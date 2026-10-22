@@ -332,7 +332,7 @@ public sealed partial class MethodBuilder
                 case "object.load":
                 case "object.store":
                     if (instruction.Op == "object.store") Pop(instruction.Type!);
-                    if (stack.Count == 0) throw new InvalidDataException("object operation requires a managed reference");
+                    if (stack.Count == 0) throw new InvalidDataException("object operation requires a managed reference or typed pointer");
                     var address = stack[^1];
                     if (address.ConstructionReceiver) throw new InvalidDataException("whole construction receiver access unsupported");
                     if (address.AddressedLocal is { } addressed)
@@ -342,6 +342,11 @@ public sealed partial class MethodBuilder
                         if (instruction.Op == "object.load" && !assigned[addressed])
                             throw new InvalidDataException("indirect local loaded before store on some path");
                         if (instruction.Op == "object.store") assigned[addressed] = true;
+                    }
+                    else if (address.PointerElement is { } pointee)
+                    {
+                        if (pointee != instruction.Type)
+                            throw new InvalidDataException("object operation pointer type mismatch");
                     }
                     else
                     {

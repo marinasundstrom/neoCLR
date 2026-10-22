@@ -190,3 +190,18 @@ all address bits and do not dereference memory. Raven can check a native allocat
 against `default(*int)` before use. A non-null pointer does not prove ownership,
 allocation lifetime or accessible bounds; ordered pointer comparisons remain outside
 this profile. Managed memory pinning remains unimplemented.
+
+### Development AOT native memory access
+
+The same trusted scalar profile supports direct Byte/Int32 pointer reads and writes.
+Raven can dereference an imported allocation, update it and release it through the
+native owner. Null and misaligned Int32 access returns a runtime fault. Bounds,
+initialization and lifetime are the caller's responsibility; other invalid addresses
+can crash the process. This does not expose managed storage or provide pinning,
+native-backed Slice borrowing or managed-library AOT integration.
+
+Future work is ordered around qualifying NativeImport across interpreter, JIT and
+AOT first, followed by stable exported names and a callable ABI for AOT libraries.
+Those exports should be usable by native consumers and importable back into neoCLR.
+Metadata sidecars mapped to the native binaries are a later step; current internal
+AOT symbols are not a published export contract.

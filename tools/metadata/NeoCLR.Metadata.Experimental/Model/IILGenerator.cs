@@ -559,16 +559,18 @@ public interface IILGenerator
     /// <exception cref="ArgumentException">Wrong opcode or owner.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
     void Emit(OpCode opCode, LocalDefinition local);
-    /// <summary>Consumes an initialized owned local address or managed-reference parameter and loads its value.</summary>
-    /// <param name="type">Exact non-Void local type, including scoped generic parameters.</param>
+    /// <summary>Consumes an initialized owned local address, managed reference or exact typed pointer and loads its value.</summary>
+    /// <param name="type">Exact non-Void target type, including scoped generic parameters.</param>
     /// <exception cref="ArgumentNullException">Type is null.</exception>
     /// <exception cref="ArgumentException">Invalid type, ownership or generic scope.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded; address, type and definite-assignment checks run on write.</exception>
+    /// <remarks>Pointer bounds, initialization and lifetime are not established by metadata validation.</remarks>
     void LoadObject(SignatureType type);
-    /// <summary>Consumes an owned local address or managed-reference parameter followed by its value; local stores establish definite assignment.</summary>
-    /// <param name="type">Exact non-Void local type, including scoped generic parameters.</param>
+    /// <summary>Consumes an owned local address, managed reference or exact typed pointer followed by its value; local stores establish definite assignment.</summary>
+    /// <param name="type">Exact non-Void target type, including scoped generic parameters.</param>
     /// <exception cref="ArgumentNullException">Type is null.</exception>
     /// <exception cref="ArgumentException">Invalid type, ownership or generic scope.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded; address and type checks run on write.</exception>
+    /// <remarks>Pointer bounds, mutability and lifetime are not established by metadata validation.</remarks>
     void StoreObject(SignatureType type);
 }

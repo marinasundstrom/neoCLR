@@ -370,3 +370,20 @@ integration tests, all 11 TaskQueue tests, five native-allocation service tests 
 one no-result worker-notification test pass: 43 distinct tests. The initial minimal
 queue fixture lacked the real TaskQueue method contract; it was replaced with a
 consumer of the actual library. No website build was needed for this internal fix.
+
+## Export sequencing — 2026-10-22
+
+The author directs completing foreign function NativeImport across interpreter,
+JIT and AOT before prioritizing name mangling for native AOT libraries. The intended
+consumers are other native libraries and neoCLR itself importing compiled AOT
+binaries through NativeImport. Metadata sidecars mapped to those binaries come later.
+This preserves the earlier code/metadata separation while making the order explicit.
+
+The assistant proposes treating symbol identity and the callable ABI together:
+name stability alone cannot expose the current private status/result convention
+as an ordinary foreign signature. No mangling format, default export visibility,
+compatibility version or sidecar schema is selected by this exchange. The later
+review should compare .NET-style explicitly named C exports with encoded identities
+for overloads and generic specializations, including collision handling, reproducible
+builds, runtime entry/ownership and library versioning. This is planned design work;
+existing experimental AOT symbols do not become public exports through this note.

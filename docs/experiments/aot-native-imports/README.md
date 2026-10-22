@@ -302,3 +302,37 @@ Validation: 13 native-import tests (including the explicitly enabled Raven consu
 24 scalar regressions and 24 website checks pass. Expanded rejection controls also
 pass in a focused rerun. The same local Raven 5966b5f84 compiler overlay is used;
 this does not qualify a released SDK or add managed AOT integration.
+
+## Direct native scalar memory access (2026-10-22)
+
+The opt-in macOS ARM64 scalar profile admits Byte/Int32 ldobj/stobj and the
+corresponding ldind.u1/ldind.i4/stind.i1/stind.i4 operations on unmanaged pointers.
+Byte loads zero-extend to the evaluation stack's Int32 representation; stores use
+the storage width. Managed local addresses remain confined to default initialization,
+and unsupported pointees, managed references and unaligned prefixes remain rejected.
+
+Null addresses and misaligned Int32 accesses return RuntimeError (status 3) before
+touching memory, preserving the host output on failure. These checks do not establish
+bounds, initialization, mutability or lifetime. Other invalid addresses can crash the
+process. This is trusted native execution, like unsafe pointer access at a .NET native
+boundary, not the interpreter's tracked-allocation safety model. Explicit alignment faults
+retain neoCLR's checked memory-access convention; .NET unsafe access can instead
+follow target-specific unaligned behavior. The cost is a null check and, for Int32,
+an alignment check per access; this slice makes no throughput claim. No managed storage
+pinning, native Slice borrowing or ownership inference is introduced.
+
+The Raven consumer reads and updates a C allocation directly, then checks the write
+through C before releasing it. Rust framework/C fixtures also cover unsigned byte
+loads, signed Int32 storage and null/misaligned reads and writes. This uses the
+existing metadata memory operations, not a new public API or bytecode encoding.
+
+Validation: all 14 native-import tests pass across the 13-test runtime run and the
+explicit Raven consumer rerun with the repaired compiler/SDK overlay. All 24 scalar
+regressions, 22 Raven portable/.NET pointer tests, the SDK pointer/local/byref/out
+contract group and 24 website tests pass. The four new compiler cases and SDK pointer
+access test reproduced their respective rejection before the fixes. The initial
+compiler overlay used the wrong host framework; rebuilding it for the bundle's
+net10.0 host corrected that setup error. This is a local paired overlay, not an
+installed-SDK or release qualification.
+
+Compiler pairing: Raven `3fc2b6d0e` with the metadata validator in this slice.

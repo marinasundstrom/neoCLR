@@ -4,6 +4,16 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args is ["--pointer-memory-access"])
+{
+    PointerSignatureChecks.Run();
+    LocalObjectChecks.Run();
+    ByReferenceChecks.Run();
+    OutParameterChecks.Run();
+    Console.WriteLine("PASS pointer access and local/byref/out memory contracts");
+    return 0;
+}
+
 if (args is ["--pointer-signatures"]) { PointerSignatureChecks.Run(); return 0; }
 
 if (args is ["--generic-definition-tokens"]) { GenericDefinitionTokenChecks.Run(); return 0; }

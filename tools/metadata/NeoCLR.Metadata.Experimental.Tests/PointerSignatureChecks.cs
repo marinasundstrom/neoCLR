@@ -10,6 +10,7 @@ internal static class PointerSignatureChecks
     {
         GenericRoundTrips();
         PointerCasts();
+        PointerAccess();
         var graph = new AssemblyBuilder(new("PointerSignatures", new(1, 0, 0, 0)), new("System.Runtime", new(10, 0, 0, 0)));
         var owner = graph.AddType("Example", "Pointers");
         var pointer = SignatureType.PointerTo(PrimitiveType.Void);
@@ -78,6 +79,31 @@ internal static class PointerSignatureChecks
         mismatch.GetILGenerator().LoadArgument(0); mismatch.GetILGenerator().Return();
         try { bad.Write(); throw new Exception("different pointer targets accepted"); }
         catch (InvalidDataException) { }
+    }
+
+    private static void PointerAccess()
+    {
+        var graph = new AssemblyBuilder(new("PointerAccess", new(1, 0, 0, 0)), new("System.Runtime", new(10, 0, 0, 0)));
+        foreach (var element in new[] { PrimitiveType.Byte, PrimitiveType.Int32 })
+        {
+            var pointer = SignatureType.PointerTo(element);
+            var method = graph.AddFunction("Access" + element, new(element, [pointer, element]));
+            method.LoadArgument(0); method.LoadArgument(1); method.StoreObject(element);
+            method.LoadArgument(0); method.LoadObject(element); method.Return();
+        }
+        _ = graph.Write();
+        _ = AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteLibraryBinary(graph));
+        foreach (var store in new[] { false, true })
+        {
+            var invalid = new AssemblyBuilder(new("MismatchedPointerAccess", new(1, 0, 0, 0)), graph.CoreLibrary);
+            var bad = invalid.AddFunction("Bad", new(PrimitiveType.Int32, [SignatureType.PointerTo(PrimitiveType.Byte)]));
+            bad.LoadArgument(0);
+            if (store) { bad.LoadConstant(42); bad.StoreObject(PrimitiveType.Int32); bad.LoadConstant(0); }
+            else bad.LoadObject(PrimitiveType.Int32);
+            bad.Return();
+            try { invalid.Write(); throw new Exception("mismatched pointer access accepted"); }
+            catch (InvalidDataException) { }
+        }
     }
 
     private static void PointerCasts()

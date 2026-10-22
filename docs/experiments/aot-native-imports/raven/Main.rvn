@@ -17,7 +17,9 @@ unsafe func Main() -> int {
         ReleaseValue(pointer)
         return -3
     }
-    let result = Read(pointer)
+    let initial = *pointer
+    *pointer = initial + 1
+    let result = Read(pointer) - 1
     Release(default(*int))
     ReleaseValue(pointer)
     return result + LiveCount() + CheckSize(ForwardSize(LargeSize())) + CheckOffset(ForwardOffset(SignedOffset()))

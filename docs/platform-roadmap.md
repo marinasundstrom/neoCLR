@@ -1,5 +1,13 @@
 # neoCLR platform roadmap
 
+**Native export sequencing (author direction, 2026-10-22):** First qualify foreign
+function NativeImport across interpreter, JIT and AOT. Then define stable AOT export
+names/name mangling and the accompanying native ABI so external native libraries
+can call compiled libraries and neoCLR can import those binaries through NativeImport.
+Metadata sidecars mapped to native binaries follow later. This refines the existing
+interop sequence; it does not select a mangling scheme or make current internal AOT
+symbols a supported ABI. [Design and open decisions](design/native-import-export-contract.md#export-sequencing--2026-10-22).
+
 **Raven native callbacks (2026-10-22):** Author-directed continuation prioritizes
 Raven-authored interop consumers over new bootstrap neoIL. NativeImport now accepts
 scalar and unit-returning Raven Function parameters and results in the interpreter. Unit remains
@@ -53,7 +61,9 @@ address width with exact local initialization and non-escaping local addresses.
 IntPtr/UIntPtr now preserve 64-bit ABI transport and unchecked conversions for C sizes
 and offsets. Pointer identity/null and native-integer equality/zero checks now use
 full-width comparisons, allowing allocation failure checks in Raven before use;
-native-width arithmetic and other numeric ABI families remain open.
+native-width arithmetic and other numeric ABI families remain open. Direct Byte/Int32
+pointer reads/writes now cover native-owned storage, with null/alignment faults and
+explicit trusted-address responsibility; managed Slice borrowing and pinning remain open.
 Its C-owned allocation, pointer transport and no-result release
 execute successfully; dependency libraries remain verification-only for this scalar
 profile. The opt-in Rust framework test documents its external compiler requirement.

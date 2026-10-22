@@ -26,6 +26,18 @@ available original wording; other text is a summary.
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
 
+## 2026-10-22 — Qualify imports before stable AOT exports
+
+The author directs completing foreign function native imports across interpreter,
+JIT and AOT, then focusing on name mangling so native libraries can reference AOT
+libraries and neoCLR can import AOT binaries back through NativeImport. Metadata
+sidecars mapped to native binaries should follow later. The assistant agrees to
+record this order and proposes defining exported names together with their calling
+contract. No symbol scheme or sidecar format is selected. The roadmap and
+[interop design](design/native-import-export-contract.md#export-sequencing--2026-10-22)
+now reflect this direction. The current pointer-access slice continues; export
+implementation and three-engine import qualification remain unfinished.
+
 ## 2026-10-22 — Explain runtime contracts through assembler text
 
 The author requests a feature page demonstrating basic IL syntax and the encoding

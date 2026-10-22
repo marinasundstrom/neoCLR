@@ -701,6 +701,10 @@ int main(void) {
 fn native_integer_transport_rejects_unimplemented_operations() {
     for body in [
         "ptr.null Int32\nconv.u\npop\nldc.i4 0",
+        "ptr.null Int32\nldobj Byte",
+        "ptr.null Byte\nldind.i4",
+        "ldc.i4 0\nstloc scratch\nldloca scratch\nldobj Int32",
+        "ptr.null Int32\nunaligned. 1\nldind.i4",
         "ptr.null Int32\nptr.null Int32\nclt\npop\nldc.i4 0",
         "ptr.null Int32\nldc.i4 0\nceq\npop\nldc.i4 0",
         "ptr.null Int32\nptr.null Byte\nceq\npop\nldc.i4 0",
@@ -709,7 +713,7 @@ fn native_integer_transport_rejects_unimplemented_operations() {
         "ldc.i4 1\nconv.u\ncall Signed(IntPtr)",
     ] {
         let source = format!(
-            ".module IntegerGaps\n.function Signed(IntPtr value) -> Int32\nldc.i4 0\nret\n.end\n.function Calculate(Int32 value) -> Int32\n{body}\nret\n.end\n"
+            ".module IntegerGaps\n.function Signed(IntPtr value) -> Int32\nldc.i4 0\nret\n.end\n.function Calculate(Int32 value) -> Int32\n.local Int32 scratch\n{body}\nret\n.end\n"
         );
         let dir = Temp::new();
         assert!(
@@ -813,4 +817,114 @@ int main(void) {
         &app,
     );
     assert!(Command::new(&app).status().unwrap().success());
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_memory_access_preserves_width_and_fault_outputs() {
+    let dir = Temp::new();
+    let fixture = dir.0.join("storage.c");
+    let library = dir.0.join("storage.dylib");
+    fs::write(
+        &fixture,
+        r#"
+#include <stdint.h>
+static int32_t number;
+static uint8_t octet;
+void *int_cell(int32_t mode) {
+    number = 0; octet = 0;
+    if (mode == 1 || mode == 3) return 0;
+    if (mode == 2 || mode == 4) return (void *)((uintptr_t)&number + 1);
+    return &number;
+}
+void *byte_cell(void) { return &octet; }
+int32_t check(void) { return number == -42 && octet == 255 ? 0 : 1000; }
+"#,
+    )
+    .unwrap();
+    cc(&[&fixture], &["-dynamiclib", "-fPIC"], &library);
+    for (int_load, int_store, byte_load, byte_store) in [
+        ("ldobj Int32", "stobj Int32", "ldobj Byte", "stobj Byte"),
+        ("ldind.i4", "stind.i4", "ldind.u1", "stind.i1"),
+    ] {
+        let _ = fs::remove_file(dir.0.join("app.o"));
+        let text = format!(
+            r#".module NativeAccess
+.function IntCell(Int32 mode) -> Ptr<Int32>
+.foreign {library:?} "int_cell" cdecl
+.end
+.function ByteCell() -> Ptr<Byte>
+.foreign {library:?} "byte_cell" cdecl
+.end
+.function Check() -> Int32
+.foreign {library:?} "check" cdecl
+.end
+.function Calculate(Int32 mode) -> Int32
+.local Ptr<Int32> cell
+.local Ptr<Byte> octet
+ldarg mode
+call IntCell(Int32)
+stloc cell
+ldarg mode
+ldc.i4 3
+bge read_only
+ldloc cell
+ldc.i4 -42
+{int_store}
+call ByteCell()
+stloc octet
+ldloc octet
+ldc.i4 255
+{byte_store}
+ldloc cell
+{int_load}
+ldloc octet
+{byte_load}
+add
+ldc.i4 213
+sub
+call Check()
+add
+ret
+read_only:
+ldloc cell
+{int_load}
+ret
+.end
+"#,
+            library = library.to_str().unwrap()
+        );
+        let result = compile(&dir, &text, &["--native-imports"]);
+        assert!(
+            result.status.success(),
+            "{}",
+            String::from_utf8_lossy(&result.stderr)
+        );
+        let host = dir.0.join("host.c");
+        fs::write(
+            &host,
+            r#"
+#include <stdint.h>
+extern int32_t neoclr_entry_v2(int32_t, int32_t *);
+int main(void) {
+    int32_t result = 12345;
+    if (neoclr_entry_v2(0, &result) || result != 0) return 1;
+    for (int mode = 1; mode <= 4; ++mode) {
+        result = 12345;
+        if (neoclr_entry_v2(mode, &result) != 3 || result != 12345) return 2;
+    }
+    return 0;
+}
+"#,
+        )
+        .unwrap();
+        let resolver = Path::new(env!("CARGO_MANIFEST_DIR")).join("../native/interop/imports.c");
+        let app = dir.0.join("app");
+        cc(
+            &[&host, &dir.0.join("app.o"), &resolver],
+            &["-pthread"],
+            &app,
+        );
+        assert!(Command::new(&app).status().unwrap().success());
+    }
 }

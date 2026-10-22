@@ -465,6 +465,61 @@ fn compile_scalar_with_imports<M: Module>(
                         };
                         stack.push(converted);
                     }
+                    Op::LoadObject(_)
+                    | Op::LoadIndirectInt32
+                    | Op::LoadIndirectUInt8
+                    | Op::StoreObject(_)
+                    | Op::StoreIndirectInt32
+                    | Op::StoreIndirectInt8 => {
+                        let store = matches!(
+                            op,
+                            Op::StoreObject(_) | Op::StoreIndirectInt32 | Op::StoreIndirectInt8
+                        );
+                        let value = if store {
+                            Some(stack.pop().expect("validated value"))
+                        } else {
+                            None
+                        };
+                        let pointer = stack.pop().expect("validated pointer");
+                        let byte = matches!(
+                            op,
+                            Op::LoadObject(Type::Byte)
+                                | Op::StoreObject(Type::Byte)
+                                | Op::LoadIndirectUInt8
+                                | Op::StoreIndirectInt8
+                        );
+                        // Preserve deterministic faults for null/misaligned accesses. Other
+                        // address validity remains the trusted native caller's responsibility.
+                        let null = builder.ins().icmp_imm(IntCC::Equal, pointer, 0);
+                        let status = builder.ins().iconst(types::I32, 3);
+                        return_if(&mut builder, null, status);
+                        if !byte {
+                            let low = builder.ins().band_imm(pointer, 3);
+                            let misaligned = builder.ins().icmp_imm(IntCC::NotEqual, low, 0);
+                            return_if(&mut builder, misaligned, status);
+                        }
+                        if let Some(value) = value {
+                            let value = if byte {
+                                builder.ins().ireduce(types::I8, value)
+                            } else {
+                                value
+                            };
+                            builder.ins().store(MemFlags::new(), value, pointer, 0);
+                        } else {
+                            let value = builder.ins().load(
+                                if byte { types::I8 } else { types::I32 },
+                                MemFlags::new(),
+                                pointer,
+                                0,
+                            );
+                            let value = if byte {
+                                builder.ins().uextend(types::I32, value)
+                            } else {
+                                value
+                            };
+                            stack.push(value);
+                        }
+                    }
                     Op::NullPointer(_) => stack.push(builder.ins().iconst(types::I64, 0)),
                     // A typed-pointer cast changes metadata only, never address bits.
                     Op::PointerCast(_) => (),

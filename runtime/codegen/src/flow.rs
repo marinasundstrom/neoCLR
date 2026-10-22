@@ -89,6 +89,20 @@ pub(super) fn analyze(
             }
             Op::NullPointer(t) if native_imports && crate::scalar_abi::pointer_target(t) => (0, 1),
             Op::PointerCast(t) if native_imports && crate::scalar_abi::pointer_target(t) => (1, 1),
+            Op::LoadObject(Type::Int32 | Type::Byte)
+            | Op::LoadIndirectInt32
+            | Op::LoadIndirectUInt8
+                if native_imports =>
+            {
+                (1, 1)
+            }
+            Op::StoreObject(Type::Int32 | Type::Byte)
+            | Op::StoreIndirectInt32
+            | Op::StoreIndirectInt8
+                if native_imports =>
+            {
+                (2, 0)
+            }
             Op::Arg(index) if *index < function.parameters.len() => (0, 1),
             Op::Load(index) if *index < function.locals.len() => (0, 1),
             Op::Store(index) if *index < function.locals.len() => (1, 0),
@@ -154,6 +168,12 @@ pub(super) fn analyze(
         let valid_operands = match op {
             Op::Dup | Op::Pop => true,
             Op::PointerCast(_) => popped == [Kind::Pointer],
+            Op::LoadObject(_) | Op::LoadIndirectInt32 | Op::LoadIndirectUInt8 => {
+                popped == [Kind::Pointer]
+            }
+            Op::StoreObject(_) | Op::StoreIndirectInt32 | Op::StoreIndirectInt8 => {
+                popped == [Kind::Pointer, Kind::Int32]
+            }
             Op::ConvertInt64
             | Op::ConvertUInt64
             | Op::ConvertNativeInt
