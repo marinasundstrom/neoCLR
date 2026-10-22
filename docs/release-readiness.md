@@ -242,3 +242,23 @@ archive membership and 139 locked package/256 notice-file checks. The validator 
 identifies the working-tree gate repair used with that committed archive. This is
 explicitly smoke-only (`full_tests: false`); the separate full-suite run and
 packaged/editor/Windows gates remain open. No runtime performance change is claimed.
+
+### Extracted development JIT bundle — 2026-10-22
+
+A refreshed macOS ARM64 bundle combines the current optimized interpreter and JIT
+compiler with the matching Raven libraries (including PriorityArrayQueue) and a
+rebuilt async host. The archive is extracted under /tmp; packaged tools compile
+and run there without source-checkout paths in the execution commands.
+
+[Qualification evidence](validation/release-stabilization-20261022/extracted-jit.json)
+records 2,293 verified manifest files, all packaged sample checks, the four HTTP
+JSON server requests and the Raven client/server exchange. The generated default
+“Build and Run (JIT)” collections task command also passes with exact guest output.
+The compressed development archive is 57,082,591 bytes; this is an artifact size,
+not a published SDK size or an AOT comparison.
+
+This closes the local extracted JIT/HTTP gate. It does not qualify installed VS Code
+UI/language-server behavior, the refreshed native build kit, Windows execution or
+the full extracted-source suite. Publication remains separate. Preparation first
+received incompatible recipe formats; the successful build uses the supported
+collector-walk-showcase async-host recipe and recompiles its native inputs.

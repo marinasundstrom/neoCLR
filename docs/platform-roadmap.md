@@ -1,5 +1,11 @@
 # neoCLR platform roadmap
 
+**Extracted JIT gate passed (2026-10-22):** The refreshed macOS ARM64 bundle passes
+manifest verification, packaged samples, HTTP server/client exchange and its default
+JIT task command outside the checkout. Installed editor, native build-kit refresh,
+Windows and full-source qualification remain open.
+[Evidence](release-readiness.md#extracted-development-jit-bundle--2026-10-22).
+
 **Fresh source smoke gate (2026-10-22):** Align the native validator with Raven-owned
 core definitions and the empty System seed. All 25 archive smoke programs and native
 import/hosting examples pass; full-suite and package/platform gates remain separate.

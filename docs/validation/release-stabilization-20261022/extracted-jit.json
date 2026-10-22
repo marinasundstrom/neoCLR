@@ -1,0 +1,306 @@
+{
+  "passed": true,
+  "platform": "macOS ARM64",
+  "scope": "Extracted development JIT bundle, HTTP and generated default task command; not installed editor, Windows, AOT kit or full release approval.",
+  "archive": {
+    "archiveSha256": "ee648b0403d74f2d3d04327b6d1793efba3dcc3ba786095c45bff11d48856241",
+    "bytes": 57082591,
+    "extraction": "/private/tmp/neoclr-extracted-jit-20261022",
+    "scope": "local development JIT package; not a published release"
+  },
+  "manifestSha256": "d1449571bc51af327a14b9a7d0b90e229d6e0bffd03d60d9e9cf676fbe127c91",
+  "preparationSha256": "608fbee50c45e33b615329aa74529727d4996c2635fa871b100d802bdd514fa5",
+  "inputs": {
+    "target/release/neoclr": "6e6bc861e2c4cdfacb605937a670831f068581a8a01273797f19eabc9929d6ea",
+    "target/release/neoclr-codegen": "03e7f50bf4c06c68fbf73b86fc5b39d395271fa81e9365c64879174b81f86cd2",
+    "target/release-jit-20261022-v3/host.dylib": "72658d72bed4532c5ec465628ed9696ee8b41f1d0e85541beb096b4c35ccfa3e",
+    "target/priority-array-queue-libraries-20261022/build-evidence.json": "10bcd1682d2595ab18530c6f183211bd8e70f513d3afd5f9d2c285bdd860747b"
+  },
+  "verification": {
+    "passed": true,
+    "root": "/private/tmp/neoclr-extracted-jit-20261022/neoclr",
+    "commands": [
+      {
+        "command": [
+          "dotnet",
+          "/private/tmp/neoclr-extracted-jit-20261022/neoclr/sdk/tools/rvnc/rvnc.dll",
+          "neoclr",
+          "--project",
+          "/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/collections/App.rvnproj"
+        ],
+        "exitCode": 0,
+        "stdout": "Native build output: /private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/collections/bin/neoclr/App.dll\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/private/tmp/neoclr-extracted-jit-20261022/neoclr/bin/neoclr",
+          "run",
+          "/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/collections/bin/neoclr/App.dll"
+        ],
+        "exitCode": 0,
+        "stdout": "Duplicate order rejected\n3\n3\nUnknown order\nOrder already shipped\nMultiple\n2\nFiltered orders share identity\n2\n303\n303\n0\nEmpty\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/private/tmp/neoclr-extracted-jit-20261022/neoclr/sdk/tools/rvnc/rvnc.dll",
+          "neoclr",
+          "--project",
+          "/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/tasks/App.rvnproj"
+        ],
+        "exitCode": 0,
+        "stdout": "Native build output: /private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/tasks/bin/neoclr/App.dll\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/private/tmp/neoclr-extracted-jit-20261022/neoclr/bin/neoclr",
+          "run",
+          "/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/tasks/bin/neoclr/App.dll"
+        ],
+        "exitCode": 0,
+        "stdout": "Suspended\n42\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/private/tmp/neoclr-extracted-jit-20261022/neoclr/sdk/tools/rvnc/rvnc.dll",
+          "neoclr",
+          "--project",
+          "/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/json/App.rvnproj"
+        ],
+        "exitCode": 0,
+        "stdout": "Native build output: /private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/json/bin/neoclr/App.dll\n",
+        "stderr": "/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/json/Main.rvn(65,33): warning RAV0168: 'error' shadows a previous declaration.\n/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/json/Main.rvn(80,39): warning RAV0168: 'error' shadows a previous declaration.\n/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/json/Mapping.rvn(50,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\n/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/json/Mapping.rvn(52,66): info RAV1506: Result propagation converts errors from 'ReflectionError' to 'MappingError' via implicit conversion 'static func implicit(error: ReflectionError) -> MappingError'.\n/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/json/Mapping.rvn(55,61): info RAV1506: Result propagation converts errors from 'ReflectionError' to 'MappingError' via implicit conversion 'static func implicit(error: ReflectionError) -> MappingError'.\n/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/json/Mapping.rvn(67,42): info RAV1506: Result propagation converts errors from 'ReflectionError' to 'MappingError' via implicit conversion 'static func implicit(error: ReflectionError) -> MappingError'.\n/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/json/Mapping.rvn(70,57): info RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\n"
+      },
+      {
+        "command": [
+          "/private/tmp/neoclr-extracted-jit-20261022/neoclr/bin/neoclr",
+          "disassemble",
+          "/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/json/bin/neoclr/App.dll",
+          "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoclr-sample-reflection-853mmbyt/module.neoil"
+        ],
+        "exitCode": 0,
+        "stdout": "Disassembled /private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/json/bin/neoclr/App.dll -> /var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoclr-sample-reflection-853mmbyt/module.neoil\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/private/tmp/neoclr-extracted-jit-20261022/neoclr/bin/neoclr",
+          "run",
+          "/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/json/bin/neoclr/App.dll",
+          "--reflection-roots",
+          "/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/json/bin/neoclr/App.reflection.json"
+        ],
+        "exitCode": 0,
+        "stdout": "JSON object mapping checks passed\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/private/tmp/neoclr-extracted-jit-20261022/neoclr/sdk/tools/rvnc/rvnc.dll",
+          "neoclr",
+          "--project",
+          "/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/http-json-server/App.rvnproj"
+        ],
+        "exitCode": 0,
+        "stdout": "Native build output: /private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/http-json-server/bin/neoclr/App.dll\n",
+        "stderr": "/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/http-json-server/HttpApplication.rvn(56,32): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/http-json-server/HttpApplication.rvn(57,45): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/http-json-server/HttpApplication.rvn(77,68): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/http-json-server/HttpApplication.rvn(79,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/http-json-server/HttpServer.rvn(18,40): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/http-json-server/HttpServer.rvn(19,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/http-json-server/HttpServer.rvn(82,9): warning RAV0162: Unreachable code\n/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/http-json-server/HttpServer.rvn(87,9): warning RAV0162: Unreachable code\n"
+      },
+      {
+        "command": [
+          "/private/tmp/neoclr-extracted-jit-20261022/neoclr/bin/neoclr",
+          "disassemble",
+          "/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/http-json-server/bin/neoclr/App.dll",
+          "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoclr-sample-reflection-l3ae_kql/module.neoil"
+        ],
+        "exitCode": 0,
+        "stdout": "Disassembled /private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/http-json-server/bin/neoclr/App.dll -> /var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoclr-sample-reflection-l3ae_kql/module.neoil\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/private/tmp/neoclr-extracted-jit-20261022/neoclr/sdk/tools/rvnc/rvnc.dll",
+          "neoclr",
+          "--project",
+          "/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/http-json-client/App.rvnproj"
+        ],
+        "exitCode": 0,
+        "stdout": "Native build output: /private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/http-json-client/bin/neoclr/App.dll\n",
+        "stderr": "/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/http-json-client/HttpApplication.rvn(56,32): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/http-json-client/HttpApplication.rvn(57,45): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/http-json-client/HttpApplication.rvn(77,68): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/http-json-client/HttpApplication.rvn(79,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/http-json-client/HttpClient.rvn(22,9): warning RAV0162: Unreachable code\n"
+      },
+      {
+        "command": [
+          "/private/tmp/neoclr-extracted-jit-20261022/neoclr/bin/neoclr",
+          "disassemble",
+          "/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/http-json-client/bin/neoclr/App.dll",
+          "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoclr-sample-reflection-rt5myhrz/module.neoil"
+        ],
+        "exitCode": 0,
+        "stdout": "Disassembled /private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/http-json-client/bin/neoclr/App.dll -> /var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoclr-sample-reflection-rt5myhrz/module.neoil\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+          "/private/tmp/neoclr-extracted-jit-20261022/neoclr/tools/verify-native-http-json.py",
+          "--runtime",
+          "/private/tmp/neoclr-extracted-jit-20261022/neoclr/bin/neoclr",
+          "--server",
+          "/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/http-json-server/bin/neoclr/App.dll",
+          "--client",
+          "/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/http-json-client/bin/neoclr/App.dll",
+          "--seed",
+          "/private/tmp/neoclr-extracted-jit-20261022/neoclr/lib/System.runtime.neox",
+          "--module",
+          "/private/tmp/neoclr-extracted-jit-20261022/neoclr/lib/System.Runtime.dll",
+          "--module",
+          "/private/tmp/neoclr-extracted-jit-20261022/neoclr/lib/System.Data.dll",
+          "--module",
+          "/private/tmp/neoclr-extracted-jit-20261022/neoclr/lib/System.Networking.dll",
+          "--module",
+          "/private/tmp/neoclr-extracted-jit-20261022/neoclr/lib/System.Web.dll",
+          "--module",
+          "/private/tmp/neoclr-extracted-jit-20261022/neoclr/lib/System.Data.PostgreSql.dll",
+          "--object-root",
+          "/private/tmp/neoclr-extracted-jit-20261022/neoclr/lib/System.Runtime.dll",
+          "--execution",
+          "default",
+          "--server-reflection-roots",
+          "/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/http-json-server/bin/neoclr/App.reflection.json",
+          "--client-reflection-roots",
+          "/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/http-json-client/bin/neoclr/App.reflection.json",
+          "--output",
+          "/private/tmp/neoclr-extracted-jit-20261022/verification-http.json"
+        ],
+        "exitCode": 0,
+        "stdout": "Native HTTP/JSON server requests passed\nNative HTTP/JSON client/server pair passed\n",
+        "stderr": ""
+      }
+    ],
+    "verifiedFiles": 2293,
+    "execution": "default",
+    "http": {
+      "execution": "default",
+      "inputs": {
+        "/private/tmp/neoclr-extracted-jit-20261022/neoclr/bin/neoclr": "6e6bc861e2c4cdfacb605937a670831f068581a8a01273797f19eabc9929d6ea",
+        "/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/http-json-server/bin/neoclr/App.dll": "af112daa10aa7553cb91441e6e9cb6356601a1479447e8dea3cd7e3f2d016ec7",
+        "/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/http-json-client/bin/neoclr/App.dll": "ccc0ad42bccc7f33a2b4ff62ad6761668f58643575c5277096deac1f225d28f1",
+        "/private/tmp/neoclr-extracted-jit-20261022/neoclr/lib/System.runtime.neox": "0c72a8656e7158d6bb2f31c0b019d8747dd61a6c4127b278155e104de437769b",
+        "/private/tmp/neoclr-extracted-jit-20261022/neoclr/lib/System.Runtime.dll": "6880eff2a9e9fb4f10c2d8afc7af9d4ecacfa4c90c9372efcf83ebbcf117be3a",
+        "/private/tmp/neoclr-extracted-jit-20261022/neoclr/lib/System.Data.dll": "49ba1be3dfb0e10257119c7bc4536603590d9eaf93143f39673a1fb521b7216a",
+        "/private/tmp/neoclr-extracted-jit-20261022/neoclr/lib/System.Networking.dll": "c82ba500279cc5d69744deb1b84b24b95beff2afb1568ff3b7ebaed9ee1c9c57",
+        "/private/tmp/neoclr-extracted-jit-20261022/neoclr/lib/System.Web.dll": "acdb45d8c412b1481063fe0b72a5c8400b6052e5f60ad9c9d9a99e56ac180dbf",
+        "/private/tmp/neoclr-extracted-jit-20261022/neoclr/lib/System.Data.PostgreSql.dll": "0043d97a3ab6e08e599cbb2bc00f23e0dd4b0f261b1cf512f646b141ddb5fb44",
+        "/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/http-json-server/bin/neoclr/App.reflection.json": "a9449aa8f0f32e580bbdb699b17dd391ec235bfe2e531de11ca83a618cf974fd",
+        "/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/http-json-client/bin/neoclr/App.reflection.json": "7b5f0fa6496763b241e15867e8db86e6e850dbda005ad528cd709ae75248329b"
+      },
+      "runs": [
+        {
+          "serverCommand": [
+            "/private/tmp/neoclr-extracted-jit-20261022/neoclr/bin/neoclr",
+            "run",
+            "/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/http-json-server/bin/neoclr/App.dll",
+            "--reflection-roots",
+            "/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/http-json-server/bin/neoclr/App.reflection.json",
+            "--",
+            "4"
+          ],
+          "requests": [
+            {
+              "method": "GET",
+              "path": "/report",
+              "status": 200,
+              "body": {
+                "station": "Caf\u00e9"
+              }
+            },
+            {
+              "method": "POST",
+              "path": "/reports",
+              "status": 201,
+              "body": {
+                "accepted": true
+              }
+            },
+            {
+              "method": "POST",
+              "path": "/reports",
+              "status": 400,
+              "body": {
+                "error": "Invalid report"
+              }
+            },
+            {
+              "method": "GET",
+              "path": "/missing",
+              "status": 404,
+              "body": {
+                "error": "Not found"
+              }
+            }
+          ],
+          "port": "53229",
+          "server": {
+            "exitCode": 0,
+            "stdout": "Reports served\n",
+            "stderr": ""
+          }
+        },
+        {
+          "serverCommand": [
+            "/private/tmp/neoclr-extracted-jit-20261022/neoclr/bin/neoclr",
+            "run",
+            "/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/http-json-server/bin/neoclr/App.dll",
+            "--reflection-roots",
+            "/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/http-json-server/bin/neoclr/App.reflection.json",
+            "--",
+            "2"
+          ],
+          "requests": [],
+          "port": "53240",
+          "clientCommand": [
+            "/private/tmp/neoclr-extracted-jit-20261022/neoclr/bin/neoclr",
+            "run",
+            "/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/http-json-client/bin/neoclr/App.dll",
+            "--reflection-roots",
+            "/private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/http-json-client/bin/neoclr/App.reflection.json",
+            "--",
+            "http://127.0.0.1:53240/"
+          ],
+          "client": {
+            "exitCode": 0,
+            "stdout": "{\"accepted\":true}\n",
+            "stderr": ""
+          },
+          "server": {
+            "exitCode": 0,
+            "stdout": "Reports served\n",
+            "stderr": ""
+          }
+        }
+      ],
+      "passed": true
+    }
+  },
+  "defaultTask": {
+    "command": [
+      "python3",
+      "/tmp/neoclr-extracted-jit-20261022/neoclr/samples/collections/../../tools/run-native-sample.py",
+      "collections",
+      "--execution",
+      "jit"
+    ],
+    "exitCode": 0,
+    "stdout": "Native build output: /private/tmp/neoclr-extracted-jit-20261022/neoclr/samples/collections/bin/neoclr/App.dll\nDuplicate order rejected\n3\n3\nUnknown order\nOrder already shipped\nMultiple\n2\nFiltered orders share identity\n2\n303\n303\n0\nEmpty\n",
+    "stderr": "",
+    "tasksSha256": "11d7d7c2df1c20a3f4de86d5ec5aa22f274e3496300d35955a3c4db47957606c",
+    "scope": "Executes generated default task command from extracted sample; does not qualify VS Code UI or language-server installation.",
+    "exactGuestOutputMatchesManifest": true
+  }
+}
