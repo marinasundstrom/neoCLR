@@ -93,10 +93,15 @@
       "retained": "../../../benchmarks/release-20261022/macos-complete/aggregate.json.gz",
       "cpuJsonProcesses": 55,
       "httpResponses": 1152
+    },
+    "nativeBuildKit": {
+      "passed": true,
+      "retained": "complete-native-kit/summary.json",
+      "archiveSha256": "5e0bb2d2872612dbba7bec83ed8eae8a2de86ca768d0417ffe9d013e3d2fb7a9"
     }
   },
   "limitations": [
-    "Windows package qualification passes; Windows HTTPS 39843930421 and benchmarks 39841353425 pending",
+    "Windows package and HTTPS qualification pass; benchmarks 39841353425 pending",
     "Rebuilt library hashes differ from earlier measured development bundle; those measurements do not qualify this archive",
     "No release published"
   ]

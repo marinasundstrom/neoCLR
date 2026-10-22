@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
+- Refresh the macOS native build kit against the qualified complete SDK and verify both extracted consumer suites. Console/HTTP (including faults), scalar native import/export and C/C++ callers pass with Cargo-free builds, empty-environment execution and tamper rejection. Archive/report hashes match the qualified SDK manifest. Explicit HTTPS-server packaging remains unsupported; Windows benchmarks and final publication checks remain open.
+
 - Qualify HTTPS against the current Windows package: all 27 JIT/AOT security, recovery, credential and cleartext-isolation cases pass. Preserve raw build/validation reports and matching manifest identity. This closes the Windows HTTPS candidate gate, not throughput or final publication; matching benchmark execution remains in progress.
 
 - Measure the rebuilt complete macOS SDK with the sequential release runner: all five stages, 55 CPU/JSON processes and 1,152 HTTP responses pass correctness and unchanged-input checks. Retain compressed raw reports and matching archive hashes separately from earlier development measurements. Update website development tables with distributions and limits; all 24 website tests and 5,703 pages pass. Windows HTTPS and measurements are running; no controlled speedup or new release is claimed.

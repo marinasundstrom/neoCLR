@@ -1,0 +1,29 @@
+{
+  "passed": true,
+  "archive": {
+    "path": "target/release-complete-native-kit-20261022/neoclr-native-build-kit-osx-arm64.tar.gz",
+    "sha256": "5e0bb2d2872612dbba7bec83ed8eae8a2de86ca768d0417ffe9d013e3d2fb7a9",
+    "bytes": 70436898
+  },
+  "reports": {
+    "http": {
+      "file": "http.json.gz",
+      "rawSha256": "d2d77965d7f82b381104c1fcb8759a497151308444da897294a0eb47e790b32a",
+      "gzipSha256": "f238f9e0653f00e0241525f118b883a833e43949dff15ecaecbcc6d0a74b6c7c",
+      "bundleManifestSha256": "15c3ff3f20364b999fc31091b47046251ed0bf24258bc36208d27de204727a47",
+      "sourceRevision": "057c231ab6a800971ae2ad50d13ee65d82c122f4",
+      "sourceDirty": false,
+      "passed": true
+    },
+    "interop": {
+      "file": "interop.json.gz",
+      "rawSha256": "42015ea32816a909bd95ae312b43cc735f425098f3e7623cbf4399aacf67f3f9",
+      "gzipSha256": "68de058bd49771c1d953d252b43410a79ece508ab6bce2b2dc9d71810f5d5097",
+      "bundleManifestSha256": "15c3ff3f20364b999fc31091b47046251ed0bf24258bc36208d27de204727a47",
+      "sourceRevision": "057c231ab6a800971ae2ad50d13ee65d82c122f4",
+      "sourceDirty": false,
+      "passed": true
+    }
+  },
+  "scope": "Extracted macOS ARM64 native kit: console, plain HTTP including faults, scalar native import/export, C/C++ consumers, Cargo-free builds and tamper rejection. Explicit HTTPS server remains source-only."
+}

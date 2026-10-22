@@ -1,5 +1,11 @@
 # neoCLR platform roadmap
 
+**Complete-SDK native kit qualified (2026-10-22):** Refreshed macOS build kit
+passes extracted console/HTTP and scalar native import/export C/C++ consumers,
+Cargo-free builds and tamper rejection. Its SDK manifest matches the qualified
+complete package. Explicit HTTPS-server packaging stays source-only.
+[Evidence](validation/release-stabilization-20261022/complete-native-kit/summary.json).
+
 **Windows HTTPS qualified (2026-10-22):** The current Windows package passes
 27 JIT/AOT TLS/security/recovery/credential/cleartext cases. Raw reports and
 build identities are retained; performance and final publication remain separate.

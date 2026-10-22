@@ -448,3 +448,14 @@ JIT and AOT, plus missing/invalid credentials and cleartext-host isolation.
 [Compressed build and validation reports](validation/release-stabilization-20261022/windows-https/summary.json)
 retain manifest and artifact identities. This is matching-package source-assisted
 project validation, not HTTPS throughput or final release publication.
+
+### Complete-SDK native kit passed — 2026-10-22
+
+The refreshed macOS ARM64 native build kit embeds the same SDK manifest as the
+qualified complete package. Both extracted consumer suites pass: console/plain
+HTTP including malformed requests and guest faults; scalar native import/export
+and C/C++ consumers. They also verify Cargo-free builds, empty-environment
+execution and tamper rejection for packaged inputs. [Archive and raw report hashes](validation/release-stabilization-20261022/complete-native-kit/summary.json)
+preserve exact identities. This replaces the earlier development kit for the
+current candidate; its evidence remains unchanged. Explicit HTTPS-server kit
+support is still source-only, and final publication checks remain open.
