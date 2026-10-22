@@ -494,10 +494,15 @@ Its exported pointer function is called by C11 and C++17 using the generated str
 All 20 existing integration tests pass; 17 focused native unit tests pass, including
 three layout tests with compiler-checked headers. This is backend evidence.
 
-`raven_value_pointer_signatures_emit_native_metadata` separately checks Raven source
-emission and decoded nominal pointee identity using the paired compiler/SDK overlay
-`target/native-struct-bundle-20261022`. It does not execute the source struct: the
-synthesized constructor needs correct scalar export-root selection first.
+`raven_value_pointer_exports_compile_and_execute` checks Raven source emission,
+decoded nominal pointee identity and C11/C++17 calls to the AOT export using the
+paired compiler/SDK overlay `target/native-struct-bundle-20261022` (Raven 8344fd293,
+SDK 2c266e5ef). The export calls an ordinary helper and preserves both null and
+C-owned struct addresses. Native-library code generation selects export roots and
+direct-call dependencies after full source verification; unused synthesized
+constructors stay in source metadata. A separate negative regression proves that
+invalid unused IL still fails, while valid unused nonscalar code need not be emitted.
+All 22 native-import/export integration tests pass with this overlay.
 The SDK pointer contract tests cover CLI/native encoding and importing value pointers;
 Raven portable tests cover capability admission and preserved symbol identity.
 See the [contract and remaining gaps](../../design/native-import-export-contract.md#native-struct-layout-and-pointer-metadata--2026-10-22).

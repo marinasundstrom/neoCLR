@@ -258,9 +258,32 @@ managed console/HTTP profiles retain their existing scope.
 
 The macOS ARM64 backend now tests native struct pointers across interpreter, scalar
 JIT and AOT, with generated C/C++ layout assertions. Packed, nested and explicit
-layouts have backend coverage. Raven nominal pointer signatures now emit, but
-source struct execution and source layout/marshalling attributes still have gaps.
-Structs passed by value are not yet supported. This is not part of the qualified
+layouts have backend coverage. Raven struct-pointer exports now compile and execute
+from C11 and C++17 callers, including calls through ordinary Raven helpers. Export
+compilation verifies the complete source and emits only exports and their direct-call
+dependencies, so unused struct constructors do not require scalar backend support.
+
+```raven
+import System.Runtime.InteropServices.*
+
+public struct Point {
+    field X: int
+    field Y: int
+}
+
+[NativeExport("point_identity")]
+unsafe func Identity(pointer: *Point) -> *Point {
+    return Echo(pointer)
+}
+
+unsafe func Echo(pointer: *Point) -> *Point {
+    return pointer
+}
+```
+
+The caller owns the pointed-to memory. This example preserves the pointer and
+introduces no managed object conversion. Source layout/marshalling attributes and
+structs passed by value are not yet supported. This is not part of the qualified
 extracted-kit sample above.
 
 ### Scope of the foundation

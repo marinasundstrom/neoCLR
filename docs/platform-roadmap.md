@@ -1,8 +1,9 @@
 # neoCLR platform roadmap
 
 **Struct interop follow-up (2026-10-22):** Backend struct-pointer/layout/header tests
-pass, and the Raven/SDK nominal pointer emission gap is repaired. Next fix export-root
-selection for source struct constructors, then source layout/marshalling attributes;
+pass, and Raven/SDK nominal pointer emission plus native-library export reachability
+are repaired. Raven struct-pointer exports execute from C/C++. Next address source
+layout/marshalling attributes;
 aggregate-by-value ABI and callback parity remain separate gaps.
 [Evidence and limits](experiments/aot-native-imports/README.md#struct-layout-and-nominal-pointer-foundation-2026-10-22).
 

@@ -318,7 +318,7 @@ not overwritten. [Detailed ABI and naming contract](https://github.com/marinasun
 ## Struct pointer development status
 
 The native backend accepts checked struct pointer layouts and generates C/C++
-size/alignment/offset assertions. Raven nominal pointer emission is implemented;
-source struct execution, StructLayout/FieldOffset APIs and field MarshalAs admission
-remain incomplete. By-value struct transport is not admitted. See the
+size/alignment/offset assertions. Raven struct-pointer exports now execute from C
+and C++ with export-root selection; unused constructors are verified but not emitted.
+Source StructLayout/FieldOffset APIs and field MarshalAs admission remain incomplete. By-value struct transport is not admitted. See the
 [feature status](/features/native-interop/) for the qualified sample and limits.

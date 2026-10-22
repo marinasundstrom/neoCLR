@@ -1547,7 +1547,7 @@ ret
 
 #[test]
 #[ignore = "requires matching NEOCLR_RAVEN_BUNDLE with nominal pointer emission"]
-fn raven_value_pointer_signatures_emit_native_metadata() {
+fn raven_value_pointer_exports_compile_and_execute() {
     let bundle = PathBuf::from(std::env::var_os("NEOCLR_RAVEN_BUNDLE").unwrap())
         .canonicalize()
         .unwrap();
@@ -1568,6 +1568,9 @@ public struct Point {
 }
 [NativeExport("point_identity")]
 unsafe func Identity(pointer: *Point) -> *Point {
+    return Echo(pointer)
+}
+unsafe func Echo(pointer: *Point) -> *Point {
     return pointer
 }
 func Main() -> int { return 0 }
@@ -1603,4 +1606,78 @@ func Main() -> int { return 0 }
         neoclr::metadata::Type::Ptr(Box::new(neoclr::metadata::Type::Named(point.name.clone())));
     assert_eq!(identity.parameters, vec![pointer.clone()]);
     assert_eq!(identity.returns, pointer);
+    let object = dir.0.join("exports.o");
+    let header = dir.0.join("exports.h");
+    let output = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
+        .arg("--native-library")
+        .arg(dir.0.join("bin/neoclr/NativeInteropSample.dll"))
+        .arg(&object)
+        .arg("--header")
+        .arg(&header)
+        .arg("--system")
+        .arg(bundle.join("lib/System.runtime.neox"))
+        .arg("--module")
+        .arg(bundle.join("lib/System.Runtime.dll"))
+        .arg("--object-root")
+        .arg(bundle.join("lib/System.Runtime.dll"))
+        .output()
+        .unwrap();
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let text = fs::read_to_string(&header).unwrap();
+    let name = text
+        .lines()
+        .find(|line| line.starts_with("typedef struct "))
+        .unwrap()
+        .split_whitespace()
+        .nth(2)
+        .unwrap();
+    let host = dir.0.join("caller.c");
+    fs::write(&host, format!("#include \"exports.h\"\nint main(void) {{ {name} p = {{40, 2}}; return point_identity(&p) != &p || point_identity(0) != 0; }}\n")).unwrap();
+    let executable = dir.0.join("caller");
+    cc(&[&host, &object], &["-std=c11"], &executable);
+    assert!(Command::new(&executable).status().unwrap().success());
+    let cpp = dir.0.join("caller.cpp");
+    fs::copy(&host, &cpp).unwrap();
+    cc(&[&cpp, &object], &["-std=c++17"], &executable);
+    assert!(Command::new(&executable).status().unwrap().success());
+}
+
+#[test]
+fn export_selection_preserves_source_verification_and_selected_admission() {
+    let source = ".module Selection\n.function Export(Int32 value) -> Int32\nldarg value\nret\n.end\n.function Unused(String value) -> String\nldarg value\nret\n.end\n";
+    for (source, export, succeeds) in [
+        (source.to_owned(), "Export", true),
+        (source.to_owned(), "Unused", false),
+        (
+            source.replace(
+                ".function Unused(String value) -> String\nldarg value",
+                ".function Unused(String value) -> String\nldc.i4 1",
+            ),
+            "Export",
+            false,
+        ),
+    ] {
+        let dir = Temp::new();
+        let input = dir.0.join("app.neoil");
+        let object = dir.0.join("app.o");
+        fs::write(&input, source).unwrap();
+        let output = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
+            .arg("--native-library")
+            .arg(&input)
+            .arg(&object)
+            .args(["--export", export])
+            .output()
+            .unwrap();
+        assert_eq!(
+            output.status.success(),
+            succeeds,
+            "{}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+        assert_eq!(object.exists(), succeeds);
+    }
 }

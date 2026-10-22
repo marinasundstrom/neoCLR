@@ -203,6 +203,20 @@ pub(super) fn compile_native_library(
     if !native_imports && input.functions.iter().any(|f| f.pinvoke.is_some()) {
         return Err("native library imports require --native-imports".into());
     }
+    // Verify the complete source before selecting executable bodies. An unused
+    // constructor need not fit the scalar backend, but must still be valid IL.
+    let owned_verification;
+    let verification = match verification {
+        Some(program) => program,
+        None => {
+            owned_verification =
+                neoclr::LoadedProgram::new(input).map_err(|error| error.to_string())?;
+            &owned_verification
+        }
+    };
+    verification.verify().map_err(|error| error.to_string())?;
+    let (selected, exports) = select_native_exports(input, exports)?;
+    let input = &selected;
     let mut flags = settings::builder();
     flags.set("is_pic", "true")?;
     let isa = isa::lookup(Target::MacosArm64.triple().parse().unwrap())?
@@ -220,10 +234,52 @@ pub(super) fn compile_native_library(
         &mut module,
         false,
         true,
-        verification,
-        exports,
+        Some(verification),
+        &exports,
     )?;
     finish(module)
+}
+
+// Scalar exports have direct calls only. Reuse nominal/signature resolution;
+// unsupported dispatch instructions remain errors in selected body admission.
+fn select_native_exports(
+    input: &neoclr::Module,
+    exports: &[(usize, String)],
+) -> Result<(neoclr::Module, Vec<(usize, String)>), Error> {
+    let mut retained = std::collections::BTreeSet::new();
+    let mut pending: Vec<_> = exports.iter().map(|(index, _)| *index).collect();
+    while let Some(index) = pending.pop() {
+        let function = input
+            .functions
+            .get(index)
+            .ok_or("native export index out of range")?;
+        if !retained.insert(index) {
+            continue;
+        }
+        for op in &function.body {
+            if let Op::Call(target) = op {
+                pending.push(crate::selection::resolve(input, target)?);
+            }
+        }
+    }
+    let rows: Vec<_> = retained.into_iter().collect();
+    let mut selected = input.clone();
+    selected.functions = rows
+        .iter()
+        .map(|index| input.functions[*index].clone())
+        .collect();
+    let exports = exports
+        .iter()
+        .map(|(index, name)| {
+            (
+                rows.binary_search(index).expect("retained export"),
+                name.clone(),
+            )
+        })
+        .collect();
+    // Keep nominal layouts and source identity intact; verification uses the
+    // original loaded program, not this private emission inventory.
+    Ok((selected, exports))
 }
 
 #[allow(clippy::too_many_arguments)]
