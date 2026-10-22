@@ -3,8 +3,9 @@ unsafe func ReleaseValue(pointer: *int) -> unit {
 }
 
 unsafe func Main() -> int {
-    let pointer = Allocate(42)
+    let pointer = (*int)Allocate(42)
     let result = Read(pointer)
+    Release(default(*int))
     ReleaseValue(pointer)
     return result + LiveCount()
 }

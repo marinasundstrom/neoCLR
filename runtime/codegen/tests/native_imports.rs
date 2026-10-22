@@ -440,13 +440,13 @@ fn raven_native_metadata_imports_execute_aot_with_explicit_load_context() {
 #include <stdlib.h>
 #include <stdint.h>
 static int32_t live;
-int32_t *allocate_value(int32_t value) {
+void *allocate_value(int32_t value) {
     int32_t *p = malloc(sizeof(*p));
     if (p) { *p = value; ++live; }
     return p;
 }
 int32_t read_value(int32_t *p) { return p ? *p : -100; }
-void release_value(int32_t *p) { if (p) { free(p); --live; } }
+void release_value(void *p) { if (p) { free(p); --live; } }
 int32_t live_count(void) { return live; }
 "#,
     )
@@ -534,4 +534,67 @@ int main(void) {
         &app,
     );
     assert!(Command::new(&app).status().unwrap().success());
+}
+
+#[test]
+fn pointer_casts_and_null_require_opt_in_and_preserve_type_validation() {
+    let valid = ".module PointerCasts\n.function Calculate(Int32 value) -> Int32\nptr.null Byte\nptr.cast void\nptr.cast Int32\npop\nldarg value\nret\n.end\n";
+    let dir = Temp::new();
+    let admitted = compile(&dir, valid, &["--native-imports"]);
+    assert!(
+        admitted.status.success(),
+        "{}",
+        String::from_utf8_lossy(&admitted.stderr)
+    );
+    for (text, flags) in [
+        (valid.to_owned(), vec![]),
+        (
+            valid.replace("ptr.null Byte", "ldc.i4 0"),
+            vec!["--native-imports"],
+        ),
+        (
+            valid.replace("ptr.null Byte", "ptr.null Double"),
+            vec!["--native-imports"],
+        ),
+        (
+            valid.replace("ptr.cast void", "ptr.cast Double"),
+            vec!["--native-imports"],
+        ),
+        (
+            valid.replace(
+                "ptr.null Byte\nptr.cast void\nptr.cast Int32\npop",
+                "ptr.null Byte\ncall Consume(Ptr<Int32>)",
+            ) + ".function Consume(Ptr<Int32> value) -> void\nret\n.end\n",
+            vec!["--native-imports"],
+        ),
+    ] {
+        let dir = Temp::new();
+        let result = compile(&dir, &text, &flags);
+        assert!(!result.status.success(), "unexpected admission: {text}");
+        assert!(!dir.0.join("app.o").exists());
+    }
+}
+
+#[test]
+fn scalar_local_defaults_do_not_admit_escaping_or_mismatched_addresses() {
+    let valid = ".module PointerDefaults\n.function Calculate(Int32 value) -> Int32\n.local Ptr<Int32> address\nldloca address\ninitobj Ptr<Int32>\nldloc address\npop\nldarg value\nret\n.end\n";
+    let dir = Temp::new();
+    let admitted = compile(&dir, valid, &["--native-imports"]);
+    assert!(
+        admitted.status.success(),
+        "{}",
+        String::from_utf8_lossy(&admitted.stderr)
+    );
+    for text in [
+        valid.replace("initobj Ptr<Int32>", "initobj Ptr<Byte>"),
+        valid.replace("ldloca address", "ptr.null Int32"),
+        valid.replace("ldloca address\ninitobj Ptr<Int32>\n", ""),
+        valid.replace("initobj Ptr<Int32>", "stloc address"),
+        valid.replace("ldloc address\npop", "ldloca address\nptr.cast void\npop"),
+    ] {
+        let dir = Temp::new();
+        let result = compile(&dir, &text, &["--native-imports"]);
+        assert!(!result.status.success(), "unexpected admission: {text}");
+        assert!(!dir.0.join("app.o").exists());
+    }
 }

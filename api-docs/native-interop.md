@@ -171,7 +171,12 @@ and persistent native-backed Memory ownership remain open.
 existing NativeImport descriptors for nongeneric free functions with at most 16
 parameters, using Int32 or raw pointer metadata to Void, Byte or Int32 for parameters
 and results, or no-result Void returns, without marshalling. Pointer locals and helper calls preserve native
-address width. The public Ptr<T> wrapper is not automatically projected yet.
+address width. Explicit pointer casts, implicit void-pointer erasure and null/default
+pointer values are supported within the same pointee set. Casts retain address bits
+without reading storage. Raven's local-address/default initialization is lowered only
+for exact scalar locals; managed local addresses cannot escape as native pointers.
+Unsupported layouts, mismatched types and integer-to-pointer conversion still reject.
+The public Ptr<T> wrapper is not automatically projected yet.
 Managed/value profiles, class members, other types, callbacks, JIT and SDK integration remain
 unsupported. The flag is required; the default still rejects imports.
 

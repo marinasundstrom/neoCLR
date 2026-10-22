@@ -48,7 +48,9 @@ ABI proof from pending closed-world/class-library integration, wrapper mapping a
 pinning, JIT and release packaging. It advances the AOT-first gate
 without declaring the NativeImport foundation complete. A Raven source consumer now
 compiles directly through PE/#Neo to native code using `@entry` and explicit seed/core
-verification inputs. Its C-owned allocation, pointer transport and no-result release
+verification inputs. Typed/void-pointer casts and null/default pointers now retain
+address width with exact local initialization and non-escaping local addresses.
+Its C-owned allocation, pointer transport and no-result release
 execute successfully; dependency libraries remain verification-only for this scalar
 profile. The opt-in Rust framework test documents its external compiler requirement.
 

@@ -3,12 +3,14 @@
 use cranelift_codegen::ir::types;
 use neoclr::metadata::Type;
 
+pub(crate) fn pointer_target(t: &Type) -> bool {
+    matches!(t, Type::Void | Type::Byte | Type::Int32)
+}
+
 pub(crate) fn scalar_type(t: &Type) -> Option<cranelift_codegen::ir::Type> {
     match t {
         Type::Int32 => Some(types::I32),
-        Type::Ptr(inner) if matches!(**inner, Type::Void | Type::Byte | Type::Int32) => {
-            Some(types::I64)
-        }
+        Type::Ptr(inner) if pointer_target(inner) => Some(types::I64),
         _ => None,
     }
 }

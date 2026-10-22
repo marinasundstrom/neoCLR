@@ -221,3 +221,33 @@ supports only a bounded scalar application and requires explicit native linking.
 Final focused validation: the opt-in Raven test passes, as do all seven default import
 checks, all 24 scalar regressions and all 24 website checks. The Raven test is separately
 selected rather than counted as passed in the default run where it is ignored.
+
+## Pointer conversions and defaults (2026-10-22)
+
+The scalar NativeImport profile now handles `ptr.cast` and `ptr.null` for its existing
+Void/Byte/Int32 pointee set. Casts preserve every address bit; they neither dereference
+nor allocate storage. Null materializes a pointer-width zero. Unsupported target types,
+integer-to-pointer casts and use without the native-import opt-in reject before output.
+Ordinary verification still enforces exact pointee types at calls/stores/returns.
+
+Raven `default(*int)` currently emits local-address initialization (`ldloca`/`initobj`)
+followed by a local read. The profile admits exact local initialization for its Int32
+and pointer storage slots. Lowering initializes the SSA local directly; it does not
+expose a native address for that local. Flow analysis retains the local's identity and
+rejects escaping addresses, mismatched initialization and conversion of a local address
+to an unmanaged pointer. The ordinary verifier retains definite-assignment checks.
+This is bounded local initialization, not general byref or arbitrary initobj support.
+
+The Raven consumer now receives `*unit` (native void*), explicitly converts it to
+`*int` for reading and implicitly erases the pointer type when releasing it. It also
+passes `default(*int)` to the fixture's null-safe release function. C allocation,
+reads and release still execute over 32 native calls; the native allocator owns storage.
+This follows .NET unsafe pointer-conversion and value-initialization semantics without
+adding a marshalling API, taking ownership or claiming a pointer cast establishes safety.
+The release still lacks Ptr<T> projection, general pointer arithmetic/dereferencing,
+managed-memory pinning and managed-library NativeImport AOT composition.
+
+Validation of this follow-through: all ten native-import tests pass with the explicit
+Raven opt-in enabled, all 24 scalar regressions pass, and all 24 website checks pass.
+The pre-fix Raven test rejected ptr.cast; the intermediate run exposed ldloca/initobj,
+which is now supported within the stated local-initialization boundary.

@@ -25,6 +25,7 @@ pub(super) fn comparison(op: &Op) -> Option<(usize, IntCC)> {
 pub(super) enum Kind {
     Int32,
     Pointer,
+    LocalAddress(usize),
     Boolean,
     Literal,
     Unit,
@@ -32,7 +33,11 @@ pub(super) enum Kind {
 
 pub(super) type Stacks = Vec<Option<Vec<Kind>>>;
 
-pub(super) fn analyze(function: &Function, functions: &[Function]) -> Result<Stacks, Error> {
+pub(super) fn analyze(
+    function: &Function,
+    functions: &[Function],
+    native_imports: bool,
+) -> Result<Stacks, Error> {
     let kind = |t: &Type| {
         if matches!(t, Type::Ptr(_)) {
             Kind::Pointer
@@ -53,6 +58,14 @@ pub(super) fn analyze(function: &Function, functions: &[Function]) -> Result<Sta
     for (pc, op) in function.body.iter().enumerate() {
         let effect = match op {
             Op::Int(_) | Op::Bool(_) | Op::String(_) => (0, 1),
+            Op::LocalAddress(index) if native_imports && *index < function.locals.len() => (0, 1),
+            Op::InitializeObject(t)
+                if native_imports && crate::scalar_abi::scalar_type(t).is_some() =>
+            {
+                (1, 0)
+            }
+            Op::NullPointer(t) if native_imports && crate::scalar_abi::pointer_target(t) => (0, 1),
+            Op::PointerCast(t) if native_imports && crate::scalar_abi::pointer_target(t) => (1, 1),
             Op::Arg(index) if *index < function.parameters.len() => (0, 1),
             Op::Load(index) if *index < function.locals.len() => (0, 1),
             Op::Store(index) if *index < function.locals.len() => (1, 0),
@@ -117,6 +130,10 @@ pub(super) fn analyze(function: &Function, functions: &[Function]) -> Result<Sta
         let popped = stack.split_off(depth - pops);
         let valid_operands = match op {
             Op::Dup | Op::Pop => true,
+            Op::PointerCast(_) => popped == [Kind::Pointer],
+            Op::InitializeObject(t) => {
+                matches!(popped.as_slice(), [Kind::LocalAddress(index)] if function.locals[*index] == *t)
+            }
             Op::Equal => popped[0] == popped[1] && matches!(popped[0], Kind::Int32 | Kind::Boolean),
             Op::BranchTrue(_) | Op::BranchFalse(_) => {
                 matches!(popped[0], Kind::Int32 | Kind::Boolean)
@@ -139,6 +156,8 @@ pub(super) fn analyze(function: &Function, functions: &[Function]) -> Result<Sta
         }
         match op {
             Op::String(_) => stack.push(Kind::Literal),
+            Op::NullPointer(_) | Op::PointerCast(_) => stack.push(Kind::Pointer),
+            Op::LocalAddress(index) => stack.push(Kind::LocalAddress(*index)),
             Op::Bool(_) | Op::Equal | Op::Less | Op::Greater => stack.push(Kind::Boolean),
             Op::Call(target) if console_call(target) => stack.push(Kind::Unit),
             Op::Arg(index) => stack.push(kind(&function.parameters[*index])),

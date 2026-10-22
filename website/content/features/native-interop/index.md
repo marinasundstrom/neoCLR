@@ -164,7 +164,8 @@ resolver. It is not yet available through the ordinary SDK application pipeline.
 
 A tested Raven consumer now goes directly from NativeImport declarations to native
 metadata and AOT machine code. It allocates, reads and releases C-owned memory through
-raw pointers and a `unit`-returning helper. The backend accepts an explicit seed/core
+raw pointers and a `unit`-returning helper, including typed/void-pointer casts and
+null/default pointers. The backend accepts an explicit seed/core
 load context for verification and uses `@entry` for the Raven entry point; dependency
 libraries are not compiled by this scalar profile.
 

@@ -1,13 +1,13 @@
 import System.Runtime.InteropServices.*
 
 [NativeImport("aot-raven-fixture", EntryPoint: "allocate_value")]
-unsafe extern func Allocate(value: int) -> *int;
+unsafe extern func Allocate(value: int) -> *unit;
 
 [NativeImport("aot-raven-fixture", EntryPoint: "read_value")]
 unsafe extern func Read(pointer: *int) -> int;
 
 [NativeImport("aot-raven-fixture", EntryPoint: "release_value")]
-unsafe extern func Release(pointer: *int) -> unit;
+unsafe extern func Release(pointer: *unit) -> unit;
 
 [NativeImport("aot-raven-fixture", EntryPoint: "live_count")]
 unsafe extern func LiveCount() -> int;

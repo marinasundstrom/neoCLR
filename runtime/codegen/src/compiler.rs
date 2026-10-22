@@ -392,9 +392,10 @@ fn compile_scalar_with_imports<M: Module>(
                             blocks[pc],
                             match kind {
                                 flow::Kind::Literal | flow::Kind::Pointer => types::I64,
-                                flow::Kind::Int32 | flow::Kind::Boolean | flow::Kind::Unit => {
-                                    types::I32
-                                }
+                                flow::Kind::Int32
+                                | flow::Kind::Boolean
+                                | flow::Kind::Unit
+                                | flow::Kind::LocalAddress(_) => types::I32,
                             },
                         );
                     }
@@ -421,6 +422,24 @@ fn compile_scalar_with_imports<M: Module>(
                     Op::Int(value) => {
                         stack.push(builder.ins().iconst(types::I32, i64::from(*value)))
                     }
+                    // Only exact local-address initobj is admitted. The address is
+                    // a flow marker, never a native pointer or an escaping byref.
+                    Op::LocalAddress(_) => stack.push(builder.ins().iconst(types::I32, 0)),
+                    Op::InitializeObject(ty) => {
+                        let Some(flow::Kind::LocalAddress(local)) =
+                            flows[index][pc].as_ref().unwrap().last()
+                        else {
+                            unreachable!("validated local initialization");
+                        };
+                        stack.pop().expect("validated stack");
+                        let zero = builder
+                            .ins()
+                            .iconst(crate::scalar_abi::scalar_type(ty).unwrap(), 0);
+                        builder.def_var(Variable::from_u32(*local as u32), zero);
+                    }
+                    Op::NullPointer(_) => stack.push(builder.ins().iconst(types::I64, 0)),
+                    // A typed-pointer cast changes metadata only, never address bits.
+                    Op::PointerCast(_) => (),
                     Op::Bool(value) => {
                         stack.push(builder.ins().iconst(types::I32, i64::from(*value)))
                     }
@@ -660,7 +679,7 @@ fn check_function(
     {
         return Err(format!("{}: scalar profile requires nongeneric free functions with admitted scalar types (pointers require native-import opt-in)", function.name).into());
     }
-    flow::analyze(function, functions)
+    flow::analyze(function, functions, native_imports)
 }
 
 fn block_args(stack: &[ir::Value]) -> Vec<ir::BlockArg> {
