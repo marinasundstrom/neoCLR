@@ -3,15 +3,18 @@ use crate::scalar_abi::scalar_type;
 use cranelift_codegen::ir::{AbiParam, InstBuilder, MemFlags, StackSlotData, StackSlotKind, types};
 use cranelift_frontend::{FunctionBuilder, FunctionBuilderContext};
 use cranelift_module::{DataDescription, FuncId, Linkage, Module};
-use neoclr::metadata::Function;
+use neoclr::metadata::{Function, Type};
 type Error = Box<dyn std::error::Error>;
 
 pub(crate) fn validate(f: &Function) -> Result<(), Error> {
     let import = f.pinvoke.as_ref().ok_or("missing native import")?;
     if f.owner.is_some()
         || f.instance
-        || scalar_type(&f.returns).is_none()
-        || f.no_result
+        || if f.no_result {
+            f.returns != Type::Void
+        } else {
+            scalar_type(&f.returns).is_none()
+        }
         || f.parameters.len() > 16
         || f.parameters.iter().any(|t| scalar_type(t).is_none())
         || !f.locals.is_empty()
@@ -76,9 +79,11 @@ pub(crate) fn emit<M: Module>(
         .iter()
         .map(|t| AbiParam::new(scalar_type(t).unwrap()))
         .collect();
-    native_sig
-        .returns
-        .push(AbiParam::new(scalar_type(&f.returns).unwrap()));
+    if !f.no_result {
+        native_sig
+            .returns
+            .push(AbiParam::new(scalar_type(&f.returns).unwrap()));
+    }
     let mut ctx = module.make_context();
     ctx.func.signature = module
         .declarations()
@@ -112,9 +117,11 @@ pub(crate) fn emit<M: Module>(
         let call = b
             .ins()
             .call_indirect(signature, address, &args[..f.parameters.len()]);
-        let result = b.inst_results(call)[0];
-        b.ins()
-            .store(MemFlags::new(), result, args[f.parameters.len()], 0);
+        if !f.no_result {
+            let result = b.inst_results(call)[0];
+            b.ins()
+                .store(MemFlags::new(), result, args[f.parameters.len()], 0);
+        }
         let success = b.ins().iconst(types::I32, 0);
         b.ins().return_(&[success]);
         b.seal_all_blocks();

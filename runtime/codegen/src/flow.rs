@@ -72,8 +72,15 @@ pub(super) fn analyze(function: &Function, functions: &[Function]) -> Result<Sta
             | Op::DivideUnsigned
             | Op::Remainder
             | Op::RemainderUnsigned => (2, 1),
-            Op::Call(target) => (target.parameters.len(), 1),
-            Op::Return => (1, 0),
+            Op::Call(target) if console_call(target) => (target.parameters.len(), 1),
+            Op::Call(target) => {
+                let callee = functions
+                    .iter()
+                    .find(|f| f.name == target.name && f.parameters == target.parameters)
+                    .ok_or_else(|| fail(pc, "unresolved scalar call"))?;
+                (target.parameters.len(), usize::from(!callee.no_result))
+            }
+            Op::Return => (usize::from(!function.no_result), 0),
             Op::Fault(_) => (0, 0),
             Op::Branch(_) => (0, 0),
             Op::BranchTrue(_) | Op::BranchFalse(_) => (1, 0),
@@ -98,8 +105,11 @@ pub(super) fn analyze(function: &Function, functions: &[Function]) -> Result<Sta
         let depth = stack.len();
         let (pops, _) = effects[pc];
         let op = &function.body[pc];
-        if matches!(op, Op::Return) && depth != 1 {
-            return Err(fail(pc, "invalid return: expected exactly one value"));
+        if matches!(op, Op::Return) && depth != usize::from(!function.no_result) {
+            return Err(fail(
+                pc,
+                "invalid return: stack does not match result contract",
+            ));
         }
         if depth < pops {
             return Err(fail(pc, "stack underflow"));
@@ -117,6 +127,7 @@ pub(super) fn analyze(function: &Function, functions: &[Function]) -> Result<Sta
                 .copied()
                 .eq(target.parameters.iter().map(&kind)),
             Op::Store(index) => popped == [kind(&function.locals[*index])],
+            Op::Return if function.no_result => popped.is_empty(),
             Op::Return => popped == [kind(&function.returns)],
             _ => popped.iter().all(|kind| *kind == Kind::Int32),
         };
@@ -137,7 +148,9 @@ pub(super) fn analyze(function: &Function, functions: &[Function]) -> Result<Sta
                     .iter()
                     .find(|f| f.name == target.name && f.parameters == target.parameters)
                     .ok_or_else(|| fail(pc, "unresolved scalar call"))?;
-                stack.push(kind(&callee.returns));
+                if !callee.no_result {
+                    stack.push(kind(&callee.returns));
+                }
             }
             Op::Dup => {
                 stack.extend_from_slice(&popped);

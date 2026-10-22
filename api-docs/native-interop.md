@@ -143,9 +143,9 @@ and persistent native-backed Memory ownership remain open.
 `neoclr-codegen --native-imports` enables the macOS ARM64 scalar AOT backend's
 existing NativeImport descriptors for nongeneric free functions with at most 16
 parameters, using Int32 or raw pointer metadata to Void, Byte or Int32 for parameters
-and results, without marshalling. Pointer locals and helper calls preserve native
+and results, or no-result Void returns, without marshalling. Pointer locals and helper calls preserve native
 address width. The public Ptr<T> wrapper is not automatically projected yet.
-Managed/value profiles, class members, other types, no-result calls, callbacks, JIT and SDK integration remain
+Managed/value profiles, class members, other types, callbacks, JIT and SDK integration remain
 unsupported. The flag is required; the default still rejects imports.
 
 Link `runtime/native/interop/imports.c` into the executable. Its private adapter
@@ -159,3 +159,10 @@ until process exit, with a 256-entry library/symbol cache. Failed lookups can re
 Generated thunks preserve the existing private managed status/result ABI while
 calling the native C ABI. No interpreter fallback, managed object marshalling or
 sandbox guarantee is provided. See [reproduction and limitations](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/aot-native-imports/README.md).
+
+
+Within this profile, imports and scalar helpers with the existing no-result Void
+contract produce no operand-stack value. C void calls have no return register;
+success leaves the private result slot untouched. Missing symbols still fault before
+continuation and preserve the exported caller's result. The distinct Void value
+carrier is not supported by this profile, and the host entry remains Int32-returning.

@@ -26,6 +26,20 @@ available original wording; other text is a summary.
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
 
+## 2026-10-22 — Void and no-result terminology
+
+While the assistant extends native AOT calls to C void returns, the author asks why
+neoIL uses `noresult` instead of Void. The assistant explains the existing distinction:
+Void is an inhabited unit value, while `returns: Void` plus `no_result: true` means
+no stack result. Structural function identity preserves this distinction; ordinary
+CLI output already uses CLR void for no-result returns. The assistant proposes
+reviewing whether distinct Unit/Void naming would be clearer, but the author has
+subsequently directs standardizing the IL to avoid retaining this baggage. The
+assistant commits the validated native-call increment first and proceeds toward
+Void as no return and Unit as the inhabited value, removing the separate flag and
+spelling. The migration is pending; this increment still reuses the existing contract. See the [function contract](neoil.md)
+and [native proof](experiments/aot-native-imports/README.md#no-result-native-calls-development-2026-10-22).
+
 ## 2026-10-22 — Reuse interop binding machinery where contracts match
 
 The author suggests sharing binding functionality with internal calls unless special

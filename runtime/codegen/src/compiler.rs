@@ -486,14 +486,18 @@ fn compile_scalar_with_imports<M: Module>(
                         let status = builder.inst_results(call)[0];
                         let failed = builder.ins().icmp_imm(IntCC::NotEqual, status, 0);
                         return_if(&mut builder, failed, status);
-                        stack.push(
-                            builder.ins().stack_load(
-                                crate::scalar_abi::scalar_type(&input.functions[callee].returns)
+                        if !input.functions[callee].no_result {
+                            stack.push(
+                                builder.ins().stack_load(
+                                    crate::scalar_abi::scalar_type(
+                                        &input.functions[callee].returns,
+                                    )
                                     .unwrap(),
-                                call_result,
-                                0,
-                            ),
-                        );
+                                    call_result,
+                                    0,
+                                ),
+                            );
+                        }
                     }
                     Op::Fault(_) => {
                         // Terminal UserFault; the experimental ABI carries category only.
@@ -502,8 +506,10 @@ fn compile_scalar_with_imports<M: Module>(
                         continue;
                     }
                     Op::Return => {
-                        let result = stack.pop().expect("validated stack");
-                        builder.ins().store(MemFlags::new(), result, output, 0);
+                        if !function.no_result {
+                            let result = stack.pop().expect("validated stack");
+                            builder.ins().store(MemFlags::new(), result, output, 0);
+                        }
                         let success = builder.ins().iconst(types::I32, 0);
                         builder.ins().return_(&[success]);
                         continue;
@@ -616,8 +622,11 @@ fn check_function(
         || function.is_override
         || function.is_internal_call()
         || function.pinvoke.is_some()
-        || function.no_result
-        || !admitted(&function.returns)
+        || if function.no_result {
+            !native_imports || function.returns != Type::Void
+        } else {
+            !admitted(&function.returns)
+        }
         || function.parameters.iter().any(|ty| !admitted(ty))
         || function.locals.iter().any(|ty| !admitted(ty))
         || function.locals.len() > 1024

@@ -19,10 +19,11 @@ recorded with their compiler revisions.
 **Bounded AOT imports (2026-10-22):** The opt-in macOS ARM64 scalar backend now
 emits thunks for free Int32/pointer C imports with lazy cached library ownership.
 Raw Void/Byte/Int32 pointers preserve address width through locals/helper calls;
-public Ptr<T> wrapper projection remains open. The
+public Ptr<T> wrapper projection remains open. No-result C calls and scalar helpers
+now preserve the caller stack without manufacturing a return value. The
 [contract and evidence](experiments/aot-native-imports/README.md) distinguish this
 ABI proof from pending closed-world/class-library integration, wrapper mapping and buffers,
-pinning, no-result calls, JIT and release packaging. It advances the AOT-first gate
+pinning, JIT and release packaging. It advances the AOT-first gate
 without declaring the NativeImport foundation complete.
 
 **Character naming (author direction, 2026-10-21):** Rename the development

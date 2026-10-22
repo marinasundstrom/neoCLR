@@ -729,7 +729,7 @@ fn native_input_rejects_corruption_and_unsupported_il_before_emission() {
         ),
         (
             neoclr::metadata_container::write_module(&wrong_owner).unwrap(),
-            "unsupported operand type",
+            "unresolved scalar call",
         ),
         (
             neoclr::metadata_container::write_module(&no_entry).unwrap(),

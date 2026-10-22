@@ -315,3 +315,97 @@ ret
         assert!(Command::new(&executable).status().unwrap().success());
     }
 }
+
+#[test]
+fn no_result_calls_do_not_supply_a_stack_value() {
+    for body in ["call Release()\npop\nldc.i4 1\nret", "call Release()\nret"] {
+        let dir = Temp::new();
+        let source = format!(
+            ".module InvalidVoid\n.function Release() -> noresult\n.foreign \"missing\" \"release\" cdecl\n.end\n.function Calculate(Int32 value) -> Int32\n{body}\n.end\n"
+        );
+        let result = compile(&dir, &source, &["--native-imports"]);
+        assert!(!result.status.success());
+        assert!(!dir.0.join("app.o").exists());
+    }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_void_release_preserves_caller_stack_and_fault_output() {
+    let dir = Temp::new();
+    let fixture = dir.0.join("release.c");
+    let library = dir.0.join("release.dylib");
+    fs::write(
+        &fixture,
+        r#"
+#include <stdint.h>
+#include <stdlib.h>
+static int32_t observed;
+void *create(int32_t value) { int32_t *p = malloc(sizeof(*p)); if (p) *p = value; return p; }
+void release(void *address) { if (address) { observed = *(int32_t *)address; free(address); } }
+int32_t read_value(void) { return observed; }
+"#,
+    )
+    .unwrap();
+    cc(&[&fixture], &["-dynamiclib", "-fPIC"], &library);
+    let source = format!(
+        r#".module Release
+.function Create(Int32 value) -> Ptr<Int32>
+.foreign {library:?} "create" cdecl
+.end
+.function Release(Ptr<Int32> address) -> noresult
+.foreign {library:?} "release" cdecl
+.end
+.function Read() -> Int32
+.foreign {library:?} "read_value" cdecl
+.end
+.function ReleaseHelper(Ptr<Int32> address) -> noresult
+ldarg address
+call Release(Ptr<Int32>)
+ret
+.end
+.function Calculate(Int32 value) -> Int32
+ldc.i4 99
+ldarg value
+call Create(Int32)
+call ReleaseHelper(Ptr<Int32>)
+call Read()
+add
+ret
+.end
+"#,
+        library = library.to_str().unwrap()
+    );
+    let resolver = Path::new(env!("CARGO_MANIFEST_DIR")).join("../native/interop/imports.c");
+    let host = dir.0.join("release-host.c");
+    for missing in [false, true] {
+        let _ = fs::remove_file(dir.0.join("app.o"));
+        let source = if missing {
+            format!(
+                ".module Missing\n.function Release() -> noresult\n.foreign {:?} \"missing_release\" cdecl\n.end\n.function Calculate(Int32 value) -> Int32\nldarg value\ncall Release()\nret\n.end\n",
+                library.to_str().unwrap()
+            )
+        } else {
+            source.clone()
+        };
+        let result = compile(&dir, &source, &["--native-imports"]);
+        assert!(
+            result.status.success(),
+            "{}",
+            String::from_utf8_lossy(&result.stderr)
+        );
+        let check = if missing {
+            "status == 3 && value == 12345"
+        } else {
+            "status == 0 && value == 140"
+        };
+        fs::write(&host, format!("#include <stdint.h>\nextern int32_t neoclr_entry_v2(int32_t,int32_t*);\nint main(void) {{ int32_t value=12345; int32_t status=neoclr_entry_v2(41,&value); return ({check}) ? 0 : 1; }}\n")).unwrap();
+        let executable = dir.0.join("release-app");
+        cc(
+            &[&host, &resolver, &dir.0.join("app.o")],
+            &["-pthread", "-Wall", "-Wextra", "-Werror"],
+            &executable,
+        );
+        assert!(Command::new(&executable).status().unwrap().success());
+    }
+}

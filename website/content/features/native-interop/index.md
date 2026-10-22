@@ -114,15 +114,15 @@ this public wrapper automatically.
 ## Development AOT import foundation
 
 The low-level macOS ARM64 scalar backend accepts `--native-imports` for free C
-functions taking up to sixteen Int32/pointer arguments and returning Int32 or a
-pointer. Pointer metadata targets are Void, Byte or Int32; address transport through
+functions taking up to sixteen Int32/pointer arguments and returning Int32, a
+pointer or no value (C void). Pointer metadata targets are Void, Byte or Int32; address transport through
 locals/helpers is supported, with ownership remaining in the native contract. Generated code
 resolves symbols lazily and retains successfully loaded libraries until process exit.
 Lookup failures return a runtime fault without writing the result. The default
 continues to reject imports; this opt-in requires explicitly linking the native
 resolver. It is not yet available through the ordinary SDK application pipeline.
 
-Managed buffers, automatic Ptr<T> wrapper mapping, no-result calls, callbacks, other numeric types, full
+Managed buffers, automatic Ptr<T> wrapper mapping, callbacks, other numeric types, full
 class-library composition and JIT imports remain future work for this path.
 [Execution contract](/docs/native-interop.html#aot-scalar-imports) ·
 [Tests and reproduction](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/aot-native-imports/README.md)
