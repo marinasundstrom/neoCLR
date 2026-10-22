@@ -8,7 +8,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
-- Replace Rust-1.85-incompatible let chains in generic type-token inspection with equivalent nested conditions, preserving open-definition inspection versus storage validation. Correct rustfmt drift in four existing test files. Formatting passes; the local minimum-Rust attempt was interrupted while macOS loaded dependency proc macros, so hosted compatibility/full-source validation remains required. Existing focused type-identity tests and strict Clippy are pending.
+- Replace Rust-1.85-incompatible let chains in generic type-token inspection with equivalent nested conditions, preserving open-definition inspection versus storage validation. Correct rustfmt drift in four existing test files. Formatting passes; the local minimum-Rust attempt was interrupted while macOS loaded dependency proc macros, so hosted compatibility/full-source validation remains required. Existing focused type-identity tests and strict Clippy are pending; explicit source run 39847804371 is pinned to `02c65eae3` and will survive documentation pushes.
 
 - Complete the two-platform benchmark refresh: Windows passes all five stages, 55 CPU/JSON processes and 1,152 HTTP responses against its qualified archive. Retain compressed raw reports, source audit and the reported dirty-checkout limitation; 85 recorded tracked inputs match the benchmark revision, but dirty paths were not captured. Add separate website Windows development tables without cross-host speedup claims; all 5,703 pages pass. Canonical source repairs and final publication remain open.
 

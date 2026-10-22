@@ -489,3 +489,8 @@ manual run 39846204524 was cancelled once the same-input failures were identifie
 Start the repaired source qualification explicitly and preserve its run identity
 so later documentation updates cannot cancel it. These syntax/format repairs do
 not change the identities of the already qualified binary archives.
+
+The repaired source qualification is explicitly pinned to `02c65eae3` in
+[run 39847804371](https://github.com/marinasundstrom/neoCLR/actions/runs/39847804371).
+It runs canonical extracted-source tests, strict Clippy/formatting, host boundaries
+and the three minimum-Rust checks; queued at recording, not yet passed.

@@ -22,5 +22,12 @@
     "/tmp/release-msrv-20261022.log": "4a7d4638cba2ebfaed5f4b9f18dc9df2c0795636e0f4bb586fc29b03b4f196d1",
     "/tmp/release-msrv-20261022-xcode.log": "892817e1608d5e58d52c02ce2dbc4adf2cf23e4f789e97cbbe089e58e713a6ff",
     "/tmp/release-msrv-rustc-sample.txt": "05c31729111b75e01d52278798d338293c440de477605fabb864d7d9675023ba"
+  },
+  "repairedRevision": "02c65eae369bc6f94f17cf0f7d3e94aa5bfbc4c2",
+  "hostedRerun": {
+    "run": 39847804371,
+    "event": "workflow_dispatch",
+    "status": "queued at recording",
+    "fullMatrix": false
   }
 }
