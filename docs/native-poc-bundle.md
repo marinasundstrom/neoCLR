@@ -419,3 +419,52 @@ The editor fixture uses the explicit native compiler command
 This new selector affects execution only; omitted selectors retain the existing
 interpreter command behavior for diagnostic consumers. No Runtime Contract,
 metadata representation or ABI changes.
+
+
+## Native interop build-kit profiles (development, 2026-10-22)
+
+The macOS ARM64 native build kit now offers two explicit scalar C ABI profiles.
+They reuse the backend import/export adapters and resolver; they do not enable
+foreign calls in the managed console/HTTP execution pipeline.
+
+From an extracted kit:
+
+```sh
+python3 scripts/build-native-project.py --profile native-interop --project samples/native-interop/App.rvnproj --output ../interop-native
+../interop-native/app
+python3 scripts/build-native-project.py --profile native-library --project samples/native-interop/App.rvnproj --output ../interop-library
+xcrun --sdk macosx clang -isysroot "$(xcrun --sdk macosx --show-sdk-path)" -I ../interop-library samples/native-interop/consumer.c ../interop-library/libapp.dylib -Wl,-rpath,@executable_path -o ../interop-library/consumer
+../interop-library/consumer
+```
+
+The executable sample allocates native Int32 storage with malloc, writes/reads it,
+and frees it through the matching native function. The library profile emits
+libapp.dylib, app.h and a build report containing exact NativeExport symbol names.
+The compiler still consumes an executable Raven project with a Main entry; the
+library backend keeps Main private and selects annotated free functions.
+A caller owns each successful allocation and must call sample_release once.
+
+Both profiles preserve existing output directories and package input hash checks.
+Managed reflection/bootstrap/heap options reject before creating output. Linking
+or dependency-validation failure removes pending native output. Scalars and
+Void/Byte/Int32 pointers follow the already qualified ABI; callback, MarshalAs,
+managed heap, pinning and async support are not introduced by packaging.
+Raw native calls are trusted, outside sandbox isolation. Guest faults escaping
+exports terminate; no exception unwinds into C/C++.
+
+Validation: six focused builder tests pass. A real archived kit was extracted
+outside the checkout into a path containing spaces, with Cargo absent from PATH.
+Both profiles built successfully; standalone executable and C/C++17 library callers
+ran with empty environments. Altering the packaged interop host rejected before
+source compilation. Reproduce with:
+
+```sh
+python3 scripts/verify-native-build-kit.py --interop-only --archive ARCHIVE --output NEW_DIRECTORY
+```
+
+[Committed validation summary](experiments/native-interop-kit/validation.json).
+Full local evidence: target/native-interop-kit-check-20261022/validation.json, built from
+native-interop-kit-bundle-20261022. That overlay records compiler 3fc2b6d0e, SDK
+417e7a451 and native-export-libraries-20261022-v3 plus exact file hashes. Inherited
+managed JIT binaries were not requalified; this is a local development kit, not a
+published SDK or full release qualification.

@@ -21196,3 +21196,21 @@ source inventory and executable-type budgets are separate. The assertion is
 corrected and all 23 specialization tests pass. This does not change runtime limits.
 The development scalar ABI checkpoint is validated; installed-SDK/managed-pipeline
 qualification is still open, and no complete interop release readiness is claimed.
+
+
+## 2026-10-22 — Kit integration and marshalling audit
+
+The author directed fixing gaps as encountered and asked whether marshalling
+attributes are checked for NativeImport/NativeExport. The assistant distinguished
+tested C scalar ABI transport from marshalling: import descriptors are interpreted
+in the VM, while scalar JIT/AOT rejects marshalling and Raven currently rejects
+MarshalAs on exports. The export parameter diagnostic misleadingly mentions
+NativeImport; no marshalling parity is claimed.
+
+The build-kit gap is closed for explicit scalar profiles. The packaged Raven sample
+allocates, reads/writes and releases native memory, and can become a C-callable
+library with a generated header. An extracted archive, outside the checkout and
+without Cargo, builds both profiles; standalone executable/C/C++ callers pass with
+empty environments. A changed packaged host is rejected before compilation.
+This qualifies the development kit only; ordinary managed-backend interop and
+the marshalling/export compiler gap remain open.

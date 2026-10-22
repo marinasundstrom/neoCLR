@@ -14,7 +14,7 @@ import time
 
 ROOT = Path(__file__).resolve().parents[1]
 PROFILE = 'macos-arm64-console-v1'
-PROFILES = {'console': PROFILE, 'http': 'macos-arm64-http-v1', 'windows-console': 'windows-x64-console-v1', 'windows-http': 'windows-x64-http-v1'}
+PROFILES = {'console': PROFILE, 'http': 'macos-arm64-http-v1', 'native-interop': 'macos-arm64-native-interop-v1', 'native-library': 'macos-arm64-native-library-v1', 'windows-console': 'windows-x64-console-v1', 'windows-http': 'windows-x64-http-v1'}
 
 
 def native_text_sources():
@@ -89,9 +89,51 @@ def validate_https_server(enabled, profile, bootstrap_root, packaged):
         raise ValueError('--https-server currently requires a source checkout, not a packaged build kit')
 
 
+def scalar_interop_profile(profile):
+    return profile in (PROFILES['native-interop'], PROFILES['native-library'])
+
+
+def validate_scalar_interop(profile, bootstrap_root, reflection, byte_array_limit):
+    if scalar_interop_profile(profile) and (bootstrap_root or reflection or byte_array_limit != 65536):
+        raise ValueError('Native interop profiles do not support managed reflection, bootstrap or heap configuration')
+
+
+def compile_scalar_interop(aot, assembly, context, output, profile, clang, sdk, run):
+    """Use the existing scalar ABI; never pass managed-profile bindings here."""
+    library = profile == PROFILES['native-library']
+    obj = output / 'app.o'
+    sources = [ROOT / 'runtime/native/interop/imports.c',
+               ROOT / 'docs/experiments/aot-scalar/console.c']
+    if library:
+        report = json.loads(run([aot, '--native-library', assembly, obj,
+            '--header', output / 'app.h', '--native-imports', *context], phase='native-compilation'))
+    else:
+        run([aot, assembly, '@entry', obj, '--native-imports', *context], phase='native-compilation')
+        sources.append(ROOT / 'tools/native/interop-host.c')
+        report = None
+    name = 'libapp.dylib' if library else 'app'
+    pending = output / (name + '.pending')
+    try:
+        run([clang, '-isysroot', sdk, '-arch', 'arm64', '-std=c11', '-O2',
+             '-Wall', '-Wextra', '-Werror', '-I', ROOT / 'docs/experiments/aot-scalar',
+             *(['-dynamiclib', '-Wl,-install_name,@rpath/libapp.dylib'] if library else []),
+             *sources, obj, '-pthread', '-o', pending], phase='host-compile-link')
+        dependencies = [line.split()[0] for line in
+                        run(['xcrun', 'otool', '-L', pending], phase='dependency-check').splitlines()[1:]]
+        expected = {'/usr/lib/libSystem.B.dylib'}
+        if library:
+            expected.add('@rpath/libapp.dylib')
+        if set(dependencies) != expected:
+            raise RuntimeError('Unexpected native dependencies: ' + repr(dependencies))
+        return pending, name, dependencies, report
+    except Exception:
+        pending.unlink(missing_ok=True)
+        raise
+
+
 def support_files():
     base = ROOT / 'docs/experiments'
-    return [ROOT / 'scripts/build-native-project.py', ROOT / 'tools/native/console-host.c', ROOT / 'tools/native/entry-arguments.c',
+    return [ROOT / 'scripts/build-native-project.py', ROOT / 'tools/native/console-host.c', ROOT / 'tools/native/interop-host.c', ROOT / 'tools/native/entry-arguments.c',
             ROOT / 'benchmarks/native-web/http-host.c', ROOT / 'benchmarks/native-web/http-session-host.c',
             base / 'aot-console/native-session.c',
             *sorted((ROOT / 'runtime/native').rglob('*.[ch]')),
@@ -130,6 +172,11 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
         raise ValueError("HTTP heap configuration requires an HTTP profile")
     if sum(bool(value) for value in (reflection_roots, reflection_types, reflection_constructor_types, reflection_method_types)) > 1:
         raise ValueError('Choose one reflection policy: roots, property types, constructor types or method types')
+    if profile not in PROFILES.values():
+        raise ValueError('Unsupported native build profile')
+    validate_scalar_interop(profile, bootstrap_root,
+        reflection_roots or reflection_types or reflection_constructor_types or reflection_method_types,
+        byte_array_limit)
     windows = profile in (PROFILES['windows-console'], PROFILES['windows-http'])
     http = profile in (PROFILES['http'], PROFILES['windows-http'])
     if bootstrap_root and not http:
@@ -238,7 +285,7 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
         if not windows:
             adapters.append(base / 'file-input.c')
         adapters.append(ROOT / 'tools/native/entry-arguments.c')
-        inputs = [*sorted((ROOT / 'runtime/native').rglob('*.[ch]')), Path(__file__).resolve(), project, catalog_path, aot, *required, *adapters,
+        inputs = [ROOT / 'tools/native/interop-host.c', *sorted((ROOT / 'runtime/native').rglob('*.[ch]')), Path(__file__).resolve(), project, catalog_path, aot, *required, *adapters,
                   *base.glob('*.h'), *base.parent.joinpath('aot-scalar').glob('*.h'),
                   *base.parent.joinpath('aot-fault-details').glob('*.h'),
                   *compiler.parent.glob('*.dll'), *compiler.parent.glob('*.json')]
@@ -266,6 +313,21 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
                 **({'constructors': True} if reflection_constructor_types else {'methods': True} if reflection_method_types else {}))[1]
         context = ['--system', seed, *[arg for path in libraries for arg in ('--module', path)],
                    '--object-root', libraries[0]]
+        if scalar_interop_profile(profile):
+            pending, name, dependencies, exports = compile_scalar_interop(
+                aot, assembly, context, output, profile, clang, sdk, run)
+            if any(sha(Path(path)) != digest for path, digest in report['inputs'].items()):
+                pending.unlink(missing_ok=True)
+                raise RuntimeError('Build inputs changed during compilation')
+            pending.rename(output / name)
+            artifacts = ['app.dll', 'app.o', name]
+            if exports is not None:
+                report['nativeExports'] = exports
+                artifacts.append('app.h')
+            report.update(passed=True, dependencies=dependencies,
+                          nativeInterop=True, artifacts={item: sha(output / item) for item in artifacts})
+            save()
+            return output / name
         flags = ['--compile-system', '--bind-user-fault', '--reference-arena', '--native-gc',
                  '--bind-console-read-byte', '--bind-console-write-line', '--bind-console-stream-output',
                  '--bind-int32-to-string', '--bind-utf8-text', '--native-stack-budget', '--bind-integer-text', '--bind-character-text', '--bind-system-culture', '--bind-time-zone-rules']

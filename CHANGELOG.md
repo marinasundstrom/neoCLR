@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
+- Integrate the scalar C ABI into explicit native-interop/native-library build-kit profiles, including a Raven native-allocation sample, generated header and C consumer. Extracted-kit qualification passes outside the checkout without Cargo, with standalone executable/C/C++ callers and pre-build tamper rejection; six focused builder tests pass. Managed-only options reject in scalar profiles. This closes development-kit access, not managed SDK execution, MarshalAs/callback parity or pinning.
+
 - Add a website walkthrough of the tested NativeExport pointer sample, its generated C declaration and three-engine reproduction command. Bound the interop completion plan to a release-useful C foundation, explicitly separating development-backend evidence from installed-SDK qualification and deferred object/sidecar work.
 
 - Correct the specialization regression's expected executable-type-budget diagnostic. Source inventory permits more declarations than the selected executable shape budget; the runtime already rejects the overflow at the correct boundary. All 23 specialization tests pass; no admission limits or generated code change.

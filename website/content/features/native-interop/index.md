@@ -232,6 +232,28 @@ interpreter, scalar JIT and AOT. See the
 [setup and tested compiler pairing](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/aot-native-imports/README.md#attribute-selected-exports-and-headers-2026-10-22).
 It uses a development build, not the published SDK.
 
+### Build from an extracted development kit
+
+The macOS ARM64 native build kit includes a self-contained
+[allocation and export sample](https://github.com/marinasundstrom/neoCLR/tree/main/tools/native/samples/native-interop).
+It can be built without Cargo or a source checkout:
+
+```sh
+python3 scripts/build-native-project.py --profile native-interop --project samples/native-interop/App.rvnproj --output ../interop-native
+../interop-native/app
+
+python3 scripts/build-native-project.py --profile native-library --project samples/native-interop/App.rvnproj --output ../interop-library
+```
+
+The second command produces `libapp.dylib` and `app.h`. The kit README shows how
+to compile its C consumer against the header. Both C and C++17 consumers are tested.
+These profiles require Python, the compiler's .NET SDK dependencies, and Apple
+Clang/macOS SDK. Resulting executables/libraries do not require .NET.
+
+These explicit profiles support the scalar/pointer contract above. They do not
+enable marshalling, callbacks, GC-managed objects or async work. The default
+managed console/HTTP profiles retain their existing scope.
+
 ### Scope of the foundation
 
 Use this foundation for C-compatible numeric functions and explicitly owned native
@@ -240,9 +262,9 @@ must pair construction and destruction through that library. Direct C++ layouts,
 virtual dispatch, foreign exceptions and managed object marshalling are outside
 this contract.
 
-The scalar round trip is qualified. Installed-SDK integration and the supported
-release execution paths still need qualification before this can be presented as
-a completed release feature. Callback parity across engines and exports, managed
+The scalar round trip and extracted development-kit profiles are qualified.
+The ordinary managed SDK execution pipeline and the final release bundle still
+need qualification before claiming general native interop support. Callback parity across engines and exports, managed
 pinning and automatic pointer-wrapper mapping remain explicit gaps; future
 metadata sidecars and language-neutral object mapping are separate work.
 

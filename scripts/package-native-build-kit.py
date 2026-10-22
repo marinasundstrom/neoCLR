@@ -36,6 +36,7 @@ def main():
         '--format-version', '1', '--manifest-path', str(cargo_manifest)], cwd=ROOT, text=True))
     sources = [*ROOT.joinpath('src').rglob('*.rs'), *ROOT.joinpath('runtime/codegen/src').rglob('*.rs'),
                ROOT / 'docs/experiments/http-server/Server.rvn',
+               *[ROOT / 'tools/native/samples/native-interop' / name for name in ('App.rvnproj', 'Main.rvn', 'consumer.c')],
                ROOT / 'Cargo.toml', ROOT / 'Cargo.lock', cargo_manifest,
                Path(__file__).resolve(), *builder.support_files(), *builder.native_text_sources()]
     inputs = {str(p.relative_to(ROOT)): builder.sha(p) for p in sources}
@@ -79,6 +80,8 @@ def main():
         copy(source, 'samples/hello/' + source.name)
     copy(ROOT / 'tools/native/samples/hello/App.rvnproj', 'samples/http/App.rvnproj')
     copy(ROOT / 'docs/experiments/http-server/Server.rvn', 'samples/http/Main.rvn')
+    for name in ('App.rvnproj', 'Main.rvn', 'consumer.c'):
+        copy(ROOT / 'tools/native/samples/native-interop' / name, 'samples/native-interop/' + name)
     copy(ROOT / 'LICENSE', 'LICENSE')
     copy(ROOT / 'Cargo.lock', 'aot-Cargo.lock')
     licenses = []
@@ -115,6 +118,22 @@ For the bounded one-request HTTP sample:
   ../http-native/app
 The server prints an ephemeral loopback port; request GET /greeting within 15 seconds.
 
+For explicit C ABI native imports (trusted macOS ARM64 scalar code):
+  python3 scripts/build-native-project.py --profile native-interop --project samples/native-interop/App.rvnproj --output ../interop-native
+  ../interop-native/app
+
+For NativeExport functions and a generated C/C++ header:
+  python3 scripts/build-native-project.py --profile native-library --project samples/native-interop/App.rvnproj --output ../interop-library
+  xcrun --sdk macosx clang -isysroot "$(xcrun --sdk macosx --show-sdk-path)" -I ../interop-library samples/native-interop/consumer.c ../interop-library/libapp.dylib -Wl,-rpath,@executable_path -o ../interop-library/consumer
+  ../interop-library/consumer
+
+These opt-in profiles admit numeric scalars and Void/Byte/Int32 native pointers.
+They have no managed heap, callbacks, marshalling, reflection or async support.
+Native code is trusted and outside VM sandbox guarantees. Allocation ownership
+stays with the native caller/library; the sample pairs malloc with free.
+Native-library writes app.h and libapp.dylib; build.json records exact symbols.
+Escaping guest faults terminate at the C export boundary.
+
 Requires Python 3, the bundled Raven compiler's .NET SDKs (net11 compiler host,
 net10 project reference packs), and Apple Clang/macOS SDK selected through xcrun.
 Building an application requires neither Cargo nor a neoCLR source checkout.
@@ -138,7 +157,7 @@ notices remain under bundle/. The runtime ABI and service profile are provisiona
 ''')
     if any(builder.sha(ROOT / path) != digest for path, digest in inputs.items()):
         raise ValueError('Sources changed while building the kit')
-    kit = dict(format='neoclr-native-build-kit-v1', profile=builder.PROFILE, profiles=[builder.PROFILES[name] for name in ("console", "http")],
+    kit = dict(format='neoclr-native-build-kit-v1', profile=builder.PROFILE, profiles=[builder.PROFILES[name] for name in ("console", "http", "native-interop", "native-library")],
         revision=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
         dirty=bool(subprocess.check_output(['git', 'status', '--porcelain'], cwd=ROOT, text=True).strip()),
         inputs=inputs, aotBuild=dict(command=command, exitCode=result.returncode, stderr=result.stderr,

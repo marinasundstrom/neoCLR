@@ -1,5 +1,15 @@
 # neoCLR platform roadmap
 
+**Extracted interop kit (2026-10-22):** Explicit native-interop and native-library
+profiles now route through the qualified scalar backend. The kit packages a
+malloc/read/write/free Raven sample and C consumer. Both profiles build outside
+the checkout without Cargo; standalone executable and C/C++ library callers pass
+with empty environments, and tampered host input rejects before compilation.
+[Reproduction and limits](native-poc-bundle.md#native-interop-build-kit-profiles-development-2026-10-22).
+This closes scalar build-kit access, not ordinary managed-backend import support.
+Marshalling/callback parity and pinning remain implementation gaps, not alternative
+semantics; the author directs fixing encountered blockers rather than hiding them.
+
 **Interop completion scope (author direction, 2026-10-22):** Close the native
 interop increment when it is good enough, publish a sample and website guidance,
 then return to release stabilization. Do not expand this into C++ object layout,

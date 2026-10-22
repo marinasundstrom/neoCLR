@@ -1,0 +1,59 @@
+{
+  "passed": true,
+  "archiveSha256": "5e37f66320f56672416b999beef19852d2943531e777dbba6876ab485f6f5445",
+  "kitManifestSha256": "741d724dd28bc345fa5e5c88df8361fb7a8550ca4775f837c2cc693005a43158",
+  "sourceRevision": "c2bd03f9ebb9d346397c3702ee61957663e96d9d",
+  "sourceDirty": true,
+  "bundleManifestSha256": "dd88ea0fc7c7a8ffbb6709ca791f2cc2a4fae4d9c2a73ea4b58f9396548cd771",
+  "nativeInterop": {
+    "executable": true,
+    "library": true,
+    "cConsumer": true,
+    "cppConsumer": true,
+    "emptyEnvironment": true,
+    "buildWithoutCargo": true,
+    "checkoutPathsAbsent": true,
+    "integrityRejection": true
+  },
+  "date": "2026-10-22",
+  "scope": "macOS ARM64 scalar C ABI profiles; not managed-backend or full release qualification",
+  "cases": [
+    {
+      "name": "native-interop output",
+      "exitCode": 0,
+      "passed": true,
+      "profile": "macos-arm64-native-interop-v1",
+      "artifacts": {
+        "app.dll": "3003bf33322adc214a95fe906324b758707e472f744495235d7c90b2652eed2c",
+        "app.o": "cf0a4f945987c29b30370f46c20c7dcb74580b5d06d8971881544c64dfb82a6e",
+        "app": "d7fcb704b2f83fe764b0702fc92a0baf056af6886d24a0e596fc639a7c9d336f"
+      },
+      "error": null
+    },
+    {
+      "name": "native-library output",
+      "exitCode": 0,
+      "passed": true,
+      "profile": "macos-arm64-native-library-v1",
+      "artifacts": {
+        "app.dll": "3003bf33322adc214a95fe906324b758707e472f744495235d7c90b2652eed2c",
+        "app.o": "0a1289264c6380776fac3da79067c0c24642071c1a4660d8b1d6680c649e73d7",
+        "libapp.dylib": "68f66253de47ab09d5edac69a8ff4b10f03cffadfdb0c7e32bfb9686fe92070a",
+        "app.h": "4947d8fa914e28e1b1ff6b3fb57c0cf09bf71dd9ff84d3ca2e08c87454c07326"
+      },
+      "error": null
+    },
+    {
+      "name": "reject changed interop host",
+      "exitCode": 1,
+      "passed": false,
+      "profile": "macos-arm64-native-interop-v1",
+      "artifacts": {},
+      "error": "Package file mismatch: tools/native/interop-host.c"
+    }
+  ],
+  "localFullEvidence": "target/native-interop-kit-check-20261022/validation.json",
+  "compilerRevision": "3fc2b6d0e",
+  "metadataSdkRevision": "417e7a451",
+  "libraryBuild": "native-export-libraries-20261022-v3"
+}

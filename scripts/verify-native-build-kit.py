@@ -63,6 +63,7 @@ def main():
     parser.add_argument('--archive', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--http', action='store_true', help='Also qualify the opt-in HTTP profile')
+    parser.add_argument('--interop-only', action='store_true', help='Qualify only the scalar native-import/export profiles and C/C++ consumers')
     args = parser.parse_args()
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
@@ -109,32 +110,33 @@ def main():
                 report['cases'].append(row)
                 return result, evidence, destination
 
-            result, evidence, destination = build('native hello output')
-            assert result.returncode == 0 and evidence['passed'], result.stderr
-            assert all(kit in Path(path).parents for path in evidence['inputs'])
-            assert all(str(ROOT) not in str(c['command']) for c in evidence['commands'])
-            standalone = location / 'standalone'
-            standalone.mkdir()
-            shutil.copy2(destination / 'app', standalone / 'app')
-            native = subprocess.run([str(standalone / 'app')], cwd=standalone, env={}, capture_output=True, timeout=30)
-            assert native.returncode == 0 and native.stdout == 'Hello, Café 🌍\n'.encode() and not native.stderr
-            assert list(standalone.iterdir()) == [standalone / 'app']
-            report['execution'] = dict(exitCode=0, stdout=native.stdout.decode(), executableOnlyDirectory=True,
-                                       emptyEnvironment=True, buildWithoutCargo=True, checkoutPathsAbsent=True)
-            for name, relative in [('adapter', 'tools/native/console-host.c'), ('backend', 'bin/neoclr-codegen'),
-                                   ('compiler', 'bundle/sdk/tools/rvnc/rvnc.runtimeconfig.json')]:
-                path = kit / relative
-                size = path.stat().st_size
-                with path.open('ab') as stream:
-                    stream.write(b'\nmodified\n')
-                try:
-                    result, evidence, destination = build('reject changed ' + name)
-                    assert result.returncode != 0 and not evidence['passed']
-                    assert evidence['commands'] == [] and 'Package file mismatch' in evidence['error']
-                    assert not (destination / 'app').exists() and not (destination / 'app.dll').exists()
-                finally:
-                    with path.open('r+b') as stream:
-                        stream.truncate(size)
+            if not args.interop_only:
+                result, evidence, destination = build('native hello output')
+                assert result.returncode == 0 and evidence['passed'], result.stderr
+                assert all(kit in Path(path).parents for path in evidence['inputs'])
+                assert all(str(ROOT) not in str(c['command']) for c in evidence['commands'])
+                standalone = location / 'standalone'
+                standalone.mkdir()
+                shutil.copy2(destination / 'app', standalone / 'app')
+                native = subprocess.run([str(standalone / 'app')], cwd=standalone, env={}, capture_output=True, timeout=30)
+                assert native.returncode == 0 and native.stdout == 'Hello, Café 🌍\n'.encode() and not native.stderr
+                assert list(standalone.iterdir()) == [standalone / 'app']
+                report['execution'] = dict(exitCode=0, stdout=native.stdout.decode(), executableOnlyDirectory=True,
+                                           emptyEnvironment=True, buildWithoutCargo=True, checkoutPathsAbsent=True)
+                for name, relative in [('adapter', 'tools/native/console-host.c'), ('backend', 'bin/neoclr-codegen'),
+                                       ('compiler', 'bundle/sdk/tools/rvnc/rvnc.runtimeconfig.json')]:
+                    path = kit / relative
+                    size = path.stat().st_size
+                    with path.open('ab') as stream:
+                        stream.write(b'\nmodified\n')
+                    try:
+                        result, evidence, destination = build('reject changed ' + name)
+                        assert result.returncode != 0 and not evidence['passed']
+                        assert evidence['commands'] == [] and 'Package file mismatch' in evidence['error']
+                        assert not (destination / 'app').exists() and not (destination / 'app.dll').exists()
+                    finally:
+                        with path.open('r+b') as stream:
+                            stream.truncate(size)
             if args.http:
                 result, evidence, destination = build('native http output', 'http', kit / 'samples/http/App.rvnproj')
                 assert result.returncode == 0 and evidence['passed'], result.stderr
@@ -188,6 +190,46 @@ def main():
                 assert 'HTTP handler failed' in native['stderr'] and not native['responseHex']
                 report['httpStandalone'] = dict(executableOnlyDirectory=True, emptyEnvironment=True,
                                                 buildWithoutCargo=True, host='existing bounded HTTP correctness host')
+            if args.interop_only:
+                project = kit / 'samples/native-interop/App.rvnproj'
+                for profile in ('native-interop', 'native-library'):
+                    result, evidence, destination = build(profile + ' output', profile, project)
+                    assert result.returncode == 0 and evidence['passed'], result.stderr
+                    assert all(kit in Path(path).parents for path in evidence['inputs'])
+                    assert all(str(ROOT) not in str(c['command']) for c in evidence['commands'])
+                    standalone = location / (profile + ' standalone')
+                    standalone.mkdir()
+                    if profile == 'native-interop':
+                        shutil.copy2(destination / 'app', standalone / 'app')
+                        result = subprocess.run([str(standalone / 'app')], cwd=standalone,
+                                                env={}, capture_output=True, timeout=30)
+                        assert result.returncode == 0 and not result.stdout and not result.stderr
+                    else:
+                        shutil.copy2(destination / 'libapp.dylib', standalone / 'libapp.dylib')
+                        assert len(evidence['nativeExports']['exports']) == 4
+                        for language in ('c', 'c++'):
+                            executable = standalone / ('consumer-' + language.replace('+', 'p'))
+                            command = [evidence['toolchain']['clang'], '-isysroot', evidence['toolchain']['sdk'],
+                                       '-Wall', '-Wextra', '-Werror', '-x', language,
+                                       *(['-std=c++17'] if language == 'c++' else []),
+                                       '-I', str(destination), str(kit / 'samples/native-interop/consumer.c'),
+                                       '-x', 'none', str(standalone / 'libapp.dylib'),
+                                       '-Wl,-rpath,@executable_path', '-o', str(executable)]
+                            subprocess.run(command, env=environment, check=True, capture_output=True, timeout=60)
+                            result = subprocess.run([str(executable)], cwd=standalone, env={},
+                                                    capture_output=True, timeout=30)
+                            assert result.returncode == 0 and not result.stdout and not result.stderr
+                path = kit / 'tools/native/interop-host.c'
+                original = path.read_bytes()
+                try:
+                    path.write_bytes(original + b'\nmodified\n')
+                    result, evidence, destination = build('reject changed interop host', 'native-interop', project)
+                    assert result.returncode != 0 and not evidence['passed']
+                    assert evidence['commands'] == [] and 'Package file mismatch' in evidence['error']
+                finally:
+                    path.write_bytes(original)
+                report['nativeInterop'] = dict(executable=True, library=True, cConsumer=True, cppConsumer=True,
+                    emptyEnvironment=True, buildWithoutCargo=True, checkoutPathsAbsent=True, integrityRejection=True)
             # Retain compact evidence; command streams remain byte-verifiable.
             for case in report['cases']:
                 for command in case['build']['commands']:
@@ -200,7 +242,7 @@ def main():
             report['passed'] = True
     finally:
         (output / 'validation.json').write_text(json.dumps(report, indent=2) + '\n')
-    print('Passed: extracted native kit, no checkout/Cargo build dependency, standalone UTF-8 execution and three pre-build integrity rejections')
+    print('Passed: extracted native kit qualification (' + ('native interop' if args.interop_only else 'console/selected hosts') + ')')
 
 
 if __name__ == '__main__':
