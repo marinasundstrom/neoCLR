@@ -1,5 +1,11 @@
 # neoCLR platform roadmap
 
+**Both versioned packages qualified (2026-10-22):** Windows package/runtime/editor
+and HTTPS gates now pass, alongside the macOS gates. Final macOS measurements
+pass all five stages with exact artifact provenance and Python-cache-only initial
+Git status. Windows measurements and final asset/publication review remain open.
+[Current release gates](validation/release-stabilization-20261022/README.md).
+
 **Versioned macOS package qualified (2026-10-22):** The installed Preview 17
 candidate passes 24 async, three JSON and 132 header executions, 15 HTTPS cases
 and extracted native-kit HTTP/C/C++ checks. Preserve the initial TLS harness

@@ -1,0 +1,82 @@
+{
+  "passed": true,
+  "packageRun": 39855375522,
+  "artifactId": 12461945098,
+  "sdkVersion": "0.1.17-neoclr.20261022.1",
+  "sourceRevision": "8511834fada0d0aee97396558287867cb52f3fa3",
+  "archiveSha256": "43b64ea02765e539527039d56522e3808c67ea0993abf1bf2443d0994d440371",
+  "manifestSha256": "e82f493f2c311f1d8f0cc5fd82f76400bfd7542a4494565d942645e8cb854a84",
+  "reports": {
+    "package": {
+      "passed": true,
+      "report": "package.json.gz",
+      "rawSha256": "622ebcf15a994cf73009de060856767f841a621b2a08b855c1fbc9685cbcca7f"
+    },
+    "gc": {
+      "passed": true,
+      "report": "gc.json.gz",
+      "rawSha256": "62e305d6cfe8ccbd3df176295d90b01124761ad0196b07de75644f9d328e1339"
+    },
+    "await": {
+      "passed": true,
+      "report": "await.json.gz",
+      "rawSha256": "f6910e844000adf82e88f5a22c5fc94bac7136d71b34847d58677f08343597ad"
+    },
+    "json": {
+      "passed": true,
+      "report": "json.json.gz",
+      "rawSha256": "beece1a4c5f5269f713320c0fbd28e72eb170e677ab1215c81ec30c996a83af7"
+    },
+    "headers": {
+      "passed": true,
+      "report": "headers.json.gz",
+      "rawSha256": "75f83481157723bf64533a47d1962fb1e4ccb70952800ae0ab8c15d8a1eb96a3"
+    },
+    "editor": {
+      "passed": true,
+      "report": "editor.json.gz",
+      "rawSha256": "441097e7ee486fc8c25b4811112118e30fc9e0d808d4b9b609f01dd76ea8e415"
+    },
+    "inlays": {
+      "passed": true,
+      "report": "inlays.json.gz",
+      "rawSha256": "1e23ea1e63f00957dd369a6604252f0d43b838fc146084d8d7422f6cbb48238f"
+    },
+    "configuration-1": {
+      "passed": true,
+      "report": "configuration-1.json.gz",
+      "rawSha256": "102e549cfade16d61a0b22fcad354c5f0326a5e51c23585d1569eb5b8ee26025"
+    },
+    "configuration-2": {
+      "passed": true,
+      "report": "configuration-2.json.gz",
+      "rawSha256": "370ba3d3b53fb3a8edc6788b4b62b64581708b543878c907438666f4bf2daafb"
+    },
+    "samples": {
+      "passed": true,
+      "report": "samples.json.gz",
+      "rawSha256": "971c985f0fead10e3464e67b9c7357c482e0506bf6bb0c15c8f8de80aa7d0b6c"
+    },
+    "http": {
+      "passed": true,
+      "report": "http.json.gz",
+      "rawSha256": "59d0d9402c7bd9129bf83cd16b035dffe119eeff3f5930643cc41366c682e56d"
+    },
+    "https": {
+      "passed": true,
+      "report": "https.json.gz",
+      "rawSha256": "23c1f00a9f26fffdd1e5914a0d99f9feb84fe77fc57477158c4e24b2bf158649"
+    },
+    "https-build": {
+      "passed": true,
+      "report": "https-build.json.gz",
+      "rawSha256": "b7d1bf0a31b93a2d83f674707ddc077425f6fa12ebef3ae1827d070d842c7b38"
+    }
+  },
+  "httpsRun": 39859994782,
+  "benchmarkRun": 39859668223,
+  "remaining": [
+    "Versioned Windows measurements",
+    "Final asset audit and publication"
+  ]
+}

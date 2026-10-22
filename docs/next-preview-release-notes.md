@@ -19,7 +19,9 @@ These development packages are not published release assets. The
 [current gate index](validation/release-stabilization-20261022/README.md) records
 exact inputs, reports and limits. Canonical full-source qualification, both host suites, formatting, strict Clippy
 and all Rust 1.85 checks pass at the repaired runtime revision. Versioned package
-qualification remains separate.
+qualification now passes on both platforms, including editor and HTTPS checks.
+Final macOS measurements pass; Windows measurements and the final asset/publication
+review remain open. [Installed candidate](local-preview-20261022.md).
 
 ## Implemented scope for replacement review
 

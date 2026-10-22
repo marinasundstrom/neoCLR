@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
+- Close versioned Windows package/runtime/editor and HTTPS qualification; retain exact reports and archive identity. Refresh final macOS candidate measurements: all five stages, 55 CPU/JSON processes and 1,152 HTTP responses pass. Record Python-cache-only initial Git status and desktop-run limitations without claiming controlled speedups. Windows measurements and final asset/publication review remain open.
+
 - Qualify the versioned macOS Preview 17 package with 24 async, three JSON and 132 HTTP-header executions, 15 HTTPS cases and extracted native-kit HTTP/C/C++ interop checks. Retain exact report/archive hashes and the initial TLS build/test timeout separately from the passing cached retry. Windows editor qualification, final measurements and publication remain open.
 
 - Install the matching Preview 17 macOS candidate SDK side by side and upgrade the default VS Code extension, preserving Preview 16 rollback. Record archive identity, installed file verification, passing JIT/interpreter HTTP/sample checks, 26 editor checks, inlays and two ten-cycle recovery runs. Document local usage and confirm Raven branches remain in separate worktrees. Windows versioned qualification and release publication remain open.

@@ -1,5 +1,5 @@
 {
-  "status": "macOS built and installed; Windows qualification running; not published",
+  "status": "both versioned packages and HTTPS qualified; Windows measurements and final publication review pending",
   "selectedDate": "2026-10-22",
   "proposedReleaseTag": "v0.1.0-preview.17",
   "sdkEditorVersion": "0.1.17-neoclr.20261022.1",
@@ -10,9 +10,9 @@
   "macOSOutput": "target/preview17-sdk-macos-isolated-20261022",
   "supersedes": "0.1.17-neoclr.20261019.1 (never published)",
   "remaining": [
-    "Build and qualify matching versioned macOS/Windows SDK, libraries and editor assets.",
-    "Verify final archive identities and record which earlier evidence remains applicable.",
-    "Finalize release notes/changelog and publish only after required gates pass."
+    "Complete Windows measurements against the versioned archive.",
+    "Finish final archive identity audit and review notes/changelog.",
+    "Publish approved release assets and update website download links."
   ],
   "macOSBuildNote": "Shared-checkout attempt exited during language-server packaging without a diagnostic; retry from an isolated git archive of the exact Raven revision. No compiler-source change inferred.",
   "localInstallation": "Matching macOS SDK installed side by side; default VS Code extension upgraded with rollback preserved. JIT/interpreter, 26 editor checks, inlays and two ten-cycle configuration recovery runs pass.",
@@ -23,5 +23,10 @@
     "url": "https://marinasundstrom.github.io/neoCLR/try/",
     "downloads": "Preview 16 until Preview 17 publication"
   },
-  "localInstallationEvidence": "local-installation/summary.json"
+  "localInstallationEvidence": "local-installation/summary.json",
+  "windowsQualification": "passed: run 39855375522",
+  "windowsHttpsQualification": "passed: run 39859994782",
+  "windowsBenchmarkRun": 39859668223,
+  "macOSQualification": "versioned-macos/summary.json",
+  "windowsQualificationEvidence": "versioned-windows/summary.json"
 }
