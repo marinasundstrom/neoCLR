@@ -17,4 +17,7 @@ Each platform passes 24 await executions, three JSON executions, 132 header case
 15 macOS and 27 Windows security/recovery/cleartext cases. Each measurement series
 validates 55 CPU/JSON processes and 1,152 HTTP responses. These counts describe
 bounded tests, not arbitrary application compatibility or peak-throughput claims.
-Publication confirmation is recorded separately after release assets are uploaded.
+[Publication confirmation](publication.json): all 12 public assets and server-side
+digests verify, as does the downloaded checksum file. Pages run 39866866097 passes;
+live install, benchmark, API and homepage checks pass after correcting the pinned
+API snapshot’s historical release banner. Runtime release assets are unchanged.

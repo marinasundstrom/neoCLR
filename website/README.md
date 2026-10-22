@@ -43,13 +43,15 @@ from `/samples/`. Preserve release-specific examples in `samples/preview9/` unti
 new release changes that baseline. See [API maintenance](../api-docs/README.md) for
 snapshot refresh and coverage.
 
-## Current publication hold — 2026-10-13
+## Historical publication hold — 2026-10-13
 
-The author requests retaining the HTTP cross-runtime comparisons on the local
+The author requested retaining the HTTP cross-runtime comparisons on the local
 website but publishing nothing until neoCLR HTTP API/handling improvements are
-ready. Do not dispatch the Pages workflow for these changes. Small allocation
-gains and a successful local build do not lift this hold. See
-[comparison scope](../benchmarks/http-server/platforms.md).
+ready. Small allocation gains and a successful local build did not lift that hold.
+The later explicit direction to continue release work with the website authorized
+publication; Preview 17 and Pages run 39866866097 are now verified. See
+[comparison scope](../benchmarks/http-server/platforms.md) and
+[publication evidence](../docs/validation/release-20261023/publication.json).
 
 ## Documentation can precede a release
 

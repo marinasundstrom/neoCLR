@@ -1,5 +1,12 @@
 # neoCLR platform roadmap
 
+**Preview 17 published (2026-10-23):** macOS ARM64 and Windows x64 release assets,
+matching SDK/editor, native kit, qualified source and notices are public. All 12
+asset identities and the live website verify, including the corrected API release
+banner. Local SDK/default extension remain installed; Raven main and neoCLR
+worktrees remain separate.
+[Publication record](validation/release-20261023/publication.json).
+
 **Preview 17 release preparation (2026-10-23):** Both platform packages, editor,
 HTTPS and fresh measurements pass. Final asset hashes, matching standalone SDKs,
 notices and the byte-identical qualified source archive are audited.

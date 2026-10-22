@@ -1,6 +1,7 @@
-# Local Preview 17 candidate — 2026-10-22
+# Local Preview 17 installation — 2026-10-22
 
-This macOS ARM64 installation is a release candidate, not a published release.
+This macOS ARM64 installation was qualified as a candidate on October 22 and is
+now the [published Preview 17](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.17).
 It pairs Raven `301e668a5` with the readiness-repaired neoCLR runtime `32184c938`.
 
 - Bundle: `~/.local/share/neoclr/preview17/neoclr`
@@ -37,6 +38,6 @@ The candidate SDK was built from an isolated archive of the pinned compiler
 revision. A preceding shared-checkout packaging attempt exited without a diagnostic;
 its cause remains unconfirmed.
 
-The [live website](https://marinasundstrom.github.io/neoCLR/try/) describes the
-candidate while retaining Preview 16 download links. Windows qualification and
-final release publication remain separate gates.
+The [live website](https://marinasundstrom.github.io/neoCLR/try/) now provides
+Preview 17 downloads. Both platform qualification and publication are complete;
+see [publication evidence](validation/release-20261023/publication.json).
