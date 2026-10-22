@@ -74,7 +74,7 @@ pub(super) fn compile_for_target(
     details: Option<&crate::fault_details::Options>,
     target: Target,
 ) -> Result<Vec<u8>, Error> {
-    compile_for_target_with_imports(input, root, console, details, target, false)
+    compile_for_target_with_imports(input, root, console, details, target, false, None)
 }
 
 pub(super) fn compile_for_target_with_imports(
@@ -84,6 +84,7 @@ pub(super) fn compile_for_target_with_imports(
     details: Option<&crate::fault_details::Options>,
     target: Target,
     native_imports: bool,
+    verification: Option<&neoclr::LoadedProgram>,
 ) -> Result<Vec<u8>, Error> {
     if native_imports
         && (target != Target::MacosArm64 || details.is_some() || !input.types.is_empty())
@@ -148,7 +149,15 @@ pub(super) fn compile_for_target_with_imports(
         "neoclr_scalar",
         cranelift_module::default_libcall_names(),
     )?);
-    compile_scalar_with_imports(input, root, console, &mut module, false, native_imports)?;
+    compile_scalar_with_imports(
+        input,
+        root,
+        console,
+        &mut module,
+        false,
+        native_imports,
+        verification,
+    )?;
     finish(module)
 }
 
@@ -160,7 +169,7 @@ pub(super) fn compile_scalar<M: Module>(
     module: &mut M,
     long_range_calls: bool,
 ) -> Result<(), Error> {
-    compile_scalar_with_imports(input, root, console, module, long_range_calls, false)
+    compile_scalar_with_imports(input, root, console, module, long_range_calls, false, None)
 }
 
 fn compile_scalar_with_imports<M: Module>(
@@ -170,6 +179,7 @@ fn compile_scalar_with_imports<M: Module>(
     module: &mut M,
     long_range_calls: bool,
     native_imports: bool,
+    verification: Option<&neoclr::LoadedProgram>,
 ) -> Result<(), Error> {
     if !input.types.is_empty() {
         return Err("scalar profile does not support type definitions".into());
@@ -284,9 +294,16 @@ fn compile_scalar_with_imports<M: Module>(
     {
         check_console_wrapper()?;
     }
-    neoclr::LoadedProgram::new(input)
-        .and_then(|program| program.verify())
-        .map_err(|error| error.to_string())?;
+    // Verify the source artifact in its declared load context. Dependencies are
+    // metadata inputs only: scalar admission above still forbids external calls,
+    // managed values and type definitions in the emitted application.
+    if let Some(program) = verification {
+        program.verify().map_err(|error| error.to_string())?;
+    } else {
+        neoclr::LoadedProgram::new(input)
+            .and_then(|program| program.verify())
+            .map_err(|error| error.to_string())?;
+    }
 
     let console_id = if uses_console {
         let mut signature = module.make_signature();

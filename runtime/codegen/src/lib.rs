@@ -675,8 +675,8 @@ pub fn run(arguments: Vec<std::ffi::OsString>) -> Result<i32, Box<dyn std::error
     }
     let shifted = inspect || closed;
     let input_path = &args[usize::from(shifted)];
-    if !(dependency_args.is_empty() || closed || inspect_closed) {
-        return Err("--module requires explicit closed-world emission or inspection".into());
+    if !(dependency_args.is_empty() || closed || inspect_closed || native_imports) {
+        return Err("load-context inputs require closed-world emission, inspection or scalar --native-imports".into());
     }
     let load_started = std::time::Instant::now();
     let input = read_module(Path::new(input_path))?;
@@ -832,6 +832,26 @@ pub fn run(arguments: Vec<std::ffi::OsString>) -> Result<i32, Box<dyn std::error
         eprintln!("JIT_RESULT {result}");
         return Ok(0);
     }
+    let import_verification = if native_imports && !dependency_args.is_empty() {
+        let context = context
+            .as_ref()
+            .ok_or("native-import load context requires explicit --system")?;
+        Some(
+            if let Some(root) = &context.object_root {
+                neoclr::LoadedProgram::with_modules_and_object_root(
+                    &input,
+                    &context.system,
+                    &dependencies,
+                    root,
+                )
+            } else {
+                neoclr::LoadedProgram::with_modules(&input, &context.system, &dependencies)
+            }
+            .map_err(|error| error.to_string())?,
+        )
+    } else {
+        None
+    };
     let object = compiler::compile_for_target_with_imports(
         compile_input,
         root,
@@ -839,6 +859,7 @@ pub fn run(arguments: Vec<std::ffi::OsString>) -> Result<i32, Box<dyn std::error
         details.as_ref(),
         target,
         native_imports,
+        import_verification.as_ref(),
     )?;
     // Do not clobber an existing artifact, including on failed compilation.
     let mut output = fs::OpenOptions::new()

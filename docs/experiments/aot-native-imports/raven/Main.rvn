@@ -1,0 +1,10 @@
+unsafe func ReleaseValue(pointer: *int) -> unit {
+    Release(pointer)
+}
+
+unsafe func Main() -> int {
+    let pointer = Allocate(42)
+    let result = Read(pointer)
+    ReleaseValue(pointer)
+    return result + LiveCount()
+}

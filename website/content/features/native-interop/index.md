@@ -162,6 +162,12 @@ Lookup failures return a runtime fault without writing the result. The default
 continues to reject imports; this opt-in requires explicitly linking the native
 resolver. It is not yet available through the ordinary SDK application pipeline.
 
+A tested Raven consumer now goes directly from NativeImport declarations to native
+metadata and AOT machine code. It allocates, reads and releases C-owned memory through
+raw pointers and a `unit`-returning helper. The backend accepts an explicit seed/core
+load context for verification and uses `@entry` for the Raven entry point; dependency
+libraries are not compiled by this scalar profile.
+
 Managed buffers, automatic Ptr<T> wrapper mapping, callbacks, other numeric types, full
 class-library composition and JIT imports remain future work for this path.
 [Execution contract](/docs/native-interop.html#aot-scalar-imports) ·

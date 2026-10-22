@@ -409,3 +409,129 @@ ret
         assert!(Command::new(&executable).status().unwrap().success());
     }
 }
+
+// Raven is an external toolchain, so this integration is explicitly selected with
+// a matching bundle. The Rust framework owns assertions and native fixture cleanup;
+// the scalar profile cannot execute the managed Raven test runner yet.
+#[test]
+#[ignore = "requires NEOCLR_RAVEN_BUNDLE with the matching native compiler and libraries"]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn raven_native_metadata_imports_execute_aot_with_explicit_load_context() {
+    let bundle =
+        PathBuf::from(std::env::var_os("NEOCLR_RAVEN_BUNDLE").expect("set NEOCLR_RAVEN_BUNDLE"))
+            .canonicalize()
+            .unwrap();
+    let root = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../..")
+        .canonicalize()
+        .unwrap();
+    let sample = root.join("docs/experiments/aot-native-imports/raven");
+    let dir = Temp::new();
+    let project = dir.0.join("raven");
+    fs::create_dir(&project).unwrap();
+    for name in ["App.rvnproj", "Main.rvn"] {
+        fs::copy(sample.join(name), project.join(name)).unwrap();
+    }
+    let fixture = dir.0.join("fixture.c");
+    let library = dir.0.join("fixture.dylib");
+    fs::write(
+        &fixture,
+        r#"
+#include <stdlib.h>
+#include <stdint.h>
+static int32_t live;
+int32_t *allocate_value(int32_t value) {
+    int32_t *p = malloc(sizeof(*p));
+    if (p) { *p = value; ++live; }
+    return p;
+}
+int32_t read_value(int32_t *p) { return p ? *p : -100; }
+void release_value(int32_t *p) { if (p) { free(p); --live; } }
+int32_t live_count(void) { return live; }
+"#,
+    )
+    .unwrap();
+    cc(&[&fixture], &["-dynamiclib", "-fPIC"], &library);
+    let imports = dir.0.join("Imports.rvn");
+    fs::write(
+        &imports,
+        fs::read_to_string(sample.join("Imports.rvn"))
+            .unwrap()
+            .replace(
+                "\"aot-raven-fixture\"",
+                &serde_json::to_string(&library.to_str().unwrap()).unwrap(),
+            ),
+    )
+    .unwrap();
+    let result = Command::new("dotnet")
+        .arg(bundle.join("sdk/tools/rvnc/rvnc.dll"))
+        .args(["neoclr", "--project"])
+        .arg(project.join("App.rvnproj"))
+        .env("NeoClrBundleRoot", &bundle)
+        .env("NeoClrAotImports", &imports)
+        .output()
+        .unwrap();
+    assert!(
+        result.status.success(),
+        "{}\n{}",
+        String::from_utf8_lossy(&result.stdout),
+        String::from_utf8_lossy(&result.stderr)
+    );
+    let artifact = project.join("bin/neoclr/RavenAotImports.dll");
+    let object = dir.0.join("app.o");
+    let backend = |output: &Path, context: bool| {
+        let mut cmd = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"));
+        cmd.arg(&artifact)
+            .arg("@entry")
+            .arg(output)
+            .arg("--native-imports");
+        if context {
+            cmd.arg("--system")
+                .arg(bundle.join("lib/System.runtime.neox"))
+                .arg("--module")
+                .arg(bundle.join("lib/System.Runtime.dll"))
+                .arg("--object-root")
+                .arg(bundle.join("lib/System.Runtime.dll"));
+        }
+        cmd.output().unwrap()
+    };
+    let missing = dir.0.join("missing-context.o");
+    assert!(!backend(&missing, false).status.success());
+    assert!(
+        !missing.exists(),
+        "unresolved source references must not produce an object"
+    );
+    let emitted = backend(&object, true);
+    assert!(
+        emitted.status.success(),
+        "{}",
+        String::from_utf8_lossy(&emitted.stderr)
+    );
+    let host = dir.0.join("host.c");
+    fs::write(
+        &host,
+        r#"
+#include <stdint.h>
+extern int32_t neoclr_entry_v2(int32_t, int32_t *);
+int main(void) {
+    for (int i = 0; i < 32; ++i) {
+        int32_t result = -1;
+        if (neoclr_entry_v2(0, &result) || result != 42) return 1;
+    }
+    return 0;
+}
+"#,
+    )
+    .unwrap();
+    let app = dir.0.join("app");
+    cc(
+        &[
+            &host,
+            &object,
+            &root.join("runtime/native/interop/imports.c"),
+        ],
+        &["-pthread"],
+        &app,
+    );
+    assert!(Command::new(&app).status().unwrap().success());
+}

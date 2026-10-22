@@ -175,6 +175,14 @@ address width. The public Ptr<T> wrapper is not automatically projected yet.
 Managed/value profiles, class members, other types, callbacks, JIT and SDK integration remain
 unsupported. The flag is required; the default still rejects imports.
 
+Development source qualification accepts explicit `--system`, `--module` and
+`--object-root` inputs to verify Raven's original metadata references. A load context
+requires `--system`; ordinary loader/verification errors reject before output. These
+libraries are verification inputs, not emitted managed code. Scalar restrictions and
+external-managed-call rejection remain in force. Use `@entry` for the Raven executable
+entry point. The tested Raven consumer performs C allocation, pointer transport and
+no-result release; no neoIL intermediary is involved.
+
 Link `runtime/native/interop/imports.c` into the executable. Its private adapter
 `neoclr_native_import_resolve_v1(const char *library, const char *symbol, void **output)`
 returns 0 on success and 3 (RuntimeError) on failure, leaving output unchanged on

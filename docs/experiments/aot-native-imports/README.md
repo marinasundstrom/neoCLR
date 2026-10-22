@@ -2,7 +2,7 @@
 
 Development, 2026-10-22. The macOS ARM64 scalar backend can emit native import thunks
 when explicitly invoked with `--native-imports`. This closes a small execution gap;
-it does not qualify class-library NativeImport, managed buffers or the SDK pipeline.
+it does not qualify managed class-library bodies, buffers or the ordinary SDK AOT pipeline.
 The existing metadata `NativeImport` descriptor is unchanged. `.foreign` is its
 low-level test spelling; no parallel declaration or library-binding format is added.
 
@@ -170,3 +170,54 @@ Author clarification after qualification: preserve neoCLR Void as a normal type.
 Only language-required values should be materialized. Native no-result calls remain
 stack-empty; a value context needs an explicit compiler adaptation, not a native
 return-register read. See the [corrected design](../../design/native-import-export-contract.md#void-values-and-native-no-result-calls).
+
+## Raven source and explicit verification context (2026-10-22)
+
+The scalar NativeImport profile now accepts trailing `--system`, `--module` and
+`--object-root` inputs for metadata verification. Supply the matching seed/core library;
+`--system` is required when a load context is supplied. The ordinary LoadedProgram
+loader verifies identity, references, accessibility and bodies in that context. No
+reference is stripped or treated as resolved merely because its code is unused.
+Only the original application is emitted. Existing scalar admission still rejects
+type definitions, external managed calls, unsupported values and marshalling; this
+is not closed-world managed-library NativeImport support.
+
+Use `@entry` for a Raven executable's metadata entry point. Source names may be lowered
+to identity-qualified names; no new root-name guessing or metadata naming rule is added.
+
+```sh
+neoclr-codegen RavenAotImports.dll @entry app.o --native-imports \
+  --system /path/to/bundle/lib/System.runtime.neox \
+  --module /path/to/bundle/lib/System.Runtime.dll \
+  --object-root /path/to/bundle/lib/System.Runtime.dll
+```
+
+The checked-in `raven/` consumer uses NativeImport attributes and raw `*int` parameters
+and results, with `unit` for a no-result release helper. It allocates an Int32 in C,
+reads 42, frees it through a Raven helper and checks the live allocation count. The
+Rust integration test compiles Raven to PE/#Neo directly, emits an AOT object, links
+the resolver/C host, and executes 32 calls. It also rejects missing source dependencies
+without writing an object. The project and all generated artifacts are copied into a
+temporary test directory; no hand-authored neoIL supplies the consumer's behavior.
+
+```sh
+NEOCLR_RAVEN_BUNDLE=/absolute/path/to/matching-bundle \
+  cargo test -p neoclr-codegen --test native_imports raven_native_metadata \
+  -- --ignored --nocapture
+```
+
+This opt-in test requires an external matching Raven compiler/bundle. It is ignored in
+the default Cargo run with an explicit reason, not silently reported as passing. The
+Rust test framework owns assertions because the bounded scalar profile cannot yet
+execute the managed Raven test runner's Result/class contracts. The ordinary seven
+native-import tests and 24 scalar regressions remain the default gate.
+
+Qualification uses the local native-callback bundle with Raven `5966b5f84`, macOS ARM64,
+matching Xcode clang/SDK and the dedicated interop-validation Cargo target. This is a
+source-to-native ABI proof, not an installed SDK release. Compared with .NET Native AOT,
+metadata dependencies are likewise validated at compilation, but this profile still
+supports only a bounded scalar application and requires explicit native linking.
+
+Final focused validation: the opt-in Raven test passes, as do all seven default import
+checks, all 24 scalar regressions and all 24 website checks. The Raven test is separately
+selected rather than counted as passed in the default run where it is ignored.
