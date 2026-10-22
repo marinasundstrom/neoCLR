@@ -21214,3 +21214,15 @@ without Cargo, builds both profiles; standalone executable/C/C++ callers pass wi
 empty environments. A changed packaged host is rejected before compilation.
 This qualifies the development kit only; ordinary managed-backend interop and
 the marshalling/export compiler gap remain open.
+
+## 2026-10-22 — Native struct layout and compiler gaps
+
+The author asked that native imports/exports handle structs and struct pointers,
+that generated headers describe structs, and that MarshalAs field overrides and
+StructLayout be respected. The author then directed: “Fix gap next”. The assistant
+implemented checked backend layouts and pointer transport, and repaired Raven/SDK
+nominal pointer signature admission. Backend C/C++ and three-engine tests pass.
+Source emission now succeeds; whole-module scalar validation still rejects the
+synthesized struct constructor. Export-root reachability and source attribute mapping
+remain open; this is not a claim of complete struct marshalling. See the
+[contract](design/native-import-export-contract.md#native-struct-layout-and-pointer-metadata--2026-10-22).

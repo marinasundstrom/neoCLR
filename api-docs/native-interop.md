@@ -314,3 +314,11 @@ names for NativeImport; it is not a runtime metadata sidecar. Guest faults escap
 an export trap and terminate the process. Pointer bounds and lifetime remain the
 native caller's responsibility. Existing files and invalid export selections are
 not overwritten. [Detailed ABI and naming contract](https://github.com/marinasundstrom/neoCLR/blob/main/docs/design/native-import-export-contract.md#free-function-c-export-increment--2026-10-22).
+
+## Struct pointer development status
+
+The native backend accepts checked struct pointer layouts and generates C/C++
+size/alignment/offset assertions. Raven nominal pointer emission is implemented;
+source struct execution, StructLayout/FieldOffset APIs and field MarshalAs admission
+remain incomplete. By-value struct transport is not admitted. See the
+[feature status](/features/native-interop/) for the qualified sample and limits.

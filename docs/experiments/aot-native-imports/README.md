@@ -485,3 +485,19 @@ SDK 417e7a451, native-export-libraries-20261022-v2 Runtime artifacts; v3 adds th
 PostgreSql provider for the documentation audit). The generated library still
 round-trips in interpreter, scalar JIT and AOT. Callback parameters/returns remain
 outside this export profile.
+
+### Struct layout and nominal pointer foundation (2026-10-22)
+
+The assembler backend fixture `native_struct_pointers_and_generated_layout_work_across_engines`
+passes C-owned Pair allocation/read/release through interpreter, scalar JIT and AOT.
+Its exported pointer function is called by C11 and C++17 using the generated struct.
+All 20 existing integration tests pass; 17 focused native unit tests pass, including
+three layout tests with compiler-checked headers. This is backend evidence.
+
+`raven_value_pointer_signatures_emit_native_metadata` separately checks Raven source
+emission and decoded nominal pointee identity using the paired compiler/SDK overlay
+`target/native-struct-bundle-20261022`. It does not execute the source struct: the
+synthesized constructor needs correct scalar export-root selection first.
+The SDK pointer contract tests cover CLI/native encoding and importing value pointers;
+Raven portable tests cover capability admission and preserved symbol identity.
+See the [contract and remaining gaps](../../design/native-import-export-contract.md#native-struct-layout-and-pointer-metadata--2026-10-22).

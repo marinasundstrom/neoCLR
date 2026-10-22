@@ -4,7 +4,7 @@ use cranelift_codegen::ir::types;
 use neoclr::metadata::Type;
 
 pub(crate) fn pointer_target(t: &Type) -> bool {
-    matches!(t, Type::Void | Type::Byte | Type::Int32)
+    matches!(t, Type::Void | Type::Byte | Type::Int32 | Type::Named(_))
 }
 
 pub(crate) fn scalar_type(t: &Type) -> Option<cranelift_codegen::ir::Type> {

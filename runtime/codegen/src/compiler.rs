@@ -86,12 +86,10 @@ pub(super) fn compile_for_target_with_imports(
     native_imports: bool,
     verification: Option<&neoclr::LoadedProgram>,
 ) -> Result<Vec<u8>, Error> {
-    if native_imports
-        && (target != Target::MacosArm64 || details.is_some() || !input.types.is_empty())
-    {
+    if native_imports && (target != Target::MacosArm64 || details.is_some()) {
         return Err("native imports currently require the macOS ARM64 scalar AOT profile".into());
     }
-    if details.is_some() || !input.types.is_empty()
+    if details.is_some() || (!native_imports && !input.types.is_empty())
         || input.functions.iter().any(|f| {
             f.parameters
                 .iter()
@@ -239,7 +237,24 @@ fn compile_scalar_impl<M: Module>(
     verification: Option<&neoclr::LoadedProgram>,
     exports: &[(usize, String)],
 ) -> Result<(), Error> {
-    if !input.types.is_empty() {
+    if native_imports {
+        let layouts = crate::native_layout::Layouts::build(input)?;
+        for function in &input.functions {
+            for ty in function
+                .parameters
+                .iter()
+                .chain(&function.locals)
+                .chain([&function.returns])
+            {
+                layouts.check_pointer(ty)?;
+            }
+            for op in &function.body {
+                if let Op::PointerCast(ty) | Op::NullPointer(ty) = op {
+                    layouts.check_pointer(&Type::Ptr(Box::new(ty.clone())))?;
+                }
+            }
+        }
+    } else if !input.types.is_empty() {
         return Err("scalar profile does not support type definitions".into());
     }
     if input.name == "System" || input.functions.len() > 128 {

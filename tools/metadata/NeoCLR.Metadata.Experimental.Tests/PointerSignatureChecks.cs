@@ -8,6 +8,7 @@ internal static class PointerSignatureChecks
 {
     internal static void Run()
     {
+        ValuePointerRoundTrips();
         GenericRoundTrips();
         PointerCasts();
         PointerAccess();
@@ -79,6 +80,30 @@ internal static class PointerSignatureChecks
         mismatch.GetILGenerator().LoadArgument(0); mismatch.GetILGenerator().Return();
         try { bad.Write(); throw new Exception("different pointer targets accepted"); }
         catch (InvalidDataException) { }
+    }
+
+    private static void ValuePointerRoundTrips()
+    {
+        var graph = new AssemblyBuilder(new("ValuePointers", new(1, 0, 0, 0)), new("System.Runtime", new(10, 0, 0, 0)));
+        var point = graph.AddValueType("Example", "Point");
+        point.AddField("X", PrimitiveType.Int32, FieldVisibility.Public);
+        var pointer = SignatureType.PointerTo(point);
+        var echo = graph.AddType("Example", "Api").AddMethod("Echo", new(pointer, [pointer]));
+        echo.LoadArgument(0); echo.Return();
+        Reject(() => SignatureType.PointerTo(graph.AddType("Example", "Owner")));
+        foreach (var snapshot in new[] { AssemblyDefinition.ReadAssembly(graph.Write(), false), AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteLibraryBinary(graph)) })
+        {
+            var method = snapshot.MainModule.Types.Single(t => t.Name == "Api").Methods.Single();
+            if (!method.TryGetSignature(out var signature) || signature!.ReturnType.PointerElement is not { } target ||
+                target.ReferencedType?.Resolve().Name != "Point" ||
+                !ReferenceEquals(target.ReferencedType.Resolve(), signature.ParameterTypes.Single().PointerElement?.ReferencedType?.Resolve()))
+                throw new Exception("nominal pointer identity lost");
+            var consumer = new AssemblyBuilder(new("ValuePointerConsumer", new(1, 0, 0, 0)), graph.CoreLibrary);
+            var imported = consumer.ImportReference(method, graph.CoreLibrary);
+            var wrapper = consumer.AddFunction("Echo", imported.Signature);
+            wrapper.LoadArgument(0); wrapper.Call(imported); wrapper.Return();
+            _ = RuntimeAssemblyContainer.WriteLibraryBinary(consumer);
+        }
     }
 
     private static void PointerAccess()

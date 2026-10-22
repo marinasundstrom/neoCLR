@@ -16,6 +16,7 @@ mod load_context;
 mod memory_views;
 mod native_exports;
 mod native_imports;
+mod native_layout;
 mod reflection_arrays;
 mod reflection_collections;
 mod reflection_construction;

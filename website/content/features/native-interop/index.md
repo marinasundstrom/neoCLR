@@ -254,6 +254,15 @@ These explicit profiles support the scalar/pointer contract above. They do not
 enable marshalling, callbacks, GC-managed objects or async work. The default
 managed console/HTTP profiles retain their existing scope.
 
+### Struct layout work in development
+
+The macOS ARM64 backend now tests native struct pointers across interpreter, scalar
+JIT and AOT, with generated C/C++ layout assertions. Packed, nested and explicit
+layouts have backend coverage. Raven nominal pointer signatures now emit, but
+source struct execution and source layout/marshalling attributes still have gaps.
+Structs passed by value are not yet supported. This is not part of the qualified
+extracted-kit sample above.
+
 ### Scope of the foundation
 
 Use this foundation for C-compatible numeric functions and explicitly owned native

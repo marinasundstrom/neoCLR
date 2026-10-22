@@ -1410,3 +1410,197 @@ ret
         assert!(!String::from_utf8_lossy(&output.stderr).contains("panicked"));
     }
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_struct_pointers_and_generated_layout_work_across_engines() {
+    let dir = Temp::new();
+    let fixture = dir.0.join("pair.c");
+    let library = dir.0.join("pair.dylib");
+    fs::write(&fixture, r#"
+#include <stdint.h>
+#include <stdlib.h>
+typedef struct { int32_t X; double Y; } Pair;
+Pair *create(int32_t value) { Pair *p = malloc(sizeof(*p)); if(p) { p->X=value; p->Y=2.0; } return p; }
+int32_t probe(Pair *p) { return p ? p->X + (int32_t)p->Y : -1; }
+void release(Pair *p) { free(p); }
+"#).unwrap();
+    cc(&[&fixture], &["-dynamiclib"], &library);
+    let source = format!(
+        r#".module Structs
+.type Pair
+.field X Int32
+.field Y Double
+.end
+.function Create(Int32 value) -> Ptr<Pair>
+.foreign {library:?} "create" cdecl
+.end
+.function Probe(Ptr<Pair> value) -> Int32
+.foreign {library:?} "probe" cdecl
+.end
+.function Release(Ptr<Pair> value) -> void
+.foreign {library:?} "release" cdecl
+.end
+.function Forward(Ptr<Pair> value) -> Int32
+ldarg value
+call Probe(Ptr<Pair>)
+ret
+.end
+.function Calculate(Int32 value) -> Int32
+.local Ptr<Pair> pointer
+.local Int32 result
+ldarg value
+call Create(Int32)
+stloc pointer
+ldloc pointer
+call Forward(Ptr<Pair>)
+stloc result
+ldloc pointer
+call Release(Ptr<Pair>)
+ldloc result
+ret
+.end
+.function Main() -> Int32
+ldc.i4 40
+call Calculate(Int32)
+ret
+.end
+.entry Main
+"#,
+        library = library.to_str().unwrap()
+    );
+    let module = neoclr::assemble(&source).unwrap();
+    let program = neoclr::LoadedProgram::new(&module).unwrap();
+    program.verify().unwrap();
+    // SAFETY: the fixture owns allocation, layout, reads and destruction.
+    assert_eq!(
+        unsafe { program.run_with_native(neoclr::Limits::default()) }
+            .unwrap()
+            .value,
+        neoclr::Value::Int32(42)
+    );
+    let output = compile(&dir, &source, &["--native-imports"]);
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let input = dir.0.join("app.neoil");
+    let jit = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
+        .args(["--jit-scalar"])
+        .arg(&input)
+        .args(["Calculate", "40", "--native-imports"])
+        .output()
+        .unwrap();
+    assert!(
+        jit.status.success(),
+        "{}",
+        String::from_utf8_lossy(&jit.stderr)
+    );
+    let result: serde_json::Value = serde_json::from_slice(&jit.stdout).unwrap();
+    assert_eq!(result["invocations"][0]["value"], 42);
+    let resolver = Path::new(env!("CARGO_MANIFEST_DIR")).join("../native/interop/imports.c");
+    let host = dir.0.join("host.c");
+    fs::write(&host, "#include <stdint.h>\nextern int32_t neoclr_entry_v2(int32_t,int32_t*);\nint main(void){int32_t r=0;return neoclr_entry_v2(40,&r) || r!=42;}\n").unwrap();
+    let executable = dir.0.join("app");
+    cc(&[&host, &dir.0.join("app.o"), &resolver], &[], &executable);
+    assert!(Command::new(&executable).status().unwrap().success());
+    let object = dir.0.join("exports.o");
+    let header = dir.0.join("exports.h");
+    let exported = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
+        .arg("--native-library")
+        .arg(&input)
+        .arg(&object)
+        .args(["--export", "Forward", "--native-imports", "--header"])
+        .arg(&header)
+        .output()
+        .unwrap();
+    assert!(
+        exported.status.success(),
+        "{}",
+        String::from_utf8_lossy(&exported.stderr)
+    );
+    let report: serde_json::Value = serde_json::from_slice(&exported.stdout).unwrap();
+    let symbol = report["exports"][0]["symbol"].as_str().unwrap();
+    let text = fs::read_to_string(&header).unwrap();
+    let name = text
+        .lines()
+        .find(|l| l.starts_with("typedef struct "))
+        .unwrap()
+        .split_whitespace()
+        .nth(2)
+        .unwrap();
+    fs::write(&host, format!("#include \"exports.h\"\nint main(void) {{ {name} p; p.field_58=40; p.field_59=2.0; return {symbol}(&p)!=42; }}\n")).unwrap();
+    cc(&[&host, &object, &resolver], &[], &executable);
+    assert!(Command::new(&executable).status().unwrap().success());
+    let cpp = dir.0.join("host.cpp");
+    fs::copy(&host, &cpp).unwrap();
+    let resolver_object = dir.0.join("resolver.o");
+    cc(&[&resolver], &["-c"], &resolver_object);
+    cc(
+        &[&cpp, &object, &resolver_object],
+        &["-std=c++17"],
+        &executable,
+    );
+    assert!(Command::new(&executable).status().unwrap().success());
+}
+
+#[test]
+#[ignore = "requires matching NEOCLR_RAVEN_BUNDLE with nominal pointer emission"]
+fn raven_value_pointer_signatures_emit_native_metadata() {
+    let bundle = PathBuf::from(std::env::var_os("NEOCLR_RAVEN_BUNDLE").unwrap())
+        .canonicalize()
+        .unwrap();
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let dir = Temp::new();
+    fs::copy(
+        root.join("tools/native/samples/native-interop/App.rvnproj"),
+        dir.0.join("App.rvnproj"),
+    )
+    .unwrap();
+    fs::write(
+        dir.0.join("Main.rvn"),
+        r#"
+import System.Runtime.InteropServices.*
+public struct Point {
+    field X: int
+    field Y: int
+}
+[NativeExport("point_identity")]
+unsafe func Identity(pointer: *Point) -> *Point {
+    return pointer
+}
+func Main() -> int { return 0 }
+"#,
+    )
+    .unwrap();
+    let output = Command::new("dotnet")
+        .arg(bundle.join("sdk/tools/rvnc/rvnc.dll"))
+        .args(["neoclr", "--project"])
+        .arg(dir.0.join("App.rvnproj"))
+        .env("NeoClrBundleRoot", &bundle)
+        .output()
+        .unwrap();
+    assert!(
+        output.status.success(),
+        "{}\n{}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let bytes = fs::read(dir.0.join("bin/neoclr/NativeInteropSample.dll")).unwrap();
+    let module = neoclr::metadata_container::decode_envelope(&bytes).unwrap();
+    let point = module
+        .types
+        .iter()
+        .find(|t| t.origin.as_ref().is_some_and(|o| o.name == "Point"))
+        .unwrap();
+    let identity = module
+        .functions
+        .iter()
+        .find(|f| f.origin.as_ref().is_some_and(|o| o.name == "Identity"))
+        .unwrap();
+    let pointer =
+        neoclr::metadata::Type::Ptr(Box::new(neoclr::metadata::Type::Named(point.name.clone())));
+    assert_eq!(identity.parameters, vec![pointer.clone()]);
+    assert_eq!(identity.returns, pointer);
+}

@@ -475,3 +475,37 @@ conventions inside AOT output. Opaque pointers can support C wrappers around C++
 objects without describing their layout; direct C++ ABI/vtable mapping is deferred.
 Callback signatures should eventually map to C function pointers and header
 typedefs, but retained callbacks/captured state require an explicit lifetime model.
+
+## Native struct layout and pointer metadata — 2026-10-22
+
+Development support on macOS ARM64 now separates native storage layout from the
+managed value layout and the aggregate calling ABI. The scalar backend admits
+pointers to checked closed value structs. Its generated C11/C++17 headers include
+source-identity-derived struct names and size, alignment and field-offset assertions.
+Sequential packing, minimum size, nested values, self pointers and explicit overlapping
+fields are covered. Explicit fields use named packed views inside a union; access uses
+`field_<encoded-name>.value`. Auto layout, managed fields, invalid offsets/packing,
+unresolved annotations and recursive by-value storage reject before output.
+
+The metadata layout decoder recognizes canonical StructLayoutAttribute and
+FieldOffsetAttribute identities and field MarshalAs Bool8/Bool32. Boolean storage
+defaults to four-byte BOOL, following .NET native marshalling. This is a native storage
+description, not automatic conversion of a managed Boolean field or permission to
+pass a struct by value. Aggregate register/stack classification remains unimplemented.
+The comparison is grounded in [default marshalling](https://learn.microsoft.com/en-us/dotnet/framework/interop/default-marshalling-behavior)
+and [blittable types](https://learn.microsoft.com/en-gb/dotnet/framework/interop/blittable-and-non-blittable-types);
+[AAPCS64](https://github.com/ARM-software/abi-aa/blob/main/aapcs64/aapcs64.rst) distinguishes
+aggregate transport from memory layout. Qualification remains Apple ARM64 only.
+
+Raven's native emitter and metadata SDK now preserve nominal value-pointer targets.
+The compiler opts into a value-pointer capability; ordinary .NET/default portable
+profiles are unchanged. This machinery is absent from Raven main and remains on
+codex/neoclr. Existing pointer metadata is reused, with ordinary nominal identity;
+no new Runtime Contract option or lossy CLI bridge encoding is introduced.
+
+Limits: Raven source StructLayout/FieldOffset APIs and field MarshalAs admission are
+still pending, including physical attribute-owner resolution. A Raven Point pointer
+signature compiles and decodes correctly, but its synthesized constructor currently
+blocks whole-module scalar compilation. Correct export-root reachability is the next
+backend gap; constructors must not simply be deleted. No installed-SDK qualification
+or source-level struct execution is claimed by this increment.

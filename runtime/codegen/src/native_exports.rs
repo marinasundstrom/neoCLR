@@ -17,6 +17,7 @@ fn hex(value: &str) -> String {
 fn tag(t: &Type) -> Result<String, Error> {
     Ok(match t {
         Type::Void => "v".into(),
+        Type::Named(name) => format!("s{}", hex(name)),
         Type::Byte => "u8".into(),
         Type::Int32 => "i32".into(),
         Type::UInt32 => "u32".into(),
@@ -134,7 +135,27 @@ fn exported_name(
                 .unwrap_or(&o.assembly)
         })
         .unwrap_or(&input.name);
-    symbol(assembly, f)
+    let layouts = crate::native_layout::Layouts::build(input)?;
+    let mut signature = f.clone();
+    for ty in signature
+        .parameters
+        .iter_mut()
+        .chain([&mut signature.returns])
+    {
+        if let Type::Ptr(inner) = ty {
+            if let Type::Named(name) = &**inner {
+                *inner = Box::new(Type::Named(
+                    layouts
+                        .0
+                        .get(name)
+                        .ok_or("unresolved native struct export")?
+                        .name
+                        .clone(),
+                ));
+            }
+        }
+    }
+    symbol(assembly, &signature)
 }
 
 fn validate_export(f: &Function) -> Result<(), Error> {
@@ -151,9 +172,15 @@ fn validate_export(f: &Function) -> Result<(), Error> {
     Ok(())
 }
 
-fn c_type(t: &Type) -> Result<String, Error> {
+fn c_type(t: &Type, layouts: &crate::native_layout::Layouts) -> Result<String, Error> {
     Ok(match t {
         Type::Void => "void".into(),
+        Type::Named(name) => layouts
+            .0
+            .get(name)
+            .ok_or("unresolved native header struct")?
+            .name
+            .clone(),
         Type::Byte => "uint8_t".into(),
         Type::Int32 => "int32_t".into(),
         Type::UInt32 => "uint32_t".into(),
@@ -163,7 +190,9 @@ fn c_type(t: &Type) -> Result<String, Error> {
         Type::UIntPtr => "uintptr_t".into(),
         Type::Single => "float".into(),
         Type::Double => "double".into(),
-        Type::Ptr(inner) if scalar_abi::pointer_target(inner) => format!("{} *", c_type(inner)?),
+        Type::Ptr(inner) if scalar_abi::pointer_target(inner) => {
+            format!("{} *", c_type(inner, layouts)?)
+        }
         _ => return Err("unsupported C header type".into()),
     })
 }
@@ -172,6 +201,8 @@ fn header(input: &neoclr::Module, exports: &[(usize, String)]) -> Result<String,
     let mut text = String::from(
         "/* Generated neoCLR C ABI v1 declarations for aarch64-apple-darwin.\n * Pointer validity, ownership and lifetime follow each function's contract.\n * Guest faults escaping an export terminate the process; no C++ unwinding.\n */\n#pragma once\n#include <stdint.h>\n#if !defined(__APPLE__) || !defined(__aarch64__)\n#error This neoCLR library targets macOS ARM64\n#endif\n#ifdef __cplusplus\nextern \"C\" {\n#endif\n",
     );
+    let layouts = crate::native_layout::Layouts::build(input)?;
+    text.push_str(&layouts.header()?);
     for (index, name) in exports {
         let keywords = "alignas alignof and and_eq asm auto bitand bitor bool break case catch char char8_t char16_t char32_t class compl concept const consteval constexpr constinit const_cast continue co_await co_return co_yield decltype default delete do double dynamic_cast else enum explicit export extern false float for friend goto if inline int long mutable namespace new noexcept not not_eq nullptr operator or or_eq private protected public register reinterpret_cast requires return short signed sizeof static static_assert static_cast struct switch template this thread_local throw true try typedef typeid typename union unsigned using virtual void volatile wchar_t while xor xor_eq _Alignas _Alignof _Atomic _Bool _Complex _Generic _Imaginary _Noreturn _Static_assert _Thread_local restrict";
         if name.is_empty()
@@ -193,14 +224,14 @@ fn header(input: &neoclr::Module, exports: &[(usize, String)]) -> Result<String,
             f.parameters
                 .iter()
                 .enumerate()
-                .map(|(i, t)| Ok(format!("{} arg{i}", c_type(t)?)))
+                .map(|(i, t)| Ok(format!("{} arg{i}", c_type(t, &layouts)?)))
                 .collect::<Result<Vec<_>, Error>>()?
                 .join(", ")
         };
         let result = if f.no_result {
             "void".into()
         } else {
-            c_type(&f.returns)?
+            c_type(&f.returns, &layouts)?
         };
         text.push_str(&format!("{result} {name}({args});\n"));
     }

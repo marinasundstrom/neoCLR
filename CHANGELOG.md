@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
+- Add checked macOS ARM64 native struct-pointer layouts and generated C/C++ layout assertions, with sequential/explicit layout metadata, packing, nested fields and Bool8/Bool32 field representations. Backend struct pointers pass interpreter/JIT/AOT and C/C++ callers. Repair metadata SDK nominal pointer admission paired with Raven native emission; preserve ordinary type identity. Source struct execution still needs export-root selection, and source layout attributes/aggregate-by-value transport remain gaps. No managed layout or installed-SDK support is implied.
+
 - Integrate the scalar C ABI into explicit native-interop/native-library build-kit profiles, including a Raven native-allocation sample, generated header and C consumer. Extracted-kit qualification passes outside the checkout without Cargo, with standalone executable/C/C++ callers and pre-build tamper rejection; six focused builder tests pass. Managed-only options reject in scalar profiles. This closes development-kit access, not managed SDK execution, MarshalAs/callback parity or pinning.
 
 - Add a website walkthrough of the tested NativeExport pointer sample, its generated C declaration and three-engine reproduction command. Bound the interop completion plan to a release-useful C foundation, explicitly separating development-backend evidence from installed-SDK qualification and deferred object/sidecar work.
