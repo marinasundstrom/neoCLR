@@ -1,18 +1,19 @@
 //! Bounded C-ABI import thunks. Managed private status/result ABI stays separate.
+use crate::scalar_abi::scalar_type;
 use cranelift_codegen::ir::{AbiParam, InstBuilder, MemFlags, StackSlotData, StackSlotKind, types};
 use cranelift_frontend::{FunctionBuilder, FunctionBuilderContext};
 use cranelift_module::{DataDescription, FuncId, Linkage, Module};
-use neoclr::metadata::{Function, Type};
+use neoclr::metadata::Function;
 type Error = Box<dyn std::error::Error>;
 
 pub(crate) fn validate(f: &Function) -> Result<(), Error> {
     let import = f.pinvoke.as_ref().ok_or("missing native import")?;
     if f.owner.is_some()
         || f.instance
-        || f.returns != Type::Int32
+        || scalar_type(&f.returns).is_none()
         || f.no_result
         || f.parameters.len() > 16
-        || f.parameters.iter().any(|t| *t != Type::Int32)
+        || f.parameters.iter().any(|t| scalar_type(t).is_none())
         || !f.locals.is_empty()
         || !f.body.is_empty()
         || f.impl_flags != 0
@@ -33,7 +34,7 @@ pub(crate) fn validate(f: &Function) -> Result<(), Error> {
         || !import.callback_parameters.is_empty()
         || import.function_return.is_some()
     {
-        return Err(format!("{}: native import profile requires free Int32 functions with at most 16 Int32 parameters and no marshalling", f.name).into());
+        return Err(format!("{}: native import profile requires free scalar functions with at most 16 Int32 or supported pointer parameters and no marshalling", f.name).into());
     }
     // The ordinary metadata verifier validates names and calling conventions.
     Ok(())
@@ -70,8 +71,14 @@ pub(crate) fn emit<M: Module>(
         &resolve_sig,
     )?;
     let mut native_sig = module.make_signature();
-    native_sig.params = vec![AbiParam::new(types::I32); f.parameters.len()];
-    native_sig.returns.push(AbiParam::new(types::I32));
+    native_sig.params = f
+        .parameters
+        .iter()
+        .map(|t| AbiParam::new(scalar_type(t).unwrap()))
+        .collect();
+    native_sig
+        .returns
+        .push(AbiParam::new(scalar_type(&f.returns).unwrap()));
     let mut ctx = module.make_context();
     ctx.func.signature = module
         .declarations()

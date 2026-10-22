@@ -2,7 +2,7 @@
 //! Definite local initialization remains the ordinary neoCLR verifier's job.
 use super::{Error, console_call};
 use cranelift_codegen::ir::condcodes::IntCC;
-use neoclr::metadata::{Function, Instruction as Op};
+use neoclr::metadata::{Function, Instruction as Op, Type};
 use std::collections::VecDeque;
 
 pub(super) fn comparison(op: &Op) -> Option<(usize, IntCC)> {
@@ -24,6 +24,7 @@ pub(super) fn comparison(op: &Op) -> Option<(usize, IntCC)> {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(super) enum Kind {
     Int32,
+    Pointer,
     Boolean,
     Literal,
     Unit,
@@ -31,7 +32,14 @@ pub(super) enum Kind {
 
 pub(super) type Stacks = Vec<Option<Vec<Kind>>>;
 
-pub(super) fn analyze(function: &Function) -> Result<Stacks, Error> {
+pub(super) fn analyze(function: &Function, functions: &[Function]) -> Result<Stacks, Error> {
+    let kind = |t: &Type| {
+        if matches!(t, Type::Ptr(_)) {
+            Kind::Pointer
+        } else {
+            Kind::Int32
+        }
+    };
     let fail =
         |pc, message| -> Error { format!("{} instruction {pc}: {message}", function.name).into() };
     let count = function.body.len();
@@ -104,6 +112,12 @@ pub(super) fn analyze(function: &Function) -> Result<Stacks, Error> {
                 matches!(popped[0], Kind::Int32 | Kind::Boolean)
             }
             Op::Call(target) if console_call(target) => popped == [Kind::Literal],
+            Op::Call(target) => popped
+                .iter()
+                .copied()
+                .eq(target.parameters.iter().map(&kind)),
+            Op::Store(index) => popped == [kind(&function.locals[*index])],
+            Op::Return => popped == [kind(&function.returns)],
             _ => popped.iter().all(|kind| *kind == Kind::Int32),
         };
         if !valid_operands {
@@ -116,6 +130,15 @@ pub(super) fn analyze(function: &Function) -> Result<Stacks, Error> {
             Op::String(_) => stack.push(Kind::Literal),
             Op::Bool(_) | Op::Equal | Op::Less | Op::Greater => stack.push(Kind::Boolean),
             Op::Call(target) if console_call(target) => stack.push(Kind::Unit),
+            Op::Arg(index) => stack.push(kind(&function.parameters[*index])),
+            Op::Load(index) => stack.push(kind(&function.locals[*index])),
+            Op::Call(target) => {
+                let callee = functions
+                    .iter()
+                    .find(|f| f.name == target.name && f.parameters == target.parameters)
+                    .ok_or_else(|| fail(pc, "unresolved scalar call"))?;
+                stack.push(kind(&callee.returns));
+            }
             Op::Dup => {
                 stack.extend_from_slice(&popped);
                 stack.extend_from_slice(&popped);

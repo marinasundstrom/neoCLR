@@ -198,7 +198,7 @@ fn compile_scalar_with_imports<M: Module>(
             crate::native_imports::validate(function)?;
             flows.push(Vec::new());
         } else {
-            flows.push(check_function(function)?);
+            flows.push(check_function(function, &input.functions, native_imports)?);
         }
     }
     let root_index = *names.get(root).ok_or("root function not found")?;
@@ -206,7 +206,9 @@ fn compile_scalar_with_imports<M: Module>(
         return Err("native import cannot be the managed AOT root".into());
     }
     let parameterless_root = input.functions[root_index].parameters.is_empty();
-    if !parameterless_root && input.functions[root_index].parameters != [Type::Int32] {
+    if input.functions[root_index].returns != Type::Int32
+        || (!parameterless_root && input.functions[root_index].parameters != [Type::Int32])
+    {
         return Err("root must have signature () -> Int32 or (Int32) -> Int32".into());
     }
     // Validate every declared body, including unreachable functions/instructions.
@@ -323,8 +325,12 @@ fn compile_scalar_with_imports<M: Module>(
     let mut ids = Vec::new();
     for (index, function) in input.functions.iter().enumerate() {
         let mut sig = module.make_signature();
-        sig.params = vec![AbiParam::new(types::I32); function.parameters.len()];
-        sig.params.push(AbiParam::new(types::I64)); // writable Int32 result pointer
+        sig.params = function
+            .parameters
+            .iter()
+            .map(|t| AbiParam::new(crate::scalar_abi::scalar_type(t).unwrap()))
+            .collect();
+        sig.params.push(AbiParam::new(types::I64)); // writable typed result pointer
         sig.returns.push(AbiParam::new(types::I32)); // status: 0 success, 1 zero, 2 overflow
         let (name, linkage) = if index == root_index && !parameterless_root {
             ("neoclr_entry_v2".to_owned(), Linkage::Export)
@@ -354,8 +360,8 @@ fn compile_scalar_with_imports<M: Module>(
             let output = args[function.parameters.len()];
             let call_result = builder.create_sized_stack_slot(StackSlotData::new(
                 StackSlotKind::ExplicitSlot,
-                4,
-                2,
+                8,
+                3,
             ));
             let blocks: Vec<_> = function
                 .body
@@ -368,7 +374,7 @@ fn compile_scalar_with_imports<M: Module>(
                         builder.append_block_param(
                             blocks[pc],
                             match kind {
-                                flow::Kind::Literal => types::I64,
+                                flow::Kind::Literal | flow::Kind::Pointer => types::I64,
                                 flow::Kind::Int32 | flow::Kind::Boolean | flow::Kind::Unit => {
                                     types::I32
                                 }
@@ -378,7 +384,10 @@ fn compile_scalar_with_imports<M: Module>(
                 }
             }
             for local in 0..function.locals.len() {
-                builder.declare_var(Variable::from_u32(local as u32), types::I32);
+                builder.declare_var(
+                    Variable::from_u32(local as u32),
+                    crate::scalar_abi::scalar_type(&function.locals[local]).unwrap(),
+                );
             }
             builder.ins().jump(blocks[0], &[]);
             for (pc, op) in function.body.iter().enumerate() {
@@ -477,7 +486,14 @@ fn compile_scalar_with_imports<M: Module>(
                         let status = builder.inst_results(call)[0];
                         let failed = builder.ins().icmp_imm(IntCC::NotEqual, status, 0);
                         return_if(&mut builder, failed, status);
-                        stack.push(builder.ins().stack_load(types::I32, call_result, 0));
+                        stack.push(
+                            builder.ins().stack_load(
+                                crate::scalar_abi::scalar_type(&input.functions[callee].returns)
+                                    .unwrap(),
+                                call_result,
+                                0,
+                            ),
+                        );
                     }
                     Op::Fault(_) => {
                         // Terminal UserFault; the experimental ABI carries category only.
@@ -585,7 +601,14 @@ fn finish(module: ObjectModule) -> Result<Vec<u8>, Error> {
     Ok(product.emit()?)
 }
 
-fn check_function(function: &Function) -> Result<flow::Stacks, Error> {
+fn check_function(
+    function: &Function,
+    functions: &[Function],
+    native_imports: bool,
+) -> Result<flow::Stacks, Error> {
+    let admitted = |t: &Type| {
+        *t == Type::Int32 || native_imports && crate::scalar_abi::scalar_type(t).is_some()
+    };
     if function.owner.is_some()
         || function.instance
         || function.is_abstract
@@ -594,9 +617,9 @@ fn check_function(function: &Function) -> Result<flow::Stacks, Error> {
         || function.is_internal_call()
         || function.pinvoke.is_some()
         || function.no_result
-        || function.returns != Type::Int32
-        || function.parameters.iter().any(|ty| *ty != Type::Int32)
-        || function.locals.iter().any(|ty| *ty != Type::Int32)
+        || !admitted(&function.returns)
+        || function.parameters.iter().any(|ty| !admitted(ty))
+        || function.locals.iter().any(|ty| !admitted(ty))
         || function.locals.len() > 1024
         || !function.generic_parameters.is_empty()
         || !function.generic_arguments.is_empty()
@@ -609,9 +632,9 @@ fn check_function(function: &Function) -> Result<flow::Stacks, Error> {
         || function.impl_flags != 0
         || function.body.len() > 8192
     {
-        return Err(format!("{}: scalar profile requires nongeneric free Int32 functions with Int32 locals and no native imports", function.name).into());
+        return Err(format!("{}: scalar profile requires nongeneric free functions with admitted scalar types (pointers require native-import opt-in)", function.name).into());
     }
-    flow::analyze(function)
+    flow::analyze(function, functions)
 }
 
 fn block_args(stack: &[ir::Value]) -> Vec<ir::BlockArg> {

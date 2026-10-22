@@ -221,3 +221,97 @@ fn native_int32_register_and_stack_arguments_keep_order_and_signedness() {
     let result = Command::new(executable).output().unwrap();
     assert!(result.status.success(), "{result:?}");
 }
+
+#[test]
+fn pointer_imports_reject_unsupported_layouts_and_scalar_misuse() {
+    for body in [
+        ".function Imported() -> Ptr<String>\n.foreign \"missing\" \"get\" cdecl\n.end\n.function Calculate(Int32 value) -> Int32\nldarg value\nret\n.end",
+        ".function Imported() -> Ptr<Int32>\n.foreign \"missing\" \"get\" cdecl\n.end\n.function Calculate(Int32 value) -> Int32\ncall Imported()\nldarg value\nadd\nret\n.end",
+        ".function Imported() -> Ptr<Int32>\n.foreign \"missing\" \"get\" cdecl\n.end\n.function Calculate(Int32 value) -> Ptr<Int32>\ncall Imported()\nret\n.end",
+        ".function Imported(Ptr<Byte> p) -> Int32\n.foreign \"missing\" \"use\" cdecl\n.end\n.function Get() -> Ptr<Int32>\n.foreign \"missing\" \"get\" cdecl\n.end\n.function Calculate(Int32 value) -> Int32\ncall Get()\ncall Imported(Ptr<Byte>)\nret\n.end",
+    ] {
+        let dir = Temp::new();
+        let result = compile(
+            &dir,
+            &format!(".module Rejected\n{body}\n"),
+            &["--native-imports"],
+        );
+        assert!(!result.status.success(), "unexpected admission: {body}");
+        assert!(!dir.0.join("app.o").exists());
+    }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_owned_pointers_survive_locals_helpers_and_null_roundtrips() {
+    let dir = Temp::new();
+    let fixture = dir.0.join("pointer.c");
+    let library = dir.0.join("pointer.dylib");
+    fs::write(
+        &fixture,
+        r#"
+#include <stdint.h>
+#include <stdlib.h>
+void *create(int32_t value) {
+    if (value == 0) return NULL;
+    int32_t *p = malloc(sizeof(*p));
+    if (p) *p = value;
+    return p;
+}
+int32_t consume(void *address) {
+    if (!address) return 0;
+    int32_t *p = address;
+    int32_t value = *p;
+    free(p);
+    return value;
+}
+"#,
+    )
+    .unwrap();
+    cc(&[&fixture], &["-dynamiclib", "-fPIC"], &library);
+    for pointee in ["Void", "Byte", "Int32"] {
+        let _ = fs::remove_file(dir.0.join("app.o"));
+        let pointer = format!("Ptr<{pointee}>");
+        let source = format!(
+            r#".module Pointers
+.function Create(Int32 value) -> {pointer}
+.foreign {library:?} "create" cdecl
+.end
+.function Consume({pointer} address) -> Int32
+.foreign {library:?} "consume" cdecl
+.end
+.function Forward({pointer} address) -> {pointer}
+ldarg address
+ret
+.end
+.function Calculate(Int32 value) -> Int32
+.local {pointer} address
+ldarg value
+call Create(Int32)
+stloc address
+ldloc address
+call Forward({pointer})
+call Consume({pointer})
+ret
+.end
+"#,
+            library = library.to_str().unwrap()
+        );
+        let result = compile(&dir, &source, &["--native-imports"]);
+        assert!(
+            result.status.success(),
+            "{}",
+            String::from_utf8_lossy(&result.stderr)
+        );
+        let host = dir.0.join("pointer-host.c");
+        fs::write(&host, "#include <stdint.h>\nextern int32_t neoclr_entry_v2(int32_t,int32_t*);\nint main(void) { int32_t result=123; for(int32_t i=-4;i<5;++i) { if(neoclr_entry_v2(i,&result)||result!=i) return 1; } return 0; }\n").unwrap();
+        let resolver = Path::new(env!("CARGO_MANIFEST_DIR")).join("../native/interop/imports.c");
+        let executable = dir.0.join("pointer-app");
+        cc(
+            &[&host, &resolver, &dir.0.join("app.o")],
+            &["-pthread", "-Wall", "-Wextra", "-Werror"],
+            &executable,
+        );
+        assert!(Command::new(&executable).status().unwrap().success());
+    }
+}

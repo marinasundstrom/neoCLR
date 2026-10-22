@@ -3,7 +3,7 @@
 **Development (2026-10-12):** Raven `extern` declarations can use neutral native-import
 attributes, lowered to explicit runtime metadata. The interpreter supports C ABI
 scalars, pointers, input text and explicitly sized booleans. A bounded development
-[AOT scalar profile](experiments/aot-native-imports/README.md) now supports free Int32
+[AOT scalar profile](experiments/aot-native-imports/README.md) now supports free Int32/pointer
 imports on macOS ARM64 with explicit opt-in. General AOT/JIT import lowering and
 installed compiler-bundle qualification remain open. This is trusted native
 execution, not a sandbox or a complete FFI.
@@ -495,3 +495,9 @@ metadata support does not imply complete Raven declaration or AOT support.
 See the [mapping design](design/native-import-export-contract.md#declaration-level-projections)
 for the intended contract and the [AOT proof](experiments/aot-native-imports/README.md)
 for the implemented subset.
+
+
+The [AOT pointer transport increment](experiments/aot-native-imports/README.md#pointer-transport-development-2026-10-22)
+now supports raw Void/Byte/Int32 pointer metadata through native calls and scalar
+locals/helpers. This does not yet implement nominal Ptr<T> projection, callbacks,
+managed pinning or class-library composition.

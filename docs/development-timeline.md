@@ -26,6 +26,17 @@ available original wording; other text is a summary.
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
 
+## 2026-10-22 — Reuse interop binding machinery where contracts match
+
+The author suggests sharing binding functionality with internal calls unless special
+mapping prevents it, leaving implementation judgment to the assistant. The assistant
+separates shared ABI representation from native-loader/callback lifetime policies.
+The pointer increment extracts one scalar-width mapper used by private calls and C
+import thunks. Existing internal-call bindings validate exact runtime services and
+may require managed/context-specific representations; they are not routed through
+the foreign loader. Additional sharing remains conditional on matching contracts.
+See [pointer transport](experiments/aot-native-imports/README.md#pointer-transport-development-2026-10-22).
+
 ## 2026-10-22 — Typed native import declarations
 
 The author clarifies that native imports should map useful types in their declarations:

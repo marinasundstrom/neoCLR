@@ -2,7 +2,7 @@
 
 **Development:** Raven `extern` functions and static methods can declare native
 imports through `System.Runtime.InteropServices` attributes. The interpreter executes
-these imports. A bounded development AOT profile additionally supports free Int32
+these imports. A bounded development AOT profile additionally supports free Int32/pointer
 C imports on macOS ARM64; general AOT/JIT and installed-bundle support remain open.
 The interface describes native libraries, ABI and value representation on any host.
 
@@ -107,19 +107,22 @@ suite tests aliases, null defaults and equality/hashing across boxing and collec
 
 A struct constraint does not establish an unmanaged layout. Native layout checks
 still apply. Pointer arithmetic and safe native Slice borrowing remain future work;
-this wrapper does not add native-pointer imports to the bounded AOT profile.
+the bounded AOT profile transports raw pointer metadata but does not yet project
+this public wrapper automatically.
 
 
 ## Development AOT import foundation
 
 The low-level macOS ARM64 scalar backend accepts `--native-imports` for free C
-functions taking up to sixteen Int32 arguments and returning Int32. Generated code
+functions taking up to sixteen Int32/pointer arguments and returning Int32 or a
+pointer. Pointer metadata targets are Void, Byte or Int32; address transport through
+locals/helpers is supported, with ownership remaining in the native contract. Generated code
 resolves symbols lazily and retains successfully loaded libraries until process exit.
 Lookup failures return a runtime fault without writing the result. The default
 continues to reject imports; this opt-in requires explicitly linking the native
 resolver. It is not yet available through the ordinary SDK application pipeline.
 
-Managed buffers, pointers, no-result calls, callbacks, other numeric types, full
+Managed buffers, automatic Ptr<T> wrapper mapping, no-result calls, callbacks, other numeric types, full
 class-library composition and JIT imports remain future work for this path.
 [Execution contract](/docs/native-interop.html#aot-scalar-imports) ·
 [Tests and reproduction](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/aot-native-imports/README.md)

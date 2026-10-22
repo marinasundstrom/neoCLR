@@ -4,7 +4,7 @@
 NativeImportAttribute, MarshalAsAttribute, NativeCallingConvention,
 NativeStringMarshalling and NativeType. Matching source compiler/runtime changes are
 required; installed bundles and general JIT/AOT imports are not yet qualified.
-A separate [bounded scalar AOT profile](#aot-scalar-imports) supports Int32 C imports.
+A separate [bounded scalar AOT profile](#aot-scalar-imports) supports Int32/pointer C imports.
 
 | API | Contract |
 | --- | --- |
@@ -141,9 +141,11 @@ and persistent native-backed Memory ownership remain open.
 ## Bounded AOT import execution (development)
 
 `neoclr-codegen --native-imports` enables the macOS ARM64 scalar AOT backend's
-existing NativeImport descriptors for nongeneric free Int32 functions with at most
-16 Int32 parameters, without marshalling. Managed/value profiles, class members,
-other types, no-result calls, pointers, callbacks, JIT and SDK integration remain
+existing NativeImport descriptors for nongeneric free functions with at most 16
+parameters, using Int32 or raw pointer metadata to Void, Byte or Int32 for parameters
+and results, without marshalling. Pointer locals and helper calls preserve native
+address width. The public Ptr<T> wrapper is not automatically projected yet.
+Managed/value profiles, class members, other types, no-result calls, callbacks, JIT and SDK integration remain
 unsupported. The flag is required; the default still rejects imports.
 
 Link `runtime/native/interop/imports.c` into the executable. Its private adapter

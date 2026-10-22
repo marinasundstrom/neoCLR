@@ -143,7 +143,7 @@ startup and deployment size should be measured separately.
 Native compilation is the primary deployment direction for Raven on neoCLR;
 JIT and interpretation remain useful execution options. Development NativeImport
 support covers the interpreter and an opt-in macOS ARM64 scalar AOT proof for free
-Int32 C functions. Full managed-program AOT imports, JIT imports and managed-memory
+Int32/pointer C functions. Full managed-program AOT imports, JIT imports and managed-memory
 pinning remain gaps. [Current scope](/features/native-interop/#development-aot-import-foundation).
 
 The development interpreter also provides explicit `NativeMemory.Copy` overloads

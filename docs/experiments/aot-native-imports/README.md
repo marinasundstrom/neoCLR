@@ -17,7 +17,7 @@ clang host.c app.o runtime/native/interop/imports.c -pthread -o app
 
 The C host uses the existing `neoclr_entry_v2(Int32, Int32*) -> status` ABI from
 `docs/experiments/aot-scalar/abi.h`. Imported functions use the target C ABI directly:
-zero through sixteen Int32 parameters and an Int32 result, nongeneric free/static
+zero through sixteen Int32/pointer parameters and an Int32/pointer result, nongeneric free/static
 module functions, without marshalling. The root itself must be ordinary managed
 code. macOS Cdecl/System conventions coincide; unsupported convention metadata is
 rejected by ordinary validation. No source attribute or compiler Runtime Contract
@@ -26,8 +26,8 @@ configuration changes.
 The default rejects imports. The opt-in rejects other targets, JIT, closed-world
 composition, inspection and managed/value/context profiles before writing an object.
 This is a backend development capability, not a new default for installed SDKs or
-VS Code. Types other than Int32, no-result calls, member imports, pointers, native
-allocation, pinning, callbacks and asynchronous work remain outside this profile.
+VS Code. Types other than Int32 and the supported pointers, no-result calls, member imports,
+managed allocation/pinning, callbacks and asynchronous work remain outside this profile.
 
 The generated thunk resolves `(library, exact entry point)` on first invocation and
 adapts the C result to the private status/result convention. Compilation and unused
@@ -84,3 +84,41 @@ not cover Windows, JIT, full managed programs or release SDK packaging.
 Validation on 2026-10-22, macOS ARM64 with the matching Xcode SDK: all three
 `native_imports` integration tests and all 24 `scalar` regression tests pass.
 This does not qualify other architectures, managed-object imports or installed SDKs.
+
+
+## Pointer transport (development, 2026-10-22)
+
+The opt-in admits raw pointer metadata `Ptr<Void>`, `Ptr<Byte>` and `Ptr<Int32>`
+in native parameters/results and ordinary helper parameters/results/locals. These
+are 64-bit address lanes on the qualified target. They are not the nominal public
+`System.Runtime.InteropServices.Ptr<T>` struct: automatic wrapper projection is
+still pending. The exported host root remains Int32 with the existing ABI.
+
+A native fixture allocates storage, returns its address, receives it back through a
+managed local/helper and frees it in native code. Null follows the same transport.
+The runtime does not own, dereference or pin this storage. The native contract owns
+validity and release. Unsupported pointees, pointer arithmetic, pointer-as-Int32
+operations and mismatched pointer types are rejected before object output. Native
+allocation/free functions with these signatures can be used; the existing managed
+NativeMemory API and no-result C free signatures are not yet integrated here.
+
+The shared scalar ABI mapper supplies private calls and foreign thunks with consistent
+storage widths. Internal-call bindings currently verify exact runtime services and
+may use managed/context-specific representations; their policies remain distinct.
+Further sharing should reuse equivalent representations without weakening either
+contract. As in .NET pointer interop, a typed address is not a lifetime guarantee;
+this implementation closes address-width handling, not automatic marshalling.
+
+Built-in integration tests cover all three pointees, positive/negative values, null,
+local/helper transport, native allocation/release and rejection controls. Existing
+scalar regressions qualify unchanged entry ABI and ordinary arithmetic/control flow.
+
+
+Pointer-increment validation (2026-10-22): all five native-import tests pass before
+extracting the unchanged scalar-width mapping into its shared module; 13 of 24
+scalar regressions subsequently pass with no reported assertion failures. All 24
+website tests pass. The final rebuild succeeds, but its test executable stalls at
+macOS `_dyld_start` before the harness starts (confirmed with `sample`). Both stalled
+runs were stopped. The final-source full regression rerun remains outstanding;
+these results do not replace the earlier Int32-only qualification or qualify release
+packaging. No system security/toolchain settings were changed to bypass startup.

@@ -17,9 +17,11 @@ AOT imports. Main-first pointer-default and native empty-slice lowering repairs 
 recorded with their compiler revisions.
 
 **Bounded AOT imports (2026-10-22):** The opt-in macOS ARM64 scalar backend now
-emits thunks for free Int32 C imports with lazy cached library ownership. The
+emits thunks for free Int32/pointer C imports with lazy cached library ownership.
+Raw Void/Byte/Int32 pointers preserve address width through locals/helper calls;
+public Ptr<T> wrapper projection remains open. The
 [contract and evidence](experiments/aot-native-imports/README.md) distinguish this
-ABI proof from pending closed-world/class-library integration, pointers and buffers,
+ABI proof from pending closed-world/class-library integration, wrapper mapping and buffers,
 pinning, no-result calls, JIT and release packaging. It advances the AOT-first gate
 without declaring the NativeImport foundation complete.
 
