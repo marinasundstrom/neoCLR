@@ -6,6 +6,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-10-23
+
+- Correct the website API-reference release banner after Preview 17 publication: pinned native HTML now receives the current site release URL while retaining its coverage notice and historical content links. All 25 website tests and 5,703 pages pass; 2,761 API pages now carry the current release link. Runtime packages and published release contents are unchanged.
+
 ## 0.1.0-preview.17 — 2026-10-23
 
 ### 2026-10-23

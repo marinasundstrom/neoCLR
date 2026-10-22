@@ -107,6 +107,9 @@ def main():
         sys.path.insert(0, str(ROOT / 'scripts'))
         spec.loader.exec_module(checks)
         checks.OUTPUT = staging
+        # Snapshot HTML retains its coverage notice, not its historical release URL.
+        site_config = json.loads((ROOT / 'website/site.json').read_text())
+        checks.refresh_release_links(staging, site_config['releaseUrl'])
         checks.make_reference_links_relative()
         pages = {}
         for page in staging.rglob('*.html'):

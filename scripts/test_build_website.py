@@ -356,6 +356,19 @@ class PublicMetadataInventory(unittest.TestCase):
 
 
 class NativePreviewPublication(unittest.TestCase):
+    def test_snapshot_banner_uses_current_release_without_rewriting_content(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            site = Path(temporary)
+            page = site / 'api.html'
+            page.write_text('<div class="release-notice" role="note">'
+                            'Native coverage in progress <a href="https://example.com/old">Release</a></div>'
+                            '<main><a href="https://example.com/old">Historical evidence</a></main>')
+            build.refresh_release_links(site, 'https://example.com/new?a=1&b=2')
+            content = page.read_text()
+            self.assertIn('Native coverage in progress', content)
+            self.assertIn('href="https://example.com/new?a=1&amp;b=2">Release', content)
+            self.assertIn('href="https://example.com/old">Historical evidence', content)
+
     def test_uncommitted_audit_requires_explicit_selection(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

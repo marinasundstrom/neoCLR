@@ -265,6 +265,19 @@ def selected_native_preview(audit=None):
     return None
 
 
+def refresh_release_links(site, release_url):
+    """Keep snapshot availability notices, but use the current release link."""
+    banner = re.compile(r'(<div\b[^>]*class="[^"]*\brelease-notice\b[^"]*"[^>]*>)(.*?)(</div>)', re.S)
+    for path in site.rglob('*.html'):
+        content = path.read_text()
+        updated = banner.sub(lambda match: match[1] + re.sub(
+            r'(<a\b[^>]*\bhref=")[^"]*(")',
+            lambda link: link[1] + escape(release_url, quote=True) + link[2],
+            match[2], count=1) + match[3], content)
+        if updated != content:
+            path.write_text(updated)
+
+
 def publish_site(staging, destination, audit):
     # Finish the selected reference before exposing any pages to the local server.
     if audit is not None:
