@@ -1548,6 +1548,46 @@ ret
 #[test]
 #[ignore = "requires matching NEOCLR_RAVEN_BUNDLE with nominal pointer emission"]
 fn raven_value_pointer_exports_compile_and_execute() {
+    qualify_raven_layout(
+        "public struct Point {\n    field X: int\n    field Y: int\n}",
+        Some(8),
+    );
+}
+
+#[test]
+#[ignore = "requires matching NEOCLR_RAVEN_BUNDLE with layout attributes"]
+fn raven_layout_attributes_control_native_headers_and_reject_invalid_contracts() {
+    for (declaration, size) in [
+        (
+            "[StructLayout(LayoutKind.Sequential, Pack: 1)]\npublic struct Point {\n    [MarshalAs(NativeType.Bool8)]\n    field Flag: bool\n    field Value: int\n}",
+            Some(5),
+        ),
+        (
+            "[StructLayout(LayoutKind.Explicit, Pack: 1, Size: 12)]\npublic struct Point {\n    [FieldOffset(1), MarshalAs(NativeType.Bool32)]\n    field Flag: bool\n    [FieldOffset(1)]\n    field Value: int\n}",
+            Some(12),
+        ),
+        (
+            "[StructLayout(LayoutKind.Auto)]\npublic struct Point { field Value: int }",
+            None,
+        ),
+        (
+            "[StructLayout(LayoutKind.Sequential, Pack: 3)]\npublic struct Point { field Value: int }",
+            None,
+        ),
+        (
+            "[StructLayout(LayoutKind.Explicit)]\npublic struct Point { field Value: int }",
+            None,
+        ),
+        (
+            "public struct Point {\n    [MarshalAs(NativeType.Bool8)]\n    field Value: int\n}",
+            None,
+        ),
+    ] {
+        qualify_raven_layout(declaration, size);
+    }
+}
+
+fn qualify_raven_layout(declaration: &str, expected_size: Option<usize>) {
     let bundle = PathBuf::from(std::env::var_os("NEOCLR_RAVEN_BUNDLE").unwrap())
         .canonicalize()
         .unwrap();
@@ -1562,10 +1602,7 @@ fn raven_value_pointer_exports_compile_and_execute() {
         dir.0.join("Main.rvn"),
         r#"
 import System.Runtime.InteropServices.*
-public struct Point {
-    field X: int
-    field Y: int
-}
+DECLARATION
 [NativeExport("point_identity")]
 unsafe func Identity(pointer: *Point) -> *Point {
     return Echo(pointer)
@@ -1574,7 +1611,8 @@ unsafe func Echo(pointer: *Point) -> *Point {
     return pointer
 }
 func Main() -> int { return 0 }
-"#,
+"#
+        .replace("DECLARATION", declaration),
     )
     .unwrap();
     let output = Command::new("dotnet")
@@ -1608,12 +1646,18 @@ func Main() -> int { return 0 }
     assert_eq!(identity.returns, pointer);
     let object = dir.0.join("exports.o");
     let header = dir.0.join("exports.h");
+    let raven = dir.0.join("Imports.rvn");
+    let library = dir.0.join("exports.dylib");
     let output = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
         .arg("--native-library")
         .arg(dir.0.join("bin/neoclr/NativeInteropSample.dll"))
         .arg(&object)
         .arg("--header")
         .arg(&header)
+        .arg("--raven-imports")
+        .arg(&raven)
+        .arg("--import-library")
+        .arg(&library)
         .arg("--system")
         .arg(bundle.join("lib/System.runtime.neox"))
         .arg("--module")
@@ -1622,6 +1666,15 @@ func Main() -> int { return 0 }
         .arg(bundle.join("lib/System.Runtime.dll"))
         .output()
         .unwrap();
+    if expected_size.is_none() {
+        assert!(
+            !output.status.success(),
+            "invalid native layout admitted: {declaration}"
+        );
+        assert!(!object.exists());
+        assert!(!header.exists());
+        return;
+    }
     assert!(
         output.status.success(),
         "{}",
@@ -1630,13 +1683,13 @@ func Main() -> int { return 0 }
     let text = fs::read_to_string(&header).unwrap();
     let name = text
         .lines()
-        .find(|line| line.starts_with("typedef struct "))
+        .find(|line| line.starts_with("typedef struct ") || line.starts_with("typedef union "))
         .unwrap()
         .split_whitespace()
         .nth(2)
         .unwrap();
     let host = dir.0.join("caller.c");
-    fs::write(&host, format!("#include \"exports.h\"\nint main(void) {{ {name} p = {{40, 2}}; return point_identity(&p) != &p || point_identity(0) != 0; }}\n")).unwrap();
+    fs::write(&host, format!("#include \"exports.h\"\nint main(void) {{ {name} p = {{0}}; return sizeof(p) != {} || point_identity(&p) != &p || point_identity(0) != 0; }}\n", expected_size.unwrap())).unwrap();
     let executable = dir.0.join("caller");
     cc(&[&host, &object], &["-std=c11"], &executable);
     assert!(Command::new(&executable).status().unwrap().success());
@@ -1644,6 +1697,52 @@ func Main() -> int { return 0 }
     fs::copy(&host, &cpp).unwrap();
     cc(&[&cpp, &object], &["-std=c++17"], &executable);
     assert!(Command::new(&executable).status().unwrap().success());
+    cc(&[&object], &["-dynamiclib"], &library);
+    let consumer = dir.0.join("consumer");
+    fs::create_dir(&consumer).unwrap();
+    fs::copy(dir.0.join("App.rvnproj"), consumer.join("App.rvnproj")).unwrap();
+    fs::copy(&raven, consumer.join("Imports.rvn")).unwrap();
+    fs::write(consumer.join("Main.rvn"), format!("unsafe func Main() -> int {{\n    let value = NativeExport0(default(*{name}))\n    if value == default(*{name}) {{ return 0 }}\n    return 1\n}}\n")).unwrap();
+    let result = Command::new("dotnet")
+        .arg(bundle.join("sdk/tools/rvnc/rvnc.dll"))
+        .args(["neoclr", "--project"])
+        .arg(consumer.join("App.rvnproj"))
+        .env("NeoClrBundleRoot", &bundle)
+        .output()
+        .unwrap();
+    assert!(
+        result.status.success(),
+        "{}\n{}",
+        String::from_utf8_lossy(&result.stdout),
+        String::from_utf8_lossy(&result.stderr)
+    );
+    let decode = |path: PathBuf| {
+        let bytes = fs::read(path).unwrap();
+        if bytes.starts_with(b"NEOX") {
+            neoclr::metadata_container::decode_envelope(&bytes).unwrap()
+        } else {
+            neoclr::metadata_container::decode(&bytes).unwrap()
+        }
+    };
+    let app = decode(consumer.join("bin/neoclr/NativeInteropSample.dll"));
+    let seed = decode(bundle.join("lib/System.runtime.neox"));
+    let core = decode(bundle.join("lib/System.Runtime.dll"));
+    let object_root = neoclr::metadata::TypeDefId {
+        module: core.name.clone(),
+        revision: core.revision.clone(),
+        index: core
+            .types
+            .iter()
+            .position(|t| t.name == "System.Object")
+            .unwrap() as u32,
+    };
+    let program =
+        neoclr::LoadedProgram::with_modules_and_object_root(&app, &seed, &[core], &object_root)
+            .unwrap();
+    program.verify().unwrap();
+    // SAFETY: the fixture owns the exact C ABI export and passes only a null pointer.
+    let result = unsafe { program.run_with_native(neoclr::Limits::default()) }.unwrap();
+    assert_eq!(result.value, neoclr::Value::Int32(0));
 }
 
 #[test]

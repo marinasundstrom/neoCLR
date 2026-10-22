@@ -408,9 +408,12 @@ impl Layouts {
                 }
                 text.push_str("};\n");
             } else {
+                // The admitted LP64 field set has natural alignment at most eight.
+                // Larger requested packs are equivalent and need no nonportable pragma.
                 text.push_str(&format!(
                     "#pragma pack(push, {})\nstruct {} {{\n",
-                    layout.pack, layout.name
+                    layout.pack.min(8),
+                    layout.name
                 ));
                 for field in &layout.fields {
                     text.push_str(&format!("{} {};\n", field.c_type, field.name));
@@ -478,6 +481,16 @@ mod tests {
             .unwrap(),
         );
     }
+    #[test]
+    fn supported_packing_values_generate_portable_target_headers() {
+        for pack in [0, 1, 2, 4, 8, 16, 32, 64, 128] {
+            let mut input = module();
+            input.types[0].packing = Some(pack);
+            let layout = Layouts::build(&input).unwrap();
+            compile_header(&layout);
+        }
+    }
+
     #[test]
     fn loaded_attribute_identity_controls_field_marshalling() {
         let mut input = module();

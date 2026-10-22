@@ -4,6 +4,19 @@ static class ForeignImportDeclarations
         namespace Runtime.InteropServices {
             public enum NativeCallingConvention { Cdecl = 0, System = 1 }
             public enum NativeStringMarshalling { None = 0, Utf8 = 1, Utf16 = 2 }
+            public enum LayoutKind { Sequential = 0, Explicit = 2, Auto = 3 }
+            [System.AttributeUsage(System.AttributeTargets.Struct, Inherited = false)]
+            public class StructLayoutAttribute : System.Attribute {
+                public StructLayoutAttribute(LayoutKind layoutKind) { }
+                public LayoutKind Value => default;
+                public int Pack { get; set; }
+                public int Size { get; set; }
+            }
+            [System.AttributeUsage(System.AttributeTargets.Field, Inherited = false)]
+            public class FieldOffsetAttribute : System.Attribute {
+                public FieldOffsetAttribute(int offset) { }
+                public int Value => default;
+            }
             public enum NativeType { Utf8 = 0, Utf16 = 1, Bool8 = 2, Bool32 = 3 }
             [System.AttributeUsage(System.AttributeTargets.Method, Inherited = false)]
             public class NativeImportAttribute : System.Attribute {
@@ -21,7 +34,7 @@ static class ForeignImportDeclarations
                 public string EntryPoint => default;
                 public NativeCallingConvention CallingConvention => default;
             }
-            [System.AttributeUsage(System.AttributeTargets.Parameter | System.AttributeTargets.ReturnValue, Inherited = false)]
+            [System.AttributeUsage(System.AttributeTargets.Parameter | System.AttributeTargets.ReturnValue | System.AttributeTargets.Field, Inherited = false)]
             public class MarshalAsAttribute : System.Attribute {
                 public MarshalAsAttribute(NativeType nativeType) { }
                 public NativeType Value => default;

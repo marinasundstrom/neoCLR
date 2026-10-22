@@ -17,6 +17,7 @@ mod memory_views;
 mod native_exports;
 mod native_imports;
 mod native_layout;
+mod native_raven;
 mod reflection_arrays;
 mod reflection_collections;
 mod reflection_construction;

@@ -50,10 +50,12 @@ public enum NativeType {
     Bool32 = 3
 }
 
-/// Overrides the native representation of one parameter or result.
+/// Overrides the native representation of one parameter, result or native struct field.
+/// Field overrides currently support Boolean Bool8/Bool32 storage in native-library layouts;
+/// they do not automatically marshal managed struct instances.
 /// Strings are input-only; Bool8 and Bool32 normalize false/true to 0/1 on input
 /// and treat every nonzero native result as true.
-[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.ReturnValue, Inherited: false)]
+[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.ReturnValue | AttributeTargets.Field, Inherited: false)]
 public class MarshalAsAttribute : System.Attribute {
     private val nativeType: NativeType
 

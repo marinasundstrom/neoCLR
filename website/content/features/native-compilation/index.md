@@ -148,7 +148,7 @@ dependencies and C allocation/release. The development scalar JIT probe now reus
 the same import path behind explicit opt-in, including Raven source metadata with
 explicit verification dependencies. Full managed-program AOT imports,
 managed JIT imports and managed-memory
-pinning remain gaps. [Current scope](/features/native-interop/#development-aot-import-foundation).
+pinning remain gaps. [Current scope](/features/native-interop/#development-native-execution).
 
 The development interpreter also provides explicit `NativeMemory.Copy` overloads
 for slices and tracked native allocations, including Memory windows and UTF-8 byte

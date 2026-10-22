@@ -503,8 +503,8 @@ profiles are unchanged. This machinery is absent from Raven main and remains on
 codex/neoclr. Existing pointer metadata is reused, with ordinary nominal identity;
 no new Runtime Contract option or lossy CLI bridge encoding is introduced.
 
-Limits: Raven source StructLayout/FieldOffset APIs and field MarshalAs admission are
-still pending. Native-library layout decoding now resolves physical attribute owners
+Initial checkpoint limits (resolved by the public-attribute increment below): Raven
+source StructLayout/FieldOffset APIs and field MarshalAs admission were pending. Native-library layout decoding now resolves physical attribute owners
 through the supplied System.Runtime source identity. It normalizes only the three
 recognized layout annotations in a private emission inventory; original constructor
 references and assembly metadata remain in the verified source program. An unrelated
@@ -515,3 +515,39 @@ in source metadata but do not enter scalar code generation. Unsupported selected
 bodies and malformed unused bodies still reject before output. The header retains
 nominal layouts and source identity. Ordinary scalar executable/JIT admission is
 unchanged; no installed-SDK or by-value struct qualification is claimed.
+
+## Public layout attributes and generated Raven imports — 2026-10-22
+
+Raven now exposes LayoutKind, StructLayoutAttribute and FieldOffsetAttribute in
+System.Runtime.InteropServices. MarshalAsAttribute accepts instance fields of value
+types; the native emitter preserves their annotations instead of treating them as
+misplaced import declarations. Sequential packing, explicit offsets/overlap, minimum
+size and Boolean Bool8/Bool32 field representations reach the native layout decoder.
+The attribute API records values; unsupported layout/marshalling is rejected before
+native output. Managed object storage is not automatically converted or pinned.
+This is the native-storage subset of the .NET attribute model, not aggregate-by-value
+ABI support, class marshalling or parameter/result MarshalAs parity across engines.
+
+A general parser bug was fixed on Raven main as 2073ee766 and carried deliberately
+to codex/neoclr: following field attributes no longer parse as array suffixes on the
+previous type. Valid multiline array ranks remain supported. Forty-nine focused
+parser tests pass on main and fifty on the native target line. No new Runtime Contract setting
+or bridge encoding is required; attributes retain ordinary source identities and
+field-targeted native metadata. The native emitter capability change is target-only.
+
+The native-library command optionally emits `--raven-imports Imports.rvn` together
+with `--import-library <loader-name-or-path>`. Numbered NativeExport0/1/... declarations
+bind exact native symbols. Struct declarations use explicit checked native offsets
+and physical field widths; Bool8 storage becomes byte, not an implicit managed
+Boolean conversion. The file is binding source, not a native runtime sidecar. The
+object, C header and Raven file are created without replacing existing files; a
+later output failure removes only files created by the current invocation.
+
+Validation: all 23 native import/export integration tests and 19 focused native unit
+tests pass. Source fixtures cover packed Boolean storage, explicit overlapping
+fields/minimum size, Auto/invalid Pack/missing FieldOffset/incompatible MarshalAs
+rejection, C11/C++17 callers and generated-import interpreter calls back into the
+AOT library. All supported pack values produce C/C++ headers without unsupported
+packing pragmas. Built-in Rust integration tests are used because the scalar backend
+cannot execute the managed Raven test runner. Generated struct imports are not yet
+qualified through the ordinary managed JIT/AOT executable pipeline.

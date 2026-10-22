@@ -178,7 +178,7 @@ for exact scalar locals; managed local addresses cannot escape as native pointer
 Unsupported layouts, mismatched types and integer-to-pointer conversion still reject.
 IntPtr/UIntPtr transport uses 64-bit registers/storage on this target. Unchecked
 integer widening/narrowing is supported for native sizes, including unsigned widening and low-bit truncation; native-width arithmetic, checked
-conversions and pointer/integer conversion remain rejected in this profile. The public Ptr<T> wrapper
+conversions and pointer/integer conversion remain rejected in this profile. The public `Ptr<T>` wrapper
 is not automatically projected yet.
 Managed/value profiles, class members, other types, callbacks, managed JIT and SDK integration remain
 unsupported. The flag is required; the default still rejects imports.
@@ -315,10 +315,56 @@ an export trap and terminate the process. Pointer bounds and lifetime remain the
 native caller's responsibility. Existing files and invalid export selections are
 not overwritten. [Detailed ABI and naming contract](https://github.com/marinasundstrom/neoCLR/blob/main/docs/design/native-import-export-contract.md#free-function-c-export-increment--2026-10-22).
 
-## Struct pointer development status
+## Native struct layout attributes
 
-The native backend accepts checked struct pointer layouts and generates C/C++
-size/alignment/offset assertions. Raven struct-pointer exports now execute from C
-and C++ with export-root selection; unused constructors are verified but not emitted.
-Source StructLayout/FieldOffset APIs and field MarshalAs admission remain incomplete. By-value struct transport is not admitted. See the
-[feature status](/features/native-interop/) for the qualified sample and limits.
+`StructLayoutAttribute(LayoutKind)` applies to structs. `LayoutKind.Sequential`
+places fields in declaration order; `Explicit` requires `FieldOffsetAttribute(int)`
+on every instance field and permits overlap. `Auto` is represented in metadata but
+rejects at the native boundary. `StructLayout.Value` and `FieldOffset.Value` expose
+the constructor arguments. `Pack` and `Size` are writable integer properties.
+
+`Pack = 0` selects eight on the current macOS ARM64 backend. Explicit packs must be
+powers of two from one through 128. `Size` is a nonnegative minimum byte size;
+field extents and alignment can increase the actual size. Negative offsets, missing
+explicit offsets, unsupported packing, reference fields and incompatible field
+marshalling reject before native output. Generated C/C++ headers assert native size,
+alignment and offsets. Explicit layouts use named union views in the C header.
+
+`MarshalAsAttribute(NativeType)` now accepts instance fields of value types.
+Boolean fields default to native four-byte BOOL; `Bool8` selects one byte and
+`Bool32` explicitly selects four. Other field conversions are not implemented.
+These attributes describe native storage. They do not pin or automatically copy
+managed instances, change managed field access, or admit by-value struct calls.
+Unlike .NET's broader marshalling surface, this development increment is limited
+to checked native struct pointers in macOS ARM64 native libraries.
+
+```raven
+import System.Runtime.InteropServices.*
+
+[StructLayout(LayoutKind.Sequential, Pack: 1)]
+public struct Packet {
+    [MarshalAs(NativeType.Bool8)]
+    field Flag: bool
+    field Value: int
+}
+```
+
+This native layout occupies five bytes. Caller-owned memory must have the layout,
+alignment and lifetime expected by the native function. The backend tests compile
+this declaration and explicit overlapping layouts with C11/C++17 callers.
+
+## Generated Raven imports
+
+`neoclr-codegen --native-library` accepts
+`--raven-imports Imports.rvn --import-library <loader-name-or-path>` in addition to
+`--header exports.h`. Both Raven options must be supplied together. The loader name
+is explicit because producing an object file does not determine the final library
+name. Existing output files are preserved on failure.
+
+The file imports `System.Runtime.InteropServices`, declares numbered free functions
+`NativeExport0`, `NativeExport1`, etc. with exact NativeImport entry points, and
+includes explicit native-layout struct declarations where required. Generated field
+types describe native storage widths (for example a Bool8 field is `byte`), rather
+than promising managed conversion. Symbol order follows the export report. Pointer
+ownership remains the caller's responsibility. This is binding source, not a runtime
+metadata sidecar or a general C header importer.

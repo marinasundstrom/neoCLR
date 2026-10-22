@@ -1,0 +1,49 @@
+module System.Runtime.InteropServices
+
+import System.*
+
+/// Selects native field placement. Auto layout cannot cross a native boundary.
+public enum LayoutKind {
+    Sequential = 0
+    Explicit = 2
+    Auto = 3
+}
+
+/// Describes native struct storage; does not convert or pin managed storage.
+/// The current native-library backend supports Sequential and Explicit layouts
+/// on macOS ARM64. Passing structs by value is not supported.
+[AttributeUsage(AttributeTargets.Struct, Inherited: false)]
+public class StructLayoutAttribute : System.Attribute {
+    private val layoutKind: LayoutKind
+
+    /// Records field placement. Explicit requires FieldOffset on each instance field.
+    init(layoutKind: LayoutKind) {
+        self.layoutKind = layoutKind
+    }
+
+    /// Gets the requested field placement.
+    val Value: LayoutKind => layoutKind
+
+    /// Gets or sets native packing. Zero selects the platform default (eight).
+    /// Supported explicit values are powers of two from one through 128.
+    var Pack: int = 0
+
+    /// Gets or sets the minimum byte size; zero lets fields determine the size.
+    /// The native layout includes tail padding to its alignment.
+    var Size: int = 0
+}
+
+/// Places an instance field at a nonnegative byte offset in an Explicit native layout.
+/// Offsets may overlap. This does not change managed field access or GC tracking.
+[AttributeUsage(AttributeTargets.Field, Inherited: false)]
+public class FieldOffsetAttribute : System.Attribute {
+    private val offset: int
+
+    /// Records an offset. Invalid offsets are rejected when admitting a native layout.
+    init(offset: int) {
+        self.offset = offset
+    }
+
+    /// Gets the requested byte offset.
+    val Value: int => offset
+}

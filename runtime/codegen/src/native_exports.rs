@@ -243,38 +243,29 @@ fn write_outputs(
     object_path: &Path,
     object: &[u8],
     header: Option<(&Path, &str)>,
+    raven: Option<(&Path, &str)>,
 ) -> Result<(), Error> {
-    let mut output = fs::OpenOptions::new()
-        .write(true)
-        .create_new(true)
-        .open(object_path)?;
-    let mut header_file = match header {
-        Some((path, _)) => match fs::OpenOptions::new()
-            .write(true)
-            .create_new(true)
-            .open(path)
-        {
-            Ok(file) => Some(file),
-            Err(error) => {
-                drop(output);
-                let _ = fs::remove_file(object_path);
-                return Err(error.into());
-            }
-        },
-        None => None,
-    };
+    let mut outputs = vec![(object_path, object)];
+    outputs.extend(
+        header
+            .into_iter()
+            .chain(raven)
+            .map(|(path, text)| (path, text.as_bytes())),
+    );
+    let mut created = Vec::new();
     let result = (|| -> std::io::Result<()> {
-        output.write_all(object)?;
-        if let (Some(file), Some((_, text))) = (&mut header_file, header) {
-            file.write_all(text.as_bytes())?;
+        for (path, contents) in outputs {
+            let mut file = fs::OpenOptions::new()
+                .write(true)
+                .create_new(true)
+                .open(path)?;
+            created.push(path);
+            file.write_all(contents)?;
         }
         Ok(())
     })();
-    drop(output);
-    drop(header_file);
     if let Err(error) = result {
-        let _ = fs::remove_file(object_path);
-        if let Some((path, _)) = header {
+        for path in created {
             let _ = fs::remove_file(path);
         }
         return Err(error.into());
@@ -284,8 +275,8 @@ fn write_outputs(
 
 pub(super) fn run(mut args: Vec<OsString>, imports: bool) -> Result<i32, Error> {
     let dependency_args = load_context::split(&mut args);
-    if args.len() < 3 || args.len() > 133 || (args.len() - 3) % 2 != 0 {
-        return Err("usage: --native-library <input> <output.o> --export <function> [--export <function> ...] [--header <output.h>] [--native-imports] [load-context pairs]".into());
+    if args.len() < 3 || args.len() > 139 || (args.len() - 3) % 2 != 0 {
+        return Err("usage: --native-library <input> <output.o> --export <function> [--export <function> ...] [--header <output.h>] [--raven-imports <output.rvn> --import-library <library>] [--native-imports] [load-context pairs]".into());
     }
     let paths = load_context::parse(&dependency_args)?;
     let input = crate::read_module(Path::new(&args[1]))?;
@@ -334,10 +325,27 @@ pub(super) fn run(mut args: Vec<OsString>, imports: bool) -> Result<i32, Error> 
         }
     }
     let mut header_path = None;
+    let mut raven_path = None;
+    let mut import_library = None;
     for pair in args[3..].chunks_exact(2) {
         if pair[0] == "--header" {
             if header_path.replace(Path::new(&pair[1])).is_some() {
                 return Err("duplicate --header option".into());
+            }
+            continue;
+        }
+        if pair[0] == "--raven-imports" {
+            if raven_path.replace(Path::new(&pair[1])).is_some() {
+                return Err("duplicate --raven-imports option".into());
+            }
+            continue;
+        }
+        if pair[0] == "--import-library" {
+            if import_library
+                .replace(pair[1].to_str().ok_or("import library must be UTF-8")?)
+                .is_some()
+            {
+                return Err("duplicate --import-library option".into());
             }
             continue;
         }
@@ -377,6 +385,12 @@ pub(super) fn run(mut args: Vec<OsString>, imports: bool) -> Result<i32, Error> 
             return Err(format!("duplicate native export symbol: {name}").into());
         }
     }
+    if raven_path.is_some() != import_library.is_some() {
+        return Err("--raven-imports requires --import-library, and vice versa".into());
+    }
+    let generated_raven = import_library
+        .map(|library| crate::native_raven::generate(&input, &exports, library))
+        .transpose()?;
     let generated_header = header_path.map(|_| header(&input, &exports)).transpose()?;
     let object =
         compiler::compile_native_library(&input, &exports, imports, verification.as_ref())?;
@@ -384,6 +398,7 @@ pub(super) fn run(mut args: Vec<OsString>, imports: bool) -> Result<i32, Error> 
         Path::new(&args[2]),
         &object,
         header_path.zip(generated_header.as_deref()),
+        raven_path.zip(generated_raven.as_deref()),
     )?;
     // A build report, not a runtime metadata sidecar or loader contract.
     let report: Vec<_> = exports
@@ -521,13 +536,28 @@ mod tests {
         let object = dir.join("exports.o");
         let header = dir.join("exports.h");
         fs::write(&header, "existing header").unwrap();
-        assert!(write_outputs(&object, b"object", Some((&header, "new header"))).is_err());
+        assert!(write_outputs(&object, b"object", Some((&header, "new header")), None).is_err());
         assert!(!object.exists());
         assert_eq!(fs::read_to_string(&header).unwrap(), "existing header");
-        assert!(write_outputs(&object, b"object", Some((&object, "new header"))).is_err());
+        assert!(write_outputs(&object, b"object", Some((&object, "new header")), None).is_err());
         assert!(!object.exists());
+        let raven = dir.join("imports.rvn");
+        fs::write(&raven, "existing imports").unwrap();
+        fs::remove_file(&header).unwrap();
+        assert!(
+            write_outputs(
+                &object,
+                b"object",
+                Some((&header, "header")),
+                Some((&raven, "imports"))
+            )
+            .is_err()
+        );
+        assert!(!object.exists());
+        assert!(!header.exists());
+        assert_eq!(fs::read_to_string(&raven).unwrap(), "existing imports");
         fs::write(&object, "existing object").unwrap();
-        assert!(write_outputs(&object, b"new object", None).is_err());
+        assert!(write_outputs(&object, b"new object", None, None).is_err());
         assert_eq!(fs::read_to_string(&object).unwrap(), "existing object");
         fs::remove_dir_all(dir).unwrap();
     }

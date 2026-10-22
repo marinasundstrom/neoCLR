@@ -2913,3 +2913,12 @@ native-export-libraries-20261022-v3, including the PostgreSql provider; the pinn
 native snapshot is refreshed from that build. The manual native interop reference
 covers backend admission, errors, names and optional C/C++ headers. This attribute
 does not establish callback or managed-object export support.
+
+Development (2026-10-22): LayoutKind, StructLayoutAttribute and FieldOffsetAttribute
+are included in both reference inventories, with constructors, Value, Pack and Size
+members. MarshalAsAttribute now documents field use and its native-storage limits.
+The native reference comes from native-layout-libraries-20261022 and
+native-layout-api-audit-20261022; the legacy reference was regenerated from the
+matching ForeignImportDeclarations scaffold. No new renderer exclusions are used.
+The manual native interop guide covers exact validation limits and generated Raven
+imports. Snapshot checks accompany this public API change.

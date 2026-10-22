@@ -166,7 +166,7 @@ and quiet-NaN payloads through mixed register/stack arguments.
 | C-owned allocation/read/release | Yes | Yes |
 | Direct access to untracked foreign Byte/Int32 storage | Not yet | Trusted raw access; null/alignment checks |
 | String/Boolean marshalling and Function callbacks | Bounded support above | Not yet |
-| Managed-memory pinning and automatic Ptr<T> projection | Not yet | Not yet |
+| Managed-memory pinning and automatic `Ptr<T>` projection | Not yet | Not yet |
 | Import an AOT-built free-function library | Tested | Tested |
 
 Libraries resolve lazily. The scalar resolver retains successful library handles for
@@ -283,8 +283,24 @@ unsafe func Echo(pointer: *Point) -> *Point {
 
 The caller owns the pointed-to memory. This example preserves the pointer and
 introduces no managed object conversion. The native-library backend resolves layout
-attribute identities from its supplied runtime metadata. Public source layout/marshalling
-attribute support and structs passed by value are still incomplete. This is not part of the qualified
+attribute identities from its supplied runtime metadata. Raven now provides
+`StructLayout`, `FieldOffset`, and Boolean field `MarshalAs` declarations. Sequential
+packing and explicit offsets are checked when producing a native library. These
+attributes describe native storage; they do not pin or convert managed instances.
+Structs passed by value remain unsupported.
+
+The native-library command can also generate Raven bindings:
+
+```sh
+neoclr-codegen --native-library App.dll exports.o --export point_identity --header exports.h \
+  --raven-imports Imports.rvn --import-library ./libapp.dylib \
+  --system System.runtime.neox --module System.Runtime.dll --object-root System.Runtime.dll
+```
+
+Supply the eventual library loader name or path explicitly. Generated `NativeExport0`,
+`NativeExport1`, and subsequent imports bind the exact exported symbols and include
+native-layout struct declarations. This is useful for round-trip tests; callers still
+own pointer lifetimes. See the [layout and binding reference](/docs/native-interop.html). This is not part of the qualified
 extracted-kit sample above.
 
 ### Scope of the foundation

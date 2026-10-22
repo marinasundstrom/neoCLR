@@ -21226,3 +21226,14 @@ Source emission now succeeds; whole-module scalar validation still rejects the
 synthesized struct constructor. Export-root reachability and source attribute mapping
 remain open; this is not a claim of complete struct marshalling. See the
 [contract](design/native-import-export-contract.md#native-struct-layout-and-pointer-metadata--2026-10-22).
+
+## 2026-10-22 — Public native layouts and Raven binding generation
+
+The author explicitly requested implementing public Raven StructLayout/FieldOffset
+and field-level MarshalAs support, then suggested an option to generate a Raven
+NativeImport file for testing. The assistant implemented both, using an explicit
+library loader name and checked physical layouts. Source testing exposed a general
+field-attribute/array-suffix parser bug; it was repaired on Raven main (2073ee766)
+and carried deliberately to codex/neoclr. Packed/explicit layouts and generated
+imports pass C/C++ and interpreter-to-AOT round trips. Managed struct conversion,
+by-value ABI and full JIT/AOT executable integration remain outside this increment.
