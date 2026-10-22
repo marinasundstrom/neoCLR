@@ -210,3 +210,12 @@ contract produce no operand-stack value. C void calls have no return register;
 success leaves the private result slot untouched. Missing symbols still fault before
 continuation and preserve the exported caller's result. The distinct Void value
 carrier is not supported by this profile, and the host entry remains Int32-returning.
+
+### Development AOT pointer checks
+
+The opt-in macOS ARM64 scalar NativeImport profile accepts pointer equality and
+null checks, and equality/zero tests for native-sized integers. Comparisons preserve
+all address bits and do not dereference memory. Raven can check a native allocation
+against `default(*int)` before use. A non-null pointer does not prove ownership,
+allocation lifetime or accessible bounds; ordered pointer comparisons remain outside
+this profile. Managed memory pinning remains unimplemented.

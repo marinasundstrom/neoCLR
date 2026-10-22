@@ -162,9 +162,22 @@ pub(super) fn analyze(
             Op::InitializeObject(t) => {
                 matches!(popped.as_slice(), [Kind::LocalAddress(index)] if function.locals[*index] == *t)
             }
-            Op::Equal => popped[0] == popped[1] && matches!(popped[0], Kind::Int32 | Kind::Boolean),
+            Op::Equal | Op::BranchEqual(_) | Op::BranchNotEqual(_) => {
+                popped[0] == popped[1]
+                    && (matches!(popped[0], Kind::Int32 | Kind::Boolean)
+                        || (native_imports
+                            && matches!(
+                                popped[0],
+                                Kind::Pointer | Kind::NativeInt | Kind::NativeUInt
+                            )))
+            }
             Op::BranchTrue(_) | Op::BranchFalse(_) => {
                 matches!(popped[0], Kind::Int32 | Kind::Boolean)
+                    || (native_imports
+                        && matches!(
+                            popped[0],
+                            Kind::Pointer | Kind::NativeInt | Kind::NativeUInt
+                        ))
             }
             Op::Call(target) if console_call(target) => popped == [Kind::Literal],
             Op::Call(target) => popped

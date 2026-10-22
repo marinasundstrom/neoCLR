@@ -279,3 +279,26 @@ remain separate work.
 
 Validation: all 12 native-import tests pass with the explicit Raven bundle enabled,
 all 24 scalar regressions pass, and all 24 website checks pass.
+
+## Pointer and native-integer conditions (2026-10-22)
+
+The bounded scalar profile now admits ceq, beq/bne.un and brtrue/brfalse for
+supported pointers and native-sized integers through its existing full-width
+comparison lowering. Ordinary metadata verification still requires compatible
+operand types. This follows .NET/C address-equality semantics: the operation does
+not dereference the target or validate its lifetime. Pointer ordering, arithmetic
+and pointer/integer conversions remain excluded.
+
+The Raven consumer checks for failed allocation before Read, exercises a deliberately
+rejected allocation size and validates pointer identity. A native fixture compares
+opaque sentinel addresses with identical low 32 bits but different high bits,
+checks null/non-null branches and signed/unsigned native-width zero/equality tests.
+The sentinels are never dereferenced. Rejection controls retain pointer ordering,
+mixed pointer/integer and incompatible pointee comparisons outside the profile.
+This is backend acceptance of existing Raven output; no Runtime Contract or metadata
+encoding changes. No public library API or new allocation is introduced.
+
+Validation: 13 native-import tests (including the explicitly enabled Raven consumer),
+24 scalar regressions and 24 website checks pass. Expanded rejection controls also
+pass in a focused rerun. The same local Raven 5966b5f84 compiler overlay is used;
+this does not qualify a released SDK or add managed AOT integration.

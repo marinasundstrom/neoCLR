@@ -181,3 +181,12 @@ No-result imports and helpers use `-> void`; no-result function signatures use
 preserves the existing native call ABI. `System.Void` now has the same no-result return semantics as `void`, including
 function shapes. Removing the legacy bare `Void` spelling remains open; see the
 [Void contract and migration status](https://github.com/marinasundstrom/neoCLR/blob/main/docs/void-semantics.md).
+
+### Development AOT pointer checks
+
+The opt-in macOS ARM64 scalar NativeImport profile accepts pointer equality and
+null checks, and equality/zero tests for native-sized integers. Comparisons preserve
+all address bits and do not dereference memory. Raven can check a native allocation
+against `default(*int)` before use. A non-null pointer does not prove ownership,
+allocation lifetime or accessible bounds; ordered pointer comparisons remain outside
+this profile. Managed memory pinning remains unimplemented.

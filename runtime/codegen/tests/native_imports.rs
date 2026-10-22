@@ -701,6 +701,9 @@ int main(void) {
 fn native_integer_transport_rejects_unimplemented_operations() {
     for body in [
         "ptr.null Int32\nconv.u\npop\nldc.i4 0",
+        "ptr.null Int32\nptr.null Int32\nclt\npop\nldc.i4 0",
+        "ptr.null Int32\nldc.i4 0\nceq\npop\nldc.i4 0",
+        "ptr.null Int32\nptr.null Byte\nceq\npop\nldc.i4 0",
         "ldc.i4 1\nconv.u\nldc.i4 2\nconv.u\nadd\nconv.i4",
         "ldc.i4 -1\nconv.ovf.u\nconv.i4",
         "ldc.i4 1\nconv.u\ncall Signed(IntPtr)",
@@ -717,4 +720,97 @@ fn native_integer_transport_rejects_unimplemented_operations() {
         );
         assert!(!dir.0.join("app.o").exists());
     }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_pointer_and_integer_conditions_use_full_address_width() {
+    let dir = Temp::new();
+    let fixture = dir.0.join("addresses.c");
+    let library = dir.0.join("addresses.dylib");
+    fs::write(
+        &fixture,
+        r#"
+#include <stdint.h>
+/* Opaque sentinels are compared only, never dereferenced. */
+void *high(void) { return (void *)(uintptr_t)UINT64_C(0x100000000); }
+void *low(void) { return (void *)(uintptr_t)UINT64_C(0x200000000); }
+"#,
+    )
+    .unwrap();
+    cc(&[&fixture], &["-dynamiclib", "-fPIC"], &library);
+    let text = format!(
+        r#".module Conditions
+.function High() -> Ptr<Int32>
+.foreign {library:?} "high" cdecl
+.end
+.function Low() -> Ptr<Int32>
+.foreign {library:?} "low" cdecl
+.end
+.function Calculate(Int32 unused) -> Int32
+call High()
+brfalse failure
+ptr.null Int32
+brtrue failure
+call High()
+call Low()
+ceq
+brtrue failure
+call High()
+call Low()
+beq failure
+call High()
+call High()
+bne.un failure
+ldc.i8 4294967296
+conv.u
+brfalse failure
+ldc.i8 4294967296
+conv.u
+ldc.i8 8589934592
+conv.u
+ceq
+brtrue failure
+ldc.i8 -4294967296
+conv.i
+brfalse failure
+ldc.i4 0
+conv.i
+brtrue failure
+ldc.i4 42
+ret
+failure:
+ldc.i4 -1
+ret
+.end
+"#,
+        library = library.to_str().unwrap()
+    );
+    let result = compile(&dir, &text, &["--native-imports"]);
+    assert!(
+        result.status.success(),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
+    let host = dir.0.join("host.c");
+    fs::write(
+        &host,
+        r#"
+#include <stdint.h>
+extern int32_t neoclr_entry_v2(int32_t, int32_t *);
+int main(void) {
+    int32_t result = 0;
+    return neoclr_entry_v2(0, &result) || result != 42;
+}
+"#,
+    )
+    .unwrap();
+    let resolver = Path::new(env!("CARGO_MANIFEST_DIR")).join("../native/interop/imports.c");
+    let app = dir.0.join("app");
+    cc(
+        &[&host, &dir.0.join("app.o"), &resolver],
+        &["-pthread"],
+        &app,
+    );
+    assert!(Command::new(&app).status().unwrap().success());
 }
