@@ -111,7 +111,34 @@ fn connect_ready(stream: &TcpStream) -> io::Result<bool> {
     }
 }
 
-#[cfg(not(windows))]
+#[cfg(unix)]
+fn connect_ready(stream: &TcpStream) -> io::Result<bool> {
+    use std::os::fd::AsRawFd;
+
+    // SO_ERROR can still be zero while a connection is pending. Observe kernel
+    // readiness before consuming it or probing the peer address.
+    let mut descriptor = libc::pollfd {
+        fd: stream.as_raw_fd(),
+        events: libc::POLLOUT,
+        revents: 0,
+    };
+    // SAFETY: descriptor contains one live borrowed socket; poll retains no
+    // pointers and the zero timeout never blocks the scheduler.
+    let ready = unsafe { libc::poll(&mut descriptor, 1, 0) };
+    if ready < 0 {
+        let error = io::Error::last_os_error();
+        if error.kind() == io::ErrorKind::Interrupted {
+            return Ok(false);
+        }
+        return Err(error);
+    }
+    if descriptor.revents & libc::POLLNVAL != 0 {
+        return Err(io::Error::from_raw_os_error(libc::EBADF));
+    }
+    Ok(descriptor.revents & (libc::POLLOUT | libc::POLLERR | libc::POLLHUP) != 0)
+}
+
+#[cfg(not(any(windows, unix)))]
 fn connect_ready(_stream: &TcpStream) -> io::Result<bool> {
     Ok(true)
 }
@@ -1097,6 +1124,32 @@ mod tests {
         while sockets.poll(heap).unwrap().is_none() {
             assert!(Instant::now() < deadline, "receive watchdog");
             std::thread::sleep(Duration::from_millis(1));
+        }
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn connect_readiness_observes_kernel_writability() {
+        let (peer, mut stream) = pair();
+        socket2::SockRef::from(&stream)
+            .set_send_buffer_size(4096)
+            .unwrap();
+        socket2::SockRef::from(&peer)
+            .set_recv_buffer_size(4096)
+            .unwrap();
+        stream.set_nonblocking(true).unwrap();
+        assert!(connect_ready(&stream).unwrap());
+        let deadline = Instant::now() + Duration::from_secs(5);
+        // The peer retains the connection without reading. Fill its receive
+        // window to distinguish actual readiness from an unconditional true.
+        while connect_ready(&stream).unwrap() {
+            match stream.write(&[0; 4096]) {
+                Ok(_) => {}
+                Err(error) if error.kind() == io::ErrorKind::WouldBlock => {}
+                Err(error) => panic!("unexpected write failure: {error}"),
+            }
+            assert!(Instant::now() < deadline, "socket remained writable");
+            std::thread::yield_now();
         }
     }
 
@@ -2290,52 +2343,55 @@ mod tests {
     }
     #[test]
     fn refused_connect_releases_socket_slot_but_retains_result_until_consumed() {
-        // Select an ephemeral loopback port, then release it so the kernel refuses connect.
-        // Keeping it bound without listen can silently drop SYN on macOS.
-        // On Windows retain the reservation so parallel tests cannot acquire
-        // this port while the refused connection is being observed.
-        let reserved = socket2::Socket::new(
-            socket2::Domain::IPV4,
-            socket2::Type::STREAM,
-            Some(socket2::Protocol::TCP),
-        )
-        .unwrap();
-        reserved
-            .bind(
-                &"127.0.0.1:0"
-                    .parse::<std::net::SocketAddr>()
-                    .unwrap()
-                    .into(),
+        // Exercise both immediate and deferred kernel completion repeatedly.
+        for _ in 0..16 {
+            // Select an ephemeral loopback port, then release it so the kernel refuses connect.
+            // Keeping it bound without listen can silently drop SYN on macOS.
+            // On Windows retain the reservation so parallel tests cannot acquire
+            // this port while the refused connection is being observed.
+            let reserved = socket2::Socket::new(
+                socket2::Domain::IPV4,
+                socket2::Type::STREAM,
+                Some(socket2::Protocol::TCP),
             )
             .unwrap();
-        let port = reserved
-            .local_addr()
-            .unwrap()
-            .as_socket()
-            .unwrap()
-            .port()
-            .into();
-        #[cfg(not(windows))]
-        drop(reserved);
-        let mut sockets = Sockets::default();
-        let heap = ManagedHeap::default();
-        let id = sockets.connect("127.0.0.1", port, callback()).unwrap();
-        deliver(&mut sockets, &heap);
-        assert!(
-            sockets.sockets.is_empty(),
-            "refused connection unexpectedly produced sockets: {:?}",
-            sockets
-                .sockets
-                .values()
-                .map(|s| (s.local_addr(), s.peer_addr()))
-                .collect::<Vec<_>>()
-        );
-        assert!(sockets.connects[&id].stream.is_none());
-        assert_eq!(
-            connect_result(&mut sockets, &heap, id),
-            Value::Erased(Box::new(Value::Byte(7)))
-        );
-        assert!(sockets.connects.is_empty());
+            reserved
+                .bind(
+                    &"127.0.0.1:0"
+                        .parse::<std::net::SocketAddr>()
+                        .unwrap()
+                        .into(),
+                )
+                .unwrap();
+            let port = reserved
+                .local_addr()
+                .unwrap()
+                .as_socket()
+                .unwrap()
+                .port()
+                .into();
+            #[cfg(not(windows))]
+            drop(reserved);
+            let mut sockets = Sockets::default();
+            let heap = ManagedHeap::default();
+            let id = sockets.connect("127.0.0.1", port, callback()).unwrap();
+            deliver(&mut sockets, &heap);
+            assert!(
+                sockets.sockets.is_empty(),
+                "refused connection unexpectedly produced sockets: {:?}",
+                sockets
+                    .sockets
+                    .values()
+                    .map(|s| (s.local_addr(), s.peer_addr()))
+                    .collect::<Vec<_>>()
+            );
+            assert!(sockets.connects[&id].stream.is_none());
+            assert_eq!(
+                connect_result(&mut sockets, &heap, id),
+                Value::Erased(Box::new(Value::Byte(7)))
+            );
+            assert!(sockets.connects.is_empty());
+        }
     }
 
     #[test]

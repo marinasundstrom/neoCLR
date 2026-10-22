@@ -14,13 +14,13 @@
     "format": "passed",
     "minimumRust": "Not qualified locally: initial CommandLineTools SDK linking failure, then full-Xcode retry stalled in macOS dyld fcntl while loading dependency proc macros; terminated owned compiler processes. Hosted validation required.",
     "clippy": "Stopped the duplicate local all-target run after hosted strict Clippy passed in run 39849082702, freeing the artifact lock for focused tests. Not a local pass.",
-    "typeIdentityTests": "Compiling after artifact lock released; result pending",
+    "typeIdentityTests": "passed: 9 tests",
     "minimumRustHosted": {
       "macOS": "passed",
       "Windows": "passed",
       "Linux": "passed"
     },
-    "terminalTests": "Queued behind focused type-identity compilation; result pending"
+    "terminalTests": "passed: 10 tests"
   },
   "logs": {
     "/tmp/release-fmt-check.log": "1f4d0c6ed62d7dc5c720a8dc20f09d182f805e04e63f843061a28e5ceee3ea19",
@@ -47,7 +47,7 @@
       "event": "workflow_dispatch",
       "revision": "bec78e0b4c730e12a47564105bc5d5af98de7bad",
       "fullMatrix": false,
-      "status": "formatting and strict Clippy passed; full source qualification running"
+      "status": "Canonical full extracted-source validation, Windows host/package checks and all three minimum-Rust jobs passed. macOS host job failed one socket refusal classification test."
     }
   }
 }
