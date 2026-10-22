@@ -21274,3 +21274,18 @@ Static linking is described only as a future deployment option; the qualified sc
 resolver remains dynamic. This records direction, not an implemented relocation.
 The author requested continued stabilization until a significant change.
 [Contract](design/native-import-export-contract.md#runtime-and-module-dependency-boundaries--2026-10-22).
+
+The author further identified Introspection/Reflection as runtime services suited
+to internal calls, and HTTP client/server as modules that may own native code
+reached through native interop. Both paths should perform well despite linking
+cost. The assistant retained that ownership distinction and separated one-time
+resolution from per-call marshalling and synchronization in the boundary contract.
+
+The author noted that JIT/AOT NativeImport should compile to native calls using
+mapped signatures and marshalled data. The assistant identified a concrete gap:
+compiled thunks still invoked the cached resolver, including its mutex and lookup,
+on every call. The author explicitly directed fixing it now. The implementation
+adds an atomic per-import address cache, keeps successful library ownership in
+the resolver and leaves failures retryable. Concurrent initialization and warmed
+call counts are tested; timing evidence is a focused instrumented fixture rather
+than a request-throughput claim.

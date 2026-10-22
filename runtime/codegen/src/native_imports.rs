@@ -65,6 +65,18 @@ pub(crate) fn emit<M: Module>(
         module.define_data(id, &data)?;
         strings.push(id);
     }
+    // The cache belongs to this generated image. The resolver keeps the library
+    // alive for process lifetime; only a successfully resolved address is published.
+    let cache = module.declare_data(
+        &format!("neoclr_import_cache_{index}"),
+        Linkage::Local,
+        true,
+        false,
+    )?;
+    let mut cache_data = DataDescription::new();
+    cache_data.define_zeroinit(8);
+    cache_data.set_align(8);
+    module.define_data(cache, &cache_data)?;
     let mut resolve_sig = module.make_signature();
     resolve_sig.params = vec![AbiParam::new(types::I64); 3];
     resolve_sig.returns.push(AbiParam::new(types::I32));
@@ -91,6 +103,7 @@ pub(crate) fn emit<M: Module>(
         .signature
         .clone();
     let resolver = module.declare_func_in_func(resolver, &mut ctx.func);
+    let cache = module.declare_data_in_func(cache, &mut ctx.func);
     let data: Vec<_> = strings
         .into_iter()
         .map(|id| module.declare_data_in_func(id, &mut ctx.func))
@@ -102,6 +115,18 @@ pub(crate) fn emit<M: Module>(
         b.append_block_params_for_function_params(entry);
         b.switch_to_block(entry);
         let args = b.block_params(entry).to_vec();
+        let cold = b.create_block();
+        let invoke = b.create_block();
+        b.append_block_param(invoke, types::I64);
+        let cache_address = b.ins().global_value(types::I64, cache);
+        let cached = b
+            .ins()
+            .atomic_load(types::I64, MemFlags::trusted(), cache_address);
+        let ready = b
+            .ins()
+            .icmp_imm(cranelift_codegen::ir::condcodes::IntCC::NotEqual, cached, 0);
+        b.ins().brif(ready, invoke, &[cached.into()], cold, &[]);
+        b.switch_to_block(cold);
         let slot = b.create_sized_stack_slot(StackSlotData::new(StackSlotKind::ExplicitSlot, 8, 3));
         let output = b.ins().stack_addr(types::I64, slot, 0);
         let library = b.ins().global_value(types::I64, data[0]);
@@ -113,6 +138,13 @@ pub(crate) fn emit<M: Module>(
             .icmp_imm(cranelift_codegen::ir::condcodes::IntCC::NotEqual, status, 0);
         crate::compiler::return_if_detailed(&mut b, failed, status, None);
         let address = b.ins().stack_load(types::I64, slot, 0);
+        // Concurrent cold callers may resolve redundantly, but the resolver
+        // serializes ownership and returns the same address for this import.
+        b.ins()
+            .atomic_store(MemFlags::trusted(), address, cache_address);
+        b.ins().jump(invoke, &[address.into()]);
+        b.switch_to_block(invoke);
+        let address = b.block_params(invoke)[0];
         let signature = b.import_signature(native_sig);
         let call = b
             .ins()

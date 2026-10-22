@@ -153,6 +153,12 @@ this public wrapper automatically.
 
 ## Development native execution
 
+Compiled scalar imports cache their resolved address per import. Warm calls use
+an atomic address load and a native ABI call, avoiding repeated resolver locking
+and lookup. Failed resolution remains retryable; the resolver retains successful
+library handles for process lifetime. Conversion and copying costs still depend
+on the signature. This is development macOS ARM64 JIT/AOT behavior.
+
 The macOS ARM64 scalar JIT/AOT backend accepts `--native-imports` for free C
 functions with up to sixteen arguments. Supported numeric types are Int32/UInt32,
 Int64/UInt64, IntPtr/UIntPtr and Single/Double; pointer targets are Void, Byte and

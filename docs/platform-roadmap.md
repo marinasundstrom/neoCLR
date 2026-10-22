@@ -1,5 +1,10 @@
 # neoCLR platform roadmap
 
+**Compiled import fast path (2026-10-22):** Scalar JIT/AOT imports now cache
+successful native addresses atomically per import, bypassing resolver locking and
+lookup on warm calls. Retryable failures and process-lifetime library ownership
+remain intact. [Concurrency and timing evidence](experiments/aot-native-imports/README.md#warm-import-call-site-cache--2026-10-22).
+
 **Native provider ownership (author direction, 2026-10-22):** Runtime-intrinsic
 mechanisms may live in Rust behind InternalCall. Module-owned native functionality
 uses separate support libraries through NativeImport; the core must not depend

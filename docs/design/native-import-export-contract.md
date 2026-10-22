@@ -28,6 +28,13 @@ The dependency direction is:
   call private runtime symbols. Any necessary runtime interaction passes through
   an explicitly supported runtime contract or an adapter owned by the runtime.
 
+Introspection and Reflection are runtime services: their authoritative metadata,
+member resolution and type identity belong behind InternalCall. HTTP client/server
+modules may own native protocol or transport support behind NativeImport, with
+runtime-owned scheduling/rooting adapters where required. Both routes require
+performance qualification; separate one-time linking/resolution from per-call
+conversion, allocation and synchronization costs.
+
 GC allocation/rooting, managed-reference access, runtime type identity, exception
 machinery and scheduler/thread attachment are runtime responsibilities. An InternalCall
 may implement those responsibilities in Rust; it is not a shortcut for arbitrary
@@ -595,3 +602,31 @@ AOT library. All supported pack values produce C/C++ headers without unsupported
 packing pragmas. Built-in Rust integration tests are used because the scalar backend
 cannot execute the managed Raven test runner. Generated struct imports are not yet
 qualified through the ordinary managed JIT/AOT executable pipeline.
+
+## Compiled import call-site caches — 2026-10-22
+
+The macOS ARM64 scalar JIT/AOT import thunk now owns an aligned, writable
+eight-byte address slot. A warm invocation atomically loads that slot and calls
+the native target with its mapped signature, bypassing resolver lookup and its
+mutex. Successful cold resolution publishes the address atomically. Concurrent
+cold callers can resolve redundantly; the shared resolver serializes library
+ownership and returns the same retained address. Failed lookups publish nothing
+and remain retryable, preserving the caller's output on failure.
+
+The resolver owns successful library handles for process lifetime, so cached
+addresses cannot outlive their libraries. The generated image owns the slot; JIT
+image disposal still requires all invocations to have completed. No resolver ABI,
+native signature mapping or library-unloading contract changed. This implements
+the author's intended compiled-call fast path without implying that marshalling,
+copying or pinning is free. It does not expand the ordinary managed-backend import
+profile or the interpreter's implementation.
+
+A regression uses eight concurrent cold callers, a failed initial lookup and five
+million warm calls, checking exact results and zero further resolver invocations.
+A local instrumented fixture compares the same native function and real resolver
+before/after; its timings include wrapper instrumentation and do not establish
+HTTP throughput or cross-platform performance.
+
+Validation: all 26 native import/export integration tests pass, including Raven
+source fixtures and generated bindings. API source/reference checks and all 5,681
+website pages pass.

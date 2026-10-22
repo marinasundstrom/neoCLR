@@ -1928,3 +1928,102 @@ fn private_boolean_calls_and_defaults_do_not_admit_native_boolean_abi() {
     );
     assert!(!rejected.0.join("app.o").exists());
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn import_callsite_cache_retries_failure_and_publishes_concurrently() {
+    let dir = Temp::new();
+    let fixture = dir.0.join("fixture.c");
+    let library = dir.0.join("fixture.dylib");
+    fs::write(
+        &fixture,
+        "#include <stdint.h>\nint32_t increment(int32_t value) { return value + 1; }\n",
+    )
+    .unwrap();
+    cc(&[&fixture], &["-dynamiclib"], &library);
+    let resolver = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../native/interop/imports.c")
+        .canonicalize()
+        .unwrap();
+    let host = dir.0.join("host.c");
+    fs::write(&host, format!("#define neoclr_native_import_resolve_v1 actual_resolve\n#include {:?}\n#undef neoclr_native_import_resolve_v1\n", resolver.to_str().unwrap()) + r#"
+#include <stdatomic.h>
+#include <stdio.h>
+#include <time.h>
+#include <sched.h>
+static atomic_int calls, start;
+extern int32_t neoclr_entry_v2(int32_t, int32_t *);
+int32_t neoclr_native_import_resolve_v1(const char *library, const char *symbol, void **output) {
+    if (atomic_fetch_add(&calls, 1) == 0) return 3;
+    return actual_resolve(library, symbol, output);
+}
+static void *worker(void *unused) {
+    (void)unused;
+    while (!atomic_load(&start)) sched_yield();
+    for (int i = 0; i < 100; ++i) {
+        int32_t result = -1;
+        if (neoclr_entry_v2(i, &result) || result != i + 1) return (void *)1;
+    }
+    return NULL;
+}
+static double now(void) {
+    struct timespec value;
+    clock_gettime(CLOCK_MONOTONIC, &value);
+    return value.tv_sec + value.tv_nsec / 1e9;
+}
+int main(int argc, char **argv) {
+    (void)argv;
+    int32_t value = 12345;
+    if (neoclr_entry_v2(41, &value) != 3 || value != 12345) return 1;
+    pthread_t threads[8];
+    for (int i = 0; i < 8; ++i) if (pthread_create(&threads[i], NULL, worker, NULL)) return 2;
+    atomic_store(&start, 1);
+    for (int i = 0; i < 8; ++i) {
+        void *result;
+        if (pthread_join(threads[i], &result) || result) return 3;
+    }
+    int cold_calls = atomic_load(&calls);
+    if (argc == 1 && (cold_calls < 2 || cold_calls > 9)) return 4;
+    for (int round = 0; round < 5; ++round) {
+        double begin = now();
+        for (int i = 0; i < 1000000; ++i) {
+            if (neoclr_entry_v2(i, &value) || value != i + 1) return 5;
+        }
+        printf("warm_million_seconds=%.9f\n", now() - begin);
+    }
+    printf("resolver_calls_cold=%d total=%d\n", cold_calls, atomic_load(&calls));
+    if (argc == 1 && atomic_load(&calls) != cold_calls) return 6;
+    return 0;
+}
+"#).unwrap();
+    let source = source(library.to_str().unwrap(), "increment");
+    assert!(
+        compile(&dir, &source, &["--native-imports"])
+            .status
+            .success()
+    );
+    let executable = dir.0.join("app");
+    cc(
+        &[&host, &dir.0.join("app.o")],
+        &["-O2", "-pthread"],
+        &executable,
+    );
+    let result = Command::new(&executable).output().unwrap();
+    assert!(result.status.success(), "{result:?}");
+    println!("cached:\n{}", String::from_utf8_lossy(&result.stdout));
+    if let Some(baseline) = std::env::var_os("NEOCLR_IMPORT_BASELINE_CODEGEN") {
+        let object = dir.0.join("baseline.o");
+        let result = Command::new(baseline)
+            .arg(dir.0.join("app.neoil"))
+            .arg("Calculate")
+            .arg(&object)
+            .arg("--native-imports")
+            .output()
+            .unwrap();
+        assert!(result.status.success(), "{result:?}");
+        cc(&[&host, &object], &["-O2", "-pthread"], &executable);
+        let result = Command::new(&executable).arg("baseline").output().unwrap();
+        assert!(result.status.success(), "{result:?}");
+        println!("baseline:\n{}", String::from_utf8_lossy(&result.stdout));
+    }
+}

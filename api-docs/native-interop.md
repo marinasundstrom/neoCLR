@@ -375,3 +375,9 @@ layouts. Supply matching runtime metadata with the explicit load-context options
 Executable generation verifies the full source before selecting the entry point
 and direct-call dependencies. This does not enable the ordinary managed JIT/AOT
 pipeline or automatic managed-storage conversion.
+
+In the macOS ARM64 scalar JIT/AOT profile, each compiled import caches a successful
+resolved address. Warm calls bypass the resolver mutex and lookup. Cold concurrent
+callers may resolve redundantly; publication is atomic and failures remain retryable.
+Library handles remain owned by the shared resolver for process lifetime. This does
+not change marshalling support or enable unloading an imported library.

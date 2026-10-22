@@ -606,3 +606,30 @@ Raven layout bundle; the additional private-Boolean regression also passes. The
 selection regression checks both executable engines as well as native-library
 emission, including rejection of invalid unused IL. API source/reference checks
 and all 5,681 website pages pass.
+
+### Warm import call-site cache — 2026-10-22
+
+Scalar JIT and AOT share a generated atomic address cache per import. After a
+successful lookup the thunk directly calls the cached address, avoiding the
+resolver mutex/string search. The resolver still owns loaded libraries for process
+lifetime. Failed lookup leaves the cache empty; concurrent cold callers may resolve
+redundantly and safely publish the same address. Each generated import adds eight
+bytes of aligned writable data and no per-call heap allocation.
+
+`import_callsite_cache_retries_failure_and_publishes_concurrently` exercises eight
+threads, an injected first failure, unchanged failure output and five million warm
+calls with no further resolver invocations. Optional
+`NEOCLR_IMPORT_BASELINE_CODEGEN=/path/to/pre-change/neoclr-codegen` runs the same
+fixture against a retained baseline binary. Run this Rust integration test with
+`--nocapture` to retain timing and resolver-count output.
+
+[Local evidence](../../validation/release-stabilization-20261022/native-import-cache.json)
+records five rounds, binary/input hashes and instrumentation limits. Median time
+per million calls changes from about 14.6 ms to 5.5 ms in this fixture. The baseline
+resolver wrapper counts each invocation atomically, so this is not an uninstrumented
+production overhead estimate or an HTTP throughput result. The API/website references
+describe the cache scope without extending ordinary managed-backend support.
+
+Validation: all 26 native import/export integration tests pass, including Raven
+source fixtures and generated bindings. API source/reference checks and all 5,681
+website pages pass.

@@ -1,0 +1,47 @@
+{
+  "date": "2026-10-22",
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "scenario": "Eight concurrent cold callers after an injected initial failure; five rounds of one million warmed scalar AOT calls to the same C increment function",
+  "sourceHashes": {
+    "runtime/codegen/src/native_imports.rs": "7bdf2d9486815149906868e4a38c075585a7be5e90d640071ba2985fabc0ccbf",
+    "runtime/codegen/tests/native_imports.rs": "bb0fa244795578b1b67e9b97f3eaf5eaf7a918710d732f5c79a02db398e917e1",
+    "runtime/native/interop/imports.c": "b6c092fd06bb64eae4b30f49235fc94f3be23407611feb45fab362bb3c4a81a4"
+  },
+  "baselineCodegenSha256": "6aeb0f1827bd9b427b771a376f65cb23c520bb775a1e64a2b09a9e53e53716f0",
+  "candidateCodegenSha256": "d1ba5740ccf031dfa3e4b05148867bb4b5d8287808ce0a5eea4bd2f02bd9fe9c",
+  "baselineSecondsPerMillion": [
+    0.014555,
+    0.014547,
+    0.014556,
+    0.014539,
+    0.014799
+  ],
+  "cachedSecondsPerMillion": [
+    0.005495,
+    0.005522,
+    0.005485,
+    0.005489,
+    0.005484
+  ],
+  "baselineMedian": 0.014555,
+  "cachedMedian": 0.005489,
+  "limits": [
+    "Local instrumented C fixture, not HTTP throughput",
+    "Real resolver wrapped with an atomic invocation counter; instrumentation contributes to baseline cost",
+    "C host compiled with -O2; generated code uses the same default backend settings",
+    "Five rounds per variant in one process each; no cross-platform or sustained-contention claim"
+  ],
+  "log": "   Compiling ring v0.17.14\n   Compiling neoclr v0.1.0-preview.13 (/Users/robert/Projects/neoclr)\n   Compiling rustls v0.23.45\n   Compiling rustls-webpki v0.103.15\n   Compiling neoclr-security-provider v0.0.0 (/Users/robert/Projects/neoclr/tools/security-provider)\n   Compiling neoclr-native-tls v0.0.0 (/Users/robert/Projects/neoclr/tools/native-tls)\n   Compiling neoclr-codegen v0.0.0 (/Users/robert/Projects/neoclr/runtime/codegen)\n    Finished `test` profile [unoptimized] target(s) in 20.46s\n     Running tests/native_imports.rs (target/interop-validation/debug/deps/native_imports-45738be9141868d0)\n\nrunning 1 test\ncached:\nwarm_million_seconds=0.005495000\nwarm_million_seconds=0.005522000\nwarm_million_seconds=0.005485000\nwarm_million_seconds=0.005489000\nwarm_million_seconds=0.005484000\nresolver_calls_cold=9 total=9\n\nbaseline:\nwarm_million_seconds=0.014555000\nwarm_million_seconds=0.014547000\nwarm_million_seconds=0.014556000\nwarm_million_seconds=0.014539000\nwarm_million_seconds=0.014799000\nresolver_calls_cold=801 total=5000801\n\ntest import_callsite_cache_retries_failure_and_publishes_concurrently ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 25 filtered out; finished in 3.03s\n\n",
+  "validation": {
+    "nativeImportIntegration": {
+      "passed": 26,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 177.28
+    },
+    "website": {
+      "pagesChecked": 5681,
+      "apiSourceAndReferenceChecks": "passed"
+    }
+  }
+}
