@@ -10,3 +10,9 @@ internal extern func NativeMultiplyChecked(elementCount: nuint, elementSize: nui
 
 [MethodImpl(MethodImplOptions.InternalCall)]
 internal unsafe extern func NativeFree(pointer: *System.Void) -> System.Void;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal unsafe extern func NativeCopyTo(source: System.ReadOnlySlice<byte>, destination: *System.Void, destinationByteCount: nuint) -> System.Void;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal unsafe extern func NativeCopyFrom(source: *System.Void, sourceByteCount: nuint, destination: System.Slice<byte>) -> System.Void;

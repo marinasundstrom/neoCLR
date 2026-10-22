@@ -457,3 +457,18 @@ Native lowering retains the generic pointer target and emits `ptr.cast` for
 explicit reinterpretation or implicit void erasure. Temporary CLI metadata uses
 PTR/VAR/MVAR and `conv.u`; the native backend preserves target identity. No Runtime
 Contract setting changes. Built-in tests live in `runtime/raven/tests/native-pointers`.
+
+
+## Explicit native byte copies (development, 2026-10-22)
+
+NativeMemory.Copy bridges ReadOnlySlice<byte>/Slice<byte> and live tracked native
+allocations without an intermediate managed array. Existing Memory projections and
+String.Utf8Bytes work directly. This is an interpreter copy fallback, not scoped
+pinning, native-backed Memory or JIT/AOT import support. Its bounds, ownership and
+initialization restrictions are documented in the [API reference](../api-docs/native-interop.md#native-byte-copies).
+
+Compared with .NET NativeMemory.Copy's raw-pointer operation, the development
+slice overloads keep the managed extent available for validation. The interpreter
+must read/write tagged byte slots, so avoiding a temporary array does not establish
+memcpy performance. Foreign-owned pointers remain outside this checked allocation
+profile; native writes alone do not update its initialization bitmap.

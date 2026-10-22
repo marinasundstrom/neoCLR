@@ -560,6 +560,78 @@ impl PointerHeap {
         Ok(())
     }
 
+    // Hold the native allocation lock across validation and transfer. Managed
+    // views and native allocations cannot alias in this interpreter profile.
+    pub(crate) fn copy_view(
+        &mut self,
+        pointer: &Pointer,
+        count: usize,
+        view: &crate::MemoryView,
+        to_native: bool,
+    ) -> Result<(), Fault> {
+        view.assigned()?;
+        let expected = if to_native {
+            crate::metadata::MemoryViewKind::ReadOnlySlice
+        } else {
+            crate::metadata::MemoryViewKind::Slice
+        };
+        if view.kind() != expected || !view.has_byte_elements() {
+            return Err(Fault::new("native copy requires a matching byte slice"));
+        }
+        let length = if to_native { view.length() } else { count };
+        if to_native && length > count || !to_native && length > view.length() {
+            return Err(Fault::new("native copy destination is too short"));
+        }
+        if length == 0 {
+            return Ok(());
+        }
+        let range = self.range(
+            pointer,
+            &Layout {
+                size: length,
+                alignment: 1,
+                fields: vec![],
+            },
+        )?;
+        if to_native {
+            // Preflight initialization before mutating native storage. No payload
+            // snapshot is needed; concurrent source mutation is not supported.
+            for index in 0..length {
+                if !matches!(view.get(index)?, Value::Byte(_)) {
+                    return Err(Fault::new("native copy requires initialized source bytes"));
+                }
+            }
+            let allocation = self.allocations[pointer.allocation.unwrap()]
+                .as_mut()
+                .unwrap();
+            for index in 0..length {
+                let Value::Byte(value) = view.get(index)? else {
+                    unreachable!()
+                };
+                allocation.bytes.slice_mut()[range.start + index] = value;
+            }
+            allocation.initialized[range.clone()].fill(true);
+            allocation.pointers.retain(|offset, _| {
+                *offset + std::mem::size_of::<usize>() <= range.start || *offset >= range.end
+            });
+        } else {
+            let allocation = self.allocation(pointer)?;
+            if allocation.initialized[range.clone()]
+                .iter()
+                .any(|initialized| !initialized)
+            {
+                return Err(Fault::new("native copy requires initialized source bytes"));
+            }
+            if let Some(reference) = view.reference() {
+                reference.require_writable()?;
+            }
+            for (index, byte) in allocation.bytes.slice()[range].iter().enumerate() {
+                view.set(index, Value::Byte(*byte))?;
+            }
+        }
+        Ok(())
+    }
+
     pub(crate) fn copy_block(
         &mut self,
         destination: &Pointer,

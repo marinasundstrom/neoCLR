@@ -1,0 +1,59 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "modes": [
+    "interpreter"
+  ],
+  "cases": [
+    {
+      "suite": "native-buffers",
+      "mode": "interpreter",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 48.377,
+      "stdout": "PASS Repeated native byte copies allocate no managed transfer buffers\nPASS Empty native byte copies never dereference null pointers\nPASS Native buffer copies bridge Memory windows through a C import\nPASS Native byte copies accept borrowed UTF8 without a temporary array\nTests: 4, passed: 4, failed: 0, skipped: 0\n",
+      "stderr": ""
+    }
+  ],
+  "phases": [
+    {
+      "suite": "native-buffers",
+      "phase": "discovery",
+      "elapsedSeconds": 6.846794,
+      "details": {
+        "sourceCompilationSeconds": 4.094172,
+        "metadataDiscoveryIncludingToolBuildSeconds": 2.750446
+      }
+    },
+    {
+      "suite": "native-buffers",
+      "phase": "source-compilation",
+      "elapsedSeconds": 4.45331,
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/native-buffer-bundle-20261022/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/tests/native-buffers/Tests.rvnproj"
+      ],
+      "assemblySha256": "a9689008b93fd4ecfd856c38cdc0a97a8070081cbeb48713d22778bd5e6448f3"
+    },
+    {
+      "suite": "native-buffers",
+      "phase": "registration-verification",
+      "elapsedSeconds": 2.593012
+    }
+  ],
+  "interpreterSha256": "33503d47834a5b8ec9fdfaa54243b2c5698cec48c28458f0820fb82737334953",
+  "libraryCatalogSha256": "6b7343e866869e5546771103cfe2914faed81a2f73cfd228f566ac4c741f9211",
+  "nativeBufferFixtureSha256": "65ddc6e711b8120d34d66b411bae43d9717936e4bc864fefdde011723bb3f79c",
+  "compilerRevision": "21c279632",
+  "libraryProducerRevision": "255906ffe",
+  "limitations": "Interpreter-only working-tree qualification; inherited JIT/AOT binaries not tested.",
+  "sourceSha256": {
+    "runtime/raven/tests/native-buffers/Tests.rvn": "9ba00b6d7c4227169341969b4755958fce35ad94d3de881d1cd724212a1502f8",
+    "runtime/raven/tests/native-buffers/fixture.c": "c5f61dc03566d75768bb14a0da218125dd10e11fd7d87501fa23e31bcae234ad",
+    "src/native.rs": "26a57b5699c76f4c3e4a02f16bb708f0c27555a490b5f28ecf70a3d62d9fa4c4",
+    "src/memory.rs": "80aed9e7f26a58c83933fb3b10c7957820863486f5be64670196c0028164e5e2"
+  }
+}

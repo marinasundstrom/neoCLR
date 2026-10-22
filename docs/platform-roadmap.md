@@ -10,6 +10,11 @@ languages. [Scope, gaps and proposed acceptance gates](design/native-import-expo
 keep future stages distinct from release commitments. Interpreter-only imports and
 an explicit copy experiment do not complete this foundation; true pinning needs
 native-compatible storage. Sandbox and trusted-native boundaries remain explicit.
+The [explicit byte-copy increment](experiments/native-buffers/README.md) now passes
+four built-in interpreter tests and two low-level tests, with native API coverage.
+It avoids intermediate managed transfer arrays; it does not supply pinning or close
+AOT imports. Main-first pointer-default and native empty-slice lowering repairs are
+recorded with their compiler revisions.
 
 **Character naming (author direction, 2026-10-21):** Rename the development
 grapheme API to `System.Character`, with no neoCLR `char` keyword alias; retain

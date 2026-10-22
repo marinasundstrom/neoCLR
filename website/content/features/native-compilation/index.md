@@ -145,6 +145,11 @@ JIT and interpretation remain useful execution options. Development NativeImport
 support currently runs in the interpreter. Native/JIT import execution and managed
 memory pinning remain gaps, not published native-compilation capabilities.
 
+The development interpreter also provides explicit `NativeMemory.Copy` overloads
+for slices and tracked native allocations, including Memory windows and UTF-8 byte
+views. These avoid an intermediate managed transfer array; they still copy bytes.
+[Copy contract and limitations](/docs/native-interop.html#native-byte-copies)
+
 The next foundation connects native calls with pointers, stack and heap allocation,
 and explicitly scoped access to managed buffers. A true pin must retain existing
 storage at a stable native-compatible address; an explicit copy is a separate operation.

@@ -4623,6 +4623,28 @@ fn interpret_instructions_with_dispatch(
                                 .push(Value::Pointer(pointer));
                             return Ok(None);
                         }
+                        if let crate::native::Binding::NativeCopy(to_native) = binding {
+                            match (to_native, args.as_slice()) {
+                                (
+                                    true,
+                                    [
+                                        Value::MemoryView(view),
+                                        Value::Pointer(pointer),
+                                        Value::UIntPtr(count),
+                                    ],
+                                ) => memory.copy_view(pointer, *count, view, true)?,
+                                (
+                                    false,
+                                    [
+                                        Value::Pointer(pointer),
+                                        Value::UIntPtr(count),
+                                        Value::MemoryView(view),
+                                    ],
+                                ) => memory.copy_view(pointer, *count, view, false)?,
+                                _ => return Err(Fault::new("invalid native byte-copy arguments")),
+                            }
+                            return Ok(None);
+                        }
                         if matches!(binding, crate::native::Binding::NativeFree) {
                             let [Value::Pointer(pointer)] = args.as_slice() else {
                                 return Err(Fault::new("native release requires a pointer"));

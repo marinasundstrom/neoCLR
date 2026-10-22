@@ -1,0 +1,64 @@
+import System.*
+import System.Result.*
+import System.Runtime.InteropServices.*
+import NeoClr.Testing.*
+
+[Test("Native buffer copies bridge Memory windows through a C import")]
+unsafe func MemoryWindow() -> Result<unit, TestFailure> {
+    let input: byte[] = [9b, 10b, 20b, 30b, 9b]
+    let source: ReadOnlyMemory<byte> = input
+    let output: byte[] = [99b, 99b, 99b, 99b, 99b]
+    let destination: Memory<byte> = output
+    let pointer = NativeMemory.Alloc((nuint)3)
+    NativeMemory.Copy(source.Slice(1, 3), pointer, (nuint)3)
+    Increment((*byte)pointer, 3)
+    NativeMemory.Copy(pointer, (nuint)3, destination.Slice(1, 3))
+    NativeMemory.Free(pointer)
+    _ = Assert.Equal(99, output[0])?
+    _ = Assert.Equal(11, output[1])?
+    _ = Assert.Equal(21, output[2])?
+    _ = Assert.Equal(31, output[3])?
+    _ = Assert.Equal(99, output[4])?
+    return Assert.Equal(10, input[1])
+}
+
+[Test("Native byte copies accept borrowed UTF8 without a temporary array")]
+unsafe func TextBytes() -> Result<unit, TestFailure> {
+    let text = "é"
+    let pointer = NativeMemory.Alloc((nuint)2)
+    NativeMemory.Copy(text.Utf8Bytes, pointer, (nuint)2)
+    let output: byte[] = [(byte)0, (byte)0, 99b]
+    NativeMemory.Copy(pointer, (nuint)2, output)
+    NativeMemory.Free(pointer)
+    _ = Assert.Equal(195, output[0])?
+    _ = Assert.Equal(169, output[1])?
+    return Assert.Equal(99, output[2])
+}
+
+[Test("Empty native byte copies never dereference null pointers")]
+unsafe func Empty() -> Result<unit, TestFailure> {
+    let pointer = default(*System.Void)
+    let input: ReadOnlySlice<byte> = []
+    let output: Slice<byte> = []
+    NativeMemory.Copy(input, pointer, (nuint)0)
+    NativeMemory.Copy(pointer, (nuint)0, output)
+    return Assert.True(true, "Empty copies have no pointer access")
+}
+
+[Test("Repeated native byte copies allocate no managed transfer buffers")]
+unsafe func Allocation() -> Result<unit, TestFailure> {
+    let source: ReadOnlySlice<byte> = [1b, 2b, 3b, 4b]
+    let destination: Slice<byte> = [(byte)0, (byte)0, (byte)0, (byte)0]
+    let pointer = NativeMemory.Alloc((nuint)4)
+    let before = System.Runtime.GC.AllocatedObjectCount
+    var index = 0
+    while index < 64 {
+        NativeMemory.Copy(source, pointer, (nuint)4)
+        NativeMemory.Copy(pointer, (nuint)4, destination)
+        index += 1
+    }
+    let allocated = System.Runtime.GC.AllocatedObjectCount - before
+    NativeMemory.Free(pointer)
+    _ = Assert.Equal(4, destination[3])?
+    return Assert.True(allocated == 0, "No managed allocation during repeated transfers")
+}

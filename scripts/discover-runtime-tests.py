@@ -10,12 +10,13 @@ import time
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def discover(project, bundle, output):
+def discover(project, bundle, output, additional_environment=None):
     project, bundle, output = project.resolve(), bundle.resolve(), output.resolve()
     output.mkdir(parents=True, exist_ok=False)
     registry = output / 'TestRegistry.rvn'
     registry.write_text('module NeoClr.Testing\nfunc RegisterDiscoveredTests(suite: TestSuite) { }\n')
     env = dict(os.environ, NeoClrBundleRoot=str(bundle), NeoClrTestRegistry=str(registry))
+    env.update(additional_environment or {})
     compiler = bundle / 'sdk/tools/rvnc/rvnc.dll'
     command = ['dotnet', str(compiler), 'neoclr', '--project', str(project)]
     started = time.perf_counter()

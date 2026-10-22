@@ -79,6 +79,15 @@ impl SharedMemory {
     ) -> Result<(), Fault> {
         self.lock().write(pointer, layout, value)
     }
+    pub(crate) fn copy_view(
+        &self,
+        pointer: &Pointer,
+        count: usize,
+        view: &crate::MemoryView,
+        to_native: bool,
+    ) -> Result<(), Fault> {
+        self.lock().copy_view(pointer, count, view, to_native)
+    }
     pub(crate) fn free(&self, pointer: &Pointer) -> Result<(), Fault> {
         self.lock().free(pointer)
     }

@@ -14522,3 +14522,22 @@ System.Char as a new native grapheme owner. This is not full release qualificati
 the broader compiler profile selection still fails its legacy CLI structural-tuple
 emission fixture. Historical CoreProbe native-binding fixtures are outside the
 new source-library cohort; no mixed-old-core compatibility is promised.
+
+
+## Pointer defaults and empty slices — 2026-10-22
+
+Raven main 9193bdff1, carried to native as fa8ecb50c, preserves pointer defaults as
+pointer types and emits zero native addresses instead of managed-reference nulls.
+No Runtime Contract setting or pointer signature changes. The .NET semantic/runtime
+regression suite passes 47 focused tests. Native lowering continues to use existing
+typed default metadata rather than introducing a special pointer carrier.
+
+Raven native 21c279632 additionally maps empty Slice/ReadOnlySlice literals to typed
+default memory views through an explicit adapter capability. Admission uses imported
+native memory-view identity or the source-core declaration contract; unrelated
+collections and ordinary .NET emission are unchanged. The four built-in native-buffer
+consumer tests pass, including empty views and a default pointer. These compiler
+repairs do not add pinning, foreign-owned Memory or JIT/AOT import execution. The
+[native buffer evidence](experiments/native-buffers/README.md) records the tested
+producer, consumer and runtime scope; native default operations already express the
+intended semantics, so no new temporary CLI bridge representation is introduced.

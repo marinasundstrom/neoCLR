@@ -249,11 +249,11 @@ Primary references reviewed for this discussion:
 - [Go cgo pointer rules](https://pkg.go.dev/cmd/cgo)
 - [Node-API ABI and object lifetime](https://nodejs.org/download/release/v26.9.0/docs/api/n-api.html)
 
-The uncommitted byte-copy experiment has two passing low-level runtime tests, but its
-built-in consumer has not yet been qualified. The first fixture build failed from a
-host SDK/linker mismatch; a retry with matching Xcode clang/SDK compiled the C fixture
-but Raven discovery rejected byte literals in a direct ReadOnlySlice<byte> collection
-expression (RAV2001). This needs reduction and compiler investigation; it does not
-establish that the literals are actually out of range. It is not public capability
-evidence, pinning support or an approved replacement for the gates above. Keep its API and documentation changes
-separate from this architectural decision.
+The byte-copy experiment is separate from this architecture. Its initial RAV2001
+failure was subsequently reduced to invalid test literals: `0b` is a binary prefix,
+not byte zero. Explicit `(byte)0` fixes that fixture error; direct slice collection
+binding was not the cause. A subsequent default-pointer failure reproduces on ordinary
+.NET and is repaired in shared Raven default typing/emission (main 9193bdff1, native
+fa8ecb50c). Native 21c279632 also closes empty-slice literal lowering. The
+[copy API evidence](../experiments/native-buffers/README.md) now qualifies the bounded
+interpreter fallback; real pinning and AOT imports remain separate gates.

@@ -124,7 +124,9 @@ pub(crate) fn uses(module: &crate::Module, function: &Function) -> Result<Vec<Se
             | crate::native::Binding::ObjectEquals
             | crate::native::Binding::ObjectReferenceEquals
             | crate::native::Binding::ObjectIdentityHash => RuntimeService::ManagedHeap,
-            crate::native::Binding::NativeAllocate | crate::native::Binding::NativeFree => {
+            crate::native::Binding::NativeCopy(_)
+            | crate::native::Binding::NativeAllocate
+            | crate::native::Binding::NativeFree => {
                 return Ok([
                     RuntimeService::NativeAllocation,
                     RuntimeService::PointerMemory,

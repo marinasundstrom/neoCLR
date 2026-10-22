@@ -54,7 +54,18 @@ uncommitted and separately unqualified; its two low-level tests pass, while the 
 built-in fixture run failed at C linking due to a host toolchain mismatch. A retry
 with matching Xcode clang/SDK compiled the fixture, then encountered Raven RAV2001
 on a direct byte-slice collection expression during discovery. Compiler investigation
-is pending. All 24 website tests pass for this documentation slice.
+was pending at that commit. All 24 website tests passed for that documentation slice.
+
+Subsequent reduction corrects the earlier suspected collection-expression gap:
+`0b` is an incomplete binary literal in Raven. Explicit byte-zero expressions fix
+that test error. The remaining default-pointer argument failure reproduces on .NET:
+shared default typing adds reference nullability to pointers, and shared emission
+uses managed null. The assistant proceeds with a main-first repair and native
+consumer validation; this is separate from the proposed pinning architecture. Main 9193bdff1 passes 47
+focused .NET tests and is carried as fa8ecb50c. Native 21c279632 closes a subsequently
+exposed empty-slice lowering gap. All four built-in native-buffer interpreter tests
+and two low-level checks pass; [evidence and remaining limits](experiments/native-buffers/README.md)
+keep pinning/AOT gaps open.
 
 ## 2026-10-20 — Default struct equality and the typed fast path
 

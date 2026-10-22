@@ -50,6 +50,12 @@ needs a disposal/lease contract. Neither bridge is implemented yet. Imported
 functions do not need to accept Slice or Memory themselves: a library wrapper can
 provide the managed API around a conventional C ABI.
 
+Development interpreter `NativeMemory.Copy` overloads connect byte slices, Memory
+windows and String.Utf8Bytes to live tracked native allocations without an
+intermediate managed transfer array. They copy bytes explicitly and do not pin
+managed storage. Native output must be initialized before the call under the current
+tracking model. [Exact contract and limits](/docs/native-interop.html#native-byte-copies).
+
 Arbitrary native imports under JIT/AOT remain an evaluation gap, including when
 using the development editor's default JIT task.
 

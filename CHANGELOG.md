@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
+- Add development interpreter NativeMemory.Copy overloads between byte slices and tracked native allocations, accepting Memory subwindows and UTF-8 views without intermediate managed arrays. Validate capacity, initialization and allocation lifetime before writes; empty copies allow null pointers. Four built-in tests (including a C import and a repeated-transfer allocation control) and two low-level checks pass. Correct invalid `0b` test literals; integrate main-first pointer-default repair (9193bdff1/fa8ecb50c) and native empty-slice lowering (21c279632). Refresh API snapshots and interop guidance; four snapshot tests, 24 website tests and the 5,646-page website build pass. Foreign-owned pointers, native write initialization tracking, managed pinning and JIT/AOT imports remain unsupported.
+
 - Record the author-directed native interop sequence: NativeImport with pointer/allocation/pinning foundations first, then native-backed metadata, extended native hosting APIs and future dynamic dispatch. Make AOT the primary deployment target, preserve explicit sandbox/native trust boundaries, and distinguish current interpreter support from proposed gates and the unfinished byte-copy experiment. Update roadmap, design, conversation record and website direction; no new runtime capability is claimed. All 24 website tests pass; the copy prototype remains uncommitted after a Raven collection-expression diagnostic blocks built-in discovery.
 
 ### 2026-10-21

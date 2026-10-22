@@ -51,6 +51,19 @@ impl MemoryView {
         }
     }
 
+    pub(crate) fn has_byte_elements(&self) -> bool {
+        match &self.0 {
+            View::Empty(_, element) => *element == Type::Byte,
+            View::Utf8(_) => true,
+            View::Slice(slice) => {
+                matches!(slice.array.target(), Type::Array(element) if **element == Type::Byte)
+            }
+            View::Memory(memory) => {
+                matches!(memory.view.array.target(), Type::Array(element) if **element == Type::Byte)
+            }
+        }
+    }
+
     pub(crate) fn length(&self) -> usize {
         match &self.0 {
             View::Empty(..) => 0,

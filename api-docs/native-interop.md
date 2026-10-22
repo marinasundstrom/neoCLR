@@ -98,3 +98,38 @@ Null, tracked-data and current temporary callback addresses are rejected. Provid
 library retention cannot guarantee arbitrary native state/code lifetime. Callable
 ABI nesting is limited to eight; native callback reentry is limited to 32 and the
 remaining managed frame budget. See [the tested example and complete boundaries](https://github.com/marinasundstrom/neoCLR/blob/main/docs/native-interop.md#callable-parameters-and-results-development).
+
+
+<a id="native-byte-copies"></a>
+
+## NativeMemory.Copy (development)
+
+The `System.Runtime.InteropServices.NativeMemory` module adds two unsafe overloads,
+implemented by `System.Runtime.dll` and currently executable in the interpreter:
+
+```raven
+unsafe func Copy(source: ReadOnlySlice<byte>, destination: *System.Void, destinationByteCount: nuint)
+unsafe func Copy(source: *System.Void, sourceByteCount: nuint, destination: Slice<byte>)
+```
+
+The first copies all source bytes; destinationByteCount is the available capacity
+and must be at least source.Length. The second copies exactly sourceByteCount bytes
+and leaves the rest of the destination unchanged. Memory windows project through
+existing slice conversions; String.Utf8Bytes can be used as read-only input. These
+operations create no intermediate managed transfer array and retain neither buffer.
+They perform explicit copies; they do not pin managed storage or transfer ownership.
+
+Both overloads require live, tracked NativeMemory.Alloc storage for nonempty native
+ranges. Empty copies do not dereference pointers and accept a null address. Invalid
+ranges, insufficient capacity, uninitialized source bytes, read-only output, freed
+storage and native allocations currently borrowed by a foreign call cause runtime
+faults. Validation occurs before writes for supported single-consumer use; concurrent
+mutation of the managed buffer is unsupported. These checks do not make arbitrary
+foreign addresses safe or admit foreign-owned pointers.
+
+Foreign writes do not currently update the interpreter's initialization tracking.
+Initialize the native range before passing it to an imported function that will
+mutate it; a C output write alone does not qualify an uninitialized range for Copy.
+The built-in native-buffers fixture copies input first, invokes an in-place C byte
+increment, and copies back into a Memory subview. JIT/AOT execution, true pinning
+and persistent native-backed Memory ownership remain open.

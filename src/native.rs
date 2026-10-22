@@ -100,6 +100,7 @@ pub(crate) enum Binding {
     NativeAllocate,
     NativeFree,
     NativeMultiplyChecked,
+    NativeCopy(bool),
     WriteLine,
     Fault,
     CharCategory,
@@ -284,6 +285,8 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
                 | "neoCLR.Runtime.WriteLine"
                 | "neoCLR.Runtime.Fail"
                 | "neoCLR.Runtime.NativeFree"
+                | "neoCLR.Runtime.NativeCopyTo"
+                | "neoCLR.Runtime.NativeCopyFrom"
         )
     {
         return Err(Fault::new(
@@ -658,6 +661,28 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             if **element == Type::Void && function.no_result =>
         {
             (Binding::NativeFree, Type::Void)
+        }
+        ("neoCLR.Runtime.NativeCopyTo", [view, Type::Ptr(element), Type::UIntPtr])
+            if **element == Type::Void
+                && function.no_result
+                && *view
+                    == (Type::Constructed {
+                        definition: "System.ReadOnlySlice".into(),
+                        arguments: vec![Type::Byte],
+                    }) =>
+        {
+            (Binding::NativeCopy(true), Type::Void)
+        }
+        ("neoCLR.Runtime.NativeCopyFrom", [Type::Ptr(element), Type::UIntPtr, view])
+            if **element == Type::Void
+                && function.no_result
+                && *view
+                    == (Type::Constructed {
+                        definition: "System.Slice".into(),
+                        arguments: vec![Type::Byte],
+                    }) =>
+        {
+            (Binding::NativeCopy(false), Type::Void)
         }
         ("neoCLR.Runtime.NativeMultiplyChecked", [Type::UIntPtr, Type::UIntPtr]) => {
             (Binding::NativeMultiplyChecked, Type::UIntPtr)

@@ -2880,3 +2880,14 @@ content explains the grapheme contract and the removal of the neoCLR `char` alia
 The historical CLI CoreProbe reference still has System.Char and is not rebuilt
 as if it were the native library. Current guides link Character; the native
 snapshot and its matching compiler revision define the development contract.
+
+
+### Native byte-copy bridge (2026-10-22)
+
+NativeMemory.Copy's two slice/pointer overloads are included through the existing
+NativeMemory type selection. The native snapshot is refreshed from
+`target/native-buffer-library-20261022` (producer Raven 255906ffe, renderer 21c279632),
+with XML summaries, parameters and lifetime limitations. The manual
+[native interop reference](native-interop.md#native-byte-copies) records
+faults, initialization tracking and interpreter-only execution. The historical CLI
+reference is not extended with development native-only members.

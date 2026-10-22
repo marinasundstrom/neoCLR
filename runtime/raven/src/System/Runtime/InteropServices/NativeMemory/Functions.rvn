@@ -14,3 +14,23 @@ public unsafe func Alloc(elementCount: nuint, elementSize: nuint) -> *System.Voi
 public unsafe func Free(pointer: *System.Void) {
     NativeAllocation.Release(pointer)
 }
+
+/// <summary>Copies source bytes into a native allocation without an intermediate array.</summary>
+/// <param name="source">Borrowed input, including a Memory window or String.Utf8Bytes.</param>
+/// <param name="destination">Live native storage owned by NativeMemory.Alloc.</param>
+/// <param name="destinationByteCount">Available destination bytes; must contain the entire source.</param>
+/// <remarks>Development interpreter support. Validates capacity before writing. Empty copies do not dereference pointers.
+/// Does not retain either buffer, pin managed storage, or transfer ownership. Arbitrary foreign-owned pointers are not admitted.</remarks>
+public unsafe func Copy(source: System.ReadOnlySlice<byte>, destination: *System.Void, destinationByteCount: nuint) {
+    neoCLR.Runtime.NativeCopyTo(source, destination, destinationByteCount)
+}
+
+/// <summary>Copies initialized native bytes into a writable slice without an intermediate array.</summary>
+/// <param name="source">Live initialized storage owned by NativeMemory.Alloc.</param>
+/// <param name="sourceByteCount">Number of bytes to copy; must fit destination.</param>
+/// <param name="destination">Borrowed output. Bytes after sourceByteCount remain unchanged.</param>
+/// <remarks>Development interpreter support. Validates both ranges and source initialization before writing.
+/// Empty copies do not dereference pointers. Does not retain either buffer or transfer ownership; concurrent mutation is unsupported.</remarks>
+public unsafe func Copy(source: *System.Void, sourceByteCount: nuint, destination: System.Slice<byte>) {
+    neoCLR.Runtime.NativeCopyFrom(source, sourceByteCount, destination)
+}
