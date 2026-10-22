@@ -6,6 +6,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+## 0.1.0-preview.17 — 2026-10-23
+
+### 2026-10-23
+
+- Prepare Preview 17 for macOS ARM64 and Windows x64 with all source/package/editor/HTTPS gates and fresh platform measurements passing. Audit final bundles, standalone SDKs, dependency notices and byte-identical qualified source; remove AppleDouble metadata from the standalone macOS SDK archive. Publish versioned release notes and prepare website downloads/benchmark tables. Release asset upload and live website verification follow separately.
+
 ### 2026-10-22
 
 - Close versioned Windows package/runtime/editor and HTTPS qualification; retain exact reports and archive identity. Refresh final macOS candidate measurements: all five stages, 55 CPU/JSON processes and 1,152 HTTP responses pass. Record Python-cache-only initial Git status and desktop-run limitations without claiming controlled speedups. Windows measurements and final asset/publication review remain open.

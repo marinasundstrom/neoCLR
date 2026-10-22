@@ -76,7 +76,7 @@
   "httpsRun": 39859994782,
   "benchmarkRun": 39859668223,
   "remaining": [
-    "Versioned Windows measurements",
-    "Final asset audit and publication"
-  ]
+    "Final publication and live verification"
+  ],
+  "benchmarkEvidence": "../../../../benchmarks/release-20261023/windows-preview17/summary.json"
 }

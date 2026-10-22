@@ -1,5 +1,10 @@
 # neoCLR platform roadmap
 
+**Preview 17 release preparation (2026-10-23):** Both platform packages, editor,
+HTTPS and fresh measurements pass. Final asset hashes, matching standalone SDKs,
+notices and the byte-identical qualified source archive are audited.
+[Release qualification](validation/release-20261023/README.md).
+
 **Both versioned packages qualified (2026-10-22):** Windows package/runtime/editor
 and HTTPS gates now pass, alongside the macOS gates. Final macOS measurements
 pass all five stages with exact artifact provenance and Python-cache-only initial

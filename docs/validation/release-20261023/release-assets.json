@@ -1,0 +1,55 @@
+{
+  "release": "v0.1.0-preview.17",
+  "qualificationPassed": true,
+  "publicationDate": "2026-10-23",
+  "packageVersion": "0.1.17-neoclr.20261022.1",
+  "ravenRevision": "301e668a51beb6ba307d63b6912b144d8ad6a6b0",
+  "qualifiedSourceRevision": "32184c938453e02680f9ae2c62fa35f7c0694b5e",
+  "windowsPackageRevision": "8511834fada0d0aee97396558287867cb52f3fa3",
+  "sourceDelta": "Only documentation, website and retained evidence changed since qualified runtime/class-library source. Qualified source archive recreated locally with identical CI hash.",
+  "assetsSha256": {
+    "neoclr-native-build-kit-osx-arm64.tar.gz": "bd2b2c45274eade0ea37966c2d8a0ba83a58297c9a26616b731df43d9babaef4",
+    "neoclr-preview17-osx-arm64.tar.gz": "c10ba8900362841edf3a228fa5db927d1df34f588c4415b87c91b9a76d5097a3",
+    "neoclr-preview17-qualified-source.tar": "afb68c79222f2f7fc0f4211ca27b5b3a1d4edaca29bfa9835cba19c622928aa8",
+    "neoclr-preview17-win-x64.tar.gz": "43b64ea02765e539527039d56522e3808c67ea0993abf1bf2443d0994d440371",
+    "raven-0.1.17-neoclr.20261022.1-osx-arm64.vsix": "57cc417cfcbd5c611b34eaf462acd92e1add89bdcf1a4c98b8751101d5d121a1",
+    "raven-0.1.17-neoclr.20261022.1-win-x64.vsix": "f160551670f433c84461e5a42a0f8036214477c9034cc3c76609a8c0d458d30f",
+    "raven-sdk-0.1.17-neoclr.20261022.1-osx-arm64.tar.gz": "4e51be931c206a630ed0daee338467aba685ee3dd545766d0344662dbef16970",
+    "raven-sdk-0.1.17-neoclr.20261022.1-win-x64.tar.gz": "c28bf258c5477a5097d9b37c4323b9dc4314fc4c802d32e35793ba4e73046010",
+    "raven-tool-notices-osx-arm64.tar.gz": "ba757c2d56b2756449d7eb0824fbc4c9cbc7db8c64e0d8eeec285786e1991ff0",
+    "raven-tool-notices-win-x64.tar.gz": "a6d89e7dc110bbc55ec6ce47d6dabac1d1df3719f69c92d36917f157c3e2266e"
+  },
+  "platforms": {
+    "osx-arm64": {
+      "verifiedManifestFiles": 2283,
+      "bundleManifestSha256": "42a77ca99fd686463d79cb08e1b073de3b5a4b3a4fb63278df7a95f027dcee36",
+      "sdkVersion": "0.1.17-neoclr.20261022.1",
+      "sdkNugetPackagesWithNotices": 27,
+      "standaloneSdkMatchedFiles": 469,
+      "sdkVsixMatchedServerFiles": 87
+    },
+    "win-x64": {
+      "verifiedManifestFiles": 2278,
+      "bundleManifestSha256": "e82f493f2c311f1d8f0cc5fd82f76400bfd7542a4494565d942645e8cb854a84",
+      "sdkVersion": "0.1.17-neoclr.20261022.1",
+      "sdkNugetPackagesWithNotices": 27,
+      "standaloneSdkMatchedFiles": 469,
+      "sdkVsixMatchedServerFiles": 87
+    }
+  },
+  "checks": {
+    "canonicalSource": 39853093086,
+    "windowsPackage": 39855375522,
+    "windowsHttps": 39859994782,
+    "windowsBenchmarks": 39859668223
+  },
+  "evidence": "../release-stabilization-20261022/README.md",
+  "macosMeasurements": "../../../benchmarks/release-20261022/macos-preview17/README.md",
+  "windowsMeasurements": "../../../benchmarks/release-20261023/windows-preview17/README.md",
+  "notes": [
+    "macOS standalone SDK repacked without AppleDouble metadata; all SDK files match qualified bundle.",
+    "TLS harness initial build/test timeout retained separately from passing cached run.",
+    "Benchmark dirty paths are generated Python caches only; no tracked-source changes.",
+    "General Raven CLI remains separately configured; local neoCLR SDK installed side by side."
+  ]
+}

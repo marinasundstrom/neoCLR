@@ -1,0 +1,29 @@
+{
+  "passed": true,
+  "sdkVersion": "0.1.17-neoclr.20261022.1",
+  "run": 39859668223,
+  "reports": {
+    "aggregate": {
+      "file": "aggregate.json.gz",
+      "rawSha256": "af555eacbd38c20378344a73fb99f9e25a7b46a999b0dc2ca05ceb23caed0b7b"
+    },
+    "execution": {
+      "file": "execution.json.gz",
+      "rawSha256": "02198a485569e8b6d9e865c05aeb0462e0c2a3e86fd0ad12c586e0d768a9d89b"
+    },
+    "cpu-native": {
+      "file": "cpu-native.json.gz",
+      "rawSha256": "aa55a1a87de24a625c8c450ed2aabd006a85fdd15e1a188582db92f2e0d16a88"
+    },
+    "http-plain": {
+      "file": "http-plain.json.gz",
+      "rawSha256": "9481a65db912507aa7162414cff87add80fb4a020364d72a3932dbae8471646f"
+    },
+    "http-json": {
+      "file": "http-json.json.gz",
+      "rawSha256": "0c01c86e59c016971f2dba16d1b0f36b90fa87f48ea17ff76175fc6737abf158"
+    }
+  },
+  "bundleManifestSha256": "e82f493f2c311f1d8f0cc5fd82f76400bfd7542a4494565d942645e8cb854a84",
+  "archiveSha256": "43b64ea02765e539527039d56522e3808c67ea0993abf1bf2443d0994d440371"
+}

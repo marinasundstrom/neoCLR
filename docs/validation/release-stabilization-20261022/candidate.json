@@ -1,5 +1,5 @@
 {
-  "status": "both versioned packages and HTTPS qualified; Windows measurements and final publication review pending",
+  "status": "qualified on both platforms; final release prepared, publication pending",
   "selectedDate": "2026-10-22",
   "proposedReleaseTag": "v0.1.0-preview.17",
   "sdkEditorVersion": "0.1.17-neoclr.20261022.1",
@@ -10,9 +10,8 @@
   "macOSOutput": "target/preview17-sdk-macos-isolated-20261022",
   "supersedes": "0.1.17-neoclr.20261019.1 (never published)",
   "remaining": [
-    "Complete Windows measurements against the versioned archive.",
-    "Finish final archive identity audit and review notes/changelog.",
-    "Publish approved release assets and update website download links."
+    "Publish final release assets and verify public identities.",
+    "Deploy and verify website release links."
   ],
   "macOSBuildNote": "Shared-checkout attempt exited during language-server packaging without a diagnostic; retry from an isolated git archive of the exact Raven revision. No compiler-source change inferred.",
   "localInstallation": "Matching macOS SDK installed side by side; default VS Code extension upgraded with rollback preserved. JIT/interpreter, 26 editor checks, inlays and two ten-cycle configuration recovery runs pass.",
@@ -28,5 +27,6 @@
   "windowsHttpsQualification": "passed: run 39859994782",
   "windowsBenchmarkRun": 39859668223,
   "macOSQualification": "versioned-macos/summary.json",
-  "windowsQualificationEvidence": "versioned-windows/summary.json"
+  "windowsQualificationEvidence": "versioned-windows/summary.json",
+  "finalQualification": "../release-20261023/README.md"
 }

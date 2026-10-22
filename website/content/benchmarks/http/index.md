@@ -1,5 +1,46 @@
 # HTTP request-processing benchmarks
 
+## Preview 17 — 22–23 October 2026
+
+The matching macOS ARM64 and Windows x64 packages each pass all five stages:
+55 CPU/JSON processes and 1,152 HTTP responses. SDK/editor version
+`0.1.17-neoclr.20261022.1`, Raven `301e668a5`. Five measured rounds retain their
+ranges; startup is separate. HTTP uses sequential loopback requests with connection
+close. Native CPU rows use longer batches than interpreter/JSON rows. Desktop and
+hosted-runner conditions prevent controlled speedup or cross-platform claims.
+
+### macOS ARM64
+
+| Workload | Mode | Median requests/s | Range | Median startup s |
+| --- | --- | ---: | ---: | ---: |
+| http-plain | interpreter | 3.70 | 3.53–3.78 | 4.282 |
+| http-plain | jit | 180.88 | 176.26–189.44 | 6.725 |
+| http-plain | aot | 188.84 | 134.97–199.28 | 0.005 |
+| http-json | interpreter | 1.71 | 1.69–1.82 | 4.537 |
+| http-json | jit | 96.31 | 95.80–100.79 | 11.456 |
+| http-json | aot | 99.59 | 99.56–100.45 | 0.014 |
+
+[Raw macOS reports and conditions](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/release-20261022/macos-preview17).
+
+### Windows x64
+
+| Workload | Mode | Median requests/s | Range | Median startup s |
+| --- | --- | ---: | ---: | ---: |
+| http-plain | interpreter | 3.27 | 3.23–3.29 | 5.778 |
+| http-plain | jit | 62.51 | 52.97–65.90 | 9.468 |
+| http-plain | aot | 59.81 | 52.88–66.52 | 0.008 |
+| http-json | interpreter | 1.60 | 1.51–1.66 | 5.901 |
+| http-json | jit | 42.73 | 39.52–46.61 | 15.525 |
+| http-json | aot | 40.04 | 37.55–41.05 | 0.008 |
+
+[Raw Windows reports and conditions](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/release-20261023/windows-preview17).
+Both runs record only generated Python caches in their initial Git status;
+no tracked input changes occurred. Earlier series below retain their original
+provenance and limitations. These results do not measure collector comparisons,
+peak concurrent throughput or HTTPS performance.
+
+## Earlier measurements
+
 Plain-text and typed-JSON Raven servers exercise the request path in interpreter,
 JIT and AOT. These **18 October 2026, Apple M1/macOS 27.0** measurements use the
 Preview 16 package with Raven `c0854cdda`. All **1,152 responses across

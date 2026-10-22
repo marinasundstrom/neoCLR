@@ -1,17 +1,9 @@
 # Install neoCLR
 
 The matched bundle includes the runtime, Raven compiler, VS Code extension and samples.
-Preview 16 provides matching packages for **Windows x64** and **macOS on Apple silicon**.
+Preview 17 provides matching packages for **Windows x64** and **macOS on Apple silicon**.
 JIT is the default on both; interpreter execution remains available explicitly.
 AOT is a separate experimental publishing workflow for supported applications.
-
-## Preview 17 candidate
-
-The next matched SDK/editor candidate is `0.1.17-neoclr.20261022.1` for macOS ARM64
-and Windows x64. It is undergoing package qualification and is not yet a published
-download. The links below continue to install Preview 16.
-[Candidate status and validation](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/release-stabilization-20261022/README.md)
-record the exact compiler, runtime and artifact identities.
 
 ## 1. Install prerequisites
 
@@ -25,8 +17,8 @@ not by neoCLR itself.
 
 ## 2. Download and extract
 
-- [Download for macOS ARM64](https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.16/neoclr-preview16-osx-arm64.tar.gz)
-- [Download for Windows x64](https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.16/neoclr-preview16-win-x64.tar.gz)
+- [Download for macOS ARM64](https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.17/neoclr-preview17-osx-arm64.tar.gz)
+- [Download for Windows x64](https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.17/neoclr-preview17-win-x64.tar.gz)
 
 Extract the archive and keep its folders together.
 
@@ -39,17 +31,15 @@ In VS Code, open **Extensions → ⋯ → Install from VSIX…** and select
 
 In VS Code, choose **File → Open Folder** and open `samples/collections` inside
 the extracted folder. Open `application-order-collections.rvn`, then choose
-**Terminal → Run Task → neoCLR: Run**. Save edits before running again.
+**Terminal → Run Task → neoCLR: Build and Run (JIT)**. Save edits before running again.
 
 The task compiles your Raven code and runs it on neoCLR. Try the `tasks` and `json`
 sample folders next.
 
-Development bundles for the next release provide **neoCLR: Build and Run (JIT)**
-as the default build task, plus a separate **neoCLR: Compile to Native** action.
-The native action requires a matching build kit (currently macOS ARM64), Apple
-build tools, and a fresh output directory; it builds without launching the result.
-These task labels are development changes; the preview.16 download above retains
-its existing **neoCLR: Run** task.
+**neoCLR: Build and Run (JIT)** is also the default build task. The separate
+**neoCLR: Compile to Native** action requires the matching
+[macOS ARM64 build kit](https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.17/neoclr-native-build-kit-osx-arm64.tar.gz),
+Apple build tools and a fresh output directory. It builds without launching the result.
 
 [Learn Raven →](../raven/) · [Explore the APIs →](../docs/)
 
@@ -75,7 +65,7 @@ with `dotnet --list-sdks`. If editor symbols are missing, open the sample folder
 containing the `.rvnproj` file and reload VS Code after installing the extension.
 
 To check the complete installation, run this optional command from the extracted
-`neoclr-native-poc` folder:
+bundle root folder:
 
 ```sh
 python3 tools/verify-native-bundle.py --report ../acceptance.json
@@ -84,7 +74,7 @@ python3 tools/verify-native-bundle.py --report ../acceptance.json
 On Windows, use `python` in place of `python3`. It compiles and runs the bundled
 collections, Tasks, JSON and HTTP examples.
 
-[Release notes and downloads](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.16)
+[Release notes and downloads](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.17)
 include the exact supported toolchain and limitations.
 
 <a id="development"></a>
@@ -104,9 +94,9 @@ bundle contains the four base libraries without that provider. Start with the
 [PostgreSQL sample](/cases/postgresql/) for local database queries.
 
 For native publishing, follow the
-[project build instructions](https://github.com/marinasundstrom/neoCLR/blob/v0.1.0-preview.16/docs/native-poc-bundle.md)
+[project build instructions](https://github.com/marinasundstrom/neoCLR/blob/v0.1.0-preview.17/docs/native-poc-bundle.md)
 with the matching compiler, runtime, libraries and host tools. AOT remains bounded;
 JIT package acceptance does not imply every application can be published natively.
 
-[Preview 16 release notes](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.16) ·
-[Qualification results](https://github.com/marinasundstrom/neoCLR/blob/v0.1.0-preview.16/docs/validation/release-20261018/README.md)
+[Preview 17 release notes](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.17) ·
+[Qualification results](https://github.com/marinasundstrom/neoCLR/blob/v0.1.0-preview.17/docs/validation/release-20261023/README.md)

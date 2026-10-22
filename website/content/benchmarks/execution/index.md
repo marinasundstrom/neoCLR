@@ -1,5 +1,52 @@
 # General execution benchmarks
 
+## Preview 17 — 22–23 October 2026
+
+The matching macOS ARM64 and Windows x64 packages each pass all five stages:
+55 CPU/JSON processes and 1,152 HTTP responses. SDK/editor version
+`0.1.17-neoclr.20261022.1`, Raven `301e668a5`. Five measured rounds retain their
+ranges; startup is separate. HTTP uses sequential loopback requests with connection
+close. Native CPU rows use longer batches than interpreter/JSON rows. Desktop and
+hosted-runner conditions prevent controlled speedup or cross-platform claims.
+
+### macOS ARM64
+
+| Workload | Mode | Median operations/s | Range | Median startup s |
+| --- | --- | ---: | ---: | ---: |
+| cpu.sum | interpreter | 5.05 | 4.98–5.08 | 4.426 |
+| cpu.sum | jit | 41917.63 | 41337.75–42001.13 | 3.626 |
+| cpu.sum | aot | 41831.46 | 41122.51–41852.21 | 0.007 |
+| json.serialize | interpreter | 14.40 | 14.38–14.45 | 4.433 |
+| json.serialize | jit | 725.64 | 721.61–729.68 | 3.574 |
+| json.serialize | aot | 699.13 | 693.42–766.44 | 0.007 |
+| json.deserialize | interpreter | 11.86 | 11.26–11.88 | 4.439 |
+| json.deserialize | jit | 523.88 | 518.46–524.37 | 3.573 |
+| json.deserialize | aot | 516.92 | 511.69–549.59 | 0.007 |
+
+[Raw macOS reports and conditions](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/release-20261022/macos-preview17).
+
+### Windows x64
+
+| Workload | Mode | Median operations/s | Range | Median startup s |
+| --- | --- | ---: | ---: | ---: |
+| cpu.sum | interpreter | 6.37 | 6.18–6.62 | 6.050 |
+| cpu.sum | jit | 54422.27 | 51174.01–54535.53 | 5.165 |
+| cpu.sum | aot | 54349.18 | 46513.73–54590.73 | 0.010 |
+| json.serialize | interpreter | 12.34 | 12.08–12.53 | 5.943 |
+| json.serialize | jit | 366.93 | 349.91–367.73 | 5.172 |
+| json.serialize | aot | 367.67 | 350.12–369.09 | 0.010 |
+| json.deserialize | interpreter | 9.85 | 8.44–10.08 | 5.964 |
+| json.deserialize | jit | 269.52 | 254.45–271.13 | 5.176 |
+| json.deserialize | aot | 270.52 | 250.29–272.16 | 0.010 |
+
+[Raw Windows reports and conditions](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/release-20261023/windows-preview17).
+Both runs record only generated Python caches in their initial Git status;
+no tracked input changes occurred. Earlier series below retain their original
+provenance and limitations. These results do not measure collector comparisons,
+peak concurrent throughput or HTTPS performance.
+
+## Earlier measurements
+
 CPU and JSON workloads run through the same Raven worker in interpreter, JIT and
 AOT. These **18 October 2026, Apple M1/macOS 27.0** measurements use the Preview 16 package with Raven `c0854cdda`. All 45 CPU/JSON processes and ten longer
 native CPU processes pass correctness and unchanged-input checks. Windows results follow below as a separate hosted-runner series.

@@ -1,7 +1,9 @@
 # Development release qualification — 2026-10-22
 
-This record tracks the development candidate after Preview 16. It is not a
-published release or a declaration that every gate has passed. Historical
+This record preserves the development qualification sequence after Preview 16.
+All final gates now pass; see [Preview 17 final qualification](../release-20261023/README.md)
+for exact release identities and completed measurements. Older rows below retain
+their historical remaining-work descriptions. Historical
 [Preview 16 qualification](../release-20261018/README.md) remains unchanged.
 Targets are macOS ARM64 and Windows x64; Raven main and `codex/neoclr` remain
 separate. The current package compiler is Raven `301e668a5`. The replacement

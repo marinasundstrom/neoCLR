@@ -72,3 +72,11 @@ The [host-handle admission series](/benchmarks/gc/#host-handle-admission-2026-10
 compares separate validation/membership walks with a combined walk. Early/late-base
 and small-heap controls remain visible. It measures root creation/read/release,
 not collection time; its separate AOT HTTP comparison shows no material gain.
+
+## 2026-10-22–23 — Preview 17
+
+Both versioned packages pass 55 CPU/JSON processes and 1,152 HTTP responses.
+[macOS evidence](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/release-20261022/macos-preview17)
+and [Windows evidence](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/release-20261023/windows-preview17)
+retain input identities, sample distributions and Python-cache-only Git status.
+These desktop/hosted runs are separate from previous development and Preview 16 series.

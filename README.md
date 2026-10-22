@@ -1,7 +1,7 @@
 # neoCLR
 
 [![CI](https://github.com/marinasundstrom/neoCLR/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/marinasundstrom/neoCLR/actions/workflows/ci.yml)
-[![Preview 14](https://img.shields.io/badge/release-v0.1.0--preview.14-blue)](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.14)
+[![Preview 17](https://img.shields.io/badge/release-v0.1.0--preview.17-blue)](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.17)
 [![MIT license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Rust 1.85+](https://img.shields.io/badge/Rust-1.85%2B-orange)](Cargo.toml)
 

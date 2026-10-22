@@ -2,7 +2,7 @@
   "subtitle": "Experimental application platform",
   "footer": "neoCLR \u00b7 Experimental application platform",
   "notice": "Development documentation \u00b7 Some APIs may be unreleased",
-  "releaseUrl": "https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.16",
+  "releaseUrl": "https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.17",
   "releaseLabel": "Published release \u2192",
   "apiPath": "docs/api",
   "apiInputs": [

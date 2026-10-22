@@ -9,7 +9,7 @@ Each report identifies the measured build, workload, machine and execution mode.
 | [Garbage collection](/benchmarks/gc/) | Matched collector-path HTTP comparisons, allocation/reclamation diagnostics and correctness evidence |
 | [General execution](/benchmarks/execution/) | CPU work, JSON serialization/deserialization and startup across interpreter, JIT and AOT |
 
-The current Preview 16 macOS ARM64 and Windows x64 reports cover CPU/JSON execution
+The current Preview 17 macOS ARM64 and Windows x64 reports cover CPU/JSON execution
 and plain/typed-JSON HTTP. Each platform validates 55 CPU/JSON processes and 1,152
 HTTP responses. These short workstation/hosted-runner series retain variability and
 limitations; they are not controlled-host regression gates or cross-platform rankings. Database and collector reports identify their own
