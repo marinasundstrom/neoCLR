@@ -26,6 +26,21 @@ available original wording; other text is a summary.
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
 
+## 2026-10-22 — One Void identity, contextual value materialization
+
+The author states that Void denotes no result in IL, rejects a special `noresult`
+keyword, and suggests `void`. Asked whether qualification/case should distinguish
+return modes, the author explicitly rejects that split: `void` aliases System.Void,
+both mean no result in return position, and the compiler supplies a value when
+required. Void remains usable as a real type, including in generics. The author
+notes this brings consistency and believes Raven already handles its side.
+
+The assistant withdraws the case-sensitive draft before committing it. Raven source
+inspection confirms preserve-result materialization, distinct handling of an original
+generic type-parameter return, and configured System.Void storage projection. No
+fresh Raven compilation or complete neoIL migration is claimed. The accepted contract
+and remaining qualification are recorded in the [interop design](design/native-import-export-contract.md#canonical-void-contract--author-clarification).
+
 ## 2026-10-22 — Preserve neoCLR Void as a normal type
 
 The author corrects the assistant's proposed Unit/Void split: Raven on .NET uses

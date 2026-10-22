@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
+- Record the canonical Void contract: void aliases System.Void, direct Void returns have no result, and language-required values remain compiler-generated; reject case/qualification-based return distinctions and the noresult keyword. Verify Raven source already distinguishes preserved no-result expressions from generic value returns. The coordinated IL migration and end-to-end qualification remain pending; no runtime semantics change in this decision record.
+
 - Record the author correction that neoCLR Void remains a normal inhabited type; withdraw the proposed Unit rename. Separate language-required Void values from no-result native call conventions in interop guidance. Return representation/syntax standardization remains open; this documentation correction changes no runtime semantics.
 
 - Admit no-result C imports and scalar helpers in the opt-in macOS ARM64 AOT profile, using the existing Void/no_result metadata contract. Emit no native return register or operand-stack result; preserve loader-fault output and ordinary host entry semantics. Add native allocation/release, side-effect, live caller-stack and invalid-result regression tests. All seven import tests, 24 scalar regressions and 24 website checks pass using a fresh non-incremental target directory, closing prior pointer qualification. Update the manual API reference, roadmap and website; class-library projection, callbacks and pinning remain open.

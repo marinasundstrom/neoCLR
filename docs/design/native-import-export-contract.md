@@ -301,3 +301,25 @@ callable identity and verification must preserve the difference. The implementat
 currently records Void plus a no_result flag for no-result calls. Standardization
 of the representation/spelling remains open; no type rename, new schema or automatic
 adapter is claimed by the bounded native-call increment.
+
+
+### Canonical Void contract — author clarification
+
+The author subsequently specifies that `void` is an alias for `System.Void`:
+qualification and casing must not create different return conventions. A directly
+Void-returning declaration has no result, following CLR call/return behavior, while
+neoCLR additionally permits Void as a real type in value/storage and generic type
+positions. There must be no special `noresult` IL keyword. Compiler-generated value
+materialization is driven by the language's expression requirements.
+
+Raven source inspection confirms that its expression emitter synthesizes a unit
+value only for a preserved no-result invocation. It separately recognizes a generic
+return whose original declaration returns a type parameter: that call already
+supplies the value, so it must not synthesize a second one. Its runtime-unit projection
+maps storage to the configured neoCLR System.Void while retaining CLI void returns.
+This is source-inspection evidence, not fresh end-to-end qualification of the new IL
+spelling. The earlier case/qualification split is rejected. The migration must cover
+assembler syntax, signature rendering, producers and fixtures together, and validate
+direct returns, used/discarded expressions and generic value returns. The binary
+return convention must preserve generic call behavior; eliminating a public keyword
+must not accidentally change a generic value-return ABI. Implementation is pending.
