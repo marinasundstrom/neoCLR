@@ -1,5 +1,11 @@
 # neoCLR platform roadmap
 
+**Minimum-Rust gate repaired (2026-10-22):** All three Rust 1.85 jobs pass.
+Canonical CI next finds a terminal `fetch_update` deprecation on newer Rust;
+apply the same scoped MSRV compatibility annotation as the scheduler, preserving
+the atomic operation and ordering. Full source qualification still requires
+a passing rerun. [Evidence](validation/release-stabilization-20261022/source-toolchain-repair.json).
+
 **Source qualification repair (2026-10-22):** CI exposes rustfmt drift and
 Rust 1.85 rejection of let chains in generic type-token inspection. Replace them
 with equivalent nested conditions and format the four affected test files.

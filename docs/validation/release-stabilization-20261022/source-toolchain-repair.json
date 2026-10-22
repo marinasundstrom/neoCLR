@@ -14,7 +14,12 @@
     "format": "passed",
     "minimumRust": "Not qualified locally: initial CommandLineTools SDK linking failure, then full-Xcode retry stalled in macOS dyld fcntl while loading dependency proc macros; terminated owned compiler processes. Hosted validation required.",
     "clippy": "pending",
-    "typeIdentityTests": "pending"
+    "typeIdentityTests": "pending",
+    "minimumRustHosted": {
+      "macOS": "passed",
+      "Windows": "passed",
+      "Linux": "passed"
+    }
   },
   "logs": {
     "/tmp/release-fmt-check.log": "1f4d0c6ed62d7dc5c720a8dc20f09d182f805e04e63f843061a28e5ceee3ea19",
@@ -27,7 +32,14 @@
   "hostedRerun": {
     "run": 39847804371,
     "event": "workflow_dispatch",
-    "status": "queued at recording",
+    "status": "minimum-Rust jobs pass on all three platforms; canonical stops at terminal fetch_update deprecation",
     "fullMatrix": false
+  },
+  "followup": {
+    "file": "src/invocation_terminal.rs",
+    "change": "Narrow allow(deprecated) at fetch_update, following existing scheduler compatibility policy: try_update is newer than Rust 1.85. No operation, ordering or overflow behavior changes.",
+    "failedJob": 120065652374,
+    "logSha256": "42667066326a3c9dbae4f0a672f7c0fc59a057c1d28b3bc53f115cb96adc25b0",
+    "validation": "formatting passes; canonical rerun and queued local terminal tests pending"
   }
 }

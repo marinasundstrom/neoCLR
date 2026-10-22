@@ -494,3 +494,14 @@ The repaired source qualification is explicitly pinned to `02c65eae3` in
 [run 39847804371](https://github.com/marinasundstrom/neoCLR/actions/runs/39847804371).
 It runs canonical extracted-source tests, strict Clippy/formatting, host boundaries
 and the three minimum-Rust checks; queued at recording, not yet passed.
+
+### Minimum-Rust passed; terminal compatibility annotation — 2026-10-22
+
+Run 39847804371 passes minimum-Rust checks on macOS, Windows and Linux, confirming
+the generic token syntax repair. Formatting also passes. Canonical Clippy then
+rejects `fetch_update` in the terminal handle allocator because newer Rust deprecates
+its spelling. Its `try_update` replacement is newer than the supported Rust 1.85
+minimum. The allocator now uses the existing scheduler/runtime-services policy:
+a statement-scoped deprecation allowance with that compatibility reason. The
+atomic operation, ordering, capacity guard and terminal behavior are unchanged.
+Full source qualification remains open; this does not weaken global warning checks.

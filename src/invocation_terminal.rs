@@ -61,6 +61,8 @@ impl Service {
         if state.input.is_some() || state.reading {
             return Err(busy());
         }
+        // try_update is newer than the supported Rust 1.85 minimum.
+        #[allow(deprecated)]
         let handle = NEXT_HANDLE
             .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
                 value.checked_add(1)
