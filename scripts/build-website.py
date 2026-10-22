@@ -291,6 +291,9 @@ def main():
         shutil.copyfile(SOURCE / name, OUTPUT / name)
     raven = 'docs/experiments/raven-target/samples/'
     samples = {
+        'NEOIL_TOUR': ('samples/neoil-tour/main.neoil', '.module ILTour', '\n.end', True),
+        'NEOIL_FUNCTION': ('samples/neoil-tour/main.neoil', '.function Main', '\n.end', True),
+        'NEOIL_VOID': ('samples/neoil-tour/main.neoil', '.function Identity', '\n.function Main', False),
         'LOCALIZATION_FORMAT_SAMPLE': ('runtime/raven/tests/localization/Tests.rvn', '    _ = Assert.Equal("Hej Raven!"', '    _ = Assert.Equal("A/B"', False),
         'SQL_PERSON_MODEL': ('docs/experiments/postgresql-people/Main.rvn', 'public class Person', '\n}', True),
         'SQL_POSITIONAL_PEOPLE': ('docs/experiments/postgresql-people/Main.rvn', '    let positional', '\n\n    let parameters', False),

@@ -41,6 +41,7 @@ and deliberate differences.
 boxing and equality. [Modules](/features/modules/) organize declarations.
 [Introspection](/features/introspection/) describes them;
 [reflection](/features/reflection/) can construct objects and invoke members.
+[neoIL](/features/neoil/) demonstrates the runtime contracts in executable IL, including structural function types.
 [Architecture](/architecture/) explains the compiler and runtime layers.
 
 ## Go deeper when you need to

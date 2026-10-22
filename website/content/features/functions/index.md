@@ -34,6 +34,8 @@ names and declaring types do not contribute to signature identity. Ordered param
 types, return type and reference-passing contracts do. Nominal component types keep
 their own identities. Calling the object uses its synthesized, typed `Invoke` method.
 
+See [the neoIL walkthrough](../neoil/) for the underlying signature, binding and invocation instructions.
+
 ## Value bindings and target inspection
 
 Function objects have value equality: separately created bindings to the same

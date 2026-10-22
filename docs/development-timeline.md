@@ -26,6 +26,18 @@ available original wording; other text is a summary.
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
 
+## 2026-10-22 — Explain runtime contracts through assembler text
+
+The author requests a feature page demonstrating basic IL syntax and the encoding
+of runtime concepts, especially structural types. They clarify that the displayed
+text is an assembler representation of metadata and bytecode, not the binary
+format, and that Raven can emit bytecode directly. The assistant adds a guide
+with excerpts from an executable structural Function/Void sample, distinguishes
+neoCLR output from .NET CLR assemblies, and links it from Guides and Function types.
+The sample passes assembly, verification, JSON round-trip and interpreter execution;
+24 website checks pass. Full rendering is blocked by an existing stale reference
+snapshot. The ongoing legacy Void migration remains separate and unfinished.
+
 ## 2026-10-22 — Prefer type keywords or qualified names in IL
 
 During the Void migration, the author clarifies that capitalized bare `Void` should

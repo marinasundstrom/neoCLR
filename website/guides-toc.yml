@@ -48,6 +48,8 @@
       href: features/globalization/index.md
 - name: Runtime and tools
   items:
+    - name: "neoIL: syntax and runtime contracts"
+      href: features/neoil/index.md
     - name: "Native libraries and FFI"
       href: features/native-interop/index.md
     - name: "Native compilation"

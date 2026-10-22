@@ -1,0 +1,33 @@
+.module ILTour
+.entry Main
+
+.function AddTwo(int32 value) -> int32
+    ldarg value
+    ldc.i4 2
+    add
+    ret
+.end
+
+.function Identity<T>(T value) -> T
+    ldarg value
+    ret
+.end
+
+.function Complete() -> void
+    .local void result
+    ldvoid
+    call Identity<void>(void)
+    stloc result
+    ret
+.end
+
+.function Main() -> int32
+    .local fn<int32,int32> transform
+    function.bind fn<int32,int32> = AddTwo(int32)
+    stloc transform
+    call Complete()
+    ldloc transform
+    ldc.i4 40
+    call instance fn<int32,int32>::Invoke(int32)
+    ret
+.end
