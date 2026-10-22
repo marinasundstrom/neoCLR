@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
+- Record successful Windows x64 requalification of the unchanged candidate package after the GC fixture and UTF-8 harness repairs: extracted samples/HTTP, native GC, all 24 await cases, three JSON cases, 132 header cases, 26 installed-editor checks, inlays and both ten-cycle configuration runs pass. Retain compressed raw reports, hashes and original package lineage. Matching Windows HTTPS and benchmark runs remain pending; this is not release publication.
+
 - Complete the rebuilt macOS package’s second ten-cycle installed-editor configuration run and matching HTTPS project qualification. All 15 AOT TLS/security/recovery/cleartext cases and native transport tests pass; retain raw evidence and build hashes. Add a current development qualification index distinct from published Preview 16 records. Windows and matching refreshed-package measurements remain open.
 
 - Rebuild the complete macOS SDK, matching language server/VSIX and native libraries from Raven `301e668a5`; verify the resulting archive outside the checkout. Packaged samples/HTTP, all 26 installed-editor checks, inlays and ten configuration recovery rounds pass. The repaired HTTP-client harness also passes AOT/interpreter/JIT locally. Preserve archive/report hashes; earlier benchmark results remain tied to their original library bytes. Windows qualification and matching benchmarks are rerunning; no release is published.

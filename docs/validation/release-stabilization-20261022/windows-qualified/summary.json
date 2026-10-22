@@ -1,0 +1,88 @@
+{
+  "passed": true,
+  "run": 39841298887,
+  "artifact": 12454870609,
+  "lineage": {
+    "qualificationRevision": "69441f2fd260e2f9eae84e4758665f39cdeb826f",
+    "packageRun": "39835531991",
+    "archiveSha256": "A30D423DF6B6B16D98EDBA2CC8D8D5174014548C8647B0E82FC0EE1EA47F7CA8"
+  },
+  "reports": {
+    "editor-acceptance/vscode-acceptance.json": {
+      "file": "editor-acceptance-vscode-acceptance.json.gz",
+      "rawSha256": "f47e9c10ad016f737e6fedc528e6006a4ff129a3a373a79b6cda9cf6fe6927f3",
+      "gzipSha256": "f6f9a1aba27d8f756b6e818719a49acd9c67a461da6a740cc46a1766fa277bb1",
+      "passed": true,
+      "checks": 26
+    },
+    "editor-acceptance/vscode-configuration-1.json": {
+      "file": "editor-acceptance-vscode-configuration-1.json.gz",
+      "rawSha256": "f792056e288403643d6a774b1e7f5136f1121ef105d4e9cad22ec3190f407566",
+      "gzipSha256": "9a7c88d870f1f848968d247d9346f1070d8da22631180525aad4502b7507159b",
+      "passed": true,
+      "rounds": 10
+    },
+    "editor-acceptance/vscode-configuration-2.json": {
+      "file": "editor-acceptance-vscode-configuration-2.json.gz",
+      "rawSha256": "da8cd33cc43e56457563ed16c57f955d44709311c21389f3ed89b4e250c29c7e",
+      "gzipSha256": "6d9dab5979c090e9f4a7020d07b9d57730d73cab19e527d25d226d843baaf886",
+      "passed": true,
+      "rounds": 10
+    },
+    "editor-acceptance/vscode-inlay-acceptance.json": {
+      "file": "editor-acceptance-vscode-inlay-acceptance.json.gz",
+      "rawSha256": "1e496f1e64c457734f4d5043ddd3643ba2ff5c03867b6fdebd7b90bc2d2bcd33",
+      "gzipSha256": "d38be7345f0a7ad9ca99e805c27c9d196765ec13010294e3951dedddd2ef25f4",
+      "passed": true
+    },
+    "release-gc/report.json": {
+      "file": "release-gc-report.json.gz",
+      "rawSha256": "8d95e0a8c6045fa0c7955f6931eba6e3b51e7fd9b91d48630662c28618c9d389",
+      "gzipSha256": "0292e25a028609f6491e711a85559f757abda9aa2a4c05e4206e60a327c391aa",
+      "passed": true
+    },
+    "release-headers/results.json": {
+      "file": "release-headers-results.json.gz",
+      "rawSha256": "4c52409864812436b143497151967ab8f89047708214c9e077252d813417cc29",
+      "gzipSha256": "5bc4cbba95e448b2db971c4eef23825637884d4135d48a7f119649cce6d365b0",
+      "passed": true,
+      "cases": 132
+    },
+    "release-json/results.json": {
+      "file": "release-json-results.json.gz",
+      "rawSha256": "d5eab37493beab0ab70fe1c986329f729b2afacc4e4f668bddbed9cf2bc7b404",
+      "gzipSha256": "96c6b65d066066e728cd08680bf71d6b6840f21f2e61130de2f51b7bc4279942",
+      "passed": true,
+      "cases": 3
+    },
+    "release-runtime-await/validation.json": {
+      "file": "release-runtime-await-validation.json.gz",
+      "rawSha256": "f6910e844000adf82e88f5a22c5fc94bac7136d71b34847d58677f08343597ad",
+      "gzipSha256": "d0d17e1273fb5fa8950e3eb9c51c83bd45d6f7e65f657704e1ddc5140081b962",
+      "passed": true,
+      "cases": 24
+    },
+    "windows-native-acceptance-inputs.json": {
+      "file": "windows-native-acceptance-inputs.json.gz",
+      "rawSha256": "fc5e517df66b0ba2ce250e8b1d0fbef8a4450030b37295f668ced49628fcecca",
+      "gzipSha256": "229338f88c6b1713197ebad34542def099cfbd7d78dd08b58d7592b4b7ffc405"
+    },
+    "windows-native-acceptance-reused-http.json": {
+      "file": "windows-native-acceptance-reused-http.json.gz",
+      "rawSha256": "2abe326c58bcd8bd43e17b741259bf78eb645832675794be3870c4788b1cbd2b",
+      "gzipSha256": "536fb8b3ee166afb9f9f7657598779ecbf133ad6e3215a5a7538ec91d71bda90",
+      "passed": true
+    },
+    "windows-native-acceptance-reused.json": {
+      "file": "windows-native-acceptance-reused.json.gz",
+      "rawSha256": "90061d86d6f4cacfb863c62cff812252d59d50a4e535c2efefda5eec3a4cdf4e",
+      "gzipSha256": "48758c9f7b1d29f1da4876cf1053f0cd449dbd79b41a0e06c86a0285a3b581af",
+      "passed": true
+    }
+  },
+  "remaining": [
+    "Windows HTTPS run 39843930421",
+    "Windows benchmark run 39841353425",
+    "Final release publication gates"
+  ]
+}

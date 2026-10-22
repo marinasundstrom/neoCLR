@@ -1,5 +1,12 @@
 # neoCLR platform roadmap
 
+**Windows candidate qualified (2026-10-22):** Run 39841298887 passes extracted
+samples/HTTP, native GC, 24 await cases, JSON/header cases and installed-editor
+acceptance including two configuration recovery runs. It reuses the original
+package with repaired validation tooling; its source identity is preserved.
+Windows HTTPS and benchmarks remain in progress.
+[Reports and lineage](validation/release-stabilization-20261022/windows-qualified/summary.json).
+
 **Complete macOS package qualification (2026-10-22):** Matching rebuilt SDK,
 language server/VSIX and libraries pass extracted samples/HTTP, 26 installed-editor
 checks, inlays and two ten-cycle configuration recovery runs. Matching-package

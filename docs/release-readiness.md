@@ -411,3 +411,17 @@ HTTPS throughput claim. [Raw report](validation/release-stabilization-20261022/m
 and [package/build identities](validation/release-stabilization-20261022/complete-macos-package.json)
 retain the exact inputs. The [current gate index](validation/release-stabilization-20261022/README.md)
 separates this candidate from published Preview 16 qualification.
+
+### Windows candidate requalification passed — 2026-10-22
+
+[Run 39841298887](https://github.com/marinasundstrom/neoCLR/actions/runs/39841298887)
+passes extracted samples/HTTP, native GC, all 24 await cases across the three
+engines, three JSON cases, 132 header cases and all 26 installed-editor checks.
+Inlays and both ten-cycle configuration recovery runs also pass. The original
+package is from run 39835531991, archive SHA-256
+`a30d423df6b6b16d98edba2cc8d8d5174014548c8647b0e82fc0ee1ea47f7ca8`;
+qualification uses the repaired harness at `69441f2fd`. The failed earlier runs
+remain failed. [Compressed raw reports and lineage](validation/release-stabilization-20261022/windows-qualified/summary.json)
+retain independent hashes. [Windows HTTPS](https://github.com/marinasundstrom/neoCLR/actions/runs/39843930421)
+and [matching measurements](https://github.com/marinasundstrom/neoCLR/actions/runs/39841353425)
+are running; neither is counted as passed yet. No release is published.
