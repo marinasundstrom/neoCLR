@@ -21395,3 +21395,10 @@ no diagnostic; shared build output interference was only a hypothesis, not a
 confirmed cause. Packaging was retried from an isolated archive of the pinned
 Raven commit. Website candidate status was published and verified; the local
 SDK/extension upgrade remained pending package checks at recording.
+
+Follow-up: the isolated package build succeeded. The assistant installed SDK
+`0.1.17-neoclr.20261022.1` side by side and upgraded the default VS Code extension,
+preserving the previous VSIX for rollback. JIT/interpreter samples and HTTP,
+26 editor checks, inlays and two ten-cycle recovery runs pass. The general Raven
+CLI selection is unchanged. Windows qualification and release publication remain
+open. See [local installation](local-preview-20261022.md).

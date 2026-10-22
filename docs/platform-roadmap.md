@@ -3,7 +3,9 @@
 **Source gates closed; candidate website live (2026-10-22):** Repaired-source
 run 39853093086 passes canonical tests/25 smoke programs, both host suites and all
 minimum-Rust jobs. The website candidate notice is published. Versioned SDK/editor
-packages and the requested local installation remain in qualification.
+package qualification continues. The requested macOS SDK/default extension installation
+is complete with passing JIT/interpreter and editor checks, including both recovery
+runs; [local usage and rollback](local-preview-20261022.md) are recorded.
 [Current release gates](validation/release-stabilization-20261022/README.md).
 
 **Replacement Preview 17 candidate building (2026-10-22):** Select SDK/editor

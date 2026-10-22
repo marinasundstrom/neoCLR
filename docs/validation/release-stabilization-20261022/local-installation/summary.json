@@ -1,0 +1,59 @@
+{
+  "previousExtension": "0.1.16-neoclr.20261017.1",
+  "rollbackVSIX": "/Users/robert/.raven/backups/preview17-20261022/raven-preview16.vsix",
+  "newSDK": "/Users/robert/.raven/sdk/0.1.17-neoclr.20261022.1",
+  "newBundle": "/Users/robert/.local/share/neoclr/preview17/neoclr",
+  "sdkVerifiedFiles": 469,
+  "defaultExtensionSwitched": true,
+  "extensionVersion": "0.1.17-neoclr.20261022.1",
+  "verifiedInstalledServerAndClientFiles": 88,
+  "vsixSha256": "57cc417cfcbd5c611b34eaf462acd92e1add89bdcf1a4c98b8751101d5d121a1",
+  "date": "2026-10-22",
+  "ravenRevision": "301e668a51beb6ba307d63b6912b144d8ad6a6b0",
+  "runtimeRevision": "32184c938453e02680f9ae2c62fa35f7c0694b5e",
+  "reports": {
+    "jit": {
+      "passed": true,
+      "report": "jit.json.gz",
+      "sha256": "013f92e36839b69df181a891f249b8e93d06c71f8dd1bb4313d13d8c8be34459"
+    },
+    "interpreter": {
+      "passed": true,
+      "report": "interpreter.json.gz",
+      "sha256": "6bb264b84779bb86812da039a327a759adb3f77968564840760283478bd4c069"
+    },
+    "editor": {
+      "passed": true,
+      "report": "editor.json.gz",
+      "sha256": "ea6431524e7b60a0ed3dd66a9aee7620b0d04d8ed2ff09287719d7f7440dce9b"
+    },
+    "inlays": {
+      "passed": true,
+      "report": "inlays.json.gz",
+      "sha256": "f978660ec0e8bfdf97976370f9269a456a982ac7d9b92ee98304d630eb0f8250"
+    },
+    "configuration-first": {
+      "passed": true,
+      "cycles": 10,
+      "report": "configuration-first.json.gz",
+      "sha256": "044e860d962d4f92fad0c86ffcf9fe9b17d757595dff805f4121697de520289d"
+    },
+    "configuration-second": {
+      "passed": true,
+      "cycles": 10,
+      "report": "configuration-second.json.gz",
+      "sha256": "cec640dce4bd140de6b17af5333c59d470acad7ef3f01989e51ba282c36b746a"
+    }
+  },
+  "releasePublished": false,
+  "archive": {
+    "path": "target/preview17-jit-macos-20261022/neoclr-preview17-osx-arm64.tar.gz",
+    "bytes": 62394326,
+    "sha256": "c10ba8900362841edf3a228fa5db927d1df34f588c4415b87c91b9a76d5097a3"
+  },
+  "limitations": [
+    "Windows versioned package qualification remains running.",
+    "Rebuilt JIT host and native modules differ from earlier development bytes; earlier full qualification is not blanket evidence for this archive.",
+    "Initial CLI recovery launches produced no report; two direct executable launches produced passing reports."
+  ]
+}

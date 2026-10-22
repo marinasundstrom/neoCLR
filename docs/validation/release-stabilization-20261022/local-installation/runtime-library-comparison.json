@@ -1,0 +1,41 @@
+{
+  "previous": "target/release-socket-repair-jit-macos-20261022/bundle",
+  "current": "target/preview17-jit-macos-20261022/bundle",
+  "scope": [
+    "bin",
+    "lib"
+  ],
+  "changed": {
+    "bin/neoclr-jit-host.dylib": {
+      "previous": "7939831ac3bc9f827a5b410bfcd547da89b3c71028970e91722e665c200090bd",
+      "current": "a00386353836c961eb4693a2f776cf2c85bd83f859324f69e46d65c5ac18a855"
+    },
+    "lib/System.Web.dll": {
+      "previous": "7b87b6ec18cdb5feb5c6de3bbb14621d92b8f2567fe8cd16349d6fa413221b81",
+      "current": "9fc0b040d217aaf1dd2b33a85e72232ac2fc01e69bad6f5521e96c453c0e8f1a"
+    },
+    "lib/System.Networking.dll": {
+      "previous": "b6b20bf2ec7aeb0a7c5f6fa4347313d38bc0251008e52ce779216a208b68be2b",
+      "current": "f861dee4fd0fb25c0a101bf10d60128e5ab090d073738ea61506d03e87b09c00"
+    },
+    "lib/bundle.json": {
+      "previous": "8ee5bf217fcc5db9393e5c69abe1f2af3024e4fa021391a786cc86b33892cf76",
+      "current": "404774a5d2d732a2ffefad4f2eac95c38096274af9480aeeaa2b32360b109186"
+    },
+    "lib/System.Runtime.dll": {
+      "previous": "1cf9b4c415d31b4982e15de5f823fcfd094d5d96627164e4d374d7386a2cfca1",
+      "current": "d51684551895d2213dfb3e574ef921fc7781d145da1d70e2e3254be662ad964d"
+    },
+    "lib/System.Data.dll": {
+      "previous": "f779217e2b587aaf54b10b9e62aeb8c2107301a0e427ce852d9be3882f0340c8",
+      "current": "0cb708e20fd5e61151e8b7ca5a1bc96e5f25abd7e185b8d9868c2a047754b19f"
+    },
+    "lib/System.Data.PostgreSql.dll": {
+      "previous": "0043d97a3ab6e08e599cbb2bc00f23e0dd4b0f261b1cf512f646b141ddb5fb44",
+      "current": "41f95dba5bb8406770ac7c89a4cdc460896d1daefeb88cc7e684d750ba1a7457"
+    }
+  },
+  "removed": [],
+  "identicalFileCount": 1458,
+  "identicalPathListSha256": "0f8c97a5cc68db060f67884ca6891047fcf21d7fd169464a08871d025f8c3882"
+}

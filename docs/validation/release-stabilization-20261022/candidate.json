@@ -1,5 +1,5 @@
 {
-  "status": "building; not published or qualified",
+  "status": "macOS built and installed; Windows qualification running; not published",
   "selectedDate": "2026-10-22",
   "proposedReleaseTag": "v0.1.0-preview.17",
   "sdkEditorVersion": "0.1.17-neoclr.20261022.1",
@@ -15,12 +15,13 @@
     "Finalize release notes/changelog and publish only after required gates pass."
   ],
   "macOSBuildNote": "Shared-checkout attempt exited during language-server packaging without a diagnostic; retry from an isolated git archive of the exact Raven revision. No compiler-source change inferred.",
-  "localInstallation": "Requested by author; pending matching SDK/VSIX and package checks. Preserve previous installation for rollback.",
+  "localInstallation": "Matching macOS SDK installed side by side; default VS Code extension upgraded with rollback preserved. JIT/interpreter, 26 editor checks, inlays and two ten-cycle configuration recovery runs pass.",
   "sourceQualification": "passed: run 39853093086",
   "website": {
     "run": 39856189825,
     "status": "published candidate notice; verified live",
     "url": "https://marinasundstrom.github.io/neoCLR/try/",
     "downloads": "Preview 16 until Preview 17 publication"
-  }
+  },
+  "localInstallationEvidence": "local-installation/summary.json"
 }

@@ -5,12 +5,12 @@ published release or a declaration that every gate has passed. Historical
 [Preview 16 qualification](../release-20261018/README.md) remains unchanged.
 Targets are macOS ARM64 and Windows x64; Raven main and `codex/neoclr` remain
 separate. The current package compiler is Raven `301e668a5`. The replacement
-[versioned candidate](candidate.json), `0.1.17-neoclr.20261022.1`, is building
-for both platforms; earlier development archive passes do not qualify these new bytes.
+[versioned candidate](candidate.json), `0.1.17-neoclr.20261022.1`, is installed locally on macOS while Windows qualification runs; earlier development archive passes do not qualify these new bytes.
 
 | Gate | Current evidence | Remaining work |
 | --- | --- | --- |
 | Source | [Canonical full-source/25-smoke and Windows host checks pass](source-qualified/README.md), as do all three minimum-Rust jobs and 19 local type-identity/terminal tests. | The Unix readiness repair passes both host jobs, all minimum-Rust jobs, 37 local socket tests and 512 refusal attempts. Canonical rerun 39853093086 passes full-source tests and 25 smoke programs. The earlier failing run remains failed. |
+| Versioned local installation | [Installed candidate](local-installation/summary.json): JIT/interpreter samples and HTTP, 26 editor checks, inlays and two ten-cycle recovery runs pass. SDK and default extension are installed with rollback. | [Usage](../../local-preview-20261022.md). Rebuilt native modules/JIT host differ from development artifacts; remaining release gates must retain exact provenance. |
 | macOS package/editor | [Complete package](complete-macos-package.json): extracted samples and HTTP exchange, 26 installed-editor checks, inlays, two ten-cycle configuration recovery runs. | [Readiness-repaired archive](socket-repair-package/summary.json) passes extracted JIT/interpreter samples and HTTP; only runtime/JIT-host bytes change. Final publication identity remains open. |
 | macOS native build kit | [Matching repaired-SDK kit](socket-repair-native-kit/summary.json): console/HTTP, C/C++ native interop, Cargo-free consumers and TLS dependency tamper rejection pass. | SDK manifest matches the qualified package. Recheck final publication identities; explicit HTTPS-server profile remains source-only. |
 | macOS HTTPS | [Matching-package project](macos-https-project.json): 15 AOT security/recovery/cleartext cases and native TLS transport tests pass. | [Windows HTTPS](windows-https/summary.json) passes 27 JIT/AOT cases against the qualified package; no HTTPS throughput claim. |

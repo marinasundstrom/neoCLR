@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
+- Install the matching Preview 17 macOS candidate SDK side by side and upgrade the default VS Code extension, preserving Preview 16 rollback. Record archive identity, installed file verification, passing JIT/interpreter HTTP/sample checks, 26 editor checks, inlays and two ten-cycle recovery runs. Document local usage and confirm Raven branches remain in separate worktrees. Windows versioned qualification and release publication remain open.
+
 - Close repaired-source qualification: canonical full-source/25-smoke, both host suites, formatting, strict Clippy and all three minimum-Rust jobs pass in run 39853093086. Retain the canonical report. Publish and verify the website candidate notice via run 39856189825, preserving Preview 16 download links. Versioned package/local installation qualification remains open.
 
 - Update the website installation page with the versioned Preview 17 candidate and qualification link, retaining working Preview 16 downloads until publication. All 24 website tests and 5,703 pages pass. Retry macOS SDK packaging from an isolated pinned Raven snapshot after a diagnostic-free shared-checkout failure; the requested local SDK/extension upgrade remains pending qualification.
