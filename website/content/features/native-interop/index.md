@@ -192,6 +192,60 @@ Callback parameters, class/object mapping and metadata sidecars remain future wo
 All code inside the library retains neoCLR runtime conventions; only the exported
 adapters use the C ABI. Native pointers do not expose a managed object's layout.
 
+### Try the tested export sample
+
+The [Raven sample](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/aot-native-imports/raven/Exports.rvn)
+contains this exported pointer operation:
+
+```raven
+[NativeExport("neoclr_sample_write", NativeCallingConvention.System)]
+unsafe func WriteExport(pointer: *int, value: int) -> unit {
+    *pointer = value
+}
+```
+
+The generated header declares:
+
+```c
+void neoclr_sample_write(int32_t * arg0, int32_t arg1);
+```
+
+A C caller can pass the address of its own `int32_t`. The function writes to that
+storage without transferring ownership. The caller must provide a valid aligned
+address for the entire call. Raven `unit` maps to System.Void and C `void`
+at this boundary. The sample also demonstrates allocation and release through
+matching native functions, numeric results, automatic symbol names, and importing
+the resulting AOT library back into Raven.
+
+From a development checkout on macOS ARM64, with `NEOCLR_RAVEN_BUNDLE` pointing to
+a matching compiler/class-library bundle, run:
+
+```sh
+cargo test -p neoclr-codegen --test native_imports \
+  raven_aot_library_exports_are_callable_from_c_and_all_three_engines \
+  -- --include-ignored
+```
+
+This executable sample compiles Raven, generates an object and header, links a
+native library, compiles C and C++ callers, and runs the Raven consumer through
+interpreter, scalar JIT and AOT. See the
+[setup and tested compiler pairing](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/aot-native-imports/README.md#attribute-selected-exports-and-headers-2026-10-22).
+It uses a development build, not the published SDK.
+
+### Scope of the foundation
+
+Use this foundation for C-compatible numeric functions and explicitly owned native
+memory. C++ libraries can expose C wrappers taking opaque object pointers; callers
+must pair construction and destruction through that library. Direct C++ layouts,
+virtual dispatch, foreign exceptions and managed object marshalling are outside
+this contract.
+
+The scalar round trip is qualified. Installed-SDK integration and the supported
+release execution paths still need qualification before this can be presented as
+a completed release feature. Callback parity across engines and exports, managed
+pinning and automatic pointer-wrapper mapping remain explicit gaps; future
+metadata sidecars and language-neutral object mapping are separate work.
+
 [Execution and attribute reference](/docs/native-interop.html) ·
 [Contract, tests and reproduction](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/aot-native-imports/README.md)
 

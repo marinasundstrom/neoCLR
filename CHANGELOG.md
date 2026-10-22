@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
+- Add a website walkthrough of the tested NativeExport pointer sample, its generated C declaration and three-engine reproduction command. Bound the interop completion plan to a release-useful C foundation, explicitly separating development-backend evidence from installed-SDK qualification and deferred object/sidecar work.
+
 - Correct the specialization regression's expected executable-type-budget diagnostic. Source inventory permits more declarations than the selected executable shape budget; the runtime already rejects the overflow at the correct boundary. All 23 specialization tests pass; no admission limits or generated code change.
 
 - Add a macOS ARM64 scalar native-library backend with versioned source-identity/signature mangling and C adapters around the private status/result ABI. Raven NativeExportAttribute selects automatic or explicit names and Cdecl/System conventions through loaded source identity. Optional generated C/C++ headers use admitted scalar/pointer signatures and preserve existing outputs on failure. The attribute-selected library passes C/C++ callers and NativeImport re-import in interpreter/scalar-JIT/AOT; escaping faults terminate at the C boundary. All 19 import/export tests, three export unit tests and 24 website checks pass, with the earlier 24 scalar regressions unchanged. Refresh both API references and document the boundary. The previously reported specialization assertion is now resolved; no full release qualification is claimed. Callback exports, managed layouts and metadata sidecars remain unsupported.

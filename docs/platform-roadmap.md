@@ -1,5 +1,14 @@
 # neoCLR platform roadmap
 
+**Interop completion scope (author direction, 2026-10-22):** Close the native
+interop increment when it is good enough, publish a sample and website guidance,
+then return to release stabilization. Do not expand this into C++ object layout,
+vtables or metadata sidecars. The tested C ABI scalar/pointer round trip and source
+exports now have a website walkthrough. This is a development-backend checkpoint,
+not installed-SDK readiness: the common managed execution pipeline, callback
+parity, pinning and wrapper projection remain identified gaps. Select remaining
+work by the minimal release-useful path, preserving the published capability limits.
+
 **Free-function scope (author clarification, 2026-10-22):** Native invocation across
 interpreter/JIT/AOT and re-import of AOT binaries now focuses on functions and pointer
 memory; class/object mapping is future work. NativeExportAttribute should mirror

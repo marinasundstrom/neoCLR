@@ -21180,3 +21180,19 @@ C/C++ headers for the existing scalar/pointer export backend. The source library
 passes C and C++ callers plus NativeImport consumers in interpreter/scalar-JIT/AOT.
 See [contract](design/native-import-export-contract.md#source-exports-and-generated-headers--2026-10-22).
 Callback parity, pinning and broader managed-backend integration remain open.
+
+
+## 2026-10-22 — Bound interop and return to stabilization
+
+The author directed that native interop should close when good enough, with a
+sample and website guidance, followed by release stabilization. The assistant
+proposed keeping the first boundary to tested C ABI functions and pointer memory,
+separating release blockers from future extensions. A website walkthrough now
+uses the tested NativeExport pointer function and documents the all-engine sample
+command, native ownership, and generated C header.
+
+The existing specialization qualification failure was a stale expected diagnostic:
+source inventory and executable-type budgets are separate. The assertion is
+corrected and all 23 specialization tests pass. This does not change runtime limits.
+The development scalar ABI checkpoint is validated; installed-SDK/managed-pipeline
+qualification is still open, and no complete interop release readiness is claimed.
