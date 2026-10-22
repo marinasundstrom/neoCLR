@@ -84,3 +84,26 @@ exited-launcher case is not qualified there and needs target-host follow-up.
 record the exact working inputs. These observations measure validation cleanup,
 not runtime request throughput. The selected-function budget/startup blocker,
 fresh source suite, matched packages and installed-editor gates remain open.
+
+### Specialization lookup optimization — 2026-10-22
+
+Rust specialization now indexes immutable source methods by name once rather than
+scanning the full source inventory for each call. All candidates still undergo the
+existing instance/generic-arity/definition/closed-owner/parameter checks. Source-order
+overload traversal and ambiguity rejection remain unchanged. The extra hash index
+is temporary compiler storage, not a runtime object allocation policy change.
+
+All 24 specialization tests pass. A five-round isolated unoptimized probe with
+4,096 source functions and 1,024 reachable functions changes median expansion time
+from 45.6 ms to 13.6 ms. [Raw evidence](validation/release-stabilization-20261022/specialization-lookup.json)
+includes limitations: no optimized-build, HTTP startup or request-throughput gain
+is established. The 2,048-function gate remains unchanged; the HTTP selection/startup
+blocker still needs end-to-end analysis with matching source artifacts.
+
+The author's preference for separate native support libraries informs subsequent
+boundary reviews. The byte-only formatter in `tools/aot-native-text/src/lib.rs` is
+a potential NativeImport-facing service; its `runtime/native/text/numeric-format.c`
+adapter allocates rooted managed text and must retain runtime integration. The TLS
+provider already has a separate native adapter with host-owned socket/scheduler
+callbacks. Any move requires all-engine import support, matched packaging and
+measured call/marshalling cost; no service was relocated in this increment.

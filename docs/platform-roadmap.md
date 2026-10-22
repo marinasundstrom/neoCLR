@@ -1,5 +1,11 @@
 # neoCLR platform roadmap
 
+**Specialization performance (2026-10-22):** Indexed method lookup passes 24
+focused tests and reduces a synthetic unoptimized probe's median from 45.6 ms to
+13.6 ms. HTTP startup/selection remains open; no budget was raised. Native support
+libraries are preferred for standalone services, preserving runtime-owned GC and
+scheduler contracts. [Evidence and boundaries](release-readiness.md#specialization-lookup-optimization--2026-10-22).
+
 **Release stabilization (2026-10-22):** HTTP qualification now owns POSIX JIT
 process groups and bounds cleanup, including launcher-exit cases. Seven focused
 tests pass. Per-slice performance review is author-directed; cleanup timings are

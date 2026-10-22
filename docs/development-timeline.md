@@ -21248,3 +21248,17 @@ blocker. The cleanup implementation and seven tests are complete; local timings
 measure only process teardown. Runtime startup/selection analysis, Windows cleanup
 qualification and fresh release-package validation remain open. See the
 [release follow-up](release-readiness.md#qualification-cleanup-repair--2026-10-22).
+
+### 2026-10-22 — Native support boundaries during stabilization
+
+The author asked whether native functionality should use internal calls or native
+imports, preferring NativeImport and separate support libraries for functionality
+that need not be integrated into the runtime. The assistant distinguished standalone
+C ABI services from GC/managed-reference/scheduler operations, and did not assume
+that changing the boundary would improve performance. The author then requested
+continued stabilization until a significant change. A bounded Rust specialization
+lookup optimization passed 24 tests and improved the recorded synthetic timing;
+HTTP end-to-end startup remains unqualified. Numeric byte formatting is identified
+as a candidate service, while its managed text allocation adapter remains coupled
+to runtime roots. No boundary relocation was performed. See the
+[review and evidence](release-readiness.md#specialization-lookup-optimization--2026-10-22).

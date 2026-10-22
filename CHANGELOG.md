@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
+- Index source methods by name during Rust native specialization, retaining source-order overload candidates and exact owner/signature/definition checks. All 24 focused specialization tests pass. A five-round unoptimized synthetic probe reduces median expansion time from 45.6 ms to 13.6 ms; this is not an HTTP or release-build performance claim. The index adds bounded temporary compiler storage; selection limits and native call boundaries are unchanged.
+
 - Bound HTTP qualification cleanup and terminate owned JIT descendants, including POSIX children whose launcher has exited. Share process-tree cleanup across HTTP server/client, foundation, method and retained-session validators; client timeouts use the same ownership. Seven focused tests pass and modified validators compile. Local listener/pipe cleanup observations are recorded separately from runtime throughput; Windows target-host qualification remains pending.
 
 - Enable generated struct-pointer imports in the opt-in scalar JIT/AOT executable profiles: resolve loaded layout attributes and select entry-root dependencies after full-source verification. Unused valid constructors no longer block lowering; invalid source and unsupported import declarations still reject. Add private Boolean scalar storage without changing C Boolean marshalling. All 24 interop integration tests plus the new Boolean regression pass; API/website validation passes. Ordinary managed JIT/AOT, by-value struct transport, callbacks and pinning remain separate gaps.

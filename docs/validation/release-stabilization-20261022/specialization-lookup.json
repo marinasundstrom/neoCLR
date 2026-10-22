@@ -1,0 +1,38 @@
+{
+  "baseRevision": "2c7b402c8bb546db1bfcd7344b6d621506bd9235",
+  "profile": "unoptimized test profile; compile and assembly parsing excluded from samples",
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "source": "runtime/codegen/src/specialization.rs",
+  "candidateSha256": "f8e8b3e5ee3c10e334176950f7430d4fe8725e70eaa970f85e48214a149f1e47",
+  "scenario": {
+    "sourceFunctions": 4096,
+    "reachableFunctions": 1024,
+    "rounds": 5
+  },
+  "baselineSeconds": [
+    0.045615,
+    0.045553,
+    0.045678,
+    0.045298,
+    0.044901
+  ],
+  "candidateSeconds": [
+    0.013987,
+    0.013728,
+    0.013606,
+    0.01364,
+    0.013613
+  ],
+  "baselineMedianSeconds": 0.045553,
+  "candidateMedianSeconds": 0.01364,
+  "medianReductionPercent": 70.05685684806708,
+  "limitations": [
+    "Synthetic specialization workload, not HTTP startup or request throughput",
+    "Unoptimized build; no release-mode speedup claimed",
+    "One local before/after series, not interleaved or cross-platform",
+    "Index adds bounded transient compiler memory; no runtime object layout change"
+  ],
+  "baselineLog": "   Compiling ring v0.17.14\n   Compiling neoclr v0.1.0-preview.13 (/Users/robert/Projects/neoclr)\n   Compiling neoclr-codegen v0.0.0 (/Users/robert/Projects/neoclr/runtime/codegen)\n   Compiling rustls v0.23.45\n   Compiling rustls-webpki v0.103.15\n   Compiling neoclr-security-provider v0.0.0 (/Users/robert/Projects/neoclr/tools/security-provider)\n   Compiling neoclr-native-tls v0.0.0 (/Users/robert/Projects/neoclr/tools/native-tls)\n    Finished `test` profile [unoptimized] target(s) in 20.28s\n     Running unittests src/lib.rs (target/interop-validation/debug/deps/neoclr_codegen-316d2b322a38be33)\n\nrunning 1 test\nspecialization_lookup_seconds=0.045615\nspecialization_lookup_seconds=0.045553\nspecialization_lookup_seconds=0.045678\nspecialization_lookup_seconds=0.045298\nspecialization_lookup_seconds=0.044901\ntest specialization::tests::specialization_lookup_timing ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 134 filtered out; finished in 1.00s\n\n",
+  "candidateLog": "\nrunning 1 test\nspecialization_lookup_seconds=0.013987\nspecialization_lookup_seconds=0.013728\nspecialization_lookup_seconds=0.013606\nspecialization_lookup_seconds=0.013640\nspecialization_lookup_seconds=0.013613\ntest specialization::tests::specialization_lookup_timing ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 134 filtered out; finished in 0.52s\n\n",
+  "validationLog": "   Compiling neoclr v0.1.0-preview.13 (/Users/robert/Projects/neoclr)\n   Compiling neoclr-codegen v0.0.0 (/Users/robert/Projects/neoclr/runtime/codegen)\n    Finished `test` profile [unoptimized] target(s) in 14.56s\n     Running unittests src/lib.rs (target/interop-validation/debug/deps/neoclr_codegen-316d2b322a38be33)\n\nrunning 24 tests\ntest specialization::tests::boxed_scalar_interface_body_specializes_generic_helpers ... ok\ntest specialization::tests::deeply_nested_type_dependencies_fail_without_overflowing_the_host_stack ... ok\ntest specialization::tests::memory_view_shapes_retain_exact_elements_without_admitting_native_layout ... ok\ntest specialization::tests::input_function_inventory_remains_bounded ... ok\ntest specialization::tests::generic_shape_expansion_has_its_own_bound_before_selection ... ok\ntest specialization::tests::generic_class_override_without_base_call_retains_closed_slot ... ok\ntest specialization::tests::method_class_bounds_validate_before_specialization ... ok\ntest specialization::tests::function_kind_constraint_preserves_typed_calls_after_specialization ... ok\ntest specialization::tests::method_categories_use_runtime_constraint_validation ... ok\ntest specialization::tests::closed_type_budget_includes_nongeneric_dependency_shapes ... ok\ntest specialization::tests::instance_methods_specialize_owner_and_method_parameters_independently ... ok\ntest specialization::tests::nominal_class_constraints_are_checked_before_specialization ... ok\ntest specialization::tests::nominal_self_inheritance_closes_views_at_the_implementing_owner ... ok\ntest specialization::tests::init_accessor_authority_survives_specialization_and_selection ... ok\ntest specialization::tests::nominal_static_self_methods_specialize_without_erasing_conformance ... ok\ntest specialization::tests::nested_generic_specializations_preserve_each_lexical_owner ... ok\nspecialization_lookup_seconds=0.028981\nspecialization_lookup_seconds=0.023961\nspecialization_lookup_seconds=0.030929\nspecialization_lookup_seconds=0.019945\nspecialization_lookup_seconds=0.023620\ntest specialization::tests::specialization_lookup_timing ... ok\ntest specialization::tests::special_type_constraints_are_checked_before_specialization ... ok\ntest specialization::tests::signature_only_classes_retain_closed_interface_conformance ... ok\ntest specialization::tests::variant_interfaces_preserve_dispatch_and_identity_after_specialization ... ok\ntest specialization::tests::variant_selection_ignores_unrelated_explicit_source_templates ... ok\ntest specialization::tests::specialized_interface_dispatch_ignores_unselected_open_overload ... ok\ntest specialization::tests::variant_interface_dispatch_closes_generic_implementations ... ok\ntest specialization::tests::selected_function_budget_accepts_boundary_and_rejects_overflow ... ok\n\ntest result: ok. 24 passed; 0 failed; 0 ignored; 0 measured; 111 filtered out; finished in 3.83s\n\n"
+}

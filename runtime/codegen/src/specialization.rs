@@ -121,6 +121,7 @@ fn closed_virtual_base_contracts(
 struct Specializer<'a> {
     conformance: &'a neoclr::Module,
     source: &'a neoclr::Module,
+    functions_by_name: std::collections::HashMap<&'a str, Vec<usize>>,
     shapes: Vec<Shape>,
     type_clones: usize,
     type_depth: usize,
@@ -481,9 +482,14 @@ impl Specializer<'_> {
             _ => vec![],
         };
         let mut candidates = vec![];
-        for (i, f) in self.source.functions.iter().enumerate() {
-            if f.name != target.name
-                || f.instance != target.instance
+        for &i in self
+            .functions_by_name
+            .get(target.name.as_str())
+            .into_iter()
+            .flatten()
+        {
+            let f = &self.source.functions[i];
+            if f.instance != target.instance
                 || f.generic_parameters.len() != target.generic_arguments.len()
                 || target
                     .definition
@@ -897,9 +903,20 @@ pub(crate) fn expand_with_conformance(
         methods: vec![],
         row: *root,
     };
+    // Preserve source order within each overload set. Index only the immutable
+    // source inventory; generated instances retain their separate identity checks.
+    let mut functions_by_name: std::collections::HashMap<&str, Vec<usize>> =
+        std::collections::HashMap::new();
+    for (index, function) in input.functions.iter().enumerate() {
+        functions_by_name
+            .entry(function.name.as_str())
+            .or_default()
+            .push(index);
+    }
     let mut context = Specializer {
         conformance,
         source: input,
+        functions_by_name,
         shapes: vec![],
         type_clones: 0,
         type_depth: 0,
@@ -1552,6 +1569,31 @@ pub fn restore_methods(report: &mut Value, specialization: &Value) {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    #[ignore = "focused specialization timing probe; run explicitly with --nocapture"]
+    fn specialization_lookup_timing() {
+        let mut text = String::from(".module Lookup\n");
+        for i in 0..4096 {
+            text.push_str(&format!(
+                ".function F{i}(Int32 value) -> Int32\nldarg value\n"
+            ));
+            if i < 1023 {
+                text.push_str(&format!("call F{}(Int32)\n", i + 1));
+            }
+            text.push_str("ret\n.end\n");
+        }
+        let source = neoclr::assemble(&text).unwrap();
+        for _ in 0..5 {
+            let started = std::time::Instant::now();
+            let (expanded, _) = super::expand(&source, "F0").unwrap();
+            assert_eq!(expanded.functions.len(), 4096);
+            println!(
+                "specialization_lookup_seconds={:.6}",
+                started.elapsed().as_secs_f64()
+            );
+        }
+    }
+
     #[test]
     fn boxed_scalar_interface_body_specializes_generic_helpers() {
         let source = neoclr::assemble(
