@@ -229,6 +229,14 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
     if !function.is_internal_call() || function.instance || function.owner.is_some() {
         return Err(Fault::new("native binding requires InternalCall metadata"));
     }
+    // Return convention belongs to the signature, not a second service-name
+    // allowlist. Each binding below still checks its exact parameter/result types.
+    // Check this before any early-returning binding, including generic services.
+    if function.no_result && function.returns != Type::Void {
+        return Err(Fault::new(
+            "no-result native service requires a Void return",
+        ));
+    }
     if let Some(operation) = crate::memory_view_services::bind(function) {
         return operation.map(Binding::MemoryView);
     }
@@ -271,27 +279,6 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             || !function.generic_constraints.is_empty())
     {
         return Err(Fault::new("cryptography service cannot be generic"));
-    }
-    if function.no_result
-        && !matches!(
-            function.name.as_str(),
-            "neoCLR.Runtime.ScheduleTask"
-                | "neoCLR.Runtime.DrainEntryTasks"
-                | "neoCLR.Runtime.RuntimeAsyncYield"
-                | "neoCLR.Runtime.RuntimeAsyncAwaitUnit"
-                | "neoCLR.Runtime.ReflectionPropertySet"
-                | "neoCLR.Runtime.GCCollect"
-                | "neoCLR.Runtime.GCKeepAlive"
-                | "neoCLR.Runtime.WriteLine"
-                | "neoCLR.Runtime.Fail"
-                | "neoCLR.Runtime.NativeFree"
-                | "neoCLR.Runtime.NativeCopyTo"
-                | "neoCLR.Runtime.NativeCopyFrom"
-        )
-    {
-        return Err(Fault::new(
-            "native service does not support no-result execution",
-        ));
     }
     if let Some((operation, arity)) = crate::math::Operation::binding(&function.name) {
         if function.parameters != vec![Type::Double; arity] || function.returns != Type::Double {
@@ -2336,6 +2323,37 @@ mod task_callback_tests {
 #[cfg(test)]
 mod reflection_signature_tests {
     #[test]
+    fn generic_void_service_result_keeps_its_value_convention() {
+        let module = crate::assemble(
+            ".module Test\n.function neoCLR.Runtime.GetDefaultTaskQueue<T>() -> T\n.methodimpl InternalCall\n.end\n"
+        ).unwrap();
+        let mut function = module.functions[0].clone();
+        function.generic_arguments = vec![crate::metadata::Type::Void];
+        function.returns = crate::metadata::Type::Void;
+        assert!(super::bind(&function).is_ok());
+        function.no_result = true;
+        assert!(super::bind(&function).is_err());
+    }
+
+    #[test]
+    fn no_result_metadata_cannot_discard_a_service_result() {
+        for signature in [
+            "CharCategory(UInt32 scalar) -> Int32",
+            "GetDefaultTaskQueue<T>() -> T",
+        ] {
+            let module = crate::assemble(&format!(
+                ".module Test\n.function neoCLR.Runtime.{signature}\n.methodimpl InternalCall\n.end\n"
+            )).unwrap();
+            let mut function = module.functions[0].clone();
+            function.no_result = true;
+            let error = super::bind(&function)
+                .err()
+                .expect("invalid no-result metadata accepted");
+            assert!(error.message.contains("requires a Void return"));
+        }
+    }
+
+    #[test]
     fn no_result_service_execution_requires_an_admitted_control_signature() {
         for (signature, accepted) in [
             (
@@ -2351,6 +2369,25 @@ mod reflection_signature_tests {
                 false,
             ),
             ("WriteLine(String text) -> void", true),
+            ("Fault(String message) -> void", true),
+            ("Fault(Int32 message) -> void", false),
+            (
+                "NotifyWorker(Int32 worker,fn<System.Void> callback) -> void",
+                true,
+            ),
+            (
+                "NotifyWorker(Int32 worker,fn<Int32> callback) -> void",
+                false,
+            ),
+            (
+                "RegisterDefaultTaskQueue(System.Concurrency.Tasks.TaskQueue queue) -> void",
+                true,
+            ),
+            (
+                "RegisterDefaultTaskQueue(System.Object queue) -> void",
+                false,
+            ),
+            ("ParseInt32(String text) -> void", false),
             ("Fail(String message) -> void", true),
             ("Fail(String message) -> Void", false),
             ("Fail(Int32 message) -> void", false),
@@ -2358,7 +2395,7 @@ mod reflection_signature_tests {
             ("GCKeepAlive(System.Object value) -> void", true),
         ] {
             let result = crate::assemble(&format!(
-                ".module System\n.type class System.Object\n.end\n.function neoCLR.Runtime.{signature}\n.methodimpl InternalCall\n.end\n"
+                ".module System\n.type class System.Object\n.end\n.type class System.Concurrency.Tasks.TaskQueue\n.end\n.function neoCLR.Runtime.{signature}\n.methodimpl InternalCall\n.end\n"
             ));
             assert_eq!(result.is_ok(), accepted, "{signature}: {result:?}");
         }

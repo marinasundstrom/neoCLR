@@ -640,3 +640,19 @@ fn cancelled_notification_keeps_receiver_alive_until_acknowledged_join() {
     assert!(result.heap.statistics().reclaimed_objects >= 100);
     assert_eq!(result.heap.statistics().live_objects, 0);
 }
+
+#[test]
+fn no_result_worker_notification_dispatches_without_a_stack_result() {
+    let types = NOTIFY_TYPES.replace(
+        "call neoCLR.Runtime.NotifyWorker(Int32,fn<Void>)\npop",
+        "call neoCLR.Runtime.NotifyWorker(Int32,fn<Void>)",
+    ) + r#"
+.function neoCLR.Runtime.NotifyWorker(Int32 worker,fn<System.Void> callback) -> void
+.methodimpl InternalCall
+.end
+"#;
+    let result = execute("call Launch()\npop\nldstr \"entry\"", &types).unwrap();
+    assert_eq!(result.value, Value::String("entry".into()));
+    assert_eq!(result.output, ["copied"]);
+    assert_eq!(result.heap.statistics().live_objects, 0);
+}

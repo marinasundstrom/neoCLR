@@ -27,8 +27,10 @@ IL stack convention. The chosen split preserves generic value semantics and the
 familiar call convention, at the cost of an explicit compiler/metadata distinction.
 It is not binary compatibility with arbitrary .NET assemblies.
 
-The author clarified on 2026-10-22 that `void`, `Void` and `System.Void`
-must denote the same type and ordinary no-result return contract. Generic returns
+The author clarified on 2026-10-22 that `void` and `System.Void`
+must denote the same type and ordinary no-result return contract. The author further
+clarifies that bare `Void` should be rejected: IL should use a type keyword or a
+fully qualified name. Generic returns
 originally declared as a type parameter retain their value ABI when closed over
 Void. There is no proposed case-sensitive semantic distinction.
 

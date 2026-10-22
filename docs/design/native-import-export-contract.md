@@ -342,3 +342,31 @@ limits, authored function-reference expectations, grapheme naming and generic
 signature expectations). These remain stabilization gaps, not successful release
 qualification. Two SDK build blockers were fixed separately; the focused generic
 definition-token check passes. Raven compiler semantics were not changed.
+
+### IL name clarification and InternalCall prerequisite — 2026-10-22
+
+Author direction: accept the keyword `void` or qualified `System.Void`; reject
+bare `Void`. Both accepted spellings must have identical direct-return semantics.
+This syntax rule remains pending alongside migrating legacy bodies/callers.
+
+InternalCall admission now checks the declared return convention against the
+signature, without a separate allowlist of service names permitted to return no
+result. Exact service identity, parameter types and result types remain mandatory;
+no-result metadata with a non-Void result is rejected before specialized binding.
+This aligns the interpreter service boundary with ordinary CLR void-return behavior
+and avoids maintaining a second incomplete list of Void-returning services. It
+changes no native C ABI, authorization boundary or public library signatures.
+Generic value-return services retain their original return convention.
+
+The new interpreter tests execute real TaskQueue registration and worker completion,
+check caller-stack preservation, retained callback data and queue identity, and
+preserve the original UserFault. Signature tests reject incorrect parameter/result
+contracts and protect generic value-return conventions. The existing native C import
+ABI is unchanged. Website/native-interop capability claims remain unchanged; no new
+public API or native backend support is introduced by this prerequisite.
+
+Validation: 11 native-binding unit tests (including focused reruns), 15 no-result
+integration tests, all 11 TaskQueue tests, five native-allocation service tests and
+one no-result worker-notification test pass: 43 distinct tests. The initial minimal
+queue fixture lacked the real TaskQueue method contract; it was replaced with a
+consumer of the actual library. No website build was needed for this internal fix.

@@ -26,6 +26,21 @@ available original wording; other text is a summary.
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
 
+## 2026-10-22 — Prefer type keywords or qualified names in IL
+
+During the Void migration, the author clarifies that capitalized bare `Void` should
+not be valid IL because type references use keywords or fully qualified names.
+The assistant agrees: emit `void`, also accept `System.Void` with the same return
+semantics, and reject bare `Void`. This refines syntax; it does not rename the type
+or change the generic value-return ABI. Alias unification and rejecting bare Void
+remain pending together with legacy body/caller migration.
+
+Inspection also finds an independent InternalCall no-result allowlist that blocks
+some already Void-returning services. The assistant removes the redundant name
+check in favor of the existing exact signature binding, adding validation for invalid
+no-result metadata and execution tests. This prerequisite does not complete the
+assembler migration or establish JIT/AOT service coverage.
+
 ## 2026-10-22 — One Void identity, contextual value materialization
 
 The author states that Void denotes no result in IL, rejects a special `noresult`

@@ -214,3 +214,24 @@ fn void_function_shape_calls_do_not_manufacture_values() {
     verify(&m).unwrap();
     assert_eq!(run(&m, Limits::default()).unwrap().value, Value::Int32(42));
 }
+
+#[test]
+fn no_result_runtime_fault_preserves_the_original_error() {
+    let m = module(
+        r#"
+.function neoCLR.Runtime.Fault(String message) -> void
+.methodimpl InternalCall
+.end
+.function Main() -> Int32
+ldc.i4 42
+ldstr "native failure"
+call neoCLR.Runtime.Fault(String)
+ret
+.end
+"#,
+    );
+    verify(&m).unwrap();
+    let error = run(&m, Limits::default()).unwrap_err();
+    assert_eq!(error.code, neoclr::FaultCode::UserFault);
+    assert!(error.message.contains("native failure"));
+}

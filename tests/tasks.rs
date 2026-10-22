@@ -341,3 +341,33 @@ fn structural_union_task_checks_pending_cancelled_and_invalid_payloads() {
     assert!(p.verify().is_err());
     assert!(p.run(Limits::default()).is_err());
 }
+
+#[test]
+fn no_result_runtime_registration_preserves_stack_and_queue_identity() {
+    let program = load_with_types(
+        r#"
+.local Tasks.TaskQueue queue
+newobj instance Tasks.TaskQueue::.ctor()
+stloc queue
+ldc.i4 42
+ldloc queue
+call neoCLR.Runtime.RegisterDefaultTaskQueue(Tasks.TaskQueue)
+call neoCLR.Runtime.DefaultTaskQueue()
+ldloc queue
+ref.eq
+brtrue Registered
+fault "registered queue identity changed"
+Registered:
+"#,
+        r#"
+.function neoCLR.Runtime.RegisterDefaultTaskQueue(System.Concurrency.Tasks.TaskQueue queue) -> void
+.methodimpl InternalCall
+.end
+"#,
+    )
+    .unwrap();
+    assert_eq!(
+        program.run(Limits::default()).unwrap().value,
+        Value::Int32(42)
+    );
+}

@@ -130,3 +130,13 @@ consumes its unit argument without producing a caller-stack result, whereas
 restriction and reuses the CLI call/return distinction described above. No new
 opcode or CLI metadata flag is needed. Tests cover caller-stack preservation,
 multiple specializations and rejection of a value left at a no-result return.
+
+## InternalCall admission — 2026-10-22
+
+InternalCall binding uses the exact declared service signature to admit no-result
+execution; it no longer maintains a second list of service names allowed to use it.
+This closes gaps for the existing Fault, worker notification and default queue
+registration services. Non-Void service results cannot be relabeled as no-result.
+The interpreter already uses the declaration's convention to avoid pushing the
+host's Void sentinel onto the caller stack. This change does not migrate legacy
+library return declarations or extend the AOT/JIT service profile.

@@ -2,8 +2,10 @@
 
 **Void IL migration (2026-10-22):** Active no-result producers and fixtures now use
 `void`, including `fn<void>`; the obsolete `noresult` spelling is rejected. This is
-the syntax migration increment. Legacy named-Void return bodies/callers and alias
-unification remain open before resuming native interop. See
+the syntax migration increment. InternalCall binding now admits ordinary no-result
+execution from exact service signatures without a separate method-name allowlist.
+Legacy named-Void return bodies/callers, alias unification and rejection of bare
+`Void` remain open before resuming native interop. See
 [contract and migration status](void-semantics.md).
 
 **Native interoperability sequence (author direction, 2026-10-22):** Complete
