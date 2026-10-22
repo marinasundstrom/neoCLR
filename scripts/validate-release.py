@@ -52,7 +52,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--revision", default="HEAD")
     parser.add_argument("--distribution", choices=("legacy", "native"), default="legacy",
-                        help="Native checks the pinned seed; legacy checks bridge snapshots")
+                        help="Native checks the source-owned core seed; legacy checks bridge snapshots")
     parser.add_argument("--toolchain", default="stable")
     parser.add_argument("--output", type=Path, help="new directory for archive, extraction and report")
     parser.add_argument("--release", action="store_true", help="Validate optimized release binaries and tests")
@@ -114,13 +114,17 @@ def main():
         run(cargo + ["build", "--locked"] + profile, source, env=env)
         executable = output / "target" / ("release" if args.release else "debug") / ("neoclr.exe" if os.name == "nt" else "neoclr")
         if args.distribution == "native":
-            seed = output / "System.neox"
-            run([executable, "assemble", source / "runtime/raven/native/poc-seed.neoil", seed, "--format", "neox"], source)
+            # Match build-native-class-library.py: Raven System.Runtime owns all
+            # core types; the reserved System module contains no declarations.
+            seed_source = output / "System.runtime.neoil"
+            seed_source.write_text(".module System\n", encoding="utf-8")
+            seed = output / "System.runtime.neox"
+            run([executable, "assemble", seed_source, seed, "--format", "neox"], source)
             digest = hashlib.sha256(seed.read_bytes()).hexdigest()
-            # Current seed includes the ordinal replacement service introduced
-            # after Preview 12. Preserve the old release's pin in its evidence.
-            if digest != "0d44005b8fb48a4655fef1cbb33b5e37987d9a06a8dc8ecbbeb3b1622f0137fd":
-                raise RuntimeError("native bootstrap seed differs from qualified artifact")
+            if digest != "0c72a8656e7158d6bb2f31c0b019d8747dd61a6c4127b278155e104de437769b":
+                raise RuntimeError("source-owned core seed differs from qualified artifact")
+            report["native_seed_contract"] = "empty System module; core definitions owned by Raven System.Runtime"
+            report["native_seed_source_sha256"] = hashlib.sha256(seed_source.read_bytes()).hexdigest()
             report["native_seed_sha256"] = digest
         for name in ["counter", "collections", "outputs", "reflection", "reference-identity",
                      "interfaces", "arrays", "control-flow", "typeof",

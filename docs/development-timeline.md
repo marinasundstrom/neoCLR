@@ -21328,3 +21328,19 @@ heap because a heap does not maintain indexed sorted order. This is a bounded
 addition before resuming release stabilization, not a change to the roadmap's
 long-term priorities. See the collection source/tests and development API reference;
 validation outcomes are recorded in the changelog rather than inferred here.
+
+### 2026-10-22 — Sorted collection design deferred
+
+The author asked how Java's SortedSet/TreeSet and SortedMap/TreeMap distinction,
+sorted lists and interface-level comparers would fit neoCLR. The assistant proposed
+capability interfaces with concrete storage names, retaining explicit Comparer and
+Option contracts; it distinguished sorted sequences from arbitrary indexed mutation
+and priority removal from FIFO. It recommended keeping Comparer rather than renaming
+it Comparator. These were proposals, not implementation commitments.
+
+The author then directed: “Let's put this on hold and continue the release”. No sorted
+collection hierarchy or comparison-policy rename is implemented. The already committed
+PriorityArrayQueue remains; work resumes release qualification. Research references:
+[Java SortedSet](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/SortedSet.html),
+[Java SortedMap](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/SortedMap.html),
+and [.NET sorted collection tradeoffs](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.sorteddictionary-2?view=net-10.0).

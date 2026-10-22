@@ -1,5 +1,15 @@
 # neoCLR platform roadmap
 
+**Fresh source smoke gate (2026-10-22):** Align the native validator with Raven-owned
+core definitions and the empty System seed. All 25 archive smoke programs and native
+import/hosting examples pass; full-suite and package/platform gates remain separate.
+[Evidence](release-readiness.md#source-owned-core-seed-and-fresh-smoke-gate--2026-10-22).
+
+**Release focus resumed (author direction, 2026-10-22):** Put the proposed sorted
+collection interfaces/implementations and Comparer/Comparator naming discussion on
+hold. Keep the committed PriorityArrayQueue; resume source, package/editor and
+platform release qualification without expanding collection scope.
+
 **Fresh-source follow-up (2026-10-22):** The extracted archive exposes a retained
 Neo sample still calling System.Char. The sample now calls System.Character and
 all five focused classification tests pass. Full source/package qualification

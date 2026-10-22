@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
+- Align native source-release validation with the current empty System seed and Raven-owned core definitions, replacing the obsolete bootstrap hash gate while preserving historical release evidence. A fresh committed-source archive passes all 25 smoke programs, native import/hosting examples and dependency notice checks. This smoke-only result does not close full-suite, packaged/editor or Windows qualification. Put the proposed sorted collection hierarchy and comparer rename on hold at the author’s direction.
+
 - Repair the retained Neo frontend character-classification sample to call `System.Character.FromString` after the public type rename. The fresh extracted-source run exposed the stale `System.Char` name; all five focused classification tests now pass. Full extracted-source and package release qualification remain open.
 
 - Add Raven-authored `PriorityArrayQueue<TElement, TPriority>` with explicit Comparer/FunctionComparer policies, a binary min-heap, Option-valued peek/dequeue, capacity reservation and reference-clearing reuse. Equal priorities have unspecified order; no default comparer, sorted indexing or per-entry heap nodes are introduced. Negative capacities and comparer reentry fault. All 23 collection tests, isolated guards and selection checks pass in interpreter and macOS ARM64 AOT. Comparison-count coverage bounds heap work; no wall-clock speedup is claimed. Refresh API references and the collections guide; snapshot checks and all 5,703 website pages pass.

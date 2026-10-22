@@ -227,3 +227,18 @@ retains the original failure and corrected test output. This does not turn the
 unchanged extracted archive into a passing release gate. The first attempt also
 encountered an incompatible local Command Line Tools SDK/linker; the rerun selected
 the matching Xcode SDK and compiler explicitly.
+
+### Source-owned core seed and fresh smoke gate — 2026-10-22
+
+The native distribution validator now matches build-native-class-library.py: an
+empty reserved System module accompanies Raven-owned System.Runtime declarations.
+The checked artifact hash is `0c72a8656e7158d6bb2f31c0b019d8747dd61a6c4127b278155e104de437769b`.
+It no longer checks the retained Preview 12 bootstrap as though it were the current
+class-library seed. Historical artifacts and release evidence are unchanged.
+
+[Fresh archive evidence](validation/release-stabilization-20261022/source-smoke.json)
+at `300ebf792` passes 25 smoke programs, native-import and host-invocation examples,
+archive membership and 139 locked package/256 notice-file checks. The validator hash
+identifies the working-tree gate repair used with that committed archive. This is
+explicitly smoke-only (`full_tests: false`); the separate full-suite run and
+packaged/editor/Windows gates remain open. No runtime performance change is claimed.
