@@ -34,11 +34,16 @@ fully qualified name. Generic returns
 originally declared as a type parameter retain their value ABI when closed over
 Void. There is no proposed case-sensitive semantic distinction.
 
-Migration status: active IL producers and fixtures now use `void` for no-result
-returns and `fn<void>` for no-result function shapes. The obsolete `noresult`
-spelling is rejected. The legacy assembler still treats explicitly named Void
-returns as value-returning; migrating those bodies/callers and unifying the aliases
-is **unfinished implementation work**, not the intended platform contract.
+Migration status: `void` and `System.Void` now select the same no-result contract
+in direct method returns and function-shape returns. Both remain inhabited types
+in storage and generic argument positions; substituting Void into an originally
+generic result preserves that result's value ABI. Producers prefer `void` and
+`fn<void>`. The obsolete `noresult` spelling is rejected.
+
+Bare `Void` remains accepted by legacy bootstrap fixtures until their bodies,
+callers and producers are migrated together. Its existing value-return behavior
+is migration debt, not an additional supported spelling in the intended contract.
+Rejecting bare `Void` is unfinished work.
 
 The prototype retains a return-mode flag internally. `ldvoid` represents a
 logical value in the interpreter; this is not a promise that a future native backend

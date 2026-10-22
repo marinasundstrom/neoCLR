@@ -353,13 +353,13 @@ int32_t read_value(void) { return observed; }
 .function Create(Int32 value) -> Ptr<Int32>
 .foreign {library:?} "create" cdecl
 .end
-.function Release(Ptr<Int32> address) -> void
+.function Release(Ptr<Int32> address) -> System.Void
 .foreign {library:?} "release" cdecl
 .end
 .function Read() -> Int32
 .foreign {library:?} "read_value" cdecl
 .end
-.function ReleaseHelper(Ptr<Int32> address) -> void
+.function ReleaseHelper(Ptr<Int32> address) -> System.Void
 ldarg address
 call Release(Ptr<Int32>)
 ret

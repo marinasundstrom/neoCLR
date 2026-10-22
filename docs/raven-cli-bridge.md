@@ -14553,3 +14553,12 @@ canonical alias migration still requires rewriting legacy named-Void return bodi
 and call sites; this increment does not qualify that work or native metadata parity.
 Raven compiler source is unchanged. The native metadata/backend replacement remains
 responsible for preserving the declaration's ABI through specialization.
+
+### Qualified Void returns — 2026-10-22
+
+The neoIL assembler now treats direct `System.Void` returns exactly like `void`,
+including structural function results. The temporary CLI bridge already emits the
+preferred keyword for CLI VOID; Runtime Contract selection and Raven code are
+unchanged. Generic value returns closed over System.Void remain value returns.
+Legacy bare-Void text and generated bodies remain pending migration; this increment
+qualifies direct interpreter and bounded AOT imports, not a fresh native Raven bundle.

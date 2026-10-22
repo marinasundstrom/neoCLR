@@ -131,6 +131,6 @@ class-library composition and JIT imports remain future work for this path.
 
 No-result imports and helpers use `-> void`; no-result function signatures use
 `fn<void>`. The obsolete `noresult` spelling is rejected. This syntax migration
-preserves the existing native call ABI. Completing the same return semantics for
-legacy `Void` and `System.Void` declarations remains open; see the
+preserves the existing native call ABI. `System.Void` now has the same no-result return semantics as `void`, including
+function shapes. Removing the legacy bare `Void` spelling remains open; see the
 [Void contract and migration status](https://github.com/marinasundstrom/neoCLR/blob/main/docs/void-semantics.md).

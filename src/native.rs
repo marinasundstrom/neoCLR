@@ -2371,10 +2371,7 @@ mod reflection_signature_tests {
             ("WriteLine(String text) -> void", true),
             ("Fault(String message) -> void", true),
             ("Fault(Int32 message) -> void", false),
-            (
-                "NotifyWorker(Int32 worker,fn<System.Void> callback) -> void",
-                true,
-            ),
+            ("NotifyWorker(Int32 worker,fn<Void> callback) -> void", true),
             (
                 "NotifyWorker(Int32 worker,fn<Int32> callback) -> void",
                 false,

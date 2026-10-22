@@ -647,7 +647,7 @@ fn no_result_worker_notification_dispatches_without_a_stack_result() {
         "call neoCLR.Runtime.NotifyWorker(Int32,fn<Void>)\npop",
         "call neoCLR.Runtime.NotifyWorker(Int32,fn<Void>)",
     ) + r#"
-.function neoCLR.Runtime.NotifyWorker(Int32 worker,fn<System.Void> callback) -> void
+.function neoCLR.Runtime.NotifyWorker(Int32 worker,fn<Void> callback) -> void
 .methodimpl InternalCall
 .end
 "#;

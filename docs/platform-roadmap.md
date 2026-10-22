@@ -4,7 +4,8 @@
 `void`, including `fn<void>`; the obsolete `noresult` spelling is rejected. This is
 the syntax migration increment. InternalCall binding now admits ordinary no-result
 execution from exact service signatures without a separate method-name allowlist.
-Legacy named-Void return bodies/callers, alias unification and rejection of bare
+The accepted spellings `void` and `System.Void` now share direct-return and
+function-shape semantics. Legacy bare-Void bodies/callers and rejection of bare
 `Void` remain open before resuming native interop. See
 [contract and migration status](void-semantics.md).
 

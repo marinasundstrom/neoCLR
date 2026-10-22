@@ -107,26 +107,45 @@ fn generic_no_result_body_rejects_a_return_value() {
 }
 
 #[test]
-fn cli_void_return_spelling_preserves_stack_and_named_unit_returns() {
+fn qualified_void_and_keyword_returns_have_identical_stack_contracts() {
     let m = module(
-        ".function Main() -> Int32\nldc.i4 42\ncall Empty()\ncall Unit()\npop\nret\n.end\n.function Empty() -> void\nret\n.end\n.function Unit() -> System.Void\nldvoid\nret\n.end",
+        ".function Main() -> Int32\nldc.i4 42\ncall Empty()\ncall Qualified()\nret\n.end\n.function Empty() -> void\nret\n.end\n.function Qualified() -> System.Void\nret\n.end",
     );
     verify(&m).unwrap();
     assert_eq!(run(&m, Limits::default()).unwrap().value, Value::Int32(42));
-    assert!(
-        m.functions
-            .iter()
-            .find(|f| f.name == "Empty")
-            .unwrap()
-            .no_result
-    );
-    assert!(
-        !m.functions
-            .iter()
-            .find(|f| f.name == "Unit")
-            .unwrap()
-            .no_result
-    );
+    for name in ["Empty", "Qualified"] {
+        assert!(
+            m.functions
+                .iter()
+                .find(|f| f.name == name)
+                .unwrap()
+                .no_result
+        );
+    }
+}
+
+#[test]
+fn both_void_spellings_reject_return_values_and_allow_generic_values() {
+    for spelling in ["void", "System.Void"] {
+        let bad = module(&format!(
+            ".function Main() -> {spelling}\nldvoid\nret\n.end"
+        ));
+        assert!(verify(&bad).is_err());
+        assert!(run(&bad, Limits::default()).is_err());
+        let good = module(&format!(
+            ".function Main() -> {spelling}\n.local {spelling} value\nldvoid\ncall Identity<{spelling}>({spelling})\nstloc value\nret\n.end\n.function Identity<T>(T value) -> T\nldarg value\nret\n.end"
+        ));
+        verify(&good).unwrap();
+        run(&good, Limits::default()).unwrap();
+        assert!(
+            !good
+                .functions
+                .iter()
+                .find(|f| f.name == "Identity")
+                .unwrap()
+                .no_result
+        );
+    }
 }
 
 #[test]

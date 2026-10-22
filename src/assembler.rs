@@ -1046,12 +1046,8 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                                 .collect::<Result<_, _>>()?,
                             generic_arguments: vec![],
                             is_abstract,
-                            no_result: result.trim() == "void",
-                            returns: if result.trim() == "void" {
-                                Type::Void
-                            } else {
-                                parse_type(result)?
-                            },
+                            no_result: matches!(result.trim(), "void" | "System.Void"),
+                            returns: parse_type(result)?,
                             locals: vec![],
                             local_names: vec![],
                             body: vec![],
@@ -1311,7 +1307,7 @@ pub fn parse_type(text: &str) -> Result<Type, Fault> {
                     let mut shape = crate::metadata::FunctionType {
                         parameters: vec![],
                         returns: parse(result, depth + 1)?,
-                        no_result: result.trim() == "void",
+                        no_result: matches!(result.trim(), "void" | "System.Void"),
                         out_parameters: vec![],
                         out_when_true: vec![],
                     };

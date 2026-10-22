@@ -354,3 +354,38 @@ fn generic_library_invokes_function_with_callers_internal_type() {
         .unwrap_err();
     assert!(error.message.contains("type access denied"), "{error}");
 }
+
+#[test]
+fn qualified_void_function_shapes_bind_and_invoke_like_the_keyword() {
+    assert_eq!(
+        parse_type("fn<void>").unwrap(),
+        parse_type("fn<System.Void>").unwrap()
+    );
+    for declaration in ["void", "System.Void"] {
+        for shape in ["void", "System.Void"] {
+            let m = module(
+                &format!(
+                    "ldc.i4 42\nfunction.bind fn<{shape}> = Empty()\ncall instance fn<{shape}>::Invoke()"
+                ),
+                &format!(".function Empty() -> {declaration}\nret\n.end"),
+            );
+            verify(&m).unwrap();
+            assert_eq!(run(&m, Limits::default()).unwrap().value, Value::Int32(42));
+        }
+    }
+}
+
+#[test]
+fn generic_void_function_returns_retain_the_original_value_abi() {
+    let open = parse_type("fn<!0>").unwrap();
+    let closed = open.substitute_type_parameters(&[Type::Void]).unwrap();
+    let Type::Function(shape) = closed else {
+        panic!("expected function shape")
+    };
+    assert_eq!(shape.returns, Type::Void);
+    assert!(!shape.no_result);
+    assert_ne!(
+        Type::Function(shape),
+        parse_type("fn<System.Void>").unwrap()
+    );
+}
