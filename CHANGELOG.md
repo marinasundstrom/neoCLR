@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
+- Add a shared sequential macOS ARM64/Windows x64 release benchmark runner for CPU, JSON and HTTP, preserving candidate/host provenance and failing on unsuccessful child evidence or manifest drift. Require explicit matching-revision Windows package selection instead of a historical default. Four focused runner tests pass; refreshed platform measurements remain pending and no new performance results are claimed.
+
 - Qualify the refreshed macOS ARM64 development JIT bundle after archive extraction outside the checkout: verify all 2,293 manifest files, compile/run packaged samples, pass HTTP JSON requests and the Raven client/server exchange, and execute the generated default JIT task with exact expected collections output. Record matching runtime/compiler/library/host hashes. Installed editor, native build-kit refresh, Windows and full-suite release gates remain open; no release is published.
 
 - Align native source-release validation with the current empty System seed and Raven-owned core definitions, replacing the obsolete bootstrap hash gate while preserving historical release evidence. A fresh committed-source archive passes all 25 smoke programs, native import/hosting examples and dependency notice checks. This smoke-only result does not close full-suite, packaged/editor or Windows qualification. Put the proposed sorted collection hierarchy and comparer rename on hold at the author’s direction.

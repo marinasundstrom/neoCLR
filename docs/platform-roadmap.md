@@ -1,5 +1,11 @@
 # neoCLR platform roadmap
 
+**Two-platform benchmark refresh (author direction, 2026-10-22):** Target both macOS
+and Windows releases, with refreshed measurements against matching candidates on
+each host. The shared [release benchmark runner](../benchmarks/release/README.md)
+records separate provenance and results; measurements remain pending while package
+and source qualification continue.
+
 **Extracted JIT gate passed (2026-10-22):** The refreshed macOS ARM64 bundle passes
 manifest verification, packaged samples, HTTP server/client exchange and its default
 JIT task command outside the checkout. Installed editor, native build-kit refresh,

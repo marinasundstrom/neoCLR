@@ -21344,3 +21344,14 @@ PriorityArrayQueue remains; work resumes release qualification. Research referen
 [Java SortedSet](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/SortedSet.html),
 [Java SortedMap](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/SortedMap.html),
 and [.NET sorted collection tradeoffs](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.sorteddictionary-2?view=net-10.0).
+
+### 2026-10-22 — Benchmarks for macOS and Windows release candidates
+
+The author directed: “We should also update benchmarks. We aim at releasing both
+macos and windows versions.” The assistant proposed matching-candidate measurements
+on each platform, preserving host and artifact provenance without treating macOS
+evidence as Windows qualification. A shared sequential CPU/JSON/HTTP runner and
+explicit matching-revision Windows package selection implement the measurement
+workflow. Its focused tests pass; new platform measurements remain pending. The
+extracted macOS build-kit HTTP check exposed an unsupported TlsCreateSession binding;
+that package gate remains open. No release or benchmark speedup is reported.

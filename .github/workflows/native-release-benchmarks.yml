@@ -1,14 +1,10 @@
 name: Native release benchmarks
 on:
-  push:
-    paths:
-      - .github/workflows/native-release-benchmarks.yml
   workflow_dispatch:
     inputs:
       bundle_run:
         description: Successful native-toolchain run containing windows-native-qualification
         required: true
-        default: '39073227105'
 permissions:
   contents: read
   actions: read
@@ -18,7 +14,7 @@ jobs:
     timeout-minutes: 150
     env:
       PYTHONUTF8: '1'
-      BUNDLE_RUN: ${{ inputs.bundle_run || '39073227105' }}
+      BUNDLE_RUN: ${{ inputs.bundle_run }}
     steps:
       - uses: actions/checkout@v4
       - name: Wait for matching package qualification
@@ -34,6 +30,7 @@ jobs:
             if ((Get-Date) -gt $deadline) { throw 'Timed out waiting for package qualification' }
             Start-Sleep -Seconds 30
           } while ($true)
+          if ($run.head_sha -ne '${{ github.sha }}') { throw 'Package and benchmark source revisions must match' }
           if ($run.conclusion -ne 'success') { throw "Package qualification failed: $($run.conclusion)" }
           New-Item -ItemType Directory target/benchmarks -Force
           $run | ConvertTo-Json -Depth 20 | Set-Content target/benchmarks/package-run.json
@@ -62,17 +59,8 @@ jobs:
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
           if (!$vs) { throw 'MSVC x64 tools not found' }
-          $commands = @(
-            'python benchmarks/execution/prepare.py --bundle target/extracted/neoclr-native-poc --output target/benchmarks/execution',
-            'python benchmarks/framework/runner.py --manifest target/benchmarks/execution/manifest.json --output target/benchmarks/execution/results.json --rounds 5 --warmups 2 --operations 16 --timeout 300',
-            'python benchmarks/framework/runner.py --manifest target/benchmarks/execution/manifest.json --output target/benchmarks/execution/cpu-native-longer.json --filter cpu.sum --mode jit --mode aot --rounds 5 --warmups 20 --operations 10000 --timeout 300',
-            'python benchmarks/http-server/benchmark.py --bundle target/extracted/neoclr-native-poc --output target/benchmarks/http-plain --rounds 5',
-            'python benchmarks/http-server/benchmark.py --bundle target/extracted/neoclr-native-poc --output target/benchmarks/http-json --workload json --rounds 5'
-          )
-          foreach ($command in $commands) {
-            cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && $command"
-            if ($LASTEXITCODE) { exit $LASTEXITCODE }
-          }
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python benchmarks/release/run.py --bundle target/extracted/neoclr-native-poc --output target/benchmarks/measurements --rounds 5"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - uses: actions/upload-artifact@v4
         if: always()
         with:
