@@ -122,3 +122,23 @@ Performance review: this repair changes test fixtures only, so it introduces no
 production Rust/Raven allocation or execution changes. Test-run duration is not a
 runtime benchmark. This closes the focused failures, not the fresh extracted-source
 release suite or pending HTTP startup/package gates.
+
+### Explicit specialization root bounds — 2026-10-22
+
+Review of the HTTP selected-function gate found that explicit host roots (including
+reflection roots) bypassed the specialization-stage function budget. Admission now
+checks each distinct host root against the same 2,048-function limit as discovered
+calls; repeated roots and the entry point consume no extra slots. Later selection
+already enforced its own bound, so this closes excess intermediate work rather
+than expanding or reducing the supported executable budget.
+
+This is an implementation guard for the experimental native backend, not a new
+.NET/CLR type or reflection semantic. It adds a constant-time check per unique host
+root, no production runtime allocation and no change to generated code. No HTTP
+startup or throughput gain is claimed. Public API/website contracts are unchanged;
+HTTP selection/startup and matched-package release qualification remain open.
+
+Validation: the regression fails before the fix and passes afterward. All 24
+specialization contract tests pass, including boundary native compilation; the
+timing-only probe is intentionally excluded. Rust formatting passes.
+[Before/after evidence](validation/release-stabilization-20261022/host-root-budget.json).

@@ -1,5 +1,10 @@
 # neoCLR platform roadmap
 
+**Specialization root bounds (2026-10-22):** Explicit host/reflection roots now
+share the selected-function budget with discovered calls; duplicates do not consume
+extra slots. This bounds intermediate work and leaves the HTTP budget/startup
+issue open. [Release checkpoint](release-readiness.md#explicit-specialization-root-bounds--2026-10-22).
+
 **Compiled import fast path (2026-10-22):** Scalar JIT/AOT imports now cache
 successful native addresses atomically per import, bypassing resolver locking and
 lookup on warm calls. Retryable failures and process-lifetime library ownership

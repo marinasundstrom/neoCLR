@@ -945,6 +945,13 @@ pub(crate) fn expand_with_conformance(
         {
             continue;
         }
+        if context.instances.len() >= crate::limits::FUNCTIONS {
+            return Err(format!(
+                "method specialization exceeds {} selected functions while admitting host roots",
+                crate::limits::FUNCTIONS
+            )
+            .into());
+        }
         let instance = Instance {
             source: index,
             types: vec![],
@@ -2462,6 +2469,49 @@ ret
                 .contains("type dependency nesting exceeds 128")
         );
     }
+    #[test]
+    fn host_roots_share_selected_function_budget_and_ignore_duplicates() {
+        let mut source = String::from(".module HostBudget\n");
+        for index in 0..=crate::limits::FUNCTIONS {
+            source += &format!(".function F{index}() -> Int32\nldc.i4 42\nret\n.end\n");
+        }
+        let input = neoclr::assemble(&source).unwrap();
+        let mut roots: Vec<_> = (0..crate::limits::FUNCTIONS).collect();
+        // Repeated roots, including the entry point, do not consume more slots.
+        roots.extend(0..crate::limits::FUNCTIONS);
+        let (_, report) = expand_with_host_roots(&input, "F0", &roots).unwrap();
+        assert_eq!(report["functionCount"], crate::limits::FUNCTIONS);
+        roots.push(crate::limits::FUNCTIONS);
+        assert!(
+            expand_with_host_roots(&input, "F0", &roots)
+                .err()
+                .expect("unique host roots must obey the selected-function budget")
+                .to_string()
+                .contains("selected functions")
+        );
+        // A call discovered after admitting host roots uses the same budget.
+        let mut input = input;
+        input.functions[0].body = vec![
+            Op::Call(FunctionRef {
+                definition: None,
+                name: format!("F{}", crate::limits::FUNCTIONS),
+                owner: None,
+                instance: false,
+                generic_arguments: vec![],
+                parameters: vec![],
+            }),
+            Op::Return,
+        ];
+        roots.pop();
+        assert!(
+            expand_with_host_roots(&input, "F0", &roots)
+                .err()
+                .expect("discovered calls must share the host-root budget")
+                .to_string()
+                .contains("selected functions")
+        );
+    }
+
     #[test]
     fn selected_function_budget_accepts_boundary_and_rejects_overflow() {
         for count in [crate::limits::FUNCTIONS, crate::limits::FUNCTIONS + 1] {
