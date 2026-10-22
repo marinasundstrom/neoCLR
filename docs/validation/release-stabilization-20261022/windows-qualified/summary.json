@@ -81,8 +81,8 @@
     }
   },
   "remaining": [
-    "Windows HTTPS run 39843930421",
     "Windows benchmark run 39841353425",
     "Final release publication gates"
-  ]
+  ],
+  "httpsEvidence": "../windows-https/summary.json"
 }

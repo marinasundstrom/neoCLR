@@ -1,5 +1,10 @@
 # neoCLR platform roadmap
 
+**Windows HTTPS qualified (2026-10-22):** The current Windows package passes
+27 JIT/AOT TLS/security/recovery/credential/cleartext cases. Raw reports and
+build identities are retained; performance and final publication remain separate.
+[Evidence](validation/release-stabilization-20261022/windows-https/summary.json).
+
 **Complete-package macOS measurements (2026-10-22):** The rebuilt matched SDK
 passes all benchmark stages: 55 CPU/JSON processes and 1,152 HTTP responses.
 Retain the earlier development series separately, update website development

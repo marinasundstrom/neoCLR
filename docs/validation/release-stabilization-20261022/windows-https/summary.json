@@ -1,0 +1,30 @@
+{
+  "passed": true,
+  "run": 39843930421,
+  "packageQualificationRun": 39841298887,
+  "artifact": 12454288479,
+  "cases": 27,
+  "reports": {
+    "validation.json": {
+      "file": "validation.json.gz",
+      "rawSha256": "a976f2c2746f8128072d0d869e944f05bca8a1615f3359e9f2e2399e80cd3e02",
+      "gzipSha256": "321440e0a9a2006f304c20aec457daa551f746cec9ddf2d3768083c7847addcc"
+    },
+    "validation/validation.json": {
+      "file": "validation-validation.json.gz",
+      "rawSha256": "e09f90006e3128f6d68d67945b2bce60a1a59e822fbcfd12b511501fdcbd548f",
+      "gzipSha256": "c211b2ef94764f475ffb829a28a8f4f172d9bc81c6b5e85487d126300cfb587d"
+    },
+    "https/build.json": {
+      "file": "https-build.json.gz",
+      "rawSha256": "e3874b763f464e6d8aa82f8431246a9cbc25b3e201f3554633d5ec84cdd6b42a",
+      "gzipSha256": "f0e3a587fe0e1269581a55d7df0f71a470d13610b9973350c4b83f46edf6b7c1"
+    },
+    "cleartext/build.json": {
+      "file": "cleartext-build.json.gz",
+      "rawSha256": "c7be06c3c06c767cbfa5c89d7075c8ee8caa96ca844a686cecaf503b768102e2",
+      "gzipSha256": "13627c2616d0b8184445ee5f9cb3471b1f2f122affde81aed3d67069f39fcc85"
+    }
+  },
+  "bundleManifestSha256": "2da664e5cc96900b6f1d7b66e7b2ab0e62a7d1d09472b613e83c7c31b8052f0d"
+}

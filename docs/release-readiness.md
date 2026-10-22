@@ -437,3 +437,14 @@ retain distributions, startup and throughput separately. Earlier development and
 published measurements remain available. The website development tables now use
 this matching archive; variable desktop load and changed library bytes prevent
 controlled speedup conclusions. Windows measurements remain pending.
+
+### Windows HTTPS candidate gate passed — 2026-10-22
+
+[Run 39843930421](https://github.com/marinasundstrom/neoCLR/actions/runs/39843930421)
+passes all 27 HTTPS cases against the package from successful qualification run
+39841298887: TLS 1.2/1.3, fragmented transfer, trust/hostname/ALPN rejection,
+plaintext/truncated/abrupt/clean EOF recovery, timeout and cancellation in both
+JIT and AOT, plus missing/invalid credentials and cleartext-host isolation.
+[Compressed build and validation reports](validation/release-stabilization-20261022/windows-https/summary.json)
+retain manifest and artifact identities. This is matching-package source-assisted
+project validation, not HTTPS throughput or final release publication.

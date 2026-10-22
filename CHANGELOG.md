@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
+- Qualify HTTPS against the current Windows package: all 27 JIT/AOT security, recovery, credential and cleartext-isolation cases pass. Preserve raw build/validation reports and matching manifest identity. This closes the Windows HTTPS candidate gate, not throughput or final publication; matching benchmark execution remains in progress.
+
 - Measure the rebuilt complete macOS SDK with the sequential release runner: all five stages, 55 CPU/JSON processes and 1,152 HTTP responses pass correctness and unchanged-input checks. Retain compressed raw reports and matching archive hashes separately from earlier development measurements. Update website development tables with distributions and limits; all 24 website tests and 5,703 pages pass. Windows HTTPS and measurements are running; no controlled speedup or new release is claimed.
 
 - Record successful Windows x64 requalification of the unchanged candidate package after the GC fixture and UTF-8 harness repairs: extracted samples/HTTP, native GC, all 24 await cases, three JSON cases, 132 header cases, 26 installed-editor checks, inlays and both ten-cycle configuration runs pass. Retain compressed raw reports, hashes and original package lineage. Matching Windows HTTPS and benchmark runs remain pending; this is not release publication.
