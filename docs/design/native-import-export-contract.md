@@ -9,6 +9,50 @@ an AOT code artifact with a sidecar describing public functions, types, members 
 additional mapping annotations. A compatible runtime or native binding tool should
 be able to consume that contract without knowing the source language.
 
+## Runtime and module dependency boundaries — 2026-10-22
+
+Author direction: intrinsically runtime-owned mechanisms may live in the Rust core
+and be reached through InternalCall. Native implementations owned by a library
+module should instead use NativeImport and separate native support libraries.
+This follows the .NET-style distinction between runtime services and platform
+invocation; provider ownership, not implementation language, determines the boundary.
+
+The dependency direction is:
+
+- Applications depend on public Raven library APIs.
+- Library modules depend on runtime contracts and, where needed, their own native
+  support library through an explicit C ABI.
+- The runtime core depends on its foundational host/OS services; it must not acquire
+  a dependency on an optional module's implementation or native support library.
+- Native support libraries must not include private GC/object-layout headers or
+  call private runtime symbols. Any necessary runtime interaction passes through
+  an explicitly supported runtime contract or an adapter owned by the runtime.
+
+GC allocation/rooting, managed-reference access, runtime type identity, exception
+machinery and scheduler/thread attachment are runtime responsibilities. An InternalCall
+may implement those responsibilities in Rust; it is not a shortcut for arbitrary
+module functionality. Pure byte/numeric transformations and external library APIs
+are candidates for NativeImport when their ABI and ownership can be stated independently.
+For example, the native byte formatter can be separated from the adapter that
+allocates and roots its resulting managed String. Moving the latter wholesale
+would leak runtime ownership across the boundary.
+
+AOT must preserve these same contracts. Internal calls lower to matched runtime
+implementations; native imports lower to native ABI adapters and declared library
+symbols. Packaging must include the appropriate support artifacts and retain ABI,
+architecture and dependency identity. Static versus dynamic linkage is a deployment
+choice, not permission for a module to depend on private runtime internals. Static
+NativeImport binding is a future implementation option, not currently qualified
+functionality: the present scalar macOS ARM64 resolver loads dynamic libraries.
+
+Before migrating a service, qualify its managed-visible behavior, error/ownership
+rules and import/export signatures in interpreter, JIT and AOT; test the extracted
+package without relying on checkout libraries. Measure call/marshalling overhead,
+startup, allocation and binary-size consequences where relevant. NativeImport is
+not presumed faster than InternalCall. Current ordinary managed-backend import,
+callback and pinning gaps remain release work; this direction does not claim they
+are resolved or require moving every existing adapter before the next preview.
+
 ## Code and metadata have separate jobs
 
 The executable/shared library contains callable entry points. The sidecar describes

@@ -21262,3 +21262,15 @@ HTTP end-to-end startup remains unqualified. Numeric byte formatting is identifi
 as a candidate service, while its managed text allocation adapter remains coupled
 to runtime roots. No boundary relocation was performed. See the
 [review and evidence](release-readiness.md#specialization-lookup-optimization--2026-10-22).
+
+### 2026-10-22 — Explicit runtime/module ownership and AOT
+
+The author clarified that runtime-intrinsic behavior may be implemented in the Rust
+core through internal calls, while modules may own separate native code reached
+through native imports. Clear boundaries and dependency direction must also hold
+for AOT. The assistant documented application → module → runtime-contract/native-ABI
+dependencies, keeping optional module implementations out of runtime-core dependencies.
+Static linking is described only as a future deployment option; the qualified scalar
+resolver remains dynamic. This records direction, not an implemented relocation.
+The author requested continued stabilization until a significant change.
+[Contract](design/native-import-export-contract.md#runtime-and-module-dependency-boundaries--2026-10-22).

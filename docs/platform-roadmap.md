@@ -1,5 +1,12 @@
 # neoCLR platform roadmap
 
+**Native provider ownership (author direction, 2026-10-22):** Runtime-intrinsic
+mechanisms may live in Rust behind InternalCall. Module-owned native functionality
+uses separate support libraries through NativeImport; the core must not depend
+on optional module implementations. The same boundary applies to AOT. Static
+import linkage remains an unimplemented deployment option.
+[Dependency contract](design/native-import-export-contract.md#runtime-and-module-dependency-boundaries--2026-10-22).
+
 **Specialization performance (2026-10-22):** Indexed method lookup passes 24
 focused tests and reduces a synthetic unoptimized probe's median from 45.6 ms to
 13.6 ms. HTTP startup/selection remains open; no budget was raised. Native support
