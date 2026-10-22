@@ -50,6 +50,8 @@ without declaring the NativeImport foundation complete. A Raven source consumer 
 compiles directly through PE/#Neo to native code using `@entry` and explicit seed/core
 verification inputs. Typed/void-pointer casts and null/default pointers now retain
 address width with exact local initialization and non-escaping local addresses.
+IntPtr/UIntPtr now preserve 64-bit ABI transport and unchecked conversions for C sizes
+and offsets; native-width arithmetic and other numeric ABI families remain open.
 Its C-owned allocation, pointer transport and no-result release
 execute successfully; dependency libraries remain verification-only for this scalar
 profile. The opt-in Rust framework test documents its external compiler requirement.

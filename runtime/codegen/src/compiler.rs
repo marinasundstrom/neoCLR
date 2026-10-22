@@ -391,7 +391,11 @@ fn compile_scalar_with_imports<M: Module>(
                         builder.append_block_param(
                             blocks[pc],
                             match kind {
-                                flow::Kind::Literal | flow::Kind::Pointer => types::I64,
+                                flow::Kind::Literal
+                                | flow::Kind::Pointer
+                                | flow::Kind::Int64
+                                | flow::Kind::NativeInt
+                                | flow::Kind::NativeUInt => types::I64,
                                 flow::Kind::Int32
                                 | flow::Kind::Boolean
                                 | flow::Kind::Unit
@@ -436,6 +440,30 @@ fn compile_scalar_with_imports<M: Module>(
                             .ins()
                             .iconst(crate::scalar_abi::scalar_type(ty).unwrap(), 0);
                         builder.def_var(Variable::from_u32(*local as u32), zero);
+                    }
+                    Op::Int64(value) => stack.push(builder.ins().iconst(types::I64, *value)),
+                    Op::ConvertInt64
+                    | Op::ConvertUInt64
+                    | Op::ConvertNativeInt
+                    | Op::ConvertNativeUInt
+                    | Op::ConvertInt32 => {
+                        let value = stack.pop().expect("validated integer conversion");
+                        let source = builder.func.dfg.value_type(value);
+                        let target = if matches!(op, Op::ConvertInt32) {
+                            types::I32
+                        } else {
+                            types::I64
+                        };
+                        let converted = if source == target {
+                            value
+                        } else if target == types::I32 {
+                            builder.ins().ireduce(target, value)
+                        } else if matches!(op, Op::ConvertUInt64 | Op::ConvertNativeUInt) {
+                            builder.ins().uextend(target, value)
+                        } else {
+                            builder.ins().sextend(target, value)
+                        };
+                        stack.push(converted);
                     }
                     Op::NullPointer(_) => stack.push(builder.ins().iconst(types::I64, 0)),
                     // A typed-pointer cast changes metadata only, never address bits.

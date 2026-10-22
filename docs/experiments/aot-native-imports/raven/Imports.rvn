@@ -1,7 +1,7 @@
 import System.Runtime.InteropServices.*
 
 [NativeImport("aot-raven-fixture", EntryPoint: "allocate_value")]
-unsafe extern func Allocate(value: int) -> *unit;
+unsafe extern func Allocate(value: int, size: nuint) -> *unit;
 
 [NativeImport("aot-raven-fixture", EntryPoint: "read_value")]
 unsafe extern func Read(pointer: *int) -> int;
@@ -11,3 +11,15 @@ unsafe extern func Release(pointer: *unit) -> unit;
 
 [NativeImport("aot-raven-fixture", EntryPoint: "live_count")]
 unsafe extern func LiveCount() -> int;
+
+[NativeImport("aot-raven-fixture", EntryPoint: "large_size")]
+unsafe extern func LargeSize() -> nuint;
+
+[NativeImport("aot-raven-fixture", EntryPoint: "check_size")]
+unsafe extern func CheckSize(value: nuint) -> int;
+
+[NativeImport("aot-raven-fixture", EntryPoint: "signed_offset")]
+unsafe extern func SignedOffset() -> nint;
+
+[NativeImport("aot-raven-fixture", EntryPoint: "check_offset")]
+unsafe extern func CheckOffset(value: nint) -> int;

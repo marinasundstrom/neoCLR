@@ -17,7 +17,7 @@ clang host.c app.o runtime/native/interop/imports.c -pthread -o app
 
 The C host uses the existing `neoclr_entry_v2(Int32, Int32*) -> status` ABI from
 `docs/experiments/aot-scalar/abi.h`. Imported functions use the target C ABI directly:
-zero through sixteen Int32/pointer parameters and an Int32/pointer or no-result return, nongeneric free/static
+zero through sixteen Int32/native-sized-integer/pointer parameters and an Int32/native-sized-integer/pointer or no-result return, nongeneric free/static
 module functions, without marshalling. The root itself must be ordinary managed
 code. macOS Cdecl/System conventions coincide; unsupported convention metadata is
 rejected by ordinary validation. No source attribute or compiler Runtime Contract
@@ -26,7 +26,7 @@ configuration changes.
 The default rejects imports. The opt-in rejects other targets, JIT, closed-world
 composition, inspection and managed/value/context profiles before writing an object.
 This is a backend development capability, not a new default for installed SDKs or
-VS Code. Types other than Int32 and the supported pointers, member imports,
+VS Code. Types other than Int32, IntPtr/UIntPtr and the supported pointers, member imports,
 managed allocation/pinning, callbacks and asynchronous work remain outside this profile.
 
 The generated thunk resolves `(library, exact entry point)` on first invocation and
@@ -251,3 +251,31 @@ Validation of this follow-through: all ten native-import tests pass with the exp
 Raven opt-in enabled, all 24 scalar regressions pass, and all 24 website checks pass.
 The pre-fix Raven test rejected ptr.cast; the intermediate run exposed ldloca/initobj,
 which is now supported within the stated local-initialization boundary.
+
+## Native-sized integer transport (2026-10-22)
+
+IntPtr/UIntPtr parameters, results, locals and helper calls now preserve the target's
+64-bit width in this macOS ARM64 profile. Raven spells them `nint`/`nuint`; a `size_t`
+argument no longer needs an incorrect Int32 declaration. The external entry ABI remains
+Int32. Native integer signedness is retained by flow analysis and ordinary verification.
+
+The supported unchecked conversion operations are conv.i/conv.u, conv.i8/conv.u8 and
+conv.i4, with Int64 constants/intermediate values admitted for those conversions.
+Widening Int32 uses sign extension for signed opcodes and zero extension for unsigned
+opcodes, matching the interpreter's existing numeric contract. Same-width conversions
+preserve bits; conv.i4 retains the low 32 bits. This does not admit Int64/UInt64 function
+signatures, native-width arithmetic, checked conversions, floating conversions or
+pointer-to-integer conversion. Unsupported operations reject before output rather
+than silently using Int32 arithmetic. Pointee-layout support remains unchanged.
+
+The Raven C fixture now takes a real `size_t` allocation size, returns a value with
+high unsigned bits set and a negative intptr_t outside the Int32 range, and checks
+both after Raven local/helper transport. A separate Rust/C test checks nine ordered
+native-sized arguments across register/stack locations, signed/unsigned widening and
+return narrowing. This follows the C ABI/.NET native-sized integer model and reuses
+the existing neoCLR conversion semantics; it adds no implicit ownership or buffer
+length inference. NativeMemory's managed library APIs and full SDK AOT integration
+remain separate work.
+
+Validation: all 12 native-import tests pass with the explicit Raven bundle enabled,
+all 24 scalar regressions pass, and all 24 website checks pass.

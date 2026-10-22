@@ -440,7 +440,8 @@ fn raven_native_metadata_imports_execute_aot_with_explicit_load_context() {
 #include <stdlib.h>
 #include <stdint.h>
 static int32_t live;
-void *allocate_value(int32_t value) {
+void *allocate_value(int32_t value, size_t size) {
+    if (size != sizeof(int32_t)) return NULL;
     int32_t *p = malloc(sizeof(*p));
     if (p) { *p = value; ++live; }
     return p;
@@ -448,6 +449,10 @@ void *allocate_value(int32_t value) {
 int32_t read_value(int32_t *p) { return p ? *p : -100; }
 void release_value(void *p) { if (p) { free(p); --live; } }
 int32_t live_count(void) { return live; }
+size_t large_size(void) { return (size_t)UINT64_C(0xfedcba9876543210); }
+int32_t check_size(size_t n) { return n == large_size() ? 0 : 100; }
+intptr_t signed_offset(void) { return -INT64_C(0x123456789); }
+int32_t check_offset(intptr_t n) { return n == signed_offset() ? 0 : 100; }
 "#,
     )
     .unwrap();
@@ -595,6 +600,121 @@ fn scalar_local_defaults_do_not_admit_escaping_or_mismatched_addresses() {
         let dir = Temp::new();
         let result = compile(&dir, &text, &["--native-imports"]);
         assert!(!result.status.success(), "unexpected admission: {text}");
+        assert!(!dir.0.join("app.o").exists());
+    }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_sized_integer_conversions_and_stack_arguments_preserve_bits() {
+    let dir = Temp::new();
+    let fixture = dir.0.join("widths.c");
+    let library = dir.0.join("widths.dylib");
+    fs::write(
+        &fixture,
+        r#"
+#include <stdint.h>
+uintptr_t widths(intptr_t a, uintptr_t b, uintptr_t c, uintptr_t d,
+                 uintptr_t e, uintptr_t f, uintptr_t g, uintptr_t h, uintptr_t i) {
+    if (a != -1 || b != UINT32_MAX || c != UINTPTR_MAX || d != UINT64_C(0x123456789) ||
+        e != 4 || f != 5 || g != 6 || h != 7 || i != UINT64_C(0xfedcba9876543210)) return 0;
+    return UINT64_C(0xfedcba9876543210);
+}
+"#,
+    )
+    .unwrap();
+    cc(&[&fixture], &["-dynamiclib", "-fPIC"], &library);
+    let text = format!(
+        r#".module NativeWidths
+.function Widths(IntPtr a, UIntPtr b, UIntPtr c, UIntPtr d, UIntPtr e, UIntPtr f, UIntPtr g, UIntPtr h, UIntPtr i) -> UIntPtr
+.foreign {library:?} "widths" cdecl
+.end
+.function Forward(UIntPtr value) -> UIntPtr
+.local UIntPtr copy
+ldarg value
+stloc copy
+ldloc copy
+ret
+.end
+.function Calculate(Int32 unused) -> Int32
+ldc.i4 -1
+conv.i
+ldc.i4 -1
+conv.u
+ldc.i4 -1
+conv.i8
+conv.u
+ldc.i8 4886718345
+conv.u
+ldc.i4 4
+conv.u
+ldc.i4 5
+conv.u
+ldc.i4 6
+conv.u
+ldc.i4 7
+conv.u
+ldc.i8 -81985529216486896
+conv.u
+call Widths(IntPtr, UIntPtr, UIntPtr, UIntPtr, UIntPtr, UIntPtr, UIntPtr, UIntPtr, UIntPtr)
+call Forward(UIntPtr)
+conv.i4
+ret
+.end
+"#,
+        library = library.to_str().unwrap()
+    );
+    let result = compile(&dir, &text, &["--native-imports"]);
+    assert!(
+        result.status.success(),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
+    let host = dir.0.join("host.c");
+    fs::write(
+        &host,
+        r#"
+#include <stdint.h>
+extern int32_t neoclr_entry_v2(int32_t, int32_t *);
+int main(void) {
+    int32_t result = 0;
+    return neoclr_entry_v2(0, &result) || result != INT32_C(0x76543210);
+}
+"#,
+    )
+    .unwrap();
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let app = dir.0.join("app");
+    cc(
+        &[
+            &host,
+            &dir.0.join("app.o"),
+            &root.join("runtime/native/interop/imports.c"),
+        ],
+        &["-pthread"],
+        &app,
+    );
+    assert!(Command::new(&app).status().unwrap().success());
+}
+
+#[test]
+fn native_integer_transport_rejects_unimplemented_operations() {
+    for body in [
+        "ptr.null Int32\nconv.u\npop\nldc.i4 0",
+        "ldc.i4 1\nconv.u\nldc.i4 2\nconv.u\nadd\nconv.i4",
+        "ldc.i4 -1\nconv.ovf.u\nconv.i4",
+        "ldc.i4 1\nconv.u\ncall Signed(IntPtr)",
+    ] {
+        let source = format!(
+            ".module IntegerGaps\n.function Signed(IntPtr value) -> Int32\nldc.i4 0\nret\n.end\n.function Calculate(Int32 value) -> Int32\n{body}\nret\n.end\n"
+        );
+        let dir = Temp::new();
+        assert!(
+            !compile(&dir, &source, &["--native-imports"])
+                .status
+                .success(),
+            "unexpected admission: {body}"
+        );
         assert!(!dir.0.join("app.o").exists());
     }
 }

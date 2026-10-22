@@ -24,6 +24,9 @@ pub(super) fn comparison(op: &Op) -> Option<(usize, IntCC)> {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(super) enum Kind {
     Int32,
+    Int64,
+    NativeInt,
+    NativeUInt,
     Pointer,
     LocalAddress(usize),
     Boolean,
@@ -42,8 +45,18 @@ pub(super) fn analyze(
         if matches!(t, Type::Ptr(_)) {
             Kind::Pointer
         } else {
-            Kind::Int32
+            match t {
+                Type::IntPtr => Kind::NativeInt,
+                Type::UIntPtr => Kind::NativeUInt,
+                _ => Kind::Int32,
+            }
         }
+    };
+    let integer = |k| {
+        matches!(
+            k,
+            Kind::Int32 | Kind::Int64 | Kind::NativeInt | Kind::NativeUInt
+        )
     };
     let fail =
         |pc, message| -> Error { format!("{} instruction {pc}: {message}", function.name).into() };
@@ -58,6 +71,16 @@ pub(super) fn analyze(
     for (pc, op) in function.body.iter().enumerate() {
         let effect = match op {
             Op::Int(_) | Op::Bool(_) | Op::String(_) => (0, 1),
+            Op::Int64(_) if native_imports => (0, 1),
+            Op::ConvertInt64
+            | Op::ConvertUInt64
+            | Op::ConvertNativeInt
+            | Op::ConvertNativeUInt
+            | Op::ConvertInt32
+                if native_imports =>
+            {
+                (1, 1)
+            }
             Op::LocalAddress(index) if native_imports && *index < function.locals.len() => (0, 1),
             Op::InitializeObject(t)
                 if native_imports && crate::scalar_abi::scalar_type(t).is_some() =>
@@ -131,6 +154,11 @@ pub(super) fn analyze(
         let valid_operands = match op {
             Op::Dup | Op::Pop => true,
             Op::PointerCast(_) => popped == [Kind::Pointer],
+            Op::ConvertInt64
+            | Op::ConvertUInt64
+            | Op::ConvertNativeInt
+            | Op::ConvertNativeUInt
+            | Op::ConvertInt32 => popped.iter().copied().all(integer),
             Op::InitializeObject(t) => {
                 matches!(popped.as_slice(), [Kind::LocalAddress(index)] if function.locals[*index] == *t)
             }
@@ -156,6 +184,9 @@ pub(super) fn analyze(
         }
         match op {
             Op::String(_) => stack.push(Kind::Literal),
+            Op::Int64(_) | Op::ConvertInt64 | Op::ConvertUInt64 => stack.push(Kind::Int64),
+            Op::ConvertNativeInt => stack.push(Kind::NativeInt),
+            Op::ConvertNativeUInt => stack.push(Kind::NativeUInt),
             Op::NullPointer(_) | Op::PointerCast(_) => stack.push(Kind::Pointer),
             Op::LocalAddress(index) => stack.push(Kind::LocalAddress(*index)),
             Op::Bool(_) | Op::Equal | Op::Less | Op::Greater => stack.push(Kind::Boolean),

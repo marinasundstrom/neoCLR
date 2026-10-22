@@ -3,9 +3,19 @@ unsafe func ReleaseValue(pointer: *int) -> unit {
 }
 
 unsafe func Main() -> int {
-    let pointer = (*int)Allocate(42)
+    let pointer = (*int)Allocate(42, (nuint)4)
     let result = Read(pointer)
     Release(default(*int))
     ReleaseValue(pointer)
-    return result + LiveCount()
+    return result + LiveCount() + CheckSize(ForwardSize(LargeSize())) + CheckOffset(ForwardOffset(SignedOffset()))
+}
+
+func ForwardSize(value: nuint) -> nuint {
+    let copy = value
+    return copy
+}
+
+func ForwardOffset(value: nint) -> nint {
+    let copy = value
+    return copy
 }

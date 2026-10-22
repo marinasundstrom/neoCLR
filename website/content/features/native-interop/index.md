@@ -154,8 +154,8 @@ this public wrapper automatically.
 ## Development AOT import foundation
 
 The low-level macOS ARM64 scalar backend accepts `--native-imports` for free C
-functions taking up to sixteen Int32/pointer arguments and returning Int32, a
-pointer or no value (C void). Pointer metadata targets are Void, Byte or Int32; address transport through
+functions taking up to sixteen Int32, native-sized integer or pointer arguments and
+returning those types or no value (C void). Pointer metadata targets are Void, Byte or Int32; address transport through
 locals/helpers is supported, with ownership remaining in the native contract. Generated code
 resolves symbols lazily and retains successfully loaded libraries until process exit.
 Lookup failures return a runtime fault without writing the result. The default
@@ -165,7 +165,7 @@ resolver. It is not yet available through the ordinary SDK application pipeline.
 A tested Raven consumer now goes directly from NativeImport declarations to native
 metadata and AOT machine code. It allocates, reads and releases C-owned memory through
 raw pointers and a `unit`-returning helper, including typed/void-pointer casts and
-null/default pointers. The backend accepts an explicit seed/core
+null/default pointers and `nint`/`nuint` transport for C offsets and `size_t` values. The backend accepts an explicit seed/core
 load context for verification and uses `@entry` for the Raven entry point; dependency
 libraries are not compiled by this scalar profile.
 
