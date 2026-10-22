@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
+- Record completion of the fresh-source root-package suite: 2,233 tests pass, four are ignored, and the sole failure is the archived pre-repair Character sample (all five focused tests already pass after `300ebf792`). Preserve the failed original archive result rather than claiming a clean rerun. Push the candidate and separate Raven compiler branch; Windows package qualification and its matching benchmark workflow are running/pending, not qualified.
+
 - Refresh the Windows qualification workflow's default Raven revision to `301e668a5`, including committed native field-marshalling and field-attribute parser support. Retain explicit revision override and separate platform evidence; this updates the next build input, not Windows qualification status.
 
 - Repair the macOS native build kit's current HTTP dependency closure by packaging the separate TLS provider and adapter, enabling TLS bindings and checking the archive before compilation. Package an optimized AOT compiler. Replace stale HTTP fault injection and compare fault contracts while preserving engine-specific traces. Nine focused tooling tests and extracted console/HTTP/native import-export checks pass, including C/C++ callers, empty-environment execution, Cargo-free builds and TLS archive tamper rejection. HTTPS-server configuration stays source-only; Windows and refreshed timed benchmarks remain pending.

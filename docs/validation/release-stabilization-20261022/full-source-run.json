@@ -1,0 +1,34 @@
+{
+  "scope": "Completed root-package fresh-source cargo test --all-targets --no-fail-fast; original archive remains failed. Separate focused repair evidence is linked, not substituted for original results.",
+  "validatorReport": {
+    "status": "failed",
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "toolchain": "stable",
+    "distribution": "native",
+    "full_tests": false,
+    "smoke_programs": [],
+    "build_profile": "debug",
+    "validator_sha256": "7cbc1bfb6c7b7da877d709ee73647a8972781150e63010d9e0f50841ba0b1a04",
+    "commit": "82819fa2618d43c9ae030371f26afb7a438dc59e",
+    "archive_sha256": "d437f60ae0848b44833d6a000cbb1b4dbb5e9beafdcbbfdda0107e5afa6a7f4b",
+    "tracked_files": 9631,
+    "registry_packages": 139,
+    "notice_files": 256,
+    "raven_library_snapshot": "not qualified by native distribution profile",
+    "rustc": "rustc 1.95.0 (59807616e 2026-04-14)\nbinary: rustc\ncommit-hash: 59807616e1fa2540724bfbac14d7976d7e4a3860\ncommit-date: 2026-04-14\nhost: aarch64-apple-darwin\nrelease: 1.95.0\nLLVM version: 22.1.2",
+    "error": "Command '['cargo', '+stable', 'test', '--locked', '--all-targets', '--no-fail-fast']' returned non-zero exit status 101.",
+    "elapsed_seconds": 2826.571
+  },
+  "log": {
+    "path": "/tmp/neoclr-source-qualification-20261022-xcode.log",
+    "sha256": "174bebf5152e4b3585a29a6855aefacd2d5bea3112e68f955d4bb4844df3a524"
+  },
+  "testSummaries": 269,
+  "passedTests": 2233,
+  "failedTests": 1,
+  "ignoredTests": 4,
+  "failedTarget": "character_classification",
+  "repairCommit": "300ebf792",
+  "repairEvidence": "character-sample-repair.json",
+  "remainingScope": "Workspace native backend, current Raven library tests, extracted packages, Windows and benchmarks have separate evidence/gates."
+}

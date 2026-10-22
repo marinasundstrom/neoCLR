@@ -296,3 +296,21 @@ attribute parser repair used by the local candidate. The Raven checkout is clean
 This is input preparation only: the matching Windows package/editor and benchmark
 runs must still succeed. Both repositories' candidate commits must be available to
 GitHub Actions before dispatch; no historical Windows run qualifies these changes.
+
+## Completed fresh-source suite and platform CI — 2026-10-22
+
+The archived `82819fa2618d43c9ae030371f26afb7a438dc59e` root-package run finished:
+2,233 tests passed, one failed and four were ignored across 269 test summaries
+(including zero-test targets). The only failed target was character_classification,
+whose stale System.Char sample was repaired by `300ebf792`; all five focused tests
+then passed. Preserve the original archive's failed status. This is completed
+baseline evidence plus a focused repair, not a newly passing full run on HEAD.
+[Full-run evidence](validation/release-stabilization-20261022/full-source-run.json).
+
+Candidate `cac555e048a04ed54144b41b53074f0efc672be2` and Raven compiler
+`301e668a51beb6ba307d63b6912b144d8ad6a6b0` are pushed on their separate branches.
+[Windows package qualification](https://github.com/marinasundstrom/neoCLR/actions/runs/39835531991)
+is running; [matching benchmark refresh](https://github.com/marinasundstrom/neoCLR/actions/runs/39835576608)
+waits for that exact package to succeed. These links identify pending evidence, not
+successful qualification. The macOS refresh started only after the local full suite
+completed. No release tag or website publication was performed.

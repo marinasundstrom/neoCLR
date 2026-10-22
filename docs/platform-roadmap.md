@@ -1,5 +1,11 @@
 # neoCLR platform roadmap
 
+**Source-suite completion and platform CI (2026-10-22):** The archived root suite
+finishes with 2,233 passes, four ignored tests and only the already repaired
+Character sample failure. Preserve the failed baseline and separate focused repair.
+Matching Windows package/benchmark jobs and the macOS benchmark refresh have begun;
+none is yet reported qualified. [Evidence](release-readiness.md#completed-fresh-source-suite-and-platform-ci--2026-10-22).
+
 **Extracted native kit repaired (2026-10-22):** The macOS ARM64 kit now includes
 its current HTTP TLS-provider dependency and an optimized compiler. Extracted
 console, plain HTTP/fault and native import/export C/C++ consumers pass without
