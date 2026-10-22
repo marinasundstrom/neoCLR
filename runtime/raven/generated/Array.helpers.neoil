@@ -45,7 +45,7 @@ ret
 .property instance Current() -> T0
 .get instance neoCLR.Library.System.Array.Type_53797374656D2E41727261794974657261746F726031<T0>::get_Current()
 .end
-.method instance .ctor(arrayref<T0> buffer) -> noresult
+.method instance .ctor(arrayref<T0> buffer) -> void
 M00000008_IL_0000:
 M00000008_IL_0001:
 ldarg 0
@@ -195,7 +195,7 @@ ldelem T0
 M0000000a_IL_0054:
 ret
 .end
-.method instance Dispose() -> noresult
+.method instance Dispose() -> void
 M0000000b_IL_0000:
 M0000000b_IL_0001:
 M0000000b_IL_0002:

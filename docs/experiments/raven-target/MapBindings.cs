@@ -52,7 +52,7 @@ static class MapBindings
         var shape = Shapes[owner];
         var (args, result) = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type);
         var expected = new[] { $"fn<{shape.Key},{shape.Key},Boolean>", $"fn<{shape.Key},Int32>" };
-        if (shape.Kind != "HashMap" || !definition.IsConstructor || !reference.HasThis || result != "noresult" || !(args.SequenceEqual(expected) || args.SequenceEqual(new[] { $"System.Collections.EqualityComparer<{shape.Key}>" })))
+        if (shape.Kind != "HashMap" || !definition.IsConstructor || !reference.HasThis || result != "void" || !(args.SequenceEqual(expected) || args.SequenceEqual(new[] { $"System.Collections.EqualityComparer<{shape.Key}>" })))
             throw new InvalidDataException("Unsupported map constructor.");
         return new(args, owner, $"newobj instance {owner}::.ctor({string.Join(',', args)})");
     }
@@ -68,7 +68,7 @@ static class MapBindings
             ("Map" or "HashMap", "Find") => (shape.Key, $"System.Option<{shape.Value}>"),
             ("Map" or "HashMap", "ContainsKey") => (shape.Key, "Boolean"),
             ("MutableMap" or "HashMap", "TryAdd") => ($"{shape.Key},{shape.Value}", "Boolean"),
-            ("MutableMap" or "HashMap", "Set") => ($"{shape.Key},{shape.Value}", "noresult"),
+            ("MutableMap" or "HashMap", "Set") => ($"{shape.Key},{shape.Value}", "void"),
             _ => throw new InvalidDataException("Unsupported map member: " + definition.FullName)
         };
         if (!reference.HasThis || !callvirt || string.Join(',', args) != expected.Item1 || result != expected.Item2)

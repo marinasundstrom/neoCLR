@@ -52,7 +52,7 @@ static class RuntimeSignatures
 
     public static string Map(TypeReference type, Func<TypeReference, string?> catalog, bool returns = false)
     {
-        if (returns && type.MetadataType == MetadataType.Void) return "noresult";
+        if (returns && type.MetadataType == MetadataType.Void) return "void";
         if (type is ByReferenceType byref) return Map(byref.ElementType, catalog) + "&";
         return catalog(type) ?? PrimitiveBindings.Type(type) ?? (type.MetadataType switch {
             MetadataType.Double => "Double", MetadataType.Boolean => "Boolean", MetadataType.Int32 => "Int32", MetadataType.String => "String",

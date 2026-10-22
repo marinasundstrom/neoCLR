@@ -218,7 +218,7 @@ fn calendar_policies_cannot_be_constructed_or_mutated_by_guest_il() {
         "call System.Globalization.Culture::get_Invariant()\nldc.i4 1\nstfld System.Globalization.Culture::kind\npop",
     ] {
         let source =
-            format!(".module InvalidCalendar\n.function Main() -> noresult\n{body}\nret\n.end\n");
+            format!(".module InvalidCalendar\n.function Main() -> void\n{body}\nret\n.end\n");
         let error = neoclr::assembler::read_modules(
             &[neoclr::assembler::ModuleInput::Source(&source)],
             &library,

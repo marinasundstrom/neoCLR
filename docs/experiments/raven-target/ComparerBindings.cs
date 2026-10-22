@@ -83,8 +83,8 @@ static class ComparerBindings
         var kind = owner == StringOwner ? "StringComparer" : owner[Prefix.Length..owner.IndexOf('<')];
         var (args, result) = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type, allowOpenMethodParameters: GenericUnionBindings.ParameterMap is not null);
         (string Args, string Result, bool Static) expected = (kind, reference.Name) switch {
-            ("FunctionComparer", ".ctor") => ($"fn<{element},{element},Int32>", "noresult", false),
-            ("FunctionEqualityComparer", ".ctor") => ($"fn<{element},{element},Boolean>,fn<{element},Int32>", "noresult", false),
+            ("FunctionComparer", ".ctor") => ($"fn<{element},{element},Int32>", "void", false),
+            ("FunctionEqualityComparer", ".ctor") => ($"fn<{element},{element},Boolean>,fn<{element},Int32>", "void", false),
             ("StringComparer", "get_Ordinal" or "get_OrdinalIgnoreCase") => ("", StringOwner, true),
             ("StringComparer" or "Comparer" or "FunctionComparer", "Compare") => ($"{element},{element}", "Int32", false),
             ("StringComparer" or "EqualityComparer" or "FunctionEqualityComparer", "Equals") => ($"{element},{element}", "Boolean", false),

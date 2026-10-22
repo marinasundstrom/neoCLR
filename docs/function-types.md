@@ -238,7 +238,7 @@ The native metadata model now represents Function shapes directly, outside nomin
 `function.bind fn<...> = Target(...)`, followed by ordinary
 `call instance fn<...>::Invoke(...)`. This is internal textual encoding, not a
 selected Raven source syntax. `readonly`, `out` and `outtrue` parameter contracts
-and a `noresult Void` result preserve the current calling distinctions.
+and a `void` result preserve the current calling distinctions.
 
 Resolved identity recursively includes component identities and reference/output
 contracts. Type substitution, module-reference checks and visibility checks visit

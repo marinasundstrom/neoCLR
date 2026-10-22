@@ -214,7 +214,7 @@ fn invalid_capacity_index_and_current_fault() {
 
 #[test]
 fn wrong_element_type_is_rejected() {
-    let app = assemble(&format!(".module Wrong\n.entry Main\n.function Main() -> noresult\n{START}ldloc list\nldstr \"wrong\"\ncall instance System.Collections.ArrayList<Int32>::Add(Int32)\nret\n.end")).unwrap();
+    let app = assemble(&format!(".module Wrong\n.entry Main\n.function Main() -> void\n{START}ldloc list\nldstr \"wrong\"\ncall instance System.Collections.ArrayList<Int32>::Add(Int32)\nret\n.end")).unwrap();
     let p = LoadedProgram::with_library(&app, library()).unwrap();
     assert!(p.verify().is_err());
     assert!(p.run(Limits::default()).is_err());

@@ -27,8 +27,8 @@ static class GCBindings
             throw new InvalidDataException("Unsupported GC member.");
         var (args, result) = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type);
         var valid = reference.Name switch {
-            "Collect" => args.Length == 0 && result == "noresult",
-            "KeepAlive" => args.SequenceEqual(new[] { "System.Object" }) && result == "noresult",
+            "Collect" => args.Length == 0 && result == "void",
+            "KeepAlive" => args.SequenceEqual(new[] { "System.Object" }) && result == "void",
             _ => Counters.Any(name => reference.Name == "get_" + name) && args.Length == 0 && result == "Int64"
         };
         if (!valid) throw new InvalidDataException("Unsupported GC signature.");

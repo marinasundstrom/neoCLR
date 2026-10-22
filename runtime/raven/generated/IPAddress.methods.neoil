@@ -4,7 +4,7 @@
 .extends System.Object
 .implements System.EquatableTo<System.Networking.IPAddress>
 .field private octets arrayref<Byte>
-.method instance .ctor(arrayref<Byte> bytes) -> noresult
+.method instance .ctor(arrayref<Byte> bytes) -> void
 .local Int32 local0
 .local arrayref<Byte> local1
 .local arrayref<Byte> local2

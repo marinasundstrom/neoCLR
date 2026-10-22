@@ -180,6 +180,6 @@
   "exports": [
     "get_BytesWritten() -> Int32",
     "get_State() -> System.Text.EncoderState",
-    ".ctor(Int32 bytesWritten,System.Text.EncoderState state) -> noresult"
+    ".ctor(Int32 bytesWritten,System.Text.EncoderState state) -> void"
   ]
 }

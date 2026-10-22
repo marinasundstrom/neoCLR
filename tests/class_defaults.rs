@@ -1,5 +1,5 @@
 use neoclr::{Limits, Value, assemble, run, verify};
-const TYPES: &str = ".type class Counter\n.field Age Int32\n.method instance .ctor() -> noresult\nret\n.end\n.end\n.type class Holder\n.field Item Counter\n.method instance .ctor() -> noresult\nret\n.end\n.end\n";
+const TYPES: &str = ".type class Counter\n.field Age Int32\n.method instance .ctor() -> void\nret\n.end\n.end\n.type class Holder\n.field Item Counter\n.method instance .ctor() -> void\nret\n.end\n.end\n";
 fn module(main: &str, returns: &str) -> neoclr::Module {
     assemble(&format!(
         ".module Defaults\n.entry Main\n{TYPES}.function Main() -> {returns}\n{main}\n.end"
@@ -50,7 +50,7 @@ fn null_reference_comparison_and_field_access_are_explicit() {
     }
     for (code, returns) in [
         ("ldfld Counter::Age\nret", "Int32"),
-        ("ldc.i4 1\nstfld Counter::Age\nret", "noresult"),
+        ("ldc.i4 1\nstfld Counter::Age\nret", "void"),
     ] {
         let m = module(
             &format!(".local Counter empty\nldloca empty\ninitobj Counter\nldloc empty\n{code}"),
@@ -80,13 +80,13 @@ fn nested_erased_fields_are_unreadable_until_assigned() {
 .end
 .type class Envelope
 .field Item Payload
-.method instance .ctor(Payload item) -> noresult
+.method instance .ctor(Payload item) -> void
 ldarg 0
 ldarg item
 stfld Envelope::Item
 ret
 .end
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
 .end

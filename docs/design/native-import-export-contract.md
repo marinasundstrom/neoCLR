@@ -323,3 +323,22 @@ assembler syntax, signature rendering, producers and fixtures together, and vali
 direct returns, used/discarded expressions and generic value returns. The binary
 return convention must preserve generic call behavior; eliminating a public keyword
 must not accidentally change a generic value-return ABI. Implementation is pending.
+
+### Syntax migration evidence — 2026-10-22
+
+The first implementation increment removes the obsolete `noresult` spelling from
+active text producers, bootstrap fixtures and generated export inventories. The
+assembler accepts `-> void` and `fn<void>` and rejects the old spelling. Internal
+return-mode metadata and original-generic value ABIs are unchanged. This does not
+yet implement the alias-parity decision above: legacy named-Void return bodies and
+callers must be migrated together before that decision can be marked complete.
+
+Validation: 14 no-result, 18 structural-function, 10 generic-function, 28 interpreter
+native-import, seven AOT native-import, 24 scalar AOT and one frontend round-trip
+test pass. All 24 website checks pass. The temporary Raven CLI bridge builds with
+11 existing nullable warnings. The metadata SDK runs 185/191 tests successfully;
+the same six failures reproduce with the previous display spelling (field-count
+limits, authored function-reference expectations, grapheme naming and generic
+signature expectations). These remain stabilization gaps, not successful release
+qualification. Two SDK build blockers were fixed separately; the focused generic
+definition-token check passes. Raven compiler semantics were not changed.

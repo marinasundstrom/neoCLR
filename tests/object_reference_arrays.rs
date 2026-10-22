@@ -178,7 +178,7 @@ ret
 fn incompatible_element_types_are_rejected_without_verification() {
     for value in ["ldc.i4 1", "ldstr \"wrong\""] {
         let m = module(&format!(
-            ".function Main() -> noresult\nldc.i4 1\narray.new Read\nldc.i4 0\n{value}\nstelem Read\nret\n.end"
+            ".function Main() -> void\nldc.i4 1\narray.new Read\nldc.i4 0\n{value}\nstelem Read\nret\n.end"
         ));
         assert!(verify(&m).is_err());
         assert!(run(&m, Limits::default()).is_err());

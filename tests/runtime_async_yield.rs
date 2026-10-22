@@ -12,12 +12,12 @@ fn program(callback: &str, main: &str) -> LoadedProgram {
 .function neoCLR.Runtime.SchedulerSubmit(fn<Void> callback) -> Int32
 .methodimpl InternalCall
 .end
-.function neoCLR.Runtime.GCCollect() -> noresult
+.function neoCLR.Runtime.GCCollect() -> void
 .methodimpl InternalCall
 .end
 .type class Counter
 .field Value Int32
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
 .method instance Complete() -> Void
@@ -171,7 +171,7 @@ fn resumed_unit_result_obeys_evaluation_stack_budget() {
 
 #[test]
 fn cli_no_result_yield_resumes_without_pushing_unit() {
-    let module = neoclr::assemble(".module Test\n.entry Main\n.function neoCLR.Runtime.RuntimeAsyncYield() -> noresult\n.methodimpl InternalCall\n.end\n.function Main() -> Int32\nldc.i4 42\ncall neoCLR.Runtime.RuntimeAsyncYield()\nret\n.end\n").unwrap();
+    let module = neoclr::assemble(".module Test\n.entry Main\n.function neoCLR.Runtime.RuntimeAsyncYield() -> void\n.methodimpl InternalCall\n.end\n.function Main() -> Int32\nldc.i4 42\ncall neoCLR.Runtime.RuntimeAsyncYield()\nret\n.end\n").unwrap();
     let program = LoadedProgram::new(&module).unwrap();
     program.verify().unwrap();
     assert_eq!(

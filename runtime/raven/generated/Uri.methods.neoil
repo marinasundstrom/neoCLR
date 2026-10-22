@@ -18,7 +18,7 @@
 .property instance IsRelative() -> Boolean
 .get instance System.Uri::get_IsRelative()
 .end
-.method private instance .ctor(String text,String scheme,String authority,String path,String query,String fragment) -> noresult
+.method private instance .ctor(String text,String scheme,String authority,String path,String query,String fragment) -> void
 M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0

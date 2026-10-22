@@ -1034,7 +1034,7 @@ ldarg arg2
 newobj instance System.Web.Http.HttpResponse::.ctor(System.Web.Http.HttpStatusCode,System.Collections.Sequence<System.Web.Http.HttpHeader>,System.Collections.Sequence<Byte>)
 ret
 .end
-.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeCliCall3(System.Web.Http.HttpContext arg0,Int32 arg1,String arg2) -> noresult
+.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeCliCall3(System.Web.Http.HttpContext arg0,Int32 arg1,String arg2) -> void
 ldarg arg0
 ldarg arg1
 call System.Web.Http.HttpStatusCode::FromValue(Int32)
@@ -1053,7 +1053,7 @@ ret
 .sealed
 .field private storedParts System.Collections.Sequence<String>
 .field private storedNames System.Collections.Sequence<String>
-.method private instance .ctor(System.Collections.Sequence<String> parts,System.Collections.Sequence<String> names) -> noresult
+.method private instance .ctor(System.Collections.Sequence<String> parts,System.Collections.Sequence<String> names) -> void
 M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0
@@ -3590,7 +3590,7 @@ ret
 .sealed
 .field private storedNames System.Collections.Sequence<String>
 .field private storedValues System.Collections.Sequence<String>
-.method internal instance .ctor(System.Collections.Sequence<String> names,System.Collections.Sequence<String> values) -> noresult
+.method internal instance .ctor(System.Collections.Sequence<String> names,System.Collections.Sequence<String> values) -> void
 M0000000a_IL_0000:
 M0000000a_IL_0001:
 ldarg 0
@@ -3967,7 +3967,7 @@ ldfld System.Web.Http.HttpRequest::storedTarget
 M00000041_IL_0008:
 ret
 .end
-.method private instance .ctor(String host,Int32 port,String target) -> noresult
+.method private instance .ctor(String host,Int32 port,String target) -> void
 M00000042_IL_0000:
 M00000042_IL_0001:
 ldarg 0
@@ -8758,7 +8758,7 @@ call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion77(System.Option.None
 M00000057_IL_0050:
 ret
 .end
-.method internal instance Associate(System.Web.Http.HttpRequest request) -> noresult
+.method internal instance Associate(System.Web.Http.HttpRequest request) -> void
 M00000058_IL_0000:
 M00000058_IL_0001:
 M00000058_IL_0002:
@@ -8863,7 +8863,7 @@ ldfld System.Web.Http.HttpResponse::storedContent
 M0000005d_IL_0008:
 ret
 .end
-.method instance .ctor(System.Web.Http.HttpStatusCode statusCode,System.Collections.Sequence<System.Web.Http.HttpHeader> headers,System.Collections.Sequence<Byte> body) -> noresult
+.method instance .ctor(System.Web.Http.HttpStatusCode statusCode,System.Collections.Sequence<System.Web.Http.HttpHeader> headers,System.Collections.Sequence<Byte> body) -> void
 M0000005e_IL_0000:
 M0000005e_IL_0001:
 ldarg 0
@@ -8907,7 +8907,7 @@ stfld System.Web.Http.HttpResponse::storedContent
 M0000005e_IL_0036:
 ret
 .end
-.method instance .ctor(Int32 statusCode,System.Collections.Sequence<System.Web.Http.HttpHeader> headers,System.Collections.Sequence<Byte> body) -> noresult
+.method instance .ctor(Int32 statusCode,System.Collections.Sequence<System.Web.Http.HttpHeader> headers,System.Collections.Sequence<Byte> body) -> void
 M0000005f_IL_0000:
 M0000005f_IL_0001:
 ldarg 0
@@ -8948,7 +8948,7 @@ stfld System.Web.Http.HttpResponse::storedContent
 M0000005f_IL_0035:
 ret
 .end
-.method instance Respond(System.Web.Http.HttpStatusCode statusCode) -> noresult
+.method instance Respond(System.Web.Http.HttpStatusCode statusCode) -> void
 M00000060_IL_0000:
 M00000060_IL_0001:
 M00000060_IL_0002:
@@ -8965,7 +8965,7 @@ M00000060_IL_0013:
 M00000060_IL_0014:
 ret
 .end
-.method instance Respond(System.Web.Http.HttpStatusCode statusCode,System.Web.Http.HttpContent content) -> noresult
+.method instance Respond(System.Web.Http.HttpStatusCode statusCode,System.Web.Http.HttpContent content) -> void
 .local System.Collections.ArrayList<System.Web.Http.HttpHeader> local0
 .local System.Collections.ArrayList<System.Web.Http.HttpHeader> local1
 .local System.Web.Http.HttpHeader local2
@@ -9344,7 +9344,7 @@ call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion87(System.Option.None
 M00000065_IL_002f:
 ret
 .end
-.method instance Dispose() -> noresult
+.method instance Dispose() -> void
 .local System.IO.InputStream local0
 .local System.Option<System.IO.InputStream> local1
 .local System.Option.Some<System.IO.InputStream> local2
@@ -9838,7 +9838,7 @@ ldfld System.Web.Http.HttpContent::storedBytes
 M0000006a_IL_0028:
 ret
 .end
-.method instance .ctor(System.Collections.Sequence<Byte> bytes) -> noresult
+.method instance .ctor(System.Collections.Sequence<Byte> bytes) -> void
 M0000006b_IL_0000:
 M0000006b_IL_0001:
 ldarg 0
@@ -9903,7 +9903,7 @@ stfld System.Web.Http.HttpContent::storedBytes
 M0000006b_IL_0051:
 ret
 .end
-.method instance .ctor(System.Collections.Sequence<Byte> bytes,String contentType) -> noresult
+.method instance .ctor(System.Collections.Sequence<Byte> bytes,String contentType) -> void
 M0000006c_IL_0000:
 M0000006c_IL_0001:
 ldarg 0
@@ -10148,7 +10148,7 @@ ldfld System.Web.Http.HttpHeader::storedValue
 M00000070_IL_0008:
 ret
 .end
-.method instance .ctor(String name,String value) -> noresult
+.method instance .ctor(String name,String value) -> void
 M00000071_IL_0000:
 M00000071_IL_0001:
 ldarg 0
@@ -10878,7 +10878,7 @@ ret
 .type class System.Web.Http.HttpSocketHandler
 .sealed
 .implements System.Web.Http.HttpHandler
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 M00000073_IL_0000:
 M00000073_IL_0001:
 ldarg 0
@@ -10975,7 +10975,7 @@ ret
 .property instance Complete() -> Boolean
 .get instance System.Web.Http.HttpResponseDecoder::get_Complete()
 .end
-.method internal instance .ctor(Boolean isHead) -> noresult
+.method internal instance .ctor(Boolean isHead) -> void
 M00000076_IL_0000:
 M00000076_IL_0001:
 ldarg 0
@@ -15218,7 +15218,7 @@ ret
 .field private sent Int32
 .field private buffer arrayref<Byte>
 .field private decoder System.Web.Http.HttpResponseDecoder
-.method internal instance .ctor(System.Web.Http.HttpRequest request,System.Concurrency.CancellationToken token) -> noresult
+.method internal instance .ctor(System.Web.Http.HttpRequest request,System.Concurrency.CancellationToken token) -> void
 M00000080_IL_0000:
 M00000080_IL_0001:
 ldarg 0
@@ -15637,7 +15637,7 @@ call instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.Htt
 M00000081_IL_01b2:
 ret
 .end
-.method private instance Cleanup() -> noresult
+.method private instance Cleanup() -> void
 .local System.Networking.Sockets.Socket local0
 .local System.Option<System.Networking.Sockets.Socket> local1
 .local System.Option.Some<System.Networking.Sockets.Socket> local2
@@ -15748,7 +15748,7 @@ M00000082_IL_00ab:
 M00000082_IL_00ac:
 ret
 .end
-.method private instance Cancel() -> noresult
+.method private instance Cancel() -> void
 M00000083_IL_0000:
 M00000083_IL_0001:
 ldarg 0
@@ -15768,7 +15768,7 @@ M00000083_IL_0014:
 M00000083_IL_0015:
 ret
 .end
-.method private instance Finish(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError> result) -> noresult
+.method private instance Finish(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError> result) -> void
 M00000084_IL_0000:
 M00000084_IL_0001:
 ldarg 0
@@ -15823,7 +15823,7 @@ M00000084_IL_0053:
 M00000084_IL_0054:
 ret
 .end
-.method private instance OnLookup() -> noresult
+.method private instance OnLookup() -> void
 .local System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>> local0
 .local System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError> local1
 .local System.Collections.Sequence<System.Networking.IPAddress> local2
@@ -16071,7 +16071,7 @@ M00000085_IL_016f:
 M00000085_IL_0170:
 ret
 .end
-.method private instance OnConnected() -> noresult
+.method private instance OnConnected() -> void
 .local System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>> local0
 .local System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError> local1
 .local System.Networking.Sockets.Socket local2
@@ -16261,7 +16261,7 @@ M00000086_IL_010e:
 M00000086_IL_010f:
 ret
 .end
-.method private instance SendNext() -> noresult
+.method private instance SendNext() -> void
 .local System.Networking.Sockets.Socket local0
 .local Int32 local1
 .local System.Result<Int32,System.Web.Http.HttpError> local2
@@ -16813,7 +16813,7 @@ M00000087_IL_02ea:
 M00000087_IL_02eb:
 ret
 .end
-.method private instance OnSent() -> noresult
+.method private instance OnSent() -> void
 .local System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>> local0
 .local System.Result<Int32,System.Networking.Sockets.SocketError> local1
 .local Int32 local2
@@ -17063,7 +17063,7 @@ M00000088_IL_0174:
 M00000088_IL_0175:
 ret
 .end
-.method private instance ReceiveNext() -> noresult
+.method private instance ReceiveNext() -> void
 .local System.Networking.Sockets.Socket local0
 .local System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>> local1
 .local System.Option<System.Networking.Sockets.Socket> local2
@@ -17184,7 +17184,7 @@ M00000089_IL_00b1:
 M00000089_IL_00b2:
 ret
 .end
-.method private instance OnReceived() -> noresult
+.method private instance OnReceived() -> void
 .local System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>> local0
 .local System.Result<Int32,System.Networking.Sockets.SocketError> local1
 .local Int32 local2
@@ -17614,7 +17614,7 @@ call instance System.Concurrency.CancellationTokenSource::get_Token()
 M0000008b_IL_000d:
 ret
 .end
-.method internal instance Release() -> noresult
+.method internal instance Release() -> void
 M0000008c_IL_0000:
 M0000008c_IL_0001:
 M0000008c_IL_0002:
@@ -17633,7 +17633,7 @@ M0000008c_IL_0010:
 M0000008c_IL_0011:
 ret
 .end
-.method internal instance .ctor(System.Networking.Sockets.Socket listener) -> noresult
+.method internal instance .ctor(System.Networking.Sockets.Socket listener) -> void
 M0000008d_IL_0000:
 M0000008d_IL_0001:
 ldarg 0
@@ -18063,7 +18063,7 @@ callvirt instance System.Web.Http.HttpServeOperation::Start()
 M00000093_IL_000f:
 ret
 .end
-.method instance Close() -> noresult
+.method instance Close() -> void
 M00000094_IL_0000:
 M00000094_IL_0001:
 M00000094_IL_0002:
@@ -19615,7 +19615,7 @@ ret
 .property instance Complete() -> Boolean
 .get instance System.Web.Http.HttpRequestDecoder::get_Complete()
 .end
-.method internal instance .ctor() -> noresult
+.method internal instance .ctor() -> void
 M00000098_IL_0000:
 M00000098_IL_0001:
 ldarg 0
@@ -22527,7 +22527,7 @@ ret
 .field private decoder System.Web.Http.HttpRequestDecoder
 .field private buffer arrayref<Byte>
 .field private deadline Int64
-.method internal instance .ctor(System.Web.Http.HttpServer owner,System.Networking.Sockets.Socket listener,System.Concurrency.CancellationToken token) -> noresult
+.method internal instance .ctor(System.Web.Http.HttpServer owner,System.Networking.Sockets.Socket listener,System.Concurrency.CancellationToken token) -> void
 .local System.Concurrency.CancellationToken local0
 ldloca local0
 initobj System.Concurrency.CancellationToken
@@ -22665,7 +22665,7 @@ stfld System.Web.Http.HttpServerExchange::shutdownRegistration
 M0000009f_IL_00d1:
 ret
 .end
-.method private instance RequestCancellation() -> noresult
+.method private instance RequestCancellation() -> void
 M000000a0_IL_0000:
 M000000a0_IL_0001:
 M000000a0_IL_0002:
@@ -22729,7 +22729,7 @@ call instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.Htt
 M000000a1_IL_004a:
 ret
 .end
-.method private instance Cleanup() -> noresult
+.method private instance Cleanup() -> void
 .local System.Concurrency.CancellationRegistration local0
 .local System.Concurrency.CancellationRegistration local1
 .local System.Concurrency.CancellationRegistration local2
@@ -22848,7 +22848,7 @@ M000000a2_IL_0089:
 M000000a2_IL_008a:
 ret
 .end
-.method private instance Fail(System.Web.Http.HttpError reason) -> noresult
+.method private instance Fail(System.Web.Http.HttpError reason) -> void
 .local System.Networking.Sockets.Socket local0
 .local Boolean local1
 .local System.Option<System.Networking.Sockets.Socket> local2
@@ -22969,7 +22969,7 @@ M000000a3_IL_00a7:
 M000000a3_IL_00a8:
 ret
 .end
-.method private instance OnAccepted() -> noresult
+.method private instance OnAccepted() -> void
 .local System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>> local0
 .local System.Networking.Sockets.Socket local1
 .local System.Networking.Sockets.SocketError local2
@@ -23165,7 +23165,7 @@ M000000a4_IL_0126:
 M000000a4_IL_0127:
 ret
 .end
-.method private instance ReceiveNext() -> noresult
+.method private instance ReceiveNext() -> void
 .local System.Networking.Sockets.Socket local0
 .local System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>> local1
 .local System.Option<System.Networking.Sockets.Socket> local2
@@ -23287,7 +23287,7 @@ M000000a5_IL_00b2:
 M000000a5_IL_00b3:
 ret
 .end
-.method private instance OnReceived() -> noresult
+.method private instance OnReceived() -> void
 .local System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>> local0
 .local Int32 local1
 .local Int32 local2
@@ -23835,7 +23835,7 @@ ret
 .property instance Response() -> System.Web.Http.HttpResponse
 .get instance System.Web.Http.HttpContext::get_Response()
 .end
-.method internal instance .ctor(System.Web.Http.HttpServer owner,System.Networking.Sockets.Socket connection,System.Web.Http.HttpRequest request) -> noresult
+.method internal instance .ctor(System.Web.Http.HttpServer owner,System.Networking.Sockets.Socket connection,System.Web.Http.HttpRequest request) -> void
 .local System.Concurrency.CancellationToken local0
 ldloca local0
 initobj System.Concurrency.CancellationToken
@@ -23998,7 +23998,7 @@ ldfld System.Web.Http.HttpContext::response
 M000000a9_IL_0008:
 ret
 .end
-.method instance Respond(System.Web.Http.HttpStatusCode statusCode) -> noresult
+.method instance Respond(System.Web.Http.HttpStatusCode statusCode) -> void
 M000000aa_IL_0000:
 M000000aa_IL_0001:
 M000000aa_IL_0002:
@@ -24013,7 +24013,7 @@ M000000aa_IL_000e:
 M000000aa_IL_000f:
 ret
 .end
-.method instance Respond(System.Web.Http.HttpStatusCode statusCode,System.Web.Http.HttpContent content) -> noresult
+.method instance Respond(System.Web.Http.HttpStatusCode statusCode,System.Web.Http.HttpContent content) -> void
 M000000ab_IL_0000:
 M000000ab_IL_0001:
 M000000ab_IL_0002:
@@ -24030,7 +24030,7 @@ M000000ab_IL_000f:
 M000000ab_IL_0010:
 ret
 .end
-.method instance RespondText(String text) -> noresult
+.method instance RespondText(String text) -> void
 M000000ac_IL_0000:
 M000000ac_IL_0001:
 M000000ac_IL_0002:
@@ -24045,7 +24045,7 @@ M000000ac_IL_000e:
 M000000ac_IL_000f:
 ret
 .end
-.method instance RespondText(System.Web.Http.HttpStatusCode statusCode,String text) -> noresult
+.method instance RespondText(System.Web.Http.HttpStatusCode statusCode,String text) -> void
 M000000ad_IL_0000:
 M000000ad_IL_0001:
 M000000ad_IL_0002:
@@ -24375,7 +24375,7 @@ call instance System.Concurrency.Tasks.Promise<System.Result<Void,System.Web.Htt
 M000000b0_IL_0182:
 ret
 .end
-.method instance Close() -> noresult
+.method instance Close() -> void
 .local System.Concurrency.CancellationRegistration local0
 .local System.Concurrency.CancellationRegistration local1
 ldloca local0
@@ -24462,7 +24462,7 @@ M000000b1_IL_0063:
 M000000b1_IL_0064:
 ret
 .end
-.method instance Dispose() -> noresult
+.method instance Dispose() -> void
 M000000b2_IL_0000:
 M000000b2_IL_0001:
 ldarg 0
@@ -24472,7 +24472,7 @@ M000000b2_IL_0007:
 M000000b2_IL_0008:
 ret
 .end
-.method private instance Finish(System.Result<Void,System.Web.Http.HttpError> result) -> noresult
+.method private instance Finish(System.Result<Void,System.Web.Http.HttpError> result) -> void
 M000000b3_IL_0000:
 M000000b3_IL_0001:
 ldarg 0
@@ -24500,7 +24500,7 @@ M000000b3_IL_0020:
 M000000b3_IL_0021:
 ret
 .end
-.method private instance SendNext() -> noresult
+.method private instance SendNext() -> void
 .local Int32 local0
 .local System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>> local1
 .local System.Concurrency.CancellationToken local2
@@ -24757,7 +24757,7 @@ M000000b4_IL_0163:
 M000000b4_IL_0164:
 ret
 .end
-.method private instance OnSent() -> noresult
+.method private instance OnSent() -> void
 .local System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>> local0
 .local Int32 local1
 .local System.Networking.Sockets.SocketError local2
@@ -25074,7 +25074,7 @@ ret
 .field private sending System.Option<System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>
 .field private callerRegistration System.Concurrency.CancellationRegistration
 .field private shutdownRegistration System.Concurrency.CancellationRegistration
-.method internal instance .ctor(System.Web.Http.HttpServer server,fn<System.Web.Http.HttpRequest,System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>> handler,System.Concurrency.CancellationToken token) -> noresult
+.method internal instance .ctor(System.Web.Http.HttpServer server,fn<System.Web.Http.HttpRequest,System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>> handler,System.Concurrency.CancellationToken token) -> void
 M000000b6_IL_0000:
 M000000b6_IL_0001:
 ldarg 0
@@ -25208,7 +25208,7 @@ call instance System.Concurrency.Tasks.Promise<System.Result<Void,System.Web.Htt
 M000000b7_IL_0045:
 ret
 .end
-.method private instance Cleanup() -> noresult
+.method private instance Cleanup() -> void
 .local System.Concurrency.CancellationRegistration local0
 .local System.Concurrency.CancellationRegistration local1
 .local System.Concurrency.CancellationRegistration local2
@@ -25365,7 +25365,7 @@ M000000b8_IL_00bf:
 M000000b8_IL_00c0:
 ret
 .end
-.method private instance Cancel() -> noresult
+.method private instance Cancel() -> void
 .local System.Web.Http.HttpContext local0
 .local System.Option<System.Web.Http.HttpContext> local1
 .local System.Option.Some<System.Web.Http.HttpContext> local2
@@ -25470,7 +25470,7 @@ M000000b9_IL_008d:
 M000000b9_IL_008e:
 ret
 .end
-.method private instance Finish(System.Result<Void,System.Web.Http.HttpError> result) -> noresult
+.method private instance Finish(System.Result<Void,System.Web.Http.HttpError> result) -> void
 M000000ba_IL_0000:
 M000000ba_IL_0001:
 ldarg 0
@@ -25492,7 +25492,7 @@ M000000ba_IL_0015:
 M000000ba_IL_0016:
 ret
 .end
-.method private instance OnAccepted() -> noresult
+.method private instance OnAccepted() -> void
 .local System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>> local0
 .local System.Web.Http.HttpContext local1
 .local System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>> local2
@@ -25797,7 +25797,7 @@ M000000bb_IL_01c9:
 M000000bb_IL_01ca:
 ret
 .end
-.method private instance OnHandled() -> noresult
+.method private instance OnHandled() -> void
 .local System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>> local0
 .local System.Web.Http.HttpResponse local1
 .local System.Web.Http.HttpContext local2
@@ -26057,7 +26057,7 @@ M000000bc_IL_017b:
 M000000bc_IL_017c:
 ret
 .end
-.method private instance OnSent() -> noresult
+.method private instance OnSent() -> void
 .local System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>> local0
 .local System.Option<System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>> local1
 .local System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>> local2
@@ -26166,7 +26166,7 @@ ret
 .type internal class System.Web.Http.HttpResponseAssociation
 .sealed
 .field private request System.Web.Http.HttpRequest
-.method internal instance .ctor(System.Web.Http.HttpRequest request) -> noresult
+.method internal instance .ctor(System.Web.Http.HttpRequest request) -> void
 M000000be_IL_0000:
 M000000be_IL_0001:
 ldarg 0

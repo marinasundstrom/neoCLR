@@ -237,7 +237,7 @@ fn cli_compatible_reference_value_and_constructor_requirements_are_distinct() {
 
 #[test]
 fn default_constructor_requirement_rejects_private_missing_and_abstract_classes() {
-    let source = ".module Ctors\n.type class Item\n.method instance .ctor() -> noresult\nret\n.end\n.end\n.type Constructible<T>\n.constraint T new\n.field Item T\n.end";
+    let source = ".module Ctors\n.type class Item\n.method instance .ctor() -> void\nret\n.end\n.end\n.type Constructible<T>\n.constraint T new\n.field Item T\n.end";
     let mut module = assemble(source).unwrap();
     let argument = parse_type("Constructible<Item>").unwrap();
     assert!(module.instantiated_fields(&argument).is_ok());

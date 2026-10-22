@@ -412,7 +412,7 @@
     {"file": "runtime/System/Console.neoil", "line": 3, "context": [".type System.Console"], "declaration": ".method static ReadByte() -> System.Result<System.Option<Byte>,System.ConsoleReadError>", "role": "library-api-review"},
     {"file": "runtime/System/Console.neoil", "line": 49, "context": [".type System.Console"], "declaration": ".method static WriteLine(string value) -> Void", "role": "library-api-review"},
     {"file": "runtime/System/Console.neoil", "line": 55, "context": [".type System.Console"], "declaration": ".method static WriteLine(int32 value) -> Void", "role": "library-api-review"},
-    {"file": "runtime/raven/generated/Fault.methods.neoil", "line": 2, "context": [], "declaration": ".function System.Fault(String message) -> noresult", "role": "library-api-review"},
+    {"file": "runtime/raven/generated/Fault.methods.neoil", "line": 2, "context": [], "declaration": ".function System.Fault(String message) -> void", "role": "library-api-review"},
     {"file": "runtime/neoCLR/Runtime/Fault.neoil", "line": 1, "context": [], "declaration": ".function neoCLR.Runtime.Fault(String message) -> Void", "role": "runtime-service-review"},
     {"file": "runtime/System/Math.neoil", "line": 1, "context": [], "declaration": ".type System.Math", "role": "library-api-review"},
     {"file": "runtime/raven/generated/Math.methods.neoil", "line": 2, "context": [".type System.Math"], "declaration": ".method static Abs(Int32 value) -> System.Result<Int32,System.OverflowError>", "role": "library-api-review"},
@@ -1172,10 +1172,10 @@
     {"file": "runtime/legacy/StreamError.neoil", "line": 696, "context": [".type System.IO.StreamError.IoFailure"], "declaration": ".method instance .ctor() -> Void", "role": "library-api-review"},
     {"file": "runtime/raven/generated/InputStream.methods.neoil", "line": 2, "context": [], "declaration": ".interface System.IO.InputStream", "role": "library-api-review"},
     {"file": "runtime/raven/generated/InputStream.methods.neoil", "line": 3, "context": [".interface System.IO.InputStream"], "declaration": ".method instance Read(arrayref<Byte> buffer,Int32 offset,Int32 count) -> System.Result<Int32,System.IO.StreamError>", "role": "library-api-review"},
-    {"file": "runtime/raven/generated/InputStream.methods.neoil", "line": 5, "context": [".interface System.IO.InputStream"], "declaration": ".method instance Close() -> noresult", "role": "library-api-review"},
+    {"file": "runtime/raven/generated/InputStream.methods.neoil", "line": 5, "context": [".interface System.IO.InputStream"], "declaration": ".method instance Close() -> void", "role": "library-api-review"},
     {"file": "runtime/raven/generated/OutputStream.methods.neoil", "line": 2, "context": [], "declaration": ".interface System.IO.OutputStream", "role": "library-api-review"},
     {"file": "runtime/raven/generated/OutputStream.methods.neoil", "line": 3, "context": [".interface System.IO.OutputStream"], "declaration": ".method instance Write(arrayref<Byte> buffer,Int32 offset,Int32 count) -> System.Result<Int32,System.IO.StreamError>", "role": "library-api-review"},
     {"file": "runtime/raven/generated/OutputStream.methods.neoil", "line": 5, "context": [".interface System.IO.OutputStream"], "declaration": ".method instance Flush() -> System.Result<Void,System.IO.StreamError>", "role": "library-api-review"},
-    {"file": "runtime/raven/generated/OutputStream.methods.neoil", "line": 7, "context": [".interface System.IO.OutputStream"], "declaration": ".method instance Close() -> noresult", "role": "library-api-review"}
+    {"file": "runtime/raven/generated/OutputStream.methods.neoil", "line": 7, "context": [".interface System.IO.OutputStream"], "declaration": ".method instance Close() -> void", "role": "library-api-review"}
   ]
 }

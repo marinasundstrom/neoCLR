@@ -1,6 +1,6 @@
 ; Generated from runtime/raven/src/System/Object.rvn. Regenerate with build_runtime_library.py.
 .type class abstract System.Object
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
 .method instance GetType() -> System.Introspection.TypeInfo

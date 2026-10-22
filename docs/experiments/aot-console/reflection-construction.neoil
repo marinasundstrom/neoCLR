@@ -3,7 +3,7 @@
 .end
 .type class Model
 .field Number Int32
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ldarg 0
 ldc.i4 42
 stfld Model::Number
@@ -11,7 +11,7 @@ ret
 .end
 .end
 .type class Private
-.method private instance .ctor() -> noresult
+.method private instance .ctor() -> void
 ret
 .end
 .end
@@ -20,7 +20,7 @@ ret
 .type class abstract Abstract
 .end
 .type class Broken
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 fault "constructor failed"
 .end
 .end

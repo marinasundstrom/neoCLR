@@ -4,6 +4,6 @@
 .implements System.Collections.Sequence<T0>
 .implements System.Collections.Collection<T0>
 .implements System.Collections.Iterable<T0>
-.method instance Add(T0 value) -> noresult
+.method instance Add(T0 value) -> void
 .end
 .end

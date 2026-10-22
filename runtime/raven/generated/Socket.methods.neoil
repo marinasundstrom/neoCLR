@@ -2,7 +2,7 @@
 .type class System.Networking.Sockets.Socket
 .sealed
 .field private handle Int64
-.method internal instance .ctor(Int64 handle) -> noresult
+.method internal instance .ctor(Int64 handle) -> void
 M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0
@@ -972,7 +972,7 @@ call instance System.Concurrency.Tasks.Promise<System.Result<Int32,System.Networ
 M0000001a_IL_002a:
 ret
 .end
-.method instance Close() -> noresult
+.method instance Close() -> void
 M0000001b_IL_0000:
 M0000001b_IL_0001:
 M0000001b_IL_0002:

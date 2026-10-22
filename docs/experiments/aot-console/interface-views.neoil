@@ -6,7 +6,7 @@
 .type class Cell
 .implements View
 .field Value Int32
-.method instance .ctor(Int32 value) -> noresult
+.method instance .ctor(Int32 value) -> void
 ldarg 0
 ldarg value
 stfld 0
@@ -15,7 +15,7 @@ ret
 .end
 .type class Other
 .implements OtherView
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
 .end

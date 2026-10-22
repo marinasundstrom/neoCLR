@@ -184,7 +184,7 @@
     "get_PeakHeapObjectCount() -> Int64",
     "get_ReclaimedObjectCount() -> Int64",
     "get_HeapObjectLimit() -> Int64",
-    "Collect() -> noresult",
-    "KeepAlive(System.Object value) -> noresult"
+    "Collect() -> void",
+    "KeepAlive(System.Object value) -> void"
   ]
 }

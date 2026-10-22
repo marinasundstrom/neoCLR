@@ -200,7 +200,7 @@ fn nested_generic_types_keep_lexical_private_access_and_independent_parameters()
 .entry Main
 .type class Owner<T>
 .field private value T
-.method instance .ctor(T value) -> noresult
+.method instance .ctor(T value) -> void
 ldarg 0
 ldarg 1
 stfld Owner<T>::value

@@ -236,7 +236,7 @@ call Say()
 ldc.i4 42
 ret
 .end
-.function Say() -> noresult
+.function Say() -> void
 ldstr "världen 🌍\u0000end"
 call neoCLR.Runtime.WriteLine(String)
 pop
@@ -359,7 +359,7 @@ int main(void) {
     assert!(r.stderr.is_empty());
 }
 
-const TEXT_SEED: &str = ".module System\n.references ()\n.function neoCLR.Runtime.Int32ToString(Int32 value) -> String\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.WriteLine(String text) -> Void\n.methodimpl InternalCall\n.end\n.function System.Fail(String text) -> noresult\nldarg text\ncall neoCLR.Runtime.Fault(String)\npop\nret\n.end\n.function neoCLR.Runtime.Fault(String text) -> Void\n.methodimpl InternalCall\n.end";
+const TEXT_SEED: &str = ".module System\n.references ()\n.function neoCLR.Runtime.Int32ToString(Int32 value) -> String\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.WriteLine(String text) -> Void\n.methodimpl InternalCall\n.end\n.function System.Fail(String text) -> void\nldarg text\ncall neoCLR.Runtime.Fault(String)\npop\nret\n.end\n.function neoCLR.Runtime.Fault(String text) -> Void\n.methodimpl InternalCall\n.end";
 #[test]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn invocation_text_survives_nested_calls_faults_and_reclaims_on_next_entry() {
@@ -1885,7 +1885,7 @@ fn thirty_two_lane_reference_allocation_respects_arena_canaries() {
         .map(|i| format!(".field F{i} Pair\n"))
         .collect::<String>();
     let source = format!(
-        ".module WideObject\n.type Pair\n.field X Int32\n.field Y Int32\n.end\n.type class Wide\n{fields}.method instance .ctor() -> noresult\nldarg 0\nldc.i4 0\nldc.i4 42\nnewobj Pair\nstfld 15\nret\n.end\n.end\n.function Calculate() -> Int32\n.local Wide value\nnewobj.ctor instance Wide::.ctor()\nstloc value\nldloc value\nldfld 0\nldfld 0\nldloc value\nldfld 15\nldfld 1\nadd\nret\n.end"
+        ".module WideObject\n.type Pair\n.field X Int32\n.field Y Int32\n.end\n.type class Wide\n{fields}.method instance .ctor() -> void\nldarg 0\nldc.i4 0\nldc.i4 42\nnewobj Pair\nstfld 15\nret\n.end\n.end\n.function Calculate() -> Int32\n.local Wide value\nnewobj.ctor instance Wide::.ctor()\nstloc value\nldloc value\nldfld 0\nldfld 0\nldloc value\nldfld 15\nldfld 1\nadd\nret\n.end"
     );
     let r = compile_source(
         &dir,
@@ -1945,7 +1945,7 @@ fn reference_allocation_at_layout_limit_respects_arena_canaries() {
         .map(|i| format!(".field F{i} Int32\n"))
         .collect::<String>();
     let source = format!(
-        ".module WideObject\n.type Pair\n.field X Int32\n.field Y Int32\n.end\n.type class Wide\n{fields}.method instance .ctor() -> noresult\nldarg 0\nldc.i4 42\nstfld 255\nret\n.end\n.end\n.function Calculate() -> Int32\n.local Wide value\nnewobj.ctor instance Wide::.ctor()\nstloc value\nldloc value\nldfld 0\nldloc value\nldfld 255\nadd\nret\n.end"
+        ".module WideObject\n.type Pair\n.field X Int32\n.field Y Int32\n.end\n.type class Wide\n{fields}.method instance .ctor() -> void\nldarg 0\nldc.i4 42\nstfld 255\nret\n.end\n.end\n.function Calculate() -> Int32\n.local Wide value\nnewobj.ctor instance Wide::.ctor()\nstloc value\nldloc value\nldfld 0\nldloc value\nldfld 255\nadd\nret\n.end"
     );
     let r = compile_source(
         &dir,
@@ -3515,7 +3515,7 @@ const OBJECT_DISPLAY_SEED: &str = r#"
 .module System
 .references ()
 .type class abstract System.Object
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
 .method instance virtual ToString() -> String
@@ -5906,7 +5906,7 @@ fn native_interface_callbacks_retain_receivers_and_propagate_faults() {
         .replace("function.bind fn<Int32,Int32> = instance Counter::Add(Int32)", "castclass Adder\nfunction.bind fn<Int32,Int32> = instance Adder::Add(Int32)")
         .replace("Fault:\nfunction.bind fn<Int32,Int32> = Fail(Int32)", "Fault:\nnewobj.ctor instance Broken::.ctor()\ncastclass Adder\nfunction.bind fn<Int32,Int32> = instance Adder::Add(Int32)");
     let source = source
-        + "\n.type class Broken\n.implements Adder\n.method instance .ctor() -> noresult\nret\n.end\n.method instance Add(Int32 number) -> Int32\nldarg number\nldc.i4 0\ndiv\nret\n.end\n.end\n";
+        + "\n.type class Broken\n.implements Adder\n.method instance .ctor() -> void\nret\n.end\n.method instance Add(Int32 number) -> Int32\nldarg number\nldc.i4 0\ndiv\nret\n.end\n.end\n";
     check_native_callbacks(&source);
 }
 
@@ -6954,15 +6954,15 @@ fn mixed_host_callback_source(no_result: bool) -> String {
         include_str!("../../../docs/experiments/aot-console/host-callbacks.neoil").to_owned();
     if no_result {
         source = source
-            .replace("-> Void", "-> noresult")
+            .replace("-> Void", "-> void")
             .replace("ldvoid\n", "")
-            .replace("fn<Void>", "fn<noresult Void>")
+            .replace("fn<Void>", "fn<void>")
             .replace("call Fail()\npop", "call Fail()");
     }
     let mut bindings = String::new();
     for i in 0..40 {
-        source.push_str(&format!("\n.function Unit{i}() -> Void\nldvoid\nret\n.end\n.function Empty{i}() -> noresult\nret\n.end\n"));
-        bindings.push_str(&format!("function.bind fn<Void> = Unit{i}()\npop\nfunction.bind fn<noresult Void> = Empty{i}()\npop\n"));
+        source.push_str(&format!("\n.function Unit{i}() -> Void\nldvoid\nret\n.end\n.function Empty{i}() -> void\nret\n.end\n"));
+        bindings.push_str(&format!("function.bind fn<Void> = Unit{i}()\npop\nfunction.bind fn<void> = Empty{i}()\npop\n"));
     }
     source = source.replace("ldarg mode\n", &format!("{bindings}ldarg mode\n"));
     source
@@ -6971,8 +6971,8 @@ fn mixed_host_callback_source(no_result: bool) -> String {
             "function.bind fn<Void> = Unit39()",
         )
         .replace(
-            "function.bind fn<noresult Void> = Unit()",
-            "function.bind fn<noresult Void> = Empty39()",
+            "function.bind fn<void> = Unit()",
+            "function.bind fn<void> = Empty39()",
         )
 }
 
@@ -7022,9 +7022,9 @@ fn native_host_callbacks_preserve_roots_state_and_faults_without_entry_reset() {
         };
         let source = if variant == 1 {
             source
-                .replace("-> Void", "-> noresult")
+                .replace("-> Void", "-> void")
                 .replace("ldvoid\n", "")
-                .replace("fn<Void>", "fn<noresult Void>")
+                .replace("fn<Void>", "fn<void>")
                 .replace("call Fail()\npop", "call Fail()")
         } else {
             source.to_owned()
@@ -7694,7 +7694,7 @@ int main(void) {
 fn native_unit_entry_returns_zero_only_on_success() {
     let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
     let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
-    for (result_type, result_instruction) in [("noresult", ""), ("Void", "ldvoid")] {
+    for (result_type, result_instruction) in [("void", ""), ("Void", "ldvoid")] {
         for arguments in [false, true] {
             let dir = Temp::new();
             let source = format!(
@@ -8116,7 +8116,7 @@ fn native_wide_ordering_matches_signed_unsigned_and_comparison_branches() {
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn primitive_instance_projection_preserves_borrowed_storage() {
     use neoclr::metadata::{Instruction as Op, Type};
-    let template = neoclr::assemble(".module Template\n.type Owner\n.field Number Int32\n.method instance byref Set(Int32 value) -> noresult\nret\n.end\n.end").unwrap();
+    let template = neoclr::assemble(".module Template\n.type Owner\n.field Number Int32\n.method instance byref Set(Int32 value) -> void\nret\n.end\n.end").unwrap();
     let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
     for (ty, name, value) in [
         (Type::Boolean, "Boolean", "ldc.bool true"),
@@ -8947,7 +8947,7 @@ fn object_display_accepts_string_boxing_with_unboxed_value_construction() {
 .type class ReferencePayload
 .end
 .type Marker<T>
-.method instance byref .ctor() -> noresult
+.method instance byref .ctor() -> void
 ret
 .end
 .end
@@ -9055,7 +9055,7 @@ fn char_box_tests_preserve_null_results_and_reject_matching_producers() {
             r#"
 .module CharBoxTest
 .type class A
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
 .end
@@ -10480,7 +10480,7 @@ fn native_reflection_arrays_preserve_boolean_string_and_reference_elements() {
             "newobj.ctor instance Cell::.ctor(Int32)\ncastclass System.Object",
         )
         .replace("unbox.any Int32", "castclass Cell\nldfld Cell::Number")
-        + "\n.type class Cell\n.field Number Int32\n.method instance .ctor(Int32 value) -> noresult\nldarg 0\nldarg value\nstfld Cell::Number\nret\n.end\n.end\n";
+        + "\n.type class Cell\n.field Number Int32\n.method instance .ctor(Int32 value) -> void\nldarg 0\nldarg value\nstfld Cell::Number\nret\n.end\n.end\n";
     check_reflection_arrays(&reference, 1, b"");
 }
 
@@ -10701,7 +10701,7 @@ fn native_inherited_interface_dispatch_preserves_conformance_anchor() {
 .end
 .type class Base
 .implements Answer
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
 .method instance Read() -> Int32
@@ -10711,7 +10711,7 @@ ret
 .end
 .type class Derived
 .extends Base
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ldarg 0
 call instance Base::.ctor()
 ret
@@ -10822,7 +10822,7 @@ fn native_generic_reference_boxing_preserves_identity_and_interface_access() {
 .type class Cell
 .implements Answer
 .field Number Int32
-.method instance .ctor(Int32 value) -> noresult
+.method instance .ctor(Int32 value) -> void
 ldarg 0
 ldarg value
 stfld Cell::Number
@@ -10835,7 +10835,7 @@ ret
 .end
 .end
 .type class Other
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
 .end
@@ -11531,7 +11531,7 @@ fn reference_field_admission_uses_the_flattened_storage_bound() {
             .map(|i| format!(".field F{i} Int32\n"))
             .collect::<String>();
         let source = format!(
-            ".module WideObject\n.type class Wide\n{fields}.method instance .ctor() -> noresult\nret\n.end\n.end\n.function Calculate() -> Int32\nnewobj.ctor instance Wide::.ctor()\nldfld {}\nret\n.end\n",
+            ".module WideObject\n.type class Wide\n{fields}.method instance .ctor() -> void\nret\n.end\n.end\n.function Calculate() -> Int32\nnewobj.ctor instance Wide::.ctor()\nldfld {}\nret\n.end\n",
             count - 1
         );
         let result = compile_source(
@@ -12158,7 +12158,7 @@ fn check_rooted_object_construction(base_arguments: bool) {
 .module Construction
 .type class Cell
 .field Data arrayref<Byte>
-.method instance .ctor(arrayref<Byte> data) -> noresult
+.method instance .ctor(arrayref<Byte> data) -> void
 ldc.i4 80
 newarr Byte
 pop
@@ -12203,7 +12203,7 @@ ret
         ) + r#"
 .type class Argument
 .field Data arrayref<Byte>
-.method instance .ctor(arrayref<Byte> data) -> noresult
+.method instance .ctor(arrayref<Byte> data) -> void
 ldarg 0
 ldarg data
 stfld Argument::Data
@@ -12220,7 +12220,7 @@ ret
 .end
 .type class Derived
 .extends Cell
-.method instance .ctor(arrayref<Byte> data) -> noresult
+.method instance .ctor(arrayref<Byte> data) -> void
 ldarg 0
 ldarg data
 newobj.ctor instance Argument::.ctor(arrayref<Byte>)

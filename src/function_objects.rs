@@ -256,7 +256,7 @@ pub(crate) fn target_display(module: &Module, target: &Function) -> Result<Strin
         })
         .collect::<Result<Vec<_>, Fault>>()?;
     let result = if target.no_result {
-        "noresult".into()
+        "void".into()
     } else {
         type_name(module, &target.returns)?
     };

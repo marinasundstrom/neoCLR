@@ -250,7 +250,7 @@ const NOMINAL: &str = r#"
 .interface Left
 .method instance Read() -> Int32
 .end
-.method instance Clear() -> noresult
+.method instance Clear() -> void
 .end
 .end
 .interface Right
@@ -261,7 +261,7 @@ const NOMINAL: &str = r#"
 .implements Left
 .implements Right
 .field private Value Int32
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ldarg this
 ldc.i4 21
 stfld 0
@@ -281,7 +281,7 @@ ldc.i4 2
 mul
 ret
 .end
-.method private instance HiddenClear() -> noresult
+.method private instance HiddenClear() -> void
 .override instance Left::Clear()
 ldarg this
 ldc.i4 0

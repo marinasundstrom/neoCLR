@@ -182,7 +182,7 @@
     "get_Length() -> Int32",
     "get_Count() -> Int32",
     "get_Item(Int32 index) -> T0",
-    "set_Item(Int32 index,T0 value) -> noresult",
-    "ForEach(fn<T0,Void> action) -> noresult"
+    "set_Item(Int32 index,T0 value) -> void",
+    "ForEach(fn<T0,Void> action) -> void"
   ]
 }

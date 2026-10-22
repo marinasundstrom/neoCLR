@@ -79,7 +79,7 @@ its output service still requires the next explicit binding. No public API chang
 ## Interactive output (2026-10-08)
 
 `--bind-console-write-line` binds the exact verified
-`neoCLR.Runtime.WriteLine(String) -> Void/noresult` InternalCall and implies ABI v3. The
+`neoCLR.Runtime.WriteLine(String) -> void` InternalCall and implies ABI v3. The
 ordinary `WriteLine(string)`, `WriteLine(bool)` and `WriteLine()` library wrappers
 compile unchanged. The linked UTF-8 adapter from the scalar experiment accepts a
 byte pointer and explicit length, preserving embedded NUL; it writes LF and flushes.

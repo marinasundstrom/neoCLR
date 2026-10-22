@@ -1,6 +1,6 @@
 .module ImportedUnion
 .entry Method_06000006
-.function Method_06000006() -> noresult
+.function Method_06000006() -> void
 IL_0000:
 IL_0001:
 IL_0002:
@@ -16,7 +16,7 @@ IL_0014:
 IL_0015:
 ret
 .end
-.function Method_06000005(Int32) -> noresult
+.function Method_06000005(Int32) -> void
 .local System.Result<Int32,System.OverflowError> local0
 .local System.Result.Ok<Int32> local1
 .local System.Result.Error<System.OverflowError> local2
@@ -269,13 +269,13 @@ ldarg value
 newobj instance System.Option<Void>::.ctor(System.Option.None)
 ret
 .end
-.function RuntimeWriteInt32(Int32 value) -> noresult
+.function RuntimeWriteInt32(Int32 value) -> void
 ldarg value
 call System.Console::WriteLine(Int32)
 pop
 ret
 .end
-.function RuntimeWriteString(String value) -> noresult
+.function RuntimeWriteString(String value) -> void
 ldarg value
 call System.Console::WriteLine(String)
 pop

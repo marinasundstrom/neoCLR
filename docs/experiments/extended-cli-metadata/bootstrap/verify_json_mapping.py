@@ -70,7 +70,7 @@ ret
 .end
 ''')
     if '.type class System.ParamArrayAttribute\n' not in seed_text:
-        seed_text += '\n.type class System.ParamArrayAttribute\n.method instance .ctor() -> noresult\nret\n.end\n.end\n'
+        seed_text += '\n.type class System.ParamArrayAttribute\n.method instance .ctor() -> void\nret\n.end\n.end\n'
     seed_source = output / 'System.neoil'
     seed_source.write_text(seed_text)
     seed = output / 'System.neox'

@@ -22,7 +22,7 @@ static class FileSystemBindings
         if (Type(reference.DeclaringType) is null) return null;
         var (args, result) = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type);
         var expected = reference.Name switch {
-            ".ctor" => ("String", "noresult"),
+            ".ctor" => ("String", "void"),
             "GetItem" => ("System.Storage.Path", "System.Result<System.Storage.StorageItem,System.Storage.StorageLookupError>"),
             "GetFile" => ("System.Storage.Path", "System.Result<System.Storage.File,System.Storage.StorageLookupError>"),
             "GetDirectory" => ("System.Storage.Path", "System.Result<System.Storage.Directory,System.Storage.StorageLookupError>"),

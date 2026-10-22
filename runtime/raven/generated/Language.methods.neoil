@@ -14,7 +14,7 @@
 .property instance Code() -> String
 .get instance System.Globalization.Language::get_Code()
 .end
-.method private instance .ctor(String code) -> noresult
+.method private instance .ctor(String code) -> void
 M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0

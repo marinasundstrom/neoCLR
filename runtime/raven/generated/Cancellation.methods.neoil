@@ -14,7 +14,7 @@
 .property instance IsDisposed() -> Boolean
 .get instance System.Concurrency.CancellationTokenSource::get_IsDisposed()
 .end
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 M00000007_IL_0000:
 M00000007_IL_0001:
 ldarg 0
@@ -97,7 +97,7 @@ M0000000a_IL_0008:
 call neoCLR.Library.System.Concurrency.CancellationTokenSource.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance Cancel() -> noresult
+.method instance Cancel() -> void
 .local System.Concurrency.CancellationRegistration local0
 .local System.Concurrency.CancellationRegistration local1
 ldloca local0
@@ -197,7 +197,7 @@ M0000000b_IL_0076:
 M0000000b_IL_0077:
 ret
 .end
-.method instance Dispose() -> noresult
+.method instance Dispose() -> void
 .local System.Concurrency.CancellationRegistration local0
 .local System.Concurrency.CancellationRegistration local1
 ldloca local0
@@ -359,7 +359,7 @@ ldloc local0
 M0000000d_IL_006c:
 ret
 .end
-.method internal instance Remove(System.Concurrency.CancellationRegistration registration) -> noresult
+.method internal instance Remove(System.Concurrency.CancellationRegistration registration) -> void
 .local System.Concurrency.CancellationRegistration local0
 .local System.Concurrency.CancellationRegistration local1
 .local System.Concurrency.CancellationRegistration local2

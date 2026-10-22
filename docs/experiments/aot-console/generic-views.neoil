@@ -5,13 +5,13 @@
 .end
 .interface Mutable<T>
 .implements Read<T>
-.method instance Set(T value) -> noresult
+.method instance Set(T value) -> void
 .end
 .end
 .type class Cell<T>
 .implements Mutable<T>
 .field Value T
-.method instance .ctor(T value) -> noresult
+.method instance .ctor(T value) -> void
 ldarg 0
 ldarg value
 stfld 0
@@ -22,7 +22,7 @@ ldarg 0
 ldfld 0
 ret
 .end
-.method instance Set(T value) -> noresult
+.method instance Set(T value) -> void
 ldarg 0
 ldarg value
 stfld 0

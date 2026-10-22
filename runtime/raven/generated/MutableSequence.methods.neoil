@@ -5,7 +5,7 @@
 .implements System.Collections.Iterable<T0>
 .method instance get_Item(Int32 index) -> T0
 .end
-.method instance set_Item(Int32 index,T0 value) -> noresult
+.method instance set_Item(Int32 index,T0 value) -> void
 .end
 .property instance Item(Int32) -> T0
 .get instance System.Collections.MutableSequence<T0>::get_Item(Int32)

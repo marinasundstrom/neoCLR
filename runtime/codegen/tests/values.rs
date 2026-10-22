@@ -1105,14 +1105,14 @@ const OVERLOADED_CONSTRUCTORS: &str = r#"
 .entry Main
 .type Cell
 .field Value Int32
-.method instance byref .ctor(Int32 value) -> noresult
+.method instance byref .ctor(Int32 value) -> void
 ldarg 0
 ldarg value
 stfld Cell::Value
 pop
 ret
 .end
-.method instance byref .ctor(Boolean value) -> noresult
+.method instance byref .ctor(Boolean value) -> void
 ldarg 0
 ldc.i4 7
 stfld Cell::Value
@@ -1614,7 +1614,7 @@ fn erased_primitives_preserve_exact_tags_copies_and_call_results() {
 
 #[test]
 fn erased_outputs_addresses_and_branch_joins_preserve_payloads() {
-    let m = neoclr::assemble(".module ErasedOutput\n.entry Main\n.function Fill(out Value& result) -> noresult\nldarg result\nldc.i4 255\nvalue.pack Byte\nstobj Value\nret\n.end\n.function Main() -> Int32\n.local Value item\nldloca item\ncall Fill(Value&)\nldc.bool true\nbrfalse other\nldloca item\nldobj Value\nbr join\nother:\nldvoid\nvalue.pack Void\njoin:\nvalue.is Byte\nbrfalse fail\nldloc item\nvalue.unpack Byte\nret\nfail:\nldc.i4 -1\nret\n.end").unwrap();
+    let m = neoclr::assemble(".module ErasedOutput\n.entry Main\n.function Fill(out Value& result) -> void\nldarg result\nldc.i4 255\nvalue.pack Byte\nstobj Value\nret\n.end\n.function Main() -> Int32\n.local Value item\nldloca item\ncall Fill(Value&)\nldc.bool true\nbrfalse other\nldloca item\nldobj Value\nbr join\nother:\nldvoid\nvalue.pack Void\njoin:\nvalue.is Byte\nbrfalse fail\nldloc item\nvalue.unpack Byte\nret\nfail:\nldc.i4 -1\nret\n.end").unwrap();
     assert_eq!(
         neoclr::LoadedProgram::new(&m)
             .unwrap()
@@ -2082,7 +2082,7 @@ fn unit_payloads_and_output_borrows_preserve_adjacent_fields() {
 .field Value T
 .field Neighbor Int32
 .end
-.function Fill(out Void& value) -> noresult
+.function Fill(out Void& value) -> void
 ldarg value
 ldvoid
 stobj Void

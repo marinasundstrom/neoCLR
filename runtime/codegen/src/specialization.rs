@@ -2118,7 +2118,7 @@ ret
 .module GenericOwner
 .entry Main
 .type class Box<T>
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
 .method instance Choose<U>(T first, U second) -> U
@@ -2163,7 +2163,7 @@ ret
 .entry Main
 .type class Owner<T>
 .field private value T
-.method instance .ctor(T value) -> noresult
+.method instance .ctor(T value) -> void
 ldarg 0
 ldarg 1
 stfld Owner<T>::value
@@ -2557,7 +2557,7 @@ ret
 .property instance Unused() -> T
 .set instance Counter<T>::Unused(T)
 .end
-.method instance .ctor(T value) -> noresult
+.method instance .ctor(T value) -> void
 ldarg 0
 ldarg value
 stfld Counter<T>::Number

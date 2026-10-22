@@ -42,7 +42,7 @@ pub fn user_fault(input: &mut neoclr::Module, selection: &Value) -> Result<Value
             || !f.out_when_true.is_empty()
             || !f.readonly_parameters.is_empty()
         {
-            return Err("native UserFault binding requires exact neoCLR.Runtime.Fault(String) -> Void or neoCLR.Runtime.Fail(String) -> noresult InternalCall contract".into());
+            return Err("native UserFault binding requires exact neoCLR.Runtime.Fault(String) -> Void or neoCLR.Runtime.Fail(String) -> void InternalCall contract".into());
         }
         // The supplied String remains a normal argument. Diagnostic lowering uses
         // the explicit binding index to capture that message at the terminal site.
@@ -174,7 +174,7 @@ pub fn console_write_line(
             || !f.out_when_true.is_empty()
             || !f.readonly_parameters.is_empty()
         {
-            return Err("native line output binding requires exact neoCLR.Runtime.WriteLine(String) -> Void/noresult InternalCall contract".into());
+            return Err("native line output binding requires exact neoCLR.Runtime.WriteLine(String) -> Void/void InternalCall contract".into());
         }
         f.impl_flags = 0;
         f.body = if f.no_result {
@@ -1592,7 +1592,7 @@ fn completion_services(
                 && !(implementation == "task-schedule-v1"
                     && f.parameters
                         == vec![
-                            neoclr::assembler::parse_type("fn<noresult Void>")
+                            neoclr::assembler::parse_type("fn<void>")
                                 .expect("fixed no-result task callback signature"),
                         ]))
             || f.returns != result
@@ -1991,8 +1991,8 @@ mod deadline_tests {
     fn deadlines_and_timers_require_exact_reserved_signatures_and_internal_bodies() {
         for (name, signature) in [
             ("ScheduleTask", "fn<Void> callback) -> Void"),
-            ("ScheduleTask", "fn<noresult Void> callback) -> Void"),
-            ("ScheduleTask", "fn<noresult Void> callback) -> noresult"),
+            ("ScheduleTask", "fn<void> callback) -> Void"),
+            ("ScheduleTask", "fn<void> callback) -> void"),
             ("SchedulerSubmit", "fn<Void> callback) -> Int32"),
             ("SchedulerCapture", ") -> Int64"),
             (
@@ -2354,7 +2354,7 @@ mod task_queue_tests {
                 "System.Concurrency.Tasks.TaskQueue"
             };
             let compiled = format!("neoCLR.Runtime.{service}$aot_method_1");
-            let mut source = neoclr::assemble(&format!(".module System\n.references ()\n.type class System.Concurrency.Tasks.TaskQueue\n.method instance Drain() -> noresult\nret\n.end\n.end\n.function Stub({parameters}) -> {returns}\nAgain:\nbr Again\n.end")).unwrap();
+            let mut source = neoclr::assemble(&format!(".module System\n.references ()\n.type class System.Concurrency.Tasks.TaskQueue\n.method instance Drain() -> void\nret\n.end\n.end\n.function Stub({parameters}) -> {returns}\nAgain:\nbr Again\n.end")).unwrap();
             source.functions[1].name = compiled.clone();
             source.functions[1].impl_flags = 0x1000;
             source.functions[1].body.clear();
@@ -2494,11 +2494,11 @@ mod type_identity_tests {
             ("RuntimeAsyncCreate", "", "Int64"),
             ("RuntimeAsyncStart", "fn<Void> callback", "Int64"),
             ("RuntimeAsyncCompleteUnit", "Int64 operation", "Boolean"),
-            ("RuntimeAsyncAwaitUnit", "Int64 operation", "noresult"),
+            ("RuntimeAsyncAwaitUnit", "Int64 operation", "void"),
             ("RuntimeAsyncRelease", "Int64 operation", "Boolean"),
             ("RuntimeAsyncIsCompleted", "Int64 operation", "Boolean"),
             ("RuntimeAsyncWaitCompletion", "Int64 operation", "Boolean"),
-            ("GCCollect", "", "noresult"),
+            ("GCCollect", "", "void"),
         ] {
             let source = neoclr::assemble(&format!(".module AsyncBinding\n.function neoCLR.Runtime.{name}({parameters}) -> {result}\n.methodimpl InternalCall\n.end\n")).unwrap();
             let inventory =

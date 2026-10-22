@@ -22,7 +22,7 @@ In assembly syntax the explicit experimental spelling is:
     call Empty()
     ret
 .end
-.function Empty() -> noresult
+.function Empty() -> void
     ret
 .end
 ```

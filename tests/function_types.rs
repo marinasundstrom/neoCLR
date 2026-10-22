@@ -36,7 +36,7 @@ fn structural_shapes_preserve_parameter_modes_and_generic_substitution() {
     );
     assert_ne!(
         parse_type("fn<Void>").unwrap(),
-        parse_type("fn<noresult Void>").unwrap()
+        parse_type("fn<void>").unwrap()
     );
     assert!(parse_type("fn<out Int32,Void>").is_err());
     assert!(parse_type("fn<outtrue Int32&,Int32>").is_err());
@@ -97,9 +97,9 @@ fn no_result_invoke_preserves_the_caller_stack() {
     for instruction in ["call", "callvirt"] {
         let m = module(
             &format!(
-                "ldc.i4 42\nfunction.bind fn<noresult Void> = Empty()\n{instruction} instance fn<noresult Void>::Invoke()"
+                "ldc.i4 42\nfunction.bind fn<void> = Empty()\n{instruction} instance fn<void>::Invoke()"
             ),
-            ".function Empty() -> noresult\nret\n.end",
+            ".function Empty() -> void\nret\n.end",
         );
         verify(&m).unwrap();
         assert_eq!(run(&m, Limits::default()).unwrap().value, Value::Int32(42));

@@ -15,7 +15,7 @@
 .property instance Outcome() -> System.Option<System.Concurrency.Tasks.TaskOutcome<T0>>
 .get instance System.Concurrency.Tasks.Task<T0>::get_Outcome()
 .end
-.method internal instance .ctor(System.Concurrency.Tasks.Promise<T0> source) -> noresult
+.method internal instance .ctor(System.Concurrency.Tasks.Promise<T0> source) -> void
 M00000007_IL_0000:
 M00000007_IL_0001:
 ldarg 0
@@ -216,7 +216,7 @@ callvirt instance System.Concurrency.Tasks.Promise<T0>::Read()
 M0000000e_IL_000d:
 ret
 .end
-.method instance OnCompleted(fn<Void> callback) -> noresult
+.method instance OnCompleted(fn<Void> callback) -> void
 M0000000f_IL_0000:
 M0000000f_IL_0001:
 M0000000f_IL_0002:

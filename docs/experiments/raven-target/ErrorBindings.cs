@@ -106,7 +106,7 @@ static class ErrorBindings
         var owner = Type(reference.DeclaringType);
         if (owner is null) return null;
         var signature = RuntimeSignatures.Match(reference, definition, Type);
-        if (signature.Result == "noresult" && (IsEmpty(owner) && owner != "System.EnvironmentError" && signature.Args.Length == 0
+        if (signature.Result == "void" && (IsEmpty(owner) && owner != "System.EnvironmentError" && signature.Args.Length == 0
             || Cases.TryGetValue(owner, out var cases) && cases.Any(c => signature.Args.SequenceEqual(new[] { owner + "." + c }))))
             return new(Helper(owner, "New" + string.Concat(signature.Args)), signature.Args, owner);
         throw new InvalidDataException("Unsupported error constructor.");

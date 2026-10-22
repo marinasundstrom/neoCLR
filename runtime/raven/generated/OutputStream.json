@@ -180,6 +180,6 @@
   "exports": [
     "Write(arrayref<Byte> buffer,Int32 offset,Int32 count) -> System.Result<Int32,System.IO.StreamError>",
     "Flush() -> System.Result<Void,System.IO.StreamError>",
-    "Close() -> noresult"
+    "Close() -> void"
   ]
 }

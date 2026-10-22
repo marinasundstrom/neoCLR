@@ -182,6 +182,6 @@
     "Read(arrayref<Byte> buffer,Int32 offset,Int32 count) -> System.Result<Int32,System.IO.StreamError>",
     "GetPosition() -> System.Result<Int64,System.IO.StreamError>",
     "Seek(Int64 position) -> System.Result<Int64,System.IO.StreamError>",
-    "Close() -> noresult"
+    "Close() -> void"
   ]
 }

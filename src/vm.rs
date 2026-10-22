@@ -6132,7 +6132,7 @@ fn interpret_instructions_with_dispatch(
                             })
                             && matches!(caller.function.body.get(caller.trace_pc), Some(Op::Call(target) | Op::CallVirtual(target))
                         if target.name == "$Function.Invoke" && target.instance
-                            && (target.owner.as_ref() == Some(&crate::assembler::parse_type("fn<Void>")?) || target.owner.as_ref() == Some(&crate::assembler::parse_type("fn<noresult Void>")?))
+                            && (target.owner.as_ref() == Some(&crate::assembler::parse_type("fn<Void>")?) || target.owner.as_ref() == Some(&crate::assembler::parse_type("fn<void>")?))
                             && target.parameters.is_empty())
                             && scheduler.poll(heap, queue)?
                         {

@@ -26,7 +26,7 @@
 .property instance DateTimeFormat() -> System.Globalization.DateTimeFormat
 .get instance System.Globalization.Culture::get_DateTimeFormat()
 .end
-.method private instance .ctor(Int32 value) -> noresult
+.method private instance .ctor(Int32 value) -> void
 M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0

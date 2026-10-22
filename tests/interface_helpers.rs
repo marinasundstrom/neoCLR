@@ -24,7 +24,7 @@ ret
 .end
 .type class Sample
 .implements Report
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
 .end

@@ -128,7 +128,7 @@ packaging. No system security/toolchain settings were changed to bypass startup.
 ## No-result native calls (development, 2026-10-22)
 
 Native imports and ordinary scalar helpers can now use the existing `no_result`
-metadata flag with a Void return (`-> noresult` in low-level fixtures). This maps
+metadata flag with a Void return (`-> void` in low-level fixtures). This maps
 to C `void`: the foreign signature has no result register, and the managed caller
 receives no operand-stack value. A helper returns with an empty stack. The private
 status/result-pointer call convention is retained, but successful no-result calls
@@ -150,12 +150,10 @@ launcher stalls. Keep the matching Xcode SDK/clang environment described above.
 These are local build options, not changes to runtime behavior or system settings.
 
 
-Terminology: neoIL's existing Void is inhabited unit; `noresult` denotes Void with
-`no_result: true`, not a new type. Structural Function signatures distinguish both
-contracts. The author questioned this naming during this work; Unit/Void naming is
-a withdrawn proposal: the author clarifies below that neoCLR Void must remain a
-normal inhabited type. No type rename or return-schema migration was implemented.
-
+The current spelling is `-> void`, including structural `fn<void>` results.
+`noresult` is rejected by the assembler. The internal `no_result` ABI metadata is
+unchanged. Canonicalizing legacy named-Void returns remains pending; see
+[the Void migration status](../../void-semantics.md).
 
 Qualification completed on 2026-10-22: seven import tests and all 24 scalar regressions
 pass, including a focused rerun after correcting the expected diagnostic for a

@@ -3,7 +3,7 @@
 .type class Signal<F>
 .constraint F func
 .field Callback F
-.method instance .ctor(F callback) -> noresult
+.method instance .ctor(F callback) -> void
 ldarg 0
 ldarg 1
 stfld Signal<F>::Callback

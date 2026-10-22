@@ -1,7 +1,7 @@
 .module NativeAccept
 .type class Completion
 .field Operation Int64
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
 .method instance Complete() -> Void

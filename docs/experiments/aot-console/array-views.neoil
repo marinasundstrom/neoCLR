@@ -7,7 +7,7 @@
 .end
 .interface Mutable<T>
 .implements Read<T>
-.method instance Set(Int32 index, T value) -> noresult
+.method instance Set(Int32 index, T value) -> void
 .end
 .end
 .interface Other
@@ -15,7 +15,7 @@
 .type class Storage<T>
 .implements Mutable<T>
 .field private Bytes arrayref<T>
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
 .method instance Count() -> Int32
@@ -32,7 +32,7 @@ ldarg index
 ldelem T
 ret
 .end
-.method instance Set(Int32 index, T value) -> noresult
+.method instance Set(Int32 index, T value) -> void
 ldarg 0
 ldfld 0
 ldarg index

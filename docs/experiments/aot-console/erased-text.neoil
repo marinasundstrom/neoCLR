@@ -3,7 +3,7 @@
 ldarg value
 ret
 .end
-.function Copy(Value source, out Value& target) -> noresult
+.function Copy(Value source, out Value& target) -> void
 ldarg target
 ldarg source
 stobj Value

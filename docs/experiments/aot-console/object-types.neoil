@@ -2,7 +2,7 @@
 .type class abstract System.Object
 .end
 .type class Cell<T>
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
 .end

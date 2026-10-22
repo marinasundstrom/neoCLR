@@ -394,11 +394,11 @@ pub(crate) fn describe_member(
                     )
                 })
                 .collect::<Vec<_>>();
-            names.push(format!(
-                "{}{}",
-                if shape.no_result { "noresult " } else { "" },
+            names.push(if shape.no_result {
+                "void".into()
+            } else {
                 returns.name
-            ));
+            });
             result.name = format!("fn<{}>", names.join(","));
             result.identity = TypeIdentity::Function {
                 parameters: parameters.into_iter().map(|p| p.identity).collect(),
@@ -609,11 +609,11 @@ pub(crate) fn signature_name(ty: &Type) -> Result<String, Fault> {
                     Ok(format!("{mode}{}", signature_name(ty)?))
                 })
                 .collect::<Result<Vec<_>, Fault>>()?;
-            parts.push(format!(
-                "{}{}",
-                if shape.no_result { "noresult " } else { "" },
+            parts.push(if shape.no_result {
+                "void".into()
+            } else {
                 signature_name(&shape.returns)?
-            ));
+            });
             format!("fn<{}>", parts.join(","))
         }
         Type::ByRef(element) => reference_name(element, false)?,

@@ -403,7 +403,7 @@ fn structural_functions_expose_their_synthesized_invoke() {
         ("fn<readonly Int32&,out Int32&,Void>", 2),
         ("fn<outtrue Int32&,Boolean>", 1),
         ("fn<Void>", 0),
-        ("fn<noresult Void>", 0),
+        ("fn<void>", 0),
     ] {
         for (flags, expected) in [(28, 5), (20, 5), (24, 0), (36, 0), (0, 0)] {
             let result = program(

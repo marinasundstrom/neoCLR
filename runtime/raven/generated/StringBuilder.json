@@ -179,8 +179,8 @@
   "compilerSha256": "c59a935b707df3e6df0aa948ff77d7ff651e4994dec21c2b0f3169a5d22db2d7",
   "coreSha256": "a055a7c3523bf197876abc8a21074b18c1b7747cff1ba71294513dd17ad9fbde",
   "exports": [
-    ".ctor() -> noresult",
-    ".ctor(Int32 maxUtf8Bytes) -> noresult",
+    ".ctor() -> void",
+    ".ctor(Int32 maxUtf8Bytes) -> void",
     "get_Utf8ByteCount() -> Int32",
     "get_MaxUtf8Bytes() -> Int32",
     "Append(String text) -> System.Text.StringBuilder",

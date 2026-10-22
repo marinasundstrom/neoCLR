@@ -284,7 +284,7 @@ fn constructor_storage_is_live_before_call_and_faults_never_publish_results() {
         r#".module ConstructorRoots
 .type Payload
 .field Text String
-.method instance byref .ctor(Int32 fail) -> noresult
+.method instance byref .ctor(Int32 fail) -> void
 ldarg this
 ldstr "ready"
 stfld 0

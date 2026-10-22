@@ -100,7 +100,7 @@ callvirt instance {context}::GetTypeInfoFromHandle(System.RuntimeTypeHandle)
     cases = [('Int32', 'Int32', True), ('Int32', 'String', False),
              ('arrayref<Int32>', 'arrayref<Int32>', True),
              ('arrayref<Int32>', 'arrayref<String>', False)]
-    body = f'.function ContextProbe() -> noresult\n.local {implementation} left\n'
+    body = f'.function ContextProbe() -> void\n.local {implementation} left\n'
     # Compare compiler-generated typeof directly with explicit context acquisition.
     body += f'newobj instance {identity_source}::.ctor()\n'
     body += f'callvirt instance {identity_source}::Resolve()\ncastclass {implementation}\nstloc left\nldloc left\n'

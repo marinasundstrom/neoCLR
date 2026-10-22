@@ -207,7 +207,7 @@ fn guarded_mutations_keep_instruction_limits_and_reject_host_suspension() {
         ("again:\nbr again", true),
         ("call neoCLR.Runtime.ConsoleReadByte()\npop\nret", false),
     ] {
-        let module = crate::assemble(&format!(".module System\n.type class System.Concurrency.Tasks.TaskQueue\n.method instance Post() -> noresult\n{body}\n.end\n.end\n.function neoCLR.Runtime.ConsoleReadByte() -> Value\n.methodimpl InternalCall\n.end")).unwrap();
+        let module = crate::assemble(&format!(".module System\n.type class System.Concurrency.Tasks.TaskQueue\n.method instance Post() -> void\n{body}\n.end\n.end\n.function neoCLR.Runtime.ConsoleReadByte() -> Value\n.methodimpl InternalCall\n.end")).unwrap();
         let cancellation = crate::CancellationToken::new();
         if cancelled {
             cancellation.cancel();
@@ -264,7 +264,7 @@ fn guarded_mutations_keep_instruction_limits_and_reject_host_suspension() {
 
 #[test]
 fn application_names_do_not_receive_system_atomic_policy() {
-    let module = crate::assemble(".module Application\n.type class System.Concurrency.Tasks.TaskQueue\n.method instance Post() -> noresult\nagain:\nbr again\n.end\n.end").unwrap();
+    let module = crate::assemble(".module Application\n.type class System.Concurrency.Tasks.TaskQueue\n.method instance Post() -> void\nagain:\nbr again\n.end\n.end").unwrap();
     let frame = Frame::new(
         module.functions[0].clone(),
         vec![Value::NullObjectReference(Type::from_name(

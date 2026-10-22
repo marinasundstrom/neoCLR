@@ -47,7 +47,7 @@ static class TupleBindings
         if (owner is null) return null;
         var (args, result) = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type);
         var expected = ((GenericInstanceType)reference.DeclaringType).GenericArguments.Select(GenericUnionBindings.Type);
-        if (!definition.IsConstructor || definition.IsStatic || definition.IsVirtual || result != "noresult"
+        if (!definition.IsConstructor || definition.IsStatic || definition.IsVirtual || result != "void"
             || !args.SequenceEqual(expected)) throw new InvalidDataException("Invalid tuple constructor.");
         return new(args, owner, $"newobj instance {owner}::.ctor({string.Join(',', args)})");
     }

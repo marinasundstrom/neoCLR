@@ -39,7 +39,7 @@ fn generic_constructor_defaults_array_field_then_assigns_buffer() {
         r#"
 .type class Buffer<T>
 .field Items arrayref<T>
-.method instance .ctor(Int32 count) -> noresult
+.method instance .ctor(Int32 count) -> void
 ldarg this
 ldfld Buffer<T>::Items
 dup
@@ -153,7 +153,7 @@ fn null_array_operations_fault_without_verifier() {
         ("ldlen", "UIntPtr"),
         ("ldc.i4 0\nldelem Int32", "Int32"),
         ("ldc.i4 0\nldelema Int32", "Int32&"),
-        ("ldc.i4 0\nldc.i4 42\nstelem Int32", "noresult"),
+        ("ldc.i4 0\nldc.i4 42\nstelem Int32", "void"),
     ] {
         let m = module(&format!(
             ".function Main() -> {returns}\n.local arrayref<Int32> items\nldloca items\ninitobj arrayref<Int32>\nldloc items\n{operation}\nret\n.end"
@@ -380,7 +380,7 @@ fn ordinary_array_operations_enforce_bounds_types_and_budgets() {
         ),
         (
             "ldc.i4 1\nnewarr Int32\nldc.i4 0\nldstr \"bad\"\nstelem Int32",
-            "noresult",
+            "void",
         ),
         ("ldc.i4 -1\nnewarr Int32", "arrayref<Int32>"),
     ] {

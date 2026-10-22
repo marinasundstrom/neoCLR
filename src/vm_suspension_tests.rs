@@ -225,10 +225,10 @@ fn queue_and_entry_drain_state_survive_collection_at_every_pause() {
 .module System
 .type class System.Concurrency.Tasks.TaskQueue
 .field Drains Int32
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
-.method instance Drain() -> noresult
+.method instance Drain() -> void
 ldarg 0
 ldarg 0
 ldfld System.Concurrency.Tasks.TaskQueue::Drains
@@ -347,7 +347,7 @@ fn completion_wait_probe(cancel: bool) {
 .type class System.Concurrency.Tasks.TaskQueue
 .field Posts Int32
 .field Drains Int32
-.method instance Post(fn<Void> callback) -> noresult
+.method instance Post(fn<Void> callback) -> void
 ldarg 0
 ldarg 0
 ldfld System.Concurrency.Tasks.TaskQueue::Posts
@@ -356,7 +356,7 @@ add
 stfld System.Concurrency.Tasks.TaskQueue::Posts
 ret
 .end
-.method instance Drain() -> noresult
+.method instance Drain() -> void
 ldarg 0
 ldarg 0
 ldfld System.Concurrency.Tasks.TaskQueue::Drains
@@ -802,7 +802,7 @@ fn guest_contexts_observe_one_default_queue_after_submitter_exits() {
 .module System
 .type class System.Concurrency.Tasks.TaskQueue
 .field Drains Int32
-.method instance Drain() -> noresult
+.method instance Drain() -> void
 ldarg 0
 ldarg 0
 ldfld System.Concurrency.Tasks.TaskQueue::Drains

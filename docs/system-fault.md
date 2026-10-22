@@ -108,7 +108,7 @@ claimed as an end-to-end success. See [recorded evidence](experiments/extended-c
 ## Native source bootstrap — 2026-10-06
 
 Unchanged System.Fail now compiles with an internal source RuntimeFailure adapter.
-The new exact `neoCLR.Runtime.Fail(String) -> noresult` service raises the same UserFault;
+The new exact `neoCLR.Runtime.Fail(String) -> void` service raises the same UserFault;
 wrong argument or inhabited-result declarations reject. Legacy `neoCLR.Runtime.Fault`
 keeps its inhabited Void convention so the existing Numbers library and seed continue
 to link. This separate service spelling avoids mixing incompatible return conventions

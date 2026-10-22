@@ -75,7 +75,7 @@ static class ResultBindings
         if (owner is null) return null;
         var (args, result) = Signature(reference, definition);
         var expected = Successes.Where(s => s.Case == owner).Select(s => s.Value).SingleOrDefault() ?? Carriers.Where(c => c.Type == owner).Select(c => $"System.Result.Ok<{c.Output}>").SingleOrDefault() ?? "";
-        if (result == "noresult" && args.SequenceEqual(new[] { expected }))
+        if (result == "void" && args.SequenceEqual(new[] { expected }))
             return new(Helper(owner, "New"), args, owner);
         throw new InvalidDataException("Unsupported Result constructor: " + reference.FullName);
     }

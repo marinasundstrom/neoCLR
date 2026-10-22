@@ -74,11 +74,11 @@ static class FunctionBindings
             return new(owner + "::get_Function", [owner], result,
                 Instruction: $"callvirt instance {owner}::get_Function()");
 
-        if (!reference.HasThis || !callvirt || reference.Name != "Invoke" || !args.SequenceEqual(signature[..^1]) || (result != signature[^1] && !(result == "noresult" && signature[^1] == "Void")))
+        if (!reference.HasThis || !callvirt || reference.Name != "Invoke" || !args.SequenceEqual(signature[..^1]) || (result != signature[^1] && !(result == "void" && signature[^1] == "Void")))
             throw new InvalidDataException($"Unsupported delegate invocation: {reference.FullName}; callvirt={callvirt}, actual={string.Join(',', args)} -> {result}, expected={string.Join(',', signature)}.");
         // Source unit Functions use an inhabited Void result. CLI Action is transport:
         // binding adapters create that value, and CLI void invocation discards it.
         return new(owner + "::Invoke", new[] { owner }.Concat(args).ToArray(), result,
-            Instruction: $"callvirt instance {owner}::Invoke({string.Join(',', args)})" + (result == "noresult" ? "\npop" : ""));
+            Instruction: $"callvirt instance {owner}::Invoke({string.Join(',', args)})" + (result == "void" ? "\npop" : ""));
     }
 }

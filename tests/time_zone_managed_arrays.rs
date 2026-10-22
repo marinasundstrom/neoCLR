@@ -43,7 +43,7 @@ ret
             .message
             .contains("heap")
     );
-    for wrong in ["arrayref<Int32>", "arrayref<String>", "noresult"] {
+    for wrong in ["arrayref<Int32>", "arrayref<String>", "void"] {
         assert!(
             neoclr::assemble(&source.replace("-> arrayref<Int64>", &format!("-> {wrong}")))
                 .is_err()

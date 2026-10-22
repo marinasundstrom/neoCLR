@@ -38,14 +38,14 @@ fn fixture(case: &str) -> neoclr::Module {
     let suffix = if generic { "<T>" } else { "" };
     let extra = match case {
         "cycle" => {
-            ".type class Peer\n.method private static .cctor() -> noresult\nret\n.end\n.end\n"
+            ".type class Peer\n.method private static .cctor() -> void\nret\n.end\n.end\n"
         }
         "reference" => {
-            ".type class Payload\n.field Value Int32\n.method instance .ctor(Int32 value) -> noresult\nldarg 0\nldarg 1\nstfld 0\nret\n.end\n.end\n"
+            ".type class Payload\n.field Value Int32\n.method instance .ctor(Int32 value) -> void\nldarg 0\nldarg 1\nstfld 0\nret\n.end\n.end\n"
         }
         _ => "",
     };
-    let mut m = neoclr::assemble(&format!(".module Initializers\n.entry Main\n.type class Cache{suffix}\n.method private static .cctor() -> noresult\nret\n.end\n.method static Read() -> Int32\nldc.i4 42\nret\n.end\n.end\n{extra}.function Main() -> Int32\nldc.i4 0\nret\n.end")).unwrap();
+    let mut m = neoclr::assemble(&format!(".module Initializers\n.entry Main\n.type class Cache{suffix}\n.method private static .cctor() -> void\nret\n.end\n.method static Read() -> Int32\nldc.i4 42\nret\n.end\n.end\n{extra}.function Main() -> Int32\nldc.i4 0\nret\n.end")).unwrap();
     if case == "strict" || case == "relaxed" {
         // Empty storage owners still need an initialization state; this faults if run.
         body(

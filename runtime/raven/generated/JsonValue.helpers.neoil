@@ -1250,7 +1250,7 @@ ret
 .end
 .type class System.Data.Json.JsonSerializer
 .sealed
-.method private instance .ctor() -> noresult
+.method private instance .ctor() -> void
 M00000002_IL_0000:
 M00000002_IL_0001:
 ldarg 0
@@ -2004,7 +2004,7 @@ ret
 .end
 .type internal class System.Data.Json.ObjectMapper
 .sealed
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 M0000000d_IL_0000:
 M0000000d_IL_0001:
 ldarg 0
@@ -4751,7 +4751,7 @@ ret
 .field private bytes System.Collections.Sequence<Byte>
 .field private position Int32
 .field private nodes Int32
-.method instance .ctor(String text) -> noresult
+.method instance .ctor(String text) -> void
 M00000014_IL_0000:
 M00000014_IL_0001:
 ldarg 0
@@ -4790,7 +4790,7 @@ stfld System.Data.Json.DocumentReader::nodes
 M00000014_IL_002c:
 ret
 .end
-.method private instance Skip() -> noresult
+.method private instance Skip() -> void
 M00000015_IL_0000:
 M00000015_IL_0001:
 M00000015_IL_0002:
@@ -6468,7 +6468,7 @@ ret
 .sealed
 .field private nodes Int32
 .field private output String
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 M0000001b_IL_0000:
 M0000001b_IL_0001:
 ldarg 0
@@ -7641,7 +7641,7 @@ ret
 .sealed
 .field private bytes System.Collections.Sequence<Byte>
 .field private position Int32
-.method instance .ctor(String text) -> noresult
+.method instance .ctor(String text) -> void
 M0000001f_IL_0000:
 M0000001f_IL_0001:
 ldarg 0
@@ -10535,7 +10535,7 @@ M00000026_IL_0207:
 M00000026_IL_0208:
 fault "Guest program reached a terminal failure"
 .end
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 M00000027_IL_0000:
 M00000027_IL_0001:
 ldarg 0
@@ -10553,7 +10553,7 @@ ret
 .property instance Count() -> Int32
 .get instance System.Data.Json.JsonObject::get_Count()
 .end
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 M00000028_IL_0000:
 M00000028_IL_0001:
 ldarg 0
@@ -10988,7 +10988,7 @@ ret
 .property instance Count() -> Int32
 .get instance System.Data.Json.JsonArray::get_Count()
 .end
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 M0000002e_IL_0000:
 M0000002e_IL_0001:
 ldarg 0
@@ -11154,7 +11154,7 @@ ret
 .property instance Value() -> String
 .get instance System.Data.Json.JsonString::get_Value()
 .end
-.method instance .ctor(String value) -> noresult
+.method instance .ctor(String value) -> void
 M00000032_IL_0000:
 M00000032_IL_0001:
 ldarg 0
@@ -11195,7 +11195,7 @@ ret
 .property instance Text() -> String
 .get instance System.Data.Json.JsonNumber::get_Text()
 .end
-.method private instance .ctor(String text) -> noresult
+.method private instance .ctor(String text) -> void
 M00000034_IL_0000:
 M00000034_IL_0001:
 ldarg 0
@@ -11400,7 +11400,7 @@ ret
 .property instance Value() -> Boolean
 .get instance System.Data.Json.JsonBoolean::get_Value()
 .end
-.method instance .ctor(Boolean value) -> noresult
+.method instance .ctor(Boolean value) -> void
 M00000038_IL_0000:
 M00000038_IL_0001:
 ldarg 0
@@ -11442,7 +11442,7 @@ ret
 .type class System.Data.Json.JsonNull
 .sealed
 .extends System.Data.Json.JsonValue
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 M0000003a_IL_0000:
 M0000003a_IL_0001:
 ldarg 0
@@ -11454,7 +11454,7 @@ ret
 .end
 .type class System.Web.Http.Json.JsonContent
 .sealed
-.method private instance .ctor() -> noresult
+.method private instance .ctor() -> void
 M0000003b_IL_0000:
 M0000003b_IL_0001:
 ldarg 0
@@ -11929,7 +11929,7 @@ ret
 .end
 .type internal class System.Web.Http.Json.JsonClientOperations
 .sealed
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 M0000004a_IL_0000:
 M0000004a_IL_0001:
 ldarg 0
@@ -12471,7 +12471,7 @@ fault "System.Fail returned unexpectedly"
 .type internal class System.Web.Http.Json.JsonClientRead
 .sealed
 .field private type System.Introspection.TypeInfo
-.method instance .ctor(System.Introspection.TypeInfo type) -> noresult
+.method instance .ctor(System.Introspection.TypeInfo type) -> void
 M00000051_IL_0000:
 M00000051_IL_0001:
 ldarg 0

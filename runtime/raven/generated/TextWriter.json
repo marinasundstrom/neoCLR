@@ -181,6 +181,6 @@
     "Write(String text) -> System.Result<Int32,System.IO.StreamError>",
     "WriteLine(String text) -> System.Result<Int32,System.IO.StreamError>",
     "Flush() -> System.Result<Void,System.IO.StreamError>",
-    "Close() -> noresult"
+    "Close() -> void"
   ]
 }

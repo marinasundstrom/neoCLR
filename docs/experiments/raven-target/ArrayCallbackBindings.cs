@@ -24,7 +24,7 @@ static class ArrayCallbackBindings
         if (reference.Name == "get_Empty" && !reference.HasThis && args.Length == 0 && result == array)
             return new(type + "::get_Empty", args, result,
                 Instruction: $"call {type}::get_Empty()");
-        if (reference.Name == "ForEach" && reference.HasThis && result == "noresult"
+        if (reference.Name == "ForEach" && reference.HasThis && result == "void"
             && args.SequenceEqual(new[] { $"fn<{element},Void>" }))
             return new(type + "::ForEach", new[] { array }.Concat(args).ToArray(), result,
                 Instruction: $"callvirt instance {type}::ForEach({string.Join(',', args)})");

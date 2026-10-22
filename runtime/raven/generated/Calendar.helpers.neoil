@@ -226,7 +226,7 @@ ret
 .property instance MaxYear() -> Int32
 .get instance neoCLR.Library.System.Time.Calendar.Type_53797374656D2E54696D652E477265676F7269616E43616C656E646172::get_MaxYear()
 .end
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 M00000011_IL_0000:
 M00000011_IL_0001:
 ldarg 0
@@ -700,7 +700,7 @@ ret
 .property instance MaxYear() -> Int32
 .get instance neoCLR.Library.System.Time.Calendar.Type_53797374656D2E54696D652E48656272657743616C656E646172::get_MaxYear()
 .end
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 M0000001f_IL_0000:
 M0000001f_IL_0001:
 ldarg 0

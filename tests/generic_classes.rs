@@ -7,13 +7,13 @@ const TYPES: &str = r#"
 .end
 .interface Mutable<T>
 .implements Read<T>
-.method instance Set(T value) -> noresult
+.method instance Set(T value) -> void
 .end
 .end
 .type class Cell<T>
 .implements Mutable<T>
 .field Value T
-.method instance .ctor(T value) -> noresult
+.method instance .ctor(T value) -> void
 ldarg this
 ldarg value
 stfld Cell<T>::Value
@@ -24,7 +24,7 @@ ldarg this
 ldfld Cell<T>::Value
 ret
 .end
-.method instance Set(T value) -> noresult
+.method instance Set(T value) -> void
 ldarg this
 ldarg value
 stfld Cell<T>::Value
@@ -85,7 +85,7 @@ ret
 fn wrong_closed_field_value_is_rejected() {
     let m = module(
         r#"
-.function Main() -> noresult
+.function Main() -> void
 ldc.i4 42
 newobj instance Cell<Int32>::.ctor(Int32)
 ldstr "wrong"

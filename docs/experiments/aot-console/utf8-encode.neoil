@@ -9,7 +9,7 @@ starg original
 ldarg original
 ret
 .end
-.function CopyInto(Byte[] source, out Byte[]& target) -> noresult
+.function CopyInto(Byte[] source, out Byte[]& target) -> void
 ldarg target
 ldarg source
 stobj Byte[]

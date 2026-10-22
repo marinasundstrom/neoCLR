@@ -292,14 +292,14 @@ mod tests {
 .entry Main
 .type class Box
 .field Text String
-.method instance .ctor(String text) -> noresult
+.method instance .ctor(String text) -> void
 ldarg 0
 ldarg text
 stfld 0
 ret
 .end
 .end
-.function Fill(out String& text) -> noresult
+.function Fill(out String& text) -> void
 ldarg text
 ldstr "filled"
 stobj String

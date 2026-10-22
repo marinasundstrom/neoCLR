@@ -3,7 +3,7 @@
 .end
 .type class Model
 .field Number Int32
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ldarg 0
 ldc.i4 1
 stfld Model::Number
@@ -14,7 +14,7 @@ ldarg 0
 ldfld Model::Number
 ret
 .end
-.method instance set_Number(Int32) -> noresult
+.method instance set_Number(Int32) -> void
 ldarg 0
 ldarg 1
 ldc.i4 2
@@ -29,7 +29,7 @@ ret
 .method instance get_Broken() -> Int32
 fault "getter failed"
 .end
-.method instance set_Broken(Int32) -> noresult
+.method instance set_Broken(Int32) -> void
 fault "setter failed"
 .end
 .property instance Number() -> Int32
@@ -56,7 +56,7 @@ fault "setter failed"
 .function neoCLR.Runtime.ReflectionPropertyGet(RuntimeTypeHandle,Int32,System.Object) -> System.Object
 .methodimpl InternalCall
 .end
-.function neoCLR.Runtime.ReflectionPropertySet(RuntimeTypeHandle,Int32,System.Object,System.Object) -> noresult
+.function neoCLR.Runtime.ReflectionPropertySet(RuntimeTypeHandle,Int32,System.Object,System.Object) -> void
 .methodimpl InternalCall
 .end
 .function Calculate(Int32 mode) -> Int32

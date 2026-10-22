@@ -33,7 +33,7 @@ call System.Runtime.InteropServices.NativeMemory.Alloc(UIntPtr)
 M00000002_IL_0011:
 ret
 .end
-.method static Free(Void* pointer) -> noresult
+.method static Free(Void* pointer) -> void
 M00000003_IL_0000:
 M00000003_IL_0001:
 M00000003_IL_0002:

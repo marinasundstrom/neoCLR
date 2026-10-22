@@ -33,7 +33,7 @@ fn string_local_and_field_defaults_are_null_not_empty() {
     );
     assert_eq!(
         execute(
-            ".type class Holder\n.field Text String\n.method instance .ctor() -> noresult\nret\n.end\n.end\n.function Main() -> String\nnewobj instance Holder::.ctor()\nldfld Holder::Text\nret\n.end"
+            ".type class Holder\n.field Text String\n.method instance .ctor() -> void\nret\n.end\n.end\n.function Main() -> String\nnewobj instance Holder::.ctor()\nldfld Holder::Text\nret\n.end"
         ),
         Value::NullObjectReference(Type::String)
     );

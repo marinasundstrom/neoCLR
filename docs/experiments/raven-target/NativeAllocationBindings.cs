@@ -24,7 +24,7 @@ static class NativeAllocationBindings
         var expected = reference.Name switch {
             "Allocate" => (new[] { "UIntPtr" }, "Void*", "heap.alloc Byte\nptr.cast Void"),
             "MultiplyChecked" => (new[] { "UIntPtr", "UIntPtr" }, "UIntPtr", "mul.ovf.un"),
-            "Release" => (new[] { "Void*" }, "noresult", "heap.free\npop"),
+            "Release" => (new[] { "Void*" }, "void", "heap.free\npop"),
             _ => throw new InvalidDataException("Unsupported native allocation operation.")
         };
         if (!signature.Args.SequenceEqual(expected.Item1) || signature.Result != expected.Item2)

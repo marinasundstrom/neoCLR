@@ -271,7 +271,7 @@ mod tests {
             "ReflectionConstructorInvoke"
         };
         let result = if check { "Int32" } else { "System.Object" };
-        let mut source = neoclr::assemble(&format!(".module ConstructorTest\n.type class System.Object\n.method instance .ctor() -> noresult\nret\n.end\n.end\n.type class Item\n.extends System.Object\n.field Value Int32\n.method instance .ctor(Int32 value) -> noresult\nldarg 0\ncall instance System.Object::.ctor()\nldarg 0\nldarg value\nstfld 0\nret\n.end\n.end\n.function neoCLR.Runtime.{name}(RuntimeTypeHandle,Int32,System.Object,arrayref<System.Object>) -> {result}\n.methodimpl InternalCall\n.end\n.entry Main\n.function Main() -> Int32\nldc.i4 0\nret\n.end")).unwrap();
+        let mut source = neoclr::assemble(&format!(".module ConstructorTest\n.type class System.Object\n.method instance .ctor() -> void\nret\n.end\n.end\n.type class Item\n.extends System.Object\n.field Value Int32\n.method instance .ctor(Int32 value) -> void\nldarg 0\ncall instance System.Object::.ctor()\nldarg 0\nldarg value\nstfld 0\nret\n.end\n.end\n.function neoCLR.Runtime.{name}(RuntimeTypeHandle,Int32,System.Object,arrayref<System.Object>) -> {result}\n.methodimpl InternalCall\n.end\n.entry Main\n.function Main() -> Int32\nldc.i4 0\nret\n.end")).unwrap();
         let object = Type::from_name("System.Object");
         let constructor = source
             .functions

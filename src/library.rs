@@ -229,7 +229,7 @@ mod scoped_service_result_tests {
         let result = if wrong_return {
             "Int32"
         } else if no_result {
-            "noresult"
+            "void"
         } else {
             "Void"
         };
@@ -284,7 +284,7 @@ mod scoped_service_result_tests {
             );
         }
         let system = crate::assembler::parse_module(".module System\n.references ()\n").unwrap();
-        let duplicate = ".module Duplicate\n.references ()\n.function neoCLR.Runtime.WriteLine(String text) -> Void\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.WriteLine(String text) -> noresult\n.methodimpl InternalCall\n.end\n";
+        let duplicate = ".module Duplicate\n.references ()\n.function neoCLR.Runtime.WriteLine(String text) -> Void\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.WriteLine(String text) -> void\n.methodimpl InternalCall\n.end\n";
         let error = read_modules(&[ModuleInput::Source(duplicate)], &system)
             .err()
             .unwrap();

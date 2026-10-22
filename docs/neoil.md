@@ -687,8 +687,10 @@ base/this call validation, partial initialization and managed stfld writes.
 
 `fn<P0,...,R>` describes a shape independently of nominal type declarations.
 Ordered types, readonly/out/outtrue parameter contracts and the return convention
-participate in identity. `fn<Void>` has no inputs and returns inhabited unit;
-`fn<noresult Void>` returns no stack value. Generic components substitute normally.
+participate in identity. `fn<void>` has no inputs and returns no stack value.
+Generic components substitute normally. The obsolete `noresult` spelling is rejected.
+Legacy named-Void result signatures still need migration to the canonical alias
+contract; see [Void migration status](void-semantics.md).
 
 `function.bind fn<...> = Target(...)` creates a checked callable object. Instance
 binding consumes one retained heap receiver; static binding consumes none. Access,

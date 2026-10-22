@@ -268,7 +268,7 @@ const GENERIC_TYPES: &str = r#"
 .implements Read<T>
 .implements Marker<T>
 .field Value T
-.method instance .ctor(T value) -> noresult
+.method instance .ctor(T value) -> void
 ldarg this
 ldarg value
 stfld Cell<T>::Value
@@ -511,7 +511,7 @@ fn serialized_wrapper_composition_loads_without_opt_in() {
 const WRAPPER_METHODS: &str = r#"
 .type class Wrapper<T>
 .field Value T
-.method instance .ctor(T value) -> noresult
+.method instance .ctor(T value) -> void
 ldarg this
 ldarg value
 stfld Wrapper<T>::Value
@@ -522,7 +522,7 @@ ldarg this
 ldfld Wrapper<T>::Value
 ret
 .end
-.method instance Set(T value) -> noresult
+.method instance Set(T value) -> void
 ldarg this
 ldarg value
 stfld Wrapper<T>::Value
@@ -739,7 +739,7 @@ fn substituted_array_storage_uses_checked_reference_vectors() {
     let methods = r#"
 .type class Buffer<T>
 .field Values arrayref<T>
-.method instance .ctor(T value) -> noresult
+.method instance .ctor(T value) -> void
 ldarg this
 ldc.i4 1
 array.reserve T
@@ -1357,7 +1357,7 @@ fn direct_record_union_fields_preserve_copies_on_replacement() {
 fn direct_record_methods_transport_and_replace_union_fields() {
     let p = program(
         ".local Holder value\n.local Holder before\nldc.i4 1\nbox Int32\ncastclass union<Int32,Both>\nnewobj Holder\nstloc value\nldloc value\nstloc before\nldloca value\nldc.i4 41\nbox Int32\ncastclass union<Int32,Both>\ncall instance Holder::Replace(union<Int32,Both>)\nldloca value\ncall instance Holder::Read()\nunbox.any Int32\nldloca before\ncall instance Holder::Read()\nunbox.any Int32\nadd",
-        ".type Holder\n.field Value union<Int32,Both>\n.method instance byref Read() -> union<Int32,Both>\nldarg this\nldfld Holder::Value\nret\n.end\n.method instance byref Replace(union<Int32,Both> value) -> noresult\nldarg this\nldarg value\nstfld Holder::Value\npop\nret\n.end\n.end",
+        ".type Holder\n.field Value union<Int32,Both>\n.method instance byref Read() -> union<Int32,Both>\nldarg this\nldfld Holder::Value\nret\n.end\n.method instance byref Replace(union<Int32,Both> value) -> void\nldarg this\nldarg value\nstfld Holder::Value\npop\nret\n.end\n.end",
     );
     p.verify().unwrap();
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));

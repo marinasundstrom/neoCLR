@@ -90,10 +90,10 @@ fn explicit_collection_cannot_evade_heap_limit() {
 fn service_signatures_are_exact() {
     for (name, args, result) in [
         ("GCCollect", "", "Int32"),
-        ("GCCollect", "Int32", "noresult"),
+        ("GCCollect", "Int32", "void"),
         ("GCCollectionCount", "", "Int32"),
         ("GCHeapObjectLimit", "Int32", "Int64"),
-        ("GCKeepAlive", "Int32", "noresult"),
+        ("GCKeepAlive", "Int32", "void"),
         ("GCKeepAlive", "System.Object", "Int64"),
     ] {
         let module = assemble(&format!(
@@ -113,7 +113,7 @@ fn service_signatures_are_exact() {
 fn construction_and_keep_alive_use_the_same_heap_roots() {
     let extra = r#"
 .type class abstract System.Object
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
 .end
@@ -123,7 +123,7 @@ ret
 .type class Item
 .extends System.Object
 .field Value Int32
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ldarg this
 call instance System.Object::.ctor()
 call neoCLR.Runtime.GCCollect()
@@ -190,10 +190,10 @@ fn no_result_gc_controls_preserve_live_stack_roots_without_pushing_unit() {
 .entry Main
 .type class System.Object
 .end
-.function neoCLR.Runtime.GCCollect() -> noresult
+.function neoCLR.Runtime.GCCollect() -> void
 .methodimpl InternalCall
 .end
-.function neoCLR.Runtime.GCKeepAlive(System.Object value) -> noresult
+.function neoCLR.Runtime.GCKeepAlive(System.Object value) -> void
 .methodimpl InternalCall
 .end
 .function Main() -> Int32

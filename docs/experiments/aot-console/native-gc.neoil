@@ -2,7 +2,7 @@
 .type class Node
 .field Next Node
 .field Text String
-.method instance .ctor(String text) -> noresult
+.method instance .ctor(String text) -> void
 ldarg 0
 ldarg text
 stfld 1
@@ -17,7 +17,7 @@ dup
 stfld 0
 ret
 .end
-.function Garbage() -> noresult
+.function Garbage() -> void
 ldstr "garbage"
 call Make(String)
 pop

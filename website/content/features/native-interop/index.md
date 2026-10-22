@@ -126,3 +126,11 @@ Managed buffers, automatic Ptr<T> wrapper mapping, callbacks, other numeric type
 class-library composition and JIT imports remain future work for this path.
 [Execution contract](/docs/native-interop.html#aot-scalar-imports) ·
 [Tests and reproduction](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/aot-native-imports/README.md)
+
+### Development IL spelling
+
+No-result imports and helpers use `-> void`; no-result function signatures use
+`fn<void>`. The obsolete `noresult` spelling is rejected. This syntax migration
+preserves the existing native call ABI. Completing the same return semantics for
+legacy `Void` and `System.Void` declarations remains open; see the
+[Void contract and migration status](https://github.com/marinasundstrom/neoCLR/blob/main/docs/void-semantics.md).

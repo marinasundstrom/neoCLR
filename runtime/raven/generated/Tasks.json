@@ -185,6 +185,6 @@
     "get_Outcome() -> System.Option<System.Concurrency.Tasks.TaskOutcome<T0>>",
     "GetAwaiter() -> System.Concurrency.Tasks.Task<T0>",
     "GetResult() -> T0",
-    "OnCompleted(fn<Void> callback) -> noresult"
+    "OnCompleted(fn<Void> callback) -> void"
   ]
 }

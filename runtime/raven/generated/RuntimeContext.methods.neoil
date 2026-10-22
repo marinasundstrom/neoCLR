@@ -7,7 +7,7 @@
 .property instance ExecutingAssembly() -> System.Introspection.AssemblyInfo
 .get instance System.Runtime.RuntimeContext::get_ExecutingAssembly()
 .end
-.method private instance .ctor() -> noresult
+.method private instance .ctor() -> void
 M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0

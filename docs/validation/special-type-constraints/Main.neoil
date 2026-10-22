@@ -2,7 +2,7 @@
 .entry Main
 .type class Payload
 .field Number Int32
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ldarg 0
 ldc.i4 40
 stfld Payload::Number
@@ -12,7 +12,7 @@ ret
 .type class ReferenceBox<T>
 .constraint T reference new
 .field Value T
-.method instance .ctor(T value) -> noresult
+.method instance .ctor(T value) -> void
 ldarg 0
 ldarg 1
 stfld ReferenceBox<T>::Value
@@ -22,7 +22,7 @@ ret
 .type class Derived<Unused,T>
 .constraint T reference new
 .extends ReferenceBox<T>
-.method instance .ctor(T value) -> noresult
+.method instance .ctor(T value) -> void
 ldarg 0
 ldarg 1
 call instance ReferenceBox<T>::.ctor(T)

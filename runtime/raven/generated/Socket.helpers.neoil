@@ -198,7 +198,7 @@ ret
 .field private token System.Concurrency.CancellationToken
 .field private registration System.Concurrency.CancellationRegistration
 .field private cancellationWon Boolean
-.method internal instance .ctor(System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>> source,System.Concurrency.CancellationToken token) -> noresult
+.method internal instance .ctor(System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>> source,System.Concurrency.CancellationToken token) -> void
 M0000001d_IL_0000:
 M0000001d_IL_0001:
 ldarg 0
@@ -245,7 +245,7 @@ stfld System.Networking.Sockets.SocketConnectCompletion::cancellationWon
 M0000001d_IL_0030:
 ret
 .end
-.method internal instance Start(String address,Int32 port) -> noresult
+.method internal instance Start(String address,Int32 port) -> void
 .local Value local0
 .local System.Concurrency.CancellationToken local1
 .local System.Concurrency.CancellationToken local2
@@ -389,7 +389,7 @@ M0000001e_IL_00c8:
 M0000001e_IL_00c9:
 ret
 .end
-.method internal instance StartAddresses(System.Collections.Sequence<String> addresses,Int32 port) -> noresult
+.method internal instance StartAddresses(System.Collections.Sequence<String> addresses,Int32 port) -> void
 M0000001f_IL_0000:
 M0000001f_IL_0001:
 M0000001f_IL_0002:
@@ -408,7 +408,7 @@ M0000001f_IL_000c:
 M0000001f_IL_000d:
 ret
 .end
-.method internal instance StartAddressesUntil(System.Collections.Sequence<String> addresses,Int32 port,Int64 deadline) -> noresult
+.method internal instance StartAddressesUntil(System.Collections.Sequence<String> addresses,Int32 port,Int64 deadline) -> void
 .local Int32 local0
 .local arrayref<String> local1
 .local Int32 local2
@@ -727,7 +727,7 @@ M00000020_IL_0199:
 M00000020_IL_019a:
 ret
 .end
-.method internal instance StartAccept(Int64 handle) -> noresult
+.method internal instance StartAccept(Int64 handle) -> void
 .local Value local0
 .local System.Concurrency.CancellationToken local1
 .local System.Concurrency.CancellationToken local2
@@ -869,7 +869,7 @@ M00000021_IL_00c7:
 M00000021_IL_00c8:
 ret
 .end
-.method internal instance RequestCancellation() -> noresult
+.method internal instance RequestCancellation() -> void
 M00000022_IL_0000:
 M00000022_IL_0001:
 M00000022_IL_0002:
@@ -888,7 +888,7 @@ M00000022_IL_0013:
 M00000022_IL_0014:
 ret
 .end
-.method internal instance Complete() -> noresult
+.method internal instance Complete() -> void
 .local System.Concurrency.CancellationRegistration local0
 .local System.Concurrency.CancellationRegistration local1
 .local Value local2
@@ -1055,7 +1055,7 @@ ret
 .field private token System.Concurrency.CancellationToken
 .field private registration System.Concurrency.CancellationRegistration
 .field private cancellationWon Boolean
-.method internal instance .ctor(System.Concurrency.Tasks.Promise<System.Result<Int32,System.Networking.Sockets.SocketError>> source,System.Concurrency.CancellationToken token) -> noresult
+.method internal instance .ctor(System.Concurrency.Tasks.Promise<System.Result<Int32,System.Networking.Sockets.SocketError>> source,System.Concurrency.CancellationToken token) -> void
 M00000024_IL_0000:
 M00000024_IL_0001:
 ldarg 0
@@ -1102,7 +1102,7 @@ stfld System.Networking.Sockets.SocketTransferCompletion::cancellationWon
 M00000024_IL_0030:
 ret
 .end
-.method internal instance StartReceive(Int64 handle,arrayref<Byte> buffer,Int32 offset,Int32 count) -> noresult
+.method internal instance StartReceive(Int64 handle,arrayref<Byte> buffer,Int32 offset,Int32 count) -> void
 M00000025_IL_0000:
 M00000025_IL_0001:
 M00000025_IL_0002:
@@ -1125,7 +1125,7 @@ M00000025_IL_000f:
 M00000025_IL_0010:
 ret
 .end
-.method internal instance StartReceiveUntil(Int64 handle,arrayref<Byte> buffer,Int32 offset,Int32 count,Int64 deadline) -> noresult
+.method internal instance StartReceiveUntil(Int64 handle,arrayref<Byte> buffer,Int32 offset,Int32 count,Int64 deadline) -> void
 .local Value local0
 .local System.Concurrency.CancellationToken local1
 .local Value local2
@@ -1313,7 +1313,7 @@ M00000026_IL_00f9:
 M00000026_IL_00fa:
 ret
 .end
-.method internal instance StartSend(Int64 handle,arrayref<Byte> buffer,Int32 offset,Int32 count) -> noresult
+.method internal instance StartSend(Int64 handle,arrayref<Byte> buffer,Int32 offset,Int32 count) -> void
 M00000027_IL_0000:
 M00000027_IL_0001:
 M00000027_IL_0002:
@@ -1336,7 +1336,7 @@ M00000027_IL_000f:
 M00000027_IL_0010:
 ret
 .end
-.method internal instance StartSendUntil(Int64 handle,arrayref<Byte> buffer,Int32 offset,Int32 count,Int64 deadline) -> noresult
+.method internal instance StartSendUntil(Int64 handle,arrayref<Byte> buffer,Int32 offset,Int32 count,Int64 deadline) -> void
 .local Value local0
 .local System.Concurrency.CancellationToken local1
 .local Value local2
@@ -1524,7 +1524,7 @@ M00000028_IL_00f9:
 M00000028_IL_00fa:
 ret
 .end
-.method internal instance RequestCancellation() -> noresult
+.method internal instance RequestCancellation() -> void
 M00000029_IL_0000:
 M00000029_IL_0001:
 M00000029_IL_0002:
@@ -1543,7 +1543,7 @@ M00000029_IL_0013:
 M00000029_IL_0014:
 ret
 .end
-.method internal instance Complete() -> noresult
+.method internal instance Complete() -> void
 .local System.Concurrency.CancellationRegistration local0
 .local System.Concurrency.CancellationRegistration local1
 .local Value local2

@@ -17,7 +17,7 @@
 .property instance MaxYear() -> Int32
 .get instance System.Time.Calendar::get_MaxYear()
 .end
-.method private instance .ctor(neoCLR.Library.System.Time.Calendar.Type_53797374656D2E54696D652E43616C656E64617252756C6573 rules) -> noresult
+.method private instance .ctor(neoCLR.Library.System.Time.Calendar.Type_53797374656D2E54696D652E43616C656E64617252756C6573 rules) -> void
 M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0

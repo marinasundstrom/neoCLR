@@ -4,7 +4,7 @@
 .property instance Now() -> System.Time.Instant
 .get instance System.Time.SystemClock::get_Now()
 .end
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0

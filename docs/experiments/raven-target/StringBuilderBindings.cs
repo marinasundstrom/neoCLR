@@ -28,8 +28,8 @@ static class StringBuilderBindings
         if (Type(reference.DeclaringType) is null) return null;
         var (args, result) = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type);
         var expected = reference.Name switch {
-            ".ctor" when args.Length == 0 => ("", "noresult"),
-            ".ctor" => ("Int32", "noresult"),
+            ".ctor" when args.Length == 0 => ("", "void"),
+            ".ctor" => ("Int32", "void"),
             "get_Utf8ByteCount" or "get_MaxUtf8Bytes" => ("", "Int32"),
             "AppendLine" when args.Length == 0 => ("", Name),
             "Append" or "AppendLine" => ("String", Name),

@@ -96,7 +96,7 @@ def main():
         if seed_text.count(declaration) != 1:
             raise ValueError('Expected exactly one retained declaration: ' + name)
         seed_text = seed_text.replace(declaration, '')
-    marker = '.type class System.ParamArrayAttribute\n.method instance .ctor() -> noresult\nret\n.end\n.end\n'
+    marker = '.type class System.ParamArrayAttribute\n.method instance .ctor() -> void\nret\n.end\n.end\n'
     if 'System.ParamArrayAttribute' in ownership['libraries'][0]['types']:
         if seed_text.count(marker) != 1:
             raise ValueError('Expected exactly one retained parameter-array marker')
@@ -106,7 +106,7 @@ def main():
     for name in ('GetDefaultTaskQueue', 'GetCurrentTaskQueue', 'RegisterTaskQueue'):
         register = name == 'RegisterTaskQueue'
         parameters = 'T queue' if register else ''
-        result = 'noresult' if register else 'T'
+        result = 'void' if register else 'T'
         body = ('ldarg queue\n' if register else '') + f'call neoCLR.Runtime.{name}<T>({"T" if register else ""})\n'
         body += ('pop\n' if register else '') + 'ret\n'
         facade = f'.method static {name}<T>({parameters}) -> {result}\n{body}.end\n'

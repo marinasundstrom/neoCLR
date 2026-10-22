@@ -85,7 +85,7 @@ static class GenericUnionBindings
             "Concurrency.Tasks.TaskOutcome" => new[] { Register("Concurrency.Tasks.TaskOutcome.Completed", shape.Args[0]), Register("Concurrency.Tasks.TaskOutcome.Cancelled") },
             "Option.None" or "Concurrency.Tasks.TaskOutcome.Cancelled" => Array.Empty<string>(), _ => new[] { shape.Args[0] }
         };
-        if (result != "noresult" || (shape.Kind is "Option.None" or "Concurrency.Tasks.TaskOutcome.Cancelled" ? args.Length != 0 : args.Length != 1 || !allowed.Contains(args[0])))
+        if (result != "void" || (shape.Kind is "Option.None" or "Concurrency.Tasks.TaskOutcome.Cancelled" ? args.Length != 0 : args.Length != 1 || !allowed.Contains(args[0])))
             throw new InvalidDataException("Unsupported union constructor.");
         return Helper(shape, ".ctor", args, owner, false, false, construct: true);
     }
@@ -98,7 +98,7 @@ static class GenericUnionBindings
         if (definition.IsVirtual && !definition.IsFinal && reference.Name != "ToString") throw new InvalidDataException("Unexpected union virtual method.");
         if (shape.Kind is "Result.Ok" or "Result.Error" or "Option.Some" or "Concurrency.Tasks.TaskOutcome.Completed")
         {
-            if (reference.HasThis && name == "Deconstruct" && result == "noresult"
+            if (reference.HasThis && name == "Deconstruct" && result == "void"
                 && args.SequenceEqual(new[] { shape.Args[0] + "&" }) && definition.Parameters[0].IsOut)
             {
                 var key = owner + ":Deconstruct";
@@ -109,9 +109,9 @@ static class GenericUnionBindings
                     helper = (helperName, body);
                     Helpers.Add(key, helper);
                 }
-                return new(helper.Name, [owner + "&", shape.Args[0] + "&"], "noresult", 1);
+                return new(helper.Name, [owner + "&", shape.Args[0] + "&"], "void", 1);
             }
-            if (reference.HasThis && name == "set_Value" && args.SequenceEqual(new[] { shape.Args[0] }) && result == "noresult")
+            if (reference.HasThis && name == "set_Value" && args.SequenceEqual(new[] { shape.Args[0] }) && result == "void")
                 return Helper(shape, name, args, result, true, true);
             if (reference.HasThis && name == "get_Value" && args.Length == 0 && result == shape.Args[0])
                 return Helper(shape, name, args, result, true, true);

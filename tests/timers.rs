@@ -6,22 +6,22 @@ fn program(setup: &str, body: &str) -> LoadedProgram {
         r#".module TimerConsumer
 .entry Main
 .type class System.Concurrency.Tasks.TaskQueue
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
-.method instance Post(fn<Void> callback) -> noresult
+.method instance Post(fn<Void> callback) -> void
 ldarg 1
 call instance fn<Void>::Invoke()
 pop
 ret
 .end
-.method instance Drain() -> noresult
+.method instance Drain() -> void
 ret
 .end
 .end
 .type class Counter
 .field Value Int32
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
 .method instance Complete() -> Void

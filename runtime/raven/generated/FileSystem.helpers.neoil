@@ -443,7 +443,7 @@ ret
 .property instance Name() -> String
 .get instance neoCLR.Library.System.Storage.FileSystem.Type_53797374656D2E53746F726167652E4C6F63616C46696C65::get_Name()
 .end
-.method instance .ctor(System.Storage.Path path,String nativePath) -> noresult
+.method instance .ctor(System.Storage.Path path,String nativePath) -> void
 M00000006_IL_0000:
 M00000006_IL_0001:
 ldarg 0
@@ -780,7 +780,7 @@ ret
 .property instance Name() -> String
 .get instance neoCLR.Library.System.Storage.FileSystem.Type_53797374656D2E53746F726167652E4C6F63616C4469726563746F7279::get_Name()
 .end
-.method instance .ctor(System.Storage.FileSystem provider,System.Storage.Path path,String nativePath) -> noresult
+.method instance .ctor(System.Storage.FileSystem provider,System.Storage.Path path,String nativePath) -> void
 M00000007_IL_0000:
 M00000007_IL_0001:
 ldarg 0

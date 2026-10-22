@@ -16,7 +16,7 @@
 .property instance Keys() -> System.Collections.Sequence<T0>
 .get instance System.Collections.HashMap<T0,T1>::get_Keys()
 .end
-.method instance .ctor(fn<T0,T0,Boolean> equal,fn<T0,Int32> hash) -> noresult
+.method instance .ctor(fn<T0,T0,Boolean> equal,fn<T0,Int32> hash) -> void
 M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0
@@ -110,7 +110,7 @@ stfld System.Collections.HashMap<T0,T1>::busy
 M00000001_IL_0066:
 ret
 .end
-.method instance .ctor(System.Collections.EqualityComparer<T0> comparer) -> noresult
+.method instance .ctor(System.Collections.EqualityComparer<T0> comparer) -> void
 M00000002_IL_0000:
 M00000002_IL_0001:
 ldarg 0
@@ -223,7 +223,7 @@ callvirt instance System.Collections.ArrayList<T0>::Copy()
 M00000004_IL_000d:
 ret
 .end
-.method private instance Enter() -> noresult
+.method private instance Enter() -> void
 M00000005_IL_0000:
 M00000005_IL_0001:
 M00000005_IL_0002:
@@ -254,7 +254,7 @@ M00000005_IL_0026:
 M00000005_IL_0027:
 ret
 .end
-.method private instance Leave() -> noresult
+.method private instance Leave() -> void
 M00000006_IL_0000:
 M00000006_IL_0001:
 M00000006_IL_0002:
@@ -518,7 +518,7 @@ M0000000a_IL_0025:
 call neoCLR.Library.System.Collections.HashMap.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method private instance Grow() -> noresult
+.method private instance Grow() -> void
 .local Int32 local0
 .local arrayref<Int32> local1
 .local Int32 local2
@@ -727,7 +727,7 @@ M0000000b_IL_00d3:
 M0000000b_IL_00d4:
 ret
 .end
-.method private instance Append(T0 key,T1 value,Int32 hash) -> noresult
+.method private instance Append(T0 key,T1 value,Int32 hash) -> void
 .local Int32 local0
 ldc.i4 0
 stloc local0
@@ -893,7 +893,7 @@ M0000000d_IL_0048:
 call neoCLR.Library.System.Collections.HashMap.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance Set(T0 key,T1 value) -> noresult
+.method instance Set(T0 key,T1 value) -> void
 .local Int32 local0
 .local Int32 local1
 ldc.i4 0

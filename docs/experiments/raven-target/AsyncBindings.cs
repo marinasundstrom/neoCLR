@@ -41,17 +41,17 @@ static class AsyncBindings
         var state = Prefix + "AsyncStateMachine";
         var payload = reference.DeclaringType is GenericInstanceType g ? GenericUnionBindings.Type(g.GenericArguments[0]) : null;
         var expected = definition.Name switch {
-            ".ctor" => ("System.Concurrency.Tasks.TaskQueue", "noresult"),
+            ".ctor" => ("System.Concurrency.Tasks.TaskQueue", "void"),
             "Create" => ("", owner),
             "get_Task" => ("", "System.Concurrency.Tasks.Task<" + payload + ">"),
-            "SetCancelled" => ("", "noresult"),
-            "SetResult" => (payload!, "noresult"),
-            "Start" or "SetStateMachine" => (state, "noresult"),
+            "SetCancelled" => ("", "void"),
+            "SetResult" => (payload!, "void"),
+            "Start" or "SetStateMachine" => (state, "void"),
             "HasStateMachine" => ("", "Boolean"),
             "GetStateMachine" => ("", state),
-            "AwaitOnCompleted" => (Prefix + "TaskAwaiter," + state, "noresult"),
-            "MoveNext" => ("", "noresult"),
-            "OnCompleted" => ("fn<Void>", "noresult"),
+            "AwaitOnCompleted" => (Prefix + "TaskAwaiter," + state, "void"),
+            "MoveNext" => ("", "void"),
+            "OnCompleted" => ("fn<Void>", "void"),
             _ => throw new InvalidDataException("Unsupported async member: " + definition.FullName)
         };
         if (string.Join(',', args) != expected.Item1 || result != expected.Item2)
@@ -100,7 +100,7 @@ static class AsyncBindings
         if (start)
         {
             var load = stateDefinition.IsValueType ? "" : "ldobj " + state + "\n";
-            return new([owner, state + "&"], "noresult", load + $"call instance {state}::MoveNext()\npop");
+            return new([owner, state + "&"], "void", load + $"call instance {state}::MoveNext()\npop");
         }
         var awaiter = map(generic.GenericArguments[0]);
         if (!awaiter.StartsWith("System.Concurrency.Tasks.Task<"))
@@ -131,6 +131,6 @@ ldloc {id}_builder
 call instance {owner}::GetStateMachine()
 call instance {owner}::AwaitOnCompleted({Prefix}TaskAwaiter,{machine})
 """;
-        return new([owner, awaiter + "&", state + "&"], "noresult", body);
+        return new([owner, awaiter + "&", state + "&"], "void", body);
     }
 }

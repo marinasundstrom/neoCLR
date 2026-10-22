@@ -274,7 +274,7 @@ static class SignatureProbe
         TypeReference deep = module.TypeSystem.Int32;
         for (var n = 0; n < 34; n++) deep = new ArrayType(deep);
         Reject("Nesting limit", () => RuntimeSignatures.Close(deep, owner));
-        Check("CLI VOID return has no result", RuntimeSignatures.Map(module.TypeSystem.Void, _ => null, returns: true) == "noresult");
+        Check("CLI VOID return has no result", RuntimeSignatures.Map(module.TypeSystem.Void, _ => null, returns: true) == "void");
         var namedVoid = new TypeReference("System", "Void", module, module, true);
         Check("Named Void storage is a type", RuntimeSignatures.Map(namedVoid, _ => null) == "Void");
         Check("Named Void value return is a type", RuntimeSignatures.Map(namedVoid, _ => null, returns: true) == "Void");
@@ -523,7 +523,7 @@ static class SignatureProbe
         }
         var baseSetter = module.GetType("System.Web.Http.HttpClient").Methods.Single(m => m.Name == "set_BaseUri");
         Check("HTTP optional string base setter", HttpBindings.Bind(baseSetter, baseSetter, false, false)
-            is { Arguments: ["System.Web.Http.HttpClient", "System.Option<String>"], Result: "noresult" });
+            is { Arguments: ["System.Web.Http.HttpClient", "System.Option<String>"], Result: "void" });
         var baseArgument = baseSetter.Parameters[0].ParameterType;
         baseSetter.Parameters[0].ParameterType = module.TypeSystem.String;
         Reject("HTTP base setter rejects plain string signature", () => HttpBindings.Bind(baseSetter, baseSetter, false, false));

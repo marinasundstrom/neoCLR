@@ -2,7 +2,7 @@
 .entry Main
 .type class Counter
 .field Age Int32
-.method instance .ctor(Int32 age) -> noresult
+.method instance .ctor(Int32 age) -> void
     ldarg this
     ldarg age
     stfld Counter::Age
@@ -14,7 +14,7 @@
     ret
 .end
 .end
-.function Main() -> noresult
+.function Main() -> void
     ldc.i4 42
     newobj instance Counter::.ctor(Int32)
     call instance Counter::Get()

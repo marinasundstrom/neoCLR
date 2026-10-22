@@ -52,7 +52,7 @@ future stable native metadata/hosting ABI.
 `--bind-user-fault` requires `--compile-system` and explicit runtime context. It also
 enables fault details. After original-scope verification, it binds only exact admitted
 InternalCall contracts: legacy `System`'s `neoCLR.Runtime.Fault(String) -> Void`, or the
-source-owned `neoCLR.Runtime.Fail(String) -> noresult` in an explicitly supplied module.
+source-owned `neoCLR.Runtime.Fail(String) -> void` in an explicitly supplied module.
 The source-owned contract is recognized by the existing runtime too. Managed wrappers
 remain selected and compiled normally; managed functions with matching names are not
 substituted. Binding reports retain original module/revision/member IDs. Private names

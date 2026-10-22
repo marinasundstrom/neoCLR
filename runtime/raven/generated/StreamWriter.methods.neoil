@@ -9,7 +9,7 @@
 .field private finished Boolean
 .field private failed Boolean
 .field private finishing Boolean
-.method instance .ctor(System.IO.OutputStream output) -> noresult
+.method instance .ctor(System.IO.OutputStream output) -> void
 M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0
@@ -74,7 +74,7 @@ stfld System.IO.StreamWriter::leaveOpen
 M00000001_IL_0048:
 ret
 .end
-.method instance .ctor(System.IO.OutputStream output,Boolean leaveOpen) -> noresult
+.method instance .ctor(System.IO.OutputStream output,Boolean leaveOpen) -> void
 M00000002_IL_0000:
 M00000002_IL_0001:
 ldarg 0
@@ -140,7 +140,7 @@ stfld System.IO.StreamWriter::leaveOpen
 M00000002_IL_0048:
 ret
 .end
-.method instance .ctor(System.IO.OutputStream output,System.Text.Encoding encoding) -> noresult
+.method instance .ctor(System.IO.OutputStream output,System.Text.Encoding encoding) -> void
 M00000003_IL_0000:
 M00000003_IL_0001:
 ldarg 0
@@ -205,7 +205,7 @@ stfld System.IO.StreamWriter::leaveOpen
 M00000003_IL_0044:
 ret
 .end
-.method instance .ctor(System.IO.OutputStream output,System.Text.Encoding encoding,Boolean leaveOpen) -> noresult
+.method instance .ctor(System.IO.OutputStream output,System.Text.Encoding encoding,Boolean leaveOpen) -> void
 M00000004_IL_0000:
 M00000004_IL_0001:
 ldarg 0
@@ -1566,7 +1566,7 @@ callvirt instance System.IO.OutputStream::Flush()
 M00000009_IL_0034:
 ret
 .end
-.method instance Close() -> noresult
+.method instance Close() -> void
 M0000000a_IL_0000:
 M0000000a_IL_0001:
 M0000000a_IL_0002:

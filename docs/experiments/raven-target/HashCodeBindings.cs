@@ -15,12 +15,12 @@ static class HashCodeBindings
         if (Type(reference.DeclaringType) is null) return null;
         var (args, result) = RuntimeSignatures.Match(reference, definition, Type);
         var valid = reference.HasThis
-            ? reference.Name == "Add" && args.Length == 1 && args[0] is "Int32" or "String" && result == "noresult"
+            ? reference.Name == "Add" && args.Length == 1 && args[0] is "Int32" or "String" && result == "void"
                 || reference.Name == "ToHashCode" && args.Length == 0 && result == "Int32"
             : reference.Name == "Combine" && args.SequenceEqual(new[] { "Int32", "Int32" }) && result == "Int32";
         if (!valid || definition.IsVirtual) throw new InvalidDataException("Unsupported HashCode member: " + reference.FullName);
         var inputs = reference.HasThis ? new[] { Owner + "&" }.Concat(args).ToArray() : args;
-        return new("", inputs, result, Instruction: $"call {(reference.HasThis ? "instance " : "")}{Owner}::{reference.Name}({string.Join(',', args)})" + (result == "noresult" ? "\npop" : ""));
+        return new("", inputs, result, Instruction: $"call {(reference.HasThis ? "instance " : "")}{Owner}::{reference.Name}({string.Join(',', args)})" + (result == "void" ? "\npop" : ""));
     }
     public const string ConstructorAdapter = ".function RuntimeNewHashCode() -> System.HashCode\nnewobj instance System.HashCode::.ctor()\nret\n.end\n";
 }

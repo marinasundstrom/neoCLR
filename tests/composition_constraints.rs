@@ -157,7 +157,7 @@ fn generic_bodies_use_only_interfaces_guaranteed_by_structural_bounds() {
 .sealed
 .implements A
 .implements B
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
 .method instance ReadA() -> Int32

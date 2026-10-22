@@ -7,7 +7,7 @@ fn program(callback_body: &str) -> LoadedProgram {
 .entry Main
 .type class Counter
 .field Value Int32
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
 .method instance Complete() -> Void
@@ -22,7 +22,7 @@ ret
 .function neoCLR.Runtime.DrainEntryTasks() -> Void
 .methodimpl InternalCall
 .end
-.function neoCLR.Runtime.GCCollect() -> noresult
+.function neoCLR.Runtime.GCCollect() -> void
 .methodimpl InternalCall
 .end
 .function Main() -> Int32

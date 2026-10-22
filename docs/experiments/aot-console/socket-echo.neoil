@@ -4,7 +4,7 @@
 .field Socket Int64
 .field Buffer arrayref<Byte>
 .field Phase Int32
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
 .method instance Complete() -> Void

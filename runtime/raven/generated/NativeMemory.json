@@ -180,6 +180,6 @@
   "exports": [
     "Alloc(UIntPtr byteCount) -> Void*",
     "Alloc(UIntPtr elementCount,UIntPtr elementSize) -> Void*",
-    "Free(Void* pointer) -> noresult"
+    "Free(Void* pointer) -> void"
   ]
 }

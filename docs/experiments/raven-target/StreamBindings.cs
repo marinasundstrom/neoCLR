@@ -83,7 +83,7 @@ static class StreamBindings
             (Prefix + "SeekableStream", "GetPosition") => ("", "System.Result<Int64,System.IO.StreamError>"),
             (Prefix + "SeekableStream", "Seek") => ("Int64", "System.Result<Int64,System.IO.StreamError>"),
             (Prefix + "OutputStream", "Flush") => ("", "System.Result<Void,System.IO.StreamError>"),
-            (_, "Close") => ("", "noresult"),
+            (_, "Close") => ("", "void"),
             _ => throw new InvalidDataException("Unsupported stream capability member.")
         };
         if (!definition.DeclaringType.IsInterface || definition.DeclaringType.HasGenericParameters
@@ -116,13 +116,13 @@ static class StreamBindings
         var (args, result) = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type);
         if (owner == Prefix + "MemoryStream") {
             var expectedMemory = reference.Name switch {
-                ".ctor" => ("", "noresult", false),
+                ".ctor" => ("", "void", false),
                 "Read" or "Write" => ("arrayref<Byte>,Int32,Int32", "System.Result<Int32,System.IO.StreamError>", true),
                 "GetLength" => ("", "System.Result<Int64,System.IO.StreamError>", false),
                 "GetPosition" => ("", "System.Result<Int64,System.IO.StreamError>", true),
                 "Seek" => ("Int64", "System.Result<Int64,System.IO.StreamError>", true),
                 "Flush" => ("", "System.Result<Void,System.IO.StreamError>", true),
-                "Close" => ("", "noresult", true),
+                "Close" => ("", "void", true),
                 _ => throw new InvalidDataException("Unsupported memory stream member.")
             };
             if (!definition.IsPublic || definition.IsStatic || definition.HasGenericParameters
@@ -142,7 +142,7 @@ static class StreamBindings
             (Prefix + "FileInputStream", "GetPosition") => ("", "System.Result<Int64,System.IO.StreamError>", false),
             (Prefix + "FileInputStream", "Seek") => ("Int64", "System.Result<Int64,System.IO.StreamError>", false),
             (Prefix + "FileOutputStream", "Flush") => ("", "System.Result<Void,System.IO.StreamError>", false),
-            (_, "Close") => ("", "noresult", false),
+            (_, "Close") => ("", "void", false),
             _ => throw new InvalidDataException("Unsupported file stream member.")
         };
         if (construct || definition.IsConstructor || definition.IsStatic != expected.Item3

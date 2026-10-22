@@ -306,7 +306,7 @@ ret
 .property instance Next() -> System.Concurrency.CancellationRegistration
 .get instance System.Concurrency.CancellationRegistration::get_Next()
 .end
-.method internal instance .ctor(System.Concurrency.CancellationTokenSource owner,System.Option<fn<Void>> callback,System.Concurrency.CancellationRegistration next) -> noresult
+.method internal instance .ctor(System.Concurrency.CancellationTokenSource owner,System.Option<fn<Void>> callback,System.Concurrency.CancellationRegistration next) -> void
 M0000000f_IL_0000:
 M0000000f_IL_0001:
 ldarg 0
@@ -346,7 +346,7 @@ ldfld System.Concurrency.CancellationRegistration::next
 M00000010_IL_0008:
 ret
 .end
-.method internal instance SetNext(System.Concurrency.CancellationRegistration value) -> noresult
+.method internal instance SetNext(System.Concurrency.CancellationRegistration value) -> void
 M00000011_IL_0000:
 M00000011_IL_0001:
 M00000011_IL_0002:
@@ -384,7 +384,7 @@ ldloc local0
 M00000012_IL_0013:
 ret
 .end
-.method internal instance Invoke() -> noresult
+.method internal instance Invoke() -> void
 .local System.Option<fn<Void>> local0
 .local System.Concurrency.CancellationTokenSource local1
 .local System.Concurrency.CancellationTokenSource local2
@@ -506,7 +506,7 @@ M00000013_IL_0090:
 M00000013_IL_0091:
 ret
 .end
-.method instance Dispose() -> noresult
+.method instance Dispose() -> void
 .local System.Concurrency.CancellationTokenSource local0
 .local System.Concurrency.CancellationTokenSource local1
 ldloca local0

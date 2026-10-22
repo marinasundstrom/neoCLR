@@ -1,6 +1,6 @@
 use neoclr::{Limits, Value, assemble, run};
 fn services() -> String {
-    let mut s=".type class abstract System.Object\n.method instance .ctor() -> noresult\nret\n.end\n.end\n".to_string();
+    let mut s=".type class abstract System.Object\n.method instance .ctor() -> void\nret\n.end\n.end\n".to_string();
     for name in [
         "ConstructArgs",
         "Invoke",
@@ -22,7 +22,7 @@ const MODEL: &str = r#"
 .type class Model
 .extends System.Object
 .field N Int32
-.method instance .ctor(Int32 value) -> noresult
+.method instance .ctor(Int32 value) -> void
 ldarg this
 call instance System.Object::.ctor()
 ldarg this
@@ -130,12 +130,12 @@ fn constructor_matching_rejects_ambiguous_reference_arguments() {
     let model = r#"
 .type class Model
 .extends System.Object
-.method instance .ctor(System.Object value) -> noresult
+.method instance .ctor(System.Object value) -> void
 ldarg this
 call instance System.Object::.ctor()
 ret
 .end
-.method instance .ctor(Model value) -> noresult
+.method instance .ctor(Model value) -> void
 ldarg this
 call instance System.Object::.ctor()
 ret

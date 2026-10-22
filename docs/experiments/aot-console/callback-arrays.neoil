@@ -1,7 +1,7 @@
 .module Callbacks
 .type class Counter
 .field Number Int32
-.method instance .ctor(Int32 number) -> noresult
+.method instance .ctor(Int32 number) -> void
 ldarg 0
 ldarg number
 stfld Counter::Number
@@ -21,7 +21,7 @@ ret
 .end
 .type class Holder
 .field Callback fn<Int32,Int32>
-.method instance .ctor(fn<Int32,Int32> callback) -> noresult
+.method instance .ctor(fn<Int32,Int32> callback) -> void
 ldarg 0
 ldarg callback
 stfld Holder::Callback
@@ -51,7 +51,7 @@ ldc.i4 42
 newobj.ctor instance Counter::.ctor(Int32)
 ret
 .end
-.function Empty() -> noresult
+.function Empty() -> void
 ret
 .end
 .function Unit() -> Void

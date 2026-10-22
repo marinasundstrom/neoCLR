@@ -13,7 +13,7 @@
 .property instance Calendar() -> System.Time.Calendar
 .get instance System.Globalization.DateTimeFormat::get_Calendar()
 .end
-.method private instance .ctor(System.Globalization.Culture culture,System.Time.Calendar calendar) -> noresult
+.method private instance .ctor(System.Globalization.Culture culture,System.Time.Calendar calendar) -> void
 M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0

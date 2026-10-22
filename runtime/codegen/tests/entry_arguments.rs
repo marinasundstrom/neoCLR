@@ -102,7 +102,7 @@ fn entry_copies_arguments_rejects_invalid_text_and_preserves_output_on_failure()
             0,
         ),
         (
-            ".module EntryArgs\n.function Calculate(arrayref<String>) -> noresult\nret\n.end\n",
+            ".module EntryArgs\n.function Calculate(arrayref<String>) -> void\nret\n.end\n",
             0,
         ),
     ] {

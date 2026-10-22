@@ -8,7 +8,7 @@ fn owner(argument: Type) -> Type {
     }
 }
 fn fixture(field_type: Type) -> neoclr::Module {
-    let mut module = assemble(".module StaticStorage\n.entry Main\n.type class Cache<T>\n.end\n.type class Item\n.field Number Int32\n.method instance .ctor() -> noresult\nret\n.end\n.end\n.function Main() -> Int32\nldc.i4 0\nret\n.end").unwrap();
+    let mut module = assemble(".module StaticStorage\n.entry Main\n.type class Cache<T>\n.end\n.type class Item\n.field Number Int32\n.method instance .ctor() -> void\nret\n.end\n.end\n.function Main() -> Int32\nldc.i4 0\nret\n.end").unwrap();
     module.types[0].static_fields.push(StaticField {
         name: "Value".into(),
         ty: field_type,

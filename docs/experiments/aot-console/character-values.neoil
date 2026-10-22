@@ -9,7 +9,7 @@ starg original
 ldarg original
 ret
 .end
-.function CopyInto(Char[] source, out Char[]& target) -> noresult
+.function CopyInto(Char[] source, out Char[]& target) -> void
 ldarg target
 ldarg source
 stobj Char[]

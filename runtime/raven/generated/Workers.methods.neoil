@@ -12,7 +12,7 @@
 .property instance IsStarted() -> Boolean
 .get instance System.Concurrency.Thread::get_IsStarted()
 .end
-.method instance .ctor(fn<String,String> callback,String input) -> noresult
+.method instance .ctor(fn<String,String> callback,String input) -> void
 M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0
@@ -80,7 +80,7 @@ M00000003_IL_0008:
 call neoCLR.Library.System.Concurrency.Thread.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance Start() -> noresult
+.method instance Start() -> void
 .local Int32 local0
 .local System.Concurrency.WorkerCompletion local1
 ldc.i4 0

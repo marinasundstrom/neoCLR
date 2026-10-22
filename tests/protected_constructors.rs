@@ -1,7 +1,7 @@
 use neoclr::{Limits, LoadedProgram, Value, assembler::assemble_modules, metadata_container};
 
-const BASE: &str = ".module Models\n.revision r1\n.type class abstract Base\n.field Value Int32\n.method protected instance .ctor(Int32 value) -> noresult\nldarg this\nldarg value\nstfld Base::Value\nret\n.end\n.end";
-const CHILD: &str = ".module Children\n.references (Models#r1)\n.type class Child\n.extends Base\n.method instance .ctor() -> noresult\nldarg this\nldc.i4 42\ncall instance Base::.ctor(Int32)\nret\n.end\n.end";
+const BASE: &str = ".module Models\n.revision r1\n.type class abstract Base\n.field Value Int32\n.method protected instance .ctor(Int32 value) -> void\nldarg this\nldarg value\nstfld Base::Value\nret\n.end\n.end";
+const CHILD: &str = ".module Children\n.references (Models#r1)\n.type class Child\n.extends Base\n.method instance .ctor() -> void\nldarg this\nldc.i4 42\ncall instance Base::.ctor(Int32)\nret\n.end\n.end";
 const APP: &str = ".module App\n.references (Models#r1,Children)\n.entry Main\n.function Main() -> Int32\nnewobj instance Child::.ctor()\nldfld Base::Value\nret\n.end";
 
 #[test]
@@ -83,7 +83,7 @@ fn open_local_branch_of_closed_family_remains_extensible() {
     let root = BASE.replace(".field Value", ".closedhierarchy\n.field Value");
     let child_definition = CHILD.split_once(".type").unwrap().1;
     let local = format!("{root}\n.type{child_definition}");
-    let leaf = ".module Leaves\n.references (Models#r1)\n.type class Leaf\n.extends Child\n.method instance .ctor() -> noresult\nldarg this\ncall instance Child::.ctor()\nret\n.end\n.end";
+    let leaf = ".module Leaves\n.references (Models#r1)\n.type class Leaf\n.extends Child\n.method instance .ctor() -> void\nldarg this\ncall instance Child::.ctor()\nret\n.end\n.end";
     let app = APP
         .replace("Models#r1,Children", "Models#r1,Leaves")
         .replace("newobj instance Child", "newobj instance Leaf");

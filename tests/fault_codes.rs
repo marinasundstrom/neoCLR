@@ -195,7 +195,7 @@ fn symbolic_code_serialization_is_stable_and_has_no_numeric_ordinal_contract() {
 #[test]
 fn source_fail_and_legacy_fault_are_both_terminal() {
     use neoclr::assembler::parse_function_ref;
-    for (name, result, discard) in [("Fail", "noresult", ""), ("Fault", "Void", "pop")] {
+    for (name, result, discard) in [("Fail", "void", ""), ("Fault", "Void", "pop")] {
         let module = assemble(&format!(
             ".module System\n.function neoCLR.Runtime.{name}(String message) -> {result}\n.methodimpl InternalCall\n.end\n.function Stop() -> Int32\nldstr \"source failure\"\ncall neoCLR.Runtime.{name}(String)\n{discard}\nldc.i4 42\nret\n.end"
         )).unwrap();

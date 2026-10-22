@@ -7,7 +7,7 @@ fn implicit_object_slots_dispatch_to_reference_class_and_inherited_override() {
 .references (System)
 .entry Main
 .type class Root
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
 .method instance override ToString() -> String
@@ -25,7 +25,7 @@ ret
 .end
 .type class Leaf
 .extends Root
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ldarg this
 call instance Root::.ctor()
 ret

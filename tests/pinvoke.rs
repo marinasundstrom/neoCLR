@@ -87,7 +87,7 @@ fn native_no_result_call_preserves_the_callers_stack() {
     let module = assemble(&format!(
         r#".module Test
 .entry Main
-.function Imported(Int32*,Int32) -> noresult
+.function Imported(Int32*,Int32) -> void
 .pinvoke {} "neoclr_set_i32" cdecl
 .end
 .function Main() -> Int32
@@ -844,12 +844,12 @@ fn callback_can_have_a_no_result_signature() {
     let fixture = Fixture::new();
     let module = callback_module(
         &fixture,
-        "fn<noresult Void>",
+        "fn<void>",
         "Int32",
         "neoclr_callback_void",
         r#"{"calling_convention":"Cdecl"}"#,
-        "function.bind fn<noresult Void> = Notify()",
-        ".function Notify() -> noresult\nret\n.end",
+        "function.bind fn<void> = Notify()",
+        ".function Notify() -> void\nret\n.end",
     );
     assert_eq!(fixture.execute(&module).unwrap().value, Value::Int32(42));
 }

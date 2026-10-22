@@ -178,7 +178,7 @@
   "compilerSha256": "6ba4e92a38dc594d7c3da219dc63862262e215e0b28976ada52974b0e13e3d0c",
   "coreSha256": "a29679dbca2677df8e10f3e542059a579da3043e428d757e78e3c29233c8cfb3",
   "exports": [
-    ".ctor() -> noresult",
+    ".ctor() -> void",
     "GetType() -> System.Introspection.TypeInfo",
     "virtual ToString() -> String",
     "virtual Equals(System.Object other) -> Boolean",

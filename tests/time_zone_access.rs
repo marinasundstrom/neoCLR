@@ -11,7 +11,7 @@ fn zone_and_offset_storage_cannot_be_forged_by_guest_il() {
         ".local System.Time.TimeOffset value\nldloca value\ninitobj System.Time.TimeOffset\nldloc value\nldc.i4 999999\nstfld System.Time.TimeOffset::StoredSeconds\npop",
     ] {
         let source =
-            format!(".module ForgedTime\n.function Main() -> noresult\n{body}\nret\n.end\n");
+            format!(".module ForgedTime\n.function Main() -> void\n{body}\nret\n.end\n");
         let error = neoclr::assembler::read_modules(
             &[neoclr::assembler::ModuleInput::Source(&source)],
             &library,

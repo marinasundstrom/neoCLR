@@ -42,7 +42,7 @@ static class NativeMemoryBindings
         var (args, result) = RuntimeSignatures.Match(reference, definition, t => Type(t) ?? GenericUnionBindings.Type(t), pointers: true);
         var valid = reference.Name switch {
             "Alloc" => result == "Void*" && (args.SequenceEqual(new[] { "UIntPtr" }) || args.SequenceEqual(new[] { "UIntPtr", "UIntPtr" })),
-            "Free" => result == "noresult" && args.SequenceEqual(new[] { "Void*" }),
+            "Free" => result == "void" && args.SequenceEqual(new[] { "Void*" }),
             _ => false
         };
         if (!valid) throw new InvalidDataException("Unsupported NativeMemory signature.");

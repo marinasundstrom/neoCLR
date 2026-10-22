@@ -350,7 +350,7 @@ fn migrated_library_has_one_canonical_api_and_no_union_instructions_at_these_bou
 
 #[test]
 fn write_line_preserves_unit_and_no_result_calling_conventions() {
-    for (result, discard) in [("Void", "pop"), ("noresult", "")] {
+    for (result, discard) in [("Void", "pop"), ("void", "")] {
         let module = assemble(&format!(
             ".module System\n.function neoCLR.Runtime.WriteLine(String text) -> {result}\n.methodimpl InternalCall\n.end\n.function Main() -> Int32\nldstr \"räven\"\ncall neoCLR.Runtime.WriteLine(String)\n{discard}\nldc.i4 42\nret\n.end"
         )).unwrap();

@@ -6,7 +6,7 @@ const TYPES: &str = r#"
 .end
 .interface Mutable<T>
 .implements Read<T>
-.method instance Set(T value) -> noresult
+.method instance Set(T value) -> void
 .end
 .end
 .type class Cell<T>
@@ -17,7 +17,7 @@ ldarg this
 ldfld Cell<T>::Value
 ret
 .end
-.method instance Set(T value) -> noresult
+.method instance Set(T value) -> void
 ldarg this
 ldarg value
 stfld Cell<T>::Value
@@ -29,7 +29,7 @@ ret
 .end
 .type class Holder
 .field Item Read<Int32>
-.method instance .ctor(Read<Int32> item) -> noresult
+.method instance .ctor(Read<Int32> item) -> void
 ldarg this
 ldarg item
 stfld Holder::Item
@@ -182,7 +182,7 @@ fn unrelated_or_wrong_generic_reference_cannot_be_implicitly_stored() {
 fn byref_slots_are_invariant_even_for_implementing_classes() {
     let m = module(
         r#"
-.function Main() -> noresult
+.function Main() -> void
 .local Cell<Int32> value
 ldc.i4 1
 newobj Cell<Int32>
@@ -191,7 +191,7 @@ ldloca value
 call Replace(Read<Int32>&)
 ret
 .end
-.function Replace(Read<Int32>& slot) -> noresult
+.function Replace(Read<Int32>& slot) -> void
 ldarg slot
 ldc.i4 42
 newobj Cell<Int32>

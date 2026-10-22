@@ -180,6 +180,6 @@
   "exports": [
     "ReadLine(Int32 maxUtf8Bytes) -> System.Result<System.Option<String>,System.IO.TextReadError>",
     "ReadToEnd(Int32 maxUtf8Bytes) -> System.Result<String,System.IO.TextReadError>",
-    "Close() -> noresult"
+    "Close() -> void"
   ]
 }

@@ -23,7 +23,7 @@ static partial class RuntimeServiceBindings
 
     static string Category(string type) => type switch
     {
-        "noresult" => "no-result",
+        "void" => "no-result",
         "Value" => "erased-value",
         "System.RuntimeTypeHandle" or "IntPtr" or "UIntPtr" => "opaque-handle",
         _ when type.StartsWith("arrayref<", StringComparison.Ordinal) => "vector",
@@ -32,8 +32,8 @@ static partial class RuntimeServiceBindings
         _ => "scalar"
     };
 
-    static bool NativeTypeSupported(string type) => type is "String" or "Int32" or "Int64" or "Boolean" or "Byte" or "Value" or "noresult"
-        or "System.Object" or "System.RuntimeTypeHandle" or "Char" or "UInt32" or "arrayref<Char>" or "arrayref<UInt32>" or "arrayref<Byte>" or "arrayref<Int32>" or "fn<String,String>" or "fn<noresult Void>";
+    static bool NativeTypeSupported(string type) => type is "String" or "Int32" or "Int64" or "Boolean" or "Byte" or "Value" or "void"
+        or "System.Object" or "System.RuntimeTypeHandle" or "Char" or "UInt32" or "arrayref<Char>" or "arrayref<UInt32>" or "arrayref<Byte>" or "arrayref<Int32>" or "fn<String,String>" or "fn<void>";
 
     static (string Name, string[] Args, string Result)[] NativeMembers(string[]? selection = null)
     {
@@ -46,18 +46,18 @@ static partial class RuntimeServiceBindings
             if (entries.Length != 1) throw new InvalidDataException("Missing or ambiguous native service: " + name);
             var entry = entries[0];
             // CLI Action transports an explicit no-result callback, not an inhabited Void return.
-            entry.Args = entry.Args.Select(t => t == "fn<Void>" ? "fn<noresult Void>" : t).ToArray();
-            if (name == "NotifyWorker" || !NativeTypeSupported(entry.Result) || entry.Args.Any(t => t == "noresult" || !NativeTypeSupported(t)) || IsProperty(name))
+            entry.Args = entry.Args.Select(t => t == "fn<Void>" ? "fn<void>" : t).ToArray();
+            if (name == "NotifyWorker" || !NativeTypeSupported(entry.Result) || entry.Args.Any(t => t == "void" || !NativeTypeSupported(t)) || IsProperty(name))
                 throw new InvalidDataException("Unsupported native bootstrap service signature: " + name);
             return entry;
         }).ToArray();
     }
 
-    static string NativeCSharp(string type) => type == "fn<noresult Void>" ? "System.Action" : CSharp(type);
+    static string NativeCSharp(string type) => type == "fn<void>" ? "System.Action" : CSharp(type);
     internal static string NativeBootstrapDeclarations =>
         "namespace System.Runtime.CompilerServices { public static class RuntimeServices { " +
         string.Join(" ", NativeMembers().Select(m => $"public static {NativeCSharp(m.Result)} {m.Name}({string.Join(',', m.Args.Select((t, i) => NativeCSharp(t) + " arg" + i))}) " +
-            (m.Result == "noresult" ? "{ }" : "=> default;"))) +
+            (m.Result == "void" ? "{ }" : "=> default;"))) +
         " public static System.RuntimeTypeHandle TypeHandle<T>() => default; public static bool IsValue<T>(System.Value value) => false; public static T UnpackValue<T>(System.Value value) => default; " + QueueDeclarations + " } }";
 
     static readonly string[] QueueServices = ["GetDefaultTaskQueue", "GetCurrentTaskQueue", "RegisterTaskQueue"];
@@ -72,7 +72,7 @@ static partial class RuntimeServiceBindings
         foreach (var name in QueueServices)
         {
             bool register = name == "RegisterTaskQueue";
-            text.AppendLine($".method static {name}<T>({(register ? "T queue" : "")}) -> {(register ? "noresult" : "T")}");
+            text.AppendLine($".method static {name}<T>({(register ? "T queue" : "")}) -> {(register ? "void" : "T")}");
             if (register) text.AppendLine("ldarg queue");
             text.AppendLine($"call neoCLR.Runtime.{name}<T>({(register ? "T" : "")})");
             if (register) text.AppendLine("pop");
@@ -89,7 +89,7 @@ static partial class RuntimeServiceBindings
             for (int i = 0; i < member.Args.Length; i++) text.AppendLine("ldarg arg" + i);
             // Equality is the existing value comparison instruction, not a host service.
             text.AppendLine(member.Name == "StringEquals" ? "ceq" : $"call neoCLR.Runtime.{member.Name}({string.Join(',', member.Args)})");
-            if (member.Result == "noresult") text.AppendLine("pop");
+            if (member.Result == "void") text.AppendLine("pop");
             if (vector)
                 text.AppendLine($"stloc source\nldloc source\nldlen\nconv.i4\nnewarr {element}\nstloc destination\nldc.i4 0\nstloc index\nbr Test\nCopy:\nldloc destination\nldloc index\nldloc source\nldloc index\nldelem {element}\nstelem {element}\nldloc index\nldc.i4 1\nadd\nstloc index\nTest:\nldloc index\nldloc source\nldlen\nconv.i4\nblt Copy\nldloc destination");
             text.AppendLine("ret\n.end");
@@ -101,7 +101,7 @@ static partial class RuntimeServiceBindings
             if (member.Name is "StringEquals" or "StringHashOrdinalIgnoreCase" or "Int32ToString"
                 or "StringConcat" or "StringCompareOrdinal" or "StringCompareOrdinalIgnoreCase"
                 or "StringGraphemeCount" or "StringGraphemeAt" or "CharText" or "TypeDisplayName" or "ObjectTypeHandle") continue;
-            var nativeResult = member.Result == "noresult" ? "Void" : member.Result.StartsWith("arrayref<", StringComparison.Ordinal) ? member.Result[9..^1] + "[]" : member.Result;
+            var nativeResult = member.Result == "void" ? "Void" : member.Result.StartsWith("arrayref<", StringComparison.Ordinal) ? member.Result[9..^1] + "[]" : member.Result;
             text.AppendLine($".function neoCLR.Runtime.{member.Name}({string.Join(',', member.Args.Select((t, i) => t + " arg" + i))}) -> {nativeResult}\n.methodimpl InternalCall\n.end");
         }
         foreach (var name in QueueServices)
@@ -138,7 +138,7 @@ static partial class RuntimeServiceBindings
             nativeBootstrap = selected.Contains(m.Name),
             implementation = m.Name is "LocalDateTime" or "TypeInfo" ? "source-factory-alias" : "requires-explicit-binding"
         }).ToArray();
-        File.WriteAllText(Path.Combine(directory, "service-catalog.json"), JsonSerializer.Serialize(new { version = 1, services = inventory, genericQueueServices = QueueServices.Select(name => new { name, typeParameters = new[] { "T" }, arguments = name == "RegisterTaskQueue" ? new[] { "T" } : [], result = name == "RegisterTaskQueue" ? "noresult" : "T", contract = "source-owned TaskQueue selected by exact type argument" }) }, new JsonSerializerOptions { WriteIndented = true }) + "\n");
+        File.WriteAllText(Path.Combine(directory, "service-catalog.json"), JsonSerializer.Serialize(new { version = 1, services = inventory, genericQueueServices = QueueServices.Select(name => new { name, typeParameters = new[] { "T" }, arguments = name == "RegisterTaskQueue" ? new[] { "T" } : [], result = name == "RegisterTaskQueue" ? "void" : "T", contract = "source-owned TaskQueue selected by exact type argument" }) }, new JsonSerializerOptions { WriteIndented = true }) + "\n");
         File.WriteAllText(Path.Combine(directory, "service-seed.neoil"), NativeBootstrapSeed());
     }
 }

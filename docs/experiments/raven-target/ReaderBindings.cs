@@ -149,12 +149,12 @@ static class ReaderBindings
         if (owner is null || IsProvider(definition.DeclaringType)) return null;
         var (args, result) = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type);
         var expected = reference.Name switch {
-            ".ctor" when owner == Stream => (ConstructorArguments("System.IO.InputStream", args), "noresult"),
-            ".ctor" when owner == StreamWriter => (ConstructorArguments("System.IO.OutputStream", args), "noresult"),
+            ".ctor" when owner == Stream => (ConstructorArguments("System.IO.InputStream", args), "void"),
+            ".ctor" when owner == StreamWriter => (ConstructorArguments("System.IO.OutputStream", args), "void"),
             "Write" or "WriteLine" when owner is Writer or StreamWriter => ("String", "System.Result<Int32,System.IO.StreamError>"),
             "Flush" when owner is Writer or StreamWriter => ("", "System.Result<Void,System.IO.StreamError>"),
             "Encode" when owner == "System.Text.Encoding" => ("String", "System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError>"),
-            ".ctor" when owner == "System.Text.EncoderProgress" => ("Int32,System.Text.EncoderState", "noresult"),
+            ".ctor" when owner == "System.Text.EncoderProgress" => ("Int32,System.Text.EncoderState", "void"),
             "get_BytesWritten" when owner == "System.Text.EncoderProgress" => ("", "Int32"),
             "get_State" when owner == "System.Text.EncoderProgress" => ("", "System.Text.EncoderState"),
             "Accept" when owner == "System.Text.Encoder" => ("String,Boolean", "System.Result<Void,System.Text.EncodingError>"),
@@ -165,7 +165,7 @@ static class ReaderBindings
             "Read" when owner is Reader or Stream => (args.Length == 1 ? "Int32" : "Int32,Int32", "System.Result<String,System.IO.TextReadError>"),
             "ReadLine" when owner is Reader or Stream => ("Int32", "System.Result<System.Option<String>,System.IO.TextReadError>"),
             "ReadToEnd" when owner is Reader or Stream => ("Int32", "System.Result<String,System.IO.TextReadError>"),
-            "Close" when owner is Reader or Stream or Writer or StreamWriter => ("", "noresult"),
+            "Close" when owner is Reader or Stream or Writer or StreamWriter => ("", "void"),
             _ => throw new InvalidDataException("Unsupported reader member.")
         };
         var virtualMember = !construct && owner != "System.Text.EncoderProgress"

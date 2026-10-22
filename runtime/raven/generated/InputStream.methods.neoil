@@ -2,6 +2,6 @@
 .interface System.IO.InputStream
 .method instance Read(arrayref<Byte> buffer,Int32 offset,Int32 count) -> System.Result<Int32,System.IO.StreamError>
 .end
-.method instance Close() -> noresult
+.method instance Close() -> void
 .end
 .end

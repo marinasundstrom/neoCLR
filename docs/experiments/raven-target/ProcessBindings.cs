@@ -16,23 +16,23 @@ static class ProcessBindings
         ("System.Console", "Read", ["Int32", "Int32"], "System.Result<String,System.IO.TextReadError>"),
         ("System.Console", "ReadLine", [], "System.Result<System.Option<String>,System.IO.TextReadError>"),
         ("System.Console", "ReadLine", ["Int32"], "System.Result<System.Option<String>,System.IO.TextReadError>"),
-        ("System.Console", "Write", ["String"], "noresult"),
-        ("System.Console", "Write", ["Int32"], "noresult"),
-        ("System.Console", "WriteLine", [], "noresult"),
-        ("System.Console", "WriteLine", ["String"], "noresult"),
-        ("System.Console", "WriteLine", ["Int32"], "noresult"),
-        ("System.Console", "WriteLine", ["System.Object"], "noresult"),
-        ("System.Console", "WriteLine", ["Boolean"], "noresult"),
-        ("System.Console", "WriteLine", ["Char"], "noresult"),
-        ("System.Console", "WriteLine", ["SByte"], "noresult"),
-        ("System.Console", "WriteLine", ["Byte"], "noresult"),
-        ("System.Console", "WriteLine", ["Int16"], "noresult"),
-        ("System.Console", "WriteLine", ["UInt16"], "noresult"),
-        ("System.Console", "WriteLine", ["UInt32"], "noresult"),
-        ("System.Console", "WriteLine", ["Int64"], "noresult"),
-        ("System.Console", "WriteLine", ["UInt64"], "noresult"),
-        ("System.Console", "WriteLine", ["IntPtr"], "noresult"),
-        ("System.Console", "WriteLine", ["UIntPtr"], "noresult"),
+        ("System.Console", "Write", ["String"], "void"),
+        ("System.Console", "Write", ["Int32"], "void"),
+        ("System.Console", "WriteLine", [], "void"),
+        ("System.Console", "WriteLine", ["String"], "void"),
+        ("System.Console", "WriteLine", ["Int32"], "void"),
+        ("System.Console", "WriteLine", ["System.Object"], "void"),
+        ("System.Console", "WriteLine", ["Boolean"], "void"),
+        ("System.Console", "WriteLine", ["Char"], "void"),
+        ("System.Console", "WriteLine", ["SByte"], "void"),
+        ("System.Console", "WriteLine", ["Byte"], "void"),
+        ("System.Console", "WriteLine", ["Int16"], "void"),
+        ("System.Console", "WriteLine", ["UInt16"], "void"),
+        ("System.Console", "WriteLine", ["UInt32"], "void"),
+        ("System.Console", "WriteLine", ["Int64"], "void"),
+        ("System.Console", "WriteLine", ["UInt64"], "void"),
+        ("System.Console", "WriteLine", ["IntPtr"], "void"),
+        ("System.Console", "WriteLine", ["UIntPtr"], "void"),
         ("System.Console", "ReadByte", [], "System.Result<System.Option<Byte>,System.ConsoleReadError>"),
         ("System.Environment", "GetCommandLineArgs", [], "arrayref<String>"),
         ("System.Environment", "GetCurrentDirectory", [], "System.Result<String,System.EnvironmentError>"),
@@ -180,7 +180,7 @@ static class ProcessBindings
             || !Members.Any(m => m.Owner == reference.DeclaringType.FullName && m.Name == reference.Name
                 && m.Args.SequenceEqual(args) && m.Result == result))
             throw new InvalidDataException("Unsupported process member: " + reference.FullName);
-        if (result == "noresult")
+        if (result == "void")
             return new("", args, result, Instruction: $"call System.Console::{reference.Name}({string.Join(',', args)})\npop");
         return new(reference.Name == "GetCommandLineArgs" ? "RuntimeArguments" : reference.DeclaringType.FullName + "::" + reference.Name, args, result);
     }

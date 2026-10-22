@@ -90,7 +90,7 @@ mod tests {
 
     #[test]
     fn identity_binding_rejects_foreign_and_noncanonical_handles() {
-        let mut module = crate::assemble(".module Here\n.type class abstract System.Object\n.end\n.type class Model\n.extends System.Object\n.method instance .ctor() -> noresult\nret\n.end\n.end").unwrap();
+        let mut module = crate::assemble(".module Here\n.type class abstract System.Object\n.end\n.type class Model\n.extends System.Object\n.method instance .ctor() -> void\nret\n.end\n.end").unwrap();
         module.normalize_definition_ids().unwrap();
         let handle = crate::type_identity::describe(&module, &Type::from_name("Model")).unwrap();
         let mut renamed = handle.clone();

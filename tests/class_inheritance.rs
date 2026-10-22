@@ -115,7 +115,7 @@ fn null_upcast_is_valid_and_byref_slots_remain_invariant() {
         Value::Boolean(true)
     );
     let m = module(
-        ".function Main() -> noresult\n.local Derived child\nldloca child\ninitobj Derived\nldloca child\ncall Replace(Base&)\nret\n.end\n.function Replace(Base& value) -> noresult\nret\n.end",
+        ".function Main() -> void\n.local Derived child\nldloca child\ninitobj Derived\nldloca child\ncall Replace(Base&)\nret\n.end\n.function Replace(Base& value) -> void\nret\n.end",
     );
     assert!(verify(&m).is_err());
     assert!(run(&m, Limits::default()).is_err());
@@ -129,7 +129,7 @@ fn inherited_storage_categories_cannot_be_mixed() {
     ] {
         assert!(
             assemble(&format!(
-                ".module Mixed\n.entry Main\n{types}\n.function Main() -> noresult\nret\n.end"
+                ".module Mixed\n.entry Main\n{types}\n.function Main() -> void\nret\n.end"
             ))
             .is_err()
         );
@@ -178,7 +178,7 @@ fn three_binary_assemblies_preserve_base_construction_dispatch_and_identity() {
 .revision r1
 .type class Base
 .field Number Int32
-.method instance .ctor(Int32 number) -> noresult
+.method instance .ctor(Int32 number) -> void
 ldarg this
 ldarg number
 stfld Base::Number
@@ -198,7 +198,7 @@ ret
 .type class Derived
 .extends Base
 .field Extra Int32
-.method instance .ctor(Int32 number,Int32 extra) -> noresult
+.method instance .ctor(Int32 number,Int32 extra) -> void
 ldarg this
 ldarg number
 call instance Base::.ctor(Int32)

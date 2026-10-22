@@ -9,7 +9,7 @@
 .origin {"assembly":"ArrayViews","module":"ArrayViews.neox","name":"System.Introspection.RuntimeTypeInfo","token":33554435,"publicly_visible":true,"field_tokens":[67108866],"field_access":["Public"],"field_readonly":[false]}
 .implements Info
 .field Handle RuntimeTypeHandle
-.method instance .ctor(RuntimeTypeHandle handle) -> noresult
+.method instance .ctor(RuntimeTypeHandle handle) -> void
 ldarg 0
 ldarg handle
 stfld RuntimeInfo::Handle

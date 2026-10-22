@@ -3,7 +3,7 @@
 .end
 .type class Cell
 .field Value Int32
-.method instance .ctor(Int32 value) -> noresult
+.method instance .ctor(Int32 value) -> void
 ldarg this
 ldarg value
 stfld Cell::Value
@@ -11,7 +11,7 @@ ret
 .end
 .end
 .type class Other
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
 .end

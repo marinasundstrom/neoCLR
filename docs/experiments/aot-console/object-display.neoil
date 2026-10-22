@@ -1,7 +1,7 @@
 .module ObjectDisplay
 .type class A
 .field Text String
-.method instance .ctor(String text) -> noresult
+.method instance .ctor(String text) -> void
 ldarg 0
 ldarg text
 stfld 0
@@ -16,7 +16,7 @@ ret
 .end
 .end
 .type class B
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
 .method instance override ToString() -> String
@@ -29,7 +29,7 @@ ret
 .end
 .end
 .type class Later
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
 .method instance override ToString() -> String

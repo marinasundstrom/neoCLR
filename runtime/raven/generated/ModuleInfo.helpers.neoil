@@ -84,7 +84,7 @@ ret
 .property instance Assembly() -> System.Introspection.AssemblyInfo
 .get instance System.Introspection.RuntimeModuleInfo::get_Assembly()
 .end
-.method private instance .ctor(String identity,String name) -> noresult
+.method private instance .ctor(String identity,String name) -> void
 M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0

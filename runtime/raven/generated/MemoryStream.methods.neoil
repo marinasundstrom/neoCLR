@@ -7,7 +7,7 @@
 .field private bytes System.Collections.List<Byte>
 .field private position Int32
 .field private closed Boolean
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0
@@ -797,7 +797,7 @@ call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion9(System.Result.Ok<Void>)
 M00000007_IL_0041:
 ret
 .end
-.method instance Close() -> noresult
+.method instance Close() -> void
 M00000008_IL_0000:
 M00000008_IL_0001:
 M00000008_IL_0002:

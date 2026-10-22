@@ -3,7 +3,7 @@ use neoclr::{Limits, Value, assemble, run, verify};
 
 fn fixture(generic: bool) -> neoclr::Module {
     let suffix = if generic { "<T>" } else { "" };
-    let mut m = assemble(&format!(".module Initializers\n.entry Main\n.type class Cache{suffix}\n.method private static .cctor() -> noresult\nret\n.end\n.method static Read() -> Int32\nldc.i4 0\nret\n.end\n.end\n.function Main() -> Int32\nldc.i4 0\nret\n.end")).unwrap();
+    let mut m = assemble(&format!(".module Initializers\n.entry Main\n.type class Cache{suffix}\n.method private static .cctor() -> void\nret\n.end\n.method static Read() -> Int32\nldc.i4 0\nret\n.end\n.end\n.function Main() -> Int32\nldc.i4 0\nret\n.end")).unwrap();
     m.types[0].static_fields.push(StaticField {
         name: "Value".into(),
         ty: Type::Int32,
@@ -183,7 +183,7 @@ fn ordinary_writes_direct_calls_and_invalid_initializers_are_rejected() {
 
 #[test]
 fn cross_type_recursion_observes_defaults_without_rerunning_initializers() {
-    let mut m = assemble(".module Cycle\n.entry Main\n.type class A\n.method private static .cctor() -> noresult\nret\n.end\n.end\n.type class B\n.method private static .cctor() -> noresult\nret\n.end\n.end\n.function Main() -> Int32\nldc.i4 0\nret\n.end").unwrap();
+    let mut m = assemble(".module Cycle\n.entry Main\n.type class A\n.method private static .cctor() -> void\nret\n.end\n.end\n.type class B\n.method private static .cctor() -> void\nret\n.end\n.end\n.function Main() -> Int32\nldc.i4 0\nret\n.end").unwrap();
     for ty in &mut m.types {
         ty.static_fields.push(StaticField {
             name: "Value".into(),
@@ -234,6 +234,6 @@ fn initializing_one_closed_type_cannot_write_anothers_readonly_field() {
 
 #[test]
 fn distinct_generic_arities_do_not_share_initializer_identity() {
-    let module = assemble(".module InitializerArity\n.entry Main\n.type class Cache\n.method private static .cctor() -> noresult\nret\n.end\n.end\n.type class Cache<T>\n.method private static .cctor() -> noresult\nret\n.end\n.end\n.function Main() -> Int32\nldc.i4 42\nret\n.end").unwrap();
+    let module = assemble(".module InitializerArity\n.entry Main\n.type class Cache\n.method private static .cctor() -> void\nret\n.end\n.end\n.type class Cache<T>\n.method private static .cctor() -> void\nret\n.end\n.end\n.function Main() -> Int32\nldc.i4 42\nret\n.end").unwrap();
     assert_eq!(result(&module), 42);
 }

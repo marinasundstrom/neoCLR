@@ -3,6 +3,6 @@
 .implements System.Collections.Map<T0,T1>
 .method instance TryAdd(T0 key,T1 value) -> Boolean
 .end
-.method instance Set(T0 key,T1 value) -> noresult
+.method instance Set(T0 key,T1 value) -> void
 .end
 .end

@@ -86,11 +86,11 @@ static class CollectionBindings
         var (parameters, result) = RuntimeSignatures.Match(reference, definition, t => parameterMap?.Invoke(t) ?? ApplicationTypes.Type(t) ?? Type(t) ?? FunctionBindings.Type(t) ?? GenericUnionBindings.Type(t), allowOpenMethodParameters: parameterMap is not null);
         var (kind, element) = owner == Disposable ? ("Disposable", "") : Shapes[owner];
         var expected = (kind, definition.Name) switch {
-            ("List" or "ArrayList", "Add") => (element, "noresult", true),
+            ("List" or "ArrayList", "Add") => (element, "void", true),
             ("ArrayList", "get_Capacity") => ("", "Int32", true),
             ("Collection" or "ArrayList", "get_Count") => ("", "Int32", true),
             ("Sequence" or "MutableSequence" or "ArrayList", "get_Item") => ("Int32", element, true),
-            ("MutableSequence" or "ArrayList", "set_Item") => ("Int32," + element, "noresult", true),
+            ("MutableSequence" or "ArrayList", "set_Item") => ("Int32," + element, "void", true),
             ("ArrayList", "FindIndex" or "FindLastIndex") => ($"fn<{element},Boolean>", "System.Option<Int32>", true),
             ("ArrayList", "Exists" or "TrueForAll") => ($"fn<{element},Boolean>", "Boolean", true),
             ("ArrayList", "Find" or "FindLast") => ($"fn<{element},Boolean>", $"System.Option<{element}>", true),
@@ -99,7 +99,7 @@ static class CollectionBindings
             ("Iterable" or "ArrayList", "GetIterator") => ("", $"System.Collections.Iterator<{element}>", true),
             ("Iterator", "MoveNext") => ("", "Boolean", true),
             ("Iterator", "get_Current") => ("", element, true),
-            ("Disposable", "Dispose") => ("", "noresult", true),
+            ("Disposable", "Dispose") => ("", "void", true),
             _ => throw new InvalidDataException("Unsupported collection member: " + definition.FullName)
         };
         if (string.Join(',', parameters) != expected.Item1 || result != expected.Item2

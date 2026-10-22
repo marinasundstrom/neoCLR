@@ -231,11 +231,11 @@ impl Ty {
                         Ok(format!("{mode}{}", Self::from_metadata(ty)?.il()))
                     })
                     .collect::<Result<Vec<_>, Fault>>()?;
-                parts.push(format!(
-                    "{}{}",
-                    if shape.no_result { "noresult " } else { "" },
+                parts.push(if shape.no_result {
+                    "void".into()
+                } else {
                     Self::from_metadata(&shape.returns)?.il()
-                ));
+                });
                 Self::Record(format!("fn<{}>", parts.join(",")))
             }
             Type::Constructed {
@@ -4471,4 +4471,19 @@ pub fn compile_named(source: &str, document: &str) -> Result<Module, Fault> {
     let module = crate::assemble(&lower_to_il_named(source, document)?)?;
     crate::LoadedProgram::new(&module)?.verify()?;
     Ok(module)
+}
+
+#[cfg(test)]
+mod void_spelling_tests {
+    use super::*;
+
+    #[test]
+    fn imported_no_result_function_shape_round_trips_through_il() {
+        for signature in ["fn<void>", "fn<Int32,void>", "fn<out Int32&,void>"] {
+            let shape = crate::assembler::parse_type(signature).unwrap();
+            let spelling = Ty::from_metadata(&shape).unwrap().il();
+            assert_eq!(crate::assembler::parse_type(&spelling).unwrap(), shape);
+            assert!(spelling.ends_with("void>"));
+        }
+    }
 }

@@ -11,7 +11,7 @@ const SERVICES: &str = r#"
 "#;
 const OBJECT: &str = r#"
 .type class abstract System.Object
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
 .end
@@ -20,7 +20,7 @@ const MODEL: &str = r#"
 .type class Model
 .extends System.Object
 .field Number Int32
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ldarg this
 call instance System.Object::.ctor()
 ldarg this
@@ -230,8 +230,8 @@ fn imported_construction_requires_explicit_public_source_access() {
     ] {
         let types = MODEL.replace(".type class Model\n", &format!(
             ".type class Model\n.origin {{\"assembly\":\"Fixture\",\"module\":\"Fixture\",\"name\":\"Model\",\"token\":33554433,\"field_tokens\":[67108865]{type_access}}}\n"
-        )).replace(".method instance .ctor() -> noresult\n", &format!(
-            ".method instance .ctor() -> noresult\n.origin {{\"assembly\":\"Fixture\",\"module\":\"Fixture\",\"name\":\".ctor\",\"token\":100663297{method_access}}}\n"
+        )).replace(".method instance .ctor() -> void\n", &format!(
+            ".method instance .ctor() -> void\n.origin {{\"assembly\":\"Fixture\",\"module\":\"Fixture\",\"name\":\".ctor\",\"token\":100663297{method_access}}}\n"
         ));
         let types = format!(
             ".assembly {{\"name\":\"Fixture\",\"full_name\":\"Fixture\",\"modules\":[\"Fixture\"],\"references\":[]}}\n{types}"

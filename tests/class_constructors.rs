@@ -1,5 +1,5 @@
 use neoclr::{Limits, Value, assemble, run, verify};
-const TYPE: &str = ".type class Counter\n.field Age Int32\n.method instance .ctor(Int32 age) -> noresult\nldarg 0\nldarg age\nstfld Counter::Age\nret\n.end\n.method instance Set(Int32 age) -> noresult\nldarg 0\nldarg age\nstfld Counter::Age\nret\n.end\n.method instance Get() -> Int32\nldarg 0\nldfld Counter::Age\nret\n.end\n.end\n";
+const TYPE: &str = ".type class Counter\n.field Age Int32\n.method instance .ctor(Int32 age) -> void\nldarg 0\nldarg age\nstfld Counter::Age\nret\n.end\n.method instance Set(Int32 age) -> void\nldarg 0\nldarg age\nstfld Counter::Age\nret\n.end\n.method instance Get() -> Int32\nldarg 0\nldfld Counter::Age\nret\n.end\n.end\n";
 fn module(main: &str) -> neoclr::Module {
     assemble(&format!(
         ".module Constructors\n.entry Main\n{TYPE}.function Main() -> Int32\n{main}\n.end"
@@ -144,7 +144,7 @@ fn direct_constructor_calls_are_rejected_until_chaining_is_supported() {
     assert!(verify(&m).unwrap_err().message.contains("no-result"));
     assert!(run(&m, Limits::default()).is_err());
     let source = format!(
-        ".module Direct\n.entry Main\n{TYPE}.function Main() -> noresult\nldc.i4 1\nnewobj Counter\nldc.i4 2\ncall instance Counter::.ctor(Int32)\nret\n.end"
+        ".module Direct\n.entry Main\n{TYPE}.function Main() -> void\nldc.i4 1\nnewobj Counter\nldc.i4 2\ncall instance Counter::.ctor(Int32)\nret\n.end"
     );
     assert!(assemble(&source).unwrap_err().message.contains("chaining"));
 }

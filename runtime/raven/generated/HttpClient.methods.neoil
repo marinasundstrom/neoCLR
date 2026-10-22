@@ -67,7 +67,7 @@ ldloc local0
 M0000000d_IL_0035:
 ret
 .end
-.method instance set_DefaultRequestHeaders(System.Collections.Sequence<System.Web.Http.HttpHeader> value) -> noresult
+.method instance set_DefaultRequestHeaders(System.Collections.Sequence<System.Web.Http.HttpHeader> value) -> void
 .local System.Collections.ArrayList<System.Web.Http.HttpHeader> local0
 .local System.Web.Http.HttpHeader local1
 .local System.Collections.Iterator<System.Web.Http.HttpHeader> local2
@@ -180,7 +180,7 @@ call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion34(System.Option.None
 M0000000f_IL_0050:
 ret
 .end
-.method instance set_BaseUri(System.Option<String> value) -> noresult
+.method instance set_BaseUri(System.Option<String> value) -> void
 .local String local0
 .local System.Option<String> local1
 .local System.Option.Some<String> local2
@@ -281,7 +281,7 @@ M00000010_IL_0093:
 M00000010_IL_0094:
 ret
 .end
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 M00000011_IL_0000:
 M00000011_IL_0001:
 ldarg 0
@@ -313,7 +313,7 @@ stfld System.Web.Http.HttpClient::handler
 M00000011_IL_002f:
 ret
 .end
-.method instance .ctor(System.Web.Http.HttpHandler handler) -> noresult
+.method instance .ctor(System.Web.Http.HttpHandler handler) -> void
 M00000012_IL_0000:
 M00000012_IL_0001:
 ldarg 0

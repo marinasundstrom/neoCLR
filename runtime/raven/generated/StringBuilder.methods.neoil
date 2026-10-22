@@ -14,7 +14,7 @@
 .property instance MaxUtf8Bytes() -> Int32
 .get instance System.Text.StringBuilder::get_MaxUtf8Bytes()
 .end
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0
@@ -68,7 +68,7 @@ stfld System.Text.StringBuilder::dirty
 M00000001_IL_0044:
 ret
 .end
-.method instance .ctor(Int32 maxUtf8Bytes) -> noresult
+.method instance .ctor(Int32 maxUtf8Bytes) -> void
 M00000002_IL_0000:
 M00000002_IL_0001:
 ldarg 0

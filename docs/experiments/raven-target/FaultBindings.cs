@@ -9,7 +9,7 @@ static class FaultBindings
         var signature = RuntimeSignatures.Match(reference, definition, _ => null);
         if (!RuntimeSignatures.IsCore(reference.DeclaringType.Scope) || reference.HasThis || definition.IsVirtual
             || !NamespaceFunctions.IsContainer(definition.DeclaringType)
-            || !signature.Args.SequenceEqual(new[] { "String" }) || signature.Result != "noresult")
+            || !signature.Args.SequenceEqual(new[] { "String" }) || signature.Result != "void")
             throw new InvalidDataException("Unsupported System.Fail signature.");
         return new("System.Fail", signature.Args, signature.Result);
     }

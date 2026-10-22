@@ -5,7 +5,7 @@
 .implements System.IO.SeekableStream
 .field private handle Int32
 .field private closed Boolean
-.method private instance .ctor(Int32 handle) -> noresult
+.method private instance .ctor(Int32 handle) -> void
 M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0
@@ -292,7 +292,7 @@ call neoCLR.Library.System.IO.FileInputStream.RuntimeUnion9(System.Result.Ok<Int
 M00000005_IL_0070:
 ret
 .end
-.method instance Close() -> noresult
+.method instance Close() -> void
 M00000006_IL_0000:
 M00000006_IL_0001:
 M00000006_IL_0002:

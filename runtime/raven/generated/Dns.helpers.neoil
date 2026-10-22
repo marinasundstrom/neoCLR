@@ -157,7 +157,7 @@ ret
 .field private token System.Concurrency.CancellationToken
 .field private registration System.Concurrency.CancellationRegistration
 .field private cancellationWon Boolean
-.method internal instance .ctor(System.Concurrency.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>> source,System.Concurrency.CancellationToken token) -> noresult
+.method internal instance .ctor(System.Concurrency.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>> source,System.Concurrency.CancellationToken token) -> void
 M00000007_IL_0000:
 M00000007_IL_0001:
 ldarg 0
@@ -204,7 +204,7 @@ stfld System.Networking.DnsCompletion::cancellationWon
 M00000007_IL_0030:
 ret
 .end
-.method internal instance Start(String hostName) -> noresult
+.method internal instance Start(String hostName) -> void
 M00000008_IL_0000:
 M00000008_IL_0001:
 M00000008_IL_0002:
@@ -221,7 +221,7 @@ M00000008_IL_000b:
 M00000008_IL_000c:
 ret
 .end
-.method internal instance StartUntil(String hostName,Int64 deadline) -> noresult
+.method internal instance StartUntil(String hostName,Int64 deadline) -> void
 .local Value local0
 .local System.Concurrency.CancellationToken local1
 .local Value local2
@@ -397,7 +397,7 @@ M00000009_IL_00ef:
 M00000009_IL_00f0:
 ret
 .end
-.method internal instance RequestCancellation() -> noresult
+.method internal instance RequestCancellation() -> void
 M0000000a_IL_0000:
 M0000000a_IL_0001:
 M0000000a_IL_0002:
@@ -416,7 +416,7 @@ M0000000a_IL_0013:
 M0000000a_IL_0014:
 ret
 .end
-.method internal instance Complete() -> noresult
+.method internal instance Complete() -> void
 .local System.Concurrency.CancellationRegistration local0
 .local System.Concurrency.CancellationRegistration local1
 .local Value local2

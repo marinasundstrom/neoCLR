@@ -39,11 +39,11 @@ static class WorkerBindings
         if (owner is null) return null;
         var (args, result) = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type);
         var expected = (owner, definition.Name) switch {
-            (Prefix + "WorkerCompletion", ".ctor") when library => ("Int32,System.Concurrency.Tasks.Promise<String>", "noresult", false),
-            (Prefix + "WorkerCompletion", "Complete") when library => ("", "noresult", false),
+            (Prefix + "WorkerCompletion", ".ctor") when library => ("Int32,System.Concurrency.Tasks.Promise<String>", "void", false),
+            (Prefix + "WorkerCompletion", "Complete") when library => ("", "void", false),
             (Prefix + "Thread", "Run") or (Prefix + "ThreadPool", "Queue") => ("fn<String,String>,String", "System.Concurrency.Tasks.Task<String>", true),
-            (Prefix + "Thread", ".ctor") => ("fn<String,String>,String", "noresult", false),
-            (Prefix + "Thread", "Start") => ("", "noresult", false),
+            (Prefix + "Thread", ".ctor") => ("fn<String,String>,String", "void", false),
+            (Prefix + "Thread", "Start") => ("", "void", false),
             (Prefix + "Thread", "get_Task") => ("", "System.Concurrency.Tasks.Task<String>", false),
             (Prefix + "Thread", "get_IsStarted") => ("", "Boolean", false),
             _ => throw new InvalidDataException("Unsupported worker member.")

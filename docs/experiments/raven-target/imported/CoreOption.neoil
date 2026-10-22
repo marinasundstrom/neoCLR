@@ -1,6 +1,6 @@
 .module ImportedUnion
 .entry Method_06000007
-.function Method_06000007() -> noresult
+.function Method_06000007() -> void
 IL_0000:
 IL_0001:
 IL_0002:
@@ -16,7 +16,7 @@ IL_0010:
 IL_0011:
 ret
 .end
-.function Method_06000006(Int32) -> noresult
+.function Method_06000006(Int32) -> void
 .local System.Option<Int32> local0
 .local System.Option.Some<Int32> local1
 .local System.Option.None local2
@@ -297,13 +297,13 @@ ldarg value
 newobj instance System.Option<Void>::.ctor(System.Option.None)
 ret
 .end
-.function RuntimeWriteInt32(Int32 value) -> noresult
+.function RuntimeWriteInt32(Int32 value) -> void
 ldarg value
 call System.Console::WriteLine(Int32)
 pop
 ret
 .end
-.function RuntimeWriteString(String value) -> noresult
+.function RuntimeWriteString(String value) -> void
 ldarg value
 call System.Console::WriteLine(String)
 pop

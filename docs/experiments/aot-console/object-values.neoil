@@ -3,13 +3,13 @@
 .end
 .type class Plain
 .implements View
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
 .end
 .type class Overridden
 .implements View
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
 .method instance override Equals(System.Object other) -> Boolean

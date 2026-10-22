@@ -96,7 +96,7 @@ static class StaticImport
                             throw new InvalidDataException("Resolved signature mismatch.");
                         if (!target.IsPublic && target.DeclaringType != method.DeclaringType)
                             throw new InvalidDataException("Cross-type nonpublic calls unsupported.");
-                        if (returns != "noresult") Push(returns);
+                        if (returns != "void") Push(returns);
                         string name;
                         if (target.Module == app.MainModule) { pending.Enqueue(target); name = Name(target); }
                         else if (target.Module == library.MainModule && TargetSurface.Bind(target) is { } binding)
@@ -104,7 +104,7 @@ static class StaticImport
                         else throw new InvalidDataException("Unsupported runtime binding: " + reference.FullName);
                         text.AppendLine($"call {name}({string.Join(',', args)})"); break;
                     case Code.Ret:
-                        if (result != "noresult") Store(result);
+                        if (result != "void") Store(result);
                         if (stack.Count != 0) throw new InvalidDataException("Input ret stack must be empty after its declared result.");
                         text.AppendLine("ret"); returned = true; break;
                     default: throw new InvalidDataException($"Unsupported reachable instruction {method.FullName} IL_{instruction.Offset:x4}: {instruction.OpCode}");
@@ -115,7 +115,7 @@ static class StaticImport
         }
         foreach (var binding in bindings.Values.Where(b => b.Returns == "Void"))
         {
-            text.AppendLine($".function {binding.ImportTarget}({string.Join(',', binding.Parameters)}) -> noresult");
+            text.AppendLine($".function {binding.ImportTarget}({string.Join(',', binding.Parameters)}) -> void");
             for (var i = 0; i < binding.Parameters.Length; i++) text.AppendLine($"ldarg {i}");
             text.AppendLine($"call {binding.Signature}\npop\nret\n.end");
         }
@@ -130,7 +130,7 @@ static class StaticImport
     }
     static string Name(MethodDefinition method) => $"Method_{method.MetadataToken.ToUInt32():x8}";
     static string Type(TypeReference type, bool result = false) => type.MetadataType switch {
-        MetadataType.Void when result => "noresult", MetadataType.Int32 => "Int32", MetadataType.String => "String",
+        MetadataType.Void when result => "void", MetadataType.Int32 => "Int32", MetadataType.String => "String",
         _ => throw new InvalidDataException("Unsupported signature type: " + type.FullName)
     };
     static void Signature(MethodReference method)

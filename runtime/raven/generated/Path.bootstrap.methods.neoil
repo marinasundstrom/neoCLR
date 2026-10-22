@@ -33,7 +33,7 @@ call neoCLR.Runtime.PathGetFileName(String)
 M00000002_IL_0008:
 ret
 .end
-.method private instance .ctor(String text) -> noresult
+.method private instance .ctor(String text) -> void
 M00000003_IL_0000:
 M00000003_IL_0001:
 ldarg 0

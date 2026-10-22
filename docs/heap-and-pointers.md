@@ -316,7 +316,7 @@ Development InternalCalls provide the runtime operations needed by the source
 | --- | --- | --- |
 | `neoCLR.Runtime.NativeAllocate` | `(UIntPtr) -> Void*` | Allocate the requested uninitialized byte count |
 | `neoCLR.Runtime.NativeMultiplyChecked` | `(UIntPtr, UIntPtr) -> UIntPtr` | Multiply count and element size with unsigned native-width overflow checking |
-| `neoCLR.Runtime.NativeFree` | `(Void*) -> noresult` | Release a tracked base pointer; null is accepted |
+| `neoCLR.Runtime.NativeFree` | `(Void*) -> void` | Release a tracked base pointer; null is accepted |
 
 Allocation/free use the same execution-owned heap as `heap.alloc`/`heap.free`. Pointers
 can cross these service/instruction boundaries without losing allocation identity.

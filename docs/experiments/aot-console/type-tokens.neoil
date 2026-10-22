@@ -5,7 +5,7 @@
 .end
 .type class Cell<T>
 .field Value T
-.method instance .ctor(T value) -> noresult
+.method instance .ctor(T value) -> void
 ldarg 0
 ldarg value
 stfld 0

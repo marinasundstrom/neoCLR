@@ -17,7 +17,7 @@
 .property instance Offset() -> System.Time.TimeOffset
 .get instance System.Time.ZonedDateTime::get_Offset()
 .end
-.method private instance .ctor(System.Time.Instant instant,System.Time.TimeZone zone,System.Time.LocalDateTime local,System.Time.TimeOffset offset) -> noresult
+.method private instance .ctor(System.Time.Instant instant,System.Time.TimeZone zone,System.Time.LocalDateTime local,System.Time.TimeOffset offset) -> void
 M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0

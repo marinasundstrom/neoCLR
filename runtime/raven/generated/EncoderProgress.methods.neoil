@@ -169,7 +169,7 @@ ldloc local1
 M00000002_IL_00d0:
 ret
 .end
-.method instance .ctor(Int32 bytesWritten,System.Text.EncoderState state) -> noresult
+.method instance .ctor(Int32 bytesWritten,System.Text.EncoderState state) -> void
 M00000003_IL_0000:
 M00000003_IL_0001:
 ldarg 0

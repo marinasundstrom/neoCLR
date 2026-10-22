@@ -4,6 +4,6 @@
 .end
 .method instance Flush() -> System.Result<Void,System.IO.StreamError>
 .end
-.method instance Close() -> noresult
+.method instance Close() -> void
 .end
 .end

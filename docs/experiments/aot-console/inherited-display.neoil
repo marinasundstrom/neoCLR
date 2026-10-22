@@ -2,7 +2,7 @@
 .type class abstract Base
 .extends System.Object
 .field Text String
-.method instance .ctor(String text) -> noresult
+.method instance .ctor(String text) -> void
 ldarg 0
 call instance System.Object::.ctor()
 ldarg 0
@@ -19,7 +19,7 @@ ret
 .type class Child
 .extends Base
 .field Number Int32
-.method instance .ctor(String text) -> noresult
+.method instance .ctor(String text) -> void
 ldarg 0
 ldarg text
 call instance Base::.ctor(String)

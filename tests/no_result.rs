@@ -7,7 +7,7 @@ fn module(functions: &str) -> neoclr::Module {
 #[test]
 fn nested_no_result_calls_preserve_caller_stack() {
     let m = module(
-        ".function Main() -> Int32\nldc.i4 42\ncall Outer()\nret\n.end\n.function Outer() -> noresult\ncall Inner()\nret\n.end\n.function Inner() -> noresult\nret\n.end",
+        ".function Main() -> Int32\nldc.i4 42\ncall Outer()\nret\n.end\n.function Outer() -> void\ncall Inner()\nret\n.end\n.function Inner() -> void\nret\n.end",
     );
     verify(&m).unwrap();
     assert_eq!(run(&m, Limits::default()).unwrap().value, Value::Int32(42));
@@ -16,7 +16,7 @@ fn nested_no_result_calls_preserve_caller_stack() {
 #[test]
 fn no_result_entry_can_call_the_existing_system_library() {
     let m = module(
-        ".function Main() -> noresult\nldstr \"hello\"\ncall System.Console::WriteLine(String)\npop\nret\n.end",
+        ".function Main() -> void\nldstr \"hello\"\ncall System.Console::WriteLine(String)\npop\nret\n.end",
     );
     verify(&m).unwrap();
     let execution = run(&m, Limits::default()).unwrap();
@@ -27,12 +27,9 @@ fn no_result_entry_can_call_the_existing_system_library() {
 #[test]
 fn result_is_required_only_by_value_returning_methods() {
     for (body, message) in [
+        (".function Main() -> void\nldvoid\nret\n.end", "empty stack"),
         (
-            ".function Main() -> noresult\nldvoid\nret\n.end",
-            "empty stack",
-        ),
-        (
-            ".function Main() -> noresult\ncall Empty()\npop\nret\n.end\n.function Empty() -> noresult\nret\n.end",
+            ".function Main() -> void\ncall Empty()\npop\nret\n.end\n.function Empty() -> void\nret\n.end",
             "underflow",
         ),
         (".function Main() -> Void\nret\n.end", "underflow"),
@@ -45,7 +42,7 @@ fn result_is_required_only_by_value_returning_methods() {
 
 #[test]
 fn serde_preserves_return_mode_and_rejects_invalid_mode_metadata() {
-    let m = module(".function Main() -> noresult\nret\n.end");
+    let m = module(".function Main() -> void\nret\n.end");
     let json = serde_json::to_string(&m).unwrap();
     let mut decoded: neoclr::Module = serde_json::from_str(&json).unwrap();
     assert!(decoded.functions[0].no_result);
@@ -73,7 +70,7 @@ fn void_remains_an_inhabited_generic_argument() {
 #[test]
 fn generic_storage_can_contain_void_inside_a_no_result_method() {
     let m = module(
-        ".type Box<T>\n.field Value T\n.end\n.function Main() -> noresult\n.local Box<Void> box\nldvoid\nnewobj Box<Void>\nstloc box\nret\n.end",
+        ".type Box<T>\n.field Value T\n.end\n.function Main() -> void\n.local Box<Void> box\nldvoid\nnewobj Box<Void>\nstloc box\nret\n.end",
     );
     verify(&m).unwrap();
     run(&m, Limits::default()).unwrap();
@@ -94,7 +91,7 @@ fn inhabited_void_delegate_cannot_bind_a_no_result_target() {
 #[test]
 fn generic_no_result_calls_preserve_caller_values_and_void_payloads() {
     let m = module(
-        ".function Main() -> Int32\nldc.i4 42\nldvoid\ncall Ignore<Void>(Void)\nldc.i4 7\ncall Ignore<Int32>(Int32)\nret\n.end\n.function Ignore<T>(T value) -> noresult\nldarg value\npop\nret\n.end",
+        ".function Main() -> Int32\nldc.i4 42\nldvoid\ncall Ignore<Void>(Void)\nldc.i4 7\ncall Ignore<Int32>(Int32)\nret\n.end\n.function Ignore<T>(T value) -> void\nldarg value\npop\nret\n.end",
     );
     verify(&m).unwrap();
     assert_eq!(run(&m, Limits::default()).unwrap().value, Value::Int32(42));
@@ -103,7 +100,7 @@ fn generic_no_result_calls_preserve_caller_values_and_void_payloads() {
 #[test]
 fn generic_no_result_body_rejects_a_return_value() {
     let m = module(
-        ".function Main() -> noresult\nldc.i4 7\ncall Bad<Int32>(Int32)\nret\n.end\n.function Bad<T>(T value) -> noresult\nldarg value\nret\n.end",
+        ".function Main() -> void\nldc.i4 7\ncall Bad<Int32>(Int32)\nret\n.end\n.function Bad<T>(T value) -> void\nldarg value\nret\n.end",
     );
     assert!(verify(&m).unwrap_err().message.contains("empty stack"));
     assert!(run(&m, Limits::default()).is_err());
@@ -151,13 +148,13 @@ fn value_no_result_method_mutates_local_and_box_without_stack_payload() {
 .type class System.Object
 .end
 .interface Stepper
-.method instance Step() -> noresult
+.method instance Step() -> void
 .end
 .end
 .type State
 .implements Stepper
 .field Number Int32
-.method instance byref Step() -> noresult
+.method instance byref Step() -> void
 ldarg this
 ldflda 0
 ldarg this
@@ -190,6 +187,29 @@ ldfld State::Number
 ret
 .end
 "#,
+    );
+    verify(&m).unwrap();
+    assert_eq!(run(&m, Limits::default()).unwrap().value, Value::Int32(42));
+}
+
+#[test]
+fn obsolete_noresult_spelling_is_rejected_in_return_and_function_types() {
+    let error = assemble(".module Old\n.function Main() -> noresult\nret\n.end").unwrap_err();
+    assert!(error.message.contains("obsolete noresult spelling"));
+    for ty in ["noresult", "fn<noresult Void>", "fn<Int32,noresult Void>"] {
+        let error = neoclr::assembler::parse_type(ty).unwrap_err();
+        assert!(
+            error.message.contains("obsolete noresult spelling"),
+            "{}",
+            error.message
+        );
+    }
+}
+
+#[test]
+fn void_function_shape_calls_do_not_manufacture_values() {
+    let m = module(
+        ".function Main() -> Int32\nldc.i4 42\nfunction.bind fn<void> = Empty()\ncall instance fn<void>::Invoke()\nret\n.end\n.function Empty() -> void\nret\n.end",
     );
     verify(&m).unwrap();
     assert_eq!(run(&m, Limits::default()).unwrap().value, Value::Int32(42));

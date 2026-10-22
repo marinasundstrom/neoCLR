@@ -7,7 +7,7 @@ const SERVICES: &str = r#".module System
 .function neoCLR.Runtime.NativeAllocate(UIntPtr count) -> Void*
 .methodimpl InternalCall
 .end
-.function neoCLR.Runtime.NativeFree(Void* pointer) -> noresult
+.function neoCLR.Runtime.NativeFree(Void* pointer) -> void
 .methodimpl InternalCall
 .end
 .function neoCLR.Runtime.NativeMultiplyChecked(UIntPtr count,UIntPtr size) -> UIntPtr
@@ -106,7 +106,7 @@ fn exact_signatures_and_logical_services_are_preserved() {
     for invalid in [
         SERVICES.replace("NativeAllocate(UIntPtr", "NativeAllocate(Int32"),
         SERVICES.replace(
-            "NativeFree(Void* pointer) -> noresult",
+            "NativeFree(Void* pointer) -> void",
             "NativeFree(Void* pointer) -> Void",
         ),
         SERVICES.replace(

@@ -5,7 +5,7 @@
 .end
 .type class First
 .implements Reader
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
 .method instance Read(Int32 mode) -> Int32
@@ -20,7 +20,7 @@ fault "reader failed"
 .end
 .type class Second
 .implements Reader
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
 .method instance Read(Int32 mode) -> Int32

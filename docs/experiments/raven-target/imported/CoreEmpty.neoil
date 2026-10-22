@@ -1,5 +1,5 @@
 .module ImportedCoreEmpty
 .entry Method_06000005
-.function Method_06000005() -> noresult
+.function Method_06000005() -> void
 ret
 .end

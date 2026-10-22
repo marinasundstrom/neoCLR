@@ -295,7 +295,7 @@ ret
 .type class Box
 .implements Clonable
 .field Value Int32
-.method instance .ctor(Int32 value) -> noresult
+.method instance .ctor(Int32 value) -> void
 ldarg this
 ldarg value
 stfld Box::Value
@@ -444,7 +444,7 @@ fn borrowed_self_reference_dispatch_preserves_virtual_targets_in_execution_and_g
 .end
 .type class Base
 .implements Reader
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
 .method instance virtual Read() -> Int32
@@ -454,7 +454,7 @@ ret
 .end
 .type class Derived
 .extends Base
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ldarg this
 call instance Base::.ctor()
 ret
@@ -527,7 +527,7 @@ const INHERITED_CLONE: &str = r#"
 .end
 .type class Base
 .implements Clonable
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
 .method instance virtual Clone() -> Base
@@ -541,7 +541,7 @@ ret
 .end
 .type class Derived
 .extends Base
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ldarg this
 call instance Base::.ctor()
 ret

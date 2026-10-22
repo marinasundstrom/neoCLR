@@ -17,5 +17,5 @@ public sealed class FunctionTypeInfo : TypeInfo
     public override bool IsNominalType => false;
     internal override int Depth => 1 + ParameterTypes.Append(ReturnType).Max(t => t.Depth);
     /// <inheritdoc/>
-    public override string DisplayName => "(" + string.Join(", ", ParameterTypes.Select(t => t.DisplayName)) + ") -> " + (NoResult ? "noresult" : ReturnType.DisplayName);
+    public override string DisplayName => "(" + string.Join(", ", ParameterTypes.Select(t => t.DisplayName)) + ") -> " + (NoResult ? "void" : ReturnType.DisplayName);
 }

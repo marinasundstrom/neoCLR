@@ -12,7 +12,7 @@
 .property instance IsFallback() -> Boolean
 .get instance System.Globalization.SystemCultureProvider::get_IsFallback()
 .end
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0
@@ -28,7 +28,7 @@ stfld System.Globalization.SystemCultureProvider::preference
 M00000001_IL_0013:
 ret
 .end
-.method private instance .ctor(String preference) -> noresult
+.method private instance .ctor(String preference) -> void
 M00000002_IL_0000:
 M00000002_IL_0001:
 ldarg 0

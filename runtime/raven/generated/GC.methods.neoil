@@ -47,7 +47,7 @@ call neoCLR.Runtime.GCHeapObjectLimit()
 M00000006_IL_0007:
 ret
 .end
-.method static Collect() -> noresult
+.method static Collect() -> void
 M00000007_IL_0000:
 M00000007_IL_0001:
 M00000007_IL_0002:
@@ -57,7 +57,7 @@ M00000007_IL_0007:
 M00000007_IL_0008:
 ret
 .end
-.method static KeepAlive(System.Object value) -> noresult
+.method static KeepAlive(System.Object value) -> void
 M00000008_IL_0000:
 M00000008_IL_0001:
 M00000008_IL_0002:

@@ -158,7 +158,7 @@ ret
 .property instance ReferencedAssemblies() -> System.Collections.Sequence<System.Introspection.AssemblyInfo>
 .get instance System.Introspection.RuntimeAssemblyInfo::get_ReferencedAssemblies()
 .end
-.method private instance .ctor(String identity) -> noresult
+.method private instance .ctor(String identity) -> void
 M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0

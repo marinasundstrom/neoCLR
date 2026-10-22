@@ -179,7 +179,7 @@
   "compilerSha256": "68fac096712230f3e13e9cc2a90af9c2b2a14142c19037ae29426aa3cf1d6f7e",
   "coreSha256": "31b0e1461f2265a54e85f58cc1238b8e1615caeddf4db9082381c850d6984a9f",
   "exports": [
-    ".ctor() -> noresult",
+    ".ctor() -> void",
     "get_Now() -> System.Time.Instant"
   ]
 }

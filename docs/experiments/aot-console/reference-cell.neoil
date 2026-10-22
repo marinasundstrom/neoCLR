@@ -2,7 +2,7 @@
 .type class Cell
 .field value Int32
 .field next Cell
-.method instance .ctor(Int32 value) -> noresult
+.method instance .ctor(Int32 value) -> void
 ldarg 0
 ldarg value
 stfld 0

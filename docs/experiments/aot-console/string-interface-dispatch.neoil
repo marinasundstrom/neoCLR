@@ -1,7 +1,7 @@
 .module StringInterfaceDispatch
 .type class Other
 .implements Root<String>
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
 .method instance Equals(String other) -> Boolean

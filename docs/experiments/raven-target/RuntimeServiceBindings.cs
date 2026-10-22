@@ -48,7 +48,7 @@ static partial class RuntimeServiceBindings
             ("JoinWorker", ["Int32"], "String"),
             ("RequestWorkerCancellation", ["Int32"], "Boolean"),
             ("JoinWorkerResult", ["Int32"], "Value"),
-            ("NotifyWorker", ["Int32", "fn<Void>"], "noresult"),
+            ("NotifyWorker", ["Int32", "fn<Void>"], "void"),
             ("LocalDateTime", ["Int64"], "System.Time.LocalDateTime"),
             ("TimeZoneExists", ["String"], "Boolean"),
             ("TimeZoneOffset", ["String", "Int64"], "Int32"),
@@ -62,8 +62,8 @@ static partial class RuntimeServiceBindings
             ("GCPeakHeapObjectCount", [], "Int64"),
             ("GCReclaimedObjectCount", [], "Int64"),
             ("GCHeapObjectLimit", [], "Int64"),
-            ("GCCollect", [], "noresult"),
-            ("GCKeepAlive", ["System.Object"], "noresult"),
+            ("GCCollect", [], "void"),
+            ("GCKeepAlive", ["System.Object"], "void"),
             ("UnixTimeTicks", [], "Int64"),
             ("UnixTimeToLocal", ["Int64"], "arrayref<Int32>"),
             ("PathCombine", ["String", "String"], "String"),
@@ -109,7 +109,7 @@ static partial class RuntimeServiceBindings
             ("ConsoleWriteBytes", ["Boolean", "arrayref<Byte>", "Int32", "Int32"], "Value"),
             ("ConsoleFlush", ["Boolean"], "Value"),
             ("ConsoleReadByte", [], "Value"),
-            ("WriteLine", ["String"], "noresult"),
+            ("WriteLine", ["String"], "void"),
             ("EnvironmentArguments", [], "arrayref<String>"),
             ("EnvironmentCurrentDirectory", [], "Value"),
             ("EnvironmentVariable", ["String"], "Value"),
@@ -144,7 +144,7 @@ static partial class RuntimeServiceBindings
             ("ReflectionPropertyGetCheck", ["System.RuntimeTypeHandle", "Int32", "System.Object"], "Int32"),
             ("ReflectionPropertySetCheck", ["System.RuntimeTypeHandle", "Int32", "System.Object", "System.Object"], "Int32"),
             ("ReflectionPropertyGet", ["System.RuntimeTypeHandle", "Int32", "System.Object"], "System.Object"),
-            ("ReflectionPropertySet", ["System.RuntimeTypeHandle", "Int32", "System.Object", "System.Object"], "noresult"),
+            ("ReflectionPropertySet", ["System.RuntimeTypeHandle", "Int32", "System.Object", "System.Object"], "void"),
             ("ObjectTypeHandle", ["System.Object"], "System.RuntimeTypeHandle"),
             ("TypeName", ["System.RuntimeTypeHandle"], "String"),
             ("TypeEquals", ["System.RuntimeTypeHandle", "System.RuntimeTypeHandle"], "Boolean"),
@@ -153,9 +153,9 @@ static partial class RuntimeServiceBindings
             ("TypeShape", ["System.RuntimeTypeHandle", "Int32"], "Boolean"),
             ("TypeDisplayName", ["System.RuntimeTypeHandle", "Int32"], "String"),
             ("DefaultTaskQueue", [], "System.Concurrency.Tasks.TaskQueue"),
-            ("ScheduleTask", ["fn<Void>"], "noresult"),
-            ("DrainEntryTasks", [], "noresult"),
-            ("RegisterDefaultTaskQueue", ["System.Concurrency.Tasks.TaskQueue"], "noresult"),
+            ("ScheduleTask", ["fn<Void>"], "void"),
+            ("DrainEntryTasks", [], "void"),
+            ("RegisterDefaultTaskQueue", ["System.Concurrency.Tasks.TaskQueue"], "void"),
             ("CurrentTaskQueue", [], "System.Concurrency.Tasks.TaskQueue"),
             ("ExecutingAssembly", [], "System.Introspection.AssemblyInfo"),
             ("AssemblyName", ["String"], "String"),
@@ -198,7 +198,7 @@ static partial class RuntimeServiceBindings
         "Boolean" => "bool",
         "Int64" => "long",
         "Value" => "System.Value",
-        "noresult" => "void",
+        "void" => "void",
         "IntPtr" => "System.IntPtr",
         "UIntPtr" => "System.UIntPtr",
         "UInt64" => "ulong",
@@ -210,7 +210,7 @@ static partial class RuntimeServiceBindings
     };
     static bool IsProperty(string name) => name is "CurrentTaskQueue" or "DefaultTaskQueue";
     public static string Declarations => "\n#nullable enable annotations\nnamespace Runtime.CompilerServices { public static class RuntimeServices { "
-        + string.Join(" ", Members.Select(m => IsProperty(m.Name) ? $"public static {CSharp(m.Result)} {m.Name} => default;" : $"public static {CSharp(m.Result)} {m.Name}({string.Join(',', m.Args.Select((t, i) => (m.Name.StartsWith("Reflection") && t == "arrayref<System.Object>" ? "object?[]" : CSharp(t)) + ((m.Name == "GCKeepAlive" || m.Name == "ObjectReferenceEquals" || m.Name == "ObjectEquals" && i == 1 || m.Name.StartsWith("Reflection") && t == "System.Object" && i >= 2) ? "?" : "") + " arg" + i))}) {(m.Result == "noresult" ? "{ }" : "=> default;")}")) + " public static System.RuntimeTypeHandle TypeHandle<T>() => default; public static bool IsValue<T>(System.Value value) => default; public static T UnpackValue<T>(System.Value value) => default; " + QueueDeclarations + " } public static class NativeReflection { public static int ReflectionConstructionCheck(System.RuntimeTypeHandle handle) => default; public static object ReflectionConstruct(System.RuntimeTypeHandle handle) => default; } }\n#nullable restore annotations\n";
+        + string.Join(" ", Members.Select(m => IsProperty(m.Name) ? $"public static {CSharp(m.Result)} {m.Name} => default;" : $"public static {CSharp(m.Result)} {m.Name}({string.Join(',', m.Args.Select((t, i) => (m.Name.StartsWith("Reflection") && t == "arrayref<System.Object>" ? "object?[]" : CSharp(t)) + ((m.Name == "GCKeepAlive" || m.Name == "ObjectReferenceEquals" || m.Name == "ObjectEquals" && i == 1 || m.Name.StartsWith("Reflection") && t == "System.Object" && i >= 2) ? "?" : "") + " arg" + i))}) {(m.Result == "void" ? "{ }" : "=> default;")}")) + " public static System.RuntimeTypeHandle TypeHandle<T>() => default; public static bool IsValue<T>(System.Value value) => default; public static T UnpackValue<T>(System.Value value) => default; " + QueueDeclarations + " } public static class NativeReflection { public static int ReflectionConstructionCheck(System.RuntimeTypeHandle handle) => default; public static object ReflectionConstruct(System.RuntimeTypeHandle handle) => default; } }\n#nullable restore annotations\n";
 
     public static ResultBindings.Binding? Bind(MethodReference reference, MethodDefinition definition)
     {
@@ -242,7 +242,7 @@ static partial class RuntimeServiceBindings
                 throw new InvalidDataException("Unsupported generic queue service.");
             var element = RuntimeSignatures.Map(generic.GenericArguments[0], GenericUnionBindings.Type);
             if (element != "System.Concurrency.Tasks.TaskQueue") throw new InvalidDataException("Unsupported legacy queue identity.");
-            return new("", register ? [element] : [], register ? "noresult" : element,
+            return new("", register ? [element] : [], register ? "void" : element,
                 Instruction: $"call neoCLR.Runtime.{reference.Name}<{element}>({(register ? element : "")})" + (register ? "\npop" : ""));
         }
         if (reference.Name is "IsValue" or "UnpackValue")

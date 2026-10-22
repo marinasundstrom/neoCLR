@@ -120,7 +120,7 @@ ret
 .type class System.Networking.IPv4Address
 .sealed
 .extends System.Networking.IPAddress
-.method internal instance .ctor(arrayref<Byte> bytes) -> noresult
+.method internal instance .ctor(arrayref<Byte> bytes) -> void
 M0000000d_IL_0000:
 M0000000d_IL_0001:
 ldarg 0
@@ -162,7 +162,7 @@ ret
 .type class System.Networking.IPv6Address
 .sealed
 .extends System.Networking.IPAddress
-.method internal instance .ctor(arrayref<Byte> bytes) -> noresult
+.method internal instance .ctor(arrayref<Byte> bytes) -> void
 M0000000e_IL_0000:
 M0000000e_IL_0001:
 ldarg 0

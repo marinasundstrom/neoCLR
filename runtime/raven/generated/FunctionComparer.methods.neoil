@@ -3,7 +3,7 @@
 .sealed
 .implements System.Collections.Comparer<T0>
 .field private compare fn<T0,T0,Int32>
-.method instance .ctor(fn<T0,T0,Int32> compare) -> noresult
+.method instance .ctor(fn<T0,T0,Int32> compare) -> void
 M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0

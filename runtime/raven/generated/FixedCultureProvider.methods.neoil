@@ -6,7 +6,7 @@
 .property instance Current() -> System.Globalization.Culture
 .get instance System.Globalization.FixedCultureProvider::get_Current()
 .end
-.method instance .ctor(System.Globalization.Culture culture) -> noresult
+.method instance .ctor(System.Globalization.Culture culture) -> void
 M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0

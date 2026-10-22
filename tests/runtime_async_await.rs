@@ -48,7 +48,7 @@ fn program(main: &str, extra: &str) -> LoadedProgram {
 .function neoCLR.Runtime.SchedulerSubmit(fn<Void> callback) -> Int32
 .methodimpl InternalCall
 .end
-.function neoCLR.Runtime.GCCollect() -> noresult
+.function neoCLR.Runtime.GCCollect() -> void
 .methodimpl InternalCall
 .end
 {extra}
@@ -95,7 +95,7 @@ const PRODUCER: &str = r#"
 .type class Producer
 .field Operation Int64
 .field Value Int32
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
 .method instance Complete() -> Void
@@ -266,7 +266,7 @@ const INDEPENDENT: &str = r#"
 .field Parent Int64
 .field Reply Int64
 .field Done Int64
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
 .method instance Run() -> Void
@@ -393,7 +393,7 @@ const BODY: &str = r#"
 .type class AsyncBody
 .field Gate Int64
 .field Phase Int32
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
 .method instance Run() -> Int32
@@ -650,7 +650,7 @@ fault "cancelled observer aborted delivery or corrupted another operation"
         r#"
 .type class Canceller
 .field Operation Int64
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
 .method instance Run() -> Void
@@ -873,7 +873,7 @@ fn cli_no_result_unit_await_does_not_push_a_value() {
 .function neoCLR.Runtime.RuntimeAsyncCompleteUnit(Int64 id) -> Boolean
 .methodimpl InternalCall
 .end
-.function neoCLR.Runtime.RuntimeAsyncAwaitUnit(Int64 id) -> noresult
+.function neoCLR.Runtime.RuntimeAsyncAwaitUnit(Int64 id) -> void
 .methodimpl InternalCall
 .end
 .function Main() -> Int32
@@ -903,7 +903,7 @@ fn entry_drain_tracks_its_frame_across_detached_unit_body_calls() {
         .replace("ldc.i4 42\nret", "call Helper()\nldvoid\nret");
     let extra = format!(
         r#"{body}
-.function Helper() -> noresult
+.function Helper() -> void
 ret
 .end
 .function neoCLR.Runtime.DrainEntryTasks() -> Void
@@ -911,7 +911,7 @@ ret
 .end
 .type class Observer
 .field Handle Int64
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
 .method instance Run() -> Void
@@ -1031,10 +1031,10 @@ ret
 .type class System.Concurrency.Tasks.TaskQueue
 .field Gate Int64
 .field Running Boolean
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
-.method instance Drain() -> noresult
+.method instance Drain() -> void
 ldarg 0
 ldfld System.Concurrency.Tasks.TaskQueue::Running
 brfalse Begin
@@ -1114,7 +1114,7 @@ fault "managed body lost current owner"
 .function neoCLR.Runtime.RuntimeAsyncCurrentOwner() -> System.Object
 .methodimpl InternalCall
 .end
-.function Abandon() -> noresult
+.function Abandon() -> void
 .local Owned owner
 newobj Owned
 stloc owner
@@ -1173,7 +1173,7 @@ ret
 .function neoCLR.Runtime.RuntimeAsyncStartManaged(System.Object owner, fn<Void> body) -> Int64
 .methodimpl InternalCall
 .end
-.function CompleteAndDrop(Int64 gate, Int64 done) -> noresult
+.function CompleteAndDrop(Int64 gate, Int64 done) -> void
 .local Owned owner
 ldarg gate
 ldarg done

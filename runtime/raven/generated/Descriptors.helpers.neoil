@@ -1192,7 +1192,7 @@ ret
 .property instance DeclaringType() -> System.Option<System.Introspection.TypeInfo>
 .get instance System.Introspection.RuntimeMemberInfo::get_DeclaringType()
 .end
-.method internal instance .ctor(String name,System.Introspection.TypeInfo declaringType,Int32 metadataToken) -> noresult
+.method internal instance .ctor(String name,System.Introspection.TypeInfo declaringType,Int32 metadataToken) -> void
 M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0
@@ -1567,7 +1567,7 @@ ret
 .property instance DefinitionIndex() -> Int32
 .get instance System.Introspection.RuntimeFieldInfo::get_DefinitionIndex()
 .end
-.method private instance .ctor(String name,System.Introspection.TypeInfo declaringType,Int32 metadataToken,System.Introspection.TypeInfo fieldType,Boolean isPublic,Boolean isPrivate,Boolean isAssembly,Boolean isStatic,Int32 definitionIndex) -> noresult
+.method private instance .ctor(String name,System.Introspection.TypeInfo declaringType,Int32 metadataToken,System.Introspection.TypeInfo fieldType,Boolean isPublic,Boolean isPrivate,Boolean isAssembly,Boolean isStatic,Int32 definitionIndex) -> void
 M00000008_IL_0000:
 M00000008_IL_0001:
 ldarg 0
@@ -1977,7 +1977,7 @@ ret
 .property instance IsAbstract() -> Boolean
 .get instance System.Introspection.RuntimeMethodInfo::get_IsAbstract()
 .end
-.method private instance .ctor(String name,System.Introspection.TypeInfo declaringType,Int32 metadataToken,System.Introspection.TypeInfo returnType,Boolean isStatic,Boolean isPublic,Boolean isPrivate,Boolean isAssembly,Boolean isReceiverByRef,Int32 definitionIndex,System.Introspection.ParameterInfo[] parameters,Boolean isReadOnly,Boolean isVirtual,Boolean isOverride,Boolean isAbstract) -> noresult
+.method private instance .ctor(String name,System.Introspection.TypeInfo declaringType,Int32 metadataToken,System.Introspection.TypeInfo returnType,Boolean isStatic,Boolean isPublic,Boolean isPrivate,Boolean isAssembly,Boolean isReceiverByRef,Int32 definitionIndex,System.Introspection.ParameterInfo[] parameters,Boolean isReadOnly,Boolean isVirtual,Boolean isOverride,Boolean isAbstract) -> void
 M00000011_IL_0000:
 M00000011_IL_0001:
 ldarg 0
@@ -2453,7 +2453,7 @@ ret
 .property instance IsAbstract() -> Boolean
 .get instance System.Introspection.RuntimeConstructorInfo::get_IsAbstract()
 .end
-.method private instance .ctor(String name,System.Introspection.TypeInfo declaringType,Int32 metadataToken,System.Introspection.TypeInfo returnType,Boolean isStatic,Boolean isPublic,Boolean isPrivate,Boolean isAssembly,Boolean isReceiverByRef,Int32 definitionIndex,System.Introspection.ParameterInfo[] parameters,Boolean isReadOnly,Boolean isVirtual,Boolean isOverride,Boolean isAbstract) -> noresult
+.method private instance .ctor(String name,System.Introspection.TypeInfo declaringType,Int32 metadataToken,System.Introspection.TypeInfo returnType,Boolean isStatic,Boolean isPublic,Boolean isPrivate,Boolean isAssembly,Boolean isReceiverByRef,Int32 definitionIndex,System.Introspection.ParameterInfo[] parameters,Boolean isReadOnly,Boolean isVirtual,Boolean isOverride,Boolean isAbstract) -> void
 M00000020_IL_0000:
 M00000020_IL_0001:
 ldarg 0
@@ -3031,7 +3031,7 @@ ret
 .property instance DefinitionIndex() -> Int32
 .get instance System.Introspection.RuntimePropertyInfo::get_DefinitionIndex()
 .end
-.method private instance .ctor(String name,System.Introspection.TypeInfo declaringType,Int32 metadataToken,System.Introspection.TypeInfo propertyType,Boolean isStatic,Boolean canRead,Boolean canWrite,Int32 definitionIndex,System.Introspection.ParameterInfo[] indexParameters,System.Option<System.Introspection.MethodInfo> getter,System.Option<System.Introspection.MethodInfo> setter) -> noresult
+.method private instance .ctor(String name,System.Introspection.TypeInfo declaringType,Int32 metadataToken,System.Introspection.TypeInfo propertyType,Boolean isStatic,Boolean canRead,Boolean canWrite,Int32 definitionIndex,System.Introspection.ParameterInfo[] indexParameters,System.Option<System.Introspection.MethodInfo> getter,System.Option<System.Introspection.MethodInfo> setter) -> void
 M0000002f_IL_0000:
 M0000002f_IL_0001:
 ldarg 0
@@ -3660,7 +3660,7 @@ ret
 .property instance Constructor() -> System.Introspection.ConstructorInfo
 .get instance System.Introspection.CustomAttributeData::get_Constructor()
 .end
-.method private instance .ctor(System.Introspection.TypeInfo type,System.Introspection.ConstructorInfo constructor,arrayref<System.Introspection.CustomAttributeTypedArgument> arguments) -> noresult
+.method private instance .ctor(System.Introspection.TypeInfo type,System.Introspection.ConstructorInfo constructor,arrayref<System.Introspection.CustomAttributeTypedArgument> arguments) -> void
 M0000003c_IL_0000:
 M0000003c_IL_0001:
 ldarg 0
@@ -3797,7 +3797,7 @@ ret
 .property instance Value() -> System.Object
 .get instance System.Introspection.CustomAttributeTypedArgument::get_Value()
 .end
-.method private instance .ctor(System.Introspection.TypeInfo type,System.Object value) -> noresult
+.method private instance .ctor(System.Introspection.TypeInfo type,System.Object value) -> void
 M00000040_IL_0000:
 M00000040_IL_0001:
 ldarg 0
@@ -3911,7 +3911,7 @@ ldfld System.Introspection.RuntimeTypeInfo::Handle
 M00000043_IL_0008:
 ret
 .end
-.method private instance .ctor(System.RuntimeTypeHandle handle) -> noresult
+.method private instance .ctor(System.RuntimeTypeHandle handle) -> void
 M00000044_IL_0000:
 M00000044_IL_0001:
 ldarg 0
@@ -4761,7 +4761,7 @@ ldfld System.Introspection.RuntimeNominalTypeInfo::Handle
 M0000006b_IL_0008:
 ret
 .end
-.method private instance .ctor(System.RuntimeTypeHandle handle) -> noresult
+.method private instance .ctor(System.RuntimeTypeHandle handle) -> void
 M0000006c_IL_0000:
 M0000006c_IL_0001:
 ldarg 0
@@ -5627,7 +5627,7 @@ ldfld System.Introspection.RuntimeFunctionTypeInfo::Handle
 M00000098_IL_0008:
 ret
 .end
-.method private instance .ctor(System.RuntimeTypeHandle handle) -> noresult
+.method private instance .ctor(System.RuntimeTypeHandle handle) -> void
 M00000099_IL_0000:
 M00000099_IL_0001:
 ldarg 0

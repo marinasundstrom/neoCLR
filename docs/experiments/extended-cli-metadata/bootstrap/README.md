@@ -852,7 +852,7 @@ first and then a consumer without those sources. ScheduleTask receives a bound
 instance callback; DrainEntryTasks completes its mutation before the consumer reads
 the same receiver and exits 42. The current catalog has 24 checked core methods.
 
-Native core Action signatures encode `fn<noresult Void>`; the legacy inventory's
+Native core Action signatures encode `fn<void>`; the legacy inventory's
 `fn<Void>` notation remains an inhabited result. ScheduleTask accepts both explicitly.
 This is not an implicit conversion between callback types. NotifyWorker remains
 unselected until its default-queue callback contract is integrated. Source Tasks and

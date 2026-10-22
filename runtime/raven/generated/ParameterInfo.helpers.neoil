@@ -168,7 +168,7 @@ ret
 .property instance IsReadOnly() -> Boolean
 .get instance System.Introspection.RuntimeParameterInfo::get_IsReadOnly()
 .end
-.method private instance .ctor(String name,Int32 position,System.Introspection.TypeInfo parameterType,Boolean isOut,Boolean isOutWhenTrue,Boolean isReadOnly,Int32 metadataToken,System.Option<System.Introspection.ModuleInfo> module,System.Introspection.TypeInfo declaringType,Int32 memberKind,Int32 memberIndex) -> noresult
+.method private instance .ctor(String name,Int32 position,System.Introspection.TypeInfo parameterType,Boolean isOut,Boolean isOutWhenTrue,Boolean isReadOnly,Int32 metadataToken,System.Option<System.Introspection.ModuleInfo> module,System.Introspection.TypeInfo declaringType,Int32 memberKind,Int32 memberIndex) -> void
 M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0

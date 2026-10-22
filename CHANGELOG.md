@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
+- Replace obsolete noresult IL spellings with void in active producers, bootstrap fixtures, generated inventories and tests; use fn<void> for no-result function shapes and reject the old spelling. Preserve internal ABI metadata and generic value returns. Fix function-shape text projection and add rejection, stack and round-trip regressions. All 102 focused Rust tests and 24 website checks pass; the CLI bridge builds. SDK validation reports 185/191 passing, with the same six failures under the old display spelling. Canonicalizing legacy Void/System.Void return bodies and callers remains unfinished; this increment does not establish alias parity. Update bridge docs in both repositories and development website guidance.
+
 - Repair metadata SDK validation build blockers: document the existing generic-definition token operation and explicitly reject a missing reflected type in its test. No token semantics or API signatures change.
 
 - Record the canonical Void contract: void aliases System.Void, direct Void returns have no result, and language-required values remain compiler-generated; reject case/qualification-based return distinctions and the noresult keyword. Verify Raven source already distinguishes preserved no-result expressions from generic value returns. The coordinated IL migration and end-to-end qualification remain pending; no runtime semantics change in this decision record.

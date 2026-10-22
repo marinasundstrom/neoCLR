@@ -22,7 +22,7 @@ of them. The legacy union/static-call paths have not all migrated yet.
 This refactor retains the CLI type-parameter and constructed-signature model already
 used by the [generic metadata foundation](generic-metadata.md) and the
 [Raven reference artifact](raven-core-declarations.md). It adds no opcode or runtime
-API contract. A CLI VOID return maps to `noresult`; named Void in a value position
+API contract. A CLI VOID return maps to `void`; named Void in a value position
 remains a type, and a generic carrier containing it remains a carrier. See
 [Void semantics](void-semantics.md) for the intentional difference from .NET.
 

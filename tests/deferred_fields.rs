@@ -1,6 +1,6 @@
 use neoclr::{Limits, Value, assemble, load, run};
 
-const CELL: &str = ".type class Cell<T>\n.field deferred Pending T\n.method instance .ctor() -> noresult\nret\n.end\n.end\n";
+const CELL: &str = ".type class Cell<T>\n.field deferred Pending T\n.method instance .ctor() -> void\nret\n.end\n.end\n";
 
 fn app(body: &str, declarations: &str) -> neoclr::Module {
     assemble(&format!(

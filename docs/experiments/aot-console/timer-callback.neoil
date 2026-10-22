@@ -1,7 +1,7 @@
 .module NativeTimer
 .type class Completion
 .field Number Int32
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ldarg 0
 ldc.i4 42
 stfld Completion::Number

@@ -260,7 +260,7 @@ ret
 .type internal class neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E55746638456E636F64696E67
 .sealed
 .implements System.Text.Encoding
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 M00000003_IL_0000:
 M00000003_IL_0001:
 ldarg 0
@@ -329,7 +329,7 @@ ret
 .type internal class neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E4173636969456E636F64696E67
 .sealed
 .implements System.Text.Encoding
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 M00000007_IL_0000:
 M00000007_IL_0001:
 ldarg 0
@@ -470,7 +470,7 @@ ret
 .field private pending Boolean
 .field private ending Boolean
 .field private finished Boolean
-.method instance .ctor(Boolean strictAscii) -> noresult
+.method instance .ctor(Boolean strictAscii) -> void
 M0000000b_IL_0000:
 M0000000b_IL_0001:
 ldarg 0
@@ -1588,7 +1588,7 @@ fault "System.Fail returned unexpectedly"
 .field private pending Int32
 .field private width Int32
 .field private stopped Boolean
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 M0000000f_IL_0000:
 M0000000f_IL_0001:
 ldarg 0
@@ -2471,7 +2471,7 @@ ret
 .sealed
 .implements System.Text.Decoder
 .field private stopped Boolean
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 M00000011_IL_0000:
 M00000011_IL_0001:
 ldarg 0

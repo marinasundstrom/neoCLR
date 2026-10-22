@@ -5646,7 +5646,7 @@ System compilation strategy for commands, limits and remaining initializer bindi
 ### Scheduling callback ABI (2026-10-04)
 
 The generated primitive core exposes ScheduleTask(Action) and DrainEntryTasks().
-Action transports a no-result function signature, `fn<noresult Void>`; native unit
+Action transports a no-result function signature, `fn<void>`; native unit
 callbacks with `fn<Void>` remain a separate accepted ScheduleTask overload. The
 runtime retains the bound receiver and verifies the exact function signature.
 No Raven emitter special case or Object-boxing bridge is introduced. The metadata
@@ -6382,7 +6382,7 @@ temporary binding input, while application and library references use native met
 The `--reference-source-failure-core` profile omits the projected Fail declaration.
 Unchanged System/Functions.rvn plus internal RuntimeFailure adapters emit Failure.dll;
 an artifact-only consumer resolves its namespace function through native metadata.
-`neoCLR.Runtime.Fail(String) -> noresult` is the new exact runtime service, while the
+`neoCLR.Runtime.Fail(String) -> void` is the new exact runtime service, while the
 legacy seed's inhabited `Fault` service remains intact for existing Numbers bodies.
 Both raise UserFault and never return. Wrong new-service signatures reject.
 
@@ -14541,3 +14541,15 @@ repairs do not add pinning, foreign-owned Memory or JIT/AOT import execution. Th
 [native buffer evidence](experiments/native-buffers/README.md) records the tested
 producer, consumer and runtime scope; native default operations already express the
 intended semantics, so no new temporary CLI bridge representation is introduced.
+
+## IL no-result spelling migration — 2026-10-22
+
+The temporary CLI bridge now emits `void` and `fn<void>` for CLI VOID returns,
+including adapters and generated bootstrap fixtures. Matching assemblers reject
+`noresult`; rebuild text artifacts with the matching bridge. This changes spelling,
+not Runtime Contract selection or the internal `no_result` ABI field. CLI named
+Void storage and original-generic value-return conventions are unchanged. The
+canonical alias migration still requires rewriting legacy named-Void return bodies
+and call sites; this increment does not qualify that work or native metadata parity.
+Raven compiler source is unchanged. The native metadata/backend replacement remains
+responsible for preserving the declaration's ABI through specialization.

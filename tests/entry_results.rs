@@ -33,7 +33,7 @@ fn entry_dispatch_without_a_queue_resumes_and_preserves_stack_values() {
 
 #[test]
 fn no_result_entry_dispatch_preserves_the_caller_stack() {
-    let module = neoclr::assemble(".module App\n.entry Main\n.function Main() -> Int32\nldc.i4 42\ncall neoCLR.Runtime.DrainEntryTasks()\nret\n.end\n.function neoCLR.Runtime.DrainEntryTasks() -> noresult\n.methodimpl InternalCall\n.end\n").unwrap();
+    let module = neoclr::assemble(".module App\n.entry Main\n.function Main() -> Int32\nldc.i4 42\ncall neoCLR.Runtime.DrainEntryTasks()\nret\n.end\n.function neoCLR.Runtime.DrainEntryTasks() -> void\n.methodimpl InternalCall\n.end\n").unwrap();
     let program = neoclr::LoadedProgram::new(&module).unwrap();
     program.verify().unwrap();
     assert_eq!(
@@ -47,14 +47,14 @@ fn dispatch_program(drain: &str) -> neoclr::LoadedProgram {
 }
 
 fn dispatch_program_with_result(drain: &str, no_result: bool) -> neoclr::LoadedProgram {
-    let drain_result = if no_result { "noresult" } else { "Void" };
+    let drain_result = if no_result { "void" } else { "Void" };
     let system = neoclr::assemble(&format!(
         r#".module System
 .type class System.Concurrency.Tasks.TaskQueue
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
-.method instance Drain() -> noresult
+.method instance Drain() -> void
 {drain}
 ret
 .end
@@ -87,7 +87,7 @@ ret
     let source = if no_result {
         source
             .replace("call Wait()\npop", "call Wait()")
-            .replace(".function Wait() -> Void", ".function Wait() -> noresult")
+            .replace(".function Wait() -> Void", ".function Wait() -> void")
     } else {
         source.to_owned()
     };

@@ -1046,8 +1046,8 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                                 .collect::<Result<_, _>>()?,
                             generic_arguments: vec![],
                             is_abstract,
-                            no_result: matches!(result.trim(), "void" | "noresult"),
-                            returns: if matches!(result.trim(), "void" | "noresult") {
+                            no_result: result.trim() == "void",
+                            returns: if result.trim() == "void" {
                                 Type::Void
                             } else {
                                 parse_type(result)?
@@ -1181,6 +1181,9 @@ pub fn parse_type(text: &str) -> Result<Type, Fault> {
             return Err(Fault::new("type nesting exceeds 32"));
         }
         let text = text.trim();
+        if text == "noresult" || text.starts_with("noresult ") {
+            return Err(Fault::new("obsolete noresult spelling; use void"));
+        }
         if let Some(element) = text
             .strip_prefix("arrayref<")
             .and_then(|t| t.strip_suffix('>'))
@@ -1307,11 +1310,8 @@ pub fn parse_type(text: &str) -> Result<Type, Fault> {
                         .ok_or_else(|| Fault::new("Function requires a result type"))?;
                     let mut shape = crate::metadata::FunctionType {
                         parameters: vec![],
-                        returns: parse(
-                            result.trim().strip_prefix("noresult ").unwrap_or(result),
-                            depth + 1,
-                        )?,
-                        no_result: result.trim().starts_with("noresult "),
+                        returns: parse(result, depth + 1)?,
+                        no_result: result.trim() == "void",
                         out_parameters: vec![],
                         out_when_true: vec![],
                     };

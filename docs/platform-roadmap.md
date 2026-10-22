@@ -1,5 +1,11 @@
 # neoCLR platform roadmap
 
+**Void IL migration (2026-10-22):** Active no-result producers and fixtures now use
+`void`, including `fn<void>`; the obsolete `noresult` spelling is rejected. This is
+the syntax migration increment. Legacy named-Void return bodies/callers and alias
+unification remain open before resuming native interop. See
+[contract and migration status](void-semantics.md).
+
 **Native interoperability sequence (author direction, 2026-10-22):** Complete
 NativeImport's pointer, stack/heap memory and managed pinning foundation first,
 with AOT as the primary deployment target and JIT/interpreter as alternative engines.

@@ -195,6 +195,6 @@
     "Receive(arrayref<Byte> buffer,Int32 offset,Int32 count,System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>",
     "Send(arrayref<Byte> buffer,Int32 offset,Int32 count) -> System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>",
     "Send(arrayref<Byte> buffer,Int32 offset,Int32 count,System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>",
-    "Close() -> noresult"
+    "Close() -> void"
   ]
 }

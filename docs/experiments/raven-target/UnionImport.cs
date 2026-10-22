@@ -81,7 +81,7 @@ static class UnionImport
         MethodDefinition? activeLibraryMethod = null;
         string ProfileType(TypeReference type, bool result = false)
         {
-            if (result && ApplicationTypes.IsInitReturn(type)) return "noresult";
+            if (result && ApplicationTypes.IsInitReturn(type)) return "void";
             if ((libraryOwner is not null || type is ByReferenceType { ElementType.MetadataType: MetadataType.Int32 or MetadataType.String } || type is ByReferenceType errorReference && ErrorBindings.Type(errorReference.ElementType) is not null) && type is ByReferenceType byref)
                 return ProfileType(byref.ElementType) + "&";
             if (type is GenericParameter parameter)
@@ -690,12 +690,12 @@ static class UnionImport
                                     ? ApplicationTypes.Close(type, constructedFunction.DeclaringType) : type;
                             var targetArguments = function.Parameters.Select(p => ProfileType(FunctionTargetType(p.ParameterType))).ToArray();
                             var targetResult = ProfileType(FunctionTargetType(function.ReturnType), true);
-                            if (!targetArguments.SequenceEqual(signature[..^1]) || (targetResult != signature[^1] && !(targetResult == "noresult" && signature[^1] == "Void")))
+                            if (!targetArguments.SequenceEqual(signature[..^1]) || (targetResult != signature[^1] && !(targetResult == "void" && signature[^1] == "Void")))
                                 throw new InvalidDataException("Function target signature mismatch.");
                             if (!function.IsAbstract) pending.Enqueue(function);
                             // Preserve the actual method identity whenever native binding can
                             // perform the same dispatch without a return-value adapter.
-                            if (function.HasThis && targetResult != "noresult"
+                            if (function.HasThis && targetResult != "void"
                                 && (!function.IsVirtual || addressSlot.VirtualFunction || addressSlot.ConstructedFunction is not null))
                             {
                                 code.AppendLine($"function.bind {delegateType} = instance {addressSlot.FunctionReceiver ?? ProfileType(function.DeclaringType)}::{ApplicationTypes.MethodName(function)}({string.Join(',', targetArguments)})");
@@ -719,7 +719,7 @@ static class UnionImport
                                 }
                                 for (var n = 0; n < targetArguments.Length; n++) body.AppendLine($"ldarg {n + 1}");
                                 body.AppendLine($"{callInstruction} instance {owner}::{ApplicationTypes.MethodName(function)}({string.Join(',', adapterArguments)})");
-                                if (targetResult == "noresult") body.AppendLine("ldvoid");
+                                if (targetResult == "void") body.AppendLine("ldvoid");
                                 body.AppendLine("ret\n.end");
                                 if (function.DeclaringType.IsInterface)
                                 {
@@ -731,7 +731,7 @@ static class UnionImport
                                 Push(new(delegateType)); break;
                             }
                             var targetName = Name(function);
-                            if (targetResult == "noresult")
+                            if (targetResult == "void")
                             {
                                 var adapterName = "RuntimeFunction" + targetName;
                                 var body = new StringBuilder($".function {adapterName}({string.Join(',', targetArguments.Select((t, i) => t + " arg" + i))}) -> Void\n");
@@ -761,7 +761,7 @@ static class UnionImport
                         if (collectionProfile && CollectionBindings.IsArrayList(CollectionBindings.Type(constructor.DeclaringType, libraryOwner is null ? null : t => ProfileType(t))))
                         {
                             var signature = RuntimeSignatures.Match(constructor, constructorDefinition, t => CollectionBindings.Type(t, libraryOwner is null ? null : p => ProfileType(p)), allowOpenMethodParameters: libraryOwner is not null);
-                            if (!constructorDefinition.IsConstructor || !constructor.HasThis || signature.Result != "noresult"
+                            if (!constructorDefinition.IsConstructor || !constructor.HasThis || signature.Result != "void"
                                 || signature.Args.Length > 1 || signature.Args.Any(p => p != "Int32"))
                                 throw new InvalidDataException("Unsupported collection constructor.");
                             if (signature.Args.Length == 1) Expect("Int32");
@@ -936,7 +936,7 @@ static class UnionImport
                                     || method.Parameters.Count != 1 || !GenericUnionLibrary.IsConditionalOutput(method, method.Parameters[0]))
                                     throw new InvalidDataException("Only conditional union outputs may remain unassigned.");
                                 var untouchedSignature = RuntimeSignatures.Match(reference, targetMethod, t => ProfileType(t), allowOpenMethodParameters: true);
-                                if (untouchedSignature.Result != "noresult" || untouchedSignature.Args.Length != 1
+                                if (untouchedSignature.Result != "void" || untouchedSignature.Args.Length != 1
                                     || untouchedSignature.Args[0] != args[1] || Expect(args[1]).Argument != 1)
                                     throw new InvalidDataException("Invalid conditional output address.");
                                 var missReturn = instructions.Skip(index + 1).Where(i => i.OpCode.Code != Code.Nop).Take(2).ToArray();
@@ -1010,7 +1010,7 @@ static class UnionImport
                                 else if (!assigned[argument.Local]) throw new InvalidDataException($"Read through uninitialized carrier address in {method.Name} at {instruction.Offset:x4}, local {argument.Local}: {reference.FullName}.");
                             }
                         }
-                        if (call.Result != "noresult") Push(new(call.Result == "Boolean" && conditionalOut < 0 ? "Int32" : PrimitiveBindings.Stack(call.Result), ConditionalOut: conditionalOut));
+                        if (call.Result != "void") Push(new(call.Result == "Boolean" && conditionalOut < 0 ? "Int32" : PrimitiveBindings.Stack(call.Result), ConditionalOut: conditionalOut));
                         call = Coerce(call, actualArguments, preserveAccess: !targetMethod.IsPublic);
                         code.AppendLine(applicationSpecialization.NativeSelfCall(instruction) ?? call.Instruction ?? $"call {call.Name}({string.Join(',', call.Arguments)})");
                         // Conditional-out results must reach their branch directly so the runtime
@@ -1025,9 +1025,9 @@ static class UnionImport
                         }
                         break;
                     case Code.Ret:
-                        if (result != "noresult") ConvertTop(result);
+                        if (result != "void") ConvertTop(result);
                         if (stack.Count != 0) throw new InvalidDataException($"Input ret stack not empty in {method.FullName}, expected {result}, remaining {string.Join(',', stack.Select(s => s.Type))}.");
-                        if ((emitInstance && method.DeclaringType.IsValueType && !asyncStateMember || libraryOwner == "System.Console" && !emitInstance && !emitOwnedStatic) && result == "noresult") code.AppendLine("ldvoid");
+                        if ((emitInstance && method.DeclaringType.IsValueType && !asyncStateMember || libraryOwner == "System.Console" && !emitInstance && !emitOwnedStatic) && result == "void") code.AppendLine("ldvoid");
                         code.AppendLine("ret"); terminates = true; break;
                     default: throw new InvalidDataException("Unsupported reachable instruction: " + instruction.OpCode);
                 }
@@ -1040,7 +1040,7 @@ static class UnionImport
             // Library metadata keeps author-supplied parameter names for introspection.
             var declaredParameters = args.Skip(method.HasThis ? 1 : 0).Select((t, i) =>
                 libraryOwner is not null ? (GenericUnionLibrary.IsConditionalOutput(method, method.Parameters[i]) || ApplicationTypes.IsConditionalUnionOutput(method) ? "out(true) " : method.Parameters[i].IsOut ? "out " : "") + t + " " + OpaqueLibrary.ParameterName(method, i) : (ApplicationTypes.IsConditionalUnionOutput(method) ? "out(true) " : method.Parameters[i].IsOut ? "out " : "") + t);
-            output.AppendLine(libraryOwner is not null && !emitInstance && !emitOwnedStatic ? $".function {(method.IsAssembly ? "internal " : "")}{Name(method)}({string.Join(',', args.Select((t, i) => t + " " + method.Parameters[i].Name))}) -> {(libraryOwner == "System.Console" && result == "noresult" ? "Void" : result)}" : emitOwnedStatic ? $".method {(method.IsPrivate ? "private " : method.IsAssembly ? "internal " : "")}static {ApplicationTypes.MethodName(method)}({string.Join(',', declaredParameters)}) -> {result}" : emitInstance ? $".method {((libraryOwner is not null || method.DeclaringType.IsInterface || ApplicationTypes.IsExplicitApplicationImplementation(method)) && method.IsPrivate ? "private " : (DescriptorLibrary.IsBaseConstructor(method) || libraryOwner is not null && method.IsAssembly) ? "internal " : "")}instance {ApplicationTypes.Modifiers(method)}{(LibraryImplementation.IsReadonlyReceiver(method) ? "readonly " : "")}{((method.DeclaringType.IsValueType && !LibraryImplementation.IsByValueReceiver(method) || OpaqueLibrary.IsByRefString(method)) ? "byref " : "")}{ApplicationTypes.MethodName(method)}({string.Join(',', declaredParameters)}) -> {(method.DeclaringType.IsValueType && !asyncStateMember && result == "noresult" ? "Void" : result)}" : $".function {(applicationSpecialization.IsSpecialized(method) ? "internal " : "")}{Name(method)}({string.Join(',', args)}) -> {result}");
+            output.AppendLine(libraryOwner is not null && !emitInstance && !emitOwnedStatic ? $".function {(method.IsAssembly ? "internal " : "")}{Name(method)}({string.Join(',', args.Select((t, i) => t + " " + method.Parameters[i].Name))}) -> {(libraryOwner == "System.Console" && result == "void" ? "Void" : result)}" : emitOwnedStatic ? $".method {(method.IsPrivate ? "private " : method.IsAssembly ? "internal " : "")}static {ApplicationTypes.MethodName(method)}({string.Join(',', declaredParameters)}) -> {result}" : emitInstance ? $".method {((libraryOwner is not null || method.DeclaringType.IsInterface || ApplicationTypes.IsExplicitApplicationImplementation(method)) && method.IsPrivate ? "private " : (DescriptorLibrary.IsBaseConstructor(method) || libraryOwner is not null && method.IsAssembly) ? "internal " : "")}instance {ApplicationTypes.Modifiers(method)}{(LibraryImplementation.IsReadonlyReceiver(method) ? "readonly " : "")}{((method.DeclaringType.IsValueType && !LibraryImplementation.IsByValueReceiver(method) || OpaqueLibrary.IsByRefString(method)) ? "byref " : "")}{ApplicationTypes.MethodName(method)}({string.Join(',', declaredParameters)}) -> {(method.DeclaringType.IsValueType && !asyncStateMember && result == "void" ? "Void" : result)}" : $".function {(applicationSpecialization.IsSpecialized(method) ? "internal " : "")}{Name(method)}({string.Join(',', args)}) -> {result}");
             if (ApplicationTypes.IsExplicitApplicationImplementation(method))
                 foreach (var declaration in method.Overrides)
                     output.AppendLine($".override instance {ProfileType(declaration.DeclaringType)}::{ApplicationTypes.MethodName(declaration.Resolve())}({string.Join(',', declaration.Parameters.Select(p => ProfileType(p.ParameterType)))})");
@@ -1184,7 +1184,7 @@ static class UnionImport
             && !unit.Methods.Any(m => m.IsConstructor && m.IsStatic) => "Void",
         "System.Void" when !result && type.IsValueType => "Void",
         "System.OverflowError" when type.IsValueType => Overflow,
-        "System.Double" => "Double", "System.Boolean" => "Boolean", "System.Void" when result => "noresult", "System.Int32" => "Int32", "System.String" => "String",
+        "System.Double" => "Double", "System.Boolean" => "Boolean", "System.Void" when result => "void", "System.Int32" => "Int32", "System.String" => "String",
         "System.Result`2<System.Void,System.OverflowError>" when type.IsValueType && type is GenericInstanceType g && g.GenericArguments[0].IsValueType && g.GenericArguments[0].Scope.Name == CoreDeclarations.Identity => VoidResult,
         "System.Result/Ok`1<System.Void>" when type.IsValueType && HasNamedVoid(type) => VoidOk,
         "System.Option`1<System.Void>" when type.IsValueType && HasNamedVoid(type) => VoidOption,
@@ -1288,9 +1288,9 @@ static class UnionImport
             && key == $"System.Result`2<System.Int32,System.OverflowError> {definition.DeclaringType.FullName}::Abs(System.Int32)" && reference.FullName == key && !reference.HasThis)
             return new("System.Math::Abs", ["Int32"], Carrier);
         if (key == "System.Void System.Console::WriteLine(System.Int32)" && reference.FullName == key && !reference.HasThis)
-            return new("RuntimeWriteInt32", ["Int32"], "noresult");
+            return new("RuntimeWriteInt32", ["Int32"], "void");
         if (key == "System.Void System.Console::WriteLine(System.String)" && reference.FullName == key && !reference.HasThis)
-            return new("RuntimeWriteString", ["String"], "noresult");
+            return new("RuntimeWriteString", ["String"], "void");
         if (reference.DeclaringType.FullName == "System.Result`2<System.Int32,System.OverflowError>" && reference.HasThis
             && reference.ReturnType.FullName == "System.Boolean" && reference.Parameters.Count == 1
             && definition.Parameters.Count == 1 && definition.Parameters[0].IsOut)
@@ -1372,13 +1372,13 @@ static class UnionImport
         if (HashCodeBindings.Type(reference.DeclaringType) is not null)
         {
             var shape = RuntimeSignatures.Match(reference, definition, HashCodeBindings.Type);
-            if (shape.Args.Length != 0 || shape.Result != "noresult") throw new InvalidDataException("Unsupported HashCode constructor.");
+            if (shape.Args.Length != 0 || shape.Result != "void") throw new InvalidDataException("Unsupported HashCode constructor.");
             return new("RuntimeNewHashCode", [], HashCodeBindings.Owner);
         }
         if (RuntimeSignatures.IsCore(reference.DeclaringType.Scope) && reference.DeclaringType.FullName == "System.Time.SystemClock")
         {
             var shape = RuntimeSignatures.Match(reference, definition, CalendarBindings.Type);
-            if (shape.Args.Length != 0 || shape.Result != "noresult")
+            if (shape.Args.Length != 0 || shape.Result != "void")
                 throw new InvalidDataException("Unsupported SystemClock constructor.");
             return new("RuntimeNewSystemClock", [], "System.Time.SystemClock");
         }
@@ -1479,7 +1479,7 @@ static class UnionImport
         foreach (var (name, type) in new[] { ("Some", VoidSome), ("None", None) })
             text.AppendLine($".function RuntimeVoidOption{name}({type} value) -> {VoidOption}\nldarg value\nnewobj instance {VoidOption}::.ctor({type})\nret\n.end");
         foreach (var type in new[] { "Int32", "String" })
-            text.AppendLine($".function RuntimeWrite{type}({type} value) -> noresult\nldarg value\ncall System.Console::WriteLine({type})\npop\nret\n.end");
+            text.AppendLine($".function RuntimeWrite{type}({type} value) -> void\nldarg value\ncall System.Console::WriteLine({type})\npop\nret\n.end");
         return AdaptUnionHelpers(text.ToString(), standardUnions);
     }
 

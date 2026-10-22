@@ -31,7 +31,7 @@ ldc.i4 2
 mul
 ret
 .end
-.method instance virtual set_Number(Int32 value) -> noresult
+.method instance virtual set_Number(Int32 value) -> void
 ldarg this
 ldarg value
 ldc.i4 1
@@ -76,7 +76,7 @@ ldc.i4 2
 add
 ret
 .end
-.method instance override set_Number(Int32 value) -> noresult
+.method instance override set_Number(Int32 value) -> void
 ldarg this
 ldarg value
 ldc.i4 2
@@ -273,7 +273,7 @@ fn signature_checks_preserve_setter_noresult_support_and_reject_wrong_types() {
             false,
         ),
         (
-            "ReflectionPropertySet(System.RuntimeTypeHandle,Int32,System.Object,System.Object) -> noresult",
+            "ReflectionPropertySet(System.RuntimeTypeHandle,Int32,System.Object,System.Object) -> void",
             true,
         ),
         (
@@ -281,7 +281,7 @@ fn signature_checks_preserve_setter_noresult_support_and_reject_wrong_types() {
             false,
         ),
         (
-            "ReflectionPropertySetCheck(System.RuntimeTypeHandle,Int32,System.Object,System.Object) -> noresult",
+            "ReflectionPropertySetCheck(System.RuntimeTypeHandle,Int32,System.Object,System.Object) -> void",
             false,
         ),
     ] {

@@ -10,7 +10,7 @@
 .sealed
 .end
 .type class abstract System.Object
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
 .method instance virtual GetHashCode() -> Int32
@@ -164,7 +164,7 @@ ret
 
 ; Metadata-only parameter-array marker; reading attributes never invokes this constructor.
 .type class System.ParamArrayAttribute
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
 .end

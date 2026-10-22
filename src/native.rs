@@ -1271,7 +1271,7 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         }
         ("neoCLR.Runtime.ScheduleTask", [callback])
             if *callback == crate::assembler::parse_type("fn<Void>")?
-                || *callback == crate::assembler::parse_type("fn<noresult Void>")? =>
+                || *callback == crate::assembler::parse_type("fn<void>")? =>
         {
             (Binding::ScheduleTask, Type::Void)
         }
@@ -2248,8 +2248,8 @@ mod task_callback_tests {
             ("GetDefaultTaskQueue<T, U>() -> T", false),
             ("GetDefaultTaskQueue() -> Int32", false),
             ("RegisterTaskQueue<T>(Int32 queue) -> Void", false),
-            ("RegisterTaskQueue<T>(T queue) -> noresult", true),
-            ("GetDefaultTaskQueue<T>() -> noresult", false),
+            ("RegisterTaskQueue<T>(T queue) -> void", true),
+            ("GetDefaultTaskQueue<T>() -> void", false),
             ("RegisterTaskQueue<T>(T queue) -> Int32", false),
         ] {
             let module = crate::assemble(&format!(
@@ -2290,7 +2290,7 @@ mod task_callback_tests {
                 false,
             ),
             (
-                "SchedulerSubmitTo(Int64 destination, fn<noresult Void> callback) -> Int32",
+                "SchedulerSubmitTo(Int64 destination, fn<void> callback) -> Int32",
                 false,
             ),
             (
@@ -2307,7 +2307,7 @@ mod task_callback_tests {
         for (signature, accepted) in [
             ("fn<Void> callback) -> Int32", true),
             ("fn<Void> callback) -> Void", false),
-            ("fn<noresult Void> callback) -> Int32", false),
+            ("fn<void> callback) -> Int32", false),
             ("fn<Int32> callback) -> Int32", false),
             ("fn<Int32,Void> callback) -> Int32", false),
         ] {
@@ -2319,11 +2319,11 @@ mod task_callback_tests {
     fn scheduling_accepts_only_parameterless_unit_or_no_result_callbacks() {
         for (callback, accepted) in [
             ("fn<Void>", true),
-            ("fn<noresult Void>", true),
+            ("fn<void>", true),
             ("fn<Int32>", false),
             ("fn<Int32,Void>", false),
         ] {
-            for result in ["Void", "noresult"] {
+            for result in ["Void", "void"] {
                 let module = crate::assemble(&format!(
                     ".module Test\n.function neoCLR.Runtime.ScheduleTask({callback} callback) -> {result}\n.methodimpl InternalCall\n.end\n"
                 ));
@@ -2339,23 +2339,23 @@ mod reflection_signature_tests {
     fn no_result_service_execution_requires_an_admitted_control_signature() {
         for (signature, accepted) in [
             (
-                "ReflectionPropertySet(RuntimeTypeHandle owner, Int32 token, System.Object receiver, System.Object value) -> noresult",
+                "ReflectionPropertySet(RuntimeTypeHandle owner, Int32 token, System.Object receiver, System.Object value) -> void",
                 true,
             ),
             (
-                "ReflectionPropertySetCheck(RuntimeTypeHandle owner, Int32 token, System.Object receiver, System.Object value) -> noresult",
+                "ReflectionPropertySetCheck(RuntimeTypeHandle owner, Int32 token, System.Object receiver, System.Object value) -> void",
                 false,
             ),
             (
-                "ReflectionPropertyGet(RuntimeTypeHandle owner, Int32 token, System.Object receiver) -> noresult",
+                "ReflectionPropertyGet(RuntimeTypeHandle owner, Int32 token, System.Object receiver) -> void",
                 false,
             ),
-            ("WriteLine(String text) -> noresult", true),
-            ("Fail(String message) -> noresult", true),
+            ("WriteLine(String text) -> void", true),
+            ("Fail(String message) -> void", true),
             ("Fail(String message) -> Void", false),
-            ("Fail(Int32 message) -> noresult", false),
-            ("GCCollect() -> noresult", true),
-            ("GCKeepAlive(System.Object value) -> noresult", true),
+            ("Fail(Int32 message) -> void", false),
+            ("GCCollect() -> void", true),
+            ("GCKeepAlive(System.Object value) -> void", true),
         ] {
             let result = crate::assemble(&format!(
                 ".module System\n.type class System.Object\n.end\n.function neoCLR.Runtime.{signature}\n.methodimpl InternalCall\n.end\n"

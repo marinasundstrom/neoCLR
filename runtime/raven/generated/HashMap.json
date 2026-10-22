@@ -178,13 +178,13 @@
   "compilerSha256": "6ba4e92a38dc594d7c3da219dc63862262e215e0b28976ada52974b0e13e3d0c",
   "coreSha256": "a29679dbca2677df8e10f3e542059a579da3043e428d757e78e3c29233c8cfb3",
   "exports": [
-    ".ctor(fn<T0,T0,Boolean> equal,fn<T0,Int32> hash) -> noresult",
-    ".ctor(System.Collections.EqualityComparer<T0> comparer) -> noresult",
+    ".ctor(fn<T0,T0,Boolean> equal,fn<T0,Int32> hash) -> void",
+    ".ctor(System.Collections.EqualityComparer<T0> comparer) -> void",
     "get_Count() -> Int32",
     "get_Keys() -> System.Collections.Sequence<T0>",
     "Find(T0 key) -> System.Option<T1>",
     "ContainsKey(T0 key) -> Boolean",
     "TryAdd(T0 key,T1 value) -> Boolean",
-    "Set(T0 key,T1 value) -> noresult"
+    "Set(T0 key,T1 value) -> void"
   ]
 }

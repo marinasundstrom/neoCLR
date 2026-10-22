@@ -130,7 +130,7 @@ False:
 .property instance DateTimeSeparator() -> String
 .get instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E4865627265774461746554696D65466F726D6174::get_DateTimeSeparator()
 .end
-.method instance .ctor(System.Time.Calendar calendar) -> noresult
+.method instance .ctor(System.Time.Calendar calendar) -> void
 M0000000a_IL_0000:
 M0000000a_IL_0001:
 ldarg 0
@@ -1267,7 +1267,7 @@ ret
 .property instance DateTimeSeparator() -> String
 .get instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E537765646973684461746554696D65466F726D6174::get_DateTimeSeparator()
 .end
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 M0000000b_IL_0000:
 M0000000b_IL_0001:
 ldarg 0
@@ -1363,7 +1363,7 @@ ret
 .property instance DateTimeSeparator() -> String
 .get instance neoCLR.Library.System.Globalization.DateTimeFormat.Type_53797374656D2E476C6F62616C697A6174696F6E2E496E76617269616E744461746554696D65466F726D6174::get_DateTimeSeparator()
 .end
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 M0000000c_IL_0000:
 M0000000c_IL_0001:
 ldarg 0
@@ -1561,7 +1561,7 @@ call System.String::Concat(String,String)
 M00000019_IL_0063:
 ret
 .end
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 M0000001a_IL_0000:
 M0000001a_IL_0001:
 ldarg 0

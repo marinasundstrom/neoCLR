@@ -9,7 +9,7 @@
 .field private eof Boolean
 .field private pendingText String
 .field private lastRead Int32
-.method instance .ctor(System.IO.InputStream input) -> noresult
+.method instance .ctor(System.IO.InputStream input) -> void
 M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0
@@ -72,7 +72,7 @@ stfld System.IO.StreamReader::leaveOpen
 M00000001_IL_004c:
 ret
 .end
-.method instance .ctor(System.IO.InputStream input,Boolean leaveOpen) -> noresult
+.method instance .ctor(System.IO.InputStream input,Boolean leaveOpen) -> void
 M00000002_IL_0000:
 M00000002_IL_0001:
 ldarg 0
@@ -136,7 +136,7 @@ stfld System.IO.StreamReader::leaveOpen
 M00000002_IL_004c:
 ret
 .end
-.method instance .ctor(System.IO.InputStream input,System.Text.Encoding encoding) -> noresult
+.method instance .ctor(System.IO.InputStream input,System.Text.Encoding encoding) -> void
 M00000003_IL_0000:
 M00000003_IL_0001:
 ldarg 0
@@ -199,7 +199,7 @@ stfld System.IO.StreamReader::leaveOpen
 M00000003_IL_0048:
 ret
 .end
-.method instance .ctor(System.IO.InputStream input,System.Text.Encoding encoding,Boolean leaveOpen) -> noresult
+.method instance .ctor(System.IO.InputStream input,System.Text.Encoding encoding,Boolean leaveOpen) -> void
 M00000004_IL_0000:
 M00000004_IL_0001:
 ldarg 0
@@ -1808,7 +1808,7 @@ call neoCLR.Library.System.IO.StreamReader.RuntimeUnion20(System.Result.Ok<Strin
 M00000008_IL_02ad:
 ret
 .end
-.method instance Close() -> noresult
+.method instance Close() -> void
 M00000009_IL_0000:
 M00000009_IL_0001:
 M00000009_IL_0002:

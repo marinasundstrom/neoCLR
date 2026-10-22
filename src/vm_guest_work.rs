@@ -173,7 +173,7 @@ ret
 .type class Job
 .field Source System.Concurrency.Tasks.Promise<Int32>
 .field Observed Int32
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ldarg 0
 newobj instance System.Concurrency.Tasks.Promise<Int32>::.ctor()
 stfld Job::Source
@@ -244,14 +244,14 @@ ret
 .entry Main
 .type class State
 .field Count Int32
-.method instance Complete() -> noresult
+.method instance Complete() -> void
 ldarg 0
 ldc.i4 42
 stfld State::Count
 ret
 .end
 .end
-.function neoCLR.Runtime.ScheduleTask(fn<noresult Void> callback) -> Void
+.function neoCLR.Runtime.ScheduleTask(fn<void> callback) -> Void
 .methodimpl InternalCall
 .end
 .function Main() -> State
@@ -260,8 +260,8 @@ ldc.i4 0
 newobj State
 stloc state
 ldloc state
-function.bind fn<noresult Void> = instance State::Complete()
-call neoCLR.Runtime.ScheduleTask(fn<noresult Void>)
+function.bind fn<void> = instance State::Complete()
+call neoCLR.Runtime.ScheduleTask(fn<void>)
 pop
 ldloc state
 ret
@@ -285,14 +285,14 @@ ret
 .entry Main
 .type class State
 .field Count Int32
-.method instance Complete() -> noresult
+.method instance Complete() -> void
 ldarg 0
 ldc.i4 42
 stfld State::Count
 ret
 .end
 .end
-.function neoCLR.Runtime.ScheduleTask(fn<noresult Void> callback) -> noresult
+.function neoCLR.Runtime.ScheduleTask(fn<void> callback) -> void
 .methodimpl InternalCall
 .end
 .function Main() -> State
@@ -301,8 +301,8 @@ ldc.i4 0
 newobj State
 stloc state
 ldloc state
-function.bind fn<noresult Void> = instance State::Complete()
-call neoCLR.Runtime.ScheduleTask(fn<noresult Void>)
+function.bind fn<void> = instance State::Complete()
+call neoCLR.Runtime.ScheduleTask(fn<void>)
 ldloc state
 ret
 .end
@@ -326,7 +326,7 @@ ret
 .field Drains Int32
 .field Pending Int32
 .field Observed Int32
-.method instance Drain() -> noresult
+.method instance Drain() -> void
 ldarg 0
 ldarg 0
 ldfld System.Concurrency.Tasks.TaskQueue::Drains

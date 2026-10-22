@@ -65,7 +65,7 @@ ldelem T0
 M00000004_IL_000e:
 ret
 .end
-.method instance set_Item(Int32 index,T0 value) -> noresult
+.method instance set_Item(Int32 index,T0 value) -> void
 M00000005_IL_0000:
 M00000005_IL_0001:
 M00000005_IL_0002:
@@ -81,7 +81,7 @@ M00000005_IL_000f:
 M00000005_IL_0010:
 ret
 .end
-.method instance ForEach(fn<T0,Void> action) -> noresult
+.method instance ForEach(fn<T0,Void> action) -> void
 .local arrayref<T0> local0
 .local Int32 local1
 ldloca local0

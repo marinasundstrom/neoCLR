@@ -12,7 +12,7 @@ owns implementation status.
 
 The native backend now binds the reserved ScheduleTask service used by Task.Run
 through the existing one-shot scheduler submission path. It accepts the two existing
-unit callback encodings (`fn<Void>` and `fn<noresult Void>`), matching interpreter
+unit callback encodings (`fn<Void>` and `fn<void>`), matching interpreter
 admission; unrelated signatures, result types and managed bodies remain rejected.
 A unit-result shim avoids writing the scheduler's Int32 admission value into unit
 result storage. GC root publication, host-root transfer, cancellation/teardown and

@@ -17,7 +17,7 @@
 .get instance System.Collections.ArrayList<T0>::get_Item(Int32)
 .set instance System.Collections.ArrayList<T0>::set_Item(Int32,T0)
 .end
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0
@@ -42,7 +42,7 @@ stfld System.Collections.ArrayList<T0>::count
 M00000001_IL_001c:
 ret
 .end
-.method instance .ctor(Int32 capacity) -> noresult
+.method instance .ctor(Int32 capacity) -> void
 M00000002_IL_0000:
 M00000002_IL_0001:
 ldarg 0
@@ -159,7 +159,7 @@ ldelem T0
 M00000005_IL_003a:
 ret
 .end
-.method instance set_Item(Int32 index,T0 value) -> noresult
+.method instance set_Item(Int32 index,T0 value) -> void
 M00000006_IL_0000:
 M00000006_IL_0001:
 M00000006_IL_0002:
@@ -212,7 +212,7 @@ M00000006_IL_003b:
 M00000006_IL_003c:
 ret
 .end
-.method instance Add(T0 value) -> noresult
+.method instance Add(T0 value) -> void
 .local arrayref<T0> local0
 .local Int32 local1
 .local Int32 local2

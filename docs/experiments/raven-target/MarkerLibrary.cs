@@ -66,6 +66,6 @@ static class MarkerLibrary
             && call.CallingConvention == MethodCallingConvention.Default && call.ReturnType.MetadataType == MetadataType.Void;
     }
     public static string Declaration(TypeDefinition type, Dictionary<MethodDefinition, string> bodies) => type.FullName == "System.Object"
-        ? ".type class abstract System.Object\n.method instance .ctor() -> noresult\nret\n.end\n" + string.Concat(bodies.Where(p => p.Key.DeclaringType == type).Select(p => p.Value)) + ".end\n"
+        ? ".type class abstract System.Object\n.method instance .ctor() -> void\nret\n.end\n" + string.Concat(bodies.Where(p => p.Key.DeclaringType == type).Select(p => p.Value)) + ".end\n"
         : ".type System.Runtime.CompilerServices.UnionAttribute\n.method instance .ctor() -> Void\nldvoid\nret\n.end\n.end\n";
 }

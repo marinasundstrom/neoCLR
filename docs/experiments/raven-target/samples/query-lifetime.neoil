@@ -45,7 +45,7 @@
         ldc.i4 42
         ret
     .end
-    .method instance Dispose() -> noresult
+    .method instance Dispose() -> void
         ldarg this
         ldfld Cursor::State
         dup
@@ -66,7 +66,7 @@
     add
     ret
 .end
-.function Assert(Int32 actual, Int32 expected) -> noresult
+.function Assert(Int32 actual, Int32 expected) -> void
     ldarg actual
     ldarg expected
     beq Good
@@ -74,7 +74,7 @@
 Good:
     ret
 .end
-.function Main() -> noresult
+.function Main() -> void
     .local Tracker state
     .local System.Collections.Iterable<Int32> query
     .local System.Collections.Iterator<Int32> iterator

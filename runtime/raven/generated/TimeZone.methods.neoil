@@ -17,7 +17,7 @@
 .property instance MaxYear() -> Int32
 .get instance System.Time.TimeZone::get_MaxYear()
 .end
-.method private instance .ctor(String id) -> noresult
+.method private instance .ctor(String id) -> void
 M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0

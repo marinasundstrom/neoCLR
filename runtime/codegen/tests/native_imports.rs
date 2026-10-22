@@ -321,7 +321,7 @@ fn no_result_calls_do_not_supply_a_stack_value() {
     for body in ["call Release()\npop\nldc.i4 1\nret", "call Release()\nret"] {
         let dir = Temp::new();
         let source = format!(
-            ".module InvalidVoid\n.function Release() -> noresult\n.foreign \"missing\" \"release\" cdecl\n.end\n.function Calculate(Int32 value) -> Int32\n{body}\n.end\n"
+            ".module InvalidVoid\n.function Release() -> void\n.foreign \"missing\" \"release\" cdecl\n.end\n.function Calculate(Int32 value) -> Int32\n{body}\n.end\n"
         );
         let result = compile(&dir, &source, &["--native-imports"]);
         assert!(!result.status.success());
@@ -353,13 +353,13 @@ int32_t read_value(void) { return observed; }
 .function Create(Int32 value) -> Ptr<Int32>
 .foreign {library:?} "create" cdecl
 .end
-.function Release(Ptr<Int32> address) -> noresult
+.function Release(Ptr<Int32> address) -> void
 .foreign {library:?} "release" cdecl
 .end
 .function Read() -> Int32
 .foreign {library:?} "read_value" cdecl
 .end
-.function ReleaseHelper(Ptr<Int32> address) -> noresult
+.function ReleaseHelper(Ptr<Int32> address) -> void
 ldarg address
 call Release(Ptr<Int32>)
 ret
@@ -382,7 +382,7 @@ ret
         let _ = fs::remove_file(dir.0.join("app.o"));
         let source = if missing {
             format!(
-                ".module Missing\n.function Release() -> noresult\n.foreign {:?} \"missing_release\" cdecl\n.end\n.function Calculate(Int32 value) -> Int32\nldarg value\ncall Release()\nret\n.end\n",
+                ".module Missing\n.function Release() -> void\n.foreign {:?} \"missing_release\" cdecl\n.end\n.function Calculate(Int32 value) -> Int32\nldarg value\ncall Release()\nret\n.end\n",
                 library.to_str().unwrap()
             )
         } else {

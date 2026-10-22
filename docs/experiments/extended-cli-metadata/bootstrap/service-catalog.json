@@ -724,7 +724,7 @@
         "Int32",
         "fn\u003CVoid\u003E"
       ],
-      "result": "noresult",
+      "result": "void",
       "categories": [
         "callback",
         "no-result",
@@ -878,7 +878,7 @@
     {
       "name": "GCCollect",
       "arguments": [],
-      "result": "noresult",
+      "result": "void",
       "categories": [
         "no-result"
       ],
@@ -890,7 +890,7 @@
       "arguments": [
         "System.Object"
       ],
-      "result": "noresult",
+      "result": "void",
       "categories": [
         "no-result",
         "nominal"
@@ -1442,7 +1442,7 @@
       "arguments": [
         "String"
       ],
-      "result": "noresult",
+      "result": "void",
       "categories": [
         "no-result",
         "scalar"
@@ -1916,7 +1916,7 @@
         "System.Object",
         "System.Object"
       ],
-      "result": "noresult",
+      "result": "void",
       "categories": [
         "no-result",
         "nominal",
@@ -2036,7 +2036,7 @@
       "arguments": [
         "fn\u003CVoid\u003E"
       ],
-      "result": "noresult",
+      "result": "void",
       "categories": [
         "callback",
         "no-result"
@@ -2047,7 +2047,7 @@
     {
       "name": "DrainEntryTasks",
       "arguments": [],
-      "result": "noresult",
+      "result": "void",
       "categories": [
         "no-result"
       ],
@@ -2059,7 +2059,7 @@
       "arguments": [
         "System.Tasks.TaskQueue"
       ],
-      "result": "noresult",
+      "result": "void",
       "categories": [
         "no-result",
         "nominal"
@@ -2437,7 +2437,7 @@
       "arguments": [
         "T"
       ],
-      "result": "noresult",
+      "result": "void",
       "contract": "source-owned TaskQueue selected by exact type argument"
     }
   ]

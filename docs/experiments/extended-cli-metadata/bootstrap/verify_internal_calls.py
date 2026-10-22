@@ -34,7 +34,7 @@ def main():
     seed_source = output / 'System.neoil'
     seed_source.write_text('''.module System
 .type class abstract System.Object
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
 .end

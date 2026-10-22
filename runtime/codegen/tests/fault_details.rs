@@ -180,7 +180,7 @@ fn binding(dir: &Temp, seed: &neoclr::Module, app: &str, flags: &[&str], inspect
 }
 const APP: &str = ".module App\n.function Calculate(Int32 value) -> Int32\nldstr \"bound failure 🌍\"\ncall System.Fail(String)\nldc.i4 42\nret\n.end";
 fn seed() -> neoclr::Module {
-    neoclr::assemble(".module System\n.references ()\n.function System.Fail(String message) -> noresult\nldarg message\ncall neoCLR.Runtime.Fault(String)\npop\nret\n.end\n.function neoCLR.Runtime.Fault(String message) -> Void\n.methodimpl InternalCall\n.end").unwrap()
+    neoclr::assemble(".module System\n.references ()\n.function System.Fail(String message) -> void\nldarg message\ncall neoCLR.Runtime.Fault(String)\npop\nret\n.end\n.function neoCLR.Runtime.Fault(String message) -> Void\n.methodimpl InternalCall\n.end").unwrap()
 }
 #[test]
 fn explicit_binding_preserves_wrapper_and_source_identity() {
@@ -317,7 +317,7 @@ fn maximum_native_trace_fits_caller_storage() {
 #[test]
 fn source_owned_noresult_failure_uses_its_original_identity() {
     let dir = Temp::new();
-    let source=neoclr::assemble(".module SourceFailure\n.function neoCLR.Runtime.Fail(String message) -> noresult\n.methodimpl InternalCall\n.end").unwrap();
+    let source=neoclr::assemble(".module SourceFailure\n.function neoCLR.Runtime.Fail(String message) -> void\n.methodimpl InternalCall\n.end").unwrap();
     fs::write(
         dir.0.join("source.neox"),
         neoclr::metadata_container::write_module(&source).unwrap(),
@@ -326,7 +326,7 @@ fn source_owned_noresult_failure_uses_its_original_identity() {
     fs::write(dir.0.join("seed.neoil"), ".module System\n.references ()\n").unwrap();
     let modules = neoclr::assembler::assemble_modules(&[
         &APP.replace("call System.Fail(String)","call neoCLR.Runtime.Fail(String)"),
-        ".module SourceFailure\n.function neoCLR.Runtime.Fail(String message) -> noresult\n.methodimpl InternalCall\n.end"
+        ".module SourceFailure\n.function neoCLR.Runtime.Fail(String message) -> void\n.methodimpl InternalCall\n.end"
     ]).unwrap();
     fs::write(
         dir.0.join("app.neox"),

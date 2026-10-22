@@ -1417,7 +1417,7 @@ ret
 .end
 .type class Cell
 .implements Readable
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ret
 .end
 .method private instance Hidden() -> Int32

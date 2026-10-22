@@ -40,7 +40,7 @@ static class AsyncRefChecks
         }
         var valid = Call(start, state);
         var binding = AsyncBindings.BindByRef(valid, start, "test", Map)!;
-        if (binding.Result != "noresult" || binding.Arguments.Length != 2 || binding.Arguments[1] != "State&")
+        if (binding.Result != "void" || binding.Arguments.Length != 2 || binding.Arguments[1] != "State&")
             throw new Exception("Ref startup contract changed.");
         var wrongReturn = Call(start, state);
         wrongReturn.ElementMethod.ReturnType = core.TypeSystem.Int32;

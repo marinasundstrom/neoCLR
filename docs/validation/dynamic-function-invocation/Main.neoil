@@ -5,13 +5,13 @@
 .end
 .type class Counter
 .field Value Int32
-.method instance .ctor(Int32 value) -> noresult
+.method instance .ctor(Int32 value) -> void
 ldarg 0
 ldarg 1
 stfld Counter::Value
 ret
 .end
-.method instance Set() -> noresult
+.method instance Set() -> void
 ldarg 0
 ldc.i4 40
 stfld Counter::Value
@@ -33,7 +33,7 @@ ldc.i4 1
 newobj instance Counter::.ctor(Int32)
 stloc counter
 ldloc counter
-function.bind fn<noresult Void> = instance Counter::Set()
+function.bind fn<void> = instance Counter::Set()
 castclass System.Object
 ldc.i4 0
 array.reserve System.Object

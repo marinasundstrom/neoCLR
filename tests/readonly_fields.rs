@@ -3,7 +3,7 @@ use serde_json::json;
 
 fn module(body: &str) -> neoclr::Module {
     let module = assemble(&format!(
-        ".module ReadOnly\n.entry Main\n.type class Counter\n.field Number Int32\n.method instance .ctor() -> noresult\nldarg 0\nldc.i4 42\nstfld Counter::Number\nret\n.end\n.method instance Read() -> Int32\n{body}\n.end\n.end\n.function Main() -> Int32\nnewobj instance Counter::.ctor()\ncall instance Counter::Read()\nret\n.end"
+        ".module ReadOnly\n.entry Main\n.type class Counter\n.field Number Int32\n.method instance .ctor() -> void\nldarg 0\nldc.i4 42\nstfld Counter::Number\nret\n.end\n.method instance Read() -> Int32\n{body}\n.end\n.end\n.function Main() -> Int32\nnewobj instance Counter::.ctor()\ncall instance Counter::Read()\nret\n.end"
     )).unwrap();
     let mut value = serde_json::to_value(module).unwrap();
     value["assemblies"] = json!([{"name":"ReadOnly", "full_name":"ReadOnly", "modules":["ReadOnly.dll"], "references":[]}]);
@@ -82,7 +82,7 @@ fn associated_init_accessor_can_write_its_declaring_readonly_storage() {
 .get instance Counter::Read()
 .set instance Counter::Write(Int32)
 .end
-.method instance .ctor() -> noresult
+.method instance .ctor() -> void
 ldarg 0
 ldc.i4 42
 stfld Counter::Number

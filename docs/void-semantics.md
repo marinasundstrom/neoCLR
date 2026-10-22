@@ -27,13 +27,16 @@ IL stack convention. The chosen split preserves generic value semantics and the
 familiar call convention, at the cost of an explicit compiler/metadata distinction.
 It is not binary compatibility with arbitrary .NET assemblies.
 
-In neoIL return position, lowercase `void` selects the ordinary CLI no-result
-calling convention. `System.Void` explicitly names the inhabited unit type, including
-in generic arguments. The older `noresult` spelling remains an internal/legacy alias;
-existing uppercase `Void` return declarations retain their unit-return behavior.
-This case-sensitive distinction avoids changing legacy library stack contracts while
-restoring familiar spelling for ordinary methods. `void` in a generic argument still
-names the unit type; the no-result convention applies only in return position.
+The author clarified on 2026-10-22 that `void`, `Void` and `System.Void`
+must denote the same type and ordinary no-result return contract. Generic returns
+originally declared as a type parameter retain their value ABI when closed over
+Void. There is no proposed case-sensitive semantic distinction.
+
+Migration status: active IL producers and fixtures now use `void` for no-result
+returns and `fn<void>` for no-result function shapes. The obsolete `noresult`
+spelling is rejected. The legacy assembler still treats explicitly named Void
+returns as value-returning; migrating those bodies/callers and unifying the aliases
+is **unfinished implementation work**, not the intended platform contract.
 
 The prototype retains a return-mode flag internally. `ldvoid` represents a
 logical value in the interpreter; this is not a promise that a future native backend

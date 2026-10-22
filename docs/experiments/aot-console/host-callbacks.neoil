@@ -1,7 +1,7 @@
 .module HostCallbacks
 .type class Counter
 .field Number Int32
-.method instance .ctor(Int32 number) -> noresult
+.method instance .ctor(Int32 number) -> void
 ldarg 0
 ldarg number
 stfld Counter::Number

@@ -3,7 +3,7 @@
 .sealed
 .implements System.Storage.StorageProvider
 .field private root String
-.method instance .ctor(String root) -> noresult
+.method instance .ctor(String root) -> void
 M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0

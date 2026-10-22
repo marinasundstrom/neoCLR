@@ -7,7 +7,7 @@ const TYPES: &str = r#"
 .end
 .interface Mutable
 .implements Read
-.method instance Set(Int32 value) -> noresult
+.method instance Set(Int32 value) -> void
 .end
 .end
 .type class Counter
@@ -18,7 +18,7 @@ ldarg this
 ldfld Counter::Age
 ret
 .end
-.method instance Set(Int32 value) -> noresult
+.method instance Set(Int32 value) -> void
 ldarg this
 ldarg value
 stfld Counter::Age
