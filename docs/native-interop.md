@@ -6,6 +6,19 @@ scalars, pointers, input text and explicitly sized booleans. JIT/AOT import lowe
 and installed compiler-bundle qualification remain open. This is trusted native
 execution, not a sandbox or a complete FFI.
 
+## Author-directed next foundation (2026-10-22)
+
+NativeImport is the first interoperability mechanism. Its remaining foundation
+includes stack/heap pointer access, real managed-memory pinning and native compilation
+support. AOT is the primary deployment target; interpreter-only support is an open
+gap, not the completed contract. The current interpreter array representation is not
+contiguous native byte storage, so simply retaining or immobilizing it cannot expose
+a C-compatible byte pointer. Explicit copies are distinct from pinning.
+
+Later, native-backed metadata, native hosting/discovery/invocation APIs and dynamic
+dispatch should converge on shared contracts. These are future directions, not
+implemented APIs. See [the sequence and acceptance gates](design/native-import-export-contract.md#language-neutral-interoperability-direction--2026-10-22).
+
 ## Source contract
 
 The source API lives in `System.Runtime.InteropServices`:

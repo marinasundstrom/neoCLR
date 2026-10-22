@@ -6,6 +6,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-10-22
+
+- Record the author-directed native interop sequence: NativeImport with pointer/allocation/pinning foundations first, then native-backed metadata, extended native hosting APIs and future dynamic dispatch. Make AOT the primary deployment target, preserve explicit sandbox/native trust boundaries, and distinguish current interpreter support from proposed gates and the unfinished byte-copy experiment. Update roadmap, design, conversation record and website direction; no new runtime capability is claimed. All 24 website tests pass; the copy prototype remains uncommitted after a Raven collection-expression diagnostic blocks built-in discovery.
+
 ### 2026-10-21
 
 - Rename the development grapheme value type from `System.Char` to `System.Character` throughout the Raven class library, native metadata and current text/console APIs. Character literals retain grapheme semantics and preserved UTF-8; neoCLR `char` is now an ordinary identifier, with no predefined type alias. Matching Raven compiler `255906ffe` keeps .NET Char unchanged. Rebuild native libraries and consumers together. The five-library build, 21 built-in interpreter tests, six JIT string tests, 15 focused runtime tests and metadata grapheme/CLI code-unit checks pass. Refresh the native API snapshot and website guidance; validate native-only links after assembling the complete site. All 24 website tests, four snapshot tests and the 5,644-page website build pass; three migrated samples compile. The legacy CLI documentation projection remains historical, and full release/AOT qualification is not claimed.

@@ -1,5 +1,16 @@
 # neoCLR platform roadmap
 
+**Native interoperability sequence (author direction, 2026-10-22):** Complete
+NativeImport's pointer, stack/heap memory and managed pinning foundation first,
+with AOT as the primary deployment target and JIT/interpreter as alternative engines.
+Later stages introduce referenceable native-backed metadata, an extended native
+hosting/reflection/invocation API, and dynamic dispatch. These share metadata and the
+object/component model without imposing one memory-management strategy on all
+languages. [Scope, gaps and proposed acceptance gates](design/native-import-export-contract.md#language-neutral-interoperability-direction--2026-10-22)
+keep future stages distinct from release commitments. Interpreter-only imports and
+an explicit copy experiment do not complete this foundation; true pinning needs
+native-compatible storage. Sandbox and trusted-native boundaries remain explicit.
+
 **Character naming (author direction, 2026-10-21):** Rename the development
 grapheme API to `System.Character`, with no neoCLR `char` keyword alias; retain
 ordinary .NET `Char`. This bounded API clarification preserves storage and text

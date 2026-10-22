@@ -91,7 +91,9 @@ and resolves no synthetic managed target. It is deliberately not an export annot
 or a final sidecar schema. ABI descriptors should be reusable by future exported
 entry stubs and generated native bindings after validation of the reverse direction.
 
-## Sequence and gates
+## Earlier sequence and gates (2026-10-12)
+
+The 2026-10-22 sequence below supersedes these priorities; completed evidence remains valid.
 
 1. Bind a returned native address to a structural Function and invoke it using the
    existing marshaller. Reject null/data pointers and unsupported signatures before
@@ -139,3 +141,119 @@ slice only. Interpreter address bindings, callable parameters and callable resul
 are included; the remaining sequence above describes potential follow-through,
 not conditions for this merge. No source attribute spelling, retained ownership
 API, native export format or AOT sidecar is finalized by that decision.
+
+
+## Language-neutral interoperability direction — 2026-10-22
+
+Author direction: AOT compilation is the primary deployment target for Raven and
+managed languages on neoCLR. JIT and interpretation remain valid execution modes,
+including development and appropriate smaller-device deployments. This is a target
+and sequencing decision, not a claim that all current features work in AOT.
+
+The author describes the eventual goal as “mix-and-match universes”: languages with
+different representations and ownership systems can use runtime services and each
+other's code through metadata and the object/component model. The immediate work is
+NativeImport, not a new component framework or universal reference-counted wrapper.
+
+### Sequence
+
+| Stage | Author-directed capability | Status and boundary |
+| --- | --- | --- |
+| 1 | NativeImport into managed languages, with pointers, stack/heap allocation and managed-memory pinning | Interpreter imports and tracked native allocation exist; memory integration, pinning and JIT/AOT imports remain incomplete |
+| 2 | Referenceable metadata bound to native implementations by the runtime | Future contract; managed languages reference it first, other consumers can follow |
+| 3 | Native runtime API extending hosting with type/member queries and invocation | Future bindings for native languages and other language runtimes |
+| 4 | Dynamic dispatch for dynamically typed languages | Future resolution path over shared type/member and invocation semantics |
+
+Do not require stages 2–4 for the first NativeImport release. Do not infer acceptance
+of a binary schema, export annotation, Ref<T> API or universal object layout from
+this direction. Component metadata must distinguish type identity, public contract,
+implementation binding and native representation. Existing managed layout is not a
+portable foreign ABI.
+
+### First-stage acceptance gates
+
+The following are assistant-proposed implementation gates within the author's scope.
+They are not descriptions of shipped functionality.
+
+- Use the target C ABI with explicit calling convention and supported scalar,
+  pointer and aggregate layouts. A struct constraint alone does not establish
+  reference-free storage or ABI compatibility. Reject unsupported shapes before entry.
+- Qualify imported pointer input/output and no-result calls in an AOT application;
+  carry the same semantics to JIT and interpreter, with explicit capability rejection
+  until each path supports them. Interpreter success alone does not close this gate.
+- Qualify stack storage lifetime, bounds and alignment, and heap allocation/free with
+  overflow, failure and allocator-pairing behavior. Native memory ownership is separate
+  from pointer identity; borrowed or foreign-owned addresses must not be freed by the
+  wrong allocator.
+- Establish native-compatible managed byte storage before exposing a true pin. Keep
+  the owner alive, stabilize its address for the pin lifetime, preserve subview offsets
+  and validate access during GC. Empty views need a defined no-dereference policy.
+  Interpreter arrays currently contain tagged Values, so a stationary array is not
+  a C byte buffer. No implementation may label a copied buffer as pinned storage.
+- Use scoped pins for call-duration borrowing. A retained pointer requires an explicit
+  longer-lived lease that lasts until foreign access has actually ended, including
+  cancellation teardown. A lexical scope alone cannot guarantee this for asynchronous
+  native operations. Native resource disposal must not race an active borrow.
+- Keep Slice/Memory as managed projections; use pointer plus count at the C boundary.
+  Copying is an explicit fallback with bounds and initialization checks, not a pinning
+  substitute. ReadOnlySlice cannot prevent a foreign function from writing illegally.
+- Preserve existing callback limitations until retained callbacks, foreign-thread entry,
+  in-flight teardown and fault barriers are qualified. No implicit exception unwinding
+  through an unspecified foreign ABI, and no automatic Promise allocation requirement.
+
+Use built-in runtime tests plus a small C fixture for the buffer contract. Include
+write-back, subviews, UTF-8 byte access, GC while pinned, multiple pins, release,
+invalid layouts and lifetime rejection where the relevant capability is implemented.
+Report managed allocations separately from native allocations and boundary overhead;
+zero managed transfer objects does not imply a zero-cost call. Compare the same
+consumer across supported execution modes rather than claiming parity from metadata.
+
+### Trust and memory management
+
+The VM's sandbox remains a requirement. Arbitrary trusted in-process native imports
+are outside its enforceable memory-safety boundary; metadata and AOT compilation do
+not themselves provide confinement. A sandboxed consumer needs controlled native
+capabilities, and untrusted native implementations need an enforceable isolation
+boundary. This direction does not grant all guests arbitrary library loading.
+
+The native runtime API should expose stable handles and documented runtime entry,
+rooting, release and thread rules. A handle retaining a GC object is distinct from a
+pin stabilizing its storage and from ownership of a native allocation. Foreign
+implementations may use GC, explicit ownership or reference counting internally.
+Ref<T> is deferred; any future retain/release protocol must specify copying, teardown,
+thread safety and cycles rather than imply that reference counting solves all lifetimes.
+
+### Comparison and tradeoffs
+
+.NET remains the API/semantic baseline. Modern LibraryImport, NativeMemory,
+SafeHandle and Memory pinning already address substantial parts of this problem.
+neoCLR's intended benefit is a consistent UTF-8, Slice/Memory and metadata contract
+across frontends and execution engines, not novelty from renaming these mechanisms.
+Costs include compiler/runtime layout coordination, GC pin support, per-target ABI
+validation and adapters for representations that cannot be shared directly.
+
+Rust contributes explicit borrowing/ownership obligations and callback teardown;
+these can inform a foreign boundary without imposing Rust's whole ownership model.
+Go's cgo rules distinguish call-scoped pointers from retained pinned storage and
+restrict references reachable through foreign-visible memory. Node-API illustrates
+a stable C boundary with opaque values and explicit reference lifetimes, without
+requiring consumers to know an engine's object layout. These are comparative models,
+not declarations of Rust, Go or JavaScript ABI compatibility.
+
+Primary references reviewed for this discussion:
+
+- [.NET native interoperability guidance](https://learn.microsoft.com/en-us/dotnet/standard/native-interop/best-practices)
+- [.NET Memory ownership and leases](https://learn.microsoft.com/en-us/dotnet/standard/memory-and-spans/memory-t-usage-guidelines)
+- [.NET MemoryManager.Pin](https://learn.microsoft.com/en-us/dotnet/api/system.buffers.memorymanager-1.pin?view=net-10.0)
+- [Rust FFI ownership and callbacks](https://doc.rust-lang.org/stable/nomicon/ffi.html)
+- [Go cgo pointer rules](https://pkg.go.dev/cmd/cgo)
+- [Node-API ABI and object lifetime](https://nodejs.org/download/release/v26.9.0/docs/api/n-api.html)
+
+The uncommitted byte-copy experiment has two passing low-level runtime tests, but its
+built-in consumer has not yet been qualified. The first fixture build failed from a
+host SDK/linker mismatch; a retry with matching Xcode clang/SDK compiled the C fixture
+but Raven discovery rejected byte literals in a direct ReadOnlySlice<byte> collection
+expression (RAV2001). This needs reduction and compiler investigation; it does not
+establish that the literals are actually out of range. It is not public capability
+evidence, pinning support or an approved replacement for the gates above. Keep its API and documentation changes
+separate from this architectural decision.

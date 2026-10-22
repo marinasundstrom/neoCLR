@@ -136,3 +136,23 @@ startup and deployment size should be measured separately.
 <a id="measurements-and-comparisons"></a>
 
 <a id="development-follow-up-native-gc-lookup"></a>
+
+
+## Native interoperability direction
+
+Native compilation is the primary deployment direction for Raven on neoCLR;
+JIT and interpretation remain useful execution options. Development NativeImport
+support currently runs in the interpreter. Native/JIT import execution and managed
+memory pinning remain gaps, not published native-compilation capabilities.
+
+The next foundation connects native calls with pointers, stack and heap allocation,
+and explicitly scoped access to managed buffers. A true pin must retain existing
+storage at a stable native-compatible address; an explicit copy is a separate operation.
+
+Longer term, referenceable metadata for native implementations, an extended native
+hosting API and dynamic dispatch should let different languages use runtime services
+and each other's components. Those languages need not share one memory-management
+strategy. These are future directions, not available component APIs. Trusted native
+imports also remain distinct from sandboxed VM execution.
+
+[Interop direction and completion gates](https://github.com/marinasundstrom/neoCLR/blob/main/docs/design/native-import-export-contract.md#language-neutral-interoperability-direction--2026-10-22)

@@ -26,6 +26,36 @@ available original wording; other text is a summary.
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
 
+## 2026-10-22 — NativeImport first, language-neutral components later
+
+The author pauses implementation to design native interop, asks what Rust, Go and
+JavaScript runtimes can teach neoCLR, and emphasizes that the runtime should serve
+more than managed languages. The assistant compares explicit ownership/callback
+lifetimes, retained-pointer restrictions and stable opaque hosting APIs. The author
+clarifies that native compilation is the primary managed-language deployment target,
+while JIT/interpreter remain valid and the VM remains sandboxed.
+
+The author then gives the sequence: NativeImport with pointer support, native stack
+and heap allocation, and managed pinning; later referenceable metadata bound to
+native code; an extended native hosting API for type/member queries and invocation;
+and eventually dynamic dispatch. The author describes the desired outcome as a
+“mix-and-match universes” arrangement driven by metadata and the object/component
+model. Ref<T> reference counting is discussed as a possible later facility, not a
+current requirement.
+
+The assistant proposes shared identity/signature/ownership contracts with independent
+foreign representations, distinguishes GC rooting from pinning and native ownership,
+and explains that arbitrary in-process native code is outside VM memory confinement.
+The subsequent “Continue” authorizes follow-through; it does not settle every proposed
+schema or acceptance detail. This change records [the direction and proposed gates](design/native-import-export-contract.md#language-neutral-interoperability-direction--2026-10-22)
+and updates roadmap and website direction. No native component format or pin API is
+implemented by this documentation change. The preceding copy prototype remains
+uncommitted and separately unqualified; its two low-level tests pass, while the first
+built-in fixture run failed at C linking due to a host toolchain mismatch. A retry
+with matching Xcode clang/SDK compiled the fixture, then encountered Raven RAV2001
+on a direct byte-slice collection expression during discovery. Compiler investigation
+is pending. All 24 website tests pass for this documentation slice.
+
 ## 2026-10-20 — Default struct equality and the typed fast path
 
 After the HttpVersion repair, the author emphasizes ordinary struct default value
