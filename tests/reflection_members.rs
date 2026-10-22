@@ -1,6 +1,8 @@
 use neoclr::{Limits, Value, assemble, run};
 fn services() -> String {
-    let mut s=".type class abstract System.Object\n.method instance .ctor() -> void\nret\n.end\n.end\n".to_string();
+    let mut s =
+        ".type class abstract System.Object\n.method instance .ctor() -> void\nret\n.end\n.end\n"
+            .to_string();
     for name in [
         "ConstructArgs",
         "Invoke",

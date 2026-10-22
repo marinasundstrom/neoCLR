@@ -471,3 +471,21 @@ records a dirty checkout. An audit matches 85 tracked source inputs at `69441f2f
 hashed build inputs. The report did not capture dirty paths, so no clean-checkout
 claim is made. Both platform measurement gates now have passing reports; source
 CI repairs and final artifact/publication checks remain open.
+
+### Source-toolchain qualification repair — 2026-10-22
+
+[Source run 39845411718](https://github.com/marinasundstrom/neoCLR/actions/runs/39845411718)
+passes both host-boundary jobs but fails rustfmt and all three Rust 1.85 checks.
+The minimum-Rust failure is the chained `if let` in `describe_token`; equivalent
+nested conditions preserve its existing type-token contract. Four test files have
+formatting-only repairs. `cargo fmt --check` passes. A local minimum-Rust attempt
+first encounters the CommandLineTools SDK linker mismatch; an explicit full-Xcode
+retry stalls in macOS dyld/fcntl while loading dependency procedural macros and is
+terminated without a pass claim. Strict Clippy and the existing type-identity tests
+remain pending at this record. [Evidence](validation/release-stabilization-20261022/source-toolchain-repair.json).
+
+Evidence-only pushes had cancelled earlier automatic source runs. The duplicate
+manual run 39846204524 was cancelled once the same-input failures were identified.
+Start the repaired source qualification explicitly and preserve its run identity
+so later documentation updates cannot cancel it. These syntax/format repairs do
+not change the identities of the already qualified binary archives.

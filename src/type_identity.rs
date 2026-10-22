@@ -181,11 +181,12 @@ pub(crate) fn apply_generic_argument(
 /// ldtoken may name a generic declaration without creating executable storage.
 pub(crate) fn describe_token(module: &Module, ty: &Type) -> Result<TypeDescriptor, Fault> {
     let normalized = crate::scope::normalize_type(module, ty)?;
-    if let Type::Named(name) = &normalized
-        && let Some(declaration) = module.types.iter().find(|d| &d.name == name)
-        && !declaration.generic_parameters.is_empty()
-    {
-        return describe_definition(module, declaration);
+    if let Type::Named(name) = &normalized {
+        if let Some(declaration) = module.types.iter().find(|d| &d.name == name) {
+            if !declaration.generic_parameters.is_empty() {
+                return describe_definition(module, declaration);
+            }
+        }
     }
     describe(module, &normalized)
 }

@@ -6962,7 +6962,9 @@ fn mixed_host_callback_source(no_result: bool) -> String {
     let mut bindings = String::new();
     for i in 0..40 {
         source.push_str(&format!("\n.function Unit{i}() -> Void\nldvoid\nret\n.end\n.function Empty{i}() -> void\nret\n.end\n"));
-        bindings.push_str(&format!("function.bind fn<Void> = Unit{i}()\npop\nfunction.bind fn<void> = Empty{i}()\npop\n"));
+        bindings.push_str(&format!(
+            "function.bind fn<Void> = Unit{i}()\npop\nfunction.bind fn<void> = Empty{i}()\npop\n"
+        ));
     }
     source = source.replace("ldarg mode\n", &format!("{bindings}ldarg mode\n"));
     source

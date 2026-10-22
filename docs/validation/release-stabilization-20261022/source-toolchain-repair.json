@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-22",
+  "failedRun": 39845411718,
+  "failures": {
+    "canonical": "cargo fmt --check: four test files",
+    "minimumRust": "Rust 1.85 rejects describe_token let chains on macOS, Windows and Linux"
+  },
+  "hostBoundaries": {
+    "macOS": "passed",
+    "Windows": "passed"
+  },
+  "repair": "Replace chained if-let with equivalent nested conditions; format four existing test files. No intended type-token semantics change.",
+  "localValidation": {
+    "format": "passed",
+    "minimumRust": "Not qualified locally: initial CommandLineTools SDK linking failure, then full-Xcode retry stalled in macOS dyld fcntl while loading dependency proc macros; terminated owned compiler processes. Hosted validation required.",
+    "clippy": "pending",
+    "typeIdentityTests": "pending"
+  },
+  "logs": {
+    "/tmp/release-fmt-check.log": "1f4d0c6ed62d7dc5c720a8dc20f09d182f805e04e63f843061a28e5ceee3ea19",
+    "/tmp/minimum-rust-39845411718.log": "d97b81596f8098b96b82ebbb697513f81cc7624d5e7e3d90457dbdbd13c5e0d9",
+    "/tmp/release-msrv-20261022.log": "4a7d4638cba2ebfaed5f4b9f18dc9df2c0795636e0f4bb586fc29b03b4f196d1",
+    "/tmp/release-msrv-20261022-xcode.log": "892817e1608d5e58d52c02ce2dbc4adf2cf23e4f789e97cbbe089e58e713a6ff",
+    "/tmp/release-msrv-rustc-sample.txt": "05c31729111b75e01d52278798d338293c440de477605fabb864d7d9675023ba"
+  }
+}

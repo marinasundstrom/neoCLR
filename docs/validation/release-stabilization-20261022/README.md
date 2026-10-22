@@ -8,7 +8,7 @@ separate. The current package compiler is Raven `301e668a5`.
 
 | Gate | Current evidence | Remaining work |
 | --- | --- | --- |
-| Source | [Archived suite](full-source-run.json): 2,233 passes, four ignored; its one failure is the subsequently repaired [Character sample](character-sample-repair.json). [25 smoke programs](source-smoke.json) pass. | Preserve the failed archive result and focused repair separately; final release inputs must be identified. |
+| Source | [Archived suite](full-source-run.json): 2,233 passes, four ignored; its one failure is the subsequently repaired [Character sample](character-sample-repair.json). [25 smoke programs](source-smoke.json) pass. | [Current source-toolchain repair](source-toolchain-repair.json): formatting and Rust 1.85 gates failed; syntax/format fixes require a pinned canonical rerun. Preserve the earlier failed archive and focused Character repair separately. |
 | macOS package/editor | [Complete package](complete-macos-package.json): extracted samples and HTTP exchange, 26 installed-editor checks, inlays, two ten-cycle configuration recovery runs. | Final publication archive and provenance verification. |
 | macOS native build kit | [Matching complete-SDK kit](complete-native-kit/summary.json): console/HTTP, C/C++ native interop, Cargo-free consumers and TLS dependency tamper rejection pass. | SDK manifest matches the qualified package. Recheck final publication identities; explicit HTTPS-server profile remains source-only. |
 | macOS HTTPS | [Matching-package project](macos-https-project.json): 15 AOT security/recovery/cleartext cases and native TLS transport tests pass. | [Windows HTTPS](windows-https/summary.json) passes 27 JIT/AOT cases against the qualified package; no HTTPS throughput claim. |

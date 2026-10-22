@@ -37,9 +37,7 @@ fn fixture(case: &str) -> neoclr::Module {
     let generic = case == "generic";
     let suffix = if generic { "<T>" } else { "" };
     let extra = match case {
-        "cycle" => {
-            ".type class Peer\n.method private static .cctor() -> void\nret\n.end\n.end\n"
-        }
+        "cycle" => ".type class Peer\n.method private static .cctor() -> void\nret\n.end\n.end\n",
         "reference" => {
             ".type class Payload\n.field Value Int32\n.method instance .ctor(Int32 value) -> void\nldarg 0\nldarg 1\nstfld 0\nret\n.end\n.end\n"
         }

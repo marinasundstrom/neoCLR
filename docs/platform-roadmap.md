@@ -1,5 +1,12 @@
 # neoCLR platform roadmap
 
+**Source qualification repair (2026-10-22):** CI exposes rustfmt drift and
+Rust 1.85 rejection of let chains in generic type-token inspection. Replace them
+with equivalent nested conditions and format the four affected test files.
+Both host-boundary jobs pass; the canonical source and minimum-Rust gates remain
+open pending a repaired, explicitly pinned run.
+[Evidence](validation/release-stabilization-20261022/source-toolchain-repair.json).
+
 **Two-platform measurements completed (2026-10-22):** Windows now also passes
 55 CPU/JSON processes and 1,152 HTTP responses against its qualified archive.
 Record distributions separately from macOS. Preserve the dirty-checkout flag:
