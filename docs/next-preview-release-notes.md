@@ -1,21 +1,22 @@
 # Next preview — Preview 17 candidate
 
-Initial candidate selected on 2026-10-19; **superseded before publication**.
-The author now requires String and StringBuilder fixes before release. The initial
-Windows package run was canceled; existing source checks remain baseline evidence.
-A new package identity and qualification run are required after text changes. The candidate SDK/editor
-version is `0.1.17-neoclr.20261019.1`, using Raven native compiler
-`2d22055dca58dcf991c6001dfe5d93657577d9d6`. Publication date remains unset.
-[Preview 16](preview-16-release-notes.md) and its assets remain unchanged.
+This is an unpublished draft. Preview 16 and its assets remain unchanged.
+No replacement release version or publication date has been selected.
 
-## Replacement readiness (2026-10-20)
+## Current qualification (2026-10-22)
 
-The identity above belongs to the superseded candidate and must not be reused as
-qualification for current source. [Current triage](validation/release-readiness-20261020/README.md)
-tracks bounded native record equality/hash fixes and remaining component/formatting gaps.
-The [String call-projection fix](validation/string-direct-call-20261020/README.md)
-closes the recorded direct-call discrepancy. Fresh source/package/editor/performance
-gates remain required. No replacement package identity is selected.
+The initial 2026-10-19 candidate `0.1.17-neoclr.20261019.1`, using Raven
+`2d22055dca58dcf991c6001dfe5d93657577d9d6`, was superseded before publication.
+Do not reuse that identity or its checks for current source.
+
+The current development SDK/editor version is `0.1.0-dev.20261021`, using Raven
+`301e668a51beb6ba307d63b6912b144d8ad6a6b0`. Extracted macOS ARM64 and Windows x64
+packages, installed-editor checks, HTTPS checks and refreshed platform benchmarks
+have passing evidence. Both archives pass manifest and SDK/editor identity audits.
+These development packages are not published release assets. The
+[current gate index](validation/release-stabilization-20261022/README.md) records
+exact inputs, reports and limits. Canonical full-source qualification is running;
+formatting, strict Clippy and Rust 1.85 checks now pass.
 
 ## Implemented scope for replacement review
 
@@ -45,29 +46,43 @@ JSON token serialization are not claimed. Experimental concurrent GC is not prom
 to a universal throughput improvement or the production default.
 
 String and StringBuilder have separate source reviews. Swift remains the text-semantic
-model. Canonical String/Char equality and matching hashes, Unicode 17 segmentation,
-search predicates, trimming/line-ending utilities, Char helpers, builder reuse and
+model. Canonical String/Character equality and matching hashes, Unicode 17 segmentation,
+search predicates, trimming/line-ending utilities, Character helpers, builder reuse and
 String.Format/Formattable are implemented with focused development qualification.
 Original UTF-8 bytes are preserved. Shared-storage String views remain deferred;
-position-based search/splitting and provider/primitive-specifier formatting remain
-coverage gaps. Native generated record equality/hash is qualified for bounded
-nongeneric positional records, including supported closed tagged-union components
-and [explicit imported value contracts](experiments/record-components/README.md)
-such as Index and Range.
-Generic record owners, unsupported components, imported value-record discovery and
-generated formatting remain gaps; see [record union evidence](experiments/record-unions/README.md).
+general custom formatting patterns and arbitrary providers remain deferred.
+[Numeric formatting and culture parsing](experiments/numeric-formats/README.md)
+are qualified across interpreter, JIT and native execution for the five bounded
+culture profiles. [Decimal](experiments/decimal/README.md) and the
+[Money value record](experiments/currency/README.md) add exact base-ten values and
+explicit currency identity without a new numeric interface hierarchy.
+
+[Record display and inheritance](experiments/record-formatting/README.md)
+include generic component display, root record classes, source-record inheritance,
+base copies and finite recursive display, with 45 built-in executions across the
+three engines. Arbitrary imported record-base synthesis remains outside that
+qualified scope. Generic boxing and display-string allocations remain costs;
+these correctness tests do not establish a throughput improvement.
+
+[Dependency injection](experiments/dependency-injection/open-generics.md) and
+[localization](experiments/localization/README.md) cover constructor activation,
+scopes, keyed/function services, open-generic typed localizers, per-key culture
+fallback and lookup-first argument formatting. Their focused built-in evidence
+remains distinct from package acceptance.
 
 Console now exposes synchronous byte/text capabilities with configurable line endings,
 and scoped ReadKey with logical keys, modifiers and optional Unicode scalar text.
 POSIX entry-thread keys, any-key exit and Ctrl+C-only exit pass interpreter/JIT/AOT.
 Windows key input, text-to-key switching and native worker attachment remain unsupported.
-These additions require a new matched package run; development evidence is not
-extracted release-package acceptance.
+Focused key-input evidence does not imply that interactive Windows input is
+qualified by the general extracted-package tests.
 
 ## Qualification remaining
 
-Require canonical committed-source tests/format/Clippy and host checks, freshly
-packaged macOS ARM64 and Windows x64 acceptance, matching editor tests, API/site
-validation, and current performance evidence. Record failures and fix them before
-publishing. Development bundles are not release assets. Website publication remains
-a separate manual operation after validation.
+Complete canonical committed-source qualification and resolve any failures. Select
+final release identities and verify publication artifacts against the qualified
+inputs; rebuilding or changing those inputs requires affected gates to be repeated.
+Keep API/site documentation aligned with the selected scope. The current benchmark
+reports preserve distributions and provenance, including the Windows dirty-checkout
+limitation; they do not establish cross-platform rankings or controlled speedups.
+Website publication remains a separate manual operation after validation.

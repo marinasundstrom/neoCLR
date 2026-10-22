@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-22
 
+- Refresh the unpublished next-preview draft against current qualification evidence: replace stale blanket numeric-formatting and generic-record gaps with bounded implemented contracts and their remaining limitations. Link current package/editor/HTTPS/benchmark gates while retaining the superseded candidate identity and leaving final version/publication unset.
+
 - Verify both qualified development archives again: all 2,283 macOS and 2,278 Windows manifest files match, with 87 byte-identical SDK/VSIX language-server files per platform and matching development versions. Record the 11 intentional PDB/XML exclusions per extension. Pin source run 39849082702 to the terminal compatibility repair; hosted formatting and strict Clippy pass, with the full source gate still running.
 
 - Confirm Rust 1.85 compatibility on macOS, Windows and Linux after the type-token syntax repair. Canonical CI then exposes the terminal handle allocator’s deprecated fetch_update spelling on newer Rust; apply the existing narrowly scoped compatibility annotation because try_update is newer than the supported minimum. Atomic ordering, overflow and runtime behavior are unchanged. Formatting passes; full source qualification remains open.
