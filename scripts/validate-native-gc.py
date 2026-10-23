@@ -62,7 +62,9 @@ def main():
         def build(name, source, gc=True, profile=False):
             binary = out / (name + ('.exe' if windows else ''))
             defines = (['NEOCLR_NATIVE_GC'] if gc else []) + (['NEOCLR_GC_PROFILE'] if profile else [])
+            threaded_pacing = source == 'native-gc-pacing-test' and not windows
             if source == 'native-gc-pacing-test': defines += ['NEOCLR_GC_PACED']
+            if threaded_pacing: defines += ['NEOCLR_TEST_THREADS']
             sources = [BASE / (source + '.c'), BASE / 'root-probe.c']
             if gc:
                 sources.append(BASE / 'native-gc.c')
@@ -79,6 +81,7 @@ def main():
             if source == 'native-gc-unicode-test':
                 sources.extend([BASE / 'text-arena.c', BASE / 'string-unicode.c', text_library])
             run(name + '-build', [*cc, *(['/I' + str(BASE)] if windows else ['-I', BASE]), *[('/D' if windows else '-D') + value for value in defines],
+                *(['-pthread'] if threaded_pacing else []),
                 *sources, *(['/Fe:' + str(binary)] if windows else ['-o', binary])])
             return binary
 

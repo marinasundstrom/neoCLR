@@ -1,0 +1,29 @@
+{
+  "baseline": {
+    "sha256": "da325aeb987f512b331afdfe70ca7eb17b37b6f297476e17a04034a0707bc9db",
+    "boundaryTlvSites": 4,
+    "boundaryAssembly": "                 ; @neoclr_gc_boundary_v1\n\t.cfi_startproc\n; %bb.0:\n\tstp\tx22, x21, [sp, #-48]!           ; 16-byte Folded Spill\n\tstp\tx20, x19, [sp, #16]             ; 16-byte Folded Spill\n\tstp\tx29, x30, [sp, #32]             ; 16-byte Folded Spill\n\tadd\tx29, sp, #32\n\t.cfi_def_cfa w29, 16\n\t.cfi_offset w30, -8\n\t.cfi_offset w29, -16\n\t.cfi_offset w19, -24\n\t.cfi_offset w20, -32\n\t.cfi_offset w21, -40\n\t.cfi_offset w22, -48\n\tmov\tx20, x1\n\tmov\tx19, x0\nLloh80:\n\tadrp\tx0, _resource_cleanup_active@TLVPPAGE\nLloh81:\n\tldr\tx0, [x0, _resource_cleanup_active@TLVPPAGEOFF]\n\tldr\tx8, [x0]\n\tblr\tx8\n\tmov\tx8, x0\n\tmov\tw0, #3                          ; =0x3\n\tcbz\tx19, LBB26_4\n; %bb.1:\n\tldr\tw8, [x8]\n\tcbnz\tw8, LBB26_4\n; %bb.2:\n\tbl\t_neoclr_root_probe_head_v1\n\tcmp\tx0, x20\n\tb.eq\tLBB26_5\nLBB26_3:\n\tmov\tw0, #3                          ; =0x3\nLBB26_4:\n\tldp\tx29, x30, [sp, #32]             ; 16-byte Folded Reload\n\tldp\tx20, x19, [sp, #16]             ; 16-byte Folded Reload\n\tldp\tx22, x21, [sp], #48             ; 16-byte Folded Reload\n\tret\nLBB26_5:\n\tcbz\tx20, LBB26_7\n; %bb.6:\n\tldr\tx8, [x20, #8]\n\tcmp\tx8, x19\n\tb.ne\tLBB26_3\nLBB26_7:\nLloh82:\n\tadrp\tx0, _pacing@TLVPPAGE\nLloh83:\n\tldr\tx0, [x0, _pacing@TLVPPAGEOFF]\n\tldr\tx8, [x0]\n\tblr\tx8\n\tmov\tx21, x0\n\tldr\tx8, [x0]\n\tcmp\tx8, x19\n\tb.ne\tLBB26_12\n; %bb.8:\nLloh84:\n\tadrp\tx0, _statistics@TLVPPAGE\nLloh85:\n\tldr\tx0, [x0, _statistics@TLVPPAGEOFF]\n\tldr\tx8, [x0]\n\tblr\tx8\n\tldr\tx8, [x0]\n\tldr\tx9, [x21, #16]\n\tcmp\tx8, x9\n\tb.ne\tLBB26_12\n; %bb.9:\n\tldr\tx8, [x0, #8]\n\tldr\tx9, [x21, #8]\n\tsub\tx8, x8, x9\n\tcmp\tx8, #255\n\tb.hi\tLBB26_12\n; %bb.10:\n\tldr\tx8, [x21, #24]\n\tadd\tx8, x8, #1\n\tstr\tx8, [x21, #24]\n\tcmp\tx8, #1024\n\tb.hs\tLBB26_12\n; %bb.11:\n\tmov\tw0, #0                          ; =0x0\n\tb\tLBB26_4\nLBB26_12:\n\tmov\tx0, x19\n\tmov\tx1, x20\n\tmov\tx2, #0                          ; =0x0\n\tmov\tw3, #0                          ; =0x0\n\tbl\t_neoclr_gc_collect_conditional_v1\n\tcbnz\tw0, LBB26_4\n; %bb.13:\n\tstr\tx19, [x21]\nLloh86:\n\tadrp\tx0, _statistics@TLVPPAGE\nLloh87:\n\tldr\tx0, [x0, _statistics@TLVPPAGEOFF]\n\tldr\tx8, [x0]\n\tblr\tx8\n\tmov\tx8, x0\n\tmov\tw0, #0                          ; =0x0\n\tldr\tq0, [x8]\n\text.16b\tv0, v0, v0, #8\n\tstur\tq0, [x21, #8]\n\tstr\txzr, [x21, #24]\n\tb\tLBB26_4\n\t.loh AdrpLdr\tLloh80, Lloh81\n\t.loh AdrpLdr\tLloh82, Lloh83\n\t.loh AdrpLdr\tLloh84, Lloh85\n\t.loh AdrpLdr\tLloh86, Lloh87\n\t"
+  },
+  "candidate": {
+    "sha256": "4cbdab13e11c0dacae1d0e59baa5133be16c3998cfa02122f9d185115d2732ab",
+    "boundaryTlvSites": 1,
+    "boundaryAssembly": "                 ; @neoclr_gc_boundary_v1\n\t.cfi_startproc\n; %bb.0:\n\tstp\tx22, x21, [sp, #-48]!           ; 16-byte Folded Spill\n\tstp\tx20, x19, [sp, #16]             ; 16-byte Folded Spill\n\tstp\tx29, x30, [sp, #32]             ; 16-byte Folded Spill\n\tadd\tx29, sp, #32\n\t.cfi_def_cfa w29, 16\n\t.cfi_offset w30, -8\n\t.cfi_offset w29, -16\n\t.cfi_offset w19, -24\n\t.cfi_offset w20, -32\n\t.cfi_offset w21, -40\n\t.cfi_offset w22, -48\n\tmov\tx21, x1\n\tmov\tx19, x0\nLloh78:\n\tadrp\tx0, _gc_state@TLVPPAGE\nLloh79:\n\tldr\tx0, [x0, _gc_state@TLVPPAGEOFF]\n\tldr\tx8, [x0]\n\tblr\tx8\n\tmov\tx20, x0\n\tmov\tw0, #3                          ; =0x3\n\tcbz\tx19, LBB26_4\n; %bb.1:\n\tldr\tw8, [x20, #64]\n\tcbnz\tw8, LBB26_4\n; %bb.2:\n\tbl\t_neoclr_root_probe_head_v1\n\tcmp\tx0, x21\n\tb.eq\tLBB26_5\nLBB26_3:\n\tmov\tw0, #3                          ; =0x3\nLBB26_4:\n\tldp\tx29, x30, [sp, #32]             ; 16-byte Folded Reload\n\tldp\tx20, x19, [sp, #16]             ; 16-byte Folded Reload\n\tldp\tx22, x21, [sp], #48             ; 16-byte Folded Reload\n\tret\nLBB26_5:\n\tcbz\tx21, LBB26_7\n; %bb.6:\n\tldr\tx8, [x21, #8]\n\tcmp\tx8, x19\n\tb.ne\tLBB26_3\nLBB26_7:\n\tldr\tx8, [x20, #32]\n\tcmp\tx8, x19\n\tb.ne\tLBB26_12\n; %bb.8:\n\tldr\tx8, [x20]\n\tldr\tx9, [x20, #48]\n\tcmp\tx8, x9\n\tb.ne\tLBB26_12\n; %bb.9:\n\tldr\tx8, [x20, #8]\n\tldr\tx9, [x20, #40]\n\tsub\tx8, x8, x9\n\tcmp\tx8, #255\n\tb.hi\tLBB26_12\n; %bb.10:\n\tldr\tx8, [x20, #56]\n\tadd\tx8, x8, #1\n\tstr\tx8, [x20, #56]\n\tcmp\tx8, #1024\n\tb.hs\tLBB26_12\n; %bb.11:\n\tmov\tw0, #0                          ; =0x0\n\tb\tLBB26_4\nLBB26_12:\n\tmov\tx0, x19\n\tmov\tx1, x21\n\tmov\tx2, #0                          ; =0x0\n\tmov\tw3, #0                          ; =0x0\n\tbl\t_neoclr_gc_collect_conditional_v1\n\tcbnz\tw0, LBB26_4\n; %bb.13:\n\tstr\tx19, [x20, #32]\n\tldr\tq0, [x20]\n\text.16b\tv0, v0, v0, #8\n\tstur\tq0, [x20, #40]\n\tstr\txzr, [x20, #56]\n\tb\tLBB26_4\n\t.loh AdrpLdr\tLloh78, Lloh79\n\t"
+  },
+  "commandTemplate": [
+    "xcrun",
+    "--sdk",
+    "macosx",
+    "clang",
+    "-std=c11",
+    "-O2",
+    "-DNEOCLR_NATIVE_GC",
+    "-I",
+    "runtime/native/gc",
+    "-S",
+    "SOURCE",
+    "-o",
+    "OUTPUT"
+  ],
+  "sourceRevision": "a6ef45c16",
+  "note": "Candidate assembly precedes removal of two blank lines only; capacity builds use the final source."
+}

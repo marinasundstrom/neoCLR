@@ -403,3 +403,14 @@ mean one/four-worker throughput and 3.7%/7.8% lower CPU per response. Background
 activity and variable tails limit these measurements; no Kestrel parity or JSON
 capacity claim follows. See
 [implementation, validation and measurements](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/primitive-comparison/owned-transient).
+
+
+## Development: GC thread-local state
+
+Co-locating private GC counters, pacing budgets and cleanup state reduces repeated
+thread-local lookups while preserving collection policy and validation. Focused
+pacing/thread/profile checks, forced-GC HTTP and shared-worker stress pass. Eight
+paired local plaintext trials show 3.4%/4.3% higher mean one/four-worker throughput
+and 3.7%/4.0% lower CPU per response. One-worker latency tails remain mixed; these
+are incremental desktop results, not a new comparison against other servers. See
+[profile, implementation and evidence](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/primitive-comparison/gc-state).

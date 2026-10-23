@@ -6534,3 +6534,15 @@ repeated descriptor checks fall 80.9%; capacity evidence and limitations are in 
 [report](../benchmarks/http-server/primitive-comparison/owned-transient/README.md).
 This completes the bounded ownership experiment; broader typed metadata and
 noncollecting-call analysis remain separate work.
+
+
+### GC pacing state locality — 2026-10-24
+
+Author-directed HTTP optimization continues with a fresh checked profile after
+transient ownership. Grouping private GC thread-local statistics, budgets and
+cleanup state reduces repeated TLS resolution without changing collection policy.
+Focused GC/thread/profile, forced-GC HTTP and shared-worker checks pass; eight paired
+local trials show 3.4%/4.3% higher mean one/four-owner throughput and 3.7%/4.0% lower
+CPU/response. [Evidence and limits](../benchmarks/http-server/primitive-comparison/gc-state/README.md).
+Broader typed metadata, generational policies and publication elimination remain
+separate investigations; this slice adds no public API or compiler bridge change.

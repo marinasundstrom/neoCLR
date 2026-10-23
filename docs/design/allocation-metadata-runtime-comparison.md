@@ -387,3 +387,16 @@ reading slot values. Ordinary mutable callers retain checks. This applies the
 existing CLR metadata/value-lifetime comparison without adopting CLR stack-map ABI
 or caching arbitrary native pointers. The cost is a trusted lifetime obligation and
 matching-runtime linkage for new objects. [Evidence and limitations](../../benchmarks/http-server/primitive-comparison/owned-transient/README.md).
+
+
+### GC state locality after transient ownership — 2026-10-24
+
+A fresh four-owner profile still attributes 16.73% of worker self samples to TLS
+lookup (wall-clock samples, not CPU shares), with paced boundaries the largest
+immediate-caller group. Reuse the owner-local runtime-state comparisons above:
+co-locate private GC counters, pacing and cleanup state while preserving their
+independent lifetimes. This differs from the rejected retained-stack grouping and
+has its own end-to-end evidence: mean one/four-owner throughput +3.4%/+4.3%,
+CPU/response −3.7%/−4.0%. Costs include four bytes of structure padding per thread;
+lookup savings depend on target/compiler. No CLR API, collector or safepoint
+semantics change. [Validation and measurements](../../benchmarks/http-server/primitive-comparison/gc-state/README.md).

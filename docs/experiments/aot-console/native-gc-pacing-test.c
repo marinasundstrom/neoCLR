@@ -1,12 +1,15 @@
 #include "native-gc.h"
 #include <stdio.h>
+#ifdef NEOCLR_TEST_THREADS
+#include <pthread.h>
+#endif
 #define CHECK(x) do { if (!(x)) { fprintf(stderr,"failed line %d\n",__LINE__); return 1; } } while(0)
 enum { ALLOCATION_BUDGET = 256, PUBLICATION_BUDGET = 1024 };
 static void boundary(neoclr_probe_frame *frame) {
     uint64_t empty=0;
     neoclr_probe_stack_roots_v2(frame,0,&empty,0,"{\"requiredSpillLanes\":[]}",25);
 }
-int main(void) {
+static int exercise(void) {
     uint64_t heap[4096]={0};
     neoclr_aot_context c={.text={(unsigned char*)heap,sizeof(heap),0}},other={0};
     void *root=NULL;neoclr_probe_storage slot={&root,8,0};neoclr_probe_frame frame;
@@ -39,5 +42,27 @@ int main(void) {
     CHECK(neoclr_gc_statistics_v1().collections==before+1);
     neoclr_probe_leave_v1(&frame);
     CHECK(!neoclr_gc_idle_v1(&c,NULL) && !c.text.used);
+    return 0;
+}
+
+#ifdef NEOCLR_TEST_THREADS
+static void *worker(void *argument) {
+    int *status = argument;
+    neoclr_gc_statistics initial = neoclr_gc_statistics_v1();
+    *status = initial.allocations || initial.collections ? 1 : exercise();
+    return NULL;
+}
+#endif
+int main(void) {
+    CHECK(!exercise());
+#ifdef NEOCLR_TEST_THREADS
+    neoclr_gc_statistics before = neoclr_gc_statistics_v1();
+    pthread_t threads[2];
+    int status[2] = {-1, -1};
+    for (unsigned i = 0; i < 2; i++) CHECK(!pthread_create(&threads[i], NULL, worker, &status[i]));
+    for (unsigned i = 0; i < 2; i++) CHECK(!pthread_join(threads[i], NULL) && !status[i]);
+    neoclr_gc_statistics after = neoclr_gc_statistics_v1();
+    CHECK(before.allocations == after.allocations && before.collections == after.collections);
+#endif
     return 0;
 }

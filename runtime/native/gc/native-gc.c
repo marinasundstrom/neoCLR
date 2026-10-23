@@ -23,7 +23,18 @@ void neoclr_gc_profile_reset_v1(void) {
 typedef struct { uint64_t span, bytes, kind, state; } block;
 _Static_assert(sizeof(block) == 32, "private allocation descriptor");
 enum { ALLOCATED = 1, MARKED = 2, SCANNED = 4 };
-static _Thread_local neoclr_gc_statistics statistics;
+/* Resolve the related hot GC state through one thread-local object. Individual
+ * counters retain their existing lifetimes; no whole-state reset or sharing is
+ * introduced. Pacing still checks the current root chain and cleanup guard. */
+static _Thread_local struct {
+    neoclr_gc_statistics statistics;
+    struct {
+        const neoclr_aot_context *context;
+        uint64_t allocations, collections, boundaries;
+    } pacing;
+    int cleanup_active;
+} gc_state;
+
 /* One exclusive runtime-owned arena per native thread. No per-object metadata
  * or allocation; an address-ordered free list is maintained by allocation and sweep.
  * Free blocks reuse their otherwise-unused bytes word for the next offset + 1;
@@ -140,20 +151,19 @@ int32_t neoclr_gc_allocation_info_v1(neoclr_aot_context *context, const void *va
     return 0;
 }
 static _Thread_local neoclr_gc_resource *resource_head;
-static _Thread_local int resource_cleanup_active;
 static void resource_cleanup(neoclr_gc_resource **link) {
     neoclr_gc_resource *resource = *link;
     void *state = resource->state;
     void (*cleanup)(void *) = resource->cleanup;
     *link = resource->next;
     *resource = (neoclr_gc_resource){0};
-    resource_cleanup_active = 1;
+    gc_state.cleanup_active = 1;
     cleanup(state);
-    resource_cleanup_active = 0;
+    gc_state.cleanup_active = 0;
 }
 int32_t neoclr_gc_resource_attach_v1(neoclr_aot_context *context, void *owner,
     neoclr_gc_resource *resource, void *state, void (*cleanup)(void *)) {
-    if (resource_cleanup_active || !context || !owner || !resource || !cleanup ||
+    if (gc_state.cleanup_active || !context || !owner || !resource || !cleanup ||
         !validated_bases(&context->text, owner, NULL)) return 3;
     unsigned count = 0;
     for (neoclr_gc_resource *r = resource_head; r; r = r->next) {
@@ -168,7 +178,7 @@ int32_t neoclr_gc_resource_attach_v1(neoclr_aot_context *context, void *owner,
     return 0;
 }
 int32_t neoclr_gc_resource_release_v1(neoclr_aot_context *context, neoclr_gc_resource *resource) {
-    if (resource_cleanup_active || !context || !resource) return 3;
+    if (gc_state.cleanup_active || !context || !resource) return 3;
     for (neoclr_gc_resource **link = &resource_head; *link; link = &(*link)->next)
         if (*link == resource && (*link)->context == context) {
             resource_cleanup(link);
@@ -371,7 +381,7 @@ int32_t neoclr_gc_allocate_v1(neoclr_aot_text_arena *a, uint64_t bytes,
     memset(chosen + 1, 0, (size_t)(chosen->span - sizeof(block)));
     if (owned) remember_base(chosen + 1);
     *output = chosen + 1;
-    statistics.allocations++;
+    gc_state.statistics.allocations++;
 #ifdef NEOCLR_GC_PROFILE
     profile.allocated_bytes += bytes;
     if (a->used > profile.peak_arena_used) profile.peak_arena_used = a->used;
@@ -384,7 +394,7 @@ int32_t neoclr_gc_allocate_v1(neoclr_aot_text_arena *a, uint64_t bytes,
 int32_t neoclr_gc_allocate_rooted_values_v1(neoclr_aot_context *context,
     const neoclr_probe_frame *boundary, const void *const *values, uint32_t count,
     uint64_t bytes, uint32_t kind, void **output) {
-    if (count > 16 || (count && !values) || !context || resource_cleanup_active || boundary != neoclr_root_probe_head_v1() ||
+    if (count > 16 || (count && !values) || !context || gc_state.cleanup_active || boundary != neoclr_root_probe_head_v1() ||
         (boundary && boundary->context != context)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     int32_t status = neoclr_gc_allocate_v1(&context->text, bytes, kind, output);
     if (status != NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT) return status;
@@ -705,7 +715,7 @@ static int32_t collect_indexed(neoclr_aot_context *context,
         block *b = (void *)(a->data + at);
         uint64_t span = b->span;
         if (b->state && !(b->state & MARKED)) {
-            statistics.reclaimed_allocations++; statistics.reclaimed_bytes += b->bytes;
+            gc_state.statistics.reclaimed_allocations++; gc_state.statistics.reclaimed_bytes += b->bytes;
             /* Poison reclaimed contents so stale reads fail functional stress tests. */
             memset(b + 1, 0xdd, (size_t)(span - sizeof(block)));
             b->state = 0; b->bytes = 0; b->kind = 0;
@@ -735,7 +745,7 @@ static int32_t collect_indexed(neoclr_aot_context *context,
         owned_heap.used = a->used;
         owned_heap.free_head = free_head;
     }
-    statistics.collections++;
+    gc_state.statistics.collections++;
 #ifdef NEOCLR_GC_PROFILE
     profile.live_bytes = live_bytes; profile.live_blocks = live_blocks;
     if (live_bytes > profile.peak_live_bytes) profile.peak_live_bytes = live_bytes;
@@ -779,7 +789,7 @@ static int32_t collect_dense(neoclr_aot_context *context,
 }
 static int32_t collect_conditional(neoclr_aot_context *context,
     const neoclr_probe_frame *head, neoclr_gc_conditional_root *conditional, uint32_t count) {
-    if (!context || resource_cleanup_active) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    if (!context || gc_state.cleanup_active) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     block *starts[256], *interns[INTERN_SEED_LIMIT];
     block_index index = {.start = starts, .interns = interns, .capacity = 256};
     if (!build_index(&context->text, &index)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
@@ -835,28 +845,24 @@ int32_t neoclr_gc_collect_conditional_v1(neoclr_aot_context *context,
  * The bounded 256-allocation / 1024-publication budget amortizes tracing on the
  * plain HTTP path; see benchmarks/http-server/primitive-comparison/pacing.
  * This is a publication budget, not a wall-clock finalization guarantee. */
-static _Thread_local struct {
-    const neoclr_aot_context *context;
-    uint64_t allocations, collections, boundaries;
-} pacing;
 int32_t neoclr_gc_idle_v1(neoclr_aot_context *context, const neoclr_probe_frame *boundary) {
     int32_t status = neoclr_gc_collect_v1(context, boundary);
     if (!status) {
-        pacing.context = context;
-        pacing.allocations = statistics.allocations;
-        pacing.collections = statistics.collections;
-        pacing.boundaries = 0;
+        gc_state.pacing.context = context;
+        gc_state.pacing.allocations = gc_state.statistics.allocations;
+        gc_state.pacing.collections = gc_state.statistics.collections;
+        gc_state.pacing.boundaries = 0;
     }
     return status;
 }
 int32_t neoclr_gc_boundary_v1(neoclr_aot_context *context, const neoclr_probe_frame *boundary) {
-    if (!context || resource_cleanup_active || boundary != neoclr_root_probe_head_v1() ||
+    if (!context || gc_state.cleanup_active || boundary != neoclr_root_probe_head_v1() ||
         (boundary && boundary->context != context)) return 3;
-    if (pacing.context == context && statistics.collections == pacing.collections &&
-        statistics.allocations - pacing.allocations < 256 && ++pacing.boundaries < 1024) return 0;
+    if (gc_state.pacing.context == context && gc_state.statistics.collections == gc_state.pacing.collections &&
+        gc_state.statistics.allocations - gc_state.pacing.allocations < 256 && ++gc_state.pacing.boundaries < 1024) return 0;
     return neoclr_gc_idle_v1(context, boundary);
 }
-neoclr_gc_statistics neoclr_gc_statistics_v1(void) { return statistics; }
+neoclr_gc_statistics neoclr_gc_statistics_v1(void) { return gc_state.statistics; }
 
 static int32_t string_intern(const neoclr_aot_text *text, neoclr_aot_text_arena *arena,
                                const neoclr_aot_text **output, int rooted) {
