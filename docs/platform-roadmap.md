@@ -6245,3 +6245,12 @@ gate. Optimized/UBSan tests pass static continuity, GC, fault isolation, callbac
 root-admission failure/retry and teardown; all eleven native groups still pass.
 This separates callback diagnostics from pool ownership without an ABI change or
 parallel generated execution. See [evidence](experiments/native-worker-pool/README.md#per-invocation-context-ownership--2026-10-23).
+
+
+Concurrent compiled integration follow-up (2026-10-23): an opt-in macOS ARM64
+backend now publishes participant compiler frames and coordinates collection on
+one shared heap. Optimized/UBSan fixtures reach four active compiled participants,
+retain aliases/cycles and detached locals across 24,544 collections, isolate faults,
+and reclaim after cancellation. Allocation/native helpers remain serialized;
+shared async Task/HTTP ownership and throughput qualification remain open.
+See [scope and evidence](experiments/native-worker-pool/README.md#concurrent-compiled-shared-heap--2026-10-23).

@@ -427,7 +427,33 @@ static void mark_frames(neoclr_aot_context *context, block_index *index,
             mark(&context->text, index, f->lanes[i], pending);
     }
 }
+#ifdef NEOCLR_WORKER_GC
+_Thread_local neoclr_gc_worker_collector neoclr_gc_worker_collect_hook;
+static _Thread_local const neoclr_gc_participant *worker_participants;
+static _Thread_local unsigned worker_participant_count;
+int32_t neoclr_gc_collect_participants_v1(neoclr_aot_context *context, const neoclr_probe_frame *head,
+    const neoclr_gc_participant *participants, unsigned count) {
+    if (worker_participants || !participants || count > 17) return 3;
+    worker_participants = participants; worker_participant_count = count;
+    int32_t status = neoclr_gc_collect_conditional_v1(context, head, NULL, 0);
+    worker_participants = NULL; worker_participant_count = 0;
+    return status;
+}
+int32_t neoclr_gc_worker_roots_check_v1(neoclr_aot_context *context, uint64_t handle) {
+    unsigned found = 0;
+    if (neoclr_roots_parked_v1()) return 3;
+    for (neoclr_gc_resource *r = resource_head; r; r = r->next) if (r->context == context) return 3;
+    for (host_root *r = host_head; r; r = r->next) if (r->context == context) {
+        if (r->handle != handle || r->conditional) return 3;
+        found++;
+    }
+    return found == 1 ? 0 : 3;
+}
+#endif
 int32_t neoclr_gc_collect_v1(neoclr_aot_context *context, const neoclr_probe_frame *head) {
+#ifdef NEOCLR_WORKER_GC
+    if (neoclr_gc_worker_collect_hook) return neoclr_gc_worker_collect_hook(context, head);
+#endif
     return neoclr_gc_collect_conditional_v1(context, head, NULL, 0);
 }
 static int32_t collect_indexed(neoclr_aot_context *context,
@@ -477,6 +503,22 @@ static int32_t collect_indexed(neoclr_aot_context *context,
             mark(a, &index, (uintptr_t)root->value, &pending);
     mark(a, &index, (uintptr_t)context->static_storage, &pending);
     mark_frames(context, &index, head, &pending);
+#ifdef NEOCLR_WORKER_GC
+    for (unsigned n = 0; n < worker_participant_count; n++) {
+        const neoclr_gc_participant *part = &worker_participants[n];
+        neoclr_probe_storage diagnostics[65];
+        int32_t slots = neoclr_probe_fault_roots_v1(part->context, diagnostics, 65);
+        if (slots < 0) return 3;
+        mark_slots(a, &index, diagnostics, (uint32_t)slots, &pending);
+        for (const neoclr_probe_frame *f = part->frames; f; f = f->previous) {
+            if (f->context != part->context) return 3;
+            mark_slots(a, &index, f->storage, f->storage_count, &pending);
+            mark_slots(a, &index, f->transient, f->transient_count, &pending);
+            for (uint32_t i = 0; i < f->lane_count; i++) mark(a, &index, f->lanes[i], &pending);
+        }
+    }
+#endif
+
     for (const neoclr_parked_roots *p = neoclr_roots_parked_v1(); p; p = p->next)
         if (!p->owner_context) mark_frames(context, &index, p->head, &pending);
     /* Each newly marked reference-bearing allocation enters the worklist once.

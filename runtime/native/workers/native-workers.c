@@ -23,6 +23,7 @@ struct neoclr_worker_job {
     neoclr_worker_callback callback;
     void *native_state;
 };
+struct compiled_participant;
 struct root { uint64_t generation; void *value; };
 struct neoclr_workers {
     uint64_t identity, submission, settlement;
@@ -31,6 +32,11 @@ struct neoclr_workers {
     pthread_cond_t ready, completion;
     unsigned thread_count, capacity, readers, mutators, waiting_writers;
     int closing, joined, dispatching;
+#ifdef NEOCLR_WORKER_GC
+    unsigned compiled_count, compiled_running, compiled_waiters, compiled_peak;
+    uint64_t compiled_collections;
+    struct compiled_participant *participants[JOBS], *compiled_exclusive;
+#endif
     neoclr_aot_context context;
     neoclr_worker_invoke invoke;
     struct neoclr_worker_job jobs[JOBS];
@@ -45,7 +51,11 @@ static void unlock(neoclr_workers *p) { if (pthread_mutex_unlock(&p->gate)) abor
 static void heap_lock(neoclr_workers *p) {
     lock(p);
     ++p->waiting_writers;
-    while (p->readers || p->mutators) if (pthread_cond_wait(&p->completion, &p->gate)) abort();
+    while (p->readers || p->mutators
+#ifdef NEOCLR_WORKER_GC
+        || p->compiled_count
+#endif
+    ) if (pthread_cond_wait(&p->completion, &p->gate)) abort();
     --p->waiting_writers;
     pthread_cond_broadcast(&p->completion);
 }
@@ -266,7 +276,11 @@ const void *neoclr_worker_read_begin(neoclr_worker_job *j) {
     if (executing != j) abort();
     neoclr_workers *p = j->pool;
     lock(p);
-    while (p->waiting_writers || p->mutators) if (pthread_cond_wait(&p->completion, &p->gate)) abort();
+    while (p->waiting_writers || p->mutators
+#ifdef NEOCLR_WORKER_GC
+        || p->compiled_count
+#endif
+    ) if (pthread_cond_wait(&p->completion, &p->gate)) abort();
     ++p->readers;
     reading = j;
     const void *capture = j->capture;
@@ -287,7 +301,11 @@ void *neoclr_worker_mutate_begin(neoclr_worker_job *j) {
     if (executing != j) abort();
     neoclr_workers *p = j->pool;
     lock(p);
-    while (p->waiting_writers || p->readers)
+    while (p->waiting_writers || p->readers
+#ifdef NEOCLR_WORKER_GC
+        || p->compiled_count
+#endif
+    )
         if (pthread_cond_wait(&p->completion, &p->gate)) abort();
     ++p->mutators;
     mutating = j;
@@ -462,3 +480,7 @@ int neoclr_workers_destroy(neoclr_workers *p) {
     pthread_cond_destroy(&p->completion); pthread_cond_destroy(&p->ready); pthread_mutex_destroy(&p->gate);
     free(p->context.text.data); free(p); return 1;
 }
+
+#ifdef NEOCLR_WORKER_GC
+#include "compiled-workers.inc"
+#endif

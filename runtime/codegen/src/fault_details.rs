@@ -10,6 +10,7 @@ type Error = Box<dyn std::error::Error>;
 pub struct Options {
     pub probe_stack_roots: bool,
     pub native_gc: bool,
+    pub native_worker_safepoints: bool,
     pub native_host_bootstrap: bool,
     pub native_stack_budget: bool,
     pub windows_stack_experiment: bool,
@@ -199,6 +200,7 @@ impl Options {
                 .collect(),
             probe_stack_roots: false,
             native_gc: false,
+            native_worker_safepoints: false,
             native_host_bootstrap: false,
             native_stack_budget: false,
             windows_stack_experiment: false,

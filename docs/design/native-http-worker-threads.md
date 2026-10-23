@@ -238,3 +238,12 @@ bounded stack context and initialization cost. It is not a throughput optimizati
 covers static continuity, collection, faults, root-admission failure/retry and
 teardown. Compiler-frame publication and genuinely shared allocation state remain
 necessary before removing the gate. No compiler ABI or Raven encoding changed.
+
+
+Concurrent compiled integration follow-up (2026-10-23): an opt-in macOS ARM64
+backend now publishes participant compiler frames and coordinates collection on
+one shared heap. Optimized/UBSan fixtures reach four active compiled participants,
+retain aliases/cycles and detached locals across 24,544 collections, isolate faults,
+and reclaim after cancellation. Allocation/native helpers remain serialized;
+shared async Task/HTTP ownership and throughput qualification remain open.
+See [scope and evidence](../experiments/native-worker-pool/README.md#concurrent-compiled-shared-heap--2026-10-23).

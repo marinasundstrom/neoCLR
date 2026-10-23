@@ -185,6 +185,21 @@ pub(super) fn point(p: &Profile<'_>, op: &Op, stack: &[Ty]) -> Result<Option<Val
         Op::String(_) => (0, "text-materialization", Some(Ty::Literal), None),
         _ => return Ok(None),
     };
+    stack_plan(p, stack, consumed, kind, result, receiver).map(Some)
+}
+
+pub(super) fn worker_point(p: &Profile<'_>, stack: &[Ty]) -> Result<Value, Error> {
+    stack_plan(p, stack, 0, "worker-safepoint", None, None)
+}
+
+fn stack_plan(
+    p: &Profile<'_>,
+    stack: &[Ty],
+    consumed: usize,
+    kind: &str,
+    result: Option<Ty>,
+    receiver: Option<Ty>,
+) -> Result<Value, Error> {
     let split = stack
         .len()
         .checked_sub(consumed)
@@ -206,13 +221,13 @@ pub(super) fn point(p: &Profile<'_>, op: &Op, stack: &[Ty]) -> Result<Option<Val
         }
         lane_base += p.lanes(ty);
     }
-    Ok(Some(
+    Ok(
         json!({"kind": kind, "stackValues": stack.len(), "stackLanes": lane_base,
         "consumedValues": consumed, "roots": roots, "requiredSpillLanes": spill_lanes,
         "resultAfterSuccess": result.as_ref().map(|t| gc_layout::layout(p, t)),
         "constructorReceiverBeforeCall": receiver.as_ref().map(|t| gc_layout::layout(p, t)),
         "resultActiveBeforeOperation": false}),
-    ))
+    )
 }
 
 pub(super) fn point_at(
@@ -265,7 +280,18 @@ pub(super) fn report(
             let Some(shape) = shape else {
                 continue;
             };
-            if let Some(mut plan) = point_at(p, i, pc, shape)? {
+            let candidate = point_at(p, i, pc, shape)?;
+            let exclusive = candidate.is_some();
+            let plan = if candidate.is_none() && details.is_some_and(|d| d.native_worker_safepoints)
+            {
+                Some(worker_point(p, shape)?)
+            } else {
+                candidate
+            };
+            if let Some(mut plan) = plan {
+                if details.is_some_and(|d| d.native_worker_safepoints) {
+                    plan["exclusiveHeapOperation"] = json!(exclusive);
+                }
                 plan["instruction"] = json!(pc);
                 points.push(plan);
             }
@@ -274,8 +300,10 @@ pub(super) fn report(
     }
     Ok(
         json!({"schema": "neoclr-pre-operation-roots-v1", "functions": functions,
-        "collection": if details.is_some_and(|d| d.native_gc) { "nonmoving-conservative-pre-operation" } else { "disabled" },
-        "notice": if details.is_some_and(|d| d.native_gc) {
+        "collection": if details.is_some_and(|d| d.native_worker_safepoints) { "worker-coordinated-nonmoving" } else if details.is_some_and(|d| d.native_gc) { "nonmoving-conservative-pre-operation" } else { "disabled" },
+        "notice": if details.is_some_and(|d| d.native_worker_safepoints) {
+            "Private synchronous worker profile: every reachable IL boundary publishes roots; shared GC waits for participants, and allocating/native operations execute exclusively. No async resources or type initializers."
+        } else if details.is_some_and(|d| d.native_gc) {
             "Collection runs only at published pre-operation boundaries; allocation services never collect. In-buffer descriptors recover interior owners, caller storage covers stack borrows, and fault contexts retain messages. Conservative candidates can over-retain. General host handles and concurrent collection are unsupported."
         } else {
             "Conservative reachable IL boundaries, not native safepoints. Opt-in diagnostic frames expose typed storage and call-result handoff; native wrappers expose arguments only. This diagnostic-only mode forbids collection."

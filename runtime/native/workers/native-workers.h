@@ -126,4 +126,12 @@ int neoclr_workers_collect(neoclr_workers *, uint64_t *live_extent);
 int neoclr_workers_close(neoclr_workers *);
 /* Reject outstanding tickets/roots or unjoined workers; no implicit discard. */
 int neoclr_workers_destroy(neoclr_workers *);
+#ifdef NEOCLR_WORKER_GC
+/* Restricted compiler-instrumented synchronous callbacks only. Requires an image
+ * built with --native-worker-safepoints and the matching collector attachment.
+ * The compiler rejects unaudited services/type initialization. Shared application
+ * fields still require synchronization/disjoint ownership. No Task/I/O migration. */
+int32_t neoclr_worker_invoke_capture_parallel(neoclr_worker_job *);
+int neoclr_workers_compiled_statistics(neoclr_workers *, unsigned *peak, uint64_t *collections);
+#endif
 #endif

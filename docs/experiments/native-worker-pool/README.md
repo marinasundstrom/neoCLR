@@ -508,3 +508,67 @@ heap ownership explicit; it does **not** yet enable simultaneous generated callb
 Concurrent generated execution still requires a shared heap coordinator independent
 of the ABI's embedded cursor, participant compiler-frame publication and audited
 allocation/static/intern helper synchronization.
+
+## Concurrent compiled shared heap — 2026-10-23
+
+The private synchronous integration now runs compiled Raven callbacks concurrently
+on one nonmoving heap. Build the native runtime with `NEOCLR_WORKER_GC` and compile
+the bootstrap image with `--native-worker-safepoints`. The latter requires the
+macOS ARM64 native-GC/bootstrap/reference-arena profile. Default builds retain
+their existing root publication and execution behavior.
+
+Every reachable generated instruction publishes its live root snapshot before
+continuing. Pure instruction regions can overlap; allocation, calls into audited
+native helpers and static operations acquire exclusive heap access. A collector
+waits for other participants to publish and pause, then scans their compiler frame
+chains, diagnostic references, pool captures/results and temporary roots against
+the current shared arena. Each invocation retains its own fault context. The
+coordinator commits the arena cursor/static root at exclusive boundaries; copying
+independent mutable cursors without this coordination would be unsafe.
+
+Admission rejects unaudited native bodies/internal calls, external imports and
+type initialization guards. The tested helper subset includes Int32 boxing/query,
+formatting and string concatenation for faults. TLS resources, parked async roots
+and additional invocation host roots are forbidden. Callers must still synchronize
+conflicting accesses: GC coordination does not make arbitrary shared writes safe.
+The fixture shares an immutable cyclic capture graph and mutates disjoint local
+graphs, retaining displaced nodes through collections on other workers.
+
+[Parallel validation](compiled-parallel-validation.json) covers optimized and
+UBSan builds: each executes 32 healthy and 32 faulting callbacks on four reused
+workers, a 32 KiB heap, cancellation, consumer-root release during execution,
+job-local fault retention and complete reclamation. Healthy runs reach four active
+participants and 24,544 coordinated collections; fault runs perform 448 collections.
+Peak participants proves overlapping execution windows, not a throughput speedup.
+[Native regression](compiled-native-validation.json) retains all eleven groups
+with the coordinator enabled. [Serialized compiled regression](compiled-serial-validation.json)
+retains the previous static/fault behavior.
+
+This intentionally expensive qualification collects at exclusive boundaries and
+publishes at every instruction. It is a working synchronous compiler/runtime
+integration, not yet shared-heap async Task/HTTP dispatch or a throughput-qualified
+server. Isolated HTTP workers remain the current HTTP integration. TSan remains
+unqualified; UBSan is not a data-race detector. Next work is lower-cost safepoints,
+allocation/scheduling measurements and explicit async resource/continuation
+ownership before migrating HTTP onto a shared heap.
+
+The design follows the shared-heap/root-coordination problem described by
+[CLR threading](https://github.com/dotnet/runtime/blob/main/docs/design/coreclr/botr/threading.md)
+and [CLR GC cooperation rules](https://github.com/dotnet/runtime/blob/main/docs/coding-guidelines/clr-code-guide.md).
+Our explicit instruction boundaries and serialized helpers deliberately trade
+throughput for auditable suspension and root lifetime. They do not reproduce
+CLR's production suspension machinery or establish equivalent performance.
+
+Reproduce with `generated.py --parallel --codegen target/release/neoclr-codegen`,
+the matching bundle/libraries and a native validation report as illustrated by
+the retained command record. Compiler source and binary digests are recorded;
+the matching Raven bundle is revision 1128b98cf. No Raven language, CLI metadata,
+Runtime Contract option or managed API changes are required.
+
+Focused compiler root-plan tests pass (2/2); the native-GC integration suite passes
+11/12, including new flag admission checks. Its unrelated record-array non-GC
+129-lane rejection assertion fails at line 15, reproduced from committed baseline
+d4d99ab3e sources ([baseline evidence](compiled-record-baseline.json)).
+The [private-context regression](compiled-private-validation.json) also passes
+640 invocations per optimized/UBSan build. The serialized fixture additionally
+verifies that the concurrent profile rejects its type initializer.

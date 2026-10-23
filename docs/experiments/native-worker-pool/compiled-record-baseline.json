@@ -1,0 +1,8 @@
+{
+  "baseline": "d4d99ab3ed0ccfd8c67eca92babcaba3d609e74c",
+  "test": "reserved_record_array_kernel_validates_extents_and_traces_initialized_elements, non-GC variant",
+  "sources": "HEAD sources extracted under target/compiled-record-baseline; clang -arch arm64 -std=c11 -Wall -Wextra -Werror -fsanitize=undefined,bounds record-array-test.c text-arena.c",
+  "exitCode": 15,
+  "stderr": "",
+  "meaning": "Existing record array 129-lane rejection assertion fails at line 15; unchanged by worker integration."
+}

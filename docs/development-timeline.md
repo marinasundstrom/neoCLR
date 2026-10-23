@@ -21874,3 +21874,15 @@ are still open. The isolated throughput run was already underway at clarificatio
 and is retained as comparison evidence only. No external-server parity or full
 framework is claimed. See the [integration record](experiments/http-worker-integration/README.md)
 and [shared graph evidence](experiments/native-worker-pool/README.md#shared-graph-gc-gate--2026-10-23).
+
+## 2026-10-23 — Working compiled shared-heap integration
+
+The author directed: “Continue until you have it working”, following the request
+to test GC while workers access shared objects before comparing HTTP throughput.
+The assistant implemented opt-in compiler safepoints and a shared heap coordinator,
+then validated four overlapping compiled participants, cross-worker graph/root
+retention, cancellation and isolated diagnostics in optimized and UBSan builds.
+The implementation remains a synchronous private runtime primitive; allocation and
+native helpers are exclusive. Shared async HTTP dispatch and throughput parity
+remain open, rather than inferred from the GC result.
+See [implementation and evidence](experiments/native-worker-pool/README.md#concurrent-compiled-shared-heap--2026-10-23).

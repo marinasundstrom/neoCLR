@@ -1,0 +1,38 @@
+import System.*
+
+class SharedNode {
+    var Value: int = 42
+    var Link: object = 0
+}
+
+public func Calculate(limit: int) -> (() -> ()) {
+    let shared = SharedNode()
+    shared.Link = shared
+    return () => {
+        let local = SharedNode()
+        local.Link = shared
+        var index = 0
+        while index < limit {
+            let displaced = (SharedNode)local.Link
+            let next = SharedNode()
+            next.Value = index
+            next.Link = shared
+            local.Link = next
+            let boxed: object = index
+            if (int)boxed != index || next.Value != index
+                || !Object.ReferenceEquals(displaced.Link, shared)
+                || !Object.ReferenceEquals(shared.Link, shared)
+                || !Object.ReferenceEquals(next.Link, shared) {
+                System.Fail("Parallel graph lost a live reference")
+            }
+            index += 1
+        }
+        if limit < 0 {
+            let failure = limit
+            System.Fail("Parallel worker failure " + failure.ToString())
+        }
+        if shared.Value != 42 {
+            System.Fail("Shared capture changed")
+        }
+    }
+}

@@ -462,6 +462,13 @@ pub(crate) fn compile_into(
                 .into(),
         );
     }
+    if details.is_some_and(|d| d.native_worker_safepoints)
+        && (!details.is_some_and(|d| {
+            d.native_gc && d.native_host_bootstrap && d.reference_arena && d.probe_stack_roots
+        }) || platform_target != super::Target::MacosArm64)
+    {
+        return Err("worker safepoints require the macOS ARM64 native-GC bootstrap profile".into());
+    }
     let reservations = input
         .functions
         .iter()
@@ -1954,6 +1961,9 @@ pub(crate) fn compile_into(
         stack_budget,
         long_range_calls,
     )?;
+    if details.is_some_and(|d| d.native_worker_safepoints) && !initialization_guards.is_empty() {
+        return Err("worker safepoints do not yet support type initializers".into());
+    }
     let root_probes = if details.is_some_and(|d| d.probe_stack_roots) {
         Some(gc_probe::Probes::prepare(module, &p, &flows, details)?)
     } else {
@@ -3906,7 +3916,8 @@ pub(crate) fn compile_into(
                     }
                 }
 
-                if !matches!(op, Op::StaticField { .. } | Op::SetStaticField { .. })
+                if (!matches!(op, Op::StaticField { .. } | Op::SetStaticField { .. })
+                    || details.is_some_and(|d| d.native_worker_safepoints))
                     && let (Some(probes), Some(spill)) = (&root_probes, root_spill)
                 {
                     probes.emit(module, &mut b, i, pc, spill, probe_frame.unwrap(), &stack);

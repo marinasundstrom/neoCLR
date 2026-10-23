@@ -184,6 +184,8 @@ the default host. [Experimental contract and evidence](https://github.com/marina
 
 The private worker experiment tests concurrent native reads and separately
 synchronized native mutations of shared objects. GC waits for active phases to
-yield, retaining explicitly published roots. Generated callbacks still execute
-exclusively, with invocation-local diagnostics and explicit transfer of shared
-heap/static ownership; parallel managed mutation remains unqualified.
+yield, retaining explicitly published roots. An opt-in compiler profile now also runs synchronous generated callbacks on one
+shared heap, with participant root publication and coordinated GC. Optimized/UBSan
+tests cover four active participants, disjoint graph mutation and isolated faults.
+Allocation/helpers remain serialized; shared async HTTP and throughput qualification
+remain open. [Development evidence](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/native-worker-pool/README.md#concurrent-compiled-shared-heap--2026-10-23).

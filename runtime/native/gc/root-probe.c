@@ -113,6 +113,13 @@ void neoclr_probe_stack_roots_v2(neoclr_probe_frame *frame, uint32_t instruction
 #endif
     calls++;
 #ifdef NEOCLR_NATIVE_GC
+#ifdef NEOCLR_WORKER_GC
+    if (neoclr_gc_worker_boundary_hook) {
+        if (frame->reserved < 0x100 || frame->reserved > 0x101) abort();
+        neoclr_gc_worker_boundary_hook((neoclr_aot_context *)frame->context, head, frame->reserved & 1);
+        return;
+    }
+#endif
     /* Complete snapshot: audited allocating helpers additionally protect their temporaries. */
 #ifdef NEOCLR_GC_PACED
     if (neoclr_gc_boundary_v1((neoclr_aot_context *)frame->context, head)) abort();
@@ -121,6 +128,15 @@ void neoclr_probe_stack_roots_v2(neoclr_probe_frame *frame, uint32_t instruction
 #endif
 #endif
 }
+#ifdef NEOCLR_WORKER_GC
+_Thread_local neoclr_gc_worker_boundary neoclr_gc_worker_boundary_hook;
+void neoclr_gc_worker_stack_roots_v1(neoclr_probe_frame *frame, uint32_t instruction,
+    const uint64_t *lanes, uint32_t count, const char *plan, uint32_t length, uint32_t exclusive) {
+    if (!frame || exclusive > 1) abort();
+    frame->reserved = 0x100 | exclusive;
+    neoclr_probe_stack_roots_v2(frame, instruction, lanes, count, plan, length);
+}
+#endif
 void neoclr_probe_transient_v2(neoclr_probe_frame *frame, uint32_t phase,
     const neoclr_probe_storage *storage, uint32_t count, const char *plan, uint32_t length) {
     if (head != frame || (phase != 1 && phase != 2 && phase != 3) || !storage || !plan || strlen(plan) != length) abort();

@@ -20,12 +20,14 @@ struct Transient {
     lanes: Vec<(usize, u32)>,
 }
 struct Point {
+    exclusive: bool,
     data: DataId,
     length: usize,
     stack_lanes: usize,
     spills: Vec<usize>,
 }
 pub(super) struct Probes {
+    workers: bool,
     callback: FuncId,
     enter: FuncId,
     leave: FuncId,
@@ -42,6 +44,27 @@ impl Probes {
         details: Option<&crate::fault_details::Options>,
     ) -> Result<Self, Error> {
         let gc = details.is_some_and(|d| d.native_gc);
+        let workers = details.is_some_and(|d| d.native_worker_safepoints);
+        if workers {
+            let d = details.unwrap();
+            for (i, f) in p.input.functions.iter().enumerate() {
+                if (gc_points::native_body(p, i, details)
+                    || f.is_internal_call()
+                    || f.pinvoke.is_some())
+                    && !d.user_faults.contains(&i)
+                    && !d.int32_to_string.contains(&i)
+                    && !d.string_concat.contains(&i)
+                    && !d.int32_boxes.contains_key(&i)
+                    && !d.scalar_box_queries.contains_key(&i)
+                {
+                    return Err(format!(
+                        "worker safepoints reject unaudited native body: {}",
+                        f.name
+                    )
+                    .into());
+                }
+            }
+        }
         let mut sig = module.make_signature();
         sig.params.extend(
             [
@@ -54,8 +77,13 @@ impl Probes {
             ]
             .map(AbiParam::new),
         );
+        if workers {
+            sig.params.push(AbiParam::new(types::I32));
+        }
         let callback = module.declare_function(
-            if gc {
+            if workers {
+                "neoclr_gc_worker_stack_roots_v1"
+            } else if gc {
                 "neoclr_gc_stack_roots_v1"
             } else {
                 "neoclr_probe_stack_roots_v2"
@@ -175,7 +203,13 @@ impl Probes {
                 let Some(stack) = &flows[i][pc] else {
                     continue;
                 };
-                let Some(plan) = gc_points::point_at(p, i, pc, stack)? else {
+                let candidate = gc_points::point_at(p, i, pc, stack)?;
+                let exclusive = candidate.is_some();
+                let plan = if let Some(plan) = candidate {
+                    plan
+                } else if workers {
+                    gc_points::worker_point(p, stack)?
+                } else {
                     continue;
                 };
                 use neoclr::metadata::Instruction as Op;
@@ -243,6 +277,7 @@ impl Probes {
                 points.insert(
                     (i, pc),
                     Point {
+                        exclusive,
                         data,
                         length,
                         stack_lanes: plan["stackLanes"].as_u64().unwrap() as usize,
@@ -257,6 +292,7 @@ impl Probes {
             }
         }
         Ok(Self {
+            workers,
             callback,
             enter,
             leave,
@@ -410,7 +446,10 @@ impl Probes {
         let descriptor = b.ins().global_value(types::I64, data);
         let length = b.ins().iconst(types::I32, point.length as i64);
         let callback = module.declare_func_in_func(self.callback, b.func);
-        b.ins()
-            .call(callback, &[frame, pc, address, count, descriptor, length]);
+        let mut args = vec![frame, pc, address, count, descriptor, length];
+        if self.workers {
+            args.push(b.ins().iconst(types::I32, i64::from(point.exclusive)));
+        }
+        b.ins().call(callback, &args);
     }
 }
