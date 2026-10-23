@@ -55,18 +55,28 @@ static void compiled_pause_locked(compiled_participant *self, const neoclr_probe
         self->running = 0;
     }
     self->frames = head;
-    /* Safepoints wake compiler participants, not unrelated job-completion waiters. */
-    pthread_cond_broadcast(&p->compiled_ready);
+    atomic_store_explicit(&p->compiled_pause_requested,
+        p->compiled_waiters != 0 || p->compiled_exclusive != NULL, memory_order_release);
+    /* Only the last active participant can enable an exclusive waiter.
+     * An exclusive lease is itself the sole active participant. */
+    if (!p->compiled_running) pthread_cond_broadcast(&p->compiled_ready);
 }
 static void compiled_boundary(neoclr_aot_context *context, const neoclr_probe_frame *head, unsigned exclusive) {
     compiled_participant *self = compiled_current;
     if (!self || context != &self->context || exclusive > 1) abort();
     if (self->handle && neoclr_gc_worker_roots_check_v1(context, self->handle)) abort();
     neoclr_workers *p = self->job->pool;
+    /* Keep the running lease across pure boundaries until an exclusive operation
+     * requests quiescence. The collector cannot inspect this thread's changing
+     * frame snapshots while it is counted as running. On the slow path, the
+     * mutex publishes the complete frame chain before dropping that count. */
+    if (!exclusive && self->running && !self->exclusive &&
+        !atomic_load_explicit(&p->compiled_pause_requested, memory_order_acquire)) return;
     lock(p);
     compiled_pause_locked(self, head);
     if (exclusive) {
         ++p->compiled_waiters;
+        atomic_store_explicit(&p->compiled_pause_requested, 1, memory_order_release);
         while (p->compiled_running) if (pthread_cond_wait(&p->compiled_ready, &p->gate)) abort();
         --p->compiled_waiters;
         p->compiled_exclusive = self;

@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-23
 
+- Avoid pool locking at pure compiled safepoints until an atomic quiescence request arrives; retain synchronized root publication, exclusive heap operations and forced collection. Optimized/UBSan native and compiled stress tests pass. Local four-worker graph mean time falls about 36% against the preceding coordinator with unchanged allocation/collection counts; shared-heap scaling remains unqualified. The author prioritizes a plain-text HTTP comparison as the primary baseline.
+
 - Measure isolated HTTP latency/scaling and compiled shared-heap coordination costs. Separate compiler safepoint notifications from job-completion waiters, preserving GC/root semantics and default runtime behavior. In two local four-worker graph trials mean wall time falls about 47%, with unchanged allocation/collection counts; the concurrent path remains slower than the exclusive adapter for this workload. Optimized/UBSan native and compiled stress tests pass. Retain exact evidence and keep shared async HTTP/performance parity unqualified; see docs/experiments/native-worker-pool/README.md.
 
 - Integrate opt-in compiler worker safepoints with a shared nonmoving heap coordinator, per-invocation diagnostics and paused participant roots. Optimized/UBSan tests reach four active compiled participants, retain cyclic graphs/live locals through 24,544 collections, isolate faults and reclaim after cancellation; native and serialized regressions pass. Reject unaudited native services/type initialization. Default compilation is unchanged; shared async HTTP and throughput qualification remain open. See docs/experiments/native-worker-pool/README.md.

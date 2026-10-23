@@ -650,3 +650,33 @@ Reproduce the cost experiment with `compiled-measure.py --validation
 compiled-parallel-validation.json --relink-current-runtime --output FRESH`;
 the explicit relink option admits changed native runtime sources only, records
 both digests and verifies all other retained inputs.
+
+## Cooperative polling fast path — 2026-10-23
+
+Pure compiled boundaries now retain their active execution lease while an atomic
+pause-request flag is clear, avoiding the pool mutex and condition broadcast.
+An exclusive operation sets that flag under the gate before waiting. A participant
+that sees a request takes the existing slow path, publishes its complete compiler
+frame chain under the mutex and leaves the active count before collection can
+proceed. The last active participant wakes exclusive waiters. Exiting an exclusive
+lease still uses the slow path to commit the shared arena/static state.
+
+The atomic flag is only a request to enter the coordinator; it does not publish
+heap objects or allow collection of a running participant. All frame/root scanning
+still requires quiescence under the mutex. Root snapshots and root-contract checks
+remain at every instruction, and collection frequency is unchanged. Default builds,
+compiler encoding, managed APIs, cancellation and diagnostic ownership are unchanged.
+
+[Native optimized/UBSan tests](poll-native-validation.json) and
+[compiled graph/fault/cancellation tests](poll-compiled-validation.json) pass.
+[Fixed-work timing](poll-costs.json) retains 499,712 allocations and 3,141,632
+collections for 4,096 concurrent callbacks. One-worker elapsed time is
+2.450/2.401 seconds, two-worker 3.315/3.435, and four-worker 5.705/5.884.
+The previous separate-condition implementation measured 2.924/2.916,
+3.856/4.584 and 9.863/8.187 respectively. Four-worker mean time is about 36% lower;
+the exclusive control remains near 1.1 seconds. These short local comparisons
+support the fast path but still do not demonstrate useful shared-heap scaling.
+
+This remains secondary runtime evidence. The author subsequently clarified that
+the primary performance baseline must be a plain-text HTTP request/response
+comparison with other servers, before complex benchmark samples.

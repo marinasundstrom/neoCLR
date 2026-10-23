@@ -34,6 +34,7 @@ struct neoclr_workers {
     int closing, joined, dispatching;
 #ifdef NEOCLR_WORKER_GC
     pthread_cond_t compiled_ready;
+    _Atomic unsigned compiled_pause_requested;
     unsigned compiled_count, compiled_running, compiled_waiters, compiled_peak;
     uint64_t compiled_collections;
     struct compiled_participant *participants[JOBS], *compiled_exclusive;
@@ -136,6 +137,7 @@ neoclr_workers *neoclr_workers_create(unsigned workers, unsigned capacity, size_
         free(p->context.text.data); free(p); return NULL;
     }
 #ifdef NEOCLR_WORKER_GC
+    atomic_init(&p->compiled_pause_requested, 0);
     if (pthread_cond_init(&p->compiled_ready, NULL)) {
         pthread_cond_destroy(&p->completion); pthread_cond_destroy(&p->ready);
         pthread_mutex_destroy(&p->gate); free(p->context.text.data); free(p); return NULL;

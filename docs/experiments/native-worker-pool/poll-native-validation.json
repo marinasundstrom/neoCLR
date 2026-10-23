@@ -1,0 +1,93 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "commands": [
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pthread",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/gc",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/workers",
+        "/Users/robert/Projects/neoclr/runtime/native/gc/native-gc.c",
+        "/Users/robert/Projects/neoclr/runtime/native/gc/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/native-worker-pool/test.c",
+        "/Users/robert/Projects/neoclr/runtime/native/workers/native-workers.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/worker-poll-native/optimized",
+        "-DNEOCLR_WORKER_GC"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/worker-poll-native/optimized"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS bounded admission, two active participants, shared identity, roots, stale tickets\nPASS unpublished result retention, tagged payload, cancellation winner, callback failure\nPASS close cancels queued and active work, reserved completions drain, joined teardown\nPASS result backpressure, foreign pool rejection, root generations and output preservation\nPASS 100 completion/cancellation contests with exactly one outcome\nPASS allocation failure preserves pool and subsequent work completes\nPASS four participant root sets across collection, result handoff, failure, cancellation and reuse\nPASS owner completion delivery, settlement order, bounded dispatch, reentrant submission, notification retention and close\nPASS concurrent native readers, collector/writer exclusion, cancellation, capture lifetime and reclamation (25 rounds)\nPASS concurrent native mutations, cooperative GC, detached cyclic roots, reattachment, cancellation and reclamation (25 rounds)\nPASS native reader/mutator exclusion in both directions and joined cancellation while phases are active\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pthread",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/gc",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/workers",
+        "/Users/robert/Projects/neoclr/runtime/native/gc/native-gc.c",
+        "/Users/robert/Projects/neoclr/runtime/native/gc/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/native-worker-pool/test.c",
+        "/Users/robert/Projects/neoclr/runtime/native/workers/native-workers.c",
+        "-fsanitize=undefined",
+        "-fno-sanitize-recover=all",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/worker-poll-native/ubsan",
+        "-DNEOCLR_WORKER_GC"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/worker-poll-native/ubsan"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS bounded admission, two active participants, shared identity, roots, stale tickets\nPASS unpublished result retention, tagged payload, cancellation winner, callback failure\nPASS close cancels queued and active work, reserved completions drain, joined teardown\nPASS result backpressure, foreign pool rejection, root generations and output preservation\nPASS 100 completion/cancellation contests with exactly one outcome\nPASS allocation failure preserves pool and subsequent work completes\nPASS four participant root sets across collection, result handoff, failure, cancellation and reuse\nPASS owner completion delivery, settlement order, bounded dispatch, reentrant submission, notification retention and close\nPASS concurrent native readers, collector/writer exclusion, cancellation, capture lifetime and reclamation (25 rounds)\nPASS concurrent native mutations, cooperative GC, detached cyclic roots, reattachment, cancellation and reclamation (25 rounds)\nPASS native reader/mutator exclusion in both directions and joined cancellation while phases are active\n",
+      "stderr": ""
+    }
+  ],
+  "meaning": "POSIX bounded pool with gated managed access and explicit capture/result roots; no generated-code or HTTP integration.",
+  "inputs": {
+    "runtime/native/gc/native-gc.c": "4b32ccd5390156b99d65929419101707580cf40b60fc65e5d869f0e69ad82514",
+    "runtime/native/gc/root-probe.c": "502f5759999da02408f57a472e27dadac934a00bf994d5b0e46387ffb6d3e866",
+    "docs/experiments/native-worker-pool/test.c": "fd975db2e17acc93b8dc3f8ac6280116679106e4374bf419a56e16b71308169f",
+    "runtime/native/workers/native-workers.c": "9f91f4724b402de0800262e54f5ff9b9262c1188c951dcac680b0a002cf4f538",
+    "runtime/native/gc/root-probe.h": "5c247269c702898e675439db37b1c8b62db7b44e0160c5043c89d93cd4c2881f",
+    "runtime/native/gc/native-gc.h": "eb230f6877c24dc6a5c0db7d1baa3d46b7f17d0140b3193885949e4b33eebc5b",
+    "runtime/native/workers/native-workers.h": "ce5e3dbfba49bcf9b1689688d66ed2b8011ba1349e509b50c3b079344b6a4d4a",
+    "runtime/native/workers/compiled-workers.inc": "7dc3a3c3ab1286799fe25ff581d8ad49a74ad4532b0dfc2da3fd853da2c2b3c0",
+    "docs/experiments/native-worker-pool/benchmark.c": "a1073c96764773a8eb80ef7237d1eacf9705d67bbaf516295495c39bdf78743b",
+    "docs/experiments/native-worker-pool/validate.py": "f311d6d5f697270cfbd8c654e3abf789456e8440d28767769f69b0f0b2c0cf08"
+  }
+}
