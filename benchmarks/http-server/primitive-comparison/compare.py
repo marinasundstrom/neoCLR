@@ -18,6 +18,9 @@ import time
 p = argparse.ArgumentParser(description=__doc__)
 p.add_argument('--neoclr-build', type=Path, required=True)
 p.add_argument('--output', type=Path, required=True)
+p.add_argument('--neoclr-object', type=Path, help='Previously validated application object; record its identity')
+p.add_argument('--refresh-native-runtime', action='store_true', help='Relink current native sources, recording changes from build provenance')
+p.add_argument('--owned-heap', action='store_true', help='Use isolated runtime-owned allocation scopes')
 p.add_argument('--client-cpus', type=int, default=2)
 p.add_argument('--client', choices=['go','python'], default='go')
 p.add_argument('--seconds', type=float, default=6)
@@ -78,9 +81,22 @@ async def load(port, seconds):
 try:
     build = json.loads(a.neoclr_build.read_text())
     assert build['passed']
+    report['nativeSourceChanges'] = {}
+    root = here.parents[2]
     for name, digest in build['inputs'].items():
-        assert hashlib.sha256(Path(name).read_bytes()).hexdigest() == digest, name
+        path = Path(name).resolve()
+        current = hashlib.sha256(path.read_bytes()).hexdigest()
+        if current != digest:
+            allowed = path.is_relative_to(root/'runtime/native') or path in [
+                root/'runtime/codegen/src/gc_probe.rs', root/'target/release/neoclr-codegen',
+                root/'benchmarks/native-web/http-host.c']
+            assert a.refresh_native_runtime and allowed, name
+            report['nativeSourceChanges'][name] = dict(original=digest, current=current)
         record(name)
+    report['ownedHeap'] = a.owned_heap
+    if a.neoclr_object:
+        record(a.neoclr_object)
+        report['neoclrObjectOverride'] = str(a.neoclr_object.resolve())
     for source in [*here.glob('*.rvn*'), here/'server.go', here/'client.go', here/'server.mjs', * (here/'kestrel').glob('*.cs*'), Path(__file__)]:
         record(source)
     record(a.neoclr_build)
@@ -90,8 +106,11 @@ try:
     run(['go','build','-trimpath','-o',out/'client',here/'client.go'],env)
     run(['dotnet','build',here/'kestrel/Server.csproj','-c','Release','-o',out/'kestrel','--nologo'])
     recipe = next(c['command'] for c in build['commands'] if c.get('phase') == 'host-compile-link')
+    original_object = next(c['command'][4] for c in build['commands'] if c.get('phase') == 'native-compilation')
     for owners in [1,4]:
-        cmd = [s for s in recipe if not s.startswith('-DNEOCLR_HTTP_WORKERS=')]
+        cmd = [str(a.neoclr_object.resolve()) if a.neoclr_object and s == original_object else s
+               for s in recipe if not s.startswith('-DNEOCLR_HTTP_WORKERS=')]
+        if a.owned_heap: cmd += ['-DNEOCLR_GC_OWNED_HEAP']
         cmd += [f'-DNEOCLR_HTTP_WORKERS={owners}','-DNEOCLR_GC_PACED']
         cmd[cmd.index('-o')+1] = str(out/f'neoclr-{owners}')
         run(cmd)

@@ -22031,3 +22031,22 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
 - Open: shared binary stack maps/image lifetimes, transient ownership and broader
   HTTP parity remain unimplemented. No permanent roadmap reprioritization is
   inferred from the author's continuation. [Contract/evidence](../benchmarks/http-server/primitive-comparison/owned-root-storage/README.md).
+
+
+### 2026-10-23 — Comparable HTTP throughput remains the target
+
+- Author clarification: “We want neoclr HttpServer to be able to process requests
+  at comparable speeds with other modern frameworks.” This reiterates the
+  end-to-end plain-text objective, not just relative neoCLR improvements.
+- Assistant response/action: treated peer throughput, CPU/request and latency as
+  the target; rejected an inconclusive TLS grouping experiment and reran the same
+  connection-close fixture against Go, Node and Kestrel. Kept runtime semantics
+  and the server-primitives scope unchanged.
+- Outcome: all 14 peer trials pass, but four-owner neoCLR averages about 4,182
+  requests/s versus 14,685 Kestrel and 20,114 Go, with materially higher CPU cost.
+  A separate diagnostic reports about 208 allocations, 3,677 root publications
+  and 3.6 collections per response. Comparable performance is not achieved.
+- Proposed next action: attribute per-request execution/publications to methods
+  and sites before selecting larger safe reductions; additional workers alone
+  do not address the measured CPU gap. Keep-alive/shared async HTTP remain open.
+  [Evidence and limits](../benchmarks/http-server/primitive-comparison/peer-refresh/README.md).

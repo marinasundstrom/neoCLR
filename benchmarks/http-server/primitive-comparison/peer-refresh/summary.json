@@ -1,0 +1,30 @@
+{
+  "neoclr-1": {
+    "requestsPerSecond": 1537.5,
+    "cpuMicrosecondsPerResponse": 640.3807411915138
+  },
+  "go-1": {
+    "requestsPerSecond": 22638.166666666664,
+    "cpuMicrosecondsPerResponse": 31.498775362602828
+  },
+  "node-1": {
+    "requestsPerSecond": 19547.666666666668,
+    "cpuMicrosecondsPerResponse": 39.62807043135012
+  },
+  "kestrel-1": {
+    "requestsPerSecond": 18093.25,
+    "cpuMicrosecondsPerResponse": 64.7451524929111
+  },
+  "neoclr-4": {
+    "requestsPerSecond": 4181.75,
+    "cpuMicrosecondsPerResponse": 819.5664712319324
+  },
+  "go-4": {
+    "requestsPerSecond": 20113.833333333332,
+    "cpuMicrosecondsPerResponse": 66.52652054456307
+  },
+  "kestrel-4": {
+    "requestsPerSecond": 14684.583333333332,
+    "cpuMicrosecondsPerResponse": 153.50374367114543
+  }
+}

@@ -6391,3 +6391,15 @@ stress pass. Short paired one/four-owner throughput rises 58.9%/30.4% with
 35.4%/28.2% less CPU/response; four-owner tails remain mixed. Shared binary metadata
 and image registration remain proposed, and new native objects require a matching
 runtime entry. See [contract and evidence](../benchmarks/http-server/primitive-comparison/owned-root-storage/README.md).
+
+
+Peer-baseline refresh (2026-10-23 author clarification): comparable modern-server
+throughput remains the target, not an achieved result. Four-owner neoCLR averages
+4,182 requests/s versus 14,685 Kestrel and 20,114 Go on the same connection-close
+fixture, with higher CPU/request; all 14 trials pass. An inconclusive GC TLS-layout
+candidate is reverted. Retain its lifetime tests and diagnostic evidence. A separate
+work inventory reports about 3,677 root publications, 208 allocations and 3.6
+collections per response. Next bounded investigation: method/site attribution of
+per-request execution and publication costs before broader optimization. Persistent
+connections/shared async HTTP remain separate gaps. See
+[current comparison](../benchmarks/http-server/primitive-comparison/peer-refresh/README.md).

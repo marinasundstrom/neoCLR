@@ -1,5 +1,9 @@
 # Plain-text server primitive baseline — 2026-10-23
 
+**Current results:** [refreshed peer comparison](peer-refresh/README.md) includes
+the generated-owned-storage runtime. neoCLR remains below reference throughput
+and CPU efficiency. Results below are the preserved historical baseline.
+
 This is the primary development baseline requested by the author: process as many
 plain HTTP requests as possible through worker execution while using as little
 CPU as possible. Allocations are a secondary diagnostic. JSON, artificial handler

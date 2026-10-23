@@ -24,7 +24,11 @@ int main(void) {
     CHECK(neoclr_gc_statistics_v1().collections==before+1);
     CHECK(c.text.used && ((uint64_t*)root)[0]==1);
     root=NULL;
-    for(int i=0;i<PUBLICATION_BUDGET-1;i++) boundary(&frame);
+    /* An unrelated empty ownership scope must not reset this context's budget. */
+    boundary(&frame);
+    CHECK(!neoclr_gc_heap_acquire_v1(&other.text));
+    CHECK(!neoclr_gc_heap_release_v1(&other.text));
+    for(int i=0;i<PUBLICATION_BUDGET-2;i++) boundary(&frame);
     CHECK(neoclr_gc_statistics_v1().collections==before+1);
     boundary(&frame);
     CHECK(neoclr_gc_statistics_v1().collections==before+2 && !c.text.used);

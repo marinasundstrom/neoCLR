@@ -1,0 +1,9 @@
+[
+  {
+    "report": "native-gc-validation.json",
+    "path": "runtime/native/gc/native-gc.c",
+    "testedSha256": "e949fba25cc72b8b2c07822ba078139ee7f74b3e0a508223b8163fe741ec7ee5",
+    "finalSha256": "f5d8ed7b9def7817436abe7d45f850f61ff0a038d516f8a04dcd6ae7888047bb",
+    "note": "Only a comment path typo was corrected during validation; C implementation is identical."
+  }
+]

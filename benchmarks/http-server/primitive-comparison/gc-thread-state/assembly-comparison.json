@@ -1,0 +1,46 @@
+{
+  "baseline": {
+    "command": [
+      "xcrun",
+      "clang",
+      "-O2",
+      "-S",
+      "-DNEOCLR_NATIVE_GC",
+      "-DNEOCLR_GC_PACED",
+      "-I",
+      "runtime/native/gc",
+      "target/gc-thread-state-assembly/baseline.c",
+      "-o",
+      "target/gc-thread-state-assembly/baseline.s"
+    ],
+    "staticTlsSites": {
+      "neoclr_gc_allocate_v1": 2,
+      "neoclr_gc_boundary_v1": 4,
+      "neoclr_gc_idle_v1": 2
+    },
+    "sourceSha256": "1d603f3127be319a68674aee78bc96ae9810d4ac8735878fd561eea6f5fb7602",
+    "assemblySha256": "5ed3a889325786757d06ade44e6b8f2a7a29d5585f39914fcd1b297cfdddd802"
+  },
+  "candidate": {
+    "command": [
+      "xcrun",
+      "clang",
+      "-O2",
+      "-S",
+      "-DNEOCLR_NATIVE_GC",
+      "-DNEOCLR_GC_PACED",
+      "-I",
+      "runtime/native/gc",
+      "runtime/native/gc/native-gc.c",
+      "-o",
+      "target/gc-thread-state-assembly/candidate.s"
+    ],
+    "staticTlsSites": {
+      "neoclr_gc_allocate_v1": 1,
+      "neoclr_gc_boundary_v1": 1,
+      "neoclr_gc_idle_v1": 1
+    },
+    "sourceSha256": "f5d8ed7b9def7817436abe7d45f850f61ff0a038d516f8a04dcd6ae7888047bb",
+    "assemblySha256": "88f814c1fe316423a9f28f412688449af54331d4ef4cb2f0bb68265f96b84cd5"
+  }
+}

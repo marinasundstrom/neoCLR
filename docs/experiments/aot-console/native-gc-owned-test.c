@@ -69,8 +69,15 @@ static int base_cache(void) {
     CHECK(reused == items[1]);
     CHECK(!neoclr_gc_allocation_info_v1(&c, reused, &bytes, &kind) && bytes == 9);
     CHECK(neoclr_gc_allocation_info_v1(&c, (unsigned char *)reused + 9, &bytes, &kind) == 3);
+    /* Ownership reset must preserve cumulative allocation/collection counters. */
+    neoclr_gc_statistics before_release = neoclr_gc_statistics_v1();
     /* Scope release/reacquisition at identical addresses must not retain proofs. */
     CHECK(!neoclr_gc_heap_release_v1(&c.text));
+    neoclr_gc_statistics after_release = neoclr_gc_statistics_v1();
+    CHECK(before_release.allocations == after_release.allocations);
+    CHECK(before_release.collections == after_release.collections);
+    CHECK(before_release.reclaimed_allocations == after_release.reclaimed_allocations);
+    CHECK(before_release.reclaimed_bytes == after_release.reclaimed_bytes);
     c.text.used = 0;
     CHECK(!neoclr_gc_heap_acquire_v1(&c.text));
     CHECK(neoclr_gc_allocation_info_v1(&c, reused, &bytes, &kind) == 3);

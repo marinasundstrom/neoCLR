@@ -1,0 +1,32 @@
+{
+  "scope": "Diagnostic sample, not capacity; main-thread condition waits excluded from worker attribution",
+  "revision": "a67aa5a0a",
+  "binary": "target/plain-owned-root/candidate-w1",
+  "binarySha256": "6b7ecdbba7e307f0f58dd89d5cb2d6d189763c52c8232b6f4ff16940bc133a5c",
+  "sample": "target/owned-root-sample/sample.txt",
+  "sampleSha256": "dc4e2dba99f4b4698b9a0f40cf6ad513b70f24b5497724ad0b12ab9c2e0c391b",
+  "workerSamples": 3414,
+  "mainThreadWaitSamples": 3414,
+  "selfSamples": {
+    "neoclr_gc_allocate_v1": 545,
+    "neoclr_gc_stack_roots_v1": 427,
+    "_tlv_get_addr": 412,
+    "__bzero": 303,
+    "collect_indexed": 250,
+    "_platform_strlen": 141
+  },
+  "samplingCommand": [
+    "/usr/bin/sample",
+    "<PID>",
+    "5",
+    "1",
+    "-file",
+    "target/owned-root-sample/sample.txt"
+  ],
+  "loadCommand": [
+    "target/primitive-comparison-eof/client",
+    "<READY port>",
+    "8"
+  ],
+  "clientProcessors": 2
+}
