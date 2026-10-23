@@ -22094,3 +22094,15 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   investigating completed async context reuse next, with lifecycle/GC validation
   and separate throughput measurements. No context reuse is implemented by this
   diagnostic slice. [Evidence](../benchmarks/http-server/primitive-comparison/stack-profile/README.md).
+
+- Assistant experiment/outcome: implemented opt-in completed async context reuse on
+  macOS at stable addresses, with fresh invocation/signal/FP state and preserved
+  root lifecycle. Fourteen native executions and forced-GC HTTP pass; paired server
+  means improve 11.7%/14.5% throughput and 10.6%/13.4% CPU per response at one/four
+  owners. Default enablement and broader qualification remain open.
+- Author briefly asks whether a “neoCLR to neoCLR” comparison needs HttpClient.
+  Assistant clarifies this meant before/after server builds using the same Go driver,
+  and proposes client lifecycle checks because the runtime is shared. The author
+  then says “Ignore my concern”; the assistant leaves that additional investigation
+  aside. No client performance or additional client lifecycle outcome is claimed.
+  [Server experiment](../benchmarks/http-server/primitive-comparison/context-reuse/README.md).

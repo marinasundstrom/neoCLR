@@ -44,6 +44,9 @@ def leaves(root):
     assert sum(counts.values()) == root['count']
     return counts,callers
 
+def has_application(node, image):
+    return node['name'].startswith(f'application  (in {image})') or any(has_application(c, image) for c in node['children'])
+
 def display(name):
     name = re.sub(r'^NeoMetadata_[0-9A-F]+\.', '', name)
     if name.startswith('T_'):
@@ -65,6 +68,8 @@ def main():
     assert capture['passed'] and build['passed']
     assert capture['inputs'][str(a.build_report.resolve())]==digest(a.build_report)
     assert build['inputs'][str(a.object.resolve())]==digest(a.object)
+    binary = Path(next(c['command'][c['command'].index('-o')+1] for c in build['commands'] if '-o' in c['command']))
+    assert capture['inputs'][str(binary)] == build['inputs'][str(binary)]
     sample=a.capture.parent/'sample.txt'
     assert digest(sample)==capture['sampleSha256']
     compilation=json.loads(a.compilation.read_text())
@@ -94,9 +99,7 @@ def main():
         counts, parents=leaves(root)
         role='coordinator' if root in mains else 'HTTP worker'
         if role=='HTTP worker':
-            def has_application(node):
-                return node['name'].startswith('application  (in server)') or any(has_application(c) for c in node['children'])
-            assert has_application(root), 'Worker identity is not established by the fixture stack'
+            assert has_application(root, binary.name), 'Worker identity is not established by the fixture stack'
             combined.update(counts);callers.update(parents)
         thread_results.append(dict(thread=root['name'],role=role,samples=root['count'],
             selfSamples=[dict(symbol=s,name=mapped(s),count=n) for s,n in counts.most_common()]))

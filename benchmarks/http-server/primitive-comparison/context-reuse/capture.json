@@ -1,0 +1,52 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "command": [
+        "/usr/bin/sample",
+        "86947",
+        "5",
+        "1",
+        "-file",
+        "/Users/robert/Projects/neoclr/target/context-reuse-stack-profile/sample.txt"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "Sampling process 86947 for 5 seconds with 1 millisecond of run time between samples\nSampling completed, processing symbols...\nSample analysis of process 86947 written to file /Users/robert/Projects/neoclr/target/context-reuse-stack-profile/sample.txt\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/primitive-comparison-refresh/client",
+        "55667",
+        "8"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    }
+  ],
+  "inputs": {
+    "/Users/robert/Projects/neoclr/target/context-reuse-measure/profile-build.json": "02e31d8c18f465105197e033d6e986822442166d82d8c92123c78121a8c8a925",
+    "/Users/robert/Projects/neoclr/target/context-reuse-measure/candidate-w4": "c7e06ed599a7d50e8e53ea59f3d6dc94615f2fb5d1061ff144cfe5a323e8b2c7",
+    "/Users/robert/Projects/neoclr/target/primitive-comparison-refresh/client": "3cb6aa638332295893b82a57e279bf42f62685e4bee6471c37fc163f4a78a579",
+    "/Users/robert/Projects/neoclr/benchmarks/http-server/primitive-comparison/stack-profile/capture.py": "f17cc41f46b497f2f765ec75114213878ad699da29ac9ac47ded8b1e91c1f363"
+  },
+  "scope": "macOS all-thread wall-clock stack samples under load; blocked threads included; not capacity evidence.",
+  "load": {
+    "clientCpuPerWall": 0.6593523268060489,
+    "clientCpuSeconds": 5.277989,
+    "clientProcessCpuSeconds": 5.285183,
+    "completed": 38623,
+    "drained": 32,
+    "latencyMilliseconds": {
+      "p50": 6.350917,
+      "p95": 8.68275,
+      "p99": 10.881875
+    },
+    "requestsPerSecond": 4827.875,
+    "windowAndDrainSeconds": 8.004808333
+  },
+  "stdout": "READY 55667 55669\nREADY 55667 55671\nREADY 55667 55670\nREADY 55667 55668\nDONE 55670 9459 0\nDONE 55669 9833 0\nDONE 55668 9682 0\nDONE 55671 9681 0\n",
+  "stderr": "",
+  "workers": 4,
+  "sampleSha256": "efdb1407cdb50a090eaff16924657e1f7accee1a31ab3973c97e8aedb339f794"
+}

@@ -1,5 +1,5 @@
 import unittest
-from analyze import parse, leaves, display
+from analyze import parse, leaves, display, has_application
 
 class SampleAccounting(unittest.TestCase):
     def tree(self, lines):
@@ -31,6 +31,11 @@ class SampleAccounting(unittest.TestCase):
     def test_unknown_format_and_orphan_rejected(self):
         for lines in ['    ??? truncated','    2 run  (in server)','']:
             with self.assertRaises(ValueError):self.tree(lines)
+
+    def test_application_uses_verified_image_name(self):
+        root=self.tree('    2 Thread_1\n    + 2 application  (in candidate-w4) + 8')[0]
+        self.assertTrue(has_application(root,'candidate-w4'))
+        self.assertFalse(has_application(root,'server'))
 
     def test_bridge_names(self):
         self.assertEqual(display('NeoMetadata_AB.T_53797374656D_54657374.M_52756E'),'System.Test.Run')

@@ -1,0 +1,18 @@
+{
+  "baseline-w1": {
+    "requestsPerSecond": 1647.1666666666665,
+    "cpuMicrosecondsPerResponse": 604.8717719988883
+  },
+  "candidate-w1": {
+    "requestsPerSecond": 1840.0,
+    "cpuMicrosecondsPerResponse": 540.681728667729
+  },
+  "baseline-w4": {
+    "requestsPerSecond": 4860.833333333334,
+    "cpuMicrosecondsPerResponse": 757.1306116274552
+  },
+  "candidate-w4": {
+    "requestsPerSecond": 5564.416666666666,
+    "cpuMicrosecondsPerResponse": 655.8830654900416
+  }
+}

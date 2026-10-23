@@ -1,0 +1,438 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "command": [
+        "clang",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-deprecated-declarations",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-owned-body-test.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-runtime.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/context-reuse-validation-capacity/native-owned-body-test-False-False"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/context-reuse-validation-capacity/native-owned-body-test-False-False"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"entered\":321,\"resumed\":160,\"abandoned\":161,\"reservedBytesAfterShutdown\":0}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-deprecated-declarations",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-idle-drain-test.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-runtime.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/context-reuse-validation-capacity/native-idle-drain-test-False-False"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/context-reuse-validation-capacity/native-idle-drain-test-False-False"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS empty polls, callback-triggered drains and suspended drain resumption\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-deprecated-declarations",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async",
+        "/Users/robert/Projects/neoclr/benchmarks/http-server/primitive-comparison/context-reuse/environment.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-runtime.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/context-reuse-validation-capacity/environment-False-False"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/context-reuse-validation-capacity/environment-False-False"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-deprecated-declarations",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-owned-body-test.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-runtime.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/context-reuse-validation-capacity/native-owned-body-test-False-True",
+        "-fsanitize=undefined,bounds",
+        "-fno-sanitize-recover=all"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/context-reuse-validation-capacity/native-owned-body-test-False-True"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"entered\":321,\"resumed\":160,\"abandoned\":161,\"reservedBytesAfterShutdown\":0}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-deprecated-declarations",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-idle-drain-test.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-runtime.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/context-reuse-validation-capacity/native-idle-drain-test-False-True",
+        "-fsanitize=undefined,bounds",
+        "-fno-sanitize-recover=all"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/context-reuse-validation-capacity/native-idle-drain-test-False-True"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS empty polls, callback-triggered drains and suspended drain resumption\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-deprecated-declarations",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async",
+        "/Users/robert/Projects/neoclr/benchmarks/http-server/primitive-comparison/context-reuse/environment.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-runtime.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/context-reuse-validation-capacity/environment-False-True",
+        "-fsanitize=undefined,bounds",
+        "-fno-sanitize-recover=all"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/context-reuse-validation-capacity/environment-False-True"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-deprecated-declarations",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-owned-body-test.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-runtime.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/context-reuse-validation-capacity/native-owned-body-test-True-False",
+        "-DNEOCLR_ASYNC_CONTEXT_REUSE"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/context-reuse-validation-capacity/native-owned-body-test-True-False"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"entered\":321,\"resumed\":160,\"abandoned\":161,\"reservedBytesAfterShutdown\":0}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-deprecated-declarations",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-idle-drain-test.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-runtime.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/context-reuse-validation-capacity/native-idle-drain-test-True-False",
+        "-DNEOCLR_ASYNC_CONTEXT_REUSE"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/context-reuse-validation-capacity/native-idle-drain-test-True-False"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS empty polls, callback-triggered drains and suspended drain resumption\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-deprecated-declarations",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async",
+        "/Users/robert/Projects/neoclr/benchmarks/http-server/primitive-comparison/context-reuse/environment.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-runtime.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/context-reuse-validation-capacity/environment-True-False",
+        "-DNEOCLR_ASYNC_CONTEXT_REUSE"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/context-reuse-validation-capacity/environment-True-False"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-deprecated-declarations",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-owned-body-test.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-runtime.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/context-reuse-validation-capacity/native-owned-body-test-True-True",
+        "-DNEOCLR_ASYNC_CONTEXT_REUSE",
+        "-fsanitize=undefined,bounds",
+        "-fno-sanitize-recover=all"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/context-reuse-validation-capacity/native-owned-body-test-True-True"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"entered\":321,\"resumed\":160,\"abandoned\":161,\"reservedBytesAfterShutdown\":0}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-deprecated-declarations",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-idle-drain-test.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-runtime.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/context-reuse-validation-capacity/native-idle-drain-test-True-True",
+        "-DNEOCLR_ASYNC_CONTEXT_REUSE",
+        "-fsanitize=undefined,bounds",
+        "-fno-sanitize-recover=all"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/context-reuse-validation-capacity/native-idle-drain-test-True-True"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS empty polls, callback-triggered drains and suspended drain resumption\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-deprecated-declarations",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async",
+        "/Users/robert/Projects/neoclr/benchmarks/http-server/primitive-comparison/context-reuse/environment.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-runtime.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/context-reuse-validation-capacity/environment-True-True",
+        "-DNEOCLR_ASYNC_CONTEXT_REUSE",
+        "-fsanitize=undefined,bounds",
+        "-fno-sanitize-recover=all"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/context-reuse-validation-capacity/environment-True-True"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "inputs": {
+    "/Users/robert/Projects/neoclr/benchmarks/http-server/primitive-comparison/context-reuse/validate.py": "bf548588a5bd65cbb88b79a99be6391207011f3ba30ade623edef66921a2041c",
+    "/Users/robert/Projects/neoclr/benchmarks/http-server/primitive-comparison/context-reuse/environment.c": "860998887e187b125c225683ee67a668a97b7d8924f66b8a8f6fbfca05ce07a0",
+    "/Users/robert/Projects/neoclr/runtime/native/async/native-runtime.c": "41f9a8090df7e10649944accaac065c71fa1920097354c5356ea75a3f66e1acb",
+    "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-owned-body-test.c": "6eac7a9c924521fed0afefcef693d7fe438270b8403fe7f49e70236de173396f",
+    "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-idle-drain-test.c": "85b81995ccda8d766f037e442d6bcd159ad3c3c005c128fca25274d689ef2e95"
+  }
+}

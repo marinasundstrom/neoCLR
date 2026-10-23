@@ -1,0 +1,81 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "command": [
+        "clang",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-deprecated-declarations",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async",
+        "/Users/robert/Projects/neoclr/benchmarks/http-server/primitive-comparison/context-reuse/environment.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-runtime.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/context-reuse-cache-bounds/cache-0",
+        "-DNEOCLR_ASYNC_CONTEXT_REUSE",
+        "-fsanitize=undefined,bounds",
+        "-fno-sanitize-recover=all",
+        "-DNEOCLR_ASYNC_STACK_CACHE_LIMIT=0"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/context-reuse-cache-bounds/cache-0"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-deprecated-declarations",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async",
+        "/Users/robert/Projects/neoclr/benchmarks/http-server/primitive-comparison/context-reuse/environment.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-runtime.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/context-reuse-cache-bounds/cache-1",
+        "-DNEOCLR_ASYNC_CONTEXT_REUSE",
+        "-fsanitize=undefined,bounds",
+        "-fno-sanitize-recover=all",
+        "-DNEOCLR_ASYNC_STACK_CACHE_LIMIT=1"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/context-reuse-cache-bounds/cache-1"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ]
+}

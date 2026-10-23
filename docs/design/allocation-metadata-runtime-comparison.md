@@ -265,3 +265,20 @@ TLS access and root publication remain leading locations. Investigate completed
 async context reuse with independent safety/performance qualification; do not infer
 that cached stack mappings already avoid context initialization, or that sampled
 proportions predict an attainable throughput gain. No runtime change is made here.
+
+### Completed async context experiment — 2026-10-23
+
+Implement opt-in macOS `NEOCLR_ASYNC_CONTEXT_REUSE`: retain successful completed
+contexts at stable addresses, reset invocation ownership/state and inherit the new
+caller's signal mask/FP environment. Suspended, expired and faulting bodies are not
+reused. Cached contexts are not live work; shutdown releases them. Default runtime
+objects remain byte-identical; Windows reuse is rejected pending qualification.
+
+Compared with [.NET state-machine async](https://devblogs.microsoft.com/dotnet/how-async-await-really-works/),
+this improves neoCLR's existing retained-stack implementation without claiming the
+same representation or ExecutionContext support. Costs include more lifecycle state
+and retained native stack contents; cache mapping bounds remain unchanged. Fourteen
+native test executions, forced-GC HTTP and paired one/four-owner trials pass. Mean
+throughput improves 11.7%/14.5% and CPU/response falls 10.6%/13.4%. A separate profile
+no longer finds the makecontext clearing hotspot. Keep this opt-in until broader
+async consumers/platforms are qualified. See [contracts and evidence](../../benchmarks/http-server/primitive-comparison/context-reuse/README.md).

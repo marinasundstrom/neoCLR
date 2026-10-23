@@ -6437,3 +6437,12 @@ completed async context reuse, preserving GC/root/fault/stack lifetime contracts
 measuring uninstrumented throughput separately. This completes a host-specific stack
 attribution tool, not precise CPU/wait timing or throughput parity. See
 [evidence and limits](../benchmarks/http-server/primitive-comparison/stack-profile/README.md).
+
+Completed-context experiment (2026-10-23): retain opt-in macOS async context reuse,
+with stable addresses, fresh invocation/signal/FP state and bounded successful-body
+caching. Fourteen lifecycle test executions, forced-GC HTTP and paired server trials
+pass. Mean one/four-owner throughput gains 11.7%/14.5% with lower CPU/response;
+four-owner mean is 5,564 requests/s. No fresh Kestrel comparison or shared-heap async
+qualification. Default and Windows behavior stay unchanged. Broader consumer/platform
+qualification precedes default enablement. See
+[evidence](../benchmarks/http-server/primitive-comparison/context-reuse/README.md).

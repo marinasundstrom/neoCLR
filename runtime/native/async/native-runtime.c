@@ -18,6 +18,13 @@
 #endif
 #include <stdlib.h>
 #include <string.h>
+#ifdef NEOCLR_ASYNC_CONTEXT_REUSE
+#ifdef _WIN32
+#error "completed context reuse is only qualified for the macOS experiment"
+#endif
+#include <fenv.h>
+#include <signal.h>
+#endif
 #if !defined(_WIN32) && (!defined(__APPLE__) || !defined(__aarch64__))
 #error "runtime-async requires macOS ARM64 or Windows"
 #endif
@@ -59,12 +66,23 @@ typedef struct fiber {
     void *owner;
     uint64_t active_owner, active_callback, ready_owner;
     int done, status, drain, parked, managed;
+#ifdef NEOCLR_ASYNC_CONTEXT_REUSE
+    int reusable;
+    fenv_t initial_environment;
+#endif
 #ifdef _WIN32
     void *caller;
 #else
     ucontext_t *caller;
 #endif
 } fiber;
+static int active(const fiber *f) {
+#ifdef NEOCLR_ASYNC_CONTEXT_REUSE
+    return f->mapping && !f->reusable;
+#else
+    return f->mapping != NULL;
+#endif
+}
 static _Thread_local struct {
     neoclr_aot_context *context;
     neoclr_async_callback invoke;
@@ -109,7 +127,13 @@ static void yield(void) {
 #endif
 }
 static void body(void) {
+#ifdef NEOCLR_ASYNC_CONTEXT_REUSE
+    for (;;) {
+#endif
     fiber *f = state.current;
+#ifdef NEOCLR_ASYNC_CONTEXT_REUSE
+    if (fesetenv(&f->initial_environment)) abort();
+#endif
     f->status = f->drain ? state.drain(state.context)
         : state.invoke(f->owner ? f->active_callback : f->callback, state.context);
     if (neoclr_root_probe_head_v1()) abort();
@@ -119,7 +143,13 @@ static void body(void) {
     if (op && !f->status) op->complete = 1;
     f->done = 1;
     yield();
+#ifdef NEOCLR_ASYNC_CONTEXT_REUSE
+    /* Resume only after the previous invocation's roots/ownership have ended.
+     * Reload state on the next iteration; never carry callback pointers forward. */
+    }
+#else
     abort();
+#endif
 }
 #ifdef _WIN32
 static VOID WINAPI windows_body(void *parameter) {
@@ -137,6 +167,21 @@ static VOID WINAPI windows_body(void *parameter) {
 #endif
 static fiber *allocate_fiber(uint64_t callback, uint64_t op, int drain) {
     fiber *f = NULL;
+#ifdef NEOCLR_ASYNC_CONTEXT_REUSE
+    for (unsigned i = 0; i < LIMIT; ++i) {
+        fiber *cached = &state.fibers[i];
+        if (!cached->reusable) continue;
+        cached->reusable = 0;
+        --state.cached;
+        cached->callback = callback; cached->operation = op; cached->drain = drain;
+        /* Fresh bodies inherit their caller's signal mask and FP environment,
+         * not the state left by the previous callback on this carrier. */
+        if (sigprocmask(0, NULL, &cached->machine.uc_sigmask) ||
+            fegetenv(&cached->initial_environment)) abort();
+        ++statistics.fibers;
+        return cached;
+    }
+#endif
     for (unsigned i = 0; i < LIMIT; ++i)
         if (!state.fibers[i].mapping) { f = &state.fibers[i]; break; }
     if (!f) return NULL;
@@ -153,10 +198,13 @@ static fiber *allocate_fiber(uint64_t callback, uint64_t op, int drain) {
         statistics.peak_reserved_bytes = statistics.reserved_bytes;
 #else
     cached_stack stack;
+#ifndef NEOCLR_ASYNC_CONTEXT_REUSE
     if (state.cached) {
         stack = state.cache[--state.cached];
         memset(&state.cache[state.cached], 0, sizeof(stack));
-    } else {
+    } else
+#endif
+    {
         long page_size = sysconf(_SC_PAGESIZE);
         if (page_size <= 0) return NULL;
         size_t bytes = STACK_BYTES + 2 * (size_t)page_size;
@@ -183,6 +231,9 @@ static fiber *allocate_fiber(uint64_t callback, uint64_t op, int drain) {
     f->machine.uc_stack.ss_size = STACK_BYTES;
     f->machine.uc_link = NULL;
     makecontext(&f->machine, body, 0);
+#ifdef NEOCLR_ASYNC_CONTEXT_REUSE
+    if (fegetenv(&f->initial_environment)) abort();
+#endif
 #endif
     return f;
 }
@@ -274,14 +325,30 @@ static int resume(fiber *f) {
         if (f->owner) --state.owned;
         if (f->managed) memset(find(f->operation), 0, sizeof(operation));
         neoclr_roots_discard_v1(&f->roots);
-        /* The callback root and parked root chain have ended. Cache only the
-         * raw guarded mapping, never a machine context or managed ownership. */
+#ifdef NEOCLR_ASYNC_CONTEXT_REUSE
+        if (!status && !state.context->fault.code && state.cached < NEOCLR_ASYNC_STACK_CACHE_LIMIT) {
+            /* Keep machine and mapping at stable addresses. A suspended C frame
+             * still points at this fiber; moving/copying ucontext is forbidden. */
+            f->roots = (neoclr_parked_roots){0};
+            f->callback = f->operation = f->waiting = 0;
+            f->owner = NULL;
+            f->active_owner = f->active_callback = f->ready_owner = 0;
+            f->done = f->status = f->drain = f->parked = f->managed = 0;
+            f->caller = NULL;
+            f->reusable = 1;
+            ++state.cached;
+            return status;
+        }
+        unmap_stack(f->mapping, f->mapping_bytes);
+#else
+        /* Baseline caches only the raw guarded mapping. */
 #if NEOCLR_ASYNC_STACK_CACHE_LIMIT > 0
         if (state.cached < NEOCLR_ASYNC_STACK_CACHE_LIMIT)
             state.cache[state.cached++] = (cached_stack){f->mapping, f->mapping_bytes, f->lower};
         else
 #endif
             unmap_stack(f->mapping, f->mapping_bytes);
+#endif
         memset(f, 0, sizeof(*f));
     }
     return status;
@@ -394,7 +461,7 @@ int32_t neoclr_runtime_async_release_v1(uint64_t id, neoclr_aot_context *c, int3
     *out = 0;
     if (!find(id) || !find(id)->complete) return 0;
     for (unsigned i = 0; i < LIMIT; ++i)
-        if (state.fibers[i].mapping && (state.fibers[i].waiting == id || state.fibers[i].operation == id)) return 0;
+        if (active(&state.fibers[i]) && (state.fibers[i].waiting == id || state.fibers[i].operation == id)) return 0;
     if (find(id)->owner) {
         if (neoclr_gc_host_root_release_v1(c, find(id)->owner)) abort();
         --state.owned;
@@ -435,7 +502,7 @@ int32_t neoclr_runtime_async_pump_v1(neoclr_aot_context *c, neoclr_async_callbac
         int draining = 0;
         for (unsigned i = 0; i < LIMIT; ++i) {
             fiber *f = &state.fibers[i];
-            if (!f->mapping) continue;
+            if (!active(f)) continue;
             operation *op = find(f->waiting);
             if (op && op->complete) {
                 status = resume(f);
@@ -443,7 +510,7 @@ int32_t neoclr_runtime_async_pump_v1(neoclr_aot_context *c, neoclr_async_callbac
                 reap_expired();
             }
             if (status) break;
-            draining |= f->mapping && f->drain;
+            draining |= active(f) && f->drain;
         }
         if (status) break;
         if (!draining && drain_needed) {
@@ -462,7 +529,7 @@ int32_t neoclr_runtime_async_pump_v1(neoclr_aot_context *c, neoclr_async_callbac
          * mapping ownership and readiness before diagnosing unresolved work. */
         reap_expired();
         int waiting = 0, ready = 0;
-        for (unsigned i = 0; i < LIMIT; ++i) if (state.fibers[i].mapping) {
+        for (unsigned i = 0; i < LIMIT; ++i) if (active(&state.fibers[i])) {
             waiting = 1;
             operation *op = find(state.fibers[i].waiting);
             ready |= op && op->complete;
@@ -501,7 +568,7 @@ int32_t neoclr_runtime_async_shutdown_v1(neoclr_aot_context *c) {
     for (unsigned i = 0; i < LIMIT; ++i) {
         fiber *f = &state.fibers[i];
         if (f->mapping) {
-            leaked = 1;
+            leaked |= active(f);
             if (f->parked) neoclr_roots_discard_v1(&f->roots);
             if (f->callback && neoclr_gc_host_root_release_v1(c, f->callback)) abort();
             if (f->ready_owner && neoclr_gc_host_root_release_v1(c, f->ready_owner)) abort();
@@ -510,8 +577,10 @@ int32_t neoclr_runtime_async_shutdown_v1(neoclr_aot_context *c) {
         leaked |= state.operations[i].id != 0;
         if (state.operations[i].owner && neoclr_gc_host_root_release_v1(c, state.operations[i].owner)) abort();
     }
+#ifndef NEOCLR_ASYNC_CONTEXT_REUSE
     for (unsigned i = 0; i < state.cached; ++i)
         unmap_stack(state.cache[i].mapping, state.cache[i].bytes);
+#endif
     if (statistics.reserved_bytes) abort();
 #ifdef _WIN32
     /* Never undo conversion owned by an embedding host. */

@@ -101,3 +101,7 @@ python3 benchmarks/http-server/primitive-comparison/stack-profile/analyze.py \
 Use the one-owner build report for a one-owner capture. Archived `.gz` files decompress
 to the original text/JSON; capture manifests retain raw sample hashes. This is a macOS
 fixture-specific tool; broader process/host identification remains future work.
+
+Follow-up: executable-image matching now uses the verified build's output filename
+instead of assuming `server`. The context-reuse experiment adds a seventh regression
+case for named candidate binaries and retains a successful full attribution.
