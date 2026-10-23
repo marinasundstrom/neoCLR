@@ -1,0 +1,156 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/shared-graph-validation/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/shared-graph-validation/bin/neoclr/WorkerGenerated.dll\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/bin/neoclr",
+        "disassemble",
+        "/Users/robert/Projects/neoclr/target/shared-graph-validation/bin/neoclr/WorkerGenerated.dll",
+        "/Users/robert/Projects/neoclr/target/shared-graph-validation/listing.txt"
+      ],
+      "exitCode": 0,
+      "stdout": "Disassembled /Users/robert/Projects/neoclr/target/shared-graph-validation/bin/neoclr/WorkerGenerated.dll -> /Users/robert/Projects/neoclr/target/shared-graph-validation/listing.txt\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/bin/neoclr-codegen",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/shared-graph-validation/bin/neoclr/WorkerGenerated.dll",
+        "NeoMetadata_C150BF40FAD28D9DFBF4D6BC6457CC71FFA8E24D70333E109DEB30BFB8E1CE13.F_43616C63756C617465",
+        "/Users/robert/Projects/neoclr/target/shared-graph-validation/code.o",
+        "--native-host-bootstrap",
+        "--bind-user-fault",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--compile-system",
+        "--reference-arena",
+        "--native-gc",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/libraries/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/libraries/System.Runtime.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/libraries/System.Runtime.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "Large output retained at /Users/robert/Projects/neoclr/target/shared-graph-validation/command-2.stdout",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pthread",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/gc",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/workers",
+        "/Users/robert/Projects/neoclr/runtime/native/gc/native-gc.c",
+        "/Users/robert/Projects/neoclr/runtime/native/gc/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/native-worker-pool/shared-host.c",
+        "/Users/robert/Projects/neoclr/runtime/native/workers/native-workers.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/shared-graph-validation/optimized",
+        "/Users/robert/Projects/neoclr/runtime/native/memory/text-arena.c",
+        "/Users/robert/Projects/neoclr/target/shared-graph-validation/code.o"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/shared-graph-validation/optimized"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS shared graph identity, cycles, edge replacement, live locals and complete reclamation across four workers: 87 successes, one isolated fault; diagnostic text survives collection and later jobs recover\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pthread",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/gc",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/workers",
+        "/Users/robert/Projects/neoclr/runtime/native/gc/native-gc.c",
+        "/Users/robert/Projects/neoclr/runtime/native/gc/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/native-worker-pool/shared-host.c",
+        "/Users/robert/Projects/neoclr/runtime/native/workers/native-workers.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/shared-graph-validation/ubsan",
+        "/Users/robert/Projects/neoclr/runtime/native/memory/text-arena.c",
+        "/Users/robert/Projects/neoclr/target/shared-graph-validation/code.o",
+        "-fsanitize=undefined",
+        "-fno-sanitize-recover=all"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/shared-graph-validation/ubsan"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS shared graph identity, cycles, edge replacement, live locals and complete reclamation across four workers: 87 successes, one isolated fault; diagnostic text survives collection and later jobs recover\n",
+      "stderr": ""
+    }
+  ],
+  "inputs": {
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/sdk/tools/rvnc/rvnc.dll": "910fbd6babab359417703b6662d646acb5bdb1ddc982bc497dd3078461b9dea3",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/bin/neoclr-codegen": "dc032798841d13e702a29df6ae5c0911454d987e609c665c1960e3846ed763ee",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/bin/neoclr": "6da8f7d4b470a7c748ff05cc1674b49de445b5afd7f3925b2d111908be5f85cc",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/libraries/System.Runtime.dll": "ac3ddea188cd6e7970869248c2501acc7f6f7a1bfca598c339ea3257d3fc1d4c",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/libraries/System.runtime.neox": "0c72a8656e7158d6bb2f31c0b019d8747dd61a6c4127b278155e104de437769b",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-worker-pool/Shared.rvn": "ecaff577e744d3eb096f55a65069b99f4726040143d20b433a12e7d98c7c2e6a",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-worker-pool/shared-host.c": "2b958ed145a74bebdb95be27c6accfb50ae3e8f1094e30fb3ca83a3c33ec950a",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-worker-pool/generated.py": "eb24c76c383b1f91fdb0009fae7214594697051004029c2c6885cff0c563ab9e",
+    "/Users/robert/Projects/neoclr/target/shared-graph-validation/App.rvnproj": "e7213d92a837dbf913a21731b775fa40f422b5d0dcbc266293d7d395aa9089ad",
+    "/Users/robert/Projects/neoclr/target/shared-graph-validation/bin/neoclr/WorkerGenerated.dll": "b179b7c565b7007e4d94525e80ea0bbc8092c871d357c0b89e6d33386ba8e320",
+    "/Users/robert/Projects/neoclr/target/shared-graph-validation/command-2.stdout": "1ccaa0e227609660adc356b1c12528c40f9e0341b09a94d47f47f40c539ac42d",
+    "/Users/robert/Projects/neoclr/runtime/native/gc/native-gc.c": "fefe1387031fa7c68bf9680e7abf34ce7d6b8ae66ec7187747b5b69ec813c13c",
+    "/Users/robert/Projects/neoclr/runtime/native/gc/root-probe.h": "5c247269c702898e675439db37b1c8b62db7b44e0160c5043c89d93cd4c2881f",
+    "/Users/robert/Projects/neoclr/runtime/native/gc/root-probe.c": "a23a8401b56cb8222b8ba384cb132469171b3e607cdada9f7b662ef1db7e911a",
+    "/Users/robert/Projects/neoclr/runtime/native/gc/native-gc.h": "1a595c126038a711ec8be054b387bcfe408528a2a7b38d87472996eee49e90c7",
+    "/Users/robert/Projects/neoclr/runtime/native/memory/memory-views.h": "f9e0026287c2a7b20c50f80ac20845350a825c2b88c3cc5543a5fd2c2635a4db",
+    "/Users/robert/Projects/neoclr/runtime/native/memory/text-arena.c": "b6e7aff8a697bae03d5a2629e6aa019ef9f57e51ac371c4dfb26e7d884283716",
+    "/Users/robert/Projects/neoclr/runtime/native/memory/memory-views-test.c": "d3e9c18f20385a87d5388bfd6af76ae1e48a67cb1973542611061e7c4a8137de",
+    "/Users/robert/Projects/neoclr/runtime/native/memory/text-arena.h": "a42bce970cc9221acf124323003ab3cca9dc33fc5b472fec30979ff4c2d8d8dc",
+    "/Users/robert/Projects/neoclr/runtime/native/memory/static-storage-test.c": "4989e9c97e3b39e610e49b0325f33773924d3041094f9f5947fd8523c288167f",
+    "/Users/robert/Projects/neoclr/runtime/native/workers/http-workers.h": "3879c029beae54cc42f83846d0bdd3485c26458bb3d7d2e41189091b2973e9a6",
+    "/Users/robert/Projects/neoclr/runtime/native/workers/native-workers.h": "86a6d1221b48af99cbfeac0964f8d4c04634c7b191f85135a13bc026c7b87578",
+    "/Users/robert/Projects/neoclr/runtime/native/workers/http-workers.c": "a059777a7cdcc6c20020b2b500afa098f9361882be095fe4fc58c62d7b0577cd",
+    "/Users/robert/Projects/neoclr/runtime/native/workers/native-workers.c": "6342a76041dedbffc2e009e4332b13a7401ef21dc0ad6b868039a8a681d9ca0c"
+  },
+  "scope": "Shared serialized callback bridge"
+}

@@ -1,0 +1,92 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pthread",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/gc",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/workers",
+        "/Users/robert/Projects/neoclr/runtime/native/gc/native-gc.c",
+        "/Users/robert/Projects/neoclr/runtime/native/gc/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/http-worker-integration/native-test.c",
+        "/Users/robert/Projects/neoclr/runtime/native/workers/native-workers.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/http-worker-native-validation-final/optimized",
+        "/Users/robert/Projects/neoclr/runtime/native/workers/http-workers.c",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/http-worker-native-validation-final/optimized"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS shared listener startup, independent duplicates, restart, mismatch and bind-failure teardown\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pthread",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/gc",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/workers",
+        "/Users/robert/Projects/neoclr/runtime/native/gc/native-gc.c",
+        "/Users/robert/Projects/neoclr/runtime/native/gc/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/http-worker-integration/native-test.c",
+        "/Users/robert/Projects/neoclr/runtime/native/workers/native-workers.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/http-worker-native-validation-final/ubsan",
+        "/Users/robert/Projects/neoclr/runtime/native/workers/http-workers.c",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-fsanitize=undefined",
+        "-fno-sanitize-recover=all"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/http-worker-native-validation-final/ubsan"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS shared listener startup, independent duplicates, restart, mismatch and bind-failure teardown\n",
+      "stderr": ""
+    }
+  ],
+  "inputs": {
+    "/Users/robert/Projects/neoclr/runtime/native/workers/http-workers.h": "3879c029beae54cc42f83846d0bdd3485c26458bb3d7d2e41189091b2973e9a6",
+    "/Users/robert/Projects/neoclr/runtime/native/workers/native-workers.h": "86a6d1221b48af99cbfeac0964f8d4c04634c7b191f85135a13bc026c7b87578",
+    "/Users/robert/Projects/neoclr/runtime/native/workers/http-workers.c": "a059777a7cdcc6c20020b2b500afa098f9361882be095fe4fc58c62d7b0577cd",
+    "/Users/robert/Projects/neoclr/runtime/native/workers/native-workers.c": "6342a76041dedbffc2e009e4332b13a7401ef21dc0ad6b868039a8a681d9ca0c",
+    "/Users/robert/Projects/neoclr/docs/experiments/http-worker-integration/native-test.c": "96fb9fdc3b62cac39463a8a024b9052e01ebdc06a3a3baa0f3f954bb393a561f",
+    "/Users/robert/Projects/neoclr/docs/experiments/http-worker-integration/native.py": "07633704a20cd4f079887c794b93fa383dbb898d8711009608808df142f3f1c2",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-os.h": "a01419c62fa8a1d3d9131282c5af182f200ba149a440d52c81104e2a156f7ef0"
+  }
+}

@@ -89,6 +89,13 @@ def validate_https_server(enabled, profile, bootstrap_root, packaged):
         raise ValueError('--https-server currently requires a source checkout, not a packaged build kit')
 
 
+def validate_http_workers(count, profile, bootstrap_root, https_server, packaged):
+    if not 0 <= count <= 4:
+        raise ValueError('HTTP worker count must be 0 (default host) or 1 through 4')
+    if count and (profile != PROFILES['http'] or bootstrap_root or https_server or packaged):
+        raise ValueError('HTTP workers require a source macOS HTTP profile without TLS or retained bootstrap')
+
+
 def scalar_interop_profile(profile):
     return profile in (PROFILES['native-interop'], PROFILES['native-library'])
 
@@ -161,8 +168,9 @@ def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, reflection_roots=None, byte_array_limit=65536, http_heap_bytes=1048576, command_timeout=180, https_server=False, reflection_types=None, reflection_constructor_types=None, reflection_method_types=None):
+def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, reflection_roots=None, byte_array_limit=65536, http_heap_bytes=1048576, command_timeout=180, https_server=False, reflection_types=None, reflection_constructor_types=None, reflection_method_types=None, http_workers=0):
     validate_https_server(https_server, profile, bootstrap_root, (ROOT / 'native-build-kit.json').exists())
+    validate_http_workers(http_workers, profile, bootstrap_root, https_server, (ROOT / 'native-build-kit.json').exists())
     if not 0 < command_timeout <= 3600:
         raise ValueError("Command timeout must be between 1 and 3600 seconds")
     if not 0 < byte_array_limit <= 2147483647:
@@ -198,7 +206,7 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
             raise ValueError('Required build tool is missing: ' + tool)
     output.mkdir(parents=True, exist_ok=False)
     report = dict(profile=profile, passed=False, project=str(project),
-                  host=platform.platform(), httpsServer=https_server, byteArrayLimit=byte_array_limit, httpHeapBytes=http_heap_bytes, commandTimeoutSeconds=command_timeout, bootstrapRoot=bootstrap_root, commands=[], inputs={})
+                  host=platform.platform(), httpWorkers=http_workers, httpsServer=https_server, byteArrayLimit=byte_array_limit, httpHeapBytes=http_heap_bytes, commandTimeoutSeconds=command_timeout, bootstrapRoot=bootstrap_root, commands=[], inputs={})
 
     def save():
         (output / 'build.json').write_text(json.dumps(report, indent=2) + '\n')
@@ -281,6 +289,8 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
             else:
                 adapters[0] = ROOT / 'benchmarks/native-web/http-host.c'
             adapters += [base / name for name in ('task-queue.c', 'socket-listener.c')]
+        if http_workers:
+            adapters += [ROOT / 'runtime/native/workers' / name for name in ('native-workers.c', 'http-workers.c')]
         if bootstrap_root:
             adapters = [ROOT / 'benchmarks/native-web/http-session-host.c' if p == ROOT / 'benchmarks/native-web/http-host.c' else p for p in adapters]
             adapters += [base / 'native-session.c']
@@ -473,7 +483,7 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
                 raise RuntimeError('Unexpected native dependencies: ' + repr(dependencies))
         else:
             run([clang, '-isysroot', sdk, '-arch', 'arm64', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror',
-                 '-DNEOCLR_NATIVE_GC', *(['-DNEOCLR_NO_DEFAULT_QUEUE'] if no_default_queue else []), *(['-DNEOCLR_RUNTIME_ASYNC', '-I', ROOT / 'runtime/native/async', '-Wno-deprecated-declarations'] if runtime_async else []), *(['-DNEOCLR_MANAGED_TLS'] if managed_tls else []), *(['-DNEOCLR_HTTPS_SERVER'] if https_server else []), '-DNEOCLR_HTTP_HEAP_BYTES=' + str(http_heap_bytes), '-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=' + str(byte_array_limit), *(['-DNEOCLR_ENTRY_ARGUMENTS'] if selection.get('entryArguments') else []), '-I', base, *adapters, obj, *native_text, *native_tls, *native_crypto, *(['-framework', 'CoreFoundation'] if system_culture else []), '-o', pending], phase='host-compile-link')
+                 '-DNEOCLR_NATIVE_GC', *(['-pthread', '-DNEOCLR_HTTP_WORKERS=' + str(http_workers)] if http_workers else []), *(['-DNEOCLR_NO_DEFAULT_QUEUE'] if no_default_queue else []), *(['-DNEOCLR_RUNTIME_ASYNC', '-I', ROOT / 'runtime/native/async', '-Wno-deprecated-declarations'] if runtime_async else []), *(['-DNEOCLR_MANAGED_TLS'] if managed_tls else []), *(['-DNEOCLR_HTTPS_SERVER'] if https_server else []), '-DNEOCLR_HTTP_HEAP_BYTES=' + str(http_heap_bytes), '-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=' + str(byte_array_limit), *(['-DNEOCLR_ENTRY_ARGUMENTS'] if selection.get('entryArguments') else []), '-I', base, *adapters, obj, *native_text, *native_tls, *native_crypto, *(['-framework', 'CoreFoundation'] if system_culture else []), '-o', pending], phase='host-compile-link')
             dependencies = [line.split()[0] for line in run(['xcrun', 'otool', '-L', pending], phase='dependency-check').splitlines()[1:]]
             allowed = {'/usr/lib/libSystem.B.dylib'}
             if system_culture:
@@ -499,6 +509,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--profile', choices=PROFILES, default='console',
                         help='Explicit native service/host profile (default: console)')
+    parser.add_argument('--http-workers', type=int, default=0, help='Experimental source macOS HTTP host: 1–4 isolated application workers sharing their first listener; 0 keeps the default host')
     parser.add_argument('--https-server', action='store_true', help='Source-only macOS/Windows HTTP host: TLS for all accepted connections; PEM credentials are supplied at runtime')
     parser.add_argument('--reflection-type', action='append', default=[], help='Application type name retained from the freshly compiled assembly; repeat for multiple types')
     parser.add_argument('--reflection-method-type', action='append', default=[], help='Exact application type whose declared methods may be inspected; does not retain invocation')
@@ -521,7 +532,7 @@ def main():
                     reflection_types=args.reflection_type,
                     reflection_constructor_types=args.reflection_constructor_type,
                     reflection_method_types=args.reflection_method_type,
-                    byte_array_limit=args.byte_array_limit, http_heap_bytes=args.http_heap_bytes, command_timeout=args.command_timeout, https_server=args.https_server))
+                    byte_array_limit=args.byte_array_limit, http_heap_bytes=args.http_heap_bytes, command_timeout=args.command_timeout, https_server=args.https_server, http_workers=args.http_workers))
     except (OSError, ValueError, KeyError, TypeError, RuntimeError, subprocess.SubprocessError) as error:
         print('native build: ' + str(error), file=sys.stderr)
         return 1

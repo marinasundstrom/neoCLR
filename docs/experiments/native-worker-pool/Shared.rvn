@@ -2,6 +2,8 @@ import System.*
 
 class Counter {
     var Value: int = 0
+    var Link: object = 0
+    var Alias: object = 0
 }
 
 public func Calculate(limit: int) -> (() -> ()) {
@@ -9,8 +11,23 @@ public func Calculate(limit: int) -> (() -> ()) {
         System.Fail("Bootstrap failure")
     }
     let calls = Counter()
+    let first = Counter()
+    first.Link = calls
+    calls.Link = first
+    calls.Alias = first
     let retained: object = 42
     return () => {
+        let previous = (Counter)calls.Link
+        if !Object.ReferenceEquals(previous, calls.Alias)
+            || !Object.ReferenceEquals(previous.Link, calls)
+            || previous.Value != calls.Value {
+            System.Fail("Shared graph lost identity or mutation")
+        }
+        let replacement = Counter()
+        replacement.Value = calls.Value + 1
+        replacement.Link = calls
+        calls.Link = replacement
+        calls.Alias = replacement
         var index = 0
         while index < 500 {
             let temporary: object = index
@@ -18,6 +35,12 @@ public func Calculate(limit: int) -> (() -> ()) {
                 System.Fail("Collected live callback state")
             }
             index += 1
+        }
+        if !Object.ReferenceEquals(previous.Link, calls)
+            || previous.Value != calls.Value
+            || !Object.ReferenceEquals(calls.Link, replacement)
+            || !Object.ReferenceEquals(calls.Alias, replacement) {
+            System.Fail("Collection lost replaced edge or live local")
         }
         calls.Value += 1
         if calls.Value == limit + 1 {

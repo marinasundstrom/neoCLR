@@ -208,6 +208,13 @@ unavailable in installed build kits or non-HTTP host profiles. The same shared
 HTTPS cases pass on both hosts; the Windows qualification also builds a matching
 JIT helper DLL. This is not installed CLI TLS support.
 
+A source-only macOS experiment also accepts `--profile http --http-workers N`
+for 1–4 isolated application invocations sharing their first listener. Each owns
+its heap, statics and async state; this is not shared-heap Task dispatch. TLS,
+retained bootstrap and packaged kits are rejected. See the
+[worker contract and validation](experiments/http-worker-integration/README.md).
+The default remains one ordinary application invocation.
+
 This profile links the existing [HTTP correctness host](../benchmarks/native-web/http-host.c),
 with a 1 MiB native GC heap, scoped sockets/tasks, private default-queue draining,
 retained callback dispatch and the macOS ARM64 stack guard. It enables the existing

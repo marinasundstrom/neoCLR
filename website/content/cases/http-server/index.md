@@ -353,3 +353,9 @@ The [HTTP benchmark matrix](/benchmarks/http/) separates plain-text responses,
 JSON serialization and JSON with database access across interpreter, JIT and AOT.
 It distinguishes measured development baselines from workloads still awaiting
 measurement, and keeps startup separate from request processing.
+
+A source-only development experiment runs 1–4 isolated HTTP application workers
+against one listening socket. Heaps, statics and async state remain per worker;
+shared-object GC qualification is a separate gate before shared-heap parallelism.
+This provides server primitives, with no new application framework or change to
+the default host. [Experimental contract and evidence](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/http-worker-integration/README.md).

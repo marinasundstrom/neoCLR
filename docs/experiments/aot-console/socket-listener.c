@@ -1,4 +1,7 @@
 #include "socket-listener.h"
+#ifdef NEOCLR_HTTP_WORKERS
+#include "../../../runtime/native/workers/http-workers.h"
+#endif
 #include "../../../runtime/native/memory/memory-views.h"
 #ifdef NEOCLR_NATIVE_GC
 #include "native-gc.h"
@@ -219,6 +222,15 @@ int32_t neoclr_socket_listen_v1(const neoclr_aot_text *address, int32_t port, in
     do {
         if (id >= INT64_MAX) return publish(output, 2, 4);
     } while (!atomic_compare_exchange_weak_explicit(&next_id, &id, id + 1, memory_order_relaxed, memory_order_relaxed));
+#ifdef NEOCLR_HTTP_WORKERS
+    int shared_descriptor = -1;
+    int shared = neoclr_http_workers_listener((octets[0] << 24) | (octets[1] << 16) | (octets[2] << 8) | octets[3], port, backlog, &shared_descriptor);
+    if (shared < 0) return publish(output, 2, error_code(neoclr_os_error()));
+    if (shared) {
+        scope->slots[slot].id = id; scope->slots[slot].descriptor = shared_descriptor; scope->slots[slot].listener = 1;
+        return publish(output, 5, id);
+    }
+#endif
     neoclr_socket_descriptor descriptor = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (descriptor == NEOCLR_INVALID_SOCKET) return publish(output, 2, error_code(neoclr_os_error()));
     struct sockaddr_in endpoint = {0};
@@ -713,6 +725,9 @@ int32_t neoclr_schedule_task_managed_v1(void *callback, neoclr_aot_context *cont
 
 int32_t neoclr_scheduler_acquire_v1(neoclr_aot_context *context, uint64_t *delivery,
     const neoclr_probe_frame *boundary) {
+#ifdef NEOCLR_HTTP_WORKERS
+    if (neoclr_http_workers_stopping()) return -1;
+#endif
     if (!delivery) return -3;
     uint64_t source = 0, owned = 0;
     int32_t progress = neoclr_scheduler_step_v1(context, &source, boundary);

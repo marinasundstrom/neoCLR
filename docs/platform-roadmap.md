@@ -6213,3 +6213,13 @@ settlement order, at most once, under a bounded owner-side pump that invokes nat
 consumers outside the heap gate. Eight optimized/UBSan groups and compiled shared
 callback delivery pass. Task/Promise and async wakeups are still owner-local and
 not wired to this pump; see [delivery evidence](experiments/native-worker-pool/README.md#owner-side-completion-delivery--2026-10-23).
+
+HTTP integration / GC gate follow-up (2026-10-23): an opt-in source host now runs
+1–4 isolated application owners against one listening socket, with real compiled
+Serve/Task/async-I/O requests, pending-read shutdown and coordinated failure
+cleanup validated. The [integration record](experiments/http-worker-integration/README.md)
+retains preliminary multicore scaling separately from shared-heap correctness.
+The author clarifies that shared-object GC testing comes first and the scope is
+server primitives, not a full framework. Expanded shared-graph tests pass under
+the serial heap gate; shared async settlement and parallel-mutator coordination
+remain open. This experiment does not permanently reprioritize the platform roadmap.

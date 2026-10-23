@@ -1,0 +1,250 @@
+{
+  "passed": true,
+  "executable": "/Users/robert/Projects/neoclr/target/http-worker-integration-final4/app",
+  "executableSha256": "edcfa2dddea640ea87f3c50e8f3a521dd6716eb5430fe8eb9a0e432513ca5fa1",
+  "workers": 4,
+  "runs": [
+    {
+      "stdout": [
+        "READY 61417 61420\n",
+        "READY 61417 61419\n",
+        "READY 61417 61421\n",
+        "READY 61417 61418\n",
+        "DONE 61419 40 0\n",
+        "DONE 61420 40 0\n",
+        "DONE 61418 41 0\n",
+        "DONE 61421 39 0\n"
+      ],
+      "stderr": [],
+      "injectedFault": false,
+      "ready": [
+        [
+          61417,
+          61420
+        ],
+        [
+          61417,
+          61419
+        ],
+        [
+          61417,
+          61421
+        ],
+        [
+          61417,
+          61418
+        ]
+      ],
+      "seconds": 2.181871958,
+      "responses": 160,
+      "ownerResponses": {
+        "61418": 41,
+        "61419": 40,
+        "61420": 40,
+        "61421": 39
+      },
+      "exitCode": 0,
+      "done": [
+        [
+          "61419",
+          "40",
+          "0"
+        ],
+        [
+          "61420",
+          "40",
+          "0"
+        ],
+        [
+          "61418",
+          "41",
+          "0"
+        ],
+        [
+          "61421",
+          "39",
+          "0"
+        ]
+      ]
+    },
+    {
+      "stdout": [
+        "READY 61594 61597\n",
+        "READY 61594 61596\n",
+        "READY 61594 61595\n",
+        "READY 61594 61598\n",
+        "DONE 61597 40 0\n",
+        "DONE 61595 39 0\n",
+        "DONE 61596 41 0\n",
+        "DONE 61598 40 0\n"
+      ],
+      "stderr": [],
+      "injectedFault": false,
+      "ready": [
+        [
+          61594,
+          61597
+        ],
+        [
+          61594,
+          61596
+        ],
+        [
+          61594,
+          61595
+        ],
+        [
+          61594,
+          61598
+        ]
+      ],
+      "seconds": 2.2611732909999995,
+      "responses": 160,
+      "ownerResponses": {
+        "61595": 39,
+        "61596": 41,
+        "61597": 40,
+        "61598": 40
+      },
+      "exitCode": 0,
+      "done": [
+        [
+          "61597",
+          "40",
+          "0"
+        ],
+        [
+          "61595",
+          "39",
+          "0"
+        ],
+        [
+          "61596",
+          "41",
+          "0"
+        ],
+        [
+          "61598",
+          "40",
+          "0"
+        ]
+      ]
+    },
+    {
+      "stdout": [
+        "READY 61776 61779\n",
+        "READY 61776 61778\n",
+        "READY 61776 61777\n",
+        "READY 61776 61780\n",
+        "DONE 61777 39 0\n",
+        "DONE 61780 41 0\n",
+        "DONE 61778 40 0\n",
+        "DONE 61779 40 0\n"
+      ],
+      "stderr": [],
+      "injectedFault": false,
+      "ready": [
+        [
+          61776,
+          61779
+        ],
+        [
+          61776,
+          61778
+        ],
+        [
+          61776,
+          61777
+        ],
+        [
+          61776,
+          61780
+        ]
+      ],
+      "seconds": 2.333904959,
+      "responses": 160,
+      "ownerResponses": {
+        "61777": 39,
+        "61778": 40,
+        "61779": 40,
+        "61780": 41
+      },
+      "exitCode": 0,
+      "done": [
+        [
+          "61777",
+          "39",
+          "0"
+        ],
+        [
+          "61780",
+          "41",
+          "0"
+        ],
+        [
+          "61778",
+          "40",
+          "0"
+        ],
+        [
+          "61779",
+          "40",
+          "0"
+        ]
+      ]
+    },
+    {
+      "stdout": [
+        "READY 61953 61954\n",
+        "READY 61953 61955\n",
+        "READY 61953 61956\n",
+        "READY 61953 61957\n"
+      ],
+      "stderr": [
+        "UserFault: Injected HTTP worker failure\n",
+        "   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n",
+        "   at System.Fail [instruction 1]\n",
+        "   at Application.N_24636C6F737572652430.M_496E766F6B65 [instruction 7]\n",
+        "   at RuntimeAwaitProvider.Body`1.Run [instruction 2]\n",
+        "   at Raven.Generated.UnitCallback.Invoke [instruction 2]\n",
+        "   at RuntimeAwaitProvider.Bridge.Start [instruction 10]\n",
+        "   at Application.Respond [instruction 4]\n",
+        "   at System.Web.Http.HttpResponseCallback.Dispatch [instruction 5]\n",
+        "   at System.Web.Http.HttpServeOperation.OnAccepted [instruction 91]\n",
+        "   at Raven.Generated.UnitCallback.Invoke [instruction 2]\n",
+        "   at System.Concurrency.Tasks.TaskQueue.Drain [instruction 33]\n",
+        "   at System.Runtime.CompilerServices.RuntimeHelpers.DrainEntryTasks [instruction 0]\n",
+        "   at Raven.Generated.<AsyncEntry> [instruction 1]\n",
+        "RuntimeError: Runtime error\n",
+        "   at System.Runtime.CompilerServices.RuntimeHelpers.DrainEntryTasks [instruction 0]\n",
+        "   at Raven.Generated.<AsyncEntry> [instruction 1]\n",
+        "RuntimeError: Runtime error\n",
+        "   at System.Runtime.CompilerServices.RuntimeHelpers.DrainEntryTasks [instruction 0]\n",
+        "   at Raven.Generated.<AsyncEntry> [instruction 1]\n",
+        "RuntimeError: Runtime error\n",
+        "   at System.Runtime.CompilerServices.RuntimeHelpers.DrainEntryTasks [instruction 0]\n",
+        "   at Raven.Generated.<AsyncEntry> [instruction 1]\n"
+      ],
+      "injectedFault": true,
+      "ready": [
+        [
+          61953,
+          61954
+        ],
+        [
+          61953,
+          61955
+        ],
+        [
+          61953,
+          61956
+        ],
+        [
+          61953,
+          61957
+        ]
+      ],
+      "exitCode": 2
+    }
+  ]
+}

@@ -175,3 +175,9 @@ strategy. These are future directions, not available component APIs. Trusted nat
 imports also remain distinct from sandboxed VM execution.
 
 [Interop direction and completion gates](https://github.com/marinasundstrom/neoCLR/blob/main/docs/design/native-import-export-contract.md#language-neutral-interoperability-direction--2026-10-22)
+
+A source-only development experiment runs 1–4 isolated HTTP application workers
+against one listening socket. Heaps, statics and async state remain per worker;
+shared-object GC qualification is a separate gate before shared-heap parallelism.
+This provides server primitives, with no new application framework or change to
+the default host. [Experimental contract and evidence](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/http-worker-integration/README.md).

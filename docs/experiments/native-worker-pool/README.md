@@ -356,3 +356,25 @@ are owner-local; this pump establishes a native delivery boundary without declar
 them thread-safe. It does not resume a generated continuation, bind Task.Run, add
 public channel APIs or migrate fibers. Next connect an explicitly owned runtime
 completion signal to this pump and qualify owner wakeups/teardown before HTTP use.
+
+## Shared graph GC gate — 2026-10-23
+
+The author clarified that collection while objects are accessed across workers is
+the correctness gate before throughput work, with server primitives rather than a
+full web framework as the scope. `Shared.rvn` now retains an aliased cyclic graph
+through its single shared closure. Every invocation checks the previous worker's
+mutation and reference identity, replaces an edge, then allocates 500 boxes while
+retaining both the displaced child and replacement through collection. Four native
+participants rendezvous each batch, so four distinct workers access that same
+closure. Owner collections also run between batches and while consuming results.
+
+[Optimized/UBSan evidence](graph-validation.json) passes 87 successful invocations
+and one isolated fault per build, preserving native participant temporaries and
+fault text. After releasing the closure and sentinel roots, an explicit collection
+reports zero occupied extent, including reclamation of cycles. Managed access
+remains serialized by the heap gate; this does not qualify concurrent mutators,
+shared async Task settlement or off-thread use of existing I/O resources.
+
+The separate [HTTP integration](../http-worker-integration/README.md) runs complete
+application owners on isolated heaps. It supplies working HTTP/async-I/O integration
+and a multicore comparison, not evidence of shared-object GC safety.

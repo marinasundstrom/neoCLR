@@ -21853,3 +21853,24 @@ results until take, and supports collection and follow-up submission in consumer
 Tests pass for delivery identity/order/budgets, cancellation, duplicate suppression
 and close lifetime; the shared Raven fixture now consumes results and faults through
 that pump. Generated continuation wakeups and HTTP integration remain unimplemented.
+
+Working integration and GC-priority clarification (2026-10-23): the author asked
+“Continue until having a working integration.” The assistant proposed and built an
+explicit isolated-owner HTTP mode: complete application invocations on worker
+threads, each retaining its own heap/Task/I/O state, sharing one kernel listener.
+It passes actual HTTP requests, pending-read shutdown and coordinated guest-fault
+cleanup. Initial paced-GC trials show roughly 457/894/1677 requests per second for
+1/2/4 owners; these short desktop trials are not a comparison with other servers
+and increase aggregate heap/lane capacity with worker count.
+
+The author then clarified: “The test will be GC while accessing objects across
+worker threads,” followed by throughput investigation, and “We are providing the
+server primitives.” The assistant acknowledged that isolated HTTP workers do not
+prove shared-object safety and strengthened the shared-heap compiled test before
+further performance work. Aliased cycles, replaced edges, retained locals, mutation
+visibility and complete reclamation pass optimized/UBSan builds across four
+workers. Access remains gated; shared async Tasks and concurrent managed mutators
+are still open. The isolated throughput run was already underway at clarification
+and is retained as comparison evidence only. No external-server parity or full
+framework is claimed. See the [integration record](experiments/http-worker-integration/README.md)
+and [shared graph evidence](experiments/native-worker-pool/README.md#shared-graph-gc-gate--2026-10-23).

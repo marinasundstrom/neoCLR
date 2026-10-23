@@ -145,6 +145,8 @@ int main(void) {
     CHECK(stats.faults == 1 && stats.successes == 87); /* One shared counter; independent jobs recover. */
     CHECK(neoclr_workers_root_release(pool, callback));
     CHECK(neoclr_workers_root_release(pool, sentinel));
+    uint64_t reclaimed_extent = 99;
+    CHECK(neoclr_workers_collect(pool, &reclaimed_extent) && !reclaimed_extent);
     CHECK(neoclr_workers_close(pool) && neoclr_workers_destroy(pool));
-    puts("PASS owner-dispatched shared compiled callback: 87 successes, one isolated fault; diagnostic text survives collection and later jobs recover");
+    puts("PASS shared graph identity, cycles, edge replacement, live locals and complete reclamation across four workers: 87 successes, one isolated fault; diagnostic text survives collection and later jobs recover");
 }

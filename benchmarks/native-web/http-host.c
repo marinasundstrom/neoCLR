@@ -96,7 +96,7 @@ static int invoke(neoclr_aot_context *context, int *failed, int argc, neoclr_pro
     return status ? 1 : result;
 }
 
-int NEOCLR_PROCESS_MAIN(int argc, neoclr_process_char **argv) {
+static int run_entry(int argc, neoclr_process_char **argv) {
 #ifdef _WIN32
     if (_setmode(_fileno(stdin), _O_BINARY) == -1 ||
         _setmode(_fileno(stdout), _O_BINARY) == -1 ||
@@ -133,4 +133,21 @@ int NEOCLR_PROCESS_MAIN(int argc, neoclr_process_char **argv) {
 #endif
     if (host_error) fputs("Native HTTP host failed\n", stderr);
     return host_error ? 2 : result;
+}
+
+#ifdef NEOCLR_HTTP_WORKERS
+#include "../../runtime/native/workers/http-workers.h"
+typedef struct { int argc; neoclr_process_char **argv; } worker_arguments;
+static int worker_entry(void *state) {
+    worker_arguments *arguments = state;
+    return run_entry(arguments->argc, arguments->argv);
+}
+#endif
+int NEOCLR_PROCESS_MAIN(int argc, neoclr_process_char **argv) {
+#ifdef NEOCLR_HTTP_WORKERS
+    worker_arguments arguments = {argc, argv};
+    return neoclr_http_workers_run(NEOCLR_HTTP_WORKERS, worker_entry, &arguments);
+#else
+    return run_entry(argc, argv);
+#endif
 }

@@ -170,3 +170,21 @@ Open decisions: shared native heap coordinator and safepoints; handler-only vers
 connection-owner distribution; blocking compensation; wakeup backend and supported
 targets; whether a separate isolated-worker API is useful. This proposal does not
 select preemption, a public green-thread model, or a permanent roadmap reordering.
+
+### Working isolated HTTP integration and shared-GC gate — 2026-10-23
+
+The source HTTP host now has an explicit 1–4 application-worker experiment sharing
+one kernel listener, with private managed heaps and owner-local I/O/Task lifetimes.
+[Integration evidence](../experiments/http-worker-integration/README.md) covers real
+requests, pending reads, failure propagation and joined teardown. This deliberately
+uses isolation instead of .NET-style shared state: useful concurrency now, at the
+cost of replicated application instances, statics and per-owner heap/lane limits.
+It is not a change to default Task.Run semantics or a new web application framework.
+
+The author's subsequent direction makes shared-object collection the correctness
+gate before throughput optimization. The expanded
+[graph qualification](../experiments/native-worker-pool/README.md#shared-graph-gc-gate--2026-10-23)
+checks cycles, aliases, mutation, live displaced children and reclamation across
+four workers under the heap gate. Parallel mutators remain unqualified. Preliminary
+isolated-owner scaling is retained separately; matched comparisons with other
+servers and allocation work follow correctness, not replace it.
