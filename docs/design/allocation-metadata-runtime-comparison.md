@@ -167,3 +167,61 @@ without adopting its per-method unwind/GC format. Costs are entry-time validatio
 a per-ancestor marker check and a new required runtime symbol for regenerated
 objects. No frame size or allocation growth. Shared binary descriptors and image
 registration remain proposals. See [validation and measurements](../../benchmarks/http-server/primitive-comparison/owned-root-storage/README.md).
+
+## Standard runtime diagnostics proposal — 2026-10-23
+
+Author suggestion: add standard monitoring/profiling to help detect runtime issues.
+This is a proposed follow-up to HTTP publication attribution, not an implemented
+public API or a replacement for the throughput objective.
+
+Existing private facilities include GC statistics/profile snapshots, async-runtime
+statistics, compiled-worker statistics and optional publication-site counting.
+Several are thread-local; reading the main thread does not produce process totals.
+The immediate need is consistent scope, units, lifetime and aggregation, followed
+by timing evidence that distinguishes CPU work from waits.
+
+Use .NET's separation of runtime metrics and diagnostic event collection as the
+API/design reference: [EventCounters](https://learn.microsoft.com/dotnet/core/diagnostics/event-counters)
+and [EventPipe](https://learn.microsoft.com/dotnet/core/diagnostics/eventpipe).
+Go similarly separates [runtime statistics, profiling and tracing](https://go.dev/doc/diagnostics).
+These sources support the separation of tools; they do not establish neoCLR's
+implementation costs or prescribe its event transport. Full EventPipe compatibility
+is not proposed for the first slice.
+
+Proposed increments:
+
+1. Define a private, versioned runtime snapshot with explicit process/worker/heap
+   scope. Start with allocation bytes/count, heap use, GC count/pause distribution,
+   active workers, queued/completed work and I/O completions. Distinguish gauges,
+   cumulative counters and rates derived by the reader. An unsupported measurement
+   must be marked unavailable rather than reported as zero. Preserve completed
+   worker totals and avoid counting a shared heap once per worker.
+2. Add opt-in bounded event recording for GC start/end, queue enqueue/start/finish,
+   worker wait/wake and I/O wait/completion. Use monotonic timestamps, worker IDs
+   and numeric operation IDs. Report dropped events explicitly. Compute queue/wait
+   durations without adding clocks to every instruction or byte operation.
+3. Support CPU sampling and generated-code symbol mapping using platform profilers
+   first. The view must include generated code, native C/Rust runtime and OS waits;
+   publication counts alone cannot identify CPU bottlenecks. Cooperative-only
+   sampling risks bias toward safepoints. Portable sampling/unwinding remains a
+   separate design task, not an assumption about current compiler support.
+
+Keep updates local to their owning thread where practical. A collector must use
+an explicit synchronized snapshot/publication protocol; unsynchronized reads of
+another thread's ordinary counters are not safe. Avoid a global lock or contended
+atomic increment per allocation/request. Bound recording storage, defer names and
+formatting to export, and do no managed allocation or file I/O in diagnostic hooks.
+Do not record request payloads/URLs as labels. Runtime-toggleable light monitoring
+and compile-time detailed instrumentation have different disabled-cost tradeoffs;
+measure both before selecting defaults. A dropped diagnostic event must not abort
+an application, unlike the deliberately strict benchmark attribution fixture.
+
+First bounded implementation candidate: aggregate existing GC/async/worker counts
+at safe owner boundaries into a versioned snapshot and integrate it with the HTTP
+benchmark reporter. Retain exact units and explicit unavailable fields. Then add
+queue/wait timing where CPU profiles show a need. Test concurrent snapshot safety,
+thread exit, shared-heap accounting, overflow/drop behavior and unchanged application
+results. Compare disabled and enabled CPU/request, throughput and memory against
+the same plain-text fixture; do not select an arbitrary overhead budget or claim
+zero cost before measuring. Native/public API exposure and tooling command names
+remain undecided; any public surface requires matching reference documentation.

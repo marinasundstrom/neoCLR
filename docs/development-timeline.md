@@ -22058,3 +22058,18 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   own 29.7% of publications; these are counts, not CPU shares. Kestrel parity is
   still open, with byte-loop/accessor work the next investigation.
   [Diagnostic evidence](../benchmarks/http-server/primitive-comparison/site-profile/README.md).
+
+### 2026-10-23 — Standard runtime monitoring and profiling
+
+- Author suggestion: “Perhaps we should add additional standard monitoring or
+  profiling into the runtime that can help us detect issues”.
+- Assistant investigation: found existing private GC, async and worker statistics,
+  plus the new publication-site diagnostic, but no unified cross-worker view.
+  Reviewed .NET EventPipe/EventCounters and Go diagnostic guidance.
+- Assistant proposal: standardize scoped snapshots first, then bounded opt-in
+  event timelines and CPU sampling/symbol mapping. Distinguish CPU execution from
+  queueing, I/O waits and GC pauses; measure instrumentation overhead and preserve
+  the plain-text throughput objective.
+- Outcome: recorded a staged proposal and validation requirements. No monitoring
+  API, event transport, default policy or implementation approval is inferred.
+  See [design proposal](design/allocation-metadata-runtime-comparison.md#standard-runtime-diagnostics-proposal--2026-10-23).

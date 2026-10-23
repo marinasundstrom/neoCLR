@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-23
 
+- Record a research-backed proposal for standard runtime monitoring: scoped cross-worker snapshots, bounded opt-in events and CPU sampling/symbol mapping. Identify existing private counters, safe aggregation and overhead-validation requirements; no new runtime API or monitoring behavior is implemented.
+
 - Add opt-in diagnostic GC publication attribution with bounded thread-local counters and byte-verified compiler method mapping. Request decoding and response encoding own 29.7% of publications in the checked plain-text run; this is work attribution, not CPU attribution or a throughput improvement. Twelve optimized/sanitized cases pass and disabled-hook GC/probe objects are byte-identical. Retain evidence and the next loop/leaf-call investigation in benchmarks/http-server/primitive-comparison/site-profile/README.md.
 
 - Refresh the plain-text Go/Node/Kestrel comparison with the current generated-owned-storage object/runtime: all 14 checked trials pass, but neoCLR remains below peer throughput and CPU efficiency (four-owner means 4,182 versus 14,685 Kestrel/20,114 Go requests/s). Add explicit object/runtime/ownership controls with recorded provenance to the comparison tool and a separate per-request work inventory. Revert an inconclusive GC TLS grouping candidate; retain counter/pacing lifetime tests and experiment evidence. Record the author's comparable-throughput target and open gap in benchmarks/http-server/primitive-comparison/peer-refresh/README.md.

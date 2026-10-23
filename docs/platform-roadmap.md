@@ -6412,3 +6412,10 @@ byte-identical. This completes publication-count attribution, not CPU attributio
 or the throughput objective. Next bounded slice: reduce repeated byte-loop/accessor
 work with preserved validation and GC/worker contracts, then measure paired CPU and
 throughput. See [evidence](../benchmarks/http-server/primitive-comparison/site-profile/README.md).
+
+Runtime diagnostics suggestion (2026-10-23): the author proposes standard monitoring
+and profiling to detect issues. Record a supporting, provisional sequence: safely
+aggregate existing scoped counters, add bounded event timelines, and enable CPU
+sampling with generated-code identities. This does not replace the HTTP throughput
+priority or commit to an EventPipe clone/public API. See the
+[proposal and validation requirements](design/allocation-metadata-runtime-comparison.md#standard-runtime-diagnostics-proposal--2026-10-23).
