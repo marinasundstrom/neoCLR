@@ -1,0 +1,924 @@
+{
+  "passed": true,
+  "inputs": {
+    "/Users/robert/Projects/neoclr/benchmarks/http-server/primitive-comparison/owned-root-storage/validate.py": "a2cefabdc681c5bc9882755df88cfd0fbab71fd1158d347f78d42f0f3c02c2ec",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-validation-test.c": "e65abb9d00983355716c950cbbd91f0a1ab82ef9fcbd4e563fd02b90bbdb4514",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c": "2863b5f63849e9d78185909b893e8ed8e452dec7d1cc8693bd7a77813944310d",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c": "1c718951ea0eb822b0f648f6192d2d9f9686e6a93613dadeecb1b78078d1f4b6",
+    "/Users/robert/Projects/neoclr/runtime/native/gc/native-gc.c": "1d603f3127be319a68674aee78bc96ae9810d4ac8735878fd561eea6f5fb7602",
+    "/Users/robert/Projects/neoclr/runtime/native/gc/root-probe.h": "9b91d3d52c94d46e423f36fdc4ee7392cb331f9eb1f630ab49f76050eab1951a",
+    "/Users/robert/Projects/neoclr/runtime/native/gc/root-probe.c": "50d3316c76ca39a06722de2a2657264f4f076be59343989c7bb8f7937616d993",
+    "/Users/robert/Projects/neoclr/runtime/native/gc/native-gc.h": "66ab967d634fe1a8e112ba67a4447c9c31b5903c38e95a3bafc3b04100ff4abe"
+  },
+  "commands": [
+    {
+      "command": [
+        "xcrun",
+        "--sdk",
+        "macosx",
+        "--find",
+        "clang"
+      ],
+      "exitCode": 0,
+      "expected": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "xcrun",
+        "--sdk",
+        "macosx",
+        "--show-sdk-path"
+      ],
+      "exitCode": 0,
+      "expected": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-validation-test.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe"
+      ],
+      "exitCode": 0,
+      "expected": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "address"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "width"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "flags"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "fault"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "transient"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "plan-missing"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "plan-length"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "plan-short"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "batch-address"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "batch-width"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "batch-flags"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "batch-transient"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "context-mutated"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "context-null"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "context-ancestor-null"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "plan-moved"
+      ],
+      "exitCode": 0,
+      "expected": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "batch-valid"
+      ],
+      "exitCode": 0,
+      "expected": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "context-valid"
+      ],
+      "exitCode": 0,
+      "expected": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "state-valid"
+      ],
+      "exitCode": 0,
+      "expected": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "width-vector-0"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "width-vector-1"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "width-vector-3"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "width-vector-4"
+      ],
+      "exitCode": 0,
+      "expected": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "width-vector-5"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "width-vector-7"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "width-vector-8"
+      ],
+      "exitCode": 0,
+      "expected": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "width-vector-9"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "width-vector-12"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "width-vector-16"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "width-vector-2147483648"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "width-vector-4294967292"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "width-vector-4294967295"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "width-tail-0"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "width-tail-1"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "width-tail-3"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "width-tail-4"
+      ],
+      "exitCode": 0,
+      "expected": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "width-tail-5"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "width-tail-7"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "width-tail-8"
+      ],
+      "exitCode": 0,
+      "expected": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "width-tail-9"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "width-tail-12"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "width-tail-16"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "width-tail-2147483648"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "width-tail-4294967292"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/probe",
+        "width-tail-4294967295"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-validation-test.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "-DNEOCLR_NATIVE_GC"
+      ],
+      "exitCode": 0,
+      "expected": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "address"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "width"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "flags"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "fault"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "transient"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "plan-missing"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "plan-length"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "plan-short"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "batch-address"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "batch-width"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "batch-flags"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "batch-transient"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "context-mutated"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "context-null"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "context-ancestor-null"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "plan-moved"
+      ],
+      "exitCode": 0,
+      "expected": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "batch-valid"
+      ],
+      "exitCode": 0,
+      "expected": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "context-valid"
+      ],
+      "exitCode": 0,
+      "expected": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "state-valid"
+      ],
+      "exitCode": 0,
+      "expected": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "owned-entry-invalid"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "owned-mixed-invalid"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "owned-transient-invalid"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "owned-valid"
+      ],
+      "exitCode": 0,
+      "expected": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "width-vector-0"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "width-vector-1"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "width-vector-3"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "width-vector-4"
+      ],
+      "exitCode": 0,
+      "expected": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "width-vector-5"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "width-vector-7"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "width-vector-8"
+      ],
+      "exitCode": 0,
+      "expected": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "width-vector-9"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "width-vector-12"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "width-vector-16"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "width-vector-2147483648"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "width-vector-4294967292"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "width-vector-4294967295"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "width-tail-0"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "width-tail-1"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "width-tail-3"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "width-tail-4"
+      ],
+      "exitCode": 0,
+      "expected": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "width-tail-5"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "width-tail-7"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "width-tail-8"
+      ],
+      "exitCode": 0,
+      "expected": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "width-tail-9"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "width-tail-12"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "width-tail-16"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "width-tail-2147483648"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "width-tail-4294967292"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-optimized/gc",
+        "width-tail-4294967295"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    }
+  ]
+}

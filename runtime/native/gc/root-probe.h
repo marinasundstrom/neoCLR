@@ -44,6 +44,18 @@ _Static_assert(sizeof(neoclr_probe_frame) == 104, "private probe frame size");
 _Static_assert(offsetof(neoclr_probe_frame, function) == 40, "private probe frame layout");
 void neoclr_probe_enter_v3(neoclr_probe_frame *frame, const void *context, uint32_t function,
     const neoclr_probe_storage *storage, uint32_t count, const char *plan, uint32_t length);
+#ifdef NEOCLR_NATIVE_GC
+/* Private generated-frame contract. Validate storage descriptors on entry, then
+ * retain them until leave/parked-frame expiry. The caller exclusively owns the
+ * table and frame: address/width/flags, table pointer and count must not change
+ * during that lifetime. Described slot VALUES remain mutable and are traced at
+ * collection. This is a trusted native contract, not memory protection; ordinary
+ * native callers use neoclr_gc_enter_v1 and retain publication-time validation.
+ * Transient tables, fault contexts and plan strings remain on the checked path. */
+enum { NEOCLR_GC_OWNED_STORAGE = 0x200 };
+void neoclr_gc_enter_owned_v1(neoclr_probe_frame *frame, const void *context, uint32_t function,
+    const neoclr_probe_storage *storage, uint32_t count, const char *plan, uint32_t length);
+#endif
 void neoclr_probe_leave_v1(neoclr_probe_frame *frame);
 void neoclr_probe_stack_roots_v2(neoclr_probe_frame *frame, uint32_t instruction,
     const uint64_t *lanes, uint32_t lane_count, const char *plan, uint32_t length);

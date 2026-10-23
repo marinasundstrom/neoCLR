@@ -82,9 +82,9 @@ static int has_spill_marker(const char *plan, uint32_t length) {
     return 1;
 }
 #ifdef NEOCLR_NATIVE_GC
-/* Validate current descriptor bytes on every publication. Accumulate failures
- * without dereferencing slot addresses so the compiler can vectorize the scan;
- * no cached validation or immutable-descriptor assumption is introduced. */
+/* Check current descriptor bytes without reading slot values: once at owned
+ * entry, or at every publication for mutable storage/transients. Accumulate
+ * failures so the compiler can vectorize the scan. */
 static void validate_storage(const neoclr_probe_storage *storage, uint32_t count,
                              int check_flags) {
     uint32_t invalid = 0;
@@ -95,6 +95,13 @@ static void validate_storage(const neoclr_probe_storage *storage, uint32_t count
             (check_flags ? (s->flags > 2) : 0);
     }
     if (invalid) abort();
+}
+void neoclr_gc_enter_owned_v1(neoclr_probe_frame *frame, const void *context, uint32_t function,
+    const neoclr_probe_storage *storage, uint32_t count, const char *plan, uint32_t length) {
+    if (!storage) abort();
+    validate_storage(storage, count, 1);
+    neoclr_probe_enter_v3(frame, context, function, storage, count, plan, length);
+    frame->reserved = NEOCLR_GC_OWNED_STORAGE;
 }
 #endif
 void neoclr_probe_stack_roots_v2(neoclr_probe_frame *frame, uint32_t instruction,
@@ -122,7 +129,8 @@ void neoclr_probe_stack_roots_v2(neoclr_probe_frame *frame, uint32_t instruction
          * Always reject NULL, including a corrupted first frame. */
         if (!f->context || f->context != previous_context) observe_fault(f->context);
         previous_context = f->context;
-        validate_storage(f->storage, f->storage_count, 1);
+        if (!(f->reserved & NEOCLR_GC_OWNED_STORAGE))
+            validate_storage(f->storage, f->storage_count, 1);
         validate_storage(f->transient, f->transient_count, 0);
 #else
         observe_fault(f->context);
@@ -148,7 +156,8 @@ void neoclr_probe_stack_roots_v2(neoclr_probe_frame *frame, uint32_t instruction
 #ifdef NEOCLR_NATIVE_GC
 #ifdef NEOCLR_WORKER_GC
     if (neoclr_gc_worker_boundary_hook) {
-        if (frame->reserved < 0x100 || frame->reserved > 0x101) abort();
+        uint32_t worker_state = frame->reserved & ~NEOCLR_GC_OWNED_STORAGE;
+        if (worker_state < 0x100 || worker_state > 0x101) abort();
         neoclr_gc_worker_boundary_hook((neoclr_aot_context *)frame->context, probe_state.head, frame->reserved & 1);
         return;
     }
@@ -166,7 +175,7 @@ _Thread_local neoclr_gc_worker_boundary neoclr_gc_worker_boundary_hook;
 void neoclr_gc_worker_stack_roots_v1(neoclr_probe_frame *frame, uint32_t instruction,
     const uint64_t *lanes, uint32_t count, const char *plan, uint32_t length, uint32_t exclusive) {
     if (!frame || exclusive > 1) abort();
-    frame->reserved = 0x100 | exclusive;
+    frame->reserved = (frame->reserved & NEOCLR_GC_OWNED_STORAGE) | 0x100 | exclusive;
     neoclr_probe_stack_roots_v2(frame, instruction, lanes, count, plan, length);
 }
 #endif

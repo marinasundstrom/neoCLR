@@ -59,7 +59,7 @@ fn recursive_windows_object_has_inline_page_probe_and_context_entry() {
     for name in [
         "neoclr_entry_v4",
         "neoclr_native_stack_check_v1",
-        "neoclr_gc_enter_v1",
+        "neoclr_gc_enter_owned_v1",
         "neoclr_gc_leave_v1",
         "neoclr_gc_stack_roots_v1",
     ] {

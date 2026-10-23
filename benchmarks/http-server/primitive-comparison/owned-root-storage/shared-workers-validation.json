@@ -1,0 +1,166 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/owned-root-workers/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/owned-root-workers/bin/neoclr/WorkerGenerated.dll\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/bin/neoclr",
+        "disassemble",
+        "/Users/robert/Projects/neoclr/target/owned-root-workers/bin/neoclr/WorkerGenerated.dll",
+        "/Users/robert/Projects/neoclr/target/owned-root-workers/listing.txt"
+      ],
+      "exitCode": 0,
+      "stdout": "Disassembled /Users/robert/Projects/neoclr/target/owned-root-workers/bin/neoclr/WorkerGenerated.dll -> /Users/robert/Projects/neoclr/target/owned-root-workers/listing.txt\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr-codegen",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/owned-root-workers/bin/neoclr/WorkerGenerated.dll",
+        "NeoMetadata_C150BF40FAD28D9DFBF4D6BC6457CC71FFA8E24D70333E109DEB30BFB8E1CE13.F_43616C63756C617465",
+        "/Users/robert/Projects/neoclr/target/owned-root-workers/code.o",
+        "--native-host-bootstrap",
+        "--bind-user-fault",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--native-worker-safepoints",
+        "--compile-system",
+        "--reference-arena",
+        "--native-gc",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/libraries/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/libraries/System.Runtime.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/libraries/System.Runtime.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "Large output retained at /Users/robert/Projects/neoclr/target/owned-root-workers/command-2.stdout",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pthread",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/gc",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/workers",
+        "/Users/robert/Projects/neoclr/runtime/native/gc/native-gc.c",
+        "/Users/robert/Projects/neoclr/runtime/native/gc/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/native-worker-pool/parallel-host.c",
+        "/Users/robert/Projects/neoclr/runtime/native/workers/native-workers.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/owned-root-workers/optimized",
+        "/Users/robert/Projects/neoclr/runtime/native/memory/text-arena.c",
+        "/Users/robert/Projects/neoclr/target/owned-root-workers/code.o",
+        "-DNEOCLR_WORKER_GC"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-workers/optimized"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS compiled shared-heap graph/GC: 32 invocations, peak 4 active participants, 24544 coordinated collections\nPASS compiled shared-heap fault isolation: 32 invocations, peak 3 active participants, 448 coordinated collections\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pthread",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/gc",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/workers",
+        "/Users/robert/Projects/neoclr/runtime/native/gc/native-gc.c",
+        "/Users/robert/Projects/neoclr/runtime/native/gc/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/native-worker-pool/parallel-host.c",
+        "/Users/robert/Projects/neoclr/runtime/native/workers/native-workers.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/owned-root-workers/ubsan",
+        "/Users/robert/Projects/neoclr/runtime/native/memory/text-arena.c",
+        "/Users/robert/Projects/neoclr/target/owned-root-workers/code.o",
+        "-DNEOCLR_WORKER_GC",
+        "-fsanitize=undefined",
+        "-fno-sanitize-recover=all"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-root-workers/ubsan"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS compiled shared-heap graph/GC: 32 invocations, peak 4 active participants, 24544 coordinated collections\nPASS compiled shared-heap fault isolation: 32 invocations, peak 2 active participants, 448 coordinated collections\n",
+      "stderr": ""
+    }
+  ],
+  "inputs": {
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/sdk/tools/rvnc/rvnc.dll": "910fbd6babab359417703b6662d646acb5bdb1ddc982bc497dd3078461b9dea3",
+    "/Users/robert/Projects/neoclr/target/release/neoclr-codegen": "56382e0167e885dab5e7fb970d146c7ac71a5cb74b065e53f1b444f8c845bcb1",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/bin/neoclr": "6da8f7d4b470a7c748ff05cc1674b49de445b5afd7f3925b2d111908be5f85cc",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/libraries/System.Runtime.dll": "ac3ddea188cd6e7970869248c2501acc7f6f7a1bfca598c339ea3257d3fc1d4c",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/libraries/System.runtime.neox": "0c72a8656e7158d6bb2f31c0b019d8747dd61a6c4127b278155e104de437769b",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-worker-pool/Parallel.rvn": "e8cb8bce3d21eef873ad6e7de8e655e02c0e8b0825e3c70064644e89d79c5269",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-worker-pool/parallel-host.c": "0691d9bc23c1b2c574d7f0152eff0c83df45c0db8f56fb64f76807623e3c53a4",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-worker-pool/generated.py": "438c8f77e14613793c62caf88305476dc0b669b4fd7add515e5324c47c04ff4c",
+    "/Users/robert/Projects/neoclr/target/owned-root-workers/App.rvnproj": "f5428713989c2bf854ff67876ad8f921cb64c2ce539ed8054d5c98c427f7a418",
+    "/Users/robert/Projects/neoclr/runtime/codegen/src/gc_points.rs": "5de3e48104ed074593ae51bccb9cedcacca9697626fcba862b60063ee4067441",
+    "/Users/robert/Projects/neoclr/runtime/codegen/src/gc_probe.rs": "be00ea80ebffc848e2ee9794abb46bf7b1eca1effb3f9deb91695f96519163c8",
+    "/Users/robert/Projects/neoclr/runtime/codegen/src/values.rs": "a8053c1558f0bdc59c4d5996cfdc0669c9401a799a8cb77d9bf6c0812e1ec0e9",
+    "/Users/robert/Projects/neoclr/runtime/codegen/src/fault_details.rs": "8bcf85e130fb218227b4be7eb3a0272835360aaa2a4760007e708d15946e1e01",
+    "/Users/robert/Projects/neoclr/runtime/codegen/src/lib.rs": "d2e562cf265b9329fe17e2ce310c2778d9f437f658fbd867860720af19e695cc",
+    "/Users/robert/Projects/neoclr/target/owned-root-workers/bin/neoclr/WorkerGenerated.dll": "1cc6ea0f0588a6be8917800262e1e41db342b9ced2372b2169b8606c30ea9071",
+    "/Users/robert/Projects/neoclr/target/owned-root-workers/command-2.stdout": "51dc55062ef014763687274004684ad1412aeb96e40c4359c0a891dc0aae30c9",
+    "/Users/robert/Projects/neoclr/runtime/native/workers/compiled-workers.inc": "7dc3a3c3ab1286799fe25ff581d8ad49a74ad4532b0dfc2da3fd853da2c2b3c0",
+    "/Users/robert/Projects/neoclr/runtime/native/gc/native-gc.c": "1d603f3127be319a68674aee78bc96ae9810d4ac8735878fd561eea6f5fb7602",
+    "/Users/robert/Projects/neoclr/runtime/native/gc/root-probe.h": "9b91d3d52c94d46e423f36fdc4ee7392cb331f9eb1f630ab49f76050eab1951a",
+    "/Users/robert/Projects/neoclr/runtime/native/gc/root-probe.c": "50d3316c76ca39a06722de2a2657264f4f076be59343989c7bb8f7937616d993",
+    "/Users/robert/Projects/neoclr/runtime/native/gc/native-gc.h": "66ab967d634fe1a8e112ba67a4447c9c31b5903c38e95a3bafc3b04100ff4abe",
+    "/Users/robert/Projects/neoclr/runtime/native/memory/memory-views.h": "f9e0026287c2a7b20c50f80ac20845350a825c2b88c3cc5543a5fd2c2635a4db",
+    "/Users/robert/Projects/neoclr/runtime/native/memory/text-arena.c": "d1a131d5eedcc92ec448a3fa7678deb2eec10b5705d2451e950ccbed2a7d7332",
+    "/Users/robert/Projects/neoclr/runtime/native/memory/memory-views-test.c": "d3e9c18f20385a87d5388bfd6af76ae1e48a67cb1973542611061e7c4a8137de",
+    "/Users/robert/Projects/neoclr/runtime/native/memory/storage-initialization-test.c": "29e69b0ea8ce5ee7bafb636c5852eca804b7653fb02cf8f2d8c4d4165334ffb6",
+    "/Users/robert/Projects/neoclr/runtime/native/memory/text-arena.h": "a42bce970cc9221acf124323003ab3cca9dc33fc5b472fec30979ff4c2d8d8dc",
+    "/Users/robert/Projects/neoclr/runtime/native/memory/static-storage-test.c": "4989e9c97e3b39e610e49b0325f33773924d3041094f9f5947fd8523c288167f",
+    "/Users/robert/Projects/neoclr/runtime/native/workers/http-workers.h": "3879c029beae54cc42f83846d0bdd3485c26458bb3d7d2e41189091b2973e9a6",
+    "/Users/robert/Projects/neoclr/runtime/native/workers/native-workers.h": "ce5e3dbfba49bcf9b1689688d66ed2b8011ba1349e509b50c3b079344b6a4d4a",
+    "/Users/robert/Projects/neoclr/runtime/native/workers/http-workers.c": "a059777a7cdcc6c20020b2b500afa098f9361882be095fe4fc58c62d7b0577cd",
+    "/Users/robert/Projects/neoclr/runtime/native/workers/native-workers.c": "9f91f4724b402de0800262e54f5ff9b9262c1188c951dcac680b0a002cf4f538"
+  },
+  "scope": "Concurrent compiled shared heap"
+}

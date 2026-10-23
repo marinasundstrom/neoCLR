@@ -22013,3 +22013,21 @@ Forgery, eviction, reclamation and address-reuse tests passed alongside HTTP and
 checked shared-worker regression checks. Paired throughput rose 19.0%/10.7% at
 one/four owners and CPU/response fell 13.8%/12.1%; baseline drift limits numerical
 precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-bases/README.md).
+
+
+### 2026-10-23 — Generated-root metadata ownership
+
+- Author context: repeated continuation of the request to improve HTTP throughput
+  and CPU efficiency, avoid unnecessary metadata work, and learn from .NET, Java
+  and Go. The author did not specify this particular ownership design.
+- Assistant investigation: generated storage tables are initialized once in the
+  function prologue; transient tables are rewritten. Proposed a bounded frame
+  ownership contract instead of introducing an image registry immediately.
+- Action/outcome: implemented a distinct validating native entry for generated
+  fixed storage, preserving checked native/transient paths and mutable live root
+  values. Compiler, parked-root, forced-GC HTTP and shared-worker checks pass.
+  Local paired one/four-owner throughput means improve 58.9%/30.4%, CPU/response
+  falls 35.4%/28.2%; desktop variation and mixed four-owner tails remain limits.
+- Open: shared binary stack maps/image lifetimes, transient ownership and broader
+  HTTP parity remain unimplemented. No permanent roadmap reprioritization is
+  inferred from the author's continuation. [Contract/evidence](../benchmarks/http-server/primitive-comparison/owned-root-storage/README.md).

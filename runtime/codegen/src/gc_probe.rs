@@ -106,7 +106,9 @@ impl Probes {
         );
         let enter = module.declare_function(
             if gc {
-                "neoclr_gc_enter_v1"
+                // This table is emitted once in the prologue and remains fixed
+                // until frame leave, including while a cooperative stack parks.
+                "neoclr_gc_enter_owned_v1"
             } else {
                 "neoclr_probe_enter_v3"
             },

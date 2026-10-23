@@ -6378,3 +6378,16 @@ Revert the candidate and retain boundary tests; the restored implementation pass
 remain proposed work to reduce repeated checks while preserving external mutable
 descriptor validation. See
 [rejected experiment and measurements](../benchmarks/http-server/primitive-comparison/root-width/README.md).
+
+
+Generated-storage ownership (2026-10-23): the first bounded ownership contract is
+implemented at frame entry rather than through an image registry. The native
+compiler emits fixed prologue storage tables and calls a new validating entry;
+ordinary native frames and rewritten transient tables remain fully checked.
+The collector still reads mutable live slot values, including parked/cross-worker
+roots. Frame/header sizes and GC pacing are unchanged. Ninety-four optimized root
+cases, native GC sanitizer, eleven codegen checks, forced-GC HTTP and shared-worker
+stress pass. Short paired one/four-owner throughput rises 58.9%/30.4% with
+35.4%/28.2% less CPU/response; four-owner tails remain mixed. Shared binary metadata
+and image registration remain proposed, and new native objects require a matching
+runtime entry. See [contract and evidence](../benchmarks/http-server/primitive-comparison/owned-root-storage/README.md).

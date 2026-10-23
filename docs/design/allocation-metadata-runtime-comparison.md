@@ -152,3 +152,18 @@ the general execution-metadata principle, not an imitation of a particular CLR/
 HotSpot/Go cache. Paired throughput improves 19.0%/10.7% with one/four owners,
 CPU/response falls 13.8%/12.1%; desktop drift limits precision. See
 [evidence](../../benchmarks/http-server/primitive-comparison/owned-bases/README.md).
+
+
+## Generated-frame ownership follow-up (2026-10-23)
+
+The first root-metadata ownership slice uses the existing frame lifetime, avoiding
+a new image registry. neoCLR's native compiler initializes each storage descriptor
+once in the prologue; a distinct entry validates it and asserts exclusive fixed
+metadata until leave/parked-stack expiry. Slot values stay mutable and traced;
+ordinary native and transient descriptors retain their checks. This follows the
+compiler/runtime cooperation described in
+[CoreCLR stack walking](https://github.com/dotnet/runtime/blob/main/docs/design/coreclr/botr/stackwalking.md),
+without adopting its per-method unwind/GC format. Costs are entry-time validation,
+a per-ancestor marker check and a new required runtime symbol for regenerated
+objects. No frame size or allocation growth. Shared binary descriptors and image
+registration remain proposals. See [validation and measurements](../../benchmarks/http-server/primitive-comparison/owned-root-storage/README.md).

@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "command": "CARGO_INCREMENTAL=0 cargo test --release -p neoclr-codegen --test root_probes --test windows_stack",
+  "tests": {
+    "root_probes": 5,
+    "windows_stack": 6
+  },
+  "scope": "11 focused tests passed on macOS ARM64; Windows object-generation checks do not qualify Windows execution",
+  "inputs": {
+    "runtime/codegen/src/gc_probe.rs": "be00ea80ebffc848e2ee9794abb46bf7b1eca1effb3f9deb91695f96519163c8",
+    "runtime/codegen/tests/root_probes.rs": "d1770ede182dc377df84872aa27aafbaa0f1719ec6b6c9555d33d3500529e96a",
+    "runtime/codegen/tests/windows_stack.rs": "cf4210d914039f7707efd8f7aabe6dbd4b0a0f479f3acc2012c9c3abb38e4989",
+    "target/release/neoclr-codegen": "56382e0167e885dab5e7fb970d146c7ac71a5cb74b065e53f1b444f8c845bcb1"
+  }
+}

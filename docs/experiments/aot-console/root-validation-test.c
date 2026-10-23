@@ -4,6 +4,9 @@
 #include "text-arena.h"
 #include <string.h>
 #include <stdlib.h>
+#ifdef NEOCLR_NATIVE_GC
+#include "native-gc.h"
+#endif
 int main(int argc, char **argv) {
 #ifdef _WIN32
     /* Expected aborts must not open Windows crash-reporting dialogs in CI. */
@@ -15,6 +18,59 @@ int main(int argc, char **argv) {
     neoclr_probe_storage slot = {&word, 8, 0};
     neoclr_probe_frame parent, child;
     neoclr_probe_enter_v3(&parent, &outer, 0, &slot, 1, "{}", 2);
+#ifdef NEOCLR_NATIVE_GC
+    if (!strncmp(argv[1], "owned-", 6)) {
+        const char *plan = "{\"requiredSpillLanes\":[]}";
+        if (!strcmp(argv[1], "owned-entry-invalid")) {
+            slot.read_bytes = 12;
+            neoclr_gc_enter_owned_v1(&child, &outer, 1, &slot, 1, "{}", 2);
+            return 0;
+        }
+        if (!strcmp(argv[1], "owned-mixed-invalid")) {
+            neoclr_gc_enter_owned_v1(&child, &outer, 1, &slot, 0, "{}", 2);
+            slot.read_bytes = 12; /* The ordinary ancestor remains checked. */
+            neoclr_probe_stack_roots_v2(&child, 0, lanes, 0, plan, (uint32_t)strlen(plan));
+            return 0;
+        }
+        neoclr_probe_leave_v1(&parent);
+        if (!strcmp(argv[1], "owned-transient-invalid")) {
+            neoclr_gc_enter_owned_v1(&parent, &outer, 0, &slot, 0, "{}", 2);
+            neoclr_probe_transient_v2(&parent, 1, &slot, 1, "{}", 2);
+            slot.read_bytes = 12; /* Even owned frames have checked transients. */
+            neoclr_gc_enter_owned_v1(&child, &outer, 1, &slot, 0, "{}", 2);
+            neoclr_probe_stack_roots_v2(&child, 0, lanes, 0, plan, (uint32_t)strlen(plan));
+            return 0;
+        }
+        if (strcmp(argv[1], "owned-valid")) return 2;
+        uint64_t buffer[128] = {0};
+        outer.text = (neoclr_aot_text_arena){(unsigned char *)buffer, sizeof(buffer), 0};
+        void *first = NULL, *second = NULL;
+        if (neoclr_gc_allocate_v1(&outer.text, 8, NEOCLR_GC_BYTES, &first)) return 3;
+        word = (uintptr_t)first;
+        neoclr_gc_enter_owned_v1(&parent, &outer, 0, &slot, 1, "{}", 2);
+        neoclr_probe_stack_roots_v2(&parent, 0, lanes, 0, plan, (uint32_t)strlen(plan));
+        if (neoclr_gc_allocate_v1(&outer.text, 8, NEOCLR_GC_BYTES, &second)) return 4;
+        word = (uintptr_t)second; /* Live values change while descriptors stay fixed. */
+        neoclr_parked_roots saved = {0};
+        neoclr_roots_park_v1(&saved);
+        neoclr_gc_enter_owned_v1(&child, &outer, 1, &slot, 0, "{}", 2);
+        neoclr_probe_stack_roots_v2(&child, 0, lanes, 0, plan, (uint32_t)strlen(plan));
+        uint64_t bytes; uint32_t kind;
+        if (neoclr_gc_allocation_info_v1(&outer, first, &bytes, &kind) != 3 ||
+            neoclr_gc_allocation_info_v1(&outer, second, &bytes, &kind)) return 5;
+        neoclr_probe_leave_v1(&child);
+        neoclr_roots_resume_v1(&saved);
+        word = 0;
+        neoclr_probe_stack_roots_v2(&parent, 0, lanes, 0, plan, (uint32_t)strlen(plan));
+        if (outer.text.used) return 6;
+        neoclr_probe_leave_v1(&parent);
+        if (parent.reserved) return 7;
+        neoclr_probe_enter_v3(&parent, &outer, 0, &slot, 1, "{}", 2);
+        if (parent.reserved) return 8; /* Ownership never leaks across frame reuse. */
+        neoclr_probe_leave_v1(&parent);
+        return 0;
+    }
+#endif
     if (!strncmp(argv[1], "width-vector-", 13) || !strncmp(argv[1], "width-tail-", 11)) {
         int vector = !strncmp(argv[1], "width-vector-", 13);
         char *end;

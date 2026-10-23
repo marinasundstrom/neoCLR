@@ -94,6 +94,10 @@ def main():
             run(name + '-batch-valid', [binary, 'batch-valid'])
             run(name + '-context-valid', [binary, 'context-valid'])
             run(name + '-state-valid', [binary, 'state-valid'])
+            if gc:
+                for case in ['owned-entry-invalid', 'owned-mixed-invalid', 'owned-transient-invalid']:
+                    run(name + '-' + case, [binary, case], 3 if windows else -signal.SIGABRT)
+                run(name + '-owned-valid', [binary, 'owned-valid'])
             for position in ['vector', 'tail']:
                 for width in [0, 1, 3, 4, 5, 7, 8, 9, 12, 16, 2147483648, 4294967292, 4294967295]:
                     case = f'width-{position}-{width}'

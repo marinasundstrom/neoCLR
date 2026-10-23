@@ -1,0 +1,7 @@
+{
+  "note": "After validation and timing, only the validate_storage comment was corrected to describe the new call sites. Removing C block comments leaves identical source. All retained runtime tests and binaries use the same implementation.",
+  "path": "runtime/native/gc/root-probe.c",
+  "testedSha256": "50d3316c76ca39a06722de2a2657264f4f076be59343989c7bb8f7937616d993",
+  "finalSha256": "153bd6ef38d6327edc2e0f817d042ff83608861095c1cfaef5da60bd7aef0700",
+  "commentStrippedSha256": "0625ec9a2919eff111fb7e613d631e76d462e78b72634a73b3464db990144842"
+}
