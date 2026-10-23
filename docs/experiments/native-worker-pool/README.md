@@ -125,3 +125,44 @@ statics, task queues, resources and fault contexts require explicit ownership;
 do not route existing HTTP delegates into this pool yet. Only after those gates
 pass should handler-only versus whole-connection distribution be measured.
 No HTTP speedup is inferred from the primitive-compute result.
+
+## Generated-code boundary qualification — 2026-10-23
+
+[Generated.rvn](Generated.rvn) and [generated-host.c](generated-host.c) now exercise
+compiled Raven through the existing invocation ABI on all four pool threads.
+Each callback owns a separate 2 KiB arena and context on its native stack. It reads
+only a copied integer from the pool and publishes only a scalar completion. No
+managed reference crosses between these invocation heaps or into the pool heap.
+This is a qualification harness, not a new runtime dispatcher or Task binding.
+
+Eight batches rendezvous four callbacks before executing, guaranteeing participation
+by every long-lived worker. Each callback invokes the same generated entry 20 times,
+alternating invalid-cast faults and successful calls in the same context. Every call
+allocates at least 501 objects, forces collection, and retains the original boxed
+input across allocation pressure. The host checks result/fault isolation, unchanged
+output on failure, empty root stacks, complete post-invocation reclamation and an
+arena boundary sentinel. A thread-local visit count proves worker reuse over all
+eight batches. The owner also collects the separate pool heap while jobs are pending.
+
+[generated-validation.json](generated-validation.json) records 640 invocations per
+build (1,280 total), passing optimized and UBSan host/runtime builds on macOS ARM64.
+The generated machine code itself is not UBSan-instrumented. The report records
+compiler, codegen, library, source and output identities; large codegen diagnostics
+remain in the local output directory with a recorded digest. Prior TSan/ASan
+limitations still apply. There is no throughput measurement in this test.
+
+Reproduce with generated.py --bundle BUNDLE --libraries MATCHING_LIBRARIES
+--validation POOL_VALIDATION_JSON --output FRESH, using the same Xcode SDK as above.
+The validation argument supplies the successful native build recipe. Raven source
+is compiled afresh, its exact native function name is discovered from metadata,
+and the existing codegen invocation ABI is linked with the canonical runtime.
+No compiler semantics or CLI bridge representation changed.
+
+This result narrows the risk to shared execution ownership: private-context
+allocation, fault cleanup and TLS reuse work in this fixture. Shared captures,
+shared statics, resources, Task settlement, suspended stacks and HTTP/socket scopes
+remain unqualified. Unlike the intended .NET-style shared Task model, these heaps
+cannot exchange references. Do not substitute this isolation model silently for
+existing Task.Run semantics. The next integration step must publish participant
+roots to shared collection and preserve one logical owner for suspended I/O before
+routing existing HTTP callbacks to workers. Public channels remain a future design.

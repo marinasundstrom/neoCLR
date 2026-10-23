@@ -21805,3 +21805,12 @@ with two/four workers. The assistant explicitly limits this result: managed acce
 is serialized, arbitrary generated callbacks and HTTP are not integrated, and
 there is no HTTP throughput claim. Generated-code participant/safepoint and task
 publication qualification remains the next gate.
+
+Generated-code follow-through: the assistant added a Raven allocation/fault fixture
+and invoked its compiled entry on four existing pool threads, using independent
+invocation contexts. Optimized and UBSan runtime builds each pass 640 invocations,
+including forced collection, retained values, fault recovery and TLS reuse. This
+is evidence for private-context execution, not shared Task/HTTP dispatch. Shared
+statics, participant roots, suspended I/O and task publication remain open; no new
+compiler contract or HTTP throughput result is inferred. See the
+[qualification](experiments/native-worker-pool/README.md#generated-code-boundary-qualification--2026-10-23).

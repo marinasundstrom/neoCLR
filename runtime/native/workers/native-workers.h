@@ -3,9 +3,12 @@
 /* Opt-in POSIX native experiment. Not a generated-code/Task/HTTP ABI.
  * All managed access is serialized through enter/leave. Outside that interval
  * callbacks may compute on copied primitives or block, but may not dereference
- * managed pointers. The pool roots capture/result slots through owner collection.
+ * pool-managed pointers. Independent invocation arenas need their own ownership
+ * and entry/cleanup qualification; they are never collected by this pool.
+ * The pool roots capture/result slots through owner collection.
  * Never call pool APIs recursively while entered except capture/allocate/result.
- * Do not use ordinary TLS host-root, socket, fiber or compiler GC hooks here.
+ * Do not use ordinary TLS host-root, socket, fiber or compiler GC hooks on the
+ * pool context. This API does not expose that context to callbacks.
  * Native pointers/pool state must be valid and outlive all calls; destroy requires
  * joined workers and no concurrent external caller. No automatic collection on
  * allocation pressure. Per-thread GC counters do not represent pool totals. */

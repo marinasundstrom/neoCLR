@@ -1,0 +1,19 @@
+import System.*
+
+// Selected directly by the native host; no async runtime or HTTP adapter.
+public func Calculate(input: int) -> int {
+    let retained: object = input
+    var index = 0
+    while index < 500 {
+        let temporary: object = index
+        if (int)temporary != index {
+            return -99
+        }
+        index += 1
+    }
+    if input < 0 {
+        let wrong: object = true
+        return (int)wrong
+    }
+    return (int)retained
+}

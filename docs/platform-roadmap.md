@@ -6178,3 +6178,9 @@ cancellation and teardown in optimized/UBSan tests. Primitive computation overla
 across workers; TSan remains incomplete. Generated-code/Task/HTTP integration and
 parallel managed access remain open. Channels are a later design consideration,
 not a new implemented API. Preserve the existing ownership/safepoint gates.
+
+Generated-code follow-up (2026-10-23): the same [worker experiment](experiments/native-worker-pool/README.md#generated-code-boundary-qualification--2026-10-23)
+now passes 640 compiled Raven invocations per optimized/UBSan build on four reused
+workers, with private arenas, forced collection and fault recovery. This qualifies
+independent invocation contexts only; shared participants, Task publication and HTTP
+I/O ownership remain prerequisites. No HTTP speedup or public API is claimed.
