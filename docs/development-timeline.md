@@ -21949,3 +21949,21 @@ The assistant preserved forced collection and pressure recovery, strengthened th
 budget-boundary test, and checked socket/scheduler behavior. Variable tail latency,
 longer unreachable-resource retention, sustained-load qualification and the large
 reference-server gap remain open. See [experiment](../benchmarks/http-server/primitive-comparison/pacing/README.md).
+
+## 2026-10-23 — CLR guidance for allocation and metadata work
+
+The author asked to improve allocation bookkeeping and metadata processing, then
+directed, “Look at .NET for guidance in handling metadata.” The assistant reviewed
+CLR type-system, stack-walking and allocator designs. It proposed separating hot
+execution data from diagnostic metadata and keeping future allocation contexts
+behind explicit ownership/integrity contracts.
+
+Two local allocator branch/first-fit experiments did not establish a reliable gain
+and were reverted. The assistant instead implemented a bounded native-backend
+change: compact GC point payloads preserve the ordered spill map while diagnostic
+probes/inspection keep full plans. Runtime root validation and worker coordination
+remain unchanged. Paired trials show about 10% higher throughput, 9% less CPU per
+response and a 17.3% smaller application object. Forced-GC HTTP, root-probe and
+optimized/UBSan shared-worker checks pass. CLR-style binary maps, image lifetime
+registration and faster maintained allocation metadata remain proposals requiring
+separate implementation/qualification. See [evidence and sources](../benchmarks/http-server/primitive-comparison/allocation-metadata/README.md).

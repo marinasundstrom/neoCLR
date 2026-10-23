@@ -1,0 +1,50 @@
+diff --git a/target/plain-allocation-metadata/baseline.c b/target/plain-allocation-metadata/candidate.c
+index 4a657921a..72953553d 100644
+--- a/target/plain-allocation-metadata/baseline.c
++++ b/target/plain-allocation-metadata/candidate.c
+@@ -31,10 +31,16 @@ static int valid(const neoclr_aot_text_arena *a) {
+ static int block_valid(const neoclr_aot_text_arena *a, uint64_t at) {
+     if (a->used - at < sizeof(block)) return 0;
+     const block *b = (const void *)(a->data + at);
+-    return b->span >= sizeof(block) + 8 && !(b->span & 7) && b->span <= a->used - at &&
+-        b->state <= 7 && (!b->state || ((b->state & ALLOCATED) &&
+-            b->bytes && b->bytes <= b->span - sizeof(block) &&
+-            b->kind >= NEOCLR_GC_TEXT && b->kind <= NEOCLR_GC_INTERN));
++    /* The header is readable now. Combine its independent metadata checks so
++     * each heap walk avoids serial branches for the common allocated block.
++     * Free blocks still ignore payload metadata; all spans remain validated. */
++    uint64_t span = b->span, state = b->state;
++    unsigned valid_span = (span >= sizeof(block) + 8) & !(span & 7) &
++        (span <= a->used - at);
++    unsigned valid_payload = ((state & ALLOCATED) != 0) & (b->bytes != 0) &
++        (b->bytes <= span - sizeof(block)) &
++        (b->kind >= NEOCLR_GC_TEXT) & (b->kind <= NEOCLR_GC_INTERN);
++    return valid_span & (state <= 7) & ((state == 0) | valid_payload);
+ }
+ static int blocks_valid(const neoclr_aot_text_arena *a) {
+     if (!valid(a)) return 0;
+@@ -272,13 +278,19 @@ int32_t neoclr_gc_allocate_v1(neoclr_aot_text_arena *a, uint64_t bytes,
+     int oversized = bytes > UINT64_MAX - sizeof(block) - 7;
+     uint64_t needed = oversized ? UINT64_MAX : sizeof(block) + ((bytes + 7) & ~UINT64_C(7));
+     block *chosen = NULL;
+-    /* Validate every span even after finding a fit: malformed trailing headers
+-     * must fail before any heap/output mutation. Remember first-fit during that
+-     * same walk rather than searching the entire heap again. */
+-    for (uint64_t at = 0; at < a->used;) {
++    /* Find the first fit while validating its prefix, then validate the tail
++     * without repeating fit-selection work. Do not mutate until every header
++     * passes: a fitting hole must not conceal corrupt trailing metadata. */
++    uint64_t at = 0;
++    for (; at < a->used;) {
+         if (!block_valid(a, at)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+         block *b = (void *)(a->data + at);
+-        if (!chosen && !b->state && b->span >= needed) chosen = b;
++        at += b->span;
++        if (!b->state && b->span >= needed) { chosen = b; break; }
++    }
++    for (; at < a->used;) {
++        if (!block_valid(a, at)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
++        const block *b = (const void *)(a->data + at);
+         at += b->span;
+     }
+     if (oversized) return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;

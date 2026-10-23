@@ -1,0 +1,41 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "neoclr-codegen",
+        "--lib",
+        "execution_metadata_tests"
+      ],
+      "exitCode": 0,
+      "passedTests": 1
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "neoclr-codegen",
+        "--test",
+        "root_probes"
+      ],
+      "exitCode": 0,
+      "passedTests": 5
+    }
+  ],
+  "environment": {
+    "CARGO_INCREMENTAL": "0",
+    "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk"
+  },
+  "inputs": {
+    "/Users/robert/Projects/neoclr/runtime/codegen/src/gc_probe.rs": "f455c7e3dc950b1f96c7e769e4d392155de026573bc0efe7c4582270ed24c2d1",
+    "/Users/robert/Projects/neoclr/runtime/codegen/tests/root_probes.rs": "d1770ede182dc377df84872aa27aafbaa0f1719ec6b6c9555d33d3500529e96a",
+    "/Users/robert/Projects/neoclr/target/release/neoclr-codegen": "461f19f99557f7cbebb6f223c334dabacd08f14f1bcf66bbdac948fbd149ce09"
+  },
+  "note": "Only formatting in the unit-test assertion changed after compilation; production code unchanged. Interrupted debug build excluded."
+}

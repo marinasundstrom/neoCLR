@@ -167,3 +167,8 @@ remains historical evidence; forced-GC behavior and the HTTP API are unchanged.
 The subsequent [batched root validation](root-scan/README.md) preserves per-publication
 validation and improves mean one/four-owner throughput and CPU efficiency by
 about 4% in paired trials against the tuned pacing baseline.
+
+The [allocation/metadata follow-up](allocation-metadata/README.md), guided by CLR
+design, rejects two allocation-loop experiments and separates native-GC point
+payloads from complete diagnostic plans. Paired trials show about 10% higher
+throughput and 9% lower CPU per response, with a 17.3% smaller application object.

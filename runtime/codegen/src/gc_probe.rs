@@ -262,7 +262,11 @@ impl Probes {
                         },
                     );
                 }
-                let mut bytes = serde_json::to_vec(&plan)?;
+                // Native GC executes the published slot/lane tables; the rich
+                // inspection plan is diagnostic data, not a tracing program.
+                // Keep only its admitted spill map in the execution image.
+                let runtime_plan = execution_plan(&plan, gc);
+                let mut bytes = serde_json::to_vec(&runtime_plan)?;
                 let length = bytes.len();
                 bytes.push(0);
                 let data = module.declare_data(
@@ -451,5 +455,38 @@ impl Probes {
             args.push(b.ins().iconst(types::I32, i64::from(point.exclusive)));
         }
         b.ins().call(callback, &args);
+    }
+}
+
+// Keep diagnostic probes lossless. Native GC retains the spill map (including
+// order) while inspection continues to expose the original complete plan.
+fn execution_plan(plan: &serde_json::Value, native_gc: bool) -> serde_json::Value {
+    if native_gc {
+        serde_json::json!({
+            "schema": "neoclr-gc-point-v1",
+            "requiredSpillLanes": plan["requiredSpillLanes"]
+        })
+    } else {
+        plan.clone()
+    }
+}
+
+#[cfg(test)]
+mod execution_metadata_tests {
+    use super::execution_plan;
+    use serde_json::json;
+
+    #[test]
+    fn native_execution_keeps_spill_order_and_diagnostics_keep_full_plan() {
+        let plan = json!({"requiredSpillLanes": [7, 2, 19], "stackLanes": 20,
+            "roots": [{"type": "record", "layout": {"fields": [1, 2]}}]});
+        let native = execution_plan(&plan, true);
+        assert_eq!(native["requiredSpillLanes"], plan["requiredSpillLanes"]);
+        assert_eq!(native["schema"], "neoclr-gc-point-v1");
+        assert!(native.get("roots").is_none());
+        assert_eq!(execution_plan(&plan, false), plan);
+        assert!(
+            serde_json::to_vec(&native).unwrap().len() < serde_json::to_vec(&plan).unwrap().len()
+        );
     }
 }

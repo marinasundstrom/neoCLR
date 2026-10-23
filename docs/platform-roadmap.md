@@ -6293,3 +6293,12 @@ root-descriptor validation preserves the root contract and passes expanded malfo
 metadata/sanitizer tests. Paired one/four-owner HTTP trials show about 4% higher
 throughput and 4% lower CPU per response. Metadata publication and heap walks remain
 open efficiency targets; shared async HTTP scope is unchanged. See [evidence](../benchmarks/http-server/primitive-comparison/root-scan/README.md).
+
+CLR-guided allocation/metadata follow-up (2026-10-23): the author specifically
+directs using .NET for metadata guidance. Compact native-GC point payloads now
+retain executable spill maps while full plans remain diagnostic/inspection data;
+root and worker ownership semantics are unchanged. Paired plain HTTP trials improve
+throughput about 10% and CPU per response about 9%, with forced-GC and shared-worker
+validation. Two allocator loop changes showed no reliable benefit and were reverted.
+Versioned image-owned maps and explicitly maintained allocation contexts remain
+proposed next steps, not implemented contracts. See [research/evidence](../benchmarks/http-server/primitive-comparison/allocation-metadata/README.md).
