@@ -111,6 +111,8 @@ def main():
         site_config = json.loads((ROOT / 'website/site.json').read_text())
         checks.refresh_release_links(staging, site_config['releaseUrl'])
         checks.make_reference_links_relative()
+        navigation_pages = checks.share_api_navigation(staging)
+        print(f"Unified shared API navigation on {navigation_pages} pages")
         pages = {}
         for page in staging.rglob('*.html'):
             check = checks.PageCheck()

@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-23
 
+- Unify all API-reference sidebars on RavenDoc’s dynamically loaded shared native menu, including the landing page, authored guides and retained CLI pages. Restore consistent visibility of DependencyInjection, Localization, Environment and other native modules; keep a compact no-JavaScript module fallback and content-based cache invalidation. Add mixed-page/cache regression coverage and regenerate the complete website: 26 tests and all 5,703 pages pass; all 2,772 API sidebars share one menu, with dynamic loading verified in the browser.
+
 - Correct the website API-reference release banner after Preview 17 publication: pinned native HTML now receives the current site release URL while retaining its coverage notice and historical content links. All 25 website tests and 5,703 pages pass; 2,761 API pages now carry the current release link. Runtime packages and published release contents are unchanged. Confirm all 12 public asset digests and the downloaded checksum manifest, successful Pages run 39866866097, and live installation/benchmark/API/homepage checks. Record the installed matching SDK/extension and publication evidence.
 
 ## 0.1.0-preview.17 — 2026-10-23

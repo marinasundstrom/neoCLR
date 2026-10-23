@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Build one RavenDoc site from Markdown, reference metadata and tested samples."""
 import argparse
+import hashlib
 from html import escape, unescape
 from html.parser import HTMLParser
 from pathlib import Path
@@ -263,6 +264,43 @@ def selected_native_preview(audit=None):
     if NATIVE_SNAPSHOT.exists():
         return extract_snapshot(NATIVE_SNAPSHOT, ROOT / 'target/native-api-publication')
     return None
+
+
+def share_api_navigation(site):
+    """Bind mixed native/bridge/guide pages to the final native navigation tree."""
+    shared = site / 'docs/api/api-navigation.html'
+    content = shared.read_text()
+    version = hashlib.sha256(content.encode()).hexdigest()[:16]
+    panel = re.compile(r'<nav\b[^>]*class="api-navigation-panel"[^>]*>.*?</nav>', re.S)
+    if not panel.search(content):
+        raise ValueError('Final API navigation panel is missing')
+    # A small, identical module index remains usable without JavaScript. The
+    # complete type/member tree is fetched and cached by RavenDoc's own loader.
+    modules = re.findall(
+        r'<details class="api-namespace"[^>]*><summary title="([^"]*)">.*?</summary>'
+        r'<ul><li><a[^>]*href="([^"]*)"', content, re.S)
+    if not modules:
+        raise ValueError('Final API navigation has no modules')
+    count = 0
+    for page in site.rglob('*.html'):
+        if page == shared:
+            continue
+        original = page.read_text()
+        if not panel.search(original):
+            continue
+        def relative(target):
+            return posixpath.relpath(str(target), str(page.parent))
+        source = relative(shared) + '?v=' + version
+        links = [('../index.html', 'API overview')] + [(href, title) for title, href in modules]
+        fallback = ''.join(
+            f'<li><a href="{escape(relative(shared.parent / unescape(href)), quote=True)}">{title}</a></li>'
+            for href, title in links)
+        replacement = (f'<nav data-navigation-src="{escape(source, quote=True)}" '
+                       'class="api-navigation-panel" aria-label="API modules and types">'
+                       f'<ul>{fallback}</ul></nav>')
+        page.write_text(panel.sub(lambda _: replacement, original))
+        count += 1
+    return count
 
 
 def refresh_release_links(site, release_url):

@@ -147,6 +147,20 @@ The benefit is accurate, portable navigation; the cost is producing and shipping
 declaration provenance beyond execution metadata. No new source-link support is claimed
 as implemented here.
 
+## Shared API navigation
+
+`website/site.json` enables RavenDoc's `sharedApiNavigation`, as on Raven's website.
+After overlaying the native reference snapshot, the publisher binds every API sidebar
+(including `/docs/`, authored guides and retained CLI pages) to the final
+`/docs/api/api-navigation.html`. RavenDoc loads and session-caches that single tree;
+a content hash in the URL invalidates older cached menus. Pages retain a compact
+module index for use without JavaScript, rather than an embedded copy of the full tree.
+The native snapshot supplies the tree, so DependencyInjection, Localization,
+Environment and the other native modules are visible consistently across the site.
+Do not rely on the initial bridge generation's navigation: it predates those modules.
+The website regression test covers mixed page origins and cache invalidation; the
+complete build validates the shared menu's local links along with all page links.
+
 ## Build and refresh
 
 Author direction (2026-09-27): run only validation needed for the change; do not
