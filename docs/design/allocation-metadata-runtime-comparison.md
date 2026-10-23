@@ -450,3 +450,21 @@ experiment does not attribute that gap to GC or scheduling. No production policy
 changes, interpreter HTTP capacity claim or new generational-GC conclusion follows.
 The existing CoreCLR comparison still guides shared metadata and bounded lifetime
 choices; this measurement slice changes no public API or layout contract.
+
+
+### Scoped method-owner candidates — 2026-10-24
+
+The measured inheritance-resolution follow-up now adds a lazy owner index to the
+existing immutable metadata lookup scope. It groups function rows by resolved
+type-definition identity and narrows `declared_method` searches while retaining
+original ordering, owner checks, generic substitution and contract validation.
+Unscoped callers keep the linear path; nested/unwound scopes and mutations between
+scopes retain their existing lifetime rules. There is no global identity cache or
+managed object-header change.
+
+This applies the existing CoreCLR comparison's shared-resolution principle without
+copying CLR layout or changing .NET-like method semantics. Costs are a per-scope
+lazy map and function-row storage. Full signature caching would need more generic
+state and invalidation; retaining the linear fallback provides a differential
+oracle. [Validation and paired execution evidence](../../benchmarks/execution/owner-index/README.md)
+separate common loading/build costs from native HTTP request execution.

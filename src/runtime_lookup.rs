@@ -3,12 +3,17 @@
 //! their existing callers. Loading/verification and execution each hold immutable
 //! scopes; mutation between scopes rebuilds indexes rather than retaining stale rows.
 use crate::metadata::Module;
-use std::{cell::RefCell, collections::HashMap, rc::Rc};
+use std::{
+    cell::{OnceCell, RefCell},
+    collections::HashMap,
+    rc::Rc,
+};
 
 struct Index {
     module: usize,
     types: HashMap<String, Rc<[usize]>>,
     functions: HashMap<String, Rc<[usize]>>,
+    owners: OnceCell<HashMap<usize, Rc<[usize]>>>,
 }
 
 thread_local! {
@@ -40,6 +45,7 @@ pub(crate) fn with_module<R>(module: &Module, operation: impl FnOnce() -> R) -> 
     // address is dereferenced or retained after the outermost scope returns.
     let index = Rc::new(Index {
         module: address,
+        owners: OnceCell::new(),
         types: grouped(
             module
                 .types
@@ -87,6 +93,47 @@ pub(crate) fn functions(module: &Module, name: &str) -> Option<Rc<[usize]>> {
     candidates(module, name, false)
 }
 
+/// Narrow methods by resolved owner, preserving module order and exact type lookup
+/// semantics (including generic arity and array backing). Built only on demand.
+/// Addresses are identity keys within the immutable scope, never dereferenced.
+pub(crate) fn owned_functions(
+    module: &Module,
+    owner: &crate::metadata::TypeDef,
+) -> Option<Rc<[usize]>> {
+    ACTIVE.with(|active| {
+        let active = active.borrow();
+        let index = active.as_ref()?;
+        if index.module != module as *const Module as usize {
+            return None;
+        }
+        let owners = index.owners.get_or_init(|| {
+            let mut groups: HashMap<usize, Vec<usize>> = HashMap::new();
+            for (row, function) in module.functions.iter().enumerate() {
+                if let Some(owner) = function
+                    .owner
+                    .as_ref()
+                    .and_then(|ty| module.type_definition(ty))
+                {
+                    groups
+                        .entry(owner as *const _ as usize)
+                        .or_default()
+                        .push(row);
+                }
+            }
+            groups
+                .into_iter()
+                .map(|(owner, rows)| (owner, rows.into()))
+                .collect()
+        });
+        Some(
+            owners
+                .get(&(owner as *const _ as usize))
+                .cloned()
+                .unwrap_or_default(),
+        )
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -100,6 +147,77 @@ mod tests {
             ".module Example\n.function Main() -> Int32\nldc.i4 {value}\nret\n.end\n.entry Main\n"
         ))
         .unwrap()
+    }
+
+    #[test]
+    fn owner_index_is_lazy_ordered_and_rebuilt_after_mutation() {
+        let mut module = assemble(".module Owners\n.type Cell\n.end\n.type Cell<T>\n.end\n.function Main() -> Int32\nldc.i4 0\nret\n.end\n.entry Main\n").unwrap();
+        let template = module.functions[0].clone();
+        for owner in [
+            "Cell<Int32>",
+            "Cell",
+            "Missing",
+            "Cell",
+            "Cell<Int32,String>",
+        ] {
+            let mut function = template.clone();
+            function.owner = Some(crate::assembler::parse_type(owner).unwrap());
+            module.functions.push(function);
+        }
+        let check = |module: &Module| {
+            for definition in &module.types {
+                let expected: Vec<_> = module
+                    .functions
+                    .iter()
+                    .enumerate()
+                    .filter_map(|(row, f)| {
+                        f.owner
+                            .as_ref()
+                            .and_then(|ty| module.type_definition(ty))
+                            .filter(|owner| std::ptr::eq(*owner, definition))
+                            .map(|_| row)
+                    })
+                    .collect();
+                assert_eq!(&*owned_functions(module, definition).unwrap(), expected);
+            }
+        };
+        assert!(owned_functions(&module, &module.types[0]).is_none());
+        with_module(&module, || {
+            ACTIVE.with(|active| assert!(active.borrow().as_ref().unwrap().owners.get().is_none()));
+            check(&module);
+            let rows = owned_functions(&module, &module.types[0]).unwrap();
+            assert_eq!(&*rows, &[2, 4]);
+            assert!(Rc::ptr_eq(
+                &rows,
+                &owned_functions(&module, &module.types[0]).unwrap()
+            ));
+            let other = super::tests::module(1);
+            let caught = std::panic::catch_unwind(|| {
+                with_module(&other, || {
+                    assert!(owned_functions(&module, &module.types[0]).is_none());
+                    panic!("restore owner scope");
+                })
+            });
+            assert!(caught.is_err());
+            assert!(Rc::ptr_eq(
+                &rows,
+                &owned_functions(&module, &module.types[0]).unwrap()
+            ));
+            std::thread::scope(|scope| {
+                scope
+                    .spawn(|| {
+                        assert!(owned_functions(&module, &module.types[0]).is_none());
+                        with_module(&module, || check(&module));
+                    })
+                    .join()
+                    .unwrap();
+            });
+        });
+        module.functions[2].owner = Some(crate::assembler::parse_type("Cell<Int32>").unwrap());
+        with_module(&module, || {
+            check(&module);
+            assert_eq!(&*owned_functions(&module, &module.types[0]).unwrap(), &[4]);
+        });
     }
 
     #[test]

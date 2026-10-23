@@ -324,24 +324,31 @@ fn declared_method(
         .ok_or_else(|| Fault::new("unknown method owner"))?;
     // CLI array storage carries the nominal System.Array<T> element argument too.
     let arguments = owner.generic_arguments();
-    for method in &module.functions {
-        if method.instance
-            && method.interface_implementations.is_empty()
-            && method
-                .owner
-                .as_ref()
-                .and_then(|t| module.type_definition(t))
-                .is_some_and(|d| std::ptr::eq(d, definition))
-        {
-            let candidate = method.map_types(|ty| ty.substitute_type_parameters(arguments))?;
-            if candidate.name.rsplit('.').next() == contract.name.rsplit('.').next()
-                && candidate.parameters == contract.parameters
+    let find = |methods: &mut dyn Iterator<Item = &crate::metadata::Function>| {
+        for method in methods {
+            if method.instance
+                && method.interface_implementations.is_empty()
+                && method
+                    .owner
+                    .as_ref()
+                    .and_then(|t| module.type_definition(t))
+                    .is_some_and(|d| std::ptr::eq(d, definition))
             {
-                return Ok(Some(candidate));
+                let candidate = method.map_types(|ty| ty.substitute_type_parameters(arguments))?;
+                if candidate.name.rsplit('.').next() == contract.name.rsplit('.').next()
+                    && candidate.parameters == contract.parameters
+                {
+                    return Ok(Some(candidate));
+                }
             }
         }
+        Ok(None)
+    };
+    if let Some(rows) = crate::runtime_lookup::owned_functions(module, definition) {
+        find(&mut rows.iter().map(|&row| &module.functions[row]))
+    } else {
+        find(&mut module.functions.iter())
     }
-    Ok(None)
 }
 // Rootless nominal records have an implicit Object view. Values adapt its slot
 // to a managed box receiver; reference classes retain their object receiver.
@@ -621,5 +628,54 @@ pub(crate) fn require_concrete(module: &Module, ty: &Type) -> Result<(), Fault> 
         Err(Fault::new("cannot instantiate an abstract record"))
     } else {
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod owner_index_tests {
+    use super::*;
+
+    #[test]
+    fn indexed_validation_and_dispatch_match_linear_results() {
+        let module = crate::assemble(".module Owners\n.entry Main\n.type Base\n.method instance virtual byref Read() -> Int32\nldc.i4 1\nret\n.end\n.end\n.type Child\n.extends Base\n.method instance override byref Read() -> Int32\nldc.i4 42\nret\n.end\n.end\n.function Main() -> Int32\nldc.i4 0\nret\n.end").unwrap();
+        let contract = module
+            .functions
+            .iter()
+            .find(|f| f.name == "Base.Read")
+            .unwrap()
+            .clone();
+        let child = Type::from_name("Child");
+        let check = |module: &Module| {
+            let expected = validate(module).map_err(|fault| fault.message);
+            let target = dispatch(module, &child, &contract)
+                .map(|f| serde_json::to_value(f).unwrap())
+                .map_err(|fault| fault.message);
+            crate::runtime_lookup::with_module(module, || {
+                assert_eq!(validate(module).map_err(|fault| fault.message), expected);
+                assert_eq!(
+                    dispatch(module, &child, &contract)
+                        .map(|f| serde_json::to_value(f).unwrap())
+                        .map_err(|fault| fault.message),
+                    target
+                );
+            });
+        };
+        assert!(validate(&module).is_ok());
+        check(&module);
+        for change in 0..3 {
+            let mut invalid = module.clone();
+            let method = invalid
+                .functions
+                .iter_mut()
+                .find(|f| f.name == "Child.Read")
+                .unwrap();
+            match change {
+                0 => method.is_override = false,
+                1 => method.receiver_readonly = true,
+                _ => method.returns = Type::String,
+            }
+            assert!(validate(&invalid).is_err());
+            check(&invalid);
+        }
     }
 }

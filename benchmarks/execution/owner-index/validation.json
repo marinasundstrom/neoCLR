@@ -1,0 +1,37 @@
+{
+  "baselineRevision": "97d62c3fe",
+  "unchangedDependencies": {
+    "/Users/robert/Projects/neoclr/target/transient-handoff-corpus-wrapped/tasks/bin/neoclr/App.dll": "fb3d1f80bd97ce0c15042dfbfed1bfcebfbe0b893f272fe9cca44b74cba7ae19",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.runtime.neox": "0c72a8656e7158d6bb2f31c0b019d8747dd61a6c4127b278155e104de437769b",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Runtime.dll": "ac3ddea188cd6e7970869248c2501acc7f6f7a1bfca598c339ea3257d3fc1d4c",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Data.dll": "846771708d06ae117fd6eb3019fbd7805ba9e3794b456c7b89d637893c7954a6",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Networking.dll": "d2c27984c00e7d89eabcb9ced7a0004557077cbef57fdb4292e264ddf2a4a4b2",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Web.dll": "434d63e3191c7a496c263dcd454807ddd32979cd4bb52bf9005af60178d7313e",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Data.PostgreSql.dll": "d456bee492ff5836a4e9f1297157f8d4fa2bfacb81cf6d9bfd2e0d99ce89da09",
+    "/Users/robert/Projects/neoclr/target/transient-handoff-corpus-wrapped/collections/bin/neoclr/App.dll": "4fb57fa8447f05a1c775d15ed1a18d33d9adcea65f2d828587cda1b92d8dcd30"
+  },
+  "checks": [
+    {
+      "command": "cargo test --release --lib runtime_lookup::tests",
+      "passed": 3
+    },
+    {
+      "command": "cargo test --release --lib owner_",
+      "passed": 20,
+      "ignored": 1,
+      "ignoredReason": "TLS fixture requires ephemeral certificate paths; unrelated to metadata index"
+    },
+    {
+      "command": "cargo test --release --test class_virtual --test class_inheritance --test interface_inheritance --test nominal_inheritance --test inherited_layout --test root_object_overrides",
+      "passed": 44
+    }
+  ],
+  "inputs": {
+    "benchmarks/execution/owner-index/http.py": "3e1da276b51ab51ba98389303454ae7f0513f65d44339867ea64bbf868460599",
+    "benchmarks/execution/owner-index/measure.py": "3584e97b6b54a4d16ecc37109b0600cc7bc1f4cffe34b280afa7acad0bdbb1a9",
+    "benchmarks/execution/owner-index/summarize.py": "04ef83a23c0ec7a84c86620cf09d559fc4c91f2c460818a77f3b4037e7caa100",
+    "target/gc-mode-comparison-final/paced-False.dylib": "4b45ca46e4635a36137f9263e8da1d416d7258854f63c67791781d28bd75b498",
+    "target/primitive-comparison-refresh/client": "3cb6aa638332295893b82a57e279bf42f62685e4bee6471c37fc163f4a78a579"
+  },
+  "platform": "Darwin Roberts-MacBook-Pro.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:27 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T8103 arm64"
+}

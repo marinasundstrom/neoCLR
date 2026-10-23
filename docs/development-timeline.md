@@ -22221,3 +22221,10 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   measure interpreter execution/coordination before redesigning its heap.
   Production behavior is unchanged. [Measurements and limits](../benchmarks/execution/gc-mode-comparison/README.md).
   Generational GC remains open; these experiments do not settle its benefit.
+
+- Follow-up after the author's continuation: assistant implements the proposed
+  immutable-scope method-owner index. Differential/lifetime tests and 44 integration
+  tests pass. Paired local measurements show 30–32% lower interpreter process time,
+  21–22% lower JIT selection/verification time and 10.4% lower HTTP JIT readiness
+  time. Task/collection/HTTP AOT objects are byte-identical. These are loading/startup
+  improvements, not a warm native throughput claim. [Implementation evidence](../benchmarks/execution/owner-index/README.md).

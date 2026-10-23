@@ -6581,3 +6581,16 @@ immutable owner/method index with unchanged verification. Warm JIT/AOT HTTP cost
 need separate matched ownership/import/TLS profiling; production behavior is
 unchanged. [Evidence, priorities and limitations](../benchmarks/execution/gc-mode-comparison/README.md).
 This does not reorder the broader active milestone or claim peer-server parity.
+
+
+### Scoped owner indexing — 2026-10-24
+
+The measured common-loading follow-up is implemented: inheritance searches use a
+lazy method-owner index scoped to immutable metadata, retaining ordering and all
+existing contract checks plus the unscoped linear fallback. Differential/lifetime
+checks and 44 integration tests pass. Paired local interpreter process time falls
+30–32%, JIT selection/verification 21–22%, and HTTP JIT readiness 10.4%. Three AOT
+objects remain byte-identical; warm native request throughput is unchanged by
+this Rust loading optimization. [Evidence and limits](../benchmarks/execution/owner-index/README.md).
+Native request-path profiling and GC work remain distinct follow-ups; broader
+milestone sequencing is unchanged.

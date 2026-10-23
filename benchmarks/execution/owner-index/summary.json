@@ -1,0 +1,52 @@
+[
+  {
+    "sample": "tasks",
+    "mode": "interpreter",
+    "field": "wallSeconds",
+    "seconds": {
+      "baseline": 4.824841833999997,
+      "candidate": 3.2999724159999992
+    },
+    "reductionPercent": 31.604547267320825
+  },
+  {
+    "sample": "tasks",
+    "mode": "jit",
+    "field": "selectionAndVerificationSeconds",
+    "seconds": {
+      "baseline": 3.128523,
+      "candidate": 2.441569666
+    },
+    "reductionPercent": 21.957752396258556
+  },
+  {
+    "sample": "collections",
+    "mode": "interpreter",
+    "field": "wallSeconds",
+    "seconds": {
+      "baseline": 4.769981334000001,
+      "candidate": 3.3393718330000013
+    },
+    "reductionPercent": 29.99193080280509
+  },
+  {
+    "sample": "collections",
+    "mode": "jit",
+    "field": "selectionAndVerificationSeconds",
+    "seconds": {
+      "baseline": 3.20405625,
+      "candidate": 2.517481042
+    },
+    "reductionPercent": 21.428313188946035
+  },
+  {
+    "sample": "http",
+    "mode": "jit",
+    "field": "readySeconds",
+    "seconds": {
+      "baseline": 6.935181625,
+      "candidate": 6.212368895499999
+    },
+    "reductionPercent": 10.422405188270767
+  }
+]
