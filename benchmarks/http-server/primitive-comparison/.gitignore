@@ -1,0 +1,4 @@
+bin/
+kestrel/bin/
+kestrel/obj/
+__pycache__/

@@ -21902,3 +21902,37 @@ GC stress tests still pass. This is a bounded scheduling improvement, not shared
 async HTTP completion or external-server parity. Lower-cost safepoints/pacing and
 async resource ownership remain open; channels/green threads are not prerequisites.
 See [evidence and limitations](experiments/native-worker-pool/README.md#coordination-cost-and-completion-wakeups--2026-10-23).
+
+
+## 2026-10-23 — Plain-text throughput, worker efficiency and reference servers
+
+The author asked to compare neoCLR's throughput with other web servers and to
+investigate their language/runtime/API approaches: being the fastest is not required,
+but the attainable result should be measured. The author then clarified that plain
+request/response handling is the basic measurement, with complex samples secondary.
+An initial emphasis on throughput with few allocations was subsequently refined:
+“Primary is increasing throughout via the use of worker thread. And using the
+least CPU as possible,” followed by the correction “Throughput.” Allocation counts
+are therefore secondary diagnostics, not the first optimization gate; JSON comes
+after the plain baseline.
+
+The assistant created direct ten-byte response consumers for neoCLR, Go, Node and
+Kestrel and researched .NET thread-pool/async guidance, Go connection goroutines,
+Node event-loop/worker separation, and Hyper/Tokio async services and ownership.
+The first Python driver saturated its CPU; a subsequent Go HTTP driver encountered
+ephemeral-port exhaustion at higher connection-close rates. The assistant retained
+those calibration outcomes and used a two-processor compiled TCP client that waits
+for server EOF, without changing system TCP settings.
+
+All 14 final comparison trials pass response checks and clean shutdown. neoCLR
+measures 485–491 requests/s with one owner and 1,531–1,693 with four. Estimated
+server CPU per response grows from about 2.05 ms to 2.28–2.42 ms; single-setting
+reference servers achieve roughly 19,000–25,000 requests/s in this short local
+connection-close workload. These are baseline observations, not production maxima
+or framework rankings. Shared async HTTP, keep-alive, CPU attribution on the new
+fixture and future throughput improvements remain open.
+
+The earlier in-progress synchronous safepoint polling optimization was completed
+and committed with GC stress tests and separate graph measurements. It is retained
+as runtime evidence, not counted as a plain HTTP improvement.
+See [primary baseline, sources and reproduction](../benchmarks/http-server/primitive-comparison/README.md).

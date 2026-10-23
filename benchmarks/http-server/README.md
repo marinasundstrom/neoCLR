@@ -1,5 +1,11 @@
 # HTTP server request-processing baseline
 
+Current author-directed throughput/CPU baseline (2026-10-23):
+[plain-text server primitives](primitive-comparison/README.md), comparing neoCLR
+one/four-owner HTTP with Go, Node and Kestrel. It has no artificial handler task
+hop; complex samples below remain separate historical/secondary evidence.
+
+
 This controller builds the existing Raven plain-text server once, then runs the
 same assembly through interpreter and default JIT and its native compilation through
 AOT. It uses the exact qualified Preview 14 macOS ARM64 bundle and the repository's

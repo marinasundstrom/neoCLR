@@ -1,22 +1,15 @@
 # Native HTTP worker threads — investigation, 2026-10-23
 
-Status: the [bounded native prototype](../experiments/native-worker-pool/README.md)
-now implements a serial managed-access pool with explicit capture/result rooting,
-mailbox wakeups and joined teardown. Eight explicit temporary-root slots per job
-now retain participant locals across gate release and owner collection. Primitive CPU work overlaps across workers.
-A generated Raven harness now qualifies forced collection, fault recovery and TLS
-reuse in independent per-invocation contexts on four workers. Shared generated-code
-parallel-mutator integration and public threading APIs remain unimplemented.
-The isolated HTTP host and native read/mutation checkpoints below are implemented
-experiments; their ownership models do not establish shared generated concurrency.
-A synchronous shared callback bridge now publishes the pool root set to existing
-compiler collection hooks under the heap gate. Synchronous faults now belong to
-individual jobs, with rooted diagnostics copied before ticket consumption;
-a bounded owner completion pump delivers tickets outside the gate. Generated
-continuation wakeups and async/resource ownership remain open.
-The architecture below remains a proposal beyond that checkpoint.
-The author explicitly requested worker-thread investigation inspired by modern
-web application frameworks.
+Status (2026-10-23): isolated application workers provide the working multicore
+HTTP path. Synchronous compiled callbacks also have an opt-in shared-heap
+coordinator with GC-qualified participant roots, job-local faults, separate
+completion notifications and atomic quiescence polling. Shared asynchronous
+Task/I/O dispatch remains unqualified. Earlier checkpoints are recorded below.
+
+The author now prioritizes [plain-text throughput and CPU per response](../../benchmarks/http-server/primitive-comparison/README.md)
+against other web server primitives; allocation work is secondary and JSON comes
+later. Reference Go/Node/Kestrel measurements and Hyper/Tokio API research are in
+that baseline. A shared-heap graph speedup must not be presented as HTTP throughput.
 
 ## Recommendation and comparison
 

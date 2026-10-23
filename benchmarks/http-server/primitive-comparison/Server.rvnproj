@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><NeoClrLibraryRoot Condition="'$(NeoClrLibraryRoot)' == ''">$(NeoClrBundleRoot)/lib</NeoClrLibraryRoot></PropertyGroup>
+  <Import Project="$(NeoClrLibraryRoot)/NeoCLR.ClassLibrary.props" />
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>PrimitiveComparison</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup><Compile Include="Server.rvn" /></ItemGroup>
+</Project>

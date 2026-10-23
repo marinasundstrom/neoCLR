@@ -1,0 +1,184 @@
+{
+  "meaning": "Calibration only; superseded by compiled TCP client waiting for EOF, two processors.",
+  "runs": [
+    {
+      "driver": "python",
+      "passed": true,
+      "fullLocalReport": "/Users/robert/Projects/neoclr/target/primitive-comparison-first/comparison.json",
+      "sha256": "c99cfc92ea2c08c91d5d733ff7c13d8083155803f63ed110199e3151f3091d51",
+      "trials": [
+        {
+          "name": "neoclr-1",
+          "requestsPerSecond": 419.0,
+          "clientCpuPerWall": 0.18775656375903174
+        },
+        {
+          "name": "go-1",
+          "requestsPerSecond": 5911.666666666667,
+          "clientCpuPerWall": 0.9610837888032705
+        },
+        {
+          "name": "node-1",
+          "requestsPerSecond": 6148.666666666667,
+          "clientCpuPerWall": 0.9636084138100071
+        },
+        {
+          "name": "kestrel-1",
+          "requestsPerSecond": 5128.833333333333,
+          "clientCpuPerWall": 0.8947452533053901
+        },
+        {
+          "name": "neoclr-4",
+          "requestsPerSecond": 1398.5,
+          "clientCpuPerWall": 0.7563503264335268
+        },
+        {
+          "name": "go-4",
+          "requestsPerSecond": 5794.166666666667,
+          "clientCpuPerWall": 0.9503602415978804
+        },
+        {
+          "name": "kestrel-4",
+          "requestsPerSecond": 5887.666666666667,
+          "clientCpuPerWall": 0.948804231613112
+        },
+        {
+          "name": "kestrel-4",
+          "requestsPerSecond": 5938.333333333333,
+          "clientCpuPerWall": 0.9507085339522459
+        },
+        {
+          "name": "go-4",
+          "requestsPerSecond": 5773.0,
+          "clientCpuPerWall": 0.9443300934934694
+        },
+        {
+          "name": "neoclr-4",
+          "requestsPerSecond": 1657.6666666666667,
+          "clientCpuPerWall": 0.870634453750713
+        },
+        {
+          "name": "kestrel-1",
+          "requestsPerSecond": 5702.833333333333,
+          "clientCpuPerWall": 0.9536338364256359
+        },
+        {
+          "name": "node-1",
+          "requestsPerSecond": 5922.333333333333,
+          "clientCpuPerWall": 0.9599926089826776
+        },
+        {
+          "name": "go-1",
+          "requestsPerSecond": 5925.166666666667,
+          "clientCpuPerWall": 0.9588463477851991
+        },
+        {
+          "name": "neoclr-1",
+          "requestsPerSecond": 475.5,
+          "clientCpuPerWall": 0.15074976167803064
+        }
+      ]
+    },
+    {
+      "driver": "go-http-one-processor",
+      "passed": true,
+      "fullLocalReport": "/Users/robert/Projects/neoclr/target/primitive-comparison-go-client/comparison.json",
+      "sha256": "c6700d218518698b3ca6fecaaa418a9159b418a8383a57a7a41f0e77a27af6e8",
+      "trials": [
+        {
+          "name": "neoclr-1",
+          "requestsPerSecond": 399,
+          "clientCpuPerWall": 0.038300213418352415
+        },
+        {
+          "name": "go-1",
+          "requestsPerSecond": 20606.5,
+          "clientCpuPerWall": 0.9406497970960742
+        },
+        {
+          "name": "node-1",
+          "requestsPerSecond": 19881,
+          "clientCpuPerWall": 0.9242793107031947
+        },
+        {
+          "name": "kestrel-1",
+          "requestsPerSecond": 19133,
+          "clientCpuPerWall": 0.9223752423215273
+        },
+        {
+          "name": "neoclr-4",
+          "requestsPerSecond": 1331.6666666666667,
+          "clientCpuPerWall": 0.3033120580630326
+        },
+        {
+          "name": "go-4",
+          "requestsPerSecond": 16281,
+          "clientCpuPerWall": 0.9025394419636575
+        },
+        {
+          "name": "kestrel-4",
+          "requestsPerSecond": 15595.833333333334,
+          "clientCpuPerWall": 0.8864980033332389
+        },
+        {
+          "name": "kestrel-4",
+          "requestsPerSecond": 17079.333333333332,
+          "clientCpuPerWall": 0.9266572689154313
+        },
+        {
+          "name": "go-4",
+          "requestsPerSecond": 18416.333333333332,
+          "clientCpuPerWall": 0.9086268316325252
+        },
+        {
+          "name": "neoclr-4",
+          "requestsPerSecond": 1553,
+          "clientCpuPerWall": 0.45306409715109286
+        },
+        {
+          "name": "kestrel-1",
+          "requestsPerSecond": 18155,
+          "clientCpuPerWall": 0.9133938963662126
+        },
+        {
+          "name": "node-1",
+          "requestsPerSecond": 18187,
+          "clientCpuPerWall": 0.928686507363208
+        },
+        {
+          "name": "go-1",
+          "requestsPerSecond": 18028.5,
+          "clientCpuPerWall": 0.9058031197856219
+        },
+        {
+          "name": "neoclr-1",
+          "requestsPerSecond": 395.1666666666667,
+          "clientCpuPerWall": 0.04741419732179954
+        }
+      ]
+    },
+    {
+      "driver": "go-http-two-processors",
+      "passed": false,
+      "fullLocalReport": "/Users/robert/Projects/neoclr/target/primitive-comparison-final/comparison.json",
+      "sha256": "d8bbb898067f1e38ffd797b62598e29b75518e7ca6a553ed4e68f24eaee4b637",
+      "trials": [
+        {
+          "name": "neoclr-1",
+          "requestsPerSecond": 416.6666666666667,
+          "clientCpuPerWall": 0.04450835113744877
+        }
+      ],
+      "failure": {
+        "command": [
+          "/Users/robert/Projects/neoclr/target/primitive-comparison-final/client",
+          "56645",
+          "6"
+        ],
+        "exitCode": 2,
+        "stdout": "",
+        "stderr": "panic: Get \"http://127.0.0.1:56645/\": dial tcp 127.0.0.1:56645: connect: can't assign requested address\n\ngoroutine 1 [running]:\nmain.main()\n\t./client.go:91 +0x8b4\n"
+      }
+    }
+  ]
+}

@@ -6265,3 +6265,16 @@ two local trials without changing allocation/collection counts. Native and compi
 GC stress regressions pass. The concurrent graph path remains slower than exclusive
 execution; lower-cost safepoints and pacing precede shared async HTTP migration.
 See [cost evidence](experiments/native-worker-pool/README.md#coordination-cost-and-completion-wakeups--2026-10-23).
+
+
+Plain-text throughput priority clarification (2026-10-23): the author explicitly
+prioritizes as many plain requests as possible through worker threads with minimal
+CPU cost; allocation minimization is secondary, and JSON/complex handlers come
+later. The [primary baseline](../benchmarks/http-server/primitive-comparison/README.md)
+now compares neoCLR with Go, Node and Kestrel using direct ten-byte responses.
+Four neoCLR owners scale approximately 3.1–3.5 times one owner, but estimated CPU
+per response rises and reference servers remain substantially faster. This selects
+plain-request worker efficiency as the next measurement target, not a framework
+feature expansion. Synchronous shared-heap safepoint polling also passes forced-GC
+tests with lower coordination cost; that graph result is secondary and is not an
+HTTP speedup. See [polling evidence](experiments/native-worker-pool/README.md#cooperative-polling-fast-path--2026-10-23).
