@@ -1,0 +1,73 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "mode": "optimized",
+      "case": "valid",
+      "exitCode": 0
+    },
+    {
+      "mode": "optimized",
+      "case": "function",
+      "exitCode": -6
+    },
+    {
+      "mode": "optimized",
+      "case": "instruction",
+      "exitCode": -6
+    },
+    {
+      "mode": "optimized",
+      "case": "capacity",
+      "exitCode": -6
+    },
+    {
+      "mode": "optimized",
+      "case": "overflow",
+      "exitCode": -6
+    },
+    {
+      "mode": "optimized",
+      "case": "mismatch",
+      "exitCode": -6
+    },
+    {
+      "mode": "sanitized",
+      "case": "valid",
+      "exitCode": 0
+    },
+    {
+      "mode": "sanitized",
+      "case": "function",
+      "exitCode": -6
+    },
+    {
+      "mode": "sanitized",
+      "case": "instruction",
+      "exitCode": -6
+    },
+    {
+      "mode": "sanitized",
+      "case": "capacity",
+      "exitCode": -6
+    },
+    {
+      "mode": "sanitized",
+      "case": "overflow",
+      "exitCode": -6
+    },
+    {
+      "mode": "sanitized",
+      "case": "mismatch",
+      "exitCode": -6
+    },
+    {
+      "mode": "gc",
+      "disabledObjectIdentical": true
+    },
+    {
+      "mode": "probe",
+      "disabledObjectIdentical": true
+    }
+  ]
+}

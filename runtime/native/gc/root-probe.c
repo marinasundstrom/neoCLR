@@ -7,6 +7,10 @@
 /* Resolve one thread-local object for the related hot publication state. This
  * changes only private storage: frame chains, counters and search hints retain
  * their independent lifetimes and are never shared between native threads. */
+#if defined(NEOCLR_NATIVE_GC) && defined(NEOCLR_GC_SITE_PROFILE)
+/* Optional diagnostic sink; absent from ordinary runtime builds. */
+extern void neoclr_gc_site_profile_v1(uint32_t function, uint32_t instruction);
+#endif
 static _Thread_local struct {
     neoclr_probe_frame *head;
     uint64_t calls;
@@ -153,6 +157,9 @@ void neoclr_probe_stack_roots_v2(neoclr_probe_frame *frame, uint32_t instruction
     (void)value;
 #endif
     probe_state.calls++;
+#if defined(NEOCLR_NATIVE_GC) && defined(NEOCLR_GC_SITE_PROFILE)
+    neoclr_gc_site_profile_v1(frame->function, instruction);
+#endif
 #ifdef NEOCLR_NATIVE_GC
 #ifdef NEOCLR_WORKER_GC
     if (neoclr_gc_worker_boundary_hook) {

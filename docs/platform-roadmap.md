@@ -6403,3 +6403,12 @@ collections per response. Next bounded investigation: method/site attribution of
 per-request execution and publication costs before broader optimization. Persistent
 connections/shared async HTTP remain separate gaps. See
 [current comparison](../benchmarks/http-server/primitive-comparison/peer-refresh/README.md).
+
+Publication attribution follow-up (2026-10-23): the checked diagnostic run maps every
+site against byte-reproduced application metadata. PushCore, EncodeResponse and
+Parse account for 29.7% of publications; slice access is another visible source.
+Twelve diagnostic cases pass; disabled instrumentation leaves GC/probe objects
+byte-identical. This completes publication-count attribution, not CPU attribution
+or the throughput objective. Next bounded slice: reduce repeated byte-loop/accessor
+work with preserved validation and GC/worker contracts, then measure paired CPU and
+throughput. See [evidence](../benchmarks/http-server/primitive-comparison/site-profile/README.md).

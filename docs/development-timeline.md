@@ -22050,3 +22050,11 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   and sites before selecting larger safe reductions; additional workers alone
   do not address the measured CPU gap. Keep-alive/shared async HTTP remain open.
   [Evidence and limits](../benchmarks/http-server/primitive-comparison/peer-refresh/README.md).
+
+- Author follow-up: “Continue. If we can reach the Kestrel number, that would be
+  great.” Assistant action: added diagnostic publication attribution, verified
+  method identities against a byte-reproduced application object, and checked
+  counters and disabled-build identity. The top three parsing/encoding methods
+  own 29.7% of publications; these are counts, not CPU shares. Kestrel parity is
+  still open, with byte-loop/accessor work the next investigation.
+  [Diagnostic evidence](../benchmarks/http-server/primitive-comparison/site-profile/README.md).
