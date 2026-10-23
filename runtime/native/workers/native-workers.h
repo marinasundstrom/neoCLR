@@ -70,6 +70,18 @@ void neoclr_worker_leave(neoclr_worker_job *);
 int neoclr_workers_wait(neoclr_workers *, neoclr_worker_handle, unsigned timeout_ms);
 int neoclr_workers_take(neoclr_workers *, neoclr_worker_handle, int *outcome,
     neoclr_worker_value *, neoclr_worker_handle *root);
+/* Owner-side bounded completion pump, not an async scheduler binding. Invokes
+ * each terminal ticket at most once in settlement order, outside the heap gate.
+ * Callback may inspect diagnostics, take results, collect or submit more work.
+ * Notification does not consume a ticket: explicit take still releases storage.
+ * Polling take before dispatch suppresses that notification. A racing external
+ * take can invalidate the ticket; use one consumer if delivery must consume it.
+ * Return count, or -1 for wrong owner, nested dispatch, null callback, limit >16.
+ * Zero limit is a no-op. Newly completed jobs may use the remaining budget.
+ * Callback/state must remain valid for this synchronous call; no managed pointers
+ * in state. Destroy is rejected during dispatch, including after callback close. */
+typedef void (*neoclr_worker_completion)(neoclr_workers *, neoclr_worker_handle, void *);
+int neoclr_workers_dispatch(neoclr_workers *, unsigned limit, neoclr_worker_completion, void *);
 /* Terminal diagnostic snapshot before take. Copies UTF-8 bytes without a NUL;
  * never exports managed pointers. 1 copied (code 0 means no guest fault), 0 pending,
  * -1 invalid, -2 insufficient buffer. Non-success preserves outputs. Take releases

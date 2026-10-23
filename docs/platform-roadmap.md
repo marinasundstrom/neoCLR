@@ -6207,3 +6207,9 @@ Optimized/UBSan tests cover 87 successful shared calls around one failure plus
 cancel-before-settlement and diagnostics surviving collection. This supersedes the
 initial pool-poisoning limitation; shared async Task/I/O integration is still open.
 See [fault ownership](experiments/native-worker-pool/README.md#job-local-callback-faults--2026-10-23).
+
+Owner-delivery follow-up (2026-10-23): completion tickets can now be dispatched in
+settlement order, at most once, under a bounded owner-side pump that invokes native
+consumers outside the heap gate. Eight optimized/UBSan groups and compiled shared
+callback delivery pass. Task/Promise and async wakeups are still owner-local and
+not wired to this pump; see [delivery evidence](experiments/native-worker-pool/README.md#owner-side-completion-delivery--2026-10-23).

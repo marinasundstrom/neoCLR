@@ -21844,3 +21844,12 @@ copy-before-take, stale handles, cancellation precedence and later job recovery.
 The assistant records the fixed storage/stack cost and keeps async Task semantics
 and parallel managed execution open. This supersedes the initial bridge's shared
 fault poisoning without claiming an HTTP throughput result.
+
+Owner completion follow-through: inspection found that Raven Promise/TaskQueue and
+native async wakeups remain owner-local. The assistant added a bounded native
+owner delivery pump instead of invoking those contracts on worker threads. It
+delivers completed tickets in settlement order outside the heap gate, retains
+results until take, and supports collection and follow-up submission in consumers.
+Tests pass for delivery identity/order/budgets, cancellation, duplicate suppression
+and close lifetime; the shared Raven fixture now consumes results and faults through
+that pump. Generated continuation wakeups and HTTP integration remain unimplemented.

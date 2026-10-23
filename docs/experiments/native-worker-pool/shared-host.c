@@ -75,6 +75,35 @@ static void cancellation_wins(void) {
     CHECK(neoclr_workers_root_release(pool, callback));
     CHECK(neoclr_workers_close(pool) && neoclr_workers_destroy(pool));
 }
+typedef struct { unsigned faults, successes; } observations;
+static void observe(neoclr_workers *pool, neoclr_worker_handle ticket, void *state) {
+    observations *stats = state;
+    neoclr_worker_value value; neoclr_worker_handle root; int outcome;
+    CHECK(neoclr_workers_wait(pool, ticket, 10000) == 1);
+    uint64_t extent, scalar;
+    CHECK(neoclr_workers_collect(pool, &extent));
+    neoclr_worker_fault_info info = {99,99,99};
+    unsigned char message[128];
+    CHECK(neoclr_workers_fault_copy(pool, ticket, &info, message, sizeof(message)) == 1);
+    if (info.code) {
+        CHECK(info.code == NEOCLR_AOT_FAULT_USER_FAULT && info.frame_count);
+        CHECK(info.message_bytes == strlen("Worker failure 81"));
+        CHECK(!memcmp(message, "Worker failure 81", info.message_bytes));
+        neoclr_worker_fault_info untouched_info = {99,99,99};
+        unsigned char tiny = 99;
+        CHECK(neoclr_workers_fault_copy(pool, ticket, &untouched_info, &tiny, 1) == -2);
+        CHECK(untouched_info.code == 99 && tiny == 99);
+        stats->faults++;
+    } else { CHECK(!info.frame_count && !info.message_bytes); stats->successes++; }
+    CHECK(neoclr_workers_take(pool, ticket, &outcome, &value, &root) == 1);
+    CHECK(outcome == (info.code ? NEOCLR_WORKER_FAILED : NEOCLR_WORKER_OK));
+    CHECK(neoclr_workers_fault_copy(pool, ticket, &info, message, sizeof(message)) == -1);
+    if (root.pool) {
+        CHECK(neoclr_workers_collect(pool, &extent));
+        CHECK(neoclr_workers_root_read(pool, root, &scalar) && scalar == 12345);
+        CHECK(neoclr_workers_root_release(pool, root));
+    } else CHECK(outcome == NEOCLR_WORKER_FAILED);
+}
 int main(void) {
     cancellation_wins();
     neoclr_workers *empty = neoclr_workers_create(1, 1, 8192);
@@ -101,45 +130,21 @@ int main(void) {
         neoclr_invoke_void_callback_v1, 80, &untouched) == 3 && untouched.pool == 99);
     CHECK(neoclr_workers_root_new(pool, 67890, &sentinel));
     check_rejected(pool, sentinel); /* non-function allocation */
-    unsigned faults = 0, successes = 0;
+    observations stats = {0};
     for (unsigned round = 0; round < 22; round++) {
         batch b = {.expected = round >= 20};
         neoclr_worker_handle tickets[4];
         for (unsigned i = 0; i < 4; i++) CHECK(neoclr_workers_submit(pool, callback, work, &b, &tickets[i]));
         for (unsigned i = 0; i < 4; i++) CHECK(neoclr_workers_wait(pool, tickets[i], 10000) == 1);
-        for (unsigned i = 0; i < 4; i++) {
-            neoclr_worker_value value; neoclr_worker_handle root; int outcome;
-            CHECK(neoclr_workers_wait(pool, tickets[i], 10000) == 1);
-            uint64_t extent, scalar;
-            CHECK(neoclr_workers_collect(pool, &extent));
-            neoclr_worker_fault_info info = {99,99,99};
-            unsigned char message[128];
-            CHECK(neoclr_workers_fault_copy(pool, tickets[i], &info, message, sizeof(message)) == 1);
-            if (info.code) {
-                CHECK(info.code == NEOCLR_AOT_FAULT_USER_FAULT && info.frame_count);
-                CHECK(info.message_bytes == strlen("Worker failure 81"));
-                CHECK(!memcmp(message, "Worker failure 81", info.message_bytes));
-                neoclr_worker_fault_info untouched_info = {99,99,99};
-                unsigned char tiny = 99;
-                CHECK(neoclr_workers_fault_copy(pool, tickets[i], &untouched_info, &tiny, 1) == -2);
-                CHECK(untouched_info.code == 99 && tiny == 99);
-                faults++;
-            } else { CHECK(!info.frame_count && !info.message_bytes); successes++; }
-            CHECK(neoclr_workers_take(pool, tickets[i], &outcome, &value, &root) == 1);
-            CHECK(outcome == (info.code ? NEOCLR_WORKER_FAILED : NEOCLR_WORKER_OK));
-            CHECK(neoclr_workers_fault_copy(pool, tickets[i], &info, message, sizeof(message)) == -1);
-            if (root.pool) {
-                CHECK(neoclr_workers_collect(pool, &extent));
-                CHECK(neoclr_workers_root_read(pool, root, &scalar) && scalar == 12345);
-                CHECK(neoclr_workers_root_release(pool, root));
-            } else CHECK(outcome == NEOCLR_WORKER_FAILED);
-        }
+        CHECK(neoclr_workers_dispatch(pool, 2, observe, &stats) == 2);
+        CHECK(neoclr_workers_dispatch(pool, 2, observe, &stats) == 2);
+        CHECK(neoclr_workers_dispatch(pool, 4, observe, &stats) == 0);
         uint64_t scalar;
         CHECK(neoclr_workers_root_read(pool, sentinel, &scalar) && scalar == 67890);
     }
-    CHECK(faults == 1 && successes == 87); /* One shared counter; independent jobs recover. */
+    CHECK(stats.faults == 1 && stats.successes == 87); /* One shared counter; independent jobs recover. */
     CHECK(neoclr_workers_root_release(pool, callback));
     CHECK(neoclr_workers_root_release(pool, sentinel));
     CHECK(neoclr_workers_close(pool) && neoclr_workers_destroy(pool));
-    puts("PASS shared compiled callback: 87 successes, one isolated fault; diagnostic text survives collection and later jobs recover");
+    puts("PASS owner-dispatched shared compiled callback: 87 successes, one isolated fault; diagnostic text survives collection and later jobs recover");
 }

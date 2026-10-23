@@ -310,3 +310,49 @@ bridge follows that ownership direction but does not yet implement public Task
 exception semantics. Native status and copied diagnostic bytes are provisional
 adapter contracts. Async Task/Promise publication, suspended I/O ownership and
 parallel mutator coordination remain the next boundaries before HTTP dispatch.
+
+## Owner-side completion delivery — 2026-10-23
+
+The private pool now has a bounded owner-side dispatch operation. Workers publish
+a settlement sequence under the heap gate; dispatch selects completed, unnotified
+tickets in that order and calls a native consumer after releasing the gate.
+Notification is at most once per ticket generation. Results/faults remain rooted
+and the slot remains occupied until explicit take. A consumer can therefore copy
+diagnostics, adopt a result, collect, or submit follow-up work without running
+those actions inside the producer's critical section.
+
+Dispatch processes at most the requested 0–16 notifications, including newly ready
+work if budget remains. No background thread, extra queue allocation, or implicit
+consumer scheduling is added. Nested dispatch and non-owner calls return -1.
+Destroy is rejected while a dispatch callback is active, even if it closes/drains
+the pool. Closing does not discard completed tickets: the owner may still dispatch
+and consume them. Existing polling take remains supported and suppresses a later
+notification. An external concurrent take may invalidate a notified ticket; use one
+consumer when notification and consumption must stay together. Notification alone
+never bypasses consumer-root backpressure or promises automatic retry.
+
+[delivery-validation.json](delivery-validation.json) passes eight optimized/UBSan
+test groups. The new group verifies settlement order differing from submission,
+strict budgets, no duplicate notifications, retained tickets, owner identity,
+reentrant submission, collection/take outside the gate, and close/destroy lifetime.
+[delivery-shared-validation.json](delivery-shared-validation.json) routes all 88
+compiled Raven job completions (87 successes and one isolated fault) through this
+pump in two-notification batches. The consumer checks diagnostics and adopts/releases
+result roots under collection pressure. Cancellation/fault tests still pass.
+[delivery-private-validation.json](delivery-private-validation.json) repeats 1,280
+private-context generated invocations. UBSan instruments the runtime/host, not the
+generated machine code; prior TSan/ASan limitations remain.
+
+The added per-job fields are a completion sequence and delivered flag, plus pool
+settlement/dispatch state. Selection scans the fixed at-most-16 slots, trading a
+small bounded scan for no new queue nodes. This is not an HTTP throughput claim.
+The copied-primitive probe is repeated in
+[delivery-measurement.json](delivery-measurement.json); it exercises ordinary take,
+not dispatch or async continuation scheduling.
+
+The .NET-oriented aim remains deferred continuation execution after synchronized
+result publication. Current Raven Promise/TaskQueue fields and native async wakeups
+are owner-local; this pump establishes a native delivery boundary without declaring
+them thread-safe. It does not resume a generated continuation, bind Task.Run, add
+public channel APIs or migrate fibers. Next connect an explicitly owned runtime
+completion signal to this pump and qualify owner wakeups/teardown before HTTP use.

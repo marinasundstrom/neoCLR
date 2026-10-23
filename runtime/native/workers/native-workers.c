@@ -13,9 +13,9 @@
 enum { FREE, QUEUED, RUNNING, DONE };
 struct neoclr_worker_job {
     struct neoclr_workers *pool;
-    uint64_t generation, order;
+    uint64_t generation, order, completion_order;
     unsigned state;
-    int cancelled, outcome;
+    int cancelled, outcome, delivered;
     void *capture;
     void *local_roots[NEOCLR_WORKER_LOCAL_ROOTS];
     neoclr_worker_value result;
@@ -25,12 +25,12 @@ struct neoclr_worker_job {
 };
 struct root { uint64_t generation; void *value; };
 struct neoclr_workers {
-    uint64_t identity, submission;
+    uint64_t identity, submission, settlement;
     pthread_t owner, threads[THREADS];
     pthread_mutex_t gate;
     pthread_cond_t ready, completion;
     unsigned thread_count, capacity;
-    int closing, joined;
+    int closing, joined, dispatching;
     neoclr_aot_context context;
     neoclr_worker_invoke invoke;
     struct neoclr_worker_job jobs[JOBS];
@@ -62,6 +62,13 @@ static int adopt(neoclr_workers *p, void *value, neoclr_worker_handle *out) {
     }
     return 0;
 }
+/* Called only under the gate; completion order is independent of submission. */
+static void complete(neoclr_worker_job *j) {
+    if (j->pool->settlement == UINT64_MAX) abort();
+    j->completion_order = ++j->pool->settlement;
+    j->state = DONE;
+    pthread_cond_broadcast(&j->pool->completion);
+}
 static void *run(void *argument) {
     neoclr_workers *p = argument;
     for (;;) {
@@ -86,8 +93,7 @@ static void *run(void *argument) {
         if (j->cancelled) memset(&j->fault, 0, sizeof(j->fault));
         j->capture = NULL;
         memset(j->local_roots, 0, sizeof(j->local_roots));
-        j->state = DONE;
-        pthread_cond_broadcast(&p->completion);
+        complete(j);
         unlock(p);
     }
 }
@@ -214,7 +220,7 @@ int neoclr_workers_submit(neoclr_workers *p, neoclr_worker_handle capture,
         neoclr_worker_job *j = &p->jobs[i];
         if (j->state != FREE || j->generation == UINT64_MAX) continue;
         j->order = ++p->submission; ++j->generation; j->capture = r->value; j->callback = callback;
-        j->native_state = native_state; j->cancelled = 0; j->result = (neoclr_worker_value){0};
+        j->native_state = native_state; j->cancelled = 0; j->delivered = 0; j->result = (neoclr_worker_value){0};
         j->state = QUEUED; *out = (neoclr_worker_handle){p->identity, j->generation, i, 2};
         pthread_cond_signal(&p->ready); ok = 1; break;
     }
@@ -224,7 +230,7 @@ int neoclr_workers_cancel(neoclr_workers *p, neoclr_worker_handle h) {
     lock(p); neoclr_worker_job *j = job_for(p, h); int ok = j && j->state != DONE && !j->cancelled;
     if (ok) {
         j->cancelled = 1;
-        if (j->state == QUEUED) { j->capture = NULL; j->outcome = NEOCLR_WORKER_CANCELLED; j->state = DONE; }
+        if (j->state == QUEUED) { j->capture = NULL; j->outcome = NEOCLR_WORKER_CANCELLED; complete(j); }
     }
     if (ok) pthread_cond_broadcast(&p->completion);
     unlock(p); return ok;
@@ -282,6 +288,35 @@ int neoclr_workers_wait(neoclr_workers *p, neoclr_worker_handle h, unsigned mill
     }
     unlock(p); return status;
 }
+int neoclr_workers_dispatch(neoclr_workers *p, unsigned limit,
+    neoclr_worker_completion callback, void *state) {
+    if (!pthread_equal(p->owner, pthread_self()) || !callback || limit > JOBS) return -1;
+    lock(p);
+    if (p->dispatching) { unlock(p); return -1; }
+    p->dispatching = 1;
+    unsigned delivered = 0;
+    while (delivered < limit) {
+        neoclr_worker_job *next = NULL;
+        unsigned slot = 0;
+        for (unsigned i = 0; i < p->capacity; i++) {
+            neoclr_worker_job *j = &p->jobs[i];
+            if (j->state == DONE && !j->delivered &&
+                (!next || j->completion_order < next->completion_order)) {
+                next = j; slot = i;
+            }
+        }
+        if (!next) break;
+        neoclr_worker_handle ticket = {p->identity, next->generation, slot, 2};
+        next->delivered = 1;
+        ++delivered;
+        unlock(p);
+        callback(p, ticket, state);
+        lock(p);
+    }
+    p->dispatching = 0;
+    unlock(p);
+    return (int)delivered;
+}
 int neoclr_workers_fault_copy(neoclr_workers *p, neoclr_worker_handle h,
     neoclr_worker_fault_info *info, unsigned char *message, size_t capacity) {
     if (!info || (!message && capacity)) return -1;
@@ -333,7 +368,7 @@ int neoclr_workers_close(neoclr_workers *p) {
         neoclr_worker_job *j = &p->jobs[i];
         if (j->state == RUNNING) j->cancelled = 1;
         if (j->state == QUEUED) {
-            j->cancelled = 1; j->capture = NULL; j->outcome = NEOCLR_WORKER_CANCELLED; j->state = DONE;
+            j->cancelled = 1; j->capture = NULL; j->outcome = NEOCLR_WORKER_CANCELLED; complete(j);
         }
     }
     pthread_cond_broadcast(&p->ready); pthread_cond_broadcast(&p->completion); unlock(p);
@@ -341,7 +376,7 @@ int neoclr_workers_close(neoclr_workers *p) {
     p->joined = 1; return 1;
 }
 int neoclr_workers_destroy(neoclr_workers *p) {
-    if (!pthread_equal(p->owner, pthread_self()) || !p->joined || entered) return 0;
+    if (!pthread_equal(p->owner, pthread_self()) || !p->joined || entered || p->dispatching) return 0;
     for (unsigned i = 0; i < p->capacity; i++) if (p->jobs[i].state != FREE) return 0;
     for (unsigned i = 0; i < ROOTS; i++) if (p->roots[i].value) return 0;
     if (p->invoke) {

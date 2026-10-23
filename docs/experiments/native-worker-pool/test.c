@@ -304,7 +304,86 @@ static void participant_roots(void) {
     CHECK(neoclr_workers_close(p) && neoclr_workers_destroy(p));
     puts("PASS four participant root sets across collection, result handoff, failure, cancellation and reuse");
 }
+typedef struct {
+    pthread_t owner;
+    neoclr_worker_handle root, expected, followup;
+    unsigned calls;
+    int closing;
+} delivery;
+static void delivered(neoclr_workers *p, neoclr_worker_handle ticket, void *state) {
+    delivery *d = state;
+    CHECK(pthread_equal(pthread_self(), d->owner));
+    CHECK(ticket.pool == d->expected.pool && ticket.slot == d->expected.slot && ticket.generation == d->expected.generation);
+    CHECK(neoclr_workers_dispatch(p, 1, delivered, state) == -1);
+    uint64_t extent;
+    CHECK(neoclr_workers_collect(p, &extent)); /* callback is outside the gate */
+    neoclr_worker_value value; neoclr_worker_handle root;
+    int outcome;
+    CHECK(neoclr_workers_take(p, ticket, &outcome, &value, &root) == 1);
+    if (!d->calls) {
+        CHECK(outcome == NEOCLR_WORKER_CANCELLED && !root.pool);
+        CHECK(neoclr_workers_submit(p, d->root, quick, NULL, &d->followup));
+        CHECK(neoclr_workers_wait(p, d->followup, 10000) == 1);
+    } else {
+        CHECK(outcome == NEOCLR_WORKER_OK);
+        if (root.pool) {
+            uint64_t scalar;
+            CHECK(neoclr_workers_root_read(p, root, &scalar) && scalar == 1);
+            CHECK(neoclr_workers_root_release(p, root));
+        } else CHECK(value.scalar == 42);
+    }
+    ++d->calls;
+    if (d->closing) {
+        CHECK(neoclr_workers_root_release(p, d->root));
+        CHECK(neoclr_workers_close(p));
+        CHECK(!neoclr_workers_destroy(p)); /* even though all roots/tickets drained */
+    }
+}
+static void notified(neoclr_workers *p, neoclr_worker_handle ticket, void *state) {
+    (void)p; (void)ticket;
+    ++*(unsigned *)state;
+}
+static int wrong_owner(neoclr_worker_job *j, void *state) {
+    (void)j;
+    unsigned unused = 0;
+    CHECK(neoclr_workers_dispatch(state, 1, notified, &unused) == -1 && !unused);
+    return 0;
+}
+static void completion_dispatch(void) {
+    neoclr_workers *p = neoclr_workers_create(1, 2, 8192);
+    delivery d = {.owner = pthread_self()};
+    CHECK(p && neoclr_workers_root_new(p, 0, &d.root));
+    neoclr_worker_handle t, r; neoclr_worker_value v;
+    CHECK(neoclr_workers_submit(p, d.root, wrong_owner, p, &t));
+    CHECK(take(p, t, &v, &r) == NEOCLR_WORKER_OK);
+    unsigned calls = 0;
+    CHECK(neoclr_workers_dispatch(p, 2, notified, &calls) == 0 && !calls); /* polled take suppresses */
+    CHECK(neoclr_workers_submit(p, d.root, quick, NULL, &t));
+    CHECK(neoclr_workers_wait(p, t, 10000) == 1);
+    CHECK(neoclr_workers_dispatch(p, 0, notified, &calls) == 0 && !calls);
+    CHECK(neoclr_workers_dispatch(p, 17, notified, &calls) == -1 && !calls);
+    CHECK(neoclr_workers_dispatch(p, 1, notified, &calls) == 1 && calls == 1);
+    CHECK(neoclr_workers_dispatch(p, 2, notified, &calls) == 0 && calls == 1);
+    CHECK(take(p, t, &v, &r) == NEOCLR_WORKER_OK); /* notification retained the ticket */
+    control c; init(&c, 0);
+    neoclr_worker_handle first, second;
+    CHECK(neoclr_workers_submit(p, d.root, work, &c, &first));
+    wait_count(&c, &c.started, 1);
+    CHECK(neoclr_workers_submit(p, d.root, quick, NULL, &second));
+    CHECK(neoclr_workers_cancel(p, second));
+    release(&c, 0); release(&c, 1);
+    CHECK(neoclr_workers_wait(p, first, 10000) == 1);
+    d.expected = second;
+    CHECK(neoclr_workers_dispatch(p, 1, delivered, &d) == 1 && d.calls == 1);
+    d.expected = first;
+    CHECK(neoclr_workers_dispatch(p, 1, delivered, &d) == 1 && d.calls == 2);
+    d.expected = d.followup; d.closing = 1;
+    CHECK(neoclr_workers_dispatch(p, 1, delivered, &d) == 1 && d.calls == 3);
+    CHECK(neoclr_workers_destroy(p));
+    dispose(&c);
+    puts("PASS owner completion delivery, settlement order, bounded dispatch, reentrant submission, notification retention and close");
+}
 int main(void) {
-    lifetimes(); result_and_cancel(); shutdown(); pressure_and_foreign(); settlement_race(); recovery(); participant_roots();
+    lifetimes(); result_and_cancel(); shutdown(); pressure_and_foreign(); settlement_race(); recovery(); participant_roots(); completion_dispatch();
     return 0;
 }

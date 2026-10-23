@@ -10,7 +10,8 @@ parallel-mutator integration, parallel HTTP and public APIs remain unimplemented
 A synchronous shared callback bridge now publishes the pool root set to existing
 compiler collection hooks under the heap gate. Synchronous faults now belong to
 individual jobs, with rooted diagnostics copied before ticket consumption;
-async/resource ownership remains open.
+a bounded owner completion pump delivers tickets outside the gate. Generated
+continuation wakeups and async/resource ownership remain open.
 The architecture below remains a proposal beyond that checkpoint.
 The author explicitly requested worker-thread investigation inspired by modern
 web application frameworks.
