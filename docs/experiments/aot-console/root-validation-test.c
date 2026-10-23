@@ -17,6 +17,30 @@ int main(int argc, char **argv) {
     neoclr_probe_storage slot = {&word, 8, 0};
     neoclr_probe_frame parent, child;
     neoclr_probe_enter_v3(&parent, &outer, 0, &slot, 1, "{}", 2);
+    if (!strcmp(argv[1], "state-valid")) {
+        const char *plan = "{\"requiredSpillLanes\":[]}";
+        neoclr_parked_roots saved = {0};
+        if (neoclr_root_probe_head_v1() != &parent ||
+            neoclr_root_probe_depth_v1() != 1 || neoclr_root_probe_count_v1()) return 3;
+        neoclr_probe_enter_v3(&child, &outer, 1, &slot, 0, "{}", 2);
+        neoclr_probe_stack_roots_v2(&child, 0, lanes, 0, plan, (uint32_t)strlen(plan));
+        neoclr_roots_park_v1(&saved);
+        if (neoclr_root_probe_head_v1() || neoclr_root_probe_depth_v1() ||
+            neoclr_root_probe_count_v1() != 1 || neoclr_roots_parked_v1() != &saved) return 4;
+        neoclr_probe_frame other;
+        neoclr_probe_enter_v3(&other, &inner, 2, &slot, 0, "{}", 2);
+        neoclr_probe_stack_roots_v2(&other, 0, lanes, 0, plan, (uint32_t)strlen(plan));
+        neoclr_probe_leave_v1(&other);
+        neoclr_roots_resume_v1(&saved);
+        if (neoclr_root_probe_head_v1() != &child ||
+            neoclr_root_probe_depth_v1() != 2 || neoclr_root_probe_count_v1() != 2 ||
+            neoclr_roots_parked_v1() || saved.head || saved.next) return 5;
+        neoclr_probe_leave_v1(&child);
+        neoclr_probe_leave_v1(&parent);
+        if (neoclr_root_probe_head_v1() || neoclr_root_probe_depth_v1() ||
+            neoclr_root_probe_count_v1() != 2) return 6;
+        return 0;
+    }
     if (!strncmp(argv[1], "context-", 8)) {
         const char *plan = "{\"requiredSpillLanes\":[]}";
         neoclr_probe_enter_v3(&child, &outer, 1, &slot, 0, "{}", 2);

@@ -1,0 +1,48 @@
+{
+  "baseline": {
+    "command": [
+      "xcrun",
+      "clang",
+      "-O2",
+      "-S",
+      "-DNEOCLR_NATIVE_GC",
+      "-DNEOCLR_GC_PACED",
+      "-I",
+      "runtime/native/gc",
+      "target/root-thread-state-assembly/baseline.c",
+      "-o",
+      "target/root-thread-state-assembly/baseline.s"
+    ],
+    "staticThreadLocalAddressSites": {
+      "neoclr_gc_enter_v1": 2,
+      "neoclr_gc_leave_v1": 2,
+      "neoclr_gc_stack_roots_v1": 3
+    }
+  },
+  "candidate": {
+    "command": [
+      "xcrun",
+      "clang",
+      "-O2",
+      "-S",
+      "-DNEOCLR_NATIVE_GC",
+      "-DNEOCLR_GC_PACED",
+      "-I",
+      "runtime/native/gc",
+      "runtime/native/gc/root-probe.c",
+      "-o",
+      "target/root-thread-state-assembly/candidate.s"
+    ],
+    "staticThreadLocalAddressSites": {
+      "neoclr_gc_enter_v1": 1,
+      "neoclr_gc_leave_v1": 1,
+      "neoclr_gc_stack_roots_v1": 1
+    }
+  },
+  "inputs": {
+    "target/root-thread-state-assembly/baseline.c": "f74987904c1623a1cf57cab9e40372f809c5daf1bdb69e55d40f4f9ed76fb6cb",
+    "runtime/native/gc/root-probe.c": "9315fb17e2c1c07caff9dae4e154c967c4ec0d3d87d328babf3c2c97d094b4bc",
+    "target/root-thread-state-assembly/baseline.s": "bd1d22e833e63fcf5d2ef8d515c2f6d7b371af5c9132110c02ff180c35ffc6b7",
+    "target/root-thread-state-assembly/candidate.s": "4a611988b5c6d78a10bc3235cf6c3996003f59dc2945e5637df3f961f3e5fecd"
+  }
+}

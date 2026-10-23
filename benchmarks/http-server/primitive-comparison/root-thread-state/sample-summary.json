@@ -1,0 +1,33 @@
+{
+  "scope": "Diagnostic sample of one isolated HTTP owner; not capacity evidence",
+  "revision": "87c442dad",
+  "binary": "target/plain-fault-validation/candidate-w1",
+  "binarySha256": "4fce62c74074cda1b6bdeb46b1c74f1cf4472eade46ab4b186da1ffcf2aaf1d3",
+  "sample": "target/fault-validation-sample/sample.txt",
+  "sampleSha256": "b45435bd97f5dda4b8c0caced10cddf4fefffe15c50e4b8af9d606f7add2db3f",
+  "samplingCommand": [
+    "/usr/bin/sample",
+    "<server PID>",
+    "5",
+    "1",
+    "-file",
+    "target/fault-validation-sample/sample.txt"
+  ],
+  "loadCommand": [
+    "target/primitive-comparison-eof/client",
+    "<READY port>",
+    "8"
+  ],
+  "clientProcessors": 2,
+  "workerSamples": 3852,
+  "mainThreadWaitSamples": 3852,
+  "selfSamples": {
+    "neoclr_gc_stack_roots_v1": 1677,
+    "_tlv_get_addr": 476,
+    "neoclr_gc_allocate_v1": 394,
+    "__bzero": 220,
+    "collect_indexed": 146,
+    "_platform_strlen": 139
+  },
+  "note": "Exclude main-thread condition waits from worker attribution. TLS samples cover all runtime lookups, not only root state."
+}

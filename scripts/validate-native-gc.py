@@ -93,6 +93,7 @@ def main():
             run(name + '-plan-moved', [binary, 'plan-moved'])
             run(name + '-batch-valid', [binary, 'batch-valid'])
             run(name + '-context-valid', [binary, 'context-valid'])
+            run(name + '-state-valid', [binary, 'state-valid'])
         for name in ['native-owned-body-test', 'native-idle-drain-test']:
             binary = out / (name + ('.exe' if windows else ''))
             flags = ['/DNEOCLR_NATIVE_GC', '/I' + str(BASE), '/I' + str(carrier)] if windows else ['-DNEOCLR_NATIVE_GC', '-Wno-deprecated-declarations', '-I', BASE, '-I', carrier]

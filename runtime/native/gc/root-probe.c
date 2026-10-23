@@ -4,9 +4,15 @@
 #ifdef NEOCLR_NATIVE_GC
 #include "native-gc.h"
 #endif
-static _Thread_local uint64_t calls;
-static _Thread_local uint32_t depth;
-static _Thread_local neoclr_probe_frame *head;
+/* Resolve one thread-local object for the related hot publication state. This
+ * changes only private storage: frame chains, counters and search hints retain
+ * their independent lifetimes and are never shared between native threads. */
+static _Thread_local struct {
+    neoclr_probe_frame *head;
+    uint64_t calls;
+    uint32_t depth;
+    uint32_t spill_marker_offsets[256];
+} probe_state;
 int32_t neoclr_probe_fault_roots_v1(const void *context, neoclr_probe_storage *output,
                                    uint32_t capacity) {
     if (!context) return -1;
@@ -42,38 +48,37 @@ void neoclr_probe_enter_v3(neoclr_probe_frame *frame, const void *context, uint3
     const neoclr_probe_storage *storage, uint32_t count, const char *plan, uint32_t length) {
     if (!frame || !context || function >= NEOCLR_NATIVE_FUNCTION_LIMIT) abort();
     memset(frame, 0, sizeof(*frame));
-    frame->previous = head;
+    frame->previous = probe_state.head;
     frame->context = context;
     frame->function = function;
     if (!storage || !plan || strlen(plan) != length) abort();
     frame->storage = storage; frame->storage_count = count;
     frame->storage_plan = plan; frame->storage_length = length;
-    head = frame;
-    depth++;
+    probe_state.head = frame;
+    probe_state.depth++;
 }
 void neoclr_probe_leave_v1(neoclr_probe_frame *frame) {
-    if (!frame || head != frame || !depth) abort();
+    if (!frame || probe_state.head != frame || !probe_state.depth) abort();
     observe_fault(frame->context);
-    head = frame->previous;
-    depth--;
+    probe_state.head = frame->previous;
+    probe_state.depth--;
     memset(frame, 0, sizeof(*frame));
 }
 /* Cache a search hint, never a validation result or an image pointer. Every
  * publication still checks the current string length and marker bytes. A hash
  * collision, mutable plan or reused image address can only cause another search.
  * The bounded thread-local table needs neither allocation nor image teardown. */
-static _Thread_local uint32_t spill_marker_offsets[256];
 static int has_spill_marker(const char *plan, uint32_t length) {
     static const char marker[] = "requiredSpillLanes";
     const uint32_t size = sizeof(marker) - 1;
     uintptr_t key = (uintptr_t)plan;
     uint32_t bucket = (uint32_t)((key >> 4) ^ (key >> 12)) & 255;
-    uint32_t hint = spill_marker_offsets[bucket];
+    uint32_t hint = probe_state.spill_marker_offsets[bucket];
     if (hint && length >= size && hint - 1 <= length - size &&
         !memcmp(plan + hint - 1, marker, size)) return 1;
     const char *found = strstr(plan, marker);
     if (!found) return 0;
-    spill_marker_offsets[bucket] = (uint32_t)(found - plan) + 1;
+    probe_state.spill_marker_offsets[bucket] = (uint32_t)(found - plan) + 1;
     return 1;
 }
 #ifdef NEOCLR_NATIVE_GC
@@ -94,7 +99,7 @@ static void validate_storage(const neoclr_probe_storage *storage, uint32_t count
 #endif
 void neoclr_probe_stack_roots_v2(neoclr_probe_frame *frame, uint32_t instruction,
     const uint64_t *lanes, uint32_t lane_count, const char *plan, uint32_t length) {
-    if (!frame || head != frame || instruction >= 8192 || lane_count > 8192 || !lanes ||
+    if (!frame || probe_state.head != frame || instruction >= 8192 || lane_count > 8192 || !lanes ||
         !plan || strlen(plan) != length || !has_spill_marker(plan, length)) abort();
     frame->transient = NULL; frame->transient_plan = NULL;
     frame->transient_count = frame->transient_length = frame->transient_phase = 0;
@@ -110,7 +115,7 @@ void neoclr_probe_stack_roots_v2(neoclr_probe_frame *frame, uint32_t instruction
 #else
     const void *previous_context = NULL;
 #endif
-    for (const neoclr_probe_frame *f = head; f; f = f->previous) {
+    for (const neoclr_probe_frame *f = probe_state.head; f; f = f->previous) {
 #ifdef NEOCLR_NATIVE_GC
         /* No guest code or collection runs during this scan. Consecutive frames
          * may share a context; validate it once within this publication only.
@@ -139,20 +144,20 @@ void neoclr_probe_stack_roots_v2(neoclr_probe_frame *frame, uint32_t instruction
 #ifndef NEOCLR_NATIVE_GC
     (void)value;
 #endif
-    calls++;
+    probe_state.calls++;
 #ifdef NEOCLR_NATIVE_GC
 #ifdef NEOCLR_WORKER_GC
     if (neoclr_gc_worker_boundary_hook) {
         if (frame->reserved < 0x100 || frame->reserved > 0x101) abort();
-        neoclr_gc_worker_boundary_hook((neoclr_aot_context *)frame->context, head, frame->reserved & 1);
+        neoclr_gc_worker_boundary_hook((neoclr_aot_context *)frame->context, probe_state.head, frame->reserved & 1);
         return;
     }
 #endif
     /* Complete snapshot: audited allocating helpers additionally protect their temporaries. */
 #ifdef NEOCLR_GC_PACED
-    if (neoclr_gc_boundary_v1((neoclr_aot_context *)frame->context, head)) abort();
+    if (neoclr_gc_boundary_v1((neoclr_aot_context *)frame->context, probe_state.head)) abort();
 #else
-    if (neoclr_gc_collect_v1((neoclr_aot_context *)frame->context, head)) abort();
+    if (neoclr_gc_collect_v1((neoclr_aot_context *)frame->context, probe_state.head)) abort();
 #endif
 #endif
 }
@@ -167,7 +172,7 @@ void neoclr_gc_worker_stack_roots_v1(neoclr_probe_frame *frame, uint32_t instruc
 #endif
 void neoclr_probe_transient_v2(neoclr_probe_frame *frame, uint32_t phase,
     const neoclr_probe_storage *storage, uint32_t count, const char *plan, uint32_t length) {
-    if (head != frame || (phase != 1 && phase != 2 && phase != 3) || !storage || !plan || strlen(plan) != length) abort();
+    if (probe_state.head != frame || (phase != 1 && phase != 2 && phase != 3) || !storage || !plan || strlen(plan) != length) abort();
     frame->transient = storage; frame->transient_count = count;
     frame->transient_plan = plan; frame->transient_length = length; frame->transient_phase = phase;
 #ifndef NEOCLR_NATIVE_GC
@@ -184,31 +189,31 @@ void neoclr_probe_transient_v2(neoclr_probe_frame *frame, uint32_t phase,
     (void)observed;
 #endif
 }
-const neoclr_probe_frame *neoclr_root_probe_head_v1(void) { return head; }
-uint64_t neoclr_root_probe_count_v1(void) { return calls; }
-uint32_t neoclr_root_probe_depth_v1(void) { return depth; }
+const neoclr_probe_frame *neoclr_root_probe_head_v1(void) { return probe_state.head; }
+uint64_t neoclr_root_probe_count_v1(void) { return probe_state.calls; }
+uint32_t neoclr_root_probe_depth_v1(void) { return probe_state.depth; }
 
 static _Thread_local neoclr_parked_roots *parked;
 void neoclr_roots_park_v1(neoclr_parked_roots *record) {
     if (!record || record->head || record->next || record->owner_context ||
         record->owner || record->expired) abort();
     for (neoclr_parked_roots *p = parked; p; p = p->next) if (p == record) abort();
-    record->head = head;
+    record->head = probe_state.head;
     record->next = parked;
     parked = record;
-    head = NULL;
-    depth = 0;
+    probe_state.head = NULL;
+    probe_state.depth = 0;
 }
 void neoclr_roots_resume_v1(neoclr_parked_roots *record) {
-    if (!record || head || record->expired) abort();
+    if (!record || probe_state.head || record->expired) abort();
     neoclr_parked_roots **p = &parked;
     while (*p && *p != record) p = &(*p)->next;
     if (!*p) abort();
     *p = record->next;
-    head = record->head;
+    probe_state.head = record->head;
     memset(record, 0, sizeof(*record));
-    depth = 0;
-    for (const neoclr_probe_frame *f = head; f; f = f->previous) depth++;
+    probe_state.depth = 0;
+    for (const neoclr_probe_frame *f = probe_state.head; f; f = f->previous) probe_state.depth++;
 }
 const neoclr_parked_roots *neoclr_roots_parked_v1(void) { return parked; }
 
@@ -234,7 +239,7 @@ int32_t neoclr_stack_trace_capture_v1(int32_t skip, neoclr_aot_context *context,
     uint64_t length = 0;
     int truncated = 0;
     const char marker[] = "   ... stack trace truncated\n";
-    for (const neoclr_probe_frame *f = head; f; f = f->previous) {
+    for (const neoclr_probe_frame *f = probe_state.head; f; f = f->previous) {
         if (f->context != context) continue;
         if (skip) { --skip; continue; }
         if (f->function >= count || !names[f->function]) return 3;
@@ -253,8 +258,8 @@ int32_t neoclr_stack_trace_capture_v1(int32_t skip, neoclr_aot_context *context,
     void *allocation = NULL;
     /* A host may capture an ancestor context while another context is active.
      * Preserve that noncollecting path: it is not a current-context retry boundary. */
-    int32_t status = !head || head->context == context
-        ? neoclr_gc_allocate_rooted_v1(context, head, 8 + length, NEOCLR_GC_TEXT, &allocation)
+    int32_t status = !probe_state.head || probe_state.head->context == context
+        ? neoclr_gc_allocate_rooted_v1(context, probe_state.head, 8 + length, NEOCLR_GC_TEXT, &allocation)
         : neoclr_gc_allocate_v1(&context->text, 8 + length, NEOCLR_GC_TEXT, &allocation);
     if (status) return status;
     neoclr_aot_text *text = allocation;

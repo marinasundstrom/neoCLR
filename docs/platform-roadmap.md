@@ -6358,3 +6358,13 @@ Short paired one/four-owner means improve throughput 6.3%/10.7% and CPU/response
 4.1%/5.7%, with roughly 10% baseline drift limiting precision. Image-owned root
 metadata and publication frequency remain open; see
 [evidence](../benchmarks/http-server/primitive-comparison/fault-validation/README.md).
+
+
+Thread-state follow-up (2026-10-23): group private root-publication fields into one
+thread-local object. Optimized macOS ARM64 publication uses one TLS lookup site
+instead of three; entry/exit use one instead of two. Park/resume state, malformed
+root checks, forced-GC HTTP and shared-worker stress pass. One-owner throughput
+improves 5.5% with 4.1% less CPU/response in short paired trials; four-owner samples
+overlap and tail latency is higher in corresponding candidate trials. Descriptor
+ownership and publication-frequency work remain open. See
+[evidence and costs](../benchmarks/http-server/primitive-comparison/root-thread-state/README.md).
