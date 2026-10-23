@@ -378,3 +378,43 @@ shared async Task settlement or off-thread use of existing I/O resources.
 The separate [HTTP integration](../http-worker-integration/README.md) runs complete
 application owners on isolated heaps. It supplies working HTTP/async-I/O integration
 and a multicore comparison, not evidence of shared-object GC safety.
+
+## Concurrent native read phases — 2026-10-23
+
+The next private correctness step permits multiple native callbacks to read the
+same rooted capture graph at once. `neoclr_worker_read_begin` returns the capture;
+`read_end` ends that thread's phase. The caller must not mutate, allocate, call
+other pool APIs, invoke generated code, or retain pointers beyond the phase.
+Blocking on another pool operation or reader admission inside a phase can deadlock
+and is prohibited. Cancellation does not revoke a phase or its roots.
+
+Mutation, allocation (including root creation), bootstrap and collection wait for
+all readers. Waiting writers prevent new readers entering, so fresh readers cannot
+indefinitely postpone GC. Metadata operations keep their existing mutex and can
+still cancel jobs or release consumer roots while readers are active. Job captures
+retain the graph until callback settlement. Close remains cooperative and joins
+callbacks; an application must eventually end every phase.
+
+This is a runtime-owned native synchronization primitive because it coordinates
+arena lifetime and root publication. It is not a new managed public API or a
+replacement for .NET's transparent managed-thread/GC coordination. The benefit is
+a small testable boundary for actual overlapping object reads; the cost is explicit
+native discipline, two synchronization operations per phase, and GC latency bounded
+by how soon all readers exit. Generated callbacks still require exclusive access,
+and concurrent managed writers/compiler safepoints remain open. Existing design
+research is linked in the [threading comparison](../../design/native-http-worker-threads.md).
+
+[Native validation](read-phases-validation.json) passes nine test groups in both
+optimized and UBSan builds. The added group performs 25 rounds with four overlapping
+readers. A native controller requires each reader to make progress while the owner
+requests collection, then releases them. The fixture checks that collection never
+finishes while a reader holds the object, serialized writes appear in the next
+round, cancellation and external-root release preserve active captures, and the
+final heap extent is zero. The existing generated shared graph test also
+[passes both builds](read-phases-shared-validation.json).
+
+The isolated HTTP listener group [passes optimized/UBSan](read-phases-http-native-validation.json).
+The [relinked HTTP host](read-phases-http-relink.json) reuses the previously qualified
+application object with current native sources; [240 responses plus pending-read
+shutdown and guest-fault exit](read-phases-http-validation.json) pass. These checks
+establish regression coverage, not a new throughput result. TSan remains unqualified.

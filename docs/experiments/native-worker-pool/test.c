@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <stdatomic.h>
+#include <sched.h>
 #define CHECK(x) do { if (!(x)) { fprintf(stderr, "failed line %d\n", __LINE__); abort(); } } while (0)
 typedef struct {
     pthread_mutex_t gate;
@@ -383,7 +385,84 @@ static void completion_dispatch(void) {
     dispose(&c);
     puts("PASS owner completion delivery, settlement order, bounded dispatch, reentrant submission, notification retention and close");
 }
+typedef struct {
+    atomic_uint readers, release, collecting, collected;
+    atomic_uint visits[4];
+    uint64_t expected;
+} shared_read_trial;
+typedef struct { shared_read_trial *trial; unsigned index; } shared_reader;
+static int read_shared(neoclr_worker_job *j, void *state) {
+    shared_reader *r = state;
+    shared_read_trial *t = r->trial;
+    const uint64_t *value = neoclr_worker_read_begin(j);
+    CHECK(value && *value == t->expected);
+    atomic_fetch_add(&t->readers, 1);
+    while (!atomic_load(&t->release)) {
+        CHECK(*value == t->expected && !atomic_load(&t->collected));
+        atomic_fetch_add(&t->visits[r->index], 1);
+    }
+    CHECK(*value == t->expected && !atomic_load(&t->collected));
+    neoclr_worker_read_end(j);
+    /* Writes must also wait for every other reader, including late departures. */
+    neoclr_worker_enter(j);
+    uint64_t *mutable_value = neoclr_worker_capture(j);
+    ++*mutable_value;
+    neoclr_worker_result(j, (neoclr_worker_value){1, 0, mutable_value});
+    neoclr_worker_leave(j);
+    return 0;
+}
+static void *release_readers(void *state) {
+    shared_read_trial *t = state;
+    while (!atomic_load(&t->collecting)) sched_yield();
+    /* All four threads must make progress while the owner requests collection. */
+    for (unsigned i = 0; i < 4; i++) {
+        unsigned before = atomic_load(&t->visits[i]);
+        while (atomic_load(&t->visits[i]) - before < 10000) sched_yield();
+    }
+    CHECK(!atomic_load(&t->collected));
+    atomic_store(&t->release, 1);
+    return NULL;
+}
+static void concurrent_read_phases(void) {
+    neoclr_workers *p = neoclr_workers_create(4, 4, 8192);
+    neoclr_worker_handle capture;
+    CHECK(p && neoclr_workers_root_new(p, 42, &capture));
+    for (unsigned round = 0; round < 25; round++) {
+        shared_read_trial t = {.expected = 42 + round * 4};
+        shared_reader readers[4]; neoclr_worker_handle tickets[4];
+        for (unsigned i = 0; i < 4; i++) {
+            readers[i] = (shared_reader){&t, i};
+            CHECK(neoclr_workers_submit(p, capture, read_shared, &readers[i], &tickets[i]));
+        }
+        while (atomic_load(&t.readers) != 4) sched_yield();
+        if (round == 24) {
+            CHECK(neoclr_workers_root_release(p, capture));
+            CHECK(neoclr_workers_cancel(p, tickets[0]));
+        }
+        pthread_t controller;
+        CHECK(!pthread_create(&controller, NULL, release_readers, &t));
+        atomic_store(&t.collecting, 1);
+        uint64_t extent;
+        CHECK(neoclr_workers_collect(p, &extent) && extent);
+        atomic_store(&t.collected, 1);
+        CHECK(!pthread_join(controller, NULL));
+        for (unsigned i = 0; i < 4; i++) {
+            neoclr_worker_value value; neoclr_worker_handle root;
+            CHECK(take(p, tickets[i], &value, &root) ==
+                (round == 24 && i == 0 ? NEOCLR_WORKER_CANCELLED : NEOCLR_WORKER_OK));
+            if (root.pool) CHECK(neoclr_workers_root_release(p, root));
+        }
+        if (round != 24) {
+            uint64_t value;
+            CHECK(neoclr_workers_root_read(p, capture, &value) && value == t.expected + 4);
+        }
+    }
+    uint64_t extent = 99;
+    CHECK(neoclr_workers_collect(p, &extent) && !extent);
+    CHECK(neoclr_workers_close(p) && neoclr_workers_destroy(p));
+    puts("PASS concurrent native readers, collector/writer exclusion, cancellation, capture lifetime and reclamation (25 rounds)");
+}
 int main(void) {
-    lifetimes(); result_and_cancel(); shutdown(); pressure_and_foreign(); settlement_race(); recovery(); participant_roots(); completion_dispatch();
+    lifetimes(); result_and_cancel(); shutdown(); pressure_and_foreign(); settlement_race(); recovery(); participant_roots(); completion_dispatch(); concurrent_read_phases();
     return 0;
 }

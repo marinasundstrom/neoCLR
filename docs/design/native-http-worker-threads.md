@@ -188,3 +188,15 @@ checks cycles, aliases, mutation, live displaced children and reclamation across
 four workers under the heap gate. Parallel mutators remain unqualified. Preliminary
 isolated-owner scaling is retained separately; matched comparisons with other
 servers and allocation work follow correctness, not replace it.
+
+### Concurrent native reads — 2026-10-23
+
+The private pool now admits overlapping native read phases over rooted capture
+graphs, while object mutation, allocation and collection wait for readers to exit.
+Pending writers prevent new read admission. This starts an explicit quiescence
+protocol without exposing uncoordinated generated mutators. Unlike .NET's managed
+thread suspension/safepoints, native callers must delimit read phases themselves;
+this is a temporary qualification tool, not a managed semantic divergence. It adds
+synchronization and can delay GC if a reader stalls. Root release/cancellation
+remain responsive through the metadata mutex, and active job captures retain data.
+See [contracts and evidence](../experiments/native-worker-pool/README.md#concurrent-native-read-phases--2026-10-23).

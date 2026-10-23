@@ -6223,3 +6223,10 @@ The author clarifies that shared-object GC testing comes first and the scope is
 server primitives, not a full framework. Expanded shared-graph tests pass under
 the serial heap gate; shared async settlement and parallel-mutator coordination
 remain open. This experiment does not permanently reprioritize the platform roadmap.
+
+Concurrent native-read follow-up (2026-10-23): private read phases now allow four
+workers to inspect shared objects concurrently while collection and writes wait
+for quiescence. Nine optimized/UBSan groups pass, including 25 shared-read rounds;
+compiled graph and HTTP regressions also pass. This is a native ownership boundary,
+not generated parallel mutation or a new public threading contract. See
+[validation](experiments/native-worker-pool/README.md#concurrent-native-read-phases--2026-10-23).

@@ -29,7 +29,7 @@ struct neoclr_workers {
     pthread_t owner, threads[THREADS];
     pthread_mutex_t gate;
     pthread_cond_t ready, completion;
-    unsigned thread_count, capacity;
+    unsigned thread_count, capacity, readers, waiting_writers;
     int closing, joined, dispatching;
     neoclr_aot_context context;
     neoclr_worker_invoke invoke;
@@ -37,9 +37,18 @@ struct neoclr_workers {
     struct root roots[ROOTS];
 };
 static _Atomic uint64_t next_identity = 1;
-static _Thread_local neoclr_worker_job *entered, *executing;
-static void lock(neoclr_workers *p) { if (entered || pthread_mutex_lock(&p->gate)) abort(); }
+static _Thread_local neoclr_worker_job *entered, *executing, *reading;
+static void lock(neoclr_workers *p) { if (entered || reading || pthread_mutex_lock(&p->gate)) abort(); }
 static void unlock(neoclr_workers *p) { if (pthread_mutex_unlock(&p->gate)) abort(); }
+/* Metadata remains mutex-protected. Only operations touching arena/object bytes
+ * need reader quiescence. Announcing a writer prevents fresh readers starving GC. */
+static void heap_lock(neoclr_workers *p) {
+    lock(p);
+    ++p->waiting_writers;
+    while (p->readers) if (pthread_cond_wait(&p->completion, &p->gate)) abort();
+    --p->waiting_writers;
+    pthread_cond_broadcast(&p->completion);
+}
 static neoclr_worker_job *job_for(neoclr_workers *p, neoclr_worker_handle h) {
     if (h.kind != 2 || h.pool != p->identity || h.slot >= p->capacity) return NULL;
     neoclr_worker_job *j = &p->jobs[h.slot];
@@ -85,7 +94,7 @@ static void *run(void *argument) {
         executing = j;
         int outcome = j->callback(j, j->native_state);
         executing = NULL;
-        if (entered) abort();
+        if (entered || reading) abort();
         lock(p);
         j->outcome = j->cancelled ? NEOCLR_WORKER_CANCELLED :
             (outcome || j->fault.code) ? NEOCLR_WORKER_FAILED : NEOCLR_WORKER_OK;
@@ -126,7 +135,7 @@ neoclr_workers *neoclr_workers_create(unsigned workers, unsigned capacity, size_
 int32_t neoclr_workers_bootstrap(neoclr_workers *p, neoclr_worker_bootstrap bootstrap,
     neoclr_worker_invoke invoke, int32_t argument, neoclr_worker_handle *out) {
     if (!pthread_equal(p->owner, pthread_self()) || !bootstrap || !invoke || !out) return 3;
-    lock(p);
+    heap_lock(p);
     if (p->closing || p->invoke || p->context.text.used || neoclr_root_probe_head_v1() || neoclr_roots_parked_v1()) {
         unlock(p); return 3;
     }
@@ -193,7 +202,7 @@ int32_t neoclr_worker_invoke_capture(neoclr_worker_job *j) {
     return status;
 }
 int neoclr_workers_root_new(neoclr_workers *p, uint64_t initial, neoclr_worker_handle *out) {
-    lock(p);
+    heap_lock(p);
     int available = 0;
     for (unsigned i = 0; i < ROOTS; i++) available |= !p->roots[i].value && p->roots[i].generation != UINT64_MAX;
     void *value = NULL;
@@ -238,7 +247,28 @@ int neoclr_workers_cancel(neoclr_workers *p, neoclr_worker_handle h) {
 int neoclr_worker_cancelled(neoclr_worker_job *j) {
     lock(j->pool); int result = j->cancelled; unlock(j->pool); return result;
 }
-void neoclr_worker_enter(neoclr_worker_job *j) { if (executing != j) abort(); lock(j->pool); entered = j; }
+void neoclr_worker_enter(neoclr_worker_job *j) { if (executing != j) abort(); heap_lock(j->pool); entered = j; }
+const void *neoclr_worker_read_begin(neoclr_worker_job *j) {
+    if (executing != j) abort();
+    neoclr_workers *p = j->pool;
+    lock(p);
+    while (p->waiting_writers) if (pthread_cond_wait(&p->completion, &p->gate)) abort();
+    ++p->readers;
+    reading = j;
+    const void *capture = j->capture;
+    unlock(p);
+    return capture;
+}
+void neoclr_worker_read_end(neoclr_worker_job *j) {
+    if (reading != j || executing != j) abort();
+    neoclr_workers *p = j->pool;
+    if (pthread_mutex_lock(&p->gate)) abort();
+    if (!p->readers) abort();
+    --p->readers;
+    reading = NULL;
+    if (!p->readers) pthread_cond_broadcast(&p->completion);
+    unlock(p);
+}
 void *neoclr_worker_capture(neoclr_worker_job *j) { if (entered != j) abort(); return j->capture; }
 void *neoclr_worker_allocate(neoclr_worker_job *j, uint64_t bytes, uint32_t kind) {
     if (entered != j) abort();
@@ -352,7 +382,7 @@ int neoclr_workers_take(neoclr_workers *p, neoclr_worker_handle h, int *outcome,
 }
 int neoclr_workers_collect(neoclr_workers *p, uint64_t *extent) {
     if (!pthread_equal(p->owner, pthread_self())) return 0;
-    lock(p);
+    heap_lock(p);
     neoclr_probe_storage slots[POOL_ROOT_SLOTS]; unsigned count = pool_slots(p, slots);
     neoclr_probe_frame frame = {.context = &p->context, .storage = slots, .storage_count = count};
     int ok = !neoclr_gc_collect_v1(&p->context, &frame);

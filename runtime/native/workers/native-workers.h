@@ -1,7 +1,8 @@
 #ifndef NEOCLR_NATIVE_WORKERS_H
 #define NEOCLR_NATIVE_WORKERS_H
 /* Opt-in POSIX native experiment. Not a general Task/HTTP ABI.
- * All managed access is serialized through enter/leave. Outside that interval
+ * Managed mutation is serialized through enter/leave; explicit native read phases
+ * may overlap. Outside these intervals
  * callbacks may compute on copied primitives or block, but may not dereference
  * pool-managed pointers. Independent invocation arenas need their own ownership
  * and entry/cleanup qualification; they are never collected by this pool.
@@ -46,6 +47,18 @@ int neoclr_workers_submit(neoclr_workers *, neoclr_worker_handle capture,
  * Running cancellation wins only before worker settlement under the gate. */
 int neoclr_workers_cancel(neoclr_workers *, neoclr_worker_handle);
 int neoclr_worker_cancelled(neoclr_worker_job *);
+/* Private native read phase: returns the current rooted capture, allowing only
+ * reads of its reachable graph until read_end on the same callback/thread.
+ * Multiple readers may overlap. Mutation, allocation and collection wait for all
+ * readers; a waiting writer prevents fresh read admission. Do not retain pointers
+ * after read_end, write object bytes, invoke generated code/GC/TLS hooks, or call
+ * any pool API within this interval except read_end. No nested phases. Never wait
+ * for pool operations or another reader to enter while holding a read phase:
+ * pending writers can prevent that admission. Callback must end its phase before
+ * returning, even when cancelled. Close waits cooperatively; no forced revocation.
+ * This is not a compiler safepoint or support for concurrent managed mutation. */
+const void *neoclr_worker_read_begin(neoclr_worker_job *);
+void neoclr_worker_read_end(neoclr_worker_job *);
 void neoclr_worker_enter(neoclr_worker_job *);
 void *neoclr_worker_capture(neoclr_worker_job *);
 void *neoclr_worker_allocate(neoclr_worker_job *, uint64_t bytes, uint32_t kind);
