@@ -12,7 +12,7 @@ try:
     source=Path(__file__).with_name('environment.c') if fixture=='environment' else carrier/(fixture+'.c')
     binary=(a.output/f'{fixture}-{reuse}-{sanitize}').resolve()
     cmd=['clang','-std=c11','-O2','-Wall','-Wextra','-Werror','-Wno-deprecated-declarations','-DNEOCLR_NATIVE_GC','-I',str(base),'-I',str(carrier),str(source),str(carrier/'native-runtime.c'),str(base/'native-gc.c'),str(base/'root-probe.c'),str(base/'native-stack.c'),'-o',str(binary)]
-    if reuse:cmd+=['-DNEOCLR_ASYNC_CONTEXT_REUSE']
+    if not reuse:cmd+=['-DNEOCLR_ASYNC_CONTEXT_REUSE=0']
     if sanitize:cmd+=['-fsanitize=undefined,bounds','-fno-sanitize-recover=all']
     for command in [cmd,[str(binary)]]:
      r=subprocess.run(command,capture_output=True,text=True,timeout=60)

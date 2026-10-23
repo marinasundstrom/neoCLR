@@ -355,3 +355,14 @@ figure identifies where bytes are allocated; it is not a promised saving from
 moving the payload elsewhere.
 [CPU/caller evidence](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/serve/caller-profile-20261018) ·
 [All comparisons, condition changes and limitations](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/serve/callback-reserve-20261018).
+
+
+## Development: completed async context reuse
+
+The macOS ARM64 native runtime now reuses successfully completed async contexts by
+default, avoiding repeated context preparation while preserving root cleanup and
+fresh callback state. Native lifecycle, compiled async consumer and forced-GC HTTP
+checks cover the change. A compile-time fallback retains the previous path; Windows
+and published packages are unchanged. This does not establish shared-heap async
+support or Kestrel parity. See the
+[implementation, measurements and qualification](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/primitive-comparison/context-reuse).

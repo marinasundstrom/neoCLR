@@ -22,7 +22,7 @@ try:
     recipe=next(c['command'] for c in build['commands'] if c.get('phase')=='host-compile-link')
     old=next(c['command'][4] for c in build['commands'] if c.get('phase')=='native-compilation')
     cmd=[str(a.object.resolve()) if s==old else s for s in recipe if not s.startswith('-DNEOCLR_HTTP_WORKERS=')]
-    cmd += ['-DNEOCLR_ASYNC_CONTEXT_REUSE','-DNEOCLR_HTTP_WORKERS=1','-DNEOCLR_GC_OWNED_HEAP','-DNEOCLR_HTTP_INVOCATIONS=2','-fsanitize=undefined,bounds','-fno-sanitize-recover=all']
+    cmd += ['-DNEOCLR_HTTP_WORKERS=1','-DNEOCLR_GC_OWNED_HEAP','-DNEOCLR_HTTP_INVOCATIONS=2','-fsanitize=undefined,bounds','-fno-sanitize-recover=all']
     cmd[cmd.index('-o')+1]=str(out/'server')
     r=subprocess.run(cmd,capture_output=True,text=True,timeout=120)
     report['commands'].append(dict(command=cmd,exitCode=r.returncode,stderr=r.stderr));r.check_returncode()

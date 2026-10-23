@@ -22106,3 +22106,14 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   then says “Ignore my concern”; the assistant leaves that additional investigation
   aside. No client performance or additional client lifecycle outcome is claimed.
   [Server experiment](../benchmarks/http-server/primitive-comparison/context-reuse/README.md).
+
+
+- Assistant follow-up under the author's continuing performance direction: broadened
+  context-reuse qualification to five compiled async consumers (40 invocations), then
+  selected reuse as the development macOS ARM64 default with an explicit fallback.
+  This default selection is an assistant implementation decision, not a separate
+  author instruction about policy. Byte-identical optimized objects establish that
+  default/fallback select the previously qualified implementations. Repeated native,
+  consumer and forced-GC HTTP checks pass; Windows and published packages remain
+  unchanged. Shared-heap async and comparable-server throughput remain open.
+  [Default integration](../benchmarks/http-server/primitive-comparison/context-reuse/README.md#macos-default-integration--2026-10-23).

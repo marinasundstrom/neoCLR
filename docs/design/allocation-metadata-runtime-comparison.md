@@ -290,3 +290,11 @@ fault teardown/re-entry. This strengthens lifecycle evidence without changing th
 representation, default or previous performance results; shared-heap async and other
 platforms remain outside this qualification. The linked experiment retains the runner
 and exact report.
+
+Following those checks, select reuse as the development macOS ARM64 default with
+`NEOCLR_ASYNC_CONTEXT_REUSE=0` as the diagnostic fallback. Optimized object identity
+proves both paths are unchanged from the qualified implementation; repeat lifecycle,
+compiled-consumer and forced-GC HTTP checks pass. This is a platform-specific policy
+selection, not a new .NET semantic divergence or cross-platform qualification. The
+retention costs and representation tradeoffs above still apply. Windows remains on
+its existing carrier. Historical opt-in reports remain historical evidence.

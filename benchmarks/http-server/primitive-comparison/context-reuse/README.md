@@ -1,10 +1,11 @@
 # Completed async context reuse — 2026-10-23
 
-The optional `NEOCLR_ASYNC_CONTEXT_REUSE` macOS ARM64 experiment reuses successfully
-completed async execution contexts, in addition to their guarded stack mappings.
-It is implemented in the main native runtime source but **not enabled by default**.
-Windows rejects this experimental define; its fiber path remains unchanged. Ordinary
-builds produce a byte-identical optimized runtime object to the preceding source.
+Completed async context reuse is now the **development default on macOS ARM64**.
+Set `NEOCLR_ASYNC_CONTEXT_REUSE=0` when compiling the native runtime to select the
+previous fresh-context path. Explicit `=1` selects reuse; other numeric values are
+rejected. Windows remains on its existing fiber path and rejects reuse.
+Published packages are unchanged. The experiment and consumer results below record
+the qualification that preceded default enablement; the final section records integration.
 
 ## Why and what changes
 
@@ -35,8 +36,7 @@ uses compiler-generated state machines and supports synchronous completion witho
 suspension. neoCLR's runtime-owned retained-stack carrier is a different existing
 implementation strategy. This experiment reduces the carrier's preparation cost;
 it is not .NET state-machine/ExecutionContext compatibility, a new green-thread API
-or a decision to avoid future compiler-level async improvements. Broader async and
-platform qualification remains necessary before selecting a default policy.
+or a decision to avoid future compiler-level async improvements. This does not qualify shared-heap async execution or reuse on other platforms.
 
 ## Validation
 
@@ -86,8 +86,7 @@ Means improve **11.7%/14.5% throughput** and **10.6%/13.4% CPU per response** at
 owners. Four-owner mean rises from 4,860.8 to 5,564.4 requests/s. One-owner tails remain
 variable; short desktop runs do not establish sustained capacity or universal speedups.
 Kestrel was not rerun. Its earlier result is a target, not a current paired control.
-Retain the useful opt-in experiment and qualify broader consumers/platform behavior
-before enabling it by default. This does not complete the comparable-throughput goal.
+At this experimental stage, reuse remained opt-in pending broader consumer checks. This does not complete the comparable-throughput goal.
 
 ## Reproduce
 
@@ -134,8 +133,8 @@ The fault case must fail with the expected diagnostic twice and without a host o
 sanitizer error; a nonzero exit alone is not a passing test. Healthy cases require
 both PASS markers and no stderr. Host teardown checks empty roots and reclaimed heap.
 These tests extend the native lifecycle and HTTP evidence; they do not measure a new
-throughput gain. No runtime source or default changes accompany this qualification.
-Reuse remains opt-in. Shared-heap async execution, other platforms and broader
+throughput gain. No runtime source or default changes accompanied that qualification commit.
+Reuse remained opt-in until the integration below. Shared-heap async execution, other platforms and broader
 application coverage remain unqualified. The existing .NET comparison still applies:
 this tests neoCLR retained-stack lifecycle, not .NET state-machine representation or
 ExecutionContext flow.
@@ -145,3 +144,45 @@ python3 benchmarks/http-server/primitive-comparison/context-reuse/qualify.py \
   --build target/primitive-comparison-build/build.json \
   --output target/context-reuse-consumers
 ```
+
+## macOS default integration — 2026-10-23
+
+The default now selects the qualified reusable-context path on macOS ARM64 only.
+`default-policy.py` compares optimized objects against commit `5afe26b02`: default
+and explicit `=1` are byte-identical to its opt-in implementation, while `=0` is
+byte-identical to its previous default. Invalid numeric configuration is rejected.
+The policy switch introduces no new context lifecycle implementation. The fallback
+is retained for diagnosis; Windows's default and unsupported-platform guard remain.
+
+The maintained runners now explicitly disable reuse for baseline cases and leave
+candidate builds unconfigured so they exercise the new default. Historical reports
+retain their original commands; rerunning an old command with no define now selects
+the new default. Use the updated runners for meaningful baseline comparisons.
+
+Integration evidence is retained in `default-policy.json`, `default-native.json.gz`,
+`default-consumers.json.gz` and `default-http.json.gz`: twelve native lifecycle runs,
+40 compiled-consumer invocations and eight sanitized forced-GC HTTP responses across
+two invocations pass. This remains isolated-owner evidence, not shared-heap async
+qualification. Existing signal/FP, abandonment, root-capacity, fault and shutdown
+checks exercise the default. No public API or compiler/bridge change is involved.
+
+```sh
+python3 benchmarks/http-server/primitive-comparison/context-reuse/default-policy.py \
+  --output target/context-reuse-default-policy
+```
+
+The integration's eight serial forward/reverse capacity trials all pass, using the
+same application object and load settings as the original experiment. Fresh results
+([default-measurement.json.gz](default-measurement.json.gz)) compare explicit `=0`
+with the unconfigured macOS default:
+
+| Owners | Fallback requests/s | Default requests/s | Change | CPU µs/response |
+| --- | ---: | ---: | ---: | --- |
+| 1 | 1,678.8 | 1,859.8 | +10.8% | 595.8 → 533.7 (−10.4%) |
+| 4 | 5,208.0 | 5,717.0 | +9.8% | 725.0 → 647.8 (−10.6%) |
+
+These short local trials corroborate the existing benefit, not an additional gain
+on top of opt-in reuse. One-owner p99 is higher in both default trials (24.14/36.77 ms
+versus 19.39/32.59 ms); four-owner p99 is lower (7.26/6.63 versus 7.37/8.18 ms).
+Tail variability remains a limitation. Kestrel was not rerun, and comparable-throughput
+remains an open target. No instrumented tests or builds overlap the timed trials.

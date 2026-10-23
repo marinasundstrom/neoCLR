@@ -46,7 +46,7 @@ try:
             cmd = [str(obj) if s==original_object else s for s in recipe if not s.startswith('-DNEOCLR_HTTP_WORKERS=')]
             cmd += [f'-DNEOCLR_HTTP_WORKERS={owners}', '-DNEOCLR_GC_PACED', '-I', str(root/'runtime/native/memory'), '-I', str(root/'runtime/native/gc'), '-I', str(root/'runtime/native/async')]
             cmd += ['-DNEOCLR_GC_OWNED_HEAP']
-            if label == 'candidate': cmd += ['-DNEOCLR_ASYNC_CONTEXT_REUSE']
+            if label == 'baseline': cmd += ['-DNEOCLR_ASYNC_CONTEXT_REUSE=0']
             cmd[cmd.index('-o')+1] = str(out/name)
             run(cmd)
             record(out/name)

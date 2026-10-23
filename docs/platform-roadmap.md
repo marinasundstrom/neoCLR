@@ -6453,3 +6453,11 @@ awaits, cancellation/disposal, GC retention above the cache bound and terminal-f
 teardown/re-entry. Retain opt-in status; no new throughput or shared-heap qualification
 claim. Next default-enablement decision must account for remaining platform/application
 coverage. See [reproduction and evidence](../benchmarks/http-server/primitive-comparison/context-reuse/README.md#compiled-async-consumer-qualification--2026-10-23).
+
+Completed-context default integration (2026-10-23): enable the qualified reusable
+carrier by default on macOS ARM64, retaining an explicit numeric-zero fallback.
+Default and fallback objects match the prior qualified paths byte for byte; twelve
+native lifecycle runs, 40 compiled-consumer invocations and eight forced-GC HTTP
+responses pass. Windows and published packages are unchanged. Remaining platform
+coverage does not prevent this macOS-only selection; shared-heap async remains open.
+See [integration evidence](../benchmarks/http-server/primitive-comparison/context-reuse/README.md#macos-default-integration--2026-10-23).

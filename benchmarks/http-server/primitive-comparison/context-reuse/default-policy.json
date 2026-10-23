@@ -1,0 +1,154 @@
+{
+  "passed": true,
+  "reference": "5afe26b02",
+  "commands": [
+    {
+      "command": [
+        "clang",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-deprecated-declarations",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/async",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-c",
+        "-DNEOCLR_ASYNC_CONTEXT_REUSE",
+        "/Users/robert/Projects/neoclr/target/context-reuse-default-policy/qualified.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/context-reuse-default-policy/old-enabled.o"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-deprecated-declarations",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/async",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-c",
+        "/Users/robert/Projects/neoclr/target/context-reuse-default-policy/qualified.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/context-reuse-default-policy/old-disabled.o"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-deprecated-declarations",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/async",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-c",
+        "/Users/robert/Projects/neoclr/runtime/native/async/native-runtime.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/context-reuse-default-policy/default.o"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-deprecated-declarations",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/async",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-c",
+        "-DNEOCLR_ASYNC_CONTEXT_REUSE=1",
+        "/Users/robert/Projects/neoclr/runtime/native/async/native-runtime.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/context-reuse-default-policy/enabled.o"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-deprecated-declarations",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/async",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-c",
+        "-DNEOCLR_ASYNC_CONTEXT_REUSE=0",
+        "/Users/robert/Projects/neoclr/runtime/native/async/native-runtime.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/context-reuse-default-policy/disabled.o"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-deprecated-declarations",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/async",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-c",
+        "-DNEOCLR_ASYNC_CONTEXT_REUSE=2",
+        "/Users/robert/Projects/neoclr/runtime/native/async/native-runtime.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/context-reuse-default-policy/invalid.o"
+      ],
+      "exitCode": 1,
+      "stderr": "/Users/robert/Projects/neoclr/runtime/native/async/native-runtime.c:31:2: error: \"NEOCLR_ASYNC_CONTEXT_REUSE must be zero or one\"\n   31 | #error \"NEOCLR_ASYNC_CONTEXT_REUSE must be zero or one\"\n      |  ^\n1 error generated.\n"
+    }
+  ],
+  "hashes": {
+    "old-enabled": "4cba58ab2893aabfa8efc853d2517fd5ff4f9a5cebe98acbcc4c9af6e920544d",
+    "old-disabled": "728d1639818dd03002c04b845a42ec6387a77cf5500c5c33dc70a7ede19ad63c",
+    "default": "4cba58ab2893aabfa8efc853d2517fd5ff4f9a5cebe98acbcc4c9af6e920544d",
+    "enabled": "4cba58ab2893aabfa8efc853d2517fd5ff4f9a5cebe98acbcc4c9af6e920544d",
+    "disabled": "728d1639818dd03002c04b845a42ec6387a77cf5500c5c33dc70a7ede19ad63c"
+  },
+  "inputs": {
+    "/Users/robert/Projects/neoclr/runtime/native/async/native-runtime.c": "46d4df31ea1f49dbcfbdc1318078d35b561b48f9708774f76f343f91eb87d8cb",
+    "/Users/robert/Projects/neoclr/target/context-reuse-default-policy/qualified.c": "41f9a8090df7e10649944accaac065c71fa1920097354c5356ea75a3f66e1acb",
+    "/Users/robert/Projects/neoclr/benchmarks/http-server/primitive-comparison/context-reuse/default-policy.py": "7f6b3d27507ac85471fde190503061714dfee6a60f9ad37bbc323115b765047f"
+  }
+}

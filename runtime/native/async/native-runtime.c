@@ -18,9 +18,21 @@
 #endif
 #include <stdlib.h>
 #include <string.h>
-#ifdef NEOCLR_ASYNC_CONTEXT_REUSE
+/* Completed-context reuse is qualified on the macOS ARM64 carrier. Keep the
+ * fresh-context path selectable for diagnostics and leave Windows fibers alone. */
+#ifndef NEOCLR_ASYNC_CONTEXT_REUSE
+#if defined(__APPLE__) && defined(__aarch64__)
+#define NEOCLR_ASYNC_CONTEXT_REUSE 1
+#else
+#define NEOCLR_ASYNC_CONTEXT_REUSE 0
+#endif
+#endif
+#if NEOCLR_ASYNC_CONTEXT_REUSE != 0 && NEOCLR_ASYNC_CONTEXT_REUSE != 1
+#error "NEOCLR_ASYNC_CONTEXT_REUSE must be zero or one"
+#endif
+#if NEOCLR_ASYNC_CONTEXT_REUSE
 #ifdef _WIN32
-#error "completed context reuse is only qualified for the macOS experiment"
+#error "completed context reuse is only qualified for macOS ARM64"
 #endif
 #include <fenv.h>
 #include <signal.h>
@@ -66,7 +78,7 @@ typedef struct fiber {
     void *owner;
     uint64_t active_owner, active_callback, ready_owner;
     int done, status, drain, parked, managed;
-#ifdef NEOCLR_ASYNC_CONTEXT_REUSE
+#if NEOCLR_ASYNC_CONTEXT_REUSE
     int reusable;
     fenv_t initial_environment;
 #endif
@@ -77,7 +89,7 @@ typedef struct fiber {
 #endif
 } fiber;
 static int active(const fiber *f) {
-#ifdef NEOCLR_ASYNC_CONTEXT_REUSE
+#if NEOCLR_ASYNC_CONTEXT_REUSE
     return f->mapping && !f->reusable;
 #else
     return f->mapping != NULL;
@@ -127,11 +139,11 @@ static void yield(void) {
 #endif
 }
 static void body(void) {
-#ifdef NEOCLR_ASYNC_CONTEXT_REUSE
+#if NEOCLR_ASYNC_CONTEXT_REUSE
     for (;;) {
 #endif
     fiber *f = state.current;
-#ifdef NEOCLR_ASYNC_CONTEXT_REUSE
+#if NEOCLR_ASYNC_CONTEXT_REUSE
     if (fesetenv(&f->initial_environment)) abort();
 #endif
     f->status = f->drain ? state.drain(state.context)
@@ -143,7 +155,7 @@ static void body(void) {
     if (op && !f->status) op->complete = 1;
     f->done = 1;
     yield();
-#ifdef NEOCLR_ASYNC_CONTEXT_REUSE
+#if NEOCLR_ASYNC_CONTEXT_REUSE
     /* Resume only after the previous invocation's roots/ownership have ended.
      * Reload state on the next iteration; never carry callback pointers forward. */
     }
@@ -167,7 +179,7 @@ static VOID WINAPI windows_body(void *parameter) {
 #endif
 static fiber *allocate_fiber(uint64_t callback, uint64_t op, int drain) {
     fiber *f = NULL;
-#ifdef NEOCLR_ASYNC_CONTEXT_REUSE
+#if NEOCLR_ASYNC_CONTEXT_REUSE
     for (unsigned i = 0; i < LIMIT; ++i) {
         fiber *cached = &state.fibers[i];
         if (!cached->reusable) continue;
@@ -198,7 +210,7 @@ static fiber *allocate_fiber(uint64_t callback, uint64_t op, int drain) {
         statistics.peak_reserved_bytes = statistics.reserved_bytes;
 #else
     cached_stack stack;
-#ifndef NEOCLR_ASYNC_CONTEXT_REUSE
+#if !NEOCLR_ASYNC_CONTEXT_REUSE
     if (state.cached) {
         stack = state.cache[--state.cached];
         memset(&state.cache[state.cached], 0, sizeof(stack));
@@ -231,7 +243,7 @@ static fiber *allocate_fiber(uint64_t callback, uint64_t op, int drain) {
     f->machine.uc_stack.ss_size = STACK_BYTES;
     f->machine.uc_link = NULL;
     makecontext(&f->machine, body, 0);
-#ifdef NEOCLR_ASYNC_CONTEXT_REUSE
+#if NEOCLR_ASYNC_CONTEXT_REUSE
     if (fegetenv(&f->initial_environment)) abort();
 #endif
 #endif
@@ -325,7 +337,7 @@ static int resume(fiber *f) {
         if (f->owner) --state.owned;
         if (f->managed) memset(find(f->operation), 0, sizeof(operation));
         neoclr_roots_discard_v1(&f->roots);
-#ifdef NEOCLR_ASYNC_CONTEXT_REUSE
+#if NEOCLR_ASYNC_CONTEXT_REUSE
         if (!status && !state.context->fault.code && state.cached < NEOCLR_ASYNC_STACK_CACHE_LIMIT) {
             /* Keep machine and mapping at stable addresses. A suspended C frame
              * still points at this fiber; moving/copying ucontext is forbidden. */
@@ -577,7 +589,7 @@ int32_t neoclr_runtime_async_shutdown_v1(neoclr_aot_context *c) {
         leaked |= state.operations[i].id != 0;
         if (state.operations[i].owner && neoclr_gc_host_root_release_v1(c, state.operations[i].owner)) abort();
     }
-#ifndef NEOCLR_ASYNC_CONTEXT_REUSE
+#if !NEOCLR_ASYNC_CONTEXT_REUSE
     for (unsigned i = 0; i < state.cached; ++i)
         unmap_stack(state.cache[i].mapping, state.cache[i].bytes);
 #endif

@@ -74,8 +74,8 @@ try:
                            if not item.startswith('-DNEOCLR_HTTP_WORKERS=')]
                 command[command.index('-o') + 1] = str(binary)
                 command += ['-DNEOCLR_GC_OWNED_HEAP', '-DNEOCLR_HTTP_INVOCATIONS=2']
-                if reuse:
-                    command += ['-DNEOCLR_ASYNC_CONTEXT_REUSE']
+                if not reuse:
+                    command += ['-DNEOCLR_ASYNC_CONTEXT_REUSE=0']
                 if sanitize:
                     command += ['-fsanitize=undefined,bounds', '-fno-sanitize-recover=all']
                 run(command, label + '-link')
