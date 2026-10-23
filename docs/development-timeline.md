@@ -21967,3 +21967,28 @@ response and a 17.3% smaller application object. Forced-GC HTTP, root-probe and
 optimized/UBSan shared-worker checks pass. CLR-style binary maps, image lifetime
 registration and faster maintained allocation metadata remain proposals requiring
 separate implementation/qualification. See [evidence and sources](../benchmarks/http-server/primitive-comparison/allocation-metadata/README.md).
+
+## 2026-10-23 — Minimal headers and comparison with Java, Go and .NET
+
+The author directed, “We should minimize the data unnecessarily loaded or resolved.
+Object headers should be minimal.” The assistant inspected the native object
+identity and GC descriptor, then implemented and tested packing allocation kind
+into span alignment bits, reducing the private descriptor from 32 to 24 bytes.
+While measurement was underway, the author added, “Anyway, we should look at how
+other languages have solved it. Java, Go, .NET”.
+
+The assistant consulted official HotSpot, Go and CoreCLR documentation/source,
+comparing shared type metadata, thread-local allocation regions, size-class spans
+and pointer maps. The candidate passed native GC, forced-GC HTTP and compiled
+shared-worker validation. Its measured peak arena extent fell 6.3%, but plain HTTP
+throughput fell 2.4%/5.1% at one/four owners and CPU per response rose 2.6%/4.9%.
+The assistant reverted it and retained the tested patch and evidence, consistent
+with the author's earlier throughput/CPU priority. This is an assistant implementation
+decision, not a separate author approval or rejection of packed headers.
+
+The proposed next step is an explicit heap-owner contract and maintained allocation
+metadata to avoid repeated walks, followed by shared execution type descriptors.
+These are not yet implemented; cross-worker GC, corruption checks and external
+mutable arena behavior remain acceptance constraints. See
+[research](design/allocation-metadata-runtime-comparison.md) and
+[experiment](../benchmarks/http-server/primitive-comparison/compact-header/README.md).

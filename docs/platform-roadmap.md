@@ -6309,3 +6309,11 @@ diagnostic mode remain intact. Paired one/four-owner HTTP throughput rises about
 4.4%/7.5% and CPU per response falls 4.6%/6.5%; four-owner tail latency is higher.
 An atomic paired-root admission experiment was reverted after no measured benefit.
 See [validation and limits](../benchmarks/http-server/primitive-comparison/slot-metadata/README.md).
+
+Header/allocation research follow-up (2026-10-23): the author directs minimal
+headers, less unnecessary metadata resolution, and comparison with Java, Go and
+.NET. A validated 24-byte private descriptor saved memory but regressed HTTP
+throughput/CPU, so it was reverted. The next proposed bounded slice is explicit
+heap ownership and maintained allocation metadata before further header packing.
+See [comparison and acceptance gates](design/allocation-metadata-runtime-comparison.md)
+and [rejected candidate evidence](../benchmarks/http-server/primitive-comparison/compact-header/README.md).

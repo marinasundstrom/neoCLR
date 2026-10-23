@@ -1,0 +1,646 @@
+diff --git a/docs/experiments/aot-console/README.md b/docs/experiments/aot-console/README.md
+index bfe950f88..248a0ba15 100644
+--- a/docs/experiments/aot-console/README.md
++++ b/docs/experiments/aot-console/README.md
+@@ -2091,7 +2091,7 @@ allocation exhaustion reports 5. The widened end calculation avoids Int32 additi
+ overflow. The kernel never collects or reenters; AOT call sites are rooted allocation
+ points. These matched symbols remain an experimental ABI, not public guest APIs.
+ String-unicode-test.c verifies combining text, empty/end bounds and a single allocation
+-(32-byte GC header plus aligned descriptor/payload), with no allocation on rejected
++(24-byte GC header plus aligned descriptor/payload; originally 32 bytes), with no allocation on rejected
+ bounds. The check passes on macOS ARM64 with UBSan and warnings-as-errors; Windows
+ execution is pending. Public String range access additionally validates its bounds
+ and preserves neoCLR's grapheme semantics, unlike .NET UTF-16 code-unit slicing.
+diff --git a/docs/experiments/aot-console/native-gc-admission-test.c b/docs/experiments/aot-console/native-gc-admission-test.c
+index 4a2eb7749..c044f6c74 100644
+--- a/docs/experiments/aot-console/native-gc-admission-test.c
++++ b/docs/experiments/aot-console/native-gc-admission-test.c
+@@ -28,7 +28,7 @@ int main(void) {
+     CHECK(neoclr_gc_allocate_rooted_v1(&c,&frame,UINT64_MAX,NEOCLR_GC_BYTES,&out)==5);
+     CHECK(neoclr_gc_allocate_rooted_v1(&c,&frame,1,99,&out)==3);
+     CHECK(out==(void *)(uintptr_t)123 && neoclr_gc_statistics_v1().collections==collections);
+-    CHECK(neoclr_gc_allocate_rooted_v1(&c,&frame,144,NEOCLR_GC_BYTES,&out)==5);
++    CHECK(neoclr_gc_allocate_rooted_v1(&c,&frame,160,NEOCLR_GC_BYTES,&out)==5);
+     CHECK(out==(void *)(uintptr_t)123 && *(uint64_t *)live==42);
+     CHECK(neoclr_gc_statistics_v1().collections==collections+1);
+     neoclr_probe_leave_v1(&frame);
+diff --git a/docs/experiments/aot-console/native-gc-allocation-test.c b/docs/experiments/aot-console/native-gc-allocation-test.c
+index d40924c84..46e45edf1 100644
+--- a/docs/experiments/aot-console/native-gc-allocation-test.c
++++ b/docs/experiments/aot-console/native-gc-allocation-test.c
+@@ -11,7 +11,7 @@ int main(void) {
+     neoclr_probe_storage slot = {&live, 8, 0};
+     neoclr_probe_frame frame = {.context = &c, .storage = &slot, .storage_count = 1};
+     CHECK(!neoclr_gc_collect_v1(&c, &frame));
+-    uint64_t *header = (uint64_t *)live - 4;
++    uint64_t *header = (uint64_t *)live - 3;
+     uint64_t span = header[0], used = c.text.used;
+     header[0] = 7;
+     uint64_t snapshot[64]; memcpy(snapshot, heap, sizeof(heap));
+@@ -25,5 +25,31 @@ int main(void) {
+     CHECK(!neoclr_gc_allocate_v1(&c.text, 8, NEOCLR_GC_BYTES, &output) && output == hole);
+     CHECK(c.text.used == used);
+     CHECK(!neoclr_gc_collect_v1(&c, NULL) && !c.text.used);
++    /* All kind tags retain exact, unaligned sizes; only padding is rounded.
++     * These descriptors are private: the payload still starts eight-byte aligned. */
++    for (uint32_t tag = NEOCLR_GC_TEXT; tag <= NEOCLR_GC_INTERN; tag++) {
++        for (uint64_t size = 1; size <= 17; size++) {
++            c.text.used = 0;
++            CHECK(!neoclr_gc_allocate_v1(&c.text, size, tag, &output));
++            CHECK(output == (unsigned char *)heap + 24);
++            CHECK(c.text.used == 24 + ((size + 7) & ~UINT64_C(7)));
++            uint64_t actual_bytes = 0;
++            uint32_t actual_kind = 0;
++            CHECK(!neoclr_gc_allocation_info_v1(&c, output, &actual_bytes, &actual_kind));
++            CHECK(actual_bytes == size && actual_kind == tag);
++            for (uint64_t i = 0; i < c.text.used - 24; i++)
++                CHECK(!((unsigned char *)output)[i]);
++            /* Invalid packed tags cannot hide behind a valid span. */
++            uint64_t saved = heap[0];
++            for (uint64_t invalid = 0; invalid <= 7; invalid += 7) {
++                heap[0] = (saved & ~UINT64_C(7)) | invalid;
++                uint64_t before[64]; memcpy(before, heap, sizeof(heap));
++                void *sentinel = (void *)(uintptr_t)1;
++                CHECK(neoclr_gc_allocate_v1(&c.text, 1, NEOCLR_GC_BYTES, &sentinel) == 3);
++                CHECK(sentinel == (void *)(uintptr_t)1 && !memcmp(before, heap, sizeof(heap)));
++            }
++            heap[0] = saved;
++        }
++    }
+     return 0;
+ }
+diff --git a/docs/experiments/aot-console/native-gc-arguments-test.c b/docs/experiments/aot-console/native-gc-arguments-test.c
+index 7750854c5..bc1063c13 100644
+--- a/docs/experiments/aot-console/native-gc-arguments-test.c
++++ b/docs/experiments/aot-console/native-gc-arguments-test.c
+@@ -20,7 +20,7 @@ int main(void) {
+     uint64_t heap[128]={0};
+     neoclr_aot_context ctx={.text={(unsigned char*)heap,sizeof(heap),0}};
+     void *dead=NULL,*out=(void*)(uintptr_t)123;
+-    CHECK(!neoclr_gc_allocate_v1(&ctx.text,sizeof(heap)-32,NEOCLR_GC_BYTES,&dead));
++    CHECK(!neoclr_gc_allocate_v1(&ctx.text,sizeof(heap)-24,NEOCLR_GC_BYTES,&dead));
+     uint64_t before=neoclr_gc_statistics_v1().collections;
+     CHECK(neoclr_process_arguments_v1(4,argv,&ctx,&out)==5 && out==(void*)(uintptr_t)123);
+     CHECK(neoclr_gc_statistics_v1().collections==before);
+@@ -56,7 +56,7 @@ int main(void) {
+     argv[3]=NULL;
+     CHECK(neoclr_process_arguments_rooted_v1(4,argv,&ctx,&out)==3 && out==(void*)(uintptr_t)123);
+     CHECK(!neoclr_gc_collect_v1(&ctx,NULL) && !ctx.text.used);
+-    argv[3]=tail;ctx.text.capacity=192;
++    argv[3]=tail;ctx.text.capacity=160;
+     CHECK(neoclr_process_arguments_rooted_v1(4,argv,&ctx,&out)==5 && out==(void*)(uintptr_t)123);
+     CHECK(!neoclr_root_probe_head_v1());
+     CHECK(!neoclr_gc_collect_v1(&ctx,NULL) && !ctx.text.used);
+diff --git a/docs/experiments/aot-console/native-gc-base-test.c b/docs/experiments/aot-console/native-gc-base-test.c
+index f517d04ae..9df55cb6b 100644
+--- a/docs/experiments/aot-console/native-gc-base-test.c
++++ b/docs/experiments/aot-console/native-gc-base-test.c
+@@ -24,7 +24,7 @@ int main(void) {
+     neoclr_parked_roots parked = {0}, empty_parked = {0};
+     int cleaned = 0;
+     /* Private descriptor corruption: first base is valid, trailing span is not. */
+-    uint64_t *tail_header = (uint64_t *)last - 4;
++    uint64_t *tail_header = (uint64_t *)last - 3;
+     uint64_t span = tail_header[0];
+     tail_header[0] = 0;
+     CHECK(neoclr_gc_allocation_info_v1(&c, first, &bytes, &kind) == 3);
+diff --git a/docs/experiments/aot-console/native-gc-borrowed-test.c b/docs/experiments/aot-console/native-gc-borrowed-test.c
+index 827176a49..cafbe6b96 100644
+--- a/docs/experiments/aot-console/native-gc-borrowed-test.c
++++ b/docs/experiments/aot-console/native-gc-borrowed-test.c
+@@ -31,7 +31,7 @@ int main(void) {
+         const neoclr_aot_text *a=NULL,*b=NULL,*c=NULL,*out=(const neoclr_aot_text *)(uintptr_t)123;
+         CHECK(!text(&ctx.text,left[mode],&a) && !text(&ctx.text,right[mode],&b) && !text(&ctx.text,replacement[mode],&c));
+         void *dead=NULL;
+-        CHECK(!neoclr_gc_allocate_v1(&ctx.text,ctx.text.capacity-ctx.text.used-32,NEOCLR_GC_BYTES,&dead));
++        CHECK(!neoclr_gc_allocate_v1(&ctx.text,ctx.text.capacity-ctx.text.used-24,NEOCLR_GC_BYTES,&dead));
+         CHECK(invoke(mode,1,a,b,c,&ctx.text,&out)==3);
+         neoclr_probe_storage slot={&dead,8,0};
+         neoclr_probe_frame frame;
+diff --git a/docs/experiments/aot-console/native-gc-dense-test.c b/docs/experiments/aot-console/native-gc-dense-test.c
+index 6da8653ad..d9503e9b9 100644
+--- a/docs/experiments/aot-console/native-gc-dense-test.c
++++ b/docs/experiments/aot-console/native-gc-dense-test.c
+@@ -5,7 +5,7 @@
+ #include <string.h>
+ static void cleaned(void *state) { ++*(int *)state; }
+ int main(void) {
+-    enum { COUNT = 4097, SPAN = 48 };
++    enum { COUNT = 4097, SPAN = 40 };
+     unsigned char *buffer = malloc(COUNT * SPAN * 2);
+     if (!buffer) return 1;
+     neoclr_aot_context c = {.text = {buffer, COUNT * SPAN * 2, 0}};
+@@ -30,7 +30,7 @@ int main(void) {
+      * cleanup or conditional outputs change. Repair and collect the same heap. */
+     unsigned char *snapshot = malloc((size_t)c.text.used);
+     if (!snapshot) return 9;
+-    uint64_t *last_header = (uint64_t *)conditional_value - 4;
++    uint64_t *last_header = (uint64_t *)conditional_value - 3;
+     uint64_t saved_span = last_header[0];
+     last_header[0] = c.text.used + 8;
+     memcpy(snapshot, buffer, (size_t)c.text.used);
+diff --git a/docs/experiments/aot-console/native-gc-helper-test.c b/docs/experiments/aot-console/native-gc-helper-test.c
+index 5f00671a8..66354b066 100644
+--- a/docs/experiments/aot-console/native-gc-helper-test.c
++++ b/docs/experiments/aot-console/native-gc-helper-test.c
+@@ -11,7 +11,7 @@ int main(void) {
+     void *live = NULL, *dead = NULL, *filler = NULL;
+     CHECK(!neoclr_gc_allocate_v1(&c.text, 64, NEOCLR_GC_BYTES, &live));
+     *(uint64_t *)live = 42;
+-    CHECK(!neoclr_gc_allocate_v1(&c.text, 320, NEOCLR_GC_BYTES, &dead));
++    CHECK(!neoclr_gc_allocate_v1(&c.text, 344, NEOCLR_GC_BYTES, &dead));
+     neoclr_probe_storage slots[] = {{&live, 8, 0}, {&trace, 8, 0}, {&filler, 8, 0}};
+     neoclr_probe_frame frame;
+     neoclr_probe_enter_v3(&frame, &c, 0, slots, 3, "{}", 2);
+@@ -24,7 +24,7 @@ int main(void) {
+     CHECK(trace->length == sizeof(expected) - 1 && !memcmp(trace->bytes, expected, sizeof(expected) - 1));
+     CHECK(*(uint64_t *)live == 42 && !memcmp(&saved, &c.fault, sizeof(saved)));
+     const neoclr_aot_text *unchanged = trace;
+-    CHECK(!neoclr_gc_allocate_v1(&c.text, 248, NEOCLR_GC_BYTES, &filler));
++    CHECK(!neoclr_gc_allocate_v1(&c.text, 280, NEOCLR_GC_BYTES, &filler));
+     *(uint64_t *)filler = 123;
+     collections = neoclr_gc_statistics_v1().collections;
+     CHECK(neoclr_stack_trace_capture_v1(0, &c, &trace, names, 1) == 5);
+diff --git a/docs/experiments/aot-console/native-gc-intern-test.c b/docs/experiments/aot-console/native-gc-intern-test.c
+index 631f26f0c..42fbb844c 100644
+--- a/docs/experiments/aot-console/native-gc-intern-test.c
++++ b/docs/experiments/aot-console/native-gc-intern-test.c
+@@ -9,7 +9,7 @@ int main(void) {
+     void *storage=NULL,*dead=NULL;
+     CHECK(!neoclr_gc_allocate_v1(&ctx.text,16,NEOCLR_GC_TEXT,&storage));
+     neoclr_aot_text *input=storage;input->length=4;memcpy(input->bytes,"a\0bc",4);
+-    CHECK(!neoclr_gc_allocate_v1(&ctx.text,ctx.text.capacity-ctx.text.used-32,NEOCLR_GC_BYTES,&dead));
++    CHECK(!neoclr_gc_allocate_v1(&ctx.text,ctx.text.capacity-ctx.text.used-24,NEOCLR_GC_BYTES,&dead));
+     const neoclr_aot_text *out=(const neoclr_aot_text*)(uintptr_t)123;
+     CHECK(neoclr_string_intern_rooted_v1(input,&ctx.text,&out)==3);
+     neoclr_probe_storage slot={&dead,8,0};neoclr_probe_frame frame;
+diff --git a/docs/experiments/aot-console/native-gc-pass-test.c b/docs/experiments/aot-console/native-gc-pass-test.c
+index cfdbb8401..fb1e360e2 100644
+--- a/docs/experiments/aot-console/native-gc-pass-test.c
++++ b/docs/experiments/aot-console/native-gc-pass-test.c
+@@ -16,20 +16,20 @@ int main(void) {
+     /* Corruption in the last descriptor must reject before clearing earlier marks
+      * or installing intrusive queue links. Header layout is private to this test. */
+     ((uint64_t *)entry1)[-1] = 3;
+-    uint64_t span = ((uint64_t *)garbage)[-4];
+-    ((uint64_t *)garbage)[-4] = 0;
++    uint64_t span = ((uint64_t *)garbage)[-3];
++    ((uint64_t *)garbage)[-3] = 0;
+     memcpy(saved, memory, sizeof(memory));
+     CHECK(neoclr_gc_collect_v1(&context, NULL) == 3);
+     CHECK(!memcmp(saved, memory, sizeof(memory)));
+-    ((uint64_t *)garbage)[-4] = span;
++    ((uint64_t *)garbage)[-3] = span;
+     for (unsigned i = 0; i < 3; ++i) {
+         CHECK(!neoclr_gc_collect_v1(&context, NULL));
+         CHECK(((uint64_t *)owner1)[1] == 123 && ((uint64_t *)owner2)[1] == 456);
+         CHECK(((uint64_t *)entry1)[-1] == 1 && ((uint64_t *)entry2)[-1] == 1);
+     }
+     /* Remove the private intern classification to verify ordinary reclamation. */
+-    ((uint64_t *)entry1)[-2] = NEOCLR_GC_TEXT;
+-    ((uint64_t *)entry2)[-2] = NEOCLR_GC_TEXT;
++    ((uint64_t *)entry1)[-3] = (((uint64_t *)entry1)[-3] & ~UINT64_C(7)) | NEOCLR_GC_TEXT;
++    ((uint64_t *)entry2)[-3] = (((uint64_t *)entry2)[-3] & ~UINT64_C(7)) | NEOCLR_GC_TEXT;
+     CHECK(!neoclr_gc_collect_v1(&context, NULL) && !context.text.used);
+     return 0;
+ }
+diff --git a/docs/experiments/aot-console/native-gc-preference-test.c b/docs/experiments/aot-console/native-gc-preference-test.c
+index 140fa99ed..f3194cf88 100644
+--- a/docs/experiments/aot-console/native-gc-preference-test.c
++++ b/docs/experiments/aot-console/native-gc-preference-test.c
+@@ -19,7 +19,7 @@ int main(void) {
+         size_t length=(size_t)out->length;unsigned char *baseline=malloc(length+1);CHECK(baseline);
+         memcpy(baseline,out->bytes,length);
+         CHECK(!neoclr_gc_collect_v1(&ctx,NULL) && !ctx.text.used);
+-        void *dead=NULL;CHECK(!neoclr_gc_allocate_v1(&ctx.text,sizeof(heap)-32,NEOCLR_GC_BYTES,&dead));
++        void *dead=NULL;CHECK(!neoclr_gc_allocate_v1(&ctx.text,sizeof(heap)-24,NEOCLR_GC_BYTES,&dead));
+         out=(const neoclr_aot_text*)(uintptr_t)123;
+         CHECK(rooted(&ctx.text,&out)==3 && out==(const neoclr_aot_text*)(uintptr_t)123);
+         neoclr_probe_frame frame;neoclr_probe_storage slot={&dead,8,0};
+diff --git a/docs/experiments/aot-console/native-gc-producer-test.c b/docs/experiments/aot-console/native-gc-producer-test.c
+index cc936e605..5e79f49ea 100644
+--- a/docs/experiments/aot-console/native-gc-producer-test.c
++++ b/docs/experiments/aot-console/native-gc-producer-test.c
+@@ -23,7 +23,7 @@ int main(void) {
+     neoclr_aot_context ctx={.text={(unsigned char*)heap,sizeof(heap),0}};
+     neoclr_aot_text_arena foreign={(unsigned char*)foreign_heap,sizeof(foreign_heap),0};
+     void *dead=NULL;
+-    CHECK(!neoclr_gc_allocate_v1(&ctx.text,sizeof(heap)-32,NEOCLR_GC_BYTES,&dead));
++    CHECK(!neoclr_gc_allocate_v1(&ctx.text,sizeof(heap)-24,NEOCLR_GC_BYTES,&dead));
+     uint64_t result[2]={99,99};
+     CHECK(neoclr_text_decode_utf8_host_bytes_rooted_v1(native,sizeof(content),&ctx.text,result)==3 && result[0]==99 && result[1]==99);
+     neoclr_probe_storage slot={&dead,8,0};neoclr_probe_frame frame;
+@@ -52,7 +52,7 @@ int main(void) {
+     void *storage=NULL;
+     CHECK(!neoclr_gc_allocate_v1(&ctx.text,8+strlen(name),NEOCLR_GC_TEXT,&storage));
+     neoclr_aot_text *path=storage;path->length=strlen(name);memcpy(path->bytes,name,strlen(name));
+-    CHECK(!neoclr_gc_allocate_v1(&ctx.text,ctx.text.capacity-ctx.text.used-32,NEOCLR_GC_BYTES,&dead));
++    CHECK(!neoclr_gc_allocate_v1(&ctx.text,ctx.text.capacity-ctx.text.used-24,NEOCLR_GC_BYTES,&dead));
+     neoclr_probe_storage roots[]={{&path,8,0},{&dead,8,0}};
+     neoclr_probe_enter_v3(&frame,&ctx,0,roots,2,"{}",2);
+     result[0]=result[1]=99;reads=closes=0;before=neoclr_gc_statistics_v1().collections;
+diff --git a/docs/experiments/aot-console/native-gc-test.c b/docs/experiments/aot-console/native-gc-test.c
+index fc30f5c3d..8b45233f7 100644
+--- a/docs/experiments/aot-console/native-gc-test.c
++++ b/docs/experiments/aot-console/native-gc-test.c
+@@ -58,7 +58,7 @@ static int mixed_free_runs(void) {
+     roots[1] = NULL;
+     CHECK(!neoclr_gc_collect_v1(&c, &frame));
+     CHECK(*items[2] == UINT64_C(0xdddddddddddddddd));
+-    void *merged = allocate(&c, 80, NEOCLR_GC_BYTES);
++    void *merged = allocate(&c, 64, NEOCLR_GC_BYTES);
+     CHECK(merged == items[1] && c.text.used == extent);
+     roots[1] = merged;
+     roots[2] = roots[3] = NULL;
+@@ -69,7 +69,7 @@ static int mixed_free_runs(void) {
+     neoclr_gc_statistics after = neoclr_gc_statistics_v1();
+     CHECK(after.allocations - before.allocations == 1);
+     CHECK(after.reclaimed_allocations - before.reclaimed_allocations == 7);
+-    CHECK(after.reclaimed_bytes - before.reclaimed_bytes == 128);
++    CHECK(after.reclaimed_bytes - before.reclaimed_bytes == 112);
+     CHECK(!neoclr_gc_collect_v1(&c, NULL) && !c.text.used);
+     return 0;
+ }
+@@ -252,14 +252,14 @@ static int indexed_conditional_roots(void) {
+         CHECK(owners[i] && value);
+         edges[i] = (neoclr_gc_conditional_root){owners[i], value, -1};
+         slots[i] = (neoclr_probe_storage){&owners[i], 8, 0};
+-        uint64_t fake[] = {40, 8, NEOCLR_GC_BYTES, 1, 42};
++        uint64_t fake[] = {32 | NEOCLR_GC_BYTES, 8, 1, 42};
+         memcpy(owners[i], fake, sizeof(fake));
+     }
+     neoclr_probe_frame frame = {.context = &c, .storage = slots, .storage_count = 100};
+     CHECK(!neoclr_gc_collect_conditional_v1(&c, &frame, edges, 100));
+     for (unsigned i = 0; i < 100; i++) {
+         CHECK(edges[i].retained);
+-        void *invalid[] = {(char *)owners[i] - 32, (char *)owners[i] + 32,
++        void *invalid[] = {(char *)owners[i] - 24, (char *)owners[i] + 24,
+                           (char *)owners[i] + 1, c.text.data + c.text.used};
+         for (unsigned j = 0; j < 4; j++) {
+             neoclr_gc_conditional_root edge = {invalid[j], edges[i].value, -1};
+@@ -453,11 +453,11 @@ int main(void) {
+     uint64_t *atomic = allocate(&c, 16, NEOCLR_GC_BYTES);
+     dead = allocate(&c, 16, NEOCLR_GC_TEXT);
+     CHECK(atomic && dead); atomic[1] = (uintptr_t)dead; interior = (uintptr_t)atomic;
+-    CHECK(!neoclr_gc_collect_v1(&c, &frame) && c.text.used == 48);
++    CHECK(!neoclr_gc_collect_v1(&c, &frame) && c.text.used == 40);
+     interior = 0;
+     CHECK(!neoclr_gc_collect_v1(&c, &frame) && !c.text.used);
+     /* Live-set exhaustion must neither collect inside allocation nor publish output. */
+-    void *large = allocate(&c, 992, NEOCLR_GC_BYTES);
++    void *large = allocate(&c, 1000, NEOCLR_GC_BYTES);
+     CHECK(large && c.text.used == 1024);
+     void *output = (void *)(uintptr_t)1;
+     CHECK(neoclr_gc_allocate_v1(&c.text, 8, NEOCLR_GC_TEXT, &output) == 5 && output == (void *)(uintptr_t)1);
+diff --git a/docs/experiments/aot-console/native-gc-text-helper-test.c b/docs/experiments/aot-console/native-gc-text-helper-test.c
+index 17fba42e6..162598286 100644
+--- a/docs/experiments/aot-console/native-gc-text-helper-test.c
++++ b/docs/experiments/aot-console/native-gc-text-helper-test.c
+@@ -10,7 +10,7 @@ int main(void) {
+     CHECK(!neoclr_string_concat_v1(literal,literal,&c.text,&left));
+     CHECK(!neoclr_string_concat_v1(literal,literal,&c.text,&right));
+     void *dead = NULL;
+-    CHECK(!neoclr_gc_allocate_v1(&c.text,344,NEOCLR_GC_BYTES,&dead));
++    CHECK(!neoclr_gc_allocate_v1(&c.text,368,NEOCLR_GC_BYTES,&dead));
+     /* Deliberately absent from caller storage: the helper must protect inputs. */
+     neoclr_probe_frame frame;
+     neoclr_probe_storage empty = {0};
+@@ -29,7 +29,7 @@ int main(void) {
+     CHECK(!neoclr_string_concat_v1(literal,literal,&c.text,&left));
+     CHECK(!neoclr_string_concat_v1(literal,literal,&c.text,&right));
+     ((const void **)parts)[2]=left; ((const void **)parts)[3]=right;
+-    CHECK(!neoclr_gc_allocate_v1(&c.text,288,NEOCLR_GC_BYTES,&dead));
++    CHECK(!neoclr_gc_allocate_v1(&c.text,320,NEOCLR_GC_BYTES,&dead));
+     neoclr_probe_enter_v3(&frame,&c,0,&empty,0,"{}",2);
+     before=neoclr_gc_statistics_v1().collections;
+     CHECK(!neoclr_string_join_parts_rooted_v1(parts,2,literal,15,&c.text,&result));
+@@ -47,7 +47,7 @@ int main(void) {
+     };
+     literal = (const void *)&unicode;
+     CHECK(!neoclr_string_concat_v1(literal,literal,&c.text,&left));
+-    CHECK(!neoclr_gc_allocate_v1(&c.text,408,NEOCLR_GC_BYTES,&dead));
++    CHECK(!neoclr_gc_allocate_v1(&c.text,424,NEOCLR_GC_BYTES,&dead));
+     uint64_t outcome[2] = {99,99};
+     neoclr_probe_storage live = {&dead,8,0};
+     neoclr_probe_enter_v3(&frame,&c,0,&live,1,"{}",2);
+diff --git a/docs/experiments/aot-console/native-gc-unicode-test.c b/docs/experiments/aot-console/native-gc-unicode-test.c
+index ba4bcd2cd..596ff22a2 100644
+--- a/docs/experiments/aot-console/native-gc-unicode-test.c
++++ b/docs/experiments/aot-console/native-gc-unicode-test.c
+@@ -30,7 +30,7 @@ int main(void) {
+         const void *input=source;
+         if(mode==6) CHECK(!neoclr_string_graphemes_v1(source,&ctx.text,&input));
+         void *dead=NULL;
+-        CHECK(!neoclr_gc_allocate_v1(&ctx.text,ctx.text.capacity-ctx.text.used-32,NEOCLR_GC_BYTES,&dead));
++        CHECK(!neoclr_gc_allocate_v1(&ctx.text,ctx.text.capacity-ctx.text.used-24,NEOCLR_GC_BYTES,&dead));
+         const void *out=(const void*)(uintptr_t)123;
+         CHECK(invoke(mode,1,input,&ctx.text,&out)==3);
+         neoclr_probe_storage roots[]={{&input,8,0},{&dead,8,0},{&source,8,0}};
+@@ -67,7 +67,7 @@ int main(void) {
+         CHECK(!neoclr_gc_entry_check_v1(&ctx));
+     }
+     /* Exhaustion after publishing some elements must release the temporary frame. */
+-    uint64_t heap[28]={0};
++    uint64_t heap[24]={0};
+     neoclr_aot_context ctx={.text={(unsigned char*)heap,sizeof(heap),0}};
+     void *storage=NULL;
+     CHECK(!neoclr_gc_allocate_v1(&ctx.text,8+sizeof(content),NEOCLR_GC_TEXT,&storage));
+diff --git a/docs/experiments/aot-console/native-gc-utf8-test.c b/docs/experiments/aot-console/native-gc-utf8-test.c
+index b51466193..3d9a7e630 100644
+--- a/docs/experiments/aot-console/native-gc-utf8-test.c
++++ b/docs/experiments/aot-console/native-gc-utf8-test.c
+@@ -15,7 +15,7 @@ int main(void) {
+         source->length = length;
+         memcpy(source->bytes, content, (size_t)length);
+         void *dead = NULL;
+-        CHECK(!neoclr_gc_allocate_v1(&c.text, c.text.capacity - c.text.used - 32, NEOCLR_GC_BYTES, &dead));
++        CHECK(!neoclr_gc_allocate_v1(&c.text, c.text.capacity - c.text.used - 24, NEOCLR_GC_BYTES, &dead));
+         const void *out = (const void *)(uintptr_t)123;
+         uint64_t before = neoclr_gc_statistics_v1().collections;
+         CHECK(neoclr_utf8_encode_rooted_v1(source, &c.text, &out) == 3 && out == (const void *)(uintptr_t)123);
+@@ -41,7 +41,7 @@ int main(void) {
+             unsigned char *bytes = (unsigned char *)array + 16;
+             memcpy(bytes, content, (size_t)length);
+             if (reserved) memset(bytes + length, 1, (size_t)length);
+-            CHECK(!neoclr_gc_allocate_v1(&c.text, c.text.capacity - c.text.used - 32, NEOCLR_GC_BYTES, &dead));
++            CHECK(!neoclr_gc_allocate_v1(&c.text, c.text.capacity - c.text.used - 24, NEOCLR_GC_BYTES, &dead));
+             uint64_t result[2] = {99,99};
+             CHECK(neoclr_utf8_decode_rooted_v1(array, &c.text, result) == 3 && result[0] == 99 && result[1] == 99);
+             neoclr_probe_enter_v3(&frame, &c, 0, &slot, 1, "{}", 2);
+diff --git a/docs/experiments/aot-console/native-gc.md b/docs/experiments/aot-console/native-gc.md
+index ace1415f9..3e2d57cb3 100644
+--- a/docs/experiments/aot-console/native-gc.md
++++ b/docs/experiments/aot-console/native-gc.md
+@@ -7,8 +7,10 @@ interpreter collector or establish a production native hosting ABI.
+ ## Kernel foundation
+
+ `native-gc.c` implements nonmoving mark-and-sweep inside the host's bounded arena.
+-A 32-byte allocation descriptor records block span, logical payload size, allocation
+-kind and mark state. Reclaimed adjacent blocks coalesce and allocations reuse holes;
++A 24-byte allocation descriptor records the aligned span with allocation kind in
++its low three bits, exact logical payload size, and pointer-sized mark/worklist state.
++The descriptor was reduced from 32 bytes on 2026-10-23; the managed object identity
++word and payload ABI remain unchanged. See the [measurement and CLR comparison](../../../benchmarks/http-server/primitive-comparison/compact-header/README.md). Reclaimed adjacent blocks coalesce and allocations reuse holes;
+ all payload addresses remain stable. Sweep and coalescing share one forward pass:
+ each block is reclaimed/poisoned once, adjacent free spans merge as they are visited,
+ and a trailing free run lowers the arena extent. No malloc or shared managed runtime is required.
+diff --git a/runtime/native/gc/native-gc.c b/runtime/native/gc/native-gc.c
+index 4a657921a..830575279 100644
+--- a/runtime/native/gc/native-gc.c
++++ b/runtime/native/gc/native-gc.c
+@@ -20,8 +20,13 @@ void neoclr_gc_profile_reset_v1(void) {
+ /* Allocation descriptors live in the same bounded buffer as payloads. Free
+  * blocks coalesce; payload addresses never move. Object words are conservative
+  * candidates; text/byte payloads are atomic, String arrays have explicit slots. */
+-typedef struct { uint64_t span, bytes, kind, state; } block;
+-_Static_assert(sizeof(block) == 32, "private allocation descriptor");
++typedef struct { uint64_t span_kind, bytes, state; } block;
++_Static_assert(sizeof(block) == 24, "private allocation descriptor");
++/* Spans are eight-byte aligned: their low bits carry the allocation kind.
++ * Keep state pointer-sized: tracing temporarily links pending blocks through it.
++ * Payload size remains exact and full-width, including unaligned byte payloads. */
++static uint64_t block_span(const block *b) { return b->span_kind & ~UINT64_C(7); }
++static uint32_t block_kind(const block *b) { return (uint32_t)(b->span_kind & 7); }
+ enum { ALLOCATED = 1, MARKED = 2, SCANNED = 4 };
+ static _Thread_local neoclr_gc_statistics statistics;
+ static int valid(const neoclr_aot_text_arena *a) {
+@@ -31,17 +36,17 @@ static int valid(const neoclr_aot_text_arena *a) {
+ static int block_valid(const neoclr_aot_text_arena *a, uint64_t at) {
+     if (a->used - at < sizeof(block)) return 0;
+     const block *b = (const void *)(a->data + at);
+-    return b->span >= sizeof(block) + 8 && !(b->span & 7) && b->span <= a->used - at &&
++    return block_span(b) >= sizeof(block) + 8 && block_span(b) <= a->used - at &&
+         b->state <= 7 && (!b->state || ((b->state & ALLOCATED) &&
+-            b->bytes && b->bytes <= b->span - sizeof(block) &&
+-            b->kind >= NEOCLR_GC_TEXT && b->kind <= NEOCLR_GC_INTERN));
++            b->bytes && b->bytes <= block_span(b) - sizeof(block) &&
++            block_kind(b) >= NEOCLR_GC_TEXT && block_kind(b) <= NEOCLR_GC_INTERN));
+ }
+ static int blocks_valid(const neoclr_aot_text_arena *a) {
+     if (!valid(a)) return 0;
+     for (uint64_t at = 0; at < a->used;) {
+         if (!block_valid(a, at)) return 0;
+         const block *b = (const void *)(a->data + at);
+-        at += b->span;
++        at += block_span(b);
+     }
+     return 1;
+ }
+@@ -69,13 +74,13 @@ static int validated_bases(const neoclr_aot_text_arena *arena, const void *value
+             found_value |= value == (const void *)(b + 1);
+             found_owner |= owner == (const void *)(b + 1);
+         }
+-        at += b->span;
++        at += block_span(b);
+     }
+     /* Once both bases match, the remaining walk only needs integrity checks. */
+     for (; at < arena->used;) {
+         if (!block_valid(arena, at)) return 0;
+         const block *b = (const void *)(arena->data + at);
+-        at += b->span;
++        at += block_span(b);
+     }
+     return found_value && found_owner;
+ }
+@@ -84,7 +89,7 @@ int32_t neoclr_gc_allocation_info_v1(neoclr_aot_context *context, const void *va
+     if (!context || !value || !bytes || !kind || !validated_bases(&context->text, value, NULL)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+     const block *b = (const block *)value - 1;
+     *bytes = b->bytes;
+-    *kind = (uint32_t)b->kind;
++    *kind = block_kind(b);
+     return 0;
+ }
+ static _Thread_local neoclr_gc_resource *resource_head;
+@@ -185,7 +190,7 @@ static int32_t callback_read(neoclr_aot_context *context, uint64_t handle, void
+         !validated_bases(&context->text, root->value, NULL)) return 3;
+     const block *allocation = (const block *)root->value - 1;
+     uint64_t kind;
+-    if (allocation->kind != NEOCLR_GC_OBJECT || allocation->bytes != 24) return 3;
++    if (block_kind(allocation) != NEOCLR_GC_OBJECT || allocation->bytes != 24) return 3;
+     memcpy(&kind, root->value, 8);
+     if (kind != UINT32_MAX) return 3;
+     *output = root->value;
+@@ -222,9 +227,9 @@ int32_t neoclr_gc_complete_invocation_v1(neoclr_aot_context *context) {
+      * roots still retain the original value normally until their own release. */
+     for (uint64_t at = 0; at < context->text.used;) {
+         block *b = (void *)(context->text.data + at);
+-        if ((b->state & ALLOCATED) && b->kind == NEOCLR_GC_INTERN)
+-            b->kind = NEOCLR_GC_BYTES;
+-        at += b->span;
++        if ((b->state & ALLOCATED) && block_kind(b) == NEOCLR_GC_INTERN)
++            b->span_kind = block_span(b) | NEOCLR_GC_BYTES;
++        at += block_span(b);
+     }
+     context->static_storage = NULL;
+     return 0;
+@@ -278,24 +283,24 @@ int32_t neoclr_gc_allocate_v1(neoclr_aot_text_arena *a, uint64_t bytes,
+     for (uint64_t at = 0; at < a->used;) {
+         if (!block_valid(a, at)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+         block *b = (void *)(a->data + at);
+-        if (!chosen && !b->state && b->span >= needed) chosen = b;
+-        at += b->span;
++        if (!chosen && !b->state && block_span(b) >= needed) chosen = b;
++        at += block_span(b);
+     }
+     if (oversized) return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
+     if (chosen) {
+-        if (chosen->span - needed >= sizeof(block) + 8) {
++        if (block_span(chosen) - needed >= sizeof(block) + 8) {
+             block *rest = (void *)((unsigned char *)chosen + needed);
+-            *rest = (block){chosen->span - needed, 0, 0, 0};
+-            chosen->span = needed;
++            *rest = (block){block_span(chosen) - needed, 0, 0};
++            chosen->span_kind = needed;
+         }
+     } else {
+         if (needed > a->capacity - a->used) return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
+         chosen = (void *)(a->data + a->used);
+-        chosen->span = needed;
++        chosen->span_kind = needed;
+         a->used += needed;
+     }
+-    chosen->bytes = bytes; chosen->kind = kind; chosen->state = ALLOCATED;
+-    memset(chosen + 1, 0, (size_t)(chosen->span - sizeof(block)));
++    chosen->bytes = bytes; chosen->span_kind = block_span(chosen) | kind; chosen->state = ALLOCATED;
++    memset(chosen + 1, 0, (size_t)(block_span(chosen) - sizeof(block)));
+     *output = chosen + 1;
+     statistics.allocations++;
+ #ifdef NEOCLR_GC_PROFILE
+@@ -351,7 +356,7 @@ typedef struct {
+  * full seed walk; these pointers live only through this synchronous collection. */
+ static void index_seed(block_index *index, block *b) {
+     index->reset_required |= b->state > ALLOCATED;
+-    if (b->state && b->kind == NEOCLR_GC_INTERN && index->intern_count <= INTERN_SEED_LIMIT) {
++    if (b->state && block_kind(b) == NEOCLR_GC_INTERN && index->intern_count <= INTERN_SEED_LIMIT) {
+         if (index->intern_count < INTERN_SEED_LIMIT)
+             index->interns[index->intern_count] = b;
+         index->intern_count++;
+@@ -368,7 +373,7 @@ static int build_index(neoclr_aot_text_arena *a, block_index *index) {
+         block *b = (void *)(a->data + at);
+         blocks++;
+         index_seed(index, b);
+-        uint64_t end = at + b->span;
++        uint64_t end = at + block_span(b);
+         while (bucket < index->capacity && ((uint64_t)bucket << index->shift) < end)
+             index->start[bucket++] = b;
+         at = end;
+@@ -385,8 +390,8 @@ static block *indexed_block(neoclr_aot_text_arena *a, const block_index *index,
+     block *first = index->start[offset >> index->shift];
+     for (uint64_t at = (uintptr_t)first - base; at < a->used;) {
+         block *b = (void *)(a->data + at);
+-        if (offset < at + b->span) return b;
+-        at += b->span;
++        if (offset < at + block_span(b)) return b;
++        at += block_span(b);
+     }
+     return NULL;
+ }
+@@ -402,7 +407,7 @@ static void mark(neoclr_aot_text_arena *a, block_index *index, uint64_t word, bl
+         /* Atomic payloads have no children: retain them without worklist traffic.
+          * Count newly marked leaves so dependent/parked owners discovered late
+          * still drive the fixed point even when no tracing work was enqueued. */
+-        if (b->kind == NEOCLR_GC_TEXT || b->kind == NEOCLR_GC_BYTES) {
++        if (block_kind(b) == NEOCLR_GC_TEXT || block_kind(b) == NEOCLR_GC_BYTES) {
+             b->state = ALLOCATED | MARKED | SCANNED;
+             index->atomic_marks++;
+         } else {
+@@ -489,9 +494,9 @@ static int32_t collect_indexed(neoclr_aot_context *context,
+         for (uint64_t at = 0; at < a->used;) {
+             block *b = (void *)(a->data + at);
+             b->state &= ALLOCATED;
+-            if ((b->state & ALLOCATED) && b->kind == NEOCLR_GC_INTERN)
++            if ((b->state & ALLOCATED) && block_kind(b) == NEOCLR_GC_INTERN)
+                 mark(a, &index, (uintptr_t)(b + 1), &pending);
+-            at += b->span;
++            at += block_span(b);
+         }
+     } else {
+         for (unsigned i = 0; i < index.intern_count; i++)
+@@ -530,15 +535,15 @@ static int32_t collect_indexed(neoclr_aot_context *context,
+             pending = (block *)(uintptr_t)(b->state & ~UINT64_C(7));
+             b->state = ALLOCATED | MARKED | SCANNED;
+             const unsigned char *data = (const void *)(b + 1);
+-            if (b->kind == NEOCLR_GC_INTERN) {
++            if (block_kind(b) == NEOCLR_GC_INTERN) {
+                 if (b->bytes != 8) goto invalid_descriptor;
+                 uint64_t owner; memcpy(&owner, data, 8);
+                 mark(a, &index, owner, &pending);
+-            } else if (b->kind == NEOCLR_GC_OBJECT) {
++            } else if (block_kind(b) == NEOCLR_GC_OBJECT) {
+                 for (uint64_t offset = 8; offset + 8 <= b->bytes; offset += 8) {
+                     uint64_t word; memcpy(&word, data + offset, 8); mark(a, &index, word, &pending);
+                 }
+-            } else if (b->kind == NEOCLR_GC_RECORDS) {
++            } else if (block_kind(b) == NEOCLR_GC_RECORDS) {
+                 uint64_t kind, length, lanes;
+                 if (b->bytes < 24) goto invalid_descriptor;
+                 memcpy(&kind, data, 8); memcpy(&length, data + 8, 8); memcpy(&lanes, data + 16, 8);
+@@ -553,7 +558,7 @@ static int32_t collect_indexed(neoclr_aot_context *context,
+                         mark(a, &index, word, &pending);
+                     }
+                 }
+-            } else if (b->kind == NEOCLR_GC_STRINGS) {
++            } else if (block_kind(b) == NEOCLR_GC_STRINGS) {
+                 uint64_t kind, length;
+                 if (b->bytes < 16) goto invalid_descriptor;
+                 memcpy(&kind, data, 8); memcpy(&length, data + 8, 8);
+@@ -624,12 +629,12 @@ static int32_t collect_indexed(neoclr_aot_context *context,
+     uint64_t free_at = 0;
+     for (uint64_t at = 0; at < a->used;) {
+         block *b = (void *)(a->data + at);
+-        uint64_t span = b->span;
++        uint64_t span = block_span(b);
+         if (b->state && !(b->state & MARKED)) {
+             statistics.reclaimed_allocations++; statistics.reclaimed_bytes += b->bytes;
+             /* Poison reclaimed contents so stale reads fail functional stress tests. */
+             memset(b + 1, 0xdd, (size_t)(span - sizeof(block)));
+-            b->state = 0; b->bytes = 0; b->kind = 0;
++            b->state = 0; b->bytes = 0; b->span_kind = span;
+         } else b->state &= ALLOCATED;
+ #ifdef NEOCLR_GC_PROFILE
+         if (b->state) { live_bytes += b->bytes; live_blocks++; }
+@@ -637,7 +642,7 @@ static int32_t collect_indexed(neoclr_aot_context *context,
+         if (b->state) {
+             free_run = NULL;
+         } else if (free_run) {
+-            free_run->span += span;
++            free_run->span_kind += span;
+         } else {
+             free_run = b;
+             free_at = at;
+@@ -655,7 +660,7 @@ invalid_descriptor:
+     /* Do not leave private queue links in public quiescent heap state on failure.
+      * Nothing has been swept; a repaired descriptor can be collected again. */
+     for (uint64_t at = 0; at < a->used;) {
+-        block *b = (void *)(a->data + at); b->state &= ALLOCATED; at += b->span;
++        block *b = (void *)(a->data + at); b->state &= ALLOCATED; at += block_span(b);
+     }
+     return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+ }
+@@ -680,7 +685,7 @@ static int32_t collect_dense(neoclr_aot_context *context,
+     for (uint64_t at = 0; at < a->used;) {
+         block *b = (void *)(a->data + at);
+         index_seed(&index, b);
+-        uint64_t end = at + b->span;
++        uint64_t end = at + block_span(b);
+         while (bucket < index.capacity && ((uint64_t)bucket << index.shift) < end)
+             index.start[bucket++] = b;
+         at = end;
+@@ -774,7 +779,7 @@ static int32_t string_intern(const neoclr_aot_text *text, neoclr_aot_text_arena
+     uint64_t count = 0, bytes = 0;
+     for (uint64_t at = 0; at < arena->used;) {
+         const block *b = (const void *)(arena->data + at);
+-        if ((b->state & ALLOCATED) && b->kind == NEOCLR_GC_INTERN) {
++        if ((b->state & ALLOCATED) && block_kind(b) == NEOCLR_GC_INTERN) {
+             if (b->bytes != 8) return 3;
+             const neoclr_aot_text *owner;
+             memcpy(&owner, b + 1, 8);
+@@ -785,7 +790,7 @@ static int32_t string_intern(const neoclr_aot_text *text, neoclr_aot_text_arena
+             }
+             bytes += owner->length; count++;
+         }
+-        at += b->span;
++        at += block_span(b);
+     }
+     if (count >= 4096 || text->length > UINT64_C(1048576) - bytes) return 10;
+     void *entry;
