@@ -6513,3 +6513,12 @@ Continue with configuration-qualified samples, survival/live-byte metrics and
 metadata-resolution/cache instrumentation before attributing costs or changing GC
 architecture. This extends the investigation; it does not supersede the existing
 collector roadmap. See [workload analysis](../benchmarks/http-server/primitive-comparison/transient-handoff/workloads.md).
+
+### HTTP validation-cost follow-up — 2026-10-24
+
+Author-directed workload investigation now measures repeated frame/descriptor and
+plan validation across plain/JSON HTTP: 64 checked responses, matched identities
+and four aggregation tests. JSON amplifies descriptor validation beyond boundary
+frequency. Compiler-owned transient descriptor lifetime is the next bounded
+experiment, pending safety and CPU/throughput evidence; no runtime change or
+reprioritization is implied. See [workload evidence](../benchmarks/http-server/primitive-comparison/transient-handoff/workloads.md#follow-up-repeated-validation-work).

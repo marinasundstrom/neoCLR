@@ -366,3 +366,13 @@ cannot distinguish tracing cost from metadata resolution or choose generations.
 Record explicit corpus admission gaps and preserve execution units. See
 [implementation](../../benchmarks/http-server/primitive-comparison/transient-handoff/README.md)
 and [coherent workload profile](../../benchmarks/http-server/primitive-comparison/transient-handoff/workloads.md).
+
+### Repeated validation profile — 2026-10-24
+
+Matched plain/JSON diagnostics find 25,892/43,753 frame visits and
+44,462/122,197 storage descriptor checks per additional response. This supports
+investigating an explicit generated transient-descriptor ownership contract,
+reusing the CLR lifetime/metadata distinction above. It does not authorize skipping
+mutable native checks or safepoints. No production change, CPU attribution or
+collector selection follows from counts alone. [Definitions, evidence and next
+experiment](../../benchmarks/http-server/primitive-comparison/transient-handoff/workloads.md#follow-up-repeated-validation-work).

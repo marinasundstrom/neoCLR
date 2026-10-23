@@ -108,3 +108,65 @@ is `json-reproduction.json.gz`.
 The rebuilt JSON object differs bytewise; eight independently checked responses
 validate reproduction (`json-reproduction-run.json.gz`). Original counter pairs
 retain their recorded object identities.
+
+## Follow-up: repeated validation work
+
+A second diagnostic pass keeps the same objects and host configuration, adding
+counters in temporary copies of root-probe.c. Four matched runs check 64 HTTP
+responses in eight server invocations. The earlier boundary counts reproduce
+exactly. An initial pass produces the same normalized counts; the final rerun
+renames a misleading descriptor-counter label before archiving the reports.
+Production runtime code and generated objects are unchanged.
+
+| Per additional response | Plain text | JSON |
+|---|---:|---:|
+| Frames visited by boundary validation (including current frame) | 25,892 | 43,753 |
+| Storage descriptors checked by validate_storage | 44,462 | 122,197 |
+| Fault-context observations | 7,546 | 11,355 |
+| Sum of plan lengths supplied to strlen validation | 429,629 | 659,629 |
+| Mean frames visited per boundary | 7.04 | 7.90 |
+
+The descriptor counter includes owned-frame entry validation and boundary scans of
+ordinary storage and transient descriptors. It excludes the separate inline scan
+inside transient publication. Fault observations include frame leave, not just
+boundaries. String lengths describe logical validation input bytes; they are neither
+unique metadata size nor measured memory traffic, and exclude marker searches.
+These counters do not measure type metadata resolution, cache misses or CPU shares.
+
+JSON raises frame visits 69% and descriptor checks 175%, versus 51% more boundaries.
+This identifies repeated ancestor validation as a concrete follow-up candidate:
+more complex handlers amplify work even when no collection is due. The existing
+owned-storage contract already removes repeated ordinary local-table validation,
+but transient descriptors remain checked at every descendant boundary.
+
+The next bounded experiment should consider a separate compiler-owned transient
+contract: prove that descriptor addresses/widths/count remain fixed between
+publication and the next boundary or leave, while values remain mutable and traced.
+Keep the checked path for mutable native callers, faults, nested contexts and
+parked/shared-worker lifetimes. Compare CPU and throughput before retaining it.
+Do not skip safepoints or cache validity by pointer based on these counts. Image-owned
+typed maps remain another candidate for repeated JSON-plan checks; the previous
+marker-prefix experiment did not justify a production change.
+
+This follows the existing CLR comparison in the allocation/metadata research:
+trusted execution metadata with an explicit lifetime can be validated separately
+from changing root values. It does not imply CLR-compatible stack maps or claim
+that generational GC would remove publication cost. Survival/live-byte data and
+CPU attribution remain open.
+
+`profile-count.py` generates diagnostic sources with checked insertion sites;
+its options match count.py. `profile-summary.py` accepts plain small/large then
+JSON small/large reports, verifies matched objects/runtime/diagnostic identities,
+and subtracts startup work. Four focused aggregation tests pass. Raw reports are
+`profile-{plain,json}{4,12}.json.gz`; `profile-summary.json` records derived results
+and input hashes. For example:
+
+```sh
+python3 benchmarks/http-server/primitive-comparison/transient-handoff/profile-count.py \
+  --build target/primitive-comparison-build/build.json \
+  --object target/transient-handoff-build/candidate.o \
+  --output target/new-root-profile --paced --requests 4
+```
+
+Repeat with twelve requests and the rooted JSON object plus `--json`. These
+sanitized diagnostic trials cannot support a new throughput-improvement claim.

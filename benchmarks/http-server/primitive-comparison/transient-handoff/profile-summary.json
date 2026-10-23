@@ -1,0 +1,25 @@
+{
+  "unit": "additional checked HTTP response",
+  "plain": {
+    "ancestorFrames": 25892.0,
+    "validatedStorageSlots": 44462.0,
+    "faultObservations": 7546.0,
+    "planValidationBytes": 429629.0,
+    "boundaries": 3676.0,
+    "framesPerBoundary": 7.043525571273123
+  },
+  "json": {
+    "ancestorFrames": 43753.0,
+    "validatedStorageSlots": 122197.0,
+    "faultObservations": 11355.0,
+    "planValidationBytes": 659629.0,
+    "boundaries": 5535.0,
+    "framesPerBoundary": 7.904787714543812
+  },
+  "inputs": {
+    "benchmarks/http-server/primitive-comparison/transient-handoff/profile-plain4.json.gz": "1f3772eb1e0d23600af9e12cadc36217ce896f8231cb5c5248b98f668e5f7c8d",
+    "benchmarks/http-server/primitive-comparison/transient-handoff/profile-plain12.json.gz": "76fce17c8f96405fe2c7665873b6e7c46852d1d755723c07420e8674ec51249d",
+    "benchmarks/http-server/primitive-comparison/transient-handoff/profile-json4.json.gz": "a48685cae4de122ab4ecd9ef99b9c875a9213053387d5822232cd471c92062ad",
+    "benchmarks/http-server/primitive-comparison/transient-handoff/profile-json12.json.gz": "364b7cc61d67b1338696f533b48026cd88d9337ddf986d932b100e2309ae63f2"
+  }
+}
