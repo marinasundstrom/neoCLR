@@ -21936,3 +21936,16 @@ The earlier in-progress synchronous safepoint polling optimization was completed
 and committed with GC stress tests and separate graph measurements. It is retained
 as runtime evidence, not counted as a plain HTTP improvement.
 See [primary baseline, sources and reproduction](../benchmarks/http-server/primitive-comparison/README.md).
+
+### Follow-up — choosing a balance
+
+The author directed, “Do what reaches a good balance.” The assistant compared
+three GC pacing budgets on the plain-text fixture with one and four isolated
+workers, then selected 256 allocations/1,024 publications for the existing opt-in
+paced mode. Final short paired trials show about 26%/23% higher mean throughput
+and 21%/20% less CPU per response. Separate main-owner instrumentation checks
+collection work and memory retention; capacity measurements remain uninstrumented.
+The assistant preserved forced collection and pressure recovery, strengthened the
+budget-boundary test, and checked socket/scheduler behavior. Variable tail latency,
+longer unreachable-resource retention, sustained-load qualification and the large
+reference-server gap remain open. See [experiment](../benchmarks/http-server/primitive-comparison/pacing/README.md).

@@ -155,3 +155,11 @@ Fresh output directories are required. Go, Node and the .NET 10 runtime/SDK must
 be available. The controller builds all reference executables and relinks the
 same neoCLR object for one/four owners before timing. All source hashes and
 commands are retained. No public API snapshot or website build is required.
+
+## Follow-up: balanced paced collection
+
+The [GC pacing experiment](pacing/README.md) compares three bounded budgets with
+the same plain response and selects 256 allocations/1,024 publications for opt-in
+paced mode. Final paired trials improve mean one/four-owner throughput about
+26%/23% and reduce CPU per response about 21%/20%. The original baseline above
+remains historical evidence; forced-GC behavior and the HTTP API are unchanged.

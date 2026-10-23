@@ -6278,3 +6278,11 @@ plain-request worker efficiency as the next measurement target, not a framework
 feature expansion. Synchronous shared-heap safepoint polling also passes forced-GC
 tests with lower coordination cost; that graph result is secondary and is not an
 HTTP speedup. See [polling evidence](experiments/native-worker-pool/README.md#cooperative-polling-fast-path--2026-10-23).
+
+Balanced plain-request follow-up (2026-10-23): the author delegates the throughput/CPU
+tradeoff. A three-budget experiment selects 256 allocations/1,024 root publications
+for existing opt-in native GC pacing, improving mean one/four-owner throughput
+about 26%/23% and CPU per response about 21%/20% in short local trials. Forced
+collection and pressure retry remain intact; longer retention and variable tail
+latency remain explicit tradeoffs. This is worker hot-path tuning, not shared-heap
+async HTTP or a new framework API. See [evidence](../benchmarks/http-server/primitive-comparison/pacing/README.md).

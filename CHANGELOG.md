@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-23
 
+- Tune opt-in native GC pacing from 16 allocations/64 root publications to 256/1,024 after a three-budget plain HTTP comparison. Final paired trials improve mean one/four-owner throughput about 26%/23% and reduce estimated CPU per response about 21%/20%; tail latency remains variable. Preserve forced collection, root validation and rooted pressure retry, with boundary/pressure and socket/scheduler validation. Record the memory-retention tradeoff and reproducible evidence in benchmarks/http-server/primitive-comparison/pacing/README.md.
+
 - Establish the author-prioritized plain-text HTTP throughput/CPU baseline against Go net/http, Node http and .NET Kestrel, without artificial handler scheduling. Validate 14 final trials using a compiled EOF-aware client after retaining driver-limit/failure calibration. neoCLR measures 485–491 requests/s with one owner and 1,531–1,693 with four; CPU cost per response remains higher than the reference servers. Record API/runtime research and treat worker throughput plus CPU efficiency as primary, allocations as secondary and JSON as later work. See benchmarks/http-server/primitive-comparison/README.md.
 
 - Avoid pool locking at pure compiled safepoints until an atomic quiescence request arrives; retain synchronized root publication, exclusive heap operations and forced collection. Optimized/UBSan native and compiled stress tests pass. Local four-worker graph mean time falls about 36% against the preceding coordinator with unchanged allocation/collection counts; shared-heap scaling remains unqualified. The author prioritizes a plain-text HTTP comparison as the primary baseline.

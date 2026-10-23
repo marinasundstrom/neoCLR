@@ -741,7 +741,10 @@ int32_t neoclr_gc_collect_conditional_v1(neoclr_aot_context *context,
 }
 /* Opt-in generated-boundary pacing; private per-owner-thread state, not ABI.
  * Unexpected global collection epochs force a sweep instead of indefinitely
- * postponing cleanup across contexts. Rooted admission handles actual pressure. */
+ * postponing cleanup across contexts. Rooted admission handles actual pressure.
+ * The bounded 256-allocation / 1024-publication budget amortizes tracing on the
+ * plain HTTP path; see benchmarks/http-server/primitive-comparison/pacing.
+ * This is a publication budget, not a wall-clock finalization guarantee. */
 static _Thread_local struct {
     const neoclr_aot_context *context;
     uint64_t allocations, collections, boundaries;
@@ -760,7 +763,7 @@ int32_t neoclr_gc_boundary_v1(neoclr_aot_context *context, const neoclr_probe_fr
     if (!context || resource_cleanup_active || boundary != neoclr_root_probe_head_v1() ||
         (boundary && boundary->context != context)) return 3;
     if (pacing.context == context && statistics.collections == pacing.collections &&
-        statistics.allocations - pacing.allocations < 16 && ++pacing.boundaries < 64) return 0;
+        statistics.allocations - pacing.allocations < 256 && ++pacing.boundaries < 1024) return 0;
     return neoclr_gc_idle_v1(context, boundary);
 }
 neoclr_gc_statistics neoclr_gc_statistics_v1(void) { return statistics; }
