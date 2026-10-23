@@ -378,3 +378,16 @@ block visits per allocation. GC, corruption, threaded-owner and forced-GC HTTP c
 pass. These are short desktop comparisons with drift and variable tails, not a fresh
 peer comparison or Kestrel parity. See
 [implementation, measurements and limits](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/primitive-comparison/free-index).
+
+
+## Development: transient-root handoff reuse
+
+Native lowering now avoids empty and duplicate temporary-root publications while
+retaining every collection and worker boundary. Forced-GC, shared-worker and async
+consumer checks pass. Eight paired plaintext trials show 10.8%/8.6% higher mean
+one/four-owner throughput and 10.2%/8.8% lower CPU per response; tails remain mixed.
+These short desktop trials do not establish Kestrel parity. A separate work-count
+comparison covers ordinary task/collection samples and plain/JSON HTTP, with units
+and coverage gaps kept explicit. See
+[implementation and evidence](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/primitive-comparison/transient-handoff)
+and [workload comparison](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/http-server/primitive-comparison/transient-handoff/workloads.md).

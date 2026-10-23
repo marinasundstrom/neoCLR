@@ -22140,3 +22140,31 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
 - Open work: allocator/metadata implementation and qualification, ThinLTO normal-build
   integration, lifetime histograms, store audit, and comparable-server throughput.
   [Full evidence and research](../benchmarks/http-server/primitive-comparison/cost-investigation/README.md).
+
+
+### 2026-10-24 — Redundant publications and a coherent workload profile
+
+- Author: asks to continue reducing unnecessary root publications and repeated
+  metadata processing. During the work, suggests comparing plain text with JSON and
+  other operations, then emphasizes existing ordinary samples and HTTP configurations
+  as a way to obtain a “Coherent picture”.
+- Assistant: identifies duplicate post-success transient tables and empty transient
+  publications. Implements native-only omission while retaining pre-call/constructor
+  roots, diagnostic events and every GC/worker boundary. Qualification passes; eight
+  paired plaintext trials show 10.8%/8.6% higher mean one/four-owner throughput and
+  10.2%/8.8% lower CPU per response, with mixed tails. These are local measurements,
+  not peer parity or JSON throughput claims.
+- Assistant: broadens the investigation to controlled paced plain/JSON HTTP counts
+  and existing task/collection samples, separating response increments from complete
+  invocation costs. JSON adds 1,859 boundaries and 249 allocations per extra response;
+  an earlier commentary arithmetic error (2,033 boundaries) is explicitly corrected
+  after automated normalization. Four aggregation tests check units and identities.
+- Outcomes/limits: retain failed preparation evidence (stale installed sample source,
+  synchronous-entry host mismatch, omitted JSON reflection roots and output-file
+  collision). Current source plus explicit async entry wrappers qualify task and
+  collection samples; the JSON DOM/stream sample remains rejected for an unsupported
+  native value-member contract in this compiler/bundle configuration. No timing or
+  zero-cost data is inferred from that exclusion. Broader configuration coverage,
+  survival/live-byte data and metadata-resolution/cache metrics remain open.
+- Evidence: [implementation and tests](../benchmarks/http-server/primitive-comparison/transient-handoff/README.md)
+  and [workload profile](../benchmarks/http-server/primitive-comparison/transient-handoff/workloads.md).

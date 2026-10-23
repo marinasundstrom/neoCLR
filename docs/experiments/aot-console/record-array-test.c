@@ -12,7 +12,7 @@ int main(void) {
     CHECK(neoclr_reserve_records_v1(&c.text, -1, 1, &result) == 3);
     CHECK(neoclr_reserve_records_v1(&c.text, 65537, 1, &result) == 7);
     CHECK(neoclr_reserve_records_v1(&c.text, 1, 0, &result) == 3);
-    CHECK(neoclr_reserve_records_v1(&c.text, 1, 129, &result) == 3);
+    CHECK(neoclr_reserve_records_v1(&c.text, 1, NEOCLR_NATIVE_LAYOUT_LANES + 1, &result) == 3);
     CHECK(neoclr_reserve_records_v1(NULL, 1, 1, &result) == 3);
     CHECK(neoclr_reserve_records_v1(&c.text, 1, 1, NULL) == 3);
     CHECK(result == (void *)(uintptr_t)1 && !c.text.used);

@@ -342,3 +342,27 @@ investigating larger reductions in publication frequency or image-owned typed ma
 rather than caching validity by pointer. Reuse the CLR metadata/effect-analysis
 comparisons above; no immutable image contract is implemented by these experiments.
 See [full evidence](../../benchmarks/http-server/primitive-comparison/stack-bounds/README.md).
+
+
+### Transient-root lifetime reuse and workload comparison — 2026-10-24
+
+Native GC now retains the already published addresses of call-result scratch storage
+and constructor receivers through return, omitting identical post-success tables and
+empty transient events. It removes unnecessary publication/metadata work without
+assuming arbitrary plans immutable or proving general calls noncollecting. All
+boundaries and published-table checks remain; diagnostic probes keep their full phase
+events. This applies the CLR distinction between execution needs and diagnostic
+descriptions while retaining neoCLR's existing nonmoving descriptor representation.
+No public API/ordinary .NET semantic divergence or new runtime ABI is introduced.
+Costs/limits: per-invocation tables and compact JSON still exist; native phase fields
+can retain pre-call/constructor phase until the next boundary, and skipped sites
+retain conservative stack-table reservation entries in lowering.
+
+Qualified tests and paired plaintext measurements support integration: 10.8%/8.6%
+higher one/four-owner throughput, 10.2%/8.8% lower CPU/response, mixed tails. A separate
+controlled work-count cohort distinguishes plain HTTP, JSON HTTP and task/collection
+samples. JSON increases both allocation and publication frequency; these counts alone
+cannot distinguish tracing cost from metadata resolution or choose generations.
+Record explicit corpus admission gaps and preserve execution units. See
+[implementation](../../benchmarks/http-server/primitive-comparison/transient-handoff/README.md)
+and [coherent workload profile](../../benchmarks/http-server/primitive-comparison/transient-handoff/workloads.md).

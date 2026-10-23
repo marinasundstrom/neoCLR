@@ -15,7 +15,7 @@ struct Storage {
     lanes: Vec<(bool, usize, usize, u32, u32)>,
 }
 struct Transient {
-    data: DataId,
+    data: Option<DataId>,
     length: usize,
     lanes: Vec<(usize, u32)>,
 }
@@ -248,6 +248,22 @@ impl Probes {
                         .into_iter()
                         .map(|lane| (lane, if wide[lane] { 8 } else { 4 }))
                         .collect();
+                    // The pre-operation boundary clears this frame's transient roots.
+                    // A pre-call table points at scratch storage throughout the call:
+                    // returning changes its values, not the descriptor addresses.
+                    // Diagnostic probes retain all phase events; GC needs neither an
+                    // empty table nor an identical post-success republication.
+                    if gc && (phase == 2 || lanes.is_empty()) {
+                        transient.insert(
+                            (i, pc, phase),
+                            Transient {
+                                data: None,
+                                length: 0,
+                                lanes: vec![],
+                            },
+                        );
+                        continue;
+                    }
                     let mut bytes = serde_json::to_vec(&execution_slots(
                         &gc_layout::layout(p, &ty),
                         "neoclr-gc-transient-v1",
@@ -268,7 +284,7 @@ impl Probes {
                     transient.insert(
                         (i, pc, phase),
                         Transient {
-                            data,
+                            data: Some(data),
                             length,
                             lanes,
                         },
@@ -395,6 +411,9 @@ impl Probes {
         storage: ir::Value,
     ) {
         let t = &self.transient[&(function, pc, phase)];
+        let Some(data) = t.data else {
+            return;
+        };
         for (index, &(lane, width)) in t.lanes.iter().enumerate() {
             let pointer = b.ins().iadd_imm(storage, (lane * 8) as i64);
             b.ins().stack_store(pointer, table, (index * 16) as i32);
@@ -407,7 +426,7 @@ impl Probes {
         let phase = b.ins().iconst(types::I32, phase as i64);
         let table = b.ins().stack_addr(types::I64, table, 0);
         let count = b.ins().iconst(types::I32, t.lanes.len() as i64);
-        let data = module.declare_data_in_func(t.data, b.func);
+        let data = module.declare_data_in_func(data, b.func);
         let plan = b.ins().global_value(types::I64, data);
         let length = b.ins().iconst(types::I32, t.length as i64);
         let callback = module.declare_func_in_func(self.publish, b.func);

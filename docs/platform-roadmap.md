@@ -6495,3 +6495,21 @@ mutable non-prefix marker hints. Keep compiler-verified publication reduction,
 explicit image-owned metadata contracts and native ThinLTO qualification as follow-ups;
 do not infer a new GC/threading direction from these negative experiments. See
 [profiles, rejected candidates and evidence](../benchmarks/http-server/primitive-comparison/stack-bounds/README.md).
+
+
+Native transient handoff reduction integrated (2026-10-24, author-directed): retain
+pre-call result/constructor tables until the next boundary, omitting empty and
+duplicate post-success publications and metadata only in native GC mode. Diagnostic
+phase observation and all collection/worker boundaries remain. Twenty focused checks,
+forced-GC HTTP, shared-worker stress and 40 async-consumer invocations pass. Mean
+one/four-owner plaintext throughput rises 10.8%/8.6%, with 10.2%/8.8% less CPU per
+response and mixed tails. See [implementation/evidence](../benchmarks/http-server/primitive-comparison/transient-handoff/README.md).
+
+The author additionally requests a coherent picture across ordinary code samples
+and HTTP configurations of varying complexity. The first controlled cohort covers
+task/collection invocations and plain/JSON HTTP increments; it explicitly excludes
+an unqualified JSON DOM/stream path and does not pool historical configurations.
+Continue with configuration-qualified samples, survival/live-byte metrics and
+metadata-resolution/cache instrumentation before attributing costs or changing GC
+architecture. This extends the investigation; it does not supersede the existing
+collector roadmap. See [workload analysis](../benchmarks/http-server/primitive-comparison/transient-handoff/workloads.md).

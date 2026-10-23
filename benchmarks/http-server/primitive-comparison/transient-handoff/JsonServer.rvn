@@ -1,0 +1,38 @@
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Concurrency.Tasks.*
+import System.Networking.Sockets.*
+import System.Web.Http.*
+
+class Application {
+    private val identity: string
+
+    init(identity: string) {
+        self.identity = identity
+    }
+
+    async func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+        let person = Person()
+        person.id = 42
+        person.name = "Café team"
+        person.active = true
+        return RespondWithPerson(person)
+    }
+}
+
+async func Main() -> Task<()> {
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 64) else { System.Fail("Listen failed") }
+    let Ok(control) = Socket.Listen("127.0.0.1", 0, 1) else { System.Fail("Control failed") }
+    let Ok(port) = server.GetLocalPort() else { System.Fail("Port failed") }
+    let Ok(controlPort) = control.GetLocalPort() else { System.Fail("Control port failed") }
+    let application = Application(controlPort.ToString())
+    let lifetime = server.Serve(application.Respond)
+    Console.WriteLine("READY " + port.ToString() + " " + controlPort.ToString())
+    let Ok(signal) = await control.Accept() else { System.Fail("Control accept failed") }
+    signal.Close()
+    control.Close()
+    server.Close()
+    if let Failure(_) = await lifetime { System.Fail("Serve failed") }
+    Console.WriteLine("DONE " + controlPort.ToString() + " " + server.CompletedRequests.ToString() + " " + server.FailedRequests.ToString())
+}

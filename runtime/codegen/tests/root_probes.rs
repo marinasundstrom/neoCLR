@@ -443,3 +443,97 @@ int main(int argc, char **argv) {
         );
     }
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_gc_keeps_pending_reference_handoff_but_omits_empty_and_duplicate_events() {
+    let dir =
+        Temp(std::env::temp_dir().join(format!("neoclr-handoff-maps-{}", std::process::id())));
+    fs::create_dir(&dir.0).unwrap();
+    let input = dir.0.join("input.neox");
+    fs::write(
+        &input,
+        r#".module Handoffs
+.references ()
+.function Text(String text) -> String
+ldarg text
+ret
+.end
+.function Number(Int32 number) -> Int32
+ldarg number
+ret
+.end
+.function Main() -> Int32
+ldstr "retained"
+call Text(String)
+pop
+ldc.i4 42
+call Number(Int32)
+ret
+.end
+"#,
+    )
+    .unwrap();
+    let module = neoclr::assemble(&fs::read_to_string(&input).unwrap()).unwrap();
+    fs::write(
+        &input,
+        neoclr::metadata_container::write_module(&module).unwrap(),
+    )
+    .unwrap();
+    let core = dir.0.join("core.neox");
+    let system = dir.0.join("system.neox");
+    for (path, source) in [
+        (
+            &core,
+            ".module Core\n.references ()\n.type class abstract System.Object\n.method instance virtual ToString() -> String\nldstr \"root\"\nret\n.end\n.method instance virtual Equals(System.Object other) -> Boolean\nldc.bool false\nret\n.end\n.method instance virtual GetHashCode() -> Int32\nldc.i4 -1\nret\n.end\n.end\n",
+        ),
+        (&system, ".module System\n.references ()\n"),
+    ] {
+        fs::write(
+            path,
+            neoclr::metadata_container::write_module(&neoclr::assemble(source).unwrap()).unwrap(),
+        )
+        .unwrap();
+    }
+    for gc in [false, true] {
+        let output = dir.0.join(if gc { "gc.o" } else { "probe.o" });
+        let mut command = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"));
+        command
+            .arg("--closed-world")
+            .arg(&input)
+            .arg("Main")
+            .arg(&output)
+            .args(["--compile-system", "--reference-arena"])
+            .arg("--system")
+            .arg(&system)
+            .arg("--module")
+            .arg(&core)
+            .arg("--object-root")
+            .arg(&core);
+        if gc {
+            command.arg("--native-gc");
+        } else {
+            command.arg("--probe-stack-roots");
+        }
+        let result = command.output().unwrap();
+        assert!(
+            result.status.success(),
+            "{}",
+            String::from_utf8_lossy(&result.stderr)
+        );
+        let result = Command::new("nm").arg(&output).output().unwrap();
+        assert!(result.status.success());
+        let symbols = String::from_utf8(result.stdout).unwrap();
+        // The text call needs an initialized pre-call result root. Its post-call
+        // descriptor is identical, and the numeric call cannot contain roots.
+        let maps: Vec<_> = symbols
+            .lines()
+            .filter(|s| s.contains("neoclr_transient_"))
+            .collect();
+        assert_eq!(maps.len(), if gc { 1 } else { 4 }, "{symbols}");
+        assert!(maps.iter().any(|s| s.ends_with("_1_3")), "{maps:?}");
+        if gc {
+            assert!(!maps.iter().any(|s| s.ends_with("_2")));
+        }
+    }
+}

@@ -6,6 +6,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-10-24
+
+- Remove empty native-GC transient publications and duplicate post-success handoffs in native lowering, retaining initialized pre-call/constructor roots and every GC/worker boundary. Omit unused per-site metadata; preserve diagnostic-probe phase events and the runtime ABI. The HTTP object shrinks 9.6%; a controlled forced-GC run executes 83.9% fewer transient publications with identical boundary counts. Twenty focused codegen/native checks, forced-GC HTTP, shared-worker stress and 40 async-consumer invocations pass. Eight paired plaintext trials improve mean one/four-owner throughput 10.8%/8.6% and reduce CPU per response 10.2%/8.8%, with mixed tails. Correct a stale record-array limit test to use the declared limit. Record matching Raven bridge documentation and evidence in benchmarks/http-server/primitive-comparison/transient-handoff/README.md.
+
+- Begin the author-requested coherent workload profile using comparable paced-GC plain/JSON HTTP runs and current task/collection samples. Retain validated counters, normalized units, source/configuration identities and four aggregation tests; JSON adds 1,859 boundaries and 249 allocations per additional response in this fixture. Keep whole-invocation sample costs separate from HTTP increments and timing data. Record the JSON DOM/stream native-admission gap and failed preparation attempts instead of treating them as measurements. See benchmarks/http-server/primitive-comparison/transient-handoff/workloads.md.
+
 ### 2026-10-23
 
 - Profile plaintext HTTP after free-space indexing and test two further native shortcuts across 16 checked capacity trials. Reject/revert marker-prefix validation (one-owner regression) and grouped macOS stack bounds (no reliable end-to-end gain), despite fewer TLS resolution sites for the latter. Keep production runtime behavior unchanged. Strengthen retained-stack recursion/reset/thread-isolation and non-prefix mutable-plan rejection coverage; optimized/UBSan checks pass against candidate and restored source. Retain full profiles, patches, measurements and limits in benchmarks/http-server/primitive-comparison/stack-bounds/ and marker-prefix/.
