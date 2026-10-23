@@ -185,3 +185,9 @@ retain the earlier failures, distinguish the author's activity change, and quali
 400/sec locally under paced GC with two 120-second trials. The separate 500/sec
 check exposes CPU saturation and admission misses. These are fixture/policy-specific
 points, not an implementation speedup or a production maximum.
+
+## Updated allocation, async I/O and execution-owner investigation — 2026-10-23
+
+[Current staged counters, native profiles and single/two-process loads](investigation-20261023/README.md)
+separate unnecessary work from allocation volume and establish the current native
+owner-thread limitation. Includes explicit async I/O/threading follow-up criteria.

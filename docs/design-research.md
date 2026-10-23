@@ -98,6 +98,9 @@ possible, instead of formatting and reparsing an equivalent URI. A contract valu
 may be a class, struct or record of either kind; choose representation separately
 from materialization timing and account for copying and ownership as well as GC.
 This discussion reports the prior observation, not a new benchmark measurement.
+The author clarified that multiple allocations inside a value object are permitted:
+there is no fixed allocation ceiling. Optimize avoidable work and copies based on
+measurement, while allowing useful component storage and ordinary GC costs.
 
 Keep validation and observable semantics consistent between the primitive and
 structured paths. Account for ownership and lifetime when borrowing primitives;

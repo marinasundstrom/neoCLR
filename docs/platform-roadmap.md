@@ -6144,3 +6144,16 @@ centralize known names on Raven main and the separately validated neoCLR line.
 These are bounded platform conventions, with source/metadata migration and rebuilt
 API references; they do not reprioritize the active milestone. See
 [the conversation record](development-timeline.md#2026-10-23--optional-platform-convention).
+
+### Author-directed URI and HTTP efficiency investigation — 2026-10-23
+
+Complete the [URI/Path review](experiments/uri-efficiency/README.md): URI temporary
+encoding/slicing/reparsing work is reduced with 51 contract executions and four
+allocation checks; Path remains unchanged. The subsequent
+[HTTP investigation](../benchmarks/http-server/serve/investigation-20261023/README.md)
+records public-stage allocation counts, native caller/sample evidence and separate
+single/two-process load measurements. Async I/O exists; multicore managed execution
+in the measured native host remains unqualified. The author explicitly requests
+async I/O/threading investigation; bounded worker ownership and wakeup qualification
+are recommended follow-ups, not implemented capabilities or a permanent reordering
+of the platform milestone.

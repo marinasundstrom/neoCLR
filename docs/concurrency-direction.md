@@ -1,5 +1,16 @@
 # Concurrency and tracked threads — post-release direction
 
+**2026-10-23 investigation:** the author explicitly requests async I/O and threading
+investigation for HTTP throughput. The [current native measurements](../benchmarks/http-server/serve/investigation-20261023/README.md)
+confirm nonblocking socket I/O and owner-thread cooperative fibers, with Task.Run
+queued on that owner in the measured AOT host. One process completes about 495/s
+at 800/s offered; two independent processes sustain 800/s aggregate. Separate
+heaps/listeners make this a scaling diagnostic, not shared-heap pool qualification.
+Compare bounded parallel managed execution and event-driven wakeups next, retaining
+the established .NET Task.Run shared-capture intent. Private fibers and the Rust VM
+worker paths already exist; neither establishes multicore AOT HTTP execution.
+No public thread/green-thread API, preemption design or worker default is selected.
+
 **2026-10-11 direction update:** concurrency is a core requirement for the native
 web/backend goal. Evaluate runtime suspension and green threads together with
 runtime-owned scheduling; no particular stack or preemption design is selected.

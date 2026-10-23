@@ -1,0 +1,62 @@
+{
+  "build.json": {
+    "source": "target/http-investigation-20261023-build/build.json",
+    "sha256": "aaf0ea8e3f6b85bdacdc3aca5b617449a5bcc664a18f49f0633a069c3529af58"
+  },
+  "caller-build.json": {
+    "source": "target/http-investigation-20261023-callers/build.json",
+    "sha256": "85be3d3df5460fafb7d9ef5aeec9be5370de4c41f949cdd278c98616ffc4538d"
+  },
+  "callers-200.json": {
+    "source": "target/http-investigation-20261023-callers/summary.json",
+    "sha256": "1894c3f49cb4bb5ca4e0b7f7915f92bb93fc257297fb0924ef7af5a164223db3"
+  },
+  "callers-400.json": {
+    "source": "target/http-investigation-20261023-callers/long.json",
+    "sha256": "18e8dd63d89c2130be20ad90c5efa0fc3996794592634c149403726a7f09332f"
+  },
+  "requests-200.json": {
+    "source": "target/http-investigation-20261023-callers/requests/results.json",
+    "sha256": "d2814d280388f69363244788436485bb5e4c1d81ff6d70752ace3ac62fc450b9"
+  },
+  "requests-400.json": {
+    "source": "target/http-investigation-20261023-callers-long/results.json",
+    "sha256": "f21d38679400f89c4fd9bb7d4e91c83c739532450383ff8873f6c1042aaaaa4e"
+  },
+  "stages.json": {
+    "source": "target/http-stage-allocations-20261023/results.json",
+    "sha256": "38b65f5e79a1067c7fad1a4de8861ad203021512c3b066e086b5a765f53de359"
+  },
+  "sample-summary.json": {
+    "source": "target/http-investigation-20261023-sample/summary.json",
+    "sha256": "7c8eb56d739089cb541ca7ec3e73149088da69d05921e3a73f07504844634673"
+  },
+  "sample.txt": {
+    "source": "target/http-investigation-20261023-sample/sample.txt",
+    "sha256": "908399a26926340ecd01bf37780274ab98784e86b7fe8d73f2092f261213e647"
+  },
+  "sample-requests.json": {
+    "source": "target/http-investigation-20261023-sample/results.json",
+    "sha256": "04902394a5f667a9d313e336fee7b04be80c6d81b71ebf998f7f8a9ca68ffb32"
+  },
+  "load400a.json": {
+    "source": "target/http-investigation-20261023-load400a/results.json",
+    "sha256": "ad26523e5003b01bd8440a5b0d29777df076c0302ffe638b4b9ac670d5b03b0f"
+  },
+  "load800.json": {
+    "source": "target/http-investigation-20261023-load800/results.json",
+    "sha256": "efb289b26857fbdf26abf99337c83a1e6bd44c7270a6822adaf6999ee42ff2d4"
+  },
+  "load400b.json": {
+    "source": "target/http-investigation-20261023-load400b/results.json",
+    "sha256": "128d65d69b0f103afbe0126c125e8bc4affbb79e10ba2bf0e36c0d3f8e3d425c"
+  },
+  "two-a.json": {
+    "source": "target/http-investigation-20261023-two-a/results.json",
+    "sha256": "4d1faef5e922a3c36d0c2087cacfe76d40fae03ea872d6e8ca79e27ed28888e5"
+  },
+  "two-b.json": {
+    "source": "target/http-investigation-20261023-two-b/results.json",
+    "sha256": "f15b7abb06b464a69162ecc8317a41c5be13c39b8d252bf393eea389da319732"
+  }
+}

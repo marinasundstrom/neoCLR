@@ -1,0 +1,34 @@
+import System.*
+import System.Result.*
+import System.Concurrency.Tasks.*
+import System.Web.Http.*
+
+async func Main() -> Task<()> {
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) else { System.Fail("Listen") }
+    let Ok(port) = server.GetLocalPort() else { System.Fail("Port") }
+    Console.WriteLine(port)
+    var index = 0
+    while index < 9 {
+        let before = System.Runtime.GC.AllocatedObjectCount
+        let Ok(context) = await server.Accept() else { System.Fail("Accept") }
+        let accepted = System.Runtime.GC.AllocatedObjectCount
+        _ = context.Request.GetContentType()
+        let projected = System.Runtime.GC.AllocatedObjectCount
+        _ = context.Request.GetContentType()
+        let repeated = System.Runtime.GC.AllocatedObjectCount
+        context.RespondText("{}")
+        let constructed = System.Runtime.GC.AllocatedObjectCount
+        let Ok(_) = await context.Complete() else { System.Fail("Complete") }
+        let completed = System.Runtime.GC.AllocatedObjectCount
+        context.Dispose()
+        let disposed = System.Runtime.GC.AllocatedObjectCount
+        Console.WriteLine(accepted - before)
+        Console.WriteLine(projected - accepted)
+        Console.WriteLine(repeated - projected)
+        Console.WriteLine(constructed - repeated)
+        Console.WriteLine(completed - constructed)
+        Console.WriteLine(disposed - completed)
+        index += 1
+    }
+    server.Close()
+}

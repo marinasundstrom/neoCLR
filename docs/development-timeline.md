@@ -21742,3 +21742,27 @@ unchanged contracts and reduced tracked allocations. Path was inspected and left
 unchanged. The assistant explicitly distinguished tracked objects from all string
 and native allocations, and allocation savings from demonstrated throughput gains.
 HTTP measurement and profiling results are recorded separately when completed.
+
+## 2026-10-23 — HTTP throughput, async I/O and execution owners
+
+The author asked to investigate unnecessary allocations and work affecting HTTP
+requests per second, then proposed the main-thread execution model as a possible
+limit and explicitly requested investigation of async I/O and threading. They
+raised thread pools and green threads as possibilities, not selected designs.
+
+The assistant measured client/server stages with independent peers, native
+allocation callers, an independent stack sample and uninstrumented offered load.
+The [retained investigation](../benchmarks/http-server/serve/investigation-20261023/README.md)
+records 216 incremental native managed allocations and 15,869 payload bytes per
+request for the Serve fixture, 400/s passing operating points and about 495/s
+completion at 800/s offered. Two simultaneous isolated servers sustain 800/s
+aggregate. These are local diagnostic results, not release performance claims or
+proof of shared-heap thread-pool scalability.
+
+Source inspection found nonblocking sockets and readiness polling already present;
+native Task.Run and cooperative fibers execute on one owner. The assistant
+distinguished those private fibers from a multicore scheduler and the Rust VM's
+existing shared-work/isolated-worker machinery from AOT host support. The
+recommendation is to qualify parallel execution ownership and unified I/O wakeups
+alongside reducing task/root overhead. Threading implementation, pool design,
+preemption, keep-alive and collector-default decisions remain open.

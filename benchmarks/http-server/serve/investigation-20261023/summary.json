@@ -1,0 +1,320 @@
+{
+  "nativeIncrementPerRequest": {
+    "allocations": 216.0,
+    "allocatedBytes": 15869.0
+  },
+  "nativeKinds": {
+    "text": {
+      "allocations": 4.0,
+      "payloadBytes": 55.0
+    },
+    "objects": {
+      "allocations": 166.0,
+      "payloadBytes": 9352.0
+    },
+    "byteArrays": {
+      "allocations": 17.0,
+      "payloadBytes": 954.0
+    },
+    "referenceSlotArrays": {
+      "allocations": 12.0,
+      "payloadBytes": 300.0
+    },
+    "recordArrays": {
+      "allocations": 17.0,
+      "payloadBytes": 5208.0
+    },
+    "internEntries": {
+      "allocations": 0.0,
+      "payloadBytes": 0.0
+    }
+  },
+  "loads": [
+    {
+      "name": "load400a",
+      "startUnixSeconds": 1792767091.8939462,
+      "rate": 400.0,
+      "durationSeconds": 12.0,
+      "offered": 4800,
+      "admitted": 4800,
+      "outcomes": {
+        "ok": 4800
+      },
+      "completedWithinWindow": 4800,
+      "successfulCompletionsPerSecond": 400.0,
+      "offeredLatencySeconds": {
+        "p50": 0.002287458999999714,
+        "p95": 0.002539667000000634,
+        "p99": 0.003938874999999342,
+        "max": 0.010771999999999338
+      },
+      "serverCpuSecondsInWindow": 9.35,
+      "sampledPeakRssKiB": 13168
+    },
+    {
+      "name": "load800",
+      "startUnixSeconds": 1792767106.2657862,
+      "rate": 800.0,
+      "durationSeconds": 12.0,
+      "offered": 9600,
+      "admitted": 6007,
+      "outcomes": {
+        "ok": 6007,
+        "generator_inflight_limit": 3593
+      },
+      "completedWithinWindow": 5944,
+      "successfulCompletionsPerSecond": 495.3333333333333,
+      "offeredLatencySeconds": {
+        "p50": 0.12780604199999956,
+        "p95": 0.13135054199999985,
+        "p99": 0.1347692500000015,
+        "max": 0.136681166999999
+      },
+      "serverCpuSecondsInWindow": 11.979999999999999,
+      "sampledPeakRssKiB": 13184
+    },
+    {
+      "name": "load400b",
+      "startUnixSeconds": 1792767121.1788359,
+      "rate": 400.0,
+      "durationSeconds": 12.0,
+      "offered": 4800,
+      "admitted": 4800,
+      "outcomes": {
+        "ok": 4800
+      },
+      "completedWithinWindow": 4800,
+      "successfulCompletionsPerSecond": 400.0,
+      "offeredLatencySeconds": {
+        "p50": 0.0022811659999995015,
+        "p95": 0.002855582999999662,
+        "p99": 0.0069684579999993446,
+        "max": 0.010826291000000765
+      },
+      "serverCpuSecondsInWindow": 9.36,
+      "sampledPeakRssKiB": 13168
+    },
+    {
+      "name": "two-a",
+      "startUnixSeconds": 1792767378.905969,
+      "rate": 400.0,
+      "durationSeconds": 12.0,
+      "offered": 4800,
+      "admitted": 4800,
+      "outcomes": {
+        "ok": 4800
+      },
+      "completedWithinWindow": 4800,
+      "successfulCompletionsPerSecond": 400.0,
+      "offeredLatencySeconds": {
+        "p50": 0.0024168750000015393,
+        "p95": 0.004990666999999505,
+        "p99": 0.009752583000000037,
+        "max": 0.01545212500000126
+      },
+      "serverCpuSecondsInWindow": 9.88,
+      "sampledPeakRssKiB": 13168
+    },
+    {
+      "name": "two-b",
+      "startUnixSeconds": 1792767378.905976,
+      "rate": 400.0,
+      "durationSeconds": 12.0,
+      "offered": 4800,
+      "admitted": 4800,
+      "outcomes": {
+        "ok": 4800
+      },
+      "completedWithinWindow": 4800,
+      "successfulCompletionsPerSecond": 400.0,
+      "offeredLatencySeconds": {
+        "p50": 0.002410499999999871,
+        "p95": 0.0049838340000007975,
+        "p99": 0.009561375000000094,
+        "max": 0.014659084000001599
+      },
+      "serverCpuSecondsInWindow": 9.86,
+      "sampledPeakRssKiB": 13168
+    }
+  ],
+  "stages": {
+    "client": {
+      "cold": {
+        "constructRequest": 19,
+        "sendAndReceive": 201,
+        "firstContentType": 9,
+        "repeatContentType": 0,
+        "dispose": 0
+      },
+      "warm": [
+        {
+          "constructRequest": 18,
+          "sendAndReceive": 199,
+          "firstContentType": 9,
+          "repeatContentType": 0,
+          "dispose": 0
+        },
+        {
+          "constructRequest": 18,
+          "sendAndReceive": 199,
+          "firstContentType": 9,
+          "repeatContentType": 0,
+          "dispose": 0
+        },
+        {
+          "constructRequest": 18,
+          "sendAndReceive": 199,
+          "firstContentType": 9,
+          "repeatContentType": 0,
+          "dispose": 0
+        },
+        {
+          "constructRequest": 18,
+          "sendAndReceive": 199,
+          "firstContentType": 9,
+          "repeatContentType": 0,
+          "dispose": 0
+        },
+        {
+          "constructRequest": 18,
+          "sendAndReceive": 199,
+          "firstContentType": 9,
+          "repeatContentType": 0,
+          "dispose": 0
+        },
+        {
+          "constructRequest": 18,
+          "sendAndReceive": 199,
+          "firstContentType": 9,
+          "repeatContentType": 0,
+          "dispose": 0
+        },
+        {
+          "constructRequest": 18,
+          "sendAndReceive": 199,
+          "firstContentType": 9,
+          "repeatContentType": 0,
+          "dispose": 0
+        },
+        {
+          "constructRequest": 18,
+          "sendAndReceive": 199,
+          "firstContentType": 9,
+          "repeatContentType": 0,
+          "dispose": 0
+        }
+      ]
+    },
+    "server": {
+      "cold": {
+        "acceptAndRead": 92,
+        "firstContentType": 9,
+        "repeatContentType": 0,
+        "configureResponse": 7,
+        "complete": 46,
+        "dispose": 0
+      },
+      "warm": [
+        {
+          "acceptAndRead": 88,
+          "firstContentType": 9,
+          "repeatContentType": 0,
+          "configureResponse": 7,
+          "complete": 46,
+          "dispose": 0
+        },
+        {
+          "acceptAndRead": 88,
+          "firstContentType": 9,
+          "repeatContentType": 0,
+          "configureResponse": 7,
+          "complete": 46,
+          "dispose": 0
+        },
+        {
+          "acceptAndRead": 88,
+          "firstContentType": 9,
+          "repeatContentType": 0,
+          "configureResponse": 7,
+          "complete": 46,
+          "dispose": 0
+        },
+        {
+          "acceptAndRead": 88,
+          "firstContentType": 9,
+          "repeatContentType": 0,
+          "configureResponse": 7,
+          "complete": 46,
+          "dispose": 0
+        },
+        {
+          "acceptAndRead": 88,
+          "firstContentType": 9,
+          "repeatContentType": 0,
+          "configureResponse": 7,
+          "complete": 46,
+          "dispose": 0
+        },
+        {
+          "acceptAndRead": 88,
+          "firstContentType": 9,
+          "repeatContentType": 0,
+          "configureResponse": 7,
+          "complete": 46,
+          "dispose": 0
+        },
+        {
+          "acceptAndRead": 88,
+          "firstContentType": 9,
+          "repeatContentType": 0,
+          "configureResponse": 7,
+          "complete": 46,
+          "dispose": 0
+        },
+        {
+          "acceptAndRead": 88,
+          "firstContentType": 9,
+          "repeatContentType": 0,
+          "configureResponse": 7,
+          "complete": 46,
+          "dispose": 0
+        }
+      ]
+    }
+  },
+  "mainThreadSamples": 3449,
+  "mainThreadExclusivePercent": {
+    "neoclr_gc_stack_roots_v1": 19.86082922586257,
+    "collect_indexed": 18.643084952160045,
+    "neoclr_gc_allocate_v1": 16.38155987242679,
+    "validated_bases": 8.408234270803131,
+    "_platform_strlen": 8.002319512902291,
+    "neoclr_gc_collect_conditional_v1": 4.5230501594665125,
+    "_tlv_get_addr": 4.2910988692374605,
+    "__bzero": 4.117135401565672,
+    "_platform_strstr": 2.0875616120614673,
+    "mark_frames": 1.5656712090461002
+  },
+  "promiseResultArrays200": {
+    "allocations": 2909,
+    "payloadBytes": 1144237
+  },
+  "inputs": {
+    "load800.json.gz": "68a759f8e299cdf4bf742951a9f1e9a1418fd8fa0984fc076c66237a75eb1c3d",
+    "requests-200.json.gz": "7829f4d07bf9c1ac4c30061fd09d71928a4c87ae66f09cd5f4502b7c4c794bb5",
+    "callers-200.json.gz": "ab8e04acb207c2c7c73f522ef662138f039af7fb06422af983a36cd414b13fff",
+    "build.json.gz": "8dfb4c864a2c97863fe3d58abf862142e58cbc89156d78bddaf5452c58b78605",
+    "callers-400.json.gz": "33769a61279473537c94f79a9d182877cd0254a8ffc688bd23d6a429df275949",
+    "requests-400.json.gz": "fbd1addc1b12fd5c8f089e5d88d009f3f6060a0d56072ed2cda4f6d6e1c2d56c",
+    "caller-build.json.gz": "ff9058c1fc0a920b22a93cecfaa2c57f2ab43a67a396a508102c9efda3a76829",
+    "two-a.json.gz": "e34f05b48aca7074a883e292b038cc2d5edc14fc7791a6518f657e2e05cac91e",
+    "load400a.json.gz": "3df222d17030b11552c3fbcf4c15def14f1a7c28835d483f93fa07282d31959a",
+    "sample.txt.gz": "2fa3139ca825aabba51afed8cd24b3f5a5d65c695f999397ae3a4c2ea0f29823",
+    "sample-requests.json.gz": "8aaa3d6a8de479707926fee6fa1fe1d75acf003a856d654e31d421bcd56ed724",
+    "manifest.json": "e3efa06472ffb202822266b88bdea489b9b12533e8c99222e31024d6332b5f48",
+    "load400b.json.gz": "9259199454b3cd58ecf018af0caab89514fcc4ab84a223d6367a8064dc0ed2fe",
+    "stages.json.gz": "ee48964eb6f8ff06f872a602ebaa4e5a1668e305594b5bcea05c3f791f96c789",
+    "two-b.json.gz": "2dd246aee5fe37863f5b22594852f728f777fa6bbff9f0940356dc8bfc49117a",
+    "sample-summary.json.gz": "56649a2513dee6231d3a213041ab8be1cf1824f708f833dd92ecfcae11aa39dd"
+  }
+}

@@ -1,0 +1,31 @@
+import System.*
+import System.Result.*
+import System.Concurrency.Tasks.*
+import System.Web.Http.*
+
+async func Main(arguments: string[]) -> Task<()> {
+    let client = HttpClient()
+    var index = 0
+    while index < 9 {
+        let before = System.Runtime.GC.AllocatedObjectCount
+        let Ok(request) = HttpRequest.Get(arguments[0]) else { System.Fail("Request") }
+        let constructed = System.Runtime.GC.AllocatedObjectCount
+        let Ok(response) = await client.Send(request) else { System.Fail("Send") }
+        let received = System.Runtime.GC.AllocatedObjectCount
+        if response.Content.Length != 2 { System.Fail("Body") }
+        _ = response.GetContentType()
+        let projected = System.Runtime.GC.AllocatedObjectCount
+        _ = response.GetContentType()
+        let repeated = System.Runtime.GC.AllocatedObjectCount
+        response.Dispose()
+        request.Dispose()
+        let disposed = System.Runtime.GC.AllocatedObjectCount
+        Console.WriteLine(constructed - before)
+        Console.WriteLine(received - constructed)
+        Console.WriteLine(projected - received)
+        Console.WriteLine(repeated - projected)
+        Console.WriteLine(disposed - repeated)
+        index += 1
+    }
+    client.Dispose()
+}
