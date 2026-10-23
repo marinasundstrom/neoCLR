@@ -1,5 +1,13 @@
 # Concurrency and tracked threads — post-release direction
 
+**2026-10-23 worker follow-up:** the author confirms investigation of worker threads
+similar to modern web frameworks. The [native worker investigation](design/native-http-worker-threads.md)
+compares ASP.NET Core, Tokio and Node, audits owner-local GC/tasks/sockets and
+defines a private shared-ownership harness before HTTP integration. An optimized
+and UBSan native probe confirms the present thread-local root-handle boundary;
+ASan remains incomplete after a timeout. A bounded runtime pool is recommended
+for exploration, not implemented or selected as a public API/default.
+
 **2026-10-23 investigation:** the author explicitly requests async I/O and threading
 investigation for HTTP throughput. The [current native measurements](../benchmarks/http-server/serve/investigation-20261023/README.md)
 confirm nonblocking socket I/O and owner-thread cooperative fibers, with Task.Run

@@ -21766,3 +21766,20 @@ existing shared-work/isolated-worker machinery from AOT host support. The
 recommendation is to qualify parallel execution ownership and unified I/O wakeups
 alongside reducing task/root overhead. Threading implementation, pool design,
 preemption, keep-alive and collector-default decisions remain open.
+
+## 2026-10-23 — Worker-thread investigation confirmed
+
+The author confirmed: “Yes, we should investigate adding worker threads similar
+to modern web app frameworks”. The assistant compared primary ASP.NET Core,
+Tokio and Node documentation and audited the native versus Rust VM ownership
+boundaries. It recommends exploring runtime-managed workers while retaining async
+socket waiting, shared Task.Run captures and single-writer HTTP context lifetime.
+
+The [design investigation](design/native-http-worker-threads.md) specifies the
+first private participant/root/mailbox/settlement/shutdown harness and distinguishes
+handler-only dispatch from distributing whole connections. The assistant added
+a native diagnostic: foreign-thread host-root lookup/release fails while independent
+worker roots and parent retention/reclamation work. Optimized and UBSan runs pass;
+the combined ASan/UBSan execution times out, retained as incomplete evidence.
+No worker pool, parallel shared-heap HTTP, compiler change or new public API is
+claimed. Shared native collection/safepoints and task publication remain prerequisites.

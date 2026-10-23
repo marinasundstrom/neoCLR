@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-23
 
+- Investigate native HTTP worker threads against ASP.NET Core, Tokio and Node models. Specify shared-root, task-publication, I/O ownership and shutdown prerequisites plus a bounded private qualification slice. Add a native thread-ownership diagnostic passing optimized and UBSan builds; retain the ASan timeout as incomplete evidence. No worker pool, compiler contract or public API is implemented. See docs/design/native-http-worker-threads.md.
+
 - Investigate HTTP allocations, async I/O and threading with reproducible client/server stage probes, native caller traces, stack sampling and separate offered-load runs. Record 216 incremental managed allocations/15,869 payload bytes per native Serve request, single-owner saturation and two-process scaling evidence; distinguish nonblocking I/O/private fibers from qualified multicore managed execution. Document task/root/wakeup candidates and required ownership validation without changing scheduler or GC defaults. Clarify that value objects may legitimately allocate multiple times. See benchmarks/http-server/serve/investigation-20261023/README.md.
 
 - Reduce Uri temporary work by borrowing UTF-8 bytes, avoiding one-character slices and constructing resolved values from validated components. Preserve ambiguous authority parsing and quotas. Keep Path unchanged after inspection. Validate 51 URI/Path contract executions and four allocation checks; measured tracked objects halve for URI parse/resolve, without claiming total string-allocation or HTTP throughput reductions. Refresh unchanged API fingerprints. See docs/experiments/uri-efficiency/README.md.

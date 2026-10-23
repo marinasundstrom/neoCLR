@@ -6157,3 +6157,14 @@ in the measured native host remains unqualified. The author explicitly requests
 async I/O/threading investigation; bounded worker ownership and wakeup qualification
 are recommended follow-ups, not implemented capabilities or a permanent reordering
 of the platform milestone.
+
+### Native worker-thread investigation follow-up — 2026-10-23
+
+The author confirms investigating worker threads comparable to modern web frameworks.
+The [researched proposal](design/native-http-worker-threads.md) records the .NET
+baseline, Tokio/Node alternatives, concrete native ownership gaps and a bounded
+participant/root/mailbox qualification slice before HTTP integration. The
+[native diagnostic](experiments/native-worker-ownership/README.md) passes optimized
+and UBSan execution; ASan is incomplete. Worker pools and multicore shared-heap HTTP
+remain unimplemented. This evidence refines the concurrency investigation without
+selecting a new public API or overriding other active milestone gates.
