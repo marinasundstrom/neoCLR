@@ -21461,6 +21461,30 @@ run independently. Retained evidence identifies the development SDK metadata
 update separately from the library producer; no published SDK was overwritten.
 
 
+## 2026-10-23 — Windows 11 ARM64 and Linux ARM64 support assessment
+
+The author asked what is required for Windows ARM64 and Linux ARM64 support,
+then clarified that the Windows target means Windows 11 running on ARM64.
+The assistant interpreted this as native ARM64 runtime binaries and generated
+code; Microsoft's “Windows on Arm” terminology also describes that OS target.
+
+Source inspection found explicit two-target admission in
+[runtime/codegen/src/compiler.rs](../runtime/codegen/src/compiler.rs) and
+[runtime/codegen/src/jit.rs](../runtime/codegen/src/jit.rs), x64-only Windows
+stack checks, macOS-only Unix stack checks and non-Windows build paths selecting
+macOS ARM64. The assistant proposed staged target/ABI bring-up, stack/GC and
+suspension qualification, OS-service validation and extracted-package testing.
+Windows services and existing AArch64 lowering are reuse candidates, not proof
+of target correctness. Linux additionally needs explicit OS integration and a
+chosen distribution/libc baseline. This follows the existing
+[Windows ARM64 assessment](native-http-parity.md#windows-arm64-follow-up) and
+[Linux direction](platform-direction.md#future-linux-arm64-target).
+
+This exchange is an assessment, not implementation authorization or a roadmap
+reprioritization. No target code was changed or native ARM64 Windows/Linux tests
+run; backend compatibility, actual effort and platform qualification remain open.
+
+
 ## 2026-10-23 — Error context and stack policy investigation
 
 The author requested investigation of Error-interface conversions, ContextError
