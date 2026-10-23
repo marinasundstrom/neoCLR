@@ -412,3 +412,19 @@ reuse of a local validation fact, not a pointer cache or safepoint omission. The
 shared pacing implementation retains context/cleanup checks and budget behavior.
 The tradeoff is an additional private caller obligation. [Tests and paired
 measurements](../../benchmarks/http-server/primitive-comparison/published-boundary/README.md).
+
+
+### Typed boundary execution headers — 2026-10-24
+
+CoreCLR's [GCInfo definitions](https://github.com/dotnet/runtime/blob/main/src/coreclr/inc/gcinfo.h)
+explicitly version execution metadata and describe diagnostics compatibility, with
+version admission by method ranges. neoCLR now separates native boundary execution
+headers from textual diagnostics: eight-byte magic/lane-count records are checked
+at publication, while explicit spilled lanes continue to carry roots. It is not a
+CLR register/PC map and does not remove GC polls. Rich inspection is byte-identical.
+
+The measured benefit is smaller objects and less repeated boundary-string work;
+costs are new private imports, format-aware frame readers, per-boundary header bytes
+and a little-endian target contract. Storage/transient plans remain JSON; a future
+image registry could amortize per-boundary versioning. See the [contract, alternatives,
+validation and paired evidence](../../benchmarks/http-server/primitive-comparison/root-map/README.md).

@@ -6556,3 +6556,16 @@ instrumented publication, collection budgets and worker synchronization retain t
 existing paths. Focused stale-boundary/cleanup checks, thread isolation, forced and
 paced HTTP, and shared-worker stress pass. [Paired measurements and limitations](../benchmarks/http-server/primitive-comparison/published-boundary/README.md).
 This does not implement general noncollecting-call analysis or typed root metadata.
+
+
+### Typed native boundary execution metadata — 2026-10-24
+
+The author-directed repeated-metadata investigation now replaces native boundary
+JSON scans with versioned eight-byte headers, retaining checked legacy APIs and
+byte-identical full inspection. New objects require matching native hooks; storage
+and transient plans remain JSON. Thirty focused tests plus header, shared-worker,
+HTTP and async-consumer checks pass. The plain object shrinks 2.3%; eight paired
+local trials improve mean one/four-worker throughput 4.0%/3.9% and reduce CPU per
+response 4.2%/3.9%. [Evidence and limitations](../benchmarks/http-server/primitive-comparison/root-map/README.md).
+Typed storage/transient maps and image-level format admission remain future work.
+Windows runtime execution remains unqualified for this slice; object emission passes.

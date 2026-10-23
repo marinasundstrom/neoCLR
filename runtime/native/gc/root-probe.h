@@ -11,7 +11,7 @@
 #define neoclr_probe_stack_roots_v2 neoclr_gc_stack_roots_v1
 #define neoclr_probe_transient_v2 neoclr_gc_transient_v1
 #endif
-enum { NEOCLR_GC_OWNED_STORAGE = 0x200, NEOCLR_GC_OWNED_TRANSIENT = 0x400 };
+enum { NEOCLR_GC_OWNED_STORAGE = 0x200, NEOCLR_GC_OWNED_TRANSIENT = 0x400, NEOCLR_GC_TYPED_PLAN = 0x800 };
 /* Private published frame chain, not a stable hosting ABI.
  * Frame storage belongs to the active native function. Diagnostic mode forbids
  * allocation, reentry, pointer mutation and collection in all callbacks.
@@ -20,7 +20,7 @@ enum { NEOCLR_GC_OWNED_STORAGE = 0x200, NEOCLR_GC_OWNED_TRANSIENT = 0x400 };
  * their own temporary roots. Enter/leave/transient never collect.
  * Ancestor snapshots
  * represent suspended pre-operation stacks, not all locals/arguments/results.
- * JSON belongs to the image; numeric holes are zero. Output-borrow pointees may be
+ * Plan data belongs to the image; numeric holes are zero. Output-borrow pointees may be
  * uninitialized. Never follow stack borrow pointees or retain frames after leave.
  */
 typedef struct {
@@ -55,6 +55,21 @@ void neoclr_probe_enter_v3(neoclr_probe_frame *frame, const void *context, uint3
  * Transient tables, fault contexts and plan strings remain on the checked path. */
 void neoclr_gc_enter_owned_v1(neoclr_probe_frame *frame, const void *context, uint32_t function,
     const neoclr_probe_storage *storage, uint32_t count, const char *plan, uint32_t length);
+#endif
+/* Native execution map, little-endian on the supported ARM64/x64 targets.
+ * The collector traces published lanes, not these bytes. Full spill/layout
+ * inspection stays in compiler metadata. A typed frame's plan points to this
+ * header (length 8); otherwise plan retains its checked JSON representation. */
+typedef struct { uint32_t magic, lane_count; } neoclr_gc_root_map;
+#define NEOCLR_GC_ROOT_MAP_MAGIC UINT32_C(0x3143474e)
+_Static_assert(sizeof(neoclr_gc_root_map) == 8, "root execution map size");
+#ifdef NEOCLR_NATIVE_GC
+void neoclr_gc_stack_map_v1(neoclr_probe_frame *, uint32_t,
+    const uint64_t *, uint32_t, const void *, uint32_t);
+#ifdef NEOCLR_WORKER_GC
+void neoclr_gc_worker_stack_map_v1(neoclr_probe_frame *, uint32_t,
+    const uint64_t *, uint32_t, const void *, uint32_t, uint32_t);
+#endif
 #endif
 void neoclr_probe_leave_v1(neoclr_probe_frame *frame);
 void neoclr_probe_stack_roots_v2(neoclr_probe_frame *frame, uint32_t instruction,

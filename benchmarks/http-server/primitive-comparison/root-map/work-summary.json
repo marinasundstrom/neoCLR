@@ -1,0 +1,71 @@
+{
+  "plain": {
+    "unit": "additional HTTP response",
+    "detail": {
+      "ancestorFrames": 25892.0,
+      "validatedStorageSlots": 8474.0,
+      "faultObservations": 7546.0,
+      "planValidationBytes": 222669.0
+    },
+    "counts": {
+      "boundaries": 3676.0,
+      "transientPublications": 830.0,
+      "allocations": 208.0,
+      "payloadBytes": 15995.5,
+      "collections": 3.875
+    }
+  },
+  "json": {
+    "unit": "additional HTTP response",
+    "detail": {
+      "ancestorFrames": 43753.0,
+      "validatedStorageSlots": 13710.0,
+      "faultObservations": 11355.0,
+      "planValidationBytes": 346634.0
+    },
+    "counts": {
+      "boundaries": 5535.0,
+      "transientPublications": 1488.0,
+      "allocations": 457.0,
+      "payloadBytes": 26173.5,
+      "collections": 6.0
+    }
+  },
+  "objects": {
+    "target/owned-transient/candidate.o": {
+      "bytes": 8650888,
+      "sha256": "da1f4ff5d7e86efbef682b79e47d13e4b31669f6c78d74b6bc8abdec00389032"
+    },
+    "target/root-map/candidate.o": {
+      "bytes": 8450192,
+      "sha256": "41954bda6924b168412e7dd0ad458e24f9f31644c4f4628621808ee529d311bc"
+    },
+    "target/root-map/json.o": {
+      "bytes": 11527784,
+      "sha256": "4f8c66fafef415ce9bc0dd53769c06e6ba74cbe25ccc5dea7f26181235c4ff7c"
+    }
+  },
+  "inputs": {
+    "benchmarks/http-server/primitive-comparison/root-map/build.json.gz": "acf2acb00e3aff46d0e3fdca112dc10d951be09472373e6b7e72ac3fabdc9910",
+    "benchmarks/http-server/primitive-comparison/root-map/plain4.json.gz": "7391507d4c57de5048a73de53ec370e1d05d825d12f260e165ca4af5c4b8eb64",
+    "benchmarks/http-server/primitive-comparison/root-map/json-build.json.gz": "f344574996d472a6328e9cdfd385b4345455d74337b8124a4537ffef98fdd5c3",
+    "benchmarks/http-server/primitive-comparison/root-map/metadata-tests.log.gz": "cde32f73e15b73d98a82e43b93978b704dbedae228e9cb21d7e326446caf5579",
+    "benchmarks/http-server/primitive-comparison/root-map/inspection.json.gz": "4b207d102dda6b82dc92a5cd41312afd26d8256c4ef64d74a942294b31146526",
+    "benchmarks/http-server/primitive-comparison/root-map/tests.log.gz": "dc3c166d503a6ad1f08c81da0207b1bdb280917d34fcf2fd9784151cdba23a86",
+    "benchmarks/http-server/primitive-comparison/root-map/workers.json.gz": "e7127b2c551c9fd6dc1a44422cd16ac04ad3e2f65d76134f68f3525e66611b3d",
+    "benchmarks/http-server/primitive-comparison/root-map/plain12.json.gz": "bc8946d63b3c79abe7c05d0e67410da4f845fced785fdd07786d2ded2c9d5581",
+    "benchmarks/http-server/primitive-comparison/root-map/json12.json.gz": "611c7074fdcc6d0bdd35bc648201e832a1e1da61fd0c78470f090c3508aba77a",
+    "benchmarks/http-server/primitive-comparison/root-map/validation.json.gz": "f61d796de282a3a21c7a45e6bb052ae94bab35af0242935ad60848e5d91bf77b",
+    "benchmarks/http-server/primitive-comparison/root-map/consumers.json.gz": "9840d659d7e641a0a916549551752037714f769706c3abbc947103fa4d119783",
+    "benchmarks/http-server/primitive-comparison/root-map/json4.json.gz": "fb8a5ba83351ec2b142228f62e40df7d08ed16a2b20d0e027765c33fc592aa87",
+    "benchmarks/http-server/primitive-comparison/root-map/forced.json.gz": "f7978fc6a0df53bf7412484d6dedc81647dd5ae4d222e06b472596dedecb888c",
+    "benchmarks/http-server/primitive-comparison/root-map/console-tests.log.gz": "891113979434db775042713ef31e0ce9f0d424d4b076dc4c499c9b4750b768f3",
+    "benchmarks/http-server/primitive-comparison/root-map/legacy.json.gz": "08a3db2fc54c681c2641cd1a5ba7e8cc2bfce5cf03bc6c535e71ba48a6a8487f",
+    "runtime/codegen/src/gc_probe.rs": "e13f9b4618486174bec3efe607596c689be5eee00d643b314aaf803a07864501",
+    "runtime/native/gc/root-probe.c": "3b84f95299fb863baaadd88a2ce4a1fb5d12e2544f5174c653f6eee3c599edd6",
+    "runtime/native/gc/root-probe.h": "5a0781db7fc96d49692dc0c244ec8d6925b0def8b7431941f6a6244c6544f396",
+    "benchmarks/http-server/primitive-comparison/root-map/measurement.json.gz": "774984f3ef9c79d48e146ee8b9c2a4e0a51a5739708b5b8b1ae780ed38ca1ab4"
+  },
+  "compilerOutputSha256": "1ecc5818100c6de829b2fcf1092eabb99b45e364789fd5aae1c08d5dcc180220",
+  "compilerSha256": "c004b32bf6127ffaecfcc569b28a9d65bce2fb9c94546f9bae7ba83a61e72946"
+}

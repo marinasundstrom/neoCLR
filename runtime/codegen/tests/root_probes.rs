@@ -534,6 +534,13 @@ ret
         assert!(maps.iter().any(|s| s.ends_with("_1_3")), "{maps:?}");
         if gc {
             assert!(symbols.contains("neoclr_gc_transient_owned_v1"));
+            assert!(symbols.contains("neoclr_gc_stack_map_v1"));
+            let bytes = fs::read(&output).unwrap();
+            assert!(
+                !bytes
+                    .windows(b"requiredSpillLanes".len())
+                    .any(|w| w == b"requiredSpillLanes")
+            );
             assert!(!maps.iter().any(|s| s.ends_with("_2")));
         }
     }

@@ -443,3 +443,48 @@ fn owned_transients_trace_changing_values_and_preserve_checked_fallback() {
     }
     fs::remove_dir_all(dir).unwrap();
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn typed_root_maps_validate_headers_and_trace_mutable_lanes() {
+    use std::os::unix::process::ExitStatusExt;
+    let dir = std::env::temp_dir().join(format!("neoclr-root-maps-{}", std::process::id()));
+    fs::create_dir_all(&dir).unwrap();
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
+    let binary = dir.join("check");
+    let result = Command::new("xcrun")
+        .args([
+            "--sdk",
+            "macosx",
+            "clang",
+            "-std=c11",
+            "-O2",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "-DNEOCLR_NATIVE_GC",
+            "-fsanitize=undefined,bounds",
+            "-fno-sanitize-recover=all",
+        ])
+        .arg(base.join("native-root-map-test.c"))
+        .arg(base.join("root-probe.c"))
+        .arg(base.join("native-gc.c"))
+        .arg("-o")
+        .arg(&binary)
+        .output()
+        .unwrap();
+    assert!(
+        result.status.success(),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
+    for case in ["valid", "magic", "count", "length", "null", "head"] {
+        let result = Command::new(&binary).arg(case).output().unwrap();
+        if case == "valid" {
+            assert!(result.status.success(), "{result:?}");
+        } else {
+            assert_eq!(result.status.signal(), Some(6), "{case}: {result:?}");
+        }
+    }
+    fs::remove_dir_all(dir).unwrap();
+}

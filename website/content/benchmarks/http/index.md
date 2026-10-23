@@ -425,3 +425,15 @@ stress pass. Eight paired local plaintext trials show 3.4%/1.6% higher mean
 one/four-worker throughput and 3.3%/2.3% lower CPU per response. Latency tails do not
 uniformly improve; these are incremental desktop measurements. See
 [contract, validation and evidence](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/primitive-comparison/published-boundary).
+
+
+## Development: typed boundary metadata
+
+Native boundary execution uses small versioned headers, removing repeated JSON
+plan scans while preserving tracing, synchronization and rich inspection. Thirty
+focused tests, header rejection/live-root checks, shared workers, HTTP and async
+consumers pass. The plain-text object is 2.3% smaller. Eight paired local trials show
+4.0%/3.9% higher mean one/four-worker throughput and 4.2%/3.9% lower CPU per response;
+one-worker latency tails remain mixed. New native objects require the matching
+runtime. These are incremental desktop results, not Kestrel parity. See
+[contract, validation and measurements](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/primitive-comparison/root-map).

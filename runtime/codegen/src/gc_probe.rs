@@ -82,9 +82,9 @@ impl Probes {
         }
         let callback = module.declare_function(
             if workers {
-                "neoclr_gc_worker_stack_roots_v1"
+                "neoclr_gc_worker_stack_map_v1"
             } else if gc {
-                "neoclr_gc_stack_roots_v1"
+                "neoclr_gc_stack_map_v1"
             } else {
                 "neoclr_probe_stack_roots_v2"
             },
@@ -292,11 +292,18 @@ impl Probes {
                 }
                 // Native GC executes the published slot/lane tables; the rich
                 // inspection plan is diagnostic data, not a tracing program.
-                // Keep only its admitted spill map in the execution image.
-                let runtime_plan = execution_plan(&plan, gc);
-                let mut bytes = serde_json::to_vec(&runtime_plan)?;
-                let length = bytes.len();
-                bytes.push(0);
+                // Keep a versioned lane-count header in the execution image.
+                let (bytes, length) = if gc {
+                    // Versioned execution header; explicit published lanes carry
+                    // roots. Rich spill/layout metadata remains in inspection.
+                    let bytes = native_root_map(plan["stackLanes"].as_u64().unwrap() as u32);
+                    (bytes, 8)
+                } else {
+                    let mut bytes = serde_json::to_vec(&plan)?;
+                    let length = bytes.len();
+                    bytes.push(0);
+                    (bytes, length)
+                };
                 let data = module.declare_data(
                     &format!("neoclr_root_probe_{i}_{pc}"),
                     Linkage::Local,
@@ -489,17 +496,12 @@ impl Probes {
     }
 }
 
-// Keep diagnostic probes lossless. Native GC retains the spill map (including
-// order) while inspection continues to expose the original complete plan.
-fn execution_plan(plan: &serde_json::Value, native_gc: bool) -> serde_json::Value {
-    if native_gc {
-        serde_json::json!({
-            "schema": "neoclr-gc-point-v1",
-            "requiredSpillLanes": plan["requiredSpillLanes"]
-        })
-    } else {
-        plan.clone()
-    }
+// Current native targets are little-endian ARM64/x64. Keep this version/layout
+// matched with neoclr_gc_root_map; do not serialize a host-sized Rust structure.
+fn native_root_map(lanes: u32) -> Vec<u8> {
+    let mut bytes = 0x3143474eu32.to_le_bytes().to_vec();
+    bytes.extend_from_slice(&lanes.to_le_bytes());
+    bytes
 }
 
 fn execution_slots(
@@ -517,7 +519,12 @@ fn execution_slots(
 
 #[cfg(test)]
 mod execution_metadata_tests {
-    use super::{execution_plan, execution_slots};
+    use super::{execution_slots, native_root_map};
+
+    #[test]
+    fn native_map_has_version_and_exact_lane_count() {
+        assert_eq!(native_root_map(8192), [0x4e, 0x47, 0x43, 0x31, 0, 32, 0, 0]);
+    }
     use serde_json::json;
 
     #[test]
@@ -533,19 +540,5 @@ mod execution_metadata_tests {
                 assert_eq!(execution_slots(&layout, schema, count, false), layout);
             }
         }
-    }
-
-    #[test]
-    fn native_execution_keeps_spill_order_and_diagnostics_keep_full_plan() {
-        let plan = json!({"requiredSpillLanes": [7, 2, 19], "stackLanes": 20,
-            "roots": [{"type": "record", "layout": {"fields": [1, 2]}}]});
-        let native = execution_plan(&plan, true);
-        assert_eq!(native["requiredSpillLanes"], plan["requiredSpillLanes"]);
-        assert_eq!(native["schema"], "neoclr-gc-point-v1");
-        assert!(native.get("roots").is_none());
-        assert_eq!(execution_plan(&plan, false), plan);
-        assert!(
-            serde_json::to_vec(&native).unwrap().len() < serde_json::to_vec(&plan).unwrap().len()
-        );
     }
 }

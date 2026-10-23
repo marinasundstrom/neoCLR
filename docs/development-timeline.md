@@ -22184,3 +22184,19 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
 - Evidence and limits: [experiment report](../benchmarks/http-server/primitive-comparison/owned-transient/README.md).
   Count reductions do not establish CPU attribution; capacity is measured separately.
   Native typed maps and broader noncollecting-call analysis remain open.
+
+
+### 2026-10-24 — Separate native boundary metadata from inspection text
+
+- Author: continues the existing throughput/CPU and repeated-metadata investigation.
+- Assistant proposal and action: identifies that tracing consumes explicit lanes,
+  then implements a bounded eight-byte native boundary header instead of repeatedly
+  scanning its JSON representation. Keeps checked legacy/diagnostic paths and all
+  spill, GC and worker behavior. This format is an assistant-selected experiment,
+  not a new author-requested public API.
+- Verified outcome: rich inspection is byte-identical; 30 focused tests, header
+  rejection/live-root checks, forced/paced plain/JSON HTTP, shared workers and 40
+  async-consumer invocations pass. Plain object size falls 2.3%; boundary string work
+  is reduced. [Paired measurements and limits](../benchmarks/http-server/primitive-comparison/root-map/README.md).
+- Open: typed storage/transient execution metadata, image-level version admission
+  and native Windows execution qualification remain separate follow-ups.
