@@ -2971,3 +2971,8 @@ System.Optional<T> replaces Option<T>, with unchanged Some/None cases.
 OptionalOperators and OptionalNestedOperators replace the corresponding extension
 containers. The selected types, authored references and matching CLI/native
 snapshots use these names. No compatibility aliases or renderer exclusions are added.
+
+2026-10-23: Error interface examples now use unqualified `Error` with System
+imported, alongside the `Failure` Result case. Three platform declarations receive
+the same source spelling cleanup. Public metadata signatures are unchanged; the
+CLI source fingerprints are refreshed while retaining the existing reference.

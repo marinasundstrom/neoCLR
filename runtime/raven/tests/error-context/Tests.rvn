@@ -12,38 +12,38 @@ class Counter {
     var Value: int = 0
 }
 
-class AuthorError : System.Error {
+class AuthorError : Error {
     val Message: string => "Author failure"
-    val Cause: Optional<System.Error> => None
+    val Cause: Optional<Error> => None
     val StackTrace: Optional<StackTrace> => None
 }
 
-class DomainError : System.Error {
-    private val reason: System.Error
-    init(reason: System.Error) {
+class DomainError : Error {
+    private val reason: Error
+    init(reason: Error) {
         self.reason = reason
     }
     val Message: string => "Domain failure"
-    val Cause: Optional<System.Error> => Some(reason)
+    val Cause: Optional<Error> => Some(reason)
     val StackTrace: Optional<StackTrace> => None
 }
 
-class CyclicError : System.Error {
+class CyclicError : Error {
     val Message: string => "Cycle"
-    val Cause: Optional<System.Error> => Some(self)
+    val Cause: Optional<Error> => Some(self)
     val StackTrace: Optional<StackTrace> => None
 }
 
 [Test("Platform and author errors opt into message and absent diagnostics")]
 func ALeafErrors() -> Result<unit, TestFailure> {
-    let file: System.Error = FileReadError.NotFound
+    let file: Error = FileReadError.NotFound
     _ = Assert.Equal("NotFound", file.Message)?
     _ = Assert.True(file.Cause is None && file.StackTrace is None, "Leaf diagnostics absent")?
-    let number: System.Error = NumberParseError.Overflow
+    let number: Error = NumberParseError.Overflow
     _ = Assert.Equal("NumberParseError.Overflow", number.Message)?
-    let stream: System.Error = StreamError.Closed
+    let stream: Error = StreamError.Closed
     _ = Assert.Equal("Closed", stream.Message)?
-    let author: System.Error = AuthorError()
+    let author: Error = AuthorError()
     return Assert.True(author.Cause is None && author.StackTrace is None, "Author defaults")
 }
 
@@ -100,7 +100,7 @@ func ENestedFormatting() -> Result<unit, TestFailure> {
     let outer = inner.WithContext("Starting application")
     _ = Assert.Equal("Starting application", outer.Message)?
     _ = Assert.True(Object.ReferenceEquals(inner, outer.Cause), "Original context identity")?
-    let error: System.Error = outer
+    let error: Error = outer
     return Assert.Equal("Starting application\nCaused by: Reading file\nCaused by: NotFound", error.FormatError())
 }
 
@@ -121,7 +121,7 @@ func FCaptureReuse() -> Result<unit, TestFailure> {
     _ = Assert.True(Object.ReferenceEquals(trace, outerTrace), "Reuse instead of recapture")?
     _ = Assert.True(Object.ReferenceEquals(trace, plainTrace), "Plain wrapper retains trace")?
     System.Runtime.GC.Collect()
-    let error: System.Error = plain
+    let error: Error = plain
     let formatted = error.FormatError()
     _ = Assert.True(formatted.Contains("Stack trace:"), "Trace rendered")?
     return Assert.True(formatted.Contains("FCaptureReuse"), "Attachment stack retained")
@@ -149,7 +149,7 @@ func GDomainMapping() -> Result<unit, TestFailure> {
 
 [Test("Malformed cyclic cause chains have bounded formatting and lookup")]
 func HBoundedChains() -> Result<unit, TestFailure> {
-    let cycle: System.Error = CyclicError()
+    let cycle: Error = CyclicError()
     _ = Assert.True(cycle.FormatError().Contains("Cause chain truncated after 64 layers"), "Bounded formatter")?
     let wrapped = cycle.WithContext("Cycle boundary")
     return Assert.True(wrapped.StackTrace is None, "Bounded trace lookup")
@@ -194,13 +194,13 @@ func KConditionalCapturePolicy() -> Result<unit, TestFailure> {
 #endif
 }
 
-func ReadThroughErrorBoundary() -> Result<int, System.Error> {
+func ReadThroughErrorBoundary() -> Result<int, Error> {
     let failure: Result<int, FileReadError> = Failure(FileReadError.NotFound)
     let value = failure?
     return Ok(value)
 }
 
-func ReadThroughContextBoundary() -> Result<int, System.Error> {
+func ReadThroughContextBoundary() -> Result<int, Error> {
     let value = Propagate()?
     return Ok(value)
 }

@@ -110,7 +110,7 @@ A contextual wrapper changes the residual type. A function returning
 `Result<T,ContextError<FileReadError>>` can propagate a contextual file failure;
 a function returning `Result<T,FileReadError>` cannot. Interface conversion does not
 wrap, `?` does not attach information, and `MapError` remains explicit domain mapping.
-`Result<T,System.Error>` is an explicit common boundary: a concrete Error can
+`Result<T, Error>` is an explicit common boundary: a concrete Error can
 propagate through its ordinary interface conversion, retaining its runtime value
 while widening the static signature. Explicit context wrappers can propagate the
 same way. This does not automatically wrap or capture.

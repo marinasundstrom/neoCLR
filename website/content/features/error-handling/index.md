@@ -80,9 +80,11 @@ existing stack trace. FileReadError, NumberParseError and StreamError are the fi
 platform adopters. Classes, structs and nominal unions can opt in; an ad-hoc union
 does not automatically acquire this interface.
 
-A boundary returning `Result<T, System.Error>` can propagate any participating
+A boundary returning `Result<T, Error>` can propagate any participating
 error. This gives callers a less specific signature, while preserving the concrete
-runtime value for type checks and diagnostics:
+runtime value for type checks and diagnostics. With `System.*` imported, the
+interface can be written as `Error`: the Result case is named `Failure`, so importing
+`System.Result.*` introduces no collision:
 
 ```raven
 {{ERROR_INTERFACE_BOUNDARY_SAMPLE}}
@@ -95,7 +97,7 @@ message. WithContext wraps only the failure channel and preserves the typed caus
 {{ERROR_CONTEXT_PROPAGATION_SAMPLE}}
 ```
 
-Here `context.Cause` remains a FileReadError; through System.Error, Cause is an
+Here `context.Cause` remains a FileReadError; through Error, Cause is an
 `Optional<Error>`. A lazy message factory runs only on failure. `FormatError()` renders
 the cause chain and at most one existing trace when the application reports the error.
 These conventions add diagnostics familiar from exceptions through composition;
