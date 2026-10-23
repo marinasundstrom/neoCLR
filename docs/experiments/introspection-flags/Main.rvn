@@ -33,7 +33,7 @@ func Main() {
     CheckFlags(typeof(Root), true, false, true, false, false, false)
     CheckFlags(typeof(Child), false, false, false, false, false, false)
     CheckFlags(typeof(TypeInfo), true, false, true, false, false, false)
-    CheckFlags(typeof(Option<int>), false, false, false, true, false, true)
+    CheckFlags(typeof(Optional<int>), false, false, false, true, false, true)
     CheckFlags(typeof(Result<int, string>), false, false, false, true, false, true)
     CheckFlags(typeof(BindingFlags), false, false, false, false, true, true)
     CheckFlags(typeof(int), false, false, false, false, false, true)
@@ -41,7 +41,7 @@ func Main() {
     CheckFlags(typeof(int[]), false, false, false, false, false, false)
     var index = 0
     while index < 180 {
-        CheckFlags(typeof(Option<string>), false, false, false, true, false, true)
+        CheckFlags(typeof(Optional<string>), false, false, false, true, false, true)
         index += 1
     }
     Console.WriteLine("TypeInfo flags passed")

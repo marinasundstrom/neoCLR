@@ -23,7 +23,7 @@ iterables for initialization or copying where the contract provides that overloa
 
 `PriorityArrayQueue<TElement, TPriority>` stores an array-backed min-heap. Supply
 an explicit `Comparer<TPriority>`, or wrap a comparison callback in
-`FunctionComparer<TPriority>`. `Peek` and `Dequeue` return `Option<TElement>`;
+`FunctionComparer<TPriority>`. `Peek` and `Dequeue` return `Optional<TElement>`;
 `PeekPriority` exposes the leading priority. Equal priorities have unspecified order.
 
 ```raven
@@ -81,7 +81,7 @@ Import the query operators to compose iterable work:
 
 Filter and Map correspond to .NET LINQ's Where and Select. Lazy operators defer work
 until iteration; ToList and ToMap materialize a new collection. Any and All
-short-circuit. First and Last return Option; Single returns a Result that distinguishes
+short-circuit. First and Last return Optional; Single returns a Result that distinguishes
 empty and multiple matches.
 
 [Complete query example](/samples/library-query-names.rvn) ·
@@ -90,7 +90,7 @@ empty and multiple matches.
 ## Index and slice carefully
 
 Bracket access is a convenience that can fault on invalid indexes or ranges.
-Checked Get and Slice methods return Option or Result. ArrayList provides its own
+Checked Get and Slice methods return Optional or Result. ArrayList provides its own
 indexing and slice implementation; Sequence access uses the appropriate capability
 or its iterator fallback. A slice owns independent array storage with shallow-copied
 elements. No concurrent snapshot is promised.
@@ -111,7 +111,7 @@ and hashing. Avoid changing a key in ways that affect equality while it is store
 
 [Collection API](xref:System.Collections) ·
 [String comparison](/features/strings/) ·
-[Option and Result](/features/outcomes/)
+[Optional and Result](/features/outcomes/)
 
 <a id="example"></a>
 

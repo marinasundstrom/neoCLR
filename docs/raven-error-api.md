@@ -105,7 +105,7 @@ Author direction: Error participation is opt-in for authors and a platform
 convention. Result and general propagation remain unconstrained. The first slice
 adds System.Error, ContextError<E>, explicit WithContext and bounded FormatError;
 FileReadError, NumberParseError and StreamError adopt the interface. Cause and
-StackTrace use Option rather than nullable references; the typed wrapper cause
+StackTrace use Optional rather than nullable references; the typed wrapper cause
 remains required. Stack capture is explicit in both Debug and Release. See the
 [member contracts](../api-docs/error-context.md) and
 [design rationale](proposals/error-propagation-and-context.md#bounded-recommendation--2026-10-23).

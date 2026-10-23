@@ -6,7 +6,7 @@ Raven `codex/neoclr`, not an ABI change or release-package qualification.
 
 ## Contract and comparison
 
-Preserve Raven's existing generated union display: `Option.Some(42)`, `Option.None`,
+Preserve Raven's existing generated union display: `Optional.Some(42)`, `Optional.None`,
 `Choice.Pair(Left=7, Right=null)`, and `<Uninitialized>` when no case is active.
 Single payloads omit their parameter name; multiple payloads use public property
 names. Nested unions and supported source record structs reuse the enclosing builder.
@@ -44,7 +44,7 @@ distinct from active empty cases; no semantic or storage ABI change is made.
 compiler. [Program.rvn](Program.rvn) checks Some/None/default, nested options,
 multiple payloads, nullable text, original decomposed Unicode and boxed dispatch.
 [validation.json](validation.json) retains interpreter/JIT/AOT results, an unsupported
-Option<Index> diagnostic, exact commands and artifact hashes. The source-core probe
+Optional<Index> diagnostic, exact commands and artifact hashes. The source-core probe
 also retains existing native equality/hash and missing-format-helper regression
 coverage: [compiler-probe.txt](compiler-probe.txt).
 

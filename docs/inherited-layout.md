@@ -50,7 +50,7 @@ allows Derived& to be used as Base& while preserving the complete owner.
 
 ## Library API
 
-`System.Type.BaseType` returns `Option<Type>`: Some contains the immediate,
+`System.Type.BaseType` returns `Optional<Type>`: Some contains the immediate,
 substituted record base; None means no record base. Interfaces, primitives, arrays,
 and reference signatures currently have no implicit Object or Array ancestry.
 GetFields and its DefinitionIndex remain declared-only, with the index relative to
@@ -67,7 +67,7 @@ Primary sources consulted 2026-09-08:
   from allocation/addressing mode and does not require Object ancestry.
 - [.NET 10 Type.BaseType](https://learn.microsoft.com/en-us/dotnet/api/system.type.basetype?view=net-10.0)
   reports the immediate substituted base. neoCLR keeps the property name and uses
-  Option for absence rather than nullable Type, consistent with its library policy.
+  Optional for absence rather than nullable Type, consistent with its library policy.
 - [C# constructor behavior](https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/using-constructors)
   includes base constructor calls. This aggregate slice does not reproduce that
   behavior; load-time restrictions prevent skipping user-defined base construction.

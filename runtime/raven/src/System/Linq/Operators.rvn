@@ -1,7 +1,7 @@
 module System.Linq
 
 import System.Collections.*
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 
 public extension Operators<T> for Iterable<T> {
@@ -127,7 +127,7 @@ public extension Operators<T> for Iterable<T> {
         return result
     }
 
-    func First() -> System.Option<T> {
+    func First() -> System.Optional<T> {
         use iterator = self.GetIterator()
         if iterator.MoveNext() {
             let value = iterator.Current
@@ -136,7 +136,7 @@ public extension Operators<T> for Iterable<T> {
         return None
     }
 
-    func Last() -> System.Option<T> {
+    func Last() -> System.Optional<T> {
         use iterator = self.GetIterator()
         if !iterator.MoveNext() {
             return None
@@ -161,7 +161,7 @@ public extension Operators<T> for Iterable<T> {
         return Ok(value)
     }
 
-    func First(predicate: (T) -> bool) -> System.Option<T> {
+    func First(predicate: (T) -> bool) -> System.Optional<T> {
         for value in self {
             if predicate(value) {
                 return Some(value)
@@ -170,7 +170,7 @@ public extension Operators<T> for Iterable<T> {
         return None
     }
 
-    func Last(predicate: (T) -> bool) -> System.Option<T> {
+    func Last(predicate: (T) -> bool) -> System.Optional<T> {
         use iterator = self.GetIterator()
         while iterator.MoveNext() {
             var value = iterator.Current

@@ -170,7 +170,7 @@ remain outside the supported mapper subset. Existing bounds still apply.
 - Every writable mapped property must be present on input. Unknown JSON fields are
   ignored; duplicate decoded names remain invalid. This strict presence rule differs
   from .NET's default treatment of non-required missing properties.
-- Reject CLR null references, unsupported collection families, Option, enums, unsupported scalars
+- Reject CLR null references, unsupported collection families, Optional, enums, unsupported scalars
   and indexers in participating properties. Int32 requires a checked integer token;
   fraction/exponent tokens are not coerced.
 

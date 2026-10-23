@@ -5,7 +5,7 @@ import System.DependencyInjection.*
 import System.Globalization.*
 import System.Introspection.*
 import System.Localization.*
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 import NeoClr.Testing.*
 
@@ -13,7 +13,7 @@ public class Feature { }
 public class Strings : Localizer<Feature> {
     val Culture: Culture => System.Globalization.Culture.Invariant
     val self[key: string]: string => "Hello"
-    func Find(key: string) -> Option<string> => Some("Hello")
+    func Find(key: string) -> Optional<string> => Some("Hello")
 }
 public class Greeting {
     val Text: string

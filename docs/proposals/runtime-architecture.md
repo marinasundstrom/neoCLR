@@ -51,7 +51,7 @@ The architecture should support:
 - generic programming;
 - runtime-supported asynchronous execution;
 - portable application APIs;
-- explicit error models such as `Result` and `Option`;
+- explicit error models such as `Result` and `Optional`;
 - introspection without requiring runtime loading;
 - optional runtime reflection and dynamic generation;
 - native interoperability;
@@ -244,7 +244,7 @@ The common model may include:
 - callable values;
 - managed references;
 - tasks;
-- `Option`;
+- `Optional`;
 - `Result`;
 - visibility;
 - metadata;
@@ -391,7 +391,7 @@ For example:
 NeoCLR concept       Possible projection
 
 Task<T>              async/await, Future<T>, Promise<T>
-Option<T>            Option<T>, Optional<T>, nullable syntax
+Optional<T>            Optional<T>, Optional<T>, nullable syntax
 Result<T,E>          Result<T,E>, union/result syntax
 Iterable<T>          foreach protocol, sequence abstraction
 ```
@@ -594,7 +594,7 @@ For example, fundamental types may include:
 ```text id="5jv49f"
 System.Object
 System.String
-System.Option<T>
+System.Optional<T>
 System.Result<T,E>
 System.RuntimeTypeHandle
 ```
@@ -1043,7 +1043,7 @@ Typical APIs should use:
 
 ```text id="pg63ve"
 Result<T, E>
-Option<T>
+Optional<T>
 ```
 
 where appropriate.
@@ -1059,7 +1059,7 @@ or:
 
 ```raven id="mp63vh"
 func Find(name: String)
-    -> Option<Item>
+    -> Optional<Item>
 ```
 
 Faults or runtime exceptions should primarily represent conditions that cannot reasonably be handled through ordinary API control flow.

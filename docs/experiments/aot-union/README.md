@@ -73,7 +73,7 @@ See the [selection contract](../aot-values/README.md#explicit-closed-world-selec
 Use an **interactive integer reader** as the next driving sample: read a line, match
 end-of-input, parse into `Result<int, ParseError>`, report success or invalid/overflow
 input, then continue until EOF. This follows the author's console-input direction and
-provides concrete tests for Option/Result, UTF-8 strings, input services and ownership
+provides concrete tests for Optional/Result, UTF-8 strings, input services and ownership
 before a network server adds sockets and concurrency.
 
 Implement it in bounded stages:
@@ -89,7 +89,7 @@ Implement it in bounded stages:
    interface conformance is now verified before direct-call compilation; the actual library
    Result success/error consumer runs standalone. Multiple instantiations remain open.
 2. The [nested input-outcome sample](../aot-input/README.md) now validates the actual
-   Result<Option<byte>, ConsoleReadError> shape. Metadata-only static member owners now
+   Result<Optional<byte>, ConsoleReadError> shape. Metadata-only static member owners now
    compile, primitive erased-value transport passes, and primitive static generic methods
    now specialize. Explicit `--compile-system` selects managed seed helpers; the
    String literals now cross locals/calls/output slots and explicit fault instructions

@@ -32,7 +32,7 @@ func Main() -> int {
     if pair.First.Value != pair.Second.Value.Value { return -4 }
     let readonlyCounter: readonly Counter& = counter
     let view = Box<readonly Counter&>(readonlyCounter)
-    let option: Option<Box<int>> = System.Option.Some(pair.First)
+    let option: Optional<Box<int>> = System.Optional.Some(pair.First)
     let Some(payload) = option else { return -5 }
     return payload.Value
 }
@@ -51,7 +51,7 @@ func Main() -> int {
 fn generic_record_type_parameters_shadow_imported_cases() {
     assert_eq!(
         run(r#"
-import System.Option.*
+import System.Optional.*
 record Box<Some>(Value: Some)
 func Main() -> int { return Box<int>(42).Value }
 "#)

@@ -3,14 +3,14 @@
 .sealed
 .field private defaultHeaders System.Collections.Sequence<System.Web.Http.HttpHeader>
 .field private handler System.Web.Http.HttpHandler
-.field private baseUri System.Option<String>
+.field private baseUri System.Optional<String>
 .property instance DefaultRequestHeaders() -> System.Collections.Sequence<System.Web.Http.HttpHeader>
 .get instance System.Web.Http.HttpClient::get_DefaultRequestHeaders()
 .set instance System.Web.Http.HttpClient::set_DefaultRequestHeaders(System.Collections.Sequence<System.Web.Http.HttpHeader>)
 .end
-.property instance BaseUri() -> System.Option<String>
+.property instance BaseUri() -> System.Optional<String>
 .get instance System.Web.Http.HttpClient::get_BaseUri()
-.set instance System.Web.Http.HttpClient::set_BaseUri(System.Option<String>)
+.set instance System.Web.Http.HttpClient::set_BaseUri(System.Optional<String>)
 .end
 .method instance get_DefaultRequestHeaders() -> System.Collections.Sequence<System.Web.Http.HttpHeader>
 .local System.Collections.ArrayList<System.Web.Http.HttpHeader> local0
@@ -124,14 +124,14 @@ M0000000e_IL_0035:
 M0000000e_IL_0036:
 ret
 .end
-.method instance get_BaseUri() -> System.Option<String>
+.method instance get_BaseUri() -> System.Optional<String>
 .local String local0
-.local System.Option<String> local1
-.local System.Option.Some<String> local2
+.local System.Optional<String> local1
+.local System.Optional.Some<String> local2
 ldloca local1
-initobj System.Option<String>
+initobj System.Optional<String>
 ldloca local2
-initobj System.Option.Some<String>
+initobj System.Optional.Some<String>
 M0000000f_IL_0000:
 M0000000f_IL_0001:
 M0000000f_IL_0002:
@@ -143,19 +143,19 @@ stloc local1
 M0000000f_IL_0009:
 ldloca local2
 M0000000f_IL_000b:
-initobj System.Option.Some<String>
+initobj System.Optional.Some<String>
 M0000000f_IL_0011:
 ldloca local1
 M0000000f_IL_0013:
 ldloca local2
 M0000000f_IL_0015:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion32(System.Option<String>&,System.Option.Some<String>&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion32(System.Optional<String>&,System.Optional.Some<String>&)
 M0000000f_IL_001a:
 brfalse M0000000f_IL_0033
 M0000000f_IL_001f:
 ldloca local2
 M0000000f_IL_0021:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion33(System.Option.Some<String>&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion33(System.Optional.Some<String>&)
 M0000000f_IL_0026:
 stloc local0
 M0000000f_IL_0027:
@@ -169,31 +169,31 @@ ldloc local0
 M0000000f_IL_003a:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion35(String)
 M0000000f_IL_003f:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion36(System.Option.Some<String>)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion36(System.Optional.Some<String>)
 M0000000f_IL_0044:
 ret
 M0000000f_IL_0045:
 M0000000f_IL_0046:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion20()
 M0000000f_IL_004b:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion34(System.Option.None)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion34(System.Optional.None)
 M0000000f_IL_0050:
 ret
 .end
-.method instance set_BaseUri(System.Option<String> value) -> void
+.method instance set_BaseUri(System.Optional<String> value) -> void
 .local String local0
-.local System.Option<String> local1
-.local System.Option.Some<String> local2
-.local System.Option<String> local3
-.local System.Option.None local4
+.local System.Optional<String> local1
+.local System.Optional.Some<String> local2
+.local System.Optional<String> local3
+.local System.Optional.None local4
 ldloca local1
-initobj System.Option<String>
+initobj System.Optional<String>
 ldloca local2
-initobj System.Option.Some<String>
+initobj System.Optional.Some<String>
 ldloca local3
-initobj System.Option<String>
+initobj System.Optional<String>
 ldloca local4
-initobj System.Option.None
+initobj System.Optional.None
 M00000010_IL_0000:
 M00000010_IL_0001:
 M00000010_IL_0002:
@@ -203,19 +203,19 @@ stloc local1
 M00000010_IL_0004:
 ldloca local2
 M00000010_IL_0006:
-initobj System.Option.Some<String>
+initobj System.Optional.Some<String>
 M00000010_IL_000c:
 ldloca local1
 M00000010_IL_000e:
 ldloca local2
 M00000010_IL_0010:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion32(System.Option<String>&,System.Option.Some<String>&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion32(System.Optional<String>&,System.Optional.Some<String>&)
 M00000010_IL_0015:
 brfalse M00000010_IL_002e
 M00000010_IL_001a:
 ldloca local2
 M00000010_IL_001c:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion33(System.Option.Some<String>&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion33(System.Optional.Some<String>&)
 M00000010_IL_0021:
 stloc local0
 M00000010_IL_0022:
@@ -231,7 +231,7 @@ ldloc local0
 M00000010_IL_0036:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion35(String)
 M00000010_IL_003b:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion36(System.Option.Some<String>)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion36(System.Optional.Some<String>)
 M00000010_IL_0040:
 stfld System.Web.Http.HttpClient::baseUri
 M00000010_IL_0045:
@@ -247,7 +247,7 @@ ldloca local3
 M00000010_IL_0051:
 ldloca local4
 M00000010_IL_0053:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion37(System.Option<String>&,System.Option.None&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion37(System.Optional<String>&,System.Optional.None&)
 M00000010_IL_0058:
 brfalse M00000010_IL_006c
 M00000010_IL_005d:
@@ -264,7 +264,7 @@ ldarg 0
 M00000010_IL_0072:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion20()
 M00000010_IL_0077:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion34(System.Option.None)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion34(System.Optional.None)
 M00000010_IL_007c:
 stfld System.Web.Http.HttpClient::baseUri
 M00000010_IL_0081:
@@ -300,7 +300,7 @@ ldarg 0
 M00000011_IL_0015:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion20()
 M00000011_IL_001a:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion34(System.Option.None)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion34(System.Optional.None)
 M00000011_IL_001f:
 stfld System.Web.Http.HttpClient::baseUri
 M00000011_IL_0024:
@@ -332,7 +332,7 @@ ldarg 0
 M00000012_IL_0015:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion20()
 M00000012_IL_001a:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion34(System.Option.None)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion34(System.Optional.None)
 M00000012_IL_001f:
 stfld System.Web.Http.HttpClient::baseUri
 M00000012_IL_0024:
@@ -3190,7 +3190,7 @@ M00000038_IL_004b:
 ret
 .end
 .method private instance ResolveAddress(System.Uri uri) -> System.Result<System.Uri,System.Web.Http.HttpError>
-.local System.Option<String> local0
+.local System.Optional<String> local0
 .local String local1
 .local System.Result<System.Uri,System.UriError> local2
 .local System.UriError local3
@@ -3198,8 +3198,8 @@ ret
 .local System.Result<System.Uri,System.UriError> local5
 .local System.Uri local6
 .local System.UriError local7
-.local System.Option<String> local8
-.local System.Option.Some<String> local9
+.local System.Optional<String> local8
+.local System.Optional.Some<String> local9
 .local System.Result<System.Uri,System.UriError> local10
 .local System.Result.Failure<System.UriError> local11
 .local System.Result<System.Uri,System.UriError> local12
@@ -3212,7 +3212,7 @@ ret
 .local System.Result<System.Uri,System.UriError> local19
 .local System.Result.Failure<System.UriError> local20
 ldloca local0
-initobj System.Option<String>
+initobj System.Optional<String>
 ldloca local2
 initobj System.Result<System.Uri,System.UriError>
 ldloca local3
@@ -3226,9 +3226,9 @@ initobj System.Uri
 ldloca local7
 initobj System.UriError
 ldloca local8
-initobj System.Option<String>
+initobj System.Optional<String>
 ldloca local9
-initobj System.Option.Some<String>
+initobj System.Optional.Some<String>
 ldloca local10
 initobj System.Result<System.Uri,System.UriError>
 ldloca local11
@@ -3267,19 +3267,19 @@ stloc local8
 M00000039_IL_000d:
 ldloca local9
 M00000039_IL_000f:
-initobj System.Option.Some<String>
+initobj System.Optional.Some<String>
 M00000039_IL_0015:
 ldloca local8
 M00000039_IL_0017:
 ldloca local9
 M00000039_IL_0019:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion32(System.Option<String>&,System.Option.Some<String>&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion32(System.Optional<String>&,System.Optional.Some<String>&)
 M00000039_IL_001e:
 brfalse M00000039_IL_0037
 M00000039_IL_0023:
 ldloca local9
 M00000039_IL_0025:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion33(System.Option.Some<String>&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion33(System.Optional.Some<String>&)
 M00000039_IL_002a:
 stloc local1
 M00000039_IL_002b:

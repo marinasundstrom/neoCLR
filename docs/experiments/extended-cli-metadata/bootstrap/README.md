@@ -1,7 +1,7 @@
 # Source-built union bootstrap (development)
 
 This bounded native gate compiles the unchanged iteration contracts, Propagatable,
-Option and Result into NeoCLR.Collections.dll. A second ordinary compiler invocation
+Optional and Result into NeoCLR.Collections.dll. A second ordinary compiler invocation
 imports only that artifact, then neoCLR verifies and executes the consumer. This is
 not the complete dual-target library gate or the collection application gate.
 
@@ -17,7 +17,7 @@ Owners:
 
 Object.ToString is a temporary target adapter: it asks the existing native type-handle
 query for the display name directly instead of allocating the guest introspection facade.
-That removes the Option/Result bootstrap cycle without a placeholder body. The runtime's
+That removes the Optional/Result bootstrap cycle without a placeholder body. The runtime's
 existing intrinsic boxed-primitive formatting and ordinary value overrides still dispatch.
 Unlike a full .NET core library, this seed deliberately exposes only the services required
 by this gate; unsupported core member references reject. Broader source-library ownership
@@ -36,7 +36,7 @@ python3 docs/experiments/extended-cli-metadata/bootstrap/verify_source_unions.py
 ```
 
 The output directory must be fresh. Evidence records every command, source/artifact hash,
-stdout and exit status. Expected output is `Option.Some(40)` then `Result.Error(7)`,
+stdout and exit status. Expected output is `Optional.Some(40)` then `Result.Error(7)`,
 with exit 42. The consumer checks copy independence, false-output initialization, unit
 residuals, error residuals, generic pattern matching and boxed virtual display. Missing
 library input and duplicate source ownership in a seed must reject before publication.
@@ -83,7 +83,7 @@ EqualityComparer, FunctionEqualityComparer, Map, MutableMap and HashMap. Their s
 are unchanged. The consumer receives only the emitted native library reference.
 
 The consumer forces every key into one bucket, grows beyond initial capacity, rejects
-an existing key, replaces and inserts through Set, checks missing Option payloads,
+an existing key, replaces and inserts through Set, checks missing Optional payloads,
 checks Keys snapshot independence, and mutates a shared ArrayList through a retrieved
 value. Both equality/hash callbacks and ordering callbacks execute through imported
 contracts. Expected stdout is empty and exit status is 42. Existing capacity-failure,

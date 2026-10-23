@@ -1,0 +1,6 @@
+; Raven-authored nested Optional extension.
+.type System.OptionalNestedOperators
+    .include "generated/OptionalNestedOperators.methods.neoil"
+.end
+
+.include "generated/OptionalNestedOperators.helpers.neoil"

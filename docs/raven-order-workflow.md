@@ -13,20 +13,20 @@ imports and executes them against its own runtime library.
 - `Order`, a class whose status changes are visible through shared references.
 - `OrderStore`, an application interface for adding, finding, saving and querying orders.
 - `FileOrderStore`, with an `ArrayList<Order>` and a bounded text-file report.
-- `Process`, which handles Option absence and Result outcomes using case patterns.
+- `Process`, which handles Optional absence and Result outcomes using case patterns.
 - A deferred `Pending()` query, projected to names with Map and materialized with ToList.
 
 `Save` uses `?` to propagate `FileWriteError` before changing the order status. Its
 success type is `Result<System.Void, FileWriteError>`: completion has no payload.
-`Find` returns `Option<Order>`, retaining the reference to the existing order.
+`Find` returns `Optional<Order>`, retaining the reference to the existing order.
 
 This adopts familiar CLR class identity, interface dispatch and generic collection
-behavior. The deliberate library difference is explicit Result/Option error and
+behavior. The deliberate library difference is explicit Result/Optional error and
 absence handling instead of exceptions/null. It is not a .NET binary-compatibility,
 transactional storage or production repository claim. The report is one text file,
 not a serialization format or database; globalization and async are not involved.
 
-The updated source sample imports `System.Result.*` and `System.Option.*`, and uses
+The updated source sample imports `System.Result.*` and `System.Optional.*`, and uses
 `Some(let order)`, `.Error(let failure)` and `Ok(let text)`. It requires the pattern
 slice of the experimental compiler/bridge and refreshed declaration metadata;
 archived .7 tools still use the earlier typed-case sample. See the
@@ -108,7 +108,7 @@ not replace the file/report scenario above. It requires current core metadata an
 System library; the installed .11 bundle does not contain the collection additions.
 
 The example registers three orders through MutableMap<int, Order> and ArrayList<Order>.
-TryAdd rejects a duplicate before the list is changed. Find returns Option<Order>;
+TryAdd rejects a duplicate before the list is changed. Find returns Optional<Order>;
 PendingOrder propagates absence with `?` and also returns None for a shipped order.
 No default Order or null placeholder is needed. HashMap's equality and hash callbacks
 are explicit in this prototype; a default comparer is still future work.

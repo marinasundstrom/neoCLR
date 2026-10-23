@@ -2,7 +2,7 @@
 
 The [outcomes sample](outcomes.rvn) compiles Raven to native neoCLR metadata/IL and
 then a standalone macOS ARM64 executable. It uses the actual runtime library's
-`Result<Option<byte>, ConsoleReadError>`: bytes 0, 128 and 255, EOF, Unavailable and
+`Result<Optional<byte>, ConsoleReadError>`: bytes 0, 128 and 255, EOF, Unavailable and
 ReadFailed. Nested `if let` and `let ... else` distinguish the cases. This sample
 constructs fixed outcomes; it does **not** read stdin.
 
@@ -14,7 +14,7 @@ producer artifacts, not native executables.
 
 ## Metadata-only generic relationships
 
-Option and Result implement different closed forms of Propagatable. Option also uses
+Optional and Result implement different closed forms of Propagatable. Optional also uses
 Void as its error argument. The previous AOT load-set path tried to specialize these
 metadata-only interface shapes as executable values and rejected the nested result.
 Now the fully verified original relationships are removed from the private projection

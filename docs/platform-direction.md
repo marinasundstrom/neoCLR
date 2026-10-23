@@ -85,7 +85,7 @@ with small target mappings. Leave the historical Neo compiler outside this migra
 
 | Area | Direction and benefit to evaluate | Costs and limits |
 | --- | --- | --- |
-| Errors and absence | Continue Result for recoverable failures and Option for optional outcomes; generic Void represents no-payload completion | API migration and compiler adaptation; terminal faults remain distinct from recovery, without a guest Exception hierarchy |
+| Errors and absence | Continue Result for recoverable failures and Optional for optional outcomes; generic Void represents no-payload completion | API migration and compiler adaptation; terminal faults remain distinct from recovery, without a guest Exception hierarchy |
 | Mutable arrays | Keep invariant element types; reject unsafe widening early and observe real-program ergonomics | Deliberate CLR covariance incompatibility; a future covariant read-only view needs its own contract |
 | Text | Build modern operations around valid UTF-8 and explicit text units | UTF-16 interoperability and offset conversions remain necessary; existing familiar contracts must not silently change |
 | Spans and managed references | Investigate bounded memory views and consistent lifetime/access guarantees across languages | Metadata, verification, GC, aliasing and eventual JIT costs must be demonstrated; no new span contract is selected |

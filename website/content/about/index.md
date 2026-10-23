@@ -37,7 +37,7 @@ toolchain; [feature guides](../guides/) explain supported behavior and practical
 
 neoCLR uses familiar managed-platform concepts: values and objects, generics,
 interfaces, metadata and garbage collection. Its runtime and class library are
-independent implementations. UTF-8 text and explicit Option/Result outcomes are
+independent implementations. UTF-8 text and explicit Optional/Result outcomes are
 important parts of its programming model.
 
 Raven can target both .NET and neoCLR, each with its own library contracts.

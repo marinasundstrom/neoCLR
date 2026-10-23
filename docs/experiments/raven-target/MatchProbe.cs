@@ -16,8 +16,8 @@ static class MatchProbe
             ["Forms"] = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "samples/library-match.rvn")),
             ["CaseImports"] = "import System.Result.*\nfunc Pick(value: int) -> int { return match Math.Abs(value) { Ok(let amount) => amount; Failure(_) => -1 } } func Main() { WriteLine(Pick(-42)); WriteLine(Pick(-2147483648)) }",
             ["OptionPositional"] = """
-                import System.Option.*
-                func Pick(value: Option<int>) -> int {
+                import System.Optional.*
+                func Pick(value: Optional<int>) -> int {
                     return match value {
                         .Some(let amount) => amount
                         .None => -1
@@ -39,7 +39,7 @@ static class MatchProbe
             ["MissingExpression"] = "func Main() { WriteLine(match Math.Abs(-2147483648) { Result.Ok<int> ok => ok.Value }) }",
             ["MissingStatement"] = "func Main() { match Math.Abs(-2147483648) { Result.Ok<int> ok => WriteLine(ok.Value) }; WriteLine(7) }",
             ["UnreachableArm"] = "func Main() { WriteLine(match Math.Abs(-42) { _ => 1; Result.Ok<int> ok => ok.Value }) }",
-            ["WrongCase"] = "func Main() { WriteLine(match Math.Abs(-42) { Option.None absent => 1; _ => 2 }) }",
+            ["WrongCase"] = "func Main() { WriteLine(match Math.Abs(-42) { Optional.None absent => 1; _ => 2 }) }",
             ["VoidOutput"] = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "samples/library-match-void.rvn")),
             ["ExpressionBlockReturn"] = "func Pick() -> int { return match Math.Abs(-42) { Result.Ok<int> ok => { return ok.Value }; _ => -1 } } func Main() { WriteLine(Pick()) }"
         };

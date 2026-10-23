@@ -1,6 +1,6 @@
 ## NeoCLR Globalization API — Current Proposal
 
-The goal is a .NET-inspired globalization model that keeps the familiar ergonomics while separating concepts more cleanly, using immutable values and NeoCLR's `Result`/`Option` conventions.
+The goal is a .NET-inspired globalization model that keeps the familiar ergonomics while separating concepts more cleanly, using immutable values and NeoCLR's `Result`/`Optional` conventions.
 
 The globalization domain is separate from the Time API and from the future localization/resource API.
 
@@ -39,8 +39,8 @@ class Culture
     Id: CultureId
 
     Language: Language
-    Region: Option<Region>
-    Script: Option<Script>
+    Region: Optional<Region>
+    Script: Optional<Script>
 
     NumberFormat: NumberFormat
     DateTimeFormat: DateTimeFormat
@@ -70,8 +70,8 @@ Conceptually:
 struct CultureId
 {
     Language: Language
-    Script: Option<Script>
-    Region: Option<Region>
+    Script: Optional<Script>
+    Region: Optional<Region>
 }
 ```
 
@@ -276,7 +276,7 @@ class NumberFormat
 
     PercentSymbol: String
 
-    Currency: Option<CurrencyFormat>
+    Currency: Optional<CurrencyFormat>
 }
 ```
 
@@ -454,7 +454,7 @@ and Raven gets normal propagation:
 let culture = Culture.Parse(input)?;
 ```
 
-`Option<T>` remains reserved for genuine absence rather than malformed input.
+`Optional<T>` remains reserved for genuine absence rather than malformed input.
 
 ---
 

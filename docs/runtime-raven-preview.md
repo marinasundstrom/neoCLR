@@ -4,7 +4,7 @@ This guide describes published Preview 7. For the earlier Preview 6 workflow,
 see its [release notes](preview-6-release-notes.md). The new preview has two entry points: neoCLR directly through neoIL, and the experimental
 Raven toolchain compiling programs against neoCLR's own runtime library.
 
-The purpose is to demonstrate that the platform's Result/Option error flow, generic
+The purpose is to demonstrate that the platform's Result/Optional error flow, generic
 Void and runtime APIs can be used from an existing CLR language. Ordinary classes,
 arrays and values follow the familiar reference/value categories. Raven remains on
 its experimental branch; its normal .NET target is a separate product path.
@@ -51,7 +51,7 @@ files. See [format direction](format-direction.md) and [Void mapping](void-seman
 Install the matching Raven SDK and VSIX, run
 `python3 configure.py --sdk /absolute/path/to/raven-sdk`, and open **msbuild-demo**
 in VS Code. Use **Tasks: Run Build Task** to compile, or **neoCLR: Run (MSBuild)** to
-build and then run. The initial `Main.rvn` demonstrates Result/Option/Void propagation.
+build and then run. The initial `Main.rvn` demonstrates Result/Optional/Void propagation.
 These standalone MSBuild assets do not import Microsoft.NET.Sdk. The normal Raven
 run/debug toolbar is not this target's pipeline.
 

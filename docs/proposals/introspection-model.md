@@ -180,7 +180,7 @@ That does not imply that nominal-specific information belongs on `TypeInfo`.
 For example, this should not be necessary:
 
 ```raven
-TypeInfo.Name: Option<String>
+TypeInfo.Name: Optional<String>
 ```
 
 A non-nominal type does not have an absent name.

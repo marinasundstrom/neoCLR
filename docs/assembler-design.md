@@ -75,7 +75,7 @@ Rust serializes the Module directly through the bounded CBOR writer and existing
 validator. The separate .NET metadata library remains a reader/writer of the same format;
 it is not embedded into the assembler or moved into Raven. Cross-reader tests compare
 complete native values with saved JSON baselines, including the full Raven collection
-System, UInt64 double operands, Option patterns and value copies. A generic three-module
+System, UInt64 double operands, Optional patterns and value copies. A generic three-module
 consumer tests independent assembly and missing-dependency rejection.
 
 Binary output requires successful typed verification and encoding before opening the

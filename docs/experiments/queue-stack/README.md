@@ -39,7 +39,7 @@ Sources inspected 2026-10-10:
   That is evidence of a substitution scenario, not proof every queue needs an
   interface. The issue closed for inactivity, not an accepted interface contract.
 - Rust's [VecDeque](https://doc.rust-lang.org/std/collections/struct.VecDeque.html)
-  provides ring-buffer FIFO operations with Option removal results. Its ownership
+  provides ring-buffer FIFO operations with Optional removal results. Its ownership
   and borrowing rules do not transfer to managed aliases or GC retention.
 - C5 at `224386389d83bce81a55f9da304a95d18be15aac` supplies
   [IQueue](https://github.com/sestoft/C5/blob/224386389d83bce81a55f9da304a95d18be15aac/C5/Interfaces/IQueue.cs),
@@ -60,8 +60,8 @@ No speed or allocation improvement is claimed without measurements.
 
 | Contract | Proposed members and behavior |
 |---|---|
-| Queue<T> : Collection<T> | Enqueue(T), Dequeue() -> Option<T>, Peek() -> Option<T>, Clear(); FIFO iteration |
-| Stack<T> : Collection<T> | Push(T), Pop() -> Option<T>, Peek() -> Option<T>, Clear(); top-first iteration |
+| Queue<T> : Collection<T> | Enqueue(T), Dequeue() -> Optional<T>, Peek() -> Optional<T>, Clear(); FIFO iteration |
+| Stack<T> : Collection<T> | Push(T), Pop() -> Optional<T>, Peek() -> Optional<T>, Clear(); top-first iteration |
 | ArrayQueue<T> | Growable circular buffer; empty/capacity constructors; Capacity |
 | ArrayStack<T> | Growable contiguous buffer; empty/capacity constructors; Capacity |
 
@@ -71,7 +71,7 @@ Count. Clear releases held element references. Capacity is not a maximum backlog
 growth must check overflow and must never silently overwrite elements. These are
 ordinary unsynchronized collections, with no waiting, cancellation or backpressure.
 
-Option results deliberately differ from .NET's Try/out and throwing pair: they fit
+Optional results deliberately differ from .NET's Try/out and throwing pair: they fit
 existing Map.Find and ArrayList.Find, but add union representation/dispatch costs.
 The prototype should start with snapshot iterators to make alias behavior explicit:
 iteration captures values in removal order, shallowly, without consuming the source.
@@ -84,7 +84,7 @@ captures its buffer/extent with visible edits; its behavior is not changed here.
 
 CheckedStorage currently exposes Reserve only; reads of unwritten elements remain
 checked. Clearing a generic non-nullable T slot by manufacturing null would violate
-that contract. First prototype occupied slots as Option<T>, explicitly initialize
+that contract. First prototype occupied slots as Optional<T>, explicitly initialize
 unused slots to None and replace removed slots with None. This keeps occupancy
 in ordinary library values and avoids a new runtime service. Its costs are tag/
 payload storage and initialization work; reference release through union storage
@@ -113,7 +113,7 @@ This is baseline evidence, not a neoCLR implementation or performance benchmark.
 
 The [Raven consumer](raven/Main.rvn) now compiles through the existing project driver
 and passes native macOS arm64 and matching interpreter execution. It uses private
-application-local QueueStorage/StackStorage classes over ArrayList<Option<T>>;
+application-local QueueStorage/StackStorage classes over ArrayList<Optional<T>>;
 this deliberately reuses existing allocation APIs rather than adding an intrinsic.
 The probe checks FIFO wrap/growth/order, LIFO growth/order, empty results, peek/count,
 reference aliasing, cleared slot tags and Clear/reuse for Int32 and reference items.

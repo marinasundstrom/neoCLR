@@ -1,7 +1,7 @@
 module System.Concurrency
 
 import System.*
-import System.Option.*
+import System.Optional.*
 import System.Time.*
 
 /// A copyable request-observation capability, independent of any task or scheduler.
@@ -41,7 +41,7 @@ public struct CancellationToken {
         if owner is CancellationTokenSource active {
             return active.Register(callback)
         }
-        return CancellationRegistration(null, System.Option.None(), null)
+        return CancellationRegistration(null, System.Optional.None(), null)
     }
 }
 
@@ -95,13 +95,13 @@ public class CancellationTokenSource : Disposable {
     }
 
     /// Some schedules cancellation; None disables the pending countdown without cancelling.
-    func CancelAfter(delay: Option<Duration>) {
+    func CancelAfter(delay: Optional<Duration>) {
         if disposed {
             System.Fail("Cancellation source is disposed")
         }
         if let Some(duration) = delay {
             CancelAfter(duration)
-        } else if let System.Option.None = delay {
+        } else if let System.Optional.None = delay {
             ClearTimer()
         } else {
             System.Fail("CancelAfter requires Some or None")
@@ -155,7 +155,7 @@ public class CancellationTokenSource : Disposable {
         }
         if requested {
             callback()
-            return CancellationRegistration(null, System.Option.None(), null)
+            return CancellationRegistration(null, System.Optional.None(), null)
         }
         let registration = CancellationRegistration(self, Some(callback), head)
         head = registration
@@ -184,10 +184,10 @@ public class CancellationTokenSource : Disposable {
 /// A disposable callback registration. Disposing removes a callback that has not started.
 public class CancellationRegistration : Disposable {
     private var owner: CancellationTokenSource?
-    private var callback: Option<() -> Void>
+    private var callback: Optional<() -> Void>
     private var next: CancellationRegistration?
 
-    internal init(owner: CancellationTokenSource?, callback: Option<() -> Void>, next: CancellationRegistration?) {
+    internal init(owner: CancellationTokenSource?, callback: Optional<() -> Void>, next: CancellationRegistration?) {
         self.owner = owner
         self.callback = callback
         self.next = next

@@ -42,8 +42,8 @@ fn optional_and_nested_carriers_require_each_declared_case_layer() {
     let source = r#"
 func Main() -> int {
     let inner: Result<int, string> = System.Result.Ok<int>(42)
-    let outer: Option<Result<int, string>> = System.Option.Some<Result<int, string>>(inner)
-    let missing: Option<int> = System.Option.None()
+    let outer: Optional<Result<int, string>> = System.Optional.Some<Result<int, string>>(inner)
+    let missing: Optional<int> = System.Optional.None()
     if let None = missing {} else { return -1 }
     let Some(result) = outer else { return -2 }
     let Ok(value) = result else { return -3 }
@@ -83,7 +83,7 @@ fn ordinary_constructors_wrong_generic_arguments_and_missing_case_layers_do_not_
         "func Main() -> () { let r: Result<Void, string> = System.Result.Ok<int>(42) }",
         "func Main() -> () { let r: Result<int, string> = System.Result.Failure<int>(42) }",
         "func Main() -> () { let r: Option<int> = System.Result.Ok<int>(42) }",
-        "func Main() -> () { let r: System.Option.Some<int> = 42 }",
+        "func Main() -> () { let r: System.Optional.Some<int> = 42 }",
         "func Main() -> () { let r: Option<Result<int, string>> = System.Result.Ok<int>(42) }",
         "func Main() -> () { let r: Result<int, string>& = System.Result.Ok<int>(42) }",
     ] {

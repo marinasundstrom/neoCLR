@@ -7,7 +7,7 @@ func Box<T>(value: T) -> Object {
 }
 
 func Main() -> int {
-    let unused = Option<int>.Some(1)
+    let unused = Optional<int>.Some(1)
     let text = String.Concat("hé", "🙂\u0000z")
     let value = Box(text)
     if String.CompareOrdinal(value.ToString(), text) != 0 {

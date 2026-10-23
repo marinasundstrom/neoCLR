@@ -1,10 +1,10 @@
 import System.*
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 import System.Web.Http.*
 
 // Direct matching needs no application union or dispatch mechanism.
-func ReadStationId(pattern: RoutePattern, target: string) -> Result<Option<int>, string> {
+func ReadStationId(pattern: RoutePattern, target: string) -> Result<Optional<int>, string> {
     let matched = pattern.Match(target)?
     let Some(parameters) = matched else {
         return Ok(None())

@@ -1,15 +1,15 @@
 ; Generated from runtime/raven/src/System/Console/Functions.rvn. Regenerate with build_runtime_library.py.
-.method static ReadByte() -> System.Result<System.Option<Byte>,System.ConsoleReadError>
+.method static ReadByte() -> System.Result<System.Optional<Byte>,System.ConsoleReadError>
 .local Value local0
 .local Int32 local1
-.local System.Option<Byte> local2
-.local System.Option<Byte> local3
+.local System.Optional<Byte> local2
+.local System.Optional<Byte> local3
 ldc.i4 0
 stloc local1
 ldloca local2
-initobj System.Option<Byte>
+initobj System.Optional<Byte>
 ldloca local3
-initobj System.Option<Byte>
+initobj System.Optional<Byte>
 M00000001_IL_0000:
 M00000001_IL_0001:
 M00000001_IL_0002:
@@ -100,15 +100,15 @@ M00000001_IL_009d:
 M00000001_IL_009e:
 call neoCLR.Library.System.Console.RuntimeUnion0()
 M00000001_IL_00a3:
-call neoCLR.Library.System.Console.RuntimeUnion1(System.Option.None)
+call neoCLR.Library.System.Console.RuntimeUnion1(System.Optional.None)
 M00000001_IL_00a8:
 stloc local2
 M00000001_IL_00a9:
 ldloc local2
 M00000001_IL_00aa:
-call neoCLR.Library.System.Console.RuntimeUnion3(System.Option<Byte>)
+call neoCLR.Library.System.Console.RuntimeUnion3(System.Optional<Byte>)
 M00000001_IL_00af:
-call neoCLR.Library.System.Console.RuntimeUnion6(System.Result.Ok<System.Option<Byte>>)
+call neoCLR.Library.System.Console.RuntimeUnion6(System.Result.Ok<System.Optional<Byte>>)
 M00000001_IL_00b4:
 ret
 M00000001_IL_00b5:
@@ -120,16 +120,16 @@ value.unpack Byte
 M00000001_IL_00bd:
 call neoCLR.Library.System.Console.RuntimeUnion4(Byte)
 M00000001_IL_00c2:
-call neoCLR.Library.System.Console.RuntimeUnion7(System.Option.Some<Byte>)
+call neoCLR.Library.System.Console.RuntimeUnion7(System.Optional.Some<Byte>)
 M00000001_IL_00c7:
 stloc local3
 M00000001_IL_00c8:
 M00000001_IL_00c9:
 ldloc local3
 M00000001_IL_00ca:
-call neoCLR.Library.System.Console.RuntimeUnion3(System.Option<Byte>)
+call neoCLR.Library.System.Console.RuntimeUnion3(System.Optional<Byte>)
 M00000001_IL_00cf:
-call neoCLR.Library.System.Console.RuntimeUnion6(System.Result.Ok<System.Option<Byte>>)
+call neoCLR.Library.System.Console.RuntimeUnion6(System.Result.Ok<System.Optional<Byte>>)
 M00000001_IL_00d4:
 ret
 .end
@@ -457,7 +457,7 @@ call neoCLR.Library.System.Console.RuntimeCliCall0(Int32)
 M00000015_IL_0008:
 ret
 .end
-.method static ReadLine() -> System.Result<System.Option<String>,System.IO.TextReadError>
+.method static ReadLine() -> System.Result<System.Optional<String>,System.IO.TextReadError>
 M00000016_IL_0000:
 M00000016_IL_0001:
 M00000016_IL_0002:
@@ -469,7 +469,7 @@ callvirt instance System.IO.TextReader::ReadLine(Int32)
 M00000016_IL_0011:
 ret
 .end
-.method static ReadLine(Int32 maxUtf8Bytes) -> System.Result<System.Option<String>,System.IO.TextReadError>
+.method static ReadLine(Int32 maxUtf8Bytes) -> System.Result<System.Optional<String>,System.IO.TextReadError>
 M00000017_IL_0000:
 M00000017_IL_0001:
 M00000017_IL_0002:

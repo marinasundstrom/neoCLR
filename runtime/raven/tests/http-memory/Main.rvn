@@ -1,7 +1,7 @@
 import System.*
 import System.Runtime.*
 import System.Result.*
-import System.Option.*
+import System.Optional.*
 import System.IO.*
 import System.Time.*
 import System.Concurrency.*

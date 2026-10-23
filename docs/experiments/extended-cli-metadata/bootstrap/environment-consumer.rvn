@@ -1,6 +1,6 @@
 import System.*
 import System.Result.*
-import System.Option.*
+import System.Optional.*
 alias HostEnvironment = System.Environment
 
 func Main() -> int {

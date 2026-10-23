@@ -1,4 +1,4 @@
-# Option and Result operators
+# Optional and Result operators
 
 Development API after Preview 8, implemented in Raven on 2026-09-19. Rebuild the
 reference assembly, callers and System library together. Published Preview 8
@@ -14,12 +14,12 @@ UnwrapOr takes an already evaluated default; UnwrapOrElse calls its factory only
 for None or Error. Result.UnwrapOrElse follows Raven.Core's parameterless factory;
 use OrElse or Match when the error is needed.
 
-| Option operation | Behavior |
+| Optional operation | Behavior |
 | --- | --- |
 | Map | Transform Some; preserve None. |
-| Then | Bind Some to another Option. |
+| Then | Bind Some to another Optional. |
 | Filter | Retain Some if its predicate passes; otherwise None. |
-| OrElse | Produce a fallback Option only for None. |
+| OrElse | Produce a fallback Optional only for None. |
 | UnwrapOr, UnwrapOrElse | Obtain a value or an eager/lazy fallback. |
 | Match | Choose the Some or None callback and return its result. |
 | Tap, TapNone | Perform an action on the selected branch. |
@@ -27,7 +27,7 @@ use OrElse or Match when the error is needed.
 | ThenResult | Bind Some to Result; obtain an error from a factory for None. |
 | MapResult | Map Some to Ok; obtain an error from a factory for None. |
 | OkOr(error), OkOr(errorFactory) | Convert to Result with eager/lazy absence error. |
-| Flatten | Unwrap one level of Option<Option<T>>. |
+| Flatten | Unwrap one level of Optional<Optional<T>>. |
 
 | Result operation | Behavior |
 | --- | --- |
@@ -40,7 +40,7 @@ use OrElse or Match when the error is needed.
 | UnwrapOr, UnwrapOrElse | Obtain a value or an eager/lazy fallback. |
 | ToIterable | Materialize Ok as one element, Error as no elements. |
 
-There are 15 Option overloads and 10 Result overloads. ToIterable allocates an
+There are 15 Optional overloads and 10 Result overloads. ToIterable allocates an
 ArrayList behind Iterable<T>; it is an explicit conversion, not an implicit
 iteration contract on the carrier. Errors are discarded by this conversion, so
 use Match or patterns when an error needs handling. Generic payloads retain their
@@ -54,9 +54,9 @@ Use imported case patterns and Raven extension declarations as described in the
 ## Raven.Core and .NET comparison
 
 The source is Raven.Core at revision `ddf10eca80d599ede28f9da59f145497a21e854e`:
-[Option](https://github.com/marinasundstrom/raven/blob/ddf10eca80d599ede28f9da59f145497a21e854e/src/Raven.Core/Option.rvn)
+[Optional](https://github.com/marinasundstrom/raven/blob/ddf10eca80d599ede28f9da59f145497a21e854e/src/Raven.Core/Optional.rvn)
 and [Result](https://github.com/marinasundstrom/raven/blob/ddf10eca80d599ede28f9da59f145497a21e854e/src/Raven.Core/Result.rvn).
-Map, Then and the outcome-specific names are retained. Option.Where becomes Filter
+Map, Then and the outcome-specific names are retained. Optional.Where becomes Filter
 to match neoCLR's collection vocabulary; ToEnumerable becomes ToIterable to name
 neoCLR's actual interface. This is a deliberate source compatibility difference.
 The collection equivalents have a separate [.NET mapping table](raven-query-api.md).
@@ -64,10 +64,10 @@ The collection equivalents have a separate [.NET mapping table](raven-query-api.
 Unlike nullable values or exceptions commonly used with .NET APIs, these carriers
 make absence and recoverable failure explicit in a return type. This adds types
 and handling to callers but supports exhaustive patterns and typed errors.
-[F# Option](https://fsharp.github.io/fsharp-core-docs/reference/fsharp-core-optionmodule.html)
+[F# Optional](https://fsharp.github.io/fsharp-core-docs/reference/fsharp-core-optionmodule.html)
 is a shipped .NET alternative with map, bind, filter and flatten. Raven uses member
 syntax and Then for binding rather than copying every F# name.
-[Rust Option](https://doc.rust-lang.org/std/option/enum.Option.html) and
+[Rust Optional](https://doc.rust-lang.org/std/option/enum.Optional.html) and
 [Result](https://doc.rust-lang.org/std/result/enum.Result.html) offer comparable
 branch-selective transformations and eager/lazy fallbacks. neoCLR does not adopt
 Rust's ownership semantics. These comparisons concern library contracts, not

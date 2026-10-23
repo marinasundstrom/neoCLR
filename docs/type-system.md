@@ -121,7 +121,7 @@ Pointers carry no ownership. A first native interop subset supports scalar/point
 externally supplied memory remains unimplemented. See [native interop](native-interop.md). Value copying a record copies its fields, including pointer addresses;
 it does not copy the pointed-to storage or acquire ownership.
 
-Option and Result are ordinary generic library carriers. Their case extraction can
+Optional and Result are ordinary generic library carriers. Their case extraction can
 use typed managed output references without new union instructions. Heap allocation
 now directly returns T&, rooted by GC. Neither
 native pointers nor managed slot references require a counted wrapper.
@@ -182,7 +182,7 @@ wrapper, boxing rule, or universal null representation is selected here.
 
 This must remain separate from allocation and ownership. A nullable declaration
 would not select heap allocation, garbage collection, or reference counting. The
-library principle also remains: use Option<T> for semantic absence; reserve null
+library principle also remains: use Optional<T> for semantic absence; reserve null
 for an intentional null-reference state.
 
 Questions to resolve before implementation:

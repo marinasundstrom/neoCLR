@@ -3,7 +3,7 @@ module NeoClr.RuntimeTests
 import System.*
 import System.Collections.*
 import System.Result.*
-import System.Option.*
+import System.Optional.*
 import NeoClr.Testing.*
 
 [Test("Index preserves direction and resolves end boundaries")]

@@ -1,9 +1,9 @@
 import System.*
 import System.Collections.*
-import System.Option.*
+import System.Optional.*
 import System.Console.*
 
-func Show(value: Option<int>) {
+func Show(value: Optional<int>) {
     match value {
         Some(let found) => WriteLine(found)
         None => WriteLine("Absent")

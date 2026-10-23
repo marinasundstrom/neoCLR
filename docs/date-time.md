@@ -34,7 +34,7 @@ All factory failures are ordinary Result values, not runtime faults. There are n
 public component constructors, setters or references to internal storage.
 
 `default(System.Time.Date)` and initobj yield 0001-01-01. `default(System.Time.TimeOfDay)` yields
-midnight. These are real values, not null or absence. Use Option<Date>/Option<TimeOfDay>
+midnight. These are real values, not null or absence. Use Optional<Date>/Optional<TimeOfDay>
 for optionality. Copying and default construction use existing runtime mechanisms.
 
 ## .NET baseline and decisions

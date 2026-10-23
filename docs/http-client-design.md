@@ -53,7 +53,7 @@ is not a reason to expand into unrelated task redesign.
 
 ## Optional base address — author direction, 2026-09-25
 
-Keep the current `BaseUri` spelling for the property, now integrated with `Option<string>`
+Keep the current `BaseUri` spelling for the property, now integrated with `Optional<string>`
 (the library's optional-value type), rather than requiring a Uri object as
 configuration. The author described this as `BaseUrl/BaseUri: Optional<string>`.
 
@@ -393,7 +393,7 @@ the author's instruction to skip future per-slice website builds.
 
 ## BaseUri and address overloads — implemented 2026-09-25
 
-`HttpClient.BaseUri` is now `Option<string>`, defaulting to None. Get(string) and
+`HttpClient.BaseUri` is now `Optional<string>`, defaulting to None. Get(string) and
 Get(Uri) share request construction, then call Send through the existing handler.
 `HttpRequest.Get(Uri)` complements its string factory; both require an absolute URI
 and apply the same bounded HTTP policy. String syntax failures preserve their UriError
@@ -412,7 +412,7 @@ and empty-reference rules. The HTTP factory now recognizes an authority ending a
 so `http://example.test?x=1` produces `/?x=1`. Fragments remain unsupported rather than
 silently removed. A malformed or unsupported base is rejected even when the reference
 would otherwise discard its path. Some/None assignment is accepted; an inactive default
-Option faults as contract misuse.
+Optional faults as contract misuse.
 
 .NET 10 [BaseAddress](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpclient.baseaddress?view=net-10.0)
 was reviewed again on 2026-09-25. It uses a Uri, rejects a relative base on assignment

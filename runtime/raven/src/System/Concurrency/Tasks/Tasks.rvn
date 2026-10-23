@@ -2,7 +2,7 @@ module System.Concurrency.Tasks {
 
 import System.*
 import System.Collections.*
-import System.Option.*
+import System.Optional.*
 import System.Concurrency.Tasks.TaskOutcome.*
 
 // Submission owns no public thread handle; all overloads use the default dispatcher.
@@ -164,7 +164,7 @@ public class Task<T> : System.Runtime.CompilerServices.TaskAwaiter {
         }
     }
 
-    val Outcome: Option<TaskOutcome<T>> {
+    val Outcome: Optional<TaskOutcome<T>> {
         get {
             if source.Cancelled() {
                 let outcome: TaskOutcome<T> = Cancelled()
@@ -284,7 +284,7 @@ public class Promise<T> {
 
 module System.Runtime.CompilerServices {
     import System.*
-    import System.Option.*
+    import System.Optional.*
     import System.Concurrency.Tasks.*
 
     public interface AsyncStateMachine {
@@ -298,7 +298,7 @@ module System.Runtime.CompilerServices {
 
     public class AsyncTaskMethodBuilder<T> {
         private field source: Promise<T>
-        private field machine: Option<AsyncStateMachine>
+        private field machine: Optional<AsyncStateMachine>
 
         init(queue: TaskQueue) {
             source = Promise<T>(queue)

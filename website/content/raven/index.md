@@ -24,7 +24,7 @@ programs against neoCLR’s libraries.
 
 This example uses neoCLR’s Math API, where an overflow is a Result. The same language can consume different library contracts on another target.
 
-[Explore Option and Result →](../features/outcomes/)
+[Explore Optional and Result →](../features/outcomes/)
 
 <a id="patterns"></a>
 
@@ -77,7 +77,7 @@ provide implementation details.
 
 Native positional records now support generated equality and matching hashes for
 qualified components, including canonical String/Character text, integers, Boolean,
-enums, nested source records and closed tagged-union payloads such as `Option<int>`.
+enums, nested source records and closed tagged-union payloads such as `Optional<int>`.
 This includes ConsoleKeyInfo's optional scalar. Nongeneric imported components
 with an explicit `EquatableTo<Self>` contract and public typed equality/hash methods,
 such as `Index` and `Range`, are also supported without boxing their components.

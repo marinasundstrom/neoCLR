@@ -7,7 +7,7 @@ small command-line programs without a configuration framework.
 | --- | --- |
 | GetCommandLineArgs() | String[]; a fresh owned copy of the arguments supplied by the host |
 | GetCurrentDirectory() | Result<String,EnvironmentError>; the host process's current directory |
-| GetEnvironmentVariable(String name) | Result<Option<String>,EnvironmentError>; process variable lookup |
+| GetEnvironmentVariable(String name) | Result<Optional<String>,EnvironmentError>; process variable lookup |
 
 A missing variable is Ok(None); an existing empty variable is Ok(Some("")). Invalid
 names (empty, containing NUL or '=') and values that cannot be represented as UTF-8
@@ -52,7 +52,7 @@ guest invocations. There is no implicit ambient argument fallback.
 
 .NET [GetEnvironmentVariable](https://learn.microsoft.com/en-us/dotnet/api/system.environment.getenvironmentvariable?view=net-10.0)
 uses null for absence and [CurrentDirectory](https://learn.microsoft.com/en-us/dotnet/api/system.environment.currentdirectory?view=net-10.0)
-is a get/set property with exceptional failure. NeoCLR uses Option for absence and
+is a get/set property with exceptional failure. NeoCLR uses Optional for absence and
 Result for failure; GetCurrentDirectory is deliberately a method to make its fallible
 host read explicit. This increases call-site handling but avoids nullable reference
 defaults and an exception dependency. UTF-8 representation errors remain explicit;
@@ -61,7 +61,7 @@ rejection is a provisional stricter contract rather than full .NET compatibility
 
 Three InternalCalls perform host access and declare ProcessEnvironment. The argument
 helper also requires ManagedArrays; the two erased-result helpers require
-ValueStorage. Ordinary library IL constructs public Option/Result carriers. Neo uses
+ValueStorage. Ordinary library IL constructs public Optional/Result carriers. Neo uses
 existing calls, arrays and match syntax; no opcode or metadata extension is needed.
 Host access is not a sandbox or a configurable environment provider. A provider can
 be explored when embedding requirements justify it. Globalization is unrelated to

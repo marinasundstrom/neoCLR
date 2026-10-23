@@ -1,6 +1,6 @@
 import System.*
 import System.Result.*
-import System.Option.*
+import System.Optional.*
 import System.Console.*
 
 // Contract sketch only: concatenation models semantics, not builder performance.
@@ -21,7 +21,7 @@ public class TextAccumulator {
 }
 
 // A delimiter consumer avoids exposing any position unit to its caller.
-public func AfterOrdinal(source: string, delimiter: string) -> Option<string> {
+public func AfterOrdinal(source: string, delimiter: string) -> Optional<string> {
     let owner = TextSource(source)
     match owner.FindOrdinal(delimiter) {
         None => return None

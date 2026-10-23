@@ -70,7 +70,7 @@ parameter or forwarded through a compatible signature. Operations requiring a kn
 numeric category or inferring a container type from an unresolved normalized parameter
 are rejected until a suitable proof/constraint mechanism exists.
 
-Ordinary Option/Result constructors and accessors follow the same signature-based
+Ordinary Optional/Result constructors and accessors follow the same signature-based
 storage conversions and stack normalization as other members. `heap.load` still
 returns its stored payload without normalization, and `heap.store` requires an exact
 type. Loading through a typed local can normalize a raw small-integer payload.

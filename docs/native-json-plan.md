@@ -488,7 +488,7 @@ TypeProperties now creates ordinary traced runtime descriptors for explicitly ro
 property metadata. A feature-gated Rust bridge, private to the in-repository native
 compiler, obtains recipes from the interpreter's metadata queries. It preserves
 source member/accessor identities, metadata tokens, index and accessor parameters,
-visibility and optional module records. Standard Option case constructors and the
+visibility and optional module records. Standard Optional case constructors and the
 existing runtime provider constructors materialize the snapshots; the backend does
 not invent a second JSON-specific descriptor format. Source metadata identities
 are assigned before canonical relocation so recipe handles remain resolvable.
@@ -502,7 +502,7 @@ coupling and generated code/allocation costs; image-owned descriptor tables rema
 the intended later representation. No public Raven API or compiler bridge change is
 required. The installed runtime does not enable the Rust native-metadata feature.
 
-Element lookup returns the existing Option<TypeInfo> for explicitly produced closed
+Element lookup returns the existing Optional<TypeInfo> for explicitly produced closed
 vector tokens. Nonarrays return None; an unknown vector fails explicitly. Generic
 flows that produce additional vectors still need retention-closure work. Property
 queries apply current public/nonpublic and instance/static flags and preserve the
@@ -706,9 +706,9 @@ Use .NET 10 as the initial compatibility baseline; later-version additions in
 these evolving pages are separate evaluation inputs, not baseline requirements.
 
 Raven source inspected at 6c90bf2c48d9d60480476433f90ddc4d0cee4a0d
-(`src/Raven.Core/Option.rvn`, `Result.rvn`, `UnionJsonConverter.rvn` and
+(`src/Raven.Core/Optional.rvn`, `Result.rvn`, `UnionJsonConverter.rvn` and
 `test/Raven.Core.Tests/UnionTest.cs`) already distinguishes:
-Option's payload-or-null representation; Result's `case` plus `value`/ `data`
+Optional's payload-or-null representation; Result's `case` plus `value`/ `data`
 representation; parenthesized unions' primitive payloads and typed object form;
 and opt-in tagged unions using a configurable discriminator (default `$case`).
 Generated cases flatten their properties; direct payloads use a naming-policy-aware

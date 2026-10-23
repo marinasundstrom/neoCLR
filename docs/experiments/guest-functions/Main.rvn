@@ -27,7 +27,7 @@ module Example.Runner {
     import System.*
     import System.Runtime.*
     import System.Introspection.*
-    import System.Option.*
+    import System.Optional.*
     import NeoClr.Testing.*
 
     func Main() -> int {

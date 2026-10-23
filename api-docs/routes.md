@@ -8,7 +8,7 @@ existing HttpServer handler. It does not own dispatch or response completion.
 | [RoutePattern.Parse](xref:System.Web.Http.RoutePattern) `(pattern: string)` | `Result<RoutePattern, string>`; validate and compile a pattern once |
 | `pattern.GetParameterNames()` | `Sequence<string>`; independent capture-name snapshot in path order |
 | `pattern.Overlaps(other: RoutePattern)` | `bool`; conservative structural overlap using decoded segments |
-| `pattern.Match(target: string)` | `Result<Option<RouteMatch>, string>`; captured values, no match, or malformed input |
+| `pattern.Match(target: string)` | `Result<Optional<RouteMatch>, string>`; captured values, no match, or malformed input |
 | [RouteMatch.Get](xref:System.Web.Http.RouteMatch) `(name: string)` | `Result<string, string>`; decoded named value or missing-name error |
 | `parameters.GetInt32(name: string)` | `Result<int, string>`; parsed value or missing/invalid/overflow error |
 

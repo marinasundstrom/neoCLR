@@ -1,7 +1,7 @@
 # Owned record inputs for host invocation
 
 Resolved IL functions can accept ordinary record Values in addition to
-primitive and ordinary Option/Result inputs. Parameters may contain nested records,
+primitive and ordinary Optional/Result inputs. Parameters may contain nested records,
 closed generic records, and [validated union payloads](union-inputs.md).
 Input fields are positional and must have their exact declared storage types:
 
@@ -36,7 +36,7 @@ prototype import limits, not native layout constraints or a universal memory pol
 
 System.Value fields now use [bounded erased-payload import](erased-inputs.md). Their
 concrete payload schemas are resolved at invocation, with shared per-value traversal
-and dynamic-schema budgets. This supports ordinary Option/Result carrier inputs
+and dynamic-schema budgets. This supports ordinary Optional/Result carrier inputs
 without giving their marker special runtime meaning.
 
 Arguments move into invoke as owned Rust Values. A caller retaining a copy can clone
@@ -47,7 +47,7 @@ of an execution handle, pointer identity, or originating artifact provenance. It
 not run constructors or establish additional library invariants.
 
 Pointer and Ref fields remain unsupported at this boundary, including when nested
-in a record or a erased Option/Result payload, or ignored by the function body.
+in a record or a erased Optional/Result payload, or ignored by the function body.
 An unused generic argument is not a stored field: Empty<Ptr<Int32>> with no fields
 can be imported because it carries no pointer value. Raw pointer/Ref transfer still
 needs its own contract. Explicit instance receivers use the

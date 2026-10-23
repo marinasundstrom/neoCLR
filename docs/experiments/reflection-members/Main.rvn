@@ -1,5 +1,5 @@
 import System.*
-import System.Option.*
+import System.Optional.*
 import System.Introspection.*
 import System.Runtime.Reflection.*
 import System.Result.*

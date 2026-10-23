@@ -58,9 +58,9 @@ transport and runtime resource limits together; changing one constant is insuffi
    Four levels and 32 values remain unchanged. Typed scalar/model arrays and jagged
    arrays are implemented; broader generic collection shapes remain deferred. The author subsequently explicitly selects
    collection serialization/deserialization, enum mapping, a new Uuid type, and
-   Option mapping for JSON nullability. These remain pending; the subsequent route/union discussion selects a bounded
-   routing slice first without cancelling the JSON requests. The proposed Option rule is None/null and Some/contained value, with
-   missing Option properties becoming None and required missing fields remaining
+   Optional mapping for JSON nullability. These remain pending; the subsequent route/union discussion selects a bounded
+   routing slice first without cancelling the JSON requests. The proposed Optional rule is None/null and Some/contained value, with
+   missing Optional properties becoming None and required missing fields remaining
    errors. Broader numeric/date/converter support is selected only through a consumer.
 3. **Route parser inside the handler — implemented in development.** Match
    literal segments and named single-segment parameters, then expose explicit typed

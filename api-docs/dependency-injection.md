@@ -8,7 +8,7 @@ title: Dependency injection
 is the default implementation. Import `System.DependencyInjection.*` for typed
 registration and lookup extensions. This development API follows .NET DI's
 service identities, registration order, constructor selection and lifetimes,
-using neoCLR `Result` and `Option` contracts.
+using neoCLR `Result` and `Optional` contracts.
 
 ## Registration and activation
 
@@ -48,7 +48,7 @@ runtime's terminal-failure behavior; they are not converted into ServiceError.
 | Member | Result |
 | --- | --- |
 | `GetRequiredService(TypeInfo)` | `Result<Object, ServiceError>`; Missing when unregistered |
-| `GetService(TypeInfo)` | `Result<Option<Object>, ServiceError>`; None only when unregistered |
+| `GetService(TypeInfo)` | `Result<Optional<Object>, ServiceError>`; None only when unregistered |
 | `GetServices(TypeInfo)` | `Result<Sequence<Object>, ServiceError>`; empty when unregistered |
 | Corresponding `<T>()` extension | The same behavior with typed values |
 
@@ -135,7 +135,7 @@ receiver separately when the provider should dispose it. Function objects have n
 automatic-constructor registration: use instance or factory registration.
 
 The key model follows [.NET keyed DI](https://learn.microsoft.com/en-us/dotnet/core/extensions/dependency-injection/overview).
-The deliberate differences are Result/Option outcomes, neoCLR's own value equality
+The deliberate differences are Result/Optional outcomes, neoCLR's own value equality
 (including canonical text equality), always-on scope validation and the documented
 subset of constructor/retention support.
 

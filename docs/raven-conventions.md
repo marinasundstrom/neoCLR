@@ -14,7 +14,7 @@ or host APIs work here.
 Use a non-null parameter type when an operation requires a value. Do not accept
 nullable arguments merely to return false or introduce a runtime absence check.
 For example, `TypeInfo.Equals`, `AssignableTo`, `AssignableFrom` and `IsSubclassOf`
-all require another `TypeInfo`. Use Option for meaningful absence in typed domain
+all require another `TypeInfo`. Use Optional for meaningful absence in typed domain
 contracts. Nullable object boundaries remain appropriate when null itself has
 specified behavior, such as `Object.Equals(Object?)` and
 `TypeInfo.IsInstanceOfType(Object?)`.
@@ -136,7 +136,7 @@ Reviewed in the Raven `neoclr` checkout on 2026-09-19, revision `9b2a558ae`:
   model the domain before selecting syntax; use patterns to establish facts.
 - [Absence and failure](https://github.com/marinasundstrom/raven/blob/9b2a558ae/docs/lang/features/option-and-result.md)
   and [patterns](https://github.com/marinasundstrom/raven/blob/9b2a558ae/docs/lang/features/patterns.md):
-  Option, Result, propagation and exhaustive interpretation.
+  Optional, Result, propagation and exhaustive interpretation.
 - [Properties specification](https://github.com/marinasundstrom/raven/blob/9b2a558ae/docs/lang/spec/properties-and-events.md):
   property-first declarations and expression-bodied computed getters.
 
@@ -164,7 +164,7 @@ declaration at once.
 Prefer an expression-bodied property for a single getter expression:
 
 ```raven
-val DeclaringType: Option<TypeInfo> => Some(StoredDeclaringType)
+val DeclaringType: Optional<TypeInfo> => Some(StoredDeclaringType)
 ```
 
 Use properties for contextual state or identity, such as TaskQueue.Current and
@@ -187,16 +187,16 @@ Use case constructors rather than spelling out both the case and carrier storage
 
 ```raven
 import System.*
-import System.Option.*
+import System.Optional.*
 
-func FindPrice(product: int) -> Option<int> {
+func FindPrice(product: int) -> Optional<int> {
     if product == 7 {
         return Some(42)
     }
     return None()
 }
 
-let price: Option<int> = Some(42)
+let price: Optional<int> = Some(42)
 ```
 
 Imported cases also avoid qualified Result factories when the expected carrier is
@@ -210,7 +210,7 @@ let failure: Result<int, string> = Failure("Unavailable")
 ```
 
 Prefer this to repeating `Result<int, string>.Failure("Unavailable")` on the right.
-The same rule applies to Option and other imported union cases throughout runtime
+The same rule applies to Optional and other imported union cases throughout runtime
 code, samples, tests and website content. Keep qualification when required to
 resolve a name or provide type information that cannot otherwise be inferred.
 
@@ -221,7 +221,7 @@ older SDK/reference bundles can still require qualification.
 The return type or annotation supplies the carrier type. Keep that context: an
 unannotated case construction can infer the case type instead of the intended
 carrier. Qualify a constructor when required to disambiguate a name. The desired
-`Option<T>.Some(value)` spelling is not currently exposed by this target's Option
+`Optional<T>.Some(value)` spelling is not currently exposed by this target's Optional
 reference contract; imported `Some(value)` works and is the tested spelling here.
 Do not add explicit carrier wrappers merely to compensate for a missing expected
 type. Payload-free construction currently uses `None()` in these target samples.
@@ -245,7 +245,7 @@ match FindPrice(7) {
 }
 ```
 
-With `import System.Option.*` and `import System.Result.*`, prefer plain case
+With `import System.Optional.*` and `import System.Result.*`, prefer plain case
 patterns (`Some`, `None`, `Ok`, `Error`) over member case patterns (`.Some`,
 `.None`, `.Ok`, `.Error`). The imports bring the case names into scope; a leading
 dot is unnecessary. Qualify a constructor only when name resolution requires it.
@@ -257,7 +257,7 @@ unused; do not hide distinct meaningful cases behind a catch-all.
 
 Use `?` to propagate compatible absence or failure when the current function
 cannot add useful handling. Return typed Result errors for expected failure and
-Option for meaningful absence. A fault is not a substitute for those ordinary
+Optional for meaningful absence. A fault is not a substitute for those ordinary
 outcomes; it is appropriate when an invariant required for execution has failed.
 
 ## Completion and the unit spelling
@@ -306,7 +306,7 @@ and pattern matching in source instead of hand-writing erased storage, construct
 predicates and checked accessors for each domain error family.
 
 Do not require an `Is*` property or `Get*` accessor for every case, including cases
-in Option and Result. Prefer construction and patterns through the generated case
+in Optional and Result. Prefer construction and patterns through the generated case
 contract. Existing helpers are implementation history, not a template or condition
 for recognizing every future union. Migrate applicable existing unions to standard
 syntax; document any remaining manual exception and its blocker.
@@ -329,7 +329,7 @@ requiring binary compatibility.
 
 ## Bootstrap exceptions and validation
 
-The current Option/Result carrier implementation is hand-authored to satisfy the
+The current Optional/Result carrier implementation is hand-authored to satisfy the
 compiler/runtime union metadata and storage contract. Its checked case accessors,
 TryGet methods, constructors and residual/output adapters are current bootstrap
 plumbing. Their continued need must be assessed as normal union emission becomes
@@ -348,7 +348,7 @@ neoCLR System.Void. Do not reintroduce carrier wrappers to mask that mismatch.
 
 Run edited samples through the saved-project runner, regenerate changed Raven
 runtime slices, and check source admission when declarations change. The
-[Option sample](experiments/raven-target/samples/library-option.rvn),
+[Optional sample](experiments/raven-target/samples/library-option.rvn),
 [nested type sample](experiments/raven-target/samples/library-nested-type-info.rvn)
 and [runtime descriptors](../runtime/raven/src/System/Introspection/Descriptors.rvn)
 provide executable examples of these conventions.
@@ -366,8 +366,8 @@ C# tooling still targets .NET and keeps its actual .NET method names.
 Use Raven's extension syntax for APIs intended to be called as extensions:
 
 ```raven
-public extension OptionOperators<T> for Option<T> {
-    func Map<U>(mapper: (T) -> U) -> Option<U> {
+public extension OptionalOperators<T> for Optional<T> {
+    func Map<U>(mapper: (T) -> U) -> Optional<U> {
         return self match {
             Some(let value) => Some(mapper(value))
             None => None
@@ -376,7 +376,7 @@ public extension OptionOperators<T> for Option<T> {
 }
 ```
 
-Import System.Option.* for these case patterns. The receiver is self; the compiler
+Import System.Optional.* for these case patterns. The receiver is self; the compiler
 emits the extension marker and ordinary static call contract. Do not rely on a
 bootstrap declaration alone to turn an ordinary runtime static class into an
 extension API. See [supported extension boundaries](raven-extension-methods.md).
@@ -407,17 +407,17 @@ union-returning callback fails inference in Raven SDK .15. Both OrElse callbacks
 in that sample compile without annotations.
 
 
-## Presenting Result and Option APIs
+## Presenting Result and Optional APIs
 
 Author direction, 2026-09-23: ordinary samples should prefer `?` for propagating
 errors through a compatible Result and pattern bindings for optional values, rather
-than requiring a match at every call. Combined Result<Option<T>, E> is a useful
+than requiring a match at every call. Combined Result<Optional<T>, E> is a useful
 example: propagate E, then bind Some or handle None. Use match when explaining case
 structure, applying different policies to cases, or handling the final error at an
 application boundary. Do not silently discard errors merely to shorten a sample.
 
 Author clarification, 2026-09-25: this preference applies to all examples showing
-how to write user code, including propagation through Option where the enclosing
+how to write user code, including propagation through Optional where the enclosing
 contract supports it. Explicit union handling remains appropriate when it expresses
 a real decision. Keep diagnostic assertions in fixtures separate from the ordinary
 application example; see the [buffered POST example](experiments/http-post/Sample.rvn).

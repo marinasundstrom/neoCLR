@@ -1677,8 +1677,8 @@ A separately authored native library and Raven consumer now construct ordinary a
 generic values directly and execute mutation/output calls (42). Metadata C# consumers
 also execute imported value/generic/reference constructors on CLR and neoCLR. All 84
 metadata groups, 29 focused compiler tests and five native profile controls pass.
-The unchanged collections sample still rejects Option<Order> construction from None:
-its nested System.Option.None signature is outside the explicit top-level import model.
+The unchanged collections sample still rejects Optional<Order> construction from None:
+its nested System.Optional.None signature is outside the explicit top-level import model.
 Next add native nested-type definitions/references and reader/writer identity support;
 do not flatten declaring-type identity into a dotted name. Full collections execution
 and native System library mapping remain pending.

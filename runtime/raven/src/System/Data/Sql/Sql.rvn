@@ -2,7 +2,7 @@ module System.Data.Sql
 
 import System.*
 import System.Collections.*
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 import System.Concurrency.Tasks.*
 
@@ -39,7 +39,7 @@ public class SqlStatement {
         }
     }
     /// A name for named values, or None for positional values. Invalid indexes fault.
-    func ParameterName(index: int) -> Option<string> {
+    func ParameterName(index: int) -> Optional<string> {
         if index < 0 || index >= parameters.Count { System.Fail("SQL parameter index out of range") }
         return if HasNamedParameters { Some(names[index]) } else { None }
     }
@@ -68,13 +68,13 @@ public interface SqlTransaction : Disposable {
 /// An owned row snapshot. Names are ordinal and duplicate names are ambiguous.
 public class SqlRow {
     private val names: ArrayList<string>
-    private val values: ArrayList<Option<string>>
-    init(columns: Sequence<string>, cells: Sequence<Option<string>>) {
+    private val values: ArrayList<Optional<string>>
+    init(columns: Sequence<string>, cells: Sequence<Optional<string>>) {
         if columns.Count != cells.Count {
             System.Fail("SQL column/value count mismatch")
         }
         names = ArrayList<string>(columns)
-        values = ArrayList<Option<string>>(cells)
+        values = ArrayList<Optional<string>>(cells)
     }
     val Count: int => values.Count
     func Column(index: int) -> Result<string, SqlError> {
@@ -83,13 +83,13 @@ public class SqlRow {
         }
         return Ok(names[index])
     }
-    func Text(index: int) -> Result<Option<string>, SqlError> {
+    func Text(index: int) -> Result<Optional<string>, SqlError> {
         if index < 0 || index >= Count {
             return Failure(SqlError.Mapping("Column index out of range"))
         }
         return Ok(values[index])
     }
-    func Text(name: string) -> Result<Option<string>, SqlError> {
+    func Text(name: string) -> Result<Optional<string>, SqlError> {
         var found = -1
         for index in 0..Count {
             if String.CompareOrdinal(names[index], name) == 0 {

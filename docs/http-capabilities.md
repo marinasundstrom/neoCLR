@@ -67,7 +67,7 @@ covers independent peers and the managed pair. Development JSON now matches the
 1,024-byte HTTP body cap; [payload evidence](experiments/json-object-mapping/payload-validation.json)
 covers boundaries and the longer report case. Typed arrays are now implemented;
 [collection evidence](experiments/json-object-mapping/collection-validation.json) covers
-array payloads and invalid elements. Enum/Uuid/Option mapping remains
+array payloads and invalid elements. Enum/Uuid/Optional mapping remains
 pending. Direct route parsing and the explicit union-dispatch case are now
 implemented; see [route evidence](experiments/http-routing/validation.json).
 Attribute-driven union mapping is the next design investigation above the parser;
@@ -236,4 +236,4 @@ NoMatch, InvalidTarget, InvalidParameter and ConstructionFailed. The server owns
 method policy, dispatch and response status. String/Int32 payloads and up to 16
 public nongeneric cases are supported. This is reusable development sample source,
 not an installed SDK mapper. The earlier generator remains an exploratory alternative.
-Enum/Uuid/Option JSON support remains requested and pending.
+Enum/Uuid/Optional JSON support remains requested and pending.

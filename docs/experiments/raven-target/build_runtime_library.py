@@ -82,7 +82,7 @@ SLICES = {
     'Fault': 'System',
     'NativeMemory': 'System.Runtime.InteropServices.NativeMemory',
     'Descriptors': 'System.Introspection.MemberInfo',
-    'Option': 'System.Option',
+    'Optional': 'System.Optional',
     'Result': 'System.Result',
     'Propagatable': 'System.Propagatable',
     'IntegerDivisionError': 'System.IntegerDivisionError',
@@ -148,8 +148,8 @@ SLICES = {
     'Value': "System.Value",
     'Math': 'System.Math',
     'Linq': 'System.Linq.Operators',
-    'OptionOperators': 'System.OptionOperators',
-    'OptionNestedOperators': 'System.OptionNestedOperators',
+    'OptionalOperators': 'System.OptionalOperators',
+    'OptionalNestedOperators': 'System.OptionalNestedOperators',
     'ResultOperators': 'System.ResultOperators',
     'Int32': 'System.Int32',
     'Char': 'System.Char',
@@ -260,7 +260,7 @@ SOURCES = {
     'Fault': 'runtime/raven/src/System/Functions.rvn',
     'NativeMemory': 'runtime/raven/src/System/Runtime/InteropServices/NativeMemory/Functions.rvn',
     'Descriptors': 'runtime/raven/src/System/Introspection/Descriptors.rvn',
-    'Option': 'runtime/raven/src/System/Option.rvn',
+    'Optional': 'runtime/raven/src/System/Optional.rvn',
     'Result': 'runtime/raven/src/System/Result.rvn',
     'Propagatable': 'runtime/raven/src/System/Propagatable.rvn',
     'IntegerDivisionError': 'runtime/raven/src/System/IntegerDivisionError.rvn',
@@ -328,8 +328,8 @@ SOURCES = {
     'Int32': 'runtime/raven/src/System/Int32.rvn',
     'Char': 'runtime/raven/src/System/Char.rvn',
     'Linq': 'runtime/raven/src/System/Linq/Operators.rvn',
-    'OptionOperators': 'runtime/raven/src/System/OptionOperators.rvn',
-    'OptionNestedOperators': 'runtime/raven/src/System/OptionOperators.rvn',
+    'OptionalOperators': 'runtime/raven/src/System/OptionalOperators.rvn',
+    'OptionalNestedOperators': 'runtime/raven/src/System/OptionalOperators.rvn',
     'ResultOperators': 'runtime/raven/src/System/ResultOperators.rvn',
     'ArrayList': 'runtime/raven/src/System/Collections/ArrayList.rvn',
     'HashMap': 'runtime/raven/src/System/Collections/HashMap.rvn',
@@ -514,7 +514,7 @@ def main():
             if args.slice and name not in args.slice:
                 continue
             compiled = root / 'compiled'
-            if name not in ('Math', 'Linq', 'OptionOperators', 'OptionNestedOperators', 'ResultOperators'):
+            if name not in ('Math', 'Linq', 'OptionalOperators', 'OptionalNestedOperators', 'ResultOperators'):
                 compiled = root / ('compiled-' + name)
                 subprocess.run(['dotnet', str(args.compiler.resolve()), str(PROJECT), '--no-project-restore',
                                 '-o', str(compiled)], env={**os.environ, 'NeoCLRBootstrapRoot': str(root),

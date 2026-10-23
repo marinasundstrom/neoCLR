@@ -489,7 +489,7 @@ fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
                 Representation::Record | Representation::Interface
             ) || matches!(
                 def.name.as_str(),
-                "Option" | "Result" | "Ref" | "Ptr" | "InterfaceRef"
+                "Optional" | "Result" | "Ref" | "Ptr" | "InterfaceRef"
             ))
         {
             return Err(Fault::new(

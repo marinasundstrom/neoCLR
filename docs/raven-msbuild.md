@@ -60,7 +60,7 @@ dotnet msbuild $HOME/.neoclr/experiments/msbuild-20260914/msbuild-demo/Demo.rvnp
 
 The packaged assets passed 15 build scenarios and 68 language-server checks on this
 standalone project. The demo was also built and executed separately with its expected
-Result/Option/Void output. All 758 manifest files were verified. See the
+Result/Optional/Void output. All 758 manifest files were verified. See the
 [local validation record](experiments/raven-target/msbuild-toolchain-20260914.json).
 This is a local installation; published previews and prior demo directories are unchanged.
 
@@ -176,7 +176,7 @@ python3 tools/verify_msbuild.py --bundle "$PWD" --sdk /absolute/path/to/raven-sd
 
 For development, the verifier also accepts `--assets /path/to/neoCLR/build`.
 It checks SDK-free evaluation, design-time behavior, Debug/Release compilation,
-Result/Option/Void, generic arrays, paths containing spaces, changed source, diagnostics,
+Result/Optional/Void, generic arrays, paths containing spaces, changed source, diagnostics,
 unsupported inputs, stale-output invalidation and recovery, including dependency
 changes/failures, Release configuration and mismatched reference packs. Successful artifacts are
 executed separately to check behavior. This is not a full MSBuild or .NET SDK release gate.

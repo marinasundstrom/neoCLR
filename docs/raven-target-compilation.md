@@ -86,7 +86,7 @@ python3 "$NEOCLR/docs/experiments/raven-target/verify_compiler_target.py" "$PROJ
 ```
 
 Five checks cover ordinary compilation, the string-filter example, combined
-Result/Option/Void propagation, rejection of an unavailable host API and conflicting
+Result/Optional/Void propagation, rejection of an unavailable host API and conflicting
 core settings. Artifact import audits dependencies: foreign host references are
 rejected rather than silently mapped away. The saved-project suite also passes with
 the new configuration. Raven's normal .NET 10/11 target matrix passes; this does not
@@ -234,7 +234,7 @@ arity, not the enclosing carrier's arity. Ten focused imported-union tests pass,
 including ordinary and target-core metadata consumers. Raven's compiler
 `docs/compiler/runtime-contracts.md` records the same metadata boundary.
 
-Option, Result and TaskOutcome now compile from ordinary Raven union declarations.
+Optional, Result and TaskOutcome now compile from ordinary Raven union declarations.
 The bridge projects generic companions and case metadata, closes method/interface
 signatures, preserves generated IUnion/HasValue/Value/TryGetValue members and imports
 the actual generated implementation. System.Void remains named unit storage in

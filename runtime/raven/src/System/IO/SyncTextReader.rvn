@@ -8,10 +8,10 @@ public interface SyncTextReader {
     var NewLine: string { get; set; }
     /// <summary>Peeks at the next grapheme without consuming it; None denotes EOF.</summary>
     /// <returns>Character or a text read error. May buffer underlying input to find a boundary.</returns>
-    func PeekChar() -> Result<Option<Character>, TextReadError>
+    func PeekChar() -> Result<Optional<Character>, TextReadError>
     /// <summary>Reads one grapheme; None denotes EOF.</summary>
     /// <returns>Character or a text read error.</returns>
-    func ReadChar() -> Result<Option<Character>, TextReadError>
+    func ReadChar() -> Result<Optional<Character>, TextReadError>
     /// <summary>Reads the requested grapheme count, or the shorter remainder at EOF.</summary>
     /// <param name="count">Nonnegative grapheme count; zero consumes nothing.</param>
     /// <returns>text or a text read error.</returns>
@@ -21,7 +21,7 @@ public interface SyncTextReader {
     /// <param name="maxUtf8Bytes">Maximum UTF-8 bytes in the returned text.</param>
     /// <returns>text, shorter at EOF, or a text read error.</returns>
     func Read(count: int, maxUtf8Bytes: int) -> Result<string, TextReadError>
-    func ReadLine(maxUtf8Bytes: int) -> Result<Option<string>, TextReadError>
+    func ReadLine(maxUtf8Bytes: int) -> Result<Optional<string>, TextReadError>
     func ReadToEnd(maxUtf8Bytes: int) -> Result<string, TextReadError>
     func Close()
 }

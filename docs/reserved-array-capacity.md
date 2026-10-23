@@ -7,7 +7,7 @@ an index or element address faults until that slot has been written. The allocat
 obeys normal heap, array-budget and GC rules. This extends the existing `array.alloc`
 reservation behavior to the target profile's ordinary array-reference category.
 
-This is needed for lists of Result/Option carriers and other values without a valid
+This is needed for lists of Result/Optional carriers and other values without a valid
 default. Capacity is not Count: creating an empty list must not fabricate an Ok,
 Error or None case. The existing Add/growth/Copy algorithms write the populated
 prefix and expose only Count elements. Source programs still use the same ArrayList

@@ -19,7 +19,7 @@ static class OptionImportChecks
             return body + ((original[body] & 3) == 2 ? 1 : (BitConverter.ToUInt16(original, body) >> 12) * 4);
         }
         Instruction Extract(string name) => show.Body.Instructions.Single(i => i.Operand is MethodReference m && m.Name == "TryGetValue" && m.Parameters[0].ParameterType.FullName.Contains(name));
-        Instruction Construct(string name) => find.Body.Instructions.Single(i => i.OpCode.Code == Code.Newobj && i.Operand is MethodReference m && m.DeclaringType.FullName.StartsWith("System.Option`1") && m.Parameters[0].ParameterType.FullName.Contains(name));
+        Instruction Construct(string name) => find.Body.Instructions.Single(i => i.OpCode.Code == Code.Newobj && i.Operand is MethodReference m && m.DeclaringType.FullName.StartsWith("System.Optional`1") && m.Parameters[0].ParameterType.FullName.Contains(name));
         var cases = new (string Name, int Offset, byte[] Bytes, string Diagnostic)[] {
             ("OptionDefaultCarrier", CodeStart(show), [(byte)OpCodes.Ldloc_0.Value], "Read of uninitialized or unsupported default local"),
             ("OptionWrongOutCase", CodeStart(show) + Extract("/Some`1").Offset + 1,

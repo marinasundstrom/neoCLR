@@ -2,7 +2,7 @@
 
 Development library slice: Queue<T>/ArrayQueue<T>, Stack<T>/ArrayStack<T> and
 Set<T>/MutableSet<T>/HashSet<T>. These use ordinary generic library code, existing
-Option values and existing comparer/array contracts. No new runtime intrinsic,
+Optional values and existing comparer/array contracts. No new runtime intrinsic,
 thread-safety guarantee or scheduler integration is introduced.
 
 The [consumer](Main.rvn) passes native macOS ARM64 and matching interpreter execution

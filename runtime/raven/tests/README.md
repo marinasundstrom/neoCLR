@@ -349,7 +349,7 @@ A single 46-test executable exceeded the current native metadata encoder envelop
 (`NEOMETA003`). Splitting projects is a temporary packaging workaround, not a maximum
 test count contract; raising or removing the metadata limit needs separate validation.
 No .NET/CLR collection semantics change in this migration. Existing comparer,
-snapshot, Option/Result and UTF-8 contracts remain the subjects of the tests.
+snapshot, Optional/Result and UTF-8 contracts remain the subjects of the tests.
 
 [Collection batch qualification](collection-batch-validation.json): all 46 tests pass native macOS ARM64
 and interpreted execution; the existing Map/ArrayQueue filters also pass. Windows
@@ -742,7 +742,7 @@ identity, capacity/clear/reuse and interleaved operations. A counting comparer
 bounds comparison work for the 127-entry workload; this is an algorithmic guard,
 not a wall-clock benchmark. Comparer objects and FunctionComparer callbacks both
 participate. The queue stores elements and priorities in separate arrays without
-per-entry wrapper nodes; Option-return and runtime allocation costs remain explicit.
+per-entry wrapper nodes; Optional-return and runtime allocation costs remain explicit.
 
 Negative capacity and mutation from a comparer cause terminal Faults, so the same
 suite executable exposes isolated `--guard priority-capacity` and

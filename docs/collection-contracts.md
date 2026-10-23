@@ -129,14 +129,14 @@ Span, native owner, pinning API or automatic resource cleanup is claimed here.
 | Collection<out T> | Count plus iteration can preserve covariance; adding Contains(T) or other element inputs changes the analysis |
 | List<out T> | Count and a getter returning T can preserve covariance for reference T. No setters or writable element byrefs. Decide whether indexing promises efficient random access |
 | Set<out T> | A normal Contains(T) consumes T, so this shape is not valid under CLR covariance. Decide whether an invariant membership contract or a smaller producer view serves the actual API |
-| Map<K, out V> | Key invariance permits key inputs and outputs. Value lookup must be designed: TryGetValue(K, out V) has a byref output, and an invariant Option<V> result is not a covariant use of V. Our Result/Option policy makes this a real contract question |
+| Map<K, out V> | Key invariance permits key inputs and outputs. Value lookup must be designed: TryGetValue(K, out V) has a byref output, and an invariant Optional<V> result is not a covariant use of V. Our Result/Optional policy makes this a real contract question |
 | Mutable* | Mutation consumes elements/values, so keep these invariant. If they inherit a read interface, decide member ownership once, rather than accidentally duplicate Count/getter slots |
 
 Do not change nullable/error policy, invent covariant value carriers or introduce
 special dispatch conversions solely to preserve a desired `out` annotation. An
 invariant interface is a valid outcome. Moving membership to an extension method may
 also lose the set's lookup/equality contract; that needs evidence rather than cosmetic
-consistency. `Option<T>`-based lookup can remain useful without a covariant Map.
+consistency. `Optional<T>`-based lookup can remain useful without a covariant Map.
 
 The proposed .NET-style variance benefit applies to reference arguments. It does not
 make a collection of value elements into a collection of Object without representation
@@ -290,10 +290,10 @@ forged setters, wrong element types and unimplemented growth declarations.
 **Next, as directed by the author:** Map<K,V> and a dictionary-style implementation.
 Use .NET Dictionary<TKey,TValue> as the behavioral baseline. Evaluate HashMap as the
 concrete name, explicit read/mutation capabilities, key comparer ownership, equality
-and hashing requirements, lookup via Option, duplicate-key Result behavior and
+and hashing requirements, lookup via Optional, duplicate-key Result behavior and
 iteration order. No Map, hasher, comparer or dictionary implementation is included in
 this slice. Decide these contracts before selecting a hash-table algorithm; do not
-assume covariant V through an invariant Option<V> or nullable-key compatibility.
+assume covariant V through an invariant Optional<V> or nullable-key compatibility.
 
 
 Source validation: 39 focused runtime tests, 22 Raven indexer/iteration tests,
@@ -306,7 +306,7 @@ no SDK, VSIX or installed demonstration was replaced.
 ## First Map implementation (2026-09-13)
 
 The subsequent [Map slice](map-contracts.md) implements Map<K,V>, MutableMap<K,V>
-and HashMap<K,V> with Option-returning Find, TryAdd, Set, Count and snapshot Keys.
+and HashMap<K,V> with Optional-returning Find, TryAdd, Set, Count and snapshot Keys.
 It requires explicit equality/hash callbacks and does not yet supply a default
 comparer, removal or pair enumeration. The two generic arguments remain invariant.
 This extends the prototype; it does not settle the whole proposed collection tree.
@@ -363,7 +363,7 @@ implementations and a [native/interpreter consumer](experiments/native-collectio
 Public contracts remain pre-stable. The prior experiments remain historical evidence.
 
 Queue and Stack inherit Collection, not indexed Sequence. Dequeue/Pop/Peek return
-Option: empty is a normal result, distinct from a present nullable value. HashSet
+Optional: empty is a normal result, distinct from a present nullable value. HashSet
 requires an explicit EqualityComparer, suppresses duplicates without replacing the
 stored representative, and returns bool for Add/Remove membership changes. It keeps
 key-only storage, unlinks bucket chains on removal and reuses freed optional slots.

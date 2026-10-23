@@ -73,9 +73,9 @@ No new guest attribute or RavenDoc type is introduced.
 The Rust metadata API adds `metadata::NativeAbi` and
 `Instruction::BindNativeFunction { function_type: Type, abi: NativeAbi }`. The ABI
 record has public fields `calling_convention: CallingConvention`,
-`string_marshalling: Option<NativeStringMarshalling>`,
+`string_marshalling: Optional<NativeStringMarshalling>`,
 `parameter_marshalling: BTreeMap<String, NativeMarshalling>` and
-`return_marshalling: Option<NativeMarshalling>`. `From<&NativeImport>` copies only
+`return_marshalling: Optional<NativeMarshalling>`. `From<&NativeImport>` copies only
 ABI/conversion fields, excluding library/export identity. Validation uses the same
 rules as named imports; zero-based keys must be canonical decimal strings. The
 function_type must be a supported structural Function signature. The instruction
@@ -100,7 +100,7 @@ Both Rust `metadata::NativeImport` and `metadata::NativeAbi` additionally expose
 | Field | Type and meaning |
 | --- | --- |
 | `callback_parameters` | `BTreeMap<String, NativeAbi>`: canonical zero-based parameter index to that callable's independent ABI. Empty by default and omitted in serialization. |
-| `function_return` | `Option<Box<NativeAbi>>`: ABI of a returned native pointer mapped to the declared structural Function. None by default and omitted in serialization. |
+| `function_return` | `Optional<Box<NativeAbi>>`: ABI of a returned native pointer mapped to the declared structural Function. None by default and omitted in serialization. |
 
 `From<&NativeImport>` copies these fields as well. The new public fields require
 updates to Rust struct literals; wire records without them retain their previous

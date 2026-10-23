@@ -3,7 +3,7 @@
 Native `TypeDeclaringType` now materializes the interpreter's descriptor recipe for
 explicitly retained, nongeneric type declarations. The Raven consumer verifies the
 actual enclosing type identity and absent ownership for a top-level type. This follows
-.NET `Type.DeclaringType` semantics, projected as `Option<TypeInfo>` rather than null.
+.NET `Type.DeclaringType` semantics, projected as `Optional<TypeInfo>` rather than null.
 It does not grant constructor or method invocation rights. Missing retention faults;
 it must never fabricate `None` for an unretained nested type.
 

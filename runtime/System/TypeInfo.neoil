@@ -23,10 +23,10 @@
         call System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)
         ret
     .end
-    .property instance BaseType() -> System.Option<System.Type>
+    .property instance BaseType() -> System.Optional<System.Type>
         .get instance System.Introspection.TypeInfo::get_BaseType()
     .end
-    .method instance get_BaseType() -> System.Option<System.Type>
+    .method instance get_BaseType() -> System.Optional<System.Type>
         ldarg this
         ldfld 0
         call neoCLR.Runtime.TypeBaseType(System.RuntimeTypeHandle)

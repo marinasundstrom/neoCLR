@@ -65,7 +65,7 @@ static class MapBindings
         var expected = (shape.Kind, definition.Name) switch {
             ("Map" or "HashMap", "get_Count") => ("", "Int32"),
             ("Map" or "HashMap", "get_Keys") => ("", $"System.Collections.Sequence<{shape.Key}>"),
-            ("Map" or "HashMap", "Find") => (shape.Key, $"System.Option<{shape.Value}>"),
+            ("Map" or "HashMap", "Find") => (shape.Key, $"System.Optional<{shape.Value}>"),
             ("Map" or "HashMap", "ContainsKey") => (shape.Key, "Boolean"),
             ("MutableMap" or "HashMap", "TryAdd") => ($"{shape.Key},{shape.Value}", "Boolean"),
             ("MutableMap" or "HashMap", "Set") => ($"{shape.Key},{shape.Value}", "void"),

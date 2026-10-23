@@ -1,21 +1,21 @@
 ; Generated from runtime/raven/src/System/Collections/HashMap.rvn. Regenerate with build_runtime_library.py.
-.function neoCLR.Library.System.Collections.HashMap.RuntimeUnion0() -> System.Option.None
-newobj instance System.Option.None::.ctor()
+.function neoCLR.Library.System.Collections.HashMap.RuntimeUnion0() -> System.Optional.None
+newobj instance System.Optional.None::.ctor()
 ret
 .end
-.function neoCLR.Library.System.Collections.HashMap.RuntimeUnion1<T1>(System.Option.None arg0) -> System.Option<T1>
+.function neoCLR.Library.System.Collections.HashMap.RuntimeUnion1<T1>(System.Optional.None arg0) -> System.Optional<T1>
 ldarg arg0
-newobj instance System.Option<T1>::.ctor(System.Option.None)
+newobj instance System.Optional<T1>::.ctor(System.Optional.None)
 ret
 .end
-.function neoCLR.Library.System.Collections.HashMap.RuntimeUnion2<T1>(T1 arg0) -> System.Option.Some<T1>
+.function neoCLR.Library.System.Collections.HashMap.RuntimeUnion2<T1>(T1 arg0) -> System.Optional.Some<T1>
 ldarg arg0
-newobj instance System.Option.Some<T1>::.ctor(T1)
+newobj instance System.Optional.Some<T1>::.ctor(T1)
 ret
 .end
-.function neoCLR.Library.System.Collections.HashMap.RuntimeUnion3<T1>(System.Option.Some<T1> arg0) -> System.Option<T1>
+.function neoCLR.Library.System.Collections.HashMap.RuntimeUnion3<T1>(System.Optional.Some<T1> arg0) -> System.Optional<T1>
 ldarg arg0
-newobj instance System.Option<T1>::.ctor(System.Option.Some<T1>)
+newobj instance System.Optional<T1>::.ctor(System.Optional.Some<T1>)
 ret
 .end
 .function neoCLR.Library.System.Collections.HashMap.RuntimeBooleanFromInt32(Int32 value) -> Boolean

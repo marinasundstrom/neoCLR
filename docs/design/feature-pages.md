@@ -129,7 +129,7 @@ optimization history. Preserve useful public anchors when reorganizing pages.
 
 Feature pages currently cover [Introspection](../../website/content/features/introspection/index.md)
 and [Strings](../../website/content/features/strings/index.md), with additional notes for
-[Option/Result](../../website/content/features/outcomes/index.md),
+[Optional/Result](../../website/content/features/outcomes/index.md),
 [Console](../../website/content/features/console/index.md),
 [arrays](../../website/content/features/arrays/index.md),
 [collections/queries](../../website/content/features/collections/index.md),
@@ -312,7 +312,7 @@ unions, explicit outcomes and pattern matching. State up front that neoCLR is a 
 platform incompatible with existing .NET libraries; distinguish Raven's separate
 .NET target. Explain cross-platform and AOT-first direction beside current support. Distinguish
 Raven’s C#/Swift/Rust/Kotlin influences and pattern syntax from neoCLR’s fresh API
-design: UTF-8 strings, Option/Result and efficient Slice/Memory views.
+design: UTF-8 strings, Optional/Result and efficient Slice/Memory views.
 
 The general error-handling guide leads with outcome/error unions, patterns and
 propagation, then API authors' outward contract choices. Error and ContextError

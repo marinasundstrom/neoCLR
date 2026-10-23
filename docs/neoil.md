@@ -72,7 +72,7 @@ escapes. Identifiers contain ASCII letters, digits, underscores, and dots.
   cannot be a branch target.
 - Types include `Void`, `SByte`, `Byte`, `Int16`, `UInt16`, `Char`, `Int32`,
   `UInt32`, `Int64`, `UInt64`, `Single`, `Double`, `IntPtr`, `UIntPtr`, `Boolean`, `String`, a record name,
-  `Option<T>`, `Result<T,E>`, `T&`, or `Ptr<T>` (also spelled `T*`). Spaces inside generic signatures are allowed.
+  `Optional<T>`, `Result<T,E>`, `T&`, or `Ptr<T>` (also spelled `T*`). Spaces inside generic signatures are allowed.
   Primitive aliases `int8`, `uint8`, `int16`, `uint16`, `char`, `uint32`,
   `int64`, `uint64`, `float32`/`single`, `float64`/`double`, `void`, `int32`/`int`, `nint`, `nuint`, `boolean`/`bool`, and `string`
   and fully qualified names such as `System.Int32` normalize to canonical types.
@@ -127,7 +127,7 @@ zero parameters:
 call System.Console.WriteLine(string)
 call System.Int32.Divide(int32, int32)
 call Initialize()
-call Handle(Result<Option<Void>, String>, Point&)
+call Handle(Result<Optional<Void>, String>, Point&)
 ```
 
 Overloads are identified by name plus exact ordered parameter types. Arity, type,
@@ -291,7 +291,7 @@ implement full CIL evaluation-stack normalization or mixed-width arithmetic. See
 [native integers](native-integers.md) for conversions and address tracking.
 
 Use ordinary carrier predicates, conditional branches and checked case accessors.
-Format 4 removes some/none/ok/err/is.case/ldcase and the special Option/Result encodings.
+Format 4 removes some/none/ok/err/is.case/ldcase and the special Optional/Result encodings.
 
 ## Runtime library contracts
 
@@ -299,7 +299,7 @@ These are ordinary functions compiled from [System.neoil](../runtime/System.neoi
 
 | Symbol | Parameters | Return |
 | --- | --- | --- |
-| `System.Console.ReadByte` | none | `System.Result<System.Option<Byte>,System.ConsoleReadError>` (ordinary nested cases) |
+| `System.Console.ReadByte` | none | `System.Result<System.Optional<Byte>,System.ConsoleReadError>` (ordinary nested cases) |
 | `System.Console.WriteLine` | `String` | `Void` |
 | `System.Console.WriteLine` | `Int32` | `Void` |
 | `System.Storage.File.ReadAllText` | `String, Int32` | `System.Result<String,System.Storage.FileReadError>` (ordinary carrier) |
@@ -322,7 +322,7 @@ The assembler emits a versioned JSON object containing `format`, `name`, `entry`
 and `body`, plus `impl_flags`, `owner`, and `instance`. Free functions have no
 owner; methods have a validated declaring type. Type definitions carry `representation`. Instruction objects use `op` and optional
 `arg`. Primitive types serialize as strings; constructed types serialize as tagged
-objects, for example `{"Option":"Void"}`, `{"Ref":{"Named":"Point"}}`, and
+objects, for example `{"Optional":"Void"}`, `{"Ref":{"Named":"Point"}}`, and
 `{"Result":["Void","Error"]}`. Unknown fields and opcode names are rejected.
 
 The loader checks declarations, duplicate names, signatures, indices, branch
@@ -396,7 +396,7 @@ and preserve older stack entries. These zero/null tests follow the familiar
 
 String, records, unions, Void, and floating-point values are not conditions.
 neoCLR does not infer reference semantics for value types based on their .NET names,
-or infer truth from string length or Option/Result cases. Use ordinary discriminator methods for unions
+or infer truth from string length or Optional/Result cases. Use ordinary discriminator methods for unions
 and explicit comparisons for floats. Managed byrefs are not accepted as branch
 conditions; short-form branch aliases remain pending. Tables do not add implicit
 default branches or union destructuring. The optional [verifier](verification.md)
@@ -529,7 +529,7 @@ as `!0`); field signatures resolve names to indexed type parameters. See
 
 Unions follow an [ordinary type convention](unions-and-enums.md), expressed
 through metadata and member calls. No `.union`/`.variant` directives or general
-union opcodes are implemented. System.Option/Result use ordinary records and calls.
+union opcodes are implemented. System.Optional/Result use ordinary records and calls.
 
 Methods inside a generic type use its indexed parameters in signatures, locals, and
 IL operands. Calls specify a constructed owner: `call Box<Int32>::Create(Int32)` or

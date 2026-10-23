@@ -1,6 +1,6 @@
 import System.*
 import System.Linq.*
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 import System.Console.*
 
@@ -10,14 +10,14 @@ func Check(actual: int, expected: int, label: string) {
     }
 }
 
-func SomeValue(value: Option<int>, expected: int) {
+func SomeValue(value: Optional<int>, expected: int) {
     match value {
         Some(let actual) => Check(actual, expected, "Some payload")
         None => System.Fail("Expected Some")
     }
 }
 
-func NoValue(value: Option<int>) {
+func NoValue(value: Optional<int>) {
     if value is Some(_) {
         System.Fail("Expected None")
     }
@@ -42,8 +42,8 @@ func Failure(value: Result<int, string>, expected: string) {
 }
 
 func Main() {
-    let some: Option<int> = Some(0)
-    let none: Option<int> = None
+    let some: Optional<int> = Some(0)
+    let none: Optional<int> = None
     var calls = 0
     let mapped = some.Map((value: int) -> int => {
         calls = calls + 1
@@ -54,10 +54,10 @@ func Main() {
         calls = calls + 1
         return value
     }))
-    Check(calls, 1, "Option Map callback count")
-    SomeValue(some.Then((value: int) -> Option<int> => Some(value + 7)), 7)
-    NoValue(some.Then((value: int) -> Option<int> => None))
-    NoValue(none.Then((value: int) -> Option<int> => {
+    Check(calls, 1, "Optional Map callback count")
+    SomeValue(some.Then((value: int) -> Optional<int> => Some(value + 7)), 7)
+    NoValue(some.Then((value: int) -> Optional<int> => None))
+    NoValue(none.Then((value: int) -> Optional<int> => {
         calls = calls + 1
         return Some(value)
     }))
@@ -67,16 +67,16 @@ func Main() {
         calls = calls + 1
         return true
     }))
-    Check(calls, 1, "Absent Option callbacks")
-    SomeValue(some.OrElse(() -> Option<int> => {
+    Check(calls, 1, "Absent Optional callbacks")
+    SomeValue(some.OrElse(() -> Optional<int> => {
         calls = calls + 1
         return Some(9)
     }), 0)
-    SomeValue(none.OrElse(() -> Option<int> => {
+    SomeValue(none.OrElse(() -> Optional<int> => {
         calls = calls + 1
         return Some(9)
     }), 9)
-    Check(calls, 2, "Option alternative is lazy")
+    Check(calls, 2, "Optional alternative is lazy")
     Check(some.UnwrapOr(99), 0, "Present zero")
     Check(none.UnwrapOr(99), 99, "Explicit default")
     Check(some.UnwrapOrElse(() => {
@@ -87,7 +87,7 @@ func Main() {
         calls = calls + 1
         return 8
     }), 8, "Absent fallback")
-    Check(calls, 3, "Option fallback is lazy")
+    Check(calls, 3, "Optional fallback is lazy")
     Check(some.Match(value => value + 1, () => 9), 1, "Some Match")
     Check(none.Match(value => value + 1, () => 9), 9, "None Match")
     SomeValue(some.Tap((value: int) => {
@@ -102,7 +102,7 @@ func Main() {
     NoValue(none.TapNone(() => {
         calls = calls + 1
     }))
-    Check(calls, 5, "Option Tap channels")
+    Check(calls, 5, "Optional Tap channels")
     Check(some.ToIterable().Count(), 1, "Some iteration")
     Check(none.ToIterable().Count(), 0, "None iteration")
     Check(some.ToIterable().Fold(42, (sum, value) => sum + value), 42, "Some zero retained")
@@ -130,14 +130,14 @@ func Main() {
         calls = calls + 100
         return Ok(value)
     }, () => "missing"), "missing")
-    Check(calls, 6, "Missing Option skips conversion mapper")
-    let nested: Option<Option<int>> = Some(some)
-    let nestedNone: Option<Option<int>> = Some(none)
-    let outerNone: Option<Option<int>> = None
+    Check(calls, 6, "Missing Optional skips conversion mapper")
+    let nested: Optional<Optional<int>> = Some(some)
+    let nestedNone: Optional<Optional<int>> = Some(none)
+    let outerNone: Optional<Optional<int>> = None
     SomeValue(nested.Flatten(), 0)
     NoValue(nestedNone.Flatten())
     NoValue(outerNone.Flatten())
-    WriteLine("Option operators passed")
+    WriteLine("Optional operators passed")
 
     let ok: Result<int, string> = Ok(0)
     let error: Result<int, string> = Failure("problem")

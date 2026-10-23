@@ -97,7 +97,7 @@ fn rejected_patterns_types_and_lifetimes() {
     }
     let nested = format!(
         "func Main() -> {}int{} {{ return 0 }}",
-        "Option<".repeat(40),
+        "Optional<".repeat(40),
         ">".repeat(40)
     );
     assert!(

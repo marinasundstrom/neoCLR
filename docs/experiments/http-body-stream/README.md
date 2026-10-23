@@ -43,7 +43,7 @@ neoCLR deliberately exposes its existing InputStream capability and typed Result
 errors rather than requiring .NET Stream or exceptions. TryGetStream, alongside
 TryGetBytes, avoids implicit copying but requires the consumer to handle both
 shapes. Length=-1 is a provisional sentinel because the existing Length is an int;
-a future nullable/Option length contract should be reviewed before stability.
+a future nullable/Optional length contract should be reviewed before stability.
 The five-second transport ceiling, original server request deadline and 1 MiB
 client decoded-body quota remain. This is bounded streaming, not unlimited bodies
 or HTTP/1.1 keep-alive. TLS shares the transport implementation, but new TLS and

@@ -7,6 +7,6 @@ public interface Map<K, V> : Iterable<KeyValuePair<K, V>> {
     val self[key: K]: V { get }
     val Count: int { get }
     val Keys: Sequence<K> { get }
-    func Find(key: K) -> System.Option<V>
+    func Find(key: K) -> System.Optional<V>
     func ContainsKey(key: K) -> bool
 }

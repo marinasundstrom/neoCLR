@@ -2,12 +2,12 @@
 
 The source case verifies all six public flags across open classes, abstract
 classes, ordinary leaves, open interfaces, closed class/interface families, the
-TypeInfo contract itself, Option/Result nominal unions, BindingFlags, primitives
+TypeInfo contract itself, Optional/Result nominal unions, BindingFlags, primitives
 and arrays. Repeated generic queries run under collection pressure. This verifies
 source metadata survives compilation, import and runtime acquisition; the Rust
 matrix additionally covers open generic classes, managed references and metadata round trips.
 The application importer currently rejects user-defined constructed generic classes;
-source generic classification coverage uses the supported Option/Result declarations.
+source generic classification coverage uses the supported Optional/Result declarations.
 
 ```sh
 python3 docs/experiments/introspection-flags/verify.py \

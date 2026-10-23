@@ -1,7 +1,7 @@
 module System.Collections
 
 import System.*
-import System.Option.*
+import System.Optional.*
 
 /// <summary>An unsynchronized binary min-heap with an explicit priority comparer.</summary>
 /// <remarks>Lowest priorities leave first. Equal priorities have no FIFO guarantee. Priorities and the comparer must retain stable ordering while queued. Comparer callbacks must not reenter queue operations (a terminal Fault). Storage grows geometrically; entries are stored inline without wrapper objects.</remarks>
@@ -88,7 +88,7 @@ public class PriorityArrayQueue<TElement, TPriority> {
     }
 
     /// Returns the minimal element without removing it, or None when empty.
-    func Peek() -> Option<TElement> {
+    func Peek() -> Optional<TElement> {
         CheckAvailable()
         if count == 0 {
             return None
@@ -97,7 +97,7 @@ public class PriorityArrayQueue<TElement, TPriority> {
     }
 
     /// Returns the minimal priority without removing it, or None when empty.
-    func PeekPriority() -> Option<TPriority> {
+    func PeekPriority() -> Optional<TPriority> {
         CheckAvailable()
         if count == 0 {
             return None
@@ -106,7 +106,7 @@ public class PriorityArrayQueue<TElement, TPriority> {
     }
 
     /// Removes the minimal element in O(log Count), or returns None when empty. Releases vacated storage references.
-    func Dequeue() -> Option<TElement> {
+    func Dequeue() -> Optional<TElement> {
         CheckAvailable()
         if count == 0 {
             return None

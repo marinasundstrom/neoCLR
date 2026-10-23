@@ -20,5 +20,5 @@ public class DefaultLocalizer<T> : Localizer<T> {
 
     val Culture: Globalization.Culture => inner.Culture
     val self[key: string]: string => inner[key]
-    func Find(key: string) -> Option<string> => inner.Find(key)
+    func Find(key: string) -> Optional<string> => inner.Find(key)
 }

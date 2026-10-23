@@ -1,15 +1,15 @@
-import System.Option.*
+import System.Optional.*
 import System.*
 import System.Console.*
 
-func Find(found: int) -> Option<int> {
+func Find(found: int) -> Optional<int> {
     if found == 1 {
         return Some(42)
     }
     return None()
 }
 
-func Read(found: int) -> Option<int> {
+func Read(found: int) -> Optional<int> {
     let value = Find(found)?
     WriteLine("Value found")
     return Some(value)

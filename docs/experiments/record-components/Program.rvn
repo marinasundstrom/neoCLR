@@ -1,9 +1,9 @@
 import System.*
-import System.Option.*
+import System.Optional.*
 
 record struct Position(Value: Index)
 record struct Interval(Value: Range)
-record struct OptionalPosition(Value: Option<Index>)
+record struct OptionalPosition(Value: Optional<Index>)
 record struct Envelope(Value: Position)
 
 func Check(value: bool, message: string) {

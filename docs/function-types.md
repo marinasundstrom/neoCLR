@@ -100,7 +100,7 @@ allocation identity. Parameter order, types and readonly/out/out-when-true modes
 come from the signature; names are empty because a shape has no parameter declaration.
 
 `MemberInfo.Module` and `MetadataToken`, and the corresponding ParameterInfo
-properties, now return Option. Declared members preserve available metadata;
+properties, now return Optional. Declared members preserve available metadata;
 synthesized Invoke and its parameters return None and empty custom attributes.
 `MethodInfo.DefinitionIndex` is also optional. This is a source/reference contract
 break: callers must pattern-match the optional values and rebuild matching artifacts.
@@ -120,7 +120,7 @@ absence explicit in the descriptor contract (primary API pages checked 2026-09-2
 A separate synthetic-method interface would avoid changing metadata getters but
 fragment ordinary GetMethods consumers. Fabricated modules/tokens would misrepresent
 the shape as a declaration. Optional metadata keeps one MethodInfo interface, at
-the cost of consumer migration and Option storage for parameter modules. No speed
+the cost of consumer migration and Optional storage for parameter modules. No speed
 or allocation improvement is claimed; native and Raven consumers validate the
 contract. Broader reflection research remains in the linked introspection design.
 

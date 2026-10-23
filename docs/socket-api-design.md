@@ -769,7 +769,7 @@ reference generation to the bundled matching compiler. Rebuild references, the n
 System library and applications together: storage, receiver conventions and member
 rows change. Production callers and the API reference follow the generated contract.
 
-The author rejects mandatory per-case predicates even for Option and Result. Existing
+The author rejects mandatory per-case predicates even for Optional and Result. Existing
 unions should migrate where applicable after this slice; generic/payload-bearing
 families need their own bridge, default/copy/boxing and GC validation.
 

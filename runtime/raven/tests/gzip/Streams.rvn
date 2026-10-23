@@ -3,7 +3,7 @@ module NeoClr.RuntimeTests
 import System.*
 import System.IO.*
 import System.Result.*
-import System.Option.*
+import System.Optional.*
 import System.Concurrency.*
 import System.Concurrency.Tasks.*
 
@@ -48,7 +48,7 @@ class FragmentedSource : InputStream {
     private var position = 0
     private var first = true
     private val promise = Promise<Result<int, StreamError>>()
-    private var destination: Option<byte[]> = Option<byte[]>.None
+    private var destination: Optional<byte[]> = Optional<byte[]>.None
     private var start = 0
     private var capacity = 0
 
@@ -61,7 +61,7 @@ class FragmentedSource : InputStream {
     func Read(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<int, StreamError>> {
         if first {
             first = false
-            destination = Option<byte[]>.Some(buffer)
+            destination = Optional<byte[]>.Some(buffer)
             start = offset
             capacity = count
             return promise.Task

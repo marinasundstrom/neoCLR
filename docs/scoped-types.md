@@ -14,7 +14,7 @@ remains supported. Qualifiers apply to a named definition; generic arguments and
 pointer suffixes retain their own structural signatures. `[System]int32` normalizes
 the primitive spelling to System.Int32. Primitive qualifiers must name System.
 Use `Ptr<[Models]Point>` or `[Models]Point*` for pointers; a bootstrap wrapper such as
-Option itself is not a named definition that can receive a qualifier.
+Optional itself is not a named definition that can receive a qualifier.
 
 Scoped signatures serialize as a `Scoped` type operand containing `module`, canonical
 `name`, and `arguments`. Empty arguments describe a non-generic type; generic arity

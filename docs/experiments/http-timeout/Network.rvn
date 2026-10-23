@@ -1,5 +1,5 @@
 import System.*
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 import System.Concurrency.Tasks.*
 import System.Time.*
@@ -11,7 +11,7 @@ async func Main(arguments: string[]) -> Task<()> {
     if mode == "timeout" {
         client.Timeout = Some(Duration.FromTicks(20000000L))
     } else {
-        client.Timeout = Option<Duration>.None()
+        client.Timeout = Optional<Duration>.None()
     }
     let result = await client.Get(arguments[0])
     client.Dispose()

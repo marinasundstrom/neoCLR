@@ -1,6 +1,6 @@
 import System.*
 import System.Concurrency.*
-import System.Option.*
+import System.Optional.*
 import System.Concurrency.Tasks.*
 import System.Time.*
 
@@ -28,7 +28,7 @@ async func Reset() -> Task<()> {
     await done.Task
     Check(source.IsCancellationRequested)
     source.CancelAfter(Duration.FromTicks(0L))
-    source.CancelAfter(Option<Duration>.None())
+    source.CancelAfter(Optional<Duration>.None())
     Check(source.IsCancellationRequested)
     registration.Dispose()
     source.Dispose()
@@ -38,10 +38,10 @@ async func Reset() -> Task<()> {
 async func Disable() -> Task<()> {
     let source = CancellationTokenSource()
     source.CancelAfter(Duration.FromTicks(0L))
-    source.CancelAfter(Option<Duration>.None())
+    source.CancelAfter(Optional<Duration>.None())
     await Pause()
     Check(!source.IsCancellationRequested)
-    source.CancelAfter(Option<Duration>.Some(Duration.FromTicks(0L)))
+    source.CancelAfter(Optional<Duration>.Some(Duration.FromTicks(0L)))
     await Pause()
     Check(source.IsCancellationRequested)
     source.Dispose()

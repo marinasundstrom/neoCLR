@@ -5,7 +5,7 @@ import System.Concurrency.*
 import System.IO.*
 import System.Collections.*
 import System.Result.*
-import System.Option.*
+import System.Optional.*
 
 func Check(value: bool) {
     if !value {

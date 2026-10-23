@@ -221,7 +221,7 @@ to be extracted from Raven source comments.
 the two assembly-level-function containers and IsReadOnlyAttribute. These remain part of
 the public inventory, with linked manual entries and checked routes. No public type
 is excluded from the inventory. `exclusions.json` records intentional page exclusions
-with reasons: non-generic Array, Option, Result and TaskOutcome are importer/exporter
+with reasons: non-generic Array, Optional, Result and TaskOutcome are importer/exporter
 scaffolds, not additional application types. Their generic APIs remain documented;
 CLR case-carrier types inside the non-generic containers are also explicitly
 excluded. Coverage checks honor these exact type exclusions.
@@ -277,7 +277,7 @@ an explicit Collection implementation, visible through Sequence/Collection only.
 
 The current audit covers every public reference type through generated type pages,
 explicit manual entries and explicitly excluded metadata scaffolds. Collections, arrays, functions, query operators,
-Option/Result, TaskOutcome, numeric types, text/encoding, environment, time/calendar,
+Optional/Result, TaskOutcome, numeric types, text/encoding, environment, time/calendar,
 resource capabilities and interop now have type/member descriptions. Compiler-reference
 scaffolds are identified as such; they do not promise executable CLR services.
 Future work can deepen examples and parameter/error descriptions without withholding
@@ -1210,7 +1210,7 @@ source owner in projection errors. Source fingerprints and the assembly checksum
 recorded in `snapshot.json`.
 
 The same bridge built against native integration `9a4f74884` currently fails reference
-regeneration in `System.Option<T>` with RAV0103 (`None` is not in scope). This is an open
+regeneration in `System.Optional<T>` with RAV0103 (`None` is not in scope). This is an open
 compiler-line compatibility regression; main succeeds. The website's CLI reference
 producer uses the validated main compiler. Native source-library/sample evidence is a
 separate workflow and does not prove this bridge regeneration works on that branch.
@@ -1224,7 +1224,7 @@ this refresh does not claim they are all resolved. No publication was performed.
 
 The reference-producer compatibility regression above is resolved by Raven integration
 `2b683df67` (general fix on main `edff20273`). The rebuilt current bridge successfully
-projects unchanged Option source and generates a reference byte-for-byte identical to
+projects unchanged Optional source and generates a reference byte-for-byte identical to
 the snapshot. No snapshot refresh or new public API is needed. See the
 [dual-target execution evidence](../docs/experiments/extended-cli-metadata/union-lexical-cases-2026-10-05.md).
 
@@ -1525,7 +1525,7 @@ libraries with RavenDoc 6c90bf2c. No new API is excluded.
 ### Basic collections (development, 2026-10-10)
 
 Queue/ArrayQueue, Stack/ArrayStack and Set/MutableSet/HashSet are selected in the
-reference with member XML and a matching native snapshot. Removal/peek Option
+reference with member XML and a matching native snapshot. Removal/peek Optional
 results, bool membership-change results, explicit comparers, snapshot iteration and
 unsynchronized behavior are documented. No public type is excluded for this slice.
 Map now inherits Iterable of KeyValuePair, with its public constructor,
@@ -1764,10 +1764,10 @@ excluded. Fixed-delay repetition includes async completion; Stop/Dispose do not 
 cancel callback work. See the timer section in docs/design/http-client-lifetime.md.
 
 Both CancelAfter overloads are included in the aggregate/native development reference.
-Duration schedules a cooperative request; Option.None disables scheduling without
+Duration schedules a cooperative request; Optional.None disables scheduling without
 resetting cancellation state. Durations follow Timer's range and rounding rules.
 
-HttpClient.Timeout is included in both development snapshots as Option<Duration>,
+HttpClient.Timeout is included in both development snapshots as Optional<Duration>,
 defaulting to Some(100 seconds), with None disabling the per-request countdown.
 Configuration freezes on send; cancellation acknowledgement precedes typed timeout
 completion. Five-second transport phase bounds remain independent limitations.
@@ -1786,7 +1786,7 @@ is a representable token but tunnelling remains unsupported by the socket handle
 
 System.Index, System.Range and System.Runtime.CompilerServices.RuntimeHelpers are
 selected in both references. Array<T>.Get(int/Index), Array<T>.Slice(Range) and
-Range.TryGetOffsetAndLength are included. Get returns Option; Slice/resolution return
+Range.TryGetOffsetAndLength are included. Get returns Optional; Slice/resolution return
 Result with InvalidRangeError. Indexing and slicing syntax may fault. Tuple results
 use Item1 (offset) and Item2 (count); optional Index construction uses two overloads.
 The explicit tuple spelling is a runtime bootstrapping gap, not a permanent named
@@ -1798,7 +1798,7 @@ experimental metadata reference; no public guest API is excluded from the snapsh
 
 String Index/Range indexers and Get(int/Index)/Slice(Range) are included in both
 Index/Range development snapshots. Grapheme boundaries match Length; Get returns
-Option<char>, Slice returns Result<string, InvalidRangeError>, and indexers may fault.
+Optional<char>, Slice returns Result<string, InvalidRangeError>, and indexers may fault.
 Slices contain copied immutable text; no view or encoding API is implied. The private
 StringSliceGraphemes runtime service is internal and is not a public API omission.
 
@@ -2630,7 +2630,7 @@ v2 library. The manual guide distinguishes canonical grapheme boundaries from
 ordinal byte/simple-fold scalar search. No new RavenDoc exclusion is needed.
 
 
-Development (2026-10-19) adds Char.TryFromString(string) returning Option<char>
+Development (2026-10-19) adds Char.TryFromString(string) returning Optional<char>
 and Equals(char, StringComparison). Both reference snapshots include the new
 members on the already-selected Char type. The native snapshot comes from
 char-utilities-api-audit-v1 and the matching five-library build. Source and manual
@@ -2710,7 +2710,7 @@ key acquisition/read failures are documented in the console guide.
 ### ConsoleKeyInfo value members — 2026-10-20
 
 Native record synthesis now emits typed/Object Equals, GetHashCode, == and != for
-ConsoleKeyInfo, including Option<int> case/payload comparison. Both reference inputs
+ConsoleKeyInfo, including Optional<int> case/payload comparison. Both reference inputs
 and authored XML cover these members. The pinned native renderer collapses equality
 and inequality to `operator_operator___.html`, where inequality overwrites equality.
 `manual-members.json` records the exact two IDs and links their complete signatures
@@ -2964,3 +2964,10 @@ reference lacks the CLR record synthesis dependencies; native metadata is author
 for record equality, deconstruction, closure and permitted subtype relationships.
 No native public members are excluded from the native audit. The Environment
 content UID changes from N:System.Environment to T:System.Environment.
+
+## Optional naming (development)
+
+System.Optional<T> replaces Option<T>, with unchanged Some/None cases.
+OptionalOperators and OptionalNestedOperators replace the corresponding extension
+containers. The selected types, authored references and matching CLI/native
+snapshots use these names. No compatibility aliases or renderer exclusions are added.

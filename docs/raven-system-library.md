@@ -19,7 +19,7 @@ This slice adds Raven sources for the fundamental and collection interfaces,
 SystemClock, LocalDateTime, IntPtr/UIntPtr comparisons, the complete Int32 member
 surface, Console and Environment. File.ReadAllText joins WriteAllText in Raven.
 The follow-up ports String and opaque Error, then five empty error types and Void,
-followed by seven typed error carriers, and the Propagatable declaration, then Option/Result and their cases, then the inherited descriptor family and NativeMemory, then System.Fault, Func declarations and the normal BindingFlags enum and Object/UnionAttribute markers, followed by managed Array members and iteration, bringing the source port to 73 slices; subsequent AssemblyInfo and ModuleInfo providers bring the current total to 75.
+followed by seven typed error carriers, and the Propagatable declaration, then Optional/Result and their cases, then the inherited descriptor family and NativeMemory, then System.Fault, Func declarations and the normal BindingFlags enum and Object/UnionAttribute markers, followed by managed Array members and iteration, bringing the source port to 73 slices; subsequent AssemblyInfo and ModuleInfo providers bring the current total to 75.
 The legacy Neo profile retains its receiver/array conventions where it differs;
 the Raven profile selects generated contracts and implementation bodies.
 
@@ -42,7 +42,7 @@ continues to use the existing host tick/local-calendar services.
 Bootstrap-only RuntimeServices bindings allow checked inspection/extraction of
 native String, Byte, Int32 and Void payloads. Erased locals require definite
 assignment; they are not initialized with fabricated default payloads. Native status
-interpretation and typed Result/Option construction are Raven code. Native integer
+interpretation and typed Result/Optional construction are Raven code. Native integer
 comparisons widen signed/unsigned storage with the existing conv.i8/conv.u8
 instructions before ordinary comparisons. Int32.ToString retains its scalar neoIL
 receiver and Console's no-result CIL exports retain the existing neoIL Void boundary.
@@ -132,7 +132,7 @@ The [propagation contract](propagation-contract.md) explains the .NET ordinary-o
 comparison and why failed extraction must not initialize a destination. This slice
 changes declaration ownership only; carrier bodies follow separately.
 
-Option/Result now own their case storage, constructors, factories, predicates,
+Optional/Result now own their case storage, constructors, factories, predicates,
 extraction and propagation in Raven. Their checked authoring family includes the
 nongeneric case containers and generic carriers; runtime case fields retain the
 existing public Value identity although Raven uses a private field and getter.
@@ -432,7 +432,7 @@ is not implemented yet. The matched class, private helper and collection gates
 below describe subsequent additions.
 
 The collection terminal migration now admits constructed Iterable/Iterator/ArrayList,
-Func and Option/Result method signatures. Before migrating foundational type definitions, establish
+Func and Optional/Result method signatures. Before migrating foundational type definitions, establish
 how implementation and reference assemblies share their identities without circular
 bootstrap dependencies. Keep native services and neoIL conformance programs where
 those representations serve the platform.
@@ -720,7 +720,7 @@ Where/Select sequences and iterators now join the seven terminal overloads in
 `src/System/Linq/Operators.rvn`. The build uses the bootstrap reference variant and retains reachable
 internal classes alongside generated adapter functions. `runtime/raven/Linq.neoil`
 only includes generated bodies; it no longer contains handwritten query algorithms.
-Public methods, Option/Result outcomes, callback timing, iterator caching, Dispose
+Public methods, Optional/Result outcomes, callback timing, iterator caching, Dispose
 order and repeated-iteration semantics are unchanged. Current uses an ordinary guard
 calling System.Fault before reading its cache; no compiler non-returning-call analysis
 or artificial fallback value was needed.
@@ -760,7 +760,7 @@ excluded, later writes within that buffer remain observable, and a reallocation 
 not retarget an ongoing scan. Find/FindAll retain the value seen by the callback even
 when the callback replaces its slot. Dispose is idempotent. These are the existing
 preview contracts, not a new .NET List version-check policy; changing mutation during
-iteration needs a separate API decision. Option results and public parameter names
+iteration needs a separate API decision. Optional results and public parameter names
 are preserved (`@match` escapes Raven's keyword while emitting the name `match`).
 
 The shared project has a temporary `NeoCLRLibrarySlice=ArrayList` authoring mode.
@@ -1347,7 +1347,7 @@ reference. General generic class-method import remains outside this bridge scope
 
 ### HTTP request association and deferred generic client prototype — 2026-09-26
 
-HttpResponse.Request and HttpClient.DefaultRequestHeaders use the existing Option,
+HttpResponse.Request and HttpClient.DefaultRequestHeaders use the existing Optional,
 Sequence, task continuation and class-reference contracts. A private per-send
 HttpResponseAssociation retains the effective request while a pending task completes.
 The bridge exposes the getter/configuration property and keeps preparation and

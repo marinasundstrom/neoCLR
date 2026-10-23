@@ -1,6 +1,6 @@
 import System.*
 import System.Introspection.*
-import System.Option.*
+import System.Optional.*
 
 // Test metadata isolates AOT retention from compiler-source annotation integration.
 public enum NoteKind {

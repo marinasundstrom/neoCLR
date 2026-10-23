@@ -20,8 +20,8 @@ pub(crate) fn uses_source(module: &Module, ty: &Type) -> bool {
             .and_then(|d| d.origin.as_ref())
             .is_some_and(|o| {
                 o.name.starts_with("System.Introspection.")
-                    || o.name == "System.Option"
-                    || o.name == "System.Option`1"
+                    || o.name == "System.Optional"
+                    || o.name == "System.Optional`1"
             }),
     }
 }
@@ -129,7 +129,7 @@ fn build(
         Value::Object { ty, mut fields } if ty == Type::from_name("$ReflectionSnapshot.Option") => {
             if !matches!(
                 name(module, expected),
-                Some("System.Option" | "System.Option`1")
+                Some("System.Optional" | "System.Optional`1")
             ) || expected.generic_arguments().len() != 1
             {
                 return Err(Fault::new(

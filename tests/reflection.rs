@@ -147,7 +147,7 @@ fn properties_report_accessors_without_executing_them() {
     ] {
         let signature = if argument.is_empty() { "" } else { "Boolean" };
         let body = format!(
-            "{prefix}\n{argument}call instance System.Introspection.PropertyInfo::{method}({signature})\ncall instance System.Option<System.Introspection.MethodInfo>::get_IsSome()"
+            "{prefix}\n{argument}call instance System.Introspection.PropertyInfo::{method}({signature})\ncall instance System.Optional<System.Introspection.MethodInfo>::get_IsSome()"
         );
         assert_eq!(
             program(&body, "Boolean")
@@ -265,7 +265,7 @@ fn shape_queries_and_element_options_preserve_address_modes() {
     }
     for (ty, some) in [("Int32[]", true), ("Int32&", true), ("Int32", false)] {
         let body = format!(
-            "ldtoken {ty}\ncall System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)\ncall instance System.Type::GetElementType()\ncall instance System.Option<System.Type>::get_IsSome()"
+            "ldtoken {ty}\ncall System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)\ncall instance System.Type::GetElementType()\ncall instance System.Optional<System.Type>::get_IsSome()"
         );
         assert_eq!(
             program(&body, "Boolean")
@@ -378,7 +378,7 @@ func Main() -> string {
     if !interfaces[0].IsInterface { return "not interface" }
     let args = interfaces[0].GetGenericArguments()
     if !args[0].IsByRef { return "lost reference" }
-    let methods = typeof(Option<int>).GetMethods()
+    let methods = typeof(Optional<int>).GetMethods()
     for i in 0..<methods.Length {
         if HasConditionalOutput(methods[i]) {
             return interfaces[0].FullName

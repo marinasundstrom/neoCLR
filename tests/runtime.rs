@@ -44,12 +44,12 @@ fn feature_tour() {
 fn void_is_a_value_and_a_generic_argument() {
     assert_eq!(eval("Void", "ldvoid\nret"), Value::Void);
     let some = eval(
-        "System.Option<Void>",
-        "ldvoid\nnewobj instance System.Option.Some<Void>::.ctor(Void)\nnewobj instance System.Option<Void>::.ctor(System.Option.Some<Void>)\nret",
+        "System.Optional<Void>",
+        "ldvoid\nnewobj instance System.Optional.Some<Void>::.ctor(Void)\nnewobj instance System.Optional<Void>::.ctor(System.Optional.Some<Void>)\nret",
     );
     let none = eval(
-        "System.Option<Void>",
-        "newobj instance System.Option.None::.ctor()\nnewobj instance System.Option<Void>::.ctor(System.Option.None)\nret",
+        "System.Optional<Void>",
+        "newobj instance System.Optional.None::.ctor()\nnewobj instance System.Optional<Void>::.ctor(System.Optional.None)\nret",
     );
     assert_eq!(some.ty(), none.ty());
     assert_ne!(some, none);
@@ -58,8 +58,8 @@ fn void_is_a_value_and_a_generic_argument() {
         Type::Constructed { definition: "System.Result".into(), arguments: vec![Type::Void, Type::Void] }
     );
     assert_eq!(
-        eval("System.Option<System.Result<Void,String>>", "ldvoid\nnewobj instance System.Result.Ok<Void>::.ctor(Void)\nnewobj instance System.Result<Void,String>::.ctor(System.Result.Ok<Void>)\nnewobj instance System.Option.Some<System.Result<Void,String>>::.ctor(System.Result<Void,String>)\nnewobj instance System.Option<System.Result<Void,String>>::.ctor(System.Option.Some<System.Result<Void,String>>)\nret").ty(),
-        Type::Constructed { definition: "System.Option".into(), arguments: vec![Type::Constructed { definition: "System.Result".into(), arguments: vec![Type::Void, Type::String] }] }
+        eval("System.Optional<System.Result<Void,String>>", "ldvoid\nnewobj instance System.Result.Ok<Void>::.ctor(Void)\nnewobj instance System.Result<Void,String>::.ctor(System.Result.Ok<Void>)\nnewobj instance System.Optional.Some<System.Result<Void,String>>::.ctor(System.Result<Void,String>)\nnewobj instance System.Optional<System.Result<Void,String>>::.ctor(System.Optional.Some<System.Result<Void,String>>)\nret").ty(),
+        Type::Constructed { definition: "System.Optional".into(), arguments: vec![Type::Constructed { definition: "System.Result".into(), arguments: vec![Type::Void, Type::String] }] }
     );
 }
 

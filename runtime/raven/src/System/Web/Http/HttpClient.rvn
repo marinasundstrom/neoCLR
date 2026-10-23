@@ -1,7 +1,7 @@
 module System.Web.Http
 
 import System.Runtime.CompilerServices.*
-import System.Option.*
+import System.Optional.*
 import System.Concurrency.Tasks.*
 import System.Concurrency.*
 import System.Networking.*
@@ -110,9 +110,9 @@ public class HttpResponse : Disposable {
     func Dispose() { storedContent.Dispose() }
 
     internal func SetContent(content: HttpContent) { storedContent = content }
-    private var originatingRequest: Option<HttpRequest> = None()
+    private var originatingRequest: Optional<HttpRequest> = None()
     /// The effective client request passed to the handler, including applied defaults.
-    val Request: Option<HttpRequest> {
+    val Request: Optional<HttpRequest> {
         get {
             if let Some(request) = originatingRequest {
                 return Some(request)
@@ -546,7 +546,7 @@ public abstract class DelegatingHandler : HttpHandler {
 }
 
 public abstract class HttpContent : Disposable {
-    private var input: Option<InputStream> = None()
+    private var input: Optional<InputStream> = None()
     private var inputLength: int = 0
     private var leaveOpen: bool = true
     private var started: bool = false
@@ -586,13 +586,13 @@ public abstract class HttpContent : Disposable {
 
     /// Returns the one-shot input stream, or None for buffered content. Does not read.
     /// The content owns the stream unless HttpStreamContent.Create was passed leaveOpen=true.
-    func TryGetStream() -> Option<InputStream> {
+    func TryGetStream() -> Optional<InputStream> {
         if let Some(stream) = input { return Some(stream) }
         return None()
     }
 
     /// Returns buffered bytes without reading or consuming an input stream.
-    internal func TryGetBytes() -> Option<Sequence<byte>> {
+    internal func TryGetBytes() -> Optional<Sequence<byte>> {
         if IsBuffered && self is not HttpMemoryContent {
             return Some(storedBytes)
         }
@@ -762,8 +762,8 @@ public abstract class HttpContent : Disposable {
         return Failure(HttpError.InvalidRequest("Content has no stream source"))
     }
 
-    private var mediaType: Option<string> = None()
-    internal val MediaType: Option<string> {
+    private var mediaType: Optional<string> = None()
+    internal val MediaType: Optional<string> {
         get {
             if let Some(value) = mediaType {
                 return Some(value)
@@ -1376,7 +1376,7 @@ public class HttpRequest : Disposable {
 
 public class HttpClient : Disposable {
     private var started = false
-    private var timeout: Option<Duration> = Some(Duration.FromTicks(1000000000L))
+    private var timeout: Optional<Duration> = Some(Duration.FromTicks(1000000000L))
 
     /// The total cooperative request budget, including custom handlers and response buffering.
     /// Defaults to Some(100 seconds); None disables the client countdown.
@@ -1385,7 +1385,7 @@ public class HttpClient : Disposable {
     /// Expiry requests cancellation and waits for handler cleanup before HttpError.TimedOut.
     /// Caller/disposal cancellation takes precedence. Normal handler results are preserved.
     /// Requires scheduler progress and cooperating handlers; transport phase limits still apply.
-    var Timeout: Option<Duration> {
+    var Timeout: Optional<Duration> {
         get {
             if let Some(duration) = timeout {
                 return Some(duration)
@@ -1400,7 +1400,7 @@ public class HttpClient : Disposable {
                 if duration.Ticks > 21474836470000L {
                     System.Fail("HTTP timeout is out of range")
                 }
-            } else if let System.Option.None = value {
+            } else if let System.Optional.None = value {
                 // Explicitly disabled, without a negative-duration sentinel.
             } else {
                 System.Fail("Timeout requires Some or None")
@@ -1437,10 +1437,10 @@ public class HttpClient : Disposable {
     }
 
     private var handler: HttpHandler
-    private var baseUri: Option<string> = None()
+    private var baseUri: Optional<string> = None()
 
     /// Optional absolute base URL, validated when a verb helper constructs a request.
-    var BaseUri: Option<string> {
+    var BaseUri: Optional<string> {
         get {
             if let Some(text) = baseUri {
                 return Some(text)
@@ -1450,7 +1450,7 @@ public class HttpClient : Disposable {
         set {
             if let Some(text) = value {
                 baseUri = Some(text)
-            } else if let System.Option.None = value {
+            } else if let System.Optional.None = value {
                 baseUri = None()
             } else {
                 System.Fail("BaseUri requires Some or None")
@@ -1963,10 +1963,10 @@ internal class HttpExchange {
     private var token: CancellationToken
     private var request: HttpRequest
     private var source: Promise<Result<HttpResponse, HttpError>>
-    private var socket: Option<HttpConnection>
-    private var lookup: Option<Task<Result<Sequence<IPAddress>, DnsError>>>
-    private var connecting: Option<Task<Result<Socket, SocketError>>>
-    private var transfer: Option<Task<Result<int, HttpError>>>
+    private var socket: Optional<HttpConnection>
+    private var lookup: Optional<Task<Result<Sequence<IPAddress>, DnsError>>>
+    private var connecting: Optional<Task<Result<Socket, SocketError>>>
+    private var transfer: Optional<Task<Result<int, HttpError>>>
     private var outgoing: Sequence<byte>
     private var sent: int
     private var buffer: byte[]
@@ -2090,7 +2090,7 @@ internal class HttpExchange {
         }
     }
 
-    private var uploadRead: Option<Task<Result<int, HttpError>>> = None()
+    private var uploadRead: Optional<Task<Result<int, HttpError>>> = None()
 
     // Outcome observation is part of the existing socket callback adapter: cancellation
     // must settle the outer operation without accessing a cancelled task's result.
@@ -2236,7 +2236,7 @@ internal class HttpSendScope {
     private val source = Promise<Result<HttpResponse, HttpError>>()
     private var callerRegistration: CancellationRegistration? = null
     private var ownerRegistration: CancellationRegistration? = null
-    private var pending: Option<Task<Result<HttpResponse, HttpError>>> = None()
+    private var pending: Optional<Task<Result<HttpResponse, HttpError>>> = None()
     private var closed = false
 
     internal init(request: HttpRequest, caller: CancellationToken, owner: CancellationToken) {

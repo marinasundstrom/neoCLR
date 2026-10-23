@@ -1,14 +1,14 @@
 import System.*
 import System.Result.*
-import System.Option.*
+import System.Optional.*
 
-func Outcome(kind: int, value: byte) -> Result<Option<byte>, ConsoleReadError> {
+func Outcome(kind: int, value: byte) -> Result<Optional<byte>, ConsoleReadError> {
     if kind == 0 {
-        let present: Option<byte> = Some(value)
+        let present: Optional<byte> = Some(value)
         return Ok(present)
     }
     if kind == 1 {
-        let absent: Option<byte> = None()
+        let absent: Optional<byte> = None()
         return Ok(absent)
     }
     if kind == 2 {
@@ -17,7 +17,7 @@ func Outcome(kind: int, value: byte) -> Result<Option<byte>, ConsoleReadError> {
     return Failure(ConsoleReadError.ReadFailed())
 }
 
-func Inspect(item: Result<Option<byte>, ConsoleReadError>) -> int {
+func Inspect(item: Result<Optional<byte>, ConsoleReadError>) -> int {
     if let Ok(option) = item {
         if let Some(value) = option {
             return value

@@ -86,7 +86,7 @@ and `IsValueType`. These classify the represented type, not the descriptor provi
   can still allow further descendants; this flag does not promise transitive closure.
 - `IsUnion` is reserved for structural union identity (author correction, 2026-10-14).
   `NominalTypeInfo.IsUnionDeclaration` separately identifies retained UnionAttribute
-  metadata, including constructed Option/Result declarations but not cases.
+  metadata, including constructed Optional/Result declarations but not cases.
   Guest structural descriptor construction remains gated.
 - `IsEnum` and `IsValueType` retain their existing type-category behavior; enums are
   value types. These predicates are independent rather than mutually exclusive.
@@ -230,7 +230,7 @@ root. It would add TypeInfo as a fourth public match case; no public NestedTypeI
 wrapper is necessary just to place a nested type in a member result.
 
 The assistant recommends `TypeInfo : MemberInfo` with optional declaring-type
-ownership in the unified model: `MemberInfo.DeclaringType: Option<TypeInfo>`.
+ownership in the unified model: `MemberInfo.DeclaringType: Optional<TypeInfo>`.
 Nested types and ordinary type members have an owner; top-level types do not.
 This should land with the retirement of the public System.Type/Type.Info split,
 rather than inventing a non-null owner for a top-level type. Existing field/method/
@@ -244,7 +244,7 @@ be null. Sources: [TypeInfo](https://learn.microsoft.com/en-us/dotnet/api/system
 [Type.MemberType](https://learn.microsoft.com/en-us/dotnet/api/system.type.membertype?view=net-10.0),
 [Type.DeclaringType](https://learn.microsoft.com/en-us/dotnet/api/system.type.declaringtype?view=net-10.0).
 neoCLR can preserve that useful relationship using its own sealed interface model
-and Option ownership, without copying the class hierarchy or null contract.
+and Optional ownership, without copying the class hierarchy or null contract.
 Validation must cover a nested type, a top-level type without an owner, and an
 exhaustive four-case MemberInfo match. This extension was subsequently selected by the author; the implementation below supersedes that proposal status.
 
@@ -667,14 +667,14 @@ No new native services, opcodes, Raven compiler changes or loading behavior are 
 ## TypeInfo as a member — 2026-09-19
 
 `TypeInfo : MemberInfo` is now the fourth sealed member case. Name, Module and
-MetadataToken are inherited. `DeclaringType: Option<TypeInfo>` represents ownership
+MetadataToken are inherited. `DeclaringType: Optional<TypeInfo>` represents ownership
 without inventing an owner for a top-level type. Ordinary fields, methods and
 properties return Some; nested types return their retained declaring definition.
 Arrays, pointers and by-reference wrappers have no declaring type. This deliberately
 breaks three-arm matches and callers that assumed a required DeclaringType.
 
 The implementation follows the .NET comparison above while retaining sealed
-interfaces and Option. The whole family is authored in Descriptors.rvn because
+interfaces and Optional. The whole family is authored in Descriptors.rvn because
 Raven requires sealed cases in the same source file. Source metadata preserves a
 module-scoped declaring TypeDef token; it is not inferred from dotted display names.
 Import retains the owner even when only the nested type is used. Missing owners

@@ -60,7 +60,7 @@ See also the [Raven experiment](../experiments/raven-target/README.md).
 - [Raven target support before library migration](../raven-target-evaluation.md)
 - [Raven target and binary artifact experiment](../raven-target-experiment.md)
 - [Raven target profiles, symbols and emission backends](../raven-target-profiles.md)
-- [Option and Result APIs from Raven](../raven-union-api.md)
+- [Optional and Result APIs from Raven](../raven-union-api.md)
 
 - [Try the completed Raven source port locally](../raven-port-local-build.md) — isolated VS Code workspace and saved-project task.
 
@@ -133,7 +133,7 @@ at static call boundaries, and preserves no-result instance provider methods.
 This is target adaptation, not a Raven compiler emission change.
 
 Validation uses matching regenerated reference/library snapshots, a greeting,
-short-write/ownership tests and both Result/Option patterns: `?` plus
+short-write/ownership tests and both Result/Optional patterns: `?` plus
 `let Some(input) = ... else` and `if let Some(input) = ... { ... } else { ... }`.
 The else guard returns before later use of input. The samples pass normal input,
 EOF, empty lines and malformed UTF-8. APIs are development-only after Preview 9.

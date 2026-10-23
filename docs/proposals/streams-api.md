@@ -292,18 +292,18 @@ if count == 0 {
 This remains preferable to:
 
 ```raven
-Result<Option<Size>, StreamError>
+Result<Optional<Size>, StreamError>
 ```
 
 at the raw byte-stream level.
 
 EOF is part of the byte-stream protocol.
 
-Semantic readers layered above streams may use `Option` where absence has domain meaning:
+Semantic readers layered above streams may use `Optional` where absence has domain meaning:
 
 ```raven
 func ReadLine()
-    -> Task<Result<Option<String>, TextError>>;
+    -> Task<Result<Optional<String>, TextError>>;
 ```
 
 ---

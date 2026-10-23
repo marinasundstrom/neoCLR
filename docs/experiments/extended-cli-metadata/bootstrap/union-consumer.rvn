@@ -1,7 +1,7 @@
 import System.*
 
 func Main() -> int {
-    var some: Option<int> = .Some(40)
+    var some: Optional<int> = .Some(40)
     let copy = some
     some = .None
     var output = 99

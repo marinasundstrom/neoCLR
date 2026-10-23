@@ -94,7 +94,7 @@ that the prototype runs on those systems.
 - Version records currently accept their components without validation, parsing or
   ordering. ProductVersion is shared by macOS/iOS for this experiment only. Decide
   whether platform-specific version types, absent components, Result errors and
-  Option payloads improve the final contract. Numeric formatting is provisional.
+  Optional payloads improve the final contract. Numeric formatting is provisional.
 - Raven uses `sealed record ... permits ...` for this closed hierarchy; it is not
   a new `closed` keyword implementation. Records remain ordinary reference types.
 - Standard union architecture was attempted first. The local CLI build produced

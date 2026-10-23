@@ -1,6 +1,6 @@
 import System.*
 import System.Collections.*
-import System.Option.*
+import System.Optional.*
 
 struct Readings {
     val Sample: float

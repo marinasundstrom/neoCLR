@@ -1,6 +1,6 @@
-# Option, Result and propagation
+# Optional, Result and propagation
 
-Option represents absence; Result represents recoverable failure. Raven patterns extract case values, and ? propagates an outcome to the caller.
+Optional represents absence; Result represents recoverable failure. Raven patterns extract case values, and ? propagates an outcome to the caller.
 
 For error unions, handling and propagation, followed by optional diagnostic conventions, see [Error handling](../error-handling/).
 
@@ -10,13 +10,14 @@ For error unions, handling and propagation, followed by optional diagnostic conv
 applications and dependencies with matching libraries; update construction and patterns.
 `Ok(value)` stays short for the common success path. `Failure(error)` names the
 outcome state; the error is its payload. `System.Error` is the optional diagnostic
-interface for that payload and keeps its name.
+interface for that payload and keeps its name. `Optional<T>` replaces `Option<T>`;
+its `Some(value)` and `None` cases keep their existing behavior.
 
 ## Error and optional-result handling in Raven
 
-A Result or Option does not require a match at every call. Use `?` when the enclosing function should propagate an error. Use a pattern binding for a value that may be absent. A match is useful when the individual cases need different processing or when the application decides how to report an error.
+A Result or Optional does not require a match at every call. Use `?` when the enclosing function should propagate an error. Use a pattern binding for a value that may be absent. A match is useful when the individual cases need different processing or when the application decides how to report an error.
 
-**Development Console example:** `Console.ReadLine()` returns `Result<Option<string>, TextReadError>`. The question mark propagates a read failure. The Some pattern binds the input, while the else branch handles EOF and returns. An empty line is still Some containing an empty string.
+**Development Console example:** `Console.ReadLine()` returns `Result<Optional<string>, TextReadError>`. The question mark propagates a read failure. The Some pattern binds the input, while the else branch handles EOF and returns. An empty line is still Some containing an empty string.
 
 ```raven
 {{CONSOLE_PROPAGATION_SAMPLE}}
@@ -30,11 +31,11 @@ The current compiler spells this linear guard `let Some(input) = ... else`; its 
 {{CONSOLE_IF_LET_SAMPLE}}
 ```
 
-Here input is scoped to the success block. Both forms combine propagation with pattern binding, and both are tested with successful input, EOF, an empty line and invalid UTF-8. These techniques apply to other APIs with compatible Result and Option contracts. [Console API and stream contracts](../../docs/console.html) · [Console feature](../console/) · [Runnable samples](../../samples/console-streams.zip)
+Here input is scoped to the success block. Both forms combine propagation with pattern binding, and both are tested with successful input, EOF, an empty line and invalid UTF-8. These techniques apply to other APIs with compatible Result and Optional contracts. [Console API and stream contracts](../../docs/console.html) · [Console feature](../console/) · [Runnable samples](../../samples/console-streams.zip)
 
 <a id="example"></a>
 
-## Option, Result and propagation in Raven
+## Optional, Result and propagation in Raven
 ```raven
 {{RAVEN_SAMPLE}}
 ```
@@ -106,7 +107,7 @@ contract for supported combinations.
 <a id="operator-list"></a>
 
 ## The current operator set
-| Operation | Option | Result |
+| Operation | Optional | Result |
 | --- | --- | --- |
 | Transform a value | Map | Map |
 | Chain an outcome | Then | Then |
@@ -128,7 +129,7 @@ Raven.Core users will recognize these operators: neoCLR calls Where **Filter** a
 
 ## Behavior and limits
 
-Option and Result are standard Raven unions. Development references use `UnionValue` (formerly `IUnion`); `Value` returns the boxed active case, and `HasValue` reports whether a case is active. Explicit `None` is active. A default carrier is inactive and should not be used to represent absence. Current development `TryGetValue` clears its output to the payload default when the case does not match, matching Raven and native emission; older bridge snapshots preserved it. Prefer patterns and propagation in application code.
+Optional and Result are standard Raven unions. Development references use `UnionValue` (formerly `IUnion`); `Value` returns the boxed active case, and `HasValue` reports whether a case is active. Explicit `None` is active. A default carrier is inactive and should not be used to represent absence. Current development `TryGetValue` clears its output to the payload default when the case does not match, matching Raven and native emission; older bridge snapshots preserved it. Prefer patterns and propagation in application code.
 Unlike exception-based APIs in .NET, recoverable outcomes are in the return type. This makes handling explicit and changes caller code. Runtime faults still exist; Result does not convert every failure into a recoverable case.
 
 [Detailed contract and comparisons →](https://github.com/marinasundstrom/neoCLR/blob/main/docs/raven-union-api.md)

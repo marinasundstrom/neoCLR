@@ -6,7 +6,7 @@ import System.Concurrency.*
 import System.Concurrency.Tasks.*
 import System.IO.*
 import System.Networking.*
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 
 // One consumer, one retained output window and one transport block. Header read-ahead
@@ -18,7 +18,7 @@ internal class HttpBodyInput : InputStream {
     private var extent: int
     private var remaining: int
     private val limit: int
-    private val deadline: Option<NetworkDeadline>
+    private val deadline: Optional<NetworkDeadline>
     private val ownsConnection: bool
     private val emptyOnly: bool
     private var chunks: HttpChunkDecoder? = null
@@ -33,7 +33,7 @@ internal class HttpBodyInput : InputStream {
     private var receiving: Task<Result<int, HttpError>>? = null
 
     internal init(connection: HttpConnection, buffer: byte[], start: int, end: int,
-        length: int, limit: int, deadline: Option<NetworkDeadline>, ownsConnection: bool, emptyOnly: bool) {
+        length: int, limit: int, deadline: Optional<NetworkDeadline>, ownsConnection: bool, emptyOnly: bool) {
         self.connection = connection
         self.buffer = buffer
         position = start

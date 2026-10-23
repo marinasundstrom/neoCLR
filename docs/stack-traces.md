@@ -74,7 +74,7 @@ root-published JIT/AOT profile. The remaining surface below is still planned.
 Provide familiar ordinary library types named System.Diagnostics.StackTrace and
 System.Diagnostics.StackFrame. StackTrace should support explicit current-stack capture,
 FrameCount, indexed GetFrame access, and formatting. StackFrame should expose method
-identity and available code/source locations. Optional metadata follows neoCLR's Option
+identity and available code/source locations. Optional metadata follows neoCLR's Optional
 conventions rather than using null to mean unavailable information.
 
 Fault formatting uses the snapshot captured at failure. Constructing or explicitly

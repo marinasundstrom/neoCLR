@@ -12,7 +12,7 @@ string metadata and culture fallback. Its normal resource model is RESX and
 satellite assemblies. We retain familiar indexer/key fallback and typed scope,
 but use an explicit configured provider and JSON as requested. No ambient culture
 or DI/factory abstraction is required. The cost is explicit configuration and a
-bounded culture catalogue. Result/Option preserve recoverable loading and missing
+bounded culture catalogue. Result/Optional preserve recoverable loading and missing
 lookup outcomes without a per-lookup LocalizedString object.
 
 Primary sources consulted 2026-10-21:

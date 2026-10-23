@@ -4,7 +4,7 @@
 .end
 .method instance get_Keys() -> System.Collections.Sequence<T0>
 .end
-.method instance Find(T0 key) -> System.Option<T1>
+.method instance Find(T0 key) -> System.Optional<T1>
 .end
 .method instance ContainsKey(T0 key) -> Boolean
 .end

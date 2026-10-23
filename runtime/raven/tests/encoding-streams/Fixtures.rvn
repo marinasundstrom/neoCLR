@@ -1,7 +1,7 @@
 module NeoClr.RuntimeTests
 
 import System.*
-import System.Option.*
+import System.Optional.*
 import System.Collections.*
 import System.IO.*
 import System.Concurrency.Tasks.*
@@ -108,7 +108,7 @@ class ProbeSink : OutputStream {
 // The test owns settlement to prove adapters support genuinely pending I/O.
 class PendingInput : InputStream {
     private val source = Promise<Result<int, StreamError>>()
-    private var destination: System.Option<byte[]> = System.Option<byte[]>.None()
+    private var destination: System.Optional<byte[]> = System.Optional<byte[]>.None()
     private var start = 0
     private var requested = false
 
@@ -120,7 +120,7 @@ class PendingInput : InputStream {
             return Task.FromResult(Result<int, StreamError>.Ok(0))
         }
         requested = true
-        destination = System.Option<byte[]>.Some(buffer)
+        destination = System.Optional<byte[]>.Some(buffer)
         start = offset
         return source.Task
     }

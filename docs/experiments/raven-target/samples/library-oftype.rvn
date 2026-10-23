@@ -2,7 +2,7 @@ import System.*
 import System.Collections.*
 import System.Introspection.*
 import System.Linq.*
-import System.Option.*
+import System.Optional.*
 
 public func Check(value: bool, message: string) {
     if !value {

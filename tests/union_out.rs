@@ -10,19 +10,19 @@ fn union_try_get_sample_extracts_a_typed_case() {
 fn all_library_union_cases_support_conditional_managed_output() {
     for (carrier, case, factory) in [
         (
-            "System.Option<String>",
-            "System.Option.Some<String>",
-            "ldstr \"hello\"\nnewobj instance System.Option.Some<String>::.ctor(String)",
+            "System.Optional<String>",
+            "System.Optional.Some<String>",
+            "ldstr \"hello\"\nnewobj instance System.Optional.Some<String>::.ctor(String)",
         ),
         (
-            "System.Option<Void>",
-            "System.Option.Some<Void>",
-            "ldvoid\nnewobj instance System.Option.Some<Void>::.ctor(Void)",
+            "System.Optional<Void>",
+            "System.Optional.Some<Void>",
+            "ldvoid\nnewobj instance System.Optional.Some<Void>::.ctor(Void)",
         ),
         (
-            "System.Option<Int32>",
-            "System.Option.None",
-            "newobj instance System.Option.None::.ctor()",
+            "System.Optional<Int32>",
+            "System.Optional.None",
+            "newobj instance System.Optional.None::.ctor()",
         ),
         (
             "System.Result<Int32,String>",

@@ -91,7 +91,7 @@ migration even when guest metadata is unchanged.
 
 ## Migration map and validation gates
 
-- **Slots, arrays and fields:** Value clone/slot reads, erased Result/Option payloads,
+- **Slots, arrays and fields:** Value clone/slot reads, erased Result/Optional payloads,
   class fields and record components must share a text owner. Check independent
   equal text, aliases, empty strings, embedded NUL, combining sequences and emoji.
 - **VM conversions and dispatch:** literals, castclass/isinst, interface views,

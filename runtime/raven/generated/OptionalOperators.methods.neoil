@@ -1,24 +1,24 @@
-; Generated from runtime/raven/src/System/OptionOperators.rvn. Regenerate with build_runtime_library.py.
-.method static Map<T0,T1>(System.Option<T0> self,fn<T0,T1> mapper) -> System.Option<T1>
-.local System.Option<T0> local0
-.local System.Option<T1> local1
+; Generated from runtime/raven/src/System/OptionalOperators.rvn. Regenerate with build_runtime_library.py.
+.method static Map<T0,T1>(System.Optional<T0> self,fn<T0,T1> mapper) -> System.Optional<T1>
+.local System.Optional<T0> local0
+.local System.Optional<T1> local1
 .local T0 local2
-.local System.Option<T0> local3
-.local System.Option.Some<T0> local4
-.local System.Option<T0> local5
-.local System.Option.None local6
+.local System.Optional<T0> local3
+.local System.Optional.Some<T0> local4
+.local System.Optional<T0> local5
+.local System.Optional.None local6
 ldloca local0
-initobj System.Option<T0>
+initobj System.Optional<T0>
 ldloca local1
-initobj System.Option<T1>
+initobj System.Optional<T1>
 ldloca local3
-initobj System.Option<T0>
+initobj System.Optional<T0>
 ldloca local4
-initobj System.Option.Some<T0>
+initobj System.Optional.Some<T0>
 ldloca local5
-initobj System.Option<T0>
+initobj System.Optional<T0>
 ldloca local6
-initobj System.Option.None
+initobj System.Optional.None
 M00000001_IL_0000:
 M00000001_IL_0001:
 M00000001_IL_0002:
@@ -29,7 +29,7 @@ stloc local0
 M00000001_IL_0005:
 ldloca local1
 M00000001_IL_0007:
-initobj System.Option<T1>
+initobj System.Optional<T1>
 M00000001_IL_000d:
 ldloc local0
 M00000001_IL_000e:
@@ -37,19 +37,19 @@ stloc local3
 M00000001_IL_000f:
 ldloca local4
 M00000001_IL_0011:
-initobj System.Option.Some<T0>
+initobj System.Optional.Some<T0>
 M00000001_IL_0017:
 ldloca local3
 M00000001_IL_0019:
 ldloca local4
 M00000001_IL_001b:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion0<T0>(System.Option<T0>&,System.Option.Some<T0>&)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion0<T0>(System.Optional<T0>&,System.Optional.Some<T0>&)
 M00000001_IL_0020:
 brfalse M00000001_IL_0051
 M00000001_IL_0025:
 ldloca local4
 M00000001_IL_0027:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion1<T0>(System.Option.Some<T0>&)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion1<T0>(System.Optional.Some<T0>&)
 M00000001_IL_002c:
 stloc local2
 M00000001_IL_002d:
@@ -63,9 +63,9 @@ ldloc local2
 M00000001_IL_003c:
 callvirt instance fn<T0,T1>::Invoke(T0)
 M00000001_IL_0041:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion3<T1>(T1)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion3<T1>(T1)
 M00000001_IL_0046:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion4<T1>(System.Option.Some<T1>)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion4<T1>(System.Optional.Some<T1>)
 M00000001_IL_004b:
 stloc local1
 M00000001_IL_004c:
@@ -81,7 +81,7 @@ ldloca local5
 M00000001_IL_0058:
 ldloca local6
 M00000001_IL_005a:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion2<T0>(System.Option<T0>&,System.Option.None&)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion2<T0>(System.Optional<T0>&,System.Optional.None&)
 M00000001_IL_005f:
 brfalse M00000001_IL_0083
 M00000001_IL_0064:
@@ -92,9 +92,9 @@ M00000001_IL_0067:
 M00000001_IL_0068:
 br M00000001_IL_0073
 M00000001_IL_0073:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion5()
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion5()
 M00000001_IL_0078:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion6<T1>(System.Option.None)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion6<T1>(System.Optional.None)
 M00000001_IL_007d:
 stloc local1
 M00000001_IL_007e:
@@ -111,26 +111,26 @@ ldloc local1
 M00000001_IL_008a:
 ret
 .end
-.method static Then<T0,T1>(System.Option<T0> self,fn<T0,System.Option<T1>> binder) -> System.Option<T1>
-.local System.Option<T0> local0
-.local System.Option<T1> local1
+.method static Then<T0,T1>(System.Optional<T0> self,fn<T0,System.Optional<T1>> binder) -> System.Optional<T1>
+.local System.Optional<T0> local0
+.local System.Optional<T1> local1
 .local T0 local2
-.local System.Option<T0> local3
-.local System.Option.Some<T0> local4
-.local System.Option<T0> local5
-.local System.Option.None local6
+.local System.Optional<T0> local3
+.local System.Optional.Some<T0> local4
+.local System.Optional<T0> local5
+.local System.Optional.None local6
 ldloca local0
-initobj System.Option<T0>
+initobj System.Optional<T0>
 ldloca local1
-initobj System.Option<T1>
+initobj System.Optional<T1>
 ldloca local3
-initobj System.Option<T0>
+initobj System.Optional<T0>
 ldloca local4
-initobj System.Option.Some<T0>
+initobj System.Optional.Some<T0>
 ldloca local5
-initobj System.Option<T0>
+initobj System.Optional<T0>
 ldloca local6
-initobj System.Option.None
+initobj System.Optional.None
 M00000002_IL_0000:
 M00000002_IL_0001:
 M00000002_IL_0002:
@@ -141,7 +141,7 @@ stloc local0
 M00000002_IL_0005:
 ldloca local1
 M00000002_IL_0007:
-initobj System.Option<T1>
+initobj System.Optional<T1>
 M00000002_IL_000d:
 ldloc local0
 M00000002_IL_000e:
@@ -149,19 +149,19 @@ stloc local3
 M00000002_IL_000f:
 ldloca local4
 M00000002_IL_0011:
-initobj System.Option.Some<T0>
+initobj System.Optional.Some<T0>
 M00000002_IL_0017:
 ldloca local3
 M00000002_IL_0019:
 ldloca local4
 M00000002_IL_001b:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion0<T0>(System.Option<T0>&,System.Option.Some<T0>&)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion0<T0>(System.Optional<T0>&,System.Optional.Some<T0>&)
 M00000002_IL_0020:
 brfalse M00000002_IL_0047
 M00000002_IL_0025:
 ldloca local4
 M00000002_IL_0027:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion1<T0>(System.Option.Some<T0>&)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion1<T0>(System.Optional.Some<T0>&)
 M00000002_IL_002c:
 stloc local2
 M00000002_IL_002d:
@@ -173,7 +173,7 @@ ldarg 1
 M00000002_IL_003b:
 ldloc local2
 M00000002_IL_003c:
-callvirt instance fn<T0,System.Option<T1>>::Invoke(T0)
+callvirt instance fn<T0,System.Optional<T1>>::Invoke(T0)
 M00000002_IL_0041:
 stloc local1
 M00000002_IL_0042:
@@ -189,7 +189,7 @@ ldloca local5
 M00000002_IL_004e:
 ldloca local6
 M00000002_IL_0050:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion2<T0>(System.Option<T0>&,System.Option.None&)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion2<T0>(System.Optional<T0>&,System.Optional.None&)
 M00000002_IL_0055:
 brfalse M00000002_IL_0079
 M00000002_IL_005a:
@@ -200,9 +200,9 @@ M00000002_IL_005d:
 M00000002_IL_005e:
 br M00000002_IL_0069
 M00000002_IL_0069:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion5()
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion5()
 M00000002_IL_006e:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion6<T1>(System.Option.None)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion6<T1>(System.Optional.None)
 M00000002_IL_0073:
 stloc local1
 M00000002_IL_0074:
@@ -219,14 +219,14 @@ ldloc local1
 M00000002_IL_0080:
 ret
 .end
-.method static Filter<T0>(System.Option<T0> self,fn<T0,Boolean> predicate) -> System.Option<T0>
+.method static Filter<T0>(System.Optional<T0> self,fn<T0,Boolean> predicate) -> System.Optional<T0>
 .local T0 local0
-.local System.Option<T0> local1
-.local System.Option.Some<T0> local2
+.local System.Optional<T0> local1
+.local System.Optional.Some<T0> local2
 ldloca local1
-initobj System.Option<T0>
+initobj System.Optional<T0>
 ldloca local2
-initobj System.Option.Some<T0>
+initobj System.Optional.Some<T0>
 M00000003_IL_0000:
 M00000003_IL_0001:
 M00000003_IL_0002:
@@ -236,19 +236,19 @@ stloc local1
 M00000003_IL_0004:
 ldloca local2
 M00000003_IL_0006:
-initobj System.Option.Some<T0>
+initobj System.Optional.Some<T0>
 M00000003_IL_000c:
 ldloca local1
 M00000003_IL_000e:
 ldloca local2
 M00000003_IL_0010:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion0<T0>(System.Option<T0>&,System.Option.Some<T0>&)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion0<T0>(System.Optional<T0>&,System.Optional.Some<T0>&)
 M00000003_IL_0015:
 brfalse M00000003_IL_002e
 M00000003_IL_001a:
 ldloca local2
 M00000003_IL_001c:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion1<T0>(System.Option.Some<T0>&)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion1<T0>(System.Optional.Some<T0>&)
 M00000003_IL_0021:
 stloc local0
 M00000003_IL_0022:
@@ -263,7 +263,7 @@ M00000003_IL_0035:
 ldloc local0
 M00000003_IL_0036:
 callvirt instance fn<T0,Boolean>::Invoke(T0)
-call neoCLR.Library.System.OptionOperators.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.OptionalOperators.RuntimeBooleanToInt32(Boolean)
 M00000003_IL_003b:
 brtrue M00000003_IL_0045
 M00000003_IL_0040:
@@ -276,31 +276,31 @@ ret
 M00000003_IL_0048:
 M00000003_IL_0049:
 M00000003_IL_004a:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion5()
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion5()
 M00000003_IL_004f:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion7<T0>(System.Option.None)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion7<T0>(System.Optional.None)
 M00000003_IL_0054:
 ret
 .end
-.method static OrElse<T0>(System.Option<T0> self,fn<System.Option<T0>> alternative) -> System.Option<T0>
-.local System.Option<T0> local0
-.local System.Option<T0> local1
-.local System.Option<T0> local2
-.local System.Option.Some<T0> local3
-.local System.Option<T0> local4
-.local System.Option.None local5
+.method static OrElse<T0>(System.Optional<T0> self,fn<System.Optional<T0>> alternative) -> System.Optional<T0>
+.local System.Optional<T0> local0
+.local System.Optional<T0> local1
+.local System.Optional<T0> local2
+.local System.Optional.Some<T0> local3
+.local System.Optional<T0> local4
+.local System.Optional.None local5
 ldloca local0
-initobj System.Option<T0>
+initobj System.Optional<T0>
 ldloca local1
-initobj System.Option<T0>
+initobj System.Optional<T0>
 ldloca local2
-initobj System.Option<T0>
+initobj System.Optional<T0>
 ldloca local3
-initobj System.Option.Some<T0>
+initobj System.Optional.Some<T0>
 ldloca local4
-initobj System.Option<T0>
+initobj System.Optional<T0>
 ldloca local5
-initobj System.Option.None
+initobj System.Optional.None
 M00000004_IL_0000:
 M00000004_IL_0001:
 M00000004_IL_0002:
@@ -311,7 +311,7 @@ stloc local0
 M00000004_IL_0005:
 ldloca local1
 M00000004_IL_0007:
-initobj System.Option<T0>
+initobj System.Optional<T0>
 M00000004_IL_000d:
 ldloc local0
 M00000004_IL_000e:
@@ -319,19 +319,19 @@ stloc local2
 M00000004_IL_000f:
 ldloca local3
 M00000004_IL_0011:
-initobj System.Option.Some<T0>
+initobj System.Optional.Some<T0>
 M00000004_IL_0017:
 ldloca local2
 M00000004_IL_0019:
 ldloca local3
 M00000004_IL_001b:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion0<T0>(System.Option<T0>&,System.Option.Some<T0>&)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion0<T0>(System.Optional<T0>&,System.Optional.Some<T0>&)
 M00000004_IL_0020:
 brfalse M00000004_IL_0041
 M00000004_IL_0025:
 ldloca local3
 M00000004_IL_0027:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion1<T0>(System.Option.Some<T0>&)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion1<T0>(System.Optional.Some<T0>&)
 M00000004_IL_002c:
 pop
 M00000004_IL_002d:
@@ -355,7 +355,7 @@ ldloca local4
 M00000004_IL_0048:
 ldloca local5
 M00000004_IL_004a:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion2<T0>(System.Option<T0>&,System.Option.None&)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion2<T0>(System.Optional<T0>&,System.Optional.None&)
 M00000004_IL_004f:
 brfalse M00000004_IL_006f
 M00000004_IL_0054:
@@ -368,7 +368,7 @@ br M00000004_IL_0063
 M00000004_IL_0063:
 ldarg 1
 M00000004_IL_0064:
-callvirt instance fn<System.Option<T0>>::Invoke()
+callvirt instance fn<System.Optional<T0>>::Invoke()
 M00000004_IL_0069:
 stloc local1
 M00000004_IL_006a:
@@ -385,24 +385,24 @@ ldloc local1
 M00000004_IL_0076:
 ret
 .end
-.method static UnwrapOrElse<T0>(System.Option<T0> self,fn<T0> factory) -> T0
-.local System.Option<T0> local0
+.method static UnwrapOrElse<T0>(System.Optional<T0> self,fn<T0> factory) -> T0
+.local System.Optional<T0> local0
 .local T0 local1
 .local T0 local2
-.local System.Option<T0> local3
-.local System.Option.Some<T0> local4
-.local System.Option<T0> local5
-.local System.Option.None local6
+.local System.Optional<T0> local3
+.local System.Optional.Some<T0> local4
+.local System.Optional<T0> local5
+.local System.Optional.None local6
 ldloca local0
-initobj System.Option<T0>
+initobj System.Optional<T0>
 ldloca local3
-initobj System.Option<T0>
+initobj System.Optional<T0>
 ldloca local4
-initobj System.Option.Some<T0>
+initobj System.Optional.Some<T0>
 ldloca local5
-initobj System.Option<T0>
+initobj System.Optional<T0>
 ldloca local6
-initobj System.Option.None
+initobj System.Optional.None
 M00000005_IL_0000:
 M00000005_IL_0001:
 M00000005_IL_0002:
@@ -417,19 +417,19 @@ stloc local3
 M00000005_IL_0007:
 ldloca local4
 M00000005_IL_0009:
-initobj System.Option.Some<T0>
+initobj System.Optional.Some<T0>
 M00000005_IL_000f:
 ldloca local3
 M00000005_IL_0011:
 ldloca local4
 M00000005_IL_0013:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion0<T0>(System.Option<T0>&,System.Option.Some<T0>&)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion0<T0>(System.Optional<T0>&,System.Optional.Some<T0>&)
 M00000005_IL_0018:
 brfalse M00000005_IL_0039
 M00000005_IL_001d:
 ldloca local4
 M00000005_IL_001f:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion1<T0>(System.Option.Some<T0>&)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion1<T0>(System.Optional.Some<T0>&)
 M00000005_IL_0024:
 stloc local2
 M00000005_IL_0025:
@@ -453,7 +453,7 @@ ldloca local5
 M00000005_IL_0040:
 ldloca local6
 M00000005_IL_0042:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion2<T0>(System.Option<T0>&,System.Option.None&)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion2<T0>(System.Optional<T0>&,System.Optional.None&)
 M00000005_IL_0047:
 brfalse M00000005_IL_0067
 M00000005_IL_004c:
@@ -483,24 +483,24 @@ ldloc local1
 M00000005_IL_006e:
 ret
 .end
-.method static UnwrapOr<T0>(System.Option<T0> self,T0 defaultValue) -> T0
-.local System.Option<T0> local0
+.method static UnwrapOr<T0>(System.Optional<T0> self,T0 defaultValue) -> T0
+.local System.Optional<T0> local0
 .local T0 local1
 .local T0 local2
-.local System.Option<T0> local3
-.local System.Option.Some<T0> local4
-.local System.Option<T0> local5
-.local System.Option.None local6
+.local System.Optional<T0> local3
+.local System.Optional.Some<T0> local4
+.local System.Optional<T0> local5
+.local System.Optional.None local6
 ldloca local0
-initobj System.Option<T0>
+initobj System.Optional<T0>
 ldloca local3
-initobj System.Option<T0>
+initobj System.Optional<T0>
 ldloca local4
-initobj System.Option.Some<T0>
+initobj System.Optional.Some<T0>
 ldloca local5
-initobj System.Option<T0>
+initobj System.Optional<T0>
 ldloca local6
-initobj System.Option.None
+initobj System.Optional.None
 M00000006_IL_0000:
 M00000006_IL_0001:
 M00000006_IL_0002:
@@ -515,19 +515,19 @@ stloc local3
 M00000006_IL_0007:
 ldloca local4
 M00000006_IL_0009:
-initobj System.Option.Some<T0>
+initobj System.Optional.Some<T0>
 M00000006_IL_000f:
 ldloca local3
 M00000006_IL_0011:
 ldloca local4
 M00000006_IL_0013:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion0<T0>(System.Option<T0>&,System.Option.Some<T0>&)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion0<T0>(System.Optional<T0>&,System.Optional.Some<T0>&)
 M00000006_IL_0018:
 brfalse M00000006_IL_0039
 M00000006_IL_001d:
 ldloca local4
 M00000006_IL_001f:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion1<T0>(System.Option.Some<T0>&)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion1<T0>(System.Optional.Some<T0>&)
 M00000006_IL_0024:
 stloc local2
 M00000006_IL_0025:
@@ -551,7 +551,7 @@ ldloca local5
 M00000006_IL_0040:
 ldloca local6
 M00000006_IL_0042:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion2<T0>(System.Option<T0>&,System.Option.None&)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion2<T0>(System.Optional<T0>&,System.Optional.None&)
 M00000006_IL_0047:
 brfalse M00000006_IL_0062
 M00000006_IL_004c:
@@ -579,24 +579,24 @@ ldloc local1
 M00000006_IL_0069:
 ret
 .end
-.method static Match<T0,T1>(System.Option<T0> self,fn<T0,T1> some,fn<T1> none) -> T1
-.local System.Option<T0> local0
+.method static Match<T0,T1>(System.Optional<T0> self,fn<T0,T1> some,fn<T1> none) -> T1
+.local System.Optional<T0> local0
 .local T1 local1
 .local T0 local2
-.local System.Option<T0> local3
-.local System.Option.Some<T0> local4
-.local System.Option<T0> local5
-.local System.Option.None local6
+.local System.Optional<T0> local3
+.local System.Optional.Some<T0> local4
+.local System.Optional<T0> local5
+.local System.Optional.None local6
 ldloca local0
-initobj System.Option<T0>
+initobj System.Optional<T0>
 ldloca local3
-initobj System.Option<T0>
+initobj System.Optional<T0>
 ldloca local4
-initobj System.Option.Some<T0>
+initobj System.Optional.Some<T0>
 ldloca local5
-initobj System.Option<T0>
+initobj System.Optional<T0>
 ldloca local6
-initobj System.Option.None
+initobj System.Optional.None
 M00000007_IL_0000:
 M00000007_IL_0001:
 M00000007_IL_0002:
@@ -611,19 +611,19 @@ stloc local3
 M00000007_IL_0007:
 ldloca local4
 M00000007_IL_0009:
-initobj System.Option.Some<T0>
+initobj System.Optional.Some<T0>
 M00000007_IL_000f:
 ldloca local3
 M00000007_IL_0011:
 ldloca local4
 M00000007_IL_0013:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion0<T0>(System.Option<T0>&,System.Option.Some<T0>&)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion0<T0>(System.Optional<T0>&,System.Optional.Some<T0>&)
 M00000007_IL_0018:
 brfalse M00000007_IL_003f
 M00000007_IL_001d:
 ldloca local4
 M00000007_IL_001f:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion1<T0>(System.Option.Some<T0>&)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion1<T0>(System.Optional.Some<T0>&)
 M00000007_IL_0024:
 stloc local2
 M00000007_IL_0025:
@@ -651,7 +651,7 @@ ldloca local5
 M00000007_IL_0046:
 ldloca local6
 M00000007_IL_0048:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion2<T0>(System.Option<T0>&,System.Option.None&)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion2<T0>(System.Optional<T0>&,System.Optional.None&)
 M00000007_IL_004d:
 brfalse M00000007_IL_006d
 M00000007_IL_0052:
@@ -681,14 +681,14 @@ ldloc local1
 M00000007_IL_0074:
 ret
 .end
-.method static Tap<T0>(System.Option<T0> self,fn<T0,Void> action) -> System.Option<T0>
+.method static Tap<T0>(System.Optional<T0> self,fn<T0,Void> action) -> System.Optional<T0>
 .local T0 local0
-.local System.Option<T0> local1
-.local System.Option.Some<T0> local2
+.local System.Optional<T0> local1
+.local System.Optional.Some<T0> local2
 ldloca local1
-initobj System.Option<T0>
+initobj System.Optional<T0>
 ldloca local2
-initobj System.Option.Some<T0>
+initobj System.Optional.Some<T0>
 M00000008_IL_0000:
 M00000008_IL_0001:
 M00000008_IL_0002:
@@ -698,19 +698,19 @@ stloc local1
 M00000008_IL_0004:
 ldloca local2
 M00000008_IL_0006:
-initobj System.Option.Some<T0>
+initobj System.Optional.Some<T0>
 M00000008_IL_000c:
 ldloca local1
 M00000008_IL_000e:
 ldloca local2
 M00000008_IL_0010:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion0<T0>(System.Option<T0>&,System.Option.Some<T0>&)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion0<T0>(System.Optional<T0>&,System.Optional.Some<T0>&)
 M00000008_IL_0015:
 brfalse M00000008_IL_002e
 M00000008_IL_001a:
 ldloca local2
 M00000008_IL_001c:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion1<T0>(System.Option.Some<T0>&)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion1<T0>(System.Optional.Some<T0>&)
 M00000008_IL_0021:
 stloc local0
 M00000008_IL_0022:
@@ -734,13 +734,13 @@ ldarg 0
 M00000008_IL_003f:
 ret
 .end
-.method static TapNone<T0>(System.Option<T0> self,fn<Void> action) -> System.Option<T0>
-.local System.Option<T0> local0
-.local System.Option.None local1
+.method static TapNone<T0>(System.Optional<T0> self,fn<Void> action) -> System.Optional<T0>
+.local System.Optional<T0> local0
+.local System.Optional.None local1
 ldloca local0
-initobj System.Option<T0>
+initobj System.Optional<T0>
 ldloca local1
-initobj System.Option.None
+initobj System.Optional.None
 M00000009_IL_0000:
 M00000009_IL_0001:
 M00000009_IL_0002:
@@ -752,7 +752,7 @@ ldloca local0
 M00000009_IL_0006:
 ldloca local1
 M00000009_IL_0008:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion2<T0>(System.Option<T0>&,System.Option.None&)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion2<T0>(System.Optional<T0>&,System.Optional.None&)
 M00000009_IL_000d:
 brfalse M00000009_IL_0020
 M00000009_IL_0012:
@@ -777,17 +777,17 @@ ldarg 0
 M00000009_IL_002f:
 ret
 .end
-.method static ToIterable<T0>(System.Option<T0> self) -> System.Collections.Iterable<T0>
+.method static ToIterable<T0>(System.Optional<T0> self) -> System.Collections.Iterable<T0>
 .local System.Collections.ArrayList<T0> local0
 .local T0 local1
-.local System.Option<T0> local2
-.local System.Option.Some<T0> local3
+.local System.Optional<T0> local2
+.local System.Optional.Some<T0> local3
 ldloca local0
 initobj System.Collections.ArrayList<T0>
 ldloca local2
-initobj System.Option<T0>
+initobj System.Optional<T0>
 ldloca local3
-initobj System.Option.Some<T0>
+initobj System.Optional.Some<T0>
 M0000000a_IL_0000:
 M0000000a_IL_0001:
 newobj instance System.Collections.ArrayList<T0>::.ctor()
@@ -801,19 +801,19 @@ stloc local2
 M0000000a_IL_000a:
 ldloca local3
 M0000000a_IL_000c:
-initobj System.Option.Some<T0>
+initobj System.Optional.Some<T0>
 M0000000a_IL_0012:
 ldloca local2
 M0000000a_IL_0014:
 ldloca local3
 M0000000a_IL_0016:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion0<T0>(System.Option<T0>&,System.Option.Some<T0>&)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion0<T0>(System.Optional<T0>&,System.Optional.Some<T0>&)
 M0000000a_IL_001b:
 brfalse M0000000a_IL_0034
 M0000000a_IL_0020:
 ldloca local3
 M0000000a_IL_0022:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion1<T0>(System.Option.Some<T0>&)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion1<T0>(System.Optional.Some<T0>&)
 M0000000a_IL_0027:
 stloc local1
 M0000000a_IL_0028:
@@ -835,26 +835,26 @@ ldloc local0
 M0000000a_IL_0044:
 ret
 .end
-.method static ThenResult<T0,T1,T2>(System.Option<T0> self,fn<T0,System.Result<T1,T2>> binder,fn<T2> noneError) -> System.Result<T1,T2>
-.local System.Option<T0> local0
+.method static ThenResult<T0,T1,T2>(System.Optional<T0> self,fn<T0,System.Result<T1,T2>> binder,fn<T2> noneError) -> System.Result<T1,T2>
+.local System.Optional<T0> local0
 .local System.Result<T1,T2> local1
 .local T0 local2
-.local System.Option<T0> local3
-.local System.Option.Some<T0> local4
-.local System.Option<T0> local5
-.local System.Option.None local6
+.local System.Optional<T0> local3
+.local System.Optional.Some<T0> local4
+.local System.Optional<T0> local5
+.local System.Optional.None local6
 ldloca local0
-initobj System.Option<T0>
+initobj System.Optional<T0>
 ldloca local1
 initobj System.Result<T1,T2>
 ldloca local3
-initobj System.Option<T0>
+initobj System.Optional<T0>
 ldloca local4
-initobj System.Option.Some<T0>
+initobj System.Optional.Some<T0>
 ldloca local5
-initobj System.Option<T0>
+initobj System.Optional<T0>
 ldloca local6
-initobj System.Option.None
+initobj System.Optional.None
 M0000000b_IL_0000:
 M0000000b_IL_0001:
 M0000000b_IL_0002:
@@ -873,19 +873,19 @@ stloc local3
 M0000000b_IL_000f:
 ldloca local4
 M0000000b_IL_0011:
-initobj System.Option.Some<T0>
+initobj System.Optional.Some<T0>
 M0000000b_IL_0017:
 ldloca local3
 M0000000b_IL_0019:
 ldloca local4
 M0000000b_IL_001b:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion0<T0>(System.Option<T0>&,System.Option.Some<T0>&)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion0<T0>(System.Optional<T0>&,System.Optional.Some<T0>&)
 M0000000b_IL_0020:
 brfalse M0000000b_IL_0047
 M0000000b_IL_0025:
 ldloca local4
 M0000000b_IL_0027:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion1<T0>(System.Option.Some<T0>&)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion1<T0>(System.Optional.Some<T0>&)
 M0000000b_IL_002c:
 stloc local2
 M0000000b_IL_002d:
@@ -913,7 +913,7 @@ ldloca local5
 M0000000b_IL_004e:
 ldloca local6
 M0000000b_IL_0050:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion2<T0>(System.Option<T0>&,System.Option.None&)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion2<T0>(System.Optional<T0>&,System.Optional.None&)
 M0000000b_IL_0055:
 brfalse M0000000b_IL_007f
 M0000000b_IL_005a:
@@ -928,9 +928,9 @@ ldarg 2
 M0000000b_IL_006a:
 callvirt instance fn<T2>::Invoke()
 M0000000b_IL_006f:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion8<T2>(T2)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion8<T2>(T2)
 M0000000b_IL_0074:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion9<T1,T2>(System.Result.Failure<T2>)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion9<T1,T2>(System.Result.Failure<T2>)
 M0000000b_IL_0079:
 stloc local1
 M0000000b_IL_007a:
@@ -947,26 +947,26 @@ ldloc local1
 M0000000b_IL_0086:
 ret
 .end
-.method static MapResult<T0,T1,T2>(System.Option<T0> self,fn<T0,T1> mapper,fn<T2> noneError) -> System.Result<T1,T2>
-.local System.Option<T0> local0
+.method static MapResult<T0,T1,T2>(System.Optional<T0> self,fn<T0,T1> mapper,fn<T2> noneError) -> System.Result<T1,T2>
+.local System.Optional<T0> local0
 .local System.Result<T1,T2> local1
 .local T0 local2
-.local System.Option<T0> local3
-.local System.Option.Some<T0> local4
-.local System.Option<T0> local5
-.local System.Option.None local6
+.local System.Optional<T0> local3
+.local System.Optional.Some<T0> local4
+.local System.Optional<T0> local5
+.local System.Optional.None local6
 ldloca local0
-initobj System.Option<T0>
+initobj System.Optional<T0>
 ldloca local1
 initobj System.Result<T1,T2>
 ldloca local3
-initobj System.Option<T0>
+initobj System.Optional<T0>
 ldloca local4
-initobj System.Option.Some<T0>
+initobj System.Optional.Some<T0>
 ldloca local5
-initobj System.Option<T0>
+initobj System.Optional<T0>
 ldloca local6
-initobj System.Option.None
+initobj System.Optional.None
 M0000000c_IL_0000:
 M0000000c_IL_0001:
 M0000000c_IL_0002:
@@ -985,19 +985,19 @@ stloc local3
 M0000000c_IL_000f:
 ldloca local4
 M0000000c_IL_0011:
-initobj System.Option.Some<T0>
+initobj System.Optional.Some<T0>
 M0000000c_IL_0017:
 ldloca local3
 M0000000c_IL_0019:
 ldloca local4
 M0000000c_IL_001b:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion0<T0>(System.Option<T0>&,System.Option.Some<T0>&)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion0<T0>(System.Optional<T0>&,System.Optional.Some<T0>&)
 M0000000c_IL_0020:
 brfalse M0000000c_IL_0051
 M0000000c_IL_0025:
 ldloca local4
 M0000000c_IL_0027:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion1<T0>(System.Option.Some<T0>&)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion1<T0>(System.Optional.Some<T0>&)
 M0000000c_IL_002c:
 stloc local2
 M0000000c_IL_002d:
@@ -1011,9 +1011,9 @@ ldloc local2
 M0000000c_IL_003c:
 callvirt instance fn<T0,T1>::Invoke(T0)
 M0000000c_IL_0041:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion10<T1>(T1)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion10<T1>(T1)
 M0000000c_IL_0046:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion11<T1,T2>(System.Result.Ok<T1>)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion11<T1,T2>(System.Result.Ok<T1>)
 M0000000c_IL_004b:
 stloc local1
 M0000000c_IL_004c:
@@ -1029,7 +1029,7 @@ ldloca local5
 M0000000c_IL_0058:
 ldloca local6
 M0000000c_IL_005a:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion2<T0>(System.Option<T0>&,System.Option.None&)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion2<T0>(System.Optional<T0>&,System.Optional.None&)
 M0000000c_IL_005f:
 brfalse M0000000c_IL_0089
 M0000000c_IL_0064:
@@ -1044,9 +1044,9 @@ ldarg 2
 M0000000c_IL_0074:
 callvirt instance fn<T2>::Invoke()
 M0000000c_IL_0079:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion8<T2>(T2)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion8<T2>(T2)
 M0000000c_IL_007e:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion9<T1,T2>(System.Result.Failure<T2>)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion9<T1,T2>(System.Result.Failure<T2>)
 M0000000c_IL_0083:
 stloc local1
 M0000000c_IL_0084:
@@ -1063,26 +1063,26 @@ ldloc local1
 M0000000c_IL_0090:
 ret
 .end
-.method static OkOr<T0,T1>(System.Option<T0> self,T1 error) -> System.Result<T0,T1>
-.local System.Option<T0> local0
+.method static OkOr<T0,T1>(System.Optional<T0> self,T1 error) -> System.Result<T0,T1>
+.local System.Optional<T0> local0
 .local System.Result<T0,T1> local1
 .local T0 local2
-.local System.Option<T0> local3
-.local System.Option.Some<T0> local4
-.local System.Option<T0> local5
-.local System.Option.None local6
+.local System.Optional<T0> local3
+.local System.Optional.Some<T0> local4
+.local System.Optional<T0> local5
+.local System.Optional.None local6
 ldloca local0
-initobj System.Option<T0>
+initobj System.Optional<T0>
 ldloca local1
 initobj System.Result<T0,T1>
 ldloca local3
-initobj System.Option<T0>
+initobj System.Optional<T0>
 ldloca local4
-initobj System.Option.Some<T0>
+initobj System.Optional.Some<T0>
 ldloca local5
-initobj System.Option<T0>
+initobj System.Optional<T0>
 ldloca local6
-initobj System.Option.None
+initobj System.Optional.None
 M0000000d_IL_0000:
 M0000000d_IL_0001:
 M0000000d_IL_0002:
@@ -1101,19 +1101,19 @@ stloc local3
 M0000000d_IL_000f:
 ldloca local4
 M0000000d_IL_0011:
-initobj System.Option.Some<T0>
+initobj System.Optional.Some<T0>
 M0000000d_IL_0017:
 ldloca local3
 M0000000d_IL_0019:
 ldloca local4
 M0000000d_IL_001b:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion0<T0>(System.Option<T0>&,System.Option.Some<T0>&)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion0<T0>(System.Optional<T0>&,System.Optional.Some<T0>&)
 M0000000d_IL_0020:
 brfalse M0000000d_IL_004b
 M0000000d_IL_0025:
 ldloca local4
 M0000000d_IL_0027:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion1<T0>(System.Option.Some<T0>&)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion1<T0>(System.Optional.Some<T0>&)
 M0000000d_IL_002c:
 stloc local2
 M0000000d_IL_002d:
@@ -1123,9 +1123,9 @@ M0000000d_IL_0039:
 M0000000d_IL_003a:
 ldloc local2
 M0000000d_IL_003b:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion12<T0>(T0)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion12<T0>(T0)
 M0000000d_IL_0040:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion13<T0,T1>(System.Result.Ok<T0>)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion13<T0,T1>(System.Result.Ok<T0>)
 M0000000d_IL_0045:
 stloc local1
 M0000000d_IL_0046:
@@ -1141,7 +1141,7 @@ ldloca local5
 M0000000d_IL_0052:
 ldloca local6
 M0000000d_IL_0054:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion2<T0>(System.Option<T0>&,System.Option.None&)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion2<T0>(System.Optional<T0>&,System.Optional.None&)
 M0000000d_IL_0059:
 brfalse M0000000d_IL_007e
 M0000000d_IL_005e:
@@ -1154,9 +1154,9 @@ br M0000000d_IL_006d
 M0000000d_IL_006d:
 ldarg 1
 M0000000d_IL_006e:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion14<T1>(T1)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion14<T1>(T1)
 M0000000d_IL_0073:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion15<T0,T1>(System.Result.Failure<T1>)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion15<T0,T1>(System.Result.Failure<T1>)
 M0000000d_IL_0078:
 stloc local1
 M0000000d_IL_0079:
@@ -1173,26 +1173,26 @@ ldloc local1
 M0000000d_IL_0085:
 ret
 .end
-.method static OkOr<T0,T1>(System.Option<T0> self,fn<T1> errorFactory) -> System.Result<T0,T1>
-.local System.Option<T0> local0
+.method static OkOr<T0,T1>(System.Optional<T0> self,fn<T1> errorFactory) -> System.Result<T0,T1>
+.local System.Optional<T0> local0
 .local System.Result<T0,T1> local1
 .local T0 local2
-.local System.Option<T0> local3
-.local System.Option.Some<T0> local4
-.local System.Option<T0> local5
-.local System.Option.None local6
+.local System.Optional<T0> local3
+.local System.Optional.Some<T0> local4
+.local System.Optional<T0> local5
+.local System.Optional.None local6
 ldloca local0
-initobj System.Option<T0>
+initobj System.Optional<T0>
 ldloca local1
 initobj System.Result<T0,T1>
 ldloca local3
-initobj System.Option<T0>
+initobj System.Optional<T0>
 ldloca local4
-initobj System.Option.Some<T0>
+initobj System.Optional.Some<T0>
 ldloca local5
-initobj System.Option<T0>
+initobj System.Optional<T0>
 ldloca local6
-initobj System.Option.None
+initobj System.Optional.None
 M0000000e_IL_0000:
 M0000000e_IL_0001:
 M0000000e_IL_0002:
@@ -1211,19 +1211,19 @@ stloc local3
 M0000000e_IL_000f:
 ldloca local4
 M0000000e_IL_0011:
-initobj System.Option.Some<T0>
+initobj System.Optional.Some<T0>
 M0000000e_IL_0017:
 ldloca local3
 M0000000e_IL_0019:
 ldloca local4
 M0000000e_IL_001b:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion0<T0>(System.Option<T0>&,System.Option.Some<T0>&)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion0<T0>(System.Optional<T0>&,System.Optional.Some<T0>&)
 M0000000e_IL_0020:
 brfalse M0000000e_IL_004b
 M0000000e_IL_0025:
 ldloca local4
 M0000000e_IL_0027:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion1<T0>(System.Option.Some<T0>&)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion1<T0>(System.Optional.Some<T0>&)
 M0000000e_IL_002c:
 stloc local2
 M0000000e_IL_002d:
@@ -1233,9 +1233,9 @@ M0000000e_IL_0039:
 M0000000e_IL_003a:
 ldloc local2
 M0000000e_IL_003b:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion12<T0>(T0)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion12<T0>(T0)
 M0000000e_IL_0040:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion13<T0,T1>(System.Result.Ok<T0>)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion13<T0,T1>(System.Result.Ok<T0>)
 M0000000e_IL_0045:
 stloc local1
 M0000000e_IL_0046:
@@ -1251,7 +1251,7 @@ ldloca local5
 M0000000e_IL_0052:
 ldloca local6
 M0000000e_IL_0054:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion2<T0>(System.Option<T0>&,System.Option.None&)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion2<T0>(System.Optional<T0>&,System.Optional.None&)
 M0000000e_IL_0059:
 brfalse M0000000e_IL_0083
 M0000000e_IL_005e:
@@ -1266,9 +1266,9 @@ ldarg 1
 M0000000e_IL_006e:
 callvirt instance fn<T1>::Invoke()
 M0000000e_IL_0073:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion14<T1>(T1)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion14<T1>(T1)
 M0000000e_IL_0078:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion15<T0,T1>(System.Result.Failure<T1>)
+call neoCLR.Library.System.OptionalOperators.RuntimeUnion15<T0,T1>(System.Result.Failure<T1>)
 M0000000e_IL_007d:
 stloc local1
 M0000000e_IL_007e:

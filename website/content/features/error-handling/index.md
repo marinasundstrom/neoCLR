@@ -8,7 +8,7 @@ of error handling in neoCLR's APIs.
 ## Describe outcomes with unions
 
 `Result<T, E>` is a union with two cases: `Ok(T)` carries the successful value and
-`Failure(E)` carries the failure. `Option<T>` uses `Some(T)` and `None` when absence
+`Failure(E)` carries the failure. `Optional<T>` uses `Some(T)` and `None` when absence
 is enough and there is no error to explain.
 
 The error type can itself be a union. FileReadError, for example, distinguishes
@@ -19,7 +19,7 @@ failure.
 
 Errors can also be ordinary classes, structs or strings. Neither Result nor
 propagation requires an error interface or a common base class. The author of an
-API chooses the contract it exposes. [Option and Result](../outcomes/) covers the
+API chooses the contract it exposes. [Optional and Result](../outcomes/) covers the
 containers and their composition operators.
 
 ## Propagate when the caller should decide
@@ -96,7 +96,7 @@ message. WithContext wraps only the failure channel and preserves the typed caus
 ```
 
 Here `context.Cause` remains a FileReadError; through System.Error, Cause is an
-`Option<Error>`. A lazy message factory runs only on failure. `FormatError()` renders
+`Optional<Error>`. A lazy message factory runs only on failure. `FormatError()` renders
 the cause chain and at most one existing trace when the application reports the error.
 These conventions add diagnostics familiar from exceptions through composition;
 they do not change the rules for unions, recovery or propagation.

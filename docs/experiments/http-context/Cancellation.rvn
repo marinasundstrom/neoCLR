@@ -1,7 +1,7 @@
 import System.*
 import System.Concurrency.*
 import System.Networking.Sockets.*
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 import System.Concurrency.Tasks.*
 import System.Web.Http.*
@@ -10,9 +10,9 @@ class CancellationProbe {
     private var server: HttpServer
     private var stop: CancellationTokenSource = CancellationTokenSource()
     private var pending: Task<Result<HttpContext, HttpError>>
-    private var connecting: Option<Task<Result<Socket, SocketError>>> = None()
-    private var connection: Option<Socket> = None()
-    private var reading: Option<Task<Result<int, SocketError>>> = None()
+    private var connecting: Optional<Task<Result<Socket, SocketError>>> = None()
+    private var connection: Optional<Socket> = None()
+    private var reading: Optional<Task<Result<int, SocketError>>> = None()
     private var buffer: byte[] = [(byte)0]
 
     init(server: HttpServer) {

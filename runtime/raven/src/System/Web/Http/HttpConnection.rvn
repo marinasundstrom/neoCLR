@@ -3,7 +3,7 @@ module System.Web.Http
 import System.*
 import System.IO.*
 import System.Result.*
-import System.Option.*
+import System.Optional.*
 import System.Concurrency.*
 import System.Concurrency.Tasks.*
 import System.Networking.*
@@ -13,8 +13,8 @@ import System.Networking.Security.*
 // HTTP keeps its deadline across every underlying TLS read/write, including handshake.
 internal class HttpSocketStream : InputStream, OutputStream {
     private val socket: Socket
-    internal var Deadline: Option<NetworkDeadline> = None()
-    internal var LastError: Option<SocketError> = None()
+    internal var Deadline: Optional<NetworkDeadline> = None()
+    internal var LastError: Optional<SocketError> = None()
     internal init(socket: Socket) { self.socket = socket }
     func Read(buffer: byte[], offset: int, count: int) -> Task<Result<int, StreamError>> {
         return Read(buffer, offset, count, CancellationToken.None)

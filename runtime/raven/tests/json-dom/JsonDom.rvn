@@ -140,12 +140,12 @@ func JsonMapLookup() -> Result<unit, TestFailure> {
     _ = Assert.Equal(2, map.Count)?
     _ = Assert.True(Object.ReferenceEquals(nullNode, map["name"]), "Indexer retains JsonNull identity")?
     _ = Assert.True(Object.ReferenceEquals(textNode, document["Name"]), "Concrete indexer retains node identity")?
-    if map.Find("name") is System.Option<JsonValue>.Some(let node) {
+    if map.Find("name") is System.Optional<JsonValue>.Some(let node) {
         _ = Assert.True(Object.ReferenceEquals(node, nullNode), "Find distinguishes present null")?
     } else {
         return Assert.True(false, "Present JsonNull must be Some")
     }
-    _ = Assert.True(map.Find("absent") is System.Option<JsonValue>.None, "Absent key is None")?
+    _ = Assert.True(map.Find("absent") is System.Optional<JsonValue>.None, "Absent key is None")?
     return Assert.True(map.ContainsKey("name") && !map.ContainsKey("NAME"), "Keys use ordinal equality")
 }
 
@@ -205,7 +205,7 @@ func JsonMapEmpty() -> Result<unit, TestFailure> {
     use pairs = map.GetIterator()
     _ = Assert.True(!pairs.MoveNext(), "Empty pair iterator")?
     _ = Assert.True(!map.ContainsKey("missing"), "Empty membership")?
-    return Assert.True(map.Find("missing") is System.Option<JsonValue>.None, "Empty safe lookup")
+    return Assert.True(map.Find("missing") is System.Optional<JsonValue>.None, "Empty safe lookup")
 }
 
 [Test("JSON sequence indexing retains node identity and explicit null")]

@@ -193,7 +193,7 @@ should remain `TypeDef`-based nominal types.
 Likewise:
 
 ```raven
-union Option<T>
+union Optional<T>
 {
     Some(T),
     None
@@ -633,7 +633,7 @@ being a type expression composed from two nominal types.
 
 ---
 
-# 15. Nullability and `Option<T>`
+# 15. Nullability and `Optional<T>`
 
 NeoCLR should preserve the distinction between:
 
@@ -644,7 +644,7 @@ String?
 and:
 
 ```raven
-Option<String>
+Optional<String>
 ```
 
 The former is a nullable type expression.
@@ -659,9 +659,9 @@ String?
     nullable String reference/value
 
 
-Option<String>
+Optional<String>
 
-    nominal type Option<String>
+    nominal type Optional<String>
     cases:
         Some(String)
         None
@@ -1686,8 +1686,8 @@ This allows Introspection and other metadata systems to refer directly to:
 ```text
 Result.Ok
 Result.Err
-Option.Some
-Option.None
+Optional.Some
+Optional.None
 ```
 
 without manufacturing identifiers from names.
@@ -2368,7 +2368,7 @@ A nominal union is already a `TypeDef`, so existing metadata readers can recogni
 For example:
 
 ```raven
-union Option<T>
+union Optional<T>
 {
     Some(T),
     None
@@ -2378,7 +2378,7 @@ union Option<T>
 can physically remain:
 
 ```text
-TypeDef Option<T>
+TypeDef Optional<T>
 ```
 
 with NeoCLR-specific metadata describing:
@@ -2394,7 +2394,7 @@ cases:
 An existing reader can still report:
 
 ```text
-Option<T>
+Optional<T>
 ```
 
 as a type.

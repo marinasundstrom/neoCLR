@@ -74,11 +74,11 @@ False:
 fn option_void_is_success_or_absence_even_without_a_payload() {
     for (factory, success) in [
         (
-            "ldvoid\nnewobj instance System.Option.Some<Void>::.ctor(Void)\nnewobj instance System.Option<Void>::.ctor(System.Option.Some<Void>)",
+            "ldvoid\nnewobj instance System.Optional.Some<Void>::.ctor(Void)\nnewobj instance System.Optional<Void>::.ctor(System.Optional.Some<Void>)",
             true,
         ),
         (
-            "ldvoid\ncall System.Option<Void>::FromResidual(Void)",
+            "ldvoid\ncall System.Optional<Void>::FromResidual(Void)",
             false,
         ),
     ] {
@@ -87,14 +87,14 @@ fn option_void_is_success_or_absence_even_without_a_payload() {
 .module VoidPropagation
 .entry Main
 .function Main() -> Boolean
-    .local System.Option<Void> carrier
+    .local System.Optional<Void> carrier
     .local Void payload
     {factory}
     stloc carrier
     ldloca carrier
-    interface.borrow System.Propagatable<System.Option<Void>,Void,Void>
+    interface.borrow System.Propagatable<System.Optional<Void>,Void,Void>
     ldloca payload
-    callvirt instance System.Propagatable<System.Option<Void>,Void,Void>::TryGetOutput(Void&)
+    callvirt instance System.Propagatable<System.Optional<Void>,Void,Void>::TryGetOutput(Void&)
     brfalse Absent
     ldloc payload
     pop
@@ -102,9 +102,9 @@ fn option_void_is_success_or_absence_even_without_a_payload() {
     ret
 Absent:
     ldloca carrier
-    interface.borrow System.Propagatable<System.Option<Void>,Void,Void>
+    interface.borrow System.Propagatable<System.Optional<Void>,Void,Void>
     ldloca payload
-    callvirt instance System.Propagatable<System.Option<Void>,Void,Void>::TryGetResidual(Void&)
+    callvirt instance System.Propagatable<System.Optional<Void>,Void,Void>::TryGetResidual(Void&)
     brfalse Invalid
     ldloc payload
     pop

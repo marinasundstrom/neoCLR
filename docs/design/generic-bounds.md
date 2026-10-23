@@ -167,7 +167,7 @@ declared contract. Native neoCLR support requires its own lowering and validatio
 
 Syntax semantics agree across targets. Runtime failure transport and text coordinates
 remain explicit platform differences: .NET APIs may throw and use UTF-16 positions;
-neoCLR consuming APIs have Fault/Option/Result contracts and grapheme string indexing.
+neoCLR consuming APIs have Fault/Optional/Result contracts and grapheme string indexing.
 This work does not make identical string offsets denote identical text on both targets.
 Slice copy/view policy also remains a property of the consuming API.
 
@@ -247,7 +247,7 @@ Interval should be enumerable. No new public API is selected in this slice.
 
 Assistant recommendation: bounds describe positions; slicing belongs to an explicitly
 conforming receiver. Compare a Slice method with a Range indexer, including output
-shape, allocation versus view ownership, coordinate units and Fault/Option/Result
+shape, allocation versus view ownership, coordinate units and Fault/Optional/Result
 behavior. Do not equate indexability with slicing or impose slicing on all types.
 
 Ordering does not imply stepping. Keep a potential Interval<T> independent of

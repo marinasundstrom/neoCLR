@@ -62,24 +62,24 @@ CopyPassed:
     fault "heap sharing failed"
 SharingPassed:
     ldvoid
-    newobj instance System.Option.Some<Void>::.ctor(Void)
-    newobj instance System.Option<Void>::.ctor(System.Option.Some<Void>)
+    newobj instance System.Optional.Some<Void>::.ctor(Void)
+    newobj instance System.Optional<Void>::.ctor(System.Optional.Some<Void>)
     dup
-    call instance System.Option<Void>::get_IsSome()
+    call instance System.Optional<Void>::get_IsSome()
     brtrue SomePassed
     fault "Some<Void> failed"
 SomePassed:
-    call instance System.Option<Void>::GetSomeCase()
-    call instance System.Option.Some<Void>::get_Value()
+    call instance System.Optional<Void>::GetSomeCase()
+    call instance System.Optional.Some<Void>::get_Value()
     pop
-    newobj instance System.Option.None::.ctor()
-    newobj instance System.Option<Void>::.ctor(System.Option.None)
+    newobj instance System.Optional.None::.ctor()
+    newobj instance System.Optional<Void>::.ctor(System.Optional.None)
     dup
-    call instance System.Option<Void>::get_IsNone()
+    call instance System.Optional<Void>::get_IsNone()
     brtrue NonePassed
     fault "None<Void> failed"
 NonePassed:
-    call instance System.Option<Void>::GetNoneCase()
+    call instance System.Optional<Void>::GetNoneCase()
     pop
 
     ; A parse failure is data; explicitly handle it and continue.

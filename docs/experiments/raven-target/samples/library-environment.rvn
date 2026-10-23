@@ -1,9 +1,9 @@
 import System.*
 import System.Console.*
 
-func Read(name: string) -> Result<Option<string>, EnvironmentError> {
+func Read(name: string) -> Result<Optional<string>, EnvironmentError> {
     let value = Environment.GetEnvironmentVariable(name)?
-    return Result<Option<string>, EnvironmentError>.Ok(value)
+    return Result<Optional<string>, EnvironmentError>.Ok(value)
 }
 
 func Show(name: string) {

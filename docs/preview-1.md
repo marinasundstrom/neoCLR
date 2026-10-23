@@ -16,7 +16,7 @@ From a fresh clone, a developer can build without .NET installed, assemble and v
 a small program, run it, and understand the deliberate semantic differences. They can
 read console input, compute a result, handle an expected Error, and see an actionable
 Fault trace when an execution contract is violated. They can inspect the library's own
-IL and see ordinary types implementing Option and Result rather than hidden union opcodes.
+IL and see ordinary types implementing Optional and Result rather than hidden union opcodes.
 
 Position the release as an original, experimental .NET-inspired VM with familiar CLI
 concepts. Do not claim .NET binary compatibility, a production runtime, a security
@@ -31,9 +31,9 @@ may remain unnamed; neoCLR is sufficient as the runtime codename for the preview
 | Execution fundamentals | Primitive values, free functions, calls/overloads, indexed parameters/locals, control flow, real Void, value copying | Implemented; preserve semantics through remaining changes |
 | Metadata and modules | Explicit types/members/signatures, generic type definitions and closed use, properties/accessors, module references and member identities | Implemented; current JSON is a documented prototype representation |
 | Ordinary type contracts | Public/internal type visibility, public/internal/private members, usable constructors with defined receiver and initialization behavior | Implemented and exercised by ordinary carrier construction, extraction and copy tests |
-| Ordinary unions | Carrier/variant convention sufficient for Option<T> and Result<T,TError>, including Void, nested carriers, and Result<T,T> | Implemented: ordinary carriers and overloaded TryGet(out Case&), using temporary System.Value payload storage; see the storage boundary below |
+| Ordinary unions | Carrier/variant convention sufficient for Optional<T> and Result<T,TError>, including Void, nested carriers, and Result<T,T> | Implemented: ordinary carriers and overloaded TryGet(out Case&), using temporary System.Value payload storage; see the storage boundary below |
 | No union-specific IL | Library, samples, native result construction and host inputs use ordinary types; remove special union operations and encodings | Implemented in format 4; old artifacts require reassembly |
-| Minimal library and console | Useful Int32/String/Error APIs; console input/output; EOF distinct from input failure; an interactive program | Implemented using raw byte input and immediate line output; `ReadByte` uses the ordinary nested Result/Option boundary. General ReadLine is not required |
+| Minimal library and console | Useful Int32/String/Error APIs; console input/output; EOF distinct from input failure; an interactive program | Implemented using raw byte input and immediate line output; `ReadByte` uses the ordinary nested Result/Optional boundary. General ReadLine is not required |
 | Minimal reflection | Obtain a System.Type-style descriptor from a type token or value, compare identity, read its name, inspect closed generic arguments | Implemented via type-only ldtoken, System.Type and declared-type System.TypeOf<T>.Of; no dynamic object dispatch |
 | Memory and arrays | Explicit pointers/allocation/free, record storage, small usable array/buffer example, documented lifetime and copy rules | Implemented: native-layout Array<T> views and ArrayList<T> with explicit release. No automatic cleanup or arbitrary-payload collection promise |
 | Managed references and interfaces | Call-scoped typed references, output parameters, explicit receiver views and a small useful interface set | Implemented: T&, out/out(true), reference receivers, List<T> and Equatable<T>; no escaping references or automatic ownership |
@@ -47,7 +47,7 @@ claim that a particular release commit has passed those remote jobs.
 
 Preview 1 can retain narrow, explicitly labeled bootstrap host helpers for console, text,
 numeric conversion and I/O where platform code still lacks the necessary primitives.
-It cannot retain union-specific execution as the final Option/Result implementation.
+It cannot retain union-specific execution as the final Optional/Result implementation.
 A JSON artifact format is acceptable for the source preview; a CLI binary reader/writer
 and compatibility with existing .NET tooling are later work, not achieved by using JSON.
 
@@ -76,7 +76,7 @@ platform direction or settle the future System.Object representation.
 
 System.Value packing allocates an owned host value tree; copying recursively copies
 owned payloads. This is a real allocation cost. It is not an allocation-free union
-representation or a native ABI. Option/Result and several host boundaries still rely
+representation or a native ABI. Optional/Result and several host boundaries still rely
 on it, even though their cases, methods and extraction are ordinary library types
 and IL. Managed slot references cannot be stored in it.
 
@@ -118,7 +118,7 @@ define the central behavioral set; embedding/native checks below cover its platf
 - **Interactive computation:** prompt before input, read a number, compute a result,
   distinguish EOF/empty input, report an ordinary input Error, and finish normally.
 - **Ordinary library types and unions:** construct a type with non-public representation,
-  read it through an accessor, copy/update explicitly, and handle Option/Result cases
+  read it through an accessor, copy/update explicitly, and handle Optional/Result cases
   through the final ordinary member contract. No bootstrap union opcodes may remain.
 - **Read-only type inspection:** obtain and compare descriptors for primitives and a
   closed generic record, display their names, and inspect the generic arguments. Verify

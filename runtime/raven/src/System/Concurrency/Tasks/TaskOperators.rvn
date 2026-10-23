@@ -1,7 +1,7 @@
 module System.Concurrency.Tasks
 
 import System.*
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 import System.Concurrency.Tasks.TaskOutcome.*
 

@@ -15,11 +15,11 @@ inputs. Contracts.rvn demonstrates a custom short-writing OutputStream, text wri
 ownership, sequential line reading and raw standard output.
 
 See the [on-site Console guide](../../../api-docs/console.md) for the .NET/Node
-comparison, Result/Option contracts, LF/CRLF limitation, byte limits, embedding
+comparison, Result/Optional contracts, LF/CRLF limitation, byte limits, embedding
 hooks and wrapper ownership. This is synchronous console I/O, not runtime suspension.
 
 
-Propagation.rvn and IfLet.rvn show Result/Option composition without nested matches:
+Propagation.rvn and IfLet.rvn show Result/Optional composition without nested matches:
 `?` propagates a read error, and a Some binding distinguishes actual input from EOF.
 The guard form returns from its else branch; the if-let form scopes input inside
 its success block. Both preserve empty input lines as valid strings. Main is the

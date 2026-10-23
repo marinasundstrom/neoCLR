@@ -3,24 +3,24 @@
 .closedhierarchy
 .method instance GetCustomAttributesData() -> System.Collections.Sequence<System.Introspection.CustomAttributeData>
 .end
-.method instance get_MetadataToken() -> System.Option<Int32>
+.method instance get_MetadataToken() -> System.Optional<Int32>
 .end
-.method instance get_Module() -> System.Option<System.Introspection.ModuleInfo>
+.method instance get_Module() -> System.Optional<System.Introspection.ModuleInfo>
 .end
 .method instance get_Name() -> String
 .end
-.method instance get_DeclaringType() -> System.Option<System.Introspection.TypeInfo>
+.method instance get_DeclaringType() -> System.Optional<System.Introspection.TypeInfo>
 .end
-.property instance MetadataToken() -> System.Option<Int32>
+.property instance MetadataToken() -> System.Optional<Int32>
 .get instance System.Introspection.MemberInfo::get_MetadataToken()
 .end
-.property instance Module() -> System.Option<System.Introspection.ModuleInfo>
+.property instance Module() -> System.Optional<System.Introspection.ModuleInfo>
 .get instance System.Introspection.MemberInfo::get_Module()
 .end
 .property instance Name() -> String
 .get instance System.Introspection.MemberInfo::get_Name()
 .end
-.property instance DeclaringType() -> System.Option<System.Introspection.TypeInfo>
+.property instance DeclaringType() -> System.Optional<System.Introspection.TypeInfo>
 .get instance System.Introspection.MemberInfo::get_DeclaringType()
 .end
 .end

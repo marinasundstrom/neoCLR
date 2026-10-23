@@ -1,10 +1,10 @@
 module Example.Unions
 
 import System.*
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 
-func Unwrap(option: Option<int>) -> int {
+func Unwrap(option: Optional<int>) -> int {
     let Some(value) = option else {
         return 2
     }
@@ -12,8 +12,8 @@ func Unwrap(option: Option<int>) -> int {
 }
 
 func Main() -> int {
-    let present = Option<int>.Some(40)
-    let absent = Option<int>.None()
+    let present = Optional<int>.Some(40)
+    let absent = Optional<int>.None()
     if Unwrap(absent) != 2 {
         return 1
     }

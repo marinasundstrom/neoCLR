@@ -441,7 +441,7 @@ real; the additional builders, decoder surface and extraction operation are prop
 | --- | --- | --- | --- |
 | Incremental decode | UTF-8 decoder produces string chunks | UTF-8 decoder produces Text chunks | Accept byte input with final-input flag and named output budget. Return text, consumed bytes and status; failures retain progress and byte error location. |
 | Construction | StringBuilder: Append(string), Build → string, Clear | TextBuilder: Append(Text), Build → Text, Clear | Append valid text; Build preserves an immutable snapshot. Reuse cannot mutate prior results. Appends can combine into one grapheme. |
-| Delimiter extraction | AfterOrdinal(string, delimiter) → Option<string> | AfterOrdinal(Text, delimiter) → Option<Text> | First exact delimiter match; Some(empty) differs from None. No caller byte arithmetic. Prototype empty delimiter matches the start; a public API must document that choice. |
+| Delimiter extraction | AfterOrdinal(string, delimiter) → Optional<string> | AfterOrdinal(Text, delimiter) → Optional<Text> | First exact delimiter match; Some(empty) differs from None. No caller byte arithmetic. Prototype empty delimiter matches the start; a public API must document that choice. |
 | Explicit representation | UTF-8 encode(string) → bytes | UTF-8 encode(Text) → bytes | Encoding conversion is explicit. Renaming the input does not change validity, ownership or byte count. |
 
 These are signature descriptions, not Raven declarations. `TextAccumulator` in the

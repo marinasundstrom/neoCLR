@@ -10,12 +10,12 @@ static class ProcessBindings
         ("System.Console", "OpenStandardInput", [], "System.IO.InputStream"),
         ("System.Console", "OpenStandardOutput", [], "System.IO.OutputStream"),
         ("System.Console", "OpenStandardError", [], "System.IO.OutputStream"),
-        ("System.Console", "PeekChar", [], "System.Result<System.Option<Char>,System.IO.TextReadError>"),
-        ("System.Console", "ReadChar", [], "System.Result<System.Option<Char>,System.IO.TextReadError>"),
+        ("System.Console", "PeekChar", [], "System.Result<System.Optional<Char>,System.IO.TextReadError>"),
+        ("System.Console", "ReadChar", [], "System.Result<System.Optional<Char>,System.IO.TextReadError>"),
         ("System.Console", "Read", ["Int32"], "System.Result<String,System.IO.TextReadError>"),
         ("System.Console", "Read", ["Int32", "Int32"], "System.Result<String,System.IO.TextReadError>"),
-        ("System.Console", "ReadLine", [], "System.Result<System.Option<String>,System.IO.TextReadError>"),
-        ("System.Console", "ReadLine", ["Int32"], "System.Result<System.Option<String>,System.IO.TextReadError>"),
+        ("System.Console", "ReadLine", [], "System.Result<System.Optional<String>,System.IO.TextReadError>"),
+        ("System.Console", "ReadLine", ["Int32"], "System.Result<System.Optional<String>,System.IO.TextReadError>"),
         ("System.Console", "Write", ["String"], "void"),
         ("System.Console", "Write", ["Int32"], "void"),
         ("System.Console", "WriteLine", [], "void"),
@@ -33,10 +33,10 @@ static class ProcessBindings
         ("System.Console", "WriteLine", ["UInt64"], "void"),
         ("System.Console", "WriteLine", ["IntPtr"], "void"),
         ("System.Console", "WriteLine", ["UIntPtr"], "void"),
-        ("System.Console", "ReadByte", [], "System.Result<System.Option<Byte>,System.ConsoleReadError>"),
+        ("System.Console", "ReadByte", [], "System.Result<System.Optional<Byte>,System.ConsoleReadError>"),
         ("System.Environment", "GetCommandLineArgs", [], "arrayref<String>"),
         ("System.Environment", "GetCurrentDirectory", [], "System.Result<String,System.EnvironmentError>"),
-        ("System.Environment", "GetEnvironmentVariable", ["String"], "System.Result<System.Option<String>,System.EnvironmentError>")
+        ("System.Environment", "GetEnvironmentVariable", ["String"], "System.Result<System.Optional<String>,System.EnvironmentError>")
     ];
     public const string ConsoleDeclaration = """
         public static Result<ConsoleKeyReader, ConsoleKeyError> OpenKeyInput() => default;
@@ -49,9 +49,9 @@ static class ProcessBindings
         public static void WriteLine(string format, object? arg0, object? arg1) { }
         public static void WriteLine(string format, object? arg0, object? arg1, object? arg2) { }
         public static void WriteLine(string format, params object?[] arguments) { }
-        public static Result<Option<byte>, ConsoleReadError> ReadByte() => default;
-        public static Result<Option<char>, IO.TextReadError> PeekChar() => default;
-        public static Result<Option<char>, IO.TextReadError> ReadChar() => default;
+        public static Result<Optional<byte>, ConsoleReadError> ReadByte() => default;
+        public static Result<Optional<char>, IO.TextReadError> PeekChar() => default;
+        public static Result<Optional<char>, IO.TextReadError> ReadChar() => default;
         public static Result<string, IO.TextReadError> Read(int count) => default;
         public static Result<string, IO.TextReadError> Read(int count, int maxUtf8Bytes) => default;
         public static IO.SyncTextReader In => default;
@@ -60,8 +60,8 @@ static class ProcessBindings
         public static IO.SyncInputStream OpenStandardInput() => default;
         public static IO.SyncOutputStream OpenStandardOutput() => default;
         public static IO.SyncOutputStream OpenStandardError() => default;
-        public static Result<Option<string>, IO.TextReadError> ReadLine() => default;
-        public static Result<Option<string>, IO.TextReadError> ReadLine(int maxUtf8Bytes) => default;
+        public static Result<Optional<string>, IO.TextReadError> ReadLine() => default;
+        public static Result<Optional<string>, IO.TextReadError> ReadLine(int maxUtf8Bytes) => default;
         public static void Write(string value0) { }
         public static void Write(int value0) { }
         public static void WriteLine() { }
@@ -146,12 +146,12 @@ static class ProcessBindings
             F12 = 283
         }
         public struct ConsoleKeyInfo : EquatableTo<ConsoleKeyInfo> {
-            public ConsoleKeyInfo(ConsoleKey key, bool shift, bool alt, bool control, Option<int> textScalar) { }
+            public ConsoleKeyInfo(ConsoleKey key, bool shift, bool alt, bool control, Optional<int> textScalar) { }
             public ConsoleKey Key => default;
             public bool Shift => default;
             public bool Alt => default;
             public bool Control => default;
-            public Option<int> TextScalar => default;
+            public Optional<int> TextScalar => default;
             public bool Equals(ConsoleKeyInfo other) => default;
             public override bool Equals(object? obj) => default;
             public override int GetHashCode() => default;
@@ -160,7 +160,7 @@ static class ProcessBindings
         }
         public class ConsoleKeyReader : Disposable {
             internal ConsoleKeyReader() { }
-            public Result<Option<ConsoleKeyInfo>, ConsoleKeyError> ReadKey() => default;
+            public Result<Optional<ConsoleKeyInfo>, ConsoleKeyError> ReadKey() => default;
             public Result<PropagationUnit, ConsoleKeyError> Close() => default;
             public void Dispose() { }
         }
@@ -263,7 +263,7 @@ static class ProcessBindings
             public static Architecture OSArchitecture => default;
             public static string[] GetCommandLineArgs() => default;
             public static Result<string, EnvironmentError> GetCurrentDirectory() => default;
-            public static Result<Option<string>, EnvironmentError> GetEnvironmentVariable(string name) => default;
+            public static Result<Optional<string>, EnvironmentError> GetEnvironmentVariable(string name) => default;
         }
         """;
     public static string? ArrayType(TypeReference type) => type is ArrayType { IsVector: true } array

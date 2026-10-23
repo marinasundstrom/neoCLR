@@ -263,7 +263,7 @@ stfld System.IO.StreamReader::leaveOpen
 M00000004_IL_0048:
 ret
 .end
-.method instance ReadLine(Int32 maxUtf8Bytes) -> System.Result<System.Option<String>,System.IO.TextReadError>
+.method instance ReadLine(Int32 maxUtf8Bytes) -> System.Result<System.Optional<String>,System.IO.TextReadError>
 .local arrayref<Byte> local0
 .local System.Collections.ArrayList<Byte> local1
 .local Int32 local2
@@ -274,7 +274,7 @@ ret
 .local System.Result<String,System.Text.Utf8SliceError> local7
 .local String local8
 .local Int32 local9
-.local System.Option<String> local10
+.local System.Optional<String> local10
 .local System.Result<String,System.IO.TextReadError> local11
 .local String local12
 .local System.IO.TextReadError local13
@@ -303,7 +303,7 @@ initobj System.Result<String,System.Text.Utf8SliceError>
 ldc.i4 0
 stloc local9
 ldloca local10
-initobj System.Option<String>
+initobj System.Optional<String>
 ldloca local11
 initobj System.Result<String,System.IO.TextReadError>
 ldloca local13
@@ -788,15 +788,15 @@ M00000005_IL_0287:
 M00000005_IL_0288:
 call neoCLR.Library.System.IO.StreamReader.RuntimeUnion2()
 M00000005_IL_028d:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion3(System.Option.None)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion3(System.Optional.None)
 M00000005_IL_0292:
 stloc local10
 M00000005_IL_0294:
 ldloc local10
 M00000005_IL_0296:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion4(System.Option<String>)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion4(System.Optional<String>)
 M00000005_IL_029b:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion5(System.Result.Ok<System.Option<String>>)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion5(System.Result.Ok<System.Optional<String>>)
 M00000005_IL_02a0:
 ret
 M00000005_IL_02a1:
@@ -1861,16 +1861,16 @@ M00000009_IL_003f:
 M00000009_IL_0040:
 ret
 .end
-.method static DecodeLine(System.Collections.Sequence<Byte> bytes,Int32 length) -> System.Result<System.Option<String>,System.IO.TextReadError>
+.method static DecodeLine(System.Collections.Sequence<Byte> bytes,Int32 length) -> System.Result<System.Optional<String>,System.IO.TextReadError>
 .local arrayref<Byte> local0
 .local Int32 local1
 .local System.Result<String,System.Text.InvalidUtf8Error> local2
-.local System.Result<System.Option<String>,System.IO.TextReadError> local3
+.local System.Result<System.Optional<String>,System.IO.TextReadError> local3
 .local String local4
 .local System.Result<String,System.Text.InvalidUtf8Error> local5
 .local System.Result.Ok<String> local6
-.local System.Option<String> local7
-.local System.Result<System.Option<String>,System.IO.TextReadError> local8
+.local System.Optional<String> local7
+.local System.Result<System.Optional<String>,System.IO.TextReadError> local8
 .local System.Result<String,System.Text.InvalidUtf8Error> local9
 .local System.Result.Failure<System.Text.InvalidUtf8Error> local10
 ldloca local0
@@ -1880,15 +1880,15 @@ stloc local1
 ldloca local2
 initobj System.Result<String,System.Text.InvalidUtf8Error>
 ldloca local3
-initobj System.Result<System.Option<String>,System.IO.TextReadError>
+initobj System.Result<System.Optional<String>,System.IO.TextReadError>
 ldloca local5
 initobj System.Result<String,System.Text.InvalidUtf8Error>
 ldloca local6
 initobj System.Result.Ok<String>
 ldloca local7
-initobj System.Option<String>
+initobj System.Optional<String>
 ldloca local8
-initobj System.Result<System.Option<String>,System.IO.TextReadError>
+initobj System.Result<System.Optional<String>,System.IO.TextReadError>
 ldloca local9
 initobj System.Result<String,System.Text.InvalidUtf8Error>
 ldloca local10
@@ -1955,7 +1955,7 @@ stloc local2
 M00000006_IL_003b:
 ldloca local3
 M00000006_IL_003d:
-initobj System.Result<System.Option<String>,System.IO.TextReadError>
+initobj System.Result<System.Optional<String>,System.IO.TextReadError>
 M00000006_IL_0043:
 M00000006_IL_0044:
 ldloc local2
@@ -1989,15 +1989,15 @@ ldloc local4
 M00000006_IL_0076:
 call neoCLR.Library.System.IO.StreamReader.RuntimeUnion15(String)
 M00000006_IL_007b:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion16(System.Option.Some<String>)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion16(System.Optional.Some<String>)
 M00000006_IL_0080:
 stloc local7
 M00000006_IL_0082:
 ldloc local7
 M00000006_IL_0084:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion4(System.Option<String>)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion4(System.Optional<String>)
 M00000006_IL_0089:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion5(System.Result.Ok<System.Option<String>>)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion5(System.Result.Ok<System.Optional<String>>)
 M00000006_IL_008e:
 stloc local8
 M00000006_IL_0090:

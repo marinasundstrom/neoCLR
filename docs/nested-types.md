@@ -2,7 +2,7 @@
 
 Status: [name-plus-arity identity](type-arities.md), ordinary nested ownership and
 [generic lexical owners](design/extended-cli-metadata.md#generic-lexical-nesting-gap-closure-2026-10-11)
-are implemented. System Option/Result cases use non-generic companions.
+are implemented. System Optional/Result cases use non-generic companions.
 The user clarified that case types
 are ordinary nested types and generic unions should use a non-generic companion type.
 This supersedes the earlier exploration of selectively capturing outer parameters.
@@ -59,7 +59,7 @@ and typed queries describe acceptance. This does not create subtype/assignabilit
 between the carrier and its case types or between differently constructed carriers.
 
 The prototype now uses System.Result.Error<T>, System.Result.Ok<T>,
-System.Option.Some<T> and System.Option.None as ordinary nested case types.
+System.Optional.Some<T> and System.Optional.None as ordinary nested case types.
 The older top-level wrappers and their extraction methods have been removed, and
 callers must reassemble against the new library. The nested Result.Error case is
 independent of the error payload type (the legacy System.Error message wrapper is retired).
@@ -148,7 +148,7 @@ and callable values are still separate prerequisites.
 ## Validation
 
 Same-name definitions with different generic arities, ordinary companion nesting,
-and generic lexical owners are implemented. Option/Result cases use their companion
+and generic lexical owners are implemented. Optional/Result cases use their companion
 owners; generic enclosing ownership is also used by compiler-generated generator
 frames. See the [generic lexical metadata checkpoint](design/extended-cli-metadata.md#generic-lexical-nesting-gap-closure-2026-10-11).
 

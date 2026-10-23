@@ -1,5 +1,5 @@
 import System.*
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 import System.IO.*
 import System.Text.*
@@ -67,7 +67,7 @@ func ObserveWrite(task: Task<Result<int, StreamError>>) -> Task<unit> {
     return observed.Task
 }
 
-func ObserveRead(task: Task<Result<Option<char>, TextReadError>>) -> Task<unit> {
+func ObserveRead(task: Task<Result<Optional<char>, TextReadError>>) -> Task<unit> {
     let observed = Promise<unit>()
     task.OnCompleted(() => { _ = observed.Complete(()) })
     return observed.Task
@@ -86,14 +86,14 @@ func Text(result: Result<string, TextReadError>, expected: string) {
     }
 }
 
-func Character(result: Result<Option<char>, TextReadError>, expected: string) {
+func Character(result: Result<Optional<char>, TextReadError>, expected: string) {
     match result {
         Ok(Some(let value)) => Check(String.CompareOrdinal(value.ToString(), expected) == 0, "Grapheme bytes")
         _ => System.Fail("Expected character")
     }
 }
 
-func End(result: Result<Option<char>, TextReadError>) {
+func End(result: Result<Optional<char>, TextReadError>) {
     match result {
         Ok(None) => { }
         _ => System.Fail("Expected character EOF")

@@ -1,9 +1,9 @@
 module System
 
 import System.*
-import System.Option.*
+import System.Optional.*
 
-public union Option<T>: Propagatable<Option<T>, T, System.Void> {
+public union Optional<T>: Propagatable<Optional<T>, T, System.Void> {
     /// Represents an available value.
     case Some(T)
 
@@ -27,6 +27,6 @@ public union Option<T>: Propagatable<Option<T>, T, System.Void> {
     }
 
     /// Constructs an empty option from a propagated residual.
-    static func FromResidual(residual: System.Void) -> Option<T> => None
+    static func FromResidual(residual: System.Void) -> Optional<T> => None
 
 }

@@ -7,7 +7,7 @@ saved program on neoCLR. The sibling tools directory contains the copied compile
 language server and importer. This snapshot is not a published release.
 
 Choose **Terminal → Run Task → neoCLR: Run saved project**, or the default build task.
-The initial ArrayList/Option/Result example prints 42, Completed, Price overflow,
+The initial ArrayList/Optional/Result example prints 42, Completed, Price overflow,
 Skipped, Product not found, Skipped. The examples folder contains normal BindingFlags,
 typeof/reflection and array programs; copy one into Main.rvn to try it.
 Raven's ordinary Run/Debug commands target .NET, so use the neoCLR task here.

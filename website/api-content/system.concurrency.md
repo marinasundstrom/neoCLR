@@ -20,6 +20,6 @@ cancelling callback work. Cancelled callback tasks stop their schedule. Timers r
 invocation scheduler progress; they do not create threads.
 
 `CancellationTokenSource.CancelAfter(delay)` schedules a cancellation request and
-replaces an earlier countdown. `CancelAfter(Option<Duration>.None())` disables it.
+replaces an earlier countdown. `CancelAfter(Optional<Duration>.None())` disables it.
 Cancel and Dispose release the countdown. An already requested source cannot be reset;
 operations must still acknowledge cancellation and finish their cleanup.

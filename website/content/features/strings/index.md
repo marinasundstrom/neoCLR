@@ -84,7 +84,7 @@ Ordinal and OrdinalIgnoreCase policies, comparing character storage directly.
 For example, composed and decomposed accents match canonically but differ ordinally.
 
 Character represents a grapheme, while `UnicodeScalar` owns scalar category checks.
-Successful Character/Option construction can allocate under the current representation;
+Successful Character/Optional construction can allocate under the current representation;
 a borrowed Character byte view remains future work. See the [Character reference](/docs/api/System/Character/index.html).
 
 ## Search text

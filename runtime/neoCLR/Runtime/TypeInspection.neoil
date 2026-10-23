@@ -26,7 +26,7 @@
 .function neoCLR.Runtime.TypeGenericArguments(System.RuntimeTypeHandle type) -> System.Type[]
     .methodimpl InternalCall
 .end
-.function neoCLR.Runtime.TypeElementType(System.RuntimeTypeHandle type) -> System.Option<System.Type>
+.function neoCLR.Runtime.TypeElementType(System.RuntimeTypeHandle type) -> System.Optional<System.Type>
     .methodimpl InternalCall
 .end
 .function neoCLR.Runtime.TypeShape(System.RuntimeTypeHandle type, Int32 kind) -> Boolean
@@ -35,7 +35,7 @@
 .function neoCLR.Runtime.TypeDisplayName(System.RuntimeTypeHandle type, Int32 kind) -> String
     .methodimpl InternalCall
 .end
-.function neoCLR.Runtime.TypeBaseType(System.RuntimeTypeHandle type) -> System.Option<System.Type>
+.function neoCLR.Runtime.TypeBaseType(System.RuntimeTypeHandle type) -> System.Optional<System.Type>
     .methodimpl InternalCall
 .end
 

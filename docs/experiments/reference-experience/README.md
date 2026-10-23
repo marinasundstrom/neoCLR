@@ -26,7 +26,7 @@ or source contract is changed.
 
 ## Current usability pass (2026-09-09)
 
-The workflow now imports `PurchaseError.*`, `System.Result.*` and `System.Option.*`.
+The workflow now imports `PurchaseError.*`, `System.Result.*` and `System.Optional.*`.
 It constructs independent cases with `Ok(receipt)` and `Error(error)`, then uses
 `let … else` and `if let` to inspect outcomes. It also checks zero-quantity rejection,
 while preserving the existing successful output. These are compiler/library usability
@@ -51,7 +51,7 @@ cost, not evidence that runtime reference semantics need changing.
 
 The service contracts continue to express distinct intentions:
 
-- `Product&` shares inventory, and lookup returns that same reference through Option.
+- `Product&` shares inventory, and lookup returns that same reference through Optional.
 - `Receipt` is a value snapshot; later price changes cannot alter its recorded total.
 - `readonly ArrayList<Product&>&` limits access through the catalog view, while its
   Product& elements still refer to mutable products. Readonly remains shallow.

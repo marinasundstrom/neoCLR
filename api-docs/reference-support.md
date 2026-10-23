@@ -7,7 +7,7 @@ runtime providers and private helpers are outside this public inventory.
 
 Many sample programs use [ArrayList](xref:System.Collections.ArrayList`1),
 [HashMap](xref:System.Collections.HashMap`2), [Sequence](xref:System.Collections.Sequence`1),
-[Option](xref:System.Option`1), [Result](xref:System.Result`2), [Function shapes](functions.md)
+[Optional](xref:System.Optional`1), [Result](xref:System.Result`2), [Function shapes](functions.md)
 and [query operators](xref:System.Linq.Operators). Their member references supplement
 the [collections](/features/collections/), [outcomes](/features/outcomes/) and
 [Function types](/features/functions/) walkthroughs.

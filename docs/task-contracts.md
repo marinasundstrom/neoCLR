@@ -226,7 +226,7 @@ Rename TaskCompletionSource<T> to Promise<T> and producer calls from
 TrySetResult(value) to Complete(value), and use Cancel()
 for an operation's explicit cancelled completion. Both return bool and preserve the
 first terminal outcome. TaskState is a normal enum; TaskOutcome<T> uses the same
-bootstrap union metadata/storage protocol as Option and Result. The proposal's union
+bootstrap union metadata/storage protocol as Optional and Result. The proposal's union
 notation is conceptual; consumers use Raven case construction and nested patterns.
 No Propagatable contract is attached to TaskOutcome: it does not overload `?`.
 

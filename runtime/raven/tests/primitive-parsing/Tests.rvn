@@ -2,7 +2,7 @@ module NeoClr.RuntimeTests
 
 import System.*
 import System.Result.*
-import System.Option.*
+import System.Optional.*
 import NeoClr.Testing.*
 
 [Test("SByte parsing preserves values and reports overflow")]

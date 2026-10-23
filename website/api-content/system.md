@@ -4,7 +4,7 @@ uid: N:System
 ## Core values and contracts
 
 The core module contains Object and Value, primitive values, immutable String text,
-Array, tuples, Option and Result, and common equality, comparison and lifetime
+Array, tuples, Optional and Result, and common equality, comparison and lifetime
 contracts. Console provides standard input and output; time-related values live
 in System.Time.
 

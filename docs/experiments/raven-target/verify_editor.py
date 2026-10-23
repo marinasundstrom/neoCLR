@@ -122,7 +122,7 @@ try:
         if hover is None or not any(name in json.dumps(hover) for name in ('int', 'Int32')):
             raise AssertionError('Loop element type was not inferred from the project target: ' + str(hover))
         results['LoopElementHover'] = hover
-        text = 'import System.*\nfunc Read(value: Option<int>) -> Option<int> {\n    let amount = value?\n    return Option<int>(Option.Some<int>(amount))\n}'
+        text = 'import System.*\nfunc Read(value: Optional<int>) -> Optional<int> {\n    let amount = value?\n    return Optional<int>(Optional.Some<int>(amount))\n}'
         send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': 6}, 'contentChanges': [{'text': text}]})
         hover = receive(send('textDocument/hover', {'textDocument': {'uri': uri},
             'position': {'line': 2, 'character': 9}}, True))
@@ -242,7 +242,7 @@ try:
         for version, expression, expected in (
             (23, 'result.', ('HasValue', 'Value', 'TryGetValue', 'TryGetOutput', 'TryGetResidual', 'Map', 'Then', 'MapError', 'Match', 'Tap', 'TapError', 'OrElse', 'UnwrapOrElse', 'UnwrapOr', 'ToIterable')),
             (24, 'option.', ('HasValue', 'Value', 'TryGetValue', 'Map', 'Then', 'Filter', 'OrElse', 'UnwrapOrElse', 'UnwrapOr', 'Match', 'Tap', 'TapNone', 'ToIterable', 'ThenResult', 'MapResult', 'OkOr'))):
-            text = 'import System.*\nfunc Inspect(result: Result<long, string>, option: Option<string>) {\n\n\n    ' + expression + '\n}'
+            text = 'import System.*\nfunc Inspect(result: Result<long, string>, option: Optional<string>) {\n\n\n    ' + expression + '\n}'
             send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version}, 'contentChanges': [{'text': text}]})
             result = receive(send('textDocument/completion', {'textDocument': {'uri': uri},
                 'position': {'line': 4, 'character': len('    ' + expression)}, 'context': {'triggerKind': 1}}, True))
@@ -463,7 +463,7 @@ try:
         for version, label, body in (
             (58, 'Order map payload', 'match index.Find(101) {\nSome(let order) => order.\nNone => ()\n}'),
             (59, 'Order filtered element', 'let order = values.FindAll((order: Order) -> bool => true)[0]\norder.')):
-            text = ('import System.*\nimport System.Collections.*\nimport System.Option.*\n'
+            text = ('import System.*\nimport System.Collections.*\nimport System.Optional.*\n'
                     'class Order { var Number: int }\n'
                     'func Inspect(index: Map<int, Order>, values: ArrayList<Order>) {\n' + body + '\n}')
             lines = text.splitlines()
@@ -539,7 +539,7 @@ try:
                   for i, expression in enumerate((
                       'typeof(int).GetFields().', 'typeof(int).GetMethods().',
                       'typeof(System.Time.Date).GetProperties().',
-                      'typeof(System.Option<int>).GetGenericArguments().',
+                      'typeof(System.Optional<int>).GetGenericArguments().',
                       'typeof(int).GetInterfaces().',
                       'typeof(System.Introspection.BindingFlags).GetEnumNames().',
                       'typeof(int).GetMethods()[0].GetParameters().',

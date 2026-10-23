@@ -80,7 +80,7 @@ introduce nested scopes; active names cannot be shadowed, but sibling scopes may
 
 Types resolve to `int`/`Int32`, `string`/`String`, `bool`/`Boolean`, `unit`/`Void`/`()`,
 or a declared record, interface or bundled System type. Qualified names and closed generic
-arguments are supported; Option/Result abbreviate System.Option/System.Result. One
+arguments are supported; Optional/Result abbreviate System.Optional/System.Result. One
 `&` suffix forms a managed reference. Plain [generic record declarations](generic-source-records.md) are supported with
 explicit constructor type arguments. Generic classes, methods on generic records,
 generic source unions and raw pointer syntax remain unsupported. Free functions and static methods accept generic parameters. Runtime restrictions on ByRef generic arguments still apply.
@@ -204,7 +204,7 @@ ordinary lifetime rules; no address to copied arm payload storage can escape.
 Bundled System union coverage uses the UnionAttribute marker,
 constructor-declared cases, and typed public test/extraction/payload accessors.
 The compiler validates that contract; arbitrary source records are not unions merely
-because their names resemble Option or Result. Unsupported contracts are diagnosed.
+because their names resemble Optional or Result. Unsupported contracts are diagnosed.
 Non-generic source declarations generate the corresponding constructors and accessors;
 their case bindings capture whole variants. Guards, nested destructuring patterns,
 generic source unions and subtype patterns remain future features.
@@ -366,7 +366,7 @@ an expected marked carrier and its accepting constructor. Generic constructor ow
 Non-generic source unions support the two forms above. Cases must be distinct
 concrete declared source value types; inline cases generate nested record types.
 A source-union case binding captures the complete variant, unlike the existing
-bundled Option/Result payload projection. See [union declarations](neo-unions.md).
+bundled Optional/Result payload projection. See [union declarations](neo-unions.md).
 
 See [conditional union bindings](conditional-patterns.md) for `if let` and
 `let … else`, including scope, failure-path rules and the order-workflow example.

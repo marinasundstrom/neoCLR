@@ -1013,13 +1013,13 @@ The abstract key/value contract should be called `Map`.
 interface Map<TKey, TValue> :
     Collection<KeyValuePair<TKey, TValue>>
 {
-    func Get(key: TKey) -> Option<TValue>
+    func Get(key: TKey) -> Optional<TValue>
 
     func ContainsKey(key: TKey) -> bool
 }
 ```
 
-This works naturally with NeoCLR's `Option` model:
+This works naturally with NeoCLR's `Optional` model:
 
 ```raven
 let user = users.Get(id)?
@@ -1066,7 +1066,7 @@ Whereas:
 func FindUser(
     users: Map<UserId, User>,
     id: UserId
-) -> Option<User>
+) -> Optional<User>
 ```
 
 depends only upon map semantics.
@@ -1144,7 +1144,7 @@ For example:
 ```raven
 func First<T>(
     values: Iterable<T>
-) -> Option<T>
+) -> Optional<T>
 ```
 
 requires only iteration.
@@ -1162,7 +1162,7 @@ requires ordering.
 func BinarySearch<T>(
     values: List<T>,
     value: T
-) -> Option<int>
+) -> Optional<int>
 ```
 
 requires positional access.

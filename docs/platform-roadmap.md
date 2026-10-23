@@ -6132,3 +6132,10 @@ each of interpreter/JIT/native on macOS ARM64, Release symbol coverage and API
 snapshot validation pass. These are development changes, not a published package. See [the API contract](../api-docs/error-context.md),
 [feature page](../website/content/features/error-handling/index.md) and
 [conversation record](development-timeline.md).
+
+**Author-directed API naming (2026-10-23):** Result retains Ok and names its failure
+case Failure; Optional replaces Option, retaining Some/None. Shared compiler facts
+centralize known names on Raven main and the separately validated neoCLR line.
+These are bounded platform conventions, with source/metadata migration and rebuilt
+API references; they do not reprioritize the active milestone. See
+[the conversation record](development-timeline.md#2026-10-23--optional-platform-convention).

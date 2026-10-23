@@ -26,7 +26,7 @@ fault-path cleanup work remain documented in [the iteration contract](raven-targ
 
 The backing array uses [reserved managed capacity](reserved-array-capacity.md), so
 unused capacity does not require a valid default T. Nested collections, reflection
-classes, interface references and Result/Option carriers are admitted. The
+classes, interface references and Result/Optional carriers are admitted. The
 [reference-payload sample](experiments/raven-target/samples/library-reference-payloads.rvn)
 checks nested aliases, independent sequence copies, stored union cases and delegates.
 Arbitrary application classes still need broader application-type import. The later [delegate projection](raven-delegate-api.md) adds Find, FindIndex and

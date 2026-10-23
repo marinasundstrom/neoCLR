@@ -1,31 +1,31 @@
 .module ConsoleTyped
 .entry Main
 
-; Demonstrates the ordinary nested System.Result<System.Option<Byte>,ConsoleReadError> Console API.
+; Demonstrates the ordinary nested System.Result<System.Optional<Byte>,ConsoleReadError> Console API.
 .function Main() -> Void
-    .local System.Result.Ok<System.Option<Byte>> success
-    .local System.Option.Some<Byte> some
+    .local System.Result.Ok<System.Optional<Byte>> success
+    .local System.Optional.Some<Byte> some
     .local System.Result.Failure<System.ConsoleReadError> failure
     call System.Console::ReadByte()
     dup
     ldloca success
-    call instance System.Result<System.Option<Byte>,System.ConsoleReadError>::TryGet(System.Result.Ok<System.Option<Byte>>&)
+    call instance System.Result<System.Optional<Byte>,System.ConsoleReadError>::TryGet(System.Result.Ok<System.Optional<Byte>>&)
     brfalse Failed
     pop
     ldloc success
-    call instance System.Result.Ok<System.Option<Byte>>::get_Value()
+    call instance System.Result.Ok<System.Optional<Byte>>::get_Value()
     dup
     ldloca some
-    call instance System.Option<Byte>::TryGet(System.Option.Some<Byte>&)
+    call instance System.Optional<Byte>::TryGet(System.Optional.Some<Byte>&)
     brfalse EndOfInput
     pop
     ldloc some
-    call instance System.Option.Some<Byte>::get_Value()
+    call instance System.Optional.Some<Byte>::get_Value()
     call System.Console::WriteLine(Int32)
     ret
 Failed:
     ldloca failure
-    call instance System.Result<System.Option<Byte>,System.ConsoleReadError>::TryGet(System.Result.Failure<System.ConsoleReadError>&)
+    call instance System.Result<System.Optional<Byte>,System.ConsoleReadError>::TryGet(System.Result.Failure<System.ConsoleReadError>&)
     brtrue ErrorExtracted
     fault "Expected Error case"
 ErrorExtracted:

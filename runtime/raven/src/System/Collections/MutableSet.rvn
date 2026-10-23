@@ -11,5 +11,5 @@ public interface MutableSet<T> : Set<T> {
     /// <summary>Looks up the stored equivalent value using this set's equality policy.</summary>
     /// <param name="value">The value to match.</param>
     /// <returns>Some containing the stored value, including a permitted null; otherwise None.</returns>
-    func Find(value: T) -> System.Option<T>
+    func Find(value: T) -> System.Optional<T>
 }

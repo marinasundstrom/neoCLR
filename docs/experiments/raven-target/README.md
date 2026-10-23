@@ -177,7 +177,7 @@ is `Continued`, `42`, then `Overflow propagated` on separate lines. To run it ma
 copy that sample to the generated editor project's `Main.rvn` and run `run_project.py`
 with the same project, `--raven` and `--runtime` arguments. The second call returns early
 without printing `Continued`. See the [contract and limits](../../propagation-contract.md):
-this slice admits Result<Int32,OverflowError>, Option<Int32> and
+this slice admits Result<Int32,OverflowError>, Optional<Int32> and
 Result<Void,OverflowError>. The generated editor opens the combined propagation
 workflow, with ArrayList constructors and iteration. `verify_project.py` exercises
 all three propagation forms.
@@ -415,7 +415,7 @@ configuration before claiming the editor MVP. No Raven edits were made in this s
 Validation: the complete emission/import probe passed, including its existing negative
 checks and the new completion checks. All five imports verify and run through
 `verify_runtime.py`; `cargo test --test raven_import` passes against the refreshed fixtures.
-The next MVP program must consume a real Result/Option API and handle both outcomes.
+The next MVP program must consume a real Result/Optional API and handle both outcomes.
 
 ## Running the Result demo (2026-09-12)
 
@@ -458,11 +458,11 @@ inhabited Void returns. Direct calls to the recognition-only `Value` property ar
 not supported. See the [Result import contract](../../raven-target-experiment.md#result-execution-profile-2026-09-12)
 for the limits and remaining POC work.
 
-## Running the Option demo (2026-09-12)
+## Running the Optional demo (2026-09-12)
 
 `samples/library-option.rvn` defines a small application lookup, `FindPrice`, returning
-`System.Option<int>`. It constructs Some(42) for product 7 and None for a missing
-product. Case/carrier constructors and extraction bind to the actual neoCLR Option
+`System.Optional<int>`. It constructs Some(42) for product 7 and None for a missing
+product. Case/carrier constructors and extraction bind to the actual neoCLR Optional
 library; FindPrice itself is application code, not a new runtime API.
 
 The reproduction command emits and imports `CoreOption.dll`. Run the checked-in
@@ -481,19 +481,19 @@ Product not found
 => Void
 ```
 
-`verify_runtime.py` now verifies seven programs. The Option probe rejects unwritten
+`verify_runtime.py` now verifies seven programs. The Optional probe rejects unwritten
 carrier reads, wrong out cases, and a wrong constructor case. `option-results.json`
 records emission and these checks; runtime results remain in `runtime-results.json`.
 
 The importer was renamed from ResultImport to UnionImport, with the same control-flow
-and lifetime checks. Its newobj bindings admit only the selected real Option constructors;
+and lifetime checks. Its newobj bindings admit only the selected real Optional constructors;
 case local defaults remain supported, while default carrier reads are rejected. It does not add
 general object construction, application classes, or a new runtime instruction. Generic
 Void and VS Code project completion remain the next POC steps.
 
 ## Running the generic Void demo (2026-09-12)
 
-`samples/library-void.rvn` returns `Option<System.Void>`: Some(()) represents completion
+`samples/library-void.rvn` returns `Optional<System.Void>`: Some(()) represents completion
 without a payload; None represents no completion. Reproduce with the same probe and
 runtime verification commands above; the script now checks eight programs. Run the
 saved import from the neoCLR repository root:
@@ -520,7 +520,7 @@ an experimental neoCLR target adapter, not native Raven backend support or a cla
 
 The importer recognizes only the compiler-generated empty Unit.Value literal with its
 validated static readonly field and no type initializer, mapping it to neoCLR's existing
-`ldvoid`. Actual Option<Void> constructors and extractors execute in the runtime library.
+`ldvoid`. Actual Optional<Void> constructors and extractors execute in the runtime library.
 The VM still represents Void with an inhabited stack marker; zero-stack/storage handling
 is future work. Arbitrary static fields, general generic Void APIs and default carrier
 reads are not admitted by this profile.
@@ -550,7 +550,7 @@ explicit metadata targets. `run_project.py` now compiles the editable project th
 RavenWorkspace, retargets emission and imports/verifies/runs the resulting saved source.
 `prepare_editor.py` creates dedicated VS Code tasks; `configure_tasks.py` updates an
 existing folder. See [edit/build/run instructions](VSCODE.md#edit-build-and-run-the-saved-project).
-`verify_project.py` checks Result, Option, generic Void, a changed output and failure
+`verify_project.py` checks Result, Optional, generic Void, a changed output and failure
 behavior. The normal Raven toolbar remains a separate pipeline. Propagation and
 interfaces are not claimed by this milestone.
 
@@ -607,7 +607,7 @@ library adaptation and union propagation are still pending.
 
 For the existing saved-project/VS Code workflow, use `samples/library-arrays.rvn` as the
 project source and refresh its `NeoCLR.CoreProbe.dll` from this probe's output. That core
-also includes the existing Result/Option declarations. Old local core files lack the
+also includes the existing Result/Optional declarations. Old local core files lack the
 Length declaration. The bridge runner must come from this checkout; no new Raven SDK or
 VS Code extension build is needed for this slice. This turn verified the compiler/import/
 runtime path, not a new manual VS Code session.
@@ -646,10 +646,10 @@ see [collection project setup and checks](VSCODE.md#collection-project-follow-up
 
 ## Fundamental Raven demonstration
 
-The collection declaration profile now also exposes Result, Option and generic Void.
+The collection declaration profile now also exposes Result, Optional and generic Void.
 `library-workflow.rvn` uses an ArrayList through List, iterates with the configured
-Iterable/Iterator protocol, handles missing products with Option and arithmetic failure
-with Result, and returns an Option<Void> completion marker. No exception handling or
+Iterable/Iterator protocol, handles missing products with Optional and arithmetic failure
+with Result, and returns an Optional<Void> completion marker. No exception handling or
 union propagation is synthesized. The existing System implementations execute; metadata
 stub bodies do not. No new Raven changes or runtime opcodes are needed for this slice.
 
@@ -661,9 +661,9 @@ assembly and adapted runtime library:
 | --- | --- | --- |
 | Class reference assignment | `library-collection-aliases.rvn`: mutating an alias changes the original list | Ordinary nominal ArrayList/List references, without explicit managed-reference syntax |
 | Array reference assignment and parameters | `library-arrays.rvn`: a called function changes the original array, output 42/2 | Int32 vectors and standard CLI array operations |
-| Value copying | `library-value-copy.rvn`: replacing an Option binding preserves its prior copy, output 42/7 | Known Option<Int32> value carrier; not arbitrary mutable struct import |
+| Value copying | `library-value-copy.rvn`: replacing an Optional binding preserves its prior copy, output 42/7 | Known Optional<Int32> value carrier; not arbitrary mutable struct import |
 | Library naming and iteration | `library-foreach.rvn` and `library-workflow.rvn` | Configured Iterable/Iterator/GetIterator, with List/ArrayList and indexers |
-| Result, Option and Void | Standalone samples plus combined workflow | Existing bounded union import and Void projection; no propagation |
+| Result, Optional and Void | Standalone samples plus combined workflow | Existing bounded union import and Void projection; no propagation |
 | Editor experience | `verify_editor.py --collections --files` | Collection and union names, selected Math API and inferred int loop binding |
 
 Expected workflow output is 42, Completed, Price overflow, Skipped, Product not found,
@@ -760,7 +760,7 @@ and the matching generated library; archived .7 packages do not contain this API
 ### TypeInfo member hierarchy (2026-09-19)
 
 The reference profile and importer now expose TypeInfo as the fourth sealed
-MemberInfo case. DeclaringType is Option<TypeInfo>; unwrap ordinary member owners,
+MemberInfo case. DeclaringType is Optional<TypeInfo>; unwrap ordinary member owners,
 and handle None for top-level types. Name, Module and MetadataToken are inherited.
 Rebuild consumers and update exhaustive matches. Runtime Contract typeof settings
 are unchanged. Raven's same-file sealed-family rule is satisfied by compiling all
@@ -786,7 +786,7 @@ services. String.IsEmpty is now a property. Runtime Contract configuration remai
 unit/() → System.Void; no Raven compiler changes are required. Rebuild reference
 metadata and generated runtime together. See [contracts, comparison and limitations](../../raven-string-api.md#strict-utf-8-conversion-2026-09-19).
 
-### Development Option and Result operators
+### Development Optional and Result operators
 
 After Preview 8, regenerate the collection-profile reference core and System library
 together to use the [outcome operator port](../../../raven-outcome-operators.md).
@@ -1086,7 +1086,7 @@ references remain accepted. This closes the HashMap<Object, ...> admission gap w
 admitting arbitrary unresolved named types. Runtime Contract configuration, public
 reference metadata, compiler semantics, library algorithms and native layout are unchanged;
 no Raven compiler patch is needed. The mixed Object map fixture checks key dispatch,
-boxed values, Option<Object> payloads, collisions, replacement, rehashing and GC. A
+boxed values, Optional<Object> payloads, collisions, replacement, rehashing and GC. A
 freshly built bridge is required; existing runtime/library fragments remain valid.
 
 ## Attributed custom unions (2026-09-24)

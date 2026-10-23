@@ -6,8 +6,8 @@ Development API in System.Collections. Import `System.*` and `System.Collections
 | --- | --- |
 | `SequenceAccess<T>.self[index: Index]: T` | Read-only extension indexer; resolves against Count and uses the integer indexer. Invalid bounds fault. |
 | `SequenceAccess<T>.self[range: Range]: T[]` | Read-only extension indexer returning an independent shallow copy. Invalid bounds or premature exhaustion fault. |
-| `Get(index: int): Option<T>` | None for negative or past-end indices, Some(element) otherwise. |
-| `Get(index: Index): Option<T>` | Resolves against Count, then returns the same validated result. ^0 is past the final element. |
+| `Get(index: int): Optional<T>` | None for negative or past-end indices, Some(element) otherwise. |
+| `Get(index: Index): Optional<T>` | Resolves against Count, then returns the same validated result. ^0 is past the final element. |
 | `Slice(range: Range): Result<T[], InvalidRangeError>` | Validates half-open bounds, including empty end slices. Error for invalid bounds or an iterator ending before the requested range. |
 | `List<T>.self[index: Index]: T` | Read/write instance contract. Invalid bounds fault. |
 | `List<T>.self[range: Range]: T[]` | Read-only instance contract returning an independent shallow copy. Invalid bounds fault. |

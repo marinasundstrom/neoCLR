@@ -13,7 +13,7 @@ ported through the former `runtime/raven/System.rvnproj`; do not add a second
 competing implementation of them.
 
 Candidate contents are the existing fundamental value/reference types, strings,
-arrays, delegates, compiler-required contracts, basic Result/Option conventions,
+arrays, delegates, compiler-required contracts, basic Result/Optional conventions,
 and the minimum shared Introspection contracts and runtime context/resolution
 support needed by the POC. Derive the precise set from working application and
 compiler requirements, not from every type currently bundled under System.

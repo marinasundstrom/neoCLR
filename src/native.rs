@@ -176,7 +176,7 @@ pub(crate) fn bind_in(module: &crate::Module, function: &Function) -> Result<Bin
                     return ty.clone();
                 };
                 let name = origin.name.trim_end_matches("`1");
-                if !(name.starts_with("System.Introspection.") || name == "System.Option") {
+                if !(name.starts_with("System.Introspection.") || name == "System.Optional") {
                     return ty.clone();
                 }
                 if ty.generic_arguments().is_empty() {

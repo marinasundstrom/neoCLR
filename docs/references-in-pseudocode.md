@@ -220,8 +220,8 @@ The general convention is `TryGet(out Case& value)`. Overload resolution uses th
 case type, including when different variants have the same payload type:
 
 ```text
-Option<T>.TryGet(out Some<T>& value) -> Boolean
-Option<T>.TryGet(out None& value) -> Boolean
+Optional<T>.TryGet(out Some<T>& value) -> Boolean
+Optional<T>.TryGet(out None& value) -> Boolean
 Result<T, E>.TryGet(out Ok<T>& value) -> Boolean
 Result<T, E>.TryGet(out Error<E>& value) -> Boolean
 ```
@@ -231,7 +231,7 @@ case types. The source signature uses `out`; neoIL declarations use `out(true)` 
 encode the conditional assignment guarantee. Normalized call signatures contain
 only the case-reference types; the callee metadata carries the output contract.
 
-System.Option and System.Result implement these TryGet overloads. [The runnable union sample](../examples/union_try_get.neoil)
+System.Optional and System.Result implement these TryGet overloads. [The runnable union sample](../examples/union_try_get.neoil)
 prints 42. The [native pointer carrier sample](../examples/pointer_union.neoil) now
 uses managed output slots too: copying methods use out(true) T&. Its payload storage
 still has an explicit native lifetime; extraction after that storage expires faults.

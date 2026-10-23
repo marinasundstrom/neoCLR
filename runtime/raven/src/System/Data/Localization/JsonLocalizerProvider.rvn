@@ -9,7 +9,7 @@ import System.Globalization.*
 import System.Introspection.*
 import System.Storage.*
 import System.Storage.FileText.*
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 
 internal class CatalogueLocalizer : Localizer {
@@ -30,7 +30,7 @@ internal class CatalogueLocalizer : Localizer {
         }
     }
 
-    func Find(key: string) -> Option<string> => entries.Find(key)
+    func Find(key: string) -> Optional<string> => entries.Find(key)
 }
 
 /// Loads one explicit catalogue in the flat JSON string-map format.
@@ -187,7 +187,7 @@ internal class FallbackLocalizer : Localizer {
         self.primary = primary
         self.fallback = fallback
     }
-    func Find(key: string) -> Option<string> {
+    func Find(key: string) -> Optional<string> {
         if primary.Find(key) is Some(let value) { return Some(value) }
         return fallback.Find(key)
     }
@@ -203,7 +203,7 @@ internal class TypedLocalizer<T> : Localizer<T> {
     val Culture: Culture => inner.Culture
     private val inner: Localizer
     init(inner: Localizer) { self.inner = inner }
-    func Find(key: string) -> Option<string> => inner.Find(key)
+    func Find(key: string) -> Optional<string> => inner.Find(key)
     val self[key: string]: string => inner[key]
 }
 
@@ -214,6 +214,6 @@ internal class CultureLocalizer : Localizer {
         self.inner = inner
         Culture = culture
     }
-    func Find(key: string) -> Option<string> => inner.Find(key)
+    func Find(key: string) -> Optional<string> => inner.Find(key)
     val self[key: string]: string => inner[key]
 }

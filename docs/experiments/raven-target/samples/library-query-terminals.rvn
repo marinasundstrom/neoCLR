@@ -2,11 +2,11 @@ import System.Introspection.*
 import System.*
 import System.Collections.*
 import System.Linq.*
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 import System.Console.*
 
-func PrintOptional(value: Option<int>) {
+func PrintOptional(value: Optional<int>) {
     match value {
         Some(let found) => WriteLine(found)
         None => WriteLine("Absent")
@@ -25,7 +25,7 @@ func OnlyPositive(values: Iterable<int>) -> Result<int, SingleError> {
     return .Ok(value)
 }
 
-func FirstPositive(values: Iterable<int>) -> Option<int> {
+func FirstPositive(values: Iterable<int>) -> Optional<int> {
     let value = values.First(number => number > 0)?
     return Some(value)
 }

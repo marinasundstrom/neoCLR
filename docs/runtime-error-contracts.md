@@ -15,7 +15,7 @@ decide what to do next.
 | System.Int32.Divide(Int32, Int32) | DivisionByZero, Overflow for minimum Int32 divided by -1 | System.IntegerDivisionError: DivisionByZero, Overflow (implemented) | Yes for this checked helper; the low-level div instruction retains its Fault contract |
 | System.Math.Abs(Int32) | Overflow for minimum Int32 | System.OverflowError, an ordinary single-purpose type (implemented) | Yes: preserves the selected checked Abs contract; no union is needed for a single failure kind |
 | System.String.SliceUtf8(Int32, Int32) | OutOfRange, InvalidBoundary | System.Text.Utf8SliceError: OutOfRange, InvalidBoundary (implemented) | Yes: callers can validate externally supplied byte ranges without Faults |
-| System.Console.ReadByte() | ConsoleUnavailable, ConsoleReadFailed | System.ConsoleReadError: Unavailable, ReadFailed (implemented) | Yes: absence of a configured host and failure of a read are distinguishable; EOF remains successful Option.None |
+| System.Console.ReadByte() | ConsoleUnavailable, ConsoleReadFailed | System.ConsoleReadError: Unavailable, ReadFailed (implemented) | Yes: absence of a configured host and failure of a read are distinguishable; EOF remains successful Optional.None |
 | System.Storage.File.ReadAllText(String, Int32) | ArgumentOutOfRange, InvalidPath, FileNotFound, AccessDenied, NotRegularFile, FileReadFailed, FileTooLarge, InvalidUtf8 | System.Storage.FileReadError: InvalidLimit, InvalidPath, NotFound, AccessDenied, NotRegularFile, ReadFailed, TooLarge, InvalidUtf8 (implemented) | Yes: bounded file input can fail for expected environmental, limit and content reasons |
 
 Names are provisional preview choices. Keep the set of cases tied to observable behavior;

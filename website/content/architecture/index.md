@@ -71,7 +71,7 @@ The current Raven target has copied values and reference-semantic classes and ar
 Managed byrefs address slots; unmanaged pointers have a separate
 [native interop contract](../features/native-interop/).
 Strings use UTF-8, with distinct byte, scalar and grapheme operations.
-[Option and Result](../features/outcomes/) express absence and expected errors;
+[Optional and Result](../features/outcomes/) express absence and expected errors;
 terminal Faults are a separate runtime mechanism. These choices affect libraries,
 verification and backend code, not just Raven syntax.
 

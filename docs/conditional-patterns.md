@@ -19,7 +19,7 @@ if let Error(error) = Purchase(product, 99, &notifications) {
 The [order workflow](../examples/source/order-workflow.neo) supplies these functions
 and a custom PurchaseError union with InvalidQuantity and OutOfStock variants.
 Source-union bindings receive the whole variant, including all its fields. Bundled
-Option/Result bindings retain their existing match projection and receive the payload.
+Optional/Result bindings retain their existing match projection and receive the payload.
 These forms reuse [union matching](neo-unions.md); they do not destructure fields.
 Use `Case(_)` to discard a bound value and a bare case name for a payload-free library
 case or a source case test. Unlike match arms, no second `let` appears inside parentheses.

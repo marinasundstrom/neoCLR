@@ -8,7 +8,7 @@ fn raven_emitted_corpus_runs_against_real_system_library() {
             vec!["Completed without a payload", "Not completed"],
         ),
         (
-            include_str!("../docs/experiments/raven-target/imported/CoreOption.neoil"),
+            include_str!("../docs/experiments/raven-target/imported/CoreOptional.neoil"),
             vec!["42", "Product not found"],
         ),
         (

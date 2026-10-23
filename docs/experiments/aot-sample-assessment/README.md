@@ -26,7 +26,7 @@ Those deserve separate diagnosis; their AOT rejection is not the cause of the VM
 [Raw survey](survey.json), [focused baseline checks](baseline-controls.json),
 [HTTP correctness/cleanup](../../../benchmarks/native-web/gc-index-validation.json).
 Twelve matched programs are constructors, ordinary types, division, integer operations,
-error values, Option, Option propagation, integer parsing, String slices, UTF-8, value
+error values, Optional, Optional propagation, integer parsing, String slices, UTF-8, value
 copies and Void. Matching output is differential evidence, not an independent oracle
 for every operation. Focused baseline verifiers additionally assert expected outcomes.
 
@@ -47,7 +47,7 @@ rewriting was used to inflate the result.
 
 ## Recommended release priorities
 
-1. **Preserve a small acceptance baseline.** Constructors/value copies, Result/Option
+1. **Preserve a small acceptance baseline.** Constructors/value copies, Result/Optional
    branches, UTF-8 console/text, callback ownership/queue faults and sequential HTTP
    should keep exact behavior, cleanup and controlled failures. Use the focused
    verifiers below as gates; the broad inventory remains informational. Publish the
@@ -230,7 +230,7 @@ can precede other missing dependencies.
 | library-oftype | not run | emission blocked | error RAV1503: Cannot convert from 'TypeInfo' to 'MemberInfo' |
 | library-option | exit 0 | matched success | — |
 | library-option-propagation | exit 0 | matched success | — |
-| library-outcome-operator-checks | not run | emission blocked | error RAV1503: Cannot convert from 'Option<U>' to 'Option<int>' |
+| library-outcome-operator-checks | not run | emission blocked | error RAV1503: Cannot convert from 'Optional<U>' to 'Optional<int>' |
 | library-outcome-operators | not run | emission blocked | error RAV1503: Cannot convert from 'Result<U, string>' to 'Result<int, string>' |
 | library-parsing | exit 0 | matched success | — |
 | library-paths | exit 0 | AOT rejected | $aot_linked_2: unsupported value member contract |

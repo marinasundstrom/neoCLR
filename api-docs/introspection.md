@@ -20,7 +20,7 @@ constructed generic types, do. General shape and member queries remain on TypeIn
 Use NominalTypeInfo for declaration metadata and DisplayName for diagnostic text.
 
 `NominalTypeInfo.Namespace` is the namespace name as a string. The inherited
-`MemberInfo.Module: Option<ModuleInfo>` navigates to the assembly-scoped metadata
+`MemberInfo.Module: Optional<ModuleInfo>` navigates to the assembly-scoped metadata
 module for that namespace; nominal runtime descriptors supply that owner. A matching
 namespace name in another assembly does not change this declaration's owner.
 The string name and module descriptor serve different queries; keeping both supports
@@ -274,7 +274,7 @@ TypeInfo exposes IsAbstract, IsOpen, IsClosedHierarchy, IsUnion, IsEnum and
 IsValueType. IsOpen means unrestricted inheritance/implementation, not generic
 openness. A closed family reports IsClosedHierarchy, while an ordinary leaf reports
 neither IsOpen nor IsClosedHierarchy. IsUnion is reserved for structural union
-identity. Nominal union declarations (including constructed Option/Result) are
+identity. Nominal union declarations (including constructed Optional/Result) are
 identified separately by NominalTypeInfo.IsUnionDeclaration; cases return false.
 This development change replaces the former nominal meaning of IsUnion. Guest structural descriptors are available in the experimental interpreter through
 UnionTypeInfo and IntersectionTypeInfo.
@@ -510,14 +510,14 @@ is returned. The obsolete CLI bootstrap remains unqualified for these providers.
 
 ## Field storage and initialization
 
-FieldInfo exposes IsInitOnly, IsLiteral and ConstantValue (`Option<Object>`, currently
+FieldInfo exposes IsInitOnly, IsLiteral and ConstantValue (`Optional<Object>`, currently
 boxed Int32 literals). GetFields includes static storage and constants according to
 BindingFlags; DefinitionIndex is a descriptor ordinal, not a storage opcode slot.
 MetadataToken retains the defining module's field token; older producers that omitted
 static tokens report None instead of inventing one. Names and generic field signatures
 remain descriptive even where reflection execution is unsupported.
 
-TypeInfo exposes IsBeforeFieldInit and TypeInitializer (`Option<ConstructorInfo>`).
+TypeInfo exposes IsBeforeFieldInit and TypeInitializer (`Optional<ConstructorInfo>`).
 The latter is a private static constructor description, separate from ordinary methods.
 Neither property executes initialization. Native JIT/AOT constructor descriptions
 require explicit constructor metadata retention in reflection-roots schema 7.

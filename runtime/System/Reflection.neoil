@@ -356,7 +356,7 @@
 
 .type System.Introspection.PropertyInfo
     .extends System.Introspection.MemberInfo
-    .method internal instance byref .ctor(String name, System.Type declaringType, System.Type propertyType, Boolean isStatic, Boolean canRead, Boolean canWrite, Int32 definitionIndex, System.Introspection.ParameterInfo[] indexParameters, System.Option<System.Introspection.MethodInfo> getter, System.Option<System.Introspection.MethodInfo> setter) -> Void
+    .method internal instance byref .ctor(String name, System.Type declaringType, System.Type propertyType, Boolean isStatic, Boolean canRead, Boolean canWrite, Int32 definitionIndex, System.Introspection.ParameterInfo[] indexParameters, System.Optional<System.Introspection.MethodInfo> getter, System.Optional<System.Introspection.MethodInfo> setter) -> Void
         ldarg this
         ldarg name
         ldarg declaringType
@@ -403,8 +403,8 @@
     .field private CanWrite Boolean
     .field private DefinitionIndex Int32
     .field private IndexParameters System.Introspection.ParameterInfo[]
-    .field private Getter System.Option<System.Introspection.MethodInfo>
-    .field private Setter System.Option<System.Introspection.MethodInfo>
+    .field private Getter System.Optional<System.Introspection.MethodInfo>
+    .field private Setter System.Optional<System.Introspection.MethodInfo>
     .property instance PropertyType() -> System.Type
         .get instance System.Introspection.PropertyInfo::get_PropertyType()
     .end
@@ -450,60 +450,60 @@
         ldfld 7
         ret
     .end
-    .method instance readonly byref GetGetMethod() -> System.Option<System.Introspection.MethodInfo>
+    .method instance readonly byref GetGetMethod() -> System.Optional<System.Introspection.MethodInfo>
         ldarg this
         ldc.bool false
         call instance System.Introspection.PropertyInfo::GetGetMethod(Boolean)
         ret
     .end
-    .method instance readonly byref GetGetMethod(Boolean nonPublic) -> System.Option<System.Introspection.MethodInfo>
+    .method instance readonly byref GetGetMethod(Boolean nonPublic) -> System.Optional<System.Introspection.MethodInfo>
         .local System.Introspection.MethodInfo method
         ldarg nonPublic
         brtrue Return
         ldarg this
         ldfld 8
-        call instance System.Option<System.Introspection.MethodInfo>::get_IsSome()
+        call instance System.Optional<System.Introspection.MethodInfo>::get_IsSome()
         brfalse Return
         ldarg this
         ldfld 8
-        call instance System.Option<System.Introspection.MethodInfo>::GetSomeCase()
-        call instance System.Option.Some<System.Introspection.MethodInfo>::get_Value()
+        call instance System.Optional<System.Introspection.MethodInfo>::GetSomeCase()
+        call instance System.Optional.Some<System.Introspection.MethodInfo>::get_Value()
         stloc method
         ldloca method
         call instance System.Introspection.MethodInfo::get_IsPublic()
         brtrue Return
-        newobj instance System.Option.None::.ctor()
-        newobj instance System.Option<System.Introspection.MethodInfo>::.ctor(System.Option.None)
+        newobj instance System.Optional.None::.ctor()
+        newobj instance System.Optional<System.Introspection.MethodInfo>::.ctor(System.Optional.None)
         ret
     Return:
         ldarg this
         ldfld 8
         ret
     .end
-    .method instance readonly byref GetSetMethod() -> System.Option<System.Introspection.MethodInfo>
+    .method instance readonly byref GetSetMethod() -> System.Optional<System.Introspection.MethodInfo>
         ldarg this
         ldc.bool false
         call instance System.Introspection.PropertyInfo::GetSetMethod(Boolean)
         ret
     .end
-    .method instance readonly byref GetSetMethod(Boolean nonPublic) -> System.Option<System.Introspection.MethodInfo>
+    .method instance readonly byref GetSetMethod(Boolean nonPublic) -> System.Optional<System.Introspection.MethodInfo>
         .local System.Introspection.MethodInfo method
         ldarg nonPublic
         brtrue Return
         ldarg this
         ldfld 9
-        call instance System.Option<System.Introspection.MethodInfo>::get_IsSome()
+        call instance System.Optional<System.Introspection.MethodInfo>::get_IsSome()
         brfalse Return
         ldarg this
         ldfld 9
-        call instance System.Option<System.Introspection.MethodInfo>::GetSomeCase()
-        call instance System.Option.Some<System.Introspection.MethodInfo>::get_Value()
+        call instance System.Optional<System.Introspection.MethodInfo>::GetSomeCase()
+        call instance System.Optional.Some<System.Introspection.MethodInfo>::get_Value()
         stloc method
         ldloca method
         call instance System.Introspection.MethodInfo::get_IsPublic()
         brtrue Return
-        newobj instance System.Option.None::.ctor()
-        newobj instance System.Option<System.Introspection.MethodInfo>::.ctor(System.Option.None)
+        newobj instance System.Optional.None::.ctor()
+        newobj instance System.Optional<System.Introspection.MethodInfo>::.ctor(System.Optional.None)
         ret
     Return:
         ldarg this

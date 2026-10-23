@@ -2,7 +2,7 @@ import System.Time.*
 import System.*
 import System.Introspection.*
 import System.Collections.*
-import System.Option.*
+import System.Optional.*
 
 func Check(value: bool, message: string) {
     if !value {

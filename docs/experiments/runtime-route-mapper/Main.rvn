@@ -78,5 +78,5 @@ public func CheckPatterns() {
     names[0] = "changed"
     Check(parameter.GetParameterNames()[0] == "id", "Capture names are snapshots")
     Check(RouteUnionMapper.Create(typeof(string)) is Failure(_), "Non-union rejected")
-    Check(RouteUnionMapper.Create(typeof(System.Option<int>)) is Failure(_), "Generic union rejected")
+    Check(RouteUnionMapper.Create(typeof(System.Optional<int>)) is Failure(_), "Generic union rejected")
 }

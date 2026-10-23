@@ -1,14 +1,14 @@
 import System.*
 import System.IO.*
 import System.Result.*
-import System.Option.*
+import System.Optional.*
 
 func ReadInput() -> Result<unit, TextReadError> {
     let result = Console.ReadLine()
     return DescribeInput(result)
 }
 
-func DescribeInput(result1: Result<Option<string>, TextReadError>) -> Result<unit, TextReadError> {
+func DescribeInput(result1: Result<Optional<string>, TextReadError>) -> Result<unit, TextReadError> {
     let Some(input) = result1? else {
         Console.WriteLine("No input")
         return Ok(())

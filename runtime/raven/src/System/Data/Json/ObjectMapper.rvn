@@ -3,7 +3,7 @@ module System.Data.Json
 import System.*
 import System.Collections.*
 import System.Introspection.*
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 import System.Runtime.Reflection.*
 import System.Runtime.CompilerServices.*

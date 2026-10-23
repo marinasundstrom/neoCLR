@@ -24,7 +24,7 @@ Covariant interfaces produce T; contravariant interfaces consume T. Differing
 arguments require supported reference conversions; identical value arguments remain
 valid. Conversions preserve the receiver and do not box elements. String argument/result
 views use the existing representation adaptation described below.
-Concrete classes, mutable collections, array storage, Option/Result
+Concrete classes, mutable collections, array storage, Optional/Result
 remain invariant. A class may still expose a wider read-only interface through its
 explicit implementations.
 

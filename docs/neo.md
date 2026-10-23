@@ -238,7 +238,7 @@ Use block arms in a standalone match statement for actions, return or loop contr
 Both forms require all cases to be covered; `_` can cover the remainder. Payload
 bindings are immutable copies scoped to their arm. Match a nested union with another
 match, as demonstrated by `Console.ReadByte()` returning
-`Result<Option<byte>, System.ConsoleReadError>`. Without a supplied console,
+`Result<Optional<byte>, System.ConsoleReadError>`. Without a supplied console,
 input reports the recoverable Unavailable case. The CLI supplies process stdin/stdout.
 
 Public System methods use known parameter context where unique and otherwise exact
@@ -510,7 +510,7 @@ views. Integer-range for syntax is unchanged. Run
 iteration through readonly collection views.
 
 [Predicate search](predicate-search.md) uses ordinary calls and contextual lambdas:
-`people.Find(person => person.Equals(expected))` returns Option<T> for exhaustive
+`people.Find(person => person.Equals(expected))` returns Optional<T> for exhaustive
 match handling. EquatableTo implementations use `readonly func Equals(other: T) -> bool`.
 These are eager ArrayList operations; LINQ remains future work.
 
@@ -518,7 +518,7 @@ These are eager ArrayList operations; LINQ remains future work.
 `name.EndsWithOrdinal(".neo")` and `System.String.CompareOrdinal(left, right)`.
 Neo borrows readonly instance receivers automatically, including string temporaries.
 Run `cargo run --locked -- run examples/source/ordinal-text.neo` for an eager file-name
-search using ArrayList, a predicate and Option matching.
+search using ArrayList, a predicate and Optional matching.
 
 [Character classification](character-classification.md) adds familiar System.Char predicates and
 Neo character literals, including Unicode IsDigit and explicit IsAsciiDigit.

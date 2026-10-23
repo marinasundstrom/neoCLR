@@ -34,8 +34,8 @@ FileSystem.Open(path, mode) -> Result<FileStream, IOError>
 FileSystem.FileExists(path) -> Bool
 FileSystem.DirectoryExists(path) -> Bool
 FileSystem.CreateDirectory(path) -> Result<Directory, IOError>
-FileSystem.GetFile(path) -> Option<File>
-FileSystem.GetDirectory(path) -> Option<Directory>
+FileSystem.GetFile(path) -> Optional<File>
+FileSystem.GetDirectory(path) -> Optional<Directory>
 FileSystem.Enumerate(path) -> Result<Iterable<FileSystemEntry>, IOError>
 ```
 
@@ -86,7 +86,7 @@ host may provide a restricted implementation or omit the host capability entirel
 
 `Path` operations are pure and should not touch the host. Resolution, permissions,
 missing entries, invalid paths, type mismatches and I/O failures belong in typed
-`Result` errors. `Option` is appropriate only for an ordinary absence such as a
+`Result` errors. `Optional` is appropriate only for an ordinary absence such as a
 nonexistent result from `GetFile`; an operation that cannot determine existence should
 return an error rather than `false` by policy. Terminal `Fault` remains for runtime
 invariant violations, resource exhaustion or failures outside the recoverable I/O

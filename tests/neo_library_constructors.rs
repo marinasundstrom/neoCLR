@@ -29,8 +29,8 @@ func Main() -> int {
     let Ok(alias) = result else { return -1 }
     if !ReferenceEquals(alias, counter) { return -2 }
     alias.Value = 41
-    let view = System.Option.Some<readonly Counter&>(counter)
-    let callback = System.Option.Some<fn<int, int>>(Add)
+    let view = System.Optional.Some<readonly Counter&>(counter)
+    let callback = System.Optional.Some<fn<int, int>>(Add)
     let empty = System.Result.Ok<Void>(Nothing())
     let voidResult = Result<Void, string>(empty)
     if let Ok(_) = voidResult { return callback.Value(view.Value.Value) }
@@ -46,7 +46,7 @@ fn constructor_arguments_execute_once_and_errors_are_distinct_variants() {
 func Next(counter: int&) -> int { counter = counter + 1; return 42 }
 func Main() -> int {
     var calls = 0
-    let some = Option<int>(System.Option.Some<int>(Next(&calls)))
+    let some = Optional<int>(System.Optional.Some<int>(Next(&calls)))
     let error = Result<int, string>(System.Result.Failure<string>("no"))
     let Some(value) = some else { return -1 }
     if calls != 1 { return -2 }
@@ -66,7 +66,7 @@ fn invalid_constructors_and_unclosed_generic_cases_are_rejected() {
         "System.Result.Ok()",
         "Result<int, string>(42)",
         "System.Collections.ArrayListState<int>()",
-        "System.Option.Some<int>(42, 43)",
+        "System.Optional.Some<int>(42, 43)",
     ] {
         assert!(
             frontend::compile(&format!("func Main() -> () {{ let value = {expression} }}"))
@@ -78,7 +78,7 @@ fn invalid_constructors_and_unclosed_generic_cases_are_rejected() {
 
 #[test]
 fn case_constructors_do_not_hide_frame_references() {
-    let source = "func Main() -> System.Option.Some<int&> { var value = 42; return System.Option.Some<int&>(&value) }";
+    let source = "func Main() -> System.Optional.Some<int&> { var value = 42; return System.Optional.Some<int&>(&value) }";
     let module = frontend::compile(source).unwrap();
     assert!(
         LoadedProgram::new(&module)
@@ -92,8 +92,8 @@ fn case_constructors_do_not_hide_frame_references() {
 fn enclosing_generic_parameters_close_case_constructors_without_losing_reference_mode() {
     let source = r#"
 record Counter(Value: int)
-func Wrap<T>(value: T) -> System.Option.Some<T> {
-    return System.Option.Some<T>(value)
+func Wrap<T>(value: T) -> System.Optional.Some<T> {
+    return System.Optional.Some<T>(value)
 }
 func Main() -> int {
     let counter = new Counter(40)
@@ -110,7 +110,7 @@ func Main() -> int {
 fn inferred_cases_preserve_argument_types_before_carrier_conversion() {
     let source = r#"
 record Counter(Value: int)
-func Wrap<T>(value: T) -> System.Option.Some<T> { return System.Option.Some(value) }
+func Wrap<T>(value: T) -> System.Optional.Some<T> { return System.Optional.Some(value) }
 func Nothing() -> () {}
 func Main() -> int {
     let counter = new Counter(40)
@@ -121,8 +121,8 @@ func Main() -> int {
     let wrapped = Wrap(alias)
     wrapped.Value.Value = 42
     let view: readonly Counter& = counter
-    let some = System.Option.Some(view)
-    let readonlyOption: Option<readonly Counter&> = some
+    let some = System.Optional.Some(view)
+    let readonlyOption: Optional<readonly Counter&> = some
     let empty: Result<Void, string> = System.Result.Ok(Nothing())
     if let Ok(_) = empty { return wrapped.Value.Value }
     return -3
@@ -135,7 +135,7 @@ func Main() -> int {
 fn constructor_inference_is_bounded_and_evaluates_arguments_once() {
     let mut expression = "Next(&calls)".to_owned();
     for _ in 0..24 {
-        expression = format!("System.Option.Some({expression})");
+        expression = format!("System.Optional.Some({expression})");
     }
     let source = format!(
         "func Next(calls: int&) -> int {{ calls = calls + 1; return 42 }} func Main() -> int {{ var calls = 0; let value = {expression}; return calls }}"
@@ -149,7 +149,7 @@ fn carrier_target_does_not_supply_or_override_constructor_evidence() {
         "let result: Result<Void, string> = System.Result.Ok(42)",
         "let result: Result<int, string> = Result(System.Result.Ok(42))",
         "let value = System.Result.Ok<int>(true)",
-        "let value = System.Option.Some()",
+        "let value = System.Optional.Some()",
         "let value = Ok(42)",
     ] {
         assert!(

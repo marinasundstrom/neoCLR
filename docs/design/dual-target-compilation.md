@@ -36,7 +36,7 @@ scope clarification.
 4. External interface contracts across contracts, implementation and consumer assemblies;
    evolve metadata writer/reader/verifier/runtime together and preserve compatibility.
 5. Establish one declared owner per bootstrap/library type, resolving source/seed iteration
-   identity; build collection contracts, ArrayList, comparers/HashMap, Option/Result/query
+   identity; build collection contracts, ArrayList, comparers/HashMap, Optional/Result/query
    dependencies as independent libraries.
 6. Run unchanged application-order-collections against those libraries on both targets;
    fix reduced regressions at their owning layer instead of rewriting consumers.
@@ -172,7 +172,7 @@ python3 scripts/check-source-iteration.py --raven-root /absolute/path/to/Raven \
 ```
 
 Next source-library dependencies include CheckedStorage, Fail, callback signatures and
-Option. The source/seed partition for those declarations remains open. The author also
+Optional. The source/seed partition for those declarations remains open. The author also
 explicitly requires native Self signatures: the runtime already understands SelfType,
 but the Cecil-like SignatureType/readers/introspection/compiler path must preserve that
 semantic form rather than the temporary CLI marker. This is additional required metadata
@@ -210,7 +210,7 @@ then `python3 scripts/check-source-storage.py --raven-root <Raven> --core /tmp/s
 --output <fresh-directory>`.
 
 The [unchanged-source inventory](../experiments/extended-cli-metadata/arraylist-inventory-2026-10-03.json)
-compiles Option and Propagatable alongside the seven collection contracts on .NET. Native
+compiles Optional and Propagatable alongside the seven collection contracts on .NET. Native
 emission rejects the propagation interface's out-parameter signatures. Including ArrayList
 also exposes missing System.Fail binding and minimal-bootstrap callback accessibility on
 native; .NET lacks the runtime storage/Fail service adapters. These are separate dependency
@@ -241,7 +241,7 @@ parity, mode conflicts, readonly rejection and open/constructed signature substi
 See [evidence](../experiments/extended-cli-metadata/parameter-modes-2026-10-03.json).
 
 The unchanged source Propagatable interface now emits with the source-owned collection
-contracts. Option no longer fails interface admission; it now reaches the native source
+contracts. Optional no longer fails interface admission; it now reaches the native source
 union/declaration emission rejection. This is the next source-library gate, alongside the
 previously recorded Fail/callback bootstrap dependencies for ArrayList. No source stubs or
 manual union carriers replace the runtime library, and broad application completion remains open.
@@ -268,7 +268,7 @@ This matches CLR inline value storage and copy semantics: an executable tag/payl
 fixture returns 42 on both runtimes after mutating an independent copy. Direct native
 imports of nongeneric/generic value constructors and methods also execute on both.
 The fixture uses an Int32 tag and is a metadata contract test, not a replacement for
-Raven union lowering or proof that source Option compiles.
+Raven union lowering or proof that source Optional compiles.
 
 Raven maps the introspection value category to Struct and its semantic ValueType base;
 generic field substitution remains in introspection. It does not reopen imported
@@ -297,7 +297,7 @@ checks ordinary driver compilation and execution on both targets: generic inline
 explicit/default constructors, accessors, self copies, local field mutation and independent
 copies return 42 with empty stdout/stderr. Unsupported value-interface implementation
 rejects with NEOMETA001 and no output. This is same-compilation source value coverage,
-not separate native library consumption or source Option completion. Source and artifact
+not separate native library consumption or source Optional completion. Source and artifact
 hashes plus command results are recorded by the harness.
 
 Remaining union dependencies include nested case/companion declarations, the Byte tag,
@@ -358,7 +358,7 @@ required. Existing library IILGenerator remains behind Raven's emitter boundary.
 
 Generated union declaration collection, Byte discriminators, full synthesized union
 contracts and symbol-authored external value/case operands remain pending. This test
-contains ordinary nested declarations; it does not claim that unchanged Option or the
+contains ordinary nested declarations; it does not claim that unchanged Optional or the
 broad class-library consumer compiles yet.
 
 
@@ -395,7 +395,7 @@ primitive encoding. Embedded native union marker constructors are metadata-only 
 records; unlike CLI attributes they currently lack System.Attribute inheritance. This
 bounded representation remains documented and does not introduce union-specific wire data.
 Separate-library native union symbol reconstruction and external value references remain
-pending; local execution is not the full union or source Option acceptance gate.
+pending; local execution is not the full union or source Optional acceptance gate.
 
 
 ## Native union imports (development, 2026-10-03)
@@ -427,8 +427,8 @@ copy after replacing the original, and match the payload. Malformed duplicate or
 reject with no output. 21 focused .NET regressions and 124 metadata contract groups pass.
 
 Limitations: native embedded marker types retain the documented bounded attribute profile;
-CLI IUnion projection, imported ToString overrides and unchanged Option/Result completion
-are not claimed. The source Option ownership probe now reaches an unregistered System.Void
+CLI IUnion projection, imported ToString overrides and unchanged Optional/Result completion
+are not claimed. The source Optional ownership probe now reaches an unregistered System.Void
 residual type argument. This requires a coherent unit-value/bootstrap contract, not removal
 of source declarations or a fallback to CLI library imports. The API documentation guest
 snapshot remains stale for the previously recorded bridge issue.
@@ -455,14 +455,14 @@ returning 42. Runtime and metadata representation were already sufficient; this 
 binding gap. The compiler fix is independently validated on the main-based fixes branch
 (fc32e3b9e), with 16 focused tests passing there and on the integration branch (ca7164aa2).
 Main is unchanged. See [execution evidence](../experiments/extended-cli-metadata/inhabited-unit-execution-2026-10-03.json).
-Unchanged Option still requires coherent bootstrap/source ownership before execution.
+Unchanged Optional still requires coherent bootstrap/source ownership before execution.
 
 
-### Unchanged source Option/Result execution (2026-10-03)
+### Unchanged source Optional/Result execution (2026-10-03)
 
 The bounded [union bootstrap](../experiments/extended-cli-metadata/bootstrap/README.md)
 now supplies executable primitive services without duplicate collection/union definitions.
-The ownership manifest assigns iteration, Propagatable, Option and Result to the source
+The ownership manifest assigns iteration, Propagatable, Optional and Result to the source
 library. A generated storage core supplies explicit primitive symbols only; native library
 references use the metadata importer. The seed's Object display adapter uses existing
 native type-handle queries rather than constructing the guest introspection facade.
@@ -476,7 +476,7 @@ positions map to the selected nominal unit representation; return positions pres
 existing no-result mapping. Importer objects remain outside emission.
 
 The unchanged sources compile into NeoCLR.Collections.dll. A separate consumer using only
-that native reference executes with exact output `Option.Some(40)` and `Result.Error(7)`,
+that native reference executes with exact output `Optional.Some(40)` and `Result.Error(7)`,
 exit 42, and checks copies, output initialization and residuals. Missing-library and duplicate
 seed ownership tests reject without output. This does not complete the executable .NET
 adapter, broader collections or application-order-collections gates. See the reproducible
@@ -496,7 +496,7 @@ The separate consumer still fails before publication: native declaration materia
 rejects the callback function-signature category used by ArrayList.Find and related methods.
 This is the next reader/facade/importer task. The source-included run is a diagnostic control,
 not a completed native-reference gate or the dual-target application gate. The existing
-separate Option/Result consumer still passes. See the bootstrap README and
+separate Optional/Result consumer still passes. See the bootstrap README and
 `docs/experiments/extended-cli-metadata/arraylist-source-assessment-2026-10-03.json` in neoCLR.
 The CLI callback declarations are existing bridge transport; no new Function semantics or
 integration of the separate structural Function branches is claimed.
@@ -513,7 +513,7 @@ Reflection backend change or integration of the separate Function language exper
 Explicit no-result callback imports reject rather than silently acquiring an inhabited
 unit result; the facade preserves both categories.
 
-The ordinary driver compiles unchanged ArrayList, iteration and Option/Result sources to
+The ordinary driver compiles unchanged ArrayList, iteration and Optional/Result sources to
 NeoCLR.Collections.dll, then compiles its consumer with only the emitted reference.
 Alias mutation, independent copies, iteration and Find callbacks execute (42). Negative
 capacity also executes through a separately compiled consumer and fails as expected.

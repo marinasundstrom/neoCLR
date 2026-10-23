@@ -1,7 +1,7 @@
 module System
 
 import System.Result.*
-import System.Option.*
+import System.Optional.*
 import System.Text.Utf8SliceError
 
 public class String : EquatableTo<string>, ComparableTo<string>, Collections.Sequence<Character> {
@@ -135,7 +135,7 @@ public class String : EquatableTo<string>, ComparableTo<string>, Collections.Seq
     }
 
     /// Returns a grapheme, or None when index is outside the text.
-    func Get(index: int) -> Option<Character> {
+    func Get(index: int) -> Optional<Character> {
         if index < 0 {
             return None
         }
@@ -146,7 +146,7 @@ public class String : EquatableTo<string>, ComparableTo<string>, Collections.Seq
     }
 
     /// Returns a grapheme at a directional index, or None when outside the text.
-    func Get(index: Index) -> Option<Character> => Get(index.GetOffset(Length))
+    func Get(index: Index) -> Optional<Character> => Get(index.GetOffset(Length))
 
     /// Copies a grapheme range, or returns InvalidRangeError for invalid bounds.
     func Slice(range: Range) -> Result<string, InvalidRangeError> {

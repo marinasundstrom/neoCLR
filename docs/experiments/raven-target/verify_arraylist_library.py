@@ -15,7 +15,7 @@ add_toolchain_arguments(parser)
 args = parser.parse_args()
 header = '''import System.*
 import System.Collections.*
-import System.Option.*
+import System.Optional.*
 import System.Console.*
 '''
 results = {}

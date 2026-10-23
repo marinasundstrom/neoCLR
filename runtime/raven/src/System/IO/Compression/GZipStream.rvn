@@ -4,7 +4,7 @@ import System.*
 import System.Collections.*
 import System.IO.*
 import System.Result.*
-import System.Option.*
+import System.Optional.*
 import System.Concurrency.*
 import System.Concurrency.Tasks.*
 import System.Runtime.CompilerServices.*
@@ -12,8 +12,8 @@ import System.Runtime.CompilerServices.*
 /// <summary>Gzip compression and bounded, validated decompression over asynchronous byte streams.</summary>
 /// <remarks>Sequential operations only. Compression writes incrementally; await Finish before Close. Decompression buffers to EOF, accepting at most 65536 compressed and 65536 decoded bytes across all members. No seek, compression-level selection or automatic HTTP encoding is supplied.</remarks>
 public class GZipStream : InputStream, OutputStream {
-    private val input: Option<InputStream>
-    private val output: Option<OutputStream>
+    private val input: Optional<InputStream>
+    private val output: Optional<OutputStream>
     private val leaveOpen: bool
     private var closed: bool = false
     private var failed: bool = false
@@ -24,7 +24,7 @@ public class GZipStream : InputStream, OutputStream {
     private var decoded: byte[] = []
     private var cursor: int = 0
 
-    private init(input: Option<InputStream>, output: Option<OutputStream>, leaveOpen: bool) {
+    private init(input: Optional<InputStream>, output: Optional<OutputStream>, leaveOpen: bool) {
         self.input = input
         self.output = output
         self.leaveOpen = leaveOpen

@@ -40,7 +40,7 @@ now permits erased/delegate payload fields to remain uninitialized while the con
 assigns them. Reading unassigned storage or publishing an incompletely initialized
 object still faults; explicit unsupported defaults remain rejected.
 
-Additional iterable and Option/Result operators are additive. Their vocabulary,
+Additional iterable and Optional/Result operators are additive. Their vocabulary,
 short-circuiting, callback and disposal contracts are documented in the existing
 [query](raven-query-api.md) and [outcome](raven-outcome-operators.md) design records.
 
@@ -62,7 +62,7 @@ These names appeared during development, not in published Preview 8:
   Error; `Then` chains tasks. Cancellation bypasses their user callbacks. Awaiting a
   cancelled task cancels the enclosing async task; it does not invent a value.
 - With the development compiler, use `await input?`: await completes first, then
-  `?` propagates Error from a Result or None from an Option. Parentheses around
+  `?` propagates Error from a Result or None from an Optional. Parentheses around
   `await input` are no longer required; they remain valid for older toolchains.
   Await inside `for` loops remains diagnosed until iterator cleanup is
   suspension-aware. These compiler protocols remain provisional.

@@ -1,8 +1,8 @@
 import System.*
-import System.Option.*
+import System.Optional.*
 
 func Main() -> int {
-    let candidate: Option<int> = Some(42)
+    let candidate: Optional<int> = Some(42)
     let Some(value) = candidate else {
         System.Fail("missing value")
     }

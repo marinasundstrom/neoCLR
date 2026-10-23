@@ -1,6 +1,6 @@
 module System
 
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 
 public extension ResultOperators<T, E> for Result<T, E> {

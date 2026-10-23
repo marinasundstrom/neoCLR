@@ -36,7 +36,7 @@ implicit-conversion behavior. A case may be accepted by more than one carrier.
 
 This slice generates constructors from source declarations. Importing arbitrary union
 metadata into Neo's type/constructor lookup is still separate work; it does not claim
-to recognize every externally authored carrier. Existing bundled Option/Result
+to recognize every externally authored carrier. Existing bundled Optional/Result
 matching continues to use their constructor/accessor convention.
 
 ## Matching whole variants
@@ -56,7 +56,7 @@ syntax. `Circle(_)` discards it; `Circle` tests the case without binding, even i
 has fields. A wildcard `_` can cover remaining cases. Expressions and statements
 require coverage, and unknown, duplicate or unreachable cases are rejected.
 Patterns use the case's simple type name; duplicate simple names in a union are
-rejected instead of guessed. Existing System.Result's `Ok(let value)` and Option's
+rejected instead of guessed. Existing System.Result's `Ok(let value)` and Optional's
 `Some(let value)` continue to extract their single payload; this slice does not
 change those published sample conventions into whole-wrapper bindings.
 

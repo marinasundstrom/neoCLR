@@ -53,13 +53,13 @@ ret
 newobj instance System.ConsoleReadError.ReadFailed::.ctor()
 ret
 .end
-.function neoCLR.Library.System.Console.RuntimeUnion0() -> System.Option.None
-newobj instance System.Option.None::.ctor()
+.function neoCLR.Library.System.Console.RuntimeUnion0() -> System.Optional.None
+newobj instance System.Optional.None::.ctor()
 ret
 .end
-.function neoCLR.Library.System.Console.RuntimeUnion1(System.Option.None arg0) -> System.Option<Byte>
+.function neoCLR.Library.System.Console.RuntimeUnion1(System.Optional.None arg0) -> System.Optional<Byte>
 ldarg arg0
-newobj instance System.Option<Byte>::.ctor(System.Option.None)
+newobj instance System.Optional<Byte>::.ctor(System.Optional.None)
 ret
 .end
 .function neoCLR.Library.System.Console.RuntimeUnion2(System.ConsoleReadError arg0) -> System.Result.Failure<System.ConsoleReadError>
@@ -67,29 +67,29 @@ ldarg arg0
 newobj instance System.Result.Failure<System.ConsoleReadError>::.ctor(System.ConsoleReadError)
 ret
 .end
-.function neoCLR.Library.System.Console.RuntimeUnion3(System.Option<Byte> arg0) -> System.Result.Ok<System.Option<Byte>>
+.function neoCLR.Library.System.Console.RuntimeUnion3(System.Optional<Byte> arg0) -> System.Result.Ok<System.Optional<Byte>>
 ldarg arg0
-newobj instance System.Result.Ok<System.Option<Byte>>::.ctor(System.Option<Byte>)
+newobj instance System.Result.Ok<System.Optional<Byte>>::.ctor(System.Optional<Byte>)
 ret
 .end
-.function neoCLR.Library.System.Console.RuntimeUnion4(Byte arg0) -> System.Option.Some<Byte>
+.function neoCLR.Library.System.Console.RuntimeUnion4(Byte arg0) -> System.Optional.Some<Byte>
 ldarg arg0
-newobj instance System.Option.Some<Byte>::.ctor(Byte)
+newobj instance System.Optional.Some<Byte>::.ctor(Byte)
 ret
 .end
-.function neoCLR.Library.System.Console.RuntimeUnion5(System.Result.Failure<System.ConsoleReadError> arg0) -> System.Result<System.Option<Byte>,System.ConsoleReadError>
+.function neoCLR.Library.System.Console.RuntimeUnion5(System.Result.Failure<System.ConsoleReadError> arg0) -> System.Result<System.Optional<Byte>,System.ConsoleReadError>
 ldarg arg0
-newobj instance System.Result<System.Option<Byte>,System.ConsoleReadError>::.ctor(System.Result.Failure<System.ConsoleReadError>)
+newobj instance System.Result<System.Optional<Byte>,System.ConsoleReadError>::.ctor(System.Result.Failure<System.ConsoleReadError>)
 ret
 .end
-.function neoCLR.Library.System.Console.RuntimeUnion6(System.Result.Ok<System.Option<Byte>> arg0) -> System.Result<System.Option<Byte>,System.ConsoleReadError>
+.function neoCLR.Library.System.Console.RuntimeUnion6(System.Result.Ok<System.Optional<Byte>> arg0) -> System.Result<System.Optional<Byte>,System.ConsoleReadError>
 ldarg arg0
-newobj instance System.Result<System.Option<Byte>,System.ConsoleReadError>::.ctor(System.Result.Ok<System.Option<Byte>>)
+newobj instance System.Result<System.Optional<Byte>,System.ConsoleReadError>::.ctor(System.Result.Ok<System.Optional<Byte>>)
 ret
 .end
-.function neoCLR.Library.System.Console.RuntimeUnion7(System.Option.Some<Byte> arg0) -> System.Option<Byte>
+.function neoCLR.Library.System.Console.RuntimeUnion7(System.Optional.Some<Byte> arg0) -> System.Optional<Byte>
 ldarg arg0
-newobj instance System.Option<Byte>::.ctor(System.Option.Some<Byte>)
+newobj instance System.Optional<Byte>::.ctor(System.Optional.Some<Byte>)
 ret
 .end
 .function neoCLR.Library.System.Console.RuntimeUnion8(System.Result<Int32,System.IO.StreamError>& arg0,out(true) System.Result.Ok<Int32>& arg1) -> Boolean
@@ -151,21 +151,21 @@ ldarg arg0
 newobj instance System.Result<Int32,System.IO.StreamError>::.ctor(System.Result.Ok<Int32>)
 ret
 .end
-.function neoCLR.Library.System.Console.RuntimeUnion19(System.Result<System.Option<Byte>,System.ConsoleReadError>& arg0,out(true) System.Result.Ok<System.Option<Byte>>& arg1) -> Boolean
+.function neoCLR.Library.System.Console.RuntimeUnion19(System.Result<System.Optional<Byte>,System.ConsoleReadError>& arg0,out(true) System.Result.Ok<System.Optional<Byte>>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Result<System.Option<Byte>,System.ConsoleReadError>::TryGetValue(System.Result.Ok<System.Option<Byte>>&)
+call instance System.Result<System.Optional<Byte>,System.ConsoleReadError>::TryGetValue(System.Result.Ok<System.Optional<Byte>>&)
 ret
 .end
-.function neoCLR.Library.System.Console.RuntimeUnion20(System.Result.Ok<System.Option<Byte>>& arg0) -> System.Option<Byte>
+.function neoCLR.Library.System.Console.RuntimeUnion20(System.Result.Ok<System.Optional<Byte>>& arg0) -> System.Optional<Byte>
 ldarg arg0
-call instance System.Result.Ok<System.Option<Byte>>::get_Value()
+call instance System.Result.Ok<System.Optional<Byte>>::get_Value()
 ret
 .end
-.function neoCLR.Library.System.Console.RuntimeUnion21(System.Result<System.Option<Byte>,System.ConsoleReadError>& arg0,out(true) System.Result.Failure<System.ConsoleReadError>& arg1) -> Boolean
+.function neoCLR.Library.System.Console.RuntimeUnion21(System.Result<System.Optional<Byte>,System.ConsoleReadError>& arg0,out(true) System.Result.Failure<System.ConsoleReadError>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Result<System.Option<Byte>,System.ConsoleReadError>::TryGetValue(System.Result.Failure<System.ConsoleReadError>&)
+call instance System.Result<System.Optional<Byte>,System.ConsoleReadError>::TryGetValue(System.Result.Failure<System.ConsoleReadError>&)
 ret
 .end
 .function neoCLR.Library.System.Console.RuntimeUnion22(System.Result.Failure<System.ConsoleReadError>& arg0) -> System.ConsoleReadError
@@ -173,21 +173,21 @@ ldarg arg0
 call instance System.Result.Failure<System.ConsoleReadError>::get_Value()
 ret
 .end
-.function neoCLR.Library.System.Console.RuntimeUnion23(System.Option<Byte>& arg0,out(true) System.Option.Some<Byte>& arg1) -> Boolean
+.function neoCLR.Library.System.Console.RuntimeUnion23(System.Optional<Byte>& arg0,out(true) System.Optional.Some<Byte>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Option<Byte>::TryGetValue(System.Option.Some<Byte>&)
+call instance System.Optional<Byte>::TryGetValue(System.Optional.Some<Byte>&)
 ret
 .end
-.function neoCLR.Library.System.Console.RuntimeUnion24(System.Option.Some<Byte>& arg0) -> Byte
+.function neoCLR.Library.System.Console.RuntimeUnion24(System.Optional.Some<Byte>& arg0) -> Byte
 ldarg arg0
-call instance System.Option.Some<Byte>::get_Value()
+call instance System.Optional.Some<Byte>::get_Value()
 ret
 .end
-.function neoCLR.Library.System.Console.RuntimeUnion25(System.Option<Byte>& arg0,out(true) System.Option.None& arg1) -> Boolean
+.function neoCLR.Library.System.Console.RuntimeUnion25(System.Optional<Byte>& arg0,out(true) System.Optional.None& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Option<Byte>::TryGetValue(System.Option.None&)
+call instance System.Optional<Byte>::TryGetValue(System.Optional.None&)
 ret
 .end
 .function neoCLR.Library.System.Console.RuntimeUnion26(System.Result.Failure<System.IO.StreamError> arg0) -> System.Result<Void,System.IO.StreamError>
@@ -277,46 +277,46 @@ M0000001b_IL_000f:
 ret
 .end
 .method instance Read(arrayref<Byte> buffer,Int32 offset,Int32 count) -> System.Result<Int32,System.IO.StreamError>
-.local System.Result<System.Option<Byte>,System.ConsoleReadError> local0
+.local System.Result<System.Optional<Byte>,System.ConsoleReadError> local0
 .local System.Result<Int32,System.IO.StreamError> local1
-.local System.Option<Byte> local2
-.local System.Result<System.Option<Byte>,System.ConsoleReadError> local3
-.local System.Result.Ok<System.Option<Byte>> local4
+.local System.Optional<Byte> local2
+.local System.Result<System.Optional<Byte>,System.ConsoleReadError> local3
+.local System.Result.Ok<System.Optional<Byte>> local4
 .local System.Result<Int32,System.IO.StreamError> local5
 .local Byte local6
-.local System.Option<Byte> local7
-.local System.Option.Some<Byte> local8
+.local System.Optional<Byte> local7
+.local System.Optional.Some<Byte> local8
 .local System.Result<Int32,System.IO.StreamError> local9
-.local System.Option<Byte> local10
-.local System.Option.None local11
-.local System.Result<System.Option<Byte>,System.ConsoleReadError> local12
+.local System.Optional<Byte> local10
+.local System.Optional.None local11
+.local System.Result<System.Optional<Byte>,System.ConsoleReadError> local12
 .local System.Result.Failure<System.ConsoleReadError> local13
 ldloca local0
-initobj System.Result<System.Option<Byte>,System.ConsoleReadError>
+initobj System.Result<System.Optional<Byte>,System.ConsoleReadError>
 ldloca local1
 initobj System.Result<Int32,System.IO.StreamError>
 ldloca local2
-initobj System.Option<Byte>
+initobj System.Optional<Byte>
 ldloca local3
-initobj System.Result<System.Option<Byte>,System.ConsoleReadError>
+initobj System.Result<System.Optional<Byte>,System.ConsoleReadError>
 ldloca local4
-initobj System.Result.Ok<System.Option<Byte>>
+initobj System.Result.Ok<System.Optional<Byte>>
 ldloca local5
 initobj System.Result<Int32,System.IO.StreamError>
 ldc.i4 0
 stloc local6
 ldloca local7
-initobj System.Option<Byte>
+initobj System.Optional<Byte>
 ldloca local8
-initobj System.Option.Some<Byte>
+initobj System.Optional.Some<Byte>
 ldloca local9
 initobj System.Result<Int32,System.IO.StreamError>
 ldloca local10
-initobj System.Option<Byte>
+initobj System.Optional<Byte>
 ldloca local11
-initobj System.Option.None
+initobj System.Optional.None
 ldloca local12
-initobj System.Result<System.Option<Byte>,System.ConsoleReadError>
+initobj System.Result<System.Optional<Byte>,System.ConsoleReadError>
 ldloca local13
 initobj System.Result.Failure<System.ConsoleReadError>
 M0000001c_IL_0000:
@@ -506,19 +506,19 @@ stloc local3
 M0000001c_IL_0121:
 ldloca local4
 M0000001c_IL_0123:
-initobj System.Result.Ok<System.Option<Byte>>
+initobj System.Result.Ok<System.Optional<Byte>>
 M0000001c_IL_0129:
 ldloca local3
 M0000001c_IL_012b:
 ldloca local4
 M0000001c_IL_012d:
-call neoCLR.Library.System.Console.RuntimeUnion19(System.Result<System.Option<Byte>,System.ConsoleReadError>&,System.Result.Ok<System.Option<Byte>>&)
+call neoCLR.Library.System.Console.RuntimeUnion19(System.Result<System.Optional<Byte>,System.ConsoleReadError>&,System.Result.Ok<System.Optional<Byte>>&)
 M0000001c_IL_0132:
 brfalse M0000001c_IL_01e1
 M0000001c_IL_0137:
 ldloca local4
 M0000001c_IL_0139:
-call neoCLR.Library.System.Console.RuntimeUnion20(System.Result.Ok<System.Option<Byte>>&)
+call neoCLR.Library.System.Console.RuntimeUnion20(System.Result.Ok<System.Optional<Byte>>&)
 M0000001c_IL_013e:
 stloc local2
 M0000001c_IL_013f:
@@ -536,19 +536,19 @@ stloc local7
 M0000001c_IL_0157:
 ldloca local8
 M0000001c_IL_0159:
-initobj System.Option.Some<Byte>
+initobj System.Optional.Some<Byte>
 M0000001c_IL_015f:
 ldloca local7
 M0000001c_IL_0161:
 ldloca local8
 M0000001c_IL_0163:
-call neoCLR.Library.System.Console.RuntimeUnion23(System.Option<Byte>&,System.Option.Some<Byte>&)
+call neoCLR.Library.System.Console.RuntimeUnion23(System.Optional<Byte>&,System.Optional.Some<Byte>&)
 M0000001c_IL_0168:
 brfalse M0000001c_IL_019e
 M0000001c_IL_016d:
 ldloca local8
 M0000001c_IL_016f:
-call neoCLR.Library.System.Console.RuntimeUnion24(System.Option.Some<Byte>&)
+call neoCLR.Library.System.Console.RuntimeUnion24(System.Optional.Some<Byte>&)
 M0000001c_IL_0174:
 stloc local6
 M0000001c_IL_0176:
@@ -588,7 +588,7 @@ ldloca local10
 M0000001c_IL_01a5:
 ldloca local11
 M0000001c_IL_01a7:
-call neoCLR.Library.System.Console.RuntimeUnion25(System.Option<Byte>&,System.Option.None&)
+call neoCLR.Library.System.Console.RuntimeUnion25(System.Optional<Byte>&,System.Optional.None&)
 M0000001c_IL_01ac:
 brfalse M0000001c_IL_01d3
 M0000001c_IL_01b1:
@@ -636,7 +636,7 @@ ldloca local12
 M0000001c_IL_01ef:
 ldloca local13
 M0000001c_IL_01f1:
-call neoCLR.Library.System.Console.RuntimeUnion21(System.Result<System.Option<Byte>,System.ConsoleReadError>&,System.Result.Failure<System.ConsoleReadError>&)
+call neoCLR.Library.System.Console.RuntimeUnion21(System.Result<System.Optional<Byte>,System.ConsoleReadError>&,System.Result.Failure<System.ConsoleReadError>&)
 M0000001c_IL_01f6:
 brfalse M0000001c_IL_0229
 M0000001c_IL_01fb:

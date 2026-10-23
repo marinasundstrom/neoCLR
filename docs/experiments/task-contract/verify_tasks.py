@@ -22,7 +22,7 @@ prelude = '''import System.*
 import System.Collections.*
 import System.Concurrency.Tasks.*
 import System.Result.*
-import System.Option.*
+import System.Optional.*
 import System.Concurrency.Tasks.TaskOutcome.*
 import System.Console.*
 
@@ -100,7 +100,7 @@ cases = {
     let unitSource = Promise<unit>(queue)
     unitSource.Complete(())
     Check(unitSource.Task.Outcome is Some(Completed(_)))
-    let optional = Promise<Option<int>>(queue)
+    let optional = Promise<Optional<int>>(queue)
     optional.Complete(None())
     Check(optional.Task.Outcome is Some(Completed(None)))
     Check(optional.Task.State == TaskState.Completed)

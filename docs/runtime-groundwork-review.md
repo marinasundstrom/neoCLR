@@ -80,17 +80,17 @@ reflection must all preserve the complete object correctly.
 ### 3. Absence and initialization need distinct representations
 
 The [nullability direction](nullability.md) now selects an explicit type-signature
-characteristic and a special null state, with Option preferred for optionality.
+characteristic and a special null state, with Optional preferred for optionality.
 The implementation remains future work.
 
 Evidence: [Type](../src/metadata.rs) has no nullable managed form. [Value](../src/value.rs)
-and slots represent uninitialized storage; Option/Result are ordinary library unions.
+and slots represent uninitialized storage; Optional/Result are ordinary library unions.
 A native null pointer is a separate construct.
 
 Groundwork: define null versus uninitialized versus Void, nullable references versus
 references to nullable values, default initialization, arrays and clearing GC edges.
 Specify whether a nullable view can be narrowed and what runtime check establishes
-non-null access. Decide the relationship to Option<T> explicitly.
+non-null access. Decide the relationship to Optional<T> explicitly.
 
 This must precede not-null generic constraints and broad nullable APIs. Constraints
 also need common validation at definition, substitution and invocation boundaries;

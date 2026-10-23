@@ -60,7 +60,7 @@ impl Query {
             "neoCLR.Runtime.TypeDeclaringType" => (
                 Self::DeclaringType,
                 false,
-                "System.Option<System.Introspection.TypeInfo>",
+                "System.Optional<System.Introspection.TypeInfo>",
             ),
             "neoCLR.Runtime.TypeMetadataToken" => (Self::MetadataToken, false, "Int32"),
             "neoCLR.Runtime.TypeModule" => (Self::Module, false, "System.Introspection.ModuleInfo"),
@@ -95,9 +95,9 @@ impl Query {
             "neoCLR.Runtime.TypeGenericArguments" => {
                 (Self::GenericArguments, false, "System.Type[]")
             }
-            "neoCLR.Runtime.TypeBaseType" => (Self::BaseType, false, "System.Option<System.Type>"),
+            "neoCLR.Runtime.TypeBaseType" => (Self::BaseType, false, "System.Optional<System.Type>"),
             "neoCLR.Runtime.TypeElementType" => {
-                (Self::ElementType, false, "System.Option<System.Type>")
+                (Self::ElementType, false, "System.Optional<System.Type>")
             }
             "neoCLR.Runtime.EnumCount" => (Self::EnumCount, false, "Int32"),
             "neoCLR.Runtime.EnumName" => (Self::EnumName, true, "String"),
@@ -1103,14 +1103,14 @@ fn option(module: &QueryContext, name: &str, value: Option<Value>) -> Result<Val
     }
     let element = crate::assembler::parse_type(name)?;
     let ty = Type::Constructed {
-        definition: "System.Option".into(),
+        definition: "System.Optional".into(),
         arguments: vec![element.clone()],
     };
     let some_type = Type::Constructed {
-        definition: "System.Option.Some".into(),
+        definition: "System.Optional.Some".into(),
         arguments: vec![element],
     };
-    let none_type = Type::from_name("System.Option.None");
+    let none_type = Type::from_name("System.Optional.None");
     let layout = crate::inheritance::fields(module, &ty)?;
     let fields = match layout.as_slice() {
         [stored] if stored.ty == Type::Value => {
@@ -1120,7 +1120,7 @@ fn option(module: &QueryContext, name: &str, value: Option<Value>) -> Result<Val
                     ty: some_type,
                     fields: vec![value],
                 },
-                None => record("System.Option.None", vec![]),
+                None => record("System.Optional.None", vec![]),
             };
             vec![Value::Erased(Box::new(case))]
         }
@@ -1142,7 +1142,7 @@ fn option(module: &QueryContext, name: &str, value: Option<Value>) -> Result<Val
             vec![
                 Value::Byte(tag),
                 payload,
-                record("System.Option.None", vec![]),
+                record("System.Optional.None", vec![]),
             ]
         }
         _ => return Err(Fault::new("unsupported reflection Option storage contract")),

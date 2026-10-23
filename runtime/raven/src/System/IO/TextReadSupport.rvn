@@ -2,13 +2,13 @@ module System.IO
 
 import System.*
 import System.Result.*
-import System.Option.*
+import System.Optional.*
 import System.Collections.*
 import System.Text.*
 import System.Runtime.CompilerServices.*
 
 internal class TextReadSupport {
-    static func DecodeLine(bytes: Sequence<byte>, length: int) -> Result<Option<string>, TextReadError> {
+    static func DecodeLine(bytes: Sequence<byte>, length: int) -> Result<Optional<string>, TextReadError> {
         let line = CheckedStorage.Reserve<byte>(length)
         var index = 0
         while index < length {
@@ -17,7 +17,7 @@ internal class TextReadSupport {
         }
         return match Utf8.Decode(line) {
             Ok(let text) => {
-                let present: Option<string> = Some(text)
+                let present: Optional<string> = Some(text)
                 Ok(present)
             }
             Failure(_) => Failure(TextReadError.InvalidEncoding)

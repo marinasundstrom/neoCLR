@@ -8,7 +8,7 @@ static class SourceString
     internal static int Build(AssemblyBuilder core, string output)
     {
         var root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../../.."));
-        var sources = new[] { "String", "Array", "EquatableTo", "Disposable", "Collections/Iterator", "Collections/Iterable", "Collections/Collection", "Collections/Sequence", "Collections/MutableSequence", "StringComparison", "Propagatable", "Option", "Result", "Attribute", "Runtime/CompilerServices/UnionAttribute", "Text/Utf8SliceError" };
+        var sources = new[] { "String", "Array", "EquatableTo", "Disposable", "Collections/Iterator", "Collections/Iterable", "Collections/Collection", "Collections/Sequence", "Collections/MutableSequence", "StringComparison", "Propagatable", "Optional", "Result", "Attribute", "Runtime/CompilerServices/UnionAttribute", "Text/Utf8SliceError" };
         var catalog = NeoClrReferenceCatalog.ReadNative(Path.Combine(output, "NativeCore.dll"), []);
         var options = CompilationOptions.NeoCLR.WithOutputKind(OutputKind.DynamicallyLinkedLibrary)
             .WithTargetCoreAssemblyName(core.Identity.Name).WithRuntimeTypeOfContract(null)

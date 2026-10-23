@@ -174,7 +174,7 @@ public func ReaderSelectionChecks() {
     let lineSource = Input([(byte)65, (byte)13, (byte)10, (byte)66])
     let lines = StreamReader(lineSource, ascii, true)
     match lines.ReadLine(1) {
-        Ok(Option<string>.Some(let line)) => Check(line.Equals("A"), "ASCII CRLF")
+        Ok(Optional<string>.Some(let line)) => Check(line.Equals("A"), "ASCII CRLF")
         _ => System.Fail("ASCII line")
     }
     ExpectRead(lines.ReadToEnd(1), "B")
@@ -200,7 +200,7 @@ public func ReaderSelectionChecks() {
     }
     let expanded = StreamReader(Input([(byte)1]), ExpandedEncoding())
     match expanded.ReadLine(1) {
-        Ok(Option<string>.Some(let line)) => Check(line.Equals("A"), "Delimit decoded text")
+        Ok(Optional<string>.Some(let line)) => Check(line.Equals("A"), "Delimit decoded text")
         _ => System.Fail("Custom codec line")
     }
     ExpectRead(expanded.ReadToEnd(1), "B")
@@ -228,11 +228,11 @@ public func LineAndRangeChecks() {
         _ = lineInput.Seek((long)0)
         let lineReader = StreamReader(lineInput)
         match lineReader.ReadLine(content.GetUtf8ByteCount()) {
-            Ok(Option<string>.Some(let line)) => Check(line.Equals(content), "Unicode/empty/lone CR line")
+            Ok(Optional<string>.Some(let line)) => Check(line.Equals(content), "Unicode/empty/lone CR line")
             _ => System.Fail("UTF-8 line")
         }
         match lineReader.ReadLine(0) {
-            Ok(Option<string>.None) => { }
+            Ok(Optional<string>.None) => { }
             _ => System.Fail("Line EOF")
         }
     }

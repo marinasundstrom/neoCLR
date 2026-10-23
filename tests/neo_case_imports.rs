@@ -113,7 +113,7 @@ fn bundled_cases_support_inference_explicit_arguments_and_type_positions() {
     let source = r#"
 func Wrap<T>(value: T) -> Some<T> { return Some(value) }
 import System.Result.*
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 record Counter(Value: int)
 func Main() -> int {
@@ -128,8 +128,8 @@ func Main() -> int {
     refCase.Value.Value = 42
     if !ReferenceEquals(refCase.Value, counter) { return -1 }
     if !typeof(Ok<int>).Equals(typeof(System.Result.Ok<int>)) { return -2 }
-    let absent: Option<int> = None()
-    let present: Option<int> = Some(explicit.Value)
+    let absent: Optional<int> = None()
+    let present: Optional<int> = Some(explicit.Value)
     let Some(value) = present else { return -3 }
     if let None = absent { if flag.Value { return value } }
     return -4
@@ -146,7 +146,7 @@ fn imported_constructor_inference_keeps_stable_expression_identity() {
     }
     assert_eq!(
         run(&format!(
-            "import System.Option.*\nfunc Next(calls: int&) -> int {{ calls = calls + 1; return 42 }} func Main() -> int {{ var calls = 0; let nested = {expression}; let number: Some<int> = Some(42); let flag: Some<bool> = Some(true); return calls }}"
+            "import System.Optional.*\nfunc Next(calls: int&) -> int {{ calls = calls + 1; return 42 }} func Main() -> int {{ var calls = 0; let nested = {expression}; let number: Some<int> = Some(42); let flag: Some<bool> = Some(true); return calls }}"
         )),
         Value::Int32(1)
     );
@@ -199,11 +199,11 @@ fn imports_do_not_expand_runtime_or_constructor_contracts() {
         "import System.String.*\nfunc Main() -> () {}",
         "import System.Result.Ok.*\nfunc Main() -> () {}",
         "import System.Result.*\nfunc Main() -> () { let result: Result<Void,string> = Ok(42) }",
-        "import System.Option.*\nfunc Main() -> () { let value = new Some(42) }",
+        "import System.Optional.*\nfunc Main() -> () { let value = new Some(42) }",
     ] {
         assert!(frontend::compile(source).is_err(), "{source}");
     }
-    let module = frontend::compile("import System.Option.*\nfunc Main() -> Option<int&> { var value = 42; return Some(&value) }").unwrap();
+    let module = frontend::compile("import System.Optional.*\nfunc Main() -> Option<int&> { var value = 42; return Some(&value) }").unwrap();
     assert!(
         LoadedProgram::new(&module)
             .unwrap()

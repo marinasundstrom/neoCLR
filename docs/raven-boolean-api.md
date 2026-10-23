@@ -6,7 +6,7 @@ can also pass through admitted generic constructors and collection methods.
 
 The [sample](experiments/raven-target/samples/library-booleans.rvn) checks both
 Boolean argument positions around an integer argument, mixed literal/value calls,
-returned equality, Option<bool> and ArrayList<bool>. It is part of the saved-project
+returned equality, Optional<bool> and ArrayList<bool>. It is part of the saved-project
 suite. Signatures remain Boolean in metadata: an Int32 member signature does not
 become an overload match merely because both use the CLI integer stack category.
 

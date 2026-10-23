@@ -1,10 +1,10 @@
 import System.*
 import System.Collections.*
-import System.Option.*
+import System.Optional.*
 
 // Application-local storage experiment, not the proposed public collection API.
 class QueueStorage<T> {
-    private var slots = ArrayList<Option<T>>()
+    private var slots = ArrayList<Optional<T>>()
     private var head = 0
     private var count = 0
 
@@ -20,7 +20,7 @@ class QueueStorage<T> {
             if capacity != 0 {
                 size = capacity * 2
             }
-            let expanded = ArrayList<Option<T>>(size)
+            let expanded = ArrayList<Optional<T>>(size)
             var index = 0
             while index < count {
                 expanded.Add(slots[(head + index) % capacity])
@@ -37,14 +37,14 @@ class QueueStorage<T> {
         count = count + 1
     }
 
-    func Peek() -> Option<T> {
+    func Peek() -> Optional<T> {
         if count == 0 {
             return None
         }
         return slots[head]
     }
 
-    func Dequeue() -> Option<T> {
+    func Dequeue() -> Optional<T> {
         if count == 0 {
             return None
         }
@@ -74,7 +74,7 @@ class QueueStorage<T> {
 
 // Reuses initialized optional slots to test LIFO removal without a new intrinsic.
 class StackStorage<T> {
-    private var slots = ArrayList<Option<T>>()
+    private var slots = ArrayList<Optional<T>>()
     private var count = 0
 
     val Count: int => count
@@ -88,14 +88,14 @@ class StackStorage<T> {
         count = count + 1
     }
 
-    func Peek() -> Option<T> {
+    func Peek() -> Optional<T> {
         if count == 0 {
             return None
         }
         return slots[count - 1]
     }
 
-    func Pop() -> Option<T> {
+    func Pop() -> Optional<T> {
         if count == 0 {
             return None
         }

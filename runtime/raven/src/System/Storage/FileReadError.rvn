@@ -5,10 +5,10 @@ public union FileReadError : System.Error {
     val Message: string => ToString()
 
     /// Leaf failures have no underlying cause.
-    val Cause: System.Option<System.Error> => System.Option<System.Error>.None
+    val Cause: System.Optional<System.Error> => System.Optional<System.Error>.None
 
     /// Leaf failures do not capture stacks implicitly.
-    val StackTrace: System.Option<System.Diagnostics.StackTrace> => System.Option<System.Diagnostics.StackTrace>.None
+    val StackTrace: System.Optional<System.Diagnostics.StackTrace> => System.Optional<System.Diagnostics.StackTrace>.None
 
     case InvalidLimit
     case InvalidPath

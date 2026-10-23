@@ -1,8 +1,8 @@
 import System.*
 import System.Text.*
-import System.Option.*
+import System.Optional.*
 
-record struct Optional(Value: Option<int>)
+record struct Optional(Value: Optional<int>)
 
 func Main(args: string[]) {
     var count = 0
@@ -18,7 +18,7 @@ func Main(args: string[]) {
             let builder = StringBuilder()
             builder.Append("Optional { ")
             builder.Append("Value = ")
-            builder.Append("Option.Some")
+            builder.Append("Optional.Some")
             builder.Append("(")
             builder.Append(i.ToString())
             builder.Append(")")

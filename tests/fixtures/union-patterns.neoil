@@ -1,14 +1,14 @@
 ; Test-only pattern extraction against the generated union contract.
-.function UnwrapSome<T0>(System.Option<T0> value) -> T0
-.local System.Option.Some<T0> matched
+.function UnwrapSome<T0>(System.Optional<T0> value) -> T0
+.local System.Optional.Some<T0> matched
 ldarga value
 ldloca matched
-call instance System.Option<T0>::TryGetValue(System.Option.Some<T0>&)
+call instance System.Optional<T0>::TryGetValue(System.Optional.Some<T0>&)
 brtrue Found
 fault "Expected Some"
 Found:
 ldloca matched
-call instance System.Option.Some<T0>::get_Value()
+call instance System.Optional.Some<T0>::get_Value()
 ret
 .end
 .function UnwrapOk<T0,T1>(System.Result<T0,T1> value) -> T0
@@ -35,11 +35,11 @@ ldloca matched
 call instance System.Result.Failure<T1>::get_Value()
 ret
 .end
-.function IsNone<T0>(System.Option<T0> value) -> Boolean
-.local System.Option.None matched
+.function IsNone<T0>(System.Optional<T0> value) -> Boolean
+.local System.Optional.None matched
 ldarga value
 ldloca matched
-call instance System.Option<T0>::TryGetValue(System.Option.None&)
+call instance System.Optional<T0>::TryGetValue(System.Optional.None&)
 brtrue Found
 ldc.bool false
 ret

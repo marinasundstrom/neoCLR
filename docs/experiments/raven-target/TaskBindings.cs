@@ -51,7 +51,7 @@ static class TaskBindings
             public sealed class Task<T> : Runtime.CompilerServices.TaskAwaiter {
                 public Task(Promise<T> source) { }
                 public TaskState State => default;
-                public Option<TaskOutcome<T>> Outcome => default;
+                public Optional<TaskOutcome<T>> Outcome => default;
                 public bool IsCompleted => default;
                 public bool IsCancelled => default;
                 public T GetResult() => default;
@@ -167,7 +167,7 @@ static class TaskBindings
             ("TaskQueue", "Drain") => ("", "void"),
             ("Task", ".ctor") => (Prefix + "Promise<" + payload + ">", "void"),
             ("Task", "get_State") => ("", EnumBindings.TaskState),
-            ("Task", "get_Outcome") => ("", "System.Option<System.Concurrency.Tasks.TaskOutcome<" + payload + ">>"),
+            ("Task", "get_Outcome") => ("", "System.Optional<System.Concurrency.Tasks.TaskOutcome<" + payload + ">>"),
             ("Task", "get_IsCompleted" or "get_IsCancelled") => ("", "Boolean"),
             ("Task" or "Promise", "Dispatcher") when library => ("", Queue),
             ("Task", "GetAwaiter") => ("", owner),

@@ -240,7 +240,7 @@ and return String; encoded types and Bytes belong at explicit representation and
 boundaries.
 
 The error model follows the rest of neoCLR: successful searches return Boolean, absent
-positions use `Option<Int>`, expected decoding, encoding and parsing failures use
+positions use `Optional<Int>`, expected decoding, encoding and parsing failures use
 typed `Result`, and `Fault` is reserved for failures where normal execution cannot
 reasonably continue. This removes sentinel indexes, `TryParse` pairs and exceptions
 from normal recoverable cases without making every text operation fallible.

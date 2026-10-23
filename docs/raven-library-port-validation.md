@@ -50,7 +50,7 @@ non-overwriting misses and unproven-read rejection. Snapshot hashes match.
 
 ## Generic union follow-up
 
-Option and Result bring the total to 65 source slices. All 12 admission cases pass,
+Optional and Result bring the total to 65 source slices. All 12 admission cases pass,
 including altered cases, constructor side effects, unsupported payloads, invalid
 defaults, changed output names and an unassigned success return. All 41 focused Rust
 error/generic-bound/result-factory/no-result/propagation/union-output tests pass.
@@ -151,12 +151,12 @@ results below remain a separate acceptance gate.
 ## Final port metadata correction
 
 The complete post-port Rust run exposed one semantic regression: generated
-Option/Result cases had qualified names but no declaring-type identity. The importer
+Optional/Result cases had qualified names but no declaring-type identity. The importer
 now preserves their lexical nesting inside the already validated companion
 containers. This restores metadata ownership without changing case storage,
 constructors, conditional outputs or managed method bodies. The regression checks
 all four cases against the exact resolved owner definition, including nongeneric
-Option.None. All 34 focused nesting, union, factory and reflection tests pass. It does not infer ownership from a display-name prefix.
+Optional.None. All 34 focused nesting, union, factory and reflection tests pass. It does not infer ownership from a display-name prefix.
 
 This is a target importer correction. Raven already emits nested CLI metadata;
 compiler semantics and Runtime Contract settings are unchanged. General application
@@ -328,7 +328,7 @@ context-owned `typeof`. These remain separate from main. Existing reusable metad
 iteration, propagation and unit configuration mechanisms on main do not authorize
 merging the neoCLR branch wholesale.
 
-The Option/Result source work exposed direct out-parameter forwarding being rejected
+The Optional/Result source work exposed direct out-parameter forwarding being rejected
 as unassigned. A regression using a source generic setter and ordinary .NET Math.DivRem
 failed with RAV0269. General fix `5f6e17347` is on Raven main; feature cherry-pick
 `2d2a1d586` keeps the target isolated. All 41 focused semantic/runtime parameter checks

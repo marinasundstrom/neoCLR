@@ -69,7 +69,7 @@ cancellation.
 
 1. **Task state and outcomes.** Implement the enum, union, immutable consumer view
    and single-terminal-transition producer contract. Regenerate matching reference
-   metadata and Raven library artifacts. Validate int, unit, Option, Result and
+   metadata and Raven library artifacts. Validate int, unit, Optional, Result and
    reference payloads, duplicate transitions and private completion authority.
 2. **Composition.** Implement Map and Then against the completion contract without
    async syntax. Use the current explicit queue as provisional dispatch: callbacks

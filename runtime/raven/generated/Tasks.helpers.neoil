@@ -8,23 +8,23 @@ ldarg arg0
 newobj instance System.Concurrency.Tasks.TaskOutcome<T0>::.ctor(System.Concurrency.Tasks.TaskOutcome.Cancelled)
 ret
 .end
-.function neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion2<T0>(System.Concurrency.Tasks.TaskOutcome<T0> arg0) -> System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>>
+.function neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion2<T0>(System.Concurrency.Tasks.TaskOutcome<T0> arg0) -> System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>>
 ldarg arg0
-newobj instance System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>>::.ctor(System.Concurrency.Tasks.TaskOutcome<T0>)
+newobj instance System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>>::.ctor(System.Concurrency.Tasks.TaskOutcome<T0>)
 ret
 .end
-.function neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion3<T0>(System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>> arg0) -> System.Option<System.Concurrency.Tasks.TaskOutcome<T0>>
+.function neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion3<T0>(System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>> arg0) -> System.Optional<System.Concurrency.Tasks.TaskOutcome<T0>>
 ldarg arg0
-newobj instance System.Option<System.Concurrency.Tasks.TaskOutcome<T0>>::.ctor(System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>>)
+newobj instance System.Optional<System.Concurrency.Tasks.TaskOutcome<T0>>::.ctor(System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>>)
 ret
 .end
-.function neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion4() -> System.Option.None
-newobj instance System.Option.None::.ctor()
+.function neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion4() -> System.Optional.None
+newobj instance System.Optional.None::.ctor()
 ret
 .end
-.function neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion5<T0>(System.Option.None arg0) -> System.Option<System.Concurrency.Tasks.TaskOutcome<T0>>
+.function neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion5<T0>(System.Optional.None arg0) -> System.Optional<System.Concurrency.Tasks.TaskOutcome<T0>>
 ldarg arg0
-newobj instance System.Option<System.Concurrency.Tasks.TaskOutcome<T0>>::.ctor(System.Option.None)
+newobj instance System.Optional<System.Concurrency.Tasks.TaskOutcome<T0>>::.ctor(System.Optional.None)
 ret
 .end
 .function neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion6<T0>(T0 arg0) -> System.Concurrency.Tasks.TaskOutcome.Completed<T0>
@@ -37,41 +37,41 @@ ldarg arg0
 newobj instance System.Concurrency.Tasks.TaskOutcome<T0>::.ctor(System.Concurrency.Tasks.TaskOutcome.Completed<T0>)
 ret
 .end
-.function neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion8(System.Option.None arg0) -> System.Option<System.Runtime.CompilerServices.AsyncStateMachine>
+.function neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion8(System.Optional.None arg0) -> System.Optional<System.Runtime.CompilerServices.AsyncStateMachine>
 ldarg arg0
-newobj instance System.Option<System.Runtime.CompilerServices.AsyncStateMachine>::.ctor(System.Option.None)
+newobj instance System.Optional<System.Runtime.CompilerServices.AsyncStateMachine>::.ctor(System.Optional.None)
 ret
 .end
-.function neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion9(System.Runtime.CompilerServices.AsyncStateMachine arg0) -> System.Option.Some<System.Runtime.CompilerServices.AsyncStateMachine>
+.function neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion9(System.Runtime.CompilerServices.AsyncStateMachine arg0) -> System.Optional.Some<System.Runtime.CompilerServices.AsyncStateMachine>
 ldarg arg0
-newobj instance System.Option.Some<System.Runtime.CompilerServices.AsyncStateMachine>::.ctor(System.Runtime.CompilerServices.AsyncStateMachine)
+newobj instance System.Optional.Some<System.Runtime.CompilerServices.AsyncStateMachine>::.ctor(System.Runtime.CompilerServices.AsyncStateMachine)
 ret
 .end
-.function neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion10(System.Option.Some<System.Runtime.CompilerServices.AsyncStateMachine> arg0) -> System.Option<System.Runtime.CompilerServices.AsyncStateMachine>
+.function neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion10(System.Optional.Some<System.Runtime.CompilerServices.AsyncStateMachine> arg0) -> System.Optional<System.Runtime.CompilerServices.AsyncStateMachine>
 ldarg arg0
-newobj instance System.Option<System.Runtime.CompilerServices.AsyncStateMachine>::.ctor(System.Option.Some<System.Runtime.CompilerServices.AsyncStateMachine>)
+newobj instance System.Optional<System.Runtime.CompilerServices.AsyncStateMachine>::.ctor(System.Optional.Some<System.Runtime.CompilerServices.AsyncStateMachine>)
 ret
 .end
-.function neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion11(System.Option<System.Runtime.CompilerServices.AsyncStateMachine>& arg0,out(true) System.Option.Some<System.Runtime.CompilerServices.AsyncStateMachine>& arg1) -> Boolean
+.function neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion11(System.Optional<System.Runtime.CompilerServices.AsyncStateMachine>& arg0,out(true) System.Optional.Some<System.Runtime.CompilerServices.AsyncStateMachine>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Option<System.Runtime.CompilerServices.AsyncStateMachine>::TryGetValue(System.Option.Some<System.Runtime.CompilerServices.AsyncStateMachine>&)
+call instance System.Optional<System.Runtime.CompilerServices.AsyncStateMachine>::TryGetValue(System.Optional.Some<System.Runtime.CompilerServices.AsyncStateMachine>&)
 ret
 .end
-.function neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion12(System.Option.Some<System.Runtime.CompilerServices.AsyncStateMachine>& arg0) -> System.Runtime.CompilerServices.AsyncStateMachine
+.function neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion12(System.Optional.Some<System.Runtime.CompilerServices.AsyncStateMachine>& arg0) -> System.Runtime.CompilerServices.AsyncStateMachine
 ldarg arg0
-call instance System.Option.Some<System.Runtime.CompilerServices.AsyncStateMachine>::get_Value()
+call instance System.Optional.Some<System.Runtime.CompilerServices.AsyncStateMachine>::get_Value()
 ret
 .end
-.function neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion13<T0>(System.Option<System.Concurrency.Tasks.TaskOutcome<T0>>& arg0,out(true) System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>>& arg1) -> Boolean
+.function neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion13<T0>(System.Optional<System.Concurrency.Tasks.TaskOutcome<T0>>& arg0,out(true) System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Option<System.Concurrency.Tasks.TaskOutcome<T0>>::TryGetValue(System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>>&)
+call instance System.Optional<System.Concurrency.Tasks.TaskOutcome<T0>>::TryGetValue(System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>>&)
 ret
 .end
-.function neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion14<T0>(System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>>& arg0) -> System.Concurrency.Tasks.TaskOutcome<T0>
+.function neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion14<T0>(System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>>& arg0) -> System.Concurrency.Tasks.TaskOutcome<T0>
 ldarg arg0
-call instance System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>>::get_Value()
+call instance System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>>::get_Value()
 ret
 .end
 .function neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion15<T0>(System.Concurrency.Tasks.TaskOutcome<T0>& arg0,out(true) System.Concurrency.Tasks.TaskOutcome.Completed<T0>& arg1) -> Boolean
@@ -91,15 +91,15 @@ ldarg arg1
 call instance System.Concurrency.Tasks.TaskOutcome<T0>::TryGetValue(System.Concurrency.Tasks.TaskOutcome.Cancelled&)
 ret
 .end
-.function neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion18<T0,T1>(System.Option<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>>& arg0,out(true) System.Option.Some<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>>& arg1) -> Boolean
+.function neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion18<T0,T1>(System.Optional<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>>& arg0,out(true) System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Option<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>>::TryGetValue(System.Option.Some<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>>&)
+call instance System.Optional<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>>::TryGetValue(System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>>&)
 ret
 .end
-.function neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion19<T0,T1>(System.Option.Some<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>>& arg0) -> System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>
+.function neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion19<T0,T1>(System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>>& arg0) -> System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>
 ldarg arg0
-call instance System.Option.Some<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>>::get_Value()
+call instance System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>>::get_Value()
 ret
 .end
 .function neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion20<T0,T1>(System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>& arg0,out(true) System.Concurrency.Tasks.TaskOutcome.Completed<System.Result<T0,T1>>& arg1) -> Boolean
@@ -925,7 +925,7 @@ ret
 .type class System.Runtime.CompilerServices.AsyncTaskMethodBuilder<T0>
 .sealed
 .field private source System.Concurrency.Tasks.Promise<T0>
-.field private machine System.Option<System.Runtime.CompilerServices.AsyncStateMachine>
+.field private machine System.Optional<System.Runtime.CompilerServices.AsyncStateMachine>
 .property instance Task() -> System.Concurrency.Tasks.Task<T0>
 .get instance System.Runtime.CompilerServices.AsyncTaskMethodBuilder<T0>::get_Task()
 .end
@@ -949,7 +949,7 @@ ldarg 0
 M0000001a_IL_0015:
 call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion4()
 M0000001a_IL_001a:
-call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion8(System.Option.None)
+call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion8(System.Optional.None)
 M0000001a_IL_001f:
 stfld System.Runtime.CompilerServices.AsyncTaskMethodBuilder<T0>::machine
 M0000001a_IL_0024:
@@ -998,7 +998,7 @@ ldarg 1
 M0000001e_IL_0004:
 call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion9(System.Runtime.CompilerServices.AsyncStateMachine)
 M0000001e_IL_0009:
-call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion10(System.Option.Some<System.Runtime.CompilerServices.AsyncStateMachine>)
+call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion10(System.Optional.Some<System.Runtime.CompilerServices.AsyncStateMachine>)
 M0000001e_IL_000e:
 stfld System.Runtime.CompilerServices.AsyncTaskMethodBuilder<T0>::machine
 M0000001e_IL_0013:
@@ -1006,12 +1006,12 @@ M0000001e_IL_0014:
 ret
 .end
 .method instance HasStateMachine() -> Boolean
-.local System.Option<System.Runtime.CompilerServices.AsyncStateMachine> local0
-.local System.Option.Some<System.Runtime.CompilerServices.AsyncStateMachine> local1
+.local System.Optional<System.Runtime.CompilerServices.AsyncStateMachine> local0
+.local System.Optional.Some<System.Runtime.CompilerServices.AsyncStateMachine> local1
 ldloca local0
-initobj System.Option<System.Runtime.CompilerServices.AsyncStateMachine>
+initobj System.Optional<System.Runtime.CompilerServices.AsyncStateMachine>
 ldloca local1
-initobj System.Option.Some<System.Runtime.CompilerServices.AsyncStateMachine>
+initobj System.Optional.Some<System.Runtime.CompilerServices.AsyncStateMachine>
 M0000001f_IL_0000:
 M0000001f_IL_0001:
 M0000001f_IL_0002:
@@ -1023,19 +1023,19 @@ stloc local0
 M0000001f_IL_0009:
 ldloca local1
 M0000001f_IL_000b:
-initobj System.Option.Some<System.Runtime.CompilerServices.AsyncStateMachine>
+initobj System.Optional.Some<System.Runtime.CompilerServices.AsyncStateMachine>
 M0000001f_IL_0011:
 ldloca local0
 M0000001f_IL_0013:
 ldloca local1
 M0000001f_IL_0015:
-call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion11(System.Option<System.Runtime.CompilerServices.AsyncStateMachine>&,System.Option.Some<System.Runtime.CompilerServices.AsyncStateMachine>&)
+call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion11(System.Optional<System.Runtime.CompilerServices.AsyncStateMachine>&,System.Optional.Some<System.Runtime.CompilerServices.AsyncStateMachine>&)
 M0000001f_IL_001a:
 brfalse M0000001f_IL_002d
 M0000001f_IL_001f:
 ldloca local1
 M0000001f_IL_0021:
-call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion12(System.Option.Some<System.Runtime.CompilerServices.AsyncStateMachine>&)
+call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion12(System.Optional.Some<System.Runtime.CompilerServices.AsyncStateMachine>&)
 M0000001f_IL_0026:
 pop
 M0000001f_IL_0027:
@@ -1050,14 +1050,14 @@ ret
 .end
 .method instance GetStateMachine() -> System.Runtime.CompilerServices.AsyncStateMachine
 .local System.Runtime.CompilerServices.AsyncStateMachine local0
-.local System.Option<System.Runtime.CompilerServices.AsyncStateMachine> local1
-.local System.Option.Some<System.Runtime.CompilerServices.AsyncStateMachine> local2
+.local System.Optional<System.Runtime.CompilerServices.AsyncStateMachine> local1
+.local System.Optional.Some<System.Runtime.CompilerServices.AsyncStateMachine> local2
 ldloca local0
 initobj System.Runtime.CompilerServices.AsyncStateMachine
 ldloca local1
-initobj System.Option<System.Runtime.CompilerServices.AsyncStateMachine>
+initobj System.Optional<System.Runtime.CompilerServices.AsyncStateMachine>
 ldloca local2
-initobj System.Option.Some<System.Runtime.CompilerServices.AsyncStateMachine>
+initobj System.Optional.Some<System.Runtime.CompilerServices.AsyncStateMachine>
 M00000020_IL_0000:
 M00000020_IL_0001:
 M00000020_IL_0002:
@@ -1069,19 +1069,19 @@ stloc local1
 M00000020_IL_0009:
 ldloca local2
 M00000020_IL_000b:
-initobj System.Option.Some<System.Runtime.CompilerServices.AsyncStateMachine>
+initobj System.Optional.Some<System.Runtime.CompilerServices.AsyncStateMachine>
 M00000020_IL_0011:
 ldloca local1
 M00000020_IL_0013:
 ldloca local2
 M00000020_IL_0015:
-call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion11(System.Option<System.Runtime.CompilerServices.AsyncStateMachine>&,System.Option.Some<System.Runtime.CompilerServices.AsyncStateMachine>&)
+call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion11(System.Optional<System.Runtime.CompilerServices.AsyncStateMachine>&,System.Optional.Some<System.Runtime.CompilerServices.AsyncStateMachine>&)
 M00000020_IL_001a:
 brfalse M00000020_IL_0033
 M00000020_IL_001f:
 ldloca local2
 M00000020_IL_0021:
-call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion12(System.Option.Some<System.Runtime.CompilerServices.AsyncStateMachine>&)
+call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion12(System.Optional.Some<System.Runtime.CompilerServices.AsyncStateMachine>&)
 M00000020_IL_0026:
 stloc local0
 M00000020_IL_0027:
@@ -1109,7 +1109,7 @@ ldarg 0
 M00000021_IL_0002:
 call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion4()
 M00000021_IL_0007:
-call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion8(System.Option.None)
+call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion8(System.Optional.None)
 M00000021_IL_000c:
 stfld System.Runtime.CompilerServices.AsyncTaskMethodBuilder<T0>::machine
 M00000021_IL_0011:
@@ -1135,7 +1135,7 @@ ldarg 0
 M00000022_IL_0002:
 call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion4()
 M00000022_IL_0007:
-call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion8(System.Option.None)
+call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion8(System.Optional.None)
 M00000022_IL_000c:
 stfld System.Runtime.CompilerServices.AsyncTaskMethodBuilder<T0>::machine
 M00000022_IL_0011:
@@ -1351,26 +1351,26 @@ ret
 .end
 .method instance Run() -> void
 .local T0 local0
-.local System.Option<System.Concurrency.Tasks.TaskOutcome<T0>> local1
-.local System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>> local2
+.local System.Optional<System.Concurrency.Tasks.TaskOutcome<T0>> local1
+.local System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>> local2
 .local System.Concurrency.Tasks.TaskOutcome<T0> local3
 .local System.Concurrency.Tasks.TaskOutcome.Completed<T0> local4
-.local System.Option<System.Concurrency.Tasks.TaskOutcome<T0>> local5
-.local System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>> local6
+.local System.Optional<System.Concurrency.Tasks.TaskOutcome<T0>> local5
+.local System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>> local6
 .local System.Concurrency.Tasks.TaskOutcome<T0> local7
 .local System.Concurrency.Tasks.TaskOutcome.Cancelled local8
 ldloca local1
-initobj System.Option<System.Concurrency.Tasks.TaskOutcome<T0>>
+initobj System.Optional<System.Concurrency.Tasks.TaskOutcome<T0>>
 ldloca local2
-initobj System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>>
+initobj System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>>
 ldloca local3
 initobj System.Concurrency.Tasks.TaskOutcome<T0>
 ldloca local4
 initobj System.Concurrency.Tasks.TaskOutcome.Completed<T0>
 ldloca local5
-initobj System.Option<System.Concurrency.Tasks.TaskOutcome<T0>>
+initobj System.Optional<System.Concurrency.Tasks.TaskOutcome<T0>>
 ldloca local6
-initobj System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>>
+initobj System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>>
 ldloca local7
 initobj System.Concurrency.Tasks.TaskOutcome<T0>
 ldloca local8
@@ -1388,19 +1388,19 @@ stloc local1
 M0000002f_IL_000e:
 ldloca local2
 M0000002f_IL_0010:
-initobj System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>>
+initobj System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>>
 M0000002f_IL_0016:
 ldloca local1
 M0000002f_IL_0018:
 ldloca local2
 M0000002f_IL_001a:
-call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion13<T0>(System.Option<System.Concurrency.Tasks.TaskOutcome<T0>>&,System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>>&)
+call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion13<T0>(System.Optional<System.Concurrency.Tasks.TaskOutcome<T0>>&,System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>>&)
 M0000002f_IL_001f:
 brfalse M0000002f_IL_0062
 M0000002f_IL_0024:
 ldloca local2
 M0000002f_IL_0026:
-call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion14<T0>(System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>>&)
+call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion14<T0>(System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>>&)
 M0000002f_IL_002b:
 stloc local3
 M0000002f_IL_002c:
@@ -1462,19 +1462,19 @@ stloc local5
 M0000002f_IL_0095:
 ldloca local6
 M0000002f_IL_0097:
-initobj System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>>
+initobj System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>>
 M0000002f_IL_009d:
 ldloca local5
 M0000002f_IL_009f:
 ldloca local6
 M0000002f_IL_00a1:
-call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion13<T0>(System.Option<System.Concurrency.Tasks.TaskOutcome<T0>>&,System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>>&)
+call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion13<T0>(System.Optional<System.Concurrency.Tasks.TaskOutcome<T0>>&,System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>>&)
 M0000002f_IL_00a6:
 brfalse M0000002f_IL_00da
 M0000002f_IL_00ab:
 ldloca local6
 M0000002f_IL_00ad:
-call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion14<T0>(System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>>&)
+call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion14<T0>(System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>>&)
 M0000002f_IL_00b2:
 stloc local7
 M0000002f_IL_00b4:
@@ -1563,12 +1563,12 @@ ret
 .local T0 local0
 .local System.Concurrency.Tasks.Task<T1> local1
 .local neoCLR.Library.System.Concurrency.Tasks.Task.Type_53797374656D2E5461736B732E4F7574636F6D655472616E736665726031<T1> local2
-.local System.Option<System.Concurrency.Tasks.TaskOutcome<T0>> local3
-.local System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>> local4
+.local System.Optional<System.Concurrency.Tasks.TaskOutcome<T0>> local3
+.local System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>> local4
 .local System.Concurrency.Tasks.TaskOutcome<T0> local5
 .local System.Concurrency.Tasks.TaskOutcome.Completed<T0> local6
-.local System.Option<System.Concurrency.Tasks.TaskOutcome<T0>> local7
-.local System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>> local8
+.local System.Optional<System.Concurrency.Tasks.TaskOutcome<T0>> local7
+.local System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>> local8
 .local System.Concurrency.Tasks.TaskOutcome<T0> local9
 .local System.Concurrency.Tasks.TaskOutcome.Cancelled local10
 ldloca local1
@@ -1576,17 +1576,17 @@ initobj System.Concurrency.Tasks.Task<T1>
 ldloca local2
 initobj neoCLR.Library.System.Concurrency.Tasks.Task.Type_53797374656D2E5461736B732E4F7574636F6D655472616E736665726031<T1>
 ldloca local3
-initobj System.Option<System.Concurrency.Tasks.TaskOutcome<T0>>
+initobj System.Optional<System.Concurrency.Tasks.TaskOutcome<T0>>
 ldloca local4
-initobj System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>>
+initobj System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>>
 ldloca local5
 initobj System.Concurrency.Tasks.TaskOutcome<T0>
 ldloca local6
 initobj System.Concurrency.Tasks.TaskOutcome.Completed<T0>
 ldloca local7
-initobj System.Option<System.Concurrency.Tasks.TaskOutcome<T0>>
+initobj System.Optional<System.Concurrency.Tasks.TaskOutcome<T0>>
 ldloca local8
-initobj System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>>
+initobj System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>>
 ldloca local9
 initobj System.Concurrency.Tasks.TaskOutcome<T0>
 ldloca local10
@@ -1604,19 +1604,19 @@ stloc local3
 M00000031_IL_000e:
 ldloca local4
 M00000031_IL_0010:
-initobj System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>>
+initobj System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>>
 M00000031_IL_0016:
 ldloca local3
 M00000031_IL_0018:
 ldloca local4
 M00000031_IL_001a:
-call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion13<T0>(System.Option<System.Concurrency.Tasks.TaskOutcome<T0>>&,System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>>&)
+call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion13<T0>(System.Optional<System.Concurrency.Tasks.TaskOutcome<T0>>&,System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>>&)
 M00000031_IL_001f:
 brfalse M00000031_IL_0063
 M00000031_IL_0024:
 ldloca local4
 M00000031_IL_0026:
-call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion14<T0>(System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>>&)
+call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion14<T0>(System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>>&)
 M00000031_IL_002b:
 stloc local5
 M00000031_IL_002d:
@@ -1692,19 +1692,19 @@ stloc local7
 M00000031_IL_00ac:
 ldloca local8
 M00000031_IL_00ae:
-initobj System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>>
+initobj System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>>
 M00000031_IL_00b4:
 ldloca local7
 M00000031_IL_00b6:
 ldloca local8
 M00000031_IL_00b8:
-call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion13<T0>(System.Option<System.Concurrency.Tasks.TaskOutcome<T0>>&,System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>>&)
+call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion13<T0>(System.Optional<System.Concurrency.Tasks.TaskOutcome<T0>>&,System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>>&)
 M00000031_IL_00bd:
 brfalse M00000031_IL_00f1
 M00000031_IL_00c2:
 ldloca local8
 M00000031_IL_00c4:
-call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion14<T0>(System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>>&)
+call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion14<T0>(System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>>&)
 M00000031_IL_00c9:
 stloc local9
 M00000031_IL_00cb:
@@ -1793,24 +1793,24 @@ ret
 .local System.Result<T0,T1> local0
 .local T0 local1
 .local T1 local2
-.local System.Option<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>> local3
-.local System.Option.Some<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>> local4
+.local System.Optional<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>> local3
+.local System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>> local4
 .local System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>> local5
 .local System.Concurrency.Tasks.TaskOutcome.Completed<System.Result<T0,T1>> local6
 .local System.Result<T0,T1> local7
 .local System.Result.Ok<T0> local8
 .local System.Result<T0,T1> local9
 .local System.Result.Failure<T1> local10
-.local System.Option<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>> local11
-.local System.Option.Some<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>> local12
+.local System.Optional<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>> local11
+.local System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>> local12
 .local System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>> local13
 .local System.Concurrency.Tasks.TaskOutcome.Cancelled local14
 ldloca local0
 initobj System.Result<T0,T1>
 ldloca local3
-initobj System.Option<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>>
+initobj System.Optional<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>>
 ldloca local4
-initobj System.Option.Some<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>>
+initobj System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>>
 ldloca local5
 initobj System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>
 ldloca local6
@@ -1824,9 +1824,9 @@ initobj System.Result<T0,T1>
 ldloca local10
 initobj System.Result.Failure<T1>
 ldloca local11
-initobj System.Option<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>>
+initobj System.Optional<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>>
 ldloca local12
-initobj System.Option.Some<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>>
+initobj System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>>
 ldloca local13
 initobj System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>
 ldloca local14
@@ -1844,19 +1844,19 @@ stloc local3
 M00000033_IL_000e:
 ldloca local4
 M00000033_IL_0010:
-initobj System.Option.Some<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>>
+initobj System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>>
 M00000033_IL_0016:
 ldloca local3
 M00000033_IL_0018:
 ldloca local4
 M00000033_IL_001a:
-call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion18<T0,T1>(System.Option<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>>&,System.Option.Some<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>>&)
+call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion18<T0,T1>(System.Optional<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>>&,System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>>&)
 M00000033_IL_001f:
 brfalse M00000033_IL_0063
 M00000033_IL_0024:
 ldloca local4
 M00000033_IL_0026:
-call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion19<T0,T1>(System.Option.Some<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>>&)
+call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion19<T0,T1>(System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>>&)
 M00000033_IL_002b:
 stloc local5
 M00000033_IL_002d:
@@ -1998,19 +1998,19 @@ stloc local11
 M00000033_IL_0126:
 ldloca local12
 M00000033_IL_0128:
-initobj System.Option.Some<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>>
+initobj System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>>
 M00000033_IL_012e:
 ldloca local11
 M00000033_IL_0130:
 ldloca local12
 M00000033_IL_0132:
-call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion18<T0,T1>(System.Option<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>>&,System.Option.Some<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>>&)
+call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion18<T0,T1>(System.Optional<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>>&,System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>>&)
 M00000033_IL_0137:
 brfalse M00000033_IL_016b
 M00000033_IL_013c:
 ldloca local12
 M00000033_IL_013e:
-call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion19<T0,T1>(System.Option.Some<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>>&)
+call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion19<T0,T1>(System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>>&)
 M00000033_IL_0143:
 stloc local13
 M00000033_IL_0145:
@@ -2089,26 +2089,26 @@ ret
 .end
 .method instance Run() -> void
 .local T0 local0
-.local System.Option<System.Concurrency.Tasks.TaskOutcome<T0>> local1
-.local System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>> local2
+.local System.Optional<System.Concurrency.Tasks.TaskOutcome<T0>> local1
+.local System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>> local2
 .local System.Concurrency.Tasks.TaskOutcome<T0> local3
 .local System.Concurrency.Tasks.TaskOutcome.Completed<T0> local4
-.local System.Option<System.Concurrency.Tasks.TaskOutcome<T0>> local5
-.local System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>> local6
+.local System.Optional<System.Concurrency.Tasks.TaskOutcome<T0>> local5
+.local System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>> local6
 .local System.Concurrency.Tasks.TaskOutcome<T0> local7
 .local System.Concurrency.Tasks.TaskOutcome.Cancelled local8
 ldloca local1
-initobj System.Option<System.Concurrency.Tasks.TaskOutcome<T0>>
+initobj System.Optional<System.Concurrency.Tasks.TaskOutcome<T0>>
 ldloca local2
-initobj System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>>
+initobj System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>>
 ldloca local3
 initobj System.Concurrency.Tasks.TaskOutcome<T0>
 ldloca local4
 initobj System.Concurrency.Tasks.TaskOutcome.Completed<T0>
 ldloca local5
-initobj System.Option<System.Concurrency.Tasks.TaskOutcome<T0>>
+initobj System.Optional<System.Concurrency.Tasks.TaskOutcome<T0>>
 ldloca local6
-initobj System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>>
+initobj System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>>
 ldloca local7
 initobj System.Concurrency.Tasks.TaskOutcome<T0>
 ldloca local8
@@ -2126,19 +2126,19 @@ stloc local1
 M00000035_IL_000e:
 ldloca local2
 M00000035_IL_0010:
-initobj System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>>
+initobj System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>>
 M00000035_IL_0016:
 ldloca local1
 M00000035_IL_0018:
 ldloca local2
 M00000035_IL_001a:
-call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion13<T0>(System.Option<System.Concurrency.Tasks.TaskOutcome<T0>>&,System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>>&)
+call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion13<T0>(System.Optional<System.Concurrency.Tasks.TaskOutcome<T0>>&,System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>>&)
 M00000035_IL_001f:
 brfalse M00000035_IL_0062
 M00000035_IL_0024:
 ldloca local2
 M00000035_IL_0026:
-call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion14<T0>(System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>>&)
+call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion14<T0>(System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>>&)
 M00000035_IL_002b:
 stloc local3
 M00000035_IL_002c:
@@ -2194,19 +2194,19 @@ stloc local5
 M00000035_IL_008a:
 ldloca local6
 M00000035_IL_008c:
-initobj System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>>
+initobj System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>>
 M00000035_IL_0092:
 ldloca local5
 M00000035_IL_0094:
 ldloca local6
 M00000035_IL_0096:
-call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion13<T0>(System.Option<System.Concurrency.Tasks.TaskOutcome<T0>>&,System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>>&)
+call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion13<T0>(System.Optional<System.Concurrency.Tasks.TaskOutcome<T0>>&,System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>>&)
 M00000035_IL_009b:
 brfalse M00000035_IL_00cf
 M00000035_IL_00a0:
 ldloca local6
 M00000035_IL_00a2:
-call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion14<T0>(System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>>&)
+call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion14<T0>(System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>>&)
 M00000035_IL_00a7:
 stloc local7
 M00000035_IL_00a9:

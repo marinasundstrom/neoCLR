@@ -7,7 +7,7 @@ static class UnionDeclarations
             bool TryGetOutput(out TOutput output);
             bool TryGetResidual(out TResidual residual);
         }
-        public static class Option {
+        public static class Optional {
             public struct None { public None() { } }
             public struct Some<T> {
                 public Some(T value) { Value = value; }
@@ -19,21 +19,21 @@ static class UnionDeclarations
         // Replaced by the source union projection before documentation consumption.
         public struct Union<T1, T2> { }
         [System.Runtime.CompilerServices.Union]
-        public struct Option<T> : Propagatable<Option<T>, T, PropagationUnit> {
+        public struct Optional<T> : Propagatable<Optional<T>, T, PropagationUnit> {
             public bool IsSome => false;
             public bool IsNone => false;
-            public Option.Some<T> GetSomeCase() => default;
-            public Option.None GetNoneCase() => default;
-            public bool TryGet(out Option.Some<T> value) { value = default; return false; }
-            public bool TryGet(out Option.None value) { value = default; return false; }
+            public Optional.Some<T> GetSomeCase() => default;
+            public Optional.None GetNoneCase() => default;
+            public bool TryGet(out Optional.Some<T> value) { value = default; return false; }
+            public bool TryGet(out Optional.None value) { value = default; return false; }
             public bool TryGetOutput(out T output) { output = default; return false; }
             public bool TryGetResidual(out PropagationUnit residual) { residual = default; return false; }
-            public static Option<T> FromResidual(PropagationUnit residual) => default;
+            public static Optional<T> FromResidual(PropagationUnit residual) => default;
             public object Value => default;
-            public Option(Option.Some<T> value) { }
-            public Option(Option.None value) { }
-            public bool TryGetValue(out Option.Some<T> value) { value = default; return false; }
-            public bool TryGetValue(out Option.None value) { value = default; return false; }
+            public Optional(Optional.Some<T> value) { }
+            public Optional(Optional.None value) { }
+            public bool TryGetValue(out Optional.Some<T> value) { value = default; return false; }
+            public bool TryGetValue(out Optional.None value) { value = default; return false; }
         }
         public static class Result {
             public struct Ok<T> {

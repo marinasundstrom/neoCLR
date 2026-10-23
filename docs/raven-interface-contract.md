@@ -115,7 +115,7 @@ dependency closure and interface-call shapes, rejects wrong element/receiver typ
 imports the supported program. Six mutated/unsupported inputs must still reject without
 creating executable IL. [collection-results.json](experiments/raven-target/collection-results.json)
 records the subsequent runtime verification and execution. These declaration bodies never execute and are not installed in the
-working demo's compiler reference set. Existing Result/Option/Void tasks remain bounded
+working demo's compiler reference set. Existing Result/Optional/Void tasks remain bounded
 to their prior runtime profile.
 
 ## Implemented nominal interface groundwork (2026-09-12)
@@ -350,7 +350,7 @@ Use the actual binary path if CARGO_TARGET_DIR overrides `target`. The verificat
 script checks both successful programs and the null fixture, then records outputs and
 the selected System source hash. Import maps identify the required `raven-collections`
 profile; the host must still select it explicitly with `--system`. Saved-project VS Code tasks now select this profile from evaluated project iteration
-settings. The profile also includes the existing Result/Option/Void declarations, enabling
+settings. The profile also includes the existing Result/Optional/Void declarations, enabling
 a [combined fundamental demo](experiments/raven-target/README.md#fundamental-raven-demonstration).
 Broader library admission remains future work.
 

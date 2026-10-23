@@ -1,4 +1,4 @@
-import System.Option.*
+import System.Optional.*
 import System.*
 import System.Console.*
 import System.Result.*
@@ -10,7 +10,7 @@ func Magnitude(value: int) -> int {
     }
 }
 
-func Number(value: Option<int>) -> int {
+func Number(value: Optional<int>) -> int {
     return match value {
         .Some(let number) => number
         .None => -1

@@ -36,7 +36,7 @@ See [bridge details](../../raven-cli-bridge.md#native-positional-record-equality
 ## Remaining gaps
 
 - Generic records, unions and other unsupported value components. ConsoleKeyInfo
-  still has an unsupported Option<int> component; KeyValuePair remains generic.
+  still has an unsupported Optional<int> component; KeyValuePair remains generic.
 - Imported value-record discovery, authored record members and record inheritance.
 - Floating-point component equality/hash. An initial interpreter experiment handled
   NaNs, but native boxed floating-point dispatch rejects; that is not three-engine

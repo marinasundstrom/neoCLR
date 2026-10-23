@@ -22,7 +22,7 @@ it, then executes it on neoCLR. Use **neoCLR: Build saved project** to omit exec
 The ordinary Raven toolbar Run/Debug commands are not the neoCLR task pipeline.
 
 The [order workflow](raven-order-workflow.md) demonstrates shared class instances,
-interface calls, Option/Result patterns, Void propagation, bounded file writes and
+interface calls, Optional/Result patterns, Void propagation, bounded file writes and
 a deferred query. Its output is:
 
 ```text

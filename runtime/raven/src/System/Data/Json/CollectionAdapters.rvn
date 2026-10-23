@@ -2,7 +2,7 @@ module System.Data.Json
 
 import System.*
 import System.Collections.*
-import System.Option.*
+import System.Optional.*
 
 // Private generic execution targets for checked collection reflection adapters.
 // JSON validation and recursive mapping remain in ObjectMapper.

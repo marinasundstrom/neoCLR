@@ -10,7 +10,7 @@ func Success() -> Result<int, string> {
 ```
 
 The case is an independent value. An expected carrier type enables conversion through
-its declared constructor, with no special treatment of Result or Option names.
+its declared constructor, with no special treatment of Result or Optional names.
 Source unions already generate and use such constructors. This slice extends the
 same exact-case rule to marked carriers in the bundled System metadata.
 
@@ -82,7 +82,7 @@ cargo test --locked --test neo_case_conversion --test neo_library_constructors -
 ```
 
 The sample prints 42 twice and returns 42. Tests cover annotations, returns, parameters,
-fields, arrays and collection setters; Option/Result and nested carriers; generic
+fields, arrays and collection setters; Optional/Result and nested carriers; generic
 reference payloads; once-only evaluation; unmarked/wrong-case/wrong-type rejection;
 readonly payload retention under collection pressure, invariant generic case arguments,
 and runtime frame escape rejection. [Generic constructor inference](neo-library-constructors.md#constructor-argument-inference)

@@ -1,7 +1,7 @@
 import System.*
 import System.Introspection.*
 import System.Collections.*
-import System.Option.*
+import System.Optional.*
 
 class Converter {
     func Convert(value: int, other: int) -> int => value + other

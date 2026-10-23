@@ -1,7 +1,7 @@
 # Owned erased values at the host boundary
 
 Loaded functions now accept explicit System.Value parameters and ordinary records
-containing them. This permits an ordinary System.Option/Result created in guest IL
+containing them. This permits an ordinary System.Optional/Result created in guest IL
 to leave the runtime and be supplied to a later invocation on the same loaded program.
 There is no special host dispatch for those carrier names or their union marker.
 

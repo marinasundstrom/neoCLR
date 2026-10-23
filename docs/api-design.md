@@ -194,7 +194,7 @@ mutation, GC retention/reclamation, invalid frame escapes and automatic Neo acce
 | Native-buffer `Array<T>` | Explicit pointer-containing descriptor with value receivers and caller-managed Free; review together with native-buffer naming and ownership, separately from managed arrays |
 | `Disposable`, `Closable<E>`, `Clonable` | Explicit receiver access; Close returns `Result<Void,E>`. Development Raven Clone returns native Self; archived Neo retains Clonable<T>. See [cloning](../api-docs/cloning.md) |
 | `EquatableTo<T>` | Readonly managed receiver and T input, aligned with ComparableTo. Preserve value equality, not reference identity; see [migration](equality.md). A separate reference-input comparison strategy remains future work |
-| `Option<T>` / `Result<T,E>` and case accessors | Constructors and extraction use values; keep independent extraction semantics. Review predicate receiver copying separately. Existing TryGet output contracts remain authoritative |
+| `Optional<T>` / `Result<T,E>` and case accessors | Constructors and extraction use values; keep independent extraction semantics. Review predicate receiver copying separately. Existing TryGet output contracts remain authoritative |
 | Numeric operations, Math, parsing | Scalar/value inputs and typed value results remain appropriate; parsing failure is an ordinary Result |
 | String, Console, File text APIs | Current text/value inputs and results remain appropriate; host primitives and their wrappers must be changed together if reference inputs are later justified |
 | Type / RuntimeTypeHandle | Descriptors and handles describe metadata identity without a boxing requirement. Use typeof(T) for declared types; TypeOf<T>.Of was removed in development on 2026-09-19. |
@@ -279,7 +279,7 @@ members and relationships; use-site type signatures carry reference access and t
 agreed future nullability characteristic; source compilers control binding reassignment.
 Slots hold runtime state validated against their signatures. Null will be a special
 state for explicitly nullable values or references, not zero/default payloads or
-uninitialized storage. Prefer Option for domain optionality. See [nullability](nullability.md).
+uninitialized storage. Prefer Optional for domain optionality. See [nullability](nullability.md).
 
 ## Common ordering and iteration
 
@@ -290,9 +290,9 @@ Dispose require writable managed receivers. Current returns T without erasing an
 explicit T&. ArrayList iterators retain their initial backing buffer and extent,
 with documented mutation visibility rather than .NET List version checking.
 
-The historical [ArrayList predicate searches](predicate-search.md) used Option<T>
+The historical [ArrayList predicate searches](predicate-search.md) used Optional<T>
 for Find, an index/-1 for FindIndex, and Boolean for Exists. The Raven profile now
-uses [direct filtering](arraylist-filtering.md), including Option<Int32> index
+uses [direct filtering](arraylist-filtering.md), including Optional<Int32> index
 results and FindLast/FindLastIndex/FindAll/TrueForAll. [LINQ](raven-query-api.md)
 is a separate library surface. These predicates do not require default comparers.
 

@@ -3,17 +3,17 @@ module Example.Display
 import System.*
 
 func CheckNumber(value: int, expected: string) -> bool {
-    let option = Option<int>.Some(value)
+    let option = Optional<int>.Some(value)
     return String.CompareOrdinal(option.ToString(), expected) == 0
 }
 
 func Main() -> int {
-    let present = Option<string>.Some("hé🙂\u0000z")
-    if String.CompareOrdinal(present.ToString(), "Option.Some(\"hé🙂\u0000z\")") != 0 {
+    let present = Optional<string>.Some("hé🙂\u0000z")
+    if String.CompareOrdinal(present.ToString(), "Optional.Some(\"hé🙂\u0000z\")") != 0 {
         return 1
     }
-    let absent = Option<string>.None()
-    if String.CompareOrdinal(absent.ToString(), "Option.None") != 0 {
+    let absent = Optional<string>.None()
+    if String.CompareOrdinal(absent.ToString(), "Optional.None") != 0 {
         return 2
     }
     let success = Result<string, string>.Ok("ready")
@@ -24,16 +24,16 @@ func Main() -> int {
     if String.CompareOrdinal(failure.ToString(), "Result.Failure(\"failed\")") != 0 {
         return 4
     }
-    if !CheckNumber(0, "Option.Some(0)") {
+    if !CheckNumber(0, "Optional.Some(0)") {
         return 5
     }
-    if !CheckNumber(-1, "Option.Some(-1)") {
+    if !CheckNumber(-1, "Optional.Some(-1)") {
         return 6
     }
-    if !CheckNumber(-2147483647 - 1, "Option.Some(-2147483648)") {
+    if !CheckNumber(-2147483647 - 1, "Optional.Some(-2147483648)") {
         return 7
     }
-    if !CheckNumber(2147483647, "Option.Some(2147483647)") {
+    if !CheckNumber(2147483647, "Optional.Some(2147483647)") {
         return 8
     }
     let number = Result<int, string>.Ok(42)

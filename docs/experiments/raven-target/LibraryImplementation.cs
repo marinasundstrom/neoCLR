@@ -99,7 +99,7 @@ static class LibraryImplementation
             var provider = owner.Replace(".Introspection.", ".Introspection.Runtime");
             return InstanceRoots(source.GetType(provider), core.GetType(provider), provider);
         }
-        if (owner is "System.Option" or "System.Result" or "System.Concurrency.Tasks.TaskOutcome")
+        if (owner is "System.Optional" or "System.Result" or "System.Concurrency.Tasks.TaskOutcome")
         {
             var name = owner + (owner == "System.Result" ? "`2" : "`1");
             return StandardUnionLibrary.Roots(source.GetType(name), core.GetType(name));
@@ -141,7 +141,7 @@ static class LibraryImplementation
                 && m.Parameters.Zip(method.Parameters).All(p => p.First.Name == p.Second.Name && SameType(p.First.ParameterType, p.Second.ParameterType))).ToArray();
             if (matches.Length == 1) CheckMethod(matches[0]);
             if (matches.Length != 1) throw new InvalidDataException("Library export does not match reference contract: " + method.FullName);
-            if (owner is HttpJsonBindings.Extensions or "System.Runtime.Reflection.TypeReflectionExtensions" or "System.Runtime.Reflection.PropertyReflectionExtensions" or "System.Runtime.Reflection.ConstructorReflectionExtensions" or "System.Runtime.Reflection.MethodReflectionExtensions" or "System.Runtime.Reflection.FieldReflectionExtensions" or "System.Linq.Operators" or "System.OptionOperators" or "System.OptionNestedOperators" or "System.ResultOperators" or "System.Concurrency.Tasks.TaskOperators" or "System.Concurrency.Tasks.TaskResultOperators")
+            if (owner is HttpJsonBindings.Extensions or "System.Runtime.Reflection.TypeReflectionExtensions" or "System.Runtime.Reflection.PropertyReflectionExtensions" or "System.Runtime.Reflection.ConstructorReflectionExtensions" or "System.Runtime.Reflection.MethodReflectionExtensions" or "System.Runtime.Reflection.FieldReflectionExtensions" or "System.Linq.Operators" or "System.OptionalOperators" or "System.OptionalNestedOperators" or "System.ResultOperators" or "System.Concurrency.Tasks.TaskOperators" or "System.Concurrency.Tasks.TaskResultOperators")
                 CheckExtensionContract(method, matches[0]);
         }
         return methods.Concat(consoleProviders).ToArray();
@@ -242,14 +242,14 @@ static class LibraryImplementation
                 ("StoredName", "System.String"), ("StoredPosition", "System.Int32"),
                 ("StoredParameterType", "System.Introspection.TypeInfo"), ("StoredIsOut", "System.Boolean"),
                 ("StoredIsOutWhenTrue", "System.Boolean"), ("StoredIsReadOnly", "System.Boolean"),
-                ("StoredMetadataToken", "System.Int32"), ("StoredModule", "System.Option`1<System.Introspection.ModuleInfo>"),
+                ("StoredMetadataToken", "System.Int32"), ("StoredModule", "System.Optional`1<System.Introspection.ModuleInfo>"),
                 ("StoredDeclaringType", "System.Introspection.TypeInfo"),
                 ("StoredMemberKind", "System.Int32"), ("StoredMemberIndex", "System.Int32"),
                 ("StoredMemberIdentity", "System.String")
             };
             if (type.Fields.Count != layout.Length || type.Fields.Zip(layout).Any(p =>
                 p.First.Name != p.Second.Name || p.First.FieldType.FullName != p.Second.Type
-                || (p.Second.Type is "System.Introspection.TypeInfo" or "System.Option`1<System.Introspection.ModuleInfo>" ? !RuntimeSignatures.IsCore(p.First.FieldType.Scope)
+                || (p.Second.Type is "System.Introspection.TypeInfo" or "System.Optional`1<System.Introspection.ModuleInfo>" ? !RuntimeSignatures.IsCore(p.First.FieldType.Scope)
                     : p.First.FieldType.MetadataType is not (MetadataType.String or MetadataType.Int32 or MetadataType.Boolean))))
                 throw new InvalidDataException("ParameterInfo library layout must match the runtime snapshot fields: "
                     + string.Join(";", type.Fields.Select(f => f.Name + ":" + f.FieldType.FullName + "@" + f.FieldType.Scope)));
@@ -296,7 +296,7 @@ static class LibraryImplementation
                 return right is GenericInstanceType r && MatchType(l.ElementType, r.ElementType)
                     && l.GenericArguments.Count == r.GenericArguments.Count
                     && l.GenericArguments.Zip(r.GenericArguments).All(p => MatchType(p.First, p.Second));
-            if (left.FullName is "System.Option/None" or "System.Option/Some`1" or "System.Result/Ok`1" or "System.Result/Failure`1" or "System.Concurrency.Tasks.TaskOutcome/Completed`1" or "System.Concurrency.Tasks.TaskOutcome/Cancelled"
+            if (left.FullName is "System.Optional/None" or "System.Optional/Some`1" or "System.Result/Ok`1" or "System.Result/Failure`1" or "System.Concurrency.Tasks.TaskOutcome/Completed`1" or "System.Concurrency.Tasks.TaskOutcome/Cancelled"
                 && left.FullName == right.FullName && GenericUnionLibrary.IsCase(left.Resolve()) && GenericUnionLibrary.IsCase(right.Resolve())
                 && RuntimeSignatures.IsCore(left.Scope) && ApplicationTypes.IsLibrary(right)) return true;
             return AsyncBindings.SameType(left, right) || TaskBindings.SameType(left, right) || DescriptorLibrary.SameType(left, right) || SameTypeArgument(left, right) || ErrorCarrierLibrary.SameCase(left, right, type, contract) || (left.FullName == contract.FullName && right.FullName == type.FullName

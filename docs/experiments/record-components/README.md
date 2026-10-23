@@ -49,7 +49,7 @@ separate work. Source-defined ordinary structs are not newly admitted by this sl
 The compiler source-core metadata probe now covers an imported positive contract,
 missing hashing, a method-only lookalike and an interface with the wrong self type.
 The executable consumer exercises Index direction/offset, both Range boundaries,
-Option<Index>, nested source records, default storage and boxed wrapper operations.
+Optional<Index>, nested source records, default storage and boxed wrapper operations.
 Historical negative results cover missing hash and missing interface contracts. The
 remaining public negative consumer covers a missing interface; missing-hash rejection
 is covered by the compiler source-core probe. Boxing a wrapper explicitly still allocates.

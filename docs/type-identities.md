@@ -30,7 +30,7 @@ The returned `TypeIdentity` supports equality and hashing:
   different closed identities; nested constructions retain every argument.
 - Pointer, managed-reference and native interface-reference signatures retain their
   target identity. The bootstrap `Ref` retains its separate wrapper identity.
-  Option and Result are ordinary constructed definition identities; there is no
+  Optional and Result are ordinary constructed definition identities; there is no
   special union identity category.
 
 For example, given an application that declares `Box<T>`:

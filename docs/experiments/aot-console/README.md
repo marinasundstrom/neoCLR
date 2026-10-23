@@ -5,7 +5,7 @@ routing workload within a fixed 64 KiB heap. The sections below record the progr
 diagnostic-only collection restrictions do not describe the explicit `--native-gc` mode.
 
 The ordinary Raven `Console.ReadByte` wrapper now compiles to ARM64 together with
-its Result/Option construction, generic seed helpers and failure path. Enable
+its Result/Optional construction, generic seed helpers and failure path. Enable
 `--compile-system --bind-user-fault --bind-console-read-byte` with an explicit
 System seed and library load set. Inspection and emission use identical admission.
 Only an exact, verified `neoCLR.Runtime.ConsoleReadByte() -> System.Value`
@@ -93,7 +93,7 @@ policy; the adapter itself does not change it. This matches the Rust CLI's broke
 behavior. Closed-fd stdout was not a valid interpreter parity oracle because Rust
 may ignore that error; use the broken-pipe test.
 
-`interactive.rvn` reads the real nested Result/Option, prints prompts and branch
+`interactive.rvn` reads the real nested Result/Optional, prints prompts and branch
 outcomes, and exercises Boolean and empty-line overloads. `verify_interactive.py`
 compiles fresh Raven metadata and compares interpreter/native output, exit codes and
 broken-pipe diagnostics exactly. `interactive-validation.json` records the pinned
@@ -184,7 +184,7 @@ reference objects, arrays and virtual dispatch remain outside this profile. The
 bounded text-region ownership contract still applies to every copied pointer.
 
 This is the representation layer needed by .NET-like reference-bearing structs and
-neoCLR's String-valued Option/Result APIs; it does not claim a general GC-compatible
+neoCLR's String-valued Optional/Result APIs; it does not claim a general GC-compatible
 layout or collection policy. It trades larger padded private storage for a simple
 mixed-width implementation. No performance advantage is asserted. ReadLine remains
 an ordinary stream-library consumer and is not replaced with a special Console body.
@@ -409,7 +409,7 @@ comparison in the [value experiment](../aot-values/README.md): concrete layouts 
 native calls but duplicate code/metadata. No code-size or performance advantage is
 claimed, and there is no representation-based merging of distinct nominal shapes.
 
-`multiple-values.rvn` combines Option<int>, Option<string>, input Option<byte> and
+`multiple-values.rvn` combines Optional<int>, Optional<string>, input Optional<byte> and
 several Result payloads, including Error/None and both pattern forms. The fresh run
 selects 24 types/55 functions, with 14 generic shapes and 23 additional function bodies.
 `verify_interactive.py --multi-values` and `multiple-values-validation.json` retain
@@ -831,7 +831,7 @@ counter. The sample host still retains allocations in a 64 KiB invocation arena;
 it does not promise the public 65536-byte maximum fits that host resource budget.
 
 Compared with .NET Console.ReadLine, neoCLR preserves its existing explicit
-`Result<Option<string>, TextReadError>` and UTF-8 byte-limit contract. The AOT path
+`Result<Optional<string>, TextReadError>` and UTF-8 byte-limit contract. The AOT path
 reuses that behavior rather than introducing another reader implementation. Its
 current cost is invocation-retained decoder buffers and copied immutable text;
 long-running input needs a managed lifetime policy or suitable host invocation
@@ -1385,7 +1385,7 @@ relocation was needed. The supplied bundle and compiler binaries are identified 
 
 The [Raven consumer](request-line.rvn) reads one line with a 96-byte limit, recognizes
 `GET /health HTTP/1.1` and `GET /items/<id> HTTP/1.1`, and produces an application-owned
-Route union. Parsing returns Result<Route, string>; input uses Result<Option<string>,
+Route union. Parsing returns Result<Route, string>; input uses Result<Optional<string>,
 TextReadError>. Ordinary `let ... else` and `if let` branches handle those outcomes.
 Item IDs use the existing Int32 parser and reject negative values; signs and leading
 zeros retain that parser's policy. Slices and public parser/union bodies stay CIL.

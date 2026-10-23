@@ -78,10 +78,10 @@ this validates guest introspection, not compiler tuple lowering.
 ## Native tuple element names (2026-10-14 development)
 
 Rust `metadata::Type::Tuple` now contains `metadata::TupleSignature`. Its
-`new(elements: Vec<Type>, names: Vec<Option<String>>) -> Result<Self, Fault>`
-constructor stores native names directly. `names() -> &[Option<String>]` returns
+`new(elements: Vec<Type>, names: Vec<Optional<String>>) -> Result<Self, Fault>`
+constructor stores native names directly. `names() -> &[Optional<String>]` returns
 the declared names; empty means entirely unnamed. `element_name(index: usize) ->
-Option<String>` returns the declared name or positional `ItemN`, and returns None
+Optional<String>` returns the declared name or positional `ItemN`, and returns None
 for an out-of-range index. `From<Vec<Type>>` creates an unnamed signature; callers
 constructing the old variant migrate to `Type::Tuple(elements.into())`. Deref and
 borrowed iteration expose the ordered element types.
@@ -101,7 +101,7 @@ direct signature metadata, without a nominal carrier or tuple-name attribute.
 Equality/hashing of TupleSignature and Type ignore names recursively; TypeIdentity
 also remains the ordered element identities. Names are preserved through native
 serialization, scope binding and type/method/Self substitution.
-`TypeDescriptor::tuple_element_names: Vec<Option<String>>` returns names in the same
+`TypeDescriptor::tuple_element_names: Vec<Optional<String>>` returns names in the same
 order as `tuple_elements`, including None for unnamed elements; non-tuples return
 an empty vector. Descriptors obtained from differently named signatures retain their
 respective names while their `identity` values compare equal. Identity alone cannot

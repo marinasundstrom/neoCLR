@@ -54,7 +54,7 @@ Existing library `out(true)` contracts are callable with the same `out` marker:
 
 ```swift
 let element = typeof(Counter&).GetElementType()
-var some: System.Option.Some<System.Type>
+var some: System.Optional.Some<System.Type>
 if element.TryGet(out some) {
     WriteLine(some.Value.Name)
 }

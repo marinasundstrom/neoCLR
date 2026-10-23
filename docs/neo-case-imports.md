@@ -31,14 +31,14 @@ Bundled union families use the same import form:
 
 ```swift
 import System.Result.*
-import System.Option.*
+import System.Optional.*
 
 let ok: Ok<int> = Ok(42)
 let result: Result<int,string> = ok
 let error = Error("Unavailable")
 let failed: Result<int,string> = error
 let some = Some(42)
-let absent: Option<int> = None()
+let absent: Optional<int> = None()
 ```
 
 The import exposes independent case type definitions. Constructor inference still

@@ -312,11 +312,11 @@ fn map_collision_growth_duplicate_and_missing_outcomes_survive_gc() {
     body += "ldloc writer\nldc.i4 0\nldc.i4 999\ncallvirt instance System.Collections.MutableMap<Int32,Int32>::TryAdd(Int32,Int32)\nbrfalse Duplicate\nfault \"duplicate inserted\"\nDuplicate:\n";
     for i in 0..40 {
         body += &format!(
-            "ldloc reader\nldc.i4 {i}\ncallvirt instance System.Collections.Map<Int32,Int32>::Find(Int32)\ncall UnwrapSome<Int32>(System.Option<Int32>)\nldc.i4 {}\nbeq Found{i}\nfault \"wrong value\"\nFound{i}:\n",
+            "ldloc reader\nldc.i4 {i}\ncallvirt instance System.Collections.Map<Int32,Int32>::Find(Int32)\ncall UnwrapSome<Int32>(System.Optional<Int32>)\nldc.i4 {}\nbeq Found{i}\nfault \"wrong value\"\nFound{i}:\n",
             i * 3
         );
     }
-    body += "ldloc reader\nldc.i4 100\ncallvirt instance System.Collections.Map<Int32,Int32>::Find(Int32)\ncall IsNone<Int32>(System.Option<Int32>)\nbrtrue Absent\nfault \"absence lost\"\nAbsent:\nldloc reader\ncallvirt instance System.Collections.Map<Int32,Int32>::get_Count()";
+    body += "ldloc reader\nldc.i4 100\ncallvirt instance System.Collections.Map<Int32,Int32>::Find(Int32)\ncall IsNone<Int32>(System.Optional<Int32>)\nbrtrue Absent\nfault \"absence lost\"\nAbsent:\nldloc reader\ncallvirt instance System.Collections.Map<Int32,Int32>::get_Count()";
     for callbacks in [
         MAP_CALLBACKS.to_string(),
         MAP_CALLBACKS.replace("ldc.i4 -2147483648", "ldarg key"),
@@ -378,7 +378,7 @@ Isolated:
 ldloc reader
 ldc.i4 1
 callvirt instance System.Collections.Map<Int32,Int32>::Find(Int32)
-call UnwrapSome<Int32>(System.Option<Int32>)
+call UnwrapSome<Int32>(System.Optional<Int32>)
 "#
     );
     assert_eq!(
@@ -474,7 +474,7 @@ initobj Box
     for i in 0..60 {
         body += &format!("ldc.i4 {i}\nnewobj Box\npop\n");
     }
-    body += "ldloc map\nldc.i4 7\nnewobj Box\ncall instance System.Collections.HashMap<Box,Box>::Find(Box)\ncall UnwrapSome<Box>(System.Option<Box>)\nldfld Box::Value";
+    body += "ldloc map\nldc.i4 7\nnewobj Box\ncall instance System.Collections.HashMap<Box,Box>::Find(Box)\ncall UnwrapSome<Box>(System.Optional<Box>)\nldfld Box::Value";
     let result = program(&body, extra)
         .run(Limits {
             heap_objects: 24,

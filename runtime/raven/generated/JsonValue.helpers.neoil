@@ -737,15 +737,15 @@ ldarg arg0
 call System.Result<String,System.Data.Json.JsonError>::FromResidual(System.Data.Json.JsonError)
 ret
 .end
-.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion25(System.Option<System.Introspection.TypeInfo>& arg0,out(true) System.Option.Some<System.Introspection.TypeInfo>& arg1) -> Boolean
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion25(System.Optional<System.Introspection.TypeInfo>& arg0,out(true) System.Optional.Some<System.Introspection.TypeInfo>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Option<System.Introspection.TypeInfo>::TryGetValue(System.Option.Some<System.Introspection.TypeInfo>&)
+call instance System.Optional<System.Introspection.TypeInfo>::TryGetValue(System.Optional.Some<System.Introspection.TypeInfo>&)
 ret
 .end
-.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion26(System.Option.Some<System.Introspection.TypeInfo>& arg0) -> System.Introspection.TypeInfo
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion26(System.Optional.Some<System.Introspection.TypeInfo>& arg0) -> System.Introspection.TypeInfo
 ldarg arg0
-call instance System.Option.Some<System.Introspection.TypeInfo>::get_Value()
+call instance System.Optional.Some<System.Introspection.TypeInfo>::get_Value()
 ret
 .end
 .function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion27(System.Result<Void,System.Data.Json.JsonError>& arg0,out Void& arg1) -> Boolean
@@ -787,15 +787,15 @@ ldarg arg1
 call instance System.Result<System.Data.Json.JsonNumber,System.Data.Json.JsonError>::TryGetResidual(System.Data.Json.JsonError&)
 ret
 .end
-.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion34(System.Option<System.Introspection.MethodInfo>& arg0,out(true) System.Option.Some<System.Introspection.MethodInfo>& arg1) -> Boolean
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion34(System.Optional<System.Introspection.MethodInfo>& arg0,out(true) System.Optional.Some<System.Introspection.MethodInfo>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Option<System.Introspection.MethodInfo>::TryGetValue(System.Option.Some<System.Introspection.MethodInfo>&)
+call instance System.Optional<System.Introspection.MethodInfo>::TryGetValue(System.Optional.Some<System.Introspection.MethodInfo>&)
 ret
 .end
-.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion35(System.Option.Some<System.Introspection.MethodInfo>& arg0) -> System.Introspection.MethodInfo
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion35(System.Optional.Some<System.Introspection.MethodInfo>& arg0) -> System.Introspection.MethodInfo
 ldarg arg0
-call instance System.Option.Some<System.Introspection.MethodInfo>::get_Value()
+call instance System.Optional.Some<System.Introspection.MethodInfo>::get_Value()
 ret
 .end
 .function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion36(System.Result<System.Object,System.Runtime.Reflection.ReflectionError>& arg0,out(true) System.Result.Ok<System.Object>& arg1) -> Boolean
@@ -1117,7 +1117,7 @@ ldarg arg0
 callvirt instance System.Introspection.TypeInfo::get_IsArray()
 ret
 .end
-.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeReflection267AF5785045EB45(System.Introspection.TypeInfo arg0) -> System.Option<System.Introspection.TypeInfo>
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeReflection267AF5785045EB45(System.Introspection.TypeInfo arg0) -> System.Optional<System.Introspection.TypeInfo>
 ldarg arg0
 callvirt instance System.Introspection.TypeInfo::GetElementType()
 ret
@@ -1182,7 +1182,7 @@ ldarg arg0
 callvirt instance System.Introspection.PropertyInfo::get_IsStatic()
 ret
 .end
-.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeReflectionAD8E36A9A34F18E8(System.Introspection.PropertyInfo arg0) -> System.Option<System.Introspection.MethodInfo>
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeReflectionAD8E36A9A34F18E8(System.Introspection.PropertyInfo arg0) -> System.Optional<System.Introspection.MethodInfo>
 ldarg arg0
 callvirt instance System.Introspection.PropertyInfo::GetGetMethod()
 ret
@@ -1198,7 +1198,7 @@ ldarg arg0
 call System.Runtime.Reflection.TypeReflectionExtensions::CreateInstance(System.Introspection.TypeInfo)
 ret
 .end
-.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeReflection7DAEFCC3628F18EB(System.Introspection.PropertyInfo arg0) -> System.Option<System.Introspection.MethodInfo>
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeReflection7DAEFCC3628F18EB(System.Introspection.PropertyInfo arg0) -> System.Optional<System.Introspection.MethodInfo>
 ldarg arg0
 callvirt instance System.Introspection.PropertyInfo::GetSetMethod()
 ret
@@ -2015,16 +2015,16 @@ ret
 .end
 .method private static CheckType(System.Introspection.TypeInfo type) -> System.Result<Void,System.Data.Json.JsonError>
 .local System.Introspection.TypeInfo local0
-.local System.Option<System.Introspection.TypeInfo> local1
-.local System.Option.Some<System.Introspection.TypeInfo> local2
+.local System.Optional<System.Introspection.TypeInfo> local1
+.local System.Optional.Some<System.Introspection.TypeInfo> local2
 .local Void local3
 .local Void local4
 ldloca local0
 initobj System.Introspection.TypeInfo
 ldloca local1
-initobj System.Option<System.Introspection.TypeInfo>
+initobj System.Optional<System.Introspection.TypeInfo>
 ldloca local2
-initobj System.Option.Some<System.Introspection.TypeInfo>
+initobj System.Optional.Some<System.Introspection.TypeInfo>
 ldvoid
 stloc local3
 ldvoid
@@ -2115,19 +2115,19 @@ stloc local1
 M0000000e_IL_0095:
 ldloca local2
 M0000000e_IL_0097:
-initobj System.Option.Some<System.Introspection.TypeInfo>
+initobj System.Optional.Some<System.Introspection.TypeInfo>
 M0000000e_IL_009d:
 ldloca local1
 M0000000e_IL_009f:
 ldloca local2
 M0000000e_IL_00a1:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion25(System.Option<System.Introspection.TypeInfo>&,System.Option.Some<System.Introspection.TypeInfo>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion25(System.Optional<System.Introspection.TypeInfo>&,System.Optional.Some<System.Introspection.TypeInfo>&)
 M0000000e_IL_00a6:
 brfalse M0000000e_IL_00bf
 M0000000e_IL_00ab:
 ldloca local2
 M0000000e_IL_00ad:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion26(System.Option.Some<System.Introspection.TypeInfo>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion26(System.Optional.Some<System.Introspection.TypeInfo>&)
 M0000000e_IL_00b2:
 stloc local0
 M0000000e_IL_00b3:
@@ -2359,8 +2359,8 @@ ret
 .local System.Result<Void,System.Data.Json.JsonError> local28
 .local Void local29
 .local System.Data.Json.JsonError local30
-.local System.Option<System.Introspection.TypeInfo> local31
-.local System.Option.Some<System.Introspection.TypeInfo> local32
+.local System.Optional<System.Introspection.TypeInfo> local31
+.local System.Optional.Some<System.Introspection.TypeInfo> local32
 .local Int32 local33
 .local Int32 local34
 .local Int32 local35
@@ -2370,8 +2370,8 @@ ret
 .local System.Data.Json.JsonError local39
 .local System.Collections.Iterator<System.Introspection.PropertyInfo> local40
 .local System.Introspection.PropertyInfo local41
-.local System.Option<System.Introspection.MethodInfo> local42
-.local System.Option.Some<System.Introspection.MethodInfo> local43
+.local System.Optional<System.Introspection.MethodInfo> local42
+.local System.Optional.Some<System.Introspection.MethodInfo> local43
 .local System.Result<Void,System.Data.Json.JsonError> local44
 .local Void local45
 .local System.Data.Json.JsonError local46
@@ -2433,9 +2433,9 @@ stloc local29
 ldloca local30
 initobj System.Data.Json.JsonError
 ldloca local31
-initobj System.Option<System.Introspection.TypeInfo>
+initobj System.Optional<System.Introspection.TypeInfo>
 ldloca local32
-initobj System.Option.Some<System.Introspection.TypeInfo>
+initobj System.Optional.Some<System.Introspection.TypeInfo>
 ldc.i4 0
 stloc local33
 ldc.i4 0
@@ -2455,9 +2455,9 @@ initobj System.Collections.Iterator<System.Introspection.PropertyInfo>
 ldloca local41
 initobj System.Introspection.PropertyInfo
 ldloca local42
-initobj System.Option<System.Introspection.MethodInfo>
+initobj System.Optional<System.Introspection.MethodInfo>
 ldloca local43
-initobj System.Option.Some<System.Introspection.MethodInfo>
+initobj System.Optional.Some<System.Introspection.MethodInfo>
 ldloca local44
 initobj System.Result<Void,System.Data.Json.JsonError>
 ldvoid
@@ -2780,19 +2780,19 @@ stloc local31
 M00000011_IL_01b4:
 ldloca local32
 M00000011_IL_01b6:
-initobj System.Option.Some<System.Introspection.TypeInfo>
+initobj System.Optional.Some<System.Introspection.TypeInfo>
 M00000011_IL_01bc:
 ldloca local31
 M00000011_IL_01be:
 ldloca local32
 M00000011_IL_01c0:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion25(System.Option<System.Introspection.TypeInfo>&,System.Option.Some<System.Introspection.TypeInfo>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion25(System.Optional<System.Introspection.TypeInfo>&,System.Optional.Some<System.Introspection.TypeInfo>&)
 M00000011_IL_01c5:
 brfalse M00000011_IL_01df
 M00000011_IL_01ca:
 ldloca local32
 M00000011_IL_01cc:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion26(System.Option.Some<System.Introspection.TypeInfo>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion26(System.Optional.Some<System.Introspection.TypeInfo>&)
 M00000011_IL_01d1:
 stloc local8
 M00000011_IL_01d3:
@@ -3078,19 +3078,19 @@ stloc local42
 M00000011_IL_036e:
 ldloca local43
 M00000011_IL_0370:
-initobj System.Option.Some<System.Introspection.MethodInfo>
+initobj System.Optional.Some<System.Introspection.MethodInfo>
 M00000011_IL_0376:
 ldloca local42
 M00000011_IL_0378:
 ldloca local43
 M00000011_IL_037a:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion34(System.Option<System.Introspection.MethodInfo>&,System.Option.Some<System.Introspection.MethodInfo>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion34(System.Optional<System.Introspection.MethodInfo>&,System.Optional.Some<System.Introspection.MethodInfo>&)
 M00000011_IL_037f:
 brfalse M00000011_IL_0392
 M00000011_IL_0384:
 ldloca local43
 M00000011_IL_0386:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion35(System.Option.Some<System.Introspection.MethodInfo>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion35(System.Optional.Some<System.Introspection.MethodInfo>&)
 M00000011_IL_038b:
 pop
 M00000011_IL_038c:
@@ -3460,16 +3460,16 @@ ret
 .local System.Result<Void,System.Data.Json.JsonError> local38
 .local Void local39
 .local System.Data.Json.JsonError local40
-.local System.Option<System.Introspection.TypeInfo> local41
-.local System.Option.Some<System.Introspection.TypeInfo> local42
+.local System.Optional<System.Introspection.TypeInfo> local41
+.local System.Optional.Some<System.Introspection.TypeInfo> local42
 .local Int32 local43
 .local Int32 local44
 .local Int32 local45
 .local Int32 local46
 .local System.Collections.Iterator<System.Introspection.PropertyInfo> local47
 .local System.Introspection.PropertyInfo local48
-.local System.Option<System.Introspection.MethodInfo> local49
-.local System.Option.Some<System.Introspection.MethodInfo> local50
+.local System.Optional<System.Introspection.MethodInfo> local49
+.local System.Optional.Some<System.Introspection.MethodInfo> local50
 .local System.Result<Void,System.Data.Json.JsonError> local51
 .local Void local52
 .local System.Data.Json.JsonError local53
@@ -3552,9 +3552,9 @@ stloc local39
 ldloca local40
 initobj System.Data.Json.JsonError
 ldloca local41
-initobj System.Option<System.Introspection.TypeInfo>
+initobj System.Optional<System.Introspection.TypeInfo>
 ldloca local42
-initobj System.Option.Some<System.Introspection.TypeInfo>
+initobj System.Optional.Some<System.Introspection.TypeInfo>
 ldc.i4 0
 stloc local43
 ldc.i4 0
@@ -3568,9 +3568,9 @@ initobj System.Collections.Iterator<System.Introspection.PropertyInfo>
 ldloca local48
 initobj System.Introspection.PropertyInfo
 ldloca local49
-initobj System.Option<System.Introspection.MethodInfo>
+initobj System.Optional<System.Introspection.MethodInfo>
 ldloca local50
-initobj System.Option.Some<System.Introspection.MethodInfo>
+initobj System.Optional.Some<System.Introspection.MethodInfo>
 ldloca local51
 initobj System.Result<Void,System.Data.Json.JsonError>
 ldvoid
@@ -3926,19 +3926,19 @@ stloc local41
 M00000013_IL_01fb:
 ldloca local42
 M00000013_IL_01fd:
-initobj System.Option.Some<System.Introspection.TypeInfo>
+initobj System.Optional.Some<System.Introspection.TypeInfo>
 M00000013_IL_0203:
 ldloca local41
 M00000013_IL_0205:
 ldloca local42
 M00000013_IL_0207:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion25(System.Option<System.Introspection.TypeInfo>&,System.Option.Some<System.Introspection.TypeInfo>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion25(System.Optional<System.Introspection.TypeInfo>&,System.Optional.Some<System.Introspection.TypeInfo>&)
 M00000013_IL_020c:
 brfalse M00000013_IL_0226
 M00000013_IL_0211:
 ldloca local42
 M00000013_IL_0213:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion26(System.Option.Some<System.Introspection.TypeInfo>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion26(System.Optional.Some<System.Introspection.TypeInfo>&)
 M00000013_IL_0218:
 stloc local7
 M00000013_IL_021a:
@@ -4292,19 +4292,19 @@ stloc local49
 M00000013_IL_0411:
 ldloca local50
 M00000013_IL_0413:
-initobj System.Option.Some<System.Introspection.MethodInfo>
+initobj System.Optional.Some<System.Introspection.MethodInfo>
 M00000013_IL_0419:
 ldloca local49
 M00000013_IL_041b:
 ldloca local50
 M00000013_IL_041d:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion34(System.Option<System.Introspection.MethodInfo>&,System.Option.Some<System.Introspection.MethodInfo>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion34(System.Optional<System.Introspection.MethodInfo>&,System.Optional.Some<System.Introspection.MethodInfo>&)
 M00000013_IL_0422:
 brfalse M00000013_IL_0435
 M00000013_IL_0427:
 ldloca local50
 M00000013_IL_0429:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion35(System.Option.Some<System.Introspection.MethodInfo>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion35(System.Optional.Some<System.Introspection.MethodInfo>&)
 M00000013_IL_042e:
 pop
 M00000013_IL_042f:

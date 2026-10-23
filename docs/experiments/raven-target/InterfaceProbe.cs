@@ -100,7 +100,7 @@ static class InterfaceProbe
         }
         UnionImport.Write(propagationPath, core, Path.Combine(output, "Propagation.neoil"), collectionProfile: true);
         var incompatible = Create(propagationSource.Replace("func Normalize(value: int) -> Result<int, OverflowError>",
-            "func Normalize(value: int) -> Option<int>"));
+            "func Normalize(value: int) -> Optional<int>"));
         if (!incompatible.GetDiagnostics().Any(d => d.Severity == DiagnosticSeverity.Error))
             throw new Exception("Incompatible propagation carrier accepted.");
         foreach (var sample in new[] { "library-option-propagation", "library-result-void-propagation" })

@@ -163,4 +163,4 @@ carrier constructors discovered via route attributes, constructs independent val
 and recovers an ordinary Raven union. The [runtime mapper](experiments/runtime-route-mapper/README.md) now composes these
 constructors with cached patterns and capture conversions. Its dynamic argument
 collections use the Sequence<Object?> Invoke overload, which copies arguments before
-applying the existing exact-type checks. JSON enum/Uuid/Option work stays pending.
+applying the existing exact-type checks. JSON enum/Uuid/Optional work stays pending.

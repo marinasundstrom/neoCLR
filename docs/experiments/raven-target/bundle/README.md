@@ -27,7 +27,7 @@ Raven entry points. Continue with Raven and VS Code:
    **Extensions: Install from VSIX** command, or `code --install-extension PATH`.
 2. Extract the matching Raven SDK and run
    `python3 configure.py --sdk /absolute/path/to/raven-sdk` from this folder.
-3. Open the **msbuild-demo** folder in VS Code. `Main.rvn` demonstrates Result/Option/Void
+3. Open the **msbuild-demo** folder in VS Code. `Main.rvn` demonstrates Result/Optional/Void
    propagation. Completion should resolve neoCLR types; for example type
    `System.Date.` or `System.Runtime.RuntimeContext.` inside a function.
 4. Use **Tasks: Run Task → neoCLR: Run (MSBuild)**. It first runs the default
@@ -120,7 +120,7 @@ is changed. The supplied language server is pinned to the bundle's compiler sour
 
 See **docs/raven-runtime-api-coverage.md** for the existing API surface, deliberate
 projection differences and unsupported compiler patterns. Recoverable failures use
-Result/Option; terminal faults are not catchable exception objects. The importer is
+Result/Optional; terminal faults are not catchable exception objects. The importer is
 bounded: generic application definitions, custom delegate declarations, value-receiver
 method groups, explicit/default interfaces, rectangular arrays, nullable metadata and
 fault-unwind cleanup are not claimed. See [application types](docs/raven-application-types.md)

@@ -29,9 +29,9 @@ Rust hosts receive `Result<Execution, neoclr::Fault>`. The `Fault` fields are:
 | --- | --- |
 | `code` | `neoclr::FaultCode`; runtime-assigned classification |
 | `message` | `String`; human diagnostic text, not a stable discriminator |
-| `function` | `Option<String>`; faulting function when available |
-| `instruction` | `Option<usize>`; instruction index when available |
-| `stack_trace` | `Option<StackTrace>`; owned execution frames; may be absent before execution |
+| `function` | `Optional<String>`; faulting function when available |
+| `instruction` | `Optional<usize>`; instruction index when available |
+| `stack_trace` | `Optional<StackTrace>`; owned execution frames; may be absent before execution |
 
 `FaultCode` is a copyable, comparable, hashable, non-exhaustive Rust enum. Match
 known variants with a fallback for future additions. `FaultCode::as_str()` returns
@@ -126,13 +126,13 @@ Storage errors or guest-selected Fault codes. Use `..Limits::default()` when a h
 
 ## Shared host presentation
 
-Rust `FaultCode::standard_message(self) -> Option<&'static str>` returns the standard
+Rust `FaultCode::standard_message(self) -> Optional<&'static str>` returns the standard
 English runtime message for that code. It returns None for UserFault, whose message
 is supplied by the guest. Wording is diagnostic; use codes for machine decisions.
 
 `Fault::diagnostic(&self) -> FaultDiagnostic<'_>` returns a borrowed, allocation-free
 host view with public fields `code: FaultCode`, `message: &str`, and
-`stack_trace: Option<&StackTrace>`. The message follows the code rule above. An absent
+`stack_trace: Optional<&StackTrace>`. The message follows the code rule above. An absent
 trace remains absent; frames are not fabricated for loader/host failures. Display prints
 code/message, then innermost-first method names and neoIL instruction indices, marking
 truncation. It does not terminate the host, capture argument/local values or run cleanup.

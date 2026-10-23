@@ -153,10 +153,10 @@ source emission and imported-consumer qualification are recorded in
 
 `GetFields` describes instance storage, static storage and Int32 literals, with binding
 filters and distinct declaration ordinals. `IsInitOnly`, `IsLiteral` and
-`ConstantValue: Option<Object>` preserve the readonly/literal distinction. Source
+`ConstantValue: Optional<Object>` preserve the readonly/literal distinction. Source
 FieldDef tokens include static/literal rows; legacy missing tokens remain absent.
 
-`TypeInitializer: Option<ConstructorInfo>` describes `.cctor`; `IsBeforeFieldInit`
+`TypeInitializer: Optional<ConstructorInfo>` describes `.cctor`; `IsBeforeFieldInit`
 preserves timing. Constructor discovery requires static/nonpublic flags to select it,
 and ordinary methods exclude it. Inspection and constant reads never execute user
 initialization or authorize direct initializer calls.

@@ -102,7 +102,7 @@ content, upstream ownership, compiler interpretation changes and validation.
 The pinned publisher now includes the shared compiler fix from Raven main
 `137431e44109c6050af23075401cc2090784729c`. A projected union case first looks up its
 logical documentation ID, then falls back to its physical CLI carrier type ID.
-This restores the already-authored Option/Result case summaries without changing
+This restores the already-authored Optional/Result case summaries without changing
 the documented union shape or adding duplicate public carrier pages.
 
 ## Callback contract presentation (2026-10-05)

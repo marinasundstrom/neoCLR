@@ -44,7 +44,7 @@ System.Int32
 
 Completion on either array spelling includes Length, GetIterator, Where, Select and
 ToList. Other samples are in `../tools/samples`, including `application-orders.rvn`
-for the Result/Option, file and application workflow. Keep your edits before copying
+for the Result/Optional, file and application workflow. Keep your edits before copying
 a different sample into Main.rvn.
 
 ## Installation and validation

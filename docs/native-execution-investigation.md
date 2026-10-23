@@ -313,7 +313,7 @@ a supported hot-reload contract or copy an unloading design from it.
 
 ## Backend options
 
-| Option | Benefit to investigate | Cost / reason not to select it yet |
+| Optional | Benefit to investigate | Cost / reason not to select it yet |
 | --- | --- | --- |
 | Cranelift for AOT and JIT | Rust implementation; ARM64 code generation; object and JIT modules expose both output paths. A practical first integration candidate. | Need to validate target ABI, debug information, root reporting, relocation and packaging against neoCLR's requirements. Compiler speed and output quality must be measured locally. |
 | LLVM for AOT and potentially ORC JIT | Established object generation and optimization infrastructure; ORC supplies JIT/linking components. Attractive for an AOT-focused product. | Larger integration/toolchain surface, version management and semantic lowering burden. ORC does not supply neoCLR GC or state migration. |
@@ -551,7 +551,7 @@ kits and native unwind qualification remain open.
 2. **Calls and services.** Specify scalars, aggregates, receivers, byrefs, interface
    dispatch, callable adapters, Void/unit and runtime context passing. Use explicit
    helper entry points initially; no Rust enum layout across the boundary. Keep
-   normal Result/Option data separate from terminal Fault propagation. A first probe
+   normal Result/Optional data separate from terminal Fault propagation. A first probe
    can use status plus out-result to avoid unwinding across Rust/C/native frames.
 3. **Managed memory.** Start with the existing nonmoving policy; prototype explicit
    shadow-stack roots before sophisticated stack maps if that simplifies correctness.

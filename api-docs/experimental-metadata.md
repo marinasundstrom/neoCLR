@@ -3621,7 +3621,7 @@ Validation: `AuthoredDefinitionChecks` covers exact facade identity, direct decl
 renaming, ownership rejection, CLR shape/execution and native verify/run (42).
 `--authored-definition-integration <runtime> <fresh-directory>` reproduces the native
 case. The 76 C# contract groups and Raven external-signature/generic-library runtime
-probes pass. The broader collections `Option<Order>` gate remains unchanged.
+probes pass. The broader collections `Optional<Order>` gate remains unchanged.
 
 
 ### Shared method declarations
@@ -3731,7 +3731,7 @@ body.Return();
 Validation extends the manual executable to call a directly declared static type method
 through an assembly-level helper. CLR and neoCLR return 42. C# contracts cover shared
 identity, access flags, duplicate/foreign attachment, detached-owner rejection and
-unsupported method categories. The broader collections `Option<Order>` gate is unchanged.
+unsupported method categories. The broader collections `Optional<Order>` gate is unchanged.
 
 
 ### Direct instance methods and constructors
@@ -3772,7 +3772,7 @@ its private readonly Int32 field in a manual constructor, calls a manual instanc
 and carries the result through the function/type-method/struct path. CLR and neoCLR
 return 42. Tests also compare emitted constructor/instance flags and reject invalid
 constructor signatures and owner categories. Canonical body definitions, direct interface
-contracts and loaded editing remain pending; the collections `Option<Order>` gate is unchanged.
+contracts and loaded editing remain pending; the collections `Optional<Order>` gate is unchanged.
 
 
 ### Direct interface declarations and dispatch
@@ -3809,7 +3809,7 @@ through the existing helper and calls it with CallVirtual. CLR and neoCLR return
 All 76 C# groups pass, including existing multi-implementation/inherited interface tests
 and new invalid-owner/flags/interface-storage checks. Raven's rebuilt external-signature
 probe also passes. Canonical bodies, relationship definitions and loaded editing remain
-pending; this does not resolve the collections `Option<Order>` import gap.
+pending; this does not resolve the collections `Optional<Order>` import gap.
 
 
 ### Authored interface relationships
@@ -3869,7 +3869,7 @@ branch label and locals, CLR execution (42), and rejection of loaded Body access
 The native manual object/interface/struct case replaces a body through the definition
 API before emission and returns 42. All 76 contract groups and the rebuilt Raven
 external-signature probe pass. Property/generic-definition migration and loaded editing
-remain open, as does the collections `Option<Order>` target gap.
+remain open, as does the collections `Optional<Order>` target gap.
 
 
 ### Shared authored property declarations
@@ -3972,7 +3972,7 @@ Author direction, 2026-10-01: the current API is good enough to resume the worki
 Raven/native case. Further object-model migration, builder naming and encoding/PE
 separation are deferred unless required by an observed integration blocker. This
 supersedes the earlier migration-first sequencing, not the architectural direction.
-The current blocker remains imported `Option<Order>` value-category support; the
+The current blocker remains imported `Optional<Order>` value-category support; the
 reference-only import contract must not be widened by treating it as a class.
 
 
@@ -4426,15 +4426,15 @@ The C# linkage fixture executes on CLR and neoCLR (42), tests versioned/unversio
 bindings and malformed mappings, and provides the checked-in binary runtime fixture.
 `LocalCoreSignatureChecks` covers local nominal/core Function signatures and cyclic
 TypeRef rejection. The unchanged Raven collections application additionally exercises
-inhabited Void through Option residual propagation.
+inhabited Void through Optional residual propagation.
 
 The Rust host metadata model exposes `metadata_origin::AssemblyMetadata`'s new
 `native_module_bindings: Vec<NativeModuleBinding>` and
 `native_type_bindings: Vec<NativeTypeBinding>` fields. Both default to empty on read and
 are omitted when empty on write. `NativeModuleBinding` has `assembly: String`,
-`module: String`, `revision: Option<String>`; `NativeTypeBinding` has
+`module: String`, `revision: Optional<String>`; `NativeTypeBinding` has
 `native_name`, `assembly`, `namespace`, `name` (`String`), `arity: usize`,
-`value_type: bool`, and `declaring: Option<String>`. They derive Debug, Clone,
+`value_type: bool`, and `declaring: Optional<String>`. They derive Debug, Clone,
 PartialEq, Eq, Serialize and Deserialize; unknown fields are rejected. Runtime admission
 checks declared scopes, text, duplicates and limits (256 modules, 4096 types, arity 32).
 These retain projection provenance; they do not authorize calls or override runtime
@@ -5936,7 +5936,7 @@ This matches CLR inline value storage and copy semantics: an executable tag/payl
 fixture returns 42 on both runtimes after mutating an independent copy. Direct native
 imports of nongeneric/generic value constructors and methods also execute on both.
 The fixture uses an Int32 tag and is a metadata contract test, not a replacement for
-Raven union lowering or proof that source Option compiles.
+Raven union lowering or proof that source Optional compiles.
 
 Raven maps the introspection value category to Struct and its semantic ValueType base;
 generic field substitution remains in introspection. It does not reopen imported
@@ -6329,7 +6329,7 @@ constructors executed by the CLR. The native Raven union consumer additionally e
 these references on neoCLR. No metadata version change is required.
 
 Development validation, 2026-10-03: authored value-interface edges retain the
-relationships needed by imported source Option/Result carriers. Unboxed value-to-interface
+relationships needed by imported source Optional/Result carriers. Unboxed value-to-interface
 assignment remains rejected; boxing or constrained dispatch is still required. C# tests
 cover idempotent value edges, wrong target kinds and foreign ownership. The unchanged
 source-library consumer executes separately on neoCLR with the bounded union bootstrap.

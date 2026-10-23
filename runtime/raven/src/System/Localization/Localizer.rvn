@@ -10,7 +10,7 @@ public interface Localizer {
     /// Returns the stored translation, or the key itself when absent. Empty translations are present.
     val self[key: string]: string { get; }
     /// Finds a translation without substituting the key when absent.
-    func Find(key: string) -> Option<string>
+    func Find(key: string) -> Optional<string>
 }
 
 /// A catalogue associated with resource type T. Lookup behavior is the same as Localizer.

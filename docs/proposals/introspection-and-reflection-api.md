@@ -910,7 +910,7 @@ and:
 ```raven
 TypeInfo<Foo>
     .GetMethod<String, Int>("Do")
-    -> Option<MethodInfo<Foo, String, Int>>
+    -> Optional<MethodInfo<Foo, String, Int>>
 ```
 
 This remains exploratory and is not required for the initial introspection model.

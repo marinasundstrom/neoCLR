@@ -176,7 +176,7 @@ Conceptually:
 ```raven
 Execute() -> Result<int, Error>
 
-ExecuteScalar<T>() -> Result<Option<T>, Error>
+ExecuteScalar<T>() -> Result<Optional<T>, Error>
 
 ExecuteReader() -> Result<SqlReader, Error>
 ```
@@ -233,12 +233,12 @@ The API should distinguish SQL `NULL` from ordinary values.
 For example:
 
 ```raven
-name = row.Get<Option<String>>("name")?
+name = row.Get<Optional<String>>("name")?
 ```
 
 or through another explicit nullable/optional retrieval mechanism.
 
-SQL nullability should not require nullable value types in the runtime. It can instead map naturally onto `Option<T>`.
+SQL nullability should not require nullable value types in the runtime. It can instead map naturally onto `Optional<T>`.
 
 ## Transactions
 

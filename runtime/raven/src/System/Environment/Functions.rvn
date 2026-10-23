@@ -2,7 +2,7 @@ module System
 
 import System.EnvironmentError
 import System.Result.*
-import System.Option.*
+import System.Optional.*
 
 /// <summary>Provides process environment and execution-platform information.</summary>
 public static class Environment {
@@ -86,16 +86,16 @@ public static class Environment {
 
     /// <summary>Reads a variable; absence is None, while invalid names or inaccessible text return an error.</summary>
     /// <param name="name">The environment variable name.</param>
-    static func GetEnvironmentVariable(name: string) -> System.Result<System.Option<string>, EnvironmentError> {
+    static func GetEnvironmentVariable(name: string) -> System.Result<System.Optional<string>, EnvironmentError> {
         let payload = neoCLR.Runtime.EnvironmentVariable(name)
         if neoCLR.Runtime.IsValue<int>(payload) {
             return Failure(default(EnvironmentError))
         }
         if neoCLR.Runtime.IsValue<System.Void>(payload) {
-            let absent: System.Option<string> = None()
+            let absent: System.Optional<string> = None()
             return Ok(absent)
         }
-        let present: System.Option<string> = Some(neoCLR.Runtime.UnpackValue<string>(payload))
+        let present: System.Optional<string> = Some(neoCLR.Runtime.UnpackValue<string>(payload))
         return Ok(present)
     }
 }

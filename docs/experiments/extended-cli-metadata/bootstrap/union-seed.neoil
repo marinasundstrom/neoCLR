@@ -1,6 +1,6 @@
 ; Bounded executable bootstrap for source-built unions.
 ; Object display uses the existing type-handle query directly, without a guest
-; introspection object graph that would itself depend on Option and Result.
+; introspection object graph that would itself depend on Optional and Result.
 .module System
 .references ()
 .type System.Void

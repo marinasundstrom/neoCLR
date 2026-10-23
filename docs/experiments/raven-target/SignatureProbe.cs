@@ -184,7 +184,7 @@ static class SignatureProbe
         var task = new GenericInstanceType(module.GetType("System.Concurrency.Tasks.Task`1"));
         task.GenericArguments.Add(module.TypeSystem.String);
         var getOutcome = task.Resolve().Methods.Single(m => m.Name == "get_Outcome");
-        Check("Task exposes optional terminal outcome", TaskBindings.Bind(Reference(getOutcome, task), getOutcome, false, false)?.Result == "System.Option<System.Concurrency.Tasks.TaskOutcome<String>>");
+        Check("Task exposes optional terminal outcome", TaskBindings.Bind(Reference(getOutcome, task), getOutcome, false, false)?.Result == "System.Optional<System.Concurrency.Tasks.TaskOutcome<String>>");
         var wrongOutcome = Reference(getOutcome, task);
         wrongOutcome.ReturnType = module.TypeSystem.String;
         Reject("Task outcome signature mismatch", () => TaskBindings.Bind(wrongOutcome, getOutcome, false, false));
@@ -523,7 +523,7 @@ static class SignatureProbe
         }
         var baseSetter = module.GetType("System.Web.Http.HttpClient").Methods.Single(m => m.Name == "set_BaseUri");
         Check("HTTP optional string base setter", HttpBindings.Bind(baseSetter, baseSetter, false, false)
-            is { Arguments: ["System.Web.Http.HttpClient", "System.Option<String>"], Result: "void" });
+            is { Arguments: ["System.Web.Http.HttpClient", "System.Optional<String>"], Result: "void" });
         var baseArgument = baseSetter.Parameters[0].ParameterType;
         baseSetter.Parameters[0].ParameterType = module.TypeSystem.String;
         Reject("HTTP base setter rejects plain string signature", () => HttpBindings.Bind(baseSetter, baseSetter, false, false));
@@ -608,7 +608,7 @@ static class SignatureProbe
         Check("Environment returns a managed string vector", ProcessBindings.Bind(Reference(arguments, environment), arguments)?.Result == "arrayref<String>");
         var variable = environment.Methods.Single(m => m.Name == "GetEnvironmentVariable");
         var variableCall = Reference(variable, environment);
-        Check("Environment closes nested Result/Option", ProcessBindings.Bind(variableCall, variable)?.Result == "System.Result<System.Option<String>,System.EnvironmentError>");
+        Check("Environment closes nested Result/Optional", ProcessBindings.Bind(variableCall, variable)?.Result == "System.Result<System.Optional<String>,System.EnvironmentError>");
         variableCall.Parameters[0].ParameterType = module.TypeSystem.Int32;
         Reject("Environment name signature mismatch", () => ProcessBindings.Bind(variableCall, variable));
         var console = module.GetType("System.Console");
@@ -616,7 +616,7 @@ static class SignatureProbe
             && m.Parameters[0].ParameterType.MetadataType == MetadataType.Object);
         Check("Console object fallback", ProcessBindings.Bind(Reference(objectWriteLine, console), objectWriteLine)?.Arguments.SequenceEqual(new[] { "System.Object" }) == true);
         var readByte = console.Methods.Single(m => m.Name == "ReadByte");
-        Check("Console retains Byte payload", ProcessBindings.Bind(Reference(readByte, console), readByte)?.Result == "System.Result<System.Option<Byte>,System.ConsoleReadError>");
+        Check("Console retains Byte payload", ProcessBindings.Bind(Reference(readByte, console), readByte)?.Result == "System.Result<System.Optional<Byte>,System.ConsoleReadError>");
         Check("Process vectors exclude multidimensional arrays", ProcessBindings.ArrayType(new ArrayType(module.TypeSystem.String, 2)) is null);
         var arrayListDefinition = module.GetType("System.Collections.ArrayList`1");
         var stringList = new GenericInstanceType(arrayListDefinition);
@@ -630,8 +630,8 @@ static class SignatureProbe
             var search = arrayListDefinition.Methods.Single(m => m.Name == name);
             var searchReference = Reference(search, stringList);
             var expected = name switch {
-                "Find" or "FindLast" => "System.Option<String>",
-                "FindIndex" or "FindLastIndex" => "System.Option<Int32>",
+                "Find" or "FindLast" => "System.Optional<String>",
+                "FindIndex" or "FindLastIndex" => "System.Optional<Int32>",
                 "FindAll" => "System.Collections.ArrayList<String>", _ => "Boolean"
             };
             Check(name + " preserves filter outcome", CollectionBindings.Bind(searchReference, search, true)?.Result == expected);
@@ -663,7 +663,7 @@ static class SignatureProbe
             terminalReference.CallingConvention = MethodCallingConvention.Generic;
             var call = new GenericInstanceMethod(terminalReference);
             call.GenericArguments.Add(module.TypeSystem.String);
-            var expected = name == "Single" ? "System.Result<String,System.Linq.SingleError>" : "System.Option<String>";
+            var expected = name == "Single" ? "System.Result<String,System.Linq.SingleError>" : "System.Optional<String>";
             Check(name + " arity " + count + " closes terminal outcome", QueryBindings.Bind(call, terminal, false)?.Result == expected);
             Reject(name + " arity " + count + " rejects virtual call", () => QueryBindings.Bind(call, terminal, true));
             if (count == 2) {
@@ -700,7 +700,7 @@ static class SignatureProbe
             Reject("Unmarked static implementation cannot satisfy an extension contract", () =>
                 LibraryImplementation.CheckExtensionContract(implementation, original));
         }
-        foreach (var ownerName in new[] { "OptionOperators", "OptionNestedOperators", "ResultOperators", "Concurrency.Tasks.TaskOperators", "Concurrency.Tasks.TaskResultOperators" }) {
+        foreach (var ownerName in new[] { "OptionalOperators", "OptionalNestedOperators", "ResultOperators", "Concurrency.Tasks.TaskOperators", "Concurrency.Tasks.TaskResultOperators" }) {
             var operatorType = module.GetType("System." + ownerName);
             var index = 0;
             foreach (var operation in operatorType.Methods) {
@@ -712,17 +712,17 @@ static class SignatureProbe
                 var expected = (ownerName, operation.Name) switch {
                     ("Concurrency.Tasks.TaskResultOperators", "MapResult") => "System.Concurrency.Tasks.Task<System.Result<Boolean,String>>",
                     ("Concurrency.Tasks.TaskOperators", "Map" or "Then") => "System.Concurrency.Tasks.Task<String>",
-                    ("OptionOperators", "Map" or "Then") => "System.Option<String>",
-                    ("OptionOperators", "Match") => "String",
-                    ("OptionOperators", "ThenResult" or "MapResult") => "System.Result<String,Boolean>",
-                    ("OptionOperators", "OkOr") => "System.Result<Int32,String>",
+                    ("OptionalOperators", "Map" or "Then") => "System.Optional<String>",
+                    ("OptionalOperators", "Match") => "String",
+                    ("OptionalOperators", "ThenResult" or "MapResult") => "System.Result<String,Boolean>",
+                    ("OptionalOperators", "OkOr") => "System.Result<Int32,String>",
                     (_, "UnwrapOr" or "UnwrapOrElse") => "Int32",
                     (_, "ToIterable") => "System.Collections.Iterable<Int32>",
                     ("ResultOperators", "Map" or "Then") => "System.Result<Boolean,String>",
                     ("ResultOperators", "MapError") => "System.Result<Int32,Boolean>",
                     ("ResultOperators", "Match") => "Boolean",
                     ("ResultOperators", _) => "System.Result<Int32,String>",
-                    _ => "System.Option<Int32>"
+                    _ => "System.Optional<Int32>"
                 };
                 var label = ownerName + "." + operation.Name + " overload " + index++;
                 Check(label + " binds closed outcome", OutcomeOperatorBindings.Bind(call, operation, false)?.Result == expected);
@@ -737,7 +737,7 @@ static class SignatureProbe
         closedMap.GenericArguments.Add(module.TypeSystem.Int32);
         closedMap.GenericArguments.Add(module.TypeSystem.String);
         var mapFind = mapDefinition.Methods.Single(m => m.Name == "Find");
-        Check("Map Find closes Option payload", MapBindings.Bind(Reference(mapFind, closedMap), mapFind, true)?.Result == "System.Option<String>");
+        Check("Map Find closes Optional payload", MapBindings.Bind(Reference(mapFind, closedMap), mapFind, true)?.Result == "System.Optional<String>");
         var wrongMapFind = Reference(mapFind, closedMap);
         wrongMapFind.ReturnType = module.TypeSystem.String;
         Reject("Map Find result mismatch", () => MapBindings.Bind(wrongMapFind, mapFind, true));

@@ -1,7 +1,7 @@
 import System.*
 import System.Collections.*
 import System.Data.Sql.*
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 import System.Concurrency.Tasks.*
 
@@ -36,7 +36,7 @@ class RecordingConnection : SqlConnection {
 async func Main() -> Task<()> {
     let names = ArrayList<string>()
     names.Add("id")
-    let values = ArrayList<Option<string>>()
+    let values = ArrayList<Optional<string>>()
     values.Add(Some("2147483648"))
     let row = SqlRow(names, values)
     names[0] = "changed"

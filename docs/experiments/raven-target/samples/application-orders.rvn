@@ -4,7 +4,7 @@ import System.Linq.*
 import System.Storage.*
 import System.Console.*
 import System.Result.*
-import System.Option.*
+import System.Optional.*
 
 class Order {
     var Id: int
@@ -19,7 +19,7 @@ class Order {
 
 interface OrderStore {
     func Add(order: Order)
-    func Find(id: int) -> Option<Order>
+    func Find(id: int) -> Optional<Order>
     func Pending() -> Iterable<Order>
     func Save(order: Order, limit: int) -> Result<System.Void, FileWriteError>
 }
@@ -35,7 +35,7 @@ class FileOrderStore : OrderStore {
     func Pending() -> Iterable<Order> {
         return orders.Filter((order: Order) -> bool => order.Status.Equals("Queued"))
     }
-    func Find(id: int) -> Option<Order> {
+    func Find(id: int) -> Optional<Order> {
         for order in orders {
             if order.Id == id {
                 return Some(order)

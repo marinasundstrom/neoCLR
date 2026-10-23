@@ -377,7 +377,7 @@ async direction: `await` removes the Task layer and `?` handles the Result layer
 Read and Write are partial operations. Read returns the number of bytes currently read,
 up to the buffer length; Write returns the number accepted. A successful Read returning
 zero means EOF. This retains the useful OS convention rather than wrapping every byte
-read in `Option`; higher-level `TextReader.ReadLine()` may return `Option<String>` because
+read in `Optional`; higher-level `TextReader.ReadLine()` may return `Optional<String>` because
 EOF then means absence of another line. `ReadExactly` and `WriteAll` are ordinary library
 helpers that loop and return `Result<Void, IOError>`.
 

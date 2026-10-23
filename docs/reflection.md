@@ -36,7 +36,7 @@ cargo run -- run examples/reflection.neoil
 ```
 
 The Neo example prints the Counter record's Age field and Add method, their types,
-System.Type's properties, and the `Counter&` argument of `Option<Counter&>`. Existing
+System.Type's properties, and the `Counter&` argument of `Optional<Counter&>`. Existing
 Neo arrays, loops, property access and library calls support this API; no new syntax
 or instruction is needed.
 
@@ -52,17 +52,17 @@ for i in 0..<fields.Length {
 
 | API | Result / contract |
 | --- | --- |
-| `BaseType` | `Option<Type>`, immediate substituted record base or None |
+| `BaseType` | `Optional<Type>`, immediate substituted record base or None |
 | `Type.Info` | `System.Reflection.TypeInfo`, explicit metadata lookup view |
 | `TypeInfo.GetFields()` / `GetFields(BindingFlags)` | `FieldInfo[]`, declared fields |
 | `TypeInfo.GetMethods()` / `GetMethods(BindingFlags)` | `MethodInfo[]`, declared instance and static methods, including property accessors |
 | `TypeInfo.GetProperties()` / `GetProperties(BindingFlags)` | `PropertyInfo[]`, declared properties |
 | `GetInterfaces()` | `Type[]`, direct and transitive interfaces, deduplicated, excluding self |
 | `GetGenericArguments()` | `Type[]`, closed signature arguments, empty for nongeneric signatures |
-| `GetElementType()` | `Option<Type>`, Some for array, managed-reference or pointer target, otherwise None |
+| `GetElementType()` | `Optional<Type>`, Some for array, managed-reference or pointer target, otherwise None |
 | `IsArray`, `IsByRef`, `IsPointer`, `IsInterface` | Boolean signature/definition facts |
-| `Name` | Existing qualified definition name, e.g. `System.Option`; wrappers include target signature |
-| `FullName` | Qualified signature, e.g. `System.Option<System.Int32&>` |
+| `Name` | Existing qualified definition name, e.g. `System.Optional`; wrappers include target signature |
+| `FullName` | Qualified signature, e.g. `System.Optional<System.Int32&>` |
 | `Namespace` | Namespace of the outermost declaring definition; empty for unqualified definitions and array/reference/pointer signatures |
 
 Existing `Equals(Type)`, `GenericArgumentCount`, and `GetGenericArgument(Int32)` remain
@@ -92,7 +92,7 @@ receiver. Parameter names are empty when absent from metadata.
 | --- | --- |
 | `FieldInfo` | Name, DeclaringType, FieldType, IsPublic, IsPrivate, IsAssembly, IsStatic, DefinitionIndex |
 | `MethodInfo` | Name, DeclaringType, ReturnType, IsStatic, IsPublic, IsPrivate, IsAssembly, IsReceiverByRef, DefinitionIndex; `GetParameters(): ParameterInfo[]` |
-| `PropertyInfo` | Name, DeclaringType, PropertyType, IsStatic, CanRead, CanWrite, DefinitionIndex; `GetIndexParameters(): ParameterInfo[]`; `GetGetMethod(): Option<MethodInfo>`, `GetSetMethod(): Option<MethodInfo>`, each also accepting Boolean nonPublic |
+| `PropertyInfo` | Name, DeclaringType, PropertyType, IsStatic, CanRead, CanWrite, DefinitionIndex; `GetIndexParameters(): ParameterInfo[]`; `GetGetMethod(): Optional<MethodInfo>`, `GetSetMethod(): Optional<MethodInfo>`, each also accepting Boolean nonPublic |
 | `ParameterInfo` | Name, Position, ParameterType, IsOut, IsOutWhenTrue |
 
 IsAssembly means neoCLR's internal visibility. Fields currently have instance storage,
@@ -185,7 +185,7 @@ or construction permission. Queries expose declarations, not executable capabili
 
 Backend reachability reports TypeInspection and, for array-producing queries,
 ManagedArrays. Property/accessor options and GetElementType also require ValueStorage
-through the current Option carrier representation. The host binding validates helper
+through the current Optional carrier representation. The host binding validates helper
 signatures; all public descriptor accessors and Type forwarding methods are ordinary IL.
 
 Invoke, GetValue/SetValue, reflective construction, attribute discovery, class inheritance,

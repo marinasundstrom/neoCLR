@@ -322,7 +322,7 @@ interfaces can supply compatible reference views. Array element storage stays
 invariant. MutableSequence/List, Set/MutableSet, Map/MutableMap, Stack/Queue,
 Sliceable, Closable and Propagatable remain invariant because they consume and
 produce parameters, use invariant value wrappers, or rely on static/Self contracts.
-Result/Option remain invariant nominal values. No result mapping or boxing is
+Result/Optional remain invariant nominal values. No result mapping or boxing is
 implied by the annotations; `Sliceable<int[]>` does not thereby become
 `Sliceable<Iterable<int>>`.
 

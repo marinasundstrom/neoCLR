@@ -47,7 +47,7 @@ foreach (var declaration in declarations)
         throw new InvalidDataException($"{type.Name}: ambiguous route patterns are not supported.");
     routes.Add(route);
 }
-var code = new StringBuilder("// Generated from validated union-case metadata. Do not edit.\nimport System.*\nimport System.Option.*\nimport System.Result.*\nimport System.Web.Http.*\n\n");
+var code = new StringBuilder("// Generated from validated union-case metadata. Do not edit.\nimport System.*\nimport System.Optional.*\nimport System.Result.*\nimport System.Web.Http.*\n\n");
 code.AppendLine("public union RouteMappingError {\n    case NoMatch\n    case InvalidTarget(reason: string)\n    case InvalidParameter(name: string, expectedType: string)\n    case InvalidConfiguration(reason: string)\n}\n");
 var parser = union.Name + "Parser";
 code.AppendLine($"public class {parser} {{");

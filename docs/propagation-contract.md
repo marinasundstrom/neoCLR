@@ -16,13 +16,13 @@ leaves it untouched and does not establish initialization. This reuses neoCLR's
 [conditional output contract](union-convention.md), avoiding a fabricated default value
 for an inactive payload. The carrier is not consumed or mutated by extraction.
 
-Result<T,E> implements Propagatable<Result<T,E>,T,E>. Option<T> implements
-Propagatable<Option<T>,T,Void>. Option's absence channel contains Void; Some<Void> is
+Result<T,E> implements Propagatable<Result<T,E>,T,E>. Optional<T> implements
+Propagatable<Optional<T>,T,Void>. Optional's absence channel contains Void; Some<Void> is
 still successful output, distinguishable from None. A well-formed carrier has exactly
 one channel. Terminal faults are not residual values and are not translated into Result.
 
 Each carrier provides a static `FromResidual` factory: Result<T,E> takes E and returns
-Error; Option<T> takes Void and returns None. A compatible residual can reconstruct a
+Error; Optional<T> takes Void and returns None. A compatible residual can reconstruct a
 carrier with a different output type. It must not be silently converted to an unrelated
 residual type. Error objects/payloads retain their existing copy/reference semantics.
 
@@ -54,7 +54,7 @@ No Raven .NET behavior is changed in this slice.
 ## Validation and next slice
 
 `cargo test --test propagation` covers interface dispatch, both Result channels,
-non-overwriting misses, Option<Void> success/absence, compatible residual reconstruction
+non-overwriting misses, Optional<Void> success/absence, compatible residual reconstruction
 with a different output type, artifact round-trip, and rejection of unproven output reads
 by both verification and execution. Existing union output, library, generic-bound,
 Clonable and adapted Raven collection checks also pass.
@@ -77,7 +77,7 @@ existing fundamentals and stale-output rejection. `--interfaces` also checks mal
 protocol metadata and rejects throwing a non-null-sentinel value. Raven's default .NET
 propagation tests remain unchanged and pass.
 
-Option<Int32> and Result<Void,OverflowError> now execute success and early residual
+Optional<Int32> and Result<Void,OverflowError> now execute success and early residual
 return, including a discarded Void-output propagation statement. The sample workflow
 uses ordinary ArrayList constructors and iteration. The [Void decision](void-semantics.md)
 separates unit values from no-result calls. Signature validation rejects raw CLI VOID

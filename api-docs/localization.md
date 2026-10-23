@@ -4,7 +4,7 @@ title: Localization
 # Localization (development)
 
 `System.Localization.Localizer` provides `strings[key]` and `Find(key)`.
-The indexer returns the key when absent; Find returns `Option<string>`.
+The indexer returns the key when absent; Find returns `Optional<string>`.
 Empty translations are present. Keys are ordinal and case-sensitive; stored UTF-8
 text is preserved. `Localizer<T>` associates a catalogue with a resource type.
 

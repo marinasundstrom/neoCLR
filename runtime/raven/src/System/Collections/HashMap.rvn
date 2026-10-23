@@ -1,6 +1,6 @@
 module System.Collections
 
-import System.Option.*
+import System.Optional.*
 
 public class HashMap<K, V> : MutableMap<K, V> {
     // Explicit storage: the pinned compiler treats uninitialized private var as getter-only.
@@ -137,7 +137,7 @@ public class HashMap<K, V> : MutableMap<K, V> {
         return -1
     }
 
-    func Find(key: K) -> System.Option<V> {
+    func Find(key: K) -> System.Optional<V> {
         Enter()
         let index = Locate(key, HashKey(key))
         Leave()

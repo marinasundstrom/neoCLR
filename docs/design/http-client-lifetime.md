@@ -213,12 +213,12 @@ and five guards pass in interpreter and macOS ARM64 AOT. Windows remains unexecu
 ## Timed cancellation (2026-10-11)
 
 `CancellationTokenSource.CancelAfter(Duration)` schedules or replaces its countdown.
-`CancelAfter(Option<Duration>)` accepts Some with identical behavior or None to disable
+`CancelAfter(Optional<Duration>)` accepts Some with identical behavior or None to disable
 scheduling. Zero is deferred; positive fractions round upward; bounds match Timer.
 Cancel and Dispose remove scheduling. An already requested source never resets its
 request flag; invalid durations and disposed use still fault. This matches .NET's
 reset-before-cancellation and cooperative request model. The deliberate API difference
-is explicit Option disabling instead of a negative infinite sentinel: clearer duration
+is explicit Optional disabling instead of a negative infinite sentinel: clearer duration
 validation at the cost of an additional overload and Some/None at optional call sites.
 No linked-source public factory is added in this slice. Scheduling remains invocation-local.
 
@@ -230,7 +230,7 @@ not executed. The source remains cooperative; no timeout preemption is claimed.
 
 ## HttpClient.Timeout (2026-10-11)
 
-`Timeout: Option<Duration>` defaults to Some(100 seconds). None disables the client
+`Timeout: Optional<Duration>` defaults to Some(100 seconds). None disables the client
 countdown; Some must be positive and no greater than Int32.MaxValue milliseconds.
 Fractional milliseconds round upward. The setting freezes on the first send, including
 pre-cancelled sends, and cannot be changed after disposal. Each request owns a separate
@@ -248,7 +248,7 @@ permanently uncooperative handler. Completed requests remove all countdown regis
 The [.NET implementation](https://github.com/dotnet/runtime/blob/main/src/libraries/System.Net.Http/src/System/Net/Http/HttpClient.cs)
 (checked 2026-10-11) provides the comparison: per-send linked cancellation, 100-second
 default, frozen configuration, cancellation classification and cleanup. neoCLR keeps
-its typed HttpError outcome instead of exception-based timeout reporting. Option<Duration>
+its typed HttpError outcome instead of exception-based timeout reporting. Optional<Duration>
 instead of an infinite TimeSpan sentinel makes disabling explicit; the cost is a different
 property type and Some/None syntax. This follows the author's permission to choose
 sensible Raven APIs while preserving useful .NET behavior.

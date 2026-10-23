@@ -1,7 +1,7 @@
 module System.Localization
 
 import System.*
-import System.Option.*
+import System.Optional.*
 
 internal class ReportingLocalizer : Localizer {
     private val inner: Localizer
@@ -24,7 +24,7 @@ internal class ReportingLocalizer : Localizer {
 
     val Culture: Globalization.Culture => inner.Culture
 
-    func Find(key: string) -> Option<string> => inner.Find(key)
+    func Find(key: string) -> Optional<string> => inner.Find(key)
 }
 
 /// Optional diagnostics for display lookups, independent of storage or logging providers.

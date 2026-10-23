@@ -1,14 +1,14 @@
 module System.Introspection
 
 import System.*
-import System.Option.*
+import System.Optional.*
 import System.Collections.*
 import System.Runtime.CompilerServices.*
 
 public sealed interface ParameterInfo {
     func GetCustomAttributesData() -> Sequence<CustomAttributeData>
-    val MetadataToken: Option<int> { get }
-    val Module: Option<ModuleInfo> { get }
+    val MetadataToken: Optional<int> { get }
+    val Module: Optional<ModuleInfo> { get }
     val Name: string { get }
     val Position: int { get }
     val ParameterType: TypeInfo { get }
@@ -25,14 +25,14 @@ internal class RuntimeParameterInfo : ParameterInfo {
     private field StoredIsOutWhenTrue: bool
     private field StoredIsReadOnly: bool
     private field StoredMetadataToken: int
-    private field StoredModule: Option<ModuleInfo>
+    private field StoredModule: Optional<ModuleInfo>
     private field StoredDeclaringType: TypeInfo
     private field StoredMemberKind: int
     private field StoredMemberIndex: int
     private field StoredMemberIdentity: string
 
     private init(name: string, position: int, parameterType: TypeInfo,
-        isOut: bool, isOutWhenTrue: bool, isReadOnly: bool, metadataToken: int, module: Option<ModuleInfo>,
+        isOut: bool, isOutWhenTrue: bool, isReadOnly: bool, metadataToken: int, module: Optional<ModuleInfo>,
         declaringType: TypeInfo, memberKind: int, memberIndex: int) {
         StoredName = name
         StoredPosition = position
@@ -55,8 +55,8 @@ internal class RuntimeParameterInfo : ParameterInfo {
         return CheckedStorage.Reserve<CustomAttributeData>(0)
     }
 
-    val MetadataToken: Option<int> => if StoredMetadataToken == 0 { None } else { Some(StoredMetadataToken) }
-    val Module: Option<ModuleInfo> => StoredModule match {
+    val MetadataToken: Optional<int> => if StoredMetadataToken == 0 { None } else { Some(StoredMetadataToken) }
+    val Module: Optional<ModuleInfo> => StoredModule match {
         Some(let module) => Some(module)
         None => None
     }

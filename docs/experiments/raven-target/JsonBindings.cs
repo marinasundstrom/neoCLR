@@ -26,7 +26,7 @@ public sealed class JsonObject : JsonValue, Collections.Map<string, JsonValue> {
     public int Count => default;
     public Collections.Sequence<string> Keys => default;
     public JsonValue this[string name] => default;
-    public Option<JsonValue> Find(string name) => default;
+    public Optional<JsonValue> Find(string name) => default;
     public bool ContainsKey(string name) => default;
     public Collections.Iterator<Collections.KeyValuePair<string, JsonValue>> GetIterator() => default;
     public Result<JsonValue, JsonError> Field(string name) => default;

@@ -54,16 +54,16 @@ access and exhaustive union matching. Library contracts must remain usable from 
 and other frontends; Neo syntax is not the platform API contract.
 
 Preserve familiar System names and member behavior where appropriate. Document
-intentional differences: values by default, explicit managed references, Option
+intentional differences: values by default, explicit managed references, Optional
 for domain absence, Result for recoverable failure, and interface names without I.
 Do not require Object ancestry or heap allocation merely to use a library contract.
 Immutable bindings remain a language feature. Explicit nullable type signatures
-remain a separate planned storage capability, not a prerequisite for Option APIs.
+remain a separate planned storage capability, not a prerequisite for Optional APIs.
 
 ## Starting point and gaps
 
 The library already contains primitive types, String operations, Console and File
-helpers, Option/Result, ArrayList/List, cleanup interfaces and type introspection.
+helpers, Optional/Result, ArrayList/List, cleanup interfaces and type introspection.
 These are bounded implementations, not complete equivalents of their .NET namesakes.
 The calculator already demonstrates parse and division results, EOF and retries,
 but manually reconstructs lines from Console.ReadByte. That work belongs in a useful
@@ -112,7 +112,7 @@ and streams should guide these mechanisms before their public hierarchies expand
    add a bounded text-data report that reads, parses, validates and collects results;
    add a polymorphic consumer that accepts a base/interface reference to both a
    frame-owned and a heap-owned implementation. Prefer ordinary library usage over
-   artificial runtime probes. Add lookup returning Option when a real example needs
+   artificial runtime probes. Add lookup returning Optional when a real example needs
    it; a dictionary requires an equality/hash contract first. A reader/stream hierarchy
    is a candidate consumer of inheritance, not a commitment to an entire I/O stack.
 
@@ -142,7 +142,7 @@ completed study of CLI metadata or a pinned CoreCLR implementation.
   can match exhaustively. That improves explicit error composition but requires
   handling code and a documented result representation; it implies no speedup.
 - [Dictionary.TryGetValue](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.dictionary-2.trygetvalue?view=net-10.0)
-  is the baseline for a proposed Option-returning lookup. Option expresses absence
+  is the baseline for a proposed Optional-returning lookup. Optional expresses absence
   independently of the payload's default value. Compare naming and migration costs
   before adding this API; do not change familiar indexer failure behavior silently.
 
@@ -202,7 +202,7 @@ Explore these bounded slices in order:
    invalidation with the current descriptor/buffer model before adding versioning or
    changing iterator semantics. Preserve value elements and explicit reference elements.
 4. **Conversion, formatting and failure APIs.** Extend useful numeric/text conversions
-   and formatting with consistent Option/Result outcomes. Compare .NET Parse/TryParse
+   and formatting with consistent Optional/Result outcomes. Compare .NET Parse/TryParse
    and formatting conventions; keep routine failure separate from invalid program
    state. Build on existing concrete error types instead of introducing a broad
    exception or culture framework without an end-to-end need.

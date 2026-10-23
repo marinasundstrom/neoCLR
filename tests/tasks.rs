@@ -192,7 +192,7 @@ brfalse Failed
 ldloc source
 call instance Tasks.Promise<Int32>::get_Task()
 call instance Tasks.Task<Int32>::get_Outcome()
-call UnwrapSome<Tasks.TaskOutcome<Int32>>(System.Option<Tasks.TaskOutcome<Int32>>)
+call UnwrapSome<Tasks.TaskOutcome<Int32>>(System.Optional<Tasks.TaskOutcome<Int32>>)
 stloc outcome
 ldloca outcome
 ldloca cancelled

@@ -1,6 +1,6 @@
 import PurchaseError.*
 import System.Result.*
-import System.Option.*
+import System.Optional.*
 import System.Console.*
 
 record Product(Name: string, Price: int, Stock: int)
@@ -22,7 +22,7 @@ record ConsoleNotifications(): Notifications {
 }
 
 func FindProduct(products: readonly System.Collections.ArrayList<Product&>&,
-                 name: string) -> Option<Product&> {
+                 name: string) -> Optional<Product&> {
     return products.Find(product => product.Name.Equals(name))
 }
 

@@ -21,7 +21,7 @@ args = parser.parse_args()
 prelude = '''import System.*
 import System.Collections.*
 import System.Concurrency.Tasks.*
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 import System.Concurrency.Tasks.TaskOutcome.*
 import System.Console.*

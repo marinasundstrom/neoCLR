@@ -72,7 +72,7 @@ Negative lengths and out-of-range indices produce terminal Faults. Access is inv
 zero-based, and excludes the one-past-end index. Empty arrays are valid but have no valid
 indices. Array<Void> retains its logical length and bounds with zero payload bytes;
 valid element addresses can coincide. A zero-byte allocation still has a tracked lifetime.
-Recoverable Option/Result accessors and bounds-error types can be layered on later.
+Recoverable Optional/Result accessors and bounds-error types can be layered on later.
 
 Allocation uses existing byte/allocation limits, and initialization consumes ordinary
 IL frames and instructions. A Fault aborts execution and releases its remaining storage

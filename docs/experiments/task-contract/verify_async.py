@@ -17,7 +17,7 @@ prelude = '''import System.*
 import System.Collections.*
 import System.Concurrency.Tasks.*
 import System.Result.*
-import System.Option.*
+import System.Optional.*
 import System.Console.*
 public func Check(value: bool) {
     if !value { System.Fail("Async assertion failed") }
@@ -233,20 +233,20 @@ public async func Read(input: Task<Result<int, string>>) -> Task<Result<int, str
     .replace('AFTER', '' if timing == 'immediate' else 'Check(!answer.IsCompleted)\n    ' + complete + '\n    queue.Drain()')
     .replace('CHECK', check))
 
-# The same shorthand propagates None from an awaited Option.
+# The same shorthand propagates None from an awaited Optional.
 for timing in ('immediate', 'resumed'):
     for outcome in ('Some', 'None'):
         complete = 'source.Complete(Some(41))' if outcome == 'Some' else 'source.Complete(None)'
         check = ('if answer.GetResult() is Some(let value) { Check(value == 42) } else { System.Fail("Expected Some") }'
                  if outcome == 'Some' else 'Check(answer.GetResult() is None)')
         cases[f'{timing} combined awaited Option propagation {outcome}'] = ("""
-public async func Read(input: Task<Option<int>>) -> Task<Option<int>> {
+public async func Read(input: Task<Optional<int>>) -> Task<Optional<int>> {
     let value = await input?
     return Some(value + 1)
 }
 """, """
     let queue = TaskQueue()
-    let source = Promise<Option<int>>(queue)
+    let source = Promise<Optional<int>>(queue)
     var answer = source.Task
     BEFORE
     queue.Run(() => { answer = Read(source.Task) })

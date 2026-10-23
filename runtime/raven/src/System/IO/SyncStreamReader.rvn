@@ -3,7 +3,7 @@ module System.IO
 import System.*
 import System.Collections.*
 import System.Result.*
-import System.Option.*
+import System.Optional.*
 import System.Text.*
 import System.Runtime.CompilerServices.*
 
@@ -52,7 +52,7 @@ public class SyncStreamReader : SyncTextReader {
     private var lastRead: int = 0
     private val operation: TextIOOperation = TextIOOperation(false)
     private var pendingOffset: int = 0
-    private var peeked: Option<Character> = None
+    private var peeked: Optional<Character> = None
     private val readBuffer: byte[] = CheckedStorage.Reserve<byte>(256)
 
     private func DrainPending() -> string {
@@ -94,7 +94,7 @@ public class SyncStreamReader : SyncTextReader {
     /// <returns>Some Character, None at EOF, or a decoding, I/O, Busy or limit error.</returns>
     /// <remarks>May read underlying input and retain lookahead. Repeated peeks reuse the cached Character.
     /// A grapheme may require a subsequent boundary or EOF. The maximum grapheme size is 65536 UTF-8 bytes.</remarks>
-    func PeekChar() -> Result<Option<Character>, TextReadError> {
+    func PeekChar() -> Result<Optional<Character>, TextReadError> {
         if closed {
             return Failure(TextReadError.Closed)
         }
@@ -112,7 +112,7 @@ public class SyncStreamReader : SyncTextReader {
     /// <returns>Some Character, None at EOF, or a decoding, I/O, Busy or limit error.</returns>
     /// <remarks>Shares buffered lookahead with PeekChar, counted reads and line reads.
     /// Counts graphemes rather than UTF-8 bytes or Unicode scalars; maximum 65536 UTF-8 bytes.</remarks>
-    func ReadChar() -> Result<Option<Character>, TextReadError> {
+    func ReadChar() -> Result<Optional<Character>, TextReadError> {
         if closed {
             return Failure(TextReadError.Closed)
         }
@@ -169,7 +169,7 @@ public class SyncStreamReader : SyncTextReader {
         return result
     }
 
-    private func PeekCharCore() -> Result<Option<Character>, TextReadError> {
+    private func PeekCharCore() -> Result<Optional<Character>, TextReadError> {
         if peeked is Some(let cached) {
             return Ok(Some(cached))
         }
@@ -237,7 +237,7 @@ public class SyncStreamReader : SyncTextReader {
         return Failure(TextReadError.IoFailure)
     }
 
-    func ReadLine(maxUtf8Bytes: int) -> Result<Option<string>, TextReadError> {
+    func ReadLine(maxUtf8Bytes: int) -> Result<Optional<string>, TextReadError> {
         if closed {
             return Failure(TextReadError.Closed)
         }
@@ -269,7 +269,7 @@ public class SyncStreamReader : SyncTextReader {
         return Ok(created)
     }
 
-    private func ReadLineCore(maxUtf8Bytes: int) -> Result<Option<string>, TextReadError> {
+    private func ReadLineCore(maxUtf8Bytes: int) -> Result<Optional<string>, TextReadError> {
         if closed {
             return Failure(TextReadError.Closed)
         }
@@ -319,7 +319,7 @@ public class SyncStreamReader : SyncTextReader {
                     prefix += 1
                 }
                 if line.Count == 0 {
-                    let absent: Option<string> = None()
+                    let absent: Optional<string> = None()
                     return Ok(absent)
                 }
                 return TextReadSupport.DecodeLine(line, line.Count)

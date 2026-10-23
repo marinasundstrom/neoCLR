@@ -94,7 +94,7 @@ on a mismatched tag, while the try-get methods return false for that case mismat
 This is a storage experiment, not a replacement for the public System.Result API.
 Payload loads require a supported native layout. Numbers, pointers, Void and records
 composed of native-layout fields work. String, Error, System.Value and the current
-System.Option/Result carriers do not yet have native payload layouts. Their pointer
+System.Optional/Result carriers do not yet have native payload layouts. Their pointer
 types can be represented, but allocating or loading those pointees is unsupported.
 Erasing a pointer cannot remove this limitation.
 

@@ -114,7 +114,7 @@ that 29% of the implementation work is complete: large, connected areas remain o
 - Minimal ordinary-driver probes reject enum declarations, double arithmetic,
   class inheritance, mutable captured locals and Self. These tests isolate failures
   hidden by larger binding cascades.
-- OptionOperators/ResultOperators compile in the audit. This is emission evidence
+- OptionalOperators/ResultOperators compile in the audit. This is emission evidence
   only, not a new execution gate.
 - No async/await keyword use was found in the audited sources after comment removal.
   Tasks are implemented with explicit queues, callbacks and state. A general compiler

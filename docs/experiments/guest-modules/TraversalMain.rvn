@@ -3,7 +3,7 @@ module Acme.CoffeeMaker.Tests
 import System.*
 import System.Introspection.*
 import System.Runtime.*
-import System.Option.*
+import System.Optional.*
 import Acme.CoffeeMaker.*
 
 func Main() -> int {

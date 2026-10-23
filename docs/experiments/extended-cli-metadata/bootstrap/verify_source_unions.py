@@ -67,7 +67,7 @@ def main():
     run(consumer_command)
     run([runtime, 'verify', str(consumer), '--module', str(library), '--system', str(seed)])
     run([runtime, 'run', str(consumer), '--module', str(library), '--system', str(seed)], 42,
-        '' if args.collections else 'Option.Some(40)\nResult.Failure(7)\n')
+        '' if args.collections else 'Optional.Some(40)\nResult.Failure(7)\n')
     if args.collections:
         invalid_source = output / 'NegativeCapacity.rvn'
         invalid_source.write_text('func Main() -> int {\n    let values = System.Collections.ArrayList<int>(-1)\n    return 42\n}\n')
@@ -282,7 +282,7 @@ def main():
     if rejected.exists():
         raise RuntimeError('Missing source-library dependency published output')
     bad_source = output / 'DuplicateSeed.neoil'
-    bad_source.write_text((HERE / 'union-seed.neoil').read_text() + '\n.type System.Option<T>\n.end\n')
+    bad_source.write_text((HERE / 'union-seed.neoil').read_text() + '\n.type System.Optional<T>\n.end\n')
     bad_seed = output / 'DuplicateSeed.neox'
     run([runtime, 'assemble', str(bad_source), str(bad_seed), '--format', 'neox'])
     bad_args = common.copy()

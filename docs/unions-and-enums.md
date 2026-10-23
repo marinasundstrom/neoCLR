@@ -1,7 +1,7 @@
 # Union convention and library fundamentals
 
 Status: the [Preview 1 member convention](union-convention.md) is selected and ordinary
-System.Option/Result implement it using explicit typed value storage and ordinary
+System.Optional/Result implement it using explicit typed value storage and ordinary
 constructors/accessors. Library APIs, native adapters and host inputs use ordinary
 carriers; format 4 removed bootstrap union encodings. This direction supersedes the earlier
 union case-table and dedicated-opcode design; broader tooling remains future work.
@@ -68,7 +68,7 @@ runtime library are not prerequisites for this milestone.
 
 | Carrier | Permitted variant types |
 | --- | --- |
-| System.Option<T> | None, Some<T> |
+| System.Optional<T> | None, Some<T> |
 | System.Result<T, TError> | Ok<T>, Error<TError> |
 
 These are conceptual signatures, not new assembler declarations. Some<T>, Ok<T>,

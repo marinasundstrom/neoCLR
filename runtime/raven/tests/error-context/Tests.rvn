@@ -2,7 +2,7 @@ module NeoClr.RuntimeTests
 
 import System.*
 import System.Result.*
-import System.Option.*
+import System.Optional.*
 import System.Diagnostics.*
 import System.Storage.*
 import System.IO.*
@@ -14,8 +14,8 @@ class Counter {
 
 class AuthorError : System.Error {
     val Message: string => "Author failure"
-    val Cause: Option<System.Error> => None
-    val StackTrace: Option<StackTrace> => None
+    val Cause: Optional<System.Error> => None
+    val StackTrace: Optional<StackTrace> => None
 }
 
 class DomainError : System.Error {
@@ -24,14 +24,14 @@ class DomainError : System.Error {
         self.reason = reason
     }
     val Message: string => "Domain failure"
-    val Cause: Option<System.Error> => Some(reason)
-    val StackTrace: Option<StackTrace> => None
+    val Cause: Optional<System.Error> => Some(reason)
+    val StackTrace: Optional<StackTrace> => None
 }
 
 class CyclicError : System.Error {
     val Message: string => "Cycle"
-    val Cause: Option<System.Error> => Some(self)
-    val StackTrace: Option<StackTrace> => None
+    val Cause: Optional<System.Error> => Some(self)
+    val StackTrace: Optional<StackTrace> => None
 }
 
 [Test("Platform and author errors opt into message and absent diagnostics")]

@@ -40,7 +40,7 @@ It retains only the returned value's reachable heap graph after final collection
 use get(identity) rather than vector indexing. Identities can have gaps. See
 [garbage collection](garbage-collection.md).
 [Resolved function handles](invocation.md) additionally support primitive and
-[owned record arguments](record-inputs.md) and [ordinary Option/Result inputs](union-inputs.md)
+[owned record arguments](record-inputs.md) and [ordinary Optional/Result inputs](union-inputs.md)
 to static and instance IL functions without an entry point.
 [Cooperative cancellation](cancellation.md) is available through ExecutionOptions.
 Persistent guest state, addressed receivers, and pointer/managed-reference transfer remain pending.

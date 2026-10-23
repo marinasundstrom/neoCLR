@@ -7,7 +7,7 @@ Development after Preview 10, selected by the author on 2026-09-27. This follows
 
 `System.Web.Http.RoutePattern.Parse(pattern)` returns `Result<RoutePattern, string>`.
 Compile the pattern once and reuse it. `Match(target)` returns
-`Result<Option<RouteMatch>, string>`: Some carries captured values, None means a
+`Result<Optional<RouteMatch>, string>`: Some carries captured values, None means a
 well-formed path did not match, and Error describes an invalid target. Configuration
 errors are returned by Parse, separately from incoming request handling.
 
@@ -90,7 +90,7 @@ mapper. Successful cases represent actual routes. NoMatch, malformed target and
 invalid parameter are distinct outcomes; normal no-match can become 404 without
 turning failed integer conversion into a fallback. No unmatched attribute is needed
 initially. This decision does not alter the fundamental Match contract, which remains
-`Result<Option<RouteMatch>, string>`, nor require the application example to change
+`Result<Optional<RouteMatch>, string>`, nor require the application example to change
 its existing explicit Unmatched case.
 
 The [implemented experiment](experiments/route-union-mapper/README.md) selects
@@ -125,7 +125,7 @@ union carriers through logical fields without general explicit-layout aliasing;
 no artificial reference payload is required. Details and validation are in the
 [experiment README](experiments/route-union-mapper/README.md).
 
-The Json enum/Uuid/Option requests remain open; this mapper does not supply missing
+The Json enum/Uuid/Optional requests remain open; this mapper does not supply missing
 primitive or JSON support. Runtime custom-attribute reading, generic schemas,
 other payload conversions and automatic build integration remain future work.
 
@@ -174,6 +174,6 @@ HTTP policy and uses 404/400/500. Attribute constructors never run, while faults
 inside executed constructors remain terminal.
 
 This completes the bounded runtime mapping experiment, not SDK packaging or
-WebApplication hosting. JSON enum/Uuid/Option support remains pending. No Raven
+WebApplication hosting. JSON enum/Uuid/Optional support remains pending. No Raven
 compiler change or Runtime Contract configuration change is required; use matching
 bridge/reference/library/runtime artifacts for IsVisible and the new overloads.

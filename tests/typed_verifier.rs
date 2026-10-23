@@ -107,7 +107,7 @@ fn pointer_type_checks_do_not_claim_pointer_validity() {
 
 #[test]
 fn union_payloads_and_heap_values_preserve_raw_storage_types() {
-    let source = ".module Test\n.function F(System.Option<Byte> value) -> Int32\nldarg value\ncall instance System.Option<Byte>::GetSomeCase()\ncall instance System.Option.Some<Byte>::get_Value()\nldc.i4 1\nadd\nret\n.end";
+    let source = ".module Test\n.function F(System.Optional<Byte> value) -> Int32\nldarg value\ncall instance System.Optional<Byte>::GetSomeCase()\ncall instance System.Optional.Some<Byte>::get_Value()\nldc.i4 1\nadd\nret\n.end";
     assert!(verify(&assemble(source).unwrap()).is_ok());
     let source = ".module Test\n.function F(Byte& value) -> Void\nldarg value\nldc.i8 1\nstobj Byte\nldvoid\nret\n.end";
     assert!(verify(&assemble(source).unwrap()).is_err());
@@ -117,7 +117,7 @@ fn union_payloads_and_heap_values_preserve_raw_storage_types() {
 fn generic_parameters_are_symbolic_and_do_not_erase_normalization() {
     let source = ".module Test\n.type Box<T>\n.field Value T\n.method instance Get() -> T\nldarg this\nldfld Box<T>::Value\nret\n.end\n.end";
     assert!(verify(&assemble(source).unwrap()).is_ok());
-    let source = ".module Test\n.type Wrap<T>\n.method static Make(T value) -> System.Option<T>\nldarg value\nnewobj instance System.Option.Some<T>::.ctor(T)\nnewobj instance System.Option<T>::.ctor(System.Option.Some<T>)\nret\n.end\n.end";
+    let source = ".module Test\n.type Wrap<T>\n.method static Make(T value) -> System.Optional<T>\nldarg value\nnewobj instance System.Optional.Some<T>::.ctor(T)\nnewobj instance System.Optional<T>::.ctor(System.Optional.Some<T>)\nret\n.end\n.end";
     assert!(verify(&assemble(source).unwrap()).is_ok());
     let source = ".module Test\n.type Identity<T>\n.method static F(T value) -> T\n.local T copy\nldarg value\nstloc copy\nldloc copy\nret\n.end\n.end";
     assert!(verify(&assemble(source).unwrap()).is_ok());

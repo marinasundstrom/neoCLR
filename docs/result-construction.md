@@ -85,7 +85,7 @@ conversion must not silently copy a referenced target or extend a frame's lifeti
 
 Implemented compiler support now covers source and bundled case imports, payload-based
 constructor inference, and conversion through a marked carrier's accepting constructor.
-Tests cover independent case bindings, nested Option/Result carriers, exact constructor
+Tests cover independent case bindings, nested Optional/Result carriers, exact constructor
 acceptance, reference payloads, lookup ambiguity and runtime lifetime checks. Broader
 constructor conversion ranking, generic source union declarations and arbitrary external
 assembly discovery remain separate work.

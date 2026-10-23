@@ -1,6 +1,6 @@
 import System.*
-import System.Option.*
-record struct Unsupported(Value: Option<Index>)
+import System.Optional.*
+record struct Unsupported(Value: Optional<Index>)
 func Main() {
     Console.WriteLine(Unsupported(Some(Index.Start)).ToString())
 }

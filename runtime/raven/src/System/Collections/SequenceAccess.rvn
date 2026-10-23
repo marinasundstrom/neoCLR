@@ -2,7 +2,7 @@ module System.Collections
 
 import System.*
 
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 
 /// Indexing, slicing and validated access to counted, ordered sequences. Import System.Collections.* to use these extensions.
@@ -21,7 +21,7 @@ public extension SequenceAccess<T> for Sequence<T> {
     }
 
     /// Returns the indexed element, or None for invalid bounds. Does not provide a concurrent snapshot.
-    func Get(index: int) -> Option<T> {
+    func Get(index: int) -> Optional<T> {
         if index < 0 {
             return None
         }
@@ -32,7 +32,7 @@ public extension SequenceAccess<T> for Sequence<T> {
     }
 
     /// Resolves a directional index against Count, returning None for invalid bounds.
-    func Get(index: Index) -> Option<T> => self.Get(index.GetOffset(self.Count))
+    func Get(index: Index) -> Optional<T> => self.Get(index.GetOffset(self.Count))
 
     /// Copies a half-open range in enumeration order, or returns InvalidRangeError for invalid bounds.
     /// Uses one iterator and does not require constant-time indexed access. No concurrent snapshot guarantee.

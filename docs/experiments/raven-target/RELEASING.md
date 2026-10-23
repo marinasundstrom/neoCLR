@@ -160,7 +160,7 @@ the new artifact paths. Record actual paths and versions in the build manifest.
 2. Open a bundled Raven project targeting neoCLR. Verify completion and hover resolve
    the supplied runtime declarations and do not silently fall back to host .NET APIs.
 3. Edit, save, build and run a demo through the neoCLR task. Verify value/reference
-   behavior, Result/Option propagation and Void completion, plus the runtime-library
+   behavior, Result/Optional propagation and Void completion, plus the runtime-library
    demonstrations required by the current coverage inventory. Capture guest output.
 4. Exercise expected failures: incompatible source and unsupported IL must fail
    without executing stale output; recoverable API failures must return their Result
@@ -260,7 +260,7 @@ limits that must accompany a build. These checks do not imply a full Dictionary 
 
 ## Query terminal source checks
 
-The terminal slice adds First/Last Option results and Single's Result/SingleError
+The terminal slice adds First/Last Optional results and Single's Result/SingleError
 contract. Rebuild the metadata core and System library together using the same
 fresh-source procedure as the Map slice. `verify_project.py --collections` and
 `verify_queries.py` include `library-query-terminals.rvn`; `verify_editor.py --queries`
@@ -271,7 +271,7 @@ Do not claim that the current installed .11 tools already contain these addition
 
 ## ArrayList filtering source checks
 
-Regenerate core metadata and System together. FindIndex now returns Option<Int32>
+Regenerate core metadata and System together. FindIndex now returns Optional<Int32>
 instead of Int32/-1; recompile callers and migrate their absence handling. The
 [filtering contract](../../arraylist-filtering.md) documents all seven operations,
 callback behavior and limits. Run `verify_project.py --collections`,
@@ -286,7 +286,7 @@ These source changes do not refresh the installed .11 SDK or VSIX.
 
 The [order collection scenario](../../raven-order-workflow.md#collection-integration-scenario-2026-09-13-source-slice)
 uses application-defined class payloads through HashMap, ArrayList filtering and
-array/interface queries with Option/Result propagation. Run `verify_application.py`
+array/interface queries with Optional/Result propagation. Run `verify_application.py`
 against the actual candidate: it includes GC-pressure and hash-collision variants.
 The full editor invocation with `--maps` also checks member discovery on application
 payloads after lookup and filtering. The sample and expected output are included
@@ -317,7 +317,7 @@ and a generated project, in addition to existing saved-project checks. It separa
 compiles and imports PE artifacts and tests rejection without host fallback. Packaging
 now carries the verifier; this checkpoint does not publish or install a new bundle.
 
-For development builds containing the Option/Result operators, also run
+For development builds containing the Optional/Result operators, also run
 `tools/verify_outcome_operators.py` against the bundled saved project, importer,
 System library and runtime. Require the operator completion checks in
 `verify_editor.py --unions`. Package the query verifier's `query_basic_cases.py`

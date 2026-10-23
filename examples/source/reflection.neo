@@ -25,7 +25,7 @@ func Main() -> () {
     for i in 0..<properties.Length {
         WriteLine(properties[i].Name)
     }
-    let arguments = typeof(Option<Counter&>).GetGenericArguments()
+    let arguments = typeof(Optional<Counter&>).GetGenericArguments()
     WriteLine(arguments[0].Name)
     if arguments[0].IsByRef {
         WriteLine("Managed reference signature")

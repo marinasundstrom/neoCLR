@@ -2,16 +2,16 @@ module System.Introspection
 
 import System.*
 import System.Collections.*
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 import System.Runtime.CompilerServices.*
 
 public sealed interface MemberInfo {
     func GetCustomAttributesData() -> Sequence<CustomAttributeData>
-    val MetadataToken: Option<int> { get }
-    val Module: Option<ModuleInfo> { get }
+    val MetadataToken: Optional<int> { get }
+    val Module: Optional<ModuleInfo> { get }
     val Name: string { get }
-    val DeclaringType: Option<TypeInfo> { get }
+    val DeclaringType: Optional<TypeInfo> { get }
 }
 
 public sealed interface FieldInfo : MemberInfo {
@@ -20,7 +20,7 @@ public sealed interface FieldInfo : MemberInfo {
     /// True for a storage-free constant declaration.
     val IsLiteral: bool { get }
     /// The declared constant, without executing initialization; None for storage fields.
-    val ConstantValue: Option<Object> { get }
+    val ConstantValue: Optional<Object> { get }
     val FieldType: TypeInfo { get }
     val IsPublic: bool { get }
     val IsPrivate: bool { get }
@@ -42,7 +42,7 @@ public sealed interface MethodInfo : MemberInfo {
     val IsPrivate: bool { get }
     val IsAssembly: bool { get }
     val IsReceiverByRef: bool { get }
-    val DefinitionIndex: Option<int> { get }
+    val DefinitionIndex: Optional<int> { get }
     func GetParameters() -> Sequence<ParameterInfo>
     val IsReadOnly: bool { get }
     val IsVirtual: bool { get }
@@ -66,17 +66,17 @@ public sealed interface PropertyInfo : MemberInfo {
     val CanWrite: bool { get }
     val DefinitionIndex: int { get }
     func GetIndexParameters() -> Sequence<ParameterInfo>
-    func GetGetMethod() -> Option<MethodInfo>
-    func GetGetMethod(arg0: bool) -> Option<MethodInfo>
-    func GetSetMethod() -> Option<MethodInfo>
-    func GetSetMethod(arg0: bool) -> Option<MethodInfo>
+    func GetGetMethod() -> Optional<MethodInfo>
+    func GetGetMethod(arg0: bool) -> Optional<MethodInfo>
+    func GetSetMethod() -> Optional<MethodInfo>
+    func GetSetMethod(arg0: bool) -> Optional<MethodInfo>
 }
 
 internal sealed class RuntimeMemberInfo {
     private field StoredName: string
     private field StoredDeclaringType: TypeInfo?
     private field StoredMetadataToken: int
-    private field StoredModule: Option<ModuleInfo>
+    private field StoredModule: Optional<ModuleInfo>
 
     protected init(name: string, declaringType: TypeInfo, metadataToken: int) {
         StoredName = name
@@ -95,8 +95,8 @@ internal sealed class RuntimeMemberInfo {
         return CheckedStorage.Reserve<CustomAttributeData>(0)
     }
 
-    val MetadataToken: Option<int> => if StoredMetadataToken == 0 { None } else { Some(StoredMetadataToken) }
-    val Module: Option<ModuleInfo> {
+    val MetadataToken: Optional<int> => if StoredMetadataToken == 0 { None } else { Some(StoredMetadataToken) }
+    val Module: Optional<ModuleInfo> {
         get {
             if let Some(module) = StoredModule {
                 return Some(module)
@@ -113,7 +113,7 @@ internal sealed class RuntimeMemberInfo {
         }
     }
     val Name: string => StoredName
-    val DeclaringType: Option<TypeInfo> {
+    val DeclaringType: Optional<TypeInfo> {
         get {
             if StoredDeclaringType is TypeInfo owner {
                 return Some(owner)
@@ -128,7 +128,7 @@ internal sealed class RuntimeMemberInfo {
 internal class RuntimeFieldInfo : RuntimeMemberInfo, FieldInfo {
     val IsInitOnly: bool => StoredIsInitOnly
     val IsLiteral: bool => StoredIsLiteral
-    val ConstantValue: Option<Object> {
+    val ConstantValue: Optional<Object> {
         get {
             if StoredConstantValue is Object value { return Some(value) }
             return None
@@ -244,7 +244,7 @@ internal class RuntimeMethodInfo : RuntimeMemberInfo, MethodInfo {
     val IsPrivate: bool => StoredIsPrivate
     val IsAssembly: bool => StoredIsAssembly
     val IsReceiverByRef: bool => StoredIsReceiverByRef
-    val DefinitionIndex: Option<int> => if StoredDefinitionIndex < 0 { None } else { Some(StoredDefinitionIndex) }
+    val DefinitionIndex: Optional<int> => if StoredDefinitionIndex < 0 { None } else { Some(StoredDefinitionIndex) }
 
     func GetParameters() -> Sequence<ParameterInfo> {
         let count = StoredParameters.Length
@@ -361,15 +361,15 @@ internal class RuntimePropertyInfo : RuntimeMemberInfo, PropertyInfo {
     private field StoredCanWrite: bool
     private field StoredDefinitionIndex: int
     private field StoredIndexParameters: ParameterSnapshot
-    private field StoredGetter: Option<MethodInfo>
-    private field StoredSetter: Option<MethodInfo>
+    private field StoredGetter: Optional<MethodInfo>
+    private field StoredSetter: Optional<MethodInfo>
 
     private init(
         name: string, declaringType: TypeInfo, metadataToken: int,
         propertyType: TypeInfo, isStatic: bool,
         canRead: bool, canWrite: bool,
         definitionIndex: int, indexParameters: ParameterSnapshot,
-        getter: Option<MethodInfo>, setter: Option<MethodInfo>): base(name, declaringType, metadataToken) {
+        getter: Optional<MethodInfo>, setter: Optional<MethodInfo>): base(name, declaringType, metadataToken) {
         StoredPropertyType = propertyType
         StoredIsStatic = isStatic
         StoredCanRead = canRead
@@ -397,11 +397,11 @@ internal class RuntimePropertyInfo : RuntimeMemberInfo, PropertyInfo {
         return result
     }
 
-    func GetGetMethod() -> Option<MethodInfo> {
+    func GetGetMethod() -> Optional<MethodInfo> {
         return GetGetMethod(false)
     }
 
-    func GetGetMethod(arg0: bool) -> Option<MethodInfo> {
+    func GetGetMethod(arg0: bool) -> Optional<MethodInfo> {
         if StoredGetter is .Some(let method) {
             if arg0 || method.IsPublic {
                 return Some(method)
@@ -410,11 +410,11 @@ internal class RuntimePropertyInfo : RuntimeMemberInfo, PropertyInfo {
         return None()
     }
 
-    func GetSetMethod() -> Option<MethodInfo> {
+    func GetSetMethod() -> Optional<MethodInfo> {
         return GetSetMethod(false)
     }
 
-    func GetSetMethod(arg0: bool) -> Option<MethodInfo> {
+    func GetSetMethod(arg0: bool) -> Optional<MethodInfo> {
         if StoredSetter is .Some(let method) {
             if arg0 || method.IsPublic {
                 return Some(method)
@@ -503,11 +503,11 @@ public sealed interface TypeInfo : EquatableTo<TypeInfo> {
     /// Whether initialization uses relaxed first-static-field-access timing.
     val IsBeforeFieldInit: bool { get }
     /// Describes the runtime-owned initializer without executing it.
-    val TypeInitializer: Option<ConstructorInfo> { get }
+    val TypeInitializer: Optional<ConstructorInfo> { get }
     func GetGenericArguments() -> Sequence<TypeInfo>
-    func GetElementType() -> Option<TypeInfo>
+    func GetElementType() -> Optional<TypeInfo>
 
-    val BaseType: Option<TypeInfo> { get }
+    val BaseType: Optional<TypeInfo> { get }
     func GetInterfaces() -> Sequence<TypeInfo>
     func GetEnumValues() -> Sequence<Object>
     func GetEnumNames() -> Sequence<string>
@@ -607,7 +607,7 @@ internal open class RuntimeTypeInfo : TypeInfo {
         return false
     }
 
-    val BaseType: Option<TypeInfo> => neoCLR.Runtime.TypeBaseType(Handle)
+    val BaseType: Optional<TypeInfo> => neoCLR.Runtime.TypeBaseType(Handle)
 
     func GetInterfaces() -> Sequence<TypeInfo> {
         return neoCLR.Runtime.TypeInterfaces(Handle)
@@ -723,7 +723,7 @@ internal open class RuntimeTypeInfo : TypeInfo {
     val IsValueType: bool => neoCLR.Runtime.TypeShape(Handle, 7)
     val IsVisible: bool => neoCLR.Runtime.TypeShape(Handle, 11)
     val IsBeforeFieldInit: bool => neoCLR.Runtime.TypeShape(Handle, 20)
-    val TypeInitializer: Option<ConstructorInfo> {
+    val TypeInitializer: Optional<ConstructorInfo> {
         get {
             if !IsNominalType {
                 return None
@@ -740,7 +740,7 @@ internal open class RuntimeTypeInfo : TypeInfo {
         return RuntimeTypeInfo.GenericArgumentsFromHandle(Handle)
     }
 
-    func GetElementType() -> Option<TypeInfo> {
+    func GetElementType() -> Optional<TypeInfo> {
         return neoCLR.Runtime.TypeElementType(Handle)
     }
 }
@@ -781,7 +781,7 @@ internal class RuntimeNominalTypeInfo : NominalTypeInfo {
         return false
     }
 
-    val BaseType: Option<TypeInfo> => neoCLR.Runtime.TypeBaseType(Handle)
+    val BaseType: Optional<TypeInfo> => neoCLR.Runtime.TypeBaseType(Handle)
 
     func GetInterfaces() -> Sequence<TypeInfo> {
         return neoCLR.Runtime.TypeInterfaces(Handle)
@@ -830,9 +830,9 @@ internal class RuntimeNominalTypeInfo : NominalTypeInfo {
     func GetProperties(flags: BindingFlags) -> Sequence<PropertyInfo> {
         return neoCLR.Runtime.TypeProperties(Handle, (int)flags)
     }
-    val DeclaringType: Option<TypeInfo> => neoCLR.Runtime.TypeDeclaringType(Handle)
-    val MetadataToken: Option<int> => Some(neoCLR.Runtime.TypeMetadataToken(Handle))
-    val Module: Option<ModuleInfo> => Some(neoCLR.Runtime.TypeModule(Handle))
+    val DeclaringType: Optional<TypeInfo> => neoCLR.Runtime.TypeDeclaringType(Handle)
+    val MetadataToken: Optional<int> => Some(neoCLR.Runtime.TypeMetadataToken(Handle))
+    val Module: Optional<ModuleInfo> => Some(neoCLR.Runtime.TypeModule(Handle))
     val Name: string => neoCLR.Runtime.TypeName(Handle)
     val FullName: string => neoCLR.Runtime.TypeDisplayName(Handle, 0)
     val Namespace: string => neoCLR.Runtime.TypeDisplayName(Handle, 1)
@@ -904,7 +904,7 @@ internal class RuntimeNominalTypeInfo : NominalTypeInfo {
     val IsValueType: bool => neoCLR.Runtime.TypeShape(Handle, 7)
     val IsVisible: bool => neoCLR.Runtime.TypeShape(Handle, 11)
     val IsBeforeFieldInit: bool => neoCLR.Runtime.TypeShape(Handle, 20)
-    val TypeInitializer: Option<ConstructorInfo> {
+    val TypeInitializer: Optional<ConstructorInfo> {
         get {
             if !IsNominalType {
                 return None
@@ -921,7 +921,7 @@ internal class RuntimeNominalTypeInfo : NominalTypeInfo {
         return RuntimeTypeInfo.GenericArgumentsFromHandle(Handle)
     }
 
-    func GetElementType() -> Option<TypeInfo> {
+    func GetElementType() -> Optional<TypeInfo> {
         return neoCLR.Runtime.TypeElementType(Handle)
     }
 }
@@ -1102,7 +1102,7 @@ internal class RuntimeFunctionTypeInfo : FunctionTypeInfo {
         return false
     }
 
-    val BaseType: Option<TypeInfo> => neoCLR.Runtime.TypeBaseType(Handle)
+    val BaseType: Optional<TypeInfo> => neoCLR.Runtime.TypeBaseType(Handle)
 
     func GetInterfaces() -> Sequence<TypeInfo> {
         return neoCLR.Runtime.TypeInterfaces(Handle)
@@ -1218,7 +1218,7 @@ internal class RuntimeFunctionTypeInfo : FunctionTypeInfo {
     val IsValueType: bool => neoCLR.Runtime.TypeShape(Handle, 7)
     val IsVisible: bool => neoCLR.Runtime.TypeShape(Handle, 11)
     val IsBeforeFieldInit: bool => neoCLR.Runtime.TypeShape(Handle, 20)
-    val TypeInitializer: Option<ConstructorInfo> {
+    val TypeInitializer: Optional<ConstructorInfo> {
         get {
             if !IsNominalType {
                 return None
@@ -1235,7 +1235,7 @@ internal class RuntimeFunctionTypeInfo : FunctionTypeInfo {
         return RuntimeTypeInfo.GenericArgumentsFromHandle(Handle)
     }
 
-    func GetElementType() -> Option<TypeInfo> {
+    func GetElementType() -> Optional<TypeInfo> {
         return neoCLR.Runtime.TypeElementType(Handle)
     }
 }

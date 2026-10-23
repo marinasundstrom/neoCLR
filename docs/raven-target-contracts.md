@@ -98,7 +98,7 @@ new RuntimeIterationContract(
 Binding requires one selected iterable instantiation and validates accessible signatures:
 GetIterator returns Iterator<T>, MoveNext returns Boolean, and Current returns T.
 The bound loop carries those resolved symbols into existing codegen. Missing, wrong or
-ambiguous contract shapes report RAVT001 without falling back to .NET iteration. Option
+ambiguous contract shapes report RAVT001 without falling back to .NET iteration. Optional
 copies retain the contract; changing it blocks semantic-state transfer. Arrays/ranges
 keep their existing paths. The initial compiler slice did not include project configuration (added below) or async/yield
 support, and the initial descriptor does not select disposal behavior.
@@ -154,7 +154,7 @@ directory. See [collection editor instructions](experiments/raven-target/VSCODE.
 
 Saved-project checks cover for loops, aliases, edits, compile/import failures and stale
 output prevention. Actual stdio LSP checks show List members Add/Count/GetIterator/Item
-and an inferred `int` loop binding. The existing Result/Option/Void project and completion
+and an inferred `int` loop binding. The existing Result/Optional/Void project and completion
 checks also pass. This is language-server evidence, not a newly installed extension or
 an observed VS Code UI session.
 

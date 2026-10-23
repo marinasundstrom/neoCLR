@@ -148,7 +148,7 @@ interpreter and ARM64 native execution agree, with libSystem-only native linkage
 The fixture now includes Byte storage for union tags. This still has deliberately
 minimal Object/String behavior, not production System.Runtime implementations.
 
-The verifier also compiles unchanged production Propagatable, Option, Result and
+The verifier also compiles unchanged production Propagatable, Optional, Result and
 UnionAttribute sources. Initial attempts rejected the value-type contract, then the
 missing Byte tag, then crashed while synthesizing String.Concat. They now report
 RAV1501 and publish no union library. The shared compiler fix also passes 14 focused
@@ -198,7 +198,7 @@ readiness. Website capability claims stay unchanged.
 ## Production union source subset (2026-10-09)
 
 Add `--unions` to the text-services command. The verifier compiles unchanged
-Propagatable, Option, Result, Attribute and UnionAttribute sources into a separate
+Propagatable, Optional, Result, Attribute and UnionAttribute sources into a separate
 native library, references it from a native-only project, then executes the
 [union consumer](union-consumer.rvn) through project run, independent interpreter
 and standalone ARM64 code. All return 42; native linkage remains libSystem only.
@@ -229,7 +229,7 @@ Add `--string-boxing` to the `--project --text-services --unions` verifier comma
 The [boxing consumer](boxing-consumer.rvn) converts a String through a generic
 `Box<T>` method to Object, displays its Unicode/NUL text, checks alias identity and
 checks that separately concatenated equal-content strings remain distinct. It also
-constructs an unrelated production Option<int>. This exposed two native admission
+constructs an unrelated production Optional<int>. This exposed two native admission
 errors: unboxed value constructors were treated as Object dispatch candidates, and
 closed `box String` was treated as unsupported value-record boxing.
 
@@ -256,7 +256,7 @@ this String path, so it needs no change. Native and interpreter allocation polic
 still differ; result/identity parity does not imply identical allocation counts or
 resource-exhaustion thresholds. No performance claim is made.
 
-A further probe of `Option<string>.Some("hé🙂").ToString()` succeeds in the
+A further probe of `Optional<string>.Some("hé🙂").ToString()` succeeds in the
 interpreter but native admission now reaches `isinst Char` in the generated formatter
 (instruction 19), which this profile does not support. That is separate from String
 boxing and must not be bypassed by removing the formatter's Char branch. Escaping,
@@ -334,7 +334,7 @@ preserves exact tool/input hashes; its result 42 means the defect was reproduced
 When the implementation is fixed, update this audit into a positive assertion.
 
 The first run exposed a separate portable compiler rejection for a freshly
-constructed value receiver: Option<string>.Some(payload).ToString(). Raven
+constructed value receiver: Optional<string>.Some(payload).ToString(). Raven
 `1190d03d3` on codex/source-object-metadata-resolution now evaluates that result
 once into temporary storage before method arguments, using existing value-call
 lowering. It preserves mutation on the temporary and existing construction guards.
@@ -425,7 +425,7 @@ quotes, backslashes, Unicode and NUL; direct non-overlapping replacement and del
 [Positive evidence](escaping-positive-validation.json) records project run,
 interpreter and ARM64 result 42, with only libSystem dynamically linked. The prior
 [known-failure evidence](escaping-validation.json) is retained as historical evidence.
-This qualifies unchanged production Option/Result over the fixture, not complete
+This qualifies unchanged production Optional/Result over the fixture, not complete
 native source-owned String/bootstrap or arbitrary value formatting.
 
 The production String source compiled and regenerated through the existing bridge;

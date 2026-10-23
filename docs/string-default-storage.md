@@ -16,7 +16,7 @@ the runtime's intrinsic string representation and existing method receiver ABI.
 This is not a claim of complete CLR String object identity, interning, interface
 casting or null-aware overload parity. Those require their own projection and
 validation. Native text operations still require actual string data and fault
-when that contract is violated; Option remains the environment API's absence model.
+when that contract is violated; Optional remains the environment API's absence model.
 
 This changes the earlier rejection of managed String defaults. It does not add
 nullable metadata, change native pointer initialization, invent an empty-string

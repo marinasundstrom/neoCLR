@@ -27,18 +27,18 @@ fn ordinary_system_carriers_round_trip_and_distinguish_equal_payload_types() {
 fn none_and_some_void_are_distinct_and_queries_agree() {
     for (creation, some) in [
         (
-            "newobj instance System.Option.None::.ctor()\nnewobj instance System.Option<Void>::.ctor(System.Option.None)",
+            "newobj instance System.Optional.None::.ctor()\nnewobj instance System.Optional<Void>::.ctor(System.Optional.None)",
             false,
         ),
         (
-            "ldvoid\nnewobj instance System.Option.Some<Void>::.ctor(Void)\nnewobj instance System.Option<Void>::.ctor(System.Option.Some<Void>)",
+            "ldvoid\nnewobj instance System.Optional.Some<Void>::.ctor(Void)\nnewobj instance System.Optional<Void>::.ctor(System.Optional.Some<Void>)",
             true,
         ),
     ] {
         for (query, expected) in [("IsSome", some), ("IsNone", !some)] {
             assert_eq!(
                 evaluate(
-                    &format!("{creation}\ncall instance System.Option<Void>::get_{query}()"),
+                    &format!("{creation}\ncall instance System.Optional<Void>::get_{query}()"),
                     "Boolean"
                 )
                 .unwrap(),
@@ -46,7 +46,7 @@ fn none_and_some_void_are_distinct_and_queries_agree() {
             );
         }
     }
-    assert_eq!(evaluate("ldvoid\nnewobj instance System.Option.Some<Void>::.ctor(Void)\nnewobj instance System.Option<Void>::.ctor(System.Option.Some<Void>)\ncall instance System.Option<Void>::GetSomeCase()\ncall instance System.Option.Some<Void>::get_Value()", "Void").unwrap(), Value::Void);
+    assert_eq!(evaluate("ldvoid\nnewobj instance System.Optional.Some<Void>::.ctor(Void)\nnewobj instance System.Optional<Void>::.ctor(System.Optional.Some<Void>)\ncall instance System.Optional<Void>::GetSomeCase()\ncall instance System.Optional.Some<Void>::get_Value()", "Void").unwrap(), Value::Void);
 }
 
 #[test]
@@ -57,29 +57,29 @@ fn void_success_and_arbitrary_error_payloads_use_ordinary_wrappers() {
 
 #[test]
 fn nested_option_result_preserves_the_complete_closed_payload() {
-    let body = "ldc.i4 257\nnewobj instance System.Option.Some<Byte>::.ctor(Byte)\nnewobj instance System.Option<Byte>::.ctor(System.Option.Some<Byte>)\nnewobj instance System.Result.Ok<System.Option<Byte>>::.ctor(System.Option<Byte>)\nnewobj instance System.Result<System.Option<Byte>,String>::.ctor(System.Result.Ok<System.Option<Byte>>)\ncall instance System.Result<System.Option<Byte>,String>::GetOkCase()\ncall instance System.Result.Ok<System.Option<Byte>>::get_Value()\ncall instance System.Option<Byte>::GetSomeCase()\ncall instance System.Option.Some<Byte>::get_Value()";
+    let body = "ldc.i4 257\nnewobj instance System.Optional.Some<Byte>::.ctor(Byte)\nnewobj instance System.Optional<Byte>::.ctor(System.Optional.Some<Byte>)\nnewobj instance System.Result.Ok<System.Optional<Byte>>::.ctor(System.Optional<Byte>)\nnewobj instance System.Result<System.Optional<Byte>,String>::.ctor(System.Result.Ok<System.Optional<Byte>>)\ncall instance System.Result<System.Optional<Byte>,String>::GetOkCase()\ncall instance System.Result.Ok<System.Optional<Byte>>::get_Value()\ncall instance System.Optional<Byte>::GetSomeCase()\ncall instance System.Optional.Some<Byte>::get_Value()";
     assert_eq!(evaluate(body, "Int32").unwrap(), Value::Int32(1));
 }
 
 #[test]
 fn wrong_accessor_faults_without_fabricating_a_payload() {
-    let fault = evaluate("newobj instance System.Option.None::.ctor()\nnewobj instance System.Option<Int32>::.ctor(System.Option.None)\ncall instance System.Option<Int32>::GetSomeCase()", "System.Option.Some<Int32>").unwrap_err();
+    let fault = evaluate("newobj instance System.Optional.None::.ctor()\nnewobj instance System.Optional<Int32>::.ctor(System.Optional.None)\ncall instance System.Optional<Int32>::GetSomeCase()", "System.Optional.Some<Int32>").unwrap_err();
     assert!(fault.message.contains("erased value contains"));
     let trace = fault.stack_trace.unwrap();
-    assert_eq!(trace.frames[0].function.name, "System.Option.GetSomeCase");
+    assert_eq!(trace.frames[0].function.name, "System.Optional.GetSomeCase");
     assert_eq!(trace.frames[1].function.name, "Main");
 }
 
 #[test]
 fn representation_is_private_and_extracted_records_are_independent_copies() {
-    let bad = ".module App\n.function Main() -> System.Option<Int32>\nldc.i4 42\nvalue.pack Int32\nnewobj System.Option<Int32>\nret\n.end";
+    let bad = ".module App\n.function Main() -> System.Optional<Int32>\nldc.i4 42\nvalue.pack Int32\nnewobj System.Optional<Int32>\nret\n.end";
     assert!(
         assemble(bad)
             .unwrap_err()
             .message
             .contains("field access denied")
     );
-    let src = ".module App\n.entry Main\n.type Cell\n.field Number Int32\n.end\n.function Main() -> Int32\n.local System.Option<Cell> saved\nldc.i4 7\nnewobj Cell\nnewobj instance System.Option.Some<Cell>::.ctor(Cell)\nnewobj instance System.Option<Cell>::.ctor(System.Option.Some<Cell>)\nstloc saved\nldloc saved\ncall instance System.Option<Cell>::GetSomeCase()\ncall instance System.Option.Some<Cell>::get_Value()\nldc.i4 42\nstfld 0\npop\nldloc saved\ncall instance System.Option<Cell>::GetSomeCase()\ncall instance System.Option.Some<Cell>::get_Value()\nldfld 0\nret\n.end";
+    let src = ".module App\n.entry Main\n.type Cell\n.field Number Int32\n.end\n.function Main() -> Int32\n.local System.Optional<Cell> saved\nldc.i4 7\nnewobj Cell\nnewobj instance System.Optional.Some<Cell>::.ctor(Cell)\nnewobj instance System.Optional<Cell>::.ctor(System.Optional.Some<Cell>)\nstloc saved\nldloc saved\ncall instance System.Optional<Cell>::GetSomeCase()\ncall instance System.Optional.Some<Cell>::get_Value()\nldc.i4 42\nstfld 0\npop\nldloc saved\ncall instance System.Optional<Cell>::GetSomeCase()\ncall instance System.Optional.Some<Cell>::get_Value()\nldfld 0\nret\n.end";
     let module = assemble(src).unwrap();
     let loaded = LoadedProgram::new(&module).unwrap();
     loaded.verify().unwrap();
@@ -96,10 +96,10 @@ fn carrier_execution_does_not_depend_on_markers_or_bootstrap_union_opcodes() {
         ty.custom_attributes.clear();
     }
     let new_methods = library.functions.iter().filter(|f| {
-        f.name.starts_with("System.Option.")
+        f.name.starts_with("System.Optional.")
             || f.name.starts_with("System.Result.")
-            || f.name.starts_with("System.Option.Some.")
-            || f.name.starts_with("System.Option.None.")
+            || f.name.starts_with("System.Optional.Some.")
+            || f.name.starts_with("System.Optional.None.")
             || f.name.starts_with("System.Result.Ok.")
             || f.name.starts_with("System.Result.Failure.")
     });
@@ -118,7 +118,7 @@ fn carrier_execution_does_not_depend_on_markers_or_bootstrap_union_opcodes() {
 #[test]
 fn unqualified_carrier_names_have_no_special_runtime_meaning() {
     assert!(
-        matches!(neoclr::assembler::parse_type("Option<Int32>").unwrap(), Type::Constructed { definition, .. } if definition == "Option")
+        matches!(neoclr::assembler::parse_type("Optional<Int32>").unwrap(), Type::Constructed { definition, .. } if definition == "Optional")
     );
     assert!(
         matches!(neoclr::assembler::parse_type("Result<Int32,String>").unwrap(), Type::Constructed { definition, .. } if definition == "Result")
@@ -132,8 +132,8 @@ fn bundled_carriers_only_accept_the_nested_case_family() {
         assert!(!library.types.iter().any(|ty| ty.name == name));
     }
     for name in [
-        "System.Option.GetNone",
-        "System.Option.GetSome",
+        "System.Optional.GetNone",
+        "System.Optional.GetSome",
         "System.Result.GetOk",
         "System.Result.GetErr",
     ] {

@@ -153,7 +153,7 @@ func Main() -> int {
 fn case_constraints_and_parameter_shadowing_remain_effective() {
     assert_eq!(
         run(r#"
-import System.Option.*
+import System.Optional.*
 record Case<T>(Value: T) where T: notvoid
 union Carrier<Some>(Case<Some>)
 func Main() -> int {

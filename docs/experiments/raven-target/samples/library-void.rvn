@@ -1,8 +1,8 @@
-import System.Option.*
+import System.Optional.*
 import System.*
 import System.Console.*
 
-func Marker(completed: int) -> Option<System.Void> {
+func Marker(completed: int) -> Optional<System.Void> {
     if completed == 1 {
         return Some(())
     }

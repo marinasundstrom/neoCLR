@@ -1,14 +1,14 @@
 module System.Collections
 
 import System.*
-import System.Option.*
+import System.Optional.*
 
 /// An unsynchronized hash set with an explicit equality policy and snapshot iteration.
 public class HashSet<T> : MutableSet<T> {
     // Explicit storage for constructor assignment with the current compiler bridge.
     private field comparer: EqualityComparer<T>
     private var buckets: int[] = [0, 0, 0, 0]
-    private var items: ArrayList<Option<T>> = ArrayList<Option<T>>()
+    private var items: ArrayList<Optional<T>> = ArrayList<Optional<T>>()
     private var hashes: ArrayList<int> = ArrayList<int>()
     private var next: ArrayList<int> = ArrayList<int>()
     private var free = -1
@@ -71,7 +71,7 @@ public class HashSet<T> : MutableSet<T> {
     /// <summary>Returns the stored equivalent value using this set's comparer.</summary>
     /// <param name="value">The value to match; never replaces an existing element.</param>
     /// <returns>Some containing the stored value, or None if absent.</returns>
-    func Find(value: T) -> Option<T> {
+    func Find(value: T) -> Optional<T> {
         Enter()
         let index = Locate(value, Hash(value))
         Leave()
@@ -168,7 +168,7 @@ public class HashSet<T> : MutableSet<T> {
     func Clear() {
         Enter()
         buckets = [0, 0, 0, 0]
-        items = ArrayList<Option<T>>()
+        items = ArrayList<Optional<T>>()
         hashes = ArrayList<int>()
         next = ArrayList<int>()
         free = -1

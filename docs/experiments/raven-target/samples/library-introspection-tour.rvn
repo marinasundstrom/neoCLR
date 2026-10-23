@@ -1,5 +1,5 @@
 import System.Time.*
-import System.Option.*
+import System.Optional.*
 import System.*
 import System.Collections.*
 import System.Introspection.*

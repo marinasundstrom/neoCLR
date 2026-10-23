@@ -42,7 +42,7 @@ code --new-window "$HOME/.neoclr/experiments/preview-4/demo"
 ```
 
 1. Run **Developer: Reload Window** if VS Code was open during the update.
-2. Open `Main.rvn`, containing the combined Result/Option/Void propagation workflow.
+2. Open `Main.rvn`, containing the combined Result/Optional/Void propagation workflow.
 3. Choose **Terminal → Run Task → neoCLR: Run saved project**.
 4. Expect `42`, `Saved`, `Completed`, `Overflow`, `Value found`, `42`, `Absent`.
 5. Try completion after `System.Date.` or `System.Type.`; undo unfinished expressions
@@ -107,10 +107,10 @@ python3 docs/experiments/raven-target/configure_tasks.py /absolute/editor/Demo.r
 Preparation also creates these tasks; pass `--runtime` to choose the executable (default:
 neoCLR's `target/debug/neoclr`). Unrelated task entries are preserved. The current project
 profile accepts exactly the supplied core reference and no project references. It reuses
-the Result/Option/Void importer: this is not general Raven IL support. Some declarations
+the Result/Optional/Void importer: this is not general Raven IL support. Some declarations
 visible in completion are still outside that execution profile, beyond the documented catalog.
 Unsupported instructions/APIs fail admission instead of falling back to host execution.
-The edit/build/run milestone is closed. The bounded interface/iteration and Result/Option propagation contracts now work.
+The edit/build/run milestone is closed. The bounded interface/iteration and Result/Optional propagation contracts now work.
 
 `verify_project.py` exercises the union and propagation demos, a saved edit, a compiler failure,
 and an unsupported-instruction failure without overwriting the user's project.
@@ -202,8 +202,8 @@ code --new-window /tmp/raven-collections-editor/editor
 If using CARGO_TARGET_DIR, supply its executable path to `--runtime` instead.
 Open Main.rvn and run the generated neoCLR build/run task. Expected output is
 `42`, `Completed`, `Price overflow`, `Skipped`, `Product not found`, `Skipped`,
-with no runner return-value suffix. The sample looks up products with Option, validates a price with
-Result, and returns an Option<Void> completion marker. The project selects Iterable/Iterator through
+with no runner return-value suffix. The sample looks up products with Optional, validates a price with
+Result, and returns an Optional<Void> completion marker. The project selects Iterable/Iterator through
 RavenIteration* properties; the task generates and uses the matching adapted runtime
 library for each build. On a List<int> parameter, completion should offer Add, Count,
 GetIterator and Item. Hover over the loop variable declaration to see `int`.
@@ -217,11 +217,11 @@ python3 docs/experiments/raven-target/verify_editor.py /tmp/raven-collections-ed
 ```
 
 The first checks executable integer Math.Min/Max/Sign, the combined workflow,
-Result/Option/Void, value copying, array and
+Result/Optional/Void, value copying, array and
 class aliasing, loops, a saved edit and failed-build stale-output protection.
 The second checks target completion and the inferred loop binding through the actual
 language server. It changes the in-memory document and retains a local LSP transcript;
-it does not edit the saved sample. The collection declaration profile now includes Result/Option/Void, so all of these
+it does not edit the saved sample. The collection declaration profile now includes Result/Optional/Void, so all of these
 examples use the same declaration assembly and adapted library. Existing non-collection
 projects retain their smaller profile; regenerate older collection demo folders to
 obtain the added declarations. Automatic disposal and defer remain future work, with

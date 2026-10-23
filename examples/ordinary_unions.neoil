@@ -36,9 +36,9 @@ Failed:
     call Describe(System.Result<Int32,Int32>)
     pop
     ldvoid
-    newobj instance System.Option.Some<Void>::.ctor(Void)
-    newobj instance System.Option<Void>::.ctor(System.Option.Some<Void>)
-    call instance System.Option<Void>::get_IsSome()
+    newobj instance System.Optional.Some<Void>::.ctor(Void)
+    newobj instance System.Optional<Void>::.ctor(System.Optional.Some<Void>)
+    call instance System.Optional<Void>::get_IsSome()
     brfalse Invalid
     ldstr "Some<Void> is present"
     call System.Console::WriteLine(String)

@@ -11,7 +11,7 @@ semantic model.
 
 The [current platform direction](platform-direction.md) retains .NET's useful value
 and reference type categories. Change a contract only when a concrete scenario and
-comparison justify its costs. Result/Option APIs, generic Void and invariant mutable
+comparison justify its costs. Result/Optional APIs, generic Void and invariant mutable
 arrays are deliberate differences. Modern UTF-8 text APIs, bounded memory views and
 nullability metadata are areas for evaluation, not reasons to replace the type model.
 

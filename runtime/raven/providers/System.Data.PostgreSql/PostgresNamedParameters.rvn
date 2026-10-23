@@ -3,7 +3,7 @@ module System.Data.PostgreSql
 import System.*
 import System.Collections.*
 import System.Data.Sql.*
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 import System.Text.*
 

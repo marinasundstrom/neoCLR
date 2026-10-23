@@ -6,8 +6,8 @@ properties and checked `Get*` accessors are not required conventions.
 
 ## Current Raven library contract
 
-`Option<T>`, `Result<T,E>` and `TaskOutcome<T>` use the generated contract.
-Option and Result follow Raven.Core's source declarations and generated
+`Optional<T>`, `Result<T,E>` and `TaskOutcome<T>` use the generated contract.
+Optional and Result follow Raven.Core's source declarations and generated
 union contract. Other migrated unions include networking, HTTP, storage, stream,
 JSON and reflection errors. Carriers implement `IUnion.Value`; generated
 `HasValue` and typed `TryGetValue` distinguish active cases from default carriers.
@@ -15,7 +15,7 @@ JSON and reflection errors. Carriers implement `IUnion.Value`; generated
 This follows Raven's shared synthesized-body contract; `out(true)` guarantees
 initialization on success, not preservation on failure. Older legacy bridge
 fragments preserved outputs; rebuild callers and libraries together.
-The [Option and Result API guide](raven-union-api.md) explains propagation and defaults.
+The [Optional and Result API guide](raven-union-api.md) explains propagation and defaults.
 
 A union's discriminator and payload belong to its ordinary carrier representation.
 The runtime executes imported types and methods without a union opcode or a Raven
@@ -47,12 +47,12 @@ The Raven runtime source audit found no remaining manual union carriers after th
 TaskOutcome migration. Standalone errors such as OverflowError are ordinary value
 types; JsonValue uses a polymorphic class hierarchy. Neither is a disguised union
 carrier requiring this migration. A subsequent mapped HTTP check found the native
-reflection snapshot adapter still constructing the old Option layout. That boundary
+reflection snapshot adapter still constructing the old Optional layout. That boundary
 now validates and constructs the selected profile’s layout; accessor regression
 checks cover both profiles.
 
 ## Composition
 
-[Option and Result operators](raven-outcome-operators.md) are ordinary library
+[Optional and Result operators](raven-outcome-operators.md) are ordinary library
 methods with generic callbacks. Expected failures stay explicit return values;
 terminal runtime faults and task cancellation retain their own contracts.

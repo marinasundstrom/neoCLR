@@ -1,7 +1,7 @@
 import System.*
 import System.Collections.*
 import System.Linq.*
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 import System.Console.*
 
@@ -31,12 +31,12 @@ func Register(index: MutableMap<int, Order>, orders: ArrayList<Order>, order: Or
     return true
 }
 
-func PendingOrder(index: Map<int, Order>, number: int) -> Option<Order> {
+func PendingOrder(index: Map<int, Order>, number: int) -> Optional<Order> {
     let order = index.Find(number)?
     if !order.Pending {
-        return Option<Order>(None())
+        return Optional<Order>(None())
     }
-    return Option<Order>(Some<Order>(order))
+    return Optional<Order>(Some<Order>(order))
 }
 
 func OnlyPending(orders: Iterable<Order>) -> Result<Order, SingleError> {

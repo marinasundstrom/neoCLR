@@ -64,7 +64,7 @@ fn reference_results_keep_heap_identity_and_survive_collection() {
     let p = program(
         r#"
 record Item(Value: int)
-func Find() -> Option<Item&> {
+func Find() -> Optional<Item&> {
     var values = System.Collections.ArrayList<Item&>(0)
     values.Add(new Item(40))
     return values.Find(item => { item.Value = item.Value + 2; return true })
@@ -132,7 +132,7 @@ fn linked_validation_still_rejects_unknown_union_payload_types() {
     assert!(
         frontend::compile(
             r#"
-func Read(value: Option<Missing>) -> int {
+func Read(value: Optional<Missing>) -> int {
     return value match { Some(_) => 1, None => 0 }
 }
 func Main() -> int { return 0 }

@@ -7,7 +7,7 @@ selects .NET-aligned categories, including reference-type arrays. Retain the alt
 below as the reasoning history, not as competing current defaults.
 The criteria come from [conversation entries 23–26](development-timeline.md): familiar
 application programming, useful object behavior for primitive/user-defined data,
-Result/Option APIs, nullable support, and meaningful separation of language and runtime.
+Result/Optional APIs, nullable support, and meaningful separation of language and runtime.
 
 ## Evaluation priority clarified after review
 
@@ -91,7 +91,7 @@ SDK 10.0.100 in the existing comparison project. No JIT implementation claim is 
 | Value behavior | [Value types](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/value-types) copy contents; reference-valued fields still alias. This is not deep copying or a guarantee of stack allocation. |
 | Metadata and execution | [.NET 10 newobj reference](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.newobj?view=net-10.0) distinguishes object construction from producing a value-type instance. Reusing the mnemonic does not make neoCLR's newobj plus heap.new contract identical. |
 | Nullability | [Nullable reference annotations](https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/null-safety/nullable-reference-types) do not change the runtime type. NeoCLR's proposed unified, enforced nullable model is separate work, not supplied by a reference-default annotation. |
-| Library policy | The C# baseline uses List<Product>, a value Receipt and a simple outcome record. Neo uses ArrayList, Option and Result. Their inventory behavior is comparable; their error API shape is intentionally different. |
+| Library policy | The C# baseline uses List<Product>, a value Receipt and a simple outcome record. Neo uses ArrayList, Optional and Result. Their inventory behavior is comparable; their error API shape is intentionally different. |
 
 Adopting CLR's full nominal value/reference split would provide a familiar model but
 requires more than an annotation: construction, signatures, generic instantiation,
@@ -103,7 +103,7 @@ specify the operational distinction. Broader CLI conformance is outside this eva
 
 All models must preserve: shared Product stock/price; receipt total 24 after a later
 price change; successful restocking through a returned callback; failed purchases that
-neither mutate stock nor notify; and missing lookup represented by Option.
+neither mutate stock nor notify; and missing lookup represented by Optional.
 
 ### A. Current Neo: explicit use modes
 
@@ -114,7 +114,7 @@ record Product(Name: string, Price: int, Stock: int)
 record Receipt(Name: string, Quantity: int, Total: int)
 
 func FindProduct(products: readonly System.Collections.ArrayList<Product&>&,
-                 name: string) -> Option<Product&> { /* existing body */ }
+                 name: string) -> Optional<Product&> { /* existing body */ }
 func Purchase(product: Product&, quantity: int,
               notifications: Notifications&) -> Result<Receipt, PurchaseError> {
     /* existing body */
@@ -146,7 +146,7 @@ class Product(Name: string, Price: int, Stock: int)
 value class Receipt(Name: string, Quantity: int, Total: int)
 
 func FindProduct(products: readonly ArrayList<Product>,
-                 name: string) -> Option<Product>
+                 name: string) -> Optional<Product>
 func Purchase(product: Product, quantity: int,
               notifications: Notifications) -> Result<Receipt, PurchaseError>
 
@@ -191,7 +191,7 @@ A provisional lowering table makes the experiment concrete:
 | --- | --- |
 | Product parameter/field/element | Product& |
 | Receipt parameter/field/element | Receipt |
-| Option<Product> | System.Option<Product&> |
+| Optional<Product> | System.Optional<Product&> |
 | ArrayList<Product> instance | System.Collections.ArrayList<Product&>& if the facade is also reference-default |
 | readonly catalog view | readonly System.Collections.ArrayList<Product&>& |
 | Notifications parameter | Notifications& |
@@ -217,7 +217,7 @@ A's frame-local borrowed implementation. These costs need measurement if adopted
 | Collections | Element T versus T& is visible; descriptor can itself be direct or referenced | Element mode follows declaration; collection API must preserve semantics | Same, but imported default choices need a mapping |
 | Interface calls | Explicit view; no copy/box required for this path | Interface spelling hides view formation | Same runtime dispatch available |
 | Return/capture | Heap roots survive; retaining a frame reference faults | Heap-default construction avoids this common trap; explicit borrows still restricted | Same; no automatic lifetime promotion needed for ordinary new objects |
-| Result/Option | Existing case/carrier conversions and extraction | Substitute effective payload use; retain value carriers | Same generic arguments after lowering |
+| Result/Optional | Existing case/carrier conversions and extraction | Substitute effective payload use; retain value carriers | Same generic arguments after lowering |
 | out Product | out Product& writes Product, not Product& storage | Needs distinct reference-slot output capability for C#-like semantics | Cannot be solved by token omission; helper-cell lowering would require a specified alias contract |
 | Null/default | No new absence state from references alone | Must specify nullable slots and initialization independently | Cannot safely emulate general nullability with a spelling convention alone |
 
@@ -238,7 +238,7 @@ local copy; Neo's immutable parameter bindings are a separate language differenc
 | Equality, hashing, record helpers | Ordinary API contracts/compiler generation | Object-like behavior does not require shared reference identity or a new storage category |
 | readonly access | Existing runtime capability, projected by language | Must survive IL/artifact inputs and interface dispatch |
 | Immutability / identity-free optimization | Separate contract if required | No default-use hint may justify eliding observable identity or ignoring mutations |
-| Result/Option shape | Ordinary library types and language conveniences | Reference defaults must not accidentally turn all union carriers into heap objects |
+| Result/Optional shape | Ordinary library types and language conveniences | Reference defaults must not accidentally turn all union carriers into heap objects |
 | Nullable representation and Fault containment | Separate runtime/API evaluation | Required for general targeting; neither solved by class defaults |
 
 ## Compatibility and implementation costs

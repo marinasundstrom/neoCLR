@@ -239,7 +239,7 @@ implicit Result unwrapping or JavaScript scheduling semantics.
 
 Evaluate value transformation, chaining a callback that returns another Task, and
 combining multiple Tasks as distinct operations. Choose names for their meaning
-and consistency with collection/Option/Result operators, not mechanical parity
+and consistency with collection/Optional/Result operators, not mechanical parity
 with either .NET or JavaScript. Benefits sought are readable pipelines and direct
 composition alongside await; costs include reduced .NET API familiarity and the
 need to define callback ordering, reentrancy, queue ownership and pending/completed

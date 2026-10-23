@@ -13,7 +13,7 @@ Development after Preview 16 adds:
 
 - `Serve(handler) -> Task<Result<System.Void, HttpError>>`
 - `Serve(handler, cancellationToken) -> Task<Result<System.Void, HttpError>>`
-- `CompletedRequests: long`, `FailedRequests: long`, `LastRequestError: Option<HttpError>`
+- `CompletedRequests: long`, `FailedRequests: long`, `LastRequestError: Optional<HttpError>`
 
 Serve accepts either `(HttpRequest) -> Task<Result<HttpResponse, HttpError>>`
 (the same callback as ServeOne) or `(HttpContext) -> Task<Result<unit, HttpError>>`.

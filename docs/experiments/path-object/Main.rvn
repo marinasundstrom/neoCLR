@@ -2,7 +2,7 @@ import System.*
 import System.Storage.Path
 import System.Collections.*
 import System.Result.*
-import System.Option.*
+import System.Optional.*
 
 func Parsed(text: string) -> Path {
     if let Ok(path) = Path.Parse(text) {

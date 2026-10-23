@@ -76,7 +76,7 @@ UTF-8 text checks include non-ASCII strings in the companion string fixtures.
 ## P2 — Console calculation and recoverable failure
 
 ```text
-func ReadDigit() -> Result<Option<Int32>, Error> {
+func ReadDigit() -> Result<Optional<Int32>, Error> {
     return Console.ReadByte() match {
         Err(let error) => Err(error)
         Ok(None) => Ok(None)
@@ -128,7 +128,7 @@ record Box<T>(value: T) {
     public Value: T { get => stored }
 }
 
-union Option<T> {
+union Optional<T> {
     case None
     case Some(value: T)
 }

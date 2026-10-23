@@ -6,7 +6,7 @@ are ordinary platform IL; line decoding and a general text reader are deferred.
 
 ## Platform methods
 
-`System.Console.ReadByte() -> System.Result<System.Option<Byte>,System.ConsoleReadError>` provides raw byte input.
+`System.Console.ReadByte() -> System.Result<System.Optional<Byte>,System.ConsoleReadError>` provides raw byte input.
 Its IL body calls the explicitly declared `neoCLR.Runtime.ConsoleReadByte` InternalCall.
 The host returns an explicitly erased Byte, Void (EOF), or Int32 status. Platform IL
 constructs the ordinary nested cases with exact Byte storage:
@@ -181,7 +181,7 @@ construction occurs at this boundary. The caller must supply an encoding-aware
 layer: POSIX terminal bytes are not guaranteed to be UTF-8. VMIN/VTIME zero plus a
 zero-time readiness check avoid waiting for input; no file-description flags change.
 
-`read(&mut [u8], Option<Duration>)` is the synchronous wait capability. `None`
+`read(&mut [u8], Optional<Duration>)` is the synchronous wait capability. `None`
 waits until bytes or end; a duration bounds the wait and returns `Pending` on
 timeout; zero delegates to `try_read`. Custom hosts default to `Unsupported` for
 nonzero waits. POSIX uses `poll`, rounding fractional milliseconds up and retaining

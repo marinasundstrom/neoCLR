@@ -1,7 +1,7 @@
 import System.*
 import System.Collections.*
 import System.Result.*
-import System.Option.*
+import System.Optional.*
 import System.Text.*
 
 // Experimental application types, not additions to System or its reference assembly.
@@ -98,7 +98,7 @@ public class TextSource {
         }
     }
 
-    func FindOrdinal(pattern: string) -> Option<SourceRange> {
+    func FindOrdinal(pattern: string) -> Optional<SourceRange> {
         let source = Utf8.Encode(Text)
         let needle = Utf8.Encode(pattern)
         if needle.Count > source.Count {

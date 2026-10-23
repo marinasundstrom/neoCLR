@@ -44,13 +44,13 @@ static class CancellationBindings
                 public bool IsDisposed => default;
                 public void Cancel() { }
                 public void CancelAfter(Time.Duration delay) { }
-                public void CancelAfter(Option<Time.Duration> delay) { }
+                public void CancelAfter(Optional<Time.Duration> delay) { }
                 public void Dispose() { }
                 public CancellationRegistration Register(Func<PropagationUnit> callback) => default;
                 public void Remove(CancellationRegistration registration) { }
             }
             public sealed class CancellationRegistration : Disposable {
-                public CancellationRegistration(CancellationTokenSource? owner, Option<Func<PropagationUnit>> callback, CancellationRegistration? next) { }
+                public CancellationRegistration(CancellationTokenSource? owner, Optional<Func<PropagationUnit>> callback, CancellationRegistration? next) { }
                 public void Dispose() { }
                 public CancellationRegistration? Next => default;
                 public CancellationRegistration? TakeNext() => default;
@@ -103,9 +103,9 @@ static class CancellationBindings
             (Source, "get_IsDisposed") when library => ("", "Boolean", false),
             (Source, "Register") when library => ("fn<Void>", Registration, false),
             (Source, "Remove") when library => (Registration, "void", false),
-            (Source, "CancelAfter") => (args.Length == 1 && args[0] == "System.Option<System.Time.Duration>" ? "System.Option<System.Time.Duration>" : "System.Time.Duration", "void", false),
+            (Source, "CancelAfter") => (args.Length == 1 && args[0] == "System.Optional<System.Time.Duration>" ? "System.Optional<System.Time.Duration>" : "System.Time.Duration", "void", false),
             (Source, "Cancel" or "Dispose") => ("", "void", false),
-            (Registration, ".ctor") when library => ($"{Source},System.Option<fn<Void>>,{Registration}", "void", false),
+            (Registration, ".ctor") when library => ($"{Source},System.Optional<fn<Void>>,{Registration}", "void", false),
             (Registration, "get_Next" or "TakeNext") when library => ("", Registration, false),
             (Registration, "SetNext") when library => (Registration, "void", false),
             (Registration, "Invoke") when library => ("", "void", false),

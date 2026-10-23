@@ -9,7 +9,7 @@ of testing the interpreter and assembler independently; final CLI-based binary
 encoding is a separate milestone.
 
 Implemented owned records, explicit shared heap references, first-class Void,
-constructed Option/Result types, free functions, locals, arithmetic, branches,
+constructed Optional/Result types, free functions, locals, arithmetic, branches,
 terminal Faults, and three bootstrap library functions. The interpreter checks
 executed operations and bounds execution resources. No guest null or exception
 instructions exist.
@@ -596,11 +596,11 @@ Linux and Windows execution remain for the existing CI matrix.
 ## 2026-09-06 — Prioritize union and generic fundamentals
 
 Recorded the user's priority: execution/metadata fundamentals before broad type-system
-features and reflection, with a representation for library-defined Option and Result.
+features and reflection, with a representation for library-defined Optional and Result.
 Proposed union for tagged typed payloads and enum for integer-backed named constants.
 Outlined closed type references, indexed generic parameters, stable case tags and
 payload-field indices, general construction/test/extraction operations, and a staged
-migration away from hard-coded Option/Result runtime cases. Names remain mappings.
+migration away from hard-coded Optional/Result runtime cases. Names remain mappings.
 
 The proposal distinguishes interpreter values from a future native ABI, preserves
 Void payloads and value copying, and avoids implicit null sentinels or ownership.
@@ -615,7 +615,7 @@ parameter name tables, and `.type Pair<T, !1>` declarations. Field names for gen
 parameters resolve to indices; indexed references are canonical. The parser now
 accepts user-defined constructed type syntax, while validation resolves definitions,
 checks arity, rejects open references outside their type context, and validates names
-and nesting. Existing builtin Option/Result/Ref/Ptr encodings remain reserved.
+and nesting. Existing builtin Optional/Result/Ref/Ptr encodings remain reserved.
 
 Added field-signature substitution APIs for closed types, preserving nested wrappers,
 pointer layers, and constructed arguments without recursively expanding definitions.
@@ -639,7 +639,7 @@ Adopted a .NET 11-inspired attribute/member convention for ordinary carrier type
 Replaced the earlier case-table/opcode proposal and removed the uncommitted general
 union experiment, including its dedicated type/value category, assembler directives,
 opcodes, and experiment-only sample/tests. The committed generic metadata foundation
-and existing bootstrap Option/Result behavior are preserved.
+and existing bootstrap Optional/Result behavior are preserved.
 
 Documented ordinary variant and optional synthesized case types, typed access,
 explicit None, Void payloads, and distinct Ok/Err wrappers for Result<T,T>. Recorded
@@ -1171,9 +1171,9 @@ Validation: all 292 integration tests pass on macOS ARM64; formatting, clippy wi
 warnings denied, and diff checks pass. The sample preserves Int32(21) and produces an
 updated Int32(42). Linux and Windows remain for CI.
 
-## 2026-09-07 — Validated bootstrap Option and Result inputs
+## 2026-09-07 — Validated bootstrap Optional and Result inputs
 
-Extended the owned invocation schema to the existing bootstrap Option/Result values,
+Extended the owned invocation schema to the existing bootstrap Optional/Result values,
 including nested payloads and fields in generic record receivers. Import checks the
 canonical type tag, permitted case, and exact payload storage value. None requires
 its existing Void placeholder; Some<Void> and Result<T,T> retain distinct case identities.
@@ -1192,7 +1192,7 @@ plus invocation and architecture documentation.
 
 Validation: all 298 integration tests pass on macOS ARM64; formatting, clippy with
 warnings denied, and diff checks pass. The sample reports Succeeded and Failed from
-Result inputs and reuses an Option<String> result containing Hello, world!.
+Result inputs and reuses an Optional<String> result containing Hello, world!.
 Linux and Windows remain for CI.
 
 ## 2026-09-07 — Cooperative host cancellation
@@ -1416,7 +1416,7 @@ Windows remain for CI.
 Recorded the proposed future model of explicit nullable declarations rather than
 nullable type identities. Listed open questions about eligible representations,
 return/accessor contracts, generics, verification, initialization, native boundaries,
-and method compatibility. Preserved Option for semantic absence and kept allocation
+and method compatibility. Preserved Optional for semantic absence and kept allocation
 and ownership independent. No implementation or final syntax is chosen.
 
 Validation: documentation-only change; diff checks pass. Runtime tests were not rerun.
@@ -1486,7 +1486,7 @@ duplicate output. Shared console objects retain their external input position ac
 otherwise fresh executions.
 
 System.Console.ReadByte is a platform-IL wrapper over one declared InternalCall,
-returning Result<Option<Byte>,Error>. EOF is ordinary absence; input failures are Error
+returning Result<Optional<Byte>,Error>. EOF is ordinary absence; input failures are Error
 values. Existing Void-returning WriteLine reports host write failure as a terminal Fault.
 Documented blocking calls, partial/external side effects, embedding defaults, and the
 experimental Rust API addition. No Stream API or general text reader was introduced.
@@ -1513,7 +1513,7 @@ as near-term ordinary-type fundamentals for expressing a union contract. Current
 .ctor-shaped and get_Message-shaped methods do not settle these contracts. Plan the
 minimal dependency order around a carrier/variant example, not extensive OOP.
 
-Made removal of all six bootstrap union instructions and the special Option/Result
+Made removal of all six bootstrap union instructions and the special Optional/Result
 runtime encodings an explicit completion condition. First replace library, host,
 and sample uses with ordinary construction, members, fields, and branches; then
 remove special dispatch and explicitly migrate or reject old serialized artifacts.
@@ -1538,7 +1538,7 @@ storage/returns, empty records, cross-module access, reachability and frame limi
 Existing aggregate newobj and ordinary value-receiver calls retain their semantics.
 Documented this bounded subset and updated the MVP/roadmap. Field-by-field receiver
 initialization, addressed access, carrier storage, allocation/ownership policy and
-ordinary Option/Result migration remain future work.
+ordinary Optional/Result migration remain future work.
 
 Validation: all 396 integration tests pass; formatting, Clippy with warnings denied,
 and diff checks pass. The sample assembled to JSON, passed the typed verifier, and
@@ -1559,7 +1559,7 @@ new representation are explicitly unsupported in this slice.
 An ordinary Outcome<T,E> sample uses public overloaded constructors and a private
 erased field, preserving Success/Failure identity when T and E are identical. This
 proves an interpreter carrier representation without inactive/default fields or
-union-specific instructions. It does not migrate System.Option/Result or settle
+union-specific instructions. It does not migrate System.Optional/Result or settle
 the final compiler-recognized member convention. Documented representation/copy
 semantics, pointer lifetime, native/host boundaries and remaining migration work.
 
@@ -1698,7 +1698,7 @@ The user selected a runnable source preview with assembler, interpreter, library
 samples as the first publication target. Added an MVP capability/gap table, implementation
 order, required offline demonstrations, release acceptance checklist, and explicit
 exclusions. Remaining feature gates center on construction/carrier storage, ordinary
-Option/Result, removal of bootstrap union operations, and minimal read-only guest type
+Optional/Result, removal of bootstrap union operations, and minimal read-only guest type
 inspection. Binaries, a high-level compiler, networking, broad reflection, and executing
 JIT/AOT backends are outside this release target.
 
@@ -1723,9 +1723,9 @@ or runtime implementation change was made.
 
 Validation: documentation-only changes; diff checks pass. Runtime tests were not rerun.
 
-## 2026-09-07 — Ordinary System.Option/Result library carriers
+## 2026-09-07 — Ordinary System.Optional/Result library carriers
 
-Implemented System.None, Some<T>, Ok<T>, Err<T>, Option<T> and Result<T,E> as ordinary
+Implemented System.None, Some<T>, Ok<T>, Err<T>, Optional<T> and Result<T,E> as ordinary
 platform-defined types. Nineteen new IL methods provide constructors, read-only payload
 properties, variant predicates and checked wrapper accessors. Carriers hold one private
 System.Value; no interpreter dispatch, native intrinsic or union opcode was added.
@@ -1735,7 +1735,7 @@ including exact wrapper identity, suffix restrictions and behavioral obligations
 Added an executable ordinary-union sample and eight integration tests for serialized
 round trips, equal success/error payload types, Void/None distinctions, arbitrary error
 payloads, nesting, failed accessors, private representation, independent copies, and
-execution without marker metadata. Fully qualified System.Option/Result select ordinary
+execution without marker metadata. Fully qualified System.Optional/Result select ordinary
 types while unqualified spellings and existing APIs remain explicit bootstrap migration
 debt. Updated Preview 1's Raven-like IL mappings and current library documentation.
 
@@ -1921,14 +1921,14 @@ continues to use `System.Error` until the carrier migration is complete.
 
 Replaced the temporary ReadByteTyped, ReadAllTextTyped and AbsTyped alternatives with
 canonical Console.ReadByte, File.ReadAllText and Math.Abs APIs returning ordinary
-nested System.Result/Option cases. Console/file host bindings return bounded erased
+nested System.Result/Optional cases. Console/file host bindings return bounded erased
 payloads (Byte/Void/Error and String/Error respectively); library IL owns all case
 construction, with no bootstrap union opcodes in these methods or native union values
 at these boundaries. Explicit System.Value storage remains the existing preview
 representation, not a new memory-management policy.
 
 Migrated the interactive console and file examples and their host expectations. Fixed
-Option/Result predicates to recognize nested cases as well as the older ordinary wrapper
+Optional/Result predicates to recognize nested cases as well as the older ordinary wrapper
 family; this corrects EOF recognition in the single-byte console example. Also updated
 stale parsing consumers in errors/types samples and made carrier/library tests assert
 behavior instead of obsolete exact method counts. Added EOF, full-byte-range, read
@@ -1950,7 +1950,7 @@ Validation: the full `cargo test --locked --no-fail-fast` suite passes, as do
 ## System sources organized by namespace
 
 Split the monolithic runtime source into class/feature files under System and
-neoCLR/Runtime namespace folders. Generic Option/Result companions stay with their
+neoCLR/Runtime namespace folders. Generic Optional/Result companions stay with their
 carriers. The ordered System.neoil manifest still produces one System module and
 preserves all pre-split metadata rows and instruction bodies.
 
@@ -2036,7 +2036,7 @@ and executes against an explicitly rebuilt System artifact on macOS ARM64.
 
 ## Typed console and file input errors
 
-Migrated Console.ReadByte to Result<Option<Byte>,ConsoleReadError> with Unavailable and
+Migrated Console.ReadByte to Result<Optional<Byte>,ConsoleReadError> with Unavailable and
 ReadFailed cases, and File.ReadAllText to Result<String,FileReadError> with InvalidLimit,
 InvalidPath, NotFound, AccessDenied, NotRegularFile, ReadFailed, TooLarge and InvalidUtf8
 cases. Both errors are ordinary non-generic carriers with directly nested case types,
@@ -2055,11 +2055,11 @@ Validation: all 34 focused host-I/O, carrier, native-binding, string and source 
 along with formatting, clippy with warnings denied and diff checks. Console input, EOF,
 and file samples assemble, verify and execute against a rebuilt System artifact on macOS ARM64.
 
-## One ordinary Option/Result case family
+## One ordinary Optional/Result case family
 
 Removed the legacy System.Some/None/Ok/Err type definitions, their carrier constructor
 overloads, and GetSome/GetNone/GetOk/GetErr extraction methods. Ordinary carriers now
-accept only System.Option.Some/None and System.Result.Ok/Error, with matching predicates
+accept only System.Optional.Some/None and System.Result.Ok/Error, with matching predicates
 and GetSomeCase/GetNoneCase/GetOkCase/GetErrorCase extraction. Removed predicate fallback
 branches that previously recognized two unrelated wrapper identities. Updated the ordinary
 union sample, host-input sample, tests and source/IL mapping documentation.
@@ -2068,7 +2068,7 @@ Existing coverage proves Some<Void> versus None, Result<T,T>, arbitrary error pa
 nested generic carriers, independent value copies and Faults on mismatched extraction.
 Added rejection coverage for the removed wrapper names and accessor signatures. This
 changes System metadata rows; reassemble applications/System together. It does not yet
-remove the separate bootstrap Option/Result VM categories or their six opcodes.
+remove the separate bootstrap Optional/Result VM categories or their six opcodes.
 
 Validation: all 452 tests pass. Formatting, clippy with warnings denied and diff checks
 pass. Ordinary union and companion samples assemble, verify and run against a rebuilt
@@ -2076,16 +2076,16 @@ System artifact on macOS ARM64.
 
 ## Remove the bootstrap union machine representation
 
-Removed the special Option/Result type categories, Union value representation and
+Removed the special Optional/Result type categories, Union value representation and
 some/none/ok/err/is.case/ldcase instructions from parsing, metadata, validation,
 execution, verification, identity, service analysis and host input handling. All
 samples and host fixtures use ordinary System carriers and member calls. Unqualified
-Option/Result names now follow normal type lookup; they are not aliases.
+Optional/Result names now follow normal type lookup; they are not aliases.
 
 Artifacts now use format 4. JSON loading checks the version before decoding and
 rejects older artifacts with a source-reassembly diagnostic. There is no automatic
 conversion. Host import checks an ordinary carrier's actual erased payload: None
-can cross the boundary even for Option<Int32*>, while a stored pointer case is
+can cross the boundary even for Optional<Int32*>, while a stored pointer case is
 rejected before execution. This is ordinary record validation, not union awareness.
 
 Validation: all 449 tests in the full suite pass; the additional erased pointer-case
@@ -2187,7 +2187,7 @@ ownership. Existing GetOk/GetError remain checked accessors that Fault on mismat
 Updated the main sample to demonstrate explicit localloc output slots, an independent
 copy, a borrowed alias observing mutation, and copying the stack-backed Error case.
 Output remains 42, 7, 11. No runtime semantics, opcodes, managed byrefs, out metadata,
-System.Option/Result members or compiler conventions were added. Updated the carrier,
+System.Optional/Result members or compiler conventions were added. Updated the carrier,
 union convention and walkthrough documentation to distinguish implemented sample
 behavior from future library and language integration.
 
@@ -2367,7 +2367,7 @@ Removed its pointer-returning try-get variants at the user's request; the alias
 sample reads through the carrier's checked accessor. Output locals no longer need
 native allocation. Payload pointers keep their explicit lifetime
 rules. Added platform-written TryGet overloads selected by Some/None and Ok/Error
-case-reference types to Option/Result, plus an executable case-extraction sample. Existing checked accessors
+case-reference types to Optional/Result, plus an executable case-extraction sample. Existing checked accessors
 and the bootstrap carrier representation remain available and unchanged.
 
 Documented &value, T&, explicit dereferencing, output parameters, byref receivers and
@@ -2886,7 +2886,7 @@ checks passed.
 Implemented exhaustive match expressions and statements with named cases, copied
 payload bindings, discards and wildcard coverage. Scrutinees evaluate once. Arms have
 local scopes; expressions require one exact result type, while statement blocks may
-return or transfer loop control. Nested matches handle Option/Result and error unions.
+return or transfer loop control. Nested matches handle Optional/Result and error unions.
 Coverage requires bundled System's union marker, constructor cases and typed public
 accessors, not a source name convention alone. Lowering uses ordinary library calls
 and branches, including a defensive fault for malformed carriers; no new VM opcodes.

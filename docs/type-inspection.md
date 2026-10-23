@@ -63,7 +63,7 @@ the archived Neo profile. In the Raven profile they have moved to TypeInfo, reac
 through Type.Info. The existing
 binding registry validates their signatures. Reachability reports the TypeInspection
 runtime service for ldtoken and those imports. The original token/name/identity
-queries need no ValueStorage service; the newer Option-returning reflection queries
+queries need no ValueStorage service; the newer Optional-returning reflection queries
 use the current System.Value carrier. A future JIT/AOT backend must
 retain the required metadata and supply this service. The interpreter's owned snapshots
 are not a prescribed native handle layout or an implemented AOT backend.

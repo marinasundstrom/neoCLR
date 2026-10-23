@@ -6,9 +6,9 @@ Console is a static class in System. Standard streams use UTF-8.
 
 <a id="input"></a>
 
-## Reading input with Result and Option
+## Reading input with Result and Optional
 
-ReadLine returns Result<Option&lt;string&gt;, TextReadError>> directly. The current host console is synchronous. The question mark propagates a read error to the caller. The Some pattern binds the line; the else branch handles end-of-input and returns. An empty line is a successful value containing an empty string.
+ReadLine returns Result<Optional&lt;string&gt;, TextReadError>> directly. The current host console is synchronous. The question mark propagates a read error to the caller. The Some pattern binds the line; the else branch handles end-of-input and returns. An empty line is a successful value containing an empty string.
 
 ```raven
 {{CONSOLE_PROPAGATION_SAMPLE}}
@@ -36,7 +36,7 @@ synchronous escape hatch. All use Result-returning Create factories.
 
 ## Behavior and limits
 
-The shape is familiar from .NET Console: text properties and standard byte-stream factories. The contracts differ: input uses typed Result and Option values, text is strict UTF-8, and operations have explicit bounds. .NET ReadLine returns null at EOF; this API returns None.
+The shape is familiar from .NET Console: text properties and standard byte-stream factories. The contracts differ: input uses typed Result and Optional values, text is strict UTF-8, and operations have explicit bounds. .NET ReadLine returns null at EOF; this API returns None.
 
 Console operations return directly and can block; they do not manufacture Tasks. ReadLine recognizes the exact configured NewLine string (LF by default), and accepts at most 65,536 UTF-8 bytes per line. The overload accepts a smaller bound. Writers append their configured NewLine string (LF by default) without a BOM and allow at most 65,536 encoded bytes per call, including a newline. SyncStreamWriter completes writes directly; callers flush explicitly. Console redirection setters, colors and cursor controls are not implemented.
 
@@ -55,7 +55,7 @@ A small “press any key to exit” application:
 ```raven
 import System.*
 import System.Result.*
-import System.Option.*
+import System.Optional.*
 
 func Main() {
     let Ok(keys) = Console.OpenKeyInput(true) else {
@@ -136,6 +136,6 @@ appends nothing. See the [full contract](../../docs/console.html#configurable-li
 
 Development key values support `==`, `!=`, typed and boxed `Equals`, and matching
 `GetHashCode`. Comparisons include every modifier and the optional Unicode scalar's
-case and payload. `None`, `Some(0)` and an uninitialized Option remain distinct.
+case and payload. `None`, `Some(0)` and an uninitialized Optional remain distinct.
 [Validation and allocation scope](https://github.com/marinasundstrom/neoclr/tree/main/docs/experiments/record-unions)
 cover the three execution engines; this does not establish a throughput improvement.

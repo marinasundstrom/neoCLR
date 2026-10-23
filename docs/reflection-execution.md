@@ -62,7 +62,7 @@ remain outside this checkpoint.
 Property values can be references or built-in numeric, Boolean and Char scalars.
 Get boxes scalars; Set requires their exact boxed type. Reference assignment accepts
 compatible values and null. Null scalar values and numeric coercion are rejected.
-This does not establish JSON null/Option mapping or nullable-annotation policy.
+This does not establish JSON null/Optional mapping or nullable-annotation policy.
 Custom structs, enums and union value payloads remain unsupported.
 
 Compared with .NET [PropertyInfo.GetValue](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.propertyinfo.getvalue?view=net-10.0)

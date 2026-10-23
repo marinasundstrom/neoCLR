@@ -152,7 +152,7 @@ fn value_type_classification_uses_type_category_not_addressing_mode() {
         ("arrayref<Int32>", false),
         ("Int32&", false),
         ("Int32*", false),
-        ("System.Option<Int32>", true),
+        ("System.Optional<Int32>", true),
     ]
     .into_iter()
     .chain(vec![
@@ -271,7 +271,7 @@ ldc.i4 0
 callvirt instance System.Collections.Sequence<System.Introspection.PropertyInfo>::get_Item(Int32)
 {argument}
 callvirt instance System.Introspection.PropertyInfo::GetGetMethod(Boolean)
-call IsNone<System.Introspection.MethodInfo>(System.Option<System.Introspection.MethodInfo>)
+call IsNone<System.Introspection.MethodInfo>(System.Optional<System.Introspection.MethodInfo>)
 {predicate}
 ret
 .end
@@ -480,12 +480,12 @@ call instance System.Runtime.RuntimeContext::GetTypeInfoFromHandle(System.Runtim
     ] {
         assert_eq!(
             run_introspection(&format!(
-                "{prefix}{query}\ncall UnwrapSome<Int32>(System.Option<Int32>)\nret\n.end"
+                "{prefix}{query}\ncall UnwrapSome<Int32>(System.Optional<Int32>)\nret\n.end"
             )),
             Value::Int32(expected)
         );
     }
-    let query = "callvirt instance System.Introspection.TypeInfo::GetMethods()\nldc.i4 0\ncallvirt instance System.Collections.Sequence<System.Introspection.MethodInfo>::get_Item(Int32)\ncallvirt instance System.Introspection.MethodInfo::GetParameters()\nldc.i4 0\ncallvirt instance System.Collections.Sequence<System.Introspection.ParameterInfo>::get_Item(Int32)\ncallvirt instance System.Introspection.ParameterInfo::get_Module()\ncall UnwrapSome<System.Introspection.ModuleInfo>(System.Option<System.Introspection.ModuleInfo>)\ncallvirt instance System.Introspection.ModuleInfo::get_Name()";
+    let query = "callvirt instance System.Introspection.TypeInfo::GetMethods()\nldc.i4 0\ncallvirt instance System.Collections.Sequence<System.Introspection.MethodInfo>::get_Item(Int32)\ncallvirt instance System.Introspection.MethodInfo::GetParameters()\nldc.i4 0\ncallvirt instance System.Collections.Sequence<System.Introspection.ParameterInfo>::get_Item(Int32)\ncallvirt instance System.Introspection.ParameterInfo::get_Module()\ncall UnwrapSome<System.Introspection.ModuleInfo>(System.Optional<System.Introspection.ModuleInfo>)\ncallvirt instance System.Introspection.ModuleInfo::get_Name()";
     assert_eq!(
         run_introspection(&format!(
             "{}{query}\nret\n.end",
@@ -581,7 +581,7 @@ ldtoken {name}
 call instance System.Runtime.RuntimeContext::GetTypeInfoFromHandle(System.RuntimeTypeHandle)
 castclass System.Introspection.MemberInfo
 callvirt instance System.Introspection.MemberInfo::get_MetadataToken()
-call UnwrapSome<Int32>(System.Option<Int32>)
+call UnwrapSome<Int32>(System.Optional<Int32>)
 ret
 .end
 "#
@@ -622,7 +622,7 @@ ldc.i4 0
 callvirt instance System.Collections.Sequence<System.Introspection.PropertyInfo>::get_Item(Int32)
 castclass System.Introspection.MemberInfo
 callvirt instance System.Introspection.MemberInfo::get_MetadataToken()
-call UnwrapSome<Int32>(System.Option<Int32>)
+call UnwrapSome<Int32>(System.Optional<Int32>)
 ret
 .end
 "#;
@@ -632,8 +632,8 @@ ret
     assert_eq!(token >> 24, 0x17);
     assert_ne!(token & 0x00ff_ffff, 0);
     let query = query.replace("Main() -> Int32", "Main() -> String").replace(
-        "callvirt instance System.Introspection.MemberInfo::get_MetadataToken()\ncall UnwrapSome<Int32>(System.Option<Int32>)",
-        "callvirt instance System.Introspection.MemberInfo::get_Module()\ncall UnwrapSome<System.Introspection.ModuleInfo>(System.Option<System.Introspection.ModuleInfo>)\ncallvirt instance System.Introspection.ModuleInfo::get_Assembly()\ncallvirt instance System.Introspection.AssemblyInfo::get_Name()"
+        "callvirt instance System.Introspection.MemberInfo::get_MetadataToken()\ncall UnwrapSome<Int32>(System.Optional<Int32>)",
+        "callvirt instance System.Introspection.MemberInfo::get_Module()\ncall UnwrapSome<System.Introspection.ModuleInfo>(System.Optional<System.Introspection.ModuleInfo>)\ncallvirt instance System.Introspection.ModuleInfo::get_Assembly()\ncallvirt instance System.Introspection.AssemblyInfo::get_Name()"
     );
     assert_eq!(
         run_introspection(&query),

@@ -20,7 +20,7 @@ receiver, parameter, and return-type accessors expose the resolved contract with
 ## Argument and execution contract
 
 Inputs include primitives (numeric types, Boolean, String, and inhabited Void),
-[validated owned records](record-inputs.md), and ordinary Option/Result records.
+[validated owned records](record-inputs.md), and ordinary Optional/Result records.
 Arguments must be their exact storage Values. A Byte parameter
 requires Value::Byte, not Value::Int32; Single requires Value::Single, not Double.
 Guest ldarg still performs the existing evaluation-stack normalization, and stores
@@ -30,7 +30,7 @@ boundary from the normalized evaluation stack used by IL call instructions.
 Arity and argument values are checked before executing any instruction. A Void
 parameter still requires one Value::Void argument. Raw pointers and prototype Ref
 values cannot be supplied as arguments or receivers, including inside records or
-Option/Result alternatives. See [ordinary union inputs](union-inputs.md) for case
+Optional/Result alternatives. See [ordinary union inputs](union-inputs.md) for case
 and payload validation. Direct native/InternalCall targets are rejected during
 resolution; IL wrappers can call native declarations using the existing instruction contracts.
 
@@ -43,7 +43,7 @@ the function without inventing an instruction location. Execution Faults also pr
 
 The result is the existing Execution, with a precise stored return Value. Return types
 are not restricted to primitive types: a guest function may produce records, Result,
-Option, or pointers using the runtime's implemented operations. Its returned allocations
+Optional, or pointers using the runtime's implemented operations. Its returned allocations
 and native-library retention belong to that Execution. These results are not transferable
 guest handles into a later invocation. Supported owned results can be imported
 as data with validation; pointer/Ref transfer and persistent state need separate contracts.

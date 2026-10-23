@@ -2,7 +2,7 @@ module System.Collections
 
 import System.*
 
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 
 public open class ArrayList<T> : List<T> {
@@ -119,7 +119,7 @@ public open class ArrayList<T> : List<T> {
         return ArrayListIterator<T>(data, count)
     }
 
-    func Find(@match: (T) -> bool) -> System.Option<T> {
+    func Find(@match: (T) -> bool) -> System.Optional<T> {
         let buffer = data
         let extent = count
         var index = 0
@@ -133,7 +133,7 @@ public open class ArrayList<T> : List<T> {
         return None
     }
 
-    func FindLast(@match: (T) -> bool) -> System.Option<T> {
+    func FindLast(@match: (T) -> bool) -> System.Optional<T> {
         let buffer = data
         let extent = count
         var index = extent - 1
@@ -147,7 +147,7 @@ public open class ArrayList<T> : List<T> {
         return None
     }
 
-    func FindIndex(@match: (T) -> bool) -> System.Option<int> {
+    func FindIndex(@match: (T) -> bool) -> System.Optional<int> {
         let buffer = data
         let extent = count
         var index = 0
@@ -161,7 +161,7 @@ public open class ArrayList<T> : List<T> {
         return None
     }
 
-    func FindLastIndex(@match: (T) -> bool) -> System.Option<int> {
+    func FindLastIndex(@match: (T) -> bool) -> System.Optional<int> {
         let buffer = data
         let extent = count
         var index = extent - 1

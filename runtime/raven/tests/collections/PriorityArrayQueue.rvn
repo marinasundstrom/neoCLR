@@ -2,7 +2,7 @@ module NeoClr.RuntimeTests
 
 import System.*
 import System.Collections.*
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 import NeoClr.Testing.*
 
@@ -116,7 +116,7 @@ class CountingPriorityComparer : Comparer<int> {
 }
 
 class ReentrantPriorityComparer : Comparer<int> {
-    var Queue: Option<PriorityArrayQueue<int, int>> { get; set; } = None
+    var Queue: Optional<PriorityArrayQueue<int, int>> { get; set; } = None
 
     func Compare(left: int, right: int) -> int {
         if Queue is Some(let queue) {

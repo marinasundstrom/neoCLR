@@ -68,7 +68,7 @@ Collation.GetSortKey(text, options) -> Result<SortKey, CollationError>
 
 Existing ordinal String operations remain deterministic and do not silently become
 culture-sensitive. Culture-sensitive parsing and formatting should use typed Result
-errors (`DateParseError`, `NumberParseError`, `CultureError`); `Option` remains for
+errors (`DateParseError`, `NumberParseError`, `CultureError`); `Optional` remains for
 absence, not malformed input.
 
 ## .NET baseline, alternatives and tradeoffs

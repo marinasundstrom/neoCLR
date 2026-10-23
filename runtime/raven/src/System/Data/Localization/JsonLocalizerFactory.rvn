@@ -5,7 +5,7 @@ import System.Collections.*
 import System.DependencyInjection.*
 import System.Globalization.*
 import System.Introspection.*
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 
 /// A configured JSON factory with lazy, reusable catalogues per resource type.
@@ -45,7 +45,7 @@ internal class LocalizerFactoryEntry {
 internal class LazyJsonLocalizer : Localizer {
     private val provider: JsonLocalizerProvider
     private val resourceType: TypeInfo
-    private var loaded: Option<Localizer> = None
+    private var loaded: Optional<Localizer> = None
     val Culture: Culture
 
     init(provider: JsonLocalizerProvider, culture: Culture, resourceType: TypeInfo) {
@@ -65,7 +65,7 @@ internal class LazyJsonLocalizer : Localizer {
     }
 
     val self[key: string]: string => Load()[key]
-    func Find(key: string) -> Option<string> => Load().Find(key)
+    func Find(key: string) -> Optional<string> => Load().Find(key)
 }
 
 /// Registers the factory and the ordinary open generic typed adapter.

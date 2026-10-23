@@ -170,8 +170,8 @@ fn terminals_report_cardinality_and_dispose_at_the_expected_boundary() {
             "ldloc probe\ncall System.Linq.Operators::{operator}<Int32>(System.Collections.Iterable<Int32>)\n"
         );
         let result = match outcome {
-            "Some" => "call UnwrapSome<Int32>(System.Option<Int32>)".into(),
-            "None" => "call IsNone<Int32>(System.Option<Int32>)".into(),
+            "Some" => "call UnwrapSome<Int32>(System.Optional<Int32>)".into(),
+            "None" => "call IsNone<Int32>(System.Optional<Int32>)".into(),
             "Ok" => "call UnwrapOk<Int32,System.Linq.SingleError>(System.Result<Int32,System.Linq.SingleError>)".into(),
             case => format!("call UnwrapError<Int32,System.Linq.SingleError>(System.Result<Int32,System.Linq.SingleError>)\nstloc error\nldloca error\nldloca {case}Payload\ncall instance System.Linq.SingleError::TryGetValue(System.Linq.SingleError.{case}&)"),
         };
@@ -242,7 +242,7 @@ call instance System.Collections.ArrayList<Int32>::Add(Int32)
 ldloc values
 function.bind fn<Int32,Boolean> = Match(Int32)
 {operation}
-call UnwrapSome<Int32>(System.Option<Int32>)
+call UnwrapSome<Int32>(System.Optional<Int32>)
 ret
 .end
 "#
@@ -306,8 +306,8 @@ fn predicate_terminals_preserve_matching_order_outcomes_and_cleanup_without_quer
             let mut body = predicate_start(count, mode, -1, false);
             body += &predicate_call(operator, via_where);
             let result: String = match outcome {
-                "Some" => "call UnwrapSome<Int32>(System.Option<Int32>)".into(),
-                "None" => "call IsNone<Int32>(System.Option<Int32>)".into(),
+                "Some" => "call UnwrapSome<Int32>(System.Optional<Int32>)".into(),
+                "None" => "call IsNone<Int32>(System.Optional<Int32>)".into(),
                 "Ok" => "call UnwrapOk<Int32,System.Linq.SingleError>(System.Result<Int32,System.Linq.SingleError>)".into(),
                 case => format!("call UnwrapError<Int32,System.Linq.SingleError>(System.Result<Int32,System.Linq.SingleError>)\nstloc error\nldloca error\nldloca {case}Payload\ncall instance System.Linq.SingleError::TryGetValue(System.Linq.SingleError.{case}&)"),
             };

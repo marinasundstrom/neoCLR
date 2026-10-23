@@ -13,7 +13,7 @@ call and callvirt; the latter exposed and corrected a verifier stack-result bug.
 `Main.rvn` checks the public descriptor split: nominal declarations implement
 NominalTypeInfo and MemberInfo, arrays implement only TypeInfo, common display and
 type queries remain available, equality works across providers and object discovery
-and collection preserve descriptors. A constructed Option<int[]> keeps a nominal
+and collection preserve descriptors. A constructed Optional<int[]> keeps a nominal
 outer descriptor and a structural generic-argument descriptor. `verify.py` also rejects declaration-only
 members on a plain TypeInfo parameter.
 

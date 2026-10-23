@@ -21,8 +21,8 @@ let found = values.Find(IsAnswer)
 ```
 
 The Raven profile's [ArrayList filtering methods](arraylist-filtering.md) now scan
-storage directly. Find/FindLast return Option<T>; FindIndex/FindLastIndex return
-Option<int>, replacing the earlier -1 sentinel. Exists and TrueForAll return Boolean;
+storage directly. Find/FindLast return Optional<T>; FindIndex/FindLastIndex return
+Optional<int>, replacing the earlier -1 sentinel. Exists and TrueForAll return Boolean;
 FindAll returns an independent list. No iterator is acquired by these methods.
 A callback fault remains terminal; no fault-path finally/defer cleanup is introduced.
 

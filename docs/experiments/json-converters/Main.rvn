@@ -2,7 +2,7 @@ import System.*
 import System.Collections.*
 import System.Data.Json.*
 import System.IO.*
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 
 public union Reading {
@@ -24,7 +24,7 @@ func ReadNumber(value: int) -> Reading {
     return Reading.Number(value)
 }
 
-func GetNumber(value: Reading) -> Option<int> {
+func GetNumber(value: Reading) -> Optional<int> {
     return match value {
         Reading.Number(let number) => Some(number)
         _ => None
@@ -35,7 +35,7 @@ func ReadText(value: string) -> Reading {
     return Reading.Text(value)
 }
 
-func GetText(value: Reading) -> Option<string> {
+func GetText(value: Reading) -> Optional<string> {
     return match value {
         Reading.Text(let text) => Some(text)
         _ => None

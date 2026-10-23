@@ -4,8 +4,8 @@ import System.*
 
 func Main() -> int {
     let payload = "quote\"slash\\end🙂\u0000"
-    let actual = Option<string>.Some(payload).ToString()
-    let escaped = "Option.Some(\"quote\\\"slash\\\\end🙂\u0000\")"
+    let actual = Optional<string>.Some(payload).ToString()
+    let escaped = "Optional.Some(\"quote\\\"slash\\\\end🙂\u0000\")"
     if String.CompareOrdinal(actual, escaped) != 0 {
         return 1
     }

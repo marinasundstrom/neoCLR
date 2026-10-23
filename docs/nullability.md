@@ -69,12 +69,12 @@ Existing lifetime protection must not be bypassed by calling an operation reset.
 
 ## Optionality and the library
 
-Prefer Option<T> for optional results and domain alternatives. Nullable storage has
+Prefer Optional<T> for optional results and domain alternatives. Nullable storage has
 a narrower primary purpose: explicit state that may be cleared or reset to null.
-Do not automatically convert Option.None into null, infer nullability from a reference,
-or treat uninitialized slots as Option.None.
+Do not automatically convert Optional.None into null, infer nullability from a reference,
+or treat uninitialized slots as Optional.None.
 
-The representation and any explicit conversions between Option<T> and N(T) remain
+The representation and any explicit conversions between Optional<T> and N(T) remain
 design decisions. Nested combinations must retain their meaning if supported.
 Native pointers retain their current interop behavior for now; reconciling Ptr/null
 operations with future qualified signatures needs an explicit migration and ABI decision.
@@ -92,7 +92,7 @@ Sources checked 2026-09-08:
 
 neoCLR's proposed improvement is one explicit runtime signature characteristic across
 its value and managed-reference addressing forms, with non-nullable defaults and
-Option-based optionality. Costs include payload-state representation, checked access,
+Optional-based optionality. Costs include payload-state representation, checked access,
 GC behavior, substitution and metadata migration. It does not imply a faster runtime
 or automatically safer native pointers.
 
@@ -143,7 +143,7 @@ contract, not just a new signature bit. Test mutation through aliases after a nu
 check, generic substitution, reflection writes, direct IL and cross-module calls.
 Flow-sensitive source diagnostics remain useful even with runtime enforcement.
 
-Option stays the preferred domain-absence API. Neither Option nor metadata eliminates
+Optional stays the preferred domain-absence API. Neither Optional nor metadata eliminates
 the need to support intentional null and foreign boundaries. A uniform surface need
 not require an identical physical representation for nullable values and references.
 
@@ -155,7 +155,7 @@ neoCLR can simplify it without shifting excessive complexity to compilers remain
 
 ## Current declaration policy (2026-09-24)
 
-The author prefers Option<T> for modeled absence across value and reference types,
+The author prefers Optional<T> for modeled absence across value and reference types,
 while retaining nullable reference annotations for Raven compatibility. Nullable
 structs/Nullable<T> remain deferred. The author additionally requested a compiler
 option with the diagnostic "Value types can't be declared as nullable".
@@ -166,7 +166,7 @@ RavenAllowNullableValueTypes project property, and --no-nullable-value-types /
 RAV0407 rejects known nullable value declarations, including struct-constrained
 type parameters; reference annotations remain valid. This gives an earlier compiler
 error instead of relying on unsupported runtime/importer behavior. It intentionally
-reduces .NET source compatibility; Option<T> is the supported absence model.
+reduces .NET source compatibility; Optional<T> is the supported absence model.
 
 The option is a source declaration policy, not a verifier guarantee for arbitrary
 metadata or inferred values. Unconstrained generic parameters are not diagnosed as

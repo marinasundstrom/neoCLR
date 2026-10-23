@@ -6,12 +6,12 @@ calling convention: they leave no result on the evaluation stack. A targeting
 compiler supplies or discards the unit value when an expression context requires
 it. Users normally do not construct Void themselves.
 
-Use `Option<T>` for a useful value or absence, and `Result<Void, E>` for completion
-or error. `Option<Void>` remains technically valid, but it is not the recommended
+Use `Optional<T>` for a useful value or absence, and `Result<Void, E>` for completion
+or error. `Optional<Void>` remains technically valid, but it is not the recommended
 API example: its useful distinction would be the case, not the payload. `None`
-already expresses absence. The propagation protocol's Void residual for Option
+already expresses absence. The propagation protocol's Void residual for Optional
 is an internal representation of that absence, not a recommendation to use Void
-as Option's public output type.
+as Optional's public output type.
 
 ## CLR comparison and layer boundaries
 
@@ -84,7 +84,7 @@ arguments and both success/error paths of Result<Void, E> propagation. The gener
 Runtime Contract mechanism is validated separately on .NET using System.ValueTuple;
 that does not establish Void-generic execution on the .NET CLR.
 
-The current executable examples are `Option<int>` and `Result<Void, OverflowError>`.
+The current executable examples are `Optional<int>` and `Result<Void, OverflowError>`.
 Broader generic payloads, reflection exposure and native ABI details still need
 validation as those features enter the target profile.
 

@@ -1,36 +1,36 @@
 ; Generated from runtime/raven/src/System/Collections/ArrayList.rvn. Regenerate with build_runtime_library.py.
-.function neoCLR.Library.System.Collections.ArrayList.RuntimeUnion0() -> System.Option.None
-newobj instance System.Option.None::.ctor()
+.function neoCLR.Library.System.Collections.ArrayList.RuntimeUnion0() -> System.Optional.None
+newobj instance System.Optional.None::.ctor()
 ret
 .end
-.function neoCLR.Library.System.Collections.ArrayList.RuntimeUnion1<T0>(System.Option.None arg0) -> System.Option<T0>
+.function neoCLR.Library.System.Collections.ArrayList.RuntimeUnion1<T0>(System.Optional.None arg0) -> System.Optional<T0>
 ldarg arg0
-newobj instance System.Option<T0>::.ctor(System.Option.None)
+newobj instance System.Optional<T0>::.ctor(System.Optional.None)
 ret
 .end
-.function neoCLR.Library.System.Collections.ArrayList.RuntimeUnion2<T0>(T0 arg0) -> System.Option.Some<T0>
+.function neoCLR.Library.System.Collections.ArrayList.RuntimeUnion2<T0>(T0 arg0) -> System.Optional.Some<T0>
 ldarg arg0
-newobj instance System.Option.Some<T0>::.ctor(T0)
+newobj instance System.Optional.Some<T0>::.ctor(T0)
 ret
 .end
-.function neoCLR.Library.System.Collections.ArrayList.RuntimeUnion3<T0>(System.Option.Some<T0> arg0) -> System.Option<T0>
+.function neoCLR.Library.System.Collections.ArrayList.RuntimeUnion3<T0>(System.Optional.Some<T0> arg0) -> System.Optional<T0>
 ldarg arg0
-newobj instance System.Option<T0>::.ctor(System.Option.Some<T0>)
+newobj instance System.Optional<T0>::.ctor(System.Optional.Some<T0>)
 ret
 .end
-.function neoCLR.Library.System.Collections.ArrayList.RuntimeUnion4(System.Option.None arg0) -> System.Option<Int32>
+.function neoCLR.Library.System.Collections.ArrayList.RuntimeUnion4(System.Optional.None arg0) -> System.Optional<Int32>
 ldarg arg0
-newobj instance System.Option<Int32>::.ctor(System.Option.None)
+newobj instance System.Optional<Int32>::.ctor(System.Optional.None)
 ret
 .end
-.function neoCLR.Library.System.Collections.ArrayList.RuntimeUnion5(Int32 arg0) -> System.Option.Some<Int32>
+.function neoCLR.Library.System.Collections.ArrayList.RuntimeUnion5(Int32 arg0) -> System.Optional.Some<Int32>
 ldarg arg0
-newobj instance System.Option.Some<Int32>::.ctor(Int32)
+newobj instance System.Optional.Some<Int32>::.ctor(Int32)
 ret
 .end
-.function neoCLR.Library.System.Collections.ArrayList.RuntimeUnion6(System.Option.Some<Int32> arg0) -> System.Option<Int32>
+.function neoCLR.Library.System.Collections.ArrayList.RuntimeUnion6(System.Optional.Some<Int32> arg0) -> System.Optional<Int32>
 ldarg arg0
-newobj instance System.Option<Int32>::.ctor(System.Option.Some<Int32>)
+newobj instance System.Optional<Int32>::.ctor(System.Optional.Some<Int32>)
 ret
 .end
 .function neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanFromInt32(Int32 value) -> Boolean

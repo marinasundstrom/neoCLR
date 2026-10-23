@@ -21,7 +21,7 @@ fn source_rejects_missing_initialization_and_incorrect_output_use() {
         "func Set(out a: int&) -> () { a = 1 }\nfunc Main() -> () { var a = 0\nSet(&a) }",
         "func Read(a: int&) -> () {}\nfunc Main() -> () { var a = 0\nRead(out a) }",
         "func Read(a: int&) -> () {}\nfunc Main() -> () { var a: int\nRead(&a) }",
-        "func Main() -> System.Type { let o = typeof(int&).GetElementType()\nvar some: System.Option.Some<System.Type>\no.TryGet(out some)\nreturn some.Value }",
+        "func Main() -> System.Type { let o = typeof(int&).GetElementType()\nvar some: System.Optional.Some<System.Type>\no.TryGet(out some)\nreturn some.Value }",
     ] {
         assert!(frontend::compile(source).is_err(), "{source}");
     }

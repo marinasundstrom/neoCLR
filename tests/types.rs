@@ -151,12 +151,12 @@ fn pointer_signatures_are_distinct_from_ownership_and_support_nested_types() {
         parse_type("Ptr<int32>").unwrap(),
         parse_type("int32&").unwrap()
     );
-    let module = assemble(".module Test\n.entry Main\n.function Unused(Ptr<Int32>, Int32&) -> Void\nldvoid\nret\n.end\n.function Main() -> System.Option<Ptr<Int32>>\nnewobj instance System.Option.None::.ctor()\nnewobj instance System.Option<Ptr<Int32>>::.ctor(System.Option.None)\nret\n.end").unwrap();
+    let module = assemble(".module Test\n.entry Main\n.function Unused(Ptr<Int32>, Int32&) -> Void\nldvoid\nret\n.end\n.function Main() -> System.Optional<Ptr<Int32>>\nnewobj instance System.Optional.None::.ctor()\nnewobj instance System.Optional<Ptr<Int32>>::.ctor(System.Optional.None)\nret\n.end").unwrap();
     let loaded = load(&serde_json::to_string(&module).unwrap()).unwrap();
     assert_eq!(
         run(&loaded, Limits::default()).unwrap().value.ty(),
         Type::Constructed {
-            definition: "System.Option".into(),
+            definition: "System.Optional".into(),
             arguments: vec![Type::Ptr(Box::new(Type::Int32))]
         }
     );

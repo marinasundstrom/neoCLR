@@ -2,7 +2,7 @@
 
 This page records the historical Neo profile implemented on 2026-09-08. The current
 Raven profile uses [direct ArrayList filtering](arraylist-filtering.md), including
-Option index results and additional methods. The older Neo implementation below
+Optional index results and additional methods. The older Neo implementation below
 is retained independently; its -1 sentinel and iterator allocation do not describe
 the new Raven profile. [LINQ support](raven-query-api.md) has also been added since
 this original design.
@@ -13,7 +13,7 @@ deferred queries and query pipelines remain future work.
 
 | Method | Result |
 | --- | --- |
-| Find(Func<T,Boolean> match) | Option<T>: Some(first matching value), otherwise None |
+| Find(Func<T,Boolean> match) | Optional<T>: Some(first matching value), otherwise None |
 | FindIndex(Func<T,Boolean> match) | Zero-based first matching index, otherwise -1 |
 | Exists(Func<T,Boolean> match) | Whether an element matches |
 
@@ -41,7 +41,7 @@ normal returns, and releases the frame's references on return. Callback faults r
 the ordinary guest stack trace and terminate the run; no exception unwinding or
 guaranteed resource cleanup on faults is added. This iterator owns only managed memory.
 
-Search takes O(n) predicate calls in the worst case. Find constructs an Option carrier;
+Search takes O(n) predicate calls in the worst case. Find constructs an Optional carrier;
 Exists and FindIndex do not. Value copies, delegate/capture allocations and the iterator
 allocation are real costs; no performance comparison is claimed.
 
@@ -58,7 +58,7 @@ Primary sources consulted 2026-09-08:
   the separate need for a consistent future equality/hash strategy.
 
 Keeping default(T) would make zero indistinguishable from absence and cannot supply a
-valid default for nonnullable references. Returning Option<T> represents both cases
+valid default for nonnullable references. Returning Optional<T> represents both cases
 without changing element nullability; its cost is carrier construction and a different
 return API from .NET. FindIndex retains the familiar -1 sentinel because it is an
 ordinary Int32 result, not an invalid element/reference. The caller explicitly chooses
@@ -72,7 +72,7 @@ concrete operations. LINQ remains a separate future concern.
 
 The [pinned .NET probe](experiments/common-interfaces-dotnet/Program.cs) demonstrates
 first-match short-circuiting and the ambiguous zero/default result. Neo regression
-coverage adds Option<UserType> and Option<UserType&>, no-default empty searches,
+coverage adds Optional<UserType> and Optional<UserType&>, no-default empty searches,
 readonly custom equality, callback faults, GC and mutation during callbacks.
 
 ## Run the example

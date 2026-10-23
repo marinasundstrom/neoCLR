@@ -15,7 +15,7 @@ parser.add_argument('--runtime', type=Path, required=True)
 args = parser.parse_args()
 bridge = Path(__file__).resolve().parent
 header = '''import System.*
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 import System.Linq.*
 import System.Console.*
@@ -40,7 +40,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-outcomes-') as temporary:
          'Option operators passed\nResult operators passed\n'),
         ('Reference and completion payloads', header + '''
 func Main() {
-    let word: Option<string> = Some("text")
+    let word: Optional<string> = Some("text")
     let mapped = word.Map(value => String.Concat(value, "!"))
     match mapped {
         Some(let value) => WriteLine(value)
@@ -49,9 +49,9 @@ func Main() {
     let completed: Result<unit, string> = Ok(())
     let answer = completed.Map((value: unit) -> int => 42)
     WriteLine(answer.UnwrapOr(0))
-    let absent: Option<unit> = None
+    let absent: Optional<unit> = None
     WriteLine(absent.ToIterable().Count())
-    let nested: Option<Option<string>> = Some(word)
+    let nested: Optional<Optional<string>> = Some(word)
     WriteLine(nested.Flatten().UnwrapOr("missing"))
 }
 ''', 'text!\n42\n0\ntext\n')]
@@ -66,7 +66,7 @@ func Main() {
 
     result = run(header + '''
 func Main() {
-    let value: Option<int> = Some(1)
+    let value: Optional<int> = Some(1)
     value.Map((item: int) -> int => {
         System.Fail("Outcome callback failed")
         return item
@@ -83,7 +83,7 @@ func Main() {
         ('Then requires Option result', 'value.Then((item: int) -> int => item)'),
         ('Flatten requires nested Option', 'value.Flatten()'),
         ('No Where alias', 'value.Where((item: int) -> bool => true)')):
-        result = run(header + 'func Main() {\n    let value: Option<int> = Some(1)\n    ' + expression + '\n}\n')
+        result = run(header + 'func Main() {\n    let value: Optional<int> = Some(1)\n    ' + expression + '\n}\n')
         assert result.returncode != 0 and 'RAV' in result.stderr, result.stdout + result.stderr
         assert 'Verified saved project:' not in result.stdout
         results[label] = 'rejected before execution'

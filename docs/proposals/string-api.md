@@ -399,7 +399,7 @@ Because UTF-8 is native, `AsUtf8()` and UTF-8 encoding can have optimized paths 
 
 ---
 
-## 10. `Option`, `Result`, and Fault follow NeoCLR conventions
+## 10. `Optional`, `Result`, and Fault follow NeoCLR conventions
 
 String APIs don't retain .NET sentinel values simply for familiarity.
 
@@ -407,7 +407,7 @@ For example:
 
 ```raven
 text.IndexOf("foo")
-    -> Option<Int>
+    -> Optional<Int>
 ```
 
 instead of `-1`.

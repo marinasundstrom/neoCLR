@@ -21,7 +21,7 @@ identity or a display string. The current hash uses FullName via System.HashCode
 distinct definitions with the same name may collide. This is a bounded consistency
 implementation, not a unique type ID, cross-build key or hash performance claim.
 Typed Equals(TypeInfo) remains non-nullable. Object.Equals(Object?) explicitly handles
-null; no nullable value type or automatic Option conversion is introduced.
+null; no nullable value type or automatic Optional conversion is introduced.
 
 The fixture also checks assembly and module wrappers through Object equality/hash/display,
 rejects null and other descriptor kinds, and retains descriptor-keyed HashMap entries

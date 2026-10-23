@@ -60,7 +60,7 @@ interpreter also carries diagnostic allocation identity and offset information
 outside those bytes. These are not part of the guest pointer's native layout.
 `ceq` compares addresses for matching pointer types; it does not compare pointee data.
 `ptr.null T` creates address zero, representing an actual null pointer. Ordinary
-absence in the library remains Option.
+absence in the library remains Optional.
 
 Supported storage layouts:
 
@@ -81,7 +81,7 @@ Supported storage layouts:
 Scalars use native byte order. Boolean reads accept only 0 or 1. Record reads require
 initialized fields, but not padding. Pointer fields support recursive structures;
 recursive by-value layouts are rejected. String, Ref, System.Value and the
-current System.Option/Result carriers do not have native storage layouts. Their pointers can be represented and cast,
+current System.Optional/Result carriers do not have native storage layouts. Their pointers can be represented and cast,
 but the unsupported pointee layouts cannot be allocated or dereferenced. Layout is
 computed on the execution host, not serialized as a fixed architecture's offsets.
 This sequential subset is not a complete foreign ABI or StructLayout implementation.

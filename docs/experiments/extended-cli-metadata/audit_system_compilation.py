@@ -49,7 +49,7 @@ def main():
         'introspection': folder('Introspection') + folder('Runtime/Reflection') + names('Runtime/RuntimeContext'),
         'json': folder('Data') + folder('Introspection') + folder('Runtime/Reflection') + names('Runtime/RuntimeContext'),
         'namespace-functions': names('Functions', 'Console/Functions', 'Console/Streams', 'Environment/Functions', 'EnvironmentError', 'ConsoleReadError'),
-        'operators': names('OptionOperators', 'ResultOperators'),
+        'operators': names('OptionalOperators', 'ResultOperators'),
     }
     probes = {
         'probe-unit-value': 'import System.*\nfunc Read() -> Result<unit, string> => .Ok(())\n',

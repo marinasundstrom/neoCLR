@@ -3,7 +3,7 @@
 This slice implements type parameter references, constructed type references, generic
 record field signatures, validation, substitution, and closed generic record values.
 Static and instance IL methods on generic types and ordinary library-defined
-System.Option/Result are implemented. Concrete static/free [functions with their own type parameters](function-generics.md)
+System.Optional/Result are implemented. Concrete static/free [functions with their own type parameters](function-generics.md)
 are implemented; generic instance methods remain deferred; read-only type inspection is documented separately
 in [type inspection](type-inspection.md).
 
@@ -11,7 +11,7 @@ in [type inspection](type-inspection.md).
 .type Pair<Left, !1>
     .field First Left
     .field Second !1
-    .field Nested System.Option<Left>
+    .field Nested System.Optional<Left>
 .end
 ```
 
@@ -77,8 +77,8 @@ fields have supported layouts. Method-level parameters are supported on concrete
 static/free functions; generic instance methods remain deferred. A recursive
 pointer signature does not expand its pointee or acquire a lifetime/ownership policy.
 
-System.Option and System.Result are ordinary generic definitions. Unqualified
-Option/Result names have no special runtime meaning and require ordinary definitions
+System.Optional and System.Result are ordinary generic definitions. Unqualified
+Optional/Result names have no special runtime meaning and require ordinary definitions
 to resolve. Ref and Ptr retain distinct runtime signature forms. Generic record
 construction, members, marker attributes and explicit typed storage implement the
 [union convention](union-convention.md); there are no union-specific instructions

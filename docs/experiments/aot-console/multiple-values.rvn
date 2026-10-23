@@ -1,11 +1,11 @@
 import System.*
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 
 func Main() -> int {
-    let number: Option<int> = Some(42)
-    let word: Option<string> = Some("ready")
-    let absent: Option<string> = None()
+    let number: Optional<int> = Some(42)
+    let word: Optional<string> = Some("ready")
+    let absent: Optional<string> = None()
     let Ok(value) = Result<int, byte>.Ok(42) else {
         return 1
     }

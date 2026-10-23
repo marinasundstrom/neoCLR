@@ -1,12 +1,12 @@
 import System.*
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 
-record struct OptionalKey(Value: Option<int>)
-record struct TextKey(Value: Option<string>)
-record struct NullableTextKey(Value: Option<string?>)
-record struct CharacterKey(Value: Option<char>)
-record struct NestedKey(Value: Option<Option<int>>)
+record struct OptionalKey(Value: Optional<int>)
+record struct TextKey(Value: Optional<string>)
+record struct NullableTextKey(Value: Optional<string?>)
+record struct CharacterKey(Value: Optional<char>)
+record struct NestedKey(Value: Optional<Optional<int>>)
 record struct ResultKey(Value: Result<int, string>)
 union Choice {
     case Empty

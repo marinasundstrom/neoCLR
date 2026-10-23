@@ -1,6 +1,6 @@
 import System.*
 import System.Collections.*
-import System.Option.*
+import System.Optional.*
 
 public enum State { Ready = 1, Alias = 1, Failed = -1 }
 public enum Other { Ready = 1 }

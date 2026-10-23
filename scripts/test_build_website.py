@@ -135,16 +135,16 @@ class RavenDocPages(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         xrefs = {uid.replace('+', '.'): path for uid, path in
                  json.loads((output / 'xref-map.json').read_text()).items()}
-        for name in ('System.Array', 'System.Option.Some`1', 'System.Result.Ok`1',
+        for name in ('System.Array', 'System.Optional.Some`1', 'System.Result.Ok`1',
                      'System.Concurrency.Tasks.TaskOutcome.Cancelled',
                      'Raven.Runtime.CompilerServices.RavenUnionCompanionAttribute'):
             self.assertNotIn('T:' + name, xrefs)
-        for name in ('System.Array`1', 'System.Option`1', 'System.Result`2',
+        for name in ('System.Array`1', 'System.Optional`1', 'System.Result`2',
                      'System.Concurrency.Tasks.TaskOutcome`1'):
             self.assertIn('T:' + name, xrefs)
             self.assertTrue((output / xrefs['T:' + name].split('#')[0]).is_file(), name)
         # Companion IDs remain useful aliases, but never create duplicate pages.
-        for name, arity in (('System.Option', 1), ('System.Result', 2), ('System.Concurrency.Tasks.TaskOutcome', 1)):
+        for name, arity in (('System.Optional', 1), ('System.Result', 2), ('System.Concurrency.Tasks.TaskOutcome', 1)):
             self.assertEqual(xrefs['T:' + name], xrefs['T:' + name + '`' + str(arity)])
         case = (output / 'api/System/BooleanParseError/InvalidFormat/index.html').read_text()
         self.assertNotIn('ReferenceEquals', case)
@@ -168,7 +168,7 @@ class RavenDocPages(unittest.TestCase):
         for receiver, container, methods in (
                 ('System/Concurrency/Tasks/Task`1', 'TaskOperators', ('Map', 'Then')),
                 ('System/Result`2', 'ResultOperators', ('Map', 'Then', 'MapError')),
-                ('System/Option`1', 'OptionOperators', ('Map',))):
+                ('System/Optional`1', 'OptionalOperators', ('Map',))):
             page = (output / 'api' / receiver / 'index.html').read_text()
             self.assertIn('data-member-extension="true"', page, receiver)
             self.assertNotIn('Number&lt;T&gt;.op_', page, receiver)
@@ -350,7 +350,7 @@ class PublicMetadataInventory(unittest.TestCase):
         actual = public_types(root / 'api-docs/reference/NeoCLR.CoreProbe.dll')
         self.assertEqual(actual, json.loads((root / 'api-docs/types.json').read_text()))
         for name in ('System.Collections.ArrayList`1', 'System.Collections.HashMap`2',
-                     'System.Option.Some`1', 'System.Runtime.CompilerServices.IsReadOnlyAttribute'):
+                     'System.Optional.Some`1', 'System.Runtime.CompilerServices.IsReadOnlyAttribute'):
             self.assertIn(name, actual)
         self.assertNotIn('System.Introspection.RuntimeTypeInfo', actual)
 

@@ -1,11 +1,11 @@
 module System.Collections
 
 import System.*
-import System.Option.*
+import System.Optional.*
 
 /// Unsynchronized array-backed FIFO queue. Iteration captures a shallow snapshot.
 public class ArrayQueue<T> : Queue<T> {
-    private var slots: ArrayList<Option<T>> = ArrayList<Option<T>>()
+    private var slots: ArrayList<Optional<T>> = ArrayList<Optional<T>>()
     private var head = 0
     private var count = 0
 
@@ -15,7 +15,7 @@ public class ArrayQueue<T> : Queue<T> {
         if capacity < 0 {
             System.Fail("Collection capacity must be non-negative")
         }
-        slots = ArrayList<Option<T>>(capacity)
+        slots = ArrayList<Optional<T>>(capacity)
         var index = 0
         while index < capacity {
             slots.Add(None)
@@ -55,7 +55,7 @@ public class ArrayQueue<T> : Queue<T> {
             if capacity != 0 {
                 size = capacity * 2
             }
-            let expanded = ArrayList<Option<T>>(size)
+            let expanded = ArrayList<Optional<T>>(size)
             var index = 0
             while index < count {
                 expanded.Add(slots[Position(index)])
@@ -72,14 +72,14 @@ public class ArrayQueue<T> : Queue<T> {
         count = count + 1
     }
 
-    func Peek() -> Option<T> {
+    func Peek() -> Optional<T> {
         if count == 0 {
             return None
         }
         return slots[head]
     }
 
-    func Dequeue() -> Option<T> {
+    func Dequeue() -> Optional<T> {
         if count == 0 {
             return None
         }

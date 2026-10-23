@@ -304,7 +304,7 @@ The nested station case adds required `readings: int[]` and checks 19 independen
 server cases, the managed pair and the managed client against an independent server.
 This changes the development sample's wire contract; Preview 10 remains unchanged.
 See [collection evidence](collection-validation.json), including runtime adapters and
-the independently extracted Raven target-metadata array fix. Enum, Uuid and Option
+the independently extracted Raven target-metadata array fix. Enum, Uuid and Optional
 mapping are the next author-requested slices.
 
 

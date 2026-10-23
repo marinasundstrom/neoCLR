@@ -28,8 +28,8 @@ fn type_descriptor_exposes_name_arguments_and_owner_read_only() {
     for (case, owner) in [
         ("System.Result.Ok<Int32>", "System.Result"),
         ("System.Result.Failure<String>", "System.Result"),
-        ("System.Option.Some<Int32>", "System.Option"),
-        ("System.Option.None", "System.Option"),
+        ("System.Optional.Some<Int32>", "System.Optional"),
+        ("System.Optional.None", "System.Optional"),
     ] {
         let descriptor = program
             .describe_type(&neoclr::assembler::parse_type(case).unwrap())

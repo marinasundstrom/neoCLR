@@ -46,7 +46,7 @@ static class MetadataIdentityChecks
         type.NestedTypes.Add(nested);
         var literal = new TypeReference(type.Namespace, type.Name + "/Child", module, module);
         Check(MetadataIdentity.TypeName(nested) != MetadataIdentity.TypeName(literal), "Nested and literal names collided.");
-        var generic = new GenericInstanceType(new TypeReference("Example", "Option`1", module, module));
+        var generic = new GenericInstanceType(new TypeReference("Example", "Optional`1", module, module));
         generic.GenericArguments.Add(module.TypeSystem.Int32);
         var closed = MetadataIdentity.TypeKey(generic);
         generic.GenericArguments[0] = module.TypeSystem.String;

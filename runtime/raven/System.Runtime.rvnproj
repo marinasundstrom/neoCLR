@@ -82,7 +82,7 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == ''">
     <Compile Include="src/System/Math/Functions.rvn" />
     <Compile Include="src/System/Linq/Operators.rvn" />
-    <Compile Include="src/System/OptionOperators.rvn" />
+    <Compile Include="src/System/OptionalOperators.rvn" />
     <Compile Include="src/System/ResultOperators.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'FileText'">
@@ -266,8 +266,8 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Propagatable'">
     <Compile Include="src/System/Propagatable.rvn" />
   </ItemGroup>
-  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Option'">
-    <Compile Include="src/System/Option.rvn" />
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Optional'">
+    <Compile Include="src/System/Optional.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Result'">
     <Compile Include="src/System/Result.rvn" />

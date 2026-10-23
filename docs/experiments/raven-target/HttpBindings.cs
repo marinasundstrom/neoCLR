@@ -30,7 +30,7 @@ static class HttpBindings
             public sealed class RoutePattern {
                 private RoutePattern() { }
                 public static Result<RoutePattern, string> Parse(string pattern) => default;
-                public Result<Option<RouteMatch>, string> Match(string target) => default;
+                public Result<Optional<RouteMatch>, string> Match(string target) => default;
                 public Collections.Sequence<string> GetParameterNames() => default;
                 public bool Overlaps(RoutePattern other) => default;
             }
@@ -44,8 +44,8 @@ static class HttpBindings
                 public HttpClient(HttpHandler handler) { }
                 public HttpClient(HttpHandler handler, bool disposeHandler) { }
                 public void Dispose() { }
-                public Option<string> BaseUri { get; set; }
-                public Option<Time.Duration> Timeout { get; set; }
+                public Optional<string> BaseUri { get; set; }
+                public Optional<Time.Duration> Timeout { get; set; }
                 public Collections.Sequence<HttpHeader> DefaultRequestHeaders { get; set; }
                 public Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Get(string url) => default;
                 public Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Get(string url, Concurrency.CancellationToken cancellationToken) => default;
@@ -159,7 +159,7 @@ static class HttpBindings
                 public HttpVersion Version => default;
                 public string ReasonPhrase => default;
                 public void Dispose() { }
-                public Option<HttpRequest> Request => default;
+                public Optional<HttpRequest> Request => default;
                 public void Associate(HttpRequest request) { }
                 public HttpResponse(int statusCode, Collections.Sequence<HttpHeader> headers, HttpContent content) { }
                 public HttpResponse(HttpStatusCode statusCode, Collections.Sequence<HttpHeader> headers, HttpContent content) { }
@@ -179,11 +179,11 @@ static class HttpBindings
                 protected HttpContent(IO.InputStream stream, int length, bool leaveOpen) { }
                 public bool IsBuffered => default;
                 public int Length => default;
-                public Option<IO.InputStream> TryGetStream() => default;
+                public Optional<IO.InputStream> TryGetStream() => default;
                 public void Dispose() { }
                 internal Result<PropagationUnit, HttpError> BeginUpload() => default;
                 internal Concurrency.Tasks.Task<Result<int, HttpError>> ReadUpload(byte[] buffer, int count, Concurrency.CancellationToken cancellationToken) => default;
-                internal Option<string> MediaType => default;
+                internal Optional<string> MediaType => default;
                 public Concurrency.Tasks.Task<Result<PropagationUnit, HttpError>> CopyTo(IO.OutputStream destination) => default;
                 public Concurrency.Tasks.Task<Result<PropagationUnit, HttpError>> CopyTo(IO.OutputStream destination, Concurrency.CancellationToken cancellationToken) => default;
             }
@@ -224,7 +224,7 @@ static class HttpBindings
                 public Concurrency.Tasks.Task<Result<PropagationUnit, HttpError>> ServeOne(Func<HttpRequest, Concurrency.Tasks.Task<Result<HttpResponse, HttpError>>> handler, Concurrency.CancellationToken cancellationToken) => default;
                 public long CompletedRequests => default;
                 public long FailedRequests => default;
-                public Option<HttpError> LastRequestError => default;
+                public Optional<HttpError> LastRequestError => default;
                 public Concurrency.Tasks.Task<Result<PropagationUnit, HttpError>> Serve(Func<HttpRequest, Concurrency.Tasks.Task<Result<HttpResponse, HttpError>>> handler) => default;
                 public Concurrency.Tasks.Task<Result<PropagationUnit, HttpError>> Serve(Func<HttpRequest, Concurrency.Tasks.Task<Result<HttpResponse, HttpError>>> handler, Concurrency.CancellationToken cancellationToken) => default;
                 public Concurrency.Tasks.Task<Result<PropagationUnit, HttpError>> Serve(Func<HttpContext, Concurrency.Tasks.Task<Result<PropagationUnit, HttpError>>> handler) => default;
@@ -300,14 +300,14 @@ static class HttpBindings
             ("RoutePattern", "Parse") => ("String", "System.Result<System.Web.Http.RoutePattern,String>", true),
             ("RoutePattern", "GetParameterNames") => ("", "System.Collections.Sequence<String>", false),
             ("RoutePattern", "Overlaps") => ("System.Web.Http.RoutePattern", "Boolean", false),
-            ("RoutePattern", "Match") => ("String", "System.Result<System.Option<System.Web.Http.RouteMatch>,String>", false),
+            ("RoutePattern", "Match") => ("String", "System.Result<System.Optional<System.Web.Http.RouteMatch>,String>", false),
             ("RouteMatch", "Get") => ("String", "System.Result<String,String>", false),
             ("RouteMatch", "GetInt32") => ("String", "System.Result<Int32,String>", false),
             ("HttpServer", ".ctor") when library => ("System.Networking.Sockets.Socket", "void", false),
             ("HttpServer", "Listen") => ("String,Int32,Int32", $"System.Result<{Prefix}HttpServer,System.Web.Http.HttpError>", true),
             ("HttpServer", "GetLocalPort") => ("", "System.Result<Int32,System.Web.Http.HttpError>", false),
             ("HttpServer", "get_CompletedRequests" or "get_FailedRequests") => ("", "Int64", false),
-            ("HttpServer", "get_LastRequestError") => ("", "System.Option<System.Web.Http.HttpError>", false),
+            ("HttpServer", "get_LastRequestError") => ("", "System.Optional<System.Web.Http.HttpError>", false),
             ("HttpServer", "Close") => ("", "void", false),
             ("HttpServer", "ServeOne" or "Serve") => ($"fn<{request},{task}>" + (args.Length == 2 ? "," + CancellationBindings.Token : ""), "System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>", false),
             ("HttpServer", "EncodeResponse") when library => (response + ",Int32", "System.Result<System.Collections.Sequence<Byte>,System.Web.Http.HttpError>", true),
@@ -349,22 +349,22 @@ static class HttpBindings
             ("HttpRequest", "get_Content") => ("", Prefix + "HttpContent", false),
             ("HttpRequest", "WithHeader") => ("String,String", $"System.Result<{request},System.Web.Http.HttpError>", false),
             ("HttpRequest", "Encode") when library => ("", "System.Result<System.Collections.Sequence<Byte>,System.Web.Http.HttpError>", false),
-            ("HttpResponse", "get_Request") => ("", "System.Option<System.Web.Http.HttpRequest>", false),
+            ("HttpResponse", "get_Request") => ("", "System.Optional<System.Web.Http.HttpRequest>", false),
             ("HttpResponse", "Associate") when library => (request, "void", false),
-            ("HttpContent", "get_MediaType") when library => ("", "System.Option<String>", false),
+            ("HttpContent", "get_MediaType") when library => ("", "System.Optional<String>", false),
             ("HttpContent", "get_IsBuffered") => ("", "Boolean", false),
             ("HttpContent", "get_Length") => ("", "Int32", false),
-            ("HttpContent", "TryGetBytes") => ("", "System.Option<System.Collections.Sequence<Byte>>", false),
+            ("HttpContent", "TryGetBytes") => ("", "System.Optional<System.Collections.Sequence<Byte>>", false),
             ("HttpContent", "Dispose") => ("", "void", false),
             ("HttpContent", "BeginUpload") when library => ("", "System.Result<Void,System.Web.Http.HttpError>", false),
             ("HttpContent", "ReadUpload") when library => ("arrayref<Byte>,Int32", "System.Result<Int32,System.Web.Http.HttpError>", false),
             ("HttpRequest", "WithDefaults") when library => ("System.Collections.Sequence<System.Web.Http.HttpHeader>", $"System.Result<{request},System.Web.Http.HttpError>", false),
             ("HttpClient", "get_DefaultRequestHeaders") => ("", "System.Collections.Sequence<System.Web.Http.HttpHeader>", false),
             ("HttpClient", "set_DefaultRequestHeaders") => ("System.Collections.Sequence<System.Web.Http.HttpHeader>", "void", false),
-            ("HttpClient", "get_Timeout") => ("", "System.Option<System.Time.Duration>", false),
-            ("HttpClient", "set_Timeout") => ("System.Option<System.Time.Duration>", "void", false),
-            ("HttpClient", "get_BaseUri") => ("", "System.Option<String>", false),
-            ("HttpClient", "set_BaseUri") => ("System.Option<String>", "void", false),
+            ("HttpClient", "get_Timeout") => ("", "System.Optional<System.Time.Duration>", false),
+            ("HttpClient", "set_Timeout") => ("System.Optional<System.Time.Duration>", "void", false),
+            ("HttpClient", "get_BaseUri") => ("", "System.Optional<String>", false),
+            ("HttpClient", "set_BaseUri") => ("System.Optional<String>", "void", false),
             ("HttpHandler" or "DelegatingHandler", "Send") => (request + ",System.Concurrency.CancellationToken", task, false),
             ("HttpClient" or "HttpSocketHandler", "Send") => (request, task, false),
             ("HttpResponseDecoder", ".ctor") when library => ("Boolean", "void", false),

@@ -19,10 +19,10 @@ Legacy Console.WriteLine diagnostics and ReadByte retain their immediate host pa
 | `Console.Error` | `SyncTextWriter` | Write UTF-8 standard error |
 | `OpenStandardInput()` | `SyncInputStream` | Read raw bytes |
 | `OpenStandardOutput()` / `OpenStandardError()` | `SyncOutputStream` | Write raw bytes without text conversion |
-| `PeekChar()` / `ReadChar()` | `Result<Option<Character>, TextReadError>` | Peek/read one grapheme; None at EOF |
+| `PeekChar()` / `ReadChar()` | `Result<Optional<Character>, TextReadError>` | Peek/read one grapheme; None at EOF |
 | `Read(count)` / `Read(count, maxUtf8Bytes)` | `Result<string, TextReadError>` | Requested grapheme count, shorter at EOF |
-| `ReadLine()` | `Result<Option<string>, TextReadError>` | Read a line with a 65536-byte content bound |
-| `ReadLine(maxUtf8Bytes)` | `Result<Option<string>, TextReadError>` | Read a line with an explicit content bound |
+| `ReadLine()` | `Result<Optional<string>, TextReadError>` | Read a line with a 65536-byte content bound |
+| `ReadLine(maxUtf8Bytes)` | `Result<Optional<string>, TextReadError>` | Read a line with an explicit content bound |
 
 Console.In returns the same reader throughout one invocation. All Console text
 methods share its decoder, buffered lookahead and closed state. Closing it makes
@@ -62,7 +62,7 @@ cancellation remain separate work. Result, String and decoder allocations remain
 this is not an allocation-free console API.
 
 .NET's [Peek](https://learn.microsoft.com/en-us/dotnet/api/system.io.textreader.peek?view=net-10.0)
-is synchronous and uses an integer sentinel. neoCLR uses Option with its grapheme Character model; StreamReader offers async peek
+is synchronous and uses an integer sentinel. neoCLR uses Optional with its grapheme Character model; StreamReader offers async peek
 and SyncStreamReader/Console offer direct peek. Counted reads follow the fill-or-EOF behavior
 of [.NET ReadBlockAsync](https://learn.microsoft.com/en-us/dotnet/api/system.io.textreader.readblockasync?view=net-10.0),
 returning UTF-8 String rather than filling a UTF-16 character buffer. This preserves
@@ -126,7 +126,7 @@ creates an owning wrapper. StreamReader has the matching input ownership options
 
 ## Propagation and optional input
 
-A combined Result/Option does not require nested matches. In a function returning a
+A combined Result/Optional does not require nested matches. In a function returning a
 compatible Result, `?` propagates a read error. Pattern binding then handles the
 optional value:
 
@@ -136,7 +136,7 @@ func ReadInput() -> Result<unit, TextReadError> {
     return DescribeInput(result)
 }
 
-func DescribeInput(result1: Result<Option<string>, TextReadError>) -> Result<unit, TextReadError> {
+func DescribeInput(result1: Result<Optional<string>, TextReadError>) -> Result<unit, TextReadError> {
     let Some(input) = result1? else {
         Console.WriteLine("No input")
         return Ok(())
@@ -183,7 +183,7 @@ channels are empty. Neither channel is implicitly redirected to the other.
 
 .NET also exposes Console.In as TextReader and Console.Out/Error as TextWriter,
 with separate OpenStandard methods for byte streams. Its ReadLine recognizes CR,
-LF and CRLF and uses null for EOF. This development API instead uses Result/Option,
+LF and CRLF and uses null for EOF. This development API instead uses Result/Optional,
 strict bounded UTF-8, a shared input reader and fresh non-owning output wrappers; it does not yet offer .NET's
 redirection, encoding selection or synchronization facilities. The bounds make
 resource use explicit but require callers to handle limit failures. Fresh output wrappers
@@ -225,7 +225,7 @@ RavenDoc renders class-library metadata, not the Rust embedding crate.
 | `Console::open_terminal(TerminalOptions) -> io::Result<Box<dyn TerminalInput>>` | Exclusive scoped input; unsupported by default and on redirected Stdio input. |
 | `TerminalOptions { capture_interrupts: bool }` | Defaults to false; POSIX true captures all ISIG characters, including Ctrl+C/quit/suspend. |
 | `TerminalInput::try_read(&mut self, &mut [u8]) -> io::Result<TerminalRead>` | Nonblocking bytes into caller storage; `Pending`, `Data(usize)` or `End`. Empty buffers fail. |
-| `TerminalInput::read(&mut self, &mut [u8], Option<Duration>) -> io::Result<TerminalRead>` | Synchronous wait: None waits indefinitely, duration returns Pending on timeout, zero tries immediately. POSIX uses OS readiness; other hosts default to Unsupported. Same buffer/closed errors as try_read; unrepresentable deadlines are InvalidInput. |
+| `TerminalInput::read(&mut self, &mut [u8], Optional<Duration>) -> io::Result<TerminalRead>` | Synchronous wait: None waits indefinitely, duration returns Pending on timeout, zero tries immediately. POSIX uses OS readiness; other hosts default to Unsupported. Same buffer/closed errors as try_read; unrepresentable deadlines are InvalidInput. |
 | `TerminalInput::close(&mut self) -> io::Result<()>` | Restores modes and releases input; retryable on restoration failure, idempotent after success. Drop makes a best-effort attempt. |
 
 `StdioConsole` shares ownership across instances, rejecting concurrent terminal or
@@ -333,7 +333,7 @@ Serialize all console input and session operations.
 
 | Member | Contract |
 | --- | --- |
-| `ConsoleKeyReader.ReadKey()` | `Result<Option<ConsoleKeyInfo>, ConsoleKeyError>`; blocks, None at EOF |
+| `ConsoleKeyReader.ReadKey()` | `Result<Optional<ConsoleKeyInfo>, ConsoleKeyError>`; blocks, None at EOF |
 | `ConsoleKeyReader.Close()` | `Result<unit, ConsoleKeyError>`; restores modes, repeatable; retry after failure |
 | `ConsoleKeyReader.Dispose()` | Attempts Close; invocation cleanup retries restoration on failure |
 | `ConsoleKeyInfo(Key, Shift, Alt, Control, TextScalar)` | Value constructor; properties retain these arguments |
@@ -342,7 +342,7 @@ Serialize all console input and session operations.
 | `ConsoleKeyInfo.GetHashCode()` | Equal key values have equal hashes; hashes are not persistent identifiers |
 | `Key: ConsoleKey` | Logical letters/digits, Space, Tab, Enter, Backspace, Escape, arrows, Home/End, Insert/Delete, PageUp/PageDown, F1–F12; None for other text |
 | `Shift`, `Alt`, `Control: bool` | Reported modifiers, with legacy terminal ambiguities |
-| `TextScalar: Option<int>` | Valid Unicode scalar for decoder-produced text; None for control/navigation; never a grapheme |
+| `TextScalar: Optional<int>` | Valid Unicode scalar for decoder-produced text; None for control/navigation; never a grapheme |
 
 `ConsoleKeyError` has Unavailable (unsupported/redirected host), Busy (input already
 owned), Closed, ReadFailed, UnsupportedSequence and InvalidUtf8 cases. Malformed
@@ -374,7 +374,7 @@ It can instead continue, or ask for confirmation, at the `ConsoleKey.C` branch.
 ```raven
 import System.*
 import System.Result.*
-import System.Option.*
+import System.Optional.*
 
 func Main() {
     let Ok(keys) = Console.OpenKeyInput(true) else {
@@ -402,7 +402,7 @@ API, including cancellation where supported, remains future work.
 
 
 Development qualification (2026-10-20): key equality and hashing now include the
-optional scalar without boxing it. `None`, `Some(0)` and an uninitialized Option
+optional scalar without boxing it. `None`, `Some(0)` and an uninitialized Optional
 remain distinct. Typed key operations have a separate allocation diagnostic;
 explicitly boxing a key still allocates. See the
 [record-union validation](https://github.com/marinasundstrom/neoclr/tree/main/docs/experiments/record-unions).
@@ -427,7 +427,7 @@ ConsoleKeyInfo is imported as a component of another supported record.
 
 Typed operations compare the optional scalar without boxing it. Explicit boxing
 still follows the value-box allocation contract. No normalization or validation of
-manually constructed scalar values is performed by equality. Default Option storage,
+manually constructed scalar values is performed by equality. Default Optional storage,
 None and Some(0) remain different values. These operations introduce no typed error
 result. See the validation linked above for execution modes and allocation scope.
 

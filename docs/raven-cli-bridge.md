@@ -14932,3 +14932,21 @@ carried neoCLR compiler `a6f650b5e`. The final compiler passes all 12 error-cont
 tests in interpreter, JIT and AOT (36 executions); 22 retained textual-runtime
 contract tests pass. The API snapshot and all 6,064 website pages pass validation.
 See [recorded results](validation/result-failure/validation.json).
+
+## Optional rename (development, 2026-10-23)
+
+Author-directed naming replaces System.Option<T> with System.Optional<T> across
+Raven main, the neoCLR compiler line and platform APIs. Some/None and generic
+propagation are unchanged. OptionalFacts centralizes compiler names; there is no
+new Runtime Contract option, opcode or union layout. Native identities and the
+temporary CLI projection use Optional, requiring matched rebuilt libraries and
+consumers. Reflection adapters and retained textual-runtime fixtures use the new
+name too. The native metadata/backend remains the owner of union representation;
+CLI limitations are unchanged.
+
+The general change is committed on Raven main `694bbeae8` and deliberately carried
+to codex/neoclr `5b9298b62`. [Validation evidence](validation/optional/validation.json)
+records focused compiler checks, native library builds, 42 consumer executions
+across all three engines, API snapshots and website checks. It preserves the
+working-build artifact identities and records two independently reproduced
+baseline lowering-trace failures; this is not full release qualification.

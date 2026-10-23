@@ -12,9 +12,9 @@ bridge (Raven `04c953d67` on `codex/neoclr-target-resolution`). Archived Preview
 | Imported cases: `import System.Result.*`, then `Ok(let value)` / `Error(_)` | Generic payload types inferred from the scrutinee; both outcomes execute |
 | Target-typed `.Ok(let value)` / `.Error(_)` | Existing member-union extraction and deconstruction contracts |
 | `Result.Ok<int>(let value)` | Explicit nominal deconstruction remains supported |
-| Option `.Some(let value)` / `.None` | Present and absent cases execute; `.None` has no payload |
+| Optional `.Some(let value)` / `.None` | Present and absent cases execute; `.None` has no payload |
 | Keyword-first expression: `return match value { ... }` | Result<Int32,OverflowError> selects an Int32 arm value on success and error |
-| Postfix expression: `value match { ... }` | Option<Int32> selects a String for Some and None |
+| Postfix expression: `value match { ... }` | Optional<Int32> selects a String for Some and None |
 | Statement: `match value { ... }` with action/block arms | Result success/error invokes the selected Console action |
 | Statement in implicit tail-return position | Int32 arm values become the enclosing function result |
 | Typed case patterns with `when` equality guard | Matching guard, failed guard and error paths select distinct arms |
@@ -50,7 +50,7 @@ locals used for expression results.
 | --- | --- |
 | Missing Result error arm, expression or statement | Compile error RAV2100 |
 | Arm following a catch-all | Compile error RAV2101 |
-| Option.None pattern against Result | Compile error RAV2102 |
+| Optional.None pattern against Result | Compile error RAV2102 |
 | Incompatible deconstruction arity | Compile error RAV1610 in the fixture |
 | `.None()` / `.Ok()` with empty parentheses | No matching Deconstruct contract; use `.None` / `.Ok` for a payload-free case test |
 | Final statement match with explicit `return` in its arm blocks | Compile error RAV1503 (Unit-to-Int32 conversion) in the fixture |

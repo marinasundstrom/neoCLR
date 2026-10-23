@@ -154,17 +154,17 @@ fn bytes_and_eof_have_exact_owned_union_types_and_shared_host_position() {
     for byte in [Some(0), Some(255), None] {
         let option = match byte {
             Some(byte) => carrier(
-                "System.Option<Byte>",
-                "System.Option.Some<Byte>",
+                "System.Optional<Byte>",
+                "System.Optional.Some<Byte>",
                 vec![Value::Byte(byte)],
             ),
-            None => carrier("System.Option<Byte>", "System.Option.None", vec![]),
+            None => carrier("System.Optional<Byte>", "System.Optional.None", vec![]),
         };
         assert_eq!(
             read.invoke(vec![], options(console.clone())).unwrap().value,
             carrier(
-                "System.Result<System.Option<Byte>,System.ConsoleReadError>",
-                "System.Result.Ok<System.Option<Byte>>",
+                "System.Result<System.Optional<Byte>,System.ConsoleReadError>",
+                "System.Result.Ok<System.Optional<Byte>>",
                 vec![option]
             )
         );
@@ -197,15 +197,15 @@ fn console_dependencies_are_discovered_without_executing_host_io() {
 
 #[test]
 fn byte_input_uses_typed_local_storage_before_integer_arithmetic() {
-    let module = assemble(".module App\n.function Increment(System.Option<Byte> value) -> Int32\n.local Byte byte\nldarg value\ncall instance System.Option<Byte>::GetSomeCase()\ncall instance System.Option.Some<Byte>::get_Value()\nstloc byte\nldloc byte\nldc.i4 1\nadd\nret\n.end").unwrap();
+    let module = assemble(".module App\n.function Increment(System.Optional<Byte> value) -> Int32\n.local Byte byte\nldarg value\ncall instance System.Optional<Byte>::GetSomeCase()\ncall instance System.Optional.Some<Byte>::get_Value()\nstloc byte\nldloc byte\nldc.i4 1\nadd\nret\n.end").unwrap();
     let program = LoadedProgram::new(&module).unwrap();
     program.verify().unwrap();
     let function = program
-        .resolve_function(&parse_function_ref("Increment(System.Option<Byte>)").unwrap())
+        .resolve_function(&parse_function_ref("Increment(System.Optional<Byte>)").unwrap())
         .unwrap();
     let value = carrier(
-        "System.Option<Byte>",
-        "System.Option.Some<Byte>",
+        "System.Optional<Byte>",
+        "System.Optional.Some<Byte>",
         vec![Value::Byte(255)],
     );
     assert_eq!(
@@ -220,7 +220,7 @@ fn byte_input_uses_typed_local_storage_before_integer_arithmetic() {
 #[test]
 fn typed_console_adapter_exposes_nested_cases() {
     let module = assemble(
-        ".module App\n.entry Main\n.function Main() -> Int32\ncall System.Console::ReadByte()\ncall instance System.Result<System.Option<Byte>,System.ConsoleReadError>::GetOkCase()\ncall instance System.Result.Ok<System.Option<Byte>>::get_Value()\ncall instance System.Option<System.Byte>::GetSomeCase()\ncall instance System.Option.Some<System.Byte>::get_Value()\nret\n.end",
+        ".module App\n.entry Main\n.function Main() -> Int32\ncall System.Console::ReadByte()\ncall instance System.Result<System.Optional<Byte>,System.ConsoleReadError>::GetOkCase()\ncall instance System.Result.Ok<System.Optional<Byte>>::get_Value()\ncall instance System.Optional<System.Byte>::GetSomeCase()\ncall instance System.Optional.Some<System.Byte>::get_Value()\nret\n.end",
     )
     .unwrap();
     let module = neoclr::load(&serde_json::to_string(&module).unwrap()).unwrap();

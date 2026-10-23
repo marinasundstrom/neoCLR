@@ -38,7 +38,7 @@ Cancellation is a distinct task outcome, never `Result.Failure`. A runtime Fault
 terminal and cannot be recovered through Task. This differs from .NET's faulted Task.
 
 [Complete propagation example](/samples/library-task-propagation.rvn) ·
-[Option and Result](/features/outcomes/)
+[Optional and Result](/features/outcomes/)
 
 ## Request cancellation
 

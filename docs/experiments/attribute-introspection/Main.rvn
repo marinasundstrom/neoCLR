@@ -2,7 +2,7 @@ import System.*
 import System.Linq.*
 import System.Collections.*
 import System.Introspection.*
-import System.Option.*
+import System.Optional.*
 
 public class NoteAttribute : Attribute {
     init(text: string, number: int, enabled: bool) {
@@ -47,7 +47,7 @@ public union AppRoutes {
     case Item(id: int)
 }
 
-func FindNote(member: MemberInfo) -> Option<string> {
+func FindNote(member: MemberInfo) -> Optional<string> {
     for attribute in member.GetCustomAttributesData() {
         if attribute.AttributeType.Equals(typeof(NoteAttribute)) {
             let arguments = attribute.GetConstructorArguments()

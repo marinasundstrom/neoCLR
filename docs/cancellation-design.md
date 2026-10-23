@@ -54,7 +54,7 @@ avoids locks and blocking callback joins, but prevents sharing tokens between th
 The registration is a reference handle rather than .NET's value registration; this
 simplifies identity and idempotent removal, at an allocation cost. A linked callback
 list avoids retaining removed captures; cancellation detaches the list before invoking
-user code. Optional delegate storage uses `Option<Func<Void>>` because this runtime
+user code. Optional delegate storage uses `Optional<Func<Void>>` because this runtime
 does not currently provide nullable delegate values.
 
 An alternative was to cancel a Task directly from every token callback. That would

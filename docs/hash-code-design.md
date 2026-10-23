@@ -73,8 +73,8 @@ requires Add(string) as well as Add(int) and ToHashCode; incomplete providers re
 
 A boundary record can now declare Owner: Person? for a supported source record class.
 Raven's [nullable model](https://github.com/marinasundstrom/raven/blob/main/docs/lang/nullability.md)
-distinguishes nullable reference state from Option<T> domain absence. This sample is
-about reference-state interoperability; it does not replace Option with null.
+distinguishes nullable reference state from Optional<T> domain absence. This sample is
+about reference-state interoperability; it does not replace Optional with null.
 As in [.NET nullable references](https://learn.microsoft.com/en-us/dotnet/csharp/nullable-references)
 (reviewed 24 September 2026), the emitted class-reference representation is unchanged.
 Raven retains the nullable static property type and resolves generated calls against
@@ -90,5 +90,5 @@ Typed call adapters now materialize application-reference nulls in argument orde
 this handles both constructors and ordinary calls, including multiple null arguments.
 It does not introduce boxes, a general null value for intrinsic String, or Nullable<T>
 value storage. Retaining explicit diagnostics for nullable strings/integers is preferable
-to silently turning null into empty text or zero. Those representations, Option record
+to silently turning null into empty text or zero. Those representations, Optional record
 components and boxed-value equality remain follow-up work.

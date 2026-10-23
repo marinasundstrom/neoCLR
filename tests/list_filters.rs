@@ -107,7 +107,7 @@ fn scans_have_expected_direction_short_circuiting_and_outcomes() {
             let extract = if method == "FindAll" {
                 "call instance System.Collections.ArrayList<Int32>::get_Count()"
             } else {
-                "call UnwrapSome<Int32>(System.Option<Int32>)"
+                "call UnwrapSome<Int32>(System.Optional<Int32>)"
             };
             body += &assert_integer(extract, expected, "Outcome");
         }
@@ -152,7 +152,7 @@ fn missing_and_empty_sequences_have_total_outcomes_without_default_elements() {
                     )
                 }
                 _ => {
-                    body += "call IsNone<Int32>(System.Option<Int32>)\nbrtrue Missing\nfault \"missing case\"\nMissing:\n"
+                    body += "call IsNone<Int32>(System.Optional<Int32>)\nbrtrue Missing\nfault \"missing case\"\nMissing:\n"
                 }
             }
             let calls = if method == "TrueForAll" && !values.is_empty() {

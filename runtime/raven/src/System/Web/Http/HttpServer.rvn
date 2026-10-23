@@ -1,7 +1,7 @@
 module System.Web.Http
 
 import System.*
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 import System.Collections.*
 import System.Concurrency.Tasks.*
@@ -66,7 +66,7 @@ internal class HttpRequestDecoder {
         return Failure(HttpError.Protocol("Incomplete headers"))
     }
     private val head: HttpRequestHeaderBuffer
-    private var request: Option<HttpRequest> = None()
+    private var request: Optional<HttpRequest> = None()
     private var complete: bool = false
     private var failed = false
     private var chunked = false
@@ -471,7 +471,7 @@ public class HttpServer {
     private var serving: HttpServerRun? = null
     private var completedRequests: long = 0L
     private var failedRequests: long = 0L
-    private var lastRequestError: Option<HttpError> = None()
+    private var lastRequestError: Optional<HttpError> = None()
     // Private, dispatcher-owned scratch storage. Never exposed through a request.
     // One retained buffer per size class bounds idle payload retention to 4352 bytes.
     private var smallReceiveBuffer: byte[]? = null
@@ -509,7 +509,7 @@ public class HttpServer {
     /// Failed Serve exchanges, excluding cancellation caused by server shutdown.
     val FailedRequests: long => failedRequests
     /// Most recent Serve request error; None before any failure.
-    val LastRequestError: Option<HttpError> {
+    val LastRequestError: Optional<HttpError> {
         get {
             if let Some(error) = lastRequestError {
                 return Some(error)
@@ -937,7 +937,7 @@ public class HttpContext : Disposable {
     private var started: bool = false
     private var shutdownRegistration: CancellationRegistration? = null
     private var source: Promise<Result<System.Void, HttpError>> = Promise<Result<System.Void, HttpError>>()
-    private var transfer: Option<Task<Result<int, HttpError>>> = None()
+    private var transfer: Optional<Task<Result<int, HttpError>>> = None()
     private var buffer: byte[] = Array<byte>.Empty
     private var outgoing: byte[] = Array<byte>.Empty
     private var sent: int = 0
@@ -1242,9 +1242,9 @@ internal class HttpServerExchange {
     private var callerRegistration: CancellationRegistration? = null
     private var shutdownRegistration: CancellationRegistration? = null
     private var source: Promise<Result<HttpContext, HttpError>> = Promise<Result<HttpContext, HttpError>>()
-    private var socket: Option<HttpConnection> = None()
-    private var accepting: Option<Task<Result<Socket, SocketError>>> = None()
-    private var transfer: Option<Task<Result<int, HttpError>>> = None()
+    private var socket: Optional<HttpConnection> = None()
+    private var accepting: Optional<Task<Result<Socket, SocketError>>> = None()
+    private var transfer: Optional<Task<Result<int, HttpError>>> = None()
     private var requestDecoder: HttpRequestDecoder? = null
     private var buffer: byte[]? = null
     private var deadline = NetworkDeadline.Expired
@@ -1478,11 +1478,11 @@ internal class HttpServeOperation {
     private var handler: HttpServerCallback
     private var token: CancellationToken
     private var source: Promise<Result<System.Void, HttpError>> = Promise<Result<System.Void, HttpError>>()
-    private var context: Option<HttpContext> = None()
-    private var accepting: Option<Task<Result<HttpContext, HttpError>>> = None()
-    private var handling: Option<Task<Result<HttpResponse, HttpError>>> = None()
-    private var configuring: Option<Task<Result<System.Void, HttpError>>> = None()
-    private var sending: Option<Task<Result<System.Void, HttpError>>> = None()
+    private var context: Optional<HttpContext> = None()
+    private var accepting: Optional<Task<Result<HttpContext, HttpError>>> = None()
+    private var handling: Optional<Task<Result<HttpResponse, HttpError>>> = None()
+    private var configuring: Optional<Task<Result<System.Void, HttpError>>> = None()
+    private var sending: Optional<Task<Result<System.Void, HttpError>>> = None()
     private var callerRegistration: CancellationRegistration? = null
     private var shutdownRegistration: CancellationRegistration? = null
 
@@ -1677,7 +1677,7 @@ internal class HttpServerRun {
     private var registration: CancellationRegistration? = null
     private var lanes: ArrayList<HttpServerLane> = ArrayList<HttpServerLane>(16)
     private var remaining: int = 16
-    private var failure: Option<HttpError> = None()
+    private var failure: Optional<HttpError> = None()
 
     internal init(server: HttpServer, handler: HttpServerCallback, token: CancellationToken) {
         self.server = server

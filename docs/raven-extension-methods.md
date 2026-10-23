@@ -62,7 +62,7 @@ compiler changes for this completion check.
 
 ## Raven-authored library extensions after Preview 8
 
-Iterable, Option and Result operators now use public Raven extension containers
+Iterable, Optional and Result operators now use public Raven extension containers
 with self receivers, rather than ordinary static source classes. The bootstrap
 checks the core-scoped ExtensionAttribute on both the emitted implementation and
 its reference declaration. Runtime calls remain ordinary static generic calls;

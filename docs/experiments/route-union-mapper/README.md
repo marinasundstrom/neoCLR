@@ -49,7 +49,7 @@ future work; `verify.py` is the executable build recipe for this slice.
   means a structurally matched capture failed conversion. Names/types are stable
   for the generated declaration; diagnostic reason strings are for display.
 - No unmatched marker/case is required. The fundamental RoutePattern.Match API
-  still returns Result<Option<RouteMatch>, string> and can be used independently.
+  still returns Result<Optional<RouteMatch>, string> and can be used independently.
 - Generation rejects missing attributes, malformed/overlapping patterns, unbound
   parameters and unsupported payloads before the application can start. Pattern
   overlap is rejected even when literal precedence might otherwise be possible.

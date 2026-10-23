@@ -1,9 +1,9 @@
 import System.*
 import System.Console.*
 
-func Read() -> Result<Option<byte>, IO.ConsoleReadError> {
+func Read() -> Result<Optional<byte>, IO.ConsoleReadError> {
     let value = ReadByte()?
-    return Result<Option<byte>, IO.ConsoleReadError>.Ok(value)
+    return Result<Optional<byte>, IO.ConsoleReadError>.Ok(value)
 }
 
 func Show() {

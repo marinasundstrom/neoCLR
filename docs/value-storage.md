@@ -49,7 +49,7 @@ neoCLR should retain intentional access to the underlying low-level operations.
 
 Before removal, establish usable native representations and explicit lifetime/copy/
 release contracts for current String, error and nested carrier payloads. Migrate
-System.Option/Result, native bindings, host inputs and samples together, preserving
+System.Optional/Result, native bindings, host inputs and samples together, preserving
 case extraction and typed Error behavior. Then remove the obsolete encodings with
 an explicit artifact version break and update the opcode/service documentation.
 The borrowed pointer sample proves only the native-layout subset, not this whole
@@ -150,7 +150,7 @@ does not implement .NET's out-parameter TryGetValue signature or finalize the
 compiler-recognized member convention. Ordinary visibility does not prove that every
 implementation honors its own contract; unsafe and trusted host boundaries still apply.
 
-Ordinary System.Option/Result now implement the selected [member convention](union-convention.md)
+Ordinary System.Optional/Result now implement the selected [member convention](union-convention.md)
 in platform IL. I/O, text and arithmetic APIs and native adapters use ordinary carriers.
 Format 4 removes bootstrap union encodings and requires source reassembly.
 

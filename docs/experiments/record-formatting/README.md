@@ -87,7 +87,7 @@ floating repro rejects at equality synthesis before formatting.
 Raven `bf541d49c` on `codex/neoclr` supplies the compiler fix. All nine executions
 (three tests across interpreter, JIT and native) pass. The built-in
 `record-formatting` suite covers Index and Range, typed/boxed record
-calls, nested records, Option payloads, null, scalar display and ordinal preservation
+calls, nested records, Optional payloads, null, scalar display and ordinal preservation
 of decomposed UTF-8. See [the execution report](imported-validation-20261021.json),
 [the current gap audit](gap-audit-20261021.json), and
 [the missing-helper compiler regression](imported-source-core-20261021.txt).

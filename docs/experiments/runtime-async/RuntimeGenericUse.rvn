@@ -46,13 +46,13 @@ module RuntimeGenericUse {
             System.Runtime.GC.Collect()
             return value
         }
-        async func Relay<U>(gate: Task<U>, log: Log) -> Task<Option<U>> {
+        async func Relay<U>(gate: Task<U>, log: Log) -> Task<Optional<U>> {
             use resource = Resource(log, 4)
             _ = value
             let result = await gate
             System.Runtime.GC.Collect()
             let read = () => result
-            return Option<U>.Some(read())
+            return Optional<U>.Some(read())
         }
     }
 
@@ -98,7 +98,7 @@ module RuntimeGenericUse {
         let nested = store.Relay<int>(nestedGate.Task, nestedLog)
         _ = nestedGate.Complete(91)
         let nestedResult = await nested
-        if !(nestedResult is Option<int>.Some(91)) || nestedLog.Count != 1 || nestedLog.Order != 4 {
+        if !(nestedResult is Optional<int>.Some(91)) || nestedLog.Count != 1 || nestedLog.Order != 4 {
             System.Fail("Generic method on generic owner lost its union payload or cleanup")
         }
         Console.WriteLine("PASS generic async methods owners and scoped cleanup")

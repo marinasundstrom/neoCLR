@@ -4,7 +4,7 @@ import System.*
 import System.IO.*
 import System.ConsoleReadError
 import System.Result.*
-import System.Option.*
+import System.Optional.*
 
 public static class Console {
     private static var inputReader: SyncTextReader?
@@ -126,7 +126,7 @@ public static class Console {
         WriteLine(String.Format(format, arguments))
     }
 
-    static func ReadByte() -> System.Result<System.Option<byte>, ConsoleReadError> {
+    static func ReadByte() -> System.Result<System.Optional<byte>, ConsoleReadError> {
         if keyInputActive {
             return Failure(ConsoleReadError.Unavailable())
         }
@@ -139,19 +139,19 @@ public static class Console {
         if neoCLR.Runtime.IsValue<int>(payload) {
             let status = neoCLR.Runtime.UnpackValue<int>(payload)
             if status == 1 {
-                return System.Result<System.Option<byte>, ConsoleReadError>.Failure(ConsoleReadError.Unavailable())
+                return System.Result<System.Optional<byte>, ConsoleReadError>.Failure(ConsoleReadError.Unavailable())
             }
             if status == 2 {
-                return System.Result<System.Option<byte>, ConsoleReadError>.Failure(ConsoleReadError.ReadFailed())
+                return System.Result<System.Optional<byte>, ConsoleReadError>.Failure(ConsoleReadError.ReadFailed())
             }
             System.Fail("invalid native I/O status")
-            return System.Result<System.Option<byte>, ConsoleReadError>.Failure(ConsoleReadError.ReadFailed())
+            return System.Result<System.Optional<byte>, ConsoleReadError>.Failure(ConsoleReadError.ReadFailed())
         }
         if neoCLR.Runtime.IsValue<System.Void>(payload) {
-            let absent: System.Option<byte> = None()
+            let absent: System.Optional<byte> = None()
             return Ok(absent)
         }
-        let present: System.Option<byte> = Some(neoCLR.Runtime.UnpackValue<byte>(payload))
+        let present: System.Optional<byte> = Some(neoCLR.Runtime.UnpackValue<byte>(payload))
         return Ok(present)
     }
 
@@ -252,11 +252,11 @@ public static class Console {
     /// <summary>Peeks at the next UTF-8 grapheme without advancing Console.In.</summary>
     /// <returns>Returned Character, None at EOF, or a text read error.</returns>
     /// <remarks>May read ahead to find a grapheme boundary. Shares the invocation-owned text reader.</remarks>
-    static func PeekChar() -> Result<Option<Character>, TextReadError> => In.PeekChar()
+    static func PeekChar() -> Result<Optional<Character>, TextReadError> => In.PeekChar()
 
     /// <summary>Reads one UTF-8 grapheme from the shared Console.In cursor.</summary>
     /// <returns>Returned Character, None at EOF, or a text read error.</returns>
-    static func ReadChar() -> Result<Option<Character>, TextReadError> => In.ReadChar()
+    static func ReadChar() -> Result<Optional<Character>, TextReadError> => In.ReadChar()
 
     /// <summary>Reads a requested grapheme count, or the shorter remainder at EOF.</summary>
     /// <param name="count">Count from zero through 65536; zero consumes nothing.</param>
@@ -269,11 +269,11 @@ public static class Console {
     /// <returns>Returned text, shorter at EOF, or a text read error.</returns>
     static func Read(count: int, maxUtf8Bytes: int) -> Result<string, TextReadError> => In.Read(count, maxUtf8Bytes)
 
-    static func ReadLine() -> System.Result<System.Option<string>, TextReadError> {
+    static func ReadLine() -> System.Result<System.Optional<string>, TextReadError> {
         return In.ReadLine(65536)
     }
 
-    static func ReadLine(maxUtf8Bytes: int) -> System.Result<System.Option<string>, TextReadError> {
+    static func ReadLine(maxUtf8Bytes: int) -> System.Result<System.Optional<string>, TextReadError> {
         return In.ReadLine(maxUtf8Bytes)
     }
 

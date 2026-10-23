@@ -31,7 +31,7 @@ func Main() {
     previous = set(root.rglob('App.neoil'))
     (root / 'Main.rvn').write_text('''import System.*
 func Main() {
-    let result = default(Option<string>)
+    let result = default(Optional<string>)
     result.GetSomeCase()
 }
 ''')

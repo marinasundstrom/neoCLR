@@ -1,0 +1,55 @@
+{
+  "date": "2026-10-23",
+  "ravenMain": "694bbeae8",
+  "ravenNeoClr": "5b9298b62",
+  "scope": "Optional naming migration; Some/None and propagation unchanged; no compatibility alias for Option",
+  "compiler": {
+    "focusedRegressionPass": {
+      "main": 157,
+      "neoclr": 183
+    },
+    "corePassEachBranch": 84,
+    "conditionalAttributePassEachBranch": 18,
+    "languageServer": {
+      "passed": 144,
+      "skipped": 3
+    }
+  },
+  "knownBaselineFailures": {
+    "tests": [
+      "ExtensionMethodSemanticTests.Lowerer_WithLoweringTrace_RecordsNestedQueryPipelinesAcrossExtensionSources",
+      "ExtensionMethodSemanticTests.Lowerer_WithLoweringTrace_RecordsNestedExtensionInvocations"
+    ],
+    "reproducedWithCompilerSourcesFrom": "59a8d09ea",
+    "note": "Broad changed-fixture runs exposed these trace expectation failures; both reproduce with baseline compiler sources. Migration-related failures were corrected and rerun."
+  },
+  "native": {
+    "platform": "macOS ARM64",
+    "rustContractAndReflectionTestsPassed": 65,
+    "errorContextTestsPerMode": 12,
+    "methodStateTestsPerMode": 2,
+    "modes": [
+      "interpreter",
+      "jit",
+      "native"
+    ],
+    "totalExecutions": 42,
+    "libraryBuild": "passed",
+    "artifactCompilerLabel": "a6f650b5e-plus-optional",
+    "artifactNote": "Built from working Optional sources before final editor and top-level compiler refinements. Final compiler commits were validated separately by .NET regression tests; native consumers use explicit Main. Artifact labels are retained, not relabeled as final commits.",
+    "sha256": {
+      "target/optional-libraries/build-evidence.json": "fead58c54f011262bdc58b62d5f968d58ff86ab988d65d79fb6dfc23a338ed08",
+      "target/optional-libraries/bundle.json": "84118ecb3177720fcbab7708f098e83e32cdb80ac2ab3d37375047b2bde39610",
+      "target/optional-bundle/bundle/manifest.json": "3a7db709640d6294ae8e17c6258456582001d2c8e7db15388af267eac426ff73"
+    }
+  },
+  "documentation": {
+    "apiSnapshotCheck": "passed",
+    "websiteTestsPassed": 26,
+    "pagesChecked": 6064
+  },
+  "reports": [
+    "error-context-report.json",
+    "method-state-report.json"
+  ]
+}

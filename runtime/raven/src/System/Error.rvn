@@ -1,7 +1,7 @@
 module System
 
 import System.Diagnostics.*
-import System.Option.*
+import System.Optional.*
 
 /// Opt-in diagnostics for recoverable failures. Result and propagation do not require this interface.
 public interface Error {
@@ -9,10 +9,10 @@ public interface Error {
     val Message: string { get }
 
     /// The underlying failure, or None for a leaf error.
-    val Cause: Option<Error> { get }
+    val Cause: Optional<Error> { get }
 
     /// An existing diagnostic snapshot, or None. Reading this property never captures a stack.
-    val StackTrace: Option<StackTrace> { get }
+    val StackTrace: Optional<StackTrace> { get }
 }
 
 /// Adds operation context while retaining the original typed failure.
@@ -43,10 +43,10 @@ public class ContextError<E: Error> : Error {
     /// The original failure with its concrete type preserved.
     val Cause: E => cause
 
-    val Error.Cause: Option<Error> => Some(cause)
+    val Error.Cause: Optional<Error> => Some(cause)
 
     /// The retained snapshot, or None when no capture was requested or supplied.
-    val StackTrace: Option<StackTrace> => trace match {
+    val StackTrace: Optional<StackTrace> => trace match {
         StackTrace captured => Some(captured)
         _ => None
     }
@@ -79,8 +79,8 @@ public static class ErrorDiagnostics {
         return StackTrace()
     }
 
-    internal static func FindTrace(error: Error) -> Option<StackTrace> {
-        var current: Option<Error> = Some(error)
+    internal static func FindTrace(error: Error) -> Optional<StackTrace> {
+        var current: Optional<Error> = Some(error)
         var depth = 0
         while current is Some(let active) && depth < 64 {
             if active.StackTrace is Some(let captured) {
@@ -127,9 +127,9 @@ public extension ErrorFormattingExtensions for Error {
     /// Formats up to 64 error layers and one existing trace; never captures a stack.
     /// A longer or cyclic chain ends with a truncation marker. Messages are not machine codes.
     func FormatError() -> string {
-        var current: Option<Error> = Some(self)
+        var current: Optional<Error> = Some(self)
         var text = ""
-        var trace: Option<StackTrace> = None
+        var trace: Optional<StackTrace> = None
         var depth = 0
         while current is Some(let active) && depth < 64 {
             if depth > 0 {

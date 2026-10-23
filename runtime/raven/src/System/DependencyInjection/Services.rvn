@@ -3,7 +3,7 @@ module System.DependencyInjection
 import System.*
 import System.Collections.*
 import System.Introspection.*
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 import System.Runtime.CompilerServices.*
 
@@ -28,13 +28,13 @@ public interface ServiceProvider : Disposable {
     /// Resolves the last registration for an exact type and key; null selects unkeyed services.
     func GetRequiredKeyedService(type: TypeInfo, key: Object?) -> Result<Object, ServiceError>
     /// Returns None only if this exact type/key is unregistered.
-    func GetKeyedService(type: TypeInfo, key: Object?) -> Result<Option<Object>, ServiceError>
+    func GetKeyedService(type: TypeInfo, key: Object?) -> Result<Optional<Object>, ServiceError>
     /// Resolves registrations for this exact type/key in registration order.
     func GetKeyedServices(type: TypeInfo, key: Object?) -> Result<Sequence<Object>, ServiceError>
     /// Resolves the last registration, or returns Missing; activation errors propagate.
     func GetRequiredService(type: TypeInfo) -> Result<Object, ServiceError>
     /// Returns None only when unregistered; registered factory or activation failures remain errors.
-    func GetService(type: TypeInfo) -> Result<Option<Object>, ServiceError>
+    func GetService(type: TypeInfo) -> Result<Optional<Object>, ServiceError>
     /// Resolves every explicit registration in registration order; an absent type yields an empty sequence.
     func GetServices(type: TypeInfo) -> Result<Sequence<Object>, ServiceError>
     /// Creates an independently disposable scope sharing the root singleton cache.
@@ -112,8 +112,8 @@ public class ServiceDescriptor {
 
 internal class ServiceEntry {
     val Registration: ServiceDescriptor
-    val Plan: Option<ConstructorPlan>
-    init(registration: ServiceDescriptor, plan: Option<ConstructorPlan>) {
+    val Plan: Optional<ConstructorPlan>
+    init(registration: ServiceDescriptor, plan: Optional<ConstructorPlan>) {
         Registration = registration
         Plan = plan
     }
@@ -206,7 +206,7 @@ public class DefaultServiceCollection : ServiceCollection {
     func Build() -> Result<ServiceProvider, ServiceError> {
         let snapshot = ArrayList<ServiceEntry>(registrations.Count)
         for registration in registrations {
-            var plan: Option<ConstructorPlan> = None
+            var plan: Optional<ConstructorPlan> = None
             if !registration.Service.IsGenericTypeDefinition && registration.Source is ServiceSource.Constructor(let implementation) {
                 match ConstructorPlan.Prepare(implementation, type => Available(type)) {
                     Ok(let prepared) => { plan = Some(prepared) }
@@ -220,7 +220,7 @@ public class DefaultServiceCollection : ServiceCollection {
 }
 
 internal class ServiceSlot {
-    var Value: Option<Object> = None
+    var Value: Optional<Object> = None
     var Resolving: bool = false
 }
 
@@ -239,14 +239,14 @@ internal class ClosedServiceSlot {
 // Invocation-owned synchronous state; isolated workers cannot share this provider.
 internal class DefaultServiceProvider : ServiceProvider {
     private val registrations: Sequence<ServiceEntry>
-    private val root: Option<DefaultServiceProvider>
+    private val root: Optional<DefaultServiceProvider>
     private val slots = ArrayList<ServiceSlot>()
     private val closedSlots = ArrayList<ClosedServiceSlot>()
     private var owned = ArrayList<Object>()
     private var disposed = false
     private var activeResolutions = 0
 
-    init(registrations: Sequence<ServiceEntry>, root: Option<DefaultServiceProvider>) {
+    init(registrations: Sequence<ServiceEntry>, root: Optional<DefaultServiceProvider>) {
         self.registrations = registrations
         self.root = root
         for registration in registrations { slots.Add(ServiceSlot()) }
@@ -270,7 +270,7 @@ internal class DefaultServiceProvider : ServiceProvider {
     }
 
     func GetRequiredService(type: TypeInfo) -> Result<Object, ServiceError> => GetRequiredKeyedService(type, null)
-    func GetService(type: TypeInfo) -> Result<Option<Object>, ServiceError> => GetKeyedService(type, null)
+    func GetService(type: TypeInfo) -> Result<Optional<Object>, ServiceError> => GetKeyedService(type, null)
     func GetServices(type: TypeInfo) -> Result<Sequence<Object>, ServiceError> => GetKeyedServices(type, null)
 
 
@@ -281,7 +281,7 @@ internal class DefaultServiceProvider : ServiceProvider {
         return Failure(ServiceError.MissingKeyed(type, key))
     }
 
-    func GetKeyedService(type: TypeInfo, key: Object?) -> Result<Option<Object>, ServiceError> {
+    func GetKeyedService(type: TypeInfo, key: Object?) -> Result<Optional<Object>, ServiceError> {
         if IsDisposed { return Failure(ServiceError.Disposed) }
         if key is null && type.Equals(typeof(ServiceProvider)) { return Ok(Some<Object>(self)) }
         var index = registrations.Count - 1
@@ -438,7 +438,7 @@ internal class DefaultServiceProvider : ServiceProvider {
 /// Typed lookups preserving missing-service and activation-error distinctions.
 public extension ServiceProviderExtensions for ServiceProvider {
     /// Typed optional lookup for an exact key; null selects unkeyed registrations.
-    func GetKeyedService<T>(key: Object?) -> Result<Option<T>, ServiceError> {
+    func GetKeyedService<T>(key: Object?) -> Result<Optional<T>, ServiceError> {
         let result = self.GetKeyedService(typeof(T), key)?
         if result is Some(let value) { return Ok(Some((T)value)) }
         return Ok(None)
@@ -454,7 +454,7 @@ public extension ServiceProviderExtensions for ServiceProvider {
         return Ok(ServiceResults<T>(values))
     }
     /// Typed form of GetService; preserves activation errors and lifetime behavior.
-    func GetService<T>() -> Result<Option<T>, ServiceError> {
+    func GetService<T>() -> Result<Optional<T>, ServiceError> {
         let result = self.GetService(typeof(T))?
         if result is Some(let value) { return Ok(Some((T)value)) }
         return Ok(None)

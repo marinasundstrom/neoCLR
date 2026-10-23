@@ -121,7 +121,7 @@ impl Factory<'_> {
             {
                 if !matches!(
                     name(self.source, expected),
-                    Some("System.Option" | "System.Option`1")
+                    Some("System.Optional" | "System.Optional`1")
                 ) {
                     return Err("snapshot requires scoped Option".into());
                 }
@@ -872,7 +872,7 @@ pub fn bind(
             };
             if !matches!(
                 name(source, &expected),
-                Some("System.Option" | "System.Option`1")
+                Some("System.Optional" | "System.Optional`1")
             ) || arguments.len() != 1
                 || name(source, &arguments[0]) != Some("System.Introspection.TypeInfo")
             {
@@ -916,7 +916,7 @@ pub fn bind(
             };
             if !matches!(
                 name(source, &expected),
-                Some("System.Option" | "System.Option`1")
+                Some("System.Optional" | "System.Optional`1")
             ) || arguments.len() != 1
                 || name(source, &arguments[0]) != Some("System.Introspection.TypeInfo")
             {
@@ -1226,7 +1226,7 @@ pub fn bind(
         } else {
             if !matches!(
                 name(source, &expected),
-                Some("System.Option" | "System.Option`1")
+                Some("System.Optional" | "System.Optional`1")
             ) {
                 return Err("TypeElementType requires scoped Option".into());
             }
@@ -1671,7 +1671,7 @@ mod catalog_tests {
 
     #[test]
     fn declaring_type_requires_exact_contract_and_explicit_retention() {
-        let source = neoclr::assemble(".module Declaring\n.function neoCLR.Runtime.TypeDeclaringType(RuntimeTypeHandle) -> System.Option<System.Introspection.TypeInfo>\n.methodimpl InternalCall\n.end\n").unwrap();
+        let source = neoclr::assemble(".module Declaring\n.function neoCLR.Runtime.TypeDeclaringType(RuntimeTypeHandle) -> System.Optional<System.Introspection.TypeInfo>\n.methodimpl InternalCall\n.end\n").unwrap();
         let mut retention = json!({"types":[]});
         let mut input = source.clone();
         bind(&mut input, &source, &[], &mut retention).unwrap();
@@ -1688,12 +1688,12 @@ mod catalog_tests {
         );
         let mut invalid = source.clone();
         invalid.functions[0].returns =
-            neoclr::assembler::parse_type("System.Option<Int32>").unwrap();
+            neoclr::assembler::parse_type("System.Optional<Int32>").unwrap();
         assert!(
             bind(&mut invalid, &source, &[], &mut retention)
                 .unwrap_err()
                 .to_string()
-                .contains("Option<TypeInfo>")
+                .contains("Optional<TypeInfo>")
         );
     }
 

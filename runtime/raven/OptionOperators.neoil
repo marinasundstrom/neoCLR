@@ -1,6 +1,0 @@
-; Raven-authored Option composition operators.
-.type System.OptionOperators
-    .include "generated/OptionOperators.methods.neoil"
-.end
-
-.include "generated/OptionOperators.helpers.neoil"

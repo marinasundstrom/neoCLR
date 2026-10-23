@@ -31,7 +31,7 @@ do not infer the latter from successful propagation. Broader structural work sta
 Use one Error interface (Raven.Core's .NET spelling remains IError) with Message,
 optional Cause, and optional StackTrace. Default Cause and StackTrace to absent.
 Resolve neoCLR's optional-value spelling consistently with its library conventions
-when implementing; no nullable-reference/Option migration is selected here.
+when implementing; no nullable-reference/Optional migration is selected here.
 The optional trace member allows wrappers and renderers to reuse a cause's trace
 without reflection or a second diagnostic interface. Adding it to Raven.Core is a
 separate compatibility change requiring validation on main before deliberate carry-over.
@@ -53,7 +53,7 @@ accept it. E1 | E2 does not automatically accept ContextError<E1>.
 
 Built-in nominal failure unions/types should implement Error by convention, preserving
 case payloads and matching. Real nested failures expose their cause; leaf failures
-have none. Do not constrain Result's E, Option, or arbitrary unions to Error. Messages
+have none. Do not constrain Result's E, Optional, or arbitrary unions to Error. Messages
 are human descriptions, not stable machine codes. Adopt incrementally; do not infer
 error behavior from a type name or implicitly wrap every library return.
 
@@ -126,7 +126,7 @@ recommendation.
 
 Raven should provide a unified model for recoverable error propagation built around `Result`, the propagation protocol, the `?` operator, and the `Error` interface.
 
-The propagation mechanism itself should remain general. A propagatable value exposes either an output or a residual, and `?` propagates that residual into the enclosing computation. This mechanism may apply to errors, but also to other concepts such as `None` in `Option`.
+The propagation mechanism itself should remain general. A propagatable value exposes either an output or a residual, and `?` propagates that residual into the enclosing computation. This mechanism may apply to errors, but also to other concepts such as `None` in `Optional`.
 
 `Error` provides additional behavior specifically for recoverable failures.
 
@@ -174,10 +174,10 @@ The propagation protocol describes control flow. It does not inherently describe
 
 This distinction allows other types to participate.
 
-For example, an `Option<T>` may eventually propagate `None`:
+For example, an `Optional<T>` may eventually propagate `None`:
 
 ```text id="18wrro"
-Option<T>
+Optional<T>
    │
    ├─ Some(T) → output T
    │
@@ -984,14 +984,14 @@ It extracts the output of a successful propagatable value or propagates its resi
 
 The propagation protocol should not be intrinsically tied to `Error`, `Result`, or failure handling.
 
-This allows constructs such as `Option` to use the same underlying mechanism:
+This allows constructs such as `Optional` to use the same underlying mechanism:
 
 ```text id="b6whp1"
 Result<T, E>
 ├─ Ok(T)  → output
 └─ Err(E) → residual
 
-Option<T>
+Optional<T>
 ├─ Some(T) → output
 └─ None    → residual
 ```
@@ -1439,18 +1439,18 @@ A complete protocol may need to express:
 - how output and residual are distinguished;
 - how the enclosing type is reconstructed from a propagated residual.
 
-The abstraction should support `Result` and `Option` naturally without being designed solely around either.
+The abstraction should support `Result` and `Optional` naturally without being designed solely around either.
 
 ---
 
-## `Option` and other residuals
+## `Optional` and other residuals
 
-`Option` provides an important test of whether the propagation abstraction is sufficiently general.
+`Optional` provides an important test of whether the propagation abstraction is sufficiently general.
 
 For example:
 
 ```raven id="pb6f8m"
-func lookup(): Option<Item> {
+func lookup(): Optional<Item> {
     let parent = findParent()?
     ...
 }

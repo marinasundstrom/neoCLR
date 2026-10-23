@@ -1,0 +1,6 @@
+; Raven-authored Optional composition operators.
+.type System.OptionalOperators
+    .include "generated/OptionalOperators.methods.neoil"
+.end
+
+.include "generated/OptionalOperators.helpers.neoil"

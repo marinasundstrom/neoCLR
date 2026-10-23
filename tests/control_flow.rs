@@ -191,7 +191,7 @@ fn conditional_branches_do_not_infer_truth_from_other_values() {
         "ldc.r8 0",
         "ldc.r8 NaN",
         "ldstr \"\"",
-        "newobj instance System.Option.None::.ctor()\nnewobj instance System.Option<Int32>::.ctor(System.Option.None)",
+        "newobj instance System.Optional.None::.ctor()\nnewobj instance System.Optional<Int32>::.ctor(System.Optional.None)",
         "ldvoid\nnewobj instance System.Result.Ok<Void>::.ctor(Void)\nnewobj instance System.Result<Void,String>::.ctor(System.Result.Ok<Void>)",
     ] {
         for branch in ["brtrue", "brfalse"] {

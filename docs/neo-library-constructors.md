@@ -7,10 +7,10 @@ let ok = System.Result.Ok(42) // System.Result.Ok<int>
 let result = Result<int, string>(ok)
 let Ok(value) = result else { return -1 }
 
-let some = System.Option.Some<int>(value)
-let option = Option<int>(some)
-let none = System.Option.None()
-let missing = Option<int>(none)
+let some = System.Optional.Some<int>(value)
+let option = Optional<int>(some)
+let none = System.Optional.None()
+let missing = Optional<int>(none)
 ```
 
 These are ordinary calls to declared public instance constructors on bundled library

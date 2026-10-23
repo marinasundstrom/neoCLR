@@ -67,7 +67,7 @@ def main():
     library = artifacts / 'Input.dll'
     consumer = artifacts / 'Consumer.dll'
     production_sources = [ROOT / 'runtime/raven/src/System' / name for name in (
-        'Propagatable.rvn', 'Option.rvn', 'Result.rvn', 'Runtime/CompilerServices/UnionAttribute.rvn')]
+        'Propagatable.rvn', 'Optional.rvn', 'Result.rvn', 'Runtime/CompilerServices/UnionAttribute.rvn')]
     union_library = artifacts / 'ProductionValues.dll'
     attribute_source = ROOT / 'runtime/raven/src/System/Attribute.rvn'
     contracts = artifacts / 'StringContracts.dll'

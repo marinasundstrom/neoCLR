@@ -41,7 +41,7 @@ clock transitions. Keep those outcomes explicit in any later conversion API.
 ## Responsibility and unresolved decisions
 
 Calendar validation, arithmetic, comparison, parsing and formatting belong in the
-library. Neo uses ordinary calls, properties and Option/Result matching. Reading a
+library. Neo uses ordinary calls, properties and Optional/Result matching. Reading a
 clock uses a narrow runtime/host service; a public injectable source remains later work;
 reading the current time must not be implicit in value construction. Monotonic
 elapsed measurement and civil time are separate services.
@@ -178,7 +178,7 @@ exact disambiguation and skipped-time policy remain open. Likewise, `Duration` a
 assumed to produce the same result as adding one calendar day to a `Date`.
 
 Parsing and timezone lookup should use the existing `Result` convention, for example
-`Date.Parse`, `Instant.Parse` and `TimeZone.Find`; `Option<T>` represents absence such
+`Date.Parse`, `Instant.Parse` and `TimeZone.Find`; `Optional<T>` represents absence such
 as an optional event end. The proposed public surface keeps recognizable .NET naming
 and member ergonomics (`date.Year`, `date.AddDays(3)`, `Duration.FromMinutes(30)`),
 while separating concepts that .NET commonly exposes through overlapping types and

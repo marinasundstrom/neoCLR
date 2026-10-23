@@ -23,7 +23,7 @@ impl Lowerer<'_> {
         };
         let path = match path.as_str() {
             "Result" => "System.Result".to_owned(),
-            "Option" => "System.Option".to_owned(),
+            "Optional" => "System.Optional".to_owned(),
             _ => path,
         };
         let inferred;

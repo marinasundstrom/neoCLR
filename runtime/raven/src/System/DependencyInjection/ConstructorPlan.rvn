@@ -3,7 +3,7 @@ module System.DependencyInjection
 import System.*
 import System.Collections.*
 import System.Introspection.*
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 import System.Runtime.Reflection.*
 
@@ -32,7 +32,7 @@ internal class ConstructorPlan {
             return Failure(ActivationError.UnsupportedType)
         }
         let constructors = type.GetConstructors()
-        var selected: Option<ConstructorInfo> = None
+        var selected: Optional<ConstructorInfo> = None
         var count = -1
         for candidate in constructors {
             if !candidate.IsPublic || candidate.IsStatic {

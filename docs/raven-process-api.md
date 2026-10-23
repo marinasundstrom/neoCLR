@@ -1,16 +1,16 @@
 # Process APIs from Raven
 
 Raven's source-built target surface exposes all current Console and Environment
-methods. It calls the runtime library's existing Result/Option APIs; declaration
+methods. It calls the runtime library's existing Result/Optional APIs; declaration
 bodies do not perform host I/O.
 
 | API | Return |
 | --- | --- |
 | Console.WriteLine(string/int) | CLI void |
-| Console.ReadByte() | Result<Option<byte>, IO.ConsoleReadError> |
+| Console.ReadByte() | Result<Optional<byte>, IO.ConsoleReadError> |
 | Environment.GetCommandLineArgs() | string[] |
 | Environment.GetCurrentDirectory() | Result<string, EnvironmentError> |
-| Environment.GetEnvironmentVariable(string) | Result<Option<string>, EnvironmentError> |
+| Environment.GetEnvironmentVariable(string) | Result<Optional<string>, EnvironmentError> |
 
 ReadByte returns Some(byte) for a byte, None at EOF, or a concrete error. The
 [console sample](experiments/raven-target/samples/library-console.rvn) propagates
@@ -30,7 +30,7 @@ at index zero followed by arguments after `--`; it does not leak the host's full
 argument list. String-array initialization uses [typed null defaults](string-default-storage.md).
 
 This follows CLR array/reference categories while retaining neoCLR's existing
-Result/Option error contracts. It adds no new opcode. The snapshot copy is a
+Result/Optional error contracts. It adds no new opcode. The snapshot copy is a
 provisional adapter cost; a future native service can produce the managed array
 directly. Non-null intrinsic String representation remains an implementation detail.
 

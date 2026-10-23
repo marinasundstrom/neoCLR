@@ -109,9 +109,9 @@ These are library contracts; C# foreach adds language lowering and cleanup behav
 Neo adopts the familiar MoveNext/Current protocol but uses the requested Iterable /
 Iterator naming and GetIterator. Omitting legacy nongeneric duplication and Reset
 reduces implementation requirements; it requires API translation from .NET and does
-not provide Reset compatibility. A Next() -> Option<T> protocol would eliminate
+not provide Reset compatibility. A Next() -> Optional<T> protocol would eliminate
 invalid Current states, but would construct today's union carrier on each
-step and diverge from the familiar cursor API. An Option adapter can be evaluated
+step and diverge from the familiar cursor API. An Optional adapter can be evaluated
 later without replacing these interfaces. No performance claim is made.
 
 The ArrayList iterator deliberately differs from .NET's modification-version checks.

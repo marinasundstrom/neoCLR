@@ -1,7 +1,7 @@
 module System.Localization
 
 import System.*
-import System.Option.*
+import System.Optional.*
 
 /// Lookup-first composite formatting. Missing resources are never interpreted as format strings.
 /// Find is safe for missing keys; invalid composite templates retain String.Format's fault behavior.
@@ -18,7 +18,7 @@ public extension LocalizerFormatting for Localizer {
     }
 
     /// Resolves and formats a translation, or returns None without formatting when missing.
-    func Find(key: string, arg0: object?) -> Option<string> {
+    func Find(key: string, arg0: object?) -> Optional<string> {
         if self.Find(key) is Some(let template) {
             return Some(String.Format(self.Culture, template, arg0))
         }
@@ -36,7 +36,7 @@ public extension LocalizerFormatting for Localizer {
     }
 
     /// Resolves and formats a translation, or returns None without formatting when missing.
-    func Find(key: string, arg0: object?, arg1: object?) -> Option<string> {
+    func Find(key: string, arg0: object?, arg1: object?) -> Optional<string> {
         if self.Find(key) is Some(let template) {
             return Some(String.Format(self.Culture, template, arg0, arg1))
         }
@@ -54,7 +54,7 @@ public extension LocalizerFormatting for Localizer {
     }
 
     /// Resolves and formats a translation, or returns None without formatting when missing.
-    func Find(key: string, arg0: object?, arg1: object?, arg2: object?) -> Option<string> {
+    func Find(key: string, arg0: object?, arg1: object?, arg2: object?) -> Optional<string> {
         if self.Find(key) is Some(let template) {
             return Some(String.Format(self.Culture, template, arg0, arg1, arg2))
         }
@@ -72,7 +72,7 @@ public extension LocalizerFormatting for Localizer {
     }
 
     /// Resolves and formats a translation, or returns None without formatting when missing.
-    func Find(key: string, params arguments: object?[]) -> Option<string> {
+    func Find(key: string, params arguments: object?[]) -> Optional<string> {
         if self.Find(key) is Some(let template) {
             return Some(String.Format(self.Culture, template, arguments))
         }

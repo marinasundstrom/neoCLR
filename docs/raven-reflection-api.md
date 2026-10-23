@@ -201,13 +201,13 @@ metadata queries and the migrated consumer syntax. Raven's compiler is unchanged
 The adapted library declares Type, MemberInfo, FieldInfo, MethodInfo, PropertyInfo
 and ParameterInfo as classes. MemberInfo remains an abstract base. Trusted runtime
 reflection factories allocate snapshots according to those declarations, including
-nested Type objects inside descriptors, arrays and Option payloads. Returning a
+nested Type objects inside descriptors, arrays and Optional payloads. Returning a
 base view retains the complete descriptor and its nested metadata objects through GC.
 Allocation observes the managed heap object limit; snapshot construction faults when
 the remaining budget is insufficient. Snapshots never retain the inspected guest object.
 
 This follows the class/reference categories of .NET reflection while retaining
-neoCLR's existing metadata-only API and Option-returning queries. It is not dynamic
+neoCLR's existing metadata-only API and Optional-returning queries. It is not dynamic
 invocation, caching or canonical Type identity. Each query can allocate fresh snapshots;
 Type.Equals compares metadata identity. Allocation cost is an explicit consequence
 of replacing copied descriptor records with familiar class references.
@@ -231,7 +231,7 @@ The current source compiler can now use `typeof(T)` for admitted closed types, a
 MemberInfo, FieldInfo, MethodInfo, PropertyInfo and ParameterInfo. Class assignment
 and base casts preserve identity. Descriptor arrays are projected as managed arrays;
 the adapter copies the owned snapshot vector while retaining descriptor references.
-Option<Type> and Option<MethodInfo> queries support typed case matching.
+Optional<Type> and Optional<MethodInfo> queries support typed case matching.
 
 [The executable sample](experiments/raven-target/samples/library-reflection.rvn)
 covers names, shapes, generic arguments, enum metadata, fields, method parameters,

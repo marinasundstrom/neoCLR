@@ -1,7 +1,7 @@
 import System.*
 import System.Collections.*
 import System.Concurrency.*
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 import System.Concurrency.Tasks.*
 import System.Time.*
@@ -24,15 +24,15 @@ func Main(arguments: string[]) {
         client.Timeout = Some(Duration.FromTicks(21474836470001L))
     } else if mode == "started" {
         _ = client.Get("http://example.test/")
-        client.Timeout = Option<Duration>.None()
+        client.Timeout = Optional<Duration>.None()
     } else if mode == "disposed" {
         client.Dispose()
-        client.Timeout = Option<Duration>.None()
+        client.Timeout = Optional<Duration>.None()
     } else if mode == "cancelled-send" {
         use source = CancellationTokenSource()
         source.Cancel()
         _ = client.Get("http://example.test/", source.Token)
-        client.Timeout = Option<Duration>.None()
+        client.Timeout = Optional<Duration>.None()
     }
     Console.WriteLine("ERROR invalid HTTP timeout change returned")
 }

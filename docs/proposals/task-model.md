@@ -43,7 +43,7 @@ Conceptually:
 ```raven
 class Task<T> {
     State: TaskState
-    Outcome: Option<TaskOutcome<T>>
+    Outcome: Optional<TaskOutcome<T>>
 }
 ```
 
@@ -108,7 +108,7 @@ enum TaskOutcome<T> {
 `Task.Outcome` is unavailable while the Task remains pending:
 
 ```raven
-Outcome: Option<TaskOutcome<T>>
+Outcome: Optional<TaskOutcome<T>>
 ```
 
 For example:
@@ -158,9 +158,9 @@ For example:
 
 ```raven
 Task<int>
-Task<Option<User>>
+Task<Optional<User>>
 Task<Result<User, LoadError>>
-Task<Result<Option<User>, QueryError>>
+Task<Result<Optional<User>, QueryError>>
 ```
 
 are all ordinary Tasks.
@@ -677,7 +677,7 @@ The minimal conceptual runtime contract for a Task is therefore:
 ```raven
 Task<T> {
     State: TaskState
-    Outcome: Option<TaskOutcome<T>>
+    Outcome: Optional<TaskOutcome<T>>
 }
 ```
 
@@ -749,7 +749,7 @@ Task<T>             │ Pending                     │
                  T may itself be:
 
                  Result<T, E>
-                 Option<T>
+                 Optional<T>
                  or any other value
 ```
 

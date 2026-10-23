@@ -2,7 +2,7 @@
 
 `System.Error` is an opt-in contract for recoverable failure diagnostics. Platform
 failure types follow this convention incrementally; applications may implement it,
-but `Result<T,E>`, `Option<T>` and `?` do not require it. This development slice
+but `Result<T,E>`, `Optional<T>` and `?` do not require it. This development slice
 adopts it for `FileReadError`, `NumberParseError` and `StreamError`. Other existing
 platform failure types are not yet migrated.
 
@@ -17,12 +17,12 @@ can all represent errors; the interface does not require a union representation.
 | Property | Contract |
 | --- | --- |
 | `Message: string` | Human-readable description of this layer; use typed patterns for classification. |
-| `Cause: Option<Error>` | `Some` of the underlying failure, or `None` for a leaf. |
-| `StackTrace: Option<System.Diagnostics.StackTrace>` | Existing snapshot or `None`; reading it never captures. |
+| `Cause: Optional<Error>` | `Some` of the underlying failure, or `None` for a leaf. |
+| `StackTrace: Optional<System.Diagnostics.StackTrace>` | Existing snapshot or `None`; reading it never captures. |
 
 Implement all three getter contracts. Native Raven currently requires explicit
 absent implementations returning `None`; default interface bodies remain a compiler
-emission gap. The optional values are ordinary Option cases, not inactive defaults.
+emission gap. The optional values are ordinary Optional cases, not inactive defaults.
 Messages and diagnostic chains may contain application data; choose what to report
 at the application boundary.
 

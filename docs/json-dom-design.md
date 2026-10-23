@@ -328,7 +328,7 @@ Preserve existing string/Uri base-address rules and cancellation behavior when
 implementing these conveniences. The combined HTTP/JSON error contract still needs
 to be established without erasing either structured cause.
 
-The author also proposes HttpResponse.Request: Option<HttpRequest>. The assistant's
+The author also proposes HttpResponse.Request: Optional<HttpRequest>. The assistant's
 proposed default is None for standalone/server-created responses, with client Send
 associating the originating request even through custom handlers. Validate request
 identity, pending completion, cancellation, handler failures and GC retention before
@@ -339,7 +339,7 @@ These are next-slice directions, not implemented APIs in this checkpoint.
 ### Response association checkpoint — 2026-09-26
 
 The author explicitly prioritizes HttpResponse.Request next. The implementation uses
-Option<HttpRequest> with a read-only public getter. HttpClient.Send associates each
+Optional<HttpRequest> with a read-only public getter. HttpClient.Send associates each
 successful Result response with the effective request passed to its handler, for
 socket and custom handlers alike. Without applied defaults this is the caller's
 original request; defaults can produce a derived request. Non-success HTTP statuses still carry a response and are
@@ -348,7 +348,7 @@ have no association guarantee. Respond changes status/content without clearing R
 Failed Results and cancelled tasks do not mutate an unrelated response.
 
 Compared with [.NET RequestMessage](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpresponsemessage.requestmessage?view=net-10.0),
-neoCLR uses explicit Option absence and no public setter. .NET documents the actual
+neoCLR uses explicit Optional absence and no public setter. .NET documents the actual
 final request after redirects/authentication; this POC records the request after
 applying client defaults and does not implement those rewrites. This limitation must be revisited
 when adding redirects or request-transforming handlers. A response reused by a custom
@@ -435,7 +435,7 @@ serialized repeatedly and read back as independent instances. Four object levels
 including the root, are allowed; deeper graphs and cycles return LimitExceeded.
 Depth bounding reuses the existing DOM contract and avoids a reference-tracking
 protocol, but does not distinguish a cycle from an ordinary overly deep graph.
-Nulls, collections, Option, generic/value models, naming policies and configurable
+Nulls, collections, Optional, generic/value models, naming policies and configurable
 limits remain deferred. The existing 128-byte/32-value document limits still apply.
 Mapping and encoded-document validation finish before stream writes.
 
@@ -552,7 +552,7 @@ The author subsequently specifies that Map should have indexers: getting a missi
 value may fault, which is why lookup methods are preferred; setting through
 MutableMap is normally straightforward. The agreed design is `Map<K,V>` getter
 indexing returning V, with a missing-key fault, and a MutableMap setter using the
-existing insert-or-replace semantics. Find remains the safe Option-returning path.
+existing insert-or-replace semantics. Find remains the safe Optional-returning path.
 Apply the same missing-key distinction to JsonObject: JsonNull is an existing node,
 not an absent entry. This resolves the indexer return-type question above. General
 map indexers and JsonObject conformance were implementation work at this point; JSON setter

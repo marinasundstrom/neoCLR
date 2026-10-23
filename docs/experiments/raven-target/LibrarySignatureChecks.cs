@@ -16,9 +16,9 @@ static class LibrarySignatureChecks
         using var nominal = AssemblyDefinition.ReadAssembly(core);
         var value = new TypeReference("System", "Void", nominal.MainModule, nominal.MainModule, true);
         var primitive = new EncodedVoid(module);
-        GenericInstanceType Option(TypeReference argument)
+        GenericInstanceType Optional(TypeReference argument)
         {
-            var result = new GenericInstanceType(module.GetType("System.Option`1"));
+            var result = new GenericInstanceType(module.GetType("System.Optional`1"));
             result.GenericArguments.Add(argument);
             return result;
         }
@@ -27,14 +27,14 @@ static class LibrarySignatureChecks
             if (!condition) throw new InvalidDataException(message);
         }
         Require(!LibraryImplementation.SameType(primitive, value), "No-result and value returns must stay distinct.");
-        Require(LibraryImplementation.SameType(Option(primitive), Option(value)), "Generic Void encodings must match.");
+        Require(LibraryImplementation.SameType(Optional(primitive), Optional(value)), "Generic Void encodings must match.");
         using var other = AssemblyDefinition.ReadAssembly(core);
         other.Name.Version = new Version(99, 0);
-        Require(!LibraryImplementation.SameType(Option(primitive), Option(new TypeReference("System", "Void", other.MainModule, other.MainModule, true))), "Different core identities must not match.");
+        Require(!LibraryImplementation.SameType(Optional(primitive), Optional(new TypeReference("System", "Void", other.MainModule, other.MainModule, true))), "Different core identities must not match.");
         other.Name.Name = "Other.Core";
-        Require(!LibraryImplementation.SameType(Option(primitive), Option(new TypeReference("System", "Void", other.MainModule, other.MainModule, true))), "Foreign Void types must not match.");
+        Require(!LibraryImplementation.SameType(Optional(primitive), Optional(new TypeReference("System", "Void", other.MainModule, other.MainModule, true))), "Foreign Void types must not match.");
         value.Resolve().Fields.Add(new FieldDefinition("Payload", FieldAttributes.Public, module.TypeSystem.Int32));
-        Require(!LibraryImplementation.SameType(Option(primitive), Option(value)), "A nonempty Void must not match the storage projection.");
+        Require(!LibraryImplementation.SameType(Optional(primitive), Optional(value)), "A nonempty Void must not match the storage projection.");
         Console.WriteLine("Generic Void encodings match; no-result returns, foreign/versioned cores and nonempty Void are rejected.");
     }
 }

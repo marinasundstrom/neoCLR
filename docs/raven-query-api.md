@@ -17,11 +17,11 @@ methods over `System.Collections.Iterable<T>` and, after Preview 5, vector array
 | `Concat<T>(Iterable<T>, Iterable<T>)` | `Iterable<T>` | Lazy first sequence followed by second |
 | `FlatMap<T, U>(Iterable<T>, Func<T, Iterable<U>>)` | `Iterable<U>` | Lazy projection and ordered flattening |
 | `ToList<T>(Iterable<T>)` | `ArrayList<T>` | Consumes the sequence immediately into a new list |
-| `First<T>(Iterable<T>)` | `Option<T>` | Reads at most the first element |
-| `Last<T>(Iterable<T>)` | `Option<T>` | Consumes the sequence, retaining the last element |
+| `First<T>(Iterable<T>)` | `Optional<T>` | Reads at most the first element |
+| `Last<T>(Iterable<T>)` | `Optional<T>` | Consumes the sequence, retaining the last element |
 | `Single<T>(Iterable<T>)` | `Result<T, SingleError>` | Requires exactly one element; stops on a second element |
-| `First<T>(Iterable<T>, Func<T, bool>)` | `Option<T>` | Stops at the first matching element |
-| `Last<T>(Iterable<T>, Func<T, bool>)` | `Option<T>` | Forward scan retaining the last match |
+| `First<T>(Iterable<T>, Func<T, bool>)` | `Optional<T>` | Stops at the first matching element |
+| `Last<T>(Iterable<T>, Func<T, bool>)` | `Optional<T>` | Forward scan retaining the last match |
 | `Single<T>(Iterable<T>, Func<T, bool>)` | `Result<T, SingleError>` | Counts matches; stops on the second match |
 
 Import `System.Linq.*` to use member syntax. See the readable
@@ -213,9 +213,9 @@ OrDefault aliases, count/aggregation operators, ordering and specialized collect
 paths remain outside this implementation.
 An empty filtered sequence is handled identically to an empty source. The
 [terminal sample](experiments/raven-target/samples/library-query-terminals.rvn)
-shows arrays, lists, reference and Result payloads, case destructuring, Option
+shows arrays, lists, reference and Result payloads, case destructuring, Optional
 propagation and Single's Result propagation. It uses the currently supported
-explicit Option carrier constructor when returning a Some value.
+explicit Optional carrier constructor when returning a Some value.
 
 The terminal acquires an iterator once and disposes it on each normal outcome,
 including an early First result or Single cardinality error. For the source-only
@@ -241,19 +241,19 @@ Sources reviewed 2026-09-13, with .NET 10 as the API baseline:
 - [.NET First](https://learn.microsoft.com/en-us/dotnet/api/system.linq.enumerable.first?view=net-10.0)
   and [Last](https://learn.microsoft.com/en-us/dotnet/api/system.linq.enumerable.last?view=net-10.0)
   throw on empty input. Their OrDefault alternatives can conflate absence with a
-  legitimate default value. neoCLR keeps familiar method names but returns Option.
+  legitimate default value. neoCLR keeps familiar method names but returns Optional.
   This changes source contracts and adds case handling; it does not imply binary
   compatibility or a performance improvement.
 - [.NET Single](https://learn.microsoft.com/en-us/dotnet/api/system.linq.enumerable.single?view=net-10.0)
   requires exactly one item. [SingleOrDefault](https://learn.microsoft.com/en-us/dotnet/api/system.linq.enumerable.singleordefault?view=net-10.0)
   still rejects multiple items. We retain the exactly-one requirement but represent
-  the two cardinality failures explicitly. Result<Option<T>, MultipleError> would
+  the two cardinality failures explicitly. Result<Optional<T>, MultipleError> would
   fit an at-most-one operation but weaken what the name Single asks for. Returning
-  only Option would erase the difference between no match and ambiguous matches.
+  only Optional would erase the difference between no match and ambiguous matches.
 - [Rust Iterator](https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.next)
-  uses Option for end-of-iteration. The transferable lesson is explicit absence,
+  uses Optional for end-of-iteration. The transferable lesson is explicit absence,
   not Rust's ownership model or its iterator API. neoCLR retains MoveNext/Current
-  for familiar interface-based iteration and puts Option on these public terminals.
+  for familiar interface-based iteration and puts Optional on these public terminals.
 - [CSharpFunctionalExtensions](https://github.com/vkhorikov/CSharpFunctionalExtensions#tryfirst-and-trylast)
   describes the ambiguity of FirstOrDefault/LastOrDefault and supplies Maybe-based
   TryFirst/TryLast. This is .NET ecosystem experience supporting an absence carrier,
@@ -341,7 +341,7 @@ use separate control-flow paths so the verifier can establish that the saved T
 payload is initialized; no default T or new verifier rule is required.
 
 This extends the earlier terminal design review, including its other-platform and
-alternative .NET Option/Maybe comparisons. Primary .NET 10 sources consulted
+alternative .NET Optional/Maybe comparisons. Primary .NET 10 sources consulted
 2026-09-13: [First(predicate)](https://learn.microsoft.com/en-us/dotnet/api/system.linq.enumerable.first?view=net-10.0)
 and [Single(predicate)](https://learn.microsoft.com/en-us/dotnet/api/system.linq.enumerable.single?view=net-10.0)
 provide familiar predicate signatures but use exceptions for missing/non-unique
@@ -380,7 +380,7 @@ in `runtime/raven/src/System/Linq/Operators.rvn`. `System.Linq.Operators` holds 
 The name describes an operation container rather than a sequence contract. Compared
 with .NET's Enumerable class, this is a naming difference, not a new query protocol.
 
-Generated bootstrap bodies retain the existing Option/Result outcomes and Dispose
+Generated bootstrap bodies retain the existing Optional/Result outcomes and Dispose
 boundaries. Iterator/predicate faults still terminate execution rather than becoming
 error outcomes; this migration does not introduce exception unwinding. Deferred
 Filter/Map sequences and iterators are also authored in Raven. Their private helper
@@ -475,7 +475,7 @@ implementation does not claim those guarantees. Counting overflow faults in neoC
 where .NET uses OverflowException. Eager materialization was rejected because it
 would consume more input and change callback timing, especially for short-circuiting.
 
-Rust separates a seeded fold from a seedless reduce returning Option. The author
+Rust separates a seeded fold from a seedless reduce returning Optional. The author
 selected Fold specifically for the seeded contract: the name communicates an explicit
 initial state and avoids conflating empty-input rules. The cost is migration from
 .NET's Aggregate spelling. Skip is already shared terminology, so changing it to
@@ -506,10 +506,10 @@ Only the listed overloads are admitted. Namespace System.Linq stays familiar.
 | `Take(count), Skip(count)` | `Take(count), Skip(count)` | Lazy prefix/suffix; non-positive bounds follow .NET behavior. |
 | `Concat(second)` | `Concat(second)` | Lazy concatenation in source order. |
 | `ToList()` | `ToList()` | Materializes an ArrayList rather than a .NET List. |
-| `First(), First(predicate)` | `First(), First(predicate)` | Returns Option; empty/no match is None rather than an exception. |
-| `Last(), Last(predicate)` | `Last(), Last(predicate)` | Returns Option; empty/no match is None rather than an exception. |
+| `First(), First(predicate)` | `First(), First(predicate)` | Returns Optional; empty/no match is None rather than an exception. |
+| `Last(), Last(predicate)` | `Last(), Last(predicate)` | Returns Optional; empty/no match is None rather than an exception. |
 | `Single(), Single(predicate)` | `Single(), Single(predicate)` | Returns Result with distinct Empty/Multiple errors. |
-| `FirstOrDefault / LastOrDefault / SingleOrDefault` | `No direct equivalent` | Use the Option/Result outcome and an explicit fallback. |
+| `FirstOrDefault / LastOrDefault / SingleOrDefault` | `No direct equivalent` | Use the Optional/Result outcome and an explicit fallback. |
 | `Aggregate without a seed, Sum, Average, Min, Max` | `Not yet implemented` | Seeded Fold can express basic accumulation. |
 | `OrderBy, ThenBy, GroupBy, Join, Distinct, Union, Intersect, Except, Zip` | `Not yet implemented` | Ordering, equality and pairing contracts remain future work. |
 

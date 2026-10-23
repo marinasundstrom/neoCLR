@@ -3,7 +3,7 @@ import System.Introspection.*
 import System.Collections.*
 import System.Runtime.Reflection.*
 import System.Result.*
-import System.Option.*
+import System.Optional.*
 
 public class Report {
     init() { }

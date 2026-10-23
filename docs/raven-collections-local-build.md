@@ -1,7 +1,7 @@
 # Try the collection library with Raven (.12)
 
 This local experimental build includes the newer collection capabilities, Map and
-HashMap, Option/Result-based LINQ terminals and direct ArrayList filters. It is not
+HashMap, Optional/Result-based LINQ terminals and direct ArrayList filters. It is not
 a newly published neoCLR release. It uses ordinary Raven classes and array syntax;
 no explicit managed-reference syntax is required for this workflow.
 
@@ -21,7 +21,7 @@ bundled runtime library. Completion uses the installed experimental extension's
 language server and matching neoCLR declaration metadata.
 
 The initial [order collection workflow](raven-order-workflow.md#collection-integration-scenario-2026-09-13-source-slice)
-shows duplicate rejection, Option lookup/propagation, shallow FindAll results that
+shows duplicate rejection, Optional lookup/propagation, shallow FindAll results that
 retain class identity, array/interface queries and Result-based cardinality errors.
 Expected output:
 
@@ -54,7 +54,7 @@ Other samples are in `../tools/samples`, including `library-list-filters.rvn`,
 
 The workspace selects this SDK explicitly. Existing SDK versions, normal selection
 and earlier demos remain separate. Do not mix its regenerated core metadata with
-an older System library. Breaking change: FindIndex now returns Option<int>, not
+an older System library. Breaking change: FindIndex now returns Optional<int>, not
 Int32/-1. Match Some/None as shown in the sample.
 
 [Collection capabilities](collection-contracts.md) remain a bounded prototype:

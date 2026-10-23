@@ -4,7 +4,7 @@ The preview should demonstrate a strong, useful subset of the new platform, not 
 complete CLR implementation. All existing public runtime-library APIs developed with
 Neo are in scope for Raven access in this POC; this does not require new .NET APIs or
 full language-feature parity. Familiar .NET type and IL behavior is the baseline;
-the visible differences are the runtime library's Result/Option error model, generic
+the visible differences are the runtime library's Result/Optional error model, generic
 Void, and target library contracts consumed through Raven.
 
 ## What the experiment should make visible
@@ -31,13 +31,13 @@ or naming familiarity alone does not imply .NET compatibility or a settled contr
 | --- | --- | --- |
 | Value/reference behavior | Value-carrier copies remain independent; class and array aliases share mutations | Verified in saved-project and application checks, including bounded application classes, value copies, inheritance and interfaces; [import limits](raven-application-types.md) remain explicit |
 | Runtime library | Calls execute neoCLR library implementations, not metadata stubs or host .NET implementations | The [existing library audit](raven-runtime-api-coverage.md) is complete for the bounded projection; declarations without concrete implementations are identified there |
-| Errors and absence | Success, expected error and absent-value paths use Result/Option | Verified with explicit case handling |
-| Propagation | Success continues; failure returns a compatible carrier; incompatible carriers are rejected | Existing Result/Option payload projections, file errors and Result<Void,E> execute with early returns; [carrier and signature limits](raven-union-api.md) remain explicit |
+| Errors and absence | Success, expected error and absent-value paths use Result/Optional | Verified with explicit case handling |
+| Propagation | Success continues; failure returns a compatible carrier; incompatible carriers are rejected | Existing Result/Optional payload projections, file errors and Result<Void,E> execute with early returns; [carrier and signature limits](raven-union-api.md) remain explicit |
 | Match syntax | Match expression and statement forms compile and execute; rejected forms and diagnostics are documented | [Bounded Raven matrix verified](raven-match-matrix.md): typed/imported cases, target-typed destructuring, both expression spellings and statement actions work; the statement-arm return caveat remains documented |
 | Text files | Read/write text, show expected I/O errors through Result, and demonstrate round-trip data | [Bounded read/write projection verified](raven-file-api.md), including propagation, typed matches and temporary-file checks; [error-type APIs are projected](raven-error-api.md) |
 | Date and time | Obtain the system's current local date/time using the separate date/time library concepts | [Existing calendar/clock APIs are projected](raven-calendar-api.md); full formatting/globalization is not required |
 | VS Code | Completion resolves target APIs and the saved project runs through the neoCLR task | Verified with the isolated [local .8 SDK/extension](raven-query-local-build.md), target completion/hover and packaged tasks |
-| Queries and callbacks | Deferred filtering/projection, materialization and generic target interfaces work together | [Where/Select/ToList](raven-query-api.md), captured callbacks and custom Raven iterators pass; [the order workflow](raven-order-workflow.md) combines queries with Result/Option and file I/O |
+| Queries and callbacks | Deferred filtering/projection, materialization and generic target interfaces work together | [Where/Select/ToList](raven-query-api.md), captured callbacks and custom Raven iterators pass; [the order workflow](raven-order-workflow.md) combines queries with Result/Optional and file I/O |
 | Reflection | List useful type/member information from the target runtime | [Public introspection APIs are projected](raven-reflection-api.md), including class descriptors and flags |
 
 Normal execution prints only guest output. Return-value and GC inspection are opt-in
@@ -51,7 +51,7 @@ Use the [runtime API inventory and coverage plan](raven-runtime-api-coverage.md)
 Inventory the public declarations in `runtime/System.neoil` and its included modules,
 then track metadata visibility, callable import, runtime behavior and an executable
 Raven example/test for each API. Include primitive/string helpers, Console input and
-output, Math, arrays/collections, Result/Option, delegates and foundational interfaces,
+output, Math, arrays/collections, Result/Optional, delegates and foundational interfaces,
 Environment, Path/File, date/time, Type/reflection and their error contracts. Internal
 implementation fields/helpers are not application APIs. Count overloads and generic
 forms explicitly rather than declaring a type covered because one method works.

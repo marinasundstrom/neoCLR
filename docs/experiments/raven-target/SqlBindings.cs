@@ -28,17 +28,17 @@ public class SqlStatement {
     public SqlStatement(string text, Collections.Sequence<SqlValue> values) { }
     public SqlStatement(string text, Collections.Sequence<Collections.KeyValuePair<string, SqlValue>> values) { }
     public bool HasNamedParameters => default;
-    public Option<string> ParameterName(int index) => default;
+    public Optional<string> ParameterName(int index) => default;
     public string Text => default;
     public int ParameterCount => default;
     public SqlValue Parameter(int index) => default;
 }
 public class SqlRow {
-    public SqlRow(Collections.Sequence<string> columns, Collections.Sequence<Option<string>> cells) { }
+    public SqlRow(Collections.Sequence<string> columns, Collections.Sequence<Optional<string>> cells) { }
     public int Count => default;
     public Result<string, SqlError> Column(int index) => default;
-    public Result<Option<string>, SqlError> Text(int index) => default;
-    public Result<Option<string>, SqlError> Text(string name) => default;
+    public Result<Optional<string>, SqlError> Text(int index) => default;
+    public Result<Optional<string>, SqlError> Text(string name) => default;
     public Result<string, SqlError> RequiredText(string name) => default;
     public Result<int, SqlError> Int32(string name) => default;
     public Result<long, SqlError> Int64(string name) => default;

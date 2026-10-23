@@ -1,15 +1,15 @@
 import System.*
 import System.Result.*
-import System.Option.*
+import System.Optional.*
 
 static class InputOutcomes {
-    static func Present(value: byte) -> Result<Option<byte>, ConsoleReadError> {
-        let option: Option<byte> = Some(value)
+    static func Present(value: byte) -> Result<Optional<byte>, ConsoleReadError> {
+        let option: Optional<byte> = Some(value)
         return Ok(option)
     }
 
-    static func End() -> Result<Option<byte>, ConsoleReadError> {
-        let option: Option<byte> = None()
+    static func End() -> Result<Optional<byte>, ConsoleReadError> {
+        let option: Optional<byte> = None()
         return Ok(option)
     }
 }

@@ -21645,3 +21645,20 @@ See [the development API contract](../api-docs/error-context.md).
   website validation passed; [evidence](validation/result-failure/validation.json).
 - **Author:** Confirmed continuing through Option to Optional and requested a
   corresponding OptionalFacts definition. This remains a separate migration.
+
+## 2026-10-23 — Optional platform convention
+
+- **Author:** Directed continuing through Option to Optional and introducing
+  OptionalFacts, after the separate Result migration.
+- **Assistant action:** Renamed the platform type and extension/converter names,
+  retaining Some/None and existing propagation/JSON behavior. Compiler constants
+  remain internal and specific to known conventions, with no configuration layer.
+  Updates include Raven main, the deliberate neoCLR carry, native reflection
+  adapters, API references, examples and website.
+- **Outcome:** Committed on Raven main (`694bbeae8`) and deliberately carried to
+  codex/neoclr (`5b9298b62`). Focused compiler, core, conditional-method, editor,
+  native runtime and documentation checks pass. Two broader lowering-trace
+  expectation failures reproduce with baseline compiler sources and remain open.
+  [Validation evidence](validation/optional/validation.json) records counts,
+  artifact identities and the distinction between native bundle builds and final
+  compiler commits. No branch merge or website publication was performed.

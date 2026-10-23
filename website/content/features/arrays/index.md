@@ -102,7 +102,7 @@ Each array slice shares storage. ToArray makes an independent shallow copy.
 `^0` describes the end boundary, so it can end a slice but cannot select an element.
 
 Indexing and slicing syntax are convenience APIs that may fault on invalid bounds;
-callers must establish valid input. `values.Get(index)` returns an `Option<T>` for
+callers must establish valid input. `values.Get(index)` returns an `Optional<T>` for
 an integer or Index. `values.Slice(range)` returns `Slice<T>`.
 Index and Range describe positions and boundaries; applying them determines validity.
 

@@ -22,12 +22,12 @@ for comparison with .NET and Rust.
 | `MapEntry<K,V>(map: MutableMap<K,V>, key: K)` | Retains the map and key; same contract as Entry. |
 | `Key: K` | Supplied lookup key, not necessarily the canonical stored key. |
 | `Value: V` | Current value; missing keys use the map's normal indexer Fault. |
-| `Find() -> Option<V>` | Current lookup; Some(null), where permitted, differs from None. |
+| `Find() -> Optional<V>` | Current lookup; Some(null), where permitted, differs from None. |
 | `Set(value: V) -> MapEntry<K,V>` | Inserts/replaces and returns the same locator. |
 | `OrInsert(value: V) -> V` | Returns the existing value, or inserts/returns the eager fallback. |
 | `OrInsertWith(factory: () -> V) -> V` | Calls factory once only if absent; callback insertion wins. |
 | `AndModify(transform: (V) -> V) -> MapEntry<K,V>` | Skips absent keys; otherwise transforms once and writes the returned value, even after nested replacement/removal. |
-| `MutableSet<T>.Find(value: T) -> Option<T>` | Returns the actual stored equivalent value using the set's policy, or None. Implemented by HashSet. |
+| `MutableSet<T>.Find(value: T) -> Optional<T>` | Returns the actual stored equivalent value using the set's policy, or None. Implemented by HashSet. |
 | `MutableSetExtensions.GetOrInsert<T>(self: MutableSet<T>, value: T) -> T` | Returns the stored equivalent element, preserving identity, or inserts/returns the candidate. |
 
 Callbacks run synchronously and may reenter the collection. Failures propagate before

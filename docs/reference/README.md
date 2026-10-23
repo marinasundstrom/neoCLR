@@ -133,7 +133,7 @@
 - [Minimal read-only type inspection](../type-inspection.md)
 - [Type system: first executable slice](../type-system.md)
 - [Preview 1 ordinary union member convention](../union-convention.md)
-- [Ordinary Option and Result inputs](../union-inputs.md)
+- [Ordinary Optional and Result inputs](../union-inputs.md)
 - [Union convention and library fundamentals](../unions-and-enums.md)
 - [Temporary explicit typed value storage](../value-storage.md)
 - [Typed control-flow verifier](../verification.md)

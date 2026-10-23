@@ -13,7 +13,7 @@ All three types are invariant in both K and V:
 
 | Type | Members declared here |
 | --- | --- |
-| `System.Collections.Map<K,V>` | `Count`, `Keys: Sequence<K>`, `Find(K): Option<V>`, `ContainsKey(K): Boolean` |
+| `System.Collections.Map<K,V>` | `Count`, `Keys: Sequence<K>`, `Find(K): Optional<V>`, `ContainsKey(K): Boolean` |
 | `MutableMap<K,V>: Map<K,V>` | `TryAdd(K,V): Boolean`, `Set(K,V): void` |
 | `HashMap<K,V>: MutableMap<K,V>` | Implements the above; constructor takes `Func<K,K,Boolean> equal` and `Func<K,Int32> hash` |
 
@@ -60,7 +60,7 @@ kind or opcode is required.
 
 - [.NET Dictionary](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.dictionary-2?view=net-10.0)
   supports comparer selection, non-null keys, indexed lookup/update and enumeration.
-  Its ordinary missing-key indexer throws. neoCLR uses an Option-returning method
+  Its ordinary missing-key indexer throws. neoCLR uses an Optional-returning method
   for expected absence and retains explicit mutation through a separate interface.
   This costs some familiar indexer ergonomics and is a provisional API choice.
 - [.NET TryAdd](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.dictionary-2.tryadd?view=net-10.0)
@@ -82,13 +82,13 @@ kind or opcode is required.
   This prototype's predictable, caller-supplied hashing has no collision-attack
   resistance or performance parity claim.
 - [LanguageExt HashMap](https://louthy.github.io/language-ext/LanguageExt.Core/Immutable%20Collections/HashMap/index.html)
-  offers `Find` returning `Option<V>`. It is a useful .NET ecosystem comparison for
+  offers `Find` returning `Optional<V>`. It is a useful .NET ecosystem comparison for
   absence, but its persistent immutable update model is different from neoCLR's
   ordinary mutable reference object. We do not imply that copying a HashMap binding
   copies its contents.
 
 Alternatives left open include the full Dictionary surface with faults on missing
-indexers; a read indexer returning Option with separately named updates; a comparer
+indexers; a read indexer returning Optional with separately named updates; a comparer
 interface plus default factory; and pair-based Iterable enumeration. A linear scan
 would have avoided hashing but would not test a HashMap. A native host dictionary
 would hide the storage and equality choices we need to exercise. The implemented
@@ -115,7 +115,7 @@ do not execute the dictionary algorithm. `MapBindings` validates invariant gener
 metadata and closes argument/result signatures. No Raven repository change is needed.
 
 The [Raven sample](experiments/raven-target/samples/library-maps.rvn) covers order
-lookup, duplicate rejection, Option destructuring, growth, snapshots, interface
+lookup, duplicate rejection, Optional destructuring, growth, snapshots, interface
 passing, Type keys, shared ArrayList values and nested generic collection usage.
 `tests/raven_collections.rs` adds direct IL checks for collisions/distributed hashes,
 GC pressure, reference retention, snapshot isolation, reentrancy faults, missing
@@ -134,7 +134,7 @@ then run the sample through `run_project.py` as described in the
 installed .11 SDK/extension/bundle does not contain this API; it was not replaced
 by this source slice. Use a fresh source-build probe directory for validation.
 
-LINQ terminal Option/Result changes remain a separate slice, as the author requested.
+LINQ terminal Optional/Result changes remain a separate slice, as the author requested.
 
 Source validation on 2026-09-13 passed 13 collection/runtime tests, 61 saved-project
 cases, 81 signature checks, ten capability rejection cases and 59 editor checks.

@@ -1,12 +1,12 @@
 import System.*
-import System.Option.*
+import System.Optional.*
 
 union Choice {
     case Pair(left: int, right: string?)
     case Empty
 }
-record struct Optional(Value: Option<int>)
-record struct Nested(Value: Option<Option<string>>)
+record struct Optional(Value: Optional<int>)
+record struct Nested(Value: Optional<Optional<string>>)
 record struct PairValue(Value: Choice)
 
 func Check(actual: string, expected: string) {
@@ -17,14 +17,14 @@ func Check(actual: string, expected: string) {
 }
 
 func Main() {
-    Check(Optional(Some(42)).ToString(), "Optional { Value = Option.Some(42) }")
-    Check(Optional(None).ToString(), "Optional { Value = Option.None }")
+    Check(Optional(Some(42)).ToString(), "Optional { Value = Optional.Some(42) }")
+    Check(Optional(None).ToString(), "Optional { Value = Optional.None }")
     let absent: Optional = default
     Check(absent.ToString(), "Optional { Value = <Uninitialized> }")
-    Check(Nested(Some(Some("é"))).ToString(), "Nested { Value = Option.Some(Option.Some(\"é\")) }")
+    Check(Nested(Some(Some("é"))).ToString(), "Nested { Value = Optional.Some(Optional.Some(\"é\")) }")
     Check(PairValue(Choice.Pair(7, null)).ToString(), "PairValue { Value = Choice.Pair(Left=7, Right=null) }")
     Check(PairValue(Choice.Empty).ToString(), "PairValue { Value = Choice.Empty }")
     let boxed: Object = Optional(Some(0))
-    Check(boxed.ToString(), "Optional { Value = Option.Some(0) }")
+    Check(boxed.ToString(), "Optional { Value = Optional.Some(0) }")
     Console.WriteLine("PASS record union formatting")
 }

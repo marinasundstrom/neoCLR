@@ -44,7 +44,7 @@ for modern application code:
 
 - **UTF-8 strings** use the encoding common to network and file formats, with
   Unicode-aware text operations and explicit byte access.
-- **Option for absence** expresses an optional value through Some and None instead
+- **Optional for absence** expresses an optional value through Some and None instead
   of relying on nullable values as the API convention.
 - **Result for recoverable errors** exposes success and failure in the return type,
   with patterns for handling and `?` for propagation.
@@ -55,7 +55,7 @@ for modern application code:
 
 These choices shape the platform's API design; adoption is incremental as existing
 APIs evolve. They do not imply .NET library compatibility. See
-[strings](../features/strings/), [Option and Result](../features/outcomes/),
+[strings](../features/strings/), [Optional and Result](../features/outcomes/),
 [error handling](../features/error-handling/), [slices and memory](../features/memory/)
 and the [platform comparison](../comparison/) for current behavior.
 

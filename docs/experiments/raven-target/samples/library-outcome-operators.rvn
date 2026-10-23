@@ -1,12 +1,12 @@
 import System.*
 import System.Collections.*
 import System.Linq.*
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 import System.Console.*
 
 func Main() {
-    let input: Option<int> = Some(21)
+    let input: Optional<int> = Some(21)
     let answer = input.Map(value => value * 2)
         .Filter(value => value > 0)
 
@@ -22,7 +22,7 @@ func Main() {
         Failure(let error) => WriteLine(error)
     }
 
-    let absent: Option<int> = None
+    let absent: Optional<int> = None
     let fallback = absent.OrElse(() => Some(7))
     WriteLine(fallback.UnwrapOr(0))
 

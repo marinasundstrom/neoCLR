@@ -6,7 +6,7 @@ import System.IO.*
 import System.Result.*
 import System.Concurrency.*
 import System.Concurrency.Tasks.*
-import System.Option.*
+import System.Optional.*
 
 /// <summary>Buffered HTTP content retaining a readonly memory window without copying.</summary>
 /// <remarks>Readonly is shallow: keep backing bytes unchanged during reads or sends.</remarks>
@@ -123,8 +123,8 @@ internal class HttpContentTextInput : InputStream {
     private val source: InputStream
     private var readToken = CancellationToken.None
     private var remaining: int
-    private var failure: Option<StreamError> = None()
-    val Failure: Option<StreamError> {
+    private var failure: Optional<StreamError> = None()
+    val Failure: Optional<StreamError> {
         get {
             if let Some(error) = failure {
                 return Some(error)

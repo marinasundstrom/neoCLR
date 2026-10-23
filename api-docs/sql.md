@@ -30,7 +30,7 @@ A transport error can follow a committed statement. No exactly-once guarantee ex
 `SqlStatement(text: string, values: Sequence<SqlValue>)` copies the sequence, preserving
 order. `SqlStatement(text, values: Sequence<KeyValuePair<string, SqlValue>>)` copies
 named values without interpreting the SQL. `HasNamedParameters: bool` distinguishes
-the constructors even for empty snapshots; `ParameterName(index) -> Option<string>`
+the constructors even for empty snapshots; `ParameterName(index) -> Optional<string>`
 returns Some(name) or None for positional values. Invalid indexes fault; inactive
 SqlValue payloads in a named pair fault. Names are preserved exactly; each provider
 validates its naming rules. `Text: string`, `ParameterCount: int` and `Parameter(index: int) -> SqlValue`
@@ -46,10 +46,10 @@ with an explicit SQL cast. Parameter values cannot stand for identifiers or SQL 
 
 ## Rows, results and mapping
 
-`SqlRow(columns: Sequence<string>, cells: Sequence<Option<string>>)` copies both
+`SqlRow(columns: Sequence<string>, cells: Sequence<Optional<string>>)` copies both
 sequences. Mismatched lengths are a programmer fault. `Count: int` is the column count.
 `Column(index: int) -> Result<string, SqlError>` returns an ordinal column name.
-`Text(index: int)` and `Text(name: string)` return `Result<Option<string>, SqlError>`.
+`Text(index: int)` and `Text(name: string)` return `Result<Optional<string>, SqlError>`.
 None means SQL NULL; Some("") is empty text. Name access is ordinal, case-sensitive;
 missing names, duplicate names and bad indexes are Mapping errors.
 

@@ -28,7 +28,7 @@ properties and a persistent runtime init-only field flag are not provided here.
 OptionalEntry models a nullable reference at a boundary: its Owner: Person? can be
 null, and OptionalPair exercises mixed/multiple null arguments. Equality, hashes,
 display and deconstruction preserve the absent reference. This does not add nullable
-strings or nullable integer components. Prefer Option<T> for domain absence; Option
+strings or nullable integer components. Prefer Optional<T> for domain absence; Optional
 record components remain a separate capability. The verifier also rejects passing
 null through the unsupported intrinsic-string argument path.
 
@@ -69,7 +69,7 @@ The development target selects RavenAllowNullableValueTypes=false. Nullable valu
 declarations now fail in Raven with RAV0407 ("Value types can't be declared as
 nullable"), before importing the program. The verifier checks this for integers,
 record structs and an ordinary method parameter. Nullable reference annotations
-remain supported; Option<T> is the preferred model for intentional absence.
+remain supported; Optional<T> is the preferred model for intentional absence.
 
 Validation for this slice: 117 focused integration compiler tests, all three record
 programs and their rejection cases, plus the Object equality sample pass. Runtime

@@ -27,7 +27,7 @@ neoCLR uses ordinary library structs, typed equality and explicit formatting/has
 Index and Range describe positions and boundaries. The author's clarified policy
 (2026-10-11) applies faulting behavior to APIs **using** those values: indexers and
 slicing syntax are convenience access whose caller must establish valid bounds.
-They remain memory-safe and bounds-checked. Array.Get(int/Index) returns Option<T>;
+They remain memory-safe and bounds-checked. Array.Get(int/Index) returns Optional<T>;
 Array.Slice(Range) and Range.TryGetOffsetAndLength return Result with InvalidRangeError.
 GetOffsetAndLength and compiler-generated GetSubArray fault for invalid bounds.
 A negative Index distance is separately an invalid value construction, as in .NET.
@@ -107,7 +107,7 @@ remain unsupported. Runtime Contract configuration is unchanged.
   `target/index-range-tests-v2/report.json`: nine tests plus six guard processes,
   each passing in interpreter and macOS ARM64 native AOT. This covers boundary
   semantics, copies/reference identity, evaluation order, readonly receivers and
-  safe Option/Result alternatives. Guard faults are expected nonzero exits.
+  safe Optional/Result alternatives. Guard faults are expected nonzero exits.
 - Metadata `--authored-references` checks authored/imported value fields, generic
   substitution, initialized receivers, invalid receivers and rejected writes.
 - Four native libraries build; aggregate and native API snapshots are refreshed.
@@ -120,7 +120,7 @@ one allocation plus a linear element loop; no timing claim is made by these chec
 
 ## String milestone — 2026-10-11
 
-String now has Index and Range indexers, Get(int/Index) returning Option<char>, and
+String now has Index and Range indexers, Get(int/Index) returning Optional<char>, and
 Slice(Range) returning Result<string, InvalidRangeError>. Boundaries count extended
 grapheme clusters, matching String.Length and the existing integer indexer. This is
 a deliberate difference from .NET UTF-16 indexing: complete user-perceived characters
@@ -154,7 +154,7 @@ was required beyond the preceding Index/Range lowering commit.
 ## Sequence and list contracts — 2026-10-11
 
 `SequenceAccess<T>` supplies Index/Range extension indexers, Get(int/Index) returning
-Option, and Slice(Range) returning Result<T[], InvalidRangeError>. The default
+Optional, and Slice(Range) returning Result<T[], InvalidRangeError>. The default
 slice validates against Count, skips to the start with one iterator and copies
 exactly the requested elements. It disposes on normal completion and early
 exhaustion; invalid and empty default slices acquire no iterator. A provider that

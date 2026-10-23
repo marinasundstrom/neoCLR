@@ -64,7 +64,7 @@ layers are not a prerequisite for removing obsolete preview representations.
 | Free functions without a class container | How to represent function ownership directly while keeping method-like signatures and tokens familiar; no synthetic class requirement in the semantic model |
 | No inherent value/reference type split | Which existing signature/type flags can be preserved and where explicit storage capabilities need extended representation |
 | Default owned allocation and explicit heap identity | Which existing operations remain valid and which need lowering or declared extensions |
-| Option/Result and no exceptions | How tagged data and branching lower to ordinary field/control-flow operations; how to reject exception clauses and represent terminal Faults |
+| Optional/Result and no exceptions | How tagged data and branching lower to ordinary field/control-flow operations; how to reject exception clauses and represent terminal Faults |
 | Future borrows/async | Which lifetime and suspension metadata is required for verification |
 
 Do not assign speculative ECMA opcode numbers, custom table IDs, or binary flags
@@ -80,7 +80,7 @@ metadata or CIL byte streams. Its integer branch operands are instruction indice
 not CIL byte displacements; field operands are record indices, not metadata tokens.
 `ldc.bool`, explicit value-storage operations, and heap operations are experimental
 IR instructions, not allocations of new binary CIL opcodes. Format 4 removed the
-earlier union-specific instructions; Option/Result use ordinary library methods.
+earlier union-specific instructions; Optional/Result use ordinary library methods.
 `newobj`, `stfld`, `ceq`, and Void-return
 behavior also have prototype differences documented in the semantic reference.
 

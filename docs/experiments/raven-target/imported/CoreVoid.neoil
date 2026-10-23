@@ -17,22 +17,22 @@ IL_0010:
 ret
 .end
 .function Method_06000006(Int32) -> void
-.local System.Option<Void> local0
-.local System.Option.Some<Void> local1
-.local System.Option.None local2
-.local System.Option<Void> local3
-.local System.Option.Some<Void> local4
-.local System.Option<Void> local5
-.local System.Option.None local6
+.local System.Optional<Void> local0
+.local System.Optional.Some<Void> local1
+.local System.Optional.None local2
+.local System.Optional<Void> local3
+.local System.Optional.Some<Void> local4
+.local System.Optional<Void> local5
+.local System.Optional.None local6
 ldvoid
-newobj System.Option.Some<Void>
+newobj System.Optional.Some<Void>
 stloc local1
-newobj System.Option.None
+newobj System.Optional.None
 stloc local2
 ldvoid
-newobj System.Option.Some<Void>
+newobj System.Optional.Some<Void>
 stloc local4
-newobj System.Option.None
+newobj System.Optional.None
 stloc local6
 IL_0000:
 IL_0001:
@@ -52,7 +52,7 @@ ldloca local3
 IL_000e:
 ldloca local4
 IL_0010:
-call RuntimeTryVoidSome(System.Option<Void>&,System.Option.Some<Void>&)
+call RuntimeTryVoidSome(System.Optional<Void>&,System.Optional.Some<Void>&)
 IL_0015:
 brfalse IL_0023
 IL_001a:
@@ -86,7 +86,7 @@ ldloca local5
 IL_0045:
 ldloca local6
 IL_0047:
-call RuntimeTryVoidNone(System.Option<Void>&,System.Option.None&)
+call RuntimeTryVoidNone(System.Optional<Void>&,System.Optional.None&)
 IL_004c:
 brfalse IL_005a
 IL_0051:
@@ -114,7 +114,7 @@ IL_0072:
 IL_0073:
 ret
 .end
-.function Method_06000005(Int32) -> System.Option<Void>
+.function Method_06000005(Int32) -> System.Optional<Void>
 IL_0000:
 IL_0001:
 IL_0002:
@@ -133,14 +133,14 @@ ldvoid
 IL_0016:
 call RuntimeNewVoidSome(Void)
 IL_001b:
-call RuntimeVoidOptionSome(System.Option.Some<Void>)
+call RuntimeVoidOptionSome(System.Optional.Some<Void>)
 IL_0020:
 ret
 IL_0021:
 IL_0022:
 call RuntimeNewNone()
 IL_0027:
-call RuntimeVoidOptionNone(System.Option.None)
+call RuntimeVoidOptionNone(System.Optional.None)
 IL_002c:
 ret
 .end
@@ -176,15 +176,15 @@ Miss:
 ldc.i4 0
 ret
 .end
-.function RuntimeTrySome(System.Option<Int32>& source,out System.Option.Some<Int32>& destination) -> Int32
+.function RuntimeTrySome(System.Optional<Int32>& source,out System.Optional.Some<Int32>& destination) -> Int32
 ldarg destination
 ldc.i4 0
-newobj System.Option.Some<Int32>
-stobj System.Option.Some<Int32>
+newobj System.Optional.Some<Int32>
+stobj System.Optional.Some<Int32>
 ldarg source
-ldobj System.Option<Int32>
+ldobj System.Optional<Int32>
 ldarg destination
-call instance System.Option<Int32>::TryGet(System.Option.Some<Int32>&)
+call instance System.Optional<Int32>::TryGet(System.Optional.Some<Int32>&)
 brfalse Miss
 ldc.i4 1
 ret
@@ -192,14 +192,14 @@ Miss:
 ldc.i4 0
 ret
 .end
-.function RuntimeTryNone(System.Option<Int32>& source,out System.Option.None& destination) -> Int32
+.function RuntimeTryNone(System.Optional<Int32>& source,out System.Optional.None& destination) -> Int32
 ldarg destination
-newobj System.Option.None
-stobj System.Option.None
+newobj System.Optional.None
+stobj System.Optional.None
 ldarg source
-ldobj System.Option<Int32>
+ldobj System.Optional<Int32>
 ldarg destination
-call instance System.Option<Int32>::TryGet(System.Option.None&)
+call instance System.Optional<Int32>::TryGet(System.Optional.None&)
 brfalse Miss
 ldc.i4 1
 ret
@@ -207,15 +207,15 @@ Miss:
 ldc.i4 0
 ret
 .end
-.function RuntimeTryVoidSome(System.Option<Void>& source,out System.Option.Some<Void>& destination) -> Int32
+.function RuntimeTryVoidSome(System.Optional<Void>& source,out System.Optional.Some<Void>& destination) -> Int32
 ldarg destination
 ldvoid
-newobj System.Option.Some<Void>
-stobj System.Option.Some<Void>
+newobj System.Optional.Some<Void>
+stobj System.Optional.Some<Void>
 ldarg source
-ldobj System.Option<Void>
+ldobj System.Optional<Void>
 ldarg destination
-call instance System.Option<Void>::TryGet(System.Option.Some<Void>&)
+call instance System.Optional<Void>::TryGet(System.Optional.Some<Void>&)
 brfalse Miss
 ldc.i4 1
 ret
@@ -223,14 +223,14 @@ Miss:
 ldc.i4 0
 ret
 .end
-.function RuntimeTryVoidNone(System.Option<Void>& source,out System.Option.None& destination) -> Int32
+.function RuntimeTryVoidNone(System.Optional<Void>& source,out System.Optional.None& destination) -> Int32
 ldarg destination
-newobj System.Option.None
-stobj System.Option.None
+newobj System.Optional.None
+stobj System.Optional.None
 ldarg source
-ldobj System.Option<Void>
+ldobj System.Optional<Void>
 ldarg destination
-call instance System.Option<Void>::TryGet(System.Option.None&)
+call instance System.Optional<Void>::TryGet(System.Optional.None&)
 brfalse Miss
 ldc.i4 1
 ret
@@ -244,10 +244,10 @@ ldobj System.Result.Ok<Int32>
 call instance System.Result.Ok<Int32>::get_Value()
 ret
 .end
-.function RuntimeSomeValue(System.Option.Some<Int32>& source) -> Int32
+.function RuntimeSomeValue(System.Optional.Some<Int32>& source) -> Int32
 ldarg source
-ldobj System.Option.Some<Int32>
-call instance System.Option.Some<Int32>::get_Value()
+ldobj System.Optional.Some<Int32>
+call instance System.Optional.Some<Int32>::get_Value()
 ret
 .end
 .function RuntimeEqual(Int32 left,Int32 right) -> Int32
@@ -261,38 +261,38 @@ False:
 ldc.i4 0
 ret
 .end
-.function RuntimeNewSome(Int32 value) -> System.Option.Some<Int32>
+.function RuntimeNewSome(Int32 value) -> System.Optional.Some<Int32>
 ldarg value
-newobj instance System.Option.Some<Int32>::.ctor(Int32)
+newobj instance System.Optional.Some<Int32>::.ctor(Int32)
 ret
 .end
-.function RuntimeNewNone() -> System.Option.None
-newobj instance System.Option.None::.ctor()
+.function RuntimeNewNone() -> System.Optional.None
+newobj instance System.Optional.None::.ctor()
 ret
 .end
-.function RuntimeOptionSome(System.Option.Some<Int32> value) -> System.Option<Int32>
+.function RuntimeOptionSome(System.Optional.Some<Int32> value) -> System.Optional<Int32>
 ldarg value
-newobj instance System.Option<Int32>::.ctor(System.Option.Some<Int32>)
+newobj instance System.Optional<Int32>::.ctor(System.Optional.Some<Int32>)
 ret
 .end
-.function RuntimeOptionNone(System.Option.None value) -> System.Option<Int32>
+.function RuntimeOptionNone(System.Optional.None value) -> System.Optional<Int32>
 ldarg value
-newobj instance System.Option<Int32>::.ctor(System.Option.None)
+newobj instance System.Optional<Int32>::.ctor(System.Optional.None)
 ret
 .end
-.function RuntimeNewVoidSome(Void value) -> System.Option.Some<Void>
+.function RuntimeNewVoidSome(Void value) -> System.Optional.Some<Void>
 ldarg value
-newobj instance System.Option.Some<Void>::.ctor(Void)
+newobj instance System.Optional.Some<Void>::.ctor(Void)
 ret
 .end
-.function RuntimeVoidOptionSome(System.Option.Some<Void> value) -> System.Option<Void>
+.function RuntimeVoidOptionSome(System.Optional.Some<Void> value) -> System.Optional<Void>
 ldarg value
-newobj instance System.Option<Void>::.ctor(System.Option.Some<Void>)
+newobj instance System.Optional<Void>::.ctor(System.Optional.Some<Void>)
 ret
 .end
-.function RuntimeVoidOptionNone(System.Option.None value) -> System.Option<Void>
+.function RuntimeVoidOptionNone(System.Optional.None value) -> System.Optional<Void>
 ldarg value
-newobj instance System.Option<Void>::.ctor(System.Option.None)
+newobj instance System.Optional<Void>::.ctor(System.Optional.None)
 ret
 .end
 .function RuntimeWriteInt32(Int32 value) -> void

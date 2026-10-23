@@ -295,7 +295,7 @@ func Main() -> () {}
             .contains("ambiguous constrained member")
     );
     let copying = r#"
-func Read<T>(value: T&) -> int where T: System.Option.Some<int> { return value.get_Value() }
+func Read<T>(value: T&) -> int where T: System.Optional.Some<int> { return value.get_Value() }
 func Main() -> () {}
 "#;
     assert!(

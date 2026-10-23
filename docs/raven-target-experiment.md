@@ -24,11 +24,11 @@ C# targeting remains a longer-term goal, not a second compiler implementation in
 experiment. Running existing .NET binaries unchanged is not the acceptance criterion.
 
 The author explicitly accepts source/API adaptation for deliberate differences:
-expected failures should use Result, absence should generally use Option, and terminal
+expected failures should use Result, absence should generally use Optional, and terminal
 Faults should not recreate .NET's ordinary catchable exception flow. Do not silently
 translate arbitrary try/catch into Result or claim unchanged source compatibility.
 Fault containment and cleanup rules still need precise contracts. Nullability remains
-a capability the platform should support, even where library APIs prefer Option;
+a capability the platform should support, even where library APIs prefer Optional;
 this experiment does not settle its representation.
 
 The [reference-defaults evaluation](reference-defaults-evaluation.md) records earlier
@@ -104,7 +104,7 @@ integration, but does not complete the binary-artifact milestone.
    load the resulting artifacts and bind to neoCLR's System. Document exact toolchains,
    source, commands, expected output and remaining unsupported language constructs.
 6. **Expand only after the first path works.** Add a user-defined type and call, then
-   a generic Result/Option API with success/error/absence cases. Use these to expose
+   a generic Result/Optional API with success/error/absence cases. Use these to expose
    semantic gaps instead of promising all Raven features at once.
 
 Keep implementation slices separate and update the changelog for each. The present
@@ -276,7 +276,7 @@ The author added union usage to the MVP. The acceptance outcomes are now:
 - Raven compiles a small program against the supplied neoCLR runtime-library declarations
   and it executes on neoCLR using the actual implementations. The five static programs
   now establish a narrow first stage, including Math and Console calls.
-- A Raven program consumes a real Result or Option API and pattern-matches both outcomes.
+- A Raven program consumes a real Result or Optional API and pattern-matches both outcomes.
   Math.Abs(Int32) is the proposed first case: ordinary success and Int32.MinValue overflow.
   Preserve neoCLR's Result contract; do not substitute .NET's throwing signature or a fake
   application-only result. This is not implemented yet.
@@ -420,7 +420,7 @@ byte offsets. See [run instructions](experiments/raven-target/README.md#running-
 ## POC demonstration priorities (2026-09-12)
 
 The author clarified the intended demonstration: a .NET-like runtime with its own
-runtime class library, Result and Option instead of exception/null-centered APIs,
+runtime class library, Result and Optional instead of exception/null-centered APIs,
 Void accepted as a generic type argument, and Raven targeting with basic VS Code
 completion. The POC should make that combination concrete before broadening the
 platform surface.
@@ -429,19 +429,19 @@ platform surface.
 | --- | --- | --- |
 | Familiar runtime and own library | Raven Math/Console and Result program execute on neoCLR | Package a small cohesive sample/project |
 | Result-based errors | Abs success and overflow execute | Broaden only as the sample needs |
-| Option-based absence | Raven price lookup constructs/extracts real library Some/None values and executes | Incorporate the lookup into the cohesive demo |
-| Generic Void | Raven Option<System.Void> constructs and matches both cases through a target adapter | Broaden target emission; zero-stack representation remains separate |
+| Optional-based absence | Raven price lookup constructs/extracts real library Some/None values and executes | Incorporate the lookup into the cohesive demo |
+| Generic Void | Raven Optional<System.Void> constructs and matches both cases through a target adapter | Broaden target emission; zero-stack representation remains separate |
 | VS Code completion | Installed extension plus dedicated tasks compile and run saved project sources | Broader execution profile; ordinary Raven toolbar integration remains separate |
 
-The next priority is the Option demo, followed by generic Void and the project/editor
+The next priority is the Optional demo, followed by generic Void and the project/editor
 integration. Address runtime gaps when these scenarios expose them. The POC does not
 require a full debugger or broad .NET application compatibility. This ordering is the
 assistant's implementation plan in response to the author's acceptance criteria.
 
-## Option lookup execution (2026-09-12)
+## Optional lookup execution (2026-09-12)
 
 The application price lookup in `samples/library-option.rvn` returns the actual
-`System.Option<Int32>` carrier. Product 7 returns Some(42); product 99 returns None.
+`System.Optional<Int32>` carrier. Product 7 returns Some(42); product 99 returns None.
 Both are matched and printed after Raven emission and neoCLR execution. This adds
 application-to-library construction and a returned carrier to the earlier Result
 scenario. It does not claim a new lookup API exists in the runtime library.
@@ -450,7 +450,7 @@ The `.NET/CLI` baseline here is value-type construction through newobj, storage 
 locals, and managed-address receiver calls, using the same instruction family as
 the prior Result profile. No runtime opcode or metadata extension was added. The
 neoCLR-owned importer is now named `UnionImport`; selected constructor references map
-to wrappers invoking the real Option.Some<Int32>, Option.None and Option<Int32>
+to wrappers invoking the real Optional.Some<Int32>, Optional.None and Optional<Int32>
 constructors. Integer ceq results are projected to CLI Int32 stack values. Admitted
 case locals retain their defaults; default carrier observation remains rejected
 rather than being silently interpreted as None. This restriction is a preview profile
@@ -470,12 +470,12 @@ and temporary binding adapters; arbitrary constructors and generic parameters ar
 newly supported. Validation now includes seven runtime programs, the Rust artifact
 regression, and three new mutation checks for unwritten carriers, mismatched out cases,
 and a mismatched constructor argument. Generic Void and actual VS Code completion
-remain outstanding. See [Option run instructions](experiments/raven-target/README.md#running-the-option-demo-2026-09-12).
+remain outstanding. See [Optional run instructions](experiments/raven-target/README.md#running-the-option-demo-2026-09-12).
 
 ## Generic Void execution (2026-09-12)
 
-Raven now demonstrates `Option<System.Void>` with Some(()) and None, using the actual
-neoCLR Option library. This is a deliberately different contract from .NET:
+Raven now demonstrates `Optional<System.Void>` with Some(()) and None, using the actual
+neoCLR Optional library. This is a deliberately different contract from .NET:
 [Type.MakeGenericType](https://learn.microsoft.com/en-us/dotnet/api/system.type.makegenerictype)
 documents Void as an invalid generic argument (consulted 2026-09-12). The probe also
 confirms that rejection on the pinned .NET 11 SDK. Ordinary method return VOID remains
@@ -506,7 +506,7 @@ for inspecting the compiler output before adaptation.
 
 Validation: eight programs verify and execute; three new rejection probes cover raw
 VOID generic signatures, a wrong payload, and a non-Unit field. These supplement the
-four Result and three Option rejection probes and the earlier static profile checks.
+four Result and three Optional rejection probes and the earlier static profile checks.
 The checked-in imports are covered by the Rust runtime regression. Actual VS Code
 project completion remains the next POC priority.
 
@@ -529,7 +529,7 @@ package/reference items remain the caller's responsibility.
 Raven changes remain isolated on `codex/neoclr-target-resolution` at `37ae973040`.
 Validation covers 37 project-loading tests and three focused language-server tests.
 The installed local VSIX displays Abs/Max/Min/Sign in VS Code, and the stdio protocol
-probe checks Console and System (including Option/Result/Void, without System.IO).
+probe checks Console and System (including Optional/Result/Void, without System.IO).
 The eight runtime programs still execute with the new compiler build. Full Build/Run
 integration is separate; [instructions and limitations](experiments/raven-target/VSCODE.md)
 make that boundary explicit.
@@ -546,7 +546,7 @@ VS Code process tasks pass paths as argument arrays and keep unrelated tasks int
 This follows the familiar project/reference/compile/run separation while reusing the
 existing temporary target importer. It does not change guest type semantics, metadata
 encodings or instructions. The bounded importer remains a cost: only its admitted
-Result/Option/Void patterns execute, even where the editor knows additional declarations.
+Result/Optional/Void patterns execute, even where the editor knows additional declarations.
 The normal SDK toolbar does not yet invoke this pipeline. Exact target identity and
 closure admission remain independent of Raven's project evaluation.
 
@@ -557,7 +557,7 @@ not an attribute stub added to neoCLR solely to satisfy the compiler. Default .N
 behavior remains covered by the project-loading tests; target authors may supply their
 own supported assembly attributes.
 
-Validation covers the actual Result, Option and Void programs; saving a changed input
+Validation covers the actual Result, Optional and Void programs; saving a changed input
 changes output from 42 to 7. Compiler and import failures produce no new executable and
 never run stale output. All 37 Raven project-loading tests pass. The next bounded milestone
 is Raven's existing union propagation operator: successful extraction, compatible failure
@@ -573,7 +573,7 @@ The bounded editor/library/execution milestone is complete. The local annotated 
 This is an experiment checkpoint, not a new preview release or a claim of general
 Raven/.NET application compatibility. Existing published preview tags remain unchanged.
 
-Acceptance evidence includes real-library Result/Option/Void execution, target-aware
+Acceptance evidence includes real-library Result/Optional/Void execution, target-aware
 completion in the installed VS Code extension, saved-source build/run tasks, changed
 output after an edit, and rejection without stale execution. Reproduction and limitations
 are in the [walkthrough](experiments/raven-target/VSCODE.md), with
@@ -609,7 +609,7 @@ The source of library behavior remains [System.neoil](../runtime/System.neoil) a
 [existing runtime library contracts](runtime-library.md). The Raven core declaration
 assembly is a compiler-facing view of that implementation, not an independent replacement
 BCL or a collection of executable host stubs. Adapt the actual library contracts and
-metadata as needed, preserve intentional Result/Option and generic Void behavior, and
+metadata as needed, preserve intentional Result/Optional and generic Void behavior, and
 keep both frontends aligned with the shared implementation where supported. Document
 necessary compatibility changes rather than preserving obsolete addressing conventions
 merely to reproduce earlier samples.
@@ -628,7 +628,7 @@ the same bounded evidence.
 Acceptance for the broader demo is saved Raven source that consumes useful existing
 library APIs, obtains completion from matching declarations, and runs their adapted
 platform implementations on neoCLR. A practical collection/iteration example can then
-combine with the established Result/Option flows. This is the desired direction, not
+combine with the established Result/Optional flows. This is the desired direction, not
 an assertion that the full earlier library surface is already available through Raven.
 Union propagation remains deferred until the interface contract is established.
 
@@ -673,7 +673,7 @@ This follows the [array ABI comparison](managed-arrays.md#ordinary-array-referen
 translation belongs in neoCLR's target bridge, not a Raven-specific opcode or guest
 wrapper. The cost of bounded admission remains explicit: only Int32 vectors and static
 application functions are covered. Five negative imports and a runtime null-default
-fixture validate rejection/state behavior. Existing Result/Option/Void probe checks
+fixture validate rejection/state behavior. Existing Result/Optional/Void probe checks
 and runtime outputs remain valid. Reference conversions and the real collection library
 remain next work; this is not full CLI array or interface-import support.
 

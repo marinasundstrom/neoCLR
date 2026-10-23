@@ -154,7 +154,7 @@ List<(int) -> string>
 and other compound types:
 
 ```raven
-Option<(Request) -> Response>
+Optional<(Request) -> Response>
 ```
 
 The exact variance rules for function parameters and return values are a separate type-system concern.

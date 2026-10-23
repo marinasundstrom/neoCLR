@@ -50,7 +50,7 @@ returns one value, including a function returning `Void`. `ret` requires exactly
 one stack value of the declared return type. A caller discards unused results with
 `pop`. This is an intentional departure from ordinary CIL void-return stack effects.
 
-`System.Option<T>` has ordinary `None` and `Some<T>` cases. Option<Void> therefore
+`System.Optional<T>` has ordinary `None` and `Some<T>` cases. Optional<Void> therefore
 has two observable cases: an empty None record and Some<Void> containing the unit
 value. Void is not a bottom/uninhabited type; a future Never would be separate.
 
@@ -71,7 +71,7 @@ index. Some load/limit Faults have no instruction location.
 There is no guest null value or `ldnull`. Uninitialized local storage is tracked by
 the host and faults on read; it does not become a default null. Future nullable
 references/native interop must represent actual null-reference semantics explicitly.
-General absence in BCL APIs should use `Option`, including for references when
+General absence in BCL APIs should use `Optional`, including for references when
 absence is the meaning.
 
 ## Numeric behavior and equality
@@ -111,7 +111,7 @@ Types have named, ordered fields unless their representation is runtime-known.
 Prototype instructions index fields and locals from zero, and assembled branch
 labels become absolute instruction indices within one function.
 
-Ordinary generic carrier types model Option and Result. Generic type definitions,
+Ordinary generic carrier types model Optional and Result. Generic type definitions,
 assembly references and selected custom attributes are supported; generic methods,
 constraints, inheritance and binary metadata tables remain deferred. Explicit
 [borrowed interface references](interfaces.md) provide a limited dispatch contract.
@@ -119,7 +119,7 @@ Interfaces use names such as `List<T>` without an `I` prefix. This is a naming
 convention, not a rule forbidding identifiers that happen to begin with I.
 
 Library organization should retain familiar `System`, `System.Collections`,
-`System.IO`, and related areas. APIs with meaningful absence return `Option<T>`;
+`System.IO`, and related areas. APIs with meaningful absence return `Optional<T>`;
 recoverable failure returns `Result<T,E>`. Runtime async has no representation yet:
 no existing opcode is being given a speculative scheduling contract.
 

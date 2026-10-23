@@ -205,6 +205,6 @@ contracts for reference-free direct-call code without enabling interface dispatc
 
 The [input-outcome follow-up](../aot-input/README.md) now removes verified relationships
 before executable specialization and reports their full closed constructed types.
-This admits Option's metadata-only Void argument and distinct Propagatable shapes without
+This admits Optional's metadata-only Void argument and distinct Propagatable shapes without
 relaxing executable value-shape limits. The earlier reports above remain historical;
-the new nested Result/Option sample records the current report representation.
+the new nested Result/Optional sample records the current report representation.

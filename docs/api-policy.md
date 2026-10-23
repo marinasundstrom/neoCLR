@@ -19,7 +19,7 @@ Implement a small coherent subset first instead of inventing unrelated substitut
 for missing framework functionality. A missing implementation remains a documented
 gap, not a reason to redefine the API silently.
 
-Intentional changes include Result-based recoverable errors, Option-based absence,
+Intentional changes include Result-based recoverable errors, Optional-based absence,
 first-class Void, invariant mutable arrays, free functions, and interface names
 without the `I` convention. These need explicit API mappings. Implementation details
 alone do not justify additional consumer-visible differences.
@@ -180,7 +180,7 @@ The first post-release slice uses `Map` for element projection (Preview 8: `Sele
 author confirmed. Preserve deferred execution,
 order, callback counts and iterator cleanup semantics while changing those names.
 Do not rename already clear operators merely to differ from .NET. Review terminal
-names against their Option/Result and cardinality contracts, not only a synonym list.
+names against their Optional/Result and cardinality contracts, not only a synonym list.
 For future flattening, `FlatMap` is preferred over `SelectMany`. Do not automatically
 choose `Fold` over `Reduce`, or `Drop` over `Skip`: names must follow the selected
 semantics, including seed and empty-input behavior where applicable. Those operators
@@ -223,7 +223,7 @@ reference does not imply counted ownership, allocation or retention.
 
 Out parameters declare assignment on every normal return. Boolean TryGet methods
 can use out(true) for assignment only on success, avoiding invented default values
-for arbitrary T. System.Option/Result case extraction now follows that contract.
+for arbitrary T. System.Optional/Result case extraction now follows that contract.
 See the [Raven-like reference guide](references-in-pseudocode.md).
 
 Reflection member descriptors share an abstract MemberInfo base for common metadata

@@ -11,7 +11,7 @@ Success:
     ret
 .end
 
-.function Echo(System.Option<String> value) -> System.Option<String>
+.function Echo(System.Optional<String> value) -> System.Optional<String>
     ldarg value
     ret
 .end

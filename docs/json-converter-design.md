@@ -27,7 +27,7 @@ therefore a useful extension point, not a substitute for ordinary primitive supp
 | Alongside converter design | JSON error location and callback/validation semantics | Failures identify the property/index, and counters prove converters are not run twice by the mapper's validation/construction passes. |
 | Next bounded coverage | Missing numeric types and nullable values | Int64 boundaries, finite floating-point values, explicit null versus absent fields, and overflow match documented .NET behavior; unsupported values fail explicitly. |
 | Separate options work | Property naming, explicit rename/ignore, unknown-member policy | Defaults preserve existing matching; naming collisions and override precedence have tests. |
-| Later wire contracts | Enums, inheritance, Option/Result and Raven unions | A cross-target golden corpus pins each wire format and rejects discriminator collisions and unknown cases as specified. |
+| Later wire contracts | Enums, inheritance, Optional/Result and Raven unions | A cross-target golden corpus pins each wire format and rejects discriminator collisions and unknown cases as specified. |
 | Later resource work | Configurable limits and incremental UTF-8 reader/writer | Oversized or partial input stays bounded, reports location, and preserves borrowed-stream ownership. |
 
 These are implementation gaps and proposals, not claims of improved semantics over

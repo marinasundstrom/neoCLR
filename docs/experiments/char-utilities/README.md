@@ -2,7 +2,7 @@
 
 Development Raven APIs:
 
-- `Char.TryFromString(string) -> Option<char>` returns Some for exactly one Unicode
+- `Char.TryFromString(string) -> Optional<char>` returns Some for exactly one Unicode
   17 extended grapheme and None for empty/multiple graphemes. Input is non-null;
   bytes are preserved. FromString remains the faulting alternative.
 - `Char.Equals(char, StringComparison) -> bool` compares complete graphemes using
@@ -14,7 +14,7 @@ Development Raven APIs:
 
 [.NET Char.TryParse](https://learn.microsoft.com/en-us/dotnet/api/system.char.tryparse?view=net-10.0)
 provides the non-throwing conversion role with Boolean/out and a single UTF-16 code
-unit. neoCLR uses its existing Option union and grapheme Char contract. This follows
+unit. neoCLR uses its existing Optional union and grapheme Char contract. This follows
 [Swift Character's one-grapheme requirement](https://developer.apple.com/documentation/swift/character/init(_:)-6o1aq)
 while exposing failed validation explicitly. The benefit is accepting composed and
 decomposed graphemes, flags and emoji consistently; the cost is Unicode segmentation
@@ -47,7 +47,7 @@ python3 docs/experiments/char-utilities/measure.py target/char-utilities-allocat
 Five registry and five grapheme runtime tests pass, plus the native helper test.
 The public consumer covers empty/multiple input, decomposed accents, emoji, flags,
 CRLF/NUL/standalone marks, newer combining marks, exact byte retention, three
-comparison policies, simple-fold limitations and invalid modes. An Option<Char>
+comparison policies, simple-fold limitations and invalid modes. An Optional<Char>
 created from a dynamically allocated String survives return from its factory and
 subsequent allocation/collection. See [six cross-engine executions](validation.json).
 

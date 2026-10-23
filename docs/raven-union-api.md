@@ -1,20 +1,20 @@
-# Option and Result APIs from Raven
+# Optional and Result APIs from Raven
 
-The Raven library declares `Option<T>` and `Result<T,E>` with standard Raven
+The Raven library declares `Optional<T>` and `Result<T,E>` with standard Raven
 `union` syntax, following Raven.Core. `Some(T)` and `None` represent presence and
 absence; `Ok(T)` and `Error(E)` represent success and recoverable failure.
 
 ```raven
 import System.*
 import System.Result.*
-import System.Option.*
+import System.Optional.*
 
 let outcome: Result<long, string> = Ok(42L)
 if outcome is Ok(let value) {
     Console.WriteLine(value)
 }
 let failure: Result<long, string> = Error("Failure")
-let missing: Option<string> = None
+let missing: Optional<string> = None
 ```
 
 Use patterns to extract payloads and `?` to propagate absence or failure.
@@ -26,13 +26,13 @@ branch actions and explicit iterable conversion.
 Both carriers implement `System.Runtime.CompilerServices.IUnion`. Their `Value`
 property returns the boxed active **case**, not its payload. `HasValue` distinguishes
 an active case from a default carrier. An explicitly constructed `None` is active;
-`default(Option<T>)` is inactive and is not a substitute for `None`. An inactive
+`default(Optional<T>)` is inactive and is not a substitute for `None`. An inactive
 carrier has `HasValue == false`, `Value == null`, and no matching case.
 
 Generated `TryGetValue(out case)` overloads return true for the requested active
 case. A mismatch returns false and preserves the destination. For a direct call,
 qualify an explicit payload-case type with its closed carrier, for example
-`Option<int>.Some<int>`; ordinary patterns infer this association. Case types remain
+`Optional<int>.Some<int>`; ordinary patterns infer this association. Case types remain
 distinct when payload types coincide, including `Result<T,T>`. `Some<Void>` and
 `Ok<Void>` carry a real unit value; `Some<Void>` differs from `None`.
 

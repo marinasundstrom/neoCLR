@@ -4,16 +4,16 @@ static class ErrorContextDeclarations
     internal const string Source = """
         public interface Error {
             string Message { get; }
-            Option<Error> Cause { get; }
-            Option<Diagnostics.StackTrace> StackTrace { get; }
+            Optional<Error> Cause { get; }
+            Optional<Diagnostics.StackTrace> StackTrace { get; }
         }
         public class ContextError<E> : Error where E : Error {
             public ContextError(string message, E cause) { }
             public ContextError(string message, E cause, bool captureStackTrace) { }
             public string Message => default;
             public E Cause => default;
-            Option<Error> Error.Cause => default;
-            public Option<Diagnostics.StackTrace> StackTrace => default;
+            Optional<Error> Error.Cause => default;
+            public Optional<Diagnostics.StackTrace> StackTrace => default;
         }
         public static class ErrorDiagnostics {
             public static bool CaptureStackTraces => default;
@@ -46,8 +46,8 @@ static class ErrorContextDeclarations
         foreach (var name in new[] { "FileReadError", "NumberParseError", "StreamError" })
             source = source.Replace("public struct " + name + " {",
                 "public struct " + name + " : System.Error { public string Message => default; " +
-                "public System.Option<System.Error> Cause => default; " +
-                "public System.Option<System.Diagnostics.StackTrace> StackTrace => default; ");
+                "public System.Optional<System.Error> Cause => default; " +
+                "public System.Optional<System.Diagnostics.StackTrace> StackTrace => default; ");
         return source;
     }
 }

@@ -52,7 +52,7 @@ Development FunctionTypeInfo.InvokeMethod and TypeInfo.GetMethods expose a synth
 Function Invoke descriptor. It has no declaration index, token or module; optional
 properties return None. MethodReflectionExtensions.Invoke returns UnboundMetadata
 for it. Use typed Function invocation to execute a binding. Declared MethodInfo
-DefinitionIndex and MemberInfo/ParameterInfo metadata now require Option matching.
+DefinitionIndex and MemberInfo/ParameterInfo metadata now require Optional matching.
 
 ## Imported artifact access information
 
@@ -226,12 +226,12 @@ uses the existing neoCLR reflection error convention.
 
 ## Fields and type initializers
 
-`FieldInfo.IsInitOnly`, `IsLiteral` and `ConstantValue: Option<Object>` distinguish
+`FieldInfo.IsInitOnly`, `IsLiteral` and `ConstantValue: Optional<Object>` distinguish
 readonly storage from storage-free Int32 literals. `GetFields` applies Public/NonPublic
 and Instance/Static flags to all three categories; its default includes public instance
 and static fields. Metadata inspection and literal reads never initialize the owner.
 `TypeInfo.IsBeforeFieldInit` exposes relaxed initialization timing, while
-`TypeInfo.TypeInitializer: Option<ConstructorInfo>` describes the private static `.cctor`.
+`TypeInfo.TypeInitializer: Optional<ConstructorInfo>` describes the private static `.cctor`.
 It is excluded from ordinary methods and public instance constructor enumeration.
 This descriptor does not grant direct invocation of a runtime-owned initializer.
 

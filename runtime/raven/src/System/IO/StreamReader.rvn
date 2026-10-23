@@ -4,7 +4,7 @@ import System.*
 import System.Concurrency.Tasks.*
 import System.Collections.*
 import System.Result.*
-import System.Option.*
+import System.Optional.*
 import System.Text.*
 import System.Runtime.CompilerServices.*
 
@@ -53,14 +53,14 @@ public class StreamReader : TextReader {
     private var lastRead: int = 0
     private val operation: TextIOOperation = TextIOOperation(false)
     private var pendingOffset: int = 0
-    private var peeked: Option<Character> = None
+    private var peeked: Optional<Character> = None
     private val readBuffer: byte[] = CheckedStorage.Reserve<byte>(256)
 
     /// <summary>Peeks at the next Unicode grapheme without advancing the text cursor.</summary>
     /// <returns>Some Character, None at EOF, or a decoding, I/O, Busy or limit error.</returns>
     /// <remarks>May await underlying input and retain lookahead. Repeated peeks reuse the cached Character.
     /// A grapheme may require a subsequent boundary or EOF. The maximum grapheme size is 65536 UTF-8 bytes.</remarks>
-    async func PeekChar() -> Task<Result<Option<Character>, TextReadError>> {
+    async func PeekChar() -> Task<Result<Optional<Character>, TextReadError>> {
         if closed {
             return Failure(TextReadError.Closed)
         }
@@ -78,7 +78,7 @@ public class StreamReader : TextReader {
     /// <returns>Some Character, None at EOF, or a decoding, I/O, Busy or limit error.</returns>
     /// <remarks>Shares buffered lookahead with PeekChar, counted reads and line reads.
     /// Counts graphemes rather than UTF-8 bytes or Unicode scalars; maximum 65536 UTF-8 bytes.</remarks>
-    async func ReadChar() -> Task<Result<Option<Character>, TextReadError>> {
+    async func ReadChar() -> Task<Result<Optional<Character>, TextReadError>> {
         if closed {
             return Failure(TextReadError.Closed)
         }
@@ -135,7 +135,7 @@ public class StreamReader : TextReader {
         return result
     }
 
-    private async func PeekCharCore() -> Task<Result<Option<Character>, TextReadError>> {
+    private async func PeekCharCore() -> Task<Result<Optional<Character>, TextReadError>> {
         if peeked is Some(let cached) {
             return Ok(Some(cached))
         }
@@ -215,7 +215,7 @@ public class StreamReader : TextReader {
         return result
     }
 
-    async func ReadLine(maxUtf8Bytes: int) -> Task<Result<Option<string>, TextReadError>> {
+    async func ReadLine(maxUtf8Bytes: int) -> Task<Result<Optional<string>, TextReadError>> {
         if closed {
             return Failure(TextReadError.Closed)
         }
@@ -247,7 +247,7 @@ public class StreamReader : TextReader {
         return Ok(created)
     }
 
-    private async func ReadLineCore(maxUtf8Bytes: int) -> Task<Result<Option<string>, TextReadError>> {
+    private async func ReadLineCore(maxUtf8Bytes: int) -> Task<Result<Optional<string>, TextReadError>> {
         if closed {
             return Failure(TextReadError.Closed)
         }
@@ -297,7 +297,7 @@ public class StreamReader : TextReader {
                     prefix += 1
                 }
                 if line.Count == 0 {
-                    let absent: Option<string> = None()
+                    let absent: Optional<string> = None()
                     return Ok(absent)
                 }
                 return TextReadSupport.DecodeLine(line, line.Count)

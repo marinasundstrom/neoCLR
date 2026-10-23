@@ -1,5 +1,5 @@
 import System.Time.*
-import System.Option.*
+import System.Optional.*
 import System.*
 import System.Console.*
 import System.Introspection.*
@@ -96,7 +96,7 @@ func Main() {
     WriteLine(typeof(int).GetFields().Count)
     Show(typeof(int).GetMethods(flags: flags).Count >= 5)
     WriteLine(typeof(Date).GetProperties(flags: flags).Count)
-    let generic = typeof(Option<int>)
+    let generic = typeof(Optional<int>)
     WriteLine(generic.GenericArgumentCount)
     WriteLine(generic.GetGenericArgument(index: 0).DisplayName)
     WriteLine(generic.GetGenericArguments()[0].DisplayName)

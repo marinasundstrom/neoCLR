@@ -129,7 +129,7 @@ Establish compiler provenance before interpreting differences:
    compiler causes, not to prove that no shared compiler bug remains.
 
 Choose cases by coverage: record equality/hash once available, ordinary class/value
-behavior, Result/Option, collection operations, and a small Console or file program.
+behavior, Result/Optional, collection operations, and a small Console or file program.
 The selected list and expected differences should be recorded with release evidence.
 Run platform-neutral cases once on the primary host; repeat only platform-specific
 boundaries on other hosts, in line with this plan's efficient CI split.

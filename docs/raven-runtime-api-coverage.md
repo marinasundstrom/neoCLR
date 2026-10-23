@@ -24,7 +24,7 @@ python3 docs/experiments/raven-target/audit_runtime_api.py --check
 | --- | --- |
 | Primitives, Boolean, Char, String | Existing conversion/comparison/character/string methods, storage and numeric API boundaries; [primitives](raven-primitive-api.md), [Boolean](raven-boolean-api.md), [String](raven-string-api.md), [parsing](raven-parsing-api.md) |
 | Math and Console | All existing Math methods, WriteLine overloads and ReadByte; [Math](raven-floating-math-api.md), [process APIs](raven-process-api.md) |
-| Option, Result, Void, Propagatable | Case/carrier constructors, predicates, extraction, residual/output flow, factories and completion; [unions](raven-union-api.md), including existing reference payloads |
+| Optional, Result, Void, Propagatable | Case/carrier constructors, predicates, extraction, residual/output flow, factories and completion; [unions](raven-union-api.md), including existing reference payloads |
 | Errors, File, Path | Existing error case/predicate/message APIs, bounded UTF-8 reading/writing, propagation and both Path methods; [errors](raven-error-api.md), [files](raven-file-api.md), [paths](raven-path-api.md) |
 | Date, Time, LocalDateTime, Clock | Existing factories, validation, components, equality/ordering and local system clock; [calendar](raven-calendar-api.md) |
 | Environment | All three APIs, copied argument arrays, current directory and variable Results/Options; [process](raven-process-api.md) |
@@ -91,7 +91,7 @@ runtime-derived binary catalog remains important groundwork.
 
 Reuse [API design](api-design.md), [target contracts](raven-target-contracts.md), and
 [design research](design-research.md) for subsequent changes. Review both the benefit
-and the migration cost before calling a divergence an improvement. Result/Option
+and the migration cost before calling a divergence an improvement. Result/Optional
 handling and terminal runtime faults remain distinct. Use the
 [preview criteria](raven-preview-acceptance.md) and
 [experimental release procedure](experiments/raven-target/RELEASING.md) for distribution.

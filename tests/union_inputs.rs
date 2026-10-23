@@ -55,17 +55,17 @@ fn format_four_rejects_old_union_encodings_and_instructions() {
             .is_err()
         );
     }
-    for ty in [r#"{"Option":"Int32"}"#, r#"{"Result":["Int32","String"]}"#] {
+    for ty in [r#"{"Optional":"Int32"}"#, r#"{"Result":["Int32","String"]}"#] {
         assert!(serde_json::from_str::<neoclr::metadata::Type>(ty).is_err());
     }
 }
 
 #[test]
 fn erased_case_storage_checks_pointer_payloads_at_import() {
-    let module = assemble(".module App\n.function None() -> System.Option<Int32*>\nnewobj instance System.Option.None::.ctor()\nnewobj instance System.Option<Int32*>::.ctor(System.Option.None)\nret\n.end\n.function Some() -> System.Option<Int32*>\nptr.null Int32\nnewobj instance System.Option.Some<Int32*>::.ctor(Int32*)\nnewobj instance System.Option<Int32*>::.ctor(System.Option.Some<Int32*>)\nret\n.end\n.function Ignore(System.Option<Int32*> value) -> Void\nldvoid\nret\n.end").unwrap();
+    let module = assemble(".module App\n.function None() -> System.Optional<Int32*>\nnewobj instance System.Optional.None::.ctor()\nnewobj instance System.Optional<Int32*>::.ctor(System.Optional.None)\nret\n.end\n.function Some() -> System.Optional<Int32*>\nptr.null Int32\nnewobj instance System.Optional.Some<Int32*>::.ctor(Int32*)\nnewobj instance System.Optional<Int32*>::.ctor(System.Optional.Some<Int32*>)\nret\n.end\n.function Ignore(System.Optional<Int32*> value) -> Void\nldvoid\nret\n.end").unwrap();
     let program = LoadedProgram::new(&module).unwrap();
     let ignore = program
-        .resolve_function(&parse_function_ref("Ignore(System.Option<Int32*>)").unwrap())
+        .resolve_function(&parse_function_ref("Ignore(System.Optional<Int32*>)").unwrap())
         .unwrap();
     for (name, accepted) in [("None()", true), ("Some()", false)] {
         let value = program

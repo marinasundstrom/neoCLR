@@ -3,7 +3,7 @@
 `System.Fail(message: String) -> void` is a namespace function. It terminates the
 current guest execution and preserves a computed UTF-8 diagnostic message. It does
 not return a Result, throw an exception object or resume guest execution. Use Result
-for errors the caller can handle and Option for ordinary absence.
+for errors the caller can handle and Optional for ordinary absence.
 
 ```raven
 import System.*

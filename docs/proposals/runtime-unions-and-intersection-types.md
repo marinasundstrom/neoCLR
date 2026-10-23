@@ -45,7 +45,7 @@ NeoCLR should additionally allow these compound types to participate directly in
 Nominal unions such as:
 
 ```raven
-Option<T>
+Optional<T>
 Result<T, E>
 ```
 
@@ -130,7 +130,7 @@ This type has no independent nominal identity.
 
 ```raven
 Result<T, E>
-Option<T>
+Optional<T>
 ```
 
 A named type declaring named union cases.
@@ -142,7 +142,7 @@ Result<T,E>
     Ok(T)
     Err(E)
 
-Option<T>
+Optional<T>
     Some(T)
     None
 ```
@@ -890,7 +890,7 @@ union Result<T, E>
 and:
 
 ```raven
-union Option<T>
+union Optional<T>
 {
     Some(T),
     None
@@ -924,7 +924,7 @@ T | E
 and:
 
 ```raven
-Option<T>
+Optional<T>
 ```
 
 is not merely:
@@ -951,7 +951,7 @@ Conceptually:
           ad-hoc union                 nominal union
                  │                           │
                A | B                    Result<T,E>
-                                        Option<T>
+                                        Optional<T>
 ```
 
 Both describe a finite set of alternatives.
@@ -1823,19 +1823,19 @@ Yet the runtime can use common union machinery for storage, discrimination, matc
 
 ---
 
-# 42. Example: nominal `Option`
+# 42. Example: nominal `Optional`
 
 Likewise:
 
 ```raven
-Option<User>
+Optional<User>
 ```
 
 remains:
 
 ```text
 Named type:
-    Option<User>
+    Optional<User>
 
 kind:
     nominal union

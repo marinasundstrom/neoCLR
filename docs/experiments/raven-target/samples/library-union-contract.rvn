@@ -1,5 +1,5 @@
 import System.*
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 import System.Runtime.CompilerServices.*
 import System.Console.*
@@ -12,14 +12,14 @@ public func Check(condition: bool, message: string) {
     }
 }
 
-func Read(value: Option<int>) -> int {
+func Read(value: Optional<int>) -> int {
     return match value {
         Some(let number) => number
         None => -1
     }
 }
 
-func PropagateOption(value: Option<int>) -> Option<int> {
+func PropagateOption(value: Optional<int>) -> Optional<int> {
     return Some(value?)
 }
 
@@ -40,14 +40,14 @@ class Payload {
 }
 
 func Main() {
-    let some: Option<int> = Some(42)
-    let none: Option<int> = None
+    let some: Optional<int> = Some(42)
+    let none: Optional<int> = None
     Check(some.HasValue, "Some must be active")
     Check(none.HasValue, "None must be active")
     Check(Read(PropagateOption(some)) == 42, "Some propagation")
     Check(PropagateOption(none) is None, "None propagation")
 
-    var extracted: Option<int>.Some<int> = Some(99)
+    var extracted: Optional<int>.Some<int> = Some(99)
     if some.TryGetValue(out extracted) {
         Check(extracted.Value == 42, "Some extraction")
     } else {
@@ -63,8 +63,8 @@ func Main() {
     let hasOutput = none.TryGetOutput(out output)
     Check(!hasOutput && output == 0, "Propagation initializes a mismatched output")
 
-    let inactive = default(Option<int>)
-    Check(!inactive.HasValue, "Default Option must be inactive")
+    let inactive = default(Optional<int>)
+    Check(!inactive.HasValue, "Default Optional must be inactive")
     Check(Object.ReferenceEquals(inactive.Value, null), "Inactive Value must be null")
     if inactive.TryGetValue(out extracted) {
         System.Fail("Inactive extraction")
@@ -72,7 +72,7 @@ func Main() {
     Check(extracted.Value == 0, "Inactive extraction clears output")
 
     let view = (UnionValue)(object)some
-    Check(view.Value is System.Option.Some<int>(let boxedNumber) && boxedNumber == 42, "UnionValue boxed case")
+    Check(view.Value is System.Optional.Some<int>(let boxedNumber) && boxedNumber == 42, "UnionValue boxed case")
     let noneView = (UnionValue)(object)none
     Check(noneView.Value is None, "UnionValue active None")
 
@@ -91,17 +91,17 @@ func Main() {
     Check(sameError is Failure(let sameErrorValue) && sameErrorValue == 7, "Same-type Error")
     Check(!(sameOk is Failure(_)), "Same-type cases must differ")
 
-    let unit: Option<System.Void> = Some(())
+    let unit: Optional<System.Void> = Some(())
     Check(unit.HasValue && unit is Some(_), "Some Void differs from None")
     let completed: Result<System.Void, string> = Ok(())
     Check(PropagateVoid(completed) is Ok(_), "Void propagation")
     let voidError: Result<System.Void, string> = Failure("failed")
     Check(PropagateVoid(voidError) is Failure(_), "Void error propagation")
 
-    let nested: Option<Result<int, string>> = Some(ok)
+    let nested: Optional<Result<int, string>> = Some(ok)
     Check(nested is Some(Ok(let nestedNumber)) && nestedNumber == 42, "Nested outcomes")
     let payload = Payload(7)
-    let reference: Option<Payload> = Some(payload)
+    let reference: Optional<Payload> = Some(payload)
     payload.Number = 9
     Check(reference is Some(let item) && item.Number == 9, "Reference identity")
     var copy = some

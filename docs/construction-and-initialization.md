@@ -145,7 +145,7 @@ The first useful tests should exercise:
 5. Returning a recoverable factory error with explicit resource cleanup.
 6. Preserving these behaviors when the caller is compiled from the future language.
 
-Option/Result now use temporary System.Value storage and ordinary typed extraction.
+Optional/Result now use temporary System.Value storage and ordinary typed extraction.
 Their TryGet methods use `out(true) Case&`: a successful direct Boolean branch
 establishes initialization, while false supplies no new initialization guarantee.
 Execution checks assignment on required returns; the verifier's propagation is

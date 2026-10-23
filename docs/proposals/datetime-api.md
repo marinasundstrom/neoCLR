@@ -160,7 +160,7 @@ let nextMonth = date + Period.FromMonths(1)
 
 Därmed behöver "24 timmar" inte felaktigt antas vara samma sak som "nästa kalenderdag".
 
-## Result och Option
+## Result och Optional
 
 NeoCLR behöver inte `.NET`-mönstret `Parse` + `TryParse`.
 
@@ -181,10 +181,10 @@ Raven kan sedan använda normal propagation:
 let date = Date.Parse(input)?
 ```
 
-`Option<T>` reserveras för **frånvaro**, inte misslyckanden:
+`Optional<T>` reserveras för **frånvaro**, inte misslyckanden:
 
 ```raven
-event.End: Option<Instant>
+event.End: Optional<Instant>
 ```
 
 Och unions används när flera resultat är legitima delar av domänen, som `LocalTimeMapping`.

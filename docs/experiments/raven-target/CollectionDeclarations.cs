@@ -5,8 +5,8 @@ static class CollectionDeclarations
         // Interface metadata for CLI vectors; allocation still uses newarr.
         public sealed class Array<T> : Collections.MutableSequence<T> {
             public T[] this[Range range] => default;
-            public Option<T> Get(int index) => default;
-            public Option<T> Get(Index index) => default;
+            public Optional<T> Get(int index) => default;
+            public Optional<T> Get(Index index) => default;
             public Result<T[], InvalidRangeError> Slice(Range range) => default;
             private Array() { }
             public static T[] Empty => default;
@@ -20,8 +20,8 @@ static class CollectionDeclarations
         namespace Collections {
             public interface Queue<T> : Collection<T> {
                 void Enqueue(T value);
-                Option<T> Dequeue();
-                Option<T> Peek();
+                Optional<T> Dequeue();
+                Optional<T> Peek();
                 void Clear();
             }
             public class ArrayQueue<T> : Queue<T> {
@@ -31,8 +31,8 @@ static class CollectionDeclarations
                 public int Count => default;
                 public int Capacity => default;
                 public void Enqueue(T value) { }
-                public Option<T> Dequeue() => default;
-                public Option<T> Peek() => default;
+                public Optional<T> Dequeue() => default;
+                public Optional<T> Peek() => default;
                 public void Clear() { }
                 public Iterator<T> GetIterator() => default;
             }
@@ -44,15 +44,15 @@ static class CollectionDeclarations
                 public Comparer<TPriority> Comparer => default;
                 public int EnsureCapacity(int capacity) => default;
                 public void Enqueue(TElement element, TPriority priority) { }
-                public Option<TElement> Dequeue() => default;
-                public Option<TElement> Peek() => default;
-                public Option<TPriority> PeekPriority() => default;
+                public Optional<TElement> Dequeue() => default;
+                public Optional<TElement> Peek() => default;
+                public Optional<TPriority> PeekPriority() => default;
                 public void Clear() { }
             }
             public interface Stack<T> : Collection<T> {
                 void Push(T value);
-                Option<T> Pop();
-                Option<T> Peek();
+                Optional<T> Pop();
+                Optional<T> Peek();
                 void Clear();
             }
             public class ArrayStack<T> : Stack<T> {
@@ -62,8 +62,8 @@ static class CollectionDeclarations
                 public int Count => default;
                 public int Capacity => default;
                 public void Push(T value) { }
-                public Option<T> Pop() => default;
-                public Option<T> Peek() => default;
+                public Optional<T> Pop() => default;
+                public Optional<T> Peek() => default;
                 public void Clear() { }
                 public Iterator<T> GetIterator() => default;
             }
@@ -71,13 +71,13 @@ static class CollectionDeclarations
                 bool Contains(T value);
             }
             public interface MutableSet<T> : Set<T> {
-                Option<T> Find(T value);
+                Optional<T> Find(T value);
                 bool Add(T value);
                 bool Remove(T value);
                 void Clear();
             }
             public class HashSet<T> : MutableSet<T> {
-                public Option<T> Find(T value) => default;
+                public Optional<T> Find(T value) => default;
                 public HashSet(EqualityComparer<T> comparer) { }
                 public HashSet(Iterable<T> items, EqualityComparer<T> comparer) { }
                 public int Count => default;
@@ -102,7 +102,7 @@ static class CollectionDeclarations
                 V this[K key] { get; }
                 int Count { get; }
                 Sequence<K> Keys { get; }
-                Option<V> Find(K key);
+                Optional<V> Find(K key);
                 bool ContainsKey(K key);
             }
             public interface MutableMap<K, V> : Map<K, V> {
@@ -114,7 +114,7 @@ static class CollectionDeclarations
                 public MapEntry(MutableMap<K, V> map, K key) { }
                 public K Key => default;
                 public V Value => default;
-                public Option<V> Find() => default;
+                public Optional<V> Find() => default;
                 public MapEntry<K, V> Set(V value) => default;
                 public V OrInsert(V value) => default;
                 public V OrInsertWith(Func<V> factory) => default;
@@ -134,7 +134,7 @@ static class CollectionDeclarations
                 public HashMap(Iterable<KeyValuePair<K, V>> items, Func<K, K, bool> equal, Func<K, int> hash) { }
                 public int Count => default;
                 public Sequence<K> Keys => default;
-                public Option<V> Find(K key) => default;
+                public Optional<V> Find(K key) => default;
                 public bool ContainsKey(K key) => default;
                 public bool TryAdd(K key, V value) => default;
                 public void Set(K key, V value) { }
@@ -169,8 +169,8 @@ static class CollectionDeclarations
                 public static T get_Item<T>(this Sequence<T> source, Index index) => default;
                 [System.Runtime.CompilerServices.SpecialName]
                 public static T[] get_Item<T>(this Sequence<T> source, Range range) => default;
-                public static Option<T> Get<T>(this Sequence<T> source, int index) => default;
-                public static Option<T> Get<T>(this Sequence<T> source, Index index) => default;
+                public static Optional<T> Get<T>(this Sequence<T> source, int index) => default;
+                public static Optional<T> Get<T>(this Sequence<T> source, Index index) => default;
                 public static Result<T[], InvalidRangeError> Slice<T>(this Sequence<T> source, Range range) => default;
             }
             public class ArrayList<T> : List<T> {
@@ -180,13 +180,13 @@ static class CollectionDeclarations
                 public ArrayList() { }
                 public ArrayList(int capacity) { }
                 public ArrayList(Iterable<T> items) { }
-                public Option<int> FindIndex(Func<T, bool> match) => default;
-                public Option<int> FindLastIndex(Func<T, bool> match) => default;
-                public Option<T> FindLast(Func<T, bool> match) => default;
+                public Optional<int> FindIndex(Func<T, bool> match) => default;
+                public Optional<int> FindLastIndex(Func<T, bool> match) => default;
+                public Optional<T> FindLast(Func<T, bool> match) => default;
                 public ArrayList<T> FindAll(Func<T, bool> match) => default;
                 public bool TrueForAll(Func<T, bool> match) => default;
                 public bool Exists(Func<T, bool> match) => default;
-                public Option<T> Find(Func<T, bool> match) => default;
+                public Optional<T> Find(Func<T, bool> match) => default;
                 public ArrayList<T> Copy() => default;
                 public int Capacity => default;
                 public int Count => default;

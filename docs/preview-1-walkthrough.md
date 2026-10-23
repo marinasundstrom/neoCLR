@@ -1,7 +1,7 @@
 # Preview 1 runnable walkthrough
 
 These programs demonstrate the current source preview: familiar System APIs and
-CLI-style calls, arithmetic and branches, alongside real Void, ordinary Result/Option
+CLI-style calls, arithmetic and branches, alongside real Void, ordinary Result/Optional
 carriers, explicit native allocation and terminal Faults. They do not require a
 high-level compiler or extensive object-oriented programming.
 
@@ -80,14 +80,14 @@ Intermediate calls returning Void use `pop` when their result is discarded.
 ## Console calculation and expected errors
 
 [ConsoleInput](../examples/console_input.neoil) reads an unsigned decimal number
-using Console.ReadByte. Its application helper returns Result<Option<Int32>,Error>:
+using Console.ReadByte. Its application helper returns Result<Optional<Int32>,Error>:
 None represents immediate EOF; an error represents invalid/empty input or a read
 failure. Native console failures have the specific ConsoleReadError type, which
 this application explicitly converts to a displayable application Error.
 
 The console and file samples use overloaded `TryGet(out Case& value)` to extract
 ordinary case values, then read their Value properties. The console first extracts
-`Ok<Option<Byte>>`, then `Some<Byte>`; a missing Some denotes EOF. The Error branch
+`Ok<Optional<Byte>>`, then `Some<Byte>`; a missing Some denotes EOF. The Error branch
 extracts `Error<ConsoleReadError>`. Output locals are read only after a successful
 Boolean branch, as required by the conditional output contract.
 
@@ -116,7 +116,7 @@ Unix, or Ctrl-Z followed by Enter on Windows). The automated test supplies exact
 bytes and closes stdin, so it does not depend on terminal behavior.
 
 Case testing and extraction use ordinary member calls. The public runtime API
-returns Result and Option with concrete error types; it does not throw exceptions.
+returns Result and Optional with concrete error types; it does not throw exceptions.
 The [ordinary union sample](../examples/ordinary_unions.neoil) separately exercises
 constructors, distinct cases, Void payloads and independent owned value copies.
 

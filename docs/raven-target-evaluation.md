@@ -597,7 +597,7 @@ missing capabilities. A second compiler backend offers control but duplicates em
 and increases Raven divergence. Shared emission plus explicit target contracts and a
 metadata-driven importer is the preferred direction: more initial validation work,
 less dependence on a growing list of special cases. Full .NET compatibility is not
-promised; Result/Option error flow, Void value positions and array invariance remain
+promised; Result/Optional error flow, Void value positions and array invariance remain
 intentional differences to validate separately.
 
 ## Branch housekeeping — 2026-09-14
@@ -771,7 +771,7 @@ These changes introduce no neoCLR names or target-specific policies into Raven m
 The importer now accepts scoped constructed collection/delegate/union signatures and
 emits generic adapters for open bodies. The actual library migration covers seven
 terminal overloads under System.Linq.Operators, following the author's naming change.
-Raven source and separate reference declarations retain their existing Option/Result,
+Raven source and separate reference declarations retain their existing Optional/Result,
 iterator and extension-method contracts. See [library authoring](raven-system-library.md).
 
 The namespace-member owner remains a standard marked CLI container; static extension
@@ -933,7 +933,7 @@ was needed for the iterable slice.
 ### Callback inference candidates exposed by outcome operators (2026-09-19)
 
 The author questioned the explicit signature in
-`absent.OrElse(() -> Option<int> => Some(7))`. The same .15 SDK compiles and runs
+`absent.OrElse(() -> Optional<int> => Some(7))`. The same .15 SDK compiles and runs
 `absent.OrElse(() => Some(7))`; both OrElse callbacks in the outcome sample now
 use inference. No annotation is needed for that contract.
 
@@ -942,7 +942,7 @@ For `Result<int,string>.Then`, replacing the sample callback with
 annotation, `(value) -> Result<int,string> => Ok(value + 1)`, reports
 “Object reference not set to an instance of an object.” The fully typed callback
 compiles and runs. Separately, `value.Tap((item: int) -> unit => { WriteLine(item) })`
-on Option<int> produces RAV1501, while omitting the return annotation works. The
+on Optional<int> produces RAV1501, while omitting the return annotation works. The
 project explicitly configures System.Void as the unit type. These are observed
 compiler/binding limitations, not desired API requirements.
 

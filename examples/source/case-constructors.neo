@@ -1,6 +1,6 @@
 import System.Console.*
 import System.Result.*
-import System.Option.*
+import System.Optional.*
 
 record Receipt(Total: int)
 
@@ -11,12 +11,12 @@ func Main() -> int {
     WriteLine(receipt.Total)
 
     let some = Some(42)
-    let option: Option<int> = some
+    let option: Optional<int> = some
     let Some(value) = option else { return -2 }
     WriteLine(value)
 
     let none = None()
-    let missing: Option<int> = none
+    let missing: Optional<int> = none
     if let None = missing { return value }
     return -3
 }

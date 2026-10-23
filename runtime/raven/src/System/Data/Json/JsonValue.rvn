@@ -51,17 +51,17 @@ public class JsonObject : JsonValue, Map<string, JsonValue> {
 
     /// <summary>Finds a field, returning None when absent and Some for every present node, including JsonNull.</summary>
     /// <param name="name">The exact ordinal field name.</param>
-    func Find(name: string) -> Option<JsonValue> {
+    func Find(name: string) -> Optional<JsonValue> {
         if Field(name) is Ok(let value) {
-            return Option<JsonValue>.Some(value)
+            return Optional<JsonValue>.Some(value)
         }
-        return Option<JsonValue>.None
+        return Optional<JsonValue>.None
     }
 
     /// <summary>Tests whether an exact ordinal field name is present.</summary>
     /// <param name="name">The field name to test.</param>
     func ContainsKey(name: string) -> bool {
-        return Find(name) is Option<JsonValue>.Some(_)
+        return Find(name) is Optional<JsonValue>.Some(_)
     }
 
     /// <summary>Returns a shallow snapshot of field pairs in insertion order.</summary>

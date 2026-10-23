@@ -4,18 +4,18 @@ using System.Text.Json;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 
-// Bounded Result/Option profile, not a general CLI loader. Only supplied metadata is resolved.
+// Bounded Result/Optional profile, not a general CLI loader. Only supplied metadata is resolved.
 static class UnionImport
 {
     const string VoidResult = "System.Result<Void,System.OverflowError>";
     const string VoidOk = "System.Result.Ok<Void>";
     const string Overflow = "System.OverflowError";
     const string IntArray = "arrayref<Int32>";
-    const string VoidOption = "System.Option<Void>";
-    const string VoidSome = "System.Option.Some<Void>";
-    const string Option = "System.Option<Int32>";
-    const string Some = "System.Option.Some<Int32>";
-    const string None = "System.Option.None";
+    const string VoidOption = "System.Optional<Void>";
+    const string VoidSome = "System.Optional.Some<Void>";
+    const string Optional = "System.Optional<Int32>";
+    const string Some = "System.Optional.Some<Int32>";
+    const string None = "System.Optional.None";
     const string Carrier = "System.Result<Int32,System.OverflowError>";
     const string Ok = "System.Result.Ok<Int32>";
     const string Error = "System.Result.Failure<System.OverflowError>";
@@ -207,7 +207,7 @@ static class UnionImport
             var emitOwnedStatic = OwnedApplicationStatic(method) || method.DeclaringType.IsInterface && method.IsStatic || libraryOwner is not null && method.IsStatic && !JsonBindings.IsGenericSerializerMethod(method) && ((((StorageItemBindings.IsName(method.DeclaringType.FullName) || ((IPAddressBindings.IsName(method.DeclaringType.FullName) || ((GlobalizationBindings.IsName(method.DeclaringType.FullName) || ComparerBindings.IsName(method.DeclaringType.FullName)) || UriBindings.IsName(method.DeclaringType.FullName))) || PathBindings.IsName(method.DeclaringType.FullName))) || StreamBindings.IsName(method.DeclaringType.FullName)) || (((JsonBindings.IsName(method.DeclaringType.FullName) || HttpBindings.IsName(method.DeclaringType.FullName)) || SocketBindings.IsName(method.DeclaringType.FullName)) || (CancellationBindings.IsReference(method.DeclaringType.FullName) || WorkerBindings.IsName(method.DeclaringType.FullName)))) || AsyncBindings.IsName(method.DeclaringType.FullName) || method.DeclaringType.FullName == "System.Concurrency.Tasks.TaskQueue" || method.DeclaringType.IsValueType || OpaqueLibrary.IsString(method.DeclaringType) || ArrayLibrary.IsMatched(method.DeclaringType) || MarkerLibrary.IsMatched(method.DeclaringType) || DescriptorLibrary.IsProvider(method.DeclaringType));
             var result = ProfileType(method.ReturnType, true);
             var locals = method.Body.Variables.Select(v => ProfileType(v.VariableType)).ToArray();
-            if (locals.Any(t => !TupleBindings.IsName(t) && !(libraryOwner is not null && t is "Value" or ParameterSnapshotBindings.Vector) && !((libraryOwner is not null || ApplicationTypes.IsGenericApplication(method.DeclaringType)) && method.GenericParameters.Concat(method.DeclaringType.GenericParameters).Any(p => t == "T" + p.Position)) && !(((StorageItemBindings.IsName(t) || ((IPAddressBindings.IsName(t) || ((GlobalizationBindings.IsName(t) || ComparerBindings.IsName(t)) || UriBindings.IsName(t))) || PathBindings.IsName(t))) || StreamBindings.IsName(t)) || (((JsonBindings.IsName(t) || HttpBindings.IsName(t)) || SocketBindings.IsName(t)) || (CancellationBindings.IsReference(t) || WorkerBindings.IsName(t)))) && t != StringBuilderBindings.Name && !ReaderBindings.IsName(t) && !EnumBindings.IsType(t) && !AsyncBindings.IsType(t) && !TaskBindings.IsType(t) && !ApplicationTypes.IsType(t) && !ManagedArrayBindings.IsType(t) && t != "System.Object" && !InterfaceBindings.IsInterface(t) && !NativeMemoryBindings.IsPointer(t) && !ReflectionBindings.IsType(t) && t != "arrayref<String>" && !FunctionBindings.IsType(t) && !GenericUnionBindings.IsType(t) && !CalendarBindings.IsReference(t) && !(t == CancellationBindings.Token || CalendarBindings.Types.Contains(t)) && t != HashCodeBindings.Owner && !PrimitiveBindings.Types.Contains(t) && !ResultBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "Double" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
+            if (locals.Any(t => !TupleBindings.IsName(t) && !(libraryOwner is not null && t is "Value" or ParameterSnapshotBindings.Vector) && !((libraryOwner is not null || ApplicationTypes.IsGenericApplication(method.DeclaringType)) && method.GenericParameters.Concat(method.DeclaringType.GenericParameters).Any(p => t == "T" + p.Position)) && !(((StorageItemBindings.IsName(t) || ((IPAddressBindings.IsName(t) || ((GlobalizationBindings.IsName(t) || ComparerBindings.IsName(t)) || UriBindings.IsName(t))) || PathBindings.IsName(t))) || StreamBindings.IsName(t)) || (((JsonBindings.IsName(t) || HttpBindings.IsName(t)) || SocketBindings.IsName(t)) || (CancellationBindings.IsReference(t) || WorkerBindings.IsName(t)))) && t != StringBuilderBindings.Name && !ReaderBindings.IsName(t) && !EnumBindings.IsType(t) && !AsyncBindings.IsType(t) && !TaskBindings.IsType(t) && !ApplicationTypes.IsType(t) && !ManagedArrayBindings.IsType(t) && t != "System.Object" && !InterfaceBindings.IsInterface(t) && !NativeMemoryBindings.IsPointer(t) && !ReflectionBindings.IsType(t) && t != "arrayref<String>" && !FunctionBindings.IsType(t) && !GenericUnionBindings.IsType(t) && !CalendarBindings.IsReference(t) && !(t == CancellationBindings.Token || CalendarBindings.Types.Contains(t)) && t != HashCodeBindings.Owner && !PrimitiveBindings.Types.Contains(t) && !ResultBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "Double" or "String" or IntArray or Carrier or Ok or Error or Optional or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
                 throw new InvalidDataException("Unsupported local default in Result profile: " + method.FullName + " (" + string.Join(", ", locals) + ").");
             NormalizePatternBranches(method);
             var instructions = method.Body.Instructions.ToArray();
@@ -215,7 +215,7 @@ static class UnionImport
             var states = new Dictionary<int, State>();
             var work = new Queue<int>();
             var bodies = new Dictionary<int, string>();
-            Merge(0, new([], locals.Select(t => !method.GenericParameters.Concat(method.DeclaringType.GenericParameters).Any(p => t == "T" + p.Position) && method.Body.InitLocals && t != Carrier && t != Option && t != VoidOption && t != VoidResult && t != "String" && !NeedsInitialization(t)).ToArray()));
+            Merge(0, new([], locals.Select(t => !method.GenericParameters.Concat(method.DeclaringType.GenericParameters).Any(p => t == "T" + p.Position) && method.Body.InitLocals && t != Carrier && t != Optional && t != VoidOption && t != VoidResult && t != "String" && !NeedsInitialization(t)).ToArray()));
             var visits = 0;
             while (work.TryDequeue(out var index))
             {
@@ -1064,7 +1064,7 @@ static class UnionImport
                 {
                     if (ApplicationTypes.LibraryUnionRequiresInitialization(locals[n]) || !ErrorBindings.IsStandard(locals[n]) && ErrorBindings.Cases.TryGetValue(locals[n], out var errorCases) && errorCases.Length > 0) continue;
                     if ((((StorageItemBindings.IsName(locals[n]) || ((IPAddressBindings.IsName(locals[n]) || ((GlobalizationBindings.IsName(locals[n]) || ComparerBindings.IsName(locals[n])) || UriBindings.IsName(locals[n]))) || PathBindings.IsName(locals[n]))) || StreamBindings.IsName(locals[n])) || (((JsonBindings.IsName(locals[n]) || HttpBindings.IsName(locals[n])) || SocketBindings.IsName(locals[n])) || (CancellationBindings.IsReference(locals[n]) || WorkerBindings.IsName(locals[n])))) || TaskBindings.IsType(locals[n]) || AsyncBindings.IsType(locals[n]) || TupleBindings.IsName(locals[n]) || ApplicationTypes.IsType(locals[n]) || ErrorBindings.IsStandard(locals[n]) || ReflectionBindings.IsType(locals[n]) && locals[n] != "System.RuntimeTypeHandle" || ManagedArrayBindings.IsType(locals[n]) || CollectionBindings.IsReference(locals[n]) || ((locals[n] == CancellationBindings.Token || CalendarBindings.Types.Contains(locals[n])) || locals[n] == HashCodeBindings.Owner) || GenericUnionBindings.IsType(locals[n]) && !GenericUnionBindings.RequiresInitialization(locals[n])) output.AppendLine($"ldloca local{n}\ninitobj {locals[n]}");
-                    else if (!method.GenericParameters.Concat(method.DeclaringType.GenericParameters).Any(p => locals[n] == "T" + p.Position) && locals[n] != Carrier && locals[n] != Option && locals[n] != VoidOption && locals[n] != VoidResult && locals[n] != "String" && !NeedsInitialization(locals[n])) output.AppendLine(Default(locals[n]) + $"\nstloc local{n}");
+                    else if (!method.GenericParameters.Concat(method.DeclaringType.GenericParameters).Any(p => locals[n] == "T" + p.Position) && locals[n] != Carrier && locals[n] != Optional && locals[n] != VoidOption && locals[n] != VoidResult && locals[n] != "String" && !NeedsInitialization(locals[n])) output.AppendLine(Default(locals[n]) + $"\nstloc local{n}");
                 }
             foreach (var index in bodies.Keys.Order())
             {
@@ -1140,7 +1140,7 @@ static class UnionImport
             ReachableMethods = seen.Select(m => new { AssemblyIdentity = m.Module.Assembly.Name.FullName, MethodToken = applicationSpecialization.Origin(m).MetadataToken.ToUInt32() }),
             Mappings = mappings.Select(m => new { AssemblyIdentity = m.Method.Module.Assembly.Name.FullName, MethodToken = applicationSpecialization.Origin(m.Method).MetadataToken.ToUInt32(), m.Offset,
                 OutputLabel = $"M{m.MethodId:x8}_IL_{m.Offset:x4}:", OutputLine = labelLines[$"M{m.MethodId:x8}_IL_{m.Offset:x4}:"] }),
-            Scope = "Bounded application class/value fields, constructors and instance methods; Int32/String vectors, optional closed collection references, file UTF-8 APIs, String helpers and generic Result/Option bindings; CFG stack/definite-assignment checked; observable default carriers rejected; explicit nongeneric library types and bodies admitted; no reference-core declaration bodies executed."
+            Scope = "Bounded application class/value fields, constructors and instance methods; Int32/String vectors, optional closed collection references, file UTF-8 APIs, String helpers and generic Result/Optional bindings; CFG stack/definite-assignment checked; observable default carriers rejected; explicit nongeneric library types and bodies admitted; no reference-core declaration bodies executed."
         }, new JsonSerializerOptions { WriteIndented = true }));
     }
 
@@ -1187,11 +1187,11 @@ static class UnionImport
         "System.Double" => "Double", "System.Boolean" => "Boolean", "System.Void" when result => "void", "System.Int32" => "Int32", "System.String" => "String",
         "System.Result`2<System.Void,System.OverflowError>" when type.IsValueType && type is GenericInstanceType g && g.GenericArguments[0].IsValueType && g.GenericArguments[0].Scope.Name == CoreDeclarations.Identity => VoidResult,
         "System.Result/Ok`1<System.Void>" when type.IsValueType && HasNamedVoid(type) => VoidOk,
-        "System.Option`1<System.Void>" when type.IsValueType && HasNamedVoid(type) => VoidOption,
-        "System.Option/Some`1<System.Void>" when type.IsValueType && HasNamedVoid(type) => VoidSome,
-        "System.Option`1<System.Int32>" when type.IsValueType => Option,
-        "System.Option/Some`1<System.Int32>" when type.IsValueType => Some,
-        "System.Option/None" when type.IsValueType => None,
+        "System.Optional`1<System.Void>" when type.IsValueType && HasNamedVoid(type) => VoidOption,
+        "System.Optional/Some`1<System.Void>" when type.IsValueType && HasNamedVoid(type) => VoidSome,
+        "System.Optional`1<System.Int32>" when type.IsValueType => Optional,
+        "System.Optional/Some`1<System.Int32>" when type.IsValueType => Some,
+        "System.Optional/None" when type.IsValueType => None,
         "System.Result`2<System.Int32,System.OverflowError>" when type.IsValueType => Carrier,
         "System.Result/Ok`1<System.Int32>" when type.IsValueType => Ok,
         "System.Result/Failure`1<System.OverflowError>" when type.IsValueType => Error,
@@ -1270,19 +1270,19 @@ static class UnionImport
                 && reference.ReturnType.FullName == "System.Result`2<!0,!1>")
                 return new($"System.Result<Void,{Overflow}>::FromResidual", [Overflow], VoidResult);
         }
-        if (reference.DeclaringType.FullName == "System.Option`1<System.Int32>" && definition.DeclaringType.FullName == "System.Option`1")
+        if (reference.DeclaringType.FullName == "System.Optional`1<System.Int32>" && definition.DeclaringType.FullName == "System.Optional`1")
         {
             if (reference.Name is "TryGetOutput" or "TryGetResidual" or "FromResidual") ValidatePropagation(definition.DeclaringType);
-            if (key == "System.Boolean System.Option`1::TryGetOutput(T&)" && reference.ReturnType.MetadataType == MetadataType.Boolean && reference.HasThis && definition.Parameters[0].IsOut
+            if (key == "System.Boolean System.Optional`1::TryGetOutput(T&)" && reference.ReturnType.MetadataType == MetadataType.Boolean && reference.HasThis && definition.Parameters[0].IsOut
                 && reference.Parameters.Count == 1 && reference.Parameters[0].ParameterType.FullName == "!0&")
-                return new("RuntimeOptionOutput", [Option + "&", "Int32&"], "Int32", 1);
-            if (key == "System.Boolean System.Option`1::TryGetResidual(System.Void&)" && reference.ReturnType.MetadataType == MetadataType.Boolean && reference.HasThis && definition.Parameters[0].IsOut
+                return new("RuntimeOptionOutput", [Optional + "&", "Int32&"], "Int32", 1);
+            if (key == "System.Boolean System.Optional`1::TryGetResidual(System.Void&)" && reference.ReturnType.MetadataType == MetadataType.Boolean && reference.HasThis && definition.Parameters[0].IsOut
                 && reference.Parameters.Count == 1 && reference.Parameters[0].ParameterType.FullName == "System.Void&")
-                return new("RuntimeOptionResidual", [Option + "&", "Void&"], "Int32", 1);
-            if (key == "System.Option`1<T> System.Option`1::FromResidual(System.Void)" && !reference.HasThis
+                return new("RuntimeOptionResidual", [Optional + "&", "Void&"], "Int32", 1);
+            if (key == "System.Optional`1<T> System.Optional`1::FromResidual(System.Void)" && !reference.HasThis
                 && reference.Parameters.Count == 1 && reference.Parameters[0].ParameterType.FullName == "System.Void"
-                && reference.ReturnType.FullName == "System.Option`1<!0>")
-                return new("System.Option<Int32>::FromResidual", ["Void"], Option);
+                && reference.ReturnType.FullName == "System.Optional`1<!0>")
+                return new("System.Optional<Int32>::FromResidual", ["Void"], Optional);
         }
         if (NamespaceFunctions.Owner(definition.DeclaringType) == "System.Math" && definition.Name == "Abs"
             && key == $"System.Result`2<System.Int32,System.OverflowError> {definition.DeclaringType.FullName}::Abs(System.Int32)" && reference.FullName == key && !reference.HasThis)
@@ -1313,26 +1313,26 @@ static class UnionImport
             && key == "T System.Result/Ok`1::get_Value()" && reference.ReturnType is GenericParameter { Position: 0 }
             && reference.Parameters.Count == 0)
             return new("RuntimeOkValue", [Ok + "&"], "Int32");
-        if (reference.DeclaringType.FullName == "System.Option`1<System.Int32>" && reference.HasThis
+        if (reference.DeclaringType.FullName == "System.Optional`1<System.Int32>" && reference.HasThis
             && reference.ReturnType.FullName == "System.Boolean" && reference.Parameters.Count == 1
             && definition.Parameters.Count == 1 && definition.Parameters[0].IsOut)
         {
-            if (key == "System.Boolean System.Option`1::TryGetValue(System.Option/Some`1<T>&)" && reference.Parameters[0].ParameterType.FullName == "System.Option/Some`1<!0>&")
-                return new("RuntimeTrySome", [Option + "&", Some + "&"], "Int32", 1);
-            if (key == "System.Boolean System.Option`1::TryGetValue(System.Option/None&)" && reference.Parameters[0].ParameterType.FullName == "System.Option/None&")
-                return new("RuntimeTryNone", [Option + "&", None + "&"], "Int32", 1);
+            if (key == "System.Boolean System.Optional`1::TryGetValue(System.Optional/Some`1<T>&)" && reference.Parameters[0].ParameterType.FullName == "System.Optional/Some`1<!0>&")
+                return new("RuntimeTrySome", [Optional + "&", Some + "&"], "Int32", 1);
+            if (key == "System.Boolean System.Optional`1::TryGetValue(System.Optional/None&)" && reference.Parameters[0].ParameterType.FullName == "System.Optional/None&")
+                return new("RuntimeTryNone", [Optional + "&", None + "&"], "Int32", 1);
         }
-        if (reference.DeclaringType.FullName == "System.Option/Some`1<System.Int32>" && reference.HasThis
-            && key == "T System.Option/Some`1::get_Value()" && reference.ReturnType is GenericParameter { Position: 0 }
+        if (reference.DeclaringType.FullName == "System.Optional/Some`1<System.Int32>" && reference.HasThis
+            && key == "T System.Optional/Some`1::get_Value()" && reference.ReturnType is GenericParameter { Position: 0 }
             && reference.Parameters.Count == 0)
             return new("RuntimeSomeValue", [Some + "&"], "Int32");
-        if (reference.DeclaringType.FullName == "System.Option`1<System.Void>" && HasNamedVoid(reference.DeclaringType)
+        if (reference.DeclaringType.FullName == "System.Optional`1<System.Void>" && HasNamedVoid(reference.DeclaringType)
             && reference.HasThis && reference.ReturnType.FullName == "System.Boolean" && reference.Parameters.Count == 1
             && definition.Parameters.Count == 1 && definition.Parameters[0].IsOut)
         {
-            if (key == "System.Boolean System.Option`1::TryGetValue(System.Option/Some`1<T>&)" && reference.Parameters[0].ParameterType.FullName == "System.Option/Some`1<!0>&")
+            if (key == "System.Boolean System.Optional`1::TryGetValue(System.Optional/Some`1<T>&)" && reference.Parameters[0].ParameterType.FullName == "System.Optional/Some`1<!0>&")
                 return new("RuntimeTryVoidSome", [VoidOption + "&", VoidSome + "&"], "Int32", 1);
-            if (key == "System.Boolean System.Option`1::TryGetValue(System.Option/None&)" && reference.Parameters[0].ParameterType.FullName == "System.Option/None&")
+            if (key == "System.Boolean System.Optional`1::TryGetValue(System.Optional/None&)" && reference.Parameters[0].ParameterType.FullName == "System.Optional/None&")
                 return new("RuntimeTryVoidNone", [VoidOption + "&", None + "&"], "Int32", 1);
         }
         throw new InvalidDataException("Unsupported runtime binding: " + reference.FullName + " definition=" + key);
@@ -1340,7 +1340,7 @@ static class UnionImport
     static void ValidatePropagation(TypeDefinition carrier)
     {
         var contracts = carrier.Interfaces.Where(i => i.InterfaceType.FullName ==
-            (carrier.FullName == "System.Option`1" ? "System.Propagatable`3<System.Option`1<T>,T,System.Void>" : "System.Propagatable`3<System.Result`2<T,E>,T,E>")).ToArray();
+            (carrier.FullName == "System.Optional`1" ? "System.Propagatable`3<System.Optional`1<T>,T,System.Void>" : "System.Propagatable`3<System.Result`2<T,E>,T,E>")).ToArray();
         if (contracts.Length != 1)
             throw new InvalidDataException("Missing or incompatible propagation carrier contract.");
         var contract = contracts[0].InterfaceType.Resolve();
@@ -1395,19 +1395,19 @@ static class UnionImport
             return new("RuntimeNewOk", ["Int32"], Ok);
         if (owner == Carrier && key == "System.Void System.Result`2::.ctor(System.Result/Ok`1<T>)" && parameters.SequenceEqual(new[] { "System.Result/Ok`1<!0>" }))
             return new("RuntimeResultOk", [Ok], Carrier);
-        if (owner == Some && key == "System.Void System.Option/Some`1::.ctor(T)" && parameters.SequenceEqual(new[] { "!0" }))
+        if (owner == Some && key == "System.Void System.Optional/Some`1::.ctor(T)" && parameters.SequenceEqual(new[] { "!0" }))
             return new("RuntimeNewSome", ["Int32"], Some);
-        if (owner == None && key == "System.Void System.Option/None::.ctor()" && parameters.Length == 0)
+        if (owner == None && key == "System.Void System.Optional/None::.ctor()" && parameters.Length == 0)
             return new("RuntimeNewNone", [], None);
-        if (owner == Option && key == "System.Void System.Option`1::.ctor(System.Option/Some`1<T>)" && parameters.SequenceEqual(new[] { "System.Option/Some`1<!0>" }))
-            return new("RuntimeOptionSome", [Some], Option);
-        if (owner == Option && key == "System.Void System.Option`1::.ctor(System.Option/None)" && parameters.SequenceEqual(new[] { "System.Option/None" }))
-            return new("RuntimeOptionNone", [None], Option);
-        if (owner == VoidSome && key == "System.Void System.Option/Some`1::.ctor(T)" && parameters.SequenceEqual(new[] { "!0" }))
+        if (owner == Optional && key == "System.Void System.Optional`1::.ctor(System.Optional/Some`1<T>)" && parameters.SequenceEqual(new[] { "System.Optional/Some`1<!0>" }))
+            return new("RuntimeOptionSome", [Some], Optional);
+        if (owner == Optional && key == "System.Void System.Optional`1::.ctor(System.Optional/None)" && parameters.SequenceEqual(new[] { "System.Optional/None" }))
+            return new("RuntimeOptionNone", [None], Optional);
+        if (owner == VoidSome && key == "System.Void System.Optional/Some`1::.ctor(T)" && parameters.SequenceEqual(new[] { "!0" }))
             return new("RuntimeNewVoidSome", ["Void"], VoidSome);
-        if (owner == VoidOption && key == "System.Void System.Option`1::.ctor(System.Option/Some`1<T>)" && parameters.SequenceEqual(new[] { "System.Option/Some`1<!0>" }))
+        if (owner == VoidOption && key == "System.Void System.Optional`1::.ctor(System.Optional/Some`1<T>)" && parameters.SequenceEqual(new[] { "System.Optional/Some`1<!0>" }))
             return new("RuntimeVoidOptionSome", [VoidSome], VoidOption);
-        if (owner == VoidOption && key == "System.Void System.Option`1::.ctor(System.Option/None)" && parameters.SequenceEqual(new[] { "System.Option/None" }))
+        if (owner == VoidOption && key == "System.Void System.Optional`1::.ctor(System.Optional/None)" && parameters.SequenceEqual(new[] { "System.Optional/None" }))
             return new("RuntimeVoidOptionNone", [None], VoidOption);
         throw new InvalidDataException("Unsupported constructor: " + reference.FullName + " definition=" + key);
     }
@@ -1446,9 +1446,9 @@ static class UnionImport
         text.AppendLine($".function RuntimeVoidResultOk({VoidOk} value) -> {VoidResult}\nldarg value\nnewobj instance {VoidResult}::.ctor({VoidOk})\nret\n.end");
         foreach (var (name, type) in new[] { ("Output", "Int32"), ("Residual", "Void") })
         {
-            text.AppendLine($".function RuntimeOption{name}({Option}& source,out {type}& destination) -> Int32");
+            text.AppendLine($".function RuntimeOption{name}({Optional}& source,out {type}& destination) -> Int32");
             text.AppendLine($"ldarg destination\n{Default(type)}\nstobj {type}");
-            text.AppendLine($"ldarg source\nldarg destination\ncall instance {Option}::TryGet{name}({type}&)");
+            text.AppendLine($"ldarg source\nldarg destination\ncall instance {Optional}::TryGet{name}({type}&)");
             text.AppendLine("brfalse Miss\nldc.i4 1\nret\nMiss:\nldc.i4 0\nret\n.end");
         }
         foreach (var (name, type) in new[] { ("Output", "Int32"), ("Residual", Overflow) })
@@ -1459,7 +1459,7 @@ static class UnionImport
             text.AppendLine($"ldarg source\nldarg destination\ncall instance {Carrier}::TryGet{name}({type}&)");
             text.AppendLine("brfalse Miss\nldc.i4 1\nret\nMiss:\nldc.i4 0\nret\n.end");
         }
-        foreach (var (name, type, carrier) in new[] { ("VoidOk", VoidOk, VoidResult), ("VoidError", Error, VoidResult), ("Ok", Ok, Carrier), ("Error", Error, Carrier), ("Some", Some, Option), ("None", None, Option), ("VoidSome", VoidSome, VoidOption), ("VoidNone", None, VoidOption) })
+        foreach (var (name, type, carrier) in new[] { ("VoidOk", VoidOk, VoidResult), ("VoidError", Error, VoidResult), ("Ok", Ok, Carrier), ("Error", Error, Carrier), ("Some", Some, Optional), ("None", None, Optional), ("VoidSome", VoidSome, VoidOption), ("VoidNone", None, VoidOption) })
         {
             text.AppendLine($".function RuntimeTry{name}({carrier}& source,out {type}& destination) -> Int32");
             text.AppendLine($"ldarg destination\n{Default(type)}\nstobj {type}");
@@ -1474,7 +1474,7 @@ static class UnionImport
         text.AppendLine($".function RuntimeNewSome(Int32 value) -> {Some}\nldarg value\nnewobj instance {Some}::.ctor(Int32)\nret\n.end");
         text.AppendLine($".function RuntimeNewNone() -> {None}\nnewobj instance {None}::.ctor()\nret\n.end");
         foreach (var (name, type) in new[] { ("Some", Some), ("None", None) })
-            text.AppendLine($".function RuntimeOption{name}({type} value) -> {Option}\nldarg value\nnewobj instance {Option}::.ctor({type})\nret\n.end");
+            text.AppendLine($".function RuntimeOption{name}({type} value) -> {Optional}\nldarg value\nnewobj instance {Optional}::.ctor({type})\nret\n.end");
         text.AppendLine($".function RuntimeNewVoidSome(Void value) -> {VoidSome}\nldarg value\nnewobj instance {VoidSome}::.ctor(Void)\nret\n.end");
         foreach (var (name, type) in new[] { ("Some", VoidSome), ("None", None) })
             text.AppendLine($".function RuntimeVoidOption{name}({type} value) -> {VoidOption}\nldarg value\nnewobj instance {VoidOption}::.ctor({type})\nret\n.end");
@@ -1487,7 +1487,7 @@ static class UnionImport
     // Raven reference families use generated byref receivers and TryGetValue.
     internal static string AdaptUnionHelpers(string text, bool standardUnions) => !standardUnions ? text
         : System.Text.RegularExpressions.Regex.Replace(text.Replace("::TryGet(", "::TryGetValue("),
-            @"(?m)^ldobj System\.(?:Option|Result)(?:\.[^<
+            @"(?m)^ldobj System\.(?:Optional|Result)(?:\.[^<
 ]+)?<[^
 ]+>
 ?

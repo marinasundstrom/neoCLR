@@ -17,7 +17,7 @@ better fit the exception-free platform and requested a Rust comparison.
 ## Rust comparison
 
 Rust separates policies in its integer methods: checked_add and checked_neg return
-Option, strict_add panics on overflow, wrapping_add wraps, saturating_add clamps,
+Optional, strict_add panics on overflow, wrapping_add wraps, saturating_add clamps,
 and overflowing_add returns the wrapped value and an overflow flag. checked_div
 returns None both for zero divisors and signed minimum divided by minus one.
 See the shipped [integer method contracts](https://doc.rust-lang.org/std/primitive.i32.html#method.checked_add),
@@ -33,7 +33,7 @@ Changing checked(expr) to return Result only on NeoCLR would change typing,
 composition and overload behavior across targets. A native fault is also not
 identical to Rust panic/unwinding; only the failure policy is comparable.
 
-Option<T> is sufficient when only success matters. Result<T, ArithmeticError>
+Optional<T> is sufficient when only success matters. Result<T, ArithmeticError>
 would preserve reasons such as overflow versus division by zero and compose with
 existing Result handling, at the cost of an error taxonomy and wider public API
 commitment. Prefer evaluating a consistent Result-based arithmetic family before

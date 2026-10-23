@@ -14,7 +14,7 @@ reinsertion. They identify a key, not one particular insertion. Keys must contin
 to satisfy the underlying map's stable hash/equality contract. Key exposes the
 supplied lookup key, not necessarily the stored canonical representative.
 
-Find returns Option (present null is distinct from absence); Value uses the existing
+Find returns Optional (present null is distinct from absence); Value uses the existing
 indexer missing-key behavior. Set inserts/replaces and returns the same handle.
 OrInsert eagerly receives a candidate, inserts only if absent and returns the
 existing/inserted V. Returned values follow normal value-copy/reference-sharing
@@ -48,7 +48,7 @@ cost. No GC/runtime change is needed: ordinary fields retain the owner and key.
 
 GetOrInsert returns the stored equivalent element, preserving reference identity,
 or inserts and returns the candidate. It never replaces an equivalent element.
-MutableSet.Find returns Option of the actual stored element using its equality
+MutableSet.Find returns Optional of the actual stored element using its equality
 policy; HashSet implements it through its existing hash lookup and reentry guard.
 This additional interface member requires custom MutableSet implementations to add
 Find and dependent native artifacts to be rebuilt. Set's read-only contract stays
@@ -76,7 +76,7 @@ Primary sources checked 2026-10-16:
   borrowing. We adopt conditional fluent operations, not its borrow/lifetime model.
 - [.NET HashSet.TryGetValue](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.hashset-1.trygetvalue?view=net-10.0)
   explicitly supports retrieving a stored representative/reference. MutableSet.Find
-  adapts this lookup to neoCLR's existing Option convention.
+  adapts this lookup to neoCLR's existing Optional convention.
 - [Language-ext Map](https://louthy.github.io/language-ext/LanguageExt.Core/Immutable%20Collections/Map/index.html)
   offers FindOrAdd returning an updated immutable map and value. It supports a library
   solution but its persistent ownership and null policy do not fit these mutable maps.

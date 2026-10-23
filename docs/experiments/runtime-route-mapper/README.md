@@ -43,7 +43,7 @@ limit and conversion domains: `/items/new` overlaps `/items/{id}` even with an I
 payload. No ordering, fallback or literal-priority rule resolves overlaps. Encoding
 limits and conversion remain enforced when matching requests. Generic unions, other
 payload types, method attributes, wildcard/default/optional captures and source
-generation are outside this sample. JSON enum/Uuid/Option support remains separate.
+generation are outside this sample. JSON enum/Uuid/Optional support remains separate.
 
 ## Run
 

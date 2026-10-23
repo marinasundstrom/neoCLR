@@ -51,13 +51,13 @@ payloads, payload-free cases and a wildcard. Both forms require exhaustive cover
 and reject duplicate/unreachable arms. Expressions have one exact result type;
 statement blocks allow actions, return and loop transfers. Scrutinees evaluate once.
 
-Closed generic annotations and typed System calls expose Option/Result. Coverage
+Closed generic annotations and typed System calls expose Optional/Result. Coverage
 requires bundled System's union marker, constructor cases and typed public accessors;
 matching lowers to existing library calls and branches. Payload bindings are ordinary
 copies scoped to their arm. Runtime provenance checks still reject indirect frame
 escapes; heap-backed field references can remain valid match results.
 
-[Acceptance tests](../tests/neo_match.rs) exercise parsing, nested Option/Result input
+[Acceptance tests](../tests/neo_match.rs) exercise parsing, nested Optional/Result input
 and EOF, type/coverage failures and lifetimes. The [match example](../examples/source/match.neo)
 prints an error message and 42. Guards, nested destructuring patterns, generic source
 unions and subtype patterns remain future work; nested unions currently use nested

@@ -1,9 +1,9 @@
-import System.Option.*
+import System.Optional.*
 import System.*
 import System.Collections.*
 import System.Console.*
 
-func FindPrice(product: int) -> Option<int> {
+func FindPrice(product: int) -> Optional<int> {
     if product == 7 {
         return Some(-42)
     }
@@ -13,7 +13,7 @@ func FindPrice(product: int) -> Option<int> {
     return None()
 }
 
-func Process(product: int) -> Option<System.Void> {
+func Process(product: int) -> Optional<System.Void> {
     let price = FindPrice(product)
     if price is .Some(let found) {
         let amount = Math.Abs(found)

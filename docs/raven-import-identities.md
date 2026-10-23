@@ -73,7 +73,7 @@ escape-prefix collisions and ordinary virtual slot spelling.
 Use `verify_application.py` for execution coverage of inheritance, interfaces,
 properties, closures, delegates, value copies and collections. The independent
 compiler/import checks in [the compilation workflow](raven-target-compilation.md)
-cover Result/Option propagation as well. Calls to closed generic APIs do not prove
+cover Result/Optional propagation as well. Calls to closed generic APIs do not prove
 that generic declaration bodies can be imported.
 
 Validation at this checkpoint: 12 metadata identity checks, 15 application checks

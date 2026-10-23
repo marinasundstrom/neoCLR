@@ -1,7 +1,7 @@
 module System.Collections
 
 import System.*
-import System.Option.*
+import System.Optional.*
 
 /// <summary>A reusable live key locator, not a borrowed storage reference or snapshot.</summary>
 /// <remarks>Retains the map and key. Each operation resolves current state through the map's comparer. No atomicity, synchronization or rollback is provided. Keys must obey the map's stability requirements.</remarks>
@@ -25,7 +25,7 @@ public class MapEntry<K, V> {
 
     /// <summary>Looks up the current value, preserving the distinction between absence and a present null.</summary>
     /// <returns>Some for a present key; otherwise None.</returns>
-    func Find() -> Option<V> => map.Find(key)
+    func Find() -> Optional<V> => map.Find(key)
 
     /// <summary>Inserts or replaces the value and returns this locator.</summary>
     /// <param name="value">The value to store.</param>

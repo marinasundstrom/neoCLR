@@ -97,7 +97,7 @@ IP literals, canonicalization and convenience members need their own use cases.
    inspectable lower-level causes where useful; malformed protocol data, unsupported
    features, resource limits and exchange timeout must be distinguishable. Content
    decoding failures remain separate from obtaining the response bytes.
-2. Add BaseUri as Option<string> and retain string/Uri request overloads, following
+2. Add BaseUri as Optional<string> and retain string/Uri request overloads, following
    the author's 2026-09-25 clarification. When set, verb helpers expect relative
    addresses; without it, they require absolute addresses. Validate and resolve
    before dispatch; handlers receive a resolved request. Check ordinary relative,

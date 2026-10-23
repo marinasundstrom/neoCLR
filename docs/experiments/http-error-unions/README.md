@@ -298,7 +298,7 @@ with the generated carrier initialization. Its optional trusted `--runner` uses 
 explicit 10,000,000-instruction budget and a 256-object GC budget. Production limits
 are unchanged; this migration does not claim equal storage or execution cost.
 
-Option and Result now use standard Raven unions following Raven.Core. The bridge
+Optional and Result now use standard Raven unions following Raven.Core. The bridge
 projects generic companions, closes parameter signatures and imports generated
 case methods plus Propagatable output/residual methods. Reference projection admits
 these supported generic families; arbitrary generic application-union execution is
@@ -312,7 +312,7 @@ explicit legacy carrier/BindingFlags snapshots; the Raven profile uses the migra
 unions. This compatibility boundary does not restore Is*/Get* requirements.
 
 The nongeneric empty-case migration batch is complete. The author subsequently
-selected Option/Result migration as a Preview 10 release correction. This does not
+selected Optional/Result migration as a Preview 10 release correction. This does not
 expand the frozen HTTP POC scope. The author also selected TaskOutcome migration
 and an audit of the remaining runtime types. No other manual Raven union carriers remain.
 
@@ -367,4 +367,4 @@ companion and overlapping-layout rejection remain unchanged. See the HTTP client
 server and JSON samples for execution through the actual public API.
 
 The [standard library union contract evidence](standard-contract-validation.json)
-records the focused Option/Result/TaskOutcome checks, source audit and limitations.
+records the focused Optional/Result/TaskOutcome checks, source audit and limitations.

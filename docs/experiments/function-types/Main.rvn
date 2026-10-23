@@ -1,6 +1,6 @@
 import System.*
 import System.Introspection.*
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 import System.Runtime.Reflection.*
 
@@ -30,7 +30,7 @@ func Main() -> int {
     } else {
         System.Fail("Missing array element")
     }
-    let generic = typeof(Option<int[]>)
+    let generic = typeof(Optional<int[]>)
     let argument = generic.GetGenericArgument(0)
     Check(generic.IsNominalType && generic is NominalTypeInfo, "Constructed declaration is nominal")
     Check(argument.Equals(array) && !argument.IsNominalType, "Generic component keeps structural identity")
@@ -88,7 +88,7 @@ func Main() -> int {
     let unit = (FunctionTypeInfo)typeof(() -> ())
     Check(unit.Parameters.Count == 0 && unit.ReturnType.Equals(typeof(System.Void)), "Zero-parameter unit signature")
     Check(invoke.Invoke(null) is Failure(ReflectionError.UnboundMetadata), "Synthesized member is descriptive in dynamic reflection")
-    let nested = typeof(Option<(int) -> string>).GetGenericArgument(0)
+    let nested = typeof(Optional<(int) -> string>).GetGenericArgument(0)
     Check(nested is FunctionTypeInfo && nested.Equals(function), "Generic argument chooses Function provider")
     System.Runtime.GC.Collect()
     Check(number.Equals(typeof(int)), "Descriptor survives collection")

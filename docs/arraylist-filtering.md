@@ -7,10 +7,10 @@ no Raven compiler or runtime instruction change is required.
 
 | Method (all take Func<T, Boolean>) | Result | Search and empty behavior |
 | --- | --- | --- |
-| Find | Option<T> | First match, or None |
-| FindLast | Option<T> | Last match, or None |
-| FindIndex | Option<Int32> | First matching zero-based index, or None |
-| FindLastIndex | Option<Int32> | Last matching zero-based index, or None |
+| Find | Optional<T> | First match, or None |
+| FindLast | Optional<T> | Last match, or None |
+| FindIndex | Optional<Int32> | First matching zero-based index, or None |
+| FindLastIndex | Optional<Int32> | Last matching zero-based index, or None |
 | Exists | Boolean | Stops at first match; false for empty input |
 | TrueForAll | Boolean | Stops at first failure; true for empty input |
 | FindAll | ArrayList<T> | All matches in source order; independent empty list if none |
@@ -55,12 +55,12 @@ Primary sources consulted 2026-09-13: shipped .NET 10
 returns a list, including an empty list for no matches;
 [FindIndex](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1.findindex?view=net-10.0)
 uses -1 for absence. The method family and delegate-based predicates are familiar,
-while neoCLR uses Option for both element and index absence. The local
+while neoCLR uses Optional for both element and index absence. The local
 [.NET comparison](experiments/list-filters/dotnet/Program.cs) exercises matching,
 missing, empty, reverse-search and independent-result cases on net10.0.
 
 Keeping -1 would reduce migration and case-handling overhead, but would preserve a
-second absence convention alongside Find's Option. Choosing Option<Int32> makes
+second absence convention alongside Find's Optional. Choosing Optional<Int32> makes
 absence explicit at the cost of a changed binary signature and more explicit use.
 Using LINQ internally would reuse iteration machinery but add objects in this
 prototype; direct scans require additional library loops and regression coverage.
@@ -69,7 +69,7 @@ not a claim that the CLI needs new semantics.
 
 The broader comparison in the [query API review](raven-query-api.md#concrete-collection-operations-versus-linq)
 includes .NET's applicable direct-access guidance and LINQ specialization;
-its terminal review also considers Rust Option and alternative .NET Maybe APIs.
+its terminal review also considers Rust Optional and alternative .NET Maybe APIs.
 That evidence supports explicit absence as a library design rather than a new
 runtime mechanism. It does not establish universal speed gains. Mutation during
 callbacks follows the bounded neoCLR policy above, not a promise to reproduce
@@ -83,7 +83,7 @@ regenerated core metadata and System library; existing binaries with the old
 signature are not compatible. For example:
 
 ```raven
-import System.Option.*
+import System.Optional.*
 
 match values.FindIndex((value: int) -> bool => value == 42) {
     Some(let index) => WriteLine(index)

@@ -8,55 +8,55 @@ ldarg value0
 call instance System.String::Equals(String)
 ret
 .end
-.function neoCLR.Library.System.Introspection.ParameterInfo.RuntimeUnion0() -> System.Option.None
-newobj instance System.Option.None::.ctor()
+.function neoCLR.Library.System.Introspection.ParameterInfo.RuntimeUnion0() -> System.Optional.None
+newobj instance System.Optional.None::.ctor()
 ret
 .end
-.function neoCLR.Library.System.Introspection.ParameterInfo.RuntimeUnion1(System.Option.None arg0) -> System.Option<Int32>
+.function neoCLR.Library.System.Introspection.ParameterInfo.RuntimeUnion1(System.Optional.None arg0) -> System.Optional<Int32>
 ldarg arg0
-newobj instance System.Option<Int32>::.ctor(System.Option.None)
+newobj instance System.Optional<Int32>::.ctor(System.Optional.None)
 ret
 .end
-.function neoCLR.Library.System.Introspection.ParameterInfo.RuntimeUnion2(Int32 arg0) -> System.Option.Some<Int32>
+.function neoCLR.Library.System.Introspection.ParameterInfo.RuntimeUnion2(Int32 arg0) -> System.Optional.Some<Int32>
 ldarg arg0
-newobj instance System.Option.Some<Int32>::.ctor(Int32)
+newobj instance System.Optional.Some<Int32>::.ctor(Int32)
 ret
 .end
-.function neoCLR.Library.System.Introspection.ParameterInfo.RuntimeUnion3(System.Option.Some<Int32> arg0) -> System.Option<Int32>
+.function neoCLR.Library.System.Introspection.ParameterInfo.RuntimeUnion3(System.Optional.Some<Int32> arg0) -> System.Optional<Int32>
 ldarg arg0
-newobj instance System.Option<Int32>::.ctor(System.Option.Some<Int32>)
+newobj instance System.Optional<Int32>::.ctor(System.Optional.Some<Int32>)
 ret
 .end
-.function neoCLR.Library.System.Introspection.ParameterInfo.RuntimeUnion4(System.Option<System.Introspection.ModuleInfo>& arg0,out(true) System.Option.Some<System.Introspection.ModuleInfo>& arg1) -> Boolean
-ldarg arg0
-ldarg arg1
-call instance System.Option<System.Introspection.ModuleInfo>::TryGetValue(System.Option.Some<System.Introspection.ModuleInfo>&)
-ret
-.end
-.function neoCLR.Library.System.Introspection.ParameterInfo.RuntimeUnion5(System.Option.Some<System.Introspection.ModuleInfo>& arg0) -> System.Introspection.ModuleInfo
-ldarg arg0
-call instance System.Option.Some<System.Introspection.ModuleInfo>::get_Value()
-ret
-.end
-.function neoCLR.Library.System.Introspection.ParameterInfo.RuntimeUnion6(System.Option<System.Introspection.ModuleInfo>& arg0,out(true) System.Option.None& arg1) -> Boolean
+.function neoCLR.Library.System.Introspection.ParameterInfo.RuntimeUnion4(System.Optional<System.Introspection.ModuleInfo>& arg0,out(true) System.Optional.Some<System.Introspection.ModuleInfo>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Option<System.Introspection.ModuleInfo>::TryGetValue(System.Option.None&)
+call instance System.Optional<System.Introspection.ModuleInfo>::TryGetValue(System.Optional.Some<System.Introspection.ModuleInfo>&)
 ret
 .end
-.function neoCLR.Library.System.Introspection.ParameterInfo.RuntimeUnion7(System.Introspection.ModuleInfo arg0) -> System.Option.Some<System.Introspection.ModuleInfo>
+.function neoCLR.Library.System.Introspection.ParameterInfo.RuntimeUnion5(System.Optional.Some<System.Introspection.ModuleInfo>& arg0) -> System.Introspection.ModuleInfo
 ldarg arg0
-newobj instance System.Option.Some<System.Introspection.ModuleInfo>::.ctor(System.Introspection.ModuleInfo)
+call instance System.Optional.Some<System.Introspection.ModuleInfo>::get_Value()
 ret
 .end
-.function neoCLR.Library.System.Introspection.ParameterInfo.RuntimeUnion8(System.Option.Some<System.Introspection.ModuleInfo> arg0) -> System.Option<System.Introspection.ModuleInfo>
+.function neoCLR.Library.System.Introspection.ParameterInfo.RuntimeUnion6(System.Optional<System.Introspection.ModuleInfo>& arg0,out(true) System.Optional.None& arg1) -> Boolean
 ldarg arg0
-newobj instance System.Option<System.Introspection.ModuleInfo>::.ctor(System.Option.Some<System.Introspection.ModuleInfo>)
+ldarg arg1
+call instance System.Optional<System.Introspection.ModuleInfo>::TryGetValue(System.Optional.None&)
 ret
 .end
-.function neoCLR.Library.System.Introspection.ParameterInfo.RuntimeUnion9(System.Option.None arg0) -> System.Option<System.Introspection.ModuleInfo>
+.function neoCLR.Library.System.Introspection.ParameterInfo.RuntimeUnion7(System.Introspection.ModuleInfo arg0) -> System.Optional.Some<System.Introspection.ModuleInfo>
 ldarg arg0
-newobj instance System.Option<System.Introspection.ModuleInfo>::.ctor(System.Option.None)
+newobj instance System.Optional.Some<System.Introspection.ModuleInfo>::.ctor(System.Introspection.ModuleInfo)
+ret
+.end
+.function neoCLR.Library.System.Introspection.ParameterInfo.RuntimeUnion8(System.Optional.Some<System.Introspection.ModuleInfo> arg0) -> System.Optional<System.Introspection.ModuleInfo>
+ldarg arg0
+newobj instance System.Optional<System.Introspection.ModuleInfo>::.ctor(System.Optional.Some<System.Introspection.ModuleInfo>)
+ret
+.end
+.function neoCLR.Library.System.Introspection.ParameterInfo.RuntimeUnion9(System.Optional.None arg0) -> System.Optional<System.Introspection.ModuleInfo>
+ldarg arg0
+newobj instance System.Optional<System.Introspection.ModuleInfo>::.ctor(System.Optional.None)
 ret
 .end
 .function neoCLR.Library.System.Introspection.ParameterInfo.RuntimeBooleanFromInt32(Int32 value) -> Boolean
@@ -139,15 +139,15 @@ ret
 .field private StoredIsOutWhenTrue Boolean
 .field private StoredIsReadOnly Boolean
 .field private StoredMetadataToken Int32
-.field private StoredModule System.Option<System.Introspection.ModuleInfo>
+.field private StoredModule System.Optional<System.Introspection.ModuleInfo>
 .field private StoredDeclaringType System.Introspection.TypeInfo
 .field private StoredMemberKind Int32
 .field private StoredMemberIndex Int32
 .field private StoredMemberIdentity String
-.property instance MetadataToken() -> System.Option<Int32>
+.property instance MetadataToken() -> System.Optional<Int32>
 .get instance System.Introspection.RuntimeParameterInfo::get_MetadataToken()
 .end
-.property instance Module() -> System.Option<System.Introspection.ModuleInfo>
+.property instance Module() -> System.Optional<System.Introspection.ModuleInfo>
 .get instance System.Introspection.RuntimeParameterInfo::get_Module()
 .end
 .property instance Name() -> String
@@ -168,7 +168,7 @@ ret
 .property instance IsReadOnly() -> Boolean
 .get instance System.Introspection.RuntimeParameterInfo::get_IsReadOnly()
 .end
-.method private instance .ctor(String name,Int32 position,System.Introspection.TypeInfo parameterType,Boolean isOut,Boolean isOutWhenTrue,Boolean isReadOnly,Int32 metadataToken,System.Option<System.Introspection.ModuleInfo> module,System.Introspection.TypeInfo declaringType,Int32 memberKind,Int32 memberIndex) -> void
+.method private instance .ctor(String name,Int32 position,System.Introspection.TypeInfo parameterType,Boolean isOut,Boolean isOutWhenTrue,Boolean isReadOnly,Int32 metadataToken,System.Optional<System.Introspection.ModuleInfo> module,System.Introspection.TypeInfo declaringType,Int32 memberKind,Int32 memberIndex) -> void
 M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0
@@ -303,13 +303,13 @@ array.reserve System.Introspection.CustomAttributeData
 M00000002_IL_0032:
 ret
 .end
-.method instance get_MetadataToken() -> System.Option<Int32>
-.local System.Option<Int32> local0
-.local System.Option<Int32> local1
+.method instance get_MetadataToken() -> System.Optional<Int32>
+.local System.Optional<Int32> local0
+.local System.Optional<Int32> local1
 ldloca local0
-initobj System.Option<Int32>
+initobj System.Optional<Int32>
 ldloca local1
-initobj System.Option<Int32>
+initobj System.Optional<Int32>
 M00000003_IL_0000:
 M00000003_IL_0001:
 M00000003_IL_0002:
@@ -326,7 +326,7 @@ brfalse M00000003_IL_0021
 M00000003_IL_0010:
 call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeUnion0()
 M00000003_IL_0015:
-call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeUnion1(System.Option.None)
+call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeUnion1(System.Optional.None)
 M00000003_IL_001a:
 stloc local0
 M00000003_IL_001b:
@@ -340,7 +340,7 @@ ldfld System.Introspection.RuntimeParameterInfo::StoredMetadataToken
 M00000003_IL_0027:
 call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeUnion2(Int32)
 M00000003_IL_002c:
-call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeUnion3(System.Option.Some<Int32>)
+call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeUnion3(System.Optional.Some<Int32>)
 M00000003_IL_0031:
 stloc local1
 M00000003_IL_0032:
@@ -348,28 +348,28 @@ ldloc local1
 M00000003_IL_0033:
 ret
 .end
-.method instance get_Module() -> System.Option<System.Introspection.ModuleInfo>
-.local System.Option<System.Introspection.ModuleInfo> local0
-.local System.Option<System.Introspection.ModuleInfo> local1
+.method instance get_Module() -> System.Optional<System.Introspection.ModuleInfo>
+.local System.Optional<System.Introspection.ModuleInfo> local0
+.local System.Optional<System.Introspection.ModuleInfo> local1
 .local System.Introspection.ModuleInfo local2
-.local System.Option<System.Introspection.ModuleInfo> local3
-.local System.Option.Some<System.Introspection.ModuleInfo> local4
-.local System.Option<System.Introspection.ModuleInfo> local5
-.local System.Option.None local6
+.local System.Optional<System.Introspection.ModuleInfo> local3
+.local System.Optional.Some<System.Introspection.ModuleInfo> local4
+.local System.Optional<System.Introspection.ModuleInfo> local5
+.local System.Optional.None local6
 ldloca local0
-initobj System.Option<System.Introspection.ModuleInfo>
+initobj System.Optional<System.Introspection.ModuleInfo>
 ldloca local1
-initobj System.Option<System.Introspection.ModuleInfo>
+initobj System.Optional<System.Introspection.ModuleInfo>
 ldloca local2
 initobj System.Introspection.ModuleInfo
 ldloca local3
-initobj System.Option<System.Introspection.ModuleInfo>
+initobj System.Optional<System.Introspection.ModuleInfo>
 ldloca local4
-initobj System.Option.Some<System.Introspection.ModuleInfo>
+initobj System.Optional.Some<System.Introspection.ModuleInfo>
 ldloca local5
-initobj System.Option<System.Introspection.ModuleInfo>
+initobj System.Optional<System.Introspection.ModuleInfo>
 ldloca local6
-initobj System.Option.None
+initobj System.Optional.None
 M00000004_IL_0000:
 M00000004_IL_0001:
 M00000004_IL_0002:
@@ -382,7 +382,7 @@ stloc local0
 M00000004_IL_000a:
 ldloca local1
 M00000004_IL_000c:
-initobj System.Option<System.Introspection.ModuleInfo>
+initobj System.Optional<System.Introspection.ModuleInfo>
 M00000004_IL_0012:
 ldloc local0
 M00000004_IL_0013:
@@ -390,19 +390,19 @@ stloc local3
 M00000004_IL_0014:
 ldloca local4
 M00000004_IL_0016:
-initobj System.Option.Some<System.Introspection.ModuleInfo>
+initobj System.Optional.Some<System.Introspection.ModuleInfo>
 M00000004_IL_001c:
 ldloca local3
 M00000004_IL_001e:
 ldloca local4
 M00000004_IL_0020:
-call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeUnion4(System.Option<System.Introspection.ModuleInfo>&,System.Option.Some<System.Introspection.ModuleInfo>&)
+call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeUnion4(System.Optional<System.Introspection.ModuleInfo>&,System.Optional.Some<System.Introspection.ModuleInfo>&)
 M00000004_IL_0025:
 brfalse M00000004_IL_004f
 M00000004_IL_002a:
 ldloca local4
 M00000004_IL_002c:
-call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeUnion5(System.Option.Some<System.Introspection.ModuleInfo>&)
+call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeUnion5(System.Optional.Some<System.Introspection.ModuleInfo>&)
 M00000004_IL_0031:
 stloc local2
 M00000004_IL_0032:
@@ -413,7 +413,7 @@ ldloc local2
 M00000004_IL_003f:
 call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeUnion7(System.Introspection.ModuleInfo)
 M00000004_IL_0044:
-call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeUnion8(System.Option.Some<System.Introspection.ModuleInfo>)
+call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeUnion8(System.Optional.Some<System.Introspection.ModuleInfo>)
 M00000004_IL_0049:
 stloc local1
 M00000004_IL_004a:
@@ -428,7 +428,7 @@ ldloca local5
 M00000004_IL_0055:
 ldloca local6
 M00000004_IL_0057:
-call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeUnion6(System.Option<System.Introspection.ModuleInfo>&,System.Option.None&)
+call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeUnion6(System.Optional<System.Introspection.ModuleInfo>&,System.Optional.None&)
 M00000004_IL_005c:
 brfalse M00000004_IL_0080
 M00000004_IL_0061:
@@ -441,7 +441,7 @@ br M00000004_IL_0070
 M00000004_IL_0070:
 call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeUnion0()
 M00000004_IL_0075:
-call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeUnion9(System.Option.None)
+call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeUnion9(System.Optional.None)
 M00000004_IL_007a:
 stloc local1
 M00000004_IL_007b:

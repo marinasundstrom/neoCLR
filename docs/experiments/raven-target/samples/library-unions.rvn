@@ -1,16 +1,16 @@
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 import System.*
 import System.Console.*
 
-func Find(found: int) -> Option<string> {
+func Find(found: int) -> Optional<string> {
     if found == 1 {
         return Some("Found")
     }
     return None()
 }
 
-func Forward(found: int) -> Option<string> {
+func Forward(found: int) -> Optional<string> {
     let value = Find(found)?
     return Some(value)
 }
@@ -45,12 +45,12 @@ func Main() {
     }
     let none = Forward(0)
     if none.IsNone {
-        let restored: Option<string> = None()
+        let restored: Optional<string> = None()
         if restored.IsNone {
             WriteLine("None")
         }
     }
-    let nested: Option<Result<long, string>> = Some(ok)
+    let nested: Optional<Result<long, string>> = Some(ok)
     if nested is Some(Ok(let nestedNumber)) {
         WriteLine(nestedNumber.CompareTo(42L))
     }

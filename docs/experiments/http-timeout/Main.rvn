@@ -1,7 +1,7 @@
 import System.*
 import System.Collections.*
 import System.Concurrency.*
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 import System.Concurrency.Tasks.*
 import System.Time.*
@@ -107,7 +107,7 @@ async func CancellationRace(mode: int) -> Task<()> {
 async func DisabledAndCompleted() -> Task<()> {
     let handler = ControlledHandler()
     let client = HttpClient(handler)
-    client.Timeout = Option<Duration>.None()
+    client.Timeout = Optional<Duration>.None()
     let task = client.Get("http://example.test/")
     let pending = handler.Requests[0]
     await Pause()

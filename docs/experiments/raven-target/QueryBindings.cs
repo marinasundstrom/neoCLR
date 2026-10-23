@@ -22,10 +22,10 @@ static class QueryBindings
                 public static Collections.Iterable<T> Skip<T>(this Collections.Iterable<T> self, int count) => default;
                 public static Collections.Iterable<T> Concat<T>(this Collections.Iterable<T> self, Collections.Iterable<T> second) => default;
                 public static Collections.Iterable<U> FlatMap<T,U>(this Collections.Iterable<T> self, Func<T,Collections.Iterable<U>> selector) => default;
-                public static Option<T> First<T>(this Collections.Iterable<T> self) => default;
-                public static Option<T> First<T>(this Collections.Iterable<T> self, Func<T, bool> predicate) => default;
-                public static Option<T> Last<T>(this Collections.Iterable<T> self) => default;
-                public static Option<T> Last<T>(this Collections.Iterable<T> self, Func<T, bool> predicate) => default;
+                public static Optional<T> First<T>(this Collections.Iterable<T> self) => default;
+                public static Optional<T> First<T>(this Collections.Iterable<T> self, Func<T, bool> predicate) => default;
+                public static Optional<T> Last<T>(this Collections.Iterable<T> self) => default;
+                public static Optional<T> Last<T>(this Collections.Iterable<T> self, Func<T, bool> predicate) => default;
                 public static Result<T, SingleError> Single<T>(this Collections.Iterable<T> self) => default;
                 public static Result<T, SingleError> Single<T>(this Collections.Iterable<T> self, Func<T, bool> predicate) => default;
                 public static Collections.HashMap<K,V> ToMap<T,K,V>(this Collections.Iterable<T> self, Func<T,K> keySelector, Func<T,V> valueSelector, Collections.EqualityComparer<K> comparer) => default;
@@ -52,7 +52,7 @@ static class QueryBindings
             "OfType" => (new[] { source }, $"System.Collections.Iterable<{types[1]}>"),
             "Filter" => (new[] { source, $"fn<{types[0]},Boolean>" }, source),
             "Map" => (new[] { source, $"fn<{types[0]},{types[1]}>" }, $"System.Collections.Iterable<{types[1]}>"),
-            "First" or "Last" => (terminalArguments, $"System.Option<{types[0]}>"),
+            "First" or "Last" => (terminalArguments, $"System.Optional<{types[0]}>"),
             "Single" => (terminalArguments, $"System.Result<{types[0]},System.Linq.SingleError>"),
             "Any" => (terminalArguments, "Boolean"),
             "All" => (new[] { source, $"fn<{types[0]},Boolean>" }, "Boolean"),

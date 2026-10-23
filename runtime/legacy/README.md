@@ -11,10 +11,10 @@ union sources, add them to the current API reference, or use them as a conventio
 for new unions. Remove them when the historical bootstrap profile is retired or
 explicitly migrated. No per-case Is*/Get* requirement is restored for Raven.
 
-Option and Result additionally preserve their manual snapshots from `1404454e`.
+Optional and Result additionally preserve their manual snapshots from `1404454e`.
 The Raven profile uses the standard source unions; the bootstrap profile retains
 its existing predicates, checked accessors and storage contract.
 
 The Propagatable snapshot preserves the Neo bootstrap profile's conditional-output
-ABI. Raven's source-generated Propagatable and Option/Result methods use ordinary
+ABI. Raven's source-generated Propagatable and Optional/Result methods use ordinary
 initialized outputs. TaskOutcome is Raven-profile-only and requires no legacy copy.

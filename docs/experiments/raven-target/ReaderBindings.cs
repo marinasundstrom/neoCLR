@@ -72,51 +72,51 @@ static class ReaderBindings
             }
             public interface TextReader {
                 string NewLine { get; set; }
-                Concurrency.Tasks.Task<Result<Option<char>, TextReadError>> PeekChar();
-                Concurrency.Tasks.Task<Result<Option<char>, TextReadError>> ReadChar();
+                Concurrency.Tasks.Task<Result<Optional<char>, TextReadError>> PeekChar();
+                Concurrency.Tasks.Task<Result<Optional<char>, TextReadError>> ReadChar();
                 Concurrency.Tasks.Task<Result<string, TextReadError>> Read(int count);
                 Concurrency.Tasks.Task<Result<string, TextReadError>> Read(int count, int maxUtf8Bytes);
-                Concurrency.Tasks.Task<Result<Option<string>, TextReadError>> ReadLine(int maxUtf8Bytes);
+                Concurrency.Tasks.Task<Result<Optional<string>, TextReadError>> ReadLine(int maxUtf8Bytes);
                 Concurrency.Tasks.Task<Result<string, TextReadError>> ReadToEnd(int maxUtf8Bytes);
                 void Close();
             }
             public sealed class StreamReader : TextReader {
                 public string NewLine { get; set; }
                 private StreamReader() { }
-                public Concurrency.Tasks.Task<Result<Option<char>, TextReadError>> PeekChar() => default;
-                public Concurrency.Tasks.Task<Result<Option<char>, TextReadError>> ReadChar() => default;
+                public Concurrency.Tasks.Task<Result<Optional<char>, TextReadError>> PeekChar() => default;
+                public Concurrency.Tasks.Task<Result<Optional<char>, TextReadError>> ReadChar() => default;
                 public Concurrency.Tasks.Task<Result<string, TextReadError>> Read(int count) => default;
                 public Concurrency.Tasks.Task<Result<string, TextReadError>> Read(int count, int maxUtf8Bytes) => default;
                 public static Result<StreamReader, TextReadError> Create(InputStream input) => default;
                 public static Result<StreamReader, TextReadError> Create(InputStream input, bool leaveOpen) => default;
                 public static Result<StreamReader, TextReadError> Create(InputStream input, Text.Encoding encoding) => default;
                 public static Result<StreamReader, TextReadError> Create(InputStream input, Text.Encoding encoding, bool leaveOpen) => default;
-                public Concurrency.Tasks.Task<Result<Option<string>, TextReadError>> ReadLine(int maxUtf8Bytes) => default;
+                public Concurrency.Tasks.Task<Result<Optional<string>, TextReadError>> ReadLine(int maxUtf8Bytes) => default;
                 public Concurrency.Tasks.Task<Result<string, TextReadError>> ReadToEnd(int maxUtf8Bytes) => default;
                 public void Close() { }
             }
             public interface SyncTextReader {
                 string NewLine { get; set; }
-                Result<Option<char>, TextReadError> PeekChar();
-                Result<Option<char>, TextReadError> ReadChar();
+                Result<Optional<char>, TextReadError> PeekChar();
+                Result<Optional<char>, TextReadError> ReadChar();
                 Result<string, TextReadError> Read(int count);
                 Result<string, TextReadError> Read(int count, int maxUtf8Bytes);
-                Result<Option<string>, TextReadError> ReadLine(int maxUtf8Bytes);
+                Result<Optional<string>, TextReadError> ReadLine(int maxUtf8Bytes);
                 Result<string, TextReadError> ReadToEnd(int maxUtf8Bytes);
                 void Close();
             }
             public sealed class SyncStreamReader : SyncTextReader {
                 public string NewLine { get; set; }
                 private SyncStreamReader() { }
-                public Result<Option<char>, TextReadError> PeekChar() => default;
-                public Result<Option<char>, TextReadError> ReadChar() => default;
+                public Result<Optional<char>, TextReadError> PeekChar() => default;
+                public Result<Optional<char>, TextReadError> ReadChar() => default;
                 public Result<string, TextReadError> Read(int count) => default;
                 public Result<string, TextReadError> Read(int count, int maxUtf8Bytes) => default;
                 public static Result<SyncStreamReader, TextReadError> Create(SyncInputStream input) => default;
                 public static Result<SyncStreamReader, TextReadError> Create(SyncInputStream input, bool leaveOpen) => default;
                 public static Result<SyncStreamReader, TextReadError> Create(SyncInputStream input, Text.Encoding encoding) => default;
                 public static Result<SyncStreamReader, TextReadError> Create(SyncInputStream input, Text.Encoding encoding, bool leaveOpen) => default;
-                public Result<Option<string>, TextReadError> ReadLine(int maxUtf8Bytes) => default;
+                public Result<Optional<string>, TextReadError> ReadLine(int maxUtf8Bytes) => default;
                 public Result<string, TextReadError> ReadToEnd(int maxUtf8Bytes) => default;
                 public void Close() { }
             }
@@ -161,9 +161,9 @@ static class ReaderBindings
             "Finish" when owner == StreamWriter => ("", "System.Result<Int32,System.IO.StreamError>"),
             "CreateEncoder" when owner == "System.Text.Encoding" => ("", "System.Text.Encoder"),
             "CreateDecoder" when owner == "System.Text.Encoding" => ("", "System.Text.Decoder"),
-            "PeekChar" or "ReadChar" when owner is Reader or Stream => ("", "System.Result<System.Option<Char>,System.IO.TextReadError>"),
+            "PeekChar" or "ReadChar" when owner is Reader or Stream => ("", "System.Result<System.Optional<Char>,System.IO.TextReadError>"),
             "Read" when owner is Reader or Stream => (args.Length == 1 ? "Int32" : "Int32,Int32", "System.Result<String,System.IO.TextReadError>"),
-            "ReadLine" when owner is Reader or Stream => ("Int32", "System.Result<System.Option<String>,System.IO.TextReadError>"),
+            "ReadLine" when owner is Reader or Stream => ("Int32", "System.Result<System.Optional<String>,System.IO.TextReadError>"),
             "ReadToEnd" when owner is Reader or Stream => ("Int32", "System.Result<String,System.IO.TextReadError>"),
             "Close" when owner is Reader or Stream or Writer or StreamWriter => ("", "void"),
             _ => throw new InvalidDataException("Unsupported reader member.")

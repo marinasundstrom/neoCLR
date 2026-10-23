@@ -1,5 +1,5 @@
 import System.*
-import System.Option.*
+import System.Optional.*
 
 func Check(value: bool) {
     if !value {
@@ -16,7 +16,7 @@ func Expect(text: string, valid: bool) {
     }
 }
 
-func CreateOwned() -> Option<char> {
+func CreateOwned() -> Optional<char> {
     return Char.TryFromString(String.Concat("e", "́"))
 }
 

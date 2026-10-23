@@ -1,6 +1,6 @@
 import System.*
 import System.Console.*
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 
 func Main() {

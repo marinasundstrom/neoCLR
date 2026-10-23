@@ -2,7 +2,7 @@
 
 Development qualification, 2026-10-20. Extends the earlier
 [record value checkpoint](../record-values/README.md) to closed declared tagged-union
-components, including the public ConsoleKeyInfo.TextScalar: Option<int> contract.
+components, including the public ConsoleKeyInfo.TextScalar: Optional<int> contract.
 This is a bounded release-gap fix, not full record or release-package qualification.
 
 ## Behavior and evidence
@@ -10,15 +10,15 @@ This is a bounded release-gap fix, not full record or release-package qualificat
 Generated ==, !=, typed/Object Equals and GetHashCode inspect the active case and
 recursively compare/hash its payloads. Typed operations use public case extraction
 and getters without payload boxing. Default carriers with no active case remain
-distinct from active empty cases; Option.None, Some(0) and default Option<int> are
+distinct from active empty cases; Optional.None, Some(0) and default Optional<int> are
 three different values. Canonical String/Char equality and matching hashes apply
 inside payloads, while original UTF-8 storage remains unchanged.
 
-- [Baseline](baseline.json): the previous compiler rejects a minimal Option<int>
+- [Baseline](baseline.json): the previous compiler rejects a minimal Optional<int>
   record comparison with the targeted unsupported-component diagnostic.
 - [Validation](validation.json): interpreter, JIT and AOT pass the public consumer;
-  Option<double> still receives the targeted unsupported-component diagnostic.
-  Covers ConsoleKeyInfo, nested Option, Result, multi-payload source cases,
+  Optional<double> still receives the targeted unsupported-component diagnostic.
+  Covers ConsoleKeyInfo, nested Optional, Result, multi-payload source cases,
   canonical/nullable text, Char, default carriers, null and boxed Object dispatch.
 - [Regression](regression.json): the earlier record-values consumer and its negative
   test pass against the same new bundle, preserving primitive, enum, nested-record

@@ -12,7 +12,7 @@ See [Web](/features/web/) for the current cleartext scope, limits and tested sam
 This preview is not a general production web stack. System.Web.Http.Json supplies
 JSON content and client helpers.
 
-HttpClient.Timeout is an `Option<Duration>`, defaulting to Some(100 seconds).
+HttpClient.Timeout is an `Optional<Duration>`, defaulting to Some(100 seconds).
 None disables the client countdown. Configure it before sending. Expiry requests
 cancellation and waits for handler cleanup before returning HttpError.TimedOut; caller
 or disposal cancellation remains task cancellation. Independent transport phase bounds

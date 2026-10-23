@@ -308,7 +308,7 @@ Likewise:
 ```raven
 Result<self, Error>
 Task<self>
-Option<self>
+Optional<self>
 Array<self>
 ```
 

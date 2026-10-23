@@ -173,7 +173,7 @@ It is not a new wire-version guarantee; matching development tools are required.
 
 ## Opaque interpreter memory views (development)
 
-Rust `TypeDef.memory_view: Option<MemoryViewKind>` is serialized only when present.
+Rust `TypeDef.memory_view: Optional<MemoryViewKind>` is serialized only when present.
 Values are `slice`, `read_only_slice`, `memory`, `read_only_memory`; old artifacts
 without the field are unchanged. The enum's `name()` returns the required canonical
 System name and `is_borrowed()` identifies the two slice kinds. Canonical names

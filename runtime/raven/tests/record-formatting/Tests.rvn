@@ -1,14 +1,14 @@
 module NeoClr.RuntimeTests
 
 import System.*
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 import NeoClr.Testing.*
 
 record struct Position(Value: Index)
 record struct Interval(Value: Range)
 record struct Envelope(Position: Position, Interval: Interval)
-record struct OptionalPosition(Value: Option<Index>)
+record struct OptionalPosition(Value: Optional<Index>)
 
 [Test("Records use imported value formatting across typed and boxed calls")]
 func ImportedValues() -> Result<unit, TestFailure> {
@@ -27,8 +27,8 @@ func NestedValues() -> Result<unit, TestFailure> {
     let envelope = Envelope(Position(Index.Start), Interval(Range.All))
     _ = Assert.Equal("Envelope { Position = Position { Value = 0 }, Interval = Interval { Value = 0..^0 } }", envelope.ToString())?
     let some = OptionalPosition(Some(Index.FromEnd(3)))
-    _ = Assert.Equal("OptionalPosition { Value = Option.Some(^3) }", some.ToString())?
-    return Assert.Equal("OptionalPosition { Value = Option.None }", OptionalPosition(None).ToString())
+    _ = Assert.Equal("OptionalPosition { Value = Optional.Some(^3) }", some.ToString())?
+    return Assert.Equal("OptionalPosition { Value = Optional.None }", OptionalPosition(None).ToString())
 }
 
 record struct Scalars(Number: int, Flag: bool, Text: string?)
@@ -44,7 +44,7 @@ func ScalarsAndNull() -> Result<unit, TestFailure> {
 public enum Access { None = 0, Read = 1, Alias = 1, Write = 2, Execute = 4 }
 record struct Permissions(Value: Access)
 record struct Comparison(Value: StringComparison)
-record struct OptionalPermission(Value: Option<Access>)
+record struct OptionalPermission(Value: Optional<Access>)
 
 [Test("Record enum display preserves names flags and numeric fallback")]
 func EnumValues() -> Result<unit, TestFailure> {
@@ -62,12 +62,12 @@ func EnumPayloads() -> Result<unit, TestFailure> {
     let boxed: object = value
     let text = boxed.ToString()
     System.Runtime.GC.Collect()
-    _ = Assert.Equal("OptionalPermission { Value = Option.Some(Read, Execute) }", text)?
+    _ = Assert.Equal("OptionalPermission { Value = Optional.Some(Read, Execute) }", text)?
     return Assert.Equal(text, value.ToString())
 }
 
 record struct Floating(Wide: double, Narrow: float)
-record struct OptionalFloating(Value: Option<double>)
+record struct OptionalFloating(Value: Optional<double>)
 record struct NestedFloating(Value: Floating)
 
 [Test("Floating records use value equality for NaNs zeros and infinities")]
@@ -115,7 +115,7 @@ func FloatingText() -> Result<unit, TestFailure> {
     let value = Floating(1.5, (float)2.5)
     let boxed: object = value
     _ = Assert.Equal("Floating { Wide = 1.5, Narrow = 2.5 }", boxed.ToString())?
-    _ = Assert.Equal("OptionalFloating { Value = Option.Some(NaN) }", OptionalFloating(Some(nan)).ToString())?
+    _ = Assert.Equal("OptionalFloating { Value = Optional.Some(NaN) }", OptionalFloating(Some(nan)).ToString())?
     return Assert.Equal("NestedFloating { Value = Floating { Wide = 1.5, Narrow = 2.5 } }", NestedFloating(value).ToString())
 }
 

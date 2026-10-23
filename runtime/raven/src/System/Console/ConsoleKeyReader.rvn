@@ -4,7 +4,7 @@ import System.*
 import System.IO.*
 import System.Runtime.CompilerServices.*
 import System.Result.*
-import System.Option.*
+import System.Optional.*
 
 /// <summary>Logical terminal key identity; Unicode text without a named key uses None.</summary>
 public enum ConsoleKey {
@@ -78,9 +78,9 @@ public enum ConsoleKey {
 /// <remarks>Shift is reported only when explicitly encoded; uppercase text alone does not imply Shift.
 /// Legacy terminals cannot distinguish Tab from Ctrl+I, Enter from Ctrl+M or Backspace from Ctrl+H.
 /// Compiler-generated self-equality interface compares all fields, including the active TextScalar case and scalar value.
-/// Equal keys have equal hashes; None, Some(0) and an uninitialized Option are distinct.</remarks>
+/// Equal keys have equal hashes; None, Some(0) and an uninitialized Optional are distinct.</remarks>
 public record struct ConsoleKeyInfo(val Key: ConsoleKey, val Shift: bool, val Alt: bool,
-    val Control: bool, val TextScalar: Option<int>)
+    val Control: bool, val TextScalar: Optional<int>)
 
 /// <summary>Exclusive synchronous key input. Use a disposal scope to restore terminal settings.</summary>
 /// <remarks>Open through Console.OpenKeyInput before using text input. Reads do not echo.
@@ -117,7 +117,7 @@ public class ConsoleKeyReader : Disposable {
     /// <returns>A value containing logical key, modifiers and optional Unicode scalar, or a typed error.</returns>
     /// <remarks>Allocates no per-key text or byte array. Invalid UTF-8 and unsupported sequences are consumed;
     /// an unrelated following byte is retained for the next read. Closing returns that byte to Console input.</remarks>
-    func ReadKey() -> Result<Option<ConsoleKeyInfo>, ConsoleKeyError> {
+    func ReadKey() -> Result<Optional<ConsoleKeyInfo>, ConsoleKeyError> {
         if closed {
             return Failure(ConsoleKeyError.Closed)
         }
@@ -131,7 +131,7 @@ public class ConsoleKeyReader : Disposable {
         return result
     }
 
-    private func ReadCore() -> Result<Option<ConsoleKeyInfo>, ConsoleKeyError> {
+    private func ReadCore() -> Result<Optional<ConsoleKeyInfo>, ConsoleKeyError> {
         var finish = ended
         while true {
             if count == 0 && ended {
@@ -139,7 +139,7 @@ public class ConsoleKeyReader : Disposable {
             }
             let step = TerminalKeyDecoder.Decode(buffer[..count], finish)
             if step.State != 0 {
-                var scalar: Option<int> = None
+                var scalar: Optional<int> = None
                 if step.TextLength > 0 {
                     let first = (int)buffer[step.TextOffset]
                     var value = first

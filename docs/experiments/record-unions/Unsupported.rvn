@@ -1,6 +1,6 @@
 import System.*
-import System.Option.*
-record struct UnsupportedKey(Value: Option<double>)
+import System.Optional.*
+record struct UnsupportedKey(Value: Optional<double>)
 func Main() {
     let key = UnsupportedKey(None)
     Console.WriteLine((key == key).ToString())

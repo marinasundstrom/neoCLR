@@ -81,7 +81,7 @@ when a concrete design is proposed.
 - Decide whether inspecting an unloaded definition requires loading it, and how
   offline metadata identity relates to an instantiated runtime type.
 - Specify the difference between an absent member, metadata omitted by a deployment,
-  and an unsupported operation. Evaluate Result/Option against the existing fault
+  and an unsupported operation. Evaluate Result/Optional against the existing fault
   policy; do not silently report an empty collection for unavailable metadata.
 - Evaluate metadata retention and executable-code requirements for interpreted,
   future JIT/AOT and constrained targets. Portability should not require every target

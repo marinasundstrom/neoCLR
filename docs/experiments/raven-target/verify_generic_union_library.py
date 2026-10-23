@@ -26,7 +26,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-foundation-library-') as tempora
     (root / 'demo').mkdir()
     core = root / 'demo/NeoCLR.CoreProbe.dll'
     run(['dotnet', args.bridge.resolve(), '--reference-library-core', core])
-    option = (ROOT / 'runtime/raven/src/System/Option.rvn').read_text()
+    option = (ROOT / 'runtime/raven/src/System/Optional.rvn').read_text()
     result = (ROOT / 'runtime/raven/src/System/Result.rvn').read_text()
     cases = [
         ('Option', 'Option', option, None),
@@ -37,8 +37,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-foundation-library-') as tempora
         ('ReferenceCase', 'Option', option.replace('struct Some<T>', 'class Some<T>'), 'value/reference representation'),
         ('CaseConstructorEffect', 'Option', option.replace('Stored = value', 'System.Fail("unexpected")\n            Stored = value'), 'union case constructor'),
         ('CarrierConstructorEffect', 'Option', option.replace('Stored = ValueStorage.Pack(value)', 'System.Fail("unexpected")\n        Stored = ValueStorage.Pack(value)', 1), 'carrier constructor'),
-        ('WrongPayload', 'Option', option.replace('ValueStorage.Is<System.Option.Some<T>>', 'ValueStorage.Is<T>'), 'Unsupported case storage payload'),
-        ('InvalidDefault', 'Option', option.replace('return System.Option<T>(System.Option.None())', 'return default(System.Option<T>)'), 'Read of uninitialized'),
+        ('WrongPayload', 'Option', option.replace('ValueStorage.Is<System.Optional.Some<T>>', 'ValueStorage.Is<T>'), 'Unsupported case storage payload'),
+        ('InvalidDefault', 'Option', option.replace('return System.Optional<T>(System.Optional.None())', 'return default(System.Optional<T>)'), 'Read of uninitialized'),
         ('UnassignedSuccess', 'Option', option.replace('ValueStorage.LeaveUnassigned(out value)\n        return false', 'ValueStorage.LeaveUnassigned(out value)\n        return true'), 'must return false immediately'),
         ('WrongParameterName', 'Result', result.replace('out output: T', 'out destination: T').replace('output =', 'destination =').replace('out output)', 'out destination)'), 'export does not match'),
     ]

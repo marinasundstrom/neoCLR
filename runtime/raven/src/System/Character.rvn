@@ -1,6 +1,6 @@
 module System
 
-import System.Option.*
+import System.Optional.*
 
 
 /// <summary>An immutable Unicode extended grapheme cluster backed by preserved UTF-8 text.</summary>
@@ -23,8 +23,8 @@ public struct Character : ComparableTo<Character>, EquatableTo<Character> {
     /// <returns>Some containing the original grapheme spelling, or None.</returns>
     /// <remarks>Uses Unicode 17 boundaries and preserves bytes without normalization.
     /// Checks whether the first grapheme occupies the entire input; no temporary String or Character array is created.
-    /// Successful construction follows the runtime's Character storage and Option allocation rules.</remarks>
-    static func TryFromString(text: string) -> Option<Character> {
+    /// Successful construction follows the runtime's Character storage and Optional allocation rules.</remarks>
+    static func TryFromString(text: string) -> Optional<Character> {
         if !neoCLR.Runtime.CharIsSingleGrapheme(text) {
             return None
         }

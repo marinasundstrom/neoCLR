@@ -1,24 +1,24 @@
 module System
 
-import System.Option.*
+import System.Optional.*
 import System.Result.*
 
-public extension OptionOperators<T> for Option<T> {
-    func Map<U>(mapper: (T) -> U) -> Option<U> {
+public extension OptionalOperators<T> for Optional<T> {
+    func Map<U>(mapper: (T) -> U) -> Optional<U> {
         return self match {
             Some(let value) => Some(mapper(value))
             None => None
         }
     }
 
-    func Then<U>(binder: (T) -> Option<U>) -> Option<U> {
+    func Then<U>(binder: (T) -> Optional<U>) -> Optional<U> {
         return self match {
             Some(let value) => binder(value)
             None => None
         }
     }
 
-    func Filter(predicate: (T) -> bool) -> Option<T> {
+    func Filter(predicate: (T) -> bool) -> Optional<T> {
         if self is Some(let value) {
             if predicate(value) {
                 return self
@@ -27,7 +27,7 @@ public extension OptionOperators<T> for Option<T> {
         return None
     }
 
-    func OrElse(alternative: () -> Option<T>) -> Option<T> {
+    func OrElse(alternative: () -> Optional<T>) -> Optional<T> {
         return self match {
             Some(_) => self
             None => alternative()
@@ -55,14 +55,14 @@ public extension OptionOperators<T> for Option<T> {
         }
     }
 
-    func Tap(action: (T) -> System.Void) -> Option<T> {
+    func Tap(action: (T) -> System.Void) -> Optional<T> {
         if self is Some(let value) {
             action(value)
         }
         return self
     }
 
-    func TapNone(action: () -> System.Void) -> Option<T> {
+    func TapNone(action: () -> System.Void) -> Optional<T> {
         if self is None {
             action()
         }
@@ -107,8 +107,8 @@ public extension OptionOperators<T> for Option<T> {
 
 }
 
-public extension OptionNestedOperators<T> for Option<Option<T>> {
-    func Flatten() -> Option<T> {
+public extension OptionalNestedOperators<T> for Optional<Optional<T>> {
+    func Flatten() -> Optional<T> {
         return self match {
             Some(let value) => value
             None => None

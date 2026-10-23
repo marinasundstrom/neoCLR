@@ -1,11 +1,11 @@
 module System.Collections
 
 import System.*
-import System.Option.*
+import System.Optional.*
 
 /// Unsynchronized array-backed LIFO stack. Iteration captures a shallow snapshot.
 public class ArrayStack<T> : Stack<T> {
-    private var slots: ArrayList<Option<T>> = ArrayList<Option<T>>()
+    private var slots: ArrayList<Optional<T>> = ArrayList<Optional<T>>()
     private var count = 0
 
     init() { }
@@ -14,7 +14,7 @@ public class ArrayStack<T> : Stack<T> {
         if capacity < 0 {
             System.Fail("Collection capacity must be non-negative")
         }
-        slots = ArrayList<Option<T>>(capacity)
+        slots = ArrayList<Optional<T>>(capacity)
     }
 
     /// <summary>Pushes elements in enumeration order; the last input is removed first.</summary>
@@ -40,14 +40,14 @@ public class ArrayStack<T> : Stack<T> {
         count = count + 1
     }
 
-    func Peek() -> Option<T> {
+    func Peek() -> Optional<T> {
         if count == 0 {
             return None
         }
         return slots[count - 1]
     }
 
-    func Pop() -> Option<T> {
+    func Pop() -> Optional<T> {
         if count == 0 {
             return None
         }

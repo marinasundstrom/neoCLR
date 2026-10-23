@@ -29,7 +29,7 @@ allocation provide a separate interop path.
 The native Raven target combines neoCLR metadata in a PE container, direct native symbol
 import/emission and a standalone Rust interpreter with source-built library subsets.
 The older bounded CIL import bridge remains a separate legacy workflow. Recoverable errors use `Result`,
-absence uses `Option`, and `Void` can be a generic unit type while ordinary void calls
+absence uses `Optional`, and `Void` can be a generic unit type while ordinary void calls
 retain the CLI no-result convention. Terminal runtime faults have no guest exception
 class hierarchy. This is an experimental subset, not a drop-in .NET replacement.
 The interpreter itself does not require .NET; the Raven compiler and editor tools do.
@@ -72,7 +72,7 @@ The following Preview 11 instructions describe the older bridge distribution.
 
 Preview 11 demonstrates typed JSON HTTP client/server applications over TCP,
 known-length client stream uploads, files and Storage, text and JSON, reflection,
-collections, Result/Option, Tasks, cancellation and isolated workers. HTTP remains
+collections, Result/Optional, Tasks, cancellation and isolated workers. HTTP remains
 a bounded cleartext POC; modern protocol work is tracked separately in the
 [HTTP capabilities plan](docs/http-capabilities.md). APIs remain experimental.
 
@@ -235,7 +235,7 @@ type arguments on free functions and static methods.
 The [property sample](docs/properties.md) demonstrates generic properties backed by ordinary methods.
 The [constructor sample](docs/constructors.md) initializes generic records through public constructors with private fields.
 The [ordinary carrier sample](docs/value-storage.md) uses explicit typed value storage and ordinary methods without union-specific instructions.
-The [ordinary System union sample](docs/union-convention.md) uses ordinary System.Option/Result library types, including the migrated I/O boundaries.
+The [ordinary System union sample](docs/union-convention.md) uses ordinary System.Optional/Result library types, including the migrated I/O boundaries.
 The [ordinary carrier hosting example](docs/erased-inputs.md) passes a guest-created Result through the Rust host and back into IL.
 The [parsing boundary](docs/int32-parse.md) now returns ordinary System.Result; the Error sample uses it throughout.
 The [type arity sample](docs/type-arities.md) lets a non-generic companion coexist with generic types of the same name.
@@ -265,7 +265,7 @@ to select a runtime library; see the [CLI module workflow](docs/cli-module-sets.
 ### More samples
 
 The feature tour checks record copying, explicit heap identity, free functions,
-loops, arithmetic, Option<Void>, and Result<Void,String>. The additional samples
+loops, arithmetic, Optional<Void>, and Result<Void,String>. The additional samples
 cover the implemented instruction set:
 
 ```sh
@@ -362,7 +362,7 @@ See [module sets](docs/module-sets.md) and [runtime library design](docs/runtime
 - Native `Ptr<T>`/`T*` values, explicit heap allocation/free, casts, byte offsets,
   field addresses, typed loads/stores, and native-sized pointer fields.
 - `Void`, `Int32`, `Boolean`, `String`, records, and constructed
-  `Option<T>` and `Result<T,E>` types, including nested uses of `Void`, plus managed `T&` references.
+  `Optional<T>` and `Result<T,E>` types, including nested uses of `Void`, plus managed `T&` references.
 - An iterative interpreter with explicit call frames and an IL-style evaluation stack.
 - Frame-owned aggregate copying and explicit heap allocation/sharing.
 - A line-oriented assembler with quoted strings, labels, source-line diagnostics,
@@ -395,7 +395,7 @@ T& is the unified reference feature for frame and heap storage. Native `Ptr<T>` 
 GC does not provide deterministic resource cleanup or guest finalizers. See
 [memory layers](docs/memory-model.md) and [GC](docs/garbage-collection.md).
 
-Option/Result still use temporary [System.Value storage](docs/value-storage.md),
+Optional/Result still use temporary [System.Value storage](docs/value-storage.md),
 which explicitly packs payloads into owned host value trees and recursively copies
 owned values. This has allocation costs and is not a settled native representation.
 Its planned removal requires a complete payload-storage and lifetime migration;
@@ -439,7 +439,7 @@ Typed memory initialization/copying (`initobj`, `cpobj`) and byte-range operatio
 Parameter, local, and qualified field names are assembly conveniences mapped to
 canonical indices. See [identifier mappings](docs/neoil.md#identifier-mappings-and-field-aliases).
 
-Library-defined Option and Result are implemented through ordinary generic carrier
+Library-defined Optional and Result are implemented through ordinary generic carrier
 types, nested cases, constructors, properties and conditional output methods.
 See the [union convention](docs/union-convention.md). Their remaining storage milestone
 is retiring temporary System.Value after payload layout, copying and lifetime
@@ -486,12 +486,12 @@ to prepare HelloWorld once and execute it twice with fresh guest state.
 
 [Resolved function invocation](docs/invocation.md) supports repeated calls to static and instance
 IL functions with typed primitive and [owned record arguments](docs/record-inputs.md),
-including libraries without an entry point. [Bootstrap Option/Result inputs](docs/union-inputs.md)
+including libraries without an entry point. [Bootstrap Optional/Result inputs](docs/union-inputs.md)
 are validated by type, case, and payload.
 Run `cargo run --example invoke` for the Rust embedding sample.
 `cargo run --example record_inputs` demonstrates copied record inputs and result reuse.
 `cargo run --example instance_invocation` demonstrates explicit copied generic receivers.
-`cargo run --example union_inputs` demonstrates Option/Result arguments and result reuse.
+`cargo run --example union_inputs` demonstrates Optional/Result arguments and result reuse.
 [Cooperative cancellation](docs/cancellation.md) is available through ExecutionOptions.
 `cargo run --example cancellation` stops an invocation from another host thread.
 [Interrupt and native boundaries](docs/interrupts-and-native.md) define the VM-level

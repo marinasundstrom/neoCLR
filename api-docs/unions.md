@@ -12,7 +12,7 @@ Named unions give a domain its own identity and cases. They remain preferable fo
 many public APIs, especially when an error contract should be independent of the
 operations used internally.
 
-- [Option&lt;T&gt;](xref:System.Option`1) documents Some and None.
+- [Optional&lt;T&gt;](xref:System.Optional`1) documents Some and None.
 - [Result&lt;T, E&gt;](xref:System.Result`2) documents Ok and Failure.
 
 RavenDoc renders each declaration's cases, properties, methods and applicable

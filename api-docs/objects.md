@@ -41,7 +41,7 @@ provide a purpose-specific type rather than an empty Object as a lock token.
 ## System.Value is a different facility
 
 [System.Value](xref:System.Value) stores a complete payload with its exact erased type.
-It is temporary interpreter support used by Option, Result, TaskOutcome and native/host
+It is temporary interpreter support used by Optional, Result, TaskOutcome and native/host
 boundaries. Applications should use typed values and those higher-level contracts.
 It is not the .NET System.ValueType base class, nor an alternative spelling of Object.
 
@@ -326,14 +326,14 @@ Generated record-specific Equals signatures are a separate compiler follow-up.
 
 ## Modeling absence
 
-neoCLR favors `Option<T>` when an API or domain model needs to express absence, for
+neoCLR favors `Optional<T>` when an API or domain model needs to express absence, for
 both value types and reference types. Nullable reference annotations remain useful
 for Raven compatibility and existing null-based contracts such as Object equality.
 They do not make nullable values the platform's preferred absence model.
 
 Nullable structs (`Nullable<T>`) and nullable-value boxing are deliberately deferred;
 they may be reconsidered later. Existing reference nulls and default initialization
-remain unchanged. This direction does not yet add Option-valued components to the
+remain unchanged. This direction does not yet add Optional-valued components to the
 configured record contract, and the final metadata representation remains open.
 
 ### Development compiler policy for absence
@@ -341,14 +341,14 @@ configured record contract, and the final metadata representation remains open.
 The neoCLR target disables nullable value declarations through Raven's
 RavenAllowNullableValueTypes option. A known value type declared with `?`, such as
 `int?` or a record struct, produces RAV0407: "Value types can't be declared as
-nullable". Reference annotations such as `Object?` remain valid. Prefer `Option<T>`
+nullable". Reference annotations such as `Object?` remain valid. Prefer `Optional<T>`
 for intentional absence in both value and reference API models.
 
 Generated record Object.Equals preserves Object's nullable comparison parameter;
 generated typed record-class Equals also accepts a nullable reference to its record
 type and compares null as false. Record-struct typed parameters remain non-nullable
 values. The EquatableTo&lt;T&gt; interface contract is unchanged. This does not add Nullable&lt;T&gt;,
-nullable-value boxing or Option components to the supported record component set.
+nullable-value boxing or Optional components to the supported record component set.
 
 Generated record-class `==` and `!=` also accept nullable operands in this preview.
 Two absent references compare equal; an absent and present reference compare unequal;
@@ -367,7 +367,7 @@ contracts; supported boxed Int32/Int64/Boolean/Single/Double/Character values us
 ordinary classes retain allocation identity. Equal keys must have equal hashes.
 
 The compiled sample checks duplicate keys, replacement, deliberate collisions,
-growth and reference-preserving Object values returned through `Option<Object>` under
+growth and reference-preserving Object values returned through `Optional<Object>` under
 GC. The String slice also supports content keys through the existing Object conversion.
 Default comparers, nullable-key policy and other boxed primitive keys remain
 outside this supported surface.
@@ -436,7 +436,7 @@ the [implementation status](https://github.com/marinasundstrom/neoCLR/blob/main/
 
 With the `native-metadata` feature, the Rust compiler bridge exposes `retain_memory_view_shape`
 (target TypeDef, source Module, source index, lowered type arguments) and
-`memory_view_element(&TypeDef) -> Option<&Type>` for private specialization IR.
+`memory_view_element(&TypeDef) -> Optional<&Type>` for private specialization IR.
 Retention validates the source opaque declaration, matching view kind and unary
 arity; errors return Fault. Ordinary types are unchanged. Callers supply verified
 source IR and lowered arguments. The retained element is remapped by
@@ -531,7 +531,7 @@ Unicode 17 extended grapheme cluster and `None` for empty text or multiple clust
 Text is non-null. Original bytes are preserved, including combining marks, CRLF,
 flags, emoji sequences and NUL. The check compares the first cluster's extent with
 the input; it does not build a Character array or normalize text. Successful creation
-uses the existing Character storage and Option carrier, so this is not a zero-allocation
+uses the existing Character storage and Optional carrier, so this is not a zero-allocation
 construction guarantee. FromString remains the faulting alternative.
 
 `Character.Equals(other, comparison)` applies Canonical, Ordinal byte identity or

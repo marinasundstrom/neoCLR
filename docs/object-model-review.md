@@ -20,7 +20,7 @@ cover class identity/display, record classes, boxed Int32 and the first
 | `System.ValueType` | Compiler/reference metadata role | Not a replacement name for System.Value and not a complete executable .NET ValueType implementation |
 
 Source evidence: [Object](../runtime/raven/src/System/Object.rvn),
-[Option](../runtime/raven/src/System/Option.rvn),
+[Optional](../runtime/raven/src/System/Optional.rvn),
 [Result](../runtime/raven/src/System/Result.rvn),
 [TaskOutcome](../runtime/raven/src/System/Tasks/TaskOutcome.rvn),
 [class semantics](class-semantics.md) and [boxing](boxed-interface-values.md).
@@ -78,7 +78,7 @@ It makes no performance claim and does not claim neoCLR already matches every ca
 **Keep:** reference/value category distinctions, typed `EquatableTo<T>` contracts,
 explicit boxing and GetType's concrete-type behavior. An Object base method must
 not silently change ordinary value assignment or introduce boxing in generic storage.
-Maintain current Result/Option ergonomics independently of payload representation.
+Maintain current Result/Optional ergonomics independently of payload representation.
 
 **Revisit:** Object metadata versus executable members, override dispatch through
 Object, defaults for Equals/GetHashCode, String identity and boxed-value dispatch.
@@ -87,7 +87,7 @@ copy CoreCLR. Identity hashes must survive collection without exposing pointers.
 Value equality needs a deliberate policy for reference fields, floating point,
 cycles and custom EquatableTo implementations rather than raw byte comparison.
 
-**Retain temporarily:** System.Value and its instructions. Option, Result, TaskOutcome,
+**Retain temporarily:** System.Value and its instructions. Optional, Result, TaskOutcome,
 native return protocols and host input/inspection still depend on this representation.
 Replacing every erased field with Object today would change copying to box aliasing,
 introduce observable identity and leave exact extraction/unboxing gaps. Replacing it
@@ -515,7 +515,7 @@ a separate compiler issue; calls through Object use the corrected base contract.
 ### Absence model clarified — 2026-09-24
 
 The author clarifies the previous provisional-nullability direction: neoCLR favors
-Option<T> for modeled absence for both value and reference types. Keep reference
+Optional<T> for modeled absence for both value and reference types. Keep reference
 annotations for Raven compatibility and existing null-based contracts. Nullable
 structs/Nullable<T> and nullable-value boxing are explicitly deferred, not the next
 implementation slice. They may be reconsidered later; no final metadata format is
@@ -523,10 +523,10 @@ selected.
 
 The .NET/Raven comparison above distinguishes reference annotations from a nullable
 value carrier. Retaining the former does not require implementing the latter.
-Option provides an explicit union case for absence across both categories; the cost
+Optional provides an explicit union case for absence across both categories; the cost
 is that its operations and generated-record integration need their own validated
 contracts. This direction neither changes default reference initialization nor
-claims that Option components already work in configured records. It supersedes
+claims that Optional components already work in configured records. It supersedes
 earlier suggestions here that nullable-value representation was a prerequisite for
 continuing the bounded Object/record work. No runtime or compiler code changes.
 
@@ -544,7 +544,7 @@ The general AllowNullableValueTypes option retains true as Raven's .NET default;
 neoCLR selects false through its shared build props. RAV0407 reports "Value types
 can't be declared as nullable". This keeps source diagnostics consistent with the
 current absence model without implementing a nullable value carrier. Reference
-annotations remain available; Option record components remain separate work.
+annotations remain available; Optional record components remain separate work.
 
 ### Typed record-class equality — 2026-09-24
 
@@ -574,7 +574,7 @@ retaining null guards. EquatableTo<T>'s public contract is unchanged.
 
 neoCLR's sample adds absent/present Key? locals and literal-null comparisons. Generic
 record support on .NET is compiler regression coverage, not new neoCLR component
-support. Option components, nullable strings and broader signature matching remain
+support. Optional components, nullable strings and broader signature matching remain
 separate questions; no public library API, runtime instruction or metadata format is
 added by this slice.
 
@@ -584,7 +584,7 @@ The next annotation gap was generated class `==`/`!=`: both parameters were mark
 non-null even though null comparisons already worked. The .NET comparison above
 and the pinned baseline now check both operator parameters and null/value symmetry
 (34 total assertions). Generated record-struct operands remain values. This is
-reference contract alignment, not nullable-value support or a change to Option policy.
+reference contract alignment, not nullable-value support or a change to Optional policy.
 
 Annotating the operands exposed an internal lowering bug: a generated null guard
 resolved overloaded `==`, recursively calling the operator until stack overflow.
@@ -673,8 +673,8 @@ operands, particularly because nullable value types are excluded. EquatableTo<T>
 typed overload; it was corrected before commit. Equals(Path) requires Path. The
 existing Object.Equals(Object?) override is the explicit null-aware reference
 boundary and returns false for null or another type. No interface change, Nullable<T>
-or implicit Option is introduced. The sample checks both EquatableTo<Path> and
-EquatableTo<int>; API absence remains a separate Option design concern.
+or implicit Optional is introduced. The sample checks both EquatableTo<Path> and
+EquatableTo<int>; API absence remains a separate Optional design concern.
 
 The .NET comparison remains useful at the contract level:
 [Object.Equals](https://learn.microsoft.com/en-us/dotnet/api/system.object.equals?view=net-10.0)
@@ -703,7 +703,7 @@ This remains an explicit importer coverage gap, not a runtime map equality limit
 | IO stream/readers/writers, Tasks/Promise/TaskQueue, Concurrency Thread | Mutable progress, ownership or resource state. | Identity remains appropriate unless a specific contract says otherwise; add targeted alias/lifetime tests when these APIs change. |
 | Collections ArrayList/HashMap and Array | Mutable contents with no sequence-equality contract; HashMap already consumes explicit callbacks. | Keep identity and custom callbacks. Evaluate a default comparer only after its typed/Object dispatch and boxing policy are explicit. |
 | Date, Time, Instant, Duration; LocalDateTime | First four have typed equality; boxed overrides/hash/display are incomplete. LocalDateTime has no typed equality yet. | Incremental exact-type boxed/typed matrices; define component semantics before default structural behavior. |
-| Char, numeric primitives, error structs and union carriers | Typed display/equality varies; most do not override Object. Int32/Boolean boxed equality/hash are special runtime paths. | Close supported primitive dispatch, then diagnostic display. Do not infer universal structural equality for Result/Option/errors. |
+| Char, numeric primitives, error structs and union carriers | Typed display/equality varies; most do not override Object. Int32/Boolean boxed equality/hash are special runtime paths. | Close supported primitive dispatch, then diagnostic display. Do not infer universal structural equality for Result/Optional/errors. |
 
 The [TypeInfo comparison](https://learn.microsoft.com/en-us/dotnet/api/system.type.equals?view=net-10.0)
 is represented-type equality across typed/Object overloads in .NET. neoCLR should
@@ -881,7 +881,7 @@ no Object operation, default comparer, runtime storage policy or native layout.
 The compiled mixed-map fixture consumes the completed library semantics: separately
 parsed Paths and fresh type descriptors compare equal, Int32 boxes compare by value,
 Boolean remains distinct from Int32, and ordinary classes retain allocation identity.
-Values travel through Object and Option<Object> without losing reference identity.
+Values travel through Object and Optional<Object> without losing reference identity.
 Forced collisions, key replacement, growth and collection are checked. All 955 managed
 objects are reclaimed across eleven collections (peak 202 under a 256-object limit).
 

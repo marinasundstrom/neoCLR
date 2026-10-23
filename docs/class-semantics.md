@@ -12,7 +12,7 @@ ref/out scenarios. They are not how callers normally express class or array shar
 The former value-by-default model is being retired, not preserved as a parallel public
 model for the CLR-compatible target. Existing unmarked runtime/library types require
 classification as they enter that target. Neo source lowering is outside this experiment. This does not assert that all .NET behaviors are implemented or
-reverse the separate Result/Option and generic Void directions.
+reverse the separate Result/Optional and generic Void directions.
 
 ## Runtime contract
 

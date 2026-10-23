@@ -50,7 +50,7 @@ constructed types. See [generic constraints](generic-constraints.md).
 ## CLR comparison
 
 The [C# union reference](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/union)
-(consulted 2026-09-09) includes a generic Option<T> composed from independently declared
+(consulted 2026-09-09) includes a generic Optional<T> composed from independently declared
 None and Some<T> cases, and constructor-based case conversions. This is the evolving
 .NET 11-era comparison, not a requirement of older CLR versions. Neo reuses ordinary
 generic metadata and its existing carrier convention, with exact conversions and

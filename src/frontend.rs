@@ -25,7 +25,7 @@ const PREDEFINED_NAMES: &[&str] = &[
     "Console",
     "WriteLine",
     "System",
-    "Option",
+    "Optional",
     "Result",
     "Byte",
     "byte",
@@ -689,7 +689,7 @@ impl Parser {
                 }
             }
             let name = match name.as_str() {
-                "Option" => "System.Option",
+                "Optional" => "System.Optional",
                 "Result" => "System.Result",
                 "bool" => "Boolean",
                 "unit" => "Void",

@@ -126,7 +126,7 @@ for file in source['sourceFiles']:
                      'tests': ['tests/errors.rs', 'tests/arithmetic_errors.rs', 'docs/experiments/raven-target/verify_empty_library.py'],
                      'note': 'Empty values preserve payload-free defaults, existing constructors/formatting and nominal Void. No new constructor on EnvironmentError or Void.'})
         continue
-    if file.startswith(('runtime/raven/generated/Option.', 'runtime/raven/generated/Result.')):
+    if file.startswith(('runtime/raven/generated/Optional.', 'runtime/raven/generated/Result.')):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-generic-union',
                      'samples': ['library-unions.rvn', 'library-generic-unions.rvn', 'library-result-void-propagation.rvn'],
                      'tests': ['tests/propagation.rs', 'tests/union_out.rs', 'docs/experiments/raven-target/verify_generic_union_library.py'],

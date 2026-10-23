@@ -12,7 +12,7 @@
 .property instance State() -> System.Concurrency.Tasks.TaskState
 .get instance System.Concurrency.Tasks.Task<T0>::get_State()
 .end
-.property instance Outcome() -> System.Option<System.Concurrency.Tasks.TaskOutcome<T0>>
+.property instance Outcome() -> System.Optional<System.Concurrency.Tasks.TaskOutcome<T0>>
 .get instance System.Concurrency.Tasks.Task<T0>::get_Outcome()
 .end
 .method internal instance .ctor(System.Concurrency.Tasks.Promise<T0> source) -> void
@@ -106,7 +106,7 @@ M0000000a_IL_0037:
 call System.Concurrency.Tasks.TaskState::FromValue(Int32)
 ret
 .end
-.method instance get_Outcome() -> System.Option<System.Concurrency.Tasks.TaskOutcome<T0>>
+.method instance get_Outcome() -> System.Optional<System.Concurrency.Tasks.TaskOutcome<T0>>
 .local System.Concurrency.Tasks.TaskOutcome<T0> local0
 .local System.Concurrency.Tasks.TaskOutcome<T0> local1
 ldloca local0
@@ -138,7 +138,7 @@ ldloc local0
 M0000000b_IL_0024:
 call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion2<T0>(System.Concurrency.Tasks.TaskOutcome<T0>)
 M0000000b_IL_0029:
-call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion3<T0>(System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>>)
+call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion3<T0>(System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>>)
 M0000000b_IL_002e:
 ret
 M0000000b_IL_002f:
@@ -173,14 +173,14 @@ ldloc local1
 M0000000b_IL_005f:
 call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion2<T0>(System.Concurrency.Tasks.TaskOutcome<T0>)
 M0000000b_IL_0064:
-call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion3<T0>(System.Option.Some<System.Concurrency.Tasks.TaskOutcome<T0>>)
+call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion3<T0>(System.Optional.Some<System.Concurrency.Tasks.TaskOutcome<T0>>)
 M0000000b_IL_0069:
 ret
 M0000000b_IL_006a:
 M0000000b_IL_006b:
 call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion4()
 M0000000b_IL_0070:
-call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion5<T0>(System.Option.None)
+call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion5<T0>(System.Optional.None)
 M0000000b_IL_0075:
 ret
 .end

@@ -1,5 +1,5 @@
 import System.*
-import System.Option.*
+import System.Optional.*
 
 struct Label {
     var Prefix: byte = (byte)7
@@ -16,7 +16,7 @@ func Select(first: bool, left: Envelope, right: Envelope) -> Envelope {
     return if first { left } else { right }
 }
 
-func Print(item: Option<string>) -> int {
+func Print(item: Optional<string>) -> int {
     if let Some(text) = item {
         Console.WriteLine(text)
         return 1
@@ -35,12 +35,12 @@ func Main() -> int {
     if selected.Data.Prefix != 7 || selected.Data.Suffix != 42 {
         return 1
     }
-    let item: Option<string> = Some(original.Data.Text)
+    let item: Optional<string> = Some(original.Data.Text)
     let Some(text) = item else {
         return 2
     }
     Console.WriteLine(text)
-    let absent: Option<string> = None()
+    let absent: Optional<string> = None()
     if Print(absent) != 0 || Print(item) != 1 {
         return 3
     }

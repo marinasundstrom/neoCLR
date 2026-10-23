@@ -23,4 +23,4 @@ Windows host 3.77, and minimum-Rust compilation 0.52/1.02/0.88 minutes.
 The slowest job was under nine minutes, with about 17.6 total runner-minutes.
 This is an observed workflow comparison, not a controlled hardware/cache benchmark.
 [Job metadata](hosted-acceptance.json) records the run. It precedes the subsequent
-Option/Result migration and does not validate that later source change.
+Optional/Result migration and does not validate that later source change.
