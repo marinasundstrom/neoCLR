@@ -55,7 +55,8 @@ static void compiled_pause_locked(compiled_participant *self, const neoclr_probe
         self->running = 0;
     }
     self->frames = head;
-    pthread_cond_broadcast(&p->completion);
+    /* Safepoints wake compiler participants, not unrelated job-completion waiters. */
+    pthread_cond_broadcast(&p->compiled_ready);
 }
 static void compiled_boundary(neoclr_aot_context *context, const neoclr_probe_frame *head, unsigned exclusive) {
     compiled_participant *self = compiled_current;
@@ -66,7 +67,7 @@ static void compiled_boundary(neoclr_aot_context *context, const neoclr_probe_fr
     compiled_pause_locked(self, head);
     if (exclusive) {
         ++p->compiled_waiters;
-        while (p->compiled_running) if (pthread_cond_wait(&p->completion, &p->gate)) abort();
+        while (p->compiled_running) if (pthread_cond_wait(&p->compiled_ready, &p->gate)) abort();
         --p->compiled_waiters;
         p->compiled_exclusive = self;
         self->exclusive = 1;
@@ -74,7 +75,7 @@ static void compiled_boundary(neoclr_aot_context *context, const neoclr_probe_fr
         self->context.static_storage = p->context.static_storage;
     } else {
         while (p->compiled_exclusive || p->compiled_waiters)
-            if (pthread_cond_wait(&p->completion, &p->gate)) abort();
+            if (pthread_cond_wait(&p->compiled_ready, &p->gate)) abort();
     }
     self->running = 1;
     ++p->compiled_running;

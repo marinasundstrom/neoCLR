@@ -21886,3 +21886,19 @@ The implementation remains a synchronous private runtime primitive; allocation a
 native helpers are exclusive. Shared async HTTP dispatch and throughput parity
 remain open, rather than inferred from the GC result.
 See [implementation and evidence](experiments/native-worker-pool/README.md#concurrent-compiled-shared-heap--2026-10-23).
+
+## 2026-10-23 — Refocus worker work on HTTP costs
+
+The author asked, “Is the current direction consistent with what we try to achieve?”
+The assistant agreed that shared-object GC correctness supports server primitives,
+but proposed moving attention to HTTP measurements and coordinator overhead rather
+than adding a general threading system. The author directed continuation.
+
+The assistant measured isolated HTTP throughput/latency and equivalent serial versus
+concurrent compiled graph work. The latter was slower despite identical allocation
+counts. Inspection identified compiler safepoints waking job-completion waiters;
+a dedicated condition reduced four-worker mean time about 47% in two local trials.
+GC stress tests still pass. This is a bounded scheduling improvement, not shared
+async HTTP completion or external-server parity. Lower-cost safepoints/pacing and
+async resource ownership remain open; channels/green threads are not prerequisites.
+See [evidence and limitations](experiments/native-worker-pool/README.md#coordination-cost-and-completion-wakeups--2026-10-23).

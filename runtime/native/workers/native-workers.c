@@ -33,6 +33,7 @@ struct neoclr_workers {
     unsigned thread_count, capacity, readers, mutators, waiting_writers;
     int closing, joined, dispatching;
 #ifdef NEOCLR_WORKER_GC
+    pthread_cond_t compiled_ready;
     unsigned compiled_count, compiled_running, compiled_waiters, compiled_peak;
     uint64_t compiled_collections;
     struct compiled_participant *participants[JOBS], *compiled_exclusive;
@@ -134,6 +135,12 @@ neoclr_workers *neoclr_workers_create(unsigned workers, unsigned capacity, size_
         pthread_cond_destroy(&p->ready); pthread_mutex_destroy(&p->gate);
         free(p->context.text.data); free(p); return NULL;
     }
+#ifdef NEOCLR_WORKER_GC
+    if (pthread_cond_init(&p->compiled_ready, NULL)) {
+        pthread_cond_destroy(&p->completion); pthread_cond_destroy(&p->ready);
+        pthread_mutex_destroy(&p->gate); free(p->context.text.data); free(p); return NULL;
+    }
+#endif
     for (unsigned i = 0; i < capacity; i++) p->jobs[i].pool = p;
     for (; p->thread_count < workers; p->thread_count++) {
         if (pthread_create(&p->threads[p->thread_count], NULL, run, p)) {
@@ -477,6 +484,9 @@ int neoclr_workers_destroy(neoclr_workers *p) {
     }
     uint64_t extent;
     if (!neoclr_workers_collect(p, &extent) || extent) return 0;
+#ifdef NEOCLR_WORKER_GC
+    pthread_cond_destroy(&p->compiled_ready);
+#endif
     pthread_cond_destroy(&p->completion); pthread_cond_destroy(&p->ready); pthread_mutex_destroy(&p->gate);
     free(p->context.text.data); free(p); return 1;
 }

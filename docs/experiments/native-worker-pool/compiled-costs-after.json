@@ -1,0 +1,504 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr-codegen",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/compiled-qualified-0/bin/neoclr/WorkerGenerated.dll",
+        "NeoMetadata_C150BF40FAD28D9DFBF4D6BC6457CC71FFA8E24D70333E109DEB30BFB8E1CE13.F_43616C63756C617465",
+        "/Users/robert/Projects/neoclr/target/compiled-worker-costs-separated/serial.o",
+        "--native-host-bootstrap",
+        "--bind-user-fault",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--compile-system",
+        "--reference-arena",
+        "--native-gc",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/libraries/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/libraries/System.Runtime.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/libraries/System.Runtime.dll"
+      ],
+      "exitCode": 0,
+      "stdout": {
+        "bytes": 1775869,
+        "sha256": "c582b547e632350a826dfe244f326f671bee21741275c46302369d05e5160bef",
+        "meaning": "Full compiler output retained in local report."
+      },
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pthread",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/gc",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/workers",
+        "/Users/robert/Projects/neoclr/runtime/native/gc/native-gc.c",
+        "/Users/robert/Projects/neoclr/runtime/native/gc/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/native-worker-pool/compiled-benchmark.c",
+        "/Users/robert/Projects/neoclr/runtime/native/workers/native-workers.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/compiled-worker-costs-separated/serial",
+        "/Users/robert/Projects/neoclr/runtime/native/memory/text-arena.c",
+        "/Users/robert/Projects/neoclr/target/compiled-worker-costs-separated/serial.o",
+        "-DNEOCLR_WORKER_GC"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pthread",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/gc",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/workers",
+        "/Users/robert/Projects/neoclr/runtime/native/gc/native-gc.c",
+        "/Users/robert/Projects/neoclr/runtime/native/gc/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/native-worker-pool/compiled-benchmark.c",
+        "/Users/robert/Projects/neoclr/runtime/native/workers/native-workers.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/compiled-worker-costs-separated/serial-profile",
+        "/Users/robert/Projects/neoclr/runtime/native/memory/text-arena.c",
+        "/Users/robert/Projects/neoclr/target/compiled-worker-costs-separated/serial.o",
+        "-DNEOCLR_WORKER_GC",
+        "-DNEOCLR_GC_PROFILE"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pthread",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/gc",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/workers",
+        "/Users/robert/Projects/neoclr/runtime/native/gc/native-gc.c",
+        "/Users/robert/Projects/neoclr/runtime/native/gc/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/native-worker-pool/compiled-benchmark.c",
+        "/Users/robert/Projects/neoclr/runtime/native/workers/native-workers.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/compiled-worker-costs-separated/parallel",
+        "/Users/robert/Projects/neoclr/runtime/native/memory/text-arena.c",
+        "/Users/robert/Projects/neoclr/target/compiled-qualified-0/code.o",
+        "-DNEOCLR_WORKER_GC"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pthread",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/gc",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/workers",
+        "/Users/robert/Projects/neoclr/runtime/native/gc/native-gc.c",
+        "/Users/robert/Projects/neoclr/runtime/native/gc/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/native-worker-pool/compiled-benchmark.c",
+        "/Users/robert/Projects/neoclr/runtime/native/workers/native-workers.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/compiled-worker-costs-separated/parallel-profile",
+        "/Users/robert/Projects/neoclr/runtime/native/memory/text-arena.c",
+        "/Users/robert/Projects/neoclr/target/compiled-qualified-0/code.o",
+        "-DNEOCLR_WORKER_GC",
+        "-DNEOCLR_GC_PROFILE"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/compiled-worker-costs-separated/serial",
+        "1",
+        "0"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"workers\":1,\"parallel\":0,\"jobs\":4096,\"wallSeconds\":1.133974,\"cpuSeconds\":1.141934,\"allocations\":499712,\"payloadBytes\":0,\"collections\":3137536,\"gcNanoseconds\":0,\"peakParticipants\":0,\"voluntarySwitches\":0,\"involuntarySwitches\":5465}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/compiled-worker-costs-separated/parallel",
+        "1",
+        "1"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"workers\":1,\"parallel\":1,\"jobs\":4096,\"wallSeconds\":2.923840,\"cpuSeconds\":2.863160,\"allocations\":499712,\"payloadBytes\":0,\"collections\":3141632,\"gcNanoseconds\":0,\"peakParticipants\":1,\"voluntarySwitches\":0,\"involuntarySwitches\":12546}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/compiled-worker-costs-separated/parallel",
+        "2",
+        "1"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"workers\":2,\"parallel\":1,\"jobs\":4096,\"wallSeconds\":3.855948,\"cpuSeconds\":4.337197,\"allocations\":499712,\"payloadBytes\":0,\"collections\":3141632,\"gcNanoseconds\":0,\"peakParticipants\":2,\"voluntarySwitches\":0,\"involuntarySwitches\":394565}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/compiled-worker-costs-separated/parallel",
+        "4",
+        "1"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"workers\":4,\"parallel\":1,\"jobs\":4096,\"wallSeconds\":9.862688,\"cpuSeconds\":17.265078,\"allocations\":499712,\"payloadBytes\":0,\"collections\":3141632,\"gcNanoseconds\":0,\"peakParticipants\":4,\"voluntarySwitches\":0,\"involuntarySwitches\":3684306}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/compiled-worker-costs-separated/parallel",
+        "4",
+        "1"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"workers\":4,\"parallel\":1,\"jobs\":4096,\"wallSeconds\":8.187386,\"cpuSeconds\":14.176144,\"allocations\":499712,\"payloadBytes\":0,\"collections\":3141632,\"gcNanoseconds\":0,\"peakParticipants\":4,\"voluntarySwitches\":0,\"involuntarySwitches\":3126414}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/compiled-worker-costs-separated/parallel",
+        "2",
+        "1"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"workers\":2,\"parallel\":1,\"jobs\":4096,\"wallSeconds\":4.584301,\"cpuSeconds\":5.310854,\"allocations\":499712,\"payloadBytes\":0,\"collections\":3141632,\"gcNanoseconds\":0,\"peakParticipants\":2,\"voluntarySwitches\":0,\"involuntarySwitches\":640671}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/compiled-worker-costs-separated/parallel",
+        "1",
+        "1"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"workers\":1,\"parallel\":1,\"jobs\":4096,\"wallSeconds\":2.916316,\"cpuSeconds\":2.847091,\"allocations\":499712,\"payloadBytes\":0,\"collections\":3141632,\"gcNanoseconds\":0,\"peakParticipants\":1,\"voluntarySwitches\":0,\"involuntarySwitches\":12936}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/compiled-worker-costs-separated/serial",
+        "1",
+        "0"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"workers\":1,\"parallel\":0,\"jobs\":4096,\"wallSeconds\":1.104579,\"cpuSeconds\":1.112829,\"allocations\":499712,\"payloadBytes\":0,\"collections\":3137536,\"gcNanoseconds\":0,\"peakParticipants\":0,\"voluntarySwitches\":0,\"involuntarySwitches\":5222}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/compiled-worker-costs-separated/serial-profile",
+        "1",
+        "0"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"workers\":1,\"parallel\":0,\"jobs\":4096,\"wallSeconds\":1.310562,\"cpuSeconds\":1.318576,\"allocations\":499712,\"payloadBytes\":10682368,\"collections\":3137536,\"gcNanoseconds\":975923000,\"peakParticipants\":0,\"voluntarySwitches\":0,\"involuntarySwitches\":5305}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/compiled-worker-costs-separated/parallel-profile",
+        "1",
+        "1"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"workers\":1,\"parallel\":1,\"jobs\":4096,\"wallSeconds\":2.989231,\"cpuSeconds\":2.998173,\"allocations\":499712,\"payloadBytes\":10682368,\"collections\":3141632,\"gcNanoseconds\":942279000,\"peakParticipants\":1,\"voluntarySwitches\":0,\"involuntarySwitches\":15229}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/compiled-worker-costs-separated/parallel-profile",
+        "4",
+        "1"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"workers\":4,\"parallel\":1,\"jobs\":4096,\"wallSeconds\":8.395481,\"cpuSeconds\":14.370102,\"allocations\":499712,\"payloadBytes\":10682368,\"collections\":3141632,\"gcNanoseconds\":1861875000,\"peakParticipants\":4,\"voluntarySwitches\":0,\"involuntarySwitches\":3071648}\n",
+      "stderr": ""
+    }
+  ],
+  "trials": [
+    {
+      "workers": 1,
+      "parallel": 0,
+      "jobs": 4096,
+      "wallSeconds": 1.133974,
+      "cpuSeconds": 1.141934,
+      "allocations": 499712,
+      "payloadBytes": 0,
+      "collections": 3137536,
+      "gcNanoseconds": 0,
+      "peakParticipants": 0,
+      "voluntarySwitches": 0,
+      "involuntarySwitches": 5465,
+      "mode": "serial",
+      "profiled": false
+    },
+    {
+      "workers": 1,
+      "parallel": 1,
+      "jobs": 4096,
+      "wallSeconds": 2.92384,
+      "cpuSeconds": 2.86316,
+      "allocations": 499712,
+      "payloadBytes": 0,
+      "collections": 3141632,
+      "gcNanoseconds": 0,
+      "peakParticipants": 1,
+      "voluntarySwitches": 0,
+      "involuntarySwitches": 12546,
+      "mode": "parallel",
+      "profiled": false
+    },
+    {
+      "workers": 2,
+      "parallel": 1,
+      "jobs": 4096,
+      "wallSeconds": 3.855948,
+      "cpuSeconds": 4.337197,
+      "allocations": 499712,
+      "payloadBytes": 0,
+      "collections": 3141632,
+      "gcNanoseconds": 0,
+      "peakParticipants": 2,
+      "voluntarySwitches": 0,
+      "involuntarySwitches": 394565,
+      "mode": "parallel",
+      "profiled": false
+    },
+    {
+      "workers": 4,
+      "parallel": 1,
+      "jobs": 4096,
+      "wallSeconds": 9.862688,
+      "cpuSeconds": 17.265078,
+      "allocations": 499712,
+      "payloadBytes": 0,
+      "collections": 3141632,
+      "gcNanoseconds": 0,
+      "peakParticipants": 4,
+      "voluntarySwitches": 0,
+      "involuntarySwitches": 3684306,
+      "mode": "parallel",
+      "profiled": false
+    },
+    {
+      "workers": 4,
+      "parallel": 1,
+      "jobs": 4096,
+      "wallSeconds": 8.187386,
+      "cpuSeconds": 14.176144,
+      "allocations": 499712,
+      "payloadBytes": 0,
+      "collections": 3141632,
+      "gcNanoseconds": 0,
+      "peakParticipants": 4,
+      "voluntarySwitches": 0,
+      "involuntarySwitches": 3126414,
+      "mode": "parallel",
+      "profiled": false
+    },
+    {
+      "workers": 2,
+      "parallel": 1,
+      "jobs": 4096,
+      "wallSeconds": 4.584301,
+      "cpuSeconds": 5.310854,
+      "allocations": 499712,
+      "payloadBytes": 0,
+      "collections": 3141632,
+      "gcNanoseconds": 0,
+      "peakParticipants": 2,
+      "voluntarySwitches": 0,
+      "involuntarySwitches": 640671,
+      "mode": "parallel",
+      "profiled": false
+    },
+    {
+      "workers": 1,
+      "parallel": 1,
+      "jobs": 4096,
+      "wallSeconds": 2.916316,
+      "cpuSeconds": 2.847091,
+      "allocations": 499712,
+      "payloadBytes": 0,
+      "collections": 3141632,
+      "gcNanoseconds": 0,
+      "peakParticipants": 1,
+      "voluntarySwitches": 0,
+      "involuntarySwitches": 12936,
+      "mode": "parallel",
+      "profiled": false
+    },
+    {
+      "workers": 1,
+      "parallel": 0,
+      "jobs": 4096,
+      "wallSeconds": 1.104579,
+      "cpuSeconds": 1.112829,
+      "allocations": 499712,
+      "payloadBytes": 0,
+      "collections": 3137536,
+      "gcNanoseconds": 0,
+      "peakParticipants": 0,
+      "voluntarySwitches": 0,
+      "involuntarySwitches": 5222,
+      "mode": "serial",
+      "profiled": false
+    },
+    {
+      "workers": 1,
+      "parallel": 0,
+      "jobs": 4096,
+      "wallSeconds": 1.310562,
+      "cpuSeconds": 1.318576,
+      "allocations": 499712,
+      "payloadBytes": 10682368,
+      "collections": 3137536,
+      "gcNanoseconds": 975923000,
+      "peakParticipants": 0,
+      "voluntarySwitches": 0,
+      "involuntarySwitches": 5305,
+      "mode": "serial",
+      "profiled": true
+    },
+    {
+      "workers": 1,
+      "parallel": 1,
+      "jobs": 4096,
+      "wallSeconds": 2.989231,
+      "cpuSeconds": 2.998173,
+      "allocations": 499712,
+      "payloadBytes": 10682368,
+      "collections": 3141632,
+      "gcNanoseconds": 942279000,
+      "peakParticipants": 1,
+      "voluntarySwitches": 0,
+      "involuntarySwitches": 15229,
+      "mode": "parallel",
+      "profiled": true
+    },
+    {
+      "workers": 4,
+      "parallel": 1,
+      "jobs": 4096,
+      "wallSeconds": 8.395481,
+      "cpuSeconds": 14.370102,
+      "allocations": 499712,
+      "payloadBytes": 10682368,
+      "collections": 3141632,
+      "gcNanoseconds": 1861875000,
+      "peakParticipants": 4,
+      "voluntarySwitches": 0,
+      "involuntarySwitches": 3071648,
+      "mode": "parallel",
+      "profiled": true
+    }
+  ],
+  "inputs": {
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/sdk/tools/rvnc/rvnc.dll": "910fbd6babab359417703b6662d646acb5bdb1ddc982bc497dd3078461b9dea3",
+    "/Users/robert/Projects/neoclr/target/release/neoclr-codegen": "2c88fe1fc71bb8d746b5b7d958966d0d543213fb9c70782baab016bb008a0d71",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/bin/neoclr": "6da8f7d4b470a7c748ff05cc1674b49de445b5afd7f3925b2d111908be5f85cc",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/libraries/System.Runtime.dll": "ac3ddea188cd6e7970869248c2501acc7f6f7a1bfca598c339ea3257d3fc1d4c",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/libraries/System.runtime.neox": "0c72a8656e7158d6bb2f31c0b019d8747dd61a6c4127b278155e104de437769b",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-worker-pool/Parallel.rvn": "e8cb8bce3d21eef873ad6e7de8e655e02c0e8b0825e3c70064644e89d79c5269",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-worker-pool/parallel-host.c": "0691d9bc23c1b2c574d7f0152eff0c83df45c0db8f56fb64f76807623e3c53a4",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-worker-pool/generated.py": "438c8f77e14613793c62caf88305476dc0b669b4fd7add515e5324c47c04ff4c",
+    "/Users/robert/Projects/neoclr/target/compiled-qualified-0/App.rvnproj": "f5428713989c2bf854ff67876ad8f921cb64c2ce539ed8054d5c98c427f7a418",
+    "/Users/robert/Projects/neoclr/runtime/codegen/src/gc_points.rs": "5de3e48104ed074593ae51bccb9cedcacca9697626fcba862b60063ee4067441",
+    "/Users/robert/Projects/neoclr/runtime/codegen/src/gc_probe.rs": "fd1239b5b59f2791d4e350bef1f90a3dc0cbe51a6c1242c968bcc9d1deba7af2",
+    "/Users/robert/Projects/neoclr/runtime/codegen/src/values.rs": "a8053c1558f0bdc59c4d5996cfdc0669c9401a799a8cb77d9bf6c0812e1ec0e9",
+    "/Users/robert/Projects/neoclr/runtime/codegen/src/fault_details.rs": "8bcf85e130fb218227b4be7eb3a0272835360aaa2a4760007e708d15946e1e01",
+    "/Users/robert/Projects/neoclr/runtime/codegen/src/lib.rs": "d2e562cf265b9329fe17e2ce310c2778d9f437f658fbd867860720af19e695cc",
+    "/Users/robert/Projects/neoclr/target/compiled-qualified-0/bin/neoclr/WorkerGenerated.dll": "c9f5a0246236abc6a5d954624dccc89ed255b5a3635ab58cc11a7dcd5169121c",
+    "/Users/robert/Projects/neoclr/target/compiled-qualified-0/command-2.stdout": "c582b547e632350a826dfe244f326f671bee21741275c46302369d05e5160bef",
+    "/Users/robert/Projects/neoclr/runtime/native/workers/compiled-workers.inc": "3e3ec411eddad7de7bf9a5504bc02cc547c8a2772d96fd77c1ab7034263e6564",
+    "/Users/robert/Projects/neoclr/runtime/native/gc/native-gc.c": "4b32ccd5390156b99d65929419101707580cf40b60fc65e5d869f0e69ad82514",
+    "/Users/robert/Projects/neoclr/runtime/native/gc/root-probe.h": "5c247269c702898e675439db37b1c8b62db7b44e0160c5043c89d93cd4c2881f",
+    "/Users/robert/Projects/neoclr/runtime/native/gc/root-probe.c": "502f5759999da02408f57a472e27dadac934a00bf994d5b0e46387ffb6d3e866",
+    "/Users/robert/Projects/neoclr/runtime/native/gc/native-gc.h": "eb230f6877c24dc6a5c0db7d1baa3d46b7f17d0140b3193885949e4b33eebc5b",
+    "/Users/robert/Projects/neoclr/runtime/native/memory/memory-views.h": "f9e0026287c2a7b20c50f80ac20845350a825c2b88c3cc5543a5fd2c2635a4db",
+    "/Users/robert/Projects/neoclr/runtime/native/memory/text-arena.c": "b6e7aff8a697bae03d5a2629e6aa019ef9f57e51ac371c4dfb26e7d884283716",
+    "/Users/robert/Projects/neoclr/runtime/native/memory/memory-views-test.c": "d3e9c18f20385a87d5388bfd6af76ae1e48a67cb1973542611061e7c4a8137de",
+    "/Users/robert/Projects/neoclr/runtime/native/memory/text-arena.h": "a42bce970cc9221acf124323003ab3cca9dc33fc5b472fec30979ff4c2d8d8dc",
+    "/Users/robert/Projects/neoclr/runtime/native/memory/static-storage-test.c": "4989e9c97e3b39e610e49b0325f33773924d3041094f9f5947fd8523c288167f",
+    "/Users/robert/Projects/neoclr/runtime/native/workers/http-workers.h": "3879c029beae54cc42f83846d0bdd3485c26458bb3d7d2e41189091b2973e9a6",
+    "/Users/robert/Projects/neoclr/runtime/native/workers/native-workers.h": "ce5e3dbfba49bcf9b1689688d66ed2b8011ba1349e509b50c3b079344b6a4d4a",
+    "/Users/robert/Projects/neoclr/runtime/native/workers/http-workers.c": "a059777a7cdcc6c20020b2b500afa098f9361882be095fe4fc58c62d7b0577cd",
+    "/Users/robert/Projects/neoclr/runtime/native/workers/native-workers.c": "dc442ed2b15134567f1ce0cbdad8931832f710c3a3f3b7aafc03147913b6133a",
+    "docs/experiments/native-worker-pool/compiled-parallel-validation.json": "c8d5479176dcae8fcea54816174d8c822bf703dfc20b8aa32b28b03d2cb59dca",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-worker-pool/compiled-measure.py": "7e8ff7304f4990a2184d418eafe3c5745c71c8c52d9d22c4b067faf05496738e",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-worker-pool/compiled-benchmark.c": "60927c282713dcf8599074db94085cbcdce135a17b0bbda400d5fcd79581e40c",
+    "/Users/robert/Projects/neoclr/target/compiled-qualified-0/code.o": "0e952691ac06eafe902d85489788851f990dbb58d4ef393ef79eecfa3a5c0274",
+    "/Users/robert/Projects/neoclr/target/compiled-worker-costs-separated/serial.o": "518921999dd542e80241ceef9f6ed082f6981f9f360df8afb862b45f0c9f4f4f",
+    "/Users/robert/Projects/neoclr/target/compiled-worker-costs-separated/serial": "c999438c24fd6b610dcbfc481c98e9203d6b343b311fb49b7f0c2bb10484db55",
+    "/Users/robert/Projects/neoclr/target/compiled-worker-costs-separated/serial-profile": "77b6bf75619ff2ba35471b972b30d715383fc1e451230ed7dcec9791ca255fdf",
+    "/Users/robert/Projects/neoclr/target/compiled-worker-costs-separated/parallel": "d07ee39ea057a3af0ece21b6e610ef030b6505df8768911908176defbb63c93d",
+    "/Users/robert/Projects/neoclr/target/compiled-worker-costs-separated/parallel-profile": "f9993798b4a1c7a03b4f8e438e1a3d0db5355884add68f5db6c3a170a32efd35"
+  },
+  "jobs": 4096,
+  "warmupJobs": 16,
+  "heapBytes": 32768,
+  "scope": "Fixed graph work, 16 queue slots, identical heap. Diagnostic timings are separate from uninstrumented timings. No HTTP throughput claim.",
+  "runtimeRelinkChanges": {
+    "/Users/robert/Projects/neoclr/runtime/native/workers/compiled-workers.inc": {
+      "previous": "1549daf48c425d51ee0834a433d749784e859b951a486c4b0f40d926eef83286",
+      "current": "3e3ec411eddad7de7bf9a5504bc02cc547c8a2772d96fd77c1ab7034263e6564"
+    },
+    "/Users/robert/Projects/neoclr/runtime/native/workers/native-workers.c": {
+      "previous": "9cfd273a32b54ac1e5c8aa83c4c63b987cc37c56cd55a95bf21005a95b4d7b96",
+      "current": "dc442ed2b15134567f1ce0cbdad8931832f710c3a3f3b7aafc03147913b6133a"
+    }
+  },
+  "retention": {
+    "fullLocalReport": "/Users/robert/Projects/neoclr/target/compiled-worker-costs-separated/measurement.json",
+    "sha256": "bea8905fb26e0a638b56f201b396e82e8d3f85fae854f413ef03104870af535d",
+    "meaning": "Large compiler stdout replaced by byte count and digest; timings and runtime outputs unchanged."
+  }
+}

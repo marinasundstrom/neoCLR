@@ -6254,3 +6254,14 @@ retain aliases/cycles and detached locals across 24,544 collections, isolate fau
 and reclaim after cancellation. Allocation/native helpers remain serialized;
 shared async Task/HTTP ownership and throughput qualification remain open.
 See [scope and evidence](experiments/native-worker-pool/README.md#concurrent-compiled-shared-heap--2026-10-23).
+
+
+Coordination-cost follow-up (2026-10-23): isolated HTTP again scales from roughly
+417–443 requests/s (one owner) to 1,525–1,584 (four), with saturated closed-loop p99
+latency falling from 90–105 ms to 31–32 ms. A separate fixed-work compiled test
+finds high shared-heap scheduling overhead. Separating safepoint notifications
+from job-completion waiters reduces four-worker mean elapsed time about 47% in
+two local trials without changing allocation/collection counts. Native and compiled
+GC stress regressions pass. The concurrent graph path remains slower than exclusive
+execution; lower-cost safepoints and pacing precede shared async HTTP migration.
+See [cost evidence](experiments/native-worker-pool/README.md#coordination-cost-and-completion-wakeups--2026-10-23).

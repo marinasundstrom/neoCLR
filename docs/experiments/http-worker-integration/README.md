@@ -97,3 +97,40 @@ Build summaries preserve inputs, artifact identities and command metadata, repla
 large compiler stdout with its digest/byte count; full reports remain at the local
 paths recorded in those summaries. No managed public API changed, so no API
 reference signature refresh is required.
+
+## Throughput and latency follow-up — 2026-10-23
+
+The [new measurement](latency-measurement.json) relinks the retained application
+object against current native runtime sources, preserving the original generated
+code and recording every changed native input digest. Use
+`measure.py --build BUILD_JSON --relink-current-runtime --output FRESH` to
+reproduce; changes outside `runtime/native` still fail input verification.
+This is an explicitly paced-GC experiment, not a default policy change.
+
+| Owners | Requests/s, two trials | p50 latency, ms | p99 latency, ms |
+| --- | --- | --- | --- |
+| 1 | 417.2, 442.5 | 75.79, 69.27 | 90.08, 105.27 |
+| 2 | 846.3, 802.7 | 35.67, 37.97 | 54.03, 69.56 |
+| 4 | 1525.3, 1584.3 | 19.87, 19.13 | 31.07, 32.18 |
+
+The six trials run in order 1/2/4/4/2/1, with 32 closed-loop clients, one second
+warmup and six measured seconds. Latency runs from connection establishment to
+complete response body and includes only completions inside the window; drained
+responses are counted separately. All bodies and owner identities are checked,
+and each process exits cleanly. Closed-loop saturation latency omits requests
+that an open-loop source might have offered while clients wait; these percentiles
+are not an offered-load SLA or directly comparable to the earlier 400/s probe.
+
+Whole-process CPU time is 7.00–7.03 seconds for one owner, 13.56–13.89 for two,
+and 26.79–27.05 for four, including startup, warmup, drain and shutdown.
+These trials again support isolated-owner scaling, approximately 3.4–3.8 times
+one-owner throughput at four owners. They do not establish a regression against
+earlier desktop timings, all-allocator counts, external-server parity, or a
+shared-heap speedup. Heap capacity and Serve lane count still grow with owners.
+
+Reuse the separate [allocation/caller evidence](../../../benchmarks/http-server/serve/investigation-20261023/README.md)
+for its measured workload: 216 managed allocations and 15,869 payload bytes per
+additional request. That workload differs from this owner-identity response, so
+those counts must not be presented as newly measured here. Shared compiler
+coordination costs are measured separately in the
+[compiled worker experiment](../native-worker-pool/README.md).

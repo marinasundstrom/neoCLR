@@ -572,3 +572,81 @@ d4d99ab3e sources ([baseline evidence](compiled-record-baseline.json)).
 The [private-context regression](compiled-private-validation.json) also passes
 640 invocations per optimized/UBSan build. The serialized fixture additionally
 verifies that the concurrent profile rejects its type initializer.
+
+## Coordination cost and completion wakeups — 2026-10-23
+
+The author asked whether concurrency work still serves efficient HTTP primitives.
+The follow-up measures existing isolated HTTP separately from shared-heap
+coordination, then fixes one measured source of unnecessary work. This reuses the
+CLR cooperation comparison above; it does not introduce a new language contract.
+
+`compiled-measure.py` compares the same `Parallel.rvn` graph workload, compiled
+with ordinary safepoints for the exclusive adapter and worker safepoints for the
+concurrent adapter. All use a 32 KiB heap, 16 queue slots, 16 warmup callbacks and
+4,096 measured callbacks, with loop bound 40. The same graph checks execute on
+every callback and final collection must reclaim the heap. The trial order is
+serial/parallel-1/parallel-2/parallel-4 and reverse; compilation finishes first.
+Timing excludes pool/bootstrap setup and final teardown but includes queue
+submission, completion waits and take. The C benchmark checks every outcome.
+
+[Before](compiled-costs-before.json) and [after](compiled-costs-after.json) contain
+wall/process-CPU time, allocation/collection counts, OS-reported context switches,
+source identities and exact commands. Large compiler output is retained locally,
+with byte count/digest in the checked-in summaries. GC timer/payload accounting runs separately;
+unprofiled zero timer/byte fields mean instrumentation disabled, not zero work.
+
+| Mode | Before wall seconds, two trials | After wall seconds, two trials |
+| --- | --- | --- |
+| Exclusive adapter, one worker | 1.175, 1.114 | 1.134, 1.105 |
+| Concurrent adapter, one worker | 3.517, 3.659 | 2.924, 2.916 |
+| Concurrent adapter, two workers | 5.344, 6.005 | 3.856, 4.584 |
+| Concurrent adapter, four workers | 18.040, 15.784 | 9.863, 8.187 |
+
+The coordinator formerly broadcast the job-completion condition at every
+instruction boundary. That repeatedly woke the owner waiting for completed jobs.
+A separate compiler-participant condition now handles these safepoints; actual
+completion and participant teardown still notify owner/native-phase waiters.
+Initialization-failure cleanup and joined destruction own the extra condition.
+The change is confined to `NEOCLR_WORKER_GC`; default HTTP/runtime builds are
+unchanged. There is no compiler encoding, ABI layout or public managed API change.
+
+Four-worker mean wall time falls about 47% in these local trials, and CPU time
+falls from 32.59–37.75 to 14.18–17.27 seconds. OS-reported involuntary context
+switches fall from 6.12–6.92 million to 3.13–3.68 million. One-worker switches
+fall from 273,107–313,348 to 12,546–12,936. These are process counters, not exact
+attribution of every switch to a condition wait, and two desktop trials are not
+a stable performance guarantee.
+
+All runs perform 499,712 managed allocations (122/callback). Profiled runs
+record 10,682,368 payload bytes (2,608/callback), excluding allocator headers,
+C allocations and stacks. Concurrent runs perform 3,141,632 collections
+(767/callback), versus 3,137,536 for the exclusive adapter. Counts remain
+unchanged by the wakeup fix. This is intentionally aggressive GC qualification,
+not a proposed production collection policy or an HTTP allocation measurement.
+
+Separate profiled runs record about 0.98 seconds inside the collector for the
+exclusive adapter, 0.94 for concurrent-one and 1.86 for concurrent-four after
+the fix. Concurrent-four takes 8.40 seconds wall time in that diagnostic run.
+The collector timer excludes waiting to acquire the coordinator and does not
+measure all root publication/scheduling overhead; these durations are not an
+additive breakdown of process CPU.
+
+The critical finding remains: four concurrent workers are still much slower than
+the exclusive adapter for this small allocation-heavy workload. Adding threads
+alone does not fix throughput. The next bounded shared-heap task should reduce
+per-instruction synchronization/root publication and evaluate GC pacing while
+retaining the forced-collection correctness mode. Shared async HTTP migration
+should follow evidence that the coordinator can support useful work efficiently,
+not precede it. The [isolated HTTP result](../http-worker-integration/README.md#throughput-and-latency-follow-up--2026-10-23)
+continues to demonstrate a separate working multicore server path.
+
+Validation: all eleven native groups pass in optimized/UBSan builds with the
+[coordinator enabled](wakeup-native-validation.json) and
+[default configuration](wakeup-default-validation.json). The
+[compiled shared-heap stress fixture](wakeup-compiled-validation.json) retains
+four participants, graph identity, fault diagnostics, cancellation and complete
+reclamation in both builds. Successful TSan qualification remains open.
+Reproduce the cost experiment with `compiled-measure.py --validation
+compiled-parallel-validation.json --relink-current-runtime --output FRESH`;
+the explicit relink option admits changed native runtime sources only, records
+both digests and verifies all other retained inputs.

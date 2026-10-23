@@ -4,6 +4,7 @@ import argparse
 import asyncio
 import hashlib
 import json
+import math
 from pathlib import Path
 import queue
 import re
@@ -16,21 +17,31 @@ import time
 p = argparse.ArgumentParser(description=__doc__)
 p.add_argument('--build', type=Path, required=True)
 p.add_argument('--output', type=Path, required=True)
+p.add_argument('--relink-current-runtime', action='store_true', help='Allow changed runtime/native sources only; record original and current digests')
 p.add_argument('--seconds', type=float, default=6)
 a = p.parse_args()
 out = a.output.resolve(); out.mkdir(parents=True, exist_ok=False)
 build = json.loads(a.build.read_text()); assert build['passed']
 recipe = next(c['command'] for c in build['commands'] if c.get('phase') == 'host-compile-link')
 report = dict(passed=False, build=str(a.build.resolve()), buildSha256=hashlib.sha256(a.build.read_bytes()).hexdigest(), commands=[], trials=[], inputs=build['inputs'], gc='explicit NEOCLR_GC_PACED; synchronous collector per worker', concurrency=32, windowSeconds=a.seconds, heapBytesPerWorker=build['httpHeapBytes'])
-for path,digest in report['inputs'].items():
-    assert hashlib.sha256(Path(path).read_bytes()).hexdigest() == digest, path
+report['runtimeRelinkChanges'] = {}
+runtime = Path(__file__).resolve().parents[3]/'runtime/native'
+for path,digest in list(report['inputs'].items()):
+    current = hashlib.sha256(Path(path).read_bytes()).hexdigest()
+    if current != digest:
+        assert a.relink_current_runtime and runtime in Path(path).parents, path
+        report['runtimeRelinkChanges'][path] = dict(previous=digest, current=current)
+        report['inputs'][path] = current
+report['inputs'][str(Path(__file__).resolve())] = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
 
 async def load(port, controls, seconds):
+    latencies = []
     stop = time.monotonic() + seconds
     owners = {str(x):0 for x in controls}; completed = drained = 0
     async def lane():
         nonlocal completed, drained
         while time.monotonic() < stop:
+            began = time.monotonic()
             reader, writer = await asyncio.wait_for(asyncio.open_connection('127.0.0.1',port), 10)
             try:
                 writer.write(b'GET / HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n')
@@ -40,13 +51,20 @@ async def load(port, controls, seconds):
                 length = int(re.search(rb'content-length:\s*(\d+)',head,re.I)[1])
                 body = await asyncio.wait_for(reader.readexactly(length),10)
                 assert int(body) in controls, body
-                if time.monotonic() <= stop: completed += 1
+                if time.monotonic() <= stop:
+                    completed += 1
+                    latencies.append((time.monotonic() - began) * 1000)
                 else: drained += 1
                 owners[body.decode()] += 1
             finally:
                 writer.close(); await writer.wait_closed()
     await asyncio.gather(*(lane() for _ in range(32)))
-    return dict(completedInWindow=completed, drainResponses=drained, requestsPerSecond=completed/seconds, ownerResponses=owners)
+    latencies.sort()
+    def percentile(q):
+        return latencies[min(len(latencies)-1, max(0, math.ceil(len(latencies)*q)-1))] if latencies else None
+    return dict(latencyMilliseconds=dict(p50=percentile(.50), p95=percentile(.95), p99=percentile(.99)),
+                latencyScope='Completed inside window, connection establishment through full body; closed-loop load',
+                completedInWindow=completed, drainResponses=drained, requestsPerSecond=completed/seconds, ownerResponses=owners)
 
 try:
     for workers in [1,2,4]:
