@@ -17,6 +17,37 @@ int main(int argc, char **argv) {
     neoclr_probe_storage slot = {&word, 8, 0};
     neoclr_probe_frame parent, child;
     neoclr_probe_enter_v3(&parent, &outer, 0, &slot, 1, "{}", 2);
+    if (!strncmp(argv[1], "context-", 8)) {
+        const char *plan = "{\"requiredSpillLanes\":[]}";
+        neoclr_probe_enter_v3(&child, &outer, 1, &slot, 0, "{}", 2);
+        neoclr_probe_stack_roots_v2(&child, 0, lanes, 0, plan, (uint32_t)strlen(plan));
+        if (!strcmp(argv[1], "context-mutated")) {
+            outer.fault.code = 3;
+            outer.fault.frame_count = 65;
+        } else if (!strcmp(argv[1], "context-null")) child.context = NULL;
+        else if (!strcmp(argv[1], "context-ancestor-null")) parent.context = NULL;
+        else if (!strcmp(argv[1], "context-valid")) {
+            /* Inactive fault fields are ignored; the largest active fault has
+             * 65 roots, and enumeration remains independent of validation. */
+            outer.fault.frame_count = 65;
+            neoclr_probe_stack_roots_v2(&child, 0, lanes, 0, plan, (uint32_t)strlen(plan));
+            outer.fault.code = 3;
+            outer.fault.frame_count = 64;
+            neoclr_probe_storage roots[65];
+            if (neoclr_probe_fault_roots_v1(&outer, roots, 65) != 65 ||
+                neoclr_probe_fault_roots_v1(&outer, roots, 64) != -1) return 3;
+            if (roots[0].address != &outer.fault.message) return 4;
+            for (uint32_t i = 0; i < 64; i++)
+                if (roots[i + 1].address != &outer.fault.frames[i].function ||
+                    roots[i + 1].read_bytes != 8 || roots[i + 1].flags) return 5;
+            neoclr_probe_stack_roots_v2(&child, 0, lanes, 0, plan, (uint32_t)strlen(plan));
+            neoclr_probe_leave_v1(&child);
+            neoclr_probe_leave_v1(&parent);
+            return 0;
+        } else return 2;
+        neoclr_probe_stack_roots_v2(&child, 0, lanes, 0, plan, (uint32_t)strlen(plan));
+        return 0;
+    }
     if (!strncmp(argv[1], "batch-", 6)) {
         uint64_t words[33] = {0};
         neoclr_probe_storage slots[33];

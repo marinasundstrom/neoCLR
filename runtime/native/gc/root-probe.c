@@ -19,10 +19,16 @@ int32_t neoclr_probe_fault_roots_v1(const void *context, neoclr_probe_storage *o
     return (int32_t)(1 + fault->frame_count);
 }
 static void observe_fault(const void *context) {
+#ifdef NEOCLR_NATIVE_GC
+    /* Collection enumerates fault roots separately. Publication only needs the
+     * current fault shape, not a temporary array of root descriptors. */
+    if (!context) abort();
+    const neoclr_aot_fault *fault = context;
+    if (fault->code && fault->frame_count > 64) abort();
+#else
     neoclr_probe_storage slots[65];
     int32_t count = neoclr_probe_fault_roots_v1(context, slots, 65);
     if (count < 0) abort();
-#ifndef NEOCLR_NATIVE_GC
     volatile uint64_t observed = 0;
     for (int32_t i = 0; i < count; i++) {
         uint64_t word;
@@ -101,13 +107,20 @@ void neoclr_probe_stack_roots_v2(neoclr_probe_frame *frame, uint32_t instruction
      * fault validation here, but reserve volatile observation for probe-only builds. */
 #ifndef NEOCLR_NATIVE_GC
     volatile uint64_t value = 0;
+#else
+    const void *previous_context = NULL;
 #endif
     for (const neoclr_probe_frame *f = head; f; f = f->previous) {
-        observe_fault(f->context);
 #ifdef NEOCLR_NATIVE_GC
+        /* No guest code or collection runs during this scan. Consecutive frames
+         * may share a context; validate it once within this publication only.
+         * Always reject NULL, including a corrupted first frame. */
+        if (!f->context || f->context != previous_context) observe_fault(f->context);
+        previous_context = f->context;
         validate_storage(f->storage, f->storage_count, 1);
         validate_storage(f->transient, f->transient_count, 0);
 #else
+        observe_fault(f->context);
         for (uint32_t i = 0; i < f->storage_count; i++) {
             const neoclr_probe_storage *s = &f->storage[i];
             if (!s->address || (s->read_bytes != 4 && s->read_bytes != 8) || s->flags > 2) abort();

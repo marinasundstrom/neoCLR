@@ -6347,3 +6347,14 @@ forced-GC HTTP and shared-worker regression. Short trials show no clear one-owne
 gain and modest, overlapping four-owner results; this is not a new capacity claim.
 Root metadata publication remains open work. See
 [evidence](../benchmarks/http-server/primitive-comparison/storage-zero/README.md).
+
+
+Root-publication follow-up (2026-10-23): native GC fault validation now checks
+current fault shape without materializing unused root descriptors and shares that
+check across consecutive same-context frames within one synchronous publication.
+Mutable storage/transient descriptors remain fully checked. Changed/NULL-context
+and maximum-fault regressions, forced-GC HTTP and shared-worker stress pass.
+Short paired one/four-owner means improve throughput 6.3%/10.7% and CPU/response
+4.1%/5.7%, with roughly 10% baseline drift limiting precision. Image-owned root
+metadata and publication frequency remain open; see
+[evidence](../benchmarks/http-server/primitive-comparison/fault-validation/README.md).
