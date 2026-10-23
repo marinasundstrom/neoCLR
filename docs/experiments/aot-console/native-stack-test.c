@@ -26,6 +26,15 @@ static void *worker(void *data) {
     assert(neoclr_native_stack_check_v1() == 0);
     return NULL;
 }
+static void *retained_worker(void *data) {
+    pthread_t thread = pthread_self();
+    uintptr_t upper = (uintptr_t)pthread_get_stackaddr_np(thread);
+    neoclr_native_stack_bounds_v1(upper - pthread_get_stacksize_np(thread), upper);
+    worker(data);
+    neoclr_native_stack_bounds_v1(0, 0);
+    assert(neoclr_native_stack_check_v1() == 0);
+    return NULL;
+}
 static void *small_worker(void *data) {
     (void)data;
     assert(neoclr_native_stack_check_v1() == 9);
@@ -37,6 +46,7 @@ int main(void) {
     assert(neoclr_native_stack_check_v1() == 9);
     neoclr_native_stack_bounds_v1(0, 0);
     assert(neoclr_native_stack_check_v1() == 0);
+    neoclr_native_stack_bounds_v1(1, 2); /* Other threads must not inherit these bounds. */
     unsigned depth = 0;
     pthread_attr_t attr;
     pthread_t thread;
@@ -45,10 +55,14 @@ int main(void) {
     assert(pthread_create(&thread, &attr, worker, &depth) == 0);
     assert(pthread_join(thread, NULL) == 0);
     assert(depth > 1);
+    assert(pthread_create(&thread, &attr, retained_worker, &depth) == 0);
+    assert(pthread_join(thread, NULL) == 0);
     assert(pthread_attr_setstacksize(&attr, 128 * 1024) == 0);
     assert(pthread_create(&thread, &attr, small_worker, NULL) == 0);
     assert(pthread_join(thread, NULL) == 0);
     assert(pthread_attr_destroy(&attr) == 0);
+    assert(neoclr_native_stack_check_v1() == 9);
+    neoclr_native_stack_bounds_v1(0, 0);
     assert(neoclr_native_stack_check_v1() == 0);
     puts("native stack boundary and unwind passed");
 }

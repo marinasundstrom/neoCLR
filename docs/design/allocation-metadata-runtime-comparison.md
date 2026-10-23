@@ -328,3 +328,17 @@ threaded owners, shared-worker regressions and forced-GC HTTP pass. Mean one/fou
 throughput rises 21.7%/18.7%, with 17.9%/16.1% lower CPU/response in short paired desktop
 trials. No public API or semantic divergence from the existing contract is introduced.
 See [implementation and evidence](../../benchmarks/http-server/primitive-comparison/free-index/README.md).
+
+
+### Post-index profile and rejected shortcuts — 2026-10-23
+
+Fresh source-matched profiling puts root publication, TLS and metadata validation
+above allocation search. A direct compact-plan marker-prefix check regresses the
+one-owner HTTP case; combining retained stack bounds reduces ARM64 TLS resolution
+sites but does not improve end-to-end results reliably. Revert both and retain all
+16 capacity trials. Strengthened mutable-plan and stack lifetime/isolation tests pass
+on restored code. This supports retaining explicit validation contracts while
+investigating larger reductions in publication frequency or image-owned typed maps,
+rather than caching validity by pointer. Reuse the CLR metadata/effect-analysis
+comparisons above; no immutable image contract is implemented by these experiments.
+See [full evidence](../../benchmarks/http-server/primitive-comparison/stack-bounds/README.md).

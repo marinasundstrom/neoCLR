@@ -88,7 +88,7 @@ def main():
         for gc in [False, True]:
             name = 'root-validation-' + ('gc' if gc else 'probe')
             binary = build(name, 'root-validation-test', gc=gc)
-            for case in ['address', 'width', 'flags', 'fault', 'transient', 'plan-missing', 'plan-length', 'plan-short', 'batch-address', 'batch-width', 'batch-flags', 'batch-transient', 'context-mutated', 'context-null', 'context-ancestor-null']:
+            for case in ['address', 'width', 'flags', 'fault', 'transient', 'plan-missing', 'plan-hint-missing', 'plan-length', 'plan-short', 'batch-address', 'batch-width', 'batch-flags', 'batch-transient', 'context-mutated', 'context-null', 'context-ancestor-null']:
                 run(name + '-' + case, [binary, case], 3 if windows else -signal.SIGABRT)
             run(name + '-plan-moved', [binary, 'plan-moved'])
             run(name + '-batch-valid', [binary, 'batch-valid'])

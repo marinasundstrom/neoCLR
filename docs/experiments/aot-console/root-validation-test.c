@@ -177,9 +177,14 @@ int main(int argc, char **argv) {
     }
     if (!strncmp(argv[1], "plan-", 5)) {
         char plan[128] = "{\"requiredSpillLanes\":[]}";
-        /* Warm the search hint, then reuse the same address with changed bytes. */
+        /* Accept the prefix, then reuse the same address with changed bytes. */
         neoclr_probe_stack_roots_v2(&parent, 0, lanes, 0, plan, (uint32_t)strlen(plan));
         if (!strcmp(argv[1], "plan-missing")) plan[2] = 'X';
+        else if (!strcmp(argv[1], "plan-hint-missing")) {
+            strcpy(plan, "{\"other\":0,\"requiredSpillLanes\":[]}");
+            neoclr_probe_stack_roots_v2(&parent, 0, lanes, 0, plan, (uint32_t)strlen(plan));
+            plan[12] = 'X'; /* Invalidate the warmed non-prefix search hint. */
+        }
         else if (!strcmp(argv[1], "plan-length")) {
             neoclr_probe_stack_roots_v2(&parent, 0, lanes, 0, plan, (uint32_t)strlen(plan) - 1);
             return 0;

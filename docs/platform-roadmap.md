@@ -6485,3 +6485,13 @@ Desktop drift and variable tails limit precision. This completes the bounded
 free-space-index follow-up above; ThinLTO qualification, publication reduction and
 survival/barrier evaluation remain open. See
 [implementation and retained evidence](../benchmarks/http-server/primitive-comparison/free-index/README.md).
+
+
+Post-index profiling and bounded experiments (2026-10-23): source-matched worker
+samples now emphasize root publication/TLS/metadata over allocation search. Sixteen
+paired trials do not justify marker-prefix validation or grouped stack bounds; both
+are reverted. Retained regression tests cover stack-bound isolation/unwind/reset and
+mutable non-prefix marker hints. Keep compiler-verified publication reduction,
+explicit image-owned metadata contracts and native ThinLTO qualification as follow-ups;
+do not infer a new GC/threading direction from these negative experiments. See
+[profiles, rejected candidates and evidence](../benchmarks/http-server/primitive-comparison/stack-bounds/README.md).
