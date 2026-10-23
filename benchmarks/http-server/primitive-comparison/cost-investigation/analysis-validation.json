@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "tests": 7,
+  "command": [
+    "python3",
+    "benchmarks/http-server/primitive-comparison/stack-profile/test_analyze.py"
+  ],
+  "inputs": {
+    "benchmarks/http-server/primitive-comparison/stack-profile/analyze.py": "8d87f4e5fb6944dec98026edce3346e7dfee2bbd821fb20afe4b3a5bd58acfa9",
+    "benchmarks/http-server/primitive-comparison/stack-profile/test_analyze.py": "88d2c87838f51a24b53fb87a66f66d626685bd5e153e704811a938c4087475f0"
+  },
+  "evidenceReuse": "Existing seven parser tests reused: analyzer/test source hashes unchanged; fresh capture independently analyzed and reconciled."
+}

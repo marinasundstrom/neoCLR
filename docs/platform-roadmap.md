@@ -6461,3 +6461,15 @@ native lifecycle runs, 40 compiled-consumer invocations and eight forced-GC HTTP
 responses pass. Windows and published packages are unchanged. Remaining platform
 coverage does not prevent this macOS-only selection; shared-heap async remains open.
 See [integration evidence](../benchmarks/http-server/primitive-comparison/context-reuse/README.md#macos-default-integration--2026-10-23).
+
+
+Post-integration cost investigation (2026-10-23, author-directed): fresh profiling and
+28 capacity trials identify repeated allocation search (about 195 headers/allocation)
+and root/TLS/metadata work. ThinLTO is a qualified-consumer follow-up candidate; an
+append-first ablation raises arena extent and larger GC budgets worsen search cost.
+No candidate changes production defaults. Next bounded performance work should
+address owned-heap free-space indexing and native build qualification, followed by
+compiler-verified publication reduction. The author asks whether generations remain
+an option: yes, with survival/store-barrier evaluation; this does not supersede the
+existing concurrent-GC direction or select a moving collector. See
+[investigation, alternatives and evidence](../benchmarks/http-server/primitive-comparison/cost-investigation/README.md).

@@ -22117,3 +22117,26 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   consumer and forced-GC HTTP checks pass; Windows and published packages remain
   unchanged. Shared-heap async and comparable-server throughput remain open.
   [Default integration](../benchmarks/http-server/primitive-comparison/context-reuse/README.md#macos-default-integration--2026-10-23).
+
+
+### 2026-10-23 — Remaining HTTP costs and the generational-GC question
+
+- Author request: “Run a thorough investigation on what can be changed to improve more”.
+- Assistant action: capture and attribute a fresh four-owner profile, screen native
+  compiler/GC-budget options, measure allocation search, and compare ThinLTO and an
+  append-first allocator ablation against the current default. All 28 capacity trials
+  pass wire/exit checks; later screening baseline drift is retained and limits claims.
+- Findings: the default scans about 195 block headers/allocation. Fourfold GC budgets
+  reduce collection work but increase search to about 326; append-first reduces it to
+  about 64 while filling the 1 MiB arena. ThinLTO confirmation shows modest throughput/
+  CPU gains, with 40 compiled async invocations passing. No candidate is integrated.
+- Author follow-up: “Is generational GC still on the table?” Assistant response: yes;
+  a nursery could address allocation and tracing work, but requires survival evidence,
+  reference-store barriers and validation of native/borrowed/worker references.
+- Assistant proposal: prioritize indexed allocation and publication reduction while
+  retaining generational evaluation alongside the previously directed concurrent-GC
+  work. Nonmoving generations and relocation are separate choices; the author has
+  not selected a design or changed implementation order in this exchange.
+- Open work: allocator/metadata implementation and qualification, ThinLTO normal-build
+  integration, lifetime histograms, store audit, and comparable-server throughput.
+  [Full evidence and research](../benchmarks/http-server/primitive-comparison/cost-investigation/README.md).

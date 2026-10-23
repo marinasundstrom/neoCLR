@@ -298,3 +298,17 @@ compiled-consumer and forced-GC HTTP checks pass. This is a platform-specific po
 selection, not a new .NET semantic divergence or cross-platform qualification. The
 retention costs and representation tradeoffs above still apply. Windows remains on
 its existing carrier. Historical opt-in reports remain historical evidence.
+
+
+### Broader post-integration investigation — 2026-10-23
+
+Fresh stack attribution, allocation-search counters and 28 paired capacity trials
+identify costly repeated first-fit search and continued publication/TLS metadata work.
+An owned-heap free-space index is the leading allocator follow-up; ThinLTO has a
+modest confirmed benefit and compiled-consumer checks. Larger GC budgets and blind
+append-first allocation expose tracing/search/memory tradeoffs, not defaults to adopt.
+The author's generational-GC question remains an open design track alongside the
+existing concurrent-GC direction. Compare nonmoving generations and copying nurseries
+with explicit barrier/relocation prerequisites; measure survival first. Full results,
+primary-source comparisons, failed/variable screening evidence and priorities are in
+[the cost investigation](../../benchmarks/http-server/primitive-comparison/cost-investigation/README.md).

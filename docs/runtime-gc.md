@@ -245,3 +245,19 @@ objects. The native test was compiled directly against the built library while a
 unrelated Cargo check held the artifact lock; the redundant waiting Cargo retry was
 cancelled. An existing Task-completion consumer also passes actual native JIT with
 explicit selection. This validates selection, not a new collection algorithm.
+
+
+## HTTP allocation/collection investigation — 2026-10-23
+
+The author asks whether generational GC is still on the table. It remains an
+exploratory architecture option, not a selected implementation or a cancellation
+of the concurrent-GC work. Current HTTP diagnostics find about 195 block-header
+visits per allocation and 3.6 collections/request. Increasing collection budgets
+reduces GC time but increases allocation search; appending first reduces search but
+fills the fixed arena and increases collection work. These costs motivate allocation
+indexing and survival/barrier measurement rather than choosing generations on
+allocation count alone. Existing native stable-address contracts favor comparing a
+nonmoving young/old prototype before assuming a copying nursery is safe. All execution
+modes, native reference writes, bulk/value copies and worker coordination remain
+part of the barrier audit. No generation API or new collector is implemented.
+See [measurements and staged evaluation](../benchmarks/http-server/primitive-comparison/cost-investigation/README.md#generational-gc-remains-an-option).

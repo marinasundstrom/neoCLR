@@ -1,0 +1,9 @@
+{
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "machine": "arm64",
+  "revision": "0675a8cf30f1ca53fe6be0b3a7efc3806779c4c3",
+  "physicalCpus": 8,
+  "logicalCpus": 8,
+  "memoryBytes": 17179869184,
+  "note": "Short workstation measurements; OS and desktop activity uncontrolled. No concurrent agent builds/tests during capacity windows."
+}
