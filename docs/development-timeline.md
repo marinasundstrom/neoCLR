@@ -22073,3 +22073,15 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
 - Outcome: recorded a staged proposal and validation requirements. No monitoring
   API, event transport, default policy or implementation approval is inferred.
   See [design proposal](design/allocation-metadata-runtime-comparison.md#standard-runtime-diagnostics-proposal--2026-10-23).
+
+- Subsequent author direction: “Continue”; then explains that the diagnostics should
+  help understand costs and improvements both generally and for HTTP Server targets.
+- Assistant action: implemented private versioned snapshots of existing owner-thread
+  counters, checked delta/merge operations and an opt-in HTTP post-join reporter.
+  Kept live cross-thread collection and non-additive heap gauges out of this slice.
+- Outcome: eight optimized/sanitized configurations and seven HTTP runs pass. Disabled
+  worker code remains byte-identical. Basic monitoring's short paired means are
+  +0.22% CPU/response and -2.84% throughput, with variation limiting conclusions.
+  Runtime-wide execution/wait attribution remains the next diagnostic need; these
+  counts do not establish a cause for the Kestrel gap or a throughput improvement.
+  [Implementation and evidence](../benchmarks/http-server/primitive-comparison/runtime-snapshot/README.md).

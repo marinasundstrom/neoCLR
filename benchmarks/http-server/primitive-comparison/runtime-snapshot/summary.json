@@ -1,0 +1,14 @@
+{
+  "off": {
+    "requestsPerSecond": 4935.0,
+    "cpuMicrosecondsPerResponse": 753.9052811162583
+  },
+  "basic": {
+    "requestsPerSecond": 4794.875,
+    "cpuMicrosecondsPerResponse": 755.555749543629
+  },
+  "timed": {
+    "requestsPerSecond": 4847.625,
+    "cpuMicrosecondsPerResponse": 763.412427460856
+  }
+}

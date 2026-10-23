@@ -225,3 +225,27 @@ results. Compare disabled and enabled CPU/request, throughput and memory against
 the same plain-text fixture; do not select an arbitrary overhead budget or claim
 zero cost before measuring. Native/public API exposure and tooling command names
 remain undecided; any public surface requires matching reference documentation.
+
+### First implemented slice — 2026-10-23
+
+Private `runtime/native/diagnostics/snapshot.h` now provides versioned owner-thread
+cumulative counters, availability, checked interval subtraction and checked merging.
+HTTP's opt-in snapshot build captures before/after each isolated application
+invocation and merges copies on the coordinator only after workers join. Export
+retains individual intervals and marks unavailable metrics null. This is a bounded
+counter foundation analogous to the role of .NET runtime metrics, not EventPipe
+transport/API compatibility. It adds no generated-code instrumentation or managed
+wrappers and does not change the compiler bridge.
+
+Scope is intentionally narrower than the proposal: no live cross-thread collector,
+shared-heap aggregate, heap gauges, queue timings, pause histograms or CPU sampler.
+Peak values are not summed. Counters have no guaranteed owner identity in the data;
+callers must preserve ownership/reset constraints. HTTP's isolated invocation
+adapter establishes those constraints; general shared-heap hosts remain unqualified.
+
+Eight optimized/sanitized source configurations and seven HTTP measurement/smoke
+runs pass. The disabled worker object is byte-identical to its prior source.
+Basic snapshots show +0.22% mean CPU/response and -2.84% throughput in short paired
+four-owner trials; variation prevents a precise overhead conclusion. GC timers
+remain separately opt-in. No faster-server claim follows from these diagnostics.
+See [contracts, measurements and limitations](../../benchmarks/http-server/primitive-comparison/runtime-snapshot/README.md).

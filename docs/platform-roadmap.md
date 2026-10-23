@@ -6419,3 +6419,12 @@ aggregate existing scoped counters, add bounded event timelines, and enable CPU
 sampling with generated-code identities. This does not replace the HTTP throughput
 priority or commit to an EventPipe clone/public API. See the
 [proposal and validation requirements](design/allocation-metadata-runtime-comparison.md#standard-runtime-diagnostics-proposal--2026-10-23).
+
+Runtime snapshot foundation (2026-10-23): implement private versioned owner-thread
+counters and checked interval/aggregate arithmetic, with optional post-join reporting
+for isolated HTTP invocations. Eight optimized/sanitized configurations and seven
+HTTP runs pass; disabled worker code is byte-identical. Short overhead trials remain
+inconclusive for small costs. This completes the bounded counter foundation, not
+live monitoring, shared-heap aggregation, queue timing or CPU attribution. Keep those
+separate from the unchanged throughput target. See
+[implementation evidence](../benchmarks/http-server/primitive-comparison/runtime-snapshot/README.md).

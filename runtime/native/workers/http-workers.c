@@ -6,6 +6,11 @@
 #include <stdatomic.h>
 #include <stdlib.h>
 #include <errno.h>
+#ifdef NEOCLR_RUNTIME_SNAPSHOT
+#include "../diagnostics/snapshot.h"
+/* Host sink runs once on the coordinator, after every worker has joined. */
+extern void neoclr_http_workers_snapshot_v1(const neoclr_runtime_snapshot *, const int *, unsigned);
+#endif
 typedef struct {
     pthread_mutex_t gate;
     atomic_int stopping;
@@ -13,6 +18,11 @@ typedef struct {
     uint32_t address;
     int (*entry)(void *);
     void *state;
+#ifdef NEOCLR_RUNTIME_SNAPSHOT
+    unsigned started;
+    neoclr_runtime_snapshot snapshots[4];
+    int snapshot_valid[4];
+#endif
     unsigned completed;
     int failed;
 } group;
@@ -61,7 +71,17 @@ static int application(neoclr_worker_job *job, void *state) {
     group *g = state;
     if (current) abort();
     current = g; primary_pending = 1;
+#ifdef NEOCLR_RUNTIME_SNAPSHOT
+    if (pthread_mutex_lock(&g->gate)) abort();
+    unsigned slot = g->started++;
+    if (pthread_mutex_unlock(&g->gate)) abort();
+    neoclr_runtime_snapshot before = neoclr_runtime_snapshot_v1();
+#endif
     int status = g->entry(g->state);
+#ifdef NEOCLR_RUNTIME_SNAPSHOT
+    neoclr_runtime_snapshot after = neoclr_runtime_snapshot_v1();
+    g->snapshot_valid[slot] = neoclr_runtime_snapshot_delta_v1(&before, &after, &g->snapshots[slot]);
+#endif
     if (status) atomic_store(&g->stopping, 1);
     current = NULL; primary_pending = 0;
     return status;
@@ -94,6 +114,9 @@ int neoclr_http_workers_run(unsigned count, int (*entry)(void *), void *state) {
     }
     if (neoclr_workers_dispatch(pool, submitted, completed, &g) != (int)submitted) abort();
     if (!neoclr_workers_close(pool) || !neoclr_workers_destroy(pool)) abort();
+#ifdef NEOCLR_RUNTIME_SNAPSHOT
+    neoclr_http_workers_snapshot_v1(g.snapshots, g.snapshot_valid, g.started);
+#endif
     if (g.listener >= 0 && close(g.listener)) g.failed = 1;
     if (pthread_mutex_destroy(&g.gate)) abort();
     return g.failed || g.completed != count ? 2 : 0;

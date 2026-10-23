@@ -8,7 +8,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-23
 
-- Record a research-backed proposal for standard runtime monitoring: scoped cross-worker snapshots, bounded opt-in events and CPU sampling/symbol mapping. Identify existing private counters, safe aggregation and overhead-validation requirements; no new runtime API or monitoring behavior is implemented.
+- Record the standard runtime monitoring proposal and implement its first private native counter foundation: versioned owner-thread snapshots, availability and checked delta/merge arithmetic, plus optional post-join aggregation of isolated HTTP invocations. Preserve disabled worker code byte for byte; eight optimized/sanitized configurations and seven HTTP runs pass. Basic snapshot overhead remains inconclusive in short paired trials (+0.22% mean CPU/response, -2.84% throughput); no throughput improvement is claimed. Live monitoring, shared-heap aggregation, event timelines and CPU sampling remain planned. See benchmarks/http-server/primitive-comparison/runtime-snapshot/README.md.
 
 - Add opt-in diagnostic GC publication attribution with bounded thread-local counters and byte-verified compiler method mapping. Request decoding and response encoding own 29.7% of publications in the checked plain-text run; this is work attribution, not CPU attribution or a throughput improvement. Twelve optimized/sanitized cases pass and disabled-hook GC/probe objects are byte-identical. Retain evidence and the next loop/leaf-call investigation in benchmarks/http-server/primitive-comparison/site-profile/README.md.
 
