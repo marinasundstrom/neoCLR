@@ -141,3 +141,14 @@ checked-path shared-worker regression tests pass. See the
 [owned-heap integration](../../benchmarks/http-server/primitive-comparison/owned-heap/README.md).
 The broader steps above remain proposals where this bounded implementation does
 not cover them.
+
+
+The next bounded follow-up adds a 64-entry positive exact-base cache to the owned
+scope. It avoids heap walks for already proven bases without a heap-wide bitmap
+or object-header expansion. Allocation/checks populate it, sweep/release invalidate
+it, and misses retain full validation. The additional fixed TLS cost is 512 bytes
+on the tested 64-bit target. This is a neoCLR-specific implementation informed by
+the general execution-metadata principle, not an imitation of a particular CLR/
+HotSpot/Go cache. Paired throughput improves 19.0%/10.7% with one/four owners,
+CPU/response falls 13.8%/12.1%; desktop drift limits precision. See
+[evidence](../../benchmarks/http-server/primitive-comparison/owned-bases/README.md).

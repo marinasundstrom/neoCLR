@@ -6327,3 +6327,13 @@ remain mixed. Native GC and repeated forced-GC HTTP pass; shared-object workers
 retain the checked path and pass regression stress. Full allocation/base indexes,
 ownership handoff and shared type descriptors remain proposed work. See
 [evidence and scope](../benchmarks/http-server/primitive-comparison/owned-heap/README.md).
+
+
+Owned-base admission follow-up (2026-10-23): a 64-entry positive cache now avoids
+heap walks for proven exact bases inside the explicit thread-bound ownership
+scope. Sweep/release invalidate it; misses/external arenas retain full checks.
+Object headers and shared-worker semantics remain unchanged. Paired one/four-owner
+throughput improves 19.0%/10.7%, CPU/response falls 13.8%/12.1%, with observed
+desktop drift. Forgery/collision/reclamation/reuse tests, native GC, repeated
+forced-GC HTTP and checked-path shared-worker regression pass. See
+[evidence and limits](../benchmarks/http-server/primitive-comparison/owned-bases/README.md).

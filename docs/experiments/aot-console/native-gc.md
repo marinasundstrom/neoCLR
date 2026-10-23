@@ -937,3 +937,13 @@ the context/payload/compiler ABI. It is explicitly opt-in in the source HTTP hos
 with NEOCLR_GC_OWNED_HEAP, for isolated per-thread arenas only; shared-object worker
 GC remains on the checked path. See [contract, research comparison, tests and
 measurements](../../../benchmarks/http-server/primitive-comparison/owned-heap/README.md).
+
+
+A subsequent owned-scope optimization caches 64 proven payload bases (512 extra
+TLS bytes on the tested 64-bit target). Allocation and successful checked admission
+insert positive proofs; collisions miss, and misses retain full validation.
+Collection clears the cache after sweeping, release clears it with the scope, and
+cache entries do not keep objects alive. Arena-shape checks precede lookup.
+This does not authorize arbitrary header writes, shared-heap access or handoff;
+cached admission relies on the scope's exclusive runtime descriptor ownership.
+See [exact-base tests, performance and limits](../../../benchmarks/http-server/primitive-comparison/owned-bases/README.md).

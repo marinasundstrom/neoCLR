@@ -29,7 +29,56 @@ static int exercise(int owned, uint64_t *offsets) {
     CHECK(!owned || !neoclr_gc_heap_release_v1(&c.text));
     return 0;
 }
+static int base_cache(void) {
+    uint64_t heap[4096] = {0}, foreign[8] = {0};
+    neoclr_aot_context c = {.text = {(unsigned char *)heap, sizeof(heap), 0}};
+    void *items[129];
+    CHECK(!neoclr_gc_heap_acquire_v1(&c.text));
+    for (unsigned i = 0; i < 129; i++)
+        CHECK(!neoclr_gc_allocate_v1(&c.text, 96, NEOCLR_GC_BYTES, &items[i]));
+    /* More entries than cache slots force eviction. Every lookup must still
+     * prove the exact base; an object-shaped header inside payload is not one. */
+    uint64_t fake[] = {40, 8, NEOCLR_GC_BYTES, 1, 42};
+    memcpy(items[0], fake, sizeof(fake));
+    uint64_t bytes = 0; uint32_t kind = 0;
+    for (unsigned i = 0; i < 129; i++) {
+        CHECK(!neoclr_gc_allocation_info_v1(&c, items[i], &bytes, &kind));
+        CHECK(bytes == 96 && kind == NEOCLR_GC_BYTES);
+    }
+    void *invalid[] = {(unsigned char *)items[0] + 32,
+        (unsigned char *)items[0] + 1, (unsigned char *)items[0] - 8,
+        (unsigned char *)items[0] + 96, foreign, c.text.data + c.text.used};
+    for (unsigned i = 0; i < sizeof(invalid) / sizeof(invalid[0]); i++) {
+        bytes = 123; kind = 456;
+        CHECK(neoclr_gc_allocation_info_v1(&c, invalid[i], &bytes, &kind) == 3);
+        CHECK(bytes == 123 && kind == 456);
+        uint64_t handle = 789;
+        CHECK(neoclr_gc_host_root_create_v1(&c, invalid[i], &handle) == 3 && handle == 789);
+    }
+    uint64_t handle = 0;
+    CHECK(!neoclr_gc_host_root_create_owned_v1(&c, items[0], items[128], &handle));
+    CHECK(!neoclr_gc_host_root_release_v1(&c, handle));
+    neoclr_probe_storage slots[] = {{&items[0], 8, 0}, {&items[128], 8, 0}};
+    neoclr_probe_frame frame = {.context = &c, .storage = slots, .storage_count = 2};
+    CHECK(!neoclr_gc_allocation_info_v1(&c, items[1], &bytes, &kind));
+    CHECK(!neoclr_gc_collect_v1(&c, &frame));
+    CHECK(neoclr_gc_allocation_info_v1(&c, items[1], &bytes, &kind) == 3);
+    CHECK(!neoclr_gc_allocation_info_v1(&c, items[0], &bytes, &kind));
+    void *reused = NULL;
+    CHECK(!neoclr_gc_allocate_v1(&c.text, 9, NEOCLR_GC_BYTES, &reused));
+    CHECK(reused == items[1]);
+    CHECK(!neoclr_gc_allocation_info_v1(&c, reused, &bytes, &kind) && bytes == 9);
+    CHECK(neoclr_gc_allocation_info_v1(&c, (unsigned char *)reused + 9, &bytes, &kind) == 3);
+    /* Scope release/reacquisition at identical addresses must not retain proofs. */
+    CHECK(!neoclr_gc_heap_release_v1(&c.text));
+    c.text.used = 0;
+    CHECK(!neoclr_gc_heap_acquire_v1(&c.text));
+    CHECK(neoclr_gc_allocation_info_v1(&c, reused, &bytes, &kind) == 3);
+    CHECK(!neoclr_gc_heap_release_v1(&c.text));
+    return 0;
+}
 int main(void) {
+    CHECK(!base_cache());
     uint64_t plain[6], owned[6];
     CHECK(!exercise(0, plain) && !exercise(1, owned));
     CHECK(!memcmp(plain, owned, sizeof(plain)));

@@ -19,7 +19,8 @@ This is an explicit trusted-native contract, not a memory-protection boundary.
 It cannot detect every illicit header overwrite at the next allocation. It is
 therefore opt-in, not automatically enabled for arbitrary caller arenas. Outside
 the scope, the allocator still validates the full heap before mutation, including
-corrupt trailing headers after a fitting hole. Root admission remains fully checked.
+corrupt trailing headers after a fitting hole. Root admission remains fully checked in this initial slice; the later
+[owned-base cache](../owned-bases/README.md) adds bounded positive proofs.
 
 Within the scope, a maintained cursor skips the prefix before the earliest
 potential free block. First-fit search stops at a fit; if no holes remain, append
@@ -112,4 +113,6 @@ fault collections. JSON files retain commands and input hashes.
 
 Keep the integration opt-in. A full free-space index, exact-base membership index,
 shared-heap ownership transfer and type-driven size/tracing descriptors remain
-separate work. In particular, root admission still performs a complete heap walk.
+separate work. At this baseline, root admission still performs a complete heap walk. The later
+[base-cache follow-up](../owned-bases/README.md) avoids walks on owned-scope hits,
+adding 512 bytes of TLS bookkeeping on the tested 64-bit target.

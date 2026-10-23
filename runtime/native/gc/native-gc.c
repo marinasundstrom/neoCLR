@@ -26,11 +26,25 @@ enum { ALLOCATED = 1, MARKED = 2, SCANNED = 4 };
 static _Thread_local neoclr_gc_statistics statistics;
 /* One exclusive runtime-owned arena per native thread. No per-object metadata
  * or allocation; the cursor is maintained by allocation and sweep. */
+enum { OWNED_BASE_CACHE_SIZE = 64 };
 static _Thread_local struct {
     neoclr_aot_text_arena *arena;
     unsigned char *data;
     uint64_t capacity, used, first_free;
+    const void *bases[OWNED_BASE_CACHE_SIZE];
 } owned_heap;
+/* Positive entries only: insertion requires a newly allocated payload or an
+ * exact-base proof from the checked walk. Collisions only cause misses. */
+static unsigned base_slot(const void *value) {
+    uintptr_t word = (uintptr_t)value >> 3;
+    return (unsigned)((word ^ (word >> 6)) & (OWNED_BASE_CACHE_SIZE - 1));
+}
+static void remember_base(const void *value) {
+    if (value) owned_heap.bases[base_slot(value)] = value;
+}
+static int known_base(const void *value) {
+    return !value || owned_heap.bases[base_slot(value)] == value;
+}
 static int valid(const neoclr_aot_text_arena *a) {
     return a && (a != owned_heap.arena ||
         (a->data == owned_heap.data && a->capacity == owned_heap.capacity && a->used == owned_heap.used)) &&
@@ -85,6 +99,8 @@ static _Atomic uint64_t next_host_handle = 1;
  * Null values retain their existing admitted-root meaning. */
 static int validated_bases(const neoclr_aot_text_arena *arena, const void *value, const void *owner) {
     if (!valid(arena)) return 0;
+    int owned = arena == owned_heap.arena;
+    if (owned && known_base(value) && known_base(owner)) return 1;
     int found_value = !value, found_owner = !owner;
     uint64_t at = 0;
     while (at < arena->used && !(found_value && found_owner)) {
@@ -101,6 +117,10 @@ static int validated_bases(const neoclr_aot_text_arena *arena, const void *value
         if (!block_valid(arena, at)) return 0;
         const block *b = (const void *)(arena->data + at);
         at += b->span;
+    }
+    if (owned && found_value && found_owner) {
+        remember_base(value);
+        remember_base(owner);
     }
     return found_value && found_owner;
 }
@@ -330,6 +350,7 @@ int32_t neoclr_gc_allocate_v1(neoclr_aot_text_arena *a, uint64_t bytes,
     }
     chosen->bytes = bytes; chosen->kind = kind; chosen->state = ALLOCATED;
     memset(chosen + 1, 0, (size_t)(chosen->span - sizeof(block)));
+    if (owned) remember_base(chosen + 1);
     *output = chosen + 1;
     statistics.allocations++;
 #ifdef NEOCLR_GC_PROFILE
@@ -681,6 +702,7 @@ static int32_t collect_indexed(neoclr_aot_context *context,
     }
     if (free_run) a->used = free_at;
     if (a == owned_heap.arena) {
+        memset(owned_heap.bases, 0, sizeof(owned_heap.bases));
         owned_heap.used = a->used;
         owned_heap.first_free = first_free < a->used ? first_free : a->used;
     }

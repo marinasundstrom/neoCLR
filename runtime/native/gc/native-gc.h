@@ -13,7 +13,9 @@ enum { NEOCLR_GC_TEXT = 1, NEOCLR_GC_OBJECT = 2, NEOCLR_GC_BYTES = 3, NEOCLR_GC_
  * While acquired, only this runtime may change descriptors, data/capacity/used.
  * Native helpers may access admitted payloads but must not overwrite headers.
  * No cross-thread arena operations or ownership handoff are permitted.
- * Allocation may omit full-heap validation; GC and release still validate.
+ * Allocation and cached exact-base admission may omit full-heap validation;
+ * cache misses, GC and release still validate. Positive cache entries are cleared
+ * after reclamation and at release; interior/forged pointers are never inserted.
  * Scope storage is thread-local, not part of the context/compiler ABI. External
  * arenas outside this scope retain complete checked allocation semantics.
  * Release clears the scope even when it reports corruption (without repairing it). */

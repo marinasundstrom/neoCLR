@@ -22004,3 +22004,12 @@ forced-GC HTTP and checked shared-worker regression checks passed. This implemen
 only the first bounded ownership/cursor slice; it does not establish shared-heap
 fast allocation or a general allocation index. See
 [implementation evidence](../benchmarks/http-server/primitive-comparison/owned-heap/README.md).
+
+
+The assistant's subsequent bounded follow-up added a 64-entry positive exact-base
+cache within that same explicit scope. It retains checked misses, invalidates after
+sweep/release, and adds no per-object fields; cached pointers are not GC roots.
+Forgery, eviction, reclamation and address-reuse tests passed alongside HTTP and
+checked shared-worker regression checks. Paired throughput rose 19.0%/10.7% at
+one/four owners and CPU/response fell 13.8%/12.1%; baseline drift limits numerical
+precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-bases/README.md).
