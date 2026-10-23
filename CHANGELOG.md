@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-23
 
+- Reduce Uri temporary work by borrowing UTF-8 bytes, avoiding one-character slices and constructing resolved values from validated components. Preserve ambiguous authority parsing and quotas. Keep Path unchanged after inspection. Validate 51 URI/Path contract executions and four allocation checks; measured tracked objects halve for URI parse/resolve, without claiming total string-allocation or HTTP throughput reductions. Refresh unchanged API fingerprints. See docs/experiments/uri-efficiency/README.md.
+
 - Add development MediaType structure, typed cached presets and HTTP content overloads. Keep raw HTTP metadata primitive and lazily project cached structured values; share allocation-free admission scanning with parsing. Preserve parameter quoting/case semantics and distinguish absent, malformed and duplicate Content-Type fields. Outbound legacy strings now receive full syntax validation before I/O; Accept ranges/weights are rejected. Validate 12 contracts in interpreter/JIT/native, two zero-allocation checks and 20 wire/guard cases; refresh native API coverage and legacy fingerprints. Prefer HTTP rebuild evidence when pinning a derived native snapshot. See docs/experiments/media-types/validation.json.
 
 - Record the author-directed value-object design principle: consumer contracts may be projected lazily from validated primitives, with deliberate class/struct/record choices and measured allocation costs. Retain the reported HTTP URI regression as motivation and queue the separate Uri/Path efficiency review.

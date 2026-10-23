@@ -25,18 +25,16 @@ public class Uri : EquatableTo<Uri> {
     val IsRelative: bool => scheme.IsEmpty
 
     private static func Part(text: string, start: int, end: int) -> string {
+        if start == end {
+            return ""
+        }
+        if start == 0 && end == text.GetUtf8ByteCount() {
+            return text
+        }
         if let Ok(part) = text.SliceUtf8(start, end - start) {
             return part
         }
         System.Fail("Invalid internal URI boundary")
-        return ""
-    }
-
-    // A one-byte slice fails for non-ASCII input instead of allocating a byte array.
-    private static func At(text: string, index: int) -> string {
-        if let Ok(value) = text.SliceUtf8(index, 1) {
-            return value
-        }
         return ""
     }
 
@@ -57,8 +55,8 @@ public class Uri : EquatableTo<Uri> {
             return Failure(UriError.TooLong())
         }
         let count = text.GetUtf8ByteCount()
-        // Encode once after the byte quota check; all grammar probes use ASCII bytes.
-        let bytes = System.Text.Utf8.Encode(text)
+        // Borrow immutable UTF-8 storage; validation needs no encoded byte array.
+        let bytes = text.Utf8Bytes
         var index = 0
         while index < count {
             let value = bytes[index]
@@ -168,7 +166,7 @@ public class Uri : EquatableTo<Uri> {
     private static func Parent(path: string) -> string {
         var index = path.GetUtf8ByteCount() - 1
         while index >= 0 {
-            if At(path, index) == "/" {
+            if path.Utf8Bytes[index] == 47 {
                 return Part(path, 0, index)
             }
             index -= 1
@@ -200,7 +198,7 @@ public class Uri : EquatableTo<Uri> {
                 input = ""
             } else {
                 var end = 1
-                while end < count && At(input, end) != "/" {
+                while end < count && input.Utf8Bytes[end] != 47 {
                     end += 1
                 }
                 output = String.Concat(output, Part(input, 0, end))
@@ -240,7 +238,7 @@ public class Uri : EquatableTo<Uri> {
                 var prefix = ""
                 var end = path.GetUtf8ByteCount() - 1
                 while end >= 0 {
-                    if At(path, end) == "/" {
+                    if path.Utf8Bytes[end] == 47 {
                         prefix = Part(path, 0, end + 1)
                         break
                     }
@@ -255,7 +253,16 @@ public class Uri : EquatableTo<Uri> {
         }
         let resolvedPrefix = String.Concat(resolvedScheme, resolvedAuthority)
         let suffix = String.Concat(resolvedQuery, reference.fragment)
-        return Parse(String.Concat(String.Concat(resolvedPrefix, resolvedPath), suffix))
+        let resolvedText = String.Concat(String.Concat(resolvedPrefix, resolvedPath), suffix)
+        if resolvedText.GetUtf8ByteCount() > 4096 {
+            return Failure(UriError.TooLong())
+        }
+        // A newly leading double slash changes the authority boundary. Preserve
+        // the existing parse semantics for that ambiguous composition.
+        if resolvedAuthority.IsEmpty && resolvedPath.StartsWithOrdinal("//") {
+            return Parse(resolvedText)
+        }
+        return Ok(Uri(resolvedText, resolvedScheme, resolvedAuthority, resolvedPath, resolvedQuery, reference.fragment))
     }
 
     func Equals(other: Uri) -> bool => String.CompareOrdinal(text, other.Text) == 0

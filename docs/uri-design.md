@@ -138,3 +138,11 @@ It verifies Object dispatch, EquatableTo, collection elements and equal hashes, 
 256-object limit. Matching bootstrap and API snapshots validate; the combined
 986-page site and 17 website tests pass. Boundary parsing is still expensive in the
 interpreter; no performance or cross-platform result is claimed.
+
+## Allocation review — 2026-10-23
+
+[Measured URI/Path review](experiments/uri-efficiency/README.md) removes temporary
+encoded buffers, one-character slices and ordinary final resolution reparsing.
+Contracts are unchanged. Remaining component strings and the temporary Uri in
+text resolution are permitted costs, not a one-allocation restriction. This does
+not establish a server throughput improvement.

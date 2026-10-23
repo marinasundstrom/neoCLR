@@ -404,7 +404,7 @@
     "runtime/raven/src/System/UInt32.rvn": "43b7cd499f594a88d39ba70538f817b0c89ecbfe610c89236c506c527d4dd902",
     "runtime/raven/src/System/UInt64.rvn": "66335bba56d6af4f9f9bf1f8c4e01ea31d7f0069eb660a1d2aede41c3c5f81d9",
     "runtime/raven/src/System/UIntPtr.rvn": "f5efb4ffe86876cfc12adca2952041636999574fc1227d8e755d360375015ba8",
-    "runtime/raven/src/System/Uri.rvn": "2c280d2972add9f418eb66f56f228e49cfafaaf4d270707c7c36a2bbd51c2946",
+    "runtime/raven/src/System/Uri.rvn": "556e56f79b5ec850656700b374034f99562d58d3248a454e92bc3fd7f82d1fa0",
     "runtime/raven/src/System/UriError.rvn": "7827af304d1df8c476dab87f7dfd6e4f41e5f434f2e5bd26fcf340147052a1ba",
     "runtime/raven/src/System/Value.rvn": "29178eeeb815a738293b3c5e675ba67fed7cfe906d19876bd4f501908625632b",
     "runtime/raven/src/System/Void.rvn": "260060b042e17bb4d8ebcd7bfd8e4fd05cebfaa3621335b6ea9920212d8ca5f7",

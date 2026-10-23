@@ -1,0 +1,12 @@
+uri-path-allocations (interpreter):
+PASS Path parsing allocates only the requested value
+FAIL URI parsing allocates only the requested value: URI parse objects: 64
+FAIL URI string resolution allocates only the result value: URI string resolution objects: 128
+FAIL URI value resolution allocates only the result value: URI value resolution objects: 64
+Tests: 4, passed: 1, failed: 3, skipped: 0
+Traceback (most recent call last):
+  File "/Users/robert/Projects/neoclr/scripts/test-runtime-library.py", line 869, in <module>
+    main()
+  File "/Users/robert/Projects/neoclr/scripts/test-runtime-library.py", line 791, in main
+    raise RuntimeError(name + ' ' + mode + ' did not match the runner contract')
+RuntimeError: uri-path-allocations interpreter did not match the runner contract

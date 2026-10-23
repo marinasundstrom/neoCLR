@@ -21726,3 +21726,19 @@ See [the development API contract](../api-docs/error-context.md).
   are refreshed; four snapshot tests pass. No full website build or publication.
   [Exact evidence](experiments/media-types/validation.json). The separate Uri/Path
   review remains pending after this commit.
+
+## 2026-10-23 — Allocation costs and HTTP throughput clarification
+
+The author clarified that value objects may legitimately contain multiple
+allocations: GC should handle ordinary allocation, and avoiding needless string
+copies matters more than a fixed wrapper count. They requested continued Uri/Path
+work followed by HTTP client/server allocation measurements and investigation of
+server requests per second, identifying tasks, scheduling and Rust runtime work
+as possibilities rather than established causes.
+
+The assistant removed URI encoding buffers, character slices and ordinary final
+reparsing; the [focused evidence](experiments/uri-efficiency/README.md) records
+unchanged contracts and reduced tracked allocations. Path was inspected and left
+unchanged. The assistant explicitly distinguished tracked objects from all string
+and native allocations, and allocation savings from demonstrated throughput gains.
+HTTP measurement and profiling results are recorded separately when completed.

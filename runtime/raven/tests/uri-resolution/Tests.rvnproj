@@ -11,7 +11,7 @@
     <Compile Include="../framework/TestSuite.rvn" />
     <Compile Include="../framework/TestAttribute.rvn" />
     <Compile Include="$(NeoClrTestRegistry)" />
-    <Compile Include="../collections/Main.rvn" />
+    <Compile Include="../framework/Main.rvn" />
     <Compile Include="Tests.rvn" />
   </ItemGroup>
 </Project>

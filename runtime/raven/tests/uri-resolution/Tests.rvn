@@ -135,6 +135,14 @@ func UriBaseRules() -> Result<unit, TestFailure> {
     _ = CheckResolution(RequiredUri("http://a")?, "child", "http://a/child")?
     _ = CheckResolution(RequiredUri("http://a/b/")?, "child", "http://a/b/child")?
     _ = CheckResolution(RequiredUri("http://a/b")?, "child", "http://a/child")?
+    // Dot removal may expose an authority marker; subsequent resolution must
+    // use the same components as parsing the resulting text.
+    let unusual = RequiredUri("x:/a")?
+    let Ok(exposed) = unusual.Resolve(".//b") else {
+        return Assert.True(false, "Exposed authority")
+    }
+    _ = Assert.Equal("x://b", exposed.Text)?
+    _ = CheckResolution(exposed, "child", "x://b/child")?
     let relative = RequiredUri("relative")?
     if relative.Resolve("http://a/") is Failure(let error) {
         return Assert.True(error is UriError.BaseNotAbsolute, "Resolution requires an absolute base")
