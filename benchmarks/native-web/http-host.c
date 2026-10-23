@@ -118,7 +118,10 @@ static int run_entry(int argc, neoclr_process_char **argv) {
     neoclr_aot_context *context = &storage;
 #endif
     int host_error = 0, result = 0;
-    for (unsigned invocation = 0; invocation < NEOCLR_HTTP_INVOCATIONS; invocation++) {
+#ifdef NEOCLR_GC_OWNED_HEAP
+    if (neoclr_gc_heap_acquire_v1(&context->text)) host_error = 1;
+#endif
+    for (unsigned invocation = 0; !host_error && invocation < NEOCLR_HTTP_INVOCATIONS; invocation++) {
         int code = invoke(context, &host_error, argc, argv);
         if (!result && code) result = code;
 #ifndef _WIN32
@@ -126,6 +129,9 @@ static int run_entry(int argc, neoclr_process_char **argv) {
 #endif
         if (host_error) break;
     }
+#ifdef NEOCLR_GC_OWNED_HEAP
+    if (neoclr_gc_heap_release_v1(&context->text)) host_error = 1;
+#endif
 #ifdef _WIN32
     if (neoclr_windows_gc_host_close(&host)) host_error = 1;
 #else

@@ -6317,3 +6317,13 @@ throughput/CPU, so it was reverted. The next proposed bounded slice is explicit
 heap ownership and maintained allocation metadata before further header packing.
 See [comparison and acceptance gates](design/allocation-metadata-runtime-comparison.md)
 and [rejected candidate evidence](../benchmarks/http-server/primitive-comparison/compact-header/README.md).
+
+
+Owned-allocation follow-up (2026-10-23): the first bounded heap-owner contract is
+implemented as an opt-in native scope for isolated thread-bound arenas, with a
+maintained allocation search cursor and unchanged object headers. Paired one/four
+owner HTTP throughput improves 18.0%/15.7%, CPU/response falls 15.2%/14.6%; tails
+remain mixed. Native GC and repeated forced-GC HTTP pass; shared-object workers
+retain the checked path and pass regression stress. Full allocation/base indexes,
+ownership handoff and shared type descriptors remain proposed work. See
+[evidence and scope](../benchmarks/http-server/primitive-comparison/owned-heap/README.md).

@@ -8,6 +8,17 @@
 /* Private nonmoving heap in the caller buffer. No malloc, external runtime or
  * arbitrary native-stack scan. All entry/arena lifetime restrictions still apply. */
 enum { NEOCLR_GC_TEXT = 1, NEOCLR_GC_OBJECT = 2, NEOCLR_GC_BYTES = 3, NEOCLR_GC_STRINGS = 4, NEOCLR_GC_RECORDS = 5, NEOCLR_GC_INTERN = 6 };
+/* Experimental exclusive allocation scope, one per native thread. Acquire only
+ * an empty arena; release on the same thread before resetting/freeing it.
+ * While acquired, only this runtime may change descriptors, data/capacity/used.
+ * Native helpers may access admitted payloads but must not overwrite headers.
+ * No cross-thread arena operations or ownership handoff are permitted.
+ * Allocation may omit full-heap validation; GC and release still validate.
+ * Scope storage is thread-local, not part of the context/compiler ABI. External
+ * arenas outside this scope retain complete checked allocation semantics.
+ * Release clears the scope even when it reports corruption (without repairing it). */
+int32_t neoclr_gc_heap_acquire_v1(neoclr_aot_text_arena *);
+int32_t neoclr_gc_heap_release_v1(neoclr_aot_text_arena *);
 typedef struct {
     uint64_t collections, allocations, reclaimed_allocations, reclaimed_bytes;
 } neoclr_gc_statistics;

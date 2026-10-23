@@ -920,3 +920,20 @@ all admission failures retained. This is native GC infrastructure improvement,
 not an HTTP-specific fast path; gains in other workloads remain unmeasured.
 Interpreter-side GC is unchanged. Green Tea page-local tracing research is recorded
 there as a separate possible direction, not an implemented collector replacement.
+
+
+## Explicit runtime-owned allocation scope (2026-10-23)
+
+The private acquire/release pair can lend an empty arena exclusively to one native
+thread. While active, only runtime allocation/collection may modify its descriptors
+or shape. A maintained cursor skips occupied prefixes and permits append without
+a descriptor walk when no free blocks remain. The external checked allocator still
+validates all headers before mutation. GC and release validate the entire heap;
+shape changes are rejected. Release clears the scope even after reported corruption,
+but does not release roots or repair the heap.
+
+The scope adds five words of TLS bookkeeping, no per-object fields, and preserves
+the context/payload/compiler ABI. It is explicitly opt-in in the source HTTP host
+with NEOCLR_GC_OWNED_HEAP, for isolated per-thread arenas only; shared-object worker
+GC remains on the checked path. See [contract, research comparison, tests and
+measurements](../../../benchmarks/http-server/primitive-comparison/owned-heap/README.md).

@@ -124,3 +124,20 @@ interior roots, cross-worker collection and forced-GC HTTP all pass. Compare the
 same ten-byte plain HTTP workload at one/four owners, forward/reverse, recording
 CPU/request, throughput, tails, side-metadata footprint and peak arena extent.
 Keep changes only when the measured balance supports the author's priorities.
+
+
+## Implemented first slice (2026-10-23 follow-up)
+
+The explicit thread-bound scope and a conservative first-free search cursor are
+now implemented as private native APIs, opt-in in the source HTTP host. Acquisition
+requires an empty arena; allocation/sweep maintain the cursor; GC/release validate
+all descriptors. The scope's caller promises exclusive runtime descriptor writes.
+This is not a general side index or shared-worker ownership protocol. The checked
+path remains the default, including for shared-object workers.
+
+Paired one/four-owner HTTP throughput rises 18.0%/15.7% and CPU/response falls
+15.2%/14.6%; four-owner tails remain mixed. Native GC, repeated forced-GC HTTP and
+checked-path shared-worker regression tests pass. See the
+[owned-heap integration](../../benchmarks/http-server/primitive-comparison/owned-heap/README.md).
+The broader steps above remain proposals where this bounded implementation does
+not cover them.

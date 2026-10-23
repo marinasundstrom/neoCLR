@@ -21992,3 +21992,15 @@ These are not yet implemented; cross-worker GC, corruption checks and external
 mutable arena behavior remain acceptance constraints. See
 [research](design/allocation-metadata-runtime-comparison.md) and
 [experiment](../benchmarks/http-server/primitive-comparison/compact-header/README.md).
+
+
+Follow-up implementation after the author's continuation: the assistant introduced
+an explicit private runtime-owned arena scope and maintained allocation cursor,
+opt-in for isolated HTTP owners. It retained full validation outside the scope and
+at GC/release, required exclusive runtime descriptor writes, and left shared-object
+workers on the checked path. Paired throughput rose 18.0%/15.7% at one/four owners;
+CPU per response fell 15.2%/14.6%, with mixed four-owner tails. Native GC, repeated
+forced-GC HTTP and checked shared-worker regression checks passed. This implements
+only the first bounded ownership/cursor slice; it does not establish shared-heap
+fast allocation or a general allocation index. See
+[implementation evidence](../benchmarks/http-server/primitive-comparison/owned-heap/README.md).
