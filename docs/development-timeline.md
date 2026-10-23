@@ -21783,3 +21783,25 @@ worker roots and parent retention/reclamation work. Optimized and UBSan runs pas
 the combined ASan/UBSan execution times out, retained as incomplete evidence.
 No worker pool, parallel shared-heap HTTP, compiler change or new public API is
 claimed. Shared native collection/safepoints and task publication remain prerequisites.
+
+## 2026-10-23 — Native worker prototype and channels follow-up
+
+The author directed continuing the experiment and explicitly allowed implementation
+in main code. They subsequently suggested channels as a later way to communicate
+safely between internally created threads. The assistant distinguished bounded
+mailbox/lifetime semantics from thread safety of shared mutable payloads; no public
+channel API was requested or implemented.
+
+The [native prototype](experiments/native-worker-pool/README.md) is implemented
+under runtime/native/workers with explicit capture/result rooting, a managed-access
+gate, bounded admission and completion storage, wakeups, cancellation and joined
+shutdown. Six groups pass optimized and UBSan runs, including 100 cancellation
+contests, collection across parked/unsettled work and saturation/recovery.
+TSan crashes without diagnostics and a minimal pthread control reproduces that
+failure; qualification remains incomplete.
+
+Separate checked primitive-compute measurements show overlapping CPU execution
+with two/four workers. The assistant explicitly limits this result: managed access
+is serialized, arbitrary generated callbacks and HTTP are not integrated, and
+there is no HTTP throughput claim. Generated-code participant/safepoint and task
+publication qualification remains the next gate.

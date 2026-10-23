@@ -1,0 +1,127 @@
+# Bounded native worker pool experiment — 2026-10-23
+
+The author authorized continuing the worker experiment directly in main runtime
+code. The implementation is under
+[runtime/native/workers](../../../runtime/native/workers/native-workers.h).
+It is an opt-in POSIX prototype, not linked into Task.Run or HttpServer and not a
+public runtime ABI. No existing scheduler/GC default changes.
+
+## Implemented boundary
+
+One pool owns a bounded shared arena, 1–4 long-lived pthread workers, up to 16 job
+slots and 32 consumer-root slots. The mutex protects FIFO admission, cancellation,
+completion publication, roots, allocator access and collection. User callbacks
+run outside the mutex and enter explicit managed-access intervals. Computation on
+copied primitives and blocking outside those intervals may overlap across workers.
+
+This is the **serial managed-access reference implementation** proposed by the
+investigation. It does not execute arbitrary generated Raven code in parallel.
+There is no compiler safepoint integration, automatic collection on allocation
+pressure, stack/fiber migration or concurrent Promise support. Existing TLS
+host-root/socket/fiber APIs must not be used inside these callbacks. Callbacks may
+not retain and dereference unregistered managed pointers outside access intervals.
+
+Capture roots are adopted before job publication. Workers publish result reference
+slots before releasing managed access, including while the callback remains
+unsettled. Owner collection traces all capture/result/consumer slots using the
+canonical collector. Workers may allocate under the gate but cannot initiate
+collection or invoke ordinary runtime GC hooks. Thread-local allocation counters
+therefore do not describe whole-pool allocation volume.
+
+Each submission reserves its completion slot. Ready results stay rooted if consumer
+root capacity is full; take does not discard or partially publish them. Handles
+carry pool identity, generation and root/ticket domain, rejecting foreign, stale
+and wrong-kind handles. Consumer adoption precedes producer release. Reference
+payloads are returned as roots, not unrooted pointers.
+
+Queued cancellation settles without invoking the callback. Running cancellation
+requests cooperative stop and wins only before settlement under the gate. Close
+stops admission, cancels queued/running work, wakes waiters and joins outside the
+gate. It cannot interrupt arbitrary native work. Destruction rejects outstanding
+tickets/consumer roots and requires complete reclamation. The owner must ensure
+there are no concurrent external callers during destruction.
+
+Work and completion condition variables provide wakeups with bounded stored state.
+The owner-side timed wait uses the POSIX realtime clock and is diagnostic, not an
+HTTP deadline contract; clock changes can affect it. Worker callbacks cannot wait
+on their own pool through this API. Other arbitrary blocking can still starve a
+fixed-size pool. No preemption or work stealing is claimed.
+
+## Correctness evidence
+
+[Optimized and fail-fast UBSan runs](validation.json) pass six test groups:
+
+- Full admission preserves caller outputs; two callbacks can be active while
+  owner collection runs. Shared capture mutations are visible through both result
+  handles; releasing the original consumer root does not lose queued captures.
+- Collection retains newly allocated reference payloads before settlement and
+  after consumer adoption. Tagged scalar/reference and scalar-only results survive.
+  These are native test payloads, not qualification of all Raven union layouts.
+- Queued/active cancellation, empty close, repeat close, reserved completion drain
+  and joined teardown leave no roots or arena extent.
+- Consumer-root saturation retains ready results; foreign pool, stale generation
+  and wrong handle domain are rejected without partial outputs.
+- One hundred completion/cancellation contests reconcile the winning operation
+  with exactly one observed terminal outcome.
+- Allocation exhaustion reports callback failure; later work still completes.
+
+This covers manual access/root intervals. It is not proof that generated-code
+roots, shared statics, runtime services or arbitrary callback captures are safe.
+
+The [TSan attempt](tsan-incomplete.json) exits with SIGSEGV without diagnostics.
+An independent minimal [pthread control](tsan-control.c) has the same
+[result](tsan-control.json). This suggests a sanitizer/toolchain/host problem,
+but its cause is unresolved and no TSan success/race-freedom claim is made.
+That attempted build predates final cleanup/recovery-test additions; hashes retain
+the precise identity. ASan was not repeated after the preceding ownership probe's
+timeout. Windows support is not implemented.
+
+## Parallel compute measurement
+
+[Uninstrumented samples and build commands](measurement.json) execute eight
+identical 20-million-iteration integer jobs with 1/2/4 workers, then reverse order.
+Each job reads a rooted scalar under the gate, computes on a copied primitive
+outside it, and publishes a checked scalar result. Pool creation, expected-result
+calculation, close and destruction are outside timing; submission/completion waits
+are inside. Managed arena capacity stays 8 KiB. Additional workers have additional
+native stacks/resources, not included in that arena budget.
+
+| Trial | Workers | Wall seconds | CPU seconds | CPU/wall |
+| --- | ---: | ---: | ---: | ---: |
+| 1 | 1 | 0.3206 | 0.3203 | 1.00 |
+| 2 | 2 | 0.1619 | 0.3226 | 1.99 |
+| 3 | 4 | 0.0881 | 0.3385 | 3.84 |
+| 4 | 4 | 0.0895 | 0.3414 | 3.82 |
+| 5 | 2 | 0.1611 | 0.3220 | 2.00 |
+| 6 | 1 | 0.3189 | 0.3190 | 1.00 |
+
+These short local samples demonstrate CPU overlap, not HTTP throughput or a
+stable production speedup. Total process CPU divided by elapsed time exceeds one
+with multiple workers; the table is generated from retained JSON. No profiler or
+sanitizer ran concurrently with these measurements. Desktop contention and small
+sample size remain limitations.
+
+Reproduce optimized/UBSan tests with validate.py --output FRESH using the same
+Xcode 26.2 SDK described in the preceding ownership experiment. Optional
+--thread-sanitizer and --address-sanitizer retain unsuccessful outcomes.
+Run measure.py --validation VALIDATION_JSON --output FRESH afterward, with no
+other builds/tests active.
+
+## Channels and next integration gate
+
+The author identified channels as a possible later safe communication abstraction.
+The internal bounded submission/completion mailboxes establish useful ingredients:
+backpressure, wakeups, lifetime retention, settlement, close and cancellation.
+A public Channel<T> remains unimplemented and undesigned.
+
+This prototype shares payload identity; a channel would still need to specify
+sharing versus copying/ownership transfer, producer/consumer counts, draining,
+close errors and cancellation. Sending an object reference does not make later
+concurrent mutations safe. Rooting guarantees lifetime, not general synchronization.
+
+Next qualify generated-code participant/safepoint integration and task publication
+against this serial reference before removing the managed-access gate. Shared
+statics, task queues, resources and fault contexts require explicit ownership;
+do not route existing HTTP delegates into this pool yet. Only after those gates
+pass should handler-only versus whole-connection distribution be measured.
+No HTTP speedup is inferred from the primitive-compute result.

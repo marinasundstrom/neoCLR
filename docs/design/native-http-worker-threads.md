@@ -1,7 +1,10 @@
 # Native HTTP worker threads — investigation, 2026-10-23
 
-Status: researched proposal with an executable ownership diagnostic. No native
-worker pool, shared-heap parallel HTTP execution or new public API is implemented.
+Status: the [bounded native prototype](../experiments/native-worker-pool/README.md)
+now implements a serial managed-access pool with explicit capture/result rooting,
+mailbox wakeups and joined teardown. Primitive CPU work overlaps across workers.
+Generated-code integration, shared-heap parallel HTTP and public APIs remain
+unimplemented. The architecture below remains a proposal beyond that checkpoint.
 The author explicitly requested worker-thread investigation inspired by modern
 web application frameworks.
 

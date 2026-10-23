@@ -6168,3 +6168,13 @@ participant/root/mailbox qualification slice before HTTP integration. The
 and UBSan execution; ASan is incomplete. Worker pools and multicore shared-heap HTTP
 remain unimplemented. This evidence refines the concurrency investigation without
 selecting a new public API or overriding other active milestone gates.
+
+### Native worker prototype — 2026-10-23
+
+Author-authorized implementation now lives under runtime/native/workers. The
+[bounded experiment](experiments/native-worker-pool/README.md) qualifies explicit
+capture/result roots, serial managed access, mailbox backpressure/wakeup,
+cancellation and teardown in optimized/UBSan tests. Primitive computation overlaps
+across workers; TSan remains incomplete. Generated-code/Task/HTTP integration and
+parallel managed access remain open. Channels are a later design consideration,
+not a new implemented API. Preserve the existing ownership/safepoint gates.

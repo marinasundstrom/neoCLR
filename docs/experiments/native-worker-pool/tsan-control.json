@@ -1,0 +1,26 @@
+[
+  {
+    "command": [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+      "-isysroot",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-std=c11",
+      "-pthread",
+      "-fsanitize=thread",
+      "/Users/robert/Projects/neoclr/target/native-worker-pool-tsan-control/control.c",
+      "-o",
+      "/Users/robert/Projects/neoclr/target/native-worker-pool-tsan-control/control"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/robert/Projects/neoclr/target/native-worker-pool-tsan-control/control"
+    ],
+    "exitCode": -11,
+    "stdout": "",
+    "stderr": ""
+  }
+]

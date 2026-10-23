@@ -1,5 +1,14 @@
 # Concurrency and tracked threads — post-release direction
 
+**2026-10-23 native prototype checkpoint:** the author authorized the experiment
+directly in main runtime code. The [bounded pool](experiments/native-worker-pool/README.md)
+now provides explicit shared capture/result roots, gated managed access, bounded
+mailboxes, cancellation and joined teardown. Optimized/UBSan tests pass; TSan is
+incomplete and its minimal pthread control also crashes. Copied-primitive CPU work
+uses multiple cores, but generated-code and HTTP integration remain open.
+The author also identifies channels as a later communication abstraction; no
+public Channel API or implicit thread safety for shared payloads is selected.
+
 **2026-10-23 worker follow-up:** the author confirms investigation of worker threads
 similar to modern web frameworks. The [native worker investigation](design/native-http-worker-threads.md)
 compares ASP.NET Core, Tokio and Node, audits owner-local GC/tasks/sockets and
