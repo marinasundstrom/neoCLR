@@ -110,3 +110,38 @@ JSON reports. The profile build manifest selects the measured candidate-w4 comma
 use it with the stack-profile capture/analyze tools. Raw sample and full attribution
 are retained as gzip files. All reports retain source/object hashes and commands.
 No public Raven API, compiler representation or website capability changes here.
+
+## Compiled async consumer qualification — 2026-10-23
+
+`qualify.py` compiles five existing Raven fixtures with the same SDK/compiler bundle
+as the server, then links each application object against baseline and reuse runtimes,
+both optimized and UBSan/bounds-instrumented. Each executable enters and tears down
+the runtime twice using the owned heap host. All **20 executions / 40 invocations**
+pass; exact commands, executable output and source/tool/object hashes are retained in
+[qualification.json.gz](qualification.json.gz).
+
+- `RuntimeAwait`: nested/unit/eager awaits, receiver and local retention through GC,
+  and cancellation observation.
+- `RuntimeUse`: reverse-order resource disposal on return and cancellation, plus
+  implicit unit-return cleanup.
+- `RuntimeStackReuse`: three rounds of 24 simultaneously suspended bodies (above
+  the eight-context cache bound), with retained objects and forced collection.
+- `RuntimeNativeContract`: operation completion, waiting and release semantics.
+- `RuntimeAwaitFault`: expected terminal fault after suspension, no unreachable
+  continuation, clean host teardown and a second invocation on the same host heap.
+
+The fault case must fail with the expected diagnostic twice and without a host or
+sanitizer error; a nonzero exit alone is not a passing test. Healthy cases require
+both PASS markers and no stderr. Host teardown checks empty roots and reclaimed heap.
+These tests extend the native lifecycle and HTTP evidence; they do not measure a new
+throughput gain. No runtime source or default changes accompany this qualification.
+Reuse remains opt-in. Shared-heap async execution, other platforms and broader
+application coverage remain unqualified. The existing .NET comparison still applies:
+this tests neoCLR retained-stack lifecycle, not .NET state-machine representation or
+ExecutionContext flow.
+
+```sh
+python3 benchmarks/http-server/primitive-comparison/context-reuse/qualify.py \
+  --build target/primitive-comparison-build/build.json \
+  --output target/context-reuse-consumers
+```

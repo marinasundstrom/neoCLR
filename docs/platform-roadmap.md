@@ -6446,3 +6446,10 @@ four-owner mean is 5,564 requests/s. No fresh Kestrel comparison or shared-heap 
 qualification. Default and Windows behavior stay unchanged. Broader consumer/platform
 qualification precedes default enablement. See
 [evidence](../benchmarks/http-server/primitive-comparison/context-reuse/README.md).
+
+Completed-context consumer qualification (2026-10-23): five existing compiled Raven
+consumers pass 40 baseline/reuse, optimized/sanitized invocations, covering nested
+awaits, cancellation/disposal, GC retention above the cache bound and terminal-fault
+teardown/re-entry. Retain opt-in status; no new throughput or shared-heap qualification
+claim. Next default-enablement decision must account for remaining platform/application
+coverage. See [reproduction and evidence](../benchmarks/http-server/primitive-comparison/context-reuse/README.md#compiled-async-consumer-qualification--2026-10-23).

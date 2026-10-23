@@ -282,3 +282,11 @@ native test executions, forced-GC HTTP and paired one/four-owner trials pass. Me
 throughput improves 11.7%/14.5% and CPU/response falls 10.6%/13.4%. A separate profile
 no longer finds the makecontext clearing hotspot. Keep this opt-in until broader
 async consumers/platforms are qualified. See [contracts and evidence](../../benchmarks/http-server/primitive-comparison/context-reuse/README.md).
+
+Follow-up compiled-consumer qualification passes 40 invocations across baseline/reuse
+and optimized/sanitized builds: nested awaits, cancellation and scoped disposal,
+retained objects through GC above the cache bound, operation lifetime and terminal
+fault teardown/re-entry. This strengthens lifecycle evidence without changing the
+representation, default or previous performance results; shared-heap async and other
+platforms remain outside this qualification. The linked experiment retains the runner
+and exact report.
