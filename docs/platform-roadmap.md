@@ -6302,3 +6302,10 @@ throughput about 10% and CPU per response about 9%, with forced-GC and shared-wo
 validation. Two allocator loop changes showed no reliable benefit and were reverted.
 Versioned image-owned maps and explicitly maintained allocation contexts remain
 proposed next steps, not implemented contracts. See [research/evidence](../benchmarks/http-server/primitive-comparison/allocation-metadata/README.md).
+
+Native GC storage/transient follow-up (2026-10-23): compact execution payloads now
+extend to storage/transient descriptions, while authoritative root tables and full
+diagnostic mode remain intact. Paired one/four-owner HTTP throughput rises about
+4.4%/7.5% and CPU per response falls 4.6%/6.5%; four-owner tail latency is higher.
+An atomic paired-root admission experiment was reverted after no measured benefit.
+See [validation and limits](../benchmarks/http-server/primitive-comparison/slot-metadata/README.md).

@@ -1,0 +1,75 @@
+diff --git a/runtime/native/async/native-runtime.c b/runtime/native/async/native-runtime.c
+index 5d03ee2c0..6094ebfa3 100644
+--- a/runtime/native/async/native-runtime.c
++++ b/runtime/native/async/native-runtime.c
+@@ -231,14 +231,11 @@ static int resume(fiber *f) {
+     if (f->owner) {
+         void *callback = NULL;
+         if (neoclr_gc_host_root_read_v1(state.context, f->callback, &callback)) return 3;
+-        int status = neoclr_gc_host_root_create_v1(state.context, f->owner, &f->active_owner);
++        uint64_t active[2];
++        int status = neoclr_gc_host_root_create_pair_v1(state.context, f->owner, callback, active);
+         if (status) return status;
+-        status = neoclr_gc_host_root_create_v1(state.context, callback, &f->active_callback);
+-        if (status) {
+-            if (neoclr_gc_host_root_release_v1(state.context, f->active_owner)) abort();
+-            f->active_owner = 0;
+-            return status;
+-        }
++        f->active_owner = active[0];
++        f->active_callback = active[1];
+     }
+     if (f->ready_owner) {
+         if (neoclr_gc_host_root_release_v1(state.context, f->ready_owner)) abort();
+diff --git a/runtime/native/gc/native-gc.c b/runtime/native/gc/native-gc.c
+index 4a657921a..cca8cde21 100644
+--- a/runtime/native/gc/native-gc.c
++++ b/runtime/native/gc/native-gc.c
+@@ -154,6 +154,32 @@ static int32_t host_root_create(neoclr_aot_context *context, void *owner, void *
+ int32_t neoclr_gc_host_root_create_v1(neoclr_aot_context *context, void *value, uint64_t *output) {
+     return host_root_create(context, NULL, value, 0, output);
+ }
++/* Resume needs two independent strong roots. Admit both against one complete
++ * heap walk and reserve both slots before publishing either handle. */
++int32_t neoclr_gc_host_root_create_pair_v1(neoclr_aot_context *context,
++    void *first, void *second, uint64_t output[2]) {
++    if (!context || !output || !validated_bases(&context->text, first, second)) return 3;
++    host_root *slots[2] = {NULL, NULL};
++    unsigned count = 0;
++    for (uint32_t i = 0; i < NEOCLR_GC_HOST_ROOT_LIMIT && count < 2; i++)
++        if (!host_roots[i].context) slots[count++] = &host_roots[i];
++    if (count != 2) return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
++    uint64_t handle = atomic_load_explicit(&next_host_handle, memory_order_relaxed);
++    do {
++        if (handle > UINT64_MAX - 2) return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
++    } while (!atomic_compare_exchange_weak_explicit(&next_host_handle, &handle, handle + 2,
++                memory_order_relaxed, memory_order_relaxed));
++    void *values[2] = {first, second};
++    for (unsigned i = 0; i < 2; i++) {
++        *slots[i] = (host_root){.context = context, .value = values[i],
++            .handle = handle + i, .next = host_head};
++        if (host_head) host_head->previous = slots[i];
++        host_head = slots[i];
++    }
++    output[0] = handle;
++    output[1] = handle + 1;
++    return 0;
++}
+ int32_t neoclr_gc_host_root_create_owned_v1(neoclr_aot_context *context, void *owner,
+     void *value, uint64_t *output) {
+     return host_root_create(context, owner, value, 1, output);
+diff --git a/runtime/native/gc/native-gc.h b/runtime/native/gc/native-gc.h
+index d10c4b827..0eeb36d46 100644
+--- a/runtime/native/gc/native-gc.h
++++ b/runtime/native/gc/native-gc.h
+@@ -45,6 +45,10 @@ int32_t neoclr_stack_trace_capture_v1(int32_t skip, neoclr_aot_context *,
+  * This does not permit cross-thread context use or extend an entry/arena lifetime. */
+ #define NEOCLR_GC_HOST_ROOT_LIMIT 256
+ int32_t neoclr_gc_host_root_create_v1(neoclr_aot_context *context, void *value, uint64_t *output);
++/* Two independent strong handles admitted atomically in one heap walk. Values
++ * may alias or be null. On failure neither output nor the root set changes.
++ * Same thread/context/lifetime rules and shared quota as single-root creation. */
++int32_t neoclr_gc_host_root_create_pair_v1(neoclr_aot_context *, void *, void *, uint64_t output[2]);
+ /* Private dependent handle: nonnull live owner retains value only while owner
+  * is independently reachable. Participates in every collection, including stack
+  * safepoints. On owner death, pointers clear before sweep; read/callback/replace

@@ -174,9 +174,14 @@ impl Probes {
                     }
                 }
             }
-            let mut bytes = serde_json::to_vec(
-                &serde_json::json!({"schema":"neoclr-probe-storage-v1", "entries":entries}),
-            )?;
+            let diagnostic =
+                serde_json::json!({"schema":"neoclr-probe-storage-v1", "entries":entries});
+            let mut bytes = serde_json::to_vec(&execution_slots(
+                &diagnostic,
+                "neoclr-gc-storage-v1",
+                lanes.len(),
+                gc,
+            ))?;
             let length = bytes.len();
             bytes.push(0);
             let data = module.declare_data(
@@ -236,7 +241,17 @@ impl Probes {
                     _ => vec![],
                 };
                 for (phase, ty) in phases {
-                    let mut bytes = serde_json::to_vec(&gc_layout::layout(p, &ty))?;
+                    let wide = p.pointer_lanes(&ty);
+                    let lanes: Vec<_> = gc_layout::seed_lanes(p, &ty)
+                        .into_iter()
+                        .map(|lane| (lane, if wide[lane] { 8 } else { 4 }))
+                        .collect();
+                    let mut bytes = serde_json::to_vec(&execution_slots(
+                        &gc_layout::layout(p, &ty),
+                        "neoclr-gc-transient-v1",
+                        lanes.len(),
+                        gc,
+                    ))?;
                     let length = bytes.len();
                     bytes.push(0);
                     let data = module.declare_data(
@@ -248,11 +263,6 @@ impl Probes {
                     let mut description = DataDescription::new();
                     description.define(bytes.into_boxed_slice());
                     module.define_data(data, &description)?;
-                    let wide = p.pointer_lanes(&ty);
-                    let lanes = gc_layout::seed_lanes(p, &ty)
-                        .into_iter()
-                        .map(|lane| (lane, if wide[lane] { 8 } else { 4 }))
-                        .collect();
                     transient.insert(
                         (i, pc, phase),
                         Transient {
@@ -471,10 +481,38 @@ fn execution_plan(plan: &serde_json::Value, native_gc: bool) -> serde_json::Valu
     }
 }
 
+fn execution_slots(
+    plan: &serde_json::Value,
+    schema: &str,
+    count: usize,
+    native_gc: bool,
+) -> serde_json::Value {
+    if native_gc {
+        serde_json::json!({"schema": schema, "slotCount": count})
+    } else {
+        plan.clone()
+    }
+}
+
 #[cfg(test)]
 mod execution_metadata_tests {
-    use super::execution_plan;
+    use super::{execution_plan, execution_slots};
     use serde_json::json;
+
+    #[test]
+    fn storage_and_transient_execution_keep_counts_and_diagnostic_layouts() {
+        let layout =
+            json!({"fields": [{"offset": 0, "readBytes": 4}, {"offset": 8, "readBytes": 8}]});
+        for schema in ["neoclr-gc-storage-v1", "neoclr-gc-transient-v1"] {
+            for count in [0, 2, 129] {
+                let compact = execution_slots(&layout, schema, count, true);
+                assert_eq!(compact["slotCount"], count);
+                assert_eq!(compact["schema"], schema);
+                assert!(compact.get("fields").is_none());
+                assert_eq!(execution_slots(&layout, schema, count, false), layout);
+            }
+        }
+    }
 
     #[test]
     fn native_execution_keeps_spill_order_and_diagnostics_keep_full_plan() {

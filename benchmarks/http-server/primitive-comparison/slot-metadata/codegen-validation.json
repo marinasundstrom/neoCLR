@@ -1,0 +1,38 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "neoclr-codegen",
+        "--lib",
+        "execution_metadata_tests"
+      ],
+      "exitCode": 0,
+      "stdout": "\nrunning 2 tests\ntest compiler::values::gc_probe::execution_metadata_tests::storage_and_transient_execution_keep_counts_and_diagnostic_layouts ... ok\ntest compiler::values::gc_probe::execution_metadata_tests::native_execution_keeps_spill_order_and_diagnostics_keep_full_plan ... ok\n\ntest result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 141 filtered out; finished in 0.00s\n\n",
+      "stderr": "   Compiling neoclr-codegen v0.0.0 (/Users/robert/Projects/neoclr/runtime/codegen)\n    Finished `release` profile [optimized] target(s) in 21.65s\n     Running unittests src/lib.rs (target/release/deps/neoclr_codegen-12f33f26d2ff4df0)\n"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "neoclr-codegen",
+        "--test",
+        "root_probes"
+      ],
+      "exitCode": 0,
+      "stdout": "\nrunning 5 tests\ntest adapter_reads_slots_without_following_uninitialized_borrow_pointees ... ok\ntest probes_require_context_and_reject_duplicates ... ok\ntest constructor_storage_is_live_before_call_and_faults_never_publish_results ... ok\ntest published_frame_function_bound_matches_native_selection ... ok\ntest native_probes_observe_real_spills_across_calls_faults_and_reentry ... ok\n\ntest result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.90s\n\n",
+      "stderr": "   Compiling neoclr-codegen v0.0.0 (/Users/robert/Projects/neoclr/runtime/codegen)\n    Finished `release` profile [optimized] target(s) in 23.72s\n     Running tests/root_probes.rs (target/release/deps/root_probes-5a9a8b345565fa1c)\n"
+    }
+  ],
+  "inputs": {
+    "/Users/robert/Projects/neoclr/runtime/codegen/src/gc_probe.rs": "99cd7c4d061aaba344646a5b885db6a6b50ee0f0acdde1c81b96491fd7b32830",
+    "/Users/robert/Projects/neoclr/runtime/codegen/tests/root_probes.rs": "d1770ede182dc377df84872aa27aafbaa0f1719ec6b6c9555d33d3500529e96a",
+    "/Users/robert/Projects/neoclr/target/release/neoclr-codegen": "47bf21b3bbab42108a6f33d8c303e80cbf2e3cde5bb8d3a7e1b1867c19baf283"
+  }
+}

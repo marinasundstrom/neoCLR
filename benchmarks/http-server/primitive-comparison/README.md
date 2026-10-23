@@ -172,3 +172,8 @@ The [allocation/metadata follow-up](allocation-metadata/README.md), guided by CL
 design, rejects two allocation-loop experiments and separates native-GC point
 payloads from complete diagnostic plans. Paired trials show about 10% higher
 throughput and 9% lower CPU per response, with a 17.3% smaller application object.
+
+The [storage/transient metadata follow-up](slot-metadata/README.md) adds about
+4.4%/7.5% throughput and 4.6%/6.5% lower CPU per response with one/four owners,
+with a further 17.7% smaller application object. Four-owner tail latency is higher
+in the paired trials; the rejected paired-root admission experiment is retained.
