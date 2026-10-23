@@ -1,0 +1,33 @@
+import System.*
+import System.Optional.*
+import System.Result.*
+import System.Concurrency.Tasks.*
+import System.Web.Http.*
+
+async func Main(arguments: string[]) -> Task<()> {
+    if arguments[0] == "charset" {
+        let Ok(media) = MediaType.Parse("text/plain; charset=iso-8859-1") else { System.Fail("Parse") }
+        _ = HttpStringContent("body", media)
+        System.Fail("Conflicting charset accepted")
+    }
+    let client = HttpClient()
+    if arguments[0] == "invalid" {
+        let content = HttpMemoryContent(default(ReadOnlyMemory<byte>), arguments[1])
+        let Ok(request) = HttpRequest.Post("http://invalid.invalid/", content) else { System.Fail("Construct legacy") }
+        let invalidResult = await client.Send(request)
+        client.Dispose()
+        let Failure(HttpError.InvalidRequest(_)) = invalidResult else { System.Fail("Invalid media type must fail before DNS") }
+        Console.WriteLine("PASS invalid media type before DNS")
+        return
+    }
+    let Ok(media) = MediaTypes.Application.Json.WithParameter("profile", "A; B") else { System.Fail("Parameter") }
+    let Ok(request) = HttpRequest.Post(arguments[0], HttpStringContent("{}", media)) else { System.Fail("Request") }
+    let result = await client.Send(request)
+    client.Dispose()
+    let Ok(response) = result else { System.Fail("Send") }
+    let Ok(Some(received)) = response.GetContentType() else { System.Fail("Response type") }
+    if !received.Equals(MediaTypes.Application.ProblemJson) || response.Content.Length != 2 {
+        System.Fail("Response mismatch")
+    }
+    Console.WriteLine("PASS media type client")
+}

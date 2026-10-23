@@ -26,6 +26,13 @@ public class HttpMemoryContent : HttpContent {
         self.memory = memory
     }
 
+    /// <summary>Retains bytes with a validated media type; does not encode or validate the body.</summary>
+    /// <param name="memory">Persistent source window; no copy is made.</param>
+    /// <param name="contentType">Structured Content-Type to format when sending.</param>
+    init(memory: ReadOnlyMemory<byte>, contentType: MediaType) : base(contentType) {
+        self.memory = memory
+    }
+
     /// <summary>The retained readonly window. Other aliases may modify its backing storage.</summary>
     val Memory: ReadOnlyMemory<byte> => memory
 }
@@ -50,6 +57,19 @@ public class HttpStreamContent : HttpContent {
         return Ok(HttpStreamContent(stream, length, leaveOpen))
     }
 
+    /// <summary>Creates a known-length stream with a validated media type.</summary>
+    /// <param name="stream">Source kept open until consumption completes.</param>
+    /// <param name="length">Exact byte count within the HTTP body limit.</param>
+    /// <param name="leaveOpen">Whether disposal leaves the source open.</param>
+    /// <param name="contentType">Content metadata; does not inspect the stream.</param>
+    /// <returns>Stream content, InvalidRequest for negative length, or LimitExceeded for excess length.</returns>
+    /// <remarks>Ownership transfers only on success when leaveOpen is false.</remarks>
+    static func Create(stream: InputStream, length: int, leaveOpen: bool, contentType: MediaType) -> Result<HttpStreamContent, HttpError> {
+        let content = Create(stream, length, leaveOpen)?
+        content.SetMediaType(contentType)
+        return Ok(content)
+    }
+
     internal static func IncomingBody(stream: InputStream, length: int) -> HttpStreamContent {
         return HttpStreamContent(stream, length, false)
     }
@@ -61,6 +81,21 @@ public class HttpStringContent : HttpContent {
     /// <summary>Encodes text as UTF-8 with text/plain; charset=utf-8.</summary>
     /// <param name="text">Text to encode into independently owned bytes.</param>
     init(text: string) : base(HttpText.Encode(text), "text/plain; charset=utf-8") { }
+
+    /// <summary>Encodes UTF-8 text with a validated Content-Type.</summary>
+    /// <param name="text">Text to encode into independently owned bytes.</param>
+    /// <param name="contentType">Media type with no charset or charset=utf-8; conflicting charsets fault.</param>
+    /// <remarks>Preserves absent charset, as appropriate for application/json. Does not serialize or validate the format.</remarks>
+    init(text: string, contentType: MediaType) : base(HttpText.Encode(text), Utf8ContentType(contentType)) { }
+
+    private static func Utf8ContentType(contentType: MediaType) -> MediaType {
+        if let Some(charset) = contentType.CharSet {
+            if charset != "utf-8" {
+                System.Fail("HttpStringContent requires charset=utf-8")
+            }
+        }
+        return contentType
+    }
 
     /// <summary>Reads a buffered or streaming body as strict UTF-8 text.</summary>
     /// <param name="content">Content to read; a streaming body is consumed once, without closing it.</param>

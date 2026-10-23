@@ -1,0 +1,77 @@
+{
+  "runtime": ".NET 10.0.0",
+  "parsing": [
+    {
+      "input": "application/json",
+      "accepted": true
+    },
+    {
+      "input": "TEXT/HTML; Charset=\u0022UTF-8\u0022",
+      "accepted": true
+    },
+    {
+      "input": "text/plain; x =a",
+      "accepted": true
+    },
+    {
+      "input": "text/plain; x= a",
+      "accepted": true
+    },
+    {
+      "input": "text/plain; x=a; X=b",
+      "accepted": true
+    },
+    {
+      "input": "text/plain; ;",
+      "accepted": false
+    },
+    {
+      "input": "text/plain; q=0.8",
+      "accepted": true
+    },
+    {
+      "input": "text/*",
+      "accepted": true
+    },
+    {
+      "input": "application/*\u002Bjson",
+      "accepted": true
+    },
+    {
+      "input": "text/plain\r\nX: bad",
+      "accepted": false
+    }
+  ],
+  "equality": [
+    {
+      "left": "text/html; charset=utf-8; x=one",
+      "right": "TEXT/HTML; x=one; charset=UTF-8",
+      "equal": true,
+      "equalHash": true
+    },
+    {
+      "left": "multipart/form-data; boundary=ABC",
+      "right": "multipart/form-data; boundary=abc",
+      "equal": true,
+      "equalHash": true
+    },
+    {
+      "left": "text/plain; x=one",
+      "right": "text/plain; x=\u0022one\u0022",
+      "equal": false,
+      "equalHash": false
+    },
+    {
+      "left": "text/plain; x=ONE",
+      "right": "text/plain; x=one",
+      "equal": true,
+      "equalHash": true
+    },
+    {
+      "left": "application/json",
+      "right": "application/problem\u002Bjson",
+      "equal": false,
+      "equalHash": false
+    }
+  ]
+}

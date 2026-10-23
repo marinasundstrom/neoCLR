@@ -2976,3 +2976,16 @@ snapshots use these names. No compatibility aliases or renderer exclusions are a
 imported, alongside the `Failure` Result case. Three platform declarations receive
 the same source spelling cleanup. Public metadata signatures are unchanged; the
 CLI source fingerprints are refreshed while retaining the existing reference.
+
+## Structured media types (development 2026-10-23)
+
+The native reference selects MediaType and all four public catalog classes in
+System.Web.Http.MediaTypes, including parameter, equality, formatting and typed
+content overloads. Request, response and content GetContentType methods have
+result/error and ownership documentation. Catalog groups are a namespace rather
+than nested static types because current native emission rejects nested static
+classes. This is ordinary library metadata, with no compiler bridge changes.
+The legacy CLI scaffold does not project these development additions; the complete
+native snapshot is authoritative, as for other native-only APIs. No native public
+member is excluded. See the [HTTP contract](../docs/http-client-design.md#structured-media-types--development-2026-10-23)
+and [focused evidence](../docs/experiments/media-types/README.md).

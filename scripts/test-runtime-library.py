@@ -406,6 +406,20 @@ INDEX_RANGE_NAMES = [
     'Sequence slicing delegates to the list range contract',
     'Native extension indexers support writes and compound assignment',
 ]
+MEDIA_TYPE_VALUES_NAMES = [
+    'Media type equality ignores order and syntax but preserves boundary case',
+    'Media type parameter views cannot mutate the value',
+    'Media type parser rejects invalid syntax and ambiguous parameters',
+    'Legacy content parsing caches values and distinguishes absence from errors',
+    'Media type limits and parameter updates return errors without faults',
+    'HTTP messages expose actual Content-Type and reject duplicate fields',
+    'Media type presets reuse values and formatted strings',
+    'Media type quoted parameters round trip escaped separators',
+    'Media types separate concrete content types from Accept ranges',
+    'Media type parsing retains structure and custom types',
+    'Typed HTTP content retains media types without reparsing',
+    'Media types accept optional whitespace and empty parameter segments',
+]
 HTTP_METHOD_VALUES_NAMES = [
     'HTTP coffee requests retain BREW and unnamed status codes',
     'HTTP custom method construction and parsing preserve spelling',
@@ -476,7 +490,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True, help='Fresh build/evidence directory')
     parser.add_argument('--aot', type=Path, default=ROOT / 'target/debug' / ('neoclr-codegen.exe' if os.name == 'nt' else 'neoclr-codegen'))
     parser.add_argument('--runtime', type=Path, default=ROOT / 'target/release' / ('neoclr.exe' if os.name == 'nt' else 'neoclr'))
-    parser.add_argument('--suite', action='append', choices=('error-context', 'environment-discovery', 'native-callbacks', 'native-buffers', 'native-pointers', 'method-state', 'type-relations', 'collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'memory-lifetimes', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'cryptography', 'gzip', 'encoding-boundaries', 'encoding-buffer-limits', 'int64-parsing', 'primitive-parsing', 'numeric-formatting', 'globalization', 'enum-parsing', 'record-formatting', 'record-allocations', 'floating-special-values', 'decimal', 'currency', 'deconstruction', 'localization', 'dependency-injection', 'path-values', 'http-header-values', 'http-method-values', 'index-range', 'http-text', 'http-content-copy', 'http-lifetime', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
+    parser.add_argument('--suite', action='append', choices=('error-context', 'environment-discovery', 'native-callbacks', 'native-buffers', 'native-pointers', 'method-state', 'type-relations', 'collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'memory-lifetimes', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'cryptography', 'gzip', 'encoding-boundaries', 'encoding-buffer-limits', 'int64-parsing', 'primitive-parsing', 'numeric-formatting', 'globalization', 'enum-parsing', 'record-formatting', 'record-allocations', 'floating-special-values', 'decimal', 'currency', 'deconstruction', 'localization', 'dependency-injection', 'path-values', 'http-header-values', 'http-method-values', 'media-type-values', 'media-type-allocations', 'index-range', 'http-text', 'http-content-copy', 'http-lifetime', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
                         help='Run only this suite (repeatable); default runs qualified suites')
     parser.add_argument("--execution-repetitions", type=int, default=1, help="Repeat the full suite process in each mode for timing; guards/selectors still run once")
     parser.add_argument('--mode', action='append', choices=('native', 'interpreter', 'jit'),
@@ -484,8 +498,8 @@ def main():
     parser.add_argument('--jit-host', type=Path, help='Matching trusted native helper library for JIT')
     args = parser.parse_args()
     modes = args.mode or ['jit']
-    if args.suite and 'record-allocations' in args.suite and set(modes) != {'interpreter'}:
-        parser.error('record-allocations requires --mode interpreter; native/JIT GC counters are not bound')
+    if args.suite and any(name in args.suite for name in ('record-allocations', 'media-type-allocations')) and set(modes) != {'interpreter'}:
+        parser.error('allocation suites require --mode interpreter; native/JIT GC counters are not bound')
     bundled_bin = args.bundle.resolve() / 'bin'
     if (bundled_bin / ('neoclr-jit-host.dll' if os.name == 'nt' else 'neoclr-jit-host.dylib')).is_file():
         if args.runtime == parser.get_default('runtime'):
@@ -557,6 +571,8 @@ def main():
         ('primitive-parsing', 0, ''.join('PASS ' + n + '\n' for n in PRIMITIVE_PARSING_NAMES) + f'Tests: {len(PRIMITIVE_PARSING_NAMES)}, passed: {len(PRIMITIVE_PARSING_NAMES)}, failed: 0, skipped: 0\n'),
         ('path-values', 0, ''.join('PASS ' + n + '\n' for n in PATH_VALUES_NAMES) + f'Tests: {len(PATH_VALUES_NAMES)}, passed: {len(PATH_VALUES_NAMES)}, failed: 0, skipped: 0\n'),
         ('index-range', 0, ''.join('PASS ' + n + '\n' for n in INDEX_RANGE_NAMES) + f'Tests: {len(INDEX_RANGE_NAMES)}, passed: {len(INDEX_RANGE_NAMES)}, failed: 0, skipped: 0\n'),
+        ('media-type-values', 0, ''.join('PASS ' + n + '\n' for n in MEDIA_TYPE_VALUES_NAMES) + f'Tests: {len(MEDIA_TYPE_VALUES_NAMES)}, passed: {len(MEDIA_TYPE_VALUES_NAMES)}, failed: 0, skipped: 0\n'),
+        ('media-type-allocations', 0, 'PASS Warm media type access performs no managed allocations\nPASS Raw media type validation performs no managed allocations\nTests: 2, passed: 2, failed: 0, skipped: 0\n'),
         ('http-method-values', 0, ''.join('PASS ' + n + '\n' for n in HTTP_METHOD_VALUES_NAMES) + f'Tests: {len(HTTP_METHOD_VALUES_NAMES)}, passed: {len(HTTP_METHOD_VALUES_NAMES)}, failed: 0, skipped: 0\n'),
         ('http-header-values', 0, ''.join('PASS ' + n + '\n' for n in HTTP_HEADER_VALUES_NAMES) + f'Tests: {len(HTTP_HEADER_VALUES_NAMES)}, passed: {len(HTTP_HEADER_VALUES_NAMES)}, failed: 0, skipped: 0\n'),
         ('http-route-matching', 0, ''.join('PASS ' + n + '\n' for n in HTTP_ROUTE_MATCHING_NAMES) + f'Tests: {len(HTTP_ROUTE_MATCHING_NAMES)}, passed: {len(HTTP_ROUTE_MATCHING_NAMES)}, failed: 0, skipped: 0\n'),
@@ -584,7 +600,7 @@ def main():
             report['libraryCatalogSha256'] = sha(lib / 'bundle.json')
         # Only explicitly qualified suites enter the default release gate.
         selected = [case for case in expected
-                    if (not args.suite and case[0] not in ('record-allocations', 'native-pointers', 'native-buffers', 'native-callbacks')) or (args.suite and case[0] in args.suite)]
+                    if (not args.suite and case[0] not in ('record-allocations', 'media-type-allocations', 'native-pointers', 'native-buffers', 'native-callbacks')) or (args.suite and case[0] in args.suite)]
         report['suites'] = [case[0] for case in selected]
         if not args.suite:
             validation.validate(bundle, out / 'discovery-signatures')

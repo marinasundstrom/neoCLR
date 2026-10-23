@@ -284,3 +284,24 @@ Object equality/hash overrides. Typed and boxed values compare both protocol
 components, and ToString consistently formats major.minor. This also applies to
 versions obtained from requests and responses; supported transport protocols remain
 unchanged. Hashes are execution-local and do not indicate protocol support.
+
+## Media types (development)
+
+HTTP content accepts a structured `MediaType`, with predefined values such as
+`MediaTypes.Application.Json` and `MediaTypes.Text.Plain`. Custom types and quoted
+parameters can be parsed with `MediaType.Parse`; `WithParameter` returns a modified
+value without mutating the original. Presets, formatted strings and hashes are
+cached, and parameter views do not copy their contents on access.
+
+`HttpRequest.GetContentType()` and `HttpResponse.GetContentType()` distinguish absent
+headers from malformed or duplicate Content-Type fields. Typed content retains its
+media type; string content still encodes UTF-8 and rejects a conflicting charset.
+Media types describe content; they do not select serializers or add multipart or
+Accept negotiation support. Outbound legacy string metadata now receives full media
+type syntax validation before sending. The parser allows up to 32 KiB and 100
+parameters; existing transport ASCII-header limits still apply.
+
+The executable fixtures in
+[media type validation](https://github.com/marinasundstrom/neoCLR/tree/main/docs/experiments/media-types)
+exercise typed content against independent HTTP peers. Browse the
+[HTTP API reference](/docs/api/System/Web/Http/index.html) for type/member contracts.

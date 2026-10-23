@@ -14,6 +14,9 @@ Use the API browser to find a module or type, or search for a name. Module pages
 list their types, functions and constants; type pages list their members. Open a
 member for parameters, return values, errors and usage notes.
 
+Media type structure, typed presets and Content-Type parsing are available in the
+[HTTP module](api/System/Web/Http/index.html) (development).
+
 ## Find an API
 
 | Area | Starting points |

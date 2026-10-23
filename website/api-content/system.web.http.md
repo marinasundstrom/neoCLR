@@ -45,3 +45,17 @@ Development `HttpServer.Serve(handler)` owns bounded concurrent callback dispatc
 Its task represents the server lifetime; applications do not await each request in
 an accept loop. See [server-managed callbacks](/docs/http-server.html#server-managed-callbacks)
 for outcome diagnostics, ownership and joined shutdown.
+
+## Media types (development)
+
+`MediaType.Parse` provides immutable type/subtype, suffix and parameter structure.
+Use typed presets such as `MediaTypes.Application.Json` and `MediaTypes.Text.Plain`
+with the typed HTTP content constructors. Presets and formatted strings are cached;
+custom inputs are not globally interned. `WithParameter` returns a changed value,
+and equality preserves case-sensitive boundary/unknown parameter values.
+
+`HttpRequest.GetContentType()` and `HttpResponse.GetContentType()` return
+`Result<Optional<MediaType>, HttpError>`: missing and malformed headers remain distinct.
+`HttpContent.GetContentType()` reads producer metadata. None of these reads consumes
+a body. Content-Type is a concrete media type, not an Accept range or quality weight.
+See the [media type contract](/features/web/#media-types-development) for limits.

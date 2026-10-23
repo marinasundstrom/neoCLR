@@ -21662,3 +21662,67 @@ See [the development API contract](../api-docs/error-context.md).
   [Validation evidence](validation/optional/validation.json) records counts,
   artifact identities and the distinction between native bundle builds and final
   compiler commits. No branch merge or website publication was performed.
+## 2026-10-23 — Media type representation discussion
+
+- **Author:** Asked how System.Web should represent media types in HTTP APIs,
+  suggesting predefined media types and a value object retaining their structure.
+- **Assistant proposal:** An immutable MediaType value object, provisionally in
+  System.Web.Http, with type/subtype, optional structured suffix, read-only
+  parameters, parsing/formatting and explicit equality semantics; a grouped
+  MediaTypes catalog supplies typed values. Prefer an ordinary reference class
+  with value equality, following HttpMethod, rather than a closed enum or special
+  runtime representation. Keep Accept ranges and quality weights separate. Add
+  typed content overloads and retain string migration paths; distinguish absent
+  from malformed incoming Content-Type.
+- **Comparison:** .NET 10 supplies string names through
+  [MediaTypeNames](https://learn.microsoft.com/en-us/dotnet/api/system.net.mime.mediatypenames?view=net-10.0)
+  and mutable structured values through
+  [MediaTypeHeaderValue](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.headers.mediatypeheadervalue?view=net-10.0).
+  Typed immutable presets would deliberately differ, making sharing safe and
+  avoiding caller-side parsing, at the cost of a different API and copy-on-change
+  operations. ASP.NET Core's structured header API and Rust
+  [mime 0.3.17](https://docs.rs/mime/0.3.17/mime/struct.Mime.html)
+  provide additional decomposition precedents. Sources consulted 2026-10-23;
+  [RFC 9110 sections 5.6.6, 8.3.1 and 12.5.1](https://www.rfc-editor.org/rfc/rfc9110.html)
+  govern parameter syntax, case rules and Accept ranges.
+- **Open:** Naming/namespace, duplicate-parameter policy and precise equality
+  require a contract before implementation. Differential .NET checks, quoted
+  parameter round trips, case-sensitive boundaries, invalid inputs and an HTTP
+  consumer are proposed validation, not performed tests. Independent .NET project
+  and API-review issue research remain open. This is a design discussion, with no
+  author acceptance, runtime implementation or roadmap reprioritization inferred.
+
+- **Author acceptance and refinement:** Directed implementation and a commit, then
+  requested tests and attention to allocation efficiency, caching and interning,
+  comparing the intended convenience with HttpMethod. Clarified that structured
+  values should materialize lazily: HTTP internals can retain validated primitive
+  strings without constructing a MediaType for every header.
+- **General author direction:** Value objects define consumer-facing contracts;
+  internal processing should prefer validated primitives when a wrapper adds no
+  value. The assistant recorded this in AGENTS.md and design-research.md, with
+  consistent validation, bounded caches and measurement requirements. This does
+  not replace structured public contracts with primitive-only APIs.
+- **Assistant action:** Implements one shared admission scanner for raw HTTP and
+  structured parsing, lazy cached content/message access, typed content overloads,
+  cached preset values/strings/hashes, retained parameter views and focused tests.
+  Allocation diagnostics identified string-to-Object conversions in the test's
+  ReferenceEquals call; hot formatting is measured without those conversions.
+  The catalog uses a namespace because native nested static classes are currently
+  unsupported; no compiler change or Runtime Contract encoding is introduced.
+- **Author follow-up:** After this slice, inspect Uri efficiency and perhaps Path.
+  The assistant will measure and address a bounded opportunity after the media
+  type commit; this is a follow-up task, not a permanent roadmap reprioritization.
+
+- **Author clarification:** Cited prior HTTP server performance loss from storing
+  URI objects eagerly. Requested treating value objects as contract views that
+  can be projected from existing validated components on demand, while choosing
+  class/struct/record representation deliberately. The assistant preserved the
+  existing request component storage and recorded the rationale; this statement
+  is author-reported prior evidence, not a new measurement of URI performance.
+
+- **Outcome:** The media type slice passes 12 contracts in interpreter/JIT/native,
+  two interpreter allocation tests (zero allocations over 128 iterations each),
+  and 20 interpreter/native wire and guard cases. Native API/reference snapshots
+  are refreshed; four snapshot tests pass. No full website build or publication.
+  [Exact evidence](experiments/media-types/validation.json). The separate Uri/Path
+  review remains pending after this commit.

@@ -102,6 +102,22 @@ See [the changelog workflow](docs/changelog.md) for consolidation and release ha
 - Record provisional choices and validation needs. This process is not an additional
   approval requirement and does not override authorized work.
 
+## Value objects and allocation efficiency
+
+- Value objects belong to the consumer-facing contract: they validate and describe
+  correctly formed inputs and outputs. Internally, prefer validated primitive
+  representations when materializing a wrapper adds no value (author direction,
+  2026-10-23). Construct structured objects lazily at the API boundary where useful,
+  retain supplied values, and cache reusable values/formatting when justified.
+- Preserve one consistent validation contract across primitive and structured paths;
+  avoiding a wrapper must not bypass validation or change observable semantics.
+  For example, retain already parsed URI components on an HTTP request and project
+  a Uri only when requested, instead of rebuilding/parsing an equivalent URI on
+  the hot path. Choose class/struct/record representation separately, accounting
+  for copy, allocation and lifetime costs rather than assuming structs are free.
+  Do not globally intern or cache arbitrary external input. Measure relevant
+  allocation/performance changes rather than assuming fewer wrappers are faster.
+
 ## Record significant development conversations
 
 - Maintain [the development conversation record](docs/development-timeline.md) for

@@ -1,0 +1,175 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "cases": [
+    {
+      "case": "conflicting-charset",
+      "mode": "interpreter",
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: HttpStringContent requires charset=utf-8\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_A73FE0C4D505EF60D01EE85D686276C3EB75EA34E15D9D88F66D1440F350FF71.T_53797374656D2E5765622E48747470_48747470537472696E67436F6E74656E74.M_55746638436F6E74656E7454797065 [instruction 15]\n   at NeoMetadata_A73FE0C4D505EF60D01EE85D686276C3EB75EA34E15D9D88F66D1440F350FF71.T_53797374656D2E5765622E48747470_48747470537472696E67436F6E74656E74..ctor [instruction 4]\n   at NeoMetadata_F814A91F1224742EBF5B15D012F242B49599C92CD8285003771CB3C9128B1809.T__24636C6F737572652430.M_496E766F6B65 [instruction 23]\n   at NeoMetadata_F814A91F1224742EBF5B15D012F242B49599C92CD8285003771CB3C9128B1809.T_52756E74696D65417761697450726F7669646572_426F64796031.M_52756E [instruction 2]\n   at NeoMetadata_F814A91F1224742EBF5B15D012F242B49599C92CD8285003771CB3C9128B1809.T_526176656E2E47656E657261746564_556E697443616C6C6261636B.M_496E766F6B65 [instruction 2]\n   at NeoMetadata_F814A91F1224742EBF5B15D012F242B49599C92CD8285003771CB3C9128B1809.T_52756E74696D65417761697450726F7669646572_427269646765.M_5374617274 [instruction 10]\n   at NeoMetadata_F814A91F1224742EBF5B15D012F242B49599C92CD8285003771CB3C9128B1809.F_4D61696E [instruction 3]\n   at NeoMetadata_F814A91F1224742EBF5B15D012F242B49599C92CD8285003771CB3C9128B1809.F_3C4E656F46756E6374696F6E3E3532363137363635364532453437363536453635373236313734363536345F334334313733373936453633343536453734373237393345 [instruction 1]\n"
+    },
+    {
+      "case": "invalid-before-dns",
+      "mode": "interpreter",
+      "exitCode": 0,
+      "stdout": "PASS invalid media type before DNS\n",
+      "stderr": "",
+      "input": "not-a-media-type"
+    },
+    {
+      "case": "invalid-before-dns",
+      "mode": "interpreter",
+      "exitCode": 0,
+      "stdout": "PASS invalid media type before DNS\n",
+      "stderr": "",
+      "input": "text/plain; x=a; X=b"
+    },
+    {
+      "case": "invalid-before-dns",
+      "mode": "interpreter",
+      "exitCode": 0,
+      "stdout": "PASS invalid media type before DNS\n",
+      "stderr": "",
+      "input": "text/*"
+    },
+    {
+      "case": "invalid-before-dns",
+      "mode": "interpreter",
+      "exitCode": 0,
+      "stdout": "PASS invalid media type before DNS\n",
+      "stderr": "",
+      "input": "text/plain; x =a"
+    },
+    {
+      "case": "invalid-before-dns",
+      "mode": "interpreter",
+      "exitCode": 0,
+      "stdout": "PASS invalid media type before DNS\n",
+      "stderr": "",
+      "input": "text/plain; x=\"unterminated"
+    },
+    {
+      "case": "invalid-before-dns",
+      "mode": "interpreter",
+      "exitCode": 0,
+      "stdout": "PASS invalid media type before DNS\n",
+      "stderr": "",
+      "input": "text/plain; x=\"a\r\nb\""
+    },
+    {
+      "case": "invalid-before-dns",
+      "mode": "interpreter",
+      "exitCode": 0,
+      "stdout": "PASS invalid media type before DNS\n",
+      "stderr": "",
+      "input": "text/plain; q=0.5"
+    },
+    {
+      "case": "media-type-client",
+      "mode": "interpreter",
+      "exitCode": 0,
+      "stdout": "PASS media type client\n",
+      "stderr": "",
+      "peer": {
+        "validated": true
+      }
+    },
+    {
+      "case": "media-type-server",
+      "mode": "interpreter",
+      "exitCode": 0,
+      "stdout": "PASS media type server\n",
+      "stderr": "",
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a20320d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a206170706c69636174696f6e2f70726f626c656d2b6a736f6e0d0a0d0a7b7d"
+    },
+    {
+      "case": "conflicting-charset",
+      "mode": "native",
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: HttpStringContent requires charset=utf-8\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at System.Web.Http.HttpStringContent.Utf8ContentType [instruction 15]\n   at System.Web.Http.HttpStringContent..ctor [instruction 4]\n   at $closure$0.Invoke [instruction 23]\n   at RuntimeAwaitProvider.Body`1.Run [instruction 2]\n   at Raven.Generated.UnitCallback.Invoke [instruction 2]\n   at RuntimeAwaitProvider.Bridge.Start [instruction 10]\n   at Main [instruction 3]\n   at Raven.Generated.<AsyncEntry> [instruction 1]\n"
+    },
+    {
+      "case": "invalid-before-dns",
+      "mode": "native",
+      "exitCode": 0,
+      "stdout": "PASS invalid media type before DNS\n",
+      "stderr": "",
+      "input": "not-a-media-type"
+    },
+    {
+      "case": "invalid-before-dns",
+      "mode": "native",
+      "exitCode": 0,
+      "stdout": "PASS invalid media type before DNS\n",
+      "stderr": "",
+      "input": "text/plain; x=a; X=b"
+    },
+    {
+      "case": "invalid-before-dns",
+      "mode": "native",
+      "exitCode": 0,
+      "stdout": "PASS invalid media type before DNS\n",
+      "stderr": "",
+      "input": "text/*"
+    },
+    {
+      "case": "invalid-before-dns",
+      "mode": "native",
+      "exitCode": 0,
+      "stdout": "PASS invalid media type before DNS\n",
+      "stderr": "",
+      "input": "text/plain; x =a"
+    },
+    {
+      "case": "invalid-before-dns",
+      "mode": "native",
+      "exitCode": 0,
+      "stdout": "PASS invalid media type before DNS\n",
+      "stderr": "",
+      "input": "text/plain; x=\"unterminated"
+    },
+    {
+      "case": "invalid-before-dns",
+      "mode": "native",
+      "exitCode": 0,
+      "stdout": "PASS invalid media type before DNS\n",
+      "stderr": "",
+      "input": "text/plain; x=\"a\r\nb\""
+    },
+    {
+      "case": "invalid-before-dns",
+      "mode": "native",
+      "exitCode": 0,
+      "stdout": "PASS invalid media type before DNS\n",
+      "stderr": "",
+      "input": "text/plain; q=0.5"
+    },
+    {
+      "case": "media-type-client",
+      "mode": "native",
+      "exitCode": 0,
+      "stdout": "PASS media type client\n",
+      "stderr": "",
+      "peer": {
+        "validated": true
+      }
+    },
+    {
+      "case": "media-type-server",
+      "mode": "native",
+      "exitCode": 0,
+      "stdout": "PASS media type server\n",
+      "stderr": "",
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a20320d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a206170706c69636174696f6e2f70726f626c656d2b6a736f6e0d0a0d0a7b7d"
+    }
+  ],
+  "sources": {
+    "Server.rvnproj": "b1786e6b71da8714a9e40dfadcc5a6925958790b35f116acc985296ec0a8f3b0",
+    "Client.rvn": "77a67b2a2f3ca55690e2f599295cd84cc3e5d435333213dba811d84ca253cfed",
+    "Client.rvnproj": "819d1c42edbc7e412001c140fa21d1ff7e4b3638a505113a07b5d95b207d6f33",
+    "Server.rvn": "07bac9ca6fba8bc97f8bb4322d38c370ce2cee5ddc1e0c9737e7d51b07575c5c"
+  },
+  "bundleManifestSha256": "d3cadbe43af181e0f2e40bf1fefcafb9d07983632f825bf5a04ea7998bff35fb"
+}

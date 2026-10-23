@@ -1,0 +1,344 @@
+module System.Web.Http
+
+import System.*
+import System.Collections.*
+import System.Optional.*
+import System.Result.*
+import System.Text.*
+
+/// <summary>An immutable concrete HTTP media type with decoded parameters and value equality.</summary>
+/// <remarks>Development API. Type, subtype and parameter names are ASCII case-insensitive. Charset values ignore ASCII case; other values use ordinal equality. Parameter order and quoting do not affect equality. Accept ranges and quality weights are not media types.</remarks>
+public class MediaType : EquatableTo<MediaType> {
+    private var typeName: string
+    private var subtypeName: string
+    private val parameters: ArrayList<KeyValuePair<string, string>>
+    private val parameterView: Sequence<KeyValuePair<string, string>>
+    private var formatted: string
+    private val hashCode: int
+    private var suffix: Optional<string> = None()
+
+    private init(typeName: string, subtypeName: string, parameters: ArrayList<KeyValuePair<string, string>>) {
+        self.typeName = typeName
+        self.subtypeName = subtypeName
+        self.parameters = parameters
+        parameterView = MediaTypeParameters(parameters)
+        let builder = StringBuilder()
+        builder.Append(typeName).Append("/").Append(subtypeName)
+        let comparer = StringComparer.Ordinal
+        var hash = comparer.GetHashCode(builder.ToString())
+        var index = 0
+        while index < parameters.Count {
+            let parameter = parameters[index]
+            AppendParameter(builder, parameter.Key, parameter.Value)
+            hash = hash ^ comparer.GetHashCode(String.Concat(parameter.Key, String.Concat("=", parameter.Value)))
+            index += 1
+        }
+        formatted = builder.ToString()
+        hashCode = hash
+        let bytes = subtypeName.Utf8Bytes
+        var last = -1
+        index = 0
+        while index < bytes.Length {
+            if bytes[index] == 43 {
+                last = index
+            }
+            index += 1
+        }
+        suffix = if last > 0 && last < bytes.Length - 1 {
+            Some(MediaTypeParser.Text(bytes, last + 1, bytes.Length))
+        } else {
+            None()
+        }
+    }
+
+    /// <summary>The lowercase top-level type, such as application.</summary>
+    val Type: string => typeName
+    /// <summary>The full lowercase subtype, including any structured suffix.</summary>
+    val SubType: string => subtypeName
+    /// <summary>The final nonempty structured suffix after +, or None.</summary>
+    val Suffix: Optional<string> {
+        get {
+            if let Some(value) = suffix {
+                return Some(value)
+            }
+            return None()
+        }
+    }
+    /// <summary>A retained read-only parameter view in input order, with lowercase names and decoded values.</summary>
+    /// <remarks>Repeated access does not allocate a snapshot. The view cannot be downcast to a mutable collection.</remarks>
+    val Parameters: Sequence<KeyValuePair<string, string>> => parameterView
+    /// <summary>The declared charset, or None. Does not select or validate a body codec.</summary>
+    val CharSet: Optional<string> => GetParameter("charset")
+
+    /// <summary>Looks up a parameter using ASCII case-insensitive naming.</summary>
+    /// <param name="name">An HTTP parameter token.</param>
+    /// <returns>The decoded value, or None for an absent or invalid name.</returns>
+    func GetParameter(name: string) -> Optional<string> {
+        let index = FindParameter(name)
+        if index >= 0 {
+            return Some(parameters[index].Value)
+        }
+        return None()
+    }
+
+    private func FindParameter(name: string) -> int {
+        // Compare ASCII bytes directly: no lowercased string or encoded buffer.
+        let candidate = name.Utf8Bytes
+        var index = 0
+        while index < parameters.Count {
+            let key = parameters[index].Key.Utf8Bytes
+            if candidate.Length == key.Length {
+                var offset = 0
+                while offset < key.Length {
+                    var value = (int)candidate[offset]
+                    if value >= 65 && value <= 90 {
+                        value += 32
+                    }
+                    if value != key[offset] {
+                        break
+                    }
+                    offset += 1
+                }
+                if offset == key.Length {
+                    return index
+                }
+            }
+            index += 1
+        }
+        return -1
+    }
+
+    /// <summary>Parses a concrete Content-Type value without changing any body.</summary>
+    /// <param name="text">A type/subtype with optional token or quoted parameters.</param>
+    /// <returns>A value, InvalidRequest for malformed syntax, duplicates, wildcards or q, or LimitExceeded above 32768 UTF-8 bytes or 100 parameters.</returns>
+    /// <remarks>Accepts optional outer whitespace and empty semicolon segments. Whitespace around = is invalid. Unknown types and parameters are retained; registration and required format-specific parameters are not checked.</remarks>
+    static func Parse(text: string) -> Result<MediaType, HttpError> {
+        let parser = MediaTypeParser(text)
+        return parser.Parse()
+    }
+
+    internal static func FromParts(typeName: string, subtypeName: string, parameters: ArrayList<KeyValuePair<string, string>>) -> MediaType {
+        return MediaType(typeName, subtypeName, parameters)
+    }
+
+    internal static func Known(text: string) -> MediaType {
+        let Ok(value) = MediaTypeParser(text).Parse() else {
+            System.Fail("Invalid predefined media type")
+            return Known("application/octet-stream")
+        }
+        value.typeName = String.Intern(value.typeName)
+        value.subtypeName = String.Intern(value.subtypeName)
+        value.formatted = String.Intern(value.formatted)
+        if let Some(suffix) = value.suffix {
+            value.suffix = Some(String.Intern(suffix))
+        }
+        return value
+    }
+
+    /// <summary>Returns a new value with a parameter added or replaced, preserving this instance.</summary>
+    /// <param name="name">A nonempty ASCII token other than q.</param>
+    /// <param name="value">Decoded parameter text. Quotes and backslashes are escaped automatically.</param>
+    /// <returns>A new value, InvalidRequest for invalid text, or LimitExceeded for parser bounds.</returns>
+    /// <remarks>Rejects CR, LF, NUL, DEL and controls other than tab. Non-ASCII text is preserved as UTF-8; legacy arbitrary byte encodings are not decoded.</remarks>
+    func WithParameter(name: string, value: string) -> Result<MediaType, HttpError> {
+        if !MediaTypeParser.ValidToken(name) || name.ToLowerInvariant() == "q" {
+            return Failure(HttpError.InvalidRequest("Invalid media type parameter name"))
+        }
+        if name.Utf8Bytes.Length > 32768 || value.Utf8Bytes.Length > 32768 ||
+            formatted.Utf8Bytes.Length + name.Utf8Bytes.Length + value.Utf8Bytes.Length * 2 + 5 > 65536 {
+            return Failure(HttpError.LimitExceeded("Media type parameter exceeds formatting limit"))
+        }
+        let key = name.ToLowerInvariant()
+        let oldIndex = FindParameter(key)
+        if oldIndex >= 0 && String.CompareOrdinal(parameters[oldIndex].Value, value) == 0 {
+            return Ok(self)
+        }
+        let builder = StringBuilder()
+        builder.Append(typeName).Append("/").Append(subtypeName)
+        for parameter in parameters {
+            if parameter.Key != key {
+                AppendParameter(builder, parameter.Key, parameter.Value)
+            }
+        }
+        AppendParameter(builder, key, value)
+        return Parse(builder.ToString())
+    }
+
+    /// <summary>Formats normalized names and safely quoted parameters in retained order.</summary>
+    /// <returns>One Content-Type value without a field name or line terminator.</returns>
+    override func ToString() -> string => formatted
+
+    private static func AppendParameter(builder: StringBuilder, name: string, value: string) {
+        builder.Append("; ").Append(name).Append("=")
+        if MediaTypeParser.ValidToken(value) {
+            builder.Append(value)
+            return
+        }
+        builder.Append("\"")
+        let bytes = value.Utf8Bytes
+        var start = 0
+        var index = 0
+        while index < bytes.Length {
+            if bytes[index] == 34 || bytes[index] == 92 {
+                builder.Append(MediaTypeParser.Text(bytes, start, index)).Append("\\")
+                start = index
+            }
+            index += 1
+        }
+        builder.Append(MediaTypeParser.Text(bytes, start, bytes.Length)).Append("\"")
+    }
+
+    /// <summary>Compares structure without parameter ordering or quoting; this is not Accept matching.</summary>
+    func Equals(other: MediaType) -> bool {
+        if typeName != other.typeName || subtypeName != other.subtypeName || parameters.Count != other.parameters.Count {
+            return false
+        }
+        var index = 0
+        while index < parameters.Count {
+            let parameter = parameters[index]
+            let otherIndex = other.FindParameter(parameter.Key)
+            if otherIndex < 0 || String.CompareOrdinal(parameter.Value, other.parameters[otherIndex].Value) != 0 {
+                return false
+            }
+            index += 1
+        }
+        return true
+    }
+
+    /// <summary>Compares a MediaType; null and other object types are unequal.</summary>
+    override func Equals(other: Object?) -> bool {
+        if other is MediaType mediaType {
+            return Equals(mediaType)
+        }
+        return false
+    }
+
+    /// <summary>Returns a hash consistent with order-independent value equality.</summary>
+    override func GetHashCode() -> int => hashCode
+
+
+}
+
+// Byte-oriented HTTP grammar; decoded quoted values retain UTF-8 text.
+internal class MediaTypeParser {
+    private val source: string
+    private val bytes: ReadOnlySlice<byte> => source.Utf8Bytes
+    private var position = 0
+
+    init(text: string) {
+        source = text
+    }
+
+    internal static func Text(bytes: ReadOnlySlice<byte>, first: int, last: int) -> string {
+        let Ok(text) = HttpText.Decode(bytes.Slice(first, last - first)) else {
+            System.Fail("Invalid UTF-8 media type text")
+            return ""
+        }
+        return text
+    }
+
+    internal static func ValidToken(text: string) -> bool {
+        let bytes = text.Utf8Bytes
+        if bytes.Length == 0 {
+            return false
+        }
+        var index = 0
+        while index < bytes.Length {
+            if !MediaTypeSyntax.Token(bytes[index]) {
+                return false
+            }
+            index += 1
+        }
+        return true
+    }
+
+    private func SkipSpace() {
+        while position < bytes.Length && (bytes[position] == 32 || bytes[position] == 9) {
+            position += 1
+        }
+    }
+
+    private func ReadToken() -> Result<string, HttpError> {
+        let start = position
+        while position < bytes.Length && MediaTypeSyntax.Token(bytes[position]) {
+            position += 1
+        }
+        if start == position {
+            return Failure(HttpError.InvalidRequest("Expected media type token"))
+        }
+        return Ok(Text(bytes, start, position))
+    }
+
+    private func ReadValue() -> Result<string, HttpError> {
+        if position >= bytes.Length || bytes[position] != 34 {
+            return ReadToken()
+        }
+        position += 1
+        let value = ArrayList<byte>()
+        while position < bytes.Length {
+            var item = bytes[position]
+            position += 1
+            if item == 34 {
+                let Ok(text) = HttpText.Decode(value) else {
+                    return Failure(HttpError.InvalidRequest("Invalid UTF-8 quoted parameter"))
+                }
+                return Ok(text)
+            }
+            if item == 92 {
+                if position == bytes.Length {
+                    return Failure(HttpError.InvalidRequest("Incomplete quoted parameter escape"))
+                }
+                item = bytes[position]
+                position += 1
+            }
+            if (item < 32 && item != 9) || item == 127 {
+                return Failure(HttpError.InvalidRequest("Invalid quoted parameter character"))
+            }
+            value.Add(item)
+        }
+        return Failure(HttpError.InvalidRequest("Unterminated quoted parameter"))
+    }
+
+    func Parse() -> Result<MediaType, HttpError> {
+        _ = MediaTypeSyntax.Validate(source)?
+        // Only materialize after the shared wire grammar has admitted the input.
+        SkipSpace()
+        let typeToken = ReadToken()?
+        let typeName = typeToken.ToLowerInvariant()
+        position += 1
+        let subtypeToken = ReadToken()?
+        let subtypeName = subtypeToken.ToLowerInvariant()
+        let parameters = ArrayList<KeyValuePair<string, string>>()
+        SkipSpace()
+        while position < bytes.Length {
+            position += 1
+            SkipSpace()
+            if position == bytes.Length || bytes[position] == 59 {
+                continue
+            }
+            let nameToken = ReadToken()?
+            let name = nameToken.ToLowerInvariant()
+            position += 1
+            var value = ReadValue()?
+            if name == "charset" {
+                value = value.ToLowerInvariant()
+            }
+            parameters.Add(KeyValuePair<string, string>(name, value))
+            SkipSpace()
+        }
+        return Ok(MediaType.FromParts(typeName, subtypeName, parameters))
+    }
+}
+
+// Retains private parser-owned storage without exposing its mutable interface.
+internal class MediaTypeParameters : Sequence<KeyValuePair<string, string>> {
+    private val items: ArrayList<KeyValuePair<string, string>>
+
+    init(items: ArrayList<KeyValuePair<string, string>>) {
+        self.items = items
+    }
+
+    val Count: int => items.Count
+    val self[index: int]: KeyValuePair<string, string> => items[index]
+    func GetIterator() -> Iterator<KeyValuePair<string, string>> => items.GetIterator()
+}

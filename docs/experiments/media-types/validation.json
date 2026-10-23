@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-23",
+  "compilerRevision": "1128b98cf",
+  "platform": "macOS ARM64",
+  "functionalTestsPerMode": 12,
+  "functionalModes": [
+    "interpreter",
+    "jit",
+    "native"
+  ],
+  "allocationTests": 2,
+  "allocationMode": "interpreter",
+  "allocationIterationsPerTest": 128,
+  "managedAllocationsPerTest": 0,
+  "wireCases": 20,
+  "wireModes": [
+    "interpreter",
+    "native"
+  ],
+  "apiSnapshotCheck": "passed",
+  "nativeSnapshotTests": 4,
+  "websiteBuild": "not run; focused API snapshot checks only",
+  "sha256": {
+    "target/media-types-contract-bundle/build-evidence.json": "4d2a55d66ce9df6cfa4c305ae54f579f766f936091973920e706c4d1aad56637",
+    "target/media-types-contract-bundle/bundle/manifest.json": "d3cadbe43af181e0f2e40bf1fefcafb9d07983632f825bf5a04ea7998bff35fb",
+    "target/media-types-contract-bundle/bundle/lib/System.Web.dll": "22fc9c02ed54cd0dba6e973c63201f7f63e2f4d43950d9e9ef418355ac7eb7ad",
+    "api-docs/native-reference.zip": "8c0467399a9ec19547183f67316bb641679e9b4adcd8204fba65ed67aafd59f7"
+  }
+}

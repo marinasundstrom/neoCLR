@@ -1,0 +1,191 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Collections.*
+import System.IO.*
+import System.Optional.*
+import System.Result.*
+import System.Web.Http.*
+import NeoClr.Testing.*
+
+func ParseMedia(text: string) -> MediaType {
+    let Ok(value) = MediaType.Parse(text) else {
+        System.Fail("Test media type must parse")
+    }
+    return value
+}
+
+[Test("Media type presets reuse values and formatted strings")]
+func Presets() -> Result<unit, TestFailure> {
+    let json = MediaTypes.Application.Json
+    _ = Assert.True(Object.ReferenceEquals(json, MediaTypes.Application.Json), "Cached preset")?
+    _ = Assert.True(Object.ReferenceEquals(json.ToString(), json.ToString()), "Cached formatting")?
+    _ = Assert.True(Object.ReferenceEquals(json.ToString(), String.Intern("application/json")), "Interned preset wire string")?
+    _ = Assert.Equal("application/problem+json", MediaTypes.Application.ProblemJson.ToString())?
+    _ = Assert.Equal("application/octet-stream", MediaTypes.Application.OctetStream.ToString())?
+    _ = Assert.Equal("application/xml", MediaTypes.Application.Xml.ToString())?
+    _ = Assert.Equal("application/x-www-form-urlencoded", MediaTypes.Application.FormUrlEncoded.ToString())?
+    _ = Assert.Equal("application/pdf", MediaTypes.Application.Pdf.ToString())?
+    _ = Assert.Equal("text/plain", MediaTypes.Text.Plain.ToString())?
+    _ = Assert.Equal("text/html", MediaTypes.Text.Html.ToString())?
+    _ = Assert.Equal("text/css", MediaTypes.Text.Css.ToString())?
+    _ = Assert.Equal("text/csv", MediaTypes.Text.Csv.ToString())?
+    _ = Assert.Equal("image/png", MediaTypes.Image.Png.ToString())?
+    _ = Assert.Equal("image/jpeg", MediaTypes.Image.Jpeg.ToString())?
+    _ = Assert.Equal("image/svg+xml", MediaTypes.Image.SvgXml.ToString())?
+    return Assert.Equal("multipart/form-data", MediaTypes.Multipart.FormData.ToString())
+}
+
+[Test("Media type parsing retains structure and custom types")]
+func Structure() -> Result<unit, TestFailure> {
+    let value = ParseMedia(" Application/Vnd.Example+JSON ; Charset=\"UTF-8\"; profile=custom ")
+    _ = Assert.Equal("application", value.Type)?
+    _ = Assert.Equal("vnd.example+json", value.SubType)?
+    let Some(suffix) = value.Suffix else { return Assert.True(false, "Suffix present") }
+    _ = Assert.Equal("json", suffix)?
+    let Some(charset) = value.CharSet else { return Assert.True(false, "Charset present") }
+    _ = Assert.Equal("utf-8", charset)?
+    _ = Assert.True(MediaTypes.Text.Plain.Suffix is None, "Absent suffix")?
+    _ = Assert.True(ParseMedia("example/custom").CharSet is None, "Absent charset")?
+    return Assert.Equal("application/vnd.example+json; charset=utf-8; profile=custom", value.ToString())
+}
+
+[Test("Media type quoted parameters round trip escaped separators")]
+func Quoting() -> Result<unit, TestFailure> {
+    let value = ParseMedia("multipart/form-data; boundary=\"A; B\\\"C\\\\D\"; empty=\"\"; title=\"café\"")
+    let Some(boundary) = value.GetParameter("BOUNDARY") else { return Assert.True(false, "Boundary present") }
+    _ = Assert.Equal("A; B\"C\\D", boundary)?
+    let Some(empty) = value.GetParameter("empty") else { return Assert.True(false, "Empty is present") }
+    _ = Assert.Equal("", empty)?
+    return Assert.True(value.Equals(ParseMedia(value.ToString())), "Quoted round trip")
+}
+
+[Test("Media type equality ignores order and syntax but preserves boundary case")]
+func Equality() -> Result<unit, TestFailure> {
+    let left = ParseMedia("TEXT/HTML; Charset=UTF-8; x=one")
+    let right = ParseMedia("text/html;x=\"one\";charset=\"utf-8\"")
+    _ = Assert.True(left.Equals(right), "Typed structure equality")?
+    _ = Assert.Equal(left.GetHashCode(), right.GetHashCode())?
+    let boxed: Object = left
+    _ = Assert.True(boxed.Equals(right), "Object equality")?
+    _ = Assert.True(!boxed.Equals(null), "Null differs")?
+    _ = Assert.True(!boxed.Equals("text/html"), "Other type differs")?
+    _ = Assert.True(!ParseMedia("multipart/form-data; boundary=ABC").Equals(ParseMedia("multipart/form-data; boundary=abc")), "Boundary case matters")?
+    return Assert.True(!MediaTypes.Application.Json.Equals(MediaTypes.Application.ProblemJson), "Suffix does not imply equality")
+}
+
+[Test("Media type parameter views cannot mutate the value")]
+func Immutability() -> Result<unit, TestFailure> {
+    let value = ParseMedia("text/plain; x=one")
+    let parameters = value.Parameters
+    _ = Assert.True(Object.ReferenceEquals(parameters, value.Parameters), "View retained")?
+    _ = Assert.True(!(parameters is List<KeyValuePair<string, string>>), "No mutable list exposure")?
+    _ = Assert.Equal("x", parameters[0].Key)?
+    let Ok(changed) = value.WithParameter("X", "two; three") else { return Assert.True(false, "Parameter replacement") }
+    _ = Assert.Equal("text/plain; x=one", value.ToString())?
+    _ = Assert.Equal("text/plain; x=\"two; three\"", changed.ToString())?
+    let Ok(same) = value.WithParameter("x", "one") else { return Assert.True(false, "No-op parameter") }
+    return Assert.True(Object.ReferenceEquals(value, same), "No-op update reuses instance")
+}
+
+[Test("Media type parser rejects invalid syntax and ambiguous parameters")]
+func InvalidSyntax() -> Result<unit, TestFailure> {
+    for text in ["", "text", "text/", "/plain", "text /plain", "text/ plain", "text/plain, application/json", "text/plain; x", "text/plain; x=", "text/plain; x =a", "text/plain; x= a", "text/plain; x=\"a", "text/plain; x=\"a\\", "text/plain; x=a; X=b", "text/plain; charset=\"\"", "text/plain; charset=\"utf 8\"", "text/plain\r\nX: bad", "text/plain; x=\"a\r\nb\"", "téxt/plain", "text/plain; x=é"] {
+        let Failure(HttpError.InvalidRequest(_)) = MediaType.Parse(text) else {
+            return Assert.True(false, String.Concat("Reject invalid media type: ", text))
+        }
+    }
+    return Assert.True(true, "All invalid values rejected")
+}
+
+[Test("Media types separate concrete content types from Accept ranges")]
+func Ranges() -> Result<unit, TestFailure> {
+    for text in ["*/*", "text/*", "application/*+json", "*/json", "text/plain; q=0.8", "text/plain; Q=1"] {
+        _ = Assert.True(MediaType.Parse(text) is Failure, "Range or weight rejected")?
+    }
+    return Assert.True(MediaTypes.Application.Json.WithParameter("q", "1") is Failure, "Cannot add quality")
+}
+
+[Test("Media types accept optional whitespace and empty parameter segments")]
+func Whitespace() -> Result<unit, TestFailure> {
+    let value = ParseMedia("\ttext/plain ; ; charset=utf-8; \t;")
+    _ = Assert.Equal("text/plain; charset=utf-8", value.ToString())?
+    _ = Assert.True(value.GetParameter("missing") is None, "Absent parameter")?
+    _ = Assert.True(value.GetParameter("charſet") is None, "ASCII names do not Unicode fold")?
+    return Assert.True(value.GetParameter("") is None, "Empty name absent")
+}
+
+[Test("Media type limits and parameter updates return errors without faults")]
+func Limits() -> Result<unit, TestFailure> {
+    var text = "text/plain"
+    var index = 0
+    while index < 101 {
+        text = String.Concat(text, String.Concat("; p", String.Concat(index.ToString(), "=x")))
+        index += 1
+    }
+    _ = Assert.True(MediaType.Parse(text) is Failure(HttpError.LimitExceeded(_)), "Parameter count bound")?
+    var huge = "xxxxxxxx"
+    index = 0
+    while index < 13 {
+        huge = String.Concat(huge, huge)
+        index += 1
+    }
+    _ = Assert.True(MediaType.Parse(huge) is Failure(HttpError.LimitExceeded(_)), "Input byte bound")?
+    _ = Assert.True(MediaTypes.Text.Plain.WithParameter("x", huge) is Failure(HttpError.LimitExceeded(_)), "Update bound")?
+    _ = Assert.True(MediaTypes.Text.Plain.WithParameter("x", "a\r\nb") is Failure, "Update rejects injection")?
+    return Assert.True(MediaTypes.Text.Plain.WithParameter("bad name", "value") is Failure, "Update name validated")
+}
+
+[Test("Typed HTTP content retains media types without reparsing")]
+func TypedContent() -> Result<unit, TestFailure> {
+    let media = MediaTypes.Application.Json
+    let memory = HttpMemoryContent(default(ReadOnlyMemory<byte>), media)
+    let Ok(Some(actual)) = memory.GetContentType() else { return Assert.True(false, "Typed metadata") }
+    _ = Assert.True(Object.ReferenceEquals(media, actual), "Typed instance retained")?
+    let text = HttpStringContent("{}", media)
+    let Ok(Some(textMedia)) = text.GetContentType() else { return Assert.True(false, "Text metadata") }
+    _ = Assert.True(Object.ReferenceEquals(media, textMedia), "Text instance retained")?
+    _ = Assert.Equal(2, text.Length)?
+    let source = MemoryStream()
+    let Ok(stream) = HttpStreamContent.Create(source, 0, true, media) else { return Assert.True(false, "Stream factory") }
+    let Ok(Some(streamMedia)) = stream.GetContentType() else { return Assert.True(false, "Stream metadata") }
+    _ = Assert.True(Object.ReferenceEquals(media, streamMedia), "Stream instance retained")?
+    stream.Dispose()
+    source.Close()
+    return Assert.True(HttpStreamContent.Create(MemoryStream(), -1, false, media) is Failure, "Length validation retained")
+}
+
+[Test("Legacy content parsing caches values and distinguishes absence from errors")]
+func LegacyContent() -> Result<unit, TestFailure> {
+    let content = HttpMemoryContent(default(ReadOnlyMemory<byte>), "text/plain; x=one")
+    let Ok(Some(first)) = content.GetContentType() else { return Assert.True(false, "Legacy parses") }
+    let Ok(Some(second)) = content.GetContentType() else { return Assert.True(false, "Legacy cached") }
+    _ = Assert.True(Object.ReferenceEquals(first, second), "Parsed instance cached")?
+    let empty = HttpMemoryContent(default(ReadOnlyMemory<byte>))
+    _ = Assert.True(empty.GetContentType() is Ok(None), "Absent")?
+    let invalid = HttpMemoryContent(default(ReadOnlyMemory<byte>), "text")
+    return Assert.True(invalid.GetContentType() is Failure(HttpError.InvalidRequest(_)), "Invalid differs from absent")
+}
+
+[Test("HTTP messages expose actual Content-Type and reject duplicate fields")]
+func Messages() -> Result<unit, TestFailure> {
+    let Ok(request) = HttpRequest.Post("http://example.test/", HttpStringContent("{}", MediaTypes.Application.Json)) else { return Assert.True(false, "Request construction") }
+    let Ok(Some(media)) = request.GetContentType() else { return Assert.True(false, "Request content type") }
+    _ = Assert.True(Object.ReferenceEquals(media, MediaTypes.Application.Json), "Request retains typed value")?
+    let headers = ArrayList<HttpHeader>()
+    let response = HttpResponse(HttpStatusCode.OK, headers, HttpMemoryContent(default(ReadOnlyMemory<byte>)))
+    _ = Assert.True(response.GetContentType() is Ok(None), "Missing header")?
+    headers.Add(HttpHeader("CONTENT-TYPE", "multipart/form-data; boundary=AbC"))
+    let Ok(Some(received)) = response.GetContentType() else { return Assert.True(false, "Incoming header") }
+    _ = Assert.Equal("multipart/form-data; boundary=AbC", received.ToString())?
+    let Ok(Some(cached)) = response.GetContentType() else { return Assert.True(false, "Cached incoming header") }
+    _ = Assert.True(Object.ReferenceEquals(received, cached), "Incoming parsed value reused")?
+    headers[0] = HttpHeader("Content-Type", "text/plain")
+    let Ok(Some(changed)) = response.GetContentType() else { return Assert.True(false, "Changed incoming header") }
+    _ = Assert.True(changed.Equals(MediaTypes.Text.Plain), "Mutable header source invalidates cache")?
+    headers.Add(HttpHeader("content-type", "text/plain"))
+    _ = Assert.True(response.GetContentType() is Failure(HttpError.Protocol(_)), "Duplicate header")?
+    let invalidHeaders = [HttpHeader("Content-Type", "broken")]
+    let invalid = HttpResponse(HttpStatusCode.OK, invalidHeaders, HttpMemoryContent(default(ReadOnlyMemory<byte>)))
+    return Assert.True(invalid.GetContentType() is Failure(HttpError.Protocol(_)), "Malformed header")
+}

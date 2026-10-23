@@ -1,0 +1,60 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Optional.*
+import System.Result.*
+import System.Web.Http.*
+import NeoClr.Testing.*
+
+[Test("Warm media type access performs no managed allocations")]
+func Allocations() -> Result<unit, TestFailure> {
+    let json = MediaTypes.Application.Json
+    let Ok(custom) = MediaType.Parse("application/problem+json; charset=utf-8; profile=custom") else { return Assert.True(false, "Custom parse") }
+    let Ok(equal) = MediaType.Parse("application/problem+json; profile=custom; charset=UTF-8") else { return Assert.True(false, "Equal parse") }
+    let content = HttpStringContent("{}", json)
+    _ = content.GetContentType()
+    _ = custom.ToString()
+    _ = custom.GetHashCode()
+    _ = custom.Equals(equal)
+    _ = custom.GetParameter("PROFILE")
+    let profileName = "PROFILE"
+    let expectedType = "application"
+    let expectedSubType = "problem+json"
+    let Ok(request) = HttpRequest.Post("http://example.test/", content) else { return Assert.True(false, "Request") }
+    _ = request.GetContentType()
+    let wireText = custom.ToString()
+    let before = System.Runtime.GC.AllocatedObjectCount
+    var index = 0
+    var correct = true
+    while index < 128 {
+        correct = correct && Object.ReferenceEquals(json, MediaTypes.Application.Json)
+        correct = correct && String.CompareOrdinal(custom.ToString(), wireText) == 0
+        correct = correct && Object.ReferenceEquals(custom.Parameters, custom.Parameters)
+        correct = correct && custom.GetHashCode() == equal.GetHashCode()
+        correct = correct && custom.Equals(equal)
+        correct = correct && custom.Type == expectedType && custom.SubType == expectedSubType
+        correct = correct && (custom.GetParameter(profileName) is Some(_)) && (custom.CharSet is Some(_)) && (custom.Suffix is Some(_))
+        correct = correct && (content.GetContentType() is Ok(Some(_)))
+        correct = correct && (request.GetContentType() is Ok(Some(_)))
+        index += 1
+    }
+    let allocated = System.Runtime.GC.AllocatedObjectCount - before
+    _ = Assert.True(correct, "Repeated operations retain values")?
+    return Assert.True(allocated == 0, String.Concat("Managed allocations: ", allocated.ToString()))
+}
+
+[Test("Raw media type validation performs no managed allocations")]
+func RawValidationAllocations() -> Result<unit, TestFailure> {
+    let text = "Multipart/Form-Data; boundary=\"AbC; 123\"; Charset=\"UTF-8\"; x=one; ;"
+    _ = Assert.True(MediaTypeSyntax.Validate(text) is Ok, "Raw grammar accepts value")?
+    let before = System.Runtime.GC.AllocatedObjectCount
+    var index = 0
+    var valid = true
+    while index < 128 {
+        valid = valid && (MediaTypeSyntax.Validate(text) is Ok(_))
+        index += 1
+    }
+    let allocated = System.Runtime.GC.AllocatedObjectCount - before
+    _ = Assert.True(valid, "Repeated primitive validation")?
+    return Assert.True(allocated == 0, String.Concat("Raw validation allocations: ", allocated.ToString()))
+}

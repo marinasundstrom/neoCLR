@@ -1,0 +1,186 @@
+module System.Web.Http.MediaTypes
+
+import System.*
+import System.Web.Http.*
+
+/// <remarks>Presets do not imply codecs, serializers or multipart support. Add required parameters separately.</remarks>
+/// <summary>Common application media types.</summary>
+public static class Application {
+    private static var cachedJson: MediaType?
+    /// <summary>application/json, without parameters.</summary>
+    static val Json: MediaType {
+        get {
+            if cachedJson is MediaType cached {
+                return cached
+            }
+            let value = MediaType.Known(String.Intern("application/json"))
+            cachedJson = value
+            return value
+        }
+    }
+    private static var cachedProblemJson: MediaType?
+    /// <summary>application/problem+json, without parameters.</summary>
+    static val ProblemJson: MediaType {
+        get {
+            if cachedProblemJson is MediaType cached {
+                return cached
+            }
+            let value = MediaType.Known(String.Intern("application/problem+json"))
+            cachedProblemJson = value
+            return value
+        }
+    }
+    private static var cachedOctetStream: MediaType?
+    /// <summary>application/octet-stream, without parameters.</summary>
+    static val OctetStream: MediaType {
+        get {
+            if cachedOctetStream is MediaType cached {
+                return cached
+            }
+            let value = MediaType.Known(String.Intern("application/octet-stream"))
+            cachedOctetStream = value
+            return value
+        }
+    }
+    private static var cachedXml: MediaType?
+    /// <summary>application/xml, without parameters.</summary>
+    static val Xml: MediaType {
+        get {
+            if cachedXml is MediaType cached {
+                return cached
+            }
+            let value = MediaType.Known(String.Intern("application/xml"))
+            cachedXml = value
+            return value
+        }
+    }
+    private static var cachedFormUrlEncoded: MediaType?
+    /// <summary>application/x-www-form-urlencoded, without parameters.</summary>
+    static val FormUrlEncoded: MediaType {
+        get {
+            if cachedFormUrlEncoded is MediaType cached {
+                return cached
+            }
+            let value = MediaType.Known(String.Intern("application/x-www-form-urlencoded"))
+            cachedFormUrlEncoded = value
+            return value
+        }
+    }
+    private static var cachedPdf: MediaType?
+    /// <summary>application/pdf, without parameters.</summary>
+    static val Pdf: MediaType {
+        get {
+            if cachedPdf is MediaType cached {
+                return cached
+            }
+            let value = MediaType.Known(String.Intern("application/pdf"))
+            cachedPdf = value
+            return value
+        }
+    }
+}
+/// <summary>Common text media types.</summary>
+public static class Text {
+    private static var cachedPlain: MediaType?
+    /// <summary>text/plain, without parameters.</summary>
+    static val Plain: MediaType {
+        get {
+            if cachedPlain is MediaType cached {
+                return cached
+            }
+            let value = MediaType.Known(String.Intern("text/plain"))
+            cachedPlain = value
+            return value
+        }
+    }
+    private static var cachedHtml: MediaType?
+    /// <summary>text/html, without parameters.</summary>
+    static val Html: MediaType {
+        get {
+            if cachedHtml is MediaType cached {
+                return cached
+            }
+            let value = MediaType.Known(String.Intern("text/html"))
+            cachedHtml = value
+            return value
+        }
+    }
+    private static var cachedCss: MediaType?
+    /// <summary>text/css, without parameters.</summary>
+    static val Css: MediaType {
+        get {
+            if cachedCss is MediaType cached {
+                return cached
+            }
+            let value = MediaType.Known(String.Intern("text/css"))
+            cachedCss = value
+            return value
+        }
+    }
+    private static var cachedCsv: MediaType?
+    /// <summary>text/csv, without parameters.</summary>
+    static val Csv: MediaType {
+        get {
+            if cachedCsv is MediaType cached {
+                return cached
+            }
+            let value = MediaType.Known(String.Intern("text/csv"))
+            cachedCsv = value
+            return value
+        }
+    }
+}
+/// <summary>Common image media types.</summary>
+public static class Image {
+    private static var cachedPng: MediaType?
+    /// <summary>image/png, without parameters.</summary>
+    static val Png: MediaType {
+        get {
+            if cachedPng is MediaType cached {
+                return cached
+            }
+            let value = MediaType.Known(String.Intern("image/png"))
+            cachedPng = value
+            return value
+        }
+    }
+    private static var cachedJpeg: MediaType?
+    /// <summary>image/jpeg, without parameters.</summary>
+    static val Jpeg: MediaType {
+        get {
+            if cachedJpeg is MediaType cached {
+                return cached
+            }
+            let value = MediaType.Known(String.Intern("image/jpeg"))
+            cachedJpeg = value
+            return value
+        }
+    }
+    private static var cachedSvgXml: MediaType?
+    /// <summary>image/svg+xml, without parameters.</summary>
+    static val SvgXml: MediaType {
+        get {
+            if cachedSvgXml is MediaType cached {
+                return cached
+            }
+            let value = MediaType.Known(String.Intern("image/svg+xml"))
+            cachedSvgXml = value
+            return value
+        }
+    }
+}
+/// <summary>Common multipart media types.</summary>
+public static class Multipart {
+    private static var cachedFormData: MediaType?
+    /// <summary>multipart/form-data, without parameters.</summary>
+    static val FormData: MediaType {
+        get {
+            if cachedFormData is MediaType cached {
+                return cached
+            }
+            let value = MediaType.Known(String.Intern("multipart/form-data"))
+            cachedFormData = value
+            return value
+        }
+    }
+}

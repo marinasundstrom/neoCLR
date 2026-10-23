@@ -17,7 +17,7 @@ def main():
     args = parser.parse_args()
     source = args.audit / 'site/docs/api'
     evidence_path = args.audit / 'inputs/build-evidence.json'
-    if evidence_path.is_file():
+    if evidence_path.is_file() and not (args.audit / 'inputs/http-foundation-build.json').is_file():
         build = json.loads(evidence_path.read_text())
     else:
         # A verified HTTP-only rebuild preserves the other bundled libraries.

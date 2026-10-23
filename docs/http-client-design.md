@@ -911,3 +911,108 @@ metadata format or AOT-specific method semantics. Focused framework tests cover
 predefined tokens, canonicalization, constructor spelling, invalid parsing, equality,
 hashing/set behavior, and request authoring. Separate interpreted/native client/server
 consumers exercise custom method wire spelling and constructor/CONNECT fault boundaries.
+
+## Structured media types — development 2026-10-23
+
+`System.Web.Http.MediaType` is an immutable reference value for a concrete
+Content-Type. `Type` and full `SubType` are lowercase ASCII tokens; `Suffix`
+provides the final nonempty `+suffix`, `CharSet` is optional, and `Parameters`
+returns a retained read-only sequence of decoded `KeyValuePair<string,string>`
+values. The backing mutable collection is private. Custom names are supported;
+this is not a closed list of registered formats or a serializer registry.
+
+`MediaType.Parse` returns `Result<MediaType,HttpError>`. It accepts outer OWS,
+quoted/escaped parameter text and empty semicolon segments. InvalidRequest covers
+malformed tokens/quotes, whitespace around `=`, duplicate case-insensitive
+parameter names, `q` weights and wildcard ranges. Both input and normalized output
+are bounded to 32768 UTF-8 bytes and 100 parameters; excess returns LimitExceeded.
+Quoted UTF-8 text is retained, but the existing HTTP wire layer still only sends
+ASCII header values. Arbitrary legacy non-UTF-8 bytes are not a string contract.
+Registration, required parameters such as multipart boundary, and body validity
+are deliberately left to the relevant format consumer.
+
+Equality ignores type/subtype/name case, parameter order and token-versus-quoted
+spelling. Charset names are nonempty tokens and normalize to lowercase; other
+parameter values use ordinal, case-sensitive equality. This conservative rule
+preserves boundaries and unknown parameter data; additional registered
+parameter-specific equivalence is not implemented. Equality does not mean media
+range matching: `application/json` and `application/problem+json` differ.
+`WithParameter` adds/replaces a parameter on a new value, escaping delimiters and
+rejecting controls. An exact no-op returns the same instance. It can return
+LimitExceeded before building an oversized escaped representation.
+
+The `System.Web.Http.MediaTypes` namespace groups predefined values under
+`Application`, `Text`, `Image` and `Multipart`, used as
+`MediaTypes.Application.Json` with `System.Web.Http.*` imported. Each property
+lazily caches its value; bounded preset type/subtype/suffix/wire strings are
+interned. Repeated warm access, ToString and GetHashCode reuse stored results;
+parameter reads use borrowed UTF-8 views instead of encoded buffers. Unknown
+input is never globally interned or added to an unbounded cache. Simultaneous cold
+readers may construct equivalent candidates, following the existing HTTP static
+cache pattern; reference identity is not a cross-thread initialization contract.
+Iteration can allocate an iterator, and parsing/changed parameters allocate owned
+values. No allocation-free parsing or native throughput claim is made.
+
+Typed overloads exist for HttpMemoryContent and HttpStringContent, and a
+HttpStreamContent.Create overload accepts a MediaType after leaveOpen. They retain
+the value and its cached wire spelling. String content always encodes UTF-8;
+explicit non-UTF-8 charset declarations fault, while an absent charset is preserved.
+Selecting a media type does not serialize or validate a body. Existing string
+constructors remain supported and parsed values are cached on first access.
+
+`HttpContent.GetContentType` exposes producer metadata as Result<Optional<MediaType>,
+HttpError>. Received message headers are read using HttpRequest/HttpResponse's
+GetContentType: missing yields Ok(None), malformed or duplicate fields yield
+Protocol, and valid fields yield Ok(Some). These methods do not consume the body.
+They reuse content-owned typed values or cache parsed incoming strings, scanning
+current headers on each call so mutations through retained header collections do
+not silently return a stale value. No default media type is invented.
+
+Outbound request and response validation uses the same admission grammar, rejecting malformed
+legacy Content-Type strings before sending (request rejection precedes DNS).
+Wire validation borrows UTF-8 bytes and scans token/parameter boundaries without
+materializing a MediaType or allocating parameter collections. Duplicate detection
+rescans at most 100 names; this trades bounded scanning for no temporary collection.
+Structured parsing invokes this same admission grammar before building its value.
+This tightens the previous nonempty/control-character check and can reject callers
+that previously sent malformed syntax, duplicates or an Accept expression as a
+Content-Type. Raw incoming headers remain inspectable; typed parsing is explicit.
+No Accept negotiation/range API, multipart encoder, encoding selection or compiler
+change is introduced. Nested static class emission is currently unavailable, so
+catalog groups are ordinary classes in a namespace; no temporary metadata encoding
+or new Runtime Contract configuration is required.
+
+### Comparison and evidence
+
+Primary sources consulted 2026-10-23:
+
+- [.NET 10 MediaTypeNames](https://learn.microsoft.com/en-us/dotnet/api/system.net.mime.mediatypenames?view=net-10.0)
+  provides string names, and
+  [MediaTypeHeaderValue](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.headers.mediatypeheadervalue?view=net-10.0)
+  provides mutable structured header values. neoCLR retains the decomposition and
+  parameter concept but deliberately uses immutable typed presets and Result
+  parsing. This avoids caller-side reparsing and mutation of shared presets, at
+  the cost of a different API and allocation when changing values.
+- [RFC 9110 §§5.6.6, 8.3.1, 12.5.1](https://www.rfc-editor.org/rfc/rfc9110.html)
+  defines HTTP parameter grammar, media types and Accept ranges. neoCLR treats
+  concrete types separately and rejects ambiguous duplicate names. Empty parameter
+  segments are accepted; normalized output removes them.
+- [Rust mime 0.3.17](https://docs.rs/mime/0.3.17/mime/struct.Mime.html) demonstrates
+  parsed type/subtype/suffix/parameter access as a library value.
+  [MimeKit ContentType](https://mimekit.net/docs/html/T_MimeKit_ContentType.htm)
+  offers structured MIME parameters and parsing in a .NET library; its broader
+  email/MIME serialization and mutable API are not adopted for HTTP.
+
+The executable [.NET comparison](experiments/media-types/dotnet-comparison.json)
+uses .NET 10.0.0. It records that .NET accepts whitespace around `=`, duplicate
+parameters and wildcard/q forms, but rejects empty parameter segments. It also
+compares unquoted boundary/unknown values case-insensitively and distinguishes
+quoted from unquoted values. neoCLR's stricter concrete-type parsing and
+quote-independent, case-sensitive unknown-value equality are intentional HTTP
+contract choices; they are not claims that .NET is defective. No relevant API
+review resolution or maintainer criticism was established by the source search.
+
+[Tests and validation](experiments/media-types/README.md) cover the native library
+and an independent HTTP peer. Broader charset-specific semantics and an Accept
+range API remain future work. This bounded author-requested slice does not change
+roadmap milestone ordering.

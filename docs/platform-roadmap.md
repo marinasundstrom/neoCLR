@@ -1,5 +1,10 @@
 # neoCLR platform roadmap
 
+**Author-directed media types (2026-10-23):** Complete the bounded HTTP value-contract
+slice with cached typed presets, lazy structured projections, shared primitive
+validation and focused allocation/wire evidence. [Contract and evidence](experiments/media-types/README.md).
+The requested Uri/Path efficiency review follows separately; milestone ordering is unchanged.
+
 **Environment discovery (author direction, 2026-10-23):** Integrate the static
 Environment class, nested closed OS/architecture record families, distinct version
 domains and readable display strings. Add built-in framework tests including

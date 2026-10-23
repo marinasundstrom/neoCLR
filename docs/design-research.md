@@ -81,6 +81,31 @@ separate native component when that separation is justified. See the existing
 [provider distinction](native-interop.md#runtime-internal-calls-and-implementation-options)
 and [trust/ownership contract](design/native-import-export-contract.md#trust-and-ownership-across-the-boundary).
 
+## Value contracts without unnecessary materialization
+
+Author direction, 2026-10-23: value objects are consumer-facing contracts that
+establish well-formed inputs and provide structure. Their presence in an API does
+not require internal HTTP, URI, path or other processing to allocate equivalent
+wrappers around every primitive value. Prefer validated primitive representations
+internally where a structured object adds no value. Materialize lazily when a
+consumer requests structure, retain values already supplied by callers, and cache
+stable formatting or a bounded known-value catalog when beneficial.
+
+The author cited the observed HTTP server cost of storing URI value objects as a
+concrete motivation: requests should retain already known URI component strings
+and project a Uri on demand. Construct from those validated components where
+possible, instead of formatting and reparsing an equivalent URI. A contract value
+may be a class, struct or record of either kind; choose representation separately
+from materialization timing and account for copying and ownership as well as GC.
+This discussion reports the prior observation, not a new benchmark measurement.
+
+Keep validation and observable semantics consistent between the primitive and
+structured paths. Account for ownership and lifetime when borrowing primitives;
+avoid unbounded interning of external input. Measure allocations and performance
+for the actual hot path, including conversions introduced by the measurement
+itself. This direction does not authorize weakening contracts or replacing every
+existing value object with a primitive-only public API.
+
 ## Required design comparison
 
 For each substantive slice, record these points in its design document. A small

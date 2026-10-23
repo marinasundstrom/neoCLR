@@ -1,0 +1,189 @@
+module System.Web.Http
+
+import System.*
+import System.Collections.*
+import System.Result.*
+
+// Shared admission grammar for both lazy HTTP validation and structured parsing.
+// Borrow the source's bytes; do not allocate tokens, parameter collections or a
+// MediaType merely to validate a wire header. Duplicate detection rescans at most
+// 100 names, trading bounded scanning for no temporary index collection.
+internal static class MediaTypeSyntax {
+    internal static func Token(value: byte) -> bool {
+        return (value >= 48 && value <= 57) || (value >= 65 && value <= 90) ||
+            (value >= 97 && value <= 122) || value == 33 || value == 35 || value == 36 ||
+            value == 37 || value == 38 || value == 39 || value == 42 || value == 43 ||
+            value == 45 || value == 46 || value == 94 || value == 95 || value == 96 ||
+            value == 124 || value == 126
+    }
+
+    internal static func SkipSpace(bytes: ReadOnlySlice<byte>, start: int) -> int {
+        var end = start
+        while end < bytes.Length && (bytes[end] == 32 || bytes[end] == 9) {
+            end += 1
+        }
+        return end
+    }
+
+    internal static func TokenEnd(bytes: ReadOnlySlice<byte>, start: int) -> int {
+        var end = start
+        while end < bytes.Length && Token(bytes[end]) {
+            end += 1
+        }
+        return end
+    }
+
+    private static func NameEquals(left: ReadOnlySlice<byte>, right: ReadOnlySlice<byte>) -> bool {
+        if left.Length != right.Length {
+            return false
+        }
+        var index = 0
+        while index < left.Length {
+            var a = (int)left[index]
+            var b = (int)right[index]
+            if a >= 65 && a <= 90 { a += 32 }
+            if b >= 65 && b <= 90 { b += 32 }
+            if a != b {
+                return false
+            }
+            index += 1
+        }
+        return true
+    }
+
+    internal static func ScanValue(bytes: ReadOnlySlice<byte>, start: int) -> Result<MediaTypeValueScan, HttpError> {
+        if start >= bytes.Length {
+            return Failure(HttpError.InvalidRequest("Missing media type parameter value"))
+        }
+        if bytes[start] != 34 {
+            let end = TokenEnd(bytes, start)
+            if end == start {
+                return Failure(HttpError.InvalidRequest("Expected media type parameter value"))
+            }
+            return Ok(MediaTypeValueScan(end, end - start, true))
+        }
+        var position = start + 1
+        var decodedLength = 0
+        var escapes = 0
+        var isToken = true
+        while position < bytes.Length {
+            var value = bytes[position]
+            position += 1
+            if value == 34 {
+                if decodedLength == 0 { isToken = false }
+                let wireLength = if isToken { decodedLength } else { decodedLength + escapes + 2 }
+                return Ok(MediaTypeValueScan(position, wireLength, isToken))
+            }
+            if value == 92 {
+                if position == bytes.Length {
+                    return Failure(HttpError.InvalidRequest("Incomplete quoted parameter escape"))
+                }
+                value = bytes[position]
+                position += 1
+            }
+            if (value < 32 && value != 9) || value == 127 {
+                return Failure(HttpError.InvalidRequest("Invalid quoted parameter character"))
+            }
+            if !Token(value) { isToken = false }
+            if value == 34 || value == 92 { escapes += 1 }
+            decodedLength += 1
+        }
+        return Failure(HttpError.InvalidRequest("Unterminated quoted parameter"))
+    }
+
+    internal static func ValidateHeaders(headers: Sequence<HttpHeader>) -> Result<unit, HttpError> {
+        var found = false
+        var index = 0
+        while index < headers.Count {
+            let header = headers[index]
+            if String.CompareOrdinalIgnoreCase(header.Name, "content-type") == 0 {
+                if found {
+                    return Failure(HttpError.Protocol("Duplicate Content-Type"))
+                }
+                found = true
+                let Ok(_) = Validate(header.Value) else {
+                    return Failure(HttpError.Protocol("Malformed Content-Type"))
+                }
+            }
+            index += 1
+        }
+        return Ok(())
+    }
+
+    internal static func Validate(text: string) -> Result<unit, HttpError> {
+        let bytes = text.Utf8Bytes
+        if bytes.Length > HttpWireLimits.HeaderBytes {
+            return Failure(HttpError.LimitExceeded("Media type exceeds 32768 UTF-8 bytes"))
+        }
+        let start = SkipSpace(bytes, 0)
+        let typeEnd = TokenEnd(bytes, start)
+        if typeEnd == start || typeEnd == bytes.Length || bytes[typeEnd] != 47 {
+            return Failure(HttpError.InvalidRequest("Expected media type and slash"))
+        }
+        let subtypeStart = typeEnd + 1
+        let subtypeEnd = TokenEnd(bytes, subtypeStart)
+        if subtypeEnd == subtypeStart {
+            return Failure(HttpError.InvalidRequest("Expected media subtype"))
+        }
+        if (typeEnd - start == 1 && bytes[start] == 42) ||
+            (subtypeEnd - subtypeStart == 1 && bytes[subtypeStart] == 42) ||
+            (subtypeEnd - subtypeStart >= 2 && bytes[subtypeStart] == 42 && bytes[subtypeStart + 1] == 43) {
+            return Failure(HttpError.InvalidRequest("A concrete media type cannot be an Accept range"))
+        }
+        var normalizedLength = subtypeEnd - start
+        var position = SkipSpace(bytes, subtypeEnd)
+        var count = 0
+        while position < bytes.Length {
+            if bytes[position] != 59 {
+                return Failure(HttpError.InvalidRequest("Expected media type parameter separator"))
+            }
+            position = SkipSpace(bytes, position + 1)
+            if position == bytes.Length || bytes[position] == 59 { continue }
+            let nameStart = position
+            let nameEnd = TokenEnd(bytes, position)
+            if nameEnd == nameStart || nameEnd == bytes.Length || bytes[nameEnd] != 61 {
+                return Failure(HttpError.InvalidRequest("Expected parameter token and equals without whitespace"))
+            }
+            let name = bytes.Slice(nameStart, nameEnd - nameStart)
+            if NameEquals(name, "q".Utf8Bytes) {
+                return Failure(HttpError.InvalidRequest("Quality weights belong to Accept"))
+            }
+            // Previous parameters have already passed this same grammar.
+            var previous = SkipSpace(bytes, subtypeEnd)
+            while previous < nameStart {
+                previous = SkipSpace(bytes, previous + 1)
+                if previous == nameStart { break }
+                if bytes[previous] == 59 { continue }
+                let previousEnd = TokenEnd(bytes, previous)
+                if NameEquals(name, bytes.Slice(previous, previousEnd - previous)) {
+                    return Failure(HttpError.InvalidRequest("Duplicate media type parameter"))
+                }
+                let previousValue = ScanValue(bytes, previousEnd + 1)?
+                previous = SkipSpace(bytes, previousValue.End)
+            }
+            let value = ScanValue(bytes, nameEnd + 1)?
+            if NameEquals(name, "charset".Utf8Bytes) && !value.IsToken {
+                return Failure(HttpError.InvalidRequest("Invalid charset name"))
+            }
+            count += 1
+            normalizedLength += 3 + name.Length + value.WireLength
+            if count > 100 || normalizedLength > HttpWireLimits.HeaderBytes {
+                return Failure(HttpError.LimitExceeded("Media type exceeds normalized byte or parameter limit"))
+            }
+            position = SkipSpace(bytes, value.End)
+        }
+        return Ok(())
+    }
+}
+
+internal struct MediaTypeValueScan {
+    val End: int
+    val WireLength: int
+    val IsToken: bool
+
+    init(end: int, wireLength: int, isToken: bool) {
+        End = end
+        WireLength = wireLength
+        IsToken = isToken
+    }
+}

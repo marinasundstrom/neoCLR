@@ -1,0 +1,11 @@
+module System.Web.Http
+
+// Bounded buffering policy, independent of socket/codec per-operation limits.
+// Configurable per-client/server budgets and live body streams remain follow-ups.
+internal static class HttpWireLimits {
+    static val BodyBytes: int => 1048576
+    static val HeaderBytes: int => 32768
+    static val HeaderCount: int => 100
+    static val ChunkFramingBytes: int => 65536
+    static val InformationalResponses: int => 16
+}
