@@ -6,7 +6,9 @@ mailbox wakeups and joined teardown. Eight explicit temporary-root slots per job
 now retain participant locals across gate release and owner collection. Primitive CPU work overlaps across workers.
 A generated Raven harness now qualifies forced collection, fault recovery and TLS
 reuse in independent per-invocation contexts on four workers. Shared generated-code
-participant integration, parallel HTTP and public APIs remain unimplemented.
+parallel-mutator integration, parallel HTTP and public APIs remain unimplemented.
+A synchronous shared callback bridge now publishes the pool root set to existing
+compiler collection hooks under the heap gate; async/resource ownership remains open.
 The architecture below remains a proposal beyond that checkpoint.
 The author explicitly requested worker-thread investigation inspired by modern
 web application frameworks.

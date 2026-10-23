@@ -30,6 +30,7 @@ struct neoclr_workers {
     unsigned thread_count, capacity;
     int closing, joined;
     neoclr_aot_context context;
+    neoclr_worker_invoke invoke;
     struct neoclr_worker_job jobs[JOBS];
     struct root roots[ROOTS];
 };
@@ -112,6 +113,65 @@ neoclr_workers *neoclr_workers_create(unsigned workers, unsigned capacity, size_
         }
     }
     return p;
+}
+int32_t neoclr_workers_bootstrap(neoclr_workers *p, neoclr_worker_bootstrap bootstrap,
+    neoclr_worker_invoke invoke, int32_t argument, neoclr_worker_handle *out) {
+    if (!pthread_equal(p->owner, pthread_self()) || !bootstrap || !invoke || !out) return 3;
+    lock(p);
+    if (p->closing || p->invoke || p->context.text.used || neoclr_root_probe_head_v1() || neoclr_roots_parked_v1()) {
+        unlock(p); return 3;
+    }
+    uint64_t handle = 0;
+    int32_t status = bootstrap(argument, &handle, &p->context);
+    if (neoclr_gc_owned_roots_check_v1(&p->context, handle ? &handle : NULL, handle ? 1 : 0)) abort();
+    if (!status) {
+        void *value = NULL;
+        status = neoclr_gc_callback_read_v1(&p->context, handle, &value);
+        if (!status && !adopt(p, value, out)) status = 5;
+    }
+    if (handle && neoclr_gc_host_root_release_v1(&p->context, handle)) abort();
+    /* Keep the image identity even on failure; teardown owns its static/intern state. */
+    p->invoke = invoke;
+    unlock(p); return status;
+}
+static unsigned pool_slots(neoclr_workers *p, neoclr_probe_storage *slots) {
+    unsigned count = 0;
+    for (unsigned i = 0; i < ROOTS; i++) slots[count++] = (neoclr_probe_storage){&p->roots[i].value, 8, 0};
+    for (unsigned i = 0; i < p->capacity; i++) {
+        slots[count++] = (neoclr_probe_storage){&p->jobs[i].capture, 8, 0};
+        slots[count++] = (neoclr_probe_storage){&p->jobs[i].result.reference, 8, 0};
+        for (unsigned n = 0; n < NEOCLR_WORKER_LOCAL_ROOTS; n++)
+            slots[count++] = (neoclr_probe_storage){&p->jobs[i].local_roots[n], 8, 0};
+    }
+    return count;
+}
+int32_t neoclr_worker_invoke_capture(neoclr_worker_job *j) {
+    if (executing != j) abort();
+    neoclr_workers *p = j->pool;
+    neoclr_worker_enter(j);
+    if (!p->invoke || p->context.fault.code || neoclr_root_probe_head_v1() || neoclr_roots_parked_v1()) {
+        neoclr_worker_leave(j); return 3;
+    }
+    uint64_t handle = 0;
+    int32_t status = neoclr_gc_host_root_create_v1(&p->context, j->capture, &handle);
+    if (!status) {
+        neoclr_probe_storage slots[ROOTS + (2 + NEOCLR_WORKER_LOCAL_ROOTS) * JOBS];
+        unsigned count = pool_slots(p, slots);
+        neoclr_probe_frame frame;
+        neoclr_parked_roots parked = {0};
+        /* Park only this adapter frame, leaving generated callback admission
+         * quiescent. The gate keeps all referenced pool slots stable. */
+        neoclr_gc_enter_v1(&frame, &p->context, 0, slots, count, "[]", 2);
+        neoclr_roots_park_v1(&parked);
+        status = p->invoke(handle, &p->context);
+        if (neoclr_root_probe_head_v1() || neoclr_roots_parked_v1() != &parked) abort();
+        neoclr_roots_resume_v1(&parked);
+        neoclr_gc_leave_v1(&frame);
+        if (neoclr_gc_owned_roots_check_v1(&p->context, &handle, 1)) abort();
+        if (neoclr_gc_host_root_release_v1(&p->context, handle)) abort();
+    }
+    neoclr_worker_leave(j);
+    return status;
 }
 int neoclr_workers_root_new(neoclr_workers *p, uint64_t initial, neoclr_worker_handle *out) {
     lock(p);
@@ -224,14 +284,7 @@ int neoclr_workers_take(neoclr_workers *p, neoclr_worker_handle h, int *outcome,
 int neoclr_workers_collect(neoclr_workers *p, uint64_t *extent) {
     if (!pthread_equal(p->owner, pthread_self())) return 0;
     lock(p);
-    neoclr_probe_storage slots[ROOTS + (2 + NEOCLR_WORKER_LOCAL_ROOTS) * JOBS]; unsigned count = 0;
-    for (unsigned i = 0; i < ROOTS; i++) slots[count++] = (neoclr_probe_storage){&p->roots[i].value, 8, 0};
-    for (unsigned i = 0; i < p->capacity; i++) {
-        slots[count++] = (neoclr_probe_storage){&p->jobs[i].capture, 8, 0};
-        slots[count++] = (neoclr_probe_storage){&p->jobs[i].result.reference, 8, 0};
-        for (unsigned n = 0; n < NEOCLR_WORKER_LOCAL_ROOTS; n++)
-            slots[count++] = (neoclr_probe_storage){&p->jobs[i].local_roots[n], 8, 0};
-    }
+    neoclr_probe_storage slots[ROOTS + (2 + NEOCLR_WORKER_LOCAL_ROOTS) * JOBS]; unsigned count = pool_slots(p, slots);
     neoclr_probe_frame frame = {.context = &p->context, .storage = slots, .storage_count = count};
     int ok = !neoclr_gc_collect_v1(&p->context, &frame);
     if (ok) *extent = p->context.text.used;
@@ -257,6 +310,10 @@ int neoclr_workers_destroy(neoclr_workers *p) {
     if (!pthread_equal(p->owner, pthread_self()) || !p->joined || entered) return 0;
     for (unsigned i = 0; i < p->capacity; i++) if (p->jobs[i].state != FREE) return 0;
     for (unsigned i = 0; i < ROOTS; i++) if (p->roots[i].value) return 0;
+    if (p->invoke) {
+        if (neoclr_gc_complete_invocation_v1(&p->context)) return 0;
+        memset(&p->context.fault, 0, sizeof(p->context.fault));
+    }
     uint64_t extent;
     if (!neoclr_workers_collect(p, &extent) || extent) return 0;
     pthread_cond_destroy(&p->completion); pthread_cond_destroy(&p->ready); pthread_mutex_destroy(&p->gate);

@@ -9,6 +9,7 @@ import subprocess
 from xml.sax.saxutils import escape
 
 p = argparse.ArgumentParser(description=__doc__)
+p.add_argument('--shared', action='store_true', help='Test serialized callbacks on the pool heap')
 p.add_argument('--bundle', type=Path, required=True)
 p.add_argument('--libraries', type=Path, required=True)
 p.add_argument('--validation', type=Path, required=True)
@@ -19,7 +20,9 @@ root = here.parents[2]
 out = a.output.resolve()
 out.mkdir(parents=True, exist_ok=False)
 bundle, libraries = a.bundle.resolve(), a.libraries.resolve()
-report = dict(passed=False, commands=[], inputs={}, scope=__doc__)
+source = here/('Shared.rvn' if a.shared else 'Generated.rvn')
+host = here/('shared-host.c' if a.shared else 'generated-host.c')
+report = dict(passed=False, commands=[], inputs={}, scope='Shared serialized callback bridge' if a.shared else __doc__)
 def record(path):
     report['inputs'][str(path)] = hashlib.sha256(path.read_bytes()).hexdigest()
 def run(command):
@@ -40,10 +43,10 @@ def run(command):
     return r.stdout
 try:
     project = out/'App.rvnproj'
-    project.write_text('<Project Sdk="Microsoft.NET.Sdk"><Import Project="'+escape(str(libraries/'NeoCLR.ClassLibrary.props'))+'" /><PropertyGroup><TargetFramework>net10.0</TargetFramework><OutputType>Library</OutputType><AssemblyName>WorkerGenerated</AssemblyName><EnableDefaultCompileItems>false</EnableDefaultCompileItems></PropertyGroup><ItemGroup><Compile Include="'+escape(str(here/'Generated.rvn'))+'" /></ItemGroup></Project>')
+    project.write_text('<Project Sdk="Microsoft.NET.Sdk"><Import Project="'+escape(str(libraries/'NeoCLR.ClassLibrary.props'))+'" /><PropertyGroup><TargetFramework>net10.0</TargetFramework><OutputType>Library</OutputType><AssemblyName>WorkerGenerated</AssemblyName><EnableDefaultCompileItems>false</EnableDefaultCompileItems></PropertyGroup><ItemGroup><Compile Include="'+escape(str(source))+'" /></ItemGroup></Project>')
     compiler = bundle/'sdk/tools/rvnc/rvnc.dll'
     codegen = bundle/'bin/neoclr-codegen'
-    for f in [compiler, codegen, bundle/'bin/neoclr', libraries/'System.Runtime.dll', libraries/'System.runtime.neox', here/'Generated.rvn', here/'generated-host.c', Path(__file__).resolve(), project]:
+    for f in [compiler, codegen, bundle/'bin/neoclr', libraries/'System.Runtime.dll', libraries/'System.runtime.neox', source, host, Path(__file__).resolve(), project]:
         record(f)
     run(['dotnet', compiler, 'neoclr', '--project', project])
     assembly = out/'bin/neoclr/WorkerGenerated.dll'
@@ -52,11 +55,11 @@ try:
     run([bundle/'bin/neoclr', 'disassemble', assembly, listing])
     names = re.findall(r'"name": "(NeoMetadata_[A-F0-9]+\.F_43616C63756C617465)"', listing.read_text())
     assert len(names) == 1, names
-    run([codegen, '--closed-world', assembly, names[0], out/'code.o', '--compile-system', '--reference-arena', '--native-gc', '--system', libraries/'System.runtime.neox', '--module', libraries/'System.Runtime.dll', '--object-root', libraries/'System.Runtime.dll'])
+    run([codegen, '--closed-world', assembly, names[0], out/'code.o', *(['--native-host-bootstrap', '--bind-user-fault'] if a.shared else []), '--compile-system', '--reference-arena', '--native-gc', '--system', libraries/'System.runtime.neox', '--module', libraries/'System.Runtime.dll', '--object-root', libraries/'System.Runtime.dll'])
     baseline = json.loads(a.validation.read_text())
     base = baseline['commands'][0]
     assert base['exitCode'] == 0 and not any('sanitize' in s for s in base['command'])
-    command = [str(here/'generated-host.c') if s.endswith('/test.c') else s for s in base['command']]
+    command = [str(host) if s.endswith('/test.c') else s for s in base['command']]
     command.extend([str(root/'runtime/native/memory/text-arena.c'), str(out/'code.o')])
     for f in [*list((root/'runtime/native/gc').glob('*.[ch]')), *list((root/'runtime/native/memory').glob('*.[ch]')), *list((root/'runtime/native/workers').glob('*.[ch]'))]:
         record(f)

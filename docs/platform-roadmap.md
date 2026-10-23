@@ -6191,3 +6191,11 @@ heap gate. Seven optimized/UBSan test groups pass, including four simultaneous
 participant sets and success/failure/cancel cleanup. Generated compiler snapshots,
 shared Task settlement and HTTP dispatch are still open; see the
 [qualification](experiments/native-worker-pool/README.md#shared-participant-roots--2026-10-23).
+
+Synchronous shared callback follow-up (2026-10-23): generated bootstrap/callback
+exports now run against the pool heap with explicit temporary TLS roots and a
+parked pool-root frame under the heap gate. The same compiled closure reaches 80
+successes and one fault across four workers, then rejects seven calls against the
+faulted context. Optimized/UBSan tests pass. This is serialized correctness
+qualification, not parallel HTTP support; task/I/O/fault ownership and coordinated
+mutator safepoints remain open. See the [bridge evidence](experiments/native-worker-pool/README.md#synchronous-shared-generated-callbacks--2026-10-23).

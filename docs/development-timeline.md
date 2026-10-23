@@ -21824,3 +21824,14 @@ private-context generated tests also pass again. This implements manual native
 root publication, not compiler snapshot integration or shared Task/HTTP dispatch.
 The assistant records its fixed storage and collector scan overhead rather than
 claiming a throughput improvement.
+
+Shared generated callback follow-through: the assistant connected existing compiled
+bootstrap/callback exports to the pool heap through a synchronous adapter. It holds
+the heap gate, publishes all pool roots during compiler-triggered GC, and removes
+temporary TLS roots before handing execution back. A compiled Raven closure shares
+one mutable counter across four workers: 80 invocations succeed, one faults and
+seven are rejected afterward. The initial fixture encountered the existing mutable
+local capture limitation; an immutable reference to a mutable Counter supplies the
+intended shared state without a compiler change. Optimized/UBSan validation passes.
+The assistant explicitly keeps async HTTP dispatch and concurrent managed mutation
+unsupported; this is a serial correctness baseline with shared fault state.

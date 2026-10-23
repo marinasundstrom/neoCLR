@@ -1,6 +1,6 @@
 #ifndef NEOCLR_NATIVE_WORKERS_H
 #define NEOCLR_NATIVE_WORKERS_H
-/* Opt-in POSIX native experiment. Not a generated-code/Task/HTTP ABI.
+/* Opt-in POSIX native experiment. Not a general Task/HTTP ABI.
  * All managed access is serialized through enter/leave. Outside that interval
  * callbacks may compute on copied primitives or block, but may not dereference
  * pool-managed pointers. Independent invocation arenas need their own ownership
@@ -8,7 +8,7 @@
  * The pool roots capture/result slots through owner collection.
  * Never call pool APIs recursively while entered except capture/allocate/result/local-root operations.
  * Do not use ordinary TLS host-root, socket, fiber or compiler GC hooks on the
- * pool context. This API does not expose that context to callbacks.
+ * pool context except through the synchronous generated bridge below.
  * Native pointers/pool state must be valid and outlive all calls; destroy requires
  * joined workers and no concurrent external caller. No automatic collection on
  * allocation pressure. Per-thread GC counters do not represent pool totals. */
@@ -23,6 +23,18 @@ enum { NEOCLR_WORKER_OK, NEOCLR_WORKER_CANCELLED, NEOCLR_WORKER_FAILED };
 /* Caller-owned native_state must remain alive until completion/join. No managed
  * pointers in it. Worker count 1..4, capacity 1..16, consumer root capacity 32.
  * Constructor owns its arena; only the creating thread may collect/close/destroy. */
+/* Private synchronous generated-callback bridge. Bootstrap once on an empty
+ * owner pool; both exports must belong to the same compiled image. No async,
+ * resources, retained TLS roots or nested pool calls. Invoke owns the heap gate
+ * for its full duration; a guest fault poisons further generated invocations.
+ * Retained TLS resources/roots or unbalanced frames violate the bridge contract
+ * and fail fast. Return native status (0 success); bootstrap output changes only
+ * on success. Cancellation is observed at job settlement, not during invocation. */
+typedef int32_t (*neoclr_worker_bootstrap)(int32_t, uint64_t *, neoclr_aot_context *);
+typedef int32_t (*neoclr_worker_invoke)(uint64_t, neoclr_aot_context *);
+int32_t neoclr_workers_bootstrap(neoclr_workers *, neoclr_worker_bootstrap,
+    neoclr_worker_invoke, int32_t argument, neoclr_worker_handle *);
+int32_t neoclr_worker_invoke_capture(neoclr_worker_job *);
 neoclr_workers *neoclr_workers_create(unsigned workers, unsigned capacity, size_t heap_bytes);
 int neoclr_workers_root_new(neoclr_workers *, uint64_t initial, neoclr_worker_handle *);
 int neoclr_workers_root_read(neoclr_workers *, neoclr_worker_handle, uint64_t *);

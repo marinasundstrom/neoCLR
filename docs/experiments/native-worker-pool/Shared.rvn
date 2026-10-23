@@ -1,0 +1,29 @@
+import System.*
+
+class Counter {
+    var Value: int = 0
+}
+
+public func Calculate(limit: int) -> (() -> ()) {
+    if limit < 0 {
+        System.Fail("Bootstrap failure")
+    }
+    let calls = Counter()
+    let retained: object = 42
+    return () => {
+        var index = 0
+        while index < 500 {
+            let temporary: object = index
+            if (int)temporary != index || (int)retained != 42 {
+                System.Fail("Collected live callback state")
+            }
+            index += 1
+        }
+        calls.Value += 1
+        if calls.Value > limit {
+            let wrong: object = true
+            let invalid = (int)wrong
+            System.Fail("Invalid cast did not fault")
+        }
+    }
+}

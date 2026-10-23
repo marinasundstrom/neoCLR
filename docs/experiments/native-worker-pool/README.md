@@ -16,7 +16,8 @@ copied primitives and blocking outside those intervals may overlap across worker
 
 This is the **serial managed-access reference implementation** proposed by the
 investigation. It does not execute arbitrary generated Raven code in parallel.
-There is no compiler safepoint integration, automatic collection on allocation
+The synchronous bridge below uses existing compiler root hooks while holding the
+heap gate; there is no parallel-mutator safepoint integration, automatic collection on allocation
 pressure, stack/fiber migration or concurrent Promise support. Existing TLS
 host-root/socket/fiber APIs must not be used on the pool context. Callbacks may
 not retain and dereference unregistered managed pointers outside access intervals.
@@ -25,8 +26,9 @@ Capture roots are adopted before job publication. Workers publish result referen
 slots before releasing managed access, including while the callback remains
 unsettled. Temporary references can be explicitly published to job-local slots
 before leaving the gate. Owner collection traces all temporary/capture/result/consumer slots using the
-canonical collector. Workers may allocate under the gate but cannot initiate
-collection or invoke ordinary runtime GC hooks. Thread-local allocation counters
+canonical collector. Workers may allocate under the gate. Ordinary native callbacks cannot initiate
+collection; the synchronous generated bridge below admits existing compiler GC
+hooks while publishing all pool roots. Thread-local allocation counters
 therefore do not describe whole-pool allocation volume.
 
 Each submission reserves its completion slot. Ready results stay rooted if consumer
@@ -209,3 +211,54 @@ boundary protects lifetime while callbacks yield the gate; it neither makes
 concurrent mutations safe nor replaces a compiler safepoint protocol. Next attach
 complete generated root snapshots and task settlement through an explicit runtime
 contract, including fault/static/resource ownership, before dispatching HTTP.
+
+## Synchronous shared generated callbacks — 2026-10-23
+
+The private runtime now bridges the existing generated bootstrap and callback
+exports into a shared pool heap. Owner-only bootstrap is admitted once on an empty
+pool, adopts the returned function descriptor into a pool root, and releases the
+owner thread's temporary host root. Both supplied exports must belong to the same
+compiled image. No compiler emission or CLI bridge encoding changed.
+
+A worker invokes its captured descriptor under the heap gate. The adapter publishes
+all consumer, capture, result and participant root slots in a temporary parked
+frame on that worker's thread, creates a temporary thread-local callback handle,
+and invokes the generated callback without resetting the heap. Existing compiler
+snapshots and allocation retries can now collect safely: the parked frame supplies
+the other jobs' roots. On return the adapter removes its frame and handle and
+checks that generated execution left no stack frames, parked stacks, host roots or
+resources behind. Violating this trusted synchronous contract fails fast; it is
+not a general sandbox or async adapter.
+
+Shared statics remain attached to the pool context. A guest fault is retained and
+blocks further generated invocations; recovery is not silently inferred. After
+joined workers and explicit draining of all jobs/consumer roots, destruction drops
+static/intern/fault ownership and collects the remaining heap. Cancellation remains
+cooperative at job settlement; it cannot interrupt a generated invocation holding
+the gate. Socket scopes, async fibers, resources and Task/Promise are unsupported.
+
+[Shared.rvn](Shared.rvn) closes over an immutable reference to a mutable counter
+(the current compiler rejects direct mutable-local capture). Four pool workers
+invoke the same closure 80 times, each allocating 500 boxes and forcing collection.
+The 81st invocation faults, proving the counter was shared rather than copied;
+seven later invocations are rejected. Every callback first publishes a separate
+temporary, with all four participants rendezvousing before invocation. Pool roots,
+paused participant roots and completion roots survive generated/owner collection.
+Tests also reject a non-function capture, an uninitialized image, repeated/nonempty
+bootstrap, and verify output preservation and teardown after bootstrap failure.
+
+[shared-validation.json](shared-validation.json) records optimized and UBSan
+host/runtime passes; generated machine code itself is not sanitizer-instrumented.
+[bridge-validation.json](bridge-validation.json) repeats all seven native pool test
+groups. [bridge-private-validation.json](bridge-private-validation.json) repeats
+the 1,280 private-context generated invocations against this bridge.
+Reproduce shared validation with generated.py --shared and the same bundle,
+libraries, validation recipe and fresh output arguments used above.
+
+This is the serial correctness reference for .NET-style shared capture identity.
+It does not provide parallel managed execution or an HTTP speedup. Each invocation
+adds temporary root registration and scans the bounded pool root set during GC;
+we have not optimized that overhead. Next separate per-invocation fault ownership,
+qualify task publication and suspended I/O ownership, then introduce coordinated
+mutator safepoints before lifting the heap gate. Do not dispatch current HTTP
+handlers through this synchronous-only bridge.
