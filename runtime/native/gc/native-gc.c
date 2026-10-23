@@ -855,12 +855,22 @@ int32_t neoclr_gc_idle_v1(neoclr_aot_context *context, const neoclr_probe_frame 
     }
     return status;
 }
-int32_t neoclr_gc_boundary_v1(neoclr_aot_context *context, const neoclr_probe_frame *boundary) {
-    if (!context || gc_state.cleanup_active || boundary != neoclr_root_probe_head_v1() ||
-        (boundary && boundary->context != context)) return 3;
+static int32_t paced_boundary(neoclr_aot_context *context, const neoclr_probe_frame *boundary) {
     if (gc_state.pacing.context == context && gc_state.statistics.collections == gc_state.pacing.collections &&
         gc_state.statistics.allocations - gc_state.pacing.allocations < 256 && ++gc_state.pacing.boundaries < 1024) return 0;
     return neoclr_gc_idle_v1(context, boundary);
+}
+int32_t neoclr_gc_boundary_v1(neoclr_aot_context *context, const neoclr_probe_frame *boundary) {
+    if (!context || gc_state.cleanup_active || boundary != neoclr_root_probe_head_v1() ||
+        (boundary && boundary->context != context)) return 3;
+    return paced_boundary(context, boundary);
+}
+/* Only root publication may reuse its just-established current-head proof.
+ * No guest execution, callback mutation or collection may intervene. Keep the
+ * cleanup/context checks here and the general native entry fully checked. */
+int32_t neoclr_gc_published_boundary_v1(neoclr_aot_context *context, const neoclr_probe_frame *boundary) {
+    if (!context || !boundary || gc_state.cleanup_active || boundary->context != context) return 3;
+    return paced_boundary(context, boundary);
 }
 neoclr_gc_statistics neoclr_gc_statistics_v1(void) { return gc_state.statistics; }
 

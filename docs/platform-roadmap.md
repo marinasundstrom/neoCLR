@@ -6546,3 +6546,13 @@ local trials show 3.4%/4.3% higher mean one/four-owner throughput and 3.7%/4.0% 
 CPU/response. [Evidence and limits](../benchmarks/http-server/primitive-comparison/gc-state/README.md).
 Broader typed metadata, generational policies and publication elimination remain
 separate investigations; this slice adds no public API or compiler bridge change.
+
+
+### Reuse of current-head admission — 2026-10-24
+
+The author-directed performance follow-up removes the duplicate root-head lookup
+between publication and pacing through a private handoff. Checked native callers,
+instrumented publication, collection budgets and worker synchronization retain their
+existing paths. Focused stale-boundary/cleanup checks, thread isolation, forced and
+paced HTTP, and shared-worker stress pass. [Paired measurements and limitations](../benchmarks/http-server/primitive-comparison/published-boundary/README.md).
+This does not implement general noncollecting-call analysis or typed root metadata.

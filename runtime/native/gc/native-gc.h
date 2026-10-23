@@ -150,6 +150,10 @@ typedef struct {
  * Caller must publish a complete current root boundary. */
 int32_t neoclr_gc_idle_v1(neoclr_aot_context *, const neoclr_probe_frame *);
 int32_t neoclr_gc_boundary_v1(neoclr_aot_context *, const neoclr_probe_frame *);
+/* Private root-probe handoff only: nonnull boundary has just been verified as
+ * this thread's current head. No guest execution, root mutation or collection
+ * may intervene. General native callers must use the checked boundary above. */
+int32_t neoclr_gc_published_boundary_v1(neoclr_aot_context *, const neoclr_probe_frame *);
 int32_t neoclr_gc_collect_conditional_v1(neoclr_aot_context *,
     const neoclr_probe_frame *, neoclr_gc_conditional_root *, uint32_t);
 /* Private conditional parked-stack registration. Park the active chain only if

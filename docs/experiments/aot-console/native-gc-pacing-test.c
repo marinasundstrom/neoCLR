@@ -9,6 +9,16 @@ static void boundary(neoclr_probe_frame *frame) {
     uint64_t empty=0;
     neoclr_probe_stack_roots_v2(frame,0,&empty,0,"{\"requiredSpillLanes\":[]}",25);
 }
+typedef struct {
+    neoclr_aot_context *context;
+    neoclr_probe_frame *frame;
+    int32_t checked, published;
+} cleanup_check;
+static void check_cleanup_boundary(void *argument) {
+    cleanup_check *state = argument;
+    state->checked = neoclr_gc_boundary_v1(state->context, state->frame);
+    state->published = neoclr_gc_published_boundary_v1(state->context, state->frame);
+}
 static int exercise(void) {
     uint64_t heap[4096]={0};
     neoclr_aot_context c={.text={(unsigned char*)heap,sizeof(heap),0}},other={0};
@@ -18,6 +28,11 @@ static int exercise(void) {
     uint64_t before=neoclr_gc_statistics_v1().collections;
     CHECK(neoclr_gc_boundary_v1(&other,&frame)==3);
     CHECK(neoclr_gc_boundary_v1(&c,NULL)==3);
+    neoclr_probe_frame stale = frame;
+    CHECK(neoclr_gc_boundary_v1(&c,&stale)==3);
+    CHECK(neoclr_gc_published_boundary_v1(NULL,&frame)==3);
+    CHECK(neoclr_gc_published_boundary_v1(&c,NULL)==3);
+    CHECK(neoclr_gc_published_boundary_v1(&other,&frame)==3);
     CHECK(neoclr_gc_statistics_v1().collections==before);
     for (int i=0;i<ALLOCATION_BUDGET-1;i++) CHECK(!neoclr_allocate_object_rooted_v1(&c.text,1,16,&root));
     boundary(&frame);
@@ -40,6 +55,16 @@ static int exercise(void) {
     before=neoclr_gc_statistics_v1().collections;
     boundary(&frame);
     CHECK(neoclr_gc_statistics_v1().collections==before+1);
+    CHECK(!neoclr_allocate_object_rooted_v1(&c.text,1,16,&root));
+    cleanup_check state = {.context=&c, .frame=&frame, .checked=-1, .published=-1};
+    neoclr_gc_resource resource = {0};
+    CHECK(!neoclr_gc_resource_attach_v1(&c,root,&resource,&state,check_cleanup_boundary));
+    before=neoclr_gc_statistics_v1().collections;
+    CHECK(!neoclr_gc_resource_release_v1(&c,&resource));
+    CHECK(state.checked==3 && state.published==3);
+    CHECK(neoclr_gc_statistics_v1().collections==before);
+    boundary(&frame); /* Cleanup guard is restored after callback exit. */
+    root=NULL;
     neoclr_probe_leave_v1(&frame);
     CHECK(!neoclr_gc_idle_v1(&c,NULL) && !c.text.used);
     return 0;

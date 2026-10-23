@@ -400,3 +400,15 @@ has its own end-to-end evidence: mean one/four-owner throughput +3.4%/+4.3%,
 CPU/response −3.7%/−4.0%. Costs include four bytes of structure padding per thread;
 lookup savings depend on target/compiler. No CLR API, collector or safepoint
 semantics change. [Validation and measurements](../../benchmarks/http-server/primitive-comparison/gc-state/README.md).
+
+
+### Reusing publication admission — 2026-10-24
+
+The paced root-publication path now reuses its just-established current-head proof
+through a private runtime handoff; general native callers retain full admission.
+No guest execution, collection or root mutation may intervene. Site-profiling builds
+retain the checked path because an external diagnostic sink intervenes. This is
+reuse of a local validation fact, not a pointer cache or safepoint omission. The
+shared pacing implementation retains context/cleanup checks and budget behavior.
+The tradeoff is an additional private caller obligation. [Tests and paired
+measurements](../../benchmarks/http-server/primitive-comparison/published-boundary/README.md).

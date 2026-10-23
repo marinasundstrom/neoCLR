@@ -173,7 +173,13 @@ void neoclr_probe_stack_roots_v2(neoclr_probe_frame *frame, uint32_t instruction
 #endif
     /* Complete snapshot: audited allocating helpers additionally protect their temporaries. */
 #ifdef NEOCLR_GC_PACED
+#ifdef NEOCLR_GC_SITE_PROFILE
+    /* The external diagnostic sink intervened after the head check. Retain the
+     * checked handoff in instrumented builds rather than extending that proof. */
     if (neoclr_gc_boundary_v1((neoclr_aot_context *)frame->context, probe_state.head)) abort();
+#else
+    if (neoclr_gc_published_boundary_v1((neoclr_aot_context *)frame->context, probe_state.head)) abort();
+#endif
 #else
     if (neoclr_gc_collect_v1((neoclr_aot_context *)frame->context, probe_state.head)) abort();
 #endif

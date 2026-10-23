@@ -414,3 +414,14 @@ paired local plaintext trials show 3.4%/4.3% higher mean one/four-worker through
 and 3.7%/4.0% lower CPU per response. One-worker latency tails remain mixed; these
 are incremental desktop results, not a new comparison against other servers. See
 [profile, implementation and evidence](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/primitive-comparison/gc-state).
+
+
+## Development: reuse of publication admission
+
+Root publication reuses its current-head check when entering paced GC, preserving
+checked native callers, instrumented hooks and collection/worker behavior. Focused
+stale-boundary, cleanup and thread checks plus forced/paced HTTP and shared-worker
+stress pass. Eight paired local plaintext trials show 3.4%/1.6% higher mean
+one/four-worker throughput and 3.3%/2.3% lower CPU per response. Latency tails do not
+uniformly improve; these are incremental desktop measurements. See
+[contract, validation and evidence](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/primitive-comparison/published-boundary).
