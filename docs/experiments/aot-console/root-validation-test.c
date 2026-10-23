@@ -17,6 +17,36 @@ int main(int argc, char **argv) {
     neoclr_probe_storage slot = {&word, 8, 0};
     neoclr_probe_frame parent, child;
     neoclr_probe_enter_v3(&parent, &outer, 0, &slot, 1, "{}", 2);
+    if (!strncmp(argv[1], "batch-", 6)) {
+        uint64_t words[33] = {0};
+        neoclr_probe_storage slots[33];
+        for (uint32_t i = 0; i < 33; i++)
+            slots[i] = (neoclr_probe_storage){&words[i], i % 2 ? 4 : 8, i % 3};
+        parent.storage = slots;
+        parent.storage_count = 33;
+        const char *plan = "{\"requiredSpillLanes\":[]}";
+        neoclr_probe_stack_roots_v2(&parent, 0, lanes, 0, plan, (uint32_t)strlen(plan));
+        /* Mutate a previously accepted ancestor, covering a vector group and
+         * the final scalar remainder without dereferencing malformed slots. */
+        if (!strcmp(argv[1], "batch-address")) slots[32].address = NULL;
+        else if (!strcmp(argv[1], "batch-width")) slots[15].read_bytes = 12;
+        else if (!strcmp(argv[1], "batch-flags")) slots[31].flags = 3;
+        else if (!strcmp(argv[1], "batch-transient")) {
+            neoclr_probe_transient_v2(&parent, 1, slots, 33, "{}", 2);
+            parent.storage_count = 0;
+            slots[32].read_bytes = 0;
+        } else if (!strcmp(argv[1], "batch-valid")) {
+            for (uint32_t count = 0; count <= 33; count++) {
+                parent.storage_count = count;
+                neoclr_probe_stack_roots_v2(&parent, 0, lanes, 0, plan, (uint32_t)strlen(plan));
+            }
+            neoclr_probe_leave_v1(&parent);
+            return 0;
+        } else return 2;
+        neoclr_probe_enter_v3(&child, &inner, 1, &slot, 0, "{}", 2);
+        neoclr_probe_stack_roots_v2(&child, 0, lanes, 0, plan, (uint32_t)strlen(plan));
+        return 0;
+    }
     if (!strncmp(argv[1], "plan-", 5)) {
         char plan[128] = "{\"requiredSpillLanes\":[]}";
         /* Warm the search hint, then reuse the same address with changed bytes. */

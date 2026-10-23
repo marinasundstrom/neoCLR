@@ -1,0 +1,45 @@
+{
+  "client": {
+    "clientCpuPerWall": 0.062259113769442154,
+    "clientCpuSeconds": 0.501131,
+    "clientProcessCpuSeconds": 0.507211,
+    "completed": 4313,
+    "drained": 32,
+    "latencyMilliseconds": {
+      "p50": 61.403417,
+      "p95": 70.232125,
+      "p99": 88.496583
+    },
+    "requestsPerSecond": 539.125,
+    "windowAndDrainSeconds": 8.04911875
+  },
+  "server": "READY 56400 56401\nDONE 56401 4345 0\n",
+  "sampleExit": 0,
+  "sampleStderr": "Sampling process 44255 for 5 seconds with 1 millisecond of run time between samples\nSampling completed, processing symbols...\nSample analysis of process 44255 written to file target/plain-hotpath/sample.txt\n",
+  "scope": "Diagnostic one-worker stack sample; not a capacity trial. Main owner waits for worker completion.",
+  "command": [
+    "sample",
+    "44255",
+    "5",
+    "1",
+    "-file",
+    "target/plain-hotpath/sample.txt"
+  ],
+  "workerSamples": 3560,
+  "mainWaitSamples": 3560,
+  "exclusiveWorkerSamples": {
+    "rootPublication": 964,
+    "allocation": 799,
+    "strlen": 358,
+    "validatedBases": 352,
+    "tlsLookup": 239,
+    "zeroFill": 161,
+    "indexedCollection": 107
+  },
+  "inputs": {
+    "target/plain-hotpath/sample.txt": "431054b90c2c93034ee576879f1c0ad6289491112d25daec12396647ff8ab2de",
+    "target/plain-pacing-final/a256-b1024-w1": "520404c24511158f3eec174da5c208894ed45ee08790469d9cb12c4e0b8bbeec",
+    "target/primitive-comparison-eof/client": "3cb6aa638332295893b82a57e279bf42f62685e4bee6471c37fc163f4a78a579",
+    "target/plain-hotpath/sample.py": "e094fcae66d89d759b3e46d5c4bbd3abf96b2a603212a5fad935feb62a4cc704"
+  }
+}

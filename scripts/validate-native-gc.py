@@ -88,9 +88,10 @@ def main():
         for gc in [False, True]:
             name = 'root-validation-' + ('gc' if gc else 'probe')
             binary = build(name, 'root-validation-test', gc=gc)
-            for case in ['address', 'width', 'flags', 'fault', 'transient', 'plan-missing', 'plan-length', 'plan-short']:
+            for case in ['address', 'width', 'flags', 'fault', 'transient', 'plan-missing', 'plan-length', 'plan-short', 'batch-address', 'batch-width', 'batch-flags', 'batch-transient']:
                 run(name + '-' + case, [binary, case], 3 if windows else -signal.SIGABRT)
             run(name + '-plan-moved', [binary, 'plan-moved'])
+            run(name + '-batch-valid', [binary, 'batch-valid'])
         for name in ['native-owned-body-test', 'native-idle-drain-test']:
             binary = out / (name + ('.exe' if windows else ''))
             flags = ['/DNEOCLR_NATIVE_GC', '/I' + str(BASE), '/I' + str(carrier)] if windows else ['-DNEOCLR_NATIVE_GC', '-Wno-deprecated-declarations', '-I', BASE, '-I', carrier]

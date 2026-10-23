@@ -70,6 +70,22 @@ static int has_spill_marker(const char *plan, uint32_t length) {
     spill_marker_offsets[bucket] = (uint32_t)(found - plan) + 1;
     return 1;
 }
+#ifdef NEOCLR_NATIVE_GC
+/* Validate current descriptor bytes on every publication. Accumulate failures
+ * without dereferencing slot addresses so the compiler can vectorize the scan;
+ * no cached validation or immutable-descriptor assumption is introduced. */
+static void validate_storage(const neoclr_probe_storage *storage, uint32_t count,
+                             int check_flags) {
+    uint32_t invalid = 0;
+    for (uint32_t i = 0; i < count; i++) {
+        const neoclr_probe_storage *s = &storage[i];
+        invalid |= (s->address == NULL) |
+            ((s->read_bytes != 4) & (s->read_bytes != 8)) |
+            (check_flags ? (s->flags > 2) : 0);
+    }
+    if (invalid) abort();
+}
+#endif
 void neoclr_probe_stack_roots_v2(neoclr_probe_frame *frame, uint32_t instruction,
     const uint64_t *lanes, uint32_t lane_count, const char *plan, uint32_t length) {
     if (!frame || head != frame || instruction >= 8192 || lane_count > 8192 || !lanes ||
@@ -88,23 +104,22 @@ void neoclr_probe_stack_roots_v2(neoclr_probe_frame *frame, uint32_t instruction
 #endif
     for (const neoclr_probe_frame *f = head; f; f = f->previous) {
         observe_fault(f->context);
+#ifdef NEOCLR_NATIVE_GC
+        validate_storage(f->storage, f->storage_count, 1);
+        validate_storage(f->transient, f->transient_count, 0);
+#else
         for (uint32_t i = 0; i < f->storage_count; i++) {
             const neoclr_probe_storage *s = &f->storage[i];
             if (!s->address || (s->read_bytes != 4 && s->read_bytes != 8) || s->flags > 2) abort();
-#ifndef NEOCLR_NATIVE_GC
             uint64_t word = 0;
             memcpy(&word, s->address, s->read_bytes);
             value ^= word; /* Observe the slot only; never follow a borrowed pointee. */
-#endif
         }
         for (uint32_t i = 0; i < f->transient_count; i++) {
             const neoclr_probe_storage *s = &f->transient[i];
             if (!s->address || (s->read_bytes != 4 && s->read_bytes != 8)) abort();
-#ifndef NEOCLR_NATIVE_GC
             uint64_t word = 0; memcpy(&word, s->address, s->read_bytes); value ^= word;
-#endif
         }
-#ifndef NEOCLR_NATIVE_GC
         for (uint32_t i = 0; i < f->lane_count; i++) value ^= f->lanes[i];
 #endif
     }

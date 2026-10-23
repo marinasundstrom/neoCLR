@@ -6286,3 +6286,10 @@ about 26%/23% and CPU per response about 21%/20% in short local trials. Forced
 collection and pressure retry remain intact; longer retention and variable tail
 latency remain explicit tradeoffs. This is worker hot-path tuning, not shared-heap
 async HTTP or a new framework API. See [evidence](../benchmarks/http-server/primitive-comparison/pacing/README.md).
+
+Plain-request root scan follow-up (2026-10-23): a fresh worker sample attributes
+substantial cost to root publication and allocation bookkeeping. Batched current-byte
+root-descriptor validation preserves the root contract and passes expanded malformed
+metadata/sanitizer tests. Paired one/four-owner HTTP trials show about 4% higher
+throughput and 4% lower CPU per response. Metadata publication and heap walks remain
+open efficiency targets; shared async HTTP scope is unchanged. See [evidence](../benchmarks/http-server/primitive-comparison/root-scan/README.md).

@@ -1,0 +1,330 @@
+{
+  "passed": true,
+  "inputs": {
+    "/Users/robert/Projects/neoclr/benchmarks/http-server/primitive-comparison/root-scan/validate.py": "22bca2c474020f72f2f78d23f80a2c1e383745697c5059ac92bd92f41e3b75e5",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-validation-test.c": "758df351f5a679b096c832bd3a76d67f9733b1f71c39fe771e100bae18ed13a7",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c": "2863b5f63849e9d78185909b893e8ed8e452dec7d1cc8693bd7a77813944310d",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c": "1c718951ea0eb822b0f648f6192d2d9f9686e6a93613dadeecb1b78078d1f4b6",
+    "/Users/robert/Projects/neoclr/runtime/native/gc/native-gc.c": "3c781db709dbad66fd7db8c30f4649899a7b3d62722709888a16a296181bb47c",
+    "/Users/robert/Projects/neoclr/runtime/native/gc/root-probe.h": "5c247269c702898e675439db37b1c8b62db7b44e0160c5043c89d93cd4c2881f",
+    "/Users/robert/Projects/neoclr/runtime/native/gc/root-probe.c": "1acaf709cec89af3a476705fe321326f171a9261e17fa98b445797a449f5f23c",
+    "/Users/robert/Projects/neoclr/runtime/native/gc/native-gc.h": "eb230f6877c24dc6a5c0db7d1baa3d46b7f17d0140b3193885949e4b33eebc5b"
+  },
+  "commands": [
+    {
+      "command": [
+        "xcrun",
+        "--sdk",
+        "macosx",
+        "--find",
+        "clang"
+      ],
+      "exitCode": 0,
+      "expected": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "xcrun",
+        "--sdk",
+        "macosx",
+        "--show-sdk-path"
+      ],
+      "exitCode": 0,
+      "expected": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-validation-test.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/plain-root-optimized-validation/probe"
+      ],
+      "exitCode": 0,
+      "expected": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/plain-root-optimized-validation/probe",
+        "address"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/plain-root-optimized-validation/probe",
+        "width"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/plain-root-optimized-validation/probe",
+        "flags"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/plain-root-optimized-validation/probe",
+        "fault"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/plain-root-optimized-validation/probe",
+        "transient"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/plain-root-optimized-validation/probe",
+        "plan-missing"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/plain-root-optimized-validation/probe",
+        "plan-length"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/plain-root-optimized-validation/probe",
+        "plan-short"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/plain-root-optimized-validation/probe",
+        "batch-address"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/plain-root-optimized-validation/probe",
+        "batch-width"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/plain-root-optimized-validation/probe",
+        "batch-flags"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/plain-root-optimized-validation/probe",
+        "batch-transient"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/plain-root-optimized-validation/probe",
+        "plan-moved"
+      ],
+      "exitCode": 0,
+      "expected": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/plain-root-optimized-validation/probe",
+        "batch-valid"
+      ],
+      "exitCode": 0,
+      "expected": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-validation-test.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/plain-root-optimized-validation/gc",
+        "-DNEOCLR_NATIVE_GC"
+      ],
+      "exitCode": 0,
+      "expected": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/plain-root-optimized-validation/gc",
+        "address"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/plain-root-optimized-validation/gc",
+        "width"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/plain-root-optimized-validation/gc",
+        "flags"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/plain-root-optimized-validation/gc",
+        "fault"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/plain-root-optimized-validation/gc",
+        "transient"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/plain-root-optimized-validation/gc",
+        "plan-missing"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/plain-root-optimized-validation/gc",
+        "plan-length"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/plain-root-optimized-validation/gc",
+        "plan-short"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/plain-root-optimized-validation/gc",
+        "batch-address"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/plain-root-optimized-validation/gc",
+        "batch-width"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/plain-root-optimized-validation/gc",
+        "batch-flags"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/plain-root-optimized-validation/gc",
+        "batch-transient"
+      ],
+      "exitCode": -6,
+      "expected": -6,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/plain-root-optimized-validation/gc",
+        "plan-moved"
+      ],
+      "exitCode": 0,
+      "expected": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/plain-root-optimized-validation/gc",
+        "batch-valid"
+      ],
+      "exitCode": 0,
+      "expected": 0,
+      "stderr": ""
+    }
+  ]
+}

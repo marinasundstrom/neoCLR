@@ -1,0 +1,13 @@
+{
+  "command": [
+    "otool",
+    "-tvV",
+    "target/plain-root-scan-final/candidate-w1"
+  ],
+  "binarySha256": "b5508d9f2a0e4bec676864704c90bd774265ee1c974757d234827565fdab08cf",
+  "function": "neoclr_gc_stack_roots_v1",
+  "assemblySha256": "f7874a331e7b8ee15e9d066d54380a44e87115e35501de5d20dc483b3bbe08e7",
+  "vectorInterleavedLoads": 20,
+  "vectorEqualityComparisons": 40,
+  "vectorOrReductions": 35
+}

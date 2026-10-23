@@ -163,3 +163,7 @@ the same plain response and selects 256 allocations/1,024 publications for opt-i
 paced mode. Final paired trials improve mean one/four-owner throughput about
 26%/23% and reduce CPU per response about 21%/20%. The original baseline above
 remains historical evidence; forced-GC behavior and the HTTP API are unchanged.
+
+The subsequent [batched root validation](root-scan/README.md) preserves per-publication
+validation and improves mean one/four-owner throughput and CPU efficiency by
+about 4% in paired trials against the tuned pacing baseline.

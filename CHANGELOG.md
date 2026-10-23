@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-23
 
+- Batch native GC root-descriptor checks into vectorizable scans while revalidating all current ancestor storage/transient metadata on every publication. Preserve mutable-plan, fault, root and collection contracts. Add mutation-after-publication and batch/tail coverage; native GC sanitizer and optimized root checks pass. Paired plain HTTP trials show about 4% higher throughput and 4% lower CPU per response with one/four owners; see benchmarks/http-server/primitive-comparison/root-scan/README.md.
+
 - Tune opt-in native GC pacing from 16 allocations/64 root publications to 256/1,024 after a three-budget plain HTTP comparison. Final paired trials improve mean one/four-owner throughput about 26%/23% and reduce estimated CPU per response about 21%/20%; tail latency remains variable. Preserve forced collection, root validation and rooted pressure retry, with boundary/pressure and socket/scheduler validation. Record the memory-retention tradeoff and reproducible evidence in benchmarks/http-server/primitive-comparison/pacing/README.md.
 
 - Establish the author-prioritized plain-text HTTP throughput/CPU baseline against Go net/http, Node http and .NET Kestrel, without artificial handler scheduling. Validate 14 final trials using a compiled EOF-aware client after retaining driver-limit/failure calibration. neoCLR measures 485–491 requests/s with one owner and 1,531–1,693 with four; CPU cost per response remains higher than the reference servers. Record API/runtime research and treat worker throughput plus CPU efficiency as primary, allocations as secondary and JSON as later work. See benchmarks/http-server/primitive-comparison/README.md.
