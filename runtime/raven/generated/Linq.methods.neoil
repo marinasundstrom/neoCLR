@@ -709,7 +709,7 @@ call neoCLR.Library.System.Linq.Operators.RuntimeErrorSystemLinqSingleErrorNewSy
 M00000011_IL_002e:
 call neoCLR.Library.System.Linq.Operators.RuntimeUnion4(System.Linq.SingleError)
 M00000011_IL_0033:
-call neoCLR.Library.System.Linq.Operators.RuntimeUnion5<T0>(System.Result.Error<System.Linq.SingleError>)
+call neoCLR.Library.System.Linq.Operators.RuntimeUnion5<T0>(System.Result.Failure<System.Linq.SingleError>)
 M00000011_IL_0038:
 ret
 M00000011_IL_0039:
@@ -749,7 +749,7 @@ call neoCLR.Library.System.Linq.Operators.RuntimeErrorSystemLinqSingleErrorNewSy
 M00000011_IL_0067:
 call neoCLR.Library.System.Linq.Operators.RuntimeUnion4(System.Linq.SingleError)
 M00000011_IL_006c:
-call neoCLR.Library.System.Linq.Operators.RuntimeUnion5<T0>(System.Result.Error<System.Linq.SingleError>)
+call neoCLR.Library.System.Linq.Operators.RuntimeUnion5<T0>(System.Result.Failure<System.Linq.SingleError>)
 M00000011_IL_0071:
 ret
 M00000011_IL_0072:
@@ -1029,7 +1029,7 @@ call neoCLR.Library.System.Linq.Operators.RuntimeErrorSystemLinqSingleErrorNewSy
 M00000014_IL_006f:
 call neoCLR.Library.System.Linq.Operators.RuntimeUnion4(System.Linq.SingleError)
 M00000014_IL_0074:
-call neoCLR.Library.System.Linq.Operators.RuntimeUnion5<T0>(System.Result.Error<System.Linq.SingleError>)
+call neoCLR.Library.System.Linq.Operators.RuntimeUnion5<T0>(System.Result.Failure<System.Linq.SingleError>)
 M00000014_IL_0079:
 ret
 M00000014_IL_007a:
@@ -1066,7 +1066,7 @@ call neoCLR.Library.System.Linq.Operators.RuntimeErrorSystemLinqSingleErrorNewSy
 M00000014_IL_00ad:
 call neoCLR.Library.System.Linq.Operators.RuntimeUnion4(System.Linq.SingleError)
 M00000014_IL_00b2:
-call neoCLR.Library.System.Linq.Operators.RuntimeUnion5<T0>(System.Result.Error<System.Linq.SingleError>)
+call neoCLR.Library.System.Linq.Operators.RuntimeUnion5<T0>(System.Result.Failure<System.Linq.SingleError>)
 M00000014_IL_00b7:
 ret
 .end

@@ -31,14 +31,14 @@ func Main() {
     }
     let outcomes = ArrayList<Result<int, OverflowError>>(1)
     outcomes.Add(Result<int, OverflowError>.Ok(42))
-    outcomes.Add(Result<int, OverflowError>.Error(OverflowError()))
+    outcomes.Add(Result<int, OverflowError>.Failure(OverflowError()))
     outcomes.Add(Result<int, OverflowError>.Ok(7))
     let outcomesCopy = outcomes.Copy()
     WriteLine(outcomesCopy.Count)
     for outcome in outcomesCopy {
         match outcome {
             .Ok(let ok) => WriteLine(ok)
-            .Error(let error) => WriteLine("Stored error")
+            .Failure(let error) => WriteLine("Stored error")
         }
     }
     let functions = ArrayList<(int) -> int>()
@@ -47,7 +47,7 @@ func Main() {
     let result = Result<TypeInfo, OverflowError>.Ok(kind)
     match result {
         .Ok(let ok) => WriteLine(ok.Name)
-        .Error(let error) => WriteLine("Overflow")
+        .Failure(let error) => WriteLine("Overflow")
     }
 }
 

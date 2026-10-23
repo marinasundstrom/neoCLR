@@ -48,9 +48,9 @@ func Acknowledge(payload: string) -> Result<JsonObject, JsonError> {
             _ = reply.Add("accepted", JsonBoolean(true))?
             return Ok(reply)
         }
-        return Error(JsonError.TypeMismatch("station string"))
+        return Failure(JsonError.TypeMismatch("station string"))
     }
-    return Error(JsonError.TypeMismatch("object"))
+    return Failure(JsonError.TypeMismatch("object"))
 }
 
 func PrepareReport() -> Result<HttpContent, AppError> {
@@ -61,7 +61,7 @@ func PrepareReport() -> Result<HttpContent, AppError> {
 
 async func ReadReply(response: HttpResponse) -> Task<Result<string, AppError>> {
     if response.StatusCode != HttpStatusCode.Created {
-        return Error(AppError.Http(HttpError.UnsuccessfulStatus(response.StatusCode)))
+        return Failure(AppError.Http(HttpError.UnsuccessfulStatus(response.StatusCode)))
     }
     let text = (await HttpStringContent.Read(response.Content)).MapError(error => AppError.Body("Invalid UTF-8 response"))?
     let value = JsonSerializer.DeserializeNode(text)?
@@ -74,5 +74,5 @@ async func ReadReply(response: HttpResponse) -> Task<Result<string, AppError>> {
             }
         }
     }
-    return Error(AppError.Body("Unexpected acknowledgement"))
+    return Failure(AppError.Body("Unexpected acknowledgement"))
 }

@@ -22,7 +22,7 @@ static class ResultBindings
     public static string Declarations => ErrorBindings.Declarations;
     public static bool RequiresInitialization(string type) => IsType(type) && !ErrorBindings.IsEmpty(type);
     public static bool IsType(string type) => ErrorBindings.IsType(type) || Successes.Any(s => s.Case == type) || Carriers.Any(c => type == c.Type || type == c.Error)
-        || Errors.Any(e => type == $"System.Result.Error<{e}>");
+        || Errors.Any(e => type == $"System.Result.Failure<{e}>");
     public static string? Type(TypeReference type)
     {
         if (!type.IsValueType || !RuntimeSignatures.IsCore(type.Scope)) return null;
@@ -59,12 +59,12 @@ static class ResultBindings
                 return new(owner + "::FromResidual", args, result);
             var expected = name switch { "TryGetOutput" => output, "TryGetResidual" => error,
                 "TryGetValue" when args.Length == 1 && args[0] == $"System.Result.Ok<{output}>&" => $"System.Result.Ok<{output}>",
-                "TryGetValue" => $"System.Result.Error<{error}>", _ => "" };
+                "TryGetValue" => $"System.Result.Failure<{error}>", _ => "" };
             if (reference.HasThis && result == "Boolean" && args.SequenceEqual(new[] { expected + "&" }) && definition.Parameters[0].IsOut)
                 return new("", [owner + "&", expected + "&"], "Boolean", 1,
                     name == "TryGetValue" ? $"call {Helper(owner, expected)}({owner}&,{expected}&)" : $"call instance {owner}::{name}({expected}&)");
         }
-        var value = Successes.Where(s => s.Case == owner).Select(s => s.Value).SingleOrDefault() ?? Errors.FirstOrDefault(e => owner == $"System.Result.Error<{e}>");
+        var value = Successes.Where(s => s.Case == owner).Select(s => s.Value).SingleOrDefault() ?? Errors.FirstOrDefault(e => owner == $"System.Result.Failure<{e}>");
         if (reference.HasThis && args.Length == 0 && name == "get_Value" && result == value)
             return new(Helper(owner!, name), [owner + "&"], result);
         throw new InvalidDataException("Unsupported Result member: " + reference.FullName);
@@ -85,11 +85,11 @@ static class ResultBindings
         var text = new StringBuilder();
         foreach (var (owner, arg) in Carriers.Select(c => (c.Type, $"System.Result.Ok<{c.Output}>" )).Concat(Successes.Select(s => (s.Case, s.Value))))
             text.AppendLine($".function {Helper(owner, "New")}({arg} value) -> {owner}\nldarg value\nnewobj instance {owner}::.ctor({arg})\nret\n.end");
-        foreach (var (owner, result, name) in Errors.Select(e => ($"System.Result.Error<{e}>", e, "get_Value"))
+        foreach (var (owner, result, name) in Errors.Select(e => ($"System.Result.Failure<{e}>", e, "get_Value"))
             .Concat(Successes.Select(s => (s.Case, s.Value, "get_Value"))))
             text.AppendLine($".function {Helper(owner, name)}({owner}& value) -> {result}\nldarg value\nldobj {owner}\ncall instance {owner}::{name}()\nret\n.end");
         foreach (var (owner, output, error) in Carriers.Select(c => (c.Type, c.Output, c.Error)))
-            foreach (var variant in new[] { $"System.Result.Ok<{output}>", $"System.Result.Error<{error}>" })
+            foreach (var variant in new[] { $"System.Result.Ok<{output}>", $"System.Result.Failure<{error}>" })
                 text.AppendLine($".function {Helper(owner, variant)}({owner}& source,out(true) {variant}& destination) -> Boolean\nldarg source\nldobj {owner}\nldarg destination\ncall instance {owner}::TryGet({variant}&)\nret\n.end");
         return UnionImport.AdaptUnionHelpers(text.ToString(), standardUnions);
     }

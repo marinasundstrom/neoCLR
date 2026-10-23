@@ -49,7 +49,7 @@ class TlsTestTransfer {
     }
     async func Read() -> Task<Result<int, StreamError>> {
         let result = await socket.ReceiveUntil(memory, NetworkDeadline.AfterMilliseconds(60000), token)
-        let Ok(read) = result else { return Error(StreamError.IoFailure) }
+        let Ok(read) = result else { return Failure(StreamError.IoFailure) }
         return Ok(read)
     }
     async func Write() -> Task<Result<unit, StreamError>> {
@@ -57,9 +57,9 @@ class TlsTestTransfer {
         var sent = 0
         while sent < source.Length {
             let Ok(written) = await socket.SendUntil(source.Slice(sent), NetworkDeadline.AfterMilliseconds(60000), token) else {
-                return Error(StreamError.IoFailure)
+                return Failure(StreamError.IoFailure)
             }
-            if written <= 0 { return Error(StreamError.IoFailure) }
+            if written <= 0 { return Failure(StreamError.IoFailure) }
             sent += written
         }
         return Ok(())
@@ -101,10 +101,10 @@ async func CheckMemoryWindows(credentials: SslServerAuthenticationOptions, trust
     var received = 0
     while received < 16386 {
         let result = await pending
-        if result is Error(StreamError.InvalidData) { return 56 }
-        if result is Error(StreamError.IoFailure) { return 57 }
-        if result is Error(StreamError.Closed) { return 58 }
-        if result is Error(StreamError.WrongAccess) { return 59 }
+        if result is Failure(StreamError.InvalidData) { return 56 }
+        if result is Failure(StreamError.IoFailure) { return 57 }
+        if result is Failure(StreamError.Closed) { return 58 }
+        if result is Failure(StreamError.WrongAccess) { return 59 }
         let Ok(count) = result else { return 46 }
         if count <= 0 || count > 4096 || count > 16386 - received { return 47 }
         if destination[0] != 255 || destination[4097] != 255 { return 48 }

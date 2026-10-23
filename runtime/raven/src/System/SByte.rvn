@@ -23,13 +23,13 @@ public struct SByte : Number, EquatableTo<sbyte>, Formattable {
         }
         let status = neoCLR.Runtime.UnpackValue<int>(payload)
         if status == 1 {
-            return Error(NumberParseError.InvalidFormat())
+            return Failure(NumberParseError.InvalidFormat())
         }
         if status == 2 {
-            return Error(NumberParseError.Overflow())
+            return Failure(NumberParseError.Overflow())
         }
         System.Fail("invalid native parse status")
-        return Error(NumberParseError.InvalidFormat())
+        return Failure(NumberParseError.InvalidFormat())
     }
 
     /// Tests equality with another value of the same type without boxing.

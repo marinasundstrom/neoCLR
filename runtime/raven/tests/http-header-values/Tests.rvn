@@ -179,7 +179,7 @@ func MessageLifetime() -> Result<unit, TestFailure> {
     alias.Dispose()
     _ = Assert.Equal(0, input.Reads)?
     _ = Assert.Equal(1, input.Closes)?
-    _ = Assert.True(request.WithHeader("X-Test", "other") is Error(_), "Disposed request rejects derivation")?
+    _ = Assert.True(request.WithHeader("X-Test", "other") is Failure(_), "Disposed request rejects derivation")?
     let borrowed = ResponseInput()
     let Ok(body) = HttpStreamContent.Create(borrowed, 3, true) else { return Assert.True(false, "Create borrowed stream") }
     let response = HttpResponse(200, ArrayList<HttpHeader>(), body)

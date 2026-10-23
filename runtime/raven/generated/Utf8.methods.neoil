@@ -112,7 +112,7 @@ call neoCLR.Library.System.Text.Utf8.RuntimeErrorSystemTextInvalidUtf8ErrorNew()
 M00000002_IL_006b:
 call neoCLR.Library.System.Text.Utf8.RuntimeUnion1(System.Text.InvalidUtf8Error)
 M00000002_IL_0070:
-call neoCLR.Library.System.Text.Utf8.RuntimeUnion3(System.Result.Error<System.Text.InvalidUtf8Error>)
+call neoCLR.Library.System.Text.Utf8.RuntimeUnion3(System.Result.Failure<System.Text.InvalidUtf8Error>)
 M00000002_IL_0075:
 ret
 .end

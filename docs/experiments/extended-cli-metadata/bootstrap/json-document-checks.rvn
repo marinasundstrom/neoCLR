@@ -49,7 +49,7 @@ public class JsonDocumentChecks {
     static func Run() -> int {
         match Check() {
             Ok(let answer) => return answer
-            Error(_) => return 1
+            Failure(_) => return 1
         }
     }
 }

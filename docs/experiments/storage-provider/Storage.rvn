@@ -63,7 +63,7 @@ class ProviderDirectory : Directory {
 
     private func Resolve(relativePath: Path) -> Result<Path, StorageLookupError> {
         if relativePath.IsAbsolute {
-            return Error<StorageLookupError>(StorageLookupError.InvalidPath)
+            return Failure<StorageLookupError>(StorageLookupError.InvalidPath)
         }
         if relativePath.Text == "." {
             return Ok(path)
@@ -77,28 +77,28 @@ class ProviderDirectory : Directory {
         }
         return match System.Storage.Path.Parse(resolved) {
             Ok(let child) => Ok(child)
-            Error(_) => Error<StorageLookupError>(StorageLookupError.InvalidPath)
+            Failure(_) => Failure<StorageLookupError>(StorageLookupError.InvalidPath)
         }
     }
 
     func GetItem(relativePath: Path) -> Result<StorageItem, StorageLookupError> {
         return match Resolve(relativePath) {
             Ok(let child) => provider.GetItem(child)
-            Error(let error) => Error(error)
+            Failure(let error) => Failure(error)
         }
     }
 
     func GetDirectory(relativePath: Path) -> Result<Directory, StorageLookupError> {
         return match Resolve(relativePath) {
             Ok(let child) => provider.GetDirectory(child)
-            Error(let error) => Error(error)
+            Failure(let error) => Failure(error)
         }
     }
 
     func GetDirectory(name: string) -> Result<Directory, StorageLookupError> {
         return match FileAt(name) {
             Ok(let child) => provider.GetDirectory(child.Path)
-            Error(let error) => Error(error)
+            Failure(let error) => Failure(error)
         }
     }
 
@@ -109,7 +109,7 @@ class ProviderDirectory : Directory {
     // This resolves a direct child address; it does not query existence.
     func FileAt(name: string) -> Result<File, StorageLookupError> {
         if name.IsEmpty || name == "." || name == ".." || name.ContainsOrdinal("/") {
-            return Error<StorageLookupError>(StorageLookupError.InvalidPath)
+            return Failure<StorageLookupError>(StorageLookupError.InvalidPath)
         }
         var childText = path.Text + "/" + name
         if path.Text == "." {
@@ -123,7 +123,7 @@ class ProviderDirectory : Directory {
                 let file: File = ProviderFile(provider, child)
                 Ok(file)
             }
-            Error(_) => Error<StorageLookupError>(StorageLookupError.InvalidPath)
+            Failure(_) => Failure<StorageLookupError>(StorageLookupError.InvalidPath)
         }
     }
 
@@ -131,14 +131,14 @@ class ProviderDirectory : Directory {
     func GetFile(name: string) -> Result<File, StorageLookupError> {
         return match FileAt(name) {
             Ok(let descriptor) => provider.GetFile(descriptor.Path)
-            Error(_) => Error<StorageLookupError>(StorageLookupError.InvalidPath)
+            Failure(_) => Failure<StorageLookupError>(StorageLookupError.InvalidPath)
         }
     }
 
     // A parsed absolute path is valid syntax, but cannot replace this context.
     func GetFile(relativePath: Path) -> Result<File, StorageLookupError> {
         if relativePath.IsAbsolute {
-            return Error<StorageLookupError>(StorageLookupError.InvalidPath)
+            return Failure<StorageLookupError>(StorageLookupError.InvalidPath)
         }
         if relativePath.Text == "." {
             return provider.GetFile(path)
@@ -152,7 +152,7 @@ class ProviderDirectory : Directory {
         }
         return match System.Storage.Path.Parse(resolved) {
             Ok(let child) => provider.GetFile(child)
-            Error(_) => Error<StorageLookupError>(StorageLookupError.InvalidPath)
+            Failure(_) => Failure<StorageLookupError>(StorageLookupError.InvalidPath)
         }
     }
 
@@ -177,7 +177,7 @@ class HostStorage : StorageProvider {
         if path.IsAbsolute {
             match text.SliceUtf8(1, text.GetUtf8ByteCount() - 1) {
                 Ok(let relative) => return System.Storage.Path.Combine(root, relative)
-                Error(_) => System.Fail("Invalid parsed path boundary")
+                Failure(_) => System.Fail("Invalid parsed path boundary")
             }
         }
         return System.Storage.Path.Combine(root, text)
@@ -198,7 +198,7 @@ class HostStorage : StorageProvider {
     func ListItems(path: Path, maxItems: int) -> Result<Sequence<StorageItem>, StorageLookupError> {
         return match storage.GetDirectory(path) {
             Ok(let directory) => directory.GetItems(maxItems)
-            Error(let error) => Error(error)
+            Failure(let error) => Failure(error)
         }
     }
 
@@ -208,7 +208,7 @@ class HostStorage : StorageProvider {
                 let input: InputStream = stream
                 Ok(input)
             }
-            Error(let error) => Error(error)
+            Failure(let error) => Failure(error)
         }
     }
 
@@ -218,7 +218,7 @@ class HostStorage : StorageProvider {
                 let output: OutputStream = stream
                 Ok(output)
             }
-            Error(let error) => Error(error)
+            Failure(let error) => Failure(error)
         }
     }
 
@@ -262,13 +262,13 @@ class MemoryStorage : StorageProvider {
     // do not implicitly create a directory tree.
     func ListItems(path: Path, maxItems: int) -> Result<Sequence<StorageItem>, StorageLookupError> {
         if maxItems < 0 {
-            return Error<StorageLookupError>(StorageLookupError.InvalidRange)
+            return Failure<StorageLookupError>(StorageLookupError.InvalidRange)
         }
         if maxItems > 1024 {
-            return Error<StorageLookupError>(StorageLookupError.LimitExceeded)
+            return Failure<StorageLookupError>(StorageLookupError.LimitExceeded)
         }
         if Key(path) != "/" {
-            return Error<StorageLookupError>(StorageLookupError.NotFound)
+            return Failure<StorageLookupError>(StorageLookupError.NotFound)
         }
         let items: List<StorageItem> = ArrayList<StorageItem>()
         for key in keys {
@@ -279,13 +279,13 @@ class MemoryStorage : StorageProvider {
                     let name = System.Storage.Path.GetFileName(key)
                     if key == "/" + name {
                         if items.Count == maxItems {
-                            return Error<StorageLookupError>(StorageLookupError.LimitExceeded)
+                            return Failure<StorageLookupError>(StorageLookupError.LimitExceeded)
                         }
                         let item: StorageItem = ProviderFile(self, child)
                         items.Add(item)
                     }
                 }
-                Error(_) => System.Fail("Stored invalid memory key")
+                Failure(_) => System.Fail("Stored invalid memory key")
             }
         }
         let result: Sequence<StorageItem> = items
@@ -298,7 +298,7 @@ class MemoryStorage : StorageProvider {
             return Ok(directoryItem)
         }
         if Find(path) < 0 {
-            return Error<StorageLookupError>(StorageLookupError.NotFound)
+            return Failure<StorageLookupError>(StorageLookupError.NotFound)
         }
         let item: StorageItem = ProviderFile(self, path)
         return Ok(item)
@@ -310,17 +310,17 @@ class MemoryStorage : StorageProvider {
             return Ok(directory)
         }
         if Find(path) >= 0 {
-            return Error<StorageLookupError>(StorageLookupError.WrongKind)
+            return Failure<StorageLookupError>(StorageLookupError.WrongKind)
         }
-        return Error<StorageLookupError>(StorageLookupError.NotFound)
+        return Failure<StorageLookupError>(StorageLookupError.NotFound)
     }
 
     func GetFile(path: Path) -> Result<File, StorageLookupError> {
         if Key(path) == "/" {
-            return Error<StorageLookupError>(StorageLookupError.WrongKind)
+            return Failure<StorageLookupError>(StorageLookupError.WrongKind)
         }
         if Find(path) < 0 {
-            return Error<StorageLookupError>(StorageLookupError.NotFound)
+            return Failure<StorageLookupError>(StorageLookupError.NotFound)
         }
         let file: File = ProviderFile(self, path)
         return Ok(file)
@@ -328,11 +328,11 @@ class MemoryStorage : StorageProvider {
 
     func OpenRead(path: Path) -> Result<InputStream, StreamError> {
         if Key(path) == "/" {
-            return Error<StreamError>(StreamError.WrongKind)
+            return Failure<StreamError>(StreamError.WrongKind)
         }
         let index = Find(path)
         if index < 0 {
-            return Error<StreamError>(StreamError.NotFound)
+            return Failure<StreamError>(StreamError.NotFound)
         }
         let stream: InputStream = MemoryInput(contents[index])
         return Ok(stream)
@@ -340,13 +340,13 @@ class MemoryStorage : StorageProvider {
 
     func CreateNew(path: Path) -> Result<OutputStream, StreamError> {
         if Key(path) == "/" {
-            return Error<StreamError>(StreamError.WrongKind)
+            return Failure<StreamError>(StreamError.WrongKind)
         }
         if Find(path) >= 0 {
-            return Error<StreamError>(StreamError.AlreadyExists)
+            return Failure<StreamError>(StreamError.AlreadyExists)
         }
         if keys.Count >= 8 {
-            return Error<StreamError>(StreamError.LimitExceeded)
+            return Failure<StreamError>(StreamError.LimitExceeded)
         }
         let bytes: List<byte> = ArrayList<byte>()
         keys.Add(Key(path))
@@ -357,40 +357,40 @@ class MemoryStorage : StorageProvider {
 
     func ReadText(path: Path, maxBytes: int) -> Result<string, FileReadError> {
         if maxBytes < 0 {
-            return Error<FileReadError>(FileReadError.InvalidLimit)
+            return Failure<FileReadError>(FileReadError.InvalidLimit)
         }
         if Key(path) == "/" {
-            return Error<FileReadError>(FileReadError.NotRegularFile)
+            return Failure<FileReadError>(FileReadError.NotRegularFile)
         }
         let index = Find(path)
         if index < 0 {
-            return Error<FileReadError>(FileReadError.NotFound)
+            return Failure<FileReadError>(FileReadError.NotFound)
         }
         let bytes = contents[index]
         if bytes.Count > maxBytes {
-            return Error<FileReadError>(FileReadError.TooLarge)
+            return Failure<FileReadError>(FileReadError.TooLarge)
         }
         return match Utf8.Decode(bytes) {
             Ok(let text) => Ok(text)
-            Error(_) => Error<FileReadError>(FileReadError.InvalidUtf8)
+            Failure(_) => Failure<FileReadError>(FileReadError.InvalidUtf8)
         }
     }
 
     func WriteText(path: Path, text: string, maxBytes: int) -> Result<unit, FileWriteError> {
         if maxBytes < 0 {
-            return Error<FileWriteError>(FileWriteError.InvalidLimit)
+            return Failure<FileWriteError>(FileWriteError.InvalidLimit)
         }
         if Key(path) == "/" {
-            return Error<FileWriteError>(FileWriteError.NotRegularFile)
+            return Failure<FileWriteError>(FileWriteError.NotRegularFile)
         }
         let count = text.GetUtf8ByteCount()
         if count > maxBytes || count > 65536 {
-            return Error<FileWriteError>(FileWriteError.TooLarge)
+            return Failure<FileWriteError>(FileWriteError.TooLarge)
         }
         let index = Find(path)
         if index < 0 && keys.Count >= 8 {
             // The temporary whole-text error family has no capacity case.
-            return Error<FileWriteError>(FileWriteError.WriteFailed)
+            return Failure<FileWriteError>(FileWriteError.WriteFailed)
         }
         let encoded = Utf8.Encode(text)
         let bytes: List<byte> = ArrayList<byte>()

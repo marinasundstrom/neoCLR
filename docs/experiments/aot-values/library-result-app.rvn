@@ -5,14 +5,14 @@ func Make(valid: bool) -> Result<int, byte> {
     if valid {
         return Result<int, byte>.Ok(42)
     }
-    return Result<int, byte>.Error((byte)7)
+    return Result<int, byte>.Failure((byte)7)
 }
 
 func Read(item: Result<int, byte>) -> int {
     if let Ok(value) = item {
         return value
     }
-    let Error(error) = item else {
+    let Failure(error) = item else {
         return 0
     }
     return 0 - error

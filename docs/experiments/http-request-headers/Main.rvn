@@ -39,7 +39,7 @@ func CheckContracts() -> Result<unit, HttpError> {
     Check(empty.GetHeaderValues("x-empty").Count == 1)
     let names: string[] = ["", "Bad Name", "X:Name", "X-İ", "Host", "CONTENT-LENGTH", "Transfer-Encoding", "Connection", "Keep-Alive", "Proxy-Connection", "TE", "Trailer", "Upgrade", "Expect", "Content-Encoding", "Content-Type"]
     for name in names {
-        if let Error(HttpError.InvalidRequest(_)) = original.WithHeader(name, "value") {
+        if let Failure(HttpError.InvalidRequest(_)) = original.WithHeader(name, "value") {
             Check(true)
         } else {
             System.Fail("Invalid or reserved header accepted")
@@ -47,7 +47,7 @@ func CheckContracts() -> Result<unit, HttpError> {
     }
     let values: string[] = ["a\r\nInjected: yes", "a\t", "Café"]
     for value in values {
-        if let Error(HttpError.InvalidRequest(_)) = original.WithHeader("X-Test", value) {
+        if let Failure(HttpError.InvalidRequest(_)) = original.WithHeader("X-Test", value) {
             Check(true)
         } else {
             System.Fail("Invalid header value accepted")
@@ -60,7 +60,7 @@ func CheckContracts() -> Result<unit, HttpError> {
         index += 1
     }
     _ = many.WithHeader("X-0", "replacement")?
-    if let Error(HttpError.LimitExceeded(_)) = many.WithHeader("X-Extra", "value") {
+    if let Failure(HttpError.LimitExceeded(_)) = many.WithHeader("X-Extra", "value") {
         Check(true)
     } else {
         System.Fail("Header count bound bypassed")
@@ -71,16 +71,16 @@ func CheckContracts() -> Result<unit, HttpError> {
     }
     let large = original.WithHeader("X-Large", longValue)?
     let oversized = HttpClient().Send(large).GetResult()
-    if let Error(HttpError.LimitExceeded(_)) = oversized {
+    if let Failure(HttpError.LimitExceeded(_)) = oversized {
         Check(true)
     } else {
-        if let Error(reason) = oversized {
+        if let Failure(reason) = oversized {
             Console.WriteLine(reason.ToString())
         }
         System.Fail("Header byte bound did not fail before DNS")
     }
     let invalidContent = HttpRequest.Post("http://not-resolved.invalid/", HttpMemoryContent(default(ReadOnlyMemory<byte>), "text/plain\r\nBad: yes"))?
-    if let Error(HttpError.InvalidRequest(_)) = HttpClient().Send(invalidContent).GetResult() {
+    if let Failure(HttpError.InvalidRequest(_)) = HttpClient().Send(invalidContent).GetResult() {
         Check(true)
     } else {
         System.Fail("Content header bypassed send validation")

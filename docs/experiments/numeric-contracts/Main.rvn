@@ -19,7 +19,7 @@ public func CheckNumber<T>(left: T, right: T, expected: T) where T: Number {
 public func CheckJsonNumber(number: System.Data.Json.JsonNumber, expectValue: bool) {
     match number.AsInt32() {
         Ok(let value) => Check(expectValue && value == 42, "JSON Int32 conversion")
-        Error(_) => Check(!expectValue, "JSON Int32 range")
+        Failure(_) => Check(!expectValue, "JSON Int32 range")
     }
 }
 
@@ -36,106 +36,106 @@ public func Main() {
     CheckNumber<double>(6.0, 2.0, 9.0)
     match SByte.Parse("-128") {
         Ok(let value) => Check(value == (sbyte)-128, "SByte parse")
-        Error(_) => System.Fail("SByte parse failed")
+        Failure(_) => System.Fail("SByte parse failed")
     }
     match Byte.Parse("255") {
         Ok(let value) => Check(value == (byte)255, "Byte parse")
-        Error(_) => System.Fail("Byte parse failed")
+        Failure(_) => System.Fail("Byte parse failed")
     }
     match Int16.Parse("-32768") {
         Ok(let value) => Check(value == (short)-32768, "Int16 parse")
-        Error(_) => System.Fail("Int16 parse failed")
+        Failure(_) => System.Fail("Int16 parse failed")
     }
     match UInt16.Parse("65535") {
         Ok(let value) => Check(value == (ushort)65535, "UInt16 parse")
-        Error(_) => System.Fail("UInt16 parse failed")
+        Failure(_) => System.Fail("UInt16 parse failed")
     }
     match Int32.Parse("2147483647") {
         Ok(let value) => Check(value == 2147483647, "Int32 parse")
-        Error(_) => System.Fail("Int32 parse failed")
+        Failure(_) => System.Fail("Int32 parse failed")
     }
     match UInt32.Parse("4294967295") {
         Ok(let value) => Check(value == (uint)4294967295L, "UInt32 parse")
-        Error(_) => System.Fail("UInt32 parse failed")
+        Failure(_) => System.Fail("UInt32 parse failed")
     }
     match Int64.Parse("9223372036854775807") {
         Ok(let value) => Check(value == 9223372036854775807L, "Int64 parse")
-        Error(_) => System.Fail("Int64 parse failed")
+        Failure(_) => System.Fail("Int64 parse failed")
     }
     match UInt64.Parse("18446744073709551615") {
         Ok(let value) => Check(value == (ulong)-1L, "UInt64 parse")
-        Error(_) => System.Fail("UInt64 parse failed")
+        Failure(_) => System.Fail("UInt64 parse failed")
     }
     match Single.Parse("1.25e2") {
         Ok(let value) => Check(value == (float)125, "Single parse")
-        Error(_) => System.Fail("Single parse failed")
+        Failure(_) => System.Fail("Single parse failed")
     }
     match Double.Parse("-2.5e-1") {
         Ok(let value) => Check(value == -0.25, "Double parse")
-        Error(_) => System.Fail("Double parse failed")
+        Failure(_) => System.Fail("Double parse failed")
     }
     match Boolean.Parse("tRuE") {
         Ok(let value) => Check(value == true, "Boolean parse")
-        Error(_) => System.Fail("Boolean parse failed")
+        Failure(_) => System.Fail("Boolean parse failed")
     }
     match Byte.Parse("1") {
         Ok(let value) => Check(value == (byte)1, "Byte parse")
-        Error(_) => System.Fail("Byte parse failed")
+        Failure(_) => System.Fail("Byte parse failed")
     }
     match Byte.Parse("2") {
         Ok(let value) => Check(value == (byte)2, "Byte parse")
-        Error(_) => System.Fail("Byte parse failed")
+        Failure(_) => System.Fail("Byte parse failed")
     }
     match SByte.Parse("128") {
-        Error(NumberParseError.Overflow) => { }
+        Failure(NumberParseError.Overflow) => { }
         _ => System.Fail("SByte parse error contract")
     }
     match Byte.Parse("-1") {
-        Error(NumberParseError.Overflow) => { }
+        Failure(NumberParseError.Overflow) => { }
         _ => System.Fail("Byte parse error contract")
     }
     match Int16.Parse("32768") {
-        Error(NumberParseError.Overflow) => { }
+        Failure(NumberParseError.Overflow) => { }
         _ => System.Fail("Int16 parse error contract")
     }
     match UInt16.Parse("65536") {
-        Error(NumberParseError.Overflow) => { }
+        Failure(NumberParseError.Overflow) => { }
         _ => System.Fail("UInt16 parse error contract")
     }
     match UInt32.Parse("4294967296") {
-        Error(NumberParseError.Overflow) => { }
+        Failure(NumberParseError.Overflow) => { }
         _ => System.Fail("UInt32 parse error contract")
     }
     match UInt64.Parse("18446744073709551616") {
-        Error(NumberParseError.Overflow) => { }
+        Failure(NumberParseError.Overflow) => { }
         _ => System.Fail("UInt64 parse error contract")
     }
     match Single.Parse("1e39") {
-        Error(NumberParseError.Overflow) => { }
+        Failure(NumberParseError.Overflow) => { }
         _ => System.Fail("Single parse error contract")
     }
     match Double.Parse("1e309") {
-        Error(NumberParseError.Overflow) => { }
+        Failure(NumberParseError.Overflow) => { }
         _ => System.Fail("Double parse error contract")
     }
     match Double.Parse(" 1") {
-        Error(NumberParseError.InvalidFormat) => { }
+        Failure(NumberParseError.InvalidFormat) => { }
         _ => System.Fail("Double parse error contract")
     }
     match UInt64.Parse("999999999999999999999999x") {
-        Error(NumberParseError.InvalidFormat) => { }
+        Failure(NumberParseError.InvalidFormat) => { }
         _ => System.Fail("UInt64 parse error contract")
     }
     match Boolean.Parse("1") {
-        Error(BooleanParseError.InvalidFormat) => { }
+        Failure(BooleanParseError.InvalidFormat) => { }
         _ => System.Fail("Boolean parse error contract")
     }
     match Int32.Parse("2147483648") {
-        Error(NumberParseError.Overflow) => { }
+        Failure(NumberParseError.Overflow) => { }
         _ => System.Fail("Int32 shared parse error")
     }
     match Int64.Parse("9223372036854775808") {
-        Error(NumberParseError.Overflow) => { }
+        Failure(NumberParseError.Overflow) => { }
         _ => System.Fail("Int64 shared parse error")
     }
     match System.Data.Json.JsonNumber.Parse("42") {

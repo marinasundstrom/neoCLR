@@ -69,14 +69,14 @@ ldarg arg0
 call instance System.Result.Ok<String>::get_Value()
 ret
 .end
-.function neoCLR.Library.System.Networking.IPAddress.RuntimeUnion2(System.Networking.IPAddressError arg0) -> System.Result.Error<System.Networking.IPAddressError>
+.function neoCLR.Library.System.Networking.IPAddress.RuntimeUnion2(System.Networking.IPAddressError arg0) -> System.Result.Failure<System.Networking.IPAddressError>
 ldarg arg0
-newobj instance System.Result.Error<System.Networking.IPAddressError>::.ctor(System.Networking.IPAddressError)
+newobj instance System.Result.Failure<System.Networking.IPAddressError>::.ctor(System.Networking.IPAddressError)
 ret
 .end
-.function neoCLR.Library.System.Networking.IPAddress.RuntimeUnion3(System.Result.Error<System.Networking.IPAddressError> arg0) -> System.Result<System.Networking.IPAddress,System.Networking.IPAddressError>
+.function neoCLR.Library.System.Networking.IPAddress.RuntimeUnion3(System.Result.Failure<System.Networking.IPAddressError> arg0) -> System.Result<System.Networking.IPAddress,System.Networking.IPAddressError>
 ldarg arg0
-newobj instance System.Result<System.Networking.IPAddress,System.Networking.IPAddressError>::.ctor(System.Result.Error<System.Networking.IPAddressError>)
+newobj instance System.Result<System.Networking.IPAddress,System.Networking.IPAddressError>::.ctor(System.Result.Failure<System.Networking.IPAddressError>)
 ret
 .end
 .function neoCLR.Library.System.Networking.IPAddress.RuntimeUnion4(System.Networking.IPAddress arg0) -> System.Result.Ok<System.Networking.IPAddress>

@@ -10,7 +10,7 @@ import NeoClr.Testing.*
 func ADateValues() -> Result<unit, TestFailure> {
     for text in ["0001-01-01", "9999-12-31", "2000-02-29", "2024-02-29", "1900-02-28"] {
         let Ok(date) = Date.Parse(text, Culture.Invariant) else {
-            return Error(TestFailure("Expected valid date: " + text, "Ok", "Error"))
+            return Failure(TestFailure("Expected valid date: " + text, "Ok", "Error"))
         }
         _ = Assert.Equal(text, date.ToString(Culture.Invariant))?
     }
@@ -20,10 +20,10 @@ func ADateValues() -> Result<unit, TestFailure> {
 [Test("Date parsing separates malformed text from invalid civil fields")]
 func BDateErrors() -> Result<unit, TestFailure> {
     for text in ["", "2024-2-29", "2024/02/29", " 2024-02-29", "2024-02-29\n", "2024-02-29x", "２０２４-02-29", "2024-0é-29", "2024-02-2x", "2024-02-29T00:00:00"] {
-        _ = Assert.True(Date.Parse(text, Culture.Invariant) is Error(DateTimeParseError.InvalidFormat), "Expected invalid format: " + text)?
+        _ = Assert.True(Date.Parse(text, Culture.Invariant) is Failure(DateTimeParseError.InvalidFormat), "Expected invalid format: " + text)?
     }
     for text in ["0000-01-01", "1900-02-29", "2023-02-29", "2024-04-31", "2024-00-01", "2024-13-01", "2024-01-00", "2024-01-32"] {
-        _ = Assert.True(Date.Parse(text, Culture.Invariant) is Error(DateTimeParseError.OutOfRange), "Expected invalid date: " + text)?
+        _ = Assert.True(Date.Parse(text, Culture.Invariant) is Failure(DateTimeParseError.OutOfRange), "Expected invalid date: " + text)?
     }
     return Assert.True(true, "Invalid date corpus rejected")
 }
@@ -34,11 +34,11 @@ func CTimeFractions() -> Result<unit, TestFailure> {
     let fractions = [0, 1000000, 1200000, 1230000, 1234000, 1234500, 1234560, 1234567, 9999999]
     for index in 0..inputs.Length {
         let Ok(time) = TimeOfDay.Parse(inputs[index], Culture.Invariant) else {
-            return Error(TestFailure("Expected valid time", "Ok", inputs[index]))
+            return Failure(TestFailure("Expected valid time", "Ok", inputs[index]))
         }
         _ = Assert.Equal(fractions[index], time.FractionTicks)?
         let Ok(copy) = TimeOfDay.Parse(time.ToString(Culture.Invariant), Culture.Invariant) else {
-            return Error(TestFailure("Expected time round trip", "Ok", "Error"))
+            return Failure(TestFailure("Expected time round trip", "Ok", "Error"))
         }
         _ = Assert.True(time.Equals(copy), "Time ticks must round trip")?
     }
@@ -48,10 +48,10 @@ func CTimeFractions() -> Result<unit, TestFailure> {
 [Test("Time parsing rejects malformed clocks leap seconds and excess precision")]
 func DTimeErrors() -> Result<unit, TestFailure> {
     for text in ["", "12:34", "1:02:03", "12-34-56", "12:34:56.", "12:34:56.12345678", "12:34:56,1", "12:34:56Z", "12:34:56 ", "12:34:5é", "12:34:56.12x", "12:34:56+01:00"] {
-        _ = Assert.True(TimeOfDay.Parse(text, Culture.Invariant) is Error(DateTimeParseError.InvalidFormat), "Expected malformed time: " + text)?
+        _ = Assert.True(TimeOfDay.Parse(text, Culture.Invariant) is Failure(DateTimeParseError.InvalidFormat), "Expected malformed time: " + text)?
     }
     for text in ["24:00:00", "23:60:00", "23:59:60", "99:00:00"] {
-        _ = Assert.True(TimeOfDay.Parse(text, Culture.Invariant) is Error(DateTimeParseError.OutOfRange), "Expected invalid clock fields: " + text)?
+        _ = Assert.True(TimeOfDay.Parse(text, Culture.Invariant) is Failure(DateTimeParseError.OutOfRange), "Expected invalid clock fields: " + text)?
     }
     return Assert.True(true, "Invalid time corpus rejected")
 }
@@ -59,26 +59,26 @@ func DTimeErrors() -> Result<unit, TestFailure> {
 [Test("Civil parsers round trip all supported numeric culture conventions")]
 func ECultures() -> Result<unit, TestFailure> {
     let Ok(date) = Date.Create(2024, 2, 29) else {
-        return Error(TestFailure("Fixture date", "Ok", "Error"))
+        return Failure(TestFailure("Fixture date", "Ok", "Error"))
     }
     let Ok(time) = TimeOfDay.Create(23, 59, 58, 1234567) else {
-        return Error(TestFailure("Fixture time", "Ok", "Error"))
+        return Failure(TestFailure("Fixture time", "Ok", "Error"))
     }
     let local = LocalDateTime.Create(date, time)
     for culture in [Culture.Invariant, Culture.SwedishSweden, Culture.HebrewIsrael] {
         let Ok(parsedDate) = Date.Parse(date.ToString(culture), culture) else {
-            return Error(TestFailure("Culture date parse", "Ok", culture.Name))
+            return Failure(TestFailure("Culture date parse", "Ok", culture.Name))
         }
         _ = Assert.True(date.Equals(parsedDate), "Culture date round trip")?
         let Ok(parsedTime) = TimeOfDay.Parse(time.ToString(culture), culture) else {
-            return Error(TestFailure("Culture time parse", "Ok", culture.Name))
+            return Failure(TestFailure("Culture time parse", "Ok", culture.Name))
         }
         _ = Assert.True(time.Equals(parsedTime), "Culture time round trip")?
         let Ok(text) = culture.DateTimeFormat.FormatLocalDateTime(local) else {
-            return Error(TestFailure("Culture local formatting", "Ok", culture.Name))
+            return Failure(TestFailure("Culture local formatting", "Ok", culture.Name))
         }
         let Ok(parsedLocal) = LocalDateTime.Parse(text, culture) else {
-            return Error(TestFailure("Culture local parse", "Ok", text))
+            return Failure(TestFailure("Culture local parse", "Ok", text))
         }
         _ = Assert.True(date.Equals(parsedLocal.Date) && time.Equals(parsedLocal.Time), "Culture local round trip")?
     }
@@ -87,51 +87,51 @@ func ECultures() -> Result<unit, TestFailure> {
 
 [Test("Explicit cultures reject mismatched date and fraction separators")]
 func FCultureMismatch() -> Result<unit, TestFailure> {
-    _ = Assert.True(Date.Parse("29.02.2024", Culture.Invariant) is Error(DateTimeParseError.InvalidFormat), "Invariant date order")?
-    _ = Assert.True(Date.Parse("2024-02-29", Culture.HebrewIsrael) is Error(DateTimeParseError.InvalidFormat), "Hebrew Israel numeric date order")?
-    _ = Assert.True(TimeOfDay.Parse("12:34:56.1", Culture.SwedishSweden) is Error(DateTimeParseError.InvalidFormat), "Swedish decimal comma")?
-    _ = Assert.True(LocalDateTime.Parse("2024-02-29 12:34:56", Culture.Invariant) is Error(DateTimeParseError.InvalidFormat), "Invariant T separator")?
-    return Assert.True(LocalDateTime.Parse("2024-02-29T12:34:56", Culture.SwedishSweden) is Error(DateTimeParseError.InvalidFormat), "Named culture space separator")
+    _ = Assert.True(Date.Parse("29.02.2024", Culture.Invariant) is Failure(DateTimeParseError.InvalidFormat), "Invariant date order")?
+    _ = Assert.True(Date.Parse("2024-02-29", Culture.HebrewIsrael) is Failure(DateTimeParseError.InvalidFormat), "Hebrew Israel numeric date order")?
+    _ = Assert.True(TimeOfDay.Parse("12:34:56.1", Culture.SwedishSweden) is Failure(DateTimeParseError.InvalidFormat), "Swedish decimal comma")?
+    _ = Assert.True(LocalDateTime.Parse("2024-02-29 12:34:56", Culture.Invariant) is Failure(DateTimeParseError.InvalidFormat), "Invariant T separator")?
+    return Assert.True(LocalDateTime.Parse("2024-02-29T12:34:56", Culture.SwedishSweden) is Failure(DateTimeParseError.InvalidFormat), "Named culture space separator")
 }
 
 [Test("Local date time parsing preserves boundaries and rejects zone suffixes")]
 func GLocalValues() -> Result<unit, TestFailure> {
     for text in ["0001-01-01T00:00:00.0000000", "9999-12-31T23:59:59.9999999", "2024-02-29T12:34:56.1234567"] {
         let Ok(value) = LocalDateTime.Parse(text, Culture.Invariant) else {
-            return Error(TestFailure("Expected local value", "Ok", text))
+            return Failure(TestFailure("Expected local value", "Ok", text))
         }
         let Ok(formatted) = Culture.Invariant.DateTimeFormat.FormatLocalDateTime(value) else {
-            return Error(TestFailure("Local formatting", "Ok", "Error"))
+            return Failure(TestFailure("Local formatting", "Ok", "Error"))
         }
         _ = Assert.Equal(text, formatted)?
     }
     for text in ["2024-02-29", "2024-02-29T12:34:56Z", "2024-02-29T12:34:56+01:00", "2024-02-29T12:34:56.12345678", "2024-02-29T12:34:56\n"] {
-        _ = Assert.True(LocalDateTime.Parse(text, Culture.Invariant) is Error(DateTimeParseError.InvalidFormat), "Expected invalid local grammar: " + text)?
+        _ = Assert.True(LocalDateTime.Parse(text, Culture.Invariant) is Failure(DateTimeParseError.InvalidFormat), "Expected invalid local grammar: " + text)?
     }
-    _ = Assert.True(LocalDateTime.Parse("2023-02-29T12:34:56", Culture.Invariant) is Error(DateTimeParseError.OutOfRange), "Invalid local date")?
-    return Assert.True(LocalDateTime.Parse("2024-02-29T24:00:00", Culture.Invariant) is Error(DateTimeParseError.OutOfRange), "Invalid local clock")
+    _ = Assert.True(LocalDateTime.Parse("2023-02-29T12:34:56", Culture.Invariant) is Failure(DateTimeParseError.OutOfRange), "Invalid local date")?
+    return Assert.True(LocalDateTime.Parse("2024-02-29T24:00:00", Culture.Invariant) is Failure(DateTimeParseError.OutOfRange), "Invalid local clock")
 }
 
 [Test("Default civil parsers use the current culture formatting convention")]
 func HCurrentCulture() -> Result<unit, TestFailure> {
     let culture = Culture.Current
     let Ok(date) = Date.Create(2024, 10, 9) else {
-        return Error(TestFailure("Fixture date", "Ok", "Error"))
+        return Failure(TestFailure("Fixture date", "Ok", "Error"))
     }
     let Ok(time) = TimeOfDay.Create(12, 34, 56, 7) else {
-        return Error(TestFailure("Fixture time", "Ok", "Error"))
+        return Failure(TestFailure("Fixture time", "Ok", "Error"))
     }
     let Ok(parsedDate) = Date.Parse(date.ToString(culture)) else {
-        return Error(TestFailure("Current date", "Ok", culture.Name))
+        return Failure(TestFailure("Current date", "Ok", culture.Name))
     }
     let Ok(parsedTime) = TimeOfDay.Parse(time.ToString(culture)) else {
-        return Error(TestFailure("Current time", "Ok", culture.Name))
+        return Failure(TestFailure("Current time", "Ok", culture.Name))
     }
     let Ok(text) = culture.DateTimeFormat.FormatLocalDateTime(LocalDateTime.Create(date, time)) else {
-        return Error(TestFailure("Current local formatting", "Ok", "Error"))
+        return Failure(TestFailure("Current local formatting", "Ok", "Error"))
     }
     let Ok(parsedLocal) = LocalDateTime.Parse(text) else {
-        return Error(TestFailure("Current local parse", "Ok", text))
+        return Failure(TestFailure("Current local parse", "Ok", text))
     }
     return Assert.True(date.Equals(parsedDate) && time.Equals(parsedTime) && date.Equals(parsedLocal.Date) && time.Equals(parsedLocal.Time), "Current culture round trip")
 }

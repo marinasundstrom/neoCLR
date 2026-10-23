@@ -43,7 +43,7 @@ class FakeHandler : HttpHandler {
         Check(request.Target == "/greeting")
         let source = Promise<Result<HttpResponse, HttpError>>()
         if fail {
-            _ = source.Complete(Error(HttpError.Handler("Fake failure")))
+            _ = source.Complete(Failure(HttpError.Handler("Fake failure")))
         } else {
             _ = source.Complete(Ok(HttpResponse(200, ArrayList<HttpHeader>(), HttpStringContent("Café 🌍"))))
         }
@@ -65,12 +65,12 @@ func CheckHandlers() {
     Check(events.Count == 4)
     Check(events[0] == "outer before" && events[1] == "inner before")
     Check(events[2] == "inner after" && events[3] == "outer after")
-    if let Error(HttpError.InvalidUri(UriError.InvalidFormat)) = client.Get("http://example.test/unsafe\r\nHeader: injected").GetResult() {
+    if let Failure(HttpError.InvalidUri(UriError.InvalidFormat)) = client.Get("http://example.test/unsafe\r\nHeader: injected").GetResult() {
         Check(fake.Calls == 1)
     } else {
         System.Fail("Unsafe target admitted")
     }
-    if let Error(HttpError.Unsupported(message)) = client.Get("https://example.test/greeting").GetResult() {
+    if let Failure(HttpError.Unsupported(message)) = client.Get("https://example.test/greeting").GetResult() {
         Check(message == "Only plain http:// URLs are supported")
     } else {
         System.Fail("Unsupported scheme admitted")
@@ -79,7 +79,7 @@ func CheckHandlers() {
     Check(events.Count == 4)
     let failureEvents = ArrayList<string>()
     let failed = HttpClient(RecordingHandler("failure", FakeHandler(true), failureEvents))
-    if let Error(HttpError.Handler(message)) = failed.Get("http://example.test/greeting").GetResult() {
+    if let Failure(HttpError.Handler(message)) = failed.Get("http://example.test/greeting").GetResult() {
         Check(message == "Fake failure")
     } else {
         System.Fail("Handler failure lost")

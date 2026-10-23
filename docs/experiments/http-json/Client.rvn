@@ -24,7 +24,7 @@ async func Main(arguments: string[]) -> Task<()> {
     let result = await ReportClient().SubmitReport(client)
     if let Ok(reply) = result {
         Console.WriteLine(reply)
-    } else if let Error(error) = result {
+    } else if let Failure(error) = result {
         System.Fail(error.ToString())
     }
 }

@@ -36,7 +36,7 @@ class Application {
     func Respond(context: HttpContext) -> Task<Result<System.Void, HttpError>> {
         let request = context.Request
         if request.Target == "/error" {
-            return Task.FromResult<Result<System.Void, HttpError>>(Result<System.Void, HttpError>.Error(HttpError.Handler("expected")))
+            return Task.FromResult<Result<System.Void, HttpError>>(Result<System.Void, HttpError>.Failure(HttpError.Handler("expected")))
         }
         if request.Target == "/cancel" {
             let cancelled = Promise<Result<System.Void, HttpError>>()
@@ -90,8 +90,8 @@ async func Main() -> Task<()> {
     preCancelled.Dispose()
     Check(server.LastRequestError is None)
     let lifetime: Task<Result<System.Void, HttpError>> = server.Serve(application.Respond, cancellation.Token)
-    Check((await server.Serve(application.Respond)) is Result<System.Void, HttpError>.Error(HttpError.InvalidRequest(_)))
-    Check((await server.Accept()) is Error(HttpError.InvalidRequest(_)))
+    Check((await server.Serve(application.Respond)) is Result<System.Void, HttpError>.Failure(HttpError.InvalidRequest(_)))
+    Check((await server.Accept()) is Failure(HttpError.InvalidRequest(_)))
     Console.WriteLine(port)
     Console.WriteLine(controlPort)
     let Ok(signal) = await control.Accept() else { System.Fail("Control failed") }
@@ -119,7 +119,7 @@ async func Main() -> Task<()> {
             Console.WriteLine(server.CompletedRequests)
             Console.WriteLine(server.FailedRequests)
             Console.WriteLine(application.Disposed)
-            Check((await server.Serve(application.Respond)) is Result<System.Void, HttpError>.Error(HttpError.InvalidRequest(_)))
+            Check((await server.Serve(application.Respond)) is Result<System.Void, HttpError>.Failure(HttpError.InvalidRequest(_)))
             signal.Close()
             control.Close()
             cancellation.Dispose()

@@ -35,7 +35,7 @@ async func Main() -> Task<()> {
             System.Fail("Client continuation fault")
         }
         Console.WriteLine(text)
-    } else if let Error(error) = result {
+    } else if let Failure(error) = result {
         Console.WriteLine(String.Concat("Error: ", error.ToString()))
     }
 }

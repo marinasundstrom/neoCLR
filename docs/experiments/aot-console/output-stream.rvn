@@ -12,7 +12,7 @@ func Main() -> int {
     if empty != 0 {
         return 2
     }
-    let Error(_) = output.Write(bytes, -1, 1) else {
+    let Failure(_) = output.Write(bytes, -1, 1) else {
         return 3
     }
     let Ok(written) = output.Write(bytes, 0, 3) else {
@@ -31,10 +31,10 @@ func Main() -> int {
         return 8
     }
     output.Close()
-    let Error(_) = output.Write(bytes, 0, 1) else {
+    let Failure(_) = output.Write(bytes, 0, 1) else {
         return 9
     }
-    let Error(_) = output.Flush() else {
+    let Failure(_) = output.Flush() else {
         return 10
     }
     Console.WriteLine("Closed output")

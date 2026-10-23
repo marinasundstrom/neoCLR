@@ -42,14 +42,14 @@ ldarg arg0
 call instance System.Result.Ok<System.Time.LocalDateTime>::get_Value()
 ret
 .end
-.function neoCLR.Library.System.Time.ZonedDateTime.RuntimeUnion5(System.Time.TimeZoneError arg0) -> System.Result.Error<System.Time.TimeZoneError>
+.function neoCLR.Library.System.Time.ZonedDateTime.RuntimeUnion5(System.Time.TimeZoneError arg0) -> System.Result.Failure<System.Time.TimeZoneError>
 ldarg arg0
-newobj instance System.Result.Error<System.Time.TimeZoneError>::.ctor(System.Time.TimeZoneError)
+newobj instance System.Result.Failure<System.Time.TimeZoneError>::.ctor(System.Time.TimeZoneError)
 ret
 .end
-.function neoCLR.Library.System.Time.ZonedDateTime.RuntimeUnion6(System.Result.Error<System.Time.TimeZoneError> arg0) -> System.Result<System.Time.ZonedDateTime,System.Time.TimeZoneError>
+.function neoCLR.Library.System.Time.ZonedDateTime.RuntimeUnion6(System.Result.Failure<System.Time.TimeZoneError> arg0) -> System.Result<System.Time.ZonedDateTime,System.Time.TimeZoneError>
 ldarg arg0
-newobj instance System.Result<System.Time.ZonedDateTime,System.Time.TimeZoneError>::.ctor(System.Result.Error<System.Time.TimeZoneError>)
+newobj instance System.Result<System.Time.ZonedDateTime,System.Time.TimeZoneError>::.ctor(System.Result.Failure<System.Time.TimeZoneError>)
 ret
 .end
 .function neoCLR.Library.System.Time.ZonedDateTime.RuntimeUnion7(System.Time.ZonedDateTime arg0) -> System.Result.Ok<System.Time.ZonedDateTime>

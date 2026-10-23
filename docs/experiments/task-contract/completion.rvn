@@ -128,7 +128,7 @@ public func Check(condition: bool) {
 public func Read(task: Awaitable, expected: int) {
     match task.GetResult() {
         Ok(let value) => Check(value == expected)
-        Error(_) => System.Fail("Expected successful completion")
+        Failure(_) => System.Fail("Expected successful completion")
     }
 }
 

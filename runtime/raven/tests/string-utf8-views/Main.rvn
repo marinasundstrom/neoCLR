@@ -32,7 +32,7 @@ func Main() -> int {
     if !bytes[bytes.Length..].IsEmpty || !"".Utf8Bytes.IsEmpty {
         System.Fail("Empty string window")
     }
-    if !(Encodings.Utf8.Decode(nested[1..]) is Error(EncodingError.InvalidUtf8)) {
+    if !(Encodings.Utf8.Decode(nested[1..]) is Failure(EncodingError.InvalidUtf8)) {
         System.Fail("Byte slicing must preserve invalid UTF-8 boundaries")
     }
     GC.Collect()

@@ -10,8 +10,8 @@
 .end
 .function Reject() -> System.Result<Void,String>
     ldstr "Not saved"
-    newobj instance System.Result.Error<String>::.ctor(String)
-    newobj instance System.Result<Void,String>::.ctor(System.Result.Error<String>)
+    newobj instance System.Result.Failure<String>::.ctor(String)
+    newobj instance System.Result<Void,String>::.ctor(System.Result.Failure<String>)
     ret
 .end
 .function Main() -> void

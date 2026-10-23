@@ -11,14 +11,14 @@ func Check(condition: bool) {
 func ExpectCount(result: Result<int, string>, expected: int) {
     match result {
         Ok(let count) => Check(count == expected)
-        Error(_) => System.Fail("Unexpected Byte Copy error")
+        Failure(_) => System.Fail("Unexpected Byte Copy error")
     }
 }
 
 func ExpectError(result: Result<int, string>) {
     match result {
         Ok(_) => System.Fail("Expected Byte Copy error")
-        Error(_) => { }
+        Failure(_) => { }
     }
 }
 
@@ -127,10 +127,10 @@ func Main() {
             Ok(let mode) => {
                 match Int32.Parse(arguments[2]) {
                     Ok(let offset) => CheckRanges(mode, offset)
-                    Error(_) => System.Fail("Invalid test offset")
+                    Failure(_) => System.Fail("Invalid test offset")
                 }
             }
-            Error(_) => System.Fail("Invalid test mode")
+            Failure(_) => System.Fail("Invalid test mode")
         }
         return
     }

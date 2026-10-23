@@ -98,7 +98,7 @@ call neoCLR.Library.System.Int64.RuntimeErrorSystemNumberParseErrorNewSystemNumb
 M00000003_IL_004f:
 call neoCLR.Library.System.Int64.RuntimeUnion2(System.NumberParseError)
 M00000003_IL_0054:
-call neoCLR.Library.System.Int64.RuntimeUnion3(System.Result.Error<System.NumberParseError>)
+call neoCLR.Library.System.Int64.RuntimeUnion3(System.Result.Failure<System.NumberParseError>)
 M00000003_IL_0059:
 ret
 M00000003_IL_005a:
@@ -123,7 +123,7 @@ call neoCLR.Library.System.Int64.RuntimeErrorSystemNumberParseErrorNewSystemNumb
 M00000003_IL_0075:
 call neoCLR.Library.System.Int64.RuntimeUnion2(System.NumberParseError)
 M00000003_IL_007a:
-call neoCLR.Library.System.Int64.RuntimeUnion3(System.Result.Error<System.NumberParseError>)
+call neoCLR.Library.System.Int64.RuntimeUnion3(System.Result.Failure<System.NumberParseError>)
 M00000003_IL_007f:
 ret
 M00000003_IL_0080:

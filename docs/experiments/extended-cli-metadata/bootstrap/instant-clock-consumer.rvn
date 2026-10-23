@@ -25,11 +25,11 @@ func Main() -> int {
     let minimum = Instant.FromUnixTimeTicks(-9223372036854775808L)
     match maximum.Add(Duration.FromTicks(1L)) {
         .Ok(_) => { return 4 }
-        .Error(_) => {}
+        .Failure(_) => {}
     }
     match minimum.Add(Duration.FromTicks(-1L)) {
         .Ok(_) => { return 5 }
-        .Error(_) => {}
+        .Failure(_) => {}
     }
     if minimum.CompareTo(maximum) != -1 || maximum.CompareTo(minimum) != 1 {
         return 6

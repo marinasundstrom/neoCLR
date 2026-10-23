@@ -101,7 +101,7 @@ call neoCLR.Library.System.Time.Instant.RuntimeErrorSystemOverflowErrorNew()
 M00000004_IL_0044:
 call neoCLR.Library.System.Time.Instant.RuntimeUnion0(System.OverflowError)
 M00000004_IL_0049:
-call neoCLR.Library.System.Time.Instant.RuntimeUnion1(System.Result.Error<System.OverflowError>)
+call neoCLR.Library.System.Time.Instant.RuntimeUnion1(System.Result.Failure<System.OverflowError>)
 M00000004_IL_004e:
 ret
 M00000004_IL_004f:
@@ -141,7 +141,7 @@ call neoCLR.Library.System.Time.Instant.RuntimeErrorSystemOverflowErrorNew()
 M00000004_IL_008b:
 call neoCLR.Library.System.Time.Instant.RuntimeUnion0(System.OverflowError)
 M00000004_IL_0090:
-call neoCLR.Library.System.Time.Instant.RuntimeUnion1(System.Result.Error<System.OverflowError>)
+call neoCLR.Library.System.Time.Instant.RuntimeUnion1(System.Result.Failure<System.OverflowError>)
 M00000004_IL_0095:
 ret
 M00000004_IL_0096:

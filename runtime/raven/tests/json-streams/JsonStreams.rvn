@@ -63,7 +63,7 @@ func StreamReadFailure() -> Result<unit, TestFailure> {
     let result = CompletedValue(JsonSerializer.DeserializeNode(input))
     _ = Assert.True(!input.Closed, "Failure must not close borrowed input")?
     input.Close()
-    return Assert.True(result is Error(JsonError.Read(TextReadError.IoFailure)), "JSON stream reads preserve the underlying I/O failure")
+    return Assert.True(result is Failure(JsonError.Read(TextReadError.IoFailure)), "JSON stream reads preserve the underlying I/O failure")
 }
 
 [Test("JSON stream reads reject split invalid UTF-8")]
@@ -73,7 +73,7 @@ func StreamInvalidUtf8() -> Result<unit, TestFailure> {
     let result = CompletedValue(JsonSerializer.DeserializeNode(input))
     _ = Assert.True(!input.Closed, "Failure must not close borrowed input")?
     input.Close()
-    return Assert.True(result is Error(JsonError.Read(TextReadError.InvalidUtf8)), "JSON stream reads reject split invalid UTF-8")
+    return Assert.True(result is Failure(JsonError.Read(TextReadError.InvalidUtf8)), "JSON stream reads reject split invalid UTF-8")
 }
 
 [Test("JSON stream reads reject a truncated document")]
@@ -82,7 +82,7 @@ func StreamTruncated() -> Result<unit, TestFailure> {
     let result = CompletedValue(JsonSerializer.DeserializeNode(input))
     _ = Assert.True(!input.Closed, "Failure must not close borrowed input")?
     input.Close()
-    return Assert.True(result is Error(JsonError.Syntax(_)), "JSON stream reads reject a truncated document")
+    return Assert.True(result is Failure(JsonError.Syntax(_)), "JSON stream reads reject a truncated document")
 }
 
 [Test("JSON stream input quota counts bytes and preserves ownership")]
@@ -98,7 +98,7 @@ func StreamReadQuota() -> Result<unit, TestFailure> {
     _ = Assert.Equal(1025, input.Position)?
     _ = Assert.True(!input.Closed, "Quota failure must not close input")?
     input.Close()
-    return Assert.True(result is Error(JsonError.Read(TextReadError.LimitExceeded)), "Oversized stream must return read quota failure")
+    return Assert.True(result is Failure(JsonError.Read(TextReadError.LimitExceeded)), "Oversized stream must return read quota failure")
 }
 
 [Test("JSON stream writes preserve partial output and failure cause")]
@@ -112,7 +112,7 @@ func StreamWriteFailure() -> Result<unit, TestFailure> {
     _ = Assert.Equal(0, output.Flushes)?
     _ = Assert.True(!output.Closed, "Write failure must not close output")?
     output.Close()
-    return Assert.True(result is Error(JsonError.Write(StreamError.AccessDenied)), "Underlying write error must survive")
+    return Assert.True(result is Failure(JsonError.Write(StreamError.AccessDenied)), "Underlying write error must survive")
 }
 
 [Test("JSON stream writes reject zero progress without looping")]
@@ -123,7 +123,7 @@ func StreamZeroProgress() -> Result<unit, TestFailure> {
     _ = Assert.Equal(0, output.Flushes)?
     _ = Assert.True(!output.Closed, "Zero-progress failure must not close output")?
     output.Close()
-    return Assert.True(result is Error(JsonError.Write(StreamError.IoFailure)), "Zero progress must return I/O failure")
+    return Assert.True(result is Failure(JsonError.Write(StreamError.IoFailure)), "Zero progress must return I/O failure")
 }
 
 [Test("JSON stream serialization detects cycles before writing")]
@@ -136,7 +136,7 @@ func StreamCyclePreflight() -> Result<unit, TestFailure> {
     _ = Assert.Equal(0, output.Flushes)?
     _ = Assert.True(!output.Closed, "Validation failure must not close output")?
     output.Close()
-    return Assert.True(result is Error(JsonError.LimitExceeded(_)), "Cycle must fail before output begins")
+    return Assert.True(result is Failure(JsonError.LimitExceeded(_)), "Cycle must fail before output begins")
 }
 
 [Test("JSON stream boundary counts UTF-8 bytes rather than characters")]
@@ -157,7 +157,7 @@ func StreamUnicodeBoundary() -> Result<unit, TestFailure> {
     } else {
         return Assert.True(false, "Exact UTF-8 quota must parse")
     }
-    return Assert.True(JsonSerializer.DeserializeNode(text + " ") is Error(JsonError.LimitExceeded(_)), "One extra byte must exceed document quota")
+    return Assert.True(JsonSerializer.DeserializeNode(text + " ") is Failure(JsonError.LimitExceeded(_)), "One extra byte must exceed document quota")
 }
 
 [Test("JSON stream output quota includes escaping and validates before writes")]
@@ -179,7 +179,7 @@ func StreamEscapedOutputQuota() -> Result<unit, TestFailure> {
     _ = Assert.Equal(0, untouched.Flushes)?
     _ = Assert.True(!untouched.Closed, "Quota rejection borrows output")?
     untouched.Close()
-    return Assert.True(rejected is Error(JsonError.LimitExceeded(_)), "Escaped output exceeding quota must fail before writing")
+    return Assert.True(rejected is Failure(JsonError.LimitExceeded(_)), "Escaped output exceeding quota must fail before writing")
 }
 
 [Test("JSON number document quota preserves long number spelling")]
@@ -202,7 +202,7 @@ func StreamNumberBoundary() -> Result<unit, TestFailure> {
     } else {
         return Assert.True(false, "Exact number quota must parse")
     }
-    return Assert.True(JsonNumber.Parse(digits + "0") is Error(JsonError.InvalidNumber), "Oversized number token must fail")
+    return Assert.True(JsonNumber.Parse(digits + "0") is Failure(JsonError.InvalidNumber), "Oversized number token must fail")
 }
 
 // Produce 511 copies in nine steps without making boundary tests depend on a
@@ -221,7 +221,7 @@ func Repeat511(value: string) -> string {
 
 func EncodedBytes(text: string) -> Result<Sequence<byte>, TestFailure> {
     let Ok(bytes) = Encodings.Utf8.Encode(text) else {
-        return Error(TestFailure("UTF-8 encode", "Ok", "Error"))
+        return Failure(TestFailure("UTF-8 encode", "Ok", "Error"))
     }
     return Ok(bytes)
 }
@@ -260,7 +260,7 @@ func StreamIndented() -> Result<unit, TestFailure> {
     }
     _ = large.Add(JsonString(text))
     let rejected = ShortOutput(-1, false)
-    _ = Assert.True(CompletedValue(JsonSerializer.SerializeNode(rejected, large, options)) is Error(JsonError.LimitExceeded(_)), "Reject formatted output quota")?
+    _ = Assert.True(CompletedValue(JsonSerializer.SerializeNode(rejected, large, options)) is Failure(JsonError.LimitExceeded(_)), "Reject formatted output quota")?
     _ = Assert.Equal(0, rejected.Count)?
     return Assert.True(!rejected.Closed, "Rejected output remains open")
 }
@@ -319,9 +319,9 @@ func ParserBorrowedValues() -> Result<unit, TestFailure> {
 func ParserInvalidTokens() -> Result<unit, TestFailure> {
     let sources = ["\"\\uD800\"", "\"\\uDC00\"", "\"\\uD800\\u0061\"", "\"\\u12\"", "\"\\x\"", "\"line\nfeed\"", "01", "-", "1.", "1e", "truex", "\"ok\" false"]
     for source in sources {
-        _ = Assert.True(JsonSerializer.DeserializeNode(source) is Error(_), "Reject malformed token")?
+        _ = Assert.True(JsonSerializer.DeserializeNode(source) is Failure(_), "Reject malformed token")?
     }
-    return Assert.True(JsonSerializer.DeserializeNode("{\"a\":1,\"\\u0061\":2}") is Error(JsonError.DuplicateField("a")), "Compare decoded names")
+    return Assert.True(JsonSerializer.DeserializeNode("{\"a\":1,\"\\u0061\":2}") is Failure(JsonError.DuplicateField("a")), "Compare decoded names")
 }
 
 [Test("JSON byte input borrows selected windows and returns owned mapped values")]
@@ -369,16 +369,16 @@ func ByteInputValidation() -> Result<unit, TestFailure> {
     _ = ExpectInvalidJsonUtf8([(byte)194, (byte)32])?
     _ = ExpectInvalidJsonUtf8([(byte)226, (byte)130, (byte)32])?
     let syntaxThenUtf8 = [(byte)63, (byte)255]
-    _ = Assert.True(JsonSerializer.DeserializeNode(syntaxThenUtf8) is Error(JsonError.Read(TextReadError.InvalidUtf8)), "Validate the entire input first")?
+    _ = Assert.True(JsonSerializer.DeserializeNode(syntaxThenUtf8) is Failure(JsonError.Read(TextReadError.InvalidUtf8)), "Validate the entire input first")?
     let empty: byte[] = []
-    _ = Assert.True(JsonSerializer.DeserializeNode(empty) is Error(JsonError.Syntax("Missing value")), "Empty window is valid UTF-8 but not JSON")?
+    _ = Assert.True(JsonSerializer.DeserializeNode(empty) is Failure(JsonError.Syntax("Missing value")), "Empty window is valid UTF-8 but not JSON")?
     let oversized = System.Runtime.CompilerServices.CheckedStorage.Reserve<byte>(1025)
     var index = 0
     while index < oversized.Length {
         oversized[index] = (byte)255
         index += 1
     }
-    return Assert.True(JsonSerializer.DeserializeNode(oversized) is Error(JsonError.LimitExceeded("Document exceeds 1024 UTF-8 bytes")), "Quota precedes UTF-8 validation")
+    return Assert.True(JsonSerializer.DeserializeNode(oversized) is Failure(JsonError.LimitExceeded("Document exceeds 1024 UTF-8 bytes")), "Quota precedes UTF-8 validation")
 }
 
 [Test("JSON byte input accepts UTF-8 scalar boundaries and rejects BOM and raw controls")]
@@ -392,9 +392,9 @@ func ByteInputUnicodeBoundaries() -> Result<unit, TestFailure> {
     _ = ExpectValidJsonUtf8([(byte)34, (byte)240, (byte)144, (byte)128, (byte)128, (byte)34])?
     _ = ExpectValidJsonUtf8([(byte)34, (byte)244, (byte)143, (byte)191, (byte)191, (byte)34])?
     let bom = [(byte)239, (byte)187, (byte)191, (byte)49]
-    _ = Assert.True(JsonSerializer.DeserializeNode(bom) is Error(JsonError.InvalidNumber), "Keep existing BOM rejection")?
+    _ = Assert.True(JsonSerializer.DeserializeNode(bom) is Failure(JsonError.InvalidNumber), "Keep existing BOM rejection")?
     let control = [(byte)34, (byte)0, (byte)34]
-    return Assert.True(JsonSerializer.DeserializeNode(control) is Error(JsonError.Syntax("Unescaped control byte")), "UTF-8 NUL is not a raw JSON string character")
+    return Assert.True(JsonSerializer.DeserializeNode(control) is Failure(JsonError.Syntax("Unescaped control byte")), "UTF-8 NUL is not a raw JSON string character")
 }
 
 [Test("JSON HTTP byte input preserves memory windows and aliases and rejects unbuffered content")]
@@ -411,14 +411,14 @@ func ByteInputHttp() -> Result<unit, TestFailure> {
     let Ok(streamed) = System.Web.Http.HttpStreamContent.Create(input, 1, true) else {
         return Assert.True(false, "Create stream content")
     }
-    _ = Assert.True(System.Web.Http.Json.JsonContent.ReadNode(streamed) is Error(JsonError.Read(TextReadError.IoFailure)), "Reject unbuffered content")?
+    _ = Assert.True(System.Web.Http.Json.JsonContent.ReadNode(streamed) is Failure(JsonError.Read(TextReadError.IoFailure)), "Reject unbuffered content")?
     _ = Assert.Equal(0, input.Position)?
     return Assert.True(!input.Closed, "Do not consume or close stream content")
 }
 
 
 func ExpectInvalidJsonUtf8(bytes: byte[]) -> Result<unit, TestFailure> {
-    return Assert.True(JsonSerializer.DeserializeNode(bytes) is Error(JsonError.Read(TextReadError.InvalidUtf8)), "Reject malformed UTF-8")
+    return Assert.True(JsonSerializer.DeserializeNode(bytes) is Failure(JsonError.Read(TextReadError.InvalidUtf8)), "Reject malformed UTF-8")
 }
 
 func ExpectValidJsonUtf8(bytes: byte[]) -> Result<unit, TestFailure> {
@@ -434,7 +434,7 @@ func ByteInputHttpAsync() -> Result<unit, TestFailure> {
     _ = Assert.True(CompletedValue(content.ReadFromJson<int>()) is Ok(1), "Read streamed integer")?
     _ = Assert.Equal(1, input.Position)?
     _ = Assert.True(!input.Closed, "Borrow stream ownership")?
-    _ = Assert.True(CompletedValue(content.ReadJsonNode()) is Error(JsonError.Read(TextReadError.IoFailure)), "Reject second consumption")?
+    _ = Assert.True(CompletedValue(content.ReadJsonNode()) is Failure(JsonError.Read(TextReadError.IoFailure)), "Reject second consumption")?
     let secondInput = ShortInput([(byte)50], -1)
     let Ok(second) = HttpStreamContent.Create(secondInput, 1, true) else {
         return Assert.True(false, "Create second content")
@@ -450,6 +450,6 @@ func ByteInputHttpAsync() -> Result<unit, TestFailure> {
     let Ok(bad) = HttpStreamContent.Create(badInput, 1, true) else {
         return Assert.True(false, "Create invalid content")
     }
-    _ = Assert.True(CompletedValue(bad.ReadJsonNode()) is Error(JsonError.Read(TextReadError.InvalidUtf8)), "Reject invalid streamed UTF-8")?
+    _ = Assert.True(CompletedValue(bad.ReadJsonNode()) is Failure(JsonError.Read(TextReadError.InvalidUtf8)), "Reject invalid streamed UTF-8")?
     return Assert.True(!badInput.Closed, "Failed JSON read preserves ownership")
 }

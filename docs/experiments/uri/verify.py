@@ -60,7 +60,7 @@ func Resolved(baseUri: Uri, reference: string, expected: string) {
 }
 
 func Invalid(text: string) {
-    if let Error(error) = Uri.Parse(text) {
+    if let Failure(error) = Uri.Parse(text) {
         Check(error is UriError.InvalidFormat)
     } else {
         Check(false)
@@ -83,12 +83,12 @@ source += '''    Resolved(Parsed("http://a"), "child", "http://a/child")
     Check(!Parsed("http://A/").Equals(Parsed("http://a/")))
     let value: Object = Parsed("a")
     Check(!value.Equals("a"))
-    if let Error(error) = Parsed("relative").Resolve("http://a/") {
+    if let Failure(error) = Parsed("relative").Resolve("http://a/") {
         Check(error is UriError.BaseNotAbsolute)
     } else {
         Check(false)
     }
-    if let Error(error) = Uri.Parse("http://[::1]/") {
+    if let Failure(error) = Uri.Parse("http://[::1]/") {
         Check(error is UriError.UnsupportedAuthority)
     } else {
         Check(false)
@@ -102,12 +102,12 @@ source += '''    Resolved(Parsed("http://a"), "child", "http://a/child")
     }
     let maximum = Parsed(longText)
     Check(maximum.Text == longText)
-    if let Error(error) = Uri.Parse(String.Concat(longText, "x")) {
+    if let Failure(error) = Uri.Parse(String.Concat(longText, "x")) {
         Check(error is UriError.TooLong)
     } else {
         Check(false)
     }
-    if let Error(error) = baseUri.Resolve(maximum) {
+    if let Failure(error) = baseUri.Resolve(maximum) {
         Check(error is UriError.TooLong)
     } else {
         Check(false)

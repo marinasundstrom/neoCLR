@@ -70,13 +70,13 @@ func Rejected(baseText: string, reference: string) {
     let capture = CaptureHandler()
     let client = HttpClient(capture)
     client.BaseUri = Some(baseText)
-    if let Error(_) = client.Get(reference).GetResult() {
+    if let Failure(_) = client.Get(reference).GetResult() {
         Check(capture.Calls == 0)
     } else {
         System.Fail("Invalid base/reference pair was dispatched")
     }
     if let Ok(uri) = Uri.Parse(reference) {
-        if let Error(_) = client.Get(uri).GetResult() {
+        if let Failure(_) = client.Get(uri).GetResult() {
             Check(capture.Calls == 0)
         } else {
             System.Fail("Invalid Uri pair was dispatched")
@@ -89,12 +89,12 @@ func Main() {
     // REJECTED_CASES
     let capture = CaptureHandler()
     let client = HttpClient(capture)
-    if let Error(HttpError.InvalidRequest(_)) = client.Get("relative").GetResult() {
+    if let Failure(HttpError.InvalidRequest(_)) = client.Get("relative").GetResult() {
         Check(capture.Calls == 0)
     } else {
         System.Fail("Relative URL without base was admitted")
     }
-    if let Error(HttpError.InvalidUri(UriError.InvalidFormat)) = client.Get("http://example.test/%broken").GetResult() {
+    if let Failure(HttpError.InvalidUri(UriError.InvalidFormat)) = client.Get("http://example.test/%broken").GetResult() {
         Check(capture.Calls == 0)
     } else {
         System.Fail("Malformed percent escape was admitted")

@@ -75,7 +75,7 @@ fn err(text: &str) -> Value {
     );
     carrier(
         "System.Result<String,System.Storage.FileReadError>",
-        "System.Result.Error<System.Storage.FileReadError>",
+        "System.Result.Failure<System.Storage.FileReadError>",
         vec![error],
     )
 }

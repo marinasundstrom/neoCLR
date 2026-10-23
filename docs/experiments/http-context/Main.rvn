@@ -12,7 +12,7 @@ func Check(value: bool) {
 }
 
 func CheckCompleted(result: Result<unit, HttpError>) {
-    if let Error(reason) = result {
+    if let Failure(reason) = result {
         System.Fail(reason.ToString())
     }
 }
@@ -35,7 +35,7 @@ func ObserveAcceptCancellation(pending: Task<Result<HttpContext, HttpError>>) ->
 
 func FailedHandler(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
     let source = Promise<Result<HttpResponse, HttpError>>()
-    _ = source.Complete(Error(HttpError.Handler("application rejected request")))
+    _ = source.Complete(Failure(HttpError.Handler("application rejected request")))
     return source.Task
 }
 
@@ -73,7 +73,7 @@ class CapacityProbe {
             Observe(server.Accept())
             index += 1
         }
-        if let Error(HttpError.LimitExceeded(_)) = server.Accept().GetResult() {
+        if let Failure(HttpError.LimitExceeded(_)) = server.Accept().GetResult() {
             Check(true)
         } else {
             System.Fail("Server exchange limit not enforced")
@@ -102,7 +102,7 @@ async func Exercise(server: HttpServer) -> Task<Result<unit, HttpError>> {
     first.Close()
     let disposable: Disposable = second
     disposable.Dispose()
-    if let Error(HttpError.InvalidRequest(_)) = await first.Complete() {
+    if let Failure(HttpError.InvalidRequest(_)) = await first.Complete() {
         Check(true)
     } else {
         System.Fail("Duplicate response accepted")
@@ -121,7 +121,7 @@ async func Exercise(server: HttpServer) -> Task<Result<unit, HttpError>> {
     abandoned.Dispose()
     abandoned.Close()
     Check(abandoned.Request.Target == "/abandon")
-    if let Error(HttpError.InvalidRequest(_)) = await abandoned.Complete() {
+    if let Failure(HttpError.InvalidRequest(_)) = await abandoned.Complete() {
         Check(true)
     } else {
         System.Fail("Disposed context accepted response")
@@ -129,18 +129,18 @@ async func Exercise(server: HttpServer) -> Task<Result<unit, HttpError>> {
 
     let invalid = await server.Accept()?
     invalid.Respond(HttpStatusCode.NoContent, HttpStringContent("Illegal content"))
-    if let Error(HttpError.InvalidRequest(_)) = await invalid.Complete() {
+    if let Failure(HttpError.InvalidRequest(_)) = await invalid.Complete() {
         Check(true)
     } else {
         System.Fail("Invalid framing response accepted")
     }
-    if let Error(HttpError.InvalidRequest(_)) = await invalid.Complete() {
+    if let Failure(HttpError.InvalidRequest(_)) = await invalid.Complete() {
         Check(true)
     } else {
         System.Fail("Failed response did not end context")
     }
 
-    if let Error(HttpError.Handler(_)) = await server.ServeOne(FailedHandler) {
+    if let Failure(HttpError.Handler(_)) = await server.ServeOne(FailedHandler) {
         Check(true)
     } else {
         System.Fail("Handler error lost")
@@ -180,12 +180,12 @@ async func Exercise(server: HttpServer) -> Task<Result<unit, HttpError>> {
     server.Close()
     server.Close()
     Check(await ObserveAcceptCancellation(pendingAccept))
-    if let Error(HttpError.InvalidRequest(_)) = await survivor.Complete() {
+    if let Failure(HttpError.InvalidRequest(_)) = await survivor.Complete() {
         Check(true)
     } else {
         System.Fail("Shutdown left context open")
     }
-    if let Error(HttpError.InvalidRequest(_)) = await server.Accept() {
+    if let Failure(HttpError.InvalidRequest(_)) = await server.Accept() {
         Check(true)
     } else {
         System.Fail("Closed server accepted request")
@@ -206,7 +206,7 @@ func Main() {
     let running = Exercise(server)
     running.OnCompleted(() => {
         server.Close()
-        if let Error(reason) = running.GetResult() {
+        if let Failure(reason) = running.GetResult() {
             System.Fail(reason.ToString())
         }
         Console.WriteLine("Context lifecycle checks passed")

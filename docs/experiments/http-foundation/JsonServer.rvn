@@ -34,7 +34,7 @@ func ConfigureJson(context: HttpContext) {
     while oversized.Length < 1024 {
         oversized = oversized + oversized
     }
-    if !(context.RespondJson(HttpStatusCode.BadRequest, JsonString(oversized)) is Error(JsonError.LimitExceeded(_))) {
+    if !(context.RespondJson(HttpStatusCode.BadRequest, JsonString(oversized)) is Failure(JsonError.LimitExceeded(_))) {
         System.Fail("Oversized JSON accepted")
     }
     if context.Response.Content.Length != before.Length || context.Response.StatusCode != HttpStatusCode.OK {

@@ -78,7 +78,7 @@ func Contracts() -> Result<unit, HttpError> {
     Check(handler.HeadCalls == 4)
     Check(handler.Calls == 16 && handler.CancellableCalls == 8)
     Check(handler.PutCalls == 4 && handler.PatchCalls == 4 && handler.DeleteCalls == 4)
-    if let Error(HttpError.InvalidRequest(_)) = client.Put("http://other.test/item", content).GetResult() {
+    if let Failure(HttpError.InvalidRequest(_)) = client.Put("http://other.test/item", content).GetResult() {
         Check(true)
     } else {
         System.Fail("Absolute URL accepted with BaseUri")

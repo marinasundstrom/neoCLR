@@ -27,7 +27,7 @@ public class ReportTextBuilder {
     func Append(text: string) -> Result<unit, BuildError> {
         let count = text.GetUtf8ByteCount()
         if count > limit - size {
-            return Error(BuildError.LimitExceeded)
+            return Failure(BuildError.LimitExceeded)
         }
         if count != 0 {
             pieces.Add(text)
@@ -40,7 +40,7 @@ public class ReportTextBuilder {
     func AppendLine(text: string) -> Result<unit, BuildError> {
         // Preflight the complete operation: failure must not leave half a line.
         if text.GetUtf8ByteCount() >= limit - size {
-            return Error(BuildError.LimitExceeded)
+            return Failure(BuildError.LimitExceeded)
         }
         return Append(String.Concat(text, "\n"))
     }

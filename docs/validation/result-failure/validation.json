@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-23",
+  "raven_main": "8a264cf8a",
+  "raven_neoclr": "a6f650b5e",
+  "compiler_tests": {
+    "main_net11": 188,
+    "neoclr_net11": 184,
+    "core_main_net10": 84
+  },
+  "runtime_tests": {
+    "suite": "error-context",
+    "tests_per_mode": 12,
+    "modes": [
+      "interpreter",
+      "jit",
+      "native"
+    ],
+    "platform": "macOS ARM64"
+  },
+  "textual_runtime_tests": 22,
+  "website_tests": 26,
+  "website_pages": 6064,
+  "api_snapshot": "checked",
+  "libraries_manifest_sha256": null
+}

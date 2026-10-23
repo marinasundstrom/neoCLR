@@ -12,13 +12,13 @@ public func Check(value: bool, message: string) {
 public func Added(result: Result<unit, BuildError>) {
     match result {
         Ok(_) => { }
-        Error(_) => System.Fail("Unexpected build limit")
+        Failure(_) => System.Fail("Unexpected build limit")
     }
 }
 
 public func Rejected(result: Result<unit, BuildError>) {
     match result {
-        Error(BuildError.LimitExceeded) => { }
+        Failure(BuildError.LimitExceeded) => { }
         _ => System.Fail("Missing build limit")
     }
 }
@@ -65,11 +65,11 @@ public func Contracts() {
     let finalBytes: byte[] = [(byte)129]
     match split.Decode(firstBytes, 0, 2, false) {
         Ok(let part) => Added(chunks.Append(part))
-        Error(_) => System.Fail("First decoded part")
+        Failure(_) => System.Fail("First decoded part")
     }
     match split.Decode(finalBytes, 0, 1, true) {
         Ok(let part) => Added(chunks.Append(part))
-        Error(_) => System.Fail("Final decoded part")
+        Failure(_) => System.Fail("Final decoded part")
     }
     Check(chunks.Build().Equals("é") && chunks.Build().Length == 1, "Decoded parts resegment")
     let odd = ReportTextBuilder(8)

@@ -11,14 +11,14 @@ import System.Web.Http.Json.*
 import System.Data.Json.*
 
 async func Echo(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
-    if !request.IsSecure { return Error(HttpError.Handler("Expected HTTPS request")) }
+    if !request.IsSecure { return Failure(HttpError.Handler("Expected HTTPS request")) }
     let result = await request.Content.ReadJsonNode()
     let Ok(node) = result else {
-        return Error(HttpError.Handler("Expected JSON request"))
+        return Failure(HttpError.Handler("Expected JSON request"))
     }
     System.Runtime.GC.Collect()
     let Ok(content) = JsonContent.CreateNode(node) else {
-        return Error(HttpError.Handler("Cannot encode JSON"))
+        return Failure(HttpError.Handler("Cannot encode JSON"))
     }
     let response = HttpResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))
     response.Respond(HttpStatusCode.OK, content)
@@ -29,7 +29,7 @@ async func CheckLifetime() -> Task<int> {
     let borrowed = MemoryStream()
     let wrapper = SslStream(borrowed, borrowed, true)
     if wrapper.IsAuthenticated { return 31 }
-    if let Error(StreamError.WrongAccess) = await wrapper.Read([], 0, 0) {
+    if let Failure(StreamError.WrongAccess) = await wrapper.Read([], 0, 0) {
     } else {
         return 32
     }
@@ -39,7 +39,7 @@ async func CheckLifetime() -> Task<int> {
     } else {
         return 33
     }
-    if let Error(StreamError.Closed) = await wrapper.Write([], 0, 0) {
+    if let Failure(StreamError.Closed) = await wrapper.Write([], 0, 0) {
     } else {
         return 34
     }
@@ -47,7 +47,7 @@ async func CheckLifetime() -> Task<int> {
     let owned = MemoryStream()
     let owner = SslStream(owned, owned)
     owner.Dispose()
-    if let Error(StreamError.Closed) = owned.GetLength() {
+    if let Failure(StreamError.Closed) = owned.GetLength() {
     } else {
         return 35
     }
@@ -81,7 +81,7 @@ async func Main() -> Task<int> {
     let Ok(node) = JsonSerializer.DeserializeNode("{\"message\":\"Café\",\"items\":[1,true,null]}") else { return 9 }
     let Ok(content) = JsonContent.CreateNode(node) else { return 10 }
     let response = await client.Post(url, content)
-    if let Error(error) = response {
+    if let Failure(error) = response {
         Console.WriteLine("HTTPS exchange failed")
         server.Close()
         return 11
@@ -92,7 +92,7 @@ async func Main() -> Task<int> {
     if text != "{\"message\":\"Café\",\"items\":[1,true,null]}" { return 15 }
     let completed = await serving
     server.Close()
-    if let Error(error) = completed {
+    if let Failure(error) = completed {
         Console.WriteLine("HTTPS exchange failed")
         return 16
     }

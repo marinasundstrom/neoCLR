@@ -61,8 +61,8 @@
         ret
         Invalid:
         newobj instance System.Time.InvalidTimeError::.ctor()
-        newobj instance System.Result.Error<System.Time.InvalidTimeError>::.ctor(System.Time.InvalidTimeError)
-        newobj instance System.Result<System.Time.TimeOfDay,System.Time.InvalidTimeError>::.ctor(System.Result.Error<System.Time.InvalidTimeError>)
+        newobj instance System.Result.Failure<System.Time.InvalidTimeError>::.ctor(System.Time.InvalidTimeError)
+        newobj instance System.Result<System.Time.TimeOfDay,System.Time.InvalidTimeError>::.ctor(System.Result.Failure<System.Time.InvalidTimeError>)
         ret
     .end
 
@@ -80,8 +80,8 @@
         ret
         Invalid:
         newobj instance System.Time.InvalidTimeError::.ctor()
-        newobj instance System.Result.Error<System.Time.InvalidTimeError>::.ctor(System.Time.InvalidTimeError)
-        newobj instance System.Result<System.Time.TimeOfDay,System.Time.InvalidTimeError>::.ctor(System.Result.Error<System.Time.InvalidTimeError>)
+        newobj instance System.Result.Failure<System.Time.InvalidTimeError>::.ctor(System.Time.InvalidTimeError)
+        newobj instance System.Result<System.Time.TimeOfDay,System.Time.InvalidTimeError>::.ctor(System.Result.Failure<System.Time.InvalidTimeError>)
         ret
     .end
 

@@ -68,12 +68,12 @@ func Main() {
     } else {
         System.Fail("First address must parse")
     }
-    if let Error(error) = IPAddress.Parse("fe80::1%3") {
+    if let Failure(error) = IPAddress.Parse("fe80::1%3") {
         Check(error is IPAddressError.UnsupportedScope)
     } else {
         System.Fail("Scope should be unsupported")
     }
-    if let Error(formatError) = IPAddress.Parse("127.1") {
+    if let Failure(formatError) = IPAddress.Parse("127.1") {
         Check(formatError is IPAddressError.InvalidFormat)
     } else {
         System.Fail("Abbreviated IPv4 should be invalid")
@@ -86,26 +86,26 @@ func Main() {
         }
     }
     if let Ok(ipv6) = IPAddress.Parse("::1") {
-        if let Error(unsupported) = Socket.Connect(ipv6, 80).GetResult() {
+        if let Failure(unsupported) = Socket.Connect(ipv6, 80).GetResult() {
             Check(unsupported is SocketError.UnsupportedAddressFamily)
         } else {
             System.Fail("IPv6 connect unexpectedly supported")
         }
-        if let Error(listenError) = Socket.Listen(ipv6, 0, 1) {
+        if let Failure(listenError) = Socket.Listen(ipv6, 0, 1) {
             Check(listenError is SocketError.UnsupportedAddressFamily)
         } else {
             System.Fail("IPv6 listen unexpectedly supported")
         }
         let mixed = ArrayList<IPAddress>()
         mixed.Add(ipv6)
-        if let Error(sequenceError) = Socket.Connect(mixed, 80).GetResult() {
+        if let Failure(sequenceError) = Socket.Connect(mixed, 80).GetResult() {
             Check(sequenceError is SocketError.UnsupportedAddressFamily)
         } else {
             System.Fail("IPv6 sequence unexpectedly supported")
         }
     }
     let empty = ArrayList<IPAddress>()
-    if let Error(emptyError) = Socket.Connect(empty, 80).GetResult() {
+    if let Failure(emptyError) = Socket.Connect(empty, 80).GetResult() {
         Check(emptyError is SocketError.InvalidRange)
     } else {
         System.Fail("Empty address values unexpectedly supported")

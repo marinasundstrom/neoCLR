@@ -6,7 +6,7 @@ import System.Web.Http.*
 
 func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
     let result: Result<HttpResponse, HttpError> = if request.IsSecure {
-        Error(HttpError.Handler("Cleartext request marked secure"))
+        Failure(HttpError.Handler("Cleartext request marked secure"))
     } else {
         Ok(HttpResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), HttpStringContent("plain")))
     }
@@ -23,7 +23,7 @@ async func Main() -> Task<int> {
     let completed = await serving
     server.Close()
     let Ok(received) = response else { return 3 }
-    if let Error(_) = completed { return 4 }
+    if let Failure(_) = completed { return 4 }
     if received.Content.Length != 5 || !HasFirstByte(received.Content) { return 5 }
     Console.WriteLine("Managed cleartext exchange passed")
     return 0

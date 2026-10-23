@@ -930,7 +930,7 @@ callvirt instance fn<T2>::Invoke()
 M0000000b_IL_006f:
 call neoCLR.Library.System.OptionOperators.RuntimeUnion8<T2>(T2)
 M0000000b_IL_0074:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion9<T1,T2>(System.Result.Error<T2>)
+call neoCLR.Library.System.OptionOperators.RuntimeUnion9<T1,T2>(System.Result.Failure<T2>)
 M0000000b_IL_0079:
 stloc local1
 M0000000b_IL_007a:
@@ -1046,7 +1046,7 @@ callvirt instance fn<T2>::Invoke()
 M0000000c_IL_0079:
 call neoCLR.Library.System.OptionOperators.RuntimeUnion8<T2>(T2)
 M0000000c_IL_007e:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion9<T1,T2>(System.Result.Error<T2>)
+call neoCLR.Library.System.OptionOperators.RuntimeUnion9<T1,T2>(System.Result.Failure<T2>)
 M0000000c_IL_0083:
 stloc local1
 M0000000c_IL_0084:
@@ -1156,7 +1156,7 @@ ldarg 1
 M0000000d_IL_006e:
 call neoCLR.Library.System.OptionOperators.RuntimeUnion14<T1>(T1)
 M0000000d_IL_0073:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion15<T0,T1>(System.Result.Error<T1>)
+call neoCLR.Library.System.OptionOperators.RuntimeUnion15<T0,T1>(System.Result.Failure<T1>)
 M0000000d_IL_0078:
 stloc local1
 M0000000d_IL_0079:
@@ -1268,7 +1268,7 @@ callvirt instance fn<T1>::Invoke()
 M0000000e_IL_0073:
 call neoCLR.Library.System.OptionOperators.RuntimeUnion14<T1>(T1)
 M0000000e_IL_0078:
-call neoCLR.Library.System.OptionOperators.RuntimeUnion15<T0,T1>(System.Result.Error<T1>)
+call neoCLR.Library.System.OptionOperators.RuntimeUnion15<T0,T1>(System.Result.Failure<T1>)
 M0000000e_IL_007d:
 stloc local1
 M0000000e_IL_007e:

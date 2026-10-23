@@ -13,21 +13,21 @@ func Main() -> int {
     if nan.CompareTo(nan) != 0 { return 6 }
     match Single.Parse("20.5") {
         .Ok(let parsed) => { if parsed != 20.5f { return 7 } }
-        .Error(_) => { return 8 }
+        .Failure(_) => { return 8 }
     }
     match Double.Parse("21.5") {
         .Ok(let parsed) => { if parsed != 21.5 { return 9 } }
-        .Error(_) => { return 10 }
+        .Failure(_) => { return 10 }
     }
     match Single.Parse("bad") {
         .Ok(_) => { return 11 }
-        .Error(let error) => {
+        .Failure(let error) => {
             if error is not NumberParseError.InvalidFormat { return 12 }
         }
     }
     match Double.Parse("1e9999") {
         .Ok(_) => { return 13 }
-        .Error(let error) => {
+        .Failure(let error) => {
             if error is not NumberParseError.Overflow { return 14 }
         }
     }

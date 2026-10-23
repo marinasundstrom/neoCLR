@@ -86,12 +86,12 @@ NonePassed:
     ldstr "not a number"
     call System.Int32.Parse(string)
     dup
-    call instance System.Result<Int32,System.Int32ParseError>::get_IsErrorCase()
+    call instance System.Result<Int32,System.Int32ParseError>::get_IsFailureCase()
     brtrue ParseFailed
     fault "expected parse error"
 ParseFailed:
-    call instance System.Result<Int32,System.Int32ParseError>::GetErrorCase()
-    call instance System.Result.Error<System.Int32ParseError>::get_Value()
+    call instance System.Result<Int32,System.Int32ParseError>::GetFailureCase()
+    call instance System.Result.Failure<System.Int32ParseError>::get_Value()
     call instance System.Int32ParseError::get_IsInvalidFormat()
     brtrue ParseHandled
     fault "wrong parse error"
@@ -108,10 +108,10 @@ ParseHandled:
 DivisionPassed:
     ; Construct both Result cases with Void as success type.
     ldstr "Demonstration"
-    newobj instance System.Result.Error<String>::.ctor(String)
-    newobj instance System.Result<Void,String>::.ctor(System.Result.Error<String>)
-    call instance System.Result<Void,String>::GetErrorCase()
-    call instance System.Result.Error<String>::get_Value()
+    newobj instance System.Result.Failure<String>::.ctor(String)
+    newobj instance System.Result<Void,String>::.ctor(System.Result.Failure<String>)
+    call instance System.Result<Void,String>::GetFailureCase()
+    call instance System.Result.Failure<String>::get_Value()
     pop
 
     ldc.i4 0

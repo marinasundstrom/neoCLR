@@ -34,6 +34,6 @@ public class AppRoutesParser {
         if boxed is AppRoutes route {
             return Ok(route)
         }
-        return Error(RouteMappingError.ConstructionFailed("Unexpected union type"))
+        return Failure(RouteMappingError.ConstructionFailed("Unexpected union type"))
     }
 }

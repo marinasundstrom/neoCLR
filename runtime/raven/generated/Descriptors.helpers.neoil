@@ -57,7 +57,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c3_IL_003f:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c3_IL_0044:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion23<T0>(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion23<T0>(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c3_IL_0049:
 ret
 M000000c3_IL_004a:
@@ -129,7 +129,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c3_IL_00aa:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c3_IL_00af:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion23<T0>(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion23<T0>(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c3_IL_00b4:
 ret
 .end
@@ -356,14 +356,14 @@ ldarg arg0
 newobj instance System.Option<System.Introspection.MethodInfo>::.ctor(System.Option.Some<System.Introspection.MethodInfo>)
 ret
 .end
-.function neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError arg0) -> System.Result.Error<System.Runtime.Reflection.ReflectionError>
+.function neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError arg0) -> System.Result.Failure<System.Runtime.Reflection.ReflectionError>
 ldarg arg0
-newobj instance System.Result.Error<System.Runtime.Reflection.ReflectionError>::.ctor(System.Runtime.Reflection.ReflectionError)
+newobj instance System.Result.Failure<System.Runtime.Reflection.ReflectionError>::.ctor(System.Runtime.Reflection.ReflectionError)
 ret
 .end
-.function neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError> arg0) -> System.Result<System.Object,System.Runtime.Reflection.ReflectionError>
+.function neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError> arg0) -> System.Result<System.Object,System.Runtime.Reflection.ReflectionError>
 ldarg arg0
-newobj instance System.Result<System.Object,System.Runtime.Reflection.ReflectionError>::.ctor(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+newobj instance System.Result<System.Object,System.Runtime.Reflection.ReflectionError>::.ctor(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 ret
 .end
 .function neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion21(System.Object arg0) -> System.Result.Ok<System.Object>
@@ -376,9 +376,9 @@ ldarg arg0
 newobj instance System.Result<System.Object,System.Runtime.Reflection.ReflectionError>::.ctor(System.Result.Ok<System.Object>)
 ret
 .end
-.function neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion23<T0>(System.Result.Error<System.Runtime.Reflection.ReflectionError> arg0) -> System.Result<T0,System.Runtime.Reflection.ReflectionError>
+.function neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion23<T0>(System.Result.Failure<System.Runtime.Reflection.ReflectionError> arg0) -> System.Result<T0,System.Runtime.Reflection.ReflectionError>
 ldarg arg0
-newobj instance System.Result<T0,System.Runtime.Reflection.ReflectionError>::.ctor(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+newobj instance System.Result<T0,System.Runtime.Reflection.ReflectionError>::.ctor(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 ret
 .end
 .function neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion24(System.Result<System.Object,System.Runtime.Reflection.ReflectionError>& arg0,out System.Object& arg1) -> Boolean
@@ -408,9 +408,9 @@ ldarg arg0
 newobj instance System.Result<T0,System.Runtime.Reflection.ReflectionError>::.ctor(System.Result.Ok<T0>)
 ret
 .end
-.function neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion29(System.Result.Error<System.Runtime.Reflection.ReflectionError> arg0) -> System.Result<Void,System.Runtime.Reflection.ReflectionError>
+.function neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion29(System.Result.Failure<System.Runtime.Reflection.ReflectionError> arg0) -> System.Result<Void,System.Runtime.Reflection.ReflectionError>
 ldarg arg0
-newobj instance System.Result<Void,System.Runtime.Reflection.ReflectionError>::.ctor(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+newobj instance System.Result<Void,System.Runtime.Reflection.ReflectionError>::.ctor(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 ret
 .end
 .function neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion30(Void arg0) -> System.Result.Ok<Void>
@@ -6493,7 +6493,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c2_IL_0068:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c2_IL_006d:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c2_IL_0072:
 ret
 M000000c2_IL_0073:
@@ -6516,7 +6516,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c2_IL_008d:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c2_IL_0092:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c2_IL_0097:
 ret
 M000000c2_IL_0098:
@@ -6539,7 +6539,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c2_IL_00b2:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c2_IL_00b7:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c2_IL_00bc:
 ret
 M000000c2_IL_00bd:
@@ -6562,7 +6562,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c2_IL_00d7:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c2_IL_00dc:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c2_IL_00e1:
 ret
 M000000c2_IL_00e2:
@@ -6585,7 +6585,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c2_IL_00fc:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c2_IL_0101:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c2_IL_0106:
 ret
 M000000c2_IL_0107:
@@ -6608,7 +6608,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c2_IL_0121:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c2_IL_0126:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c2_IL_012b:
 ret
 M000000c2_IL_012c:
@@ -6631,7 +6631,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c2_IL_0146:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c2_IL_014b:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c2_IL_0150:
 ret
 M000000c2_IL_0151:
@@ -6654,7 +6654,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c2_IL_016c:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c2_IL_0171:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c2_IL_0176:
 ret
 M000000c2_IL_0177:
@@ -6666,7 +6666,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c2_IL_0183:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c2_IL_0188:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c2_IL_018d:
 ret
 .end
@@ -6755,7 +6755,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c4_IL_0062:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c4_IL_0067:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c4_IL_006c:
 ret
 M000000c4_IL_006d:
@@ -6778,7 +6778,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c4_IL_0087:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c4_IL_008c:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c4_IL_0091:
 ret
 M000000c4_IL_0092:
@@ -6801,7 +6801,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c4_IL_00ac:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c4_IL_00b1:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c4_IL_00b6:
 ret
 M000000c4_IL_00b7:
@@ -6812,7 +6812,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c4_IL_00c2:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c4_IL_00c7:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c4_IL_00cc:
 ret
 M000000c4_IL_00cd:
@@ -6823,7 +6823,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c4_IL_00d8:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c4_IL_00dd:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c4_IL_00e2:
 ret
 .end
@@ -6993,7 +6993,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c5_IL_00c6:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c5_IL_00cb:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c5_IL_00d0:
 ret
 M000000c5_IL_00d1:
@@ -7016,7 +7016,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c5_IL_00ec:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c5_IL_00f1:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c5_IL_00f6:
 ret
 M000000c5_IL_00f7:
@@ -7039,7 +7039,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c5_IL_0112:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c5_IL_0117:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c5_IL_011c:
 ret
 M000000c5_IL_011d:
@@ -7062,7 +7062,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c5_IL_0138:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c5_IL_013d:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c5_IL_0142:
 ret
 M000000c5_IL_0143:
@@ -7073,7 +7073,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c5_IL_014e:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c5_IL_0153:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c5_IL_0158:
 ret
 M000000c5_IL_0159:
@@ -7086,7 +7086,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c5_IL_0166:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c5_IL_016b:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c5_IL_0170:
 ret
 .end
@@ -7264,7 +7264,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c6_IL_00d2:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c6_IL_00d7:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion29(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion29(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c6_IL_00dc:
 ret
 M000000c6_IL_00dd:
@@ -7287,7 +7287,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c6_IL_00f8:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c6_IL_00fd:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion29(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion29(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c6_IL_0102:
 ret
 M000000c6_IL_0103:
@@ -7310,7 +7310,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c6_IL_011e:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c6_IL_0123:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion29(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion29(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c6_IL_0128:
 ret
 M000000c6_IL_0129:
@@ -7333,7 +7333,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c6_IL_0144:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c6_IL_0149:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion29(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion29(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c6_IL_014e:
 ret
 M000000c6_IL_014f:
@@ -7356,7 +7356,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c6_IL_016a:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c6_IL_016f:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion29(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion29(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c6_IL_0174:
 ret
 M000000c6_IL_0175:
@@ -7367,7 +7367,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c6_IL_0180:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c6_IL_0185:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion29(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion29(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c6_IL_018a:
 ret
 M000000c6_IL_018b:
@@ -7380,7 +7380,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c6_IL_0198:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c6_IL_019d:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion29(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion29(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c6_IL_01a2:
 ret
 .end
@@ -7664,7 +7664,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c8_IL_00c3:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c8_IL_00c8:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c8_IL_00cd:
 ret
 M000000c8_IL_00ce:
@@ -7687,7 +7687,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c8_IL_00e9:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c8_IL_00ee:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c8_IL_00f3:
 ret
 M000000c8_IL_00f4:
@@ -7710,7 +7710,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c8_IL_010f:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c8_IL_0114:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c8_IL_0119:
 ret
 M000000c8_IL_011a:
@@ -7733,7 +7733,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c8_IL_0135:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c8_IL_013a:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c8_IL_013f:
 ret
 M000000c8_IL_0140:
@@ -7744,7 +7744,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c8_IL_014b:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c8_IL_0150:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c8_IL_0155:
 ret
 M000000c8_IL_0156:
@@ -7757,7 +7757,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c8_IL_0163:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c8_IL_0168:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c8_IL_016d:
 ret
 .end
@@ -7972,7 +7972,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c9_IL_00f9:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c9_IL_00fe:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c9_IL_0103:
 ret
 M000000c9_IL_0104:
@@ -7995,7 +7995,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c9_IL_011f:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c9_IL_0124:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c9_IL_0129:
 ret
 M000000c9_IL_012a:
@@ -8018,7 +8018,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c9_IL_0145:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c9_IL_014a:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c9_IL_014f:
 ret
 M000000c9_IL_0150:
@@ -8041,7 +8041,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c9_IL_016b:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c9_IL_0170:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c9_IL_0175:
 ret
 M000000c9_IL_0176:
@@ -8064,7 +8064,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c9_IL_0191:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c9_IL_0196:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c9_IL_019b:
 ret
 M000000c9_IL_019c:
@@ -8087,7 +8087,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c9_IL_01b7:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c9_IL_01bc:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c9_IL_01c1:
 ret
 M000000c9_IL_01c2:
@@ -8110,7 +8110,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c9_IL_01dd:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c9_IL_01e2:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c9_IL_01e7:
 ret
 M000000c9_IL_01e8:
@@ -8133,7 +8133,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c9_IL_0204:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c9_IL_0209:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c9_IL_020e:
 ret
 M000000c9_IL_020f:
@@ -8147,7 +8147,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000c9_IL_021d:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000c9_IL_0222:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000c9_IL_0227:
 ret
 .end
@@ -8325,7 +8325,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000ca_IL_00d2:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000ca_IL_00d7:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000ca_IL_00dc:
 ret
 M000000ca_IL_00dd:
@@ -8348,7 +8348,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000ca_IL_00f8:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000ca_IL_00fd:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000ca_IL_0102:
 ret
 M000000ca_IL_0103:
@@ -8371,7 +8371,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000ca_IL_011e:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000ca_IL_0123:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000ca_IL_0128:
 ret
 M000000ca_IL_0129:
@@ -8394,7 +8394,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000ca_IL_0144:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000ca_IL_0149:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000ca_IL_014e:
 ret
 M000000ca_IL_014f:
@@ -8417,7 +8417,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000ca_IL_016a:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000ca_IL_016f:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000ca_IL_0174:
 ret
 M000000ca_IL_0175:
@@ -8440,7 +8440,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000ca_IL_0190:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000ca_IL_0195:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000ca_IL_019a:
 ret
 M000000ca_IL_019b:
@@ -8463,7 +8463,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000ca_IL_01b6:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000ca_IL_01bb:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000ca_IL_01c0:
 ret
 M000000ca_IL_01c1:
@@ -8486,7 +8486,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000ca_IL_01dd:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000ca_IL_01e2:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000ca_IL_01e7:
 ret
 M000000ca_IL_01e8:
@@ -8500,7 +8500,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000ca_IL_01f6:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000ca_IL_01fb:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion20(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000ca_IL_0200:
 ret
 .end
@@ -8699,7 +8699,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000cb_IL_00e5:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000cb_IL_00ea:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion29(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion29(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000cb_IL_00ef:
 ret
 M000000cb_IL_00f0:
@@ -8722,7 +8722,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000cb_IL_010b:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000cb_IL_0110:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion29(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion29(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000cb_IL_0115:
 ret
 M000000cb_IL_0116:
@@ -8745,7 +8745,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000cb_IL_0131:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000cb_IL_0136:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion29(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion29(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000cb_IL_013b:
 ret
 M000000cb_IL_013c:
@@ -8768,7 +8768,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000cb_IL_0157:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000cb_IL_015c:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion29(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion29(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000cb_IL_0161:
 ret
 M000000cb_IL_0162:
@@ -8791,7 +8791,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000cb_IL_017d:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000cb_IL_0182:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion29(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion29(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000cb_IL_0187:
 ret
 M000000cb_IL_0188:
@@ -8814,7 +8814,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000cb_IL_01a3:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000cb_IL_01a8:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion29(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion29(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000cb_IL_01ad:
 ret
 M000000cb_IL_01ae:
@@ -8837,7 +8837,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000cb_IL_01c9:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000cb_IL_01ce:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion29(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion29(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000cb_IL_01d3:
 ret
 M000000cb_IL_01d4:
@@ -8860,7 +8860,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000cb_IL_01f0:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000cb_IL_01f5:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion29(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion29(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000cb_IL_01fa:
 ret
 M000000cb_IL_01fb:
@@ -8874,7 +8874,7 @@ call neoCLR.Library.System.Introspection.MemberInfo.RuntimeErrorSystemRuntimeRef
 M000000cb_IL_0209:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion19(System.Runtime.Reflection.ReflectionError)
 M000000cb_IL_020e:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion29(System.Result.Error<System.Runtime.Reflection.ReflectionError>)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion29(System.Result.Failure<System.Runtime.Reflection.ReflectionError>)
 M000000cb_IL_0213:
 ret
 .end

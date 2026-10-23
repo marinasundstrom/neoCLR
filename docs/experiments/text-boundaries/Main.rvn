@@ -12,7 +12,7 @@ public func Check(value: bool, message: string) {
 public func Step(result: Result<DecodeStep, DecodeFailure>) -> DecodeStep {
     return match result {
         Ok(let value) => value
-        Error(_) => {
+        Failure(_) => {
             System.Fail("Unexpected decode failure")
             DecodeStep("", 0, 0, DecodeStatus.Finished)
         }
@@ -21,7 +21,7 @@ public func Step(result: Result<DecodeStep, DecodeFailure>) -> DecodeStep {
 
 public func Failure(result: Result<DecodeStep, DecodeFailure>) -> DecodeFailure {
     return match result {
-        Error(let value) => value
+        Failure(let value) => value
         Ok(_) => {
             System.Fail("Expected decode failure")
             DecodeFailure("", 0, 0, DecodeError.Stopped)
@@ -46,12 +46,12 @@ public func CheckBoundaries() {
                 Check(scalar.Value == value, "Scalar value")
                 Check(scalar.ToText().GetUtf8ByteCount() > 0, "Scalar encoding")
             }
-            Error(_) => System.Fail("Valid scalar rejected")
+            Failure(_) => System.Fail("Valid scalar rejected")
         }
     }
     for value in [(uint)55296, (uint)57343, (uint)1114112] {
         match ScalarValue.FromValue(value) {
-            Error(BoundaryError.InvalidScalar) => { }
+            Failure(BoundaryError.InvalidScalar) => { }
             _ => System.Fail("Invalid scalar accepted")
         }
     }
@@ -65,7 +65,7 @@ public func CheckBoundaries() {
                 _ => System.Fail("Slice rejected")
             }
             match TextSource("name=é").Slice(range) {
-                Error(BoundaryError.WrongSource) => { }
+                Failure(BoundaryError.WrongSource) => { }
                 _ => System.Fail("Wrong source accepted")
             }
         }
@@ -87,15 +87,15 @@ public func CheckBoundaries() {
         _ => System.Fail("Missing delimiter")
     }
     match source.Slice(SourceRange(source, 7, 1)) {
-        Error(BoundaryError.InvalidBoundary) => { }
+        Failure(BoundaryError.InvalidBoundary) => { }
         _ => System.Fail("Forged boundary")
     }
     match source.Slice(SourceRange(source, 0, 99)) {
-        Error(BoundaryError.OutOfRange) => { }
+        Failure(BoundaryError.OutOfRange) => { }
         _ => System.Fail("Forged range")
     }
     match source.Slice(default(SourceRange)) {
-        Error(BoundaryError.UninitializedRange) => { }
+        Failure(BoundaryError.UninitializedRange) => { }
         _ => System.Fail("Null range")
     }
     match source.FindOrdinal("") {

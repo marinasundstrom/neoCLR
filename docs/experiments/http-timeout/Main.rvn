@@ -78,7 +78,7 @@ async func TimeoutAndCleanup() -> Task<()> {
     Check(pending.Token.IsCancellationRequested && !task.IsCompleted)
     pending.Result.Cancel()
     let result = await task
-    let Error(HttpError.TimedOut) = result else { System.Fail("Expected timeout") }
+    let Failure(HttpError.TimedOut) = result else { System.Fail("Expected timeout") }
     client.Dispose()
     Console.WriteLine("PASS timeout waits for handler acknowledgement")
 }
@@ -141,7 +141,7 @@ async func ExpectSuccess(task: Task<Result<HttpResponse, HttpError>>) -> Task<()
 
 async func ExpectTimeout(task: Task<Result<HttpResponse, HttpError>>) -> Task<()> {
     let result = await task
-    let Error(HttpError.TimedOut) = result else { System.Fail("Expected timeout") }
+    let Failure(HttpError.TimedOut) = result else { System.Fail("Expected timeout") }
 }
 
 async func IndependentRequests() -> Task<()> {

@@ -21607,3 +21607,41 @@ See [the development API contract](../api-docs/error-context.md).
   `59a8d09ea` and its deliberate neoCLR integration as `37056b534`; kept branches
   separate. The neoCLR commit includes APIs, runtime integration, references and
   website pages. Pre-existing Windows ARM64 assessment edits are excluded.
+
+## 2026-10-23 — Result failure case naming
+
+- **Author:** Identified the clash between Result.Error and System.Error. Accepted
+  renaming the case to Result.Err, describing it as a command/verb.
+- **Assistant:** Recommended Ok/Err while keeping the diagnostic interface Error;
+  treated Option versus Optional as a separate API naming decision.
+- **Author clarification:** Optional would match Swift and read better in Raven's
+  style, with Java also using Optional; observed Rust's preference for shorter words.
+- **Assistant response:** Favored Optional on readability grounds while retaining
+  the authorized scope of this change: Result.Err. Option remains unchanged.
+- **Implementation:** Rename neoCLR result construction and patterns, compiler
+  result-case recognition, examples and reference metadata together. Preserve
+  historical evidence and published release notes; no Error alias is added to the
+  new Result. Existing .NET Raven.Core Error-shaped results remain supported.
+
+- **Author decision:** Requested separate verified migrations, first Result cases,
+  then Option to Optional, with universal names in Raven for .NET and neoCLR.
+  Considered Success/Failure, then retained Ok because success is the most frequent
+  concept and benefits from a short spelling. Selected **Ok / Failure**: failure is
+  the outcome state, while the error is its payload. This supersedes the earlier
+  Err choice; no intermediate Err API is committed.
+- **Assistant action:** Migrating both libraries and compiler consumers to Ok/Failure,
+  retaining compiler recognition of legacy Error-shaped metadata. The Optional
+  migration begins only after this change is verified and committed.
+
+- **Author:** Suggested centralizing compiler-known words such as Failure while
+  acknowledging the risk of unnecessary indirection.
+- **Assistant action:** Added a small internal ResultFacts definition on both Raven
+  lines, with case names and legacy failure-case lookup. Payload members such as
+  UnwrapError keep their own meaning; these constants are not a configurable language
+  vocabulary or a promise that future API renames are source compatible.
+
+- **Outcome:** Result migration committed on Raven main (`8a264cf8a`) and carried
+  to codex/neoclr (`a6f650b5e`). Focused compiler, library, native runtime, API and
+  website validation passed; [evidence](validation/result-failure/validation.json).
+- **Author:** Confirmed continuing through Option to Optional and requested a
+  corresponding OptionalFacts definition. This remains a separate migration.

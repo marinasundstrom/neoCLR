@@ -27,14 +27,14 @@ ldarg arg0
 newobj instance System.Result<Byte,System.NumberParseError>::.ctor(System.Result.Ok<Byte>)
 ret
 .end
-.function neoCLR.Library.System.Byte.RuntimeUnion2(System.NumberParseError arg0) -> System.Result.Error<System.NumberParseError>
+.function neoCLR.Library.System.Byte.RuntimeUnion2(System.NumberParseError arg0) -> System.Result.Failure<System.NumberParseError>
 ldarg arg0
-newobj instance System.Result.Error<System.NumberParseError>::.ctor(System.NumberParseError)
+newobj instance System.Result.Failure<System.NumberParseError>::.ctor(System.NumberParseError)
 ret
 .end
-.function neoCLR.Library.System.Byte.RuntimeUnion3(System.Result.Error<System.NumberParseError> arg0) -> System.Result<Byte,System.NumberParseError>
+.function neoCLR.Library.System.Byte.RuntimeUnion3(System.Result.Failure<System.NumberParseError> arg0) -> System.Result<Byte,System.NumberParseError>
 ldarg arg0
-newobj instance System.Result<Byte,System.NumberParseError>::.ctor(System.Result.Error<System.NumberParseError>)
+newobj instance System.Result<Byte,System.NumberParseError>::.ctor(System.Result.Failure<System.NumberParseError>)
 ret
 .end
 .function neoCLR.Library.System.Byte.RuntimeBooleanToInt32(Boolean value) -> Int32

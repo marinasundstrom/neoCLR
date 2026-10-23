@@ -318,7 +318,7 @@
   "System.Propagatable`3",
   "System.Range",
   "System.Result",
-  "System.Result.Error`1",
+  "System.Result.Failure`1",
   "System.Result.Ok`1",
   "System.ResultErrorContextExtensions",
   "System.ResultOperators",

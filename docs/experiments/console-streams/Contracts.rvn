@@ -21,7 +21,7 @@ class ShortOutput : OutputStream {
     func ByteAt(index: int) -> byte => bytes[index]
     private func WriteCore(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
         if closed {
-            return Error(StreamError.Closed)
+            return Failure(StreamError.Closed)
         }
         if count == 0 {
             return Ok(0)
@@ -52,7 +52,7 @@ class ShortOutput : OutputStream {
         while !(sent >= count) {
             let amount = WriteCore(buffer, offset + sent, count - sent)?
             if amount == 0 {
-                return Error(StreamError.IoFailure)
+                return Failure(StreamError.IoFailure)
             }
             sent += amount
         }
@@ -96,7 +96,7 @@ class ZeroOutput : OutputStream {
         while !(sent >= count) {
             let amount = WriteCore(buffer, offset + sent, count - sent)?
             if amount == 0 {
-                return Error(StreamError.IoFailure)
+                return Failure(StreamError.IoFailure)
             }
             sent += amount
         }
@@ -137,7 +137,7 @@ func Main() {
         System.Fail("Unable to create text wrapper")
     }
     match CompletedValue(stopped.Write("x")) {
-        Error(let error) => Check((error is System.IO.StreamError.IoFailure))
+        Failure(let error) => Check((error is System.IO.StreamError.IoFailure))
         Ok(_) => System.Fail("Zero-progress output was accepted")
     }
     let destination = ShortOutput()
@@ -146,14 +146,14 @@ func Main() {
     }
     match CompletedValue(writer.WriteLine("å")) {
         Ok(let count) => Check(count == 3)
-        Error(_) => System.Fail("Short writes were not handled")
+        Failure(_) => System.Fail("Short writes were not handled")
     }
     Check(destination.Count == 3)
     Check(destination.ByteAt(0) == 195 && destination.ByteAt(1) == 165 && destination.ByteAt(2) == 10)
     writer.Close()
     Check(!destination.Closed)
     match CompletedValue(writer.Write("")) {
-        Error(let error) => Check((error is System.IO.StreamError.Closed))
+        Failure(let error) => Check((error is System.IO.StreamError.Closed))
         Ok(_) => System.Fail("Closed writer accepted text")
     }
     let Ok(owned) = StreamWriter.Create(destination) else {
@@ -184,21 +184,21 @@ func Main() {
     next.Close()
     let buffer: byte[] = [(byte)0]
     match input.Read(buffer[..0]) {
-        Error(let error) => Check((error is System.IO.StreamError.Closed))
+        Failure(let error) => Check((error is System.IO.StreamError.Closed))
         Ok(_) => System.Fail("Owned input was not closed")
     }
     // Closing a wrapper must not close the process channel.
     let closed = Console.OpenStandardOutput()
     closed.Close()
     match closed.Write(buffer) {
-        Error(let error) => Check((error is System.IO.StreamError.Closed))
+        Failure(let error) => Check((error is System.IO.StreamError.Closed))
         Ok(_) => System.Fail("Closed output accepted bytes")
     }
     let output = Console.OpenStandardOutput()
     let raw: byte[] = [(byte)65, (byte)10]
     match output.Write(raw) {
         Ok(_) => { }
-        Error(_) => System.Fail("Byte output failed")
+        Failure(_) => System.Fail("Byte output failed")
     }
     let Ok(_) = output.Flush() else {
         System.Fail("Could not flush raw output")

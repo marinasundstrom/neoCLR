@@ -18,7 +18,7 @@ func Load(path: string, limit: int) -> Result<string, FileReadError> {
 func ShowWrite(result: Result<System.Void, FileWriteError>) {
     match result {
         Ok(_) => WriteLine("Completed")
-        Error(let error) => {
+        Failure(let error) => {
             if (error is FileWriteError.TooLarge) {
                 WriteLine("Write too large")
             } else {
@@ -31,7 +31,7 @@ func ShowWrite(result: Result<System.Void, FileWriteError>) {
 func ShowRead(result: Result<string, FileReadError>) {
     match result {
         Ok(let ok) => WriteLine(ok)
-        Error(let error) => {
+        Failure(let error) => {
             if (error is FileReadError.NotFound) {
                 WriteLine("Not found")
             } else if (error is FileReadError.TooLarge) {

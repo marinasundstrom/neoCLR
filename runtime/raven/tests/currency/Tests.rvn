@@ -16,7 +16,7 @@ func AIdentity() -> Result<unit, TestFailure> {
     _ = Assert.True(default(Currency) == Currency.Unspecified, "Default is unspecified")?
     _ = Assert.True(Currency.JPY.DecimalDigits == 0 && usd.DecimalDigits == 2, "Currency digits")?
     let unsupported = Currency.Parse("usd")
-    return Assert.True(unsupported is Error(_), "Codes are explicit uppercase identifiers")
+    return Assert.True(unsupported is Failure(_), "Codes are explicit uppercase identifiers")
 }
 
 [Test("Currency formatting follows all five culture profiles")]
@@ -54,13 +54,13 @@ func DParsing() -> Result<unit, TestFailure> {
     let Ok(ils) = Currency.ILS.ParseAmount("‏‎-1,234.50 ‏₪", Culture.HebrewIsrael) else { return Assert.True(false, "Hebrew parse") }
     _ = Assert.True(ils.Amount == sek.Amount && ils != sek, "Bidi marks do not change value")?
     let wrong = Currency.USD.ParseAmount("€1,234.50", Culture.EnglishUnitedStates)
-    _ = Assert.True(wrong is Error(_), "Wrong currency rejected")?
+    _ = Assert.True(wrong is Failure(_), "Wrong currency rejected")?
     let grouping = Currency.USD.ParseAmount("$12,34.50", Culture.EnglishUnitedStates)
-    _ = Assert.True(grouping is Error(_), "Malformed grouping rejected")?
+    _ = Assert.True(grouping is Failure(_), "Malformed grouping rejected")?
     let spacing = Currency.SEK.ParseAmount("1 234,50 kr", Culture.SwedishSweden)
-    _ = Assert.True(spacing is Error(_), "ASCII spaces do not replace NBSP")?
+    _ = Assert.True(spacing is Failure(_), "ASCII spaces do not replace NBSP")?
     let bare = Currency.USD.ParseAmount("1234.50", Culture.EnglishUnitedStates)
-    return Assert.True(bare is Error(_), "Currency token required")
+    return Assert.True(bare is Failure(_), "Currency token required")
 }
 
 [Test("Currency data and language direction are explicit immutable policies")]

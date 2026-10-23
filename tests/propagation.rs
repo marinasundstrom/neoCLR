@@ -137,8 +137,8 @@ fn residual_factory_changes_output_type_and_preserves_the_error() {
     brfalse Invalid
     ldloc error
     call System.Result<Void,String>::FromResidual(String)
-    call instance System.Result<Void,String>::GetErrorCase()
-    call instance System.Result.Error<String>::get_Value()
+    call instance System.Result<Void,String>::GetFailureCase()
+    call instance System.Result.Failure<String>::get_Value()
     ret
 Invalid:
     fault "expected error"

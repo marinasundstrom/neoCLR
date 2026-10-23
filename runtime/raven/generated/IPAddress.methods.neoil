@@ -1233,7 +1233,7 @@ call neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAd
 M00000008_IL_0021:
 call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion2(System.Networking.IPAddressError)
 M00000008_IL_0026:
-call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion3(System.Result.Error<System.Networking.IPAddressError>)
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion3(System.Result.Failure<System.Networking.IPAddressError>)
 M00000008_IL_002b:
 ret
 M00000008_IL_002c:
@@ -1276,7 +1276,7 @@ call neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAd
 M00000008_IL_005e:
 call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion2(System.Networking.IPAddressError)
 M00000008_IL_0063:
-call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion3(System.Result.Error<System.Networking.IPAddressError>)
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion3(System.Result.Failure<System.Networking.IPAddressError>)
 M00000008_IL_0068:
 ret
 M00000008_IL_0069:
@@ -1370,7 +1370,7 @@ call neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAd
 M00000008_IL_00bf:
 call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion2(System.Networking.IPAddressError)
 M00000008_IL_00c4:
-call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion3(System.Result.Error<System.Networking.IPAddressError>)
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion3(System.Result.Failure<System.Networking.IPAddressError>)
 M00000008_IL_00c9:
 ret
 M00000008_IL_00ca:
@@ -1614,7 +1614,7 @@ call neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAd
 M00000008_IL_018f:
 call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion2(System.Networking.IPAddressError)
 M00000008_IL_0194:
-call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion3(System.Result.Error<System.Networking.IPAddressError>)
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion3(System.Result.Failure<System.Networking.IPAddressError>)
 M00000008_IL_0199:
 ret
 M00000008_IL_019a:
@@ -1666,7 +1666,7 @@ call neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAd
 M00000008_IL_01d2:
 call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion2(System.Networking.IPAddressError)
 M00000008_IL_01d7:
-call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion3(System.Result.Error<System.Networking.IPAddressError>)
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion3(System.Result.Failure<System.Networking.IPAddressError>)
 M00000008_IL_01dc:
 ret
 M00000008_IL_01dd:
@@ -1788,7 +1788,7 @@ call neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAd
 M00000008_IL_0277:
 call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion2(System.Networking.IPAddressError)
 M00000008_IL_027c:
-call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion3(System.Result.Error<System.Networking.IPAddressError>)
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion3(System.Result.Failure<System.Networking.IPAddressError>)
 M00000008_IL_0281:
 ret
 M00000008_IL_0282:
@@ -1822,7 +1822,7 @@ call neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAd
 M00000008_IL_02a7:
 call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion2(System.Networking.IPAddressError)
 M00000008_IL_02ac:
-call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion3(System.Result.Error<System.Networking.IPAddressError>)
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion3(System.Result.Failure<System.Networking.IPAddressError>)
 M00000008_IL_02b1:
 ret
 M00000008_IL_02b2:
@@ -1870,7 +1870,7 @@ call neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAd
 M00000008_IL_02ea:
 call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion2(System.Networking.IPAddressError)
 M00000008_IL_02ef:
-call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion3(System.Result.Error<System.Networking.IPAddressError>)
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion3(System.Result.Failure<System.Networking.IPAddressError>)
 M00000008_IL_02f4:
 ret
 M00000008_IL_02f5:
@@ -1927,7 +1927,7 @@ call neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAd
 M00000008_IL_033b:
 call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion2(System.Networking.IPAddressError)
 M00000008_IL_0340:
-call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion3(System.Result.Error<System.Networking.IPAddressError>)
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion3(System.Result.Failure<System.Networking.IPAddressError>)
 M00000008_IL_0345:
 ret
 M00000008_IL_0346:
@@ -2081,7 +2081,7 @@ call neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAd
 M00000008_IL_03e9:
 call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion2(System.Networking.IPAddressError)
 M00000008_IL_03ee:
-call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion3(System.Result.Error<System.Networking.IPAddressError>)
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion3(System.Result.Failure<System.Networking.IPAddressError>)
 M00000008_IL_03f3:
 ret
 M00000008_IL_03f4:
@@ -2120,7 +2120,7 @@ call neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAd
 M00000008_IL_0421:
 call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion2(System.Networking.IPAddressError)
 M00000008_IL_0426:
-call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion3(System.Result.Error<System.Networking.IPAddressError>)
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion3(System.Result.Failure<System.Networking.IPAddressError>)
 M00000008_IL_042b:
 ret
 M00000008_IL_042c:
@@ -2202,7 +2202,7 @@ call neoCLR.Library.System.Networking.IPAddress.RuntimeErrorSystemNetworkingIPAd
 M00000008_IL_0488:
 call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion2(System.Networking.IPAddressError)
 M00000008_IL_048d:
-call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion3(System.Result.Error<System.Networking.IPAddressError>)
+call neoCLR.Library.System.Networking.IPAddress.RuntimeUnion3(System.Result.Failure<System.Networking.IPAddressError>)
 M00000008_IL_0492:
 ret
 M00000008_IL_0493:

@@ -15,12 +15,12 @@ class UnavailableStorage : ByteStorage {
 
     func OpenRead(path: Path) -> Result<InputStream, StreamError> {
         calls += 1
-        return Error<StreamError>(StreamError.NotFound)
+        return Failure<StreamError>(StreamError.NotFound)
     }
 
     func CreateNew(path: Path) -> Result<OutputStream, StreamError> {
         calls += 1
-        return Error<StreamError>(StreamError.AccessDenied)
+        return Failure<StreamError>(StreamError.AccessDenied)
     }
 }
 
@@ -33,7 +33,7 @@ func Main() {
         System.Fail("Descriptor construction or properties performed I/O")
     }
     match file.OpenRead() {
-        Error(let error) => {
+        Failure(let error) => {
             if !(error is System.IO.StreamError.NotFound) {
                 System.Fail("Provider read error changed")
             }
@@ -44,7 +44,7 @@ func Main() {
         }
     }
     match file.CreateNew() {
-        Error(let error) => {
+        Failure(let error) => {
             if !(error is System.IO.StreamError.AccessDenied) {
                 System.Fail("Provider creation error changed")
             }

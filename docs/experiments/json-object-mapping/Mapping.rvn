@@ -42,7 +42,7 @@ func StationProperty() -> Result<PropertyInfo, MappingError> {
             return Ok(property)
         }
     }
-    return Error(MappingError.Schema("Station property is unavailable"))
+    return Failure(MappingError.Schema("Station property is unavailable"))
 }
 
 func DecodeReport(value: JsonValue) -> Result<StationReport, MappingError> {
@@ -55,11 +55,11 @@ func DecodeReport(value: JsonValue) -> Result<StationReport, MappingError> {
                 _ = property.SetValue(report, station.Value)?
                 return Ok(report)
             }
-            return Error(MappingError.Schema("Unexpected constructed type"))
+            return Failure(MappingError.Schema("Unexpected constructed type"))
         }
-        return Error(MappingError.Json(JsonError.TypeMismatch("station string")))
+        return Failure(MappingError.Json(JsonError.TypeMismatch("station string")))
     }
-    return Error(MappingError.Json(JsonError.TypeMismatch("object")))
+    return Failure(MappingError.Json(JsonError.TypeMismatch("object")))
 }
 
 func EncodeReport(report: StationReport) -> Result<JsonObject, MappingError> {
@@ -70,5 +70,5 @@ func EncodeReport(report: StationReport) -> Result<JsonObject, MappingError> {
         _ = document.Add("station", JsonString(station))?
         return Ok(document)
     }
-    return Error(MappingError.Schema("Station getter did not return a string"))
+    return Failure(MappingError.Schema("Station getter did not return a string"))
 }

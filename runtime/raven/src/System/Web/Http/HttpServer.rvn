@@ -63,7 +63,7 @@ internal class HttpRequestDecoder {
     internal func EnableStreaming() { headersOnly = true }
     internal func FinishHeaders() -> Result<HttpRequest, HttpError> {
         if let Some(parsed) = request { return Ok(parsed) }
-        return Error(HttpError.Protocol("Incomplete headers"))
+        return Failure(HttpError.Protocol("Incomplete headers"))
     }
     private val head: HttpRequestHeaderBuffer
     private var request: Option<HttpRequest> = None()
@@ -88,10 +88,10 @@ internal class HttpRequestDecoder {
 
     internal func Push(buffer: ReadOnlySlice<byte>) -> Result<bool, HttpError> {
         if failed {
-            return Error(HttpError.Protocol("Decoder already failed"))
+            return Failure(HttpError.Protocol("Decoder already failed"))
         }
         let result = PushCore(buffer)
-        if let Error(_) = result {
+        if let Failure(_) = result {
             failed = true
         }
         return result
@@ -101,7 +101,7 @@ internal class HttpRequestDecoder {
     // Header/body storage owns copied bytes before the receive buffer is reused.
     private func PushCore(buffer: ReadOnlySlice<byte>) -> Result<bool, HttpError> {
         if complete {
-            return Error(HttpError.Protocol("Request already complete"))
+            return Failure(HttpError.Protocol("Request already complete"))
         }
         var index = 0
         while index < buffer.Length && !complete && !(headersOnly && headersComplete) {
@@ -117,17 +117,17 @@ internal class HttpRequestDecoder {
                 continue
             }
             if head.Count >= settings.HeaderBytes {
-                return Error(HttpError.LimitExceeded("Request header limit exceeded"))
+                return Failure(HttpError.LimitExceeded("Request header limit exceeded"))
             }
             let count = head.Count
             if value == 10 && (count == 0 || head[count - 1] != 13) {
-                return Error(HttpError.Protocol("Bare LF in request"))
+                return Failure(HttpError.Protocol("Bare LF in request"))
             }
             if count > 0 && head[count - 1] == 13 && value != 10 {
-                return Error(HttpError.Protocol("Bare CR in request"))
+                return Failure(HttpError.Protocol("Bare CR in request"))
             }
             if value != 9 && value != 10 && value != 13 && !(value >= 32 && value <= 126) {
-                return Error(HttpError.Protocol("Invalid request byte"))
+                return Failure(HttpError.Protocol("Invalid request byte"))
             }
             head.Add(value)
             let size = head.Count
@@ -144,12 +144,12 @@ internal class HttpRequestDecoder {
 
     internal func Finish() -> Result<HttpRequest, HttpError> {
         if !Complete {
-            return Error(HttpError.Protocol("Incomplete request"))
+            return Failure(HttpError.Protocol("Incomplete request"))
         }
         if let Some(parsed) = request {
             return Ok(parsed)
         }
-        return Error(HttpError.Protocol("Incomplete request"))
+        return Failure(HttpError.Protocol("Incomplete request"))
     }
 
     private func Token(value: byte) -> bool {
@@ -162,14 +162,14 @@ internal class HttpRequestDecoder {
 
     private func MethodToken(bytes: ReadOnlySlice<byte>) -> Result<string, HttpError> {
         if bytes.Length == 0 {
-            return Error(HttpError.Protocol("Invalid request method"))
+            return Failure(HttpError.Protocol("Invalid request method"))
         }
         var index = 0
         while index < bytes.Length {
             if !Token(bytes[index]) {
                 // Keep malformed UTF-8's existing text error ahead of token errors.
                 let ignored = Text(0, bytes.Length, 0)?
-                return Error(HttpError.Protocol("Invalid request method"))
+                return Failure(HttpError.Protocol("Invalid request method"))
             }
             index += 1
         }
@@ -181,7 +181,7 @@ internal class HttpRequestDecoder {
             if let Ok(text) = HttpText.Decode(head.Written[start..end]) {
                 return Ok(text)
             }
-            return Error(HttpError.Protocol("Invalid header text"))
+            return Failure(HttpError.Protocol("Invalid header text"))
         }
         let bytes = ArrayList<byte>(end - start)
         var index = start
@@ -196,7 +196,7 @@ internal class HttpRequestDecoder {
         if let Ok(text) = HttpText.Decode(bytes) {
             return Ok(text)
         }
-        return Error(HttpError.Protocol("Invalid header text"))
+        return Failure(HttpError.Protocol("Invalid header text"))
     }
 
     // Fixed ASCII spellings avoid lowercase buffers and UTF-8 decoding for common names.
@@ -355,30 +355,30 @@ internal class HttpRequestDecoder {
                 if end < methodEnd + 11 || !(head[end - 9] == 32 && head[end - 8] == 72 && head[end - 7] == 84 &&
                     head[end - 6] == 84 && head[end - 5] == 80 && head[end - 4] == 47 &&
                     head[end - 3] == 49 && head[end - 2] == 46 && head[end - 1] == 49) {
-                    return Error(HttpError.Unsupported("Unsupported request line"))
+                    return Failure(HttpError.Unsupported("Unsupported request line"))
                 }
                 method = MethodToken(head.Written[0..methodEnd])?
                 let parsedTarget = Text(methodEnd + 1, end - 9, 0)?
                 var targetIndex = methodEnd + 1
                 while targetIndex < end - 9 {
                     if head[targetIndex] <= 32 || head[targetIndex] == 127 || head[targetIndex] == 35 {
-                        return Error(HttpError.Protocol("Invalid request target"))
+                        return Failure(HttpError.Protocol("Invalid request target"))
                     }
                     targetIndex += 1
                 }
                 target = parsedTarget
                 if !target.StartsWithOrdinal("/") {
-                    return Error(HttpError.Protocol("Origin-form target required"))
+                    return Failure(HttpError.Protocol("Origin-form target required"))
                 }
             } else if end == start {
                 if host.IsEmpty {
-                    return Error(HttpError.Protocol("Host required"))
+                    return Failure(HttpError.Protocol("Host required"))
                 }
                 if (method == "GET" || method == "DELETE" || method == "HEAD") && length != 0 {
-                    return Error(HttpError.Unsupported(String.Concat(method, " request bodies unsupported")))
+                    return Failure(HttpError.Unsupported(String.Concat(method, " request bodies unsupported")))
                 }
                 if chunked && hasLength {
-                    return Error(HttpError.Protocol("Ambiguous request framing"))
+                    return Failure(HttpError.Protocol("Ambiguous request framing"))
                 }
                 if chunked {
                     chunks = HttpChunkDecoder(body, method == "GET" || method == "DELETE" || method == "HEAD", settings.BodyBytes)
@@ -387,17 +387,17 @@ internal class HttpRequestDecoder {
                 return HttpRequest.FromIncoming(HttpMethod.FromValidatedToken(method), target, host, headers, body, secure)
             } else {
                 if headers.Count >= settings.HeaderCount {
-                    return Error(HttpError.LimitExceeded("Request header count exceeded"))
+                    return Failure(HttpError.LimitExceeded("Request header count exceeded"))
                 }
                 var colon = start
                 while colon < end && head[colon] != 58 {
                     if !Token(head[colon]) {
-                        return Error(HttpError.Protocol("Invalid request header name"))
+                        return Failure(HttpError.Protocol("Invalid request header name"))
                     }
                     colon += 1
                 }
                 if colon == start || colon == end {
-                    return Error(HttpError.Protocol("Missing request header name or colon"))
+                    return Failure(HttpError.Protocol("Missing request header name or colon"))
                 }
                 let name = HeaderName(start, colon)?
                 var first = colon + 1
@@ -411,41 +411,41 @@ internal class HttpRequestDecoder {
                 let value = Text(first, last, 0)?
                 if name == "host" {
                     if !host.IsEmpty {
-                        return Error(HttpError.Protocol("Duplicate Host"))
+                        return Failure(HttpError.Protocol("Duplicate Host"))
                     }
                     if value.IsEmpty {
-                        return Error(HttpError.Protocol("Empty Host"))
+                        return Failure(HttpError.Protocol("Empty Host"))
                     }
                     host = value
                 }
                 if name == "expect" || name == "content-encoding" {
-                    return Error(HttpError.Unsupported("Request expectation or content encoding unsupported"))
+                    return Failure(HttpError.Unsupported("Request expectation or content encoding unsupported"))
                 }
                 if name == "transfer-encoding" {
                     if chunked {
-                        return Error(HttpError.Protocol("Duplicate request Transfer-Encoding"))
+                        return Failure(HttpError.Protocol("Duplicate request Transfer-Encoding"))
                     }
                     if String.CompareOrdinalIgnoreCase(value, "chunked") != 0 {
-                        return Error(HttpError.Unsupported("Request transfer encoding unsupported"))
+                        return Failure(HttpError.Unsupported("Request transfer encoding unsupported"))
                     }
                     chunked = true
                 }
                 if name == "content-length" {
                     if hasLength {
-                        return Error(HttpError.Protocol("Duplicate request Content-Length"))
+                        return Failure(HttpError.Protocol("Duplicate request Content-Length"))
                     }
                     hasLength = true
                     if first == last {
-                        return Error(HttpError.Protocol("Invalid request Content-Length"))
+                        return Failure(HttpError.Protocol("Invalid request Content-Length"))
                     }
                     var cursor = first
                     while cursor < last {
                         let digit = (int)head[cursor] - 48
                         if !(digit >= 0 && digit <= 9) {
-                            return Error(HttpError.Protocol("Invalid request Content-Length"))
+                            return Failure(HttpError.Protocol("Invalid request Content-Length"))
                         }
                         if digit > settings.BodyBytes || length > (settings.BodyBytes - digit) / 10 {
-                            return Error(HttpError.LimitExceeded("Request body limit exceeded"))
+                            return Failure(HttpError.LimitExceeded("Request body limit exceeded"))
                         }
                         length = length * 10 + digit
                         cursor += 1
@@ -457,7 +457,7 @@ internal class HttpRequestDecoder {
             start = end + 2
             end = start
         }
-        return Error(HttpError.Protocol("Incomplete request"))
+        return Failure(HttpError.Protocol("Incomplete request"))
     }
 }
 
@@ -611,10 +611,10 @@ public class HttpServer {
         if let Ok(listener) = result {
             return Ok(HttpServer(listener, settings, options.SslOptions))
         }
-        if let Error(reason) = result {
-            return Error(HttpError.Transport(reason))
+        if let Failure(reason) = result {
+            return Failure(HttpError.Transport(reason))
         }
-        return Error(HttpError.Protocol("Inactive listen result"))
+        return Failure(HttpError.Protocol("Inactive listen result"))
     }
 
     func GetLocalPort() -> Result<int, HttpError> {
@@ -622,7 +622,7 @@ public class HttpServer {
         if let Ok(port) = result {
             return Ok(port)
         }
-        return Error(HttpError.InvalidRequest("Listener port unavailable"))
+        return Failure(HttpError.InvalidRequest("Listener port unavailable"))
     }
 
     /// Accepts request headers, transferring the exchange and unread body to the caller.
@@ -651,7 +651,7 @@ public class HttpServer {
 
     private func AcceptCore(cancellationToken: CancellationToken, streaming: bool, managed: bool) -> Task<Result<HttpContext, HttpError>> {
         if !managed && serving is HttpServerRun {
-            return Task.FromResult<Result<HttpContext, HttpError>>(Result<HttpContext, HttpError>.Error(HttpError.InvalidRequest("Serve owns request acceptance")))
+            return Task.FromResult<Result<HttpContext, HttpError>>(Result<HttpContext, HttpError>.Failure(HttpError.InvalidRequest("Serve owns request acceptance")))
         }
         if cancellationToken.IsCancellationRequested {
             let rejected = Promise<Result<HttpContext, HttpError>>()
@@ -660,12 +660,12 @@ public class HttpServer {
         }
         if closed {
             let rejected = Promise<Result<HttpContext, HttpError>>()
-            _ = rejected.Complete(Error(HttpError.InvalidRequest("Server is closed")))
+            _ = rejected.Complete(Failure(HttpError.InvalidRequest("Server is closed")))
             return rejected.Task
         }
         if active >= 16 {
             let rejected = Promise<Result<HttpContext, HttpError>>()
-            _ = rejected.Complete(Error(HttpError.LimitExceeded("Server exchange limit exceeded")))
+            _ = rejected.Complete(Failure(HttpError.LimitExceeded("Server exchange limit exceeded")))
             return rejected.Task
         }
         active += 1
@@ -702,7 +702,7 @@ public class HttpServer {
             return cancelled.Task
         }
         if closed || serving is HttpServerRun || active != 0 {
-            return Task.FromResult<Result<System.Void, HttpError>>(Result<System.Void, HttpError>.Error(HttpError.InvalidRequest("Serve requires an open idle server")))
+            return Task.FromResult<Result<System.Void, HttpError>>(Result<System.Void, HttpError>.Failure(HttpError.InvalidRequest("Serve requires an open idle server")))
         }
         let run = HttpServerRun(self, handler, cancellationToken)
         serving = run
@@ -734,21 +734,21 @@ public class HttpServer {
     internal static func EncodeResponse(response: HttpResponse, headOnly: int) -> Result<byte[], HttpError> {
         let status = (int)response.StatusCode
         if !(status >= 200 && status <= 599) {
-            return Error(HttpError.InvalidRequest("A final response status from 200 through 599 is required"))
+            return Failure(HttpError.InvalidRequest("A final response status from 200 through 599 is required"))
         }
         let count = response.Content.Length
         if count < 0 {
-            return Error(HttpError.Unsupported("Unknown-length response output is not implemented"))
+            return Failure(HttpError.Unsupported("Unknown-length response output is not implemented"))
         }
         if (status == 204 || status == 205 || status == 304) && count != 0 {
-            return Error(HttpError.InvalidRequest("This response status cannot contain content"))
+            return Failure(HttpError.InvalidRequest("This response status cannot contain content"))
         }
         if count > HttpWireLimits.BodyBytes {
-            return Error(HttpError.LimitExceeded("Response body limit exceeded"))
+            return Failure(HttpError.LimitExceeded("Response body limit exceeded"))
         }
         let fields = response.Headers
         if fields.Count > HttpWireLimits.HeaderCount - 2 {
-            return Error(HttpError.LimitExceeded("Response header count exceeded"))
+            return Failure(HttpError.LimitExceeded("Response header count exceeded"))
         }
         let result = ArrayList<byte>()
         AppendStatusPrefix(result)
@@ -767,17 +767,17 @@ public class HttpServer {
         while index < fields.Count {
             let header = fields[index]
             if header.Name.GetUtf8ByteCount() > HttpWireLimits.HeaderBytes - 2 || header.Value.GetUtf8ByteCount() > HttpWireLimits.HeaderBytes - 2 {
-                return Error(HttpError.LimitExceeded("Response header limit exceeded"))
+                return Failure(HttpError.LimitExceeded("Response header limit exceeded"))
             }
             let name = HttpText.Encode(header.Name)
             if name.Count == 0 {
-                return Error(HttpError.Protocol("Empty response header name"))
+                return Failure(HttpError.Protocol("Empty response header name"))
             }
             var part = 0
             while part < name.Count {
                 let value = name[part]
                 if !HeaderToken(value) {
-                    return Error(HttpError.Protocol("Invalid response header name"))
+                    return Failure(HttpError.Protocol("Invalid response header name"))
                 }
                 part += 1
             }
@@ -785,14 +785,14 @@ public class HttpServer {
                String.CompareOrdinalIgnoreCase(header.Name, "connection") == 0 ||
                String.CompareOrdinalIgnoreCase(header.Name, "transfer-encoding") == 0 ||
                String.CompareOrdinalIgnoreCase(header.Name, "content-encoding") == 0 {
-                return Error(HttpError.Protocol("Response framing headers are server-owned"))
+                return Failure(HttpError.Protocol("Response framing headers are server-owned"))
             }
             let valueBytes = HttpText.Encode(header.Value)
             part = 0
             while part < valueBytes.Count {
                 let value = valueBytes[part]
                 if value != 9 && !(value >= 32 && value <= 126) {
-                    return Error(HttpError.Protocol("Invalid response header value"))
+                    return Failure(HttpError.Protocol("Invalid response header value"))
                 }
                 part += 1
             }
@@ -803,7 +803,7 @@ public class HttpServer {
             result.Add((byte)13)
             result.Add((byte)10)
             if result.Count > HttpWireLimits.HeaderBytes - 2 {
-                return Error(HttpError.LimitExceeded("Response header limit exceeded"))
+                return Failure(HttpError.LimitExceeded("Response header limit exceeded"))
             }
             index += 1
         }
@@ -999,7 +999,7 @@ public class HttpContext : Disposable {
     internal func Send(response: HttpResponse, cancellationToken: CancellationToken) -> Task<Result<System.Void, HttpError>> {
         if started || closed {
             let rejected = Promise<Result<System.Void, HttpError>>()
-            _ = rejected.Complete(Error(HttpError.InvalidRequest("Context is closed or response already started")))
+            _ = rejected.Complete(Failure(HttpError.InvalidRequest("Context is closed or response already started")))
             return rejected.Task
         }
         started = true
@@ -1013,8 +1013,8 @@ public class HttpContext : Disposable {
         }
         let encoded = HttpServer.EncodeResponse(response, if request.Method.Method == "HEAD" { 1 } else { 0 })
         if let Ok(bytes) = encoded {
-            if let Error(reason) = response.Content.BeginUpload() {
-                Finish(Error(reason))
+            if let Failure(reason) = response.Content.BeginUpload() {
+                Finish(Failure(reason))
                 return source.Task
             }
             if !response.Content.IsBuffered {
@@ -1043,8 +1043,8 @@ public class HttpContext : Disposable {
                 cancellation.CancelAfter(Duration.FromTicks(((long)owner.Settings.WriteMilliseconds + 1L) * 10000L))
             }
             SendNext()
-        } else if let Error(reason) = encoded {
-            Finish(Error(reason))
+        } else if let Failure(reason) = encoded {
+            Finish(Failure(reason))
         }
         return source.Task
     }
@@ -1097,7 +1097,7 @@ public class HttpContext : Disposable {
 
     private func SendNext() {
         if !closed && !callerToken.IsCancellationRequested && deadline.IsExpired {
-            Finish(Error(HttpError.TimedOut))
+            Finish(Failure(HttpError.TimedOut))
             return
         }
         if closed || token.IsCancellationRequested {
@@ -1107,7 +1107,7 @@ public class HttpContext : Disposable {
             return
         }
         if deadline.IsExpired {
-            Finish(Error(HttpError.TimedOut))
+            Finish(Failure(HttpError.TimedOut))
             return
         }
         if sent == outgoing.Length && remainingContent > 0 {
@@ -1122,7 +1122,7 @@ public class HttpContext : Disposable {
                     readingContent = bodyRead
                     bodyRead.OnCompleted(self.OnContentRead)
                 } else {
-                    Finish(Error(HttpError.InvalidRequest("Missing response content")))
+                    Finish(Failure(HttpError.InvalidRequest("Missing response content")))
                 }
             }
             return
@@ -1158,7 +1158,7 @@ public class HttpContext : Disposable {
         if readingContent is Task<Result<int, HttpError>> pending {
             readingContent = null
             if !closed && !callerToken.IsCancellationRequested && deadline.IsExpired {
-                Finish(Error(HttpError.TimedOut))
+                Finish(Failure(HttpError.TimedOut))
                 return
             }
             if pending.IsCancelled || closed || token.IsCancellationRequested {
@@ -1170,8 +1170,8 @@ public class HttpContext : Disposable {
                 contentCount = count
                 contentOffset = 0
                 SendNext()
-            } else if let Error(reason) = pending.GetResult() {
-                Finish(Error(reason))
+            } else if let Failure(reason) = pending.GetResult() {
+                Finish(Failure(reason))
             }
         }
     }
@@ -1189,7 +1189,7 @@ public class HttpContext : Disposable {
         if let Some(pending) = transfer {
             transfer = None()
             if !closed && !callerToken.IsCancellationRequested && deadline.IsExpired {
-                Finish(Error(HttpError.TimedOut))
+                Finish(Failure(HttpError.TimedOut))
                 return
             }
             if pending.IsCancelled || closed || token.IsCancellationRequested {
@@ -1199,12 +1199,12 @@ public class HttpContext : Disposable {
                 return
             }
             if deadline.IsExpired {
-                Finish(Error(HttpError.TimedOut))
+                Finish(Failure(HttpError.TimedOut))
                 return
             }
             if let Ok(count) = pending.GetResult() {
                 if count == 0 {
-                    Finish(Error(HttpError.Protocol("Response send made no progress")))
+                    Finish(Failure(HttpError.Protocol("Response send made no progress")))
                     return
                 }
                 if sent == outgoing.Length && remainingContent > 0 {
@@ -1214,8 +1214,8 @@ public class HttpContext : Disposable {
                     sent += count
                 }
                 SendNext()
-            } else if let Error(reason) = pending.GetResult() {
-                Finish(Error(reason))
+            } else if let Failure(reason) = pending.GetResult() {
+                Finish(Failure(reason))
             }
         }
     }
@@ -1310,7 +1310,7 @@ internal class HttpServerExchange {
         if cancelled {
             _ = source.Cancel()
         } else {
-            _ = source.Complete(Error(reason))
+            _ = source.Complete(Failure(reason))
         }
     }
 
@@ -1331,7 +1331,7 @@ internal class HttpServerExchange {
                     authentication = handshake
                     handshake.OnCompleted(self.OnAuthenticated)
                 } else { ReceiveNext() }
-            } else if let Error(reason) = pending.GetResult() {
+            } else if let Failure(reason) = pending.GetResult() {
                 owner.ListenerFailed(HttpError.Transport(reason))
                 Fail(HttpError.Transport(reason))
             }
@@ -1344,7 +1344,7 @@ internal class HttpServerExchange {
         if authentication is Task<Result<unit, HttpError>> pending {
             authentication = null
             if pending.IsCancelled { Fail(HttpError.InvalidRequest("TLS cancelled")); return }
-            if let Error(error) = pending.GetResult() { Fail(error); return }
+            if let Failure(error) = pending.GetResult() { Fail(error); return }
             ReceiveNext()
         }
     }
@@ -1398,7 +1398,7 @@ internal class HttpServerExchange {
                     Fail(HttpError.Protocol("EOF before complete request"))
                     return
                 }
-                if let Error(reason) = decoder.Push(received[0..count]) {
+                if let Failure(reason) = decoder.Push(received[0..count]) {
                     Fail(reason)
                     return
                 }
@@ -1440,7 +1440,7 @@ internal class HttpServerExchange {
                     }
                     ReceiveNext()
                 }
-            } else if let Error(reason) = pending.GetResult() {
+            } else if let Failure(reason) = pending.GetResult() {
                 Fail(reason)
             }
         }
@@ -1582,8 +1582,8 @@ internal class HttpServeOperation {
                 if stopping {
                     Cancel()
                 }
-            } else if let Error(reason) = pending.GetResult() {
-                Finish(Error(reason))
+            } else if let Failure(reason) = pending.GetResult() {
+                Finish(Failure(reason))
             }
         }
     }
@@ -1608,8 +1608,8 @@ internal class HttpServeOperation {
                 Cancel()
                 return
             }
-            if let Error(reason) = pending.GetResult() {
-                Finish(Error(reason))
+            if let Failure(reason) = pending.GetResult() {
+                Finish(Failure(reason))
                 return
             }
             if let Some(active) = context {
@@ -1648,8 +1648,8 @@ internal class HttpServeOperation {
                     sending = Some(result)
                     result.OnCompleted(self.OnSent)
                 }
-            } else if let Error(reason) = pending.GetResult() {
-                Finish(Error(reason))
+            } else if let Failure(reason) = pending.GetResult() {
+                Finish(Failure(reason))
             }
         }
     }
@@ -1713,7 +1713,7 @@ internal class HttpServerRun {
         }
         registration = null
         if let Some(error) = failure {
-            _ = source.Complete(Error(error))
+            _ = source.Complete(Failure(error))
         } else if token.IsCancellationRequested {
             _ = source.Cancel()
         } else {
@@ -1751,7 +1751,7 @@ internal class HttpServerLane {
                 if !server.IsClosed {
                     server.RecordFailure(HttpError.Handler("Request handler cancelled"))
                 }
-            } else if let Error(error) = operation.GetResult() {
+            } else if let Failure(error) = operation.GetResult() {
                 if !server.IsClosed {
                     server.RecordFailure(error)
                 }

@@ -59,12 +59,12 @@ func Main() {
         } else {
             System.Fail("Property read failed")
         }
-        Check(count.SetValue(report, "wrong") is Error(ReflectionError.InvalidValue))
-        Check(count.SetValue(report, null) is Error(ReflectionError.InvalidValue))
-        Check(count.GetValue(null) is Error(ReflectionError.InvalidReceiver))
-        Check(Property("ReadOnly").SetValue(report, 1) is Error(ReflectionError.MissingAccessor))
-        Check(typeof(int).CreateInstance() is Error(ReflectionError.UnsupportedType))
-        Check(typeof(Locked).CreateInstance() is Error(ReflectionError.AccessDenied))
+        Check(count.SetValue(report, "wrong") is Failure(ReflectionError.InvalidValue))
+        Check(count.SetValue(report, null) is Failure(ReflectionError.InvalidValue))
+        Check(count.GetValue(null) is Failure(ReflectionError.InvalidReceiver))
+        Check(Property("ReadOnly").SetValue(report, 1) is Failure(ReflectionError.MissingAccessor))
+        Check(typeof(int).CreateInstance() is Failure(ReflectionError.UnsupportedType))
+        Check(typeof(Locked).CreateInstance() is Failure(ReflectionError.AccessDenied))
         let restricted = Property("Restricted")
         Check(restricted.MetadataToken is Some(let token) && token != 0)
         Check(restricted.GetSetMethod() is None)
@@ -73,7 +73,7 @@ func Main() {
         } else {
             System.Fail("Missing private setter metadata")
         }
-        Check(restricted.SetValue(report, 1) is Error(ReflectionError.AccessDenied))
+        Check(restricted.SetValue(report, 1) is Failure(ReflectionError.AccessDenied))
         let name = Property("Name")
         Check(name.SetValue(report, null) is Ok(_))
         if let Ok(nullableValue) = name.GetValue(report) {

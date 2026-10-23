@@ -42,10 +42,10 @@ func Main() -> int {
     if !slice.Equals("é") {
         return 12
     }
-    let Error(InvalidBoundary) = text.SliceUtf8(2, 1) else {
+    let Failure(InvalidBoundary) = text.SliceUtf8(2, 1) else {
         return 13
     }
-    let Error(OutOfRange) = text.SliceUtf8(-1, 1) else {
+    let Failure(OutOfRange) = text.SliceUtf8(-1, 1) else {
         return 14
     }
     let values = ["a", "é", "", "🙂"]

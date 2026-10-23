@@ -17,13 +17,13 @@ public struct Int64 : Number, Formattable, EquatableTo<long> {
         }
         let status = neoCLR.Runtime.UnpackValue<byte>(payload)
         if status == 1 {
-            return Error(NumberParseError.InvalidFormat())
+            return Failure(NumberParseError.InvalidFormat())
         }
         if status == 2 {
-            return Error(NumberParseError.Overflow())
+            return Failure(NumberParseError.Overflow())
         }
         System.Fail("invalid native parse status")
-        return Error(NumberParseError.InvalidFormat())
+        return Failure(NumberParseError.InvalidFormat())
     }
 
     func ToString() -> string {

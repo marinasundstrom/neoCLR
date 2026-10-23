@@ -34,7 +34,7 @@ public class DocumentReader {
     private func Slice(start: int) -> Result<string, string> {
         match source.SliceUtf8(start, position - start) {
             Ok(let text) => return Ok(text)
-            Error(_) => return Error("Invalid token boundary")
+            Failure(_) => return Failure("Invalid token boundary")
         }
     }
 
@@ -42,7 +42,7 @@ public class DocumentReader {
         Skip()
         let start = position
         if !Take((byte)34) {
-            return Error("Expected string")
+            return Failure("Expected string")
         }
         var escaped = false
         while position < bytes.Count {
@@ -57,14 +57,14 @@ public class DocumentReader {
                 return ReadMessage(token)
             }
         }
-        return Error("Unclosed string")
+        return Failure("Unclosed string")
     }
 
     private func Value(depth: int) -> Result<JsonValue, string> {
         Skip()
         nodes += 1
         if nodes > 32 || position == bytes.Count {
-            return Error("Missing value or node limit exceeded")
+            return Failure("Missing value or node limit exceeded")
         }
         let first = bytes[position]
         if first == 34 {
@@ -73,7 +73,7 @@ public class DocumentReader {
         }
         if first == 123 || first == 91 {
             if depth >= 4 {
-                return Error("Container depth exceeds four")
+                return Failure("Container depth exceeds four")
             }
             position += 1
             let objectValue = first == 123
@@ -89,7 +89,7 @@ public class DocumentReader {
                 if objectValue {
                     name = ReadString()?
                     if !Take((byte)58) {
-                        return Error("Expected colon")
+                        return Failure("Expected colon")
                     }
                 }
                 let child = Value(depth + 1)?
@@ -100,7 +100,7 @@ public class DocumentReader {
                 }
                 containerClosed = Take(closing)
                 if !containerClosed && !Take((byte)44) {
-                    return Error("Expected comma or container end")
+                    return Failure("Expected comma or container end")
                 }
             }
             return Ok(result)
@@ -131,7 +131,7 @@ public class DocumentReader {
         let result = Value(0)?
         Skip()
         if position != bytes.Count {
-            return Error("Trailing content")
+            return Failure("Trailing content")
         }
         return Ok(result)
     }
@@ -139,7 +139,7 @@ public class DocumentReader {
 
 public func ReadDocument(text: string) -> Result<JsonValue, string> {
     if text.GetUtf8ByteCount() > 128 {
-        return Error("Document exceeds 128 UTF-8 bytes")
+        return Failure("Document exceeds 128 UTF-8 bytes")
     }
     return DocumentReader(text).Read()
 }
@@ -155,7 +155,7 @@ public class DocumentWriter {
 
     private func Append(text: string) -> Result<unit, string> {
         if text.GetUtf8ByteCount() > 128 - output.GetUtf8ByteCount() {
-            return Error("Document exceeds 128 UTF-8 bytes")
+            return Failure("Document exceeds 128 UTF-8 bytes")
         }
         output = String.Concat(output, text)
         return Ok(())
@@ -164,7 +164,7 @@ public class DocumentWriter {
     private func Value(value: JsonValue, depth: int) -> Result<unit, string> {
         nodes += 1
         if nodes > 32 {
-            return Error("Document exceeds 32 values")
+            return Failure("Document exceeds 32 values")
         }
         if value is JsonString {
             let text = value.AsString()?
@@ -186,7 +186,7 @@ public class DocumentWriter {
             return Append("null")
         }
         if depth >= 4 {
-            return Error("Container depth exceeds four (or cyclic tree)")
+            return Failure("Container depth exceeds four (or cyclic tree)")
         }
         let objectValue = value is JsonObject
         if objectValue {

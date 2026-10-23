@@ -17,6 +17,6 @@ func Main() {
             WriteLine("Graphemes:")
             WriteLine(text.Length)
         }
-        Error(let message) => WriteLine(message)
+        Failure(let message) => WriteLine(message)
     }
 }

@@ -10,7 +10,7 @@ import System.Text.*
 func Parse(text: string) -> Path {
     return match Path.Parse(text) {
         Ok(let path) => path
-        Error(_) => {
+        Failure(_) => {
             System.Fail("Invalid sample path")
             Parse("/")
         }
@@ -21,8 +21,8 @@ async func WriteMessage(output: OutputStream) -> Task<Result<unit, StreamError>>
     let writer = StreamWriter(output, true)
     let written = await writer.Write("Hello, värld!")
     writer.Close()
-    if let Error(error) = written {
-        return Error(error)
+    if let Failure(error) = written {
+        return Failure(error)
     }
     return await output.Flush()
 }
@@ -30,7 +30,7 @@ async func WriteMessage(output: OutputStream) -> Task<Result<unit, StreamError>>
 func ShowText(prefix: string, result: Result<string, TextReadError>) {
     match result {
         Ok(let text) => Console.WriteLine(prefix + text)
-        Error(let error) => System.Fail(error.ToString())
+        Failure(let error) => System.Fail(error.ToString())
     }
 }
 
@@ -41,10 +41,10 @@ async func FileAccess(file: File) -> Task<()> {
             output.Close()
             match written {
                 Ok(_) => Console.WriteLine("Created " + file.Name)
-                Error(let error) => System.Fail(error.ToString())
+                Failure(let error) => System.Fail(error.ToString())
             }
         }
-        Error(let error) => System.Fail(error.ToString())
+        Failure(let error) => System.Fail(error.ToString())
     }
     match file.OpenRead() {
         Ok(let input) => {
@@ -63,15 +63,15 @@ async func FileAccess(file: File) -> Task<()> {
                         again.Close()
                         ShowText("Re-read after seek: ", reread)
                     }
-                    Error(let error) => System.Fail(error.ToString())
+                    Failure(let error) => System.Fail(error.ToString())
                 }
             }
             input.Close()
         }
-        Error(let error) => System.Fail(error.ToString())
+        Failure(let error) => System.Fail(error.ToString())
     }
     match file.CreateNew() {
-        Error(let error) => Console.WriteLine("Existing file: " + error.ToString())
+        Failure(let error) => Console.WriteLine("Existing file: " + error.ToString())
         Ok(let unexpected) => {
             unexpected.Close()
             System.Fail("Exclusive creation replaced a file")
@@ -84,7 +84,7 @@ async func Explore(directory: Directory) -> Task<()> {
     // FileAt describes a destination; CreateNew performs exclusive creation.
     match directory.FileAt("message.txt") {
         Ok(let file) => await FileAccess(file)
-        Error(let error) => System.Fail(error.ToString())
+        Failure(let error) => System.Fail(error.ToString())
     }
     match directory.GetItems(8) {
         Ok(let items) => {
@@ -97,18 +97,18 @@ async func Explore(directory: Directory) -> Task<()> {
                 }
             }
         }
-        Error(let error) => System.Fail(error.ToString())
+        Failure(let error) => System.Fail(error.ToString())
     }
     match directory.GetDirectory("examples") {
         Ok(let child) => Console.WriteLine("Directory: " + child.Path.Text)
-        Error(let error) => System.Fail(error.ToString())
+        Failure(let error) => System.Fail(error.ToString())
     }
     match directory.GetItem(Parse("message.txt")) {
         Ok(let item) => Console.WriteLine("Item: " + item.Name)
-        Error(let error) => System.Fail(error.ToString())
+        Failure(let error) => System.Fail(error.ToString())
     }
     match directory.GetFile("missing.txt") {
-        Error(let error) => Console.WriteLine("Missing file: " + error.ToString())
+        Failure(let error) => Console.WriteLine("Missing file: " + error.ToString())
         Ok(_) => System.Fail("Unexpected fixture file")
     }
     return ()
@@ -118,7 +118,7 @@ async func Main() -> Task<()> {
     let provider: StorageProvider = FileSystem("storage-demo")
     match provider.GetDirectory(Parse("/")) {
         Ok(let directory) => await Explore(directory)
-        Error(let error) => System.Fail(error.ToString())
+        Failure(let error) => System.Fail(error.ToString())
     }
     return ()
 }

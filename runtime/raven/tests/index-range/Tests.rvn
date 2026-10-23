@@ -160,9 +160,9 @@ func IValidatedAccess() -> Result<unit, TestFailure> {
     } else {
         return Assert.True(false, "Last element missing")
     }
-    _ = Assert.True(values.Slice(Range(2, 1)) is Error(_), "Reversed range")?
-    _ = Assert.True(values.Slice(Range(0, 4)) is Error(_), "Past end range")?
-    _ = Assert.True(Range.All.TryGetOffsetAndLength(-1) is Error(_), "Negative length")?
+    _ = Assert.True(values.Slice(Range(2, 1)) is Failure(_), "Reversed range")?
+    _ = Assert.True(values.Slice(Range(0, 4)) is Failure(_), "Past end range")?
+    _ = Assert.True(Range.All.TryGetOffsetAndLength(-1) is Failure(_), "Negative length")?
     if values.Slice(1..^0) is Ok(let copy) {
         _ = Assert.Equal(2, copy.Length)?
         _ = Assert.Equal(20, copy[0])?
@@ -199,9 +199,9 @@ func KStringSafeAccess() -> Result<unit, TestFailure> {
     _ = Assert.True(text.Get(-1) is None, "Negative")?
     _ = Assert.True(text.Get(2) is None, "End")?
     _ = Assert.True(text.Get(Index.End) is None, "From end zero")?
-    _ = Assert.True(text.Slice(Range(2, 1)) is Error(_), "Reversed")?
-    _ = Assert.True(text.Slice(Range(0, 3)) is Error(_), "Past end")?
-    _ = Assert.True(text.Slice(Range.StartAt(^3)) is Error(_), "Before start")?
+    _ = Assert.True(text.Slice(Range(2, 1)) is Failure(_), "Reversed")?
+    _ = Assert.True(text.Slice(Range(0, 3)) is Failure(_), "Past end")?
+    _ = Assert.True(text.Slice(Range.StartAt(^3)) is Failure(_), "Before start")?
     if text.Get(^1) is Some(let last) {
         _ = Assert.Equal("🙂", last.ToString())?
     } else {
@@ -247,7 +247,7 @@ func MListRanges() -> Result<unit, TestFailure> {
     _ = Assert.Equal(20, list[1])?
     _ = Assert.Equal(0, list[^0..].Length)?
     _ = Assert.True(list.Get(Index.End) is None, "Count rather than capacity")?
-    return Assert.True(list.Slice(0..4) is Error(_), "Range excludes spare capacity")
+    return Assert.True(list.Slice(0..4) is Failure(_), "Range excludes spare capacity")
 }
 
 [Test("Sequence slicing consumes one iterator without indexed reads")]
@@ -271,8 +271,8 @@ func NSequenceSlices() -> Result<unit, TestFailure> {
 func OSequenceBoundaries() -> Result<unit, TestFailure> {
     let observed = ObservedSequence(5)
     let sequence: System.Collections.Sequence<int> = observed
-    _ = Assert.True(sequence.Slice(4..2) is Error(_), "Reversed")?
-    _ = Assert.True(sequence.Slice(..6) is Error(_), "Past end")?
+    _ = Assert.True(sequence.Slice(4..2) is Failure(_), "Reversed")?
+    _ = Assert.True(sequence.Slice(..6) is Failure(_), "Past end")?
     _ = Assert.True(sequence.Get(5) is None, "Invalid index")?
     if sequence.Slice(^0..) is Ok(let copy) {
         _ = Assert.Equal(0, copy.Length)?
@@ -286,7 +286,7 @@ func OSequenceBoundaries() -> Result<unit, TestFailure> {
 func PSequenceShortSource() -> Result<unit, TestFailure> {
     let observed = ObservedSequence(2)
     let sequence: System.Collections.Sequence<int> = observed
-    _ = Assert.True(sequence.Slice(1..4) is Error(_), "Short source")?
+    _ = Assert.True(sequence.Slice(1..4) is Failure(_), "Short source")?
     _ = Assert.Equal(1, observed.Reads)?
     return Assert.Equal(1, observed.Disposed)
 }

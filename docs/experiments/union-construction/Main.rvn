@@ -34,11 +34,11 @@ public class ItemRouteFactory {
                                     if pattern == "/items/{id}" {
                                         let constructors = candidate.GetConstructors()
                                         if constructors.Count != 1 {
-                                            return Error("Expected one case constructor")
+                                            return Failure("Expected one case constructor")
                                         }
                                         let parameters = constructors[0].GetParameters()
                                         if parameters.Count != 1 || parameters[0].Name != "id" || !parameters[0].ParameterType.Equals(typeof(int)) {
-                                            return Error("Expected one Int32 payload")
+                                            return Failure("Expected one Int32 payload")
                                         }
                                         for carrier in routes.GetConstructors() {
                                             let payloads = carrier.GetParameters()
@@ -54,7 +54,7 @@ public class ItemRouteFactory {
                 }
             }
         }
-        return Error("Item route constructors missing")
+        return Failure("Item route constructors missing")
     }
 
     func Create(id: int) -> Result<CatalogRoutes, ReflectionError> {
@@ -63,7 +63,7 @@ public class ItemRouteFactory {
         if route is CatalogRoutes value {
             return Ok(value)
         }
-        return Error(ReflectionError.InvalidResultType)
+        return Failure(ReflectionError.InvalidResultType)
     }
 }
 
@@ -81,7 +81,7 @@ public class Locked {
 func Main() {
     let factory = match ItemRouteFactory.Prepare() {
         Ok(let value) => value
-        Error(let reason) => {
+        Failure(let reason) => {
             System.Fail(reason)
         }
     }
@@ -100,11 +100,11 @@ func Main() {
         return
     }
     Check(((Product)value).Id == 19, "Reference construction")
-    Check(constructor.Invoke("19") is Error(ReflectionError.InvalidArguments), "Exact argument type")
-    Check(constructor.Invoke() is Error(ReflectionError.InvalidArguments), "Exact arity")
-    Check(constructor.Invoke(null) is Error(ReflectionError.InvalidArguments), "Null value rejected")
+    Check(constructor.Invoke("19") is Failure(ReflectionError.InvalidArguments), "Exact argument type")
+    Check(constructor.Invoke() is Failure(ReflectionError.InvalidArguments), "Exact arity")
+    Check(constructor.Invoke(null) is Failure(ReflectionError.InvalidArguments), "Null value rejected")
     let denied = typeof(Locked).GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic)[0]
-    Check(denied.Invoke() is Error(ReflectionError.AccessDenied), "Private constructor rejected")
+    Check(denied.Invoke() is Failure(ReflectionError.AccessDenied), "Private constructor rejected")
     let caseConstructor = typeof(TextRoutes.Item).GetConstructors()[0]
     let Ok(payload) = caseConstructor.Invoke("catalog", 23) else {
         System.Fail("Mixed case constructor failed")

@@ -20,7 +20,7 @@ func Process(product: int) -> Option<System.Void> {
         if amount is .Ok(let ok) {
             WriteLine(ok)
             return Some(())
-        } else if amount is .Error(let error) {
+        } else if amount is .Failure(let error) {
             WriteLine("Price overflow")
         }
     } else if price is .None {

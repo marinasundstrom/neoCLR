@@ -11,7 +11,7 @@ func Main() -> int {
     if empty != 0 {
         return 2
     }
-    let Error(_) = input.Read(buffer, -1, 1) else {
+    let Failure(_) = input.Read(buffer, -1, 1) else {
         return 3
     }
     let Ok(count) = input.Read(buffer, 1, 1) else {
@@ -24,7 +24,7 @@ func Main() -> int {
         Console.WriteLine("End of input")
     }
     input.Close()
-    let Error(_) = input.Read(buffer, 0, 1) else {
+    let Failure(_) = input.Read(buffer, 0, 1) else {
         return 5
     }
     Console.WriteLine("Closed input")

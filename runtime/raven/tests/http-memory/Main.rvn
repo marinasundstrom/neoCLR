@@ -67,7 +67,7 @@ async func CheckBody(server: HttpServer, port: int, chunked: bool, cancel: bool)
         if destination[0] != 9 || destination[1] != 99 || destination[2] != 100 || destination[3] != 9 { return 22 }
         if await input.Read(destination, 1, 2) is not Ok(0) { return 23 }
         if await input.Read(destination, 4, 0) is not Ok(0) { return 24 }
-        if await input.Read(destination, 3, 2) is not Error(StreamError.InvalidRange) { return 25 }
+        if await input.Read(destination, 3, 2) is not Failure(StreamError.InvalidRange) { return 25 }
     }
     context.Close()
     client.Close()

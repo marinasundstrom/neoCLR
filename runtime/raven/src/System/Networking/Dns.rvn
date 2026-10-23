@@ -24,7 +24,7 @@ public class Dns {
     static func GetHostAddressesUntil(hostName: string, deadline: NetworkDeadline, cancellationToken: CancellationToken) -> Task<Result<Sequence<IPAddress>, DnsError>> {
         if !cancellationToken.IsCancellationRequested && deadline.IsExpired {
             let source = Promise<Result<Sequence<IPAddress>, DnsError>>()
-            _ = source.Complete(Error(DnsError.TimedOut))
+            _ = source.Complete(Failure(DnsError.TimedOut))
             return source.Task
         }
         return GetHostAddressesUntil(hostName, deadline.Stamp, cancellationToken)
@@ -96,7 +96,7 @@ internal class DnsCompletion {
             neoCLR.Runtime.DnsLookupUntil(hostName, deadline, self.Complete)
         }
         if neoCLR.Runtime.IsValue<byte>(payload) {
-            _ = source.Complete(Error(Dns.DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload))))
+            _ = source.Complete(Failure(Dns.DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload))))
         } else {
             operation = neoCLR.Runtime.UnpackValue<long>(payload)
             if token.CanBeCancelled {
@@ -122,7 +122,7 @@ internal class DnsCompletion {
             return
         }
         if neoCLR.Runtime.IsValue<byte>(payload) {
-            _ = source.Complete(Error(Dns.DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload))))
+            _ = source.Complete(Failure(Dns.DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload))))
         } else {
             let addresses: Sequence<string> = neoCLR.Runtime.DnsAddresses(payload)
             let values = ArrayList<IPAddress>()
@@ -131,7 +131,7 @@ internal class DnsCompletion {
                 if let Ok(address) = IPAddress.Parse(addresses[index]) {
                     values.Add(address)
                 } else {
-                    _ = source.Complete(Error(DnsError.LookupFailed()))
+                    _ = source.Complete(Failure(DnsError.LookupFailed()))
                     return
                 }
                 index += 1

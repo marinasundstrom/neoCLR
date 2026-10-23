@@ -44,7 +44,7 @@ internal static class HttpText {
     private static func EncodeChunk(text: string) -> Sequence<byte> {
         return match Encodings.Utf8.Encode(text) {
             Ok(let bytes) => bytes
-            Error(_) => {
+            Failure(_) => {
                 System.Fail("Prevalidated HTTP text encoding failed")
                 ArrayList<byte>()
             }
@@ -81,7 +81,7 @@ internal static class HttpText {
                 var backedUp = 0
                 while bytes[offset + count] >= 128 && bytes[offset + count] <= 191 {
                     if backedUp == 3 {
-                        return Error(EncodingError.InvalidUtf8)
+                        return Failure(EncodingError.InvalidUtf8)
                     }
                     count -= 1
                     backedUp += 1
@@ -126,7 +126,7 @@ internal static class HttpText {
                 var backedUp = 0
                 while bytes[offset + count] >= 128 && bytes[offset + count] <= 191 {
                     if backedUp == 3 {
-                        return Error(EncodingError.InvalidUtf8)
+                        return Failure(EncodingError.InvalidUtf8)
                     }
                     count -= 1
                     backedUp += 1

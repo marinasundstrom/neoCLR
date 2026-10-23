@@ -65,11 +65,11 @@ class ServerProbe {
         serving.OnCompleted(() => {
             let result = serving.GetResult()
             if remaining > 2 {
-                if let Error(reason) = result {
+                if let Failure(reason) = result {
                     System.Fail(reason.ToString())
                 }
             } else {
-                if let Error(HttpError.InvalidRequest(_)) = result {
+                if let Failure(HttpError.InvalidRequest(_)) = result {
                     Console.WriteLine("Rejected response")
                 } else {
                     System.Fail("Invalid application response was accepted")

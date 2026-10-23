@@ -53,7 +53,7 @@ call neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageStorageLook
 M00000001_IL_003c:
 call neoCLR.Library.System.Storage.Metadata.RuntimeUnion0(System.Storage.StorageLookupError)
 M00000001_IL_0041:
-call neoCLR.Library.System.Storage.Metadata.RuntimeUnion1(System.Result.Error<System.Storage.StorageLookupError>)
+call neoCLR.Library.System.Storage.Metadata.RuntimeUnion1(System.Result.Failure<System.Storage.StorageLookupError>)
 M00000001_IL_0046:
 ret
 M00000001_IL_0047:
@@ -78,7 +78,7 @@ call neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageStorageLook
 M00000001_IL_0062:
 call neoCLR.Library.System.Storage.Metadata.RuntimeUnion0(System.Storage.StorageLookupError)
 M00000001_IL_0067:
-call neoCLR.Library.System.Storage.Metadata.RuntimeUnion1(System.Result.Error<System.Storage.StorageLookupError>)
+call neoCLR.Library.System.Storage.Metadata.RuntimeUnion1(System.Result.Failure<System.Storage.StorageLookupError>)
 M00000001_IL_006c:
 ret
 M00000001_IL_006d:
@@ -103,7 +103,7 @@ call neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageStorageLook
 M00000001_IL_0088:
 call neoCLR.Library.System.Storage.Metadata.RuntimeUnion0(System.Storage.StorageLookupError)
 M00000001_IL_008d:
-call neoCLR.Library.System.Storage.Metadata.RuntimeUnion1(System.Result.Error<System.Storage.StorageLookupError>)
+call neoCLR.Library.System.Storage.Metadata.RuntimeUnion1(System.Result.Failure<System.Storage.StorageLookupError>)
 M00000001_IL_0092:
 ret
 M00000001_IL_0093:
@@ -128,7 +128,7 @@ call neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageStorageLook
 M00000001_IL_00ae:
 call neoCLR.Library.System.Storage.Metadata.RuntimeUnion0(System.Storage.StorageLookupError)
 M00000001_IL_00b3:
-call neoCLR.Library.System.Storage.Metadata.RuntimeUnion1(System.Result.Error<System.Storage.StorageLookupError>)
+call neoCLR.Library.System.Storage.Metadata.RuntimeUnion1(System.Result.Failure<System.Storage.StorageLookupError>)
 M00000001_IL_00b8:
 ret
 M00000001_IL_00b9:
@@ -153,7 +153,7 @@ call neoCLR.Library.System.Storage.Metadata.RuntimeErrorSystemStorageStorageLook
 M00000001_IL_00d5:
 call neoCLR.Library.System.Storage.Metadata.RuntimeUnion0(System.Storage.StorageLookupError)
 M00000001_IL_00da:
-call neoCLR.Library.System.Storage.Metadata.RuntimeUnion1(System.Result.Error<System.Storage.StorageLookupError>)
+call neoCLR.Library.System.Storage.Metadata.RuntimeUnion1(System.Result.Failure<System.Storage.StorageLookupError>)
 M00000001_IL_00df:
 ret
 M00000001_IL_00e0:

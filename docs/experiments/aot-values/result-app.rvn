@@ -2,21 +2,21 @@ import ParseResult.*
 
 union ParseResult<T, E> {
     case Ok(T)
-    case Error(E)
+    case Failure(E)
 }
 
 func Make(valid: bool) -> ParseResult<int, byte> {
     if valid {
         return ParseResult<int, byte>.Ok(42)
     }
-    return ParseResult<int, byte>.Error((byte)7)
+    return ParseResult<int, byte>.Failure((byte)7)
 }
 
 func Read(item: ParseResult<int, byte>) -> int {
     if let Ok(value) = item {
         return value
     }
-    let Error(error) = item else {
+    let Failure(error) = item else {
         return 0
     }
     return 0 - (int)error

@@ -74,9 +74,9 @@ func RequestAssociation() {
 
     let failed = ReplyHandler(200, "{}", true)
     let failure = HttpClient(failed).Send(request)
-    _ = failed.Completion.Complete(Error(HttpError.Handler("expected")))
+    _ = failed.Completion.Complete(Failure(HttpError.Handler("expected")))
     TaskQueue.Default.Drain()
-    let Error(HttpError.Handler(message)) = failure.GetResult() else {
+    let Failure(HttpError.Handler(message)) = failure.GetResult() else {
         System.Fail("Handler error missing")
     }
     Check(message == "expected")
@@ -130,16 +130,16 @@ func DefaultHeaders() {
     let untouched = ReplyHandler(200, "{}", false)
     let invalidClient = HttpClient(untouched)
     invalidClient.DefaultRequestHeaders = invalid
-    Check(invalidClient.Send(baseRequest).GetResult() is Error(HttpError.InvalidRequest(_)))
+    Check(invalidClient.Send(baseRequest).GetResult() is Failure(HttpError.InvalidRequest(_)))
     Check(untouched.Calls == 0)
     let framing = ArrayList<HttpHeader>()
     framing.Add(HttpHeader("Host", "other.test"))
     invalidClient.DefaultRequestHeaders = framing
-    Check(invalidClient.Send(baseRequest).GetResult() is Error(HttpError.InvalidRequest(_)))
+    Check(invalidClient.Send(baseRequest).GetResult() is Failure(HttpError.InvalidRequest(_)))
     let injected = ArrayList<HttpHeader>()
     injected.Add(HttpHeader("X-Test", "value\r\nInjected: true"))
     invalidClient.DefaultRequestHeaders = injected
-    Check(invalidClient.Send(baseRequest).GetResult() is Error(HttpError.InvalidRequest(_)))
+    Check(invalidClient.Send(baseRequest).GetResult() is Failure(HttpError.InvalidRequest(_)))
     Check(untouched.Calls == 0)
 }
 

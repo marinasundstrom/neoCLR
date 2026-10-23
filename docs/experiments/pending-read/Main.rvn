@@ -25,7 +25,7 @@ async func Consume(read: PendingRead, expected: int) -> Task<unit> {
                 Check(read.ByteAt(2) == 9)
             }
         }
-        Error(_) => {
+        Failure(_) => {
             Check(expected == -1)
             Check(read.ByteAt(1) == 9 && read.ByteAt(2) == 9)
         }

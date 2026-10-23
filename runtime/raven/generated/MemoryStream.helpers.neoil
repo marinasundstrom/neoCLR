@@ -26,14 +26,14 @@ ret
 newobj instance System.IO.StreamError.LimitExceeded::.ctor()
 ret
 .end
-.function neoCLR.Library.System.IO.MemoryStream.RuntimeUnion0(System.IO.StreamError arg0) -> System.Result.Error<System.IO.StreamError>
+.function neoCLR.Library.System.IO.MemoryStream.RuntimeUnion0(System.IO.StreamError arg0) -> System.Result.Failure<System.IO.StreamError>
 ldarg arg0
-newobj instance System.Result.Error<System.IO.StreamError>::.ctor(System.IO.StreamError)
+newobj instance System.Result.Failure<System.IO.StreamError>::.ctor(System.IO.StreamError)
 ret
 .end
-.function neoCLR.Library.System.IO.MemoryStream.RuntimeUnion1(System.Result.Error<System.IO.StreamError> arg0) -> System.Result<Int64,System.IO.StreamError>
+.function neoCLR.Library.System.IO.MemoryStream.RuntimeUnion1(System.Result.Failure<System.IO.StreamError> arg0) -> System.Result<Int64,System.IO.StreamError>
 ldarg arg0
-newobj instance System.Result<Int64,System.IO.StreamError>::.ctor(System.Result.Error<System.IO.StreamError>)
+newobj instance System.Result<Int64,System.IO.StreamError>::.ctor(System.Result.Failure<System.IO.StreamError>)
 ret
 .end
 .function neoCLR.Library.System.IO.MemoryStream.RuntimeUnion2(Int64 arg0) -> System.Result.Ok<Int64>
@@ -46,9 +46,9 @@ ldarg arg0
 newobj instance System.Result<Int64,System.IO.StreamError>::.ctor(System.Result.Ok<Int64>)
 ret
 .end
-.function neoCLR.Library.System.IO.MemoryStream.RuntimeUnion4(System.Result.Error<System.IO.StreamError> arg0) -> System.Result<Int32,System.IO.StreamError>
+.function neoCLR.Library.System.IO.MemoryStream.RuntimeUnion4(System.Result.Failure<System.IO.StreamError> arg0) -> System.Result<Int32,System.IO.StreamError>
 ldarg arg0
-newobj instance System.Result<Int32,System.IO.StreamError>::.ctor(System.Result.Error<System.IO.StreamError>)
+newobj instance System.Result<Int32,System.IO.StreamError>::.ctor(System.Result.Failure<System.IO.StreamError>)
 ret
 .end
 .function neoCLR.Library.System.IO.MemoryStream.RuntimeUnion5(Int32 arg0) -> System.Result.Ok<Int32>
@@ -61,9 +61,9 @@ ldarg arg0
 newobj instance System.Result<Int32,System.IO.StreamError>::.ctor(System.Result.Ok<Int32>)
 ret
 .end
-.function neoCLR.Library.System.IO.MemoryStream.RuntimeUnion7(System.Result.Error<System.IO.StreamError> arg0) -> System.Result<Void,System.IO.StreamError>
+.function neoCLR.Library.System.IO.MemoryStream.RuntimeUnion7(System.Result.Failure<System.IO.StreamError> arg0) -> System.Result<Void,System.IO.StreamError>
 ldarg arg0
-newobj instance System.Result<Void,System.IO.StreamError>::.ctor(System.Result.Error<System.IO.StreamError>)
+newobj instance System.Result<Void,System.IO.StreamError>::.ctor(System.Result.Failure<System.IO.StreamError>)
 ret
 .end
 .function neoCLR.Library.System.IO.MemoryStream.RuntimeUnion8(Void arg0) -> System.Result.Ok<Void>

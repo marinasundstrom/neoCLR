@@ -9,7 +9,7 @@ func Acknowledge(payload: string) -> Result<string, string> {
     let station = stationValue.AsString()?
     let readings = report.Field("readings")?
     if !(readings is JsonArray) {
-        return Error("Expected readings array")
+        return Failure("Expected readings array")
     }
     let first = readings.Item(0)?
     _ = first.AsInt32()?
@@ -26,7 +26,7 @@ func Acknowledge(payload: string) -> Result<string, string> {
 func StoragePath(text: string) -> Result<System.Storage.Path, string> {
     return match System.Storage.Path.Parse(text) {
         Ok(let path) => Ok(path)
-        Error(_) => Error("Invalid sample path")
+        Failure(_) => Failure("Invalid sample path")
     }
 }
 
@@ -40,10 +40,10 @@ func ReadReport(file: System.Storage.File) -> Result<string, string> {
             reader.Close()
             return match result {
                 Ok(let text) => Ok(text)
-                Error(let error) => Error(error.ToString())
+                Failure(let error) => Failure(error.ToString())
             }
         }
-        Error(let error) => Error(error.ToString())
+        Failure(let error) => Failure(error.ToString())
     }
 }
 
@@ -67,13 +67,13 @@ func WriteReply(output: System.IO.OutputStream, text: string) -> Result<unit, st
                     }
                     offset += written
                 }
-                Error(let error) => return Error(error.ToString())
+                Failure(let error) => return Failure(error.ToString())
             }
         }
     }
     return match output.Flush() {
         Ok(_) => Ok(())
-        Error(let error) => Error(error.ToString())
+        Failure(let error) => Failure(error.ToString())
     }
 }
 
@@ -81,7 +81,7 @@ func Transform(provider: System.Storage.StorageProvider) -> Result<unit, string>
     let sourcePath = StoragePath("report.json")?
     let source = match provider.GetFile(sourcePath) {
         Ok(let file) => file
-        Error(let error) => return Error(error.ToString())
+        Failure(let error) => return Failure(error.ToString())
     }
     let payload = ReadReport(source)?
     // Validate and serialize completely before creating an output file.
@@ -89,11 +89,11 @@ func Transform(provider: System.Storage.StorageProvider) -> Result<unit, string>
     let rootPath = StoragePath("/")?
     let root = match provider.GetDirectory(rootPath) {
         Ok(let directory) => directory
-        Error(let error) => return Error(error.ToString())
+        Failure(let error) => return Failure(error.ToString())
     }
     let destination = match root.FileAt("reply.json") {
         Ok(let file) => file
-        Error(let error) => return Error(error.ToString())
+        Failure(let error) => return Failure(error.ToString())
     }
     return match destination.CreateNew() {
         Ok(let output) => {
@@ -101,7 +101,7 @@ func Transform(provider: System.Storage.StorageProvider) -> Result<unit, string>
             output.Close()
             result
         }
-        Error(let error) => Error(error.ToString())
+        Failure(let error) => Failure(error.ToString())
     }
 }
 
@@ -109,6 +109,6 @@ func Main() {
     let provider: System.Storage.StorageProvider = System.Storage.FileSystem("reports")
     match Transform(provider) {
         Ok(_) => WriteLine("Saved reply.json")
-        Error(let error) => WriteLine("Failed: " + error)
+        Failure(let error) => WriteLine("Failed: " + error)
     }
 }

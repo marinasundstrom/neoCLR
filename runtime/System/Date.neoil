@@ -43,8 +43,8 @@
         ret
         Invalid:
         newobj instance System.Time.InvalidDateError::.ctor()
-        newobj instance System.Result.Error<System.Time.InvalidDateError>::.ctor(System.Time.InvalidDateError)
-        newobj instance System.Result<System.Time.Date,System.Time.InvalidDateError>::.ctor(System.Result.Error<System.Time.InvalidDateError>)
+        newobj instance System.Result.Failure<System.Time.InvalidDateError>::.ctor(System.Time.InvalidDateError)
+        newobj instance System.Result<System.Time.Date,System.Time.InvalidDateError>::.ctor(System.Result.Failure<System.Time.InvalidDateError>)
         ret
     .end
 
@@ -62,8 +62,8 @@
         ret
         Invalid:
         newobj instance System.Time.InvalidDateError::.ctor()
-        newobj instance System.Result.Error<System.Time.InvalidDateError>::.ctor(System.Time.InvalidDateError)
-        newobj instance System.Result<System.Time.Date,System.Time.InvalidDateError>::.ctor(System.Result.Error<System.Time.InvalidDateError>)
+        newobj instance System.Result.Failure<System.Time.InvalidDateError>::.ctor(System.Time.InvalidDateError)
+        newobj instance System.Result<System.Time.Date,System.Time.InvalidDateError>::.ctor(System.Result.Failure<System.Time.InvalidDateError>)
         ret
     .end
 

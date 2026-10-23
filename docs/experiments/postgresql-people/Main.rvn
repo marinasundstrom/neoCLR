@@ -45,7 +45,7 @@ async func Main(arguments: string[]) -> Task<()> {
         System.Fail("Expected an integer port")
     }
     let result = await ReadPeople(port)
-    if let Error(error) = result {
+    if let Failure(error) = result {
         System.Fail(error.ToString())
     }
 }

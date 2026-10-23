@@ -42,14 +42,14 @@ ret
 newobj instance System.Time.TimeZoneError.SystemZoneUnavailable::.ctor()
 ret
 .end
-.function neoCLR.Library.System.Time.TimeZone.RuntimeUnion0(System.Time.TimeZoneError arg0) -> System.Result.Error<System.Time.TimeZoneError>
+.function neoCLR.Library.System.Time.TimeZone.RuntimeUnion0(System.Time.TimeZoneError arg0) -> System.Result.Failure<System.Time.TimeZoneError>
 ldarg arg0
-newobj instance System.Result.Error<System.Time.TimeZoneError>::.ctor(System.Time.TimeZoneError)
+newobj instance System.Result.Failure<System.Time.TimeZoneError>::.ctor(System.Time.TimeZoneError)
 ret
 .end
-.function neoCLR.Library.System.Time.TimeZone.RuntimeUnion1(System.Result.Error<System.Time.TimeZoneError> arg0) -> System.Result<System.Time.TimeZone,System.Time.TimeZoneError>
+.function neoCLR.Library.System.Time.TimeZone.RuntimeUnion1(System.Result.Failure<System.Time.TimeZoneError> arg0) -> System.Result<System.Time.TimeZone,System.Time.TimeZoneError>
 ldarg arg0
-newobj instance System.Result<System.Time.TimeZone,System.Time.TimeZoneError>::.ctor(System.Result.Error<System.Time.TimeZoneError>)
+newobj instance System.Result<System.Time.TimeZone,System.Time.TimeZoneError>::.ctor(System.Result.Failure<System.Time.TimeZoneError>)
 ret
 .end
 .function neoCLR.Library.System.Time.TimeZone.RuntimeUnion2(System.Time.TimeZone arg0) -> System.Result.Ok<System.Time.TimeZone>
@@ -73,9 +73,9 @@ ldarg arg0
 call instance System.Result.Ok<System.Time.TimeOffset>::get_Value()
 ret
 .end
-.function neoCLR.Library.System.Time.TimeZone.RuntimeUnion6(System.Result.Error<System.Time.TimeZoneError> arg0) -> System.Result<System.Time.TimeOffset,System.Time.TimeZoneError>
+.function neoCLR.Library.System.Time.TimeZone.RuntimeUnion6(System.Result.Failure<System.Time.TimeZoneError> arg0) -> System.Result<System.Time.TimeOffset,System.Time.TimeZoneError>
 ldarg arg0
-newobj instance System.Result<System.Time.TimeOffset,System.Time.TimeZoneError>::.ctor(System.Result.Error<System.Time.TimeZoneError>)
+newobj instance System.Result<System.Time.TimeOffset,System.Time.TimeZoneError>::.ctor(System.Result.Failure<System.Time.TimeZoneError>)
 ret
 .end
 .function neoCLR.Library.System.Time.TimeZone.RuntimeUnion7(System.Time.TimeOffset arg0) -> System.Result.Ok<System.Time.TimeOffset>
@@ -104,9 +104,9 @@ ldarg arg1
 call instance System.Result<System.Time.ZonedDateTime,System.Time.TimeZoneError>::TryGetOutput(System.Time.ZonedDateTime&)
 ret
 .end
-.function neoCLR.Library.System.Time.TimeZone.RuntimeUnion12(System.Result.Error<System.Time.TimeZoneError> arg0) -> System.Result<System.Time.LocalTimeMapping,System.Time.TimeZoneError>
+.function neoCLR.Library.System.Time.TimeZone.RuntimeUnion12(System.Result.Failure<System.Time.TimeZoneError> arg0) -> System.Result<System.Time.LocalTimeMapping,System.Time.TimeZoneError>
 ldarg arg0
-newobj instance System.Result<System.Time.LocalTimeMapping,System.Time.TimeZoneError>::.ctor(System.Result.Error<System.Time.TimeZoneError>)
+newobj instance System.Result<System.Time.LocalTimeMapping,System.Time.TimeZoneError>::.ctor(System.Result.Failure<System.Time.TimeZoneError>)
 ret
 .end
 .function neoCLR.Library.System.Time.TimeZone.RuntimeUnion13(System.Result<System.Time.ZonedDateTime,System.Time.TimeZoneError>& arg0,out System.Time.TimeZoneError& arg1) -> Boolean

@@ -22,13 +22,13 @@ func Main() -> int {
     if result != text || total != 7 { return 4 }
     let ascii = Encodings.Ascii
     match ascii.Encode(text) {
-        Error(EncodingError.UnrepresentableText) => {}
+        Failure(EncodingError.UnrepresentableText) => {}
         _ => return 5
     }
     let broken = encoding.CreateDecoder()
     let prefix: byte[] = [(byte)240]
     match broken.Decode(prefix, 0, 1, true) {
-        Error(EncodingError.InvalidUtf8) => {}
+        Failure(EncodingError.InvalidUtf8) => {}
         _ => return 6
     }
     return 42

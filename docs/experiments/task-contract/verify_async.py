@@ -98,11 +98,11 @@ public async func Read(input: Task<Result<int, string>>) -> Task<Result<int, str
     var answer = source.Task
     queue.Run(() => {
         answer = Read(source.Task)
-        source.Complete(Error("Unavailable"))
+        source.Complete(Failure("Unavailable"))
     })
     match answer.GetResult() {
         Ok(_) => System.Fail("Failure was lost")
-        Error(let message) => Check(message == "Unavailable")
+        Failure(let message) => Check(message == "Unavailable")
     }
 '''),
     'Nested async composition': ('''
@@ -146,12 +146,12 @@ public async func Read(initial: Result<int, string>, input: Task<int>) -> Task<R
     let input = Promise<int>(queue)
     let placeholder = Promise<Result<int, string>>(queue)
     var answer = placeholder.Task
-    queue.Run(() => { answer = Read(Error("early"), input.Task) })
+    queue.Run(() => { answer = Read(Failure("early"), input.Task) })
     Check(answer.IsCompleted)
     Check(!input.Task.IsCompleted)
     match answer.GetResult() {
         Ok(_) => System.Fail("Failure was lost")
-        Error(let message) => Check(message == "early")
+        Failure(let message) => Check(message == "early")
     }
 ''')
 cases['Nested queue scopes restore outer context'] = ('''
@@ -205,15 +205,15 @@ public async func Outer(input: Task<PAYLOAD>, effects: Effects) -> Task<PAYLOAD>
 """.replace('PAYLOAD', payload)
     .replace('BEFORE', 'source.Cancel()' if timing == 'immediate' else '')
     .replace('AFTER', '' if timing == 'immediate' else 'Check(!answer.IsCompleted)\n    source.Cancel()\n    queue.Drain()')
-    .replace('DEFAULT', {'int': '42', 'Result<int, string>': 'Error("ordinary")', 'unit': '()'}[payload])))
+    .replace('DEFAULT', {'int': '42', 'Result<int, string>': 'Failure("ordinary")', 'unit': '()'}[payload])))
 
 # Await completes first; postfix propagation then handles the Result.
 for timing in ('immediate', 'resumed'):
     for outcome in ('Ok', 'Error', 'Cancelled'):
-        complete = {'Ok': 'source.Complete(Ok(41))', 'Error': 'source.Complete(Error("unavailable"))', 'Cancelled': 'source.Cancel()'}[outcome]
+        complete = {'Ok': 'source.Complete(Ok(41))', 'Error': 'source.Complete(Failure("unavailable"))', 'Cancelled': 'source.Cancel()'}[outcome]
         check = {
             'Ok': 'if answer.GetResult() is Ok(let value) { Check(value == 42) } else { System.Fail("Expected Ok") }',
-            'Error': 'if answer.GetResult() is Error(let message) { Check(message == "unavailable") } else { System.Fail("Expected Error") }',
+            'Error': 'if answer.GetResult() is Failure(let message) { Check(message == "unavailable") } else { System.Fail("Expected Error") }',
             'Cancelled': 'Check(answer.IsCancelled)',
         }[outcome]
         cases[f'{timing} combined awaited propagation {outcome}'] = ("""

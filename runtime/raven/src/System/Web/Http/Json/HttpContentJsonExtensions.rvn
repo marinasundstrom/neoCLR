@@ -23,8 +23,8 @@ public extension HttpContentJsonExtensions for HttpContent {
     /// Buffered conversion is synchronous and cannot be interrupted once started.
     func ReadFromJson<T>(cancellationToken: CancellationToken) -> Task<Result<T, JsonError>> {
         if !cancellationToken.IsCancellationRequested && !self.IsBuffered {
-            if self.IsDisposed || self.BeginUpload() is Error(_) {
-                return Task.FromResult<Result<T, JsonError>>(Result<T, JsonError>.Error(JsonError.Read(TextReadError.IoFailure)))
+            if self.IsDisposed || self.BeginUpload() is Failure(_) {
+                return Task.FromResult<Result<T, JsonError>>(Result<T, JsonError>.Failure(JsonError.Read(TextReadError.IoFailure)))
             }
             if let Some(stream) = self.TryGetStream() {
                 return JsonSerializer.Deserialize<T>(HttpContentTextInput(self, stream, cancellationToken))
@@ -47,8 +47,8 @@ public extension HttpContentJsonExtensions for HttpContent {
     /// Reads JSON using a runtime type; cancellation applies to asynchronous stream reads.
     func ReadFromJson(type: TypeInfo, cancellationToken: CancellationToken) -> Task<Result<Object, JsonError>> {
         if !cancellationToken.IsCancellationRequested && !self.IsBuffered {
-            if self.IsDisposed || self.BeginUpload() is Error(_) {
-                return Task.FromResult<Result<Object, JsonError>>(Result<Object, JsonError>.Error(JsonError.Read(TextReadError.IoFailure)))
+            if self.IsDisposed || self.BeginUpload() is Failure(_) {
+                return Task.FromResult<Result<Object, JsonError>>(Result<Object, JsonError>.Failure(JsonError.Read(TextReadError.IoFailure)))
             }
             if let Some(stream) = self.TryGetStream() {
                 return JsonSerializer.Deserialize(HttpContentTextInput(self, stream, cancellationToken), type)
@@ -71,8 +71,8 @@ public extension HttpContentJsonExtensions for HttpContent {
     /// Parses a JSON DOM; cancellation applies to asynchronous stream reads.
     func ReadJsonNode(cancellationToken: CancellationToken) -> Task<Result<JsonValue, JsonError>> {
         if !cancellationToken.IsCancellationRequested && !self.IsBuffered {
-            if self.IsDisposed || self.BeginUpload() is Error(_) {
-                return Task.FromResult<Result<JsonValue, JsonError>>(Result<JsonValue, JsonError>.Error(JsonError.Read(TextReadError.IoFailure)))
+            if self.IsDisposed || self.BeginUpload() is Failure(_) {
+                return Task.FromResult<Result<JsonValue, JsonError>>(Result<JsonValue, JsonError>.Failure(JsonError.Read(TextReadError.IoFailure)))
             }
             if let Some(stream) = self.TryGetStream() {
                 return JsonSerializer.DeserializeNode(HttpContentTextInput(self, stream, cancellationToken))

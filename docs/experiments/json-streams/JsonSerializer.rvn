@@ -14,7 +14,7 @@ class JsonSerializer {
         reader.Close()
         return match result {
             Ok(let text) => Deserialize(text)
-            Error(let error) => Error("Read: " + error.ToString())
+            Failure(let error) => Failure("Read: " + error.ToString())
         }
     }
 
@@ -30,7 +30,7 @@ class JsonSerializer {
         writer.Close()
         return match result {
             Ok(_) => Ok(())
-            Error(let error) => Error("Write: " + error.ToString())
+            Failure(let error) => Failure("Write: " + error.ToString())
         }
     }
 }

@@ -40,7 +40,7 @@ module RuntimeHttpSample {
                 System.Fail("HTTP response changed")
             }
             let served = await serving
-            if let Error(error) = served {
+            if let Failure(error) = served {
                 System.Fail(error.ToString())
             }
             count = count + 1

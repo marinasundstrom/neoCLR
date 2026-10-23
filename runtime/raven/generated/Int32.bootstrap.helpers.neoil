@@ -45,24 +45,24 @@ ldarg arg0
 newobj instance System.Result<Int32,System.Int32ParseError>::.ctor(System.Result.Ok<Int32>)
 ret
 .end
-.function neoCLR.Library.System.Int32.RuntimeUnion2(System.Int32ParseError arg0) -> System.Result.Error<System.Int32ParseError>
+.function neoCLR.Library.System.Int32.RuntimeUnion2(System.Int32ParseError arg0) -> System.Result.Failure<System.Int32ParseError>
 ldarg arg0
-newobj instance System.Result.Error<System.Int32ParseError>::.ctor(System.Int32ParseError)
+newobj instance System.Result.Failure<System.Int32ParseError>::.ctor(System.Int32ParseError)
 ret
 .end
-.function neoCLR.Library.System.Int32.RuntimeUnion3(System.Result.Error<System.Int32ParseError> arg0) -> System.Result<Int32,System.Int32ParseError>
+.function neoCLR.Library.System.Int32.RuntimeUnion3(System.Result.Failure<System.Int32ParseError> arg0) -> System.Result<Int32,System.Int32ParseError>
 ldarg arg0
-newobj instance System.Result<Int32,System.Int32ParseError>::.ctor(System.Result.Error<System.Int32ParseError>)
+newobj instance System.Result<Int32,System.Int32ParseError>::.ctor(System.Result.Failure<System.Int32ParseError>)
 ret
 .end
-.function neoCLR.Library.System.Int32.RuntimeUnion4(System.IntegerDivisionError arg0) -> System.Result.Error<System.IntegerDivisionError>
+.function neoCLR.Library.System.Int32.RuntimeUnion4(System.IntegerDivisionError arg0) -> System.Result.Failure<System.IntegerDivisionError>
 ldarg arg0
-newobj instance System.Result.Error<System.IntegerDivisionError>::.ctor(System.IntegerDivisionError)
+newobj instance System.Result.Failure<System.IntegerDivisionError>::.ctor(System.IntegerDivisionError)
 ret
 .end
-.function neoCLR.Library.System.Int32.RuntimeUnion5(System.Result.Error<System.IntegerDivisionError> arg0) -> System.Result<Int32,System.IntegerDivisionError>
+.function neoCLR.Library.System.Int32.RuntimeUnion5(System.Result.Failure<System.IntegerDivisionError> arg0) -> System.Result<Int32,System.IntegerDivisionError>
 ldarg arg0
-newobj instance System.Result<Int32,System.IntegerDivisionError>::.ctor(System.Result.Error<System.IntegerDivisionError>)
+newobj instance System.Result<Int32,System.IntegerDivisionError>::.ctor(System.Result.Failure<System.IntegerDivisionError>)
 ret
 .end
 .function neoCLR.Library.System.Int32.RuntimeUnion6(System.Result.Ok<Int32> arg0) -> System.Result<Int32,System.IntegerDivisionError>

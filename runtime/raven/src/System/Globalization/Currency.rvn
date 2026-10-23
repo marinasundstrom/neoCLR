@@ -79,7 +79,7 @@ public struct Currency : EquatableTo<Currency> {
         if code == "XXX" {
             return Ok(Unspecified)
         }
-        return Error(CurrencyError.UnsupportedCode())
+        return Failure(CurrencyError.UnsupportedCode())
     }
 
     /// Tests currency identity, independently of culture and presentation.

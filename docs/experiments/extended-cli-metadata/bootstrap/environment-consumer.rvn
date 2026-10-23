@@ -20,7 +20,7 @@ func Main() -> int {
                 _ => { return 13 }
             }
         }
-        Error(_) => { return 6 }
+        Failure(_) => { return 6 }
     }
     match HostEnvironment.GetEnvironmentVariable("NEOCLR_BOOTSTRAP_PRESENT") {
         Ok(Some(let value)) => {
@@ -39,7 +39,7 @@ func Main() -> int {
         _ => { return 11 }
     }
     match HostEnvironment.GetEnvironmentVariable("bad=name") {
-        Error(_) => { }
+        Failure(_) => { }
         _ => { return 12 }
     }
     Console.WriteLine("Native source environment passed")

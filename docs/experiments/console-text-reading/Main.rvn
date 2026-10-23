@@ -82,7 +82,7 @@ func Check(condition: bool, message: string) {
 func Text(result: Result<string, TextReadError>, expected: string) {
     match result {
         Ok(let value) => Check(String.CompareOrdinal(value, expected) == 0, "Text bytes")
-        Error(let error) => System.Fail("Unexpected text error: " + error.ToString())
+        Failure(let error) => System.Fail("Unexpected text error: " + error.ToString())
     }
 }
 
@@ -131,7 +131,7 @@ async func Main() -> Task<unit> {
         Text(await reader.ReadToEnd(100), "")
         reader.Close()
         match await reader.PeekChar() {
-            Error(TextReadError.Closed) => { }
+            Failure(TextReadError.Closed) => { }
             _ => System.Fail("Closed peek")
         }
     }
@@ -143,12 +143,12 @@ async func Main() -> Task<unit> {
     Text(await limited.Read(0, 0), "")
     Check(limitedInput.Reads == 0, "Zero read consumed input")
     match await limited.Read(-1) {
-        Error(TextReadError.InvalidRange) => { }
+        Failure(TextReadError.InvalidRange) => { }
         _ => System.Fail("Invalid count")
     }
     Check(limitedInput.Reads == 0, "Invalid read consumed input")
     match await limited.Read(1, 1) {
-        Error(TextReadError.LimitExceeded) => { }
+        Failure(TextReadError.LimitExceeded) => { }
         _ => System.Fail("Expected byte limit")
     }
     Character(await limited.PeekChar(), "é")
@@ -162,7 +162,7 @@ async func Main() -> Task<unit> {
     let first = pendingReader.PeekChar()
     Check(!first.IsCompleted, "Peek did not suspend")
     match await pendingReader.ReadChar() {
-        Error(TextReadError.Busy) => { }
+        Failure(TextReadError.Busy) => { }
         _ => System.Fail("Overlapping read accepted")
     }
     pendingInput.Source.Complete(Ok(0))
@@ -188,13 +188,13 @@ async func Main() -> Task<unit> {
     }
     let pendingWrite = pendingWriter.Write("abc")
     Check(!pendingWrite.IsCompleted, "Write did not suspend")
-    Check(await pendingWriter.Write("overlap") is Error(StreamError.Busy), "Overlapping write")
-    Check(await pendingWriter.Flush() is Error(StreamError.Busy), "Overlapping flush")
+    Check(await pendingWriter.Write("overlap") is Failure(StreamError.Busy), "Overlapping write")
+    Check(await pendingWriter.Flush() is Failure(StreamError.Busy), "Overlapping flush")
     let writeObserved = ObserveWrite(pendingWrite)
     _ = pendingOutput.Source.Cancel()
     await writeObserved
     Check(pendingWrite.IsCancelled, "Write cancellation")
-    Check(await pendingWriter.Write("retry") is Error(StreamError.InvalidEncoding), "Abandoned writer reused")
+    Check(await pendingWriter.Write("retry") is Failure(StreamError.InvalidEncoding), "Abandoned writer reused")
 
     // Standard input is supplied by the runner; all convenience methods share one cursor.
     Character(Console.PeekChar(), "é")

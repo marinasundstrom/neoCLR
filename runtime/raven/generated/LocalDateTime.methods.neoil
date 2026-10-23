@@ -392,7 +392,7 @@ call neoCLR.Library.System.Time.LocalDateTime.RuntimeErrorSystemTimeInvalidDateE
 M00000004_IL_00ce:
 call neoCLR.Library.System.Time.LocalDateTime.RuntimeUnion4(System.Time.InvalidDateError)
 M00000004_IL_00d3:
-call neoCLR.Library.System.Time.LocalDateTime.RuntimeUnion5(System.Result.Error<System.Time.InvalidDateError>)
+call neoCLR.Library.System.Time.LocalDateTime.RuntimeUnion5(System.Result.Failure<System.Time.InvalidDateError>)
 M00000004_IL_00d8:
 ret
 M00000004_IL_00d9:
@@ -413,7 +413,7 @@ call neoCLR.Library.System.Time.LocalDateTime.RuntimeErrorSystemTimeInvalidDateE
 M00000004_IL_00f6:
 call neoCLR.Library.System.Time.LocalDateTime.RuntimeUnion4(System.Time.InvalidDateError)
 M00000004_IL_00fb:
-call neoCLR.Library.System.Time.LocalDateTime.RuntimeUnion5(System.Result.Error<System.Time.InvalidDateError>)
+call neoCLR.Library.System.Time.LocalDateTime.RuntimeUnion5(System.Result.Failure<System.Time.InvalidDateError>)
 M00000004_IL_0100:
 ret
 M00000004_IL_0101:
@@ -509,7 +509,7 @@ call neoCLR.Library.System.Time.LocalDateTime.RuntimeErrorSystemTimeInvalidDateE
 M00000004_IL_0191:
 call neoCLR.Library.System.Time.LocalDateTime.RuntimeUnion4(System.Time.InvalidDateError)
 M00000004_IL_0196:
-call neoCLR.Library.System.Time.LocalDateTime.RuntimeUnion5(System.Result.Error<System.Time.InvalidDateError>)
+call neoCLR.Library.System.Time.LocalDateTime.RuntimeUnion5(System.Result.Failure<System.Time.InvalidDateError>)
 M00000004_IL_019b:
 ret
 M00000004_IL_019c:

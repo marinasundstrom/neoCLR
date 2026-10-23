@@ -29,7 +29,7 @@ class RecordingConnection : SqlConnection {
         if named { Check(statement.ParameterName(0) is Some("id"), "Mapper preserves provider name") }
         return Task.FromResult(Result<SqlResult, SqlError>.Ok(result))
     }
-    func Begin() -> Task<Result<SqlTransaction, SqlError>> => Task.FromResult(Result<SqlTransaction, SqlError>.Error(SqlError.Unsupported("Test connection")))
+    func Begin() -> Task<Result<SqlTransaction, SqlError>> => Task.FromResult(Result<SqlTransaction, SqlError>.Failure(SqlError.Unsupported("Test connection")))
     func Dispose() { Closed = true }
 }
 
@@ -42,12 +42,12 @@ async func Main() -> Task<()> {
     names[0] = "changed"
     values[0] = None
     Check(row.Column(0) is Ok("id"), "Column names copied")
-    Check(row.Int32("id") is Error(_), "Int32 overflow")
+    Check(row.Int32("id") is Failure(_), "Int32 overflow")
     Check(row.Int64("id") is Ok(2147483648L), "Int64 explicit conversion")
-    Check(row.Text(-1) is Error(_), "Negative index")
-    Check(row.Text(1) is Error(_), "Upper index")
-    Check(row.Text("missing") is Error(_), "Missing name")
-    Check(row.Boolean("id") is Error(_), "Boolean conversion rejects integers")
+    Check(row.Text(-1) is Failure(_), "Negative index")
+    Check(row.Text(1) is Failure(_), "Upper index")
+    Check(row.Text("missing") is Failure(_), "Missing name")
+    Check(row.Boolean("id") is Failure(_), "Boolean conversion rejects integers")
     let parameters = ArrayList<SqlValue>()
     parameters.Add(SqlValue.Text("original"))
     let statement = SqlStatement("SELECT $1", parameters)
@@ -69,7 +69,7 @@ async func Main() -> Task<()> {
     rows.Add(row)
     Check(result.Count == 1, "Result rows copied")
     let mapping = SqlMapper.Map<int>(result, value => value.Int32("id"))
-    Check(mapping is Error(_), "Mapping failure is propagated")
+    Check(mapping is Failure(_), "Mapping failure is propagated")
     let good = SqlMapper.Map<long>(result, value => value.Int64("id"))
     let Ok(mapped) = good else { System.Fail("Explicit Int64 map") }
     Check(mapped[0] == 2147483648L, "Explicit Int64 mapping result")

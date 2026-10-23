@@ -142,20 +142,20 @@ cases = {
     let second = Promise<Result<int, string>>(queue)
     var calls = 0
     let result = first.Task.Map((value: Result<int, string>) -> Result<int, string> => {
-        Check(value is Error(_))
+        Check(value is Failure(_))
         calls = calls + 1
         return value
     }).Then((value: Result<int, string>) -> Task<Result<int, string>> => {
-        Check(value is Error(_))
+        Check(value is Failure(_))
         calls = calls + 1
         second.Complete(value)
         return second.Task
     })
-    first.Complete(Error("Unavailable"))
+    first.Complete(Failure("Unavailable"))
     queue.Drain()
     Check(calls == 2)
     Check(result.State == TaskState.Completed)
-    if result.GetResult() is Error(let message) {
+    if result.GetResult() is Failure(let message) {
         Check(message == "Unavailable")
     } else {
         System.Fail("Result was changed")

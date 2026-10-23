@@ -16,7 +16,7 @@ async func Main(arguments: string[]) -> Task<()> {
     let result = await client.Get(arguments[0])
     client.Dispose()
     if mode == "timeout" {
-        let Error(HttpError.TimedOut) = result else { System.Fail("Expected network timeout") }
+        let Failure(HttpError.TimedOut) = result else { System.Fail("Expected network timeout") }
         Console.WriteLine("PASS socket cleanup before timeout acknowledgement")
     } else {
         let Ok(response) = result else { System.Fail("Expected network response") }

@@ -19,8 +19,8 @@
     Failed:
         pop
         newobj System.EnvironmentError
-        newobj.ctor instance System.Result.Error<System.EnvironmentError>::.ctor(System.EnvironmentError)
-        newobj.ctor instance System.Result<String,System.EnvironmentError>::.ctor(System.Result.Error<System.EnvironmentError>)
+        newobj.ctor instance System.Result.Failure<System.EnvironmentError>::.ctor(System.EnvironmentError)
+        newobj.ctor instance System.Result<String,System.EnvironmentError>::.ctor(System.Result.Failure<System.EnvironmentError>)
         ret
     .end
     .method static GetEnvironmentVariable(String name) -> System.Result<System.Option<String>,System.EnvironmentError>
@@ -47,8 +47,8 @@
     Failed:
         pop
         newobj System.EnvironmentError
-        newobj.ctor instance System.Result.Error<System.EnvironmentError>::.ctor(System.EnvironmentError)
-        newobj.ctor instance System.Result<System.Option<String>,System.EnvironmentError>::.ctor(System.Result.Error<System.EnvironmentError>)
+        newobj.ctor instance System.Result.Failure<System.EnvironmentError>::.ctor(System.EnvironmentError)
+        newobj.ctor instance System.Result<System.Option<String>,System.EnvironmentError>::.ctor(System.Result.Failure<System.EnvironmentError>)
         ret
     .end
 .end

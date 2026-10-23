@@ -7,7 +7,7 @@ import NeoClr.Testing.*
 
 // The discovery runner is synchronous. Await these lifecycle tests explicitly.
 func Report(result: Result<unit, TestFailure>, name: string) {
-    if result is Error(_) { System.Fail(name) }
+    if result is Failure(_) { System.Fail(name) }
     Console.WriteLine("PASS " + name)
 }
 

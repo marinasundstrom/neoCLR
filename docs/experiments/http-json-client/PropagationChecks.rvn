@@ -51,17 +51,17 @@ async func Main() -> Task<int> {
     Check(progress.Steps == 2 && progress.Disposed == 1)
 
     let failed = Promise<Result<int, HttpError>>()
-    _ = failed.Complete(Error(HttpError.TimedOut))
+    _ = failed.Complete(Failure(HttpError.TimedOut))
     let httpProgress = Progress()
     let http = Compose(failed.Task, ReadyJson(Ok(2)), httpProgress)
-    let Error(httpError) = await http else {
+    let Failure(httpError) = await http else {
         System.Fail("HTTP residual lost")
     }
     Check(httpError is HttpError && httpProgress.Steps == 0 && httpProgress.Disposed == 1)
 
     let jsonProgress = Progress()
-    let json = Compose(source.Task, ReadyJson(Error(JsonError.Syntax("invalid"))), jsonProgress)
-    let Error(jsonError) = await json else {
+    let json = Compose(source.Task, ReadyJson(Failure(JsonError.Syntax("invalid"))), jsonProgress)
+    let Failure(jsonError) = await json else {
         System.Fail("JSON residual lost")
     }
     Check(jsonError is JsonError && jsonProgress.Steps == 1 && jsonProgress.Disposed == 1)

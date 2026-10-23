@@ -24,10 +24,10 @@ func Main() {
         return
     }
     Check(second == -7 && first == 42, "independent captures")
-    Check(parser.Parse("/missing") is Error(RouteMappingError.NoMatch), "no match")
-    Check(parser.Parse("/items/no") is Error(RouteMappingError.InvalidParameter(_, _)), "invalid parameter")
-    Check(parser.Parse("/items/2147483648") is Error(RouteMappingError.InvalidParameter(_, _)), "overflow")
-    Check(parser.Parse("/items/%2F") is Error(RouteMappingError.InvalidTarget(_)), "invalid target")
+    Check(parser.Parse("/missing") is Failure(RouteMappingError.NoMatch), "no match")
+    Check(parser.Parse("/items/no") is Failure(RouteMappingError.InvalidParameter(_, _)), "invalid parameter")
+    Check(parser.Parse("/items/2147483648") is Failure(RouteMappingError.InvalidParameter(_, _)), "overflow")
+    Check(parser.Parse("/items/%2F") is Failure(RouteMappingError.InvalidTarget(_)), "invalid target")
     let Ok(AppRoutes.GetItem(encoded)) = parser.Parse("/items/%34%32") else {
         System.Fail("Encoded integer failed")
         return
@@ -77,6 +77,6 @@ public func CheckPatterns() {
     Check(names.Count == 1 && names[0] == "id", "Capture names")
     names[0] = "changed"
     Check(parameter.GetParameterNames()[0] == "id", "Capture names are snapshots")
-    Check(RouteUnionMapper.Create(typeof(string)) is Error(_), "Non-union rejected")
-    Check(RouteUnionMapper.Create(typeof(System.Option<int>)) is Error(_), "Generic union rejected")
+    Check(RouteUnionMapper.Create(typeof(string)) is Failure(_), "Non-union rejected")
+    Check(RouteUnionMapper.Create(typeof(System.Option<int>)) is Failure(_), "Generic union rejected")
 }

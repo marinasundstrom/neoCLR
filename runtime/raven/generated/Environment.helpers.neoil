@@ -1,12 +1,12 @@
 ; Generated from runtime/raven/src/System/Environment/Functions.rvn. Regenerate with build_runtime_library.py.
-.function neoCLR.Library.System.Environment.RuntimeUnion0(System.EnvironmentError arg0) -> System.Result.Error<System.EnvironmentError>
+.function neoCLR.Library.System.Environment.RuntimeUnion0(System.EnvironmentError arg0) -> System.Result.Failure<System.EnvironmentError>
 ldarg arg0
-newobj instance System.Result.Error<System.EnvironmentError>::.ctor(System.EnvironmentError)
+newobj instance System.Result.Failure<System.EnvironmentError>::.ctor(System.EnvironmentError)
 ret
 .end
-.function neoCLR.Library.System.Environment.RuntimeUnion1(System.Result.Error<System.EnvironmentError> arg0) -> System.Result<String,System.EnvironmentError>
+.function neoCLR.Library.System.Environment.RuntimeUnion1(System.Result.Failure<System.EnvironmentError> arg0) -> System.Result<String,System.EnvironmentError>
 ldarg arg0
-newobj instance System.Result<String,System.EnvironmentError>::.ctor(System.Result.Error<System.EnvironmentError>)
+newobj instance System.Result<String,System.EnvironmentError>::.ctor(System.Result.Failure<System.EnvironmentError>)
 ret
 .end
 .function neoCLR.Library.System.Environment.RuntimeUnion2(String arg0) -> System.Result.Ok<String>
@@ -19,9 +19,9 @@ ldarg arg0
 newobj instance System.Result<String,System.EnvironmentError>::.ctor(System.Result.Ok<String>)
 ret
 .end
-.function neoCLR.Library.System.Environment.RuntimeUnion4(System.Result.Error<System.EnvironmentError> arg0) -> System.Result<System.Option<String>,System.EnvironmentError>
+.function neoCLR.Library.System.Environment.RuntimeUnion4(System.Result.Failure<System.EnvironmentError> arg0) -> System.Result<System.Option<String>,System.EnvironmentError>
 ldarg arg0
-newobj instance System.Result<System.Option<String>,System.EnvironmentError>::.ctor(System.Result.Error<System.EnvironmentError>)
+newobj instance System.Result<System.Option<String>,System.EnvironmentError>::.ctor(System.Result.Failure<System.EnvironmentError>)
 ret
 .end
 .function neoCLR.Library.System.Environment.RuntimeUnion5() -> System.Option.None

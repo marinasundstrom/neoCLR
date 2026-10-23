@@ -45,7 +45,7 @@ func Check(condition: bool, message: string) {
 func Text(result: Result<string, TextReadError>, expected: string) {
     match result {
         Ok(let value) => Check(String.CompareOrdinal(value, expected) == 0, "Text bytes")
-        Error(let error) => System.Fail("Unexpected text error: " + error.ToString())
+        Failure(let error) => System.Fail("Unexpected text error: " + error.ToString())
     }
 }
 
@@ -94,7 +94,7 @@ func Main() {
         Text(reader.ReadToEnd(100), "")
         reader.Close()
         match reader.PeekChar() {
-            Error(TextReadError.Closed) => { }
+            Failure(TextReadError.Closed) => { }
             _ => System.Fail("Closed peek")
         }
     }
@@ -106,12 +106,12 @@ func Main() {
     Text(limited.Read(0, 0), "")
     Check(limitedInput.Reads == 0, "Zero read consumed input")
     match limited.Read(-1) {
-        Error(TextReadError.InvalidRange) => { }
+        Failure(TextReadError.InvalidRange) => { }
         _ => System.Fail("Invalid count")
     }
     Check(limitedInput.Reads == 0, "Invalid read consumed input")
     match limited.Read(1, 1) {
-        Error(TextReadError.LimitExceeded) => { }
+        Failure(TextReadError.LimitExceeded) => { }
         _ => System.Fail("Expected byte limit")
     }
     Character(limited.PeekChar(), "é")
@@ -143,7 +143,7 @@ func Main() {
         System.Fail("Overlap reader")
     }
     overlap.NewLine = ""
-    Check(overlap.ReadLine(8) is Error(TextReadError.InvalidRange), "Empty delimiter")
+    Check(overlap.ReadLine(8) is Failure(TextReadError.InvalidRange), "Empty delimiter")
     Check(invalidInput.Reads == 0, "Invalid delimiter consumed input")
     overlap.NewLine = "aab"
     Check(overlap.ReadLine(1) is Ok(Some("a")), "Overlapping delimiter prefixes")
@@ -189,24 +189,24 @@ func Main() {
     Check(writer.Write("tail") is Ok(4), "Flush finalized encoder")
     Check(writer.Finish() is Ok(0), "Finish")
     Check(writer.Finish() is Ok(0), "Repeat finish")
-    Check(writer.Write("bad") is Error(StreamError.InvalidEncoding), "Write after finish")
+    Check(writer.Write("bad") is Failure(StreamError.InvalidEncoding), "Write after finish")
     writer.Close()
-    Check(writer.Flush() is Error(StreamError.Closed), "Closed writer")
+    Check(writer.Flush() is Failure(StreamError.Closed), "Closed writer")
     Check(memory.Seek(0) is Ok(0), "leaveOpen")
     let Ok(roundtrip) = SyncStreamReader.Create(memory) else {
         System.Fail("Roundtrip reader creation")
     }
     Text(roundtrip.ReadToEnd(100), "éx\ntail")
     roundtrip.Close()
-    Check(memory.GetLength() is Error(StreamError.Closed), "Reader owns input")
+    Check(memory.GetLength() is Failure(StreamError.Closed), "Reader owns input")
 
     let ascii = MemoryStream()
     let Ok(asciiWriter) = SyncStreamWriter.Create(ascii, Encodings.Ascii) else {
         System.Fail("ASCII writer creation")
     }
     Check(ascii.GetLength() is Ok(0), "Creation wrote bytes")
-    Check(asciiWriter.Write("é") is Error(StreamError.InvalidEncoding), "ASCII rejection")
+    Check(asciiWriter.Write("é") is Failure(StreamError.InvalidEncoding), "ASCII rejection")
     asciiWriter.Close()
-    Check(ascii.GetLength() is Error(StreamError.Closed), "Writer owns output")
+    Check(ascii.GetLength() is Failure(StreamError.Closed), "Writer owns output")
     Console.Write("PASS sync text wrappers\n")
 }

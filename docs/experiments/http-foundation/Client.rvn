@@ -29,7 +29,7 @@ func Validate(result: Result<HttpResponse, HttpError>, size: int, expected: stri
         if response.GetHeaderValues("Link").Count != 0 {
             System.Fail("Informational headers leaked into final response")
         }
-    } else if let Error(reason) = result {
+    } else if let Failure(reason) = result {
         CheckError(reason, expected)
     }
     Console.WriteLine("PASS client")

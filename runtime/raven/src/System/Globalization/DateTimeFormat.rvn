@@ -98,7 +98,7 @@ public class DateTimeFormat {
             return Invariant.FormatDate(date)
         }
         System.Fail("Unsupported Date format")
-        return Error(System.Time.InvalidDateError())
+        return Failure(System.Time.InvalidDateError())
     }
 
     /// Supports empty/G for existing culture precision, O/o for invariant seven-digit precision,
@@ -156,7 +156,7 @@ public class DateTimeFormat {
             return Ok(date + "T" + selected.FormatTime(value.Time, "T"))
         }
         System.Fail("Unsupported LocalDateTime format")
-        return Error(System.Time.InvalidDateError())
+        return Failure(System.Time.InvalidDateError())
     }
 
 }

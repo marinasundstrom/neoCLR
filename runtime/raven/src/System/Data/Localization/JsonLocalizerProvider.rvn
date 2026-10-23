@@ -61,7 +61,7 @@ public class JsonLocalizerProvider {
                 let localizer: Localizer = CatalogueLocalizer(entries)
                 Ok(localizer)
             }
-            Error(let error) => Error(LocalizationError.Json(error))
+            Failure(let error) => Failure(LocalizationError.Json(error))
         }
     }
 
@@ -73,13 +73,13 @@ public class JsonLocalizerProvider {
     async static func Read(input: InputStream) -> Task<Result<Localizer, LocalizationError>> {
         let reader = match StreamReader.Create(input, true) {
             Ok(let value) => value
-            Error(let error) => return Error(LocalizationError.Read(error))
+            Failure(let error) => return Failure(LocalizationError.Read(error))
         }
         let result = await reader.ReadToEnd(65536)
         reader.Close()
         return match result {
             Ok(let text) => Create(text)
-            Error(let error) => Error(LocalizationError.Read(error))
+            Failure(let error) => Failure(LocalizationError.Read(error))
         }
     }
 
@@ -89,7 +89,7 @@ public class JsonLocalizerProvider {
     static func Load(path: string) -> Result<Localizer, LocalizationError> {
         return match ReadAllText(path, 65536) {
             Ok(let text) => Create(text)
-            Error(let error) => Error(LocalizationError.File(error))
+            Failure(let error) => Failure(LocalizationError.File(error))
         }
     }
 
@@ -105,13 +105,13 @@ public class JsonLocalizerProvider {
     /// Missing files yield an empty catalogue if no files exist. Each file has the documented byte and entry limits.
     func Load(culture: Culture, scope: string) -> Result<Localizer, LocalizationError> {
         if scope == "." || scope == ".." {
-            return Error(LocalizationError.InvalidScope)
+            return Failure(LocalizationError.InvalidScope)
         }
         let scopeBytes = scope.Utf8Bytes
         for index in 0..scopeBytes.Length {
             let value = scopeBytes[index]
             if value == 0 || value == 47 || value == 92 || value == 58 {
-                return Error(LocalizationError.InvalidScope)
+                return Failure(LocalizationError.InvalidScope)
             }
         }
         var prefix = directory
@@ -146,7 +146,7 @@ public class JsonLocalizerProvider {
     /// Loads resources for a nominal runtime type using the same simple-name scope as the generic Load overload.
     func Load(culture: Culture, resourceType: TypeInfo) -> Result<Localizer, LocalizationError> {
         if !(resourceType is NominalTypeInfo) {
-            return Error(LocalizationError.InvalidScope)
+            return Failure(LocalizationError.InvalidScope)
         }
         // Native nominal names currently retain their namespace/nesting path.
         // Resource scope is deliberately the final nominal name component.
@@ -160,7 +160,7 @@ public class JsonLocalizerProvider {
         }
         let scope = match name.SliceUtf8(start, bytes.Length - start) {
             Ok(let value) => value
-            Error(_) => return Error(LocalizationError.InvalidScope)
+            Failure(_) => return Failure(LocalizationError.InvalidScope)
         }
         return Load(culture, scope)
     }
@@ -171,8 +171,8 @@ public class JsonLocalizerProvider {
                 let combined: Localizer = FallbackLocalizer(value, fallback)
                 Ok(combined)
             }
-            Error(LocalizationError.File(FileReadError.NotFound)) => Ok(fallback)
-            Error(let error) => Error(error)
+            Failure(LocalizationError.File(FileReadError.NotFound)) => Ok(fallback)
+            Failure(let error) => Failure(error)
         }
     }
 

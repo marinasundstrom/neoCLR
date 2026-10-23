@@ -13,7 +13,7 @@ static class GenericUnionBindings
     {
         var name = "System." + kind + (args.Length == 0 ? "" : "<" + string.Join(',', args) + ">");
         Shapes.TryAdd(name, new(kind, args, name));
-        if (kind == "Result") { Register("Result.Ok", args[0]); Register("Result.Error", args[1]); }
+        if (kind == "Result") { Register("Result.Ok", args[0]); Register("Result.Failure", args[1]); }
         if (kind == "Concurrency.Tasks.TaskOutcome") { Register("Concurrency.Tasks.TaskOutcome.Completed", args[0]); Register("Concurrency.Tasks.TaskOutcome.Cancelled"); }
         if (kind == "Option") { Register("Option.Some", args[0]); Register("Option.None"); }
         return name;
@@ -37,7 +37,7 @@ static class GenericUnionBindings
         {
             var kind = g.ElementType.FullName switch {
                 "System.Result`2" => "Result", "System.Option`1" => "Option",
-                "System.Result/Ok`1" => "Result.Ok", "System.Result/Error`1" => "Result.Error",
+                "System.Result/Ok`1" => "Result.Ok", "System.Result/Failure`1" => "Result.Failure",
                 "System.Concurrency.Tasks.TaskOutcome`1" => "Concurrency.Tasks.TaskOutcome",
                 "System.Concurrency.Tasks.TaskOutcome/Completed`1" => "Concurrency.Tasks.TaskOutcome.Completed",
                 "System.Option/Some`1" => "Option.Some", _ => null
@@ -80,7 +80,7 @@ static class GenericUnionBindings
         if (owner is null || !Shapes.TryGetValue(owner, out var shape)) return null;
         var (args, result) = RuntimeSignatures.Match(reference, definition, Type, allowOpenMethodParameters: ParameterMap is not null);
         var allowed = shape.Kind switch {
-            "Result" => new[] { Register("Result.Ok", shape.Args[0]), Register("Result.Error", shape.Args[1]) },
+            "Result" => new[] { Register("Result.Ok", shape.Args[0]), Register("Result.Failure", shape.Args[1]) },
             "Option" => new[] { Register("Option.Some", shape.Args[0]), Register("Option.None") },
             "Concurrency.Tasks.TaskOutcome" => new[] { Register("Concurrency.Tasks.TaskOutcome.Completed", shape.Args[0]), Register("Concurrency.Tasks.TaskOutcome.Cancelled") },
             "Option.None" or "Concurrency.Tasks.TaskOutcome.Cancelled" => Array.Empty<string>(), _ => new[] { shape.Args[0] }
@@ -96,7 +96,7 @@ static class GenericUnionBindings
         var (args, result) = RuntimeSignatures.Match(reference, definition, Type, allowOpenMethodParameters: ParameterMap is not null);
         var name = reference.Name;
         if (definition.IsVirtual && !definition.IsFinal && reference.Name != "ToString") throw new InvalidDataException("Unexpected union virtual method.");
-        if (shape.Kind is "Result.Ok" or "Result.Error" or "Option.Some" or "Concurrency.Tasks.TaskOutcome.Completed")
+        if (shape.Kind is "Result.Ok" or "Result.Failure" or "Option.Some" or "Concurrency.Tasks.TaskOutcome.Completed")
         {
             if (reference.HasThis && name == "Deconstruct" && result == "void"
                 && args.SequenceEqual(new[] { shape.Args[0] + "&" }) && definition.Parameters[0].IsOut)
@@ -120,10 +120,10 @@ static class GenericUnionBindings
         {
             var payload = shape.Args[0]; var residual = shape.Kind == "Result" ? shape.Args[1] : "Void";
             var first = Register(shape.Kind == "Result" ? "Result.Ok" : shape.Kind == "Option" ? "Option.Some" : "Concurrency.Tasks.TaskOutcome.Completed", payload);
-            var second = shape.Kind == "Result" ? Register("Result.Error", residual) : Register(shape.Kind == "Option" ? "Option.None" : "Concurrency.Tasks.TaskOutcome.Cancelled");
+            var second = shape.Kind == "Result" ? Register("Result.Failure", residual) : Register(shape.Kind == "Option" ? "Option.None" : "Concurrency.Tasks.TaskOutcome.Cancelled");
             if (!reference.HasThis && result == owner && args.Length == 1
                 && (shape.Kind != "Concurrency.Tasks.TaskOutcome" && name == "FromResidual" && args[0] == residual
-                    || shape.Kind == "Result" && (name == "Ok" && args[0] == payload || name == "Error" && args[0] == residual)))
+                    || shape.Kind == "Result" && (name == "Ok" && args[0] == payload || name == "Failure" && args[0] == residual)))
                 return Helper(shape, name, args, result, false, false);
             if (reference.HasThis && args.Length == 0)
             {

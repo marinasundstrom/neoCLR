@@ -30,7 +30,7 @@ fn error(name: &str) -> Value {
     carrier(
         "System.Result<String,System.Text.Utf8SliceError>",
         record(
-            "System.Result.Error<System.Text.Utf8SliceError>",
+            "System.Result.Failure<System.Text.Utf8SliceError>",
             vec![error],
         ),
     )
@@ -308,12 +308,12 @@ fn slice_errors_have_checked_case_accessors_and_native_statuses() {
             .unwrap()
             .value;
         let case =
-            resolve("instance System.Result<String,System.Text.Utf8SliceError>::GetErrorCase()")
+            resolve("instance System.Result<String,System.Text.Utf8SliceError>::GetFailureCase()")
                 .invoke_instance(result, vec![], Limits::default())
                 .unwrap()
                 .value;
         let error =
-            resolve("instance System.Result.Error<System.Text.Utf8SliceError>::get_Value()")
+            resolve("instance System.Result.Failure<System.Text.Utf8SliceError>::get_Value()")
                 .invoke_instance(case, vec![], Limits::default())
                 .unwrap()
                 .value;

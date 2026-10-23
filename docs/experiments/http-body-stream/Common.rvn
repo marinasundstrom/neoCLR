@@ -20,7 +20,7 @@ async func Consume(stream: InputStream, mode: int) -> Task<()> {
     buffer[0] = (byte)77
     buffer[18] = (byte)99
     Check((await stream.Read(buffer, 1, 0)) is Ok(0))
-    Check((await stream.Read(buffer, -1, 1)) is Error(StreamError.InvalidRange))
+    Check((await stream.Read(buffer, -1, 1)) is Failure(StreamError.InvalidRange))
     let stop = CancellationTokenSource()
     stop.Cancel()
     Check(await ObserveCancellation(stream.Read(buffer, 1, 17, stop.Token)))
@@ -30,24 +30,24 @@ async func Consume(stream: InputStream, mode: int) -> Task<()> {
         let cancellation = CancellationTokenSource()
         cancellation.CancelAfter(Duration.FromTicks(1000000L))
         let reading = stream.Read(buffer, 1, 17, cancellation.Token)
-        Check((await stream.Read(buffer, 1, 17)) is Error(StreamError.WrongAccess))
+        Check((await stream.Read(buffer, 1, 17)) is Failure(StreamError.WrongAccess))
         Check(await ObserveCancellation(reading))
         cancellation.Dispose()
         return
     }
     if mode == 7 {
         let reading = stream.Read(buffer, 1, 17)
-        Check((await stream.Read(buffer, 1, 17)) is Error(StreamError.WrongAccess))
+        Check((await stream.Read(buffer, 1, 17)) is Failure(StreamError.WrongAccess))
         stream.Close()
-        Check((await reading) is Error(StreamError.Closed))
-        Check((await stream.Read(buffer, 1, 17)) is Error(StreamError.Closed))
+        Check((await reading) is Failure(StreamError.Closed))
+        Check((await stream.Read(buffer, 1, 17)) is Failure(StreamError.Closed))
         return
     }
     var total = 0
     while true {
         let result = await stream.Read(buffer, 1, 17)
         Check(buffer[0] == 77 && buffer[18] == 99)
-        if let Error(error) = result {
+        if let Failure(error) = result {
             if mode == 5 {
                 Check(error is StreamError.LimitExceeded)
             } else {

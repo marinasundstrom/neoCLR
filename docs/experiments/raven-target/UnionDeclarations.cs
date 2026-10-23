@@ -41,8 +41,8 @@ static class UnionDeclarations
                 public T Value { get; set; }
                 public void Deconstruct(out T value) { value = Value; }
             }
-            public struct Error<E> {
-                public Error(E value) { Value = value; }
+            public struct Failure<E> {
+                public Failure(E value) { Value = value; }
                 public E Value { get; set; }
                 public void Deconstruct(out E value) { value = Value; }
             }
@@ -50,24 +50,24 @@ static class UnionDeclarations
         [System.Runtime.CompilerServices.Union]
         public struct Result<T, E> : Propagatable<Result<T, E>, T, E> {
             public static Result<T, E> Ok(T value) => default;
-            public static Result<T, E> Error(E error) => default;
+            public static Result<T, E> Failure(E error) => default;
             public bool IsOk => false;
             public bool IsOkCase => false;
             public bool IsErr => false;
-            public bool IsErrorCase => false;
+            public bool IsFailureCase => false;
             public Result.Ok<T> GetOkCase() => default;
-            public Result.Error<E> GetErrorCase() => default;
+            public Result.Failure<E> GetFailureCase() => default;
             public bool TryGet(out Result.Ok<T> value) { value = default; return false; }
-            public bool TryGet(out Result.Error<E> value) { value = default; return false; }
+            public bool TryGet(out Result.Failure<E> value) { value = default; return false; }
             public bool TryGetOutput(out T output) { output = default; return false; }
             public bool TryGetResidual(out E residual) { residual = default; return false; }
             public static Result<T, E> FromResidual(E residual) => default;
             // Required by Raven's union recognition protocol; not an admitted runtime API.
             public object Value => default;
             public Result(Result.Ok<T> value) { }
-            public Result(Result.Error<E> value) { }
+            public Result(Result.Failure<E> value) { }
             public bool TryGetValue(out Result.Ok<T> value) { value = default; return false; }
-            public bool TryGetValue(out Result.Error<E> value) { value = default; return false; }
+            public bool TryGetValue(out Result.Failure<E> value) { value = default; return false; }
         }
         """;
 }

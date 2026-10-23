@@ -12,7 +12,7 @@ func Text(result: Result<string, string>) -> string {
     var text = ""
     match result {
         Ok(let value) => text = value
-        Error(_) => System.Fail("Unexpected decoding failure")
+        Failure(_) => System.Fail("Unexpected decoding failure")
     }
     return text
 }
@@ -20,7 +20,7 @@ func Text(result: Result<string, string>) -> string {
 func Rejected(result: Result<string, string>) {
     match result {
         Ok(_) => System.Fail("Expected decoding failure")
-        Error(_) => { }
+        Failure(_) => { }
     }
 }
 

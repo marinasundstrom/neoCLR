@@ -14,7 +14,7 @@ func Show() {
         } else {
             WriteLine("End of input")
         }
-    } else if result is .Error(let error) {
+    } else if result is .Failure(let error) {
         WriteLine(error.ToString())
     }
 }

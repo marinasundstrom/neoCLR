@@ -54,7 +54,7 @@ public class Uri : EquatableTo<Uri> {
 
     static func Parse(text: string) -> Result<Uri, UriError> {
         if text.GetUtf8ByteCount() > 4096 {
-            return Error(UriError.TooLong())
+            return Failure(UriError.TooLong())
         }
         let count = text.GetUtf8ByteCount()
         // Encode once after the byte quota check; all grammar probes use ASCII bytes.
@@ -64,7 +64,7 @@ public class Uri : EquatableTo<Uri> {
             let value = bytes[index]
             if value == 37 {
                 if index + 2 >= count || !Hex(bytes[index + 1]) || !Hex(bytes[index + 2]) {
-                    return Error(UriError.InvalidFormat())
+                    return Failure(UriError.InvalidFormat())
                 }
                 index += 3
                 continue
@@ -74,9 +74,9 @@ public class Uri : EquatableTo<Uri> {
                 value == 33 || value == 36 || value == 38 || value == 39 || value == 40 || value == 41 ||
                 value == 42 || value == 43 || value == 44 || value == 59 || value == 61) {
                 if value == 91 || value == 93 {
-                    return Error(UriError.UnsupportedAuthority())
+                    return Failure(UriError.UnsupportedAuthority())
                 }
-                return Error(UriError.InvalidFormat())
+                return Failure(UriError.InvalidFormat())
             }
             index += 1
         }
@@ -89,13 +89,13 @@ public class Uri : EquatableTo<Uri> {
         while index < count && bytes[index] != 47 && bytes[index] != 63 && bytes[index] != 35 {
             if bytes[index] == 58 {
                 if index == 0 || !Alpha(bytes[0]) {
-                    return Error(UriError.InvalidFormat())
+                    return Failure(UriError.InvalidFormat())
                 }
                 var position = 1
                 while position < index {
                     let value = bytes[position]
                     if !(Alpha(value) || Digit(value) || value == 43 || value == 45 || value == 46) {
-                        return Error(UriError.InvalidFormat())
+                        return Failure(UriError.InvalidFormat())
                     }
                     position += 1
                 }
@@ -112,7 +112,7 @@ public class Uri : EquatableTo<Uri> {
             while index < count && bytes[index] != 47 && bytes[index] != 63 && bytes[index] != 35 {
                 if bytes[index] == 64 {
                     if at >= 0 {
-                        return Error(UriError.InvalidFormat())
+                        return Failure(UriError.InvalidFormat())
                     }
                     at = index
                     colon = -1
@@ -128,10 +128,10 @@ public class Uri : EquatableTo<Uri> {
             }
             while position < index {
                 if bytes[position] == 58 && position != colon {
-                    return Error(UriError.InvalidFormat())
+                    return Failure(UriError.InvalidFormat())
                 }
                 if colon >= 0 && position > colon && !Digit(bytes[position]) {
-                    return Error(UriError.InvalidFormat())
+                    return Failure(UriError.InvalidFormat())
                 }
                 position += 1
             }
@@ -156,7 +156,7 @@ public class Uri : EquatableTo<Uri> {
             index += 1
             while index < count {
                 if bytes[index] == 35 {
-                    return Error(UriError.InvalidFormat())
+                    return Failure(UriError.InvalidFormat())
                 }
                 index += 1
             }
@@ -217,7 +217,7 @@ public class Uri : EquatableTo<Uri> {
 
     func Resolve(reference: Uri) -> Result<Uri, UriError> {
         if !IsAbsolute {
-            return Error(UriError.BaseNotAbsolute())
+            return Failure(UriError.BaseNotAbsolute())
         }
         var resolvedScheme = scheme
         var resolvedAuthority = authority

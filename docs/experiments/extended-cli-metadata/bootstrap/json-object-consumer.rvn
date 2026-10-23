@@ -68,15 +68,15 @@ func Main() -> int {
         } else {
             return 16
         }
-        if JsonSerializer.Deserialize<Batch>("{}") is Error(_) {
-            if JsonSerializer.Deserialize<int[]>("[1,\"bad\"]") is Error(_) {
+        if JsonSerializer.Deserialize<Batch>("{}") is Failure(_) {
+            if JsonSerializer.Deserialize<int[]>("[1,\"bad\"]") is Failure(_) {
                 Console.WriteLine("Native JSON object mapping passed")
                 return 42
             }
         }
         return 7
     }
-    if let Error(error) = JsonSerializer.Deserialize<Batch>(text) {
+    if let Failure(error) = JsonSerializer.Deserialize<Batch>(text) {
         Console.WriteLine(error.ToString())
     }
     return 1

@@ -52,7 +52,7 @@ call neoCLR.Library.System.Console.RuntimeErrorSystemConsoleReadErrorNewSystemCo
 M00000001_IL_003a:
 call neoCLR.Library.System.Console.RuntimeUnion2(System.ConsoleReadError)
 M00000001_IL_003f:
-call neoCLR.Library.System.Console.RuntimeUnion5(System.Result.Error<System.ConsoleReadError>)
+call neoCLR.Library.System.Console.RuntimeUnion5(System.Result.Failure<System.ConsoleReadError>)
 M00000001_IL_0044:
 ret
 M00000001_IL_0045:
@@ -75,7 +75,7 @@ call neoCLR.Library.System.Console.RuntimeErrorSystemConsoleReadErrorNewSystemCo
 M00000001_IL_005f:
 call neoCLR.Library.System.Console.RuntimeUnion2(System.ConsoleReadError)
 M00000001_IL_0064:
-call neoCLR.Library.System.Console.RuntimeUnion5(System.Result.Error<System.ConsoleReadError>)
+call neoCLR.Library.System.Console.RuntimeUnion5(System.Result.Failure<System.ConsoleReadError>)
 M00000001_IL_0069:
 ret
 M00000001_IL_006a:
@@ -488,11 +488,11 @@ ret
 .local System.Result<Int32,System.IO.StreamError> local3
 .local System.Result.Ok<Int32> local4
 .local System.Result<Int32,System.IO.StreamError> local5
-.local System.Result.Error<System.IO.StreamError> local6
+.local System.Result.Failure<System.IO.StreamError> local6
 .local System.Result<Void,System.IO.StreamError> local7
 .local System.Result.Ok<Void> local8
 .local System.Result<Void,System.IO.StreamError> local9
-.local System.Result.Error<System.IO.StreamError> local10
+.local System.Result.Failure<System.IO.StreamError> local10
 ldloca local1
 initobj System.Result<Int32,System.IO.StreamError>
 ldloca local2
@@ -504,7 +504,7 @@ initobj System.Result.Ok<Int32>
 ldloca local5
 initobj System.Result<Int32,System.IO.StreamError>
 ldloca local6
-initobj System.Result.Error<System.IO.StreamError>
+initobj System.Result.Failure<System.IO.StreamError>
 ldloca local7
 initobj System.Result<Void,System.IO.StreamError>
 ldloca local8
@@ -512,7 +512,7 @@ initobj System.Result.Ok<Void>
 ldloca local9
 initobj System.Result<Void,System.IO.StreamError>
 ldloca local10
-initobj System.Result.Error<System.IO.StreamError>
+initobj System.Result.Failure<System.IO.StreamError>
 M00000018_IL_0000:
 M00000018_IL_0001:
 M00000018_IL_0002:
@@ -564,19 +564,19 @@ stloc local5
 M00000018_IL_0047:
 ldloca local6
 M00000018_IL_0049:
-initobj System.Result.Error<System.IO.StreamError>
+initobj System.Result.Failure<System.IO.StreamError>
 M00000018_IL_004f:
 ldloca local5
 M00000018_IL_0051:
 ldloca local6
 M00000018_IL_0053:
-call neoCLR.Library.System.Console.RuntimeUnion10(System.Result<Int32,System.IO.StreamError>&,System.Result.Error<System.IO.StreamError>&)
+call neoCLR.Library.System.Console.RuntimeUnion10(System.Result<Int32,System.IO.StreamError>&,System.Result.Failure<System.IO.StreamError>&)
 M00000018_IL_0058:
 brfalse M00000018_IL_007c
 M00000018_IL_005d:
 ldloca local6
 M00000018_IL_005f:
-call neoCLR.Library.System.Console.RuntimeUnion11(System.Result.Error<System.IO.StreamError>&)
+call neoCLR.Library.System.Console.RuntimeUnion11(System.Result.Failure<System.IO.StreamError>&)
 M00000018_IL_0064:
 pop
 M00000018_IL_0065:
@@ -638,19 +638,19 @@ stloc local9
 M00000018_IL_00c1:
 ldloca local10
 M00000018_IL_00c3:
-initobj System.Result.Error<System.IO.StreamError>
+initobj System.Result.Failure<System.IO.StreamError>
 M00000018_IL_00c9:
 ldloca local9
 M00000018_IL_00cb:
 ldloca local10
 M00000018_IL_00cd:
-call neoCLR.Library.System.Console.RuntimeUnion14(System.Result<Void,System.IO.StreamError>&,System.Result.Error<System.IO.StreamError>&)
+call neoCLR.Library.System.Console.RuntimeUnion14(System.Result<Void,System.IO.StreamError>&,System.Result.Failure<System.IO.StreamError>&)
 M00000018_IL_00d2:
 brfalse M00000018_IL_00f6
 M00000018_IL_00d7:
 ldloca local10
 M00000018_IL_00d9:
-call neoCLR.Library.System.Console.RuntimeUnion11(System.Result.Error<System.IO.StreamError>&)
+call neoCLR.Library.System.Console.RuntimeUnion11(System.Result.Failure<System.IO.StreamError>&)
 M00000018_IL_00de:
 pop
 M00000018_IL_00df:

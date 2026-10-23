@@ -13,7 +13,7 @@ public static class Environment {
         if kind == "linux" {
             let kernel = neoCLR.Runtime.EnvironmentPlatformInfo(1)
             if kernel == "" {
-                return Error(default(EnvironmentError))
+                return Failure(default(EnvironmentError))
             }
             return Ok(OperatingSystem.Linux(KernelRelease(kernel), null))
         }
@@ -36,7 +36,7 @@ public static class Environment {
             return Ok(OperatingSystem.IOS(version))
         }
         if kind == "" {
-            return Error(default(EnvironmentError))
+            return Failure(default(EnvironmentError))
         }
         return Ok(OperatingSystem.OtherOS(kind))
     }
@@ -56,7 +56,7 @@ public static class Environment {
         if parsed is Ok(let value) {
             return Ok(value)
         }
-        return Error(default(EnvironmentError))
+        return Failure(default(EnvironmentError))
     }
 
     private static func ClassifyArchitecture(name: string) -> Architecture {
@@ -79,7 +79,7 @@ public static class Environment {
     static func GetCurrentDirectory() -> System.Result<string, EnvironmentError> {
         let payload = neoCLR.Runtime.EnvironmentCurrentDirectory()
         if neoCLR.Runtime.IsValue<int>(payload) {
-            return Error(default(EnvironmentError))
+            return Failure(default(EnvironmentError))
         }
         return Ok(neoCLR.Runtime.UnpackValue<string>(payload))
     }
@@ -89,7 +89,7 @@ public static class Environment {
     static func GetEnvironmentVariable(name: string) -> System.Result<System.Option<string>, EnvironmentError> {
         let payload = neoCLR.Runtime.EnvironmentVariable(name)
         if neoCLR.Runtime.IsValue<int>(payload) {
-            return Error(default(EnvironmentError))
+            return Failure(default(EnvironmentError))
         }
         if neoCLR.Runtime.IsValue<System.Void>(payload) {
             let absent: System.Option<string> = None()

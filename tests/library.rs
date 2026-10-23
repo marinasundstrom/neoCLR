@@ -78,7 +78,7 @@ fn platform_abs_handles_signs_and_overflow() {
     }
     let result = run(
         &app(
-            "ldc.i4 -2147483648\ncall System.Math.Abs(int32)\ncall instance System.Result<Int32,System.OverflowError>::GetErrorCase()\ncall instance System.Result.Error<System.OverflowError>::get_Value()\ncall instance System.OverflowError::ToString()",
+            "ldc.i4 -2147483648\ncall System.Math.Abs(int32)\ncall instance System.Result<Int32,System.OverflowError>::GetFailureCase()\ncall instance System.Result.Failure<System.OverflowError>::get_Value()\ncall instance System.OverflowError::ToString()",
             "String",
         ),
         Limits::default(),
@@ -116,7 +116,7 @@ fn div_truncates_toward_zero_and_faults_without_library_handling() {
         );
         let result = run(
             &app(
-                &format!("ldc.i4 {a}\nldc.i4 {b}\ncall System.Int32.Divide(int32, int32)\ncall instance System.Result<Int32,System.IntegerDivisionError>::get_IsErrorCase()"),
+                &format!("ldc.i4 {a}\nldc.i4 {b}\ncall System.Int32.Divide(int32, int32)\ncall instance System.Result<Int32,System.IntegerDivisionError>::get_IsFailureCase()"),
                 "Boolean",
             ),
             Limits::default(),

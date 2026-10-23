@@ -67,13 +67,13 @@ public class BoundedUtf8Decoder {
     func Decode(source: byte[], offset: int, count: int, final: bool,
                 maxOutputUtf8Bytes: int) -> Result<DecodeStep, DecodeFailure> {
         if stopped {
-            return Error(DecodeFailure("", 0, 0, DecodeError.Stopped))
+            return Failure(DecodeFailure("", 0, 0, DecodeError.Stopped))
         }
         if !(offset >= 0) || !(count >= 0) || offset > source.Length || count > source.Length - offset || !(maxOutputUtf8Bytes >= 0) {
-            return Error(DecodeFailure("", 0, 0, DecodeError.InvalidRange))
+            return Failure(DecodeFailure("", 0, 0, DecodeError.InvalidRange))
         }
         if count > 256 || maxOutputUtf8Bytes > 256 || count > 4096 - accepted {
-            return Error(DecodeFailure("", 0, 0, DecodeError.LimitExceeded))
+            return Failure(DecodeFailure("", 0, 0, DecodeError.LimitExceeded))
         }
         var text = ""
         var consumed = 0
@@ -93,7 +93,7 @@ public class BoundedUtf8Decoder {
                     width = 4
                 } else {
                     stopped = true
-                    return Error(DecodeFailure(text, consumed, scalars, DecodeError.InvalidUtf8(StreamBytePosition(accepted))))
+                    return Failure(DecodeFailure(text, consumed, scalars, DecodeError.InvalidUtf8(StreamBytePosition(accepted))))
                 }
             }
             // Never emit a partial scalar. Carry from earlier calls also needs room.
@@ -105,7 +105,7 @@ public class BoundedUtf8Decoder {
                 expected = width
             } else if !(value >= 128 && value <= 191) {
                 stopped = true
-                return Error(DecodeFailure(text, consumed, scalars, DecodeError.InvalidUtf8(StreamBytePosition(scalarStart))))
+                return Failure(DecodeFailure(text, consumed, scalars, DecodeError.InvalidUtf8(StreamBytePosition(scalarStart))))
             }
             pending.Add(value)
             consumed += 1
@@ -117,9 +117,9 @@ public class BoundedUtf8Decoder {
                         produced += expected
                         scalars += 1
                     }
-                    Error(_) => {
+                    Failure(_) => {
                         stopped = true
-                        return Error(DecodeFailure(text, consumed, scalars, DecodeError.InvalidUtf8(StreamBytePosition(scalarStart))))
+                        return Failure(DecodeFailure(text, consumed, scalars, DecodeError.InvalidUtf8(StreamBytePosition(scalarStart))))
                     }
                 }
                 pending = ArrayList<byte>(4)
@@ -129,7 +129,7 @@ public class BoundedUtf8Decoder {
         if final {
             stopped = true
             if pending.Count != 0 {
-                return Error(DecodeFailure(text, consumed, scalars, DecodeError.IncompleteUtf8(StreamBytePosition(scalarStart))))
+                return Failure(DecodeFailure(text, consumed, scalars, DecodeError.IncompleteUtf8(StreamBytePosition(scalarStart))))
             }
             return Ok(DecodeStep(text, consumed, scalars, DecodeStatus.Finished))
         }

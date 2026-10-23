@@ -27,8 +27,8 @@
     ldc.i4 7
     ldc.i4 1
     call instance System.String::SliceUtf8(Int32,Int32)
-    call instance System.Result<String,System.Text.Utf8SliceError>::GetErrorCase()
-    call instance System.Result.Error<System.Text.Utf8SliceError>::get_Value()
+    call instance System.Result<String,System.Text.Utf8SliceError>::GetFailureCase()
+    call instance System.Result.Failure<System.Text.Utf8SliceError>::get_Value()
     call instance System.Text.Utf8SliceError::get_IsInvalidBoundary()
     brtrue Handled
     fault "invalid UTF-8 boundary was accepted"

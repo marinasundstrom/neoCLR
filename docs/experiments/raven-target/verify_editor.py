@@ -317,7 +317,7 @@ try:
             text = ('import System.*\nimport System.Result.*\n'
                     'func Inspect(value: Result<string, OverflowError>) {\n'
                     '    match value {\n        ' + case_head + ' => {\n'
-                    '            text.\n        }\n        .Error(_) => {}\n    }\n}')
+                    '            text.\n        }\n        .Failure(_) => {}\n    }\n}')
             send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version}, 'contentChanges': [{'text': text}]})
             result = receive(send('textDocument/completion', {'textDocument': {'uri': uri},
                 'position': {'line': 5, 'character': len('            text.')},

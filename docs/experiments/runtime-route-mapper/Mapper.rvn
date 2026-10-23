@@ -38,24 +38,24 @@ class BoundRoute {
             if integers[index] {
                 let value = match captures.GetInt32(names[index]) {
                     Ok(let number) => number
-                    Error(_) => return Error(RouteMappingError.InvalidParameter(names[index], "Int32"))
+                    Failure(_) => return Failure(RouteMappingError.InvalidParameter(names[index], "Int32"))
                 }
                 arguments.Add(value)
             } else {
                 let value = match captures.Get(names[index]) {
                     Ok(let text) => text
-                    Error(_) => return Error(RouteMappingError.InvalidParameter(names[index], "String"))
+                    Failure(_) => return Failure(RouteMappingError.InvalidParameter(names[index], "String"))
                 }
                 arguments.Add(value)
             }
         }
         let payload = match constructor.Invoke(arguments) {
             Ok(let value) => value
-            Error(_) => return Error(RouteMappingError.ConstructionFailed("Case construction failed"))
+            Failure(_) => return Failure(RouteMappingError.ConstructionFailed("Case construction failed"))
         }
         return match carrier.Invoke(payload) {
             Ok(let value) => Ok(value)
-            Error(_) => Error(RouteMappingError.ConstructionFailed("Union construction failed"))
+            Failure(_) => Failure(RouteMappingError.ConstructionFailed("Union construction failed"))
         }
     }
 }
@@ -70,11 +70,11 @@ public class RouteUnionMapper {
 
     static func Create(type: TypeInfo) -> Result<RouteUnionMapper, string> {
         if !type.IsVisible || !type.IsNominalType || !type.IsValueType || type.IsOpen || type.GenericArgumentCount != 0 {
-            return Error("Expected a public nongeneric value union")
+            return Failure("Expected a public nongeneric value union")
         }
         let nominal = (NominalTypeInfo)type
         if !nominal.IsUnionDeclaration {
-            return Error("Expected a nominal union declaration")
+            return Failure("Expected a nominal union declaration")
         }
         let prepared = ArrayList<BoundRoute>()
         let carriers = type.GetConstructors()
@@ -83,7 +83,7 @@ public class RouteUnionMapper {
                 if let Some(parent) = candidate.DeclaringType {
                     if parent.Equals(type) {
                         if !candidate.IsVisible || !candidate.IsValueType || candidate.IsEnum || candidate.IsOpen {
-                            return Error("Unsupported nested route case")
+                            return Failure("Unsupported nested route case")
                         }
                         var template = ""
                         var markers = 0
@@ -92,32 +92,32 @@ public class RouteUnionMapper {
                                 markers += 1
                                 let arguments = attribute.GetConstructorArguments()
                                 if arguments.Count != 1 {
-                                    return Error("RoutePattern requires one string")
+                                    return Failure("RoutePattern requires one string")
                                 }
                                 if arguments[0].Value is string text {
                                     template = text
                                 } else {
-                                    return Error("RoutePattern requires a non-null string")
+                                    return Failure("RoutePattern requires a non-null string")
                                 }
                             }
                         }
                         if markers != 1 {
-                            return Error("Each case requires exactly one RoutePattern")
+                            return Failure("Each case requires exactly one RoutePattern")
                         }
                         let pattern = RoutePattern.Parse(template)?
                         for existing in prepared {
                             if existing.Pattern.Overlaps(pattern) {
-                                return Error("Overlapping route patterns")
+                                return Failure("Overlapping route patterns")
                             }
                         }
                         let constructors = candidate.GetConstructors()
                         if constructors.Count != 1 {
-                            return Error("Expected one public case constructor")
+                            return Failure("Expected one public case constructor")
                         }
                         let parameters = constructors[0].GetParameters()
                         let captures = pattern.GetParameterNames()
                         if captures.Count != parameters.Count {
-                            return Error("Capture names must match case parameters")
+                            return Failure("Capture names must match case parameters")
                         }
                         let names = ArrayList<string>()
                         let integers = ArrayList<bool>()
@@ -130,15 +130,15 @@ public class RouteUnionMapper {
                             }
                             for name in names {
                                 if name == parameter.Name {
-                                    return Error("Duplicate case parameter name")
+                                    return Failure("Duplicate case parameter name")
                                 }
                             }
                             if !found {
-                                return Error("Capture names must match case parameters")
+                                return Failure("Capture names must match case parameters")
                             }
                             let integer = parameter.ParameterType.Equals(typeof(int))
                             if !integer && !parameter.ParameterType.Equals(typeof(string)) {
-                                return Error("Only String and Int32 route parameters are supported")
+                                return Failure("Only String and Int32 route parameters are supported")
                             }
                             names.Add(parameter.Name)
                             integers.Add(integer)
@@ -148,24 +148,24 @@ public class RouteUnionMapper {
                             let payloads = carrier.GetParameters()
                             if payloads.Count == 1 && payloads[0].ParameterType.Equals(candidate) {
                                 if bound {
-                                    return Error("Ambiguous union constructor")
+                                    return Failure("Ambiguous union constructor")
                                 }
                                 if prepared.Count == 16 {
-                                    return Error("Route union exceeds 16 cases")
+                                    return Failure("Route union exceeds 16 cases")
                                 }
                                 prepared.Add(BoundRoute(pattern, constructors[0], carrier, names, integers))
                                 bound = true
                             }
                         }
                         if !bound {
-                            return Error("Public union constructor missing")
+                            return Failure("Public union constructor missing")
                         }
                     }
                 }
             }
         }
         if prepared.Count == 0 {
-            return Error("Route union has no cases")
+            return Failure("Route union has no cases")
         }
         let snapshot: Sequence<BoundRoute> = prepared
         return Ok(RouteUnionMapper(snapshot))
@@ -175,12 +175,12 @@ public class RouteUnionMapper {
         for route in routes {
             let matched = match route.Pattern.Match(target) {
                 Ok(let value) => value
-                Error(let reason) => return Error(RouteMappingError.InvalidTarget(reason))
+                Failure(let reason) => return Failure(RouteMappingError.InvalidTarget(reason))
             }
             if let Some(captures) = matched {
                 return route.Construct(captures)
             }
         }
-        return Error(RouteMappingError.NoMatch)
+        return Failure(RouteMappingError.NoMatch)
     }
 }

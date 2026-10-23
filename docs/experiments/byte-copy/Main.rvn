@@ -18,7 +18,7 @@ func TransferGreeting() -> Result<int, string> {
     WriteLine("Decoded message:")
     match Utf8.Decode(destination) {
         Ok(let text) => WriteLine(text)
-        Error(_) => WriteLine("Invalid UTF-8")
+        Failure(_) => WriteLine("Invalid UTF-8")
     }
     return Ok(output.Count)
 }
@@ -26,6 +26,6 @@ func TransferGreeting() -> Result<int, string> {
 func Main() {
     match TransferGreeting() {
         Ok(_) => WriteLine("Transfer complete")
-        Error(let message) => WriteLine(message)
+        Failure(let message) => WriteLine(message)
     }
 }

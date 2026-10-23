@@ -17,7 +17,7 @@ public class FileOutputStream : OutputStream {
     static func CreateNew(path: string) -> Result<FileOutputStream, StreamError> {
         let payload = neoCLR.Runtime.FileCreateNew(path)
         if neoCLR.Runtime.IsValue<byte>(payload) {
-            return Error(DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload)))
+            return Failure(DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload)))
         }
         return Ok(FileOutputStream(neoCLR.Runtime.UnpackValue<int>(payload)))
     }
@@ -46,9 +46,9 @@ public class FileOutputStream : OutputStream {
             }
             sent += written
             if sent == count { return Ok(()) }
-            if written == 0 { return Error(StreamError.IoFailure) }
+            if written == 0 { return Failure(StreamError.IoFailure) }
         }
-        return Error(StreamError.IoFailure)
+        return Failure(StreamError.IoFailure)
     }
 
     func Flush() -> Task<Result<unit, StreamError>> {
@@ -66,26 +66,26 @@ public class FileOutputStream : OutputStream {
 
     private func WriteCore(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
         if closed {
-            return Error(StreamError.Closed())
+            return Failure(StreamError.Closed())
         }
         if offset < 0 || count < 0 || offset > buffer.Length || count > buffer.Length - offset {
-            return Error(StreamError.InvalidRange)
+            return Failure(StreamError.InvalidRange)
         }
         let memory: ReadOnlyMemory<byte> = buffer
         let payload = neoCLR.Runtime.FileWriteChunk(handle, memory.Slice(offset, count))
         if neoCLR.Runtime.IsValue<byte>(payload) {
-            return Error(DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload)))
+            return Failure(DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload)))
         }
         return Ok(neoCLR.Runtime.UnpackValue<int>(payload))
     }
 
     private func FlushCore() -> Result<unit, StreamError> {
         if closed {
-            return Error(StreamError.Closed())
+            return Failure(StreamError.Closed())
         }
         let payload = neoCLR.Runtime.FileFlush(handle)
         if neoCLR.Runtime.IsValue<byte>(payload) {
-            return Error(DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload)))
+            return Failure(DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload)))
         }
         return Ok(())
     }

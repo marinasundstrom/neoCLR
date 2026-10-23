@@ -19,15 +19,15 @@ async func Main() -> Task<int> {
     // Two writes with distinct caller ranges cross internal block boundaries.
     match await gzip.Write(data, 7, 39986) {
         Ok(_) => { }
-        Error(_) => return 1
+        Failure(_) => return 1
     }
     match await gzip.Write(data, 0, data.Length) {
         Ok(_) => { }
-        Error(_) => return 2
+        Failure(_) => return 2
     }
     match await gzip.Finish() {
         Ok(_) => { }
-        Error(_) => return 3
+        Failure(_) => return 3
     }
     gzip.Close()
     let Ok(length) = destination.GetLength() else {
@@ -37,7 +37,7 @@ async func Main() -> Task<int> {
     _ = destination.Seek(0)
     match await destination.Read(encoded, 0, (int)length) {
         Ok(_) => { }
-        Error(_) => return 5
+        Failure(_) => return 5
     }
     index = 0
     while index < (int)length {

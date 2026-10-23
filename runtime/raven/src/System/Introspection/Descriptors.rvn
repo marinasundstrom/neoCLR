@@ -553,14 +553,14 @@ internal open class RuntimeTypeInfo : TypeInfo {
     }
 
     internal static func ConstructGeneric(handle: RuntimeTypeHandle, arguments: Sequence<TypeInfo>) -> Result<TypeInfo, GenericTypeError> {
-        if !neoCLR.Runtime.TypeShape(handle, 22) { return Error(GenericTypeError.InvalidDefinition) }
-        if neoCLR.Runtime.TypeArgumentCount(handle) != arguments.Count { return Error(GenericTypeError.ArgumentCount) }
+        if !neoCLR.Runtime.TypeShape(handle, 22) { return Failure(GenericTypeError.InvalidDefinition) }
+        if neoCLR.Runtime.TypeArgumentCount(handle) != arguments.Count { return Failure(GenericTypeError.ArgumentCount) }
         var bound = handle
         for index in 0..arguments.Count {
             let argument = HandleOf(arguments[index])
             let status = neoCLR.Runtime.TypeApplyGenericArgumentCheck(bound, index, argument)
-            if status == 2 { return Error(GenericTypeError.NotRetained) }
-            if status != 0 { return Error(GenericTypeError.InvalidArgument) }
+            if status == 2 { return Failure(GenericTypeError.NotRetained) }
+            if status != 0 { return Failure(GenericTypeError.InvalidArgument) }
             bound = neoCLR.Runtime.TypeApplyGenericArgument(bound, index, argument)
         }
         return Ok(FromHandle(bound))

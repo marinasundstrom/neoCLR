@@ -112,8 +112,8 @@ internal class TaskResultMapContinuation<T, E, U> {
         if input.Outcome is Some(Completed(let result)) {
             if result is Ok(let value) {
                 _ = output.Complete(Ok(transform(value)))
-            } else if result is Error(let error) {
-                _ = output.Complete(Error(error))
+            } else if result is Failure(let error) {
+                _ = output.Complete(Failure(error))
             }
         } else if input.Outcome is Some(Cancelled) {
             _ = output.Cancel()

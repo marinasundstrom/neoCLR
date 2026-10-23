@@ -31,8 +31,8 @@ fn all_library_union_cases_support_conditional_managed_output() {
         ),
         (
             "System.Result<Int32,String>",
-            "System.Result.Error<String>",
-            "ldstr \"error\"\nnewobj instance System.Result.Error<String>::.ctor(String)",
+            "System.Result.Failure<String>",
+            "ldstr \"error\"\nnewobj instance System.Result.Failure<String>::.ctor(String)",
         ),
     ] {
         let source = format!(
@@ -58,7 +58,7 @@ fn a_mismatched_case_does_not_initialize_or_replace_output() {
             "ldloc value\ncall instance System.Result.Ok<Int32>::get_Value()"
         };
         let source = format!(
-            ".module App\n.entry Main\n.function Main() -> Int32\n.local System.Result.Ok<Int32> value\n{initial}ldstr \"error\"\nnewobj instance System.Result.Error<String>::.ctor(String)\nnewobj instance System.Result<Int32,String>::.ctor(System.Result.Error<String>)\nldloca value\ncall instance System.Result<Int32,String>::TryGet(System.Result.Ok<Int32>&)\nbrfalse Miss\nfault \"unexpected match\"\nMiss:\n{suffix}\nret\n.end"
+            ".module App\n.entry Main\n.function Main() -> Int32\n.local System.Result.Ok<Int32> value\n{initial}ldstr \"error\"\nnewobj instance System.Result.Failure<String>::.ctor(String)\nnewobj instance System.Result<Int32,String>::.ctor(System.Result.Failure<String>)\nldloca value\ncall instance System.Result<Int32,String>::TryGet(System.Result.Ok<Int32>&)\nbrfalse Miss\nfault \"unexpected match\"\nMiss:\n{suffix}\nret\n.end"
         );
         let p = LoadedProgram::new(&assemble(&source).unwrap()).unwrap();
         p.verify().unwrap();
@@ -68,7 +68,7 @@ fn a_mismatched_case_does_not_initialize_or_replace_output() {
 
 #[test]
 fn case_reference_overloads_remain_distinct_when_payload_types_are_identical() {
-    let source = ".module App\n.entry Main\n.function Main() -> Int32\n.local System.Result<Int32,Int32> result\n.local System.Result.Ok<Int32> ok\n.local System.Result.Error<Int32> error\nldc.i4 42\nnewobj instance System.Result.Ok<Int32>::.ctor(Int32)\nnewobj instance System.Result<Int32,Int32>::.ctor(System.Result.Ok<Int32>)\nstloc result\nldloc result\nldloca error\ncall instance System.Result<Int32,Int32>::TryGet(System.Result.Error<Int32>&)\nbrfalse GetOk\nfault \"wrong case matched\"\nGetOk:\nldloc result\nldloca ok\ncall instance System.Result<Int32,Int32>::TryGet(System.Result.Ok<Int32>&)\nbrfalse Miss\nldloc ok\ncall instance System.Result.Ok<Int32>::get_Value()\nret\nMiss:\nfault \"expected Ok\"\n.end";
+    let source = ".module App\n.entry Main\n.function Main() -> Int32\n.local System.Result<Int32,Int32> result\n.local System.Result.Ok<Int32> ok\n.local System.Result.Failure<Int32> error\nldc.i4 42\nnewobj instance System.Result.Ok<Int32>::.ctor(Int32)\nnewobj instance System.Result<Int32,Int32>::.ctor(System.Result.Ok<Int32>)\nstloc result\nldloc result\nldloca error\ncall instance System.Result<Int32,Int32>::TryGet(System.Result.Failure<Int32>&)\nbrfalse GetOk\nfault \"wrong case matched\"\nGetOk:\nldloc result\nldloca ok\ncall instance System.Result<Int32,Int32>::TryGet(System.Result.Ok<Int32>&)\nbrfalse Miss\nldloc ok\ncall instance System.Result.Ok<Int32>::get_Value()\nret\nMiss:\nfault \"expected Ok\"\n.end";
     let module = assemble(source).unwrap();
     let module = neoclr::load(&serde_json::to_string(&module).unwrap()).unwrap();
     let p = LoadedProgram::new(&module).unwrap();

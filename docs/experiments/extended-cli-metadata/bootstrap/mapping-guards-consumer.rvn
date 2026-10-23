@@ -12,7 +12,7 @@ func Main() -> int {
     if Operations.Guard(true) != 11 { return 2 }
     if Operations.Guard(false) != 12 { return 3 }
     if Operations.Guard("text") != 13 { return 4 }
-    if let Error(reason) = TerminalGuard.Read(true) {
+    if let Failure(reason) = TerminalGuard.Read(true) {
         if reason != "failed" { return 5 }
     } else { return 6 }
     if let Ok(value) = TerminalGuard.Read(false) {

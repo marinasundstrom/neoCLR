@@ -7,11 +7,11 @@ func Main() -> int {
     if one0.CompareTo((sbyte)2) != -1 { return 2 }
     match SByte.Parse("-128") {
         .Ok(let parsed) => { if parsed != (sbyte)-128 { return 3 } }
-        .Error(_) => { return 4 }
+        .Failure(_) => { return 4 }
     }
     match SByte.Parse("-129") {
         .Ok(_) => { return 5 }
-        .Error(let error) => {
+        .Failure(let error) => {
             if error is not NumberParseError.Overflow { return 6 }
         }
     }
@@ -20,11 +20,11 @@ func Main() -> int {
     if one1.CompareTo((byte)2) != -1 { return 12 }
     match Byte.Parse("255") {
         .Ok(let parsed) => { if parsed != (byte)255 { return 13 } }
-        .Error(_) => { return 14 }
+        .Failure(_) => { return 14 }
     }
     match Byte.Parse("256") {
         .Ok(_) => { return 15 }
-        .Error(let error) => {
+        .Failure(let error) => {
             if error is not NumberParseError.Overflow { return 16 }
         }
     }
@@ -33,11 +33,11 @@ func Main() -> int {
     if one2.CompareTo((short)2) != -1 { return 22 }
     match Int16.Parse("-32768") {
         .Ok(let parsed) => { if parsed != (short)-32768 { return 23 } }
-        .Error(_) => { return 24 }
+        .Failure(_) => { return 24 }
     }
     match Int16.Parse("-32769") {
         .Ok(_) => { return 25 }
-        .Error(let error) => {
+        .Failure(let error) => {
             if error is not NumberParseError.Overflow { return 26 }
         }
     }
@@ -46,11 +46,11 @@ func Main() -> int {
     if one3.CompareTo((ushort)2) != -1 { return 32 }
     match UInt16.Parse("65535") {
         .Ok(let parsed) => { if parsed != (ushort)65535 { return 33 } }
-        .Error(_) => { return 34 }
+        .Failure(_) => { return 34 }
     }
     match UInt16.Parse("65536") {
         .Ok(_) => { return 35 }
-        .Error(let error) => {
+        .Failure(let error) => {
             if error is not NumberParseError.Overflow { return 36 }
         }
     }
@@ -59,11 +59,11 @@ func Main() -> int {
     if one4.CompareTo((uint)2) != -1 { return 42 }
     match UInt32.Parse("4294967295") {
         .Ok(let parsed) => { if parsed != (uint)-1 { return 43 } }
-        .Error(_) => { return 44 }
+        .Failure(_) => { return 44 }
     }
     match UInt32.Parse("4294967296") {
         .Ok(_) => { return 45 }
-        .Error(let error) => {
+        .Failure(let error) => {
             if error is not NumberParseError.Overflow { return 46 }
         }
     }
@@ -72,11 +72,11 @@ func Main() -> int {
     if one5.CompareTo((ulong)2) != -1 { return 52 }
     match UInt64.Parse("18446744073709551615") {
         .Ok(let parsed) => { if parsed != (ulong)-1L { return 53 } }
-        .Error(_) => { return 54 }
+        .Failure(_) => { return 54 }
     }
     match UInt64.Parse("18446744073709551616") {
         .Ok(_) => { return 55 }
-        .Error(let error) => {
+        .Failure(let error) => {
             if error is not NumberParseError.Overflow { return 56 }
         }
     }
@@ -86,15 +86,15 @@ func Main() -> int {
     if Int64.MaxValue.ToString() != "9223372036854775807" { return 73 }
     match Int32.Parse("-2147483648") {
         .Ok(let value) => { if value != -2147483648 { return 74 } }
-        .Error(_) => { return 75 }
+        .Failure(_) => { return 75 }
     }
     match Int64.Parse("-9223372036854775808") {
         .Ok(let value) => { if value != Int64.MinValue { return 76 } }
-        .Error(_) => { return 77 }
+        .Failure(_) => { return 77 }
     }
     match Int32.Divide(1, 0) {
         .Ok(_) => { return 78 }
-        .Error(let error) => {
+        .Failure(let error) => {
             if error is not IntegerDivisionError.DivisionByZero { return 79 }
         }
     }
@@ -109,21 +109,21 @@ func Main() -> int {
     if nan.CompareTo(nan) != 0 { return 100 + 6 }
     match Single.Parse("20.5") {
         .Ok(let parsed) => { if parsed != 20.5f { return 100 + 7 } }
-        .Error(_) => { return 100 + 8 }
+        .Failure(_) => { return 100 + 8 }
     }
     match Double.Parse("21.5") {
         .Ok(let parsed) => { if parsed != 21.5 { return 100 + 9 } }
-        .Error(_) => { return 100 + 10 }
+        .Failure(_) => { return 100 + 10 }
     }
     match Single.Parse("bad") {
         .Ok(_) => { return 100 + 11 }
-        .Error(let error) => {
+        .Failure(let error) => {
             if error is not NumberParseError.InvalidFormat { return 100 + 12 }
         }
     }
     match Double.Parse("1e9999") {
         .Ok(_) => { return 100 + 13 }
-        .Error(let error) => {
+        .Failure(let error) => {
             if error is not NumberParseError.Overflow { return 100 + 14 }
         }
     }

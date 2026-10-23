@@ -15,7 +15,7 @@ func CheckRequest(pattern: RoutePattern, index: int) -> int {
         else { "/items/42/" }
     let result = pattern.Match(target)
     if mode == 3 || mode == 6 {
-        if let Error(_) = result {
+        if let Failure(_) = result {
             return 0
         }
         return 10
@@ -42,7 +42,7 @@ func CheckRequest(pattern: RoutePattern, index: int) -> int {
         return if id == 42 { 0 } else { 16 }
     }
     if mode == 2 {
-        if let Error(_) = parameters.GetInt32("id") {
+        if let Failure(_) = parameters.GetInt32("id") {
             return 0
         }
         return 17

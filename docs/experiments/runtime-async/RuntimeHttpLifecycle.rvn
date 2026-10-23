@@ -40,11 +40,11 @@ module RuntimeHttpLifecycle {
             System.Fail("runtime HTTP continuation fault")
         }
         if mode == "timeout" {
-            let Error(HttpError.TimedOut) = result else {
+            let Failure(HttpError.TimedOut) = result else {
                 System.Fail("Expected HTTP timeout result")
             }
         } else if mode == "protocol" {
-            let Error(HttpError.Protocol(_)) = result else {
+            let Failure(HttpError.Protocol(_)) = result else {
                 System.Fail("Expected HTTP protocol error")
             }
         } else {

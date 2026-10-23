@@ -6,7 +6,7 @@
 .implements System.Runtime.CompilerServices.UnionValue
 .field private Metadata_V1_3C5461673E Byte
 .field private Metadata_V1_3C4F6B5061796C6F61643E System.Result.Ok<T0>
-.field private Metadata_V1_3C4572726F725061796C6F61643E System.Result.Error<T1>
+.field private Metadata_V1_3C4572726F725061796C6F61643E System.Result.Failure<T1>
 .property instance Value() -> System.Object
 .get instance System.Result<T0,T1>::get_Value()
 .end
@@ -15,11 +15,11 @@
 .end
 .method instance override byref ToString() -> String
 .local System.Result.Ok<T0> local0
-.local System.Result.Error<T1> local1
+.local System.Result.Failure<T1> local1
 ldloca local0
 initobj System.Result.Ok<T0>
 ldloca local1
-initobj System.Result.Error<T1>
+initobj System.Result.Failure<T1>
 M00000001_IL_0000:
 ldarg 0
 M00000001_IL_0001:
@@ -98,7 +98,7 @@ ldstr "."
 M00000001_IL_0080:
 call System.String::Concat(String,String)
 M00000001_IL_0085:
-ldstr "Error"
+ldstr "Failure"
 M00000001_IL_008a:
 call System.String::Concat(String,String)
 M00000001_IL_008f:
@@ -114,7 +114,7 @@ stloc local1
 M00000001_IL_00a0:
 ldloca local1
 M00000001_IL_00a2:
-call instance System.Result.Error<T1>::get_Value()
+call instance System.Result.Failure<T1>::get_Value()
 M00000001_IL_00a7:
 box T1
 M00000001_IL_00ac:
@@ -230,10 +230,10 @@ ret
 .local System.Result.Ok<T0> local1
 .local Byte unionDefault1_0
 .local System.Result.Ok<T0> unionDefault1_1
-.local System.Result.Error<T1> unionDefault1_2
+.local System.Result.Failure<T1> unionDefault1_2
 .local Byte unionFieldDefault4
 .local System.Result.Ok<T0> unionFieldDefault7
-.local System.Result.Error<T1> unionFieldDefault10
+.local System.Result.Failure<T1> unionFieldDefault10
 ldc.i4 0
 stloc local0
 ldloca local1
@@ -255,7 +255,7 @@ ldloc unionDefault1_1
 stfld System.Result<T0,T1>::Metadata_V1_3C4F6B5061796C6F61643E
 pop
 ldloca unionDefault1_2
-initobj System.Result.Error<T1>
+initobj System.Result.Failure<T1>
 ldarg 0
 ldloc unionDefault1_2
 stfld System.Result<T0,T1>::Metadata_V1_3C4572726F725061796C6F61643E
@@ -283,7 +283,7 @@ ldarg 0
 M00000003_IL_0020:
 M00000003_IL_0025:
 ldloca unionFieldDefault10
-initobj System.Result.Error<T1>
+initobj System.Result.Failure<T1>
 ldloc unionFieldDefault10
 stfld System.Result<T0,T1>::Metadata_V1_3C4572726F725061796C6F61643E
 pop
@@ -364,19 +364,19 @@ ldc.bool false
 M00000004_IL_0034:
 ret
 .end
-.method instance byref .ctor(System.Result.Error<T1> value) -> Void
+.method instance byref .ctor(System.Result.Failure<T1> value) -> Void
 .local Byte local0
-.local System.Result.Error<T1> local1
+.local System.Result.Failure<T1> local1
 .local Byte unionDefault1_0
 .local System.Result.Ok<T0> unionDefault1_1
-.local System.Result.Error<T1> unionDefault1_2
+.local System.Result.Failure<T1> unionDefault1_2
 .local Byte unionFieldDefault4
 .local System.Result.Ok<T0> unionFieldDefault7
-.local System.Result.Error<T1> unionFieldDefault10
+.local System.Result.Failure<T1> unionFieldDefault10
 ldc.i4 0
 stloc local0
 ldloca local1
-initobj System.Result.Error<T1>
+initobj System.Result.Failure<T1>
 M00000005_IL_0000:
 ldarg 0
 M00000005_IL_0001:
@@ -394,7 +394,7 @@ ldloc unionDefault1_1
 stfld System.Result<T0,T1>::Metadata_V1_3C4F6B5061796C6F61643E
 pop
 ldloca unionDefault1_2
-initobj System.Result.Error<T1>
+initobj System.Result.Failure<T1>
 ldarg 0
 ldloc unionDefault1_2
 stfld System.Result<T0,T1>::Metadata_V1_3C4572726F725061796C6F61643E
@@ -422,7 +422,7 @@ ldarg 0
 M00000005_IL_0020:
 M00000005_IL_0025:
 ldloca unionFieldDefault10
-initobj System.Result.Error<T1>
+initobj System.Result.Failure<T1>
 ldloc unionFieldDefault10
 stfld System.Result<T0,T1>::Metadata_V1_3C4572726F725061796C6F61643E
 pop
@@ -454,20 +454,20 @@ M00000005_IL_003e:
 ldvoid
 ret
 .end
-.method instance byref TryGetValue(out(true) System.Result.Error<T1>& value) -> Boolean
-.local System.Result.Error<T1> local0
+.method instance byref TryGetValue(out(true) System.Result.Failure<T1>& value) -> Boolean
+.local System.Result.Failure<T1> local0
 ldloca local0
-initobj System.Result.Error<T1>
+initobj System.Result.Failure<T1>
 M00000006_IL_0000:
 ldarg 1
 M00000006_IL_0001:
 ldloca local0
 M00000006_IL_0003:
-initobj System.Result.Error<T1>
+initobj System.Result.Failure<T1>
 M00000006_IL_0009:
 ldloc local0
 M00000006_IL_000a:
-stobj System.Result.Error<T1>
+stobj System.Result.Failure<T1>
 M00000006_IL_000f:
 ldarg 0
 M00000006_IL_0010:
@@ -492,7 +492,7 @@ ldarg 0
 M00000006_IL_0026:
 ldfld System.Result<T0,T1>::Metadata_V1_3C4572726F725061796C6F61643E
 M00000006_IL_002b:
-stobj System.Result.Error<T1>
+stobj System.Result.Failure<T1>
 M00000006_IL_0030:
 ldc.bool true
 M00000006_IL_0031:
@@ -579,11 +579,11 @@ ret
 .local T1 local0
 .local T1 local1
 .local System.Result<T0,T1> local2
-.local System.Result.Error<T1> local3
+.local System.Result.Failure<T1> local3
 ldloca local2
 initobj System.Result<T0,T1>
 ldloca local3
-initobj System.Result.Error<T1>
+initobj System.Result.Failure<T1>
 M00000008_IL_0000:
 M00000008_IL_0001:
 M00000008_IL_0002:
@@ -606,19 +606,19 @@ stloc local2
 M00000008_IL_0019:
 ldloca local3
 M00000008_IL_001b:
-initobj System.Result.Error<T1>
+initobj System.Result.Failure<T1>
 M00000008_IL_0021:
 ldloca local2
 M00000008_IL_0023:
 ldloca local3
 M00000008_IL_0025:
-call instance System.Result<T0,T1>::TryGetValue(System.Result.Error<T1>&)
+call instance System.Result<T0,T1>::TryGetValue(System.Result.Failure<T1>&)
 M00000008_IL_002a:
 brfalse M00000008_IL_0043
 M00000008_IL_002f:
 ldloca local3
 M00000008_IL_0031:
-call instance System.Result.Error<T1>::get_Value()
+call instance System.Result.Failure<T1>::get_Value()
 M00000008_IL_0036:
 stloc local0
 M00000008_IL_0037:
@@ -652,9 +652,9 @@ M00000009_IL_0000:
 M00000009_IL_0001:
 ldarg 0
 M00000009_IL_0002:
-newobj instance System.Result.Error<T1>::.ctor(T1)
+newobj instance System.Result.Failure<T1>::.ctor(T1)
 M00000009_IL_0007:
-newobj instance System.Result<T0,T1>::.ctor(System.Result.Error<T1>)
+newobj instance System.Result<T0,T1>::.ctor(System.Result.Failure<T1>)
 M00000009_IL_000c:
 ret
 .end
@@ -707,7 +707,7 @@ ldarg 0
 M0000000a_IL_0038:
 ldfld System.Result<T0,T1>::Metadata_V1_3C4572726F725061796C6F61643E
 M0000000a_IL_003d:
-box System.Result.Error<T1>
+box System.Result.Failure<T1>
 M0000000a_IL_0042:
 ret
 M0000000a_IL_0043:
@@ -918,11 +918,11 @@ M00000010_IL_008a:
 ret
 .end
 .end
-.type Error<T0>
+.type Failure<T0>
 .sealed
 .field Value T0
 .property instance Value() -> T0
-.get instance System.Result.Error<T0>::get_Value()
+.get instance System.Result.Failure<T0>::get_Value()
 .end
 .method instance byref .ctor(T0 value) -> Void
 .local T0 local0
@@ -935,7 +935,7 @@ ldloca unionDefault1_0
 initobj T0
 ldarg 0
 ldloc unionDefault1_0
-stfld System.Result.Error<T0>::Value
+stfld System.Result.Failure<T0>::Value
 pop
 M00000011_IL_0007:
 M00000011_IL_0008:
@@ -947,7 +947,7 @@ ldarg 0
 M00000011_IL_000b:
 ldloc local0
 M00000011_IL_000c:
-stfld System.Result.Error<T0>::Value
+stfld System.Result.Failure<T0>::Value
 pop
 M00000011_IL_0011:
 ldvoid
@@ -958,7 +958,7 @@ M00000012_IL_0000:
 M00000012_IL_0001:
 ldarg 0
 M00000012_IL_0002:
-ldfld System.Result.Error<T0>::Value
+ldfld System.Result.Failure<T0>::Value
 M00000012_IL_0007:
 ret
 .end
@@ -968,7 +968,7 @@ ldarg 1
 M00000013_IL_0001:
 ldarg 0
 M00000013_IL_0002:
-call instance System.Result.Error<T0>::get_Value()
+call instance System.Result.Failure<T0>::get_Value()
 M00000013_IL_0007:
 stobj T0
 M00000013_IL_000c:
@@ -983,7 +983,7 @@ ldstr "."
 M00000014_IL_000a:
 call System.String::Concat(String,String)
 M00000014_IL_000f:
-ldstr "Error"
+ldstr "Failure"
 M00000014_IL_0014:
 call System.String::Concat(String,String)
 M00000014_IL_0019:
@@ -993,11 +993,11 @@ call System.String::Concat(String,String)
 M00000014_IL_0023:
 ldarg 0
 M00000014_IL_0024:
-call instance System.Result.Error<T0>::get_Value()
+call instance System.Result.Failure<T0>::get_Value()
 M00000014_IL_0029:
 box T0
 M00000014_IL_002e:
-call System.Result.Error<T0>::Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object)
+call System.Result.Failure<T0>::Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object)
 M00000014_IL_0033:
 call System.String::Concat(String,String)
 M00000014_IL_0038:

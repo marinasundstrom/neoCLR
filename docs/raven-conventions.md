@@ -206,10 +206,10 @@ known:
 import System.*
 import System.Result.*
 
-let failure: Result<int, string> = Error("Unavailable")
+let failure: Result<int, string> = Failure("Unavailable")
 ```
 
-Prefer this to repeating `Result<int, string>.Error("Unavailable")` on the right.
+Prefer this to repeating `Result<int, string>.Failure("Unavailable")` on the right.
 The same rule applies to Option and other imported union cases throughout runtime
 code, samples, tests and website content. Keep qualification when required to
 resolve a name or provide type information that cannot otherwise be inferred.
@@ -443,7 +443,7 @@ The alternatives remain discoverable in the signature. Apply this to implementat
 examples and tests when it reduces boilerplate and makes their intent easier to read.
 
 Use the same spelling directly in generic constructors and method type arguments;
-no alias is needed. After extracting `Error(let error)`, narrow with a typed pattern
+no alias is needed. After extracting `Failure(let error)`, narrow with a typed pattern
 such as `error is FileReadError fileError`, then inspect the nominal error's cases.
 
 See the [configuration loader](experiments/adhoc-error-unions/Config.rvn), the

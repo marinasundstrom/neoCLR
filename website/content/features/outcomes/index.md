@@ -6,6 +6,12 @@ For error unions, handling and propagation, followed by optional diagnostic conv
 
 <a id="handling"></a>
 
+**Development migration:** the failure case is now `Failure` (formerly `Error`). Rebuild
+applications and dependencies with matching libraries; update construction and patterns.
+`Ok(value)` stays short for the common success path. `Failure(error)` names the
+outcome state; the error is its payload. `System.Error` is the optional diagnostic
+interface for that payload and keeps its name.
+
 ## Error and optional-result handling in Raven
 
 A Result or Option does not require a match at every call. Use `?` when the enclosing function should propagate an error. Use a pattern binding for a value that may be absent. A match is useful when the individual cases need different processing or when the application decides how to report an error.
@@ -48,16 +54,16 @@ Map transforms a successful value. Then chains an operation that already returns
 {{OUTCOME_OPERATORS_SAMPLE}}
 ```
 
-This example prints 42, 43, 7, Read: Unavailable, 9 and 42 on separate lines. The explicit Then callback signature works around a current compiler inference limitation; the other callbacks use inferred types. The recovery callback only runs for Error. ToIterable explicitly converts a successful value to a one-element collection; None and Error become empty collections.
+This example prints 42, 43, 7, Read: Unavailable, 9 and 42 on separate lines. The explicit Then callback signature works around a current compiler inference limitation; the other callbacks use inferred types. The recovery callback only runs for Failure. ToIterable explicitly converts a successful value to a one-element collection; None and Failure become empty collections.
 
 [Complete executable sample →](../../samples/library-outcome-operators.rvn) · [Expected output →](../../samples/library-outcome-operators.expected.txt) · [Preview setup →](../../try/#development)
 
 <a id="error-payloads"></a>
 
 ## Errors are ordinary values
-Use a string for a simple message or a dedicated error type when callers need to distinguish cases. Result.Error is the union case; it does not require an error base class.
+Use a string for a simple message or a dedicated error type when callers need to distinguish cases. Result.Failure is the union case; it does not require an error base class.
 
-With imported Result cases and an expected type, write `let failure: Result<int, string> = Error("Unavailable")`, as in the tested example above.
+With imported Result cases and an expected type, write `let failure: Result<int, string> = Failure("Unavailable")`, as in the tested example above.
 
 <a id="adhoc-errors"></a>
 
@@ -72,7 +78,7 @@ loader preserves either the file-read error or the numeric parse error:
 {{ADHOC_ERROR_UNION_SAMPLE}}
 ```
 
-`?` returns immediately on either failure. After matching `Error(let error)`, use
+`?` returns immediately on either failure. After matching `Failure(let error)`, use
 `error is FileReadError` or `error is NumberParseError` to distinguish the listed
 alternatives and inspect their cases. An unrelated error cannot propagate into
 this union. The final `Ok(config)` constructs the successful Result.
@@ -84,7 +90,7 @@ cases, and keep the contract independent of lower-level implementation choices.
 Use a converter when it performs that intentional domain mapping.
 
 HTTP JSON client helpers return `HttpError | JsonError`, composing transport and
-serialization errors directly. Match the typed alternatives after extracting Error;
+serialization errors directly. Match the typed alternatives after extracting Failure;
 HttpError and JsonError retain their nominal cases. See [HTTP JSON APIs](../../docs/json.html).
 
 Native structural unions support value and reference alternatives. Supported
@@ -106,7 +112,7 @@ contract for supported combinations.
 | Chain an outcome | Then | Then |
 | Keep a matching value | Filter | — |
 | Transform an error | — | MapError |
-| Recover with an outcome | OrElse (None) | OrElse (Error) |
+| Recover with an outcome | OrElse (None) | OrElse (Failure) |
 | Extract with a fallback | UnwrapOr, UnwrapOrElse | UnwrapOr, UnwrapOrElse |
 | Handle both branches | Match | Match |
 | Run a branch action | Tap, TapNone | Tap, TapError |
@@ -114,7 +120,7 @@ contract for supported combinations.
 | Convert absence to an error | OkOr (value or factory), MapResult, ThenResult | — |
 | Remove one nested layer | Flatten | — |
 
-Callbacks run immediately on the matching branch. Tap methods return the original outcome. UnwrapOr takes an already evaluated fallback; UnwrapOrElse calls a parameterless factory only for None or Error. Use Result.OrElse or Match if the error itself is needed. ToIterable allocates a small collection and discards an Error payload, so use patterns when the error needs handling.
+Callbacks run immediately on the matching branch. Tap methods return the original outcome. UnwrapOr takes an already evaluated fallback; UnwrapOrElse calls a parameterless factory only for None or Failure. Use Result.OrElse or Match if the error itself is needed. ToIterable allocates a small collection and discards an Failure payload, so use patterns when the error needs handling.
 
 Raven.Core users will recognize these operators: neoCLR calls Where **Filter** and ToEnumerable **ToIterable**. Throwing unwrap helpers, generic-default helpers, nullable adapters and JSON integration are outside this slice. Development [context-error support](../error-handling/) adds explicit diagnostic decoration. Collection queries have their own [.NET operator mapping](../collections/#dotnet-mapping).
 

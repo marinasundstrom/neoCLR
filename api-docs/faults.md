@@ -41,7 +41,7 @@ string. Enum ordinals are not an API, and these are not .NET HRESULT values.
 ```rust
 match program.run(neoclr::Limits::default()) {
     Ok(execution) => { /* consume the result */ }
-    Err(fault) => match fault.code {
+    Failure(fault) => match fault.code {
         neoclr::FaultCode::StackOverflow => { /* report excessive call depth */ }
         neoclr::FaultCode::UserFault => { /* report an explicit guest failure */ }
         _ => { /* handle another terminal failure */ }

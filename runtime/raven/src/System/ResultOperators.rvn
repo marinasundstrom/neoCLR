@@ -7,28 +7,28 @@ public extension ResultOperators<T, E> for Result<T, E> {
     func Map<U>(mapper: (T) -> U) -> Result<U, E> {
         return self match {
             Ok(let value) => Ok(mapper(value))
-            Error(let error) => Error(error)
+            Failure(let error) => Failure(error)
         }
     }
 
     func Then<U>(binder: (T) -> Result<U, E>) -> Result<U, E> {
         return self match {
             Ok(let value) => binder(value)
-            Error(let error) => Error(error)
+            Failure(let error) => Failure(error)
         }
     }
 
     func MapError<F>(mapper: (E) -> F) -> Result<T, F> {
         return self match {
             Ok(let value) => Ok(value)
-            Error(let error) => Error(mapper(error))
+            Failure(let error) => Failure(mapper(error))
         }
     }
 
     func Match<U>(ok: (T) -> U, error: (E) -> U) -> U {
         return self match {
             Ok(let value) => ok(value)
-            Error(let errorValue) => error(errorValue)
+            Failure(let errorValue) => error(errorValue)
         }
     }
 
@@ -40,7 +40,7 @@ public extension ResultOperators<T, E> for Result<T, E> {
     }
 
     func TapError(action: (E) -> System.Void) -> Result<T, E> {
-        if self is Error(let error) {
+        if self is Failure(let error) {
             action(error)
         }
         return self
@@ -49,21 +49,21 @@ public extension ResultOperators<T, E> for Result<T, E> {
     func OrElse(recover: (E) -> Result<T, E>) -> Result<T, E> {
         return self match {
             Ok(_) => self
-            Error(let error) => recover(error)
+            Failure(let error) => recover(error)
         }
     }
 
     func UnwrapOrElse(factory: () -> T) -> T {
         return self match {
             Ok(let value) => value
-            Error(_) => factory()
+            Failure(_) => factory()
         }
     }
 
     func UnwrapOr(defaultValue: T) -> T {
         return self match {
             Ok(let value) => value
-            Error(_) => defaultValue
+            Failure(_) => defaultValue
         }
     }
 

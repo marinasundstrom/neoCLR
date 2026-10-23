@@ -8,7 +8,7 @@
     call System.Int32::Parse(String)
     stloc parsed
     ldloc parsed
-    call instance System.Result<Int32,System.Int32ParseError>::get_IsErrorCase()
+    call instance System.Result<Int32,System.Int32ParseError>::get_IsFailureCase()
     brtrue ParseFailed
     ldloc parsed
     call instance System.Result<Int32,System.Int32ParseError>::GetOkCase()
@@ -20,16 +20,16 @@
     ldstr "Expected a positive number: "
     ldarg text
     call System.String::Concat(String,String)
-    newobj instance System.Result.Error<String>::.ctor(String)
-    newobj instance System.Result<Int32,String>::.ctor(System.Result.Error<String>)
+    newobj instance System.Result.Failure<String>::.ctor(String)
+    newobj instance System.Result<Int32,String>::.ctor(System.Result.Failure<String>)
     ret
 ParseFailed:
     ldloc parsed
-    call instance System.Result<Int32,System.Int32ParseError>::GetErrorCase()
-    call instance System.Result.Error<System.Int32ParseError>::get_Value()
+    call instance System.Result<Int32,System.Int32ParseError>::GetFailureCase()
+    call instance System.Result.Failure<System.Int32ParseError>::get_Value()
     call instance System.Int32ParseError::ToString()
-    newobj instance System.Result.Error<String>::.ctor(String)
-    newobj instance System.Result<Int32,String>::.ctor(System.Result.Error<String>)
+    newobj instance System.Result.Failure<String>::.ctor(String)
+    newobj instance System.Result<Int32,String>::.ctor(System.Result.Failure<String>)
     ret
 Success:
     ldloc value
@@ -43,8 +43,8 @@ Success:
     dup
     call instance System.Result<Int32,String>::get_IsOkCase()
     brtrue Success
-    call instance System.Result<Int32,String>::GetErrorCase()
-    call instance System.Result.Error<String>::get_Value()
+    call instance System.Result<Int32,String>::GetFailureCase()
+    call instance System.Result.Failure<String>::get_Value()
     call System.Console::WriteLine(String)
     ret
 Success:

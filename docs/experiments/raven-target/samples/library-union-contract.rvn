@@ -77,26 +77,26 @@ func Main() {
     Check(noneView.Value is None, "UnionValue active None")
 
     let ok: Result<int, string> = Ok(42)
-    let error: Result<int, string> = Error("failed")
+    let error: Result<int, string> = Failure("failed")
     Check(PropagateResult(ok) is Ok(let number) && number == 42, "Ok propagation")
-    Check(PropagateResult(error) is Error(let message) && message.Equals("failed"), "Error propagation")
+    Check(PropagateResult(error) is Failure(let message) && message.Equals("failed"), "Error propagation")
     let resultView = (UnionValue)(object)error
-    Check(resultView.Value is System.Result.Error<string>(let boxedMessage) && boxedMessage.Equals("failed"), "Result UnionValue")
+    Check(resultView.Value is System.Result.Failure<string>(let boxedMessage) && boxedMessage.Equals("failed"), "Result UnionValue")
     let inactiveResult = default(Result<int, string>)
     Check(!inactiveResult.HasValue && Object.ReferenceEquals(inactiveResult.Value, null), "Default Result")
 
     let sameOk: Result<int, int> = Ok(7)
-    let sameError: Result<int, int> = Error(7)
+    let sameError: Result<int, int> = Failure(7)
     Check(sameOk is Ok(let sameOkValue) && sameOkValue == 7, "Same-type Ok")
-    Check(sameError is Error(let sameErrorValue) && sameErrorValue == 7, "Same-type Error")
-    Check(!(sameOk is Error(_)), "Same-type cases must differ")
+    Check(sameError is Failure(let sameErrorValue) && sameErrorValue == 7, "Same-type Error")
+    Check(!(sameOk is Failure(_)), "Same-type cases must differ")
 
     let unit: Option<System.Void> = Some(())
     Check(unit.HasValue && unit is Some(_), "Some Void differs from None")
     let completed: Result<System.Void, string> = Ok(())
     Check(PropagateVoid(completed) is Ok(_), "Void propagation")
-    let voidError: Result<System.Void, string> = Error("failed")
-    Check(PropagateVoid(voidError) is Error(_), "Void error propagation")
+    let voidError: Result<System.Void, string> = Failure("failed")
+    Check(PropagateVoid(voidError) is Failure(_), "Void error propagation")
 
     let nested: Option<Result<int, string>> = Some(ok)
     Check(nested is Some(Ok(let nestedNumber)) && nestedNumber == 42, "Nested outcomes")
@@ -130,6 +130,6 @@ func Main() {
     let voidTask: TaskOutcome<System.Void> = Completed(())
     Check(voidTask is Completed(_), "Completed Void")
     let failedTask: TaskOutcome<Result<int, string>> = Completed(error)
-    Check(failedTask is Completed(Error(let taskError)) && taskError.Equals("failed"), "Completed error differs from cancellation")
+    Check(failedTask is Completed(Failure(let taskError)) && taskError.Equals("failed"), "Completed error differs from cancellation")
     WriteLine("Union contract passed")
 }

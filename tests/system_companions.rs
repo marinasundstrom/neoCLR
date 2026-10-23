@@ -27,7 +27,7 @@ fn type_descriptor_exposes_name_arguments_and_owner_read_only() {
     assert_eq!(descriptor.generic_arguments[0].name, "System.Int32");
     for (case, owner) in [
         ("System.Result.Ok<Int32>", "System.Result"),
-        ("System.Result.Error<String>", "System.Result"),
+        ("System.Result.Failure<String>", "System.Result"),
         ("System.Option.Some<Int32>", "System.Option"),
         ("System.Option.None", "System.Option"),
     ] {

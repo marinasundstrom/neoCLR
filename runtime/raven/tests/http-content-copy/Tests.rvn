@@ -34,7 +34,7 @@ class CopyInput : InputStream {
     private func ReadCore(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
         Reads += 1
         if count > LargestRequest { LargestRequest = count }
-        if mode == 1 { return Error(StreamError.AccessDenied) }
+        if mode == 1 { return Failure(StreamError.AccessDenied) }
         if mode == 2 { return Ok(-1) }
         if mode == 3 { return Ok(count + 1) }
         var take = size - Position
@@ -102,7 +102,7 @@ class CopyOutput : OutputStream {
             _ = cancelled.Cancel()
             return await cancelled.Task
         }
-        if fail { return Error(StreamError.AccessDenied) }
+        if fail { return Failure(StreamError.AccessDenied) }
         var index = 0
         while index < count {
             if buffer[offset + index] != (byte)((Count + index) % 251) { Valid = false }
@@ -143,7 +143,7 @@ async func ABackpressure() -> Task<Result<unit, TestFailure>> {
     _ = Assert.Equal(0, input.Closed)?
     _ = Assert.Equal(0, output.Closed)?
     _ = Assert.Equal(0, output.Flushes)?
-    _ = Assert.True(await content.CopyTo(output) is Error(HttpError.InvalidRequest(_)), "Stream cannot replay")?
+    _ = Assert.True(await content.CopyTo(output) is Failure(HttpError.InvalidRequest(_)), "Stream cannot replay")?
     content.Dispose()
     content.Dispose()
     return Assert.Equal(1, input.Closed)
@@ -180,7 +180,7 @@ async func CFailures() -> Task<Result<unit, TestFailure>> {
     let truncated = CopyInput(1, 0)
     let Ok(content) = HttpStreamContent.Create(truncated, 2, true) else { return Assert.True(false, "Create truncated source") }
     let output = ReadyOutput()
-    _ = Assert.True(await content.CopyTo(output) is Error(HttpError.Content(StreamError.IoFailure)), "Early EOF")?
+    _ = Assert.True(await content.CopyTo(output) is Failure(HttpError.Content(StreamError.IoFailure)), "Early EOF")?
     _ = Assert.Equal(1, output.Count)?
     for mode in 1..4 {
         let invalidInput = CopyInput(2, mode)
@@ -188,18 +188,18 @@ async func CFailures() -> Task<Result<unit, TestFailure>> {
         let sink = ReadyOutput()
         let result = await invalid.CopyTo(sink)
         if mode == 1 {
-            _ = Assert.True(result is Error(HttpError.Content(StreamError.AccessDenied)), "Preserve read error")?
+            _ = Assert.True(result is Failure(HttpError.Content(StreamError.AccessDenied)), "Preserve read error")?
         } else {
-            _ = Assert.True(result is Error(HttpError.Content(StreamError.IoFailure)), "Reject impossible count")?
+            _ = Assert.True(result is Failure(HttpError.Content(StreamError.IoFailure)), "Reject impossible count")?
         }
         _ = Assert.Equal(0, sink.Writes)?
     }
     let input = CopyInput(2500, 0)
     let Ok(failing) = HttpStreamContent.Create(input, 2500, true) else { return Assert.True(false, "Create write failure") }
     let rejected = CopyOutput(Task.FromResult(true), true)
-    _ = Assert.True(await failing.CopyTo(rejected) is Error(HttpError.Content(StreamError.AccessDenied)), "Preserve write error")?
+    _ = Assert.True(await failing.CopyTo(rejected) is Failure(HttpError.Content(StreamError.AccessDenied)), "Preserve write error")?
     _ = Assert.Equal(1, input.Reads)?
-    _ = Assert.True(await failing.CopyTo(rejected) is Error(HttpError.InvalidRequest(_)), "Failure consumes stream")?
+    _ = Assert.True(await failing.CopyTo(rejected) is Failure(HttpError.InvalidRequest(_)), "Failure consumes stream")?
     failing.Dispose()
     return Assert.Equal(0, input.Closed)
 }
@@ -249,7 +249,7 @@ async func ECancellation() -> Task<Result<unit, TestFailure>> {
     _ = Assert.Equal(1, input.Reads)?
     _ = Assert.Equal(0, pending.Count)?
     _ = Assert.True(pending.TokenSeen, "Pass cancellation to destination")?
-    _ = Assert.True(await content.CopyTo(output) is Error(HttpError.InvalidRequest(_)), "Cancellation consumes started stream")?
+    _ = Assert.True(await content.CopyTo(output) is Failure(HttpError.InvalidRequest(_)), "Cancellation consumes started stream")?
     content.Dispose()
     cancellation.Dispose()
     active.Dispose()
@@ -262,7 +262,7 @@ async func FDisposal() -> Task<Result<unit, TestFailure>> {
     let buffered = HttpMemoryContent(bytes)
     buffered.Dispose()
     let output = ReadyOutput()
-    _ = Assert.True(await buffered.CopyTo(output) is Error(HttpError.Content(StreamError.Closed)), "Disposed buffered content")?
+    _ = Assert.True(await buffered.CopyTo(output) is Failure(HttpError.Content(StreamError.Closed)), "Disposed buffered content")?
     _ = Assert.Equal(0, output.Writes)?
     let input = CopyInput(2500, 0)
     let Ok(content) = HttpStreamContent.Create(input, 2500, false) else { return Assert.True(false, "Create source") }
@@ -273,7 +273,7 @@ async func FDisposal() -> Task<Result<unit, TestFailure>> {
     content.Dispose()
     _ = Assert.Equal(1, input.Closed)?
     _ = gate.Complete(true)
-    _ = Assert.True(await operation is Error(HttpError.Content(StreamError.Closed)), "Stop after pending write settles")?
+    _ = Assert.True(await operation is Failure(HttpError.Content(StreamError.Closed)), "Stop after pending write settles")?
     _ = Assert.Equal(1, input.Reads)?
     _ = Assert.Equal(700, pending.Count)?
     return Assert.Equal(0, pending.Closed)
@@ -287,7 +287,7 @@ async func GTextReader() -> Task<Result<unit, TestFailure>> {
     let Ok(content) = HttpStreamContent.Create(input, 3, true) else { return Assert.True(false, "Create stream") }
     _ = Assert.True(await HttpStringContent.Read(content) is Ok("\u0000\u0001\u0002"), "Read generic stream")?
     _ = Assert.Equal(0, input.Closed)?
-    _ = Assert.True(await HttpStringContent.Read(content) is Error(HttpError.InvalidRequest(_)), "Read consumes stream")?
+    _ = Assert.True(await HttpStringContent.Read(content) is Failure(HttpError.InvalidRequest(_)), "Read consumes stream")?
     let prefix = CopyInput(3, 0)
     let Ok(prefixContent) = HttpStreamContent.Create(prefix, 2, true) else { return Assert.True(false, "Create prefix") }
     _ = Assert.True(await HttpStringContent.Read(prefixContent) is Ok("\u0000\u0001"), "Stop at declared length")?
@@ -297,13 +297,13 @@ async func GTextReader() -> Task<Result<unit, TestFailure>> {
     _ = Assert.True(await HttpStringContent.Read(splitContent) is Ok("éé"), "Decode split UTF-8 incrementally")?
     let truncated = CopyInput(1, 0)
     let Ok(shortContent) = HttpStreamContent.Create(truncated, 2, true) else { return Assert.True(false, "Create truncated input") }
-    _ = Assert.True(await HttpStringContent.Read(shortContent) is Error(HttpError.Content(StreamError.IoFailure)), "Reject early EOF")?
+    _ = Assert.True(await HttpStringContent.Read(shortContent) is Failure(HttpError.Content(StreamError.IoFailure)), "Reject early EOF")?
     let denied = CopyInput(1, 1)
     let Ok(deniedContent) = HttpStreamContent.Create(denied, 1, true) else { return Assert.True(false, "Create denied input") }
-    _ = Assert.True(await HttpStringContent.Read(deniedContent) is Error(HttpError.Content(StreamError.AccessDenied)), "Preserve stream errors")?
+    _ = Assert.True(await HttpStringContent.Read(deniedContent) is Failure(HttpError.Content(StreamError.AccessDenied)), "Preserve stream errors")?
     let large = CopyInput(65537, 5)
     let Ok(largeContent) = HttpStreamContent.Create(large, 65537, true) else { return Assert.True(false, "Create large text") }
-    _ = Assert.True(await HttpStringContent.Read(largeContent) is Error(HttpError.Content(StreamError.LimitExceeded)), "Enforce text quota")?
+    _ = Assert.True(await HttpStringContent.Read(largeContent) is Failure(HttpError.Content(StreamError.LimitExceeded)), "Enforce text quota")?
     _ = Assert.True(large.LargestRequest <= 256, "Bound text staging")?
     let bytes: byte[] = [(byte)255, (byte)195, (byte)169, (byte)255]
     let memory: ReadOnlyMemory<byte> = bytes
@@ -311,20 +311,20 @@ async func GTextReader() -> Task<Result<unit, TestFailure>> {
     let Ok(text) = await HttpStringContent.Read(body) else { return Assert.True(false, "Read memory window") }
     bytes[1] = (byte)65
     _ = Assert.Equal("é", text)?
-    _ = Assert.True(await HttpStringContent.Read(body) is Error(HttpError.Protocol(_)), "Invalid UTF-8 remains typed")?
+    _ = Assert.True(await HttpStringContent.Read(body) is Failure(HttpError.Protocol(_)), "Invalid UTF-8 remains typed")?
     body.Dispose()
-    return Assert.True(await HttpStringContent.Read(body) is Error(HttpError.Content(StreamError.Closed)), "Disposed text content")
+    return Assert.True(await HttpStringContent.Read(body) is Failure(HttpError.Content(StreamError.Closed)), "Disposed text content")
 }
 
 [Test("HTTP stream creation validates before taking ownership or reading")]
 async func HFactory() -> Task<Result<unit, TestFailure>> {
     let input = CopyInput(3, 0)
-    _ = Assert.True(HttpStreamContent.Create(input, -1, false) is Error(HttpError.InvalidRequest(_)), "Negative length")?
-    _ = Assert.True(HttpStreamContent.Create(input, 1048577, false) is Error(HttpError.LimitExceeded(_)), "Oversized length")?
+    _ = Assert.True(HttpStreamContent.Create(input, -1, false) is Failure(HttpError.InvalidRequest(_)), "Negative length")?
+    _ = Assert.True(HttpStreamContent.Create(input, 1048577, false) is Failure(HttpError.LimitExceeded(_)), "Oversized length")?
     _ = Assert.Equal(0, input.Reads)?
     _ = Assert.Equal(0, input.Closed)?
     let Ok(content) = HttpStreamContent.Create(input, 3, false) else { return Assert.True(false, "Create valid stream") }
     content.Dispose()
     _ = Assert.Equal(1, input.Closed)?
-    return Assert.True(await content.CopyTo(ReadyOutput()) is Error(HttpError.Content(StreamError.Closed)), "Owned stream closed")
+    return Assert.True(await content.CopyTo(ReadyOutput()) is Failure(HttpError.Content(StreamError.Closed)), "Owned stream closed")
 }

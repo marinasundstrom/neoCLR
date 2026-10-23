@@ -18,7 +18,7 @@ func Names() -> Result<unit, TestFailure> {
     let Ok(alias) = Enum.Parse<State>(" Alias ") else { return Assert.True(false, "Alias and whitespace") }
     _ = Assert.True(ready == State.Ready && alias == ready, "Aliases preserve value")?
     let Ok(folded) = Enum.Parse<State>("rEaDy", true) else { return Assert.True(false, "Ignore case") }
-    _ = Assert.True(folded == ready && Enum.Parse<State>("ready") is Error(_), "Case is explicit")?
+    _ = Assert.True(folded == ready && Enum.Parse<State>("ready") is Failure(_), "Case is explicit")?
     let Ok(imported) = Enum.Parse<StringComparison>("Ordinal") else { return Assert.True(false, "Imported enum") }
     _ = Assert.True(imported == StringComparison.Ordinal, "Imported identity")?
     let Ok(forwarded) = ParseEnum<State>("Ready") else { return Assert.True(false, "Constrained forwarding") }
@@ -33,8 +33,8 @@ func Numbers() -> Result<unit, TestFailure> {
     let Ok(negative) = Enum.Parse<State>("-2147483648") else { return Assert.True(false, "Minimum") }
     let Ok(maximum) = Enum.Parse<State>("2147483647") else { return Assert.True(false, "Maximum") }
     _ = Assert.True((int)positive == 42 && (int)negative == -2147483648 && (int)maximum == 2147483647, "Numeric bits")?
-    _ = Assert.True(Enum.Parse<State>("2147483648") is Error(NumberParseError.Overflow()), "Positive overflow")?
-    _ = Assert.True(Enum.Parse<State>("-2147483649") is Error(NumberParseError.Overflow()), "Negative overflow")?
+    _ = Assert.True(Enum.Parse<State>("2147483648") is Failure(NumberParseError.Overflow()), "Positive overflow")?
+    _ = Assert.True(Enum.Parse<State>("-2147483649") is Failure(NumberParseError.Overflow()), "Negative overflow")?
     let Ok(empty) = Enum.Parse<Empty>("0") else { return Assert.True(false, "Empty enum numeric value") }
     return Assert.True((int)empty == 0, "Empty enum bits")
 }
@@ -70,7 +70,7 @@ func UnicodeNames() -> Result<unit, TestFailure> {
     _ = Assert.True(folded == Letters.Ångström, "Unicode case value")?
     let Ok(hebrew) = Enum.Parse<Letters>("שלום") else { return Assert.True(false, "Hebrew name") }
     _ = Assert.True(hebrew == Letters.שלום, "Hebrew identity")?
-    _ = Assert.True(Enum.Parse<Letters>("Café") is Error(_), "Ordinal names do not normalize")?
+    _ = Assert.True(Enum.Parse<Letters>("Café") is Failure(_), "Ordinal names do not normalize")?
     let Ok(list) = Enum.Parse<Letters>("Ångström, Café") else { return Assert.True(false, "Unicode list") }
     System.Runtime.GC.Collect()
     return Assert.True((int)list == 3 && accent.ToString().Equals("Café", StringComparison.Ordinal), "Names retain bytes through display")

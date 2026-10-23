@@ -67,15 +67,15 @@ fn void_is_a_value_and_a_generic_argument() {
 fn arithmetic_failures_are_errors_when_requested() {
     for (body, expected) in [
         (
-            "ldc.i4 1\nldc.i4 0\ncall System.Int32.Divide(int32, int32)\ncall instance System.Result<Int32,System.IntegerDivisionError>::GetErrorCase()\ncall instance System.Result.Error<System.IntegerDivisionError>::get_Value()\ncall instance System.IntegerDivisionError::ToString()\nret",
+            "ldc.i4 1\nldc.i4 0\ncall System.Int32.Divide(int32, int32)\ncall instance System.Result<Int32,System.IntegerDivisionError>::GetFailureCase()\ncall instance System.Result.Failure<System.IntegerDivisionError>::get_Value()\ncall instance System.IntegerDivisionError::ToString()\nret",
             "DivisionByZero",
         ),
         (
-            "ldc.i4 -2147483648\nldc.i4 -1\ncall System.Int32.Divide(int32, int32)\ncall instance System.Result<Int32,System.IntegerDivisionError>::GetErrorCase()\ncall instance System.Result.Error<System.IntegerDivisionError>::get_Value()\ncall instance System.IntegerDivisionError::ToString()\nret",
+            "ldc.i4 -2147483648\nldc.i4 -1\ncall System.Int32.Divide(int32, int32)\ncall instance System.Result<Int32,System.IntegerDivisionError>::GetFailureCase()\ncall instance System.Result.Failure<System.IntegerDivisionError>::get_Value()\ncall instance System.IntegerDivisionError::ToString()\nret",
             "Overflow",
         ),
         (
-            "ldstr \"2147483648\"\ncall System.Int32.Parse(string)\ncall instance System.Result<Int32,System.Int32ParseError>::GetErrorCase()\ncall instance System.Result.Error<System.Int32ParseError>::get_Value()\ncall instance System.Int32ParseError::ToString()\nret",
+            "ldstr \"2147483648\"\ncall System.Int32.Parse(string)\ncall instance System.Result<Int32,System.Int32ParseError>::GetFailureCase()\ncall instance System.Result.Failure<System.Int32ParseError>::get_Value()\ncall instance System.Int32ParseError::ToString()\nret",
             "Overflow",
         ),
     ] {

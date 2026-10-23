@@ -6,10 +6,10 @@ import System.Option.*
 func Main() -> int {
     Console.Write("Input: ")
     let reader = Console.In
-    let Error(TextReadError.InvalidRange) = reader.ReadToEnd(-1) else {
+    let Failure(TextReadError.InvalidRange) = reader.ReadToEnd(-1) else {
         return 2
     }
-    let Error(TextReadError.LimitExceeded) = reader.ReadToEnd(65537) else {
+    let Failure(TextReadError.LimitExceeded) = reader.ReadToEnd(65537) else {
         return 3
     }
     let Ok(first) = reader.ReadLine(32) else {
@@ -32,7 +32,7 @@ func Main() -> int {
         return 6
     }
     reader.Close()
-    let Error(TextReadError.Closed) = reader.ReadToEnd(32) else {
+    let Failure(TextReadError.Closed) = reader.ReadToEnd(32) else {
         return 7
     }
     return 0

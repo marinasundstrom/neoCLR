@@ -52,7 +52,7 @@ public class HttpMethod : EquatableTo<HttpMethod> {
     /// custom spelling is retained. Invalid tokens return HttpError.InvalidRequest.
     static func Parse(method: string) -> Result<HttpMethod, HttpError> {
         if !Valid(method) {
-            return Error(HttpError.InvalidRequest("Invalid HTTP method"))
+            return Failure(HttpError.InvalidRequest("Invalid HTTP method"))
         }
         if String.CompareOrdinalIgnoreCase(method, "GET") == 0 {
             return Ok(Get)

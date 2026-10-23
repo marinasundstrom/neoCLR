@@ -47,7 +47,7 @@ func Next(counter: int&) -> int { counter = counter + 1; return 42 }
 func Main() -> int {
     var calls = 0
     let some = Option<int>(System.Option.Some<int>(Next(&calls)))
-    let error = Result<int, string>(System.Result.Error<string>("no"))
+    let error = Result<int, string>(System.Result.Failure<string>("no"))
     let Some(value) = some else { return -1 }
     if calls != 1 { return -2 }
     if let Error(message) = error { if message.Equals("no") { return value } }

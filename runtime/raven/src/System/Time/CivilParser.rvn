@@ -30,22 +30,22 @@ internal class CivilParser {
         var dayStart = 8
         if culture.Name.Equals("he-IL") {
             if text[2] != 46 || text[5] != 46 {
-                return Error(DateTimeParseError.InvalidFormat)
+                return Failure(DateTimeParseError.InvalidFormat)
             }
             yearStart = 6
             monthStart = 3
             dayStart = 0
         } else if text[4] != 45 || text[7] != 45 {
-            return Error(DateTimeParseError.InvalidFormat)
+            return Failure(DateTimeParseError.InvalidFormat)
         }
         let year = Digits(text, yearStart, 4)
         let month = Digits(text, monthStart, 2)
         let day = Digits(text, dayStart, 2)
         if year < 0 || month < 0 || day < 0 {
-            return Error(DateTimeParseError.InvalidFormat)
+            return Failure(DateTimeParseError.InvalidFormat)
         }
         let Ok(value) = Date.Create(year, month, day) else {
-            return Error(DateTimeParseError.OutOfRange)
+            return Failure(DateTimeParseError.OutOfRange)
         }
         return Ok(value)
     }
@@ -53,13 +53,13 @@ internal class CivilParser {
     private static func TimePart(text: Sequence<byte>, start: int, culture: Culture) -> Result<TimeOfDay, DateTimeParseError> {
         let length = text.Count - start
         if length < 8 {
-            return Error(DateTimeParseError.InvalidFormat)
+            return Failure(DateTimeParseError.InvalidFormat)
         }
         if length > 16 || length == 9 {
-            return Error(DateTimeParseError.InvalidFormat)
+            return Failure(DateTimeParseError.InvalidFormat)
         }
         if text[start + 2] != 58 || text[start + 5] != 58 {
-            return Error(DateTimeParseError.InvalidFormat)
+            return Failure(DateTimeParseError.InvalidFormat)
         }
         let hour = Digits(text, start, 2)
         let minute = Digits(text, start + 3, 2)
@@ -71,32 +71,32 @@ internal class CivilParser {
                 separator = 44
             }
             if (int)text[start + 8] != separator {
-                return Error(DateTimeParseError.InvalidFormat)
+                return Failure(DateTimeParseError.InvalidFormat)
             }
             fraction = Digits(text, start + 9, length - 9)
             if fraction < 0 {
-                return Error(DateTimeParseError.InvalidFormat)
+                return Failure(DateTimeParseError.InvalidFormat)
             }
             for index in length - 9..7 {
                 fraction *= 10
             }
         }
         if hour < 0 || minute < 0 || second < 0 {
-            return Error(DateTimeParseError.InvalidFormat)
+            return Failure(DateTimeParseError.InvalidFormat)
         }
         let Ok(value) = TimeOfDay.Create(hour, minute, second, fraction) else {
-            return Error(DateTimeParseError.OutOfRange)
+            return Failure(DateTimeParseError.OutOfRange)
         }
         return Ok(value)
     }
 
     static func ParseDate(value: string, culture: Culture) -> Result<Date, DateTimeParseError> {
         if value.GetUtf8ByteCount() != 10 {
-            return Error(DateTimeParseError.InvalidFormat)
+            return Failure(DateTimeParseError.InvalidFormat)
         }
         let text = Utf8.Encode(value)
         if text.Count != 10 {
-            return Error(DateTimeParseError.InvalidFormat)
+            return Failure(DateTimeParseError.InvalidFormat)
         }
         return DatePart(text, culture)
     }
@@ -104,14 +104,14 @@ internal class CivilParser {
     static func ParseTime(value: string, culture: Culture) -> Result<TimeOfDay, DateTimeParseError> {
         let length = value.GetUtf8ByteCount()
         if length < 8 {
-            return Error(DateTimeParseError.InvalidFormat)
+            return Failure(DateTimeParseError.InvalidFormat)
         }
         if length > 16 {
-            return Error(DateTimeParseError.InvalidFormat)
+            return Failure(DateTimeParseError.InvalidFormat)
         }
         let text = Utf8.Encode(value)
         if text.Count != length {
-            return Error(DateTimeParseError.InvalidFormat)
+            return Failure(DateTimeParseError.InvalidFormat)
         }
         return TimePart(text, 0, culture)
     }
@@ -119,21 +119,21 @@ internal class CivilParser {
     static func ParseLocal(value: string, culture: Culture) -> Result<LocalDateTime, DateTimeParseError> {
         let length = value.GetUtf8ByteCount()
         if length < 19 {
-            return Error(DateTimeParseError.InvalidFormat)
+            return Failure(DateTimeParseError.InvalidFormat)
         }
         if length > 27 {
-            return Error(DateTimeParseError.InvalidFormat)
+            return Failure(DateTimeParseError.InvalidFormat)
         }
         let text = Utf8.Encode(value)
         if text.Count != length {
-            return Error(DateTimeParseError.InvalidFormat)
+            return Failure(DateTimeParseError.InvalidFormat)
         }
         var separator = 32
         if culture.Name.IsEmpty {
             separator = 84
         }
         if (int)text[10] != separator {
-            return Error(DateTimeParseError.InvalidFormat)
+            return Failure(DateTimeParseError.InvalidFormat)
         }
         let date = DatePart(text, culture)?
         let time = TimePart(text, 11, culture)?
@@ -143,10 +143,10 @@ internal class CivilParser {
     static func ParseDuration(value: string) -> Result<Duration, DateTimeParseError> {
         let length = value.GetUtf8ByteCount()
         if length < 8 {
-            return Error(DateTimeParseError.InvalidFormat)
+            return Failure(DateTimeParseError.InvalidFormat)
         }
         if length > 26 {
-            return Error(DateTimeParseError.InvalidFormat)
+            return Failure(DateTimeParseError.InvalidFormat)
         }
         let text = Utf8.Encode(value)
         var start = 0
@@ -162,14 +162,14 @@ internal class CivilParser {
             if text[cursor] == 46 {
                 let count = cursor - start
                 if count < 1 {
-                    return Error(DateTimeParseError.InvalidFormat)
+                    return Failure(DateTimeParseError.InvalidFormat)
                 }
                 if count > 8 {
-                    return Error(DateTimeParseError.InvalidFormat)
+                    return Failure(DateTimeParseError.InvalidFormat)
                 }
                 days = Digits(text, start, count)
                 if days < 0 {
-                    return Error(DateTimeParseError.InvalidFormat)
+                    return Failure(DateTimeParseError.InvalidFormat)
                 }
                 clockStart = cursor + 1
                 break
@@ -178,7 +178,7 @@ internal class CivilParser {
         }
         let time = TimePart(text, clockStart, Culture.Invariant)?
         if days > 10675199 {
-            return Error(DateTimeParseError.OutOfRange)
+            return Failure(DateTimeParseError.OutOfRange)
         }
         let dayTicks = days * 864000000000L
         // Accumulate negatively so Int64.MinValue never needs a positive magnitude.
@@ -187,7 +187,7 @@ internal class CivilParser {
             limit -= 1L
         }
         if -time.Ticks < limit + dayTicks {
-            return Error(DateTimeParseError.OutOfRange)
+            return Failure(DateTimeParseError.OutOfRange)
         }
         let ticks = -dayTicks - time.Ticks
         if negative {
@@ -202,36 +202,36 @@ internal class CivilParser {
         }
         let length = value.GetUtf8ByteCount()
         if length != 6 && length != 9 {
-            return Error(DateTimeParseError.InvalidFormat)
+            return Failure(DateTimeParseError.InvalidFormat)
         }
         let text = Utf8.Encode(value)
         if text[0] != 43 && text[0] != 45 {
-            return Error(DateTimeParseError.InvalidFormat)
+            return Failure(DateTimeParseError.InvalidFormat)
         }
         if text[3] != 58 {
-            return Error(DateTimeParseError.InvalidFormat)
+            return Failure(DateTimeParseError.InvalidFormat)
         }
         let hour = Digits(text, 1, 2)
         let minute = Digits(text, 4, 2)
         var second = 0
         if length == 9 {
             if text[6] != 58 {
-                return Error(DateTimeParseError.InvalidFormat)
+                return Failure(DateTimeParseError.InvalidFormat)
             }
             second = Digits(text, 7, 2)
         }
         if hour < 0 || minute < 0 || second < 0 {
-            return Error(DateTimeParseError.InvalidFormat)
+            return Failure(DateTimeParseError.InvalidFormat)
         }
         if minute > 59 || second > 59 {
-            return Error(DateTimeParseError.OutOfRange)
+            return Failure(DateTimeParseError.OutOfRange)
         }
         var seconds = hour * 3600 + minute * 60 + second
         if text[0] == 45 {
             seconds = -seconds
         }
         let Ok(offset) = TimeOffset.FromSeconds(seconds) else {
-            return Error(DateTimeParseError.OutOfRange)
+            return Failure(DateTimeParseError.OutOfRange)
         }
         return Ok(offset)
     }
@@ -239,21 +239,21 @@ internal class CivilParser {
     static func ParseInstant(value: string) -> Result<Instant, DateTimeParseError> {
         let length = value.GetUtf8ByteCount()
         if length < 20 {
-            return Error(DateTimeParseError.InvalidFormat)
+            return Failure(DateTimeParseError.InvalidFormat)
         }
         if length > 36 {
-            return Error(DateTimeParseError.InvalidFormat)
+            return Failure(DateTimeParseError.InvalidFormat)
         }
         let text = Utf8.Encode(value)
         let offsetStart = TimestampOffsetStart(text)
         if offsetStart < 0 {
-            return Error(DateTimeParseError.InvalidFormat)
+            return Failure(DateTimeParseError.InvalidFormat)
         }
         let Ok(localText) = value.SliceUtf8(0, offsetStart) else {
-            return Error(DateTimeParseError.InvalidFormat)
+            return Failure(DateTimeParseError.InvalidFormat)
         }
         let Ok(offsetText) = value.SliceUtf8(offsetStart, length - offsetStart) else {
-            return Error(DateTimeParseError.InvalidFormat)
+            return Failure(DateTimeParseError.InvalidFormat)
         }
         let local = ParseLocal(localText, Culture.Invariant)?
         let offset = ParseOffset(offsetText)?
@@ -276,14 +276,14 @@ internal class CivilParser {
         let text = Utf8.Encode(value)
         let start = TimestampOffsetStart(text)
         let Ok(offsetText) = value.SliceUtf8(start, text.Count - start) else {
-            return Error(DateTimeParseError.InvalidFormat)
+            return Failure(DateTimeParseError.InvalidFormat)
         }
         let expectedOffset = ParseOffset(offsetText)?
         let Ok(zoned) = ZonedDateTime.Create(instant, zone) else {
-            return Error(DateTimeParseError.OutOfRange)
+            return Failure(DateTimeParseError.OutOfRange)
         }
         if !zoned.Offset.Equals(expectedOffset) {
-            return Error(DateTimeParseError.OffsetMismatch)
+            return Failure(DateTimeParseError.OffsetMismatch)
         }
         return Ok(zoned)
     }

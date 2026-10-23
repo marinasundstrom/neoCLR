@@ -28,7 +28,7 @@ internal class StringMapReader {
         Skip(bytes)
         let start = position
         if !Take(bytes, (byte)34) {
-            return Error(JsonError.TypeMismatch("JSON string"))
+            return Failure(JsonError.TypeMismatch("JSON string"))
         }
         var escaped = false
         var needsDecoding = false
@@ -41,54 +41,54 @@ internal class StringMapReader {
                 escaped = true
                 needsDecoding = true
             } else if value <= 31 {
-                return Error(JsonError.Syntax("Unescaped control byte"))
+                return Failure(JsonError.Syntax("Unescaped control byte"))
             } else if value == 34 {
                 if needsDecoding {
                     return MessageReader().Read(bytes.Slice(start, position - start), 65536)
                 }
                 return match Encodings.Utf8.Decode(bytes.Slice(start + 1, position - start - 2)) {
                     Ok(let text) => Ok(text)
-                    Error(_) => Error(JsonError.Syntax("Invalid UTF-8"))
+                    Failure(_) => Failure(JsonError.Syntax("Invalid UTF-8"))
                 }
             }
         }
-        return Error(JsonError.Syntax("Unclosed string"))
+        return Failure(JsonError.Syntax("Unclosed string"))
     }
 
     func Read(bytes: ReadOnlySlice<byte>) -> Result<HashMap<string, string>, JsonError> {
         if bytes.Length > 65536 {
-            return Error(JsonError.LimitExceeded("Catalogue exceeds 65536 UTF-8 bytes"))
+            return Failure(JsonError.LimitExceeded("Catalogue exceeds 65536 UTF-8 bytes"))
         }
         if !JsonSyntax.ValidUtf8(bytes) {
-            return Error(JsonError.Syntax("Invalid UTF-8"))
+            return Failure(JsonError.Syntax("Invalid UTF-8"))
         }
         if !Take(bytes, (byte)123) {
-            return Error(JsonError.TypeMismatch("JSON object of strings"))
+            return Failure(JsonError.TypeMismatch("JSON object of strings"))
         }
         let entries = HashMap<string, string>(StringComparer.Ordinal)
         if !Take(bytes, (byte)125) {
             var closed = false
             while !closed {
                 if entries.Count == 4096 {
-                    return Error(JsonError.LimitExceeded("Catalogue exceeds 4096 entries"))
+                    return Failure(JsonError.LimitExceeded("Catalogue exceeds 4096 entries"))
                 }
                 let key = Text(bytes)?
                 if !Take(bytes, (byte)58) {
-                    return Error(JsonError.Syntax("Expected colon"))
+                    return Failure(JsonError.Syntax("Expected colon"))
                 }
                 let value = Text(bytes)?
                 if !entries.TryAdd(key, value) {
-                    return Error(JsonError.DuplicateField(key))
+                    return Failure(JsonError.DuplicateField(key))
                 }
                 closed = Take(bytes, (byte)125)
                 if !closed && !Take(bytes, (byte)44) {
-                    return Error(JsonError.Syntax("Expected comma or object end"))
+                    return Failure(JsonError.Syntax("Expected comma or object end"))
                 }
             }
         }
         Skip(bytes)
         if position != bytes.Length {
-            return Error(JsonError.Syntax("Trailing content"))
+            return Failure(JsonError.Syntax("Trailing content"))
         }
         return Ok(entries)
     }

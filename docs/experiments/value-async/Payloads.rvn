@@ -40,7 +40,7 @@ func ObserveUnit(result: Task<unit>) {
 
 func ObserveResult(result: Task<Result<int, string>>) {
     result.OnCompleted(() => {
-        if let Error(text) = result.GetResult() {
+        if let Failure(text) = result.GetResult() {
             Console.WriteLine(text)
         } else {
             System.Fail("Expected propagated error")
@@ -62,7 +62,7 @@ func Main() {
     Churn()
     queue.Run(() => {
         _ = first.Complete(1)
-        _ = second.Complete(Error("Expected error"))
+        _ = second.Complete(Failure("Expected error"))
     })
     Churn()
 }

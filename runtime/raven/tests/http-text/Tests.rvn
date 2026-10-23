@@ -14,7 +14,7 @@ func LargePrefix() -> string {
     }
     return match text.SliceUtf8(0, 65535) {
         Ok(let prefix) => prefix
-        Error(_) => {
+        Failure(_) => {
             System.Fail("ASCII fixture boundary")
             ""
         }
@@ -26,12 +26,12 @@ func LargePrefix() -> string {
 [Test("HTTP buffered text preserves scalars beyond the one-shot codec quota")]
 func ALargeRoundTrip() -> Result<unit, TestFailure> {
     let text = String.Concat(LargePrefix(), "😀é")
-    _ = Assert.True(Encodings.Utf8.Encode(text) is Error(EncodingError.LimitExceeded), "Fixture exceeds one-shot quota")?
+    _ = Assert.True(Encodings.Utf8.Encode(text) is Failure(EncodingError.LimitExceeded), "Fixture exceeds one-shot quota")?
     let content = HttpStringContent(text)
     _ = Assert.True(content is HttpStringContent, "Text factory creates specialization")?
     _ = Assert.Equal(65541, content.Length)?
     let Ok(decoded) = HttpStringContent.Read(content).GetResult() else {
-        return Error(TestFailure("Large body decode", "Ok", "Error"))
+        return Failure(TestFailure("Large body decode", "Ok", "Error"))
     }
     return Assert.Equal(text, decoded)
 }
@@ -40,12 +40,12 @@ func ALargeRoundTrip() -> Result<unit, TestFailure> {
 func BLargeErrors() -> Result<unit, TestFailure> {
     let bytes: byte[] = [for index in 0..65537 => (byte)120]
     bytes[bytes.Length - 1] = (byte)195
-    _ = Assert.True(HttpStringContent.Read(HttpMemoryContent(bytes)).GetResult() is Error(_), "Truncated final scalar")?
+    _ = Assert.True(HttpStringContent.Read(HttpMemoryContent(bytes)).GetResult() is Failure(_), "Truncated final scalar")?
     bytes[bytes.Length - 1] = (byte)128
-    _ = Assert.True(HttpStringContent.Read(HttpMemoryContent(bytes)).GetResult() is Error(_), "Stray continuation")?
+    _ = Assert.True(HttpStringContent.Read(HttpMemoryContent(bytes)).GetResult() is Failure(_), "Stray continuation")?
     bytes[bytes.Length - 1] = (byte)65
     let Ok(text) = HttpStringContent.Read(HttpMemoryContent(bytes)).GetResult() else {
-        return Error(TestFailure("Fresh decode after errors", "Ok", "Error"))
+        return Failure(TestFailure("Fresh decode after errors", "Ok", "Error"))
     }
     return Assert.True(text.EndsWithOrdinal("xA"), "Valid body remains readable")
 }
@@ -54,7 +54,7 @@ func BLargeErrors() -> Result<unit, TestFailure> {
 func CSmallRoundTrips() -> Result<unit, TestFailure> {
     for text in ["", "\uFEFFcafé\u0000🌍"] {
         let Ok(decoded) = HttpStringContent.Read(HttpStringContent(text)).GetResult() else {
-            return Error(TestFailure("Buffered text decode", "Ok", "Error"))
+            return Failure(TestFailure("Buffered text decode", "Ok", "Error"))
         }
         _ = Assert.Equal(text, decoded)?
     }

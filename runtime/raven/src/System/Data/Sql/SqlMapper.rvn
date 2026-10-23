@@ -30,7 +30,7 @@ public class SqlMapper {
     static func Query<T>(connection: SqlConnection, text: string, params parameters: Object?[]) -> Task<Result<Sequence<T>, SqlError>> {
         return match SqlParameters.Create(text, parameters) {
             Ok(let statement) => Query<T>(connection, statement)
-            Error(let error) => Task.FromResult(Result<Sequence<T>, SqlError>.Error(error))
+            Failure(let error) => Task.FromResult(Result<Sequence<T>, SqlError>.Failure(error))
         }
     }
 
@@ -38,7 +38,7 @@ public class SqlMapper {
     static func Query<T>(connection: SqlConnection, text: string, map: (SqlRow) -> Result<T, SqlError>, params parameters: Object?[]) -> Task<Result<Sequence<T>, SqlError>> {
         return match SqlParameters.Create(text, parameters) {
             Ok(let statement) => Query<T>(connection, statement, map)
-            Error(let error) => Task.FromResult(Result<Sequence<T>, SqlError>.Error(error))
+            Failure(let error) => Task.FromResult(Result<Sequence<T>, SqlError>.Failure(error))
         }
     }
 
@@ -59,7 +59,7 @@ public class SqlMapper {
     static func Map<T>(result: SqlResult) -> Result<Sequence<T>, SqlError> {
         let type = typeof(T)
         if type.IsValueType || type.IsInterface || type.IsArray || type.IsOpen || type.GenericArgumentCount != 0 {
-            return Error(SqlError.Mapping("Expected a nongeneric reference class"))
+            return Failure(SqlError.Mapping("Expected a nongeneric reference class"))
         }
         let properties = ArrayList<PropertyInfo>()
         for property in type.GetProperties() {
@@ -68,25 +68,25 @@ public class SqlMapper {
                 if property.GetIndexParameters().Count != 0 ||
                    !(target.Equals(typeof(string)) || target.Equals(typeof(int)) ||
                      target.Equals(typeof(bool))) {
-                    return Error(SqlError.Mapping("Unsupported property: " + property.Name))
+                    return Failure(SqlError.Mapping("Unsupported property: " + property.Name))
                 }
                 properties.Add(property)
             }
         }
         if properties.Count == 0 {
-            return Error(SqlError.Mapping("No writable scalar properties"))
+            return Failure(SqlError.Mapping("No writable scalar properties"))
         }
         let output = ArrayList<T>()
         for index in 0..result.Count {
             let row = result.Row(index)
             let instance = match type.CreateInstance() {
                 Ok(let created) => created
-                Error(_) => return Error(SqlError.Mapping("Public parameterless constructor required"))
+                Failure(_) => return Failure(SqlError.Mapping("Public parameterless constructor required"))
             }
             for property in properties {
                 let value = Read(row, property.Name, property.PropertyType)?
-                if property.SetValue(instance, value) is Error(_) {
-                    return Error(SqlError.Mapping("Cannot assign property: " + property.Name))
+                if property.SetValue(instance, value) is Failure(_) {
+                    return Failure(SqlError.Mapping("Cannot assign property: " + property.Name))
                 }
             }
             output.Add((T)instance)

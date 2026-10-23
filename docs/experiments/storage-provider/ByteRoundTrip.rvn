@@ -29,7 +29,7 @@ func WriteMessage(output: OutputStream) -> Result<unit, StreamError> {
                     }
                     offset += written
                 }
-                Error(let error) => return Error(error)
+                Failure(let error) => return Failure(error)
             }
         }
     }
@@ -47,7 +47,7 @@ func ReadMessage(input: InputStream) -> Result<List<byte>, StreamError> {
                     finished = true
                 }
                 if count > 64 - bytes.Count {
-                    return Error<StreamError>(StreamError.LimitExceeded)
+                    return Failure<StreamError>(StreamError.LimitExceeded)
                 }
                 var index = 0
                 while index < count {
@@ -55,7 +55,7 @@ func ReadMessage(input: InputStream) -> Result<List<byte>, StreamError> {
                     index += 1
                 }
             }
-            Error(let error) => return Error(error)
+            Failure(let error) => return Failure(error)
         }
     }
     return Ok(bytes)
@@ -72,10 +72,10 @@ func ByteRoundTrip(directory: Directory, provider: StorageProvider) {
                     output.Close()
                     match written {
                         Ok(_) => { }
-                        Error(let error) => System.Fail(error.ToString())
+                        Failure(let error) => System.Fail(error.ToString())
                     }
                     match output.Flush() {
-                        Error(let error) => {
+                        Failure(let error) => {
                             if !(error is System.IO.StreamError.Closed) {
                                 System.Fail("Expected closed output")
                             }
@@ -83,10 +83,10 @@ func ByteRoundTrip(directory: Directory, provider: StorageProvider) {
                         Ok(_) => System.Fail("Closed output flushed")
                     }
                 }
-                Error(let error) => System.Fail(error.ToString())
+                Failure(let error) => System.Fail(error.ToString())
             }
             match file.CreateNew() {
-                Error(let error) => {
+                Failure(let error) => {
                     if !(error is System.IO.StreamError.AlreadyExists) {
                         System.Fail("Expected exclusive creation")
                     }
@@ -110,14 +110,14 @@ func ByteRoundTrip(directory: Directory, provider: StorageProvider) {
                                     }
                                     Console.WriteLine("Byte stream round trip: " + text)
                                 }
-                                Error(let error) => System.Fail(error.ToString())
+                                Failure(let error) => System.Fail(error.ToString())
                             }
                         }
-                        Error(let error) => System.Fail(error.ToString())
+                        Failure(let error) => System.Fail(error.ToString())
                     }
                     let buffer: byte[] = [(byte)99]
                     match input.Read(buffer, 0, 1) {
-                        Error(let error) => {
+                        Failure(let error) => {
                             if !(error is System.IO.StreamError.Closed) || buffer[0] != (byte)99 {
                                 System.Fail("Expected closed input with untouched buffer")
                             }
@@ -125,7 +125,7 @@ func ByteRoundTrip(directory: Directory, provider: StorageProvider) {
                         Ok(_) => System.Fail("Closed input read")
                     }
                 }
-                Error(let error) => System.Fail(error.ToString())
+                Failure(let error) => System.Fail(error.ToString())
             }
             match provider.ReadText(file.Path, 14) {
                 Ok(let text) => {
@@ -133,12 +133,12 @@ func ByteRoundTrip(directory: Directory, provider: StorageProvider) {
                         System.Fail("Byte writes not visible through text helper")
                     }
                 }
-                Error(let error) => System.Fail(error.ToString())
+                Failure(let error) => System.Fail(error.ToString())
             }
             Console.WriteLine("Byte stream write visible through text helper")
             Console.WriteLine("Exclusive creation and closed streams checked")
         }
-        Error(let error) => System.Fail(error.ToString())
+        Failure(let error) => System.Fail(error.ToString())
     }
 }
 
@@ -152,13 +152,13 @@ func ReadFileText(file: File) -> Result<string, StreamError> {
                 Ok(let bytes) => {
                     match Utf8.Decode(bytes) {
                         Ok(let text) => return Ok(text)
-                        Error(_) => System.Fail("Expected UTF-8 fixture contents")
+                        Failure(_) => System.Fail("Expected UTF-8 fixture contents")
                     }
                 }
-                Error(let error) => return Error(error)
+                Failure(let error) => return Failure(error)
             }
         }
-        Error(let error) => return Error(error)
+        Failure(let error) => return Failure(error)
     }
-    return Error<StreamError>(StreamError.IoFailure)
+    return Failure<StreamError>(StreamError.IoFailure)
 }

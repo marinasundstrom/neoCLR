@@ -8,7 +8,7 @@
   "T:System.Option.None": "Physical case-carrier scaffold in the non-generic companion. RavenDoc publishes the logical case under its generic union instead of duplicating this metadata type.",
   "T:System.Option.Some`1": "Physical case-carrier scaffold in the non-generic companion. RavenDoc publishes the logical case under its generic union instead of duplicating this metadata type.",
   "T:System.Result.Ok`1": "Physical case-carrier scaffold in the non-generic companion. RavenDoc publishes the logical case under its generic union instead of duplicating this metadata type.",
-  "T:System.Result.Error`1": "Physical case-carrier scaffold in the non-generic companion. RavenDoc publishes the logical case under its generic union instead of duplicating this metadata type.",
+  "T:System.Result.Failure`1": "Physical case-carrier scaffold in the non-generic companion. RavenDoc publishes the logical case under its generic union instead of duplicating this metadata type.",
   "T:System.Concurrency.Tasks.TaskOutcome.Cancelled": "Physical case-carrier scaffold in the non-generic companion. RavenDoc publishes the logical case under its generic union instead of duplicating this metadata type.",
   "T:System.Concurrency.Tasks.TaskOutcome.Completed`1": "Physical case-carrier scaffold in the non-generic companion. RavenDoc publishes the logical case under its generic union instead of duplicating this metadata type.",
   "T:Raven.Runtime.CompilerServices.RavenUnionCaseAttribute": "Raven-owned compiler-reference case metadata, not an executable platform API. The bridge consumes it; the runtime has no dependency on this attribute.",

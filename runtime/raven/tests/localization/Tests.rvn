@@ -44,16 +44,16 @@ func BUnicode() -> Result<unit, TestFailure> {
     _ = Assert.Equal("two", strings["é"])?
     _ = Assert.Equal("😀", strings["emoji"])?
     _ = Assert.Equal("a\nb", strings["line"])?
-    return Assert.True(JsonLocalizerProvider.Create("{\"a\":\"1\",\"\\u0061\":\"2\"}") is Error(LocalizationError.Json(JsonError.DuplicateField("a"))), "Decoded duplicate")
+    return Assert.True(JsonLocalizerProvider.Create("{\"a\":\"1\",\"\\u0061\":\"2\"}") is Failure(LocalizationError.Json(JsonError.DuplicateField("a"))), "Decoded duplicate")
 }
 
 [Test("Localizer rejects malformed and non-string catalogues")]
 func CInvalid() -> Result<unit, TestFailure> {
     for text in ["[]", "null", "{\"a\":1}", "{\"a\":null}", "{\"a\":{}}", "{\"a\":[]}", "{\"a\":\"b\",}", "{}x", "{\"a\":\"\\uD800\"}", "{\"a\":\"\\q\"}"] {
-        _ = Assert.True(JsonLocalizerProvider.Create(text) is Error(_), "Invalid catalogue")?
+        _ = Assert.True(JsonLocalizerProvider.Create(text) is Failure(_), "Invalid catalogue")?
     }
     let invalid: byte[] = [(byte)123, (byte)255, (byte)125]
-    _ = Assert.True(JsonLocalizerProvider.Create(invalid[..]) is Error(_), "Invalid UTF-8")?
+    _ = Assert.True(JsonLocalizerProvider.Create(invalid[..]) is Failure(_), "Invalid UTF-8")?
     return Assert.True(JsonLocalizerProvider.Create(" {} \n") is Ok(_), "Empty catalogue")
 }
 
@@ -71,7 +71,7 @@ func DSize() -> Result<unit, TestFailure> {
     }
     _ = Assert.Equal("translation", strings["key99"])?
     let tooLarge = System.Runtime.CompilerServices.CheckedStorage.Reserve<byte>(65537)
-    return Assert.True(JsonLocalizerProvider.Create(tooLarge[..]) is Error(LocalizationError.Json(JsonError.LimitExceeded(_))), "Byte quota before parsing")
+    return Assert.True(JsonLocalizerProvider.Create(tooLarge[..]) is Failure(LocalizationError.Json(JsonError.LimitExceeded(_))), "Byte quota before parsing")
 }
 
 [Test("Localizer reads borrowed streams and explicit files")]
@@ -88,13 +88,13 @@ func EInput() -> Result<unit, TestFailure> {
     _ = Assert.Equal("Hej", strings["hello"])?
     _ = Assert.True(memory.GetPosition() is Ok(_), "Borrowed stream remains open")?
     memory.Close()
-    _ = Assert.True(CompletedValue(JsonLocalizerProvider.Read(memory)) is Error(LocalizationError.Read(_)), "Closed stream")?
+    _ = Assert.True(CompletedValue(JsonLocalizerProvider.Read(memory)) is Failure(LocalizationError.Read(_)), "Closed stream")?
     let Ok(fileStrings) = JsonLocalizerProvider.Load("catalogue.json") else {
         return Assert.True(false, "Load explicit file")
     }
     _ = Assert.Equal("Hej världen", fileStrings["hello"])?
-    _ = Assert.True(JsonLocalizerProvider.Load("invalid.json") is Error(LocalizationError.Json(_)), "Bad file content")?
-    return Assert.True(JsonLocalizerProvider.Load("absent-localization-file.json") is Error(LocalizationError.File(_)), "Missing file")
+    _ = Assert.True(JsonLocalizerProvider.Load("invalid.json") is Failure(LocalizationError.Json(_)), "Bad file content")?
+    return Assert.True(JsonLocalizerProvider.Load("absent-localization-file.json") is Failure(LocalizationError.File(_)), "Missing file")
 }
 
 class MissingKeys {
@@ -142,8 +142,8 @@ func GFallback() -> Result<unit, TestFailure> {
     _ = Assert.Equal("scoped sv-SE", scopedStrings["regional"])?
     _ = Assert.Equal("scoped sv", scopedStrings["neutral"])?
     _ = Assert.Equal("scoped invariant", scopedStrings["base"])?
-    _ = Assert.True(provider.Load(Culture.SwedishSweden, "../bad") is Error(LocalizationError.InvalidScope), "Scope is not a path")?
-    return Assert.True(provider.Load(Culture.SwedishSweden, "Broken") is Error(LocalizationError.Json(_)), "Malformed fallback is not silently ignored")
+    _ = Assert.True(provider.Load(Culture.SwedishSweden, "../bad") is Failure(LocalizationError.InvalidScope), "Scope is not a path")?
+    return Assert.True(provider.Load(Culture.SwedishSweden, "Broken") is Failure(LocalizationError.Json(_)), "Malformed fallback is not silently ignored")
 }
 
 [Test("Localizer invariant fallback is configurable and typed scope is explicit")]

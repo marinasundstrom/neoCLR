@@ -89,14 +89,14 @@ ret
 newobj instance System.IO.StreamError.IoFailure::.ctor()
 ret
 .end
-.function neoCLR.Library.System.IO.FileInputStream.RuntimeUnion0(System.IO.StreamError arg0) -> System.Result.Error<System.IO.StreamError>
+.function neoCLR.Library.System.IO.FileInputStream.RuntimeUnion0(System.IO.StreamError arg0) -> System.Result.Failure<System.IO.StreamError>
 ldarg arg0
-newobj instance System.Result.Error<System.IO.StreamError>::.ctor(System.IO.StreamError)
+newobj instance System.Result.Failure<System.IO.StreamError>::.ctor(System.IO.StreamError)
 ret
 .end
-.function neoCLR.Library.System.IO.FileInputStream.RuntimeUnion1(System.Result.Error<System.IO.StreamError> arg0) -> System.Result<System.IO.FileInputStream,System.IO.StreamError>
+.function neoCLR.Library.System.IO.FileInputStream.RuntimeUnion1(System.Result.Failure<System.IO.StreamError> arg0) -> System.Result<System.IO.FileInputStream,System.IO.StreamError>
 ldarg arg0
-newobj instance System.Result<System.IO.FileInputStream,System.IO.StreamError>::.ctor(System.Result.Error<System.IO.StreamError>)
+newobj instance System.Result<System.IO.FileInputStream,System.IO.StreamError>::.ctor(System.Result.Failure<System.IO.StreamError>)
 ret
 .end
 .function neoCLR.Library.System.IO.FileInputStream.RuntimeUnion2(System.IO.FileInputStream arg0) -> System.Result.Ok<System.IO.FileInputStream>
@@ -109,9 +109,9 @@ ldarg arg0
 newobj instance System.Result<System.IO.FileInputStream,System.IO.StreamError>::.ctor(System.Result.Ok<System.IO.FileInputStream>)
 ret
 .end
-.function neoCLR.Library.System.IO.FileInputStream.RuntimeUnion4(System.Result.Error<System.IO.StreamError> arg0) -> System.Result<Int32,System.IO.StreamError>
+.function neoCLR.Library.System.IO.FileInputStream.RuntimeUnion4(System.Result.Failure<System.IO.StreamError> arg0) -> System.Result<Int32,System.IO.StreamError>
 ldarg arg0
-newobj instance System.Result<Int32,System.IO.StreamError>::.ctor(System.Result.Error<System.IO.StreamError>)
+newobj instance System.Result<Int32,System.IO.StreamError>::.ctor(System.Result.Failure<System.IO.StreamError>)
 ret
 .end
 .function neoCLR.Library.System.IO.FileInputStream.RuntimeUnion5(Int32 arg0) -> System.Result.Ok<Int32>
@@ -124,9 +124,9 @@ ldarg arg0
 newobj instance System.Result<Int32,System.IO.StreamError>::.ctor(System.Result.Ok<Int32>)
 ret
 .end
-.function neoCLR.Library.System.IO.FileInputStream.RuntimeUnion7(System.Result.Error<System.IO.StreamError> arg0) -> System.Result<Int64,System.IO.StreamError>
+.function neoCLR.Library.System.IO.FileInputStream.RuntimeUnion7(System.Result.Failure<System.IO.StreamError> arg0) -> System.Result<Int64,System.IO.StreamError>
 ldarg arg0
-newobj instance System.Result<Int64,System.IO.StreamError>::.ctor(System.Result.Error<System.IO.StreamError>)
+newobj instance System.Result<Int64,System.IO.StreamError>::.ctor(System.Result.Failure<System.IO.StreamError>)
 ret
 .end
 .function neoCLR.Library.System.IO.FileInputStream.RuntimeUnion8(Int64 arg0) -> System.Result.Ok<Int64>

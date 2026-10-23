@@ -9,7 +9,7 @@ public static class HMACSHA256 {
     /// <param name="key">Fully initialized key bytes; empty keys are accepted.</param>
     /// <param name="data">Fully initialized input bytes; empty data is accepted.</param>
     /// <param name="destination">Writable byte slice of at least 32 bytes.</param>
-    /// <returns>Ok(32), or Error(DestinationTooSmall) without mutation.</returns>
+    /// <returns>Ok(32), or Failure(DestinationTooSmall) without mutation.</returns>
     /// <remarks>Invalid storage or uninitialized inputs are terminal faults.</remarks>
     static func HashData(key: ReadOnlySlice<byte>, data: ReadOnlySlice<byte>, destination: Slice<byte>) -> Result<int, CryptographyError> {
         let status = neoCLR.Runtime.CryptoHmacSha256(key, data, destination)
@@ -17,7 +17,7 @@ public static class HMACSHA256 {
             return Ok(32)
         }
         if status == -1 {
-            return Error(CryptographyError.DestinationTooSmall)
+            return Failure(CryptographyError.DestinationTooSmall)
         }
         System.Fail("Unexpected cryptography provider result")
     }

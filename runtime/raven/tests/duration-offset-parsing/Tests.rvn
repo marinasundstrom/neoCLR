@@ -11,7 +11,7 @@ func ADurationBounds() -> Result<unit, TestFailure> {
     let ticks = [9223372036854775807L, -9223372036854775807L - 1L, 1L, -1L, 0L, 1838450000000L]
     for index in 0..inputs.Length {
         let Ok(value) = Duration.Parse(inputs[index]) else {
-            return Error(TestFailure("Expected duration", "Ok", inputs[index]))
+            return Failure(TestFailure("Expected duration", "Ok", inputs[index]))
         }
         _ = Assert.True(value.Ticks == ticks[index], "Exact duration ticks: " + inputs[index])?
     }
@@ -21,7 +21,7 @@ func ADurationBounds() -> Result<unit, TestFailure> {
 [Test("Duration parsing rejects overflow and invalid clock fields")]
 func BDurationRanges() -> Result<unit, TestFailure> {
     for text in ["10675199.02:48:05.4775808", "-10675199.02:48:05.4775809", "10675200.00:00:00", "99999999.00:00:00", "24:00:00", "00:60:00", "00:00:60", "-1.24:00:00"] {
-        _ = Assert.True(Duration.Parse(text) is Error(DateTimeParseError.OutOfRange), "Expected out of range: " + text)?
+        _ = Assert.True(Duration.Parse(text) is Failure(DateTimeParseError.OutOfRange), "Expected out of range: " + text)?
     }
     return Assert.True(true, "Overflow rejected without wrapping")
 }
@@ -29,7 +29,7 @@ func BDurationRanges() -> Result<unit, TestFailure> {
 [Test("Duration parsing rejects unsupported numeric grammar")]
 func CDurationGrammar() -> Result<unit, TestFailure> {
     for text in ["", "-", "00:00", "+00:00:00", " 00:00:00", "00:00:00 ", "0:00:00", ".00:00:00", "1..00:00:00", "1x.00:00:00", "000000000.00:00:00", "00:00:00.", "00:00:00.12345678", "00:00:00,1", "00:00:00Z", "００:00:00", "--00:00:00"] {
-        _ = Assert.True(Duration.Parse(text) is Error(DateTimeParseError.InvalidFormat), "Expected invalid duration format: " + text)?
+        _ = Assert.True(Duration.Parse(text) is Failure(DateTimeParseError.InvalidFormat), "Expected invalid duration format: " + text)?
     }
     return Assert.True(true, "Malformed duration corpus rejected")
 }
@@ -40,7 +40,7 @@ func DDurationFractions() -> Result<unit, TestFailure> {
     let ticks = [1000000L, 1200000L, 1230000L, 1234000L, 1234500L, 1234560L, 1234567L, 864000000000L]
     for index in 0..inputs.Length {
         let Ok(value) = Duration.Parse(inputs[index]) else {
-            return Error(TestFailure("Expected fractional duration", "Ok", inputs[index]))
+            return Failure(TestFailure("Expected fractional duration", "Ok", inputs[index]))
         }
         _ = Assert.True(value.Ticks == ticks[index], "Fraction or day precision")?
     }
@@ -53,7 +53,7 @@ func EOffsetValues() -> Result<unit, TestFailure> {
     let seconds = [0, 0, 0, 0, 64800, -64800, 19800, -1, 3723]
     for index in 0..inputs.Length {
         let Ok(value) = TimeOffset.Parse(inputs[index]) else {
-            return Error(TestFailure("Expected offset", "Ok", inputs[index]))
+            return Failure(TestFailure("Expected offset", "Ok", inputs[index]))
         }
         _ = Assert.Equal(seconds[index], value.Seconds)?
     }
@@ -63,7 +63,7 @@ func EOffsetValues() -> Result<unit, TestFailure> {
 [Test("Offset parsing rejects invalid ranges without normalization")]
 func FOffsetRanges() -> Result<unit, TestFailure> {
     for text in ["+18:00:01", "-18:00:01", "+18:01", "-19:00", "+99:00", "+00:60", "-00:00:60"] {
-        _ = Assert.True(TimeOffset.Parse(text) is Error(DateTimeParseError.OutOfRange), "Expected invalid offset range: " + text)?
+        _ = Assert.True(TimeOffset.Parse(text) is Failure(DateTimeParseError.OutOfRange), "Expected invalid offset range: " + text)?
     }
     return Assert.True(true, "Invalid offset fields rejected")
 }
@@ -71,7 +71,7 @@ func FOffsetRanges() -> Result<unit, TestFailure> {
 [Test("Offset parsing requires complete ASCII signed syntax")]
 func GOffsetGrammar() -> Result<unit, TestFailure> {
     for text in ["", "z", "UTC", "00:00", "+1:00", "+01", "+0100", "+01:00Z", " +01:00", "+01:00 ", "+01:00:00.1", "+01-00", "+01:00-01", "+0x:00", "+01:0x", "+01:00:0x", "＋01:00"] {
-        _ = Assert.True(TimeOffset.Parse(text) is Error(DateTimeParseError.InvalidFormat), "Expected malformed offset: " + text)?
+        _ = Assert.True(TimeOffset.Parse(text) is Failure(DateTimeParseError.InvalidFormat), "Expected malformed offset: " + text)?
     }
     return Assert.True(true, "Malformed offset corpus rejected")
 }
@@ -79,18 +79,18 @@ func GOffsetGrammar() -> Result<unit, TestFailure> {
 [Test("Parsed offsets project instants and parsed durations preserve arithmetic")]
 func HConsumers() -> Result<unit, TestFailure> {
     let Ok(offset) = TimeOffset.Parse("+01:02:03") else {
-        return Error(TestFailure("Offset fixture", "Ok", "Error"))
+        return Failure(TestFailure("Offset fixture", "Ok", "Error"))
     }
     let epoch = Instant.FromUnixTimeTicks(0L)
     let Ok(local) = offset.AtInstant(epoch) else {
-        return Error(TestFailure("Offset projection", "Ok", "Error"))
+        return Failure(TestFailure("Offset projection", "Ok", "Error"))
     }
     _ = Assert.True(offset.ToInstant(local).Equals(epoch), "Offset projection round trip")?
     let Ok(duration) = Duration.Parse("-00:00:00.0000001") else {
-        return Error(TestFailure("Duration fixture", "Ok", "Error"))
+        return Failure(TestFailure("Duration fixture", "Ok", "Error"))
     }
     let Ok(previous) = epoch.Add(duration) else {
-        return Error(TestFailure("Instant addition", "Ok", "Error"))
+        return Failure(TestFailure("Instant addition", "Ok", "Error"))
     }
     return Assert.True(previous.UnixTimeTicks == -1L, "Parsed duration participates in arithmetic")
 }

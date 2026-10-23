@@ -24,26 +24,26 @@ public class Path : EquatableTo<Path> {
 
     static func Parse(text: string) -> Result<Path, InvalidPathError> {
         if text.IsEmpty || text.ContainsOrdinal("\u0000") {
-            return Error(InvalidPathError())
+            return Failure(InvalidPathError())
         }
         // This first logical grammar deliberately excludes native drive/UNC syntax.
         if text.ContainsOrdinal("\\") || text.ContainsOrdinal(":") {
-            return Error(InvalidPathError())
+            return Failure(InvalidPathError())
         }
         if text == "." || text == "/" {
             return Ok(Path(text))
         }
         if text.ContainsOrdinal("//") || text.EndsWithOrdinal("/") {
-            return Error(InvalidPathError())
+            return Failure(InvalidPathError())
         }
         if text == ".." || text.StartsWithOrdinal("./") || text.StartsWithOrdinal("../") {
-            return Error(InvalidPathError())
+            return Failure(InvalidPathError())
         }
         if text.ContainsOrdinal("/./") || text.ContainsOrdinal("/../") {
-            return Error(InvalidPathError())
+            return Failure(InvalidPathError())
         }
         if text.EndsWithOrdinal("/.") || text.EndsWithOrdinal("/..") {
-            return Error(InvalidPathError())
+            return Failure(InvalidPathError())
         }
         return Ok(Path(text))
     }

@@ -51,7 +51,7 @@ class GeneratedInput : InputStream {
         Check(Closes == 0 && offset == 0 && count > 0 && count <= 256)
         Reads += 1
         if mode == "read-error" {
-            return Error(StreamError.AccessDenied)
+            return Failure(StreamError.AccessDenied)
         }
         if mode == "overread" {
             return Ok(count + 1)
@@ -110,7 +110,7 @@ class UploadCase {
 
     func Run() -> Task<unit> {
         Check(!content.IsBuffered)
-        Check(JsonContent.ReadNode(content) is Error(JsonError.Read(TextReadError.IoFailure)))
+        Check(JsonContent.ReadNode(content) is Failure(JsonError.Read(TextReadError.IoFailure)))
         if mode == "precancel" {
             cancellation.Cancel()
         }
@@ -125,7 +125,7 @@ class UploadCase {
         pending = client.Post(url, content, cancellation.Token)
         if mode == "success" {
             // The first exchange owns consumption even while DNS/connect is pending.
-            Check(client.Post(url, content).GetResult() is Error(HttpError.InvalidRequest(_)))
+            Check(client.Post(url, content).GetResult() is Failure(HttpError.InvalidRequest(_)))
         }
         // This fixture observes cancellation as an outcome; Main still awaits
         // the fixture's completion so the runtime owns the asynchronous lifetime.
@@ -137,13 +137,13 @@ class UploadCase {
         if mode == "cancel" || mode == "precancel" {
             Check(pending.IsCancelled)
         } else if mode == "read-error" {
-            Check(pending.GetResult() is Error(HttpError.Content(StreamError.AccessDenied)))
+            Check(pending.GetResult() is Failure(HttpError.Content(StreamError.AccessDenied)))
         } else if mode == "eof" || mode == "overread" {
-            Check(pending.GetResult() is Error(HttpError.Content(StreamError.IoFailure)))
+            Check(pending.GetResult() is Failure(HttpError.Content(StreamError.IoFailure)))
         } else if mode == "disposed" || mode == "invalid-header" {
-            Check(pending.GetResult() is Error(HttpError.InvalidRequest(_)))
+            Check(pending.GetResult() is Failure(HttpError.InvalidRequest(_)))
         } else if mode == "refused" {
-            Check(pending.GetResult() is Error(HttpError.Transport(_)))
+            Check(pending.GetResult() is Failure(HttpError.Transport(_)))
         } else {
             let Ok(response) = pending.GetResult() else {
                 System.Fail("Upload failed")
@@ -165,7 +165,7 @@ class UploadCase {
         content.Dispose()
         content.Dispose()
         Check(input.Closes == (if mode == "borrowed" { 0 } else { 1 }))
-        Check(client.Post(url, content).GetResult() is Error(HttpError.InvalidRequest(_)))
+        Check(client.Post(url, content).GetResult() is Failure(HttpError.InvalidRequest(_)))
         cancellation.Dispose()
         Console.WriteLine("Stream upload checks passed")
         _ = completion.Complete(())
@@ -175,8 +175,8 @@ class UploadCase {
 async func Main(arguments: string[]) -> Task<unit> {
     let cancellation = CancellationTokenSource()
     let untouched = GeneratedInput("success", cancellation)
-    Check(HttpStreamContent.Create(untouched, -1, false) is Error(HttpError.InvalidRequest(_)))
-    Check(HttpStreamContent.Create(untouched, 1048577, false) is Error(HttpError.LimitExceeded(_)))
+    Check(HttpStreamContent.Create(untouched, -1, false) is Failure(HttpError.InvalidRequest(_)))
+    Check(HttpStreamContent.Create(untouched, 1048577, false) is Failure(HttpError.LimitExceeded(_)))
     Check(untouched.Closes == 0 && untouched.Reads == 0)
     let Ok(maximum) = HttpStreamContent.Create(untouched, 1048576, true) else {
         System.Fail("Maximum length rejected")

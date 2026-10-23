@@ -104,7 +104,7 @@ public class ConsoleKeyReader : Disposable {
         }
     }
 
-    internal static func Failure(status: int) -> ConsoleKeyError {
+    internal static func ToKeyError(status: int) -> ConsoleKeyError {
         return match status {
             -3 => ConsoleKeyError.Unavailable
             -4 => ConsoleKeyError.Busy
@@ -119,10 +119,10 @@ public class ConsoleKeyReader : Disposable {
     /// an unrelated following byte is retained for the next read. Closing returns that byte to Console input.</remarks>
     func ReadKey() -> Result<Option<ConsoleKeyInfo>, ConsoleKeyError> {
         if closed {
-            return Error(ConsoleKeyError.Closed)
+            return Failure(ConsoleKeyError.Closed)
         }
         if operation.Active {
-            return Error(ConsoleKeyError.Busy)
+            return Failure(ConsoleKeyError.Busy)
         }
         operation.Begin()
         use lease = operation
@@ -165,10 +165,10 @@ public class ConsoleKeyReader : Disposable {
                     retained += 1
                 }
                 if step.State == 2 {
-                    return Error(ConsoleKeyError.UnsupportedSequence)
+                    return Failure(ConsoleKeyError.UnsupportedSequence)
                 }
                 if step.State == 3 {
-                    return Error(ConsoleKeyError.InvalidUtf8)
+                    return Failure(ConsoleKeyError.InvalidUtf8)
                 }
                 var key = step.Key
                 if key < 256 && key != 8 && key != 9 && key != 13 && key != 27 && key != 32 &&
@@ -193,7 +193,7 @@ public class ConsoleKeyReader : Disposable {
                 ended = true
                 finish = true
             } else {
-                return Error(Failure(next))
+                return Failure(ToKeyError(next))
             }
         }
         return Ok(None)
@@ -205,11 +205,11 @@ public class ConsoleKeyReader : Disposable {
             return Ok(())
         }
         if operation.Active {
-            return Error(ConsoleKeyError.Busy)
+            return Failure(ConsoleKeyError.Busy)
         }
         let status = neoCLR.Runtime.ConsoleTerminalClose(handle)
         if status < 0 {
-            return Error(Failure(status))
+            return Failure(ToKeyError(status))
         }
         closed = true
         Console.ReleaseKeyInput(buffer, count)
@@ -220,7 +220,7 @@ public class ConsoleKeyReader : Disposable {
     func Dispose() {
         match Close() {
             Ok(_) => { }
-            Error(_) => { }
+            Failure(_) => { }
         }
     }
 }

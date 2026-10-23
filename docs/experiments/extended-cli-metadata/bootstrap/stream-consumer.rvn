@@ -18,7 +18,7 @@ func Main() -> int {
     output.Close()
     match output.Flush() {
         .Ok(_) => { return 7 }
-        .Error(_) => {}
+        .Failure(_) => {}
     }
     return 42
 }

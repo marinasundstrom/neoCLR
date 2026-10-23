@@ -10,19 +10,19 @@ public func GetKind(path: string) -> Result<EntryKind, StorageLookupError> {
     if neoCLR.Runtime.IsValue<byte>(payload) {
         let status = neoCLR.Runtime.UnpackValue<byte>(payload)
         if status == 1 {
-            return Error(StorageLookupError.InvalidPath())
+            return Failure(StorageLookupError.InvalidPath())
         }
         if status == 2 {
-            return Error(StorageLookupError.NotFound())
+            return Failure(StorageLookupError.NotFound())
         }
         if status == 3 {
-            return Error(StorageLookupError.AccessDenied())
+            return Failure(StorageLookupError.AccessDenied())
         }
         if status == 4 {
-            return Error(StorageLookupError.WrongKind())
+            return Failure(StorageLookupError.WrongKind())
         }
         if status == 10 {
-            return Error(StorageLookupError.IoFailure())
+            return Failure(StorageLookupError.IoFailure())
         }
         System.Fail("Unexpected metadata error status")
     }
@@ -34,5 +34,5 @@ public func GetKind(path: string) -> Result<EntryKind, StorageLookupError> {
         return Ok(EntryKind.Directory)
     }
     System.Fail("Unexpected metadata kind")
-    return Error(StorageLookupError.IoFailure())
+    return Failure(StorageLookupError.IoFailure())
 }

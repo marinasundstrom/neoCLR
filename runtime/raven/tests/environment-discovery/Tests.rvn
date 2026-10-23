@@ -66,7 +66,7 @@ func ERecordEquality() -> Result<unit, TestFailure> {
 func FHostDiscovery() -> Result<unit, TestFailure> {
     let result = Environment.GetOperatingSystem()
     let Ok(os) = result else {
-        return Error(TestFailure("OS unavailable", "OS description", result.ToString()))
+        return Failure(TestFailure("OS unavailable", "OS description", result.ToString()))
     }
     _ = Assert.True(os.ToString() != "", "OS display")?
     _ = Assert.True(Environment.ProcessArchitecture.ToString() != "", "Process architecture")?
@@ -80,7 +80,7 @@ func FHostDiscovery() -> Result<unit, TestFailure> {
 [Test("Discovered platform values survive garbage collection")]
 func GHostValueLifetime() -> Result<unit, TestFailure> {
     let Ok(os) = Environment.GetOperatingSystem() else {
-        return Error(TestFailure("OS unavailable", "OS description", "Error"))
+        return Failure(TestFailure("OS unavailable", "OS description", "Error"))
     }
     let expected = os.ToString()
     let architecture = Environment.OSArchitecture
@@ -108,7 +108,7 @@ func HPatterns() -> Result<unit, TestFailure> {
         _ = Assert.Equal("6.12-custom", kernel.Value)?
         _ = Assert.True(distribution is DistributionRelease, "Distribution payload")?
     } else {
-        return Error(TestFailure("Linux pattern", "Linux payload", "No match"))
+        return Failure(TestFailure("Linux pattern", "Linux payload", "No match"))
     }
     _ = Assert.Equal("linux", Family(OperatingSystem.Linux(KernelRelease("6.12"), null)))?
     _ = Assert.Equal("windows", Family(OperatingSystem.Windows(WindowsVersion(10, 0, 26100, 0))))?

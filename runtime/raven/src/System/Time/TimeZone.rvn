@@ -33,7 +33,7 @@ public class TimeZone : EquatableTo<TimeZone> {
 
     static func Find(id: string) -> Result<TimeZone, TimeZoneError> {
         if !neoCLR.Runtime.TimeZoneExists(id) {
-            return Error(TimeZoneError.UnknownZone)
+            return Failure(TimeZoneError.UnknownZone)
         }
         return Ok(TimeZone(id))
     }
@@ -42,7 +42,7 @@ public class TimeZone : EquatableTo<TimeZone> {
     static func GetSystem() -> Result<TimeZone, TimeZoneError> {
         let name = neoCLR.Runtime.SystemTimeZoneName()
         if name.Length == 0 {
-            return Error(TimeZoneError.SystemZoneUnavailable)
+            return Failure(TimeZoneError.SystemZoneUnavailable)
         }
         return Find(name)
     }
@@ -50,7 +50,7 @@ public class TimeZone : EquatableTo<TimeZone> {
     func GetUtcOffset(instant: Instant) -> Result<TimeOffset, TimeZoneError> {
         let seconds = neoCLR.Runtime.TimeZoneOffset(identifier, instant.UnixTimeTicks)
         let Ok(offset) = TimeOffset.FromSeconds(seconds) else {
-            return Error(TimeZoneError.OutOfRange)
+            return Failure(TimeZoneError.OutOfRange)
         }
         return Ok(offset)
     }
@@ -75,6 +75,6 @@ public class TimeZone : EquatableTo<TimeZone> {
             let later = AtInstant(Instant.FromUnixTimeTicks(values[2]))?
             return Ok(LocalTimeMapping.Ambiguous(earlier, later))
         }
-        return Error(TimeZoneError.OutOfRange)
+        return Failure(TimeZoneError.OutOfRange)
     }
 }

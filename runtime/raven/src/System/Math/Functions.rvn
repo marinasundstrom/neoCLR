@@ -15,7 +15,7 @@ public const Tau: double = 6.283185307179586476925
 
 public func Abs(value: int) -> System.Result<int, OverflowError> {
     if value == -2147483648 {
-        return Error(OverflowError())
+        return Failure(OverflowError())
     }
     if value < 0 {
         return Ok(0 - value)
@@ -49,7 +49,7 @@ public func Sign(value: int) -> int {
 
 public func Clamp(value: int, min: int, max: int) -> System.Result<int, InvalidRangeError> {
     if min > max {
-        return Error(InvalidRangeError())
+        return Failure(InvalidRangeError())
     }
     return Ok(Min(Max(value, min), max))
 }

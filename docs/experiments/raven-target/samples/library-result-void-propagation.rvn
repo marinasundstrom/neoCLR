@@ -18,7 +18,7 @@ func Show(value: int) {
     let result = Save(value)
     if result is .Ok(let done) {
         WriteLine("Completed")
-    } else if result is .Error(let error) {
+    } else if result is .Failure(let error) {
         WriteLine("Overflow")
     }
 }

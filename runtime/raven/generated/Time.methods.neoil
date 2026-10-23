@@ -85,7 +85,7 @@ call neoCLR.Library.System.Time.TimeOfDay.RuntimeErrorSystemTimeInvalidTimeError
 M00000003_IL_0015:
 call neoCLR.Library.System.Time.TimeOfDay.RuntimeUnion0(System.Time.InvalidTimeError)
 M00000003_IL_001a:
-call neoCLR.Library.System.Time.TimeOfDay.RuntimeUnion1(System.Result.Error<System.Time.InvalidTimeError>)
+call neoCLR.Library.System.Time.TimeOfDay.RuntimeUnion1(System.Result.Failure<System.Time.InvalidTimeError>)
 M00000003_IL_001f:
 ret
 M00000003_IL_0020:
@@ -106,7 +106,7 @@ call neoCLR.Library.System.Time.TimeOfDay.RuntimeErrorSystemTimeInvalidTimeError
 M00000003_IL_0036:
 call neoCLR.Library.System.Time.TimeOfDay.RuntimeUnion0(System.Time.InvalidTimeError)
 M00000003_IL_003b:
-call neoCLR.Library.System.Time.TimeOfDay.RuntimeUnion1(System.Result.Error<System.Time.InvalidTimeError>)
+call neoCLR.Library.System.Time.TimeOfDay.RuntimeUnion1(System.Result.Failure<System.Time.InvalidTimeError>)
 M00000003_IL_0040:
 ret
 M00000003_IL_0041:
@@ -127,7 +127,7 @@ call neoCLR.Library.System.Time.TimeOfDay.RuntimeErrorSystemTimeInvalidTimeError
 M00000003_IL_0056:
 call neoCLR.Library.System.Time.TimeOfDay.RuntimeUnion0(System.Time.InvalidTimeError)
 M00000003_IL_005b:
-call neoCLR.Library.System.Time.TimeOfDay.RuntimeUnion1(System.Result.Error<System.Time.InvalidTimeError>)
+call neoCLR.Library.System.Time.TimeOfDay.RuntimeUnion1(System.Result.Failure<System.Time.InvalidTimeError>)
 M00000003_IL_0060:
 ret
 M00000003_IL_0061:
@@ -148,7 +148,7 @@ call neoCLR.Library.System.Time.TimeOfDay.RuntimeErrorSystemTimeInvalidTimeError
 M00000003_IL_0077:
 call neoCLR.Library.System.Time.TimeOfDay.RuntimeUnion0(System.Time.InvalidTimeError)
 M00000003_IL_007c:
-call neoCLR.Library.System.Time.TimeOfDay.RuntimeUnion1(System.Result.Error<System.Time.InvalidTimeError>)
+call neoCLR.Library.System.Time.TimeOfDay.RuntimeUnion1(System.Result.Failure<System.Time.InvalidTimeError>)
 M00000003_IL_0081:
 ret
 M00000003_IL_0082:
@@ -169,7 +169,7 @@ call neoCLR.Library.System.Time.TimeOfDay.RuntimeErrorSystemTimeInvalidTimeError
 M00000003_IL_0097:
 call neoCLR.Library.System.Time.TimeOfDay.RuntimeUnion0(System.Time.InvalidTimeError)
 M00000003_IL_009c:
-call neoCLR.Library.System.Time.TimeOfDay.RuntimeUnion1(System.Result.Error<System.Time.InvalidTimeError>)
+call neoCLR.Library.System.Time.TimeOfDay.RuntimeUnion1(System.Result.Failure<System.Time.InvalidTimeError>)
 M00000003_IL_00a1:
 ret
 M00000003_IL_00a2:
@@ -190,7 +190,7 @@ call neoCLR.Library.System.Time.TimeOfDay.RuntimeErrorSystemTimeInvalidTimeError
 M00000003_IL_00b8:
 call neoCLR.Library.System.Time.TimeOfDay.RuntimeUnion0(System.Time.InvalidTimeError)
 M00000003_IL_00bd:
-call neoCLR.Library.System.Time.TimeOfDay.RuntimeUnion1(System.Result.Error<System.Time.InvalidTimeError>)
+call neoCLR.Library.System.Time.TimeOfDay.RuntimeUnion1(System.Result.Failure<System.Time.InvalidTimeError>)
 M00000003_IL_00c2:
 ret
 M00000003_IL_00c3:
@@ -211,7 +211,7 @@ call neoCLR.Library.System.Time.TimeOfDay.RuntimeErrorSystemTimeInvalidTimeError
 M00000003_IL_00d8:
 call neoCLR.Library.System.Time.TimeOfDay.RuntimeUnion0(System.Time.InvalidTimeError)
 M00000003_IL_00dd:
-call neoCLR.Library.System.Time.TimeOfDay.RuntimeUnion1(System.Result.Error<System.Time.InvalidTimeError>)
+call neoCLR.Library.System.Time.TimeOfDay.RuntimeUnion1(System.Result.Failure<System.Time.InvalidTimeError>)
 M00000003_IL_00e2:
 ret
 M00000003_IL_00e3:
@@ -232,7 +232,7 @@ call neoCLR.Library.System.Time.TimeOfDay.RuntimeErrorSystemTimeInvalidTimeError
 M00000003_IL_00fc:
 call neoCLR.Library.System.Time.TimeOfDay.RuntimeUnion0(System.Time.InvalidTimeError)
 M00000003_IL_0101:
-call neoCLR.Library.System.Time.TimeOfDay.RuntimeUnion1(System.Result.Error<System.Time.InvalidTimeError>)
+call neoCLR.Library.System.Time.TimeOfDay.RuntimeUnion1(System.Result.Failure<System.Time.InvalidTimeError>)
 M00000003_IL_0106:
 ret
 M00000003_IL_0107:
@@ -300,7 +300,7 @@ call neoCLR.Library.System.Time.TimeOfDay.RuntimeErrorSystemTimeInvalidTimeError
 M00000004_IL_001d:
 call neoCLR.Library.System.Time.TimeOfDay.RuntimeUnion0(System.Time.InvalidTimeError)
 M00000004_IL_0022:
-call neoCLR.Library.System.Time.TimeOfDay.RuntimeUnion1(System.Result.Error<System.Time.InvalidTimeError>)
+call neoCLR.Library.System.Time.TimeOfDay.RuntimeUnion1(System.Result.Failure<System.Time.InvalidTimeError>)
 M00000004_IL_0027:
 ret
 M00000004_IL_0028:
@@ -321,7 +321,7 @@ call neoCLR.Library.System.Time.TimeOfDay.RuntimeErrorSystemTimeInvalidTimeError
 M00000004_IL_0045:
 call neoCLR.Library.System.Time.TimeOfDay.RuntimeUnion0(System.Time.InvalidTimeError)
 M00000004_IL_004a:
-call neoCLR.Library.System.Time.TimeOfDay.RuntimeUnion1(System.Result.Error<System.Time.InvalidTimeError>)
+call neoCLR.Library.System.Time.TimeOfDay.RuntimeUnion1(System.Result.Failure<System.Time.InvalidTimeError>)
 M00000004_IL_004f:
 ret
 M00000004_IL_0050:

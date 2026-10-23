@@ -33,7 +33,7 @@ class ServerProbe {
         }
         let pending = server.ServeOne(Echo)
         pending.OnCompleted(() => {
-            if let Error(reason) = pending.GetResult() {
+            if let Failure(reason) = pending.GetResult() {
                 Console.WriteLine(String.Concat("Rejected: ", reason.ToString()))
             } else {
                 Console.WriteLine("Served")

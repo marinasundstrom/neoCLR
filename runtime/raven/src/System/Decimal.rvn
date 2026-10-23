@@ -178,12 +178,12 @@ public struct Decimal : Number, EquatableTo<Decimal>, Formattable {
         }
         if scale < 0 {
             if scale < -28 || value.CompareTo(Limit) > 0 {
-                return Error(NumberParseError.Overflow())
+                return Failure(NumberParseError.Overflow())
             }
             var scaled = value
             scaled.ScaleUp(-scale)
             if scaled.CompareTo(Limit) > 0 {
-                return Error(NumberParseError.Overflow())
+                return Failure(NumberParseError.Overflow())
             }
             return Ok(Decimal(scaled, negative, 0))
         }
@@ -213,7 +213,7 @@ public struct Decimal : Number, EquatableTo<Decimal>, Formattable {
             }
             drop += 1
         }
-        return Error(NumberParseError.Overflow())
+        return Failure(NumberParseError.Overflow())
     }
 
     static func +(left: Decimal, right: Decimal) -> Decimal {
@@ -379,7 +379,7 @@ public struct Decimal : Number, EquatableTo<Decimal>, Formattable {
 
     private static func ParseBytes(bytes: ReadOnlySlice<byte>, grouping: bool, swedish: bool, sign: bool) -> Result<Decimal, NumberParseError> {
         if bytes.Length == 0 {
-            return Error(NumberParseError.InvalidFormat())
+            return Failure(NumberParseError.InvalidFormat())
         }
         var index = 0
         var negative = sign
@@ -403,13 +403,13 @@ public struct Decimal : Number, EquatableTo<Decimal>, Formattable {
             } else { bytes[index] == (byte)44 })
             if group {
                 if point || groupDigits == 0 || (groupSeen && groupDigits != 3) || (!groupSeen && groupDigits > 3) {
-                    return Error(NumberParseError.InvalidFormat())
+                    return Failure(NumberParseError.InvalidFormat())
                 }
                 groupSeen = true
                 groupDigits = 0
                 if swedish { index += 1 }
             } else if bytes[index] == (if swedish { (byte)44 } else { (byte)46 }) && !point {
-                if groupSeen && groupDigits != 3 { return Error(NumberParseError.InvalidFormat()) }
+                if groupSeen && groupDigits != 3 { return Failure(NumberParseError.InvalidFormat()) }
                 point = true
             } else if digit >= 0 && digit <= 9 {
                 if !point { groupDigits += 1 }
@@ -429,14 +429,14 @@ public struct Decimal : Number, EquatableTo<Decimal>, Formattable {
                         }
                     }
                 }
-            } else { return Error(NumberParseError.InvalidFormat()) }
+            } else { return Failure(NumberParseError.InvalidFormat()) }
             index += 1
         }
         if groupSeen && !point && groupDigits != 3 {
-            return Error(NumberParseError.InvalidFormat())
+            return Failure(NumberParseError.InvalidFormat())
         }
         if !any {
-            return Error(NumberParseError.InvalidFormat())
+            return Failure(NumberParseError.InvalidFormat())
         }
         return Fit(magnitude, negative, fraction - discarded, sticky)
     }

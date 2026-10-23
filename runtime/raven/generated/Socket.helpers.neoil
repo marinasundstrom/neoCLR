@@ -125,14 +125,14 @@ ret
 newobj instance System.Networking.Sockets.SocketError.UnsupportedAddressFamily::.ctor()
 ret
 .end
-.function neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion0(System.Networking.Sockets.SocketError arg0) -> System.Result.Error<System.Networking.Sockets.SocketError>
+.function neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion0(System.Networking.Sockets.SocketError arg0) -> System.Result.Failure<System.Networking.Sockets.SocketError>
 ldarg arg0
-newobj instance System.Result.Error<System.Networking.Sockets.SocketError>::.ctor(System.Networking.Sockets.SocketError)
+newobj instance System.Result.Failure<System.Networking.Sockets.SocketError>::.ctor(System.Networking.Sockets.SocketError)
 ret
 .end
-.function neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion1(System.Result.Error<System.Networking.Sockets.SocketError> arg0) -> System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>
+.function neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion1(System.Result.Failure<System.Networking.Sockets.SocketError> arg0) -> System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>
 ldarg arg0
-newobj instance System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>::.ctor(System.Result.Error<System.Networking.Sockets.SocketError>)
+newobj instance System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>::.ctor(System.Result.Failure<System.Networking.Sockets.SocketError>)
 ret
 .end
 .function neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion2(System.Networking.Sockets.Socket arg0) -> System.Result.Ok<System.Networking.Sockets.Socket>
@@ -145,9 +145,9 @@ ldarg arg0
 newobj instance System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>::.ctor(System.Result.Ok<System.Networking.Sockets.Socket>)
 ret
 .end
-.function neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion4(System.Result.Error<System.Networking.Sockets.SocketError> arg0) -> System.Result<Int32,System.Networking.Sockets.SocketError>
+.function neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion4(System.Result.Failure<System.Networking.Sockets.SocketError> arg0) -> System.Result<Int32,System.Networking.Sockets.SocketError>
 ldarg arg0
-newobj instance System.Result<Int32,System.Networking.Sockets.SocketError>::.ctor(System.Result.Error<System.Networking.Sockets.SocketError>)
+newobj instance System.Result<Int32,System.Networking.Sockets.SocketError>::.ctor(System.Result.Failure<System.Networking.Sockets.SocketError>)
 ret
 .end
 .function neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion5(Int32 arg0) -> System.Result.Ok<Int32>
@@ -330,7 +330,7 @@ call System.Networking.Sockets.Socket::DecodeError(Byte)
 M0000001e_IL_0069:
 call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion0(System.Networking.Sockets.SocketError)
 M0000001e_IL_006e:
-call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion1(System.Result.Error<System.Networking.Sockets.SocketError>)
+call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion1(System.Result.Failure<System.Networking.Sockets.SocketError>)
 M0000001e_IL_0073:
 call instance System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::Complete(System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>)
 call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeBooleanToInt32(Boolean)
@@ -497,7 +497,7 @@ call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeErrorSystemNetworkin
 M00000020_IL_0056:
 call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion0(System.Networking.Sockets.SocketError)
 M00000020_IL_005b:
-call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion1(System.Result.Error<System.Networking.Sockets.SocketError>)
+call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion1(System.Result.Failure<System.Networking.Sockets.SocketError>)
 M00000020_IL_0060:
 call instance System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::Complete(System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>)
 call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeBooleanToInt32(Boolean)
@@ -531,7 +531,7 @@ call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeErrorSystemNetworkin
 M00000020_IL_008a:
 call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion0(System.Networking.Sockets.SocketError)
 M00000020_IL_008f:
-call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion1(System.Result.Error<System.Networking.Sockets.SocketError>)
+call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion1(System.Result.Failure<System.Networking.Sockets.SocketError>)
 M00000020_IL_0094:
 call instance System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::Complete(System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>)
 call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeBooleanToInt32(Boolean)
@@ -668,7 +668,7 @@ call System.Networking.Sockets.Socket::DecodeError(Byte)
 M00000020_IL_0138:
 call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion0(System.Networking.Sockets.SocketError)
 M00000020_IL_013d:
-call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion1(System.Result.Error<System.Networking.Sockets.SocketError>)
+call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion1(System.Result.Failure<System.Networking.Sockets.SocketError>)
 M00000020_IL_0142:
 call instance System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::Complete(System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>)
 call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeBooleanToInt32(Boolean)
@@ -810,7 +810,7 @@ call System.Networking.Sockets.Socket::DecodeError(Byte)
 M00000021_IL_0068:
 call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion0(System.Networking.Sockets.SocketError)
 M00000021_IL_006d:
-call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion1(System.Result.Error<System.Networking.Sockets.SocketError>)
+call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion1(System.Result.Failure<System.Networking.Sockets.SocketError>)
 M00000021_IL_0072:
 call instance System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::Complete(System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>)
 call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeBooleanToInt32(Boolean)
@@ -1002,7 +1002,7 @@ call System.Networking.Sockets.Socket::DecodeError(Byte)
 M00000023_IL_0089:
 call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion0(System.Networking.Sockets.SocketError)
 M00000023_IL_008e:
-call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion1(System.Result.Error<System.Networking.Sockets.SocketError>)
+call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion1(System.Result.Failure<System.Networking.Sockets.SocketError>)
 M00000023_IL_0093:
 call instance System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::Complete(System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>)
 call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeBooleanToInt32(Boolean)
@@ -1254,7 +1254,7 @@ call System.Networking.Sockets.Socket::DecodeError(Byte)
 M00000026_IL_0098:
 call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion0(System.Networking.Sockets.SocketError)
 M00000026_IL_009d:
-call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion4(System.Result.Error<System.Networking.Sockets.SocketError>)
+call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion4(System.Result.Failure<System.Networking.Sockets.SocketError>)
 M00000026_IL_00a2:
 call instance System.Concurrency.Tasks.Promise<System.Result<Int32,System.Networking.Sockets.SocketError>>::Complete(System.Result<Int32,System.Networking.Sockets.SocketError>)
 call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeBooleanToInt32(Boolean)
@@ -1465,7 +1465,7 @@ call System.Networking.Sockets.Socket::DecodeError(Byte)
 M00000028_IL_0098:
 call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion0(System.Networking.Sockets.SocketError)
 M00000028_IL_009d:
-call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion4(System.Result.Error<System.Networking.Sockets.SocketError>)
+call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion4(System.Result.Failure<System.Networking.Sockets.SocketError>)
 M00000028_IL_00a2:
 call instance System.Concurrency.Tasks.Promise<System.Result<Int32,System.Networking.Sockets.SocketError>>::Complete(System.Result<Int32,System.Networking.Sockets.SocketError>)
 call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeBooleanToInt32(Boolean)
@@ -1657,7 +1657,7 @@ call System.Networking.Sockets.Socket::DecodeError(Byte)
 M0000002a_IL_0089:
 call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion0(System.Networking.Sockets.SocketError)
 M0000002a_IL_008e:
-call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion4(System.Result.Error<System.Networking.Sockets.SocketError>)
+call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion4(System.Result.Failure<System.Networking.Sockets.SocketError>)
 M0000002a_IL_0093:
 call instance System.Concurrency.Tasks.Promise<System.Result<Int32,System.Networking.Sockets.SocketError>>::Complete(System.Result<Int32,System.Networking.Sockets.SocketError>)
 call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeBooleanToInt32(Boolean)

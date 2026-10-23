@@ -28,32 +28,32 @@ public struct Date : ComparableTo<Date>, EquatableTo<Date>, Formattable {
 
     static func Create(year: int, month: int, day: int) -> Result<Date, InvalidDateError> {
         if year < 1 {
-            return Error(InvalidDateError())
+            return Failure(InvalidDateError())
         }
         if year > 9999 {
-            return Error(InvalidDateError())
+            return Failure(InvalidDateError())
         }
         if month < 1 {
-            return Error(InvalidDateError())
+            return Failure(InvalidDateError())
         }
         if month > 12 {
-            return Error(InvalidDateError())
+            return Failure(InvalidDateError())
         }
         if day < 1 {
-            return Error(InvalidDateError())
+            return Failure(InvalidDateError())
         }
         if day > DaysInMonth(year, month) {
-            return Error(InvalidDateError())
+            return Failure(InvalidDateError())
         }
         return Ok(Date(DaysBeforeYear(year) + DaysBeforeMonth(year, month) + day - 1))
     }
 
     static func FromDayNumber(dayNumber: int) -> Result<Date, InvalidDateError> {
         if dayNumber < 0 {
-            return Error(InvalidDateError())
+            return Failure(InvalidDateError())
         }
         if dayNumber > 3652058 {
-            return Error(InvalidDateError())
+            return Failure(InvalidDateError())
         }
         return Ok(Date(dayNumber))
     }
@@ -142,10 +142,10 @@ public struct Date : ComparableTo<Date>, EquatableTo<Date>, Formattable {
     func AddDays(days: int) -> Result<Date, InvalidDateError> {
         let target = (long)StoredDayNumber + days
         if target < 0L {
-            return Error(InvalidDateError())
+            return Failure(InvalidDateError())
         }
         if target > 3652058L {
-            return Error(InvalidDateError())
+            return Failure(InvalidDateError())
         }
         return FromDayNumber((int)target)
     }
@@ -154,10 +154,10 @@ public struct Date : ComparableTo<Date>, EquatableTo<Date>, Formattable {
     func AddMonths(months: int) -> Result<Date, InvalidDateError> {
         let target = (long)(Year - 1) * 12L + Month - 1 + months
         if target < 0L {
-            return Error(InvalidDateError())
+            return Failure(InvalidDateError())
         }
         if target > 119987L {
-            return Error(InvalidDateError())
+            return Failure(InvalidDateError())
         }
         let year = (int)(target / 12L) + 1
         let month = (int)(target % 12L) + 1
@@ -172,10 +172,10 @@ public struct Date : ComparableTo<Date>, EquatableTo<Date>, Formattable {
     /// Adds years, clamping February 29 to February 28 when necessary.
     func AddYears(years: int) -> Result<Date, InvalidDateError> {
         if years < -9998 {
-            return Error(InvalidDateError())
+            return Failure(InvalidDateError())
         }
         if years > 9998 {
-            return Error(InvalidDateError())
+            return Failure(InvalidDateError())
         }
         return AddMonths(years * 12)
     }

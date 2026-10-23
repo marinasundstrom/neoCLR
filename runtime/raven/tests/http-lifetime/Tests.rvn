@@ -93,7 +93,7 @@ func ECompleted() -> Result<unit, TestFailure> {
     _ = Assert.True(!handler.Token.IsCancellationRequested, "Completed request registrations released")?
     _ = Assert.True(result.IsCompleted && !result.IsCancelled, "Completed response preserved")?
     let Some(request) = response.Request else {
-        return Error(TestFailure("Request association", "Some", "None"))
+        return Failure(TestFailure("Request association", "Some", "None"))
     }
     return Assert.Equal("/answer", request.Target)
 }
@@ -207,10 +207,10 @@ func JIndependentOwners() -> Result<unit, TestFailure> {
     _ = Assert.True(shared.Tokens[0].IsCancellationRequested, "First owner requests cancellation")?
     _ = Assert.True(!shared.Tokens[1].IsCancellationRequested, "Other owner is independent")?
     _ = shared.Completions[0].Cancel()
-    _ = shared.Completions[1].Complete(Error(HttpError.Handler("expected")))
+    _ = shared.Completions[1].Complete(Failure(HttpError.Handler("expected")))
     TaskQueue.Default.Drain()
     _ = Assert.True(cancelled.IsCancelled, "First send acknowledges cancellation")?
-    return Assert.True(survivor.GetResult() is Error(HttpError.Handler("expected")), "Independent failure preserved")
+    return Assert.True(survivor.GetResult() is Failure(HttpError.Handler("expected")), "Independent failure preserved")
 }
 
 [Test("HTTP disposed requests are rejected before invoking a custom handler")]
@@ -221,6 +221,6 @@ func ZDisposedRequest() -> Result<unit, TestFailure> {
     request.Dispose()
     let operation = client.Send(request)
     _ = Assert.True(operation.IsCompleted, "Disposed request fails immediately")?
-    _ = Assert.True(operation.GetResult() is Error(HttpError.InvalidRequest(_)), "Disposed request error")?
+    _ = Assert.True(operation.GetResult() is Failure(HttpError.InvalidRequest(_)), "Disposed request error")?
     return Assert.Equal(0, handler.Calls)
 }

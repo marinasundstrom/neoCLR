@@ -44,14 +44,14 @@ ret
 newobj instance System.Storage.InvalidPathError::.ctor()
 ret
 .end
-.function neoCLR.Library.System.Storage.Path.RuntimeUnion0(System.Storage.InvalidPathError arg0) -> System.Result.Error<System.Storage.InvalidPathError>
+.function neoCLR.Library.System.Storage.Path.RuntimeUnion0(System.Storage.InvalidPathError arg0) -> System.Result.Failure<System.Storage.InvalidPathError>
 ldarg arg0
-newobj instance System.Result.Error<System.Storage.InvalidPathError>::.ctor(System.Storage.InvalidPathError)
+newobj instance System.Result.Failure<System.Storage.InvalidPathError>::.ctor(System.Storage.InvalidPathError)
 ret
 .end
-.function neoCLR.Library.System.Storage.Path.RuntimeUnion1(System.Result.Error<System.Storage.InvalidPathError> arg0) -> System.Result<System.Storage.Path,System.Storage.InvalidPathError>
+.function neoCLR.Library.System.Storage.Path.RuntimeUnion1(System.Result.Failure<System.Storage.InvalidPathError> arg0) -> System.Result<System.Storage.Path,System.Storage.InvalidPathError>
 ldarg arg0
-newobj instance System.Result<System.Storage.Path,System.Storage.InvalidPathError>::.ctor(System.Result.Error<System.Storage.InvalidPathError>)
+newobj instance System.Result<System.Storage.Path,System.Storage.InvalidPathError>::.ctor(System.Result.Failure<System.Storage.InvalidPathError>)
 ret
 .end
 .function neoCLR.Library.System.Storage.Path.RuntimeUnion2(System.Storage.Path arg0) -> System.Result.Ok<System.Storage.Path>

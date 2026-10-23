@@ -31,7 +31,7 @@ writes and failure after opening still apply.
 Both error types expose their runtime `Is…` case predicates. Read errors include
 InvalidLimit, InvalidPath, NotFound, AccessDenied, NotRegularFile, ReadFailed,
 TooLarge and InvalidUtf8. Write errors replace ReadFailed with WriteFailed and have
-no InvalidUtf8 case. `Result.Error<FileReadError>.Value` and the corresponding write
+no InvalidUtf8 case. `Result.Failure<FileReadError>.Value` and the corresponding write
 case expose the error for those predicates; `Result.Ok<string>.Value` exposes text.
 Full error-union construction, case deconstruction and ToString are not yet admitted
 by this slice. They remain part of the [existing-API release coverage gate](raven-preview-acceptance.md).

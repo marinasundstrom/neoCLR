@@ -42,7 +42,7 @@ class PendingRead {
         }
         let bytes = Utf8.Encode(payload)
         if bytes.Count > 2 {
-            let failure: Result<int, string> = Error("Payload exceeds requested range")
+            let failure: Result<int, string> = Failure("Payload exceeds requested range")
             completion.Complete(failure)
             return
         }

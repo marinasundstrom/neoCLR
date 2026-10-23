@@ -153,7 +153,7 @@ public class String : EquatableTo<string>, ComparableTo<string>, Collections.Seq
         if range.TryGetOffsetAndLength(Length) is Ok(let bounds) {
             return Ok(neoCLR.Runtime.StringSliceGraphemes(m_value, bounds.Item1, bounds.Item2))
         }
-        return Error(InvalidRangeError())
+        return Failure(InvalidRangeError())
     }
 
     /// Returns true for null or empty text without creating a string.
@@ -516,12 +516,12 @@ public class String : EquatableTo<string>, ComparableTo<string>, Collections.Seq
         }
         let status = neoCLR.Runtime.UnpackValue<byte>(payload)
         if status == 1 {
-            return Error(Utf8SliceError.OutOfRange())
+            return Failure(Utf8SliceError.OutOfRange())
         }
         if status == 2 {
-            return Error(Utf8SliceError.InvalidBoundary())
+            return Failure(Utf8SliceError.InvalidBoundary())
         }
         System.Fail("invalid native UTF-8 slice status")
-        return Error(Utf8SliceError.OutOfRange())
+        return Failure(Utf8SliceError.OutOfRange())
     }
 }

@@ -58,11 +58,11 @@ internal class HttpBodyInput : InputStream {
         if cancellationToken.IsCancellationRequested {
             _ = result.Cancel()
         } else if closed {
-            _ = result.Complete(Error(StreamError.Closed))
+            _ = result.Complete(Failure(StreamError.Closed))
         } else if busy {
-            _ = result.Complete(Error(StreamError.WrongAccess))
+            _ = result.Complete(Failure(StreamError.WrongAccess))
         } else if !(offset >= 0 && count >= 0 && offset <= buffer.Length && count <= buffer.Length - offset) {
-            _ = result.Complete(Error(StreamError.InvalidRange))
+            _ = result.Complete(Failure(StreamError.InvalidRange))
         } else if count == 0 || ended {
             _ = result.Complete(Ok(0))
         } else {
@@ -96,7 +96,7 @@ internal class HttpBodyInput : InputStream {
 
     private func Fail(error: StreamError) {
         Close()
-        Finish(Error(error))
+        Finish(Failure(error))
     }
 
     private func Cancel() {
@@ -125,11 +125,11 @@ internal class HttpBodyInput : InputStream {
                 var decoded = value
                 if chunks is HttpChunkDecoder decoder {
                     let progress = decoder.Push(value)
-                    if let Error(HttpError.LimitExceeded(_)) = progress {
+                    if let Failure(HttpError.LimitExceeded(_)) = progress {
                         Fail(StreamError.LimitExceeded)
                         return
                     }
-                    if let Error(_) = progress { Fail(StreamError.InvalidData); return }
+                    if let Failure(_) = progress { Fail(StreamError.InvalidData); return }
                     if let Ok(done) = progress { ended = done }
                     available = decoder.HasByte
                     decoded = decoder.Byte
@@ -169,7 +169,7 @@ internal class HttpBodyInput : InputStream {
             receiving = null
             if pending.IsCancelled || token.IsCancellationRequested { Cancel(); return }
             if closed { Fail(StreamError.Closed); return }
-            if let Error(_) = pending.GetResult() { Fail(StreamError.IoFailure); return }
+            if let Failure(_) = pending.GetResult() { Fail(StreamError.IoFailure); return }
             if let Ok(count) = pending.GetResult() {
                 if count == 0 {
                     if remaining != -2 { Fail(StreamError.InvalidData); return }

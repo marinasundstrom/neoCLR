@@ -512,7 +512,7 @@ call neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorNewSystemUriErrorTooLon
 M0000000a_IL_0023:
 call neoCLR.Library.System.Uri.RuntimeUnion2(System.UriError)
 M0000000a_IL_0028:
-call neoCLR.Library.System.Uri.RuntimeUnion3(System.Result.Error<System.UriError>)
+call neoCLR.Library.System.Uri.RuntimeUnion3(System.Result.Failure<System.UriError>)
 M0000000a_IL_002d:
 ret
 M0000000a_IL_002e:
@@ -638,7 +638,7 @@ call neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorNewSystemUriErrorInvali
 M0000000a_IL_00bf:
 call neoCLR.Library.System.Uri.RuntimeUnion2(System.UriError)
 M0000000a_IL_00c4:
-call neoCLR.Library.System.Uri.RuntimeUnion3(System.Result.Error<System.UriError>)
+call neoCLR.Library.System.Uri.RuntimeUnion3(System.Result.Failure<System.UriError>)
 M0000000a_IL_00c9:
 ret
 M0000000a_IL_00ca:
@@ -972,7 +972,7 @@ call neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorNewSystemUriErrorUnsupp
 M0000000a_IL_02e9:
 call neoCLR.Library.System.Uri.RuntimeUnion2(System.UriError)
 M0000000a_IL_02ee:
-call neoCLR.Library.System.Uri.RuntimeUnion3(System.Result.Error<System.UriError>)
+call neoCLR.Library.System.Uri.RuntimeUnion3(System.Result.Failure<System.UriError>)
 M0000000a_IL_02f3:
 ret
 M0000000a_IL_02f4:
@@ -983,7 +983,7 @@ call neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorNewSystemUriErrorInvali
 M0000000a_IL_02ff:
 call neoCLR.Library.System.Uri.RuntimeUnion2(System.UriError)
 M0000000a_IL_0304:
-call neoCLR.Library.System.Uri.RuntimeUnion3(System.Result.Error<System.UriError>)
+call neoCLR.Library.System.Uri.RuntimeUnion3(System.Result.Failure<System.UriError>)
 M0000000a_IL_0309:
 ret
 M0000000a_IL_030a:
@@ -1154,7 +1154,7 @@ call neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorNewSystemUriErrorInvali
 M0000000a_IL_03ef:
 call neoCLR.Library.System.Uri.RuntimeUnion2(System.UriError)
 M0000000a_IL_03f4:
-call neoCLR.Library.System.Uri.RuntimeUnion3(System.Result.Error<System.UriError>)
+call neoCLR.Library.System.Uri.RuntimeUnion3(System.Result.Failure<System.UriError>)
 M0000000a_IL_03f9:
 ret
 M0000000a_IL_03fa:
@@ -1257,7 +1257,7 @@ call neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorNewSystemUriErrorInvali
 M0000000a_IL_0491:
 call neoCLR.Library.System.Uri.RuntimeUnion2(System.UriError)
 M0000000a_IL_0496:
-call neoCLR.Library.System.Uri.RuntimeUnion3(System.Result.Error<System.UriError>)
+call neoCLR.Library.System.Uri.RuntimeUnion3(System.Result.Failure<System.UriError>)
 M0000000a_IL_049b:
 ret
 M0000000a_IL_049c:
@@ -1495,7 +1495,7 @@ call neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorNewSystemUriErrorInvali
 M0000000a_IL_05c6:
 call neoCLR.Library.System.Uri.RuntimeUnion2(System.UriError)
 M0000000a_IL_05cb:
-call neoCLR.Library.System.Uri.RuntimeUnion3(System.Result.Error<System.UriError>)
+call neoCLR.Library.System.Uri.RuntimeUnion3(System.Result.Failure<System.UriError>)
 M0000000a_IL_05d0:
 ret
 M0000000a_IL_05d1:
@@ -1636,7 +1636,7 @@ call neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorNewSystemUriErrorInvali
 M0000000a_IL_067b:
 call neoCLR.Library.System.Uri.RuntimeUnion2(System.UriError)
 M0000000a_IL_0680:
-call neoCLR.Library.System.Uri.RuntimeUnion3(System.Result.Error<System.UriError>)
+call neoCLR.Library.System.Uri.RuntimeUnion3(System.Result.Failure<System.UriError>)
 M0000000a_IL_0685:
 ret
 M0000000a_IL_0686:
@@ -1697,7 +1697,7 @@ call neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorNewSystemUriErrorInvali
 M0000000a_IL_06d0:
 call neoCLR.Library.System.Uri.RuntimeUnion2(System.UriError)
 M0000000a_IL_06d5:
-call neoCLR.Library.System.Uri.RuntimeUnion3(System.Result.Error<System.UriError>)
+call neoCLR.Library.System.Uri.RuntimeUnion3(System.Result.Failure<System.UriError>)
 M0000000a_IL_06da:
 ret
 M0000000a_IL_06db:
@@ -1970,7 +1970,7 @@ call neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorNewSystemUriErrorInvali
 M0000000a_IL_0823:
 call neoCLR.Library.System.Uri.RuntimeUnion2(System.UriError)
 M0000000a_IL_0828:
-call neoCLR.Library.System.Uri.RuntimeUnion3(System.Result.Error<System.UriError>)
+call neoCLR.Library.System.Uri.RuntimeUnion3(System.Result.Failure<System.UriError>)
 M0000000a_IL_082d:
 ret
 M0000000a_IL_082e:
@@ -2528,7 +2528,7 @@ call neoCLR.Library.System.Uri.RuntimeErrorSystemUriErrorNewSystemUriErrorBaseNo
 M0000000e_IL_001f:
 call neoCLR.Library.System.Uri.RuntimeUnion2(System.UriError)
 M0000000e_IL_0024:
-call neoCLR.Library.System.Uri.RuntimeUnion3(System.Result.Error<System.UriError>)
+call neoCLR.Library.System.Uri.RuntimeUnion3(System.Result.Failure<System.UriError>)
 M0000000e_IL_0029:
 ret
 M0000000e_IL_002a:

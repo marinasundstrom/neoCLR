@@ -23,7 +23,7 @@ func Main() -> int {
     let holder = Holder(ok)
     var results = System.Collections.ArrayList<Result<int, string>>(1)
     results.Add(ok)
-    results[0] = System.Result.Error<string>("no")
+    results[0] = System.Result.Failure<string>("no")
     if let Error(_) = results[0] {} else { return -2 }
     let array = new Result<int, string>[1] { ok }
     array[0] = System.Result.Ok<int>(42)
@@ -81,7 +81,7 @@ fn ordinary_constructors_wrong_generic_arguments_and_missing_case_layers_do_not_
     for source in [
         "func Main() -> () { let r: Result<int, string> = 42 }",
         "func Main() -> () { let r: Result<Void, string> = System.Result.Ok<int>(42) }",
-        "func Main() -> () { let r: Result<int, string> = System.Result.Error<int>(42) }",
+        "func Main() -> () { let r: Result<int, string> = System.Result.Failure<int>(42) }",
         "func Main() -> () { let r: Option<int> = System.Result.Ok<int>(42) }",
         "func Main() -> () { let r: System.Option.Some<int> = 42 }",
         "func Main() -> () { let r: Option<Result<int, string>> = System.Result.Ok<int>(42) }",

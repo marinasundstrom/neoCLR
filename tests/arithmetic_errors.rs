@@ -48,12 +48,12 @@ fn division_result_preserves_quotients_and_distinguishes_error_cases() {
             .unwrap()
             .value;
         let case =
-            resolve("instance System.Result<Int32,System.IntegerDivisionError>::GetErrorCase()")
+            resolve("instance System.Result<Int32,System.IntegerDivisionError>::GetFailureCase()")
                 .invoke_instance(result, vec![], Limits::default())
                 .unwrap()
                 .value;
         let error =
-            resolve("instance System.Result.Error<System.IntegerDivisionError>::get_Value()")
+            resolve("instance System.Result.Failure<System.IntegerDivisionError>::get_Value()")
                 .invoke_instance(case, vec![], Limits::default())
                 .unwrap()
                 .value;
@@ -100,7 +100,7 @@ fn division_result_preserves_quotients_and_distinguishes_error_cases() {
 
 #[test]
 fn abs_overflow_is_an_ordinary_error_value_and_old_result_type_is_rejected() {
-    let source = ".module App\n.entry Main\n.function Main() -> System.OverflowError\nldc.i4 -2147483648\ncall System.Math::Abs(Int32)\ncall instance System.Result<Int32,System.OverflowError>::GetErrorCase()\ncall instance System.Result.Error<System.OverflowError>::get_Value()\nret\n.end";
+    let source = ".module App\n.entry Main\n.function Main() -> System.OverflowError\nldc.i4 -2147483648\ncall System.Math::Abs(Int32)\ncall instance System.Result<Int32,System.OverflowError>::GetFailureCase()\ncall instance System.Result.Failure<System.OverflowError>::get_Value()\nret\n.end";
     let module = assemble(source).unwrap();
     let loaded = neoclr::load(&serde_json::to_string(&module).unwrap()).unwrap();
     let program = LoadedProgram::new(&loaded).unwrap();

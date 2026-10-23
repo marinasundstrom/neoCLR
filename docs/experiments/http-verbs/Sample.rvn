@@ -7,7 +7,7 @@ import System.Web.Http.*
 async func ReplaceText(client: HttpClient, text: string) -> Task<Result<HttpResponse, HttpError>> {
     let response = await client.Put("item", HttpStringContent(text))?
     if !response.IsSuccessStatusCode {
-        return Error(HttpError.UnsuccessfulStatus(response.StatusCode))
+        return Failure(HttpError.UnsuccessfulStatus(response.StatusCode))
     }
     return Ok(response)
 }

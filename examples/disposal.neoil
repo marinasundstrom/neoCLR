@@ -71,8 +71,8 @@
         ldstr "Draft is empty"
     Error:
         newobj DraftCloseError
-        newobj instance System.Result.Error<DraftCloseError>::.ctor(DraftCloseError)
-        newobj instance System.Result<Void,DraftCloseError>::.ctor(System.Result.Error<DraftCloseError>)
+        newobj instance System.Result.Failure<DraftCloseError>::.ctor(DraftCloseError)
+        newobj instance System.Result<Void,DraftCloseError>::.ctor(System.Result.Failure<DraftCloseError>)
         ret
     .end
 .end
@@ -131,8 +131,8 @@
     ldloca incomplete
     interface.borrow System.Closable<DraftCloseError>
     call Finish(System.Closable<DraftCloseError>&)
-    call instance System.Result<Void,DraftCloseError>::GetErrorCase()
-    call instance System.Result.Error<DraftCloseError>::get_Value()
+    call instance System.Result<Void,DraftCloseError>::GetFailureCase()
+    call instance System.Result.Failure<DraftCloseError>::get_Value()
     ldfld DraftCloseError::Message
     call System.Console::WriteLine(String)
     pop

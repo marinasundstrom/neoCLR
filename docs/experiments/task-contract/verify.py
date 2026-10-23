@@ -56,12 +56,12 @@ cases = {
     let source = Completion(executor)
     let destination = Completion(executor)
     Start(source, destination)
-    Check(source.TryComplete(Result<int, string>.Error("Expected failure")))
+    Check(source.TryComplete(Result<int, string>.Failure("Expected failure")))
     executor.Drain()
     Check(destination.IsCompleted)
     match destination.GetResult() {
         Ok(_) => System.Fail("Lost expected error")
-        Error(let message) => Check(message == "Expected failure")
+        Failure(let message) => Check(message == "Expected failure")
     }
 ''',
     'Duplicate completion cannot replace the result': '''
@@ -154,7 +154,7 @@ func Main() {
     source.OnCompleted(() => {
         match source.GetResult() {
             Ok(_) => WriteLine("Completed unit")
-            Error(_) => System.Fail("Expected completion")
+            Failure(_) => System.Fail("Expected completion")
         }
     })
     source.TryComplete(Ok(()))

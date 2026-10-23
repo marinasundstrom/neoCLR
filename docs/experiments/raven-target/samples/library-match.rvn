@@ -5,7 +5,7 @@ import System.Console.*
 func Magnitude(value: int) -> int {
     return match Math.Abs(value) {
         .Ok(let ok) => ok
-        .Error(let error) => -1
+        .Failure(let error) => -1
     }
 }
 
@@ -21,7 +21,7 @@ func Show(value: int) {
         .Ok(let ok) => {
             WriteLine(ok)
         }
-        .Error(let error) => {
+        .Failure(let error) => {
             WriteLine("Overflow")
         }
     }

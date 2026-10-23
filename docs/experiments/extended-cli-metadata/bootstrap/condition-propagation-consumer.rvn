@@ -7,7 +7,7 @@ class Harness {
     private func Read(fail: bool) -> Result<int, string> {
         count += 1
         if fail {
-            return Error("failed")
+            return Failure("failed")
         }
         return Ok(7)
     }
@@ -35,7 +35,7 @@ class Harness {
                 System.Fail("Short circuit evaluated a skipped operand")
             }
         } else if fail {
-            if count != 1 || !(result is Error(let error) && error == "failed") {
+            if count != 1 || !(result is Failure(let error) && error == "failed") {
                 System.Fail("Residual did not return exactly once")
             }
         } else {

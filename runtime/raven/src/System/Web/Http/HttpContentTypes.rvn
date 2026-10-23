@@ -42,10 +42,10 @@ public class HttpStreamContent : HttpContent {
     /// <returns>Stream content, InvalidRequest for negative length or LimitExceeded for excessive length. Failure leaves ownership with the caller.</returns>
     static func Create(stream: InputStream, length: int, leaveOpen: bool) -> Result<HttpStreamContent, HttpError> {
         if length < 0 {
-            return Error(HttpError.InvalidRequest("Negative stream content length"))
+            return Failure(HttpError.InvalidRequest("Negative stream content length"))
         }
         if length > HttpWireLimits.BodyBytes {
-            return Error(HttpError.LimitExceeded("Stream upload exceeds HTTP body limit"))
+            return Failure(HttpError.LimitExceeded("Stream upload exceeds HTTP body limit"))
         }
         return Ok(HttpStreamContent(stream, length, leaveOpen))
     }
@@ -68,7 +68,7 @@ public class HttpStringContent : HttpContent {
     /// <remarks>No Content-Type negotiation or decompression. Streaming reads use the incremental UTF-8 decoder with bounded byte staging. Memory content is decoded directly from its selected window.</remarks>
     static async func Read(content: HttpContent) -> Task<Result<string, HttpError>> {
         if content.IsDisposed {
-            return Error(HttpError.Content(StreamError.Closed))
+            return Failure(HttpError.Content(StreamError.Closed))
         }
         if content is HttpMemoryContent memoryContent {
             return Decode(memoryContent.Memory)
@@ -78,35 +78,35 @@ public class HttpStringContent : HttpContent {
         }
         _ = content.BeginUpload()?
         let Some(stream) = content.TryGetStream() else {
-            return Error(HttpError.Content(StreamError.IoFailure))
+            return Failure(HttpError.Content(StreamError.IoFailure))
         }
         let input = HttpContentTextInput(content, stream)
         let Ok(reader) = StreamReader.Create(input, true) else {
-            return Error(HttpError.Content(StreamError.InvalidEncoding))
+            return Failure(HttpError.Content(StreamError.InvalidEncoding))
         }
         let result = await reader.ReadToEnd(65536)
         reader.Close()
         if let Some(error) = input.Failure {
-            return Error(HttpError.Content(error))
+            return Failure(HttpError.Content(error))
         }
         return match result {
             Ok(let text) => Ok(text)
-            Error(TextReadError.LimitExceeded) => Error(HttpError.Content(StreamError.LimitExceeded))
-            Error(_) => Error(HttpError.Protocol("Invalid UTF-8 body"))
+            Failure(TextReadError.LimitExceeded) => Failure(HttpError.Content(StreamError.LimitExceeded))
+            Failure(_) => Failure(HttpError.Protocol("Invalid UTF-8 body"))
         }
     }
 
     private static func Decode(memory: ReadOnlySlice<byte>) -> Result<string, HttpError> {
         return match HttpText.Decode(memory) {
             Ok(let text) => Ok(text)
-            Error(_) => Error(HttpError.Protocol("Invalid UTF-8 body"))
+            Failure(_) => Failure(HttpError.Protocol("Invalid UTF-8 body"))
         }
     }
 
     private static func DecodeBytes(bytes: Sequence<byte>) -> Result<string, HttpError> {
         return match HttpText.Decode(bytes) {
             Ok(let text) => Ok(text)
-            Error(_) => Error(HttpError.Protocol("Invalid UTF-8 body"))
+            Failure(_) => Failure(HttpError.Protocol("Invalid UTF-8 body"))
         }
     }
 
@@ -164,7 +164,7 @@ internal class HttpContentTextInput : InputStream {
         if content.IsDisposed {
             return Fail(StreamError.Closed)
         }
-        if let Error(error) = result {
+        if let Failure(error) = result {
             return Fail(error)
         }
         let Ok(read) = result else {
@@ -181,6 +181,6 @@ internal class HttpContentTextInput : InputStream {
 
     private func Fail(error: StreamError) -> Result<int, StreamError> {
         failure = Some(error)
-        return Error(error)
+        return Failure(error)
     }
 }

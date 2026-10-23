@@ -73,7 +73,7 @@ call neoCLR.Library.System.Int32.RuntimeErrorSystemInt32ParseErrorNewSystemInt32
 M00000001_IL_004f:
 call neoCLR.Library.System.Int32.RuntimeUnion2(System.Int32ParseError)
 M00000001_IL_0054:
-call neoCLR.Library.System.Int32.RuntimeUnion3(System.Result.Error<System.Int32ParseError>)
+call neoCLR.Library.System.Int32.RuntimeUnion3(System.Result.Failure<System.Int32ParseError>)
 M00000001_IL_0059:
 ret
 M00000001_IL_005a:
@@ -98,7 +98,7 @@ call neoCLR.Library.System.Int32.RuntimeErrorSystemInt32ParseErrorNewSystemInt32
 M00000001_IL_0075:
 call neoCLR.Library.System.Int32.RuntimeUnion2(System.Int32ParseError)
 M00000001_IL_007a:
-call neoCLR.Library.System.Int32.RuntimeUnion3(System.Result.Error<System.Int32ParseError>)
+call neoCLR.Library.System.Int32.RuntimeUnion3(System.Result.Failure<System.Int32ParseError>)
 M00000001_IL_007f:
 ret
 M00000001_IL_0080:
@@ -130,7 +130,7 @@ call neoCLR.Library.System.Int32.RuntimeErrorSystemIntegerDivisionErrorNewSystem
 M00000002_IL_001a:
 call neoCLR.Library.System.Int32.RuntimeUnion4(System.IntegerDivisionError)
 M00000002_IL_001f:
-call neoCLR.Library.System.Int32.RuntimeUnion5(System.Result.Error<System.IntegerDivisionError>)
+call neoCLR.Library.System.Int32.RuntimeUnion5(System.Result.Failure<System.IntegerDivisionError>)
 M00000002_IL_0024:
 ret
 M00000002_IL_0025:
@@ -166,7 +166,7 @@ call neoCLR.Library.System.Int32.RuntimeErrorSystemIntegerDivisionErrorNewSystem
 M00000002_IL_0052:
 call neoCLR.Library.System.Int32.RuntimeUnion4(System.IntegerDivisionError)
 M00000002_IL_0057:
-call neoCLR.Library.System.Int32.RuntimeUnion5(System.Result.Error<System.IntegerDivisionError>)
+call neoCLR.Library.System.Int32.RuntimeUnion5(System.Result.Failure<System.IntegerDivisionError>)
 M00000002_IL_005c:
 ret
 M00000002_IL_005d:

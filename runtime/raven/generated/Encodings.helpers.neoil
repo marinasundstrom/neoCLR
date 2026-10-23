@@ -101,14 +101,14 @@ ret
 newobj instance System.Text.EncodingError.Busy::.ctor()
 ret
 .end
-.function neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError arg0) -> System.Result.Error<System.Text.EncodingError>
+.function neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError arg0) -> System.Result.Failure<System.Text.EncodingError>
 ldarg arg0
-newobj instance System.Result.Error<System.Text.EncodingError>::.ctor(System.Text.EncodingError)
+newobj instance System.Result.Failure<System.Text.EncodingError>::.ctor(System.Text.EncodingError)
 ret
 .end
-.function neoCLR.Library.System.Text.Encodings.RuntimeUnion1(System.Result.Error<System.Text.EncodingError> arg0) -> System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError>
+.function neoCLR.Library.System.Text.Encodings.RuntimeUnion1(System.Result.Failure<System.Text.EncodingError> arg0) -> System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError>
 ldarg arg0
-newobj instance System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError>::.ctor(System.Result.Error<System.Text.EncodingError>)
+newobj instance System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError>::.ctor(System.Result.Failure<System.Text.EncodingError>)
 ret
 .end
 .function neoCLR.Library.System.Text.Encodings.RuntimeUnion2(System.Collections.Sequence<Byte> arg0) -> System.Result.Ok<System.Collections.Sequence<Byte>>
@@ -121,9 +121,9 @@ ldarg arg0
 newobj instance System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError>::.ctor(System.Result.Ok<System.Collections.Sequence<Byte>>)
 ret
 .end
-.function neoCLR.Library.System.Text.Encodings.RuntimeUnion4(System.Result.Error<System.Text.EncodingError> arg0) -> System.Result<Void,System.Text.EncodingError>
+.function neoCLR.Library.System.Text.Encodings.RuntimeUnion4(System.Result.Failure<System.Text.EncodingError> arg0) -> System.Result<Void,System.Text.EncodingError>
 ldarg arg0
-newobj instance System.Result<Void,System.Text.EncodingError>::.ctor(System.Result.Error<System.Text.EncodingError>)
+newobj instance System.Result<Void,System.Text.EncodingError>::.ctor(System.Result.Failure<System.Text.EncodingError>)
 ret
 .end
 .function neoCLR.Library.System.Text.Encodings.RuntimeUnion5(System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError>& arg0,out(true) System.Result.Ok<System.Collections.Sequence<Byte>>& arg1) -> Boolean
@@ -147,20 +147,20 @@ ldarg arg0
 call instance System.Result.Ok<System.Collections.Sequence<Byte>>::get_Value()
 ret
 .end
-.function neoCLR.Library.System.Text.Encodings.RuntimeUnion9(System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError>& arg0,out(true) System.Result.Error<System.Text.EncodingError>& arg1) -> Boolean
+.function neoCLR.Library.System.Text.Encodings.RuntimeUnion9(System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError>& arg0,out(true) System.Result.Failure<System.Text.EncodingError>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError>::TryGetValue(System.Result.Error<System.Text.EncodingError>&)
+call instance System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError>::TryGetValue(System.Result.Failure<System.Text.EncodingError>&)
 ret
 .end
-.function neoCLR.Library.System.Text.Encodings.RuntimeUnion10(System.Result.Error<System.Text.EncodingError>& arg0) -> System.Text.EncodingError
+.function neoCLR.Library.System.Text.Encodings.RuntimeUnion10(System.Result.Failure<System.Text.EncodingError>& arg0) -> System.Text.EncodingError
 ldarg arg0
-call instance System.Result.Error<System.Text.EncodingError>::get_Value()
+call instance System.Result.Failure<System.Text.EncodingError>::get_Value()
 ret
 .end
-.function neoCLR.Library.System.Text.Encodings.RuntimeUnion11(System.Result.Error<System.Text.EncodingError> arg0) -> System.Result<System.Text.EncoderProgress,System.Text.EncodingError>
+.function neoCLR.Library.System.Text.Encodings.RuntimeUnion11(System.Result.Failure<System.Text.EncodingError> arg0) -> System.Result<System.Text.EncoderProgress,System.Text.EncodingError>
 ldarg arg0
-newobj instance System.Result<System.Text.EncoderProgress,System.Text.EncodingError>::.ctor(System.Result.Error<System.Text.EncodingError>)
+newobj instance System.Result<System.Text.EncoderProgress,System.Text.EncodingError>::.ctor(System.Result.Failure<System.Text.EncodingError>)
 ret
 .end
 .function neoCLR.Library.System.Text.Encodings.RuntimeUnion12(System.Text.EncoderProgress arg0) -> System.Result.Ok<System.Text.EncoderProgress>
@@ -184,20 +184,20 @@ ldarg arg0
 call instance System.Result.Ok<String>::get_Value()
 ret
 .end
-.function neoCLR.Library.System.Text.Encodings.RuntimeUnion16(System.Result<String,System.Text.Utf8SliceError>& arg0,out(true) System.Result.Error<System.Text.Utf8SliceError>& arg1) -> Boolean
+.function neoCLR.Library.System.Text.Encodings.RuntimeUnion16(System.Result<String,System.Text.Utf8SliceError>& arg0,out(true) System.Result.Failure<System.Text.Utf8SliceError>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Result<String,System.Text.Utf8SliceError>::TryGetValue(System.Result.Error<System.Text.Utf8SliceError>&)
+call instance System.Result<String,System.Text.Utf8SliceError>::TryGetValue(System.Result.Failure<System.Text.Utf8SliceError>&)
 ret
 .end
-.function neoCLR.Library.System.Text.Encodings.RuntimeUnion17(System.Result.Error<System.Text.Utf8SliceError>& arg0) -> System.Text.Utf8SliceError
+.function neoCLR.Library.System.Text.Encodings.RuntimeUnion17(System.Result.Failure<System.Text.Utf8SliceError>& arg0) -> System.Text.Utf8SliceError
 ldarg arg0
-call instance System.Result.Error<System.Text.Utf8SliceError>::get_Value()
+call instance System.Result.Failure<System.Text.Utf8SliceError>::get_Value()
 ret
 .end
-.function neoCLR.Library.System.Text.Encodings.RuntimeUnion18(System.Result.Error<System.Text.EncodingError> arg0) -> System.Result<String,System.Text.EncodingError>
+.function neoCLR.Library.System.Text.Encodings.RuntimeUnion18(System.Result.Failure<System.Text.EncodingError> arg0) -> System.Result<String,System.Text.EncodingError>
 ldarg arg0
-newobj instance System.Result<String,System.Text.EncodingError>::.ctor(System.Result.Error<System.Text.EncodingError>)
+newobj instance System.Result<String,System.Text.EncodingError>::.ctor(System.Result.Failure<System.Text.EncodingError>)
 ret
 .end
 .function neoCLR.Library.System.Text.Encodings.RuntimeUnion19(System.Result<String,System.Text.InvalidUtf8Error>& arg0,out(true) System.Result.Ok<String>& arg1) -> Boolean
@@ -206,10 +206,10 @@ ldarg arg1
 call instance System.Result<String,System.Text.InvalidUtf8Error>::TryGetValue(System.Result.Ok<String>&)
 ret
 .end
-.function neoCLR.Library.System.Text.Encodings.RuntimeUnion20(System.Result<String,System.Text.InvalidUtf8Error>& arg0,out(true) System.Result.Error<System.Text.InvalidUtf8Error>& arg1) -> Boolean
+.function neoCLR.Library.System.Text.Encodings.RuntimeUnion20(System.Result<String,System.Text.InvalidUtf8Error>& arg0,out(true) System.Result.Failure<System.Text.InvalidUtf8Error>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Result<String,System.Text.InvalidUtf8Error>::TryGetValue(System.Result.Error<System.Text.InvalidUtf8Error>&)
+call instance System.Result<String,System.Text.InvalidUtf8Error>::TryGetValue(System.Result.Failure<System.Text.InvalidUtf8Error>&)
 ret
 .end
 .function neoCLR.Library.System.Text.Encodings.RuntimeUnion21(String arg0) -> System.Result.Ok<String>
@@ -222,9 +222,9 @@ ldarg arg0
 newobj instance System.Result<String,System.Text.EncodingError>::.ctor(System.Result.Ok<String>)
 ret
 .end
-.function neoCLR.Library.System.Text.Encodings.RuntimeUnion23(System.Result.Error<System.Text.InvalidUtf8Error>& arg0) -> System.Text.InvalidUtf8Error
+.function neoCLR.Library.System.Text.Encodings.RuntimeUnion23(System.Result.Failure<System.Text.InvalidUtf8Error>& arg0) -> System.Text.InvalidUtf8Error
 ldarg arg0
-call instance System.Result.Error<System.Text.InvalidUtf8Error>::get_Value()
+call instance System.Result.Failure<System.Text.InvalidUtf8Error>::get_Value()
 ret
 .end
 .function neoCLR.Library.System.Text.Encodings.RuntimeBooleanFromInt32(Int32 value) -> Boolean
@@ -302,7 +302,7 @@ call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNew
 M00000005_IL_0023:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
 M00000005_IL_0028:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion1(System.Result.Error<System.Text.EncodingError>)
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion1(System.Result.Failure<System.Text.EncodingError>)
 M00000005_IL_002d:
 ret
 M00000005_IL_002e:
@@ -383,7 +383,7 @@ call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNew
 M00000009_IL_0023:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
 M00000009_IL_0028:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion1(System.Result.Error<System.Text.EncodingError>)
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion1(System.Result.Failure<System.Text.EncodingError>)
 M00000009_IL_002d:
 ret
 M00000009_IL_002e:
@@ -434,7 +434,7 @@ call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNew
 M00000009_IL_006b:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
 M00000009_IL_0070:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion1(System.Result.Error<System.Text.EncodingError>)
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion1(System.Result.Failure<System.Text.EncodingError>)
 M00000009_IL_0075:
 ret
 M00000009_IL_0076:
@@ -578,7 +578,7 @@ ret
 .local System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError> local3
 .local System.Result.Ok<System.Collections.Sequence<Byte>> local4
 .local System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError> local5
-.local System.Result.Error<System.Text.EncodingError> local6
+.local System.Result.Failure<System.Text.EncodingError> local6
 .local Void local7
 ldc.i4 0
 stloc local0
@@ -591,7 +591,7 @@ initobj System.Result.Ok<System.Collections.Sequence<Byte>>
 ldloca local5
 initobj System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError>
 ldloca local6
-initobj System.Result.Error<System.Text.EncodingError>
+initobj System.Result.Failure<System.Text.EncodingError>
 ldvoid
 stloc local7
 M0000000c_IL_0000:
@@ -623,7 +623,7 @@ call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNew
 M0000000c_IL_002d:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
 M0000000c_IL_0032:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion4(System.Result.Error<System.Text.EncodingError>)
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion4(System.Result.Failure<System.Text.EncodingError>)
 M0000000c_IL_0037:
 ret
 M0000000c_IL_0038:
@@ -644,7 +644,7 @@ call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNew
 M0000000c_IL_0054:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
 M0000000c_IL_0059:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion4(System.Result.Error<System.Text.EncodingError>)
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion4(System.Result.Failure<System.Text.EncodingError>)
 M0000000c_IL_005e:
 ret
 M0000000c_IL_005f:
@@ -669,7 +669,7 @@ call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNew
 M0000000c_IL_0082:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
 M0000000c_IL_0087:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion4(System.Result.Error<System.Text.EncodingError>)
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion4(System.Result.Failure<System.Text.EncodingError>)
 M0000000c_IL_008c:
 ret
 M0000000c_IL_008d:
@@ -761,19 +761,19 @@ stloc local5
 M0000000c_IL_0105:
 ldloca local6
 M0000000c_IL_0107:
-initobj System.Result.Error<System.Text.EncodingError>
+initobj System.Result.Failure<System.Text.EncodingError>
 M0000000c_IL_010d:
 ldloca local5
 M0000000c_IL_010f:
 ldloca local6
 M0000000c_IL_0111:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion9(System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError>&,System.Result.Error<System.Text.EncodingError>&)
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion9(System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError>&,System.Result.Failure<System.Text.EncodingError>&)
 M0000000c_IL_0116:
 brfalse M0000000c_IL_0144
 M0000000c_IL_011b:
 ldloca local6
 M0000000c_IL_011d:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion10(System.Result.Error<System.Text.EncodingError>&)
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion10(System.Result.Failure<System.Text.EncodingError>&)
 M0000000c_IL_0122:
 pop
 M0000000c_IL_0123:
@@ -786,7 +786,7 @@ call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNew
 M0000000c_IL_0139:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
 M0000000c_IL_013e:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion4(System.Result.Error<System.Text.EncodingError>)
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion4(System.Result.Failure<System.Text.EncodingError>)
 M0000000c_IL_0143:
 ret
 M0000000c_IL_0144:
@@ -879,7 +879,7 @@ ret
 .local System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError> local5
 .local System.Result.Ok<System.Collections.Sequence<Byte>> local6
 .local System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError> local7
-.local System.Result.Error<System.Text.EncodingError> local8
+.local System.Result.Failure<System.Text.EncodingError> local8
 .local System.Collections.ArrayList<Byte> local9
 ldc.i4 0
 stloc local0
@@ -896,7 +896,7 @@ initobj System.Result.Ok<System.Collections.Sequence<Byte>>
 ldloca local7
 initobj System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError>
 ldloca local8
-initobj System.Result.Error<System.Text.EncodingError>
+initobj System.Result.Failure<System.Text.EncodingError>
 ldloca local9
 initobj System.Collections.ArrayList<Byte>
 M0000000d_IL_0000:
@@ -917,7 +917,7 @@ call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNew
 M0000000d_IL_001c:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
 M0000000d_IL_0021:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion11(System.Result.Error<System.Text.EncodingError>)
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion11(System.Result.Failure<System.Text.EncodingError>)
 M0000000d_IL_0026:
 ret
 M0000000d_IL_0027:
@@ -1009,7 +1009,7 @@ call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNew
 M0000000d_IL_0086:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
 M0000000d_IL_008b:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion11(System.Result.Error<System.Text.EncodingError>)
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion11(System.Result.Failure<System.Text.EncodingError>)
 M0000000d_IL_0090:
 ret
 M0000000d_IL_0091:
@@ -1032,7 +1032,7 @@ call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNew
 M0000000d_IL_00af:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
 M0000000d_IL_00b4:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion11(System.Result.Error<System.Text.EncodingError>)
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion11(System.Result.Failure<System.Text.EncodingError>)
 M0000000d_IL_00b9:
 ret
 M0000000d_IL_00ba:
@@ -1194,19 +1194,19 @@ stloc local7
 M0000000d_IL_01a1:
 ldloca local8
 M0000000d_IL_01a3:
-initobj System.Result.Error<System.Text.EncodingError>
+initobj System.Result.Failure<System.Text.EncodingError>
 M0000000d_IL_01a9:
 ldloca local7
 M0000000d_IL_01ab:
 ldloca local8
 M0000000d_IL_01ad:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion9(System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError>&,System.Result.Error<System.Text.EncodingError>&)
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion9(System.Result<System.Collections.Sequence<Byte>,System.Text.EncodingError>&,System.Result.Failure<System.Text.EncodingError>&)
 M0000000d_IL_01b2:
 brfalse M0000000d_IL_01e4
 M0000000d_IL_01b7:
 ldloca local8
 M0000000d_IL_01b9:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion10(System.Result.Error<System.Text.EncodingError>&)
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion10(System.Result.Failure<System.Text.EncodingError>&)
 M0000000d_IL_01be:
 pop
 M0000000d_IL_01bf:
@@ -1428,7 +1428,7 @@ ret
 .local System.Result<String,System.Text.Utf8SliceError> local3
 .local System.Result.Ok<String> local4
 .local System.Result<String,System.Text.Utf8SliceError> local5
-.local System.Result.Error<System.Text.Utf8SliceError> local6
+.local System.Result.Failure<System.Text.Utf8SliceError> local6
 ldc.i4 0
 stloc local0
 ldloca local1
@@ -1440,7 +1440,7 @@ initobj System.Result.Ok<String>
 ldloca local5
 initobj System.Result<String,System.Text.Utf8SliceError>
 ldloca local6
-initobj System.Result.Error<System.Text.Utf8SliceError>
+initobj System.Result.Failure<System.Text.Utf8SliceError>
 M0000000e_IL_0000:
 M0000000e_IL_0001:
 M0000000e_IL_0002:
@@ -1534,19 +1534,19 @@ stloc local5
 M0000000e_IL_0074:
 ldloca local6
 M0000000e_IL_0076:
-initobj System.Result.Error<System.Text.Utf8SliceError>
+initobj System.Result.Failure<System.Text.Utf8SliceError>
 M0000000e_IL_007c:
 ldloca local5
 M0000000e_IL_007e:
 ldloca local6
 M0000000e_IL_0080:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion16(System.Result<String,System.Text.Utf8SliceError>&,System.Result.Error<System.Text.Utf8SliceError>&)
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion16(System.Result<String,System.Text.Utf8SliceError>&,System.Result.Failure<System.Text.Utf8SliceError>&)
 M0000000e_IL_0085:
 brfalse M0000000e_IL_00a8
 M0000000e_IL_008a:
 ldloca local6
 M0000000e_IL_008c:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion17(System.Result.Error<System.Text.Utf8SliceError>&)
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion17(System.Result.Failure<System.Text.Utf8SliceError>&)
 M0000000e_IL_0091:
 pop
 M0000000e_IL_0092:
@@ -1683,7 +1683,7 @@ ret
 .local System.Result<String,System.Text.InvalidUtf8Error> local11
 .local System.Result.Ok<String> local12
 .local System.Result<String,System.Text.InvalidUtf8Error> local13
-.local System.Result.Error<System.Text.InvalidUtf8Error> local14
+.local System.Result.Failure<System.Text.InvalidUtf8Error> local14
 .local System.Result<String,System.Text.EncodingError> local15
 ldloca local0
 initobj System.Collections.ArrayList<Byte>
@@ -1712,7 +1712,7 @@ initobj System.Result.Ok<String>
 ldloca local13
 initobj System.Result<String,System.Text.InvalidUtf8Error>
 ldloca local14
-initobj System.Result.Error<System.Text.InvalidUtf8Error>
+initobj System.Result.Failure<System.Text.InvalidUtf8Error>
 ldloca local15
 initobj System.Result<String,System.Text.EncodingError>
 M00000010_IL_0000:
@@ -1733,7 +1733,7 @@ call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNew
 M00000010_IL_001c:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
 M00000010_IL_0021:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion18(System.Result.Error<System.Text.EncodingError>)
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion18(System.Result.Failure<System.Text.EncodingError>)
 M00000010_IL_0026:
 ret
 M00000010_IL_0027:
@@ -1825,7 +1825,7 @@ call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNew
 M00000010_IL_0086:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
 M00000010_IL_008b:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion18(System.Result.Error<System.Text.EncodingError>)
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion18(System.Result.Failure<System.Text.EncodingError>)
 M00000010_IL_0090:
 ret
 M00000010_IL_0091:
@@ -1848,7 +1848,7 @@ call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNew
 M00000010_IL_00af:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
 M00000010_IL_00b4:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion18(System.Result.Error<System.Text.EncodingError>)
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion18(System.Result.Failure<System.Text.EncodingError>)
 M00000010_IL_00b9:
 ret
 M00000010_IL_00ba:
@@ -2095,7 +2095,7 @@ call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNew
 M00000010_IL_01db:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
 M00000010_IL_01e0:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion18(System.Result.Error<System.Text.EncodingError>)
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion18(System.Result.Failure<System.Text.EncodingError>)
 M00000010_IL_01e5:
 ret
 M00000010_IL_01e6:
@@ -2163,7 +2163,7 @@ call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNew
 M00000010_IL_0233:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
 M00000010_IL_0238:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion18(System.Result.Error<System.Text.EncodingError>)
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion18(System.Result.Failure<System.Text.EncodingError>)
 M00000010_IL_023d:
 ret
 M00000010_IL_023e:
@@ -2351,7 +2351,7 @@ call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNew
 M00000010_IL_0326:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
 M00000010_IL_032b:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion18(System.Result.Error<System.Text.EncodingError>)
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion18(System.Result.Failure<System.Text.EncodingError>)
 M00000010_IL_0330:
 ret
 M00000010_IL_0331:
@@ -2413,19 +2413,19 @@ stloc local13
 M00000010_IL_038e:
 ldloca local14
 M00000010_IL_0390:
-initobj System.Result.Error<System.Text.InvalidUtf8Error>
+initobj System.Result.Failure<System.Text.InvalidUtf8Error>
 M00000010_IL_0396:
 ldloca local13
 M00000010_IL_0398:
 ldloca local14
 M00000010_IL_039a:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion20(System.Result<String,System.Text.InvalidUtf8Error>&,System.Result.Error<System.Text.InvalidUtf8Error>&)
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion20(System.Result<String,System.Text.InvalidUtf8Error>&,System.Result.Failure<System.Text.InvalidUtf8Error>&)
 M00000010_IL_039f:
 brfalse M00000010_IL_03de
 M00000010_IL_03a4:
 ldloca local14
 M00000010_IL_03a6:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion23(System.Result.Error<System.Text.InvalidUtf8Error>&)
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion23(System.Result.Failure<System.Text.InvalidUtf8Error>&)
 M00000010_IL_03ab:
 pop
 M00000010_IL_03ac:
@@ -2445,7 +2445,7 @@ call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNew
 M00000010_IL_03c9:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
 M00000010_IL_03ce:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion18(System.Result.Error<System.Text.EncodingError>)
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion18(System.Result.Failure<System.Text.EncodingError>)
 M00000010_IL_03d3:
 stloc local15
 M00000010_IL_03d5:
@@ -2498,7 +2498,7 @@ ret
 .local System.Result<String,System.Text.InvalidUtf8Error> local6
 .local System.Result.Ok<String> local7
 .local System.Result<String,System.Text.InvalidUtf8Error> local8
-.local System.Result.Error<System.Text.InvalidUtf8Error> local9
+.local System.Result.Failure<System.Text.InvalidUtf8Error> local9
 ldloca local0
 initobj System.Collections.ArrayList<Byte>
 ldc.i4 0
@@ -2516,7 +2516,7 @@ initobj System.Result.Ok<String>
 ldloca local8
 initobj System.Result<String,System.Text.InvalidUtf8Error>
 ldloca local9
-initobj System.Result.Error<System.Text.InvalidUtf8Error>
+initobj System.Result.Failure<System.Text.InvalidUtf8Error>
 M00000012_IL_0000:
 M00000012_IL_0001:
 M00000012_IL_0002:
@@ -2535,7 +2535,7 @@ call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNew
 M00000012_IL_001c:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
 M00000012_IL_0021:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion18(System.Result.Error<System.Text.EncodingError>)
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion18(System.Result.Failure<System.Text.EncodingError>)
 M00000012_IL_0026:
 ret
 M00000012_IL_0027:
@@ -2627,7 +2627,7 @@ call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNew
 M00000012_IL_0086:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
 M00000012_IL_008b:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion18(System.Result.Error<System.Text.EncodingError>)
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion18(System.Result.Failure<System.Text.EncodingError>)
 M00000012_IL_0090:
 ret
 M00000012_IL_0091:
@@ -2650,7 +2650,7 @@ call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNew
 M00000012_IL_00af:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
 M00000012_IL_00b4:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion18(System.Result.Error<System.Text.EncodingError>)
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion18(System.Result.Failure<System.Text.EncodingError>)
 M00000012_IL_00b9:
 ret
 M00000012_IL_00ba:
@@ -2721,7 +2721,7 @@ call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNew
 M00000012_IL_0100:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
 M00000012_IL_0105:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion18(System.Result.Error<System.Text.EncodingError>)
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion18(System.Result.Failure<System.Text.EncodingError>)
 M00000012_IL_010a:
 ret
 M00000012_IL_010b:
@@ -2818,19 +2818,19 @@ stloc local8
 M00000012_IL_018d:
 ldloca local9
 M00000012_IL_018f:
-initobj System.Result.Error<System.Text.InvalidUtf8Error>
+initobj System.Result.Failure<System.Text.InvalidUtf8Error>
 M00000012_IL_0195:
 ldloca local8
 M00000012_IL_0197:
 ldloca local9
 M00000012_IL_0199:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion20(System.Result<String,System.Text.InvalidUtf8Error>&,System.Result.Error<System.Text.InvalidUtf8Error>&)
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion20(System.Result<String,System.Text.InvalidUtf8Error>&,System.Result.Failure<System.Text.InvalidUtf8Error>&)
 M00000012_IL_019e:
 brfalse M00000012_IL_01d2
 M00000012_IL_01a3:
 ldloca local9
 M00000012_IL_01a5:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion23(System.Result.Error<System.Text.InvalidUtf8Error>&)
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion23(System.Result.Failure<System.Text.InvalidUtf8Error>&)
 M00000012_IL_01aa:
 pop
 M00000012_IL_01ab:
@@ -2843,7 +2843,7 @@ call neoCLR.Library.System.Text.Encodings.RuntimeErrorSystemTextEncodingErrorNew
 M00000012_IL_01c1:
 call neoCLR.Library.System.Text.Encodings.RuntimeUnion0(System.Text.EncodingError)
 M00000012_IL_01c6:
-call neoCLR.Library.System.Text.Encodings.RuntimeUnion18(System.Result.Error<System.Text.EncodingError>)
+call neoCLR.Library.System.Text.Encodings.RuntimeUnion18(System.Result.Failure<System.Text.EncodingError>)
 M00000012_IL_01cb:
 stloc local4
 M00000012_IL_01cd:

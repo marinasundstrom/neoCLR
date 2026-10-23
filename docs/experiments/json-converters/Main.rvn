@@ -73,9 +73,9 @@ class IntTextConverter : JsonConverter<int> {
             if Int32.Parse(text.Value) is Ok(let number) {
                 return Ok(number)
             }
-            return Error(JsonError.InvalidNumber)
+            return Failure(JsonError.InvalidNumber)
         }
-        return Error(JsonError.TypeMismatch("numeric string"))
+        return Failure(JsonError.TypeMismatch("numeric string"))
     }
 
     func Write(value: int) -> Result<JsonValue, JsonError> {
@@ -88,11 +88,11 @@ class RejectInt : JsonConverter<int> {
     init() { }
 
     func Read(value: JsonValue) -> Result<int, JsonError> {
-        return Error(JsonError.Syntax("second converter should not run"))
+        return Failure(JsonError.Syntax("second converter should not run"))
     }
 
     func Write(value: int) -> Result<JsonValue, JsonError> {
-        return Error(JsonError.Syntax("second converter should not run"))
+        return Failure(JsonError.Syntax("second converter should not run"))
     }
 }
 
@@ -129,7 +129,7 @@ func CheckConverters() -> Result<unit, JsonError> {
     Check(list.Count == 2 && list[1] == 4, "Converted list")
     let map = JsonSerializer.Deserialize<HashMap<string, int>>("{\"x\":\"5\"}", options)?
     Check(map["x"] == 5, "Converted map")
-    Check(JsonSerializer.Deserialize<int>("\"bad\"", options) is Error(JsonError.InvalidNumber), "Original converter error")
+    Check(JsonSerializer.Deserialize<int>("\"bad\"", options) is Failure(JsonError.InvalidNumber), "Original converter error")
     let stream = MemoryStream()
     _ = JsonSerializer.Serialize(stream, 9, options)?
     Check(stream.GetLength() is Ok(3L), "Converter stream output")
@@ -140,7 +140,7 @@ func CheckConverters() -> Result<unit, JsonError> {
     let cyclicOptions = JsonSerializerOptions()
     cyclicOptions.Converters.Add<int>(CyclicInt())
     let output = MemoryStream()
-    Check(JsonSerializer.Serialize(output, 1, cyclicOptions) is Error(JsonError.LimitExceeded(_)), "Cycle rejected")
+    Check(JsonSerializer.Serialize(output, 1, cyclicOptions) is Failure(JsonError.LimitExceeded(_)), "Cycle rejected")
     Check(output.GetLength() is Ok(0L), "No output before validation")
     output.Close()
     Console.WriteLine("PASS converters root arrays lists maps and borrowed streams")
@@ -160,12 +160,12 @@ func Run() -> Result<unit, JsonError> {
     Check(JsonSerializer.Deserialize<Reading>("42", options)? is Reading.Number(42), "Number read")
     Check(JsonSerializer.Deserialize<Reading>("\"hello\"", options)? is Reading.Text("hello"), "String read")
     Check(IsEmpty(JsonSerializer.Deserialize<Reading>("null", options)?), "Null read")
-    Check(JsonSerializer.Deserialize<Reading>("true", options) is Error(JsonError.TypeMismatch(_)), "Unknown shape")
+    Check(JsonSerializer.Deserialize<Reading>("true", options) is Failure(JsonError.TypeMismatch(_)), "Unknown shape")
     let ambiguous = Converter()
     ambiguous.AddCase<int>(JsonUnionCaseKind.Number, value => ReadNumber(value), value => GetNumber(value))
     let ambiguousOptions = JsonSerializerOptions()
     ambiguousOptions.Converters.Add<Reading>(ambiguous)
-    Check(JsonSerializer.Deserialize<Reading>("1", ambiguousOptions) is Error(JsonError.UnsupportedMapping(_)), "Ambiguous shape")
+    Check(JsonSerializer.Deserialize<Reading>("1", ambiguousOptions) is Failure(JsonError.UnsupportedMapping(_)), "Ambiguous shape")
     let readings = JsonSerializer.Deserialize<Reading[]>("[42,\"hello\",null]", options)?
     Check(readings.Length == 3 && readings[0] is Reading.Number(42), "Union array read")
     Check(JsonSerializer.Serialize(readings, options)? == "[42,\"hello\",null]", "Union array write")
@@ -180,7 +180,7 @@ func Run() -> Result<unit, JsonError> {
 }
 
 func Main() -> int {
-    if Run() is Error(let error) {
+    if Run() is Failure(let error) {
         Console.WriteLine(error.ToString())
         return 1
     }

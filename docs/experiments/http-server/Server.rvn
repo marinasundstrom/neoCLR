@@ -7,7 +7,7 @@ import System.Web.Http.*
 
 func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
     if request.Method.Method != "GET" || request.Target != "/greeting" || request.Headers.Count == 0 {
-        let errorResult: Result<HttpResponse, HttpError> = Error(HttpError.Handler("Unexpected request"))
+        let errorResult: Result<HttpResponse, HttpError> = Failure(HttpError.Handler("Unexpected request"))
         return Task.FromResult(errorResult)
     }
     let headers = ArrayList<HttpHeader>()
@@ -23,7 +23,7 @@ async func Start(server: HttpServer) -> Task<()> {
     server.Close()
     if let Ok(_) = result {
         Console.WriteLine("Served greeting; server closed")
-    } else if let Error(message) = result {
+    } else if let Failure(message) = result {
         Console.WriteLine(String.Concat("Server error: ", message.ToString()))
     }
 }

@@ -23,7 +23,7 @@ func Main() -> int {
     let only = numbers.Single(value => value == 22)
     let result = match only {
         .Ok(let value) => value
-        .Error(let error) => 0
+        .Failure(let error) => 0
     }
     return numbers[0] + result
 }

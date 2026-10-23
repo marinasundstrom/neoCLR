@@ -24,7 +24,7 @@ public struct ScalarValue {
 
     static func FromValue(value: uint) -> Result<ScalarValue, BoundaryError> {
         if value > 1114111 || (value >= 55296 && value <= 57343) {
-            return Error(BoundaryError.InvalidScalar)
+            return Failure(BoundaryError.InvalidScalar)
         }
         return Ok(ScalarValue(value))
     }
@@ -48,7 +48,7 @@ public struct ScalarValue {
         }
         return match Utf8.Decode(bytes) {
             Ok(let text) => text
-            Error(_) => {
+            Failure(_) => {
                 System.Fail("Invalid scalar encoding in prototype")
                 ""
             }
@@ -79,22 +79,22 @@ public class TextSource {
     func RangeFromUtf8(start: int, length: int) -> Result<SourceRange, BoundaryError> {
         return match Text.SliceUtf8(start, length) {
             Ok(_) => Ok(SourceRange(self, start, length))
-            Error(Utf8SliceError.OutOfRange) => Error(BoundaryError.OutOfRange)
-            Error(_) => Error(BoundaryError.InvalidBoundary)
+            Failure(Utf8SliceError.OutOfRange) => Failure(BoundaryError.OutOfRange)
+            Failure(_) => Failure(BoundaryError.InvalidBoundary)
         }
     }
 
     func Slice(range: SourceRange?) -> Result<string, BoundaryError> {
         if range is not SourceRange actual {
-            return Error(BoundaryError.UninitializedRange)
+            return Failure(BoundaryError.UninitializedRange)
         }
         if !Object.ReferenceEquals(self, actual.Source) {
-            return Error(BoundaryError.WrongSource)
+            return Failure(BoundaryError.WrongSource)
         }
         return match Text.SliceUtf8(actual.Utf8Start, actual.Utf8Length) {
             Ok(let text) => Ok(text)
-            Error(Utf8SliceError.OutOfRange) => Error(BoundaryError.OutOfRange)
-            Error(_) => Error(BoundaryError.InvalidBoundary)
+            Failure(Utf8SliceError.OutOfRange) => Failure(BoundaryError.OutOfRange)
+            Failure(_) => Failure(BoundaryError.InvalidBoundary)
         }
     }
 

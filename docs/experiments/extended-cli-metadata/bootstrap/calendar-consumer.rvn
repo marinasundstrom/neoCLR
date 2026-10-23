@@ -42,7 +42,7 @@ func Main() -> int {
     if unique.LocalDateTime.Date.Day != 31 {
         return 13
     }
-    let Error(TimeZoneError.UnknownZone) = TimeZone.Find("Invented/Zone") else {
+    let Failure(TimeZoneError.UnknownZone) = TimeZone.Find("Invented/Zone") else {
         return 14
     }
     if Kind(unique) != 2 {
@@ -51,7 +51,7 @@ func Main() -> int {
     if Kind(LocalDateTime.Create(date, time)) != 1 {
         return 16
     }
-    let Error(TimeZoneError.OutOfRange) = zone.GetUtcOffset(Instant.FromUnixTimeTicks(-9223372036854775807L)) else {
+    let Failure(TimeZoneError.OutOfRange) = zone.GetUtcOffset(Instant.FromUnixTimeTicks(-9223372036854775807L)) else {
         return 17
     }
     System.Console.WriteLine("Native source calendar passed")

@@ -19,9 +19,9 @@ async func Configure(request: HttpRequest, response: HttpResponse) -> Task<Resul
     } else if request.Target == "/json" {
         let parsed = await request.Content.ReadJsonNode()
         let Ok(value) = parsed else {
-            return Error(HttpError.Handler("JSON failed"))
+            return Failure(HttpError.Handler("JSON failed"))
         }
-        let Ok(text) = JsonSerializer.SerializeNode(value) else { return Error(HttpError.Handler("JSON output failed")) }
+        let Ok(text) = JsonSerializer.SerializeNode(value) else { return Failure(HttpError.Handler("JSON output failed")) }
         response.Respond(HttpStatusCode.OK, HttpStringContent(text))
     } else {
         response.Respond(HttpStatusCode.OK, HttpStringContent("unread"))
@@ -41,11 +41,11 @@ async func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>
 
 async func AcceptOne(server: HttpServer, headers: bool) -> Task<Result<System.Void, HttpError>> {
     let accepted = if headers { await server.AcceptHeaders() } else { await server.Accept() }
-    let Ok(context) = accepted else { return Error(HttpError.Handler("Accept failed")) }
+    let Ok(context) = accepted else { return Failure(HttpError.Handler("Accept failed")) }
     let result = await Handle(context)
-    if let Error(error) = result {
+    if let Failure(error) = result {
         context.Close()
-        return Error(error)
+        return Failure(error)
     }
     return await context.Complete()
 }

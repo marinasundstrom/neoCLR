@@ -7,14 +7,14 @@ ret
 newobj instance System.OverflowError::.ctor()
 ret
 .end
-.function neoCLR.Library.System.Math.RuntimeUnion0(System.OverflowError arg0) -> System.Result.Error<System.OverflowError>
+.function neoCLR.Library.System.Math.RuntimeUnion0(System.OverflowError arg0) -> System.Result.Failure<System.OverflowError>
 ldarg arg0
-newobj instance System.Result.Error<System.OverflowError>::.ctor(System.OverflowError)
+newobj instance System.Result.Failure<System.OverflowError>::.ctor(System.OverflowError)
 ret
 .end
-.function neoCLR.Library.System.Math.RuntimeUnion1(System.Result.Error<System.OverflowError> arg0) -> System.Result<Int32,System.OverflowError>
+.function neoCLR.Library.System.Math.RuntimeUnion1(System.Result.Failure<System.OverflowError> arg0) -> System.Result<Int32,System.OverflowError>
 ldarg arg0
-newobj instance System.Result<Int32,System.OverflowError>::.ctor(System.Result.Error<System.OverflowError>)
+newobj instance System.Result<Int32,System.OverflowError>::.ctor(System.Result.Failure<System.OverflowError>)
 ret
 .end
 .function neoCLR.Library.System.Math.RuntimeUnion2(Int32 arg0) -> System.Result.Ok<Int32>
@@ -27,14 +27,14 @@ ldarg arg0
 newobj instance System.Result<Int32,System.OverflowError>::.ctor(System.Result.Ok<Int32>)
 ret
 .end
-.function neoCLR.Library.System.Math.RuntimeUnion4(System.InvalidRangeError arg0) -> System.Result.Error<System.InvalidRangeError>
+.function neoCLR.Library.System.Math.RuntimeUnion4(System.InvalidRangeError arg0) -> System.Result.Failure<System.InvalidRangeError>
 ldarg arg0
-newobj instance System.Result.Error<System.InvalidRangeError>::.ctor(System.InvalidRangeError)
+newobj instance System.Result.Failure<System.InvalidRangeError>::.ctor(System.InvalidRangeError)
 ret
 .end
-.function neoCLR.Library.System.Math.RuntimeUnion5(System.Result.Error<System.InvalidRangeError> arg0) -> System.Result<Int32,System.InvalidRangeError>
+.function neoCLR.Library.System.Math.RuntimeUnion5(System.Result.Failure<System.InvalidRangeError> arg0) -> System.Result<Int32,System.InvalidRangeError>
 ldarg arg0
-newobj instance System.Result<Int32,System.InvalidRangeError>::.ctor(System.Result.Error<System.InvalidRangeError>)
+newobj instance System.Result<Int32,System.InvalidRangeError>::.ctor(System.Result.Failure<System.InvalidRangeError>)
 ret
 .end
 .function neoCLR.Library.System.Math.RuntimeUnion6(System.Result.Ok<Int32> arg0) -> System.Result<Int32,System.InvalidRangeError>

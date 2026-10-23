@@ -14,14 +14,14 @@ public func Check(value: bool, message: string) {
 public func Accepted(result: Result<unit, EncoderFailure>) {
     match result {
         Ok(_) => { }
-        Error(_) => System.Fail("Unexpected acceptance failure")
+        Failure(_) => System.Fail("Unexpected acceptance failure")
     }
 }
 
 public func Step(result: Result<EncodeStep, EncoderFailure>) -> EncodeStep {
     return match result {
         Ok(let value) => value
-        Error(_) => {
+        Failure(_) => {
             System.Fail("Unexpected drain failure")
             EncodeStep(0, EncodeState.Ready)
         }
@@ -31,7 +31,7 @@ public func Step(result: Result<EncodeStep, EncoderFailure>) -> EncodeStep {
 public func Wrote(result: Result<int, StreamError>, expected: int) {
     match result {
         Ok(let count) => Check(count == expected, "Encoded byte count")
-        Error(_) => System.Fail("Unexpected write failure")
+        Failure(_) => System.Fail("Unexpected write failure")
     }
 }
 
@@ -48,10 +48,10 @@ public class ProbeSink : OutputStream {
     val Flushes: int => flushes
     func Write(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
         if closed {
-            return Error(StreamError.Closed)
+            return Failure(StreamError.Closed)
         }
         if failAfter >= 0 && bytes.Count >= failAfter {
-            return Error(StreamError.AccessDenied)
+            return Failure(StreamError.AccessDenied)
         }
         if count == 0 {
             return Ok(0)
@@ -71,7 +71,7 @@ public class ProbeSink : OutputStream {
 public func Text(bytes: Sequence<byte>) -> string {
     return match Utf8.Decode(bytes) {
         Ok(let value) => value
-        Error(_) => {
+        Failure(_) => {
             System.Fail("Unexpected encoded bytes")
             ""
         }
@@ -86,11 +86,11 @@ public func ProgressChecks() {
     Accepted(encoder.Accept(source, false))
     source = "changed"
     match encoder.Accept("other", false) {
-        Error(EncoderFailure.Busy) => { }
+        Failure(EncoderFailure.Busy) => { }
         _ => System.Fail("Pending input cannot be overwritten")
     }
     match encoder.Drain(target, 3, 1) {
-        Error(EncoderFailure.InvalidRange) => { }
+        Failure(EncoderFailure.InvalidRange) => { }
         _ => System.Fail("Invalid destination range")
     }
     let zero = Step(encoder.Drain(target, 1, 0))
@@ -111,16 +111,16 @@ public func ProgressChecks() {
     Accepted(encoder.Accept("", true))
     Check(Step(encoder.Drain(target, 0, 0)).State is EncodeState.Finished, "Empty final drain")
     match encoder.Accept("", false) {
-        Error(EncoderFailure.Finished) => { }
+        Failure(EncoderFailure.Finished) => { }
         _ => System.Fail("No input after finish")
     }
     match encoder.Drain(target, 0, 1) {
-        Error(EncoderFailure.Finished) => { }
+        Failure(EncoderFailure.Finished) => { }
         _ => System.Fail("No drain after finish")
     }
     let ascii = BoundedTextEncoder(true)
     match ascii.Accept("0123456789012345678901234567890123456789é", true) {
-        Error(EncoderFailure.UnrepresentableText) => { }
+        Failure(EncoderFailure.UnrepresentableText) => { }
         _ => System.Fail("Strict preflight")
     }
     Accepted(ascii.Accept("A", true))
@@ -152,7 +152,7 @@ public func BoundaryChecks() {
     }
     let limited = BoundedTextEncoder(false)
     match limited.Accept(excessive, true) {
-        Error(EncoderFailure.LimitExceeded) => { }
+        Failure(EncoderFailure.LimitExceeded) => { }
         _ => System.Fail("Accept byte limit")
     }
     Accepted(limited.Accept("ok", true))
@@ -179,7 +179,7 @@ public func WriterChecks() {
     let asciiSink = ProbeSink(-1)
     let ascii = EncodingWriterProbe(asciiSink, BoundedTextEncoder(true), false)
     match ascii.Write("prefix é") {
-        Error(StreamError.InvalidEncoding) => Check(asciiSink.Bytes.Count == 0, "Reject before output")
+        Failure(StreamError.InvalidEncoding) => Check(asciiSink.Bytes.Count == 0, "Reject before output")
         _ => System.Fail("ASCII write")
     }
     Wrote(ascii.Write("ok"), 2)
@@ -199,17 +199,17 @@ public func WriterChecks() {
     Wrote(ending.Finish(), 0)
     Check(Text(endingSink.Bytes).Equals("A<end>"), "Drain trailer exactly once")
     match ending.Write("B") {
-        Error(StreamError.InvalidEncoding) => { }
+        Failure(StreamError.InvalidEncoding) => { }
         _ => System.Fail("Write after finalization")
     }
     let failed = EncodingWriterProbe(ProbeSink(1), TrailerEncoder(), true)
     Wrote(failed.Write("A"), 1)
     match failed.Finish() {
-        Error(StreamError.AccessDenied) => { }
+        Failure(StreamError.AccessDenied) => { }
         _ => System.Fail("Final output failure is observable")
     }
     match failed.Finish() {
-        Error(StreamError.InvalidEncoding) => { }
+        Failure(StreamError.InvalidEncoding) => { }
         _ => System.Fail("No automatic retry after partial output failure")
     }
     WriteLine("Encoder writer partial transfers and finalization passed")

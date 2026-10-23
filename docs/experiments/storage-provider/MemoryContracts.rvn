@@ -12,14 +12,14 @@ func CheckText(provider: StorageProvider, path: Path, expected: string) {
                 System.Fail("Unexpected stored text")
             }
         }
-        Error(let error) => System.Fail(error.ToString())
+        Failure(let error) => System.Fail(error.ToString())
     }
 }
 
 func PutText(provider: StorageProvider, path: Path, text: string) {
     match provider.WriteText(path, text, 65536) {
         Ok(_) => { }
-        Error(let error) => System.Fail(error.ToString())
+        Failure(let error) => System.Fail(error.ToString())
     }
 }
 
@@ -37,10 +37,10 @@ func Main() {
                         System.Fail("Unexpected byte write count")
                     }
                 }
-                Error(let error) => System.Fail(error.ToString())
+                Failure(let error) => System.Fail(error.ToString())
             }
             match provider.ReadText(path, 0) {
-                Error(let error) => {
+                Failure(let error) => {
                     if !(error is System.Storage.FileReadError.TooLarge) {
                         System.Fail("Read limit must precede decoding")
                     }
@@ -48,7 +48,7 @@ func Main() {
                 Ok(_) => System.Fail("Read limit ignored")
             }
             match provider.ReadText(path, 1) {
-                Error(let error) => {
+                Failure(let error) => {
                     if !(error is System.Storage.FileReadError.InvalidUtf8) {
                         System.Fail("Expected invalid UTF-8")
                     }
@@ -59,12 +59,12 @@ func Main() {
             PutText(provider, path, "new")
             match output.Write(invalid, 0, 1) {
                 Ok(_) => { }
-                Error(let error) => System.Fail(error.ToString())
+                Failure(let error) => System.Fail(error.ToString())
             }
             output.Close()
             CheckText(provider, path, "new")
         }
-        Error(let error) => System.Fail(error.ToString())
+        Failure(let error) => System.Fail(error.ToString())
     }
     match provider.OpenRead(path) {
         Ok(let input) => {
@@ -76,15 +76,15 @@ func Main() {
                         System.Fail("Old reader lost its byte payload")
                     }
                 }
-                Error(let error) => System.Fail(error.ToString())
+                Failure(let error) => System.Fail(error.ToString())
             }
             input.Close()
         }
-        Error(let error) => System.Fail(error.ToString())
+        Failure(let error) => System.Fail(error.ToString())
     }
     CheckText(provider, RequirePath("data"), "replacement")
     match provider.CreateNew(RequirePath("data")) {
-        Error(let error) => {
+        Failure(let error) => {
             if !(error is System.IO.StreamError.AlreadyExists) {
                 System.Fail("Text file not visible to exclusive creation")
             }
@@ -92,7 +92,7 @@ func Main() {
         Ok(_) => System.Fail("Existing text file replaced by creation")
     }
     match provider.OpenRead(RequirePath("/")) {
-        Error(let error) => {
+        Failure(let error) => {
             if !(error is System.IO.StreamError.WrongKind) {
                 System.Fail("Root is not a file")
             }
@@ -107,7 +107,7 @@ func Main() {
     }
     let extra = RequirePath("/extra")
     match provider.CreateNew(extra) {
-        Error(let error) => {
+        Failure(let error) => {
             if !(error is System.IO.StreamError.LimitExceeded) {
                 System.Fail("Wrong storage capacity error")
             }
@@ -115,7 +115,7 @@ func Main() {
         Ok(_) => System.Fail("Storage capacity ignored")
     }
     match provider.WriteText(extra, "rejected", 64) {
-        Error(let error) => {
+        Failure(let error) => {
             if !(error is System.Storage.FileWriteError.WriteFailed) {
                 System.Fail("Wrong temporary text capacity error")
             }
@@ -126,7 +126,7 @@ func Main() {
     CheckText(provider, path, "still writable")
     CheckText(provider, RequirePath("/file1"), "kept")
     match provider.OpenRead(extra) {
-        Error(let error) => {
+        Failure(let error) => {
             if !(error is System.IO.StreamError.NotFound) {
                 System.Fail("Rejected creation left an entry")
             }

@@ -151,12 +151,12 @@ public extension Operators<T> for Iterable<T> {
     func Single() -> System.Result<T, SingleError> {
         use iterator = self.GetIterator()
         if !iterator.MoveNext() {
-            return Error(SingleError.Empty())
+            return Failure(SingleError.Empty())
         }
         let value = iterator.Current
         let multiple = iterator.MoveNext()
         if multiple {
-            return Error(SingleError.Multiple())
+            return Failure(SingleError.Multiple())
         }
         return Ok(value)
     }
@@ -194,13 +194,13 @@ public extension Operators<T> for Iterable<T> {
             if predicate(value) {
                 while iterator.MoveNext() {
                     if predicate(iterator.Current) {
-                        return Error(SingleError.Multiple())
+                        return Failure(SingleError.Multiple())
                     }
                 }
                 return Ok(value)
             }
         }
-        return Error(SingleError.Empty())
+        return Failure(SingleError.Empty())
     }
 }
 

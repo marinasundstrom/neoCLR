@@ -31,13 +31,13 @@ class FailingSink : OutputStream {
         return Write(buffer, offset, count, CancellationToken.None)
     }
     func Write(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
-        return Task.FromResult(Result<unit, StreamError>.Error(StreamError.AccessDenied))
+        return Task.FromResult(Result<unit, StreamError>.Failure(StreamError.AccessDenied))
     }
     func Flush() -> Task<Result<unit, StreamError>> {
         return Flush(CancellationToken.None)
     }
     func Flush(cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
-        return Task.FromResult(Result<unit, StreamError>.Error(StreamError.AccessDenied))
+        return Task.FromResult(Result<unit, StreamError>.Failure(StreamError.AccessDenied))
     }
     func Close() { }
 }

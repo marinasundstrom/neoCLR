@@ -21,7 +21,7 @@ func DescribeInput(result1: Result<Option<string>, TextReadError>) -> Result<uni
 func Main() {
     match ReadInput() {
         Ok(_) => { }
-        Error(_) => {
+        Failure(_) => {
             let diagnostics = Console.Error
             let result1 = diagnostics.WriteLine("Could not read input")
             let Ok(_) = result1 else {

@@ -14,8 +14,8 @@ public record struct Money(val Amount: Decimal, val Currency: Currency) : Format
         if parsed is Ok(let amount) {
             return Ok(Money(amount, currency))
         }
-        let Error(error) = parsed else { return Error(NumberParseError.InvalidFormat()) }
-        return Error(error)
+        let Failure(error) = parsed else { return Failure(NumberParseError.InvalidFormat()) }
+        return Failure(error)
     }
 
     /// Formats the stored currency with its default display precision and explicit culture.

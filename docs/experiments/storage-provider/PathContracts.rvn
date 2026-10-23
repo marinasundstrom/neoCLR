@@ -21,13 +21,13 @@ func Valid(text: string, absolute: bool) {
                 System.Fail("Path equality used object identity")
             }
         }
-        Error(_) => System.Fail("Valid logical path rejected")
+        Failure(_) => System.Fail("Valid logical path rejected")
     }
 }
 
 func Invalid(text: string) {
     match Path.Parse(text) {
-        Error(_) => { }
+        Failure(_) => { }
         Ok(_) => System.Fail("Invalid logical path accepted")
     }
 }
@@ -77,10 +77,10 @@ func Main() {
         Ok(let file) => {
             match memory.WriteText(file.Path, "rooted", 16) {
                 Ok(_) => { }
-                Error(let error) => System.Fail(error.ToString())
+                Failure(let error) => System.Fail(error.ToString())
             }
         }
-        Error(let error) => System.Fail(error.ToString())
+        Failure(let error) => System.Fail(error.ToString())
     }
     // Providers may resolve distinct lexical values to the same address.
     match current.FileAt("note") {
@@ -91,13 +91,13 @@ func Main() {
                         System.Fail("Relative resolution changed provider context")
                     }
                 }
-                Error(let error) => System.Fail(error.ToString())
+                Failure(let error) => System.Fail(error.ToString())
             }
         }
-        Error(let error) => System.Fail(error.ToString())
+        Failure(let error) => System.Fail(error.ToString())
     }
     match root.FileAt("a\\b") {
-        Error(_) => { }
+        Failure(_) => { }
         Ok(_) => System.Fail("Directory bypassed path validation")
     }
     let host: StorageProvider = HostStorage(".")
@@ -107,7 +107,7 @@ func Main() {
                 System.Fail("Provider-rooted path reached wrong disk file")
             }
         }
-        Error(let error) => System.Fail(error.ToString())
+        Failure(let error) => System.Fail(error.ToString())
     }
     match host.ReadText(RequirePath("notes.txt"), 64) {
         Ok(let text) => {
@@ -115,11 +115,11 @@ func Main() {
                 System.Fail("Relative path reached wrong disk file")
             }
         }
-        Error(let error) => System.Fail(error.ToString())
+        Failure(let error) => System.Fail(error.ToString())
     }
     // Parse checks syntax without querying storage.
     match host.OpenRead(RequirePath("/missing")) {
-        Error(let error) => {
+        Failure(let error) => {
             if !(error is System.IO.StreamError.NotFound) {
                 System.Fail("Parsing performed storage lookup")
             }

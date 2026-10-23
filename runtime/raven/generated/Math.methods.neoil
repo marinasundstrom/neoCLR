@@ -18,7 +18,7 @@ call neoCLR.Library.System.Math.RuntimeErrorSystemOverflowErrorNew()
 M00000001_IL_0019:
 call neoCLR.Library.System.Math.RuntimeUnion0(System.OverflowError)
 M00000001_IL_001e:
-call neoCLR.Library.System.Math.RuntimeUnion1(System.Result.Error<System.OverflowError>)
+call neoCLR.Library.System.Math.RuntimeUnion1(System.Result.Failure<System.OverflowError>)
 M00000001_IL_0023:
 ret
 M00000001_IL_0024:
@@ -173,7 +173,7 @@ call neoCLR.Library.System.Math.RuntimeErrorSystemInvalidRangeErrorNew()
 M00000005_IL_0015:
 call neoCLR.Library.System.Math.RuntimeUnion4(System.InvalidRangeError)
 M00000005_IL_001a:
-call neoCLR.Library.System.Math.RuntimeUnion5(System.Result.Error<System.InvalidRangeError>)
+call neoCLR.Library.System.Math.RuntimeUnion5(System.Result.Failure<System.InvalidRangeError>)
 M00000005_IL_001f:
 ret
 M00000005_IL_0020:

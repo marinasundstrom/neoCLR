@@ -30,10 +30,10 @@ class ItemServer {
                         }
                     }
                 }
-            } else if parsed is Error(RouteMappingError.ConstructionFailed(_)) {
+            } else if parsed is Failure(RouteMappingError.ConstructionFailed(_)) {
                 status = HttpStatusCode.InternalServerError
                 body = "{\"error\":\"Route construction failed\"}"
-            } else if !(parsed is Error(RouteMappingError.NoMatch)) {
+            } else if !(parsed is Failure(RouteMappingError.NoMatch)) {
                 status = HttpStatusCode.BadRequest
                 body = "{\"error\":\"Invalid route\"}"
             }
@@ -47,8 +47,8 @@ class ItemServer {
             let context = await server.Accept()?
             Configure(context)
             let sent = await context.Complete()
-            if let Error(error) = sent {
-                return Error(error)
+            if let Failure(error) = sent {
+                return Failure(error)
             }
             index += 1
         }
@@ -78,7 +78,7 @@ func Main(arguments: string[]) {
     let serving = ItemServer(routes).Serve(server, count)
     serving.OnCompleted(() => {
         server.Close()
-        if let Error(error) = serving.GetResult() {
+        if let Failure(error) = serving.GetResult() {
             System.Fail(error.ToString())
         }
         Console.WriteLine("Items served")

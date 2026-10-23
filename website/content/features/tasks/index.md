@@ -34,7 +34,7 @@ Await obtains the Result; `?` propagates its error:
 ```
 
 `await input?` awaits first and then propagates; `(await input)?` is also valid.
-Cancellation is a distinct task outcome, never `Result.Error`. A runtime Fault is
+Cancellation is a distinct task outcome, never `Result.Failure`. A runtime Fault is
 terminal and cannot be recovered through Task. This differs from .NET's faulted Task.
 
 [Complete propagation example](/samples/library-task-propagation.rvn) ·

@@ -12,7 +12,7 @@ async func Print(input: Task<Result<int, string>>) -> Task<unit> {
     let result = await input
     match result {
         Ok(let value) => WriteLine(value)
-        Error(let message) => WriteLine(message)
+        Failure(let message) => WriteLine(message)
     }
     return ()
 }
@@ -20,5 +20,5 @@ async func Print(input: Task<Result<int, string>>) -> Task<unit> {
 func Main() {
     let promise = Promise<Result<int, string>>()
     _ = Print(Read(promise.Task))
-    promise.Complete(Error("Unavailable"))
+    promise.Complete(Failure("Unavailable"))
 }

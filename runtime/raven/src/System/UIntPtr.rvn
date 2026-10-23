@@ -11,7 +11,7 @@ public struct UIntPtr : ComparableTo<nuint>, EquatableTo<nuint>, Formattable {
     static func Parse(text: string) -> Result<nuint, NumberParseError> {
         let value = UInt64.Parse(text)?
         let result = (nuint)value
-        if neoCLR.Runtime.UIntPtrToUInt64(result) != value { return Error(NumberParseError.Overflow()) }
+        if neoCLR.Runtime.UIntPtrToUInt64(result) != value { return Failure(NumberParseError.Overflow()) }
         return Ok(result)
     }
 

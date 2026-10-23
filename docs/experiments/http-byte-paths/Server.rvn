@@ -43,7 +43,7 @@ async func Main() -> Task<()> {
     Console.WriteLine(port)
     for index in 0..8 {
         let result = await server.ServeOne(Respond)
-        if let Error(_) = result {
+        if let Failure(_) = result {
             if index < 6 {
                 System.Fail("Valid response failed")
             }

@@ -12,10 +12,10 @@ internal class ConsoleInputStream : SyncInputStream {
 
     func Read(buffer: Slice<byte>) -> Result<int, StreamError> {
         if closed {
-            return Error(StreamError.Closed)
+            return Failure(StreamError.Closed)
         }
         if buffer.Length > 65536 {
-            return Error(StreamError.LimitExceeded)
+            return Failure(StreamError.LimitExceeded)
         }
         if buffer.IsEmpty {
             return Ok(0)
@@ -26,7 +26,7 @@ internal class ConsoleInputStream : SyncInputStream {
                 Ok(1)
             }
             Ok(None) => Ok(0)
-            Error(_) => Error(StreamError.IoFailure)
+            Failure(_) => Failure(StreamError.IoFailure)
         }
     }
 
@@ -45,16 +45,16 @@ internal class ConsoleOutputStream : SyncOutputStream {
 
     func Write(buffer: ReadOnlySlice<byte>) -> Result<unit, StreamError> {
         if closed {
-            return Error(StreamError.Closed)
+            return Failure(StreamError.Closed)
         }
         if buffer.Length > 65536 {
-            return Error(StreamError.LimitExceeded)
+            return Failure(StreamError.LimitExceeded)
         }
         var sent = 0
         while true {
             let payload = neoCLR.Runtime.ConsoleWriteBytes(error, buffer[sent..])
             if neoCLR.Runtime.IsValue<byte>(payload) {
-                return Error(StreamError.IoFailure)
+                return Failure(StreamError.IoFailure)
             }
             let written = neoCLR.Runtime.UnpackValue<int>(payload)
             if written < 0 || written > buffer.Length - sent {
@@ -65,19 +65,19 @@ internal class ConsoleOutputStream : SyncOutputStream {
                 return Ok(())
             }
             if written == 0 {
-                return Error(StreamError.IoFailure)
+                return Failure(StreamError.IoFailure)
             }
         }
-        return Error(StreamError.IoFailure)
+        return Failure(StreamError.IoFailure)
     }
 
     func Flush() -> Result<unit, StreamError> {
         if closed {
-            return Error(StreamError.Closed)
+            return Failure(StreamError.Closed)
         }
         let payload = neoCLR.Runtime.ConsoleFlush(error)
         if neoCLR.Runtime.IsValue<byte>(payload) {
-            return Error(StreamError.IoFailure)
+            return Failure(StreamError.IoFailure)
         }
         return Ok(())
     }

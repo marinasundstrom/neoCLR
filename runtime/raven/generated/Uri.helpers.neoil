@@ -81,14 +81,14 @@ ldarg arg0
 call instance System.Result.Ok<String>::get_Value()
 ret
 .end
-.function neoCLR.Library.System.Uri.RuntimeUnion2(System.UriError arg0) -> System.Result.Error<System.UriError>
+.function neoCLR.Library.System.Uri.RuntimeUnion2(System.UriError arg0) -> System.Result.Failure<System.UriError>
 ldarg arg0
-newobj instance System.Result.Error<System.UriError>::.ctor(System.UriError)
+newobj instance System.Result.Failure<System.UriError>::.ctor(System.UriError)
 ret
 .end
-.function neoCLR.Library.System.Uri.RuntimeUnion3(System.Result.Error<System.UriError> arg0) -> System.Result<System.Uri,System.UriError>
+.function neoCLR.Library.System.Uri.RuntimeUnion3(System.Result.Failure<System.UriError> arg0) -> System.Result<System.Uri,System.UriError>
 ldarg arg0
-newobj instance System.Result<System.Uri,System.UriError>::.ctor(System.Result.Error<System.UriError>)
+newobj instance System.Result<System.Uri,System.UriError>::.ctor(System.Result.Failure<System.UriError>)
 ret
 .end
 .function neoCLR.Library.System.Uri.RuntimeUnion4(System.Uri arg0) -> System.Result.Ok<System.Uri>

@@ -27,7 +27,7 @@ func Main() -> int {
                 return 6
             }
         }
-        .Error(_) => return 7
+        .Failure(_) => return 7
     }
     return 42
 }

@@ -20,8 +20,8 @@ func Main() -> int {
     if String.CompareOrdinal(success.ToString(), "Result.Ok(\"ready\")") != 0 {
         return 3
     }
-    let failure = Result<string, string>.Error("failed")
-    if String.CompareOrdinal(failure.ToString(), "Result.Error(\"failed\")") != 0 {
+    let failure = Result<string, string>.Failure("failed")
+    if String.CompareOrdinal(failure.ToString(), "Result.Failure(\"failed\")") != 0 {
         return 4
     }
     if !CheckNumber(0, "Option.Some(0)") {
@@ -40,8 +40,8 @@ func Main() -> int {
     if String.CompareOrdinal(number.ToString(), "Result.Ok(42)") != 0 {
         return 9
     }
-    let errorCode = Result<string, int>.Error(-7)
-    if String.CompareOrdinal(errorCode.ToString(), "Result.Error(-7)") != 0 {
+    let errorCode = Result<string, int>.Failure(-7)
+    if String.CompareOrdinal(errorCode.ToString(), "Result.Failure(-7)") != 0 {
         return 10
     }
     return 42

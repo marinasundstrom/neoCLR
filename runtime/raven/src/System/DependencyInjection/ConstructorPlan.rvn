@@ -29,7 +29,7 @@ internal class ConstructorPlan {
     // Availability is metadata-only: never resolve services while choosing a constructor.
     internal static func Prepare(type: TypeInfo, available: (TypeInfo) -> bool) -> Result<ConstructorPlan, ActivationError> {
         if type.IsAbstract || type.IsInterface || type.ContainsGenericParameters || type.IsValueType {
-            return Error(ActivationError.UnsupportedType)
+            return Failure(ActivationError.UnsupportedType)
         }
         let constructors = type.GetConstructors()
         var selected: Option<ConstructorInfo> = None
@@ -51,7 +51,7 @@ internal class ConstructorPlan {
             }
         }
         let Some(best) = selected else {
-            return Error(ActivationError.MissingConstructor)
+            return Failure(ActivationError.MissingConstructor)
         }
         let bestParameters = best.GetParameters()
         // Like the default .NET container, another applicable constructor is
@@ -78,7 +78,7 @@ internal class ConstructorPlan {
                 }
             }
             if usable && !subset {
-                return Error(ActivationError.AmbiguousConstructor)
+                return Failure(ActivationError.AmbiguousConstructor)
             }
         }
         return Ok(ConstructorPlan(best))
@@ -88,7 +88,7 @@ internal class ConstructorPlan {
 
     internal func Invoke(arguments: Object?[]) -> Result<Object, ActivationError> {
         if constructor.Invoke(arguments) is Ok(let instance) { return Ok(instance) }
-        return Error(ActivationError.InvocationFailed)
+        return Failure(ActivationError.InvocationFailed)
     }
 
 }

@@ -14915,3 +14915,20 @@ metadata interface-bound checks and 25 specialization tests pass (one timing pro
 ignored). CLI fingerprints, the native API audit and 26 website checks pass.
 See [exact working-tree artifact identities](validation/error-context/validation.json);
 other hosts and published package qualification remain separate.
+
+## Result case rename (2026-10-23)
+
+The current library uses Ok and Failure; the earlier Error case name remains only
+in historical evidence. Failure is the state and the error is the payload.
+Consumers must migrate constructors/patterns and rebuild; generated case metadata
+changes as well. Both Raven main and codex/neoclr recognize Failure and retain
+legacy Error metadata recognition. This changes no Runtime Contract configuration,
+propagation protocol, CLI encoding or native metadata representation. The bounded
+CLI documentation projection and retained textual library fixtures use matching
+case names. Option remains unchanged until its separate migration is validated.
+
+Validation of the Result rename uses Raven main `8a264cf8a` and deliberately
+carried neoCLR compiler `a6f650b5e`. The final compiler passes all 12 error-context
+tests in interpreter, JIT and AOT (36 executions); 22 retained textual-runtime
+contract tests pass. The API snapshot and all 6,064 website pages pass validation.
+See [recorded results](validation/result-failure/validation.json).

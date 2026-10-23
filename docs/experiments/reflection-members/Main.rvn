@@ -66,21 +66,21 @@ func Exercise() -> Result<(), ReflectionError> {
     let _ = Field("Count").SetValue(model, 41)?
     let count = Field("Count").GetValue(model)?
     Check(count is int value && value == 41)
-    Check(Field("Count").SetValue(model, "wrong") is Error(ReflectionError.InvalidValue))
-    Check(Field("Fixed").SetValue(model, 9) is Error(ReflectionError.AccessDenied))
-    Check(Field("secret").GetValue(model) is Error(ReflectionError.AccessDenied))
+    Check(Field("Count").SetValue(model, "wrong") is Failure(ReflectionError.InvalidValue))
+    Check(Field("Fixed").SetValue(model, 9) is Failure(ReflectionError.AccessDenied))
+    Check(Field("secret").GetValue(model) is Failure(ReflectionError.AccessDenied))
     Check(Field("secret").IsPrivate)
-    Check(Method("Add").Invoke(null, 1) is Error(ReflectionError.InvalidReceiver))
-    Check(Method("Add").Invoke(model, "wrong") is Error(ReflectionError.InvalidArguments))
-    Check(type.CreateInstance<string>(17) is Error(ReflectionError.InvalidResultType))
-    Check(type.CreateInstance("wrong") is Error(ReflectionError.MissingConstructor))
+    Check(Method("Add").Invoke(null, 1) is Failure(ReflectionError.InvalidReceiver))
+    Check(Method("Add").Invoke(model, "wrong") is Failure(ReflectionError.InvalidArguments))
+    Check(type.CreateInstance<string>(17) is Failure(ReflectionError.InvalidResultType))
+    Check(type.CreateInstance("wrong") is Failure(ReflectionError.MissingConstructor))
     let cleared = Method("Clear").Invoke(model)?
     Check(cleared is null && model.Count == 0)
     return Ok(())
 }
 
 func Main() {
-    if Exercise() is Error(_) {
+    if Exercise() is Failure(_) {
         System.Fail("Reflection workflow failed")
     }
     Console.WriteLine("Constructor, invocation and field checks passed")

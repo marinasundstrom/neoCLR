@@ -26,7 +26,7 @@ class ReportServer {
                     context.Respond(HttpStatusCode.Created, content)
                     return Ok(())
                 }
-            } else if acknowledged is Error(JsonError.Reflection(_)) || acknowledged is Error(JsonError.UnsupportedMapping(_)) {
+            } else if acknowledged is Failure(JsonError.Reflection(_)) || acknowledged is Failure(JsonError.UnsupportedMapping(_)) {
                 context.Respond(HttpStatusCode.InternalServerError, ErrorContent("{\"error\":\"Report mapping failed\"}"))
                 return Ok(())
             }
@@ -41,27 +41,27 @@ class ReportServer {
         var index = 0
         while index < count {
             let accepted = await server.Accept()
-            if let Error(reason) = accepted {
+            if let Failure(reason) = accepted {
                 // Accept already closes the rejected connection and releases its slot.
                 // Count rejected attempts too, so the sample has a bounded lifetime.
                 if reason is HttpError.Protocol(_) || reason is HttpError.LimitExceeded(_) || reason is HttpError.Unsupported(_) {
                     index += 1
                     continue
                 }
-                return Error(AppError.Http(reason))
+                return Failure(AppError.Http(reason))
             }
             let Ok(context) = accepted else {
-                return Error(AppError.Body("Missing accepted request"))
+                return Failure(AppError.Body("Missing accepted request"))
             }
             // Close the owned exchange before propagating a configuration failure.
             let configured = await Configure(context)
-            if let Error(error) = configured {
+            if let Failure(error) = configured {
                 context.Close()
-                return Error(error)
+                return Failure(error)
             }
             let sent = await context.Complete()
-            if let Error(sendError) = sent {
-                return Error(AppError.Http(sendError))
+            if let Failure(sendError) = sent {
+                return Failure(AppError.Http(sendError))
             }
             index += 1
         }
@@ -94,7 +94,7 @@ func StartServer(arguments: string[]) -> Task<()> {
 async func FinishServing(server: HttpServer, serving: Task<Result<unit, AppError>>) -> Task<()> {
     let result = await serving
     server.Close()
-    if let Error(error) = result {
+    if let Failure(error) = result {
         System.Fail(error.ToString())
     }
     Console.WriteLine("Reports served")

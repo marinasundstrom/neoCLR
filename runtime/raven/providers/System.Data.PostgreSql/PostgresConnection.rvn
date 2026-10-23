@@ -41,18 +41,18 @@ internal class PostgresConnection : SqlConnection {
         var offset = 0
         while offset < bytes.Length {
             let sent = await socket.SendUntil(bytes.Slice(offset), deadline.Value, CancellationToken.None)
-            if let Error(error) = sent { return Error(SqlError.Transport(error.ToString())) }
+            if let Failure(error) = sent { return Failure(SqlError.Transport(error.ToString())) }
             let Ok(count) = sent else { System.Fail("Expected send count") }
-            if count <= 0 { return Error(SqlError.Transport("Connection closed while sending")) }
+            if count <= 0 { return Failure(SqlError.Transport("Connection closed while sending")) }
             offset += count
         }
         return Ok(())
     }
     private async func Fill(deadline: Budget) -> Task<Result<unit, SqlError>> {
         let incoming = await socket.ReceiveUntil(receiveBuffer, deadline.Value, CancellationToken.None)
-        if let Error(error) = incoming { return Error(SqlError.Transport(error.ToString())) }
+        if let Failure(error) = incoming { return Failure(SqlError.Transport(error.ToString())) }
         let Ok(length) = incoming else { System.Fail("Expected receive count") }
-        if length <= 0 { return Error(SqlError.Transport("Unexpected PostgreSQL EOF")) }
+        if length <= 0 { return Failure(SqlError.Transport("Unexpected PostgreSQL EOF")) }
         receiveOffset = 0
         receiveCount = length
         return Ok(())
@@ -68,9 +68,9 @@ internal class PostgresConnection : SqlConnection {
             if header {
                 kind = pending.Byte()
                 let length = pending.Integer()
-                if length < 4 { return Error(SqlError.Protocol("Invalid frame length")) }
+                if length < 4 { return Failure(SqlError.Protocol("Invalid frame length")) }
                 if length > 65540 || received > 1048576 - length {
-                    return Error(SqlError.LimitExceeded("PostgreSQL frame/result limit"))
+                    return Failure(SqlError.LimitExceeded("PostgreSQL frame/result limit"))
                 }
                 received += length
                 expected = length - 4
@@ -88,7 +88,7 @@ internal class PostgresConnection : SqlConnection {
     }
     private func Finished(packet: Packet) -> Result<unit, SqlError> {
         if !packet.Valid || packet.Remaining != 0 {
-            return Error(SqlError.Protocol("Malformed PostgreSQL message"))
+            return Failure(SqlError.Protocol("Malformed PostgreSQL message"))
         }
         return Ok(())
     }
@@ -110,65 +110,65 @@ internal class PostgresConnection : SqlConnection {
     private func ParameterStatus(packet: Packet) -> Result<unit, SqlError> {
         let name = packet.CString()
         let value = packet.CString()
-        if let Error(error) = Finished(packet) { return Error(error) }
+        if let Failure(error) = Finished(packet) { return Failure(error) }
         if name == "client_encoding" && value != "UTF8" {
-            return Error(SqlError.Unsupported("Only UTF8 client encoding is supported"))
+            return Failure(SqlError.Unsupported("Only UTF8 client encoding is supported"))
         }
         return Ok(())
     }
     internal async func Start(startup: Packet, deadline: Budget) -> Task<Result<unit, SqlError>> {
         let sent = await Send(startup.Frame(0), deadline)
-        if let Error(error) = sent { return Error(error) }
+        if let Failure(error) = sent { return Failure(error) }
         var authenticated = false
         while true {
             if deadline.Value.IsExpired {
-                return Error(SqlError.Transport("PostgreSQL operation timed out"))
+                return Failure(SqlError.Transport("PostgreSQL operation timed out"))
             }
             let packetResult = Next()
-            if let Error(error) = packetResult { return Error(error) }
+            if let Failure(error) = packetResult { return Failure(error) }
             let Ok(available) = packetResult else { System.Fail("Expected successful SQL result") }
             if available is None {
                 let filled = await Fill(deadline)
-                if let Error(error) = filled { return Error(error) }
+                if let Failure(error) = filled { return Failure(error) }
                 continue
             }
             let Some(packet) = available else { System.Fail("Expected buffered packet") }
             if kind == 82 {
                 if packet.Integer() != 0 {
-                    return Error(SqlError.Unsupported("Only local trust authentication is supported"))
+                    return Failure(SqlError.Unsupported("Only local trust authentication is supported"))
                 }
-                if let Error(error) = Finished(packet) { return Error(error) }
+                if let Failure(error) = Finished(packet) { return Failure(error) }
                 authenticated = true
             } else if kind == 83 {
-                if let Error(error) = ParameterStatus(packet) { return Error(error) }
+                if let Failure(error) = ParameterStatus(packet) { return Failure(error) }
             } else if kind == 75 {
                 _ = packet.Integer()
                 _ = packet.Integer()
-                if let Error(error) = Finished(packet) { return Error(error) }
+                if let Failure(error) = Finished(packet) { return Failure(error) }
             } else if kind == 78 {
                 let notice = ServerError(packet)
-                if notice is SqlError.Protocol { return Error(notice) }
+                if notice is SqlError.Protocol { return Failure(notice) }
             } else if kind == 69 {
-                return Error(ServerError(packet))
+                return Failure(ServerError(packet))
             } else if kind == 90 {
                 if !authenticated || packet.Byte() != 73 {
-                    return Error(SqlError.Protocol("Expected authenticated idle session"))
+                    return Failure(SqlError.Protocol("Expected authenticated idle session"))
                 }
                 return Finished(packet)
             } else {
-                return Error(SqlError.Protocol("Unexpected startup message"))
+                return Failure(SqlError.Protocol("Unexpected startup message"))
             }
         }
-        return Error(SqlError.Protocol("Missing ReadyForQuery"))
+        return Failure(SqlError.Protocol("Missing ReadyForQuery"))
     }
 
     private func Request(statement: SqlStatement) -> Result<byte[], SqlError> {
         if statement.Text == "" || statement.ParameterCount > 64 {
-            return Error(SqlError.InvalidInput("Expected nonempty SQL and at most 64 parameters"))
+            return Failure(SqlError.InvalidInput("Expected nonempty SQL and at most 64 parameters"))
         }
         let parse = Packet()
         parse.Put(0)
-        if let Error(error) = parse.PutText(statement.Text, true) { return Error(error) }
+        if let Failure(error) = parse.PutText(statement.Text, true) { return Failure(error) }
         parse.PutShort(0)
         let bind = Packet()
         bind.Put(0)
@@ -184,10 +184,10 @@ internal class PostgresConnection : SqlConnection {
                     SqlValue.Text(let input) => input
                     SqlValue.Integer(let input) => input.ToString()
                     SqlValue.Boolean(let input) => if input { "true" } else { "false" }
-                    _ => return Error(SqlError.InvalidInput("Invalid SQL value"))
+                    _ => return Failure(SqlError.InvalidInput("Invalid SQL value"))
                 }
                 bind.PutInteger(text.GetUtf8ByteCount())
-                if let Error(error) = bind.PutText(text, false) { return Error(error) }
+                if let Failure(error) = bind.PutText(text, false) { return Failure(error) }
             }
         }
         bind.PutShort(0)
@@ -204,7 +204,7 @@ internal class PostgresConnection : SqlConnection {
         for value in execute.Frame(69) { bytes.Add(value) }
         for value in Packet().Frame(83) { bytes.Add(value) }
         if bytes.Count > 65536 {
-            return Error(SqlError.LimitExceeded("Request exceeds 65536 bytes"))
+            return Failure(SqlError.LimitExceeded("Request exceeds 65536 bytes"))
         }
         let output = CheckedStorage.Reserve<byte>(bytes.Count)
         for index in 0..bytes.Count { output[index] = bytes[index] }
@@ -213,32 +213,32 @@ internal class PostgresConnection : SqlConnection {
 
     async func Execute(statement: SqlStatement) -> Task<Result<SqlResult, SqlError>> {
         if closed || busy {
-            return Error(SqlError.InvalidState("Session is closed or busy"))
+            return Failure(SqlError.InvalidState("Session is closed or busy"))
         }
         // Construct and validate all values before writing any bytes.
         var bound = statement
         if statement.HasNamedParameters {
             let binding = PostgresNamedParameters(statement).Bind()
-            if let Error(error) = binding { return Error(error) }
+            if let Failure(error) = binding { return Failure(error) }
             let Ok(value) = binding else { System.Fail("Expected successful parameter binding") }
             bound = value
         }
         let requestResult = Request(bound)
-        if let Error(error) = requestResult { return Error(error) }
+        if let Failure(error) = requestResult { return Failure(error) }
         let Ok(request) = requestResult else { System.Fail("Expected successful SQL result") }
         busy = true
         received = 0
         let result = await Exchange(request, Budget(timeout))
         busy = false
         // A server error has been drained through ReadyForQuery; other failures retire the session.
-        if let Error(error) = result {
+        if let Failure(error) = result {
             if !(error is SqlError.Server) { Dispose() }
         }
         return result
     }
     private async func Exchange(request: byte[], deadline: Budget) -> Task<Result<SqlResult, SqlError>> {
         let sent = await Send(request, deadline)
-        if let Error(error) = sent { return Error(error) }
+        if let Failure(error) = sent { return Failure(error) }
         let columns = ArrayList<string>()
         let rows = ArrayList<SqlRow>()
         var tag = ""
@@ -247,47 +247,47 @@ internal class PostgresConnection : SqlConnection {
         var hasRows = false
         while true {
             if deadline.Value.IsExpired {
-                return Error(SqlError.Transport("PostgreSQL operation timed out"))
+                return Failure(SqlError.Transport("PostgreSQL operation timed out"))
             }
             let packetResult = Next()
-            if let Error(error) = packetResult { return Error(error) }
+            if let Failure(error) = packetResult { return Failure(error) }
             let Ok(available) = packetResult else { System.Fail("Expected successful SQL result") }
             if available is None {
                 let filled = await Fill(deadline)
-                if let Error(error) = filled { return Error(error) }
+                if let Failure(error) = filled { return Failure(error) }
                 continue
             }
             let Some(packet) = available else { System.Fail("Expected buffered packet") }
             if kind == 69 {
                 failure = Some(ServerError(packet))
             } else if kind == 83 {
-                if let Error(error) = ParameterStatus(packet) { return Error(error) }
+                if let Failure(error) = ParameterStatus(packet) { return Failure(error) }
             } else if kind == 78 {
                 let notice = ServerError(packet)
-                if notice is SqlError.Protocol { return Error(notice) }
+                if notice is SqlError.Protocol { return Failure(notice) }
             } else if kind == 90 {
                 let status = packet.Byte()
-                if let Error(error) = Finished(packet) { return Error(error) }
+                if let Failure(error) = Finished(packet) { return Failure(error) }
                 if status != 73 && status != 84 && status != 69 {
-                    return Error(SqlError.Protocol("Invalid transaction status"))
+                    return Failure(SqlError.Protocol("Invalid transaction status"))
                 }
                 if transactionStatus != 73 && status == 73 { generation += 1 }
                 transactionStatus = status
-                if let Some(error) = failure { return Error(error) }
-                if stage != 4 { return Error(SqlError.Protocol("Incomplete SQL response")) }
+                if let Some(error) = failure { return Failure(error) }
+                if stage != 4 { return Failure(SqlError.Protocol("Incomplete SQL response")) }
                 return Ok(SqlResult(tag, rows))
             } else if failure is Some(_) {
-                return Error(SqlError.Protocol("Unexpected message after server error"))
+                return Failure(SqlError.Protocol("Unexpected message after server error"))
             } else if kind == 49 && stage == 0 {
-                if let Error(error) = Finished(packet) { return Error(error) }
+                if let Failure(error) = Finished(packet) { return Failure(error) }
                 stage = 1
             } else if kind == 50 && stage == 1 {
-                if let Error(error) = Finished(packet) { return Error(error) }
+                if let Failure(error) = Finished(packet) { return Failure(error) }
                 stage = 2
             } else if kind == 84 && stage == 2 {
                 hasRows = true
                 let count = packet.Short()
-                if count > 64 { return Error(SqlError.LimitExceeded("More than 64 columns")) }
+                if count > 64 { return Failure(SqlError.LimitExceeded("More than 64 columns")) }
                 for index in 0..count {
                     columns.Add(packet.CString())
                     _ = packet.Integer()
@@ -295,64 +295,64 @@ internal class PostgresConnection : SqlConnection {
                     _ = packet.Integer()
                     _ = packet.Short()
                     _ = packet.Integer()
-                    if packet.Short() != 0 { return Error(SqlError.Unsupported("Binary result format")) }
+                    if packet.Short() != 0 { return Failure(SqlError.Unsupported("Binary result format")) }
                 }
-                if let Error(error) = Finished(packet) { return Error(error) }
+                if let Failure(error) = Finished(packet) { return Failure(error) }
                 stage = 3
             } else if kind == 110 && stage == 2 {
-                if let Error(error) = Finished(packet) { return Error(error) }
+                if let Failure(error) = Finished(packet) { return Failure(error) }
                 stage = 3
             } else if kind == 68 && stage == 3 {
                 if !hasRows || packet.Short() != columns.Count {
-                    return Error(SqlError.Protocol("DataRow column count mismatch"))
+                    return Failure(SqlError.Protocol("DataRow column count mismatch"))
                 }
-                if rows.Count >= 1024 { return Error(SqlError.LimitExceeded("More than 1024 rows")) }
+                if rows.Count >= 1024 { return Failure(SqlError.LimitExceeded("More than 1024 rows")) }
                 let cells = ArrayList<Option<string>>()
                 for index in 0..columns.Count {
                     let length = packet.Integer()
                     if length == -1 { cells.Add(None) }
-                    else if length < 0 { return Error(SqlError.Protocol("Invalid cell length")) }
+                    else if length < 0 { return Failure(SqlError.Protocol("Invalid cell length")) }
                     else { cells.Add(Some(packet.Text(length))) }
                 }
-                if let Error(error) = Finished(packet) { return Error(error) }
+                if let Failure(error) = Finished(packet) { return Failure(error) }
                 rows.Add(SqlRow(columns, cells))
             } else if kind == 67 && stage == 3 {
                 tag = packet.CString()
-                if let Error(error) = Finished(packet) { return Error(error) }
+                if let Failure(error) = Finished(packet) { return Failure(error) }
                 stage = 4
             } else if kind == 73 && stage == 3 {
-                if let Error(error) = Finished(packet) { return Error(error) }
+                if let Failure(error) = Finished(packet) { return Failure(error) }
                 stage = 4
             } else {
-                return Error(SqlError.Unsupported("Unexpected PostgreSQL message (COPY and multiple results are unsupported)"))
+                return Failure(SqlError.Unsupported("Unexpected PostgreSQL message (COPY and multiple results are unsupported)"))
             }
         }
-        return Error(SqlError.Protocol("Missing ReadyForQuery"))
+        return Failure(SqlError.Protocol("Missing ReadyForQuery"))
     }
     async func Begin() -> Task<Result<SqlTransaction, SqlError>> {
         if transactionStatus != 73 || busy || closed {
-            return Error(SqlError.InvalidState("Transaction requires an idle open session"))
+            return Failure(SqlError.InvalidState("Transaction requires an idle open session"))
         }
         let started = await Execute(SqlStatement("BEGIN"))
-        if let Error(error) = started { return Error(error) }
-        if transactionStatus != 84 { Dispose(); return Error(SqlError.Protocol("BEGIN did not start a transaction")) }
+        if let Failure(error) = started { return Failure(error) }
+        if transactionStatus != 84 { Dispose(); return Failure(SqlError.Protocol("BEGIN did not start a transaction")) }
         generation += 1
         return Ok(PostgresTransaction(self, generation))
     }
     internal async func Finish(version: int, commit: bool) -> Task<Result<unit, SqlError>> {
         if version != generation || closed || busy || transactionStatus == 73 {
-            return Error(SqlError.InvalidState("Transaction is no longer active or session is busy"))
+            return Failure(SqlError.InvalidState("Transaction is no longer active or session is busy"))
         }
         if commit && transactionStatus == 69 {
-            return Error(SqlError.InvalidState("Transaction failed; roll back explicitly"))
+            return Failure(SqlError.InvalidState("Transaction failed; roll back explicitly"))
         }
         let expected = if commit { "COMMIT" } else { "ROLLBACK" }
         let finished = await Execute(SqlStatement(expected))
-        if let Error(error) = finished { return Error(error) }
+        if let Failure(error) = finished { return Failure(error) }
         let Ok(result) = finished else { System.Fail("Expected successful SQL result") }
         if transactionStatus != 73 || result.CommandTag != expected {
             Dispose()
-            return Error(SqlError.Protocol("Unexpected transaction completion"))
+            return Failure(SqlError.Protocol("Unexpected transaction completion"))
         }
         return Ok(())
     }

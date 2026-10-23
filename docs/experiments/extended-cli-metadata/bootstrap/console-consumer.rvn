@@ -24,7 +24,7 @@ func Main() -> int {
     let first = Console.OpenStandardOutput()
     first.Close()
     match first.Flush() {
-        Error(_) => { }
+        Failure(_) => { }
         _ => { return 4 }
     }
     let writer = Console.Out

@@ -22,14 +22,14 @@ public class Operations {
 
 public class TerminalGuard {
     private static func Input(fail: bool) -> System.Result<object, string> {
-        if fail { return System.Result<object, string>.Error("failed") }
+        if fail { return System.Result<object, string>.Failure("failed") }
         return System.Result<object, string>.Ok(42)
     }
     static func Read(fail: bool) -> System.Result<object, string> {
         let input = Input(fail)
         let result = match input {
             Ok(let value) => value
-            Error(let reason) => return System.Result<object, string>.Error(reason)
+            Failure(let reason) => return System.Result<object, string>.Failure(reason)
         }
         return System.Result<object, string>.Ok(result)
     }

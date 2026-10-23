@@ -40,7 +40,7 @@ func Main() -> int {
     let Ok(_) = seek.Seek(0L) else { return 14 }
     let bounded = StreamReader(input, true)
     match bounded.ReadToEnd(2) {
-        Error(TextReadError.LimitExceeded) => {}
+        Failure(TextReadError.LimitExceeded) => {}
         _ => return 15
     }
     let invalid = MemoryStream()
@@ -49,12 +49,12 @@ func Main() -> int {
     let Ok(_) = invalid.Seek(0L) else { return 17 }
     let broken = StreamReader(invalid)
     match broken.ReadToEnd(64) {
-        Error(TextReadError.InvalidUtf8) => {}
+        Failure(TextReadError.InvalidUtf8) => {}
         _ => return 18
     }
     broken.Close()
     match invalid.GetLength() {
-        Error(StreamError.Closed) => {}
+        Failure(StreamError.Closed) => {}
         _ => return 19
     }
     return 42

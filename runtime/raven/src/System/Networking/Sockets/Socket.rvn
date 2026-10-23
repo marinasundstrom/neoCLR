@@ -31,7 +31,7 @@ public class Socket {
             return Connect(address.ToString(), port, cancellationToken)
         }
         let source = Promise<Result<Socket, SocketError>>()
-        _ = source.Complete(Error(SocketError.UnsupportedAddressFamily()))
+        _ = source.Complete(Failure(SocketError.UnsupportedAddressFamily()))
         return source.Task
     }
 
@@ -50,7 +50,7 @@ public class Socket {
     static func ConnectUntil(addresses: Sequence<IPAddress>, port: int, deadline: NetworkDeadline, cancellationToken: CancellationToken) -> Task<Result<Socket, SocketError>> {
         if !cancellationToken.IsCancellationRequested && deadline.IsExpired {
             let source = Promise<Result<Socket, SocketError>>()
-            _ = source.Complete(Error(SocketError.TimedOut))
+            _ = source.Complete(Failure(SocketError.TimedOut))
             return source.Task
         }
         return ConnectUntil(addresses, port, deadline.Stamp, cancellationToken)
@@ -68,12 +68,12 @@ public class Socket {
         }
         if addresses.Count == 0 {
             let empty = Promise<Result<Socket, SocketError>>()
-            _ = empty.Complete(Error(SocketError.InvalidRange()))
+            _ = empty.Complete(Failure(SocketError.InvalidRange()))
             return empty.Task
         }
         if addresses.Count > 16 {
             let excessive = Promise<Result<Socket, SocketError>>()
-            _ = excessive.Complete(Error(SocketError.LimitExceeded()))
+            _ = excessive.Complete(Failure(SocketError.LimitExceeded()))
             return excessive.Task
         }
         let text = ArrayList<string>()
@@ -82,7 +82,7 @@ public class Socket {
             let address = addresses[index]
             if !(address is IPv4Address) {
                 let source = Promise<Result<Socket, SocketError>>()
-                _ = source.Complete(Error(SocketError.UnsupportedAddressFamily()))
+                _ = source.Complete(Failure(SocketError.UnsupportedAddressFamily()))
                 return source.Task
             }
             text.Add(address.ToString())
@@ -96,7 +96,7 @@ public class Socket {
         if address is IPv4Address {
             return Listen(address.ToString(), port, backlog)
         }
-        return Error(SocketError.UnsupportedAddressFamily())
+        return Failure(SocketError.UnsupportedAddressFamily())
     }
 
     static func Connect(address: string, port: int) -> Task<Result<Socket, SocketError>> {
@@ -125,7 +125,7 @@ public class Socket {
     static func ConnectUntil(addresses: Sequence<string>, port: int, deadline: NetworkDeadline, cancellationToken: CancellationToken) -> Task<Result<Socket, SocketError>> {
         if !cancellationToken.IsCancellationRequested && deadline.IsExpired {
             let source = Promise<Result<Socket, SocketError>>()
-            _ = source.Complete(Error(SocketError.TimedOut))
+            _ = source.Complete(Failure(SocketError.TimedOut))
             return source.Task
         }
         return ConnectUntil(addresses, port, deadline.Stamp, cancellationToken)
@@ -145,7 +145,7 @@ public class Socket {
     static func Listen(address: string, port: int, backlog: int) -> Result<Socket, SocketError> {
         let payload = neoCLR.Runtime.SocketListen(address, port, backlog)
         if neoCLR.Runtime.IsValue<byte>(payload) {
-            return Error(DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload)))
+            return Failure(DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload)))
         }
         return Ok(Socket(neoCLR.Runtime.UnpackValue<long>(payload)))
     }
@@ -165,7 +165,7 @@ public class Socket {
     func GetLocalPort() -> Result<int, SocketError> {
         let payload = neoCLR.Runtime.SocketLocalPort(handle)
         if neoCLR.Runtime.IsValue<byte>(payload) {
-            return Error(DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload)))
+            return Failure(DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload)))
         }
         return Ok(neoCLR.Runtime.UnpackValue<int>(payload))
     }
@@ -187,7 +187,7 @@ public class Socket {
     func ReceiveUntil(buffer: Memory<byte>, deadline: NetworkDeadline, cancellationToken: CancellationToken) -> Task<Result<int, SocketError>> {
         if !cancellationToken.IsCancellationRequested && deadline.IsExpired {
             let source = Promise<Result<int, SocketError>>()
-            _ = source.Complete(Error(SocketError.TimedOut))
+            _ = source.Complete(Failure(SocketError.TimedOut))
             return source.Task
         }
         return ReceiveUntil(buffer, deadline.Stamp, cancellationToken)
@@ -221,7 +221,7 @@ public class Socket {
     func SendUntil(buffer: ReadOnlyMemory<byte>, deadline: NetworkDeadline, cancellationToken: CancellationToken) -> Task<Result<int, SocketError>> {
         if !cancellationToken.IsCancellationRequested && deadline.IsExpired {
             let source = Promise<Result<int, SocketError>>()
-            _ = source.Complete(Error(SocketError.TimedOut))
+            _ = source.Complete(Failure(SocketError.TimedOut))
             return source.Task
         }
         return SendUntil(buffer, deadline.Stamp, cancellationToken)
@@ -310,7 +310,7 @@ internal class SocketConnectCompletion {
         _ = TaskQueue.Default
         let payload = neoCLR.Runtime.SocketConnect(address, port, self.Complete)
         if neoCLR.Runtime.IsValue<byte>(payload) {
-            _ = source.Complete(Error(Socket.DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload))))
+            _ = source.Complete(Failure(Socket.DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload))))
         } else {
             operation = neoCLR.Runtime.UnpackValue<long>(payload)
             if token.CanBeCancelled {
@@ -330,11 +330,11 @@ internal class SocketConnectCompletion {
         }
         let count = addresses.Count
         if count <= 0 {
-            _ = source.Complete(Error(SocketError.InvalidRange()))
+            _ = source.Complete(Failure(SocketError.InvalidRange()))
             return
         }
         if count > 16 {
-            _ = source.Complete(Error(SocketError.LimitExceeded()))
+            _ = source.Complete(Failure(SocketError.LimitExceeded()))
             return
         }
         let snapshot = CheckedStorage.Reserve<string>(count)
@@ -350,7 +350,7 @@ internal class SocketConnectCompletion {
             neoCLR.Runtime.SocketConnectAddressesUntil(snapshot, port, deadline, self.Complete)
         }
         if neoCLR.Runtime.IsValue<byte>(payload) {
-            _ = source.Complete(Error(Socket.DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload))))
+            _ = source.Complete(Failure(Socket.DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload))))
         } else {
             operation = neoCLR.Runtime.UnpackValue<long>(payload)
             if token.CanBeCancelled {
@@ -367,7 +367,7 @@ internal class SocketConnectCompletion {
         _ = TaskQueue.Default
         let payload = neoCLR.Runtime.SocketAccept(handle, self.Complete)
         if neoCLR.Runtime.IsValue<byte>(payload) {
-            _ = source.Complete(Error(Socket.DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload))))
+            _ = source.Complete(Failure(Socket.DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload))))
         } else {
             operation = neoCLR.Runtime.UnpackValue<long>(payload)
             if token.CanBeCancelled {
@@ -393,7 +393,7 @@ internal class SocketConnectCompletion {
             return
         }
         if neoCLR.Runtime.IsValue<byte>(payload) {
-            _ = source.Complete(Error(Socket.DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload))))
+            _ = source.Complete(Failure(Socket.DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload))))
         } else {
             _ = source.Complete(Ok(Socket(neoCLR.Runtime.UnpackValue<long>(payload))))
         }
@@ -431,7 +431,7 @@ internal class SocketTransferCompletion {
             neoCLR.Runtime.SocketReceiveUntil(handle, buffer, deadline, self.Complete)
         }
         if neoCLR.Runtime.IsValue<byte>(payload) {
-            _ = source.Complete(Error(Socket.DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload))))
+            _ = source.Complete(Failure(Socket.DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload))))
         } else {
             operation = neoCLR.Runtime.UnpackValue<long>(payload)
             if token.CanBeCancelled {
@@ -456,7 +456,7 @@ internal class SocketTransferCompletion {
             neoCLR.Runtime.SocketSendUntil(handle, buffer, deadline, self.Complete)
         }
         if neoCLR.Runtime.IsValue<byte>(payload) {
-            _ = source.Complete(Error(Socket.DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload))))
+            _ = source.Complete(Failure(Socket.DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload))))
         } else {
             operation = neoCLR.Runtime.UnpackValue<long>(payload)
             if token.CanBeCancelled {
@@ -482,7 +482,7 @@ internal class SocketTransferCompletion {
             return
         }
         if neoCLR.Runtime.IsValue<byte>(payload) {
-            _ = source.Complete(Error(Socket.DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload))))
+            _ = source.Complete(Failure(Socket.DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload))))
         } else {
             _ = source.Complete(Ok(neoCLR.Runtime.UnpackValue<int>(payload)))
         }

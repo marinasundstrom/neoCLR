@@ -11,13 +11,13 @@ import System.Storage.Path
 // A platform provider resolves items; byte methods and text helpers are not required.
 class MissingProvider : System.Storage.StorageProvider {
     func GetItem(path: Path) -> Result<StorageItem, StorageLookupError> {
-        return Error<StorageLookupError>(StorageLookupError.NotFound)
+        return Failure<StorageLookupError>(StorageLookupError.NotFound)
     }
     func GetFile(path: Path) -> Result<File, StorageLookupError> {
-        return Error<StorageLookupError>(StorageLookupError.NotFound)
+        return Failure<StorageLookupError>(StorageLookupError.NotFound)
     }
     func GetDirectory(path: Path) -> Result<Directory, StorageLookupError> {
-        return Error<StorageLookupError>(StorageLookupError.NotFound)
+        return Failure<StorageLookupError>(StorageLookupError.NotFound)
     }
 }
 
@@ -31,7 +31,7 @@ func CheckItems(provider: System.Storage.StorageProvider) {
                 System.Fail("Generic lookup returned the wrong branch")
             }
         }
-        Error(let error) => System.Fail(error.ToString())
+        Failure(let error) => System.Fail(error.ToString())
     }
     match provider.GetItem(RequirePath("/")) {
         Ok(let item) => {
@@ -39,10 +39,10 @@ func CheckItems(provider: System.Storage.StorageProvider) {
                 System.Fail("Generic root lookup lost its directory branch")
             }
         }
-        Error(let error) => System.Fail(error.ToString())
+        Failure(let error) => System.Fail(error.ToString())
     }
     match provider.GetItem(RequirePath("/missing-item")) {
-        Error(let error) => {
+        Failure(let error) => {
             if !(error is System.Storage.StorageLookupError.NotFound) {
                 System.Fail("Missing generic item changed error")
             }
@@ -55,14 +55,14 @@ func Main() {
     let memory = MemoryStorage()
     match memory.WriteText(RequirePath("/lookup.txt"), "found", 5) {
         Ok(_) => { }
-        Error(let error) => System.Fail(error.ToString())
+        Failure(let error) => System.Fail(error.ToString())
     }
     CheckItems(memory)
     // The preceding file-lookup fixture writes this native file.
     CheckItems(HostStorage("."))
     let missing: System.Storage.StorageProvider = MissingProvider()
     match missing.GetItem(RequirePath("anything")) {
-        Error(let error) => {
+        Failure(let error) => {
             if !(error is System.Storage.StorageLookupError.NotFound) {
                 System.Fail("Resolution-only provider changed error")
             }

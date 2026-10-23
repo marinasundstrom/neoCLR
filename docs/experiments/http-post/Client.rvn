@@ -61,9 +61,9 @@ func CheckContracts() {
 
     // Persistent views have a fixed length: reject an oversized body at construction.
     let bytes = (byte[])[for index in 0..1048577 => (byte)1]
-    Check(HttpRequest.Post("http://not-resolved.invalid/", HttpMemoryContent(bytes)) is Error(HttpError.LimitExceeded(_)))
+    Check(HttpRequest.Post("http://not-resolved.invalid/", HttpMemoryContent(bytes)) is Failure(HttpError.LimitExceeded(_)))
     let bad = HttpMemoryContent(default(ReadOnlyMemory<byte>), "text/plain\r\nInjected: yes")
-    if let Error(HttpError.InvalidRequest(_)) = HttpClient().Post("http://not-resolved.invalid/", bad).GetResult() {
+    if let Failure(HttpError.InvalidRequest(_)) = HttpClient().Post("http://not-resolved.invalid/", bad).GetResult() {
         Check(true)
     } else {
         System.Fail("Header injection reached transport")

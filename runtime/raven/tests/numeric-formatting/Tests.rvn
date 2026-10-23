@@ -144,20 +144,20 @@ func CultureParsing() -> Result<unit, TestFailure> {
 func CultureParsingFailures() -> Result<unit, TestFailure> {
     let swedish = Culture.SwedishSweden
     let invariant = Culture.Invariant
-    _ = Assert.True(Int32.Parse("12,34", invariant) is Error(NumberParseError.InvalidFormat), "Int32 rejects 12,34")?
-    _ = Assert.True(Int32.Parse("1234,567", invariant) is Error(NumberParseError.InvalidFormat), "Int32 rejects 1234,567")?
-    _ = Assert.True(Int32.Parse("1,,234", invariant) is Error(NumberParseError.InvalidFormat), "Int32 rejects 1,,234")?
-    _ = Assert.True(Int32.Parse("1,234,", invariant) is Error(NumberParseError.InvalidFormat), "Int32 rejects 1,234,")?
-    _ = Assert.True(Int32.Parse("1 23", swedish) is Error(NumberParseError.InvalidFormat), "Int32 rejects 1 23")?
-    _ = Assert.True(Int32.Parse("1.234", swedish) is Error(NumberParseError.InvalidFormat), "Int32 rejects 1.234")?
-    _ = Assert.True(Int32.Parse("1,0", swedish) is Error(NumberParseError.InvalidFormat), "Int32 rejects 1,0")?
-    _ = Assert.True(Double.Parse("1,234.5", swedish) is Error(NumberParseError.InvalidFormat), "Double rejects 1,234.5")?
-    _ = Assert.True(Double.Parse("1,23", invariant) is Error(NumberParseError.InvalidFormat), "Double rejects 1,23")?
-    _ = Assert.True(Double.Parse("1,234.5,678", invariant) is Error(NumberParseError.InvalidFormat), "Double rejects 1,234.5,678")?
-    _ = Assert.True(Double.Parse("1 234,5 6", swedish) is Error(NumberParseError.InvalidFormat), "Double rejects 1 234,5 6")?
-    _ = Assert.True(Double.Parse(" 1,5", swedish) is Error(NumberParseError.InvalidFormat), "Double rejects  1,5")?
-    _ = Assert.True(Byte.Parse("256", invariant) is Error(NumberParseError.Overflow), "Byte rejects 256")?
-    _ = Assert.True(UInt64.Parse("18 446 744 073 709 551 616", swedish) is Error(NumberParseError.Overflow), "UInt64 rejects 18 446 744 073 709 551 616")?
-    _ = Assert.True(Single.Parse("1,0e99", swedish) is Error(NumberParseError.Overflow), "Single rejects 1,0e99")?
-    return Assert.True(Double.Parse("1,5") is Error(NumberParseError.InvalidFormat), "Invariant overload remains unchanged")
+    _ = Assert.True(Int32.Parse("12,34", invariant) is Failure(NumberParseError.InvalidFormat), "Int32 rejects 12,34")?
+    _ = Assert.True(Int32.Parse("1234,567", invariant) is Failure(NumberParseError.InvalidFormat), "Int32 rejects 1234,567")?
+    _ = Assert.True(Int32.Parse("1,,234", invariant) is Failure(NumberParseError.InvalidFormat), "Int32 rejects 1,,234")?
+    _ = Assert.True(Int32.Parse("1,234,", invariant) is Failure(NumberParseError.InvalidFormat), "Int32 rejects 1,234,")?
+    _ = Assert.True(Int32.Parse("1 23", swedish) is Failure(NumberParseError.InvalidFormat), "Int32 rejects 1 23")?
+    _ = Assert.True(Int32.Parse("1.234", swedish) is Failure(NumberParseError.InvalidFormat), "Int32 rejects 1.234")?
+    _ = Assert.True(Int32.Parse("1,0", swedish) is Failure(NumberParseError.InvalidFormat), "Int32 rejects 1,0")?
+    _ = Assert.True(Double.Parse("1,234.5", swedish) is Failure(NumberParseError.InvalidFormat), "Double rejects 1,234.5")?
+    _ = Assert.True(Double.Parse("1,23", invariant) is Failure(NumberParseError.InvalidFormat), "Double rejects 1,23")?
+    _ = Assert.True(Double.Parse("1,234.5,678", invariant) is Failure(NumberParseError.InvalidFormat), "Double rejects 1,234.5,678")?
+    _ = Assert.True(Double.Parse("1 234,5 6", swedish) is Failure(NumberParseError.InvalidFormat), "Double rejects 1 234,5 6")?
+    _ = Assert.True(Double.Parse(" 1,5", swedish) is Failure(NumberParseError.InvalidFormat), "Double rejects  1,5")?
+    _ = Assert.True(Byte.Parse("256", invariant) is Failure(NumberParseError.Overflow), "Byte rejects 256")?
+    _ = Assert.True(UInt64.Parse("18 446 744 073 709 551 616", swedish) is Failure(NumberParseError.Overflow), "UInt64 rejects 18 446 744 073 709 551 616")?
+    _ = Assert.True(Single.Parse("1,0e99", swedish) is Failure(NumberParseError.Overflow), "Single rejects 1,0e99")?
+    return Assert.True(Double.Parse("1,5") is Failure(NumberParseError.InvalidFormat), "Invariant overload remains unchanged")
 }

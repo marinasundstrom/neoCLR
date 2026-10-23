@@ -27,9 +27,9 @@ async func Main(arguments: string[]) -> Task<()> {
                 Check(buffer[0] == 77 && buffer[1] == 120 && buffer[2] == 99)
             }
         } else {
-            Check(result is Error(HttpError.Content(StreamError.InvalidData)))
+            Check(result is Failure(HttpError.Content(StreamError.InvalidData)))
         }
-        Check((await response.Content.CopyTo(destination)) is Error(HttpError.InvalidRequest(_)))
+        Check((await response.Content.CopyTo(destination)) is Failure(HttpError.InvalidRequest(_)))
         destination.Close()
         response.Dispose()
         Console.WriteLine("CASE")

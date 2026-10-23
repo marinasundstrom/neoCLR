@@ -130,15 +130,15 @@ ldarg arg0
 call instance System.Result.Ok<T0>::get_Value()
 ret
 .end
-.function neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion25<T0,T1>(System.Result<T0,T1>& arg0,out(true) System.Result.Error<T1>& arg1) -> Boolean
+.function neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion25<T0,T1>(System.Result<T0,T1>& arg0,out(true) System.Result.Failure<T1>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Result<T0,T1>::TryGetValue(System.Result.Error<T1>&)
+call instance System.Result<T0,T1>::TryGetValue(System.Result.Failure<T1>&)
 ret
 .end
-.function neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion26<T1>(System.Result.Error<T1>& arg0) -> T1
+.function neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion26<T1>(System.Result.Failure<T1>& arg0) -> T1
 ldarg arg0
-call instance System.Result.Error<T1>::get_Value()
+call instance System.Result.Failure<T1>::get_Value()
 ret
 .end
 .function neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion27<T2>(T2 arg0) -> System.Result.Ok<T2>
@@ -151,14 +151,14 @@ ldarg arg0
 newobj instance System.Result<T2,T1>::.ctor(System.Result.Ok<T2>)
 ret
 .end
-.function neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion29<T1>(T1 arg0) -> System.Result.Error<T1>
+.function neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion29<T1>(T1 arg0) -> System.Result.Failure<T1>
 ldarg arg0
-newobj instance System.Result.Error<T1>::.ctor(T1)
+newobj instance System.Result.Failure<T1>::.ctor(T1)
 ret
 .end
-.function neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion30<T1,T2>(System.Result.Error<T1> arg0) -> System.Result<T2,T1>
+.function neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion30<T1,T2>(System.Result.Failure<T1> arg0) -> System.Result<T2,T1>
 ldarg arg0
-newobj instance System.Result<T2,T1>::.ctor(System.Result.Error<T1>)
+newobj instance System.Result<T2,T1>::.ctor(System.Result.Failure<T1>)
 ret
 .end
 .function neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeBooleanFromInt32(Int32 value) -> Boolean
@@ -1800,7 +1800,7 @@ ret
 .local System.Result<T0,T1> local7
 .local System.Result.Ok<T0> local8
 .local System.Result<T0,T1> local9
-.local System.Result.Error<T1> local10
+.local System.Result.Failure<T1> local10
 .local System.Option<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>> local11
 .local System.Option.Some<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>> local12
 .local System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>> local13
@@ -1822,7 +1822,7 @@ initobj System.Result.Ok<T0>
 ldloca local9
 initobj System.Result<T0,T1>
 ldloca local10
-initobj System.Result.Error<T1>
+initobj System.Result.Failure<T1>
 ldloca local11
 initobj System.Option<System.Concurrency.Tasks.TaskOutcome<System.Result<T0,T1>>>
 ldloca local12
@@ -1945,19 +1945,19 @@ stloc local9
 M00000033_IL_00c8:
 ldloca local10
 M00000033_IL_00ca:
-initobj System.Result.Error<T1>
+initobj System.Result.Failure<T1>
 M00000033_IL_00d0:
 ldloca local9
 M00000033_IL_00d2:
 ldloca local10
 M00000033_IL_00d4:
-call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion25<T0,T1>(System.Result<T0,T1>&,System.Result.Error<T1>&)
+call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion25<T0,T1>(System.Result<T0,T1>&,System.Result.Failure<T1>&)
 M00000033_IL_00d9:
 brfalse M00000033_IL_00f2
 M00000033_IL_00de:
 ldloca local10
 M00000033_IL_00e0:
-call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion26<T1>(System.Result.Error<T1>&)
+call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion26<T1>(System.Result.Failure<T1>&)
 M00000033_IL_00e5:
 stloc local2
 M00000033_IL_00e6:
@@ -1975,7 +1975,7 @@ ldloc local2
 M00000033_IL_00ff:
 call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion29<T1>(T1)
 M00000033_IL_0104:
-call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion30<T1,T2>(System.Result.Error<T1>)
+call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeUnion30<T1,T2>(System.Result.Failure<T1>)
 M00000033_IL_0109:
 callvirt instance System.Concurrency.Tasks.Promise<System.Result<T2,T1>>::Complete(System.Result<T2,T1>)
 call neoCLR.Library.System.Concurrency.Tasks.Task.RuntimeBooleanToInt32(Boolean)

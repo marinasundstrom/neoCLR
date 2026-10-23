@@ -8,7 +8,7 @@ public union Result<T, E>: Propagatable<Result<T, E>, T, E> {
     case Ok(T)
 
     /// Represents an error result.
-    case Error(E)
+    case Failure(E)
 
     /// Attempts to extract the successful output used by the propagation protocol.
     func TryGetOutput(out output: T) -> bool {
@@ -23,7 +23,7 @@ public union Result<T, E>: Propagatable<Result<T, E>, T, E> {
     /// Attempts to extract the residual used by the propagation protocol.
     func TryGetResidual(out residual: E) -> bool {
         residual = default
-        if self is Error(let error) {
+        if self is Failure(let error) {
             residual = error
             return true
         }
@@ -31,6 +31,6 @@ public union Result<T, E>: Propagatable<Result<T, E>, T, E> {
     }
 
     /// Constructs an error result from a propagated residual.
-    static func FromResidual(residual: E) -> Result<T, E> => Error(residual)
+    static func FromResidual(residual: E) -> Result<T, E> => Failure(residual)
 
 }

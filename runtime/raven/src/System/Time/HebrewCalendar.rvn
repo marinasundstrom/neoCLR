@@ -77,10 +77,10 @@ internal class HebrewCalendar : CalendarRules {
 
     func IsLeapYear(year: int) -> Result<bool, InvalidDateError> {
         if year < MinYear {
-            return Error(InvalidDateError())
+            return Failure(InvalidDateError())
         }
         if year > MaxYear {
-            return Error(InvalidDateError())
+            return Failure(InvalidDateError())
         }
         return Ok(HebrewLeap(year))
     }
@@ -96,10 +96,10 @@ internal class HebrewCalendar : CalendarRules {
     func GetDaysInMonth(year: int, month: int) -> Result<int, InvalidDateError> {
         let count = GetMonthsInYear(year)?
         if month < 1 {
-            return Error(InvalidDateError())
+            return Failure(InvalidDateError())
         }
         if month > count {
-            return Error(InvalidDateError())
+            return Failure(InvalidDateError())
         }
         return Ok(HebrewMonthDays(year, month))
     }
@@ -107,10 +107,10 @@ internal class HebrewCalendar : CalendarRules {
     func CreateDate(year: int, month: int, day: int) -> Result<Date, InvalidDateError> {
         let days = GetDaysInMonth(year, month)?
         if day < 1 {
-            return Error(InvalidDateError())
+            return Failure(InvalidDateError())
         }
         if day > days {
-            return Error(InvalidDateError())
+            return Failure(InvalidDateError())
         }
         var number = HebrewStart(year) + day - 1
         var current = 1
@@ -123,10 +123,10 @@ internal class HebrewCalendar : CalendarRules {
 
     func GetYear(date: Date) -> Result<int, InvalidDateError> {
         if date.DayNumber < HebrewStart(5344) {
-            return Error(InvalidDateError())
+            return Failure(InvalidDateError())
         }
         if date.DayNumber >= HebrewStart(6000) {
-            return Error(InvalidDateError())
+            return Failure(InvalidDateError())
         }
         var year = date.Year + 3760
         if date.DayNumber >= HebrewStart(year + 1) {
@@ -165,16 +165,16 @@ internal class HebrewCalendar : CalendarRules {
         var year = GetYear(date)?
         // More than 9000 months cannot fit within the supported Hebrew range.
         if months < -9000 {
-            return Error(InvalidDateError())
+            return Failure(InvalidDateError())
         }
         if months > 9000 {
-            return Error(InvalidDateError())
+            return Failure(InvalidDateError())
         }
         var month = GetMonth(date)? + months
         while month < 1 {
             year = year - 1
             if year < MinYear {
-                return Error(InvalidDateError())
+                return Failure(InvalidDateError())
             }
             month = month + HebrewMonthCount(year)
         }
@@ -182,7 +182,7 @@ internal class HebrewCalendar : CalendarRules {
             month = month - HebrewMonthCount(year)
             year = year + 1
             if year > MaxYear {
-                return Error(InvalidDateError())
+                return Failure(InvalidDateError())
             }
         }
         var day = GetDay(date)?
@@ -197,10 +197,10 @@ internal class HebrewCalendar : CalendarRules {
     func AddYears(date: Date, years: int) -> Result<Date, InvalidDateError> {
         let year = GetYear(date)?
         if years < -655 {
-            return Error(InvalidDateError())
+            return Failure(InvalidDateError())
         }
         if years > 655 {
-            return Error(InvalidDateError())
+            return Failure(InvalidDateError())
         }
         let resultYear = year + years
         let count = GetMonthsInYear(resultYear)?

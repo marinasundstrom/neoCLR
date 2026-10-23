@@ -18,7 +18,7 @@ static class UnionImport
     const string None = "System.Option.None";
     const string Carrier = "System.Result<Int32,System.OverflowError>";
     const string Ok = "System.Result.Ok<Int32>";
-    const string Error = "System.Result.Error<System.OverflowError>";
+    const string Error = "System.Result.Failure<System.OverflowError>";
     sealed record Slot(string Type, int Local = -1, int ConditionalOut = -1, int Argument = -1, MethodDefinition? Function = null, bool VirtualFunction = false, string? FunctionReceiver = null, GenericInstanceMethod? GenericFunction = null, MethodReference? ConstructedFunction = null, ApplicationTypes.FieldShape? ConstructorField = null);
     sealed record State(List<Slot> Stack, bool[] Assigned);
     sealed record Call(string Name, string[] Arguments, string Result, int OutArgument = -1, string? Instruction = null, bool ConditionalOutput = false, int[]? Outputs = null);
@@ -1194,7 +1194,7 @@ static class UnionImport
         "System.Option/None" when type.IsValueType => None,
         "System.Result`2<System.Int32,System.OverflowError>" when type.IsValueType => Carrier,
         "System.Result/Ok`1<System.Int32>" when type.IsValueType => Ok,
-        "System.Result/Error`1<System.OverflowError>" when type.IsValueType => Error,
+        "System.Result/Failure`1<System.OverflowError>" when type.IsValueType => Error,
         _ => throw new InvalidDataException("Unsupported Result profile type: " + type.FullName)
     };
     static bool Converts(string source, string target) => source == "FaultNull" && (target == "System.Object" || CancellationBindings.IsReference(target) || ApplicationTypes.IsReference(target)) || source != target && target == "System.Object" && ManagedArrayBindings.IsReference(source) || ApplicationTypes.IsLibraryUnion(target) && source == target + "&" || InterfaceBindings.Converts(source, target) || BooleanBindings.Converts(source, target) || EnumBindings.Converts(source, target);
@@ -1297,7 +1297,7 @@ static class UnionImport
         {
             if (key == "System.Boolean System.Result`2::TryGetValue(System.Result/Ok`1<T>&)" && reference.Parameters[0].ParameterType.FullName == "System.Result/Ok`1<!0>&")
                 return new("RuntimeTryOk", [Carrier + "&", Ok + "&"], "Int32", 1);
-            if (key == "System.Boolean System.Result`2::TryGetValue(System.Result/Error`1<E>&)" && reference.Parameters[0].ParameterType.FullName == "System.Result/Error`1<!1>&")
+            if (key == "System.Boolean System.Result`2::TryGetValue(System.Result/Failure`1<E>&)" && reference.Parameters[0].ParameterType.FullName == "System.Result/Failure`1<!1>&")
                 return new("RuntimeTryError", [Carrier + "&", Error + "&"], "Int32", 1);
         }
         if (reference.DeclaringType.FullName == "System.Result`2<System.Void,System.OverflowError>" && reference.HasThis
@@ -1306,7 +1306,7 @@ static class UnionImport
         {
             if (key == "System.Boolean System.Result`2::TryGetValue(System.Result/Ok`1<T>&)" && reference.Parameters[0].ParameterType.FullName == "System.Result/Ok`1<!0>&")
                 return new("RuntimeTryVoidOk", [VoidResult + "&", VoidOk + "&"], "Int32", 1);
-            if (key == "System.Boolean System.Result`2::TryGetValue(System.Result/Error`1<E>&)" && reference.Parameters[0].ParameterType.FullName == "System.Result/Error`1<!1>&")
+            if (key == "System.Boolean System.Result`2::TryGetValue(System.Result/Failure`1<E>&)" && reference.Parameters[0].ParameterType.FullName == "System.Result/Failure`1<!1>&")
                 return new("RuntimeTryVoidError", [VoidResult + "&", Error + "&"], "Int32", 1);
         }
         if (reference.DeclaringType.FullName == "System.Result/Ok`1<System.Int32>" && reference.HasThis

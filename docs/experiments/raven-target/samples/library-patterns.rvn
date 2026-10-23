@@ -6,7 +6,7 @@ import System.Result.*
 func Magnitude(value: int) -> int {
     return match Math.Abs(value) {
         Ok(let amount) => amount
-        Error(_) => -1
+        Failure(_) => -1
     }
 }
 

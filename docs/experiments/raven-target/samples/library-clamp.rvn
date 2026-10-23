@@ -10,7 +10,7 @@ func ClampInput(value: int, min: int, max: int) -> Result<int, InvalidRangeError
 func ShowClamp(result: Result<int, InvalidRangeError>) {
     match result {
         .Ok(let ok) => WriteLine(ok)
-        .Error(let error) => WriteLine("Invalid range")
+        .Failure(let error) => WriteLine("Invalid range")
     }
 }
 

@@ -49,20 +49,20 @@ public extension SequenceAccess<T> for Sequence<T> {
             var skipped = 0
             while skipped < bounds.Item1 {
                 if !iterator.MoveNext() {
-                    return Error(InvalidRangeError())
+                    return Failure(InvalidRangeError())
                 }
                 skipped += 1
             }
             var copied = 0
             while copied < bounds.Item2 {
                 if !iterator.MoveNext() {
-                    return Error(InvalidRangeError())
+                    return Failure(InvalidRangeError())
                 }
                 result[copied] = iterator.Current
                 copied += 1
             }
             return Ok(result)
         }
-        return Error(InvalidRangeError())
+        return Failure(InvalidRangeError())
     }
 }

@@ -48,7 +48,7 @@ async func Main() -> Task<int> {
     if await client.Send(source.Slice(4)) is not Ok(0) { return 10 }
     if await peer.Receive(destination.Slice(4)) is not Ok(0) { return 11 }
     let expired = NetworkDeadline.Expired
-    if await peer.ReceiveUntil(destination, expired, CancellationToken.None) is not Error(SocketError.TimedOut) { return 12 }
+    if await peer.ReceiveUntil(destination, expired, CancellationToken.None) is not Failure(SocketError.TimedOut) { return 12 }
     let cancellation = CancellationTokenSource()
     let cancelled = peer.Receive(destination.Slice(1, 2), cancellation.Token)
     let observer = CancellationObserver(cancelled)
@@ -68,7 +68,7 @@ async func Main() -> Task<int> {
     client.Close()
     if await peer.Receive(destination) is not Ok(0) { return 16 }
     peer.Close()
-    if await peer.Receive(destination) is not Error(SocketError.Closed) { return 17 }
+    if await peer.Receive(destination) is not Failure(SocketError.Closed) { return 17 }
     Console.WriteLine("PASS socket memory windows, snapshots, GC, cancellation and EOF")
     return 0
 }

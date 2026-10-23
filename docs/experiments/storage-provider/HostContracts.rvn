@@ -19,10 +19,10 @@ func Main() {
                 System.Fail("Mixed snapshot lost its interface branches")
             }
         }
-        Error(let error) => System.Fail(error.ToString())
+        Failure(let error) => System.Fail(error.ToString())
     }
     match root.GetItems(1) {
-        Error(let error) => {
+        Failure(let error) => {
             if !(error is System.Storage.StorageLookupError.LimitExceeded) {
                 System.Fail("Over-bound listing changed error")
             }
@@ -30,7 +30,7 @@ func Main() {
         Ok(_) => System.Fail("Listing silently truncated")
     }
     match root.GetItems(-1) {
-        Error(let error) => {
+        Failure(let error) => {
             if !(error is System.Storage.StorageLookupError.InvalidRange) {
                 System.Fail("Invalid listing bound changed error")
             }
@@ -45,10 +45,10 @@ func Main() {
                         System.Fail("Empty directory contains items")
                     }
                 }
-                Error(let error) => System.Fail(error.ToString())
+                Failure(let error) => System.Fail(error.ToString())
             }
         }
-        Error(let error) => System.Fail(error.ToString())
+        Failure(let error) => System.Fail(error.ToString())
     }
     match root.GetDirectory(RequirePath("a-dir")) {
         Ok(let child) => {
@@ -56,7 +56,7 @@ func Main() {
                 System.Fail("Relative directory traversal changed path")
             }
         }
-        Error(let error) => System.Fail(error.ToString())
+        Failure(let error) => System.Fail(error.ToString())
     }
     match root.GetItem(RequirePath("z.txt")) {
         Ok(let item) => {
@@ -64,10 +64,10 @@ func Main() {
                 System.Fail("Relative generic lookup changed item")
             }
         }
-        Error(let error) => System.Fail(error.ToString())
+        Failure(let error) => System.Fail(error.ToString())
     }
     match root.GetDirectory(RequirePath("/a-dir")) {
-        Error(let error) => {
+        Failure(let error) => {
             if !(error is System.Storage.StorageLookupError.InvalidPath) {
                 System.Fail("Absolute child lookup changed error")
             }

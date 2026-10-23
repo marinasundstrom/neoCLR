@@ -17,7 +17,7 @@ func RouteCaptures() -> Result<unit, TestFailure> {
         return Assert.True(false, "Named capture must exist")
     }
     _ = Assert.True(values.GetInt32("stationId") is Ok(42), "Typed capture")?
-    return Assert.True(values.Get("missing") is Error(_), "Missing capture reports failure")
+    return Assert.True(values.Get("missing") is Failure(_), "Missing capture reports failure")
 }
 
 [Test("Route matching preserves case segment and trailing-slash distinctions")]
@@ -35,7 +35,7 @@ func RouteAbsence() -> Result<unit, TestFailure> {
 func RouteInvalidTargets() -> Result<unit, TestFailure> {
     let pattern = RequiredPattern("/stations/{stationId}/reports")?
     for target in ["/elsewhere/%ZZ", "stations/42/reports", "/stations/%2f/reports", "/stations/%5C/reports", "/stations/%00/reports", "/stations/%ff/reports", "/stations/%/reports", "/stations/%GG/reports", "/stations/42/reports#fragment"] {
-        _ = Assert.True(pattern.Match(target) is Error(_), "Invalid target must report failure: " + target)?
+        _ = Assert.True(pattern.Match(target) is Failure(_), "Invalid target must report failure: " + target)?
     }
     return Assert.True(true, "Malformed targets rejected")
 }
@@ -43,7 +43,7 @@ func RouteInvalidTargets() -> Result<unit, TestFailure> {
 [Test("Route parsing rejects malformed and unsupported pattern syntax")]
 func RouteInvalidPatterns() -> Result<unit, TestFailure> {
     for text in ["relative", "/{id}/{id}", "/{id", "/{}", "/{1id}", "/{id?}", "/{id:int}", "/x{id}", "/a?b", "/a#b", "/%ZZ"] {
-        _ = Assert.True(RoutePattern.Parse(text) is Error(_), "Invalid pattern must report failure: " + text)?
+        _ = Assert.True(RoutePattern.Parse(text) is Failure(_), "Invalid pattern must report failure: " + text)?
     }
     return Assert.True(true, "Malformed patterns rejected")
 }
@@ -67,7 +67,7 @@ func RouteIntegerBounds() -> Result<unit, TestFailure> {
     }
     for text in ["abc", "2147483648", "1.5"] {
         let values = RequiredMatch(pattern, "/stations/" + text + "/reports")?
-        _ = Assert.True(values.GetInt32("stationId") is Error(_), "Matched text with invalid integer fails conversion")?
+        _ = Assert.True(values.GetInt32("stationId") is Failure(_), "Matched text with invalid integer fails conversion")?
     }
     return Assert.True(true, "Integer conversions checked")
 }
@@ -82,8 +82,8 @@ func RouteSegmentLimit() -> Result<unit, TestFailure> {
     }
     let pattern = RequiredPattern(text)?
     _ = Assert.True(pattern.Match(text) is Ok(Some(_)), "Exact segment quota matches")?
-    _ = Assert.True(RoutePattern.Parse(text + "/a") is Error(_), "Pattern segment overflow")?
-    return Assert.True(pattern.Match(text + "/a") is Error(_), "Target segment overflow")
+    _ = Assert.True(RoutePattern.Parse(text + "/a") is Failure(_), "Pattern segment overflow")?
+    return Assert.True(pattern.Match(text + "/a") is Failure(_), "Target segment overflow")
 }
 
 [Test("Route byte quotas admit the boundary and reject one extra byte")]
@@ -98,22 +98,22 @@ func RouteByteLimit() -> Result<unit, TestFailure> {
     }
     let pattern = RequiredPattern(text)?
     _ = Assert.True(pattern.Match(text) is Ok(Some(_)), "Exact UTF-8 byte quota matches")?
-    _ = Assert.True(RoutePattern.Parse(text + "a") is Error(_), "Pattern byte overflow")?
-    return Assert.True(pattern.Match(text + "a") is Error(_), "Target byte overflow")
+    _ = Assert.True(RoutePattern.Parse(text + "a") is Failure(_), "Pattern byte overflow")?
+    return Assert.True(pattern.Match(text + "a") is Failure(_), "Target byte overflow")
 }
 
 func RequiredPattern(text: string) -> Result<RoutePattern, TestFailure> {
     if RoutePattern.Parse(text) is Ok(let pattern) {
         return Ok(pattern)
     }
-    return Error(TestFailure("Expected valid route pattern", text, "parse failure"))
+    return Failure(TestFailure("Expected valid route pattern", text, "parse failure"))
 }
 
 func RequiredMatch(pattern: RoutePattern, target: string) -> Result<RouteMatch, TestFailure> {
     if pattern.Match(target) is Ok(Some(let values)) {
         return Ok(values)
     }
-    return Error(TestFailure("Expected route match", target, "absent or invalid"))
+    return Failure(TestFailure("Expected route match", target, "absent or invalid"))
 }
 
 func CapturedName(pattern: RoutePattern, target: string, expected: string) -> Result<unit, TestFailure> {

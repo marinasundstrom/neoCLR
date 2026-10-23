@@ -37,11 +37,11 @@ public static class Encodings {
 internal class Utf8Encoding : Encoding {
     func Decode(bytes: ReadOnlySlice<byte>) -> Result<string, EncodingError> {
         if bytes.Length > 65536 {
-            return Error(EncodingError.LimitExceeded)
+            return Failure(EncodingError.LimitExceeded)
         }
         return match Utf8.Decode(bytes) {
             Ok(let text) => Ok(text)
-            Error(_) => Error(EncodingError.InvalidUtf8)
+            Failure(_) => Failure(EncodingError.InvalidUtf8)
         }
     }
 
@@ -50,7 +50,7 @@ internal class Utf8Encoding : Encoding {
     }
     func Encode(text: string) -> Result<Sequence<byte>, EncodingError> {
         if text.GetUtf8ByteCount() > 65536 {
-            return Error(EncodingError.LimitExceeded)
+            return Failure(EncodingError.LimitExceeded)
         }
         return Ok(Utf8.Encode(text))
     }
@@ -62,18 +62,18 @@ internal class Utf8Encoding : Encoding {
 internal class AsciiEncoding : Encoding {
     func Decode(bytes: ReadOnlySlice<byte>) -> Result<string, EncodingError> {
         if bytes.Length > 65536 {
-            return Error(EncodingError.LimitExceeded)
+            return Failure(EncodingError.LimitExceeded)
         }
         var index = 0
         while index < bytes.Length {
             if bytes[index] > 127 {
-                return Error(EncodingError.InvalidData)
+                return Failure(EncodingError.InvalidData)
             }
             index += 1
         }
         return match Utf8.Decode(bytes) {
             Ok(let text) => Ok(text)
-            Error(_) => Error(EncodingError.InvalidData)
+            Failure(_) => Failure(EncodingError.InvalidData)
         }
     }
 
@@ -82,12 +82,12 @@ internal class AsciiEncoding : Encoding {
     }
     func Encode(text: string) -> Result<Sequence<byte>, EncodingError> {
         if text.GetUtf8ByteCount() > 65536 {
-            return Error(EncodingError.LimitExceeded)
+            return Failure(EncodingError.LimitExceeded)
         }
         let bytes = Utf8.Encode(text)
         for value in bytes {
             if value > 127 {
-                return Error(EncodingError.UnrepresentableText)
+                return Failure(EncodingError.UnrepresentableText)
             }
         }
         return Ok(bytes)
@@ -105,11 +105,11 @@ internal class Utf8Decoder : Decoder {
 
     func Decode(source: ReadOnlySlice<byte>, final: bool) -> Result<string, EncodingError> {
         if stopped {
-            return Error(EncodingError.Finished)
+            return Failure(EncodingError.Finished)
         }
         let count = source.Length
         if count > 65536 {
-            return Error(EncodingError.LimitExceeded)
+            return Failure(EncodingError.LimitExceeded)
         }
         let output = ArrayList<byte>(count + 3)
         var index = 0
@@ -126,11 +126,11 @@ internal class Utf8Decoder : Decoder {
                     width = 4
                 } else {
                     stopped = true
-                    return Error(EncodingError.InvalidUtf8)
+                    return Failure(EncodingError.InvalidUtf8)
                 }
             } else if !(value >= 128 && value <= 191) {
                 stopped = true
-                return Error(EncodingError.InvalidUtf8)
+                return Failure(EncodingError.InvalidUtf8)
             }
             carry[pending] = value
             pending += 1
@@ -145,14 +145,14 @@ internal class Utf8Decoder : Decoder {
         if final {
             stopped = true
             if pending != 0 {
-                return Error(EncodingError.InvalidUtf8)
+                return Failure(EncodingError.InvalidUtf8)
             }
         }
         return match Utf8.Decode(output) {
             Ok(let text) => Ok(text)
-            Error(_) => {
+            Failure(_) => {
                 stopped = true
-                Error(EncodingError.InvalidUtf8)
+                Failure(EncodingError.InvalidUtf8)
             }
         }
     }
@@ -163,11 +163,11 @@ internal class AsciiDecoder : Decoder {
 
     func Decode(source: ReadOnlySlice<byte>, final: bool) -> Result<string, EncodingError> {
         if stopped {
-            return Error(EncodingError.Finished)
+            return Failure(EncodingError.Finished)
         }
         let count = source.Length
         if count > 65536 {
-            return Error(EncodingError.LimitExceeded)
+            return Failure(EncodingError.LimitExceeded)
         }
         let bytes = ArrayList<byte>(count)
         var index = 0
@@ -175,7 +175,7 @@ internal class AsciiDecoder : Decoder {
             let value = source[index]
             if value > 127 {
                 stopped = true
-                return Error(EncodingError.InvalidData)
+                return Failure(EncodingError.InvalidData)
             }
             bytes.Add(value)
             index += 1
@@ -185,7 +185,7 @@ internal class AsciiDecoder : Decoder {
         }
         return match Utf8.Decode(bytes) {
             Ok(let text) => Ok(text)
-            Error(_) => Error(EncodingError.InvalidData)
+            Failure(_) => Failure(EncodingError.InvalidData)
         }
     }
 }
@@ -210,13 +210,13 @@ internal class TextEncoder : Encoder {
 
     func Accept(text: string, final: bool) -> Result<unit, EncodingError> {
         if finished || ending {
-            return Error(EncodingError.Finished)
+            return Failure(EncodingError.Finished)
         }
         if pending {
-            return Error(EncodingError.Busy)
+            return Failure(EncodingError.Busy)
         }
         if text.GetUtf8ByteCount() > 65536 {
-            return Error(EncodingError.LimitExceeded)
+            return Failure(EncodingError.LimitExceeded)
         }
         // Validate restricted encodings before acceptance or any destination write.
         if ascii {
@@ -225,7 +225,7 @@ internal class TextEncoder : Encoder {
                 let part = ScalarChunk(text, position)
                 match policy.Encode(part) {
                     Ok(_) => { }
-                    Error(_) => return Error(EncodingError.UnrepresentableText)
+                    Failure(_) => return Failure(EncodingError.UnrepresentableText)
                 }
                 position += part.GetUtf8ByteCount()
             }
@@ -241,11 +241,11 @@ internal class TextEncoder : Encoder {
 
     func Drain(output: Slice<byte>) -> Result<EncoderProgress, EncodingError> {
         if finished {
-            return Error(EncodingError.Finished)
+            return Failure(EncodingError.Finished)
         }
         let count = output.Length
         if count > 65536 {
-            return Error(EncodingError.LimitExceeded)
+            return Failure(EncodingError.LimitExceeded)
         }
         if !pending {
             return Ok(EncoderProgress(0, EncoderState.Ready))
@@ -259,7 +259,7 @@ internal class TextEncoder : Encoder {
                 let part = ScalarChunk(text, sourceOffset)
                 bytes = match policy.Encode(part) {
                     Ok(let encoded) => encoded
-                    Error(_) => {
+                    Failure(_) => {
                         System.Fail("Validated text encoding failed")
                         ArrayList<byte>()
                     }
@@ -293,7 +293,7 @@ internal class TextEncoder : Encoder {
         while count > 0 {
             match text.SliceUtf8(start, count) {
                 Ok(let part) => return part
-                Error(_) => count -= 1
+                Failure(_) => count -= 1
             }
         }
         System.Fail("Invalid internal scalar boundary")

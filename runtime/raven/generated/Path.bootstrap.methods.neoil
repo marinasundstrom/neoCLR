@@ -122,7 +122,7 @@ call neoCLR.Library.System.Storage.Path.RuntimeErrorSystemStorageInvalidPathErro
 M00000007_IL_002d:
 call neoCLR.Library.System.Storage.Path.RuntimeUnion0(System.Storage.InvalidPathError)
 M00000007_IL_0032:
-call neoCLR.Library.System.Storage.Path.RuntimeUnion1(System.Result.Error<System.Storage.InvalidPathError>)
+call neoCLR.Library.System.Storage.Path.RuntimeUnion1(System.Result.Failure<System.Storage.InvalidPathError>)
 M00000007_IL_0037:
 ret
 M00000007_IL_0038:
@@ -156,7 +156,7 @@ call neoCLR.Library.System.Storage.Path.RuntimeErrorSystemStorageInvalidPathErro
 M00000007_IL_006a:
 call neoCLR.Library.System.Storage.Path.RuntimeUnion0(System.Storage.InvalidPathError)
 M00000007_IL_006f:
-call neoCLR.Library.System.Storage.Path.RuntimeUnion1(System.Result.Error<System.Storage.InvalidPathError>)
+call neoCLR.Library.System.Storage.Path.RuntimeUnion1(System.Result.Failure<System.Storage.InvalidPathError>)
 M00000007_IL_0074:
 ret
 M00000007_IL_0075:
@@ -227,7 +227,7 @@ call neoCLR.Library.System.Storage.Path.RuntimeErrorSystemStorageInvalidPathErro
 M00000007_IL_00e6:
 call neoCLR.Library.System.Storage.Path.RuntimeUnion0(System.Storage.InvalidPathError)
 M00000007_IL_00eb:
-call neoCLR.Library.System.Storage.Path.RuntimeUnion1(System.Result.Error<System.Storage.InvalidPathError>)
+call neoCLR.Library.System.Storage.Path.RuntimeUnion1(System.Result.Failure<System.Storage.InvalidPathError>)
 M00000007_IL_00f0:
 ret
 M00000007_IL_00f1:
@@ -274,7 +274,7 @@ call neoCLR.Library.System.Storage.Path.RuntimeErrorSystemStorageInvalidPathErro
 M00000007_IL_0139:
 call neoCLR.Library.System.Storage.Path.RuntimeUnion0(System.Storage.InvalidPathError)
 M00000007_IL_013e:
-call neoCLR.Library.System.Storage.Path.RuntimeUnion1(System.Result.Error<System.Storage.InvalidPathError>)
+call neoCLR.Library.System.Storage.Path.RuntimeUnion1(System.Result.Failure<System.Storage.InvalidPathError>)
 M00000007_IL_0143:
 ret
 M00000007_IL_0144:
@@ -308,7 +308,7 @@ call neoCLR.Library.System.Storage.Path.RuntimeErrorSystemStorageInvalidPathErro
 M00000007_IL_0176:
 call neoCLR.Library.System.Storage.Path.RuntimeUnion0(System.Storage.InvalidPathError)
 M00000007_IL_017b:
-call neoCLR.Library.System.Storage.Path.RuntimeUnion1(System.Result.Error<System.Storage.InvalidPathError>)
+call neoCLR.Library.System.Storage.Path.RuntimeUnion1(System.Result.Failure<System.Storage.InvalidPathError>)
 M00000007_IL_0180:
 ret
 M00000007_IL_0181:
@@ -342,7 +342,7 @@ call neoCLR.Library.System.Storage.Path.RuntimeErrorSystemStorageInvalidPathErro
 M00000007_IL_01b3:
 call neoCLR.Library.System.Storage.Path.RuntimeUnion0(System.Storage.InvalidPathError)
 M00000007_IL_01b8:
-call neoCLR.Library.System.Storage.Path.RuntimeUnion1(System.Result.Error<System.Storage.InvalidPathError>)
+call neoCLR.Library.System.Storage.Path.RuntimeUnion1(System.Result.Failure<System.Storage.InvalidPathError>)
 M00000007_IL_01bd:
 ret
 M00000007_IL_01be:

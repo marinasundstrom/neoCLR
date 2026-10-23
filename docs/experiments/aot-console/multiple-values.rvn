@@ -22,8 +22,8 @@ func Main() -> int {
         Console.WriteLine(unexpected)
         return 5
     }
-    let failure: Result<string, byte> = Error((byte)7)
-    let Error(code) = failure else {
+    let failure: Result<string, byte> = Failure((byte)7)
+    let Failure(code) = failure else {
         return 7
     }
     Console.WriteLine(code)

@@ -20,7 +20,7 @@ internal class TextReadSupport {
                 let present: Option<string> = Some(text)
                 Ok(present)
             }
-            Error(_) => Error(TextReadError.InvalidEncoding)
+            Failure(_) => Failure(TextReadError.InvalidEncoding)
         }
     }
 

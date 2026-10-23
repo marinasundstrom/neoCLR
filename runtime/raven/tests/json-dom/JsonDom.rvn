@@ -13,8 +13,8 @@ func JsonArrayBounds() -> Result<unit, TestFailure> {
     _ = Assert.True(array.Add(JsonBoolean(true)) is Ok(_), "Add array element")?
     _ = Assert.Equal(1, array.Count)?
     _ = Assert.True(array.Item(0) is Ok(JsonBoolean), "Read array element")?
-    _ = Assert.True(array.Item(-1) is Error(JsonError.InvalidIndex(-1)), "Negative index must preserve its value")?
-    return Assert.True(array.Item(1) is Error(JsonError.InvalidIndex(1)), "Past-end index must be rejected")
+    _ = Assert.True(array.Item(-1) is Failure(JsonError.InvalidIndex(-1)), "Negative index must preserve its value")?
+    return Assert.True(array.Item(1) is Failure(JsonError.InvalidIndex(1)), "Past-end index must be rejected")
 }
 
 [Test("JSON objects distinguish present null from missing fields")]
@@ -22,7 +22,7 @@ func JsonObjectNull() -> Result<unit, TestFailure> {
     let document = JsonObject()
     _ = Assert.True(document.Add("note", JsonNull()) is Ok(_), "Add explicit null")?
     _ = Assert.True(document.Field("note") is Ok(JsonNull), "Present null must remain a node")?
-    return Assert.True(document.Field("missing") is Error(JsonError.MissingField("missing")),
+    return Assert.True(document.Field("missing") is Failure(JsonError.MissingField("missing")),
         "Missing field must preserve its name")
 }
 
@@ -30,7 +30,7 @@ func JsonObjectNull() -> Result<unit, TestFailure> {
 func JsonObjectDuplicate() -> Result<unit, TestFailure> {
     let document = JsonObject()
     _ = Assert.True(document.Add("note", JsonNull()) is Ok(_), "Add original value")?
-    if document.Add("note", JsonBoolean(false)) is Error(JsonError.DuplicateField(let name)) {
+    if document.Add("note", JsonBoolean(false)) is Failure(JsonError.DuplicateField(let name)) {
         _ = Assert.Equal("note", name)?
     } else {
         return Assert.True(false, "Reject duplicate name")
@@ -62,7 +62,7 @@ func JsonNumberFraction() -> Result<unit, TestFailure> {
         return Assert.True(false, "Valid decimal must parse")
     }
     _ = Assert.Equal("22.5", number.Text)?
-    return Assert.True(number.AsInt32() is Error(JsonError.NumberOutOfRange), "Fraction must not silently truncate")
+    return Assert.True(number.AsInt32() is Failure(JsonError.NumberOutOfRange), "Fraction must not silently truncate")
 }
 
 [Test("JSON scalar nodes expose their typed values")]
@@ -74,7 +74,7 @@ func JsonScalarProperties() -> Result<unit, TestFailure> {
 
 [Test("JSON parsing rejects escaped aliases of duplicate names")]
 func JsonEscapedDuplicate() -> Result<unit, TestFailure> {
-    if JsonSerializer.DeserializeNode("{\"a\":1,\"\\u0061\":2}") is Error(JsonError.DuplicateField(let name)) {
+    if JsonSerializer.DeserializeNode("{\"a\":1,\"\\u0061\":2}") is Failure(JsonError.DuplicateField(let name)) {
         return Assert.Equal("a", name)
     }
     return Assert.True(false, "Escaped aliases must compare after decoding")
@@ -82,8 +82,8 @@ func JsonEscapedDuplicate() -> Result<unit, TestFailure> {
 
 [Test("JSON parsing rejects trailing commas and truncated input")]
 func JsonMalformed() -> Result<unit, TestFailure> {
-    _ = Assert.True(JsonSerializer.DeserializeNode("[1,]") is Error(_), "Trailing comma must fail")?
-    return Assert.True(JsonSerializer.DeserializeNode("[1,") is Error(_), "Truncated array must fail")
+    _ = Assert.True(JsonSerializer.DeserializeNode("[1,]") is Failure(_), "Trailing comma must fail")?
+    return Assert.True(JsonSerializer.DeserializeNode("[1,") is Failure(_), "Truncated array must fail")
 }
 
 [Test("JSON nested documents round trip with Unicode and number spelling")]
@@ -109,7 +109,7 @@ func JsonRootKinds() -> Result<unit, TestFailure> {
 func JsonCycle() -> Result<unit, TestFailure> {
     let cycle = JsonArray()
     _ = Assert.True(cycle.Add(cycle) is Ok(_), "Construct cycle for serialization validation")?
-    return Assert.True(JsonSerializer.SerializeNode(cycle) is Error(JsonError.LimitExceeded(_)), "Cycle must return a bounded serialization error")
+    return Assert.True(JsonSerializer.SerializeNode(cycle) is Failure(JsonError.LimitExceeded(_)), "Cycle must return a bounded serialization error")
 }
 
 func CheckJsonDocument(input: string, canonical: string) -> Result<unit, TestFailure> {
@@ -313,7 +313,7 @@ func JsonFormatting() -> Result<unit, TestFailure> {
     _ = Assert.Equal("\"hello\"", scalar)?
     let cycle = JsonArray()
     _ = cycle.Add(cycle)
-    _ = Assert.True(cycle.ToJsonString(options) is Error(JsonError.LimitExceeded(_)), "Reject cycles")?
+    _ = Assert.True(cycle.ToJsonString(options) is Failure(JsonError.LimitExceeded(_)), "Reject cycles")?
     let large = JsonArray()
     var text = ""
     for index in 0..1018 {
@@ -321,5 +321,5 @@ func JsonFormatting() -> Result<unit, TestFailure> {
     }
     _ = large.Add(JsonString(text))
     _ = Assert.True(large.ToJsonString() is Ok(_), "Compact fits the byte quota")?
-    return Assert.True(large.ToJsonString(options) is Error(JsonError.LimitExceeded(_)), "Indentation counts toward the byte quota")
+    return Assert.True(large.ToJsonString(options) is Failure(JsonError.LimitExceeded(_)), "Indentation counts toward the byte quota")
 }

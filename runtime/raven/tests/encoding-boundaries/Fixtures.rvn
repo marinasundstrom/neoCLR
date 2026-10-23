@@ -12,7 +12,7 @@ import System.Text.*
 class ExpandedEncoding : Encoding {
     func Decode(bytes: ReadOnlySlice<byte>) -> Result<string, EncodingError> {
         if bytes.Length > 65536 {
-            return Error(EncodingError.LimitExceeded)
+            return Failure(EncodingError.LimitExceeded)
         }
         if bytes.Length == 0 {
             return Ok("")
@@ -68,10 +68,10 @@ class FailedSink : OutputStream {
         if calls == 1 {
             return Ok(1)
         }
-        return Error(StreamError.AccessDenied)
+        return Failure(StreamError.AccessDenied)
     }
     private func FlushCore() -> Result<unit, StreamError> {
-        return Error(StreamError.IoFailure)
+        return Failure(StreamError.IoFailure)
     }
     func Close() { }
 
@@ -92,7 +92,7 @@ class FailedSink : OutputStream {
         while !(sent >= count) {
             let amount = WriteCore(buffer, offset + sent, count - sent)?
             if amount == 0 {
-                return Error(StreamError.IoFailure)
+                return Failure(StreamError.IoFailure)
             }
             sent += amount
         }
@@ -148,7 +148,7 @@ class CountingSink : OutputStream {
         while !(sent >= count) {
             let amount = WriteCore(buffer, offset + sent, count - sent)?
             if amount == 0 {
-                return Error(StreamError.IoFailure)
+                return Failure(StreamError.IoFailure)
             }
             sent += amount
         }

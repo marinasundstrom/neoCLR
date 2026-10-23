@@ -5,7 +5,7 @@ func Show(value: int) {
     let result = Math.Abs(value)
     if result is .Ok(let ok) {
         WriteLine(ok)
-    } else if result is .Error(let error) {
+    } else if result is .Failure(let error) {
         WriteLine("Overflow")
     }
 }

@@ -16,7 +16,7 @@ match System.Storage.Metadata.GetKind(".") {
             System.Fail("Directory metadata lost its kind")
         }
     }
-    Error(let error) => System.Fail(error.ToString())
+    Failure(let error) => System.Fail(error.ToString())
 }
 ```
 

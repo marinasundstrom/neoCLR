@@ -10,12 +10,12 @@ func Main() {
     WriteLine(ok.Value)
     match carrier {
         Ok(let value) => WriteLine(value)
-        Error(_) => Fail("Expected success")
+        Failure(_) => Fail("Expected success")
     }
     var some = Some("Before")
     some = Some("After")
     WriteLine(some.Value)
-    var error = Error("Original error")
-    error = Error("Updated error")
+    var error = Failure("Original error")
+    error = Failure("Updated error")
     WriteLine(error.Value)
 }

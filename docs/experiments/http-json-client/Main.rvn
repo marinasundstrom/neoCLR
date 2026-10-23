@@ -94,9 +94,9 @@ func JsonVerbs() {
     let malformed = HttpClient(ReplyHandler(200, "{", false)).GetFromJson<Report>("http://example.test/")
     let transport = ReplyHandler(200, "{}", true)
     let transportResult = HttpClient(transport).GetFromJson<Report>(uri)
-    _ = transport.Completion.Complete(Error(HttpError.TimedOut))
+    _ = transport.Completion.Complete(Failure(HttpError.TimedOut))
     TaskQueue.Default.Drain()
-    let Error(statusError) = rejection.GetResult() else {
+    let Failure(statusError) = rejection.GetResult() else {
         System.Fail("Status error missing")
     }
     if statusError is HttpError httpError {
@@ -107,7 +107,7 @@ func JsonVerbs() {
     } else {
         System.Fail("Status alternative missing")
     }
-    let Error(parseError) = malformed.GetResult() else {
+    let Failure(parseError) = malformed.GetResult() else {
         System.Fail("JSON error missing")
     }
     if parseError is JsonError jsonError {
@@ -115,7 +115,7 @@ func JsonVerbs() {
     } else {
         System.Fail("JSON alternative missing")
     }
-    let Error(transportError) = transportResult.GetResult() else {
+    let Failure(transportError) = transportResult.GetResult() else {
         System.Fail("Transport error missing")
     }
     if transportError is HttpError httpError {
@@ -139,7 +139,7 @@ func JsonVerbs() {
 
     let unsupported = ReplyHandler(200, "{}", false)
     let badModel = HttpClient(unsupported).PostAsJson("http://example.test/", (byte)42)
-    let Error(mappingError) = badModel.GetResult() else {
+    let Failure(mappingError) = badModel.GetResult() else {
         System.Fail("Mapping error missing")
     }
     if mappingError is JsonError jsonError {

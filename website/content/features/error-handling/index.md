@@ -8,7 +8,7 @@ of error handling in neoCLR's APIs.
 ## Describe outcomes with unions
 
 `Result<T, E>` is a union with two cases: `Ok(T)` carries the successful value and
-`Error(E)` carries the failure. `Option<T>` uses `Some(T)` and `None` when absence
+`Failure(E)` carries the failure. `Option<T>` uses `Some(T)` and `None` when absence
 is enough and there is no error to explain.
 
 The error type can itself be a union. FileReadError, for example, distinguishes

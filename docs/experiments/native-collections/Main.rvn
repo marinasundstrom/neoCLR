@@ -253,7 +253,7 @@ class Program {
             return false
         }
         let single = ObservedNumbers()
-        if single.Single() is not Error(SingleError.Multiple) || !Counts(single, 2, 1) {
+        if single.Single() is not Failure(SingleError.Multiple) || !Counts(single, 2, 1) {
             return false
         }
         let selectedFirst = ObservedNumbers()
@@ -286,7 +286,7 @@ class Program {
             return false
         }
         let multiple = ObservedNumbers()
-        if multiple.Single(value => value < 3) is not Error(SingleError.Multiple) || !Counts(multiple, 2, 2) {
+        if multiple.Single(value => value < 3) is not Failure(SingleError.Multiple) || !Counts(multiple, 2, 2) {
             return false
         }
         let noMatch = ObservedNumbers()

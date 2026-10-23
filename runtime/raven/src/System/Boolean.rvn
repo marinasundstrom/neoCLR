@@ -15,10 +15,10 @@ public struct Boolean : ComparableTo<bool>, EquatableTo<bool> {
         }
         let status = neoCLR.Runtime.UnpackValue<int>(payload)
         if status == 1 {
-            return Error(BooleanParseError.InvalidFormat())
+            return Failure(BooleanParseError.InvalidFormat())
         }
         System.Fail("invalid native parse status")
-        return Error(BooleanParseError.InvalidFormat())
+        return Failure(BooleanParseError.InvalidFormat())
     }
 
     /// Tests equality with another value of the same type without boxing.

@@ -26,22 +26,22 @@ internal class SqlParameters {
 
     private static func Named(text: string, owner: Object) -> Result<SqlStatement, SqlError> {
         if owner.GetType().IsArray || owner.GetType().GenericArgumentCount != 0 {
-            return Error(SqlError.Mapping("Expected a parameter object with readable properties"))
+            return Failure(SqlError.Mapping("Expected a parameter object with readable properties"))
         }
         let values = ArrayList<KeyValuePair<string, SqlValue>>()
         for property in owner.GetType().GetProperties() {
             if !property.IsStatic && property.GetGetMethod() is Some(_) {
                 if property.GetIndexParameters().Count != 0 {
-                    return Error(SqlError.Mapping("Indexed SQL parameter property: " + property.Name))
+                    return Failure(SqlError.Mapping("Indexed SQL parameter property: " + property.Name))
                 }
                 for existing in values {
                     if String.CompareOrdinal(existing.Key, property.Name) == 0 {
-                        return Error(SqlError.Mapping("Ambiguous SQL parameter: " + property.Name))
+                        return Failure(SqlError.Mapping("Ambiguous SQL parameter: " + property.Name))
                     }
                 }
                 let content = match property.GetValue(owner) {
                     Ok(let item) => item
-                    Error(_) => return Error(SqlError.Mapping("Cannot read parameter: " + property.Name))
+                    Failure(_) => return Failure(SqlError.Mapping("Cannot read parameter: " + property.Name))
                 }
                 values.Add(KeyValuePair<string, SqlValue>(property.Name, Convert(content)?))
             }
@@ -55,7 +55,7 @@ internal class SqlParameters {
         if present is int number { return Ok(SqlValue.Integer(number)) }
         if present is long wide { return Ok(SqlValue.Integer(wide)) }
         if present is bool flag { return Ok(SqlValue.Boolean(flag)) }
-        return Error(SqlError.Mapping("Unsupported SQL parameter type"))
+        return Failure(SqlError.Mapping("Unsupported SQL parameter type"))
     }
 }
 

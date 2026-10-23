@@ -50,10 +50,10 @@ class ProbeSink : OutputStream {
     val Flushes: int => flushes
     private func WriteCore(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
         if closed {
-            return Error(StreamError.Closed)
+            return Failure(StreamError.Closed)
         }
         if failAfter >= 0 && bytes.Count >= failAfter {
-            return Error(StreamError.AccessDenied)
+            return Failure(StreamError.AccessDenied)
         }
         if count == 0 {
             return Ok(0)
@@ -86,7 +86,7 @@ class ProbeSink : OutputStream {
         while !(sent >= count) {
             let amount = WriteCore(buffer, offset + sent, count - sent)?
             if amount == 0 {
-                return Error(StreamError.IoFailure)
+                return Failure(StreamError.IoFailure)
             }
             sent += amount
         }

@@ -27,7 +27,7 @@ async func Main(arguments: string[]) -> Task<()> {
         let connectClient = HttpClient()
         let connectResult = await connectClient.Send(ConnectRequest())
         connectClient.Dispose()
-        let Error(HttpError.Unsupported(_)) = connectResult else { System.Fail("CONNECT must not pretend to tunnel") }
+        let Failure(HttpError.Unsupported(_)) = connectResult else { System.Fail("CONNECT must not pretend to tunnel") }
         Console.WriteLine("PASS CONNECT remains unsupported")
         return
     }

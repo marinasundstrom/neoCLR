@@ -8,14 +8,14 @@ ret
 newobj instance System.OverflowError::.ctor()
 ret
 .end
-.function neoCLR.Library.System.Time.Instant.RuntimeUnion0(System.OverflowError arg0) -> System.Result.Error<System.OverflowError>
+.function neoCLR.Library.System.Time.Instant.RuntimeUnion0(System.OverflowError arg0) -> System.Result.Failure<System.OverflowError>
 ldarg arg0
-newobj instance System.Result.Error<System.OverflowError>::.ctor(System.OverflowError)
+newobj instance System.Result.Failure<System.OverflowError>::.ctor(System.OverflowError)
 ret
 .end
-.function neoCLR.Library.System.Time.Instant.RuntimeUnion1(System.Result.Error<System.OverflowError> arg0) -> System.Result<System.Time.Instant,System.OverflowError>
+.function neoCLR.Library.System.Time.Instant.RuntimeUnion1(System.Result.Failure<System.OverflowError> arg0) -> System.Result<System.Time.Instant,System.OverflowError>
 ldarg arg0
-newobj instance System.Result<System.Time.Instant,System.OverflowError>::.ctor(System.Result.Error<System.OverflowError>)
+newobj instance System.Result<System.Time.Instant,System.OverflowError>::.ctor(System.Result.Failure<System.OverflowError>)
 ret
 .end
 .function neoCLR.Library.System.Time.Instant.RuntimeUnion2(System.Time.Instant arg0) -> System.Result.Ok<System.Time.Instant>

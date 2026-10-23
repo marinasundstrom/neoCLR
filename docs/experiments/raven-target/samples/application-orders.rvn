@@ -55,7 +55,7 @@ func Process(store: OrderStore, id: int, limit: int) {
     if found is Some(let order) {
         match store.Save(order, limit) {
             .Ok => WriteLine(order.Status)
-            .Error(let failure) => {
+            .Failure(let failure) => {
                 if (failure is System.Storage.FileWriteError.TooLarge) {
                     WriteLine("Order report exceeds limit")
                 } else {
@@ -82,7 +82,7 @@ func Main() {
     WriteLine(second.Status)
     match FileText.ReadAllText("neoclr-orders.txt", 64) {
         Ok(let text) => WriteLine(text)
-        Error(let error) => WriteLine("Order report could not be read")
+        Failure(let error) => WriteLine("Order report could not be read")
     }
     let pendingNames = pending.Map((order: Order) -> string => order.Name).ToList()
     WriteLine("Pending orders")

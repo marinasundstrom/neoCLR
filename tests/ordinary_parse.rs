@@ -16,9 +16,9 @@ fn parse_returns_typed_cases_for_boundaries_format_and_overflow() {
     };
     let parse = resolve("System.Int32::Parse(String)");
     let ok = resolve("instance System.Result<Int32,System.Int32ParseError>::GetOkCase()");
-    let err = resolve("instance System.Result<Int32,System.Int32ParseError>::GetErrorCase()");
+    let err = resolve("instance System.Result<Int32,System.Int32ParseError>::GetFailureCase()");
     let ok_value = resolve("instance System.Result.Ok<Int32>::get_Value()");
-    let err_value = resolve("instance System.Result.Error<System.Int32ParseError>::get_Value()");
+    let err_value = resolve("instance System.Result.Failure<System.Int32ParseError>::get_Value()");
     for (text, expected) in [
         ("2147483647", i32::MAX),
         ("-2147483648", i32::MIN),

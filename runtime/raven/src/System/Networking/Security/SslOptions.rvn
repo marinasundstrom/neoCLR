@@ -18,7 +18,7 @@ public class SslClientAuthenticationOptions : Disposable {
         let options = SslClientAuthenticationOptions()
         let status = neoCLR.Runtime.TlsCreateClient(options.owner, trustPem, [])
         if status != 0 {
-            return Error(SslBuffers.Error(status))
+            return Failure(SslBuffers.Error(status))
         }
         return Ok(options)
     }
@@ -51,7 +51,7 @@ public class SslServerAuthenticationOptions : Disposable {
         let options = SslServerAuthenticationOptions()
         let status = neoCLR.Runtime.TlsCreateServer(options.owner, certificatePem, privateKeyPem, [])
         if status != 0 {
-            return Error(SslBuffers.Error(status))
+            return Failure(SslBuffers.Error(status))
         }
         return Ok(options)
     }

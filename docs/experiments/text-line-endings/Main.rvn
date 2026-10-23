@@ -82,7 +82,7 @@ func Check(condition: bool, message: string) {
 func Text(result: Result<string, TextReadError>, expected: string) {
     match result {
         Ok(let value) => Check(String.CompareOrdinal(value, expected) == 0, "Text bytes")
-        Error(let error) => System.Fail("Unexpected text error: " + error.ToString())
+        Failure(let error) => System.Fail("Unexpected text error: " + error.ToString())
     }
 }
 
@@ -123,7 +123,7 @@ async func Main() -> Task<unit> {
     pendingReader.NewLine = ""
     _ = pendingInput.Source.Complete(Ok(0))
     Check(await pendingLine is Ok(None), "Changed pending delimiter")
-    Check(await pendingReader.ReadLine(0) is Error(TextReadError.InvalidRange), "Next delimiter configuration")
+    Check(await pendingReader.ReadLine(0) is Failure(TextReadError.InvalidRange), "Next delimiter configuration")
 
     let exactInput = FragmentedInput("xéyéz", 1)
     let Ok(exact) = StreamReader.Create(exactInput) else {
@@ -138,7 +138,7 @@ async func Main() -> Task<unit> {
         System.Fail("Overlap reader")
     }
     overlap.NewLine = ""
-    Check(await overlap.ReadLine(8) is Error(TextReadError.InvalidRange), "Empty delimiter")
+    Check(await overlap.ReadLine(8) is Failure(TextReadError.InvalidRange), "Empty delimiter")
     Check(invalidInput.Reads == 0, "Invalid delimiter consumed input")
     overlap.NewLine = "aab"
     Check(await overlap.ReadLine(1) is Ok(Some("a")), "Overlapping delimiter prefixes")

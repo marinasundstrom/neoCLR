@@ -23,19 +23,19 @@ func Main() {
     if ok is Ok(let number) {
         WriteLine(number.CompareTo(42L))
     }
-    let error: Result<long, string> = Error("Failure")
+    let error: Result<long, string> = Failure("Failure")
     if error.IsErr {
         WriteLine("Error")
     }
-    if error is Error(let failure) {
+    if error is Failure(let failure) {
         WriteLine(failure)
     }
     if ok is Ok(let extracted) {
         WriteLine(extracted.CompareTo(42L))
     }
-    if error is Error(let residual) {
-        let restored: Result<long, string> = Error(residual)
-        if restored is Error(let restoredFailure) {
+    if error is Failure(let residual) {
+        let restored: Result<long, string> = Failure(residual)
+        if restored is Failure(let restoredFailure) {
             WriteLine(restoredFailure)
         }
     }

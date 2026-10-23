@@ -37,8 +37,8 @@
         newobj instance System.ConsoleReadError::.ctor(System.ConsoleReadError.ReadFailed)
         br WrapError
     WrapError:
-        newobj instance System.Result.Error<System.ConsoleReadError>::.ctor(System.ConsoleReadError)
-        newobj instance System.Result<System.Option<Byte>,System.ConsoleReadError>::.ctor(System.Result.Error<System.ConsoleReadError>)
+        newobj instance System.Result.Failure<System.ConsoleReadError>::.ctor(System.ConsoleReadError)
+        newobj instance System.Result<System.Option<Byte>,System.ConsoleReadError>::.ctor(System.Result.Failure<System.ConsoleReadError>)
         ret
     EndOfInput:
         pop

@@ -16,7 +16,7 @@ func Main() -> int {
         return 3
     }
     let ok: Result<int, int> = .Ok(2)
-    let error: Result<int, int> = .Error(7)
+    let error: Result<int, int> = .Failure(7)
     var residual = 0
     if !error.TryGetResidual(out residual) {
         return 4
@@ -30,7 +30,7 @@ func Main() -> int {
     }
     let right = match ok {
         .Ok(let value) => value
-        .Error(let failure) => 0
+        .Failure(let failure) => 0
     }
     let displayedOption: object = copy
     let displayedResult: object = error

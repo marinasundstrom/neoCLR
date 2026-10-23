@@ -15,7 +15,7 @@ func Url(host: string, port: int) -> string {
 
 func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
     if !request.IsSecure {
-        let error: Result<HttpResponse, HttpError> = Error(HttpError.Handler("Expected secure request"))
+        let error: Result<HttpResponse, HttpError> = Failure(HttpError.Handler("Expected secure request"))
         return Task.FromResult(error)
     }
     let response: Result<HttpResponse, HttpError> = Ok(HttpResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), HttpStringContent("recovered")))
@@ -32,11 +32,11 @@ async func RejectionAndRecovery(credentials: SslServerAuthenticationOptions, tru
     use client = HttpClient(HttpSocketHandler(trust))
     let rejected = server.ServeOne(Respond)
     // The fixture has DNS:localhost only. Trusting its issuer must not bypass name checking.
-    if let Error(HttpError.Tls(SslError.AuthenticationFailed)) = await client.Get(Url("127.0.0.1", port)) {
+    if let Failure(HttpError.Tls(SslError.AuthenticationFailed)) = await client.Get(Url("127.0.0.1", port)) {
     } else {
         return 12
     }
-    if let Error(_) = await rejected {
+    if let Failure(_) = await rejected {
     } else {
         return 13
     }
@@ -46,7 +46,7 @@ async func RejectionAndRecovery(credentials: SslServerAuthenticationOptions, tru
     if response.Content.Length != 9 { return 15 }
     let completed = await serving
     server.Close()
-    if let Error(_) = completed { return 16 }
+    if let Failure(_) = completed { return 16 }
     return 0
 }
 
@@ -65,7 +65,7 @@ async func ClientTimeout(trust: SslClientAuthenticationOptions) -> Task<int> {
     let result = await pending
     peer.Close()
     listener.Close()
-    if let Error(HttpError.TimedOut) = result { return 0 }
+    if let Failure(HttpError.TimedOut) = result { return 0 }
     return 23
 }
 
@@ -102,7 +102,7 @@ async func ServerDeadline(credentials: SslServerAuthenticationOptions) -> Task<i
     let result = await serving
     peer.Close()
     server.Close()
-    if let Error(HttpError.TimedOut) = result { return 0 }
+    if let Failure(HttpError.TimedOut) = result { return 0 }
     return 43
 }
 

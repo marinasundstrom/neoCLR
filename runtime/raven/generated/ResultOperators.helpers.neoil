@@ -10,10 +10,10 @@ ldarg arg0
 call instance System.Result.Ok<T0>::get_Value()
 ret
 .end
-.function neoCLR.Library.System.ResultOperators.RuntimeUnion2<T0,T1>(System.Result<T0,T1>& arg0,out(true) System.Result.Error<T1>& arg1) -> Boolean
+.function neoCLR.Library.System.ResultOperators.RuntimeUnion2<T0,T1>(System.Result<T0,T1>& arg0,out(true) System.Result.Failure<T1>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Result<T0,T1>::TryGetValue(System.Result.Error<T1>&)
+call instance System.Result<T0,T1>::TryGetValue(System.Result.Failure<T1>&)
 ret
 .end
 .function neoCLR.Library.System.ResultOperators.RuntimeUnion3<T2>(T2 arg0) -> System.Result.Ok<T2>
@@ -21,9 +21,9 @@ ldarg arg0
 newobj instance System.Result.Ok<T2>::.ctor(T2)
 ret
 .end
-.function neoCLR.Library.System.ResultOperators.RuntimeUnion4<T1>(System.Result.Error<T1>& arg0) -> T1
+.function neoCLR.Library.System.ResultOperators.RuntimeUnion4<T1>(System.Result.Failure<T1>& arg0) -> T1
 ldarg arg0
-call instance System.Result.Error<T1>::get_Value()
+call instance System.Result.Failure<T1>::get_Value()
 ret
 .end
 .function neoCLR.Library.System.ResultOperators.RuntimeUnion5<T1,T2>(System.Result.Ok<T2> arg0) -> System.Result<T2,T1>
@@ -31,14 +31,14 @@ ldarg arg0
 newobj instance System.Result<T2,T1>::.ctor(System.Result.Ok<T2>)
 ret
 .end
-.function neoCLR.Library.System.ResultOperators.RuntimeUnion6<T1>(T1 arg0) -> System.Result.Error<T1>
+.function neoCLR.Library.System.ResultOperators.RuntimeUnion6<T1>(T1 arg0) -> System.Result.Failure<T1>
 ldarg arg0
-newobj instance System.Result.Error<T1>::.ctor(T1)
+newobj instance System.Result.Failure<T1>::.ctor(T1)
 ret
 .end
-.function neoCLR.Library.System.ResultOperators.RuntimeUnion7<T1,T2>(System.Result.Error<T1> arg0) -> System.Result<T2,T1>
+.function neoCLR.Library.System.ResultOperators.RuntimeUnion7<T1,T2>(System.Result.Failure<T1> arg0) -> System.Result<T2,T1>
 ldarg arg0
-newobj instance System.Result<T2,T1>::.ctor(System.Result.Error<T1>)
+newobj instance System.Result<T2,T1>::.ctor(System.Result.Failure<T1>)
 ret
 .end
 .function neoCLR.Library.System.ResultOperators.RuntimeUnion8<T0>(T0 arg0) -> System.Result.Ok<T0>
@@ -51,13 +51,13 @@ ldarg arg0
 newobj instance System.Result<T0,T2>::.ctor(System.Result.Ok<T0>)
 ret
 .end
-.function neoCLR.Library.System.ResultOperators.RuntimeUnion10<T2>(T2 arg0) -> System.Result.Error<T2>
+.function neoCLR.Library.System.ResultOperators.RuntimeUnion10<T2>(T2 arg0) -> System.Result.Failure<T2>
 ldarg arg0
-newobj instance System.Result.Error<T2>::.ctor(T2)
+newobj instance System.Result.Failure<T2>::.ctor(T2)
 ret
 .end
-.function neoCLR.Library.System.ResultOperators.RuntimeUnion11<T0,T2>(System.Result.Error<T2> arg0) -> System.Result<T0,T2>
+.function neoCLR.Library.System.ResultOperators.RuntimeUnion11<T0,T2>(System.Result.Failure<T2> arg0) -> System.Result<T0,T2>
 ldarg arg0
-newobj instance System.Result<T0,T2>::.ctor(System.Result.Error<T2>)
+newobj instance System.Result<T0,T2>::.ctor(System.Result.Failure<T2>)
 ret
 .end

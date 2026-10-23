@@ -53,14 +53,14 @@ public class SslStream : InputStream, OutputStream, Disposable {
             return await CancelAuthentication()
         }
         if closed {
-            return Error(SslError.Closed)
+            return Failure(SslError.Closed)
         }
         if started || busy {
-            return Error(SslError.InvalidConfiguration)
+            return Failure(SslError.InvalidConfiguration)
         }
         let status = options.CreateSession(owner, targetHost)
         if status != 0 {
-            return Error(SslBuffers.Error(status))
+            return Failure(SslBuffers.Error(status))
         }
         return await Authenticate(cancellationToken)
     }
@@ -74,14 +74,14 @@ public class SslStream : InputStream, OutputStream, Disposable {
             return await CancelAuthentication()
         }
         if closed {
-            return Error(SslError.Closed)
+            return Failure(SslError.Closed)
         }
         if started || busy {
-            return Error(SslError.InvalidConfiguration)
+            return Failure(SslError.InvalidConfiguration)
         }
         let status = options.CreateSession(owner)
         if status != 0 {
-            return Error(SslBuffers.Error(status))
+            return Failure(SslBuffers.Error(status))
         }
         return await Authenticate(cancellationToken)
     }
@@ -94,8 +94,8 @@ public class SslStream : InputStream, OutputStream, Disposable {
         started = true
         busy = true
         use operation = SslOperation(self, token)
-        if let Error(error) = await Pump(1, [], operation.Token) {
-            return Error(SslError.AuthenticationFailed)
+        if let Failure(error) = await Pump(1, [], operation.Token) {
+            return Failure(SslError.AuthenticationFailed)
         }
         authenticated = true
         operation.Complete()
@@ -112,7 +112,7 @@ public class SslStream : InputStream, OutputStream, Disposable {
         control[0] = (byte)kind
         while true {
             if closed {
-                return Error(StreamError.Closed)
+                return Failure(StreamError.Closed)
             }
             control[1] = (byte)(if eof { 1 } else { 0 })
             SslBuffers.WriteCount(control[4..8], inputCount)
@@ -129,13 +129,13 @@ public class SslStream : InputStream, OutputStream, Disposable {
                 _ = (await output.Write(encryptedOutput, 0, produced, token))?
             }
             if closed {
-                return Error(StreamError.Closed)
+                return Failure(StreamError.Closed)
             }
             if status >= 0 {
                 return Ok(status)
             }
             if status != -1 {
-                return Error(StreamError.InvalidData)
+                return Failure(StreamError.InvalidData)
             }
             // A short write can leave another TLS record queued. Drain all output
             // progress before waiting for the peer, even when the buffer was not full.
@@ -144,7 +144,7 @@ public class SslStream : InputStream, OutputStream, Disposable {
             }
             if inputCount == 0 {
                 if eof {
-                    return Error(StreamError.InvalidData)
+                    return Failure(StreamError.InvalidData)
                 }
                 let received = (await input.Read(encryptedInput, 0, encryptedInput.Length, token))?
                 inputCount = received
@@ -167,13 +167,13 @@ public class SslStream : InputStream, OutputStream, Disposable {
             return await promise.Task
         }
         if closed {
-            return Error(StreamError.Closed)
+            return Failure(StreamError.Closed)
         }
         if !authenticated || failed || busy {
-            return Error(StreamError.WrongAccess)
+            return Failure(StreamError.WrongAccess)
         }
         if !(offset >= 0) || !(count >= 0) || offset > buffer.Length || count > buffer.Length - offset {
-            return Error(StreamError.InvalidRange)
+            return Failure(StreamError.InvalidRange)
         }
         if count == 0 {
             return Ok(0)
@@ -198,13 +198,13 @@ public class SslStream : InputStream, OutputStream, Disposable {
             return await CancelWrite()
         }
         if closed {
-            return Error(StreamError.Closed)
+            return Failure(StreamError.Closed)
         }
         if !authenticated || failed || busy || writeClosed {
-            return Error(StreamError.WrongAccess)
+            return Failure(StreamError.WrongAccess)
         }
         if !(offset >= 0) || !(count >= 0) || offset > buffer.Length || count > buffer.Length - offset {
-            return Error(StreamError.InvalidRange)
+            return Failure(StreamError.InvalidRange)
         }
         busy = true
         use operation = SslOperation(self, cancellationToken)
@@ -236,16 +236,16 @@ public class SslStream : InputStream, OutputStream, Disposable {
             return await CancelWrite()
         }
         if closed {
-            return Error(StreamError.Closed)
+            return Failure(StreamError.Closed)
         }
         if !authenticated || failed || busy {
-            return Error(StreamError.WrongAccess)
+            return Failure(StreamError.WrongAccess)
         }
         busy = true
         use operation = SslOperation(self, cancellationToken)
         _ = (await output.Flush(operation.Token))?
         if closed {
-            return Error(StreamError.Closed)
+            return Failure(StreamError.Closed)
         }
         operation.Complete()
         return Ok(())
@@ -258,10 +258,10 @@ public class SslStream : InputStream, OutputStream, Disposable {
             return await CancelWrite()
         }
         if closed {
-            return Error(StreamError.Closed)
+            return Failure(StreamError.Closed)
         }
         if !authenticated || failed || busy {
-            return Error(StreamError.WrongAccess)
+            return Failure(StreamError.WrongAccess)
         }
         if writeClosed {
             return Ok(())
@@ -271,7 +271,7 @@ public class SslStream : InputStream, OutputStream, Disposable {
         _ = (await Pump(4, [], operation.Token))?
         _ = (await output.Flush(operation.Token))?
         if closed {
-            return Error(StreamError.Closed)
+            return Failure(StreamError.Closed)
         }
         writeClosed = true
         operation.Complete()

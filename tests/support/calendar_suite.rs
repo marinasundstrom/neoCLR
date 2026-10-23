@@ -179,7 +179,7 @@ fn invalid_components_are_results_and_comparison_is_value_based() {
     ] {
         for values in cases {
             let result = call(&p, sig, ints(&values));
-            assert!(format!("{result:?}").contains("System.Result.Error"));
+            assert!(format!("{result:?}").contains("System.Result.Failure"));
         }
     }
     for ticks in [-1, 864_000_000_000, i64::MAX] {
@@ -191,7 +191,7 @@ fn invalid_components_are_results_and_comparison_is_value_based() {
                 vec![Value::Int64(ticks)]
             )
         )
-        .contains("System.Result.Error"));
+        .contains("System.Result.Failure"));
     }
     for (name, sig, left, right) in [
         (

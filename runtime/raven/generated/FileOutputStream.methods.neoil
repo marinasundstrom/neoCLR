@@ -58,7 +58,7 @@ call System.IO.FileOutputStream::DecodeError(Byte)
 M00000002_IL_0026:
 call neoCLR.Library.System.IO.FileOutputStream.RuntimeUnion0(System.IO.StreamError)
 M00000002_IL_002b:
-call neoCLR.Library.System.IO.FileOutputStream.RuntimeUnion1(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.FileOutputStream.RuntimeUnion1(System.Result.Failure<System.IO.StreamError>)
 M00000002_IL_0030:
 ret
 M00000002_IL_0031:
@@ -96,7 +96,7 @@ call neoCLR.Library.System.IO.FileOutputStream.RuntimeErrorSystemIOStreamErrorNe
 M00000003_IL_001c:
 call neoCLR.Library.System.IO.FileOutputStream.RuntimeUnion0(System.IO.StreamError)
 M00000003_IL_0021:
-call neoCLR.Library.System.IO.FileOutputStream.RuntimeUnion4(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.FileOutputStream.RuntimeUnion4(System.Result.Failure<System.IO.StreamError>)
 M00000003_IL_0026:
 ret
 M00000003_IL_0027:
@@ -135,7 +135,7 @@ call System.IO.FileOutputStream::DecodeError(Byte)
 M00000003_IL_0055:
 call neoCLR.Library.System.IO.FileOutputStream.RuntimeUnion0(System.IO.StreamError)
 M00000003_IL_005a:
-call neoCLR.Library.System.IO.FileOutputStream.RuntimeUnion4(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.FileOutputStream.RuntimeUnion4(System.Result.Failure<System.IO.StreamError>)
 M00000003_IL_005f:
 ret
 M00000003_IL_0060:
@@ -174,7 +174,7 @@ call neoCLR.Library.System.IO.FileOutputStream.RuntimeErrorSystemIOStreamErrorNe
 M00000004_IL_001c:
 call neoCLR.Library.System.IO.FileOutputStream.RuntimeUnion0(System.IO.StreamError)
 M00000004_IL_0021:
-call neoCLR.Library.System.IO.FileOutputStream.RuntimeUnion7(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.FileOutputStream.RuntimeUnion7(System.Result.Failure<System.IO.StreamError>)
 M00000004_IL_0026:
 ret
 M00000004_IL_0027:
@@ -207,7 +207,7 @@ call System.IO.FileOutputStream::DecodeError(Byte)
 M00000004_IL_0052:
 call neoCLR.Library.System.IO.FileOutputStream.RuntimeUnion0(System.IO.StreamError)
 M00000004_IL_0057:
-call neoCLR.Library.System.IO.FileOutputStream.RuntimeUnion7(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.FileOutputStream.RuntimeUnion7(System.Result.Failure<System.IO.StreamError>)
 M00000004_IL_005c:
 ret
 M00000004_IL_005d:

@@ -8,12 +8,12 @@ func Main() -> int {
         return 2
     }
     Console.WriteLine(slice)
-    if let Error(_) = text.SliceUtf8(2, 0) {
+    if let Failure(_) = text.SliceUtf8(2, 0) {
         Console.WriteLine("invalid boundary")
     } else {
         return 3
     }
-    if let Error(_) = text.SliceUtf8(-1, 0) {
+    if let Failure(_) = text.SliceUtf8(-1, 0) {
         Console.WriteLine("out of range")
     } else {
         return 4

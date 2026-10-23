@@ -39,18 +39,18 @@ public struct Range : EquatableTo<Range> {
     /// Resolves offset and count, returning InvalidRangeError for invalid bounds or a negative length.
     func TryGetOffsetAndLength(length: int) -> Result<(Offset: int, Length: int), InvalidRangeError> {
         if length < 0 {
-            return Error(InvalidRangeError())
+            return Failure(InvalidRangeError())
         }
         let offset = start.GetOffset(length)
         let limit = end.GetOffset(length)
         if offset < 0 {
-            return Error(InvalidRangeError())
+            return Failure(InvalidRangeError())
         }
         if limit < offset {
-            return Error(InvalidRangeError())
+            return Failure(InvalidRangeError())
         }
         if limit > length {
-            return Error(InvalidRangeError())
+            return Failure(InvalidRangeError())
         }
         return Ok((offset, limit - offset))
     }

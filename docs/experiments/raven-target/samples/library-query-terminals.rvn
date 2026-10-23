@@ -16,7 +16,7 @@ func PrintOptional(value: Option<int>) {
 func PrintSingle(value: Result<int, SingleError>) {
     match value {
         Ok(let found) => WriteLine(found)
-        Error(let error) => WriteLine(error.ToString())
+        Failure(let error) => WriteLine(error.ToString())
     }
 }
 

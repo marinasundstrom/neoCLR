@@ -33,7 +33,7 @@ internal class DocumentReader {
     private func DecodeToken(bytes: ReadOnlySlice<byte>) -> Result<string, JsonError> {
         match Encodings.Utf8.Decode(bytes) {
             Ok(let text) => return Ok(text)
-            Error(_) => return Error(JsonError.Syntax("Invalid token boundary"))
+            Failure(_) => return Failure(JsonError.Syntax("Invalid token boundary"))
         }
     }
 
@@ -42,7 +42,7 @@ internal class DocumentReader {
         Skip(bytes)
         let start = position
         if !Take(bytes, (byte)34) {
-            return Error(JsonError.Syntax("Expected string"))
+            return Failure(JsonError.Syntax("Expected string"))
         }
         var escaped = false
         var needsDecoding = false
@@ -63,7 +63,7 @@ internal class DocumentReader {
                 needsDecoding = true
             }
         }
-        return Error(JsonError.Syntax("Unclosed string"))
+        return Failure(JsonError.Syntax("Unclosed string"))
     }
 
     private func Value(bytes: ReadOnlySlice<byte>, depth: int) -> Result<JsonValue, JsonError> {
@@ -71,10 +71,10 @@ internal class DocumentReader {
         Skip(bytes)
         nodes += 1
         if nodes > 32 {
-            return Error(JsonError.LimitExceeded("Document exceeds 32 values"))
+            return Failure(JsonError.LimitExceeded("Document exceeds 32 values"))
         }
         if position == length {
-            return Error(JsonError.Syntax("Missing value"))
+            return Failure(JsonError.Syntax("Missing value"))
         }
         let first = bytes[position]
         if first == 34 {
@@ -84,7 +84,7 @@ internal class DocumentReader {
         }
         if first == 123 || first == 91 {
             if depth >= 4 {
-                return Error(JsonError.LimitExceeded("Container depth exceeds four"))
+                return Failure(JsonError.LimitExceeded("Container depth exceeds four"))
             }
             position += 1
             let objectValue = first == 123
@@ -100,7 +100,7 @@ internal class DocumentReader {
                 if objectValue {
                     name = ReadString(bytes)?
                     if !Take(bytes, (byte)58) {
-                        return Error(JsonError.Syntax("Expected colon"))
+                        return Failure(JsonError.Syntax("Expected colon"))
                     }
                 }
                 let child = Value(bytes, depth + 1)?
@@ -111,7 +111,7 @@ internal class DocumentReader {
                 }
                 containerClosed = Take(bytes, closing)
                 if !containerClosed && !Take(bytes, (byte)44) {
-                    return Error(JsonError.Syntax("Expected comma or container end"))
+                    return Failure(JsonError.Syntax("Expected comma or container end"))
                 }
             }
             return Ok(result)
@@ -148,7 +148,7 @@ internal class DocumentReader {
         let result = Value(bytes, 0)?
         Skip(bytes)
         if position != bytes.Length {
-            return Error(JsonError.Syntax("Trailing content"))
+            return Failure(JsonError.Syntax("Trailing content"))
         }
         return Ok(result)
     }
@@ -190,7 +190,7 @@ internal class DocumentWriter {
 
     private func Append(text: string) -> Result<unit, JsonError> {
         if text.GetUtf8ByteCount() > 1024 - size {
-            return Error(JsonError.LimitExceeded("Document exceeds 1024 UTF-8 bytes"))
+            return Failure(JsonError.LimitExceeded("Document exceeds 1024 UTF-8 bytes"))
         }
         let bytes = text.Utf8Bytes
         Reserve(bytes.Length)
@@ -209,7 +209,7 @@ internal class DocumentWriter {
 
     private func AppendMessage(text: string) -> Result<unit, JsonError> {
         if text.GetUtf8ByteCount() > 1022 {
-            return Error(JsonError.LimitExceeded("Message exceeds payload limit"))
+            return Failure(JsonError.LimitExceeded("Message exceeds payload limit"))
         }
         let bytes = text.Utf8Bytes
         var count = 2
@@ -218,12 +218,12 @@ internal class DocumentWriter {
             let value = bytes[index]
             count += if value <= 31 { 6 } else if value == 34 || value == 92 { 2 } else { 1 }
             if count > 1024 {
-                return Error(JsonError.LimitExceeded("Escaped message exceeds payload limit"))
+                return Failure(JsonError.LimitExceeded("Escaped message exceeds payload limit"))
             }
             index += 1
         }
         if count > 1024 - size {
-            return Error(JsonError.LimitExceeded("Document exceeds 1024 UTF-8 bytes"))
+            return Failure(JsonError.LimitExceeded("Document exceeds 1024 UTF-8 bytes"))
         }
         Reserve(count)
         output[size] = (byte)34
@@ -256,7 +256,7 @@ internal class DocumentWriter {
 
     private func AppendByte(value: byte) -> Result<unit, JsonError> {
         if size == 1024 {
-            return Error(JsonError.LimitExceeded("Document exceeds 1024 UTF-8 bytes"))
+            return Failure(JsonError.LimitExceeded("Document exceeds 1024 UTF-8 bytes"))
         }
         Reserve(1)
         output[size] = value
@@ -278,7 +278,7 @@ internal class DocumentWriter {
     private func Value(value: JsonValue, depth: int) -> Result<unit, JsonError> {
         nodes += 1
         if nodes > 32 {
-            return Error(JsonError.LimitExceeded("Document exceeds 32 values"))
+            return Failure(JsonError.LimitExceeded("Document exceeds 32 values"))
         }
         if value is JsonString {
             let text = ((JsonString)value).Value
@@ -299,7 +299,7 @@ internal class DocumentWriter {
             return Append("null")
         }
         if depth >= 4 {
-            return Error(JsonError.LimitExceeded("Container depth exceeds four (or cyclic tree)"))
+            return Failure(JsonError.LimitExceeded("Container depth exceeds four (or cyclic tree)"))
         }
         let objectValue = value is JsonObject
         if objectValue {
@@ -346,7 +346,7 @@ internal class DocumentWriter {
         _ = Value(value, 0)?
         return match Encodings.Utf8.Decode(output[..size]) {
             Ok(let text) => Ok(text)
-            Error(_) => Error(JsonError.Syntax("Invalid UTF-8"))
+            Failure(_) => Failure(JsonError.Syntax("Invalid UTF-8"))
         }
     }
 

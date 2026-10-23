@@ -19,9 +19,9 @@ func Main() {
             WriteLine(reply)
             match ReadMessage(reply) {
                 Ok(let text) => WriteLine(text)
-                Error(let error) => WriteLine(error)
+                Failure(let error) => WriteLine(error)
             }
         }
-        Error(let error) => WriteLine(error)
+        Failure(let error) => WriteLine(error)
     }
 }

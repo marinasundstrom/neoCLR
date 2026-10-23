@@ -64,7 +64,7 @@ call neoCLR.Library.System.IO.MemoryStream.RuntimeErrorSystemIOStreamErrorNewSys
 M00000002_IL_001c:
 call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion0(System.IO.StreamError)
 M00000002_IL_0021:
-call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion1(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion1(System.Result.Failure<System.IO.StreamError>)
 M00000002_IL_0026:
 ret
 M00000002_IL_0027:
@@ -103,7 +103,7 @@ call neoCLR.Library.System.IO.MemoryStream.RuntimeErrorSystemIOStreamErrorNewSys
 M00000003_IL_001c:
 call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion0(System.IO.StreamError)
 M00000003_IL_0021:
-call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion1(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion1(System.Result.Failure<System.IO.StreamError>)
 M00000003_IL_0026:
 ret
 M00000003_IL_0027:
@@ -140,7 +140,7 @@ call neoCLR.Library.System.IO.MemoryStream.RuntimeErrorSystemIOStreamErrorNewSys
 M00000004_IL_001c:
 call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion0(System.IO.StreamError)
 M00000004_IL_0021:
-call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion1(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion1(System.Result.Failure<System.IO.StreamError>)
 M00000004_IL_0026:
 ret
 M00000004_IL_0027:
@@ -165,7 +165,7 @@ call neoCLR.Library.System.IO.MemoryStream.RuntimeErrorSystemIOStreamErrorNewSys
 M00000004_IL_0042:
 call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion0(System.IO.StreamError)
 M00000004_IL_0047:
-call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion1(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion1(System.Result.Failure<System.IO.StreamError>)
 M00000004_IL_004c:
 ret
 M00000004_IL_004d:
@@ -190,7 +190,7 @@ call neoCLR.Library.System.IO.MemoryStream.RuntimeErrorSystemIOStreamErrorNewSys
 M00000004_IL_006c:
 call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion0(System.IO.StreamError)
 M00000004_IL_0071:
-call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion1(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion1(System.Result.Failure<System.IO.StreamError>)
 M00000004_IL_0076:
 ret
 M00000004_IL_0077:
@@ -235,7 +235,7 @@ call neoCLR.Library.System.IO.MemoryStream.RuntimeErrorSystemIOStreamErrorNewSys
 M00000005_IL_001c:
 call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion0(System.IO.StreamError)
 M00000005_IL_0021:
-call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion4(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion4(System.Result.Failure<System.IO.StreamError>)
 M00000005_IL_0026:
 ret
 M00000005_IL_0027:
@@ -258,7 +258,7 @@ call neoCLR.Library.System.IO.MemoryStream.RuntimeErrorSystemIOStreamErrorNewSys
 M00000005_IL_0041:
 call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion0(System.IO.StreamError)
 M00000005_IL_0046:
-call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion4(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion4(System.Result.Failure<System.IO.StreamError>)
 M00000005_IL_004b:
 ret
 M00000005_IL_004c:
@@ -281,7 +281,7 @@ call neoCLR.Library.System.IO.MemoryStream.RuntimeErrorSystemIOStreamErrorNewSys
 M00000005_IL_0066:
 call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion0(System.IO.StreamError)
 M00000005_IL_006b:
-call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion4(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion4(System.Result.Failure<System.IO.StreamError>)
 M00000005_IL_0070:
 ret
 M00000005_IL_0071:
@@ -307,7 +307,7 @@ call neoCLR.Library.System.IO.MemoryStream.RuntimeErrorSystemIOStreamErrorNewSys
 M00000005_IL_0090:
 call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion0(System.IO.StreamError)
 M00000005_IL_0095:
-call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion4(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion4(System.Result.Failure<System.IO.StreamError>)
 M00000005_IL_009a:
 ret
 M00000005_IL_009b:
@@ -337,7 +337,7 @@ call neoCLR.Library.System.IO.MemoryStream.RuntimeErrorSystemIOStreamErrorNewSys
 M00000005_IL_00bc:
 call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion0(System.IO.StreamError)
 M00000005_IL_00c1:
-call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion4(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion4(System.Result.Failure<System.IO.StreamError>)
 M00000005_IL_00c6:
 ret
 M00000005_IL_00c7:
@@ -456,7 +456,7 @@ call neoCLR.Library.System.IO.MemoryStream.RuntimeErrorSystemIOStreamErrorNewSys
 M00000006_IL_001c:
 call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion0(System.IO.StreamError)
 M00000006_IL_0021:
-call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion4(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion4(System.Result.Failure<System.IO.StreamError>)
 M00000006_IL_0026:
 ret
 M00000006_IL_0027:
@@ -479,7 +479,7 @@ call neoCLR.Library.System.IO.MemoryStream.RuntimeErrorSystemIOStreamErrorNewSys
 M00000006_IL_0041:
 call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion0(System.IO.StreamError)
 M00000006_IL_0046:
-call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion4(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion4(System.Result.Failure<System.IO.StreamError>)
 M00000006_IL_004b:
 ret
 M00000006_IL_004c:
@@ -502,7 +502,7 @@ call neoCLR.Library.System.IO.MemoryStream.RuntimeErrorSystemIOStreamErrorNewSys
 M00000006_IL_0066:
 call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion0(System.IO.StreamError)
 M00000006_IL_006b:
-call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion4(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion4(System.Result.Failure<System.IO.StreamError>)
 M00000006_IL_0070:
 ret
 M00000006_IL_0071:
@@ -528,7 +528,7 @@ call neoCLR.Library.System.IO.MemoryStream.RuntimeErrorSystemIOStreamErrorNewSys
 M00000006_IL_0090:
 call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion0(System.IO.StreamError)
 M00000006_IL_0095:
-call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion4(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion4(System.Result.Failure<System.IO.StreamError>)
 M00000006_IL_009a:
 ret
 M00000006_IL_009b:
@@ -558,7 +558,7 @@ call neoCLR.Library.System.IO.MemoryStream.RuntimeErrorSystemIOStreamErrorNewSys
 M00000006_IL_00bc:
 call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion0(System.IO.StreamError)
 M00000006_IL_00c1:
-call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion4(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion4(System.Result.Failure<System.IO.StreamError>)
 M00000006_IL_00c6:
 ret
 M00000006_IL_00c7:
@@ -587,7 +587,7 @@ call neoCLR.Library.System.IO.MemoryStream.RuntimeErrorSystemIOStreamErrorNewSys
 M00000006_IL_00ec:
 call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion0(System.IO.StreamError)
 M00000006_IL_00f1:
-call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion4(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion4(System.Result.Failure<System.IO.StreamError>)
 M00000006_IL_00f6:
 ret
 M00000006_IL_00f7:
@@ -778,7 +778,7 @@ call neoCLR.Library.System.IO.MemoryStream.RuntimeErrorSystemIOStreamErrorNewSys
 M00000007_IL_001c:
 call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion0(System.IO.StreamError)
 M00000007_IL_0021:
-call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion7(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.MemoryStream.RuntimeUnion7(System.Result.Failure<System.IO.StreamError>)
 M00000007_IL_0026:
 ret
 M00000007_IL_0027:

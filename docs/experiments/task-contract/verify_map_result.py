@@ -38,14 +38,14 @@ cases = [
 """, '42\n'),
     ('Already completed Error bypasses mapper', '', """
     let source = Promise<Result<int, string>>()
-    source.Complete(Error("unavailable"))
+    source.Complete(Failure("unavailable"))
     let mapped = source.Task.MapResult<int>(value => {
         System.Fail("Error invoked mapper")
         return value + 1
     })
     Check(!mapped.IsCompleted)
     mapped.OnCompleted(() => {
-        if mapped.GetResult() is Error(let error) { WriteLine(error) }
+        if mapped.GetResult() is Failure(let error) { WriteLine(error) }
     })
 """, 'unavailable\n'),
     ('Cancellation bypasses mapper', '', """

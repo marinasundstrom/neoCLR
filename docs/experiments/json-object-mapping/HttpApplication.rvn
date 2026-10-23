@@ -62,9 +62,9 @@ func PrepareReport() -> Result<HttpContent, AppError> {
 func AdaptClientResult<T>(result: Result<T, HttpError | JsonError>) -> Result<T, AppError> {
     return match result {
         Ok(let value) => Ok(value)
-        Error(let error) => match error {
-            HttpError reason => Error(AppError.Http(reason))
-            JsonError reason => Error(AppError.Json(reason))
+        Failure(let error) => match error {
+            HttpError reason => Failure(AppError.Http(reason))
+            JsonError reason => Failure(AppError.Json(reason))
         }
     }
 }
@@ -72,12 +72,12 @@ func AdaptClientResult<T>(result: Result<T, HttpError | JsonError>) -> Result<T,
 func ReadReply(result: Result<HttpResponse, HttpError | JsonError>) -> Result<string, AppError> {
     let response = AdaptClientResult(result)?
     if response.StatusCode != HttpStatusCode.Created {
-        return Error(AppError.Http(HttpError.UnsuccessfulStatus(response.StatusCode)))
+        return Failure(AppError.Http(HttpError.UnsuccessfulStatus(response.StatusCode)))
     }
     let reply = JsonContent.Read<Acknowledgement>(response.Content)?
     if reply.accepted {
         let output = JsonSerializer.Serialize(reply)?
         return Ok(output)
     }
-    return Error(AppError.Body("Unexpected acknowledgement"))
+    return Failure(AppError.Body("Unexpected acknowledgement"))
 }

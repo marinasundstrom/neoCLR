@@ -18,13 +18,13 @@ public class ChunkDecoder {
 
     func Decode(source: byte[], offset: int, count: int, final: bool) -> Result<string, string> {
         if stopped {
-            return Error("Decoder is finished")
+            return Failure("Decoder is finished")
         }
         if !ValidRange(source.Length, offset, count) {
-            return Error("Invalid input range")
+            return Failure("Invalid input range")
         }
         if count > 256 {
-            return Error("Chunk exceeds the experiment limit")
+            return Failure("Chunk exceeds the experiment limit")
         }
         var text = ""
         var index = 0
@@ -41,19 +41,19 @@ public class ChunkDecoder {
                     expected = 4
                 } else {
                     stopped = true
-                    return Error("Invalid UTF-8")
+                    return Failure("Invalid UTF-8")
                 }
             } else if !(value >= 128 && value <= 191) {
                 stopped = true
-                return Error("Invalid UTF-8")
+                return Failure("Invalid UTF-8")
             }
             pending.Add(value)
             if pending.Count == expected {
                 match Utf8.Decode(pending) {
                     Ok(let scalar) => text = String.Concat(text, scalar)
-                    Error(_) => {
+                    Failure(_) => {
                         stopped = true
-                        return Error("Invalid UTF-8")
+                        return Failure("Invalid UTF-8")
                     }
                 }
                 pending = ArrayList<byte>(4)
@@ -64,7 +64,7 @@ public class ChunkDecoder {
         if final {
             stopped = true
             if pending.Count != 0 {
-                return Error("Truncated UTF-8")
+                return Failure("Truncated UTF-8")
             }
         }
         return Ok(text)
@@ -73,7 +73,7 @@ public class ChunkDecoder {
 
 public func ReadText(input: MemoryInput, scratch: byte[]) -> Result<string, string> {
     if scratch.Length == 0 || scratch.Length > 256 {
-        return Error("Scratch length must be 1 through 256")
+        return Failure("Scratch length must be 1 through 256")
     }
     let decoder = ChunkDecoder()
     var text = ""
@@ -82,7 +82,7 @@ public func ReadText(input: MemoryInput, scratch: byte[]) -> Result<string, stri
     while !finished {
         let count = input.Read(scratch, 0, scratch.Length)?
         if count > 4096 - totalBytes {
-            return Error("Text exceeds the experiment limit")
+            return Failure("Text exceeds the experiment limit")
         }
         totalBytes = totalBytes + count
         finished = count == 0

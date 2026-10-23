@@ -15,7 +15,7 @@ async func Main(arguments: string[]) -> Task<()> {
         let Some(stream) = response.Content.TryGetStream() else { System.Fail("Missing body stream") }
         if mode == 1 {
             let Ok(forward) = HttpRequest.Post(arguments[0], response.Content) else { System.Fail("Forward preparation failed") }
-            Check((await client.Send(forward)) is Error(HttpError.Unsupported(_)))
+            Check((await client.Send(forward)) is Failure(HttpError.Unsupported(_)))
         }
         await Consume(stream, mode)
         response.Dispose()

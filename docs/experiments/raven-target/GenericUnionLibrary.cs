@@ -7,7 +7,7 @@ static class GenericUnionLibrary
 {
     public static bool IsCarrier(TypeDefinition? type) => type?.FullName is "System.Option`1" or "System.Result`2" or "System.Concurrency.Tasks.TaskOutcome`1";
     public static bool IsContainer(TypeDefinition? type) => type?.FullName is "System.Option" or "System.Result" or "System.Concurrency.Tasks.TaskOutcome";
-    public static bool IsCase(TypeDefinition? type) => type?.FullName is "System.Option/None" or "System.Option/Some`1" or "System.Result/Ok`1" or "System.Result/Error`1" or "System.Concurrency.Tasks.TaskOutcome/Completed`1" or "System.Concurrency.Tasks.TaskOutcome/Cancelled";
+    public static bool IsCase(TypeDefinition? type) => type?.FullName is "System.Option/None" or "System.Option/Some`1" or "System.Result/Ok`1" or "System.Result/Failure`1" or "System.Concurrency.Tasks.TaskOutcome/Completed`1" or "System.Concurrency.Tasks.TaskOutcome/Cancelled";
     public static bool IsFamily(TypeDefinition type) => IsCarrier(type) || IsCase(type);
     public static bool IsMatched(TypeDefinition type) => IsFamily(type) && ApplicationTypes.IsLibrary(type)
         && !StandardUnionLibrary.IsCandidate(type)
@@ -17,7 +17,7 @@ static class GenericUnionLibrary
     public static bool IsProtocol(MethodDefinition method) => IsCarrier(method.DeclaringType)
         ? method.Name is "get_Value" or "TryGetValue"
         : IsCase(method.DeclaringType) && method.Name is "set_Value" or "Deconstruct";
-    public static bool IsRuntimeProperty(PropertyDefinition property) => !(IsCarrier(property.DeclaringType) && property.Name is "Value" or "IsOkCase" or "IsErrorCase");
+    public static bool IsRuntimeProperty(PropertyDefinition property) => !(IsCarrier(property.DeclaringType) && property.Name is "Value" or "IsOkCase" or "IsFailureCase");
     public static bool IsConditionalOutput(MethodDefinition method, ParameterDefinition parameter) => IsCarrier(method.DeclaringType)
         && !StandardUnionLibrary.IsCandidate(method.DeclaringType)
         && method.HasThis && method.Name is "TryGet" or "TryGetOutput" or "TryGetResidual"

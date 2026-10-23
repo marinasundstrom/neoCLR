@@ -14,21 +14,21 @@ public struct Int32 : Number, EquatableTo<int>, Formattable {
         }
         let status = neoCLR.Runtime.UnpackValue<byte>(payload)
         if status == 1 {
-            return Error(NumberParseError.InvalidFormat())
+            return Failure(NumberParseError.InvalidFormat())
         }
         if status == 2 {
-            return Error(NumberParseError.Overflow())
+            return Failure(NumberParseError.Overflow())
         }
         System.Fail("invalid native parse status")
-        return Error(NumberParseError.InvalidFormat())
+        return Failure(NumberParseError.InvalidFormat())
     }
 
     static func Divide(dividend: int, divisor: int) -> System.Result<int, IntegerDivisionError> {
         if divisor == 0 {
-            return Error(IntegerDivisionError.DivisionByZero())
+            return Failure(IntegerDivisionError.DivisionByZero())
         }
         if dividend == -2147483648 && divisor == -1 {
-            return Error(IntegerDivisionError.Overflow())
+            return Failure(IntegerDivisionError.Overflow())
         }
         return Ok(dividend / divisor)
     }

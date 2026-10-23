@@ -66,8 +66,8 @@ func Generics() -> Result<unit, TestFailure> {
         return Assert.True(false, "Unable to construct retained ArrayList<int>")
     }
     _ = Assert.True(reconstructed.Equals(generic), "Construction preserves closed identity")?
-    _ = Assert.True(definition.MakeGenericType([typeof(int), typeof(string)]) is Error(GenericTypeError.ArgumentCount), "Generic arity checked")?
-    _ = Assert.True(typeof(int).MakeGenericType([typeof(int)]) is Error(GenericTypeError.InvalidDefinition), "Non-generic definition rejected")?
+    _ = Assert.True(definition.MakeGenericType([typeof(int), typeof(string)]) is Failure(GenericTypeError.ArgumentCount), "Generic arity checked")?
+    _ = Assert.True(typeof(int).MakeGenericType([typeof(int)]) is Failure(GenericTypeError.InvalidDefinition), "Non-generic definition rejected")?
     _ = Assert.True(generic.IsGenericType, "Constructed nominal type is generic")?
     _ = Assert.True(generic.IsConstructedGenericType, "Constructed identity")?
     _ = Assert.True(!generic.IsGenericTypeDefinition, "Closed type is not its definition")?

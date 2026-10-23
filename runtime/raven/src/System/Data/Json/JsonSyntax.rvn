@@ -10,7 +10,7 @@ internal class JsonSyntax {
     internal static func EncodeToken(text: string) -> Sequence<byte> {
         return match Encodings.Utf8.Encode(text) {
             Ok(let bytes) => bytes
-            Error(_) => {
+            Failure(_) => {
                 System.Fail("Prevalidated JSON token encoding failed")
                 ArrayList<byte>()
             }
@@ -159,7 +159,7 @@ internal class JsonSyntax {
 
     static func WriteMessage(text: string) -> Result<string, JsonError> {
         if text.GetUtf8ByteCount() > 1022 {
-            return Error(JsonError.LimitExceeded("Message exceeds payload limit"))
+            return Failure(JsonError.LimitExceeded("Message exceeds payload limit"))
         }
         let input = JsonSyntax.EncodeToken(text)
         let output = ArrayList<byte>(input.Count + 2)
@@ -180,13 +180,13 @@ internal class JsonSyntax {
                 output.Add(value)
             }
             if output.Count > 1023 {
-                return Error(JsonError.LimitExceeded("Escaped message exceeds payload limit"))
+                return Failure(JsonError.LimitExceeded("Escaped message exceeds payload limit"))
             }
         }
         output.Add((byte)34)
         match Encodings.Utf8.Decode(output[..]) {
             Ok(let payload) => return Ok(payload)
-            Error(_) => return Error(JsonError.Syntax("Invalid UTF-8"))
+            Failure(_) => return Failure(JsonError.Syntax("Invalid UTF-8"))
         }
     }
 }
@@ -200,13 +200,13 @@ internal class MessageReader {
 
     private func HexQuad(bytes: ReadOnlySlice<byte>) -> Result<int, JsonError> {
         if bytes.Length - position < 4 {
-            return Error(JsonError.Syntax("Truncated Unicode escape"))
+            return Failure(JsonError.Syntax("Truncated Unicode escape"))
         }
         var value = 0
         for index in 0..4 {
             let digit = JsonSyntax.HexDigit(bytes[position])
             if digit == -1 {
-                return Error(JsonError.Syntax("Invalid Unicode escape"))
+                return Failure(JsonError.Syntax("Invalid Unicode escape"))
             }
             value = value * 16 + digit
             position += 1
@@ -220,13 +220,13 @@ internal class MessageReader {
     func Read(bytes: ReadOnlySlice<byte>, maxBytes: int) -> Result<string, JsonError> {
         let length = bytes.Length
         if length > maxBytes {
-            return Error(JsonError.LimitExceeded("JSON string exceeds byte limit"))
+            return Failure(JsonError.LimitExceeded("JSON string exceeds byte limit"))
         }
         while position < length && JsonSyntax.Whitespace(bytes[position]) {
             position += 1
         }
         if position == length || bytes[position] != 34 {
-            return Error(JsonError.Syntax("Expected a JSON string"))
+            return Failure(JsonError.Syntax("Expected a JSON string"))
         }
         position += 1
         let output = ArrayList<byte>(length)
@@ -238,7 +238,7 @@ internal class MessageReader {
                 closed = true
             } else if value == 92 {
                 if position == length {
-                    return Error(JsonError.Syntax("Truncated escape"))
+                    return Failure(JsonError.Syntax("Truncated escape"))
                 }
                 let escape = bytes[position]
                 position += 1
@@ -258,19 +258,19 @@ internal class MessageReader {
                     var scalar = HexQuad(bytes)?
                     if scalar >= 55296 && scalar <= 56319 {
                         if length - position < 6 {
-                            return Error(JsonError.Syntax("Missing low surrogate"))
+                            return Failure(JsonError.Syntax("Missing low surrogate"))
                         }
                         if bytes[position] != 92 || bytes[position + 1] != 117 {
-                            return Error(JsonError.Syntax("Missing low surrogate"))
+                            return Failure(JsonError.Syntax("Missing low surrogate"))
                         }
                         position += 2
                         let low = HexQuad(bytes)?
                         if !(low >= 56320 && low <= 57343) {
-                            return Error(JsonError.Syntax("Invalid low surrogate"))
+                            return Failure(JsonError.Syntax("Invalid low surrogate"))
                         }
                         scalar = 65536 + (scalar - 55296) * 1024 + low - 56320
                     } else if scalar >= 56320 && scalar <= 57343 {
-                        return Error(JsonError.Syntax("Unpaired low surrogate"))
+                        return Failure(JsonError.Syntax("Unpaired low surrogate"))
                     }
                     if scalar <= 127 {
                         output.Add((byte)scalar)
@@ -288,26 +288,26 @@ internal class MessageReader {
                         output.Add((byte)(128 + scalar % 64))
                     }
                 } else {
-                    return Error(JsonError.Syntax("Unknown escape"))
+                    return Failure(JsonError.Syntax("Unknown escape"))
                 }
             } else if value <= 31 {
-                return Error(JsonError.Syntax("Unescaped control byte"))
+                return Failure(JsonError.Syntax("Unescaped control byte"))
             } else {
                 output.Add(value)
             }
         }
         if !closed {
-            return Error(JsonError.Syntax("Unclosed string"))
+            return Failure(JsonError.Syntax("Unclosed string"))
         }
         while position < length && JsonSyntax.Whitespace(bytes[position]) {
             position += 1
         }
         if position != length {
-            return Error(JsonError.Syntax("Trailing content"))
+            return Failure(JsonError.Syntax("Trailing content"))
         }
         match Encodings.Utf8.Decode(output[..]) {
             Ok(let text) => return Ok(text)
-            Error(_) => return Error(JsonError.Syntax("Invalid UTF-8"))
+            Failure(_) => return Failure(JsonError.Syntax("Invalid UTF-8"))
         }
     }
 }

@@ -62,13 +62,13 @@ class ReportServer {
             let context = await server.Accept()?
             // Close the owned exchange before propagating a configuration failure.
             let configured = await Configure(context)
-            if let Error(error) = configured {
+            if let Failure(error) = configured {
                 context.Close()
-                return Error(error)
+                return Failure(error)
             }
             let sent = await context.Complete()
-            if let Error(sendError) = sent {
-                return Error(AppError.Http(sendError))
+            if let Failure(sendError) = sent {
+                return Failure(AppError.Http(sendError))
             }
             index += 1
         }
@@ -106,7 +106,7 @@ func StartServer(arguments: string[]) -> Task<()> {
 async func FinishServing(server: HttpServer, serving: Task<Result<unit, AppError>>) -> Task<()> {
     let result = await serving
     server.Close()
-    if let Error(error) = result {
+    if let Failure(error) = result {
         System.Fail(error.ToString())
     }
     Console.WriteLine("Reports served")

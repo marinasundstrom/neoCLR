@@ -11,10 +11,10 @@ func Check(value: bool, message: string) {
 func Main() {
     match LoadConfig("valid.cfg") {
         Ok(let config) => Check(config.Port == 4242, "config value")
-        Error(_) => System.Fail("valid config failed")
+        Failure(_) => System.Fail("valid config failed")
     }
     match LoadConfig("missing.cfg") {
-        Error(let error) => {
+        Failure(let error) => {
             Check(error is FileReadError, "file alternative")
             if error is FileReadError fileError {
                 Check(fileError is FileReadError.NotFound, "file payload")
@@ -23,7 +23,7 @@ func Main() {
         Ok(_) => System.Fail("missing config succeeded")
     }
     match LoadConfig("invalid.cfg") {
-        Error(let error) => {
+        Failure(let error) => {
             Check(error is NumberParseError, "parse alternative")
             if error is NumberParseError parseError {
                 Check(parseError is NumberParseError.InvalidFormat, "parse payload")

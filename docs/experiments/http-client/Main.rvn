@@ -29,7 +29,7 @@ async func Main() -> Task<()> {
     if let Ok(text) = result {
         Console.WriteLine("HTTP 200")
         Console.WriteLine(text)
-    } else if let Error(message) = result {
+    } else if let Failure(message) = result {
         Console.WriteLine(String.Concat("HTTP error: ", message))
     }
     return ()

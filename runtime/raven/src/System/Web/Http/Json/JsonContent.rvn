@@ -45,10 +45,10 @@ public class JsonContent {
 
     private static func BufferedBytes(content: HttpContent) -> Result<byte[], JsonError> {
         if !content.IsBuffered {
-            return Error(JsonError.Read(TextReadError.IoFailure))
+            return Failure(JsonError.Read(TextReadError.IoFailure))
         }
         if content.Bytes.Count > 1024 {
-            return Error(JsonError.LimitExceeded("Document exceeds 1024 UTF-8 bytes"))
+            return Failure(JsonError.LimitExceeded("Document exceeds 1024 UTF-8 bytes"))
         }
         return Ok(HttpText.Snapshot(content.Bytes))
     }

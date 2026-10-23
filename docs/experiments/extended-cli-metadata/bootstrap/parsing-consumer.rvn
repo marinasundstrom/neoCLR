@@ -5,7 +5,7 @@ import System.Runtime.CompilerServices.*
 func ReadBoolean(text: string) -> int {
     return Boolean.Parse(text) match {
         Ok(let value) => if value { 1 } else { 0 }
-        Error(_) => -1
+        Failure(_) => -1
     }
 }
 

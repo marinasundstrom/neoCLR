@@ -61,10 +61,10 @@ public class StreamWriter : TextWriter {
 
     private func Begin() -> Result<unit, StreamError> {
         if closed {
-            return Error(StreamError.Closed)
+            return Failure(StreamError.Closed)
         }
         if operation.Active {
-            return Error(StreamError.Busy)
+            return Failure(StreamError.Busy)
         }
         operation.Begin()
         return Ok(())
@@ -72,18 +72,18 @@ public class StreamWriter : TextWriter {
 
     private func Prepare(text: string, line: bool, final: bool) -> Result<unit, StreamError> {
         if failed || operation.WasAbandoned || finished {
-            return Error(StreamError.InvalidEncoding)
+            return Failure(StreamError.InvalidEncoding)
         }
         let ending = if line { NewLine } else { "" }
         let endingBytes = ending.Utf8Bytes.Length
         if endingBytes > 65536 || text.Utf8Bytes.Length > 65536 - endingBytes {
-            return Error(StreamError.LimitExceeded)
+            return Failure(StreamError.LimitExceeded)
         }
         let content = if ending.IsEmpty { text } else { text + ending }
         match encoder.Accept(content, final) {
             Ok(_) => { }
-            Error(EncodingError.LimitExceeded) => return Error(StreamError.LimitExceeded)
-            Error(_) => return Error(StreamError.InvalidEncoding)
+            Failure(EncodingError.LimitExceeded) => return Failure(StreamError.LimitExceeded)
+            Failure(_) => return Failure(StreamError.InvalidEncoding)
         }
         finishing = final
         return Ok(())
@@ -92,9 +92,9 @@ public class StreamWriter : TextWriter {
     private func Drain(total: int) -> Result<EncoderProgress, StreamError> {
         let step = match encoder.Drain(buffer) {
             Ok(let value) => value
-            Error(_) => {
+            Failure(_) => {
                 failed = true
-                return Error(StreamError.InvalidEncoding)
+                return Failure(StreamError.InvalidEncoding)
             }
         }
         if !(step.BytesWritten >= 0) || step.BytesWritten > buffer.Length {
@@ -102,7 +102,7 @@ public class StreamWriter : TextWriter {
         }
         if step.BytesWritten > 65536 - total {
             failed = true
-            return Error(StreamError.LimitExceeded)
+            return Failure(StreamError.LimitExceeded)
         }
         return Ok(step)
     }
@@ -110,7 +110,7 @@ public class StreamWriter : TextWriter {
     private async func Run(text: string, line: bool, final: bool) -> Task<Result<int, StreamError>> {
         match Begin() {
             Ok(_) => { }
-            Error(let error) => return Error(error)
+            Failure(let error) => return Failure(error)
         }
         use lease = operation
         let result = await WriteCore(text, line, final)
@@ -124,7 +124,7 @@ public class StreamWriter : TextWriter {
         }
         match Prepare(text, line, final) {
             Ok(_) => { }
-            Error(let error) => return Error(error)
+            Failure(let error) => return Failure(error)
         }
         return await Pump()
     }
@@ -135,18 +135,18 @@ public class StreamWriter : TextWriter {
             while true {
                 let step = match Drain(total) {
                     Ok(let value) => value
-                    Error(let error) => return Error(error)
+                    Failure(let error) => return Failure(error)
                 }
                 let result = await destination.Write(buffer, 0, step.BytesWritten)
                 if closed {
                     failed = true
-                    return Error(StreamError.Closed)
+                    return Failure(StreamError.Closed)
                 }
                 match result {
                     Ok(_) => total += step.BytesWritten
-                    Error(let error) => {
+                    Failure(let error) => {
                         failed = true
-                        return Error(error)
+                        return Failure(error)
                     }
                 }
                 if TextWriteSupport.CompleteStep(step, finishing) {
@@ -157,29 +157,29 @@ public class StreamWriter : TextWriter {
                     return Ok(total)
                 }
             }
-            return Error(StreamError.IoFailure)
+            return Failure(StreamError.IoFailure)
 
         }
-        return Error(StreamError.WrongAccess)
+        return Failure(StreamError.WrongAccess)
     }
 
     /// <summary>Flushes the underlying output without finalizing the encoder.</summary>
     async func Flush() -> Task<Result<unit, StreamError>> {
         match Begin() {
             Ok(_) => { }
-            Error(let error) => return Error(error)
+            Failure(let error) => return Failure(error)
         }
         use lease = operation
         if output is OutputStream destination {
             let result = await destination.Flush()
             operation.Complete()
             if closed {
-                return Error(StreamError.Closed)
+                return Failure(StreamError.Closed)
             }
             return result
         }
         operation.Complete()
-        return Error(StreamError.WrongAccess)
+        return Failure(StreamError.WrongAccess)
     }
 
     /// <summary>Closes this wrapper and its output unless leaveOpen was selected. Does not flush or finish.</summary>

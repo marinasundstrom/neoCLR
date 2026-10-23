@@ -41,22 +41,22 @@ internal class ObjectMapper {
            type.Equals(typeof(UIntPtr)) || type.Equals(typeof(Single)) ||
            type.Equals(typeof(Double)) || type.Equals(typeof(Character)) ||
            type.Equals(typeof(RuntimeTypeHandle)) {
-            return Error(JsonError.UnsupportedMapping("Unsupported scalar type"))
+            return Failure(JsonError.UnsupportedMapping("Unsupported scalar type"))
         }
         if type is NominalTypeInfo nominal {
             if nominal.IsUnionDeclaration {
-                return Error(JsonError.UnsupportedMapping("Nominal unions require an explicit JSON mapping"))
+                return Failure(JsonError.UnsupportedMapping("Nominal unions require an explicit JSON mapping"))
             }
         }
         if (type.IsValueType && (!type.IsNominalType || type.IsEnum || type.IsUnion)) || type.IsInterface || type.IsArray || type.IsByRef || type.IsPointer || type.IsOpen || type.GenericArgumentCount != 0 {
-            return Error(JsonError.UnsupportedMapping("Expected a scalar, typed array or nongeneric object record"))
+            return Failure(JsonError.UnsupportedMapping("Expected a scalar, typed array or nongeneric object record"))
         }
         return Ok(())
     }
 
     private static func CheckProperty(property: PropertyInfo) -> Result<unit, JsonError> {
         if property.GetIndexParameters().Count != 0 {
-            return Error(JsonError.UnsupportedMapping("Indexed property: " + property.Name))
+            return Failure(JsonError.UnsupportedMapping("Indexed property: " + property.Name))
         }
         return CheckType(property.PropertyType)
     }
@@ -67,7 +67,7 @@ internal class ObjectMapper {
 
     private static func WriteValue(value: Object?, type: TypeInfo, depth: int) -> Result<JsonValue, JsonError> {
         _ = CheckType(type)?
-        let present: Object = value ?? return Error(JsonError.UnsupportedMapping("Null mapped value"))
+        let present: Object = value ?? return Failure(JsonError.UnsupportedMapping("Null mapped value"))
         if IsNodeType(type) {
             if present is JsonValue node {
                 if MatchesNode(node, type) {
@@ -76,17 +76,17 @@ internal class ObjectMapper {
                     return Ok(node)
                 }
             }
-            return Error(JsonError.TypeMismatch("declared JSON node kind"))
+            return Failure(JsonError.TypeMismatch("declared JSON node kind"))
         }
         let collection = neoCLR.Runtime.ReflectionCollectionKind(type)
         let actual = present.GetType()
         if collection != 0 {
             if neoCLR.Runtime.ReflectionCollectionKind(actual) != collection ||
                !actual.GetGenericArgument(collection - 1).Equals(type.GetGenericArgument(collection - 1)) {
-                return Error(JsonError.UnsupportedMapping("Incompatible collection value"))
+                return Failure(JsonError.UnsupportedMapping("Incompatible collection value"))
             }
         } else if !actual.Equals(type) {
-            return Error(JsonError.UnsupportedMapping("Polymorphic mapped value"))
+            return Failure(JsonError.UnsupportedMapping("Polymorphic mapped value"))
         }
         if present is string text {
             return Ok(JsonString(text))
@@ -99,13 +99,13 @@ internal class ObjectMapper {
             return Ok(JsonBoolean(flag))
         }
         if depth >= 4 {
-            return Error(JsonError.LimitExceeded("Container depth exceeds four (or cyclic graph)"))
+            return Failure(JsonError.LimitExceeded("Container depth exceeds four (or cyclic graph)"))
         }
         if collection != 0 {
             let element = type.GetGenericArgument(collection - 1)
             let count = neoCLR.Runtime.ReflectionCollectionCount(type, present)
             if count > 31 {
-                return Error(JsonError.LimitExceeded("Collection exceeds 31 items"))
+                return Failure(JsonError.LimitExceeded("Collection exceeds 31 items"))
             }
             if collection == 1 {
                 let sequence = JsonArray()
@@ -127,11 +127,11 @@ internal class ObjectMapper {
         }
         if type.IsArray {
             let Some(element) = type.GetElementType() else {
-                return Error(JsonError.UnsupportedMapping("Missing array element type"))
+                return Failure(JsonError.UnsupportedMapping("Missing array element type"))
             }
             let count = ArrayReflection.GetLength(present)
             if count > 31 {
-                return Error(JsonError.LimitExceeded("Array exceeds 31 items"))
+                return Failure(JsonError.LimitExceeded("Array exceeds 31 items"))
             }
             let array = JsonArray()
             for index in 0..count {
@@ -147,7 +147,7 @@ internal class ObjectMapper {
                 _ = CheckProperty(property)?
                 let item: Object? = match property.GetValue(present) {
                     Ok(let content) => content
-                    Error(let reason) => return Error(JsonError.Reflection(reason))
+                    Failure(let reason) => return Failure(JsonError.Reflection(reason))
                 }
                 let node = WriteValue(item, property.PropertyType, depth + 1)?
                 _ = document.Add(property.Name, node)?
@@ -170,32 +170,32 @@ internal class ObjectMapper {
             if MatchesNode(value, type) {
                 return Ok(value)
             }
-            return Error(JsonError.TypeMismatch("declared JSON node kind"))
+            return Failure(JsonError.TypeMismatch("declared JSON node kind"))
         }
         if type.Equals(typeof(string)) {
             if value is JsonString text {
                 return Ok(text.Value)
             }
-            return Error(JsonError.TypeMismatch("string"))
+            return Failure(JsonError.TypeMismatch("string"))
         }
         if type.Equals(typeof(int)) {
             if value is JsonNumber number {
                 let parsed = number.AsInt32()?
                 return Ok(parsed)
             }
-            return Error(JsonError.TypeMismatch("Int32"))
+            return Failure(JsonError.TypeMismatch("Int32"))
         }
         if type.Equals(typeof(bool)) {
             if value is JsonBoolean flag {
                 return Ok(flag.Value)
             }
-            return Error(JsonError.TypeMismatch("Boolean"))
+            return Failure(JsonError.TypeMismatch("Boolean"))
         }
         if type.IsValueType {
-            return Error(JsonError.UnsupportedMapping("Value-record deserialization requires constructor mapping"))
+            return Failure(JsonError.UnsupportedMapping("Value-record deserialization requires constructor mapping"))
         }
         if depth >= 4 {
-            return Error(JsonError.LimitExceeded("Container depth exceeds four"))
+            return Failure(JsonError.LimitExceeded("Container depth exceeds four"))
         }
         let collection = neoCLR.Runtime.ReflectionCollectionKind(type)
         if collection != 0 {
@@ -213,7 +213,7 @@ internal class ObjectMapper {
                     }
                     return Ok(neoCLR.Runtime.ReflectionCollectionCreate(type, items, []))
                 }
-                return Error(JsonError.TypeMismatch("array"))
+                return Failure(JsonError.TypeMismatch("array"))
             }
             if value is JsonObject map {
                 let items = CheckedStorage.Reserve<Object>(map.Count)
@@ -230,11 +230,11 @@ internal class ObjectMapper {
                 }
                 return Ok(neoCLR.Runtime.ReflectionCollectionCreate(type, items, keys))
             }
-            return Error(JsonError.TypeMismatch("object"))
+            return Failure(JsonError.TypeMismatch("object"))
         }
         if type.IsArray {
             let Some(element) = type.GetElementType() else {
-                return Error(JsonError.UnsupportedMapping("Missing array element type"))
+                return Failure(JsonError.UnsupportedMapping("Missing array element type"))
             }
             if value is JsonArray array {
                 let items = CheckedStorage.Reserve<Object>(array.Count)
@@ -248,7 +248,7 @@ internal class ObjectMapper {
                 }
                 return Ok(ArrayReflection.Create(type, items))
             }
-            return Error(JsonError.TypeMismatch("array"))
+            return Failure(JsonError.TypeMismatch("array"))
         }
         if value is JsonObject document {
             let properties = ArrayList<PropertyInfo>()
@@ -267,15 +267,15 @@ internal class ObjectMapper {
             }
             let instance = match type.CreateInstance() {
                 Ok(let created) => created
-                Error(let reason) => return Error(JsonError.Reflection(reason))
+                Failure(let reason) => return Failure(JsonError.Reflection(reason))
             }
             for index in 0..properties.Count {
-                if let Error(reason) = properties[index].SetValue(instance, values[index]) {
-                    return Error(JsonError.Reflection(reason))
+                if let Failure(reason) = properties[index].SetValue(instance, values[index]) {
+                    return Failure(JsonError.Reflection(reason))
                 }
             }
             return Ok(instance)
         }
-        return Error(JsonError.TypeMismatch("object"))
+        return Failure(JsonError.TypeMismatch("object"))
     }
 }

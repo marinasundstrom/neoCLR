@@ -53,14 +53,14 @@ ret
 newobj instance System.Networking.DnsError.LookupFailed::.ctor()
 ret
 .end
-.function neoCLR.Library.System.Networking.Dns.RuntimeUnion0(System.Networking.DnsError arg0) -> System.Result.Error<System.Networking.DnsError>
+.function neoCLR.Library.System.Networking.Dns.RuntimeUnion0(System.Networking.DnsError arg0) -> System.Result.Failure<System.Networking.DnsError>
 ldarg arg0
-newobj instance System.Result.Error<System.Networking.DnsError>::.ctor(System.Networking.DnsError)
+newobj instance System.Result.Failure<System.Networking.DnsError>::.ctor(System.Networking.DnsError)
 ret
 .end
-.function neoCLR.Library.System.Networking.Dns.RuntimeUnion1(System.Result.Error<System.Networking.DnsError> arg0) -> System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>
+.function neoCLR.Library.System.Networking.Dns.RuntimeUnion1(System.Result.Failure<System.Networking.DnsError> arg0) -> System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>
 ldarg arg0
-newobj instance System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>::.ctor(System.Result.Error<System.Networking.DnsError>)
+newobj instance System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>::.ctor(System.Result.Failure<System.Networking.DnsError>)
 ret
 .end
 .function neoCLR.Library.System.Networking.Dns.RuntimeUnion2(System.Collections.Sequence<System.Networking.IPAddress> arg0) -> System.Result.Ok<System.Collections.Sequence<System.Networking.IPAddress>>
@@ -338,7 +338,7 @@ call System.Networking.Dns::DecodeError(Byte)
 M00000009_IL_008e:
 call neoCLR.Library.System.Networking.Dns.RuntimeUnion0(System.Networking.DnsError)
 M00000009_IL_0093:
-call neoCLR.Library.System.Networking.Dns.RuntimeUnion1(System.Result.Error<System.Networking.DnsError>)
+call neoCLR.Library.System.Networking.Dns.RuntimeUnion1(System.Result.Failure<System.Networking.DnsError>)
 M00000009_IL_0098:
 call instance System.Concurrency.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>::Complete(System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>)
 call neoCLR.Library.System.Networking.Dns.RuntimeBooleanToInt32(Boolean)
@@ -551,7 +551,7 @@ call System.Networking.Dns::DecodeError(Byte)
 M0000000b_IL_0089:
 call neoCLR.Library.System.Networking.Dns.RuntimeUnion0(System.Networking.DnsError)
 M0000000b_IL_008e:
-call neoCLR.Library.System.Networking.Dns.RuntimeUnion1(System.Result.Error<System.Networking.DnsError>)
+call neoCLR.Library.System.Networking.Dns.RuntimeUnion1(System.Result.Failure<System.Networking.DnsError>)
 M0000000b_IL_0093:
 call instance System.Concurrency.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>::Complete(System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>)
 call neoCLR.Library.System.Networking.Dns.RuntimeBooleanToInt32(Boolean)
@@ -646,7 +646,7 @@ call neoCLR.Library.System.Networking.Dns.RuntimeErrorSystemNetworkingDnsErrorNe
 M0000000b_IL_012a:
 call neoCLR.Library.System.Networking.Dns.RuntimeUnion0(System.Networking.DnsError)
 M0000000b_IL_012f:
-call neoCLR.Library.System.Networking.Dns.RuntimeUnion1(System.Result.Error<System.Networking.DnsError>)
+call neoCLR.Library.System.Networking.Dns.RuntimeUnion1(System.Result.Failure<System.Networking.DnsError>)
 M0000000b_IL_0134:
 call instance System.Concurrency.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>::Complete(System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>)
 call neoCLR.Library.System.Networking.Dns.RuntimeBooleanToInt32(Boolean)

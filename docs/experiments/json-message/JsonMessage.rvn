@@ -32,13 +32,13 @@ public class MessageReader {
 
     private func HexQuad() -> Result<int, string> {
         if bytes.Count - position < 4 {
-            return Error("Truncated Unicode escape")
+            return Failure("Truncated Unicode escape")
         }
         var value = 0
         for index in 0..4 {
             let digit = HexDigit(bytes[position])
             if digit == -1 {
-                return Error("Invalid Unicode escape")
+                return Failure("Invalid Unicode escape")
             }
             value = value * 16 + digit
             position += 1
@@ -48,13 +48,13 @@ public class MessageReader {
 
     func Read() -> Result<string, string> {
         if bytes.Count > 128 {
-            return Error("Payload exceeds 128 UTF-8 bytes")
+            return Failure("Payload exceeds 128 UTF-8 bytes")
         }
         while position < bytes.Count && Whitespace(bytes[position]) {
             position += 1
         }
         if position == bytes.Count || bytes[position] != 34 {
-            return Error("Expected a JSON string")
+            return Failure("Expected a JSON string")
         }
         position += 1
         let output = ArrayList<byte>(bytes.Count)
@@ -66,7 +66,7 @@ public class MessageReader {
                 closed = true
             } else if value == 92 {
                 if position == bytes.Count {
-                    return Error("Truncated escape")
+                    return Failure("Truncated escape")
                 }
                 let escape = bytes[position]
                 position += 1
@@ -86,19 +86,19 @@ public class MessageReader {
                     var scalar = HexQuad()?
                     if scalar >= 55296 && scalar <= 56319 {
                         if bytes.Count - position < 6 {
-                            return Error("Missing low surrogate")
+                            return Failure("Missing low surrogate")
                         }
                         if bytes[position] != 92 || bytes[position + 1] != 117 {
-                            return Error("Missing low surrogate")
+                            return Failure("Missing low surrogate")
                         }
                         position += 2
                         let low = HexQuad()?
                         if !(low >= 56320 && low <= 57343) {
-                            return Error("Invalid low surrogate")
+                            return Failure("Invalid low surrogate")
                         }
                         scalar = 65536 + (scalar - 55296) * 1024 + low - 56320
                     } else if scalar >= 56320 && scalar <= 57343 {
-                        return Error("Unpaired low surrogate")
+                        return Failure("Unpaired low surrogate")
                     }
                     if scalar <= 127 {
                         output.Add((byte)scalar)
@@ -116,26 +116,26 @@ public class MessageReader {
                         output.Add((byte)(128 + scalar % 64))
                     }
                 } else {
-                    return Error("Unknown escape")
+                    return Failure("Unknown escape")
                 }
             } else if value <= 31 {
-                return Error("Unescaped control byte")
+                return Failure("Unescaped control byte")
             } else {
                 output.Add(value)
             }
         }
         if !closed {
-            return Error("Unclosed string")
+            return Failure("Unclosed string")
         }
         while position < bytes.Count && Whitespace(bytes[position]) {
             position += 1
         }
         if position != bytes.Count {
-            return Error("Trailing content")
+            return Failure("Trailing content")
         }
         match Utf8.Decode(output) {
             Ok(let text) => return Ok(text)
-            Error(_) => return Error("Invalid UTF-8")
+            Failure(_) => return Failure("Invalid UTF-8")
         }
     }
 }
@@ -147,7 +147,7 @@ public func ReadMessage(payload: string) -> Result<string, string> {
 public func WriteMessage(text: string) -> Result<string, string> {
     let input = Utf8.Encode(text)
     if input.Count > 126 {
-        return Error("Message exceeds payload limit")
+        return Failure("Message exceeds payload limit")
     }
     let output = ArrayList<byte>(input.Count + 2)
     let hex = Utf8.Encode("0123456789abcdef")
@@ -167,12 +167,12 @@ public func WriteMessage(text: string) -> Result<string, string> {
             output.Add(value)
         }
         if output.Count > 127 {
-            return Error("Escaped message exceeds payload limit")
+            return Failure("Escaped message exceeds payload limit")
         }
     }
     output.Add((byte)34)
     match Utf8.Decode(output) {
         Ok(let payload) => return Ok(payload)
-        Error(_) => return Error("Invalid UTF-8")
+        Failure(_) => return Failure("Invalid UTF-8")
     }
 }

@@ -27,7 +27,7 @@ func Main() {
     }
     match Date.Create(2026, 9, 13) {
         .Ok(let ok) => CheckDate(ok)
-        .Error(let error) => WriteLine("Invalid date")
+        .Failure(let error) => WriteLine("Invalid date")
     }
     let wide: ComparableTo<long> = 42L
     WriteLine(wide.CompareTo(42L))

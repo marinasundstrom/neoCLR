@@ -15,7 +15,7 @@ public func Input(bytes: byte[]) -> MemoryStream {
     let stream = MemoryStream()
     match stream.Write(bytes, 0, bytes.Length) {
         Ok(let count) => Check(count == bytes.Length, "Fixture write")
-        Error(_) => System.Fail("Fixture write error")
+        Failure(_) => System.Fail("Fixture write error")
     }
     _ = stream.Seek((long)0)
     return stream
@@ -30,7 +30,7 @@ public class ShortSink : OutputStream {
     val Flushes: int => flushes
     func Write(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
         if closed {
-            return Error(StreamError.Closed)
+            return Failure(StreamError.Closed)
         }
         if count == 0 {
             return Ok(0)
@@ -50,14 +50,14 @@ public class ShortSink : OutputStream {
 public func ExpectRead(result: Result<string, SelectionFailure>, expected: string) {
     match result {
         Ok(let text) => Check(text.Equals(expected), "Selected read content")
-        Error(_) => System.Fail("Selected read failed")
+        Failure(_) => System.Fail("Selected read failed")
     }
 }
 
 public func ExpectDecode(result: Result<string, CodecFailure>, expected: string) {
     match result {
         Ok(let text) => Check(text.Equals(expected), "Decoded content")
-        Error(_) => System.Fail("Decode failed")
+        Failure(_) => System.Fail("Decode failed")
     }
 }
 
@@ -68,7 +68,7 @@ public func ReaderSelectionChecks() {
     ExpectRead(SelectedReader(Input(bytes)).ReadToEnd(2), "é")
     ExpectRead(SelectedReader(Input(bytes), utf8).ReadToEnd(2), "é")
     match SelectedReader(Input(bytes), ascii).ReadToEnd(2) {
-        Error(SelectionFailure.Codec(CodecFailure.InvalidData(_))) => { }
+        Failure(SelectionFailure.Codec(CodecFailure.InvalidData(_))) => { }
         _ => System.Fail("ASCII decoding must be strict")
     }
     let plain: byte[] = [(byte)0, (byte)65, (byte)127]
@@ -77,7 +77,7 @@ public func ReaderSelectionChecks() {
     ExpectRead(reader.ReadToEnd(0), "")
     reader.Close()
     match reader.ReadToEnd(3) {
-        Error(SelectionFailure.Closed) => { }
+        Failure(SelectionFailure.Closed) => { }
         _ => System.Fail("Closed reader")
     }
     let first = utf8.CreateDecoder()
@@ -89,18 +89,18 @@ public func ReaderSelectionChecks() {
     ExpectDecode(second.Decode(head, 0, 1, true), "A")
     ExpectDecode(first.Decode(tail, 0, 1, true), "é")
     match first.Decode(tail, 0, 1, true) {
-        Error(CodecFailure.Finished) => { }
+        Failure(CodecFailure.Finished) => { }
         _ => System.Fail("Decoder finalization")
     }
     let strict = ascii.CreateDecoder()
     match strict.Decode(plain, 0, 4, false) {
-        Error(CodecFailure.InvalidRange) => { }
+        Failure(CodecFailure.InvalidRange) => { }
         _ => System.Fail("Invalid range")
     }
     ExpectDecode(strict.Decode(plain, 0, 3, true), "\u0000A\u007f")
     let limited = SelectedReader(Input(plain), ascii)
     match limited.ReadToEnd(2) {
-        Error(SelectionFailure.LimitExceeded) => { }
+        Failure(SelectionFailure.LimitExceeded) => { }
         _ => System.Fail("Read quota")
     }
     WriteLine("Encoding selection reader and independent decoder checks passed")
@@ -120,7 +120,7 @@ public func WriterSelectionChecks() {
     let asciiSink = ShortSink()
     let asciiWriter = SelectedWriter(asciiSink, AsciiSelection())
     match asciiWriter.Write("valid then é") {
-        Error(SelectionFailure.Codec(CodecFailure.UnrepresentableText)) => Check(asciiSink.Bytes.Count == 0, "Reject before output")
+        Failure(SelectionFailure.Codec(CodecFailure.UnrepresentableText)) => Check(asciiSink.Bytes.Count == 0, "Reject before output")
         _ => System.Fail("ASCII encoding must be strict")
     }
     match asciiWriter.WriteLine("A") {
@@ -132,7 +132,7 @@ public func WriterSelectionChecks() {
     asciiWriter.Close()
     Check(asciiSink.Closed, "Close ownership")
     match asciiWriter.Write("A") {
-        Error(SelectionFailure.Closed) => { }
+        Failure(SelectionFailure.Closed) => { }
         _ => System.Fail("Closed writer")
     }
     WriteLine("Encoding selection writer and strict rejection checks passed")

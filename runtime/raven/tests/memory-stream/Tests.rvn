@@ -50,9 +50,9 @@ func MemoryGap() -> Result<unit, TestFailure> {
 func MemoryInvalidRanges() -> Result<unit, TestFailure> {
     let stream = MemoryStream()
     let bytes: byte[] = [(byte)1]
-    _ = Assert.True(CompletedValue(stream.Write(bytes, 2147483647, 1)) is Error(StreamError.InvalidRange), "Overflowing write range")?
-    _ = Assert.True(CompletedValue(stream.Read(bytes, -1, 1)) is Error(StreamError.InvalidRange), "Negative read offset")?
-    _ = Assert.True(stream.Seek(-1) is Error(StreamError.InvalidRange), "Negative seek")?
+    _ = Assert.True(CompletedValue(stream.Write(bytes, 2147483647, 1)) is Failure(StreamError.InvalidRange), "Overflowing write range")?
+    _ = Assert.True(CompletedValue(stream.Read(bytes, -1, 1)) is Failure(StreamError.InvalidRange), "Negative read offset")?
+    _ = Assert.True(stream.Seek(-1) is Failure(StreamError.InvalidRange), "Negative seek")?
     _ = Assert.True(stream.GetPosition() is Ok(0L), "Rejected operations must preserve position")?
     _ = Assert.True(stream.GetLength() is Ok(0L), "Rejected operations must preserve length")?
     stream.Close()
@@ -64,10 +64,10 @@ func MemoryCapacity() -> Result<unit, TestFailure> {
     let stream = MemoryStream()
     let bytes: byte[] = [(byte)1]
     _ = Assert.True(CompletedValue(stream.Write(bytes, 0, 1)) is Ok(_), "Write initial byte")?
-    _ = Assert.True(stream.Seek(65537) is Error(StreamError.LimitExceeded), "Seek beyond quota")?
+    _ = Assert.True(stream.Seek(65537) is Failure(StreamError.LimitExceeded), "Seek beyond quota")?
     _ = Assert.True(stream.GetPosition() is Ok(1L), "Rejected seek must not move")?
     _ = Assert.True(stream.Seek(65536) is Ok(_), "Exact boundary seek")?
-    _ = Assert.True(CompletedValue(stream.Write(bytes, 0, 1)) is Error(StreamError.LimitExceeded), "Write beyond quota")?
+    _ = Assert.True(CompletedValue(stream.Write(bytes, 0, 1)) is Failure(StreamError.LimitExceeded), "Write beyond quota")?
     _ = Assert.True(stream.GetLength() is Ok(1L), "Rejected write must not extend length")?
     _ = Assert.True(stream.GetPosition() is Ok(65536L), "Rejected write must not move")?
     stream.Close()
@@ -84,12 +84,12 @@ func MemoryClosed() -> Result<unit, TestFailure> {
     input.Close()
     output.Close()
     let bytes: byte[] = [(byte)0]
-    _ = Assert.True(stream.GetLength() is Error(StreamError.Closed), "Closed length")?
-    _ = Assert.True(seek.GetPosition() is Error(StreamError.Closed), "Closed position")?
-    _ = Assert.True(CompletedValue(output.Write(bytes, 0, 0)) is Error(StreamError.Closed), "Closed empty write")?
-    _ = Assert.True(CompletedValue(input.Read(bytes, 0, 0)) is Error(StreamError.Closed), "Closed empty read")?
-    _ = Assert.True(CompletedValue(output.Flush()) is Error(StreamError.Closed), "Closed flush")?
-    return Assert.True(seek.Seek(0) is Error(StreamError.Closed), "Closed seek")
+    _ = Assert.True(stream.GetLength() is Failure(StreamError.Closed), "Closed length")?
+    _ = Assert.True(seek.GetPosition() is Failure(StreamError.Closed), "Closed position")?
+    _ = Assert.True(CompletedValue(output.Write(bytes, 0, 0)) is Failure(StreamError.Closed), "Closed empty write")?
+    _ = Assert.True(CompletedValue(input.Read(bytes, 0, 0)) is Failure(StreamError.Closed), "Closed empty read")?
+    _ = Assert.True(CompletedValue(output.Flush()) is Failure(StreamError.Closed), "Closed flush")?
+    return Assert.True(seek.Seek(0) is Failure(StreamError.Closed), "Closed seek")
 }
 
 [Test("MemoryStream async interfaces preserve complete writes short reads and EOF")]
@@ -133,8 +133,8 @@ internal class AsyncMemoryChecks {
             && flushed is Some(Completed(Ok(_)))
             && eof is Some(Completed(Ok(0)))
             && empty is Some(Completed(Ok(0)))
-            && closedWrite is Some(Completed(Error(StreamError.Closed)))
-            && closedFlush is Some(Completed(Error(StreamError.Closed)))
+            && closedWrite is Some(Completed(Failure(StreamError.Closed)))
+            && closedFlush is Some(Completed(Failure(StreamError.Closed)))
             && destination[0] == 99 && destination[1] == 22 && destination[2] == 33 && destination[3] == 99
     }
 }
@@ -150,11 +150,11 @@ func MemoryAsyncRejection() -> Result<unit, TestFailure> {
     _ = Assert.True(stream.Read(bytes, -1, 1, cancellation.Token).IsCancelled, "Cancellation precedes range validation")?
     _ = Assert.True(stream.Flush(cancellation.Token).IsCancelled, "Cancelled flush")?
     _ = Assert.True(stream.GetLength() is Ok(0L) && stream.GetPosition() is Ok(0L), "No mutation on cancellation")?
-    let Some(Completed(Error(StreamError.InvalidRange))) = stream.Write(bytes, 2147483647, 1, CancellationToken.None).Outcome else {
+    let Some(Completed(Failure(StreamError.InvalidRange))) = stream.Write(bytes, 2147483647, 1, CancellationToken.None).Outcome else {
         return Assert.True(false, "Overflow-safe range rejection")
     }
     _ = Assert.True(stream.Seek(65536) is Ok(_), "Quota boundary")?
-    let Some(Completed(Error(StreamError.LimitExceeded))) = stream.Write(bytes, 0, 1, CancellationToken.None).Outcome else {
+    let Some(Completed(Failure(StreamError.LimitExceeded))) = stream.Write(bytes, 0, 1, CancellationToken.None).Outcome else {
         return Assert.True(false, "Quota rejection")
     }
     _ = Assert.True(stream.GetLength() is Ok(0L) && stream.GetPosition() is Ok(65536L), "Rejected writes preserve state")?

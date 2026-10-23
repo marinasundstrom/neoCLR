@@ -58,14 +58,14 @@ public struct LocalDateTime : EquatableTo<LocalDateTime>, ComparableTo<LocalDate
             day = day + 1L
         }
         if day < 0L {
-            return Error(InvalidDateError())
+            return Failure(InvalidDateError())
         }
         if day > 3652058L {
-            return Error(InvalidDateError())
+            return Failure(InvalidDateError())
         }
         let date = System.Time.Date.FromDayNumber((int)day)?
         let Ok(time) = System.Time.TimeOfDay.FromTicks(ticks) else {
-            return Error(InvalidDateError())
+            return Failure(InvalidDateError())
         }
         return Ok(LocalDateTime(date, time))
     }

@@ -9,7 +9,7 @@ import System.Web.Http.*
 
 func CheckInvalid(options: HttpServerOptions) {
     // Invalid configuration must be rejected before attempting this invalid bind.
-    if !(HttpServer.Listen("invalid address", -1, 0, options) is Error(HttpError.InvalidRequest(_))) {
+    if !(HttpServer.Listen("invalid address", -1, 0, options) is Failure(HttpError.InvalidRequest(_))) {
         System.Fail("Invalid server options were not rejected first")
     }
 }
@@ -75,7 +75,7 @@ func Validate(result: Result<System.Void, HttpError>, expected: string) {
         if expected != "ok" {
             System.Fail("Configured limit was ignored")
         }
-    } else if let Error(reason) = result {
+    } else if let Failure(reason) = result {
         let kind = match reason {
             HttpError.LimitExceeded(_) => "limit"
             HttpError.TimedOut => "timeout"

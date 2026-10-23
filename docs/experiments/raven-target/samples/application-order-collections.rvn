@@ -47,7 +47,7 @@ func OnlyPending(orders: Iterable<Order>) -> Result<Order, SingleError> {
 func PrintPending(orders: Iterable<Order>) {
     match OnlyPending(orders) {
         Ok(let order) => WriteLine(order.Number)
-        Error(let error) => WriteLine(error.ToString())
+        Failure(let error) => WriteLine(error.ToString())
     }
 }
 

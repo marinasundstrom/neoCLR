@@ -276,11 +276,11 @@ ret
 .local System.Result<Void,System.Text.EncodingError> local1
 .local System.Result.Ok<Void> local2
 .local System.Result<Void,System.Text.EncodingError> local3
-.local System.Result.Error<System.Text.EncodingError> local4
+.local System.Result.Failure<System.Text.EncodingError> local4
 .local System.Text.EncodingError local5
 .local System.Text.EncodingError.LimitExceeded local6
 .local System.Result<Void,System.Text.EncodingError> local7
-.local System.Result.Error<System.Text.EncodingError> local8
+.local System.Result.Failure<System.Text.EncodingError> local8
 ldloca local0
 initobj System.Result<Void,System.Text.EncodingError>
 ldloca local1
@@ -290,7 +290,7 @@ initobj System.Result.Ok<Void>
 ldloca local3
 initobj System.Result<Void,System.Text.EncodingError>
 ldloca local4
-initobj System.Result.Error<System.Text.EncodingError>
+initobj System.Result.Failure<System.Text.EncodingError>
 ldloca local5
 initobj System.Text.EncodingError
 newobj System.Text.EncodingError.LimitExceeded
@@ -298,7 +298,7 @@ stloc local6
 ldloca local7
 initobj System.Result<Void,System.Text.EncodingError>
 ldloca local8
-initobj System.Result.Error<System.Text.EncodingError>
+initobj System.Result.Failure<System.Text.EncodingError>
 M00000005_IL_0000:
 M00000005_IL_0001:
 M00000005_IL_0002:
@@ -317,7 +317,7 @@ call neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorNewSys
 M00000005_IL_001c:
 call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion0(System.IO.StreamError)
 M00000005_IL_0021:
-call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Failure<System.IO.StreamError>)
 M00000005_IL_0026:
 ret
 M00000005_IL_0027:
@@ -349,7 +349,7 @@ call neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorNewSys
 M00000005_IL_0054:
 call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion0(System.IO.StreamError)
 M00000005_IL_0059:
-call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Failure<System.IO.StreamError>)
 M00000005_IL_005e:
 ret
 M00000005_IL_005f:
@@ -374,7 +374,7 @@ call neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorNewSys
 M00000005_IL_0082:
 call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion0(System.IO.StreamError)
 M00000005_IL_0087:
-call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Failure<System.IO.StreamError>)
 M00000005_IL_008c:
 ret
 M00000005_IL_008d:
@@ -427,19 +427,19 @@ stloc local3
 M00000005_IL_00d2:
 ldloca local4
 M00000005_IL_00d4:
-initobj System.Result.Error<System.Text.EncodingError>
+initobj System.Result.Failure<System.Text.EncodingError>
 M00000005_IL_00da:
 ldloca local3
 M00000005_IL_00dc:
 ldloca local4
 M00000005_IL_00de:
-call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion4(System.Result<Void,System.Text.EncodingError>&,System.Result.Error<System.Text.EncodingError>&)
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion4(System.Result<Void,System.Text.EncodingError>&,System.Result.Failure<System.Text.EncodingError>&)
 M00000005_IL_00e3:
 brfalse M00000005_IL_012c
 M00000005_IL_00e8:
 ldloca local4
 M00000005_IL_00ea:
-call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion5(System.Result.Error<System.Text.EncodingError>&)
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion5(System.Result.Failure<System.Text.EncodingError>&)
 M00000005_IL_00ef:
 stloc local5
 M00000005_IL_00f1:
@@ -463,7 +463,7 @@ call neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorNewSys
 M00000005_IL_0121:
 call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion0(System.IO.StreamError)
 M00000005_IL_0126:
-call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Failure<System.IO.StreamError>)
 M00000005_IL_012b:
 ret
 M00000005_IL_012c:
@@ -474,19 +474,19 @@ stloc local7
 M00000005_IL_0130:
 ldloca local8
 M00000005_IL_0132:
-initobj System.Result.Error<System.Text.EncodingError>
+initobj System.Result.Failure<System.Text.EncodingError>
 M00000005_IL_0138:
 ldloca local7
 M00000005_IL_013a:
 ldloca local8
 M00000005_IL_013c:
-call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion4(System.Result<Void,System.Text.EncodingError>&,System.Result.Error<System.Text.EncodingError>&)
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion4(System.Result<Void,System.Text.EncodingError>&,System.Result.Failure<System.Text.EncodingError>&)
 M00000005_IL_0141:
 brfalse M00000005_IL_016f
 M00000005_IL_0146:
 ldloca local8
 M00000005_IL_0148:
-call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion5(System.Result.Error<System.Text.EncodingError>&)
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion5(System.Result.Failure<System.Text.EncodingError>&)
 M00000005_IL_014d:
 pop
 M00000005_IL_014e:
@@ -499,7 +499,7 @@ call neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorNewSys
 M00000005_IL_0164:
 call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion0(System.IO.StreamError)
 M00000005_IL_0169:
-call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Failure<System.IO.StreamError>)
 M00000005_IL_016e:
 ret
 M00000005_IL_016f:
@@ -521,11 +521,11 @@ ret
 .local System.Result<Void,System.Text.EncodingError> local1
 .local System.Result.Ok<Void> local2
 .local System.Result<Void,System.Text.EncodingError> local3
-.local System.Result.Error<System.Text.EncodingError> local4
+.local System.Result.Failure<System.Text.EncodingError> local4
 .local System.Text.EncodingError local5
 .local System.Text.EncodingError.LimitExceeded local6
 .local System.Result<Void,System.Text.EncodingError> local7
-.local System.Result.Error<System.Text.EncodingError> local8
+.local System.Result.Failure<System.Text.EncodingError> local8
 ldloca local0
 initobj System.Result<Void,System.Text.EncodingError>
 ldloca local1
@@ -535,7 +535,7 @@ initobj System.Result.Ok<Void>
 ldloca local3
 initobj System.Result<Void,System.Text.EncodingError>
 ldloca local4
-initobj System.Result.Error<System.Text.EncodingError>
+initobj System.Result.Failure<System.Text.EncodingError>
 ldloca local5
 initobj System.Text.EncodingError
 newobj System.Text.EncodingError.LimitExceeded
@@ -543,7 +543,7 @@ stloc local6
 ldloca local7
 initobj System.Result<Void,System.Text.EncodingError>
 ldloca local8
-initobj System.Result.Error<System.Text.EncodingError>
+initobj System.Result.Failure<System.Text.EncodingError>
 M00000006_IL_0000:
 M00000006_IL_0001:
 M00000006_IL_0002:
@@ -562,7 +562,7 @@ call neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorNewSys
 M00000006_IL_001c:
 call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion0(System.IO.StreamError)
 M00000006_IL_0021:
-call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Failure<System.IO.StreamError>)
 M00000006_IL_0026:
 ret
 M00000006_IL_0027:
@@ -583,7 +583,7 @@ call neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorNewSys
 M00000006_IL_0043:
 call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion0(System.IO.StreamError)
 M00000006_IL_0048:
-call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Failure<System.IO.StreamError>)
 M00000006_IL_004d:
 ret
 M00000006_IL_004e:
@@ -656,19 +656,19 @@ stloc local3
 M00000006_IL_00b6:
 ldloca local4
 M00000006_IL_00b8:
-initobj System.Result.Error<System.Text.EncodingError>
+initobj System.Result.Failure<System.Text.EncodingError>
 M00000006_IL_00be:
 ldloca local3
 M00000006_IL_00c0:
 ldloca local4
 M00000006_IL_00c2:
-call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion4(System.Result<Void,System.Text.EncodingError>&,System.Result.Error<System.Text.EncodingError>&)
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion4(System.Result<Void,System.Text.EncodingError>&,System.Result.Failure<System.Text.EncodingError>&)
 M00000006_IL_00c7:
 brfalse M00000006_IL_0110
 M00000006_IL_00cc:
 ldloca local4
 M00000006_IL_00ce:
-call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion5(System.Result.Error<System.Text.EncodingError>&)
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion5(System.Result.Failure<System.Text.EncodingError>&)
 M00000006_IL_00d3:
 stloc local5
 M00000006_IL_00d5:
@@ -692,7 +692,7 @@ call neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorNewSys
 M00000006_IL_0105:
 call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion0(System.IO.StreamError)
 M00000006_IL_010a:
-call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Failure<System.IO.StreamError>)
 M00000006_IL_010f:
 ret
 M00000006_IL_0110:
@@ -703,19 +703,19 @@ stloc local7
 M00000006_IL_0114:
 ldloca local8
 M00000006_IL_0116:
-initobj System.Result.Error<System.Text.EncodingError>
+initobj System.Result.Failure<System.Text.EncodingError>
 M00000006_IL_011c:
 ldloca local7
 M00000006_IL_011e:
 ldloca local8
 M00000006_IL_0120:
-call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion4(System.Result<Void,System.Text.EncodingError>&,System.Result.Error<System.Text.EncodingError>&)
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion4(System.Result<Void,System.Text.EncodingError>&,System.Result.Failure<System.Text.EncodingError>&)
 M00000006_IL_0125:
 brfalse M00000006_IL_0153
 M00000006_IL_012a:
 ldloca local8
 M00000006_IL_012c:
-call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion5(System.Result.Error<System.Text.EncodingError>&)
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion5(System.Result.Failure<System.Text.EncodingError>&)
 M00000006_IL_0131:
 pop
 M00000006_IL_0132:
@@ -728,7 +728,7 @@ call neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorNewSys
 M00000006_IL_0148:
 call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion0(System.IO.StreamError)
 M00000006_IL_014d:
-call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Failure<System.IO.StreamError>)
 M00000006_IL_0152:
 ret
 M00000006_IL_0153:
@@ -768,12 +768,12 @@ ret
 .local System.Result<System.Text.EncoderProgress,System.Text.EncodingError> local11
 .local System.Result.Ok<System.Text.EncoderProgress> local12
 .local System.Result<System.Text.EncoderProgress,System.Text.EncodingError> local13
-.local System.Result.Error<System.Text.EncodingError> local14
+.local System.Result.Failure<System.Text.EncodingError> local14
 .local System.Result<Int32,System.IO.StreamError> local15
 .local System.Result<Int32,System.IO.StreamError> local16
 .local System.Result.Ok<Int32> local17
 .local System.Result<Int32,System.IO.StreamError> local18
-.local System.Result.Error<System.IO.StreamError> local19
+.local System.Result.Failure<System.IO.StreamError> local19
 .local System.Text.EncoderState local20
 .local System.Text.EncoderState.NeedsOutput local21
 .local System.Text.EncoderState local22
@@ -803,7 +803,7 @@ initobj System.Result.Ok<System.Text.EncoderProgress>
 ldloca local13
 initobj System.Result<System.Text.EncoderProgress,System.Text.EncodingError>
 ldloca local14
-initobj System.Result.Error<System.Text.EncodingError>
+initobj System.Result.Failure<System.Text.EncodingError>
 ldloca local15
 initobj System.Result<Int32,System.IO.StreamError>
 ldloca local16
@@ -813,7 +813,7 @@ initobj System.Result.Ok<Int32>
 ldloca local18
 initobj System.Result<Int32,System.IO.StreamError>
 ldloca local19
-initobj System.Result.Error<System.IO.StreamError>
+initobj System.Result.Failure<System.IO.StreamError>
 ldloca local20
 initobj System.Text.EncoderState
 newobj System.Text.EncoderState.NeedsOutput
@@ -906,19 +906,19 @@ stloc local13
 M00000007_IL_006f:
 ldloca local14
 M00000007_IL_0071:
-initobj System.Result.Error<System.Text.EncodingError>
+initobj System.Result.Failure<System.Text.EncodingError>
 M00000007_IL_0077:
 ldloca local13
 M00000007_IL_0079:
 ldloca local14
 M00000007_IL_007b:
-call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion10(System.Result<System.Text.EncoderProgress,System.Text.EncodingError>&,System.Result.Error<System.Text.EncodingError>&)
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion10(System.Result<System.Text.EncoderProgress,System.Text.EncodingError>&,System.Result.Failure<System.Text.EncodingError>&)
 M00000007_IL_0080:
 brfalse M00000007_IL_00bb
 M00000007_IL_0085:
 ldloca local14
 M00000007_IL_0087:
-call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion5(System.Result.Error<System.Text.EncodingError>&)
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion5(System.Result.Failure<System.Text.EncodingError>&)
 M00000007_IL_008c:
 pop
 M00000007_IL_008d:
@@ -939,7 +939,7 @@ call neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorNewSys
 M00000007_IL_00ab:
 call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion0(System.IO.StreamError)
 M00000007_IL_00b0:
-call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Failure<System.IO.StreamError>)
 M00000007_IL_00b5:
 ret
 M00000007_IL_00bb:
@@ -1035,7 +1035,7 @@ call neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorNewSys
 M00000007_IL_012f:
 call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion0(System.IO.StreamError)
 M00000007_IL_0134:
-call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Failure<System.IO.StreamError>)
 M00000007_IL_0139:
 ret
 M00000007_IL_013a:
@@ -1181,7 +1181,7 @@ call neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorNewSys
 M00000007_IL_01fb:
 call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion0(System.IO.StreamError)
 M00000007_IL_0200:
-call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Failure<System.IO.StreamError>)
 M00000007_IL_0205:
 ret
 M00000007_IL_0206:
@@ -1213,19 +1213,19 @@ stloc local18
 M00000007_IL_021f:
 ldloca local19
 M00000007_IL_0221:
-initobj System.Result.Error<System.IO.StreamError>
+initobj System.Result.Failure<System.IO.StreamError>
 M00000007_IL_0227:
 ldloca local18
 M00000007_IL_0229:
 ldloca local19
 M00000007_IL_022b:
-call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion13(System.Result<Int32,System.IO.StreamError>&,System.Result.Error<System.IO.StreamError>&)
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion13(System.Result<Int32,System.IO.StreamError>&,System.Result.Failure<System.IO.StreamError>&)
 M00000007_IL_0230:
 brfalse M00000007_IL_0260
 M00000007_IL_0235:
 ldloca local19
 M00000007_IL_0237:
-call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion14(System.Result.Error<System.IO.StreamError>&)
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion14(System.Result.Failure<System.IO.StreamError>&)
 M00000007_IL_023c:
 stloc local9
 M00000007_IL_023e:
@@ -1245,7 +1245,7 @@ ldloc local9
 M00000007_IL_0255:
 call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion0(System.IO.StreamError)
 M00000007_IL_025a:
-call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Failure<System.IO.StreamError>)
 M00000007_IL_025f:
 ret
 M00000007_IL_0260:
@@ -1430,7 +1430,7 @@ call neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorNewSys
 M00000007_IL_037f:
 call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion0(System.IO.StreamError)
 M00000007_IL_0384:
-call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Failure<System.IO.StreamError>)
 M00000007_IL_0389:
 ret
 .end
@@ -1453,7 +1453,7 @@ call neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorNewSys
 M00000008_IL_001c:
 call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion0(System.IO.StreamError)
 M00000008_IL_0021:
-call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Failure<System.IO.StreamError>)
 M00000008_IL_0026:
 ret
 M00000008_IL_0027:
@@ -1485,7 +1485,7 @@ call neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorNewSys
 M00000008_IL_0054:
 call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion0(System.IO.StreamError)
 M00000008_IL_0059:
-call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Failure<System.IO.StreamError>)
 M00000008_IL_005e:
 ret
 M00000008_IL_005f:
@@ -1515,7 +1515,7 @@ call neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorNewSys
 M00000008_IL_0085:
 call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion0(System.IO.StreamError)
 M00000008_IL_008a:
-call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion1(System.Result.Failure<System.IO.StreamError>)
 M00000008_IL_008f:
 ret
 M00000008_IL_0090:
@@ -1552,7 +1552,7 @@ call neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorNewSys
 M00000009_IL_001c:
 call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion0(System.IO.StreamError)
 M00000009_IL_0021:
-call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion15(System.Result.Error<System.IO.StreamError>)
+call neoCLR.Library.System.IO.StreamWriter.RuntimeUnion15(System.Result.Failure<System.IO.StreamError>)
 M00000009_IL_0026:
 ret
 M00000009_IL_0027:

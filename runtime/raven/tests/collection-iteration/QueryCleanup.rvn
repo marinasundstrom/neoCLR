@@ -38,7 +38,7 @@ func QueryLast() -> Result<unit, TestFailure> {
 [Test("Single rejects multiple values without reading the second")]
 func QuerySingle() -> Result<unit, TestFailure> {
     let input = ObservedNumbers()
-    _ = Assert.True(input.Single() is Error(SingleError.Multiple), "Single rejects multiple values without reading the second")?
+    _ = Assert.True(input.Single() is Failure(SingleError.Multiple), "Single rejects multiple values without reading the second")?
     return CheckObservation(input, 1, 2, 1, 1)
 }
 
@@ -95,7 +95,7 @@ func QueryEmptyAny() -> Result<unit, TestFailure> {
 [Test("Predicate Single stops at the second match")]
 func QueryMultipleMatches() -> Result<unit, TestFailure> {
     let input = ObservedNumbers()
-    _ = Assert.True(input.Single(value => value < 3) is Error(SingleError.Multiple), "Predicate Single stops at the second match")?
+    _ = Assert.True(input.Single(value => value < 3) is Failure(SingleError.Multiple), "Predicate Single stops at the second match")?
     return CheckObservation(input, 1, 2, 2, 1)
 }
 

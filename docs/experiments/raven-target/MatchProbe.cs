@@ -14,7 +14,7 @@ static class MatchProbe
         CoreDeclarations.Write(core, unionProbe: true, collectionProbe: true);
         var cases = new Dictionary<string, string> {
             ["Forms"] = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "samples/library-match.rvn")),
-            ["CaseImports"] = "import System.Result.*\nfunc Pick(value: int) -> int { return match Math.Abs(value) { Ok(let amount) => amount; Error(_) => -1 } } func Main() { WriteLine(Pick(-42)); WriteLine(Pick(-2147483648)) }",
+            ["CaseImports"] = "import System.Result.*\nfunc Pick(value: int) -> int { return match Math.Abs(value) { Ok(let amount) => amount; Failure(_) => -1 } } func Main() { WriteLine(Pick(-42)); WriteLine(Pick(-2147483648)) }",
             ["OptionPositional"] = """
                 import System.Option.*
                 func Pick(value: Option<int>) -> int {
@@ -28,14 +28,14 @@ static class MatchProbe
                     WriteLine(Pick(None()))
                 }
                 """,
-            ["PositionalSingleEvaluation"] = "func Observe() -> Result<int, OverflowError> { WriteLine(7); return Math.Abs(-42) } func Main() { WriteLine(match Observe() { .Ok(let amount) => amount; .Error(_) => -1 }) }",
-            ["PositionalWrongArity"] = "func Main() { match Math.Abs(-42) { .Ok(let a, let b) => WriteLine(a); .Error(_) => WriteLine(-1) } }",
-            ["Positional"] = "func Pick(value: int) -> int { return match Math.Abs(value) { .Ok(let amount) => amount; .Error(_) => -1 } } func Main() { WriteLine(Pick(-42)); WriteLine(Pick(-2147483648)) }",
-            ["StatementReturn"] = "func Pick(value: int) -> int { match Math.Abs(value) { Result.Ok<int> ok => { return ok.Value }; Result.Error<OverflowError> error => { return -1 } } } func Main() { WriteLine(Pick(-42)); WriteLine(Pick(-2147483648)) }",
-            ["Guard"] = "func Pick(value: int) -> int { return match Math.Abs(value) { Result.Ok<int> ok when ok.Value == 42 => 1; Result.Ok<int> ok => 2; Result.Error<OverflowError> error => 3 } } func Main() { WriteLine(Pick(-42)); WriteLine(Pick(-7)); WriteLine(Pick(-2147483648)) }",
-            ["StatementTail"] = "func Pick(value: int) -> int { match Math.Abs(value) { Result.Ok<int> ok => ok.Value; Result.Error<OverflowError> error => -1 } } func Main() { WriteLine(Pick(-42)); WriteLine(Pick(-2147483648)) }",
-            ["SingleEvaluation"] = "func Observe() -> Result<int, OverflowError> { WriteLine(7); return Math.Abs(-42) } func Main() { WriteLine(match Observe() { Result.Ok<int> ok => ok.Value; Result.Error<OverflowError> error => -1 }) }",
-            ["NominalDeconstruction"] = "func Main() { WriteLine(match Math.Abs(-42) { Result.Ok<int>(let amount) => amount; Result.Error<OverflowError>(_) => -1 }) }",
+            ["PositionalSingleEvaluation"] = "func Observe() -> Result<int, OverflowError> { WriteLine(7); return Math.Abs(-42) } func Main() { WriteLine(match Observe() { .Ok(let amount) => amount; .Failure(_) => -1 }) }",
+            ["PositionalWrongArity"] = "func Main() { match Math.Abs(-42) { .Ok(let a, let b) => WriteLine(a); .Failure(_) => WriteLine(-1) } }",
+            ["Positional"] = "func Pick(value: int) -> int { return match Math.Abs(value) { .Ok(let amount) => amount; .Failure(_) => -1 } } func Main() { WriteLine(Pick(-42)); WriteLine(Pick(-2147483648)) }",
+            ["StatementReturn"] = "func Pick(value: int) -> int { match Math.Abs(value) { Result.Ok<int> ok => { return ok.Value }; Result.Failure<OverflowError> error => { return -1 } } } func Main() { WriteLine(Pick(-42)); WriteLine(Pick(-2147483648)) }",
+            ["Guard"] = "func Pick(value: int) -> int { return match Math.Abs(value) { Result.Ok<int> ok when ok.Value == 42 => 1; Result.Ok<int> ok => 2; Result.Failure<OverflowError> error => 3 } } func Main() { WriteLine(Pick(-42)); WriteLine(Pick(-7)); WriteLine(Pick(-2147483648)) }",
+            ["StatementTail"] = "func Pick(value: int) -> int { match Math.Abs(value) { Result.Ok<int> ok => ok.Value; Result.Failure<OverflowError> error => -1 } } func Main() { WriteLine(Pick(-42)); WriteLine(Pick(-2147483648)) }",
+            ["SingleEvaluation"] = "func Observe() -> Result<int, OverflowError> { WriteLine(7); return Math.Abs(-42) } func Main() { WriteLine(match Observe() { Result.Ok<int> ok => ok.Value; Result.Failure<OverflowError> error => -1 }) }",
+            ["NominalDeconstruction"] = "func Main() { WriteLine(match Math.Abs(-42) { Result.Ok<int>(let amount) => amount; Result.Failure<OverflowError>(_) => -1 }) }",
             ["MissingExpression"] = "func Main() { WriteLine(match Math.Abs(-2147483648) { Result.Ok<int> ok => ok.Value }) }",
             ["MissingStatement"] = "func Main() { match Math.Abs(-2147483648) { Result.Ok<int> ok => WriteLine(ok.Value) }; WriteLine(7) }",
             ["UnreachableArm"] = "func Main() { WriteLine(match Math.Abs(-42) { _ => 1; Result.Ok<int> ok => ok.Value }) }",

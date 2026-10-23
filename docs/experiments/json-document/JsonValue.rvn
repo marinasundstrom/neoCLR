@@ -100,14 +100,14 @@ public sealed class JsonValue {
 
     func AsString() -> Result<string, string> {
         if !(self is JsonString) {
-            return Error("Expected string")
+            return Failure("Expected string")
         }
         return Ok(text)
     }
 
     func NumberText() -> Result<string, string> {
         if !(self is JsonNumber) {
-            return Error("Expected number")
+            return Failure("Expected number")
         }
         return Ok(text)
     }
@@ -116,47 +116,47 @@ public sealed class JsonValue {
         let number = NumberText()?
         match Int32.Parse(number) {
             Ok(let value) => return Ok(value)
-            Error(_) => return Error("Number is not an Int32 integer token")
+            Failure(_) => return Failure("Number is not an Int32 integer token")
         }
     }
 
     func AsBoolean() -> Result<bool, string> {
         if !(self is JsonBoolean) {
-            return Error("Expected boolean")
+            return Failure("Expected boolean")
         }
         return Ok(text.Equals("true"))
     }
 
     func Field(name: string) -> Result<JsonValue, string> {
         if !(self is JsonObject) {
-            return Error("Expected object")
+            return Failure("Expected object")
         }
         for index in 0..names.Count {
             if names[index].Equals(name) {
                 return Ok(items[index])
             }
         }
-        return Error("Missing field")
+        return Failure("Missing field")
     }
 
     // Object entries retain insertion order; arrays have no names.
     func Item(index: int) -> Result<JsonValue, string> {
         if index < 0 || index >= items.Count {
-            return Error("Invalid item index")
+            return Failure("Invalid item index")
         }
         return Ok(items[index])
     }
 
     func Name(index: int) -> Result<string, string> {
         if !(self is JsonObject) || index < 0 || index >= names.Count {
-            return Error("Invalid field index")
+            return Failure("Invalid field index")
         }
         return Ok(names[index])
     }
 
     func Add(value: JsonValue) -> Result<unit, string> {
         if !(self is JsonArray) || items.Count >= 31 {
-            return Error("Expected array with room for an item")
+            return Failure("Expected array with room for an item")
         }
         items.Add(value)
         return Ok(())
@@ -164,11 +164,11 @@ public sealed class JsonValue {
 
     func Put(name: string, value: JsonValue) -> Result<unit, string> {
         if !(self is JsonObject) || items.Count >= 31 {
-            return Error("Expected object with room for a field")
+            return Failure("Expected object with room for a field")
         }
         for previous in names {
             if previous.Equals(name) {
-                return Error("Duplicate field")
+                return Failure("Duplicate field")
             }
         }
         names.Add(name)
@@ -194,7 +194,7 @@ public class JsonNumber : JsonValue {
 
     static func Create(value: string) -> Result<JsonValue, string> {
         if !ValidNumber(value) {
-            return Error("Invalid JSON number")
+            return Failure("Invalid JSON number")
         }
         let number: JsonValue = JsonNumber(value)
         return Ok(number)

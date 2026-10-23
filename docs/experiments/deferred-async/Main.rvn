@@ -15,7 +15,7 @@ class Garbage {
 
 class Worker {
     async func Keep(input: Task<int>) -> Task<Result<int, Failure>> {
-        let saved: Result<int, Failure> = Error(Failure.Message("Retained error"))
+        let saved: Result<int, Failure> = Failure(Failure.Message("Retained error"))
         _ = await input
         return saved
     }
@@ -31,7 +31,7 @@ func Churn() {
 
 func Observe(task: Task<Result<int, Failure>>) {
     task.OnCompleted(() => {
-        if let Error(Failure.Message(text)) = task.GetResult() {
+        if let Failure(Failure.Message(text)) = task.GetResult() {
             Console.WriteLine(text)
         } else {
             System.Fail("Expected retained error")

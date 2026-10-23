@@ -18,7 +18,7 @@ func IpValidIPv4() -> Result<unit, TestFailure> {
 [Test("IPv4 parsing rejects malformed and unsupported corpus forms")]
 func IpInvalidIPv4() -> Result<unit, TestFailure> {
     for text in ["", "127.1", "0xffffffff", "1.1.1.010", "256.0.0.1", "1.2.3.-1", "1.2.3.4.", ".1.2.3.4", "1..2.3", "1.2.3.4.5", " 127.0.0.1", "127.0.0.1\n", "é.0.0.1"] {
-        _ = Assert.True(IPAddress.Parse(text) is Error(_), "Invalid address must fail: " + text)?
+        _ = Assert.True(IPAddress.Parse(text) is Failure(_), "Invalid address must fail: " + text)?
     }
     return Assert.True(true, "Invalid address corpus rejected")
 }
@@ -41,7 +41,7 @@ func IpValidIPv6() -> Result<unit, TestFailure> {
 [Test("IPv6 parsing rejects malformed and unsupported corpus forms")]
 func IpInvalidIPv6() -> Result<unit, TestFailure> {
     for text in [":", ":1", "1:", ":::1", "1:::2", "1::2::3", "1:2:3:4:5:6:7", "1:2:3:4:5:6:7:8:9", "1:2:3:4:5:6:7:8::", "12345::", "gggg::", "[::1]", "fe80::1%3", "::ffff:192.0.2.999", "::192.0.2.1:1", "1:2:3:4:5:6:7:192.0.2.1"] {
-        _ = Assert.True(IPAddress.Parse(text) is Error(_), "Invalid address must fail: " + text)?
+        _ = Assert.True(IPAddress.Parse(text) is Failure(_), "Invalid address must fail: " + text)?
     }
     return Assert.True(true, "Invalid address corpus rejected")
 }
@@ -73,12 +73,12 @@ func IpAllocationChurn() -> Result<unit, TestFailure> {
 
 [Test("IPAddress parsing distinguishes unsupported scope from invalid format")]
 func IpTypedErrors() -> Result<unit, TestFailure> {
-    if IPAddress.Parse("fe80::1%3") is Error(let error) {
+    if IPAddress.Parse("fe80::1%3") is Failure(let error) {
         _ = Assert.True(error is IPAddressError.UnsupportedScope, "Scope reports unsupported capability")?
     } else {
         return Assert.True(false, "Scoped address must fail")
     }
-    if IPAddress.Parse("127.1") is Error(let error) {
+    if IPAddress.Parse("127.1") is Failure(let error) {
         return Assert.True(error is IPAddressError.InvalidFormat, "Abbreviated IPv4 reports format error")
     }
     return Assert.True(false, "Abbreviated IPv4 must fail")
@@ -88,7 +88,7 @@ func RequiredAddress(text: string) -> Result<IPAddress, TestFailure> {
     if IPAddress.Parse(text) is Ok(let value) {
         return Ok(value)
     }
-    return Error(TestFailure("Expected valid address", text, "parse failure"))
+    return Failure(TestFailure("Expected valid address", text, "parse failure"))
 }
 
 func CheckAddress(text: string, expected: string, ipv6: bool) -> Result<unit, TestFailure> {

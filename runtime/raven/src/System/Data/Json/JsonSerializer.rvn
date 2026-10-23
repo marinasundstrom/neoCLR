@@ -12,7 +12,7 @@ public class JsonSerializer {
 
     static func DeserializeNode(text: string) -> Result<JsonValue, JsonError> {
         if text.GetUtf8ByteCount() > 1024 {
-            return Error(JsonError.LimitExceeded("Document exceeds 1024 UTF-8 bytes"))
+            return Failure(JsonError.LimitExceeded("Document exceeds 1024 UTF-8 bytes"))
         }
         return DocumentReader().Read(text.Utf8Bytes)
     }
@@ -22,10 +22,10 @@ public class JsonSerializer {
     /// <returns>A JSON node or a quota, UTF-8 or syntax error. The 1024-byte limit is checked before UTF-8; complete UTF-8 validation precedes JSON parsing.</returns>
     static func DeserializeNode(utf8: ReadOnlySlice<byte>) -> Result<JsonValue, JsonError> {
         if utf8.Length > 1024 {
-            return Error(JsonError.LimitExceeded("Document exceeds 1024 UTF-8 bytes"))
+            return Failure(JsonError.LimitExceeded("Document exceeds 1024 UTF-8 bytes"))
         }
         if !JsonSyntax.ValidUtf8(utf8) {
-            return Error(JsonError.Read(TextReadError.InvalidUtf8))
+            return Failure(JsonError.Read(TextReadError.InvalidUtf8))
         }
         return DocumentReader().Read(utf8)
     }
@@ -33,13 +33,13 @@ public class JsonSerializer {
     async static func DeserializeNode(input: InputStream) -> Task<Result<JsonValue, JsonError>> {
         let reader = match StreamReader.Create(input, true) {
             Ok(let value) => value
-            Error(let error) => return Error(JsonError.Read(error))
+            Failure(let error) => return Failure(JsonError.Read(error))
         }
         let result = await reader.ReadToEnd(1024)
         reader.Close()
         return match result {
             Ok(let text) => DeserializeNode(text)
-            Error(let error) => Error(JsonError.Read(error))
+            Failure(let error) => Failure(JsonError.Read(error))
         }
     }
 
@@ -61,7 +61,7 @@ public class JsonSerializer {
         let result = await output.Write(bytes, 0, bytes.Length)
         return match result {
             Ok(_) => Ok(())
-            Error(let error) => Error(JsonError.Write(error))
+            Failure(let error) => Failure(JsonError.Write(error))
         }
     }
 
@@ -76,7 +76,7 @@ public class JsonSerializer {
         let result = await output.Write(bytes, 0, bytes.Length)
         return match result {
             Ok(_) => Ok(())
-            Error(let error) => Error(JsonError.Write(error))
+            Failure(let error) => Failure(JsonError.Write(error))
         }
     }
 

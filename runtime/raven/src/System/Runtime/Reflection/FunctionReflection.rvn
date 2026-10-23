@@ -21,11 +21,11 @@ public static class FunctionReflection {
             return Ok(neoCLR.Runtime.InvokeFunction(function, arguments))
         }
         if status == 6 {
-            return Error(ReflectionError.InvalidReceiver)
+            return Failure(ReflectionError.InvalidReceiver)
         }
         if status == 8 {
-            return Error(ReflectionError.InvalidArguments)
+            return Failure(ReflectionError.InvalidArguments)
         }
-        return Error(ReflectionError.UnsupportedType)
+        return Failure(ReflectionError.UnsupportedType)
     }
 }

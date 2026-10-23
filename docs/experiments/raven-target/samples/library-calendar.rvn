@@ -23,7 +23,7 @@ func ReadDate(result: Result<Date, InvalidDateError>) -> Result<Date, InvalidDat
 func CheckDate(result: Result<Date, InvalidDateError>) {
     match ReadDate(result) {
         .Ok(let ok) => WriteLine("Date accepted")
-        .Error(let error) => WriteLine("Invalid date")
+        .Failure(let error) => WriteLine("Invalid date")
     }
 }
 
@@ -50,7 +50,7 @@ func ReadTime(result: Result<TimeOfDay, InvalidTimeError>) -> Result<TimeOfDay, 
 func CheckTime(result: Result<TimeOfDay, InvalidTimeError>) {
     match ReadTime(result) {
         .Ok(let ok) => WriteLine("TimeOfDay accepted")
-        .Error(let error) => WriteLine("Invalid time")
+        .Failure(let error) => WriteLine("Invalid time")
     }
 }
 

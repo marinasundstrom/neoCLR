@@ -48,7 +48,7 @@ class GeneratedInput : InputStream {
         Check(Closes == 0 && offset == 0 && count > 0 && count <= 4096)
         Reads += 1
         if mode == 4 { return Ok(0) }
-        if mode == 5 { return Error(StreamError.AccessDenied) }
+        if mode == 5 { return Failure(StreamError.AccessDenied) }
         if mode == 6 { return Ok(count + 1) }
         let read = if mode == 1 { count } else if count > 71 { 71 } else { count }
         var index = 0
@@ -110,15 +110,15 @@ async func Main() -> Task<()> {
         } else {
             let result = await sending
             if mode == 9 {
-                Check(result is Error(HttpError.TimedOut))
+                Check(result is Failure(HttpError.TimedOut))
             } else if mode < 4 {
                 Check(result is Ok(_))
             } else if mode == 5 {
-                Check(result is Error(HttpError.Content(StreamError.AccessDenied)))
+                Check(result is Failure(HttpError.Content(StreamError.AccessDenied)))
             } else if mode == 7 {
-                Check(result is Error(HttpError.InvalidRequest(_)))
+                Check(result is Failure(HttpError.InvalidRequest(_)))
             } else {
-                Check(result is Error(HttpError.Content(StreamError.IoFailure)))
+                Check(result is Failure(HttpError.Content(StreamError.IoFailure)))
             }
         }
         cancellation.Dispose()

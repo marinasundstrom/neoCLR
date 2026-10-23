@@ -21,7 +21,7 @@ func Main() -> int {
         let parsed = Int32.Parse(line)
         if let Ok(value) = parsed {
             Console.WriteLine(value)
-        } else if let Error(NumberParseError.Overflow) = parsed {
+        } else if let Failure(NumberParseError.Overflow) = parsed {
             Console.WriteLine("Overflow")
         } else {
             Console.WriteLine("Invalid format")

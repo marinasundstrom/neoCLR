@@ -17,9 +17,9 @@ func Make(choice: int) -> Result<Response, HttpError | JsonError> {
         return Ok(Response(42))
     }
     if choice == 1 {
-        return Error(HttpError.TimedOut)
+        return Failure(HttpError.TimedOut)
     }
-    return Error(JsonError.InvalidIndex(42))
+    return Failure(JsonError.InvalidIndex(42))
 }
 
 func Inspect(result: Result<Response, HttpError | JsonError>, choice: int) -> int {
@@ -29,7 +29,7 @@ func Inspect(result: Result<Response, HttpError | JsonError>, choice: int) -> in
         }
         return -1
     }
-    if let Error(error) = result {
+    if let Failure(error) = result {
         if choice == 1 {
             return match (HttpError)error {
                 HttpError.TimedOut => 42

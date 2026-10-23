@@ -788,7 +788,7 @@ call neoCLR.Library.System.String.RuntimeErrorSystemTextUtf8SliceErrorNewSystemT
 M00000019_IL_0056:
 call neoCLR.Library.System.String.RuntimeUnion2(System.Text.Utf8SliceError)
 M00000019_IL_005b:
-call neoCLR.Library.System.String.RuntimeUnion3(System.Result.Error<System.Text.Utf8SliceError>)
+call neoCLR.Library.System.String.RuntimeUnion3(System.Result.Failure<System.Text.Utf8SliceError>)
 M00000019_IL_0060:
 ret
 M00000019_IL_0061:
@@ -813,7 +813,7 @@ call neoCLR.Library.System.String.RuntimeErrorSystemTextUtf8SliceErrorNewSystemT
 M00000019_IL_007c:
 call neoCLR.Library.System.String.RuntimeUnion2(System.Text.Utf8SliceError)
 M00000019_IL_0081:
-call neoCLR.Library.System.String.RuntimeUnion3(System.Result.Error<System.Text.Utf8SliceError>)
+call neoCLR.Library.System.String.RuntimeUnion3(System.Result.Failure<System.Text.Utf8SliceError>)
 M00000019_IL_0086:
 ret
 M00000019_IL_0087:

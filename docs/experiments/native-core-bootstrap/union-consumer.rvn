@@ -20,8 +20,8 @@ func Main() -> int {
     let Ok(number) = Result<int, string>.Ok(Unwrap(present)) else {
         return 2
     }
-    let failure = Result<int, string>.Error("hé🙂\u0000error")
-    let Error(message) = failure else {
+    let failure = Result<int, string>.Failure("hé🙂\u0000error")
+    let Failure(message) = failure else {
         return 3
     }
     if String.CompareOrdinal(message, "hé🙂\u0000error") != 0 {
@@ -30,7 +30,7 @@ func Main() -> int {
     if let Some(_) = absent {
         return 5
     }
-    if let Error(_) = Result<int, string>.Ok(42) {
+    if let Failure(_) = Result<int, string>.Ok(42) {
         return 6
     }
     if let Some(value) = present {
@@ -40,7 +40,7 @@ func Main() -> int {
     } else {
         return 8
     }
-    if let Error(text) = failure {
+    if let Failure(text) = failure {
         if text.GetByteCount() != 13 {
             return 9
         }

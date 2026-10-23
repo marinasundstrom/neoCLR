@@ -32,28 +32,28 @@ public struct TimeOfDay : ComparableTo<TimeOfDay>, EquatableTo<TimeOfDay>, Forma
 
     static func Create(hour: int, minute: int, second: int, fractionTicks: int) -> Result<TimeOfDay, InvalidTimeError> {
         if hour < 0 {
-            return Error(InvalidTimeError())
+            return Failure(InvalidTimeError())
         }
         if hour > 23 {
-            return Error(InvalidTimeError())
+            return Failure(InvalidTimeError())
         }
         if minute < 0 {
-            return Error(InvalidTimeError())
+            return Failure(InvalidTimeError())
         }
         if minute > 59 {
-            return Error(InvalidTimeError())
+            return Failure(InvalidTimeError())
         }
         if second < 0 {
-            return Error(InvalidTimeError())
+            return Failure(InvalidTimeError())
         }
         if second > 59 {
-            return Error(InvalidTimeError())
+            return Failure(InvalidTimeError())
         }
         if fractionTicks < 0 {
-            return Error(InvalidTimeError())
+            return Failure(InvalidTimeError())
         }
         if fractionTicks > 9999999 {
-            return Error(InvalidTimeError())
+            return Failure(InvalidTimeError())
         }
         let seconds: long = (hour * 60 + minute) * 60 + second
         return Ok(TimeOfDay(seconds * 10000000L + fractionTicks))
@@ -61,10 +61,10 @@ public struct TimeOfDay : ComparableTo<TimeOfDay>, EquatableTo<TimeOfDay>, Forma
 
     static func FromTicks(ticks: long) -> Result<TimeOfDay, InvalidTimeError> {
         if ticks < 0L {
-            return Error(InvalidTimeError())
+            return Failure(InvalidTimeError())
         }
         if ticks > 863999999999L {
-            return Error(InvalidTimeError())
+            return Failure(InvalidTimeError())
         }
         return Ok(TimeOfDay(ticks))
     }

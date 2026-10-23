@@ -45,10 +45,10 @@ func CheckImmediate(content: HttpContent) {
     Check(content.ReadFromJson(typeof(Message)).GetResult() is Ok(_))
     Check(content.ReadJsonNode().GetResult() is Ok(_))
     Check(HttpStringContent("null").ReadJsonNode().GetResult() is Ok(_))
-    Check(HttpStringContent("{").ReadJsonNode().GetResult() is Error(_))
-    Check(HttpStringContent("").ReadFromJson<Message>().GetResult() is Error(_))
+    Check(HttpStringContent("{").ReadJsonNode().GetResult() is Failure(_))
+    Check(HttpStringContent("").ReadFromJson<Message>().GetResult() is Failure(_))
     let invalid: byte[] = [(byte)255]
-    Check(HttpMemoryContent(invalid).ReadJsonNode().GetResult() is Error(JsonError.Read(TextReadError.InvalidUtf8)))
+    Check(HttpMemoryContent(invalid).ReadJsonNode().GetResult() is Failure(JsonError.Read(TextReadError.InvalidUtf8)))
     let source = CancellationTokenSource()
     source.Cancel()
     Check(HttpStringContent("{").ReadFromJson<Message>(source.Token).IsCancelled)
@@ -70,7 +70,7 @@ func CheckImmediate(content: HttpContent) {
         System.Fail("JSON array node expected")
     }
     let input = MemoryStream()
-    Check(HttpStreamContent.Create(input, 1048577, true) is Error(HttpError.LimitExceeded(_)))
+    Check(HttpStreamContent.Create(input, 1048577, true) is Failure(HttpError.LimitExceeded(_)))
     let Ok(maximum) = HttpStreamContent.Create(input, 1048576, true) else {
         System.Fail("Stream admission boundary failed")
     }
@@ -78,7 +78,7 @@ func CheckImmediate(content: HttpContent) {
     let Ok(stream) = HttpStreamContent.Create(input, 0, true) else {
         System.Fail("Stream creation failed")
     }
-    Check(stream.ReadFromJson<Message>().GetResult() is Error(JsonError.Read(TextReadError.IoFailure)))
+    Check(stream.ReadFromJson<Message>().GetResult() is Failure(JsonError.Read(TextReadError.IoFailure)))
     Check(input.GetPosition() is Ok(0L))
     stream.Dispose()
     input.Close()

@@ -9,31 +9,31 @@ union Route {
 
 func Parse(line: string) -> Result<Route, string> {
     if line.ContainsOrdinal("\u0000") || line.ContainsOrdinal("\t") {
-        return Error("Invalid request line")
+        return Failure("Invalid request line")
     }
     if !line.StartsWithOrdinal("GET /") {
-        return Error("Unsupported request")
+        return Failure("Unsupported request")
     }
     if !line.EndsWithOrdinal(" HTTP/1.1") {
-        return Error("Unsupported version")
+        return Failure("Unsupported version")
     }
     let Ok(target) = line.SliceUtf8(4, line.GetUtf8ByteCount() - 13) else {
-        return Error("Invalid target")
+        return Failure("Invalid target")
     }
     if target == "/health" {
         return Ok(Route.Health)
     }
     if !target.StartsWithOrdinal("/items/") {
-        return Error("No route")
+        return Failure("No route")
     }
     let Ok(text) = target.SliceUtf8(7, target.GetUtf8ByteCount() - 7) else {
-        return Error("Invalid item id")
+        return Failure("Invalid item id")
     }
     let Ok(id) = Int32.Parse(text) else {
-        return Error("Invalid item id")
+        return Failure("Invalid item id")
     }
     if id < 0 {
-        return Error("Invalid item id")
+        return Failure("Invalid item id")
     }
     return Ok(Route.Item(id))
 }
@@ -56,7 +56,7 @@ func Main() -> int {
         } else {
             Console.WriteLine("Health")
         }
-    } else if let Error(message) = parsed {
+    } else if let Failure(message) = parsed {
         Console.WriteLine(message)
     }
     return 0

@@ -13,7 +13,7 @@ func Check(value: bool) {
 }
 
 async func Read(success: bool) -> Task<Result<string, string>> {
-    if !success { return Error("expected") }
+    if !success { return Failure("expected") }
     return Ok("value")
 }
 
@@ -29,7 +29,7 @@ async func Evaluate(success: bool) -> Task<Result<int, string>> {
 
 async func Main() -> Task<int> {
     Check((await Evaluate(true)) is Ok(42))
-    Check((await Evaluate(false)) is Error("expected"))
+    Check((await Evaluate(false)) is Failure("expected"))
     Console.WriteLine("PASS async expression propagation and pattern assignment")
     return 0
 }

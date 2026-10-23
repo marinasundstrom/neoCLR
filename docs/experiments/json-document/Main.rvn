@@ -9,7 +9,7 @@ func Acknowledge(payload: string) -> Result<string, string> {
     let station = stationValue.AsString()?
     let readings = report.Field("readings")?
     if !(readings is JsonArray) {
-        return Error("Expected readings array")
+        return Failure("Expected readings array")
     }
     let first = readings.Item(0)?
     let reading = first.AsInt32()?
@@ -28,6 +28,6 @@ func Main() {
     let payload = "{\"station\":\"Café\",\"readings\":[21,22.5]}"
     match Acknowledge(payload) {
         Ok(let reply) => WriteLine(reply)
-        Error(let message) => WriteLine(message)
+        Failure(let message) => WriteLine(message)
     }
 }

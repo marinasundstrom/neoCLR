@@ -18,27 +18,27 @@ public class MemoryStream : InputStream, OutputStream, SeekableStream, SyncInput
 
     func GetLength() -> Result<long, StreamError> {
         if closed {
-            return Error(StreamError.Closed)
+            return Failure(StreamError.Closed)
         }
         return Ok((long)bytes.Count)
     }
 
     func GetPosition() -> Result<long, StreamError> {
         if closed {
-            return Error(StreamError.Closed)
+            return Failure(StreamError.Closed)
         }
         return Ok((long)position)
     }
 
     func Seek(position: long) -> Result<long, StreamError> {
         if closed {
-            return Error(StreamError.Closed)
+            return Failure(StreamError.Closed)
         }
         if position < 0 {
-            return Error(StreamError.InvalidRange)
+            return Failure(StreamError.InvalidRange)
         }
         if position > 65536 {
-            return Error(StreamError.LimitExceeded)
+            return Failure(StreamError.LimitExceeded)
         }
         self.position = (int)position
         return Ok(position)
@@ -46,19 +46,19 @@ public class MemoryStream : InputStream, OutputStream, SeekableStream, SyncInput
 
     private func ReadCore(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
         if closed {
-            return Error(StreamError.Closed)
+            return Failure(StreamError.Closed)
         }
         if offset < 0 {
-            return Error(StreamError.InvalidRange)
+            return Failure(StreamError.InvalidRange)
         }
         if count < 0 {
-            return Error(StreamError.InvalidRange)
+            return Failure(StreamError.InvalidRange)
         }
         if offset > buffer.Length {
-            return Error(StreamError.InvalidRange)
+            return Failure(StreamError.InvalidRange)
         }
         if count > buffer.Length - offset {
-            return Error(StreamError.InvalidRange)
+            return Failure(StreamError.InvalidRange)
         }
         let view: Slice<byte> = buffer
         return ReadBorrowed(view.Slice(offset, count))
@@ -66,7 +66,7 @@ public class MemoryStream : InputStream, OutputStream, SeekableStream, SyncInput
 
     private func ReadBorrowed(buffer: Slice<byte>) -> Result<int, StreamError> {
         if closed {
-            return Error(StreamError.Closed)
+            return Failure(StreamError.Closed)
         }
         let count = buffer.Length
         var read = 0
@@ -80,19 +80,19 @@ public class MemoryStream : InputStream, OutputStream, SeekableStream, SyncInput
 
     private func WriteCore(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
         if closed {
-            return Error(StreamError.Closed)
+            return Failure(StreamError.Closed)
         }
         if offset < 0 {
-            return Error(StreamError.InvalidRange)
+            return Failure(StreamError.InvalidRange)
         }
         if count < 0 {
-            return Error(StreamError.InvalidRange)
+            return Failure(StreamError.InvalidRange)
         }
         if offset > buffer.Length {
-            return Error(StreamError.InvalidRange)
+            return Failure(StreamError.InvalidRange)
         }
         if count > buffer.Length - offset {
-            return Error(StreamError.InvalidRange)
+            return Failure(StreamError.InvalidRange)
         }
         let view: ReadOnlySlice<byte> = buffer
         return WriteBorrowed(view.Slice(offset, count))
@@ -100,11 +100,11 @@ public class MemoryStream : InputStream, OutputStream, SeekableStream, SyncInput
 
     private func WriteBorrowed(buffer: ReadOnlySlice<byte>) -> Result<int, StreamError> {
         if closed {
-            return Error(StreamError.Closed)
+            return Failure(StreamError.Closed)
         }
         let count = buffer.Length
         if count > 65536 - position {
-            return Error(StreamError.LimitExceeded)
+            return Failure(StreamError.LimitExceeded)
         }
         if count == 0 {
             return Ok(0)
@@ -131,7 +131,7 @@ public class MemoryStream : InputStream, OutputStream, SeekableStream, SyncInput
     func SyncOutputStream.Write(buffer: ReadOnlySlice<byte>) -> Result<unit, StreamError> {
         return match WriteBorrowed(buffer) {
             Ok(_) => Ok(())
-            Error(let error) => Error(error)
+            Failure(let error) => Failure(error)
         }
     }
 
@@ -139,7 +139,7 @@ public class MemoryStream : InputStream, OutputStream, SeekableStream, SyncInput
 
     private func FlushCore() -> Result<unit, StreamError> {
         if closed {
-            return Error(StreamError.Closed)
+            return Failure(StreamError.Closed)
         }
         return Ok(())
     }
@@ -177,7 +177,7 @@ public class MemoryStream : InputStream, OutputStream, SeekableStream, SyncInput
         }
         let result: Result<unit, StreamError> = match WriteCore(buffer, offset, count) {
             Ok(_) => Ok(())
-            Error(let error) => Error(error)
+            Failure(let error) => Failure(error)
         }
         return Task.FromResult(result)
     }

@@ -32,8 +32,8 @@ ldstr "Ok"
 ret
 Error:
 ldloc result
-call instance System.Result<Void,System.Storage.FileWriteError>::GetErrorCase()
-call instance System.Result.Error<System.Storage.FileWriteError>::get_Value()
+call instance System.Result<Void,System.Storage.FileWriteError>::GetFailureCase()
+call instance System.Result.Failure<System.Storage.FileWriteError>::get_Value()
 call instance System.Storage.FileWriteError::ToString()
 ret
 .end

@@ -11,7 +11,7 @@ func Extract(text: string, start: int, count: int) -> Result<string, Utf8SliceEr
 func ShowSlice(result: Result<string, Utf8SliceError>) {
     match result {
         .Ok(let ok) => WriteLine(ok)
-        .Error(let error) => {
+        .Failure(let error) => {
             if (error is System.Text.Utf8SliceError.OutOfRange) {
                 WriteLine("Out of range")
             } else if (error is System.Text.Utf8SliceError.InvalidBoundary) {

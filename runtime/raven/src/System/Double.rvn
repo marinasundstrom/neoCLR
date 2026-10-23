@@ -41,13 +41,13 @@ public struct Double : Number, EquatableTo<double>, Formattable {
         }
         let status = neoCLR.Runtime.UnpackValue<int>(payload)
         if status == 1 {
-            return Error(NumberParseError.InvalidFormat())
+            return Failure(NumberParseError.InvalidFormat())
         }
         if status == 2 {
-            return Error(NumberParseError.Overflow())
+            return Failure(NumberParseError.Overflow())
         }
         System.Fail("invalid native parse status")
-        return Error(NumberParseError.InvalidFormat())
+        return Failure(NumberParseError.InvalidFormat())
     }
 
     /// Tests value equality; NaNs compare equal and signed zeros compare equal.

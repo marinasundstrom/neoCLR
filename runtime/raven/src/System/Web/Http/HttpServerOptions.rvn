@@ -59,16 +59,16 @@ internal class HttpServerSettings {
         let read = options.RequestReadTimeout
         let write = options.ResponseWriteTimeout
         if !(body >= 0 && body <= HttpWireLimits.BodyBytes) {
-            return Error(HttpError.InvalidRequest("MaxRequestBodySize is outside the supported range"))
+            return Failure(HttpError.InvalidRequest("MaxRequestBodySize is outside the supported range"))
         }
         if !(headers >= 1 && headers <= HttpWireLimits.HeaderBytes) {
-            return Error(HttpError.InvalidRequest("MaxRequestHeadersTotalSize is outside the supported range"))
+            return Failure(HttpError.InvalidRequest("MaxRequestHeadersTotalSize is outside the supported range"))
         }
         if !(count >= 1 && count <= HttpWireLimits.HeaderCount) {
-            return Error(HttpError.InvalidRequest("MaxRequestHeaderCount is outside the supported range"))
+            return Failure(HttpError.InvalidRequest("MaxRequestHeaderCount is outside the supported range"))
         }
         if read.Ticks <= 0L || read.Ticks > 600000000L || write.Ticks <= 0L || write.Ticks > 600000000L {
-            return Error(HttpError.InvalidRequest("HTTP read/write timeouts must be positive and at most 60 seconds"))
+            return Failure(HttpError.InvalidRequest("HTTP read/write timeouts must be positive and at most 60 seconds"))
         }
         return Ok(HttpServerSettings(body, headers, count,
             (int)((read.Ticks + 9999L) / 10000L), (int)((write.Ticks + 9999L) / 10000L)))

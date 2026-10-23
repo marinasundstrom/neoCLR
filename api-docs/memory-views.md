@@ -97,7 +97,7 @@ views are empty. Reading an uninitialized array element faults.
 Range-based and integer slicing both report IndexOutOfRange for invalid bounds.
 Development compatibility note: Range.GetOffsetAndLength previously reported
 UserFault; its callers now receive the same terminal bounds category as integer
-slicing. TryGetOffsetAndLength continues returning Error(InvalidRangeError).
+slicing. TryGetOffsetAndLength continues returning Failure(InvalidRangeError).
 
 Slices cannot be stored in ordinary fields, arrays or boxed objects, used as
 ordinary generic arguments, captured by functions, or retained across suspension.

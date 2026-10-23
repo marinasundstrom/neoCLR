@@ -11,7 +11,7 @@ func ParseInput(text: string) -> Result<int, NumberParseError> {
 func ShowParse(result: Result<int, NumberParseError>) {
     match result {
         .Ok(let ok) => WriteLine(ok)
-        .Error(let error) => {
+        .Failure(let error) => {
             if (error is NumberParseError.InvalidFormat) {
                 WriteLine("Invalid format")
             } else if (error is NumberParseError.Overflow) {

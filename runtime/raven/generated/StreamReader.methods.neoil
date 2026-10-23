@@ -281,11 +281,11 @@ ret
 .local System.Result<String,System.Text.Utf8SliceError> local14
 .local System.Result.Ok<String> local15
 .local System.Result<String,System.Text.Utf8SliceError> local16
-.local System.Result.Error<System.Text.Utf8SliceError> local17
+.local System.Result.Failure<System.Text.Utf8SliceError> local17
 .local System.Result<String,System.IO.TextReadError> local18
 .local System.Result.Ok<String> local19
 .local System.Result<String,System.IO.TextReadError> local20
-.local System.Result.Error<System.IO.TextReadError> local21
+.local System.Result.Failure<System.IO.TextReadError> local21
 ldloca local0
 initobj arrayref<Byte>
 ldloca local1
@@ -315,7 +315,7 @@ initobj System.Result.Ok<String>
 ldloca local16
 initobj System.Result<String,System.Text.Utf8SliceError>
 ldloca local17
-initobj System.Result.Error<System.Text.Utf8SliceError>
+initobj System.Result.Failure<System.Text.Utf8SliceError>
 ldloca local18
 initobj System.Result<String,System.IO.TextReadError>
 ldloca local19
@@ -323,7 +323,7 @@ initobj System.Result.Ok<String>
 ldloca local20
 initobj System.Result<String,System.IO.TextReadError>
 ldloca local21
-initobj System.Result.Error<System.IO.TextReadError>
+initobj System.Result.Failure<System.IO.TextReadError>
 M00000005_IL_0000:
 M00000005_IL_0001:
 M00000005_IL_0002:
@@ -342,7 +342,7 @@ call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewS
 M00000005_IL_001c:
 call neoCLR.Library.System.IO.StreamReader.RuntimeUnion0(System.IO.TextReadError)
 M00000005_IL_0021:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion1(System.Result.Error<System.IO.TextReadError>)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion1(System.Result.Failure<System.IO.TextReadError>)
 M00000005_IL_0026:
 ret
 M00000005_IL_0027:
@@ -365,7 +365,7 @@ call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewS
 M00000005_IL_0041:
 call neoCLR.Library.System.IO.StreamReader.RuntimeUnion0(System.IO.TextReadError)
 M00000005_IL_0046:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion1(System.Result.Error<System.IO.TextReadError>)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion1(System.Result.Failure<System.IO.TextReadError>)
 M00000005_IL_004b:
 ret
 M00000005_IL_004c:
@@ -388,7 +388,7 @@ call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewS
 M00000005_IL_006a:
 call neoCLR.Library.System.IO.StreamReader.RuntimeUnion0(System.IO.TextReadError)
 M00000005_IL_006f:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion1(System.Result.Error<System.IO.TextReadError>)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion1(System.Result.Failure<System.IO.TextReadError>)
 M00000005_IL_0074:
 ret
 M00000005_IL_0075:
@@ -558,19 +558,19 @@ stloc local16
 M00000005_IL_014b:
 ldloca local17
 M00000005_IL_014d:
-initobj System.Result.Error<System.Text.Utf8SliceError>
+initobj System.Result.Failure<System.Text.Utf8SliceError>
 M00000005_IL_0153:
 ldloca local16
 M00000005_IL_0155:
 ldloca local17
 M00000005_IL_0157:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion9(System.Result<String,System.Text.Utf8SliceError>&,System.Result.Error<System.Text.Utf8SliceError>&)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion9(System.Result<String,System.Text.Utf8SliceError>&,System.Result.Failure<System.Text.Utf8SliceError>&)
 M00000005_IL_015c:
 brfalse M00000005_IL_0180
 M00000005_IL_0161:
 ldloca local17
 M00000005_IL_0163:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion11(System.Result.Error<System.Text.Utf8SliceError>&)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion11(System.Result.Failure<System.Text.Utf8SliceError>&)
 M00000005_IL_0168:
 pop
 M00000005_IL_0169:
@@ -712,7 +712,7 @@ call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewS
 M00000005_IL_0216:
 call neoCLR.Library.System.IO.StreamReader.RuntimeUnion0(System.IO.TextReadError)
 M00000005_IL_021b:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion1(System.Result.Error<System.IO.TextReadError>)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion1(System.Result.Failure<System.IO.TextReadError>)
 M00000005_IL_0220:
 ret
 M00000005_IL_0221:
@@ -766,7 +766,7 @@ call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewS
 M00000005_IL_0267:
 call neoCLR.Library.System.IO.StreamReader.RuntimeUnion0(System.IO.TextReadError)
 M00000005_IL_026c:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion1(System.Result.Error<System.IO.TextReadError>)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion1(System.Result.Failure<System.IO.TextReadError>)
 M00000005_IL_0271:
 ret
 M00000005_IL_0272:
@@ -835,7 +835,7 @@ call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewS
 M00000005_IL_02cc:
 call neoCLR.Library.System.IO.StreamReader.RuntimeUnion0(System.IO.TextReadError)
 M00000005_IL_02d1:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion1(System.Result.Error<System.IO.TextReadError>)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion1(System.Result.Failure<System.IO.TextReadError>)
 M00000005_IL_02d6:
 ret
 M00000005_IL_02d7:
@@ -895,19 +895,19 @@ stloc local20
 M00000005_IL_0327:
 ldloca local21
 M00000005_IL_0329:
-initobj System.Result.Error<System.IO.TextReadError>
+initobj System.Result.Failure<System.IO.TextReadError>
 M00000005_IL_032f:
 ldloca local20
 M00000005_IL_0331:
 ldloca local21
 M00000005_IL_0333:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion10(System.Result<String,System.IO.TextReadError>&,System.Result.Error<System.IO.TextReadError>&)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion10(System.Result<String,System.IO.TextReadError>&,System.Result.Failure<System.IO.TextReadError>&)
 M00000005_IL_0338:
 brfalse M00000005_IL_0360
 M00000005_IL_033d:
 ldloca local21
 M00000005_IL_033f:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion12(System.Result.Error<System.IO.TextReadError>&)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion12(System.Result.Failure<System.IO.TextReadError>&)
 M00000005_IL_0344:
 stloc local13
 M00000005_IL_0346:
@@ -919,7 +919,7 @@ ldloc local13
 M00000005_IL_0355:
 call neoCLR.Library.System.IO.StreamReader.RuntimeUnion0(System.IO.TextReadError)
 M00000005_IL_035a:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion1(System.Result.Error<System.IO.TextReadError>)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion1(System.Result.Failure<System.IO.TextReadError>)
 M00000005_IL_035f:
 ret
 M00000005_IL_0360:
@@ -950,7 +950,7 @@ call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewS
 M00000005_IL_0380:
 call neoCLR.Library.System.IO.StreamReader.RuntimeUnion0(System.IO.TextReadError)
 M00000005_IL_0385:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion1(System.Result.Error<System.IO.TextReadError>)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion1(System.Result.Failure<System.IO.TextReadError>)
 M00000005_IL_038a:
 ret
 .end
@@ -965,7 +965,7 @@ ret
 .local System.Result<String,System.IO.TextReadError> local7
 .local System.Result.Ok<String> local8
 .local System.Result<String,System.IO.TextReadError> local9
-.local System.Result.Error<System.IO.TextReadError> local10
+.local System.Result.Failure<System.IO.TextReadError> local10
 ldloca local0
 initobj arrayref<Byte>
 ldc.i4 0
@@ -983,7 +983,7 @@ initobj System.Result.Ok<String>
 ldloca local9
 initobj System.Result<String,System.IO.TextReadError>
 ldloca local10
-initobj System.Result.Error<System.IO.TextReadError>
+initobj System.Result.Failure<System.IO.TextReadError>
 M00000007_IL_0000:
 M00000007_IL_0001:
 M00000007_IL_0002:
@@ -1002,7 +1002,7 @@ call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewS
 M00000007_IL_001c:
 call neoCLR.Library.System.IO.StreamReader.RuntimeUnion0(System.IO.TextReadError)
 M00000007_IL_0021:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion18(System.Result.Error<System.IO.TextReadError>)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion18(System.Result.Failure<System.IO.TextReadError>)
 M00000007_IL_0026:
 ret
 M00000007_IL_0027:
@@ -1025,7 +1025,7 @@ call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewS
 M00000007_IL_0041:
 call neoCLR.Library.System.IO.StreamReader.RuntimeUnion0(System.IO.TextReadError)
 M00000007_IL_0046:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion18(System.Result.Error<System.IO.TextReadError>)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion18(System.Result.Failure<System.IO.TextReadError>)
 M00000007_IL_004b:
 ret
 M00000007_IL_004c:
@@ -1048,7 +1048,7 @@ call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewS
 M00000007_IL_006a:
 call neoCLR.Library.System.IO.StreamReader.RuntimeUnion0(System.IO.TextReadError)
 M00000007_IL_006f:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion18(System.Result.Error<System.IO.TextReadError>)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion18(System.Result.Failure<System.IO.TextReadError>)
 M00000007_IL_0074:
 ret
 M00000007_IL_0075:
@@ -1107,7 +1107,7 @@ call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewS
 M00000007_IL_00c4:
 call neoCLR.Library.System.IO.StreamReader.RuntimeUnion0(System.IO.TextReadError)
 M00000007_IL_00c9:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion18(System.Result.Error<System.IO.TextReadError>)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion18(System.Result.Failure<System.IO.TextReadError>)
 M00000007_IL_00ce:
 ret
 M00000007_IL_00cf:
@@ -1230,19 +1230,19 @@ stloc local9
 M00000007_IL_0165:
 ldloca local10
 M00000007_IL_0167:
-initobj System.Result.Error<System.IO.TextReadError>
+initobj System.Result.Failure<System.IO.TextReadError>
 M00000007_IL_016d:
 ldloca local9
 M00000007_IL_016f:
 ldloca local10
 M00000007_IL_0171:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion10(System.Result<String,System.IO.TextReadError>&,System.Result.Error<System.IO.TextReadError>&)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion10(System.Result<String,System.IO.TextReadError>&,System.Result.Failure<System.IO.TextReadError>&)
 M00000007_IL_0176:
 brfalse M00000007_IL_019e
 M00000007_IL_017b:
 ldloca local10
 M00000007_IL_017d:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion12(System.Result.Error<System.IO.TextReadError>&)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion12(System.Result.Failure<System.IO.TextReadError>&)
 M00000007_IL_0182:
 stloc local6
 M00000007_IL_0184:
@@ -1254,7 +1254,7 @@ ldloc local6
 M00000007_IL_0193:
 call neoCLR.Library.System.IO.StreamReader.RuntimeUnion0(System.IO.TextReadError)
 M00000007_IL_0198:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion18(System.Result.Error<System.IO.TextReadError>)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion18(System.Result.Failure<System.IO.TextReadError>)
 M00000007_IL_019d:
 ret
 M00000007_IL_019e:
@@ -1294,7 +1294,7 @@ call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewS
 M00000007_IL_01c7:
 call neoCLR.Library.System.IO.StreamReader.RuntimeUnion0(System.IO.TextReadError)
 M00000007_IL_01cc:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion18(System.Result.Error<System.IO.TextReadError>)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion18(System.Result.Failure<System.IO.TextReadError>)
 M00000007_IL_01d1:
 ret
 M00000007_IL_01d2:
@@ -1308,7 +1308,7 @@ call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewS
 M00000007_IL_01e3:
 call neoCLR.Library.System.IO.StreamReader.RuntimeUnion0(System.IO.TextReadError)
 M00000007_IL_01e8:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion18(System.Result.Error<System.IO.TextReadError>)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion18(System.Result.Failure<System.IO.TextReadError>)
 M00000007_IL_01ed:
 ret
 .end
@@ -1325,19 +1325,19 @@ ret
 .local System.Result<Int32,System.IO.StreamError> local9
 .local System.Result.Ok<Int32> local10
 .local System.Result<Int32,System.IO.StreamError> local11
-.local System.Result.Error<System.IO.StreamError> local12
+.local System.Result.Failure<System.IO.StreamError> local12
 .local System.Result<String,System.Text.EncodingError> local13
 .local System.Result.Ok<String> local14
 .local System.Result<String,System.Text.EncodingError> local15
-.local System.Result.Error<System.Text.EncodingError> local16
+.local System.Result.Failure<System.Text.EncodingError> local16
 .local System.Text.EncodingError local17
 .local System.Text.EncodingError.InvalidUtf8 local18
 .local System.Result<String,System.Text.EncodingError> local19
-.local System.Result.Error<System.Text.EncodingError> local20
+.local System.Result.Failure<System.Text.EncodingError> local20
 .local System.Text.EncodingError local21
 .local System.Text.EncodingError.LimitExceeded local22
 .local System.Result<String,System.Text.EncodingError> local23
-.local System.Result.Error<System.Text.EncodingError> local24
+.local System.Result.Failure<System.Text.EncodingError> local24
 ldc.i4 0
 stloc local0
 ldloca local1
@@ -1357,7 +1357,7 @@ initobj System.Result.Ok<Int32>
 ldloca local11
 initobj System.Result<Int32,System.IO.StreamError>
 ldloca local12
-initobj System.Result.Error<System.IO.StreamError>
+initobj System.Result.Failure<System.IO.StreamError>
 ldloca local13
 initobj System.Result<String,System.Text.EncodingError>
 ldloca local14
@@ -1365,7 +1365,7 @@ initobj System.Result.Ok<String>
 ldloca local15
 initobj System.Result<String,System.Text.EncodingError>
 ldloca local16
-initobj System.Result.Error<System.Text.EncodingError>
+initobj System.Result.Failure<System.Text.EncodingError>
 ldloca local17
 initobj System.Text.EncodingError
 newobj System.Text.EncodingError.InvalidUtf8
@@ -1373,7 +1373,7 @@ stloc local18
 ldloca local19
 initobj System.Result<String,System.Text.EncodingError>
 ldloca local20
-initobj System.Result.Error<System.Text.EncodingError>
+initobj System.Result.Failure<System.Text.EncodingError>
 ldloca local21
 initobj System.Text.EncodingError
 newobj System.Text.EncodingError.LimitExceeded
@@ -1381,7 +1381,7 @@ stloc local22
 ldloca local23
 initobj System.Result<String,System.Text.EncodingError>
 ldloca local24
-initobj System.Result.Error<System.Text.EncodingError>
+initobj System.Result.Failure<System.Text.EncodingError>
 M00000008_IL_0000:
 M00000008_IL_0001:
 M00000008_IL_0002:
@@ -1445,19 +1445,19 @@ stloc local11
 M00000008_IL_0054:
 ldloca local12
 M00000008_IL_0056:
-initobj System.Result.Error<System.IO.StreamError>
+initobj System.Result.Failure<System.IO.StreamError>
 M00000008_IL_005c:
 ldloca local11
 M00000008_IL_005e:
 ldloca local12
 M00000008_IL_0060:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion23(System.Result<Int32,System.IO.StreamError>&,System.Result.Error<System.IO.StreamError>&)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion23(System.Result<Int32,System.IO.StreamError>&,System.Result.Failure<System.IO.StreamError>&)
 M00000008_IL_0065:
 brfalse M00000008_IL_0093
 M00000008_IL_006a:
 ldloca local12
 M00000008_IL_006c:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion24(System.Result.Error<System.IO.StreamError>&)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion24(System.Result.Failure<System.IO.StreamError>&)
 M00000008_IL_0071:
 stloc local4
 M00000008_IL_0073:
@@ -1471,7 +1471,7 @@ call System.IO.StreamReader.FromStream(System.IO.StreamError)
 M00000008_IL_0087:
 call neoCLR.Library.System.IO.StreamReader.RuntimeUnion0(System.IO.TextReadError)
 M00000008_IL_008c:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion18(System.Result.Error<System.IO.TextReadError>)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion18(System.Result.Failure<System.IO.TextReadError>)
 M00000008_IL_0091:
 ret
 M00000008_IL_0093:
@@ -1553,7 +1553,7 @@ call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewS
 M00000008_IL_00ec:
 call neoCLR.Library.System.IO.StreamReader.RuntimeUnion0(System.IO.TextReadError)
 M00000008_IL_00f1:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion18(System.Result.Error<System.IO.TextReadError>)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion18(System.Result.Failure<System.IO.TextReadError>)
 M00000008_IL_00f6:
 ret
 M00000008_IL_00f7:
@@ -1640,19 +1640,19 @@ stloc local15
 M00000008_IL_0167:
 ldloca local16
 M00000008_IL_0169:
-initobj System.Result.Error<System.Text.EncodingError>
+initobj System.Result.Failure<System.Text.EncodingError>
 M00000008_IL_016f:
 ldloca local15
 M00000008_IL_0171:
 ldloca local16
 M00000008_IL_0173:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion26(System.Result<String,System.Text.EncodingError>&,System.Result.Error<System.Text.EncodingError>&)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion26(System.Result<String,System.Text.EncodingError>&,System.Result.Failure<System.Text.EncodingError>&)
 M00000008_IL_0178:
 brfalse M00000008_IL_01c2
 M00000008_IL_017d:
 ldloca local16
 M00000008_IL_017f:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion27(System.Result.Error<System.Text.EncodingError>&)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion27(System.Result.Failure<System.Text.EncodingError>&)
 M00000008_IL_0184:
 stloc local17
 M00000008_IL_0186:
@@ -1676,7 +1676,7 @@ call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewS
 M00000008_IL_01b6:
 call neoCLR.Library.System.IO.StreamReader.RuntimeUnion0(System.IO.TextReadError)
 M00000008_IL_01bb:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion18(System.Result.Error<System.IO.TextReadError>)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion18(System.Result.Failure<System.IO.TextReadError>)
 M00000008_IL_01c0:
 ret
 M00000008_IL_01c2:
@@ -1687,19 +1687,19 @@ stloc local19
 M00000008_IL_01c7:
 ldloca local20
 M00000008_IL_01c9:
-initobj System.Result.Error<System.Text.EncodingError>
+initobj System.Result.Failure<System.Text.EncodingError>
 M00000008_IL_01cf:
 ldloca local19
 M00000008_IL_01d1:
 ldloca local20
 M00000008_IL_01d3:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion26(System.Result<String,System.Text.EncodingError>&,System.Result.Error<System.Text.EncodingError>&)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion26(System.Result<String,System.Text.EncodingError>&,System.Result.Failure<System.Text.EncodingError>&)
 M00000008_IL_01d8:
 brfalse M00000008_IL_0222
 M00000008_IL_01dd:
 ldloca local20
 M00000008_IL_01df:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion27(System.Result.Error<System.Text.EncodingError>&)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion27(System.Result.Failure<System.Text.EncodingError>&)
 M00000008_IL_01e4:
 stloc local21
 M00000008_IL_01e6:
@@ -1723,7 +1723,7 @@ call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewS
 M00000008_IL_0216:
 call neoCLR.Library.System.IO.StreamReader.RuntimeUnion0(System.IO.TextReadError)
 M00000008_IL_021b:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion18(System.Result.Error<System.IO.TextReadError>)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion18(System.Result.Failure<System.IO.TextReadError>)
 M00000008_IL_0220:
 ret
 M00000008_IL_0222:
@@ -1734,19 +1734,19 @@ stloc local23
 M00000008_IL_0227:
 ldloca local24
 M00000008_IL_0229:
-initobj System.Result.Error<System.Text.EncodingError>
+initobj System.Result.Failure<System.Text.EncodingError>
 M00000008_IL_022f:
 ldloca local23
 M00000008_IL_0231:
 ldloca local24
 M00000008_IL_0233:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion26(System.Result<String,System.Text.EncodingError>&,System.Result.Error<System.Text.EncodingError>&)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion26(System.Result<String,System.Text.EncodingError>&,System.Result.Failure<System.Text.EncodingError>&)
 M00000008_IL_0238:
 brfalse M00000008_IL_0267
 M00000008_IL_023d:
 ldloca local24
 M00000008_IL_023f:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion27(System.Result.Error<System.Text.EncodingError>&)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion27(System.Result.Failure<System.Text.EncodingError>&)
 M00000008_IL_0244:
 pop
 M00000008_IL_0245:
@@ -1759,7 +1759,7 @@ call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewS
 M00000008_IL_025b:
 call neoCLR.Library.System.IO.StreamReader.RuntimeUnion0(System.IO.TextReadError)
 M00000008_IL_0260:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion18(System.Result.Error<System.IO.TextReadError>)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion18(System.Result.Failure<System.IO.TextReadError>)
 M00000008_IL_0265:
 ret
 M00000008_IL_0267:
@@ -1794,7 +1794,7 @@ call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewS
 M00000008_IL_0294:
 call neoCLR.Library.System.IO.StreamReader.RuntimeUnion0(System.IO.TextReadError)
 M00000008_IL_0299:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion18(System.Result.Error<System.IO.TextReadError>)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion18(System.Result.Failure<System.IO.TextReadError>)
 M00000008_IL_029e:
 ret
 M00000008_IL_029f:
@@ -1872,7 +1872,7 @@ ret
 .local System.Option<String> local7
 .local System.Result<System.Option<String>,System.IO.TextReadError> local8
 .local System.Result<String,System.Text.InvalidUtf8Error> local9
-.local System.Result.Error<System.Text.InvalidUtf8Error> local10
+.local System.Result.Failure<System.Text.InvalidUtf8Error> local10
 ldloca local0
 initobj arrayref<Byte>
 ldc.i4 0
@@ -1892,7 +1892,7 @@ initobj System.Result<System.Option<String>,System.IO.TextReadError>
 ldloca local9
 initobj System.Result<String,System.Text.InvalidUtf8Error>
 ldloca local10
-initobj System.Result.Error<System.Text.InvalidUtf8Error>
+initobj System.Result.Failure<System.Text.InvalidUtf8Error>
 M00000006_IL_0000:
 M00000006_IL_0001:
 M00000006_IL_0002:
@@ -2014,19 +2014,19 @@ stloc local9
 M00000006_IL_009c:
 ldloca local10
 M00000006_IL_009e:
-initobj System.Result.Error<System.Text.InvalidUtf8Error>
+initobj System.Result.Failure<System.Text.InvalidUtf8Error>
 M00000006_IL_00a4:
 ldloca local9
 M00000006_IL_00a6:
 ldloca local10
 M00000006_IL_00a8:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion14(System.Result<String,System.Text.InvalidUtf8Error>&,System.Result.Error<System.Text.InvalidUtf8Error>&)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion14(System.Result<String,System.Text.InvalidUtf8Error>&,System.Result.Failure<System.Text.InvalidUtf8Error>&)
 M00000006_IL_00ad:
 brfalse M00000006_IL_00e0
 M00000006_IL_00b2:
 ldloca local10
 M00000006_IL_00b4:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion17(System.Result.Error<System.Text.InvalidUtf8Error>&)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion17(System.Result.Failure<System.Text.InvalidUtf8Error>&)
 M00000006_IL_00b9:
 pop
 M00000006_IL_00ba:
@@ -2039,7 +2039,7 @@ call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorNewS
 M00000006_IL_00d0:
 call neoCLR.Library.System.IO.StreamReader.RuntimeUnion0(System.IO.TextReadError)
 M00000006_IL_00d5:
-call neoCLR.Library.System.IO.StreamReader.RuntimeUnion1(System.Result.Error<System.IO.TextReadError>)
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion1(System.Result.Failure<System.IO.TextReadError>)
 M00000006_IL_00da:
 stloc local3
 M00000006_IL_00db:

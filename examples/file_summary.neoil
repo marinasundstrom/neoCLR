@@ -3,7 +3,7 @@
 
 .function Report(String path) -> Void
     .local System.Result.Ok<String> success
-    .local System.Result.Error<System.Storage.FileReadError> failure
+    .local System.Result.Failure<System.Storage.FileReadError> failure
     .local String text
     .local System.Storage.FileReadError error
     ldarg path
@@ -32,12 +32,12 @@
     ret
 Failed:
     ldloca failure
-    call instance System.Result<String,System.Storage.FileReadError>::TryGet(System.Result.Error<System.Storage.FileReadError>&)
+    call instance System.Result<String,System.Storage.FileReadError>::TryGet(System.Result.Failure<System.Storage.FileReadError>&)
     brtrue ErrorExtracted
     fault "Expected Error case"
 ErrorExtracted:
     ldloc failure
-    call instance System.Result.Error<System.Storage.FileReadError>::get_Value()
+    call instance System.Result.Failure<System.Storage.FileReadError>::get_Value()
     stloc error
     ldloc error
     call instance System.Storage.FileReadError::get_IsNotFound()

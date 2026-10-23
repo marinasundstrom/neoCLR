@@ -25,7 +25,7 @@ func Scalar(info: ConsoleKeyInfo, expected: int) {
 func Main(args: string[]) {
     let mode = args[0]
     if mode == "redirected" {
-        let Error(ConsoleKeyError.Unavailable) = Console.OpenKeyInput() else {
+        let Failure(ConsoleKeyError.Unavailable) = Console.OpenKeyInput() else {
             System.Fail("redirected input must reject key acquisition")
         }
         Console.WriteLine("PASS")
@@ -35,7 +35,7 @@ func Main(args: string[]) {
         let Ok(Some(_)) = Console.PeekChar() else {
             System.Fail("peek")
         }
-        let Error(ConsoleKeyError.Busy) = Console.OpenKeyInput() else {
+        let Failure(ConsoleKeyError.Busy) = Console.OpenKeyInput() else {
             System.Fail("text cursor must retain ownership")
         }
         let Ok(Some(text)) = Console.ReadLine() else {
@@ -53,15 +53,15 @@ func Main(args: string[]) {
         System.Fail("key session fault cleanup")
     }
     use scope = keys
-    let Error(ConsoleKeyError.Busy) = Console.OpenKeyInput() else {
+    let Failure(ConsoleKeyError.Busy) = Console.OpenKeyInput() else {
         System.Fail("exclusive keys")
     }
-    let Error(_) = Console.ReadByte() else {
+    let Failure(_) = Console.ReadByte() else {
         System.Fail("text cannot steal keys")
     }
     Console.WriteLine("READY")
     if mode == "handoff" {
-        let Error(ConsoleKeyError.InvalidUtf8) = keys.ReadKey() else {
+        let Failure(ConsoleKeyError.InvalidUtf8) = keys.ReadKey() else {
             System.Fail("handoff invalid UTF8")
         }
         let Ok(_) = keys.Close() else {
@@ -97,10 +97,10 @@ func Main(args: string[]) {
         Check(alt.Alt, "Alt text")
         Scalar(alt, 120)
         Check((int)Read(keys).Key == 27, "standalone Escape")
-        let Error(ConsoleKeyError.UnsupportedSequence) = keys.ReadKey() else {
+        let Failure(ConsoleKeyError.UnsupportedSequence) = keys.ReadKey() else {
             System.Fail("unsupported sequence")
         }
-        let Error(ConsoleKeyError.InvalidUtf8) = keys.ReadKey() else {
+        let Failure(ConsoleKeyError.InvalidUtf8) = keys.ReadKey() else {
             System.Fail("invalid UTF8")
         }
         // The invalid continuation byte is the following 'z'. Closing hands it back.
@@ -108,7 +108,7 @@ func Main(args: string[]) {
     let Ok(_) = keys.Close() else {
         System.Fail("close keys")
     }
-    let Error(ConsoleKeyError.Closed) = keys.ReadKey() else {
+    let Failure(ConsoleKeyError.Closed) = keys.ReadKey() else {
         System.Fail("closed keys")
     }
     if mode == "keys" {

@@ -228,26 +228,26 @@ internal class HttpResponseDecoder {
 
     internal func Push(value: byte) -> Result<bool, HttpError> {
         if failed {
-            return Error(HttpError.Protocol("Decoder already failed"))
+            return Failure(HttpError.Protocol("Decoder already failed"))
         }
         let result = PushCore(value)
-        if let Error(message) = result {
+        if let Failure(message) = result {
             failed = true
-            return Error(message)
+            return Failure(message)
         }
         return result
     }
 
     private func PushCore(value: byte) -> Result<bool, HttpError> {
         if Complete {
-            return Error(HttpError.Protocol("Bytes after response"))
+            return Failure(HttpError.Protocol("Bytes after response"))
         }
         if expected == -2 {
             if body.Count >= HttpWireLimits.BodyBytes {
-                return Error(HttpError.LimitExceeded("Body limit exceeded"))
+                return Failure(HttpError.LimitExceeded("Body limit exceeded"))
             }
             if statusCode == 205 {
-                return Error(HttpError.Protocol("Status 205 cannot contain content"))
+                return Failure(HttpError.Protocol("Status 205 cannot contain content"))
             }
             body.Add(value)
             return Ok(false)
@@ -257,24 +257,24 @@ internal class HttpResponseDecoder {
                 ended = decoder.Push(value)?
                 return Ok(Complete)
             }
-            return Error(HttpError.Protocol("Missing chunk decoder"))
+            return Failure(HttpError.Protocol("Missing chunk decoder"))
         }
         if expected >= 0 {
             body.Add(value)
             return Ok(Complete)
         }
         if headerBytes >= HttpWireLimits.HeaderBytes {
-            return Error(HttpError.LimitExceeded("Header limit exceeded"))
+            return Failure(HttpError.LimitExceeded("Header limit exceeded"))
         }
         let count = head.Count
         if value == 10 && (count == 0 || head[count - 1] != 13) {
-            return Error(HttpError.Protocol("Bare LF in headers"))
+            return Failure(HttpError.Protocol("Bare LF in headers"))
         }
         if count > 0 && head[count - 1] == 13 && value != 10 {
-            return Error(HttpError.Protocol("Bare CR in headers"))
+            return Failure(HttpError.Protocol("Bare CR in headers"))
         }
         if value != 9 && value != 10 && value != 13 && !(value >= 32 && value <= 126) {
-            return Error(HttpError.Protocol("Invalid header byte"))
+            return Failure(HttpError.Protocol("Invalid header byte"))
         }
         headerBytes += 1
         head.Add(value)
@@ -284,7 +284,7 @@ internal class HttpResponseDecoder {
             if statusCode < 200 {
                 informational += 1
                 if informational > HttpWireLimits.InformationalResponses {
-                    return Error(HttpError.LimitExceeded("Informational response limit exceeded"))
+                    return Failure(HttpError.LimitExceeded("Informational response limit exceeded"))
                 }
                 head = ArrayList<byte>()
                 headers = ArrayList<HttpHeader>()
@@ -304,7 +304,7 @@ internal class HttpResponseDecoder {
             ended = true
         }
         if !Complete {
-            return Error(HttpError.Protocol("EOF before complete response"))
+            return Failure(HttpError.Protocol("EOF before complete response"))
         }
         return Finish()
     }
@@ -331,7 +331,7 @@ internal class HttpResponseDecoder {
         if let Ok(text) = HttpText.Decode(bytes) {
             return Ok(text)
         }
-        return Error(HttpError.Protocol("Invalid header text"))
+        return Failure(HttpError.Protocol("Invalid header text"))
     }
 
     private func ParseHead() -> Result<int, HttpError> {
@@ -346,42 +346,42 @@ internal class HttpResponseDecoder {
             }
             if line == 0 {
                 if end < 13 || Text(0, 9, 0)? != "HTTP/1.1 " || head[12] != 32 {
-                    return Error(HttpError.Protocol("Invalid status line"))
+                    return Failure(HttpError.Protocol("Invalid status line"))
                 }
                 var code = 0
                 var digitIndex = 9
                 while digitIndex < 12 {
                     let digit = (int)head[digitIndex] - 48
                     if !(digit >= 0 && digit <= 9) {
-                        return Error(HttpError.Protocol("Invalid status code"))
+                        return Failure(HttpError.Protocol("Invalid status code"))
                     }
                     code = code * 10 + digit
                     digitIndex += 1
                 }
                 if !(code >= 100 && code <= 599) {
-                    return Error(HttpError.Protocol("Invalid status code"))
+                    return Failure(HttpError.Protocol("Invalid status code"))
                 }
                 if code == 101 {
-                    return Error(HttpError.Unsupported("Protocol upgrades are not implemented"))
+                    return Failure(HttpError.Unsupported("Protocol upgrades are not implemented"))
                 }
                 statusCode = code
                 reasonEnd = end
             } else if end == start {
                 if chunked && length >= 0 {
-                    return Error(HttpError.Protocol("Ambiguous response framing"))
+                    return Failure(HttpError.Protocol("Ambiguous response framing"))
                 }
                 if statusCode < 200 {
                     if chunked || length >= 0 {
-                        return Error(HttpError.Protocol("Informational responses cannot contain framing headers"))
+                        return Failure(HttpError.Protocol("Informational responses cannot contain framing headers"))
                     }
                     return Ok(0)
                 }
                 if statusCode == 204 {
                     if chunked {
-                        return Error(HttpError.Protocol("Transfer-Encoding is prohibited for status 204"))
+                        return Failure(HttpError.Protocol("Transfer-Encoding is prohibited for status 204"))
                     }
                     if length >= 0 {
-                        return Error(HttpError.Protocol("Content-Length is prohibited for status 204"))
+                        return Failure(HttpError.Protocol("Content-Length is prohibited for status 204"))
                     }
                     return Ok(0)
                 }
@@ -396,22 +396,22 @@ internal class HttpResponseDecoder {
                     return Ok(-2)
                 }
                 if statusCode == 205 && length != 0 {
-                    return Error(HttpError.Protocol("Status 205 cannot contain content"))
+                    return Failure(HttpError.Protocol("Status 205 cannot contain content"))
                 }
                 return Ok(length)
             } else {
                 if headers.Count >= HttpWireLimits.HeaderCount {
-                    return Error(HttpError.LimitExceeded("Header count exceeded"))
+                    return Failure(HttpError.LimitExceeded("Header count exceeded"))
                 }
                 var colon = start
                 while colon < end && head[colon] != 58 {
                     if !Token(head[colon]) {
-                        return Error(HttpError.Protocol("Invalid header name"))
+                        return Failure(HttpError.Protocol("Invalid header name"))
                     }
                     colon += 1
                 }
                 if colon == start || colon == end {
-                    return Error(HttpError.Protocol("Missing header name or colon"))
+                    return Failure(HttpError.Protocol("Missing header name or colon"))
                 }
                 let name = Text(start, colon, 1)?
                 var first = colon + 1
@@ -424,38 +424,38 @@ internal class HttpResponseDecoder {
                 }
                 let value = Text(first, last, 0)?
                 if name == "content-encoding" {
-                    return Error(HttpError.Unsupported("Unsupported encoding"))
+                    return Failure(HttpError.Unsupported("Unsupported encoding"))
                 }
                 if name == "transfer-encoding" {
                     if chunked {
-                        return Error(HttpError.Protocol("Duplicate Transfer-Encoding"))
+                        return Failure(HttpError.Protocol("Duplicate Transfer-Encoding"))
                     }
                     if Text(first, last, 1)? != "chunked" {
-                        return Error(HttpError.Unsupported("Unsupported transfer encoding"))
+                        return Failure(HttpError.Unsupported("Unsupported transfer encoding"))
                     }
                     chunked = true
                 }
                 if name == "content-length" {
                     if length >= 0 {
-                        return Error(HttpError.Protocol("Duplicate Content-Length"))
+                        return Failure(HttpError.Protocol("Duplicate Content-Length"))
                     }
                     if first == last {
-                        return Error(HttpError.Protocol("Empty Content-Length"))
+                        return Failure(HttpError.Protocol("Empty Content-Length"))
                     }
                     var number = 0
                     var index = first
                     while index < last {
                         let digit = (int)head[index] - 48
                         if !(digit >= 0 && digit <= 9) {
-                            return Error(HttpError.Protocol("Invalid Content-Length"))
+                            return Failure(HttpError.Protocol("Invalid Content-Length"))
                         }
                         // Bound before multiplication, avoiding integer overflow.
                         let limit = if statusCode == 304 || isHead { 2147483647 } else { HttpWireLimits.BodyBytes }
                         if number > (limit - digit) / 10 {
                             if statusCode == 304 || isHead {
-                                return Error(HttpError.LimitExceeded("Content-Length metadata limit exceeded"))
+                                return Failure(HttpError.LimitExceeded("Content-Length metadata limit exceeded"))
                             }
-                            return Error(HttpError.LimitExceeded("Body limit exceeded"))
+                            return Failure(HttpError.LimitExceeded("Body limit exceeded"))
                         }
                         number = number * 10 + digit
                         index += 1
@@ -468,12 +468,12 @@ internal class HttpResponseDecoder {
             start = end + 2
             end = start
         }
-        return Error(HttpError.Protocol("Incomplete headers"))
+        return Failure(HttpError.Protocol("Incomplete headers"))
     }
 
     internal func Finish() -> Result<HttpResponse, HttpError> {
         if !Complete {
-            return Error(HttpError.Protocol("Incomplete or invalid response"))
+            return Failure(HttpError.Protocol("Incomplete or invalid response"))
         }
         let response = HttpResponse(statusCode, headers, HttpMemoryContent(HttpText.Snapshot(body)))
         response.SetReason(head, reasonEnd)
@@ -616,7 +616,7 @@ public abstract class HttpContent : Disposable {
             return await CancelledCopy()
         }
         if disposed {
-            return Error(HttpError.Content(StreamError.Closed))
+            return Failure(HttpError.Content(StreamError.Closed))
         }
         _ = BeginUpload()?
         if IsBuffered {
@@ -637,7 +637,7 @@ public abstract class HttpContent : Disposable {
                     return await CancelledCopy()
                 }
                 if disposed {
-                    return Error(HttpError.Content(StreamError.Closed))
+                    return Failure(HttpError.Content(StreamError.Closed))
                 }
                 let sequenceRemaining = count - offset
                 let sequenceTake = if sequenceRemaining < sequenceBuffer.Length { sequenceRemaining } else { sequenceBuffer.Length }
@@ -656,7 +656,7 @@ public abstract class HttpContent : Disposable {
             return Ok(())
         }
         let Some(stream) = input else {
-            return Error(HttpError.Content(StreamError.IoFailure))
+            return Failure(HttpError.Content(StreamError.IoFailure))
         }
         var remaining = inputLength
         if remaining == 0 {
@@ -668,24 +668,24 @@ public abstract class HttpContent : Disposable {
                 return await CancelledCopy()
             }
             if disposed {
-                return Error(HttpError.Content(StreamError.Closed))
+                return Failure(HttpError.Content(StreamError.Closed))
             }
             let take = if remaining > 0 && remaining < buffer.Length { remaining } else { buffer.Length }
             let result = await stream.Read(buffer, 0, take, cancellationToken)
             let Ok(read) = result else {
-                if result is Error(let reason) {
-                    return Error(HttpError.Content(reason))
+                if result is Failure(let reason) {
+                    return Failure(HttpError.Content(reason))
                 }
-                return Error(HttpError.Content(StreamError.IoFailure))
+                return Failure(HttpError.Content(StreamError.IoFailure))
             }
             if read < 0 || read > take || (read == 0 && remaining > 0) {
-                return Error(HttpError.Content(StreamError.IoFailure))
+                return Failure(HttpError.Content(StreamError.IoFailure))
             }
             if cancellationToken.IsCancellationRequested {
                 return await CancelledCopy()
             }
             if disposed {
-                return Error(HttpError.Content(StreamError.Closed))
+                return Failure(HttpError.Content(StreamError.Closed))
             }
             if read == 0 {
                 return Ok(())
@@ -710,7 +710,7 @@ public abstract class HttpContent : Disposable {
     private static func CopyResult(result: Result<unit, StreamError>) -> Result<unit, HttpError> {
         return match result {
             Ok(_) => Ok(())
-            Error(let reason) => Error(HttpError.Content(reason))
+            Failure(let reason) => Failure(HttpError.Content(reason))
         }
     }
 
@@ -736,7 +736,7 @@ public abstract class HttpContent : Disposable {
     internal func BeginUpload() -> Result<unit, HttpError> {
         if !IsBuffered {
             if started || disposed {
-                return Error(HttpError.InvalidRequest("Stream content has already been consumed or disposed"))
+                return Failure(HttpError.InvalidRequest("Stream content has already been consumed or disposed"))
             }
             started = true
         }
@@ -746,20 +746,20 @@ public abstract class HttpContent : Disposable {
     internal async func ReadUpload(buffer: byte[], count: int, cancellationToken: CancellationToken) -> Task<Result<int, HttpError>> {
         if let Some(stream) = input {
             if disposed {
-                return Error(HttpError.Content(StreamError.Closed))
+                return Failure(HttpError.Content(StreamError.Closed))
             }
             let result = await stream.Read(buffer, 0, count, cancellationToken)
-            if let Error(reason) = result {
-                return Error(HttpError.Content(reason))
+            if let Failure(reason) = result {
+                return Failure(HttpError.Content(reason))
             }
             if let Ok(read) = result {
                 if read <= 0 || read > count {
-                    return Error(HttpError.Content(StreamError.IoFailure))
+                    return Failure(HttpError.Content(StreamError.IoFailure))
                 }
                 return Ok(read)
             }
         }
-        return Error(HttpError.InvalidRequest("Content has no stream source"))
+        return Failure(HttpError.InvalidRequest("Content has no stream source"))
     }
 
     private var mediaType: Option<string> = None()
@@ -859,12 +859,12 @@ public class HttpRequest : Disposable {
             let value = bytes[index]
             if value == 37 {
                 if index + 2 >= bytes.Count {
-                    return Error(HttpError.InvalidUri(UriError.InvalidFormat()))
+                    return Failure(HttpError.InvalidUri(UriError.InvalidFormat()))
                 }
                 for offset in 1..3 {
                     let digit = bytes[index + offset]
                     if !((digit >= 48 && digit <= 57) || (digit >= 65 && digit <= 70) || (digit >= 97 && digit <= 102)) {
-                        return Error(HttpError.InvalidUri(UriError.InvalidFormat()))
+                        return Failure(HttpError.InvalidUri(UriError.InvalidFormat()))
                     }
                 }
                 index += 3
@@ -876,9 +876,9 @@ public class HttpRequest : Disposable {
                 value == 33 || value == 36 || value == 38 || value == 39 || value == 40 || value == 41 ||
                 value == 42 || value == 43 || value == 44 || value == 59 || value == 61) {
                 if value == 91 || value == 93 {
-                    return Error(HttpError.InvalidUri(UriError.UnsupportedAuthority()))
+                    return Failure(HttpError.InvalidUri(UriError.UnsupportedAuthority()))
                 }
-                return Error(HttpError.InvalidUri(UriError.InvalidFormat()))
+                return Failure(HttpError.InvalidUri(UriError.InvalidFormat()))
             }
             index += 1
         }
@@ -891,7 +891,7 @@ public class HttpRequest : Disposable {
         let prefixLength = if secure { 8 } else { 7 }
         let length = prefixLength + authority.GetUtf8ByteCount() + target.GetUtf8ByteCount()
         if length > 4096 {
-            return Error(HttpError.InvalidUri(UriError.TooLong()))
+            return Failure(HttpError.InvalidUri(UriError.TooLong()))
         }
         let hostBytes = HttpText.Encode(authority)
         let targetBytes = HttpText.Encode(target)
@@ -903,7 +903,7 @@ public class HttpRequest : Disposable {
         while end < hostBytes.Count && hostBytes[end] != 47 && hostBytes[end] != 63 && hostBytes[end] != 35 {
             if hostBytes[end] == 64 {
                 if at >= 0 {
-                    return Error(HttpError.InvalidUri(UriError.InvalidFormat()))
+                    return Failure(HttpError.InvalidUri(UriError.InvalidFormat()))
                 }
                 at = end
                 lastColon = -1
@@ -917,7 +917,7 @@ public class HttpRequest : Disposable {
             let value = hostBytes[position]
             if (value == 58 && position != lastColon) ||
                 (lastColon >= 0 && position > lastColon && !(value >= 48 && value <= 57)) {
-                return Error(HttpError.InvalidUri(UriError.InvalidFormat()))
+                return Failure(HttpError.InvalidUri(UriError.InvalidFormat()))
             }
             position += 1
         }
@@ -926,26 +926,26 @@ public class HttpRequest : Disposable {
         while position < hostBytes.Count {
             if hostBytes[position] == 35 {
                 if fragment {
-                    return Error(HttpError.InvalidUri(UriError.InvalidFormat()))
+                    return Failure(HttpError.InvalidUri(UriError.InvalidFormat()))
                 }
                 fragment = true
             }
             position += 1
         }
         if length > 1024 {
-            return Error(HttpError.LimitExceeded("URL limit exceeded"))
+            return Failure(HttpError.LimitExceeded("URL limit exceeded"))
         }
         var colon = 0
         while colon < end && hostBytes[colon] != 58 {
             let value = hostBytes[colon]
             if !((value >= 65 && value <= 90) || (value >= 97 && value <= 122) ||
                 (value >= 48 && value <= 57) || value == 45 || value == 46) {
-                return Error(HttpError.Unsupported("Unsupported hostname"))
+                return Failure(HttpError.Unsupported("Unsupported hostname"))
             }
             colon += 1
         }
         if colon == 0 || colon > 253 {
-            return Error(HttpError.InvalidRequest("Invalid hostname length"))
+            return Failure(HttpError.InvalidRequest("Invalid hostname length"))
         }
         var port = if secure { 443 } else { 80 }
         var host = authority
@@ -953,26 +953,26 @@ public class HttpRequest : Disposable {
             port = 0
             position = colon + 1
             if position == end {
-                return Error(HttpError.InvalidRequest("Empty port"))
+                return Failure(HttpError.InvalidRequest("Empty port"))
             }
             while position < end {
                 let digit = (int)hostBytes[position] - 48
                 if !(digit >= 0 && digit <= 9) || port > (65535 - digit) / 10 {
-                    return Error(HttpError.InvalidRequest("Invalid port"))
+                    return Failure(HttpError.InvalidRequest("Invalid port"))
                 }
                 port = port * 10 + digit
                 position += 1
             }
             if port == 0 {
-                return Error(HttpError.InvalidRequest("Invalid port"))
+                return Failure(HttpError.InvalidRequest("Invalid port"))
             }
             host = Text(hostBytes, 0, colon)?
         }
         if fragment {
-            return Error(HttpError.Unsupported("Unsupported request target"))
+            return Failure(HttpError.Unsupported("Unsupported request target"))
         }
         if end != hostBytes.Count {
-            return Error(HttpError.InvalidRequest("Invalid Host authority"))
+            return Failure(HttpError.InvalidRequest("Invalid Host authority"))
         }
         let request = HttpRequest(host, port, target)
         request.secure = secure
@@ -987,7 +987,7 @@ public class HttpRequest : Disposable {
     /// Constructs a request with explicit method and content; transport bounds apply when sent.
     static func Create(method: HttpMethod, url: string, content: HttpContent) -> Result<HttpRequest, HttpError> {
         if method is null {
-            return Error(HttpError.InvalidRequest("HTTP method cannot be null"))
+            return Failure(HttpError.InvalidRequest("HTTP method cannot be null"))
         }
         let request = Post(url, content)?
         request.storedMethod = method
@@ -1002,7 +1002,7 @@ public class HttpRequest : Disposable {
     /// Constructs a URI-based request with explicit method and content.
     static func Create(method: HttpMethod, uri: Uri, content: HttpContent) -> Result<HttpRequest, HttpError> {
         if method is null {
-            return Error(HttpError.InvalidRequest("HTTP method cannot be null"))
+            return Failure(HttpError.InvalidRequest("HTTP method cannot be null"))
         }
         let request = Post(uri, content)?
         request.storedMethod = method
@@ -1094,13 +1094,13 @@ public class HttpRequest : Disposable {
     /// Returns a new request with one application header replaced case-insensitively.
     /// The original request is unchanged; content is shared and framing stays provider-owned.
     func WithHeader(name: string, value: string) -> Result<HttpRequest, HttpError> {
-        if storedContent.IsDisposed { return Error(HttpError.InvalidRequest("Request is disposed")) }
+        if storedContent.IsDisposed { return Failure(HttpError.InvalidRequest("Request is disposed")) }
         let key = HeaderName(name)?
         if ReservedHeader(key) || key == "content-type" {
-            return Error(HttpError.InvalidRequest("Header is controlled by transport or content"))
+            return Failure(HttpError.InvalidRequest("Header is controlled by transport or content"))
         }
         if !HeaderValueValid(value) {
-            return Error(HttpError.InvalidRequest("Invalid request header value"))
+            return Failure(HttpError.InvalidRequest("Invalid request header value"))
         }
         let headers = ArrayList<HttpHeader>()
         for header in storedHeaders {
@@ -1110,7 +1110,7 @@ public class HttpRequest : Disposable {
         }
         headers.Add(HttpHeader(name, value))
         if headers.Count > HttpWireLimits.HeaderCount - 3 {
-            return Error(HttpError.LimitExceeded("Request application header count exceeded"))
+            return Failure(HttpError.LimitExceeded("Request application header count exceeded"))
         }
         let request = HttpRequest(storedHost, storedPort, storedTarget)
         request.secure = secure
@@ -1121,21 +1121,21 @@ public class HttpRequest : Disposable {
     }
 
     internal func WithDefaults(defaults: Sequence<HttpHeader>) -> Result<HttpRequest, HttpError> {
-        if storedContent.IsDisposed { return Error(HttpError.InvalidRequest("Request is disposed")) }
+        if storedContent.IsDisposed { return Failure(HttpError.InvalidRequest("Request is disposed")) }
         if defaults.Count == 0 {
             return Ok(self)
         }
         if defaults.Count > HttpWireLimits.HeaderCount - 3 {
-            return Error(HttpError.LimitExceeded("Default request header count exceeded"))
+            return Failure(HttpError.LimitExceeded("Default request header count exceeded"))
         }
         let headers = ArrayList<HttpHeader>()
         for header in defaults {
             let key = HeaderName(header.Name)?
             if ReservedHeader(key) || key == "content-type" {
-                return Error(HttpError.InvalidRequest("Default header is controlled by transport or content"))
+                return Failure(HttpError.InvalidRequest("Default header is controlled by transport or content"))
             }
             if !HeaderValueValid(header.Value) {
-                return Error(HttpError.InvalidRequest("Invalid default request header value"))
+                return Failure(HttpError.InvalidRequest("Invalid default request header value"))
             }
             if HttpHeader.FindValues(storedHeaders, header.Name).Count == 0 {
                 headers.Add(header)
@@ -1148,7 +1148,7 @@ public class HttpRequest : Disposable {
             headers.Add(header)
         }
         if headers.Count > HttpWireLimits.HeaderCount - 3 {
-            return Error(HttpError.LimitExceeded("Request application header count exceeded"))
+            return Failure(HttpError.LimitExceeded("Request application header count exceeded"))
         }
         let request = HttpRequest(storedHost, storedPort, storedTarget)
         request.secure = secure
@@ -1162,7 +1162,7 @@ public class HttpRequest : Disposable {
     private static func HeaderName(name: string) -> Result<string, HttpError> {
         let bytes = HttpText.Encode(name)
         if bytes.Count == 0 || bytes.Count > HttpWireLimits.HeaderBytes {
-            return Error(HttpError.InvalidRequest("Invalid request header name"))
+            return Failure(HttpError.InvalidRequest("Invalid request header name"))
         }
         let lower = ArrayList<byte>()
         for value in bytes {
@@ -1171,14 +1171,14 @@ public class HttpRequest : Disposable {
                 value == 37 || value == 38 || value == 39 || value == 42 || value == 43 ||
                 value == 45 || value == 46 || value == 94 || value == 95 || value == 96 ||
                 value == 124 || value == 126) {
-                return Error(HttpError.InvalidRequest("Invalid request header name"))
+                return Failure(HttpError.InvalidRequest("Invalid request header name"))
             }
             lower.Add(if value >= 65 && value <= 90 { (byte)((int)value + 32) } else { value })
         }
         if let Ok(text) = HttpText.Decode(lower) {
             return Ok(text)
         }
-        return Error(HttpError.InvalidRequest("Invalid request header name"))
+        return Failure(HttpError.InvalidRequest("Invalid request header name"))
     }
 
     private static func HeaderValueValid(value: string) -> bool {
@@ -1203,21 +1203,21 @@ public class HttpRequest : Disposable {
 
     internal func Encode() -> Result<Sequence<byte>, HttpError> {
         if (String.CompareOrdinalIgnoreCase(storedMethod.Method, "CONNECT") == 0) {
-            return Error(HttpError.Unsupported("CONNECT tunnelling is not supported"))
+            return Failure(HttpError.Unsupported("CONNECT tunnelling is not supported"))
         }
         let count = storedContent.Length
         if count < 0 {
-            return Error(HttpError.Unsupported("Unknown-length uploads are not implemented"))
+            return Failure(HttpError.Unsupported("Unknown-length uploads are not implemented"))
         }
         if storedContent.IsBuffered && count > HttpWireLimits.BodyBytes {
-            return Error(HttpError.LimitExceeded("Request body limit exceeded"))
+            return Failure(HttpError.LimitExceeded("Request body limit exceeded"))
         }
         let method = storedMethod.Method
         let noBody = String.CompareOrdinalIgnoreCase(method, "GET") == 0 ||
             String.CompareOrdinalIgnoreCase(method, "DELETE") == 0 ||
             String.CompareOrdinalIgnoreCase(method, "HEAD") == 0
         if noBody && count != 0 {
-            return Error(HttpError.InvalidRequest("This request method cannot contain content"))
+            return Failure(HttpError.InvalidRequest("This request method cannot contain content"))
         }
         let port = storedPort
         var wire = String.Concat(String.Concat(storedMethod.Method, " "), storedTarget)
@@ -1229,29 +1229,29 @@ public class HttpRequest : Disposable {
             wire = String.Concat(wire, "\r\n")
         }
         if storedHeaders.Count > HttpWireLimits.HeaderCount - 3 {
-            return Error(HttpError.LimitExceeded("Request application header count exceeded"))
+            return Failure(HttpError.LimitExceeded("Request application header count exceeded"))
         }
         var hasContentType = false
         for header in storedHeaders {
             let key = HeaderName(header.Name)?
             if key == "content-type" {
                 if hasContentType {
-                    return Error(HttpError.InvalidRequest("Duplicate request Content-Type"))
+                    return Failure(HttpError.InvalidRequest("Duplicate request Content-Type"))
                 }
                 hasContentType = true
             }
             if ReservedHeader(key) {
-                return Error(HttpError.InvalidRequest("Header is controlled by transport"))
+                return Failure(HttpError.InvalidRequest("Header is controlled by transport"))
             }
             if !HeaderValueValid(header.Value) || (key == "content-type" && header.Value.IsEmpty) {
-                return Error(HttpError.InvalidRequest("Invalid request header value"))
+                return Failure(HttpError.InvalidRequest("Invalid request header value"))
             }
             wire = String.Concat(wire, String.Concat(header.Name, ": "))
             wire = String.Concat(wire, String.Concat(header.Value, "\r\n"))
         }
         let encoded = HttpText.Encode(String.Concat(wire, "\r\n"))
         if encoded.Count > HttpWireLimits.HeaderBytes {
-            return Error(HttpError.LimitExceeded("Request header limit exceeded"))
+            return Failure(HttpError.LimitExceeded("Request header limit exceeded"))
         }
         let outgoing = ArrayList<byte>()
         var cursor = 0
@@ -1287,7 +1287,7 @@ public class HttpRequest : Disposable {
         if let Ok(text) = HttpText.Decode(part) {
             return Ok(text)
         }
-        return Error(HttpError.InvalidRequest("Invalid URL text"))
+        return Failure(HttpError.InvalidRequest("Invalid URL text"))
     }
 
     /// Parses an absolute HTTP URL and constructs a GET request without performing I/O.
@@ -1295,27 +1295,27 @@ public class HttpRequest : Disposable {
         let parsed = Uri.Parse(url)
         if let Ok(uri) = parsed {
             return Get(uri)
-        } else if let Error(reason) = parsed {
-            return Error(HttpError.InvalidUri(reason))
+        } else if let Failure(reason) = parsed {
+            return Failure(HttpError.InvalidUri(reason))
         }
         System.Fail("URI parser returned no outcome")
-        return Error(HttpError.InvalidRequest("Invalid URI"))
+        return Failure(HttpError.InvalidRequest("Invalid URI"))
     }
 
     /// Constructs a GET request from an absolute URI; unsupported HTTP forms remain errors.
     static func Get(uri: Uri) -> Result<HttpRequest, HttpError> {
         if !uri.IsAbsolute {
-            return Error(HttpError.InvalidRequest("An absolute request URI is required"))
+            return Failure(HttpError.InvalidRequest("An absolute request URI is required"))
         }
         let url = uri.Text
         let secure = url.StartsWithOrdinal("https://")
         if !secure && !url.StartsWithOrdinal("http://") {
-            return Error(HttpError.Unsupported("Only http:// and https:// URLs are supported"))
+            return Failure(HttpError.Unsupported("Only http:// and https:// URLs are supported"))
         }
         let authorityStart = if secure { 8 } else { 7 }
         let bytes = HttpText.Encode(url)
         if bytes.Count > 1024 {
-            return Error(HttpError.LimitExceeded("URL limit exceeded"))
+            return Failure(HttpError.LimitExceeded("URL limit exceeded"))
         }
         var end = authorityStart
         while end < bytes.Count && bytes[end] != 47 && bytes[end] != 63 && bytes[end] != 35 {
@@ -1326,12 +1326,12 @@ public class HttpRequest : Disposable {
             let value = bytes[colon]
             if !((value >= 65 && value <= 90) || (value >= 97 && value <= 122) ||
                 (value >= 48 && value <= 57) || value == 45 || value == 46) {
-                return Error(HttpError.Unsupported("Unsupported hostname"))
+                return Failure(HttpError.Unsupported("Unsupported hostname"))
             }
             colon += 1
         }
         if colon == authorityStart || colon - authorityStart > 253 {
-            return Error(HttpError.InvalidRequest("Invalid hostname length"))
+            return Failure(HttpError.InvalidRequest("Invalid hostname length"))
         }
         let host = Text(bytes, authorityStart, colon)?
         var port = if secure { 443 } else { 80 }
@@ -1339,18 +1339,18 @@ public class HttpRequest : Disposable {
             port = 0
             var index = colon + 1
             if index == end {
-                return Error(HttpError.InvalidRequest("Empty port"))
+                return Failure(HttpError.InvalidRequest("Empty port"))
             }
             while index < end {
                 let digit = (int)bytes[index] - 48
                 if !(digit >= 0 && digit <= 9) || port > (65535 - digit) / 10 {
-                    return Error(HttpError.InvalidRequest("Invalid port"))
+                    return Failure(HttpError.InvalidRequest("Invalid port"))
                 }
                 port = port * 10 + digit
                 index += 1
             }
             if port == 0 {
-                return Error(HttpError.InvalidRequest("Invalid port"))
+                return Failure(HttpError.InvalidRequest("Invalid port"))
             }
         }
         var target = "/"
@@ -1359,7 +1359,7 @@ public class HttpRequest : Disposable {
             while index < bytes.Count {
                 let value = bytes[index]
                 if !(value >= 33 && value <= 126) || value == 35 {
-                    return Error(HttpError.Unsupported("Unsupported request target"))
+                    return Failure(HttpError.Unsupported("Unsupported request target"))
                 }
                 index += 1
             }
@@ -1511,7 +1511,7 @@ public class HttpClient : Disposable {
     func Send(request: HttpRequest, completionOption: HttpCompletionOption, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
         EnsureUsable()
         if completionOption != HttpCompletionOption.ResponseContentRead && completionOption != HttpCompletionOption.ResponseHeadersRead {
-            return Failure(HttpError.InvalidRequest("Unknown HTTP completion option"))
+            return FailedResponse(HttpError.InvalidRequest("Unknown HTTP completion option"))
         }
         started = true
         if cancellationToken.IsCancellationRequested {
@@ -1519,8 +1519,8 @@ public class HttpClient : Disposable {
             return Cancelled()
         }
         let prepared = request.WithDefaults(defaultHeaders)
-        if let Error(error) = prepared {
-            return Failure(error)
+        if let Failure(error) = prepared {
+            return FailedResponse(error)
         }
         let Ok(outgoing) = prepared else {
             System.Fail("Request preparation returned no outcome")
@@ -1548,11 +1548,11 @@ public class HttpClient : Disposable {
         let parsed = Uri.Parse(url)
         if let Ok(uri) = parsed {
             return Get(uri, cancellationToken)
-        } else if let Error(reason) = parsed {
-            return Failure(HttpError.InvalidUri(reason))
+        } else if let Failure(reason) = parsed {
+            return FailedResponse(HttpError.InvalidUri(reason))
         }
         System.Fail("URI parser returned no outcome")
-        return Failure(HttpError.InvalidRequest("Invalid URI"))
+        return FailedResponse(HttpError.InvalidRequest("Invalid URI"))
     }
 
     /// Uses the same base-resolution rules as the string overload.
@@ -1570,11 +1570,11 @@ public class HttpClient : Disposable {
         let parsed = CreateRequest(uri)
         if let Ok(request) = parsed {
             return Send(request, cancellationToken)
-        } else if let Error(reason) = parsed {
-            return Failure(reason)
+        } else if let Failure(reason) = parsed {
+            return FailedResponse(reason)
         }
         System.Fail("Request construction returned no outcome")
-        return Failure(HttpError.InvalidRequest("Invalid request"))
+        return FailedResponse(HttpError.InvalidRequest("Invalid request"))
     }
 
     /// Posts buffered content using the same BaseUri and handler rules as Get.
@@ -1592,11 +1592,11 @@ public class HttpClient : Disposable {
         let parsed = Uri.Parse(url)
         if let Ok(uri) = parsed {
             return Post(uri, content, cancellationToken)
-        } else if let Error(reason) = parsed {
-            return Failure(HttpError.InvalidUri(reason))
+        } else if let Failure(reason) = parsed {
+            return FailedResponse(HttpError.InvalidUri(reason))
         }
         System.Fail("URI parser returned no outcome")
-        return Failure(HttpError.InvalidRequest("Invalid URI"))
+        return FailedResponse(HttpError.InvalidRequest("Invalid URI"))
     }
 
     /// Posts content to a URI using the same base-resolution rules as Get.
@@ -1614,11 +1614,11 @@ public class HttpClient : Disposable {
         let parsed = CreatePost(uri, content)
         if let Ok(request) = parsed {
             return Send(request, cancellationToken)
-        } else if let Error(reason) = parsed {
-            return Failure(reason)
+        } else if let Failure(reason) = parsed {
+            return FailedResponse(reason)
         }
         System.Fail("Request construction returned no outcome")
-        return Failure(HttpError.InvalidRequest("Invalid request"))
+        return FailedResponse(HttpError.InvalidRequest("Invalid request"))
     }
 
     private func CreatePost(uri: Uri, content: HttpContent) -> Result<HttpRequest, HttpError> {
@@ -1640,11 +1640,11 @@ public class HttpClient : Disposable {
         let parsed = Uri.Parse(url)
         if let Ok(uri) = parsed {
             return Put(uri, content, cancellationToken)
-        } else if let Error(reason) = parsed {
-            return Failure(HttpError.InvalidUri(reason))
+        } else if let Failure(reason) = parsed {
+            return FailedResponse(HttpError.InvalidUri(reason))
         }
         System.Fail("URI parser returned no outcome")
-        return Failure(HttpError.InvalidRequest("Invalid URI"))
+        return FailedResponse(HttpError.InvalidRequest("Invalid URI"))
     }
 
     /// Sends PUT content to a URI using the same base-resolution rules as Get.
@@ -1662,11 +1662,11 @@ public class HttpClient : Disposable {
         let parsed = CreatePut(uri, content)
         if let Ok(request) = parsed {
             return Send(request, cancellationToken)
-        } else if let Error(reason) = parsed {
-            return Failure(reason)
+        } else if let Failure(reason) = parsed {
+            return FailedResponse(reason)
         }
         System.Fail("Request construction returned no outcome")
-        return Failure(HttpError.InvalidRequest("Invalid request"))
+        return FailedResponse(HttpError.InvalidRequest("Invalid request"))
     }
 
     private func CreatePut(uri: Uri, content: HttpContent) -> Result<HttpRequest, HttpError> {
@@ -1688,11 +1688,11 @@ public class HttpClient : Disposable {
         let parsed = Uri.Parse(url)
         if let Ok(uri) = parsed {
             return Patch(uri, content, cancellationToken)
-        } else if let Error(reason) = parsed {
-            return Failure(HttpError.InvalidUri(reason))
+        } else if let Failure(reason) = parsed {
+            return FailedResponse(HttpError.InvalidUri(reason))
         }
         System.Fail("URI parser returned no outcome")
-        return Failure(HttpError.InvalidRequest("Invalid URI"))
+        return FailedResponse(HttpError.InvalidRequest("Invalid URI"))
     }
 
     /// Sends PATCH content to a URI using the same base-resolution rules as Get.
@@ -1710,11 +1710,11 @@ public class HttpClient : Disposable {
         let parsed = CreatePatch(uri, content)
         if let Ok(request) = parsed {
             return Send(request, cancellationToken)
-        } else if let Error(reason) = parsed {
-            return Failure(reason)
+        } else if let Failure(reason) = parsed {
+            return FailedResponse(reason)
         }
         System.Fail("Request construction returned no outcome")
-        return Failure(HttpError.InvalidRequest("Invalid request"))
+        return FailedResponse(HttpError.InvalidRequest("Invalid request"))
     }
 
     private func CreatePatch(uri: Uri, content: HttpContent) -> Result<HttpRequest, HttpError> {
@@ -1736,11 +1736,11 @@ public class HttpClient : Disposable {
         let parsed = Uri.Parse(url)
         if let Ok(uri) = parsed {
             return Delete(uri, cancellationToken)
-        } else if let Error(reason) = parsed {
-            return Failure(HttpError.InvalidUri(reason))
+        } else if let Failure(reason) = parsed {
+            return FailedResponse(HttpError.InvalidUri(reason))
         }
         System.Fail("URI parser returned no outcome")
-        return Failure(HttpError.InvalidRequest("Invalid URI"))
+        return FailedResponse(HttpError.InvalidRequest("Invalid URI"))
     }
 
     /// Uses the same base-resolution rules as the string overload.
@@ -1758,11 +1758,11 @@ public class HttpClient : Disposable {
         let parsed = CreateDelete(uri)
         if let Ok(request) = parsed {
             return Send(request, cancellationToken)
-        } else if let Error(reason) = parsed {
-            return Failure(reason)
+        } else if let Failure(reason) = parsed {
+            return FailedResponse(reason)
         }
         System.Fail("Request construction returned no outcome")
-        return Failure(HttpError.InvalidRequest("Invalid request"))
+        return FailedResponse(HttpError.InvalidRequest("Invalid request"))
     }
 
     private func CreateDelete(uri: Uri) -> Result<HttpRequest, HttpError> {
@@ -1784,11 +1784,11 @@ public class HttpClient : Disposable {
         let parsed = Uri.Parse(url)
         if let Ok(uri) = parsed {
             return Head(uri, cancellationToken)
-        } else if let Error(reason) = parsed {
-            return Failure(HttpError.InvalidUri(reason))
+        } else if let Failure(reason) = parsed {
+            return FailedResponse(HttpError.InvalidUri(reason))
         }
         System.Fail("URI parser returned no outcome")
-        return Failure(HttpError.InvalidRequest("Invalid URI"))
+        return FailedResponse(HttpError.InvalidRequest("Invalid URI"))
     }
 
     /// Uses the same base-resolution rules as the string overload.
@@ -1806,11 +1806,11 @@ public class HttpClient : Disposable {
         let parsed = CreateHead(uri)
         if let Ok(request) = parsed {
             return Send(request, cancellationToken)
-        } else if let Error(reason) = parsed {
-            return Failure(reason)
+        } else if let Failure(reason) = parsed {
+            return FailedResponse(reason)
         }
         System.Fail("Request construction returned no outcome")
-        return Failure(HttpError.InvalidRequest("Invalid request"))
+        return FailedResponse(HttpError.InvalidRequest("Invalid request"))
     }
 
     private func CreateHead(uri: Uri) -> Result<HttpRequest, HttpError> {
@@ -1854,21 +1854,21 @@ public class HttpClient : Disposable {
     private static func DecodeText(result: Result<HttpResponse, HttpError>) -> Result<string, HttpError> {
         let response = result?
         if !response.IsSuccessStatusCode {
-            return Error(HttpError.UnsuccessfulStatus(response.StatusCode))
+            return Failure(HttpError.UnsuccessfulStatus(response.StatusCode))
         }
         if !response.Content.IsBuffered {
-            return Error(HttpError.Unsupported("Response content is not buffered"))
+            return Failure(HttpError.Unsupported("Response content is not buffered"))
         }
         if response.Content is HttpMemoryContent memoryContent {
             return match HttpText.Decode(memoryContent.Memory) {
                 Ok(let text) => Ok(text)
-                Error(_) => Error(HttpError.Protocol("Invalid UTF-8 body"))
+                Failure(_) => Failure(HttpError.Protocol("Invalid UTF-8 body"))
             }
         }
         if let Ok(text) = HttpText.Decode(response.Content.Bytes) {
             return Ok(text)
         }
-        return Error(HttpError.Protocol("Invalid UTF-8 body"))
+        return Failure(HttpError.Protocol("Invalid UTF-8 body"))
     }
 
     private static func Cancelled() -> Task<Result<HttpResponse, HttpError>> {
@@ -1886,30 +1886,30 @@ public class HttpClient : Disposable {
         let configured = baseUri
         if let Some(baseText) = configured {
             if uri.IsAbsolute || uri.Text.StartsWithOrdinal("//") {
-                return Error(HttpError.InvalidRequest("A relative URL without authority is required with BaseUri"))
+                return Failure(HttpError.InvalidRequest("A relative URL without authority is required with BaseUri"))
             }
             let parsed = Uri.Parse(baseText)
-            if let Error(reason) = parsed {
-                return Error(HttpError.InvalidUri(reason))
+            if let Failure(reason) = parsed {
+                return Failure(HttpError.InvalidUri(reason))
             } else if let Ok(baseAddress) = parsed {
                 // Validate HTTP policy on the base before allowing resolution.
                 _ = HttpRequest.Get(baseAddress)?
                 let resolved = baseAddress.Resolve(uri)
                 if let Ok(address) = resolved {
                     return Ok(address)
-                } else if let Error(reason) = resolved {
-                    return Error(HttpError.InvalidUri(reason))
+                } else if let Failure(reason) = resolved {
+                    return Failure(HttpError.InvalidUri(reason))
                 }
             }
             System.Fail("URI resolution returned no outcome")
-            return Error(HttpError.InvalidRequest("Invalid URI"))
+            return Failure(HttpError.InvalidRequest("Invalid URI"))
         }
         return Ok(uri)
     }
 
-    private static func Failure(reason: HttpError) -> Task<Result<HttpResponse, HttpError>> {
+    private static func FailedResponse(reason: HttpError) -> Task<Result<HttpResponse, HttpError>> {
         let source = Promise<Result<HttpResponse, HttpError>>()
-        _ = source.Complete(Error(reason))
+        _ = source.Complete(Failure(reason))
         return source.Task
     }
 
@@ -1991,19 +1991,19 @@ internal class HttpExchange {
 
     internal func Execute() -> Task<Result<HttpResponse, HttpError>> {
         if request.IsSecure && sslOptions is null {
-            _ = source.Complete(Error(HttpError.InvalidRequest("HTTPS requires explicit TLS trust options")))
+            _ = source.Complete(Failure(HttpError.InvalidRequest("HTTPS requires explicit TLS trust options")))
             return source.Task
         }
         // Validate and snapshot before starting the network exchange budget.
         let encoded = request.Encode()
         if let Ok(bytes) = encoded {
             outgoing = bytes
-        } else if let Error(reason) = encoded {
-            _ = source.Complete(Error(reason))
+        } else if let Failure(reason) = encoded {
+            _ = source.Complete(Failure(reason))
             return source.Task
         }
-        if let Error(reason) = request.Content.BeginUpload() {
-            _ = source.Complete(Error(reason))
+        if let Failure(reason) = request.Content.BeginUpload() {
+            _ = source.Complete(Failure(reason))
             return source.Task
         }
         if !request.Content.IsBuffered {
@@ -2052,8 +2052,8 @@ internal class HttpExchange {
                 let next = Socket.Connect(addresses, request.Port, token)
                 connecting = Some(next)
                 next.OnCompleted(self.OnConnected)
-            } else if let Error(reason) = result {
-                Finish(Error(HttpError.NameResolution(reason)))
+            } else if let Failure(reason) = result {
+                Finish(Failure(HttpError.NameResolution(reason)))
             }
         }
     }
@@ -2074,8 +2074,8 @@ internal class HttpExchange {
                     authentication = pending
                     pending.OnCompleted(self.OnAuthenticated)
                 } else { SendNext() }
-            } else if let Error(reason) = result {
-                Finish(Error(HttpError.Transport(reason)))
+            } else if let Failure(reason) = result {
+                Finish(Failure(HttpError.Transport(reason)))
             }
         }
     }
@@ -2085,7 +2085,7 @@ internal class HttpExchange {
         if authentication is Task<Result<unit, HttpError>> pending {
             authentication = null
             if pending.IsCancelled { Cancel(); return }
-            if let Error(error) = pending.GetResult() { Finish(Error(error)); return }
+            if let Failure(error) = pending.GetResult() { Finish(Failure(error)); return }
             SendNext()
         }
     }
@@ -2102,8 +2102,8 @@ internal class HttpExchange {
                 return
             }
             let reading = pending.GetResult()
-            if let Error(reason) = reading {
-                Finish(Error(reason))
+            if let Failure(reason) = reading {
+                Finish(Failure(reason))
                 return
             }
             if let Ok(read) = reading {
@@ -2162,10 +2162,10 @@ internal class HttpExchange {
                     sent += count
                     SendNext()
                 } else {
-                    Finish(Error(HttpError.Protocol("Send made no progress")))
+                    Finish(Failure(HttpError.Protocol("Send made no progress")))
                 }
-            } else if let Error(reason) = result {
-                Finish(Error(reason))
+            } else if let Failure(reason) = result {
+                Finish(Failure(reason))
             }
         }
     }
@@ -2194,8 +2194,8 @@ internal class HttpExchange {
                 var index = 0
                 while index < count && !decoder.Complete && !(request.HeadersOnly && decoder.HeadersComplete) {
                     let progress = decoder.Push(buffer[index])
-                    if let Error(message) = progress {
-                        Finish(Error(message))
+                    if let Failure(message) = progress {
+                        Finish(Failure(message))
                         return
                     }
                     index += 1
@@ -2215,8 +2215,8 @@ internal class HttpExchange {
                 } else {
                     ReceiveNext()
                 }
-            } else if let Error(reason) = result {
-                Finish(Error(reason))
+            } else if let Failure(reason) = result {
+                Finish(Failure(reason))
             }
         }
     }
@@ -2319,7 +2319,7 @@ internal class HttpSendScope {
             let callerToken = self.caller
             let ownerToken = self.owner
             if timedOut && !callerToken.IsCancellationRequested && !ownerToken.IsCancellationRequested {
-                _ = source.Complete(Error(HttpError.TimedOut))
+                _ = source.Complete(Failure(HttpError.TimedOut))
             } else {
                 _ = source.Cancel()
             }

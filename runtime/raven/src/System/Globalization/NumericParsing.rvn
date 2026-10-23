@@ -21,7 +21,7 @@ internal static class NumericParsing {
             let group = if swedish { code == 194 && index + 1 < bytes.Length && (int)bytes[index + 1] == 160 } else { code == 44 }
             if group {
                 if !integer || digits == 0 || (grouped && digits != 3) || (!grouped && digits > 3) {
-                    return Error(NumberParseError.InvalidFormat())
+                    return Failure(NumberParseError.InvalidFormat())
                 }
                 grouped = true
                 digits = 0
@@ -32,16 +32,16 @@ internal static class NumericParsing {
             } else {
                 if code == (if swedish { 44 } else { 46 }) {
                     if !floating || decimalSeen || exponent || (grouped && digits != 3) {
-                        return Error(NumberParseError.InvalidFormat())
+                        return Failure(NumberParseError.InvalidFormat())
                     }
                     decimalSeen = true
                     integer = false
                     if swedish { changed = true }
                 } else if code == 46 && swedish {
-                    return Error(NumberParseError.InvalidFormat())
+                    return Failure(NumberParseError.InvalidFormat())
                 } else if code == 69 || code == 101 {
                     if integer && grouped && digits != 3 {
-                        return Error(NumberParseError.InvalidFormat())
+                        return Failure(NumberParseError.InvalidFormat())
                     }
                     integer = false
                     exponent = true
@@ -51,7 +51,7 @@ internal static class NumericParsing {
                 index += 1
             }
         }
-        if integer && grouped && digits != 3 { return Error(NumberParseError.InvalidFormat()) }
+        if integer && grouped && digits != 3 { return Failure(NumberParseError.InvalidFormat()) }
         if !changed { return Ok(text) }
         let buffer = System.Runtime.CompilerServices.CheckedStorage.Reserve<byte>(bytes.Length - removed)
         index = 0
@@ -69,7 +69,7 @@ internal static class NumericParsing {
             }
         }
         let normalized: ReadOnlySlice<byte> = buffer
-        let Ok(value) = System.Text.Utf8.Decode(normalized) else { return Error(NumberParseError.InvalidFormat()) }
+        let Ok(value) = System.Text.Utf8.Decode(normalized) else { return Failure(NumberParseError.InvalidFormat()) }
         return Ok(value)
     }
 }

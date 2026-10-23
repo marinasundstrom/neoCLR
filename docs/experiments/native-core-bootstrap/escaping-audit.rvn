@@ -9,8 +9,8 @@ func Main() -> int {
     if String.CompareOrdinal(actual, escaped) != 0 {
         return 1
     }
-    let error = Result<string, string>.Error(payload).ToString()
-    if String.CompareOrdinal(error, "Result.Error(\"quote\\\"slash\\\\end🙂\u0000\")") != 0 {
+    let error = Result<string, string>.Failure(payload).ToString()
+    if String.CompareOrdinal(error, "Result.Failure(\"quote\\\"slash\\\\end🙂\u0000\")") != 0 {
         return 2
     }
     if String.CompareOrdinal("aaaaa".Replace("aa", "X"), "XXa") != 0 {

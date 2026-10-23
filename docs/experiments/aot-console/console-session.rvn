@@ -5,10 +5,10 @@ import System.Option.*
 
 func Main() -> int {
     System.Console.Write("Lines: ")
-    let Error(TextReadError.InvalidRange) = System.Console.ReadLine(-1) else {
+    let Failure(TextReadError.InvalidRange) = System.Console.ReadLine(-1) else {
         return 2
     }
-    let Error(TextReadError.LimitExceeded) = System.Console.ReadLine(65537) else {
+    let Failure(TextReadError.LimitExceeded) = System.Console.ReadLine(65537) else {
         return 3
     }
     let Ok(first) = System.Console.ReadLine() else {
@@ -29,7 +29,7 @@ func Main() -> int {
         System.Console.WriteLine("EOF")
     }
     reader.Close()
-    let Error(TextReadError.Closed) = reader.ReadLine(32) else {
+    let Failure(TextReadError.Closed) = reader.ReadLine(32) else {
         return 6
     }
     let Ok(third) = System.Console.ReadLine(32) else {

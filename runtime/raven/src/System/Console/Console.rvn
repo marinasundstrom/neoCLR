@@ -21,11 +21,11 @@ public static class Console {
     /// Text input can follow a closed key session, but a text cursor cannot currently be handed back to key mode.</remarks>
     static func OpenKeyInput(captureInterrupts: bool) -> Result<ConsoleKeyReader, ConsoleKeyError> {
         if textInputUsed || keyInputActive {
-            return Error(ConsoleKeyError.Busy)
+            return Failure(ConsoleKeyError.Busy)
         }
         let handle = neoCLR.Runtime.ConsoleTerminalOpen(captureInterrupts)
         if handle < 0 {
-            return Error(ConsoleKeyReader.Failure(handle))
+            return Failure(ConsoleKeyReader.ToKeyError(handle))
         }
         keyInputActive = true
         let reader = ConsoleKeyReader(handle)
@@ -128,7 +128,7 @@ public static class Console {
 
     static func ReadByte() -> System.Result<System.Option<byte>, ConsoleReadError> {
         if keyInputActive {
-            return Error(ConsoleReadError.Unavailable())
+            return Failure(ConsoleReadError.Unavailable())
         }
         textInputUsed = true
         let pendingByte = TakeKeyByte()
@@ -139,13 +139,13 @@ public static class Console {
         if neoCLR.Runtime.IsValue<int>(payload) {
             let status = neoCLR.Runtime.UnpackValue<int>(payload)
             if status == 1 {
-                return System.Result<System.Option<byte>, ConsoleReadError>.Error(ConsoleReadError.Unavailable())
+                return System.Result<System.Option<byte>, ConsoleReadError>.Failure(ConsoleReadError.Unavailable())
             }
             if status == 2 {
-                return System.Result<System.Option<byte>, ConsoleReadError>.Error(ConsoleReadError.ReadFailed())
+                return System.Result<System.Option<byte>, ConsoleReadError>.Failure(ConsoleReadError.ReadFailed())
             }
             System.Fail("invalid native I/O status")
-            return System.Result<System.Option<byte>, ConsoleReadError>.Error(ConsoleReadError.ReadFailed())
+            return System.Result<System.Option<byte>, ConsoleReadError>.Failure(ConsoleReadError.ReadFailed())
         }
         if neoCLR.Runtime.IsValue<System.Void>(payload) {
             let absent: System.Option<byte> = None()
@@ -281,11 +281,11 @@ public static class Console {
         let writer = Out
         match writer.Write(value0) {
             Ok(_) => { }
-            Error(_) => System.Fail("console output failed")
+            Failure(_) => System.Fail("console output failed")
         }
         match writer.Flush() {
             Ok(_) => { }
-            Error(_) => System.Fail("console output failed")
+            Failure(_) => System.Fail("console output failed")
         }
         return ()
     }

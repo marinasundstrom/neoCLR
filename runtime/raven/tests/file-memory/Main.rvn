@@ -18,10 +18,10 @@ func CompletedValue<T>(task: Task<T>) -> T {
 func Main(arguments: string[]) -> int {
     let Ok(output) = FileOutputStream.CreateNew(arguments[0]) else { return 1 }
     let bytes: byte[] = [(byte)165, (byte)40, (byte)2, (byte)166]
-    if CompletedValue(output.Write(bytes, 1, 2)) is Error(_) { return 2 }
-    if CompletedValue(output.Write(bytes, 4, 0)) is Error(_) { return 3 }
-    if CompletedValue(output.Write(bytes, -1, 1)) is not Error(StreamError.InvalidRange) { return 4 }
-    if CompletedValue(output.Flush()) is Error(_) { return 5 }
+    if CompletedValue(output.Write(bytes, 1, 2)) is Failure(_) { return 2 }
+    if CompletedValue(output.Write(bytes, 4, 0)) is Failure(_) { return 3 }
+    if CompletedValue(output.Write(bytes, -1, 1)) is not Failure(StreamError.InvalidRange) { return 4 }
+    if CompletedValue(output.Flush()) is Failure(_) { return 5 }
     output.Close()
     let Ok(input) = FileInputStream.Open(arguments[0]) else { return 6 }
     let destination: byte[] = [(byte)9, (byte)9, (byte)9, (byte)9, (byte)9]
@@ -29,10 +29,10 @@ func Main(arguments: string[]) -> int {
     if destination[0] != 9 || destination[1] != 40 || destination[2] != 2 || destination[3] != 9 || destination[4] != 9 { return 8 }
     if CompletedValue(input.Read(destination, 5, 0)) is not Ok(0) { return 9 }
     if CompletedValue(input.Read(destination, 0, 1)) is not Ok(0) { return 10 }
-    if CompletedValue(input.Read(destination, 4, 2)) is not Error(StreamError.InvalidRange) { return 11 }
+    if CompletedValue(input.Read(destination, 4, 2)) is not Failure(StreamError.InvalidRange) { return 11 }
     if input.GetPosition() is not Ok(2L) { return 12 }
     input.Close()
-    if CompletedValue(input.Read(destination, -1, 1)) is not Error(StreamError.Closed) { return 13 }
+    if CompletedValue(input.Read(destination, -1, 1)) is not Failure(StreamError.Closed) { return 13 }
     let cancellation = CancellationTokenSource()
     cancellation.Cancel()
     if !input.Read(destination, -1, 1, cancellation.Token).IsCancelled { return 14 }

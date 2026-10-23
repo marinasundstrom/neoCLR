@@ -29,7 +29,7 @@ func AHash() -> Result<unit, TestFailure> {
     }
     _ = Assert.Equal(165, (int)output[32])?
     let shortBuffer: byte[] = [(byte)165]
-    _ = Assert.True(SHA256.HashData(data, shortBuffer) is Error(CryptographyError.DestinationTooSmall), "Short destination")?
+    _ = Assert.True(SHA256.HashData(data, shortBuffer) is Failure(CryptographyError.DestinationTooSmall), "Short destination")?
     _ = Assert.Equal(165, (int)shortBuffer[0])?
     let aliased: byte[] = [
         (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0,
@@ -62,7 +62,7 @@ func AHash() -> Result<unit, TestFailure> {
         _ = Assert.Equal((int)expected[index], (int)output[index + 1])?
         index = index + 1
     }
-    _ = Assert.True(SHA256.HashData(data, output[1..32]) is Error(CryptographyError.DestinationTooSmall), "Short window")?
+    _ = Assert.True(SHA256.HashData(data, output[1..32]) is Failure(CryptographyError.DestinationTooSmall), "Short window")?
     _ = Assert.Equal((int)expected[0], (int)output[1])?
     return Ok(())
 }
@@ -108,7 +108,7 @@ func BMac() -> Result<unit, TestFailure> {
     _ = Assert.True(!HMACSHA256.VerifyData(key, data, tag), "Reject altered tag")?
     let small: byte[] = [(byte)165]
     _ = Assert.True(!HMACSHA256.VerifyData(key, data, small), "Reject truncated tag")?
-    _ = Assert.True(HMACSHA256.HashData(key, data, small) is Error(CryptographyError.DestinationTooSmall), "Short MAC destination")?
+    _ = Assert.True(HMACSHA256.HashData(key, data, small) is Failure(CryptographyError.DestinationTooSmall), "Short MAC destination")?
     return Assert.Equal(165, (int)small[0])
 }
 

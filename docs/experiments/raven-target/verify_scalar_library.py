@@ -52,7 +52,7 @@ func Show(value: bool) {
 func ShowDivision(value: Result<int, IntegerDivisionError>) {
     match value {
         Ok(let result) => WriteLine(result)
-        Error(let error) => {
+        Failure(let error) => {
             if (error is IntegerDivisionError.DivisionByZero) { WriteLine("zero") } else { WriteLine("overflow") }
         }
     }

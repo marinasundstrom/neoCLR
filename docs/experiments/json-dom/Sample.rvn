@@ -10,5 +10,5 @@ func AddAcknowledgement(input: InputStream, output: OutputStream) -> Result<unit
         _ = report.Add("accepted", JsonBoolean(true))?
         return JsonSerializer.SerializeNode(output, report)
     }
-    return Error(JsonError.TypeMismatch("object"))
+    return Failure(JsonError.TypeMismatch("object"))
 }

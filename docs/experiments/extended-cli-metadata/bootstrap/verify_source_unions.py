@@ -67,7 +67,7 @@ def main():
     run(consumer_command)
     run([runtime, 'verify', str(consumer), '--module', str(library), '--system', str(seed)])
     run([runtime, 'run', str(consumer), '--module', str(library), '--system', str(seed)], 42,
-        '' if args.collections else 'Option.Some(40)\nResult.Error(7)\n')
+        '' if args.collections else 'Option.Some(40)\nResult.Failure(7)\n')
     if args.collections:
         invalid_source = output / 'NegativeCapacity.rvn'
         invalid_source.write_text('func Main() -> int {\n    let values = System.Collections.ArrayList<int>(-1)\n    return 42\n}\n')

@@ -10,14 +10,14 @@ import System.Data.Json.*
 
 async func Echo(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
     if !request.IsSecure || request.Method.Method != "POST" || request.Target != "/echo" {
-        return Error(HttpError.Handler("Unexpected request"))
+        return Failure(HttpError.Handler("Unexpected request"))
     }
     let Ok(node) = await request.Content.ReadJsonNode() else {
-        return Error(HttpError.Handler("Invalid JSON request"))
+        return Failure(HttpError.Handler("Invalid JSON request"))
     }
     System.Runtime.GC.Collect()
     let Ok(content) = JsonContent.CreateNode(node) else {
-        return Error(HttpError.Handler("Cannot encode JSON response"))
+        return Failure(HttpError.Handler("Cannot encode JSON response"))
     }
     let response = HttpResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))
     response.Respond(HttpStatusCode.OK, content)
@@ -37,7 +37,7 @@ async func Main(arguments: string[]) -> Task<int> {
         Console.WriteLine(port)
         var served = 0
         while served < 2 {
-            if let Error(error) = await server.ServeOne(Echo) {
+            if let Failure(error) = await server.ServeOne(Echo) {
                 Console.WriteLine(error.ToString())
                 server.Close()
                 return 4
@@ -58,7 +58,7 @@ async func Main(arguments: string[]) -> Task<int> {
         let Ok(content) = JsonContent.CreateNode(node) else { return 7 }
         let result = await client.Post(arguments[1], content)
         let Ok(response) = result else {
-            if let Error(error) = result { Console.WriteLine(error.ToString()) }
+            if let Failure(error) = result { Console.WriteLine(error.ToString()) }
             return 8
         }
         let Ok(reply) = await response.Content.ReadJsonNode() else { return 9 }

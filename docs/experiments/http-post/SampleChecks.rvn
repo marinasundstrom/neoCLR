@@ -15,7 +15,7 @@ class SampleHandler : HttpHandler {
     override func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
         let source = Promise<Result<HttpResponse, HttpError>>()
         if mode == 1 {
-            _ = source.Complete(Error(HttpError.Protocol("peer")))
+            _ = source.Complete(Failure(HttpError.Protocol("peer")))
         } else if mode == 2 {
             let bytes: byte[] = [(byte)255]
             _ = source.Complete(Ok(HttpResponse(HttpStatusCode.Created, ArrayList<HttpHeader>(), HttpMemoryContent(bytes))))
@@ -48,7 +48,7 @@ func CheckSample(mode: int) {
             System.Fail("Sample changed text")
         }
     } else {
-        let Error(HttpError.Protocol(message)) = pending.GetResult() else {
+        let Failure(HttpError.Protocol(message)) = pending.GetResult() else {
             System.Fail("Sample lost typed error")
             return
         }

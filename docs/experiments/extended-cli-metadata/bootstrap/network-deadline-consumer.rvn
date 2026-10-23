@@ -27,11 +27,11 @@ async func Main() -> Task<int> {
     Check(!copied.IsExpired)
     let resolved = await Dns.GetHostAddressesUntil("localhost", active, CancellationToken.None)
     Check(resolved is Ok(_))
-    Check(Dns.GetHostAddressesUntil("localhost", expired, CancellationToken.None).GetResult() is Error(DnsError.TimedOut))
+    Check(Dns.GetHostAddressesUntil("localhost", expired, CancellationToken.None).GetResult() is Failure(DnsError.TimedOut))
     let addresses = ArrayList<IPAddress>()
-    Check(Socket.ConnectUntil(addresses, 0, expired, CancellationToken.None).GetResult() is Error(SocketError.TimedOut))
+    Check(Socket.ConnectUntil(addresses, 0, expired, CancellationToken.None).GetResult() is Failure(SocketError.TimedOut))
     let text = ArrayList<string>()
-    Check(Socket.ConnectUntil(text, 0, expired, CancellationToken.None).GetResult() is Error(SocketError.TimedOut))
+    Check(Socket.ConnectUntil(text, 0, expired, CancellationToken.None).GetResult() is Failure(SocketError.TimedOut))
     let stopped = CancellationTokenSource()
     stopped.Cancel()
     Check(Dns.GetHostAddressesUntil("localhost", expired, stopped.Token).IsCancelled)
@@ -41,8 +41,8 @@ async func Main() -> Task<int> {
         return 1
     }
     let buffer: byte[] = [(byte)0]
-    Check(listener.SendUntil(buffer, 0, 1, expired, CancellationToken.None).GetResult() is Error(SocketError.TimedOut))
-    Check(listener.ReceiveUntil(buffer, 0, 1, expired, CancellationToken.None).GetResult() is Error(SocketError.TimedOut))
+    Check(listener.SendUntil(buffer, 0, 1, expired, CancellationToken.None).GetResult() is Failure(SocketError.TimedOut))
+    Check(listener.ReceiveUntil(buffer, 0, 1, expired, CancellationToken.None).GetResult() is Failure(SocketError.TimedOut))
     listener.Close()
     stopped.Dispose()
     Console.WriteLine("Network deadline checks passed")

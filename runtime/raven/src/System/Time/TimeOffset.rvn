@@ -16,10 +16,10 @@ public struct TimeOffset : EquatableTo<TimeOffset>, ComparableTo<TimeOffset> {
 
     static func FromSeconds(seconds: int) -> Result<TimeOffset, InvalidTimeError> {
         if seconds < -64800 {
-            return Error(InvalidTimeError())
+            return Failure(InvalidTimeError())
         }
         if seconds > 64800 {
-            return Error(InvalidTimeError())
+            return Failure(InvalidTimeError())
         }
         return Ok(TimeOffset(seconds))
     }
@@ -39,17 +39,17 @@ public struct TimeOffset : EquatableTo<TimeOffset>, ComparableTo<TimeOffset> {
         let ticks = instant.UnixTimeTicks
         let delta: long = StoredSeconds * 10000000L
         if ticks < -621355968000000000L - delta {
-            return Error(InvalidDateError())
+            return Failure(InvalidDateError())
         }
         if ticks > 2534023007999999999L - delta {
-            return Error(InvalidDateError())
+            return Failure(InvalidDateError())
         }
         let local = ticks + delta + 621355968000000000L
         let Ok(date) = Date.FromDayNumber((int)(local / 864000000000L)) else {
-            return Error(InvalidDateError())
+            return Failure(InvalidDateError())
         }
         let Ok(time) = TimeOfDay.FromTicks(local % 864000000000L) else {
-            return Error(InvalidDateError())
+            return Failure(InvalidDateError())
         }
         return Ok(LocalDateTime.Create(date, time))
     }

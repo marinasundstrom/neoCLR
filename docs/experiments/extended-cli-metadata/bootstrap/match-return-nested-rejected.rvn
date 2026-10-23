@@ -7,10 +7,10 @@ func Read(choice: Result<int, string>) -> int {
     return Add(1, {
         let value = match choice {
             Ok(let item) => item
-            Error(_) => return 42
+            Failure(_) => return 42
         }
         value
     })
 }
 
-func Main() -> int => Read(Error("stop"))
+func Main() -> int => Read(Failure("stop"))

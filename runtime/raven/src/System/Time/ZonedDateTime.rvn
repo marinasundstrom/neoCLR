@@ -32,7 +32,7 @@ public class ZonedDateTime : EquatableTo<ZonedDateTime> {
     static func Create(instant: Instant, zone: TimeZone) -> Result<ZonedDateTime, TimeZoneError> {
         let offset = zone.GetUtcOffset(instant)?
         let Ok(local) = offset.AtInstant(instant) else {
-            return Error(TimeZoneError.OutOfRange)
+            return Failure(TimeZoneError.OutOfRange)
         }
         return Ok(ZonedDateTime(instant, zone, local, offset))
     }

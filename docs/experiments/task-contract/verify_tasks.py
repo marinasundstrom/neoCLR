@@ -86,9 +86,9 @@ cases = {
 """,
     'Result failure is a completed ordinary payload': """
     let source = Promise<Result<int, string>>(TaskQueue())
-    source.Complete(Error("Unavailable"))
+    source.Complete(Failure("Unavailable"))
     Check(source.Task.State == TaskState.Completed)
-    if source.Task.Outcome is Some(Completed(Error(let message))) {
+    if source.Task.Outcome is Some(Completed(Failure(let message))) {
         Check(message == "Unavailable")
     } else {
         System.Fail("Missing Result error payload")
@@ -194,11 +194,11 @@ cases = {
     source.Task.OnCompleted(() => {
         match source.Task.GetResult() {
             Ok(_) => System.Fail("Expected Error payload")
-            Error(let message) => Check(message == "Unavailable")
+            Failure(let message) => Check(message == "Unavailable")
         }
         called = true
     })
-    Check(source.Complete(Error("Unavailable")))
+    Check(source.Complete(Failure("Unavailable")))
     Check(source.Task.IsCompleted)
     Check(!called)
     queue.Drain()

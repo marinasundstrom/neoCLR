@@ -18,14 +18,14 @@ ldarg arg0
 newobj instance System.Result<Boolean,System.BooleanParseError>::.ctor(System.Result.Ok<Boolean>)
 ret
 .end
-.function neoCLR.Library.System.Boolean.RuntimeUnion2(System.BooleanParseError arg0) -> System.Result.Error<System.BooleanParseError>
+.function neoCLR.Library.System.Boolean.RuntimeUnion2(System.BooleanParseError arg0) -> System.Result.Failure<System.BooleanParseError>
 ldarg arg0
-newobj instance System.Result.Error<System.BooleanParseError>::.ctor(System.BooleanParseError)
+newobj instance System.Result.Failure<System.BooleanParseError>::.ctor(System.BooleanParseError)
 ret
 .end
-.function neoCLR.Library.System.Boolean.RuntimeUnion3(System.Result.Error<System.BooleanParseError> arg0) -> System.Result<Boolean,System.BooleanParseError>
+.function neoCLR.Library.System.Boolean.RuntimeUnion3(System.Result.Failure<System.BooleanParseError> arg0) -> System.Result<Boolean,System.BooleanParseError>
 ldarg arg0
-newobj instance System.Result<Boolean,System.BooleanParseError>::.ctor(System.Result.Error<System.BooleanParseError>)
+newobj instance System.Result<Boolean,System.BooleanParseError>::.ctor(System.Result.Failure<System.BooleanParseError>)
 ret
 .end
 .function neoCLR.Library.System.Boolean.RuntimeBooleanFromInt32(Int32 value) -> Boolean

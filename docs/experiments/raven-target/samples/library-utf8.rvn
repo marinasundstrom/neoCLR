@@ -15,14 +15,14 @@ func RoundTrip(text: string) {
                 WriteLine("Round trip")
             }
         }
-        .Error(let error) => WriteLine(error.ToString())
+        .Failure(let error) => WriteLine(error.ToString())
     }
 }
 
 func Reject(bytes: byte[]) {
     match Encodings.Utf8.Decode(bytes) {
         .Ok(let text) => WriteLine("Unexpected text")
-        .Error(let error) => WriteLine(error.ToString())
+        .Failure(let error) => WriteLine(error.ToString())
     }
 }
 
@@ -46,7 +46,7 @@ func Main() {
     source[0] = (byte)90
     match result {
         .Ok(let text) => WriteLine(text)
-        .Error(let error) => WriteLine(error.ToString())
+        .Failure(let error) => WriteLine(error.ToString())
     }
     Reject([(byte)128])
     Reject([(byte)192, (byte)128])

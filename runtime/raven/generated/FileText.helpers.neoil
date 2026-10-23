@@ -144,14 +144,14 @@ ldarg arg0
 newobj instance System.Result<Void,System.Storage.FileWriteError>::.ctor(System.Result.Ok<Void>)
 ret
 .end
-.function neoCLR.Library.System.Storage.FileText.RuntimeUnion2(System.Storage.FileWriteError arg0) -> System.Result.Error<System.Storage.FileWriteError>
+.function neoCLR.Library.System.Storage.FileText.RuntimeUnion2(System.Storage.FileWriteError arg0) -> System.Result.Failure<System.Storage.FileWriteError>
 ldarg arg0
-newobj instance System.Result.Error<System.Storage.FileWriteError>::.ctor(System.Storage.FileWriteError)
+newobj instance System.Result.Failure<System.Storage.FileWriteError>::.ctor(System.Storage.FileWriteError)
 ret
 .end
-.function neoCLR.Library.System.Storage.FileText.RuntimeUnion3(System.Result.Error<System.Storage.FileWriteError> arg0) -> System.Result<Void,System.Storage.FileWriteError>
+.function neoCLR.Library.System.Storage.FileText.RuntimeUnion3(System.Result.Failure<System.Storage.FileWriteError> arg0) -> System.Result<Void,System.Storage.FileWriteError>
 ldarg arg0
-newobj instance System.Result<Void,System.Storage.FileWriteError>::.ctor(System.Result.Error<System.Storage.FileWriteError>)
+newobj instance System.Result<Void,System.Storage.FileWriteError>::.ctor(System.Result.Failure<System.Storage.FileWriteError>)
 ret
 .end
 .function neoCLR.Library.System.Storage.FileText.RuntimeUnion4(String arg0) -> System.Result.Ok<String>
@@ -164,14 +164,14 @@ ldarg arg0
 newobj instance System.Result<String,System.Storage.FileReadError>::.ctor(System.Result.Ok<String>)
 ret
 .end
-.function neoCLR.Library.System.Storage.FileText.RuntimeUnion6(System.Storage.FileReadError arg0) -> System.Result.Error<System.Storage.FileReadError>
+.function neoCLR.Library.System.Storage.FileText.RuntimeUnion6(System.Storage.FileReadError arg0) -> System.Result.Failure<System.Storage.FileReadError>
 ldarg arg0
-newobj instance System.Result.Error<System.Storage.FileReadError>::.ctor(System.Storage.FileReadError)
+newobj instance System.Result.Failure<System.Storage.FileReadError>::.ctor(System.Storage.FileReadError)
 ret
 .end
-.function neoCLR.Library.System.Storage.FileText.RuntimeUnion7(System.Result.Error<System.Storage.FileReadError> arg0) -> System.Result<String,System.Storage.FileReadError>
+.function neoCLR.Library.System.Storage.FileText.RuntimeUnion7(System.Result.Failure<System.Storage.FileReadError> arg0) -> System.Result<String,System.Storage.FileReadError>
 ldarg arg0
-newobj instance System.Result<String,System.Storage.FileReadError>::.ctor(System.Result.Error<System.Storage.FileReadError>)
+newobj instance System.Result<String,System.Storage.FileReadError>::.ctor(System.Result.Failure<System.Storage.FileReadError>)
 ret
 .end
 .function neoCLR.Library.System.Storage.FileText.RuntimeBooleanToInt32(Boolean value) -> Int32

@@ -17,11 +17,11 @@ func Main() -> int {
     }
     match TimeOffset.FromSeconds(64801) {
         .Ok(_) => { return 5 }
-        .Error(_) => {}
+        .Failure(_) => {}
     }
     match TimeOffset.FromSeconds(-64801) {
         .Ok(_) => { return 6 }
-        .Error(_) => {}
+        .Failure(_) => {}
     }
     let instant = Instant.FromUnixTimeTicks(-1L)
     let Ok(local) = east.AtInstant(instant) else {
@@ -55,19 +55,19 @@ func Main() -> int {
     }
     match limit.AtInstant(Instant.FromUnixTimeTicks(firstTicks - 1L)) {
         .Ok(_) => { return 16 }
-        .Error(_) => {}
+        .Failure(_) => {}
     }
     match west.AtInstant(Instant.FromUnixTimeTicks(lastTicks + 1L)) {
         .Ok(_) => { return 17 }
-        .Error(_) => {}
+        .Failure(_) => {}
     }
     match east.AtInstant(Instant.FromUnixTimeTicks(9223372036854775807L)) {
         .Ok(_) => { return 18 }
-        .Error(_) => {}
+        .Failure(_) => {}
     }
     match east.AtInstant(Instant.FromUnixTimeTicks(-9223372036854775808L)) {
         .Ok(_) => { return 19 }
-        .Error(_) => {}
+        .Failure(_) => {}
     }
     return 42
 }

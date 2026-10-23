@@ -7,7 +7,7 @@ import System.Result.*
 public static class RandomNumberGenerator {
     /// <summary>Fills the entire buffer with secure random bytes.</summary>
     /// <param name="destination">Writable byte slice; empty buffers succeed without requesting randomness.</param>
-    /// <returns>Ok(unit), or Error(ProviderFailure) after clearing the entire destination slice.</returns>
+    /// <returns>Ok(unit), or Failure(ProviderFailure) after clearing the entire destination slice.</returns>
     /// <remarks>Invalid managed storage is a terminal fault.</remarks>
     static func Fill(destination: Slice<byte>) -> Result<unit, CryptographyError> {
         let status = neoCLR.Runtime.CryptoRandomFill(destination)
@@ -15,7 +15,7 @@ public static class RandomNumberGenerator {
             return Ok(())
         }
         if status == -2 {
-            return Error(CryptographyError.ProviderFailure)
+            return Failure(CryptographyError.ProviderFailure)
         }
         System.Fail("Unexpected random provider result")
     }

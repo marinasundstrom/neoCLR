@@ -74,16 +74,16 @@ public class GZipStream : InputStream, OutputStream {
             return await promise.Task
         }
         if self.closed {
-            return Error(StreamError.Closed)
+            return Failure(StreamError.Closed)
         }
         let Some(source) = self.input else {
-            return Error(StreamError.WrongAccess)
+            return Failure(StreamError.WrongAccess)
         }
         if !(offset >= 0) || !(count >= 0) || offset > buffer.Length || count > buffer.Length - offset {
-            return Error(StreamError.InvalidRange)
+            return Failure(StreamError.InvalidRange)
         }
         if self.failed {
-            return Error(StreamError.IoFailure)
+            return Failure(StreamError.IoFailure)
         }
         if count == 0 {
             return Ok(0)
@@ -96,16 +96,16 @@ public class GZipStream : InputStream, OutputStream {
             while !eof {
                 let read = match await source.Read(chunk, 0, chunk.Length, cancellationToken) {
                     Ok(let value) => value
-                    Error(let error) => return Error(error)
+                    Failure(let error) => return Failure(error)
                 }
                 if self.closed {
-                    return Error(StreamError.Closed)
+                    return Failure(StreamError.Closed)
                 }
                 if !(read >= 0) || read > chunk.Length {
                     System.Fail("Invalid gzip input count")
                 }
                 if read > 65536 - bytes.Count {
-                    return Error(StreamError.LimitExceeded)
+                    return Failure(StreamError.LimitExceeded)
                 }
                 var index = 0
                 while index < read {
@@ -122,7 +122,7 @@ public class GZipStream : InputStream, OutputStream {
             }
             self.decoded = match GZipDecoder(compressed).Decode() {
                 Ok(let value) => value
-                Error(let error) => return Error(error)
+                Failure(let error) => return Failure(error)
             }
             self.finished = true
             self.failed = false
@@ -154,19 +154,19 @@ public class GZipStream : InputStream, OutputStream {
             return await promise.Task
         }
         if self.closed {
-            return Error(StreamError.Closed)
+            return Failure(StreamError.Closed)
         }
         let Some(sink) = self.output else {
-            return Error(StreamError.WrongAccess)
+            return Failure(StreamError.WrongAccess)
         }
         if !(offset >= 0) || !(count >= 0) || offset > buffer.Length || count > buffer.Length - offset {
-            return Error(StreamError.InvalidRange)
+            return Failure(StreamError.InvalidRange)
         }
         if self.failed {
-            return Error(StreamError.IoFailure)
+            return Failure(StreamError.IoFailure)
         }
         if self.finished {
-            return Error(StreamError.WrongAccess)
+            return Failure(StreamError.WrongAccess)
         }
         if count == 0 {
             return Ok(())
@@ -186,7 +186,7 @@ public class GZipStream : InputStream, OutputStream {
             self.size = (self.size + (long)length) % 4294967296L
             _ = (await sink.Write(compressed, 0, compressed.Length, cancellationToken))?
             if self.closed {
-                return Error(StreamError.Closed)
+                return Failure(StreamError.Closed)
             }
             consumed += length
         }
@@ -199,7 +199,7 @@ public class GZipStream : InputStream, OutputStream {
             let header: byte[] = [(byte)31,(byte)139,(byte)8,(byte)0,(byte)0,(byte)0,(byte)0,(byte)0,(byte)0,(byte)255]
             _ = (await sink.Write(header, 0, header.Length, cancellationToken))?
             if self.closed {
-                return Error(StreamError.Closed)
+                return Failure(StreamError.Closed)
             }
             self.started = true
         }
@@ -221,13 +221,13 @@ public class GZipStream : InputStream, OutputStream {
             return await promise.Task
         }
         if self.closed {
-            return Error(StreamError.Closed)
+            return Failure(StreamError.Closed)
         }
         let Some(sink) = self.output else {
-            return Error(StreamError.WrongAccess)
+            return Failure(StreamError.WrongAccess)
         }
         if self.failed {
-            return Error(StreamError.IoFailure)
+            return Failure(StreamError.IoFailure)
         }
         if self.finished {
             return Ok(())
@@ -250,7 +250,7 @@ public class GZipStream : InputStream, OutputStream {
         }
         _ = (await sink.Write(trailer, 0, trailer.Length, cancellationToken))?
         if self.closed {
-            return Error(StreamError.Closed)
+            return Failure(StreamError.Closed)
         }
         self.finished = true
         self.failed = false
@@ -272,18 +272,18 @@ public class GZipStream : InputStream, OutputStream {
             return await promise.Task
         }
         if self.closed {
-            return Error(StreamError.Closed)
+            return Failure(StreamError.Closed)
         }
         let Some(sink) = self.output else {
-            return Error(StreamError.WrongAccess)
+            return Failure(StreamError.WrongAccess)
         }
         if self.failed {
-            return Error(StreamError.IoFailure)
+            return Failure(StreamError.IoFailure)
         }
         self.failed = true
         _ = (await sink.Flush(cancellationToken))?
         if self.closed {
-            return Error(StreamError.Closed)
+            return Failure(StreamError.Closed)
         }
         self.failed = false
         return Ok(())

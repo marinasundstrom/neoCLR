@@ -74,7 +74,7 @@ def main():
             artifacts += [source, app]
             run(configured + ['--refs', str(library), '-o', str(app), str(source)])
             runtime_config(name)
-            expected_text = 'Option.Some(40)\nResult.Error(7)\n' if name == 'union' else ''
+            expected_text = 'Option.Some(40)\nResult.Failure(7)\n' if name == 'union' else ''
             run(['dotnet', str(app)], 42, expected_text, '')
         stage = 'separate consumer compilation'
         source = ROOT / 'docs/experiments/raven-target/samples/application-order-collections.rvn'

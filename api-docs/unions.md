@@ -13,7 +13,7 @@ many public APIs, especially when an error contract should be independent of the
 operations used internally.
 
 - [Option&lt;T&gt;](xref:System.Option`1) documents Some and None.
-- [Result&lt;T, E&gt;](xref:System.Result`2) documents Ok and Error.
+- [Result&lt;T, E&gt;](xref:System.Result`2) documents Ok and Failure.
 
 RavenDoc renders each declaration's cases, properties, methods and applicable
 extensions. There is no universal case list shared by every declared union.
@@ -23,7 +23,7 @@ extensions. There is no universal case list shared by every declared union.
 A return type such as `Result<Config, FileReadError | NumberParseError>` exposes
 both possible error types. Each underlying error can propagate with `?` without
 inheritance, a shared interface, a wrapper error or implicit converters written
-solely for aggregation. Extract `Error(let error)` and use typed patterns to
+solely for aggregation. Extract `Failure(let error)` and use typed patterns to
 inspect the listed alternatives. Unrelated errors are rejected.
 
 Use a nominal union or dedicated type when the API needs domain-specific cases

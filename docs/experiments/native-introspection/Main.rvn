@@ -30,7 +30,7 @@ func Main() -> int {
     }
     let value = match info.CreateInstance() {
         Ok(let created) => created
-        Error(_) => return 3
+        Failure(_) => return 3
     }
     let report = (Report)value
     if report.Name != "constructed" {
@@ -47,7 +47,7 @@ func Main() -> int {
     if property.Name != "Name" || !property.PropertyType.Equals(typeof(string)) || !property.CanRead || !property.CanWrite {
         return 13
     }
-    if property.SetValue(value, "reflected") is Error(_) {
+    if property.SetValue(value, "reflected") is Failure(_) {
         return 14
     }
     if property.GetValue(value) is Ok(let read) {

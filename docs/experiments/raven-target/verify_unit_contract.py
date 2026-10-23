@@ -41,7 +41,7 @@ func Take(value: Void) -> int {
 
 func Complete(fail: bool) -> System.Result<Void, OverflowError> {
     if fail {
-        return Error(OverflowError())
+        return Failure(OverflowError())
     }
     return Ok(())
 }
@@ -58,11 +58,11 @@ func Main() {
     WriteLine(Take(Notify()))
     match Forward(false) {
         Ok(_) => WriteLine("complete")
-        Error(_) => WriteLine("unexpected error")
+        Failure(_) => WriteLine("unexpected error")
     }
     match Forward(true) {
         Ok(_) => WriteLine("unexpected success")
-        Error(_) => WriteLine("error")
+        Failure(_) => WriteLine("error")
     }
 }
 ''')

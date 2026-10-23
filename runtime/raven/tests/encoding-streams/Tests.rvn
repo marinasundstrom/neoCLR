@@ -11,14 +11,14 @@ import NeoClr.Testing.*
 
 func Wrote(result: Result<int, StreamError>, expected: int) -> Result<unit, TestFailure> {
     let Ok(count) = result else {
-        return Error(TestFailure("Write", "Ok", "Error"))
+        return Failure(TestFailure("Write", "Ok", "Error"))
     }
     return Assert.Equal(expected, count)
 }
 
 func Content(bytes: Sequence<byte>, expected: string) -> Result<unit, TestFailure> {
     let Ok(text) = Encodings.Utf8.Decode(ArrayList<byte>(bytes)[..]) else {
-        return Error(TestFailure("Encoded output", "UTF-8", "Error"))
+        return Failure(TestFailure("Encoded output", "UTF-8", "Error"))
     }
     return Assert.Equal(expected, text)
 }
@@ -36,7 +36,7 @@ func AShortWrites() -> Result<unit, TestFailure> {
     _ = Content(sink.Bytes, "é😀é")?
     writer.Close()
     _ = Assert.True(!sink.Closed, "leaveOpen preserves sink")?
-    return Assert.True(CompletedValue(writer.Write("A")) is Error(StreamError.Closed), "Closed wrapper rejects writes")
+    return Assert.True(CompletedValue(writer.Write("A")) is Failure(StreamError.Closed), "Closed wrapper rejects writes")
 }
 
 [Test("ASCII StreamWriter rejects complete lines before output and remains reusable")]
@@ -45,10 +45,10 @@ func BAsciiPreflight() -> Result<unit, TestFailure> {
     let Ok(writer) = StreamWriter.Create(sink, Encodings.Ascii) else {
         System.Fail("Unable to create text wrapper")
     }
-    _ = Assert.True(CompletedValue(writer.Write("prefix é")) is Error(StreamError.InvalidEncoding), "Strict write")?
+    _ = Assert.True(CompletedValue(writer.Write("prefix é")) is Failure(StreamError.InvalidEncoding), "Strict write")?
     _ = Assert.Equal(0, sink.Bytes.Count)?
     _ = Wrote(CompletedValue(writer.Write("ok")), 2)?
-    _ = Assert.True(CompletedValue(writer.WriteLine("é")) is Error(StreamError.InvalidEncoding), "Strict complete line")?
+    _ = Assert.True(CompletedValue(writer.WriteLine("é")) is Failure(StreamError.InvalidEncoding), "Strict complete line")?
     _ = Assert.Equal(2, sink.Bytes.Count)?
     _ = Wrote(CompletedValue(writer.WriteLine("A")), 2)?
     _ = Content(sink.Bytes, "okA\n")?
@@ -69,7 +69,7 @@ func CCompletion() -> Result<unit, TestFailure> {
     _ = Wrote(CompletedValue(writer.Finish()), 5)?
     _ = Wrote(CompletedValue(writer.Finish()), 0)?
     _ = Content(sink.Bytes, "A<end>")?
-    return Assert.True(CompletedValue(writer.Write("B")) is Error(StreamError.InvalidEncoding), "No writes after finalization")
+    return Assert.True(CompletedValue(writer.Write("B")) is Failure(StreamError.InvalidEncoding), "No writes after finalization")
 }
 
 [Test("Closing a writer manages ownership without implicit encoder finalization")]
@@ -82,7 +82,7 @@ func DClose() -> Result<unit, TestFailure> {
     writer.Close()
     _ = Assert.True(sink.Closed, "Owned sink closes")?
     _ = Content(sink.Bytes, "A")?
-    return Assert.True(CompletedValue(writer.Finish()) is Error(StreamError.Closed), "Cannot finish a closed writer")
+    return Assert.True(CompletedValue(writer.Finish()) is Failure(StreamError.Closed), "Cannot finish a closed writer")
 }
 
 [Test("Partial write and final-output failures are observable without replay")]
@@ -91,18 +91,18 @@ func EOutputFailure() -> Result<unit, TestFailure> {
     let Ok(writer) = StreamWriter.Create(sink, Encodings.Utf8, true) else {
         System.Fail("Unable to create text wrapper")
     }
-    _ = Assert.True(CompletedValue(writer.Write("AB")) is Error(StreamError.AccessDenied), "Preserve first output error")?
+    _ = Assert.True(CompletedValue(writer.Write("AB")) is Failure(StreamError.AccessDenied), "Preserve first output error")?
     _ = Content(sink.Bytes, "A")?
-    _ = Assert.True(CompletedValue(writer.Write("C")) is Error(StreamError.InvalidEncoding), "Failed writer cannot replay")?
-    _ = Assert.True(CompletedValue(writer.Finish()) is Error(StreamError.InvalidEncoding), "Failed writer cannot finalize")?
+    _ = Assert.True(CompletedValue(writer.Write("C")) is Failure(StreamError.InvalidEncoding), "Failed writer cannot replay")?
+    _ = Assert.True(CompletedValue(writer.Finish()) is Failure(StreamError.InvalidEncoding), "Failed writer cannot finalize")?
     let finalSink = ProbeSink(2)
     let Ok(finalWriter) = StreamWriter.Create(finalSink, TrailerEncoding(), true) else {
         System.Fail("Unable to create text wrapper")
     }
     _ = Wrote(CompletedValue(finalWriter.Write("A")), 1)?
-    _ = Assert.True(CompletedValue(finalWriter.Finish()) is Error(StreamError.AccessDenied), "Final trailer failure")?
+    _ = Assert.True(CompletedValue(finalWriter.Finish()) is Failure(StreamError.AccessDenied), "Final trailer failure")?
     _ = Content(finalSink.Bytes, "A<")?
-    _ = Assert.True(CompletedValue(finalWriter.Finish()) is Error(StreamError.InvalidEncoding), "No final-output replay")?
+    _ = Assert.True(CompletedValue(finalWriter.Finish()) is Failure(StreamError.InvalidEncoding), "No final-output replay")?
     return Content(finalSink.Bytes, "A<")
 }
 
@@ -112,12 +112,12 @@ func FFinalDrain() -> Result<unit, TestFailure> {
     _ = Assert.True(encoder.Accept("", true) is Ok(_), "Accept final input")?
     let buffer: byte[] = [(byte)0, (byte)0, (byte)0]
     let Ok(first) = encoder.Drain(buffer[..3]) else {
-        return Error(TestFailure("First final drain", "Ok", "Error"))
+        return Failure(TestFailure("First final drain", "Ok", "Error"))
     }
     _ = Assert.True(first.BytesWritten == 3 && first.State is EncoderState.NeedsOutput, "Trailer still pending")?
     _ = Assert.True(buffer[0] == 60 && buffer[1] == 101 && buffer[2] == 110, "Trailer prefix")?
     let Ok(last) = encoder.Drain(buffer[..3]) else {
-        return Error(TestFailure("Last final drain", "Ok", "Error"))
+        return Failure(TestFailure("Last final drain", "Ok", "Error"))
     }
     return Assert.True(last.BytesWritten == 2 && last.State is EncoderState.Finished && buffer[0] == 100 && buffer[1] == 62, "Completion includes trailer suffix")
 }
@@ -133,11 +133,11 @@ func GReader() -> Result<unit, TestFailure> {
     }
     reader.NewLine = "\r\n"
     let Ok(Some(line)) = CompletedValue(reader.ReadLine(1)) else {
-        return Error(TestFailure("ASCII line", "Some", "Error or None"))
+        return Failure(TestFailure("ASCII line", "Some", "Error or None"))
     }
     _ = Assert.Equal("A", line)?
     let Ok(rest) = CompletedValue(reader.ReadToEnd(1)) else {
-        return Error(TestFailure("ASCII remainder", "Ok", "Error"))
+        return Failure(TestFailure("ASCII remainder", "Ok", "Error"))
     }
     _ = Assert.Equal("B", rest)?
     reader.Close()
@@ -153,7 +153,7 @@ func HReaderErrors() -> Result<unit, TestFailure> {
     let Ok(reader) = StreamReader.Create(source, Encodings.Ascii) else {
         System.Fail("Unable to create text wrapper")
     }
-    _ = Assert.True(CompletedValue(reader.ReadToEnd(8)) is Error(TextReadError.InvalidEncoding), "Strict reader conversion")?
+    _ = Assert.True(CompletedValue(reader.ReadToEnd(8)) is Failure(TextReadError.InvalidEncoding), "Strict reader conversion")?
     let valid = MemoryStream()
     let plain: byte[] = [(byte)65, (byte)66, (byte)67]
     _ = Assert.True(CompletedValue(valid.Write(plain, 0, 3)) is Ok(_), "Complete byte write")?
@@ -161,7 +161,7 @@ func HReaderErrors() -> Result<unit, TestFailure> {
     let Ok(validReader) = StreamReader.Create(valid, Encodings.Ascii) else {
         System.Fail("Unable to create reader")
     }
-    return Assert.True(CompletedValue(validReader.ReadToEnd(2)) is Error(TextReadError.LimitExceeded), "Decoded text limit")
+    return Assert.True(CompletedValue(validReader.ReadToEnd(2)) is Failure(TextReadError.LimitExceeded), "Decoded text limit")
 }
 
 // These fixtures promise inline completion; observation verifies that contract.

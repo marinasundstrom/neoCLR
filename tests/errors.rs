@@ -36,12 +36,12 @@ fn result_error_payloads_can_be_imported_and_formatted_without_faults() {
         .value;
     let get_error = program
         .resolve_function(
-            &parse_function_ref("instance System.Result<Int32,String>::GetErrorCase()").unwrap(),
+            &parse_function_ref("instance System.Result<Int32,String>::GetFailureCase()").unwrap(),
         )
         .unwrap();
     let get_value = program
         .resolve_function(
-            &parse_function_ref("instance System.Result.Error<String>::get_Value()").unwrap(),
+            &parse_function_ref("instance System.Result.Failure<String>::get_Value()").unwrap(),
         )
         .unwrap();
     let wrapper = get_error

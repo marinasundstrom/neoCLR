@@ -8,7 +8,7 @@ async func PostText(client: HttpClient, text: string) -> Task<Result<string, Htt
     let response = await client.Post("echo", HttpStringContent(text))?
     // This sample requires success; callers using Post can also inspect error responses.
     if !response.IsSuccessStatusCode {
-        return Error(HttpError.UnsuccessfulStatus(response.StatusCode))
+        return Failure(HttpError.UnsuccessfulStatus(response.StatusCode))
     }
     // ReadText currently has a string error; adapt it at this application boundary.
     return await HttpStringContent.Read(response.Content)

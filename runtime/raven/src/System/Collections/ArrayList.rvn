@@ -74,7 +74,7 @@ public open class ArrayList<T> : List<T> {
         if range.TryGetOffsetAndLength(count) is Ok(let bounds) {
             return Ok(System.Runtime.CompilerServices.RuntimeHelpers.CopyRange<T>(data, bounds.Item1, bounds.Item2))
         }
-        return Error(InvalidRangeError())
+        return Failure(InvalidRangeError())
     }
 
     func Add(value: T) {

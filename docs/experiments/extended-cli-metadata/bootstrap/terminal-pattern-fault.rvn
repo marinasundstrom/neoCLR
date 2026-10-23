@@ -9,5 +9,5 @@ func Read(input: Result<int, string>, message: string) -> int {
 }
 
 func Main() -> int {
-    return Read(.Error("input failed"), "Preserved dynamic failure message")
+    return Read(.Failure("input failed"), "Preserved dynamic failure message")
 }

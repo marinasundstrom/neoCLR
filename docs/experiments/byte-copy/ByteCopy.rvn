@@ -11,10 +11,10 @@ public func ValidRange(length: int, offset: int, count: int) -> bool {
 // unread bytes even when source and destination are aliases of the same array.
 public func CopyBytes(source: byte[], sourceOffset: int, destination: byte[], destinationOffset: int, count: int) -> Result<int, string> {
     if !ValidRange(source.Length, sourceOffset, count) {
-        return Error("Invalid source range")
+        return Failure("Invalid source range")
     }
     if !ValidRange(destination.Length, destinationOffset, count) {
-        return Error("Invalid destination range")
+        return Failure("Invalid destination range")
     }
     if destinationOffset > sourceOffset {
         var remaining = count
@@ -45,7 +45,7 @@ public class MemoryInput {
 
     func Read(destination: byte[], offset: int, count: int) -> Result<int, string> {
         if !ValidRange(destination.Length, offset, count) {
-            return Error("Invalid destination range")
+            return Failure("Invalid destination range")
         }
         let available = data.Length - position
         let transferred = Math.Min(Math.Min(count, available), 2)
@@ -68,13 +68,13 @@ public class MemoryOutput {
 
     func Write(source: byte[], offset: int, count: int) -> Result<int, string> {
         if !ValidRange(source.Length, offset, count) {
-            return Error("Invalid source range")
+            return Failure("Invalid source range")
         }
         if count == 0 {
             return Ok(0)
         }
         if position == data.Length {
-            return Error("Output is full")
+            return Failure("Output is full")
         }
         let transferred = Math.Min(count, 1)
         let copied = CopyBytes(source, offset, data, position, transferred)?
@@ -87,7 +87,7 @@ public class MemoryOutput {
 // experiment. Per-call overlap is supported; whole-pipeline aliasing is not.
 public func CopyAll(input: MemoryInput, output: MemoryOutput, scratch: byte[]) -> Result<int, string> {
     if scratch.Length == 0 {
-        return Error("Copy requires a nonempty buffer")
+        return Failure("Copy requires a nonempty buffer")
     }
     var total = 0
     var finished = false
@@ -100,7 +100,7 @@ public func CopyAll(input: MemoryInput, output: MemoryOutput, scratch: byte[]) -
         while written < read {
             let count = output.Write(scratch, written, read - written)?
             if count == 0 {
-                return Error("Output made no progress")
+                return Failure("Output made no progress")
             }
             written = written + count
             total = total + count

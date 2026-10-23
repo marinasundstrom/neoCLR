@@ -22,7 +22,7 @@ func Main() {
     Check("é".StartsWithOrdinal("e"), "ordinal prefix can end within a grapheme")
     match "é".SliceUtf8(1, 2) {
         Ok(let mark) => Check(mark == "́", "byte slice allows scalar boundary inside grapheme")
-        Error(_) => System.Fail("unexpected slice failure")
+        Failure(_) => System.Fail("unexpected slice failure")
     }
     let parts: char[] = ['e', Char.FromString("́")]
     Check(String(parts).Length == 1, "construction does not preserve input grapheme count")
@@ -32,7 +32,7 @@ func Main() {
     let invalid: byte[] = [(byte)255]
     match Utf8.Decode(invalid) {
         Ok(_) => System.Fail("malformed UTF-8 accepted")
-        Error(_) => { }
+        Failure(_) => { }
     }
     Console.WriteLine("Text foundation observations passed")
 }

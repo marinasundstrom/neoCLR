@@ -79,13 +79,13 @@ public class SqlRow {
     val Count: int => values.Count
     func Column(index: int) -> Result<string, SqlError> {
         if index < 0 || index >= Count {
-            return Error(SqlError.Mapping("Column index out of range"))
+            return Failure(SqlError.Mapping("Column index out of range"))
         }
         return Ok(names[index])
     }
     func Text(index: int) -> Result<Option<string>, SqlError> {
         if index < 0 || index >= Count {
-            return Error(SqlError.Mapping("Column index out of range"))
+            return Failure(SqlError.Mapping("Column index out of range"))
         }
         return Ok(values[index])
     }
@@ -94,13 +94,13 @@ public class SqlRow {
         for index in 0..Count {
             if String.CompareOrdinal(names[index], name) == 0 {
                 if found >= 0 {
-                    return Error(SqlError.Mapping("Ambiguous column: " + name))
+                    return Failure(SqlError.Mapping("Ambiguous column: " + name))
                 }
                 found = index
             }
         }
         if found < 0 {
-            return Error(SqlError.Mapping("Missing column: " + name))
+            return Failure(SqlError.Mapping("Missing column: " + name))
         }
         return Text(found)
     }
@@ -109,28 +109,28 @@ public class SqlRow {
         let value = Text(name)?
         return match value {
             Some(let text) => Ok(text)
-            None => Error(SqlError.Mapping("SQL NULL: " + name))
+            None => Failure(SqlError.Mapping("SQL NULL: " + name))
         }
     }
     func Int64(name: string) -> Result<long, SqlError> {
         let text = RequiredText(name)?
         return match System.Int64.Parse(text) {
             Ok(let value) => Ok(value)
-            Error(_) => Error(SqlError.Mapping("Invalid Int64: " + name))
+            Failure(_) => Failure(SqlError.Mapping("Invalid Int64: " + name))
         }
     }
     func Int32(name: string) -> Result<int, SqlError> {
         let text = RequiredText(name)?
         return match System.Int32.Parse(text) {
             Ok(let value) => Ok(value)
-            Error(_) => Error(SqlError.Mapping("Invalid Int32: " + name))
+            Failure(_) => Failure(SqlError.Mapping("Invalid Int32: " + name))
         }
     }
     func Boolean(name: string) -> Result<bool, SqlError> {
         let text = RequiredText(name)?
         if text == "t" || text == "true" { return Ok(true) }
         if text == "f" || text == "false" { return Ok(false) }
-        return Error(SqlError.Mapping("Invalid Boolean: " + name))
+        return Failure(SqlError.Mapping("Invalid Boolean: " + name))
     }
 }
 

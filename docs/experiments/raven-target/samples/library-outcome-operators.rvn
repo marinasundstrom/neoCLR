@@ -19,14 +19,14 @@ func Main() {
         .Then((value: int) -> Result<int, string> => Ok(value + 1))
     match result {
         Ok(let value) => WriteLine(value)
-        Error(let error) => WriteLine(error)
+        Failure(let error) => WriteLine(error)
     }
 
     let absent: Option<int> = None
     let fallback = absent.OrElse(() => Some(7))
     WriteLine(fallback.UnwrapOr(0))
 
-    let failure: Result<int, string> = Error("Unavailable")
+    let failure: Result<int, string> = Failure("Unavailable")
     let recovered = failure.MapError(message => String.Concat("Read: ", message))
         .OrElse(message => {
             WriteLine(message)

@@ -24,7 +24,7 @@ func ValidateServer(result: Result<System.Void, HttpError>, expected: string) {
         if expected != "ok" {
             System.Fail("Invalid request accepted")
         }
-    } else if let Error(reason) = result {
+    } else if let Failure(reason) = result {
         CheckError(reason, expected)
     }
     Console.WriteLine("PASS server")

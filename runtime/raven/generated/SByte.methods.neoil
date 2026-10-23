@@ -162,7 +162,7 @@ call neoCLR.Library.System.SByte.RuntimeErrorSystemNumberParseErrorNewSystemNumb
 M00000007_IL_004e:
 call neoCLR.Library.System.SByte.RuntimeUnion2(System.NumberParseError)
 M00000007_IL_0053:
-call neoCLR.Library.System.SByte.RuntimeUnion3(System.Result.Error<System.NumberParseError>)
+call neoCLR.Library.System.SByte.RuntimeUnion3(System.Result.Failure<System.NumberParseError>)
 M00000007_IL_0058:
 ret
 M00000007_IL_0059:
@@ -185,7 +185,7 @@ call neoCLR.Library.System.SByte.RuntimeErrorSystemNumberParseErrorNewSystemNumb
 M00000007_IL_0073:
 call neoCLR.Library.System.SByte.RuntimeUnion2(System.NumberParseError)
 M00000007_IL_0078:
-call neoCLR.Library.System.SByte.RuntimeUnion3(System.Result.Error<System.NumberParseError>)
+call neoCLR.Library.System.SByte.RuntimeUnion3(System.Result.Failure<System.NumberParseError>)
 M00000007_IL_007d:
 ret
 M00000007_IL_007e:

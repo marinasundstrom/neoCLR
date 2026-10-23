@@ -25,7 +25,7 @@ public class ChunkInput : InputStream {
     func Read(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
         calls += 1
         if closed {
-            return Error(StreamError.Closed)
+            return Failure(StreamError.Closed)
         }
         var copied = 0
         while copied < count && copied < width && position < data.Count {
@@ -43,7 +43,7 @@ public class ChunkInput : InputStream {
 
 public class FailedInput : InputStream {
     func Read(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
-        return Error(StreamError.AccessDenied)
+        return Failure(StreamError.AccessDenied)
     }
     func Close() { }
 }
@@ -51,7 +51,7 @@ public class FailedInput : InputStream {
 public func ExpectText(result: Result<string, TextReadError>, expected: string) {
     match result {
         Ok(let text) => Check(text.Equals(expected), "Reader text mismatch")
-        Error(_) => System.Fail("Unexpected reader error")
+        Failure(_) => System.Fail("Unexpected reader error")
     }
 }
 
@@ -66,41 +66,41 @@ public func CheckReader() {
         reader.Close()
         Check(!(input.Closed), "Leave-open ownership")
         match reader.ReadToEnd(-1) {
-            Error(TextReadError.Closed) => { }
+            Failure(TextReadError.Closed) => { }
             _ => System.Fail("Closed precedes bounds")
         }
     }
     let invalid = ChunkInput([(byte)255, (byte)65], 1)
     match StreamReader(invalid).ReadToEnd(20) {
-        Error(TextReadError.InvalidUtf8) => Check(invalid.Position == 1, "Reject malformed input before another read")
+        Failure(TextReadError.InvalidUtf8) => Check(invalid.Position == 1, "Reject malformed input before another read")
         _ => System.Fail("Invalid input accepted")
     }
     for bad in [[(byte)224, (byte)128, (byte)128], [(byte)237, (byte)160, (byte)128], [(byte)244, (byte)144, (byte)128, (byte)128], [(byte)226], [(byte)195, (byte)65]] {
         match StreamReader(ChunkInput(bad, 1)).ReadToEnd(8) {
-            Error(TextReadError.InvalidUtf8) => { }
+            Failure(TextReadError.InvalidUtf8) => { }
             _ => System.Fail("Strict malformed/truncated input")
         }
     }
     let bounded = ChunkInput(Utf8.Encode("abc"), 3)
     let boundedReader = StreamReader(bounded)
     match boundedReader.ReadToEnd(-1) {
-        Error(TextReadError.InvalidRange) => { }
+        Failure(TextReadError.InvalidRange) => { }
         _ => System.Fail("Negative bound")
     }
     match boundedReader.ReadToEnd(65537) {
-        Error(TextReadError.LimitExceeded) => { }
+        Failure(TextReadError.LimitExceeded) => { }
         _ => System.Fail("Unsupported bound")
     }
     Check(bounded.Calls == 0, "Invalid bounds must not read")
     match boundedReader.ReadToEnd(2) {
-        Error(TextReadError.LimitExceeded) => Check(bounded.Position == 3, "Single excess byte")
+        Failure(TextReadError.LimitExceeded) => Check(bounded.Position == 3, "Single excess byte")
         _ => System.Fail("Exceeded bound accepted")
     }
     boundedReader.Close()
     boundedReader.Close()
     Check(bounded.Closed, "Owned close")
     match StreamReader(FailedInput()).ReadToEnd(10) {
-        Error(TextReadError.AccessDenied) => { }
+        Failure(TextReadError.AccessDenied) => { }
         _ => System.Fail("Stream error lost")
     }
     ExpectText(StreamReader(ChunkInput(Utf8.Encode("\uFEFFx"), 1)).ReadToEnd(4), "\uFEFFx")
@@ -127,7 +127,7 @@ public func CheckReaderBoundary() {
     // Check the full value independently, preserving the actual emoji position.
     let decoded = match Utf8.Decode(bytes) {
         Ok(let text) => text
-        Error(_) => "invalid fixture"
+        Failure(_) => "invalid fixture"
     }
     ExpectText(StreamReader(ChunkInput(bytes, 256)).ReadToEnd(bytes.Count), decoded)
     WriteLine("Incremental StreamReader carry/output boundary passed")

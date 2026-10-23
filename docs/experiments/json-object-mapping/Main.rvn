@@ -37,17 +37,17 @@ async func RoundTrip() -> Task<Result<unit, StreamError | JsonError | MappingErr
     stream.Close()
 
     let missing = JsonObject()
-    Check(DecodeReport(missing) is Error(MappingError.Json(JsonError.MissingField(_))))
+    Check(DecodeReport(missing) is Failure(MappingError.Json(JsonError.MissingField(_))))
     _ = missing.Add("station", JsonNull())?
-    Check(DecodeReport(missing) is Error(MappingError.Json(JsonError.TypeMismatch(_))))
-    Check(DecodeReport(JsonArray()) is Error(MappingError.Json(JsonError.TypeMismatch(_))))
+    Check(DecodeReport(missing) is Failure(MappingError.Json(JsonError.TypeMismatch(_))))
+    Check(DecodeReport(JsonArray()) is Failure(MappingError.Json(JsonError.TypeMismatch(_))))
     return Ok(())
 }
 
 async func ErrorAlternatives() -> Task<()> {
     let closed = MemoryStream()
     closed.Close()
-    let Error(streamFailure) = await ReadReport(closed) else {
+    let Failure(streamFailure) = await ReadReport(closed) else {
         System.Fail("Expected stream failure")
     }
     if streamFailure is StreamError error {
@@ -59,7 +59,7 @@ async func ErrorAlternatives() -> Task<()> {
     let empty = MemoryStream()
     let invalidJson = await ReadReport(empty)
     empty.Close()
-    let Error(jsonFailure) = invalidJson else {
+    let Failure(jsonFailure) = invalidJson else {
         System.Fail("Expected JSON failure")
     }
     if jsonFailure is JsonError error {
@@ -74,7 +74,7 @@ async func ErrorAlternatives() -> Task<()> {
     }
     let invalidMapping = await ReadReport(missingField)
     missingField.Close()
-    let Error(mappingFailure) = invalidMapping else {
+    let Failure(mappingFailure) = invalidMapping else {
         System.Fail("Expected mapping failure")
     }
     if mappingFailure is MappingError error {

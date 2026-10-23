@@ -34,9 +34,9 @@ internal class JsonClientOperations {
         let created = JsonContent.Create(value)
         if let Ok(content) = created {
             return client.Post(url, content, token).Map(Adapt)
-        } else if let Error(error) = created {
+        } else if let Failure(error) = created {
             let failed = Promise<Result<HttpResponse, HttpError | JsonError>>()
-            _ = failed.Complete(Error(error))
+            _ = failed.Complete(Failure(error))
             return failed.Task
         }
         System.Fail("JSON creation returned no outcome")
@@ -55,9 +55,9 @@ internal class JsonClientOperations {
         let created = JsonContent.Create(value)
         if let Ok(content) = created {
             return client.Post(url, content, token).Map(Adapt)
-        } else if let Error(error) = created {
+        } else if let Failure(error) = created {
             let failed = Promise<Result<HttpResponse, HttpError | JsonError>>()
-            _ = failed.Complete(Error(error))
+            _ = failed.Complete(Failure(error))
             return failed.Task
         }
         System.Fail("JSON creation returned no outcome")
@@ -73,7 +73,7 @@ internal class JsonClientRead {
     func Decode(result: Result<HttpResponse, HttpError>) -> Result<Object, HttpError | JsonError> {
         let response = result?
         if !response.IsSuccessStatusCode {
-            return Error(HttpError.UnsuccessfulStatus(response.StatusCode))
+            return Failure(HttpError.UnsuccessfulStatus(response.StatusCode))
         }
         let value = JsonContent.Read(response.Content, type)?
         return Ok(value)

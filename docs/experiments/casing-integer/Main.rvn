@@ -10,14 +10,14 @@ public func Check(value: bool, message: string) {
 public func Parsed(text: string, expected: long) {
     match Int64.Parse(text) {
         Ok(let value) => Check(value == expected, "parsed value")
-        Error(_) => System.Fail("unexpected parse error")
+        Failure(_) => System.Fail("unexpected parse error")
     }
 }
 
 public func Rejected(text: string, overflow: bool) {
     match Int64.Parse(text) {
-        Error(NumberParseError.InvalidFormat) => Check(!overflow, "expected overflow")
-        Error(NumberParseError.Overflow) => Check(overflow, "expected format")
+        Failure(NumberParseError.InvalidFormat) => Check(!overflow, "expected overflow")
+        Failure(NumberParseError.Overflow) => Check(overflow, "expected format")
         _ => System.Fail("expected parse error")
     }
 }

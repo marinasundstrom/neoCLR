@@ -73,13 +73,13 @@ namespace System.Math {
 func ShowAbs(value: Result<int, OverflowError>) {
     match value {
         Ok(let result) => WriteLine(result)
-        Error(_) => WriteLine("overflow")
+        Failure(_) => WriteLine("overflow")
     }
 }
 func ShowClamp(value: Result<int, InvalidRangeError>) {
     match value {
         Ok(let result) => WriteLine(result)
-        Error(_) => WriteLine("invalid")
+        Failure(_) => WriteLine("invalid")
     }
 }
 func Main() {

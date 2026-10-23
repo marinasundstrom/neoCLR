@@ -40,14 +40,14 @@ ldarg arg0
 newobj instance System.Option<T0>::.ctor(System.Option.None)
 ret
 .end
-.function neoCLR.Library.System.OptionOperators.RuntimeUnion8<T2>(T2 arg0) -> System.Result.Error<T2>
+.function neoCLR.Library.System.OptionOperators.RuntimeUnion8<T2>(T2 arg0) -> System.Result.Failure<T2>
 ldarg arg0
-newobj instance System.Result.Error<T2>::.ctor(T2)
+newobj instance System.Result.Failure<T2>::.ctor(T2)
 ret
 .end
-.function neoCLR.Library.System.OptionOperators.RuntimeUnion9<T1,T2>(System.Result.Error<T2> arg0) -> System.Result<T1,T2>
+.function neoCLR.Library.System.OptionOperators.RuntimeUnion9<T1,T2>(System.Result.Failure<T2> arg0) -> System.Result<T1,T2>
 ldarg arg0
-newobj instance System.Result<T1,T2>::.ctor(System.Result.Error<T2>)
+newobj instance System.Result<T1,T2>::.ctor(System.Result.Failure<T2>)
 ret
 .end
 .function neoCLR.Library.System.OptionOperators.RuntimeUnion10<T1>(T1 arg0) -> System.Result.Ok<T1>
@@ -70,14 +70,14 @@ ldarg arg0
 newobj instance System.Result<T0,T1>::.ctor(System.Result.Ok<T0>)
 ret
 .end
-.function neoCLR.Library.System.OptionOperators.RuntimeUnion14<T1>(T1 arg0) -> System.Result.Error<T1>
+.function neoCLR.Library.System.OptionOperators.RuntimeUnion14<T1>(T1 arg0) -> System.Result.Failure<T1>
 ldarg arg0
-newobj instance System.Result.Error<T1>::.ctor(T1)
+newobj instance System.Result.Failure<T1>::.ctor(T1)
 ret
 .end
-.function neoCLR.Library.System.OptionOperators.RuntimeUnion15<T0,T1>(System.Result.Error<T1> arg0) -> System.Result<T0,T1>
+.function neoCLR.Library.System.OptionOperators.RuntimeUnion15<T0,T1>(System.Result.Failure<T1> arg0) -> System.Result<T0,T1>
 ldarg arg0
-newobj instance System.Result<T0,T1>::.ctor(System.Result.Error<T1>)
+newobj instance System.Result<T0,T1>::.ctor(System.Result.Failure<T1>)
 ret
 .end
 .function neoCLR.Library.System.OptionOperators.RuntimeBooleanToInt32(Boolean value) -> Int32

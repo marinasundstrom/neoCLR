@@ -42,13 +42,13 @@ internal class Packet {
     func PutText(text: string, terminated: bool) -> Result<unit, SqlError> {
         let encoded = match Encodings.Utf8.Encode(text) {
             Ok(let value) => value
-            Error(_) => return Error(SqlError.LimitExceeded("Text exceeds 65536 UTF-8 bytes"))
+            Failure(_) => return Failure(SqlError.LimitExceeded("Text exceeds 65536 UTF-8 bytes"))
         }
         if Bytes.Count + encoded.Count + 1 > 65536 {
-            return Error(SqlError.LimitExceeded("PostgreSQL packet exceeds 65536 bytes"))
+            return Failure(SqlError.LimitExceeded("PostgreSQL packet exceeds 65536 bytes"))
         }
         for value in encoded {
-            if value == 0 { return Error(SqlError.InvalidInput("PostgreSQL text cannot contain NUL")) }
+            if value == 0 { return Failure(SqlError.InvalidInput("PostgreSQL text cannot contain NUL")) }
         }
         for value in encoded { Bytes.Add(value) }
         if terminated { Put(0) }
@@ -63,7 +63,7 @@ internal class Packet {
         for index in 0..length { bytes.Add((byte)Byte()) }
         return match Encodings.Utf8.Decode(bytes[..]) {
             Ok(let text) => text
-            Error(_) => {
+            Failure(_) => {
                 Valid = false
                 ""
             }

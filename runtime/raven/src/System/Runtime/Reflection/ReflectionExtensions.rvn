@@ -15,42 +15,42 @@ public extension TypeReflectionExtensions for TypeInfo {
                 return Ok(neoCLR.Runtime.ReflectionConstructArgs(handle, 0, null, arguments))
             }
                     if status == 1 {
-                        return Error(ReflectionError.UnboundMetadata)
+                        return Failure(ReflectionError.UnboundMetadata)
                     }
                     if status == 2 {
-                        return Error(ReflectionError.UnsupportedType)
+                        return Failure(ReflectionError.UnsupportedType)
                     }
                     if status == 3 {
-                        return Error(ReflectionError.AccessDenied)
+                        return Failure(ReflectionError.AccessDenied)
                     }
                     if status == 4 {
-                        return Error(ReflectionError.MissingConstructor)
+                        return Failure(ReflectionError.MissingConstructor)
                     }
                     if status == 6 {
-                        return Error(ReflectionError.InvalidReceiver)
+                        return Failure(ReflectionError.InvalidReceiver)
                     }
                     if status == 7 {
-                        return Error(ReflectionError.InvalidValue)
+                        return Failure(ReflectionError.InvalidValue)
                     }
                     if status == 8 {
-                        return Error(ReflectionError.InvalidArguments)
+                        return Failure(ReflectionError.InvalidArguments)
                     }
                     if status == 9 {
-                        return Error(ReflectionError.AmbiguousConstructor)
+                        return Failure(ReflectionError.AmbiguousConstructor)
                     }
         }
-        return Error(ReflectionError.UnboundMetadata)
+        return Failure(ReflectionError.UnboundMetadata)
     }
 
     func CreateInstance<T>(params arguments: Object?[]) -> Result<T, ReflectionError> {
         if self is RuntimeNominalTypeInfo implementation {
             if !self.AssignableTo(typeof(T)) {
-                return Error(ReflectionError.InvalidResultType)
+                return Failure(ReflectionError.InvalidResultType)
             }
             let instance = self.CreateInstance(arguments)?
             return Ok((T)instance)
         }
-        return Error(ReflectionError.UnboundMetadata)
+        return Failure(ReflectionError.UnboundMetadata)
     }
 
 
@@ -62,17 +62,17 @@ public extension TypeReflectionExtensions for TypeInfo {
                 return Ok(NativeReflection.ReflectionConstruct(handle))
             }
             if status == 1 {
-                return Error(ReflectionError.UnboundMetadata)
+                return Failure(ReflectionError.UnboundMetadata)
             }
             if status == 2 {
-                return Error(ReflectionError.UnsupportedType)
+                return Failure(ReflectionError.UnsupportedType)
             }
             if status == 3 {
-                return Error(ReflectionError.AccessDenied)
+                return Failure(ReflectionError.AccessDenied)
             }
-            return Error(ReflectionError.MissingConstructor)
+            return Failure(ReflectionError.MissingConstructor)
         }
-        return Error(ReflectionError.UnboundMetadata)
+        return Failure(ReflectionError.UnboundMetadata)
     }
 }
 
@@ -88,22 +88,22 @@ public extension PropertyReflectionExtensions for PropertyInfo {
                         return Ok(value)
                     }
                     if status == 1 {
-                        return Error(ReflectionError.UnboundMetadata)
+                        return Failure(ReflectionError.UnboundMetadata)
                     }
                     if status == 3 {
-                        return Error(ReflectionError.AccessDenied)
+                        return Failure(ReflectionError.AccessDenied)
                     }
                     if status == 5 {
-                        return Error(ReflectionError.MissingAccessor)
+                        return Failure(ReflectionError.MissingAccessor)
                     }
                     if status == 6 {
-                        return Error(ReflectionError.InvalidReceiver)
+                        return Failure(ReflectionError.InvalidReceiver)
                     }
-                    return Error(ReflectionError.UnsupportedProperty)
+                    return Failure(ReflectionError.UnsupportedProperty)
                 }
             }
         }
-        return Error(ReflectionError.UnboundMetadata)
+        return Failure(ReflectionError.UnboundMetadata)
     }
 
     func SetValue(receiver: Object?, value: Object?) -> Result<(), ReflectionError> {
@@ -117,25 +117,25 @@ public extension PropertyReflectionExtensions for PropertyInfo {
                         return Ok(())
                     }
                     if status == 1 {
-                        return Error(ReflectionError.UnboundMetadata)
+                        return Failure(ReflectionError.UnboundMetadata)
                     }
                     if status == 3 {
-                        return Error(ReflectionError.AccessDenied)
+                        return Failure(ReflectionError.AccessDenied)
                     }
                     if status == 5 {
-                        return Error(ReflectionError.MissingAccessor)
+                        return Failure(ReflectionError.MissingAccessor)
                     }
                     if status == 6 {
-                        return Error(ReflectionError.InvalidReceiver)
+                        return Failure(ReflectionError.InvalidReceiver)
                     }
                     if status == 7 {
-                        return Error(ReflectionError.InvalidValue)
+                        return Failure(ReflectionError.InvalidValue)
                     }
-                    return Error(ReflectionError.UnsupportedProperty)
+                    return Failure(ReflectionError.UnsupportedProperty)
                 }
             }
         }
-        return Error(ReflectionError.UnboundMetadata)
+        return Failure(ReflectionError.UnboundMetadata)
     }
 }
 
@@ -151,33 +151,33 @@ public extension MethodReflectionExtensions for MethodInfo {
                         return Ok(value)
                     }
                     if status == 1 {
-                        return Error(ReflectionError.UnboundMetadata)
+                        return Failure(ReflectionError.UnboundMetadata)
                     }
                     if status == 2 {
-                        return Error(ReflectionError.UnsupportedMethod)
+                        return Failure(ReflectionError.UnsupportedMethod)
                     }
                     if status == 3 {
-                        return Error(ReflectionError.AccessDenied)
+                        return Failure(ReflectionError.AccessDenied)
                     }
                     if status == 4 {
-                        return Error(ReflectionError.UnsupportedMethod)
+                        return Failure(ReflectionError.UnsupportedMethod)
                     }
                     if status == 6 {
-                        return Error(ReflectionError.InvalidReceiver)
+                        return Failure(ReflectionError.InvalidReceiver)
                     }
                     if status == 7 {
-                        return Error(ReflectionError.InvalidValue)
+                        return Failure(ReflectionError.InvalidValue)
                     }
                     if status == 8 {
-                        return Error(ReflectionError.InvalidArguments)
+                        return Failure(ReflectionError.InvalidArguments)
                     }
                     if status == 9 {
-                        return Error(ReflectionError.AmbiguousConstructor)
+                        return Failure(ReflectionError.AmbiguousConstructor)
                     }
                 }
             }
         }
-        return Error(ReflectionError.UnboundMetadata)
+        return Failure(ReflectionError.UnboundMetadata)
     }
 }
 
@@ -193,33 +193,33 @@ public extension FieldReflectionExtensions for FieldInfo {
                         return Ok(value)
                     }
                     if status == 1 {
-                        return Error(ReflectionError.UnboundMetadata)
+                        return Failure(ReflectionError.UnboundMetadata)
                     }
                     if status == 2 {
-                        return Error(ReflectionError.UnsupportedField)
+                        return Failure(ReflectionError.UnsupportedField)
                     }
                     if status == 3 {
-                        return Error(ReflectionError.AccessDenied)
+                        return Failure(ReflectionError.AccessDenied)
                     }
                     if status == 4 {
-                        return Error(ReflectionError.UnsupportedField)
+                        return Failure(ReflectionError.UnsupportedField)
                     }
                     if status == 6 {
-                        return Error(ReflectionError.InvalidReceiver)
+                        return Failure(ReflectionError.InvalidReceiver)
                     }
                     if status == 7 {
-                        return Error(ReflectionError.InvalidValue)
+                        return Failure(ReflectionError.InvalidValue)
                     }
                     if status == 8 {
-                        return Error(ReflectionError.InvalidArguments)
+                        return Failure(ReflectionError.InvalidArguments)
                     }
                     if status == 9 {
-                        return Error(ReflectionError.AmbiguousConstructor)
+                        return Failure(ReflectionError.AmbiguousConstructor)
                     }
                 }
             }
         }
-        return Error(ReflectionError.UnboundMetadata)
+        return Failure(ReflectionError.UnboundMetadata)
     }
     func SetValue(receiver: Object?, value: Object?) -> Result<(), ReflectionError> {
         if self is RuntimeFieldInfo implementation {
@@ -232,33 +232,33 @@ public extension FieldReflectionExtensions for FieldInfo {
                         return Ok(())
                     }
                     if status == 1 {
-                        return Error(ReflectionError.UnboundMetadata)
+                        return Failure(ReflectionError.UnboundMetadata)
                     }
                     if status == 2 {
-                        return Error(ReflectionError.UnsupportedField)
+                        return Failure(ReflectionError.UnsupportedField)
                     }
                     if status == 3 {
-                        return Error(ReflectionError.AccessDenied)
+                        return Failure(ReflectionError.AccessDenied)
                     }
                     if status == 4 {
-                        return Error(ReflectionError.UnsupportedField)
+                        return Failure(ReflectionError.UnsupportedField)
                     }
                     if status == 6 {
-                        return Error(ReflectionError.InvalidReceiver)
+                        return Failure(ReflectionError.InvalidReceiver)
                     }
                     if status == 7 {
-                        return Error(ReflectionError.InvalidValue)
+                        return Failure(ReflectionError.InvalidValue)
                     }
                     if status == 8 {
-                        return Error(ReflectionError.InvalidArguments)
+                        return Failure(ReflectionError.InvalidArguments)
                     }
                     if status == 9 {
-                        return Error(ReflectionError.AmbiguousConstructor)
+                        return Failure(ReflectionError.AmbiguousConstructor)
                     }
                 }
             }
         }
-        return Error(ReflectionError.UnboundMetadata)
+        return Failure(ReflectionError.UnboundMetadata)
     }
 }
 
@@ -281,21 +281,21 @@ public extension ConstructorReflectionExtensions for ConstructorInfo {
                         return Ok(neoCLR.Runtime.ReflectionConstructorInvoke(handle, implementation.DefinitionIndex, null, arguments))
                     }
                     if status == 1 {
-                        return Error(ReflectionError.UnboundMetadata)
+                        return Failure(ReflectionError.UnboundMetadata)
                     }
                     if status == 2 {
-                        return Error(ReflectionError.UnsupportedType)
+                        return Failure(ReflectionError.UnsupportedType)
                     }
                     if status == 3 {
-                        return Error(ReflectionError.AccessDenied)
+                        return Failure(ReflectionError.AccessDenied)
                     }
                     if status == 4 {
-                        return Error(ReflectionError.MissingConstructor)
+                        return Failure(ReflectionError.MissingConstructor)
                     }
-                    return Error(ReflectionError.InvalidArguments)
+                    return Failure(ReflectionError.InvalidArguments)
                 }
             }
         }
-        return Error(ReflectionError.UnboundMetadata)
+        return Failure(ReflectionError.UnboundMetadata)
     }
 }

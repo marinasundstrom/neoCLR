@@ -602,14 +602,14 @@ ret
 newobj instance System.IO.TextReadError.InvalidUtf8::.ctor()
 ret
 .end
-.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError arg0) -> System.Result.Error<System.Data.Json.JsonError>
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError arg0) -> System.Result.Failure<System.Data.Json.JsonError>
 ldarg arg0
-newobj instance System.Result.Error<System.Data.Json.JsonError>::.ctor(System.Data.Json.JsonError)
+newobj instance System.Result.Failure<System.Data.Json.JsonError>::.ctor(System.Data.Json.JsonError)
 ret
 .end
-.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion1(System.Result.Error<System.Data.Json.JsonError> arg0) -> System.Result<System.Data.Json.JsonValue,System.Data.Json.JsonError>
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion1(System.Result.Failure<System.Data.Json.JsonError> arg0) -> System.Result<System.Data.Json.JsonValue,System.Data.Json.JsonError>
 ldarg arg0
-newobj instance System.Result<System.Data.Json.JsonValue,System.Data.Json.JsonError>::.ctor(System.Result.Error<System.Data.Json.JsonError>)
+newobj instance System.Result<System.Data.Json.JsonValue,System.Data.Json.JsonError>::.ctor(System.Result.Failure<System.Data.Json.JsonError>)
 ret
 .end
 .function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion2(System.Result<String,System.IO.TextReadError>& arg0,out(true) System.Result.Ok<String>& arg1) -> Boolean
@@ -623,15 +623,15 @@ ldarg arg0
 call instance System.Result.Ok<String>::get_Value()
 ret
 .end
-.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion4(System.Result<String,System.IO.TextReadError>& arg0,out(true) System.Result.Error<System.IO.TextReadError>& arg1) -> Boolean
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion4(System.Result<String,System.IO.TextReadError>& arg0,out(true) System.Result.Failure<System.IO.TextReadError>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Result<String,System.IO.TextReadError>::TryGetValue(System.Result.Error<System.IO.TextReadError>&)
+call instance System.Result<String,System.IO.TextReadError>::TryGetValue(System.Result.Failure<System.IO.TextReadError>&)
 ret
 .end
-.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion5(System.Result.Error<System.IO.TextReadError>& arg0) -> System.IO.TextReadError
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion5(System.Result.Failure<System.IO.TextReadError>& arg0) -> System.IO.TextReadError
 ldarg arg0
-call instance System.Result.Error<System.IO.TextReadError>::get_Value()
+call instance System.Result.Failure<System.IO.TextReadError>::get_Value()
 ret
 .end
 .function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion6(System.Result<String,System.Data.Json.JsonError>& arg0,out String& arg1) -> Boolean
@@ -662,10 +662,10 @@ ldarg arg0
 call instance System.Result.Ok<Int32>::get_Value()
 ret
 .end
-.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion11(System.Result<Int32,System.IO.StreamError>& arg0,out(true) System.Result.Error<System.IO.StreamError>& arg1) -> Boolean
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion11(System.Result<Int32,System.IO.StreamError>& arg0,out(true) System.Result.Failure<System.IO.StreamError>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Result<Int32,System.IO.StreamError>::TryGetValue(System.Result.Error<System.IO.StreamError>&)
+call instance System.Result<Int32,System.IO.StreamError>::TryGetValue(System.Result.Failure<System.IO.StreamError>&)
 ret
 .end
 .function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion12(Void arg0) -> System.Result.Ok<Void>
@@ -673,9 +673,9 @@ ldarg arg0
 newobj instance System.Result.Ok<Void>::.ctor(Void)
 ret
 .end
-.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion13(System.Result.Error<System.IO.StreamError>& arg0) -> System.IO.StreamError
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion13(System.Result.Failure<System.IO.StreamError>& arg0) -> System.IO.StreamError
 ldarg arg0
-call instance System.Result.Error<System.IO.StreamError>::get_Value()
+call instance System.Result.Failure<System.IO.StreamError>::get_Value()
 ret
 .end
 .function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion14(System.Result.Ok<Void> arg0) -> System.Result<Void,System.Data.Json.JsonError>
@@ -683,9 +683,9 @@ ldarg arg0
 newobj instance System.Result<Void,System.Data.Json.JsonError>::.ctor(System.Result.Ok<Void>)
 ret
 .end
-.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion15(System.Result.Error<System.Data.Json.JsonError> arg0) -> System.Result<Void,System.Data.Json.JsonError>
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion15(System.Result.Failure<System.Data.Json.JsonError> arg0) -> System.Result<Void,System.Data.Json.JsonError>
 ldarg arg0
-newobj instance System.Result<Void,System.Data.Json.JsonError>::.ctor(System.Result.Error<System.Data.Json.JsonError>)
+newobj instance System.Result<Void,System.Data.Json.JsonError>::.ctor(System.Result.Failure<System.Data.Json.JsonError>)
 ret
 .end
 .function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion16(System.Result<System.Object,System.Data.Json.JsonError>& arg0,out System.Object& arg1) -> Boolean
@@ -809,15 +809,15 @@ ldarg arg0
 call instance System.Result.Ok<System.Object>::get_Value()
 ret
 .end
-.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion38(System.Result<System.Object,System.Runtime.Reflection.ReflectionError>& arg0,out(true) System.Result.Error<System.Runtime.Reflection.ReflectionError>& arg1) -> Boolean
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion38(System.Result<System.Object,System.Runtime.Reflection.ReflectionError>& arg0,out(true) System.Result.Failure<System.Runtime.Reflection.ReflectionError>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Result<System.Object,System.Runtime.Reflection.ReflectionError>::TryGetValue(System.Result.Error<System.Runtime.Reflection.ReflectionError>&)
+call instance System.Result<System.Object,System.Runtime.Reflection.ReflectionError>::TryGetValue(System.Result.Failure<System.Runtime.Reflection.ReflectionError>&)
 ret
 .end
-.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion39(System.Result.Error<System.Runtime.Reflection.ReflectionError>& arg0) -> System.Runtime.Reflection.ReflectionError
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion39(System.Result.Failure<System.Runtime.Reflection.ReflectionError>& arg0) -> System.Runtime.Reflection.ReflectionError
 ldarg arg0
-call instance System.Result.Error<System.Runtime.Reflection.ReflectionError>::get_Value()
+call instance System.Result.Failure<System.Runtime.Reflection.ReflectionError>::get_Value()
 ret
 .end
 .function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion40(System.Object arg0) -> System.Result.Ok<System.Object>
@@ -830,9 +830,9 @@ ldarg arg0
 newobj instance System.Result<System.Object,System.Data.Json.JsonError>::.ctor(System.Result.Ok<System.Object>)
 ret
 .end
-.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion42(System.Result.Error<System.Data.Json.JsonError> arg0) -> System.Result<System.Object,System.Data.Json.JsonError>
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion42(System.Result.Failure<System.Data.Json.JsonError> arg0) -> System.Result<System.Object,System.Data.Json.JsonError>
 ldarg arg0
-newobj instance System.Result<System.Object,System.Data.Json.JsonError>::.ctor(System.Result.Error<System.Data.Json.JsonError>)
+newobj instance System.Result<System.Object,System.Data.Json.JsonError>::.ctor(System.Result.Failure<System.Data.Json.JsonError>)
 ret
 .end
 .function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion43(System.Result<Int32,System.Data.Json.JsonError>& arg0,out Int32& arg1) -> Boolean
@@ -847,10 +847,10 @@ ldarg arg1
 call instance System.Result<Int32,System.Data.Json.JsonError>::TryGetResidual(System.Data.Json.JsonError&)
 ret
 .end
-.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion45(System.Result<Void,System.Runtime.Reflection.ReflectionError>& arg0,out(true) System.Result.Error<System.Runtime.Reflection.ReflectionError>& arg1) -> Boolean
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion45(System.Result<Void,System.Runtime.Reflection.ReflectionError>& arg0,out(true) System.Result.Failure<System.Runtime.Reflection.ReflectionError>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Result<Void,System.Runtime.Reflection.ReflectionError>::TryGetValue(System.Result.Error<System.Runtime.Reflection.ReflectionError>&)
+call instance System.Result<Void,System.Runtime.Reflection.ReflectionError>::TryGetValue(System.Result.Failure<System.Runtime.Reflection.ReflectionError>&)
 ret
 .end
 .function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion46(System.Result<String,System.Text.Utf8SliceError>& arg0,out(true) System.Result.Ok<String>& arg1) -> Boolean
@@ -859,10 +859,10 @@ ldarg arg1
 call instance System.Result<String,System.Text.Utf8SliceError>::TryGetValue(System.Result.Ok<String>&)
 ret
 .end
-.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion47(System.Result<String,System.Text.Utf8SliceError>& arg0,out(true) System.Result.Error<System.Text.Utf8SliceError>& arg1) -> Boolean
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion47(System.Result<String,System.Text.Utf8SliceError>& arg0,out(true) System.Result.Failure<System.Text.Utf8SliceError>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Result<String,System.Text.Utf8SliceError>::TryGetValue(System.Result.Error<System.Text.Utf8SliceError>&)
+call instance System.Result<String,System.Text.Utf8SliceError>::TryGetValue(System.Result.Failure<System.Text.Utf8SliceError>&)
 ret
 .end
 .function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion48(String arg0) -> System.Result.Ok<String>
@@ -875,19 +875,19 @@ ldarg arg0
 newobj instance System.Result<String,System.Data.Json.JsonError>::.ctor(System.Result.Ok<String>)
 ret
 .end
-.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion50(System.Result.Error<System.Text.Utf8SliceError>& arg0) -> System.Text.Utf8SliceError
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion50(System.Result.Failure<System.Text.Utf8SliceError>& arg0) -> System.Text.Utf8SliceError
 ldarg arg0
-call instance System.Result.Error<System.Text.Utf8SliceError>::get_Value()
+call instance System.Result.Failure<System.Text.Utf8SliceError>::get_Value()
 ret
 .end
-.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Error<System.Data.Json.JsonError> arg0) -> System.Result<String,System.Data.Json.JsonError>
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Failure<System.Data.Json.JsonError> arg0) -> System.Result<String,System.Data.Json.JsonError>
 ldarg arg0
-newobj instance System.Result<String,System.Data.Json.JsonError>::.ctor(System.Result.Error<System.Data.Json.JsonError>)
+newobj instance System.Result<String,System.Data.Json.JsonError>::.ctor(System.Result.Failure<System.Data.Json.JsonError>)
 ret
 .end
-.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion52(System.Result.Error<System.Data.Json.JsonError> arg0) -> System.Result<Int32,System.Data.Json.JsonError>
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion52(System.Result.Failure<System.Data.Json.JsonError> arg0) -> System.Result<Int32,System.Data.Json.JsonError>
 ldarg arg0
-newobj instance System.Result<Int32,System.Data.Json.JsonError>::.ctor(System.Result.Error<System.Data.Json.JsonError>)
+newobj instance System.Result<Int32,System.Data.Json.JsonError>::.ctor(System.Result.Failure<System.Data.Json.JsonError>)
 ret
 .end
 .function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion53(Int32 arg0) -> System.Result.Ok<Int32>
@@ -906,20 +906,20 @@ ldarg arg1
 call instance System.Result<String,System.Text.InvalidUtf8Error>::TryGetValue(System.Result.Ok<String>&)
 ret
 .end
-.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion56(System.Result<String,System.Text.InvalidUtf8Error>& arg0,out(true) System.Result.Error<System.Text.InvalidUtf8Error>& arg1) -> Boolean
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion56(System.Result<String,System.Text.InvalidUtf8Error>& arg0,out(true) System.Result.Failure<System.Text.InvalidUtf8Error>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Result<String,System.Text.InvalidUtf8Error>::TryGetValue(System.Result.Error<System.Text.InvalidUtf8Error>&)
+call instance System.Result<String,System.Text.InvalidUtf8Error>::TryGetValue(System.Result.Failure<System.Text.InvalidUtf8Error>&)
 ret
 .end
-.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion57(System.Result.Error<System.Text.InvalidUtf8Error>& arg0) -> System.Text.InvalidUtf8Error
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion57(System.Result.Failure<System.Text.InvalidUtf8Error>& arg0) -> System.Text.InvalidUtf8Error
 ldarg arg0
-call instance System.Result.Error<System.Text.InvalidUtf8Error>::get_Value()
+call instance System.Result.Failure<System.Text.InvalidUtf8Error>::get_Value()
 ret
 .end
-.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion58(System.Result.Error<System.Data.Json.JsonError> arg0) -> System.Result<System.Data.Json.JsonNumber,System.Data.Json.JsonError>
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion58(System.Result.Failure<System.Data.Json.JsonError> arg0) -> System.Result<System.Data.Json.JsonNumber,System.Data.Json.JsonError>
 ldarg arg0
-newobj instance System.Result<System.Data.Json.JsonNumber,System.Data.Json.JsonError>::.ctor(System.Result.Error<System.Data.Json.JsonError>)
+newobj instance System.Result<System.Data.Json.JsonNumber,System.Data.Json.JsonError>::.ctor(System.Result.Failure<System.Data.Json.JsonError>)
 ret
 .end
 .function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion59(System.Data.Json.JsonNumber arg0) -> System.Result.Ok<System.Data.Json.JsonNumber>
@@ -938,15 +938,15 @@ ldarg arg1
 call instance System.Result<Int32,System.NumberParseError>::TryGetValue(System.Result.Ok<Int32>&)
 ret
 .end
-.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion62(System.Result<Int32,System.NumberParseError>& arg0,out(true) System.Result.Error<System.NumberParseError>& arg1) -> Boolean
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion62(System.Result<Int32,System.NumberParseError>& arg0,out(true) System.Result.Failure<System.NumberParseError>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Result<Int32,System.NumberParseError>::TryGetValue(System.Result.Error<System.NumberParseError>&)
+call instance System.Result<Int32,System.NumberParseError>::TryGetValue(System.Result.Failure<System.NumberParseError>&)
 ret
 .end
-.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion63(System.Result.Error<System.NumberParseError>& arg0) -> System.NumberParseError
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion63(System.Result.Failure<System.NumberParseError>& arg0) -> System.NumberParseError
 ldarg arg0
-call instance System.Result.Error<System.NumberParseError>::get_Value()
+call instance System.Result.Failure<System.NumberParseError>::get_Value()
 ret
 .end
 .function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion64(System.Data.Json.JsonError arg0) -> System.Result<System.Web.Http.HttpContent,System.Data.Json.JsonError>
@@ -997,10 +997,10 @@ ldarg arg0
 call instance System.Result.Ok<System.Web.Http.HttpResponse>::get_Value()
 ret
 .end
-.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion73(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>& arg0,out(true) System.Result.Error<System.Web.Http.HttpError>& arg1) -> Boolean
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion73(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>& arg0,out(true) System.Result.Failure<System.Web.Http.HttpError>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>::TryGetValue(System.Result.Error<System.Web.Http.HttpError>&)
+call instance System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>::TryGetValue(System.Result.Failure<System.Web.Http.HttpError>&)
 ret
 .end
 .function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion74(System.Web.Http.HttpResponse arg0) -> System.Result.Ok<System.Web.Http.HttpResponse>
@@ -1013,19 +1013,19 @@ ldarg arg0
 newobj instance System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>::.ctor(System.Result.Ok<System.Web.Http.HttpResponse>)
 ret
 .end
-.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion76(System.Result.Error<System.Web.Http.HttpError>& arg0) -> System.Web.Http.HttpError
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion76(System.Result.Failure<System.Web.Http.HttpError>& arg0) -> System.Web.Http.HttpError
 ldarg arg0
-call instance System.Result.Error<System.Web.Http.HttpError>::get_Value()
+call instance System.Result.Failure<System.Web.Http.HttpError>::get_Value()
 ret
 .end
-.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion77(System.Web.Http.Json.HttpJsonError arg0) -> System.Result.Error<System.Web.Http.Json.HttpJsonError>
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion77(System.Web.Http.Json.HttpJsonError arg0) -> System.Result.Failure<System.Web.Http.Json.HttpJsonError>
 ldarg arg0
-newobj instance System.Result.Error<System.Web.Http.Json.HttpJsonError>::.ctor(System.Web.Http.Json.HttpJsonError)
+newobj instance System.Result.Failure<System.Web.Http.Json.HttpJsonError>::.ctor(System.Web.Http.Json.HttpJsonError)
 ret
 .end
-.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion78(System.Result.Error<System.Web.Http.Json.HttpJsonError> arg0) -> System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion78(System.Result.Failure<System.Web.Http.Json.HttpJsonError> arg0) -> System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>
 ldarg arg0
-newobj instance System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>::.ctor(System.Result.Error<System.Web.Http.Json.HttpJsonError>)
+newobj instance System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>::.ctor(System.Result.Failure<System.Web.Http.Json.HttpJsonError>)
 ret
 .end
 .function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion79(System.Result<System.Web.Http.HttpContent,System.Data.Json.JsonError>& arg0,out(true) System.Result.Ok<System.Web.Http.HttpContent>& arg1) -> Boolean
@@ -1039,20 +1039,20 @@ ldarg arg0
 call instance System.Result.Ok<System.Web.Http.HttpContent>::get_Value()
 ret
 .end
-.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion81(System.Result<System.Web.Http.HttpContent,System.Data.Json.JsonError>& arg0,out(true) System.Result.Error<System.Data.Json.JsonError>& arg1) -> Boolean
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion81(System.Result<System.Web.Http.HttpContent,System.Data.Json.JsonError>& arg0,out(true) System.Result.Failure<System.Data.Json.JsonError>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Result<System.Web.Http.HttpContent,System.Data.Json.JsonError>::TryGetValue(System.Result.Error<System.Data.Json.JsonError>&)
+call instance System.Result<System.Web.Http.HttpContent,System.Data.Json.JsonError>::TryGetValue(System.Result.Failure<System.Data.Json.JsonError>&)
 ret
 .end
-.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion82(System.Result.Error<System.Data.Json.JsonError>& arg0) -> System.Data.Json.JsonError
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion82(System.Result.Failure<System.Data.Json.JsonError>& arg0) -> System.Data.Json.JsonError
 ldarg arg0
-call instance System.Result.Error<System.Data.Json.JsonError>::get_Value()
+call instance System.Result.Failure<System.Data.Json.JsonError>::get_Value()
 ret
 .end
-.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion83(System.Result.Error<System.Web.Http.Json.HttpJsonError> arg0) -> System.Result<System.Object,System.Web.Http.Json.HttpJsonError>
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion83(System.Result.Failure<System.Web.Http.Json.HttpJsonError> arg0) -> System.Result<System.Object,System.Web.Http.Json.HttpJsonError>
 ldarg arg0
-newobj instance System.Result<System.Object,System.Web.Http.Json.HttpJsonError>::.ctor(System.Result.Error<System.Web.Http.Json.HttpJsonError>)
+newobj instance System.Result<System.Object,System.Web.Http.Json.HttpJsonError>::.ctor(System.Result.Failure<System.Web.Http.Json.HttpJsonError>)
 ret
 .end
 .function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion84(System.Result<System.Object,System.Data.Json.JsonError>& arg0,out(true) System.Result.Ok<System.Object>& arg1) -> Boolean
@@ -1061,10 +1061,10 @@ ldarg arg1
 call instance System.Result<System.Object,System.Data.Json.JsonError>::TryGetValue(System.Result.Ok<System.Object>&)
 ret
 .end
-.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion85(System.Result<System.Object,System.Data.Json.JsonError>& arg0,out(true) System.Result.Error<System.Data.Json.JsonError>& arg1) -> Boolean
+.function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion85(System.Result<System.Object,System.Data.Json.JsonError>& arg0,out(true) System.Result.Failure<System.Data.Json.JsonError>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Result<System.Object,System.Data.Json.JsonError>::TryGetValue(System.Result.Error<System.Data.Json.JsonError>&)
+call instance System.Result<System.Object,System.Data.Json.JsonError>::TryGetValue(System.Result.Failure<System.Data.Json.JsonError>&)
 ret
 .end
 .function neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion86(System.Result.Ok<System.Object> arg0) -> System.Result<System.Object,System.Web.Http.Json.HttpJsonError>
@@ -1285,7 +1285,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Lim
 M00000003_IL_0029:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000003_IL_002e:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion1(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion1(System.Result.Failure<System.Data.Json.JsonError>)
 M00000003_IL_0033:
 ret
 M00000003_IL_0034:
@@ -1308,7 +1308,7 @@ ret
 .local System.Result<String,System.IO.TextReadError> local5
 .local System.Result.Ok<String> local6
 .local System.Result<String,System.IO.TextReadError> local7
-.local System.Result.Error<System.IO.TextReadError> local8
+.local System.Result.Failure<System.IO.TextReadError> local8
 ldloca local1
 initobj System.Result<String,System.IO.TextReadError>
 ldloca local2
@@ -1322,7 +1322,7 @@ initobj System.Result.Ok<String>
 ldloca local7
 initobj System.Result<String,System.IO.TextReadError>
 ldloca local8
-initobj System.Result.Error<System.IO.TextReadError>
+initobj System.Result.Failure<System.IO.TextReadError>
 M00000004_IL_0000:
 M00000004_IL_0001:
 M00000004_IL_0002:
@@ -1395,19 +1395,19 @@ stloc local7
 M00000004_IL_0066:
 ldloca local8
 M00000004_IL_0068:
-initobj System.Result.Error<System.IO.TextReadError>
+initobj System.Result.Failure<System.IO.TextReadError>
 M00000004_IL_006e:
 ldloca local7
 M00000004_IL_0070:
 ldloca local8
 M00000004_IL_0072:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion4(System.Result<String,System.IO.TextReadError>&,System.Result.Error<System.IO.TextReadError>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion4(System.Result<String,System.IO.TextReadError>&,System.Result.Failure<System.IO.TextReadError>&)
 M00000004_IL_0077:
 brfalse M00000004_IL_00ae
 M00000004_IL_007c:
 ldloca local8
 M00000004_IL_007e:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion5(System.Result.Error<System.IO.TextReadError>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion5(System.Result.Failure<System.IO.TextReadError>&)
 M00000004_IL_0083:
 stloc local4
 M00000004_IL_0085:
@@ -1423,7 +1423,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Rea
 M00000004_IL_009e:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000004_IL_00a3:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion1(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion1(System.Result.Failure<System.Data.Json.JsonError>)
 M00000004_IL_00a8:
 stloc local2
 M00000004_IL_00a9:
@@ -1464,7 +1464,7 @@ ret
 .local System.Result<Int32,System.IO.StreamError> local8
 .local System.Result.Ok<Int32> local9
 .local System.Result<Int32,System.IO.StreamError> local10
-.local System.Result.Error<System.IO.StreamError> local11
+.local System.Result.Failure<System.IO.StreamError> local11
 .local Void local12
 ldloca local0
 initobj System.Result<String,System.Data.Json.JsonError>
@@ -1483,7 +1483,7 @@ initobj System.Result.Ok<Int32>
 ldloca local10
 initobj System.Result<Int32,System.IO.StreamError>
 ldloca local11
-initobj System.Result.Error<System.IO.StreamError>
+initobj System.Result.Failure<System.IO.StreamError>
 ldvoid
 stloc local12
 M00000006_IL_0000:
@@ -1612,19 +1612,19 @@ stloc local10
 M00000006_IL_00ba:
 ldloca local11
 M00000006_IL_00bc:
-initobj System.Result.Error<System.IO.StreamError>
+initobj System.Result.Failure<System.IO.StreamError>
 M00000006_IL_00c2:
 ldloca local10
 M00000006_IL_00c4:
 ldloca local11
 M00000006_IL_00c6:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion11(System.Result<Int32,System.IO.StreamError>&,System.Result.Error<System.IO.StreamError>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion11(System.Result<Int32,System.IO.StreamError>&,System.Result.Failure<System.IO.StreamError>&)
 M00000006_IL_00cb:
 brfalse M00000006_IL_0103
 M00000006_IL_00d0:
 ldloca local11
 M00000006_IL_00d2:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion13(System.Result.Error<System.IO.StreamError>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion13(System.Result.Failure<System.IO.StreamError>&)
 M00000006_IL_00d7:
 stloc local7
 M00000006_IL_00d9:
@@ -1640,7 +1640,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Wri
 M00000006_IL_00f2:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000006_IL_00f7:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion15(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion15(System.Result.Failure<System.Data.Json.JsonError>)
 M00000006_IL_00fc:
 stloc local6
 M00000006_IL_00fe:
@@ -2239,7 +2239,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Uns
 M0000000e_IL_015b:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M0000000e_IL_0160:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion15(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion15(System.Result.Failure<System.Data.Json.JsonError>)
 M0000000e_IL_0165:
 ret
 M0000000e_IL_0166:
@@ -2297,7 +2297,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Uns
 M0000000f_IL_0038:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M0000000f_IL_003d:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion15(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion15(System.Result.Failure<System.Data.Json.JsonError>)
 M0000000f_IL_0042:
 ret
 M0000000f_IL_0043:
@@ -2378,7 +2378,7 @@ ret
 .local System.Result<System.Object,System.Runtime.Reflection.ReflectionError> local47
 .local System.Result.Ok<System.Object> local48
 .local System.Result<System.Object,System.Runtime.Reflection.ReflectionError> local49
-.local System.Result.Error<System.Runtime.Reflection.ReflectionError> local50
+.local System.Result.Failure<System.Runtime.Reflection.ReflectionError> local50
 .local System.Result<Void,System.Data.Json.JsonError> local51
 .local Void local52
 .local System.Data.Json.JsonError local53
@@ -2471,7 +2471,7 @@ initobj System.Result.Ok<System.Object>
 ldloca local49
 initobj System.Result<System.Object,System.Runtime.Reflection.ReflectionError>
 ldloca local50
-initobj System.Result.Error<System.Runtime.Reflection.ReflectionError>
+initobj System.Result.Failure<System.Runtime.Reflection.ReflectionError>
 ldloca local51
 initobj System.Result<Void,System.Data.Json.JsonError>
 ldvoid
@@ -2536,7 +2536,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Uns
 M00000011_IL_004b:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000011_IL_0050:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion1(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion1(System.Result.Failure<System.Data.Json.JsonError>)
 M00000011_IL_0055:
 ret
 M00000011_IL_0056:
@@ -2570,7 +2570,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Uns
 M00000011_IL_0081:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000011_IL_0086:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion1(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion1(System.Result.Failure<System.Data.Json.JsonError>)
 M00000011_IL_008b:
 ret
 M00000011_IL_008c:
@@ -2756,7 +2756,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Lim
 M00000011_IL_018e:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000011_IL_0193:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion1(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion1(System.Result.Failure<System.Data.Json.JsonError>)
 M00000011_IL_0198:
 ret
 M00000011_IL_0199:
@@ -2812,7 +2812,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Uns
 M00000011_IL_01fa:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000011_IL_01ff:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion1(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion1(System.Result.Failure<System.Data.Json.JsonError>)
 M00000011_IL_0204:
 ret
 M00000011_IL_0205:
@@ -2845,7 +2845,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Lim
 M00000011_IL_0230:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000011_IL_0235:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion1(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion1(System.Result.Failure<System.Data.Json.JsonError>)
 M00000011_IL_023a:
 ret
 M00000011_IL_023b:
@@ -3196,19 +3196,19 @@ stloc local49
 M00000011_IL_0421:
 ldloca local50
 M00000011_IL_0423:
-initobj System.Result.Error<System.Runtime.Reflection.ReflectionError>
+initobj System.Result.Failure<System.Runtime.Reflection.ReflectionError>
 M00000011_IL_0429:
 ldloca local49
 M00000011_IL_042b:
 ldloca local50
 M00000011_IL_042d:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion38(System.Result<System.Object,System.Runtime.Reflection.ReflectionError>&,System.Result.Error<System.Runtime.Reflection.ReflectionError>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion38(System.Result<System.Object,System.Runtime.Reflection.ReflectionError>&,System.Result.Failure<System.Runtime.Reflection.ReflectionError>&)
 M00000011_IL_0432:
 brfalse M00000011_IL_0465
 M00000011_IL_0437:
 ldloca local50
 M00000011_IL_0439:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion39(System.Result.Error<System.Runtime.Reflection.ReflectionError>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion39(System.Result.Failure<System.Runtime.Reflection.ReflectionError>&)
 M00000011_IL_043e:
 stloc local23
 M00000011_IL_0440:
@@ -3224,7 +3224,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Ref
 M00000011_IL_0459:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000011_IL_045e:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion1(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion1(System.Result.Failure<System.Data.Json.JsonError>)
 M00000011_IL_0463:
 ret
 M00000011_IL_0465:
@@ -3476,13 +3476,13 @@ ret
 .local System.Result<System.Object,System.Runtime.Reflection.ReflectionError> local54
 .local System.Result.Ok<System.Object> local55
 .local System.Result<System.Object,System.Runtime.Reflection.ReflectionError> local56
-.local System.Result.Error<System.Runtime.Reflection.ReflectionError> local57
+.local System.Result.Failure<System.Runtime.Reflection.ReflectionError> local57
 .local Int32 local58
 .local Int32 local59
 .local Int32 local60
 .local Int32 local61
 .local System.Result<Void,System.Runtime.Reflection.ReflectionError> local62
-.local System.Result.Error<System.Runtime.Reflection.ReflectionError> local63
+.local System.Result.Failure<System.Runtime.Reflection.ReflectionError> local63
 ldloca local0
 initobj System.Data.Json.JsonString
 ldloca local1
@@ -3584,7 +3584,7 @@ initobj System.Result.Ok<System.Object>
 ldloca local56
 initobj System.Result<System.Object,System.Runtime.Reflection.ReflectionError>
 ldloca local57
-initobj System.Result.Error<System.Runtime.Reflection.ReflectionError>
+initobj System.Result.Failure<System.Runtime.Reflection.ReflectionError>
 ldc.i4 0
 stloc local58
 ldc.i4 0
@@ -3596,7 +3596,7 @@ stloc local61
 ldloca local62
 initobj System.Result<Void,System.Runtime.Reflection.ReflectionError>
 ldloca local63
-initobj System.Result.Error<System.Runtime.Reflection.ReflectionError>
+initobj System.Result.Failure<System.Runtime.Reflection.ReflectionError>
 M00000013_IL_0000:
 M00000013_IL_0001:
 M00000013_IL_0002:
@@ -3693,7 +3693,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Typ
 M00000013_IL_008c:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000013_IL_0091:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion42(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion42(System.Result.Failure<System.Data.Json.JsonError>)
 M00000013_IL_0096:
 ret
 M00000013_IL_0097:
@@ -3806,7 +3806,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Typ
 M00000013_IL_013b:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000013_IL_0140:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion42(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion42(System.Result.Failure<System.Data.Json.JsonError>)
 M00000013_IL_0145:
 ret
 M00000013_IL_0146:
@@ -3871,7 +3871,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Typ
 M00000013_IL_01a7:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000013_IL_01ac:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion42(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion42(System.Result.Failure<System.Data.Json.JsonError>)
 M00000013_IL_01b1:
 ret
 M00000013_IL_01b2:
@@ -3902,7 +3902,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Lim
 M00000013_IL_01d5:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000013_IL_01da:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion42(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion42(System.Result.Failure<System.Data.Json.JsonError>)
 M00000013_IL_01df:
 ret
 M00000013_IL_01e0:
@@ -3958,7 +3958,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Uns
 M00000013_IL_0241:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000013_IL_0246:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion42(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion42(System.Result.Failure<System.Data.Json.JsonError>)
 M00000013_IL_024b:
 ret
 M00000013_IL_024c:
@@ -4217,7 +4217,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Typ
 M00000013_IL_03a4:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000013_IL_03a9:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion42(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion42(System.Result.Failure<System.Data.Json.JsonError>)
 M00000013_IL_03ae:
 ret
 M00000013_IL_03af:
@@ -4556,19 +4556,19 @@ stloc local56
 M00000013_IL_0593:
 ldloca local57
 M00000013_IL_0595:
-initobj System.Result.Error<System.Runtime.Reflection.ReflectionError>
+initobj System.Result.Failure<System.Runtime.Reflection.ReflectionError>
 M00000013_IL_059b:
 ldloca local56
 M00000013_IL_059d:
 ldloca local57
 M00000013_IL_059f:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion38(System.Result<System.Object,System.Runtime.Reflection.ReflectionError>&,System.Result.Error<System.Runtime.Reflection.ReflectionError>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion38(System.Result<System.Object,System.Runtime.Reflection.ReflectionError>&,System.Result.Failure<System.Runtime.Reflection.ReflectionError>&)
 M00000013_IL_05a4:
 brfalse M00000013_IL_05dc
 M00000013_IL_05a9:
 ldloca local57
 M00000013_IL_05ab:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion39(System.Result.Error<System.Runtime.Reflection.ReflectionError>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion39(System.Result.Failure<System.Runtime.Reflection.ReflectionError>&)
 M00000013_IL_05b0:
 stloc local35
 M00000013_IL_05b2:
@@ -4584,7 +4584,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Ref
 M00000013_IL_05cb:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000013_IL_05d0:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion42(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion42(System.Result.Failure<System.Data.Json.JsonError>)
 M00000013_IL_05d5:
 ret
 M00000013_IL_05dc:
@@ -4676,19 +4676,19 @@ stloc local62
 M00000013_IL_064c:
 ldloca local63
 M00000013_IL_064e:
-initobj System.Result.Error<System.Runtime.Reflection.ReflectionError>
+initobj System.Result.Failure<System.Runtime.Reflection.ReflectionError>
 M00000013_IL_0654:
 ldloca local62
 M00000013_IL_0656:
 ldloca local63
 M00000013_IL_0658:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion45(System.Result<Void,System.Runtime.Reflection.ReflectionError>&,System.Result.Error<System.Runtime.Reflection.ReflectionError>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion45(System.Result<Void,System.Runtime.Reflection.ReflectionError>&,System.Result.Failure<System.Runtime.Reflection.ReflectionError>&)
 M00000013_IL_065d:
 brfalse M00000013_IL_0677
 M00000013_IL_0662:
 ldloca local63
 M00000013_IL_0664:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion39(System.Result.Error<System.Runtime.Reflection.ReflectionError>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion39(System.Result.Failure<System.Runtime.Reflection.ReflectionError>&)
 M00000013_IL_0669:
 stloc local36
 M00000013_IL_066b:
@@ -4706,7 +4706,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Ref
 M00000013_IL_0689:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000013_IL_068e:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion42(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion42(System.Result.Failure<System.Data.Json.JsonError>)
 M00000013_IL_0693:
 ret
 M00000013_IL_0694:
@@ -4740,7 +4740,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Typ
 M00000013_IL_06c0:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000013_IL_06c5:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion42(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion42(System.Result.Failure<System.Data.Json.JsonError>)
 M00000013_IL_06ca:
 ret
 .end
@@ -4932,7 +4932,7 @@ ret
 .local System.Result<String,System.Text.Utf8SliceError> local2
 .local System.Result.Ok<String> local3
 .local System.Result<String,System.Text.Utf8SliceError> local4
-.local System.Result.Error<System.Text.Utf8SliceError> local5
+.local System.Result.Failure<System.Text.Utf8SliceError> local5
 ldloca local0
 initobj System.Result<String,System.Text.Utf8SliceError>
 ldloca local2
@@ -4942,7 +4942,7 @@ initobj System.Result.Ok<String>
 ldloca local4
 initobj System.Result<String,System.Text.Utf8SliceError>
 ldloca local5
-initobj System.Result.Error<System.Text.Utf8SliceError>
+initobj System.Result.Failure<System.Text.Utf8SliceError>
 M00000017_IL_0000:
 M00000017_IL_0001:
 M00000017_IL_0002:
@@ -5006,19 +5006,19 @@ stloc local4
 M00000017_IL_0055:
 ldloca local5
 M00000017_IL_0057:
-initobj System.Result.Error<System.Text.Utf8SliceError>
+initobj System.Result.Failure<System.Text.Utf8SliceError>
 M00000017_IL_005d:
 ldloca local4
 M00000017_IL_005f:
 ldloca local5
 M00000017_IL_0061:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion47(System.Result<String,System.Text.Utf8SliceError>&,System.Result.Error<System.Text.Utf8SliceError>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion47(System.Result<String,System.Text.Utf8SliceError>&,System.Result.Failure<System.Text.Utf8SliceError>&)
 M00000017_IL_0066:
 brfalse M00000017_IL_009a
 M00000017_IL_006b:
 ldloca local5
 M00000017_IL_006d:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion50(System.Result.Error<System.Text.Utf8SliceError>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion50(System.Result.Failure<System.Text.Utf8SliceError>&)
 M00000017_IL_0072:
 pop
 M00000017_IL_0073:
@@ -5034,7 +5034,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Syn
 M00000017_IL_008f:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000017_IL_0094:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Failure<System.Data.Json.JsonError>)
 M00000017_IL_0099:
 ret
 M00000017_IL_009a:
@@ -5103,7 +5103,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Syn
 M00000018_IL_0036:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000018_IL_003b:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Failure<System.Data.Json.JsonError>)
 M00000018_IL_0040:
 ret
 M00000018_IL_0041:
@@ -5284,7 +5284,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Syn
 M00000018_IL_0130:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000018_IL_0135:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Failure<System.Data.Json.JsonError>)
 M00000018_IL_013a:
 ret
 .end
@@ -5436,7 +5436,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Lim
 M00000019_IL_003b:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000019_IL_0040:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion1(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion1(System.Result.Failure<System.Data.Json.JsonError>)
 M00000019_IL_0045:
 ret
 M00000019_IL_0046:
@@ -5468,7 +5468,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Syn
 M00000019_IL_0075:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000019_IL_007a:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion1(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion1(System.Result.Failure<System.Data.Json.JsonError>)
 M00000019_IL_007f:
 ret
 M00000019_IL_0080:
@@ -5618,7 +5618,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Lim
 M00000019_IL_0141:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000019_IL_0146:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion1(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion1(System.Result.Failure<System.Data.Json.JsonError>)
 M00000019_IL_014b:
 ret
 M00000019_IL_014c:
@@ -5785,7 +5785,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Syn
 M00000019_IL_0219:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000019_IL_021e:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion1(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion1(System.Result.Failure<System.Data.Json.JsonError>)
 M00000019_IL_0223:
 ret
 M00000019_IL_0224:
@@ -5994,7 +5994,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Syn
 M00000019_IL_0338:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000019_IL_033d:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion1(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion1(System.Result.Failure<System.Data.Json.JsonError>)
 M00000019_IL_0342:
 ret
 M00000019_IL_0343:
@@ -6449,7 +6449,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Syn
 M0000001a_IL_0078:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M0000001a_IL_007d:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion1(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion1(System.Result.Failure<System.Data.Json.JsonError>)
 M0000001a_IL_0082:
 ret
 M0000001a_IL_0083:
@@ -6528,7 +6528,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Lim
 M0000001c_IL_0035:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M0000001c_IL_003a:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion15(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion15(System.Result.Failure<System.Data.Json.JsonError>)
 M0000001c_IL_003f:
 ret
 M0000001c_IL_0040:
@@ -6730,7 +6730,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Lim
 M0000001d_IL_0035:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M0000001d_IL_003a:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion15(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion15(System.Result.Failure<System.Data.Json.JsonError>)
 M0000001d_IL_003f:
 ret
 M0000001d_IL_0040:
@@ -6955,7 +6955,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Lim
 M0000001d_IL_0169:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M0000001d_IL_016e:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion15(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion15(System.Result.Failure<System.Data.Json.JsonError>)
 M0000001d_IL_0173:
 ret
 M0000001d_IL_0174:
@@ -7718,7 +7718,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Syn
 M00000020_IL_0031:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000020_IL_0036:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion52(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion52(System.Result.Failure<System.Data.Json.JsonError>)
 M00000020_IL_003b:
 ret
 M00000020_IL_003c:
@@ -7820,7 +7820,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Syn
 M00000020_IL_00b5:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000020_IL_00ba:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion52(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion52(System.Result.Failure<System.Data.Json.JsonError>)
 M00000020_IL_00bf:
 ret
 M00000020_IL_00c0:
@@ -7887,7 +7887,7 @@ ret
 .local System.Result<String,System.Text.InvalidUtf8Error> local14
 .local System.Result.Ok<String> local15
 .local System.Result<String,System.Text.InvalidUtf8Error> local16
-.local System.Result.Error<System.Text.InvalidUtf8Error> local17
+.local System.Result.Failure<System.Text.InvalidUtf8Error> local17
 ldloca local0
 initobj System.Collections.ArrayList<Byte>
 ldc.bool false
@@ -7921,7 +7921,7 @@ initobj System.Result.Ok<String>
 ldloca local16
 initobj System.Result<String,System.Text.InvalidUtf8Error>
 ldloca local17
-initobj System.Result.Error<System.Text.InvalidUtf8Error>
+initobj System.Result.Failure<System.Text.InvalidUtf8Error>
 M00000021_IL_0000:
 M00000021_IL_0001:
 M00000021_IL_0002:
@@ -7949,7 +7949,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Lim
 M00000021_IL_002e:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000021_IL_0033:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Failure<System.Data.Json.JsonError>)
 M00000021_IL_0038:
 ret
 M00000021_IL_0039:
@@ -8063,7 +8063,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Syn
 M00000021_IL_00e1:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000021_IL_00e6:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Failure<System.Data.Json.JsonError>)
 M00000021_IL_00eb:
 ret
 M00000021_IL_00ec:
@@ -8221,7 +8221,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Syn
 M00000021_IL_01bb:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000021_IL_01c0:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Failure<System.Data.Json.JsonError>)
 M00000021_IL_01c5:
 ret
 M00000021_IL_01c6:
@@ -8567,7 +8567,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Syn
 M00000021_IL_0387:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000021_IL_038c:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Failure<System.Data.Json.JsonError>)
 M00000021_IL_0391:
 ret
 M00000021_IL_0392:
@@ -8640,7 +8640,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Syn
 M00000021_IL_03ed:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000021_IL_03f2:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Failure<System.Data.Json.JsonError>)
 M00000021_IL_03f7:
 ret
 M00000021_IL_03f8:
@@ -8758,7 +8758,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Syn
 M00000021_IL_0493:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000021_IL_0498:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Failure<System.Data.Json.JsonError>)
 M00000021_IL_049d:
 ret
 M00000021_IL_049e:
@@ -8833,7 +8833,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Syn
 M00000021_IL_0502:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000021_IL_0507:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Failure<System.Data.Json.JsonError>)
 M00000021_IL_050c:
 ret
 M00000021_IL_050d:
@@ -9086,7 +9086,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Syn
 M00000021_IL_0643:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000021_IL_0648:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Failure<System.Data.Json.JsonError>)
 M00000021_IL_064d:
 ret
 M00000021_IL_064e:
@@ -9127,7 +9127,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Syn
 M00000021_IL_067f:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000021_IL_0684:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Failure<System.Data.Json.JsonError>)
 M00000021_IL_0689:
 ret
 M00000021_IL_0690:
@@ -9166,7 +9166,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Syn
 M00000021_IL_06c0:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000021_IL_06c5:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Failure<System.Data.Json.JsonError>)
 M00000021_IL_06ca:
 ret
 M00000021_IL_06cb:
@@ -9257,7 +9257,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Syn
 M00000021_IL_0752:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000021_IL_0757:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Failure<System.Data.Json.JsonError>)
 M00000021_IL_075c:
 ret
 M00000021_IL_075d:
@@ -9311,19 +9311,19 @@ stloc local16
 M00000021_IL_07aa:
 ldloca local17
 M00000021_IL_07ac:
-initobj System.Result.Error<System.Text.InvalidUtf8Error>
+initobj System.Result.Failure<System.Text.InvalidUtf8Error>
 M00000021_IL_07b2:
 ldloca local16
 M00000021_IL_07b4:
 ldloca local17
 M00000021_IL_07b6:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion56(System.Result<String,System.Text.InvalidUtf8Error>&,System.Result.Error<System.Text.InvalidUtf8Error>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion56(System.Result<String,System.Text.InvalidUtf8Error>&,System.Result.Failure<System.Text.InvalidUtf8Error>&)
 M00000021_IL_07bb:
 brfalse M00000021_IL_07ef
 M00000021_IL_07c0:
 ldloca local17
 M00000021_IL_07c2:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion57(System.Result.Error<System.Text.InvalidUtf8Error>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion57(System.Result.Failure<System.Text.InvalidUtf8Error>&)
 M00000021_IL_07c7:
 pop
 M00000021_IL_07c8:
@@ -9339,7 +9339,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Syn
 M00000021_IL_07e4:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000021_IL_07e9:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Failure<System.Data.Json.JsonError>)
 M00000021_IL_07ee:
 ret
 M00000021_IL_07ef:
@@ -10154,7 +10154,7 @@ ret
 .local System.Result<String,System.Text.InvalidUtf8Error> local8
 .local System.Result.Ok<String> local9
 .local System.Result<String,System.Text.InvalidUtf8Error> local10
-.local System.Result.Error<System.Text.InvalidUtf8Error> local11
+.local System.Result.Failure<System.Text.InvalidUtf8Error> local11
 ldloca local0
 initobj System.Collections.Sequence<Byte>
 ldloca local1
@@ -10176,7 +10176,7 @@ initobj System.Result.Ok<String>
 ldloca local10
 initobj System.Result<String,System.Text.InvalidUtf8Error>
 ldloca local11
-initobj System.Result.Error<System.Text.InvalidUtf8Error>
+initobj System.Result.Failure<System.Text.InvalidUtf8Error>
 M00000026_IL_0000:
 M00000026_IL_0001:
 M00000026_IL_0002:
@@ -10209,7 +10209,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Lim
 M00000026_IL_0031:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000026_IL_0036:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Failure<System.Data.Json.JsonError>)
 M00000026_IL_003b:
 ret
 M00000026_IL_003c:
@@ -10432,7 +10432,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Lim
 M00000026_IL_0158:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000026_IL_015d:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Failure<System.Data.Json.JsonError>)
 M00000026_IL_0162:
 ret
 M00000026_IL_0163:
@@ -10497,19 +10497,19 @@ stloc local10
 M00000026_IL_01bf:
 ldloca local11
 M00000026_IL_01c1:
-initobj System.Result.Error<System.Text.InvalidUtf8Error>
+initobj System.Result.Failure<System.Text.InvalidUtf8Error>
 M00000026_IL_01c7:
 ldloca local10
 M00000026_IL_01c9:
 ldloca local11
 M00000026_IL_01cb:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion56(System.Result<String,System.Text.InvalidUtf8Error>&,System.Result.Error<System.Text.InvalidUtf8Error>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion56(System.Result<String,System.Text.InvalidUtf8Error>&,System.Result.Failure<System.Text.InvalidUtf8Error>&)
 M00000026_IL_01d0:
 brfalse M00000026_IL_0204
 M00000026_IL_01d5:
 ldloca local11
 M00000026_IL_01d7:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion57(System.Result.Error<System.Text.InvalidUtf8Error>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion57(System.Result.Failure<System.Text.InvalidUtf8Error>&)
 M00000026_IL_01dc:
 pop
 M00000026_IL_01dd:
@@ -10525,7 +10525,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Syn
 M00000026_IL_01f9:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000026_IL_01fe:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Failure<System.Data.Json.JsonError>)
 M00000026_IL_0203:
 ret
 M00000026_IL_0204:
@@ -10717,7 +10717,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Mis
 M0000002a_IL_0091:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M0000002a_IL_0096:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion1(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion1(System.Result.Failure<System.Data.Json.JsonError>)
 M0000002a_IL_009b:
 ret
 .end
@@ -10767,7 +10767,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Inv
 M0000002b_IL_0038:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M0000002b_IL_003d:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion1(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion1(System.Result.Failure<System.Data.Json.JsonError>)
 M0000002b_IL_0042:
 ret
 M0000002b_IL_0043:
@@ -10833,7 +10833,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Inv
 M0000002c_IL_0038:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M0000002c_IL_003d:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Failure<System.Data.Json.JsonError>)
 M0000002c_IL_0042:
 ret
 M0000002c_IL_0043:
@@ -10906,7 +10906,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Dup
 M0000002d_IL_003d:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M0000002d_IL_0042:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion15(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion15(System.Result.Failure<System.Data.Json.JsonError>)
 M0000002d_IL_0047:
 ret
 M0000002d_IL_0048:
@@ -10943,7 +10943,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Lim
 M0000002d_IL_007b:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M0000002d_IL_0080:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion15(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion15(System.Result.Failure<System.Data.Json.JsonError>)
 M0000002d_IL_0085:
 ret
 M0000002d_IL_0086:
@@ -11062,7 +11062,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Inv
 M00000030_IL_0038:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000030_IL_003d:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion1(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion1(System.Result.Failure<System.Data.Json.JsonError>)
 M00000030_IL_0042:
 ret
 M00000030_IL_0043:
@@ -11118,7 +11118,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Lim
 M00000031_IL_002e:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000031_IL_0033:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion15(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion15(System.Result.Failure<System.Data.Json.JsonError>)
 M00000031_IL_0038:
 ret
 M00000031_IL_0039:
@@ -11252,7 +11252,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Inv
 M00000036_IL_001f:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000036_IL_0024:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion58(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion58(System.Result.Failure<System.Data.Json.JsonError>)
 M00000036_IL_0029:
 ret
 M00000036_IL_002a:
@@ -11275,7 +11275,7 @@ ret
 .local System.Result<Int32,System.NumberParseError> local3
 .local System.Result.Ok<Int32> local4
 .local System.Result<Int32,System.NumberParseError> local5
-.local System.Result.Error<System.NumberParseError> local6
+.local System.Result.Failure<System.NumberParseError> local6
 ldloca local0
 initobj System.Result<Int32,System.NumberParseError>
 ldloca local1
@@ -11289,7 +11289,7 @@ initobj System.Result.Ok<Int32>
 ldloca local5
 initobj System.Result<Int32,System.NumberParseError>
 ldloca local6
-initobj System.Result.Error<System.NumberParseError>
+initobj System.Result.Failure<System.NumberParseError>
 M00000037_IL_0000:
 M00000037_IL_0001:
 M00000037_IL_0002:
@@ -11350,19 +11350,19 @@ stloc local5
 M00000037_IL_005a:
 ldloca local6
 M00000037_IL_005c:
-initobj System.Result.Error<System.NumberParseError>
+initobj System.Result.Failure<System.NumberParseError>
 M00000037_IL_0062:
 ldloca local5
 M00000037_IL_0064:
 ldloca local6
 M00000037_IL_0066:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion62(System.Result<Int32,System.NumberParseError>&,System.Result.Error<System.NumberParseError>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion62(System.Result<Int32,System.NumberParseError>&,System.Result.Failure<System.NumberParseError>&)
 M00000037_IL_006b:
 brfalse M00000037_IL_009e
 M00000037_IL_0070:
 ldloca local6
 M00000037_IL_0072:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion63(System.Result.Error<System.NumberParseError>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion63(System.Result.Failure<System.NumberParseError>&)
 M00000037_IL_0077:
 pop
 M00000037_IL_0078:
@@ -11375,7 +11375,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Num
 M00000037_IL_008e:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000037_IL_0093:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion52(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion52(System.Result.Failure<System.Data.Json.JsonError>)
 M00000037_IL_0098:
 stloc local1
 M00000037_IL_0099:
@@ -11748,7 +11748,7 @@ ret
 .local System.Result<String,System.Text.InvalidUtf8Error> local3
 .local System.Result.Ok<String> local4
 .local System.Result<String,System.Text.InvalidUtf8Error> local5
-.local System.Result.Error<System.Text.InvalidUtf8Error> local6
+.local System.Result.Failure<System.Text.InvalidUtf8Error> local6
 ldloca local0
 initobj System.Result<String,System.Text.InvalidUtf8Error>
 ldloca local1
@@ -11760,7 +11760,7 @@ initobj System.Result.Ok<String>
 ldloca local5
 initobj System.Result<String,System.Text.InvalidUtf8Error>
 ldloca local6
-initobj System.Result.Error<System.Text.InvalidUtf8Error>
+initobj System.Result.Failure<System.Text.InvalidUtf8Error>
 M00000041_IL_0000:
 M00000041_IL_0001:
 M00000041_IL_0002:
@@ -11788,7 +11788,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Rea
 M00000041_IL_0029:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000041_IL_002e:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Failure<System.Data.Json.JsonError>)
 M00000041_IL_0033:
 ret
 M00000041_IL_0034:
@@ -11818,7 +11818,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Lim
 M00000041_IL_0062:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000041_IL_0067:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Failure<System.Data.Json.JsonError>)
 M00000041_IL_006c:
 ret
 M00000041_IL_006d:
@@ -11880,19 +11880,19 @@ stloc local5
 M00000041_IL_00c6:
 ldloca local6
 M00000041_IL_00c8:
-initobj System.Result.Error<System.Text.InvalidUtf8Error>
+initobj System.Result.Failure<System.Text.InvalidUtf8Error>
 M00000041_IL_00ce:
 ldloca local5
 M00000041_IL_00d0:
 ldloca local6
 M00000041_IL_00d2:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion56(System.Result<String,System.Text.InvalidUtf8Error>&,System.Result.Error<System.Text.InvalidUtf8Error>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion56(System.Result<String,System.Text.InvalidUtf8Error>&,System.Result.Failure<System.Text.InvalidUtf8Error>&)
 M00000041_IL_00d7:
 brfalse M00000041_IL_0114
 M00000041_IL_00dc:
 ldloca local6
 M00000041_IL_00de:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion57(System.Result.Error<System.Text.InvalidUtf8Error>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion57(System.Result.Failure<System.Text.InvalidUtf8Error>&)
 M00000041_IL_00e3:
 pop
 M00000041_IL_00e4:
@@ -11909,7 +11909,7 @@ newobj instance System.Data.Json.JsonError::.ctor(System.Data.Json.JsonError.Rea
 M00000041_IL_0104:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion0(System.Data.Json.JsonError)
 M00000041_IL_0109:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Error<System.Data.Json.JsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion51(System.Result.Failure<System.Data.Json.JsonError>)
 M00000041_IL_010e:
 stloc local1
 M00000041_IL_010f:
@@ -11946,7 +11946,7 @@ ret
 .local System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError> local4
 .local System.Result.Ok<System.Web.Http.HttpResponse> local5
 .local System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError> local6
-.local System.Result.Error<System.Web.Http.HttpError> local7
+.local System.Result.Failure<System.Web.Http.HttpError> local7
 ldloca local0
 initobj System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>
 ldloca local1
@@ -11962,7 +11962,7 @@ initobj System.Result.Ok<System.Web.Http.HttpResponse>
 ldloca local6
 initobj System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>
 ldloca local7
-initobj System.Result.Error<System.Web.Http.HttpError>
+initobj System.Result.Failure<System.Web.Http.HttpError>
 M0000004c_IL_0000:
 M0000004c_IL_0001:
 M0000004c_IL_0002:
@@ -12018,19 +12018,19 @@ stloc local6
 M0000004c_IL_0050:
 ldloca local7
 M0000004c_IL_0052:
-initobj System.Result.Error<System.Web.Http.HttpError>
+initobj System.Result.Failure<System.Web.Http.HttpError>
 M0000004c_IL_0058:
 ldloca local6
 M0000004c_IL_005a:
 ldloca local7
 M0000004c_IL_005c:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion73(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>&,System.Result.Error<System.Web.Http.HttpError>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion73(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>&,System.Result.Failure<System.Web.Http.HttpError>&)
 M0000004c_IL_0061:
 brfalse M0000004c_IL_0096
 M0000004c_IL_0066:
 ldloca local7
 M0000004c_IL_0068:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion76(System.Result.Error<System.Web.Http.HttpError>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion76(System.Result.Failure<System.Web.Http.HttpError>&)
 M0000004c_IL_006d:
 stloc local3
 M0000004c_IL_006e:
@@ -12046,7 +12046,7 @@ newobj instance System.Web.Http.Json.HttpJsonError::.ctor(System.Web.Http.Json.H
 M0000004c_IL_0086:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion77(System.Web.Http.Json.HttpJsonError)
 M0000004c_IL_008b:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion78(System.Result.Error<System.Web.Http.Json.HttpJsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion78(System.Result.Failure<System.Web.Http.Json.HttpJsonError>)
 M0000004c_IL_0090:
 stloc local1
 M0000004c_IL_0091:
@@ -12095,7 +12095,7 @@ ret
 .local System.Result<System.Web.Http.HttpContent,System.Data.Json.JsonError> local5
 .local System.Result.Ok<System.Web.Http.HttpContent> local6
 .local System.Result<System.Web.Http.HttpContent,System.Data.Json.JsonError> local7
-.local System.Result.Error<System.Data.Json.JsonError> local8
+.local System.Result.Failure<System.Data.Json.JsonError> local8
 ldloca local0
 initobj System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>
 ldloca local1
@@ -12113,7 +12113,7 @@ initobj System.Result.Ok<System.Web.Http.HttpContent>
 ldloca local7
 initobj System.Result<System.Web.Http.HttpContent,System.Data.Json.JsonError>
 ldloca local8
-initobj System.Result.Error<System.Data.Json.JsonError>
+initobj System.Result.Failure<System.Data.Json.JsonError>
 M0000004e_IL_0000:
 M0000004e_IL_0001:
 M0000004e_IL_0002:
@@ -12208,19 +12208,19 @@ stloc local7
 M0000004e_IL_008c:
 ldloca local8
 M0000004e_IL_008e:
-initobj System.Result.Error<System.Data.Json.JsonError>
+initobj System.Result.Failure<System.Data.Json.JsonError>
 M0000004e_IL_0094:
 ldloca local7
 M0000004e_IL_0096:
 ldloca local8
 M0000004e_IL_0098:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion81(System.Result<System.Web.Http.HttpContent,System.Data.Json.JsonError>&,System.Result.Error<System.Data.Json.JsonError>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion81(System.Result<System.Web.Http.HttpContent,System.Data.Json.JsonError>&,System.Result.Failure<System.Data.Json.JsonError>&)
 M0000004e_IL_009d:
 brfalse M0000004e_IL_00b6
 M0000004e_IL_00a2:
 ldloca local8
 M0000004e_IL_00a4:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion82(System.Result.Error<System.Data.Json.JsonError>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion82(System.Result.Failure<System.Data.Json.JsonError>&)
 M0000004e_IL_00a9:
 stloc local3
 M0000004e_IL_00aa:
@@ -12244,7 +12244,7 @@ newobj instance System.Web.Http.Json.HttpJsonError::.ctor(System.Web.Http.Json.H
 M0000004e_IL_00d0:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion77(System.Web.Http.Json.HttpJsonError)
 M0000004e_IL_00d5:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion78(System.Result.Error<System.Web.Http.Json.HttpJsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion78(System.Result.Failure<System.Web.Http.Json.HttpJsonError>)
 M0000004e_IL_00da:
 call instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>::Complete(System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>)
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeBooleanToInt32(Boolean)
@@ -12297,7 +12297,7 @@ ret
 .local System.Result<System.Web.Http.HttpContent,System.Data.Json.JsonError> local5
 .local System.Result.Ok<System.Web.Http.HttpContent> local6
 .local System.Result<System.Web.Http.HttpContent,System.Data.Json.JsonError> local7
-.local System.Result.Error<System.Data.Json.JsonError> local8
+.local System.Result.Failure<System.Data.Json.JsonError> local8
 ldloca local0
 initobj System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>
 ldloca local1
@@ -12315,7 +12315,7 @@ initobj System.Result.Ok<System.Web.Http.HttpContent>
 ldloca local7
 initobj System.Result<System.Web.Http.HttpContent,System.Data.Json.JsonError>
 ldloca local8
-initobj System.Result.Error<System.Data.Json.JsonError>
+initobj System.Result.Failure<System.Data.Json.JsonError>
 M00000050_IL_0000:
 M00000050_IL_0001:
 M00000050_IL_0002:
@@ -12410,19 +12410,19 @@ stloc local7
 M00000050_IL_008c:
 ldloca local8
 M00000050_IL_008e:
-initobj System.Result.Error<System.Data.Json.JsonError>
+initobj System.Result.Failure<System.Data.Json.JsonError>
 M00000050_IL_0094:
 ldloca local7
 M00000050_IL_0096:
 ldloca local8
 M00000050_IL_0098:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion81(System.Result<System.Web.Http.HttpContent,System.Data.Json.JsonError>&,System.Result.Error<System.Data.Json.JsonError>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion81(System.Result<System.Web.Http.HttpContent,System.Data.Json.JsonError>&,System.Result.Failure<System.Data.Json.JsonError>&)
 M00000050_IL_009d:
 brfalse M00000050_IL_00b6
 M00000050_IL_00a2:
 ldloca local8
 M00000050_IL_00a4:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion82(System.Result.Error<System.Data.Json.JsonError>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion82(System.Result.Failure<System.Data.Json.JsonError>&)
 M00000050_IL_00a9:
 stloc local3
 M00000050_IL_00aa:
@@ -12446,7 +12446,7 @@ newobj instance System.Web.Http.Json.HttpJsonError::.ctor(System.Web.Http.Json.H
 M00000050_IL_00d0:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion77(System.Web.Http.Json.HttpJsonError)
 M00000050_IL_00d5:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion78(System.Result.Error<System.Web.Http.Json.HttpJsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion78(System.Result.Failure<System.Web.Http.Json.HttpJsonError>)
 M00000050_IL_00da:
 call instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>::Complete(System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>)
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeBooleanToInt32(Boolean)
@@ -12495,13 +12495,13 @@ ret
 .local System.Object local4
 .local System.Data.Json.JsonError local5
 .local System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError> local6
-.local System.Result.Error<System.Web.Http.HttpError> local7
+.local System.Result.Failure<System.Web.Http.HttpError> local7
 .local System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError> local8
 .local System.Result.Ok<System.Web.Http.HttpResponse> local9
 .local System.Result<System.Object,System.Data.Json.JsonError> local10
 .local System.Result.Ok<System.Object> local11
 .local System.Result<System.Object,System.Data.Json.JsonError> local12
-.local System.Result.Error<System.Data.Json.JsonError> local13
+.local System.Result.Failure<System.Data.Json.JsonError> local13
 ldloca local0
 initobj System.Web.Http.HttpError
 ldloca local1
@@ -12515,7 +12515,7 @@ initobj System.Data.Json.JsonError
 ldloca local6
 initobj System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>
 ldloca local7
-initobj System.Result.Error<System.Web.Http.HttpError>
+initobj System.Result.Failure<System.Web.Http.HttpError>
 ldloca local8
 initobj System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>
 ldloca local9
@@ -12527,7 +12527,7 @@ initobj System.Result.Ok<System.Object>
 ldloca local12
 initobj System.Result<System.Object,System.Data.Json.JsonError>
 ldloca local13
-initobj System.Result.Error<System.Data.Json.JsonError>
+initobj System.Result.Failure<System.Data.Json.JsonError>
 M00000052_IL_0000:
 M00000052_IL_0001:
 M00000052_IL_0002:
@@ -12537,19 +12537,19 @@ stloc local6
 M00000052_IL_0005:
 ldloca local7
 M00000052_IL_0007:
-initobj System.Result.Error<System.Web.Http.HttpError>
+initobj System.Result.Failure<System.Web.Http.HttpError>
 M00000052_IL_000d:
 ldloca local6
 M00000052_IL_000f:
 ldloca local7
 M00000052_IL_0011:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion73(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>&,System.Result.Error<System.Web.Http.HttpError>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion73(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>&,System.Result.Failure<System.Web.Http.HttpError>&)
 M00000052_IL_0016:
 brfalse M00000052_IL_002f
 M00000052_IL_001b:
 ldloca local7
 M00000052_IL_001d:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion76(System.Result.Error<System.Web.Http.HttpError>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion76(System.Result.Failure<System.Web.Http.HttpError>&)
 M00000052_IL_0022:
 stloc local0
 M00000052_IL_0023:
@@ -12567,7 +12567,7 @@ newobj instance System.Web.Http.Json.HttpJsonError::.ctor(System.Web.Http.Json.H
 M00000052_IL_0040:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion77(System.Web.Http.Json.HttpJsonError)
 M00000052_IL_0045:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion83(System.Result.Error<System.Web.Http.Json.HttpJsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion83(System.Result.Failure<System.Web.Http.Json.HttpJsonError>)
 M00000052_IL_004a:
 ret
 M00000052_IL_004b:
@@ -12639,7 +12639,7 @@ newobj instance System.Web.Http.Json.HttpJsonError::.ctor(System.Web.Http.Json.H
 M00000052_IL_00c0:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion77(System.Web.Http.Json.HttpJsonError)
 M00000052_IL_00c5:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion83(System.Result.Error<System.Web.Http.Json.HttpJsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion83(System.Result.Failure<System.Web.Http.Json.HttpJsonError>)
 M00000052_IL_00ca:
 ret
 M00000052_IL_00cb:
@@ -12705,19 +12705,19 @@ stloc local12
 M00000052_IL_012d:
 ldloca local13
 M00000052_IL_012f:
-initobj System.Result.Error<System.Data.Json.JsonError>
+initobj System.Result.Failure<System.Data.Json.JsonError>
 M00000052_IL_0135:
 ldloca local12
 M00000052_IL_0137:
 ldloca local13
 M00000052_IL_0139:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion85(System.Result<System.Object,System.Data.Json.JsonError>&,System.Result.Error<System.Data.Json.JsonError>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion85(System.Result<System.Object,System.Data.Json.JsonError>&,System.Result.Failure<System.Data.Json.JsonError>&)
 M00000052_IL_013e:
 brfalse M00000052_IL_0175
 M00000052_IL_0143:
 ldloca local13
 M00000052_IL_0145:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion82(System.Result.Error<System.Data.Json.JsonError>&)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion82(System.Result.Failure<System.Data.Json.JsonError>&)
 M00000052_IL_014a:
 stloc local5
 M00000052_IL_014c:
@@ -12733,7 +12733,7 @@ newobj instance System.Web.Http.Json.HttpJsonError::.ctor(System.Web.Http.Json.H
 M00000052_IL_0165:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion77(System.Web.Http.Json.HttpJsonError)
 M00000052_IL_016a:
-call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion83(System.Result.Error<System.Web.Http.Json.HttpJsonError>)
+call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion83(System.Result.Failure<System.Web.Http.Json.HttpJsonError>)
 M00000052_IL_016f:
 stloc local3
 M00000052_IL_0170:

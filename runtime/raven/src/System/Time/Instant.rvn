@@ -24,12 +24,12 @@ public struct Instant : ComparableTo<Instant>, EquatableTo<Instant> {
         let amount = duration.Ticks
         if amount > 0L {
             if StoredTicks > 9223372036854775807L - amount {
-                return Error(OverflowError())
+                return Failure(OverflowError())
             }
         }
         if amount < 0L {
             if StoredTicks < -9223372036854775808L - amount {
-                return Error(OverflowError())
+                return Failure(OverflowError())
             }
         }
         return Ok(Instant(StoredTicks + amount))

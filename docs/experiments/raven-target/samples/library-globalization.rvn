@@ -19,7 +19,7 @@ func RequireDate(result: Result<Date, InvalidDateError>) -> Date {
 
 func RejectDate(result: Result<Date, InvalidDateError>) {
     match result {
-        .Error(_) => { }
+        .Failure(_) => { }
         .Ok(_) => System.Fail("Expected invalid date")
     }
 }
@@ -113,15 +113,15 @@ func Main() {
         Check(total == end.DayOfYear)
     }
     match calendar.IsLeapYear(0) {
-        .Error(_) => { }
+        .Failure(_) => { }
         .Ok(_) => System.Fail("Invalid year accepted")
     }
     match calendar.GetDaysInMonth(10000, 12) {
-        .Error(_) => { }
+        .Failure(_) => { }
         .Ok(_) => System.Fail("Invalid year accepted")
     }
     match calendar.GetDaysInMonth(2024, 13) {
-        .Error(_) => { }
+        .Failure(_) => { }
         .Ok(_) => System.Fail("Invalid month accepted")
     }
     let Ok(time) = TimeOfDay.Create(12, 34, 56, 1234567) else {
@@ -180,7 +180,7 @@ func Main() {
     Check(Text(swedish.DateTimeFormat.FormatLocalDateTime(local)).Equals("2024-02-29 12:34:56,1234567"))
     Check(Text(israeli.DateTimeFormat.FormatLocalDateTime(local)).Equals("29.02.2024 12:34:56.1234567"))
     match hebrewFormat.FormatDate(first) {
-        .Error(_) => { }
+        .Failure(_) => { }
         .Ok(_) => System.Fail("Out-of-range Hebrew formatting accepted")
     }
     let hebrewLocal = LocalDateTime.Create(newYear, time)

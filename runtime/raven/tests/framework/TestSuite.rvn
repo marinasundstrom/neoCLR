@@ -172,7 +172,7 @@ class TestSuite {
                         results.Add(TestExecution(test.Id, test.Name, TestOutcome.Passed()))
                         passed = passed + 1
                     }
-                    Error(let failure) => {
+                    Failure(let failure) => {
                         results.Add(TestExecution(test.Id, test.Name, TestOutcome.Failed(failure)))
                         failed = failed + 1
                     }

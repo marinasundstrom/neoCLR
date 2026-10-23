@@ -29,7 +29,7 @@ public func AfterOrdinal(source: string, delimiter: string) -> Option<string> {
             let start = range.Utf8Start + range.Utf8Length
             match owner.Slice(SourceRange(owner, start, source.GetUtf8ByteCount() - start)) {
                 Ok(let suffix) => return Some(suffix)
-                Error(_) => System.Fail("Invalid internally constructed suffix")
+                Failure(_) => System.Fail("Invalid internally constructed suffix")
             }
         }
     }

@@ -12,9 +12,9 @@ func Outcome(kind: int, value: byte) -> Result<Option<byte>, ConsoleReadError> {
         return Ok(absent)
     }
     if kind == 2 {
-        return Error(ConsoleReadError.Unavailable())
+        return Failure(ConsoleReadError.Unavailable())
     }
-    return Error(ConsoleReadError.ReadFailed())
+    return Failure(ConsoleReadError.ReadFailed())
 }
 
 func Inspect(item: Result<Option<byte>, ConsoleReadError>) -> int {
@@ -27,7 +27,7 @@ func Inspect(item: Result<Option<byte>, ConsoleReadError>) -> int {
         }
         return -4
     }
-    let Error(error) = item else {
+    let Failure(error) = item else {
         return -4
     }
     if let ConsoleReadError.Unavailable = error {

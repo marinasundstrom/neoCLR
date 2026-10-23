@@ -172,7 +172,7 @@ call neoCLR.Library.System.Time.ZonedDateTime.RuntimeErrorSystemTimeTimeZoneErro
 M00000002_IL_0094:
 call neoCLR.Library.System.Time.ZonedDateTime.RuntimeUnion5(System.Time.TimeZoneError)
 M00000002_IL_0099:
-call neoCLR.Library.System.Time.ZonedDateTime.RuntimeUnion6(System.Result.Error<System.Time.TimeZoneError>)
+call neoCLR.Library.System.Time.ZonedDateTime.RuntimeUnion6(System.Result.Failure<System.Time.TimeZoneError>)
 M00000002_IL_009e:
 ret
 M00000002_IL_009f:

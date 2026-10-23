@@ -52,7 +52,7 @@ fn none_and_some_void_are_distinct_and_queries_agree() {
 #[test]
 fn void_success_and_arbitrary_error_payloads_use_ordinary_wrappers() {
     assert_eq!(evaluate("ldvoid\nnewobj instance System.Result.Ok<Void>::.ctor(Void)\nnewobj instance System.Result<Void,String>::.ctor(System.Result.Ok<Void>)\ncall instance System.Result<Void,String>::GetOkCase()\ncall instance System.Result.Ok<Void>::get_Value()", "Void").unwrap(), Value::Void);
-    assert_eq!(evaluate("ldstr \"failure text\"\nnewobj instance System.Result.Error<String>::.ctor(String)\nnewobj instance System.Result<Void,String>::.ctor(System.Result.Error<String>)\ncall instance System.Result<Void,String>::GetErrorCase()\ncall instance System.Result.Error<String>::get_Value()", "String").unwrap(), Value::String("failure text".into()));
+    assert_eq!(evaluate("ldstr \"failure text\"\nnewobj instance System.Result.Failure<String>::.ctor(String)\nnewobj instance System.Result<Void,String>::.ctor(System.Result.Failure<String>)\ncall instance System.Result<Void,String>::GetFailureCase()\ncall instance System.Result.Failure<String>::get_Value()", "String").unwrap(), Value::String("failure text".into()));
 }
 
 #[test]
@@ -101,7 +101,7 @@ fn carrier_execution_does_not_depend_on_markers_or_bootstrap_union_opcodes() {
             || f.name.starts_with("System.Option.Some.")
             || f.name.starts_with("System.Option.None.")
             || f.name.starts_with("System.Result.Ok.")
-            || f.name.starts_with("System.Result.Error.")
+            || f.name.starts_with("System.Result.Failure.")
     });
     let mut count = 0;
     for method in new_methods {

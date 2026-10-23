@@ -10,10 +10,10 @@ func Check(condition: bool) {
 }
 
 func Main() {
-    let http: Result<ReportPayload, HttpError | JsonError> = Error(HttpError.TimedOut)
-    let json: Result<ReportPayload, HttpError | JsonError> = Error(JsonError.Syntax("invalid"))
-    Check(AdaptClientResult(http) is Error(AppError.Http(HttpError.TimedOut)))
-    Check(AdaptClientResult(json) is Error(AppError.Json(JsonError.Syntax("invalid"))))
+    let http: Result<ReportPayload, HttpError | JsonError> = Failure(HttpError.TimedOut)
+    let json: Result<ReportPayload, HttpError | JsonError> = Failure(JsonError.Syntax("invalid"))
+    Check(AdaptClientResult(http) is Failure(AppError.Http(HttpError.TimedOut)))
+    Check(AdaptClientResult(json) is Failure(AppError.Json(JsonError.Syntax("invalid"))))
     let Ok(payload) = CreateReport() else {
         System.Fail("Report creation failed")
     }

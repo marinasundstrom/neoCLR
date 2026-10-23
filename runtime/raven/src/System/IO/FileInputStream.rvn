@@ -17,7 +17,7 @@ public class FileInputStream : InputStream, SeekableStream {
     static func Open(path: string) -> Result<FileInputStream, StreamError> {
         let payload = neoCLR.Runtime.FileOpenRead(path)
         if neoCLR.Runtime.IsValue<byte>(payload) {
-            return Error(DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload)))
+            return Failure(DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload)))
         }
         return Ok(FileInputStream(neoCLR.Runtime.UnpackValue<int>(payload)))
     }
@@ -38,37 +38,37 @@ public class FileInputStream : InputStream, SeekableStream {
 
     private func ReadCore(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
         if closed {
-            return Error(StreamError.Closed())
+            return Failure(StreamError.Closed())
         }
         if offset < 0 || count < 0 || offset > buffer.Length || count > buffer.Length - offset {
-            return Error(StreamError.InvalidRange)
+            return Failure(StreamError.InvalidRange)
         }
         let memory: Memory<byte> = buffer
         let payload = neoCLR.Runtime.FileReadInto(handle, memory.Slice(offset, count))
         if neoCLR.Runtime.IsValue<byte>(payload) {
-            return Error(DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload)))
+            return Failure(DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload)))
         }
         return Ok(neoCLR.Runtime.UnpackValue<int>(payload))
     }
 
     func GetPosition() -> Result<long, StreamError> {
         if closed {
-            return Error(StreamError.Closed())
+            return Failure(StreamError.Closed())
         }
         let payload = neoCLR.Runtime.FilePosition(handle)
         if neoCLR.Runtime.IsValue<byte>(payload) {
-            return Error(DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload)))
+            return Failure(DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload)))
         }
         return Ok(neoCLR.Runtime.UnpackValue<long>(payload))
     }
 
     func Seek(position: long) -> Result<long, StreamError> {
         if closed {
-            return Error(StreamError.Closed())
+            return Failure(StreamError.Closed())
         }
         let payload = neoCLR.Runtime.FileSeek(handle, position)
         if neoCLR.Runtime.IsValue<byte>(payload) {
-            return Error(DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload)))
+            return Failure(DecodeError(neoCLR.Runtime.UnpackValue<byte>(payload)))
         }
         return Ok(neoCLR.Runtime.UnpackValue<long>(payload))
     }

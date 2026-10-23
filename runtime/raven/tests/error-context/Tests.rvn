@@ -51,7 +51,7 @@ func ALeafErrors() -> Result<unit, TestFailure> {
 func BTypedCause() -> Result<unit, TestFailure> {
     let context = FileReadError.NotFound.WithContext("Loading configuration")
     _ = Assert.True(context.Cause is FileReadError.NotFound, "Typed case retained")?
-    let view: System.Error = context
+    let view: Error = context
     _ = Assert.Equal("Loading configuration", view.Message)?
     _ = Assert.True(view.Cause is Some(FileReadError), "Interface retains concrete error")?
     return Assert.True(view.StackTrace is None, "No implicit trace")
@@ -70,7 +70,7 @@ func CSuccessBypass() -> Result<unit, TestFailure> {
 }
 
 func Propagate() -> Result<int, ContextError<FileReadError>> {
-    let failure: Result<int, FileReadError> = Error(FileReadError.AccessDenied)
+    let failure: Result<int, FileReadError> = Failure(FileReadError.AccessDenied)
     let value = failure.WithContext("Reading settings")?
     return Ok(value + 1)
 }
@@ -78,17 +78,17 @@ func Propagate() -> Result<int, ContextError<FileReadError>> {
 [Test("Failure context evaluates once and propagates the typed wrapper")]
 func DFailurePropagation() -> Result<unit, TestFailure> {
     let calls = Counter()
-    let failure: Result<int, FileReadError> = Error(FileReadError.NotFound)
+    let failure: Result<int, FileReadError> = Failure(FileReadError.NotFound)
     let wrapped = failure.WithContext(() => {
         calls.Value = calls.Value + 1
         return "Reading file"
     })
     _ = Assert.Equal(1, calls.Value)?
-    let Error(context) = wrapped else {
+    let Failure(context) = wrapped else {
         return Assert.True(false, "Expected contextual failure")
     }
     _ = Assert.True(context.Cause is FileReadError.NotFound, "Original payload")?
-    let Error(propagated) = Propagate() else {
+    let Failure(propagated) = Propagate() else {
         return Assert.True(false, "Expected propagated failure")
     }
     return Assert.True(propagated.Cause is FileReadError.AccessDenied, "Propagation retained cause")
@@ -139,9 +139,9 @@ func GDomainMapping() -> Result<unit, TestFailure> {
         return Assert.True(false, "Expected domain trace")
     }
     _ = Assert.True(Object.ReferenceEquals(originalTrace, retainedTrace), "Trace found through domain cause")?
-    let source: Result<int, FileReadError> = Error(FileReadError.NotFound)
+    let source: Result<int, FileReadError> = Failure(FileReadError.NotFound)
     let mapped = source.MapError(error => DomainError(error))
-    let Error(value) = mapped else {
+    let Failure(value) = mapped else {
         return Assert.True(false, "Expected mapped error")
     }
     return Assert.True(value.Cause is Some(FileReadError), "Mapping retains structured cause")
@@ -157,8 +157,8 @@ func HBoundedChains() -> Result<unit, TestFailure> {
 
 [Test("Unrelated result error types remain unconstrained")]
 func IUnconstrainedResult() -> Result<unit, TestFailure> {
-    let value: Result<int, string> = Error("ordinary residual")
-    return Assert.True(value is Error("ordinary residual"), "No mandatory Error interface")
+    let value: Result<int, string> = Failure("ordinary residual")
+    return Assert.True(value is Failure("ordinary residual"), "No mandatory Error interface")
 }
 
 [Test("Application capture policy is opt in and explicit overrides win")]
@@ -195,7 +195,7 @@ func KConditionalCapturePolicy() -> Result<unit, TestFailure> {
 }
 
 func ReadThroughErrorBoundary() -> Result<int, System.Error> {
-    let failure: Result<int, FileReadError> = Error(FileReadError.NotFound)
+    let failure: Result<int, FileReadError> = Failure(FileReadError.NotFound)
     let value = failure?
     return Ok(value)
 }
@@ -207,12 +207,12 @@ func ReadThroughContextBoundary() -> Result<int, System.Error> {
 
 [Test("Interface result boundaries preserve runtime errors without automatic context")]
 func LInterfaceBoundary() -> Result<unit, TestFailure> {
-    let Error(error) = ReadThroughErrorBoundary() else {
+    let Failure(error) = ReadThroughErrorBoundary() else {
         return Assert.True(false, "Expected interface error")
     }
     _ = Assert.True(error is FileReadError, "Concrete error retained")?
     _ = Assert.True(error.Cause is None && error.StackTrace is None, "No automatic decoration")?
-    let Error(context) = ReadThroughContextBoundary() else {
+    let Failure(context) = ReadThroughContextBoundary() else {
         return Assert.True(false, "Expected interface context")
     }
     _ = Assert.True(context is ContextError<FileReadError>, "Explicit context retained")?

@@ -7,7 +7,7 @@ import System.IO.*
 
 func ExpectError(result: Result<int, StreamError>, name: string) {
     match result {
-        Error(let error) => {
+        Failure(let error) => {
             if error.ToString() != name {
                 System.Fail("Wrong stream error")
             }
@@ -23,13 +23,13 @@ func ExpectCount(result: Result<int, StreamError>, expected: int) {
                 System.Fail("Wrong transfer count")
             }
         }
-        Error(let error) => System.Fail(error.ToString())
+        Failure(let error) => System.Fail(error.ToString())
     }
 }
 
 func Main() {
     match FileInputStream.Open("missing-file") {
-        Error(let error) => {
+        Failure(let error) => {
             if !(error is System.IO.StreamError.NotFound) {
                 System.Fail("Expected missing file")
             }
@@ -40,7 +40,7 @@ func Main() {
         }
     }
     match FileInputStream.Open("") {
-        Error(let error) => {
+        Failure(let error) => {
             if !(error is System.IO.StreamError.InvalidPath) {
                 System.Fail("Expected invalid path")
             }
@@ -51,7 +51,7 @@ func Main() {
         }
     }
     match FileInputStream.Open(".") {
-        Error(let error) => {
+        Failure(let error) => {
             if !(error is System.IO.StreamError.WrongKind) {
                 System.Fail("Expected wrong kind")
             }
@@ -82,7 +82,7 @@ func Main() {
             ExpectError(input.Read(buffer, 0, 1), "Closed")
             ExpectError(capability.Read(buffer, 0, 1), "Closed")
         }
-        Error(let error) => System.Fail(error.ToString())
+        Failure(let error) => System.Fail(error.ToString())
     }
     match FileOutputStream.CreateNew("failed-write.bin") {
         Ok(let output) => {
@@ -94,7 +94,7 @@ func Main() {
             output.Close()
             ExpectError(output.Write(buffer, 0, 1), "Closed")
             match capability.Flush() {
-                Error(let error) => {
+                Failure(let error) => {
                     if !(error is System.IO.StreamError.Closed) {
                         System.Fail("Unexpected closed flush error")
                     }
@@ -102,14 +102,14 @@ func Main() {
                 Ok(_) => System.Fail("Flush ignored interface close")
             }
         }
-        Error(let error) => System.Fail(error.ToString())
+        Failure(let error) => System.Fail(error.ToString())
     }
     // Exceed the simultaneous-open budget cumulatively: Close must release slots.
     var iteration = 0
     while iteration < 70 {
         match FileInputStream.Open("stream.txt") {
             Ok(let input) => input.Close()
-            Error(let error) => System.Fail(error.ToString())
+            Failure(let error) => System.Fail(error.ToString())
         }
         iteration += 1
     }

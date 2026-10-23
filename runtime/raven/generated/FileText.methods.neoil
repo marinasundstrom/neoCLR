@@ -64,7 +64,7 @@ call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileWriteEr
 M00000001_IL_004e:
 call neoCLR.Library.System.Storage.FileText.RuntimeUnion2(System.Storage.FileWriteError)
 M00000001_IL_0053:
-call neoCLR.Library.System.Storage.FileText.RuntimeUnion3(System.Result.Error<System.Storage.FileWriteError>)
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion3(System.Result.Failure<System.Storage.FileWriteError>)
 M00000001_IL_0058:
 ret
 M00000001_IL_0059:
@@ -87,7 +87,7 @@ call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileWriteEr
 M00000001_IL_0073:
 call neoCLR.Library.System.Storage.FileText.RuntimeUnion2(System.Storage.FileWriteError)
 M00000001_IL_0078:
-call neoCLR.Library.System.Storage.FileText.RuntimeUnion3(System.Result.Error<System.Storage.FileWriteError>)
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion3(System.Result.Failure<System.Storage.FileWriteError>)
 M00000001_IL_007d:
 ret
 M00000001_IL_007e:
@@ -110,7 +110,7 @@ call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileWriteEr
 M00000001_IL_0098:
 call neoCLR.Library.System.Storage.FileText.RuntimeUnion2(System.Storage.FileWriteError)
 M00000001_IL_009d:
-call neoCLR.Library.System.Storage.FileText.RuntimeUnion3(System.Result.Error<System.Storage.FileWriteError>)
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion3(System.Result.Failure<System.Storage.FileWriteError>)
 M00000001_IL_00a2:
 ret
 M00000001_IL_00a3:
@@ -133,7 +133,7 @@ call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileWriteEr
 M00000001_IL_00bd:
 call neoCLR.Library.System.Storage.FileText.RuntimeUnion2(System.Storage.FileWriteError)
 M00000001_IL_00c2:
-call neoCLR.Library.System.Storage.FileText.RuntimeUnion3(System.Result.Error<System.Storage.FileWriteError>)
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion3(System.Result.Failure<System.Storage.FileWriteError>)
 M00000001_IL_00c7:
 ret
 M00000001_IL_00c8:
@@ -156,7 +156,7 @@ call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileWriteEr
 M00000001_IL_00e2:
 call neoCLR.Library.System.Storage.FileText.RuntimeUnion2(System.Storage.FileWriteError)
 M00000001_IL_00e7:
-call neoCLR.Library.System.Storage.FileText.RuntimeUnion3(System.Result.Error<System.Storage.FileWriteError>)
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion3(System.Result.Failure<System.Storage.FileWriteError>)
 M00000001_IL_00ec:
 ret
 M00000001_IL_00ed:
@@ -179,7 +179,7 @@ call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileWriteEr
 M00000001_IL_0107:
 call neoCLR.Library.System.Storage.FileText.RuntimeUnion2(System.Storage.FileWriteError)
 M00000001_IL_010c:
-call neoCLR.Library.System.Storage.FileText.RuntimeUnion3(System.Result.Error<System.Storage.FileWriteError>)
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion3(System.Result.Failure<System.Storage.FileWriteError>)
 M00000001_IL_0111:
 ret
 M00000001_IL_0112:
@@ -202,7 +202,7 @@ call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileWriteEr
 M00000001_IL_012c:
 call neoCLR.Library.System.Storage.FileText.RuntimeUnion2(System.Storage.FileWriteError)
 M00000001_IL_0131:
-call neoCLR.Library.System.Storage.FileText.RuntimeUnion3(System.Result.Error<System.Storage.FileWriteError>)
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion3(System.Result.Failure<System.Storage.FileWriteError>)
 M00000001_IL_0136:
 ret
 M00000001_IL_0137:
@@ -283,7 +283,7 @@ call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileReadErr
 M00000002_IL_0053:
 call neoCLR.Library.System.Storage.FileText.RuntimeUnion6(System.Storage.FileReadError)
 M00000002_IL_0058:
-call neoCLR.Library.System.Storage.FileText.RuntimeUnion7(System.Result.Error<System.Storage.FileReadError>)
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion7(System.Result.Failure<System.Storage.FileReadError>)
 M00000002_IL_005d:
 ret
 M00000002_IL_005e:
@@ -308,7 +308,7 @@ call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileReadErr
 M00000002_IL_0079:
 call neoCLR.Library.System.Storage.FileText.RuntimeUnion6(System.Storage.FileReadError)
 M00000002_IL_007e:
-call neoCLR.Library.System.Storage.FileText.RuntimeUnion7(System.Result.Error<System.Storage.FileReadError>)
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion7(System.Result.Failure<System.Storage.FileReadError>)
 M00000002_IL_0083:
 ret
 M00000002_IL_0084:
@@ -333,7 +333,7 @@ call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileReadErr
 M00000002_IL_009f:
 call neoCLR.Library.System.Storage.FileText.RuntimeUnion6(System.Storage.FileReadError)
 M00000002_IL_00a4:
-call neoCLR.Library.System.Storage.FileText.RuntimeUnion7(System.Result.Error<System.Storage.FileReadError>)
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion7(System.Result.Failure<System.Storage.FileReadError>)
 M00000002_IL_00a9:
 ret
 M00000002_IL_00aa:
@@ -358,7 +358,7 @@ call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileReadErr
 M00000002_IL_00c5:
 call neoCLR.Library.System.Storage.FileText.RuntimeUnion6(System.Storage.FileReadError)
 M00000002_IL_00ca:
-call neoCLR.Library.System.Storage.FileText.RuntimeUnion7(System.Result.Error<System.Storage.FileReadError>)
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion7(System.Result.Failure<System.Storage.FileReadError>)
 M00000002_IL_00cf:
 ret
 M00000002_IL_00d0:
@@ -383,7 +383,7 @@ call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileReadErr
 M00000002_IL_00eb:
 call neoCLR.Library.System.Storage.FileText.RuntimeUnion6(System.Storage.FileReadError)
 M00000002_IL_00f0:
-call neoCLR.Library.System.Storage.FileText.RuntimeUnion7(System.Result.Error<System.Storage.FileReadError>)
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion7(System.Result.Failure<System.Storage.FileReadError>)
 M00000002_IL_00f5:
 ret
 M00000002_IL_00f6:
@@ -408,7 +408,7 @@ call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileReadErr
 M00000002_IL_0111:
 call neoCLR.Library.System.Storage.FileText.RuntimeUnion6(System.Storage.FileReadError)
 M00000002_IL_0116:
-call neoCLR.Library.System.Storage.FileText.RuntimeUnion7(System.Result.Error<System.Storage.FileReadError>)
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion7(System.Result.Failure<System.Storage.FileReadError>)
 M00000002_IL_011b:
 ret
 M00000002_IL_011c:
@@ -433,7 +433,7 @@ call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileReadErr
 M00000002_IL_0137:
 call neoCLR.Library.System.Storage.FileText.RuntimeUnion6(System.Storage.FileReadError)
 M00000002_IL_013c:
-call neoCLR.Library.System.Storage.FileText.RuntimeUnion7(System.Result.Error<System.Storage.FileReadError>)
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion7(System.Result.Failure<System.Storage.FileReadError>)
 M00000002_IL_0141:
 ret
 M00000002_IL_0142:
@@ -458,7 +458,7 @@ call neoCLR.Library.System.Storage.FileText.RuntimeErrorSystemStorageFileReadErr
 M00000002_IL_015d:
 call neoCLR.Library.System.Storage.FileText.RuntimeUnion6(System.Storage.FileReadError)
 M00000002_IL_0162:
-call neoCLR.Library.System.Storage.FileText.RuntimeUnion7(System.Result.Error<System.Storage.FileReadError>)
+call neoCLR.Library.System.Storage.FileText.RuntimeUnion7(System.Result.Failure<System.Storage.FileReadError>)
 M00000002_IL_0167:
 ret
 M00000002_IL_0168:

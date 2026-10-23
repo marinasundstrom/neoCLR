@@ -88,14 +88,14 @@ ldarg arg0
 call System.Result<Int32,System.Time.InvalidDateError>::FromResidual(System.Time.InvalidDateError)
 ret
 .end
-.function neoCLR.Library.System.Time.Calendar.RuntimeUnion8(System.Time.InvalidDateError arg0) -> System.Result.Error<System.Time.InvalidDateError>
+.function neoCLR.Library.System.Time.Calendar.RuntimeUnion8(System.Time.InvalidDateError arg0) -> System.Result.Failure<System.Time.InvalidDateError>
 ldarg arg0
-newobj instance System.Result.Error<System.Time.InvalidDateError>::.ctor(System.Time.InvalidDateError)
+newobj instance System.Result.Failure<System.Time.InvalidDateError>::.ctor(System.Time.InvalidDateError)
 ret
 .end
-.function neoCLR.Library.System.Time.Calendar.RuntimeUnion9(System.Result.Error<System.Time.InvalidDateError> arg0) -> System.Result<Boolean,System.Time.InvalidDateError>
+.function neoCLR.Library.System.Time.Calendar.RuntimeUnion9(System.Result.Failure<System.Time.InvalidDateError> arg0) -> System.Result<Boolean,System.Time.InvalidDateError>
 ldarg arg0
-newobj instance System.Result<Boolean,System.Time.InvalidDateError>::.ctor(System.Result.Error<System.Time.InvalidDateError>)
+newobj instance System.Result<Boolean,System.Time.InvalidDateError>::.ctor(System.Result.Failure<System.Time.InvalidDateError>)
 ret
 .end
 .function neoCLR.Library.System.Time.Calendar.RuntimeUnion10(System.Result<Boolean,System.Time.InvalidDateError>& arg0,out Boolean& arg1) -> Boolean
@@ -122,9 +122,9 @@ ldarg arg1
 call instance System.Result<Int32,System.Time.InvalidDateError>::TryGetResidual(System.Time.InvalidDateError&)
 ret
 .end
-.function neoCLR.Library.System.Time.Calendar.RuntimeUnion14(System.Result.Error<System.Time.InvalidDateError> arg0) -> System.Result<Int32,System.Time.InvalidDateError>
+.function neoCLR.Library.System.Time.Calendar.RuntimeUnion14(System.Result.Failure<System.Time.InvalidDateError> arg0) -> System.Result<Int32,System.Time.InvalidDateError>
 ldarg arg0
-newobj instance System.Result<Int32,System.Time.InvalidDateError>::.ctor(System.Result.Error<System.Time.InvalidDateError>)
+newobj instance System.Result<Int32,System.Time.InvalidDateError>::.ctor(System.Result.Failure<System.Time.InvalidDateError>)
 ret
 .end
 .function neoCLR.Library.System.Time.Calendar.RuntimeUnion15(System.Time.InvalidDateError arg0) -> System.Result<System.Time.Date,System.Time.InvalidDateError>
@@ -132,9 +132,9 @@ ldarg arg0
 call System.Result<System.Time.Date,System.Time.InvalidDateError>::FromResidual(System.Time.InvalidDateError)
 ret
 .end
-.function neoCLR.Library.System.Time.Calendar.RuntimeUnion16(System.Result.Error<System.Time.InvalidDateError> arg0) -> System.Result<System.Time.Date,System.Time.InvalidDateError>
+.function neoCLR.Library.System.Time.Calendar.RuntimeUnion16(System.Result.Failure<System.Time.InvalidDateError> arg0) -> System.Result<System.Time.Date,System.Time.InvalidDateError>
 ldarg arg0
-newobj instance System.Result<System.Time.Date,System.Time.InvalidDateError>::.ctor(System.Result.Error<System.Time.InvalidDateError>)
+newobj instance System.Result<System.Time.Date,System.Time.InvalidDateError>::.ctor(System.Result.Failure<System.Time.InvalidDateError>)
 ret
 .end
 .function neoCLR.Library.System.Time.Calendar.RuntimeUnion17(System.Time.Date arg0) -> System.Result.Ok<System.Time.Date>
@@ -1369,7 +1369,7 @@ call neoCLR.Library.System.Time.Calendar.RuntimeErrorSystemTimeInvalidDateErrorN
 M00000027_IL_001a:
 call neoCLR.Library.System.Time.Calendar.RuntimeUnion8(System.Time.InvalidDateError)
 M00000027_IL_001f:
-call neoCLR.Library.System.Time.Calendar.RuntimeUnion9(System.Result.Error<System.Time.InvalidDateError>)
+call neoCLR.Library.System.Time.Calendar.RuntimeUnion9(System.Result.Failure<System.Time.InvalidDateError>)
 M00000027_IL_0024:
 ret
 M00000027_IL_0025:
@@ -1392,7 +1392,7 @@ call neoCLR.Library.System.Time.Calendar.RuntimeErrorSystemTimeInvalidDateErrorN
 M00000027_IL_003f:
 call neoCLR.Library.System.Time.Calendar.RuntimeUnion8(System.Time.InvalidDateError)
 M00000027_IL_0044:
-call neoCLR.Library.System.Time.Calendar.RuntimeUnion9(System.Result.Error<System.Time.InvalidDateError>)
+call neoCLR.Library.System.Time.Calendar.RuntimeUnion9(System.Result.Failure<System.Time.InvalidDateError>)
 M00000027_IL_0049:
 ret
 M00000027_IL_004a:
@@ -1596,7 +1596,7 @@ call neoCLR.Library.System.Time.Calendar.RuntimeErrorSystemTimeInvalidDateErrorN
 M00000029_IL_005d:
 call neoCLR.Library.System.Time.Calendar.RuntimeUnion8(System.Time.InvalidDateError)
 M00000029_IL_0062:
-call neoCLR.Library.System.Time.Calendar.RuntimeUnion14(System.Result.Error<System.Time.InvalidDateError>)
+call neoCLR.Library.System.Time.Calendar.RuntimeUnion14(System.Result.Failure<System.Time.InvalidDateError>)
 M00000029_IL_0067:
 ret
 M00000029_IL_0068:
@@ -1617,7 +1617,7 @@ call neoCLR.Library.System.Time.Calendar.RuntimeErrorSystemTimeInvalidDateErrorN
 M00000029_IL_007d:
 call neoCLR.Library.System.Time.Calendar.RuntimeUnion8(System.Time.InvalidDateError)
 M00000029_IL_0082:
-call neoCLR.Library.System.Time.Calendar.RuntimeUnion14(System.Result.Error<System.Time.InvalidDateError>)
+call neoCLR.Library.System.Time.Calendar.RuntimeUnion14(System.Result.Failure<System.Time.InvalidDateError>)
 M00000029_IL_0087:
 ret
 M00000029_IL_0088:
@@ -1731,7 +1731,7 @@ call neoCLR.Library.System.Time.Calendar.RuntimeErrorSystemTimeInvalidDateErrorN
 M0000002a_IL_005e:
 call neoCLR.Library.System.Time.Calendar.RuntimeUnion8(System.Time.InvalidDateError)
 M0000002a_IL_0063:
-call neoCLR.Library.System.Time.Calendar.RuntimeUnion16(System.Result.Error<System.Time.InvalidDateError>)
+call neoCLR.Library.System.Time.Calendar.RuntimeUnion16(System.Result.Failure<System.Time.InvalidDateError>)
 M0000002a_IL_0068:
 ret
 M0000002a_IL_0069:
@@ -1752,7 +1752,7 @@ call neoCLR.Library.System.Time.Calendar.RuntimeErrorSystemTimeInvalidDateErrorN
 M0000002a_IL_007e:
 call neoCLR.Library.System.Time.Calendar.RuntimeUnion8(System.Time.InvalidDateError)
 M0000002a_IL_0083:
-call neoCLR.Library.System.Time.Calendar.RuntimeUnion16(System.Result.Error<System.Time.InvalidDateError>)
+call neoCLR.Library.System.Time.Calendar.RuntimeUnion16(System.Result.Failure<System.Time.InvalidDateError>)
 M0000002a_IL_0088:
 ret
 M0000002a_IL_0089:
@@ -1854,7 +1854,7 @@ call neoCLR.Library.System.Time.Calendar.RuntimeErrorSystemTimeInvalidDateErrorN
 M0000002b_IL_0025:
 call neoCLR.Library.System.Time.Calendar.RuntimeUnion8(System.Time.InvalidDateError)
 M0000002b_IL_002a:
-call neoCLR.Library.System.Time.Calendar.RuntimeUnion14(System.Result.Error<System.Time.InvalidDateError>)
+call neoCLR.Library.System.Time.Calendar.RuntimeUnion14(System.Result.Failure<System.Time.InvalidDateError>)
 M0000002b_IL_002f:
 ret
 M0000002b_IL_0030:
@@ -1886,7 +1886,7 @@ call neoCLR.Library.System.Time.Calendar.RuntimeErrorSystemTimeInvalidDateErrorN
 M0000002b_IL_0058:
 call neoCLR.Library.System.Time.Calendar.RuntimeUnion8(System.Time.InvalidDateError)
 M0000002b_IL_005d:
-call neoCLR.Library.System.Time.Calendar.RuntimeUnion14(System.Result.Error<System.Time.InvalidDateError>)
+call neoCLR.Library.System.Time.Calendar.RuntimeUnion14(System.Result.Failure<System.Time.InvalidDateError>)
 M0000002b_IL_0062:
 ret
 M0000002b_IL_0063:
@@ -2646,7 +2646,7 @@ call neoCLR.Library.System.Time.Calendar.RuntimeErrorSystemTimeInvalidDateErrorN
 M0000002f_IL_0061:
 call neoCLR.Library.System.Time.Calendar.RuntimeUnion8(System.Time.InvalidDateError)
 M0000002f_IL_0066:
-call neoCLR.Library.System.Time.Calendar.RuntimeUnion16(System.Result.Error<System.Time.InvalidDateError>)
+call neoCLR.Library.System.Time.Calendar.RuntimeUnion16(System.Result.Failure<System.Time.InvalidDateError>)
 M0000002f_IL_006b:
 ret
 M0000002f_IL_006c:
@@ -2667,7 +2667,7 @@ call neoCLR.Library.System.Time.Calendar.RuntimeErrorSystemTimeInvalidDateErrorN
 M0000002f_IL_0085:
 call neoCLR.Library.System.Time.Calendar.RuntimeUnion8(System.Time.InvalidDateError)
 M0000002f_IL_008a:
-call neoCLR.Library.System.Time.Calendar.RuntimeUnion16(System.Result.Error<System.Time.InvalidDateError>)
+call neoCLR.Library.System.Time.Calendar.RuntimeUnion16(System.Result.Failure<System.Time.InvalidDateError>)
 M0000002f_IL_008f:
 ret
 M0000002f_IL_0090:
@@ -2775,7 +2775,7 @@ call neoCLR.Library.System.Time.Calendar.RuntimeErrorSystemTimeInvalidDateErrorN
 M0000002f_IL_0112:
 call neoCLR.Library.System.Time.Calendar.RuntimeUnion8(System.Time.InvalidDateError)
 M0000002f_IL_0117:
-call neoCLR.Library.System.Time.Calendar.RuntimeUnion16(System.Result.Error<System.Time.InvalidDateError>)
+call neoCLR.Library.System.Time.Calendar.RuntimeUnion16(System.Result.Failure<System.Time.InvalidDateError>)
 M0000002f_IL_011c:
 ret
 M0000002f_IL_011d:
@@ -2853,7 +2853,7 @@ call neoCLR.Library.System.Time.Calendar.RuntimeErrorSystemTimeInvalidDateErrorN
 M0000002f_IL_0173:
 call neoCLR.Library.System.Time.Calendar.RuntimeUnion8(System.Time.InvalidDateError)
 M0000002f_IL_0178:
-call neoCLR.Library.System.Time.Calendar.RuntimeUnion16(System.Result.Error<System.Time.InvalidDateError>)
+call neoCLR.Library.System.Time.Calendar.RuntimeUnion16(System.Result.Failure<System.Time.InvalidDateError>)
 M0000002f_IL_017d:
 ret
 M0000002f_IL_017e:
@@ -3086,7 +3086,7 @@ call neoCLR.Library.System.Time.Calendar.RuntimeErrorSystemTimeInvalidDateErrorN
 M00000030_IL_0061:
 call neoCLR.Library.System.Time.Calendar.RuntimeUnion8(System.Time.InvalidDateError)
 M00000030_IL_0066:
-call neoCLR.Library.System.Time.Calendar.RuntimeUnion16(System.Result.Error<System.Time.InvalidDateError>)
+call neoCLR.Library.System.Time.Calendar.RuntimeUnion16(System.Result.Failure<System.Time.InvalidDateError>)
 M00000030_IL_006b:
 ret
 M00000030_IL_006c:
@@ -3107,7 +3107,7 @@ call neoCLR.Library.System.Time.Calendar.RuntimeErrorSystemTimeInvalidDateErrorN
 M00000030_IL_0085:
 call neoCLR.Library.System.Time.Calendar.RuntimeUnion8(System.Time.InvalidDateError)
 M00000030_IL_008a:
-call neoCLR.Library.System.Time.Calendar.RuntimeUnion16(System.Result.Error<System.Time.InvalidDateError>)
+call neoCLR.Library.System.Time.Calendar.RuntimeUnion16(System.Result.Failure<System.Time.InvalidDateError>)
 M00000030_IL_008f:
 ret
 M00000030_IL_0090:

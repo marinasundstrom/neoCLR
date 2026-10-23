@@ -9,7 +9,7 @@ internal static class EnumParsing {
         let input = (text ?? "").Trim()
         let bytes = input.Utf8Bytes
         if bytes.Length == 0 {
-            return Error(NumberParseError.InvalidFormat())
+            return Failure(NumberParseError.InvalidFormat())
         }
         let first = (int)bytes[0]
         if (first >= 48 && first <= 57) || first == 43 || first == 45 {
@@ -24,7 +24,7 @@ internal static class EnumParsing {
                 var name = input
                 if start != 0 || end != bytes.Length {
                     let Ok(decoded) = Text.Utf8.Decode(bytes.Slice(start, end - start)) else {
-                        return Error(NumberParseError.InvalidFormat())
+                        return Failure(NumberParseError.InvalidFormat())
                     }
                     name = decoded.Trim()
                 }
@@ -40,7 +40,7 @@ internal static class EnumParsing {
                     index += 1
                 }
                 if !found {
-                    return Error(NumberParseError.InvalidFormat())
+                    return Failure(NumberParseError.InvalidFormat())
                 }
                 start = end + 1
             }

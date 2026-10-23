@@ -11,7 +11,7 @@ func Main() -> int {
     let invalid: byte[] = [(byte)255]
     match Utf8.Decode(invalid) {
         .Ok(_) => { return 4 }
-        .Error(_) => {}
+        .Failure(_) => {}
     }
     let Ok(output) = FileOutputStream.CreateNew("__TEST_FILE__") else { return 5 }
     let payload: byte[] = [(byte)40, (byte)2]

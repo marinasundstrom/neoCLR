@@ -137,25 +137,25 @@ public class DefaultServiceCollection : ServiceCollection {
     func Add(descriptor: ServiceDescriptor) -> Result<unit, ServiceError> {
         let service = descriptor.Service
         if !ValidLifetime(descriptor.Lifetime) || (!service.IsGenericTypeDefinition && !ValidService(service)) {
-            return Error(ServiceError.InvalidRegistration(service))
+            return Failure(ServiceError.InvalidRegistration(service))
         }
         if service.IsGenericTypeDefinition {
             let ServiceSource.Constructor(implementation) = descriptor.Source else {
-                return Error(ServiceError.InvalidRegistration(service))
+                return Failure(ServiceError.InvalidRegistration(service))
             }
             if !implementation.IsGenericTypeDefinition || implementation.GenericArgumentCount != service.GenericArgumentCount || implementation.IsAbstract || implementation.IsInterface || implementation.IsValueType || service.IsValueType {
-                return Error(ServiceError.InvalidRegistration(service))
+                return Failure(ServiceError.InvalidRegistration(service))
             }
         } else if descriptor.Source is ServiceSource.Constructor(let implementation) {
             if !implementation.AssignableTo(service) || implementation.IsAbstract || implementation.IsInterface || implementation.ContainsGenericParameters || implementation.IsValueType || implementation.IsFunctionType {
-                return Error(ServiceError.InvalidRegistration(service))
+                return Failure(ServiceError.InvalidRegistration(service))
             }
         } else if descriptor.Source is ServiceSource.Instance(let instance) {
             if descriptor.Lifetime != ServiceLifetime.Singleton || !service.IsInstanceOfType(instance) {
-                return Error(ServiceError.InvalidRegistration(service))
+                return Failure(ServiceError.InvalidRegistration(service))
             }
         } else if !(descriptor.Source is ServiceSource.Factory(_)) {
-            return Error(ServiceError.InvalidRegistration(service))
+            return Failure(ServiceError.InvalidRegistration(service))
         }
         registrations.Add(descriptor)
         return Ok(())
@@ -210,7 +210,7 @@ public class DefaultServiceCollection : ServiceCollection {
             if !registration.Service.IsGenericTypeDefinition && registration.Source is ServiceSource.Constructor(let implementation) {
                 match ConstructorPlan.Prepare(implementation, type => Available(type)) {
                     Ok(let prepared) => { plan = Some(prepared) }
-                    Error(let error) => { return Error(ServiceError.Activation(registration.Service, error)) }
+                    Failure(let error) => { return Failure(ServiceError.Activation(registration.Service, error)) }
                 }
             }
             snapshot.Add(ServiceEntry(registration, plan))
@@ -262,7 +262,7 @@ internal class DefaultServiceProvider : ServiceProvider {
 
     /// Creates an independently disposable scope sharing the root singleton cache.
     func CreateScope() -> Result<ServiceProvider, ServiceError> {
-        if IsDisposed { return Error(ServiceError.Disposed) }
+        if IsDisposed { return Failure(ServiceError.Disposed) }
         if root is Some(let owner) {
             return Ok(DefaultServiceProvider(registrations, Some(owner)))
         }
@@ -277,12 +277,12 @@ internal class DefaultServiceProvider : ServiceProvider {
     func GetRequiredKeyedService(type: TypeInfo, key: Object?) -> Result<Object, ServiceError> {
         let result = GetKeyedService(type, key)?
         if result is Some(let value) { return Ok(value) }
-        if key is null { return Error(ServiceError.Missing(type)) }
-        return Error(ServiceError.MissingKeyed(type, key))
+        if key is null { return Failure(ServiceError.Missing(type)) }
+        return Failure(ServiceError.MissingKeyed(type, key))
     }
 
     func GetKeyedService(type: TypeInfo, key: Object?) -> Result<Option<Object>, ServiceError> {
-        if IsDisposed { return Error(ServiceError.Disposed) }
+        if IsDisposed { return Failure(ServiceError.Disposed) }
         if key is null && type.Equals(typeof(ServiceProvider)) { return Ok(Some<Object>(self)) }
         var index = registrations.Count - 1
         while index >= 0 {
@@ -304,7 +304,7 @@ internal class DefaultServiceProvider : ServiceProvider {
     }
 
     func GetKeyedServices(type: TypeInfo, key: Object?) -> Result<Sequence<Object>, ServiceError> {
-        if IsDisposed { return Error(ServiceError.Disposed) }
+        if IsDisposed { return Failure(ServiceError.Disposed) }
         let results = ArrayList<Object>()
         for index in 0..registrations.Count {
             if registrations[index].Registration.Matches(type, key) || registrations[index].Registration.MatchesGeneric(type, key) {
@@ -315,14 +315,14 @@ internal class DefaultServiceProvider : ServiceProvider {
     }
 
     private func ResolveSlot(index: int, type: TypeInfo) -> Result<Object, ServiceError> {
-        if IsDisposed { return Error(ServiceError.Disposed) }
+        if IsDisposed { return Failure(ServiceError.Disposed) }
         var entry = registrations[index]
         var registration = entry.Registration
         if registration.Lifetime == ServiceLifetime.Singleton && root is Some(let owner) {
             return owner.ResolveSlot(index, type)
         }
         if registration.Lifetime == ServiceLifetime.Scoped && root is None {
-            return Error(ServiceError.ScopeRequired(type))
+            return Failure(ServiceError.ScopeRequired(type))
         }
         var slot = slots[index]
         if registration.Service.IsGenericTypeDefinition {
@@ -332,7 +332,7 @@ internal class DefaultServiceProvider : ServiceProvider {
             slot = closed.Slot
         }
         if slot.Value is Some(let cached) { return Ok(cached) }
-        if slot.Resolving { return Error(ServiceError.Cycle(registration.Service)) }
+        if slot.Resolving { return Failure(ServiceError.Cycle(registration.Service)) }
         slot.Resolving = true
         activeResolutions = activeResolutions + 1
         let result = Create(entry)
@@ -357,15 +357,15 @@ internal class DefaultServiceProvider : ServiceProvider {
         }
         let registration = registrations[index].Registration
         let ServiceSource.Constructor(definition) = registration.Source else {
-            return Error(ServiceError.InvalidRegistration(service))
+            return Failure(ServiceError.InvalidRegistration(service))
         }
         let Ok(implementation) = definition.MakeGenericType(service.GetGenericArguments()) else {
-            return Error(ServiceError.InvalidRegistration(service))
+            return Failure(ServiceError.InvalidRegistration(service))
         }
-        if !implementation.AssignableTo(service) { return Error(ServiceError.InvalidRegistration(service)) }
+        if !implementation.AssignableTo(service) { return Failure(ServiceError.InvalidRegistration(service)) }
         let plan = match ConstructorPlan.Prepare(implementation, type => Available(type)) {
             Ok(let value) => value
-            Error(let error) => return Error(ServiceError.Activation(service, error))
+            Failure(let error) => return Failure(ServiceError.Activation(service, error))
         }
         let descriptor = ServiceDescriptor(service, registration.ServiceKey, ServiceSource.Constructor(implementation), registration.Lifetime)
         let created = ClosedServiceSlot(index, service, ServiceEntry(descriptor, Some(plan)))
@@ -389,12 +389,12 @@ internal class DefaultServiceProvider : ServiceProvider {
         if result is Ok(let instance) {
             if !registration.Service.IsInstanceOfType(instance) {
                 ReleaseUnpublished(instance)
-                return Error(ServiceError.InvalidFactoryResult(registration.Service))
+                return Failure(ServiceError.InvalidFactoryResult(registration.Service))
             }
             // Factories may reenter disposal; never publish a value after that.
             if IsDisposed {
                 if !(registration.Source is ServiceSource.Instance(_)) { ReleaseUnpublished(instance) }
-                return Error(ServiceError.Disposed)
+                return Failure(ServiceError.Disposed)
             }
             if !(registration.Source is ServiceSource.Instance(_)) && instance is Disposable {
                 if !IsOwned(instance) { owned.Add(instance) }
@@ -409,7 +409,7 @@ internal class DefaultServiceProvider : ServiceProvider {
         if registration.Source is ServiceSource.Instance(let instance) { return Ok(instance) }
         if registration.Source is ServiceSource.Factory(let create) { return create(self) }
         let Some(plan) = entry.Plan else {
-            return Error(ServiceError.Activation(registration.Service, ActivationError.MissingConstructor))
+            return Failure(ServiceError.Activation(registration.Service, ActivationError.MissingConstructor))
         }
         let arguments = CheckedStorage.Reserve<Object?>(plan.ParameterCount)
         for index in 0..plan.ParameterCount {
@@ -417,7 +417,7 @@ internal class DefaultServiceProvider : ServiceProvider {
         }
         return match plan.Invoke(arguments) {
             Ok(let value) => Ok(value)
-            Error(let error) => Error(ServiceError.Activation(registration.Service, error))
+            Failure(let error) => Failure(ServiceError.Activation(registration.Service, error))
         }
     }
 

@@ -92,7 +92,7 @@ func UriResolution6() -> Result<unit, TestFailure> {
 [Test("URI parsing rejects every invalid grammar corpus input")]
 func UriInvalid() -> Result<unit, TestFailure> {
     for text in ["a b", "a\\b", "a\n", "%", "%0", "%zz", "1:a", ":a", "a#b#c", "http://a:xyz/", "http://a:1:2/", "http://a@b@c/", "é", "<x>"] {
-        if Uri.Parse(text) is Error(let error) {
+        if Uri.Parse(text) is Failure(let error) {
             _ = Assert.True(error is UriError.InvalidFormat, "Invalid grammar error kind")?
         } else {
             return Assert.True(false, "Invalid URI accepted: " + text)
@@ -108,7 +108,7 @@ func UriByteGrammar() -> Result<unit, TestFailure> {
         _ = Assert.Equal(text, uri.Text)?
     }
     for text in ["a%0G", "a%G0", "a%/0", "a%:0", "a%`0", "a%g0", "a%é", "http://a/雪", "http://a/?😀", "http://a/#é", "a\t", "a\r"] {
-        if Uri.Parse(text) is Error(let error) {
+        if Uri.Parse(text) is Failure(let error) {
             _ = Assert.True(error is UriError.InvalidFormat, "Byte grammar must reject raw non-ASCII and invalid hex")?
         } else {
             return Assert.True(false, "Invalid byte grammar accepted: " + text)
@@ -136,7 +136,7 @@ func UriBaseRules() -> Result<unit, TestFailure> {
     _ = CheckResolution(RequiredUri("http://a/b/")?, "child", "http://a/b/child")?
     _ = CheckResolution(RequiredUri("http://a/b")?, "child", "http://a/child")?
     let relative = RequiredUri("relative")?
-    if relative.Resolve("http://a/") is Error(let error) {
+    if relative.Resolve("http://a/") is Failure(let error) {
         return Assert.True(error is UriError.BaseNotAbsolute, "Resolution requires an absolute base")
     }
     return Assert.True(false, "Relative base must fail")
@@ -144,7 +144,7 @@ func UriBaseRules() -> Result<unit, TestFailure> {
 
 [Test("URI parsing reports unsupported bracketed authorities")]
 func UriUnsupportedAuthority() -> Result<unit, TestFailure> {
-    if Uri.Parse("http://[::1]/") is Error(let error) {
+    if Uri.Parse("http://[::1]/") is Failure(let error) {
         return Assert.True(error is UriError.UnsupportedAuthority, "IPv6 authority remains an explicit unsupported grammar shape")
     }
     return Assert.True(false, "Unsupported authority must fail")
@@ -160,13 +160,13 @@ func UriLengthQuota() -> Result<unit, TestFailure> {
     }
     let maximum = RequiredUri(text)?
     _ = Assert.Equal(text, maximum.Text)?
-    if Uri.Parse(text + "x") is Error(let error) {
+    if Uri.Parse(text + "x") is Failure(let error) {
         _ = Assert.True(error is UriError.TooLong, "One extra byte exceeds URI quota")?
     } else {
         return Assert.True(false, "Oversized URI must fail")
     }
     let baseUri = RequiredUri("http://a/b/c/d;p?q")?
-    if baseUri.Resolve(maximum) is Error(let error) {
+    if baseUri.Resolve(maximum) is Failure(let error) {
         return Assert.True(error is UriError.TooLong, "Resolved URI must obey the same quota")
     }
     return Assert.True(false, "Oversized resolved URI must fail")
@@ -176,7 +176,7 @@ func RequiredUri(text: string) -> Result<Uri, TestFailure> {
     if Uri.Parse(text) is Ok(let uri) {
         return Ok(uri)
     }
-    return Error(TestFailure("Expected valid URI", text, "parse failure"))
+    return Failure(TestFailure("Expected valid URI", text, "parse failure"))
 }
 
 func CheckResolution(baseUri: Uri, reference: string, expected: string) -> Result<unit, TestFailure> {

@@ -28,10 +28,10 @@ class ShortInput : InputStream {
 
     private func ReadCore(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
         if closed {
-            return Error(StreamError.Closed)
+            return Failure(StreamError.Closed)
         }
         if position == failAt {
-            return Error(StreamError.IoFailure)
+            return Failure(StreamError.IoFailure)
         }
         if count == 0 || position == bytes.Count {
             return Ok(0)
@@ -77,10 +77,10 @@ class ShortOutput : OutputStream {
 
     private func WriteCore(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
         if closed {
-            return Error(StreamError.Closed)
+            return Failure(StreamError.Closed)
         }
         if bytes.Count == failAt {
-            return Error(StreamError.AccessDenied)
+            return Failure(StreamError.AccessDenied)
         }
         if count == 0 || zeroProgress {
             return Ok(0)
@@ -115,7 +115,7 @@ class ShortOutput : OutputStream {
         while !(sent >= count) {
             let amount = WriteCore(buffer, offset + sent, count - sent)?
             if amount == 0 {
-                return Error(StreamError.IoFailure)
+                return Failure(StreamError.IoFailure)
             }
             sent += amount
         }

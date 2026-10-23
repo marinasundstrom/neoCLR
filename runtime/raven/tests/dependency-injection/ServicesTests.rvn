@@ -48,7 +48,7 @@ func ERegistry() -> Result<unit, TestFailure> {
     let Ok(greeting) = provider.GetRequiredService<Greeting>() else { return Assert.True(false, "Resolve") }
     _ = Assert.Equal("Hello", greeting.Text)?
     _ = Assert.True(services.Add(typeof(Feature), typeof(Feature), ServiceLifetime.Singleton) is Ok(_), "Later registration")?
-    _ = Assert.True(provider.GetRequiredService<Feature>() is Error(ServiceError.Missing(_)), "Snapshot excludes later registration")?
+    _ = Assert.True(provider.GetRequiredService<Feature>() is Failure(ServiceError.Missing(_)), "Snapshot excludes later registration")?
     let Ok(newProvider) = services.Build() else { return Assert.True(false, "Build new snapshot") }
     _ = Assert.True(newProvider.GetRequiredService<Feature>() is Ok(_), "New snapshot sees registration")?
     provider.Dispose()
@@ -75,7 +75,7 @@ func FLifetimes() -> Result<unit, TestFailure> {
     let Ok(f) = first.GetRequiredService<SingletonService>() else { return Assert.True(false, "Singleton") }
     let Ok(g) = second.GetRequiredService<SingletonService>() else { return Assert.True(false, "Singleton again") }
     _ = Assert.True(Object.ReferenceEquals(f, g), "Shared singleton")?
-    _ = Assert.True(root.GetRequiredService<ScopedService>() is Error(ServiceError.ScopeRequired(_)), "No root scoped resolution")?
+    _ = Assert.True(root.GetRequiredService<ScopedService>() is Failure(ServiceError.ScopeRequired(_)), "No root scoped resolution")?
     first.Dispose()
     second.Dispose()
     root.Dispose()
@@ -91,10 +91,10 @@ func GFailures() -> Result<unit, TestFailure> {
     _ = services.Add(typeof(Captive), typeof(Captive), ServiceLifetime.Singleton)
     _ = services.Add(typeof(Feature), typeof(Feature), ServiceLifetime.Transient)
     let Ok(root) = services.Build() else { return Assert.True(false, "Build") }
-    _ = Assert.True(root.GetRequiredService<CycleA>() is Error(ServiceError.Cycle(_)), "Cycle")?
-    _ = Assert.True(root.GetRequiredService<CycleA>() is Error(ServiceError.Cycle(_)), "State resets")?
+    _ = Assert.True(root.GetRequiredService<CycleA>() is Failure(ServiceError.Cycle(_)), "Cycle")?
+    _ = Assert.True(root.GetRequiredService<CycleA>() is Failure(ServiceError.Cycle(_)), "State resets")?
     let Ok(scope) = root.CreateScope() else { return Assert.True(false, "Scope") }
-    _ = Assert.True(scope.GetRequiredService<Captive>() is Error(ServiceError.ScopeRequired(_)), "Singleton cannot capture scope")?
+    _ = Assert.True(scope.GetRequiredService<Captive>() is Failure(ServiceError.ScopeRequired(_)), "Singleton cannot capture scope")?
     _ = Assert.True(scope.GetRequiredService<Feature>() is Ok(_), "Independent resolution survives failures")?
     scope.Dispose()
     root.Dispose()
@@ -117,8 +117,8 @@ func HDisposal() -> Result<unit, TestFailure> {
     scope.Dispose()
     scope.Dispose()
     _ = Assert.Equal("CD", log.Text)?
-    _ = Assert.True(scope.GetRequiredService<OwnedConsumer>() is Error(ServiceError.Disposed), "Disposed scope")?
-    _ = Assert.True(scope.CreateScope() is Error(ServiceError.Disposed), "Cannot create scope after disposal")?
+    _ = Assert.True(scope.GetRequiredService<OwnedConsumer>() is Failure(ServiceError.Disposed), "Disposed scope")?
+    _ = Assert.True(scope.CreateScope() is Failure(ServiceError.Disposed), "Cannot create scope after disposal")?
     root.Dispose()
     return Assert.Equal(0, external.Count)
 }
@@ -126,12 +126,12 @@ func HDisposal() -> Result<unit, TestFailure> {
 [Test("DI validates factories and registrations and resets failed singleton factories")]
 func IFactories() -> Result<unit, TestFailure> {
     let services = DefaultServiceCollection()
-    _ = Assert.True(services.Add(typeof(Localizer), typeof(Feature), ServiceLifetime.Singleton) is Error(ServiceError.InvalidRegistration(_)), "Invalid implementation")?
-    _ = Assert.True(services.AddInstance(typeof(Localizer), Feature()) is Error(ServiceError.InvalidRegistration(_)), "Invalid instance")?
+    _ = Assert.True(services.Add(typeof(Localizer), typeof(Feature), ServiceLifetime.Singleton) is Failure(ServiceError.InvalidRegistration(_)), "Invalid implementation")?
+    _ = Assert.True(services.AddInstance(typeof(Localizer), Feature()) is Failure(ServiceError.InvalidRegistration(_)), "Invalid instance")?
     _ = services.AddFactory(typeof(Feature), provider => Ok<Object>(Strings()), ServiceLifetime.Singleton)
     let Ok(bad) = services.Build() else { return Assert.True(false, "Build factory") }
-    _ = Assert.True(bad.GetRequiredService<Feature>() is Error(ServiceError.InvalidFactoryResult(_)), "Wrong result")?
-    _ = Assert.True(bad.GetRequiredService<Feature>() is Error(ServiceError.InvalidFactoryResult(_)), "Failed singleton not cached or poisoned")?
+    _ = Assert.True(bad.GetRequiredService<Feature>() is Failure(ServiceError.InvalidFactoryResult(_)), "Wrong result")?
+    _ = Assert.True(bad.GetRequiredService<Feature>() is Failure(ServiceError.InvalidFactoryResult(_)), "Failed singleton not cached or poisoned")?
     let expected = Feature()
     _ = services.AddFactory(typeof(Feature), provider => Ok<Object>(expected), ServiceLifetime.Singleton)
     let Ok(good) = services.Build() else { return Assert.True(false, "Build later registration") }
@@ -151,7 +151,7 @@ func JProvider() -> Result<unit, TestFailure> {
     let Ok(consumer) = scope.GetRequiredService<ProviderConsumer>() else { return Assert.True(false, "Provider injection") }
     _ = Assert.True(Object.ReferenceEquals(scope, consumer.Provider), "Current provider")?
     root.Dispose()
-    _ = Assert.True(scope.GetRequiredService<ProviderConsumer>() is Error(ServiceError.Disposed), "Root invalidates scope")?
+    _ = Assert.True(scope.GetRequiredService<ProviderConsumer>() is Failure(ServiceError.Disposed), "Root invalidates scope")?
     scope.Dispose()
     return Ok(())
 }
@@ -176,7 +176,7 @@ func KLookups() -> Result<unit, TestFailure> {
     for item in all { count = count + 1 }
     _ = Assert.Equal(2, count)?
     _ = Assert.True(provider.GetService<Missing>() is Ok(None), "Missing optional")?
-    _ = Assert.True(provider.GetRequiredService<Missing>() is Error(ServiceError.Missing(_)), "Missing required")?
+    _ = Assert.True(provider.GetRequiredService<Missing>() is Failure(ServiceError.Missing(_)), "Missing required")?
     let Ok(empty) = provider.GetServices<Missing>() else { return Assert.True(false, "Missing plural") }
     _ = Assert.Equal(0, empty.Count)?
     _ = Assert.True(provider.GetRequiredService<ExtensibleService>() is Ok(_), "Open inheritance is not an open generic")?
@@ -195,12 +195,12 @@ func LGenericRegistrations() -> Result<unit, TestFailure> {
         let strings = provider.GetRequiredService<Localizer<Feature>>()?
         return Ok(Greeting(strings))
     })
-    _ = services.AddTransient<Missing>(provider => Error<ServiceError>(ServiceError.Missing(typeof(Feature))))
+    _ = services.AddTransient<Missing>(provider => Failure<ServiceError>(ServiceError.Missing(typeof(Feature))))
     let Ok(root) = services.Build() else { return Assert.True(false, "Build generic registrations") }
     let Ok(greeting) = root.GetRequiredService<Greeting>() else { return Assert.True(false, "Typed factory") }
     _ = Assert.Equal("Hello", greeting.Text)?
-    _ = Assert.True(root.GetService<Missing>() is Error(ServiceError.Missing(_)), "Registered factory failure is not absence")?
-    _ = Assert.True(root.GetServices<Missing>() is Error(ServiceError.Missing(_)), "Plural propagates failure")?
+    _ = Assert.True(root.GetService<Missing>() is Failure(ServiceError.Missing(_)), "Registered factory failure is not absence")?
+    _ = Assert.True(root.GetServices<Missing>() is Failure(ServiceError.Missing(_)), "Plural propagates failure")?
     let Ok(first) = root.GetServices<Feature>() else { return Assert.True(false, "First plural") }
     let Ok(second) = root.GetServices<Feature>() else { return Assert.True(false, "Second plural") }
     _ = Assert.True(!Object.ReferenceEquals(first[0], first[1]), "Independent singleton registration slots")?
@@ -218,7 +218,7 @@ func MFactoryDisposal() -> Result<unit, TestFailure> {
         return Ok(created)
     })
     let Ok(provider) = services.Build() else { return Assert.True(false, "Build") }
-    _ = Assert.True(provider.GetRequiredService<ExternalService>() is Error(ServiceError.Disposed), "Do not publish after disposal")?
+    _ = Assert.True(provider.GetRequiredService<ExternalService>() is Failure(ServiceError.Disposed), "Do not publish after disposal")?
     _ = Assert.Equal(1, created.Count)?
     provider.Dispose()
     _ = Assert.Equal(1, created.Count)?
@@ -231,7 +231,7 @@ func MFactoryDisposal() -> Result<unit, TestFailure> {
         return Ok<Disposable>(value)
     })
     let Ok(other) = aliases.Build() else { return Assert.True(false, "Build aliases") }
-    _ = Assert.True(other.GetRequiredService<Disposable>() is Error(ServiceError.Disposed), "Reject disposed alias")?
+    _ = Assert.True(other.GetRequiredService<Disposable>() is Failure(ServiceError.Disposed), "Reject disposed alias")?
     return Assert.Equal(1, shared.Count)
 }
 
@@ -255,7 +255,7 @@ func NKeys() -> Result<unit, TestFailure> {
     let Ok(defaults) = provider.GetKeyedServices<Feature>(null) else { return Assert.True(false, "Null selects unkeyed") }
     _ = Assert.Equal(1, defaults.Count)?
     _ = Assert.True(provider.GetKeyedService<Feature>("missing") is Ok(None), "No fallback to unkeyed")?
-    _ = Assert.True(provider.GetRequiredKeyedService<Feature>("missing") is Error(ServiceError.MissingKeyed(_, _)), "Required missing key")?
+    _ = Assert.True(provider.GetRequiredKeyedService<Feature>("missing") is Failure(ServiceError.MissingKeyed(_, _)), "Required missing key")?
     provider.Dispose()
     return Ok(())
 }
@@ -270,19 +270,19 @@ func OKeyedLifetimes() -> Result<unit, TestFailure> {
         if key is string text { log.Append(text) }
         return Ok(Feature())
     })
-    _ = services.AddKeyedTransient<Missing>("failure", (provider, key) => Error<ServiceError>(ServiceError.Missing(typeof(Feature))))
+    _ = services.AddKeyedTransient<Missing>("failure", (provider, key) => Failure<ServiceError>(ServiceError.Missing(typeof(Feature))))
     let Ok(root) = services.Build() else { return Assert.True(false, "Build") }
     let Ok(scope) = root.CreateScope() else { return Assert.True(false, "Scope") }
     let Ok(a) = scope.GetRequiredKeyedService<ScopedService>("a") else { return Assert.True(false, "Scope a") }
     let Ok(aAgain) = scope.GetRequiredKeyedService<ScopedService>("a") else { return Assert.True(false, "Scope a again") }
     let Ok(b) = scope.GetRequiredKeyedService<ScopedService>("b") else { return Assert.True(false, "Scope b") }
     _ = Assert.True(Object.ReferenceEquals(a, aAgain) && !Object.ReferenceEquals(a, b), "Separate key caches")?
-    _ = Assert.True(root.GetRequiredKeyedService<ScopedService>("a") is Error(ServiceError.ScopeRequired(_)), "Root scope check")?
+    _ = Assert.True(root.GetRequiredKeyedService<ScopedService>("a") is Failure(ServiceError.ScopeRequired(_)), "Root scope check")?
     let Ok(singleton) = scope.GetRequiredKeyedService<Feature>("factory") else { return Assert.True(false, "Keyed factory") }
     let Ok(same) = root.GetRequiredKeyedService<Feature>("factory") else { return Assert.True(false, "Root singleton") }
     _ = Assert.True(Object.ReferenceEquals(singleton, same), "Shared keyed singleton")?
     _ = Assert.Equal("factory", log.Text)?
-    _ = Assert.True(root.GetKeyedService<Missing>("failure") is Error(ServiceError.Missing(_)), "Factory failure is not absence")?
+    _ = Assert.True(root.GetKeyedService<Missing>("failure") is Failure(ServiceError.Missing(_)), "Factory failure is not absence")?
     scope.Dispose()
     root.Dispose()
     return Ok(())
@@ -337,7 +337,7 @@ func QTryAdd() -> Result<unit, TestFailure> {
     _ = Assert.True(services.TryAddKeyedSingleton<(int) -> int>("function", increment) is Ok(true), "Function registration")?
     _ = Assert.True(services.TryAddKeyedSingleton<(int) -> int>("function", doubleValue) is Ok(false), "Preserve original function")?
     _ = Assert.True(services.TryAddKeyedSingleton<(int) -> int>("other", doubleValue) is Ok(true), "Different key")?
-    _ = Assert.True(services.TryAddSingleton<int>(1) is Error(ServiceError.InvalidRegistration(_)), "Reject invalid new service")?
+    _ = Assert.True(services.TryAddSingleton<int>(1) is Failure(ServiceError.InvalidRegistration(_)), "Reject invalid new service")?
     let Ok(provider) = services.Build() else { return Assert.True(false, "Build TryAdd registrations") }
     let Ok(first) = provider.GetRequiredService<SingletonService>() else { return Assert.True(false, "Preserved singleton") }
     let Ok(second) = provider.GetRequiredService<SingletonService>() else { return Assert.True(false, "Cached singleton") }
@@ -392,7 +392,7 @@ func RGraphs() -> Result<unit, TestFailure> {
     _ = services.AddTransient<GraphRight>()
     _ = services.AddTransient<GraphRoot>()
     let Ok(provider) = services.Build() else { return Assert.True(false, "Build graph") }
-    _ = Assert.True(provider.GetRequiredService<GraphRoot>() is Error(ServiceError.ScopeRequired(_)), "Reject scoped dependency deep in graph")?
+    _ = Assert.True(provider.GetRequiredService<GraphRoot>() is Failure(ServiceError.ScopeRequired(_)), "Reject scoped dependency deep in graph")?
     let Ok(scope) = provider.CreateScope() else { return Assert.True(false, "First scope") }
     let Ok(other) = scope.CreateScope() else { return Assert.True(false, "Independent nested scope") }
     let Ok(a) = scope.GetRequiredService<GraphRoot>() else { return Assert.True(false, "First graph") }
@@ -414,7 +414,7 @@ func RGraphs() -> Result<unit, TestFailure> {
     _ = Assert.Equal(0, c.Left.Shared.DisposalCount)?
     let Ok(d) = other.GetRequiredService<GraphRoot>() else { return Assert.True(false, "Other scope remains usable") }
     provider.Dispose()
-    _ = Assert.True(other.GetRequiredService<GraphRoot>() is Error(ServiceError.Disposed), "Root invalidates live scopes")?
+    _ = Assert.True(other.GetRequiredService<GraphRoot>() is Failure(ServiceError.Disposed), "Root invalidates live scopes")?
     other.Dispose()
     _ = Assert.Equal(1, c.Left.DisposalCount)?
     _ = Assert.Equal(1, d.Left.DisposalCount)?
@@ -464,7 +464,7 @@ func YOpenGenericScopes() -> Result<unit, TestFailure> {
     _ = services.Add(typeof(GenericCycle<>), typeof(GenericCycle<>), ServiceLifetime.Transient)
     let Ok(provider) = services.Build() else { return Assert.True(false, "Build generic provider") }
     use root = provider
-    _ = Assert.True(root.GetRequiredService<GenericService<int>>() is Error(ServiceError.ScopeRequired(_)), "Scoped service needs a scope")?
+    _ = Assert.True(root.GetRequiredService<GenericService<int>>() is Failure(ServiceError.ScopeRequired(_)), "Scoped service needs a scope")?
     let Ok(firstScope) = root.CreateScope() else { return Assert.True(false, "First scope") }
     use scope = firstScope
     let Ok(secondScope) = root.CreateScope() else { return Assert.True(false, "Second scope") }
@@ -478,8 +478,8 @@ func YOpenGenericScopes() -> Result<unit, TestFailure> {
     _ = Assert.True(!Object.ReferenceEquals(repeated, separate), "Scopes isolate closed slots")?
     _ = Assert.True(repeated.Argument.Equals(typeof(int)), "Integer argument")?
     _ = Assert.True(text.Argument.Equals(typeof(string)), "String argument")?
-    _ = Assert.True(scope.GetRequiredService<GenericCycle<int>>() is Error(ServiceError.Cycle(_)), "Closed cycle detected")?
-    _ = Assert.True(scope.GetRequiredService<GenericCycle<int>>() is Error(ServiceError.Cycle(_)), "Closed cycle state resets")?
+    _ = Assert.True(scope.GetRequiredService<GenericCycle<int>>() is Failure(ServiceError.Cycle(_)), "Closed cycle detected")?
+    _ = Assert.True(scope.GetRequiredService<GenericCycle<int>>() is Failure(ServiceError.Cycle(_)), "Closed cycle state resets")?
     _ = Assert.True(scope.GetRequiredService<GenericOwned<int>>() is Ok(_), "Owned integer instance")?
     _ = Assert.True(scope.GetRequiredService<GenericOwned<string>>() is Ok(_), "Owned string instance")?
     scope.Dispose()

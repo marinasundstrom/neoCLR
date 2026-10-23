@@ -80,28 +80,28 @@ public extension OptionOperators<T> for Option<T> {
     func ThenResult<U, E>(binder: (T) -> Result<U, E>, noneError: () -> E) -> Result<U, E> {
         return self match {
             Some(let value) => binder(value)
-            None => Error(noneError())
+            None => Failure(noneError())
         }
     }
 
     func MapResult<U, E>(mapper: (T) -> U, noneError: () -> E) -> Result<U, E> {
         return self match {
             Some(let value) => Ok(mapper(value))
-            None => Error(noneError())
+            None => Failure(noneError())
         }
     }
 
     func OkOr<E>(error: E) -> Result<T, E> {
         return self match {
             Some(let value) => Ok(value)
-            None => Error(error)
+            None => Failure(error)
         }
     }
 
     func OkOr<E>(errorFactory: () -> E) -> Result<T, E> {
         return self match {
             Some(let value) => Ok(value)
-            None => Error(errorFactory())
+            None => Failure(errorFactory())
         }
     }
 

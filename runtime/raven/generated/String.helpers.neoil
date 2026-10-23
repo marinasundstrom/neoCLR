@@ -43,14 +43,14 @@ ldarg arg0
 newobj instance System.Result<String,System.Text.Utf8SliceError>::.ctor(System.Result.Ok<String>)
 ret
 .end
-.function neoCLR.Library.System.String.RuntimeUnion2(System.Text.Utf8SliceError arg0) -> System.Result.Error<System.Text.Utf8SliceError>
+.function neoCLR.Library.System.String.RuntimeUnion2(System.Text.Utf8SliceError arg0) -> System.Result.Failure<System.Text.Utf8SliceError>
 ldarg arg0
-newobj instance System.Result.Error<System.Text.Utf8SliceError>::.ctor(System.Text.Utf8SliceError)
+newobj instance System.Result.Failure<System.Text.Utf8SliceError>::.ctor(System.Text.Utf8SliceError)
 ret
 .end
-.function neoCLR.Library.System.String.RuntimeUnion3(System.Result.Error<System.Text.Utf8SliceError> arg0) -> System.Result<String,System.Text.Utf8SliceError>
+.function neoCLR.Library.System.String.RuntimeUnion3(System.Result.Failure<System.Text.Utf8SliceError> arg0) -> System.Result<String,System.Text.Utf8SliceError>
 ldarg arg0
-newobj instance System.Result<String,System.Text.Utf8SliceError>::.ctor(System.Result.Error<System.Text.Utf8SliceError>)
+newobj instance System.Result<String,System.Text.Utf8SliceError>::.ctor(System.Result.Failure<System.Text.Utf8SliceError>)
 ret
 .end
 .function neoCLR.Library.System.String.RuntimeBooleanFromInt32(Int32 value) -> Boolean

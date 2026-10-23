@@ -22,7 +22,7 @@ extension HttpErrorConversion for HttpError {
 }
 
 func FailedNumber() -> Result<int, HttpError> {
-    return Error(HttpError.UnsuccessfulStatus(HttpStatusCode.NotFound))
+    return Failure(HttpError.UnsuccessfulStatus(HttpStatusCode.NotFound))
 }
 
 func ConvertedError() -> Result<int, AppError> {
@@ -87,7 +87,7 @@ class StatusProbe {
                 }
                 Check(text == (if code == 204 || code == 205 { "" } else { "body" }))
             } else {
-                let Error(HttpError.UnsuccessfulStatus(actual)) = result else {
+                let Failure(HttpError.UnsuccessfulStatus(actual)) = result else {
                     System.Fail("Non-success status cause lost")
                     return
                 }
@@ -119,16 +119,16 @@ class StatusProbe {
         let pending = client.Get(String.Concat("http://127.0.0.1:19091/invalid-", failureNumber.ToString()))
         pending.OnCompleted(() => {
             if failures == 2 {
-                if let Error(HttpError.Unsupported(_)) = pending.GetResult() {
+                if let Failure(HttpError.Unsupported(_)) = pending.GetResult() {
                     Check(true)
                 } else {
                     System.Fail("Informational response was accepted")
                 }
             } else {
-                if let Error(HttpError.Protocol(_)) = pending.GetResult() {
+                if let Failure(HttpError.Protocol(_)) = pending.GetResult() {
                     Check(true)
                 } else {
-                    if let Error(reason) = pending.GetResult() {
+                    if let Failure(reason) = pending.GetResult() {
                         System.Fail("Malformed response returned " + reason.ToString())
                     }
                     System.Fail("Malformed response was accepted")
@@ -167,7 +167,7 @@ func CheckNamedStatus() {
 
 func Main() {
     CheckNamedStatus()
-    let Error(appError) = ConvertedError() else {
+    let Failure(appError) = ConvertedError() else {
         System.Fail("Extension conversion did not return an error")
         return
     }
@@ -180,7 +180,7 @@ func Main() {
     } else {
         System.Fail("Extension conversion did not preserve status")
     }
-    if let Error(boxed) = BoxedError() {
+    if let Failure(boxed) = BoxedError() {
         Check(boxed.ToString() == "HTTP status 404")
     } else {
         System.Fail("Object error conversion failed")

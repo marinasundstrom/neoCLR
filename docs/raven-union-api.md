@@ -66,7 +66,7 @@ for the release validation cases.
 
 `System.Tasks.TaskOutcome<T>` uses the same generated union contract, with
 `Completed(T)` and `Cancelled`. Both are active cases; the default is inactive.
-`Value` boxes the case, not its payload. A completed `Result.Error` remains a
+`Value` boxes the case, not its payload. A completed `Result.Failure` remains a
 completed task, distinct from cancellation. TaskOutcome has no Propagatable
 implementation; task/await cancellation follows the task builder contract.
 

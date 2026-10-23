@@ -40,14 +40,14 @@ ldarg arg0
 call instance System.Result.Ok<System.Time.TimeOfDay>::get_Value()
 ret
 .end
-.function neoCLR.Library.System.Time.LocalDateTime.RuntimeUnion4(System.Time.InvalidDateError arg0) -> System.Result.Error<System.Time.InvalidDateError>
+.function neoCLR.Library.System.Time.LocalDateTime.RuntimeUnion4(System.Time.InvalidDateError arg0) -> System.Result.Failure<System.Time.InvalidDateError>
 ldarg arg0
-newobj instance System.Result.Error<System.Time.InvalidDateError>::.ctor(System.Time.InvalidDateError)
+newobj instance System.Result.Failure<System.Time.InvalidDateError>::.ctor(System.Time.InvalidDateError)
 ret
 .end
-.function neoCLR.Library.System.Time.LocalDateTime.RuntimeUnion5(System.Result.Error<System.Time.InvalidDateError> arg0) -> System.Result<System.Time.LocalDateTime,System.Time.InvalidDateError>
+.function neoCLR.Library.System.Time.LocalDateTime.RuntimeUnion5(System.Result.Failure<System.Time.InvalidDateError> arg0) -> System.Result<System.Time.LocalDateTime,System.Time.InvalidDateError>
 ldarg arg0
-newobj instance System.Result<System.Time.LocalDateTime,System.Time.InvalidDateError>::.ctor(System.Result.Error<System.Time.InvalidDateError>)
+newobj instance System.Result<System.Time.LocalDateTime,System.Time.InvalidDateError>::.ctor(System.Result.Failure<System.Time.InvalidDateError>)
 ret
 .end
 .function neoCLR.Library.System.Time.LocalDateTime.RuntimeUnion6(System.Result<System.Time.Date,System.Time.InvalidDateError>& arg0,out System.Time.Date& arg1) -> Boolean

@@ -51,7 +51,7 @@ func MethodTokenValidation() -> Result<unit, TestFailure> {
     }
     _ = Assert.Equal(punctuation, valid.Method)?
     for invalid in ["", " GET", "GET ", "GE\tT", "GET\r\nX: y", "a/b", "a:b", "a(b)", "é", "😀"] {
-        let Error(HttpError.InvalidRequest(_)) = HttpMethod.Parse(invalid) else {
+        let Failure(HttpError.InvalidRequest(_)) = HttpMethod.Parse(invalid) else {
             return Assert.True(false, "Invalid method is rejected")
         }
     }

@@ -80,19 +80,19 @@ public class JsonObject : JsonValue, Map<string, JsonValue> {
                 return Ok(values[index])
             }
         }
-        return Error(JsonError.MissingField(name))
+        return Failure(JsonError.MissingField(name))
     }
 
     func Item(index: int) -> Result<JsonValue, JsonError> {
         if index < 0 || index >= values.Count {
-            return Error(JsonError.InvalidIndex(index))
+            return Failure(JsonError.InvalidIndex(index))
         }
         return Ok(values[index])
     }
 
     func Name(index: int) -> Result<string, JsonError> {
         if index < 0 || index >= names.Count {
-            return Error(JsonError.InvalidIndex(index))
+            return Failure(JsonError.InvalidIndex(index))
         }
         return Ok(names[index])
     }
@@ -101,11 +101,11 @@ public class JsonObject : JsonValue, Map<string, JsonValue> {
     func Add(name: string, value: JsonValue) -> Result<unit, JsonError> {
         for previous in names {
             if String.CompareOrdinal(previous, name) == 0 {
-                return Error(JsonError.DuplicateField(name))
+                return Failure(JsonError.DuplicateField(name))
             }
         }
         if values.Count >= 31 {
-            return Error(JsonError.LimitExceeded("Container exceeds 31 entries"))
+            return Failure(JsonError.LimitExceeded("Container exceeds 31 entries"))
         }
         names.Add(name)
         values.Add(value)
@@ -142,14 +142,14 @@ public class JsonArray : JsonValue, Sequence<JsonValue> {
 
     func Item(index: int) -> Result<JsonValue, JsonError> {
         if index < 0 || index >= values.Count {
-            return Error(JsonError.InvalidIndex(index))
+            return Failure(JsonError.InvalidIndex(index))
         }
         return Ok(values[index])
     }
 
     func Add(value: JsonValue) -> Result<unit, JsonError> {
         if values.Count >= 31 {
-            return Error(JsonError.LimitExceeded("Container exceeds 31 entries"))
+            return Failure(JsonError.LimitExceeded("Container exceeds 31 entries"))
         }
         values.Add(value)
         return Ok(())
@@ -177,7 +177,7 @@ public class JsonNumber : JsonValue {
 
     static func Parse(text: string) -> Result<JsonNumber, JsonError> {
         if !JsonSyntax.ValidNumber(text) {
-            return Error(JsonError.InvalidNumber)
+            return Failure(JsonError.InvalidNumber)
         }
         return Ok(JsonNumber(text))
     }
@@ -185,7 +185,7 @@ public class JsonNumber : JsonValue {
     func AsInt32() -> Result<int, JsonError> {
         return match Int32.Parse(text) {
             Ok(let value) => Ok(value)
-            Error(_) => Error(JsonError.NumberOutOfRange)
+            Failure(_) => Failure(JsonError.NumberOutOfRange)
         }
     }
 }

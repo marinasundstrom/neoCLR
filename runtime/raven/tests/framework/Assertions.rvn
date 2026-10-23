@@ -21,7 +21,7 @@ static class Assert {
         if condition {
             return Ok(())
         }
-        return Error(TestFailure(message, "true", "false"))
+        return Failure(TestFailure(message, "true", "false"))
     }
 
     static func Equal(expected: int, actual: int) -> Result<unit, TestFailure> {
@@ -30,13 +30,13 @@ static class Assert {
         }
         let expectedText = expected.ToString()
         let actualText = actual.ToString()
-        return Error(TestFailure("Expected " + expectedText + ", actual " + actualText, expectedText, actualText))
+        return Failure(TestFailure("Expected " + expectedText + ", actual " + actualText, expectedText, actualText))
     }
 
     static func Equal(expected: string, actual: string) -> Result<unit, TestFailure> {
         if expected == actual {
             return Ok(())
         }
-        return Error(TestFailure("Expected '" + expected + "', actual '" + actual + "'", expected, actual))
+        return Failure(TestFailure("Expected '" + expected + "', actual '" + actual + "'", expected, actual))
     }
 }

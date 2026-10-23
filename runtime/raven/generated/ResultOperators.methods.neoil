@@ -7,7 +7,7 @@
 .local System.Result<T0,T1> local4
 .local System.Result.Ok<T0> local5
 .local System.Result<T0,T1> local6
-.local System.Result.Error<T1> local7
+.local System.Result.Failure<T1> local7
 ldloca local0
 initobj System.Result<T0,T1>
 ldloca local1
@@ -19,7 +19,7 @@ initobj System.Result.Ok<T0>
 ldloca local6
 initobj System.Result<T0,T1>
 ldloca local7
-initobj System.Result.Error<T1>
+initobj System.Result.Failure<T1>
 M00000001_IL_0000:
 M00000001_IL_0001:
 M00000001_IL_0002:
@@ -79,19 +79,19 @@ stloc local6
 M00000001_IL_0056:
 ldloca local7
 M00000001_IL_0058:
-initobj System.Result.Error<T1>
+initobj System.Result.Failure<T1>
 M00000001_IL_005e:
 ldloca local6
 M00000001_IL_0060:
 ldloca local7
 M00000001_IL_0062:
-call neoCLR.Library.System.ResultOperators.RuntimeUnion2<T0,T1>(System.Result<T0,T1>&,System.Result.Error<T1>&)
+call neoCLR.Library.System.ResultOperators.RuntimeUnion2<T0,T1>(System.Result<T0,T1>&,System.Result.Failure<T1>&)
 M00000001_IL_0067:
 brfalse M00000001_IL_0092
 M00000001_IL_006c:
 ldloca local7
 M00000001_IL_006e:
-call neoCLR.Library.System.ResultOperators.RuntimeUnion4<T1>(System.Result.Error<T1>&)
+call neoCLR.Library.System.ResultOperators.RuntimeUnion4<T1>(System.Result.Failure<T1>&)
 M00000001_IL_0073:
 stloc local3
 M00000001_IL_0074:
@@ -103,7 +103,7 @@ ldloc local3
 M00000001_IL_0082:
 call neoCLR.Library.System.ResultOperators.RuntimeUnion6<T1>(T1)
 M00000001_IL_0087:
-call neoCLR.Library.System.ResultOperators.RuntimeUnion7<T1,T2>(System.Result.Error<T1>)
+call neoCLR.Library.System.ResultOperators.RuntimeUnion7<T1,T2>(System.Result.Failure<T1>)
 M00000001_IL_008c:
 stloc local1
 M00000001_IL_008d:
@@ -128,7 +128,7 @@ ret
 .local System.Result<T0,T1> local4
 .local System.Result.Ok<T0> local5
 .local System.Result<T0,T1> local6
-.local System.Result.Error<T1> local7
+.local System.Result.Failure<T1> local7
 ldloca local0
 initobj System.Result<T0,T1>
 ldloca local1
@@ -140,7 +140,7 @@ initobj System.Result.Ok<T0>
 ldloca local6
 initobj System.Result<T0,T1>
 ldloca local7
-initobj System.Result.Error<T1>
+initobj System.Result.Failure<T1>
 M00000002_IL_0000:
 M00000002_IL_0001:
 M00000002_IL_0002:
@@ -196,19 +196,19 @@ stloc local6
 M00000002_IL_004c:
 ldloca local7
 M00000002_IL_004e:
-initobj System.Result.Error<T1>
+initobj System.Result.Failure<T1>
 M00000002_IL_0054:
 ldloca local6
 M00000002_IL_0056:
 ldloca local7
 M00000002_IL_0058:
-call neoCLR.Library.System.ResultOperators.RuntimeUnion2<T0,T1>(System.Result<T0,T1>&,System.Result.Error<T1>&)
+call neoCLR.Library.System.ResultOperators.RuntimeUnion2<T0,T1>(System.Result<T0,T1>&,System.Result.Failure<T1>&)
 M00000002_IL_005d:
 brfalse M00000002_IL_0088
 M00000002_IL_0062:
 ldloca local7
 M00000002_IL_0064:
-call neoCLR.Library.System.ResultOperators.RuntimeUnion4<T1>(System.Result.Error<T1>&)
+call neoCLR.Library.System.ResultOperators.RuntimeUnion4<T1>(System.Result.Failure<T1>&)
 M00000002_IL_0069:
 stloc local3
 M00000002_IL_006a:
@@ -220,7 +220,7 @@ ldloc local3
 M00000002_IL_0078:
 call neoCLR.Library.System.ResultOperators.RuntimeUnion6<T1>(T1)
 M00000002_IL_007d:
-call neoCLR.Library.System.ResultOperators.RuntimeUnion7<T1,T2>(System.Result.Error<T1>)
+call neoCLR.Library.System.ResultOperators.RuntimeUnion7<T1,T2>(System.Result.Failure<T1>)
 M00000002_IL_0082:
 stloc local1
 M00000002_IL_0083:
@@ -245,7 +245,7 @@ ret
 .local System.Result<T0,T1> local4
 .local System.Result.Ok<T0> local5
 .local System.Result<T0,T1> local6
-.local System.Result.Error<T1> local7
+.local System.Result.Failure<T1> local7
 ldloca local0
 initobj System.Result<T0,T1>
 ldloca local1
@@ -257,7 +257,7 @@ initobj System.Result.Ok<T0>
 ldloca local6
 initobj System.Result<T0,T1>
 ldloca local7
-initobj System.Result.Error<T1>
+initobj System.Result.Failure<T1>
 M00000003_IL_0000:
 M00000003_IL_0001:
 M00000003_IL_0002:
@@ -313,19 +313,19 @@ stloc local6
 M00000003_IL_0050:
 ldloca local7
 M00000003_IL_0052:
-initobj System.Result.Error<T1>
+initobj System.Result.Failure<T1>
 M00000003_IL_0058:
 ldloca local6
 M00000003_IL_005a:
 ldloca local7
 M00000003_IL_005c:
-call neoCLR.Library.System.ResultOperators.RuntimeUnion2<T0,T1>(System.Result<T0,T1>&,System.Result.Error<T1>&)
+call neoCLR.Library.System.ResultOperators.RuntimeUnion2<T0,T1>(System.Result<T0,T1>&,System.Result.Failure<T1>&)
 M00000003_IL_0061:
 brfalse M00000003_IL_0092
 M00000003_IL_0066:
 ldloca local7
 M00000003_IL_0068:
-call neoCLR.Library.System.ResultOperators.RuntimeUnion4<T1>(System.Result.Error<T1>&)
+call neoCLR.Library.System.ResultOperators.RuntimeUnion4<T1>(System.Result.Failure<T1>&)
 M00000003_IL_006d:
 stloc local3
 M00000003_IL_006e:
@@ -341,7 +341,7 @@ callvirt instance fn<T1,T2>::Invoke(T1)
 M00000003_IL_0082:
 call neoCLR.Library.System.ResultOperators.RuntimeUnion10<T2>(T2)
 M00000003_IL_0087:
-call neoCLR.Library.System.ResultOperators.RuntimeUnion11<T0,T2>(System.Result.Error<T2>)
+call neoCLR.Library.System.ResultOperators.RuntimeUnion11<T0,T2>(System.Result.Failure<T2>)
 M00000003_IL_008c:
 stloc local1
 M00000003_IL_008d:
@@ -366,7 +366,7 @@ ret
 .local System.Result<T0,T1> local4
 .local System.Result.Ok<T0> local5
 .local System.Result<T0,T1> local6
-.local System.Result.Error<T1> local7
+.local System.Result.Failure<T1> local7
 ldloca local0
 initobj System.Result<T0,T1>
 ldloca local4
@@ -376,7 +376,7 @@ initobj System.Result.Ok<T0>
 ldloca local6
 initobj System.Result<T0,T1>
 ldloca local7
-initobj System.Result.Error<T1>
+initobj System.Result.Failure<T1>
 M00000004_IL_0000:
 M00000004_IL_0001:
 M00000004_IL_0002:
@@ -428,19 +428,19 @@ stloc local6
 M00000004_IL_0044:
 ldloca local7
 M00000004_IL_0046:
-initobj System.Result.Error<T1>
+initobj System.Result.Failure<T1>
 M00000004_IL_004c:
 ldloca local6
 M00000004_IL_004e:
 ldloca local7
 M00000004_IL_0050:
-call neoCLR.Library.System.ResultOperators.RuntimeUnion2<T0,T1>(System.Result<T0,T1>&,System.Result.Error<T1>&)
+call neoCLR.Library.System.ResultOperators.RuntimeUnion2<T0,T1>(System.Result<T0,T1>&,System.Result.Failure<T1>&)
 M00000004_IL_0055:
 brfalse M00000004_IL_007c
 M00000004_IL_005a:
 ldloca local7
 M00000004_IL_005c:
-call neoCLR.Library.System.ResultOperators.RuntimeUnion4<T1>(System.Result.Error<T1>&)
+call neoCLR.Library.System.ResultOperators.RuntimeUnion4<T1>(System.Result.Failure<T1>&)
 M00000004_IL_0061:
 stloc local3
 M00000004_IL_0062:
@@ -525,11 +525,11 @@ ret
 .method static TapError<T0,T1>(System.Result<T0,T1> self,fn<T1,Void> action) -> System.Result<T0,T1>
 .local T1 local0
 .local System.Result<T0,T1> local1
-.local System.Result.Error<T1> local2
+.local System.Result.Failure<T1> local2
 ldloca local1
 initobj System.Result<T0,T1>
 ldloca local2
-initobj System.Result.Error<T1>
+initobj System.Result.Failure<T1>
 M00000006_IL_0000:
 M00000006_IL_0001:
 M00000006_IL_0002:
@@ -539,19 +539,19 @@ stloc local1
 M00000006_IL_0004:
 ldloca local2
 M00000006_IL_0006:
-initobj System.Result.Error<T1>
+initobj System.Result.Failure<T1>
 M00000006_IL_000c:
 ldloca local1
 M00000006_IL_000e:
 ldloca local2
 M00000006_IL_0010:
-call neoCLR.Library.System.ResultOperators.RuntimeUnion2<T0,T1>(System.Result<T0,T1>&,System.Result.Error<T1>&)
+call neoCLR.Library.System.ResultOperators.RuntimeUnion2<T0,T1>(System.Result<T0,T1>&,System.Result.Failure<T1>&)
 M00000006_IL_0015:
 brfalse M00000006_IL_002e
 M00000006_IL_001a:
 ldloca local2
 M00000006_IL_001c:
-call neoCLR.Library.System.ResultOperators.RuntimeUnion4<T1>(System.Result.Error<T1>&)
+call neoCLR.Library.System.ResultOperators.RuntimeUnion4<T1>(System.Result.Failure<T1>&)
 M00000006_IL_0021:
 stloc local0
 M00000006_IL_0022:
@@ -582,7 +582,7 @@ ret
 .local System.Result<T0,T1> local3
 .local System.Result.Ok<T0> local4
 .local System.Result<T0,T1> local5
-.local System.Result.Error<T1> local6
+.local System.Result.Failure<T1> local6
 ldloca local0
 initobj System.Result<T0,T1>
 ldloca local1
@@ -594,7 +594,7 @@ initobj System.Result.Ok<T0>
 ldloca local5
 initobj System.Result<T0,T1>
 ldloca local6
-initobj System.Result.Error<T1>
+initobj System.Result.Failure<T1>
 M00000007_IL_0000:
 M00000007_IL_0001:
 M00000007_IL_0002:
@@ -646,19 +646,19 @@ stloc local5
 M00000007_IL_0045:
 ldloca local6
 M00000007_IL_0047:
-initobj System.Result.Error<T1>
+initobj System.Result.Failure<T1>
 M00000007_IL_004d:
 ldloca local5
 M00000007_IL_004f:
 ldloca local6
 M00000007_IL_0051:
-call neoCLR.Library.System.ResultOperators.RuntimeUnion2<T0,T1>(System.Result<T0,T1>&,System.Result.Error<T1>&)
+call neoCLR.Library.System.ResultOperators.RuntimeUnion2<T0,T1>(System.Result<T0,T1>&,System.Result.Failure<T1>&)
 M00000007_IL_0056:
 brfalse M00000007_IL_007d
 M00000007_IL_005b:
 ldloca local6
 M00000007_IL_005d:
-call neoCLR.Library.System.ResultOperators.RuntimeUnion4<T1>(System.Result.Error<T1>&)
+call neoCLR.Library.System.ResultOperators.RuntimeUnion4<T1>(System.Result.Failure<T1>&)
 M00000007_IL_0062:
 stloc local2
 M00000007_IL_0063:
@@ -694,7 +694,7 @@ ret
 .local System.Result<T0,T1> local3
 .local System.Result.Ok<T0> local4
 .local System.Result<T0,T1> local5
-.local System.Result.Error<T1> local6
+.local System.Result.Failure<T1> local6
 ldloca local0
 initobj System.Result<T0,T1>
 ldloca local3
@@ -704,7 +704,7 @@ initobj System.Result.Ok<T0>
 ldloca local5
 initobj System.Result<T0,T1>
 ldloca local6
-initobj System.Result.Error<T1>
+initobj System.Result.Failure<T1>
 M00000008_IL_0000:
 M00000008_IL_0001:
 M00000008_IL_0002:
@@ -752,19 +752,19 @@ stloc local5
 M00000008_IL_003d:
 ldloca local6
 M00000008_IL_003f:
-initobj System.Result.Error<T1>
+initobj System.Result.Failure<T1>
 M00000008_IL_0045:
 ldloca local5
 M00000008_IL_0047:
 ldloca local6
 M00000008_IL_0049:
-call neoCLR.Library.System.ResultOperators.RuntimeUnion2<T0,T1>(System.Result<T0,T1>&,System.Result.Error<T1>&)
+call neoCLR.Library.System.ResultOperators.RuntimeUnion2<T0,T1>(System.Result<T0,T1>&,System.Result.Failure<T1>&)
 M00000008_IL_004e:
 brfalse M00000008_IL_0073
 M00000008_IL_0053:
 ldloca local6
 M00000008_IL_0055:
-call neoCLR.Library.System.ResultOperators.RuntimeUnion4<T1>(System.Result.Error<T1>&)
+call neoCLR.Library.System.ResultOperators.RuntimeUnion4<T1>(System.Result.Failure<T1>&)
 M00000008_IL_005a:
 pop
 M00000008_IL_005b:
@@ -797,7 +797,7 @@ ret
 .local System.Result<T0,T1> local3
 .local System.Result.Ok<T0> local4
 .local System.Result<T0,T1> local5
-.local System.Result.Error<T1> local6
+.local System.Result.Failure<T1> local6
 ldloca local0
 initobj System.Result<T0,T1>
 ldloca local3
@@ -807,7 +807,7 @@ initobj System.Result.Ok<T0>
 ldloca local5
 initobj System.Result<T0,T1>
 ldloca local6
-initobj System.Result.Error<T1>
+initobj System.Result.Failure<T1>
 M00000009_IL_0000:
 M00000009_IL_0001:
 M00000009_IL_0002:
@@ -855,19 +855,19 @@ stloc local5
 M00000009_IL_003d:
 ldloca local6
 M00000009_IL_003f:
-initobj System.Result.Error<T1>
+initobj System.Result.Failure<T1>
 M00000009_IL_0045:
 ldloca local5
 M00000009_IL_0047:
 ldloca local6
 M00000009_IL_0049:
-call neoCLR.Library.System.ResultOperators.RuntimeUnion2<T0,T1>(System.Result<T0,T1>&,System.Result.Error<T1>&)
+call neoCLR.Library.System.ResultOperators.RuntimeUnion2<T0,T1>(System.Result<T0,T1>&,System.Result.Failure<T1>&)
 M00000009_IL_004e:
 brfalse M00000009_IL_006f
 M00000009_IL_0053:
 ldloca local6
 M00000009_IL_0055:
-call neoCLR.Library.System.ResultOperators.RuntimeUnion4<T1>(System.Result.Error<T1>&)
+call neoCLR.Library.System.ResultOperators.RuntimeUnion4<T1>(System.Result.Failure<T1>&)
 M00000009_IL_005a:
 pop
 M00000009_IL_005b:

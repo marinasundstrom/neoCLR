@@ -24,7 +24,7 @@ func Int64Signs() -> Result<unit, TestFailure> {
 [Test("Int64 parsing rejects noncanonical lexical inputs")]
 func Int64InvalidFormat() -> Result<unit, TestFailure> {
     for text in ["", "+", "-", " 1", "1 ", "1\u0000", "１２", "1,000", "0x10", "++1"] {
-        _ = Assert.True(Int64.Parse(text) is Error(NumberParseError.InvalidFormat), "Invalid integer text must report format error: " + text)?
+        _ = Assert.True(Int64.Parse(text) is Failure(NumberParseError.InvalidFormat), "Invalid integer text must report format error: " + text)?
     }
     return Assert.True(true, "All malformed forms rejected")
 }
@@ -32,9 +32,9 @@ func Int64InvalidFormat() -> Result<unit, TestFailure> {
 [Test("Int64 parsing distinguishes overflow from invalid trailing text")]
 func Int64Overflow() -> Result<unit, TestFailure> {
     for text in ["9223372036854775808", "-9223372036854775809", "99999999999999999999999999999"] {
-        _ = Assert.True(Int64.Parse(text) is Error(NumberParseError.Overflow), "Out-of-range integer must report overflow")?
+        _ = Assert.True(Int64.Parse(text) is Failure(NumberParseError.Overflow), "Out-of-range integer must report overflow")?
     }
-    return Assert.True(Int64.Parse("99999999999999999999999999999x") is Error(NumberParseError.InvalidFormat), "Malformed suffix takes precedence over overflow")
+    return Assert.True(Int64.Parse("99999999999999999999999999999x") is Failure(NumberParseError.InvalidFormat), "Malformed suffix takes precedence over overflow")
 }
 
 [Test("Int64 decimal formatting round trips signed boundaries")]

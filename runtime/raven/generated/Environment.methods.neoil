@@ -39,7 +39,7 @@ ldloc local1
 M00000002_IL_0023:
 call neoCLR.Library.System.Environment.RuntimeUnion0(System.EnvironmentError)
 M00000002_IL_0028:
-call neoCLR.Library.System.Environment.RuntimeUnion1(System.Result.Error<System.EnvironmentError>)
+call neoCLR.Library.System.Environment.RuntimeUnion1(System.Result.Failure<System.EnvironmentError>)
 M00000002_IL_002d:
 ret
 M00000002_IL_002e:
@@ -95,7 +95,7 @@ ldloc local3
 M00000003_IL_0024:
 call neoCLR.Library.System.Environment.RuntimeUnion0(System.EnvironmentError)
 M00000003_IL_0029:
-call neoCLR.Library.System.Environment.RuntimeUnion4(System.Result.Error<System.EnvironmentError>)
+call neoCLR.Library.System.Environment.RuntimeUnion4(System.Result.Failure<System.EnvironmentError>)
 M00000003_IL_002e:
 ret
 M00000003_IL_002f:

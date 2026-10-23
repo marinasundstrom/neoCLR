@@ -81,16 +81,16 @@ internal class GZipDecoder {
 
     func Decode() -> Result<byte[], StreamError> {
         if source.Length == 0 {
-            return Error(StreamError.InvalidData)
+            return Failure(StreamError.InvalidData)
         }
         while position < source.Length && !invalid {
             let headerStart = position
             if Read(8) != 31 || Read(8) != 139 || Read(8) != 8 {
-                return Error(StreamError.InvalidData)
+                return Failure(StreamError.InvalidData)
             }
             let flags = Read(8)
             if (flags & 224) != 0 {
-                return Error(StreamError.InvalidData)
+                return Failure(StreamError.InvalidData)
             }
             _ = Word()
             _ = Read(8)
@@ -128,7 +128,7 @@ internal class GZipDecoder {
                         invalid = true
                     }
                     if count > 65536 - output.Count {
-                        return Error(StreamError.LimitExceeded)
+                        return Failure(StreamError.LimitExceeded)
                     }
                     var index = 0
                     while index < count && !invalid {
@@ -225,7 +225,7 @@ internal class GZipDecoder {
                         let symbol = Symbol(literalTree)
                         if symbol < 256 {
                             if output.Count >= 65536 {
-                                return Error(StreamError.LimitExceeded)
+                                return Failure(StreamError.LimitExceeded)
                             }
                             output.Add((byte)symbol)
                         } else if symbol == 256 {
@@ -245,7 +245,7 @@ internal class GZipDecoder {
                                     invalid = true
                                 }
                                 if length > 65536 - output.Count {
-                                    return Error(StreamError.LimitExceeded)
+                                    return Failure(StreamError.LimitExceeded)
                                 }
                                 index = 0
                                 while index < length && !invalid {
@@ -273,7 +273,7 @@ internal class GZipDecoder {
             }
         }
         if invalid {
-            return Error(StreamError.InvalidData)
+            return Failure(StreamError.InvalidData)
         }
         let result = CheckedStorage.Reserve<byte>(output.Count)
         var resultIndex = 0

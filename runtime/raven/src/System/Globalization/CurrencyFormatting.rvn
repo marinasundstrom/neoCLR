@@ -73,7 +73,7 @@ internal static class CurrencyFormatting {
         var start = 0
         var end = bytes.Length
         if !Matches(bytes, start, direction) {
-            return Error(NumberParseError.InvalidFormat())
+            return Failure(NumberParseError.InvalidFormat())
         }
         start += direction.Utf8Bytes.Length
         let minus = NegativeSign(culture)
@@ -90,34 +90,34 @@ internal static class CurrencyFormatting {
             if !Matches(bytes, end - symbol.Utf8Bytes.Length, symbol) {
                 token = currency.Code
                 if !Matches(bytes, end - token.Utf8Bytes.Length, token) {
-                    return Error(NumberParseError.InvalidFormat())
+                    return Failure(NumberParseError.InvalidFormat())
                 }
             }
             end -= token.Utf8Bytes.Length
             end -= direction.Utf8Bytes.Length
             if !Matches(bytes, end, direction) {
-                return Error(NumberParseError.InvalidFormat())
+                return Failure(NumberParseError.InvalidFormat())
             }
             end -= 2
             if !Matches(bytes, end, " ") {
-                return Error(NumberParseError.InvalidFormat())
+                return Failure(NumberParseError.InvalidFormat())
             }
         } else {
             if !Matches(bytes, start, symbol) {
                 token = currency.Code
                 if !Matches(bytes, start, token) {
-                    return Error(NumberParseError.InvalidFormat())
+                    return Failure(NumberParseError.InvalidFormat())
                 }
             }
             start += token.Utf8Bytes.Length
             let space = PrefixSpace(token)
             if !Matches(bytes, start, space) {
-                return Error(NumberParseError.InvalidFormat())
+                return Failure(NumberParseError.InvalidFormat())
             }
             start += space.Utf8Bytes.Length
         }
         if start >= end {
-            return Error(NumberParseError.InvalidFormat())
+            return Failure(NumberParseError.InvalidFormat())
         }
         return Decimal.ParseCurrencyDigits(bytes[start..end], culture, negative)
     }

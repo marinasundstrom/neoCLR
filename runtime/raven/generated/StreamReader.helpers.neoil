@@ -119,14 +119,14 @@ ret
 newobj instance System.IO.TextReadError.InvalidEncoding::.ctor()
 ret
 .end
-.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion0(System.IO.TextReadError arg0) -> System.Result.Error<System.IO.TextReadError>
+.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion0(System.IO.TextReadError arg0) -> System.Result.Failure<System.IO.TextReadError>
 ldarg arg0
-newobj instance System.Result.Error<System.IO.TextReadError>::.ctor(System.IO.TextReadError)
+newobj instance System.Result.Failure<System.IO.TextReadError>::.ctor(System.IO.TextReadError)
 ret
 .end
-.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion1(System.Result.Error<System.IO.TextReadError> arg0) -> System.Result<System.Option<String>,System.IO.TextReadError>
+.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion1(System.Result.Failure<System.IO.TextReadError> arg0) -> System.Result<System.Option<String>,System.IO.TextReadError>
 ldarg arg0
-newobj instance System.Result<System.Option<String>,System.IO.TextReadError>::.ctor(System.Result.Error<System.IO.TextReadError>)
+newobj instance System.Result<System.Option<String>,System.IO.TextReadError>::.ctor(System.Result.Failure<System.IO.TextReadError>)
 ret
 .end
 .function neoCLR.Library.System.IO.StreamReader.RuntimeUnion2() -> System.Option.None
@@ -165,26 +165,26 @@ ldarg arg0
 call instance System.Result.Ok<String>::get_Value()
 ret
 .end
-.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion9(System.Result<String,System.Text.Utf8SliceError>& arg0,out(true) System.Result.Error<System.Text.Utf8SliceError>& arg1) -> Boolean
+.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion9(System.Result<String,System.Text.Utf8SliceError>& arg0,out(true) System.Result.Failure<System.Text.Utf8SliceError>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Result<String,System.Text.Utf8SliceError>::TryGetValue(System.Result.Error<System.Text.Utf8SliceError>&)
+call instance System.Result<String,System.Text.Utf8SliceError>::TryGetValue(System.Result.Failure<System.Text.Utf8SliceError>&)
 ret
 .end
-.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion10(System.Result<String,System.IO.TextReadError>& arg0,out(true) System.Result.Error<System.IO.TextReadError>& arg1) -> Boolean
+.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion10(System.Result<String,System.IO.TextReadError>& arg0,out(true) System.Result.Failure<System.IO.TextReadError>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Result<String,System.IO.TextReadError>::TryGetValue(System.Result.Error<System.IO.TextReadError>&)
+call instance System.Result<String,System.IO.TextReadError>::TryGetValue(System.Result.Failure<System.IO.TextReadError>&)
 ret
 .end
-.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion11(System.Result.Error<System.Text.Utf8SliceError>& arg0) -> System.Text.Utf8SliceError
+.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion11(System.Result.Failure<System.Text.Utf8SliceError>& arg0) -> System.Text.Utf8SliceError
 ldarg arg0
-call instance System.Result.Error<System.Text.Utf8SliceError>::get_Value()
+call instance System.Result.Failure<System.Text.Utf8SliceError>::get_Value()
 ret
 .end
-.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion12(System.Result.Error<System.IO.TextReadError>& arg0) -> System.IO.TextReadError
+.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion12(System.Result.Failure<System.IO.TextReadError>& arg0) -> System.IO.TextReadError
 ldarg arg0
-call instance System.Result.Error<System.IO.TextReadError>::get_Value()
+call instance System.Result.Failure<System.IO.TextReadError>::get_Value()
 ret
 .end
 .function neoCLR.Library.System.IO.StreamReader.RuntimeUnion13(System.Result<String,System.Text.InvalidUtf8Error>& arg0,out(true) System.Result.Ok<String>& arg1) -> Boolean
@@ -193,10 +193,10 @@ ldarg arg1
 call instance System.Result<String,System.Text.InvalidUtf8Error>::TryGetValue(System.Result.Ok<String>&)
 ret
 .end
-.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion14(System.Result<String,System.Text.InvalidUtf8Error>& arg0,out(true) System.Result.Error<System.Text.InvalidUtf8Error>& arg1) -> Boolean
+.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion14(System.Result<String,System.Text.InvalidUtf8Error>& arg0,out(true) System.Result.Failure<System.Text.InvalidUtf8Error>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Result<String,System.Text.InvalidUtf8Error>::TryGetValue(System.Result.Error<System.Text.InvalidUtf8Error>&)
+call instance System.Result<String,System.Text.InvalidUtf8Error>::TryGetValue(System.Result.Failure<System.Text.InvalidUtf8Error>&)
 ret
 .end
 .function neoCLR.Library.System.IO.StreamReader.RuntimeUnion15(String arg0) -> System.Option.Some<String>
@@ -209,14 +209,14 @@ ldarg arg0
 newobj instance System.Option<String>::.ctor(System.Option.Some<String>)
 ret
 .end
-.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion17(System.Result.Error<System.Text.InvalidUtf8Error>& arg0) -> System.Text.InvalidUtf8Error
+.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion17(System.Result.Failure<System.Text.InvalidUtf8Error>& arg0) -> System.Text.InvalidUtf8Error
 ldarg arg0
-call instance System.Result.Error<System.Text.InvalidUtf8Error>::get_Value()
+call instance System.Result.Failure<System.Text.InvalidUtf8Error>::get_Value()
 ret
 .end
-.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion18(System.Result.Error<System.IO.TextReadError> arg0) -> System.Result<String,System.IO.TextReadError>
+.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion18(System.Result.Failure<System.IO.TextReadError> arg0) -> System.Result<String,System.IO.TextReadError>
 ldarg arg0
-newobj instance System.Result<String,System.IO.TextReadError>::.ctor(System.Result.Error<System.IO.TextReadError>)
+newobj instance System.Result<String,System.IO.TextReadError>::.ctor(System.Result.Failure<System.IO.TextReadError>)
 ret
 .end
 .function neoCLR.Library.System.IO.StreamReader.RuntimeUnion19(String arg0) -> System.Result.Ok<String>
@@ -240,15 +240,15 @@ ldarg arg0
 call instance System.Result.Ok<Int32>::get_Value()
 ret
 .end
-.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion23(System.Result<Int32,System.IO.StreamError>& arg0,out(true) System.Result.Error<System.IO.StreamError>& arg1) -> Boolean
+.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion23(System.Result<Int32,System.IO.StreamError>& arg0,out(true) System.Result.Failure<System.IO.StreamError>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Result<Int32,System.IO.StreamError>::TryGetValue(System.Result.Error<System.IO.StreamError>&)
+call instance System.Result<Int32,System.IO.StreamError>::TryGetValue(System.Result.Failure<System.IO.StreamError>&)
 ret
 .end
-.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion24(System.Result.Error<System.IO.StreamError>& arg0) -> System.IO.StreamError
+.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion24(System.Result.Failure<System.IO.StreamError>& arg0) -> System.IO.StreamError
 ldarg arg0
-call instance System.Result.Error<System.IO.StreamError>::get_Value()
+call instance System.Result.Failure<System.IO.StreamError>::get_Value()
 ret
 .end
 .function neoCLR.Library.System.IO.StreamReader.RuntimeUnion25(System.Result<String,System.Text.EncodingError>& arg0,out(true) System.Result.Ok<String>& arg1) -> Boolean
@@ -257,15 +257,15 @@ ldarg arg1
 call instance System.Result<String,System.Text.EncodingError>::TryGetValue(System.Result.Ok<String>&)
 ret
 .end
-.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion26(System.Result<String,System.Text.EncodingError>& arg0,out(true) System.Result.Error<System.Text.EncodingError>& arg1) -> Boolean
+.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion26(System.Result<String,System.Text.EncodingError>& arg0,out(true) System.Result.Failure<System.Text.EncodingError>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Result<String,System.Text.EncodingError>::TryGetValue(System.Result.Error<System.Text.EncodingError>&)
+call instance System.Result<String,System.Text.EncodingError>::TryGetValue(System.Result.Failure<System.Text.EncodingError>&)
 ret
 .end
-.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion27(System.Result.Error<System.Text.EncodingError>& arg0) -> System.Text.EncodingError
+.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion27(System.Result.Failure<System.Text.EncodingError>& arg0) -> System.Text.EncodingError
 ldarg arg0
-call instance System.Result.Error<System.Text.EncodingError>::get_Value()
+call instance System.Result.Failure<System.Text.EncodingError>::get_Value()
 ret
 .end
 .function neoCLR.Library.System.IO.StreamReader.RuntimeBooleanFromInt32(Int32 value) -> Boolean

@@ -118,17 +118,17 @@ func CheckContracts() {
     let status = HttpClient(ReplyHandler(404, HttpStringContent("missing"))).GetString("http://example.test/")
     let badUri = client.GetString("http://another.test/")
     TaskQueue.Default.Drain()
-    if let Error(HttpError.Protocol(message)) = invalid.GetResult() {
+    if let Failure(HttpError.Protocol(message)) = invalid.GetResult() {
         Check(message == "Invalid UTF-8 body")
     } else {
         System.Fail("Invalid UTF-8 was accepted")
     }
-    if let Error(HttpError.UnsuccessfulStatus(code)) = status.GetResult() {
+    if let Failure(HttpError.UnsuccessfulStatus(code)) = status.GetResult() {
         Check(code == HttpStatusCode.NotFound)
     } else {
         System.Fail("Non-success status was accepted")
     }
-    if let Error(HttpError.InvalidRequest(_)) = badUri.GetResult() {
+    if let Failure(HttpError.InvalidRequest(_)) = badUri.GetResult() {
         Check(true)
     } else {
         System.Fail("BaseUri failure was lost")
@@ -180,7 +180,7 @@ func Main() {
     let survivor = client.GetString("keep", CancellationToken.None)
     response.OnCompleted(() => {
         if !response.IsCancelled {
-            if let Error(reason) = response.GetResult() {
+            if let Failure(reason) = response.GetResult() {
                 System.Fail(String.Concat("Response completed before cancellation: ", reason.ToString()))
             }
             System.Fail("Response succeeded before cancellation")

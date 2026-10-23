@@ -54,9 +54,9 @@ async func Main(arguments: string[]) -> Task<()> {
         if mode == "ok" {
             if !(first is Ok(_)) { System.Fail("HTTPS request failed") }
         } else if mode == "timeout" {
-            if !(first is Error(HttpError.TimedOut)) { System.Fail("Expected handshake timeout") }
+            if !(first is Failure(HttpError.TimedOut)) { System.Fail("Expected handshake timeout") }
         } else {
-            if !(first is Error(_)) { System.Fail("Invalid TLS peer reached handler") }
+            if !(first is Failure(_)) { System.Fail("Invalid TLS peer reached handler") }
         }
     }
     let recovery = await server.ServeOne(Respond)

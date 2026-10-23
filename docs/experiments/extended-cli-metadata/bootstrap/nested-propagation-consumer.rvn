@@ -9,7 +9,7 @@ class Effects {
     func Read(fail: bool) -> Result<int, string> {
         Count = Count * 10 + 2
         if fail {
-            return .Error("failed")
+            return .Failure("failed")
         }
         return .Ok(7)
     }
@@ -39,12 +39,12 @@ func Main() -> int {
                 return 1
             }
         }
-        .Error(_) => { return 2 }
+        .Failure(_) => { return 2 }
     }
     let failureEffects = Effects()
     let failure = Run(failureEffects, true)
     match failure {
-        .Error(let message) => {
+        .Failure(let message) => {
             if message != "failed" || failureEffects.Count != 12 {
                 return 3
             }
@@ -60,7 +60,7 @@ func Main() -> int {
                 return 5
             }
         }
-        .Error(_) => { return 6 }
+        .Failure(_) => { return 6 }
     }
     return 42
 }

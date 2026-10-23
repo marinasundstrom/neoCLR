@@ -47,14 +47,14 @@ func Check(value: bool) {
 func Text(result: Result<string, string>) -> string {
     match result {
         Ok(let value) => return value
-        Error(_) => System.Fail("Unexpected codec error")
+        Failure(_) => System.Fail("Unexpected codec error")
     }
     return ""
 }
 func Rejected(result: Result<string, string>) {
     match result {
         Ok(_) => System.Fail("Expected codec rejection")
-        Error(_) => { }
+        Failure(_) => { }
     }
 }
 '''

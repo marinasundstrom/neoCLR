@@ -7,7 +7,7 @@ async func Print(input: Task<Result<int, string>>) -> Task<unit> {
     let result = await input
     if let Ok(value) = result {
         WriteLine(value)
-    } else if let Error(message) = result {
+    } else if let Failure(message) = result {
         WriteLine(message)
     }
 }

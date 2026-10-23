@@ -115,7 +115,7 @@ fn failed_close_can_be_followed_by_disposal_and_typed_closed_state_error() {
         ldloca value
         interface.borrow System.Closable<DraftCloseError>
         call Finish(System.Closable<DraftCloseError>&)
-        call instance System.Result<Void,DraftCloseError>::GetErrorCase()
+        call instance System.Result<Void,DraftCloseError>::GetFailureCase()
         pop
         ldloca value
         interface.borrow System.Disposable
@@ -124,8 +124,8 @@ fn failed_close_can_be_followed_by_disposal_and_typed_closed_state_error() {
         ldloca value
         interface.borrow System.Closable<DraftCloseError>
         call Finish(System.Closable<DraftCloseError>&)
-        call instance System.Result<Void,DraftCloseError>::GetErrorCase()
-        call instance System.Result.Error<DraftCloseError>::get_Value()
+        call instance System.Result<Void,DraftCloseError>::GetFailureCase()
+        call instance System.Result.Failure<DraftCloseError>::get_Value()
         ldfld DraftCloseError::Message
         ldstr "Draft is disposed"
         ceq

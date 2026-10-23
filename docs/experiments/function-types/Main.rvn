@@ -87,7 +87,7 @@ func Main() -> int {
     }
     let unit = (FunctionTypeInfo)typeof(() -> ())
     Check(unit.Parameters.Count == 0 && unit.ReturnType.Equals(typeof(System.Void)), "Zero-parameter unit signature")
-    Check(invoke.Invoke(null) is Error(ReflectionError.UnboundMetadata), "Synthesized member is descriptive in dynamic reflection")
+    Check(invoke.Invoke(null) is Failure(ReflectionError.UnboundMetadata), "Synthesized member is descriptive in dynamic reflection")
     let nested = typeof(Option<(int) -> string>).GetGenericArgument(0)
     Check(nested is FunctionTypeInfo && nested.Equals(function), "Generic argument chooses Function provider")
     System.Runtime.GC.Collect()

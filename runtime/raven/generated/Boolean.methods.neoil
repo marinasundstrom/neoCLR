@@ -64,7 +64,7 @@ call neoCLR.Library.System.Boolean.RuntimeErrorSystemBooleanParseErrorNewSystemB
 M00000001_IL_004e:
 call neoCLR.Library.System.Boolean.RuntimeUnion2(System.BooleanParseError)
 M00000001_IL_0053:
-call neoCLR.Library.System.Boolean.RuntimeUnion3(System.Result.Error<System.BooleanParseError>)
+call neoCLR.Library.System.Boolean.RuntimeUnion3(System.Result.Failure<System.BooleanParseError>)
 M00000001_IL_0058:
 ret
 M00000001_IL_0059:

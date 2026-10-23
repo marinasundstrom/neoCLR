@@ -24,15 +24,15 @@ call instance System.Result.Ok<T0>::get_Value()
 ret
 .end
 .function UnwrapError<T0,T1>(System.Result<T0,T1> value) -> T1
-.local System.Result.Error<T1> matched
+.local System.Result.Failure<T1> matched
 ldarga value
 ldloca matched
-call instance System.Result<T0,T1>::TryGetValue(System.Result.Error<T1>&)
+call instance System.Result<T0,T1>::TryGetValue(System.Result.Failure<T1>&)
 brtrue Found
 fault "Expected Error"
 Found:
 ldloca matched
-call instance System.Result.Error<T1>::get_Value()
+call instance System.Result.Failure<T1>::get_Value()
 ret
 .end
 .function IsNone<T0>(System.Option<T0> value) -> Boolean
