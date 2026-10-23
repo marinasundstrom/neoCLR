@@ -6230,3 +6230,11 @@ for quiescence. Nine optimized/UBSan groups pass, including 25 shared-read round
 compiled graph and HTTP regressions also pass. This is a native ownership boundary,
 not generated parallel mutation or a new public threading contract. See
 [validation](experiments/native-worker-pool/README.md#concurrent-native-read-phases--2026-10-23).
+
+Cooperative native-mutator follow-up (2026-10-23): explicit mutation phases and
+participant roots now pass 25 four-worker graph/GC rounds, including detached
+cycles, synchronized shared updates, cancellation and final reclamation. Eleven
+optimized/UBSan native groups and generated/HTTP-listener regressions pass. This
+is a native safepoint prototype; generated callbacks remain exclusive pending
+shared-heap/context separation and compiler-frame publication. See
+[evidence](experiments/native-worker-pool/README.md#cooperative-native-mutation-phases--2026-10-23).

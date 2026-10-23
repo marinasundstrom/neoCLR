@@ -462,7 +462,164 @@ static void concurrent_read_phases(void) {
     CHECK(neoclr_workers_close(p) && neoclr_workers_destroy(p));
     puts("PASS concurrent native readers, collector/writer exclusion, cancellation, capture lifetime and reclamation (25 rounds)");
 }
+typedef struct mutable_graph mutable_graph;
+typedef struct { uint64_t value; mutable_graph *back; } graph_child;
+struct mutable_graph {
+    uint64_t updates;
+    graph_child *heads[4], *aliases[4];
+    uint64_t lanes[4];
+};
+static int make_mutable_graph(neoclr_worker_job *j, void *state) {
+    (void)state;
+    neoclr_worker_enter(j);
+    mutable_graph *g = neoclr_worker_allocate(j, sizeof(*g), NEOCLR_GC_OBJECT);
+    CHECK(g);
+    for (unsigned i = 0; i < 4; i++) {
+        graph_child *child = neoclr_worker_allocate(j, sizeof(*child), NEOCLR_GC_OBJECT);
+        CHECK(child);
+        child->value = 42 + i; child->back = g;
+        g->heads[i] = child; g->aliases[i] = child;
+    }
+    neoclr_worker_result(j, (neoclr_worker_value){1, 0, g});
+    neoclr_worker_leave(j);
+    return 0;
+}
+typedef struct {
+    shared_read_trial progress;
+    pthread_mutex_t application_gate;
+} mutation_trial;
+typedef struct { mutation_trial *trial; unsigned index; } graph_mutator;
+static int mutate_graph(neoclr_worker_job *j, void *state) {
+    graph_mutator *m = state;
+    mutation_trial *t = m->trial;
+    unsigned i = m->index;
+    mutable_graph *g = neoclr_worker_mutate_begin(j);
+    graph_child *child = g->heads[i];
+    CHECK(child && child == g->aliases[i] && child->back == g && child->value == 42 + i);
+    CHECK(neoclr_worker_local_store(j, 0, child));
+    CHECK(!neoclr_worker_local_store(j, NEOCLR_WORKER_LOCAL_ROOTS, child));
+    CHECK(!neoclr_worker_local_store(j, 1, (unsigned char *)child + 1));
+    /* Each worker owns its array slots. Detached cyclic children now require
+     * participant roots: back edges alone cannot retain a child from the graph. */
+    g->heads[i] = NULL; g->aliases[i] = NULL;
+    atomic_fetch_add(&t->progress.readers, 1);
+    while (!atomic_load(&t->progress.release)) {
+        ++g->lanes[i];
+        CHECK(child->back == g && !atomic_load(&t->progress.collected));
+        atomic_fetch_add(&t->progress.visits[i], 1);
+    }
+    /* No application lock is held across the native safepoint. */
+    g = neoclr_worker_mutate_poll(j);
+    child = neoclr_worker_local_load(j, 0);
+    CHECK(child && child->back == g && child->value == 42 + i);
+    neoclr_worker_mutate_end(j);
+    while (!atomic_load(&t->progress.collected)) sched_yield();
+    g = neoclr_worker_mutate_begin(j);
+    child = neoclr_worker_local_load(j, 0);
+    CHECK(child && child->back == g && child->value == 42 + i);
+    CHECK(!g->heads[i] && !g->aliases[i]);
+    g->heads[i] = child; g->aliases[i] = child;
+    CHECK(neoclr_worker_local_store(j, 0, NULL));
+    CHECK(!pthread_mutex_lock(&t->application_gate));
+    ++g->updates;
+    CHECK(!pthread_mutex_unlock(&t->application_gate));
+    neoclr_worker_mutate_end(j);
+    return 0;
+}
+static void concurrent_mutation_phases(void) {
+    neoclr_workers *p = neoclr_workers_create(4, 4, 8192);
+    neoclr_worker_handle seed, ticket, graph;
+    neoclr_worker_value value;
+    CHECK(p && neoclr_workers_root_new(p, 0, &seed));
+    CHECK(neoclr_workers_submit(p, seed, make_mutable_graph, NULL, &ticket));
+    CHECK(take(p, ticket, &value, &graph) == NEOCLR_WORKER_OK && graph.pool);
+    CHECK(neoclr_workers_root_release(p, seed));
+    for (unsigned round = 0; round < 25; round++) {
+        mutation_trial t = {0};
+        CHECK(!pthread_mutex_init(&t.application_gate, NULL));
+        graph_mutator mutators[4]; neoclr_worker_handle tickets[4];
+        for (unsigned i = 0; i < 4; i++) {
+            mutators[i] = (graph_mutator){&t, i};
+            CHECK(neoclr_workers_submit(p, graph, mutate_graph, &mutators[i], &tickets[i]));
+        }
+        while (atomic_load(&t.progress.readers) != 4) sched_yield();
+        CHECK(neoclr_workers_cancel(p, tickets[0]));
+        pthread_t controller;
+        CHECK(!pthread_create(&controller, NULL, release_readers, &t.progress));
+        atomic_store(&t.progress.collecting, 1);
+        uint64_t extent;
+        CHECK(neoclr_workers_collect(p, &extent) && extent);
+        atomic_store(&t.progress.collected, 1);
+        CHECK(!pthread_join(controller, NULL));
+        for (unsigned i = 0; i < 4; i++) {
+            neoclr_worker_handle root;
+            CHECK(take(p, tickets[i], &value, &root) ==
+                (i == 0 ? NEOCLR_WORKER_CANCELLED : NEOCLR_WORKER_OK));
+            CHECK(!root.pool);
+        }
+        uint64_t updates;
+        CHECK(neoclr_workers_root_read(p, graph, &updates) && updates == (round + 1) * 4);
+        CHECK(!pthread_mutex_destroy(&t.application_gate));
+    }
+    CHECK(neoclr_workers_root_release(p, graph));
+    uint64_t extent = 99;
+    CHECK(neoclr_workers_collect(p, &extent) && !extent);
+    CHECK(neoclr_workers_close(p) && neoclr_workers_destroy(p));
+    puts("PASS concurrent native mutations, cooperative GC, detached cyclic roots, reattachment, cancellation and reclamation (25 rounds)");
+}
+typedef struct { atomic_int active, attempt, release; int mutation_first; } phase_modes;
+static int first_mode(neoclr_worker_job *j, void *state) {
+    phase_modes *m = state;
+    const uint64_t *value = m->mutation_first ? neoclr_worker_mutate_begin(j) : neoclr_worker_read_begin(j);
+    CHECK(value && *value == 42);
+    atomic_store(&m->active, 1);
+    while (!atomic_load(&m->release)) sched_yield();
+    CHECK(*value == 42);
+    atomic_store(&m->active, 0);
+    if (m->mutation_first) neoclr_worker_mutate_end(j); else neoclr_worker_read_end(j);
+    return 0;
+}
+static int second_mode(neoclr_worker_job *j, void *state) {
+    phase_modes *m = state;
+    atomic_store(&m->attempt, 1);
+    const uint64_t *value = m->mutation_first ? neoclr_worker_read_begin(j) : neoclr_worker_mutate_begin(j);
+    CHECK(!atomic_load(&m->active) && value && *value == 42);
+    if (m->mutation_first) neoclr_worker_read_end(j); else neoclr_worker_mutate_end(j);
+    return 0;
+}
+static void *release_modes(void *state) {
+    phase_modes *m = state;
+    for (unsigned i = 0; i < 10000; i++) {
+        CHECK(atomic_load(&m->active));
+        sched_yield();
+    }
+    atomic_store(&m->release, 1);
+    return NULL;
+}
+static void mixed_phase_shutdown(void) {
+    for (int mode = 0; mode < 2; mode++) {
+        phase_modes m = {.mutation_first = mode};
+        neoclr_workers *p = neoclr_workers_create(2, 2, 8192);
+        neoclr_worker_handle capture, first, second;
+        CHECK(p && neoclr_workers_root_new(p, 42, &capture));
+        CHECK(neoclr_workers_submit(p, capture, first_mode, &m, &first));
+        while (!atomic_load(&m.active)) sched_yield();
+        CHECK(neoclr_workers_submit(p, capture, second_mode, &m, &second));
+        while (!atomic_load(&m.attempt)) sched_yield();
+        CHECK(neoclr_workers_root_release(p, capture));
+        CHECK(neoclr_workers_cancel(p, first) && neoclr_workers_cancel(p, second));
+        pthread_t controller;
+        CHECK(!pthread_create(&controller, NULL, release_modes, &m));
+        CHECK(neoclr_workers_close(p));
+        CHECK(!pthread_join(controller, NULL));
+        neoclr_worker_value value; neoclr_worker_handle root;
+        CHECK(take(p, first, &value, &root) == NEOCLR_WORKER_CANCELLED && !root.pool);
+        CHECK(take(p, second, &value, &root) == NEOCLR_WORKER_CANCELLED && !root.pool);
+        CHECK(neoclr_workers_destroy(p));
+    }
+    puts("PASS native reader/mutator exclusion in both directions and joined cancellation while phases are active");
+}
 int main(void) {
-    lifetimes(); result_and_cancel(); shutdown(); pressure_and_foreign(); settlement_race(); recovery(); participant_roots(); completion_dispatch(); concurrent_read_phases();
+    lifetimes(); result_and_cancel(); shutdown(); pressure_and_foreign(); settlement_race(); recovery(); participant_roots(); completion_dispatch(); concurrent_read_phases(); concurrent_mutation_phases(); mixed_phase_shutdown();
     return 0;
 }

@@ -6,7 +6,9 @@ mailbox wakeups and joined teardown. Eight explicit temporary-root slots per job
 now retain participant locals across gate release and owner collection. Primitive CPU work overlaps across workers.
 A generated Raven harness now qualifies forced collection, fault recovery and TLS
 reuse in independent per-invocation contexts on four workers. Shared generated-code
-parallel-mutator integration, parallel HTTP and public APIs remain unimplemented.
+parallel-mutator integration and public threading APIs remain unimplemented.
+The isolated HTTP host and native read/mutation checkpoints below are implemented
+experiments; their ownership models do not establish shared generated concurrency.
 A synchronous shared callback bridge now publishes the pool root set to existing
 compiler collection hooks under the heap gate. Synchronous faults now belong to
 individual jobs, with rooted diagnostics copied before ticket consumption;
@@ -200,3 +202,23 @@ this is a temporary qualification tool, not a managed semantic divergence. It ad
 synchronization and can delay GC if a reader stalls. Root release/cancellation
 remain responsive through the metadata mutex, and active job captures retain data.
 See [contracts and evidence](../experiments/native-worker-pool/README.md#concurrent-native-read-phases--2026-10-23).
+
+### Cooperative native mutation checkpoint — 2026-10-23
+
+The private pool now supports explicit native mutation phases with per-job local
+roots and cooperative polling. Workers may mutate disjoint fields or synchronize
+conflicting fields with application locks; the collector waits until all mutators
+have yielded. Native read phases and mutation phases are mutually exclusive. Eleven
+optimized/UBSan groups include detached cyclic graph roots, cross-worker updates,
+GC, cancellation and joined shutdown; generated shared callbacks remain exclusive.
+See [qualification and constraints](../experiments/native-worker-pool/README.md#cooperative-native-mutation-phases--2026-10-23).
+
+Relative to .NET's transparent managed GC coordination, this is a private native
+implementation experiment requiring explicit discipline. It establishes overlapping
+writes and root publication without pretending that the current compiler ABI is
+thread-safe. A stalled native phase delays collection; phase entry/polling adds
+synchronization but no per-phase allocation. Generated integration requires a
+shared heap coordinator distinct from thread-local fault/context state, complete
+participant frame snapshots and audited allocation/static/intern helpers. Do not
+copy the existing embedded arena cursor across contexts or remove the generated
+callback gate as a substitute for those changes.

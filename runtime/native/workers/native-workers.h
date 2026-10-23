@@ -1,9 +1,9 @@
 #ifndef NEOCLR_NATIVE_WORKERS_H
 #define NEOCLR_NATIVE_WORKERS_H
 /* Opt-in POSIX native experiment. Not a general Task/HTTP ABI.
- * Managed mutation is serialized through enter/leave; explicit native read phases
- * may overlap. Outside these intervals
- * callbacks may compute on copied primitives or block, but may not dereference
+ * Generated execution and allocation are serialized through enter/leave; explicit
+ * native read or synchronized mutation phases may overlap within their mode.
+ * Outside these intervals callbacks may compute on copied primitives or block, but may not dereference
  * pool-managed pointers. Independent invocation arenas need their own ownership
  * and entry/cleanup qualification; they are never collected by this pool.
  * The pool roots capture/result slots through owner collection.
@@ -59,12 +59,29 @@ int neoclr_worker_cancelled(neoclr_worker_job *);
  * This is not a compiler safepoint or support for concurrent managed mutation. */
 const void *neoclr_worker_read_begin(neoclr_worker_job *);
 void neoclr_worker_read_end(neoclr_worker_job *);
+/* Private cooperative native mutators. Other mutators may overlap; callers must
+ * synchronize conflicting fields/edges (e.g. a native mutex), or own disjoint
+ * fields. Plain native readers are excluded. GC, allocation and generated entry
+ * wait for every mutator to exit/poll. No implicit atomicity or thread safety.
+ * begin/poll returns the rooted capture. Before poll/end, publish live detached
+ * references using local_store; after begin/poll reload locals through local_load.
+ * Only local_store/load and mutate_end/poll are allowed pool calls inside a phase.
+ * No allocation, generated callbacks or TLS roots/resources. Never wait for pool
+ * operations, another phase admission, or hold application locks across begin/poll/end.
+ * Poll temporarily leaves the phase and lets pending exclusive work run; object
+ * edges may change, so reload/revalidate them with application synchronization.
+ * Cancellation does not revoke access. End on the originating callback/thread
+ * before returning. This is a native safepoint prototype, not a compiler ABI. */
+void *neoclr_worker_mutate_begin(neoclr_worker_job *);
+void *neoclr_worker_mutate_poll(neoclr_worker_job *);
+void neoclr_worker_mutate_end(neoclr_worker_job *);
 void neoclr_worker_enter(neoclr_worker_job *);
 void *neoclr_worker_capture(neoclr_worker_job *);
 void *neoclr_worker_allocate(neoclr_worker_job *, uint64_t bytes, uint32_t kind);
 void neoclr_worker_result(neoclr_worker_job *, neoclr_worker_value);
 /* Private participant roots: eight fixed slots per running job. Calls require
- * enter/leave. Store copies an exact pool allocation base (or NULL to release);
+ * enter/leave or a native mutation phase. Store copies an exact pool allocation
+ * base (or NULL to release);
  * invalid slot/value returns 0 without changing the slot. Load returns NULL for
  * an invalid/empty slot. Roots survive leaving the gate and owner collection,
  * and are cleared on all settlement paths. No stack addresses are retained.

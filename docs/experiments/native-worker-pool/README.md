@@ -418,3 +418,47 @@ The [relinked HTTP host](read-phases-http-relink.json) reuses the previously qua
 application object with current native sources; [240 responses plus pending-read
 shutdown and guest-fault exit](read-phases-http-validation.json) pass. These checks
 establish regression coverage, not a new throughput result. TSan remains unqualified.
+
+## Cooperative native mutation phases — 2026-10-23
+
+`neoclr_worker_mutate_begin/end/poll` now permit overlapping native mutations of
+shared capture graphs. Callers must synchronize conflicting fields themselves or
+own disjoint fields. This does not make ordinary objects thread-safe. Native read
+phases are excluded while mutators run; exclusive entry, allocation, consumer-root
+reads, diagnostic copying and collection wait for phase quiescence. Pending
+exclusive work prevents fresh phases from entering. No fairness between sustained
+reader and mutator groups is promised.
+
+The existing eight participant-root slots can now be stored/loaded inside mutation
+phases. Their exact-base validation uses stable arena headers and the metadata
+mutex; it never tries to acquire exclusive heap access while the caller is counted
+as a mutator. Publish live detached references before a poll and reload afterward.
+A poll exits and re-enters the phase, permitting pending GC/exclusive work to run.
+Application locks must not be held across begin/poll/end, and a phase must not wait
+for other pool operations or phase admission. Cancellation does not revoke roots or
+force a participant to stop. A stalled participant can delay GC and joined shutdown.
+Phase bookkeeping adds no per-entry heap allocation.
+
+[Eleven native groups](mutation-phases-validation.json) pass optimized/UBSan builds.
+The new graph test runs 25 rounds on four workers: concurrent writes to separately
+owned fields, a mutex-protected shared counter, aliased cyclic children detached
+into participant roots, collection, reloading and reattachment, cancellation and
+complete final reclamation. The collector runs after all active phases yield;
+there is no concurrent tracing of mutating object bytes. A separate test excludes
+reader/mutator phases in both directions and joins cancelled callbacks while an
+active phase and a waiting phase still retain their captures. Existing read and
+exclusive-access tests remain enabled.
+
+The [compiled shared graph](mutation-phases-shared-validation.json) and
+[isolated HTTP listener group](mutation-phases-http-native-validation.json) also
+pass optimized/UBSan regressions. This change does not add a new HTTP throughput
+claim. Prior end-to-end HTTP evidence remains separate. TSan is still unqualified.
+
+This is an explicit native safepoint prototype, not generated managed concurrency.
+Before generated callbacks can use it, the runtime/code generator must separate
+per-invocation faults from shared heap ownership, publish each suspended compiler
+frame chain to the collector, and serialize allocation/static/intern helpers.
+The current ABI embeds mutable arena and diagnostic state in one context; copying
+that context or merely removing the callback gate would be incorrect. Async Tasks,
+resource ownership and compiler safepoints remain separate integration work. No
+managed API or compiler bridge encoding changed in this slice.

@@ -182,6 +182,7 @@ shared-object GC qualification is a separate gate before shared-heap parallelism
 This provides server primitives, with no new application framework or change to
 the default host. [Experimental contract and evidence](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/http-worker-integration/README.md).
 
-The private worker experiment also tests concurrent native reads of shared objects,
-with mutation and collection waiting for readers to leave. Generated callbacks
-still execute exclusively; parallel managed mutation remains unqualified.
+The private worker experiment tests concurrent native reads and separately
+synchronized native mutations of shared objects. GC waits for active phases to
+yield, retaining explicitly published roots. Generated callbacks still execute
+exclusively; parallel managed mutation remains unqualified.
