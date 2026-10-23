@@ -1,0 +1,220 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Result.*
+import System.Option.*
+import System.Diagnostics.*
+import System.Storage.*
+import System.IO.*
+import NeoClr.Testing.*
+
+class Counter {
+    var Value: int = 0
+}
+
+class AuthorError : System.Error {
+    val Message: string => "Author failure"
+    val Cause: Option<System.Error> => None
+    val StackTrace: Option<StackTrace> => None
+}
+
+class DomainError : System.Error {
+    private val reason: System.Error
+    init(reason: System.Error) {
+        self.reason = reason
+    }
+    val Message: string => "Domain failure"
+    val Cause: Option<System.Error> => Some(reason)
+    val StackTrace: Option<StackTrace> => None
+}
+
+class CyclicError : System.Error {
+    val Message: string => "Cycle"
+    val Cause: Option<System.Error> => Some(self)
+    val StackTrace: Option<StackTrace> => None
+}
+
+[Test("Platform and author errors opt into message and absent diagnostics")]
+func ALeafErrors() -> Result<unit, TestFailure> {
+    let file: System.Error = FileReadError.NotFound
+    _ = Assert.Equal("NotFound", file.Message)?
+    _ = Assert.True(file.Cause is None && file.StackTrace is None, "Leaf diagnostics absent")?
+    let number: System.Error = NumberParseError.Overflow
+    _ = Assert.Equal("NumberParseError.Overflow", number.Message)?
+    let stream: System.Error = StreamError.Closed
+    _ = Assert.Equal("Closed", stream.Message)?
+    let author: System.Error = AuthorError()
+    return Assert.True(author.Cause is None && author.StackTrace is None, "Author defaults")
+}
+
+[Test("Context preserves typed payload and interface cause without capturing")]
+func BTypedCause() -> Result<unit, TestFailure> {
+    let context = FileReadError.NotFound.WithContext("Loading configuration")
+    _ = Assert.True(context.Cause is FileReadError.NotFound, "Typed case retained")?
+    let view: System.Error = context
+    _ = Assert.Equal("Loading configuration", view.Message)?
+    _ = Assert.True(view.Cause is Some(FileReadError), "Interface retains concrete error")?
+    return Assert.True(view.StackTrace is None, "No implicit trace")
+}
+
+[Test("Successful results skip lazy context and capture")]
+func CSuccessBypass() -> Result<unit, TestFailure> {
+    let calls = Counter()
+    let success: Result<int, FileReadError> = Ok(42)
+    let wrapped = success.WithContext(() => {
+        calls.Value = calls.Value + 1
+        return "Unused"
+    }, true)
+    _ = Assert.Equal(0, calls.Value)?
+    return Assert.True(wrapped is Ok(42), "Success preserved")
+}
+
+func Propagate() -> Result<int, ContextError<FileReadError>> {
+    let failure: Result<int, FileReadError> = Error(FileReadError.AccessDenied)
+    let value = failure.WithContext("Reading settings")?
+    return Ok(value + 1)
+}
+
+[Test("Failure context evaluates once and propagates the typed wrapper")]
+func DFailurePropagation() -> Result<unit, TestFailure> {
+    let calls = Counter()
+    let failure: Result<int, FileReadError> = Error(FileReadError.NotFound)
+    let wrapped = failure.WithContext(() => {
+        calls.Value = calls.Value + 1
+        return "Reading file"
+    })
+    _ = Assert.Equal(1, calls.Value)?
+    let Error(context) = wrapped else {
+        return Assert.True(false, "Expected contextual failure")
+    }
+    _ = Assert.True(context.Cause is FileReadError.NotFound, "Original payload")?
+    let Error(propagated) = Propagate() else {
+        return Assert.True(false, "Expected propagated failure")
+    }
+    return Assert.True(propagated.Cause is FileReadError.AccessDenied, "Propagation retained cause")
+}
+
+[Test("Nested context formats each cause once and keeps concise display")]
+func ENestedFormatting() -> Result<unit, TestFailure> {
+    let inner = FileReadError.NotFound.WithContext("Reading file")
+    let outer = inner.WithContext("Starting application")
+    _ = Assert.Equal("Starting application", outer.Message)?
+    _ = Assert.True(Object.ReferenceEquals(inner, outer.Cause), "Original context identity")?
+    let error: System.Error = outer
+    return Assert.Equal("Starting application\nCaused by: Reading file\nCaused by: NotFound", error.FormatError())
+}
+
+[Test("Explicit capture survives collection and later wrappers reuse its snapshot")]
+func FCaptureReuse() -> Result<unit, TestFailure> {
+    let inner = FileReadError.NotFound.WithContext("Capture boundary", true)
+    let outer = inner.WithContext("Outer boundary", true)
+    let plain = outer.WithContext("No new capture")
+    let Some(trace) = inner.StackTrace else {
+        return Assert.True(false, "Expected explicit capture")
+    }
+    let Some(outerTrace) = outer.StackTrace else {
+        return Assert.True(false, "Expected retained trace")
+    }
+    let Some(plainTrace) = plain.StackTrace else {
+        return Assert.True(false, "Expected retained plain trace")
+    }
+    _ = Assert.True(Object.ReferenceEquals(trace, outerTrace), "Reuse instead of recapture")?
+    _ = Assert.True(Object.ReferenceEquals(trace, plainTrace), "Plain wrapper retains trace")?
+    System.Runtime.GC.Collect()
+    let error: System.Error = plain
+    let formatted = error.FormatError()
+    _ = Assert.True(formatted.Contains("Stack trace:"), "Trace rendered")?
+    return Assert.True(formatted.Contains("FCaptureReuse"), "Attachment stack retained")
+}
+
+[Test("Domain causes preserve trace and explicit mapping remains available")]
+func GDomainMapping() -> Result<unit, TestFailure> {
+    let captured = AuthorError().WithContext("Origin", true)
+    let domain = DomainError(captured)
+    let outer = domain.WithContext("Boundary", true)
+    let Some(originalTrace) = captured.StackTrace else {
+        return Assert.True(false, "Expected origin trace")
+    }
+    let Some(retainedTrace) = outer.StackTrace else {
+        return Assert.True(false, "Expected domain trace")
+    }
+    _ = Assert.True(Object.ReferenceEquals(originalTrace, retainedTrace), "Trace found through domain cause")?
+    let source: Result<int, FileReadError> = Error(FileReadError.NotFound)
+    let mapped = source.MapError(error => DomainError(error))
+    let Error(value) = mapped else {
+        return Assert.True(false, "Expected mapped error")
+    }
+    return Assert.True(value.Cause is Some(FileReadError), "Mapping retains structured cause")
+}
+
+[Test("Malformed cyclic cause chains have bounded formatting and lookup")]
+func HBoundedChains() -> Result<unit, TestFailure> {
+    let cycle: System.Error = CyclicError()
+    _ = Assert.True(cycle.FormatError().Contains("Cause chain truncated after 64 layers"), "Bounded formatter")?
+    let wrapped = cycle.WithContext("Cycle boundary")
+    return Assert.True(wrapped.StackTrace is None, "Bounded trace lookup")
+}
+
+[Test("Unrelated result error types remain unconstrained")]
+func IUnconstrainedResult() -> Result<unit, TestFailure> {
+    let value: Result<int, string> = Error("ordinary residual")
+    return Assert.True(value is Error("ordinary residual"), "No mandatory Error interface")
+}
+
+[Test("Application capture policy is opt in and explicit overrides win")]
+func JApplicationPolicy() -> Result<unit, TestFailure> {
+    _ = Assert.True(!ErrorDiagnostics.CaptureStackTraces, "Initially disabled")?
+    ErrorDiagnostics.ConfigureStackTraceCapture(true)
+    let enabled = AuthorError().WithContext("Application policy")
+    let suppressed = AuthorError().WithContext("Explicit suppression", false)
+    ErrorDiagnostics.ConfigureStackTraceCapture(false)
+    _ = Assert.True(enabled.StackTrace is Some(_), "Configured capture")?
+    _ = Assert.True(suppressed.StackTrace is None, "Explicit override")?
+    return Assert.True(AuthorError().WithContext("Disabled").StackTrace is None, "Disabled policy")
+}
+
+[Conditional("DEBUG")]
+func EnableDevelopmentErrorDiagnostics() {
+    ErrorDiagnostics.ConfigureStackTraceCapture(true)
+}
+
+[Test("Conditional startup configures capture only when DEBUG is defined")]
+func KConditionalCapturePolicy() -> Result<unit, TestFailure> {
+    ErrorDiagnostics.ConfigureStackTraceCapture(false)
+    EnableDevelopmentErrorDiagnostics()
+    let enabled = ErrorDiagnostics.CaptureStackTraces
+    let context = AuthorError().WithContext("Development boundary")
+    ErrorDiagnostics.ConfigureStackTraceCapture(false)
+#if DEBUG
+    _ = Assert.True(enabled, "DEBUG retains startup call")?
+    return Assert.True(context.StackTrace is Some(_), "Debug opt-in captures")
+#else
+    _ = Assert.True(!enabled, "No DEBUG omits startup call")?
+    return Assert.True(context.StackTrace is None, "Capture stays off")
+#endif
+}
+
+func ReadThroughErrorBoundary() -> Result<int, System.Error> {
+    let failure: Result<int, FileReadError> = Error(FileReadError.NotFound)
+    let value = failure?
+    return Ok(value)
+}
+
+func ReadThroughContextBoundary() -> Result<int, System.Error> {
+    let value = Propagate()?
+    return Ok(value)
+}
+
+[Test("Interface result boundaries preserve runtime errors without automatic context")]
+func LInterfaceBoundary() -> Result<unit, TestFailure> {
+    let Error(error) = ReadThroughErrorBoundary() else {
+        return Assert.True(false, "Expected interface error")
+    }
+    _ = Assert.True(error is FileReadError, "Concrete error retained")?
+    _ = Assert.True(error.Cause is None && error.StackTrace is None, "No automatic decoration")?
+    let Error(context) = ReadThroughContextBoundary() else {
+        return Assert.True(false, "Expected interface context")
+    }
+    _ = Assert.True(context is ContextError<FileReadError>, "Explicit context retained")?
+    return Assert.Equal("Reading settings", context.Message)
+}

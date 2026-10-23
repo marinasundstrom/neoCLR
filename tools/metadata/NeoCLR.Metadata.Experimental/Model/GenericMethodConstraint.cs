@@ -261,11 +261,19 @@ public sealed partial class MethodBuilder
                          : Assembly.SatisfiesConstrainedBound(caller.Definition.ConstraintSignature(c.InterfaceType), required.ImportedType!, argument)))) continue;
                 throw new ArgumentException("forwarded method argument lacks required interface bounds");
             }
+            if (argument.TypeParameterIndex is { } ownerParameter)
+            {
+                if (caller is null && deferOpen) continue;
+                var required = Definition.ConstraintSignature(constraint.InterfaceType);
+                if (caller?.DeclaringType?.GenericConstraints.Any(c => c.ParameterIndex == ownerParameter &&
+                    SatisfiesStructuralBound(c.BaseType, required)) == true) continue;
+                throw new ArgumentException("forwarded declaring-type argument lacks required interface bound");
+            }
             var type = argument.ClassType ?? (argument.Primitive is { } primitive
                 ? Assembly.Types.SingleOrDefault(t => t.NativePrimitive == primitive) : null);
             var bound = Definition.ConstraintSignature(constraint.InterfaceType);
             var actual = type is not null ? (SignatureType)type : argument.Primitive is { } scalar && Assembly.ExternalPrimitive(scalar) is { } external ? (SignatureType)external : argument;
-            if (!(bound.ClassType is { } local ? type?.ConformsTo(local) == true : Assembly.SatisfiesInterfaceBound(actual, bound.ImportedType!)))
+            if (!SatisfiesStructuralBound(actual, bound))
                 throw new ArgumentException("generic method argument does not satisfy its interface bound");
         }
     }

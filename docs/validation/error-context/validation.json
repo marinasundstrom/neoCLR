@@ -1,0 +1,74 @@
+{
+  "passed": true,
+  "modes": [
+    "interpreter",
+    "jit",
+    "native"
+  ],
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "cases": [
+    {
+      "suite": "error-context",
+      "mode": "interpreter",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 5.863,
+      "stdout": "PASS Platform and author errors opt into message and absent diagnostics\nPASS Context preserves typed payload and interface cause without capturing\nPASS Successful results skip lazy context and capture\nPASS Failure context evaluates once and propagates the typed wrapper\nPASS Nested context formats each cause once and keeps concise display\nPASS Explicit capture survives collection and later wrappers reuse its snapshot\nPASS Domain causes preserve trace and explicit mapping remains available\nPASS Malformed cyclic cause chains have bounded formatting and lookup\nPASS Unrelated result error types remain unconstrained\nPASS Application capture policy is opt in and explicit overrides win\nPASS Conditional startup configures capture only when DEBUG is defined\nPASS Interface result boundaries preserve runtime errors without automatic context\nTests: 12, passed: 12, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "error-context",
+      "mode": "jit",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 4.566,
+      "stdout": "PASS Platform and author errors opt into message and absent diagnostics\nPASS Context preserves typed payload and interface cause without capturing\nPASS Successful results skip lazy context and capture\nPASS Failure context evaluates once and propagates the typed wrapper\nPASS Nested context formats each cause once and keeps concise display\nPASS Explicit capture survives collection and later wrappers reuse its snapshot\nPASS Domain causes preserve trace and explicit mapping remains available\nPASS Malformed cyclic cause chains have bounded formatting and lookup\nPASS Unrelated result error types remain unconstrained\nPASS Application capture policy is opt in and explicit overrides win\nPASS Conditional startup configures capture only when DEBUG is defined\nPASS Interface result boundaries preserve runtime errors without automatic context\nTests: 12, passed: 12, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "error-context",
+      "mode": "native",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 0.291,
+      "stdout": "PASS Platform and author errors opt into message and absent diagnostics\nPASS Context preserves typed payload and interface cause without capturing\nPASS Successful results skip lazy context and capture\nPASS Failure context evaluates once and propagates the typed wrapper\nPASS Nested context formats each cause once and keeps concise display\nPASS Explicit capture survives collection and later wrappers reuse its snapshot\nPASS Domain causes preserve trace and explicit mapping remains available\nPASS Malformed cyclic cause chains have bounded formatting and lookup\nPASS Unrelated result error types remain unconstrained\nPASS Application capture policy is opt in and explicit overrides win\nPASS Conditional startup configures capture only when DEBUG is defined\nPASS Interface result boundaries preserve runtime errors without automatic context\nTests: 12, passed: 12, failed: 0, skipped: 0\n",
+      "stderr": ""
+    }
+  ],
+  "aotSha256": "2a471070dcb17ae0f8906d20012a93babf7f6fc05407f6b68bffa60b077b7e43",
+  "interpreterSha256": "95fe123341ffbd57b038756ec8d6f01a2a5d27a532956bfd692ce12525ed2c84",
+  "jitHostSha256": "dd5700e69e4af04c5bb38ac0d9031c297afd38afa43c630566bc2b779fdc9886",
+  "date": "2026-10-23",
+  "scope": "Development working-tree validation, macOS ARM64; not a published package or other-host qualification",
+  "releaseSymbolCheck": {
+    "configuration": "Release",
+    "passed": true,
+    "stdout": "PASS Platform and author errors opt into message and absent diagnostics\nPASS Context preserves typed payload and interface cause without capturing\nPASS Successful results skip lazy context and capture\nPASS Failure context evaluates once and propagates the typed wrapper\nPASS Nested context formats each cause once and keeps concise display\nPASS Explicit capture survives collection and later wrappers reuse its snapshot\nPASS Domain causes preserve trace and explicit mapping remains available\nPASS Malformed cyclic cause chains have bounded formatting and lookup\nPASS Unrelated result error types remain unconstrained\nPASS Application capture policy is opt in and explicit overrides win\nPASS Conditional startup configures capture only when DEBUG is defined\nPASS Interface result boundaries preserve runtime errors without automatic context\nTests: 12, passed: 12, failed: 0, skipped: 0\n"
+  },
+  "ravenMainFocusedTests": 19,
+  "ravenNeoClrFocusedTests": 27,
+  "specializationTests": {
+    "passed": 25,
+    "ignored": 1
+  },
+  "websiteTests": 26,
+  "inputs": {
+    "target/error-context-bundle/bundle/sdk/tools/rvnc/rvnc.dll": "910fbd6babab359417703b6662d646acb5bdb1ddc982bc497dd3078461b9dea3",
+    "target/error-context-bundle/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.dll": "547508eaa4157db448b428ac0ffea7f503561087faaa5ebfa2a1d369a5d09251",
+    "target/error-context-bundle/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "f35e7cc951820a12e9ab9bde3f82545d87ee6c127d893b4a59553ea6ca765739",
+    "target/error-context-bundle/bundle/sdk/tools/rvnc/NeoCLR.Metadata.Experimental.dll": "00f6a2c80cfe64ff9e960a6fe6bdb07cb1f6a87d3a1453461335e5b4c03dce40",
+    "target/error-context-libraries-v5/System.Runtime.dll": "c3136652c2816e8cd323b0b49b1b26a83d1568bab2d67dd9fb5d789ea67a7a2b",
+    "target/error-context-libraries-v5/bundle.json": "048d968618355743a8044abfa8a9db3d890eceda2d2ca7ea7db6d727a909c7ff",
+    "runtime/raven/tests/error-context/Tests.rvn": "b0e2b3a5e4f63204cd809d042ddb5a365d0a855788a471182f7a0a665850422b"
+  },
+  "repositoryBases": {
+    "/Users/robert/Projects/neoclr": "465a37f9b0a0c4acdabe4ee761b94d12b1fc9d49",
+    "/Users/robert/Projects/Raven": "8f4aa542d2858616bf40a5237a9d25eb629c9357",
+    "/Users/robert/Projects/Raven-checked-conversions": "db41ad0395e4b860018ea5569a030e5a857bf13d"
+  },
+  "implementationCommits": {
+    "ravenMain": "59a8d09ea",
+    "ravenNeoClr": "37056b534"
+  },
+  "websitePagesChecked": 6064
+}

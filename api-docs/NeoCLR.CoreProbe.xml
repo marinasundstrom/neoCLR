@@ -4181,5 +4181,115 @@ No input is read or output written. Use one buffering wrapper per stream directi
   <member name="M:System.Collections.PriorityArrayQueue`2.Peek"><summary>Returns the minimal element without removing it, or None when empty.</summary></member>
   <member name="M:System.Collections.PriorityArrayQueue`2.PeekPriority"><summary>Returns the minimal priority without removing it, or None when empty.</summary></member>
   <member name="M:System.Collections.PriorityArrayQueue`2.Clear"><summary>Removes all entries and releases references, retaining capacity.</summary></member>
+    <member name="M:System.ContextError`1.#ctor(System.String,`0)">
+      <summary>Adds context using the application stack-capture setting, which defaults to disabled.</summary>
+    </member>
+    <member name="M:System.ContextError`1.#ctor(System.String,`0,System.Boolean)">
+      <summary>Adds context with an explicit per-call override of the application capture setting.
+Capture records the attachment site only when the cause chain has no existing trace.</summary>
+    </member>
+    <member name="M:System.Diagnostics.ConditionalAttribute.#ctor(System.String)">
+      <summary>Names the case-sensitive symbol that retains a call or attribute application.</summary>
+    </member>
+    <member name="M:System.ErrorDiagnostics.ConfigureStackTraceCapture(System.Boolean)">
+      <summary>Sets the application policy. Call at startup, optionally under a conditional compilation symbol.
+This setting does not alter existing snapshots or explicit per-call capture overrides.</summary>
+    </member>
+    <member name="M:System.ErrorExtensions.WithContext``1(``0,System.String)">
+      <summary>Adds context using the application capture setting (disabled by default).</summary>
+    </member>
+    <member name="M:System.ErrorExtensions.WithContext``1(``0,System.String,System.Boolean)">
+      <summary>Adds context, optionally capturing once at this boundary when no cause trace exists.</summary>
+    </member>
+    <member name="M:System.ErrorFormattingExtensions.FormatError(System.Error)">
+      <summary>Formats up to 64 error layers and one existing trace; never captures a stack.
+A longer or cyclic chain ends with a truncation marker. Messages are not machine codes.</summary>
+    </member>
+    <member name="M:System.ResultErrorContextExtensions.WithContext``2(System.Result{``0,``1},System.Func{System.String})">
+      <summary>Evaluates the message factory only on failure; uses the application capture setting.</summary>
+    </member>
+    <member name="M:System.ResultErrorContextExtensions.WithContext``2(System.Result{``0,``1},System.Func{System.String},System.Boolean)">
+      <summary>Evaluates the message factory and optional capture only on failure.</summary>
+    </member>
+    <member name="M:System.ResultErrorContextExtensions.WithContext``2(System.Result{``0,``1},System.String)">
+      <summary>Preserves success and wraps failure with operation context.</summary>
+    </member>
+    <member name="M:System.ResultErrorContextExtensions.WithContext``2(System.Result{``0,``1},System.String,System.Boolean)">
+      <summary>Preserves success and optionally captures a stack only on failure.</summary>
+    </member>
+    <member name="P:System.ContextError`1.Cause">
+      <summary>The original failure with its concrete type preserved.</summary>
+    </member>
+    <member name="P:System.ContextError`1.Message">
+      <summary>Describes the operation at this boundary without duplicating the cause&apos;s message.</summary>
+    </member>
+    <member name="P:System.ContextError`1.StackTrace">
+      <summary>The retained snapshot, or None when no capture was requested or supplied.</summary>
+    </member>
+    <member name="P:System.Diagnostics.ConditionalAttribute.ConditionString">
+      <summary>Gets the compilation symbol associated with this condition.</summary>
+    </member>
+    <member name="P:System.Error.Cause">
+      <summary>The underlying failure, or None for a leaf error.</summary>
+    </member>
+    <member name="P:System.Error.Message">
+      <summary>A human-readable description; match the concrete error rather than parsing this text.</summary>
+    </member>
+    <member name="P:System.Error.StackTrace">
+      <summary>An existing diagnostic snapshot, or None. Reading this property never captures a stack.</summary>
+    </member>
+    <member name="P:System.ErrorDiagnostics.CaptureStackTraces">
+      <summary>Whether ordinary context attachment captures a stack when the cause chain has none. Initially false.</summary>
+    </member>
+    <member name="P:System.IO.StreamError.Cause">
+      <summary>Leaf failures have no underlying cause.</summary>
+    </member>
+    <member name="P:System.IO.StreamError.Message">
+      <summary>A human-readable case description; use patterns to classify this failure.</summary>
+    </member>
+    <member name="P:System.IO.StreamError.StackTrace">
+      <summary>Leaf failures do not capture stacks implicitly.</summary>
+    </member>
+    <member name="P:System.NumberParseError.Cause">
+      <summary>Leaf failures have no underlying cause.</summary>
+    </member>
+    <member name="P:System.NumberParseError.Message">
+      <summary>A human-readable case description; use patterns to classify this failure.</summary>
+    </member>
+    <member name="P:System.NumberParseError.StackTrace">
+      <summary>Leaf failures do not capture stacks implicitly.</summary>
+    </member>
+    <member name="P:System.Storage.FileReadError.Cause">
+      <summary>Leaf failures have no underlying cause.</summary>
+    </member>
+    <member name="P:System.Storage.FileReadError.Message">
+      <summary>A human-readable case description; use patterns to classify this failure.</summary>
+    </member>
+    <member name="P:System.Storage.FileReadError.StackTrace">
+      <summary>Leaf failures do not capture stacks implicitly.</summary>
+    </member>
+    <member name="T:System.ContextError`1">
+      <summary>Adds operation context while retaining the original typed failure.
+This is an ordinary reference object: diagnostic snapshots do not define value equality.</summary>
+    </member>
+    <member name="T:System.Diagnostics.ConditionalAttribute">
+      <summary>Makes method calls or attribute applications conditional on the caller&apos;s compilation symbols.
+A method remains in metadata; an omitted call evaluates neither its receiver nor its arguments.</summary>
+    </member>
+    <member name="T:System.Error">
+      <summary>Opt-in diagnostics for recoverable failures. Result and propagation do not require this interface.</summary>
+    </member>
+    <member name="T:System.ErrorDiagnostics">
+      <summary>Application-owned diagnostic policy. Configure at startup before concurrent work begins.</summary>
+    </member>
+    <member name="T:System.ErrorExtensions">
+      <summary>Explicit typed context attachment for authors who implement Error.</summary>
+    </member>
+    <member name="T:System.ErrorFormattingExtensions">
+      <summary>Human-readable diagnostics for explicit reporting boundaries.</summary>
+    </member>
+    <member name="T:System.ResultErrorContextExtensions">
+      <summary>Context attachment only transforms Result&apos;s failure channel.</summary>
+    </member>
 </members>
 </doc>

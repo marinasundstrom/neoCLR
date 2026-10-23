@@ -2,6 +2,8 @@
 
 Option represents absence; Result represents recoverable failure. Raven patterns extract case values, and ? propagates an outcome to the caller.
 
+For error unions, handling and propagation, followed by optional diagnostic conventions, see [Error handling](../error-handling/).
+
 <a id="handling"></a>
 
 ## Error and optional-result handling in Raven
@@ -114,7 +116,7 @@ contract for supported combinations.
 
 Callbacks run immediately on the matching branch. Tap methods return the original outcome. UnwrapOr takes an already evaluated fallback; UnwrapOrElse calls a parameterless factory only for None or Error. Use Result.OrElse or Match if the error itself is needed. ToIterable allocates a small collection and discards an Error payload, so use patterns when the error needs handling.
 
-Raven.Core users will recognize these operators: neoCLR calls Where **Filter** and ToEnumerable **ToIterable**. Throwing unwrap helpers, generic-default helpers, nullable adapters, JSON integration and context-error support are outside this slice. Collection queries have their own [.NET operator mapping](../collections/#dotnet-mapping).
+Raven.Core users will recognize these operators: neoCLR calls Where **Filter** and ToEnumerable **ToIterable**. Throwing unwrap helpers, generic-default helpers, nullable adapters and JSON integration are outside this slice. Development [context-error support](../error-handling/) adds explicit diagnostic decoration. Collection queries have their own [.NET operator mapping](../collections/#dotnet-mapping).
 
 <a id="limits"></a>
 

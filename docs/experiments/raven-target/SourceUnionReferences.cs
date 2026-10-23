@@ -6,7 +6,7 @@ using Raven.CodeAnalysis.Syntax;
 // seed is never shipped: both bootstrap and consumer cores receive the same projection.
 static class SourceUnionReferences
 {
-    static readonly string[] Owners = ["System.Time.TimeZoneError", "System.Time.DateTime", "System.Time.LocalTimeMapping", "System.Networking.IPAddressError", "System.Networking.Sockets.SocketError", "System.Networking.DnsError", "System.UriError",
+    static readonly string[] Owners = ["System.Option`1", "System.Time.TimeZoneError", "System.Time.DateTime", "System.Time.LocalTimeMapping", "System.Networking.IPAddressError", "System.Networking.Sockets.SocketError", "System.Networking.DnsError", "System.UriError",
         "System.Storage.StorageLookupError",
         "System.Text.EncodingError",
         "System.Security.Cryptography.CryptographyError",
@@ -23,7 +23,7 @@ static class SourceUnionReferences
         "System.NumberParseError",
         "System.Time.DateTimeParseError",
         "System.Linq.SingleError",
-        "System.Runtime.Reflection.ReflectionError", "System.IntegerDivisionError", "System.Web.Http.HttpError", "System.Data.Json.JsonError", "System.Web.Http.Json.HttpJsonError", "System.Data.Sql.SqlError", "System.Data.Sql.SqlValue", "System.Option`1", "System.Result`2", "System.Concurrency.Tasks.TaskOutcome`1"];
+        "System.Runtime.Reflection.ReflectionError", "System.IntegerDivisionError", "System.Web.Http.HttpError", "System.Data.Json.JsonError", "System.Web.Http.Json.HttpJsonError", "System.Data.Sql.SqlError", "System.Data.Sql.SqlValue", "System.Result`2", "System.Concurrency.Tasks.TaskOutcome`1"];
 
     public static void Project(string corePath)
     {

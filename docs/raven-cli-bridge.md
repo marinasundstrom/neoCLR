@@ -14868,3 +14868,50 @@ of interpreter, JIT and native execution, including nested Result/OS patterns,
 exhaustive matching, base/Object display, equality and GC lifetime. This is not
 mobile/Windows/Linux host qualification. Runtime/library/SDK ownership and exact
 hashes are retained in neoCLR's environment-discovery integration evidence.
+
+## Error decorators and native owner interface bounds (2026-10-23 development)
+
+The Error context slice uses ordinary library classes, interfaces and Option values;
+no new Runtime Contract configuration, propagation operator or error runtime tag is
+introduced. Native intent is `ContextError<E: Error>` with a required typed cause,
+optional cause/trace interface views and explicit context/stack attachment. Error
+is opt-in for author types, including classes, structs and nominal unions; platform
+failures follow the convention incrementally. Ad-hoc union composition is separate.
+
+The compiler's native declaration planner and metadata SDK previously admitted only
+class bounds on generic owners. The bounded extension admits one nongeneric nominal
+interface bound through the existing TypeBound metadata, preserving value-type
+conformance without treating it as reference inheritance. The ordinary CLI form is
+GenericParamConstraint. This is native metadata, not a new temporary error carrier;
+source libraries own the decorators, while runtime StackTraceCapture owns snapshots.
+Native default interface bodies and broader structural-union constraint satisfaction
+remain gaps. The native specializer validates interface owner bounds before closing
+executable shapes; ordinary native project builds now bind the existing opt-in stack
+capture service, as JIT already did.
+
+### Conditional diagnostic calls (2026-10-23, development)
+
+ConditionalAttribute is shared Raven compiler behavior, developed on main at
+59a8d09ea and carried separately to codex/neoclr in 37056b534. No Runtime Contract switch changes ordinary
+.NET behavior. Caller parse symbols control omission; disabled calls retain
+semantic binding but lose receiver/argument evaluation before lowering. Native
+custom-attribute emission also honors conditional attribute classes. The platform
+supplies System.Diagnostics.ConditionalAttribute, with ordinary native metadata.
+
+Context decorators exposed native generic gaps: interface bounds now retain
+value-type conformance without implying a reference constraint; closure owners
+preserve owned nominal bounds, and lowered extension parameters belong to methods,
+not their non-generic container. Generic-to-interface conversions require boxing
+that preserves reference values. Imported nominal bounds on synthesized closure
+owners remain outside the current authoring support and receive an explicit
+unsupported diagnostic. No new runtime metadata encoding is introduced.
+
+Source file/line lookup is not part of this change. Stack snapshots retain the
+current guest method/IL representation. All 12 error-context tests pass in interpreter,
+JIT and native modes on macOS ARM64 (36 executions), including common Error result
+boundaries, typed causes, lazy success paths, trace reuse through GC and conditional
+startup. A Release project separately passes all 12 tests with DEBUG absent. The
+metadata interface-bound checks and 25 specialization tests pass (one timing probe
+ignored). CLI fingerprints, the native API audit and 26 website checks pass.
+See [exact working-tree artifact identities](validation/error-context/validation.json);
+other hosts and published package qualification remain separate.

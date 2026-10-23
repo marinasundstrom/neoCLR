@@ -8,6 +8,9 @@ neoCLR is an open-source project developing a managed runtime, a class library a
 tools for Raven applications. It was initiated by Marina Sundström and is available
 under the MIT license.
 
+[Who Raven and neoCLR are for](../who-its-for/) explains the modern .NET-inspired programming
+experience, intended audience and library compatibility boundary.
+
 <a id="goals"></a>
 
 <a id="background"></a>

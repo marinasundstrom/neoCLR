@@ -14,6 +14,8 @@ if (args is ["--pointer-memory-access"])
     return 0;
 }
 
+if (args is ["--interface-type-constraints"]) { InterfaceTypeConstraintChecks.Run(); return 0; }
+
 if (args is ["--pointer-signatures"]) { PointerSignatureChecks.Run(); return 0; }
 
 if (args is ["--generic-definition-tokens"]) { GenericDefinitionTokenChecks.Run(); return 0; }

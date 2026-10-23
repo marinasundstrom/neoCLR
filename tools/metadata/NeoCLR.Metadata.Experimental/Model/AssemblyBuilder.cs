@@ -1210,7 +1210,7 @@ public sealed partial class TypeBuilder
         signature.ValidateOwner(Assembly, GenericParameterNames.Count, allowSelf: IsInterface);
         if (string.IsNullOrEmpty(name) || name.Length > 1024 || methods.Count >= 256 ||
             methods.Any(m => m.Name == name && m.Signature.GenericParameterNames.Count == signature.GenericParameterNames.Count && m.Signature.ParameterTypes.SequenceEqual(signature.ParameterTypes)))
-            throw new ArgumentException("invalid or duplicate method");
+            throw new ArgumentException($"invalid or duplicate method: {Namespace}.{Name}.{name}");
         var method = new MethodBuilder(Assembly, this, name, signature, visibility, isStatic: isStatic); Definition.Methods.Add(method.Definition); return method;
     }
 }

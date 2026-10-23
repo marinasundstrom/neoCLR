@@ -1,0 +1,16 @@
+module System.Diagnostics
+
+/// Makes method calls or attribute applications conditional on the caller's compilation symbols.
+/// A method remains in metadata; an omitted call evaluates neither its receiver nor its arguments.
+[System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Class, AllowMultiple: true)]
+public class ConditionalAttribute : System.Attribute {
+    private val conditionString: string
+
+    /// Names the case-sensitive symbol that retains a call or attribute application.
+    init(conditionString: string) {
+        self.conditionString = conditionString
+    }
+
+    /// Gets the compilation symbol associated with this condition.
+    val ConditionString: string => conditionString
+}

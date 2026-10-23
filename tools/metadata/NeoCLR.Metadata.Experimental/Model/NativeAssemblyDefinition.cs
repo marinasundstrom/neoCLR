@@ -528,8 +528,8 @@ public sealed partial class NativeAssemblyDefinition
             for (int i = 0; i < types.Count; i++)
                 foreach (var constraint in types[i].Constraints)
                 {
-                    int bound = types.FindIndex(t => t.NativeName == constraint.Bound && !t.IsStatic && !t.IsInterface && !t.IsValueType && t.GenericNames.Length == 0);
-                    Require(bound >= 0, "type bound requires owned nongeneric class");
+                    int bound = types.FindIndex(t => t.NativeName == constraint.Bound && !t.IsStatic && !t.IsValueType && t.GenericNames.Length == 0);
+                    Require(bound >= 0, "type bound requires owned nongeneric class or interface");
                     signatureOwners[i].AddBaseTypeConstraint(constraint.Parameter, signatureOwners[bound]);
                 }
             for (int i = 0; i < types.Count; i++)

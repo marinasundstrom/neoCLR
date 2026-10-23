@@ -1,0 +1,153 @@
+module System
+
+import System.Diagnostics.*
+import System.Option.*
+
+/// Opt-in diagnostics for recoverable failures. Result and propagation do not require this interface.
+public interface Error {
+    /// A human-readable description; match the concrete error rather than parsing this text.
+    val Message: string { get }
+
+    /// The underlying failure, or None for a leaf error.
+    val Cause: Option<Error> { get }
+
+    /// An existing diagnostic snapshot, or None. Reading this property never captures a stack.
+    val StackTrace: Option<StackTrace> { get }
+}
+
+/// Adds operation context while retaining the original typed failure.
+/// This is an ordinary reference object: diagnostic snapshots do not define value equality.
+public class ContextError<E: Error> : Error {
+    private val message: string
+    private val cause: E
+    private val trace: StackTrace?
+
+    /// Adds context using the application stack-capture setting, which defaults to disabled.
+    init(message: string, cause: E) {
+        self.message = message
+        self.cause = cause
+        trace = ErrorDiagnostics.SelectTrace(cause, ErrorDiagnostics.CaptureStackTraces)
+    }
+
+    /// Adds context with an explicit per-call override of the application capture setting.
+    /// Capture records the attachment site only when the cause chain has no existing trace.
+    init(message: string, cause: E, captureStackTrace: bool) {
+        self.message = message
+        self.cause = cause
+        trace = ErrorDiagnostics.SelectTrace(cause, captureStackTrace)
+    }
+
+    /// Describes the operation at this boundary without duplicating the cause's message.
+    val Message: string => message
+
+    /// The original failure with its concrete type preserved.
+    val Cause: E => cause
+
+    val Error.Cause: Option<Error> => Some(cause)
+
+    /// The retained snapshot, or None when no capture was requested or supplied.
+    val StackTrace: Option<StackTrace> => trace match {
+        StackTrace captured => Some(captured)
+        _ => None
+    }
+
+}
+
+/// Application-owned diagnostic policy. Configure at startup before concurrent work begins.
+public static class ErrorDiagnostics {
+    private static var captureStacks = false
+
+    /// Whether ordinary context attachment captures a stack when the cause chain has none. Initially false.
+    static val CaptureStackTraces: bool => captureStacks
+
+    /// Sets the application policy. Call at startup, optionally under a conditional compilation symbol.
+    /// This setting does not alter existing snapshots or explicit per-call capture overrides.
+    static func ConfigureStackTraceCapture(enabled: bool) {
+        captureStacks = enabled
+    }
+
+    internal static func SelectTrace(error: Error, capture: bool) -> StackTrace? {
+        if error.StackTrace is Some(let existing) {
+            return existing
+        }
+        if !capture {
+            return null
+        }
+        if FindTrace(error) is Some(let existing) {
+            return existing
+        }
+        return StackTrace()
+    }
+
+    internal static func FindTrace(error: Error) -> Option<StackTrace> {
+        var current: Option<Error> = Some(error)
+        var depth = 0
+        while current is Some(let active) && depth < 64 {
+            if active.StackTrace is Some(let captured) {
+                return Some(captured)
+            }
+            current = active.Cause
+            depth = depth + 1
+        }
+        return None
+    }
+}
+
+/// Explicit typed context attachment for authors who implement Error.
+public extension ErrorExtensions<E: Error> for E {
+    /// Adds context using the application capture setting (disabled by default).
+    func WithContext(message: string) -> ContextError<E> => ContextError<E>(message, self)
+
+    /// Adds context, optionally capturing once at this boundary when no cause trace exists.
+    func WithContext(message: string, captureStackTrace: bool) -> ContextError<E>
+        => ContextError<E>(message, self, captureStackTrace)
+}
+
+/// Context attachment only transforms Result's failure channel.
+public extension ResultErrorContextExtensions<T, E: Error> for Result<T, E> {
+    /// Preserves success and wraps failure with operation context.
+    func WithContext(message: string) -> Result<T, ContextError<E>>
+        => self.MapError(error => error.WithContext(message))
+
+    /// Preserves success and optionally captures a stack only on failure.
+    func WithContext(message: string, captureStackTrace: bool) -> Result<T, ContextError<E>>
+        => self.MapError(error => error.WithContext(message, captureStackTrace))
+
+    /// Evaluates the message factory only on failure; uses the application capture setting.
+    func WithContext(message: () -> string) -> Result<T, ContextError<E>>
+        => self.MapError(error => error.WithContext(message()))
+
+    /// Evaluates the message factory and optional capture only on failure.
+    func WithContext(message: () -> string, captureStackTrace: bool) -> Result<T, ContextError<E>>
+        => self.MapError(error => error.WithContext(message(), captureStackTrace))
+}
+
+/// Human-readable diagnostics for explicit reporting boundaries.
+public extension ErrorFormattingExtensions for Error {
+    /// Formats up to 64 error layers and one existing trace; never captures a stack.
+    /// A longer or cyclic chain ends with a truncation marker. Messages are not machine codes.
+    func FormatError() -> string {
+        var current: Option<Error> = Some(self)
+        var text = ""
+        var trace: Option<StackTrace> = None
+        var depth = 0
+        while current is Some(let active) && depth < 64 {
+            if depth > 0 {
+                text = text + "\nCaused by: "
+            }
+            text = text + active.Message
+            if trace is None {
+                trace = active.StackTrace
+            }
+            current = active.Cause
+            depth = depth + 1
+        }
+        if current is Some(_) {
+            text = text + "\n[Cause chain truncated after 64 layers]"
+        }
+        if trace is Some(let captured) {
+            text = text + "\nStack trace:\n" + captured.ToString()
+        }
+        return text
+    }
+}

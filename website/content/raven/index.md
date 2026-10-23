@@ -1,8 +1,11 @@
 # Raven language and neoCLR integration
 
-Raven is a typed, general-purpose language for .NET. It brings functions, pattern matching, classes and interfaces into one language, and is the first language being adapted to neoCLR.
+Raven is a typed, general-purpose language for .NET, influenced by C#, Swift, Rust and Kotlin. It combines modern and familiar programming concepts, with expressive pattern matching, functions, classes and interfaces, and is the first language being adapted to neoCLR.
 
 Raven targets both .NET and neoCLR. Each target has its own libraries and runtime capabilities.
+
+[Who Raven and neoCLR are for](../who-its-for/) introduces the combination of familiar
+managed programming, explicit outcomes and native deployment.
 
 [Raven website ↗](https://marinasundstrom.github.io/raven/) · [Try the language playground ↗](https://marinasundstrom.github.io/raven/playground/)
 

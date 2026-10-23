@@ -303,3 +303,17 @@ feature pages focused on current behavior; link dated measurements and immutable
 runs from benchmark reports. Preserve slower runs as well as improvements. Follow the
 [history and regression policy](../benchmark-history.md): compare stable workloads
 under matching conditions, and do not turn noisy exploratory runs into regression gates.
+
+## Audience and error-handling emphasis — author direction, 2026-10-23
+
+The dedicated “Who it’s for” page presents Raven and neoCLR as a modern programming
+experience based on .NET, combining familiar managed APIs/runtime services with
+unions, explicit outcomes and pattern matching. State up front that neoCLR is a new
+platform incompatible with existing .NET libraries; distinguish Raven's separate
+.NET target. Explain cross-platform and AOT-first direction beside current support. Distinguish
+Raven’s C#/Swift/Rust/Kotlin influences and pattern syntax from neoCLR’s fresh API
+design: UTF-8 strings, Option/Result and efficient Slice/Memory views.
+
+The general error-handling guide leads with outcome/error unions, patterns and
+propagation, then API authors' outward contract choices. Error and ContextError
+are optional platform conventions introduced afterward, not the organizing center.

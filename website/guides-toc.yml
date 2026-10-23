@@ -1,5 +1,7 @@
 - name: Guides overview
   href: guides/index.md
+- name: Who it’s for
+  href: who-its-for/index.md
 - name: Cases
   items:
     - name: "Query PostgreSQL objects"
@@ -28,6 +30,8 @@
       href: raven/index.md
     - name: "Option and Result"
       href: features/outcomes/index.md
+    - name: "Error handling"
+      href: features/error-handling/index.md
     - name: "Function types"
       href: features/functions/index.md
     - name: "Arrays"
@@ -154,6 +158,8 @@
       href: docs/benchmarking.md
     - name: "Testing"
       href: docs/testing.md
+    - name: "Error and context contracts"
+      href: docs/error-context.md
     - name: "Stack traces"
       href: docs/stack-trace.md
     - name: "Sequence access"

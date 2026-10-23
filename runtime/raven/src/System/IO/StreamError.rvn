@@ -1,6 +1,15 @@
 module System.IO
 
-public union StreamError {
+public union StreamError : System.Error {
+    /// A human-readable case description; use patterns to classify this failure.
+    val Message: string => ToString()
+
+    /// Leaf failures have no underlying cause.
+    val Cause: System.Option<System.Error> => System.Option<System.Error>.None
+
+    /// Leaf failures do not capture stacks implicitly.
+    val StackTrace: System.Option<System.Diagnostics.StackTrace> => System.Option<System.Diagnostics.StackTrace>.None
+
     case InvalidPath
     case NotFound
     case AccessDenied

@@ -10561,3 +10561,19 @@ consumers with the matching compiler/library; this is a development API migratio
 Ordinary CLI `System.Char` imports, including signed core scope and `0x03` encoding,
 remain UTF-16 code units. The focused metadata checks use a small separate CLI
 fixture so they do not depend on the full test runner's field count.
+
+## Nominal interface owner bounds (development)
+
+GenericTypeConstraint and imported owner constraints admit one nongeneric nominal
+class or interface bound per parameter. An interface bound checks conformance for
+both values and references; it does not imply a reference-type constraint. The
+native reader/importer retains these bounds, and generic method calls can forward
+a compatible enclosing-owner bound. Native specialization validates the closed
+arguments before removing generic parameters from executable shapes.
+
+The CLI projection uses GenericParamConstraint; native metadata uses its existing
+TypeBound form. This is the same nominal interface constraint model used by .NET,
+within the SDK's current single-bound and nongeneric-bound limits. It does not
+provide general structural-union constraint satisfaction. Synthesized Raven closure
+owners currently require owned nominal bounds; imported nominal closure bounds
+remain unsupported. See [error diagnostics](error-context.md) for the consumer.

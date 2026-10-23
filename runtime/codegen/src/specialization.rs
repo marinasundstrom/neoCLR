@@ -284,9 +284,12 @@ impl Specializer<'_> {
                 neoclr::metadata::ConstraintKind::TypeBound(bound) => {
                     !matches!(bound, Type::Named(_))
                         || !self.source.type_definition(bound).is_some_and(|owner| {
-                            owner.is_reference_type
-                                && owner.generic_parameters.is_empty()
-                                && owner.representation == neoclr::metadata::Representation::Record
+                            owner.generic_parameters.is_empty()
+                                && (owner.representation
+                                    == neoclr::metadata::Representation::Interface
+                                    || (owner.is_reference_type
+                                        && owner.representation
+                                            == neoclr::metadata::Representation::Record))
                         })
                 }
                 _ => true,
@@ -1528,7 +1531,7 @@ pub(crate) fn expand_with_conformance(
         })
         .map(|shape| shape.row)
         .collect();
-    let report = json!({"referenceArrayBackings":reference_backings,"policy":format!("up to {} closed value/reference/interface shapes, {} function clones and {} selected functions; closed generic methods and lexical owners; reference/value/new and nongeneric nominal class type constraints; function-kind and nongeneric nominal interface method constraints", MAX_SPECIALIZED_TYPES, MAX_FUNCTION_CLONES, crate::limits::FUNCTIONS),
+    let report = json!({"referenceArrayBackings":reference_backings,"policy":format!("up to {} closed value/reference/interface shapes, {} function clones and {} selected functions; closed generic methods and lexical owners; reference/value/new and nongeneric nominal class/interface type constraints; function-kind and nongeneric nominal interface method constraints", MAX_SPECIALIZED_TYPES, MAX_FUNCTION_CLONES, crate::limits::FUNCTIONS),
         "typeCount": context.shapes.len(), "functionCount": context.instances.len(), "functionCloneCount": context.clones,
         "methods": context.instances.iter().filter(|v| !v.methods.is_empty() || !v.types.is_empty()).map(|v| json!({"sourceIndex":v.source,"expandedIndex":v.row,"definition":input.functions[v.source].definition.clone().unwrap_or(neoclr::metadata::MemberId { module: input.name.clone(), revision: input.revision.clone(), index: v.source as u32 }),"name":input.functions[v.source].name,"sourceOrigin":input.functions[v.source].origin,"arguments":v.methods,"typeArguments":v.types})).collect::<Vec<_>>(),
         "types": context.shapes.iter().filter(|v| !v.arguments.is_empty()).map(|v| json!({"sourceIndex":v.source,"expandedIndex":v.row,"definition":input.types[v.source].definition,"name":input.types[v.source].name,"compiledName":v.name,"arguments":v.arguments})).collect::<Vec<_>>()});
@@ -2014,6 +2017,37 @@ ret
                     .contains("violates")
             );
         }
+    }
+
+    #[test]
+    fn nominal_interface_owner_bounds_are_checked_before_specialization() {
+        let text = include_str!("../../../docs/validation/special-type-constraints/Main.neoil")
+            .replace(
+                ".type class Payload",
+                ".interface Failure\n.end\n.type class Payload\n.implements Failure",
+            )
+            .replace(
+                ".constraint T reference new",
+                ".constraint T reference new Failure",
+            );
+        let source = neoclr::assemble(&text).unwrap();
+        let (expanded, _) = super::expand(&source, "Main").unwrap();
+        let (selected, _) = super::super::selection::select(&expanded, "Main").unwrap();
+        let program = neoclr::LoadedProgram::new(&selected).unwrap();
+        program.verify().unwrap();
+        assert_eq!(
+            program.run(neoclr::Limits::default()).unwrap().value,
+            neoclr::Value::Int32(42)
+        );
+        let mut invalid = source.clone();
+        invalid
+            .types
+            .iter_mut()
+            .find(|t| t.name == "Payload")
+            .unwrap()
+            .implements
+            .clear();
+        assert!(super::expand(&invalid, "Main").is_err());
     }
 
     #[test]

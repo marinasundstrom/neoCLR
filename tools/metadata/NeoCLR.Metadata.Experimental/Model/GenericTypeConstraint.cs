@@ -1,6 +1,6 @@
 namespace NeoCLR.Metadata.Experimental.Model;
 
-/// <summary>A nominal class bound for one declaring-type parameter.</summary>
+/// <summary>A nominal class or interface bound for one declaring-type parameter.</summary>
 public sealed record GenericTypeConstraint(int ParameterIndex, TypeBuilder BaseType);
 
 /// <summary>Special type-parameter requirements; FunctionType is native-only.</summary>
@@ -36,7 +36,7 @@ public sealed partial class TypeBuilder
     public void SetSpecialConstraints(int parameterIndex, TypeParameterConstraints constraints)
     {
         if (parameterIndex < 0 || parameterIndex >= GenericParameterNames.Count || !ValidSpecialConstraintFlags(constraints) ||
-            (constraints.HasFlag(TypeParameterConstraints.ValueType) || constraints.HasFlag(TypeParameterConstraints.FunctionType)) && genericConstraints.Any(c => c.ParameterIndex == parameterIndex))
+            (constraints.HasFlag(TypeParameterConstraints.ValueType) || constraints.HasFlag(TypeParameterConstraints.FunctionType)) && genericConstraints.Any(c => c.ParameterIndex == parameterIndex && (!c.BaseType.IsInterface || constraints.HasFlag(TypeParameterConstraints.FunctionType))))
             throw new ArgumentException("invalid or conflicting special constraints");
         if (constraints == TypeParameterConstraints.None) specialConstraints.Remove(parameterIndex);
         else specialConstraints[parameterIndex] = constraints;
@@ -44,18 +44,18 @@ public sealed partial class TypeBuilder
     private List<GenericTypeConstraint> genericConstraints => Definition.GenericConstraintStorage;
     /// <summary>Gets nominal bounds in parameter order.</summary>
     public IReadOnlyList<GenericTypeConstraint> GenericConstraints => Definition.GenericConstraints;
-    /// <summary>Adds one owned nongeneric root-class bound for a declared parameter.</summary>
+    /// <summary>Adds one owned nongeneric class or interface bound for a declared parameter.</summary>
     /// <param name="parameterIndex">Zero-based declaring-type parameter index.</param>
-    /// <param name="baseType">Owned nongeneric nonstatic class.</param>
+    /// <param name="baseType">Owned nongeneric nonstatic class or interface.</param>
     /// <exception cref="ArgumentNullException">Null bound.</exception>
     /// <exception cref="ArgumentException">Invalid index, duplicate parameter, static/generic or foreign bound.</exception>
     /// <remarks>CLI uses GenericParamConstraint, native uses TypeBound. No class/struct/new flags are implied. Existing uses are revalidated when writing.</remarks>
     public void AddBaseTypeConstraint(int parameterIndex, TypeBuilder baseType)
     {
         ArgumentNullException.ThrowIfNull(baseType);
-        if (parameterIndex < 0 || parameterIndex >= GenericParameterNames.Count || genericConstraints.Any(c => c.ParameterIndex == parameterIndex) || (specialConstraints.GetValueOrDefault(parameterIndex).HasFlag(TypeParameterConstraints.ValueType) || specialConstraints.GetValueOrDefault(parameterIndex).HasFlag(TypeParameterConstraints.FunctionType)) ||
-            !ReferenceEquals(baseType.Assembly, Assembly) || baseType.IsStatic || baseType.IsInterface || baseType.IsValueType || baseType.GenericParameterNames.Count != 0)
-            throw new ArgumentException("one owned nongeneric class bound per declared type parameter required");
+        if (parameterIndex < 0 || parameterIndex >= GenericParameterNames.Count || genericConstraints.Any(c => c.ParameterIndex == parameterIndex) || (specialConstraints.GetValueOrDefault(parameterIndex).HasFlag(TypeParameterConstraints.ValueType) && !baseType.IsInterface || specialConstraints.GetValueOrDefault(parameterIndex).HasFlag(TypeParameterConstraints.FunctionType)) ||
+            !ReferenceEquals(baseType.Assembly, Assembly) || baseType.IsStatic || baseType.IsValueType || baseType.GenericParameterNames.Count != 0)
+            throw new ArgumentException("one owned nongeneric class or interface bound per declared type parameter required");
         genericConstraints.Add(new(parameterIndex, baseType));
         genericConstraints.Sort((a, b) => a.ParameterIndex.CompareTo(b.ParameterIndex));
     }
@@ -72,7 +72,7 @@ public sealed partial class TypeBuilder
                     if (instance.TypeArguments[index].TypeParameterIndex is not { } parameter) continue;
                     var actual = specialConstraints.GetValueOrDefault(parameter);
                     if (actual.HasFlag(TypeParameterConstraints.ValueType)) actual |= TypeParameterConstraints.DefaultConstructor;
-                    if (genericConstraints.Any(c => c.ParameterIndex == parameter && !c.BaseType.IsNativeObjectRoot)) actual |= TypeParameterConstraints.ReferenceType;
+                    if (genericConstraints.Any(c => c.ParameterIndex == parameter && !c.BaseType.IsNativeObjectRoot && !c.BaseType.IsInterface)) actual |= TypeParameterConstraints.ReferenceType;
                     if ((actual & required) != required) throw new InvalidDataException("base argument does not prove required special constraints");
                 }
                 foreach (var required in instance.Definition.GenericConstraints)
@@ -88,12 +88,12 @@ public sealed partial class TypeBuilder
                     if (external.TypeArguments[index].TypeParameterIndex is not { } parameter) continue;
                     var actual = specialConstraints.GetValueOrDefault(parameter);
                     if (actual.HasFlag(TypeParameterConstraints.ValueType)) actual |= TypeParameterConstraints.DefaultConstructor;
-                    if (genericConstraints.Any(c => c.ParameterIndex == parameter && !c.BaseType.IsNativeObjectRoot)) actual |= TypeParameterConstraints.ReferenceType;
+                    if (genericConstraints.Any(c => c.ParameterIndex == parameter && !c.BaseType.IsNativeObjectRoot && !c.BaseType.IsInterface)) actual |= TypeParameterConstraints.ReferenceType;
                     if ((actual & required) != required) throw new InvalidDataException("external base argument does not prove required special constraints");
                 }
                 foreach (var (index, bound) in external.TypeConstraints)
                     if (external.TypeArguments[index].TypeParameterIndex is { } parameter &&
-                        !genericConstraints.Any(c => c.ParameterIndex == parameter && Assembly.HasVariantReferenceConversion(c.BaseType, bound)))
+                        !genericConstraints.Any(c => c.ParameterIndex == parameter && Assembly.SatisfiesNominalTypeBound(c.BaseType, bound)))
                         throw new InvalidDataException("external base argument does not prove nominal bound");
                 foreach (var argument in external.TypeArguments) Visit(argument);
             }
@@ -116,8 +116,8 @@ public sealed partial class TypeBuilder
             var type = arguments[constraint.ParameterIndex];
             // Symbolic arguments are checked after substitution by the runtime.
             if (type.TypeParameterIndex is not null || type.MethodParameterIndex is not null) continue;
-            if (!Assembly.HasVariantReferenceConversion(type, constraint.BaseType))
-                throw new ArgumentException("type argument does not satisfy the nominal class bound");
+            if (!Assembly.SatisfiesNominalTypeBound(type, constraint.BaseType))
+                throw new ArgumentException("type argument does not satisfy the nominal class or interface bound");
         }
     }
     internal static void ValidateSpecialTypeArgument(SignatureType type, TypeParameterConstraints flags, bool complete)

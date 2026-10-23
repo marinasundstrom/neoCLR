@@ -332,7 +332,7 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
             return output / name
         flags = ['--compile-system', '--bind-user-fault', '--reference-arena', '--native-gc',
                  '--bind-console-read-byte', '--bind-console-write-line', '--bind-console-stream-output',
-                 '--bind-int32-to-string', '--bind-utf8-text', '--native-stack-budget', '--bind-integer-text', '--bind-character-text', '--bind-system-culture', '--bind-environment-platform', '--bind-time-zone-rules']
+                 '--bind-int32-to-string', '--bind-utf8-text', '--bind-stack-trace', '--native-stack-budget', '--bind-integer-text', '--bind-character-text', '--bind-system-culture', '--bind-environment-platform', '--bind-time-zone-rules']
         if not kit_path.exists():
             flags += ['--bind-cryptography']
         flags += ['--bind-tls']

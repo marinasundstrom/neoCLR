@@ -52,6 +52,15 @@ The selected namespace container and XML member entry include the new name; host
 and FaultCode retain their manual reference. Source callers must migrate from
 `System.Fault` and use the matching reference/compiler/runtime bundle.
 
+## Error diagnostics (development)
+
+The selected types now include System.Error, ContextError, ErrorDiagnostics, the
+three context/format extension containers and Diagnostics.ConditionalAttribute.
+FileReadError, NumberParseError and StreamError expose the diagnostic contract.
+The refreshed CLI reference and production native snapshot include these APIs;
+[the manual contract](error-context.md) covers overloads, capture policy, bounds
+and propagation. No additional renderer exclusions were required.
+
 ## One class-library reference across assemblies
 
 Author direction (2026-10-07): present the class library as one reference, organized by

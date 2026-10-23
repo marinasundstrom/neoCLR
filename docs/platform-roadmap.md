@@ -6113,3 +6113,22 @@ matching SDK/installed-editor qualification is still required before release.
 The HTTP JSON generic-composition import blocker is repaired (033942653), with
 SDK contract tests and client/server interpreter requests passing.
 See [development editor contract](native-poc-bundle.md#development-editor-execution-actions-2026-10-21).
+
+### Author-directed error diagnostics (2026-10-23, validated development slice)
+
+The author selected an opt-in Error contract and typed context decorators, with
+Option-valued cause/trace properties and capture disabled unless requested locally
+or configured by the application. Adopt it first on FileReadError, NumberParseError
+and StreamError; broader adoption is incremental. Result and structural-union
+propagation remain independent. General ConditionalAttribute compiler support is
+developed on Raven main and carried deliberately to codex/neoclr. This
+bounded author-directed task does not reorder the remaining platform milestones.
+
+Compared with .NET exceptions, context decorators offer messages, causes and optional
+attachment-site stack snapshots without exception inheritance or unwinding; they
+do not reconstruct an error's original stack. Source file/line resolution from
+debug symbols is explicitly deferred. Shared compiler tests, 12 runtime cases in
+each of interpreter/JIT/native on macOS ARM64, Release symbol coverage and API
+snapshot validation pass. These are development changes, not a published package. See [the API contract](../api-docs/error-context.md),
+[feature page](../website/content/features/error-handling/index.md) and
+[conversation record](development-timeline.md).

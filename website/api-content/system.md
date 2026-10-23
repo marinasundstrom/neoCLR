@@ -12,3 +12,5 @@ Start with [objects and values](/docs/objects.html), [strings](/features/strings
 [arrays](/docs/arrays.html), [outcomes](/features/outcomes/) or
 [Console](/docs/console.html). The declarations below link to member contracts,
 including typed errors and execution-mode limitations.
+
+[Error handling](/features/error-handling/) explains recoverable failures, domain mapping and opt-in context diagnostics. [Error API](/docs/error-context.html).

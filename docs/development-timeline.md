@@ -21459,3 +21459,127 @@ The assistant also separated the ordinary built-in test runner from a
 collections-specific crash probe so record-formatting and environment suites can
 run independently. Retained evidence identifies the development SDK metadata
 update separately from the library producer; no published SDK was overwritten.
+
+
+## 2026-10-23 — Error context and stack policy investigation
+
+The author requested investigation of Error-interface conversions, ContextError
+wrapping during propagation, Debug/Release stack capture and built-in error
+conventions, noting existing Raven.Core helpers and structural ad-hoc propagation.
+The author then asked for a coherent system that is feasible without complexity.
+
+The assistant inspected both Raven checkouts, existing neoCLR error unions and
+StackTrace, and primary .NET/Rust/library references. It recommends an Error
+contract with Message, optional Cause/StackTrace; typed ContextError and explicit
+WithContext; unchanged general propagation; built-in error implementation by
+convention; and opt-in capture with trace reuse in both build modes. Structural
+all-alternatives generic-constraint support remains a separate validation question.
+The [bounded recommendation](proposals/error-propagation-and-context.md#bounded-recommendation--2026-10-23)
+records evidence, tradeoffs, deferred machinery and a focused implementation gate.
+No runtime/compiler changes or fresh execution validation were performed. Author
+acceptance and implementation remain open; roadmap priorities are unchanged.
+
+
+### Implementation direction and optional diagnostics
+
+The author accepted the bounded Error proposal and directed implementation: “This
+should be opt-in for authors but a platform convention.” The assistant began the
+library contract, typed context helpers, bounded formatting and representative
+platform error adoption. The author then suggested Optional instead of nullable;
+the assistant adopted existing Option<Error> and Option<StackTrace> for public
+diagnostics, retaining the mandatory typed ContextError<E>.Cause. Native default
+interface emission is a known gap, so the initial implementations spell absent
+properties explicitly. Validation outcomes are recorded separately below.
+
+The author further clarified that error projection remains the API/library author's
+choice, Error applies to ordinary error-representing types as well as unions, and
+ad-hoc unions remain a distinct composition decision. The author described context
+and its infrastructure as adding some diagnostics familiar from .NET exceptions
+without requiring an inheritance hierarchy: errors are decorated. The assistant
+adopted that framing and retained ordinary class errors in the validation suite.
+Native generic owner interface constraints exposed an additional compiler/metadata
+admission gap; investigation targets that missing constraint support rather than
+weakening ContextError's cause type.
+
+### 2026-10-23 — Opt-in capture and shared conditional compilation (continued)
+
+- **Author:** clarified that errors are ordinary values of author-selected types,
+  with optional context decorators providing some exception diagnostics without
+  inheritance hierarchies. Required Optional/Option public absence contracts and
+  opt-in capture, either at a context boundary or through application configuration.
+- **Author:** required ConditionalAttribute support on Raven main and the neoCLR
+  compiler branch. Main and target integration remain separate; this does not
+  authorize a full branch merge.
+- **Assistant:** implemented shared call omission on main, carried the patch to
+  codex/neoclr, and added the native attribute contract. Main focused tests passed
+  19 cases; the carried shared/compiler-bound group passed 27. Native runtime
+  validation and API snapshot refresh remain in progress at this entry.
+- **Author:** distinguished Debug source locations from capture policy, then
+  explicitly deferred source file/line support, normally resolved from a debug
+  symbol file. **Assistant:** retained current method/IL traces, documented the gap,
+  and kept DEBUG as an ordinary caller symbol controlling an opt-in startup method.
+- **Performance decision:** ordinary capture-disabled context construction does
+  not walk the full cause chain. It reuses an immediate snapshot; explicit capture
+  may search up to 64 layers before capturing, and explicit formatting traverses
+  causes without capture. Wrapper allocation and possible interface boxing remain.
+
+See [the development API contract](../api-docs/error-context.md).
+
+- **Author (subsequent clarification):** adopt Error on a selected set of unions
+  or ordinary error types now and expand later. **Assistant:** selected
+  FileReadError, NumberParseError and StreamError; all other failure types remain
+  unchanged in this slice.
+
+### Common error boundaries and website audience — 2026-10-23
+
+- **Author:** Clarified that any error implementing System.Error may propagate into
+  Result<T, System.Error>, accepting a less specific outward contract. Requested a
+  general error-handling feature page linked from outcomes.
+- **Assistant action:** Added a tested common-interface boundary preserving the
+  concrete runtime failure without automatic wrapping/capture, and a dedicated
+  page explaining domain mapping, context, reporting and opt-in traces. Twelve
+  interpreter cases pass; native/JIT qualification continues below.
+- **Author:** Requested a separate explanation of who Raven and neoCLR are for:
+  people who like C#/.NET ergonomics, APIs, automatic memory management, GC and
+  introspection/reflection, together with Rust-style unions for optionals/errors.
+  Added cross-platform and AOT-first support to that direction.
+- **Assistant action:** Added [Who it’s for](../website/content/who-its-for/index.md),
+  linked from the homepage, about page, Raven introduction and guide navigation.
+  It distinguishes the cross-platform AOT deployment direction from current
+  target coverage and explains the independent runtime/library contracts.
+
+- **Assistant outcome:** All 12 error-context tests pass in interpreter, JIT and
+  AOT native execution on macOS ARM64 (36 executions); a Release project also passes
+  all 12. Native generic interface owner admission and ordinary native build stack
+  binding were required integration fixes. Metadata checks, 25 specialization tests
+  (one optional timing probe ignored), main's 19 and neoCLR Raven's 27 focused
+  compiler tests pass. API snapshots were refreshed; 26 website checks pass.
+  [Artifact identities and outcomes](validation/error-context/validation.json) retain
+  the working-tree status. Source file/line resolution, broader error adoption and
+  other-host/package qualification remain open. No publication was performed.
+
+- **Author correction:** Error handling must center on unions and propagation, with
+  Error/ContextError introduced later as conventions. The audience is people who
+  want a modern programming experience based on .NET, with the clear caveat that
+  neoCLR is a new platform incompatible with existing .NET libraries.
+- **Assistant action:** Reordered the error guide around outcome unions, propagation,
+  handling and outward domain contracts, using existing tested sample sources.
+  Moved diagnostic conventions later and shortened stack-policy detail. Revised
+  the audience introduction to state the compatibility boundary immediately, while
+  distinguishing Raven's separate .NET target.
+
+- **Author clarification:** Raven combines modern and familiar concepts and strong
+  pattern-matching syntax, influenced by C#, Swift, Rust and Kotlin. neoCLR APIs
+  should be understood as modern designs without .NET's legacy compatibility
+  obligations: UTF-8 strings, Option instead of nullable as an API convention,
+  Result for errors, and Slice/Memory for efficiency.
+- **Assistant action:** Separated the audience page's language and runtime/API
+  explanations, adding those influences and concrete API choices with feature
+  links. Described buffer views and incremental API adoption without claiming
+  that all copies or nullable types have disappeared.
+
+- **Author:** Requested commits when complete.
+- **Assistant action:** Committed shared compiler support on Raven main as
+  `59a8d09ea` and its deliberate neoCLR integration as `37056b534`; kept branches
+  separate. The neoCLR commit includes APIs, runtime integration, references and
+  website pages. Pre-existing Windows ARM64 assessment edits are excluded.

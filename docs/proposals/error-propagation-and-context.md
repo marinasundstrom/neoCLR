@@ -1,5 +1,127 @@
 # Raven Error Propagation and Context
 
+## Bounded recommendation — 2026-10-23
+
+Status: the author accepted this bounded direction and requested implementation.
+The original recommendation below records the design discussion; the implemented
+development contract is maintained in [Error and context](../../api-docs/error-context.md).
+This does not reprioritize the roadmap. Broader ideas below remain exploratory,
+and development changes are not yet part of a published release.
+
+### Existing evidence
+
+Inspected Raven main at `db41ad039` and `codex/neoclr` at `8f4aa542d`:
+`src/Raven.Core/Error.rvn` has IError.Message, nullable Cause with a null default,
+ContextError<E: IError>, typed WithContext and interface-level Box(message).
+`src/Raven.Core/Result.rvn` maps WithContext over the error channel only.
+Error.rvn is identical in these checkouts. Raven.Macros.Error derives ordinary
+interface implementations for nominal unions; it does not make every union an error.
+These are source observations, not fresh execution qualification.
+
+neoCLR's FileReadError and StreamError currently provide case-based ToString without
+this interface. Its [StackTrace](../../runtime/raven/src/System/Diagnostics/StackTrace.rvn)
+already captures an owned current guest-stack text snapshot at construction: at most
+64 frames, method names and IL instruction indexes, no source lines or suspended
+async callers. See [diagnostic scope](../stack-traces.md). Structural propagation
+and all-alternatives interface/generic-constraint satisfaction are separate contracts;
+do not infer the latter from successful propagation. Broader structural work stays parked.
+
+### Proposed small contract
+
+Use one Error interface (Raven.Core's .NET spelling remains IError) with Message,
+optional Cause, and optional StackTrace. Default Cause and StackTrace to absent.
+Resolve neoCLR's optional-value spelling consistently with its library conventions
+when implementing; no nullable-reference/Option migration is selected here.
+The optional trace member allows wrappers and renderers to reuse a cause's trace
+without reflection or a second diagnostic interface. Adding it to Raven.Core is a
+separate compatibility change requiring validation on main before deliberate carry-over.
+
+Use one ContextError<E: Error>, retaining typed Cause and exposing it through Error.
+WithContext(message) wraps only failure values; its Result extension returns
+Result<T, ContextError<E>>. Add a lazy-message overload so message construction
+need not run on success. Context messages describe the current operation; they do
+not concatenate the cause's text. Existing explicit Box(message) remains an erased
+boundary convenience on .NET, not a requirement for ordinary typed propagation.
+
+Ordinary interface conversion exposes an existing error without contextual wrapping.
+Ordinary ? preserves or performs already-supported residual adaptation. Neither
+implicitly adds context or captures stacks. Domain mapping remains MapError or a
+specific existing conversion; never add a universal E-to-ContextError conversion,
+which has no meaningful operation message and risks ambiguous conversion selection.
+ContextError<E> is a different residual type: the enclosing return signature must
+accept it. E1 | E2 does not automatically accept ContextError<E1>.
+
+Built-in nominal failure unions/types should implement Error by convention, preserving
+case payloads and matching. Real nested failures expose their cause; leaf failures
+have none. Do not constrain Result's E, Option, or arbitrary unions to Error. Messages
+are human descriptions, not stable machine codes. Adopt incrementally; do not infer
+error behavior from a type name or implicitly wrap every library return.
+
+For E1 | E2, use typed wrappers per branch, or an explicit per-alternative MapError
+projection to Error at an application/reporting boundary. ContextError<E1 | E2> is
+only available once all-alternatives Error constraint satisfaction is qualified.
+Do not add a special Error-only structural rule to deliver the first version.
+
+### Stack policy
+
+WithContext defaults to no new capture in both Debug and Release. An explicit
+captureStackTrace option captures at the context boundary if the cause chain has
+no trace; otherwise preserve/reuse the existing snapshot. A later ordinary wrapper
+must still expose the retained trace. No capture at each ?, leaf-error construction,
+Message access or formatting. Capture immediately when requested, never lazily at
+logging time. An opt-in capture records the attachment site, not necessarily the
+original failure; capture at creation explicitly when origin evidence is required.
+
+Use identical types, matching, causes and defaults across build modes. Debug symbols
+may improve future rendering; production capture must remain available. Automatic
+Debug-only capture, global policy, sampling, propagation breadcrumbs and logical
+async stacks are deferred. This makes the cost visible and avoids changing release
+diagnostics accidentally. Wrappers allocate and interface views of value errors may
+box; no performance improvement is claimed. Diagnostic data should not participate
+in semantic error equality; check record synthesis before adding stored trace fields.
+
+A library formatter prints outer context, causes and one retained trace, with bounded
+cause traversal for malformed/cyclic custom errors. Keep ToString concise. Logging
+must not become the capture point. Existing runtime Fault behavior stays separate.
+
+### Baseline and alternatives
+
+Primary references consulted 2026-10-23:
+
+- [.NET Exception.StackTrace (.NET 10)](https://learn.microsoft.com/en-us/dotnet/api/system.exception.stacktrace?view=net-10.0)
+  documents unavailable traces before throwing; Exception's InnerException supplies
+  causal nesting. Reuse message/cause/snapshot concepts, while deliberately using
+  returned typed values rather than throw/unwind for recoverable failures. This retains
+  typed matching but requires explicit diagnostic attachment and exception adapters
+  for the ordinary .NET target.
+- [Rust Error](https://doc.rust-lang.org/std/error/trait.Error.html) separates error
+  description and source chaining from Result propagation.
+  [Rust backtrace](https://doc.rust-lang.org/stable/std/backtrace/) documents capture
+  cost and explicit/configured capture. [anyhow](https://docs.rs/anyhow/1.0.104/anyhow/struct.Error.html)
+  demonstrates context chains, preserved inspection and trace reuse. Its erased
+  application-error model is useful at boundaries, but does not replace typed unions.
+- [FluentResults](https://github.com/altmann/FluentResults) demonstrates library-owned
+  .NET error objects/chains. Its broader reason/metadata model is unnecessary for
+  this first slice. No API-review consensus or maintainer endorsement of this proposal
+  was established; implementation-performance comparisons remain unmeasured.
+
+### First validation slice
+
+Implement the interface, typed wrapper/helpers and two representative leaf/domain
+errors; validate success bypass (including lazy messages), typed/nested causes,
+explicit domain mapping, incompatible residual rejection, value-error interface
+views, no default capture, explicit capture and trace reuse. Check Debug/Release
+behavior and interpreter/JIT/native execution with the matching compiler/library
+bundle. Verify separate-library metadata and generic constraints before widening
+coverage. Test structural constraint satisfaction separately, including one
+non-Error alternative; retain explicit projection when unsupported. Measure capture
+cost only before choosing any automatic capture default. Public API snapshots and
+both repositories' relevant integration/compiler docs must accompany implementation.
+No implementation, compilation, benchmark or website build was performed for this
+recommendation.
+
+---
+
 ## Summary
 
 Raven should provide a unified model for recoverable error propagation built around `Result`, the propagation protocol, the `?` operator, and the `Error` interface.

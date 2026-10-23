@@ -23,7 +23,7 @@ public sealed class ImportedTypeReference : IEquatable<ImportedTypeReference>
     public IReadOnlyList<SignatureType> TypeArguments { get; }
     /// <summary>Gets registered reference/value requirements by definition parameter ordinal, shared by all constructions.</summary>
     public IReadOnlyDictionary<int, TypeParameterConstraints> SpecialConstraints => Owner.ImportedSpecialConstraints(this);
-    /// <summary>Gets registered nominal class bounds by parameter ordinal.</summary>
+    /// <summary>Gets registered nominal class or interface bounds by parameter ordinal.</summary>
     public IReadOnlyDictionary<int, SignatureType> TypeConstraints => Owner.ImportedBounds(this);
     internal void ValidateTypeArguments(bool complete = false)
     {
@@ -31,8 +31,8 @@ public sealed class ImportedTypeReference : IEquatable<ImportedTypeReference>
         foreach (var (index, flags) in SpecialConstraints)
             TypeBuilder.ValidateSpecialTypeArgument(TypeArguments[index], flags, complete);
         foreach (var (index, bound) in TypeConstraints)
-            if (TypeArguments[index].TypeParameterIndex is null && TypeArguments[index].MethodParameterIndex is null && !Owner.HasVariantReferenceConversion(TypeArguments[index], bound))
-                throw new ArgumentException("type argument does not satisfy nominal class bound");
+            if (TypeArguments[index].TypeParameterIndex is null && TypeArguments[index].MethodParameterIndex is null && !Owner.SatisfiesNominalTypeBound(TypeArguments[index], bound))
+                throw new ArgumentException("type argument does not satisfy nominal class or interface bound");
     }
     /// <summary>Constructs this generic definition with types belonging to the consumer.</summary>
     /// <param name="arguments">Exactly one non-Void type per parameter; copied.</param>
@@ -157,7 +157,7 @@ public sealed partial class AssemblyBuilder
         return ImportReference(definition, core);
     }
     /// <summary>Imports a public class, interface or value-type definition for use in signatures.</summary>
-    /// <param name="definition">External public type; generic definitions must be unconstrained; declared interface variance is retained. Values must extend the explicit core System.ValueType or System.Enum.</param>
+    /// <param name="definition">External public type; supported special and nongeneric nominal owner bounds are retained, as is declared interface variance. Values must extend the explicit core System.ValueType or System.Enum.</param>
     /// <param name="dependencyCoreLibrary">Explicit matching core contract.</param>
     /// <returns>An interned immutable reference; generic definitions require construction before signature use.</returns>
     /// <exception cref="ArgumentNullException">A required argument is null.</exception>
@@ -196,7 +196,18 @@ public sealed partial class AssemblyBuilder
         if (definition.IsEnum) enumReferences.Add(result);
         if (definition.NativeGrapheme) SetNativeGrapheme(result);
         if (definition.GenericParameterVariance is { } annotations) importedVariance[result] = annotations;
-        if (definition.Module.Assembly.IsNative) nativeImportedDefinitions[result] = definition;
+        if (definition.Module.Assembly.IsNative)
+        {
+            nativeImportedDefinitions[result] = definition;
+            foreach (var (parameter, flags) in definition.SpecialConstraints)
+                SetSpecialConstraints(result, parameter, flags);
+            foreach (var constraint in definition.NativeTypeConstraints ?? [])
+            {
+                var bound = definition.Module.GetTypeDefinition(constraint.Interface)
+                    ?? throw new InvalidDataException("missing native owner constraint");
+                AddBaseTypeConstraint(result, constraint.Parameter, ImportReference(bound, dependencyCoreLibrary));
+            }
+        }
         return result;
     }
     private ImportedTypeReference? ImportDeclaringScope(TypeDefinition? type, AssemblyIdentity core, int depth = 0)
