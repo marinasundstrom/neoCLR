@@ -428,3 +428,25 @@ costs are new private imports, format-aware frame readers, per-boundary header b
 and a little-endian target contract. Storage/transient plans remain JSON; a future
 image registry could amortize per-boundary versioning. See the [contract, alternatives,
 validation and paired evidence](../../benchmarks/http-server/primitive-comparison/root-map/README.md).
+
+
+### Execution modes and measured cost separation — 2026-10-24
+
+The author's multi-mode GC objective now has a [matched-mode investigation](../../benchmarks/execution/gc-mode-comparison/README.md).
+Interpreter execution uses a separate Rust heap; managed JIT and AOT share native
+lowering and the C collector. Their host pacing and ownership settings must match
+before comparing execution cost. Forty checked task/collection invocations agree
+on native allocation/collection counts; interpreter counts describe another heap.
+
+JIT selection/verification takes 3.1–3.4 seconds in these small samples while native
+invocation takes less than a millisecond. A separate startup profile identifies
+repeated inheritance method-owner resolution and hashing. An immutable per-scope
+owner/method index is the next proposed common-loading experiment, preserving
+all source validation. It would affect startup/build time, not warm AOT requests.
+
+Eight warm plaintext trials expose a separate JIT/AOT gap with paced, external-heap
+hosts. Native imports, dynamic-host TLS and code layout remain hypotheses; the
+experiment does not attribute that gap to GC or scheduling. No production policy
+changes, interpreter HTTP capacity claim or new generational-GC conclusion follows.
+The existing CoreCLR comparison still guides shared metadata and bounded lifetime
+choices; this measurement slice changes no public API or layout contract.

@@ -1,0 +1,29 @@
+{
+  "revision": "7d14c15c659056330003900cbc5b3261c6ac8679",
+  "platform": "Darwin Roberts-MacBook-Pro.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:27 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T8103 arm64",
+  "inputs": {
+    "target/gc-mode-comparison-final/startup.sample.txt": "93c9dc40f8cc757d006ce849c0aa769c734e8ec66a21ae0cf17088ea4ca61edb",
+    "target/gc-mode-comparison-final/startup-profile.json": "f256d3dd51795c5986ee3bd8c1a7f1a2022ba4fe676253aa39e9bb19a5ec78ed",
+    "/Users/robert/Projects/neoclr/target/transient-handoff-corpus-wrapped/tasks/bin/neoclr/App.dll": "fb3d1f80bd97ce0c15042dfbfed1bfcebfbe0b893f272fe9cca44b74cba7ae19",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.runtime.neox": "0c72a8656e7158d6bb2f31c0b019d8747dd61a6c4127b278155e104de437769b",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Runtime.dll": "ac3ddea188cd6e7970869248c2501acc7f6f7a1bfca598c339ea3257d3fc1d4c",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Data.dll": "846771708d06ae117fd6eb3019fbd7805ba9e3794b456c7b89d637893c7954a6",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Networking.dll": "d2c27984c00e7d89eabcb9ced7a0004557077cbef57fdb4292e264ddf2a4a4b2",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Web.dll": "434d63e3191c7a496c263dcd454807ddd32979cd4bb52bf9005af60178d7313e",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Data.PostgreSql.dll": "d456bee492ff5836a4e9f1297157f8d4fa2bfacb81cf6d9bfd2e0d99ce89da09",
+    "/Users/robert/Projects/neoclr/target/transient-handoff-corpus-wrapped/collections/bin/neoclr/App.dll": "4fb57fa8447f05a1c775d15ed1a18d33d9adcea65f2d828587cda1b92d8dcd30",
+    "target/root-map/build.json": "f7161093325d6442325a36faea7309367709abe12946346954937389aeb9e3a4",
+    "target/primitive-comparison-build/build.json": "1f5beaade5ad4395d90ad0d0518d94afd1e6c52e2d2714595f8cc698118e3fce",
+    "src/runtime_lookup.rs": "b80c21f2e7196c084f77d40cbe255bff53c578c23423736dff221c4941df5b00",
+    "src/inheritance.rs": "68a9cb341e935d191567469041dd73c25ef6b44d08096b3c863ad9d0053079bb",
+    "src/gc.rs": "55b7d5d4d09e38a4038b5c7f0d484415b31dbb11c99ee8341835080241a9af7c",
+    "src/shared_heap.rs": "cce58ed7b4d448a861976c4e6e563e9a109cf4c834e9d29b2686a1aaee0612e3",
+    "src/vm.rs": "c60350feb733c48019687415e02737180babd1278112cc25f0b6343cad239dbf",
+    "src/slots.rs": "88ec946fb7f2d0956de316a46de162a6113bf51a86a679b6c1598d2340eef203",
+    "runtime/codegen/src/jit.rs": "269bad17190aad1540e63532f3e1b13dba292e16dc04ed787427ff0afe940218",
+    "runtime/codegen/src/values.rs": "a8053c1558f0bdc59c4d5996cfdc0669c9401a799a8cb77d9bf6c0812e1ec0e9",
+    "runtime/codegen/src/lib.rs": "d2e562cf265b9329fe17e2ce310c2778d9f437f658fbd867860720af19e695cc",
+    "runtime/codegen/src/linking.rs": "a01116af60d5b497a2c075cf8a0eeae97cef3b0b9a4c414d52cb591cdb0a67a1"
+  },
+  "httpCompilationFlagsMatchRootMapBuild": true
+}

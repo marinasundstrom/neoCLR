@@ -6569,3 +6569,15 @@ local trials improve mean one/four-worker throughput 4.0%/3.9% and reduce CPU pe
 response 4.2%/3.9%. [Evidence and limitations](../benchmarks/http-server/primitive-comparison/root-map/README.md).
 Typed storage/transient maps and image-level format admission remain future work.
 Windows runtime execution remains unqualified for this slice; object emission passes.
+
+
+### Cross-mode execution and HTTP investigation — 2026-10-24
+
+Author-directed performance work now separates shared loading services from the
+interpreter Rust heap and native JIT/AOT collector. Forty sample invocations and
+eight matched-host plaintext trials pass; a separate startup profile identifies
+repeated inheritance-owner resolution. The next bounded loading experiment is an
+immutable owner/method index with unchanged verification. Warm JIT/AOT HTTP costs
+need separate matched ownership/import/TLS profiling; production behavior is
+unchanged. [Evidence, priorities and limitations](../benchmarks/execution/gc-mode-comparison/README.md).
+This does not reorder the broader active milestone or claim peer-server parity.

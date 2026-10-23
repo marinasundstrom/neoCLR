@@ -22200,3 +22200,24 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   is reduced. [Paired measurements and limits](../benchmarks/http-server/primitive-comparison/root-map/README.md).
 - Open: typed storage/transient execution metadata, image-level version admission
   and native Windows execution qualification remain separate follow-ups.
+
+
+### 2026-10-24 — Separate common and mode-specific execution costs
+
+- Author: asks to continue improving execution and HTTP, with GC improvements for
+  JIT/AOT and possible interpreter benefits. Notes that multiple modes can reveal
+  common-service versus mode-specific costs, and proposes metadata, heap tracking,
+  scheduling and suspension as areas to investigate.
+- Assistant finding: interpreter uses a Rust heap; managed JIT and AOT share native
+  lowering and a C collector. Shared GC goals do not imply one implementation.
+  Host pacing and heap ownership also differ from execution-mode selection.
+- Assistant action and verified outcome: runs 40 checked ordinary invocations and
+  eight matched-host plaintext trials, plus a separate startup stack capture.
+  Native counts match across JIT/AOT. JIT selection/verification dominates small
+  sample startup; the profile identifies repeated inheritance-owner resolution.
+  Warm paced HTTP retains a JIT/AOT gap whose cause is not established.
+- Proposed next steps: qualify an immutable owner/method index for common loading,
+  compare owned-heap native hosts and profile dynamic imports/TLS separately, and
+  measure interpreter execution/coordination before redesigning its heap.
+  Production behavior is unchanged. [Measurements and limits](../benchmarks/execution/gc-mode-comparison/README.md).
+  Generational GC remains open; these experiments do not settle its benefit.

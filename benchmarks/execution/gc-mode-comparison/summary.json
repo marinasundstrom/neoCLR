@@ -1,0 +1,120 @@
+{
+  "ordinary": [
+    {
+      "sample": "tasks",
+      "mode": "interpreter",
+      "policy": null,
+      "processWallSeconds": 4.957424374999999,
+      "processCpuSeconds": 4.952621
+    },
+    {
+      "sample": "tasks",
+      "mode": "jit",
+      "policy": "forced",
+      "processWallSeconds": 3.5181897499999977,
+      "processCpuSeconds": 3.5104079999999964,
+      "metadataLoadSeconds": 0.099868875,
+      "selectionAndVerificationSeconds": 3.289902167,
+      "compileAndFinalizeSeconds": 0.099187292,
+      "invocationSeconds": 0.000325292
+    },
+    {
+      "sample": "tasks",
+      "mode": "jit",
+      "policy": "paced",
+      "processWallSeconds": 3.3828828330000036,
+      "processCpuSeconds": 3.376746999999999,
+      "metadataLoadSeconds": 0.099469209,
+      "selectionAndVerificationSeconds": 3.136852875,
+      "compileAndFinalizeSeconds": 0.093914625,
+      "invocationSeconds": 0.00030075
+    },
+    {
+      "sample": "tasks",
+      "mode": "aot",
+      "policy": "forced",
+      "processWallSeconds": 0.004610291999995297,
+      "processCpuSeconds": 0.0030950000000040667,
+      "invocationSeconds": 0.000243
+    },
+    {
+      "sample": "tasks",
+      "mode": "aot",
+      "policy": "paced",
+      "processWallSeconds": 0.004431042000000218,
+      "processCpuSeconds": 0.00293800000000477,
+      "invocationSeconds": 0.000203
+    },
+    {
+      "sample": "collections",
+      "mode": "interpreter",
+      "policy": null,
+      "processWallSeconds": 5.003914375000008,
+      "processCpuSeconds": 4.998951000000008
+    },
+    {
+      "sample": "collections",
+      "mode": "jit",
+      "policy": "forced",
+      "processWallSeconds": 3.7016199589999985,
+      "processCpuSeconds": 3.6963120000000123,
+      "metadataLoadSeconds": 0.099884583,
+      "selectionAndVerificationSeconds": 3.36996325,
+      "compileAndFinalizeSeconds": 0.202404541,
+      "invocationSeconds": 0.000739209
+    },
+    {
+      "sample": "collections",
+      "mode": "jit",
+      "policy": "paced",
+      "processWallSeconds": 3.702033583000002,
+      "processCpuSeconds": 3.697004999999991,
+      "metadataLoadSeconds": 0.099608292,
+      "selectionAndVerificationSeconds": 3.370303583,
+      "compileAndFinalizeSeconds": 0.202078833,
+      "invocationSeconds": 0.000433334
+    },
+    {
+      "sample": "collections",
+      "mode": "aot",
+      "policy": "forced",
+      "processWallSeconds": 0.004978792000002841,
+      "processCpuSeconds": 0.0034079999999994115,
+      "invocationSeconds": 0.000544
+    },
+    {
+      "sample": "collections",
+      "mode": "aot",
+      "policy": "paced",
+      "processWallSeconds": 0.00473795800000687,
+      "processCpuSeconds": 0.0031449999999955125,
+      "invocationSeconds": 0.000272
+    }
+  ],
+  "http": [
+    {
+      "label": "aot-forced",
+      "medianRequestsPerSecond": 32.6,
+      "medianWindowCpuMicrosecondsPerResponse": 30326.92307692308,
+      "medianReadySeconds": 0.1383610420000041
+    },
+    {
+      "label": "jit-forced",
+      "medianRequestsPerSecond": 32.3,
+      "medianWindowCpuMicrosecondsPerResponse": 30697.67441860465,
+      "medianReadySeconds": 7.505038479000007
+    },
+    {
+      "label": "aot-paced",
+      "medianRequestsPerSecond": 1268.1,
+      "medianWindowCpuMicrosecondsPerResponse": 789.0474908924673,
+      "medianReadySeconds": 0.13798895850000115
+    },
+    {
+      "label": "jit-paced",
+      "medianRequestsPerSecond": 994.6,
+      "medianWindowCpuMicrosecondsPerResponse": 1004.3250361025932,
+      "medianReadySeconds": 7.352550104500001
+    }
+  ]
+}
