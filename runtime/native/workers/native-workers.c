@@ -176,8 +176,19 @@ int32_t neoclr_worker_invoke_capture(neoclr_worker_job *j) {
     if (!p->invoke || j->fault.code || p->context.fault.code || neoclr_root_probe_head_v1() || neoclr_roots_parked_v1()) {
         neoclr_worker_leave(j); return 3;
     }
+    /* ABI v4 embeds its arena cursor/static root beside per-invocation faults.
+     * Transfer exclusive ownership, rather than making two active cursor copies.
+     * The gate excludes readers, native mutators, allocation and owner collection
+     * until the invocation returns its heap state. No context identity escapes. */
+    neoclr_aot_context invocation = {
+        .text = p->context.text, .static_storage = p->context.static_storage
+    };
+    unsigned char *arena = invocation.text.data;
+    uint64_t capacity = invocation.text.capacity;
+    p->context.text = (neoclr_aot_text_arena){0};
+    p->context.static_storage = NULL;
     uint64_t handle = 0;
-    int32_t status = neoclr_gc_host_root_create_v1(&p->context, j->capture, &handle);
+    int32_t status = neoclr_gc_host_root_create_v1(&invocation, j->capture, &handle);
     if (!status) {
         neoclr_probe_storage slots[POOL_ROOT_SLOTS];
         unsigned count = pool_slots(p, slots);
@@ -185,19 +196,22 @@ int32_t neoclr_worker_invoke_capture(neoclr_worker_job *j) {
         neoclr_parked_roots parked = {0};
         /* Park only this adapter frame, leaving generated callback admission
          * quiescent. The gate keeps all referenced pool slots stable. */
-        neoclr_gc_enter_v1(&frame, &p->context, 0, slots, count, "[]", 2);
+        neoclr_gc_enter_v1(&frame, &invocation, 0, slots, count, "[]", 2);
         neoclr_roots_park_v1(&parked);
-        status = p->invoke(handle, &p->context);
+        status = p->invoke(handle, &invocation);
         if (neoclr_root_probe_head_v1() || neoclr_roots_parked_v1() != &parked) abort();
         neoclr_roots_resume_v1(&parked);
         neoclr_gc_leave_v1(&frame);
-        if (neoclr_gc_owned_roots_check_v1(&p->context, &handle, 1)) abort();
-        if (neoclr_gc_host_root_release_v1(&p->context, handle)) abort();
+        if (neoclr_gc_owned_roots_check_v1(&invocation, &handle, 1)) abort();
+        if (neoclr_gc_host_root_release_v1(&invocation, handle)) abort();
     }
-    if (p->context.fault.code) {
-        j->fault = p->context.fault;
-        memset(&p->context.fault, 0, sizeof(p->context.fault));
-    }
+    if (invocation.text.data != arena || invocation.text.capacity != capacity ||
+        invocation.text.used > capacity || p->context.text.data ||
+        p->context.text.capacity || p->context.text.used || p->context.static_storage) abort();
+    p->context.text = invocation.text;
+    p->context.static_storage = invocation.static_storage;
+    if (invocation.fault.code) j->fault = invocation.fault;
+    memset(&invocation, 0, sizeof(invocation));
     neoclr_worker_leave(j);
     return status;
 }

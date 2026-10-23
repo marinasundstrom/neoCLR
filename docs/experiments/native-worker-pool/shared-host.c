@@ -6,6 +6,24 @@
 #include <string.h>
 #define CHECK(x) do { if (!(x)) { fprintf(stderr, "failed %d: %s\n", __LINE__, #x); abort(); } } while (0)
 extern int32_t neoclr_bootstrap_callback_v1(int32_t, uint64_t *, neoclr_aot_context *);
+/* Native image adapter audit: the pool owner is inactive while each fresh
+ * invocation exclusively owns the same arena, including newly created statics. */
+static neoclr_aot_context *heap_owner;
+static unsigned char *heap_data;
+static int32_t audit_bootstrap(int32_t argument, uint64_t *handle, neoclr_aot_context *context) {
+    heap_owner = context; heap_data = context->text.data;
+    return neoclr_bootstrap_callback_v1(argument, handle, context);
+}
+static int32_t audit_invoke(uint64_t handle, neoclr_aot_context *context) {
+    CHECK(context != heap_owner && context->text.data == heap_data);
+    CHECK(!context->fault.code && !context->fault.frame_count && !context->fault.message);
+    CHECK(!heap_owner->text.data && !heap_owner->text.capacity && !heap_owner->text.used);
+    CHECK(!heap_owner->static_storage && !heap_owner->fault.code);
+    int32_t status = neoclr_invoke_void_callback_v1(handle, context);
+    CHECK(context->text.data == heap_data);
+    if (status != 3) CHECK(context->static_storage);
+    return status;
+}
 typedef struct { atomic_uint arrived; int expected; } batch;
 static int work(neoclr_worker_job *job, void *state) {
     batch *b = state;
@@ -56,8 +74,8 @@ static int cancel_fault(neoclr_worker_job *job, void *state) {
 static void cancellation_wins(void) {
     neoclr_workers *pool = neoclr_workers_create(1, 1, 8192);
     neoclr_worker_handle callback, ticket, root;
-    CHECK(pool && !neoclr_workers_bootstrap(pool, neoclr_bootstrap_callback_v1,
-        neoclr_invoke_void_callback_v1, 0, &callback));
+    CHECK(pool && !neoclr_workers_bootstrap(pool, audit_bootstrap,
+        audit_invoke, 0, &callback));
     cancellation c = {0};
     CHECK(neoclr_workers_submit(pool, callback, cancel_fault, &c, &ticket));
     while (!atomic_load(&c.ready)) sched_yield();
@@ -72,6 +90,37 @@ static void cancellation_wins(void) {
     neoclr_worker_value value; int outcome;
     CHECK(neoclr_workers_take(pool, ticket, &outcome, &value, &root) == 1);
     CHECK(outcome == NEOCLR_WORKER_CANCELLED && !root.pool);
+    CHECK(neoclr_workers_root_release(pool, callback));
+    CHECK(neoclr_workers_close(pool) && neoclr_workers_destroy(pool));
+}
+static int exhaust_callback_handles(neoclr_worker_job *job, void *state) {
+    (void)state;
+    uint64_t buffer[64] = {0};
+    neoclr_aot_context foreign = {.text = {(unsigned char *)buffer, sizeof(buffer), 0}};
+    void *value = NULL;
+    CHECK(!neoclr_gc_allocate_v1(&foreign.text, 8, NEOCLR_GC_BYTES, &value));
+    uint64_t handles[NEOCLR_GC_HOST_ROOT_LIMIT];
+    for (unsigned i = 0; i < NEOCLR_GC_HOST_ROOT_LIMIT; i++)
+        CHECK(!neoclr_gc_host_root_create_v1(&foreign, value, &handles[i]));
+    CHECK(neoclr_worker_invoke_capture(job) == NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT);
+    neoclr_worker_enter(job);
+    CHECK(heap_owner->text.data == heap_data && !heap_owner->fault.code);
+    neoclr_worker_leave(job);
+    for (unsigned i = 0; i < NEOCLR_GC_HOST_ROOT_LIMIT; i++)
+        CHECK(!neoclr_gc_host_root_release_v1(&foreign, handles[i]));
+    CHECK(!neoclr_gc_owned_roots_check_v1(&foreign, NULL, 0));
+    /* Admission failure must return the lease without faulting this job. */
+    CHECK(!neoclr_worker_invoke_capture(job));
+    return 0;
+}
+static void admission_recovery(void) {
+    neoclr_workers *pool = neoclr_workers_create(1, 1, 8192);
+    neoclr_worker_handle callback, ticket, root;
+    CHECK(pool && !neoclr_workers_bootstrap(pool, audit_bootstrap, audit_invoke, 1, &callback));
+    CHECK(neoclr_workers_submit(pool, callback, exhaust_callback_handles, NULL, &ticket));
+    CHECK(neoclr_workers_wait(pool, ticket, 10000) == 1);
+    neoclr_worker_value value; int outcome;
+    CHECK(neoclr_workers_take(pool, ticket, &outcome, &value, &root) == 1 && !outcome && !root.pool);
     CHECK(neoclr_workers_root_release(pool, callback));
     CHECK(neoclr_workers_close(pool) && neoclr_workers_destroy(pool));
 }
@@ -106,28 +155,29 @@ static void observe(neoclr_workers *pool, neoclr_worker_handle ticket, void *sta
 }
 int main(void) {
     cancellation_wins();
+    admission_recovery();
     neoclr_workers *empty = neoclr_workers_create(1, 1, 8192);
     neoclr_worker_handle scalar, unchanged = {99,99,99,99};
     CHECK(empty && neoclr_workers_root_new(empty, 5, &scalar));
     check_rejected(empty, scalar); /* no compiled image */
-    CHECK(neoclr_workers_bootstrap(empty, neoclr_bootstrap_callback_v1,
-        neoclr_invoke_void_callback_v1, 80, &unchanged) == 3 && unchanged.pool == 99);
+    CHECK(neoclr_workers_bootstrap(empty, audit_bootstrap,
+        audit_invoke, 80, &unchanged) == 3 && unchanged.pool == 99);
     CHECK(neoclr_workers_root_release(empty, scalar));
     CHECK(neoclr_workers_close(empty) && neoclr_workers_destroy(empty));
     empty = neoclr_workers_create(1, 1, 8192);
     CHECK(empty);
-    CHECK(neoclr_workers_bootstrap(empty, neoclr_bootstrap_callback_v1,
-        neoclr_invoke_void_callback_v1, -1, &unchanged) != 0 && unchanged.pool == 99);
+    CHECK(neoclr_workers_bootstrap(empty, audit_bootstrap,
+        audit_invoke, -1, &unchanged) != 0 && unchanged.pool == 99);
     CHECK(neoclr_workers_close(empty) && neoclr_workers_destroy(empty));
 
     neoclr_workers *pool = neoclr_workers_create(4, 4, 8192);
     neoclr_worker_handle callback, sentinel;
     CHECK(pool);
-    CHECK(!neoclr_workers_bootstrap(pool, neoclr_bootstrap_callback_v1,
-        neoclr_invoke_void_callback_v1, 80, &callback));
+    CHECK(!neoclr_workers_bootstrap(pool, audit_bootstrap,
+        audit_invoke, 80, &callback));
     neoclr_worker_handle untouched = {99,99,99,99};
-    CHECK(neoclr_workers_bootstrap(pool, neoclr_bootstrap_callback_v1,
-        neoclr_invoke_void_callback_v1, 80, &untouched) == 3 && untouched.pool == 99);
+    CHECK(neoclr_workers_bootstrap(pool, audit_bootstrap,
+        audit_invoke, 80, &untouched) == 3 && untouched.pool == 99);
     CHECK(neoclr_workers_root_new(pool, 67890, &sentinel));
     check_rejected(pool, sentinel); /* non-function allocation */
     observations stats = {0};
@@ -146,7 +196,11 @@ int main(void) {
     CHECK(neoclr_workers_root_release(pool, callback));
     CHECK(neoclr_workers_root_release(pool, sentinel));
     uint64_t reclaimed_extent = 99;
-    CHECK(neoclr_workers_collect(pool, &reclaimed_extent) && !reclaimed_extent);
+    /* Image statics intentionally remain rooted until invocation teardown. */
+    CHECK(heap_owner->text.data == heap_data && heap_owner->static_storage && !heap_owner->fault.code);
+    uint64_t reclaimed_before = neoclr_gc_statistics_v1().reclaimed_allocations;
+    CHECK(neoclr_workers_collect(pool, &reclaimed_extent) && reclaimed_extent);
+    CHECK(neoclr_gc_statistics_v1().reclaimed_allocations > reclaimed_before);
     CHECK(neoclr_workers_close(pool) && neoclr_workers_destroy(pool));
-    puts("PASS shared graph identity, cycles, edge replacement, live locals and complete reclamation across four workers: 87 successes, one isolated fault; diagnostic text survives collection and later jobs recover");
+    puts("PASS invocation context ownership, shared statics, graph identity, cycles and teardown across four workers: 87 successes, one isolated fault; diagnostic text survives collection and later jobs recover");
 }

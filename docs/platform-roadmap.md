@@ -6238,3 +6238,10 @@ optimized/UBSan native groups and generated/HTTP-listener regressions pass. This
 is a native safepoint prototype; generated callbacks remain exclusive pending
 shared-heap/context separation and compiler-frame publication. See
 [evidence](experiments/native-worker-pool/README.md#cooperative-native-mutation-phases--2026-10-23).
+
+Invocation-context follow-up (2026-10-23): generated callbacks now temporarily own
+the pool arena/static root through a fresh execution context under the existing
+gate. Optimized/UBSan tests pass static continuity, GC, fault isolation, callback
+root-admission failure/retry and teardown; all eleven native groups still pass.
+This separates callback diagnostics from pool ownership without an ABI change or
+parallel generated execution. See [evidence](experiments/native-worker-pool/README.md#per-invocation-context-ownership--2026-10-23).

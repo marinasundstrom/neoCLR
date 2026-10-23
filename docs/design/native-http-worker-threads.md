@@ -222,3 +222,19 @@ shared heap coordinator distinct from thread-local fault/context state, complete
 participant frame snapshots and audited allocation/static/intern helpers. Do not
 copy the existing embedded arena cursor across contexts or remove the generated
 callback gate as a substitute for those changes.
+
+### Invocation state separated under the existing gate — 2026-10-23
+
+The compiled callback adapter now transfers the arena/static root to a fresh
+invocation context for the duration of each exclusive call, returning both before
+releasing the gate. Job faults come from invocation-local diagnostics. This models
+the distinction between shared heap ownership and per-execution failure state
+without changing ABI v4 or allowing concurrent cursor copies. Relative to .NET's
+shared heap/per-thread execution model, it is still an explicitly serialized
+adapter; its benefit is ownership/fault isolation, with 1,080 bytes of additional
+bounded stack context and initialization cost. It is not a throughput optimization.
+
+[Validation](../experiments/native-worker-pool/README.md#per-invocation-context-ownership--2026-10-23)
+covers static continuity, collection, faults, root-admission failure/retry and
+teardown. Compiler-frame publication and genuinely shared allocation state remain
+necessary before removing the gate. No compiler ABI or Raven encoding changed.

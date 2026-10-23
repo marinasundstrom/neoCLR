@@ -6,6 +6,17 @@ class Counter {
     var Alias: object = 0
 }
 
+static class InvocationState {
+    private static var count = 0
+
+    static func Advance(expected: int) {
+        if count != expected {
+            System.Fail("Shared static state lost between invocation contexts")
+        }
+        count += 1
+    }
+}
+
 public func Calculate(limit: int) -> (() -> ()) {
     if limit < 0 {
         System.Fail("Bootstrap failure")
@@ -42,6 +53,7 @@ public func Calculate(limit: int) -> (() -> ()) {
             || !Object.ReferenceEquals(calls.Alias, replacement) {
             System.Fail("Collection lost replaced edge or live local")
         }
+        InvocationState.Advance(calls.Value)
         calls.Value += 1
         if calls.Value == limit + 1 {
             System.Fail("Worker failure " + calls.Value.ToString())

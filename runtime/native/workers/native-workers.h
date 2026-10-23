@@ -27,7 +27,8 @@ enum { NEOCLR_WORKER_OK, NEOCLR_WORKER_CANCELLED, NEOCLR_WORKER_FAILED };
 /* Private synchronous generated-callback bridge. Bootstrap once on an empty
  * owner pool; both exports must belong to the same compiled image. No async,
  * resources, retained TLS roots or nested pool calls. Invoke owns the heap gate
- * for its full duration; a guest fault belongs to this job and prevents another
+ * for its full duration, transfers the arena/static root to a fresh invocation
+ * context and returns them before releasing the gate; a guest fault belongs to this job and prevents another
  * invocation in the same job. Other jobs retain the shared heap and may proceed.
  * Retained TLS resources/roots or unbalanced frames violate the bridge contract
  * and fail fast. Return native status (0 success); bootstrap output changes only

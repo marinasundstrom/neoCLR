@@ -185,4 +185,5 @@ the default host. [Experimental contract and evidence](https://github.com/marina
 The private worker experiment tests concurrent native reads and separately
 synchronized native mutations of shared objects. GC waits for active phases to
 yield, retaining explicitly published roots. Generated callbacks still execute
-exclusively; parallel managed mutation remains unqualified.
+exclusively, with invocation-local diagnostics and explicit transfer of shared
+heap/static ownership; parallel managed mutation remains unqualified.

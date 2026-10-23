@@ -462,3 +462,49 @@ The current ABI embeds mutable arena and diagnostic state in one context; copyin
 that context or merely removing the callback gate would be incorrect. Async Tasks,
 resource ownership and compiler safepoints remain separate integration work. No
 managed API or compiler bridge encoding changed in this slice.
+
+## Per-invocation context ownership — 2026-10-23
+
+The synchronous generated bridge now uses a fresh invocation context for each
+callback. Under the existing exclusive gate it transfers the pool's arena cursor
+and image-static root into that context, clears those fields in the inactive pool
+owner, then returns the updated state before leaving the gate. It checks the arena
+identity/capacity on return. Faults are copied directly from invocation state into
+the job; the pool's diagnostic state is not used for callback faults.
+
+This is an exclusive transfer, not independent contexts concurrently copying one
+arena cursor. Allocation, native phases and owner GC remain excluded throughout
+the callback. The pool root frame, callback handle and generated frames all use the
+invocation context identity. Owned-root/resource checks and frame-balance checks
+must pass before that stack-local context expires. Static storage created inside
+a callback is returned to the pool, retaining its values across worker invocations
+and owner collection. No compiler ABI layout, helper symbol or Raven bridge
+encoding changed; ABI v4's single active owner remains the contract.
+
+[Compiled optimized/UBSan qualification](invocation-context-shared-validation.json)
+passes the cyclic graph/500-allocation pressure fixture with shared static counter
+continuity, 87 successful calls around one isolated guest fault, cancellation, and
+later job recovery. The native adapter verifies that the callback context differs
+from the pool owner, starts with clean diagnostics and exclusively owns the original
+arena while the owner's arena/static fields are empty. An additional test fills
+all 256 TLS host-root slots with foreign-context roots, verifies pre-entry callback
+admission fails, releases those handles and successfully retries in the same job.
+The heap owner is restored on that failure path as well.
+
+Static tables intentionally remain rooted after releasing the consumer graph;
+collection then reclaims the unreferenced graph while retaining image statics.
+Pool destruction releases statics/intern ownership and verifies zero heap extent.
+This updates the fixture's earlier pre-destruction zero-extent expectation: image
+statics are now deliberately exercised. The first local audit attempt incorrectly
+required statics even for rejected non-function callbacks; the corrected audit only
+requires them when the managed callback actually executes.
+
+[All eleven native groups](invocation-context-native-validation.json) also pass
+optimized/UBSan builds. Existing isolated HTTP ownership is unaffected and its prior
+validation is reused. There is no throughput claim or successful TSan qualification.
+The fresh context costs 1,080 bytes of bounded stack storage and initialization,
+not a per-callback heap allocation. This isolates execution diagnostics and makes
+heap ownership explicit; it does **not** yet enable simultaneous generated callbacks.
+Concurrent generated execution still requires a shared heap coordinator independent
+of the ABI's embedded cursor, participant compiler-frame publication and audited
+allocation/static/intern helper synchronization.
