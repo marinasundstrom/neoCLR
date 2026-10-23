@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "tests": 6,
+  "command": [
+    "python3",
+    "benchmarks/http-server/primitive-comparison/stack-profile/test_analyze.py"
+  ],
+  "inputs": {
+    "benchmarks/http-server/primitive-comparison/stack-profile/analyze.py": "68e952e23f03e507a45a4bc52b7fedaae17e0edfe30d250047512f8a7fc11452",
+    "benchmarks/http-server/primitive-comparison/stack-profile/test_analyze.py": "f9d650a331f96b258ad1379f034d31d1ad3c30660f1262bb13314bcb96fac4db",
+    "benchmarks/http-server/primitive-comparison/stack-profile/capture.py": "f17cc41f46b497f2f765ec75114213878ad699da29ac9ac47ded8b1e91c1f363"
+  }
+}

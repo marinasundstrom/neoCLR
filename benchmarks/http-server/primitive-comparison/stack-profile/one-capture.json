@@ -1,0 +1,52 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "command": [
+        "/usr/bin/sample",
+        "85950",
+        "5",
+        "1",
+        "-file",
+        "/Users/robert/Projects/neoclr/target/http-stack-profile-one/sample.txt"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "Sampling process 85950 for 5 seconds with 1 millisecond of run time between samples\nSampling completed, processing symbols...\nSample analysis of process 85950 written to file /Users/robert/Projects/neoclr/target/http-stack-profile-one/sample.txt\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/primitive-comparison-refresh/client",
+        "50173",
+        "8"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    }
+  ],
+  "inputs": {
+    "/Users/robert/Projects/neoclr/target/runtime-snapshot-one-owner/profile.json": "2cb94b46d014b435672d0ba7b6fdfe2a134d88184e35caee94e03bcf95f8b4d7",
+    "/Users/robert/Projects/neoclr/target/runtime-snapshot-one-owner/server": "a56f80090ebd5835f2315ae97cb101fbb15f967883877e75bff263f7496e81b1",
+    "/Users/robert/Projects/neoclr/target/primitive-comparison-refresh/client": "3cb6aa638332295893b82a57e279bf42f62685e4bee6471c37fc163f4a78a579",
+    "/Users/robert/Projects/neoclr/benchmarks/http-server/primitive-comparison/stack-profile/capture.py": "199428f42f62513608a29a49ec1cdcf5b649c42132531c20a0bdfa2f102c3abf"
+  },
+  "scope": "macOS all-thread wall-clock stack samples under load; blocked threads included; not capacity evidence.",
+  "load": {
+    "clientCpuPerWall": 0.14905272138829906,
+    "clientCpuSeconds": 1.19522,
+    "clientProcessCpuSeconds": 1.201826,
+    "completed": 11116,
+    "drained": 32,
+    "latencyMilliseconds": {
+      "p50": 23.034625,
+      "p95": 30.387458,
+      "p99": 35.468208
+    },
+    "requestsPerSecond": 1389.5,
+    "windowAndDrainSeconds": 8.018773417
+  },
+  "stdout": "READY 50173 50174\nDONE 50174 11148 0\n",
+  "stderr": "",
+  "workers": 1,
+  "sampleSha256": "163c38b0fe363a5210a96b2d55e7b1c185c15edb0ff76aff7187a543471fad85"
+}

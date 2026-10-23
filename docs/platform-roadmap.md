@@ -6428,3 +6428,12 @@ inconclusive for small costs. This completes the bounded counter foundation, not
 live monitoring, shared-heap aggregation, queue timing or CPU attribution. Keep those
 separate from the unchanged throughput target. See
 [implementation evidence](../benchmarks/http-server/primitive-comparison/runtime-snapshot/README.md).
+
+Native stack profiling follow-up (2026-10-23): add reproducible macOS captures,
+per-thread sample reconciliation and byte-verified generated method mapping. Six
+tests and checked one/four-owner captures pass. Allocation/root/TLS work remains
+prominent; most clearing samples are under makecontext. Next bounded investigation:
+completed async context reuse, preserving GC/root/fault/stack lifetime contracts and
+measuring uninstrumented throughput separately. This completes a host-specific stack
+attribution tool, not precise CPU/wait timing or throughput parity. See
+[evidence and limits](../benchmarks/http-server/primitive-comparison/stack-profile/README.md).

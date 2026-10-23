@@ -22085,3 +22085,12 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   Runtime-wide execution/wait attribution remains the next diagnostic need; these
   counts do not establish a cause for the Kestrel gap or a throughput improvement.
   [Implementation and evidence](../benchmarks/http-server/primitive-comparison/runtime-snapshot/README.md).
+
+- Assistant follow-up action: added a repeatable OS stack profiler workflow with
+  verified generated-method mapping. One/four-owner captures show memory clearing
+  predominantly under makecontext, alongside allocation/root/TLS work. Six parser
+  tests pass and all self counts reconcile. These are wall-clock stack samples,
+  not exact CPU shares; coordinator waits are reported separately. Proposed
+  investigating completed async context reuse next, with lifecycle/GC validation
+  and separate throughput measurements. No context reuse is implemented by this
+  diagnostic slice. [Evidence](../benchmarks/http-server/primitive-comparison/stack-profile/README.md).

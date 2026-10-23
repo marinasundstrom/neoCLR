@@ -249,3 +249,19 @@ Basic snapshots show +0.22% mean CPU/response and -2.84% throughput in short pai
 four-owner trials; variation prevents a precise overhead conclusion. GC timers
 remain separately opt-in. No faster-server claim follows from these diagnostics.
 See [contracts, measurements and limitations](../../benchmarks/http-server/primitive-comparison/runtime-snapshot/README.md).
+
+### Native stack attribution follow-up — 2026-10-23
+
+The [macOS stack-profile tool](../../benchmarks/http-server/primitive-comparison/stack-profile/README.md)
+now captures checked one/four-owner HTTP loads and maps generated leaf/caller symbols
+using byte-reproduced compiler output. All thread self counts reconcile, including
+small leaves and recursion. Coordinator waits are separate. Six parser/name tests
+pass. This uses an OS diagnostic as proposed; it is wall-clock sampling including
+blocked threads, not a portable on-CPU profiler or managed async-causality trace.
+
+A useful distinction emerges: most memory-clearing self samples are called from
+makecontext, while the allocator has very few direct clearing samples. Allocation,
+TLS access and root publication remain leading locations. Investigate completed
+async context reuse with independent safety/performance qualification; do not infer
+that cached stack mappings already avoid context initialization, or that sampled
+proportions predict an attainable throughput gain. No runtime change is made here.
