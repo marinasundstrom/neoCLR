@@ -947,3 +947,11 @@ cache entries do not keep objects alive. Arena-shape checks precede lookup.
 This does not authorize arbitrary header writes, shared-heap access or handoff;
 cached admission relies on the scope's exclusive runtime descriptor ownership.
 See [exact-base tests, performance and limits](../../../benchmarks/http-server/primitive-comparison/owned-bases/README.md).
+
+
+Fresh GC allocations are zeroed once by the allocator. Object/static/array
+constructors rely on that guarantee instead of clearing the same payload again;
+non-GC arena constructors still zero their own reserved storage. Nonzero initialized
+flags remain explicit writes. Dirty-buffer/reuse tests cover both modes. This
+changes neither layout nor allocation count; see
+[validation and measurements](../../../benchmarks/http-server/primitive-comparison/storage-zero/README.md).

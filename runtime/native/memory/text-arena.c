@@ -15,6 +15,17 @@ enum { TEXT_STORAGE = NEOCLR_GC_TEXT, OBJECT_STORAGE = NEOCLR_GC_OBJECT,
 #else
 enum { TEXT_STORAGE = 1, OBJECT_STORAGE = 2, BYTES_STORAGE = 3, STRINGS_STORAGE = 4, RECORDS_STORAGE = 5 };
 #endif
+/* GC allocation clears the complete payload, including reused blocks. Ordinary
+ * arena reservation does not. Only use this helper for fresh reserved storage;
+ * initialized/reserved flag bytes that must become one still need explicit writes. */
+static void zero_new_storage(void *storage, size_t bytes) {
+#ifndef NEOCLR_NATIVE_GC
+    memset(storage, 0, bytes);
+#else
+    (void)storage;
+    (void)bytes;
+#endif
+}
 static int32_t reserve_storage(neoclr_aot_text_arena *arena, uint64_t bytes,
                                uint32_t kind, void **output) {
 #ifdef NEOCLR_NATIVE_GC
@@ -154,7 +165,7 @@ static int32_t allocate_object(neoclr_aot_text_arena *arena, uint32_t type,
     unsigned char *object = storage;
     uint64_t identity = type;
     memcpy(object, &identity, sizeof(identity));
-    memset(object + 8, 0, bytes - 8);
+    zero_new_storage(object + 8, bytes - 8);
     *output = object;
     return NEOCLR_AOT_FAULT_NONE;
 }
@@ -174,7 +185,7 @@ static int32_t static_storage(neoclr_aot_context *context, uint32_t type,
         int32_t status = reserve_values(&context->text, 8 + 8 * (uint64_t)count,
             OBJECT_STORAGE, &table, rooted, NULL, 0);
         if (status) return status;
-        memset(table, 0, 8 + 8 * (size_t)count);
+        zero_new_storage(table, 8 + 8 * (size_t)count);
         uint64_t length = count; memcpy(table, &length, 8);
         context->static_storage = table;
     }
@@ -216,7 +227,7 @@ static int32_t allocate_bytes(neoclr_aot_text_arena *arena, int32_t length, int 
     uint64_t kind = reserved ? UINT64_C(0x80000002) : UINT64_C(0x80000001), count = (uint64_t)length;
     memcpy(array, &kind, 8);
     memcpy(array + 8, &count, 8);
-    memset(array + 16, 0, (size_t)length * (reserved ? 2 : 1));
+    zero_new_storage(array + 16, (size_t)length * (reserved ? 2 : 1));
     *output = array;
     return NEOCLR_AOT_FAULT_NONE;
 }
@@ -634,7 +645,7 @@ static int32_t allocate_strings(neoclr_aot_text_arena *arena, int32_t length,
     uint64_t count = (uint64_t)length;
     memcpy(array, &kind, 8);
     memcpy(array + 8, &count, 8);
-    memset(array + 16, 0, (size_t)length * (reserved ? 9 : 8));
+    zero_new_storage(array + 16, (size_t)length * (reserved ? 9 : 8));
     *output = array;
     return NEOCLR_AOT_FAULT_NONE;
 }
@@ -652,7 +663,7 @@ static int32_t reserve_records(neoclr_aot_text_arena *arena, int32_t length,
     if (status) return status;
     uint64_t header[] = {UINT64_C(0x80000005), (uint64_t)length, lanes};
     memcpy(storage, header, sizeof(header));
-    memset((unsigned char *)storage + 24, 0, (size_t)bytes - 24);
+    zero_new_storage((unsigned char *)storage + 24, (size_t)bytes - 24);
     *output = storage;
     return NEOCLR_AOT_FAULT_NONE;
 }
@@ -701,8 +712,11 @@ static int32_t allocate_scalars(neoclr_aot_text_arena *arena, int32_t length,
     if (status) return status;
     uint64_t header[] = {UINT64_C(0x80000006), (uint64_t)length, 1};
     memcpy(storage, header, sizeof(header));
-    memset((unsigned char *)storage + 24, 0, (size_t)length * 8);
-    memset((unsigned char *)storage + 24 + (size_t)length * 8, reserved ? 0 : 1, (size_t)length);
+    zero_new_storage((unsigned char *)storage + 24, (size_t)length * 8);
+    if (reserved)
+        zero_new_storage((unsigned char *)storage + 24 + (size_t)length * 8, (size_t)length);
+    else
+        memset((unsigned char *)storage + 24 + (size_t)length * 8, 1, (size_t)length);
     *output = storage;
     return NEOCLR_AOT_FAULT_NONE;
 }

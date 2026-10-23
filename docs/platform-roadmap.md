@@ -6337,3 +6337,13 @@ throughput improves 19.0%/10.7%, CPU/response falls 13.8%/12.1%, with observed
 desktop drift. Forgery/collision/reclamation/reuse tests, native GC, repeated
 forced-GC HTTP and checked-path shared-worker regression pass. See
 [evidence and limits](../benchmarks/http-server/primitive-comparison/owned-bases/README.md).
+
+
+Native initialization follow-up (2026-10-23): profiling still identifies root
+publication as the largest sampled worker cost. Redundant constructor zeroing is
+removed for fresh GC allocations, with explicit non-GC initialization preserved.
+Dirty/reused object, static and array storage tests pass in both modes, alongside
+forced-GC HTTP and shared-worker regression. Short trials show no clear one-owner
+gain and modest, overlapping four-owner results; this is not a new capacity claim.
+Root metadata publication remains open work. See
+[evidence](../benchmarks/http-server/primitive-comparison/storage-zero/README.md).

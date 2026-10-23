@@ -101,7 +101,7 @@ def main():
             run(name, [binary])
             if windows and name == 'native-owned-body-test':
                 run(name + '-host-fiber', [binary, '--host-fiber'])
-        for fixture in ['static-storage', 'memory-views']:
+        for fixture in ['static-storage', 'memory-views', 'storage-initialization']:
             for gc in [False, True]:
                 name = fixture + '-' + ('gc' if gc else 'arena')
                 binary = out / (name + ('.exe' if windows else ''))

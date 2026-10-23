@@ -108,7 +108,9 @@ int32_t neoclr_invoke_void_callback_v1(uint64_t handle, neoclr_aot_context *cont
  * Outputs publish only on success; no roots, allocation or collection. */
 int32_t neoclr_gc_allocation_info_v1(neoclr_aot_context *, const void *,
     uint64_t *bytes, uint32_t *kind);
-/* Allocation never collects; output is published only on success. */
+/* Allocation never collects; output is published only on success.
+ * Successful storage is fully zeroed, including reused payload and padding.
+ * Constructors may rely on this guarantee; non-GC arena reservation differs. */
 int32_t neoclr_gc_allocate_v1(neoclr_aot_text_arena *arena, uint64_t bytes,
                              uint32_t kind, void **output);
 /* Private opt-in admission: try allocation, collect once on recoverable arena

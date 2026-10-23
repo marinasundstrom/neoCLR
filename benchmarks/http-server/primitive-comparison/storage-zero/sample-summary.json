@@ -1,0 +1,34 @@
+{
+  "scope": "Diagnostic sampling of one owned-heap worker; not a capacity measurement",
+  "revision": "9b8cfac86",
+  "binary": "target/plain-owned-bases/candidate-w1",
+  "binarySha256": "88f4b69de39f33c2dcf2cfd64af85237206720aa0bd59341d309b1c32ea4760a",
+  "sample": "target/owned-bases-sample/sample.txt",
+  "sampleSha256": "f5dabbe2e7cc4a213cb69a60983c0acdbb950f08b851d83c42b9b15de3a2a9b8",
+  "samplingCommand": [
+    "/usr/bin/sample",
+    "<server PID>",
+    "5",
+    "1",
+    "-file",
+    "target/owned-bases-sample/sample.txt"
+  ],
+  "loadCommand": [
+    "target/primitive-comparison-eof/client",
+    "<READY port>",
+    "8"
+  ],
+  "clientProcessors": 2,
+  "workerSamples": 3603,
+  "mainThreadWaitSamples": 3603,
+  "selfSamples": {
+    "neoclr_gc_stack_roots_v1": 1341,
+    "_tlv_get_addr": 390,
+    "neoclr_gc_allocate_v1": 356,
+    "__bzero": 267,
+    "collect_indexed": 163,
+    "_platform_strlen": 118,
+    "validated_bases": 52
+  },
+  "note": "Main-thread condition waiting is excluded from worker CPU attribution. Zeroing samples are not all redundant constructor work."
+}
