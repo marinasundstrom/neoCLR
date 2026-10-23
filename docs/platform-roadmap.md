@@ -6473,3 +6473,15 @@ compiler-verified publication reduction. The author asks whether generations rem
 an option: yes, with survival/store-barrier evaluation; this does not supersede the
 existing concurrent-GC direction or select a moving collector. See
 [investigation, alternatives and evidence](../benchmarks/http-server/primitive-comparison/cost-investigation/README.md).
+
+
+Owned-heap free-space indexing integrated (2026-10-23): an address-ordered free list
+now skips live blocks during allocation, without growing descriptors or changing
+first-fit placement. The native GC/root suite, differential/corruption tests,
+independent threaded owners, shared-worker regressions and forced-GC HTTP pass.
+Eight paired trials improve mean one/four-owner throughput 21.7%/18.7% with
+17.9%/16.1% less CPU per response; diagnostic search falls to 7.6 visits/allocation.
+Desktop drift and variable tails limit precision. This completes the bounded
+free-space-index follow-up above; ThinLTO qualification, publication reduction and
+survival/barrier evaluation remain open. See
+[implementation and retained evidence](../benchmarks/http-server/primitive-comparison/free-index/README.md).

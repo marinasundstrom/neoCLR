@@ -312,3 +312,19 @@ existing concurrent-GC direction. Compare nonmoving generations and copying nurs
 with explicit barrier/relocation prerequisites; measure survival first. Full results,
 primary-source comparisons, failed/variable screening evidence and priorities are in
 [the cost investigation](../../benchmarks/http-server/primitive-comparison/cost-investigation/README.md).
+
+
+### Owned free-space index integrated — 2026-10-23
+
+Implement the bounded allocation-index follow-up using an address-ordered list in
+unused free-descriptor words. Compared with the .NET/Go/HotSpot approaches discussed
+above, this keeps neoCLR's existing nonmoving first-fit contract rather than adopting
+size classes, per-thread bump regions or generational lifetime assumptions. It removes
+most live-block searches without adding descriptor bytes or auxiliary allocations.
+Costs are link maintenance and reconciliation during existing full validation walks;
+fragmented heaps still have linear free-run search. External/shared heaps retain their
+checked path. Differential placement/extent tests, corruption checks, independent
+threaded owners, shared-worker regressions and forced-GC HTTP pass. Mean one/four-owner
+throughput rises 21.7%/18.7%, with 17.9%/16.1% lower CPU/response in short paired desktop
+trials. No public API or semantic divergence from the existing contract is introduced.
+See [implementation and evidence](../../benchmarks/http-server/primitive-comparison/free-index/README.md).

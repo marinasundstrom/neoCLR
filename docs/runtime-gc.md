@@ -261,3 +261,14 @@ nonmoving young/old prototype before assuming a copying nursery is safe. All exe
 modes, native reference writes, bulk/value copies and worker coordination remain
 part of the barrier audit. No generation API or new collector is implemented.
 See [measurements and staged evaluation](../benchmarks/http-server/primitive-comparison/cost-investigation/README.md#generational-gc-remains-an-option).
+
+
+The subsequent owned-heap allocator change maintains an address-ordered free list
+inside unused free-descriptor words. Allocation visits free blocks only; splitting
+and unlinking preserve first-fit placement. Sweep rebuilds the list while coalescing
+and trimming, and collection/release reconcile it against the complete block walk.
+External arenas keep full allocation-time validation. No object header, allocation
+count, lifetime, GC budget or address-stability contract changes. Differential and
+worker tests pass; plaintext diagnostic search falls to 7.6 visits/allocation and
+paired capacity improves. This addresses search overhead independently of collector
+generations. See [implementation, tests and measurements](../benchmarks/http-server/primitive-comparison/free-index/README.md).

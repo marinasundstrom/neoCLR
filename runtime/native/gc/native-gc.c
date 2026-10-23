@@ -25,12 +25,14 @@ _Static_assert(sizeof(block) == 32, "private allocation descriptor");
 enum { ALLOCATED = 1, MARKED = 2, SCANNED = 4 };
 static _Thread_local neoclr_gc_statistics statistics;
 /* One exclusive runtime-owned arena per native thread. No per-object metadata
- * or allocation; the cursor is maintained by allocation and sweep. */
+ * or allocation; an address-ordered free list is maintained by allocation and sweep.
+ * Free blocks reuse their otherwise-unused bytes word for the next offset + 1;
+ * zero terminates the list. Live object descriptors and payloads are unchanged. */
 enum { OWNED_BASE_CACHE_SIZE = 64 };
 static _Thread_local struct {
     neoclr_aot_text_arena *arena;
     unsigned char *data;
-    uint64_t capacity, used, first_free;
+    uint64_t capacity, used, free_head;
     const void *bases[OWNED_BASE_CACHE_SIZE];
 } owned_heap;
 /* Positive entries only: insertion requires a newly allocated payload or an
@@ -61,19 +63,24 @@ static int block_valid(const neoclr_aot_text_arena *a, uint64_t at) {
 }
 static int blocks_valid(const neoclr_aot_text_arena *a) {
     if (!valid(a)) return 0;
+    uint64_t next_free = a == owned_heap.arena ? owned_heap.free_head : 0;
     for (uint64_t at = 0; at < a->used;) {
         if (!block_valid(a, at)) return 0;
         const block *b = (const void *)(a->data + at);
+        if (a == owned_heap.arena && !b->state) {
+            if (next_free != at + 1) return 0;
+            next_free = b->bytes;
+        }
         at += b->span;
     }
-    return 1;
+    return !next_free;
 }
 int32_t neoclr_gc_heap_acquire_v1(neoclr_aot_text_arena *arena) {
     if (owned_heap.arena || !valid(arena) || arena->used) return 3;
     owned_heap.arena = arena;
     owned_heap.data = arena->data;
     owned_heap.capacity = arena->capacity;
-    owned_heap.used = owned_heap.first_free = 0;
+    owned_heap.used = owned_heap.free_head = 0;
     return 0;
 }
 int32_t neoclr_gc_heap_release_v1(neoclr_aot_text_arena *arena) {
@@ -318,25 +325,39 @@ int32_t neoclr_gc_allocate_v1(neoclr_aot_text_arena *a, uint64_t bytes,
     uint64_t needed = oversized ? UINT64_MAX : sizeof(block) + ((bytes + 7) & ~UINT64_C(7));
     block *chosen = NULL;
     int owned = a == owned_heap.arena;
-    /* External arenas retain complete pre-mutation validation, including the
-     * tail after a fit. An explicitly acquired arena has runtime-only descriptor
-     * writes: search from its maintained cursor and stop at the first fit. */
-    for (uint64_t at = owned ? owned_heap.first_free : 0; at < a->used;) {
-        if (!block_valid(a, at)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
-        block *b = (void *)(a->data + at);
-        if (!chosen && !b->state && b->span >= needed) {
-            chosen = b;
-            if (owned) break;
+    uint64_t *free_link = &owned_heap.free_head;
+    /* The owned list preserves first-fit address order while skipping live blocks.
+     * Validate visited descriptors/links before mutation; collection and release
+     * reconcile the complete list against the authoritative block walk. */
+    if (owned) {
+        while (*free_link) {
+            uint64_t at = *free_link - 1;
+            if (at >= a->used || (at & 7) || !block_valid(a, at)) return 3;
+            block *b = (void *)(a->data + at);
+            uint64_t next = b->bytes;
+            if (b->state || (next && ((next - 1) < at + b->span ||
+                (next - 1) >= a->used || ((next - 1) & 7)))) return 3;
+            if (b->span >= needed) { chosen = b; break; }
+            free_link = &b->bytes;
         }
-        at += b->span;
+    } else {
+        /* External arenas still validate every descriptor, even after a fit. */
+        for (uint64_t at = 0; at < a->used;) {
+            if (!block_valid(a, at)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+            block *b = (void *)(a->data + at);
+            if (!chosen && !b->state && b->span >= needed) chosen = b;
+            at += b->span;
+        }
     }
     if (oversized) return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
     if (chosen) {
+        uint64_t next = owned ? chosen->bytes : 0;
         if (chosen->span - needed >= sizeof(block) + 8) {
             block *rest = (void *)((unsigned char *)chosen + needed);
-            *rest = (block){chosen->span - needed, 0, 0, 0};
+            *rest = (block){chosen->span - needed, next, 0, 0};
             chosen->span = needed;
-        }
+            if (owned) *free_link = (unsigned char *)rest - a->data + 1;
+        } else if (owned) *free_link = next;
     } else {
         if (needed > a->capacity - a->used) return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
         chosen = (void *)(a->data + a->used);
@@ -344,8 +365,6 @@ int32_t neoclr_gc_allocate_v1(neoclr_aot_text_arena *a, uint64_t bytes,
         a->used += needed;
     }
     if (owned) {
-        uint64_t at = (unsigned char *)chosen - a->data;
-        if (at == owned_heap.first_free) owned_heap.first_free = at + chosen->span;
         owned_heap.used = a->used;
     }
     chosen->bytes = bytes; chosen->kind = kind; chosen->state = ALLOCATED;
@@ -418,9 +437,14 @@ static int build_index(neoclr_aot_text_arena *a, block_index *index) {
     index->shift = 6;
     while (a->used && ((a->used - 1) >> index->shift) >= index->capacity) index->shift++;
     unsigned bucket = 0;
+    uint64_t next_free = a == owned_heap.arena ? owned_heap.free_head : 0;
     for (uint64_t at = 0; at < a->used;) {
         if (!block_valid(a, at)) return 0;
         block *b = (void *)(a->data + at);
+        if (a == owned_heap.arena && !b->state) {
+            if (next_free != at + 1) return 0;
+            next_free = b->bytes;
+        }
         blocks++;
         index_seed(index, b);
         uint64_t end = at + b->span;
@@ -429,7 +453,7 @@ static int build_index(neoclr_aot_text_arena *a, block_index *index) {
         at = end;
     }
     index->blocks = blocks;
-    return 1;
+    return !next_free;
 }
 /* Index lookup preserves exact payload-base validation for host owners/values.
  * Only use after blocks_valid and before sweep changes block spans. */
@@ -675,8 +699,8 @@ static int32_t collect_indexed(neoclr_aot_context *context,
 #endif
     /* Sweep and coalesce in one forward walk. Preserve the original span before
      * extending a preceding free run; no later lookup uses the marking index. */
-    block *free_run = NULL;
-    uint64_t free_at = 0, first_free = a->used;
+    block *free_run = NULL, *last_free = NULL;
+    uint64_t free_at = 0, free_head = 0;
     for (uint64_t at = 0; at < a->used;) {
         block *b = (void *)(a->data + at);
         uint64_t span = b->span;
@@ -690,13 +714,18 @@ static int32_t collect_indexed(neoclr_aot_context *context,
         if (b->state) { live_bytes += b->bytes; live_blocks++; }
 #endif
         if (b->state) {
+            if (free_run && a == owned_heap.arena) {
+                if (last_free) last_free->bytes = free_at + 1;
+                else free_head = free_at + 1;
+                last_free = free_run;
+            }
             free_run = NULL;
         } else if (free_run) {
             free_run->span += span;
         } else {
             free_run = b;
             free_at = at;
-            if (at < first_free) first_free = at;
+            if (a == owned_heap.arena) b->bytes = 0;
         }
         at += span;
     }
@@ -704,7 +733,7 @@ static int32_t collect_indexed(neoclr_aot_context *context,
     if (a == owned_heap.arena) {
         memset(owned_heap.bases, 0, sizeof(owned_heap.bases));
         owned_heap.used = a->used;
-        owned_heap.first_free = first_free < a->used ? first_free : a->used;
+        owned_heap.free_head = free_head;
     }
     statistics.collections++;
 #ifdef NEOCLR_GC_PROFILE

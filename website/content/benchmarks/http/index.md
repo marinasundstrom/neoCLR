@@ -366,3 +366,15 @@ checks cover the change. A compile-time fallback retains the previous path; Wind
 and published packages are unchanged. This does not establish shared-heap async
 support or Kestrel parity. See the
 [implementation, measurements and qualification](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/primitive-comparison/context-reuse).
+
+
+## Development: owned-heap allocation indexing
+
+The native runtime now searches an address-ordered free-block list for explicitly
+owned heaps, preserving allocation placement and object headers. Eight paired
+plaintext trials show 21.7%/18.7% higher mean throughput at one/four owners and
+17.9%/16.1% lower CPU per response. Diagnostic search falls from about 195 to 7.6
+block visits per allocation. GC, corruption, threaded-owner and forced-GC HTTP checks
+pass. These are short desktop comparisons with drift and variable tails, not a fresh
+peer comparison or Kestrel parity. See
+[implementation, measurements and limits](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/primitive-comparison/free-index).
