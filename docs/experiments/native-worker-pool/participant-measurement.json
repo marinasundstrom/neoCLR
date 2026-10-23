@@ -1,0 +1,86 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pthread",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/gc",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/workers",
+        "/Users/robert/Projects/neoclr/runtime/native/gc/native-gc.c",
+        "/Users/robert/Projects/neoclr/runtime/native/gc/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/native-worker-pool/benchmark.c",
+        "/Users/robert/Projects/neoclr/runtime/native/workers/native-workers.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-worker-participants-measure/benchmark"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/native-worker-participants-measure/benchmark"
+      ],
+      "exitCode": 0,
+      "stdout": "{\"workers\":1,\"jobs\":8,\"wallSeconds\":0.323735,\"cpuSeconds\":0.323467}\n{\"workers\":2,\"jobs\":8,\"wallSeconds\":0.162176,\"cpuSeconds\":0.323269}\n{\"workers\":4,\"jobs\":8,\"wallSeconds\":0.088235,\"cpuSeconds\":0.335979}\n{\"workers\":4,\"jobs\":8,\"wallSeconds\":0.087737,\"cpuSeconds\":0.335829}\n{\"workers\":2,\"jobs\":8,\"wallSeconds\":0.162457,\"cpuSeconds\":0.323472}\n{\"workers\":1,\"jobs\":8,\"wallSeconds\":0.321745,\"cpuSeconds\":0.321203}\n",
+      "stderr": ""
+    }
+  ],
+  "samples": [
+    {
+      "workers": 1,
+      "jobs": 8,
+      "wallSeconds": 0.323735,
+      "cpuSeconds": 0.323467
+    },
+    {
+      "workers": 2,
+      "jobs": 8,
+      "wallSeconds": 0.162176,
+      "cpuSeconds": 0.323269
+    },
+    {
+      "workers": 4,
+      "jobs": 8,
+      "wallSeconds": 0.088235,
+      "cpuSeconds": 0.335979
+    },
+    {
+      "workers": 4,
+      "jobs": 8,
+      "wallSeconds": 0.087737,
+      "cpuSeconds": 0.335829
+    },
+    {
+      "workers": 2,
+      "jobs": 8,
+      "wallSeconds": 0.162457,
+      "cpuSeconds": 0.323472
+    },
+    {
+      "workers": 1,
+      "jobs": 8,
+      "wallSeconds": 0.321745,
+      "cpuSeconds": 0.321203
+    }
+  ],
+  "scope": "Eight identical copied-primitive CPU jobs. Managed access is gated; no generated-code or HTTP throughput claim.",
+  "inputs": {
+    "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang": "be5518e9c6736cda8dfc3486ce11e8112a2e08045084260691cf41f57a653f59",
+    "/Users/robert/Projects/neoclr/runtime/native/gc/native-gc.c": "fefe1387031fa7c68bf9680e7abf34ce7d6b8ae66ec7187747b5b69ec813c13c",
+    "/Users/robert/Projects/neoclr/runtime/native/gc/root-probe.c": "a23a8401b56cb8222b8ba384cb132469171b3e607cdada9f7b662ef1db7e911a",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-worker-pool/benchmark.c": "a1073c96764773a8eb80ef7237d1eacf9705d67bbaf516295495c39bdf78743b",
+    "/Users/robert/Projects/neoclr/runtime/native/workers/native-workers.c": "303d9d2caf419a9de31752b457fc810c719b0163ec480a540f982a0f56a42b9a"
+  }
+}

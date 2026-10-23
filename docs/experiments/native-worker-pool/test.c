@@ -235,7 +235,76 @@ static void recovery(void) {
     CHECK(neoclr_workers_close(p) && neoclr_workers_destroy(p));
     puts("PASS allocation failure preserves pool and subsequent work completes");
 }
+static int participant(neoclr_worker_job *j, void *state) {
+    control *c = state;
+    neoclr_worker_enter(j);
+    for (unsigned i = 0; i < NEOCLR_WORKER_LOCAL_ROOTS; i++) {
+        CHECK(!neoclr_worker_local_load(j, i)); /* job slot reuse must be clean */
+        uint64_t *value = neoclr_worker_allocate(j, 8, NEOCLR_GC_BYTES);
+        CHECK(value); *value = 100 + i;
+        CHECK(neoclr_worker_local_store(j, i, value));
+    }
+    uint64_t foreign = 7;
+    CHECK(!neoclr_worker_local_store(j, 0, &foreign));
+    CHECK(!neoclr_worker_local_store(j, 0, (char *)neoclr_worker_local_load(j, 0) + 1));
+    CHECK(!neoclr_worker_local_store(j, NEOCLR_WORKER_LOCAL_ROOTS, NULL));
+    CHECK(!neoclr_worker_local_load(j, NEOCLR_WORKER_LOCAL_ROOTS));
+    neoclr_worker_leave(j);
+    CHECK(!pthread_mutex_lock(&c->gate));
+    ++c->prepared; CHECK(!pthread_cond_broadcast(&c->changed));
+    while (!c->release) CHECK(!pthread_cond_wait(&c->changed, &c->gate));
+    CHECK(!pthread_mutex_unlock(&c->gate));
+    neoclr_worker_enter(j);
+    for (unsigned i = 0; i < NEOCLR_WORKER_LOCAL_ROOTS; i++) {
+        uint64_t *value = neoclr_worker_local_load(j, i);
+        CHECK(value && *value == 100 + i);
+        CHECK(neoclr_worker_local_store(j, i, value)); /* still an allocated base */
+    }
+    /* Transfer one local into completion ownership; leave others registered to
+     * prove automatic cleanup on success, failure and cancellation. */
+    void *result = neoclr_worker_local_load(j, 7);
+    neoclr_worker_result(j, (neoclr_worker_value){1, 107, result});
+    CHECK(neoclr_worker_local_store(j, 7, NULL));
+    CHECK(!neoclr_worker_local_load(j, 7));
+    neoclr_worker_leave(j);
+    return c->mode == 1;
+}
+static void participant_roots(void) {
+    neoclr_workers *p = neoclr_workers_create(4, 4, 16384);
+    CHECK(p);
+    for (int mode = 0; mode < 3; mode++) {
+        control c; init(&c, mode);
+        neoclr_worker_handle capture, tickets[4];
+        CHECK(neoclr_workers_root_new(p, 42, &capture));
+        for (unsigned i = 0; i < 4; i++)
+            CHECK(neoclr_workers_submit(p, capture, participant, &c, &tickets[i]));
+        CHECK(neoclr_workers_root_release(p, capture));
+        wait_count(&c, &c.prepared, 4);
+        uint64_t extent;
+        /* No capture or result refers to the 32 new temporaries. Only the
+         * participants' published local slots can keep these objects alive. */
+        for (unsigned i = 0; i < 3; i++) CHECK(neoclr_workers_collect(p, &extent) && extent);
+        if (mode == 2) for (unsigned i = 0; i < 4; i++)
+            CHECK(neoclr_workers_cancel(p, tickets[i]));
+        release(&c, 0);
+        for (unsigned i = 0; i < 4; i++) {
+            neoclr_worker_value value; neoclr_worker_handle adopted;
+            int expected = mode == 0 ? NEOCLR_WORKER_OK : mode == 1 ? NEOCLR_WORKER_FAILED : NEOCLR_WORKER_CANCELLED;
+            CHECK(take(p, tickets[i], &value, &adopted) == expected);
+            if (mode == 0) {
+                uint64_t scalar;
+                CHECK(neoclr_workers_collect(p, &extent));
+                CHECK(neoclr_workers_root_read(p, adopted, &scalar) && scalar == 107);
+                CHECK(neoclr_workers_root_release(p, adopted));
+            } else CHECK(!adopted.pool);
+        }
+        CHECK(neoclr_workers_collect(p, &extent) && !extent);
+        dispose(&c);
+    }
+    CHECK(neoclr_workers_close(p) && neoclr_workers_destroy(p));
+    puts("PASS four participant root sets across collection, result handoff, failure, cancellation and reuse");
+}
 int main(void) {
-    lifetimes(); result_and_cancel(); shutdown(); pressure_and_foreign(); settlement_race(); recovery();
+    lifetimes(); result_and_cancel(); shutdown(); pressure_and_foreign(); settlement_race(); recovery(); participant_roots();
     return 0;
 }

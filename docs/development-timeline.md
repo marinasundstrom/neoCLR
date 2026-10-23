@@ -21814,3 +21814,13 @@ is evidence for private-context execution, not shared Task/HTTP dispatch. Shared
 statics, participant roots, suspended I/O and task publication remain open; no new
 compiler contract or HTTP throughput result is inferred. See the
 [qualification](experiments/native-worker-pool/README.md#generated-code-boundary-qualification--2026-10-23).
+
+Shared-root follow-through: the assistant extended the private pool with fixed
+participant temporary-root slots, explaining that lifetime protection must precede
+shared generated HTTP execution. Four native callbacks now retain 32 otherwise
+unreachable objects across repeated owner collections; success/failure/cancellation
+and slot reuse pass alongside the existing tests in optimized/UBSan builds. The
+private-context generated tests also pass again. This implements manual native
+root publication, not compiler snapshot integration or shared Task/HTTP dispatch.
+The assistant records its fixed storage and collector scan overhead rather than
+claiming a throughput improvement.

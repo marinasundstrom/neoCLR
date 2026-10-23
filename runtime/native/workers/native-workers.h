@@ -6,7 +6,7 @@
  * pool-managed pointers. Independent invocation arenas need their own ownership
  * and entry/cleanup qualification; they are never collected by this pool.
  * The pool roots capture/result slots through owner collection.
- * Never call pool APIs recursively while entered except capture/allocate/result.
+ * Never call pool APIs recursively while entered except capture/allocate/result/local-root operations.
  * Do not use ordinary TLS host-root, socket, fiber or compiler GC hooks on the
  * pool context. This API does not expose that context to callbacks.
  * Native pointers/pool state must be valid and outlive all calls; destroy requires
@@ -37,6 +37,16 @@ void neoclr_worker_enter(neoclr_worker_job *);
 void *neoclr_worker_capture(neoclr_worker_job *);
 void *neoclr_worker_allocate(neoclr_worker_job *, uint64_t bytes, uint32_t kind);
 void neoclr_worker_result(neoclr_worker_job *, neoclr_worker_value);
+/* Private participant roots: eight fixed slots per running job. Calls require
+ * enter/leave. Store copies an exact pool allocation base (or NULL to release);
+ * invalid slot/value returns 0 without changing the slot. Load returns NULL for
+ * an invalid/empty slot. Roots survive leaving the gate and owner collection,
+ * and are cleared on all settlement paths. No stack addresses are retained.
+ * Publish every live temporary before leaving; reload only after re-entering.
+ * These explicit slots are not compiler stack registration or a safepoint ABI. */
+#define NEOCLR_WORKER_LOCAL_ROOTS 8
+int neoclr_worker_local_store(neoclr_worker_job *, unsigned slot, void *value);
+void *neoclr_worker_local_load(neoclr_worker_job *, unsigned slot);
 void neoclr_worker_leave(neoclr_worker_job *);
 /* Nonblocking take adopts reference into a consumer root before freeing ticket.
  * Returns 1 ready, 0 pending or consumer-root capacity, -1 invalid/stale ticket.

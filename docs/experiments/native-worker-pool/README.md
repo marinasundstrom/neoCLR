@@ -9,7 +9,7 @@ public runtime ABI. No existing scheduler/GC default changes.
 ## Implemented boundary
 
 One pool owns a bounded shared arena, 1–4 long-lived pthread workers, up to 16 job
-slots and 32 consumer-root slots. The mutex protects FIFO admission, cancellation,
+slots, eight temporary-root slots per job and 32 consumer-root slots. The mutex protects FIFO admission, cancellation,
 completion publication, roots, allocator access and collection. User callbacks
 run outside the mutex and enter explicit managed-access intervals. Computation on
 copied primitives and blocking outside those intervals may overlap across workers.
@@ -18,12 +18,13 @@ This is the **serial managed-access reference implementation** proposed by the
 investigation. It does not execute arbitrary generated Raven code in parallel.
 There is no compiler safepoint integration, automatic collection on allocation
 pressure, stack/fiber migration or concurrent Promise support. Existing TLS
-host-root/socket/fiber APIs must not be used inside these callbacks. Callbacks may
+host-root/socket/fiber APIs must not be used on the pool context. Callbacks may
 not retain and dereference unregistered managed pointers outside access intervals.
 
 Capture roots are adopted before job publication. Workers publish result reference
 slots before releasing managed access, including while the callback remains
-unsettled. Owner collection traces all capture/result/consumer slots using the
+unsettled. Temporary references can be explicitly published to job-local slots
+before leaving the gate. Owner collection traces all temporary/capture/result/consumer slots using the
 canonical collector. Workers may allocate under the gate but cannot initiate
 collection or invoke ordinary runtime GC hooks. Thread-local allocation counters
 therefore do not describe whole-pool allocation volume.
@@ -166,3 +167,45 @@ cannot exchange references. Do not substitute this isolation model silently for
 existing Task.Run semantics. The next integration step must publish participant
 roots to shared collection and preserve one logical owner for suspended I/O before
 routing existing HTTP callbacks to workers. Public channels remain a future design.
+
+## Shared participant roots — 2026-10-23
+
+The serial reference now includes eight fixed temporary-root slots per running
+job. Store/load require that job's managed-access gate. Store validates an exact
+allocation base in this pool (or null for release), copies the reference into
+pool-owned storage and rejects invalid indices/pointers without replacing a root.
+No pointer to a worker stack slot escapes. Owner collection includes every job's
+published roots while the gate excludes heap mutation. Settlement clears temporary
+roots on success, callback failure and cooperative cancellation; result publication
+retains its own root before temporary ownership is released.
+
+This supplies a bounded native participant boundary, not arbitrary generated stack
+registration. Callbacks must publish all live temporary references before leaving,
+then reload/dereference only after re-entering. Registration costs no per-object
+allocation: it adds eight pointer slots per job (1 KiB across the fixed 16-job
+storage on this 64-bit target) and up to 128 root entries per collection. The
+collector's temporary root description array also grows by 2 KiB on the owner's
+stack. These costs are deliberate correctness overhead, not an allocation or
+throughput improvement. Slot count remains a private experimental limit.
+
+[participant-validation.json](participant-validation.json) passes all seven test
+groups in optimized and UBSan builds. Four callbacks publish 32 newly allocated
+temporaries, all unreachable from captures/results, and pause while the owner
+collects three times. On return each slot is checked for value and a still-valid
+allocation base. Invalid stack/interior pointers and indices preserve prior roots.
+The test repeats for success/failure/cancellation, checks result adoption across
+collection, clean job reuse and full final reclamation. Existing saturation,
+shutdown and settlement-contest tests also pass.
+
+[participant-generated-validation.json](participant-generated-validation.json)
+repeats all 1,280 private-context generated invocations against the updated pool.
+The independent heaps remain separate; this does not qualify generated callbacks
+against shared pool storage. The copied-primitive performance probe is repeated in
+[participant-measurement.json](participant-measurement.json); it does not exercise
+collection or HTTP and cannot measure the added collector root-scan cost.
+
+.NET-style shared Task captures remain the intended contract. This explicit root
+boundary protects lifetime while callbacks yield the gate; it neither makes
+concurrent mutations safe nor replaces a compiler safepoint protocol. Next attach
+complete generated root snapshots and task settlement through an explicit runtime
+contract, including fault/static/resource ownership, before dispatching HTTP.

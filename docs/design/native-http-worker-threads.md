@@ -2,7 +2,8 @@
 
 Status: the [bounded native prototype](../experiments/native-worker-pool/README.md)
 now implements a serial managed-access pool with explicit capture/result rooting,
-mailbox wakeups and joined teardown. Primitive CPU work overlaps across workers.
+mailbox wakeups and joined teardown. Eight explicit temporary-root slots per job
+now retain participant locals across gate release and owner collection. Primitive CPU work overlaps across workers.
 A generated Raven harness now qualifies forced collection, fault recovery and TLS
 reuse in independent per-invocation contexts on four workers. Shared generated-code
 participant integration, parallel HTTP and public APIs remain unimplemented.

@@ -16,6 +16,7 @@ struct neoclr_worker_job {
     unsigned state;
     int cancelled, outcome;
     void *capture;
+    void *local_roots[NEOCLR_WORKER_LOCAL_ROOTS];
     neoclr_worker_value result;
     neoclr_worker_callback callback;
     void *native_state;
@@ -80,6 +81,7 @@ static void *run(void *argument) {
             outcome ? NEOCLR_WORKER_FAILED : NEOCLR_WORKER_OK;
         if (j->outcome != NEOCLR_WORKER_OK) j->result = (neoclr_worker_value){0};
         j->capture = NULL;
+        memset(j->local_roots, 0, sizeof(j->local_roots));
         j->state = DONE;
         pthread_cond_broadcast(&p->completion);
         unlock(p);
@@ -171,6 +173,18 @@ void neoclr_worker_result(neoclr_worker_job *j, neoclr_worker_value value) {
     if (value.reference && neoclr_gc_allocation_info_v1(&j->pool->context, value.reference, &bytes, &kind)) abort();
     j->result = value;
 }
+int neoclr_worker_local_store(neoclr_worker_job *j, unsigned slot, void *value) {
+    if (entered != j) abort();
+    uint64_t bytes; uint32_t kind;
+    if (slot >= NEOCLR_WORKER_LOCAL_ROOTS ||
+        (value && neoclr_gc_allocation_info_v1(&j->pool->context, value, &bytes, &kind))) return 0;
+    j->local_roots[slot] = value;
+    return 1;
+}
+void *neoclr_worker_local_load(neoclr_worker_job *j, unsigned slot) {
+    if (entered != j) abort();
+    return slot < NEOCLR_WORKER_LOCAL_ROOTS ? j->local_roots[slot] : NULL;
+}
 void neoclr_worker_leave(neoclr_worker_job *j) { if (entered != j) abort(); entered = NULL; unlock(j->pool); }
 int neoclr_workers_wait(neoclr_workers *p, neoclr_worker_handle h, unsigned milliseconds) {
     if ((executing && executing->pool == p) || milliseconds > 60000) return -1;
@@ -210,11 +224,13 @@ int neoclr_workers_take(neoclr_workers *p, neoclr_worker_handle h, int *outcome,
 int neoclr_workers_collect(neoclr_workers *p, uint64_t *extent) {
     if (!pthread_equal(p->owner, pthread_self())) return 0;
     lock(p);
-    neoclr_probe_storage slots[ROOTS + 2 * JOBS]; unsigned count = 0;
+    neoclr_probe_storage slots[ROOTS + (2 + NEOCLR_WORKER_LOCAL_ROOTS) * JOBS]; unsigned count = 0;
     for (unsigned i = 0; i < ROOTS; i++) slots[count++] = (neoclr_probe_storage){&p->roots[i].value, 8, 0};
     for (unsigned i = 0; i < p->capacity; i++) {
         slots[count++] = (neoclr_probe_storage){&p->jobs[i].capture, 8, 0};
         slots[count++] = (neoclr_probe_storage){&p->jobs[i].result.reference, 8, 0};
+        for (unsigned n = 0; n < NEOCLR_WORKER_LOCAL_ROOTS; n++)
+            slots[count++] = (neoclr_probe_storage){&p->jobs[i].local_roots[n], 8, 0};
     }
     neoclr_probe_frame frame = {.context = &p->context, .storage = slots, .storage_count = count};
     int ok = !neoclr_gc_collect_v1(&p->context, &frame);

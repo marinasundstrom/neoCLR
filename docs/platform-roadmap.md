@@ -6184,3 +6184,10 @@ now passes 640 compiled Raven invocations per optimized/UBSan build on four reus
 workers, with private arenas, forced collection and fault recovery. This qualifies
 independent invocation contexts only; shared participants, Task publication and HTTP
 I/O ownership remain prerequisites. No HTTP speedup or public API is claimed.
+
+Shared participant-root follow-up (2026-10-23): eight fixed temporary-root slots per
+job now preserve native callback locals across owner collection under the serial
+heap gate. Seven optimized/UBSan test groups pass, including four simultaneous
+participant sets and success/failure/cancel cleanup. Generated compiler snapshots,
+shared Task settlement and HTTP dispatch are still open; see the
+[qualification](experiments/native-worker-pool/README.md#shared-participant-roots--2026-10-23).
