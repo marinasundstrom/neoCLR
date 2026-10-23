@@ -57,18 +57,18 @@ public sealed partial class TypeBuilder
     /// <exception cref="ArgumentNullException">Parameters are null.</exception>
     public TypeBuilder AddNestedGenericClass(string name, IEnumerable<string> parameters, TypeVisibility visibility = TypeVisibility.Public)
         => AddNested(name, visibility, false, parameters ?? throw new ArgumentNullException(nameof(parameters)));
-    /// <summary>Adds a nested class deriving from this assembly's native Object root.</summary>
+    /// <summary>Adds a nested class deriving from this assembly's native Object root or its enclosing closed family.</summary>
     /// <param name="name">Simple metadata name, without an arity suffix.</param>
-    /// <param name="baseType">The native Object root attached to this assembly.</param>
-    /// <param name="parameters">Complete generic parameter scope, or null for a nongeneric class.</param>
+    /// <param name="baseType">The native Object root attached to this assembly, or this enclosing closed family.</param>
+    /// <param name="parameters">Complete generic parameter scope, or null for a nongeneric class. Closed-family cases require null.</param>
     /// <param name="visibility">Public or Internal.</param>
     /// <returns>The attached nested reference class.</returns>
-    /// <exception cref="ArgumentException">The base is not this assembly's native Object root, or names/visibility are invalid.</exception>
+    /// <exception cref="ArgumentException">The base is neither this assembly's native Object root nor this enclosing closed family, or names/visibility are invalid.</exception>
     public TypeBuilder AddNestedClass(string name, TypeBuilder baseType, IEnumerable<string>? parameters = null, TypeVisibility visibility = TypeVisibility.Public)
     {
         ArgumentNullException.ThrowIfNull(baseType);
-        if (!ReferenceEquals(baseType.Assembly, Assembly) || !baseType.IsNativeObjectRoot)
-            throw new ArgumentException("nested local bases require this output's native Object root", nameof(baseType));
+        if (!ReferenceEquals(baseType.Assembly, Assembly) || !(baseType.IsNativeObjectRoot || ReferenceEquals(baseType, this) && IsClosedHierarchy && parameters is null))
+            throw new ArgumentException("nested local bases require the native Object root or the nongeneric enclosing closed family", nameof(baseType));
         if (visibility is not (TypeVisibility.Public or TypeVisibility.Internal))
             throw new ArgumentException("unsupported nested visibility", nameof(visibility));
         var attributes = visibility == TypeVisibility.Public ? 2u : 5u;

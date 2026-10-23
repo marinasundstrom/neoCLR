@@ -192,7 +192,7 @@ public sealed partial class AssemblyBuilder
         ArgumentNullException.ThrowIfNull(definition);
         return definition.Producer ?? throw new InvalidOperationException("loaded definition editing remains unsupported");
     }
-    private static bool IsOrdinaryDerived(TypeBuilder type) => !type.IsStatic && !type.IsInterface && !type.IsValueType && type.NativePrimitive is null && !type.NativeGrapheme && type.Definition.DeclaringType is null;
+    private static bool IsOrdinaryDerived(TypeBuilder type) => !type.IsStatic && !type.IsInterface && !type.IsValueType && type.NativePrimitive is null && !type.NativeGrapheme && (type.Definition.DeclaringType is null || type.LocalBase is { IsClosedHierarchy: true } parent && ReferenceEquals(type.Definition.DeclaringType, parent.Definition));
     private static bool IsOrdinaryBase(TypeBuilder type) => !type.IsStatic && !type.IsInterface && !type.IsValueType && type.NativePrimitive is null && !type.NativeGrapheme && type.GenericParameterNames.Count == 0 && type.Definition.DeclaringType is null;
     internal TypeDefinition AttachType(TypeDefinition definition)
     {
@@ -219,7 +219,7 @@ public sealed partial class AssemblyBuilder
                 if (definition.BaseType is not null) throw new ArgumentException("interfaces have no class base");
             }
             else if (!definition.IsNativeObjectRoot && !(definition.AuthoredExternalBase is { } externalBase &&
-                HasClassBaseContract(externalBase) && definition.DeclaringType is null && category is 0 or 0x80 or 0x100) && !(category is 0 or 0x80 or 0x100 && definition.BaseType is { ExplicitScope: null } localBase && ReferenceEquals(localBase.Module, Definition.MainModule) && localBase.Resolve().Producer is { } parent && (IsOrdinaryBase(parent) || IsOrdinaryDerived(parent) && definition.AuthoredBaseSignature?.GenericInstance is { } construction && ReferenceEquals(construction.Definition, parent)) && (definition.DeclaringType is null || parent.IsNativeObjectRoot)) && (definition.BaseType is not { } baseType || !ReferenceEquals(baseType.Module, Definition.MainModule) || !Equals(baseType.ExplicitScope, CoreLibrary) || baseType.Namespace != "System" ||
+                HasClassBaseContract(externalBase) && definition.DeclaringType is null && category is 0 or 0x80 or 0x100) && !(category is 0 or 0x80 or 0x100 && definition.BaseType is { ExplicitScope: null } localBase && ReferenceEquals(localBase.Module, Definition.MainModule) && localBase.Resolve().Producer is { } parent && (IsOrdinaryBase(parent) || IsOrdinaryDerived(parent) && definition.AuthoredBaseSignature?.GenericInstance is { } construction && ReferenceEquals(construction.Definition, parent)) && (definition.DeclaringType is null || parent.IsNativeObjectRoot || parent.IsClosedHierarchy && ReferenceEquals(definition.DeclaringType, parent.Definition))) && (definition.BaseType is not { } baseType || !ReferenceEquals(baseType.Module, Definition.MainModule) || !Equals(baseType.ExplicitScope, CoreLibrary) || baseType.Namespace != "System" ||
                 baseType.Name != (definition.IsEnum ? "Enum" : definition.IsValueType ? "ValueType" : "Object") || definition.IsValueType != (category == 0x108 || category == 0x100 && definition.IsEnum)))
                 throw new ArgumentException("type base/category does not match the explicit core contract");
             if (definition.AuthoredExternalBase is { } externalSignature) ((SignatureType)externalSignature).ValidateOwner(this, typeArity: definition.GenericArity);

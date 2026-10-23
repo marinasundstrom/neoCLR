@@ -1,0 +1,112 @@
+module System
+
+import System.*
+
+// Distinct domains: no shared ordering or forced conversion to System.Version.
+/// <summary>Windows major, minor, build and revision components; no cross-domain ordering.</summary>
+public record class WindowsVersion(Major: int, Minor: int, Build: int, Revision: int) {
+    /// <summary>Returns a readable display string; not a serialization or comparison format.</summary>
+    override func ToString() -> string => "${Major}.${Minor}.${Build}.${Revision}"
+}
+/// <summary>Numeric OS product version with major, minor and patch components.</summary>
+public record class ProductVersion(Major: int, Minor: int, Patch: int) {
+    /// <summary>Returns a readable display string; not a serialization or comparison format.</summary>
+    override func ToString() -> string => "${Major}.${Minor}.${Patch}"
+}
+/// <summary>Exact kernel release text, including vendor suffixes; no numeric ordering.</summary>
+public record class KernelRelease(Value: string) {
+    /// <summary>Returns a readable display string; not a serialization or comparison format.</summary>
+    override func ToString() -> string => Value
+}
+/// <summary>Optional distribution identity and release text; release need not be numeric.</summary>
+public record class DistributionRelease(Id: string?, VersionId: string?) {
+    /// <summary>Returns a readable display string; not a serialization or comparison format.</summary>
+    override func ToString() -> string {
+        let name = Id ?? "Unknown distribution"
+        if VersionId is string version {
+            return "${name} ${version}"
+        }
+        return name
+    }
+}
+/// <summary>Android SDK API level, distinct from kernel and product versions.</summary>
+public record class AndroidApiLevel(Value: int) {
+    /// <summary>Returns a readable display string; not a serialization or comparison format.</summary>
+    override func ToString() -> string => "API ${Value}"
+}
+
+// Closed hierarchy; ordinary reference records, not a separate runtime category.
+/// <summary>Closed execution operating-system classification with OS-specific version data.</summary>
+public sealed record class OperatingSystem() {
+    /// <summary>Returns a readable display string; not a serialization or comparison format.</summary>
+    override func ToString() -> string => "Unknown operating system"
+    /// <summary>Windows platform value.</summary>
+    record class Windows(Version: WindowsVersion) : OperatingSystem {
+        /// <summary>Returns a readable display string; not a serialization or comparison format.</summary>
+        override func ToString() -> string => "Windows ${Version}"
+    }
+    /// <summary>Linux platform value.</summary>
+    record class Linux(Kernel: KernelRelease, Distribution: DistributionRelease?) : OperatingSystem {
+        /// <summary>Returns a readable display string; not a serialization or comparison format.</summary>
+        override func ToString() -> string {
+            if Distribution is DistributionRelease distribution {
+                return "Linux ${Kernel} (${distribution})"
+            }
+            return "Linux ${Kernel}"
+        }
+    }
+    /// <summary>MacOS platform value.</summary>
+    record class MacOS(Version: ProductVersion) : OperatingSystem {
+        /// <summary>Returns a readable display string; not a serialization or comparison format.</summary>
+        override func ToString() -> string => "macOS ${Version}"
+    }
+    /// <summary>Android platform value.</summary>
+    record class Android(ApiLevel: AndroidApiLevel) : OperatingSystem {
+        /// <summary>Returns a readable display string; not a serialization or comparison format.</summary>
+        override func ToString() -> string => "Android ${ApiLevel}"
+    }
+    /// <summary>IOS platform value.</summary>
+    record class IOS(Version: ProductVersion) : OperatingSystem {
+        /// <summary>Returns a readable display string; not a serialization or comparison format.</summary>
+        override func ToString() -> string => "iOS ${Version}"
+    }
+    /// <summary>OtherOS platform value.</summary>
+    record class OtherOS(Description: string) : OperatingSystem {
+        /// <summary>Returns a readable display string; not a serialization or comparison format.</summary>
+        override func ToString() -> string => Description
+    }
+
+}
+
+// Architecture records preserve unknown host names.
+/// <summary>Closed processor-architecture classification; OtherArchitecture retains unrecognized host names.</summary>
+public sealed record class Architecture() {
+    /// <summary>Returns a readable display string; not a serialization or comparison format.</summary>
+    override func ToString() -> string => "Unknown architecture"
+    /// <summary>X86 platform value.</summary>
+    record class X86() : Architecture {
+        /// <summary>Returns a readable display string; not a serialization or comparison format.</summary>
+        override func ToString() -> string => "x86"
+    }
+    /// <summary>X64 platform value.</summary>
+    record class X64() : Architecture {
+        /// <summary>Returns a readable display string; not a serialization or comparison format.</summary>
+        override func ToString() -> string => "x64"
+    }
+    /// <summary>Arm platform value.</summary>
+    record class Arm() : Architecture {
+        /// <summary>Returns a readable display string; not a serialization or comparison format.</summary>
+        override func ToString() -> string => "ARM"
+    }
+    /// <summary>Arm64 platform value.</summary>
+    record class Arm64() : Architecture {
+        /// <summary>Returns a readable display string; not a serialization or comparison format.</summary>
+        override func ToString() -> string => "ARM64"
+    }
+    /// <summary>OtherArchitecture platform value.</summary>
+    record class OtherArchitecture(Name: string) : Architecture {
+        /// <summary>Returns a readable display string; not a serialization or comparison format.</summary>
+        override func ToString() -> string => Name
+    }
+
+}

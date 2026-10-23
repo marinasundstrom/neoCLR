@@ -2,6 +2,9 @@
 mod source;
 
 fn main() {
+    cc::Build::new()
+        .file("runtime/native/environment/platform.c")
+        .compile("neoclr_platform");
     println!("cargo:rerun-if-changed=runtime");
     println!("cargo:rerun-if-changed=src/source.rs");
     let text = source::read_source("runtime/System.neoil").expect("expand System library sources");

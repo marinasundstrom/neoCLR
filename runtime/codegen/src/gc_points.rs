@@ -94,6 +94,7 @@ pub(super) fn native_body(
                 &d.string_graphemes,
                 &d.string_scalars,
                 &d.system_culture,
+                &d.environment_platform,
                 &d.time_zone_exists,
                 &d.time_zone_offset,
                 &d.time_zone_version,

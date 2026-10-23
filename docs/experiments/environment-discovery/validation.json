@@ -1,0 +1,31 @@
+{
+  "scope": "Raven on .NET 10; not native neoCLR validation",
+  "command": [
+    "dotnet",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+    "--framework",
+    "net10.0",
+    "--raven-core",
+    "/Users/robert/Projects/Raven/src/Raven.Core/bin/Debug/net10.0/Raven.Core.dll",
+    "/Users/robert/Projects/neoclr/docs/experiments/environment-discovery/Model.rvn",
+    "/Users/robert/Projects/neoclr/docs/experiments/environment-discovery/DotNetHost.rvn",
+    "/Users/robert/Projects/neoclr/docs/experiments/environment-discovery/Main.rvn",
+    "-o",
+    "/Users/robert/Projects/neoclr/target/environment-discovery-prototype/Prototype.dll"
+  ],
+  "sha256": {
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "ea571cd21115d3e5d241cef2d25da4d948a66b576e203fdd1fc568fef59242c5",
+    "/Users/robert/Projects/Raven/src/Raven.Core/bin/Debug/net10.0/Raven.Core.dll": "18b6a717c1e380c1dfebe6b841f8b67a4d0a972289f93402c7f52fbf4e5c6f34",
+    "/Users/robert/Projects/neoclr/docs/experiments/environment-discovery/Model.rvn": "a955d783af294aa411b6169ac3e039d47ebdf22fd4aebcc7db66ac3541bd7db0",
+    "/Users/robert/Projects/neoclr/docs/experiments/environment-discovery/DotNetHost.rvn": "9a06ba45dc1a1bf239b37cbdc5253c3162d6d1af04438b800ef18589bf1b8c60",
+    "/Users/robert/Projects/neoclr/docs/experiments/environment-discovery/Main.rvn": "8778e1518267f8759dd93edce8d293b6206e43bb3c9a9b944f3dd9c587c8c4c1",
+    "/Users/robert/Projects/neoclr/target/environment-discovery-prototype/Prototype.dll": "fb1a38e90b324cca783c5f233f8fbc8ce080d33f1d57dcf9d99cdee2806b4589"
+  },
+  "build_stdout": "\nBuild succeeded in 5,9s\n",
+  "build_stderr": "",
+  "exit_code": 0,
+  "stdout": "macOS 27.0.0\nProcess architecture: ARM64\nOS architecture: ARM64\nNewLine length: 1\nFixture classifications (not detected hosts):\nWindows 10.0.26100.0\nLinux 6.12.0-custom (debian testing)\nLinux 6.12.0-custom\nmacOS 15.2.0\nAndroid API 35\niOS 18.0.0\nfuture host\nPASS environment prototype\n",
+  "stderr": "",
+  "passed": true,
+  "validation_date": "2026-10-23"
+}

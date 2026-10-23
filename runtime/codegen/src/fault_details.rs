@@ -104,6 +104,7 @@ pub struct Options {
     pub string_graphemes: Vec<usize>,
     pub string_scalars: Vec<usize>,
     pub system_culture: Vec<usize>,
+    pub environment_platform: Vec<usize>,
     pub time_zone_exists: Vec<usize>,
     pub time_zone_offset: Vec<usize>,
     pub time_zone_version: Vec<usize>,
@@ -1187,6 +1188,13 @@ impl Options {
                 .into_iter()
                 .flatten()
                 .filter(|r| r["implementation"] == "system-culture-name-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            environment_platform: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
+                .filter(|r| r["implementation"] == "environment-platform-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
             time_zone_exists: report

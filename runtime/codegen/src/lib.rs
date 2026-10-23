@@ -420,6 +420,18 @@ pub fn run(arguments: Vec<std::ffi::OsString>) -> Result<i32, Box<dyn std::error
     if bind_system_culture && !compile_system {
         return Err("--bind-system-culture requires --compile-system".into());
     }
+    let platform_count = args
+        .iter()
+        .filter(|a| *a == "--bind-environment-platform")
+        .count();
+    if platform_count > 1 {
+        return Err("duplicate --bind-environment-platform option".into());
+    }
+    let bind_environment_platform = platform_count == 1;
+    args.retain(|a| a != "--bind-environment-platform");
+    if bind_environment_platform && !compile_system {
+        return Err("--bind-environment-platform requires --compile-system".into());
+    }
     let zone_count = args
         .iter()
         .filter(|a| *a == "--bind-time-zone-rules")
@@ -624,6 +636,9 @@ pub fn run(arguments: Vec<std::ffi::OsString>) -> Result<i32, Box<dyn std::error
     if bind_system_culture && !reference_arena {
         return Err("--bind-system-culture requires --reference-arena".into());
     }
+    if bind_environment_platform && !reference_arena {
+        return Err("--bind-environment-platform requires --reference-arena".into());
+    }
     if bind_utf8_text && !reference_arena {
         return Err("--bind-utf8-text requires --reference-arena".into());
     }
@@ -643,6 +658,7 @@ pub fn run(arguments: Vec<std::ffi::OsString>) -> Result<i32, Box<dyn std::error
         || bind_console_write_line
         || bind_console_stream_output
         || bind_int32_to_string
+        || bind_environment_platform
         || bind_system_culture
         || bind_character_text
         || bind_integer_text
@@ -694,7 +710,7 @@ pub fn run(arguments: Vec<std::ffi::OsString>) -> Result<i32, Box<dyn std::error
         || (args.len() == 4 && (args[3] == "--console" || closed || inspect_closed)))
     {
         return Err(
-            "usage: neoclr-codegen <input.neoil|input.neox|input.dll> <root-name|@entry> <output.o> [--console]; or --inspect <input> <root-name|@entry> [--closed-world]; or --closed-world <input> <root-name|@entry> <output.o>; --gc mark-sweep explicitly selects the included collector and requires --native-gc; closed-world modes accept trailing --module <library>, --system <seed>, --object-root <dependency> pairs; --reflection-roots <file.json> admits explicit source-identity construction, metadata and module-function retention (schemas 1–5) with --compile-system and --reference-arena; --compile-system opts supplied System managed bodies into closed-world selection; --bind-tls binds exact TLS ownership services with --compile-system, --reference-arena and --native-gc plus a matching TLS host adapter; --bind-cryptography binds exact byte-array hash/MAC/random services with --compile-system and --reference-arena plus a matching host adapter; --bind-user-fault binds exact supplied neoCLR.Runtime.Fault/Fail services to UserFault with details; --bind-console-read-byte binds the exact supplied input service to a linked C adapter; --bind-console-write-line binds the exact supplied output service to a linked UTF-8 adapter; --bind-console-stream-output binds raw byte Write/Flush with --reference-arena; --bind-int32-to-string binds formatting with caller-owned text arena ABI v4; --bind-paths binds exact lexical Unix path services; --bind-file-output binds bounded blocking UTF-8 file output; --bind-file-input binds bounded strict UTF-8 file input; --bind-utf8-text binds UTF-8 encoding/decoding, concatenation, ordinal predicates, byte counts and scalar-boundary slices with --reference-arena; --bind-system-culture binds a host preference snapshot with --reference-arena; --bind-time-zone-rules binds pinned IANA lookup/offset/version services with --reference-arena; --bind-character-text binds exact UTF-8 grapheme character services; --bind-integer-text binds primitive numeric/Boolean parsing, signed/unsigned 64-bit formatting and native-width conversion services; --bind-scheduler binds private deferred runnable submission with --native-gc; --bind-timers binds private one-shot scheduling with --native-gc and a polled host scope; --bind-socket-transfer binds Receive/Send/TransferResult and request-deadline services with --native-gc; --bind-socket-client binds bounded DNS/outbound connect with --native-gc and --bind-socket-accept; --bind-task-queue binds exact closed TaskQueue services with --native-gc; --bind-socket-accept binds Accept/ConnectResult/Cancel with --native-gc; --bind-socket-listener binds Listen/LocalPort/Close to an explicit host socket scope (requires --reference-arena); --reference-arena admits bounded invocation-owned reference objects in ABI v4; --fault-details exports ABI v3 with caller-owned diagnostics; --probe-stack-roots adds a read-only pre-operation spill callback (requires a context-enabled profile, not a collector); --native-host-bootstrap exports an owned fn<Void> root handle instead of an ordinary entry (requires --native-gc); --native-gc enables experimental nonmoving collection with --reference-arena and a matching statically linked GC adapter; --native-stack-budget opts into guarded recursion with --native-gc and the matching macOS ARM64 stack adapter; --native-imports opts macOS ARM64 scalar AOT or --jit-scalar into trusted free numeric/pointer C imports (AOT links runtime/native/interop/imports.c)"
+            "usage: neoclr-codegen <input.neoil|input.neox|input.dll> <root-name|@entry> <output.o> [--console]; or --inspect <input> <root-name|@entry> [--closed-world]; or --closed-world <input> <root-name|@entry> <output.o>; --gc mark-sweep explicitly selects the included collector and requires --native-gc; closed-world modes accept trailing --module <library>, --system <seed>, --object-root <dependency> pairs; --reflection-roots <file.json> admits explicit source-identity construction, metadata and module-function retention (schemas 1–5) with --compile-system and --reference-arena; --compile-system opts supplied System managed bodies into closed-world selection; --bind-tls binds exact TLS ownership services with --compile-system, --reference-arena and --native-gc plus a matching TLS host adapter; --bind-cryptography binds exact byte-array hash/MAC/random services with --compile-system and --reference-arena plus a matching host adapter; --bind-user-fault binds exact supplied neoCLR.Runtime.Fault/Fail services to UserFault with details; --bind-console-read-byte binds the exact supplied input service to a linked C adapter; --bind-console-write-line binds the exact supplied output service to a linked UTF-8 adapter; --bind-console-stream-output binds raw byte Write/Flush with --reference-arena; --bind-int32-to-string binds formatting with caller-owned text arena ABI v4; --bind-paths binds exact lexical Unix path services; --bind-file-output binds bounded blocking UTF-8 file output; --bind-file-input binds bounded strict UTF-8 file input; --bind-utf8-text binds UTF-8 encoding/decoding, concatenation, ordinal predicates, byte counts and scalar-boundary slices with --reference-arena; --bind-system-culture binds a host preference snapshot with --reference-arena; --bind-environment-platform binds execution-host OS, architecture and newline discovery with --reference-arena; --bind-time-zone-rules binds pinned IANA lookup/offset/version services with --reference-arena; --bind-character-text binds exact UTF-8 grapheme character services; --bind-integer-text binds primitive numeric/Boolean parsing, signed/unsigned 64-bit formatting and native-width conversion services; --bind-scheduler binds private deferred runnable submission with --native-gc; --bind-timers binds private one-shot scheduling with --native-gc and a polled host scope; --bind-socket-transfer binds Receive/Send/TransferResult and request-deadline services with --native-gc; --bind-socket-client binds bounded DNS/outbound connect with --native-gc and --bind-socket-accept; --bind-task-queue binds exact closed TaskQueue services with --native-gc; --bind-socket-accept binds Accept/ConnectResult/Cancel with --native-gc; --bind-socket-listener binds Listen/LocalPort/Close to an explicit host socket scope (requires --reference-arena); --reference-arena admits bounded invocation-owned reference objects in ABI v4; --fault-details exports ABI v3 with caller-owned diagnostics; --probe-stack-roots adds a read-only pre-operation spill callback (requires a context-enabled profile, not a collector); --native-host-bootstrap exports an owned fn<Void> root handle instead of an ordinary entry (requires --native-gc); --native-gc enables experimental nonmoving collection with --reference-arena and a matching statically linked GC adapter; --native-stack-budget opts into guarded recursion with --native-gc and the matching macOS ARM64 stack adapter; --native-imports opts macOS ARM64 scalar AOT or --jit-scalar into trusted free numeric/pointer C imports (AOT links runtime/native/interop/imports.c)"
                 .into(),
         );
     }
@@ -740,6 +756,7 @@ pub fn run(arguments: Vec<std::ffi::OsString>) -> Result<i32, Box<dyn std::error
                 bind_file_input,
                 bind_character_text,
                 bind_system_culture,
+                bind_environment_platform,
                 bind_time_zone_rules,
                 bind_integer_text,
                 bind_socket_listener,

@@ -1,0 +1,75 @@
+{
+  "date": "2026-10-23",
+  "passed": true,
+  "host": "macOS 27.0 ARM64",
+  "ravenMain": {
+    "fix": "a271da192",
+    "nestedTests": "db41ad039",
+    "focusedTestsPassed": 51
+  },
+  "ravenNeoClr": {
+    "fix": "bf2acea78",
+    "nestedTests": "edfa03df6",
+    "nativeEmission": "8f4aa542d",
+    "focusedTestsPassed": 51
+  },
+  "runtimeTests": {
+    "report": "native-tests.json",
+    "sha256": "972806a0fbb033b98ea51e97836a0ea76913c9dd8db94cb9339e407e1d819287",
+    "testsPerMode": 23,
+    "modes": [
+      "interpreter",
+      "jit",
+      "native"
+    ],
+    "totalPassed": 69
+  },
+  "metadata": "Class-base/closed-family round trips, nested case imports, interface conversions and virtual references pass.",
+  "otherChecks": {
+    "existingEnvironmentTests": 4,
+    "hostAdapterTests": 1,
+    "bindingTests": 1,
+    "websiteTests": 26,
+    "snapshotTests": 4,
+    "websitePages": 6001
+  },
+  "artifacts": {
+    "target/environment-bundle-final/bundle/manifest.json": "fff3af5b078dc6f90cc089088d08b5e360be69fa7bafd0ccd4e80fe5a44180c9",
+    "target/environment-libraries-nested-v5/build-evidence.json": "902391ddcaa8e0abf3153ac06458c8bf3ce4fb2df301e035e26385c59296a0f7",
+    "target/environment-libraries-nested-v5/System.Runtime.dll": "f41df1cb2af2d0fd3b1bc758ac04b1e11c7d60886a785d7a7ac4b6d5a977d1b9",
+    "target/environment-bundle-final/bundle/sdk/tools/rvnc/NeoCLR.Metadata.Experimental.dll": "c002b4176eaa20075d28c38e9d825e6d633ed9e8d4ea7d59fd03b7eec6585ec2",
+    "target/environment-bundle-final/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "25d09752820b7988316dce4a4b86931cba8d427afdedc8a33500c2a3c0564075",
+    "target/release/neoclr": "95fe123341ffbd57b038756ec8d6f01a2a5d27a532956bfd692ce12525ed2c84",
+    "target/release/neoclr-codegen": "9cf158f38a720962cde2677cb5409da7b3645bf7a33acd2bc72ed91a61168ac4",
+    "target/environment-bundle-final/host.dylib": "dd5700e69e4af04c5bb38ac0d9031c297afd38afa43c630566bc2b779fdc9886"
+  },
+  "sourceSha256": {
+    "runtime/raven/src/System/Environment/Platform.rvn": "976df478c702e11458440c58511d229321d352c445e232c2e39e18129d5a9f2e",
+    "runtime/raven/src/System/Environment/Functions.rvn": "4c5d9442bd01bf6a0ac62fb074d5081ff1c29ad21e5964b62e6d0406a24e00c2",
+    "runtime/native/environment/platform.c": "f3c28b4bc9d863f2ad35b77c286c4ad650fc49820d64d42f6f2fdb3c5e40a5cd",
+    "runtime/native/environment/platform.h": "6745f25a2fa3c07f541d7e8ea3d13358a308a37e1372de122bb14b7a35e573cf",
+    "src/environment_platform.rs": "35e00c0644a371814bf69e2c004275cdf87f2e35486b352a4f928cdaa77655ca",
+    "docs/experiments/aot-console/environment-platform.c": "4d2ab455d1613c38f3729c345033df8bdd92f2c01d951fd758f5b5941a9b8401",
+    "runtime/codegen/src/linking.rs": "a01116af60d5b497a2c075cf8a0eeae97cef3b0b9a4c414d52cb591cdb0a67a1"
+  },
+  "logs": {
+    "target/environment-metadata-tests.log": "85d73cd1d79fb8b4482e6a2da2bab69dbae7e4309a58f53e36ad661c4ed968ba",
+    "target/environment-existing-tests.log": "d7c06d93bd710af501406760fa02a721315cdb99867469bd5b1ea41d304e143d",
+    "target/environment-host-tests.log": "08761f4efcf322d4f159bf9b4a7dccd88a9f57937c979d18753e185adac6d9ef",
+    "target/environment-binding-tests.log": "791defbca82151a510961de9de133ac37191768513b50fb15ca0acd126173699",
+    "target/environment-website-tests.log": "f8a3066afe008854905dfdc7edda58eff5a030b01cefa5d2467c4d818206286d",
+    "target/environment-website-build.log": "3fa61ceb5d17b1ea905931f4cfa59e14827425ea4b753dd870733b0f71adf2e8",
+    "target/environment-snapshot-tests.log": "9d654695c0a90577e252109954dd749137ace81d33f39cf1a31990e7f48cf31d",
+    "target/environment-api-check.log": "4cb8d1fd9c31376815473df52b21ae7c0f3f6177cdb5b415223d150273f780eb",
+    "/tmp/raven-nested-tests-final.log": "aa49cbe2ebadfe9c00c7fd9c1dc9acdaeea026a16e0e5acb3319d7014160651e",
+    "/tmp/raven-target-nested-tests.log": "f3ad6dd238b82e16794c0a2e0ebd77141d91a26ece749177886b00a105ed4d91",
+    "target/environment-website-build-final.log": "79f6fb8fca835aabc78dfdef03c38edd236e9353477e12d2664d3cd189d647bb"
+  },
+  "provenance": "Library producer recorded as bf2acea78-plus-nested-records, corresponding to subsequently committed 8f4aa542d. The development bundle metadata SDK was then updated for nested class-base, interface and virtual reference admission; its manifest was rehashed. Published packages were not modified. Reference snapshots are from the same v5 library artifacts used by the suites.",
+  "limitations": [
+    "Local macOS execution only; Windows/Linux/mobile paths not qualified here.",
+    "Linux distribution metadata remains unavailable; Windows revision is zero.",
+    "Numeric version validation, parsing and ordering are not implemented.",
+    "Native abstract overrides and explicit permits naming nested cases remain separate compiler/metadata gaps."
+  ]
+}

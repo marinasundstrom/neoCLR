@@ -75,7 +75,7 @@ public sealed partial class AssemblyBuilder
             isOverride && (primitive != PrimitiveType.String || isStatic || !MethodDefinition.IsObjectOverride(name, signature, CoreLibrary, NativeObjectRoot, ExternalObjectRoot))))
             throw new ArgumentException("invalid native primitive member owner", nameof(nativePrimitive));
         if ((isVirtual || isAbstract) && (isStatic || declaringType.IsValueType || IsAuthoredInterface(declaringType) ||
-            declaringType.DeclaringType is not null || name is ".ctor" or ".cctor" ||
+            declaringType.DeclaringType is not null && !(declaringType.GenericArity == 0 && Equals(DeclaredClassBase(declaringType), declaringType.DeclaringType)) || name is ".ctor" or ".cctor" ||
             signature.GenericParameterNames.Count != 0 || isAbstract && (!isVirtual || isOverride)))
             throw new ArgumentException("class slot requires an ordinary nongeneric instance method");
         if (isOverride && !isVirtual && (isStatic || !declaringType.IsValueType && declaringType.GenericArity != 0 || !MethodDefinition.IsObjectOverride(name, signature, CoreLibrary, NativeObjectRoot, ExternalObjectRoot)))

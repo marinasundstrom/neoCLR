@@ -21402,3 +21402,60 @@ preserving the previous VSIX for rollback. JIT/interpreter samples and HTTP,
 26 editor checks, inlays and two ten-cycle recovery runs pass. The general Raven
 CLI selection is unchanged. Windows qualification and release publication remain
 open. See [local installation](local-preview-20261022.md).
+
+
+## 2026-10-23 — Environment, operating-system versions and architecture prototype
+
+The author noted that System.Environment is currently a module, proposed making
+it a class, and requested next-release operating-system discovery and default line
+endings. The proposed closed OperatingSystem record hierarchy contained Windows,
+Linux (optional distribution), MacOS, Android (API level) and IOS. The assistant
+favored a static class and identified kernel versus distribution version semantics,
+unknown platforms and closed-hierarchy evolution as decisions to resolve.
+
+The author added that various Version types may be needed, then directed:
+“Start implementing a prototype and let me inspect.” The author subsequently added
+Architecture, requested ToString overrides for OperatingSystem and its derived
+types, and broadened the principle to types where a useful string representation
+matters. The assistant implemented separate version domains, distinct process/OS
+architectures, and explicit display strings for all prototype OS/version/architecture
+types. These choices are prototype decisions, not approval of a final API contract.
+
+The [prototype](experiments/environment-discovery/README.md) runs Raven on .NET
+through an isolated host adapter, preserving the shipped native module. Local macOS
+execution and fixture/dispatch checks pass with retained hashes and output. Native
+integration, distribution discovery, Android API-level binding, other-host execution,
+version validation/ordering and final error semantics remain open. Compiler issues
+observed with union property forwarding, abstract override dispatch and interpolation
+are documented with workarounds; no Raven compiler edits or branch merges occurred.
+
+
+**Integration follow-up:** The author directed integration and commits, fixing the
+compiler gap on both Raven main and codex/neoclr, and adding tests with the built-in
+framework. The assistant fixed empty record Deconstruct synthesis and abstract
+ToString override slot reuse on Raven main (`a271da192`) and deliberately carried
+those fixes to codex/neoclr (`bf2acea78`), with 43 and 45 focused tests respectively.
+These updates supersede the prototype's earlier statement that no compiler edits
+were made. Native abstract overrides remain a separate metadata limitation; the
+closed bases retain concrete ToString implementations.
+
+The author emphasized matching selected characteristics and exhaustive OS cases,
+then requested nesting the OS types in OperatingSystem and likewise Architecture.
+The assistant adopted nested cases, separate version records, and tests for nested
+Result/OS destructuring and exhaustive classification. Native nested record case
+emission and closed-family metadata required bounded extensions. A compiled Object
+dispatch transformation also needed to preserve intermediate override bodies under
+private names after removing source slots. Implementation and validation evidence
+are recorded with the environment integration; other-platform execution and Linux
+distribution discovery remain open. These are explicit next-release directions,
+not a permanent roadmap reprioritization.
+
+
+Validation follow-up: the native suite passes all eight tests in interpreter, JIT
+and native execution (24 executions) on macOS ARM64. Nested CLR pattern/display
+coverage passes 51 tests on each Raven line. Main adds regression commit db41ad039;
+codex/neoclr carries it as edfa03df6 and adds native emission in 8f4aa542d.
+The assistant also separated the ordinary built-in test runner from a
+collections-specific crash probe so record-formatting and environment suites can
+run independently. Retained evidence identifies the development SDK metadata
+update separately from the library producer; no published SDK was overwritten.

@@ -37,6 +37,9 @@ libc = "0.2"
 [target.'cfg(windows)'.dependencies]
 windows-sys = { version = "=0.60.2", features = ["Win32_Networking_WinSock"] }
 
+[build-dependencies]
+cc = "1"
+
 [features]
 # Structural signatures are part of the runtime, including reduced builds.
 default = []

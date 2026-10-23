@@ -10,7 +10,7 @@ using NeoCLR.Metadata.Experimental.Introspection;
 
 internal static class ClosedClassChecks
 {
-    private static AssemblyBuilder Create(bool manual, bool sourceRoot = false)
+    private static AssemblyBuilder Create(bool manual, bool sourceRoot = false, bool nested = false)
     {
         var host = typeof(object).Assembly.GetName();
         var core = new AssemblyIdentity(host.Name!, host.Version!, host.CultureName ?? "", Convert.ToHexString(host.GetPublicKeyToken() ?? []));
@@ -32,7 +32,7 @@ internal static class ClosedClassChecks
         var il = initialize.GetILGenerator();
         if (objectConstructor is not null) { il.LoadArgument(0); il.Call(objectConstructor); }
         il.LoadArgument(0); il.LoadArgument(1); il.StoreField(field); il.Return();
-        var child = graph.AddClass("Example", "Child", root);
+        var child = nested ? root.AddNestedClass("Child", root) : graph.AddClass("Example", "Child", root);
         var constructor = child.AddConstructor(Array.Empty<PrimitiveType>());
         il = constructor.GetILGenerator(); il.LoadArgument(0); il.LoadConstant(42); il.Call(initialize); il.Return();
         var main = graph.AddFunction("Main"); graph.EntryPoint = main;
@@ -44,8 +44,9 @@ internal static class ClosedClassChecks
     {
         foreach (bool manual in new[] { false, true })
         foreach (bool sourceRoot in new[] { false, true })
+        foreach (bool nested in new[] { false, true })
         {
-            var graph = Create(manual, sourceRoot);
+            var graph = Create(manual, sourceRoot, nested);
             var authoredRoot = graph.Types.Single(t => t.Name == "Root");
             if (!authoredRoot.IsClosedHierarchy || !authoredRoot.IsAbstract || authoredRoot.IsStatic)
                 throw new Exception("authored closed family flags lost");
@@ -125,6 +126,16 @@ internal static class ClosedClassChecks
         var leafRef = referenceHost.CreateTypeReference(dependency, ordinary.CoreLibrary, new string('a', 64), "Example", "Leaf");
         referenceHost.DeclareClassBase(childRef, parentRef); referenceHost.DeclareClassBase(leafRef, childRef);
         referenceHost.DeclareClassBase(childRef, parentRef);
+        var nestedRef = referenceHost.CreateNestedTypeReference(parentRef, "Nested");
+        referenceHost.DeclareClassBase(nestedRef, parentRef);
+        _ = referenceHost.CreateMethodReference(nestedRef, "Number", new MethodSignature(PrimitiveType.Int32, []), isVirtual: true);
+        var nestedContract = referenceHost.CreateInterfaceReference(dependency, ordinary.CoreLibrary, new string('a', 64), "Example", "NestedContract");
+        referenceHost.AddInterfaceConversion(nestedRef, nestedContract);
+        var nestedConvert = referenceHost.AddFunction("NestedUpcast", new MethodSignature(parentRef, new SignatureType[] { nestedRef }));
+        nestedConvert.GetILGenerator().LoadArgument(0); nestedConvert.GetILGenerator().Return();
+        var unrelatedNested = referenceHost.CreateNestedTypeReference(childRef, "Unrelated");
+        try { referenceHost.DeclareClassBase(unrelatedNested, parentRef); throw new Exception("unrelated nested base accepted"); }
+        catch (ArgumentException) { }
         try { referenceHost.DeclareClassBase(parentRef, leafRef); throw new Exception("cyclic reference base accepted"); }
         catch (ArgumentException) { }
         try { referenceHost.DeclareClassBase(leafRef, parentRef); throw new Exception("conflicting reference base accepted"); }

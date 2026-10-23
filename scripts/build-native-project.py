@@ -142,7 +142,7 @@ def support_files():
               ('windows-console-host.c', 'windows-gc-host.c', 'windows-host-memory.c', 'windows-native-stack.c')],
             *[base / 'aot-console' / name for name in
               ('root-probe.c', 'native-gc.c', 'text-arena.c', 'console.c',
-               'native-stack.c', 'task-queue.c', 'socket-listener.c', 'string-unicode.c', 'system-culture.c', 'time-zone.c', 'file-input.c')],
+               'native-stack.c', 'task-queue.c', 'socket-listener.c', 'string-unicode.c', 'system-culture.c', 'time-zone.c', 'environment-platform.c', 'file-input.c')],
             base / 'aot-scalar/console.c', base / 'aot-fault-details/render.c',
             base / 'aot-console/tls-managed.c', base / 'https-server/native-tls.h',
             *sorted((base / 'aot-console').glob('*.h')),
@@ -332,7 +332,7 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
             return output / name
         flags = ['--compile-system', '--bind-user-fault', '--reference-arena', '--native-gc',
                  '--bind-console-read-byte', '--bind-console-write-line', '--bind-console-stream-output',
-                 '--bind-int32-to-string', '--bind-utf8-text', '--native-stack-budget', '--bind-integer-text', '--bind-character-text', '--bind-system-culture', '--bind-time-zone-rules']
+                 '--bind-int32-to-string', '--bind-utf8-text', '--native-stack-budget', '--bind-integer-text', '--bind-character-text', '--bind-system-culture', '--bind-environment-platform', '--bind-time-zone-rules']
         if not kit_path.exists():
             flags += ['--bind-cryptography']
         flags += ['--bind-tls']
@@ -390,6 +390,9 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
                              for binding in selection.get('nativeBindings', []))
         if system_culture:
             adapters.append(base / 'system-culture.c')
+        if any(binding.get('implementation') == 'environment-platform-v1'
+               for binding in selection.get('nativeBindings', [])):
+            adapters += [base / 'environment-platform.c', ROOT / 'runtime/native/environment/platform.c']
         time_zone_rules = any(binding.get('implementation', '').startswith('time-zone-')
                               for binding in selection.get('nativeBindings', []))
         if time_zone_rules:

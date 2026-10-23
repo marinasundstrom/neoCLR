@@ -1,0 +1,79 @@
+namespace NeoClr.EnvironmentPrototype
+
+// Distinct domains: no shared ordering or forced conversion to System.Version.
+public record WindowsVersion(Major: int, Minor: int, Build: int, Revision: int) {
+    override func ToString() -> string => "${Major}.${Minor}.${Build}.${Revision}"
+}
+public record ProductVersion(Major: int, Minor: int, Patch: int) {
+    override func ToString() -> string => "${Major}.${Minor}.${Patch}"
+}
+public record KernelRelease(Value: string) {
+    override func ToString() -> string => Value
+}
+public record DistributionRelease(Id: string?, VersionId: string?) {
+    override func ToString() -> string {
+        let name = Id ?? "Unknown distribution"
+        if VersionId is string version {
+            return "${name} ${version}"
+        }
+        return name
+    }
+}
+public record AndroidApiLevel(Value: int) {
+    override func ToString() -> string => "API ${Value}"
+}
+
+// Raven currently spells a closed source hierarchy with sealed + permits (implicitly abstract).
+public sealed record OperatingSystem permits Windows, Linux, MacOS, Android, IOS, OtherOS {
+    override func ToString() -> string => "Unknown operating system"
+}
+public record Windows(Version: WindowsVersion) : OperatingSystem {
+    override func ToString() -> string => "Windows ${Version}"
+}
+public record Linux(Kernel: KernelRelease, Distribution: DistributionRelease?) : OperatingSystem {
+    override func ToString() -> string {
+        if Distribution is DistributionRelease distribution {
+            return "Linux ${Kernel} (${distribution})"
+        }
+        return "Linux ${Kernel}"
+    }
+}
+public record MacOS(Version: ProductVersion) : OperatingSystem {
+    override func ToString() -> string => "macOS ${Version}"
+}
+public record Android(ApiLevel: AndroidApiLevel) : OperatingSystem {
+    override func ToString() -> string => "Android ${ApiLevel}"
+}
+public record IOS(Version: ProductVersion) : OperatingSystem {
+    override func ToString() -> string => "iOS ${Version}"
+}
+public record OtherOS(Description: string) : OperatingSystem {
+    override func ToString() -> string => Description
+}
+
+// Closed records avoid the current CLI prototype's union-getter execution failure.
+public sealed record Architecture permits X86, X64, Arm, Arm64, OtherArchitecture {
+    override func ToString() -> string => "Unknown architecture"
+}
+public record X86 : Architecture {
+    override func ToString() -> string => "x86"
+}
+public record X64 : Architecture {
+    override func ToString() -> string => "x64"
+}
+public record Arm : Architecture {
+    override func ToString() -> string => "ARM"
+}
+public record Arm64 : Architecture {
+    override func ToString() -> string => "ARM64"
+}
+public record OtherArchitecture(Name: string) : Architecture {
+    override func ToString() -> string => Name
+}
+
+public static class Environment {
+    static func GetOperatingSystem() -> OperatingSystem => DotNetHost.GetOperatingSystem()
+    static val NewLine: string => DotNetHost.NewLine
+    static val ProcessArchitecture: Architecture => DotNetHost.GetProcessArchitecture()
+    static val OSArchitecture: Architecture => DotNetHost.GetOSArchitecture()
+}

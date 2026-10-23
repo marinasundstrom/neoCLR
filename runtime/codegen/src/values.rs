@@ -1421,6 +1421,15 @@ pub(crate) fn compile_into(
                 vec![types::I64, types::I64],
             ),
             (
+                &d.environment_platform,
+                if d.native_gc {
+                    "neoclr_environment_platform_rooted_v1"
+                } else {
+                    "neoclr_environment_platform_v1"
+                },
+                vec![types::I32, types::I64, types::I64],
+            ),
+            (
                 &d.string_scalars,
                 if d.native_gc {
                     "neoclr_string_scalars_rooted_v1"
@@ -3622,6 +3631,7 @@ pub(crate) fn compile_into(
                     || details.unwrap().utf8_encode.contains(&i)
                     || details.unwrap().utf8_decode.contains(&i)
                     || details.unwrap().path_file_name.contains(&i)
+                    || details.unwrap().environment_platform.contains(&i)
                 {
                     let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
                     vec![parameters[0], arena, output]

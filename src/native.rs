@@ -24,6 +24,7 @@ pub(crate) enum Binding {
     TimeZoneMapLocal,
     TimeZoneDatabaseVersion,
     SystemTimeZoneName,
+    EnvironmentPlatformInfo,
     EnvironmentArguments,
     EnvironmentCurrentDirectory,
     EnvironmentVariable,
@@ -562,6 +563,9 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
                 Type::Array(Box::new(Type::String))
             },
         ),
+        ("neoCLR.Runtime.EnvironmentPlatformInfo", [Type::Int32]) => {
+            (Binding::EnvironmentPlatformInfo, Type::String)
+        }
         ("neoCLR.Runtime.EnvironmentCurrentDirectory", []) => {
             (Binding::EnvironmentCurrentDirectory, Type::Value)
         }
@@ -1505,6 +1509,9 @@ impl Binding {
             )),
             (Self::SystemCultureName, []) => Ok(Value::String(
                 sys_locale::get_locale().unwrap_or_default().into(),
+            )),
+            (Self::EnvironmentPlatformInfo, [Value::Int32(selector)]) => Ok(Value::String(
+                crate::environment_platform::read(*selector).into(),
             )),
             (Self::EnvironmentArguments, []) => Ok(Value::Array {
                 element: Type::String,

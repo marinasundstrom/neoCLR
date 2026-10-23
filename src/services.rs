@@ -141,7 +141,8 @@ pub(crate) fn uses(module: &crate::Module, function: &Function) -> Result<Vec<Se
             crate::native::Binding::NativeMultiplyChecked | crate::native::Binding::Fault => {
                 return Ok(vec![]);
             }
-            crate::native::Binding::EnvironmentArguments
+            crate::native::Binding::EnvironmentPlatformInfo
+            | crate::native::Binding::EnvironmentArguments
             | crate::native::Binding::EnvironmentCurrentDirectory
             | crate::native::Binding::EnvironmentVariable
             | crate::native::Binding::SystemTimeZoneName

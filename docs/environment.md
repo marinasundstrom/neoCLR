@@ -80,3 +80,76 @@ array, including independent mutation across repeated calls. Its host buffer is 
 implementation detail; inline value arrays are not an exposed platform feature.
 A separate consumer exercises all three functions, Unicode and absence/error distinctions.
 See the [source gate and limitations](experiments/extended-cli-metadata/source-environment-2026-10-06.md).
+
+## Platform discovery (development, 2026-10-23)
+
+`System.Environment` is now a static class in namespace System. Existing qualified
+calls retain their spelling; code importing the former module's functions must
+use the class. Rebuild native consumers against the matching library/compiler.
+This is next-release development and does not change published Preview 17 packages.
+
+| API | Contract |
+| --- | --- |
+| GetOperatingSystem() | Result<OperatingSystem, EnvironmentError>; execution host classification |
+| NewLine | CRLF on Windows, LF elsewhere; independent of protocol delimiters |
+| ProcessArchitecture | Architecture of this process |
+| OSArchitecture | Host OS architecture, best effort under emulation |
+
+OperatingSystem is a closed record family with nested Windows, Linux, MacOS,
+Android, IOS and OtherOS cases. Architecture likewise nests X86, X64, Arm, Arm64
+and OtherArchitecture. Unknown cases retain descriptive text. Match the named
+cases for exhaustive classification, or destructure only the characteristics of
+interest. Adding a named case is a source compatibility consideration for exhaustive
+matches. The base families cannot be instantiated.
+
+The compiled suite uses this nested pattern (`result` has type
+`Result<OperatingSystem, EnvironmentError>`):
+
+```raven
+if result is Ok(OperatingSystem.Linux(let kernel, let distribution)) {
+    _ = Assert.Equal("6.12-custom", kernel.Value)?
+    _ = Assert.True(distribution is DistributionRelease, "Distribution payload")?
+}
+```
+
+A case-only pattern is `OperatingSystem.Linux`; a match over OperatingSystem can
+list all six qualified cases without a catch-all. The suite exercises both forms.
+
+Windows carries WindowsVersion(Major, Minor, Build, Revision); macOS/iOS carry
+ProductVersion(Major, Minor, Patch); Linux carries KernelRelease(Value) and nullable
+DistributionRelease(Id, VersionId); Android carries AndroidApiLevel(Value).
+Numeric records currently accept components without validation or parsing/ordering
+APIs. Kernel and distribution release text retains vendor suffixes and nonnumeric
+values. Every family, case and version type has an explicit readable ToString;
+these displays are not stable serialization or sorting formats.
+
+The host adapter uses Windows RtlGetVersion/GetNativeSystemInfo, Unix uname,
+Apple kern.osproductversion/hw.optional.arm64 and Android ro.build.version.sdk.
+Windows Revision is currently zero (the OS revision is unavailable through this
+binding). Linux distribution metadata is currently null. Unsupported or failed OS
+version reads return EnvironmentError; unknown architecture becomes
+OtherArchitecture("unknown"). Mobile and other-platform bindings require host
+qualification; local macOS testing does not establish support on those targets.
+
+A private Int32-to-String InternalCall requires ProcessEnvironment. Interpreter
+and compiled hosts share `runtime/native/environment/platform.c`; no external
+command is executed. Native/JIT admission requires `--bind-environment-platform`,
+`--compile-system`, `--reference-arena` and the matching text-arena host adapter.
+The private selector ABI is implementation detail, not a public platform contract.
+
+Compared with .NET Environment.OSVersion/System.OperatingSystem and
+RuntimeInformation.ProcessArchitecture/OSArchitecture, this API deliberately uses
+closed record cases and OS-specific version domains. That enables typed patterns
+and preserves Linux release text, at the cost of more public types and exhaustive
+match migration when cases are added. Fallible discovery uses the existing Result
+convention. Architecture lives beside Environment for one platform discovery entry
+point; no .NET RuntimeInformation compatibility is claimed. The earlier
+[.NET prototype and research](experiments/environment-discovery/README.md) retain
+historical evidence separately from the native implementation.
+
+The built-in framework suite is `runtime/raven/tests/environment-discovery` and
+runs through `scripts/test-runtime-library.py --suite environment-discovery`.
+It exercises string dispatch, equality, nested patterns, exhaustive matches, live
+host facts and GC lifetime. See the [retained integration evidence](experiments/environment-discovery/integration.json)
+for execution results and exact artifacts. All eight environment and fifteen record
+formatting tests pass in all three engines (69 executions) on macOS ARM64.

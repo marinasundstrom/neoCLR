@@ -142,6 +142,7 @@ pub(crate) fn run(
         "--bind-integer-text",
         "--bind-character-text",
         "--bind-system-culture",
+        "--bind-environment-platform",
         "--bind-time-zone-rules",
         "--bind-cryptography",
         "--bind-tls",

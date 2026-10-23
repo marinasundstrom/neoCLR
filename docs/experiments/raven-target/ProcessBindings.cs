@@ -164,7 +164,103 @@ static class ProcessBindings
             public Result<PropagationUnit, ConsoleKeyError> Close() => default;
             public void Dispose() { }
         }
+        // Documentation projection of native platform records; not a CLI runtime implementation.
+        public class WindowsVersion {
+            public WindowsVersion(int major, int minor, int build, int revision) { }
+            public int Major => default;
+            public int Minor => default;
+            public int Build => default;
+            public int Revision => default;
+            public override string ToString() => default;
+        }
+        public class ProductVersion {
+            public ProductVersion(int major, int minor, int patch) { }
+            public int Major => default;
+            public int Minor => default;
+            public int Patch => default;
+            public override string ToString() => default;
+        }
+        public class KernelRelease {
+            public KernelRelease(string value) { }
+            public string Value => default;
+            public override string ToString() => default;
+        }
+        public class DistributionRelease {
+            public DistributionRelease(string? id, string? versionid) { }
+            public string? Id => default;
+            public string? VersionId => default;
+            public override string ToString() => default;
+        }
+        public class AndroidApiLevel {
+            public AndroidApiLevel(int value) { }
+            public int Value => default;
+            public override string ToString() => default;
+        }
+        public class OperatingSystem {
+            public OperatingSystem() { }
+            public override string ToString() => default;
+            public class Windows : OperatingSystem {
+                public Windows(WindowsVersion version) { }
+                public WindowsVersion Version => default;
+                public override string ToString() => default;
+            }
+            public class Linux : OperatingSystem {
+                public Linux(KernelRelease kernel, DistributionRelease? distribution) { }
+                public KernelRelease Kernel => default;
+                public DistributionRelease? Distribution => default;
+                public override string ToString() => default;
+            }
+            public class MacOS : OperatingSystem {
+                public MacOS(ProductVersion version) { }
+                public ProductVersion Version => default;
+                public override string ToString() => default;
+            }
+            public class Android : OperatingSystem {
+                public Android(AndroidApiLevel apilevel) { }
+                public AndroidApiLevel ApiLevel => default;
+                public override string ToString() => default;
+            }
+            public class IOS : OperatingSystem {
+                public IOS(ProductVersion version) { }
+                public ProductVersion Version => default;
+                public override string ToString() => default;
+            }
+            public class OtherOS : OperatingSystem {
+                public OtherOS(string description) { }
+                public string Description => default;
+                public override string ToString() => default;
+            }
+        }
+        public class Architecture {
+            public Architecture() { }
+            public override string ToString() => default;
+            public class X86 : Architecture {
+                public X86() { }
+                public override string ToString() => default;
+            }
+            public class X64 : Architecture {
+                public X64() { }
+                public override string ToString() => default;
+            }
+            public class Arm : Architecture {
+                public Arm() { }
+                public override string ToString() => default;
+            }
+            public class Arm64 : Architecture {
+                public Arm64() { }
+                public override string ToString() => default;
+            }
+            public class OtherArchitecture : Architecture {
+                public OtherArchitecture(string name) { }
+                public string Name => default;
+                public override string ToString() => default;
+            }
+        }
         public static class Environment {
+            public static Result<OperatingSystem, EnvironmentError> GetOperatingSystem() => default;
+            public static string NewLine => default;
+            public static Architecture ProcessArchitecture => default;
+            public static Architecture OSArchitecture => default;
             public static string[] GetCommandLineArgs() => default;
             public static Result<string, EnvironmentError> GetCurrentDirectory() => default;
             public static Result<Option<string>, EnvironmentError> GetEnvironmentVariable(string name) => default;

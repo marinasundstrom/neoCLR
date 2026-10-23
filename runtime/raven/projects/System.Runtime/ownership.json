@@ -43,6 +43,7 @@
         "runtime/raven/src/System/Double.rvn",
         "runtime/raven/src/System/Time/Duration.rvn",
         "runtime/raven/src/System/Environment/Functions.rvn",
+        "runtime/raven/src/System/Environment/Platform.rvn",
         "runtime/raven/src/System/EnvironmentError.rvn",
         "runtime/raven/src/System/EquatableTo.rvn",
         "runtime/raven/src/System/Functions.rvn",

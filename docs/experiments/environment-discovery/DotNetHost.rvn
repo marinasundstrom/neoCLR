@@ -1,0 +1,42 @@
+namespace NeoClr.EnvironmentPrototype
+
+// Prototype adapter only. No compiler-host constants or native neoCLR bindings.
+internal static class DotNetHost {
+    static val NewLine: string => System.Environment.NewLine
+    static func GetProcessArchitecture() -> Architecture => ClassifyArchitecture(System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString())
+    static func GetOSArchitecture() -> Architecture => ClassifyArchitecture(System.Runtime.InteropServices.RuntimeInformation.OSArchitecture.ToString())
+
+    static func ClassifyArchitecture(name: string) -> Architecture {
+        return match name {
+            "X86" => X86()
+            "X64" => X64()
+            "Arm" => Arm()
+            "Arm64" => Arm64()
+            _ => OtherArchitecture(name)
+        }
+    }
+
+    static func GetOperatingSystem() -> OperatingSystem {
+        let version = System.Environment.OSVersion.Version
+        // More specific product identities precede kernel-family checks.
+        if System.OperatingSystem.IsAndroid() {
+            // Requires an Android SDK_INT binding; never substitute a kernel version.
+            throw System.PlatformNotSupportedException("Android API-level discovery is not bound in this prototype")
+        }
+        if System.OperatingSystem.IsIOS() {
+            return IOS(ProductVersion(version.Major, version.Minor, version.Build))
+        }
+        if System.OperatingSystem.IsWindows() {
+            return Windows(WindowsVersion(version.Major, version.Minor, version.Build, version.Revision))
+        }
+        if System.OperatingSystem.IsMacOS() {
+            return MacOS(ProductVersion(version.Major, version.Minor, version.Build))
+        }
+        if System.OperatingSystem.IsLinux() {
+            // Preserve the release text rather than pretending it is a numeric product version.
+            // Distribution discovery is deliberately absent in this first adapter.
+            return Linux(KernelRelease(System.IO.File.ReadAllText("/proc/sys/kernel/osrelease").Trim()), null)
+        }
+        return OtherOS(System.Runtime.InteropServices.RuntimeInformation.OSDescription)
+    }
+}

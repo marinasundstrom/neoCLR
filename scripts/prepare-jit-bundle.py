@@ -117,7 +117,7 @@ def complete_services(command):
     # text-only archive alongside it and introduce duplicate definitions.
     command = [str(arg) for arg in command if 'neoclr_aot_native_text' not in str(arg)]
     additions = [ROOT / 'docs/experiments/aot-console' / name
-                 for name in ('string-unicode.c', 'system-culture.c', 'time-zone.c')]
+                 for name in ('string-unicode.c', 'system-culture.c', 'time-zone.c', 'environment-platform.c')] + [ROOT / 'runtime/native/environment/platform.c']
     additions.append(archive)
     for path in project.native_crypto_sources():
         report['inputsSha256'][str(path)] = sha(path)

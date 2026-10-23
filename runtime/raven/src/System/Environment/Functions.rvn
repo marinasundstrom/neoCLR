@@ -1,30 +1,101 @@
-module System.Environment
+module System
 
 import System.EnvironmentError
 import System.Result.*
 import System.Option.*
 
-public func GetCommandLineArgs() -> string[] {
-    return neoCLR.Runtime.EnvironmentArguments()
-}
+/// <summary>Provides process environment and execution-platform information.</summary>
+public static class Environment {
+    /// <summary>Returns the execution host's OS classification or an unavailable error.</summary>
+    /// <remarks>Versions describe the OS product, except Linux which preserves the kernel release. Distribution data is optional.</remarks>
+    static func GetOperatingSystem() -> Result<OperatingSystem, EnvironmentError> {
+        let kind = neoCLR.Runtime.EnvironmentPlatformInfo(0)
+        if kind == "linux" {
+            let kernel = neoCLR.Runtime.EnvironmentPlatformInfo(1)
+            if kernel == "" {
+                return Error(default(EnvironmentError))
+            }
+            return Ok(OperatingSystem.Linux(KernelRelease(kernel), null))
+        }
+        if kind == "android" {
+            let level = ReadVersionComponent(14)?
+            return Ok(OperatingSystem.Android(AndroidApiLevel(level)))
+        }
+        if kind == "windows" || kind == "macos" || kind == "ios" {
+            let major = ReadVersionComponent(10)?
+            let minor = ReadVersionComponent(11)?
+            let build = ReadVersionComponent(12)?
+            if kind == "windows" {
+                let revision = ReadVersionComponent(13)?
+                return Ok(OperatingSystem.Windows(WindowsVersion(major, minor, build, revision)))
+            }
+            let version = ProductVersion(major, minor, build)
+            if kind == "macos" {
+                return Ok(OperatingSystem.MacOS(version))
+            }
+            return Ok(OperatingSystem.IOS(version))
+        }
+        if kind == "" {
+            return Error(default(EnvironmentError))
+        }
+        return Ok(OperatingSystem.OtherOS(kind))
+    }
 
-public func GetCurrentDirectory() -> System.Result<string, EnvironmentError> {
-    let payload = neoCLR.Runtime.EnvironmentCurrentDirectory()
-    if neoCLR.Runtime.IsValue<int>(payload) {
+    /// <summary>Gets the execution platform's default line separator: CRLF on Windows, LF elsewhere.</summary>
+    /// <remarks>Does not override explicit protocol or reader/writer delimiters.</remarks>
+    static val NewLine: string => neoCLR.Runtime.EnvironmentPlatformInfo(6)
+
+    /// <summary>Gets the architecture executing this process, which can differ from the OS under emulation.</summary>
+    static val ProcessArchitecture: Architecture => ClassifyArchitecture(neoCLR.Runtime.EnvironmentPlatformInfo(4))
+
+    /// <summary>Gets the OS architecture reported by the host, on a best-effort basis under emulation.</summary>
+    static val OSArchitecture: Architecture => ClassifyArchitecture(neoCLR.Runtime.EnvironmentPlatformInfo(5))
+
+    private static func ReadVersionComponent(selector: int) -> Result<int, EnvironmentError> {
+        let parsed = Int32.Parse(neoCLR.Runtime.EnvironmentPlatformInfo(selector))
+        if parsed is Ok(let value) {
+            return Ok(value)
+        }
         return Error(default(EnvironmentError))
     }
-    return Ok(neoCLR.Runtime.UnpackValue<string>(payload))
-}
 
-public func GetEnvironmentVariable(name: string) -> System.Result<System.Option<string>, EnvironmentError> {
-    let payload = neoCLR.Runtime.EnvironmentVariable(name)
-    if neoCLR.Runtime.IsValue<int>(payload) {
-        return Error(default(EnvironmentError))
+    private static func ClassifyArchitecture(name: string) -> Architecture {
+        return match name {
+            "x86" => Architecture.X86()
+            "x64" => Architecture.X64()
+            "arm" => Architecture.Arm()
+            "arm64" => Architecture.Arm64()
+            "" => Architecture.OtherArchitecture("unknown")
+            _ => Architecture.OtherArchitecture(name)
+        }
     }
-    if neoCLR.Runtime.IsValue<System.Void>(payload) {
-        let absent: System.Option<string> = None()
-        return Ok(absent)
+
+    /// <summary>Returns a fresh copy of the arguments supplied by the execution host.</summary>
+    static func GetCommandLineArgs() -> string[] {
+        return neoCLR.Runtime.EnvironmentArguments()
     }
-    let present: System.Option<string> = Some(neoCLR.Runtime.UnpackValue<string>(payload))
-    return Ok(present)
+
+    /// <summary>Reads the current directory or returns EnvironmentUnavailable.</summary>
+    static func GetCurrentDirectory() -> System.Result<string, EnvironmentError> {
+        let payload = neoCLR.Runtime.EnvironmentCurrentDirectory()
+        if neoCLR.Runtime.IsValue<int>(payload) {
+            return Error(default(EnvironmentError))
+        }
+        return Ok(neoCLR.Runtime.UnpackValue<string>(payload))
+    }
+
+    /// <summary>Reads a variable; absence is None, while invalid names or inaccessible text return an error.</summary>
+    /// <param name="name">The environment variable name.</param>
+    static func GetEnvironmentVariable(name: string) -> System.Result<System.Option<string>, EnvironmentError> {
+        let payload = neoCLR.Runtime.EnvironmentVariable(name)
+        if neoCLR.Runtime.IsValue<int>(payload) {
+            return Error(default(EnvironmentError))
+        }
+        if neoCLR.Runtime.IsValue<System.Void>(payload) {
+            let absent: System.Option<string> = None()
+            return Ok(absent)
+        }
+        let present: System.Option<string> = Some(neoCLR.Runtime.UnpackValue<string>(payload))
+        return Ok(present)
+    }
 }

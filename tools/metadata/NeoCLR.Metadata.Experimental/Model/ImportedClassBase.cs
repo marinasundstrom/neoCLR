@@ -5,17 +5,17 @@ public sealed partial class AssemblyBuilder
     private readonly Dictionary<ImportedTypeReference, ImportedTypeReference> declaredClassBases = [];
 
     /// <summary>Declares an existing dependency's direct class base for output-side reference conversion validation.</summary>
-    /// <param name="type">An output-owned, unconstructed top-level external class definition.</param>
+    /// <param name="type">An output-owned, unconstructed external class definition; a nongeneric nested case may derive from its enclosing type.</param>
     /// <param name="baseType">Its direct base signature, with arguments scoped to the derived definition.</param>
     /// <exception cref="ArgumentNullException">Either reference is null.</exception>
-    /// <exception cref="ArgumentException">Foreign, value, interface, unbound base, nested, cyclic, out-of-scope or conflicting relationship.</exception>
+    /// <exception cref="ArgumentException">Foreign, value, interface, unbound base, unsupported nesting, cyclic, out-of-scope or conflicting relationship.</exception>
     /// <exception cref="InvalidDataException">More than 4096 relationships are declared.</exception>
     /// <remarks>The host supplies truthful symbol facts; no reader is reopened. This does not author a new inherited definition or change dependency metadata. Native linking/verifying uses the actual dependency definitions. Generic base arguments are substituted through each declared ancestry edge; constructed classes remain invariant. This contract does not enable authoring generic class layouts.</remarks>
     public void DeclareClassBase(ImportedTypeReference type, ImportedTypeReference baseType)
     {
         ArgumentNullException.ThrowIfNull(type); ArgumentNullException.ThrowIfNull(baseType);
         bool Class(ImportedTypeReference value) => ReferenceEquals(value.Owner, this) && !value.IsValueType &&
-            !IsAuthoredInterface(value) && !nominalKinds.GetValueOrDefault(InterfaceDefinition(value)) && value.DeclaringType is null;
+            !IsAuthoredInterface(value) && !nominalKinds.GetValueOrDefault(InterfaceDefinition(value)) && (value.DeclaringType is null || value.GenericArity == 0 && value.Equals(type) && value.DeclaringType.Equals(baseType));
         bool Argument(SignatureType value) => value.TypeParameterIndex is { } index ? index < type.GenericArity
             : value.Primitive is { } primitive ? primitive != PrimitiveType.Void
             : value.ArrayElement is { } element ? Argument(element)

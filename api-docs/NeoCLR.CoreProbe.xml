@@ -1543,7 +1543,7 @@
 
     <member name="M:System.Func`5.Invoke(`0,`1,`2,`3)"><summary>Invokes the bound callback with the declared arguments and returns its result.</summary></member>
 
-    <member name="T:System.Environment"><summary>Host environment queries for arguments, the current directory and named variables.</summary></member>
+    <member name="T:System.Environment"><summary>Static process environment and execution-platform queries, including OS and architecture discovery.</summary></member>
     <member name="M:System.Environment.GetCommandLineArgs"><summary>Returns the invocation command-line arguments as a string array.</summary></member>
 
     <member name="M:System.Environment.GetCurrentDirectory"><summary>Returns the host current directory or an EnvironmentError when it cannot be read.</summary></member>

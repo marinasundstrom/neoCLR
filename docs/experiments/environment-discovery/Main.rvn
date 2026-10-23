@@ -1,0 +1,47 @@
+import System.*
+import NeoClr.EnvironmentPrototype.*
+
+func Check(condition: bool, message: string) {
+    if !condition {
+        throw InvalidOperationException(message)
+    }
+}
+
+func CheckText(os: NeoClr.EnvironmentPrototype.OperatingSystem, expected: string) {
+    Check(os.ToString() == expected, "OperatingSystem.ToString: ${expected}")
+    let boxed: Object = os
+    Check(boxed.ToString() == expected, "Object.ToString: ${expected}")
+    Console.WriteLine(os.ToString())
+}
+
+func Main() {
+    let os = NeoClr.EnvironmentPrototype.Environment.GetOperatingSystem()
+    Console.WriteLine(os.ToString())
+    Console.WriteLine("Process architecture: ${NeoClr.EnvironmentPrototype.Environment.ProcessArchitecture.ToString()}")
+    Console.WriteLine("OS architecture: ${NeoClr.EnvironmentPrototype.Environment.OSArchitecture.ToString()}")
+    Console.WriteLine("NewLine length: ${NeoClr.EnvironmentPrototype.Environment.NewLine.Length}")
+
+    Check(NeoClr.EnvironmentPrototype.Environment.NewLine == System.Environment.NewLine, "Host newline")
+    Check(WindowsVersion(10, 0, 26100, 0) != WindowsVersion(10, 0, 22631, 0), "Windows build identity")
+    Check(KernelRelease("6.12.0-custom") != KernelRelease("6.12.0"), "Kernel suffix preservation")
+    Check(DistributionRelease("debian", "testing") == DistributionRelease("debian", "testing"), "Nonnumeric distribution release")
+    Check(DotNetHost.ClassifyArchitecture("FutureCPU") == OtherArchitecture("FutureCPU"), "Unknown architecture preservation")
+    Check(DotNetHost.ClassifyArchitecture("Arm64") == Arm64(), "Arm64 classification")
+    Console.WriteLine("Fixture classifications (not detected hosts):")
+    CheckText(Windows(WindowsVersion(10, 0, 26100, 0)), "Windows 10.0.26100.0")
+    CheckText(Linux(KernelRelease("6.12.0-custom"), DistributionRelease("debian", "testing")), "Linux 6.12.0-custom (debian testing)")
+    CheckText(Linux(KernelRelease("6.12.0-custom"), null), "Linux 6.12.0-custom")
+    CheckText(MacOS(ProductVersion(15, 2, 0)), "macOS 15.2.0")
+    CheckText(Android(AndroidApiLevel(35)), "Android API 35")
+    CheckText(IOS(ProductVersion(18, 0, 0)), "iOS 18.0.0")
+    CheckText(OtherOS("future host"), "future host")
+    Check(DistributionRelease(null, null).ToString() == "Unknown distribution", "Missing distribution")
+    Check(DistributionRelease("debian", null).ToString() == "debian", "Missing distribution version")
+    let architecture: Architecture = Arm64()
+    let boxedArchitecture: Object = architecture
+    Check(boxedArchitecture.ToString() == "ARM64", "Architecture Object.ToString dispatch")
+    Check(architecture.ToString() == "ARM64", "Architecture.ToString dispatch")
+    Check(X86().ToString() == "x86" && X64().ToString() == "x64" && Arm().ToString() == "ARM", "Architecture names")
+    Check(OtherArchitecture("FutureCPU").ToString() == "FutureCPU", "Unknown architecture text")
+    Console.WriteLine("PASS environment prototype")
+}

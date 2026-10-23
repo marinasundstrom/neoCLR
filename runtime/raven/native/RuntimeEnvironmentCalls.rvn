@@ -10,3 +10,7 @@ internal extern func EnvironmentCurrentDirectory() -> System.Value;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
 internal extern func EnvironmentVariable(name: string) -> System.Value;
+
+// Private execution-host query; empty text means unavailable for the requested field.
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func EnvironmentPlatformInfo(selector: int) -> string;

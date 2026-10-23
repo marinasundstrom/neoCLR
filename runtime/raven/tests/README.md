@@ -750,3 +750,12 @@ suite executable exposes isolated `--guard priority-capacity` and
 nonzero exits in each selected execution mode. Stateful comparer objects avoid the
 current native compiler's mutable captured-local limitation; this change does not
 claim that compiler gap is fixed.
+
+## Environment discovery
+
+`--suite environment-discovery` uses eight discovered tests for distinct version
+strings, OS and architecture display through base/Object references, record equality,
+optional distributions, live execution-host discovery/newlines, GC lifetime, and
+nested OS patterns with exhaustive classification. Run all three engine modes
+against a matching development bundle; this is host qualification only for the
+machine executing the suite.

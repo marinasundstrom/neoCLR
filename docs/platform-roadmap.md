@@ -1,5 +1,13 @@
 # neoCLR platform roadmap
 
+**Environment discovery (author direction, 2026-10-23):** Integrate the static
+Environment class, nested closed OS/architecture record families, distinct version
+domains and readable display strings. Add built-in framework tests including
+characteristic patterns and exhaustive matching. See [contract and validation](environment.md).
+This is bounded next-release work, not selection of the broader ShellEnvironment
+proposal. Cross-platform qualification, distribution discovery and richer version
+operations remain open; published Preview 17 packages are unchanged.
+
 **Preview 17 published (2026-10-23):** macOS ARM64 and Windows x64 release assets,
 matching SDK/editor, native kit, qualified source and notices are public. All 12
 asset identities and the live website verify, including the corrected API release

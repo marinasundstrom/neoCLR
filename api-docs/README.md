@@ -2945,3 +2945,13 @@ produced from priority-array-queue-libraries-20261022 with the matching field-ma
 compiler. The CLI declarations are documentation projections, not a second queue
 implementation. The generated type inventory includes the new type; no exclusion
 is needed. Primary comparison: [.NET PriorityQueue](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.priorityqueue-2?view=net-10.0).
+
+
+Development (2026-10-23): Environment is a static class, with fallible OS discovery,
+NewLine and process/OS architecture. The native snapshot includes all version types
+and nested OperatingSystem/Architecture record cases. The CLI documentation scaffold
+projects constructor/property/display signatures as classes because this freestanding
+reference lacks the CLR record synthesis dependencies; native metadata is authoritative
+for record equality, deconstruction, closure and permitted subtype relationships.
+No native public members are excluded from the native audit. The Environment
+content UID changes from N:System.Environment to T:System.Environment.
