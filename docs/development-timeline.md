@@ -21835,3 +21835,12 @@ local capture limitation; an immutable reference to a mutable Counter supplies t
 intended shared state without a compiler change. Optimized/UBSan validation passes.
 The assistant explicitly keeps async HTTP dispatch and concurrent managed mutation
 unsupported; this is a serial correctness baseline with shared fault state.
+
+Fault ownership follow-through: the assistant separated synchronous callback faults
+from the shared context into job-owned, GC-visible storage. One failed invocation
+no longer blocks later jobs; faulted jobs settle as failures even if their native
+adapter returns success. Tests pass for runtime-built diagnostic text after GC,
+copy-before-take, stale handles, cancellation precedence and later job recovery.
+The assistant records the fixed storage/stack cost and keeps async Task semantics
+and parallel managed execution open. This supersedes the initial bridge's shared
+fault poisoning without claiming an HTTP throughput result.

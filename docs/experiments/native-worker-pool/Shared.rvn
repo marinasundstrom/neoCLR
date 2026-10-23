@@ -20,10 +20,8 @@ public func Calculate(limit: int) -> (() -> ()) {
             index += 1
         }
         calls.Value += 1
-        if calls.Value > limit {
-            let wrong: object = true
-            let invalid = (int)wrong
-            System.Fail("Invalid cast did not fault")
+        if calls.Value == limit + 1 {
+            System.Fail("Worker failure " + calls.Value.ToString())
         }
     }
 }

@@ -9,6 +9,7 @@
 #define JOBS 16
 #define ROOTS 32
 #define THREADS 4
+#define POOL_ROOT_SLOTS (ROOTS + (2 + NEOCLR_WORKER_LOCAL_ROOTS + 65) * JOBS)
 enum { FREE, QUEUED, RUNNING, DONE };
 struct neoclr_worker_job {
     struct neoclr_workers *pool;
@@ -18,6 +19,7 @@ struct neoclr_worker_job {
     void *capture;
     void *local_roots[NEOCLR_WORKER_LOCAL_ROOTS];
     neoclr_worker_value result;
+    neoclr_aot_fault fault;
     neoclr_worker_callback callback;
     void *native_state;
 };
@@ -79,8 +81,9 @@ static void *run(void *argument) {
         if (entered) abort();
         lock(p);
         j->outcome = j->cancelled ? NEOCLR_WORKER_CANCELLED :
-            outcome ? NEOCLR_WORKER_FAILED : NEOCLR_WORKER_OK;
+            (outcome || j->fault.code) ? NEOCLR_WORKER_FAILED : NEOCLR_WORKER_OK;
         if (j->outcome != NEOCLR_WORKER_OK) j->result = (neoclr_worker_value){0};
+        if (j->cancelled) memset(&j->fault, 0, sizeof(j->fault));
         j->capture = NULL;
         memset(j->local_roots, 0, sizeof(j->local_roots));
         j->state = DONE;
@@ -140,6 +143,12 @@ static unsigned pool_slots(neoclr_workers *p, neoclr_probe_storage *slots) {
     for (unsigned i = 0; i < p->capacity; i++) {
         slots[count++] = (neoclr_probe_storage){&p->jobs[i].capture, 8, 0};
         slots[count++] = (neoclr_probe_storage){&p->jobs[i].result.reference, 8, 0};
+        if (p->jobs[i].fault.code) {
+            if (p->jobs[i].fault.frame_count > 64) abort();
+            slots[count++] = (neoclr_probe_storage){&p->jobs[i].fault.message, 8, 0};
+            for (unsigned n = 0; n < p->jobs[i].fault.frame_count; n++)
+                slots[count++] = (neoclr_probe_storage){&p->jobs[i].fault.frames[n].function, 8, 0};
+        }
         for (unsigned n = 0; n < NEOCLR_WORKER_LOCAL_ROOTS; n++)
             slots[count++] = (neoclr_probe_storage){&p->jobs[i].local_roots[n], 8, 0};
     }
@@ -149,13 +158,13 @@ int32_t neoclr_worker_invoke_capture(neoclr_worker_job *j) {
     if (executing != j) abort();
     neoclr_workers *p = j->pool;
     neoclr_worker_enter(j);
-    if (!p->invoke || p->context.fault.code || neoclr_root_probe_head_v1() || neoclr_roots_parked_v1()) {
+    if (!p->invoke || j->fault.code || p->context.fault.code || neoclr_root_probe_head_v1() || neoclr_roots_parked_v1()) {
         neoclr_worker_leave(j); return 3;
     }
     uint64_t handle = 0;
     int32_t status = neoclr_gc_host_root_create_v1(&p->context, j->capture, &handle);
     if (!status) {
-        neoclr_probe_storage slots[ROOTS + (2 + NEOCLR_WORKER_LOCAL_ROOTS) * JOBS];
+        neoclr_probe_storage slots[POOL_ROOT_SLOTS];
         unsigned count = pool_slots(p, slots);
         neoclr_probe_frame frame;
         neoclr_parked_roots parked = {0};
@@ -169,6 +178,10 @@ int32_t neoclr_worker_invoke_capture(neoclr_worker_job *j) {
         neoclr_gc_leave_v1(&frame);
         if (neoclr_gc_owned_roots_check_v1(&p->context, &handle, 1)) abort();
         if (neoclr_gc_host_root_release_v1(&p->context, handle)) abort();
+    }
+    if (p->context.fault.code) {
+        j->fault = p->context.fault;
+        memset(&p->context.fault, 0, sizeof(p->context.fault));
     }
     neoclr_worker_leave(j);
     return status;
@@ -269,6 +282,26 @@ int neoclr_workers_wait(neoclr_workers *p, neoclr_worker_handle h, unsigned mill
     }
     unlock(p); return status;
 }
+int neoclr_workers_fault_copy(neoclr_workers *p, neoclr_worker_handle h,
+    neoclr_worker_fault_info *info, unsigned char *message, size_t capacity) {
+    if (!info || (!message && capacity)) return -1;
+    lock(p);
+    neoclr_worker_job *j = job_for(p, h);
+    int status = -1;
+    if (j) {
+        status = 0;
+        if (j->state == DONE) {
+            uint64_t length = j->fault.message ? j->fault.message->length : 0;
+            status = -2;
+            if (length <= capacity) {
+                if (length) memcpy(message, j->fault.message->bytes, (size_t)length);
+                *info = (neoclr_worker_fault_info){j->fault.code, j->fault.frame_count, length};
+                status = 1;
+            }
+        }
+    }
+    unlock(p); return status;
+}
 int neoclr_workers_take(neoclr_workers *p, neoclr_worker_handle h, int *outcome,
     neoclr_worker_value *value, neoclr_worker_handle *root) {
     lock(p); neoclr_worker_job *j = job_for(p, h); int status = -1;
@@ -276,6 +309,7 @@ int neoclr_workers_take(neoclr_workers *p, neoclr_worker_handle h, int *outcome,
         status = 0;
         if (j->state == DONE && adopt(p, j->result.reference, root)) {
             *outcome = j->outcome; *value = j->result; value->reference = NULL;
+            memset(&j->fault, 0, sizeof(j->fault));
             j->result = (neoclr_worker_value){0}; j->callback = NULL; j->native_state = NULL; j->state = FREE; status = 1;
         }
     }
@@ -284,7 +318,7 @@ int neoclr_workers_take(neoclr_workers *p, neoclr_worker_handle h, int *outcome,
 int neoclr_workers_collect(neoclr_workers *p, uint64_t *extent) {
     if (!pthread_equal(p->owner, pthread_self())) return 0;
     lock(p);
-    neoclr_probe_storage slots[ROOTS + (2 + NEOCLR_WORKER_LOCAL_ROOTS) * JOBS]; unsigned count = pool_slots(p, slots);
+    neoclr_probe_storage slots[POOL_ROOT_SLOTS]; unsigned count = pool_slots(p, slots);
     neoclr_probe_frame frame = {.context = &p->context, .storage = slots, .storage_count = count};
     int ok = !neoclr_gc_collect_v1(&p->context, &frame);
     if (ok) *extent = p->context.text.used;

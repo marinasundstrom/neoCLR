@@ -26,7 +26,8 @@ enum { NEOCLR_WORKER_OK, NEOCLR_WORKER_CANCELLED, NEOCLR_WORKER_FAILED };
 /* Private synchronous generated-callback bridge. Bootstrap once on an empty
  * owner pool; both exports must belong to the same compiled image. No async,
  * resources, retained TLS roots or nested pool calls. Invoke owns the heap gate
- * for its full duration; a guest fault poisons further generated invocations.
+ * for its full duration; a guest fault belongs to this job and prevents another
+ * invocation in the same job. Other jobs retain the shared heap and may proceed.
  * Retained TLS resources/roots or unbalanced frames violate the bridge contract
  * and fail fast. Return native status (0 success); bootstrap output changes only
  * on success. Cancellation is observed at job settlement, not during invocation. */
@@ -69,6 +70,13 @@ void neoclr_worker_leave(neoclr_worker_job *);
 int neoclr_workers_wait(neoclr_workers *, neoclr_worker_handle, unsigned timeout_ms);
 int neoclr_workers_take(neoclr_workers *, neoclr_worker_handle, int *outcome,
     neoclr_worker_value *, neoclr_worker_handle *root);
+/* Terminal diagnostic snapshot before take. Copies UTF-8 bytes without a NUL;
+ * never exports managed pointers. 1 copied (code 0 means no guest fault), 0 pending,
+ * -1 invalid, -2 insufficient buffer. Non-success preserves outputs. Take releases
+ * diagnostics; cancellation wins over faults and reports no diagnostic. */
+typedef struct { uint32_t code, frame_count; uint64_t message_bytes; } neoclr_worker_fault_info;
+int neoclr_workers_fault_copy(neoclr_workers *, neoclr_worker_handle,
+    neoclr_worker_fault_info *, unsigned char *message, size_t capacity);
 int neoclr_workers_collect(neoclr_workers *, uint64_t *live_extent);
 /* Owner-only close: stop admission, request cancellation, join outside gate.
  * Cooperative callbacks must return; no forced interruption or bounded join. */

@@ -6199,3 +6199,11 @@ successes and one fault across four workers, then rejects seven calls against th
 faulted context. Optimized/UBSan tests pass. This is serialized correctness
 qualification, not parallel HTTP support; task/I/O/fault ownership and coordinated
 mutator safepoints remain open. See the [bridge evidence](experiments/native-worker-pool/README.md#synchronous-shared-generated-callbacks--2026-10-23).
+
+Synchronous fault-isolation follow-up (2026-10-23): guest faults are now rooted on
+their job, clear the shared invocation diagnostic state, force failed settlement
+and remain readable as copied bytes until take. Cancellation takes precedence.
+Optimized/UBSan tests cover 87 successful shared calls around one failure plus
+cancel-before-settlement and diagnostics surviving collection. This supersedes the
+initial pool-poisoning limitation; shared async Task/I/O integration is still open.
+See [fault ownership](experiments/native-worker-pool/README.md#job-local-callback-faults--2026-10-23).

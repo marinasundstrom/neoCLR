@@ -55,7 +55,7 @@ try:
     run([bundle/'bin/neoclr', 'disassemble', assembly, listing])
     names = re.findall(r'"name": "(NeoMetadata_[A-F0-9]+\.F_43616C63756C617465)"', listing.read_text())
     assert len(names) == 1, names
-    run([codegen, '--closed-world', assembly, names[0], out/'code.o', *(['--native-host-bootstrap', '--bind-user-fault'] if a.shared else []), '--compile-system', '--reference-arena', '--native-gc', '--system', libraries/'System.runtime.neox', '--module', libraries/'System.Runtime.dll', '--object-root', libraries/'System.Runtime.dll'])
+    run([codegen, '--closed-world', assembly, names[0], out/'code.o', *(['--native-host-bootstrap', '--bind-user-fault', '--bind-int32-to-string', '--bind-utf8-text'] if a.shared else []), '--compile-system', '--reference-arena', '--native-gc', '--system', libraries/'System.runtime.neox', '--module', libraries/'System.Runtime.dll', '--object-root', libraries/'System.Runtime.dll'])
     baseline = json.loads(a.validation.read_text())
     base = baseline['commands'][0]
     assert base['exitCode'] == 0 and not any('sanitize' in s for s in base['command'])

@@ -214,6 +214,9 @@ contract, including fault/static/resource ownership, before dispatching HTTP.
 
 ## Synchronous shared generated callbacks — 2026-10-23
 
+This records the initial bridge checkpoint. Its pool-wide fault poisoning is
+superseded by the job-local fault ownership below; historical evidence is retained.
+
 The private runtime now bridges the existing generated bootstrap and callback
 exports into a shared pool heap. Owner-only bootstrap is admitted once on an empty
 pool, adopts the returned function descriptor into a pool root, and releases the
@@ -262,3 +265,48 @@ we have not optimized that overhead. Next separate per-invocation fault ownershi
 qualify task publication and suspended I/O ownership, then introduce coordinated
 mutator safepoints before lifting the heap gate. Do not dispatch current HTTP
 handlers through this synchronous-only bridge.
+
+## Job-local callback faults — 2026-10-23
+
+Generated callback faults now belong to their job. Before releasing the heap gate,
+the bridge copies the fault header and frames into fixed job storage, then clears
+the shared context's diagnostic state. The same job cannot invoke again after its
+fault, but other jobs can use the shared closure/heap. A guest fault forces failed
+settlement even when the native adapter returns success; cancellation that wins
+before settlement takes precedence and discards diagnostics. Mutations performed
+before a fault are not rolled back. Bootstrap failures still prevent use of that
+image/context; there is no general recovery promise for corruption or native crashes.
+
+The collector traces message/function-name pointers for outstanding job faults,
+including during subsequent generated invocations. Pending diagnostics stay private.
+For a terminal ticket, fault_copy copies metadata and UTF-8 message bytes into
+caller storage under the gate; it never exports managed pointers. A too-small
+buffer, invalid ticket or pending job preserves outputs. Callers choose a buffer
+capacity; a successful no-fault read reports zero code/length. Take releases all
+fault ownership, and stale tickets cannot read a recycled job's diagnostics.
+
+Fixed fault storage adds 1,048 bytes per job (16,768 bytes across the 16-slot pool),
+with no per-fault native allocation. The worst-case collector slot array grows by
+16,640 stack bytes; actual scans include only active fault messages and recorded
+frames, so successful jobs add no diagnostic slots. These are provisional costs
+for a correctness baseline, not a claim of improved allocation or throughput.
+
+[fault-shared-validation.json](fault-shared-validation.json) passes optimized and
+UBSan runtime/host builds with 87 successful invocations and one isolated failure
+on the same shared closure. The failure constructs its message at runtime. Owner
+collection and subsequent callbacks preserve that text until copying/take. Tests
+check same-job reinvocation rejection, forced failed settlement, insufficient-buffer
+output preservation, no stale access, successful job reuse and full teardown.
+A separate synchronized test holds a faulted job before settlement, collects,
+cancels it, and verifies a cancelled outcome with no retained diagnostic.
+[fault-pool-validation.json](fault-pool-validation.json) repeats seven native groups;
+[fault-private-validation.json](fault-private-validation.json) repeats 1,280 private
+context invocations. Generated machine code is not UBSan-instrumented. Earlier
+TSan/ASan limitations remain unchanged.
+
+This closes synchronous job fault isolation only. Exceptions in .NET are normally
+attached to a Task's failure rather than poisoning unrelated Tasks; this private
+bridge follows that ownership direction but does not yet implement public Task
+exception semantics. Native status and copied diagnostic bytes are provisional
+adapter contracts. Async Task/Promise publication, suspended I/O ownership and
+parallel mutator coordination remain the next boundaries before HTTP dispatch.
