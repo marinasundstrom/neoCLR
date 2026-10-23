@@ -94,6 +94,11 @@ def main():
             run(name + '-batch-valid', [binary, 'batch-valid'])
             run(name + '-context-valid', [binary, 'context-valid'])
             run(name + '-state-valid', [binary, 'state-valid'])
+            for position in ['vector', 'tail']:
+                for width in [0, 1, 3, 4, 5, 7, 8, 9, 12, 16, 2147483648, 4294967292, 4294967295]:
+                    case = f'width-{position}-{width}'
+                    expected = 0 if width in [4, 8] else (3 if windows else -signal.SIGABRT)
+                    run(name + '-' + case, [binary, case], expected)
         for name in ['native-owned-body-test', 'native-idle-drain-test']:
             binary = out / (name + ('.exe' if windows else ''))
             flags = ['/DNEOCLR_NATIVE_GC', '/I' + str(BASE), '/I' + str(carrier)] if windows else ['-DNEOCLR_NATIVE_GC', '-Wno-deprecated-declarations', '-I', BASE, '-I', carrier]

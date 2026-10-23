@@ -1,0 +1,38 @@
+{
+  "baseline": {
+    "command": [
+      "xcrun",
+      "clang",
+      "-O2",
+      "-S",
+      "-DNEOCLR_NATIVE_GC",
+      "-DNEOCLR_GC_PACED",
+      "-I",
+      "runtime/native/gc",
+      "target/root-width-assembly/baseline.c",
+      "-o",
+      "target/root-width-assembly/baseline.s"
+    ],
+    "publicationStaticInstructions": 433,
+    "sourceSha256": "9315fb17e2c1c07caff9dae4e154c967c4ec0d3d87d328babf3c2c97d094b4bc",
+    "assemblySha256": "4a611988b5c6d78a10bc3235cf6c3996003f59dc2945e5637df3f961f3e5fecd"
+  },
+  "candidate": {
+    "command": [
+      "xcrun",
+      "clang",
+      "-O2",
+      "-S",
+      "-DNEOCLR_NATIVE_GC",
+      "-DNEOCLR_GC_PACED",
+      "-I",
+      "runtime/native/gc",
+      "runtime/native/gc/root-probe.c",
+      "-o",
+      "target/root-width-assembly/candidate.s"
+    ],
+    "publicationStaticInstructions": 407,
+    "sourceSha256": "71bf47a3d5038d0b940cfbbdbd96ac373c3683b79fc7dfa1c0721c1bf37b9543",
+    "assemblySha256": "7b2af8f6d14975e2e5947bac670cb688222e826d9bbc771c6bcc8c0bd5df65bb"
+  }
+}

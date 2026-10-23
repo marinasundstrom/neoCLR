@@ -3,9 +3,7 @@
 #include "root-probe.h"
 #include "text-arena.h"
 #include <string.h>
-#ifdef _WIN32
 #include <stdlib.h>
-#endif
 int main(int argc, char **argv) {
 #ifdef _WIN32
     /* Expected aborts must not open Windows crash-reporting dialogs in CI. */
@@ -17,6 +15,25 @@ int main(int argc, char **argv) {
     neoclr_probe_storage slot = {&word, 8, 0};
     neoclr_probe_frame parent, child;
     neoclr_probe_enter_v3(&parent, &outer, 0, &slot, 1, "{}", 2);
+    if (!strncmp(argv[1], "width-vector-", 13) || !strncmp(argv[1], "width-tail-", 11)) {
+        int vector = !strncmp(argv[1], "width-vector-", 13);
+        char *end;
+        unsigned long width = strtoul(argv[1] + (vector ? 13 : 11), &end, 10);
+        if (*end || width > UINT32_MAX) return 2;
+        uint64_t words[33] = {0};
+        neoclr_probe_storage slots[33];
+        for (uint32_t i = 0; i < 33; i++) slots[i] = (neoclr_probe_storage){&words[i], 8, 0};
+        parent.storage = slots;
+        parent.storage_count = 33;
+        const char *plan = "{\"requiredSpillLanes\":[]}";
+        neoclr_probe_stack_roots_v2(&parent, 0, lanes, 0, plan, (uint32_t)strlen(plan));
+        slots[vector ? 15 : 32].read_bytes = (uint32_t)width;
+        neoclr_probe_enter_v3(&child, &inner, 1, &slot, 0, "{}", 2);
+        neoclr_probe_stack_roots_v2(&child, 0, lanes, 0, plan, (uint32_t)strlen(plan));
+        neoclr_probe_leave_v1(&child);
+        neoclr_probe_leave_v1(&parent);
+        return 0;
+    }
     if (!strcmp(argv[1], "state-valid")) {
         const char *plan = "{\"requiredSpillLanes\":[]}";
         neoclr_parked_roots saved = {0};

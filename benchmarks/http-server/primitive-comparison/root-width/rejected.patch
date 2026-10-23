@@ -1,0 +1,17 @@
+diff --git a/runtime/native/gc/root-probe.c b/runtime/native/gc/root-probe.c
+index 3a4100462..00fa128d3 100644
+--- a/runtime/native/gc/root-probe.c
++++ b/runtime/native/gc/root-probe.c
+@@ -90,8 +90,11 @@ static void validate_storage(const neoclr_probe_storage *storage, uint32_t count
+     uint32_t invalid = 0;
+     for (uint32_t i = 0; i < count; i++) {
+         const neoclr_probe_storage *s = &storage[i];
++        /* Unsigned subtraction maps exactly widths 4/8 to 0/4. Clearing bit
++         * two leaves zero only for those widths, including across wraparound.
++         * Accumulate the invalid bits directly, without boolean normalization. */
+         invalid |= (s->address == NULL) |
+-            ((s->read_bytes != 4) & (s->read_bytes != 8)) |
++            ((s->read_bytes - UINT32_C(4)) & ~UINT32_C(4)) |
+             (check_flags ? (s->flags > 2) : 0);
+     }
+     if (invalid) abort();

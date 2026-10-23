@@ -6368,3 +6368,13 @@ improves 5.5% with 4.1% less CPU/response in short paired trials; four-owner sam
 overlap and tail latency is higher in corresponding candidate trials. Descriptor
 ownership and publication-frequency work remain open. See
 [evidence and costs](../benchmarks/http-server/primitive-comparison/root-thread-state/README.md).
+
+
+Root-width experiment (2026-10-23): arithmetic invalid-bit accumulation passes
+boundary/wraparound, sanitizer, forced-GC HTTP and shared-worker checks, but does
+not show a reliable throughput/CPU benefit despite smaller optimized ARM64 code.
+Revert the candidate and retain boundary tests; the restored implementation passes
+90 optimized root cases. Explicit compiler-owned metadata registration/lifetimes
+remain proposed work to reduce repeated checks while preserving external mutable
+descriptor validation. See
+[rejected experiment and measurements](../benchmarks/http-server/primitive-comparison/root-width/README.md).
