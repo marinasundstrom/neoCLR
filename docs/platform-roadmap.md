@@ -6522,3 +6522,15 @@ and four aggregation tests. JSON amplifies descriptor validation beyond boundary
 frequency. Compiler-owned transient descriptor lifetime is the next bounded
 experiment, pending safety and CPU/throughput evidence; no runtime change or
 reprioritization is implied. See [workload evidence](../benchmarks/http-server/primitive-comparison/transient-handoff/workloads.md#follow-up-repeated-validation-work).
+
+
+### Owned transient execution contract — 2026-10-24
+
+Author-directed follow-up implements a compiler-owned transient publication hook:
+validate descriptors once per publication lifetime, retain changing root tracing
+and the mutable native fallback. Nineteen release-mode codegen/native tests,
+forced-GC HTTP, shared-worker and 40 async-consumer invocations pass. Plain HTTP
+repeated descriptor checks fall 80.9%; capacity evidence and limitations are in the
+[report](../benchmarks/http-server/primitive-comparison/owned-transient/README.md).
+This completes the bounded ownership experiment; broader typed metadata and
+noncollecting-call analysis remain separate work.

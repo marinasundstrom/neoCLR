@@ -533,6 +533,7 @@ ret
         assert_eq!(maps.len(), if gc { 1 } else { 4 }, "{symbols}");
         assert!(maps.iter().any(|s| s.ends_with("_1_3")), "{maps:?}");
         if gc {
+            assert!(symbols.contains("neoclr_gc_transient_owned_v1"));
             assert!(!maps.iter().any(|s| s.ends_with("_2")));
         }
     }

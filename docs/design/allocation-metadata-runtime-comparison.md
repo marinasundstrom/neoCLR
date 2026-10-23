@@ -376,3 +376,14 @@ reusing the CLR lifetime/metadata distinction above. It does not authorize skipp
 mutable native checks or safepoints. No production change, CPU attribution or
 collector selection follows from counts alone. [Definitions, evidence and next
 experiment](../../benchmarks/http-server/primitive-comparison/transient-handoff/workloads.md#follow-up-repeated-validation-work).
+
+
+### Owned transient implementation — 2026-10-24
+
+The explicit author-requested ownership experiment now extends the generated-table
+lifetime contract to transients. A separate native hook validates each publication;
+descendant boundaries skip redundant descriptor checks, while collections continue
+reading slot values. Ordinary mutable callers retain checks. This applies the
+existing CLR metadata/value-lifetime comparison without adopting CLR stack-map ABI
+or caching arbitrary native pointers. The cost is a trusted lifetime obligation and
+matching-runtime linkage for new objects. [Evidence and limitations](../../benchmarks/http-server/primitive-comparison/owned-transient/README.md).

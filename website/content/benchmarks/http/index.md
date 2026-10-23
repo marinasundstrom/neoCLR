@@ -391,3 +391,15 @@ comparison covers ordinary task/collection samples and plain/JSON HTTP, with uni
 and coverage gaps kept explicit. See
 [implementation and evidence](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/primitive-comparison/transient-handoff)
 and [workload comparison](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/http-server/primitive-comparison/transient-handoff/workloads.md).
+
+
+## Development: compiler-owned transient descriptors
+
+The native backend now validates generated temporary-root descriptors once per
+publication lifetime while continuing to trace changing values. Mutable native
+callers retain checks. Nineteen focused tests, forced-GC HTTP, shared-worker and
+async consumers pass. Eight paired local plaintext trials show 4.1%/9.9% higher
+mean one/four-worker throughput and 3.7%/7.8% lower CPU per response. Background host
+activity and variable tails limit these measurements; no Kestrel parity or JSON
+capacity claim follows. See
+[implementation, validation and measurements](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/primitive-comparison/owned-transient).

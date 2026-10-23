@@ -112,6 +112,7 @@ void neoclr_probe_stack_roots_v2(neoclr_probe_frame *frame, uint32_t instruction
     const uint64_t *lanes, uint32_t lane_count, const char *plan, uint32_t length) {
     if (!frame || probe_state.head != frame || instruction >= 8192 || lane_count > 8192 || !lanes ||
         !plan || strlen(plan) != length || !has_spill_marker(plan, length)) abort();
+    frame->reserved &= ~NEOCLR_GC_OWNED_TRANSIENT;
     frame->transient = NULL; frame->transient_plan = NULL;
     frame->transient_count = frame->transient_length = frame->transient_phase = 0;
     frame->instruction = instruction;
@@ -135,7 +136,8 @@ void neoclr_probe_stack_roots_v2(neoclr_probe_frame *frame, uint32_t instruction
         previous_context = f->context;
         if (!(f->reserved & NEOCLR_GC_OWNED_STORAGE))
             validate_storage(f->storage, f->storage_count, 1);
-        validate_storage(f->transient, f->transient_count, 0);
+        if (!(f->reserved & NEOCLR_GC_OWNED_TRANSIENT))
+            validate_storage(f->transient, f->transient_count, 0);
 #else
         observe_fault(f->context);
         for (uint32_t i = 0; i < f->storage_count; i++) {
@@ -189,6 +191,7 @@ void neoclr_gc_worker_stack_roots_v1(neoclr_probe_frame *frame, uint32_t instruc
 void neoclr_probe_transient_v2(neoclr_probe_frame *frame, uint32_t phase,
     const neoclr_probe_storage *storage, uint32_t count, const char *plan, uint32_t length) {
     if (probe_state.head != frame || (phase != 1 && phase != 2 && phase != 3) || !storage || !plan || strlen(plan) != length) abort();
+    frame->reserved &= ~NEOCLR_GC_OWNED_TRANSIENT;
     frame->transient = storage; frame->transient_count = count;
     frame->transient_plan = plan; frame->transient_length = length; frame->transient_phase = phase;
 #ifndef NEOCLR_NATIVE_GC
@@ -205,6 +208,13 @@ void neoclr_probe_transient_v2(neoclr_probe_frame *frame, uint32_t phase,
     (void)observed;
 #endif
 }
+#ifdef NEOCLR_NATIVE_GC
+void neoclr_gc_transient_owned_v1(neoclr_probe_frame *frame, uint32_t phase,
+    const neoclr_probe_storage *storage, uint32_t count, const char *plan, uint32_t length) {
+    neoclr_probe_transient_v2(frame, phase, storage, count, plan, length);
+    frame->reserved |= NEOCLR_GC_OWNED_TRANSIENT;
+}
+#endif
 const neoclr_probe_frame *neoclr_root_probe_head_v1(void) { return probe_state.head; }
 uint64_t neoclr_root_probe_count_v1(void) { return probe_state.calls; }
 uint32_t neoclr_root_probe_depth_v1(void) { return probe_state.depth; }

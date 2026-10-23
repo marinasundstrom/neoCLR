@@ -140,7 +140,7 @@ impl Probes {
         );
         let publish = module.declare_function(
             if gc {
-                "neoclr_gc_transient_v1"
+                "neoclr_gc_transient_owned_v1"
             } else {
                 "neoclr_probe_transient_v2"
             },

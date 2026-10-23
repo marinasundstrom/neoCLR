@@ -15081,3 +15081,15 @@ analysis is not introduced. Qualification covers emitted maps, unchanged diagnos
 probes, forced-GC HTTP, recompiled shared workers and 40 async-consumer invocations;
 measurements and precise limits are retained in neoCLR's
 `benchmarks/http-server/primitive-comparison/transient-handoff/README.md`.
+
+### Compiler-owned transient descriptors (2026-10-24)
+
+Native-GC lowering now calls `neoclr_gc_transient_owned_v1`, validating generated
+address/width tables at publication and retaining that result until replacement,
+the frame's next boundary or leave/expiry. Values remain mutable and traced;
+parked frames preserve the ownership obligation. Ordinary native publication stays
+checked. New objects need the matching runtime hook; old objects retain their path.
+Raven Runtime Contract configuration, semantic lowering and CLI representation are
+unchanged. The native backend/runtime own this contract. Native typed metadata is
+still the replacement direction for JSON plans, not implemented by this change.
+[Safety, limitations and validation](../benchmarks/http-server/primitive-comparison/owned-transient/README.md).

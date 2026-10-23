@@ -22168,3 +22168,19 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   survival/live-byte data and metadata-resolution/cache metrics remain open.
 - Evidence: [implementation and tests](../benchmarks/http-server/primitive-comparison/transient-handoff/README.md)
   and [workload profile](../benchmarks/http-server/primitive-comparison/transient-handoff/workloads.md).
+
+### 2026-10-24 — Validate owned transient descriptors within their lifetime
+
+- Author: explicitly asks to “validate compiler-owned transient descriptors once
+  during their lifetime while continuing to trace changing root values.”
+- Assistant action: adds a distinct native hook and compiler import; retains the
+  ordinary checked hook, mutable root tracing, safepoints, fault and plan checks.
+  Publishes ownership until replacement, frame boundary or leave/expiry, including
+  parked stacks. Tests malformed publication, checked fallback and changed values.
+- Verified outcome: 19 release-mode codegen/native tests, forced-GC HTTP, shared
+  worker optimized/sanitized checks and 40 async-consumer invocations pass. Repeated
+  storage-descriptor checks drop 80.9% in plain HTTP with unchanged boundary counts.
+  Debug compilation was stopped after stalling; release-mode checks completed.
+- Evidence and limits: [experiment report](../benchmarks/http-server/primitive-comparison/owned-transient/README.md).
+  Count reductions do not establish CPU attribution; capacity is measured separately.
+  Native typed maps and broader noncollecting-call analysis remain open.

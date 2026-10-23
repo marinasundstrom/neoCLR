@@ -41,15 +41,28 @@ int main(int argc, char **argv) {
             neoclr_probe_stack_roots_v2(&child, 0, lanes, 0, plan, (uint32_t)strlen(plan));
             return 0;
         }
-        if (strcmp(argv[1], "owned-valid")) return 2;
+        if (!strcmp(argv[1], "owned-handoff-invalid") || !strcmp(argv[1], "owned-handoff-fallback")) {
+            neoclr_gc_enter_owned_v1(&parent, &outer, 0, &slot, 0, "{}", 2);
+            if (!strcmp(argv[1], "owned-handoff-invalid")) slot.read_bytes = 12;
+            neoclr_gc_transient_owned_v1(&parent, 3, &slot, 1, "{}", 2);
+            neoclr_probe_transient_v2(&parent, 3, &slot, 1, "{}", 2);
+            if (parent.reserved & NEOCLR_GC_OWNED_TRANSIENT) return 7;
+            slot.read_bytes = 12;
+            neoclr_gc_enter_owned_v1(&child, &outer, 1, &slot, 0, "{}", 2);
+            neoclr_probe_stack_roots_v2(&child, 0, lanes, 0, plan, (uint32_t)strlen(plan));
+            return 0;
+        }
+        int handoff = !strcmp(argv[1], "owned-handoff-valid");
+        if (!handoff && strcmp(argv[1], "owned-valid")) return 2;
         uint64_t buffer[128] = {0};
         outer.text = (neoclr_aot_text_arena){(unsigned char *)buffer, sizeof(buffer), 0};
         void *first = NULL, *second = NULL;
         if (neoclr_gc_allocate_v1(&outer.text, 8, NEOCLR_GC_BYTES, &first)) return 3;
         word = (uintptr_t)first;
-        neoclr_gc_enter_owned_v1(&parent, &outer, 0, &slot, 1, "{}", 2);
-        neoclr_probe_stack_roots_v2(&parent, 0, lanes, 0, plan, (uint32_t)strlen(plan));
+        neoclr_gc_enter_owned_v1(&parent, &outer, 0, &slot, handoff ? 0 : 1, "{}", 2);
+        if (!handoff) neoclr_probe_stack_roots_v2(&parent, 0, lanes, 0, plan, (uint32_t)strlen(plan));
         if (neoclr_gc_allocate_v1(&outer.text, 8, NEOCLR_GC_BYTES, &second)) return 4;
+        if (handoff) neoclr_gc_transient_owned_v1(&parent, 3, &slot, 1, "{}", 2);
         word = (uintptr_t)second; /* Live values change while descriptors stay fixed. */
         neoclr_parked_roots saved = {0};
         neoclr_roots_park_v1(&saved);
@@ -62,7 +75,7 @@ int main(int argc, char **argv) {
         neoclr_roots_resume_v1(&saved);
         word = 0;
         neoclr_probe_stack_roots_v2(&parent, 0, lanes, 0, plan, (uint32_t)strlen(plan));
-        if (outer.text.used) return 6;
+        if (outer.text.used || (parent.reserved & NEOCLR_GC_OWNED_TRANSIENT)) return 6;
         neoclr_probe_leave_v1(&parent);
         if (parent.reserved) return 7;
         neoclr_probe_enter_v3(&parent, &outer, 0, &slot, 1, "{}", 2);

@@ -1,0 +1,10 @@
+{
+  "runtime/native/gc/root-probe.c": "05b726f123ce03d02eed418644cb43e26a5d37db99b5dc648e9a5a240939f8b2",
+  "runtime/native/gc/root-probe.h": "588a74cf2734f9cf121dd5f0ed955c6a184b30542f5be56e003bf0420098e8ac",
+  "runtime/codegen/src/gc_probe.rs": "9a31b89cde9dbee1a656b836095c1aa86a31dacd2bcc049af097c8b91d80c213",
+  "runtime/codegen/tests/native_gc.rs": "328ce76e5740601a96e967a206d013581d99b093e1ec7b97afea2b550a85f980",
+  "runtime/codegen/tests/root_probes.rs": "6e754b432ebc79ea9cd8b9c4f19955b1d7e2e70a17abab5115537b7fae4d3e3e",
+  "docs/experiments/aot-console/root-validation-test.c": "223e1d21e4da6c5cf47b8a75a53ced8e6745fa4d363b8ee91c909705347b05ec",
+  "target/owned-transient/candidate.o": "da1f4ff5d7e86efbef682b79e47d13e4b31669f6c78d74b6bc8abdec00389032",
+  "target/transient-handoff-build/candidate.o": "00844edaafef64aabe6905c4505a39f0fe92def82dbc54509c1f0e40db019abb"
+}

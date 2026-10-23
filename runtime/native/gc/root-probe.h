@@ -11,6 +11,7 @@
 #define neoclr_probe_stack_roots_v2 neoclr_gc_stack_roots_v1
 #define neoclr_probe_transient_v2 neoclr_gc_transient_v1
 #endif
+enum { NEOCLR_GC_OWNED_STORAGE = 0x200, NEOCLR_GC_OWNED_TRANSIENT = 0x400 };
 /* Private published frame chain, not a stable hosting ABI.
  * Frame storage belongs to the active native function. Diagnostic mode forbids
  * allocation, reentry, pointer mutation and collection in all callbacks.
@@ -52,7 +53,6 @@ void neoclr_probe_enter_v3(neoclr_probe_frame *frame, const void *context, uint3
  * collection. This is a trusted native contract, not memory protection; ordinary
  * native callers use neoclr_gc_enter_v1 and retain publication-time validation.
  * Transient tables, fault contexts and plan strings remain on the checked path. */
-enum { NEOCLR_GC_OWNED_STORAGE = 0x200 };
 void neoclr_gc_enter_owned_v1(neoclr_probe_frame *frame, const void *context, uint32_t function,
     const neoclr_probe_storage *storage, uint32_t count, const char *plan, uint32_t length);
 #endif
@@ -64,6 +64,16 @@ void neoclr_probe_stack_roots_v2(neoclr_probe_frame *frame, uint32_t instruction
  * Live slot addresses persist until the next pre-operation snapshot or frame leave. */
 void neoclr_probe_transient_v2(neoclr_probe_frame *frame, uint32_t phase,
     const neoclr_probe_storage *storage, uint32_t count, const char *plan, uint32_t length);
+#ifdef NEOCLR_NATIVE_GC
+/* Generated descriptors are exclusively owned and immutable from publication
+ * until the next boundary, replacement publication or frame leave/expiry.
+ * Slot values remain mutable and are read afresh by collection. Suspended/parked
+ * frames retain this obligation. Ordinary native callers use the checked hook.
+ * Only descriptor validation is amortized; faults and plan checks are unchanged. */
+void neoclr_gc_transient_owned_v1(neoclr_probe_frame *frame, uint32_t phase,
+    const neoclr_probe_storage *storage, uint32_t count, const char *plan, uint32_t length);
+#endif
+
 /* Read-only fault-context slot view for ABI v3/v4, including after frame removal.
  * Context must be initialized, alive and quiescent. Code zero returns zero without
  * reading stale frame storage. Otherwise output contains message, then frame names.
