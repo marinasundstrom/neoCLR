@@ -1,0 +1,125 @@
+{
+  "passed": true,
+  "iterations": 4096,
+  "rounds": 5,
+  "allocationEquality": true,
+  "cases": [
+    {
+      "sample": "tasks",
+      "mode": "sync",
+      "medianCpuSeconds": 0.017138,
+      "medianWallSeconds": 0.017213,
+      "allocations": 65548,
+      "allocatedBytes": 2261361,
+      "maximumPeakLiveBytes": 497,
+      "completedEpochRange": [
+        0,
+        0
+      ],
+      "firstRunStoreCounts": null,
+      "firstRunStoreLookupCounts": null
+    },
+    {
+      "sample": "tasks",
+      "mode": "live",
+      "medianCpuSeconds": 0.103722,
+      "medianWallSeconds": 0.103461,
+      "allocations": 65548,
+      "allocatedBytes": 2261361,
+      "maximumPeakLiveBytes": 9329,
+      "completedEpochRange": [
+        128,
+        128
+      ],
+      "firstRunStoreCounts": [
+        372788,
+        220318,
+        896,
+        0,
+        0
+      ],
+      "firstRunStoreLookupCounts": [
+        106126,
+        85520
+      ]
+    },
+    {
+      "sample": "collections",
+      "mode": "sync",
+      "medianCpuSeconds": 0.099004,
+      "medianWallSeconds": 0.099469,
+      "allocations": 237580,
+      "allocatedBytes": 7864689,
+      "maximumPeakLiveBytes": 1694,
+      "completedEpochRange": [
+        0,
+        0
+      ],
+      "firstRunStoreCounts": null,
+      "firstRunStoreLookupCounts": null
+    },
+    {
+      "sample": "collections",
+      "mode": "live",
+      "medianCpuSeconds": 0.559068,
+      "medianWallSeconds": 0.557979,
+      "allocations": 237580,
+      "allocatedBytes": 7864689,
+      "maximumPeakLiveBytes": 10113,
+      "completedEpochRange": [
+        464,
+        464
+      ],
+      "firstRunStoreCounts": [
+        2555956,
+        943694,
+        10704,
+        0,
+        0
+      ],
+      "firstRunStoreLookupCounts": [
+        458072,
+        436662
+      ]
+    },
+    {
+      "sample": "arrays",
+      "mode": "sync",
+      "medianCpuSeconds": 0.052827,
+      "medianWallSeconds": 0.054509,
+      "allocations": 86028,
+      "allocatedBytes": 1892721,
+      "maximumPeakLiveBytes": 593,
+      "completedEpochRange": [
+        0,
+        0
+      ],
+      "firstRunStoreCounts": null,
+      "firstRunStoreLookupCounts": null
+    },
+    {
+      "sample": "arrays",
+      "mode": "live",
+      "medianCpuSeconds": 0.140913,
+      "medianWallSeconds": 0.141227,
+      "allocations": 86028,
+      "allocatedBytes": 1892721,
+      "maximumPeakLiveBytes": 6239,
+      "completedEpochRange": [
+        168,
+        168
+      ],
+      "firstRunStoreCounts": [
+        225332,
+        179798,
+        456,
+        0,
+        0
+      ],
+      "firstRunStoreLookupCounts": [
+        89926,
+        85792
+      ]
+    }
+  ]
+}

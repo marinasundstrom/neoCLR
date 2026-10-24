@@ -1,5 +1,7 @@
 # neoCLR platform roadmap
 
+**Broader concurrent profiling (2026-10-25):** [Batched ordinary workloads](../benchmarks/execution/concurrent-workloads/README.md) now complete concurrent epochs: 30 matched AOT runs pass output/cleanup and allocation equality. Live CPU remains higher for tasks, collections and arrays; checked-store range work is a cross-workload target. Preserve Unicode/reflection/JSON helper admission gaps and the cancellation batching limit separately. Guarded controls, sustained JIT, pauses and scaling remain open; no default change.
+
 **Owned lookup follow-up (2026-10-25):** Retain a private last-allocation range hint
 only while the existing exact-base proof is valid. Cached/uncached safety suites and
 a stale-interior-header negative control pass. Matched plaintext/JSON controls show

@@ -38,3 +38,8 @@ The current allocation totals are unchanged by the range cache. Its improvement 
 lookup/CPU work, not an allocation improvement. Remaining out-of-arena store calls,
 repeated publications and metadata work should be assessed across these families
 before choosing the next general runtime optimization.
+
+Follow-up: [sustained ordinary measurements](../concurrent-workloads/README.md) now
+cover tasks, collections and array tour with matched sync/live AOT allocation and
+CPU evidence. The eight-sample build/pilot matrix retains shared helper gaps and
+a cancellation batching failure; those workloads are not performance-qualified.
