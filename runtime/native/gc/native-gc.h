@@ -42,6 +42,22 @@ neoclr_gc_profile neoclr_gc_profile_v1(void);
 /* Reset diagnostics only, between operations; never changes heap/GC state.
  * Disabled builds return zero diagnostics and reset is a no-op. */
 void neoclr_gc_profile_reset_v1(void);
+/* Opt-in origin diagnostics: requests on the calling native thread, not completed
+ * collections. Worker delegation may collect elsewhere; direct conditional/participant
+ * entries bypass these origins. Counts include failed dispatches. Disabled builds
+ * return zero and allocate no trigger TLS. Reset only between operations; it never
+ * changes pacing or heap state. */
+enum {
+    NEOCLR_GC_TRIGGER_DIRECT, NEOCLR_GC_TRIGGER_IDLE, NEOCLR_GC_TRIGGER_PRESSURE,
+    NEOCLR_GC_TRIGGER_MANAGED, NEOCLR_GC_TRIGGER_CONTEXT, NEOCLR_GC_TRIGGER_EPOCH,
+    NEOCLR_GC_TRIGGER_ALLOCATION, NEOCLR_GC_TRIGGER_PUBLICATION, NEOCLR_GC_TRIGGER_COUNT
+};
+typedef struct {
+    uint64_t requests[NEOCLR_GC_TRIGGER_COUNT], failures[NEOCLR_GC_TRIGGER_COUNT];
+} neoclr_gc_trigger_profile;
+neoclr_gc_trigger_profile neoclr_gc_trigger_profile_v1(void);
+void neoclr_gc_trigger_profile_reset_v1(void);
+
 /* Private lookup diagnostics, enabled with NEOCLR_GC_PROFILE. Counts are
  * cumulative per native thread, including failed operations. Reset only between
  * operations; it never changes caches, heap state or ordinary statistics. */

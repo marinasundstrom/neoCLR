@@ -279,3 +279,24 @@ The interpreter uses its own heap and is not covered by these native counters.
 keep diagnostic runs separate from uninstrumented capacity measurements. New tests
 are registered in `validate-native-gc.py`; local qualification covers macOS ARM64,
 not a new Windows execution claim.
+
+## Native collection-request origins — 2026-10-24
+
+`neoclr_gc_trigger_profile_v1()` returns separate `requests` and `failures` arrays,
+indexed by `NEOCLR_GC_TRIGGER_*`: DIRECT, IDLE, PRESSURE, MANAGED, CONTEXT, EPOCH,
+ALLOCATION and PUBLICATION. Enabled by `NEOCLR_GC_PROFILE` consistently in root and
+collector units; disabled getters return zero without trigger TLS. The enabled
+snapshot costs 128 thread-local bytes. Existing profile/lookup layouts are unchanged.
+`neoclr_gc_trigger_profile_reset_v1()` resets only origin diagnostics, between operations.
+
+These count dispatch requests on the calling thread, including failed dispatches.
+DIRECT includes explicit native and unpaced root requests; MANAGED is GC.Collect;
+IDLE bypasses pacing; PRESSURE is a rooted allocation retry after native-memory-limit
+failure, excluding impossible blocks. Paced collection selects the first failed
+condition: context identity, intervening collection epoch, 256-allocation budget,
+then 1,024-publication budget. Classification does not change these policies.
+
+Do not sum origins as completed collections in general: direct conditional/participant
+entry bypasses origins and worker delegation may collect on another thread. Pause
+attempts remain the separate collector-entry measure. No reason-specific timing or
+attach-protocol extension is implemented. [Plain/JSON AOT/JIT results and qualification](../../../benchmarks/execution/gc-triggers/README.md).

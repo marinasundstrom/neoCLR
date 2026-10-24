@@ -11,6 +11,25 @@
 #include <time.h>
 #endif
 #endif
+#ifdef NEOCLR_GC_PROFILE
+static _Thread_local neoclr_gc_trigger_profile trigger_profile;
+static int32_t collect_requested(neoclr_aot_context *, const neoclr_probe_frame *, unsigned);
+#define GC_REQUEST(c, h, reason) collect_requested(c, h, reason)
+#else
+#define GC_REQUEST(c, h, reason) neoclr_gc_collect_v1(c, h)
+#endif
+neoclr_gc_trigger_profile neoclr_gc_trigger_profile_v1(void) {
+#ifdef NEOCLR_GC_PROFILE
+    return trigger_profile;
+#else
+    return (neoclr_gc_trigger_profile){0};
+#endif
+}
+void neoclr_gc_trigger_profile_reset_v1(void) {
+#ifdef NEOCLR_GC_PROFILE
+    trigger_profile = (neoclr_gc_trigger_profile){0};
+#endif
+}
 static _Thread_local neoclr_gc_profile profile;
 static _Thread_local neoclr_gc_lookup_profile lookup_profile;
 neoclr_gc_lookup_profile neoclr_gc_lookup_profile_v1(void) { return lookup_profile; }
@@ -422,7 +441,7 @@ int32_t neoclr_gc_allocate_rooted_values_v1(neoclr_aot_context *context,
     for (uint32_t i = 0; i < count; i++) slots[i] = (neoclr_probe_storage){&values[i], 8, 0};
     neoclr_probe_frame helper = {.previous = (neoclr_probe_frame *)boundary,
         .context = context, .storage = slots, .storage_count = count};
-    status = neoclr_gc_collect_v1(context, count ? &helper : boundary);
+    status = GC_REQUEST(context, count ? &helper : boundary, NEOCLR_GC_TRIGGER_PRESSURE);
     if (status) return status;
     return neoclr_gc_allocate_v1(&context->text, bytes, kind, output);
 }
@@ -565,12 +584,27 @@ int32_t neoclr_gc_worker_roots_check_v1(neoclr_aot_context *context, uint64_t ha
     return found == 1 ? 0 : 3;
 }
 #endif
+#ifdef NEOCLR_GC_PROFILE
+static int32_t collect_dispatch(neoclr_aot_context *context, const neoclr_probe_frame *head) {
+#else
 int32_t neoclr_gc_collect_v1(neoclr_aot_context *context, const neoclr_probe_frame *head) {
+#endif
 #ifdef NEOCLR_WORKER_GC
     if (neoclr_gc_worker_collect_hook) return neoclr_gc_worker_collect_hook(context, head);
 #endif
     return neoclr_gc_collect_conditional_v1(context, head, NULL, 0);
 }
+#ifdef NEOCLR_GC_PROFILE
+static int32_t collect_requested(neoclr_aot_context *context, const neoclr_probe_frame *head, unsigned reason) {
+    trigger_profile.requests[reason]++;
+    int32_t status = collect_dispatch(context, head);
+    trigger_profile.failures[reason] += status != 0;
+    return status;
+}
+int32_t neoclr_gc_collect_v1(neoclr_aot_context *context, const neoclr_probe_frame *head) {
+    return collect_requested(context, head, NEOCLR_GC_TRIGGER_DIRECT);
+}
+#endif
 static int32_t collect_indexed(neoclr_aot_context *context,
     const neoclr_probe_frame *head, neoclr_gc_conditional_root *conditional, uint32_t conditional_count,
     block_index index) {
@@ -877,8 +911,13 @@ int32_t neoclr_gc_collect_conditional_v1(neoclr_aot_context *context,
  * The bounded 256-allocation / 1024-publication budget amortizes tracing on the
  * plain HTTP path; see benchmarks/http-server/primitive-comparison/pacing.
  * This is a publication budget, not a wall-clock finalization guarantee. */
+#ifdef NEOCLR_GC_PROFILE
+static int32_t collect_idle(neoclr_aot_context *context, const neoclr_probe_frame *boundary, unsigned reason) {
+    int32_t status = collect_requested(context, boundary, reason);
+#else
 int32_t neoclr_gc_idle_v1(neoclr_aot_context *context, const neoclr_probe_frame *boundary) {
     int32_t status = neoclr_gc_collect_v1(context, boundary);
+#endif
     if (!status) {
         gc_state.pacing.context = context;
         gc_state.pacing.allocations = gc_state.statistics.allocations;
@@ -887,6 +926,18 @@ int32_t neoclr_gc_idle_v1(neoclr_aot_context *context, const neoclr_probe_frame 
     }
     return status;
 }
+#ifdef NEOCLR_GC_PROFILE
+int32_t neoclr_gc_idle_v1(neoclr_aot_context *context, const neoclr_probe_frame *boundary) {
+    return collect_idle(context, boundary, NEOCLR_GC_TRIGGER_IDLE);
+}
+int32_t neoclr_gc_paced_collect_v1(neoclr_aot_context *context, const neoclr_probe_frame *boundary) {
+    unsigned reason = gc_state.pacing.context != context ? NEOCLR_GC_TRIGGER_CONTEXT :
+        gc_state.statistics.collections != gc_state.pacing.collections ? NEOCLR_GC_TRIGGER_EPOCH :
+        gc_state.statistics.allocations - gc_state.pacing.allocations >= 256 ? NEOCLR_GC_TRIGGER_ALLOCATION :
+        NEOCLR_GC_TRIGGER_PUBLICATION;
+    return collect_idle(context, boundary, reason);
+}
+#endif
 int32_t neoclr_gc_boundary_v1(neoclr_aot_context *context, const neoclr_probe_frame *boundary) {
     if (!context || gc_state.cleanup_active || boundary != neoclr_root_probe_head_v1() ||
         (boundary && boundary->context != context)) return 3;
@@ -945,5 +996,5 @@ int32_t neoclr_string_intern_rooted_v1(const neoclr_aot_text *text, neoclr_aot_t
 /* Managed GC.Collect is available independently of runtime suspension. */
 int32_t neoclr_gc_collect_managed_v1(neoclr_aot_context *c, void *out) {
     (void)out;
-    return neoclr_gc_collect_v1(c, neoclr_root_probe_head_v1());
+    return GC_REQUEST(c, neoclr_root_probe_head_v1(), NEOCLR_GC_TRIGGER_MANAGED);
 }

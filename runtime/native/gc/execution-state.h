@@ -29,13 +29,22 @@ __attribute__((visibility("hidden")))
 #endif
 extern _Thread_local neoclr_execution_state neoclr_execution_state_v1;
 
+#ifdef NEOCLR_GC_PROFILE
+/* Diagnostic-only slow path classifies the first failed pacing condition. */
+int32_t neoclr_gc_paced_collect_v1(neoclr_aot_context *, const neoclr_probe_frame *);
+#endif
+
 static inline int32_t neoclr_paced_boundary(neoclr_execution_state *state,
     neoclr_aot_context *context, const neoclr_probe_frame *boundary) {
     if (state->gc.pacing.context == context &&
         state->gc.statistics.collections == state->gc.pacing.collections &&
         state->gc.statistics.allocations - state->gc.pacing.allocations < 256 &&
         ++state->gc.pacing.boundaries < 1024) return 0;
+#ifdef NEOCLR_GC_PROFILE
+    return neoclr_gc_paced_collect_v1(context, boundary);
+#else
     return neoclr_gc_idle_v1(context, boundary);
+#endif
 }
 /* Only immediately after root publication's head/context proof, with no callback,
  * guest execution or collection intervening. Ordinary native callers stay checked. */

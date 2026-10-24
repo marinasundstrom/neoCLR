@@ -688,3 +688,13 @@ reducing candidate-lookup overhead is different from avoiding nonreference field
 through authoritative physical layouts. It does not prove a precise-layout speedup
 or justify incomplete pointer masks. [Source snapshots, differential tests and paired
 evidence](../../benchmarks/execution/scan-batches/README.md).
+
+### Collection-trigger measurement — 2026-10-24
+
+The existing CLR/Go allocation-policy comparison requires separating allocation
+pressure from neoCLR's publication-count fairness budget. New opt-in request-origin
+counters show the latter dominates request-phase collections for plain/JSON in owned
+JIT/AOT hosts. This is frequency evidence, not proof that raising a budget improves
+capacity or that current pauses have equal costs. A budget experiment must measure
+retained memory and cleanup delay alongside throughput; precise-layout work remains
+separate. [Measurements and attribution limits](../../benchmarks/execution/gc-triggers/README.md).

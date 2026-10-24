@@ -1,0 +1,186 @@
+{
+  "plain": {
+    "aot": {
+      "requestDelta": 32,
+      "triggersPerRequest": {
+        "direct": 0.0,
+        "idle": 1.0,
+        "pressure": 0.0,
+        "managed": 0.0,
+        "context": 0.0,
+        "epoch": 0.0,
+        "allocation": 0.0,
+        "publication": 3.0
+      },
+      "gcPerRequest": {
+        "attempts": 4.0,
+        "failures": 0.0,
+        "allocations": 208.0,
+        "publications": 3676.0,
+        "nanoseconds": 56968.75,
+        "allocated_bytes": 15995.0
+      },
+      "peakLiveBytes": 45490,
+      "peakArenaBytes": 73408,
+      "zeroRequest": {
+        "triggers": [
+          2,
+          7,
+          0,
+          0,
+          1,
+          0,
+          2,
+          2
+        ],
+        "gc": [
+          14,
+          0,
+          537,
+          4458,
+          161000,
+          40987,
+          58176,
+          43461
+        ]
+      }
+    },
+    "jit": {
+      "requestDelta": 32,
+      "triggersPerRequest": {
+        "direct": 0.0,
+        "idle": 1.0,
+        "pressure": 0.0,
+        "managed": 0.0,
+        "context": 0.0,
+        "epoch": 0.0,
+        "allocation": 0.0,
+        "publication": 3.0
+      },
+      "gcPerRequest": {
+        "attempts": 4.0,
+        "failures": 0.0,
+        "allocations": 208.0,
+        "publications": 3676.0,
+        "nanoseconds": 66593.75,
+        "allocated_bytes": 15995.0
+      },
+      "peakLiveBytes": 45490,
+      "peakArenaBytes": 73408,
+      "zeroRequest": {
+        "triggers": [
+          2,
+          4,
+          0,
+          0,
+          1,
+          0,
+          2,
+          2
+        ],
+        "gc": [
+          11,
+          0,
+          537,
+          4458,
+          117000,
+          40987,
+          58176,
+          43461
+        ]
+      }
+    }
+  },
+  "json": {
+    "aot": {
+      "requestDelta": 32,
+      "triggersPerRequest": {
+        "direct": 0.0,
+        "idle": 1.03125,
+        "pressure": 0.0,
+        "managed": 0.0,
+        "context": 0.0,
+        "epoch": 0.0,
+        "allocation": 0.0,
+        "publication": 5.0
+      },
+      "gcPerRequest": {
+        "attempts": 6.03125,
+        "failures": 0.0,
+        "allocations": 457.0,
+        "publications": 5535.0,
+        "nanoseconds": 115812.5,
+        "allocated_bytes": 26173.0
+      },
+      "peakLiveBytes": 52602,
+      "peakArenaBytes": 79552,
+      "zeroRequest": {
+        "triggers": [
+          2,
+          5,
+          0,
+          0,
+          1,
+          0,
+          2,
+          2
+        ],
+        "gc": [
+          12,
+          0,
+          560,
+          4458,
+          124000,
+          40987,
+          57896,
+          43933
+        ]
+      }
+    },
+    "jit": {
+      "requestDelta": 32,
+      "triggersPerRequest": {
+        "direct": 0.0,
+        "idle": 1.0,
+        "pressure": 0.0,
+        "managed": 0.0,
+        "context": 0.0,
+        "epoch": 0.0,
+        "allocation": 0.0,
+        "publication": 5.0
+      },
+      "gcPerRequest": {
+        "attempts": 6.0,
+        "failures": 0.0,
+        "allocations": 457.0,
+        "publications": 5535.0,
+        "nanoseconds": 115156.25,
+        "allocated_bytes": 26173.0
+      },
+      "peakLiveBytes": 52602,
+      "peakArenaBytes": 79552,
+      "zeroRequest": {
+        "triggers": [
+          2,
+          4,
+          0,
+          0,
+          1,
+          0,
+          2,
+          2
+        ],
+        "gc": [
+          11,
+          0,
+          560,
+          4458,
+          121000,
+          40987,
+          57896,
+          43933
+        ]
+      }
+    }
+  }
+}

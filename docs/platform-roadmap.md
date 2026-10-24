@@ -6755,3 +6755,10 @@ scalar tracing is restored; exhaustive payload/partial-word/interior-root tests 
 the standard validator. Authoritative physical layouts and collection-trigger cost
 separation remain investigation work, not implemented changes or new priorities.
 [Reproducible evidence](../benchmarks/execution/scan-batches/README.md).
+
+Opt-in GC request-origin diagnostics now distinguish context/epoch, allocation and
+publication budgets from direct/idle/managed/pressure requests. Plain/JSON request
+phases show 3/5 publication-budget collections plus about one idle collection, with
+no allocation-budget or pressure requests. Defaults remain unchanged; a larger
+publication budget is an evidence-backed experiment, requiring retention, cleanup
+and latency checks. [Data and attribution limits](../benchmarks/execution/gc-triggers/README.md).

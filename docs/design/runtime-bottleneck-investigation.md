@@ -349,3 +349,13 @@ shows added scalar control work rather than the hoped-for SIMD filter. This reje
 these implementations, not all batching. The useful broader questions remain how to
 avoid scanning scalar fields using authoritative layouts, and how much collection
 work comes from each trigger before adjusting allocation/publication/idle policy.
+
+[Collection-origin diagnostics](../../benchmarks/execution/gc-triggers/README.md)
+now separate trigger frequency from scan implementation cost. At 32→64 requests,
+plaintext adds three publication-budget and one idle collection/request; JSON adds
+five publication-budget and about one idle collection. Neither adds allocation-budget
+or pressure requests in the owned 1 MiB hosts. JIT/AOT agree on the main counts.
+This supports testing a larger publication budget before more scan-loop changes,
+while retaining pressure/idle behavior and measuring retention/cleanup/latency.
+Counters are opt-in caller-thread requests, not generally collector completions;
+worker reason transfer and per-reason timing remain open. Defaults are unchanged.
