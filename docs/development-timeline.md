@@ -22228,3 +22228,10 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   21–22% lower JIT selection/verification time and 10.4% lower HTTP JIT readiness
   time. Task/collection/HTTP AOT objects are byte-identical. These are loading/startup
   improvements, not a warm native throughput claim. [Implementation evidence](../benchmarks/execution/owner-index/README.md).
+
+- Further continuation: a fresh profile leads the assistant to reuse owner candidates
+  in interface-member and Self-signature checks. All 106 focused tests and the
+  executable cohorts pass; separate paired results show about 15% lower interpreter
+  process/JIT selection time and 4.2% lower HTTP JIT readiness. Generated AOT objects
+  remain byte-identical. [Evidence and fallback tradeoffs](../benchmarks/execution/interface-owner-index/README.md).
+  Warm native request-path improvement remains an open, separate objective.

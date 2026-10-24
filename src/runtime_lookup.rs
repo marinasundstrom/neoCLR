@@ -134,6 +134,19 @@ pub(crate) fn owned_functions(
     })
 }
 
+/// Candidate rows only: callers must still check ownership and their contract.
+/// Outside a matching scope, preserve the complete linear candidate sequence.
+pub(crate) fn functions_for_owner<'a>(
+    module: &'a Module,
+    owner: &crate::metadata::TypeDef,
+) -> impl Iterator<Item = &'a crate::metadata::Function> {
+    let rows = owned_functions(module, owner);
+    let count = rows
+        .as_ref()
+        .map_or(module.functions.len(), |rows| rows.len());
+    (0..count).map(move |index| &module.functions[rows.as_ref().map_or(index, |rows| rows[index])])
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

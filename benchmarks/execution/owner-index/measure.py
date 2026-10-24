@@ -11,6 +11,8 @@ import time
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--output', type=Path, required=True)
+parser.add_argument('--baseline-runtime', type=Path, default=Path('target/gc-mode-comparison-final/baseline-neoclr'))
+parser.add_argument('--baseline-codegen', type=Path, default=Path('target/gc-mode-comparison-final/baseline-codegen'))
 args = parser.parse_args()
 out = args.output.resolve()
 out.mkdir(parents=True, exist_ok=False)
@@ -43,8 +45,8 @@ try:
                                     and not x['diagnostic'] and (mode == 'interpreter' or x['policy'] == 'paced'))
                     command = original['command'].copy()
                     binary = 'neoclr' if mode == 'interpreter' else 'neoclr-codegen'
-                    command[0] = str(root / ('target/release/' + binary if variant == 'candidate'
-                                            else 'target/gc-mode-comparison-final/baseline-' + ('codegen' if mode == 'jit' else 'neoclr')))
+                    command[0] = str(root / ('target/release/' + binary) if variant == 'candidate'
+                                     else (args.baseline_codegen if mode == 'jit' else args.baseline_runtime).resolve())
                     row = run(command, sample=case['sample'], mode=mode, variant=variant, repetition=repetition)
                     assert row['stdout'] == case['expected']
                     if mode == 'jit':
@@ -55,8 +57,8 @@ try:
         hashes = {}
         for variant in ['baseline', 'candidate']:
             command = original.copy()
-            command[0] = str(root / ('target/release/neoclr-codegen' if variant == 'candidate'
-                                    else 'target/gc-mode-comparison-final/baseline-codegen'))
+            command[0] = str(root / 'target/release/neoclr-codegen' if variant == 'candidate'
+                             else args.baseline_codegen.resolve())
             obj = out / f"{case['sample']}-{variant}.o"
             command[4] = str(obj)
             row = run(command, sample=case['sample'], mode='aot-compile', variant=variant)

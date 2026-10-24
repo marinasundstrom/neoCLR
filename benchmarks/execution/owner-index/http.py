@@ -14,6 +14,7 @@ import time
 
 p = argparse.ArgumentParser(description=__doc__)
 p.add_argument('--output', type=Path, required=True)
+p.add_argument('--baseline-codegen', type=Path, default=Path('target/gc-mode-comparison-final/baseline-codegen'))
 a = p.parse_args()
 a.output.mkdir(parents=True, exist_ok=False)
 root = Path(__file__).resolve().parents[3]
@@ -35,8 +36,8 @@ try:
     original = next(x['command'] for x in previous['trials'] if x['label']=='jit-paced')
     for variant in ['baseline', 'candidate', 'candidate', 'baseline']:
         command = original.copy()
-        command[0] = str(root/('target/release/neoclr-codegen' if variant=='candidate'
-                              else 'target/gc-mode-comparison-final/baseline-codegen'))
+        command[0] = str(root/'target/release/neoclr-codegen' if variant=='candidate'
+                         else a.baseline_codegen.resolve())
         started = time.perf_counter()
         proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         lines, errors, events = [], [], queue.Queue()

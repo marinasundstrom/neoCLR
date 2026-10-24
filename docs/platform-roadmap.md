@@ -6594,3 +6594,15 @@ objects remain byte-identical; warm native request throughput is unchanged by
 this Rust loading optimization. [Evidence and limits](../benchmarks/execution/owner-index/README.md).
 Native request-path profiling and GC work remain distinct follow-ups; broader
 milestone sequencing is unchanged.
+
+
+### Interface owner-candidate reuse — 2026-10-24
+
+The follow-up startup profile identifies repeated interface member-owner resolution.
+Interface obligations and Self-signature queries now reuse the existing scoped
+index without caching conformance or bypassing signature checks. All 106 focused
+tests pass. A separate paired local cohort reduces interpreter process and JIT
+selection time about 15%, and HTTP JIT readiness 4.2%. Three AOT objects remain
+byte-identical; warm native throughput is not measured. [Evidence and tradeoffs](../benchmarks/execution/interface-owner-index/README.md).
+The next HTTP performance work should return to warm request-path profiling; these
+common-loading improvements do not establish a GC or scheduler throughput gain.

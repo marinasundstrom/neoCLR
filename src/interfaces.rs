@@ -197,18 +197,18 @@ pub(crate) fn satisfies_self_bound(
 fn has_self_contract(module: &Module, interface: &Type) -> Result<bool, Fault> {
     let interfaces = closure(module, interface)?;
     Ok(interfaces.iter().any(Type::contains_self)
-        || module.functions.iter().any(|method| {
-            // Most methods have no implementing-type placeholders. Reject them
-            // before resolving owners across the inherited interface closure.
-            crate::self_types::signature_has_self(method)
-                && method.owner.as_ref().is_some_and(|owner| {
-                    interfaces.iter().any(|ty| {
-                        module
-                            .type_definition(owner)
-                            .zip(module.type_definition(ty))
-                            .is_some_and(|(left, right)| std::ptr::eq(left, right))
-                    })
-                })
+        || interfaces.iter().any(|interface| {
+            let Some(definition) = module.type_definition(interface) else {
+                return false;
+            };
+            crate::runtime_lookup::functions_for_owner(module, definition).any(|method| {
+                crate::self_types::signature_has_self(method)
+                    && method
+                        .owner
+                        .as_ref()
+                        .and_then(|owner| module.type_definition(owner))
+                        .is_some_and(|owner| std::ptr::eq(owner, definition))
+            })
         }))
 }
 
@@ -397,7 +397,7 @@ fn ensure_members(module: &Module, concrete: &Type, interface: &Type) -> Result<
     for inherited in closure(module, interface)? {
         let inherited = inherited.substitute_self(&owner)?;
         let definition = interface_definition(module, &inherited)?;
-        for method in &module.functions {
+        for method in crate::runtime_lookup::functions_for_owner(module, definition) {
             if method
                 .owner
                 .as_ref()
@@ -896,6 +896,60 @@ mod self_contract_tests {
              .type Noise\n.method static Read() -> Int32\nldc.i4 42\nret\n.end\n.end\n",
         )
         .unwrap()
+    }
+
+    #[test]
+    fn indexed_members_preserve_inherited_contracts_and_rejections() {
+        let module = crate::assemble(
+            r#"
+.module MemberCandidates
+.interface Read
+.method instance Get() -> Int32
+.end
+.end
+.interface Child
+.implements Read
+.end
+.type class Sample
+.implements Child
+.method instance Get() -> Int32
+ldc.i4 42
+ret
+.end
+.end
+"#,
+        )
+        .unwrap();
+        let concrete = Type::from_name("Sample");
+        let interface = Type::from_name("Child");
+        let check = |module: &Module| {
+            let expected =
+                ensure_implementation(module, &concrete, &interface).map_err(|fault| fault.message);
+            crate::runtime_lookup::with_module(module, || {
+                assert_eq!(
+                    ensure_implementation(module, &concrete, &interface)
+                        .map_err(|fault| fault.message),
+                    expected
+                );
+            });
+            expected
+        };
+        assert!(check(&module).is_ok());
+        for variant in 0..4 {
+            let mut invalid = module.clone();
+            let method = invalid
+                .functions
+                .iter_mut()
+                .find(|f| f.name == "Sample.Get")
+                .unwrap();
+            match variant {
+                0 => method.returns = Type::String,
+                1 => method.receiver_readonly = true,
+                2 => method.visibility = Visibility::Private,
+                _ => method.name = "Sample.Missing".into(),
+            }
+            assert!(check(&invalid).is_err());
+        }
     }
 
     #[test]

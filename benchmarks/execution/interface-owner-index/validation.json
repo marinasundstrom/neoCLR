@@ -1,0 +1,38 @@
+{
+  "baselineRevision": "ceefedb30",
+  "unchangedDependencies": {
+    "/Users/robert/Projects/neoclr/target/transient-handoff-corpus-wrapped/tasks/bin/neoclr/App.dll": "fb3d1f80bd97ce0c15042dfbfed1bfcebfbe0b893f272fe9cca44b74cba7ae19",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.runtime.neox": "0c72a8656e7158d6bb2f31c0b019d8747dd61a6c4127b278155e104de437769b",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Runtime.dll": "ac3ddea188cd6e7970869248c2501acc7f6f7a1bfca598c339ea3257d3fc1d4c",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Data.dll": "846771708d06ae117fd6eb3019fbd7805ba9e3794b456c7b89d637893c7954a6",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Networking.dll": "d2c27984c00e7d89eabcb9ced7a0004557077cbef57fdb4292e264ddf2a4a4b2",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Web.dll": "434d63e3191c7a496c263dcd454807ddd32979cd4bb52bf9005af60178d7313e",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Data.PostgreSql.dll": "d456bee492ff5836a4e9f1297157f8d4fa2bfacb81cf6d9bfd2e0d99ce89da09",
+    "/Users/robert/Projects/neoclr/target/transient-handoff-corpus-wrapped/collections/bin/neoclr/App.dll": "4fb57fa8447f05a1c775d15ed1a18d33d9adcea65f2d828587cda1b92d8dcd30"
+  },
+  "platform": "Darwin Roberts-MacBook-Pro.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:27 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T8103 arm64",
+  "checks": [
+    {
+      "command": "cargo test --release --lib interfaces::self_contract_tests",
+      "passed": 2,
+      "ignored": 1,
+      "ignoredReason": "Manual timing probe; performance measured with paired executable cohorts instead."
+    },
+    {
+      "command": "cargo test --release --test interface_inheritance --test explicit_interfaces --test default_interfaces --test nominal_interfaces --test interface_helpers --test interface_variance --test self_types --test boxed_interfaces --test class_interfaces --test common_interfaces",
+      "passed": 104
+    }
+  ],
+  "inputs": {
+    "src/interfaces.rs": "46d21f118bba008ff3549f8ca92a08b68a941555a35c99a02116f43a6d019229",
+    "src/runtime_lookup.rs": "176a84e63eb31b8cba9deeb8fbeafac37d2aae62ce9a8947a9384ddcbdc99ef3",
+    "target/owner-index-followup/baseline-neoclr": "503bb511f59dc330c84e341ac1f87c9c5b855b2cbbcf2aebdaf6e0df303f2b82",
+    "target/owner-index-followup/baseline-codegen": "6236231f095b08c30b36e3d8d43f62a0eae3529e4f6fa397ef0c13b646fdfc53",
+    "target/release/neoclr": "34f96553d8100744698f048b9c11db6c2768e575239be74ba0e16945fb74f4ac",
+    "target/release/neoclr-codegen": "3aa9b5f94939d51e9e297221dab052118be57bed7ac6452665c95c2b47227213",
+    "benchmarks/execution/owner-index/measure.py": "64d5e20a6e4d37899237daebc20cf633bc9aaafaf3f13764c491574a50a866ec",
+    "benchmarks/execution/owner-index/http.py": "4f9fd1167d0a449c81174c969e0b4c3a625ea3d359d00ffe6f4aa6f534866ee0",
+    "target/gc-mode-comparison-final/paced-False.dylib": "4b45ca46e4635a36137f9263e8da1d416d7258854f63c67791781d28bd75b498",
+    "target/primitive-comparison-refresh/client": "3cb6aa638332295893b82a57e279bf42f62685e4bee6471c37fc163f4a78a579"
+  }
+}

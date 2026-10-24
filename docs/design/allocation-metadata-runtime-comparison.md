@@ -468,3 +468,21 @@ lazy map and function-row storage. Full signature caching would need more generi
 state and invalidation; retaining the linear fallback provides a differential
 oracle. [Validation and paired execution evidence](../../benchmarks/execution/owner-index/README.md)
 separate common loading/build costs from native HTTP request execution.
+
+
+### Interface member candidate reuse — 2026-10-24
+
+A fresh post-owner-index profile identifies interface member validation as another
+repeated owner-resolution path. Interface obligations and Self-signature queries
+now reuse the same immutable-scope owner candidates, retaining member order,
+owner/signature checks, generic and Self substitution, explicit/default selection
+and helper exclusions. No conformance result is cached. The fallback remains a
+checked linear scan; unscoped Self queries traverse the closure before methods,
+which can repeat signature scans when several interfaces are involved.
+
+This extends the existing CoreCLR-inspired shared-resolution comparison without
+changing type semantics or adding another index. It trades earlier use of the
+existing lazy owner map for fewer scoped method scans. A full conformance cache
+would require additional instantiated-identity and lifetime obligations.
+[Profile, validation and measurements](../../benchmarks/execution/interface-owner-index/README.md)
+keep loading/startup improvements separate from native request execution.
