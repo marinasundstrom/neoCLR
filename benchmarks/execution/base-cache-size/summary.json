@@ -1,0 +1,110 @@
+{
+  "aotOneOwner": {
+    "baseline-w1": {
+      "requestsPerSecond": 4323.700000000001,
+      "range": [
+        4309.8,
+        4337.6
+      ],
+      "cpuMicrosecondsPerResponse": 226.87968654966593,
+      "cpuRange": [
+        226.5821924365725,
+        227.17718066275935
+      ],
+      "p99Milliseconds": [
+        8.56825,
+        8.975916
+      ]
+    },
+    "candidate-w1": {
+      "requestsPerSecond": 4450.2,
+      "range": [
+        4428.7,
+        4471.7
+      ],
+      "cpuMicrosecondsPerResponse": 220.39862835018283,
+      "cpuRange": [
+        220.0909447348768,
+        220.70631196548885
+      ],
+      "p99Milliseconds": [
+        7.992834,
+        9.068875
+      ]
+    },
+    "throughputGainPercent": 2.9257349029766067,
+    "cpuReductionPercent": 2.8566057623075625
+  },
+  "aotFourOwners": {
+    "baseline-w4": {
+      "requestsPerSecond": 11060.349999999999,
+      "range": [
+        11036.8,
+        11083.9
+      ],
+      "cpuMicrosecondsPerResponse": 318.3719349716232,
+      "cpuRange": [
+        317.65604760545193,
+        319.0878223377944
+      ],
+      "p99Milliseconds": [
+        3.922583,
+        3.619084
+      ]
+    },
+    "candidate-w4": {
+      "requestsPerSecond": 11399.85,
+      "range": [
+        11399.7,
+        11400
+      ],
+      "cpuMicrosecondsPerResponse": 308.62848183601534,
+      "cpuRange": [
+        308.51960598460096,
+        308.7373576874298
+      ],
+      "p99Milliseconds": [
+        3.403583,
+        3.853834
+      ]
+    },
+    "throughputGainPercent": 3.069523116357087,
+    "cpuReductionPercent": 3.060399509296041
+  },
+  "jitOneOwner": {
+    "baseline": {
+      "requestsPerSecond": 2278.55,
+      "range": [
+        2241.8,
+        2315.3
+      ],
+      "cpuMicrosecondsPerResponse": 436.86599154800024,
+      "cpuRange": [
+        429.9065420560748,
+        443.8254410399257
+      ],
+      "p99Milliseconds": [
+        19.114083,
+        21.829458
+      ]
+    },
+    "candidate": {
+      "requestsPerSecond": 2351.9,
+      "range": [
+        2351,
+        2352.8
+      ],
+      "cpuMicrosecondsPerResponse": 423.6079101682201,
+      "cpuRange": [
+        423.00346608191273,
+        424.2123542545275
+      ],
+      "p99Milliseconds": [
+        19.870375,
+        19.760834
+      ]
+    },
+    "throughputGainPercent": 3.2191525312150304,
+    "cpuReductionPercent": 3.034816542437002
+  }
+}

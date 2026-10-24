@@ -711,3 +711,17 @@ It avoids repeated scanning without skipping root updates. Costs are fourfold
 publication-count cleanup delay and a measured 8–13 KB arena-extent increase for
 plain/JSON; no wall-clock cleanup guarantee exists. Native JIT/AOT benefit; the
 interpreter is unchanged. [Evidence and limits](../../benchmarks/execution/publication-budget/README.md).
+
+
+### Exact-base cache capacity — 2026-10-24
+
+The post-pacing profile leaves exact-base validation visible. Increase the owned
+heap's positive cache from 64 to 256 entries, preserving exact-address proofs,
+reclamation invalidation and checked misses. This is a bounded extension of the
+existing owner-local cache, not CLR/Go page/span indexing or changed object headers.
+It costs 1.5 KiB/native thread on 64-bit targets; measured descriptor visits fall
+58–74% for plain and 33–42% for JSON. Paired plaintext AOT one/four-owner and owned
+JIT capacity improves about 3%, with similar CPU reduction and overlapping latency
+tails. External heaps, policy and interpreter stay unchanged. Broader heap indexes
+and precise layout work remain distinct architectural tasks.
+[Evidence and validation](../../benchmarks/execution/base-cache-size/README.md).

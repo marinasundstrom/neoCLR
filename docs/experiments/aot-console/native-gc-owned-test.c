@@ -30,18 +30,18 @@ static int exercise(int owned, uint64_t *offsets) {
     return 0;
 }
 static int base_cache(void) {
-    uint64_t heap[4096] = {0}, foreign[8] = {0};
+    uint64_t heap[16384] = {0}, foreign[8] = {0};
     neoclr_aot_context c = {.text = {(unsigned char *)heap, sizeof(heap), 0}};
-    void *items[129];
+    void *items[513];
     CHECK(!neoclr_gc_heap_acquire_v1(&c.text));
-    for (unsigned i = 0; i < 129; i++)
+    for (unsigned i = 0; i < 513; i++)
         CHECK(!neoclr_gc_allocate_v1(&c.text, 96, NEOCLR_GC_BYTES, &items[i]));
     /* More entries than cache slots force eviction. Every lookup must still
      * prove the exact base; an object-shaped header inside payload is not one. */
     uint64_t fake[] = {40, 8, NEOCLR_GC_BYTES, 1, 42};
     memcpy(items[0], fake, sizeof(fake));
     uint64_t bytes = 0; uint32_t kind = 0;
-    for (unsigned i = 0; i < 129; i++) {
+    for (unsigned i = 0; i < 513; i++) {
         CHECK(!neoclr_gc_allocation_info_v1(&c, items[i], &bytes, &kind));
         CHECK(bytes == 96 && kind == NEOCLR_GC_BYTES);
     }
@@ -56,16 +56,16 @@ static int base_cache(void) {
         CHECK(neoclr_gc_host_root_create_v1(&c, invalid[i], &handle) == 3 && handle == 789);
     }
     uint64_t handle = 0;
-    CHECK(!neoclr_gc_host_root_create_owned_v1(&c, items[0], items[128], &handle));
+    CHECK(!neoclr_gc_host_root_create_owned_v1(&c, items[0], items[512], &handle));
     CHECK(!neoclr_gc_host_root_release_v1(&c, handle));
-    neoclr_probe_storage slots[] = {{&items[0], 8, 0}, {&items[128], 8, 0}};
+    neoclr_probe_storage slots[] = {{&items[0], 8, 0}, {&items[512], 8, 0}};
     neoclr_probe_frame frame = {.context = &c, .storage = slots, .storage_count = 2};
     CHECK(!neoclr_gc_allocation_info_v1(&c, items[1], &bytes, &kind));
-    CHECK(!neoclr_gc_allocation_info_v1(&c, items[128], &bytes, &kind));
+    CHECK(!neoclr_gc_allocation_info_v1(&c, items[512], &bytes, &kind));
     neoclr_gc_lookup_profile_reset_v1();
     CHECK(!neoclr_gc_collect_v1(&c, &frame));
     /* Reclaiming many colliding bases must preserve the survivor's proof. */
-    CHECK(!neoclr_gc_allocation_info_v1(&c, items[128], &bytes, &kind));
+    CHECK(!neoclr_gc_allocation_info_v1(&c, items[512], &bytes, &kind));
 #ifdef NEOCLR_GC_PROFILE
     neoclr_gc_lookup_profile lookup = neoclr_gc_lookup_profile_v1();
     CHECK(lookup.base_calls == 1 && lookup.base_cache_hits == 1 && !lookup.base_walks);

@@ -64,7 +64,7 @@ enum { ALLOCATED = 1, MARKED = 2, SCANNED = 4 };
  * or allocation; an address-ordered free list is maintained by allocation and sweep.
  * Free blocks reuse their otherwise-unused bytes word for the next offset + 1;
  * zero terminates the list. Live object descriptors and payloads are unchanged. */
-enum { OWNED_BASE_CACHE_SIZE = 64 };
+enum { OWNED_BASE_CACHE_SIZE = 256 };
 static _Thread_local struct {
     neoclr_aot_text_arena *arena;
     unsigned char *data;

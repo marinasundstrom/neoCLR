@@ -371,3 +371,14 @@ workloads; it does not resolve frame-entry/TLS costs or establish precise-layout
 generational, interpreter or peer-parity gains. Idle collections and shared-worker
 coordination remain unchanged. Longer retention and fourfold publication-count
 cleanup delay are explicit policy tradeoffs; further tuning needs workload evidence.
+
+
+A [post-pacing profile](../../benchmarks/execution/post-pacing-profile/README.md)
+records 10,696 worker samples: TLS resolution 1,476, owned entry 1,063, publication
+636, collection 612 and exact-base validation 532. The coordinator is waiting in
+all its samples. These are wall-clock samples, not CPU shares. Retain idle collection
+pending a cleanup/progress design; its scheduler boundary can reclaim parked stacks
+and abandoned native resources before waiting. A [256-entry exact-base cache](../../benchmarks/execution/base-cache-size/README.md)
+reduces checked descriptor walks with about 3% plaintext capacity/CPU gains at
+1.5 KiB/thread cost. Frame/TLS overhead is now the larger remaining native target;
+this does not establish that caching alone can close the framework gap.

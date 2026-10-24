@@ -469,3 +469,13 @@ plain/JSON arena extent increases about 8/13 KB, and no-allocation cleanup may t
 four times as many publications. Allocation pressure and idle collection remain.
 These are incremental desktop results; JSON throughput and peer parity are unproven.
 See [measurements and policy tradeoffs](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/execution/publication-budget).
+
+
+## Development: exact object lookup
+
+After the pacing change, a larger owner-local exact-address cache reduces repeated
+heap validation walks. Local paired plaintext throughput improves about 3% in AOT
+and owned JIT, with similar CPU savings, at 1.5 KiB extra native storage per thread.
+Latency ranges overlap. Frame and thread-local bookkeeping remain larger targets;
+these incremental results do not establish peer parity.
+See [lookup evidence and tradeoffs](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/execution/base-cache-size).

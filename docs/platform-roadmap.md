@@ -6772,3 +6772,13 @@ counts; arena extent grows about 8/13 KB. Local AOT one/four-owner throughput ga
 shared-worker/async and checked HTTP consumers pass. Fourfold publication-count
 cleanup delay and broader workload/platform qualification remain explicit costs.
 [Evidence](../benchmarks/execution/publication-budget/README.md).
+
+
+**Post-pacing lookup follow-up (2026-10-24):** Fresh worker sampling moves the focus
+to TLS/frame maintenance and exact-base validation; the coordinator is waiting.
+Retain a 256-entry owned exact-base cache (1.5 KiB extra/thread): plain/JSON lookup
+walks fall, and paired plaintext AOT one/four-owner and owned JIT gain about 3%
+throughput with lower CPU. Eviction/reclamation/reuse checks and integrated consumers
+pass. Idle cleanup policy remains; frame/TLS architecture and broader heap indexing
+remain open. [Profile](../benchmarks/execution/post-pacing-profile/README.md) and
+[implementation evidence](../benchmarks/execution/base-cache-size/README.md).
