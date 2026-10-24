@@ -800,7 +800,7 @@ fn managed_options_for(source: &str) -> crate::fault_details::Options {
         options.runtime_async_startmanaged.push(11);
         options.object_base=Some(0);
     }
-    if source.starts_with(".module LiveSocketWrappers") {
+    if source.starts_with(".module LiveSocket") {
         options.socket_listen.push(0);
         options.socket_local_port.push(1);
         options.socket_close.push(2);
@@ -814,6 +814,9 @@ fn managed_options_for(source: &str) -> crate::fault_details::Options {
         options.socket_transfer_result.push(10);
         options.socket_receive_until.push(11);
         options.socket_send_until.push(12);
+        if source.starts_with(".module LiveSocketMemory") {
+            options.socket_memory.extend([8,9,11,12]);
+        }
     }
     if source.starts_with(".module LiveNativeText") {
         options.string_concat.push(0);
@@ -868,7 +871,19 @@ fn managed_input(source: &str) -> neoclr::metadata::Module {
             }
         }
     }
-    if source.starts_with(".module LiveSocketWrappers") {
+    if source.starts_with(".module LiveSocket") {
+        if source.starts_with(".module LiveSocketMemory") {
+            use neoclr::metadata::MemoryViewKind;
+            for (kind,name) in [(MemoryViewKind::Memory,"SocketMemory"),(MemoryViewKind::ReadOnlyMemory,"SocketReadOnlyMemory")] {
+                let mut ty=crate::memory_views::test_module(kind,Type::Byte).types.remove(0);
+                ty.name=name.into();ty.definition=None;input.types.push(ty);
+            }
+            for i in [8,9,11,12] {
+                let name=if i==8 || i==11 { "SocketMemory" } else { "SocketReadOnlyMemory" };
+                input.functions[i].parameters.splice(1..4,[Type::Named(name.into())]);
+                input.functions[i].parameter_names.clear();
+            }
+        }
         let rows: Vec<_> = (0..13).map(|i| serde_json::json!({"name":input.functions[i].name,
             "compiledIndex":i,"definition":{"module":"LiveSocketWrappers","index":i}})).collect();
         let selection=serde_json::json!({"functions":rows});
@@ -980,7 +995,7 @@ fn emit_managed(source: &str) {
                     (5,"live_async_release"),(6,"live_async_iscompleted"),(7,"live_async_wait"),(8,"live_async_start"),(9,"live_async_createowned"),
                     (10,"live_async_currentowner"),(11,"live_async_startmanaged")]);
             }
-            if source.starts_with(".module LiveSocketWrappers") {
+            if source.starts_with(".module LiveSocket") {
                 exports.extend([(0,"live_socket_listen"), (1,"live_socket_local_port"), (2,"live_socket_close"), (3,"live_socket_accept"), (4,"live_socket_connect_result"), (5,"live_socket_cancel"), (6,"live_socket_deadline_after"), (7,"live_socket_deadline_expired"), (8,"live_socket_receive"), (9,"live_socket_send"), (10,"live_socket_transfer_result"), (11,"live_socket_receive_until"), (12,"live_socket_send_until")]);
             }
             for (index, name) in exports {
@@ -1416,6 +1431,33 @@ fn managed_socket_wrappers_run_on_live_collector() {
     let mut code = Code(Some(JITModule::new(builder)));
     let module = code.0.as_mut().unwrap();
     let source=include_str!("../../../benchmarks/execution/concurrent-store/socket-wrappers.neoil");
+    crate::compiler::values::compile_into(&managed_input(source),"Main",Some(&managed_options_for(source)),crate::compiler::Target::MacosArm64,module,true).unwrap();
+    module.finalize_definitions().unwrap();
+    let mut pointers=Vec::new();
+    for name in (0..13).map(|i| format!("neoclr_value_{i}")) {
+        let Some(cranelift_module::FuncOrDataId::Func(id))=module.get_name(&name) else { panic!("async wrapper") };
+        pointers.push(module.get_finalized_function(id));
+    }
+    type Run = unsafe extern "C" fn(*const *const u8) -> i32;
+    let run: libloading::Symbol<Run> = unsafe { library.get(b"managed_socket_consumer") }.unwrap();
+    assert_eq!(unsafe { run(pointers.as_ptr()) }, 0);
+}
+
+#[test]
+fn managed_socket_memory_emit_guarded_results() {
+    emit_managed(include_str!("../../../benchmarks/execution/concurrent-store/socket-memory.neoil"));
+}
+#[test]
+#[ignore = "requires socket host built by validate-socket-memory.py"]
+fn managed_socket_memory_run_on_live_collector() {
+    let library = std::sync::Arc::new(unsafe { libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host")) }.unwrap());
+    unsafe { crate::mutation_admission::require_managed_host(&library) }.unwrap();
+    let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
+    let resolver = library.clone();
+    builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
+    let mut code = Code(Some(JITModule::new(builder)));
+    let module = code.0.as_mut().unwrap();
+    let source=include_str!("../../../benchmarks/execution/concurrent-store/socket-memory.neoil");
     crate::compiler::values::compile_into(&managed_input(source),"Main",Some(&managed_options_for(source)),crate::compiler::Target::MacosArm64,module,true).unwrap();
     module.finalize_definitions().unwrap();
     let mut pointers=Vec::new();

@@ -1,7 +1,7 @@
 """Route the existing loopback fixture through generated socket result wrappers."""
 import argparse
 from pathlib import Path
-p=argparse.ArgumentParser(description=__doc__);p.add_argument('--output',type=Path,required=True);a=p.parse_args()
+p=argparse.ArgumentParser(description=__doc__);p.add_argument('--output',type=Path,required=True);p.add_argument('--memory',action='store_true');a=p.parse_args()
 root=Path(__file__).resolve().parents[3]
 s='''#include "socket-listener.h"
 #include "native-gc.h"
@@ -63,6 +63,11 @@ t=t.replace(a1,'''    CHECK(!neoclr_gc_heap_acquire_v1(&c.text));
     CHECK(!experiment_gc_begin(&c,NULL,NULL,0));
 '''+a1)
 t=t.replace('neoclr_gc_collect_v1(&c, NULL)','collect_and_begin(&c)')
+if a.memory:
+    old='CHECK(!neoclr_socket_send_v1(accepted, array, 8, 1, callback, &c, result) && result[0] == 2 && result[1] == 3);'
+    assert t.count(old)==1
+    t=t.replace(old,'CHECK(neoclr_socket_send_v1(accepted, array, 8, 1, callback, &c, result) == 3);')
+
 a1='    c.fault.code = 4;';assert t.count(a1)==1
 t=t.replace(a1,'''    CHECK(!neoclr_socket_close_v1(listener,&c,result) && result[0]==0);
     CHECK(!neoclr_socket_close_v1(listener,&c,result) && result[0]==0);

@@ -861,3 +861,37 @@ transfers, remaining native services, generated pump/queue/bootstrap entry and s
 heaps remain open. No default switch, throughput gain or race-detector claim. The
 existing CLR rooted native-call comparison and private CLI Value representation still
 apply; no new public API or deliberate semantic divergence is introduced.
+
+
+## Generated socket memory transfers (2026-10-24)
+
+The four persistent memory transfer providers (Receive, Send and their deadline
+variants) now join exact live-GC admission. Receive requires Memory<Byte>; Send
+requires ReadOnlyMemory<Byte>. The existing production binder enforces these
+capabilities. Their flattened owner/offset/length ABI uses the same guarded result
+publication as the array variants. Ordinary compilation and native semantics are
+unchanged; no public API is added.
+
+`socket-memory.neoil` is an assembler scaffold: the test installs retained memory
+metadata and replaces array/offset/count parameters with a single memory parameter
+before production binding and compilation. It clears obsolete parameter names. The
+initial fixture failed metadata validation because it retained those names; preserve
+that failure in `socket-memory-initial-fixture-failure.json.gz`.
+
+`validate-socket-memory.py --runner <codegen-test-runner> --output <fresh-directory>`
+passes 192 loopback cases across forced/paced JIT and optimized/undefined-bounds AOT.
+It reuses the native transfer fixture and generated-wrapper adapter with memory
+providers: sliced receive buffers, empty views, initialization, send snapshots after
+later mutation, deadlines/cancellation, EOF, protected heap results and cleanup.
+A forged out-of-range memory descriptor returns runtime status 3 rather than the
+legacy array path's Value error; this is existing native validation, not a semantic
+change. Failed calls preserve the heap output carrier. Twenty-three mutation tests
+and the exact memory-capability binding test pass; sixteen host-dependent tests are
+skipped by the general filter, with both JIT configurations explicitly executed here.
+Reports, emitted object and generated consumer are retained as `socket-memory-*`.
+
+The existing CLR rooted native-call and persistent memory comparisons apply. Temporary
+CLI memory metadata and flattened native representation remain unchanged; neoCLR owns
+backend qualification and eventual native metadata replacement. Generated pump/queue/
+bootstrap entry, remaining providers and shared heaps remain unqualified. These are
+correctness tests, not throughput measurements or evidence for switching the default.
