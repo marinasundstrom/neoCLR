@@ -1748,3 +1748,102 @@ fn managed_integer_format_runs_on_live_collector() {
     let run: libloading::Symbol<Run> = unsafe { library.get(b"integer_format_consumer") }.unwrap();
     assert_eq!(unsafe { run(functions[0],functions[1],functions[2]) },0);
 }
+
+fn utf8_conversion_input() -> (neoclr::Module, crate::fault_details::Options) {
+    use neoclr::metadata::{MemoryViewKind, Type};
+    let mut input = neoclr::assemble(r#"
+.module LiveUtf8Conversion
+.references ()
+.function neoCLR.Runtime.Utf8Encode(String) -> arrayref<Byte>
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.Utf8Decode(arrayref<Byte>) -> Value
+.methodimpl InternalCall
+.end
+.function Utf8SlicePlaceholder(arrayref<Byte>) -> Value
+ldc.i4 0
+value.pack Int32
+ret
+.end
+.function Main(Int32 value) -> Int32
+ldarg value
+ret
+.end
+"#).unwrap();
+    let mut view = crate::memory_views::test_module(MemoryViewKind::ReadOnlySlice,Type::Byte).types.remove(0);
+    view.name="ReadOnlyBytes".into(); view.definition=None; input.types.push(view);
+    input.functions[2].name="neoCLR.Runtime.Utf8DecodeSlice".into();
+    input.functions[2].impl_flags=0x1000;
+    input.functions[2].body.clear();
+    input.functions[2].parameters=vec![Type::Named("ReadOnlyBytes".into())];
+    let rows: Vec<_> = input.functions.iter().take(3).enumerate().map(|(i,f)|
+        serde_json::json!({"name":f.name,"compiledIndex":i,"definition":{"module":"LiveUtf8Conversion","index":i}})).collect();
+    let selection = serde_json::json!({"functions":rows});
+    assert_eq!(crate::bindings::utf8_text(&mut input,&selection).unwrap().len(),3);
+    for i in 0..3 { input.functions[i].name=format!("Utf8Conversion{i}"); }
+    let mut options = managed_options();
+    options.utf8_encode.push(0);
+    options.utf8_decode.push(1);
+    options.utf8_decode_slice.push(2);
+    (input, options)
+}
+
+#[test]
+fn managed_utf8_conversion_emits_guarded_result() {
+    let (input, mut options) = utf8_conversion_input();
+    for enabled in [false, true] {
+        options.experimental_live_gc_stores = enabled;
+        let mut module = ObjectModule::new(ObjectBuilder::new(isa(target(), true), "utf8", cranelift_module::default_libcall_names()).unwrap());
+        crate::compiler::values::compile_into(&input,"Main",Some(&options),crate::compiler::Target::MacosArm64,&mut module,false).unwrap();
+        for i in 0..3 {
+            let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name(&format!("neoclr_value_{i}")) else { panic!("utf8") };
+            let signature = module.declarations().get_function_decl(id).signature.clone();
+            let export = module.declare_function(&format!("live_utf8_conversion_{i}"), Linkage::Export, &signature).unwrap();
+            let mut context = module.make_context();
+            context.func.signature = signature;
+            let callee = module.declare_func_in_func(id, &mut context.func);
+            let mut fb = FunctionBuilderContext::new();
+            let mut b = FunctionBuilder::new(&mut context.func, &mut fb);
+            let entry = b.create_block();
+            b.append_block_params_for_function_params(entry);
+            b.switch_to_block(entry);
+            let args = b.block_params(entry).to_vec();
+            let call = b.ins().call(callee, &args);
+            let status = b.inst_results(call)[0];
+            b.ins().return_(&[status]);
+            b.seal_all_blocks();
+            b.finalize();
+            module.define_function(export, &mut context).unwrap();
+        }
+        let bytes = module.finish().emit().unwrap();
+        let object = object::File::parse(bytes.as_slice()).unwrap();
+        let imports: Vec<_> = object.symbols().filter(|s| s.is_undefined()).filter_map(|s| s.name().ok()).collect();
+        assert!(imports.iter().any(|s| s.contains("neoclr_utf8_decode_slice_rooted")));
+        assert_eq!(imports.iter().any(|s| s.contains("experiment_gc_store")), enabled);
+        if enabled {
+            if let Some(path) = std::env::var_os("NEOCLR_MUTATION_MANAGED_OBJECT") { std::fs::write(path, bytes).unwrap(); }
+        }
+    }
+}
+
+#[test]
+#[ignore = "requires utf8-conversion host built by validate-utf8-conversion.py"]
+fn managed_utf8_conversion_runs_on_live_collector() {
+    let library = std::sync::Arc::new(unsafe { libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host")) }.unwrap());
+    unsafe { crate::mutation_admission::require_managed_host(&library) }.unwrap();
+    let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
+    let resolver = library.clone();
+    builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
+    let mut code = Code(Some(JITModule::new(builder)));
+    let module = code.0.as_mut().unwrap();
+    let (input, options) = utf8_conversion_input();
+    crate::compiler::values::compile_into(&input,"Main",Some(&options),crate::compiler::Target::MacosArm64,module,true).unwrap();
+    module.finalize_definitions().unwrap();
+    let functions: Vec<_> = (0..3).map(|i| {
+        let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name(&format!("neoclr_value_{i}")) else { panic!("utf8") };
+        module.get_finalized_function(id)
+    }).collect();
+    type Run = unsafe extern "C" fn(*const u8,*const u8,*const u8) -> i32;
+    let run: libloading::Symbol<Run> = unsafe { library.get(b"utf8_conversion_consumer") }.unwrap();
+    assert_eq!(unsafe { run(functions[0],functions[1],functions[2]) },0);
+}

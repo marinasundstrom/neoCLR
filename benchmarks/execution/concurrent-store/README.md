@@ -1169,3 +1169,43 @@ The retained HTTP import audit now reports 6/7 missing names for plain/JSON, res
 interning, TLS and UTF-8 encode/decode, plus JSON ordinal comparison. Host-I/O entry,
 whole-selected-program qualification and live HTTP performance remain open. These
 fixtures establish integration correctness for formatting, not a throughput gain.
+
+
+## UTF-8 conversion admission (2026-10-24)
+
+Admit rooted Utf8Encode, Utf8Decode and Utf8DecodeSlice with exact provider ABIs and
+native replacement selection. The existing typed stack-result publication is sufficient:
+encoding returns an eight-byte array reference, decoding returns a sixteen-byte Value.
+No native ownership/boundary or runtime helper change was necessary. Live mode uses
+the same supported contracts as ordinary compilation; this does not change neoCLR's
+UTF-8 platform representation or introduce a new divergence from its .NET API model.
+
+Native audit: encode retains its input text across the rooted array allocation and
+initializes the new allocation without another safepoint. Decode validates bytes,
+retains the input array/text owner through rooted text allocation and initializes the
+new text without another safepoint. New allocations remain excluded from marker reads
+until owner remark. Slice decoding uses the existing checked byte-window kernel;
+trusted text-backed windows retain the original owner. No new native fallback scope
+is required. All supplied data remains subject to the existing validation contract.
+
+`validate-utf8-conversion.py --runner <codegen-test-runner> --output <fresh-directory>`
+passes 720 forced/paced JIT and optimized/undefined-bounds AOT cycles. Production
+binding validation precedes direct backend selection. Cases include encode/decode
+roundtrips, ASCII/multibyte bytes, a multibyte text-backed subwindow, malformed UTF-8
+Value results, reserved/uninitialized input, null/empty inputs, invalid windows,
+recoverable garbage pressure, all-live exhaustion, heap result aliases, unchanged
+failed outputs, guarded store counts and retention after original inputs are dropped.
+Thirty-one focused compiler checks pass; 23 host-dependent tests are skipped by the
+general filter, with this fixture's JIT test run explicitly by the validator.
+
+Preserve `utf8-conversion-*` artifacts, including two fixture setup failures: the text
+assembler rejected a not-yet-installed slice type, then rejected a placeholder with
+an incorrect native signature. The final fixture installs the exact read-only byte
+slice metadata before invoking the production native-binding validator. Neither was
+a runtime defect. Existing wrapper fault mapping for invalid windows is preserved.
+
+The retained HTTP import audit falls to 4/5 missing names for plaintext/JSON:
+console output, record reservation, interning and TLS, plus JSON ordinal comparison
+(`http-dependencies-utf8-conversion.json.gz`). Host-I/O entry, whole-program live
+execution and HTTP performance qualification remain open. No default switch,
+throughput improvement or public API/website behavior change is claimed.

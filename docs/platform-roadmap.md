@@ -153,6 +153,10 @@ Integer formatting now passes 720 forced/paced JIT/AOT cycles after correcting
 heap result publication; 30 compiler checks pass. Native ownership is unchanged.
 The retained import audit falls to 6/7 missing names for plain/JSON
 ([formatting evidence](../benchmarks/execution/concurrent-store/README.md#integer-formatting-admission-2026-10-24)).
+UTF-8 encode/array decode/slice decode now pass 720 JIT/AOT cycles using existing
+publication and ownership contracts; 31 compiler checks pass. Retained HTTP imports
+leave 4/5 missing names for plain/JSON
+([UTF-8 evidence](../benchmarks/execution/concurrent-store/README.md#utf-8-conversion-admission-2026-10-24)).
 Capability conversions, callable arrays, remaining text/byte services and async/full
 host-entry integration remain next;
 the recorded plaintext import inventory guides that coverage.
