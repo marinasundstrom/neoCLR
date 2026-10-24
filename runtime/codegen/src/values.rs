@@ -513,6 +513,7 @@ pub(crate) fn compile_into(
         let admitted = details.is_some_and(|d|
             d.int32_to_string.contains(&i) || d.int64_to_string.contains(&i)
             || d.uint64_to_string.contains(&i)
+            || d.string_intern.contains(&i) || d.string_compare_ordinal.contains(&i) || d.console_write_line.contains(&i)
             || d.utf8_encode.contains(&i) || d.utf8_decode.contains(&i) || d.utf8_decode_slice.contains(&i)
             || d.string_concat.contains(&i) || d.string_byte_count.contains(&i)
             || d.string_compare_canonical.contains(&i) || d.string_compare_ignore_case.contains(&i)

@@ -1857,3 +1857,93 @@ fn managed_record_arrays_emit_guarded_stores() {
 fn managed_record_arrays_run_on_live_collector() {
     run_managed(include_str!("../../../benchmarks/execution/concurrent-store/record-arrays.neoil"));
 }
+
+fn text_finish_input() -> (neoclr::Module, crate::fault_details::Options) {
+    use neoclr::metadata::Type;
+    let mut input = neoclr::assemble(".module LiveTextFinish\n.function Main(Int32 value) -> Int32\nldarg value\nret\n.end").unwrap();
+    let mut main = input.functions.pop().unwrap();
+    main.definition = None;
+    let contracts = [
+        ("neoCLR.Runtime.StringIntern",vec![Type::String],Type::String,false),
+        ("neoCLR.Runtime.StringCompareOrdinal",vec![Type::String,Type::String],Type::Int32,false),
+        ("neoCLR.Runtime.WriteLine",vec![Type::String],Type::Void,false),
+        ("neoCLR.Runtime.WriteLine",vec![Type::String],Type::Void,true),
+    ];
+    let mut rows=Vec::new();
+    for (i,(name,parameters,returns,no_result)) in contracts.into_iter().enumerate() {
+        input.functions.push(serde_json::from_value(serde_json::json!({
+            "name":name,"parameters":parameters,"returns":returns,"no_result":no_result,"impl_flags":4096
+        })).unwrap());
+        rows.push(serde_json::json!({"name":name,"compiledIndex":i}));
+    }
+    let selection=serde_json::json!({"functions":rows});
+    assert_eq!(crate::bindings::utf8_text(&mut input,&selection).unwrap().len(),2);
+    assert_eq!(crate::bindings::console_write_line(&mut input,&selection).unwrap().len(),2);
+    for i in 0..4 { input.functions[i].name=format!("TextFinish{i}"); }
+    input.functions.push(main);
+    let mut options=managed_options();
+    options.string_intern.push(0);
+    options.string_compare_ordinal.push(1);
+    options.console_write_line.extend([2,3]);
+    (input, options)
+}
+
+#[test]
+fn managed_text_finish_emits_guarded_result() {
+    let (input, mut options) = text_finish_input();
+    for enabled in [false, true] {
+        options.experimental_live_gc_stores = enabled;
+        let mut module = ObjectModule::new(ObjectBuilder::new(isa(target(), true), "text-finish", cranelift_module::default_libcall_names()).unwrap());
+        crate::compiler::values::compile_into(&input,"Main",Some(&options),crate::compiler::Target::MacosArm64,&mut module,false).unwrap();
+        for i in 0..4 {
+        let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name(&format!("neoclr_value_{i}")) else { panic!("text-finish") };
+        let signature = module.declarations().get_function_decl(id).signature.clone();
+        let export = module.declare_function(&format!("live_text_finish_{i}"), Linkage::Export, &signature).unwrap();
+        let mut context = module.make_context();
+        context.func.signature = signature;
+        let callee = module.declare_func_in_func(id, &mut context.func);
+        let mut fb = FunctionBuilderContext::new();
+        let mut b = FunctionBuilder::new(&mut context.func, &mut fb);
+        let entry = b.create_block();
+        b.append_block_params_for_function_params(entry);
+        b.switch_to_block(entry);
+        let args = b.block_params(entry).to_vec();
+        let call = b.ins().call(callee, &args);
+        let status = b.inst_results(call)[0];
+        b.ins().return_(&[status]);
+        b.seal_all_blocks();
+        b.finalize();
+        module.define_function(export, &mut context).unwrap();
+        }
+        let bytes = module.finish().emit().unwrap();
+        let object = object::File::parse(bytes.as_slice()).unwrap();
+        let imports: Vec<_> = object.symbols().filter(|s| s.is_undefined()).filter_map(|s| s.name().ok()).collect();
+        assert!(imports.iter().any(|s| s.contains("neoclr_string_intern_rooted")));
+        assert_eq!(imports.iter().any(|s| s.contains("experiment_gc_store")), enabled);
+        if enabled {
+            if let Some(path) = std::env::var_os("NEOCLR_MUTATION_MANAGED_OBJECT") { std::fs::write(path, bytes).unwrap(); }
+        }
+    }
+}
+
+#[test]
+#[ignore = "requires text-finish host built by validate-text-finish.py"]
+fn managed_text_finish_runs_on_live_collector() {
+    let library = std::sync::Arc::new(unsafe { libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host")) }.unwrap());
+    unsafe { crate::mutation_admission::require_managed_host(&library) }.unwrap();
+    let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
+    let resolver = library.clone();
+    builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
+    let mut code = Code(Some(JITModule::new(builder)));
+    let module = code.0.as_mut().unwrap();
+    let (input, options) = text_finish_input();
+    crate::compiler::values::compile_into(&input,"Main",Some(&options),crate::compiler::Target::MacosArm64,module,true).unwrap();
+    module.finalize_definitions().unwrap();
+    let functions: Vec<_> = (0..4).map(|i| {
+        let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name(&format!("neoclr_value_{i}")) else { panic!("text-finish") };
+        module.get_finalized_function(id)
+    }).collect();
+    type Run = unsafe extern "C" fn(*const u8,*const u8,*const u8,*const u8) -> i32;
+    let run: libloading::Symbol<Run> = unsafe { library.get(b"text_finish_consumer") }.unwrap();
+    assert_eq!(unsafe { run(functions[0],functions[1],functions[2],functions[3]) },0);
+}

@@ -1246,3 +1246,48 @@ The retained HTTP import audit falls to 3/4 missing names for plain/JSON: consol
 interning and TLS, plus JSON ordinal comparison (`http-dependencies-record-arrays.json.gz`).
 Whole-program/host-I/O qualification and performance measurements remain open; no
 public API, website behavior, production default or throughput claim changes.
+
+
+## Interning, ordinal comparison and console admission (2026-10-24)
+
+Admit the existing rooted intern, ordinal comparison and UTF-8 line-output providers
+with exact ABIs. Generated intern/compare results already use typed scratch and
+protected publication. Console unit results pass through store lowering; no-result
+calls do not access the reserved output pointer. No native ownership or runtime
+provider implementation change was necessary.
+
+Native audit: intern scans owner-thread allocation metadata and immutable text,
+allocates one rooted pool entry for a new value, and publishes it without another
+safepoint. Existing pool entries retain the chosen original string; equal input reuses
+that identity without allocation. Invocation completion already cancels/joins the live
+marker before retiring pool roots, and rejects completion with active frames. This
+remains neoCLR's bounded invocation-scoped pool, not a new process-wide CLR interning
+contract. Ordinal comparison reads immutable bytes without collection. The actual
+POSIX console provider serializes stdio output but does not allocate managed storage,
+collect, yield to guest code or retain the input pointer after return. Its bytes remain
+valid throughout the synchronous call. Blocking output can still affect throughput;
+this admission does not claim otherwise or qualify the separate Windows provider.
+
+`validate-text-finish.py --runner <codegen-test-runner> --output <fresh-directory>`
+passes 720 forced/paced JIT and optimized/undefined-bounds AOT cycles with production
+binding validation before backend selection. Cases cover intern identity/no-allocation
+hits, invocation pool retention after all ordinary roots are dropped, active-frame
+completion rejection, marker cancellation on successful completion, pool retirement,
+garbage pressure, all-live exhaustion, null inputs and the byte-limit error. Ordinal
+equal/prefix/differing-byte results use heap aliases. Actual console output is captured
+and checked byte-for-byte for both unit and no-result wrappers; null arguments and a
+closed-output-descriptor write fail without overwriting results. No-result output
+storage is NULL. Thirty-three focused compiler checks pass; 25 host-dependent tests
+are skipped by the general filter, with this fixture's JIT test run explicitly.
+
+Preserve `text-finish-*` artifacts including two fixture failures: stale Main definition
+identity after moving its index, and stdio bytes left buffered after the deliberate
+write failure. The corrected macOS harness discards failed buffered bytes with fpurge
+before restoring output capture; it does not change production console behavior.
+
+The retained import audit now leaves only `neoclr_tls_managed_v2` missing for both
+plaintext and JSON (`http-dependencies-text-finish.json.gz`). This is not whole-server
+admission: TLS, required host-I/O entry, full selected compilation/execution and live
+HTTP performance remain open. Public API/website behavior and production defaults
+are unchanged. Next: qualify the retained TLS path, then expose and resolve the full
+selection/entry gates before running throughput comparisons.

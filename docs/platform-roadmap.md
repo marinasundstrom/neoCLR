@@ -162,6 +162,11 @@ checks, including initialized-lane reference retention. Native tracing/ownership
 unchanged; historical record storage is a layout category, not record semantics.
 Retained HTTP import gaps are 3/4 for plain/JSON
 ([array evidence](../benchmarks/execution/concurrent-store/README.md#inline-value-array-allocation-admission-2026-10-24)).
+Interning, ordinal comparison and POSIX console output now pass 720 JIT/AOT cycles
+and 33 compiler checks using existing native boundaries. The retained plain/JSON
+import audit leaves TLS alone; full selected compilation and host-I/O entry remain
+unqualified
+([remaining text evidence](../benchmarks/execution/concurrent-store/README.md#interning-ordinal-comparison-and-console-admission-2026-10-24)).
 Capability conversions, callable arrays, remaining text/byte services and async/full
 host-entry integration remain next;
 the recorded plaintext import inventory guides that coverage.
