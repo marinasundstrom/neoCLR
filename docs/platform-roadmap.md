@@ -61,8 +61,10 @@ unpublished temporaries. Native width/extent/construction/cleanup checks pass;
 now passes scalar/fault JIT tests and real native-collector JIT/AOT consumers.
 Proven in-slot generic stores remain direct, including pre-frame argument copies;
 unknown byrefs stay checked, with extent-rejection and executable copy tests.
-Ordinary compilation does not invoke the pass; closed-world host/writer admission,
-root-return cleanup integration and managed consumers remain next.
+Framed lowering now checks initialization dominance and passes real-runtime
+JIT/AOT root-chain restoration on success and rejected writes using shared production
+return cleanup. Ordinary compilation does not invoke the pass; closed-world
+host/writer admission, complete pipeline integration and managed consumers remain next.
 
 **Author-directed media types (2026-10-23):** Complete the bounded HTTP value-contract
 slice with cached typed presets, lazy structured projections, shared primitive

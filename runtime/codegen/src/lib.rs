@@ -17,6 +17,7 @@ mod memory_views;
 // Qualified in focused consumers; not wired into ordinary compilation yet.
 #[allow(dead_code)]
 mod mutation_store;
+mod frame_cleanup;
 mod native_exports;
 mod native_imports;
 mod native_layout;

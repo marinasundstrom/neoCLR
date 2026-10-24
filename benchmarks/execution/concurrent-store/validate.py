@@ -33,6 +33,6 @@ try:
  run(common+['-dynamiclib','-o',host])
  run([runner,'mutation_store::tests::native_collector_jit_consumer','--exact','--ignored','--nocapture'],dict(os.environ,NEOCLR_MUTATION_TEST_HOST=str(host)))
  assert '1 passed' in r['commands'][-1]['stdout']
- r['inputs']={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in [runner,obj,source,base/'consumer.c',Path(__file__),root/'runtime/codegen/src/mutation_store.rs',root/'runtime/codegen/src/mutation_store_tests.rs',base.parent/'concurrent-mutation-gate/gate.c',base.parent/'concurrent-mutation-gate/gate.h',root/'runtime/native/gc/native-gc.h',root/'runtime/native/gc/root-probe.c',root/'runtime/native/gc/root-probe.h']}
+ r['inputs']={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in [runner,obj,source,base/'consumer.c',Path(__file__),root/'runtime/codegen/src/frame_cleanup.rs',root/'runtime/codegen/src/gc_probe.rs',root/'runtime/codegen/src/mutation_store.rs',root/'runtime/codegen/src/mutation_store_tests.rs',base.parent/'concurrent-mutation-gate/gate.c',base.parent/'concurrent-mutation-gate/gate.h',root/'runtime/native/gc/native-gc.h',root/'runtime/native/gc/root-probe.c',root/'runtime/native/gc/root-probe.h']}
  r['passed']=True
 finally:(out/'results.json').write_text(json.dumps(r,indent=2)+'\n')

@@ -205,6 +205,10 @@ fn emits_aot_hook_import_for_both_targets() {
             lower(&mut module, &mut ctx.func, context).unwrap();
             module.define_function(id, &mut ctx).unwrap();
         }
+        let (id, mut ctx, context, frame, _, ready) = framed_function(&mut module, false);
+        lower_framed(&mut module, &mut ctx.func, context, ready).unwrap();
+        finish_native_frame(&mut module, &mut ctx.func, frame);
+        module.define_function(id, &mut ctx).unwrap();
         let bytes = module.finish().emit().unwrap();
         let object = object::File::parse(bytes.as_slice()).unwrap();
         assert!(object.symbols().any(|s| s.is_undefined()
@@ -256,15 +260,23 @@ fn native_collector_jit_consumer() {
     type Run = unsafe extern "C" fn(Writer) -> i32;
     let hook: libloading::Symbol<Hook> = unsafe { library.get(b"experiment_gc_store") }.unwrap();
     let run: libloading::Symbol<Run> = unsafe { library.get(b"native_store_consumer") }.unwrap();
+    type Enter =
+        unsafe extern "C" fn(*mut std::ffi::c_void, *mut std::ffi::c_void) -> *mut std::ffi::c_void;
+    type Leave = unsafe extern "C" fn(*mut std::ffi::c_void, *mut std::ffi::c_void);
+    let enter: libloading::Symbol<Enter> = unsafe { library.get(b"frame_enter") }.unwrap();
+    let leave: libloading::Symbol<Leave> = unsafe { library.get(b"frame_leave") }.unwrap();
     let mut builder = JITBuilder::with_isa(
         isa(target(), false),
         cranelift_module::default_libcall_names(),
     );
     builder.symbol("experiment_gc_store", *hook as *const u8);
+    builder.symbol("frame_enter", *enter as *const u8);
+    builder.symbol("frame_leave", *leave as *const u8);
     let mut code = Code(Some(JITModule::new(builder)));
     let module = code.0.as_mut().unwrap();
-    let (id, mut ctx, context) = function(module, "live_writer", types::I64);
-    lower(module, &mut ctx.func, context).unwrap();
+    let (id, mut ctx, context, frame, _, ready) = framed_function(module, false);
+    lower_framed(module, &mut ctx.func, context, ready).unwrap();
+    finish_native_frame(module, &mut ctx.func, frame);
     module.define_function(id, &mut ctx).unwrap();
     module.finalize_definitions().unwrap();
     let call: Writer = unsafe { std::mem::transmute(module.get_finalized_function(id)) };
@@ -371,4 +383,177 @@ fn invalid_proven_stack_extent_rejected_without_edits() {
             .contains("exceeds proven stack slot"));
         assert_eq!(ctx.func.display().to_string(), before);
     }
+}
+
+#[repr(C)]
+struct FramedState {
+    stores: State,
+    enters: u32,
+    leaves: u32,
+    active: bool,
+}
+unsafe extern "C" fn frame_enter(frame: *mut usize, state: *mut FramedState) -> *mut FramedState {
+    let state = unsafe { &mut *state };
+    assert!(!state.active);
+    state.active = true;
+    state.enters += 1;
+    unsafe { frame.write(state as *mut FramedState as usize) };
+    state
+}
+unsafe extern "C" fn frame_leave(frame: *mut usize) {
+    let state = unsafe { &mut *(frame.read() as *mut FramedState) };
+    assert!(state.active);
+    state.active = false;
+    state.leaves += 1;
+}
+unsafe extern "C" fn state_frame_leave(state: *mut FramedState, frame: *mut usize) {
+    assert_eq!(unsafe { frame.read() }, state as usize);
+    unsafe { frame_leave(frame) };
+}
+fn framed_function(
+    module: &mut impl Module,
+    late: bool,
+) -> (
+    cranelift_module::FuncId,
+    cranelift_codegen::Context,
+    ir::Value,
+    ir::StackSlot,
+    ir::Inst,
+    ir::Inst,
+) {
+    let (id, mut ctx, context) = function(module, "framed", types::I64);
+    let stores: Vec<_> = ctx
+        .func
+        .layout
+        .blocks()
+        .flat_map(|b| ctx.func.layout.block_insts(b))
+        .filter(|&i| ctx.func.dfg.insts[i].opcode() == Opcode::Store)
+        .collect();
+    let frame = ctx.func.create_sized_stack_slot(ir::StackSlotData::new(
+        ir::StackSlotKind::ExplicitSlot,
+        112,
+        3,
+    ));
+    let mut signature = module.make_signature();
+    signature.params.extend([types::I64; 2].map(AbiParam::new));
+    signature.returns.push(AbiParam::new(types::I64));
+    let enter = module
+        .declare_function("frame_enter", Linkage::Import, &signature)
+        .unwrap();
+    let enter = module.declare_func_in_func(enter, &mut ctx.func);
+    let mut cursor = FuncCursor::new(&mut ctx.func).at_inst(stores[usize::from(late)]);
+    let address = cursor.ins().stack_addr(types::I64, frame, 0);
+    let call = cursor.ins().call(enter, &[address, context]);
+    let state = cursor.func.dfg.inst_results(call)[0];
+    let ready = cursor.ins().stack_store(state, frame, 104);
+    (id, ctx, context, frame, call, ready)
+}
+#[test]
+fn framed_fault_and_normal_returns_use_production_cleanup() {
+    for state_handle in [false, true] {
+        let mut builder = JITBuilder::with_isa(
+            isa(target(), false),
+            cranelift_module::default_libcall_names(),
+        );
+        builder.symbol("experiment_gc_store", hook as *const u8);
+        builder.symbol("frame_enter", frame_enter as *const u8);
+        builder.symbol(
+            "frame_leave",
+            if state_handle {
+                state_frame_leave as *const u8
+            } else {
+                frame_leave as *const u8
+            },
+        );
+        let mut code = Code(Some(JITModule::new(builder)));
+        let module = code.0.as_mut().unwrap();
+        let (id, mut ctx, context, frame, _, ready) = framed_function(module, false);
+        assert_eq!(
+            lower_framed(module, &mut ctx.func, context, ready)
+                .unwrap()
+                .stores,
+            2
+        );
+        let mut signature = module.make_signature();
+        signature.params.extend(vec![
+            AbiParam::new(types::I64);
+            if state_handle { 2 } else { 1 }
+        ]);
+        let leave = module
+            .declare_function("frame_leave", Linkage::Import, &signature)
+            .unwrap();
+        crate::frame_cleanup::finish(module, &mut ctx.func, frame, leave, state_handle);
+        module.define_function(id, &mut ctx).unwrap();
+        module.finalize_definitions().unwrap();
+        let call: unsafe extern "C" fn(*mut FramedState, *mut u8, u64) -> i32 =
+            unsafe { std::mem::transmute(module.get_finalized_function(id)) };
+        for reject_at in [0, 1, 2] {
+            let mut state = FramedState {
+                stores: State {
+                    calls: 0,
+                    reject_at,
+                    widths: [0; 2],
+                    bits: [0; 2],
+                },
+                enters: 0,
+                leaves: 0,
+                active: false,
+            };
+            let mut output = [0; 32];
+            assert_eq!(
+                unsafe { call(&mut state, output.as_mut_ptr(), 42) },
+                if reject_at == 0 { 0 } else { 3 }
+            );
+            assert_eq!((state.enters, state.leaves, state.active), (1, 1, false));
+            assert_eq!(state.stores.calls, if reject_at == 1 { 1 } else { 2 });
+        }
+    }
+}
+#[test]
+fn frame_initialization_must_dominate_stores_and_returns() {
+    for bypass in [false, true] {
+        let mut module = ObjectModule::new(
+            ObjectBuilder::new(
+                isa(target(), true),
+                "framed",
+                cranelift_module::default_libcall_names(),
+            )
+            .unwrap(),
+        );
+        let (_, mut ctx, context, _, call, ready) = framed_function(&mut module, !bypass);
+        if bypass {
+            let entry = ctx.func.layout.entry_block().unwrap();
+            // Branch around frame initialization, leaving an unframed return.
+            let initialized = ctx.func.dfg.make_block();
+            ctx.func.layout.split_block(initialized, call);
+            let unframed = ctx.func.dfg.make_block();
+            ctx.func.layout.append_block(unframed);
+            let condition = ctx.func.dfg.block_params(entry)[2];
+            FuncCursor::new(&mut ctx.func).at_bottom(entry).ins().brif(
+                condition,
+                initialized,
+                &[],
+                unframed,
+                &[],
+            );
+            let mut cursor = FuncCursor::new(&mut ctx.func).at_bottom(unframed);
+            let zero = cursor.ins().iconst(types::I32, 0);
+            cursor.ins().return_(&[zero]);
+        }
+        let before = ctx.func.display().to_string();
+        assert!(lower_framed(&mut module, &mut ctx.func, context, ready)
+            .unwrap_err()
+            .to_string()
+            .contains("must dominate"));
+        assert_eq!(ctx.func.display().to_string(), before);
+    }
+}
+
+fn finish_native_frame(module: &mut impl Module, func: &mut ir::Function, frame: ir::StackSlot) {
+    let mut signature = module.make_signature();
+    signature.params.extend([types::I64; 2].map(AbiParam::new));
+    let leave = module
+        .declare_function("frame_leave", Linkage::Import, &signature)
+        .unwrap();
+    crate::frame_cleanup::finish(module, func, frame, leave, true);
 }

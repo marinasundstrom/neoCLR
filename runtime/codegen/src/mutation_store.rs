@@ -49,6 +49,27 @@ pub(crate) fn lower(
     func: &mut ir::Function,
     context: ir::Value,
 ) -> Result<Lowered, Error> {
+    lower_impl(module, func, context, None)
+}
+
+/// The caller identifies the instruction completing frame linkage and saved-state
+/// initialization. Every fallible store and every return must be dominated by it.
+/// Invoke before return cleanup; this does not admit native writers or callees.
+pub(crate) fn lower_framed(
+    module: &mut impl Module,
+    func: &mut ir::Function,
+    context: ir::Value,
+    frame_ready: ir::Inst,
+) -> Result<Lowered, Error> {
+    lower_impl(module, func, context, Some(frame_ready))
+}
+
+fn lower_impl(
+    module: &mut impl Module,
+    func: &mut ir::Function,
+    context: ir::Value,
+    frame_ready: Option<ir::Inst>,
+) -> Result<Lowered, Error> {
     let entry = func.layout.entry_block().ok_or("missing entry block")?;
     if func.signature.returns.len() != 1 || func.signature.returns[0].value_type != types::I32 {
         return Err("mutation lowering requires an I32 status return".into());
@@ -58,12 +79,34 @@ pub(crate) fn lower(
     {
         return Err("mutation context must be an I64 entry parameter".into());
     }
+    let dominance = if let Some(ready) = frame_ready {
+        if func.layout.inst_block(ready).is_none() {
+            return Err("frame-ready instruction is not in the function".into());
+        }
+        let cfg = cranelift_codegen::flowgraph::ControlFlowGraph::with_function(func);
+        Some(cranelift_codegen::dominator_tree::DominatorTree::with_function(func, &cfg))
+    } else {
+        None
+    };
+    let require_frame = |inst| -> Result<(), Error> {
+        if let (Some(ready), Some(dominance)) = (frame_ready, &dominance) {
+            if inst == ready || !dominance.dominates(ready, inst, &func.layout) {
+                return Err(
+                    "frame initialization must dominate fallible stores and returns".into(),
+                );
+            }
+        }
+        Ok(())
+    };
     let mut stores = Vec::new();
     let mut stack_stores = 0;
     // Validate the entire input before changing any instruction or adding imports.
     for block in func.layout.blocks() {
         for inst in func.layout.block_insts(block) {
             let instruction = &func.dfg.insts[inst];
+            if instruction.opcode() == Opcode::Return {
+                require_frame(inst)?;
+            }
             if instruction.opcode() == Opcode::StackStore {
                 stack_stores += 1;
                 continue;
@@ -111,6 +154,7 @@ pub(crate) fn lower(
                 stack_stores += 1;
                 continue;
             }
+            require_frame(inst)?;
             stores.push((inst, args, i64::from(offset), ty, width));
         }
     }

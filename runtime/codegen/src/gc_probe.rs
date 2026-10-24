@@ -3,7 +3,6 @@ use super::{
     Error, gc_layout, gc_points,
     profile::{Profile, Stacks, Ty},
 };
-use cranelift_codegen::cursor::{Cursor, FuncCursor};
 use cranelift_codegen::ir::{self, AbiParam, InstBuilder, StackSlot, types};
 use cranelift_frontend::FunctionBuilder;
 use cranelift_module::{DataDescription, DataId, FuncId, Linkage, Module};
@@ -410,23 +409,7 @@ impl Probes {
     // Lowering emits returns in many fault branches. Instrument the completed IR
     // so all returns, including arithmetic/null faults, share the same cleanup.
     pub fn finish(&self, module: &mut impl Module, func: &mut ir::Function, frame: StackSlot) {
-        let returns: Vec<_> = func
-            .layout
-            .blocks()
-            .flat_map(|block| func.layout.block_insts(block))
-            .filter(|&inst| func.dfg.insts[inst].opcode() == ir::Opcode::Return)
-            .collect();
-        let leave = module.declare_func_in_func(self.leave, func);
-        for inst in returns {
-            let mut cursor = FuncCursor::new(func).at_inst(inst);
-            let address = cursor.ins().stack_addr(types::I64, frame, 0);
-            if self.state_handle {
-                let state = cursor.ins().stack_load(types::I64, frame, 104);
-                cursor.ins().call(leave, &[state, address]);
-            } else {
-                cursor.ins().call(leave, &[address]);
-            }
-        }
+        crate::frame_cleanup::finish(module, func, frame, self.leave, self.state_handle);
     }
     pub fn transient_bytes(&self, function: usize) -> Option<u32> {
         self.transient
