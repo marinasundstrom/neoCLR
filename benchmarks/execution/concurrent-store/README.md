@@ -469,3 +469,46 @@ stall's root cause or establish a GC failure; no host security policy was disabl
 The emitted live object is retained as `initializers.o.gz`. No throughput measurement
 was taken. Callable/native replacement bodies, remaining text/byte services, async/socket
 providers and full host entry still require qualification before HTTP comparisons.
+
+
+## Native text replacement bodies
+
+The internal live compiler admits the existing rooted StringConcat and StringByteCount
+bindings. Native replacement bodies now use the same store-lowering, shared frame-cleanup
+and deferred call-closure path as ordinary bodies. Other native replacements remain
+rejected. The fixture uses production UTF-8 binding validation before value lowering, then
+gives the validated replacement placeholders private names to avoid collision with
+bundled System during backend verification. Full selection/entry integration is
+not covered by this direct backend fixture.
+
+Live text wrappers pass compiler-owned stack scratch to their providers, then publish
+successful results through checked stores. A provider cannot write directly through an
+arbitrary managed result alias. Concat retains both inputs over allocation, initializes
+only fresh immutable TEXT storage, and returns without another collection; byte count
+reads immutable text and writes only its stack result. The noncollecting publication
+barrier preserves that result until the caller can publish it. The synchronous/default
+path and production C providers are unchanged.
+
+This follows CLR's separation of compiler roots, native-helper cooperation and managed
+write barriers, using the [previously researched](../concurrent-mutation-audit/README.md#alternatives-and-research)
+nonmoving conservative live protocol.
+The deliberate UTF-8 text contract is unchanged; this does not introduce CLR UTF-16
+semantics. Shared heaps, other provider writes, async/socket services and full HTTP entry
+still need qualification. These checks establish integration behavior, not throughput.
+
+`native-text-validation.json.gz` records 1,200 forced/paced JIT and optimized/UBSan AOT
+cycles: 600 nested allocation/pressure/exhaustion/null-fault cycles and 600 direct
+native-wrapper heap-result-alias cycles. Exact store counters confirm both pointer
+and scalar results use the barrier; host roots, immutable contents and final reclamation
+are checked. `native-text-initializer-regression.json.gz` records 600 existing initializer
+cycles. The emitted object is archived; generated GC is byte-identical to
+`text-arrays-automatic-gc.c.gz` and the production text provider is unchanged.
+
+`native-text-codegen-tests.json.gz` records the full codegen library run: 156 passed,
+12 ignored and one pre-existing reflection diagnostic assertion failure. The same
+failure reproduces with the previous initializer runner in `native-text-existing-failure.json.gz`:
+the test expects Optional<TypeInfo>, but the diagnostic says Option<TypeInfo>.
+`native-text-fixture-failures.json.gz` retains initial local/argument, binding-name,
+missing binding preparation, duplicate System identity and reserved-module fixture
+failures. These are corrected fixture setup failures, not collector race evidence.
+No HTTP performance measurement or default switch is claimed.

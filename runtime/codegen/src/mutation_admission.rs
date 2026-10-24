@@ -142,6 +142,8 @@ pub(crate) fn root_providers(module: &impl Module) -> Vec<(&'static str, Signatu
     vec![
         ("experiment_gc_store", make(&[I64, I64, I64, I32], &[I32])),
         ("experiment_gc_static_storage_rooted_v1", make(&[I64, I32, I32, I32, I64], &[I32])),
+        ("neoclr_string_concat_rooted_v1", make(&[I64, I64, I64, I64], &[I32])),
+        ("neoclr_string_byte_count_v1", make(&[I64, I64], &[I32])),
         ("experiment_gc_store_text", make(&[I64, I64, I32, I64], &[I32])),
         ("neoclr_allocate_strings_rooted_v1", make(&[I64, I32, I32, I64], &[I32])),
         ("experiment_gc_store_record", make(&[I64, I64, I32, I64, I32], &[I32])),

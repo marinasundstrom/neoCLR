@@ -1,0 +1,32 @@
+.module LiveNativeText
+.references ()
+.function neoCLR.Runtime.StringConcat(String left,String right) -> String
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.StringByteCount(String text) -> Int32
+.methodimpl InternalCall
+.end
+.function Write(out String& first,out String& second,String value) -> Int32
+.local String combined
+ldarg value
+ldarg value
+call neoCLR.Runtime.StringConcat(String,String)
+stloc combined
+ldarg first
+ldloc combined
+stobj String
+ldloc combined
+ldarg value
+call neoCLR.Runtime.StringConcat(String,String)
+stloc combined
+ldarg second
+ldloc combined
+stobj String
+ldloc combined
+call neoCLR.Runtime.StringByteCount(String)
+ret
+.end
+.function Main(Int32 value) -> Int32
+ldarg value
+ret
+.end

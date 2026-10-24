@@ -310,6 +310,7 @@ fn native_collector_jit_consumer() {
     module.finalize_definitions().unwrap();
     let call: Writer = unsafe { std::mem::transmute(module.get_finalized_function(id)) };
     assert_eq!(unsafe { run(call) }, 0);
+
 }
 
 // This mirrors argument/local copies emitted before a GC frame is linked: they
@@ -784,9 +785,58 @@ fn managed_text_arrays_emit_grouped_stores() {
 fn managed_statics_emit_guarded_publication() {
     emit_managed(include_str!("../../../benchmarks/execution/concurrent-store/statics.neoil"));
 }
+fn managed_options_for(source: &str) -> crate::fault_details::Options {
+    let mut options = managed_options();
+    if source.starts_with(".module LiveNativeText") {
+        options.string_concat.push(0);
+        options.string_byte_count.push(1);
+    }
+    options
+}
+#[test]
+fn managed_native_text_emits_guarded_wrappers() {
+    let source = include_str!("../../../benchmarks/execution/concurrent-store/native-text.neoil");
+    emit_managed(source);
+    let input = managed_input(source);
+    let mut options = managed_options_for(source);
+    options.string_concat.clear();
+    options.string_upper.push(0);
+    let mut module = ObjectModule::new(ObjectBuilder::new(
+        isa(target(), true), "reject-provider", cranelift_module::default_libcall_names(),
+    ).unwrap());
+    let error = crate::compiler::values::compile_into(
+        &input, "Main", Some(&options), crate::compiler::Target::MacosArm64, &mut module, false,
+    ).unwrap_err();
+    assert!(error.to_string().contains("unaudited native replacement bodies"));
+}
 fn managed_input(source: &str) -> neoclr::metadata::Module {
     use neoclr::metadata::{Instruction as Op, StaticField, Type, Visibility};
     let mut input = neoclr::assemble(source).unwrap();
+    if source.starts_with(".module LiveNativeText") {
+        // Exercise production binding validation before value-profile lowering.
+        let rows: Vec<_> = input.functions.iter().take(2).enumerate().map(|(i, f)| {
+            serde_json::json!({"name": f.name, "compiledIndex": i,
+                "definition": {"module": "LiveNativeText", "index": i}})
+        }).collect();
+        let bindings = crate::bindings::utf8_text(
+            &mut input, &serde_json::json!({"functions": rows}),
+        ).unwrap();
+        assert_eq!(bindings.len(), 2);
+        // This direct backend fixture lacks the production closed-world name
+        // projection. Give the validated replacement placeholders private names
+        // so verifier loading cannot collide with bundled System declarations.
+        for (index, name) in [(0, "LiveNativeText.Concat"), (1, "LiveNativeText.ByteCount")] {
+            let original = input.functions[index].name.clone();
+            input.functions[index].name = name.into();
+            for function in &mut input.functions {
+                for op in &mut function.body {
+                    if let Op::Call(target) = op {
+                        if target.name == original { target.name = name.into(); }
+                    }
+                }
+            }
+        }
+    }
     if source.starts_with(".module LiveStatics") || source.starts_with(".module LiveInitializers") {
         // Static-field syntax is not exposed by the text assembler. Use the same
         // metadata construction as the existing static-storage compiler tests.
@@ -852,7 +902,7 @@ fn emit_managed(source: &str) {
             )
             .unwrap(),
         );
-        let mut options = managed_options();
+        let mut options = managed_options_for(source);
         options.experimental_live_gc_stores = enabled;
         crate::compiler::values::compile_into(
             &input,
@@ -864,36 +914,42 @@ fn emit_managed(source: &str) {
         )
         .unwrap();
         if enabled {
-            let Some(cranelift_module::FuncOrDataId::Func(writer)) =
-                module.get_name(&format!("neoclr_value_{}", input.functions.iter().position(|f| f.name == "Write").unwrap()))
-            else {
-                panic!("writer")
-            };
-            let signature = module
-                .declarations()
-                .get_function_decl(writer)
-                .signature
-                .clone();
-            let export = module
-                .declare_function("live_managed_writer", Linkage::Export, &signature)
-                .unwrap();
-            let mut context = module.make_context();
-            context.func.signature = signature;
-            let writer = module.declare_func_in_func(writer, &mut context.func);
-            let mut fb = FunctionBuilderContext::new();
-            {
-                let mut b = FunctionBuilder::new(&mut context.func, &mut fb);
-                let entry = b.create_block();
-                b.append_block_params_for_function_params(entry);
-                b.switch_to_block(entry);
-                let arguments = b.block_params(entry).to_vec();
-                let call = b.ins().call(writer, &arguments);
-                let status = b.inst_results(call)[0];
-                b.ins().return_(&[status]);
-                b.seal_all_blocks();
-                b.finalize();
+            let mut exports = vec![(input.functions.iter().position(|f| f.name == "Write").unwrap(), "live_managed_writer")];
+            if source.starts_with(".module LiveNativeText") {
+                exports.extend([(0, "live_native_concat"), (1, "live_native_count")]);
             }
-            module.define_function(export, &mut context).unwrap();
+            for (index, name) in exports {
+                let Some(cranelift_module::FuncOrDataId::Func(writer)) =
+                    module.get_name(&format!("neoclr_value_{index}"))
+                else {
+                    panic!("writer")
+                };
+                let signature = module
+                    .declarations()
+                    .get_function_decl(writer)
+                    .signature
+                    .clone();
+                let export = module
+                    .declare_function(name, Linkage::Export, &signature)
+                    .unwrap();
+                let mut context = module.make_context();
+                context.func.signature = signature;
+                let writer = module.declare_func_in_func(writer, &mut context.func);
+                let mut fb = FunctionBuilderContext::new();
+                {
+                    let mut b = FunctionBuilder::new(&mut context.func, &mut fb);
+                    let entry = b.create_block();
+                    b.append_block_params_for_function_params(entry);
+                    b.switch_to_block(entry);
+                    let arguments = b.block_params(entry).to_vec();
+                    let call = b.ins().call(writer, &arguments);
+                    let status = b.inst_results(call)[0];
+                    b.ins().return_(&[status]);
+                    b.seal_all_blocks();
+                    b.finalize();
+                }
+                module.define_function(export, &mut context).unwrap();
+            }
         }
         let bytes = module.finish().emit().unwrap();
         if enabled {
@@ -928,7 +984,7 @@ fn emit_managed(source: &str) {
         )
         .unwrap(),
     );
-    let mut options = managed_options();
+    let mut options = managed_options_for(source);
     options.native_worker_safepoints = true;
     assert!(crate::compiler::values::compile_into(
         &input,
@@ -972,6 +1028,11 @@ fn managed_statics_run_on_live_collector() {
 fn managed_initializers_run_on_live_collector() {
     run_managed(include_str!("../../../benchmarks/execution/concurrent-store/initializers.neoil"));
 }
+#[test]
+#[ignore = "requires native-text host built by validate-native-text.py"]
+fn managed_native_text_runs_on_live_collector() {
+    run_managed(include_str!("../../../benchmarks/execution/concurrent-store/native-text.neoil"));
+}
 fn run_managed(source: &str) {
     let path = std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host");
     let library = std::sync::Arc::new(unsafe { libloading::Library::new(path) }.unwrap());
@@ -993,7 +1054,7 @@ fn run_managed(source: &str) {
     crate::compiler::values::compile_into(
         &input,
         "Main",
-        Some(&managed_options()),
+        Some(&managed_options_for(source)),
         crate::compiler::Target::MacosArm64,
         module,
         true,
@@ -1014,4 +1075,13 @@ fn run_managed(source: &str) {
     let run: libloading::Symbol<Run> = unsafe { library.get(b"native_managed_consumer") }.unwrap();
     let call: Writer = unsafe { std::mem::transmute(module.get_finalized_function(id)) };
     assert_eq!(unsafe { run(call) }, 0);
+    if source.starts_with(".module LiveNativeText") {
+        type NativeRun = unsafe extern "C" fn(*const u8, *const u8) -> i32;
+        let run: libloading::Symbol<NativeRun> = unsafe { library.get(b"native_text_alias_consumer") }.unwrap();
+        let pointers: Vec<_> = (0..2).map(|index| {
+            let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name(&format!("neoclr_value_{index}")) else { panic!("native wrapper") };
+            module.get_finalized_function(id)
+        }).collect();
+        assert_eq!(unsafe { run(pointers[0], pointers[1]) }, 0);
+    }
 }

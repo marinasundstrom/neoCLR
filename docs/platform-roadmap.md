@@ -86,7 +86,9 @@ publication and rooted strings-array allocation also pass JIT/AOT, bounds and ov
 checks. Guarded static-owner publication now passes cold/warm, pressure and lifetime
 JIT/AOT checks through a distinct experimental provider. Initializer guards now join
 store lowering and closure checks, with live reentry/cached-failure and default-mode
-regression coverage. Callable arrays, text/byte services and async/full host-entry
+regression coverage. Rooted text concatenation and byte count now pass native replacement
+frame/store/closure integration, including direct heap-result aliases, pressure and faults
+across JIT/AOT. Callable arrays, remaining text/byte services and async/full host-entry
 integration remain next;
 the recorded plaintext import inventory guides that coverage.
 The isolated consumers now check call closure against supplied bodies/explicit provider

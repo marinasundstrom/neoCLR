@@ -508,8 +508,11 @@ pub(crate) fn compile_into(
         matches!(op, Op::StoreArrayElement(neoclr::metadata::Type::Function(_))))) {
         return Err("live stores require qualification for callable arrays".into());
     }
-    if live_stores && input.functions.iter().enumerate().any(|(i,f)|
-        f.is_internal_call() || f.pinvoke.is_some() || gc_points::native_body(&p,i,details)) {
+    if live_stores && input.functions.iter().enumerate().any(|(i, f)| {
+        let admitted = details.is_some_and(|d|
+            d.string_concat.contains(&i) || d.string_byte_count.contains(&i));
+        f.pinvoke.is_some() || ((f.is_internal_call() || gc_points::native_body(&p, i, details)) && !admitted)
+    }) {
         return Err("experimental live stores reject unaudited native replacement bodies".into());
     }
     let bootstrap = details.is_some_and(|d| d.native_host_bootstrap);
@@ -2072,10 +2075,11 @@ pub(crate) fn compile_into(
                 b.ins().return_(&[status]);
                 b.seal_all_blocks();
                 b.finalize();
-                if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
-                    probes.finish(module, &mut context.func, frame);
-                }
-                define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
+                finish_value_body(
+                    module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
+                    mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
+                    stack_budget, long_range_calls,
+                )?;
                 continue;
             }
             if details.is_some_and(|d| {
@@ -2273,10 +2277,11 @@ pub(crate) fn compile_into(
                 b.ins().return_(&[zero]);
                 b.seal_all_blocks();
                 b.finalize();
-                if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
-                    probes.finish(module, &mut context.func, frame);
-                }
-                define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
+                finish_value_body(
+                    module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
+                    mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
+                    stack_budget, long_range_calls,
+                )?;
                 continue;
             }
             if let Some(targets) = details.and_then(|d| d.object_type_queries.get(&i)) {
@@ -2370,10 +2375,11 @@ pub(crate) fn compile_into(
                 b.ins().return_(&[status]);
                 b.seal_all_blocks();
                 b.finalize();
-                if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
-                    probes.finish(module, &mut context.func, frame);
-                }
-                define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
+                finish_value_body(
+                    module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
+                    mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
+                    stack_budget, long_range_calls,
+                )?;
                 continue;
             }
             if let Some(&(tag_index, unbox)) = details.and_then(|d| d.scalar_box_queries.get(&i)) {
@@ -2446,10 +2452,11 @@ pub(crate) fn compile_into(
                 }
                 b.seal_all_blocks();
                 b.finalize();
-                if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
-                    probes.finish(module, &mut context.func, frame);
-                }
-                define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
+                finish_value_body(
+                    module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
+                    mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
+                    stack_budget, long_range_calls,
+                )?;
                 continue;
             }
             if let Some(&record) = details.and_then(|d| {
@@ -2506,10 +2513,11 @@ pub(crate) fn compile_into(
                 b.ins().return_(&[zero]);
                 b.seal_all_blocks();
                 b.finalize();
-                if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
-                    probes.finish(module, &mut context.func, frame);
-                }
-                define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
+                finish_value_body(
+                    module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
+                    mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
+                    stack_budget, long_range_calls,
+                )?;
                 continue;
             }
             if let Some(targets) = p.dispatch.get(&i) {
@@ -3055,10 +3063,11 @@ pub(crate) fn compile_into(
                 }
                 b.seal_all_blocks();
                 b.finalize();
-                if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
-                    probes.finish(module, &mut context.func, frame);
-                }
-                define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
+                finish_value_body(
+                    module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
+                    mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
+                    stack_budget, long_range_calls,
+                )?;
                 continue;
             }
             if details.is_some_and(|d| d.entry_task_drain.contains(&i))
@@ -3088,10 +3097,11 @@ pub(crate) fn compile_into(
                 b.ins().return_(&[zero]);
                 b.seal_all_blocks();
                 b.finalize();
-                if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
-                    probes.finish(module, &mut context.func, frame);
-                }
-                define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
+                finish_value_body(
+                    module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
+                    mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
+                    stack_budget, long_range_calls,
+                )?;
                 continue;
             }
             if details.is_some_and(|d| d.entry_task_drain.contains(&i)) {
@@ -3185,10 +3195,11 @@ pub(crate) fn compile_into(
                 b.ins().return_(&[zero]);
                 b.seal_all_blocks();
                 b.finalize();
-                if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
-                    probes.finish(module, &mut context.func, frame);
-                }
-                define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
+                finish_value_body(
+                    module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
+                    mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
+                    stack_budget, long_range_calls,
+                )?;
                 continue;
             }
             if let Some(service) = socket_services.get(&i) {
@@ -3259,10 +3270,11 @@ pub(crate) fn compile_into(
                 b.ins().return_(&[zero]);
                 b.seal_all_blocks();
                 b.finalize();
-                if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
-                    probes.finish(module, &mut context.func, frame);
-                }
-                define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
+                finish_value_body(
+                    module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
+                    mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
+                    stack_budget, long_range_calls,
+                )?;
                 continue;
             }
             if let Some(operation) = details.and_then(|d| d.cryptography.get(&i)) {
@@ -3310,10 +3322,11 @@ pub(crate) fn compile_into(
                 b.ins().return_(&[zero]);
                 b.seal_all_blocks();
                 b.finalize();
-                if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
-                    probes.finish(module, &mut context.func, frame);
-                }
-                define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
+                finish_value_body(
+                    module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
+                    mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
+                    stack_budget, long_range_calls,
+                )?;
                 continue;
             }
             if let Some(operation) = details.and_then(|d| d.tls.get(&i)) {
@@ -3348,10 +3361,11 @@ pub(crate) fn compile_into(
                 b.ins().return_(&[zero]);
                 b.seal_all_blocks();
                 b.finalize();
-                if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
-                    probes.finish(module, &mut context.func, frame);
-                }
-                define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
+                finish_value_body(
+                    module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
+                    mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
+                    stack_budget, long_range_calls,
+                )?;
                 continue;
             }
             if let Some(service) = stream_services.get(&i) {
@@ -3446,10 +3460,11 @@ pub(crate) fn compile_into(
                 b.ins().return_(&[zero]);
                 b.seal_all_blocks();
                 b.finalize();
-                if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
-                    probes.finish(module, &mut context.func, frame);
-                }
-                define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
+                finish_value_body(
+                    module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
+                    mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
+                    stack_budget, long_range_calls,
+                )?;
                 continue;
             }
             if let Some((_, kind)) =
@@ -3472,10 +3487,11 @@ pub(crate) fn compile_into(
                 b.ins().return_(&[zero]);
                 b.seal_all_blocks();
                 b.finalize();
-                if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
-                    probes.finish(module, &mut context.func, frame);
-                }
-                define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
+                finish_value_body(
+                    module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
+                    mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
+                    stack_budget, long_range_calls,
+                )?;
                 continue;
             }
             if details.is_some_and(|d| d.console_read_byte.contains(&i)) {
@@ -3499,10 +3515,11 @@ pub(crate) fn compile_into(
                 b.ins().return_(&[zero]);
                 b.seal_all_blocks();
                 b.finalize();
-                if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
-                    probes.finish(module, &mut context.func, frame);
-                }
-                define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
+                finish_value_body(
+                    module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
+                    mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
+                    stack_budget, long_range_calls,
+                )?;
                 continue;
             }
             if details.is_some_and(|d| d.console_write_line.contains(&i)) {
@@ -3542,10 +3559,11 @@ pub(crate) fn compile_into(
                 b.ins().return_(&[zero]);
                 b.seal_all_blocks();
                 b.finalize();
-                if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
-                    probes.finish(module, &mut context.func, frame);
-                }
-                define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
+                finish_value_body(
+                    module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
+                    mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
+                    stack_budget, long_range_calls,
+                )?;
                 continue;
             }
             if details.is_some_and(|d| d.char_from_string.contains(&i) || d.char_text.contains(&i))
@@ -3592,10 +3610,11 @@ pub(crate) fn compile_into(
                 b.ins().return_(&[zero]);
                 b.seal_all_blocks();
                 b.finalize();
-                if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
-                    probes.finish(module, &mut context.func, frame);
-                }
-                define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
+                finish_value_body(
+                    module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
+                    mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
+                    stack_budget, long_range_calls,
+                )?;
                 continue;
             }
             if details.is_some_and(|d| d.native_integer_to64.contains(&i)) {
@@ -3604,13 +3623,23 @@ pub(crate) fn compile_into(
                 b.ins().return_(&[zero]);
                 b.seal_all_blocks();
                 b.finalize();
-                if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
-                    probes.finish(module, &mut context.func, frame);
-                }
-                define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
+                finish_value_body(
+                    module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
+                    mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
+                    stack_budget, long_range_calls,
+                )?;
                 continue;
             }
             if let Some(service) = utf8_services.get(&i) {
+                // Native helpers must not write directly through an arbitrary
+                // managed result alias while the marker reads old payloads.
+                let destination = output;
+                let output = if live_stores {
+                    let scratch = slot(&mut b, 8);
+                    b.ins().stack_addr(types::I64, scratch, 0)
+                } else {
+                    output
+                };
                 let service = module.declare_func_in_func(*service, b.func);
                 let args = if details.unwrap().utf8_decode_slice.contains(&i) {
                     vec![
@@ -3723,6 +3752,11 @@ pub(crate) fn compile_into(
                 );
                 site.capture_frame = false;
                 return_if_detailed(&mut b, failed, status, Some(&site));
+                if live_stores {
+                    let ty = p.results[i].as_ref().ok_or("missing native text result")?;
+                    let result = read(&mut b, &p, ty, output);
+                    write(&mut b, destination, &result);
+                }
                 if let Some(ty) = &p.results[i] {
                     // The legacy helper produces an immutable value snapshot. A native
                     // Byte[] result owns this fresh allocation as an ordinary array.
@@ -3740,10 +3774,11 @@ pub(crate) fn compile_into(
                 b.ins().return_(&[zero]);
                 b.seal_all_blocks();
                 b.finalize();
-                if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
-                    probes.finish(module, &mut context.func, frame);
-                }
-                define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
+                finish_value_body(
+                    module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
+                    mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
+                    stack_budget, long_range_calls,
+                )?;
                 continue;
             }
             if details.is_some_and(|d| d.int32_to_string.contains(&i))
@@ -3795,10 +3830,11 @@ pub(crate) fn compile_into(
                 b.ins().return_(&[zero]);
                 b.seal_all_blocks();
                 b.finalize();
-                if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
-                    probes.finish(module, &mut context.func, frame);
-                }
-                define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
+                finish_value_body(
+                    module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
+                    mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
+                    stack_budget, long_range_calls,
+                )?;
                 continue;
             }
             let call_result_bytes = p.call_result_bytes();
@@ -5443,24 +5479,11 @@ pub(crate) fn compile_into(
             b.seal_all_blocks();
             b.finalize();
         }
-        if live_stores {
-            let entry = context.func.layout.entry_block().unwrap();
-            let owner = *context.func.dfg.block_params(entry).last().unwrap();
-            crate::mutation_store::lower_framed(
-                module,
-                &mut context.func,
-                owner,
-                mutation_frame_ready.ok_or("missing live-store frame initialization")?,
-            )?;
-        }
-        if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
-            probes.finish(module, &mut context.func, frame);
-        }
-        if live_stores {
-            live_bodies.push((ids[i], context));
-        } else {
-            define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
-        }
+        finish_value_body(
+            module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
+            mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
+            stack_budget, long_range_calls,
+        )?;
     }
     if live_stores {
         if live_bodies.len() != ids.len() + initialization_guards.len() {
@@ -6164,6 +6187,38 @@ mod structural_jit_tests {
                 })
             );
         }
+    }
+}
+
+// All value/replacement bodies use the same ordering: lower fallible stores,
+// append shared frame cleanup, then defer for closure checking or define normally.
+fn finish_value_body(
+    module: &mut impl Module,
+    id: cranelift_module::FuncId,
+    context: &mut cranelift_codegen::Context,
+    probes: Option<&gc_probe::Probes>,
+    frame: Option<ir::StackSlot>,
+    ready: Option<ir::Inst>,
+    live_bodies: Option<&mut Vec<(cranelift_module::FuncId, cranelift_codegen::Context)>>,
+    stack_budget: bool,
+    long_range_calls: bool,
+) -> Result<(), Error> {
+    if live_bodies.is_some() {
+        let entry = context.func.layout.entry_block().unwrap();
+        let owner = *context.func.dfg.block_params(entry).last().unwrap();
+        crate::mutation_store::lower_framed(
+            module, &mut context.func, owner,
+            ready.ok_or("missing live-store frame initialization")?,
+        )?;
+    }
+    if let (Some(probes), Some(frame)) = (probes, frame) {
+        probes.finish(module, &mut context.func, frame);
+    }
+    if let Some(bodies) = live_bodies {
+        bodies.push((id, std::mem::replace(context, module.make_context())));
+        Ok(())
+    } else {
+        define_checked(module, id, context, stack_budget, long_range_calls)
     }
 }
 
