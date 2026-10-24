@@ -1,0 +1,87 @@
+.module LivePrimitiveArrays
+.function Write(out arrayref<Byte>& first,out arrayref<Byte>& second,Int64 mode) -> Int32
+.local arrayref<Int32> numbers
+.local arrayref<Int64> pending
+.local arrayref<Byte> bytes
+.local arrayref<Byte> reserved
+ldc.i4 2
+newarr Int32
+stloc numbers
+ldloc numbers
+ldc.i4 0
+ldc.i4 42
+stelem Int32
+ldc.i4 2
+array.reserve Int64
+stloc pending
+ldloc pending
+ldc.i4 0
+ldc.i8 99
+stelem Int64
+ldc.i4 8
+newarr Byte
+stloc bytes
+ldarg first
+ldloc bytes
+stobj arrayref<Byte>
+ldc.i4 8
+array.reserve Byte
+stloc reserved
+ldarg second
+ldloc reserved
+stobj arrayref<Byte>
+ldloc bytes
+ldc.i4 0
+ldc.i4 42
+conv.u1
+stelem Byte
+ldloc reserved
+ldc.i4 0
+ldc.i4 43
+conv.u1
+stelem Byte
+ldarg mode
+ldc.i8 3
+beq bad_byte
+ldarg mode
+ldc.i8 4
+beq bad_scalar
+ldarg mode
+ldc.i8 5
+beq bad_index
+ldloc pending
+ldc.i4 0
+ldelem Int64
+conv.i4
+ldloc numbers
+ldc.i4 0
+ldelem Int32
+add
+ldloc numbers
+ldc.i4 1
+ldelem Int32
+add
+ret
+bad_byte:
+ldloc reserved
+ldc.i4 1
+ldelem Byte
+conv.i4
+ret
+bad_scalar:
+ldloc pending
+ldc.i4 1
+ldelem Int64
+conv.i4
+ret
+bad_index:
+ldloc bytes
+ldc.i4 8
+ldelem Byte
+conv.i4
+ret
+.end
+.function Main(Int32 value) -> Int32
+ldarg value
+ret
+.end

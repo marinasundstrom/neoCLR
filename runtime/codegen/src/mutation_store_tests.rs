@@ -966,7 +966,7 @@ fn emit_managed(source: &str) {
             assert_eq!(object.symbols().any(|s| s.is_undefined()
                 && s.name().unwrap_or("").trim_start_matches('_') == "experiment_gc_static_storage_rooted_v1"), enabled);
         }
-        if source.contains("stelem") {
+        if source.contains("stelem") && !source.starts_with(".module LivePrimitiveArrays") {
             let helper = if source.contains("stelem String") {
                 "experiment_gc_store_text"
             } else { "experiment_gc_store_record" };
@@ -1197,4 +1197,14 @@ fn managed_byte_views_run_on_live_collector() {
     type Run = unsafe extern "C" fn(*const *const u8) -> i32;
     let run: libloading::Symbol<Run> = unsafe { library.get(b"managed_byte_view_consumer") }.unwrap();
     assert_eq!(unsafe { run(pointers.as_ptr()) }, 0);
+}
+
+#[test]
+fn managed_primitive_arrays_emit_guarded_stores() {
+    emit_managed(include_str!("../../../benchmarks/execution/concurrent-store/primitive-arrays.neoil"));
+}
+#[test]
+#[ignore = "requires primitive-array host built by validate-primitive-arrays.py"]
+fn managed_primitive_arrays_run_on_live_collector() {
+    run_managed(include_str!("../../../benchmarks/execution/concurrent-store/primitive-arrays.neoil"));
 }

@@ -625,3 +625,33 @@ The object is archived; the generated collector and production native providers 
 unchanged. `managed-byte-views-initial-failures.json.gz` retains a corrected stale fixture
 definition index and the missing-frame rejection that exposed UTF-8 projection's live
 integration gap. No throughput measurement or default change is claimed.
+
+
+## Managed primitive buffer allocation
+
+Live call-closure admission now includes the existing rooted byte allocation,
+byte reservation and scalar-array allocation providers. Generated calls already
+publish their collecting-boundary roots and pass stack result slots. Providers
+initialize fresh storage without another collection before return; managed output
+publication uses checked stores. Scalar arrays use the existing BYTES allocation
+kind so pointer-shaped integers are not reference edges. The default compiler and
+production provider implementations are unchanged.
+
+`primitive-arrays.neoil` executes ordinary/reserved Byte, Int32 and Int64 array
+construction, stores and reads. The native consumer supplies old heap output aliases
+and tests normal operation, garbage-pressure recovery, all-live exhaustion, reserved
+byte/scalar uninitialized reads, and bounds failures. Earlier published arrays survive
+faults, result storage remains unchanged on failure, and the host root chain is
+restored. Only the published heap owners retain exported buffers across collection;
+clearing the final owner reclaims everything. Local scalar arrays stay rooted across
+subsequent allocating calls, and the final sum checks stored and zero-initialized data.
+
+`primitive-arrays-validation.json.gz` records 720 forced/paced JIT and optimized/UBSan
+AOT cycles; `primitive-arrays-compiler.json.gz` records 19 focused compiler tests passing
+(11 host-dependent tests ignored there; this fixture's JIT host test runs explicitly).
+The emitted object is archived. The generated collector is byte-identical to
+`text-arrays-automatic-gc.c.gz`. This extends the existing CLR-style distinction between
+reference-containing and primitive arrays, with neoCLR's already documented reserved
+initialization checks. No new semantic divergence, HTTP throughput result or default
+switch is claimed. Capability conversions, remaining text/native services and async/
+full-entry integration remain open.
