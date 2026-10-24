@@ -805,6 +805,7 @@ fn managed_options_for(source: &str) -> crate::fault_details::Options {
         options.task_queue_drain = Some(15);
     }
     if source.starts_with(".module LiveAsyncWrappersPumpNetwork") {
+        options.entry_host_io = true;
         options.socket_connect_result.push(16);
     }
     if source.starts_with(".module LiveQueue") {
@@ -1588,6 +1589,7 @@ fn live_pump_requires_async_dispatch_and_queue_drain() {
     let input = managed_input(source);
     for missing_async in [false, true] {
         let mut options = managed_options_for(source);
+        options.entry_host_io = true;
         if missing_async {
             options.runtime_async_start.clear();
             options.runtime_async_startmanaged.clear();
@@ -2026,4 +2028,23 @@ fn managed_tls_wrappers_runs_on_live_collector() {
     type Run = unsafe extern "C" fn(*const *const u8) -> i32;
     let run: libloading::Symbol<Run> = unsafe { library.get(b"tls_wrappers_consumer") }.unwrap();
     assert_eq!(unsafe { run(functions.as_ptr()) },0);
+}
+
+#[test]
+#[ignore = "requires retained HTTP inputs and NEOCLR_LIVE_SELECTION_COMMAND"]
+fn full_http_selection_compiles_with_live_gc() {
+    let path=std::env::var_os("NEOCLR_LIVE_SELECTION_COMMAND").expect("selection command JSON");
+    let command: Vec<String>=serde_json::from_slice(&std::fs::read(path).unwrap()).unwrap();
+    let arguments=command.into_iter().skip(1).map(std::ffi::OsString::from).collect();
+    let live=std::env::var("NEOCLR_LIVE_SELECTION_MODE").as_deref()!=Ok("sync");
+    assert_eq!(crate::run_internal(arguments,live).unwrap(),0);
+}
+
+#[test]
+fn live_host_io_requires_admitted_pump() {
+    let source=include_str!("../../../benchmarks/execution/concurrent-store/managed.neoil");
+    let mut options=managed_options_for(source);options.entry_host_io=true;
+    let mut module=ObjectModule::new(ObjectBuilder::new(isa(target(),true),"reject_host_io",cranelift_module::default_libcall_names()).unwrap());
+    assert!(crate::compiler::values::compile_into(&managed_input(source),"Main",Some(&options),crate::compiler::Target::MacosArm64,&mut module,false).unwrap_err().to_string().contains("owned published frames"));
+    assert!(crate::run_internal(vec!["--jit-managed".into()],true).unwrap_err().to_string().contains("AOT-only"));
 }

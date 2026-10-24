@@ -459,7 +459,7 @@ pub(crate) fn compile_into(
     let live_stores = details.is_some_and(|d| d.experimental_live_gc_stores);
     if live_stores && !details.is_some_and(|d| d.native_gc && d.probe_stack_roots
         && d.reference_arena && !d.native_worker_safepoints && !d.native_host_bootstrap
-        && !d.entry_host_io && (d.entry_task_drain.is_empty()
+        && (!d.entry_host_io || !d.entry_task_drain.is_empty()) && (d.entry_task_drain.is_empty()
             || (d.task_queue_drain.is_some() && (!d.runtime_async_start.is_empty() || !d.runtime_async_startmanaged.is_empty())))) {
         return Err("experimental live stores require owned published frames without host bootstrap/services".into());
     }

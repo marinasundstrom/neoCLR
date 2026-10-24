@@ -173,6 +173,13 @@ plain/JSON import audit has zero missing names. Next priority is full selected
 compilation, required host-I/O entry and executable HTTP qualification; import coverage
 is not execution proof
 ([TLS evidence](../benchmarks/execution/concurrent-store/README.md#tls-managed-boundary-admission-2026-10-24)).
+Host-I/O entry now qualifies with the admitted modern pump: 600 real-scheduler
+JIT/AOT cycles include missing-scope rejection and 450 accepts; 35 compiler checks pass.
+A private AOT driver harness freshly compiles the retained full plaintext/JSON cohort:
+ordinary builds succeed (1,131/1,559 functions), but both live builds reject callable
+arrays. **Next: qualify callable-array stores/lifetimes, then rerun full selection**
+to expose further generated-body gaps before HTTP execution or performance claims
+([full selection evidence](../benchmarks/execution/concurrent-store/README.md#full-http-selection-and-host-io-entry-qualification-2026-10-24)).
 Capability conversions, callable arrays, remaining text/byte services and async/full
 host-entry integration remain next;
 the recorded plaintext import inventory guides that coverage.

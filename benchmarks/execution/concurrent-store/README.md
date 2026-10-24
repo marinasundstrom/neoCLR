@@ -1336,3 +1336,47 @@ expose capability/callable/bootstrap or other integration gaps. Next work is ful
 selection/entry integration and executable HTTP qualification, followed by matched
 synchronous/live throughput, CPU, pauses and memory measurements. Public APIs, website
 behavior and production default GC are unchanged.
+
+
+## Full HTTP selection and host-I/O entry qualification (2026-10-24)
+
+The live gate now permits `entry_host_io` only with an admitted entry pump. The
+existing async callback/queue prerequisites still apply; host-I/O without that pump
+and the legacy path remain rejected. Inspection shows the flag is consumed by the
+legacy poll branch; the modern native async pump already drives the real scheduler,
+which rejects calls without a socket scope. No native ownership or scheduling
+semantics change was necessary.
+
+The real-network fixture now selects `entry_host_io=true` and first checks missing
+socket-scope rejection, unchanged output, restored roots and recovery. The subsequent
+600 forced/paced JIT and optimized/undefined-bounds AOT cycles still cover 450 loopback
+accepts through generated callbacks/result consumption. Thirty-five focused compiler
+checks pass (27 host-dependent tests skipped in the general filter; network JIT tests
+run explicitly), including host-I/O without a pump and a private AOT-only execution
+guard. Evidence: `network-pump-host-io-*` and `full-http-compiler-checks.txt.gz`.
+
+Add a private `run_internal` qualification route through the ordinary driver selection
+and compilation pipeline. Public hosting always supplies live=false; no CLI flag,
+public API, default behavior or JIT execution route is enabled. An ignored test reads
+an explicit retained command JSON and selects ordinary or live AOT options.
+`qualify-http-selection.py --runner <test-runner> --output <fresh-directory>` runs the
+same existing plaintext/JSON input cohort and flags under both modes, records hashes,
+stdout/stderr and actual outcomes, and returns failure unless all four builds succeed.
+
+The first complete run is intentionally **not green**. Ordinary plaintext compilation
+succeeds with 1,131 selected functions/63 native bindings; ordinary JSON succeeds with
+1,559 functions/81 bindings. Both live compilations reject callable-array stores with
+`live stores require qualification for callable arrays`. This is a verified compiler
+admission gap, not a stale input or missing-native-symbol inference. Preserve the full
+report as `full-http-selection-initial.json.gz` and its compact summary. The selected
+library/input cohort remains retained from prior benchmarks; these are fresh backend
+builds, not rebuilt Raven samples or server executions.
+
+Next: qualify callable-array construction, stores, receiver/reference retention,
+initialization and invocation under live marking, then rerun full live selection to
+expose subsequent gaps (including generated bodies that have no native import).
+Do not remove the callable guard merely because import coverage is complete. Host
+bootstrap/shared heaps, full HTTP execution and throughput/CPU/pause/memory comparisons
+remain open. CLR-style separation of generated-code root/store obligations and collector
+ownership remains the comparison; this change introduces no language-level semantics
+or collector policy. Website/public API behavior is unchanged.

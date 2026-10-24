@@ -9,7 +9,14 @@ s=s.replace('(&c.text,56,NEOCLR_GC_OBJECT','(&c.text,64,NEOCLR_GC_OBJECT')
 start=s.index('void neoclr_scheduler_wait_v1(')
 end=s.index('extern void experiment_gc_store_counts',start)
 s=s[:start]+s[end:]
-s=s.replace('neoclr_task_scope scope;', 'neoclr_socket_scope sockets;\n        CHECK(!neoclr_socket_scope_enter_v1(&sockets,&c));\n        neoclr_task_scope scope;')
+s=s.replace('neoclr_task_scope scope;', 'neoclr_socket_scope sockets;\n        neoclr_task_scope scope;')
+s=s.replace('        int32_t pump_result=777;', '''        int32_t missing_result=777;
+        CHECK(pump(&missing_result,&c)==3 && missing_result==777);
+        CHECK(!neoclr_root_probe_head_v1());
+        CHECK(!neoclr_runtime_async_shutdown_v1(&c));
+        c.fault.code=0;
+        CHECK(!neoclr_socket_scope_enter_v1(&sockets,&c));
+        int32_t pump_result=777;''')
 s=s.replace('CHECK(!neoclr_task_scope_leave_v1(&scope));','CHECK(!neoclr_socket_scope_leave_v1(&sockets));\n            CHECK(!neoclr_task_scope_leave_v1(&scope));')
 needle='        CHECK(!neoclr_runtime_async_shutdown_v1(&c));\n        /* A started callback'
 assert s.count(needle)==1

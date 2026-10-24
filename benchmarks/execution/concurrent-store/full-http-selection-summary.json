@@ -1,0 +1,31 @@
+{
+  "scope": "Current backend compilation of retained HTTP input cohort; no execution or throughput claim.",
+  "cases": [
+    {
+      "sample": "plain",
+      "mode": "sync",
+      "exitCode": 0,
+      "selectedFunctions": 1131,
+      "nativeBindings": 63
+    },
+    {
+      "sample": "plain",
+      "mode": "live",
+      "exitCode": 101,
+      "failure": "live stores require qualification for callable arrays"
+    },
+    {
+      "sample": "json",
+      "mode": "sync",
+      "exitCode": 0,
+      "selectedFunctions": 1559,
+      "nativeBindings": 81
+    },
+    {
+      "sample": "json",
+      "mode": "live",
+      "exitCode": 101,
+      "failure": "live stores require qualification for callable arrays"
+    }
+  ]
+}

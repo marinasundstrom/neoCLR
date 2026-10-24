@@ -56,6 +56,15 @@ use std::{
 /// Calls are serialized because native helper state is not yet a concurrent-session
 /// contract. Hosts must not reenter the driver from guest/native callbacks.
 pub fn run(arguments: Vec<std::ffi::OsString>) -> Result<i32, Box<dyn std::error::Error>> {
+    run_internal(arguments, false)
+}
+
+// Private AOT qualification route: ordinary hosting never enables live stores.
+// Execution still requires independently qualified host capability/ownership checks.
+fn run_internal(arguments: Vec<std::ffi::OsString>, live_stores: bool) -> Result<i32, Box<dyn std::error::Error>> {
+    if live_stores && arguments.iter().any(|a| a.to_string_lossy().starts_with("--jit")) {
+        return Err("live selection qualification is AOT-only".into());
+    }
     static HOST: std::sync::Mutex<()> = std::sync::Mutex::new(());
     let _session = HOST
         .lock()
@@ -835,6 +844,7 @@ pub fn run(arguments: Vec<std::ffi::OsString>) -> Result<i32, Box<dyn std::error
         if windows_stack || windows_heap {
             d.reference_arena = true;
         }
+        d.experimental_live_gc_stores = live_stores;
         d.probe_stack_roots = probe_stack_roots;
         d.native_gc = native_gc;
         d.native_worker_safepoints = native_worker_safepoints;
