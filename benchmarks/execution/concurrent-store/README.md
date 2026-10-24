@@ -690,3 +690,39 @@ is preserved in `scoped-slice-initial-cast-failure.json.gz`. Correcting the type
 resolved it. No HTTP/performance measurement or default change is claimed. The next
 integration work remains remaining native services, capability/callable wrappers,
 async callbacks and full entry. See the [runtime scope tradeoff and CLR comparison](../concurrent-live/README.md#native-call-synchronous-fallback-prototype-2026-10-24).
+
+
+## Generated ordinary callback dispatcher (2026-10-24)
+
+The live compiler now defers ordinary host-callback definition until after its
+store lowering and the complete managed-body/callback call-closure check. Previously
+this dispatcher was emitted after the live closure had already been checked. The
+exact noncollecting `neoclr_gc_callback_read_v1` ABI joins the provider list; this does
+not admit arbitrary host calls. The strong host handle retains the callable descriptor
+and instance receiver while the generated callee publishes its own frame. The reader
+rejects entry when a matching managed frame is already active. Entry-pump dispatch,
+queue draining, bootstrap and native async replacement admission remain separate.
+
+`callbacks.neoil` supplies inhabited-Void and no-result instance targets. The first
+allocates a byte array, stores it in its receiver and writes a scalar; the second
+raises division-by-zero. The real collector consumer invokes the exported dispatcher
+with a host-root handle, including allocation pressure, invalid identities, stale
+handles, malformed descriptors and already-active-frame rejection. It checks receiver
+and child retention, unchanged rejected receivers, fault status, root-chain restoration
+and complete reclamation after releasing the handle.
+
+`validate-callbacks.py --runner <codegen-test-runner> --output <fresh-directory>`
+passes 720 forced/paced JIT and optimized/undefined-bounds AOT cycles. Twenty focused
+compiler checks pass (13 host-dependent checks skipped in that general run; the
+callback JIT test runs explicitly in the harness). Reports and AOT object are archived
+as `callbacks-*`. The first rejection fixture incorrectly passed null storage to the
+root-frame API, which requires a non-null descriptor even for zero slots; the native
+assertion aborted before dispatch. Its failure report is retained. Correcting the
+fixture resolves it. The local LLDB launcher also crashed during diagnosis; a temporary
+abort backtrace located the fixture issue. This is not race-detector qualification.
+
+Default compilation and managed API semantics are unchanged. This narrows the gap
+between the native carrier evidence and generated HTTP code, but does not qualify
+full entry/pumps, asynchronous retained writes, shared heaps or server throughput.
+Native async/socket result aliases still need guarded publication before admission.
+The existing CLR rooted-transition comparison applies; this adds no public contract.

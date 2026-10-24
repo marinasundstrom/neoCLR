@@ -1284,3 +1284,30 @@ fn managed_scoped_slice_runs_on_live_collector() {
     let run: libloading::Symbol<Run> = unsafe { library.get(b"scoped_slice_consumer") }.unwrap();
     assert_eq!(unsafe { run(module.get_finalized_function(id)) }, 0);
 }
+
+#[test]
+fn managed_callbacks_join_live_closure() {
+    let source = include_str!("../../../benchmarks/execution/concurrent-store/callbacks.neoil");
+    let input = managed_input(source);
+    assert!(input.functions[0].name.ends_with("Run"));
+    assert!(input.functions[1].name.ends_with("Fail"));
+    emit_managed(source);
+}
+#[test]
+#[ignore = "requires callback host built by validate-callbacks.py"]
+fn managed_callbacks_run_on_live_collector() {
+    let library = std::sync::Arc::new(unsafe { libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host")) }.unwrap());
+    unsafe { crate::mutation_admission::require_managed_host(&library) }.unwrap();
+    let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
+    let resolver = library.clone();
+    builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
+    let mut code = Code(Some(JITModule::new(builder)));
+    let module = code.0.as_mut().unwrap();
+    let input = managed_input(include_str!("../../../benchmarks/execution/concurrent-store/callbacks.neoil"));
+    crate::compiler::values::compile_into(&input,"Main",Some(&managed_options()),crate::compiler::Target::MacosArm64,module,true).unwrap();
+    module.finalize_definitions().unwrap();
+    let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name("neoclr_invoke_void_callback_v1") else { panic!("callback") };
+    type Run = unsafe extern "C" fn(*const u8) -> i32;
+    let run: libloading::Symbol<Run> = unsafe { library.get(b"managed_callback_consumer") }.unwrap();
+    assert_eq!(unsafe { run(module.get_finalized_function(id)) }, 0);
+}

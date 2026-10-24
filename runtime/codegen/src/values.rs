@@ -5497,13 +5497,6 @@ pub(crate) fn compile_into(
         if live_bodies.len() != ids.len() + initialization_guards.len() {
             return Err("live stores reject unqualified replacement emission".into());
         }
-        let bodies: Vec<_> = live_bodies.iter().map(|(id, ctx)| (*id, &ctx.func)).collect();
-        crate::mutation_admission::check_call_closure(
-            module, &bodies, &crate::mutation_admission::root_providers(module),
-        )?;
-        for (id, mut context) in live_bodies {
-            define_checked(module, id, &mut context, stack_budget, long_range_calls)?;
-        }
     }
     let entry_check = if details.is_some_and(|d| d.native_gc) {
         let mut signature = module.make_signature();
@@ -5756,6 +5749,7 @@ pub(crate) fn compile_into(
             diagnostic_data.as_ref(),
             false,
             long_range_calls,
+            if live_stores { Some(&mut live_bodies) } else { None },
         )?;
         if details.is_some_and(|d| !d.entry_task_drain.is_empty()) {
             compile_host_callbacks(
@@ -5766,6 +5760,7 @@ pub(crate) fn compile_into(
                 diagnostic_data.as_ref(),
                 true,
                 long_range_calls,
+                None, // Entry pumps remain rejected by live admission.
             )?;
         }
         if let Some(drain) = details.and_then(|d| d.task_queue_drain) {
@@ -5777,6 +5772,15 @@ pub(crate) fn compile_into(
                 diagnostic_data.as_ref().unwrap(),
                 long_range_calls,
             )?;
+        }
+    }
+    if live_stores {
+        let bodies: Vec<_> = live_bodies.iter().map(|(id, ctx)| (*id, &ctx.func)).collect();
+        crate::mutation_admission::check_call_closure(
+            module, &bodies, &crate::mutation_admission::root_providers(module),
+        )?;
+        for (id, mut context) in live_bodies {
+            define_checked(module, id, &mut context, stack_budget, long_range_calls)?;
         }
     }
     Ok(())
@@ -5792,6 +5796,7 @@ fn compile_host_callbacks(
     diagnostic_data: Option<&crate::fault_details::Data>,
     entry_pump: bool,
     long_range_calls: bool,
+    live_bodies: Option<&mut Vec<(cranelift_module::FuncId, cranelift_codegen::Context)>>,
 ) -> Result<(), Error> {
     use neoclr::metadata::{FunctionType, Type};
     let shape = Type::Function(Box::new(FunctionType {
@@ -5901,13 +5906,16 @@ fn compile_host_callbacks(
         b.seal_all_blocks();
         b.finalize();
     }
-    define_checked(
-        module,
-        export,
-        &mut context,
-        stack_check.is_some(),
-        long_range_calls,
-    )?;
+    if let Some(bodies) = live_bodies {
+        // Host ownership roots the descriptor/receiver until the managed callee
+        // publishes its own frame. Reader/store hooks do not collect.
+        let entry = context.func.layout.entry_block().ok_or("missing callback entry")?;
+        let owner_context = context.func.dfg.block_params(entry)[1];
+        crate::mutation_store::lower(module, &mut context.func, owner_context)?;
+        bodies.push((export, context));
+    } else {
+        define_checked(module, export, &mut context, stack_check.is_some(), long_range_calls)?;
+    }
     Ok(())
 }
 

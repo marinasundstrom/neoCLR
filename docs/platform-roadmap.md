@@ -104,7 +104,10 @@ Async callbacks remain unqualified; cancellation cost and HTTP performance remai
 unmeasured. Real async-carrier ownership and loopback socket transfers now match
 synchronous GC in forced/paced optimized/UBSan native fixtures: parked conditional
 roots, resumed mutations, abandonment, transfer buffers and fault teardown pass.
-Generated async callbacks/full entry and shared heaps remain unqualified.
+The ordinary generated callback dispatcher now joins live store/closure checking;
+JIT/AOT tests cover receiver allocations under pressure, faults, rejection and root
+restoration. Entry pumps, native async wrappers/full entry and shared heaps remain
+unqualified.
 Capability conversions, callable arrays, remaining text/byte services and async/full
 host-entry integration remain next;
 the recorded plaintext import inventory guides that coverage.
