@@ -1,8 +1,19 @@
 /* Reads only through the mutation gate; allocation headers are detached. */
 static int live_read(shadow_snapshot *s, const block *b, uint64_t offset, void *out, size_t bytes) {
     size_t i = (size_t)(b - s->headers);
+#ifdef NEOCLR_LIVE_BATCH
+    if (bytes>GATE_SCRATCH || offset>b->bytes || bytes>b->bytes-offset) return 0;
+    if (s->read_held && (s->read_bytes+bytes>4096 || s->read_calls==64))
+        live_batch_leave(s);
+    if (!live_batch_enter(s)) return 0;
+    memcpy(out,(void *)(s->base+s->offsets[i]+sizeof(block)+offset),bytes);
+    s->read_bytes+=(unsigned)bytes;
+    s->read_calls++;
+    return 1;
+#else
     return !gate_read(s->gate, s->epoch,
         (void *)(s->base + s->offsets[i] + sizeof(block)), b->bytes, offset, out, bytes);
+#endif
 }
 static int live_words(shadow_snapshot *s, const block *b, uint64_t start, uint64_t end) {
     uint64_t scratch[GATE_SCRATCH / 8];

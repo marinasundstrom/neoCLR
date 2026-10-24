@@ -7,6 +7,8 @@ import subprocess
 parser = argparse.ArgumentParser()
 parser.add_argument('--output', type=Path, required=True)
 parser.add_argument('--sparse-index', action='store_true')
+parser.add_argument('--batch-comparison', action='store_true')
+parser.add_argument('--gate-profile', action='store_true')
 args = parser.parse_args()
 base = Path(__file__).resolve().parent
 root = base.parents[2]
@@ -23,13 +25,22 @@ try:
     recipe=json.loads((root/'benchmarks/execution/call-layout/results.json').read_text())['builds'][1]['command']
     cc=recipe[:recipe.index('-std=c11')]
     if args.sparse_index: cc += ['-DNEOCLR_SHADOW_SPARSE_INDEX']
+    if args.gate_profile: cc += ['-DNEOCLR_LIVE_GATE_PROFILE']
     exe=out/'benchmark'
-    run(cc+['-std=c11','-O2','-Wall','-Wextra','-Werror','-pthread','-DNEOCLR_NATIVE_GC','-I',base.parent/'concurrent-mutation-gate',base.parent/'concurrent-mutation-gate/gate.c','-I',root/'runtime/native/gc',base/'benchmark.c',root/'runtime/native/gc/root-probe.c',source,'-o',exe])
-    for mode in ['sync','concurrent','concurrent','sync']:
-        words=run([exe,mode]).split();assert words[0]==mode
+    command=cc+['-std=c11','-O2','-Wall','-Wextra','-Werror','-pthread','-DNEOCLR_NATIVE_GC','-I',base.parent/'concurrent-mutation-gate',base.parent/'concurrent-mutation-gate/gate.c','-I',root/'runtime/native/gc',base/'benchmark.c',root/'runtime/native/gc/root-probe.c',source,'-o',exe]
+    run(command)
+    batched=out/'batched'
+    if args.batch_comparison:
+        batch_command=command.copy();batch_command[-1]=batched
+        batch_command+=['-DNEOCLR_LIVE_BATCH']
+        run(batch_command)
+    modes=['sync','concurrent','batched','batched','concurrent','sync'] if args.batch_comparison else ['sync','concurrent','concurrent','sync']
+    for mode in modes:
+        argument='concurrent' if mode=='batched' else mode
+        words=run([batched if mode=='batched' else exe,argument]).split();assert words[0]==argument
         wall,cpu,peak,checksum=map(int,words[1:])
         r['trials'].append(dict(mode=mode,wallNanoseconds=wall,processCpuNanoseconds=cpu,peakArenaBytes=peak,checksum=checksum))
     assert len({row['checksum'] for row in r['trials']})==1
-    r['inputs']={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in [source,base/'benchmark.c',base/'measure.py',base/'scan.h',base/'generate.py',base.parent/'concurrent-mutation-gate/gate.c',base.parent/'concurrent-mutation-gate/gate.h']}
+    r['inputs']={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in [source,base/'benchmark.c',base/'measure.py',base/'scan.h',base/'batch.h',base/'generate.py',base.parent/'concurrent-mutation-gate/gate.c',base.parent/'concurrent-mutation-gate/gate.h']}
     r['passed']=True
 finally:(out/'results.json').write_text(json.dumps(r,indent=2)+'\n')

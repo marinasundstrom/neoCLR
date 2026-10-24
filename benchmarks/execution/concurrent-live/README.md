@@ -109,3 +109,11 @@ Run `validate.py --sparse-index --output <fresh-directory>` and
 `measure.py --sparse-index --output <fresh-directory>`. The generated source links
 with concurrent-mutation-gate/gate.c and current native root helpers. This private
 experiment changes neither Raven emission nor the managed/native bridge contract.
+
+
+## Gate granularity follow-up
+
+The [bounded-batch comparison](batch-results.md) separates marker CPU, owner pauses,
+guarded writes and uninstrumented process costs. Larger batches reduce lock calls
+but increase process CPU 20.8% and move more blocking into mutations in this native
+cohort. The macro remains off; these findings do not replace managed/HTTP qualification.

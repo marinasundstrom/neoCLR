@@ -50,6 +50,10 @@ payload capture. Delayed mutation, array publication, overflow recovery, negativ
 barrier controls and 12,000 differential object checks pass. A native graph workload
 still costs 2.59× synchronous CPU; generated/native writer admission and managed
 workload qualification remain required before HTTP or default use.
+A [gate-granularity comparison](../benchmarks/execution/concurrent-live/batch-results.md)
+now separates process/marker CPU, lifecycle pauses and guarded-write time. Bounded
+batches pass safety tests but use 20.8% more native-workload CPU and increase write
+blocking; keep batching off. Fewer lock calls alone are not the acceptance criterion.
 
 **Author-directed media types (2026-10-23):** Complete the bounded HTTP value-contract
 slice with cached typed presets, lazy structured projections, shared primitive

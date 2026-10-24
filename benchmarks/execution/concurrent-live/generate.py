@@ -15,8 +15,13 @@ s='#include "gate.h"\n#ifdef NEOCLR_WORKER_GC\n#error Live shared heaps are not 
 replace('    uint64_t used, *offsets, *pending;', '''    uint64_t used, *offsets, *pending;
     block *headers;
     mutation_gate *gate;
-    uint64_t epoch, payload_read, barrier_words;''')
-replace('static _Thread_local uint64_t shadow_stats[5];', 'static _Thread_local uint64_t live_counts[5];\nstatic _Thread_local uint64_t shadow_stats[5];')
+    uint64_t epoch, payload_read, barrier_words;
+#ifdef NEOCLR_LIVE_BATCH
+    unsigned read_held, read_bytes, read_calls;
+    uint64_t read_acquisitions, max_read_bytes, max_read_calls;
+    uint64_t hold_start, hold_max, hold_total;
+#endif''')
+replace('static _Thread_local uint64_t shadow_stats[5];', 'static _Thread_local uint64_t live_counts[5], live_batch_counts[5], live_time_counts[5];\nstatic _Thread_local uint64_t shadow_stats[5];')
 # All descriptor accesses use compact detached headers.
 replace('(const void *)(s->data + s->offsets[i])','&s->headers[i]',5)
 replace('''    s->data = shadow_alloc(s->used, 1);
@@ -28,6 +33,14 @@ replace('        s->offsets[n++] = at;','        s->headers[n] = *b;\n        s-
 replace('    shadow_stats[1] += s->used;','    shadow_stats[1] += s->count * sizeof(block);')
 replace('    free(s->edges); free(s->pending); free(s->offsets);','''    gate_stop(s->gate);
     if (gate_destroy(s->gate)) abort();
+#ifdef NEOCLR_LIVE_BATCH
+    live_batch_counts[0]+=s->read_acquisitions;
+    if (s->max_read_bytes>live_batch_counts[1]) live_batch_counts[1]=s->max_read_bytes;
+    if (s->max_read_calls>live_batch_counts[2]) live_batch_counts[2]=s->max_read_calls;
+    if (s->hold_max>live_batch_counts[3]) live_batch_counts[3]=s->hold_max;
+    live_batch_counts[4]+=s->hold_total;
+#endif
+    live_time_counts[0] += s->cpu_ns;
     live_counts[0] += s->count * sizeof(block);
     live_counts[1] += s->payload_read;
     live_counts[2] += s->barrier_words;
@@ -39,6 +52,7 @@ replace('    free(s->edges); free(s->pending); free(s->offsets);','''    gate_st
 # unresolved conservative word. No separate future-address vector is needed.
 replace('        s->valid = 1;', '        /* Validity persists across worker passes. */')
 replace('    s->base = (uintptr_t)context->text.data;', '    s->valid = 1;\n    s->base = (uintptr_t)context->text.data;')
+replace('s->cpu_ns = shadow_clock(CLOCK_THREAD_CPUTIME_ID) - start;', 's->cpu_ns += shadow_clock(CLOCK_THREAD_CPUTIME_ID) - start;')
 # Each worker pass drains any available barrier words before deciding it is done.
 replace('''            if (!s->pending_count) break;
         }
@@ -49,6 +63,30 @@ replace('''            if (!s->pending_count) break;
             if (!s->pending_count) break;
         }
         s->cpu_ns''')
+replace('/* Generated scanner below shares the production payload semantics. */',
+        (base/'batch.h').read_text()+'\n/* Generated scanner below shares the production payload semantics. */')
+replace('''            while (s->pending_count) {
+                size_t i = s->pending[--s->pending_count];
+                if (!shadow_scan(s, &s->headers[i])) {
+                    s->valid = 0;
+                    break;
+                }
+            }''', '''            while (s->pending_count) {
+#ifdef NEOCLR_LIVE_BATCH
+                unsigned objects=0;
+                while (s->pending_count && objects++<32) {
+#endif
+                    size_t i = s->pending[--s->pending_count];
+                    if (!shadow_scan(s, &s->headers[i])) {
+                        s->valid = 0;
+                        break;
+                    }
+#ifdef NEOCLR_LIVE_BATCH
+                }
+                live_batch_leave(s);
+                if (!s->valid || !live_batch_drain(s)) { s->valid=0; break; }
+#endif
+            }''')
 start=s.index('static int shadow_scan(shadow_snapshot *s, const block *b) {')
 end=s.index('/* Explicit experimental lifecycle;',start)
 s=s[:start]+(base/'scan.h').read_text()+'\n'+s[end:]
@@ -82,6 +120,8 @@ replace('''    candidate_wait();
     }
     candidate_phase = 2;''')
 s+='''
+void experiment_gc_time_counts(uint64_t *out) { memcpy(out,live_time_counts,sizeof(live_time_counts)); }
+void experiment_gc_batch_counts(uint64_t *out) { memcpy(out,live_batch_counts,sizeof(live_batch_counts)); }
 void experiment_gc_live_counts(uint64_t *out) { memcpy(out,live_counts,sizeof(live_counts)); }
 void experiment_gc_live_wait(void) { if (!candidate_active) abort(); candidate_wait(); }
 /* Raw native caller must admit every mutation through this adapter. This is not
@@ -98,7 +138,18 @@ int experiment_gc_write(neoclr_aot_context *context, void *payload,
     if (count > GATE_PATCHES) return GATE_INVALID;
     for (size_t i=0;i<count;i++)
         if (patches[i].length && patches[i].offset < header) return GATE_INVALID;
-    return gate_write(s->gate,payload,bytes,kind==NEOCLR_GC_OBJECT?8:0,patches,count);
+#ifdef NEOCLR_LIVE_GATE_PROFILE
+    uint64_t start=shadow_clock(CLOCK_MONOTONIC), cpu=shadow_clock(CLOCK_THREAD_CPUTIME_ID);
+#endif
+    int result=gate_write(s->gate,payload,bytes,kind==NEOCLR_GC_OBJECT?8:0,patches,count);
+#ifdef NEOCLR_LIVE_GATE_PROFILE
+    live_time_counts[4]+=shadow_clock(CLOCK_THREAD_CPUTIME_ID)-cpu;
+    uint64_t elapsed=shadow_clock(CLOCK_MONOTONIC)-start;
+    live_time_counts[1]+=elapsed;
+    if (elapsed>live_time_counts[2]) live_time_counts[2]=elapsed;
+    live_time_counts[3]++;
+#endif
+    return result;
 }
 '''
 a.output.write_text(s)

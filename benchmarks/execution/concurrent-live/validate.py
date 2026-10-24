@@ -8,6 +8,7 @@ import signal
 parser = argparse.ArgumentParser()
 parser.add_argument('--output', type=Path, required=True)
 parser.add_argument('--sparse-index', action='store_true')
+parser.add_argument('--batch', action='store_true')
 args = parser.parse_args()
 root = Path(__file__).resolve().parents[3]
 base = Path(__file__).resolve().parent
@@ -25,6 +26,7 @@ try:
     recipe = json.loads((root/'benchmarks/execution/call-layout/results.json').read_text())['builds'][1]['command']
     cc = recipe[:recipe.index('-std=c11')]
     if args.sparse_index: cc += ['-DNEOCLR_SHADOW_SPARSE_INDEX']
+    if args.batch: cc += ['-DNEOCLR_LIVE_BATCH','-DNEOCLR_LIVE_GATE_PROFILE']
     for sanitizer in [False, True]:
         for case in ['lifetime', 'native-gc-test', 'native-gc-scan-test', 'native-gc-dense-test', 'native-gc-seed-test']:
             fixture = base/(case+'.c')

@@ -22472,3 +22472,24 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   A particular write-barrier implementation is not a universal prerequisite for
   every concurrent algorithm. Full copying/comparison currently adds CPU and
   blocking work, so latency, throughput, CPU and memory remain separate gates.
+
+
+- Author later supplies another ChatGPT assessment emphasizing the distinction
+  between collection CPU, application throughput and interruptions, and asks whether
+  the gate protects individual objects or larger regions. Assistant clarifies that
+  the live prototype has one mutex per owned heap, acquired for each payload read
+  (up to 256 bytes), shared with that heap's admitted mutator. The reported 2.59×
+  CPU ratio is whole-workload process CPU, not isolated GC CPU. The prototype logs
+  both deleted and inserted candidates, retains new objects through remark and
+  checks current roots; assistant does not label it pure SATB.
+- Assistant proceeds with bounded scan batches and separate instrumentation for
+  gate holds, store calls, marker CPU and begin/finish pauses. These are native
+  diagnostic scopes; none alone establishes HTTP throughput or overall GC overhead.
+  The supplied assessment is treated as a cross-check, not a new default-policy
+  decision or proof of correctness under all interleavings.
+- Assistant measures the bounded-batch variant: native process CPU rises 20.8%
+  despite fewer payload-gate acquisitions. Separate instrumented runs show shorter
+  finish waits but guarded-write wall time rising from about 0.33 s to 1.18 s.
+  Assistant retains batching as a disabled experiment; this is a measured policy
+  rejection for the fixture, not an author decision against concurrent GC.
+  [Scopes, tests and raw evidence](../benchmarks/execution/concurrent-live/batch-results.md).

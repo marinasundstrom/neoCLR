@@ -2,6 +2,8 @@
 #include "gate.h"
 extern int experiment_gc_write(neoclr_aot_context *,void *,const mutation_patch *,size_t);
 extern void experiment_gc_live_counts(uint64_t *);
+extern void experiment_gc_batch_counts(uint64_t *);
+extern void experiment_gc_time_counts(uint64_t *);
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -35,8 +37,22 @@ int main(int argc, char **argv) {
     uint64_t wall = now(CLOCK_MONOTONIC), cpu = now(CLOCK_PROCESS_CPUTIME_ID);
     uint64_t peak = c.text.used;
     volatile uint64_t checksum = 1;
+#ifdef NEOCLR_LIVE_GATE_PROFILE
+    uint64_t pause_totals[2]={0},pause_max[2]={0},owner_cpu=0;
+#endif
     for (unsigned round = 0; round < 10000; round++) {
-        if (concurrent) CHECK(!experiment_gc_begin(&c, &frame, NULL, 0));
+        if (concurrent) {
+#ifdef NEOCLR_LIVE_GATE_PROFILE
+            uint64_t start=now(CLOCK_MONOTONIC), begin_cpu=now(CLOCK_THREAD_CPUTIME_ID);
+#endif
+            CHECK(!experiment_gc_begin(&c, &frame, NULL, 0));
+#ifdef NEOCLR_LIVE_GATE_PROFILE
+            owner_cpu+=now(CLOCK_THREAD_CPUTIME_ID)-begin_cpu;
+            uint64_t elapsed=now(CLOCK_MONOTONIC)-start;
+            pause_totals[0]+=elapsed;
+            if(elapsed>pause_max[0]) pause_max[0]=elapsed;
+#endif
+        }
         for (unsigned i = 0; i < 64; i++) {
             uint64_t value=(uintptr_t)node(&c);
             if (concurrent) {
@@ -46,8 +62,17 @@ int main(int argc, char **argv) {
         }
         for (unsigned i = 0; i < 10000; i++) checksum = checksum * 33 + i;
         if (c.text.used > peak) peak = c.text.used;
+#ifdef NEOCLR_LIVE_GATE_PROFILE
+        uint64_t start=now(CLOCK_MONOTONIC), finish_cpu=now(CLOCK_THREAD_CPUTIME_ID);
+#endif
         if (concurrent) CHECK(!experiment_gc_finish(&c, &frame, NULL, 0));
         else CHECK(!neoclr_gc_collect_v1(&c, &frame));
+#ifdef NEOCLR_LIVE_GATE_PROFILE
+        owner_cpu+=now(CLOCK_THREAD_CPUTIME_ID)-finish_cpu;
+        uint64_t elapsed=now(CLOCK_MONOTONIC)-start;
+        pause_totals[1]+=elapsed;
+        if(elapsed>pause_max[1]) pause_max[1]=elapsed;
+#endif
         CHECK(root[0] == 17 && ((uint64_t *)(uintptr_t)root[2])[0] == 17);
     }
     cpu = now(CLOCK_PROCESS_CPUTIME_ID) - cpu;
@@ -61,6 +86,19 @@ int main(int argc, char **argv) {
     fprintf(stderr,"LIVE %llu %llu %llu %llu %llu\n",
         (unsigned long long)counters[0],(unsigned long long)counters[1],
         (unsigned long long)counters[2],(unsigned long long)counters[3],(unsigned long long)counters[4]);
+    experiment_gc_batch_counts(counters);
+    fprintf(stderr,"BATCH %llu %llu %llu %llu %llu\n",
+        (unsigned long long)counters[0],(unsigned long long)counters[1],
+        (unsigned long long)counters[2],(unsigned long long)counters[3],(unsigned long long)counters[4]);
+    experiment_gc_time_counts(counters);
+    fprintf(stderr,"TIMES %llu %llu %llu %llu %llu\n",
+        (unsigned long long)counters[0],(unsigned long long)counters[1],
+        (unsigned long long)counters[2],(unsigned long long)counters[3],(unsigned long long)counters[4]);
+#ifdef NEOCLR_LIVE_GATE_PROFILE
+    fprintf(stderr,"PAUSES %llu %llu %llu %llu %llu\n",
+        (unsigned long long)pause_totals[0],(unsigned long long)pause_max[0],
+        (unsigned long long)pause_totals[1],(unsigned long long)pause_max[1],(unsigned long long)owner_cpu);
+#endif
     root = NULL;
     CHECK(!neoclr_gc_collect_v1(&c, &frame) && !c.text.used);
     CHECK(!neoclr_gc_heap_release_v1(&c.text));

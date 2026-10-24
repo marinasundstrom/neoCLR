@@ -8,6 +8,7 @@ extern int32_t experiment_gc_finish(neoclr_aot_context *, const neoclr_probe_fra
 extern int experiment_gc_write(neoclr_aot_context *,void *,const mutation_patch *,size_t);
 extern void experiment_gc_shadow_gate(int);
 extern void experiment_gc_live_wait(void);
+extern void experiment_gc_batch_counts(uint64_t *);
 #define CHECK(x) do { if (!(x)) { fprintf(stderr,"line %d\n",__LINE__); abort(); } } while(0)
 static uint64_t *object(neoclr_aot_context *c) {
     uint64_t *p;
@@ -183,6 +184,34 @@ static void randomized(void) {
         CHECK(!neoclr_gc_heap_release_v1(&c.text));
     }
 }
+static void large_payloads(void) {
+    uint64_t heap[8192]={0};
+    neoclr_aot_context c={.text={(unsigned char *)heap,sizeof(heap),0}};
+    CHECK(!neoclr_gc_heap_acquire_v1(&c.text));
+    uint64_t *root=object(&c),*child=object(&c),*large,*array;
+    CHECK(!neoclr_gc_allocate_v1(&c.text,20000,NEOCLR_GC_OBJECT,(void **)&large));
+    large[0]=17; large[2499]=(uintptr_t)child; root[1]=(uintptr_t)large;
+    CHECK(!neoclr_gc_allocate_v1(&c.text,16+1024*9,NEOCLR_GC_STRINGS,(void **)&array));
+    array[0]=UINT64_C(0x80000004); array[1]=1024; root[2]=(uintptr_t)array;
+    array[2+1023]=(uintptr_t)child;
+    ((unsigned char *)array)[16+1024*8+1023]=1;
+    neoclr_probe_storage slot={&root,8,0};
+    neoclr_probe_frame frame={.context=&c,.storage=&slot,.storage_count=1};
+    CHECK(!experiment_gc_begin(&c,&frame,NULL,0));
+    CHECK(!experiment_gc_finish(&c,&frame,NULL,0) && *child==17);
+    root=NULL; CHECK(!neoclr_gc_collect_v1(&c,&frame) && !c.text.used);
+    CHECK(!neoclr_gc_heap_release_v1(&c.text));
+#ifdef NEOCLR_LIVE_BATCH
+    uint64_t counts[5]; experiment_gc_batch_counts(counts);
+    CHECK(counts[0]>0 && counts[1]==4096 && counts[2]==64);
+#ifdef NEOCLR_LIVE_GATE_PROFILE
+    CHECK(counts[3]>0 && counts[4]>=counts[3]);
+#endif
+    printf("BATCH %llu %llu %llu %llu %llu\n",(unsigned long long)counts[0],
+        (unsigned long long)counts[1],(unsigned long long)counts[2],
+        (unsigned long long)counts[3],(unsigned long long)counts[4]);
+#endif
+}
 int main(void) {
     for(unsigned i=0;i<100;i++) deleted_edge();
     array_publication();
@@ -190,5 +219,6 @@ int main(void) {
     late_insertion();
     overflow();
     randomized();
+    large_payloads();
     puts("PASS live deletion/insertion/future-address/overflow cases and 12000 differential blocks");
 }
