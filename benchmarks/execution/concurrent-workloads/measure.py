@@ -15,6 +15,7 @@ p.add_argument('--output', type=Path, required=True)
 p.add_argument('--rounds', type=int, default=5)
 p.add_argument('--guarded-control', action='store_true')
 p.add_argument('--disable-exact-store', action='store_true')
+p.add_argument('--store-ranges', type=int, choices=range(1,17), default=4)
 a = p.parse_args()
 assert a.rounds > 0
 root = Path(__file__).resolve().parents[3]
@@ -113,7 +114,7 @@ static void report_profile(struct rusage *a, struct rusage *b, struct timespec *
                 elif mode != 'sync' and item.endswith('/text-arena.c'): item = str(provider)
                 command.append(item)
             command[command.index('-o') + 1] = str(out / (case['sample'] + '-' + mode))
-            command += ['-DNEOCLR_GC_PROFILE']
+            command += ['-DNEOCLR_GC_PROFILE', f'-DNEOCLR_LIVE_STORE_RANGES={a.store_ranges}']
             if mode != 'sync':
                 gate = root / 'benchmarks/execution/concurrent-mutation-gate'
                 command += ['-DWORKLOAD_LIVE', '-DNEOCLR_SHADOW_SPARSE_INDEX',

@@ -1,0 +1,270 @@
+{
+  "standalone": {
+    "passed": true,
+    "allocationEquality": true,
+    "samples": {
+      "tasks": {
+        "sync": {
+          "cpuSeconds": 0.017139,
+          "wallSeconds": 0.017204,
+          "firstStoreLookups": null,
+          "allocations": 65548,
+          "allocatedBytes": 2261361,
+          "completedEpochs": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "guarded-sync": {
+          "cpuSeconds": 0.052198,
+          "wallSeconds": 0.052223,
+          "firstStoreLookups": [
+            131089,
+            61453
+          ],
+          "allocations": 65548,
+          "allocatedBytes": 2261361,
+          "completedEpochs": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "live": {
+          "cpuSeconds": 0.085328,
+          "wallSeconds": 0.085055,
+          "firstStoreLookups": [
+            130449,
+            61197
+          ],
+          "allocations": 65548,
+          "allocatedBytes": 2261361,
+          "completedEpochs": [
+            128,
+            128,
+            128,
+            128,
+            128
+          ]
+        }
+      },
+      "collections": {
+        "sync": {
+          "cpuSeconds": 0.09981,
+          "wallSeconds": 0.100325,
+          "firstStoreLookups": null,
+          "allocations": 237580,
+          "allocatedBytes": 7864689,
+          "completedEpochs": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "guarded-sync": {
+          "cpuSeconds": 0.275313,
+          "wallSeconds": 0.275968,
+          "firstStoreLookups": [
+            618513,
+            286733
+          ],
+          "allocations": 237580,
+          "allocatedBytes": 7864689,
+          "completedEpochs": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "live": {
+          "cpuSeconds": 0.438571,
+          "wallSeconds": 0.437295,
+          "firstStoreLookups": [
+            612557,
+            282177
+          ],
+          "allocations": 237580,
+          "allocatedBytes": 7864689,
+          "completedEpochs": [
+            464,
+            464,
+            464,
+            464,
+            464
+          ]
+        }
+      },
+      "arrays": {
+        "sync": {
+          "cpuSeconds": 0.053107,
+          "wallSeconds": 0.054636,
+          "firstStoreLookups": null,
+          "allocations": 86028,
+          "allocatedBytes": 1892721,
+          "completedEpochs": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "guarded-sync": {
+          "cpuSeconds": 0.074942,
+          "wallSeconds": 0.07618,
+          "firstStoreLookups": [
+            143297,
+            32861
+          ],
+          "allocations": 86028,
+          "allocatedBytes": 1892721,
+          "completedEpochs": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "live": {
+          "cpuSeconds": 0.098231,
+          "wallSeconds": 0.099242,
+          "firstStoreLookups": [
+            143025,
+            32693
+          ],
+          "allocations": 86028,
+          "allocatedBytes": 1892721,
+          "completedEpochs": [
+            168,
+            168,
+            168,
+            168,
+            168
+          ]
+        }
+      }
+    }
+  },
+  "ranges4-http-plain": {
+    "passed": true,
+    "summary": {
+      "sync": {
+        "requestsPerSecond": 3893.422605458025,
+        "requestSeconds": 0.06575191700000005,
+        "processCpuSeconds": 0.06559,
+        "peakRssBytes": 9846784
+      },
+      "guarded-sync": {
+        "requestsPerSecond": 1376.2204555505916,
+        "requestSeconds": 0.18601670899999867,
+        "processCpuSeconds": 0.195064,
+        "peakRssBytes": 11862016
+      },
+      "live": {
+        "requestsPerSecond": 1381.9539423037886,
+        "requestSeconds": 0.18524495800000018,
+        "processCpuSeconds": 0.206478,
+        "peakRssBytes": 12107776
+      },
+      "live-one-range": {
+        "requestsPerSecond": 1211.2650049060287,
+        "requestSeconds": 0.21134929099999944,
+        "processCpuSeconds": 0.236265,
+        "peakRssBytes": 12124160
+      },
+      "guarded-sync-one-range": {
+        "requestsPerSecond": 1222.950625202943,
+        "requestSeconds": 0.20932979199999835,
+        "processCpuSeconds": 0.219208,
+        "peakRssBytes": 11878400
+      }
+    },
+    "allocations": 57120,
+    "allocatedBytes": 4394837,
+    "lookups": {
+      "sync": null,
+      "guarded-sync": [
+        540490,
+        77320
+      ],
+      "live": [
+        512750,
+        62068
+      ],
+      "live-one-range": [
+        422361,
+        152457
+      ],
+      "guarded-sync-one-range": [
+        445385,
+        172425
+      ]
+    }
+  },
+  "ranges4-http-json": {
+    "passed": true,
+    "summary": {
+      "sync": {
+        "requestsPerSecond": 2188.3248798741947,
+        "requestSeconds": 0.11698445800000101,
+        "processCpuSeconds": 0.10353200000000001,
+        "peakRssBytes": 11649024
+      },
+      "guarded-sync": {
+        "requestsPerSecond": 884.1218970218118,
+        "requestSeconds": 0.2895528330000001,
+        "processCpuSeconds": 0.303315,
+        "peakRssBytes": 14090240
+      },
+      "live": {
+        "requestsPerSecond": 819.7809505591977,
+        "requestSeconds": 0.3122785419999996,
+        "processCpuSeconds": 0.336209,
+        "peakRssBytes": 14368768
+      },
+      "live-one-range": {
+        "requestsPerSecond": 655.5909072993267,
+        "requestSeconds": 0.3904874169999992,
+        "processCpuSeconds": 0.430732,
+        "peakRssBytes": 14417920
+      },
+      "guarded-sync-one-range": {
+        "requestsPerSecond": 762.3403849818942,
+        "requestSeconds": 0.3358080000000001,
+        "processCpuSeconds": 0.35361200000000004,
+        "peakRssBytes": 14155776
+      }
+    },
+    "allocations": 124873,
+    "allocatedBytes": 7163755,
+    "lookups": {
+      "sync": null,
+      "guarded-sync": [
+        698516,
+        109422
+      ],
+      "live": [
+        681645,
+        99874
+      ],
+      "live-one-range": [
+        561883,
+        219636
+      ],
+      "guarded-sync-one-range": [
+        576216,
+        231722
+      ]
+    }
+  }
+}

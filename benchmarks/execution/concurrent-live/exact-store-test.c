@@ -26,6 +26,20 @@ int main(void) {
     }
     /* Earlier proof entries may have been evicted. Checked lookup remains valid. */
     CHECK(!experiment_gc_store(&c,values[0],19,8) && values[0][0]==19);
+    /* Alternating interior writes must benefit from older proved ranges too. */
+    for(unsigned i=0;i<3;i++) CHECK(!experiment_gc_store(&c,values[i]+1,31+i,8));
+    uint64_t before[2],after[2];experiment_gc_store_lookup_counts(before);
+    for(unsigned repeat=0;repeat<20;repeat++)
+        for(unsigned i=0;i<3;i++) CHECK(!experiment_gc_store(&c,values[i]+1,31+i,8));
+    experiment_gc_store_lookup_counts(after);
+#if NEOCLR_LIVE_STORE_RANGES >= 3 && !defined(NEOCLR_LIVE_NO_STORE_CACHE)
+    CHECK(after[1]==before[1]);
+    CHECK(after[0]==before[0]+60);
+#endif
+    for(unsigned i=0;i<3;i++) {
+        CHECK(values[i][1]==31+i);
+        CHECK(experiment_gc_store(&c,(unsigned char *)values[i]+15,55,2)==3);
+    }
     neoclr_probe_frame frame={.context=&c};
     CHECK(!neoclr_gc_collect_v1(&c,&frame) && !c.text.used);
     CHECK(experiment_gc_store(&c,values[0],21,8)==3);

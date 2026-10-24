@@ -8,6 +8,7 @@ import signal
 parser = argparse.ArgumentParser()
 parser.add_argument('--output', type=Path, required=True)
 parser.add_argument('--sparse-index', action='store_true')
+parser.add_argument('--store-ranges', type=int, choices=range(1,17), default=4)
 parser.add_argument('--batch', action='store_true')
 parser.add_argument('--disable-store-cache', action='store_true')
 parser.add_argument('--gate-words', type=int, default=4096)
@@ -26,7 +27,7 @@ try:
     source = out/'native-gc.c'
     run(['python3', base/'generate.py', '--output', source])
     recipe = json.loads((root/'benchmarks/execution/call-layout/results.json').read_text())['builds'][1]['command']
-    cc = recipe[:recipe.index('-std=c11')] + [f'-DGATE_WORDS={args.gate_words}']
+    cc = recipe[:recipe.index('-std=c11')] + [f'-DGATE_WORDS={args.gate_words}', f'-DNEOCLR_LIVE_STORE_RANGES={args.store_ranges}']
     if args.sparse_index: cc += ['-DNEOCLR_SHADOW_SPARSE_INDEX']
     if args.disable_store_cache: cc += ['-DNEOCLR_LIVE_NO_STORE_CACHE']
     if args.batch: cc += ['-DNEOCLR_LIVE_BATCH','-DNEOCLR_LIVE_GATE_PROFILE']
@@ -76,6 +77,16 @@ __attribute__((destructor)) static void drain(void) { uint64_t stats[5]; experim
         run(cc+['-std=c11','-O2','-Wall','-Wextra','-Werror','-pthread','-DNEOCLR_NATIVE_GC','-DNEOCLR_GC_PROFILE','-DNEOCLR_SHADOW_TEST','-I',base.parent/'concurrent-mutation-gate','-I',root/'runtime/native/gc',base.parent/'concurrent-mutation-gate/gate.c',base/'store-test.c',root/'runtime/native/gc/root-probe.c',unsafe_source,'-o',unsafe_exe])
         result=subprocess.run([str(unsafe_exe)],capture_output=True,text=True,timeout=30)
         report['cacheNegative']=dict(exitCode=result.returncode,stdout=result.stdout,stderr=result.stderr,expectedSignal='SIGABRT')
+        assert result.returncode == -signal.SIGABRT
+    if args.store_ranges > 1 and not args.disable_store_cache:
+        # Revocation must protect every older range, not just the newest hint.
+        unsafe_source=out/'unproven-recent.c'
+        original_source=source.read_text();assert original_source.count('!known_base(recent)')==1
+        unsafe_source.write_text(original_source.replace('!known_base(recent)','0'))
+        unsafe_exe=out/'unproven-recent'
+        run(cc+['-std=c11','-O2','-Wall','-Wextra','-Werror','-pthread','-DNEOCLR_NATIVE_GC','-DNEOCLR_GC_PROFILE','-DNEOCLR_SHADOW_TEST','-I',base.parent/'concurrent-mutation-gate','-I',root/'runtime/native/gc',base.parent/'concurrent-mutation-gate/gate.c',base/'store-test.c',root/'runtime/native/gc/root-probe.c',unsafe_source,'-o',unsafe_exe])
+        result=subprocess.run([str(unsafe_exe)],capture_output=True,text=True,timeout=30)
+        report['recentNegative']=dict(exitCode=result.returncode,stdout=result.stdout,stderr=result.stderr,expectedSignal='SIGABRT')
         assert result.returncode == -signal.SIGABRT
     report['inputs']={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in [source, *base.glob('*.[ch]'), base/'generate.py', base/'validate.py', * (base.parent/'concurrent-shadow').glob('*.[ch]'), *(base.parent/'concurrent-mutation-gate').glob('gate.[ch]')]}
     report['passed']=True

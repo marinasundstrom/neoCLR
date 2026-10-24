@@ -3,6 +3,16 @@
  * host storage, not permission to mutate a different managed heap. */
 #if !defined(NEOCLR_LIVE_NO_STORE_CACHE) && !defined(NEOCLR_LIVE_LINEAR_STORE)
 static _Thread_local const void *live_store_last_payload;
+#ifndef NEOCLR_LIVE_STORE_RANGES
+#define NEOCLR_LIVE_STORE_RANGES 4
+#endif
+#if NEOCLR_LIVE_STORE_RANGES < 1 || NEOCLR_LIVE_STORE_RANGES > 16
+#error "store range count must be between 1 and 16"
+#endif
+#if NEOCLR_LIVE_STORE_RANGES > 1
+static _Thread_local const void *live_store_recent[NEOCLR_LIVE_STORE_RANGES-1];
+static _Thread_local unsigned live_store_recent_next;
+#endif
 #endif
 static _Thread_local uint64_t live_store_lookup_counts[2]; /* proved range/base, checked walks */
 static _Thread_local uint64_t live_store_counts[5]; /* outside, inactive/new, guarded old, cancelled, rejected */
@@ -80,6 +90,24 @@ int experiment_gc_store(neoclr_aot_context *context, void *destination,
         goto located;
     }
 #endif
+#if NEOCLR_LIVE_STORE_RANGES > 1
+    for (unsigned i=0;i<NEOCLR_LIVE_STORE_RANGES-1;i++) {
+        const void *recent=live_store_recent[i];
+        uintptr_t previous=(uintptr_t)recent;
+        /* A stale hint is never a proof. Do not inspect its header until the
+         * current owned exact-base cache authorizes it. */
+        if (!recent || previous<base || previous-base<sizeof(block) ||
+            previous-base>=a->used || address<previous || !known_base(recent)) continue;
+        uint64_t at=previous-base-sizeof(block);
+        if (!block_valid(a,at)) goto rejected;
+        block *cached=(void *)(a->data+at);
+        if ((cached->state&ALLOCATED) && address-previous<cached->bytes) {
+            b=cached;
+            live_store_lookup_counts[0]++;
+            goto located;
+        }
+    }
+#endif
 #endif
     live_store_lookup_counts[1]++;
     for (uint64_t at=0;at<a->used;) {
@@ -97,6 +125,12 @@ located:;
     if (width>b->bytes-offset) goto rejected;
 #if !defined(NEOCLR_LIVE_NO_STORE_CACHE) && !defined(NEOCLR_LIVE_LINEAR_STORE)
     remember_base((void *)payload);
+#if NEOCLR_LIVE_STORE_RANGES > 1
+    if (live_store_last_payload!=(void *)payload) {
+        live_store_recent[live_store_recent_next]=live_store_last_payload;
+        live_store_recent_next=(live_store_recent_next+1)%(NEOCLR_LIVE_STORE_RANGES-1);
+    }
+#endif
     live_store_last_payload=(void *)payload;
 #endif
     if (!candidate_active || shadow_find(shadow_owner->job,address)==SIZE_MAX) {

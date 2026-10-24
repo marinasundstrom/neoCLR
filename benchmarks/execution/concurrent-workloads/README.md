@@ -114,3 +114,10 @@ separate more of the adapter cost from marking. The measurement tool accepts
 `--guarded-control` and `--disable-exact-store`; the HTTP tool accepts
 `--compare-exact-store` for interleaved previous/new lookup controls. The new
 shortcut reduces standalone range walks and CPU, while HTTP gains remain small.
+
+## Recent-range follow-up
+
+[Four recent ranges](ranges4-results.md) now reduce interior-field lookup cost.
+The tools default to `--store-ranges 4`; use `--store-ranges 1` to reproduce the
+preceding exact-base-only configuration. HTTP `--compare-store-ranges` interleaves
+one-range and configured-range controls. Production GC is unchanged.

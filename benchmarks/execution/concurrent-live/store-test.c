@@ -115,7 +115,7 @@ static void detached_identity(void) {
 }
 /* A remembered payload may become interior storage after coalescing and reuse.
  * Header-looking user bytes must not authorize that stale allocation identity. */
-static void cached_interior_header(void) {
+static void cached_interior_header(int recent) {
     uint64_t heap[128]={0};
     neoclr_aot_context c={.text={(unsigned char *)heap,sizeof(heap),0}};
     CHECK(!neoclr_gc_heap_acquire_v1(&c.text));
@@ -126,6 +126,7 @@ static void cached_interior_header(void) {
     neoclr_probe_storage slots[]={{&root,8,0},{&tail,8,0}};
     neoclr_probe_frame frame={.context=&c,.storage=slots,.storage_count=2};
     CHECK(!experiment_gc_store(&c,root+1,42,8));
+    if (recent) CHECK(!experiment_gc_store(&c,tail+1,43,8));
     root=NULL;
     CHECK(!neoclr_gc_collect_v1(&c,&frame));
     root=object(&c,88);CHECK((void *)root==first);
@@ -177,6 +178,7 @@ int main(void) {
     uint64_t counts[5]; experiment_gc_store_counts(counts);
     CHECK(counts[0]==2 && counts[1]>=5 && counts[2]>=97 && counts[3]==1 && counts[4]==8);
     cached_range_lifetime();
-    cached_interior_header();
+    cached_interior_header(0);
+    cached_interior_header(1);
     puts("PASS 97 scalar ranges, stack/byref classification, new array construction and noncollecting overflow recovery");
 }
