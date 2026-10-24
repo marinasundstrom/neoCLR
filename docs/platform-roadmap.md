@@ -101,7 +101,10 @@ synchronous collection and pacing-resumption tests, plus existing managed AOT
 regressions. Generated UTF-8 slicing now selects an exact scoped adapter and passes
 forced/paced JIT/AOT success, fault, exhaustion and two-lane result-publication checks.
 Async callbacks remain unqualified; cancellation cost and HTTP performance remain
-unmeasured.
+unmeasured. Real async-carrier ownership and loopback socket transfers now match
+synchronous GC in forced/paced optimized/UBSan native fixtures: parked conditional
+roots, resumed mutations, abandonment, transfer buffers and fault teardown pass.
+Generated async callbacks/full entry and shared heaps remain unqualified.
 Capability conversions, callable arrays, remaining text/byte services and async/full
 host-entry integration remain next;
 the recorded plaintext import inventory guides that coverage.

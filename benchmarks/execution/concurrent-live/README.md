@@ -219,3 +219,47 @@ The initial harness incorrectly ran the forced-collection baseline with pacing;
 its exit 58 is preserved in `native-scopes-initial-harness-failure.json.gz`. Correcting
 that configuration made the baseline pass. There is no new performance result,
 compiler admission, HTTP qualification or production-default change in this slice.
+
+
+## Async ownership and socket transfers with live epochs (2026-10-24)
+
+Two native integration harnesses now compare synchronous GC with the automatic live
+candidate across forced/paced and optimized/undefined-bounds builds on macOS ARM64.
+They use the real cooperative async carrier and real loopback socket implementation;
+the async fixture stubs the idle scheduler to isolate ownership, while the socket
+fixture exercises actual polling and transfer. No fallback scope surrounds the pump.
+
+`validate-async-ownership.py --output <fresh-directory>` derives a checked extension
+of the existing native-owned-body fixture. Each of eight runs starts 321 callbacks,
+resumes 160 and abandons 161, including owner expiry inside scheduler acquire and
+host-root capacity exhaustion. All return zero reserved stack bytes after shutdown.
+Each run exercises 1,121 explicit collection/start points and 640 mutations. In the
+four live runs, begin asserts an active epoch; a new child is attached through a
+suspended local's heap object, and guarded scalar mutations run after resumption.
+The callback root frame is parked/restored by the production carrier. Collection
+retains the child through that conditional frame, then reclaims the graph when its
+owner disappears. These tests also cover late completion after abandonment, managed
+and ordinary owned bodies, cached contexts, release and shutdown. This is controlled
+native callback evidence, not generated callback-wrapper admission or an HTTP test.
+
+`validate-socket-transfer.py --output <fresh-directory>` extends the existing real
+loopback transfer fixture to start an epoch after collection and retain ownership
+until shutdown. All eight builds pass accept/delivery root lifetime, partial receive,
+reserved-byte initialization, snapshot send despite later buffer mutation, deadline
+and cancellation errors, EOF, pending-operation fault teardown and zero retained
+heap. The live marker can remain active while native receive copies modify BYTES
+payloads, which the collector intentionally does not trace. Result outputs are C
+stack storage; generated heap-output aliases still require guarded wrappers.
+
+Reports and generated fixtures are archived in `async-ownership-*` and
+`socket-transfer-*`. The first async extension mistakenly placed the child pointer
+in OBJECT's untraced type-header word; the synchronous baseline correctly failed.
+The corrected fixture uses a separate fourth payload word, retaining its original
+owner back-reference. The initial failure is archived, not counted as a runtime bug.
+
+This advances carrier/socket lifetime qualification without changing production
+code, compiler admission or collector defaults. Existing CLR frame/suspension and
+conditional-root research still applies. Full generated callback/entry integration,
+remaining native services, shared heaps, race-detector coverage and HTTP/standalone
+performance comparisons remain open. These runs measure correctness, not throughput
+or CPU; do not extrapolate their small fixture timings to server performance.
