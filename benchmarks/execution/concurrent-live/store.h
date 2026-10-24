@@ -22,6 +22,24 @@ static void live_store_cancel_epoch(void) {
         candidate_active=0;
         live_store_counts[3]++;
 }
+/* Width was validated by the adapter. Constant-size memcpy keeps unaligned
+ * destinations legal and preserves native integer truncation/byte order without
+ * a second dynamic-size copy. This does not authorize or synchronize a store. */
+static inline void live_store_bits(void *destination, uint64_t bits, uint32_t width) {
+#ifdef NEOCLR_LIVE_SERIALIZED_STORE
+    unsigned char value[8];
+    if (width==1) { uint8_t v=(uint8_t)bits; memcpy(value,&v,1); }
+    else if (width==2) { uint16_t v=(uint16_t)bits; memcpy(value,&v,2); }
+    else if (width==4) { uint32_t v=(uint32_t)bits; memcpy(value,&v,4); }
+    else memcpy(value,&bits,8);
+    memcpy(destination,value,width);
+#else
+    if (width==1) { uint8_t v=(uint8_t)bits; memcpy(destination,&v,1); }
+    else if (width==2) { uint16_t v=(uint16_t)bits; memcpy(destination,&v,2); }
+    else if (width==4) { uint32_t v=(uint32_t)bits; memcpy(destination,&v,4); }
+    else memcpy(destination,&bits,8);
+#endif
+}
 int experiment_gc_store(neoclr_aot_context *context, void *destination,
                        uint64_t bits, uint32_t width) {
     if (!context || owned_heap.arena != &context->text || !valid(&context->text) ||
@@ -29,15 +47,10 @@ int experiment_gc_store(neoclr_aot_context *context, void *destination,
         (candidate_active && candidate_context!=context)) goto rejected;
     uintptr_t address=(uintptr_t)destination, base=(uintptr_t)context->text.data;
     if (address>UINTPTR_MAX-width || base>UINTPTR_MAX-context->text.capacity) goto rejected;
-    unsigned char value[8];
-    if (width==1) { uint8_t v=(uint8_t)bits; memcpy(value,&v,1); }
-    else if (width==2) { uint16_t v=(uint16_t)bits; memcpy(value,&v,2); }
-    else if (width==4) { uint32_t v=(uint32_t)bits; memcpy(value,&v,4); }
-    else memcpy(value,&bits,8);
     uintptr_t end=base+context->text.capacity;
     if (address>=end || address+width<=base) {
         live_store_counts[0]++;
-        memcpy(destination,value,width);
+        live_store_bits(destination,bits,width);
         return 0;
     }
     if (address<base || address-base>=context->text.used) goto rejected;
@@ -137,9 +150,11 @@ located:;
         /* New allocations are excluded from marker reads and are all
          * traced at remark. No publication exemption for old objects. */
         live_store_counts[1]++;
-        memcpy(destination,value,width);
+        live_store_bits(destination,bits,width);
         return 0;
     }
+    unsigned char value[8];
+    live_store_bits(value,bits,width);
     mutation_patch patch={offset,width,value};
 #ifdef NEOCLR_LIVE_LINEAR_STORE
     int status=experiment_gc_write(context,(void *)payload,&patch,1);
@@ -151,7 +166,7 @@ located:;
          * detached work before writing; future collection needs a normal
          * root-published boundary. Temporaries may be unpublished now. */
         live_store_cancel_epoch();
-        memcpy(destination,value,width);
+        live_store_bits(destination,bits,width);
         return 0;
     }
     if (status) goto rejected;

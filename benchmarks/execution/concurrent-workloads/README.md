@@ -133,3 +133,6 @@ use ordinary providers, with HTTP `--previous-live-object` interleaving old/new 
 The [generated-code optimization qualification](optimizer-results.md) compares
 Cranelift settings across both collectors, including native correctness fixtures
 and retained standalone/HTTP selections. Production compilation keeps its defaults.
+
+[Fixed-width native stores](direct-store-results.md) compare scalar copy strategies
+without changing generated managed objects or weakening mutation/ownership checks.

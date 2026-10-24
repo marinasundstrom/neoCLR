@@ -40,6 +40,48 @@ static void ranges(void) {
         CHECK(!neoclr_gc_heap_release_v1(&c.text));
     }
 }
+/* Exercise the non-marker paths at every unaligned offset, preserving adjacent
+ * bytes and rejecting unsupported widths before changing the destination. */
+static void direct_ranges(void) {
+    unsigned widths[]={1,2,4,8};
+    for(unsigned mode=0;mode<3;mode++) for(unsigned w=0;w<4;w++)
+    for(unsigned offset=8;offset+widths[w]<=35;offset++) {
+        uint64_t heap[256]={0}; unsigned char stack[35];
+        neoclr_aot_context c={.text={(unsigned char *)heap,sizeof(heap),0}};
+        CHECK(!neoclr_gc_heap_acquire_v1(&c.text));
+        unsigned char *root=object(&c,35);
+        neoclr_probe_storage slot={&root,8,0};
+        neoclr_probe_frame frame={.context=&c,.storage=&slot,.storage_count=1};
+        if(mode==2) {
+            CHECK(!experiment_gc_begin(&c,&frame,NULL,0));
+            experiment_gc_live_wait();
+            root=object(&c,35);
+        }
+        unsigned char *destination=mode==0?stack:root;
+        memset(destination+8,0xcc,27);
+        uint64_t bits=UINT64_C(0x8877665544332211);
+        CHECK(!experiment_gc_store(&c,destination+offset,bits,widths[w]));
+        unsigned char expected[8];
+        switch(widths[w]) {
+            case 1: { uint8_t v=(uint8_t)bits; memcpy(expected,&v,1); break; }
+            case 2: { uint16_t v=(uint16_t)bits; memcpy(expected,&v,2); break; }
+            case 4: { uint32_t v=(uint32_t)bits; memcpy(expected,&v,4); break; }
+            default: memcpy(expected,&bits,8); break;
+        }
+        for(unsigned j=8;j<35;j++)
+            CHECK(destination[j]==(j>=offset && j<offset+widths[w]?expected[j-offset]:0xcc));
+        unsigned char saved[27]; memcpy(saved,destination+8,27);
+        unsigned invalid[]={0,3,5,16};
+        for(unsigned j=0;j<4;j++) {
+            CHECK(experiment_gc_store(&c,destination+8,0,invalid[j])==3);
+            CHECK(!memcmp(saved,destination+8,27));
+        }
+        if(mode==2) CHECK(!experiment_gc_finish(&c,&frame,NULL,0));
+        root=NULL; CHECK(!neoclr_gc_collect_v1(&c,&frame) && !c.text.used);
+        CHECK(!neoclr_gc_heap_release_v1(&c.text));
+    }
+    puts("PASS 291 outside/inactive/new unaligned scalar ranges and invalid-width rejection");
+}
 static void cleaned(void *state) { (*(unsigned *)state)++; }
 static void cancellation(void) {
     uint64_t heap[256]={0};
@@ -177,6 +219,7 @@ int main(void) {
     ranges(); cancellation(); construction(); detached_identity();
     uint64_t counts[5]; experiment_gc_store_counts(counts);
     CHECK(counts[0]==2 && counts[1]>=5 && counts[2]>=97 && counts[3]==1 && counts[4]==8);
+    direct_ranges();
     cached_range_lifetime();
     cached_interior_header(0);
     cached_interior_header(1);

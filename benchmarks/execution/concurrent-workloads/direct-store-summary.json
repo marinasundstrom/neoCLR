@@ -1,0 +1,210 @@
+{
+  "scope": "Fixed-width scalar copies; unchanged managed objects compiled at speed; sequential HTTP, not saturation",
+  "standalone": {
+    "direct-store-measure": {
+      "tasks": {
+        "sync": {
+          "cpuSeconds": 0.015332,
+          "allocations": 65548,
+          "allocatedBytes": 2261361
+        },
+        "guarded-sync": {
+          "cpuSeconds": 0.047602,
+          "allocations": 65548,
+          "allocatedBytes": 2261361
+        },
+        "live": {
+          "cpuSeconds": 0.081339,
+          "allocations": 65548,
+          "allocatedBytes": 2261361
+        }
+      },
+      "collections": {
+        "sync": {
+          "cpuSeconds": 0.089957,
+          "allocations": 237580,
+          "allocatedBytes": 7864689
+        },
+        "guarded-sync": {
+          "cpuSeconds": 0.244565,
+          "allocations": 237580,
+          "allocatedBytes": 7864689
+        },
+        "live": {
+          "cpuSeconds": 0.408804,
+          "allocations": 237580,
+          "allocatedBytes": 7864689
+        }
+      },
+      "arrays": {
+        "sync": {
+          "cpuSeconds": 0.050218,
+          "allocations": 86028,
+          "allocatedBytes": 1892721
+        },
+        "guarded-sync": {
+          "cpuSeconds": 0.070814,
+          "allocations": 86028,
+          "allocatedBytes": 1892721
+        },
+        "live": {
+          "cpuSeconds": 0.093555,
+          "allocations": 86028,
+          "allocatedBytes": 1892721
+        }
+      }
+    },
+    "serialized-store-measure": {
+      "tasks": {
+        "sync": {
+          "cpuSeconds": 0.0152,
+          "allocations": 65548,
+          "allocatedBytes": 2261361
+        },
+        "guarded-sync": {
+          "cpuSeconds": 0.049798,
+          "allocations": 65548,
+          "allocatedBytes": 2261361
+        },
+        "live": {
+          "cpuSeconds": 0.082757,
+          "allocations": 65548,
+          "allocatedBytes": 2261361
+        }
+      },
+      "collections": {
+        "sync": {
+          "cpuSeconds": 0.08947,
+          "allocations": 237580,
+          "allocatedBytes": 7864689
+        },
+        "guarded-sync": {
+          "cpuSeconds": 0.258489,
+          "allocations": 237580,
+          "allocatedBytes": 7864689
+        },
+        "live": {
+          "cpuSeconds": 0.423245,
+          "allocations": 237580,
+          "allocatedBytes": 7864689
+        }
+      },
+      "arrays": {
+        "sync": {
+          "cpuSeconds": 0.049719,
+          "allocations": 86028,
+          "allocatedBytes": 1892721
+        },
+        "guarded-sync": {
+          "cpuSeconds": 0.072738,
+          "allocations": 86028,
+          "allocatedBytes": 1892721
+        },
+        "live": {
+          "cpuSeconds": 0.095208,
+          "allocations": 86028,
+          "allocatedBytes": 1892721
+        }
+      }
+    }
+  },
+  "http": {
+    "direct-store-http-plain": {
+      "summary": {
+        "sync": {
+          "requestsPerSecond": 4387.656288831208,
+          "requestSeconds": 0.05834549999999972,
+          "processCpuSeconds": 0.056944999999999996,
+          "peakRssBytes": 9273344
+        },
+        "guarded-sync": {
+          "requestsPerSecond": 1739.9884192895768,
+          "requestSeconds": 0.147127416,
+          "processCpuSeconds": 0.157004,
+          "peakRssBytes": 11124736
+        },
+        "live": {
+          "requestsPerSecond": 1651.4957003051395,
+          "requestSeconds": 0.155011,
+          "processCpuSeconds": 0.181006,
+          "peakRssBytes": 11468800
+        },
+        "live-serialized": {
+          "requestsPerSecond": 1562.0221169518297,
+          "requestSeconds": 0.163890125,
+          "processCpuSeconds": 0.183814,
+          "peakRssBytes": 11370496
+        },
+        "guarded-sync-serialized": {
+          "requestsPerSecond": 1584.6940836282133,
+          "requestSeconds": 0.16154537499999932,
+          "processCpuSeconds": 0.165176,
+          "peakRssBytes": 11108352
+        }
+      },
+      "allocations": 57120,
+      "allocatedBytes": 4394837
+    },
+    "direct-store-http-json": {
+      "summary": {
+        "sync": {
+          "requestsPerSecond": 2387.525180929633,
+          "requestSeconds": 0.10722400000000043,
+          "processCpuSeconds": 0.090539,
+          "peakRssBytes": 10649600
+        },
+        "guarded-sync": {
+          "requestsPerSecond": 1083.1346412390003,
+          "requestSeconds": 0.2363510410000007,
+          "processCpuSeconds": 0.245525,
+          "peakRssBytes": 12910592
+        },
+        "live": {
+          "requestsPerSecond": 1005.6416773077084,
+          "requestSeconds": 0.2545638330000006,
+          "processCpuSeconds": 0.275819,
+          "peakRssBytes": 13189120
+        },
+        "live-serialized": {
+          "requestsPerSecond": 926.6895633075734,
+          "requestSeconds": 0.2762521669999991,
+          "processCpuSeconds": 0.29926,
+          "peakRssBytes": 13189120
+        },
+        "guarded-sync-serialized": {
+          "requestsPerSecond": 988.5815929775919,
+          "requestSeconds": 0.25895687500000086,
+          "processCpuSeconds": 0.269711,
+          "peakRssBytes": 12910592
+        }
+      },
+      "allocations": 124873,
+      "allocatedBytes": 7163755
+    }
+  },
+  "inputs": {
+    "target/concurrent-workloads/direct-store-safety/results.json": "9c7092cb0331fcd35e1eec1864a9576a07d9aee3054fa92a2d2c06aa5395ae61",
+    "target/concurrent-workloads/serialized-store-safety/results.json": "bdd614872e98a678a871622edca3e2cc74502be053ede46c00e8aa0f35eacbcc",
+    "target/concurrent-workloads/direct-store-entry/results.json": "c9072abd6439ea4b5ae6b4d4a9072e664761ac79167274b84f8bef3d1cdb3dcb",
+    "target/concurrent-workloads/direct-store-records/results.json": "3dbaa828fc9ddb18a564defd5df30e6ea92878734f2c70e15c3edee1bc6952bc",
+    "target/concurrent-workloads/direct-store-measure/results.json": "03fdf5a68c93fe04535e9b6b9699f72d03950fd1e8a3c68d0063afe071a01ade",
+    "target/concurrent-workloads/serialized-store-measure/results.json": "9d5b0c44f98a6fa2f993be2e0d471b1e9d3f5d1122ed7734d7995d9f2ece0387",
+    "target/concurrent-workloads/direct-store-http-plain/results.json": "fe1c1d610877871aa3e54719dd6420f686ab809bd00ce9c79a2a29aaf2030508",
+    "target/concurrent-workloads/direct-store-http-json/results.json": "556e6fdcc244b05d7e52402c868d8078df23469818910eefa361ef0f450c7968",
+    "benchmarks/execution/concurrent-live/store.h": "2b5f765ee08faccf08e3d728f068d65bfdceb4080474a0b87fb5e890a4fd59bb",
+    "benchmarks/execution/concurrent-live/store-test.c": "bcc8d7c75bfae017fa55e25761b3d7eb1457c4dff06db1cb566a69520346833d",
+    "target/concurrent-workloads/direct-store-json-jit/results.json": "ffdf2f6f7a8e43314b968105069643f689729f976437f127fe93ae60bf5a728e"
+  },
+  "jit": {
+    "passed": true,
+    "requests": 128,
+    "candidateCounts": [
+      135,
+      134,
+      1,
+      5,
+      134,
+      0
+    ]
+  }
+}
