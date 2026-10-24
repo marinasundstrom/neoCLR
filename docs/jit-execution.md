@@ -55,6 +55,22 @@ and 4 MiB byte arrays, configurable at preparation with `--heap-bytes` and
 memory limits. Standalone interpreter packages do not contain JIT dependencies;
 select `--execution interpreter` explicitly on supported JIT hosts.
 
+On macOS ARM64, `--owned-heap` explicitly opts the development JIT helper into
+same-thread exclusive arena ownership. This enables the existing allocator's
+owned-heap fast paths. The host acquires an empty arena and releases it after all
+scope/root cleanup, including admission and fault exits. Native helpers must obey
+that arena contract: only the runtime may modify descriptors or arena cursors;
+cross-thread arena operations and ownership transfer are unsupported. This is not
+a shared-heap or general native-FFI qualification.
+
+The default remains external-heap behavior. Preparation removes inherited ownership
+defines from reused recipes unless `--owned-heap` is selected, and records
+`jit.heapOwnership` as `exclusive-thread` or `external` in the manifest. The option
+is currently rejected on Windows; its default behavior is unchanged. Ownership
+does not select GC pacing: the passing recipe's `NEOCLR_GC_PACED` setting remains
+independent. The previous HTTP gain was measured with pacing enabled.
+[Host qualification, tests and packaging limitations](../benchmarks/execution/owned-jit-host/README.md).
+
 The runtime launches the optional compiler backend with inherited standard streams.
 The backend selects the executing host, compiles the verified closed-world assembly
 in memory and runs its entry. Guest output is streamed normally and its exit code is

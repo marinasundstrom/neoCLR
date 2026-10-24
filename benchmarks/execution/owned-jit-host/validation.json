@@ -1,0 +1,48 @@
+{
+  "baselineRevision": "71d448f2e",
+  "policyTests": {
+    "command": "python3 -m unittest discover -s scripts -p test_jit_host_policy.py",
+    "passed": 5
+  },
+  "manifests": {
+    "owned-jit-bundle": {
+      "sha256": "63f0a747bb7e02714ee40e68558aee722cba7271056f85b2d55f45dcaa6718a2",
+      "jit": {
+        "default": true,
+        "compiler": "bin/neoclr-codegen",
+        "host": "bin/neoclr-jit-host.dylib",
+        "runtimeAsync": true,
+        "cryptography": true,
+        "tlsOwnership": true,
+        "heapBytes": 1048576,
+        "byteArrayLimit": 65536,
+        "heapOwnership": "exclusive-thread"
+      }
+    },
+    "owned-jit-paced-bundle": {
+      "sha256": "4d609b55160fea3cd4eab5147563948dcd4ed15506042b0993f21716a04b270f",
+      "jit": {
+        "default": true,
+        "compiler": "bin/neoclr-codegen",
+        "host": "bin/neoclr-jit-host.dylib",
+        "runtimeAsync": true,
+        "cryptography": true,
+        "tlsOwnership": true,
+        "heapBytes": 1048576,
+        "byteArrayLimit": 65536,
+        "heapOwnership": "exclusive-thread"
+      }
+    }
+  },
+  "inputs": {
+    "scripts/prepare-jit-bundle.py": "dec0f7555ca4018d888ed1991da0415087636291fb27e7871690f43a8160de6a",
+    "scripts/jit_host_policy.py": "720bc146e8e526d9a93ad09c909e2d361023950cad2b179578338f53cd856bdd",
+    "scripts/test_jit_host_policy.py": "28f8a86d2e493baafb9086d69e5a2a92a47ced06388b8be4c304305a669628a6",
+    "benchmarks/execution/owned-jit-host/consumers.py": "464585d30a06a46b6a8b21350196d1c795d0f77c8a582179c6c0be8c26216cf3",
+    "benchmarks/execution/owned-jit-host/verify.py": "931668fa24fa435cd41de67e8a536fd57162f925c49afab02c173d392a155f0a",
+    "benchmarks/execution/owned-jit-host/failures.c": "fb05b4b9ecae9526ecbf18efd1854741df1ae4583be878231e8c632c039979db",
+    "docs/experiments/jit-managed/host.c": "636b35a7eccf3f6c93ad7ca25aab74903e84b10ee2387ab90092b06e9b93dcb4"
+  },
+  "policyRefinement": "After staging, add normalization of recipe undefines; passing staging recipes contain none, so their emitted commands and helper code are unaffected. Verified by the focused policy tests.",
+  "harnessRefinement": "Verifier strips ownership from newer reusable recipe commands before its explicit mode matrix; retained tested recipe had no such define, so tested commands are unchanged."
+}

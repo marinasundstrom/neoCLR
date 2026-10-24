@@ -43,11 +43,25 @@ static int32_t run_entry(const void *entry, int32_t with_args, int32_t argc, con
     unsigned char *heap = calloc(1, heap_bytes);
     if (!heap) return 2;
     neoclr_aot_context context = {.text = {heap, heap_bytes, 0}};
+#ifdef NEOCLR_GC_OWNED_HEAP
+    /* Opt-in: this invocation and all helpers must obey the exclusive arena
+       contract. Acquisition failure must not release an incumbent owner. */
+    if (neoclr_gc_heap_acquire_v1(&context.text)) { free(heap); return 2; }
+#endif
     neoclr_socket_scope operations;
-    if (neoclr_socket_scope_enter_v1(&operations, &context)) { free(heap); return 2; }
+    if (neoclr_socket_scope_enter_v1(&operations, &context)) {
+#ifdef NEOCLR_GC_OWNED_HEAP
+        if (neoclr_gc_heap_release_v1(&context.text)) abort();
+#endif
+        free(heap);
+        return 2;
+    }
     neoclr_task_scope tasks;
     if (neoclr_task_scope_enter_v1(&tasks, &context)) {
         if (neoclr_socket_scope_leave_v1(&operations)) abort();
+#ifdef NEOCLR_GC_OWNED_HEAP
+        if (neoclr_gc_heap_release_v1(&context.text)) abort();
+#endif
         free(heap);
         return 2;
     }
@@ -56,6 +70,9 @@ static int32_t run_entry(const void *entry, int32_t with_args, int32_t argc, con
     neoclr_terminal_scope_v1 terminal = {0};
     if (neoclr_terminal_scope_enter_v1(&terminal, &context)) {
         if (neoclr_socket_scope_leave_v1(&operations) || neoclr_task_scope_leave_v1(&tasks)) abort();
+#ifdef NEOCLR_GC_OWNED_HEAP
+        if (neoclr_gc_heap_release_v1(&context.text)) abort();
+#endif
         free(heap);
         return 2;
     }
@@ -87,6 +104,9 @@ static int32_t run_entry(const void *entry, int32_t with_args, int32_t argc, con
 #ifdef NEOCLR_RUNTIME_ASYNC
     memset(&context.fault, 0, sizeof(context.fault));
     if (neoclr_gc_collect_v1(&context, NULL) || context.text.used) abort();
+#endif
+#ifdef NEOCLR_GC_OWNED_HEAP
+    if (neoclr_gc_heap_release_v1(&context.text)) abort();
 #endif
     free(heap);
     return render_error || terminal_error ? 2 : status ? 1 : result;

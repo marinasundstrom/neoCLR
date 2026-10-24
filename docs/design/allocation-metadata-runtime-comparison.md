@@ -504,3 +504,19 @@ Lifecycle tests cover admission, faults, re-entry and independent thread owners 
 forced/paced optimized/sanitized configurations. The existing CoreCLR allocation
 context comparison still applies, but neoCLR's exclusive arena forbids cross-thread
 operations; ownership must not be inferred solely from a consumer API.
+
+
+### Explicit owned JIT host qualification — 2026-10-24
+
+The measured ownership path is now an explicit macOS ARM64 bundle preparation
+option, `--owned-heap`. Defaults remain external and reused recipe ownership flags
+are removed unless requested. A manifest field records the selected contract.
+Acquire/release follow the existing private arena ABI; no generated metadata or
+managed layout changes. Same-thread runtime-only descriptor mutation remains a
+host obligation, not an inferred property of arbitrary managed/native code.
+
+Twelve optimized/sanitized cleanup/lifetime runs, five policy tests and eight
+installed task/collection/plain/JSON consumer invocations pass. Default and opt-in
+host objects match the prior default and measured experimental code respectively.
+The stale packaged collections source prevents full bundle-source acceptance;
+Windows opt-in and general FFI remain unqualified. [Evidence and contract](../../benchmarks/execution/owned-jit-host/README.md).

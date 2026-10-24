@@ -31,18 +31,14 @@ try:
  obj=root/'target/root-map/candidate.o';client=root/'target/primitive-comparison-refresh/client';compiler=root/'target/release/neoclr-codegen'
  configs=[]
  source=(root/'docs/experiments/jit-managed/host.c').read_text()
- # Only this experiment opts into ownership. Every established-context exit releases it.
- assert source.count('free(heap);') == 4
- source=source.replace('free(heap);', 'if (neoclr_gc_heap_release_v1(&context.text)) abort(); free(heap);')
- anchor='neoclr_aot_context context = {.text = {heap, heap_bytes, 0}};'
- assert source.count(anchor)==1
- source=source.replace(anchor, anchor+'\n    if (neoclr_gc_heap_acquire_v1(&context.text)) { free(heap); return 2; }')
+ # The qualified host now exposes the same ownership contract explicitly.
  owned=out/'owned-host.c';owned.write_text(source);record(owned)
  for ownership in ['external','owned']:
   original=a.ordinary.resolve()/'paced-False.dylib'
   base=next(x['command'].copy() for x in ordinary['commands'] if x['label']=='host-build' and str(original) in x['command'])
   if ownership=='owned':
    base=[str(owned) if x.endswith('/docs/experiments/jit-managed/host.c') else x for x in base]
+   base.append('-DNEOCLR_GC_OWNED_HEAP')
   host=out/f'{ownership}.dylib'
   base[base.index('-o')+1]=str(host)
   x=subprocess.run(base,capture_output=True,text=True,timeout=90);r['commands'].append(dict(command=base,exitCode=x.returncode,stderr=x.stderr));x.check_returncode()

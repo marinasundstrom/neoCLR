@@ -6618,3 +6618,15 @@ evidence for an explicit owned JIT configuration and call-layout investigation.
 [Results, contract and limits](../benchmarks/execution/native-host-ownership/README.md).
 Production JIT defaults remain unchanged; the already-owned worker server cannot
 claim these gains again. No peer-server parity or new threading capability is claimed.
+
+
+### Explicit owned JIT development configuration — 2026-10-24
+
+The ownership experiment is integrated as the macOS ARM64 preparation option
+`--owned-heap`, with explicit manifest provenance and unchanged external defaults.
+Inherited recipe defines cannot silently opt in. Twelve native failure/lifecycle
+runs, five policy tests and eight installed current-consumer invocations pass;
+default/owned host objects match their previously validated implementations.
+Full packaged-source verification remains blocked by stale collections sample APIs;
+Windows opt-in and unrestricted FFI are not qualified. [Contract and evidence](../benchmarks/execution/owned-jit-host/README.md).
+This changes neither collector policy nor warm-call layout. No package is published.

@@ -124,3 +124,19 @@ The [shared metadata optimization](startup-optimization.md) retains the original
 above and adds a balanced before/after comparison for JIT and interpreter. Both continue
 to perform all semantic checks. The private result now reports metadata loading and
 selection/verification separately from lowering/finalization and invocation.
+
+
+## Explicit owned arena configuration — 2026-10-24
+
+`host.c` now accepts `NEOCLR_GC_OWNED_HEAP` for the same-thread exclusive arena
+contract in `runtime/native/gc/native-gc.h`. Acquire occurs before service scopes;
+every non-aborting acquired-heap exit releases before freeing the original buffer.
+Failed acquisition leaves any incumbent owner untouched. Existing final root checks,
+collections, fault rendering and async teardown remain in place.
+
+The supported macOS bundle opt-in is `prepare-jit-bundle.py --owned-heap`; defaults
+remain external and inherited recipe ownership flags are removed unless requested.
+GC pacing is an independent recipe choice. Native helper code must not mutate arena
+headers/cursors outside runtime APIs or use the arena from other threads. Windows
+bundle opt-in and unrestricted native helpers are not qualified by this slice.
+[Failure, lifetime, installed-consumer and machine-code evidence](../../../benchmarks/execution/owned-jit-host/README.md).

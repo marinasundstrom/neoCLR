@@ -9,6 +9,7 @@ from pathlib import Path
 import shutil
 import subprocess
 from native_bundle_notices import refresh_notices
+from jit_host_policy import ownership_command
 from native_bundle_samples import refresh_samples, sample_definitions, configure_editor_tasks
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -24,6 +25,7 @@ p.add_argument('--output', type=Path, required=True)
 p.add_argument('--refresh-samples', action='store_true', help='Refresh packaged Raven samples against replacement libraries')
 p.add_argument('--heap-bytes', type=int, default=33554432)
 p.add_argument('--byte-array-limit', type=int, default=4194304)
+p.add_argument('--owned-heap', action='store_true', help='Opt into same-thread exclusive heap ownership (macOS ARM64 only)')
 a = p.parse_args()
 if a.refresh_samples and not a.libraries:
     p.error('--refresh-samples requires replacement --libraries')
@@ -32,6 +34,8 @@ if not windows and not (platform.system() == 'Darwin' and platform.machine() == 
     p.error('JIT bundles currently support macOS ARM64 and Windows x64')
 if not 0 < a.byte_array_limit <= 2147483647 or not 0 < a.heap_bytes <= 2147483647:
     p.error('Heap and byte-array budgets must be positive Int32 values')
+if a.owned_heap and windows:
+    p.error('--owned-heap is currently qualified only on macOS ARM64')
 source, out = a.bundle.resolve(), a.output.resolve()
 manifest = json.loads((source / 'manifest.json').read_text())
 retained = {relative: digest for relative, digest in manifest['files'].items()
@@ -74,7 +78,8 @@ if a.libraries:
 report = dict(passed=False, commands=[], originalManifestSha256=sha(source / 'manifest.json'),
     replacementLibraries=bool(a.libraries), inputsSha256={str(a.host_recipe.resolve()): sha(a.host_recipe),
     str(a.runtime.resolve()): sha(a.runtime), str(a.jit_compiler.resolve()): sha(a.jit_compiler),
-    str(Path(__file__).resolve()): sha(__file__)})
+    str(Path(__file__).resolve()): sha(__file__),
+    str(ROOT / 'scripts/jit_host_policy.py'): sha(ROOT / 'scripts/jit_host_policy.py')})
 for path in (ROOT / 'runtime/native').rglob('*.[ch]'):
     report['inputsSha256'][str(path)] = sha(path)
 for directory in ('aot-console', 'aot-fault-details', 'runtime-async', 'jit-managed'):
@@ -101,7 +106,7 @@ def budget_command(command, prefix):
     names = ('NEOCLR_HTTP_HEAP_BYTES', 'NEOCLR_NATIVE_BYTE_ARRAY_LIMIT')
     command = [str(arg) for arg in command if not any(str(arg).startswith(prefix + name + '=') for name in names)]
     flags = [prefix + names[0] + '=' + str(a.heap_bytes), prefix + names[1] + '=' + str(a.byte_array_limit)]
-    return command[:1] + flags + command[1:]
+    return ownership_command(command[:1] + flags + command[1:], a.owned_heap, windows)
 
 
 def complete_services(command):
@@ -194,7 +199,8 @@ try:
     manifest['runtime'] = 'bin/neoclr' + suffix
     manifest['jit'] = dict(default=True, compiler='bin/neoclr-codegen' + suffix,
                            host='bin/' + helper_name, runtimeAsync=True, cryptography=True, tlsOwnership=True,
-                           heapBytes=a.heap_bytes, byteArrayLimit=a.byte_array_limit)
+                           heapBytes=a.heap_bytes, byteArrayLimit=a.byte_array_limit,
+                           heapOwnership='exclusive-thread' if a.owned_heap else 'external')
     if a.refresh_samples:
         refresh_samples(bundle, manifest)
         for sources, _, _ in sample_definitions().values():

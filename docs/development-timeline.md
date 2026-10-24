@@ -22244,3 +22244,11 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   differ in one case. Assistant retains the candidate as an experiment and proposes
   explicit host qualification and call-layout isolation; no production default is
   changed. [Evidence and ownership restrictions](../benchmarks/execution/native-host-ownership/README.md).
+
+- Host integration continuation: assistant adds an explicit macOS bundle opt-in
+  and removes accidental ownership inheritance from reused recipes. Twelve native
+  cleanup/lifetime runs, five policy tests and eight current installed-consumer
+  invocations pass. Default and enabled host objects match prior code. A separate
+  full packaged-source attempt fails on stale collections Option usage before
+  execution; the failure is retained rather than reported as full qualification.
+  [Implemented configuration, ownership contract and limits](../benchmarks/execution/owned-jit-host/README.md).
