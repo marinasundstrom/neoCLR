@@ -794,6 +794,7 @@ fn managed_options_for(source: &str) -> crate::fault_details::Options {
         options.runtime_async_release.push(5);
         options.runtime_async_iscompleted.push(6);
         options.runtime_async_waitcompletion.push(7);
+        options.runtime_async_start.push(8);
     }
     if source.starts_with(".module LiveNativeText") {
         options.string_concat.push(0);
@@ -849,10 +850,10 @@ fn managed_input(source: &str) -> neoclr::metadata::Module {
         }
     }
     if source.starts_with(".module LiveAsyncWrappers") {
-        let rows: Vec<_> = (2..8).map(|i| serde_json::json!({"name":input.functions[i].name,
+        let rows: Vec<_> = (2..9).map(|i| serde_json::json!({"name":input.functions[i].name,
             "compiledIndex":i,"definition":{"module":"LiveAsyncWrappers","index":i}})).collect();
-        assert_eq!(crate::bindings::runtime_async(&mut input, &serde_json::json!({"functions":rows})).unwrap().len(),6);
-        for i in 2..8 {
+        assert_eq!(crate::bindings::runtime_async(&mut input, &serde_json::json!({"functions":rows})).unwrap().len(),7);
+        for i in 2..9 {
             let original=input.functions[i].name.clone();
             let name=format!("LiveAsyncWrapper{i}");
             input.functions[i].name=name.clone();
@@ -948,7 +949,7 @@ fn emit_managed(source: &str) {
             }
             if source.starts_with(".module LiveAsyncWrappers") {
                 exports.extend([(2,"live_async_create"),(3,"live_async_complete"),(4,"live_async_await"),
-                    (5,"live_async_release"),(6,"live_async_iscompleted"),(7,"live_async_wait")]);
+                    (5,"live_async_release"),(6,"live_async_iscompleted"),(7,"live_async_wait"),(8,"live_async_start")]);
             }
             for (index, name) in exports {
                 let Some(cranelift_module::FuncOrDataId::Func(writer)) =
@@ -1359,7 +1360,7 @@ fn managed_async_wrappers_run_on_live_collector() {
     crate::compiler::values::compile_into(&managed_input(source),"Main",Some(&managed_options_for(source)),crate::compiler::Target::MacosArm64,module,true).unwrap();
     module.finalize_definitions().unwrap();
     let mut pointers=Vec::new();
-    for name in (2..8).map(|i| format!("neoclr_value_{i}")).chain(std::iter::once("neoclr_invoke_void_callback_v1".into())) {
+    for name in (2..9).map(|i| format!("neoclr_value_{i}")).chain(std::iter::once("neoclr_invoke_void_callback_v1".into())) {
         let Some(cranelift_module::FuncOrDataId::Func(id))=module.get_name(&name) else { panic!("async wrapper") };
         pointers.push(module.get_finalized_function(id));
     }

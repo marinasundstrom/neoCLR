@@ -43,6 +43,9 @@ ret
 .function neoCLR.Runtime.RuntimeAsyncWaitCompletion(Int64 operation) -> Boolean
 .methodimpl InternalCall
 .end
+.function neoCLR.Runtime.RuntimeAsyncStart(fn<Void> callback) -> Int64
+.methodimpl InternalCall
+.end
 .function Write(Counter value) -> Int32
 ldarg value
 function.bind fn<Void> = instance Counter::Run()

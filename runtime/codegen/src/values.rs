@@ -516,7 +516,8 @@ pub(crate) fn compile_into(
             || d.byte_memory_create.contains(&i) || d.byte_memory_slice.contains(&i)
             || d.byte_memory_length.contains(&i) || d.byte_view_get.contains(&i)
             || d.byte_view_set.contains(&i) || d.byte_view_utf8.contains(&i)
-            || d.runtime_async_create.contains(&i) || d.runtime_async_completeunit.contains(&i)
+            || d.runtime_async_create.contains(&i) || d.runtime_async_start.contains(&i)
+            || d.runtime_async_completeunit.contains(&i)
             || d.runtime_async_awaitunit.contains(&i) || d.runtime_async_release.contains(&i)
             || d.runtime_async_iscompleted.contains(&i) || d.runtime_async_waitcompletion.contains(&i));
         f.pinvoke.is_some() || ((f.is_internal_call() || gc_points::native_body(&p, i, details)) && !admitted)

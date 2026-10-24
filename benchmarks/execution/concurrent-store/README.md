@@ -761,3 +761,33 @@ The CLR comparison remains explicit published/parked roots and rooted transition
 neoCLR's private cooperative carrier is not CLR thread scheduling. Remaining work is
 owned/start wrappers, native socket result publication, entry/queue/bootstrap integration
 and the full HTTP/standalone correctness and performance matrix.
+
+
+## Generated strong async startup (2026-10-24)
+
+RuntimeAsyncStart now joins live native-provider admission, using the already guarded
+result wrapper and checked generated callback dispatcher. The startup frame is parked
+while the callback runs on its native carrier; after the callback suspends, startup
+resumes and publishes the operation handle through the caller's heap alias. This
+adds no whole-pump fallback or new public scheduling contract. CreateOwned, CurrentOwner,
+StartManaged and generated pump entry remain unadmitted.
+
+The async-wrappers fixture now binds seven exact reserved signatures. Its 600 forced/
+paced JIT and optimized/undefined-bounds AOT cycles alternate generated strong startup
+(300 suspended callbacks) with native owned startup (300). Every cycle additionally
+executes generated startup with a faulting callback and a null callback, requiring
+unchanged heap output and restored roots. Success paths verify operation release and
+clean shutdown; failure paths deliberately clear fault state, check shutdown reports
+outstanding failed operations, then verify state reset and zero reserved stack bytes.
+Twenty-one focused compiler tests pass; the fourteen host-dependent checks skipped
+in the general run include the async JIT test executed explicitly by the harness.
+
+`async-start-validation.json.gz`, the AOT object and compiler report preserve this
+extension; earlier six-wrapper evidence remains archived separately. Three initial
+fixture assertions failed and are retained: callback boundaries can complete an epoch
+before the result store (so count both safe inactive and guarded-old stores); wrapper
+status is 3 while the original division fault detail remains 1; and shutdown reports
+outstanding failed operations if the caller has cleared its fault. Correcting these
+expectations preserved existing runtime semantics rather than changing them to fit
+the experiment. No HTTP throughput/default claim; owned startup, socket publication,
+pump/full-entry integration and full workload performance remain open.
