@@ -32,8 +32,10 @@ an overflow fallback there could collect those values. Waiting/discarding the ma
 without collecting leaves them intact. It can still block, so cancellation frequency
 and latency require measurement after integration. No throughput benefit is claimed.
 
-The destination lookup currently walks allocation descriptors. That is a correctness
-baseline, not an efficient store path for a large heap. Lowering must preserve known
+Active old-allocation destinations now use the existing detached index, validate
+live descriptor identity, and reuse the validated extent for the gated write.
+Inactive epochs and new allocations still walk allocation descriptors. That fallback
+is a correctness baseline, not an efficient store path for a large heap. Lowering must preserve known
 stack/heap provenance where possible and measure any checked owner hint or indexed
 lookup before deployment. Do not introduce a per-store metadata walk into production
 silently. Counters distinguish outside-arena, inactive/new heap, guarded old heap,
@@ -80,3 +82,5 @@ already researched in the mutation audit, while retaining neoCLR's current conse
 payload semantics. A native helper alone does not establish complete barrier coverage.
 The next deliverable remains generated-store integration and executable managed
 consumers, followed by the full performance/correctness matrix.
+
+[Indexed scalar-store measurements and validation](store-index-results.md).

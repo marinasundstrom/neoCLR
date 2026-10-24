@@ -126,11 +126,8 @@ void experiment_gc_live_counts(uint64_t *out) { memcpy(out,live_counts,sizeof(li
 void experiment_gc_live_wait(void) { if (!candidate_active) abort(); candidate_wait(); }
 /* Raw native caller must admit every mutation through this adapter. This is not
  * sufficient admission for generated code, providers, or shared heaps. */
-int experiment_gc_write(neoclr_aot_context *context, void *payload,
+static int live_write_known(void *payload, uint64_t bytes, uint32_t kind,
     const mutation_patch *patches, size_t count) {
-    if (!candidate_active || context != candidate_context) return GATE_INVALID;
-    uint64_t bytes; uint32_t kind;
-    if (neoclr_gc_allocation_info_v1(context,payload,&bytes,&kind)) return GATE_INVALID;
     shadow_snapshot *s=shadow_owner->job;
     /* Published array shape is immutable. Markers and payload use grouped patches. */
     size_t header=kind==NEOCLR_GC_RECORDS?24:kind==NEOCLR_GC_STRINGS?16:0;
@@ -150,6 +147,13 @@ int experiment_gc_write(neoclr_aot_context *context, void *payload,
     live_time_counts[3]++;
 #endif
     return result;
+}
+int experiment_gc_write(neoclr_aot_context *context, void *payload,
+    const mutation_patch *patches, size_t count) {
+    if (!candidate_active || context != candidate_context) return GATE_INVALID;
+    uint64_t bytes; uint32_t kind;
+    if (neoclr_gc_allocation_info_v1(context,payload,&bytes,&kind)) return GATE_INVALID;
+    return live_write_known(payload,bytes,kind,patches,count);
 }
 '''
 s+='\n'+(base/'store.h').read_text()

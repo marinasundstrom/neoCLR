@@ -30,8 +30,10 @@ The hook cannot collect, including when an overflowing barrier buffer cancels th
 marker. Expression temporaries need not be newly published at each store.
 See [the native boundary](../concurrent-live/store-boundary.md).
 
-The current dynamic destination classification walks allocation descriptors. It is
-a correctness baseline with a known scaling cost, not a production fast path.
+Dynamic destination classification now indexes old allocations during an active
+epoch; new/inactive destinations still walk allocation descriptors. See the
+[paired lookup experiment](../concurrent-live/store-index-results.md). This is not
+a qualified production fast path.
 Calls, checks and extra branches also cost CPU/code size. Preserve proven storage
 provenance and measure indexed byref lookup before admitting this broadly.
 

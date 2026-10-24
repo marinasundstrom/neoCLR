@@ -91,9 +91,29 @@ static void construction(void) {
     root=NULL; CHECK(!neoclr_gc_collect_v1(&c,&frame) && !c.text.used);
     CHECK(!neoclr_gc_heap_release_v1(&c.text));
 }
+static void detached_identity(void) {
+    uint64_t heap[128]={0};
+    neoclr_aot_context c={.text={(unsigned char *)heap,sizeof(heap),0}};
+    CHECK(!neoclr_gc_heap_acquire_v1(&c.text));
+    uint64_t *root=object(&c,24);
+    neoclr_probe_storage slot={&root,8,0};
+    neoclr_probe_frame frame={.context=&c,.storage=&slot,.storage_count=1};
+    CHECK(!experiment_gc_begin(&c,&frame,NULL,0)); experiment_gc_live_wait();
+    /* Deliberately violate immutable old identity while the worker is idle.
+     * Restore it before remark; a mismatching descriptor cannot authorize writes. */
+    uint64_t *header=root-4, saved_bytes=header[1], saved_kind=header[2];
+    header[1]=23;
+    CHECK(experiment_gc_store(&c,root+1,42,8)==3 && root[1]==0);
+    header[1]=saved_bytes; header[2]=NEOCLR_GC_BYTES;
+    CHECK(experiment_gc_store(&c,root+1,42,8)==3 && root[1]==0);
+    header[2]=saved_kind;
+    CHECK(!experiment_gc_finish(&c,&frame,NULL,0));
+    root=NULL; CHECK(!neoclr_gc_collect_v1(&c,&frame) && !c.text.used);
+    CHECK(!neoclr_gc_heap_release_v1(&c.text));
+}
 int main(void) {
-    ranges(); cancellation(); construction();
+    ranges(); cancellation(); construction(); detached_identity();
     uint64_t counts[5]; experiment_gc_store_counts(counts);
-    CHECK(counts[0]==2 && counts[1]>=5 && counts[2]>=97 && counts[3]==1 && counts[4]==6);
+    CHECK(counts[0]==2 && counts[1]>=5 && counts[2]>=97 && counts[3]==1 && counts[4]==8);
     puts("PASS 97 scalar ranges, stack/byref classification, new array construction and noncollecting overflow recovery");
 }

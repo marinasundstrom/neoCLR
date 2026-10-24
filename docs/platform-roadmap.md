@@ -65,6 +65,10 @@ Framed lowering now checks initialization dominance and passes real-runtime
 JIT/AOT root-chain restoration on success and rejected writes using shared production
 return cleanup. Ordinary compilation does not invoke the pass; closed-world
 host/writer admission, complete pipeline integration and managed consumers remain next.
+[Indexed old-object scalar writes](../benchmarks/execution/concurrent-live/store-index-results.md)
+now remove repeated allocation walks during active epochs, with native/generated
+safety tests and paired lookup-cost evidence. New/inactive fallbacks remain linear;
+large isolated store savings do not establish managed/HTTP improvement.
 
 **Author-directed media types (2026-10-23):** Complete the bounded HTTP value-contract
 slice with cached typed presets, lazy structured projections, shared primitive

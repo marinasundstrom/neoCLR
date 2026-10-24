@@ -22,39 +22,64 @@ int experiment_gc_store(neoclr_aot_context *context, void *destination,
     }
     if (address<base || address-base>=context->text.used) goto rejected;
     neoclr_aot_text_arena *a=&context->text;
+    block *b=NULL;
+#ifndef NEOCLR_LIVE_LINEAR_STORE
+    if (candidate_active) {
+        shadow_snapshot *snapshot=shadow_owner->job;
+        size_t index=shadow_find(snapshot,address);
+        if (index!=SIZE_MAX) {
+            uint64_t at=snapshot->offsets[index];
+            const block *saved=&snapshot->headers[index];
+            if (!block_valid(a,at)) goto rejected;
+            b=(void *)(a->data+at);
+            /* Old allocations cannot move, retire or be reclaimed during this
+             * epoch. Validate the identity before trusting detached lookup. */
+            if (!(b->state&ALLOCATED) || b->span!=saved->span ||
+                b->bytes!=saved->bytes || b->kind!=saved->kind) goto rejected;
+            goto located;
+        }
+    }
+#endif
     for (uint64_t at=0;at<a->used;) {
         if (!block_valid(a,at)) goto rejected;
-        block *b=(void *)(a->data+at);
+        b=(void *)(a->data+at);
         uintptr_t payload=(uintptr_t)(b+1);
-        if (address>=payload && address-payload<b->bytes && (b->state&ALLOCATED)) {
-            uint64_t offset=address-payload;
-            if (width>b->bytes-offset) goto rejected;
-            if (!candidate_active || shadow_find(shadow_owner->job,address)==SIZE_MAX) {
-                /* New allocations are excluded from marker reads and are all
-                 * traced at remark. No publication exemption for old objects. */
-                live_store_counts[1]++;
-                memcpy(destination,value,width);
-                return 0;
-            }
-            mutation_patch patch={offset,width,value};
-            int status=experiment_gc_write(context,(void *)payload,&patch,1);
-            if (status==GATE_CANCELLED) {
-                /* No root walk, sweep, cleanup or managed callback here. Discard
-                 * detached work before writing; future collection needs a normal
-                 * root-published boundary. Temporaries may be unpublished now. */
-                candidate_dispose();
-                candidate_context=NULL;
-                candidate_active=0;
-                live_store_counts[3]++;
-                memcpy(destination,value,width);
-                return 0;
-            }
-            if (status) goto rejected;
-            live_store_counts[2]++;
-            return 0;
-        }
+        if (address>=payload && address-payload<b->bytes && (b->state&ALLOCATED))
+            goto located;
         at+=b->span;
     }
+    goto rejected;
+located:;
+    uintptr_t payload=(uintptr_t)(b+1);
+    uint64_t offset=address-payload;
+    if (width>b->bytes-offset) goto rejected;
+    if (!candidate_active || shadow_find(shadow_owner->job,address)==SIZE_MAX) {
+        /* New allocations are excluded from marker reads and are all
+         * traced at remark. No publication exemption for old objects. */
+        live_store_counts[1]++;
+        memcpy(destination,value,width);
+        return 0;
+    }
+    mutation_patch patch={offset,width,value};
+#ifdef NEOCLR_LIVE_LINEAR_STORE
+    int status=experiment_gc_write(context,(void *)payload,&patch,1);
+#else
+    int status=live_write_known((void *)payload,b->bytes,b->kind,&patch,1);
+#endif
+    if (status==GATE_CANCELLED) {
+        /* No root walk, sweep, cleanup or managed callback here. Discard
+         * detached work before writing; future collection needs a normal
+         * root-published boundary. Temporaries may be unpublished now. */
+        candidate_dispose();
+        candidate_context=NULL;
+        candidate_active=0;
+        live_store_counts[3]++;
+        memcpy(destination,value,width);
+        return 0;
+    }
+    if (status) goto rejected;
+    live_store_counts[2]++;
+    return 0;
 rejected:
     live_store_counts[4]++;
     return 3;
