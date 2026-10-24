@@ -1,0 +1,64 @@
+.module LiveCallableArrays
+.type class Counter
+.field Number Int32
+.field Child arrayref<Byte>
+.method instance Read() -> Int32
+ldarg 0
+ldc.i4 8
+newarr Byte
+stfld Counter::Child
+ldarg 0
+ldfld Counter::Number
+ret
+.end
+.end
+.function Write(arrayref<fn<Int32>> first,arrayref<fn<Int32>> second,Counter value) -> Int32
+.local Counter absent
+.local arrayref<fn<Int32>> temp
+.local arrayref<fn<Int32>> reserved
+ldloca absent
+initobj Counter
+ldarg value
+ldloc absent
+ref.eq
+brtrue invoke
+ldc.i4 1
+newarr fn<Int32>
+stloc temp
+ldc.i4 1
+array.reserve fn<Int32>
+stloc reserved
+ldloc temp
+ldc.i4 0
+ldarg value
+function.bind fn<Int32> = instance Counter::Read()
+stelem fn<Int32>
+ldloc reserved
+ldc.i4 0
+ldloc temp
+ldc.i4 0
+ldelem fn<Int32>
+stelem fn<Int32>
+ldarg first
+ldc.i4 0
+ldloc reserved
+ldc.i4 0
+ldelem fn<Int32>
+stelem fn<Int32>
+ldarg second
+ldc.i4 0
+ldarg first
+ldc.i4 0
+ldelem fn<Int32>
+stelem fn<Int32>
+invoke:
+ldarg first
+ldc.i4 0
+ldelem fn<Int32>
+callvirt instance fn<Int32>::Invoke()
+ret
+.end
+.function Main(Int32 value) -> Int32
+ldarg value
+ret
+.end

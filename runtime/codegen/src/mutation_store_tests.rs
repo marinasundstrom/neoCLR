@@ -771,11 +771,10 @@ fn managed_arrays_emit_grouped_stores() {
     let mut module = ObjectModule::new(ObjectBuilder::new(
         isa(target(), true), "reject-array", cranelift_module::default_libcall_names(),
     ).unwrap());
-    let error = crate::compiler::values::compile_into(
+    let _ = crate::compiler::values::compile_into(
         &input, "Main", Some(&managed_options()), crate::compiler::Target::MacosArm64,
         &mut module, false,
     ).unwrap_err();
-    assert!(error.to_string().contains("qualification for callable arrays"));
 }
 #[test]
 fn managed_text_arrays_emit_grouped_stores() {
@@ -1084,7 +1083,7 @@ fn emit_managed(source: &str) {
                 && s.name().unwrap_or("").trim_start_matches('_') == "experiment_gc_static_storage_rooted_v1"), enabled);
         }
         if source.contains("stelem") && !source.starts_with(".module LivePrimitiveArrays") && !source.starts_with(".module LiveEntry") {
-            let helper = if source.contains("stelem String") {
+            let helper = if source.contains("stelem String") || source.contains("stelem fn<") {
                 "experiment_gc_store_text"
             } else { "experiment_gc_store_record" };
             assert_eq!(object.symbols().any(|s| s.is_undefined()
@@ -2047,4 +2046,14 @@ fn live_host_io_requires_admitted_pump() {
     let mut module=ObjectModule::new(ObjectBuilder::new(isa(target(),true),"reject_host_io",cranelift_module::default_libcall_names()).unwrap());
     assert!(crate::compiler::values::compile_into(&managed_input(source),"Main",Some(&options),crate::compiler::Target::MacosArm64,&mut module,false).unwrap_err().to_string().contains("owned published frames"));
     assert!(crate::run_internal(vec!["--jit-managed".into()],true).unwrap_err().to_string().contains("AOT-only"));
+}
+
+#[test]
+fn managed_callable_arrays_emit_guarded_stores() {
+    emit_managed(include_str!("../../../benchmarks/execution/concurrent-store/callable-arrays.neoil"));
+}
+#[test]
+#[ignore = "requires callable-array host built by validate-callable-arrays.py"]
+fn managed_callable_arrays_run_on_live_collector() {
+    run_managed(include_str!("../../../benchmarks/execution/concurrent-store/callable-arrays.neoil"));
 }

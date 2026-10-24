@@ -22585,3 +22585,11 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   Eight hundred forty JIT/AOT cycles and 32 compiler checks pass without native
   ownership or tracing changes. Full HTTP integration remains open.
 - [Evidence and limits](../benchmarks/execution/concurrent-store/README.md#inline-value-array-allocation-admission-2026-10-24).
+
+- Follow-up implementation qualifies callable arrays through their existing pointer
+  storage and ordinary descriptor/receiver graph tracing, without adding a source
+  language category to GC. Seven hundred twenty JIT/AOT cycles cover retained
+  receivers, invocation after collection and replacement. Full HTTP compilation
+  advances beyond the callable-array gate but still requires native-body admission;
+  no HTTP performance improvement or default switch is claimed.
+- [Callable-array evidence](../benchmarks/execution/concurrent-store/README.md#callable-array-admission-2026-10-24).

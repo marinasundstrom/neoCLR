@@ -122,7 +122,7 @@ int experiment_gc_store_record(neoclr_aot_context *context, void *array,
     return 0;
 }
 
-/* Text/character arrays share the traced pointer-array layout. */
+/* Text, character and callable-descriptor arrays share traced pointer storage. */
 int experiment_gc_store_text(neoclr_aot_context *context, void *array,
     uint32_t index, uint64_t value) {
     if (!context || owned_heap.arena!=&context->text || !array ||

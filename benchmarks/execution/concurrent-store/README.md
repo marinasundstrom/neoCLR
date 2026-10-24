@@ -1380,3 +1380,41 @@ bootstrap/shared heaps, full HTTP execution and throughput/CPU/pause/memory comp
 remain open. CLR-style separation of generated-code root/store obligations and collector
 ownership remains the comparison; this change introduces no language-level semantics
 or collector policy. Website/public API behavior is unchanged.
+
+
+## Callable-array admission (2026-10-24)
+
+Remove the provisional callable-array store gate after qualifying the existing
+pointer-array representation. Function elements point to descriptors; ordinary
+object tracing retains each descriptor's receiver. The existing grouped pointer
+store publishes the value and reservation initialization flag together. No new GC
+storage category, language-record special case or native ownership change is needed.
+This follows the CLR distinction between reference elements and reference-bearing
+inline values, while retaining neoCLR's current conservative payload tracing.
+
+`validate-callable-arrays.py` runs 720 forced/paced JIT and optimized/undefined-bounds
+AOT cycles. A real bound instance method allocates a child and returns its receiver's
+field. Checks cover normal and reserved arrays, uninitialized reads, bounds failures,
+partial publication, recoverable allocation pressure, all-live exhaustion, removal
+of the original receiver root, invocation after collection, replacement during a
+new epoch and final empty-heap cleanup. The initial emission assertion incorrectly
+assumed every non-string array used inline storage; the harness now recognizes
+callable pointer storage. Evidence: `callable-arrays-validation.json.gz`, object and
+native-source archives. These are deterministic safety checks, not timing results.
+
+The full HTTP qualification script now accepts `--mode live` to reuse unaffected
+ordinary-build evidence. Native-body admission failures identify the selected
+function, making subsequent qualification gaps actionable. Public options, native
+ownership and production GC defaults remain unchanged. Full HTTP execution and
+matched throughput, CPU, pause and memory qualification remain open.
+
+The fresh full-live rerun still fails, with preserved evidence in
+`full-http-selection-callable.json.gz`: plaintext rejects selected function 40
+(`$aot_linked_40`), JSON function 47 (`$aot_linked_47`). The unchanged ordinary
+selection metadata in `full-http-selection-initial.json.gz` maps these to
+`neoCLR.Runtime.ViewBoundsFault` and `neoCLR.Runtime.ObjectTypeHandle`, respectively.
+These are the next specific admission checks; later gaps may remain. The preceding
+generic-error run is retained as `full-http-selection-callable-initial.json.gz`.
+Thirty-six focused compiler checks pass (28 host-dependent checks skipped in that
+filter; callable JIT checks run explicitly). Website/public API behavior is unchanged;
+no website build is needed for this internal qualification change.

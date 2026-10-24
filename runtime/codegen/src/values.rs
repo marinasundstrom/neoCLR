@@ -505,11 +505,8 @@ pub(crate) fn compile_into(
     p.boxed_interfaces = details
         .map(|d| d.boxed_interfaces.clone())
         .unwrap_or_default();
-    if live_stores && input.functions.iter().any(|f| f.body.iter().any(|op|
-        matches!(op, Op::StoreArrayElement(neoclr::metadata::Type::Function(_))))) {
-        return Err("live stores require qualification for callable arrays".into());
-    }
-    if live_stores && input.functions.iter().enumerate().any(|(i, f)| {
+    if let Some((index, function)) = input.functions.iter().enumerate().find(|&(i, f)| {
+        if !live_stores { return false; }
         let admitted = details.is_some_and(|d|
             d.int32_to_string.contains(&i) || d.int64_to_string.contains(&i)
             || d.uint64_to_string.contains(&i) || d.tls.contains_key(&i)
@@ -538,7 +535,7 @@ pub(crate) fn compile_into(
             || d.socket_send_until.contains(&i));
         f.pinvoke.is_some() || ((f.is_internal_call() || gc_points::native_body(&p, i, details)) && !admitted)
     }) {
-        return Err("experimental live stores reject unaudited native replacement bodies".into());
+        return Err(format!("experimental live stores reject unaudited native replacement bodies: function {index} ({})", function.name).into());
     }
     let bootstrap = details.is_some_and(|d| d.native_host_bootstrap);
     if bootstrap && !details.is_some_and(|d| d.native_gc) {

@@ -177,10 +177,13 @@ Host-I/O entry now qualifies with the admitted modern pump: 600 real-scheduler
 JIT/AOT cycles include missing-scope rejection and 450 accepts; 35 compiler checks pass.
 A private AOT driver harness freshly compiles the retained full plaintext/JSON cohort:
 ordinary builds succeed (1,131/1,559 functions), but both live builds reject callable
-arrays. **Next: qualify callable-array stores/lifetimes, then rerun full selection**
-to expose further generated-body gaps before HTTP execution or performance claims
+arrays. Callable arrays subsequently pass 720 JIT/AOT cycles and 36 compiler checks
+using existing pointer storage and receiver tracing. Full live selection now advances
+to `ViewBoundsFault` (plaintext) and `ObjectTypeHandle` (JSON) admission failures.
+**Next: qualify the identified generated
+bodies, then execute full HTTP before performance/default decisions**
 ([full selection evidence](../benchmarks/execution/concurrent-store/README.md#full-http-selection-and-host-io-entry-qualification-2026-10-24)).
-Capability conversions, callable arrays, remaining text/byte services and async/full
+Capability conversions, remaining text/byte services and async/full
 host-entry integration remain next;
 the recorded plaintext import inventory guides that coverage.
 The isolated consumers now check call closure against supplied bodies/explicit provider

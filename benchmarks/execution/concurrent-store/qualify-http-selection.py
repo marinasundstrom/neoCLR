@@ -8,6 +8,7 @@ import subprocess
 p=argparse.ArgumentParser(description=__doc__)
 p.add_argument('--runner',type=Path,required=True)
 p.add_argument('--output',type=Path,required=True)
+p.add_argument('--mode',choices=['both','sync','live'],default='both')
 a=p.parse_args();root=Path(__file__).resolve().parents[3];out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
 r={'passed':False,'commands':[],'inputs':{},'scope':'Compilation only; no host execution or HTTP throughput claim.'}
 try:
@@ -15,7 +16,7 @@ try:
  for sample,recipe in [('plain','build.json'),('json','json-build.json')]:
   path=root/'target/root-map'/recipe;data=json.loads(path.read_text())
   original=data.get('command') or data['commands'][0]['command']
-  for mode in ['sync','live']:
+  for mode in (['sync','live'] if a.mode=='both' else [a.mode]):
    command=original.copy();command[4]=str(out/f'{sample}-{mode}.o')
    input_path=out/f'{sample}-{mode}-command.json';input_path.write_text(json.dumps(command,indent=2)+'\n')
    env=dict(os.environ,NEOCLR_LIVE_SELECTION_COMMAND=str(input_path),NEOCLR_LIVE_SELECTION_MODE=mode)
