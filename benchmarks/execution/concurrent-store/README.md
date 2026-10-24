@@ -147,3 +147,37 @@ source is byte-identical to `native-gc.c.gz`. The initial real-runtime fixture p
 a null table for zero storage entries and aborted as required by frame entry;
 `framed-initial-null-table.json.gz` retains that failure. Supplying a non-null empty
 table corrects the fixture without weakening runtime validation.
+
+## Call-closure gate
+
+The private `mutation_admission::check_call_closure` checks completed IR against
+all supplied generated bodies and an explicit native-provider ABI list. Each body
+must match a non-import declaration. Direct calls must name either a supplied body
+or an imported provider with an exactly matching signature, including calling
+convention. Missing transitive bodies, duplicate bodies/contracts, unlisted imports,
+forged call-site signatures and indirect/tail/exceptional calls are rejected.
+It examines every supplied body, not only the entry or one level of callees.
+
+The scalar and framed AOT fixtures and real native-host JIT fixture now invoke this
+gate before defining code. Store lowering and cleanup still run first. The gate
+is read-only and does not establish that lowering was applied, that a provider's
+implementation is safe, or that the linker resolved an approved host. It is one
+pipeline obligation, not complete image admission. A versioned host capability and
+ordinary compiler integration remain required; no public switch enables live GC.
+
+The provider list in the tests is constructed from explicit expected ABIs rather
+than copied from emitted call signatures. New call-closure tests cover missing
+callee bodies, missing/wrong providers, duplicated bodies, mismatched call sites,
+indirect calls and tail calls. Runtime consumers exercise the existing scalar/frame
+provider set after checking it; they do not admit application/native service APIs.
+
+Backend-introduced libcalls also need validation after lowering. The AOT fixture
+now checks its complete undefined-symbol set on both targets, not only presence of
+the store hook. This fixture-level check is not yet a general image/link verifier.
+
+`admission-compiler-tests.json.gz` records nine passing focused compiler tests;
+`admission-validation.json.gz` records complete AOT import checks, optimized/UBSan
+native AOT consumers (200 cycles each) and framed real-host JIT (100 cycles).
+The generated object remains byte-identical to `framed-stores.o.gz`: this gate
+adds validation without changing the fixture's emitted code. No timing comparison
+was made during this qualification.

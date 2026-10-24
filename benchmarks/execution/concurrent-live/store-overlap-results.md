@@ -1,5 +1,11 @@
 # Scalar stores with synchronous and concurrent collection — 2026-10-24
 
+**Timing qualification:** After these runs, the author reported watching a video
+that might have interfered. Concurrent playback was not logged, so its overlap and
+magnitude cannot be established. Treat timing ratios and tails as provisional until
+repeated under controlled quieter conditions. Preserve the runs; their correctness
+checks and deterministic work counts remain useful.
+
 The indexed adapter removes its repeated linear lookup cost, but the full live-GC
 candidate remains more expensive than synchronous collection in this small-work
 fixture. At 16,384 objects, two cohorts put candidate process CPU at about 2.6–2.8×

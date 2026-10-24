@@ -22502,3 +22502,16 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   direction, but does not enable ordinary managed compilation or demonstrate an
   HTTP gain. Explicit host admission, native-writer coverage and managed workload
   qualification remain open. [Evidence](../benchmarks/execution/concurrent-store/README.md).
+
+
+### 2026-10-24 — Focus and benchmark interference
+
+- Author says “I stop any side work.” Assistant interprets this as focusing on the
+  active concurrent-GC integration and qualification goal, not pausing that goal.
+- Author reports “I was watching a video, that might have interfered.” Assistant
+  acknowledges possible scheduling/CPU interference and treats the recorded timings
+  as provisional. Playback overlap was not measured; no causal attribution is proven.
+  Existing correctness checks remain evidence, and controlled timing repeats remain
+  outstanding. [Affected comparison](../benchmarks/execution/concurrent-live/store-overlap-results.md).
+- Assistant returns to compiler call-closure enforcement as part of writer admission,
+  rather than drawing further default-GC conclusions from those noisy timings.

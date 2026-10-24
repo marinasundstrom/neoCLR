@@ -65,13 +65,17 @@ Framed lowering now checks initialization dominance and passes real-runtime
 JIT/AOT root-chain restoration on success and rejected writes using shared production
 return cleanup. Ordinary compilation does not invoke the pass; closed-world
 host/writer admission, complete pipeline integration and managed consumers remain next.
+The isolated consumers now check call closure against supplied bodies/explicit provider
+ABIs and validate their complete AOT import set. This does not establish provider
+implementation safety or matching host capability; ordinary compilation remains unchanged.
 [Indexed old-object scalar writes](../benchmarks/execution/concurrent-live/store-index-results.md)
 now remove repeated allocation walks during active epochs, with native/generated
 safety tests and paired lookup-cost evidence. New/inactive fallbacks remain linear;
 large isolated store savings do not establish managed/HTTP improvement.
 A [synchronous/idle/overlap comparison](../benchmarks/execution/concurrent-live/store-overlap-results.md)
 now retains phase distributions, marker CPU/work and RSS. The large live-graph
-candidate still costs about 2.6–2.8× synchronous CPU; owner capture/completion work
+candidate timing ratios are provisional after reported possible video-playback
+interference; controlled repeats remain required. Owner capture/completion work
 needs isolation before attributing the remaining cost or changing defaults.
 
 **Author-directed media types (2026-10-23):** Complete the bounded HTTP value-contract

@@ -203,16 +203,38 @@ fn emits_aot_hook_import_for_both_targets() {
         ] {
             let (id, mut ctx, context) = function(&mut module, &format!("mutation_{ty}"), ty);
             lower(&mut module, &mut ctx.func, context).unwrap();
+            crate::mutation_admission::check_call_closure(
+                &module,
+                &[(id, &ctx.func)],
+                &live_providers(&module),
+            )
+            .unwrap();
             module.define_function(id, &mut ctx).unwrap();
         }
         let (id, mut ctx, context, frame, _, ready) = framed_function(&mut module, false);
         lower_framed(&mut module, &mut ctx.func, context, ready).unwrap();
         finish_native_frame(&mut module, &mut ctx.func, frame);
+        crate::mutation_admission::check_call_closure(
+            &module,
+            &[(id, &ctx.func)],
+            &live_providers(&module),
+        )
+        .unwrap();
         module.define_function(id, &mut ctx).unwrap();
         let bytes = module.finish().emit().unwrap();
         let object = object::File::parse(bytes.as_slice()).unwrap();
-        assert!(object.symbols().any(|s| s.is_undefined()
-            && s.name().unwrap_or("").trim_start_matches('_') == "experiment_gc_store"));
+        let imports: std::collections::BTreeSet<_> = object
+            .symbols()
+            .filter(|symbol| symbol.is_undefined())
+            .map(|symbol| symbol.name().unwrap().trim_start_matches('_').to_owned())
+            .collect();
+        assert_eq!(
+            imports,
+            ["experiment_gc_store", "frame_enter", "frame_leave"]
+                .into_iter()
+                .map(str::to_owned)
+                .collect()
+        );
         if triple == target() {
             if let Some(path) = std::env::var_os("NEOCLR_MUTATION_TEST_OBJECT") {
                 std::fs::write(path, &bytes).unwrap();
@@ -277,6 +299,12 @@ fn native_collector_jit_consumer() {
     let (id, mut ctx, context, frame, _, ready) = framed_function(module, false);
     lower_framed(module, &mut ctx.func, context, ready).unwrap();
     finish_native_frame(module, &mut ctx.func, frame);
+    crate::mutation_admission::check_call_closure(
+        module,
+        &[(id, &ctx.func)],
+        &live_providers(module),
+    )
+    .unwrap();
     module.define_function(id, &mut ctx).unwrap();
     module.finalize_definitions().unwrap();
     let call: Writer = unsafe { std::mem::transmute(module.get_finalized_function(id)) };
@@ -556,4 +584,142 @@ fn finish_native_frame(module: &mut impl Module, func: &mut ir::Function, frame:
         .declare_function("frame_leave", Linkage::Import, &signature)
         .unwrap();
     crate::frame_cleanup::finish(module, func, frame, leave, true);
+}
+
+fn live_providers(module: &impl Module) -> Vec<(&'static str, ir::Signature)> {
+    let make = |parameters: &[ir::Type], returns: &[ir::Type]| {
+        let mut signature = module.make_signature();
+        signature
+            .params
+            .extend(parameters.iter().copied().map(AbiParam::new));
+        signature
+            .returns
+            .extend(returns.iter().copied().map(AbiParam::new));
+        signature
+    };
+    vec![
+        (
+            "experiment_gc_store",
+            make(
+                &[types::I64, types::I64, types::I64, types::I32],
+                &[types::I32],
+            ),
+        ),
+        (
+            "frame_enter",
+            make(&[types::I64, types::I64], &[types::I64]),
+        ),
+        ("frame_leave", make(&[types::I64, types::I64], &[])),
+    ]
+}
+
+#[test]
+fn call_closure_requires_transitive_bodies_and_exact_providers() {
+    let mut module = ObjectModule::new(
+        ObjectBuilder::new(
+            isa(target(), true),
+            "closure",
+            cranelift_module::default_libcall_names(),
+        )
+        .unwrap(),
+    );
+    let (callee, mut callee_ctx, context) = function(&mut module, "callee", types::I64);
+    lower(&mut module, &mut callee_ctx.func, context).unwrap();
+    let (caller, mut caller_ctx, context) = function(&mut module, "caller", types::I64);
+    lower(&mut module, &mut caller_ctx.func, context).unwrap();
+    let entry = caller_ctx.func.layout.entry_block().unwrap();
+    let args = caller_ctx.func.dfg.block_params(entry).to_vec();
+    let target = module.declare_func_in_func(callee, &mut caller_ctx.func);
+    let first = caller_ctx.func.layout.first_inst(entry).unwrap();
+    let call = FuncCursor::new(&mut caller_ctx.func)
+        .at_inst(first)
+        .ins()
+        .call(target, &args);
+    let providers = live_providers(&module);
+    let check = crate::mutation_admission::check_call_closure;
+    assert!(check(&module, &[(caller, &caller_ctx.func)], &providers)
+        .unwrap_err()
+        .to_string()
+        .contains("no supplied body"));
+    let bodies = [(caller, &caller_ctx.func), (callee, &callee_ctx.func)];
+    check(&module, &bodies, &providers).unwrap();
+    assert!(check(&module, &bodies, &[])
+        .unwrap_err()
+        .to_string()
+        .contains("no admitted provider"));
+    let mut wrong = live_providers(&module);
+    wrong[0].1.params[3].value_type = types::I64;
+    assert!(check(&module, &bodies, &wrong)
+        .unwrap_err()
+        .to_string()
+        .contains("signature mismatch"));
+    assert!(check(
+        &module,
+        &[(callee, &callee_ctx.func), (callee, &callee_ctx.func)],
+        &providers
+    )
+    .unwrap_err()
+    .to_string()
+    .contains("duplicate generated"));
+    if let ir::InstructionData::Call { opcode, .. } = &mut caller_ctx.func.dfg.insts[call] {
+        *opcode = Opcode::ReturnCall;
+    }
+    assert!(check(
+        &module,
+        &[(caller, &caller_ctx.func), (callee, &callee_ctx.func)],
+        &providers
+    )
+    .unwrap_err()
+    .to_string()
+    .contains("tail"));
+}
+
+#[test]
+fn call_closure_rejects_indirect_calls_and_forged_site_signatures() {
+    let mut module = ObjectModule::new(
+        ObjectBuilder::new(
+            isa(target(), true),
+            "calls",
+            cranelift_module::default_libcall_names(),
+        )
+        .unwrap(),
+    );
+    let (id, mut ctx, context) = function(&mut module, "calls", types::I64);
+    lower(&mut module, &mut ctx.func, context).unwrap();
+    let entry = ctx.func.layout.entry_block().unwrap();
+    let call = ctx
+        .func
+        .layout
+        .block_insts(entry)
+        .find(|&i| ctx.func.dfg.insts[i].opcode() == Opcode::Call)
+        .unwrap();
+    let ir::InstructionData::Call { func_ref, .. } = ctx.func.dfg.insts[call] else {
+        unreachable!()
+    };
+    let signature = ctx.func.dfg.ext_funcs[func_ref].signature;
+    ctx.func.dfg.signatures[signature].params[3].value_type = types::I64;
+    assert!(crate::mutation_admission::check_call_closure(
+        &module,
+        &[(id, &ctx.func)],
+        &live_providers(&module)
+    )
+    .unwrap_err()
+    .to_string()
+    .contains("call-site signature"));
+    let args = ctx.func.dfg.block_params(entry).to_vec();
+    let signature = ctx.func.signature.clone();
+    let signature = ctx.func.import_signature(signature);
+    let first = ctx.func.layout.first_inst(entry).unwrap();
+    FuncCursor::new(&mut ctx.func)
+        .at_inst(first)
+        .ins()
+        .call_indirect(signature, context, &args);
+    assert!(crate::mutation_admission::check_call_closure(
+        &module,
+        &[(id, &ctx.func)],
+        &live_providers(&module)
+    )
+    .unwrap_err()
+    .to_string()
+    .contains("indirect"));
 }
