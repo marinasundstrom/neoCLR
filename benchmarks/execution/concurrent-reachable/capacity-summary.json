@@ -1,0 +1,16 @@
+{
+  "means": {
+    "baseline-w1": {
+      "requestsPerSecond": 4226.450000000001,
+      "cpuMicrosecondsPerResponse": 229.1396491715975
+    },
+    "candidate-w1": {
+      "requestsPerSecond": 4107.15,
+      "cpuMicrosecondsPerResponse": 246.33510608593912
+    }
+  },
+  "percentChange": {
+    "requestsPerSecond": -2.822699901808867,
+    "cpuMicrosecondsPerResponse": 7.504356830652359
+  }
+}

@@ -27,8 +27,12 @@ work as the larger measured blocking cost; removing idle rechecks requires expli
 cleanup-timing, shutdown and memory qualification.
 The [idle-without-recheck candidate](../benchmarks/execution/concurrent-idle/README.md)
 now passes delayed cleanup, churn and JIT/AOT HTTP checks, but retains more memory
-and still regresses CPU/capacity. Next, reduce blanket marking of new/changed blocks
-while preserving conservative and conditional reachability.
+and still regresses CPU/capacity. The [reachable-closure remark candidate](../benchmarks/execution/concurrent-reachable/README.md)
+now removes blanket new/changed retention while preserving conservative future-address
+and conditional reachability. Native differential/churn checks and 8,192 checked
+HTTP responses pass, but capacity remains 2.8% lower with 7.5% more CPU/response.
+Keep this as a correctness reference; a cheaper mutation/read protocol and broader
+managed workload qualification remain next, not a default switch.
 
 **Author-directed media types (2026-10-23):** Complete the bounded HTTP value-contract
 slice with cached typed presets, lazy structured projections, shared primitive

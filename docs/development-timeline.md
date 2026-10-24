@@ -22445,3 +22445,30 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   capacity still loses 13.7% throughput and uses 13.4% more CPU/response.
   Assistant keeps the synchronous default and records pause-accounting/platform/
   broader-workload gaps. [Evidence](../benchmarks/execution/concurrent-integration/README.md).
+
+
+### 2026-10-24 — External GC guidance as a design cross-check
+
+- Author supplies a ChatGPT summary distinguishing concurrent, parallel,
+  incremental and generational collection, and emphasizing suspended-task roots,
+  safepoints and mutation barriers. Its suggested progression puts parallel
+  stop-the-world collection before concurrent marking. Author explicitly says,
+  “This is not necessarily what we should do. But take it into consideration.”
+- Assistant treats the summary as input, not an adopted sequence. The existing
+  concurrent-default direction remains; parallel collection and generations are
+  alternatives to evaluate against measured workload costs. Concurrent marking
+  need not wait for a parallel collector. Suspended tasks need their live state
+  reachable through scheduler/task roots; every suspended local need not be an
+  independent root. Cross-thread publication and reclamation require an explicit
+  safety protocol regardless of HTTP execution.
+- Assistant checks [.NET background GC](https://learn.microsoft.com/en-us/dotnet/standard/garbage-collection/background-gc)
+  and [Go's GC guide](https://go.dev/doc/gc-guide): the former combines background
+  generation-2 work with foreground ephemeral collections, while the latter
+  describes a nonmoving mark/sweep design and CPU/memory tradeoffs. These are
+  design references, not evidence that concurrency alone improves neoCLR capacity.
+- Current immutable-copy experiment avoids worker reads of changing live payloads;
+  it is not qualification of barriered shared-heap tracing. Mutation barriers and
+  coordinated root snapshots must be designed for a cheaper live-heap candidate.
+  A particular write-barrier implementation is not a universal prerequisite for
+  every concurrent algorithm. Full copying/comparison currently adds CPU and
+  blocking work, so latency, throughput, CPU and memory remain separate gates.
