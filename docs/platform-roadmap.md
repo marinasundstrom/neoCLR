@@ -157,6 +157,11 @@ UTF-8 encode/array decode/slice decode now pass 720 JIT/AOT cycles using existin
 publication and ownership contracts; 31 compiler checks pass. Retained HTTP imports
 leave 4/5 missing names for plain/JSON
 ([UTF-8 evidence](../benchmarks/execution/concurrent-store/README.md#utf-8-conversion-admission-2026-10-24)).
+Existing inline value-array reservation now passes 840 JIT/AOT cycles and 32 compiler
+checks, including initialized-lane reference retention. Native tracing/ownership are
+unchanged; historical record storage is a layout category, not record semantics.
+Retained HTTP import gaps are 3/4 for plain/JSON
+([array evidence](../benchmarks/execution/concurrent-store/README.md#inline-value-array-allocation-admission-2026-10-24)).
 Capability conversions, callable arrays, remaining text/byte services and async/full
 host-entry integration remain next;
 the recorded plaintext import inventory guides that coverage.

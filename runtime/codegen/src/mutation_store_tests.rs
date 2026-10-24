@@ -1847,3 +1847,13 @@ fn managed_utf8_conversion_runs_on_live_collector() {
     let run: libloading::Symbol<Run> = unsafe { library.get(b"utf8_conversion_consumer") }.unwrap();
     assert_eq!(unsafe { run(functions[0],functions[1],functions[2]) },0);
 }
+
+#[test]
+fn managed_record_arrays_emit_guarded_stores() {
+    emit_managed(include_str!("../../../benchmarks/execution/concurrent-store/record-arrays.neoil"));
+}
+#[test]
+#[ignore = "requires record-array host built by validate-record-arrays.py"]
+fn managed_record_arrays_run_on_live_collector() {
+    run_managed(include_str!("../../../benchmarks/execution/concurrent-store/record-arrays.neoil"));
+}

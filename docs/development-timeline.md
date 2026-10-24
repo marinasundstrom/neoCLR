@@ -22568,3 +22568,20 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   ownership. Six hundred JIT/AOT cycles and 29 compiler checks pass; no native
   boundary/ownership change was needed. Full HTTP qualification remains open.
 - [Validation and limits](../benchmarks/execution/concurrent-store/README.md#queue-and-timer-service-admission-2026-10-24).
+
+
+### 2026-10-24 — Array tracing must follow layout, not record syntax
+
+- Author asks: “Why do record-array need special treatment by the GC or any services?
+  It's a class or a struct depending on mode.”
+- Assistant clarifies that records should not receive special GC semantics: class
+  arrays contain references, while inline values require tracing of their reference
+  fields. The existing native “record” storage name describes multi-lane arrays and
+  reservation initialization flags; it is not a new source-language category.
+- Assistant identifies the current conservative initialized-lane scan as a limitation;
+  layout-driven reference information is the architectural direction, not an
+  implemented precise-map improvement. No additional author decision is inferred.
+- The ongoing change qualifies the existing rooted reservation entry point only.
+  Eight hundred forty JIT/AOT cycles and 32 compiler checks pass without native
+  ownership or tracing changes. Full HTTP integration remains open.
+- [Evidence and limits](../benchmarks/execution/concurrent-store/README.md#inline-value-array-allocation-admission-2026-10-24).

@@ -1209,3 +1209,40 @@ console output, record reservation, interning and TLS, plus JSON ordinal compari
 (`http-dependencies-utf8-conversion.json.gz`). Host-I/O entry, whole-program live
 execution and HTTP performance qualification remain open. No default switch,
 throughput improvement or public API/website behavior change is claimed.
+
+
+## Inline value-array allocation admission (2026-10-24)
+
+Admit the existing `neoclr_reserve_records_rooted_v1` provider with its exact ABI.
+The historical native name means initialized multi-lane array storage, not special
+GC semantics for language-level records. Class-element arrays contain references;
+inline value-element arrays contain their fields. The collector needs storage layout
+and reference information regardless of the source type's record/class/struct label.
+The current implementation conservatively examines initialized lanes; precise element
+reference maps remain a limitation. Unlike ordinary zero-initialized arrays, the
+existing `array.reserve` contract rejects reads before initialization. No such semantic
+or tracing change is introduced here. CLR-style layout-driven tracing remains the
+design comparison; this admission does not endorse source-language record categories
+inside the GC or add a new permanent allocation boundary.
+
+Native audit: reservation allocates rooted RECORDS storage, sets header/length/lane
+count, and initializes fresh storage without another safepoint. Generated element
+writes already pass through mutation lowering. No native ownership or GC tracing
+change was necessary. The fixture contains a two-lane inline value (object reference
+and Int64), with a child reachable through that reference.
+
+`validate-record-arrays.py --runner <codegen-test-runner> --output <fresh-directory>`
+passes 840 forced/paced JIT and optimized/undefined-bounds AOT cycles. Cases cover
+initialized and uninitialized destinations, temporary managed reservation, multi-lane
+copy, partial progress on bounds faults, rejection of an uninitialized read, garbage
+pressure, all-live exhaustion, graph survival after dropping the original root, and
+collection of a graph whose only remaining pointer is in an uninitialized lane.
+Thirty-two focused compiler checks pass; 24 host-dependent tests are skipped by the
+general filter, with this fixture's JIT test run explicitly. Preserve `record-arrays-*`
+artifacts, including the initial validator's incorrect test selector (zero tests ran;
+missing object output correctly failed validation). No runtime defect was found.
+
+The retained HTTP import audit falls to 3/4 missing names for plain/JSON: console,
+interning and TLS, plus JSON ordinal comparison (`http-dependencies-record-arrays.json.gz`).
+Whole-program/host-I/O qualification and performance measurements remain open; no
+public API, website behavior, production default or throughput claim changes.

@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-24
 
+- Admit existing rooted multi-lane array reservation to internal live GC. Eight hundred forty forced/paced JIT and optimized/undefined-bounds AOT cycles cover reference-bearing inline values, initialization, bounds, pressure/exhaustion and retention; 32 compiler checks pass. Archive record-arrays-* evidence and corrected validator selector failure. Clarify that historical record storage names express layout, not source-level record semantics; tracing/ownership/defaults are unchanged. Retained HTTP import gaps fall to 3/4; full HTTP qualification remains open. Update both bridge documents.
+
 - Admit rooted UTF-8 encode, array decode and read-only slice decode to internal live GC through existing typed result publication. Seven hundred twenty forced/paced JIT and optimized/undefined-bounds AOT cycles cover roundtrips, invalid input, slices, pressure/exhaustion and heap aliases; 31 compiler checks pass. Archive utf8-conversion-* evidence and corrected fixture setup failures. Retained HTTP import gaps fall to 4/5; ownership/default behavior are unchanged and full HTTP qualification remains open. Update both bridge documents.
 
 - Admit Int32/Int64/UInt64 formatting to internal live GC, publishing native results through stack scratch and guarded stores. Seven hundred twenty forced/paced JIT and optimized/undefined-bounds AOT cycles cover extrema, heap aliases, pressure, exhaustion and retention; 30 compiler checks pass. Preserve integer-format-* evidence including the corrected exhaustion fixture. Retained HTTP import gaps fall to 6/7; native ownership/default emission are unchanged, and full HTTP qualification remains open. Update both bridge documents.

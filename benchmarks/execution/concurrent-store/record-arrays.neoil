@@ -1,0 +1,54 @@
+.module LiveRecordArrays
+.type class Node
+.field Next Node
+.end
+.type Pair
+.field Item Node
+.field Number Int64
+.end
+.function Dummy(Int32 value) -> Int32
+ldarg value
+ret
+.end
+.function Write(arrayref<Pair> first,arrayref<Pair> second,Node value) -> Int32
+.local arrayref<Pair> temp
+ldarg first
+ldlen
+conv.i4
+ldc.i4 2
+beq uninitialized
+br write
+uninitialized:
+ldarg first
+ldc.i4 1
+ldelem Pair
+pop
+write:
+ldc.i4 1
+array.reserve Pair
+stloc temp
+ldloc temp
+ldc.i4 0
+ldarg value
+ldc.i8 42
+newobj Pair
+stelem Pair
+ldarg first
+ldc.i4 0
+ldloc temp
+ldc.i4 0
+ldelem Pair
+stelem Pair
+ldarg second
+ldc.i4 0
+ldarg value
+ldc.i8 42
+newobj Pair
+stelem Pair
+ldc.i4 0
+ret
+.end
+.function Main(Int32 value) -> Int32
+ldarg value
+ret
+.end
