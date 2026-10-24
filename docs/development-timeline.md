@@ -22352,3 +22352,13 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   stress and async consumers pass. A validation-runner assumption about deliberate
   terminal faults is corrected and its failed run retained. Collection, TLS and frame
   entry remain follow-up targets. [Evidence](../benchmarks/execution/owned-root-chain/README.md).
+
+- On the next continuation, assistant completes binary storage/transient execution
+  headers after the prior profile showed frame-entry/string work. Generated roots
+  retain their ownership and tracing rules; rich inspection is unchanged. Paired
+  AOT one/four-owner throughput improves 6.1%/4.0%, CPU 5.6%/4.3%; owned JIT improves
+  3.4%/2.9%. Rebuilt consumers and forced-GC HTTP pass. One sanitized worker run fails
+  the minimum-concurrency assertion; three unchanged-binary replays reach four graph
+  participants and pass. The failure is retained rather than weakening the gate.
+  Image-level admission and broader execution-state/metadata redesign remain open.
+  [Implementation and evidence](../benchmarks/execution/slot-maps/README.md).

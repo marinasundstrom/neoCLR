@@ -650,3 +650,16 @@ static and special-carrier allocation kinds currently prevent blindly indexing a
 GC map from the leading word. Future compact descriptors need explicit producer
 classification and image/arena lifetime ownership, with conservative fallback for
 unsupported shapes. That collector integration remains unimplemented.
+
+### Completing binary execution headers — 2026-10-24
+
+Following the GCInfo comparison above, native storage/transient plans now use fixed
+versioned count headers as well. Execution does not need JSON field descriptions;
+actual roots remain explicit address/width tables. This removes string scans and
+unneeded diagnostic layout construction in native-GC lowering. Rich probe and
+inspection data remain separate. Header validation is still per entry/publication,
+not once per image: avoiding a registry keeps unload/lifetime handling unchanged,
+at the cost of repeated fixed-size validation. CLR GCInfo/PC maps remain the richer
+long-term comparison; this is not binary CLR compatibility or precise object tracing.
+New private imports and format-discriminator flags are the compatibility cost, with
+no frame-size increase. [Qualification and measured tradeoffs](../../benchmarks/execution/slot-maps/README.md).

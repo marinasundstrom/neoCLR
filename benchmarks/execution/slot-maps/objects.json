@@ -1,0 +1,34 @@
+{
+  "plain": {
+    "baseline": {
+      "path": "target/root-map/candidate.o",
+      "bytes": 8450192,
+      "sha256": "41954bda6924b168412e7dd0ad458e24f9f31644c4f4628621808ee529d311bc",
+      "storageSchemaStrings": 1133,
+      "transientSchemaStrings": 1554
+    },
+    "candidate": {
+      "path": "target/slot-maps/plain.o",
+      "bytes": 8339456,
+      "sha256": "32b8520004417d46b06ad8be3ef11a84177448ea2e7a67d14b2186beebecb622",
+      "storageSchemaStrings": 0,
+      "transientSchemaStrings": 0
+    }
+  },
+  "json": {
+    "baseline": {
+      "path": "target/root-map/json.o",
+      "bytes": 11527784,
+      "sha256": "4f8c66fafef415ce9bc0dd53769c06e6ba74cbe25ccc5dea7f26181235c4ff7c",
+      "storageSchemaStrings": 1567,
+      "transientSchemaStrings": 2063
+    },
+    "candidate": {
+      "path": "target/slot-maps/json.o",
+      "bytes": 11378296,
+      "sha256": "ba96a83a21b3222d220727b87bf67c1ce8cbc4c7ad3634e16c74dca60c48addc",
+      "storageSchemaStrings": 0,
+      "transientSchemaStrings": 0
+    }
+  }
+}

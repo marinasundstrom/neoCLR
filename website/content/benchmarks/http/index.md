@@ -437,3 +437,14 @@ consumers pass. The plain-text object is 2.3% smaller. Eight paired local trials
 one-worker latency tails remain mixed. New native objects require the matching
 runtime. These are incremental desktop results, not Kestrel parity. See
 [contract, validation and measurements](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/http-server/primitive-comparison/root-map).
+
+
+## Development: binary slot metadata
+
+Storage and transient execution plans now also use binary count headers; rich
+inspection and changing-root tracing remain. Paired local plaintext trials improve
+AOT one/four-owner throughput 6.1%/4.0%, with 5.6%/4.3% lower CPU per response;
+matched owned JIT improves 3.4%/2.9%. Objects shrink about 1.3%. These are incremental
+development measurements, not peer parity. The validation record includes a
+scheduling-sensitive worker concurrency assertion failure and successful replays.
+See [contract, evidence and limitations](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/execution/slot-maps).

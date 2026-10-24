@@ -6729,3 +6729,13 @@ Latency tails are mixed. Forced-GC plain/JSON, shared-worker graph/fault stress 
 async lifetime/cleanup checks pass. [Evidence and limitations](../benchmarks/execution/owned-root-chain/README.md).
 The candidate profile leaves collection, TLS and owned-frame entry prominent;
 full execution-state and metadata-graph redesigns remain open.
+
+The next execution-state slice completes binary storage/transient count headers,
+removing execution JSON scans without changing descriptor/root lifetimes or frame
+size. Native-GC lowering also skips discarded diagnostic layout construction.
+Paired AOT one/four-owner throughput gains are 6.1%/4.0%, with CPU reductions of
+5.6%/4.3%; owned JIT gains are 3.4%/2.9%. Rich inspection remains identical, generated
+consumers and forced-GC HTTP pass. A scheduling-sensitive shared-worker concurrency
+gate failure and three passing identical-binary replays are retained explicitly.
+Image admission, execution-state/TLS redesign and resolved metadata remain open.
+[Contract, measurements and limits](../benchmarks/execution/slot-maps/README.md).

@@ -108,7 +108,7 @@ impl Probes {
             if gc {
                 // This table is emitted once in the prologue and remains fixed
                 // until frame leave, including while a cooperative stack parks.
-                "neoclr_gc_enter_owned_v1"
+                "neoclr_gc_enter_map_v1"
             } else {
                 "neoclr_probe_enter_v3"
             },
@@ -140,7 +140,7 @@ impl Probes {
         );
         let publish = module.declare_function(
             if gc {
-                "neoclr_gc_transient_owned_v1"
+                "neoclr_gc_transient_map_v1"
             } else {
                 "neoclr_probe_transient_v2"
             },
@@ -171,21 +171,16 @@ impl Probes {
                             0
                         };
                         lanes.push((argument, index, lane, width, flags));
-                        entries.push(serde_json::json!({"argument": argument, "index": index,
-                            "lane": lane, "readBytes": width, "flags": flags, "layout": gc_layout::layout(p, ty)}));
+                        if !gc {
+                            entries.push(serde_json::json!({"argument": argument, "index": index,
+                                "lane": lane, "readBytes": width, "flags": flags, "layout": gc_layout::layout(p, ty)}));
+                        }
                     }
                 }
             }
             let diagnostic =
                 serde_json::json!({"schema":"neoclr-probe-storage-v1", "entries":entries});
-            let mut bytes = serde_json::to_vec(&execution_slots(
-                &diagnostic,
-                "neoclr-gc-storage-v1",
-                lanes.len(),
-                gc,
-            ))?;
-            let length = bytes.len();
-            bytes.push(0);
+            let (bytes, length) = execution_slots(&diagnostic, STORAGE_MAP_MAGIC, lanes.len(), gc)?;
             let data = module.declare_data(
                 &format!("neoclr_root_storage_{i}"),
                 Linkage::Local,
@@ -264,14 +259,13 @@ impl Probes {
                         );
                         continue;
                     }
-                    let mut bytes = serde_json::to_vec(&execution_slots(
-                        &gc_layout::layout(p, &ty),
-                        "neoclr-gc-transient-v1",
-                        lanes.len(),
-                        gc,
-                    ))?;
-                    let length = bytes.len();
-                    bytes.push(0);
+                    let diagnostic = if gc {
+                        serde_json::Value::Null
+                    } else {
+                        gc_layout::layout(p, &ty)
+                    };
+                    let (bytes, length) =
+                        execution_slots(&diagnostic, TRANSIENT_MAP_MAGIC, lanes.len(), gc)?;
                     let data = module.declare_data(
                         &format!("neoclr_transient_{i}_{pc}_{phase}"),
                         Linkage::Local,
@@ -498,46 +492,64 @@ impl Probes {
 
 // Current native targets are little-endian ARM64/x64. Keep this version/layout
 // matched with neoclr_gc_root_map; do not serialize a host-sized Rust structure.
-fn native_root_map(lanes: u32) -> Vec<u8> {
-    let mut bytes = 0x3143474eu32.to_le_bytes().to_vec();
-    bytes.extend_from_slice(&lanes.to_le_bytes());
+const ROOT_MAP_MAGIC: u32 = 0x3143474e;
+const STORAGE_MAP_MAGIC: u32 = 0x3153474e;
+const TRANSIENT_MAP_MAGIC: u32 = 0x3154474e;
+
+fn native_count_map(magic: u32, count: u32) -> Vec<u8> {
+    let mut bytes = magic.to_le_bytes().to_vec();
+    bytes.extend_from_slice(&count.to_le_bytes());
     bytes
+}
+
+fn native_root_map(lanes: u32) -> Vec<u8> {
+    native_count_map(ROOT_MAP_MAGIC, lanes)
 }
 
 fn execution_slots(
     plan: &serde_json::Value,
-    schema: &str,
+    magic: u32,
     count: usize,
     native_gc: bool,
-) -> serde_json::Value {
+) -> Result<(Vec<u8>, usize), Error> {
     if native_gc {
-        serde_json::json!({"schema": schema, "slotCount": count})
+        Ok((native_count_map(magic, count.try_into()?), 8))
     } else {
-        plan.clone()
+        let mut bytes = serde_json::to_vec(plan)?;
+        let length = bytes.len();
+        bytes.push(0);
+        Ok((bytes, length))
     }
 }
 
 #[cfg(test)]
 mod execution_metadata_tests {
-    use super::{execution_slots, native_root_map};
+    use super::{STORAGE_MAP_MAGIC, TRANSIENT_MAP_MAGIC, execution_slots, native_root_map};
+    use serde_json::json;
 
     #[test]
     fn native_map_has_version_and_exact_lane_count() {
         assert_eq!(native_root_map(8192), [0x4e, 0x47, 0x43, 0x31, 0, 32, 0, 0]);
     }
-    use serde_json::json;
 
     #[test]
-    fn storage_and_transient_execution_keep_counts_and_diagnostic_layouts() {
+    fn storage_and_transient_maps_keep_counts_and_diagnostic_layouts() {
         let layout =
             json!({"fields": [{"offset": 0, "readBytes": 4}, {"offset": 8, "readBytes": 8}]});
-        for schema in ["neoclr-gc-storage-v1", "neoclr-gc-transient-v1"] {
+        for (magic, tag) in [(STORAGE_MAP_MAGIC, b"NGS1"), (TRANSIENT_MAP_MAGIC, b"NGT1")] {
             for count in [0, 2, 129] {
-                let compact = execution_slots(&layout, schema, count, true);
-                assert_eq!(compact["slotCount"], count);
-                assert_eq!(compact["schema"], schema);
-                assert!(compact.get("fields").is_none());
-                assert_eq!(execution_slots(&layout, schema, count, false), layout);
+                let (bytes, length) = execution_slots(&layout, magic, count, true).unwrap();
+                assert_eq!(length, 8);
+                assert_eq!(bytes.len(), 8);
+                assert_eq!(&bytes[..4], tag);
+                assert_eq!(&bytes[4..], &(count as u32).to_le_bytes());
+                let (bytes, length) = execution_slots(&layout, magic, count, false).unwrap();
+                assert_eq!(bytes.len(), length + 1);
+                assert_eq!(bytes[length], 0);
+                assert_eq!(
+                    serde_json::from_slice::<serde_json::Value>(&bytes[..length]).unwrap(),
+                    layout
+                );
             }
         }
     }

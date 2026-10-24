@@ -1,0 +1,8 @@
+    Finished `release` profile [optimized] target(s) in 3.75s
+     Running unittests src/lib.rs (target/release/deps/neoclr_codegen-12f33f26d2ff4df0)
+
+running 2 tests
+test compiler::values::gc_probe::execution_metadata_tests::native_map_has_version_and_exact_lane_count ... ok
+test compiler::values::gc_probe::execution_metadata_tests::storage_and_transient_maps_keep_counts_and_diagnostic_layouts ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 141 filtered out; finished in 0.00s

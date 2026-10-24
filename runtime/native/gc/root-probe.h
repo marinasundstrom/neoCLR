@@ -12,7 +12,7 @@
 #define neoclr_probe_transient_v2 neoclr_gc_transient_v1
 #endif
 enum { NEOCLR_GC_OWNED_STORAGE = 0x200, NEOCLR_GC_OWNED_TRANSIENT = 0x400, NEOCLR_GC_TYPED_PLAN = 0x800,
-       NEOCLR_GC_OWNED_CHAIN = 0x1000 };
+       NEOCLR_GC_OWNED_CHAIN = 0x1000, NEOCLR_GC_STORAGE_MAP = 0x2000, NEOCLR_GC_TRANSIENT_MAP = 0x4000 };
 /* Private published frame chain, not a stable hosting ABI.
  * Frame storage belongs to the active native function. Diagnostic mode forbids
  * allocation, reentry, pointer mutation and collection in all callbacks.
@@ -70,8 +70,18 @@ void neoclr_gc_enter_owned_v1(neoclr_probe_frame *frame, const void *context, ui
  * header (length 8); otherwise plan retains its checked JSON representation. */
 typedef struct { uint32_t magic, lane_count; } neoclr_gc_root_map;
 #define NEOCLR_GC_ROOT_MAP_MAGIC UINT32_C(0x3143474e)
+#define NEOCLR_GC_STORAGE_MAP_MAGIC UINT32_C(0x3153474e)
+#define NEOCLR_GC_TRANSIENT_MAP_MAGIC UINT32_C(0x3154474e)
 _Static_assert(sizeof(neoclr_gc_root_map) == 8, "root execution map size");
 #ifdef NEOCLR_NATIVE_GC
+/* Owned descriptor contracts with binary slot-count headers. Map bytes are
+ * checked on each entry/publication; slot addresses/widths are still admitted.
+ * STORAGE_MAP/TRANSIENT_MAP discriminate frame plan pointers from C strings.
+ * Ordinary/legacy string hooks remain checked and clear the relevant format bit. */
+void neoclr_gc_enter_map_v1(neoclr_probe_frame *, const void *, uint32_t,
+    const neoclr_probe_storage *, uint32_t, const void *, uint32_t);
+void neoclr_gc_transient_map_v1(neoclr_probe_frame *, uint32_t,
+    const neoclr_probe_storage *, uint32_t, const void *, uint32_t);
 void neoclr_gc_stack_map_v1(neoclr_probe_frame *, uint32_t,
     const uint64_t *, uint32_t, const void *, uint32_t);
 #ifdef NEOCLR_WORKER_GC

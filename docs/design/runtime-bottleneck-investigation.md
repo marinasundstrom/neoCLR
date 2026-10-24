@@ -320,3 +320,12 @@ are a separate cohort; the original investigation measurements above remain inta
 The new profile places fewer samples in stack_roots while collection, TLS and frame
 entry remain prominent. This advances the execution-state workstream without claiming
 to complete it or improve interpreter metadata processing.
+
+The following [binary slot-header slice](../../benchmarks/execution/slot-maps/README.md)
+removes storage/transient string scans and discarded diagnostic-layout construction.
+Paired AOT one/four-owner throughput improves 6.1%/4.0% and CPU/response 5.6%/4.3%;
+owned JIT improves 3.4%/2.9%. Objects shrink about 1.3%. It completes fixed execution
+headers, while per-frame tables, TLS, collector work and resolved metadata remain.
+This does not establish once-per-image admission, interpreter gains or peer parity.
+The validation record preserves a worker minimum-concurrency assertion failure and
+successful identical-binary replays; the gate remains scheduling-sensitive.
