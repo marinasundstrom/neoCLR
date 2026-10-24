@@ -4,7 +4,7 @@
 #if !defined(NEOCLR_LIVE_NO_STORE_CACHE) && !defined(NEOCLR_LIVE_LINEAR_STORE)
 static _Thread_local const void *live_store_last_payload;
 #endif
-static _Thread_local uint64_t live_store_lookup_counts[2]; /* cached range, checked walks */
+static _Thread_local uint64_t live_store_lookup_counts[2]; /* proved range/base, checked walks */
 static _Thread_local uint64_t live_store_counts[5]; /* outside, inactive/new, guarded old, cancelled, rejected */
 static void live_store_cancel_epoch(void) {
         candidate_dispose();
@@ -67,6 +67,19 @@ int experiment_gc_store(neoclr_aot_context *context, void *destination,
             }
         }
     }
+    /* Allocation-base writes can use the existing current owned proof directly.
+     * This also seeds the last range for subsequent field initialization. Never
+     * derive a header from an unproved destination or skip snapshot checks. */
+#ifndef NEOCLR_LIVE_NO_EXACT_STORE
+    if (address-base>=sizeof(block) && known_base(destination)) {
+        uint64_t at=address-base-sizeof(block);
+        if (!block_valid(a,at)) goto rejected;
+        b=(void *)(a->data+at);
+        if (!(b->state&ALLOCATED)) goto rejected;
+        live_store_lookup_counts[0]++;
+        goto located;
+    }
+#endif
 #endif
     live_store_lookup_counts[1]++;
     for (uint64_t at=0;at<a->used;) {

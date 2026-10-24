@@ -1,0 +1,264 @@
+{
+  "guarded4096": {
+    "passed": true,
+    "allocationEquality": true,
+    "samples": {
+      "tasks": {
+        "sync": {
+          "cpuSeconds": 0.017107,
+          "wallSeconds": 0.017156,
+          "firstStoreLookups": null
+        },
+        "guarded-sync": {
+          "cpuSeconds": 0.05909,
+          "wallSeconds": 0.059118,
+          "firstStoreLookups": [
+            106510,
+            86032
+          ]
+        },
+        "live": {
+          "cpuSeconds": 0.103523,
+          "wallSeconds": 0.103304,
+          "firstStoreLookups": [
+            106126,
+            85520
+          ]
+        }
+      },
+      "collections": {
+        "sync": {
+          "cpuSeconds": 0.099635,
+          "wallSeconds": 0.100126,
+          "firstStoreLookups": null
+        },
+        "guarded-sync": {
+          "cpuSeconds": 0.32206,
+          "wallSeconds": 0.322742,
+          "firstStoreLookups": [
+            462862,
+            442384
+          ]
+        },
+        "live": {
+          "cpuSeconds": 0.55915,
+          "wallSeconds": 0.557825,
+          "firstStoreLookups": [
+            458072,
+            436662
+          ]
+        }
+      },
+      "arrays": {
+        "sync": {
+          "cpuSeconds": 0.053013,
+          "wallSeconds": 0.054314,
+          "firstStoreLookups": null
+        },
+        "guarded-sync": {
+          "cpuSeconds": 0.093039,
+          "wallSeconds": 0.093816,
+          "firstStoreLookups": [
+            90126,
+            86032
+          ]
+        },
+        "live": {
+          "cpuSeconds": 0.140629,
+          "wallSeconds": 0.140752,
+          "firstStoreLookups": [
+            89926,
+            85792
+          ]
+        }
+      }
+    }
+  },
+  "exact4096": {
+    "passed": true,
+    "allocationEquality": true,
+    "samples": {
+      "tasks": {
+        "sync": {
+          "cpuSeconds": 0.017194,
+          "wallSeconds": 0.017254,
+          "firstStoreLookups": null
+        },
+        "guarded-sync": {
+          "cpuSeconds": 0.057562,
+          "wallSeconds": 0.057588,
+          "firstStoreLookups": [
+            110607,
+            81935
+          ]
+        },
+        "live": {
+          "cpuSeconds": 0.100277,
+          "wallSeconds": 0.099972,
+          "firstStoreLookups": [
+            110223,
+            81423
+          ]
+        }
+      },
+      "collections": {
+        "sync": {
+          "cpuSeconds": 0.099743,
+          "wallSeconds": 0.100229,
+          "firstStoreLookups": null
+        },
+        "guarded-sync": {
+          "cpuSeconds": 0.293164,
+          "wallSeconds": 0.293802,
+          "firstStoreLookups": [
+            544783,
+            360463
+          ]
+        },
+        "live": {
+          "cpuSeconds": 0.493688,
+          "wallSeconds": 0.49243,
+          "firstStoreLookups": [
+            539993,
+            354741
+          ]
+        }
+      },
+      "arrays": {
+        "sync": {
+          "cpuSeconds": 0.05299,
+          "wallSeconds": 0.054501,
+          "firstStoreLookups": null
+        },
+        "guarded-sync": {
+          "cpuSeconds": 0.085758,
+          "wallSeconds": 0.086651,
+          "firstStoreLookups": [
+            110607,
+            65551
+          ]
+        },
+        "live": {
+          "cpuSeconds": 0.12424,
+          "wallSeconds": 0.124777,
+          "firstStoreLookups": [
+            110407,
+            65311
+          ]
+        }
+      }
+    }
+  },
+  "exact-http-plain": {
+    "passed": true,
+    "summary": {
+      "sync": {
+        "requestsPerSecond": 3932.6356714757403,
+        "requestSeconds": 0.06509629199999978,
+        "processCpuSeconds": 0.064437,
+        "peakRssBytes": 9846784
+      },
+      "guarded-sync": {
+        "requestsPerSecond": 1188.4458459233356,
+        "requestSeconds": 0.21540737499999985,
+        "processCpuSeconds": 0.227019,
+        "peakRssBytes": 11878400
+      },
+      "live": {
+        "requestsPerSecond": 1201.3980293430566,
+        "requestSeconds": 0.21308508400000026,
+        "processCpuSeconds": 0.23838800000000002,
+        "peakRssBytes": 12140544
+      },
+      "live-no-exact": {
+        "requestsPerSecond": 1195.9568697215525,
+        "requestSeconds": 0.21405454199999951,
+        "processCpuSeconds": 0.23930600000000002,
+        "peakRssBytes": 12091392
+      },
+      "guarded-sync-no-exact": {
+        "requestsPerSecond": 1217.2239567267343,
+        "requestSeconds": 0.21031462500000053,
+        "processCpuSeconds": 0.221128,
+        "peakRssBytes": 11845632
+      }
+    },
+    "allocations": 57120,
+    "allocatedBytes": 4394837,
+    "lookups": {
+      "sync": null,
+      "guarded-sync": [
+        445385,
+        172425
+      ],
+      "live": [
+        422361,
+        152457
+      ],
+      "live-no-exact": [
+        419094,
+        155724
+      ],
+      "guarded-sync-no-exact": [
+        442118,
+        175692
+      ]
+    }
+  },
+  "exact-http-json": {
+    "passed": true,
+    "summary": {
+      "sync": {
+        "requestsPerSecond": 2167.5054108258687,
+        "requestSeconds": 0.1181081250000009,
+        "processCpuSeconds": 0.104526,
+        "peakRssBytes": 11649024
+      },
+      "guarded-sync": {
+        "requestsPerSecond": 757.2242259988934,
+        "requestSeconds": 0.3380768750000005,
+        "processCpuSeconds": 0.35648,
+        "peakRssBytes": 14155776
+      },
+      "live": {
+        "requestsPerSecond": 656.3066928969555,
+        "requestSeconds": 0.3900615409999997,
+        "processCpuSeconds": 0.42834900000000004,
+        "peakRssBytes": 14434304
+      },
+      "live-no-exact": {
+        "requestsPerSecond": 645.5351264169215,
+        "requestSeconds": 0.39657020900000006,
+        "processCpuSeconds": 0.436252,
+        "peakRssBytes": 14368768
+      },
+      "guarded-sync-no-exact": {
+        "requestsPerSecond": 754.8197162790115,
+        "requestSeconds": 0.339153833000001,
+        "processCpuSeconds": 0.359118,
+        "peakRssBytes": 14123008
+      }
+    },
+    "allocations": 124873,
+    "allocatedBytes": 7163755,
+    "lookups": {
+      "sync": null,
+      "guarded-sync": [
+        576216,
+        231722
+      ],
+      "live": [
+        561821,
+        219533
+      ],
+      "live-no-exact": [
+        553720,
+        227799
+      ],
+      "guarded-sync-no-exact": [
+        568053,
+        239885
+      ]
+    }
+  }
+}

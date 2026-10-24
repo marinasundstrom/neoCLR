@@ -106,3 +106,11 @@ mutation/lifetime negative controls and matched HTTP plus standalone measurement
 Repair/qualify the missing helper and cancellation workload boundaries separately;
 retain JIT, outer pauses and worker scaling as explicit coverage gaps. The current
 live collector remains slower than synchronous GC despite the prior cache gains.
+
+## Exact-base follow-up
+
+[Guarded controls and exact-base lookup results](exact-base-results.md) now
+separate more of the adapter cost from marking. The measurement tool accepts
+`--guarded-control` and `--disable-exact-store`; the HTTP tool accepts
+`--compare-exact-store` for interleaved previous/new lookup controls. The new
+shortcut reduces standalone range walks and CPU, while HTTP gains remain small.

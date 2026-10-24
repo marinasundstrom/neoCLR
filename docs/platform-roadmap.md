@@ -1,5 +1,7 @@
 # neoCLR platform roadmap
 
+**Exact-base store follow-up (2026-10-25):** Reuse current owned allocation proofs to avoid initialization-store heap walks, retaining snapshot identity and bounds checks. Native safety/negative controls and 90 guarded/live/sync standalone runs pass. Standalone live CPU improves about 3–12%; 13,600 matched HTTP responses pass but HTTP gains remain small. See [evidence and limits](../benchmarks/execution/concurrent-workloads/exact-base-results.md). Range lookup and repeated publication work remain targets; synchronous GC is still the default.
+
 **Broader concurrent profiling (2026-10-25):** [Batched ordinary workloads](../benchmarks/execution/concurrent-workloads/README.md) now complete concurrent epochs: 30 matched AOT runs pass output/cleanup and allocation equality. Live CPU remains higher for tasks, collections and arrays; checked-store range work is a cross-workload target. Preserve Unicode/reflection/JSON helper admission gaps and the cancellation batching limit separately. Guarded controls, sustained JIT, pauses and scaling remain open; no default change.
 
 **Owned lookup follow-up (2026-10-25):** Retain a private last-allocation range hint

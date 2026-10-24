@@ -13,6 +13,8 @@ p = argparse.ArgumentParser(description=__doc__)
 p.add_argument('--build', type=Path, required=True)
 p.add_argument('--output', type=Path, required=True)
 p.add_argument('--rounds', type=int, default=5)
+p.add_argument('--guarded-control', action='store_true')
+p.add_argument('--disable-exact-store', action='store_true')
 a = p.parse_args()
 assert a.rounds > 0
 root = Path(__file__).resolve().parents[3]
@@ -22,6 +24,7 @@ build = json.loads((a.build / 'results.json').read_text())
 recipe_file = root / 'target/native-host-ownership/results.json'
 recipe = next(c['command'] for c in json.loads(recipe_file.read_text())['commands']
               if str(root / 'target/native-host-ownership/owned-aot') in c['command'])
+modes = ['sync', 'guarded-sync', 'live'] if a.guarded_control else ['sync', 'live']
 report = {'passed': False, 'scope': __doc__, 'iterations': build['iterations'],
           'commands': [], 'trials': [], 'inputs': {}, 'excluded': []}
 def run(command):
@@ -37,6 +40,13 @@ try:
     provider = out / 'text-arena.c'
     run(['python3', root / 'benchmarks/execution/concurrent-live/native-scopes.py', '--output', collector])
     run(['python3', root / 'benchmarks/execution/concurrent-store/native-providers.py', '--output', provider])
+    guarded = out / 'guarded-sync-gc.c'
+    if a.guarded_control:
+        code = collector.read_text()
+        start = 'candidate_autostart = reason == NEOCLR_GC_TRIGGER_PUBLICATION || reason == NEOCLR_GC_TRIGGER_ALLOCATION;'
+        idle = 'if (!status && !native_scope_depth && reason == NEOCLR_GC_TRIGGER_IDLE && owned_heap.arena == &context->text)'
+        assert code.count(start) == 1 and code.count(idle) == 1
+        guarded.write_text(code.replace(start, 'candidate_autostart = 0; /* Synchronous control. */').replace(idle, 'if (0 && !status && !native_scope_depth && reason == NEOCLR_GC_TRIGGER_IDLE && owned_heap.arena == &context->text)'))
     host = out / 'owned-host.c'
     source = (root / 'target/native-host-ownership/owned-host.c').read_text()
     boundary = '    int32_t status = run_entry(entry, with_args, argc, argv);'
@@ -93,28 +103,29 @@ static void report_profile(struct rusage *a, struct rusage *b, struct timespec *
             report['excluded'].append(case['sample'])
             continue
         admitted.append(case)
-        for mode in ['sync', 'live']:
+        for mode in modes:
             command = []
             for item in recipe:
                 if item.endswith('/owned-host.c'): item = str(host)
                 elif item == str(root / 'target/root-map/candidate.o'):
-                    item = str(a.build.resolve() / case['sample'] / (mode + '.o'))
-                elif mode == 'live' and item.endswith('/native-gc.c'): item = str(collector)
-                elif mode == 'live' and item.endswith('/text-arena.c'): item = str(provider)
+                    item = str(a.build.resolve() / case['sample'] / (('sync' if mode == 'sync' else 'live') + '.o'))
+                elif mode != 'sync' and item.endswith('/native-gc.c'): item = str(guarded if mode == 'guarded-sync' else collector)
+                elif mode != 'sync' and item.endswith('/text-arena.c'): item = str(provider)
                 command.append(item)
             command[command.index('-o') + 1] = str(out / (case['sample'] + '-' + mode))
             command += ['-DNEOCLR_GC_PROFILE']
-            if mode == 'live':
+            if mode != 'sync':
                 gate = root / 'benchmarks/execution/concurrent-mutation-gate'
                 command += ['-DWORKLOAD_LIVE', '-DNEOCLR_SHADOW_SPARSE_INDEX',
                             '-I', str(root / 'runtime/native/memory'), '-I', str(gate), str(gate / 'gate.c')]
+            if a.disable_exact_store: command += ['-DNEOCLR_LIVE_NO_EXACT_STORE']
             run(command)
             for item in command:
                 path = Path(item)
                 if path.is_file(): report['inputs'][str(path)] = hashlib.sha256(path.read_bytes()).hexdigest()
     for repetition in range(a.rounds):
         for case in admitted:
-            for mode in (['sync', 'live'] if repetition % 2 == 0 else ['live', 'sync']):
+            for mode in (modes if repetition % 2 == 0 else list(reversed(modes))):
                 result = subprocess.run([str(out / (case['sample'] + '-' + mode))],
                                         capture_output=True, text=True, timeout=120)
                 row = {'sample': case['sample'], 'mode': mode, 'round': repetition,
@@ -128,11 +139,12 @@ static void report_profile(struct rusage *a, struct rusage *b, struct timespec *
                 if values:
                     row.update(dict(zip(['cpuSeconds', 'wallSeconds'], map(float, values[:2]))))
                     row.update(dict(zip(['allocations', 'allocatedBytes', 'collections', 'peakLiveBytes', 'peakArenaUsed'], map(int, values[2:]))))
-                if mode == 'live':
+                if mode != 'sync':
                     counts = next((list(map(int, x.split()[1:])) for x in lines if x.startswith('CANDIDATE ')), [])
                     row['candidateCounts'] = counts
                 row['passed'] = result.returncode == 0 and row['outputMatches'] and values is not None
-                if mode == 'live': row['passed'] &= len(counts) == 6 and counts[0] == counts[1] + counts[2] and counts[5] == 0
+                if mode != 'sync': row['passed'] &= len(counts) == 6 and counts[0] == counts[1] + counts[2] and counts[5] == 0
+                if mode == 'guarded-sync': row['passed'] &= counts == [0] * 6
     report['allocationEquality'] = all(
         len({(t.get('allocations'), t.get('allocatedBytes')) for t in report['trials'] if t['sample'] == c['sample']}) == 1
         for c in admitted)
