@@ -98,8 +98,10 @@ UTF-8 projection gains a frame only in live mode. Rooted ordinary/reserved byte 
 scalar arrays now pass live JIT/AOT pressure, initialization, fault and lifetime checks.
 A private owned-thread native fallback scope now passes cancellation, nesting,
 synchronous collection and pacing-resumption tests, plus existing managed AOT
-regressions. It is not yet emitted by the compiler or qualified for async callbacks;
-its cancellation cost and HTTP performance remain unmeasured.
+regressions. Generated UTF-8 slicing now selects an exact scoped adapter and passes
+forced/paced JIT/AOT success, fault, exhaustion and two-lane result-publication checks.
+Async callbacks remain unqualified; cancellation cost and HTTP performance remain
+unmeasured.
 Capability conversions, callable arrays, remaining text/byte services and async/full
 host-entry integration remain next;
 the recorded plaintext import inventory guides that coverage.

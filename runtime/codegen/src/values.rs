@@ -512,7 +512,7 @@ pub(crate) fn compile_into(
         let admitted = details.is_some_and(|d|
             d.string_concat.contains(&i) || d.string_byte_count.contains(&i)
             || d.string_compare_canonical.contains(&i) || d.string_compare_ignore_case.contains(&i)
-            || d.string_starts_with_ordinal.contains(&i)
+            || d.string_starts_with_ordinal.contains(&i) || d.string_slice_utf8.contains(&i)
             || d.byte_memory_create.contains(&i) || d.byte_memory_slice.contains(&i)
             || d.byte_memory_length.contains(&i) || d.byte_view_get.contains(&i)
             || d.byte_view_set.contains(&i) || d.byte_view_utf8.contains(&i));
@@ -1541,7 +1541,9 @@ pub(crate) fn compile_into(
             ),
             (
                 &d.string_slice_utf8,
-                if d.native_gc {
+                if live_stores {
+                    "experiment_gc_string_slice_utf8_rooted_v1"
+                } else if d.native_gc {
                     "neoclr_string_slice_utf8_rooted_v1"
                 } else {
                     "neoclr_string_slice_utf8_v1"
@@ -3640,7 +3642,8 @@ pub(crate) fn compile_into(
                 // managed result alias while the marker reads old payloads.
                 let destination = output;
                 let output = if live_stores {
-                    let scratch = slot(&mut b, 8);
+                    let ty = p.results[i].as_ref().ok_or("missing native text result")?;
+                    let scratch = slot(&mut b, p.bytes(ty));
                     b.ins().stack_addr(types::I64, scratch, 0)
                 } else {
                     output

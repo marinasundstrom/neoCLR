@@ -191,7 +191,9 @@ overflow, stale-token and out-of-order entry/exit requests reject; heap release 
 rejected while scoped. Existing synchronous rooting requirements still apply.
 
 This is a proposed integration mechanism, not general native-provider admission.
-No compiler emits these calls yet. Nonlocal unwinding, asynchronous retained writes,
+The compiler now selects an exact scoped UTF-8 slicing adapter (see
+[generated qualification](../concurrent-store/README.md#scoped-utf-8-slicing-2026-10-24)).
+Other calls remain unadmitted. Nonlocal unwinding, asynchronous retained writes,
 shared heaps and callback/fiber transitions remain unqualified. Wrapping an entire
 async pump would suppress concurrent collection for that whole native call and is
 not an acceptable substitute for qualifying its individual transitions. Frequent

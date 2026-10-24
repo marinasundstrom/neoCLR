@@ -655,3 +655,38 @@ reference-containing and primitive arrays, with neoCLR's already documented rese
 initialization checks. No new semantic divergence, HTTP throughput result or default
 switch is claimed. Capability conversions, remaining text/native services and async/
 full-entry integration remain open.
+
+
+## Scoped UTF-8 slicing (2026-10-24)
+
+The internal live compiler now binds StringSliceUtf8 to the exact private
+`experiment_gc_string_slice_utf8_rooted_v1` adapter. This synchronous leaf enters
+the owned native fallback, calls the existing rooted implementation, and leaves on
+success or failure. It cancels active marking without reclaiming unpublished values;
+collection during allocation is synchronous. This does not admit arbitrary native
+calls, async pumps, retained asynchronous writes or shared heaps.
+
+Generated UTF-8 helper scratch storage now uses the actual result width instead of
+an eight-byte assumption. Slicing returns a two-lane erased Value (tag plus payload);
+the wrapper reads both lanes and uses checked managed stores only after success.
+The result tag remains the existing private ABI, not a new public contract. Default
+compilation still binds the original helper. A live image needs the scoped adapter
+symbol, which earlier experimental hosts do not provide.
+
+`validate-scoped-slice.py --runner <codegen-test-runner> --output <fresh-directory>`
+executes actual generated wrappers in forced/paced JIT and optimized/undefined-bounds
+AOT: 720 cycles pass, with valid multibyte/empty results, invalid range/boundary values,
+null faults, all-live exhaustion, unchanged outputs on failure, heap aliases, owner-only
+result retention, root-chain restoration and resumed pacing. Scope counters verify
+one balanced entry and cancellation per call. The production binding validator checks
+the StringSliceUtf8 signature before the backend fixture renames it privately.
+Nineteen focused mutation/compiler tests pass, with twelve host-dependent tests skipped
+in that general run; the scoped JIT tests execute explicitly in the harness.
+
+`scoped-slice-validation.json.gz`, `scoped-slice-compiler-tests.json.gz`, the generated
+native source and AOT object preserve evidence. The initial adapter build omitted the
+explicit cast from the root frame's opaque context pointer; its failed compilation
+is preserved in `scoped-slice-initial-cast-failure.json.gz`. Correcting the typed access
+resolved it. No HTTP/performance measurement or default change is claimed. The next
+integration work remains remaining native services, capability/callable wrappers,
+async callbacks and full entry. See the [runtime scope tradeoff and CLR comparison](../concurrent-live/README.md#native-call-synchronous-fallback-prototype-2026-10-24).

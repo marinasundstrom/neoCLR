@@ -64,4 +64,21 @@ void experiment_gc_native_scope_counts(uint64_t *out) {
     out[4] = native_scope_depth;
 }
 '''
+s+='''
+/* Exact synchronous leaf adapter; never use this to wrap an async pump.
+ * The generated caller supplies stack result storage and publishes after return. */
+int32_t experiment_gc_string_slice_utf8_rooted_v1(const neoclr_aot_text *text,
+    int32_t start, int32_t length, neoclr_aot_text_arena *arena, void *output) {
+    const neoclr_probe_frame *head = neoclr_root_probe_head_v1();
+    if (!head || !head->context || !output) return 3;
+    neoclr_aot_context *context = (neoclr_aot_context *)head->context;
+    if (&context->text != arena) return 3;
+    uint64_t token;
+    int32_t status = experiment_gc_native_enter_v1(context, &token);
+    if (status) return status;
+    status = neoclr_string_slice_utf8_rooted_v1(text, start, length, arena, output);
+    int32_t leave_status = experiment_gc_native_leave_v1(context, token);
+    return leave_status ? leave_status : status;
+}
+'''
 a.output.write_text(s)
