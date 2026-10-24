@@ -117,3 +117,11 @@ The [bounded-batch comparison](batch-results.md) separates marker CPU, owner pau
 guarded writes and uninstrumented process costs. Larger batches reduce lock calls
 but increase process CPU 20.8% and move more blocking into mutations in this native
 cohort. The macro remains off; these findings do not replace managed/HTTP qualification.
+
+
+## Generated-store boundary follow-up
+
+A [private scalar-store adapter](store-boundary.md) now handles narrow/interior
+writes and cancels an overflowing epoch without collecting unpublished temporaries.
+Native tests verify bounds, construction and deferred cleanup. It is not yet emitted
+by the compiler; complete writer admission and JIT/AOT consumers remain next.

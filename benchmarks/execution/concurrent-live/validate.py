@@ -28,9 +28,9 @@ try:
     if args.sparse_index: cc += ['-DNEOCLR_SHADOW_SPARSE_INDEX']
     if args.batch: cc += ['-DNEOCLR_LIVE_BATCH','-DNEOCLR_LIVE_GATE_PROFILE']
     for sanitizer in [False, True]:
-        for case in ['lifetime', 'native-gc-test', 'native-gc-scan-test', 'native-gc-dense-test', 'native-gc-seed-test']:
+        for case in ['lifetime', 'store-test', 'native-gc-test', 'native-gc-scan-test', 'native-gc-dense-test', 'native-gc-seed-test']:
             fixture = base/(case+'.c')
-            if case != 'lifetime':
+            if case not in ['lifetime', 'store-test']:
                 fixture = out/(case+'.c')
                 fixture.write_text('''#include "native-gc.h"
 extern int32_t experiment_gc_begin(neoclr_aot_context *, const neoclr_probe_frame *, neoclr_gc_conditional_root *, uint32_t);

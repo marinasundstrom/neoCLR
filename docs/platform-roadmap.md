@@ -54,6 +54,10 @@ A [gate-granularity comparison](../benchmarks/execution/concurrent-live/batch-re
 now separates process/marker CPU, lifecycle pauses and guarded-write time. Bounded
 batches pass safety tests but use 20.8% more native-workload CPU and increase write
 blocking; keep batching off. Fewer lock calls alone are not the acceptance criterion.
+The [noncollecting store boundary](../benchmarks/execution/concurrent-live/store-boundary.md)
+now handles native scalar/byref writes and overflow cancellation without sweeping
+unpublished temporaries. Native width/extent/construction/cleanup checks pass;
+experimental compiler emission, host admission and managed consumers remain next.
 
 **Author-directed media types (2026-10-23):** Complete the bounded HTTP value-contract
 slice with cached typed presets, lazy structured projections, shared primitive
