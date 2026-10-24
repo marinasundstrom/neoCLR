@@ -120,7 +120,11 @@ Remaining native services, entry pumps/full entry and shared heaps remain unqual
 an active marker before arena reuse; 400 native boundary cycles and a negative
 control pass. Owned heaps reject direct cursor reset, so full entry still needs a
 coordinated reset and complete generated-body qualification
-([evidence](../benchmarks/execution/concurrent-live/README.md#entry-admission-and-owned-arena-reuse-2026-10-24)).
+([evidence](../benchmarks/execution/concurrent-live/README.md#entry-admission-and-owned-arena-reuse-2026-10-24)). The candidate now has a coordinated owned-entry reset
+provider: 400 cycles cover ownership/frame rejection, free-list and cached-base
+retirement and reuse; omitting cache invalidation fails the control. Compiler
+selection and complete invocation tests are next
+([reset evidence](../benchmarks/execution/concurrent-live/README.md#coordinated-owned-heap-entry-reset-2026-10-24)).
 Capability conversions, callable arrays, remaining text/byte services and async/full
 host-entry integration remain next;
 the recorded plaintext import inventory guides that coverage.

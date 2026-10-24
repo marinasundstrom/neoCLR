@@ -295,3 +295,36 @@ protocol can discard marking work and add join latency; no throughput benefit is
 claimed. neoCLR's invocation-scoped arena is an existing experimental host contract,
 not CLR's process-wide heap lifetime. HTTP/standalone measurements and the default
 switch remain gated on full integration and correctness evidence.
+
+
+## Coordinated owned-heap entry reset (2026-10-24)
+
+The automatic candidate now provides internal `experiment_gc_prepare_entry_v1`.
+It first requires an intact owned arena on the calling thread, no cleanup/collector
+phase, and the ordinary entry ownership checks. Rejection preserves the arena,
+static storage and active epoch. Successful admission joins the marker, clears
+static storage and both used cursors, resets the free list and exact-base cache,
+and invalidates pacing's context. It preserves cumulative statistics and unrelated
+root state. Retirement does not invoke collection or count as a collection; entry
+ownership checks reject outstanding native resources before reset.
+
+`validate-entry-reset.py --output <fresh-directory>` passes 400 forced/paced
+optimized and undefined-bounds cycles. Tests cover null/unowned/wrong-thread entry,
+active frames and host roots, damaged cursor rejection, free-list holes, stale
+cached base rejection, allocation at reused addresses, static storage retirement,
+and post-reset collection. Removing cache invalidation makes the negative control
+fail: a stale pointer can otherwise acquire a host root after retirement. The prior
+entry-boundary regression also passes 400 cycles and its cancellation control.
+Reports and the generated candidate are archived as `entry-reset-*`.
+
+This supplies the native transition needed by generated entry, but the compiler
+has not selected it yet. Next, replace the live entry's direct cursor writes with
+this provider, add entry to store lowering and call-closure validation, and execute
+complete JIT/AOT invocations including failed entries and outputs. Existing entry
+arguments/bootstrap restrictions, pump/queue qualification and HTTP measurements
+remain open. No production/default changes or throughput claim.
+
+The previous CLR comparison remains applicable: root admission and marker lifetime
+must precede storage reuse. The invocation reset remains neoCLR's experimental host
+contract rather than CLR heap lifetime. The integrity walk, cache clear and marker
+join have costs to measure once actual invocations are integrated.

@@ -76,4 +76,21 @@ replace('    candidate_dispose();\n    return status;', '    candidate_dispose()
 s += '\nvoid experiment_gc_candidate_counts(uint64_t *out) { memcpy(out, candidate_counts, sizeof(candidate_counts)); out[5] = candidate_active; }\n'
 assert s.count('        candidate_active=0;') == 1
 replace('        candidate_active=0;', '        candidate_active=0; candidate_counts[2]++;', 1)
+s += r"""
+/* Internal live-entry transition. Admission rejects all outstanding ownership;
+ * the successful check joins the marker before any storage is invalidated. */
+int32_t experiment_gc_prepare_entry_v1(neoclr_aot_context *context) {
+    if (!context || owned_heap.arena != &context->text || gc_state.cleanup_active ||
+        candidate_phase || !blocks_valid(&context->text)) return 3;
+    int32_t status = neoclr_gc_entry_check_v1(context);
+    if (status) return status;
+    context->static_storage = NULL;
+    context->text.used = 0;
+    owned_heap.used = owned_heap.free_head = 0;
+    memset(owned_heap.bases, 0, sizeof(owned_heap.bases));
+    /* Keep aggregate statistics and unrelated root state; force fresh pacing. */
+    gc_state.pacing.context = NULL;
+    return 0;
+}
+"""
 args.output.write_text(s)
