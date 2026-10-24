@@ -787,7 +787,7 @@ fn managed_statics_emit_guarded_publication() {
 fn managed_input(source: &str) -> neoclr::metadata::Module {
     use neoclr::metadata::{Instruction as Op, StaticField, Type, Visibility};
     let mut input = neoclr::assemble(source).unwrap();
-    if source.starts_with(".module LiveStatics") {
+    if source.starts_with(".module LiveStatics") || source.starts_with(".module LiveInitializers") {
         // Static-field syntax is not exposed by the text assembler. Use the same
         // metadata construction as the existing static-storage compiler tests.
         for index in [1, 2] {
@@ -798,7 +798,8 @@ fn managed_input(source: &str) -> neoclr::metadata::Module {
         }
         let first = Type::Named("First".into());
         let second = Type::Named("Second".into());
-        input.functions[1].body = vec![
+        let writer = input.functions.iter().position(|f| f.name == "Write").unwrap();
+        input.functions[writer].body = vec![
             Op::Arg(2), Op::SetStaticField { owner: first.clone(), index: 0 },
             Op::Arg(2), Op::SetStaticField { owner: second.clone(), index: 0 },
             Op::Arg(0), Op::StaticField { owner: first, index: 0 }, Op::StoreObject(Type::Named("Node".into())),
@@ -806,7 +807,39 @@ fn managed_input(source: &str) -> neoclr::metadata::Module {
             Op::Int(0), Op::Return,
         ];
     }
+    if source.starts_with(".module LiveInitializers") {
+        let owner = Type::Named("First".into());
+        input.types[1].static_fields.push(StaticField {
+            name: "Count".into(), ty: Type::Int32,
+            visibility: Visibility::Public, readonly: false,
+        });
+        let initializer = input.functions.iter().position(|f| f.name == "First..cctor").unwrap();
+        input.functions[initializer].body = vec![
+            Op::StaticField { owner: owner.clone(), index: 1 }, Op::Int(1), Op::Add,
+            Op::SetStaticField { owner: owner.clone(), index: 1 },
+            Op::Call(neoclr::assembler::parse_function_ref("First::Reenter()").unwrap()), Op::Pop,
+            Op::Return,
+        ];
+        for name in ["Count", "Fail"] {
+            input.types[2].static_fields.push(StaticField {
+                name: name.into(), ty: Type::Int32,
+                visibility: Visibility::Public, readonly: false,
+            });
+        }
+        let owner = Type::Named("Second".into());
+        let initializer = input.functions.iter().position(|f| f.name == "Second..cctor").unwrap();
+        input.functions[initializer].body = vec![
+            Op::StaticField { owner: owner.clone(), index: 1 }, Op::Int(1), Op::Add,
+            Op::SetStaticField { owner: owner.clone(), index: 1 },
+            Op::StaticField { owner, index: 2 }, Op::BranchFalse(10),
+            Op::Int(i32::MAX), Op::Int(1), Op::AddChecked, Op::Pop, Op::Return,
+        ];
+    }
     input
+}
+#[test]
+fn managed_initializers_emit_guarded_stores() {
+    emit_managed(include_str!("../../../benchmarks/execution/concurrent-store/initializers.neoil"));
 }
 fn emit_managed(source: &str) {
     let input = managed_input(source);
@@ -832,7 +865,7 @@ fn emit_managed(source: &str) {
         .unwrap();
         if enabled {
             let Some(cranelift_module::FuncOrDataId::Func(writer)) =
-                module.get_name("neoclr_value_1")
+                module.get_name(&format!("neoclr_value_{}", input.functions.iter().position(|f| f.name == "Write").unwrap()))
             else {
                 panic!("writer")
             };
@@ -870,7 +903,7 @@ fn emit_managed(source: &str) {
         }
 
         let object = object::File::parse(bytes.as_slice()).unwrap();
-        if source.starts_with(".module LiveStatics") {
+        if source.starts_with(".module LiveStatics") || source.starts_with(".module LiveInitializers") {
             assert_eq!(object.symbols().any(|s| s.is_undefined()
                 && s.name().unwrap_or("").trim_start_matches('_') == "experiment_gc_static_storage_rooted_v1"), enabled);
         }
@@ -934,6 +967,11 @@ fn managed_text_arrays_run_on_live_collector() {
 fn managed_statics_run_on_live_collector() {
     run_managed(include_str!("../../../benchmarks/execution/concurrent-store/statics.neoil"));
 }
+#[test]
+#[ignore = "requires initializer host built by validate-initializers.py"]
+fn managed_initializers_run_on_live_collector() {
+    run_managed(include_str!("../../../benchmarks/execution/concurrent-store/initializers.neoil"));
+}
 fn run_managed(source: &str) {
     let path = std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host");
     let library = std::sync::Arc::new(unsafe { libloading::Library::new(path) }.unwrap());
@@ -962,7 +1000,7 @@ fn run_managed(source: &str) {
     )
     .unwrap();
     module.finalize_definitions().unwrap();
-    let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name("neoclr_value_1") else {
+    let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name(&format!("neoclr_value_{}", input.functions.iter().position(|f| f.name == "Write").unwrap())) else {
         panic!("managed writer")
     };
     type Writer = unsafe extern "C" fn(

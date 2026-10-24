@@ -1,0 +1,30 @@
+.module LiveInitializers
+.type class Node
+.field Next Node
+.end
+.type class First
+.method private static .cctor() -> void
+ret
+.end
+.method static Reenter() -> Int32
+ldc.i4 0
+ret
+.end
+.end
+.type class Second
+.method private static .cctor() -> void
+ret
+.end
+.end
+.function Dummy(Int32 value) -> Int32
+ldarg value
+ret
+.end
+.function Write(out Node& first,out Node& second,Node value) -> Int32
+ldc.i4 0
+ret
+.end
+.function Main(Int32 value) -> Int32
+ldarg value
+ret
+.end

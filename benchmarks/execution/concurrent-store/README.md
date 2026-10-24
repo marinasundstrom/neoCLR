@@ -429,3 +429,43 @@ cooperation and conservative-layout tradeoffs remain as previously researched. R
 Contract configuration and CLI metadata are unchanged. Native byte/text helpers,
 initializers, async/socket services and full HTTP entry remain unqualified; there is
 no new throughput evidence or default switch.
+
+
+## Static initializer guard integration
+
+Live compilation now defers generated initializer guards alongside ordinary managed
+bodies, lowers their stores through the noncollecting barrier and includes them in
+whole-body call-closure validation. The body-count check includes these guards while
+still rejecting unqualified replacement emission. Default compilation continues to
+define guards on the original path. Shared-worker initialization remains unsupported.
+
+A guard uses its caller's published frame. Across the initializer call it retains only
+the static owner already rooted by the context table; its result scratch is Void.
+It therefore does not add an independent root frame. Managed initializer bodies still
+publish their own normal frames. Guard state writes use the scalar barrier, preserving
+the existing running/completed/cached-status representation, reentry and failure behavior.
+This follows the established [initialization contract](../../../docs/construction-and-initialization.md)
+and CLR comparison; it adds no new exception semantics or lifetime divergence.
+
+`initializers.neoil` is augmented with static fields/instructions in `managed_input`,
+as for the previous static fixture. First's initializer increments an attempt counter
+and reenters through a static method; Second increments its counter and optionally
+raises arithmetic overflow. Repeated calls verify one attempt for both success and
+cached failure. `initializers-validation.json.gz` records 600 forced/paced JIT and
+optimized/UBSan AOT cycles, also covering table creation, allocation pressure, static-only
+retention, root-chain restoration and invocation cleanup. Generated native sources
+are unchanged from the archived static-provider/text-array collector variants.
+
+`initializers-compiler-tests.json.gz` records 16 compiler tests and four root controls;
+`initializers-statics-regression.json.gz` records previous static consumers.
+`initializers-default-regression.json.gz` records the existing six-case initializer
+integration test (field/generic/strict/relaxed/cycle/reference) across interpreter,
+ordinary JIT and AOT, with sanitized AOT consumers. Its first test-runner launch stalled
+before main at `_dyld_start`; a sample and explicit termination result are retained in
+`initializers-default-sample.txt.gz` and `initializers-default-launch-abort.json.gz`.
+A stable byte copy, locally ad-hoc signed, completed. This does not identify the launch
+stall's root cause or establish a GC failure; no host security policy was disabled.
+
+The emitted live object is retained as `initializers.o.gz`. No throughput measurement
+was taken. Callable/native replacement bodies, remaining text/byte services, async/socket
+providers and full host entry still require qualification before HTTP comparisons.

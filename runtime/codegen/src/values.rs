@@ -1970,6 +1970,7 @@ pub(crate) fn compile_into(
     } else {
         None
     };
+    let mut live_bodies = Vec::new();
     let initialization_guards = compile_initialization_guards(
         module,
         &p,
@@ -1977,14 +1978,11 @@ pub(crate) fn compile_into(
         static_service,
         stack_budget,
         long_range_calls,
+        if live_stores { Some(&mut live_bodies) } else { None },
     )?;
     if details.is_some_and(|d| d.native_worker_safepoints) && !initialization_guards.is_empty() {
         return Err("worker safepoints do not yet support type initializers".into());
     }
-    if live_stores && !initialization_guards.is_empty() {
-        return Err("live stores do not admit initialization guards yet".into());
-    }
-    let mut live_bodies = Vec::new();
     let root_probes = if details.is_some_and(|d| d.probe_stack_roots) {
         Some(gc_probe::Probes::prepare(module, &p, &flows, details)?)
     } else {
@@ -5465,7 +5463,7 @@ pub(crate) fn compile_into(
         }
     }
     if live_stores {
-        if live_bodies.len() != ids.len() {
+        if live_bodies.len() != ids.len() + initialization_guards.len() {
             return Err("live stores reject unqualified replacement emission".into());
         }
         let bodies: Vec<_> = live_bodies.iter().map(|(id, ctx)| (*id, &ctx.func)).collect();
@@ -6179,6 +6177,7 @@ fn compile_initialization_guards(
     allocator: Option<cranelift_module::FuncId>,
     stack_budget: bool,
     long_range_calls: bool,
+    mut live_bodies: Option<&mut Vec<(cranelift_module::FuncId, cranelift_codegen::Context)>>,
 ) -> Result<std::collections::HashMap<String, cranelift_module::FuncId>, Error> {
     let mut guards = std::collections::HashMap::new();
     let owners: Vec<_> = p
@@ -6277,7 +6276,17 @@ fn compile_initialization_guards(
             b.seal_all_blocks();
             b.finalize();
         }
-        define_checked(module, id, &mut context, stack_budget, long_range_calls)?;
+        if let Some(bodies) = &mut live_bodies {
+            // The caller has published its frame. This guard retains only the
+            // context-rooted static owner across the initializer call; its result
+            // scratch is Void. It adds no independently live managed reference.
+            let entry = context.func.layout.entry_block().unwrap();
+            let owner = context.func.dfg.block_params(entry)[0];
+            crate::mutation_store::lower(module, &mut context.func, owner)?;
+            bodies.push((id, context));
+        } else {
+            define_checked(module, id, &mut context, stack_budget, long_range_calls)?;
+        }
     }
     Ok(guards)
 }
