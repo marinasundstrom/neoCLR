@@ -1,0 +1,30 @@
+{
+  "baselineRevision": "77de160ee",
+  "sources": {
+    "runtime/native/gc/root-probe.c": "9b9ede3794df1e73158f5197689c1277d5eaa1d91b22de75cca661c8c7122472",
+    "runtime/native/gc/root-probe.h": "d58f742519c495e86f6f8f7f98cfaa4c08959254faaef461ffdc75ce8bf20db7",
+    "scripts/validate-native-gc.py": "e9fb8d525275b0e6344dfab88e453f3ccbb2f584cd6111baba4be68b94f55731",
+    "docs/experiments/aot-console/native-gc-owned-chain-test.c": "9358ee5870f181b4d528576210e5bbaa95510c45ccb64c33d87adb0cf983f2fb",
+    "benchmarks/execution/owned-root-chain/measure.py": "60933d414f966e37166c5b6310021517a98a762deb2aef8e2d1fe2b73c6c1a7f",
+    "benchmarks/execution/owned-root-chain/jit.py": "09a8e93d96bc2ab0cc3458b67b7bf90981eecbf961498f07778880b1c3baf2bc",
+    "benchmarks/execution/owned-root-chain/profile.py": "8709709d0bcfa20c91e4bd52bd32c4b5363a2543cb8ec5e940b6481219794e47",
+    "benchmarks/execution/owned-root-chain/consumers.py": "dca8ce37242b82de821343f6f969c28f9b759647ed7c1fd48e7d2b61001c8e96",
+    "benchmarks/execution/owned-root-chain/summarize.py": "ecbf28f4b8840fedc1f61fa7d760cfdabbb46224eb18e25c92c230906081df77",
+    "benchmarks/execution/owned-root-chain/validate.py": "609784e430639cbd478a3f6f3ac25b783db5643c30adc4855c426712acee44ec",
+    "benchmarks/execution/owned-root-chain/test_summary.py": "14b2eab8b6018d49956095449d4f1889b3ed0524feec4c868ae32ddf366b809a"
+  },
+  "archives": {
+    "forced-json.json.gz": "f0930340757274f78e739e757eb559d757cbd7aa0b439c68e7145335e2b286c5",
+    "capacity.json.gz": "f224e34f8800e2e99b9e28be45dafc431307c7832dd988667473a4ab96215335",
+    "tests.json.gz": "324e4d83679a314a76eb5357a4ce40ce39b285ef1d28c140eec630976a140ed0",
+    "jit-capacity.json.gz": "91406e8821db1eb1fae10b0392bf306e495a0e498d5738c010289d2dbc986519",
+    "forced-plain.json.gz": "834fa2093e1c53a302bd11b1b6c73ffd15f654f6e26474d1bd0d371583009a29",
+    "consumer-initial.json.gz": "e355dd3d15e04a639e0157e71e848e382c694db784e8fd9200e3fae97e4067b9",
+    "consumer-faults.json.gz": "df6adbcbb2280123ef485351b06139d74cd86683eff45b96a329d9e3852818d5",
+    "profile/commands.json.gz": "62f63e63f5487a01dd00fb960fce3694b14711d6de5d1e758cd529cb6d635e57",
+    "profile/build.json.gz": "f24ca0ee518fe05f4f14d59ba16381fc0a733224cd7d69f5f1b1ed655fee969e",
+    "profile/sample.txt.gz": "6abcddcaec585d086838291bd11b23ea1f600fe73f0d390dfd238026c7edbb46",
+    "profile/summary.json.gz": "837bd0c34e2fd6323e31e06fd7dfe3a45d53c789619c11f9b10f070fb0234098",
+    "profile/capture.json.gz": "cc195fd53531aee2172928cbcda6960edcc20e08c2dfb429f1663cd73c6776dd"
+  }
+}

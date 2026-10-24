@@ -106,6 +106,14 @@ void neoclr_gc_enter_owned_v1(neoclr_probe_frame *frame, const void *context, ui
     validate_storage(storage, count, 1);
     neoclr_probe_enter_v3(frame, context, function, storage, count, plan, length);
     frame->reserved = NEOCLR_GC_OWNED_STORAGE;
+    const neoclr_probe_frame *parent = frame->previous;
+    /* A proof about suspended ancestors, never their changing root values.
+     * The current frame's transient table is admitted separately and checked
+     * when this frame becomes an ancestor of another owned frame. */
+    if (!parent || ((parent->reserved & NEOCLR_GC_OWNED_CHAIN) &&
+        parent->context == context && (!parent->transient_count ||
+        (parent->reserved & NEOCLR_GC_OWNED_TRANSIENT))))
+        frame->reserved |= NEOCLR_GC_OWNED_CHAIN;
 }
 #endif
 static void stack_roots(neoclr_probe_frame *frame, uint32_t instruction,
@@ -131,6 +139,11 @@ static void stack_roots(neoclr_probe_frame *frame, uint32_t instruction,
     volatile uint64_t value = 0;
 #else
     const void *previous_context = NULL;
+#endif
+#ifdef NEOCLR_NATIVE_GC
+    if (frame->reserved & NEOCLR_GC_OWNED_CHAIN) {
+        observe_fault(frame->context);
+    } else
 #endif
     for (const neoclr_probe_frame *f = probe_state.head; f; f = f->previous) {
 #ifdef NEOCLR_NATIVE_GC
@@ -170,7 +183,7 @@ static void stack_roots(neoclr_probe_frame *frame, uint32_t instruction,
 #ifdef NEOCLR_NATIVE_GC
 #ifdef NEOCLR_WORKER_GC
     if (neoclr_gc_worker_boundary_hook) {
-        uint32_t worker_state = frame->reserved & ~(NEOCLR_GC_OWNED_STORAGE | NEOCLR_GC_TYPED_PLAN);
+        uint32_t worker_state = frame->reserved & ~(NEOCLR_GC_OWNED_STORAGE | NEOCLR_GC_TYPED_PLAN | NEOCLR_GC_OWNED_CHAIN);
         if (worker_state < 0x100 || worker_state > 0x101) abort();
         neoclr_gc_worker_boundary_hook((neoclr_aot_context *)frame->context, probe_state.head, frame->reserved & 1);
         return;
@@ -205,13 +218,13 @@ _Thread_local neoclr_gc_worker_boundary neoclr_gc_worker_boundary_hook;
 void neoclr_gc_worker_stack_roots_v1(neoclr_probe_frame *frame, uint32_t instruction,
     const uint64_t *lanes, uint32_t count, const char *plan, uint32_t length, uint32_t exclusive) {
     if (!frame || exclusive > 1) abort();
-    frame->reserved = (frame->reserved & NEOCLR_GC_OWNED_STORAGE) | 0x100 | exclusive;
+    frame->reserved = (frame->reserved & (NEOCLR_GC_OWNED_STORAGE | NEOCLR_GC_OWNED_CHAIN)) | 0x100 | exclusive;
     neoclr_probe_stack_roots_v2(frame, instruction, lanes, count, plan, length);
 }
 void neoclr_gc_worker_stack_map_v1(neoclr_probe_frame *frame, uint32_t instruction,
     const uint64_t *lanes, uint32_t count, const void *map, uint32_t length, uint32_t exclusive) {
     if (!frame || exclusive > 1) abort();
-    frame->reserved = (frame->reserved & NEOCLR_GC_OWNED_STORAGE) | 0x100 | exclusive;
+    frame->reserved = (frame->reserved & (NEOCLR_GC_OWNED_STORAGE | NEOCLR_GC_OWNED_CHAIN)) | 0x100 | exclusive;
     neoclr_gc_stack_map_v1(frame, instruction, lanes, count, map, length);
 }
 #endif

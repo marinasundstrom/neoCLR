@@ -307,3 +307,16 @@ subphase/native-allocation counts, object survival ages, barriers, hardware cach
 counters, scheduler queue delay and non-macOS behavior. None is silently assigned a
 zero cost. The next implementation should address the two first-order workstreams,
 not resume a series of unrelated local cache tweaks.
+
+## Implemented follow-up: owned root-chain proofs
+
+The first execution-state slice now records a same-context, immutable-ancestor proof
+at owned frame entry and skips repeated ancestry validation on qualifying publications.
+Collection still traces current root values, and mutable/mixed chains retain the
+checked walk. [Implementation and qualification](../../benchmarks/execution/owned-root-chain/README.md)
+record paired AOT one/four-owner throughput gains of 18.3%/12.1%, CPU reductions of
+15.6%/12.2%, and matched owned-JIT throughput/CPU gains of 7.7%/7.7%. These results
+are a separate cohort; the original investigation measurements above remain intact.
+The new profile places fewer samples in stack_roots while collection, TLS and frame
+entry remain prominent. This advances the execution-state workstream without claiming
+to complete it or improve interpreter metadata processing.

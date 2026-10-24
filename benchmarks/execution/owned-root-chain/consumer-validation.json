@@ -1,0 +1,116 @@
+{
+  "passed": true,
+  "configurations": {
+    "workers-optimized": {
+      "passed": true,
+      "exitCode": 0,
+      "source": "consumers"
+    },
+    "workers-ubsan": {
+      "passed": true,
+      "exitCode": 0,
+      "source": "consumers"
+    },
+    "consumers-RuntimeAwait-False-False": {
+      "passed": true,
+      "exitCode": 0,
+      "source": "consumers"
+    },
+    "consumers-RuntimeAwait-False-True": {
+      "passed": true,
+      "exitCode": 0,
+      "source": "consumers"
+    },
+    "consumers-RuntimeAwait-True-False": {
+      "passed": true,
+      "exitCode": 0,
+      "source": "consumers"
+    },
+    "consumers-RuntimeAwait-True-True": {
+      "passed": true,
+      "exitCode": 0,
+      "source": "consumers"
+    },
+    "consumers-RuntimeUse-False-False": {
+      "passed": true,
+      "exitCode": 0,
+      "source": "consumers"
+    },
+    "consumers-RuntimeUse-False-True": {
+      "passed": true,
+      "exitCode": 0,
+      "source": "consumers"
+    },
+    "consumers-RuntimeUse-True-False": {
+      "passed": true,
+      "exitCode": 0,
+      "source": "consumers"
+    },
+    "consumers-RuntimeUse-True-True": {
+      "passed": true,
+      "exitCode": 0,
+      "source": "consumers"
+    },
+    "consumers-RuntimeStackReuse-False-False": {
+      "passed": true,
+      "exitCode": 0,
+      "source": "consumers"
+    },
+    "consumers-RuntimeStackReuse-False-True": {
+      "passed": true,
+      "exitCode": 0,
+      "source": "consumers"
+    },
+    "consumers-RuntimeStackReuse-True-False": {
+      "passed": true,
+      "exitCode": 0,
+      "source": "consumers"
+    },
+    "consumers-RuntimeStackReuse-True-True": {
+      "passed": true,
+      "exitCode": 0,
+      "source": "consumers"
+    },
+    "consumers-RuntimeNativeContract-False-False": {
+      "passed": true,
+      "exitCode": 0,
+      "source": "consumers"
+    },
+    "consumers-RuntimeNativeContract-False-True": {
+      "passed": true,
+      "exitCode": 0,
+      "source": "consumers"
+    },
+    "consumers-RuntimeNativeContract-True-False": {
+      "passed": true,
+      "exitCode": 0,
+      "source": "consumers"
+    },
+    "consumers-RuntimeNativeContract-True-True": {
+      "passed": true,
+      "exitCode": 0,
+      "source": "consumers"
+    },
+    "consumers-RuntimeAwaitFault-False-False": {
+      "passed": true,
+      "exitCode": 1,
+      "source": "fault-consumers"
+    },
+    "consumers-RuntimeAwaitFault-False-True": {
+      "passed": true,
+      "exitCode": 1,
+      "source": "fault-consumers"
+    },
+    "consumers-RuntimeAwaitFault-True-False": {
+      "passed": true,
+      "exitCode": 1,
+      "source": "fault-consumers"
+    },
+    "consumers-RuntimeAwaitFault-True-True": {
+      "passed": true,
+      "exitCode": 1,
+      "source": "fault-consumers"
+    }
+  },
+  "explanation": "Initial runner rejected an expected terminal fault; independent reconciliation and focused fault rerun validate all 22 configurations."
+}

@@ -6718,3 +6718,14 @@ An older CPU/JSON package fails current interpreter admission, so its batch resu
 remain historical pending a coherent rebuild. This records measured priorities for
 the runtime investigation, not completed architectural changes or a replacement for
 the platform milestones. [Reproducible evidence and limits](../benchmarks/execution/bottleneck-review/README.md).
+
+The first execution-state implementation now amortizes ancestor validation using
+an owned same-context frame-chain proof. The current frame's shared fault context
+is still checked, mixed/mutable chains retain full validation, and every collection
+traces changing root values. Frames remain 104 bytes with unchanged generated hooks.
+Paired local plaintext trials improve AOT one/four-owner throughput 18.3%/12.1% and
+CPU/response 15.6%/12.2%; matched owned JIT improves throughput/CPU 7.7%/7.7%.
+Latency tails are mixed. Forced-GC plain/JSON, shared-worker graph/fault stress and
+async lifetime/cleanup checks pass. [Evidence and limitations](../benchmarks/execution/owned-root-chain/README.md).
+The candidate profile leaves collection, TLS and owned-frame entry prominent;
+full execution-state and metadata-graph redesigns remain open.

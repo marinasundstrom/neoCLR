@@ -11,7 +11,8 @@
 #define neoclr_probe_stack_roots_v2 neoclr_gc_stack_roots_v1
 #define neoclr_probe_transient_v2 neoclr_gc_transient_v1
 #endif
-enum { NEOCLR_GC_OWNED_STORAGE = 0x200, NEOCLR_GC_OWNED_TRANSIENT = 0x400, NEOCLR_GC_TYPED_PLAN = 0x800 };
+enum { NEOCLR_GC_OWNED_STORAGE = 0x200, NEOCLR_GC_OWNED_TRANSIENT = 0x400, NEOCLR_GC_TYPED_PLAN = 0x800,
+       NEOCLR_GC_OWNED_CHAIN = 0x1000 };
 /* Private published frame chain, not a stable hosting ABI.
  * Frame storage belongs to the active native function. Diagnostic mode forbids
  * allocation, reentry, pointer mutation and collection in all callbacks.
@@ -52,7 +53,14 @@ void neoclr_probe_enter_v3(neoclr_probe_frame *frame, const void *context, uint3
  * during that lifetime. Described slot VALUES remain mutable and are traced at
  * collection. This is a trusted native contract, not memory protection; ordinary
  * native callers use neoclr_gc_enter_v1 and retain publication-time validation.
- * Transient tables, fault contexts and plan strings remain on the checked path. */
+ * Frame linkage/context are runtime-owned and cannot be mutated by the caller.
+ * OWNED_CHAIN is a runtime-only proof: this storage and every ancestor storage
+ * are owned, ancestor transients are absent or owned, and contexts are identical.
+ * It is established on entry from the parent proof plus the parent's current
+ * transient contract. Suspended ancestors cannot republish until resumed.
+ * Publication then checks the one shared fault context without walking ancestors;
+ * collection still traces every frame and changing slot value. Mixed chains keep
+ * publication-time validation. Current transient admission and plans stay checked. */
 void neoclr_gc_enter_owned_v1(neoclr_probe_frame *frame, const void *context, uint32_t function,
     const neoclr_probe_storage *storage, uint32_t count, const char *plan, uint32_t length);
 #endif

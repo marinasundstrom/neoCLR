@@ -22344,3 +22344,11 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
 - [Full findings, evidence and validation gates](design/runtime-bottleneck-investigation.md).
   These are assistant recommendations grounded in measurements, not an author
   selection of a specific new architecture.
+
+- Following the author's request to continue optimization, assistant implements the
+  first execution-state slice: an owned same-context ancestor proof that removes
+  repeated publication-time walks without caching root values or skipping collections.
+  Paired AOT/JIT runs show CPU/throughput improvement; forced-GC HTTP, shared-worker
+  stress and async consumers pass. A validation-runner assumption about deliberate
+  terminal faults is corrected and its failed run retained. Collection, TLS and frame
+  entry remain follow-up targets. [Evidence](../benchmarks/execution/owned-root-chain/README.md).
