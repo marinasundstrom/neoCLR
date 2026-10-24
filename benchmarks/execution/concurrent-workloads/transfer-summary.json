@@ -1,0 +1,306 @@
+{
+  "standalone": {
+    "tasks": {
+      "sync": {
+        "medianCpuSeconds": 0.017125,
+        "allocations": 65548,
+        "allocatedBytes": 2261361,
+        "storeCounts": null
+      },
+      "guarded-sync": {
+        "medianCpuSeconds": 0.051006,
+        "allocations": 65548,
+        "allocatedBytes": 2261361,
+        "storeCounts": [
+          282668,
+          221214,
+          0,
+          0,
+          0
+        ]
+      },
+      "live": {
+        "medianCpuSeconds": 0.083976,
+        "allocations": 65548,
+        "allocatedBytes": 2261361,
+        "storeCounts": [
+          282668,
+          220318,
+          896,
+          0,
+          0
+        ]
+      }
+    },
+    "collections": {
+      "sync": {
+        "medianCpuSeconds": 0.09951,
+        "allocations": 237580,
+        "allocatedBytes": 7864689,
+        "storeCounts": null
+      },
+      "guarded-sync": {
+        "medianCpuSeconds": 0.268964,
+        "allocations": 237580,
+        "allocatedBytes": 7864689,
+        "storeCounts": [
+          2146348,
+          954398,
+          0,
+          0,
+          0
+        ]
+      },
+      "live": {
+        "medianCpuSeconds": 0.433332,
+        "allocations": 237580,
+        "allocatedBytes": 7864689,
+        "storeCounts": [
+          2146348,
+          943694,
+          10704,
+          0,
+          0
+        ]
+      }
+    },
+    "arrays": {
+      "sync": {
+        "medianCpuSeconds": 0.05292,
+        "allocations": 86028,
+        "allocatedBytes": 1892721,
+        "storeCounts": null
+      },
+      "guarded-sync": {
+        "medianCpuSeconds": 0.074721,
+        "allocations": 86028,
+        "allocatedBytes": 1892721,
+        "storeCounts": [
+          213036,
+          180254,
+          0,
+          0,
+          0
+        ]
+      },
+      "live": {
+        "medianCpuSeconds": 0.097986,
+        "allocations": 86028,
+        "allocatedBytes": 1892721,
+        "storeCounts": [
+          213036,
+          179798,
+          456,
+          0,
+          0
+        ]
+      }
+    }
+  },
+  "http": {
+    "plain": {
+      "passed": true,
+      "summary": {
+        "sync": {
+          "requestsPerSecond": 3883.7946785823306,
+          "requestSeconds": 0.06591491599999966,
+          "processCpuSeconds": 0.064642,
+          "peakRssBytes": 9846784
+        },
+        "guarded-sync": {
+          "requestsPerSecond": 1523.103501873761,
+          "requestSeconds": 0.16807787499999982,
+          "processCpuSeconds": 0.18079399999999998,
+          "peakRssBytes": 11665408
+        },
+        "live": {
+          "requestsPerSecond": 1491.1347408981383,
+          "requestSeconds": 0.17168133299999866,
+          "processCpuSeconds": 0.191798,
+          "peakRssBytes": 11927552
+        },
+        "live-previous-code": {
+          "requestsPerSecond": 1384.9413327220109,
+          "requestSeconds": 0.1848453750000001,
+          "processCpuSeconds": 0.20656599999999997,
+          "peakRssBytes": 12091392
+        },
+        "guarded-sync-previous-code": {
+          "requestsPerSecond": 1420.3323910685444,
+          "requestSeconds": 0.18023950000000077,
+          "processCpuSeconds": 0.18693099999999999,
+          "peakRssBytes": 11845632
+        }
+      },
+      "stores": {
+        "sync": null,
+        "guarded-sync": [
+          2710373,
+          631289,
+          0,
+          0,
+          0
+        ],
+        "live": [
+          2710373,
+          580961,
+          50328,
+          0,
+          0
+        ],
+        "live-previous-code": [
+          3568656,
+          580961,
+          50328,
+          0,
+          0
+        ],
+        "guarded-sync-previous-code": [
+          3568656,
+          631289,
+          0,
+          0,
+          0
+        ]
+      },
+      "allocations": 57120,
+      "allocatedBytes": 4394837
+    },
+    "json": {
+      "passed": true,
+      "summary": {
+        "sync": {
+          "requestsPerSecond": 2203.55400724514,
+          "requestSeconds": 0.11617595900000133,
+          "processCpuSeconds": 0.103328,
+          "peakRssBytes": 11649024
+        },
+        "guarded-sync": {
+          "requestsPerSecond": 969.5049379442784,
+          "requestSeconds": 0.2640522910000005,
+          "processCpuSeconds": 0.278248,
+          "peakRssBytes": 13893632
+        },
+        "live": {
+          "requestsPerSecond": 898.6677513867239,
+          "requestSeconds": 0.28486612500000064,
+          "processCpuSeconds": 0.310467,
+          "peakRssBytes": 14155776
+        },
+        "live-previous-code": {
+          "requestsPerSecond": 837.3722040812661,
+          "requestSeconds": 0.3057182919999999,
+          "processCpuSeconds": 0.336053,
+          "peakRssBytes": 14368768
+        },
+        "guarded-sync-previous-code": {
+          "requestsPerSecond": 885.5542237650197,
+          "requestSeconds": 0.2890845000000013,
+          "processCpuSeconds": 0.30364,
+          "peakRssBytes": 14090240
+        }
+      },
+      "stores": {
+        "sync": null,
+        "guarded-sync": [
+          4582821,
+          824953,
+          0,
+          0,
+          0
+        ],
+        "live": [
+          4582821,
+          795264,
+          29689,
+          0,
+          0
+        ],
+        "live-previous-code": [
+          6094176,
+          795264,
+          29689,
+          0,
+          0
+        ],
+        "guarded-sync-previous-code": [
+          6094176,
+          824953,
+          0,
+          0,
+          0
+        ]
+      },
+      "allocations": 124873,
+      "allocatedBytes": 7163755
+    }
+  },
+  "sites": {
+    "sites-standalone": [
+      {
+        "sample": "tasks",
+        "total": 372788,
+        "ResultCalls": 0,
+        "OptionalCalls": 212992
+      },
+      {
+        "sample": "collections",
+        "total": 2555956,
+        "ResultCalls": 737280,
+        "OptionalCalls": 434176
+      },
+      {
+        "sample": "arrays",
+        "total": 225332,
+        "ResultCalls": 0,
+        "OptionalCalls": 0
+      }
+    ],
+    "sites-http-plain": [
+      {
+        "sample": "plain",
+        "total": 1894544,
+        "ResultCalls": 764151,
+        "OptionalCalls": 142963
+      }
+    ],
+    "sites-http-json": [
+      {
+        "sample": "json",
+        "total": 3231584,
+        "ResultCalls": 1461687,
+        "OptionalCalls": 175795
+      }
+    ],
+    "transfer-sites-standalone": [
+      {
+        "sample": "tasks",
+        "total": 282668,
+        "ResultCalls": 0,
+        "OptionalCalls": 135168
+      },
+      {
+        "sample": "collections",
+        "total": 2146348,
+        "ResultCalls": 503808,
+        "OptionalCalls": 294912
+      },
+      {
+        "sample": "arrays",
+        "total": 213036,
+        "ResultCalls": 0,
+        "OptionalCalls": 0
+      }
+    ]
+  },
+  "irDiagnostic": {
+    "function": "neoclr_value_20",
+    "sameObject": true,
+    "sha256": {
+      "target/concurrent-workloads/transfer-ir/tasks.o": "455f8127cb1046f9f54d1e8ab8d2daf7f20c5e6103e39b7e167c41b7ae31b072",
+      "target/concurrent-workloads/transfer-build/tasks/live.o": "455f8127cb1046f9f54d1e8ab8d2daf7f20c5e6103e39b7e167c41b7ae31b072",
+      "target/concurrent-workloads/test-runner-store-ir": "36a9c6da4b3acf324eb74bc6312c7a95d1b7167722bf8a3fab643e1eae8be6be",
+      "target/concurrent-workloads/transfer-ir/value20.clif": "7d2f69d57a20db3d844940d4d076b0acd6391f006b0ea8323537745f1fbec14f"
+    }
+  }
+}

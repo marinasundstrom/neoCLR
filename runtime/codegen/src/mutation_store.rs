@@ -1,8 +1,9 @@
 //! Experimental scalar-store lowering. Not admission for concurrent execution:
 //! native calls, construction and scheduler paths require separate qualification.
 use cranelift_codegen::cursor::{Cursor, FuncCursor};
-use cranelift_codegen::ir::{self, types, AbiParam, InstBuilder, MemFlags, Opcode};
+use cranelift_codegen::ir::{self, AbiParam, InstBuilder, MemFlags, Opcode, types};
 use cranelift_module::{Linkage, Module};
+use std::collections::HashMap;
 
 type Error = Box<dyn std::error::Error>;
 
@@ -12,13 +13,55 @@ pub(crate) struct Lowered {
     pub stack_stores: usize,
 }
 
-// Resolve only compiler-owned addresses and checked constant offsets. A loaded
-// pointer, block parameter or arbitrary arithmetic has no proven stack provenance.
-fn stack_destination(func: &ir::Function, mut value: ir::Value) -> Option<(ir::StackSlot, i64)> {
+// Preserve provenance only across a unique incoming edge. Count edges, not
+// predecessor blocks: both arms of a branch can pass different addresses.
+fn single_edge_arguments(func: &ir::Function) -> HashMap<ir::Value, Option<ir::Value>> {
+    let mut incoming = HashMap::new();
+    for block in func.layout.blocks() {
+        for inst in func.layout.block_insts(block) {
+            for edge in func.dfg.insts[inst]
+                .branch_destination(&func.dfg.jump_tables, &func.dfg.exception_tables)
+            {
+                let target = edge.block(&func.dfg.value_lists);
+                if Some(target) == func.layout.entry_block() {
+                    continue;
+                }
+                for (&parameter, argument) in func
+                    .dfg
+                    .block_params(target)
+                    .iter()
+                    .zip(edge.args(&func.dfg.value_lists))
+                {
+                    incoming
+                        .entry(parameter)
+                        .and_modify(|value| *value = None)
+                        .or_insert(argument.as_value());
+                }
+            }
+        }
+    }
+    incoming
+}
+
+// Resolve compiler-owned addresses, checked constant offsets and unique-edge
+// transfers. Loaded pointers, entry parameters, joins and cycles remain unknown.
+fn stack_destination(
+    func: &ir::Function,
+    mut value: ir::Value,
+    incoming: &HashMap<ir::Value, Option<ir::Value>>,
+) -> Option<(ir::StackSlot, i64)> {
     let mut displacement = 0i64;
-    loop {
-        let ir::ValueDef::Result(inst, _) = func.dfg.value_def(value) else {
-            return None;
+    // A single-edge cycle with no originating stack address must not establish
+    // a proof or hang compilation. Every successful chain visits fewer values.
+    for _ in 0..func.dfg.num_values() {
+        value = func.dfg.resolve_aliases(value);
+        let inst = match func.dfg.value_def(value) {
+            ir::ValueDef::Result(inst, _) => inst,
+            ir::ValueDef::Param(_, _) => {
+                value = (*incoming.get(&value)?)?;
+                continue;
+            }
+            _ => return None,
         };
         match func.dfg.insts[inst] {
             ir::InstructionData::StackLoad {
@@ -39,6 +82,7 @@ fn stack_destination(func: &ir::Function, mut value: ir::Value) -> Option<(ir::S
             _ => return None,
         }
     }
+    None
 }
 
 /// Run before frame-return cleanup instrumentation so the new fault return also
@@ -98,6 +142,7 @@ fn lower_impl(
         }
         Ok(())
     };
+    let incoming = single_edge_arguments(func);
     let mut stores = Vec::new();
     let mut stack_stores = 0;
     // Validate the entire input before changing any instruction or adding imports.
@@ -143,7 +188,7 @@ fn lower_impl(
                 Opcode::Istore32 => 4,
                 _ => return Err(format!("unadmitted memory writer: {opcode}").into()),
             };
-            if let Some((slot, displacement)) = stack_destination(func, args[1]) {
+            if let Some((slot, displacement)) = stack_destination(func, args[1], &incoming) {
                 let start = displacement.checked_add(i64::from(offset));
                 let end = start.and_then(|start| start.checked_add(i64::from(width)));
                 if !matches!((start, end), (Some(start), Some(end))

@@ -22696,3 +22696,15 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   and the broader [required workload matrix](../benchmarks/execution/concurrent-gc-investigation/README.md#required-workload-matrix).
 - **Open:** Batched standalone execution, allocation/CPU/outer-pause profiles,
   metadata-heavy and additional async/I/O workloads, and saturated/worker scaling.
+
+- **Profiling follow-through (same date):** The assistant added sustained ordinary
+  samples, guarded controls and call-site attribution. Counts reconcile with the
+  adapter: Result/Optional construction and extraction are frequent out-of-arena
+  writers, but observed addresses alone cannot justify skipping checks. Disassembly
+  and IR expose stack provenance lost at managed instruction boundaries. A bounded
+  single-edge proof preserves known local storage while keeping byrefs/joins guarded.
+  Focused tests and matched HTTP runs pass; HTTP CPU improves about 7–8%, whereas
+  standalone call reductions translate to much smaller CPU effects. This distinction
+  corrects any inference that high call counts alone establish CPU dominance.
+  Generated-code optimization settings, broader helper coverage, outer pauses and
+  worker scaling remain open. See [analysis and evidence](../benchmarks/execution/concurrent-workloads/transfer-results.md).

@@ -16,6 +16,7 @@ p.add_argument('--rounds', type=int, default=5)
 p.add_argument('--guarded-control', action='store_true')
 p.add_argument('--disable-exact-store', action='store_true')
 p.add_argument('--store-ranges', type=int, choices=range(1,17), default=4)
+p.add_argument('--profile-store-sites', action='store_true')
 a = p.parse_args()
 assert a.rounds > 0
 root = Path(__file__).resolve().parents[3]
@@ -41,6 +42,9 @@ try:
     provider = out / 'text-arena.c'
     run(['python3', root / 'benchmarks/execution/concurrent-live/native-scopes.py', '--output', collector])
     run(['python3', root / 'benchmarks/execution/concurrent-store/native-providers.py', '--output', provider])
+    if a.profile_store_sites:
+        report['diagnosticOnly'] = 'Call-site instrumentation; timings are not benchmark evidence.'
+        run(['python3', root / 'benchmarks/execution/concurrent-workloads/store-sites.py', '--source', collector])
     guarded = out / 'guarded-sync-gc.c'
     if a.guarded_control:
         code = collector.read_text()
@@ -82,6 +86,10 @@ static void report_profile(struct rusage *a, struct rusage *b, struct timespec *
   (unsigned long long)stats.collections, (unsigned long long)profile.peak_live_bytes,
   (unsigned long long)profile.peak_arena_used);
 #ifdef WORKLOAD_LIVE
+#ifdef NEOCLR_STORE_SITES
+ extern void experiment_store_sites_report(void);
+ experiment_store_sites_report();
+#endif
  extern void experiment_gc_candidate_counts(uint64_t *);
  extern void experiment_gc_store_counts(uint64_t *);
  extern void experiment_gc_store_lookup_counts(uint64_t *);
@@ -119,6 +127,7 @@ static void report_profile(struct rusage *a, struct rusage *b, struct timespec *
                 gate = root / 'benchmarks/execution/concurrent-mutation-gate'
                 command += ['-DWORKLOAD_LIVE', '-DNEOCLR_SHADOW_SPARSE_INDEX',
                             '-I', str(root / 'runtime/native/memory'), '-I', str(gate), str(gate / 'gate.c')]
+            if a.profile_store_sites and mode != 'sync': command += ['-DNEOCLR_STORE_SITES']
             if a.disable_exact_store: command += ['-DNEOCLR_LIVE_NO_EXACT_STORE']
             run(command)
             for item in command:

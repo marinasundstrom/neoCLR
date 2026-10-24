@@ -121,3 +121,11 @@ shortcut reduces standalone range walks and CPU, while HTTP gains remain small.
 The tools default to `--store-ranges 4`; use `--store-ranges 1` to reproduce the
 preceding exact-base-only configuration. HTTP `--compare-store-ranges` interleaves
 one-range and configured-range controls. Production GC is unchanged.
+
+## Call-site attribution and stack transfers
+
+[Store attribution and transfer proofs](transfer-results.md) connect runtime counts
+to generated functions and preserve stack provenance across single incoming edges.
+Both measurement tools accept `--profile-store-sites` for diagnostic-only cohorts;
+`summarize-sites.py` requires exact symbol/selection reconciliation. CPU comparisons
+use ordinary providers, with HTTP `--previous-live-object` interleaving old/new code.

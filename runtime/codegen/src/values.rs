@@ -6310,6 +6310,17 @@ fn finish_value_body(
     long_range_calls: bool,
 ) -> Result<(), Error> {
     if live_bodies.is_some() {
+        // Private diagnostic driver: inspect provenance before mutation lowering.
+        // Neither ordinary builds nor native execution read these test-only knobs.
+        #[cfg(test)]
+        if let (Ok(name), Ok(path)) = (
+            std::env::var("NEOCLR_LIVE_STORE_IR_FUNCTION"),
+            std::env::var("NEOCLR_LIVE_STORE_IR_OUTPUT"),
+        ) {
+            if module.declarations().get_function_decl(id).name.as_deref() == Some(name.as_str()) {
+                std::fs::write(path, context.func.display().to_string())?;
+            }
+        }
         let entry = context.func.layout.entry_block().unwrap();
         let owner = *context.func.dfg.block_params(entry).last().unwrap();
         crate::mutation_store::lower_framed(

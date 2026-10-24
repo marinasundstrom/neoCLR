@@ -12,6 +12,7 @@ import time
 p=argparse.ArgumentParser(description=__doc__)
 p.add_argument('--sync-object',type=Path,required=True)
 p.add_argument('--live-object',type=Path,required=True)
+p.add_argument('--previous-live-object',type=Path)
 p.add_argument('--output',type=Path,required=True)
 p.add_argument('--requests',type=int,default=256)
 p.add_argument('--sample',choices=['plain','json'],default='plain')
@@ -24,9 +25,11 @@ p.add_argument('--compare-store-cache',action='store_true')
 p.add_argument('--compare-exact-store',action='store_true')
 p.add_argument('--store-ranges',type=int,choices=range(1,17),default=4)
 p.add_argument('--compare-store-ranges',action='store_true')
+p.add_argument('--profile-store-sites', action='store_true')
 a=p.parse_args();assert a.requests>0 and a.warmup>=0 and a.pairs>0
 assert not (a.disable_store_cache and a.compare_store_cache)
 assert not (a.compare_exact_store and (a.disable_store_cache or a.compare_store_cache))
+assert not (a.previous_live_object and (a.compare_store_ranges or a.compare_store_cache or a.compare_exact_store))
 assert not (a.compare_store_ranges and (a.disable_store_cache or a.compare_store_cache or a.compare_exact_store or a.store_ranges==1))
 root=Path(__file__).resolve().parents[3];base=Path(__file__).resolve().parent
 out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
@@ -40,6 +43,9 @@ try:
  previous=json.loads(recipe_path.read_text());old=root/'target/native-host-ownership/owned-aot'
  recipe=next(c['command'].copy() for c in previous['commands'] if str(old) in c['command'])
  source=out/'native-gc.c';run(['python3',base.parent/'concurrent-live/native-scopes.py','--output',source])
+ if a.profile_store_sites:
+  r['diagnosticOnly']='Call-site instrumentation; timings are not benchmark evidence.'
+  run(['python3',base.parent/'concurrent-workloads/store-sites.py','--source',source])
  guarded_source=out/'guarded-sync-gc.c'
  if a.include_guarded_sync:
   code=source.read_text()
@@ -69,6 +75,10 @@ static void report_measurement(void) {
    (unsigned long long)p.allocated_bytes,(unsigned long long)p.peak_live_bytes,
    (unsigned long long)p.peak_arena_used);
 #ifdef LIVE_REPORT
+#ifdef NEOCLR_STORE_SITES
+ extern void experiment_store_sites_report(void);
+ experiment_store_sites_report();
+#endif
  extern void experiment_gc_candidate_counts(uint64_t *);
  extern void experiment_gc_native_scope_counts(uint64_t *);
  extern void experiment_gc_store_counts(uint64_t *);
@@ -99,6 +109,9 @@ static void report_measurement(void) {
  if a.compare_store_ranges:
   configurations.append(('live-one-range',a.live_object))
   if a.include_guarded_sync:configurations.append(('guarded-sync-one-range',a.live_object))
+ if a.previous_live_object:
+  configurations.append(('live-previous-code',a.previous_live_object))
+  if a.include_guarded_sync:configurations.append(('guarded-sync-previous-code',a.previous_live_object))
  for mode,obj in configurations:
   exe=out/mode;command=[]
   for item in recipe:
@@ -114,6 +127,7 @@ static void report_measurement(void) {
   if mode!='sync' and (a.disable_store_cache or mode.endswith('-no-cache')):command+=['-DNEOCLR_LIVE_NO_STORE_CACHE']
   if mode.endswith('-no-exact'):command+=['-DNEOCLR_LIVE_NO_EXACT_STORE']
   command += [f'-DNEOCLR_LIVE_STORE_RANGES={1 if mode.endswith("-one-range") else a.store_ranges}']
+  if a.profile_store_sites and mode!='sync':command+=['-DNEOCLR_STORE_SITES']
   run(command);executables[mode]=exe
  # Finish every build before timing. Alternate order to expose systematic drift.
  for pair in range(a.pairs):
@@ -182,6 +196,7 @@ static void report_measurement(void) {
  r['summary']={mode:{field:statistics.median(t[field] for t in r['trials'] if t['mode']==mode) for field in ['requestsPerSecond','requestSeconds','processCpuSeconds','peakRssBytes']} for mode in executables}
  for path in [a.sync_object.resolve(),a.live_object.resolve(),Path(__file__),recipe_path,host,source,provider,base/'native-providers.py',base.parent/'concurrent-live/native-scopes.py',base.parent/'concurrent-mutation-gate/gate.c',base.parent/'concurrent-mutation-gate/gate.h',base.parent/'concurrent-live/store.h',*[Path(x) for x in recipe if Path(x).is_file()],*[p for p in (root/'runtime/native').rglob('*') if p.suffix in ['.c','.h']]]:
   r['inputs'][str(path)]=hashlib.sha256(path.read_bytes()).hexdigest()
+ if a.previous_live_object:r['inputs'][str(a.previous_live_object.resolve())]=hashlib.sha256(a.previous_live_object.read_bytes()).hexdigest()
  if a.include_guarded_sync:r['inputs'][str(guarded_source)]=hashlib.sha256(guarded_source.read_bytes()).hexdigest()
  r['passed']=True
 finally:(out/'results.json').write_text(json.dumps(r,indent=2)+'\n')

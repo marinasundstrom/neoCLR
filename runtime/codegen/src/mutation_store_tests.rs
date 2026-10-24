@@ -2176,3 +2176,182 @@ fn managed_primitive_boxes_run_on_live_collector() {
     let run: libloading::Symbol<Run> = unsafe { library.get(b"managed_primitive_box_consumer") }.unwrap();
     assert_eq!(unsafe { run(pointers.as_ptr()) }, 0);
 }
+
+// Managed evaluation stacks cross an instruction block for every operation.
+// Keep a local's proof through those transfers, without trusting byref arguments.
+fn transferred_stack_copy(
+    module: &mut impl Module,
+    displacement: i64,
+    kind: u8,
+) -> (
+    cranelift_module::FuncId,
+    cranelift_codegen::Context,
+    ir::Value,
+) {
+    let mut ctx = module.make_context();
+    ctx.func
+        .signature
+        .params
+        .extend([types::I64; 3].map(AbiParam::new));
+    ctx.func.signature.returns.push(AbiParam::new(types::I32));
+    let id = module
+        .declare_function(
+            "transferred_stack_copy",
+            Linkage::Export,
+            &ctx.func.signature,
+        )
+        .unwrap();
+    let mut fb = FunctionBuilderContext::new();
+    let owner;
+    {
+        let mut b = FunctionBuilder::new(&mut ctx.func, &mut fb);
+        let entry = b.create_block();
+        b.append_block_params_for_function_params(entry);
+        b.switch_to_block(entry);
+        let args = b.block_params(entry).to_vec();
+        owner = args[0];
+        let slot = b.create_sized_stack_slot(ir::StackSlotData::new(
+            ir::StackSlotKind::ExplicitSlot,
+            32,
+            3,
+        ));
+        let base = if kind == 2 { args[1] } else { b.ins().stack_addr(types::I64, slot, 4) };
+        let first = b.create_block();
+        let next = b.create_block();
+        b.append_block_param(first, types::I64);
+        b.append_block_param(next, types::I64);
+        if kind == 1 {
+            // One predecessor, two edges: a stack pointer and an unknown byref.
+            let condition = b.ins().icmp_imm(ir::condcodes::IntCC::Equal, args[2], 0);
+            b.ins()
+                .brif(condition, first, &[base.into()], first, &[args[1].into()]);
+        } else {
+            b.ins().jump(first, &[base.into()]);
+        }
+        b.switch_to_block(first);
+        let address = b.block_params(first)[0];
+        let address = b.ins().iadd_imm(address, displacement);
+        b.ins().jump(next, &[address.into()]);
+        b.switch_to_block(next);
+        let address = b.block_params(next)[0];
+        b.ins().store(MemFlags::new(), args[2], address, 8);
+        let copied = b.ins().load(types::I64, MemFlags::new(), address, 8);
+        b.ins().store(MemFlags::new(), copied, args[1], 8);
+        let zero = b.ins().iconst(types::I32, 0);
+        b.ins().return_(&[zero]);
+        b.seal_all_blocks();
+        b.finalize();
+    }
+    (id, ctx, owner)
+}
+
+#[test]
+fn single_edge_stack_transfers_elide_only_proved_stores() {
+    for kind in [0, 1, 2] {
+        let mut builder = JITBuilder::with_isa(
+            isa(target(), false),
+            cranelift_module::default_libcall_names(),
+        );
+        builder.symbol("experiment_gc_store", hook as *const u8);
+        let mut code = Code(Some(JITModule::new(builder)));
+        let module = code.0.as_mut().unwrap();
+        let (id, mut ctx, owner) = transferred_stack_copy(module, 4, kind);
+        assert_eq!(
+            lower(module, &mut ctx.func, owner).unwrap(),
+            Lowered {
+                stores: if kind != 0 { 2 } else { 1 },
+                stack_stores: if kind != 0 { 0 } else { 1 },
+            }
+        );
+        module.define_function(id, &mut ctx).unwrap();
+        module.finalize_definitions().unwrap();
+        let call: unsafe extern "C" fn(*mut State, *mut u8, u64) -> i32 =
+            unsafe { std::mem::transmute(module.get_finalized_function(id)) };
+        for bits in [0, 0x123456789abcdef0] {
+            for reject_at in [0, 1] {
+                let mut state = State {
+                    calls: 0,
+                    reject_at,
+                    widths: [0; 2],
+                    bits: [0; 2],
+                };
+                let mut output = [0xa5u8; 32];
+                assert_eq!(
+                    unsafe { call(&mut state, output.as_mut_ptr(), bits) },
+                    if reject_at == 0 { 0 } else { 3 }
+                );
+                assert_eq!(state.calls, if reject_at == 0 && kind != 0 { 2 } else { 1 });
+                if reject_at == 0 {
+                    assert_eq!(&output[8..16], &bits.to_le_bytes());
+                } else {
+                    assert_eq!(output, [0xa5; 32]);
+                }
+            }
+        }
+    }
+}
+
+#[test]
+fn transferred_stack_bounds_reject_before_mutating_ir() {
+    let mut module = ObjectModule::new(
+        ObjectBuilder::new(
+            isa(target(), true),
+            "transfer_bounds",
+            cranelift_module::default_libcall_names(),
+        )
+        .unwrap(),
+    );
+    for displacement in [-13, 13] {
+        let (_, mut ctx, owner) = transferred_stack_copy(&mut module, displacement, 0);
+        let before = ctx.func.display().to_string();
+        assert!(
+            lower(&mut module, &mut ctx.func, owner)
+                .unwrap_err()
+                .to_string()
+                .contains("exceeds proven stack slot")
+        );
+        assert_eq!(ctx.func.display().to_string(), before);
+    }
+}
+
+#[test]
+fn single_edge_cycle_does_not_prove_stack_storage() {
+    let mut func = ir::Function::new();
+    let entry = func.dfg.make_block();
+    func.layout.append_block(entry);
+    let cycle = func.dfg.make_block();
+    func.layout.append_block(cycle);
+    let pointer = func.dfg.append_block_param(cycle, types::I64);
+    FuncCursor::new(&mut func)
+        .at_bottom(entry)
+        .ins()
+        .return_(&[]);
+    FuncCursor::new(&mut func)
+        .at_bottom(cycle)
+        .ins()
+        .jump(cycle, &[pointer.into()]);
+    assert_eq!(
+        stack_destination(&func, pointer, &single_edge_arguments(&func)),
+        None
+    );
+}
+
+#[test]
+fn transferred_stack_offset_overflow_remains_guarded() {
+    let mut module = ObjectModule::new(
+        ObjectBuilder::new(
+            isa(target(), true),
+            "transfer_overflow",
+            cranelift_module::default_libcall_names(),
+        )
+        .unwrap(),
+    );
+    let (_, mut ctx, owner) = transferred_stack_copy(&mut module, i64::MAX, 0);
+    assert_eq!(
+        lower(&mut module, &mut ctx.func, owner).unwrap(),
+        Lowered {
+            stores: 2,
+            stack_stores: 0
+        }
+    );
+}
