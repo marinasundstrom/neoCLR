@@ -22380,3 +22380,16 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   word/interior-root tests and archives both experiments. Precise physical layouts
   and collection-trigger analysis remain proposals for further investigation, not
   author-approved implementations or measured wins. [Evidence](../benchmarks/execution/scan-batches/README.md).
+
+
+- On continued optimization, assistant adds opt-in collection-origin diagnostics.
+  Plain/JSON runs show three/five publication-triggered collections plus about one
+  idle collection per request. Assistant tests and retains a 4,096-publication budget,
+  preserving the 256-allocation bound and pressure/idle paths. Local AOT gains are
+  15.9%/12.1% for one/four owners; owned JIT gains 9.4%, with lower CPU. Arena extent
+  rises about 8/13 KB, and publication-count cleanup delay can be four times longer.
+  Threaded pacing, cleanup, shared-worker/async and HTTP validation pass. These are
+  assistant-measured outcomes under the author's continuation direction, not a new
+  author policy statement or a claim of peer parity.
+  [Diagnostics](../benchmarks/execution/gc-triggers/README.md) and
+  [retained policy/evidence](../benchmarks/execution/publication-budget/README.md).

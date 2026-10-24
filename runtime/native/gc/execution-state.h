@@ -39,7 +39,7 @@ static inline int32_t neoclr_paced_boundary(neoclr_execution_state *state,
     if (state->gc.pacing.context == context &&
         state->gc.statistics.collections == state->gc.pacing.collections &&
         state->gc.statistics.allocations - state->gc.pacing.allocations < 256 &&
-        ++state->gc.pacing.boundaries < 1024) return 0;
+        ++state->gc.pacing.boundaries < 4096) return 0;
 #ifdef NEOCLR_GC_PROFILE
     return neoclr_gc_paced_collect_v1(context, boundary);
 #else

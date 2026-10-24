@@ -698,3 +698,16 @@ JIT/AOT hosts. This is frequency evidence, not proof that raising a budget impro
 capacity or that current pauses have equal costs. A budget experiment must measure
 retained memory and cleanup delay alongside throughput; precise-layout work remains
 separate. [Measurements and attribution limits](../../benchmarks/execution/gc-triggers/README.md).
+
+
+### Publication fairness budget — 2026-10-24
+
+Retain the CLR/Go comparison above: allocation pressure and publication frequency
+are distinct policy signals. neoCLR now permits 4,096 publications between paced
+collections while preserving its 256-allocation bound, pressure retry and explicit
+idle/managed collection. This is a measured adjustment to the experimental native
+collector, not adoption of CLR generational budgeting or Go's heap-growth controller.
+It avoids repeated scanning without skipping root updates. Costs are fourfold
+publication-count cleanup delay and a measured 8–13 KB arena-extent increase for
+plain/JSON; no wall-clock cleanup guarantee exists. Native JIT/AOT benefit; the
+interpreter is unchanged. [Evidence and limits](../../benchmarks/execution/publication-budget/README.md).

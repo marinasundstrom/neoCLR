@@ -6,7 +6,7 @@
 #endif
 #define CHECK(x) do { if (!(x)) { fprintf(stderr,"failed line %d\n",__LINE__); return 1; } } while(0)
 static int cleanup_publication;
-enum { ALLOCATION_BUDGET = 256, PUBLICATION_BUDGET = 1024 };
+enum { ALLOCATION_BUDGET = 256, PUBLICATION_BUDGET = 4096 };
 static void boundary(neoclr_probe_frame *frame) {
     uint64_t empty=0;
     neoclr_probe_stack_roots_v2(frame,0,&empty,0,"{\"requiredSpillLanes\":[]}",25);

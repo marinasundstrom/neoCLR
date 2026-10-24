@@ -294,7 +294,8 @@ DIRECT includes explicit native and unpaced root requests; MANAGED is GC.Collect
 IDLE bypasses pacing; PRESSURE is a rooted allocation retry after native-memory-limit
 failure, excluding impossible blocks. Paced collection selects the first failed
 condition: context identity, intervening collection epoch, 256-allocation budget,
-then 1,024-publication budget. Classification does not change these policies.
+then 4,096-publication budget. Classification does not change these policies.
+The original diagnostics used 1,024; the [measured policy follow-up](../../../benchmarks/execution/publication-budget/README.md) records the change and cleanup/memory costs.
 
 Do not sum origins as completed collections in general: direct conditional/participant
 entry bypasses origins and worker delegation may collect on another thread. Pause

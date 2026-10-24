@@ -80,3 +80,7 @@ python3 -m unittest discover -s benchmarks/execution/gc-triggers -p 'test_*.py'
 Existing published throughput claims remain unchanged; no website build is needed.
 The interpreter's separate heap is not measured here. Reasons for cross-worker
 requests are not transferred into the coordinator's pause records.
+
+Follow-up: the [publication-budget experiment](../publication-budget/README.md)
+retains 4,096 publications. The counts above intentionally preserve the original
+1,024-budget baseline.

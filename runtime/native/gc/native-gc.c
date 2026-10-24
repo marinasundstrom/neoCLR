@@ -908,7 +908,7 @@ int32_t neoclr_gc_collect_conditional_v1(neoclr_aot_context *context,
 /* Opt-in generated-boundary pacing; private per-owner-thread state, not ABI.
  * Unexpected global collection epochs force a sweep instead of indefinitely
  * postponing cleanup across contexts. Rooted admission handles actual pressure.
- * The bounded 256-allocation / 1024-publication budget amortizes tracing on the
+ * The bounded 256-allocation / 4096-publication budget amortizes tracing on the
  * plain HTTP path; see benchmarks/http-server/primitive-comparison/pacing.
  * This is a publication budget, not a wall-clock finalization guarantee. */
 #ifdef NEOCLR_GC_PROFILE

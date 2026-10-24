@@ -458,3 +458,14 @@ improves 3.6%/2.0%, with 3.9%/1.8% lower CPU per response; owned JIT improves
 2.2%/2.5%. Latency tails remain mixed. Collection, frame entry and other state access
 remain material costs. These modest desktop gains do not establish peer parity.
 See [validation, profiles and measurement limits](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/execution/state-access).
+
+
+## Development: collection frequency
+
+A larger native publication budget reduces repeated collection during request
+handling. Local paired plaintext AOT throughput improves 15.9% with one owner and
+12.1% with four; owned JIT improves 9.4%, with lower CPU per response. Diagnostic
+plain/JSON arena extent increases about 8/13 KB, and no-allocation cleanup may take
+four times as many publications. Allocation pressure and idle collection remain.
+These are incremental desktop results; JSON throughput and peer parity are unproven.
+See [measurements and policy tradeoffs](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/execution/publication-budget).

@@ -6762,3 +6762,13 @@ phases show 3/5 publication-budget collections plus about one idle collection, w
 no allocation-budget or pressure requests. Defaults remain unchanged; a larger
 publication budget is an evidence-backed experiment, requiring retention, cleanup
 and latency checks. [Data and attribution limits](../benchmarks/execution/gc-triggers/README.md).
+
+
+**Native publication pacing follow-up (2026-10-24):** Retain 4,096 publications
+between paced collections, keeping the 256-allocation bound and pressure/idle
+paths. Plain/JSON collections fall to one/two per request with unchanged allocation
+counts; arena extent grows about 8/13 KB. Local AOT one/four-owner throughput gains
+15.9%/12.1%, owned JIT 9.4%, with lower CPU. Exact-budget cleanup, threaded triggers,
+shared-worker/async and checked HTTP consumers pass. Fourfold publication-count
+cleanup delay and broader workload/platform qualification remain explicit costs.
+[Evidence](../benchmarks/execution/publication-budget/README.md).

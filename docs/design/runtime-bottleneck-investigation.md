@@ -359,3 +359,15 @@ This supports testing a larger publication budget before more scan-loop changes,
 while retaining pressure/idle behavior and measuring retention/cleanup/latency.
 Counters are opt-in caller-thread requests, not generally collector completions;
 worker reason transfer and per-reason timing remain open. Defaults are unchanged.
+
+
+The [publication-budget follow-up](../../benchmarks/execution/publication-budget/README.md)
+retains a 4,096-publication threshold. Plain request-phase collections drop from four
+to one; JSON from about six to two (allocation + idle), with unchanged allocations.
+Unprofiled AOT one/four-owner throughput improves 15.9%/12.1%, CPU/response falls
+13.9%/11.9%; owned JIT improves 9.4%/8.2%. Peak arena extent grows about 8/13 KB
+for plain/JSON. This establishes collection frequency as a meaningful cost in these
+workloads; it does not resolve frame-entry/TLS costs or establish precise-layout,
+generational, interpreter or peer-parity gains. Idle collections and shared-worker
+coordination remain unchanged. Longer retention and fourfold publication-count
+cleanup delay are explicit policy tradeoffs; further tuning needs workload evidence.

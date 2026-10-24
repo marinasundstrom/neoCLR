@@ -40,10 +40,10 @@ static int exercise(void) {
     neoclr_probe_enter_v3(&frame, &c, 0, &slot, 0, "{}", 2);
     boundary(&frame); EXPECT(CONTEXT);
     CHECK(neoclr_gc_boundary_v1(NULL, &frame) == 3); CHECK(!check(e, f));
-    /* Reset diagnostics must not reset the 1024-publication policy budget. */
-    for (unsigned i = 0; i < 512; i++) boundary(&frame);
+    /* Reset diagnostics must not reset the 4096-publication policy budget. */
+    for (unsigned i = 0; i < 2048; i++) boundary(&frame);
     neoclr_gc_trigger_profile_reset_v1(); memset(e, 0, sizeof(e));
-    for (unsigned i = 0; i < 511; i++) boundary(&frame);
+    for (unsigned i = 0; i < 2047; i++) boundary(&frame);
     CHECK(!check(e, f)); boundary(&frame); EXPECT(PUBLICATION);
     void *value;
     for (unsigned i = 0; i < 256; i++) CHECK(!neoclr_gc_allocate_v1(&c.text, 8, NEOCLR_GC_BYTES, &value));
