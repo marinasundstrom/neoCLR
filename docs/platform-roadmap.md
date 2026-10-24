@@ -69,6 +69,10 @@ host/writer admission, complete pipeline integration and managed consumers remai
 now remove repeated allocation walks during active epochs, with native/generated
 safety tests and paired lookup-cost evidence. New/inactive fallbacks remain linear;
 large isolated store savings do not establish managed/HTTP improvement.
+A [synchronous/idle/overlap comparison](../benchmarks/execution/concurrent-live/store-overlap-results.md)
+now retains phase distributions, marker CPU/work and RSS. The large live-graph
+candidate still costs about 2.6–2.8× synchronous CPU; owner capture/completion work
+needs isolation before attributing the remaining cost or changing defaults.
 
 **Author-directed media types (2026-10-23):** Complete the bounded HTTP value-contract
 slice with cached typed presets, lazy structured projections, shared primitive

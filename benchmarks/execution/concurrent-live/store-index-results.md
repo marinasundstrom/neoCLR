@@ -59,3 +59,6 @@ concurrent-store harness with its qualified Rust runner. Existing CLR/Go barrier
 research and the mutation audit remain the design basis; this reuses the native
 collector's detached index, not a new managed or metadata contract. Further work
 must qualify all writers/hosts and measure managed standalone and HTTP workloads.
+
+[Follow-up synchronous and overlapping-marker comparison](store-overlap-results.md)
+shows the remaining whole-collector cost after lookup optimization.
