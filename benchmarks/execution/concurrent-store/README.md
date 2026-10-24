@@ -726,3 +726,38 @@ between the native carrier evidence and generated HTTP code, but does not qualif
 full entry/pumps, asynchronous retained writes, shared heaps or server throughput.
 Native async/socket result aliases still need guarded publication before admission.
 The existing CLR rooted-transition comparison applies; this adds no public contract.
+
+
+## Generated async operation wrappers and suspension (2026-10-24)
+
+Live compilation now admits six exact async operation providers: Create, CompleteUnit,
+AwaitUnit, Release, IsCompleted and WaitCompletion. Their generated wrappers use
+result-type-sized stack scratch and guarded publication after success, retaining the
+existing frame and fault cleanup. No-result AwaitUnit allocates scratch for the native
+ABI but never reads or publishes it. Ordinary compilation retains its existing path.
+CreateOwned, CurrentOwner, Start/StartManaged and entry pumps remain unadmitted.
+
+`async-wrappers.neoil` validates reserved signatures through the production binding
+validator before privately renaming the backend fixture. Its generated callback calls
+AwaitUnit, suspends on the real native carrier, resumes, allocates a buffer and stores
+it into its receiver. C starts/pumps that callback; those generated start/pump wrappers
+are explicitly outside this test. The native scheduler is an idle stub, not a socket
+server. C owns the host-root handle and uses the guarded store hook for its own old
+heap mutations. There is no native fallback scope around suspension or pumping.
+
+`validate-async-wrappers.py --runner <codegen-test-runner> --output <fresh-directory>`
+passes 600 cycles across forced/paced JIT and optimized/undefined-bounds AOT. Collection
+runs while generated frames are parked; half the cycles force collection during the
+resumed callback's allocation. Checks cover heap-result aliases, barrier counts,
+unchanged fault outputs, waiting outside a fiber, no-result destination preservation,
+completion/release, invalid released IDs, restored root chains, empty final heap and
+zero reserved stack bytes after shutdown. Twenty-one focused compiler tests pass,
+with fourteen host-dependent tests skipped in the general run; this JIT fixture is
+invoked explicitly by the harness. `async-wrappers-validation.json.gz`, the AOT object
+and compiler report retain evidence. No new performance claim or default change.
+
+This integrates generated suspension with the previously tested carrier/root protocol.
+The CLR comparison remains explicit published/parked roots and rooted transitions;
+neoCLR's private cooperative carrier is not CLR thread scheduling. Remaining work is
+owned/start wrappers, native socket result publication, entry/queue/bootstrap integration
+and the full HTTP/standalone correctness and performance matrix.

@@ -106,8 +106,10 @@ synchronous GC in forced/paced optimized/UBSan native fixtures: parked condition
 roots, resumed mutations, abandonment, transfer buffers and fault teardown pass.
 The ordinary generated callback dispatcher now joins live store/closure checking;
 JIT/AOT tests cover receiver allocations under pressure, faults, rejection and root
-restoration. Entry pumps, native async wrappers/full entry and shared heaps remain
-unqualified.
+restoration. Six generated async operation wrappers now use guarded result publication
+and pass actual suspension/resumption with parked-root collection and allocation
+pressure in JIT/AOT. Owned/start wrappers, socket results, entry pumps/full entry and
+shared heaps remain unqualified.
 Capability conversions, callable arrays, remaining text/byte services and async/full
 host-entry integration remain next;
 the recorded plaintext import inventory guides that coverage.

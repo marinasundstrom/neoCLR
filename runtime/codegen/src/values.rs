@@ -515,7 +515,10 @@ pub(crate) fn compile_into(
             || d.string_starts_with_ordinal.contains(&i) || d.string_slice_utf8.contains(&i)
             || d.byte_memory_create.contains(&i) || d.byte_memory_slice.contains(&i)
             || d.byte_memory_length.contains(&i) || d.byte_view_get.contains(&i)
-            || d.byte_view_set.contains(&i) || d.byte_view_utf8.contains(&i));
+            || d.byte_view_set.contains(&i) || d.byte_view_utf8.contains(&i)
+            || d.runtime_async_create.contains(&i) || d.runtime_async_completeunit.contains(&i)
+            || d.runtime_async_awaitunit.contains(&i) || d.runtime_async_release.contains(&i)
+            || d.runtime_async_iscompleted.contains(&i) || d.runtime_async_waitcompletion.contains(&i));
         f.pinvoke.is_some() || ((f.is_internal_call() || gc_points::native_body(&p, i, details)) && !admitted)
     }) {
         return Err("experimental live stores reject unaudited native replacement bodies".into());
@@ -3210,6 +3213,14 @@ pub(crate) fn compile_into(
                 continue;
             }
             if let Some(service) = socket_services.get(&i) {
+                let destination = output;
+                let output = if live_stores {
+                    let bytes = p.results[i].as_ref().map_or(8, |ty| p.bytes(ty));
+                    let scratch = slot(&mut b, bytes);
+                    b.ins().stack_addr(types::I64, scratch, 0)
+                } else {
+                    output
+                };
                 let service = module.declare_func_in_func(*service, b.func);
                 let argument_lanes: usize = p.args[i].iter().map(|t| lanes(&p, t).len()).sum();
                 let mut args = parameters[..argument_lanes].to_vec();
@@ -3269,6 +3280,10 @@ pub(crate) fn compile_into(
                 );
                 site.capture_frame = false;
                 return_if_detailed(&mut b, failed, status, Some(&site));
+                if live_stores && let Some(ty) = &p.results[i] {
+                    let result = read(&mut b, &p, ty, output);
+                    write(&mut b, destination, &result);
+                }
                 if let Some(ty @ Ty::StringArray) = &p.results[i] {
                     let array = b.ins().load(types::I64, MemFlags::new(), output, 0);
                     tag_array(&mut b, &p, ty, array);

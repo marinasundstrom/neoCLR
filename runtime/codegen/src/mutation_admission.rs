@@ -142,6 +142,12 @@ pub(crate) fn root_providers(module: &impl Module) -> Vec<(&'static str, Signatu
     vec![
         ("experiment_gc_store", make(&[I64, I64, I64, I32], &[I32])),
         ("neoclr_gc_callback_read_v1", make(&[I64, I64, I64], &[I32])),
+        ("neoclr_runtime_async_create_v1", make(&[I64, I64], &[I32])),
+        ("neoclr_runtime_async_completeunit_v1", make(&[I64, I64, I64], &[I32])),
+        ("neoclr_runtime_async_awaitunit_v1", make(&[I64, I64, I64], &[I32])),
+        ("neoclr_runtime_async_release_v1", make(&[I64, I64, I64], &[I32])),
+        ("neoclr_runtime_async_iscompleted_v1", make(&[I64, I64, I64], &[I32])),
+        ("neoclr_runtime_async_waitcompletion_v1", make(&[I64, I64, I64], &[I32])),
         ("experiment_gc_string_slice_utf8_rooted_v1", make(&[I64, I32, I32, I64, I64], &[I32])),
         ("neoclr_byte_view_create_all_v1", make(&[I64, I64, I64, I64], &[I32])),
         ("neoclr_byte_view_create_v1", make(&[I64, I64, I32, I32, I64, I64], &[I32])),
