@@ -804,6 +804,9 @@ fn managed_options_for(source: &str) -> crate::fault_details::Options {
         options.entry_task_drain.push(14);
         options.task_queue_drain = Some(15);
     }
+    if source.starts_with(".module LiveAsyncWrappersPumpNetwork") {
+        options.socket_connect_result.push(16);
+    }
     if source.starts_with(".module LiveQueue") {
         options.task_queue_drain = Some(0);
     }
@@ -912,6 +915,19 @@ fn managed_input(source: &str) -> neoclr::metadata::Module {
                     if let Op::Call(target)=op {
                         if target.name==original { target.name=name.clone(); }
                     }
+                }
+            }
+        }
+    }
+    if source.starts_with(".module LiveAsyncWrappersPumpNetwork") {
+        let original = input.functions[16].name.clone();
+        let selection = serde_json::json!({"functions":[{"name":original,"compiledIndex":16}]});
+        assert_eq!(crate::bindings::socket_accept(&mut input, &selection).unwrap().len(), 1);
+        input.functions[16].name = "LiveNetwork.ConnectResult".into();
+        for f in &mut input.functions {
+            for op in &mut f.body {
+                if let Op::Call(target) = op {
+                    if target.name == original { target.name = "LiveNetwork.ConnectResult".into(); }
                 }
             }
         }
@@ -1575,4 +1591,31 @@ fn live_pump_requires_async_dispatch_and_queue_drain() {
         ).unwrap_err();
         assert!(error.to_string().contains("owned published frames"));
     }
+}
+
+#[test]
+fn managed_network_pump_emits_guarded_results() {
+    emit_managed(include_str!("../../../benchmarks/execution/concurrent-store/network-pump.neoil"));
+}
+#[test]
+#[ignore = "requires async host built by validate-network-pump.py"]
+fn managed_network_pump_runs_on_live_collector() {
+    let library = std::sync::Arc::new(unsafe { libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host")) }.unwrap());
+    unsafe { crate::mutation_admission::require_managed_host(&library) }.unwrap();
+    let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
+    let resolver = library.clone();
+    builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
+    let mut code = Code(Some(JITModule::new(builder)));
+    let module = code.0.as_mut().unwrap();
+    let source=include_str!("../../../benchmarks/execution/concurrent-store/network-pump.neoil");
+    crate::compiler::values::compile_into(&managed_input(source),"Main",Some(&managed_options_for(source)),crate::compiler::Target::MacosArm64,module,true).unwrap();
+    module.finalize_definitions().unwrap();
+    let mut pointers=Vec::new();
+    for name in (2..12).map(|i| format!("neoclr_value_{i}")).chain(["neoclr_invoke_void_callback_v1".into(), "neoclr_value_14".into()]) {
+        let Some(cranelift_module::FuncOrDataId::Func(id))=module.get_name(&name) else { panic!("async wrapper") };
+        pointers.push(module.get_finalized_function(id));
+    }
+    type Run = unsafe extern "C" fn(*const *const u8) -> i32;
+    let run: libloading::Symbol<Run> = unsafe { library.get(b"managed_async_consumer") }.unwrap();
+    assert_eq!(unsafe { run(pointers.as_ptr()) }, 0);
 }

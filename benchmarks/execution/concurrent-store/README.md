@@ -996,3 +996,37 @@ corrected fixture uses a managed placeholder selected for backend replacement.
 Existing CLR suspension/root-transition comparisons, Runtime Contract and temporary
 CLI/native async representation remain unchanged; neoCLR owns backend qualification
 and eventual native metadata replacement. No HTTP throughput or default-switch claim.
+
+
+## Real scheduler and loopback accept delivery (2026-10-24)
+
+`validate-network-pump.py --runner <codegen-test-runner> --output <fresh-directory>`
+replaces the async-pump fixture's scheduler stubs with actual socket-listener.c and
+real socket scopes. Six forced/paced JIT and optimized/undefined-bounds AOT runs pass
+600 carrier cycles, including 450 loopback accepts. The generated callback consumes
+the accept result through the generated SocketConnectResult wrapper and clears its
+operation field before continuing. Existing pressure, abandonment, fault/recovery,
+root restoration and zero reserved-stack checks remain. Twenty-eight compiler
+checks pass; 20 host-dependent tests are skipped by the general filter, with both
+network JIT configurations executed explicitly here.
+
+The first fixture consumed the result in C only after pump return. The real scheduler
+correctly treated the unconsumed operation as pending, and the validator timed out
+after 90 seconds. Move consumption into the callback, matching the completion path;
+no scheduler/runtime behavior change was required. Preserve that timeout report and
+its observed termination separately. The validator now records timeout commands
+explicitly. Final artifacts and generated consumer are retained as `network-pump-*`.
+
+`network-pump-consumer.py` derives the existing async fixture, expanding its controlled
+owner layout for the accept operation. The real socket operation retains the callback
+through collection and scheduler delivery; the generated callback can allocate after
+consumption while the carrier retains dispatch ownership. Accepted sockets are closed
+by scope teardown. The SocketConnectResult binding is validated before private naming;
+pump/drain selection remains controlled backend configuration.
+
+This qualifies network accept delivery through generated callback/pump code with live
+GC and real idle collection. It does not yet exchange HTTP request/response payloads,
+exercise the full System library selection, or measure server throughput. Host-I/O
+entry/bootstrap, remaining providers and full HTTP qualification remain open. Existing
+CLR ownership/suspension comparison and temporary CLI/native representation apply;
+ordinary code generation and native behavior are unchanged. No default-switch claim.

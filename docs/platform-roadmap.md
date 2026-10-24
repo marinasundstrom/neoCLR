@@ -135,7 +135,11 @@ allocation, retention, rejection and fault cleanup. Pump integration remains nex
 with real carriers/task scopes, 450 resumptions and 150 abandoned owners; missing
 callback/queue prerequisites are rejected. The scheduler is an idle stub in this
 fixture, so network delivery, host-I/O entry and full HTTP qualification remain open
-([pump evidence](../benchmarks/execution/concurrent-store/README.md#generated-async-pump-2026-10-24)).
+([pump evidence](../benchmarks/execution/concurrent-store/README.md#generated-async-pump-2026-10-24)). A follow-up real-scheduler fixture now passes 600 cycles
+including 450 loopback accepts through generated callbacks/pumping and result
+consumption. Preserve the initial unconsumed-result timeout; no scheduler fix was
+needed. Payload exchange, host-I/O/bootstrap and full HTTP performance remain open
+([network evidence](../benchmarks/execution/concurrent-store/README.md#real-scheduler-and-loopback-accept-delivery-2026-10-24)).
 Capability conversions, callable arrays, remaining text/byte services and async/full
 host-entry integration remain next;
 the recorded plaintext import inventory guides that coverage.
