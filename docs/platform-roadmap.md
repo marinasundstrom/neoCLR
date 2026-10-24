@@ -144,7 +144,11 @@ needed. Payload exchange, host-I/O/bootstrap and full HTTP performance remain op
 comparison), plus plaintext's explicitly required host-I/O entry flag. Prioritize
 queue/timer services, text/allocation boundaries and the retained TLS path, then
 whole-selection live compilation; this inventory is not execution qualification
-([dependency audit](../benchmarks/execution/concurrent-store/README.md#whole-server-dependency-audit-2026-10-24)).
+([dependency audit](../benchmarks/execution/concurrent-store/README.md#whole-server-dependency-audit-2026-10-24)). Queue Register/Default/Current and Timer Start/Cancel
+now pass 600 JIT/AOT cycles using existing ownership contracts; 29 compiler checks
+pass. The same import audit falls to 8/9 missing names for plain/JSON; host-I/O entry
+and whole-program qualification remain open
+([service evidence](../benchmarks/execution/concurrent-store/README.md#queue-and-timer-service-admission-2026-10-24)).
 Capability conversions, callable arrays, remaining text/byte services and async/full
 host-entry integration remain next;
 the recorded plaintext import inventory guides that coverage.

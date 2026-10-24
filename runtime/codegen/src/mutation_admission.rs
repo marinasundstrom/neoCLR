@@ -141,6 +141,11 @@ pub(crate) fn root_providers(module: &impl Module) -> Vec<(&'static str, Signatu
     };
     vec![
         ("neoclr_runtime_async_pump_v1", make(&[I64, I64, I64], &[I32])),
+        ("neoclr_task_queue_register_v1", make(&[I64, I64, I64], &[I32])),
+        ("neoclr_task_queue_default_v1", make(&[I64, I64], &[I32])),
+        ("neoclr_task_queue_current_v1", make(&[I64, I32, I32, I64], &[I32])),
+        ("neoclr_timer_start_v1", make(&[I32, I64, I64, I64], &[I32])),
+        ("neoclr_timer_cancel_v1", make(&[I64, I64, I64], &[I32])),
         ("neoclr_task_queue_host_read_v1", make(&[I64, I64], &[I32])),
         ("experiment_gc_prepare_entry_v1", make(&[I64], &[I32])),
         ("neoclr_gc_complete_invocation_v1", make(&[I64], &[I32])),

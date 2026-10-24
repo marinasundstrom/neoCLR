@@ -1090,3 +1090,41 @@ change to the default criteria follows from this inventory.
 
 Evidence: `http-dependencies.json.gz`. The existing CLR rooted-provider and native
 transition research applies; this audit introduces no API or semantic divergence.
+
+
+## Queue and timer service admission (2026-10-24)
+
+Five exact providers now join internal live-mode admission: TaskQueue Register,
+Default and Current, plus Timer Start and Cancel. Generated wrappers use the existing
+typed scratch and guarded result publication. Native scopes remain the owners of
+queue/timer roots; the collector's root contract, scheduler lifecycle and ordinary
+compilation are unchanged. No ownership or boundary fix was required.
+
+`validate-queue-timers.py --runner <codegen-test-runner> --output <fresh-directory>`
+passes 600 forced/paced JIT and optimized/undefined-bounds AOT cycles. The controlled
+backend fixture uses real task/socket scopes and heap-aliased result storage. It
+checks missing-scope/null/duplicate rejection with unchanged outputs, default queue
+retention, and Current inside Drain of a different receiver. It checks timer callback
+retention through collection, cancellation/repeated cancellation, real scheduler
+expiry/delivery acknowledgment, and final zero-heap cleanup. The timer descriptor is
+used for ownership/delivery checks, not invoked as a managed callback; generated
+callback/pump invocation is covered by the separate network-pump fixture.
+
+Twenty-nine focused compiler checks pass; 21 host-dependent tests are skipped by
+the general filter, with both service JIT configurations explicitly run. Selection
+uses explicit backend indices and typed placeholders; full System API binding and
+whole-server selection are not claimed by this fixture. The initial fixture used
+numeric branch comparison on object references; it was rejected before emission and
+corrected to ref.eq/brtrue. Preserve this failure and results as `queue-timers-*`.
+
+Rerunning the same retained-object audit reduces unadmitted import names from 13/14
+to 8/9 for plain/JSON. Remaining names are console output, Int32/Int64 formatting,
+reserved record arrays, string interning, TLS, UTF-8 encode/decode, and JSON's ordinal
+comparison. Evidence: `http-dependencies-queue-timers.json.gz`. Host-I/O entry and
+whole-program compilation/execution still require qualification; this reduction is
+not an HTTP performance result.
+
+Existing CLR root/host transition comparisons apply. Temporary CLI/native encoding,
+Runtime Contract and consumer-facing APIs remain unchanged. neoCLR owns backend
+qualification and native metadata replacement. Respect the author's clarification:
+change ownership/boundary contracts only when a concrete issue requires it.

@@ -22554,3 +22554,17 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   for switching defaults. The author's correctness and significant HTTP improvement
   criteria, with CPU as a reported proof-of-concept tradeoff, remain unchanged.
 - [Protocol, CLR comparison and validation](../benchmarks/execution/concurrent-live/README.md#native-call-synchronous-fallback-prototype-2026-10-24).
+
+
+### 2026-10-24 — Boundary and ownership changes require a concrete issue
+
+- Author directs: “Be mindful of boundaries.” Assistant interprets this as keeping
+  collector policy, host ownership, scheduler/socket lifecycle and generated-code
+  contracts explicit during integration.
+- Author clarifies: “You might fix issues with boundaries and ownership if necessary.
+  But only then”. Assistant accepts changes when a concrete issue requires them,
+  rather than treating integration as permission to redesign those contracts.
+- Assistant continues queue/timer wrapper admission using existing native scope
+  ownership. Six hundred JIT/AOT cycles and 29 compiler checks pass; no native
+  boundary/ownership change was needed. Full HTTP qualification remains open.
+- [Validation and limits](../benchmarks/execution/concurrent-store/README.md#queue-and-timer-service-admission-2026-10-24).

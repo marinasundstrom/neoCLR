@@ -810,6 +810,13 @@ fn managed_options_for(source: &str) -> crate::fault_details::Options {
     if source.starts_with(".module LiveQueue") {
         options.task_queue_drain = Some(0);
     }
+    if source.starts_with(".module LiveQueueTimers") {
+        options.task_queue_register.push(3);
+        options.task_queue_default.push(4);
+        options.task_queue_current.push(5);
+        options.timer_start.push(6);
+        options.timer_cancel.push(7);
+    }
     if source.starts_with(".module LiveSocket") {
         options.socket_listen.push(0);
         options.socket_local_port.push(1);
@@ -1020,6 +1027,10 @@ fn emit_managed(source: &str) {
             }
             if source.starts_with(".module LiveAsyncWrappersPump") {
                 exports.push((14, "live_async_pump"));
+            }
+            if source.starts_with(".module LiveQueueTimers") {
+                exports.extend([(0,"live_queue_body"),(3,"live_queue_register"),(4,"live_queue_default"),
+                    (5,"live_queue_current"),(6,"live_timer_start"),(7,"live_timer_cancel")]);
             }
             if source.starts_with(".module LiveSocket") {
                 exports.extend([(0,"live_socket_listen"), (1,"live_socket_local_port"), (2,"live_socket_close"), (3,"live_socket_accept"), (4,"live_socket_connect_result"), (5,"live_socket_cancel"), (6,"live_socket_deadline_after"), (7,"live_socket_deadline_expired"), (8,"live_socket_receive"), (9,"live_socket_send"), (10,"live_socket_transfer_result"), (11,"live_socket_receive_until"), (12,"live_socket_send_until")]);
@@ -1617,5 +1628,32 @@ fn managed_network_pump_runs_on_live_collector() {
     }
     type Run = unsafe extern "C" fn(*const *const u8) -> i32;
     let run: libloading::Symbol<Run> = unsafe { library.get(b"managed_async_consumer") }.unwrap();
+    assert_eq!(unsafe { run(pointers.as_ptr()) }, 0);
+}
+
+#[test]
+fn managed_queue_timers_emits_guarded_dispatch() {
+    emit_managed(include_str!("../../../benchmarks/execution/concurrent-store/queue-timers.neoil"));
+}
+#[test]
+#[ignore = "requires entry host built by validate-queue-timers.py"]
+fn managed_queue_timers_runs_on_live_collector() {
+    let library = std::sync::Arc::new(unsafe { libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host")) }.unwrap());
+    unsafe { crate::mutation_admission::require_managed_host(&library) }.unwrap();
+    let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
+    let resolver = library.clone();
+    builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
+    let mut code = Code(Some(JITModule::new(builder)));
+    let module = code.0.as_mut().unwrap();
+    let source = include_str!("../../../benchmarks/execution/concurrent-store/queue-timers.neoil");
+    crate::compiler::values::compile_into(&managed_input(source), "Main", Some(&managed_options_for(source)), crate::compiler::Target::MacosArm64, module, true).unwrap();
+    module.finalize_definitions().unwrap();
+    let mut pointers = Vec::new();
+    for i in [0,3,4,5,6,7] {
+        let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name(&format!("neoclr_value_{i}")) else { panic!("queue service") };
+        pointers.push(module.get_finalized_function(id));
+    }
+    type Run = unsafe extern "C" fn(*const *const u8) -> i32;
+    let run: libloading::Symbol<Run> = unsafe { library.get(b"managed_queue_timers_consumer") }.unwrap();
     assert_eq!(unsafe { run(pointers.as_ptr()) }, 0);
 }
