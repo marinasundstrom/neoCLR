@@ -512,7 +512,10 @@ pub(crate) fn compile_into(
         let admitted = details.is_some_and(|d|
             d.string_concat.contains(&i) || d.string_byte_count.contains(&i)
             || d.string_compare_canonical.contains(&i) || d.string_compare_ignore_case.contains(&i)
-            || d.string_starts_with_ordinal.contains(&i));
+            || d.string_starts_with_ordinal.contains(&i)
+            || d.byte_memory_create.contains(&i) || d.byte_memory_slice.contains(&i)
+            || d.byte_memory_length.contains(&i) || d.byte_view_get.contains(&i)
+            || d.byte_view_set.contains(&i) || d.byte_view_utf8.contains(&i));
         f.pinvoke.is_some() || ((f.is_internal_call() || gc_points::native_body(&p, i, details)) && !admitted)
     }) {
         return Err("experimental live stores reject unaudited native replacement bodies".into());

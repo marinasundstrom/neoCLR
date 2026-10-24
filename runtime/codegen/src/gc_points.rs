@@ -15,7 +15,10 @@ pub(super) fn native_body(
         return true;
     }
     details.is_some_and(|d| {
-        d.console_terminal.iter().any(|(index, _)| *index == i)
+        // The noncollecting UTF-8 view leaf needs a framed store boundary when
+        // its managed result is published through live-GC checked stores.
+        (d.experimental_live_gc_stores && d.byte_view_utf8.contains(&i))
+            || d.console_terminal.iter().any(|(index, _)| *index == i)
             || d.tls.contains_key(&i)
             || d.cryptography.contains_key(&i)
             || d.primitive_parsers.contains_key(&i)

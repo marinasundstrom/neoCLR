@@ -1088,3 +1088,113 @@ fn run_managed(source: &str) {
         assert_eq!(unsafe { run(pointers[0], pointers[1], pointers[2], pointers[3], pointers[4]) }, 0);
     }
 }
+
+fn byte_view_input() -> (neoclr::Module, crate::fault_details::Options) {
+    use neoclr::metadata::{MemoryViewKind, Type};
+    let mut input = neoclr::assemble(".module LiveByteViews\n.function Main(Int32 value) -> Int32\nldarg value\nret\n.end").unwrap();
+    let mut main = input.functions.pop().unwrap();
+    main.definition = None;
+    for (kind, name) in [(MemoryViewKind::Slice, "ByteSlice"), (MemoryViewKind::ReadOnlySlice, "ReadOnlyByteSlice"), (MemoryViewKind::Memory, "ByteMemory"), (MemoryViewKind::ReadOnlyMemory, "ReadOnlyByteMemory")] {
+        let mut ty = crate::memory_views::test_module(kind, Type::Byte).types.remove(0);
+        ty.name = name.into();
+        ty.definition = None;
+        input.types.push(ty);
+    }
+    let slice = Type::Named("ByteSlice".into());
+    let readonly = Type::Named("ReadOnlyByteSlice".into());
+    let bytes = Type::ArrayRef(Box::new(Type::Byte));
+    let contracts = [
+        ("neoCLR.Runtime.ViewCreateSlice", vec![bytes.clone()], slice.clone(), false),
+        ("neoCLR.Runtime.ViewCreateSlice", vec![bytes.clone(), Type::Int32, Type::Int32], slice.clone(), false),
+        ("neoCLR.Runtime.ViewSlice", vec![slice.clone(), Type::Int32, Type::Int32], slice.clone(), false),
+        ("neoCLR.Runtime.ViewGet", vec![slice.clone(), Type::Int32], Type::Byte, false),
+        ("neoCLR.Runtime.ViewSet", vec![slice.clone(), Type::Int32, Type::Byte], Type::Void, true),
+        ("neoCLR.Runtime.ViewLength", vec![slice], Type::Int32, false),
+        ("neoCLR.Runtime.ViewUtf8", vec![Type::String], readonly, false),
+        ("neoCLR.Runtime.ViewCreateMemory", vec![bytes.clone()], Type::Named("ByteMemory".into()), false),
+        ("neoCLR.Runtime.ViewCreateReadOnlyMemory", vec![bytes], Type::Named("ReadOnlyByteMemory".into()), false),
+    ];
+    let mut rows = vec![];
+    for (index, (name, parameters, returns, no_result)) in contracts.into_iter().enumerate() {
+        // Private compiled names avoid rebinding bundled System. The real binding
+        // validator checks each reserved source name and closed view signature.
+        let compiled = format!("LiveByteViews.Service{index}");
+        input.functions.push(serde_json::from_value(serde_json::json!({
+            "name":compiled,"parameters":parameters,"returns":returns,
+            "no_result":no_result,"impl_flags":4096
+        })).unwrap());
+        rows.push(serde_json::json!({"name":name,"compiledName":compiled,"compiledIndex":index}));
+    }
+    assert_eq!(crate::memory_views::bind(&mut input, &serde_json::json!({"functions":rows}), true).unwrap().len(), 9);
+    input.functions.push(main);
+    let mut options = managed_options();
+    options.byte_memory_create = vec![0, 1, 7, 8];
+    options.byte_memory_slice = vec![2];
+    options.byte_view_get = vec![3];
+    options.byte_view_set = vec![4];
+    options.byte_memory_length = vec![5];
+    options.byte_view_utf8 = vec![6];
+    (input, options)
+}
+
+fn export_byte_views(module: &mut ObjectModule) {
+    for index in 0..9 {
+        let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name(&format!("neoclr_value_{index}")) else { panic!("view body") };
+        let signature = module.declarations().get_function_decl(id).signature.clone();
+        let export = module.declare_function(&format!("live_view_{index}"), Linkage::Export, &signature).unwrap();
+        let mut context = module.make_context();
+        context.func.signature = signature;
+        let callee = module.declare_func_in_func(id, &mut context.func);
+        let mut fb = FunctionBuilderContext::new();
+        let mut b = FunctionBuilder::new(&mut context.func, &mut fb);
+        let entry = b.create_block();
+        b.append_block_params_for_function_params(entry);
+        b.switch_to_block(entry);
+        let args = b.block_params(entry).to_vec();
+        let call = b.ins().call(callee, &args);
+        let status = b.inst_results(call)[0];
+        b.ins().return_(&[status]);
+        b.seal_all_blocks();
+        b.finalize();
+        module.define_function(export, &mut context).unwrap();
+    }
+}
+
+#[test]
+fn managed_byte_views_emit_guarded_results() {
+    let (input, mut options) = byte_view_input();
+    for enabled in [false, true] {
+        options.experimental_live_gc_stores = enabled;
+        let mut module = ObjectModule::new(ObjectBuilder::new(isa(target(), true), "views", cranelift_module::default_libcall_names()).unwrap());
+        crate::compiler::values::compile_into(&input,"Main",Some(&options),crate::compiler::Target::MacosArm64,&mut module,false).unwrap();
+        export_byte_views(&mut module);
+        let bytes = module.finish().emit().unwrap();
+        let object = object::File::parse(bytes.as_slice()).unwrap();
+        assert_eq!(object.symbols().any(|s| s.is_undefined() && s.name().unwrap_or("").trim_start_matches('_') == "experiment_gc_store"), enabled);
+        if enabled {
+            if let Some(path) = std::env::var_os("NEOCLR_MUTATION_MANAGED_OBJECT") { std::fs::write(path, bytes).unwrap(); }
+        }
+    }
+}
+
+#[test]
+#[ignore = "requires managed byte-view host built by validate-managed-byte-views.py"]
+fn managed_byte_views_run_on_live_collector() {
+    let library = std::sync::Arc::new(unsafe { libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host")) }.unwrap());
+    unsafe { crate::mutation_admission::require_managed_host(&library) }.unwrap();
+    let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
+    let resolver = library.clone();
+    builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
+    let mut code = Code(Some(JITModule::new(builder)));
+    let module = code.0.as_mut().unwrap();
+    let (input, options) = byte_view_input();
+    crate::compiler::values::compile_into(&input,"Main",Some(&options),crate::compiler::Target::MacosArm64,module,true).unwrap();
+    module.finalize_definitions().unwrap();
+    let pointers: Vec<_> = (0..9).map(|index| {
+        let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name(&format!("neoclr_value_{index}")) else { panic!("view body") };
+        module.get_finalized_function(id)
+    }).collect();
+    type Run = unsafe extern "C" fn(*const *const u8) -> i32;
+    let run: libloading::Symbol<Run> = unsafe { library.get(b"managed_byte_view_consumer") }.unwrap();
+    assert_eq!(unsafe { run(pointers.as_ptr()) }, 0);
+}
