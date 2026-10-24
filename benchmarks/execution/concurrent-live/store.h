@@ -2,6 +2,12 @@
  * supplies a valid native destination; out-of-arena storage is trusted stack or
  * host storage, not permission to mutate a different managed heap. */
 static _Thread_local uint64_t live_store_counts[5]; /* outside, inactive/new, guarded old, cancelled, rejected */
+static void live_store_cancel_epoch(void) {
+        candidate_dispose();
+        candidate_context=NULL;
+        candidate_active=0;
+        live_store_counts[3]++;
+}
 int experiment_gc_store(neoclr_aot_context *context, void *destination,
                        uint64_t bits, uint32_t width) {
     if (!context || owned_heap.arena != &context->text || !valid(&context->text) ||
@@ -70,10 +76,7 @@ located:;
         /* No root walk, sweep, cleanup or managed callback here. Discard
          * detached work before writing; future collection needs a normal
          * root-published boundary. Temporaries may be unpublished now. */
-        candidate_dispose();
-        candidate_context=NULL;
-        candidate_active=0;
-        live_store_counts[3]++;
+        live_store_cancel_epoch();
         memcpy(destination,value,width);
         return 0;
     }
@@ -86,4 +89,35 @@ rejected:
 }
 void experiment_gc_store_counts(uint64_t *out) {
     memcpy(out,live_store_counts,sizeof(live_store_counts));
+}
+
+/* Trusted generated source is a compiler-owned stack snapshot, never an alias
+ * into the destination. Publish payload and initialization marker together. */
+int experiment_gc_store_record(neoclr_aot_context *context, void *array,
+    uint32_t index, const void *source, uint32_t width) {
+    if (!context || owned_heap.arena!=&context->text || !array || !source ||
+        (candidate_active && candidate_context!=context)) return 3;
+    uint64_t bytes; uint32_t kind;
+    if (neoclr_gc_allocation_info_v1(context,array,&bytes,&kind) ||
+        kind!=NEOCLR_GC_RECORDS || bytes<24) return 3;
+    uint64_t header[3]; memcpy(header,array,24);
+    uint64_t length=header[1],lanes=header[2];
+    if ((uint32_t)header[0]!=UINT32_C(0x80000005) ||
+        (header[0]>>32)>NEOCLR_NATIVE_TYPE_LIMIT ||
+        ((header[0]>>32) && lanes!=1) || !lanes || lanes>NEOCLR_NATIVE_LAYOUT_LANES ||
+        width!=lanes || length>65536 || index>=length ||
+        length>(bytes-24)/(lanes*8+1)) return 3;
+    unsigned char initialized=1;
+    mutation_patch patches[2]={{24+index*lanes*8,lanes*8,source},
+        {24+length*lanes*8+index,1,&initialized}};
+    if (candidate_active && shadow_find(shadow_owner->job,(uintptr_t)array)!=SIZE_MAX) {
+        int status=live_write_known(array,bytes,kind,patches,2);
+        if (status==GATE_CANCELLED) live_store_cancel_epoch();
+        else if (status) return 3;
+        else { live_store_counts[2]++; return 0; }
+    }
+    for (unsigned i=0;i<2;i++)
+        memcpy((unsigned char *)array+patches[i].offset,patches[i].source,patches[i].length);
+    live_store_counts[1]++;
+    return 0;
 }

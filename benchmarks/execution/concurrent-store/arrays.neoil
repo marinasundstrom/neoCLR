@@ -1,0 +1,34 @@
+.module LiveArrays
+.type class Node
+.field Next Node
+.end
+.function Dummy(Int32 value) -> Int32
+ldarg value
+ret
+.end
+.function Write(arrayref<Node> first,arrayref<Node> second,Node value) -> Int32
+.local arrayref<Node> temp
+ldc.i4 1
+newarr Node
+stloc temp
+ldloc temp
+ldc.i4 0
+ldarg value
+stelem Node
+ldarg first
+ldc.i4 0
+ldloc temp
+ldc.i4 0
+ldelem Node
+stelem Node
+ldarg second
+ldc.i4 0
+ldarg value
+stelem Node
+ldc.i4 0
+ret
+.end
+.function Main(Int32 value) -> Int32
+ldarg value
+ret
+.end

@@ -504,6 +504,11 @@ pub(crate) fn compile_into(
     p.boxed_interfaces = details
         .map(|d| d.boxed_interfaces.clone())
         .unwrap_or_default();
+    if live_stores && input.functions.iter().any(|f| f.body.iter().any(|op|
+        matches!(op, Op::StoreArrayElement(neoclr::metadata::Type::String
+            | neoclr::metadata::Type::Char | neoclr::metadata::Type::Function(_))))) {
+        return Err("live stores require grouped publication for text/callable arrays".into());
+    }
     if live_stores && input.functions.iter().enumerate().any(|(i,f)|
         f.is_internal_call() || f.pinvoke.is_some() || gc_points::native_body(&p,i,details)) {
         return Err("experimental live stores reject unaudited native replacement bodies".into());
@@ -4771,9 +4776,38 @@ pub(crate) fn compile_into(
                         if let Some(value) = value {
                             // Publish initialization only after the complete snapshot is stored.
                             // There is no collector boundary between these instructions.
-                            write_typed(&mut b, &p, &ty, address, &value);
-                            let initialized = b.ins().iconst(types::I8, 1);
-                            b.ins().store(MemFlags::new(), initialized, marker, 0);
+                            if live_stores && !crate::selection::scalar_array_element(t) {
+                                let snapshot = slot(&mut b, (width * 8) as u32);
+                                let source = b.ins().stack_addr(types::I64, snapshot, 0);
+                                // Narrow lanes must not copy uninitialized stack padding.
+                                let zero = b.ins().iconst(types::I64, 0);
+                                for lane in 0..width {
+                                    b.ins().stack_store(zero, snapshot, (lane * 8) as i32);
+                                }
+                                write_typed(&mut b, &p, &ty, source, &value);
+                                let mut signature = module.make_signature();
+                                signature.params.extend(
+                                    [types::I64, types::I64, types::I32, types::I64, types::I32]
+                                        .map(AbiParam::new),
+                                );
+                                signature.returns.push(AbiParam::new(types::I32));
+                                let helper = module.declare_function(
+                                    "experiment_gc_store_record", Linkage::Import, &signature,
+                                )?;
+                                let helper = module.declare_func_in_func(helper, b.func);
+                                let ordinal = b.ins().ireduce(types::I32, index);
+                                let lanes = b.ins().iconst(types::I32, width as i64);
+                                let call = b.ins().call(helper, &[
+                                    fault_context.unwrap(), array, ordinal, source, lanes,
+                                ]);
+                                let status = b.inst_results(call)[0];
+                                let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                                return_if_detailed(&mut b, failed, status, site.as_ref());
+                            } else {
+                                write_typed(&mut b, &p, &ty, address, &value);
+                                let initialized = b.ins().iconst(types::I8, 1);
+                                b.ins().store(MemFlags::new(), initialized, marker, 0);
+                            }
                         } else {
                             let initialized = b.ins().load(types::I8, MemFlags::new(), marker, 0);
                             let unreadable = b.ins().icmp_imm(IntCC::Equal, initialized, 0);

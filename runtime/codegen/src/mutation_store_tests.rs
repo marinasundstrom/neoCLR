@@ -762,6 +762,20 @@ fn ordinary_value_pipeline_lowers_only_when_opted_in() {
 fn managed_construction_emits_guarded_stores() {
     emit_managed(include_str!("../../../benchmarks/execution/concurrent-store/construction.neoil"));
 }
+#[test]
+fn managed_arrays_emit_grouped_stores() {
+    let source = include_str!("../../../benchmarks/execution/concurrent-store/arrays.neoil");
+    emit_managed(source);
+    let input = neoclr::assemble(&source.replace("stelem Node", "stelem String")).unwrap();
+    let mut module = ObjectModule::new(ObjectBuilder::new(
+        isa(target(), true), "reject-array", cranelift_module::default_libcall_names(),
+    ).unwrap());
+    let error = crate::compiler::values::compile_into(
+        &input, "Main", Some(&managed_options()), crate::compiler::Target::MacosArm64,
+        &mut module, false,
+    ).unwrap_err();
+    assert!(error.to_string().contains("grouped publication for text/callable arrays"));
+}
 fn emit_managed(source: &str) {
     let input = neoclr::assemble(source).unwrap();
     for enabled in [false, true] {
@@ -824,6 +838,10 @@ fn emit_managed(source: &str) {
         }
 
         let object = object::File::parse(bytes.as_slice()).unwrap();
+        if source.contains("stelem") {
+            assert_eq!(object.symbols().any(|s| s.is_undefined()
+                && s.name().unwrap_or("").trim_start_matches('_') == "experiment_gc_store_record"), enabled);
+        }
         assert_eq!(
             object.symbols().any(|s| s.is_undefined()
                 && s.name().unwrap_or("").trim_start_matches('_') == "experiment_gc_store"),
@@ -861,6 +879,11 @@ fn managed_pipeline_runs_on_live_collector() {
 #[ignore = "requires construction host built by validate-construction.py"]
 fn managed_construction_runs_on_live_collector() {
     run_managed(include_str!("../../../benchmarks/execution/concurrent-store/construction.neoil"));
+}
+#[test]
+#[ignore = "requires array host built by validate-arrays.py"]
+fn managed_arrays_run_on_live_collector() {
+    run_managed(include_str!("../../../benchmarks/execution/concurrent-store/arrays.neoil"));
 }
 fn run_managed(source: &str) {
     let path = std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host");

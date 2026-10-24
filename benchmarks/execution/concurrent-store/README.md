@@ -296,3 +296,51 @@ and owner-thread allocation remain provisional implementation choices. Array/nat
 service writers, full host entry and HTTP workloads remain unqualified. This result
 admits object construction to the internal experimental path; it does not enable
 production concurrent GC or demonstrate a throughput gain.
+
+
+## Grouped reference-array publication
+
+The internal compiler now emits `experiment_gc_store_record` for traced record-layout
+array element stores. A compiler stack snapshot holds the whole element; zeroing
+its padding prevents narrow lanes from copying uninitialized bytes. The noncollecting
+helper validates allocation kind, immutable shape, width and index, then publishes
+payload and initialization marker in one mutation-gate transaction. New/inactive
+allocations copy directly. If the bounded barrier log cannot hold the transaction,
+it cancels/joins the epoch before copying, without collecting unpublished temporaries.
+The scalar adapter shares this cancellation path. Snapshot stack space, zeroing and
+helper calls are additional costs, not a demonstrated performance improvement.
+
+The rooted nominal-reference-array allocator is now in the explicit provider list.
+It reserves fresh record-layout storage and initializes its null slots/markers before
+returning, without a callback after reservation. Typed array identity stores remain
+on the new-allocation path. Text/character/callable array stores are rejected on the
+internal live path pending their grouped publication integration. Ordinary compilation
+and managed array semantics are unchanged. The new private helper must exist in the
+matching host; this is not a public switch or general native-provider admission.
+
+`arrays.neoil` allocates a temporary reference array, writes/reads an element, then
+publishes it into two existing arrays. Forced/paced JIT and optimized/UBSan AOT run
+100 cycles each: initialized null slots, uninitialized slots, first-array bounds
+failure and second-array bounds failure. Checks cover marker publication, transitive
+liveness, exact old-array transaction counts, temporary-array writes, fault/root-chain
+cleanup and final reclamation. A second-array failure preserves the already completed
+first write, as normal sequential semantics require. Native grouped-helper tests cover
+1/2/32/65-lane elements, rejected extents/widths and cancellation for a transaction
+larger than the log. Wider managed record/structural arrays remain to be qualified.
+
+The records helper follows the existing CLR/Go compiler/runtime bulk-barrier research
+in the mutation audit. neoCLR's conservative layout and initialization markers require
+broader grouped snapshots than a precise reference-only barrier; this is a provisional
+cost. Future native layout/provenance metadata should narrow coverage when validated.
+Runtime Contract configuration, Raven semantics and temporary CLI representation are
+unchanged. Full host entry, additional native-service writers and HTTP remain open.
+
+Evidence: `arrays-validation.json.gz` (600 managed cycles), `arrays-compiler-tests.json.gz`
+(13 compiler tests and four root controls), `arrays-native-validation.json.gz` (including
+400 grouped native cycles, broader native fixtures and deletion-barrier negative control),
+`arrays-construction-regression.json.gz` and `arrays-scheduling-regression.json.gz`.
+Generated objects and explicit/automatic collector sources are archived alongside them.
+The initial assembly fixture incorrectly used value-array syntax `Node[]`; it now uses
+`arrayref<Node>`. An initial overflow assertion used exactly 64 lanes, which fit the log;
+65 lanes correctly exercise cancellation. Both initial failures are retained. No
+throughput measurements or default switch are claimed.
