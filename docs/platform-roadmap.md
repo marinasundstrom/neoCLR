@@ -17,6 +17,10 @@ An [explicit snapshot/remark candidate](../benchmarks/execution/concurrent-remar
 now performs real owner-thread reclamation with background marks, but its native
 workload CPU regression rejects full copying/comparison as the default performance
 architecture. Retain the reference while developing a cheaper read/mutation protocol.
+The [automatic owned-heap experiment](../benchmarks/execution/concurrent-integration/README.md)
+now passes plain/JSON JIT/AOT execution and shutdown, with sparse lookup reducing
+prototype overhead. Its one-owner plaintext capacity still regresses; keep the
+synchronous default while reducing work and extending safety/measurement coverage.
 
 **Author-directed media types (2026-10-23):** Complete the bounded HTTP value-contract
 slice with cached typed presets, lazy structured projections, shared primitive

@@ -18,6 +18,9 @@ static void candidate_dispose(void) {
     shadow_snapshot *s = w->job;
     w->job = NULL;
     if (pthread_mutex_unlock(&w->mutex)) abort();
+#ifdef NEOCLR_SHADOW_SPARSE_INDEX
+    free(s->starts);
+#endif
     free(s->edges); free(s->pending); free(s->offsets);
     free(s->expected); free(s->marked); free(s->data); free(s);
 }

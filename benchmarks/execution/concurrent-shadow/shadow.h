@@ -9,6 +9,10 @@ typedef struct {
     uintptr_t base;
     unsigned char *data, *marked, *expected;
     uint64_t used, *offsets, *pending;
+#ifdef NEOCLR_SHADOW_SPARSE_INDEX
+    size_t *starts;
+    unsigned index_capacity, index_shift;
+#endif
     size_t count, pending_count, edge_count, edge_capacity;
     shadow_edge *edges;
     int reference_valid, valid;
@@ -42,6 +46,10 @@ static void *shadow_alloc(size_t count, size_t bytes) {
 static size_t shadow_find(const shadow_snapshot *s, uint64_t word) {
     if (word < s->base || word - s->base >= s->used) return SIZE_MAX;
     uint64_t offset = word - s->base;
+#ifdef NEOCLR_SHADOW_SPARSE_INDEX
+    size_t i = s->starts[offset >> s->index_shift];
+    while (i + 1 < s->count && s->offsets[i + 1] <= offset) i++;
+#else
     size_t low = 0, high = s->count;
     while (low < high) {
         size_t mid = low + (high - low) / 2;
@@ -50,6 +58,7 @@ static size_t shadow_find(const shadow_snapshot *s, uint64_t word) {
     }
     if (!low) return SIZE_MAX;
     size_t i = low - 1;
+#endif
     const block *b = (const void *)(s->data + s->offsets[i]);
     uint64_t payload = s->offsets[i] + sizeof(block);
     return (b->state & ALLOCATED) && offset >= payload && offset - payload < b->bytes ? i : SIZE_MAX;
@@ -135,6 +144,9 @@ static void shadow_drain(void) {
         shadow_stats[0]++;
     } else shadow_stats[4]++;
     shadow_stats[3] += s->cpu_ns;
+#ifdef NEOCLR_SHADOW_SPARSE_INDEX
+    free(s->starts);
+#endif
     free(s->edges); free(s->pending); free(s->offsets);
     free(s->expected); free(s->marked); free(s->data); free(s);
 }
@@ -178,6 +190,22 @@ static void shadow_begin(neoclr_aot_context *context,
         s->offsets[n++] = at;
         at += b->span;
     }
+#ifdef NEOCLR_SHADOW_SPARSE_INDEX
+    /* Same population threshold and minimum bucket width as the live collector.
+     * Buckets hold detached block ordinals, never addresses in the live arena. */
+    s->index_capacity = s->count > 2048 ? 4096 : 256;
+    s->index_shift = 6;
+    while (s->used && ((s->used - 1) >> s->index_shift) >= s->index_capacity)
+        s->index_shift++;
+    s->starts = shadow_alloc(s->index_capacity, sizeof(size_t));
+    unsigned bucket = 0;
+    for (size_t i = 0; i < s->count; i++) {
+        const block *b = (const void *)(s->data + s->offsets[i]);
+        uint64_t end = s->offsets[i] + b->span;
+        while (bucket < s->index_capacity && ((uint64_t)bucket << s->index_shift) < end)
+            s->starts[bucket++] = i;
+    }
+#endif
     /* Production has seeded every strong root and intern before this capture.
      * Copy the seed bits, not queue links into the original arena. */
     for (size_t i = 0; i < s->count; i++) {

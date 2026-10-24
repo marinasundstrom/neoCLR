@@ -8,6 +8,7 @@ import subprocess
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--output', type=Path, required=True)
 parser.add_argument('--sanitizers', nargs='+', default=['none', 'undefined,bounds'])
+parser.add_argument('--sparse-index', action='store_true')
 args = parser.parse_args()
 root = Path(__file__).resolve().parents[3]
 out = args.output.resolve()
@@ -24,6 +25,7 @@ try:
     run(['python3', Path(__file__).with_name('generate.py'), '--output', source])
     recipe = json.loads((root / 'benchmarks/execution/call-layout/results.json').read_text())['builds'][1]['command']
     cc = recipe[:recipe.index('-std=c11')]
+    if args.sparse_index: cc += ['-DNEOCLR_SHADOW_SPARSE_INDEX']
     # Drain each external-heap fixture's final job before process shutdown.
     tail = out / 'drain.c'
     tail.write_text('#include <stdint.h>\n#include <stdio.h>\nextern void experiment_gc_shadow(uint64_t *);\n__attribute__((destructor)) static void drain(void) { uint64_t s[5]; experiment_gc_shadow(s); fprintf(stderr,"SHADOW %llu %llu\\n",(unsigned long long)s[0],(unsigned long long)s[4]); }\n')

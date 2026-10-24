@@ -111,3 +111,10 @@ selection remain open under the original author-directed goal.
 python3 benchmarks/execution/concurrent-remark/validate.py --output target/remark-new/validation
 python3 benchmarks/execution/concurrent-remark/measure.py --output target/remark-new/measurement
 ```
+
+
+Follow-up: [sparse lookup and automatic integration](../concurrent-integration/README.md)
+reduce the detached lookup overhead and qualify ordinary JIT/AOT HTTP lifecycles.
+The 3.69× result above measures the complete original prototype, not copying alone.
+The updated candidate still regresses native CPU and HTTP capacity; no default
+change follows from functional integration.

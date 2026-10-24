@@ -6,6 +6,7 @@ import subprocess
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--output', type=Path, required=True)
+parser.add_argument('--sparse-index', action='store_true')
 args = parser.parse_args()
 root = Path(__file__).resolve().parents[3]
 base = Path(__file__).resolve().parent
@@ -22,6 +23,7 @@ try:
     run(['python3', base/'generate.py', '--output', source])
     recipe = json.loads((root/'benchmarks/execution/call-layout/results.json').read_text())['builds'][1]['command']
     cc = recipe[:recipe.index('-std=c11')]
+    if args.sparse_index: cc += ['-DNEOCLR_SHADOW_SPARSE_INDEX']
     for sanitizer in [False, True]:
         for case in ['lifetime', 'native-gc-test', 'native-gc-scan-test', 'native-gc-dense-test', 'native-gc-seed-test']:
             fixture = base/'lifetime.c'

@@ -6,6 +6,7 @@ import subprocess
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--output', type=Path, required=True)
+parser.add_argument('--sparse-index', action='store_true')
 args = parser.parse_args()
 base = Path(__file__).resolve().parent
 root = base.parents[2]
@@ -21,6 +22,7 @@ try:
     run(['python3',base/'generate.py','--output',source])
     recipe=json.loads((root/'benchmarks/execution/call-layout/results.json').read_text())['builds'][1]['command']
     cc=recipe[:recipe.index('-std=c11')]
+    if args.sparse_index: cc += ['-DNEOCLR_SHADOW_SPARSE_INDEX']
     exe=out/'benchmark'
     run(cc+['-std=c11','-O2','-Wall','-Wextra','-Werror','-pthread','-DNEOCLR_NATIVE_GC','-I',root/'runtime/native/gc',base/'benchmark.c',root/'runtime/native/gc/root-probe.c',source,'-o',exe])
     for mode in ['sync','concurrent','concurrent','sync']:

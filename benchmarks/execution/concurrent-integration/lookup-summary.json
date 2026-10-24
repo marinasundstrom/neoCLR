@@ -1,0 +1,47 @@
+{
+  "binary": {
+    "sync": {
+      "wallNanoseconds": [
+        868308000,
+        861168000
+      ],
+      "cpuNanoseconds": [
+        864895000,
+        861175000
+      ]
+    },
+    "concurrent": {
+      "wallNanoseconds": [
+        2796776000,
+        2791341000
+      ],
+      "cpuNanoseconds": [
+        3191231000,
+        3189719000
+      ]
+    }
+  },
+  "sparse": {
+    "sync": {
+      "wallNanoseconds": [
+        857712000,
+        857946000
+      ],
+      "cpuNanoseconds": [
+        857694000,
+        857902000
+      ]
+    },
+    "concurrent": {
+      "wallNanoseconds": [
+        1589771000,
+        1514537000
+      ],
+      "cpuNanoseconds": [
+        1895276000,
+        1899423000
+      ]
+    }
+  },
+  "candidateCpuReductionPercent": 40.53081437716954
+}

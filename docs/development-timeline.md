@@ -22435,3 +22435,13 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   automatic execution integration and a cheaper protocol remain unfinished.
   This is an assistant experiment under continuation, not a new author decision.
   [Evidence](../benchmarks/execution/concurrent-remark/README.md).
+
+- Assistant separates detached lookup cost from copying: sparse indexing reduces
+  candidate native-workload CPU about 41%, revising the attribution of the previous
+  whole-prototype regression. The automatic owned-heap integration initially fails
+  activation checks, then shutdown. Diagnostics identify intern retirement changing
+  descriptor kinds; cancellation before retirement fixes it. Long plain/JSON JIT/AOT
+  runs complete 4,163 concurrent epochs over 4,096 responses. Matched one-owner AOT
+  capacity still loses 13.7% throughput and uses 13.4% more CPU/response.
+  Assistant keeps the synchronous default and records pause-accounting/platform/
+  broader-workload gaps. [Evidence](../benchmarks/execution/concurrent-integration/README.md).
