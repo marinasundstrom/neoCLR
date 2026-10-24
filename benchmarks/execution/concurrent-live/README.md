@@ -263,3 +263,35 @@ conditional-root research still applies. Full generated callback/entry integrati
 remaining native services, shared heaps, race-detector coverage and HTTP/standalone
 performance comparisons remain open. These runs measure correctness, not throughput
 or CPU; do not extrapolate their small fixture timings to server performance.
+
+
+## Entry admission and owned arena reuse (2026-10-24)
+
+Inspection of the generated public entry found a transition absent from the live
+candidate: successful `neoclr_gc_entry_check_v1` could leave an epoch active before
+entry resets the arena cursor. The automatic candidate now cancels and joins the
+marker after admission checks succeed. It does not collect or reclaim objects at
+that boundary. Rejected reentry leaves the epoch and host-owned objects intact.
+Production synchronous behavior and compiler admission are unchanged.
+
+`validate-entry-boundary.py --output <fresh-directory>` passes 400 native cycles
+across forced/paced optimized and undefined-bounds builds. Each checks host-root
+rejection, accepted-entry cancellation, unchanged object contents, coordinated
+collection/reuse and invocation completion. A negative control removes only the
+entry cancellation and fails because the marker remains active. The generated
+memory socket regression also passes all 192 JIT/AOT loopback cases.
+
+The initial test tried to imitate the generated cursor reset directly on an owned
+heap. Allocation correctly rejected the mismatch with `owned_heap.used`. The final
+test uses collection before reuse; it does **not** claim to qualify the generated
+entry. Full-entry integration must replace the direct cursor/static-storage resets
+with an owned-heap-aware transition, include the entry in store lowering/call-closure
+validation, and qualify fault/output/root lifetimes. Generated pump/queue/bootstrap
+paths remain open. Preserve the initial failure and final reports as `entry-boundary-*`.
+
+The existing CLR safepoint/root-transition comparison applies: a marker cannot read
+storage concurrently with its retirement/reuse. This experimental cancellation
+protocol can discard marking work and add join latency; no throughput benefit is
+claimed. neoCLR's invocation-scoped arena is an existing experimental host contract,
+not CLR's process-wide heap lifetime. HTTP/standalone measurements and the default
+switch remain gated on full integration and correctness evidence.

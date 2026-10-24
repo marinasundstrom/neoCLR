@@ -22,6 +22,10 @@ s = '#include <stdint.h>\n#ifndef NEOCLR_GC_PROFILE\n#error Experimental pacing 
 replace('static _Thread_local int candidate_active;', 'static _Thread_local int candidate_active, candidate_autostart;\nstatic void candidate_cancel(void);\nstatic _Thread_local uint64_t candidate_counts[5];',1)
 replace('    if (candidate_active) return 3;\n    shadow_stop();', '    if (candidate_active) candidate_cancel();\n    shadow_stop();',1)
 replace('    /* Removing pool ownership never frees an exposed String.', '    if (candidate_active) candidate_cancel();\n    /* Removing pool ownership never frees an exposed String.', 1)
+# A successful public entry is followed by arena reset in generated code. Join
+# the old marker first; rejected reentry must retain its current epoch/roots.
+needle = '    return 0;\n}\nint32_t neoclr_gc_owned_roots_check_v1'
+replace(needle, '    if (candidate_active) candidate_cancel(); /* admitted entry resets the arena */\n' + needle)
 # Explicit/pressure operations finish and synchronously recheck the current
 # context. Context changes discard detached state without freeing old-heap objects.
 needle = 'int32_t neoclr_gc_collect_conditional_v1(neoclr_aot_context *context,\n    const neoclr_probe_frame *head, neoclr_gc_conditional_root *conditional, uint32_t count) {'
