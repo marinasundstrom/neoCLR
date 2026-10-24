@@ -517,6 +517,8 @@ pub(crate) fn compile_into(
             || d.byte_memory_length.contains(&i) || d.byte_view_get.contains(&i)
             || d.byte_view_set.contains(&i) || d.byte_view_utf8.contains(&i)
             || d.runtime_async_create.contains(&i) || d.runtime_async_start.contains(&i)
+            || d.runtime_async_createowned.contains(&i) || d.runtime_async_currentowner.contains(&i)
+            || d.runtime_async_startmanaged.contains(&i)
             || d.runtime_async_completeunit.contains(&i)
             || d.runtime_async_awaitunit.contains(&i) || d.runtime_async_release.contains(&i)
             || d.runtime_async_iscompleted.contains(&i) || d.runtime_async_waitcompletion.contains(&i));

@@ -1,9 +1,17 @@
 .module LiveAsyncWrappers
+.type class abstract System.Object
+.end
 .type class Counter
+.extends System.Object
 .field Number Int32
 .field Buffer arrayref<Byte>
 .field Operation Int64
+.field ObservedOwner System.Object
+.field Body Int64
 .method instance Run() -> Void
+ldarg 0
+call neoCLR.Runtime.RuntimeAsyncCurrentOwner()
+stfld Counter::ObservedOwner
 ldarg 0
 ldfld Counter::Operation
 call neoCLR.Runtime.RuntimeAsyncAwaitUnit(Int64)
@@ -44,6 +52,15 @@ ret
 .methodimpl InternalCall
 .end
 .function neoCLR.Runtime.RuntimeAsyncStart(fn<Void> callback) -> Int64
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.RuntimeAsyncCreateOwned(System.Object owner) -> Int64
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.RuntimeAsyncCurrentOwner() -> System.Object
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.RuntimeAsyncStartManaged(System.Object owner,fn<Void> callback) -> Int64
 .methodimpl InternalCall
 .end
 .function Write(Counter value) -> Int32

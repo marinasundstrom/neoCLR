@@ -109,8 +109,10 @@ JIT/AOT tests cover receiver allocations under pressure, faults, rejection and r
 restoration. Six generated async operation wrappers now use guarded result publication
 and pass actual suspension/resumption with parked-root collection and allocation
 pressure in JIT/AOT. Generated strong startup now also passes parked-parent/result
-publication, callback failure and shutdown checks. Owned startup, socket results,
-entry pumps/full entry and shared heaps remain unqualified.
+publication, callback failure and shutdown checks. Generated owned startup, operation
+ownership and CurrentOwner now pass JIT/AOT self-reference, abandonment, late-completion
+and null-owner tests, completing the ten async service wrappers in this profile.
+Socket results, entry pumps/full entry and shared heaps remain unqualified.
 Capability conversions, callable arrays, remaining text/byte services and async/full
 host-entry integration remain next;
 the recorded plaintext import inventory guides that coverage.

@@ -791,3 +791,36 @@ outstanding failed operations if the caller has cleared its fault. Correcting th
 expectations preserved existing runtime semantics rather than changing them to fit
 the experiment. No HTTP throughput/default claim; owned startup, socket publication,
 pump/full-entry integration and full workload performance remain open.
+
+
+## Generated owned async startup and owner access (2026-10-24)
+
+CreateOwned, CurrentOwner and StartManaged now join live-GC admission through their
+exact native provider ABIs. The fixture validates all ten reserved async signatures
+with the production binder, using the existing explicit System.Object base shape and
+a derived Counter. These wrappers reuse typed stack results and protected publication.
+Generated startup now drives both strong and owned callbacks; C only pumps the native
+carrier with an idle scheduler. The callback obtains/stores CurrentOwner before it
+suspends, so its receiver may contain a self-reference.
+
+The expanded `validate-async-wrappers.py` passes 600 forced/paced JIT and optimized/
+undefined-bounds AOT cycles: 450 callbacks resume, while 150 owned callbacks are
+abandoned and reclaimed. Dropping the last strong host handle must reclaim the
+self-referential owner and conditionally parked generated frames; later completion
+must not revive that callback. Retained cases cover pressure allocation, callback
+faults, safe heap aliases, null-owner creation/start rejection, CurrentOwner outside
+and inside callbacks, release, restored root chains and zero reserved stacks after
+shutdown. Twenty-one focused compiler tests pass; fourteen host-dependent checks
+are skipped in the general run, with this JIT fixture explicitly run by the harness.
+
+`async-owned-validation.json.gz`, the AOT object and compiler report preserve results.
+The initial C fixture omitted the existing empty-base storage lane, so generated code
+read the wrong operation field and faulted. Correcting its allocation/offsets to the
+actual inherited layout resolved the failure; the report is retained as
+`async-owned-initial-layout-failure.json.gz`. No runtime layout change was made.
+
+All ten async service wrappers are now covered in this controlled owned-heap profile.
+This is not full selection/HTTP admission: generated pump/entry/queue code, socket
+result wrappers, remaining native services and shared heaps still need qualification.
+No new throughput/default claim. Existing CLR ownership/root-transition comparisons
+and CLI/native metadata replacement plans remain unchanged.
