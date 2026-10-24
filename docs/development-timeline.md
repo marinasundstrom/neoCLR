@@ -22308,3 +22308,17 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   type-number-to-GC-map lookup. Producer classification and descriptor lifetime
   remain open implementation work; the author's exploratory suggestion is not
   recorded as approval of a particular new ID encoding.
+
+### 2026-10-24 — Compatibility during experimental runtime development
+
+- Author clarifies that more invasive changes are authorized: backward compatibility
+  is not a concern while neoCLR remains experimental and in its early phases.
+- Assistant accepts this as scope for structural changes to runtime interfaces,
+  metadata identities/layouts and allocation/tracing machinery, rather than a
+  requirement to preserve old encodings or add compatibility adapters. Correctness,
+  GC safety and measured benefits remain requirements; this does not select a
+  particular architecture or remove the .NET semantic comparison requirement.
+- At this clarification, the image-specific precise-object tracing experiment fails
+  during HTTP startup. It remains uncommitted experimental tooling; no successful
+  tracing integration or throughput improvement is claimed. The committed native
+  collector is unchanged by that experiment.

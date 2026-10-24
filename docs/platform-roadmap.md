@@ -1524,7 +1524,14 @@ and lifecycle hooks remain gaps. Typed-object/collection JSON and internal opera
 timing remain open.
 The author also requests a [BenchmarkDotNet-like framework](benchmarking-framework.md),
 combining external process orchestration with Raven workload measurement.
-Experimental API/compiler compatibility may be broken where justified. Compare the
+Experimental API/compiler compatibility may be broken where justified. The author
+clarifies on 2026-10-24 that backward compatibility is not a constraint during
+neoCLR's early experimental development: invasive runtime, metadata and GC interface
+changes are authorized, with correctness, safety and measured validation retained.
+This permits coordinated changes without compatibility-only adapters; it does not
+select an implementation or permanently reprioritize the roadmap. See the
+[conversation record](development-timeline.md#2026-10-24--compatibility-during-experimental-runtime-development).
+Compare the
 scheduler contract with .NET TaskScheduler/ThreadPool and the suspension mechanism
 with compiler-generated async state machines; document benefits, costs and evidence
 before claiming improvements. Evaluate GC roots, cancellation, cleanup, fairness,

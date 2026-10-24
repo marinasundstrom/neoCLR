@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-24
 
+- Record the author's clarification that backward compatibility is not a constraint during experimental neoCLR development, including invasive runtime/metadata/GC interface changes. Preserve correctness, safety and measured validation requirements; no new implementation or performance outcome is implied.
+
 - Lazily index exact metadata definition identities within immutable lookup scopes, preserving module/revision identity, first-row semantics, source tokens and the unscoped fallback. Thirty-two focused tests pass. An isolated repeated-lookup experiment shows a large warm lookup reduction with explicit preparation/memory costs, not an HTTP speedup. Retain evidence and an ordinary-object tracing recipe inventory in benchmarks/execution/definition-index/; raw-token resolution and collector-map registration remain separate work.
 
 - Add opt-in native heap-lookup work counters and retain owned exact-base cache entries for surviving allocations, revoking matching entries before reclamation/reuse. Four-request plaintext/JSON checks reduce base-validation descriptor visits 42.1% and 30.6–31.9%, without increasing cache storage; eight uninstrumented trials establish no convincing throughput gain. Enabled/disabled threaded diagnostics, optimized/sanitized collector and host lifecycle regressions, forced/paced plain/JSON and ordinary JIT/AOT consumers pass. Retain the rejected larger-index experiment and evidence in benchmarks/execution/lookup-profile/. External-heap validation, nonmoving semantics and managed APIs remain unchanged.
