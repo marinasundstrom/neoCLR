@@ -1,0 +1,195 @@
+{
+  "osVersion": {
+    "train": "macOS 27.0",
+    "build": "26A428",
+    "releaseType": "User"
+  },
+  "exception": {
+    "codes": "0x0000000000000001, 0x0000000000000000",
+    "rawCodes": [
+      1,
+      0
+    ],
+    "type": "EXC_BAD_ACCESS",
+    "signal": "SIGSEGV",
+    "subtype": "KERN_INVALID_ADDRESS at 0x0000000000000000"
+  },
+  "termination": {
+    "flags": 0,
+    "code": 11,
+    "namespace": "SIGNAL",
+    "indicator": "Segmentation fault: 11",
+    "byProc": "exc handler",
+    "byPid": 86818
+  },
+  "frames": [
+    {
+      "imageOffset": 426916,
+      "symbol": "__tsan::SlotLock(__tsan::ThreadState*)",
+      "symbolLocation": 28,
+      "imageIndex": 1
+    },
+    {
+      "imageOffset": 476428,
+      "symbol": "__tsan::Release(__tsan::ThreadState*, unsigned long, unsigned long)",
+      "symbolLocation": 48,
+      "imageIndex": 1
+    },
+    {
+      "imageOffset": 537360,
+      "symbol": "wrap_dispatch_once",
+      "symbolLocation": 176,
+      "imageIndex": 1
+    },
+    {
+      "imageOffset": 42840,
+      "symbol": "dyldFrameworkVtable()",
+      "symbolLocation": 44,
+      "imageIndex": 2
+    },
+    {
+      "imageOffset": 20240,
+      "symbol": "dyld_shared_cache_iterate_text",
+      "symbolLocation": 92,
+      "imageIndex": 2
+    },
+    {
+      "imageOffset": 70116,
+      "symbol": "__sanitizer::get_dyld_hdr()",
+      "symbolLocation": 236,
+      "imageIndex": 1
+    },
+    {
+      "imageOffset": 71060,
+      "symbol": "__sanitizer::MemoryMappingLayout::Next(__sanitizer::MemoryMappedSegment*)",
+      "symbolLocation": 148,
+      "imageIndex": 1
+    },
+    {
+      "imageOffset": 531012,
+      "symbol": "__tsan::CheckAndProtect(bool, bool, bool)",
+      "symbolLocation": 172,
+      "imageIndex": 1
+    },
+    {
+      "imageOffset": 529424,
+      "symbol": "__tsan::InitializePlatform()",
+      "symbolLocation": 40,
+      "imageIndex": 1
+    },
+    {
+      "imageOffset": 429980,
+      "symbol": "__tsan::Initialize(__tsan::ThreadState*)",
+      "symbolLocation": 264,
+      "imageIndex": 1
+    },
+    {
+      "imageOffset": 185296,
+      "symbol": "__tsan::ScopedInterceptor::ScopedInterceptor(__tsan::ThreadState*, char const*, unsigned long)",
+      "symbolLocation": 108,
+      "imageIndex": 1
+    },
+    {
+      "imageOffset": 327708,
+      "symbol": "wrap_strlcpy",
+      "symbolLocation": 88,
+      "imageIndex": 1
+    },
+    {
+      "imageOffset": 129760,
+      "symbol": "__guard_setup",
+      "symbolLocation": 132,
+      "imageIndex": 3
+    },
+    {
+      "imageOffset": 129140,
+      "symbol": "_libc_initializer",
+      "symbolLocation": 72,
+      "imageIndex": 3
+    },
+    {
+      "imageOffset": 4876,
+      "symbol": "libSystem_initializer",
+      "symbolLocation": 168,
+      "imageIndex": 4
+    },
+    {
+      "imageOffset": 407384,
+      "symbol": "invocation function for block in dyld4::Loader::findAndRunAllInitializers(dyld4::RuntimeState&) const::$_0::operator()() const",
+      "symbolLocation": 360,
+      "imageIndex": 5
+    },
+    {
+      "imageOffset": 618604,
+      "symbol": "invocation function for block in mach_o::Image::forEachInitializer(void (unsigned int) block_pointer) const",
+      "symbolLocation": 84,
+      "imageIndex": 5
+    },
+    {
+      "imageOffset": 582920,
+      "symbol": "mach_o::Header::SegmentInfo mach_o::Header::parse_segment_command<true>(mach_o::Header::LoadCommandInfo const&, unsigned short, void (mach_o::Header::SegmentInfo const&, mach_o::Header::SectionInfo const&) block_pointer, mach_o::Error*) const",
+      "symbolLocation": 580,
+      "imageIndex": 5
+    },
+    {
+      "imageOffset": 604532,
+      "symbol": "invocation function for block in mach_o::Header::forEachSection(void (mach_o::Header::SectionInfo const&, bool&) block_pointer) const",
+      "symbolLocation": 156,
+      "imageIndex": 5
+    },
+    {
+      "imageOffset": 577540,
+      "symbol": "mach_o::Header::forEachLoadCommand(void (mach_o::Header::LoadCommandInfo const&, bool&) block_pointer, mach_o::Error*) const",
+      "symbolLocation": 228,
+      "imageIndex": 5
+    },
+    {
+      "imageOffset": 594044,
+      "symbol": "mach_o::Header::forEachSection(void (mach_o::Header::SectionInfo const&, bool&) block_pointer) const",
+      "symbolLocation": 128,
+      "imageIndex": 5
+    },
+    {
+      "imageOffset": 618396,
+      "symbol": "mach_o::Image::forEachInitializer(void (unsigned int) block_pointer) const",
+      "symbolLocation": 244,
+      "imageIndex": 5
+    },
+    {
+      "imageOffset": 386580,
+      "symbol": "dyld4::Loader::findAndRunAllInitializers(dyld4::RuntimeState&) const",
+      "symbolLocation": 680,
+      "imageIndex": 5
+    },
+    {
+      "imageOffset": 419240,
+      "symbol": "dyld4::PrebuiltLoader::runInitializers(dyld4::RuntimeState&) const",
+      "symbolLocation": 44,
+      "imageIndex": 5
+    },
+    {
+      "imageOffset": 159280,
+      "symbol": "dyld4::APIs::runAllInitializersForMain()",
+      "symbolLocation": 100,
+      "imageIndex": 5
+    },
+    {
+      "imageOffset": 212244,
+      "symbol": "dyld4::prepare(dyld4::APIs&, mach_o::UnsafeHeader const*)",
+      "symbolLocation": 4724,
+      "imageIndex": 5
+    },
+    {
+      "imageOffset": 207492,
+      "symbol": "dyld4::start(dyld4::KernelArgs*, void*, void*, unsigned long long)::$_1::operator()() const",
+      "symbolLocation": 320,
+      "imageIndex": 5
+    },
+    {
+      "imageOffset": 204324,
+      "symbol": "start",
+      "symbolLocation": 6596,
+      "imageIndex": 5
+    }
+  ]
+}

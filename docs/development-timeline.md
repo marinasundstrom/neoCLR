@@ -22416,3 +22416,12 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   CPU share or a concurrent speedup. The complete standalone matrix, mutation/read
   protocol, concurrent tracing and safe reclamation remain open. The current
   default remains synchronous. [Baseline and requirements](../benchmarks/execution/concurrent-gc-investigation/README.md).
+
+- On the author's instruction to continue without stopping, assistant implements
+  concurrent shadow tracing over immutable captures, with synchronous GC retaining
+  reclamation authority. Delayed tracing after root/heap mutation and storage reuse,
+  existing native fixtures and 4,096 checked HTTP responses pass. Copying and duplicate
+  tracing add work; this is a correctness oracle, not a performance improvement.
+  Thread/AddressSanitizer startup failures reproduce with empty programs on the host
+  and remain explicit validation gaps. Live-heap access, reclamation and the wider
+  workload matrix remain open. [Evidence](../benchmarks/execution/concurrent-shadow/README.md).

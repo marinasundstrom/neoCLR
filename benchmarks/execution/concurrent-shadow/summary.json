@@ -1,0 +1,38 @@
+[
+  {
+    "sample": "plain",
+    "mode": "aot",
+    "requests": 1024,
+    "comparedCollections": 1040,
+    "copiedBytesPerRequest": 82742.5625,
+    "captureMicrosecondsPerRequest": 9.0703125,
+    "backgroundCpuMicrosecondsPerRequest": 23.0057578125
+  },
+  {
+    "sample": "plain",
+    "mode": "jit",
+    "requests": 1024,
+    "comparedCollections": 1033,
+    "copiedBytesPerRequest": 81868.5390625,
+    "captureMicrosecondsPerRequest": 8.2412109375,
+    "backgroundCpuMicrosecondsPerRequest": 21.80697265625
+  },
+  {
+    "sample": "json",
+    "mode": "aot",
+    "requests": 1024,
+    "comparedCollections": 2058,
+    "copiedBytesPerRequest": 182362.1796875,
+    "captureMicrosecondsPerRequest": 21.3291015625,
+    "backgroundCpuMicrosecondsPerRequest": 47.89350390625
+  },
+  {
+    "sample": "json",
+    "mode": "jit",
+    "requests": 1024,
+    "comparedCollections": 2057,
+    "copiedBytesPerRequest": 182305.84375,
+    "captureMicrosecondsPerRequest": 20.146484375,
+    "backgroundCpuMicrosecondsPerRequest": 44.6469755859375
+  }
+]

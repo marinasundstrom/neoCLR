@@ -9,6 +9,10 @@ throughput, CPU, pauses and memory together. There is no 10,000-request plaintex
 ceiling: that figure was an illustrative JSON expectation. The current collector is
 still synchronous per heap; the [phase baseline and implementation requirements](../benchmarks/execution/concurrent-gc-investigation/README.md)
 record evidence and outstanding work, not a concurrent performance claim.
+The first [immutable concurrent shadow tracer](../benchmarks/execution/concurrent-shadow/README.md)
+now matches synchronous marks across native fixtures and checked JIT/AOT HTTP.
+It is diagnostic only: live-heap mutation/read safety, concurrent reclamation,
+race-detector qualification and the complete workload matrix remain open.
 
 **Author-directed media types (2026-10-23):** Complete the bounded HTTP value-contract
 slice with cached typed presets, lazy structured projections, shared primitive

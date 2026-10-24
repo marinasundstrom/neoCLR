@@ -425,3 +425,12 @@ synchronous collector retained for comparison. The [new phase baseline](../../be
 separates collector tracing cost from application CPU and records mutation,
 read-safety, root capture and reclamation requirements. HTTP and standalone
 workloads are both required; concurrent collection and gains are not yet implemented.
+
+The [immutable shadow tracer](../../benchmarks/execution/concurrent-shadow/README.md)
+now executes detached graph tracing concurrently and compares block marks with the
+synchronous collector. Final HTTP cohorts match 6,188 collections over 4,096
+responses. Heap capture adds roughly 8–9 microseconds per plain response and
+20–21 microseconds per JSON response, excluding waits; background tracing adds
+roughly 22–23/45–48 microseconds of CPU per response. These diagnostic costs include
+startup/shutdown and duplicate collector work, not capacity improvements. Use the
+oracle to qualify a future live-heap protocol; do not enable reclamation from it.
