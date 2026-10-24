@@ -6,6 +6,7 @@ import subprocess
 
 p = argparse.ArgumentParser()
 p.add_argument('--output', type=Path, required=True)
+p.add_argument('--gate-words', type=int, default=4096)
 a = p.parse_args()
 base = Path(__file__).resolve().parent
 root = base.parents[2]
@@ -24,7 +25,7 @@ try:
     cc = recipe[:recipe.index('-std=c11')]
     for sanitize in [False,True]:
         exe = out/f'test-{sanitize}'
-        cmd = cc + ['-std=c11','-O2','-Wall','-Wextra','-Werror','-pthread',base/'gate.c',base/'test.c','-o',exe]
+        cmd = cc + [f'-DGATE_WORDS={a.gate_words}','-std=c11','-O2','-Wall','-Wextra','-Werror','-pthread',base/'gate.c',base/'test.c','-o',exe]
         if sanitize: cmd += ['-fsanitize=undefined,bounds','-fno-sanitize-recover=all']
         run(cmd)
         run([exe])

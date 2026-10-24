@@ -1,0 +1,80 @@
+{
+  "plaintext-initial": {
+    "passed": true,
+    "summary": {
+      "sync": {
+        "requestsPerSecond": 3314.3395353127144,
+        "requestSeconds": 0.07724012500000121,
+        "processCpuSeconds": 0.065149,
+        "peakRssBytes": 9846784
+      },
+      "live": {
+        "requestsPerSecond": 45.318284830376854,
+        "requestSeconds": 5.648933999999999,
+        "processCpuSeconds": 5.883708,
+        "peakRssBytes": 14368768
+      }
+    },
+    "sha256": "cb41d8aded426bc7b31282c026cd4327a83b10f03c1f6d0365b06c98815ef14d"
+  },
+  "plaintext-isolation": {
+    "passed": true,
+    "summary": {
+      "sync": {
+        "requestsPerSecond": 3310.385850686684,
+        "requestSeconds": 0.07733237500000101,
+        "processCpuSeconds": 0.06990099999999999,
+        "peakRssBytes": 9846784
+      },
+      "guarded-sync": {
+        "requestsPerSecond": 671.1837560673688,
+        "requestSeconds": 0.38141566699999885,
+        "processCpuSeconds": 0.40171599999999996,
+        "peakRssBytes": 11862016
+      },
+      "live": {
+        "requestsPerSecond": 45.28415998336515,
+        "requestSeconds": 5.653190875,
+        "processCpuSeconds": 5.817591999999999,
+        "peakRssBytes": 14417920
+      }
+    },
+    "sha256": "19794b627670c4482a11a6d6b3abd62695281086543d3d8423b27ee054d45d1f"
+  },
+  "plaintext-gate1024": {
+    "passed": true,
+    "summary": {
+      "sync": {
+        "requestsPerSecond": 3345.333847329955,
+        "requestSeconds": 0.07652449999999966,
+        "processCpuSeconds": 0.065326,
+        "peakRssBytes": 9846784
+      },
+      "live": {
+        "requestsPerSecond": 521.3672754970365,
+        "requestSeconds": 0.4910166249999999,
+        "processCpuSeconds": 0.585716,
+        "peakRssBytes": 12255232
+      }
+    },
+    "sha256": "8c071840e14b5eaad29d3ebb24353797dee010d35ec02e957e71719ab7910d48"
+  },
+  "plaintext-gate4096": {
+    "passed": true,
+    "summary": {
+      "sync": {
+        "requestsPerSecond": 3360.7175804177577,
+        "requestSeconds": 0.0761742080000003,
+        "processCpuSeconds": 0.064946,
+        "peakRssBytes": 9846784
+      },
+      "live": {
+        "requestsPerSecond": 599.9571119721074,
+        "requestSeconds": 0.42669716699999993,
+        "processCpuSeconds": 0.500498,
+        "peakRssBytes": 12288000
+      }
+    },
+    "sha256": "5c13db709da38b5df50ed1bae60ddc53df15fafcaf47665de511e2d923dca6e7"
+  }
+}

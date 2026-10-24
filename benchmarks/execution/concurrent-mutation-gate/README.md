@@ -1,8 +1,8 @@
 # Bounded native mutation gate — 2026-10-24
 
 This implements the first primitive from the [mutation audit](../concurrent-mutation-audit/README.md).
-It is private experimental C code, not an enabled GC or a new managed API. Neither
-production generated stores nor native helpers call it yet. The full-copy candidate
+It is private experimental C code, not an enabled GC or a new managed API. It is now integrated with the admitted live-generated/native paths; the initial
+primitive evidence below predates that integration. The full-copy candidate
 and synchronous collector remain the correctness/performance references.
 
 ## Implemented protocol
@@ -17,7 +17,10 @@ candidate lanes. Identity lanes can be excluded by an aligned scan-start offset;
 trailing incomplete words are protected but not logged, matching the current scanner.
 Overlapping patches have sequential memmove semantics and may log duplicate lanes.
 
-The queue holds 128 words. Writes reserve space for both old and new words before
+The original measurements below used 128 words. The current experimental default is
+4,096 words (32 KiB), configurable from 8 to 16,384 with a consistent `GATE_WORDS`
+definition across translation units; see the [matched HTTP evidence](../concurrent-store/plaintext-performance.md).
+The wider bounded log avoids observed cancellation churn at a native-space cost. Writes reserve space for both old and new words before
 changing anything. Exhaustion cancels the epoch and leaves the payload unchanged;
 subsequent reads/drains/writes reject that cancelled epoch. The integrating owner
 must stop/join the marker, discard its detached marks, and retry only after the cycle

@@ -22614,3 +22614,28 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   CPU/pause/memory comparisons and broader safety coverage remain open. Concurrent GC
   is still experimental; no default-switch or benchmark-win claim is made.
 - [Evidence, corrected fixture assumptions and limits](../benchmarks/execution/concurrent-store/README.md#reference-interface-dispatch-admission-2026-10-24).
+
+
+### 2026-10-24 — Matched live HTTP measurements identify cancellation churn
+
+- Continuing the author's concurrent-GC performance objective, the assistant compares
+  ordinary synchronous, guarded synchronous and live AOT plaintext execution using
+  the same retained sample/library cohort and owned host. This is assistant-performed
+  fixed-work research, not a new author decision or saturated framework benchmark.
+- Initial hypothesis: scoped native fallbacks may explain cancellation. Measured
+  counters are zero; 248–250 store-barrier cancellations identify the bounded 128-word
+  log instead. Guarded-synchronous execution also exposes substantial independent
+  store-checking overhead. The assistant corrects the hypothesis from this evidence.
+- Three paired repeats with a 4,096-word log eliminate store overflow, raising measured
+  sequential throughput from about 45 to 600 requests/s and reducing process CPU about
+  91%. The synchronous comparison still reaches about 3,361 requests/s. A 1,024-word
+  alternative retains occasional overflow; the assistant chooses 4,096 provisionally
+  after safety qualification, accepting larger native log/scratch storage.
+- Performed checks include primitive gate overflow/concurrency, live differential
+  tracing and deletion-barrier negative controls, and 840 generated-interface JIT/AOT
+  cycles. Capacity-dependent fixture expectations replace old hardcoded limits.
+- The assistant retains synchronous GC as the production default and identifies
+  checked-store provenance/allocation lookup and repeated rechecks as next measured
+  costs. JSON, full-server JIT, pause distributions, standalone workloads and saturated
+  throughput remain in the goal; no completion or cross-framework win is claimed.
+- [Raw evidence, comparison scope and tradeoffs](../benchmarks/execution/concurrent-store/plaintext-performance.md).

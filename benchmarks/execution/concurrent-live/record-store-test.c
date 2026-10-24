@@ -1,4 +1,5 @@
 #include "native-gc.h"
+#include "gate.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,7 +32,7 @@ int main(void) {
         CHECK(!memcmp(array+3,values,lanes*8));
         CHECK(((unsigned char *)(array+3+4*lanes))[0]==1);
         /* Wide transactions exceed the bounded log and must cancel before copying. */
-        if(lanes==65) CHECK(!experiment_gc_live_active(&c));
+        if(lanes>GATE_WORDS/2) CHECK(!experiment_gc_live_active(&c));
         if(experiment_gc_live_active(&c)) CHECK(!experiment_gc_finish(&c,&frame,NULL,0));
         else CHECK(!neoclr_gc_collect_v1(&c,&frame));
         CHECK(*child==17);

@@ -111,7 +111,7 @@ static void overflow(void) {
     CHECK(!experiment_gc_begin(&c,&frame,NULL,0));
     for(unsigned i=0;i<GATE_WORDS/2;i++) set(&c,root,1,i);
     uint64_t value=999; mutation_patch patch={8,8,&value};
-    CHECK(experiment_gc_write(&c,root,&patch,1)==GATE_CANCELLED && root[1]==63);
+    CHECK(experiment_gc_write(&c,root,&patch,1)==GATE_CANCELLED && root[1]==GATE_WORDS/2-1);
     experiment_gc_shadow_gate(0);
     CHECK(experiment_gc_finish(&c,&frame,NULL,0)==3);
     CHECK(*dead==17); /* failed epoch must not sweep */

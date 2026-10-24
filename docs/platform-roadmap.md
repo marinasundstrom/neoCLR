@@ -198,6 +198,14 @@ The paced run also cancels 235 epochs: investigate that cost in matched measurem
 without drawing a throughput/default conclusion from one correctness run. Next qualify
 JSON helpers, full-server JIT and controlled synchronous/live comparisons
 ([dispatch and HTTP evidence](../benchmarks/execution/concurrent-store/README.md#reference-interface-dispatch-admission-2026-10-24)).
+Matched AOT plaintext fixed-work measurements now isolate a major cancellation cost:
+128-word mutation logs yield about 45 requests/s, while 4,096-word logs reach about
+600 with no store overflows and about 91% less process CPU. Synchronous comparison
+is still about 3,361 requests/s; guarded synchronous is about 671. Retain the qualified
+4,096-word private gate default, not concurrent GC as the runtime default. Next target
+checked-store/provenance and allocation lookup cost, preserving JSON/JIT and broader
+workload qualification. These are sequential measurements, not saturated capacity
+([evidence, tradeoffs and next work](../benchmarks/execution/concurrent-store/plaintext-performance.md)).
 The isolated consumers now check call closure against supplied bodies/explicit provider
 ABIs and validate their complete AOT import set. This does not establish provider
 implementation safety. A versioned native query now rejects missing/incompatible

@@ -1,4 +1,5 @@
 #include "native-gc.h"
+#include "gate.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -53,8 +54,8 @@ static void cancellation(void) {
     uint64_t collections=neoclr_gc_statistics_v1().collections;
     uint64_t stack=0;
     CHECK(!experiment_gc_store(&c,&stack,123,8) && stack==123);
-    for(uint64_t i=0;i<65;i++) CHECK(!experiment_gc_store(&c,root+1,i,8));
-    CHECK(root[1]==64 && *unpublished==17 && !cleanups);
+    for(uint64_t i=0;i<GATE_WORDS/2+1;i++) CHECK(!experiment_gc_store(&c,root+1,i,8));
+    CHECK(root[1]==GATE_WORDS/2 && *unpublished==17 && !cleanups);
     CHECK(neoclr_gc_statistics_v1().collections==collections);
     CHECK(experiment_gc_finish(&c,&frame,NULL,0)==3);
     CHECK(!experiment_gc_store(&c,root+2,(uintptr_t)unpublished,8));

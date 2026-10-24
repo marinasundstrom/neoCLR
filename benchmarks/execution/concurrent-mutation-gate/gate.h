@@ -4,7 +4,12 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define GATE_WORDS 128
+#ifndef GATE_WORDS
+#define GATE_WORDS 4096
+#endif
+#if GATE_WORDS < 8 || GATE_WORDS > 16384
+#error Experimental gate log must contain 8 to 16384 words
+#endif
 #define GATE_SCRATCH 256
 #define GATE_PATCHES 8
 /* Private experimental protocol. No managed ABI or collector admission implied. */

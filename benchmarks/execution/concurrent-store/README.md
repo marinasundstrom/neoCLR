@@ -1525,3 +1525,21 @@ Full-server JIT execution, JSON execution, race coverage, controlled synchronous
 throughput/CPU/pause/memory comparisons and broader workloads remain open. Next
 qualify JSON's seven helper bodies while extending the working plaintext execution
 harness into matched measurements. Website/public API behavior is unchanged.
+
+
+## Matched plaintext performance and bounded-log adjustment (2026-10-24)
+
+The [matched fixed-work report](plaintext-performance.md) now separates ordinary
+synchronous, guarded synchronous and live execution. Native fallback counters are
+zero; the 128-word log cancels almost once per request. A 4,096-word log removes
+store-overflow cancellations in three repeats, improves sequential throughput from
+about 45 to 600 requests/s and cuts process CPU about 91%, but still trails the
+synchronous comparison at about 3,361 requests/s. Keep these measurements distinct
+from saturated capacity, GC pause distributions and framework comparisons.
+
+Retain 4,096 words as the private gate default after gate/live differential/negative
+controls and 840 generated-interface JIT/AOT cycles pass. Capacity remains bounded
+and overflow handling unchanged; native log/scratch storage increases. Production GC
+stays synchronous. The remaining guarded-store overhead, heap lookup and repeated
+rechecks are measured priorities alongside JSON/JIT integration, not reasons to
+weaken safety or claim completion of the default-GC goal.
