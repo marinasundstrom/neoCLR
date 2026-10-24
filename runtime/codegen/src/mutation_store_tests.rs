@@ -800,6 +800,21 @@ fn managed_options_for(source: &str) -> crate::fault_details::Options {
         options.runtime_async_startmanaged.push(11);
         options.object_base=Some(0);
     }
+    if source.starts_with(".module LiveSocketWrappers") {
+        options.socket_listen.push(0);
+        options.socket_local_port.push(1);
+        options.socket_close.push(2);
+        options.socket_accept.push(3);
+        options.socket_connect_result.push(4);
+        options.socket_cancel.push(5);
+        options.socket_deadline_after.push(6);
+        options.socket_deadline_expired.push(7);
+        options.socket_receive.push(8);
+        options.socket_send.push(9);
+        options.socket_transfer_result.push(10);
+        options.socket_receive_until.push(11);
+        options.socket_send_until.push(12);
+    }
     if source.starts_with(".module LiveNativeText") {
         options.string_concat.push(0);
         options.string_byte_count.push(1);
@@ -852,6 +867,15 @@ fn managed_input(source: &str) -> neoclr::metadata::Module {
                 }
             }
         }
+    }
+    if source.starts_with(".module LiveSocketWrappers") {
+        let rows: Vec<_> = (0..13).map(|i| serde_json::json!({"name":input.functions[i].name,
+            "compiledIndex":i,"definition":{"module":"LiveSocketWrappers","index":i}})).collect();
+        let selection=serde_json::json!({"functions":rows});
+        assert_eq!(crate::bindings::socket_listener(&mut input,&selection).unwrap().len(),3);
+        assert_eq!(crate::bindings::socket_accept(&mut input,&selection).unwrap().len(),3);
+        assert_eq!(crate::bindings::socket_transfer(&mut input,&selection).unwrap().len(),7);
+        for i in 0..13 { input.functions[i].name=format!("LiveSocketWrapper{i}"); }
     }
     if source.starts_with(".module LiveAsyncWrappers") {
         let rows: Vec<_> = (2..12).map(|i| serde_json::json!({"name":input.functions[i].name,
@@ -955,6 +979,9 @@ fn emit_managed(source: &str) {
                 exports.extend([(2,"live_async_create"),(3,"live_async_complete"),(4,"live_async_await"),
                     (5,"live_async_release"),(6,"live_async_iscompleted"),(7,"live_async_wait"),(8,"live_async_start"),(9,"live_async_createowned"),
                     (10,"live_async_currentowner"),(11,"live_async_startmanaged")]);
+            }
+            if source.starts_with(".module LiveSocketWrappers") {
+                exports.extend([(0,"live_socket_listen"), (1,"live_socket_local_port"), (2,"live_socket_close"), (3,"live_socket_accept"), (4,"live_socket_connect_result"), (5,"live_socket_cancel"), (6,"live_socket_deadline_after"), (7,"live_socket_deadline_expired"), (8,"live_socket_receive"), (9,"live_socket_send"), (10,"live_socket_transfer_result"), (11,"live_socket_receive_until"), (12,"live_socket_send_until")]);
             }
             for (index, name) in exports {
                 let Some(cranelift_module::FuncOrDataId::Func(writer)) =
@@ -1371,5 +1398,32 @@ fn managed_async_wrappers_run_on_live_collector() {
     }
     type Run = unsafe extern "C" fn(*const *const u8) -> i32;
     let run: libloading::Symbol<Run> = unsafe { library.get(b"managed_async_consumer") }.unwrap();
+    assert_eq!(unsafe { run(pointers.as_ptr()) }, 0);
+}
+
+#[test]
+fn managed_socket_wrappers_emit_guarded_results() {
+    emit_managed(include_str!("../../../benchmarks/execution/concurrent-store/socket-wrappers.neoil"));
+}
+#[test]
+#[ignore = "requires socket host built by validate-socket-wrappers.py"]
+fn managed_socket_wrappers_run_on_live_collector() {
+    let library = std::sync::Arc::new(unsafe { libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host")) }.unwrap());
+    unsafe { crate::mutation_admission::require_managed_host(&library) }.unwrap();
+    let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
+    let resolver = library.clone();
+    builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
+    let mut code = Code(Some(JITModule::new(builder)));
+    let module = code.0.as_mut().unwrap();
+    let source=include_str!("../../../benchmarks/execution/concurrent-store/socket-wrappers.neoil");
+    crate::compiler::values::compile_into(&managed_input(source),"Main",Some(&managed_options_for(source)),crate::compiler::Target::MacosArm64,module,true).unwrap();
+    module.finalize_definitions().unwrap();
+    let mut pointers=Vec::new();
+    for name in (0..13).map(|i| format!("neoclr_value_{i}")) {
+        let Some(cranelift_module::FuncOrDataId::Func(id))=module.get_name(&name) else { panic!("async wrapper") };
+        pointers.push(module.get_finalized_function(id));
+    }
+    type Run = unsafe extern "C" fn(*const *const u8) -> i32;
+    let run: libloading::Symbol<Run> = unsafe { library.get(b"managed_socket_consumer") }.unwrap();
     assert_eq!(unsafe { run(pointers.as_ptr()) }, 0);
 }

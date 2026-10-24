@@ -1,0 +1,49 @@
+.module LiveSocketWrappers
+.references ()
+.function neoCLR.Runtime.SocketListen(String address,Int32 port,Int32 backlog) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.SocketLocalPort(Int64 handle) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.SocketClose(Int64 handle) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.SocketAccept(Int64 listener,fn<Void> callback) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.SocketConnectResult(Int64 operation) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.SocketCancel(Int64 operation) -> Boolean
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.SocketDeadlineAfter(Int32 milliseconds) -> Int64
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.SocketDeadlineExpired(Int64 stamp) -> Boolean
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.SocketReceive(Int64 socket,arrayref<Byte> buffer,Int32 offset,Int32 count,fn<Void> callback) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.SocketSend(Int64 socket,arrayref<Byte> buffer,Int32 offset,Int32 count,fn<Void> callback) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.SocketTransferResult(Int64 operation) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.SocketReceiveUntil(Int64 socket,arrayref<Byte> buffer,Int32 offset,Int32 count,Int64 deadline,fn<Void> callback) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.SocketSendUntil(Int64 socket,arrayref<Byte> buffer,Int32 offset,Int32 count,Int64 deadline,fn<Void> callback) -> Value
+.methodimpl InternalCall
+.end
+.function Write(Int32 value) -> Int32
+ldarg value
+ret
+.end
+.function Main(Int32 value) -> Int32
+ldarg value
+ret
+.end

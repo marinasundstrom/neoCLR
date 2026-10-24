@@ -824,3 +824,40 @@ This is not full selection/HTTP admission: generated pump/entry/queue code, sock
 result wrappers, remaining native services and shared heaps still need qualification.
 No new throughput/default claim. Existing CLR ownership/root-transition comparisons
 and CLI/native metadata replacement plans remain unchanged.
+
+
+## Generated socket primitives and array transfers (2026-10-24)
+
+Thirteen exact socket provider ABIs now join live admission: Listen, LocalPort, Close,
+Accept, ConnectResult, Cancel, DeadlineAfter, DeadlineExpired, Receive, Send,
+TransferResult, ReceiveUntil and SendUntil. These are the array-buffer transfer forms;
+memory-view variants have distinct native symbols and remain excluded by call-closure
+checking. Providers reuse the typed native-result scratch/guarded publication path.
+Production binding validates all thirteen reserved signatures before private fixture
+names are assigned. Ordinary compilation and native socket behavior are unchanged.
+
+`socket-wrappers-consumer.py` derives the existing real loopback socket-transfer test,
+redirecting those calls through generated wrappers. An old managed result carrier is
+strongly rooted; every successful scalar or two-lane Value result must pass exactly
+one or two protected heap stores. Failed calls must not alter that carrier or the
+original caller output. The adapter deliberately clears diagnostic fault state after
+recording returned status, preserving the native fixture's error-recovery policy.
+The test starts an epoch before its first socket call and after each collection.
+Raw receive-buffer writes remain safe because the marker excludes BYTES payloads.
+Added close/double-close and stale-port checks exercise every admitted wrapper.
+
+`validate-socket-wrappers.py --runner <codegen-test-runner> --output <fresh-directory>`
+passes 192 real loopback cases across forced/paced JIT and optimized/undefined-bounds
+AOT: accept/delivery roots, partial receive, reserved-byte initialization, send snapshots
+under later mutation, deadline/cancellation errors, EOF, fault teardown and empty final
+heap. This reuses the synchronous/native comparison fixture already qualified in
+concurrent-live/socket-transfer-*; the generated runs here use the live candidate.
+Twenty-two focused compiler tests pass (15 host-dependent tests skipped in the general
+run; the socket JIT tests execute explicitly in the harness). Reports, generated C and
+AOT object are archived as `socket-wrappers-*`.
+
+This is generated network I/O qualification, not an HTTP benchmark. Memory-view
+transfers, remaining native services, generated pump/queue/bootstrap entry and shared
+heaps remain open. No default switch, throughput gain or race-detector claim. The
+existing CLR rooted native-call comparison and private CLI Value representation still
+apply; no new public API or deliberate semantic divergence is introduced.

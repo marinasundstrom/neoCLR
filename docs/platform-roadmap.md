@@ -112,7 +112,9 @@ pressure in JIT/AOT. Generated strong startup now also passes parked-parent/resu
 publication, callback failure and shutdown checks. Generated owned startup, operation
 ownership and CurrentOwner now pass JIT/AOT self-reference, abandonment, late-completion
 and null-owner tests, completing the ten async service wrappers in this profile.
-Socket results, entry pumps/full entry and shared heaps remain unqualified.
+Thirteen generated socket primitive/array-transfer wrappers now pass real loopback,
+heap-result publication, error and teardown tests in JIT/AOT. Memory-view transfers,
+remaining native services, entry pumps/full entry and shared heaps remain unqualified.
 Capability conversions, callable arrays, remaining text/byte services and async/full
 host-entry integration remain next;
 the recorded plaintext import inventory guides that coverage.

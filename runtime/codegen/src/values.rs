@@ -521,7 +521,14 @@ pub(crate) fn compile_into(
             || d.runtime_async_startmanaged.contains(&i)
             || d.runtime_async_completeunit.contains(&i)
             || d.runtime_async_awaitunit.contains(&i) || d.runtime_async_release.contains(&i)
-            || d.runtime_async_iscompleted.contains(&i) || d.runtime_async_waitcompletion.contains(&i));
+            || d.runtime_async_iscompleted.contains(&i) || d.runtime_async_waitcompletion.contains(&i)
+            || d.socket_listen.contains(&i) || d.socket_local_port.contains(&i)
+            || d.socket_close.contains(&i) || d.socket_accept.contains(&i)
+            || d.socket_connect_result.contains(&i) || d.socket_cancel.contains(&i)
+            || d.socket_deadline_after.contains(&i) || d.socket_deadline_expired.contains(&i)
+            || d.socket_receive.contains(&i) || d.socket_send.contains(&i)
+            || d.socket_transfer_result.contains(&i) || d.socket_receive_until.contains(&i)
+            || d.socket_send_until.contains(&i));
         f.pinvoke.is_some() || ((f.is_internal_call() || gc_points::native_body(&p, i, details)) && !admitted)
     }) {
         return Err("experimental live stores reject unaudited native replacement bodies".into());
