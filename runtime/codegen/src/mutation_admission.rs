@@ -186,6 +186,7 @@ pub(crate) fn root_providers(module: &impl Module) -> Vec<(&'static str, Signatu
         ("neoclr_byte_view_set_v1", make(&[I64, I64, I32, ir::types::I8], &[I32])),
         ("neoclr_byte_view_utf8_v1", make(&[I64, I64, I64], &[I32])),
         ("experiment_gc_static_storage_rooted_v1", make(&[I64, I32, I32, I32, I64], &[I32])),
+        ("neoclr_tls_managed_v2", make(&[I32, I64, I64, I64, I64, I64, I64, I64], &[I32])),
         ("neoclr_string_intern_rooted_v1", make(&[I64, I64, I64], &[I32])),
         ("neoclr_string_compare_ordinal_v1", make(&[I64, I64, I64], &[I32])),
         ("neoclr_console_write_line_utf8_v1", make(&[I64, I64], &[I32])),

@@ -512,7 +512,7 @@ pub(crate) fn compile_into(
     if live_stores && input.functions.iter().enumerate().any(|(i, f)| {
         let admitted = details.is_some_and(|d|
             d.int32_to_string.contains(&i) || d.int64_to_string.contains(&i)
-            || d.uint64_to_string.contains(&i)
+            || d.uint64_to_string.contains(&i) || d.tls.contains_key(&i)
             || d.string_intern.contains(&i) || d.string_compare_ordinal.contains(&i) || d.console_write_line.contains(&i)
             || d.utf8_encode.contains(&i) || d.utf8_decode.contains(&i) || d.utf8_decode_slice.contains(&i)
             || d.string_concat.contains(&i) || d.string_byte_count.contains(&i)
@@ -3370,6 +3370,11 @@ pub(crate) fn compile_into(
                 continue;
             }
             if let Some(operation) = details.and_then(|d| d.tls.get(&i)) {
+                let destination = output;
+                let output = if live_stores {
+                    let scratch = slot(&mut b, 4);
+                    b.ins().stack_addr(types::I64, scratch, 0)
+                } else { output };
                 let service = module.declare_func_in_func(tls_service.unwrap(), b.func);
                 let op = b.ins().iconst(types::I32, i64::from(*operation));
                 let null = b.ins().iconst(types::I64, 0);
@@ -3397,6 +3402,10 @@ pub(crate) fn compile_into(
                 );
                 site.capture_frame = false;
                 return_if_detailed(&mut b, failed, status, Some(&site));
+                if live_stores {
+                    let result = b.ins().load(types::I32, MemFlags::new(), output, 0);
+                    write(&mut b, destination, &[result]);
+                }
                 let zero = b.ins().iconst(types::I32, 0);
                 b.ins().return_(&[zero]);
                 b.seal_all_blocks();

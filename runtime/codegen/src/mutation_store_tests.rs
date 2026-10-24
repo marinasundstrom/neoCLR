@@ -1947,3 +1947,83 @@ fn managed_text_finish_runs_on_live_collector() {
     let run: libloading::Symbol<Run> = unsafe { library.get(b"text_finish_consumer") }.unwrap();
     assert_eq!(unsafe { run(functions[0],functions[1],functions[2],functions[3]) },0);
 }
+
+fn tls_wrappers_input() -> (neoclr::Module, crate::fault_details::Options) {
+    use neoclr::metadata::Type;
+    let mut input = neoclr::assemble(".module LiveTlsWrappers\n.function Main(Int32 value) -> Int32\nldarg value\nret\n.end").unwrap();
+    let mut main=input.functions.pop().unwrap();main.definition=None;
+    let mut rows=Vec::new();
+    for (i,(name,arity)) in [("TlsCreateClient",3),("TlsCreateServer",4),("TlsCreateSession",3),("TlsRelease",1),("TlsAbort",1),("TlsPump",5)].into_iter().enumerate() {
+        let name=format!("neoCLR.Runtime.{name}");
+        input.functions.push(serde_json::from_value(serde_json::json!({
+            "name":name,"parameters":vec![Type::ArrayRef(Box::new(Type::Byte));arity],"returns":Type::Int32,"impl_flags":4096
+        })).unwrap());
+        rows.push(serde_json::json!({"name":name,"compiledIndex":i}));
+    }
+    assert_eq!(crate::bindings::tls(&mut input,&serde_json::json!({"functions":rows})).unwrap().len(),6);
+    for i in 0..6 { input.functions[i].name=format!("TlsWrapper{i}"); }
+    input.functions.push(main);
+    let mut options=managed_options();
+    for i in 0..6 { options.tls.insert(i,i as i32+1); }
+    (input, options)
+}
+
+#[test]
+fn managed_tls_wrappers_emits_guarded_result() {
+    let (input, mut options) = tls_wrappers_input();
+    for enabled in [false, true] {
+        options.experimental_live_gc_stores = enabled;
+        let mut module = ObjectModule::new(ObjectBuilder::new(isa(target(), true), "tls-wrappers", cranelift_module::default_libcall_names()).unwrap());
+        crate::compiler::values::compile_into(&input,"Main",Some(&options),crate::compiler::Target::MacosArm64,&mut module,false).unwrap();
+        for i in 0..6 {
+        let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name(&format!("neoclr_value_{i}")) else { panic!("tls-wrappers") };
+        let signature = module.declarations().get_function_decl(id).signature.clone();
+        let export = module.declare_function(&format!("live_tls_wrappers_{i}"), Linkage::Export, &signature).unwrap();
+        let mut context = module.make_context();
+        context.func.signature = signature;
+        let callee = module.declare_func_in_func(id, &mut context.func);
+        let mut fb = FunctionBuilderContext::new();
+        let mut b = FunctionBuilder::new(&mut context.func, &mut fb);
+        let entry = b.create_block();
+        b.append_block_params_for_function_params(entry);
+        b.switch_to_block(entry);
+        let args = b.block_params(entry).to_vec();
+        let call = b.ins().call(callee, &args);
+        let status = b.inst_results(call)[0];
+        b.ins().return_(&[status]);
+        b.seal_all_blocks();
+        b.finalize();
+        module.define_function(export, &mut context).unwrap();
+        }
+        let bytes = module.finish().emit().unwrap();
+        let object = object::File::parse(bytes.as_slice()).unwrap();
+        let imports: Vec<_> = object.symbols().filter(|s| s.is_undefined()).filter_map(|s| s.name().ok()).collect();
+        assert!(imports.iter().any(|s| s.contains("neoclr_tls_managed_v2")));
+        assert_eq!(imports.iter().any(|s| s.contains("experiment_gc_store")), enabled);
+        if enabled {
+            if let Some(path) = std::env::var_os("NEOCLR_MUTATION_MANAGED_OBJECT") { std::fs::write(path, bytes).unwrap(); }
+        }
+    }
+}
+
+#[test]
+#[ignore = "requires tls-wrappers host built by validate-tls-wrappers.py"]
+fn managed_tls_wrappers_runs_on_live_collector() {
+    let library = std::sync::Arc::new(unsafe { libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host")) }.unwrap());
+    unsafe { crate::mutation_admission::require_managed_host(&library) }.unwrap();
+    let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
+    let resolver = library.clone();
+    builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
+    let mut code = Code(Some(JITModule::new(builder)));
+    let module = code.0.as_mut().unwrap();
+    let (input, options) = tls_wrappers_input();
+    crate::compiler::values::compile_into(&input,"Main",Some(&options),crate::compiler::Target::MacosArm64,module,true).unwrap();
+    module.finalize_definitions().unwrap();
+    let functions: Vec<_> = (0..6).map(|i| {
+        let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name(&format!("neoclr_value_{i}")) else { panic!("tls-wrappers") };
+        module.get_finalized_function(id)
+    }).collect();
+    type Run = unsafe extern "C" fn(*const *const u8) -> i32;
+    let run: libloading::Symbol<Run> = unsafe { library.get(b"tls_wrappers_consumer") }.unwrap();
+    assert_eq!(unsafe { run(functions.as_ptr()) },0);
+}

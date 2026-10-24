@@ -167,6 +167,12 @@ and 33 compiler checks using existing native boundaries. The retained plain/JSON
 import audit leaves TLS alone; full selected compilation and host-I/O entry remain
 unqualified
 ([remaining text evidence](../benchmarks/execution/concurrent-store/README.md#interning-ordinal-comparison-and-console-admission-2026-10-24)).
+All six TLS wrappers now pass 600 JIT/AOT cycles using the real provider, with guarded
+status publication and unchanged native ownership; 34 compiler checks pass. The retained
+plain/JSON import audit has zero missing names. Next priority is full selected
+compilation, required host-I/O entry and executable HTTP qualification; import coverage
+is not execution proof
+([TLS evidence](../benchmarks/execution/concurrent-store/README.md#tls-managed-boundary-admission-2026-10-24)).
 Capability conversions, callable arrays, remaining text/byte services and async/full
 host-entry integration remain next;
 the recorded plaintext import inventory guides that coverage.

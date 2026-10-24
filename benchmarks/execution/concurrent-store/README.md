@@ -1291,3 +1291,48 @@ admission: TLS, required host-I/O entry, full selected compilation/execution and
 HTTP performance remain open. Public API/website behavior and production defaults
 are unchanged. Next: qualify the retained TLS path, then expose and resolve the full
 selection/entry gates before running throughput comparisons.
+
+
+## TLS managed-boundary admission (2026-10-24)
+
+Admit all six existing TLS operation wrappers and the exact `neoclr_tls_managed_v2`
+provider ABI. The generated wrapper formerly passed caller result storage directly
+to native code; live mode now uses four-byte stack scratch and publishes successful
+provider status through the existing store barrier. Faults preserve caller output.
+Ordinary emission and native resource/buffer ownership are unchanged.
+
+Native audit: adapter validation requires exact live packed byte arrays in the current
+context. The Rust provider borrows byte pointers only for the synchronous call, owns
+its native configuration/session state, and never collects managed storage or invokes
+guest callbacks. Pump writes only byte payloads/control bytes, which the marker does
+not scan for references; scalar result aliases can be reference-scanned heap storage
+and therefore require guarded publication. Native resource associations do not root
+their managed owner; owner-thread GC cleanup or explicit disposal releases them. This
+preserves the existing private TLS/GC resource contract, not a new SslStream contract
+or a shared-heap/concurrent-owner model. No native fallback scope was needed.
+
+`validate-tls-wrappers.py --runner <codegen-test-runner> --output <fresh-directory>`
+builds the actual Rust TLS provider and generates temporary test credentials. It
+passes 600 forced/paced JIT and optimized/undefined-bounds AOT cycles: client/server
+configuration, session creation, client flight output/server input wait, invalid and
+uninitialized buffers, duplicate owners, alias rejection, heap result publication,
+collection of configuration owners while sessions survive, abort, repeat release,
+unreachable-owner cleanup, terminal-Fault disposal and resource-free heap release.
+Production binding validation checks all six exact signatures. Thirty-four focused
+compiler checks pass; 26 host-dependent tests are skipped by the general filter,
+with this fixture's JIT test run explicitly. This is buffered TLS boundary validation,
+not an end-to-end TLS handshake, HTTPS request or throughput measurement.
+
+Preserve `tls-wrappers-*` evidence, including the initial local SDK/linker incompatibility
+and generated-key rejection (provider -12). The validator uses the same SDK as existing
+C build evidence, without changing system settings, and the existing TLS fixture's
+explicit named-curve key-generation option. Test private keys stay in local output
+directories and are not archived. Neither failure required a runtime ownership change.
+
+The retained plaintext/JSON import audit now has zero missing provider names
+(`http-dependencies-tls-wrappers.json.gz`). That is not whole-server admission: the
+required host-I/O entry flag remains rejected, and full selected compilation must still
+expose capability/callable/bootstrap or other integration gaps. Next work is full
+selection/entry integration and executable HTTP qualification, followed by matched
+synchronous/live throughput, CPU, pauses and memory measurements. Public APIs, website
+behavior and production default GC are unchanged.
