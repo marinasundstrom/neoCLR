@@ -15145,3 +15145,25 @@ Windows qualification covers object emission on macOS, not Windows runtime execu
 See [the report](../benchmarks/execution/slot-maps/README.md) for measurements, malformed-header/live-root tests, generated consumers,
 forced-GC JIT/AOT plain/JSON checks and shared-worker stress, including a retained
 scheduling-sensitive minimum-concurrency assertion failure and successful replays.
+
+
+## Scoped native execution state — 2026-10-24
+
+neoCLR native GC lowering (excluding shared-worker safepoints) emits private
+`neoclr_gc_state_*_v1` imports. Entry returns its existing owner-thread state;
+publication and leave reuse a compiler-owned eight-byte slot, included in stack
+budgets. The collector-visible 104-byte frame and managed metadata are unchanged.
+Normal/fault returns use matching leave. New objects require matching runtime/native
+kit helpers; old hosts reject missing symbols before execution. Same-thread cooperative
+suspension/reentry is supported; handle migration/escape is forbidden. These are
+current backend/provider restrictions, not permanent Raven language semantics.
+
+Raven Runtime Contract configuration, source/semantic model, NEOX/temporary CLI
+representation and ordinary .NET behavior do not change. There is no new temporary
+CLI encoding or information loss. neoCLR owns the backend/helper contract; future
+native PC/root maps or scheduler migration must explicitly replace its lifetime
+assumptions. Raven codex/neoclr remains separate from main, with documentation only.
+Fourteen compiler/generated tests, native lifetime/rejection and rebuilt worker/async
+consumers, forced-GC JIT/AOT HTTP and explicit old-host rejection pass. Windows
+qualification is object generation on macOS, not runtime execution.
+[Measured tradeoffs and artifacts](../benchmarks/execution/state-integration/README.md).

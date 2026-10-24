@@ -479,3 +479,19 @@ and owned JIT, with similar CPU savings, at 1.5 KiB extra native storage per thr
 Latency ranges overlap. Frame and thread-local bookkeeping remain larger targets;
 these incremental results do not establish peer parity.
 See [lookup evidence and tradeoffs](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/execution/base-cache-size).
+
+
+## Development: generated execution-state reuse
+
+Native JIT/AOT generated hooks can reuse an owner-thread state handle across frame
+publication and leave. Local plaintext CPU per response improves 1.1–1.6%; throughput
+changes are smaller and latency tails are mixed. The cost is eight stack bytes per
+affected activation and about 1.8–1.9% larger native objects. New native objects need
+matching hosts. This does not make GC concurrent or establish framework parity.
+See [qualification and measurements](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/execution/state-integration).
+
+
+Concurrent GC is the next development investigation. Collection currently blocks
+its owning heap. Qualification will compare synchronous and concurrent collectors
+across plaintext, complex handlers and standalone workloads, considering CPU,
+pauses and memory alongside throughput. No concurrent collector result is claimed.

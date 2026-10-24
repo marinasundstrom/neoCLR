@@ -5652,7 +5652,7 @@ fn check_gc_borrowed_and_erased(source: &str) {
         .unwrap();
     let imports = String::from_utf8_lossy(&imports.stdout);
     assert!(
-        imports.contains("neoclr_gc_stack_map_v1")
+        imports.contains("neoclr_gc_state_stack_v1")
             && !imports.contains("neoclr_probe_stack_roots_v2")
     );
     assert!(

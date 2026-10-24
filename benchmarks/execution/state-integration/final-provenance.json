@@ -1,0 +1,24 @@
+{
+  "ravenDocumentationCommit": "058272317",
+  "objectComparison": {
+    "plain": {
+      "identical": true,
+      "sha256": "de42863bd8b275ad37e1c00d21b71bd5ba5cd03cd9e5522225ebecd6e01d2794",
+      "bytes": 8489240
+    },
+    "json": {
+      "identical": true,
+      "sha256": "2e5afaf1a8e9dae984abf4e232aff79b2366bfa543a162687f69fd031c968b3b",
+      "bytes": 11595352
+    }
+  },
+  "sources": {
+    "runtime/codegen/src/gc_probe.rs": "3bfff511c9a93a029b992bca62eed6c0e3cb2d927dcc91f6ef9ba31755bf5ef4",
+    "runtime/codegen/src/values.rs": "8e5dd6a53e373aa0f0f5e6180f694a4e04f7ccc7fcd1a0400ac61a8a0a69d08e",
+    "runtime/native/gc/native-gc.c": "620792d7cb20f8b1be620df704b45a4763c2723ef24b575f5708fdf58ec0306e",
+    "runtime/native/gc/root-probe.h": "0a53036a98b33abe7f8bd62bbb241ecc2076407ae771da53014ef9fccd416492",
+    "runtime/native/gc/execution-state.h": "9453c87647b25f1c57bc12e713451fc7f4074869e934a95c9775cce69655dc56",
+    "runtime/native/gc/root-probe.c": "535a7f0155195fef4c9b1b9cccfc8a605c94b6bba1a49054baea446ae8b56a60",
+    "runtime/native/gc/native-gc.h": "1df3ab2a0da442ac5f78e3a8d81049368b2da629c15a738365ff997ead978764"
+  }
+}

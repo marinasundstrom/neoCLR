@@ -407,3 +407,21 @@ the trusted contract, not dynamically rejected. The next integration is new type
 imports plus a compiler-owned eight-byte state slot and explicit stack-budget,
 early-return, suspension and JIT/AOT validation. Production state-pointer retention
 remains prohibited until that contract is implemented and qualified.
+
+
+The [generated state-handle integration](../../benchmarks/execution/state-integration/README.md)
+now passes native lifetime/rejection, rebuilt worker/async, forced-GC JIT/AOT HTTP
+and compiler checks. Admission returns the already-resolved state after an initial
+adapter's duplicate TLS lookup caused a regression. Final CPU/request falls 1.1–1.6%,
+with modest throughput changes, mixed tails, eight extra stack bytes and 1.8–1.9%
+larger objects. Treat this as reusable owner-state infrastructure and a small CPU
+improvement, not closure of the execution gap. New imports require matching hosts.
+
+
+### Concurrent collector evaluation (2026-10-24)
+
+The author now prioritizes concurrent GC toward becoming the default, with the
+synchronous collector retained for comparison. The [new phase baseline](../../benchmarks/execution/concurrent-gc-investigation/README.md)
+separates collector tracing cost from application CPU and records mutation,
+read-safety, root capture and reclamation requirements. HTTP and standalone
+workloads are both required; concurrent collection and gains are not yet implemented.

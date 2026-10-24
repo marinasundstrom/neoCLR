@@ -28,6 +28,7 @@ struct Point {
 }
 pub(super) struct Probes {
     workers: bool,
+    state_handle: bool,
     callback: FuncId,
     enter: FuncId,
     leave: FuncId,
@@ -45,6 +46,7 @@ impl Probes {
     ) -> Result<Self, Error> {
         let gc = details.is_some_and(|d| d.native_gc);
         let workers = details.is_some_and(|d| d.native_worker_safepoints);
+        let state_handle = gc && !workers;
         if workers {
             let d = details.unwrap();
             for (i, f) in p.input.functions.iter().enumerate() {
@@ -80,9 +82,14 @@ impl Probes {
         if workers {
             sig.params.push(AbiParam::new(types::I32));
         }
+        if state_handle {
+            sig.params.insert(0, AbiParam::new(types::I64));
+        }
         let callback = module.declare_function(
             if workers {
                 "neoclr_gc_worker_stack_map_v1"
+            } else if state_handle {
+                "neoclr_gc_state_stack_v1"
             } else if gc {
                 "neoclr_gc_stack_map_v1"
             } else {
@@ -104,8 +111,13 @@ impl Probes {
             ]
             .map(AbiParam::new),
         );
+        if state_handle {
+            enter_sig.returns.push(AbiParam::new(types::I64));
+        }
         let enter = module.declare_function(
-            if gc {
+            if state_handle {
+                "neoclr_gc_state_enter_v1"
+            } else if gc {
                 // This table is emitted once in the prologue and remains fixed
                 // until frame leave, including while a cooperative stack parks.
                 "neoclr_gc_enter_map_v1"
@@ -117,8 +129,13 @@ impl Probes {
         )?;
         let mut leave_sig = module.make_signature();
         leave_sig.params.push(AbiParam::new(types::I64));
+        if state_handle {
+            leave_sig.params.push(AbiParam::new(types::I64));
+        }
         let leave = module.declare_function(
-            if gc {
+            if state_handle {
+                "neoclr_gc_state_leave_v1"
+            } else if gc {
                 "neoclr_gc_leave_v1"
             } else {
                 "neoclr_probe_leave_v1"
@@ -138,8 +155,13 @@ impl Probes {
             ]
             .map(AbiParam::new),
         );
+        if state_handle {
+            sig.params.insert(0, AbiParam::new(types::I64));
+        }
         let publish = module.declare_function(
-            if gc {
+            if state_handle {
+                "neoclr_gc_state_transient_v1"
+            } else if gc {
                 "neoclr_gc_transient_map_v1"
             } else {
                 "neoclr_probe_transient_v2"
@@ -326,6 +348,7 @@ impl Probes {
         }
         Ok(Self {
             workers,
+            state_handle,
             callback,
             enter,
             leave,
@@ -334,6 +357,11 @@ impl Probes {
             transient,
             publish,
         })
+    }
+    // The collector-visible prefix remains 104 bytes. The trailing handle is
+    // compiler-owned native state, never a managed root or part of frame traversal.
+    pub fn frame_bytes(&self) -> u32 {
+        if self.state_handle { 112 } else { 104 }
     }
     // GC publication keeps frame, storage and instruction operands explicit at each emission site.
     #[allow(clippy::too_many_arguments)]
@@ -370,10 +398,14 @@ impl Probes {
         let length = b.ins().iconst(types::I32, storage.length as i64);
         let function = b.ins().iconst(types::I32, function as i64);
         let enter = module.declare_func_in_func(self.enter, b.func);
-        b.ins().call(
+        let call = b.ins().call(
             enter,
             &[address, context, function, table, count, plan, length],
         );
+        if self.state_handle {
+            let state = b.inst_results(call)[0];
+            b.ins().stack_store(state, frame, 104);
+        }
     }
     // Lowering emits returns in many fault branches. Instrument the completed IR
     // so all returns, including arithmetic/null faults, share the same cleanup.
@@ -388,7 +420,12 @@ impl Probes {
         for inst in returns {
             let mut cursor = FuncCursor::new(func).at_inst(inst);
             let address = cursor.ins().stack_addr(types::I64, frame, 0);
-            cursor.ins().call(leave, &[address]);
+            if self.state_handle {
+                let state = cursor.ins().stack_load(types::I64, frame, 104);
+                cursor.ins().call(leave, &[state, address]);
+            } else {
+                cursor.ins().call(leave, &[address]);
+            }
         }
     }
     pub fn transient_bytes(&self, function: usize) -> Option<u32> {
@@ -423,6 +460,9 @@ impl Probes {
             b.ins().stack_store(size, table, (index * 16 + 8) as i32);
             b.ins().stack_store(flag, table, (index * 16 + 12) as i32);
         }
+        let state = self
+            .state_handle
+            .then(|| b.ins().stack_load(types::I64, frame, 104));
         let frame = b.ins().stack_addr(types::I64, frame, 0);
         let phase = b.ins().iconst(types::I32, phase as i64);
         let table = b.ins().stack_addr(types::I64, table, 0);
@@ -431,8 +471,13 @@ impl Probes {
         let plan = b.ins().global_value(types::I64, data);
         let length = b.ins().iconst(types::I32, t.length as i64);
         let callback = module.declare_func_in_func(self.publish, b.func);
-        b.ins()
-            .call(callback, &[frame, phase, table, count, plan, length]);
+        if let Some(state) = state {
+            b.ins()
+                .call(callback, &[state, frame, phase, table, count, plan, length]);
+        } else {
+            b.ins()
+                .call(callback, &[frame, phase, table, count, plan, length]);
+        }
     }
     pub fn table_bytes(&self, function: usize) -> u32 {
         (self.storage[&function].lanes.len().max(1) * 16) as u32
@@ -474,6 +519,9 @@ impl Probes {
             };
             b.ins().stack_store(value, slot, (lane * 8) as i32);
         }
+        let state = self
+            .state_handle
+            .then(|| b.ins().stack_load(types::I64, frame, 104));
         let frame = b.ins().stack_addr(types::I64, frame, 0);
         let pc = b.ins().iconst(types::I32, pc as i64);
         let address = b.ins().stack_addr(types::I64, slot, 0);
@@ -483,6 +531,9 @@ impl Probes {
         let length = b.ins().iconst(types::I32, point.length as i64);
         let callback = module.declare_func_in_func(self.callback, b.func);
         let mut args = vec![frame, pc, address, count, descriptor, length];
+        if let Some(state) = state {
+            args.insert(0, state);
+        }
         if self.workers {
             args.push(b.ins().iconst(types::I32, i64::from(point.exclusive)));
         }

@@ -1999,7 +1999,8 @@ pub(crate) fn compile_into(
                     // Native wrappers keep typed argument copies visible across service
                     // calls/dispatch. These frames do not enter the guest fault trace.
                     let table_bytes = probes.table_bytes(i);
-                    let mut frame_bytes = 104 + 7 + table_bytes as usize + 7;
+                    let mut frame_bytes =
+                        probes.frame_bytes() as usize + 7 + table_bytes as usize + 7;
                     let mut arguments = vec![];
                     let mut at = 0;
                     for t in &p.args[i] {
@@ -2013,7 +2014,7 @@ pub(crate) fn compile_into(
                     if frame_bytes > 65536 {
                         return Err("native probe frame storage exceeds 64 KiB".into());
                     }
-                    let frame = slot(&mut b, 104);
+                    let frame = slot(&mut b, probes.frame_bytes());
                     let table = slot(&mut b, table_bytes);
                     probes.enter(
                         module,
@@ -3828,8 +3829,8 @@ pub(crate) fn compile_into(
                 });
             let storage_table = root_probes.as_ref().map(|probes| {
                 let bytes = probes.table_bytes(i);
-                frame_bytes += 104 + 7 + bytes as usize + 7;
-                probe_frame = Some(slot(&mut b, 104));
+                frame_bytes += probes.frame_bytes() as usize + 7 + bytes as usize + 7;
+                probe_frame = Some(slot(&mut b, probes.frame_bytes()));
                 slot(&mut b, bytes)
             });
             let transient_table = root_probes

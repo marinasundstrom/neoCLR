@@ -78,6 +78,20 @@ _Static_assert(sizeof(neoclr_gc_root_map) == 8, "root execution map size");
  * checked on each entry/publication; slot addresses/widths are still admitted.
  * STORAGE_MAP/TRANSIENT_MAP discriminate frame plan pointers from C strings.
  * Ordinary/legacy string hooks remain checked and clear the relevant format bit. */
+/* Trusted owner-thread state imports. Entry returns an opaque runtime-instance
+ * handle scoped to this generated activation. Store in an untraced compiler slot;
+ * never expose through managed objects, queues or callbacks. Same-thread park/resume
+ * and nested host reentry preserve it; migration or use after leave/thread exit is
+ * forbidden. Ordinary native callers use the checked map hooks below. Each use
+ * still validates current head, descriptors and faults; root values are not cached.
+ * Shared-worker lowering retains its existing coordination imports. */
+void *neoclr_gc_state_enter_v1(neoclr_probe_frame *, const void *, uint32_t,
+    const neoclr_probe_storage *, uint32_t, const void *, uint32_t);
+void neoclr_gc_state_stack_v1(void *, neoclr_probe_frame *, uint32_t,
+    const uint64_t *, uint32_t, const void *, uint32_t);
+void neoclr_gc_state_transient_v1(void *, neoclr_probe_frame *, uint32_t,
+    const neoclr_probe_storage *, uint32_t, const void *, uint32_t);
+void neoclr_gc_state_leave_v1(void *, neoclr_probe_frame *);
 void neoclr_gc_enter_map_v1(neoclr_probe_frame *, const void *, uint32_t,
     const neoclr_probe_storage *, uint32_t, const void *, uint32_t);
 void neoclr_gc_transient_map_v1(neoclr_probe_frame *, uint32_t,

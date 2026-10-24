@@ -1,5 +1,15 @@
 # neoCLR platform roadmap
 
+**Concurrent GC priority (author direction, 2026-10-24):** Work toward concurrent
+native GC as the default, retaining synchronous GC as the comparison and reusing
+existing root, metadata and heap optimizations. Qualify correctness before enabling
+concurrent reclamation. Evaluate plain and complex HTTP handlers and standalone
+workloads across JIT/AOT; assess interpreter-specific behavior separately. Measure
+throughput, CPU, pauses and memory together. There is no 10,000-request plaintext
+ceiling: that figure was an illustrative JSON expectation. The current collector is
+still synchronous per heap; the [phase baseline and implementation requirements](../benchmarks/execution/concurrent-gc-investigation/README.md)
+record evidence and outstanding work, not a concurrent performance claim.
+
 **Author-directed media types (2026-10-23):** Complete the bounded HTTP value-contract
 slice with cached typed presets, lazy structured projections, shared primitive
 validation and focused allocation/wire evidence. [Contract and evidence](experiments/media-types/README.md).
@@ -6801,3 +6811,12 @@ state slot and stack-budget/early-return/lifetime qualification in JIT/AOT. Keep
 ordinary checked imports and shared-worker coordination separate; no production
 state-retention or generated-code change is implemented yet.
 [Contract and evidence](../benchmarks/execution/state-handle/README.md).
+
+
+**Generated state handles integrated (2026-10-24):** Native JIT/AOT without shared
+worker lowering now reuses admission's execution state through typed imports and
+an eight-byte compiler slot. Collector frames remain 104 bytes; early returns,
+suspension/reentry, forced GC, worker and async checks pass. Matching hosts are
+required. CPU/request improves 1.1–1.6% in local trials, throughput 0.3–1.1%, with
+mixed tails and 1.8–1.9% larger objects. Initial duplicate-TLS regression is preserved.
+[Evidence and limits](../benchmarks/execution/state-integration/README.md).

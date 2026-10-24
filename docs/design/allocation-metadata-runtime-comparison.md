@@ -750,3 +750,26 @@ nonmigration lifetime contract; wrong-thread/stale handles cannot be accepted as
 ordinary native inputs. Native tests and 6.6–8.8% hook-loop CPU savings support a
 next generated-code experiment, not a production/HTTP performance claim.
 [Contract, alternatives and evidence](../../benchmarks/execution/state-handle/README.md).
+
+
+### Generated state handles integrated — 2026-10-24
+
+Native JIT/AOT without shared-worker lowering now carries a scoped opaque state
+handle in eight extra compiler-owned stack bytes. Admission returns its existing
+TLS resolution; publication and leave reuse it while checking current state. The
+collector-visible frame stays 104 bytes. Same-thread suspension/reentry remains
+supported; cross-thread migration is prohibited by this trusted private contract.
+Checked native/probe/shared-worker imports remain. An initial duplicate TLS lookup
+regressed capacity and was removed. Retained local CPU/response falls 1.1–1.6%,
+with only 0.3–1.1% throughput changes and mixed tails; plain/JSON objects grow
+1.8–1.9%. This is a modest cost tradeoff, not concurrent GC or peer parity.
+[Qualification and raw evidence](../../benchmarks/execution/state-integration/README.md).
+
+
+### Concurrent collector evaluation (2026-10-24)
+
+The author now prioritizes concurrent GC toward becoming the default, with the
+synchronous collector retained for comparison. The [new phase baseline](../../benchmarks/execution/concurrent-gc-investigation/README.md)
+separates collector tracing cost from application CPU and records mutation,
+read-safety, root capture and reclamation requirements. HTTP and standalone
+workloads are both required; concurrent collection and gains are not yet implemented.

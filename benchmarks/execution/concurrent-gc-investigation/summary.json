@@ -1,0 +1,214 @@
+{
+  "plain": {
+    "aot": {
+      "collectorWallMicrosecondsPerRequest": [
+        20.4755859375,
+        18.880859375,
+        20.4150390625
+      ],
+      "phaseMeanMicrosecondsPerRequest": {
+        "index": 2.8095703125,
+        "roots": 0.24348958333333334,
+        "trace": 13.594075520833334,
+        "cleanup": 0.054036458333333336,
+        "sweep": 3.2545572916666665
+      },
+      "phaseSharePercent": {
+        "index": 14.0790160511549,
+        "roots": 1.2201487668015136,
+        "trace": 68.12116664491712,
+        "cleanup": 0.27078167819391885,
+        "sweep": 16.30888685893253
+      },
+      "instrumentedCollectorWallMicrosecondsPerRequest": [
+        18.923828125,
+        18.9033203125,
+        22.26953125
+      ],
+      "instrumentedPausesIncludingStartup": [
+        {
+          "maximumMicroseconds": 32.0,
+          "bucketUpperMicroseconds": {
+            "0.5": 32.768,
+            "0.95": 32.768,
+            "0.99": 32.768
+          }
+        },
+        {
+          "maximumMicroseconds": 34.0,
+          "bucketUpperMicroseconds": {
+            "0.5": 32.768,
+            "0.95": 32.768,
+            "0.99": 32.768
+          }
+        },
+        {
+          "maximumMicroseconds": 111.0,
+          "bucketUpperMicroseconds": {
+            "0.5": 32.768,
+            "0.95": 32.768,
+            "0.99": 65.536
+          }
+        }
+      ]
+    },
+    "jit": {
+      "collectorWallMicrosecondsPerRequest": [
+        17.2802734375,
+        17.5849609375,
+        17.5107421875
+      ],
+      "phaseMeanMicrosecondsPerRequest": {
+        "index": 2.5345052083333335,
+        "roots": 0.24153645833333334,
+        "trace": 12.498697916666666,
+        "cleanup": 0.06510416666666667,
+        "sweep": 3.123046875
+      },
+      "phaseSharePercent": {
+        "index": 13.727564441623471,
+        "roots": 1.3082266652561796,
+        "trace": 67.69632215522408,
+        "cleanup": 0.35262174265665225,
+        "sweep": 16.915264995239607
+      },
+      "instrumentedCollectorWallMicrosecondsPerRequest": [
+        17.81640625,
+        17.880859375,
+        19.87890625
+      ],
+      "instrumentedPausesIncludingStartup": [
+        {
+          "maximumMicroseconds": 29.0,
+          "bucketUpperMicroseconds": {
+            "0.5": 32.768,
+            "0.95": 32.768,
+            "0.99": 32.768
+          }
+        },
+        {
+          "maximumMicroseconds": 30.0,
+          "bucketUpperMicroseconds": {
+            "0.5": 32.768,
+            "0.95": 32.768,
+            "0.99": 32.768
+          }
+        },
+        {
+          "maximumMicroseconds": 77.0,
+          "bucketUpperMicroseconds": {
+            "0.5": 32.768,
+            "0.95": 32.768,
+            "0.99": 32.768
+          }
+        }
+      ]
+    }
+  },
+  "json": {
+    "aot": {
+      "collectorWallMicrosecondsPerRequest": [
+        42.7080078125,
+        40.9853515625,
+        40.1484375
+      ],
+      "phaseMeanMicrosecondsPerRequest": {
+        "index": 6.188151041666667,
+        "roots": 2.53515625,
+        "trace": 28.898111979166668,
+        "cleanup": 0.12369791666666667,
+        "sweep": 7.019856770833333
+      },
+      "phaseSharePercent": {
+        "index": 13.823644904667026,
+        "roots": 5.66325862796143,
+        "trace": 64.55518550298869,
+        "cleanup": 0.2763274625867159,
+        "sweep": 15.681583501796126
+      },
+      "instrumentedCollectorWallMicrosecondsPerRequest": [
+        45.298828125,
+        45.283203125,
+        44.1796875
+      ],
+      "instrumentedPausesIncludingStartup": [
+        {
+          "maximumMicroseconds": 39.0,
+          "bucketUpperMicroseconds": {
+            "0.5": 32.768,
+            "0.95": 32.768,
+            "0.99": 65.536
+          }
+        },
+        {
+          "maximumMicroseconds": 43.0,
+          "bucketUpperMicroseconds": {
+            "0.5": 32.768,
+            "0.95": 32.768,
+            "0.99": 65.536
+          }
+        },
+        {
+          "maximumMicroseconds": 41.0,
+          "bucketUpperMicroseconds": {
+            "0.5": 32.768,
+            "0.95": 32.768,
+            "0.99": 32.768
+          }
+        }
+      ]
+    },
+    "jit": {
+      "collectorWallMicrosecondsPerRequest": [
+        39.318359375,
+        39.51171875,
+        39.103515625
+      ],
+      "phaseMeanMicrosecondsPerRequest": {
+        "index": 6.0146484375,
+        "roots": 2.548828125,
+        "trace": 29.0087890625,
+        "cleanup": 0.10709635416666667,
+        "sweep": 6.897786458333333
+      },
+      "phaseSharePercent": {
+        "index": 13.49267202663921,
+        "roots": 5.717790873441847,
+        "trace": 65.07547045808049,
+        "cleanup": 0.24024945049327812,
+        "sweep": 15.473817191345177
+      },
+      "instrumentedCollectorWallMicrosecondsPerRequest": [
+        46.6044921875,
+        44.4599609375,
+        43.1494140625
+      ],
+      "instrumentedPausesIncludingStartup": [
+        {
+          "maximumMicroseconds": 108.0,
+          "bucketUpperMicroseconds": {
+            "0.5": 32.768,
+            "0.95": 32.768,
+            "0.99": 65.536
+          }
+        },
+        {
+          "maximumMicroseconds": 45.0,
+          "bucketUpperMicroseconds": {
+            "0.5": 32.768,
+            "0.95": 32.768,
+            "0.99": 65.536
+          }
+        },
+        {
+          "maximumMicroseconds": 76.0,
+          "bucketUpperMicroseconds": {
+            "0.5": 32.768,
+            "0.95": 32.768,
+            "0.99": 32.768
+          }
+        }
+      ]
+    }
+  }
+}

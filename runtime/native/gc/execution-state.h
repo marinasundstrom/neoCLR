@@ -5,7 +5,9 @@
  * Consolidation does not merge lifetimes: no whole-state reset is permitted.
  * Park/resume changes roots only; pacing epochs and statistics survive it.
  * A published boundary may check pacing using the state it already resolved.
- * No pointer to this state may be retained or transferred to another thread. */
+ * Only trusted generated activations may retain the opaque handle until leave,
+ * including same-owner-thread park/resume. Never transfer it to another thread;
+ * ordinary native callers resolve current TLS instead. See root-probe.h. */
 typedef struct {
     struct {
         neoclr_probe_frame *head;

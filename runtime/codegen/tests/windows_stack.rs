@@ -59,9 +59,9 @@ fn recursive_windows_object_has_inline_page_probe_and_context_entry() {
     for name in [
         "neoclr_entry_v4",
         "neoclr_native_stack_check_v1",
-        "neoclr_gc_enter_map_v1",
-        "neoclr_gc_leave_v1",
-        "neoclr_gc_stack_map_v1",
+        "neoclr_gc_state_enter_v1",
+        "neoclr_gc_state_leave_v1",
+        "neoclr_gc_state_stack_v1",
     ] {
         assert!(names.contains(&name), "missing {name}");
     }
@@ -337,5 +337,5 @@ fn console_admits_scheduler_and_runtime_await_with_rooted_stack_contract() {
     assert_eq!(obj.format(), object::BinaryFormat::Coff);
     let names: Vec<_> = obj.symbols().filter_map(|s| s.name().ok()).collect();
     assert!(names.contains(&"neoclr_native_stack_check_v1"));
-    assert!(names.contains(&"neoclr_gc_stack_map_v1"));
+    assert!(names.contains(&"neoclr_gc_state_stack_v1"));
 }

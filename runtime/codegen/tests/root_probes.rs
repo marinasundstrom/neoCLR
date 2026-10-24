@@ -533,8 +533,8 @@ ret
         assert_eq!(maps.len(), if gc { 1 } else { 4 }, "{symbols}");
         assert!(maps.iter().any(|s| s.ends_with("_1_3")), "{maps:?}");
         if gc {
-            assert!(symbols.contains("neoclr_gc_transient_map_v1"));
-            assert!(symbols.contains("neoclr_gc_stack_map_v1"));
+            assert!(symbols.contains("neoclr_gc_state_transient_v1"));
+            assert!(symbols.contains("neoclr_gc_state_stack_v1"));
             let bytes = fs::read(&output).unwrap();
             assert!(
                 !bytes

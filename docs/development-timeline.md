@@ -22393,3 +22393,26 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   author policy statement or a claim of peer parity.
   [Diagnostics](../benchmarks/execution/gc-triggers/README.md) and
   [retained policy/evidence](../benchmarks/execution/publication-budget/README.md).
+
+
+### 2026-10-24 — Concurrent GC direction and whole-runtime qualification
+
+- Author asks whether concurrent GC is in use, correcting an initial reference to
+  concurrent JIT. Assistant explains that collection currently blocks the owning
+  heap; independent worker heaps do not make an individual collection concurrent.
+- Author directs work toward concurrent GC as the default, retaining synchronous
+  GC for comparison and reusing previous optimizations. The author's belief that
+  current GC is causing performance problems is a hypothesis to test. Assistant
+  proposes measuring tracing, pauses, CPU and memory before attributing the gap.
+- Author corrects the interpretation of 10,000 requests/second: plaintext should
+  maximize throughput against comparable servers; that number was illustrative for
+  basic JSON. Author also requires ordinary samples and increasingly complex work
+  inside and outside HTTP requests, across relevant execution modes.
+- Assistant integrates scoped state handles with modest local CPU gains and larger
+  generated objects; this is reusable infrastructure, not concurrent collection.
+  [Integration and validation](../benchmarks/execution/state-integration/README.md).
+- Assistant measures normal and instrumented plain/JSON JIT/AOT cohorts. Tracing is
+  65–68% of instrumented collector phase time. This does not establish application
+  CPU share or a concurrent speedup. The complete standalone matrix, mutation/read
+  protocol, concurrent tracing and safe reclamation remain open. The current
+  default remains synchronous. [Baseline and requirements](../benchmarks/execution/concurrent-gc-investigation/README.md).
