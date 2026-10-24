@@ -1,0 +1,90 @@
+00000001001b0a50 <_neoclr_value_0>:
+1001b0a50: a9bf7bfd    	stp	x29, x30, [sp, #-0x10]!
+1001b0a54: 910003fd    	mov	x29, sp
+1001b0a58: f81f0ffa    	str	x26, [sp, #-0x10]!
+1001b0a5c: a9bf63f7    	stp	x23, x24, [sp, #-0x10]!
+1001b0a60: a9bf5bf5    	stp	x21, x22, [sp, #-0x10]!
+1001b0a64: d10283ff    	sub	sp, sp, #0xa0
+1001b0a68: aa0303f7    	mov	x23, x3
+1001b0a6c: aa0203fa    	mov	x26, x2
+1001b0a70: 910003e2    	mov	x2, sp
+1001b0a74: f9000040    	str	x0, [x2]
+1001b0a78: aa0003f6    	mov	x22, x0
+1001b0a7c: 910023e3    	add	x3, sp, #0x8
+1001b0a80: f9000061    	str	x1, [x3]
+1001b0a84: aa0103f5    	mov	x21, x1
+1001b0a88: 910043e0    	add	x0, sp, #0x10
+1001b0a8c: 910003e4    	mov	x4, sp
+1001b0a90: 9101e3e5    	add	x5, sp, #0x78
+1001b0a94: f90000a4    	str	x4, [x5]
+1001b0a98: 52800106    	mov	w6, #0x8                ; =8
+1001b0a9c: 52800005    	mov	w5, #0x0                ; =0
+1001b0aa0: 910203e7    	add	x7, sp, #0x80
+1001b0aa4: b90000e6    	str	w6, [x7]
+1001b0aa8: 910213e6    	add	x6, sp, #0x84
+1001b0aac: b90000c5    	str	w5, [x6]
+1001b0ab0: 910023e7    	add	x7, sp, #0x8
+1001b0ab4: 910223e8    	add	x8, sp, #0x88
+1001b0ab8: f9000107    	str	x7, [x8]
+1001b0abc: 52800109    	mov	w9, #0x8                ; =8
+1001b0ac0: 52800008    	mov	w8, #0x0                ; =0
+1001b0ac4: 910243ea    	add	x10, sp, #0x90
+1001b0ac8: b9000149    	str	w9, [x10]
+1001b0acc: 910253e9    	add	x9, sp, #0x94
+1001b0ad0: b9000128    	str	w8, [x9]
+1001b0ad4: 9101e3e3    	add	x3, sp, #0x78
+1001b0ad8: 52800044    	mov	w4, #0x2                ; =2
+1001b0adc: d0003245    	adrp	x5, 0x1007fa000 <_fault_frame_1124+0x20>
+1001b0ae0: 910d90a5    	add	x5, x5, #0x364
+1001b0ae4: 528005e6    	mov	w6, #0x2f               ; =47
+1001b0ae8: 52800002    	mov	w2, #0x0                ; =0
+1001b0aec: 90fff28a    	adrp	x10, 0x100000000 <_writev+0x100000000>
+1001b0af0: 9133414a    	add	x10, x10, #0xcd0
+1001b0af4: aa1703e1    	mov	x1, x23
+1001b0af8: d63f0140    	blr	x10
+1001b0afc: b0fff2cb    	adrp	x11, 0x100009000 <_neoclr_terminal_read_v1+0x38>
+1001b0b00: 9121816b    	add	x11, x11, #0x860
+1001b0b04: d63f0160    	blr	x11
+1001b0b08: d0003241    	adrp	x1, 0x1007fa000 <_fault_frame_1124+0x20>
+1001b0b0c: 9108a021    	add	x1, x1, #0x228
+1001b0b10: d0003244    	adrp	x4, 0x1007fa000 <_fault_frame_1124+0x20>
+1001b0b14: 91090084    	add	x4, x4, #0x240
+1001b0b18: d0003245    	adrp	x5, 0x1007fa000 <_fault_frame_1124+0x20>
+1001b0b1c: 910980a5    	add	x5, x5, #0x260
+1001b0b20: d0003243    	adrp	x3, 0x1007fa000 <_fault_frame_1124+0x20>
+1001b0b24: 9109e063    	add	x3, x3, #0x278
+1001b0b28: d0003242    	adrp	x2, 0x1007fa000 <_fault_frame_1124+0x20>
+1001b0b2c: 910a8042    	add	x2, x2, #0x2a0
+1001b0b30: d000324f    	adrp	x15, 0x1007fa000 <_fault_frame_1124+0x20>
+1001b0b34: 910ae1ef    	add	x15, x15, #0x2b8
+1001b0b38: d000324e    	adrp	x14, 0x1007fa000 <_fault_frame_1124+0x20>
+1001b0b3c: 910b61ce    	add	x14, x14, #0x2d8
+1001b0b40: d000324d    	adrp	x13, 0x1007fa000 <_fault_frame_1124+0x20>
+1001b0b44: 910be1ad    	add	x13, x13, #0x2f8
+1001b0b48: d000324c    	adrp	x12, 0x1007fa000 <_fault_frame_1124+0x20>
+1001b0b4c: 910c818c    	add	x12, x12, #0x320
+1001b0b50: d000324b    	adrp	x11, 0x1007fa000 <_fault_frame_1124+0x20>
+1001b0b54: 910d416b    	add	x11, x11, #0x350
+1001b0b58: 7100001f    	cmp	w0, #0x0
+1001b0b5c: 54000b01    	b.ne	0x1001b0cbc <_neoclr_value_0+0x26c>
+1001b0b60: 90002e04    	adrp	x4, 0x100770000 <_neoclr_entry_v4+0x4>
+1001b0b64: 91066084    	add	x4, x4, #0x198
+1001b0b68: d0fff30d    	adrp	x13, 0x100012000 <_neoclr_http_workers_run+0x300>
+1001b0b6c: 9136b1ad    	add	x13, x13, #0xdac
+1001b0b70: aa1a03e3    	mov	x3, x26
+1001b0b74: aa1503e1    	mov	x1, x21
+1001b0b78: aa1703f5    	mov	x21, x23
+1001b0b7c: aa1603e0    	mov	x0, x22
+1001b0b80: aa1503e2    	mov	x2, x21
+1001b0b84: d63f01a0    	blr	x13
+1001b0b88: 528000ad    	mov	w13, #0x5               ; =5
+1001b0b8c: 5280006e    	mov	w14, #0x3               ; =3
+1001b0b90: 7100141f    	cmp	w0, #0x5
+1001b0b94: aa0003e9    	mov	x9, x0
+1001b0b98: 9a8e01a0    	csel	x0, x13, x14, eq
+1001b0b9c: d0003244    	adrp	x4, 0x1007fa000 <_fault_frame_1124+0x20>
+1001b0ba0: 9108a084    	add	x4, x4, #0x228
+1001b0ba4: d0003247    	adrp	x7, 0x1007fa000 <_fault_frame_1124+0x20>
+1001b0ba8: 910900e7    	add	x7, x7, #0x240
+1001b0bac: d0003248    	adrp	x8, 0x1007fa000 <_fault_frame_1124+0x20>
+1001b0bb0: 91098108    	add	x8, x8, #0x260

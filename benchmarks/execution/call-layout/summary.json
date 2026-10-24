@@ -1,0 +1,34 @@
+{
+  "baseline": {
+    "requestsPerSecond": 2937.7,
+    "rateRange": [
+      2906.6,
+      2968.8
+    ],
+    "cpuMicrosecondsPerResponse": 338.4566885173314
+  },
+  "long-range": {
+    "requestsPerSecond": 2911.1000000000004,
+    "rateRange": [
+      2898.8,
+      2923.4
+    ],
+    "cpuMicrosecondsPerResponse": 344.36673347726764
+  },
+  "dynamic": {
+    "requestsPerSecond": 2954.9,
+    "rateRange": [
+      2940.4,
+      2969.4
+    ],
+    "cpuMicrosecondsPerResponse": 339.0178508447825
+  },
+  "jit": {
+    "requestsPerSecond": 1781.2,
+    "rateRange": [
+      1737.4,
+      1825
+    ],
+    "cpuMicrosecondsPerResponse": 549.8674603567683
+  }
+}

@@ -1,0 +1,29 @@
+diff --git a/runtime/codegen/src/values.rs b/runtime/codegen/src/values.rs
+index a7961d4cf..8afa01678 100644
+--- a/runtime/codegen/src/values.rs
++++ b/runtime/codegen/src/values.rs
+@@ -434,8 +434,15 @@ pub(super) fn compile(
+     details: Option<&crate::fault_details::Options>,
+     platform_target: super::Target,
+ ) -> Result<Vec<u8>, Error> {
++    let policy = std::env::var("NEOCLR_CALL_EXPERIMENT").unwrap_or_default();
++    if !matches!(policy.as_str(), "" | "long-range" | "jit-policy") {
++        return Err("unknown diagnostic call policy".into());
++    }
+     let mut flags = settings::builder();
+-    flags.set("is_pic", "true")?;
++    flags.set("is_pic", if policy == "jit-policy" { "false" } else { "true" })?;
++    if policy == "jit-policy" {
++        flags.set("use_colocated_libcalls", "false")?;
++    }
+     platform_target.configure_stack(&mut flags)?;
+     let isa = isa::lookup(platform_target.triple().parse().unwrap())?
+         .finish(settings::Flags::new(flags))?;
+@@ -444,6 +451,6 @@ pub(super) fn compile(
+         "neoclr_values",
+         cranelift_module::default_libcall_names(),
+     )?);
+-    compile_into(input, root, details, platform_target, &mut module, false)?;
++    compile_into(input, root, details, platform_target, &mut module, !policy.is_empty())?;
+     super::finish(module)
+ }

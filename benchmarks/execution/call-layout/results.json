@@ -1,0 +1,754 @@
+{
+  "passed": true,
+  "builds": [
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/call-layout/experiment-codegen",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/primitive-comparison-build/app.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/call-layout/results/baseline.o",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-console-read-byte",
+        "--bind-console-write-line",
+        "--bind-console-stream-output",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--bind-stack-trace",
+        "--native-stack-budget",
+        "--bind-integer-text",
+        "--bind-character-text",
+        "--bind-system-culture",
+        "--bind-environment-platform",
+        "--bind-time-zone-rules",
+        "--bind-cryptography",
+        "--bind-tls",
+        "--bind-scheduler",
+        "--bind-task-queue",
+        "--bind-timers",
+        "--bind-runtime-async",
+        "--bind-file-input",
+        "--bind-socket-listener",
+        "--bind-socket-accept",
+        "--bind-socket-transfer",
+        "--bind-socket-client"
+      ],
+      "policy": "",
+      "exitCode": 0,
+      "stdoutSha256": "1ecc5818100c6de829b2fcf1092eabb99b45e364789fd5aae1c08d5dcc180220",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-pthread",
+        "-DNEOCLR_RUNTIME_ASYNC",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/async",
+        "-Wno-deprecated-declarations",
+        "-DNEOCLR_MANAGED_TLS",
+        "-DNEOCLR_HTTP_HEAP_BYTES=1048576",
+        "-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=65536",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "/Users/robert/Projects/neoclr/target/native-host-ownership/owned-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.c",
+        "/Users/robert/Projects/neoclr/runtime/native/workers/native-workers.c",
+        "/Users/robert/Projects/neoclr/runtime/native/workers/http-workers.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/file-input.c",
+        "/Users/robert/Projects/neoclr/tools/native/entry-arguments.c",
+        "/Users/robert/Projects/neoclr/runtime/native/async/native-runtime.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/tls-managed.c",
+        "/Users/robert/Projects/neoclr/tools/aot-native-text/target/text-only/aarch64-apple-darwin/release/libneoclr_aot_native_text.a",
+        "/Users/robert/Projects/neoclr/tools/native-tls/target/aarch64-apple-darwin/native-ffi/libneoclr_native_tls.a",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/call-layout/results/baseline",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/gc",
+        "-DNEOCLR_GC_PACED",
+        "/Users/robert/Projects/neoclr/target/gc-mode-comparison-final/main.c",
+        "/Users/robert/Projects/neoclr/target/call-layout/results/baseline.o"
+      ],
+      "policy": null,
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/call-layout/experiment-codegen",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/primitive-comparison-build/app.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/call-layout/results/long-range.o",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-console-read-byte",
+        "--bind-console-write-line",
+        "--bind-console-stream-output",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--bind-stack-trace",
+        "--native-stack-budget",
+        "--bind-integer-text",
+        "--bind-character-text",
+        "--bind-system-culture",
+        "--bind-environment-platform",
+        "--bind-time-zone-rules",
+        "--bind-cryptography",
+        "--bind-tls",
+        "--bind-scheduler",
+        "--bind-task-queue",
+        "--bind-timers",
+        "--bind-runtime-async",
+        "--bind-file-input",
+        "--bind-socket-listener",
+        "--bind-socket-accept",
+        "--bind-socket-transfer",
+        "--bind-socket-client"
+      ],
+      "policy": "long-range",
+      "exitCode": 0,
+      "stdoutSha256": "1ecc5818100c6de829b2fcf1092eabb99b45e364789fd5aae1c08d5dcc180220",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-pthread",
+        "-DNEOCLR_RUNTIME_ASYNC",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/async",
+        "-Wno-deprecated-declarations",
+        "-DNEOCLR_MANAGED_TLS",
+        "-DNEOCLR_HTTP_HEAP_BYTES=1048576",
+        "-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=65536",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "/Users/robert/Projects/neoclr/target/native-host-ownership/owned-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.c",
+        "/Users/robert/Projects/neoclr/runtime/native/workers/native-workers.c",
+        "/Users/robert/Projects/neoclr/runtime/native/workers/http-workers.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/file-input.c",
+        "/Users/robert/Projects/neoclr/tools/native/entry-arguments.c",
+        "/Users/robert/Projects/neoclr/runtime/native/async/native-runtime.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/tls-managed.c",
+        "/Users/robert/Projects/neoclr/tools/aot-native-text/target/text-only/aarch64-apple-darwin/release/libneoclr_aot_native_text.a",
+        "/Users/robert/Projects/neoclr/tools/native-tls/target/aarch64-apple-darwin/native-ffi/libneoclr_native_tls.a",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/call-layout/results/long-range",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/gc",
+        "-DNEOCLR_GC_PACED",
+        "/Users/robert/Projects/neoclr/target/gc-mode-comparison-final/main.c",
+        "/Users/robert/Projects/neoclr/target/call-layout/results/long-range.o"
+      ],
+      "policy": null,
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "/Users/robert/Projects/neoclr/target/gc-mode-comparison-final/main.c",
+        "/Users/robert/Projects/neoclr/target/call-layout/results/baseline.o",
+        "/Users/robert/Projects/neoclr/target/native-host-ownership/owned.dylib",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/call-layout/results/dynamic"
+      ],
+      "policy": null,
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    }
+  ],
+  "trials": [
+    {
+      "label": "baseline",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/call-layout/results/baseline"
+      ],
+      "warmup": {
+        "clientCpuPerWall": 0.20632428299578587,
+        "clientCpuSeconds": 0.208546,
+        "clientProcessCpuSeconds": 0.213313,
+        "completed": 2942,
+        "drained": 32,
+        "latencyMilliseconds": {
+          "p50": 10.797584,
+          "p95": 11.205,
+          "p99": 13.273
+        },
+        "requestsPerSecond": 2942,
+        "windowAndDrainSeconds": 1.010768083
+      },
+      "trial": {
+        "clientCpuPerWall": 0.20465994766461237,
+        "clientCpuSeconds": 1.0254079999999999,
+        "clientProcessCpuSeconds": 1.02924,
+        "completed": 14844,
+        "drained": 32,
+        "latencyMilliseconds": {
+          "p50": 10.742875,
+          "p95": 10.992625,
+          "p99": 12.460292
+        },
+        "requestsPerSecond": 2968.8,
+        "windowAndDrainSeconds": 5.010301291
+      },
+      "psCpuBefore": "0:00.01",
+      "psCpuAfter": "0:06.01",
+      "cpuSeconds": 6.0,
+      "cpuMicrosecondsPerResponse": 336.1344537815126,
+      "exitCode": 0,
+      "stdout": [
+        "READY 55895 55896\n",
+        "DONE 55896 17850 0\n"
+      ],
+      "stderr": [
+        "MODETIME 6.055099000\n"
+      ]
+    },
+    {
+      "label": "long-range",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/call-layout/results/long-range"
+      ],
+      "warmup": {
+        "clientCpuPerWall": 0.21312098834016144,
+        "clientCpuSeconds": 0.215411,
+        "clientProcessCpuSeconds": 0.218219,
+        "completed": 2814,
+        "drained": 32,
+        "latencyMilliseconds": {
+          "p50": 11.014125,
+          "p95": 12.268209,
+          "p99": 18.788792
+        },
+        "requestsPerSecond": 2814,
+        "windowAndDrainSeconds": 1.010745125
+      },
+      "trial": {
+        "clientCpuPerWall": 0.21030838004835814,
+        "clientCpuSeconds": 1.0538750000000001,
+        "clientProcessCpuSeconds": 1.057724,
+        "completed": 14494,
+        "drained": 32,
+        "latencyMilliseconds": {
+          "p50": 10.957833,
+          "p95": 11.600125,
+          "p99": 14.6835
+        },
+        "requestsPerSecond": 2898.8,
+        "windowAndDrainSeconds": 5.011093708
+      },
+      "psCpuBefore": "0:00.01",
+      "psCpuAfter": "0:06.01",
+      "cpuSeconds": 6.0,
+      "cpuMicrosecondsPerResponse": 345.383375546857,
+      "exitCode": 0,
+      "stdout": [
+        "READY 57401 57402\n",
+        "DONE 57402 17372 0\n"
+      ],
+      "stderr": [
+        "MODETIME 6.042589000\n"
+      ]
+    },
+    {
+      "label": "dynamic",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/call-layout/results/dynamic"
+      ],
+      "warmup": {
+        "clientCpuPerWall": 0.2250761411260739,
+        "clientCpuSeconds": 0.227412,
+        "clientProcessCpuSeconds": 0.230582,
+        "completed": 2805,
+        "drained": 32,
+        "latencyMilliseconds": {
+          "p50": 10.964125,
+          "p95": 12.217,
+          "p99": 20.264042
+        },
+        "requestsPerSecond": 2805,
+        "windowAndDrainSeconds": 1.010378083
+      },
+      "trial": {
+        "clientCpuPerWall": 0.21022514311626622,
+        "clientCpuSeconds": 1.0534070000000002,
+        "clientProcessCpuSeconds": 1.057285,
+        "completed": 14847,
+        "drained": 32,
+        "latencyMilliseconds": {
+          "p50": 10.748791,
+          "p95": 10.9935,
+          "p99": 11.620042
+        },
+        "requestsPerSecond": 2969.4,
+        "windowAndDrainSeconds": 5.010851625
+      },
+      "psCpuBefore": "0:00.01",
+      "psCpuAfter": "0:06.01",
+      "cpuSeconds": 6.0,
+      "cpuMicrosecondsPerResponse": 338.67690223526756,
+      "exitCode": 0,
+      "stdout": [
+        "READY 58423 58424\n",
+        "DONE 58424 17716 0\n"
+      ],
+      "stderr": [
+        "MODETIME 6.045363000\n"
+      ]
+    },
+    {
+      "label": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr-codegen",
+        "--jit-managed",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/primitive-comparison-build/app.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/native-host-ownership/owned.dylib",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-console-read-byte",
+        "--bind-console-write-line",
+        "--bind-console-stream-output",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--bind-stack-trace",
+        "--native-stack-budget",
+        "--bind-integer-text",
+        "--bind-character-text",
+        "--bind-system-culture",
+        "--bind-environment-platform",
+        "--bind-time-zone-rules",
+        "--bind-cryptography",
+        "--bind-tls",
+        "--bind-scheduler",
+        "--bind-task-queue",
+        "--bind-timers",
+        "--bind-runtime-async",
+        "--bind-file-input",
+        "--bind-socket-listener",
+        "--bind-socket-accept",
+        "--bind-socket-transfer",
+        "--bind-socket-client"
+      ],
+      "warmup": {
+        "clientCpuPerWall": 0.17622438237211957,
+        "clientCpuSeconds": 0.18051899999999999,
+        "clientProcessCpuSeconds": 0.18334,
+        "completed": 1824,
+        "drained": 32,
+        "latencyMilliseconds": {
+          "p50": 17.459292,
+          "p95": 17.785125,
+          "p99": 17.951375
+        },
+        "requestsPerSecond": 1824,
+        "windowAndDrainSeconds": 1.024370167
+      },
+      "trial": {
+        "clientCpuPerWall": 0.1771681049365878,
+        "clientCpuSeconds": 0.8888710000000001,
+        "clientProcessCpuSeconds": 0.892369,
+        "completed": 9125,
+        "drained": 32,
+        "latencyMilliseconds": {
+          "p50": 17.385,
+          "p95": 18.151,
+          "p99": 26.224292
+        },
+        "requestsPerSecond": 1825,
+        "windowAndDrainSeconds": 5.017105084
+      },
+      "psCpuBefore": "0:06.19",
+      "psCpuAfter": "0:12.19",
+      "cpuSeconds": 5.999999999999999,
+      "cpuMicrosecondsPerResponse": 544.8106782892944,
+      "exitCode": 0,
+      "stdout": [
+        "READY 59795 59796\n",
+        "DONE 59796 11013 0\n"
+      ],
+      "stderr": [
+        "JIT_RESULT {\"compileAndFinalizeSeconds\":2.496540375,\"guestExitCode\":0,\"invocationSeconds\":6.066193417,\"metadataLoadSeconds\":0.108329792,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":3.602887833}\n"
+      ]
+    },
+    {
+      "label": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr-codegen",
+        "--jit-managed",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/primitive-comparison-build/app.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/native-host-ownership/owned.dylib",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-console-read-byte",
+        "--bind-console-write-line",
+        "--bind-console-stream-output",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--bind-stack-trace",
+        "--native-stack-budget",
+        "--bind-integer-text",
+        "--bind-character-text",
+        "--bind-system-culture",
+        "--bind-environment-platform",
+        "--bind-time-zone-rules",
+        "--bind-cryptography",
+        "--bind-tls",
+        "--bind-scheduler",
+        "--bind-task-queue",
+        "--bind-timers",
+        "--bind-runtime-async",
+        "--bind-file-input",
+        "--bind-socket-listener",
+        "--bind-socket-accept",
+        "--bind-socket-transfer",
+        "--bind-socket-client"
+      ],
+      "warmup": {
+        "clientCpuPerWall": 0.1701928712965506,
+        "clientCpuSeconds": 0.17461200000000002,
+        "clientProcessCpuSeconds": 0.17744,
+        "completed": 1809,
+        "drained": 32,
+        "latencyMilliseconds": {
+          "p50": 17.464625,
+          "p95": 17.801292,
+          "p99": 18.041791
+        },
+        "requestsPerSecond": 1809,
+        "windowAndDrainSeconds": 1.025965416
+      },
+      "trial": {
+        "clientCpuPerWall": 0.17436766046595148,
+        "clientCpuSeconds": 0.8746740000000001,
+        "clientProcessCpuSeconds": 0.87801,
+        "completed": 8687,
+        "drained": 32,
+        "latencyMilliseconds": {
+          "p50": 17.492125,
+          "p95": 23.342542,
+          "p99": 45.895166
+        },
+        "requestsPerSecond": 1737.4,
+        "windowAndDrainSeconds": 5.01626275
+      },
+      "psCpuBefore": "0:06.17",
+      "psCpuAfter": "0:12.03",
+      "cpuSeconds": 5.859999999999999,
+      "cpuMicrosecondsPerResponse": 554.9242424242424,
+      "exitCode": 0,
+      "stdout": [
+        "READY 54433 54434\n",
+        "DONE 54434 10560 0\n"
+      ],
+      "stderr": [
+        "JIT_RESULT {\"compileAndFinalizeSeconds\":2.503297583,\"guestExitCode\":0,\"invocationSeconds\":6.077575917,\"metadataLoadSeconds\":0.099984417,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":3.571777}\n"
+      ]
+    },
+    {
+      "label": "dynamic",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/call-layout/results/dynamic"
+      ],
+      "warmup": {
+        "clientCpuPerWall": 0.22221465495775086,
+        "clientCpuSeconds": 0.22459199999999999,
+        "clientProcessCpuSeconds": 0.227648,
+        "completed": 2826,
+        "drained": 32,
+        "latencyMilliseconds": {
+          "p50": 11.0865,
+          "p95": 12.079875,
+          "p99": 17.110709
+        },
+        "requestsPerSecond": 2826,
+        "windowAndDrainSeconds": 1.010698417
+      },
+      "trial": {
+        "clientCpuPerWall": 0.21049401079778987,
+        "clientCpuSeconds": 1.054708,
+        "clientProcessCpuSeconds": 1.058587,
+        "completed": 14702,
+        "drained": 32,
+        "latencyMilliseconds": {
+          "p50": 10.78175,
+          "p95": 11.147541,
+          "p99": 15.945417
+        },
+        "requestsPerSecond": 2940.4,
+        "windowAndDrainSeconds": 5.010631875
+      },
+      "psCpuBefore": "0:00.01",
+      "psCpuAfter": "0:05.98",
+      "cpuSeconds": 5.970000000000001,
+      "cpuMicrosecondsPerResponse": 339.35879945429747,
+      "exitCode": 0,
+      "stdout": [
+        "READY 65030 65031\n",
+        "DONE 65031 17592 0\n"
+      ],
+      "stderr": [
+        "MODETIME 6.041387000\n"
+      ]
+    },
+    {
+      "label": "long-range",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/call-layout/results/long-range"
+      ],
+      "warmup": {
+        "clientCpuPerWall": 0.21945046207418728,
+        "clientCpuSeconds": 0.22179700000000002,
+        "clientProcessCpuSeconds": 0.224647,
+        "completed": 2823,
+        "drained": 32,
+        "latencyMilliseconds": {
+          "p50": 11.057208,
+          "p95": 12.255959,
+          "p99": 17.443291
+        },
+        "requestsPerSecond": 2823,
+        "windowAndDrainSeconds": 1.010692791
+      },
+      "trial": {
+        "clientCpuPerWall": 0.20790987522137389,
+        "clientCpuSeconds": 1.041807,
+        "clientProcessCpuSeconds": 1.045691,
+        "completed": 14617,
+        "drained": 32,
+        "latencyMilliseconds": {
+          "p50": 10.919167,
+          "p95": 11.159458,
+          "p99": 12.336292
+        },
+        "requestsPerSecond": 2923.4,
+        "windowAndDrainSeconds": 5.010858666
+      },
+      "psCpuBefore": "0:00.00",
+      "psCpuAfter": "0:06.01",
+      "cpuSeconds": 6.01,
+      "cpuMicrosecondsPerResponse": 343.35009140767824,
+      "exitCode": 0,
+      "stdout": [
+        "READY 49889 49890\n",
+        "DONE 49890 17504 0\n"
+      ],
+      "stderr": [
+        "MODETIME 6.040716000\n"
+      ]
+    },
+    {
+      "label": "baseline",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/call-layout/results/baseline"
+      ],
+      "warmup": {
+        "clientCpuPerWall": 0.21850198918783906,
+        "clientCpuSeconds": 0.22081099999999998,
+        "clientProcessCpuSeconds": 0.223702,
+        "completed": 2863,
+        "drained": 32,
+        "latencyMilliseconds": {
+          "p50": 10.827459,
+          "p95": 12.042291,
+          "p99": 18.260083
+        },
+        "requestsPerSecond": 2863,
+        "windowAndDrainSeconds": 1.010567459
+      },
+      "trial": {
+        "clientCpuPerWall": 0.21664802856445403,
+        "clientCpuSeconds": 1.084755,
+        "clientProcessCpuSeconds": 1.088618,
+        "completed": 14533,
+        "drained": 32,
+        "latencyMilliseconds": {
+          "p50": 10.761959,
+          "p95": 11.624291,
+          "p99": 20.312584
+        },
+        "requestsPerSecond": 2906.6,
+        "windowAndDrainSeconds": 5.00699225
+      },
+      "psCpuBefore": "0:00.00",
+      "psCpuAfter": "0:05.95",
+      "cpuSeconds": 5.95,
+      "cpuMicrosecondsPerResponse": 340.7789232531501,
+      "exitCode": 0,
+      "stdout": [
+        "READY 51041 51042\n",
+        "DONE 51042 17460 0\n"
+      ],
+      "stderr": [
+        "MODETIME 6.036949000\n"
+      ]
+    }
+  ],
+  "inputs": {
+    "/Users/robert/Projects/neoclr/target/call-layout/results/baseline.o": "41954bda6924b168412e7dd0ad458e24f9f31644c4f4628621808ee529d311bc",
+    "/Users/robert/Projects/neoclr/target/call-layout/results/baseline": "91fb409989c87f3304a2e6b628c5d037ce59f7a0e4d70bc0b86c97751edc0dd5",
+    "/Users/robert/Projects/neoclr/target/call-layout/results/long-range.o": "1f9fa185e35a326337f843656dc41e2cb985f5d1cd678859364398d369aed888",
+    "/Users/robert/Projects/neoclr/target/call-layout/results/long-range": "3c501a2a5d24cbf8fe1ed1c917a21e3f29df11f59e331a680a3257c9398262b0",
+    "/Users/robert/Projects/neoclr/target/call-layout/results/dynamic": "c9fd4aacab72cdd0610811ea3a9c90154a4f5184abd372bc238dca2d448f917e",
+    "/Users/robert/Projects/neoclr/target/call-layout/experiment-codegen": "e8ccb9930b6dbe8e649e3fd21c8d06a0f17eb0504e824d53d9f23aab2b81dae3",
+    "/Users/robert/Projects/neoclr/target/native-host-ownership/owned.dylib": "32a26f60c076bde97e969fa63211ff9ddab474cdc296d8b8f953fcdf6f02b2ce",
+    "/Users/robert/Projects/neoclr/target/primitive-comparison-refresh/client": "3cb6aa638332295893b82a57e279bf42f62685e4bee6471c37fc163f4a78a579",
+    "/Users/robert/Projects/neoclr/target/gc-mode-comparison-final/main.c": "834b04b5047a1d33ea60a7b970f03a97eff6c3cbae733bdff4a3fd2d75e1e7ad",
+    "/Users/robert/Projects/neoclr/benchmarks/execution/call-layout/measure.py": "91d2e9f24fd2c6b3abc01367250a4503675db1027381b748f582cc6fa81ebc74",
+    "/Users/robert/Projects/neoclr/target/call-layout/experiment.patch": "9b999cb73186c914e3425f11940e0868483c3190dd49bdcb6eaac6ed8e63eed8",
+    "/Users/robert/Projects/neoclr/target/call-layout/baseline-codegen": "3aa9b5f94939d51e9e297221dab052118be57bed7ac6452665c95c2b47227213",
+    "/Users/robert/Projects/neoclr/target/native-host-ownership/owned-host.c": "6339fe91de823281ff6b8771f242bab2e3cb6a510daf2126f0211142fdae4142",
+    "/Users/robert/Projects/neoclr/target/primitive-comparison-build/app.dll": "5ea5e6c95c456fee753186e066d242d256414832ad5916b58ccf069e086aec03",
+    "/Users/robert/Projects/neoclr/target/root-map/candidate.o": "41954bda6924b168412e7dd0ad458e24f9f31644c4f4628621808ee529d311bc",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.runtime.neox": "0c72a8656e7158d6bb2f31c0b019d8747dd61a6c4127b278155e104de437769b",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Runtime.dll": "ac3ddea188cd6e7970869248c2501acc7f6f7a1bfca598c339ea3257d3fc1d4c",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Data.dll": "846771708d06ae117fd6eb3019fbd7805ba9e3794b456c7b89d637893c7954a6",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Networking.dll": "d2c27984c00e7d89eabcb9ced7a0004557077cbef57fdb4292e264ddf2a4a4b2",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Web.dll": "434d63e3191c7a496c263dcd454807ddd32979cd4bb52bf9005af60178d7313e",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Data.PostgreSql.dll": "d456bee492ff5836a4e9f1297157f8d4fa2bfacb81cf6d9bfd2e0d99ce89da09",
+    "/Users/robert/Projects/neoclr/runtime/native/memory/memory-views.h": "f9e0026287c2a7b20c50f80ac20845350a825c2b88c3cc5543a5fd2c2635a4db",
+    "/Users/robert/Projects/neoclr/runtime/native/memory/text-arena.c": "d1a131d5eedcc92ec448a3fa7678deb2eec10b5705d2451e950ccbed2a7d7332",
+    "/Users/robert/Projects/neoclr/runtime/native/memory/memory-views-test.c": "d3e9c18f20385a87d5388bfd6af76ae1e48a67cb1973542611061e7c4a8137de",
+    "/Users/robert/Projects/neoclr/runtime/native/memory/storage-initialization-test.c": "29e69b0ea8ce5ee7bafb636c5852eca804b7653fb02cf8f2d8c4d4165334ffb6",
+    "/Users/robert/Projects/neoclr/runtime/native/memory/text-arena.h": "a42bce970cc9221acf124323003ab3cca9dc33fc5b472fec30979ff4c2d8d8dc",
+    "/Users/robert/Projects/neoclr/runtime/native/memory/static-storage-test.c": "4989e9c97e3b39e610e49b0325f33773924d3041094f9f5947fd8523c288167f",
+    "/Users/robert/Projects/neoclr/runtime/native/faults/render.c": "f1e561bfb6b73ac3e4a7078d5bc9e9905eea9637f545ac3178273698d08efb96",
+    "/Users/robert/Projects/neoclr/runtime/native/faults/fault-details.h": "8acf145dd10c8050c7d4c9266a73dec171009cea570aeb2f5473ac39cbfa4370",
+    "/Users/robert/Projects/neoclr/runtime/native/interop/imports.c": "b6c092fd06bb64eae4b30f49235fc94f3be23407611feb45fab362bb3c4a81a4",
+    "/Users/robert/Projects/neoclr/runtime/native/async/native-runtime.c": "46d4df31ea1f49dbcfbdc1318078d35b561b48f9708774f76f343f91eb87d8cb",
+    "/Users/robert/Projects/neoclr/runtime/native/async/native-runtime.h": "63d99993950bb924ec570bb81a7cc3d22dee8e053f3e3d14d1431f704d5fcaa2",
+    "/Users/robert/Projects/neoclr/runtime/native/diagnostics/attach.h": "8c9e805d2d01055cdcea88dba433474b7ed165b0325a82b1bd93acaef94880c0",
+    "/Users/robert/Projects/neoclr/runtime/native/diagnostics/snapshot.c": "0aab60053e2853ad87d594371c26a41eb62753a371124a5d778c89c0ad5acc50",
+    "/Users/robert/Projects/neoclr/runtime/native/diagnostics/attach.c": "945aebf06af7e79e4bb31ed1e70d1977da498597c6cb56237b220812931baaeb",
+    "/Users/robert/Projects/neoclr/runtime/native/diagnostics/snapshot.h": "f4cbf660362c4bb234f74bb7e1eb6a80cbec188c516aa11b592ed958e79864de",
+    "/Users/robert/Projects/neoclr/runtime/native/environment/platform.c": "f3c28b4bc9d863f2ad35b77c286c4ad650fc49820d64d42f6f2fdb3c5e40a5cd",
+    "/Users/robert/Projects/neoclr/runtime/native/environment/platform.h": "6745f25a2fa3c07f541d7e8ea3d13358a308a37e1372de122bb14b7a35e573cf",
+    "/Users/robert/Projects/neoclr/runtime/native/gc/native-gc.c": "5b51ecfa54e316e0c197b76193209cb4e57ff9fd7574a15039e4e8775496ca06",
+    "/Users/robert/Projects/neoclr/runtime/native/gc/root-probe.h": "5a0781db7fc96d49692dc0c244ec8d6925b0def8b7431941f6a6244c6544f396",
+    "/Users/robert/Projects/neoclr/runtime/native/gc/root-probe.c": "3b84f95299fb863baaadd88a2ce4a1fb5d12e2544f5174c653f6eee3c599edd6",
+    "/Users/robert/Projects/neoclr/runtime/native/gc/native-gc.h": "a085d5863a8cae8c1db2bc040fdc017362f286b0622b48561217907daeb97146",
+    "/Users/robert/Projects/neoclr/runtime/native/workers/http-workers.h": "3879c029beae54cc42f83846d0bdd3485c26458bb3d7d2e41189091b2973e9a6",
+    "/Users/robert/Projects/neoclr/runtime/native/workers/native-workers.h": "ce5e3dbfba49bcf9b1689688d66ed2b8011ba1349e509b50c3b079344b6a4d4a",
+    "/Users/robert/Projects/neoclr/runtime/native/workers/http-workers.c": "b1a55701e547e99f731ac13580fb134d274552f0abeec710c780fd1ef1045b54",
+    "/Users/robert/Projects/neoclr/runtime/native/workers/native-workers.c": "9f91f4724b402de0800262e54f5ff9b9262c1188c951dcac680b0a002cf4f538",
+    "/Users/robert/Projects/neoclr/runtime/native/text/numeric-format.c": "e671df700e8b6c08dc871c93a36fd6abdf559e3474c8e09aed38f91ac860fb95"
+  }
+}

@@ -6630,3 +6630,21 @@ default/owned host objects match their previously validated implementations.
 Full packaged-source verification remains blocked by stale collections sample APIs;
 Windows opt-in and unrestricted FFI are not qualified. [Contract and evidence](../benchmarks/execution/owned-jit-host/README.md).
 This changes neither collector policy nor warm-call layout. No package is published.
+
+
+### Warm call-policy isolation — 2026-10-24
+
+Eight checked trials isolate PIC long-range AOT calls and dynamic helper linking
+from the remaining owned JIT/AOT gap. Means are 2,938 requests/s for baseline AOT,
+2,911 for long-range AOT, 2,955 for AOT using JIT's helper dylib, and 1,781 for JIT.
+Disassembly confirms all 3,815 direct generated calls became indirect. Neither
+isolated change reproduces the large gap; two trials per configuration do not
+establish small differences as reliable improvements. Non-PIC AOT is rejected by
+the Mach-O linker, leaving actual JIT code placement and non-PIC execution
+unisolated. Retain that failure and the earlier overlapped cohort separately.
+[Evidence, reproduction and limits](../benchmarks/execution/call-layout/README.md).
+
+Production compiler policy and JIT branch-reach guarantees remain unchanged.
+The next bounded investigation is generated JIT machine code and hot helper call
+frequency under symbolized profiling, keeping startup/loading separate from warm
+execution and shared collector work. No API, GC-policy or peer-parity claim changes.

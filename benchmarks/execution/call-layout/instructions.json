@@ -1,0 +1,23 @@
+{
+  "baseline": {
+    "bl": 3815,
+    "blr": 18223,
+    "adrp": 110853,
+    "ldr": 191656,
+    "functions": 1133
+  },
+  "long-range": {
+    "bl": 0,
+    "blr": 22038,
+    "adrp": 114668,
+    "ldr": 190207,
+    "functions": 1133
+  },
+  "dynamic": {
+    "bl": 3815,
+    "blr": 18223,
+    "adrp": 110853,
+    "ldr": 209879,
+    "functions": 1133
+  }
+}
