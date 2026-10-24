@@ -1,0 +1,93 @@
+"""Run a freshly compiled live plaintext HTTP object with the owned native host."""
+import argparse
+import hashlib
+import json
+import queue
+from pathlib import Path
+import socket
+import subprocess
+import threading
+p=argparse.ArgumentParser(description=__doc__)
+p.add_argument('--object',type=Path,required=True)
+p.add_argument('--output',type=Path,required=True)
+p.add_argument('--requests',type=int,default=256)
+a=p.parse_args();assert a.requests>0
+root=Path(__file__).resolve().parents[3];base=Path(__file__).resolve().parent
+out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
+r={'passed':False,'scope':'AOT plaintext correctness/lifecycle only, not a capacity benchmark.','commands':[],'trials':[],'inputs':{}}
+def run(cmd):
+ x=subprocess.run(list(map(str,cmd)),cwd=root,capture_output=True,text=True,timeout=120)
+ r['commands'].append({'command':list(map(str,cmd)),'exitCode':x.returncode,'stdout':x.stdout,'stderr':x.stderr})
+ x.check_returncode()
+try:
+ recipe_path=root/'target/native-host-ownership/results.json'
+ previous=json.loads(recipe_path.read_text())
+ old=root/'target/native-host-ownership/owned-aot'
+ recipe=next(c['command'].copy() for c in previous['commands'] if str(old) in c['command'])
+ source=out/'native-gc.c';run(['python3',base.parent/'concurrent-live/native-scopes.py','--output',source])
+ provider=out/'text-arena.c';run(['python3',base/'native-providers.py','--output',provider])
+ host=out/'owned-host.c'
+ host.write_text((root/'target/native-host-ownership/owned-host.c').read_text()+'''
+__attribute__((destructor)) static void report_candidate(void) {
+ extern void experiment_gc_candidate_counts(uint64_t *);
+ uint64_t counts[6]; experiment_gc_candidate_counts(counts);
+ fprintf(stderr,"CANDIDATE");
+ for(unsigned i=0;i<6;i++) fprintf(stderr," %llu",(unsigned long long)counts[i]);
+ fprintf(stderr,"\\n");
+}
+''')
+ for paced in [False,True]:
+  exe=out/('paced' if paced else 'forced')
+  command=[]
+  for item in recipe:
+   if item=='-DNEOCLR_GC_PACED':continue
+   if item.endswith('/owned-host.c'):item=str(host)
+   elif item.endswith('/native-gc.c'):item=str(source)
+   elif item.endswith('/text-arena.c'):item=str(provider)
+   elif item==str(root/'target/root-map/candidate.o'):item=str(a.object.resolve())
+   command.append(item)
+  command[command.index('-o')+1]=str(exe)
+  command+=['-I',str(root/'runtime/native/memory'),'-DNEOCLR_GC_PROFILE','-DNEOCLR_SHADOW_SPARSE_INDEX','-I',str(base.parent/'concurrent-mutation-gate'),str(base.parent/'concurrent-mutation-gate/gate.c')]
+  if paced:command+=['-DNEOCLR_GC_PACED']
+  run(command)
+  proc=subprocess.Popen([str(exe)],stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
+  lines=[];errors=[];events=queue.Queue()
+  def read(stream,target):
+   for line in stream:target.append(line);events.put(line)
+  readers=[threading.Thread(target=read,args=(proc.stdout,lines)),threading.Thread(target=read,args=(proc.stderr,errors))]
+  for reader in readers:reader.start()
+  trial={'paced':paced,'requested':a.requests};r['trials'].append(trial)
+  try:
+   while True:
+    line=events.get(timeout=30)
+    if line.startswith('READY '):break
+   _,port,control=line.split()
+   for _ in range(a.requests):
+    with socket.create_connection(('127.0.0.1',int(port)),timeout=10) as connection:
+     connection.sendall(b'GET / HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n')
+     response=b''
+     while True:
+      part=connection.recv(4096)
+      if not part:break
+      response+=part
+     header,body=response.split(b'\r\n\r\n',1)
+     assert header.startswith(b'HTTP/1.1 200 ') and body==b'xxxxxxxxxx'
+   with socket.create_connection(('127.0.0.1',int(control)),timeout=10):pass
+   proc.wait(timeout=30)
+   for reader in readers:reader.join(timeout=2)
+   assert proc.returncode==0
+   done=next(s for s in lines if s.startswith('DONE ')).split()
+   assert int(done[2])==a.requests and int(done[3])==0
+   counts=list(map(int,next(s for s in errors if s.startswith('CANDIDATE ')).split()[1:]))
+   assert len(counts)==6 and counts[0]==counts[1]+counts[2] and counts[5]==0
+   if paced:assert counts[1]>0
+   trial['candidateCounts']=counts
+  finally:
+   if proc.poll() is None:proc.kill()
+   proc.wait()
+   for reader in readers:reader.join(timeout=2)
+   trial.update(exitCode=proc.returncode,stdout=lines,stderr=errors)
+ for path in [a.object.resolve(),Path(__file__),recipe_path,host,source,provider,base/'native-providers.py',base.parent/'concurrent-live/native-scopes.py',base.parent/'concurrent-mutation-gate/gate.c',*[Path(x) for x in recipe if Path(x).is_file()],*[p for p in (root/'runtime/native').rglob('*') if p.suffix in ['.c','.h']]]:
+  r['inputs'][str(path)]=hashlib.sha256(path.read_bytes()).hexdigest()
+ r['passed']=True
+finally:(out/'results.json').write_text(json.dumps(r,indent=2)+'\n')

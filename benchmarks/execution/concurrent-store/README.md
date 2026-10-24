@@ -1465,3 +1465,63 @@ and frame restoration. Then qualify JSON's object-type and boxing paths. Neither
 selection executes yet; native provider-name coverage never established full generated
 body coverage. Keep full HTTP throughput/CPU/pause/memory comparisons and synchronous
 baseline qualification pending until those paths execute safely.
+
+
+## Reference interface-dispatch admission (2026-10-24)
+
+Admit ordinary reference interface dispatch through the existing generated-call
+closure: dispatch and targets retain their published argument frames and generated
+store lowering. Display/value intrinsics, string-specific dispatch and boxed/byref
+receiver adaptation remain rejected pending their own qualification; a negative
+compiler check preserves the display exclusion. No native ownership or ABI change is
+needed. This follows CLR-style compiler/runtime cooperation for receiver reachability
+and checked call targets, without introducing collector knowledge of interface APIs.
+
+`validate-interface-dispatch.py` passes 840 forced/paced JIT and optimized/undefined-
+bounds AOT cycles. Public and private explicit targets allocate returned byte arrays;
+checks cover receiver roots across pressure collection, returned-object retention,
+null/unmatched receivers, target faults, recoverable pressure, all-live exhaustion,
+unchanged failed outputs, root restoration and final empty-heap cleanup. Thirty-seven
+focused compiler checks pass (29 host-dependent checks skipped in the general filter;
+dispatch JIT checks run explicitly). Evidence: `interface-dispatch-*`.
+
+Preserved initial fixture failures identify corrected test assumptions: `ldlen`
+requires an Int32 conversion; native-host-created concrete types must be supplied
+through the production conformance selector; native class tags use zero-based type
+indices; explicit user faults return status 4. The fixture now uses the selector's
+verified public/private mappings, rather than a handwritten target table. None of
+these corrections changes production semantics. Existing whole-server failures are
+retained; qualification here is not HTTP execution or a performance claim. Public
+APIs/website behavior and default GC remain unchanged.
+
+
+Full retained plaintext live compilation now succeeds. JSON's generated interface
+bodies also pass admission, leaving ObjectTypeHandle, Int32/Boolean boxing and four
+scalar-box query/unbox bodies. Preserve `full-http-selection-dispatch.json.gz` and
+its mapped summary; compilation of JSON still fails and no JSON execution is claimed.
+
+### First full live plaintext execution
+
+`qualify-http-execution.py --object <fresh-live-object> --output <fresh-directory>`
+composes the retained owned-host recipe with current live collector/gate code,
+the already-qualified static publication provider and scoped UTF-8 slice adapter.
+The first link failed because the last two adapters were absent; that failure is
+retained as `plain-live-link-initial.json.gz`. The corrected composition changes no
+ownership contract or public runtime option. It uses the retained sample/compiler
+input cohort, not newly rebuilt Raven libraries.
+
+Both forced and paced AOT hosts pass 256 sequential loopback requests each: HTTP 200,
+exact ten-byte bodies, server count 256 and zero request errors, process exit 0,
+root/heap cleanup and no active marker at shutdown. Forced mode records no concurrent
+epochs. Paced mode records 241 starts, six completions and 235 cancellations, with
+five extra synchronous checks and 56 idle starts. Counts balance and prove actual
+concurrent collection completed during this real server run. Cancellation is an
+important next measurement/optimization question; this single correctness run is
+not a throughput comparison or evidence for making concurrent GC the default.
+The collector retains scoped synchronous fallback for the qualified UTF-8 slice path.
+
+Archive `plain-live-execution.json.gz` and generated host/collector/provider sources.
+Full-server JIT execution, JSON execution, race coverage, controlled synchronous/live
+throughput/CPU/pause/memory comparisons and broader workloads remain open. Next
+qualify JSON's seven helper bodies while extending the working plaintext execution
+harness into matched measurements. Website/public API behavior is unchanged.

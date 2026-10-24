@@ -190,6 +190,14 @@ boxing/query helpers. **Next: qualify interface dispatch as a shared generated p
 then JSON type/boxing helpers and executable HTTP**. These are admission counts, not
 performance measurements
 ([view admission and inventory](../benchmarks/execution/concurrent-store/README.md#memory-view-conversion-and-fault-admission-2026-10-24)).
+Reference interface dispatch now passes 840 JIT/AOT cycles and 37 focused checks.
+Full plaintext live compilation succeeds; JSON is down to seven type/boxing helper
+bodies. **First full live plaintext AOT execution passes 512 checked requests** across
+forced/paced owned hosts, clean shutdown and six completed concurrent collections.
+The paced run also cancels 235 epochs: investigate that cost in matched measurements,
+without drawing a throughput/default conclusion from one correctness run. Next qualify
+JSON helpers, full-server JIT and controlled synchronous/live comparisons
+([dispatch and HTTP evidence](../benchmarks/execution/concurrent-store/README.md#reference-interface-dispatch-admission-2026-10-24)).
 The isolated consumers now check call closure against supplied bodies/explicit provider
 ABIs and validate their complete AOT import set. This does not establish provider
 implementation safety. A versioned native query now rejects missing/incompatible

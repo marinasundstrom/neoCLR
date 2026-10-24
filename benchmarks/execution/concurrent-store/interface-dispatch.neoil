@@ -1,0 +1,61 @@
+.module LiveInterfaceDispatch
+.interface Factory
+.method instance Make() -> arrayref<Byte>
+.end
+.end
+.type class Producer
+.implements Factory
+.field Number Int32
+.field Child arrayref<Byte>
+.method instance Make() -> arrayref<Byte>
+ldarg 0
+ldc.i4 8
+newarr Byte
+stfld Producer::Child
+ldarg 0
+ldfld Producer::Child
+ret
+.end
+.end
+.type class Alternate
+.implements Factory
+.field Number Int32
+.field Child arrayref<Byte>
+.method private instance Build() -> arrayref<Byte>
+.override instance Factory::Make()
+ldarg 0
+ldc.i4 16
+newarr Byte
+stfld Alternate::Child
+ldarg 0
+ldfld Alternate::Child
+ret
+.end
+.end
+.type class Failing
+.implements Factory
+.method instance Make() -> arrayref<Byte>
+fault "dispatch target failure"
+.end
+.end
+.type class Holder
+.field Child arrayref<Byte>
+.end
+.type class Other
+.field Number Int32
+.end
+.function Write(Factory value,Holder output,Int64 unused) -> Int32
+ldarg output
+ldarg value
+callvirt instance Factory::Make()
+stfld Holder::Child
+ldarg output
+ldfld Holder::Child
+ldlen
+conv.i4
+ret
+.end
+.function Main(Int32 value) -> Int32
+ldarg value
+ret
+.end

@@ -507,7 +507,14 @@ pub(crate) fn compile_into(
         .unwrap_or_default();
     let unaudited: Vec<_> = input.functions.iter().enumerate().filter(|&(i, f)| {
         if !live_stores { return false; }
-        let admitted = details.is_some_and(|d|
+        // Ordinary reference dispatch forwards to already checked generated bodies.
+        // Display/value intrinsics and boxed byref adaptation need separate qualification.
+        let reference_dispatch = p.dispatch.get(&i).is_some_and(|targets|
+            targets.iter().all(|&(_, target)| !input.functions[target].receiver_byref
+                && !details.is_some_and(|d| d.primitive_receivers.contains(&target)))
+            && !details.is_some_and(|d| d.object_display.contains_key(&i)
+                || d.object_value_kinds.contains_key(&i) || d.string_dispatch.contains_key(&i)));
+        let admitted = reference_dispatch || details.is_some_and(|d|
             d.int32_to_string.contains(&i) || d.int64_to_string.contains(&i)
             || d.uint64_to_string.contains(&i) || d.tls.contains_key(&i)
             || d.string_intern.contains(&i) || d.string_compare_ordinal.contains(&i) || d.console_write_line.contains(&i)

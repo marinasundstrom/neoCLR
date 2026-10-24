@@ -786,6 +786,19 @@ fn managed_statics_emit_guarded_publication() {
 }
 fn managed_options_for(source: &str) -> crate::fault_details::Options {
     let mut options = managed_options();
+    if source.starts_with(".module LiveInterfaceDispatch") {
+        // The native test host constructs receivers. Supply that conformance set
+        // through the production selector rather than inventing dispatch mappings.
+        let input = neoclr::assemble(source).unwrap();
+        let reached = (0..input.functions.len()).collect();
+        let constructed = (0..input.types.len()).collect();
+        let mut relations = crate::selection::DispatchRelations::new(&input);
+        let targets = crate::selection::dispatch_targets_with_array(
+            &mut relations, 0, &reached, None, &[], Some(&constructed),
+        ).unwrap();
+        assert_eq!(targets.len(), 3);
+        options.interface_dispatch.insert(0, targets);
+    }
     if source.starts_with(".module LiveAsyncWrappers") {
         options.runtime_async_create.push(2);
         options.runtime_async_completeunit.push(3);
@@ -2062,4 +2075,26 @@ fn managed_callable_arrays_emit_guarded_stores() {
 #[ignore = "requires callable-array host built by validate-callable-arrays.py"]
 fn managed_callable_arrays_run_on_live_collector() {
     run_managed(include_str!("../../../benchmarks/execution/concurrent-store/callable-arrays.neoil"));
+}
+
+#[test]
+fn managed_interface_dispatch_emits_guarded_results() {
+    let source = include_str!("../../../benchmarks/execution/concurrent-store/interface-dispatch.neoil");
+    emit_managed(source);
+    let input = managed_input(source);
+    let mut options = managed_options();
+    options.object_display.insert(0, vec![]);
+    let mut module = ObjectModule::new(ObjectBuilder::new(
+        isa(target(), true), "reject-special-dispatch", cranelift_module::default_libcall_names(),
+    ).unwrap());
+    let error = crate::compiler::values::compile_into(
+        &input, "Main", Some(&options), crate::compiler::Target::MacosArm64,
+        &mut module, false,
+    ).unwrap_err();
+    assert!(error.to_string().contains("unaudited native replacement bodies"));
+}
+#[test]
+#[ignore = "requires interface-dispatch host built by validate-interface-dispatch.py"]
+fn managed_interface_dispatch_runs_on_live_collector() {
+    run_managed(include_str!("../../../benchmarks/execution/concurrent-store/interface-dispatch.neoil"));
 }

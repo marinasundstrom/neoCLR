@@ -1,0 +1,90 @@
+{
+  "scope": "Compiler admission only; not execution or performance evidence.",
+  "samples": [
+    {
+      "sample": "plain",
+      "exitCode": 0,
+      "categories": {},
+      "rejectedBodies": [],
+      "stderr": ""
+    },
+    {
+      "sample": "json",
+      "exitCode": 101,
+      "categories": {
+        "other": 1,
+        "int32Boxes": 1,
+        "booleanBoxes": 1,
+        "scalarBoxQueries": 4
+      },
+      "rejectedBodies": [
+        {
+          "compiledIndex": 47,
+          "compiledName": "$aot_linked_47",
+          "definition": {
+            "index": 112,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "name": "neoCLR.Runtime.ObjectTypeHandle",
+          "sourceIndex": 163,
+          "selectionCategories": []
+        },
+        {
+          "compiledIndex": 1561,
+          "name": "$aot_box_int32_614",
+          "mapping": "Absent from ordinary selection metadata; name from live diagnostic.",
+          "selectionCategories": [
+            "int32Boxes"
+          ]
+        },
+        {
+          "compiledIndex": 1562,
+          "name": "$aot_box_boolean_615",
+          "mapping": "Absent from ordinary selection metadata; name from live diagnostic.",
+          "selectionCategories": [
+            "booleanBoxes"
+          ]
+        },
+        {
+          "compiledIndex": 1563,
+          "name": "$aot_box_query_1563",
+          "mapping": "Absent from ordinary selection metadata; name from live diagnostic.",
+          "selectionCategories": [
+            "scalarBoxQueries"
+          ]
+        },
+        {
+          "compiledIndex": 1564,
+          "name": "$aot_box_query_1564",
+          "mapping": "Absent from ordinary selection metadata; name from live diagnostic.",
+          "selectionCategories": [
+            "scalarBoxQueries"
+          ]
+        },
+        {
+          "compiledIndex": 1565,
+          "name": "$aot_box_query_1565",
+          "mapping": "Absent from ordinary selection metadata; name from live diagnostic.",
+          "selectionCategories": [
+            "scalarBoxQueries"
+          ]
+        },
+        {
+          "compiledIndex": 1566,
+          "name": "$aot_box_query_1566",
+          "mapping": "Absent from ordinary selection metadata; name from live diagnostic.",
+          "selectionCategories": [
+            "scalarBoxQueries"
+          ]
+        }
+      ],
+      "stderr": "\nthread 'mutation_store::tests::full_http_selection_compiles_with_live_gc' (90538522) panicked at runtime/codegen/src/mutation_store_tests.rs:2058:52:\ncalled `Result::unwrap()` on an `Err` value: \"experimental live stores reject unaudited native replacement bodies: function 47 ($aot_linked_47), function 1561 ($aot_box_int32_614), function 1562 ($aot_box_boolean_615), function 1563 ($aot_box_query_1563), function 1564 ($aot_box_query_1564), function 1565 ($aot_box_query_1565), function 1566 ($aot_box_query_1566)\"\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    }
+  ],
+  "inputs": {
+    "benchmarks/execution/concurrent-store/full-http-selection-initial.json.gz": "4ac3b5c984da274c657ac0674b20f41d0a3c6836639e9807ac24bc5ce26f32f8",
+    "target/concurrent-store/full-http-selection-dispatch/results.json": "6ac0e359cc5284a0d3af431c6574ca7d66b5c755f97ff9731772d5205607af66",
+    "/Users/robert/Projects/neoclr/benchmarks/execution/concurrent-store/summarize-http-selection.py": "87caf79b440c94ffa1c8c9ca64c907610d74d931fd9773e4734304b0eea5623f"
+  }
+}

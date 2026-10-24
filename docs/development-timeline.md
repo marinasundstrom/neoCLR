@@ -22593,3 +22593,24 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   advances beyond the callable-array gate but still requires native-body admission;
   no HTTP performance improvement or default switch is claimed.
 - [Callable-array evidence](../benchmarks/execution/concurrent-store/README.md#callable-array-admission-2026-10-24).
+
+
+### 2026-10-24 — First full live-heap plaintext HTTP execution
+
+- Continuing the author's direction to integrate concurrent GC while respecting
+  boundaries, the assistant qualifies reference interface dispatch through existing
+  root/store and call-closure checks. Native ownership is unchanged; special display
+  and boxed adaptations remain gated. No new author decision is inferred.
+- The full retained plaintext selection compiles with live stores; JSON's remaining
+  admission failures are reduced to seven type/boxing helper bodies. The assistant
+  composes the already-qualified static-storage and UTF-8 slice adapters into the
+  owned native host after an initial missing-symbol link failure.
+- Verified outcome: 840 isolated JIT/AOT dispatch cycles and 37 compiler checks pass;
+  the full plaintext AOT server returns 512 exact responses across forced/paced runs,
+  reports no request errors, and shuts down with balanced roots/heap and no marker.
+  Paced GC records six completed concurrent collections and 235 cancellations.
+- The assistant treats cancellation as a measurement question, not proof of a
+  performance regression or improvement. Full-server JIT, JSON, controlled throughput,
+  CPU/pause/memory comparisons and broader safety coverage remain open. Concurrent GC
+  is still experimental; no default-switch or benchmark-win claim is made.
+- [Evidence, corrected fixture assumptions and limits](../benchmarks/execution/concurrent-store/README.md#reference-interface-dispatch-admission-2026-10-24).
