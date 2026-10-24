@@ -744,6 +744,16 @@ fn incompatible_live_hosts_rejected_before_binding() {
         unsafe { libloading::Library::new(directory.join("noboundary.dylib")) }.unwrap();
     unsafe { crate::mutation_admission::require_host(&scalar_host) }.unwrap();
     assert!(unsafe { crate::mutation_admission::require_managed_host(&scalar_host) }.is_err());
+    let input = neoclr::assemble(".module HostAdmission\n.function Main(Int32 value) -> Int32\nldarg value\nret\n.end").unwrap();
+    let mut options = managed_options();
+    options.native_stack_budget = true;
+    for name in ["missing", "legacy", "partial", "noboundary"] {
+        let error = crate::jit::execute_managed(
+            &input, "Main", &options, &directory.join(format!("{name}.dylib")),
+            &[], crate::compiler::Target::MacosArm64,
+        ).unwrap_err();
+        assert!(error.to_string().contains("host lacks"), "{name}: {error}");
+    }
 }
 
 fn managed_options() -> crate::fault_details::Options {
@@ -1273,10 +1283,14 @@ fn byte_view_input() -> (neoclr::Module, crate::fault_details::Options) {
 }
 
 fn export_byte_views(module: &mut ObjectModule) {
-    for index in 0..13 {
+    export_managed_bodies(module, "live_view", &(0..13).collect::<Vec<_>>());
+}
+
+fn export_managed_bodies(module: &mut ObjectModule, prefix: &str, indices: &[usize]) {
+    for (ordinal, &index) in indices.iter().enumerate() {
         let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name(&format!("neoclr_value_{index}")) else { panic!("view body") };
         let signature = module.declarations().get_function_decl(id).signature.clone();
-        let export = module.declare_function(&format!("live_view_{index}"), Linkage::Export, &signature).unwrap();
+        let export = module.declare_function(&format!("{prefix}_{ordinal}"), Linkage::Export, &signature).unwrap();
         let mut context = module.make_context();
         context.func.signature = signature;
         let callee = module.declare_func_in_func(id, &mut context.func);
@@ -2064,7 +2078,7 @@ fn live_host_io_requires_admitted_pump() {
     let mut options=managed_options_for(source);options.entry_host_io=true;
     let mut module=ObjectModule::new(ObjectBuilder::new(isa(target(),true),"reject_host_io",cranelift_module::default_libcall_names()).unwrap());
     assert!(crate::compiler::values::compile_into(&managed_input(source),"Main",Some(&options),crate::compiler::Target::MacosArm64,&mut module,false).unwrap_err().to_string().contains("owned published frames"));
-    assert!(crate::run_internal(vec!["--jit-managed".into()],true).unwrap_err().to_string().contains("AOT-only"));
+    assert!(crate::run_internal(vec!["--jit-scalar".into()],true).unwrap_err().to_string().contains("requires managed hosting"));
 }
 
 #[test]
@@ -2097,4 +2111,68 @@ fn managed_interface_dispatch_emits_guarded_results() {
 #[ignore = "requires interface-dispatch host built by validate-interface-dispatch.py"]
 fn managed_interface_dispatch_runs_on_live_collector() {
     run_managed(include_str!("../../../benchmarks/execution/concurrent-store/interface-dispatch.neoil"));
+}
+
+fn primitive_box_input() -> (neoclr::Module, crate::fault_details::Options, Vec<usize>) {
+    let mut input = neoclr::assemble(include_str!("../../../benchmarks/execution/concurrent-store/primitive-boxes.neoil")).unwrap();
+    let mut report = serde_json::json!({"referenceArena":true,"objectBaseProjection":{"compiledIndex":0},
+        "functions":[{"compiledIndex":0,"name":"neoCLR.Runtime.ObjectTypeHandle"}],
+        "sourceMetadata":{"types":[{"compiledTypeIndex":1}]},"nativeBindings":[]});
+    crate::boxing::project(&mut input, &mut report).unwrap();
+    crate::boxing::project_scalar_queries(&mut input, &mut report).unwrap();
+    crate::reflection_metadata::bind_object_type(&mut input, &mut report).unwrap();
+    input.functions[0].name = "LivePrimitiveBoxes.TypeHandle".into();
+    let details = crate::fault_details::Options::from_report(Some(&report));
+    let mut indices = vec![report["int32Boxes"][0]["helperCompiledIndex"].as_u64().unwrap() as usize,
+        report["booleanBoxes"][0]["helperCompiledIndex"].as_u64().unwrap() as usize];
+    indices.extend(report["scalarBoxQueries"].as_array().unwrap().iter().map(|r| r["helperCompiledIndex"].as_u64().unwrap() as usize));
+    assert_eq!(indices.len(), 6);
+    indices.extend([0, 1]);
+    let mut options = managed_options();
+    options.object_base = Some(0);
+    options.int32_boxes = details.int32_boxes;
+    options.boolean_boxes = details.boolean_boxes;
+    options.scalar_box_queries = details.scalar_box_queries;
+    options.object_type_queries = details.object_type_queries;
+    options.object_function_queries = details.object_function_queries;
+    (input, options, indices)
+}
+
+#[test]
+fn managed_primitive_boxes_emit_guarded_results() {
+    let (input, mut options, indices) = primitive_box_input();
+    for enabled in [false, true] {
+        options.experimental_live_gc_stores = enabled;
+        let mut module = ObjectModule::new(ObjectBuilder::new(isa(target(), true), "boxes", cranelift_module::default_libcall_names()).unwrap());
+        crate::compiler::values::compile_into(&input,"Main",Some(&options),crate::compiler::Target::MacosArm64,&mut module,false).unwrap();
+        export_managed_bodies(&mut module, "live_box", &indices);
+        let bytes = module.finish().emit().unwrap();
+        let object = object::File::parse(bytes.as_slice()).unwrap();
+        assert_eq!(object.symbols().any(|s| s.is_undefined() && s.name().unwrap_or("").trim_start_matches('_') == "experiment_gc_store"), enabled);
+        if enabled {
+            if let Some(path) = std::env::var_os("NEOCLR_MUTATION_MANAGED_OBJECT") { std::fs::write(path, bytes).unwrap(); }
+        }
+    }
+}
+
+#[test]
+#[ignore = "requires primitive-box host built by validate-primitive-boxes.py"]
+fn managed_primitive_boxes_run_on_live_collector() {
+    let library = std::sync::Arc::new(unsafe { libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host")) }.unwrap());
+    unsafe { crate::mutation_admission::require_managed_host(&library) }.unwrap();
+    let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
+    let resolver = library.clone();
+    builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
+    let mut code = Code(Some(JITModule::new(builder)));
+    let module = code.0.as_mut().unwrap();
+    let (input, options, indices) = primitive_box_input();
+    crate::compiler::values::compile_into(&input,"Main",Some(&options),crate::compiler::Target::MacosArm64,module,true).unwrap();
+    module.finalize_definitions().unwrap();
+    let pointers: Vec<_> = indices.iter().map(|index| {
+        let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name(&format!("neoclr_value_{index}")) else { panic!("box body") };
+        module.get_finalized_function(id)
+    }).collect();
+    type Run = unsafe extern "C" fn(*const *const u8) -> i32;
+    let run: libloading::Symbol<Run> = unsafe { library.get(b"managed_primitive_box_consumer") }.unwrap();
+    assert_eq!(unsafe { run(pointers.as_ptr()) }, 0);
 }

@@ -22654,3 +22654,25 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   a compilation failure, so no completed qualification or adoption is claimed.
 - Existing bounded-log improvements and their evidence remain committed. Further
   optimization is follow-up work after integration, not the next active slice.
+
+
+### 2026-10-25 — Consistency cleanup during concurrent GC integration
+
+- **Author:** Asked to clean up issues found that should be fixed for consistency,
+  following the direction to integrate concurrent GC before further optimization.
+- **Assistant:** Kept cleanup local to integration. Identified native boxing's direct
+  caller-result publication as inconsistent with the other admitted live-GC helpers;
+  changed live emission to initialize through scratch and publish through the guarded
+  store. Reused the existing fixture export code for the added helper tests.
+- **Outcome:** Primitive boxing and type queries pass 720 JIT/AOT cycles and 38 focused
+  compiler checks. Full-server integration and default acceptance remain separate
+  work; this does not authorize unrelated refactoring or establish a speedup.
+  See [integration evidence](../benchmarks/execution/concurrent-store/README.md).
+
+- **Integration follow-through:** Full plaintext/JSON JIT/AOT execution subsequently
+  passed 1,024 checked responses across forced/paced hosts. Initial JIT activity checks
+  failed because the harness sampled thread-local counters from a library destructor;
+  reporting on the invoking owner after cleanup resolves the observation, without
+  changing collector ownership. Four incompatible JIT hosts are rejected before
+  binding. The assistant retains failed and successful evidence and leaves the
+  synchronous default in place; optimization/comparison is the next phase.

@@ -6,6 +6,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-10-25
+
+- Qualify Int32/Boolean boxing, exact-type queries/unboxing and ObjectTypeHandle for internal live GC. Publish allocated boxes through stack scratch and guarded stores to support heap result aliases consistently. Seven hundred twenty JIT/AOT cycles and 38 focused compiler checks pass, covering faults, invalid extents, pressure/exhaustion, type identity and cleanup. Reuse the fixture export helper and retain validation evidence; update both bridge documents. Int64/compound boxing remain gated, native ownership and production GC defaults unchanged. Full plaintext/JSON live compilation and 1,024 checked HTTP responses pass across JIT/AOT and forced/paced hosts, with clean shutdown and completed concurrent epochs. Enable the private managed JIT qualification route with host capability checks; reject four incompatible hosts before binding. Fix the harness to sample thread-local counters on the invoking owner after cleanup, and check guest status separately from the test runner. Preserve failed destructor-counter observations and successful repeats; optimization/comparison can resume while default acceptance remains open.
+
 ### 2026-10-24
 
 - Record author sequencing: finish concurrent-GC integration/qualification before further optimization and synchronous comparison. Prioritize JSON helpers and full-server JIT; park the unfinished lookup-cache experiment locally and retain the existing candidate and synchronous default.

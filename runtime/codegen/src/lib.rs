@@ -59,11 +59,11 @@ pub fn run(arguments: Vec<std::ffi::OsString>) -> Result<i32, Box<dyn std::error
     run_internal(arguments, false)
 }
 
-// Private AOT qualification route: ordinary hosting never enables live stores.
+// Private qualification route: ordinary hosting never enables live stores.
 // Execution still requires independently qualified host capability/ownership checks.
 fn run_internal(arguments: Vec<std::ffi::OsString>, live_stores: bool) -> Result<i32, Box<dyn std::error::Error>> {
-    if live_stores && arguments.iter().any(|a| a.to_string_lossy().starts_with("--jit")) {
-        return Err("live selection qualification is AOT-only".into());
+    if live_stores && arguments.iter().any(|a| a == "--jit-scalar") {
+        return Err("live selection qualification requires managed hosting".into());
     }
     static HOST: std::sync::Mutex<()> = std::sync::Mutex::new(());
     let _session = HOST

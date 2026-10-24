@@ -1,5 +1,14 @@
 # neoCLR platform roadmap
 
+**Concurrent integration update (2026-10-25):** JSON’s seven type/boxing helpers now
+pass focused JIT/AOT qualification. Full retained plaintext and JSON live AOT
+selections compile, and both serve checked HTTP responses with clean owned-heap
+shutdown. Full-server JIT now also passes through an explicit host
+capability check: 1,024 checked plaintext/JSON responses across JIT/AOT and
+forced/paced hosts, with completed concurrent epochs and clean shutdown. See [integration evidence](../benchmarks/execution/concurrent-store/README.md).
+Production GC remains synchronous; optimization and matched performance comparison
+follow this integration slice, with broader safety/default acceptance still required.
+
 **Integration before further optimization (author direction, 2026-10-24):** Finish
 concurrent-GC integration/qualification before the next optimization and synchronous
 comparison cycle. Plaintext AOT now executes; prioritize JSON's seven type/boxing

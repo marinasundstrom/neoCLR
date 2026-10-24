@@ -1,0 +1,47 @@
+.module LivePrimitiveBoxes
+.type class abstract System.Object
+.end
+.type class Model
+.end
+.function neoCLR.Runtime.ObjectTypeHandle(System.Object) -> RuntimeTypeHandle
+.methodimpl InternalCall
+.end
+.function MakeFunction() -> System.Object
+function.bind fn<Int32,Int32> = Main(Int32)
+castclass System.Object
+ret
+.end
+.function BoxInt(Int32 value) -> System.Object
+ldarg value
+box Int32
+ret
+.end
+.function BoxBool(Boolean value) -> System.Object
+ldarg value
+box Boolean
+ret
+.end
+.function QueryInt(System.Object value) -> System.Object
+ldarg value
+isinst Int32
+ret
+.end
+.function UnboxInt(System.Object value) -> Int32
+ldarg value
+unbox.any Int32
+ret
+.end
+.function QueryBool(System.Object value) -> System.Object
+ldarg value
+isinst Boolean
+ret
+.end
+.function UnboxBool(System.Object value) -> Boolean
+ldarg value
+unbox.any Boolean
+ret
+.end
+.function Main(Int32 value) -> Int32
+ldarg value
+ret
+.end

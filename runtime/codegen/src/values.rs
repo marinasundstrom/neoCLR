@@ -514,8 +514,12 @@ pub(crate) fn compile_into(
                 && !details.is_some_and(|d| d.primitive_receivers.contains(&target)))
             && !details.is_some_and(|d| d.object_display.contains_key(&i)
                 || d.object_value_kinds.contains_key(&i) || d.string_dispatch.contains_key(&i)));
-        let admitted = reference_dispatch || details.is_some_and(|d|
-            d.int32_to_string.contains(&i) || d.int64_to_string.contains(&i)
+        let primitive_box = details.is_some_and(|d|
+            d.int32_boxes.contains_key(&i) || d.boolean_boxes.contains_key(&i)
+            || d.scalar_box_queries.get(&i).is_some_and(|(tag, _)| tag.is_some_and(|tag|
+                d.int32_boxes.values().chain(d.boolean_boxes.values()).any(|&known| known == tag))));
+        let admitted = reference_dispatch || primitive_box || details.is_some_and(|d|
+            d.object_type_queries.contains_key(&i) || d.int32_to_string.contains(&i) || d.int64_to_string.contains(&i)
             || d.uint64_to_string.contains(&i) || d.tls.contains_key(&i)
             || d.string_intern.contains(&i) || d.string_compare_ordinal.contains(&i) || d.console_write_line.contains(&i)
             || d.utf8_encode.contains(&i) || d.utf8_decode.contains(&i) || d.utf8_decode_slice.contains(&i)
@@ -2500,6 +2504,15 @@ pub(crate) fn compile_into(
                     .or_else(|| d.int64_boxes.get(&i))
                     .or_else(|| d.boolean_boxes.get(&i))
             }) {
+                // Native allocation must not publish directly into a possible heap
+                // alias. Initialize the new box first, then use the guarded store.
+                let destination = output;
+                let output = if live_stores {
+                    let scratch = slot(&mut b, 8);
+                    b.ins().stack_addr(types::I64, scratch, 0)
+                } else {
+                    output
+                };
                 let service = module.declare_func_in_func(object_service.unwrap(), b.func);
                 let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
                 let tag = b.ins().iconst(types::I32, record as i64);
@@ -2542,6 +2555,10 @@ pub(crate) fn compile_into(
                         pointer,
                         &parameters[..p.lanes(&p.args[i][0])],
                     );
+                }
+                if live_stores {
+                    let pointer = b.ins().load(types::I64, MemFlags::new(), output, 0);
+                    write(&mut b, destination, &[pointer]);
                 }
                 let zero = b.ins().iconst(types::I32, 0);
                 b.ins().return_(&[zero]);

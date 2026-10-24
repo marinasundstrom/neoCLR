@@ -1543,3 +1543,66 @@ and overflow handling unchanged; native log/scratch storage increases. Productio
 stays synchronous. The remaining guarded-store overhead, heap lookup and repeated
 rechecks are measured priorities alongside JSON/JIT integration, not reasons to
 weaken safety or claim completion of the default-GC goal.
+
+
+## JSON primitive boxing and type queries (2026-10-25)
+
+The production boxing projection and ObjectTypeHandle binder now qualify Int32 and
+Boolean boxes, their exact-type tests/unboxing and type-handle results for internal
+live GC. Native allocation returns into stack scratch; initialization precedes guarded
+result publication, including callers that supply a managed heap slot. Ordinary
+emission and native ownership are unchanged. Int64 and compound boxing remain gated;
+the type query follows existing layout/tag contracts, without record-specific GC rules.
+
+`validate-primitive-boxes.py` runs 720 forced/paced JIT and optimized/undefined-bounds
+AOT cycles through production-generated helpers. Cases cover extrema, Boolean values,
+heap aliases, null/mismatch faults with untouched results, invalid output extents,
+class/string/boxed/callable type identity, collection retention, pressure recovery,
+all-live exhaustion, root restoration and complete cleanup. The 38 focused compiler
+checks pass; the shared test-export helper replaces duplicate fixture export code.
+Evidence: `json-helpers-validation.json.gz`. Full server qualification is recorded
+separately below; these checks alone are not HTTP performance evidence.
+
+
+Full retained plaintext and JSON live AOT selections now both compile, with the
+original input hashes and zero rejected bodies. The extended HTTP execution harness
+checks 256 plaintext and 256 JSON responses across forced/paced hosts. JSON bodies
+match `{"id":42,"name":"Café team","active":true}`; both servers restore owned roots and
+reclaim the heap at shutdown. Paced runs complete 90 plaintext and 131 JSON epochs,
+with one cancellation each and no active epoch on exit. These are correctness runs,
+not throughput measurements. Archives: `full-http-selection-json-helpers.json.gz`,
+its `-summary` companion, `plain-live-json-helpers.json.gz`, `json-live-helpers.json.gz`.
+The inputs are retained compiler/library artifacts, not a freshly rebuilt Raven bundle.
+
+
+The private full-server JIT route now requires the same live-GC capability admission
+as the managed fixtures before binding providers or compiling/invoking guest code.
+Four incompatible hosts (missing, legacy, partial and missing published-boundary
+completion) are rejected by the actual managed JIT entry path. Public CLI defaults
+remain synchronous; scalar JIT is not admitted to the private live route.
+
+Initial full-server JIT runs exposed a measurement boundary error: sampling
+thread-local collector counts from a library destructor yielded zero counts even
+though checked requests and guest shutdown succeeded. The execution harness now
+reports after `run_entry` cleanup on its invoking owner thread, and independently
+checks `JIT_RESULT.guestExitCode` rather than relying on the test-runner exit code.
+This changes harness observation, not collector ownership. Retain the initial
+failed activity-check reports alongside the owner-thread reporting reruns.
+
+
+The owner-thread reruns pass: plaintext and JSON each serve 256 checked JIT
+responses across forced/paced hosts, with guest exit status zero. Paced JIT completes
+116 plaintext and 132 JSON epochs, with one cancellation each and no active epoch
+on exit. The updated AOT reporting check also passes 256 plaintext responses and
+102 completed paced epochs. All runs use the macOS ARM64 single owned-heap host.
+Archives: `plain-live-jit-owner-report.json.gz`, `json-live-jit-owner-report.json.gz`,
+`plain-live-aot-owner-report.json.gz`, and `http-live-jit-host-rejection.txt.gz`.
+Initial failed observations are in `plain-live-jit-destructor-counters.json.gz`,
+`json-live-jit-destructor-counters.json.gz` and `http-live-jit-destructor-host.c.gz`.
+
+This completes the requested plaintext/JSON JIT/AOT integration slice: 1,024 checked
+responses in the four sample/mode combinations, plus the AOT reporting regression.
+It does not establish default eligibility, worker/shared-heap support, general race
+safety or a performance improvement. Resume optimization and matched synchronous/live
+comparisons next; retain the synchronous default and broader workload/safety gates.
+The website and public API contract remain unchanged; no website build is required.

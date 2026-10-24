@@ -156,6 +156,10 @@ pub(super) fn execute_managed(
     // SAFETY: this explicit development host path is trusted native code, like a
     // statically linked AOT adapter. Keep the library alive longer than JIT code.
     let library = std::sync::Arc::new(unsafe { libloading::Library::new(host) }?);
+    if details.experimental_live_gc_stores {
+        // Check the explicit host before binding or executing generated code.
+        unsafe { crate::mutation_admission::require_managed_host(&library) }?;
+    }
     type Host = unsafe extern "C" fn(*const u8, i32, i32, *const *const EntryChar) -> i32;
     let run: libloading::Symbol<Host> = unsafe { library.get(b"neoclr_jit_run_v1") }?;
     let mut flags = settings::builder();
