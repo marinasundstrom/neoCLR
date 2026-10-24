@@ -249,3 +249,33 @@ The [provisional HTTP attachment proof](../runtime-diagnostics/README.md) now pa
 on macOS ARM64 AOT/JIT: a separate client reads coherent owner-thread snapshots while
 the server handles requests. This complements the build-and-sample workflow; CPU
 stack sampling is not yet exposed through the attachment endpoint.
+
+## Native object-lookup counters — 2026-10-24
+
+`NEOCLR_GC_PROFILE` also enables the separate private
+`neoclr_gc_lookup_profile_v1()` snapshot and
+`neoclr_gc_lookup_profile_reset_v1()` operation. Existing pause/profile structures
+and reset behavior are unchanged. Counters are cumulative per native thread and
+include failed operations; reset between operations, never during collection.
+Disabled builds return zero counters and compile out increments.
+
+| Counter | Work counted |
+| --- | --- |
+| `base_calls` | Calls reaching exact-base validation |
+| `base_cache_hits` | Owned-cache fast returns; null operands are already admitted |
+| `base_walks`, `base_spans` | Slow validation attempts and descriptors visited, including trailing integrity checks |
+| `index_build_spans` | Descriptors visited in the initial validated index-building pass; excludes the dense-table rebuild |
+| `index_queries`, `index_outside` | Address-index queries and immediate out-of-arena rejection |
+| `index_probes` | Block descriptors examined after an in-range bucket lookup |
+| `mark_candidates` | Words submitted to marking, including roots and payloads |
+| `payload_matches` | Allocated payload candidates, including already-marked/interior references |
+| `newly_marked` | First marks of live allocations |
+| `object_words` | Ordinary-object words scanned after the leading object word |
+
+These are work counts, not timings or distinct-object counts. `index_queries` also
+includes exact-base root validation, so it differs from `mark_candidates`.
+The interpreter uses its own heap and is not covered by these native counters.
+[Plain/JSON/ordinary-workload evidence and cache retention](../../../benchmarks/execution/lookup-profile/README.md)
+keep diagnostic runs separate from uninstrumented capacity measurements. New tests
+are registered in `validate-native-gc.py`; local qualification covers macOS ARM64,
+not a new Windows execution claim.

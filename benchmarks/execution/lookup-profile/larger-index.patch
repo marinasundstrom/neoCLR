@@ -1,0 +1,7 @@
+--- a/runtime/native/gc/native-gc.c
++++ b/runtime/native/gc/native-gc.c
+@@ -826,2 +826,2 @@
+-    block *starts[256], *interns[INTERN_SEED_LIMIT];
+-    block_index index = {.start = starts, .interns = interns, .capacity = 256};
++    block *starts[512], *interns[INTERN_SEED_LIMIT];
++    block_index index = {.start = starts, .interns = interns, .capacity = 512};

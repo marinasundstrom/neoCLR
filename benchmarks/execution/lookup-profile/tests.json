@@ -1,0 +1,146 @@
+[
+  {
+    "command": [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+      "-isysroot",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-arch",
+      "arm64",
+      "-pthread",
+      "-DNEOCLR_TEST_THREADS",
+      "-std=c11",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-DNEOCLR_NATIVE_GC",
+      "-I",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc-lookup-profile-test.c",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+      "-o",
+      "/Users/robert/Projects/neoclr/target/lookup-profile/test-False-False"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/robert/Projects/neoclr/target/lookup-profile/test-False-False"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+      "-isysroot",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-arch",
+      "arm64",
+      "-pthread",
+      "-DNEOCLR_TEST_THREADS",
+      "-std=c11",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-DNEOCLR_NATIVE_GC",
+      "-I",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+      "-fsanitize=undefined,bounds",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc-lookup-profile-test.c",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+      "-o",
+      "/Users/robert/Projects/neoclr/target/lookup-profile/test-False-True"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/robert/Projects/neoclr/target/lookup-profile/test-False-True"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+      "-isysroot",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-arch",
+      "arm64",
+      "-pthread",
+      "-DNEOCLR_TEST_THREADS",
+      "-std=c11",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-DNEOCLR_NATIVE_GC",
+      "-I",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+      "-DNEOCLR_GC_PROFILE",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc-lookup-profile-test.c",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+      "-o",
+      "/Users/robert/Projects/neoclr/target/lookup-profile/test-True-False"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/robert/Projects/neoclr/target/lookup-profile/test-True-False"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+      "-isysroot",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-arch",
+      "arm64",
+      "-pthread",
+      "-DNEOCLR_TEST_THREADS",
+      "-std=c11",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-DNEOCLR_NATIVE_GC",
+      "-I",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+      "-DNEOCLR_GC_PROFILE",
+      "-fsanitize=undefined,bounds",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc-lookup-profile-test.c",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+      "-o",
+      "/Users/robert/Projects/neoclr/target/lookup-profile/test-True-True"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/robert/Projects/neoclr/target/lookup-profile/test-True-True"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  }
+]

@@ -61,7 +61,15 @@ static int base_cache(void) {
     neoclr_probe_storage slots[] = {{&items[0], 8, 0}, {&items[128], 8, 0}};
     neoclr_probe_frame frame = {.context = &c, .storage = slots, .storage_count = 2};
     CHECK(!neoclr_gc_allocation_info_v1(&c, items[1], &bytes, &kind));
+    CHECK(!neoclr_gc_allocation_info_v1(&c, items[128], &bytes, &kind));
+    neoclr_gc_lookup_profile_reset_v1();
     CHECK(!neoclr_gc_collect_v1(&c, &frame));
+    /* Reclaiming many colliding bases must preserve the survivor's proof. */
+    CHECK(!neoclr_gc_allocation_info_v1(&c, items[128], &bytes, &kind));
+#ifdef NEOCLR_GC_PROFILE
+    neoclr_gc_lookup_profile lookup = neoclr_gc_lookup_profile_v1();
+    CHECK(lookup.base_calls == 1 && lookup.base_cache_hits == 1 && !lookup.base_walks);
+#endif
     CHECK(neoclr_gc_allocation_info_v1(&c, items[1], &bytes, &kind) == 3);
     CHECK(!neoclr_gc_allocation_info_v1(&c, items[0], &bytes, &kind));
     void *reused = NULL;

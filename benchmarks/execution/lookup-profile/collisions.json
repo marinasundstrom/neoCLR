@@ -1,0 +1,71 @@
+[
+  {
+    "command": [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+      "-isysroot",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-arch",
+      "arm64",
+      "-std=c11",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-DNEOCLR_NATIVE_GC",
+      "-DNEOCLR_GC_PROFILE",
+      "-I",
+      "docs/experiments/aot-console",
+      "docs/experiments/aot-console/native-gc-owned-test.c",
+      "docs/experiments/aot-console/native-gc.c",
+      "docs/experiments/aot-console/root-probe.c",
+      "-o",
+      "target/lookup-profile/owned-profile-False"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "target/lookup-profile/owned-profile-False"
+    ],
+    "exitCode": 0,
+    "stdout": "PASS owned heap cursor, reclamation, shape checks and release\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+      "-isysroot",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-arch",
+      "arm64",
+      "-std=c11",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-DNEOCLR_NATIVE_GC",
+      "-DNEOCLR_GC_PROFILE",
+      "-I",
+      "docs/experiments/aot-console",
+      "-fsanitize=undefined,bounds",
+      "docs/experiments/aot-console/native-gc-owned-test.c",
+      "docs/experiments/aot-console/native-gc.c",
+      "docs/experiments/aot-console/root-probe.c",
+      "-o",
+      "target/lookup-profile/owned-profile-True"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "target/lookup-profile/owned-profile-True"
+    ],
+    "exitCode": 0,
+    "stdout": "PASS owned heap cursor, reclamation, shape checks and release\n",
+    "stderr": ""
+  }
+]

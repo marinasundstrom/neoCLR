@@ -600,3 +600,26 @@ worker stop/suspension invariants and (for generations) write barriers/remembere
 sets. Measure fragmentation and retained live space separately from lookup CPU;
 compaction may improve locality but adds copying, relocation work and pause costs.
 These are proposals and validation needs, not newly implemented contracts.
+
+### Measured native lookup reuse — 2026-10-24
+
+The proposed diagnostic slice is now implemented through separate private lookup
+counters under `NEOCLR_GC_PROFILE`. Fixed-request plain/JSON and ordinary consumers
+separate exact-base admission walks from GC candidate/index work. The larger-index
+experiment reduces probes but has mixed throughput and costs 2 KiB more native
+stack, so it is not adopted. [Counters, evidence and definitions](../../benchmarks/execution/lookup-profile/README.md).
+
+The implemented improvement preserves exact-base cache proofs for surviving
+allocations. Sweep invalidates a matching entry before reclaiming that allocation;
+release clears all entries. Existing exclusive ownership ensures descriptors remain
+runtime-controlled, and nonmoving live allocations preserve identity. This reuses
+validated stable facts for their actual lifetime rather than each collection epoch.
+It adds no header, side table or cache space and retains checked misses/external
+heaps. Tests cover stale pointers, collisions, split/reuse, scope reacquisition,
+thread isolation and forced/paced execution.
+
+Four-request plaintext validation visits fall 42.1%; JSON falls 30.6–31.9%.
+Uninstrumented throughput differences are below 1%, so no speedup is established.
+The counters confirm that ordinary-object candidate scanning remains substantial;
+precise shared reference layouts and cold-metadata separation remain the next design
+work, with the .NET comparison and producer/relocation obligations described above.

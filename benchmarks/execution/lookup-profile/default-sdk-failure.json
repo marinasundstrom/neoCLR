@@ -1,0 +1,24 @@
+[
+  {
+    "command": [
+      "xcrun",
+      "clang",
+      "-std=c11",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-DNEOCLR_NATIVE_GC",
+      "-I",
+      "docs/experiments/aot-console",
+      "docs/experiments/aot-console/native-gc-lookup-profile-test.c",
+      "docs/experiments/aot-console/native-gc.c",
+      "docs/experiments/aot-console/root-probe.c",
+      "-o",
+      "target/lookup-profile/test-False-False"
+    ],
+    "exitCode": 1,
+    "stdout": "",
+    "stderr": "ld: tapi error: malformed file\n/Library/Developer/CommandLineTools/SDKs/MacOSX27.0.sdk/usr/lib/libSystem.B.tbd:4:20: error: unknown architecture\n                   arm64e.x1-macos, arm64e.x1-maccatalyst ]\n                   ^~~~~~~~~~~~~~~\n in '/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib/libSystem.tbd'\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\n"
+  }
+]

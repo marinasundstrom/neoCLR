@@ -1,0 +1,538 @@
+[
+  {
+    "command": [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+      "-isysroot",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-arch",
+      "arm64",
+      "-std=c11",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-DNEOCLR_NATIVE_GC",
+      "-I",
+      "docs/experiments/aot-console",
+      "docs/experiments/aot-console/native-gc-owned-test.c",
+      "docs/experiments/aot-console/native-gc.c",
+      "docs/experiments/aot-console/root-probe.c",
+      "-o",
+      "/Users/robert/Projects/neoclr/target/lookup-profile/owned-False"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/robert/Projects/neoclr/target/lookup-profile/owned-False"
+    ],
+    "exitCode": 0,
+    "stdout": "PASS owned heap cursor, reclamation, shape checks and release\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+      "-isysroot",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-arch",
+      "arm64",
+      "-std=c11",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-DNEOCLR_NATIVE_GC",
+      "-I",
+      "docs/experiments/aot-console",
+      "-fsanitize=undefined,bounds",
+      "docs/experiments/aot-console/native-gc-owned-test.c",
+      "docs/experiments/aot-console/native-gc.c",
+      "docs/experiments/aot-console/root-probe.c",
+      "-o",
+      "/Users/robert/Projects/neoclr/target/lookup-profile/owned-True"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/robert/Projects/neoclr/target/lookup-profile/owned-True"
+    ],
+    "exitCode": 0,
+    "stdout": "PASS owned heap cursor, reclamation, shape checks and release\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+      "-isysroot",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-arch",
+      "arm64",
+      "-std=c11",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-DNEOCLR_NATIVE_GC",
+      "-I",
+      "docs/experiments/aot-console",
+      "docs/experiments/aot-console/native-gc-base-test.c",
+      "docs/experiments/aot-console/native-gc.c",
+      "docs/experiments/aot-console/root-probe.c",
+      "-o",
+      "/Users/robert/Projects/neoclr/target/lookup-profile/base-False"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/robert/Projects/neoclr/target/lookup-profile/base-False"
+    ],
+    "exitCode": 0,
+    "stdout": "PASS exact-base admission, trailing corruption, atomic failure and reclamation\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+      "-isysroot",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-arch",
+      "arm64",
+      "-std=c11",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-DNEOCLR_NATIVE_GC",
+      "-I",
+      "docs/experiments/aot-console",
+      "-fsanitize=undefined,bounds",
+      "docs/experiments/aot-console/native-gc-base-test.c",
+      "docs/experiments/aot-console/native-gc.c",
+      "docs/experiments/aot-console/root-probe.c",
+      "-o",
+      "/Users/robert/Projects/neoclr/target/lookup-profile/base-True"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/robert/Projects/neoclr/target/lookup-profile/base-True"
+    ],
+    "exitCode": 0,
+    "stdout": "PASS exact-base admission, trailing corruption, atomic failure and reclamation\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+      "-isysroot",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-arch",
+      "arm64",
+      "-std=c11",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-DNEOCLR_NATIVE_GC",
+      "-I",
+      "docs/experiments/aot-console",
+      "docs/experiments/aot-console/native-gc-index-test.c",
+      "docs/experiments/aot-console/native-gc.c",
+      "docs/experiments/aot-console/root-probe.c",
+      "-o",
+      "/Users/robert/Projects/neoclr/target/lookup-profile/index-False"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/robert/Projects/neoclr/target/lookup-profile/index-False"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+      "-isysroot",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-arch",
+      "arm64",
+      "-std=c11",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-DNEOCLR_NATIVE_GC",
+      "-I",
+      "docs/experiments/aot-console",
+      "-fsanitize=undefined,bounds",
+      "docs/experiments/aot-console/native-gc-index-test.c",
+      "docs/experiments/aot-console/native-gc.c",
+      "docs/experiments/aot-console/root-probe.c",
+      "-o",
+      "/Users/robert/Projects/neoclr/target/lookup-profile/index-True"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/robert/Projects/neoclr/target/lookup-profile/index-True"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+      "-isysroot",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-arch",
+      "arm64",
+      "-std=c11",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-DNEOCLR_NATIVE_GC",
+      "-I",
+      "docs/experiments/aot-console",
+      "docs/experiments/aot-console/native-gc-dense-test.c",
+      "docs/experiments/aot-console/native-gc.c",
+      "docs/experiments/aot-console/root-probe.c",
+      "-o",
+      "/Users/robert/Projects/neoclr/target/lookup-profile/dense-False"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/robert/Projects/neoclr/target/lookup-profile/dense-False"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+      "-isysroot",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-arch",
+      "arm64",
+      "-std=c11",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-DNEOCLR_NATIVE_GC",
+      "-I",
+      "docs/experiments/aot-console",
+      "-fsanitize=undefined,bounds",
+      "docs/experiments/aot-console/native-gc-dense-test.c",
+      "docs/experiments/aot-console/native-gc.c",
+      "docs/experiments/aot-console/root-probe.c",
+      "-o",
+      "/Users/robert/Projects/neoclr/target/lookup-profile/dense-True"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/robert/Projects/neoclr/target/lookup-profile/dense-True"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+      "-isysroot",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-arch",
+      "arm64",
+      "-std=c11",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-DNEOCLR_NATIVE_GC",
+      "-I",
+      "docs/experiments/aot-console",
+      "docs/experiments/aot-console/native-gc-free-index-test.c",
+      "docs/experiments/aot-console/native-gc.c",
+      "docs/experiments/aot-console/root-probe.c",
+      "-o",
+      "/Users/robert/Projects/neoclr/target/lookup-profile/free-index-False"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/robert/Projects/neoclr/target/lookup-profile/free-index-False"
+    ],
+    "exitCode": 0,
+    "stdout": "PASS indexed first-fit differential, corruption, reclamation and reset\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+      "-isysroot",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-arch",
+      "arm64",
+      "-std=c11",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-DNEOCLR_NATIVE_GC",
+      "-I",
+      "docs/experiments/aot-console",
+      "-fsanitize=undefined,bounds",
+      "docs/experiments/aot-console/native-gc-free-index-test.c",
+      "docs/experiments/aot-console/native-gc.c",
+      "docs/experiments/aot-console/root-probe.c",
+      "-o",
+      "/Users/robert/Projects/neoclr/target/lookup-profile/free-index-True"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/robert/Projects/neoclr/target/lookup-profile/free-index-True"
+    ],
+    "exitCode": 0,
+    "stdout": "PASS indexed first-fit differential, corruption, reclamation and reset\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+      "-isysroot",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-arch",
+      "arm64",
+      "-std=c11",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-DNEOCLR_NATIVE_GC",
+      "-I",
+      "docs/experiments/aot-console",
+      "docs/experiments/aot-console/native-gc-seed-test.c",
+      "docs/experiments/aot-console/native-gc.c",
+      "docs/experiments/aot-console/root-probe.c",
+      "-o",
+      "/Users/robert/Projects/neoclr/target/lookup-profile/seed-False"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/robert/Projects/neoclr/target/lookup-profile/seed-False"
+    ],
+    "exitCode": 0,
+    "stdout": "PASS sparse/dense clear/stale marks, intern seeding, child tracing and reclamation\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+      "-isysroot",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-arch",
+      "arm64",
+      "-std=c11",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-DNEOCLR_NATIVE_GC",
+      "-I",
+      "docs/experiments/aot-console",
+      "-fsanitize=undefined,bounds",
+      "docs/experiments/aot-console/native-gc-seed-test.c",
+      "docs/experiments/aot-console/native-gc.c",
+      "docs/experiments/aot-console/root-probe.c",
+      "-o",
+      "/Users/robert/Projects/neoclr/target/lookup-profile/seed-True"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/robert/Projects/neoclr/target/lookup-profile/seed-True"
+    ],
+    "exitCode": 0,
+    "stdout": "PASS sparse/dense clear/stale marks, intern seeding, child tracing and reclamation\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+      "-isysroot",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-arch",
+      "arm64",
+      "-std=c11",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-DNEOCLR_NATIVE_GC",
+      "-I",
+      "docs/experiments/aot-console",
+      "docs/experiments/aot-console/native-gc-pass-test.c",
+      "docs/experiments/aot-console/native-gc.c",
+      "docs/experiments/aot-console/root-probe.c",
+      "-o",
+      "/Users/robert/Projects/neoclr/target/lookup-profile/pass-False"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/robert/Projects/neoclr/target/lookup-profile/pass-False"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+      "-isysroot",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-arch",
+      "arm64",
+      "-std=c11",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-DNEOCLR_NATIVE_GC",
+      "-I",
+      "docs/experiments/aot-console",
+      "-fsanitize=undefined,bounds",
+      "docs/experiments/aot-console/native-gc-pass-test.c",
+      "docs/experiments/aot-console/native-gc.c",
+      "docs/experiments/aot-console/root-probe.c",
+      "-o",
+      "/Users/robert/Projects/neoclr/target/lookup-profile/pass-True"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/robert/Projects/neoclr/target/lookup-profile/pass-True"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+      "-isysroot",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-arch",
+      "arm64",
+      "-std=c11",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-DNEOCLR_NATIVE_GC",
+      "-I",
+      "docs/experiments/aot-console",
+      "docs/experiments/aot-console/native-gc-profile-test.c",
+      "docs/experiments/aot-console/native-gc.c",
+      "docs/experiments/aot-console/root-probe.c",
+      "-o",
+      "/Users/robert/Projects/neoclr/target/lookup-profile/profile-False"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/robert/Projects/neoclr/target/lookup-profile/profile-False"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+      "-isysroot",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-arch",
+      "arm64",
+      "-std=c11",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-DNEOCLR_NATIVE_GC",
+      "-I",
+      "docs/experiments/aot-console",
+      "-fsanitize=undefined,bounds",
+      "docs/experiments/aot-console/native-gc-profile-test.c",
+      "docs/experiments/aot-console/native-gc.c",
+      "docs/experiments/aot-console/root-probe.c",
+      "-o",
+      "/Users/robert/Projects/neoclr/target/lookup-profile/profile-True"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/robert/Projects/neoclr/target/lookup-profile/profile-True"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  }
+]

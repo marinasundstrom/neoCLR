@@ -11,6 +11,18 @@
 #endif
 #endif
 static _Thread_local neoclr_gc_profile profile;
+static _Thread_local neoclr_gc_lookup_profile lookup_profile;
+neoclr_gc_lookup_profile neoclr_gc_lookup_profile_v1(void) { return lookup_profile; }
+void neoclr_gc_lookup_profile_reset_v1(void) {
+#ifdef NEOCLR_GC_PROFILE
+    lookup_profile = (neoclr_gc_lookup_profile){0};
+#endif
+}
+#ifdef NEOCLR_GC_PROFILE
+#define LOOKUP_COUNT(field) (lookup_profile.field++)
+#else
+#define LOOKUP_COUNT(field) ((void)0)
+#endif
 neoclr_gc_profile neoclr_gc_profile_v1(void) { return profile; }
 void neoclr_gc_profile_reset_v1(void) {
 #ifdef NEOCLR_GC_PROFILE
@@ -116,12 +128,18 @@ static _Atomic uint64_t next_host_handle = 1;
  * stop validation early: a matching prefix cannot hide a corrupt trailing block.
  * Null values retain their existing admitted-root meaning. */
 static int validated_bases(const neoclr_aot_text_arena *arena, const void *value, const void *owner) {
+    LOOKUP_COUNT(base_calls);
     if (!valid(arena)) return 0;
     int owned = arena == owned_heap.arena;
-    if (owned && known_base(value) && known_base(owner)) return 1;
+    if (owned && known_base(value) && known_base(owner)) {
+        LOOKUP_COUNT(base_cache_hits);
+        return 1;
+    }
+    LOOKUP_COUNT(base_walks);
     int found_value = !value, found_owner = !owner;
     uint64_t at = 0;
     while (at < arena->used && !(found_value && found_owner)) {
+        LOOKUP_COUNT(base_spans);
         if (!block_valid(arena, at)) return 0;
         const block *b = (const void *)(arena->data + at);
         if (b->state & ALLOCATED) {
@@ -132,6 +150,7 @@ static int validated_bases(const neoclr_aot_text_arena *arena, const void *value
     }
     /* Once both bases match, the remaining walk only needs integrity checks. */
     for (; at < arena->used;) {
+        LOOKUP_COUNT(base_spans);
         if (!block_valid(arena, at)) return 0;
         const block *b = (const void *)(arena->data + at);
         at += b->span;
@@ -449,6 +468,7 @@ static int build_index(neoclr_aot_text_arena *a, block_index *index) {
     unsigned bucket = 0;
     uint64_t next_free = a == owned_heap.arena ? owned_heap.free_head : 0;
     for (uint64_t at = 0; at < a->used;) {
+        LOOKUP_COUNT(index_build_spans);
         if (!block_valid(a, at)) return 0;
         block *b = (void *)(a->data + at);
         if (a == owned_heap.arena && !b->state) {
@@ -468,11 +488,16 @@ static int build_index(neoclr_aot_text_arena *a, block_index *index) {
 /* Index lookup preserves exact payload-base validation for host owners/values.
  * Only use after blocks_valid and before sweep changes block spans. */
 static block *indexed_block(neoclr_aot_text_arena *a, const block_index *index, uint64_t word) {
+    LOOKUP_COUNT(index_queries);
     uintptr_t base = (uintptr_t)a->data;
-    if (word < base || word - base >= a->used) return NULL;
+    if (word < base || word - base >= a->used) {
+        LOOKUP_COUNT(index_outside);
+        return NULL;
+    }
     uint64_t offset = word - base;
     block *first = index->start[offset >> index->shift];
     for (uint64_t at = (uintptr_t)first - base; at < a->used;) {
+        LOOKUP_COUNT(index_probes);
         block *b = (void *)(a->data + at);
         if (offset < at + b->span) return b;
         at += b->span;
@@ -485,9 +510,16 @@ static int indexed_live_base(neoclr_aot_text_arena *a, const block_index *index,
     return b && (b->state & ALLOCATED) && value == (void *)(b + 1);
 }
 static void mark(neoclr_aot_text_arena *a, block_index *index, uint64_t word, block **pending) {
+    LOOKUP_COUNT(mark_candidates);
     block *b = indexed_block(a, index, word);
+#ifdef NEOCLR_GC_PROFILE
+    if (b && b->state && word >= (uintptr_t)(b + 1) &&
+        word - (uintptr_t)(b + 1) < b->bytes)
+        LOOKUP_COUNT(payload_matches);
+#endif
     if (b && b->state && word >= (uintptr_t)(b + 1) &&
         word - (uintptr_t)(b + 1) < b->bytes && !(b->state & MARKED)) {
+        LOOKUP_COUNT(newly_marked);
         /* Atomic payloads have no children: retain them without worklist traffic.
          * Count newly marked leaves so dependent/parked owners discovered late
          * still drive the fixed point even when no tracing work was enqueued. */
@@ -625,6 +657,7 @@ static int32_t collect_indexed(neoclr_aot_context *context,
                 mark(a, &index, owner, &pending);
             } else if (b->kind == NEOCLR_GC_OBJECT) {
                 for (uint64_t offset = 8; offset + 8 <= b->bytes; offset += 8) {
+                    LOOKUP_COUNT(object_words);
                     uint64_t word; memcpy(&word, data + offset, 8); mark(a, &index, word, &pending);
                 }
             } else if (b->kind == NEOCLR_GC_RECORDS) {
@@ -716,6 +749,12 @@ static int32_t collect_indexed(neoclr_aot_context *context,
         uint64_t span = b->span;
         if (b->state && !(b->state & MARKED)) {
             gc_state.statistics.reclaimed_allocations++; gc_state.statistics.reclaimed_bytes += b->bytes;
+            /* Keep positive proofs for survivors. Revoke a reclaimed exact base
+             * before its descriptor/payload can be reused or coalesced. */
+            if (a == owned_heap.arena) {
+                unsigned slot = base_slot(b + 1);
+                if (owned_heap.bases[slot] == (void *)(b + 1)) owned_heap.bases[slot] = NULL;
+            }
             /* Poison reclaimed contents so stale reads fail functional stress tests. */
             memset(b + 1, 0xdd, (size_t)(span - sizeof(block)));
             b->state = 0; b->bytes = 0; b->kind = 0;
@@ -741,7 +780,6 @@ static int32_t collect_indexed(neoclr_aot_context *context,
     }
     if (free_run) a->used = free_at;
     if (a == owned_heap.arena) {
-        memset(owned_heap.bases, 0, sizeof(owned_heap.bases));
         owned_heap.used = a->used;
         owned_heap.free_head = free_head;
     }

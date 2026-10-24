@@ -47,7 +47,7 @@ def main():
             cc = [clang, '-isysroot', sdk, '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror', '-fsanitize=undefined,bounds']
         else:
             raise ValueError('Requires Windows or macOS')
-        names = ['native-gc-free-index-test', 'native-gc-owned-test', 'native-gc-pacing-test', 'native-gc-test', 'native-gc-intern-test', 'native-gc-object-test', 'native-gc-base-test', 'native-gc-format-test', 'native-gc-primitive-test', 'native-gc-reference-test', 'native-gc-borrowed-test', 'native-gc-utf8-test', 'native-gc-unicode-test', 'native-gc-arguments-test', 'native-gc-producer-test', 'native-gc-preference-test', 'native-gc-admission-test', 'native-gc-allocation-test', 'native-gc-helper-test', 'native-gc-text-helper-test', 'native-gc-index-test', 'native-gc-dense-test', 'native-gc-pass-test', 'native-gc-seed-test', 'native-gc-profile-test']
+        names = ['native-gc-free-index-test', 'native-gc-owned-test', 'native-gc-pacing-test', 'native-gc-test', 'native-gc-intern-test', 'native-gc-object-test', 'native-gc-base-test', 'native-gc-format-test', 'native-gc-primitive-test', 'native-gc-reference-test', 'native-gc-borrowed-test', 'native-gc-utf8-test', 'native-gc-unicode-test', 'native-gc-arguments-test', 'native-gc-producer-test', 'native-gc-preference-test', 'native-gc-admission-test', 'native-gc-allocation-test', 'native-gc-helper-test', 'native-gc-text-helper-test', 'native-gc-index-test', 'native-gc-dense-test', 'native-gc-pass-test', 'native-gc-seed-test', 'native-gc-profile-test', 'native-gc-lookup-profile-test']
         text_crate = ROOT / 'tools/aot-native-text'
         run('unicode-library', ['cargo', 'build', '--locked', '--release', '--features', 'time-zone-rules', '--manifest-path', text_crate / 'Cargo.toml'], timeout=300)
         text_library = text_crate / 'target/release' / ('neoclr_aot_native_text.lib' if windows else 'libneoclr_aot_native_text.a')
@@ -62,7 +62,7 @@ def main():
         def build(name, source, gc=True, profile=False):
             binary = out / (name + ('.exe' if windows else ''))
             defines = (['NEOCLR_NATIVE_GC'] if gc else []) + (['NEOCLR_GC_PROFILE'] if profile else [])
-            threaded_pacing = source == 'native-gc-pacing-test' and not windows
+            threaded_pacing = source in ['native-gc-pacing-test', 'native-gc-lookup-profile-test'] and not windows
             if source == 'native-gc-pacing-test': defines += ['NEOCLR_GC_PACED']
             if threaded_pacing: defines += ['NEOCLR_TEST_THREADS']
             sources = [BASE / (source + '.c'), BASE / 'root-probe.c']
@@ -88,6 +88,8 @@ def main():
         for name in names:
             run(name, [build(name, name)])
         run('profile-enabled', [build('profile-enabled', 'native-gc-profile-test', profile=True)])
+        run('lookup-profile-enabled', [build('lookup-profile-enabled', 'native-gc-lookup-profile-test', profile=True)])
+        run('owned-profile-enabled', [build('owned-profile-enabled', 'native-gc-owned-test', profile=True)])
         for gc in [False, True]:
             name = 'root-validation-' + ('gc' if gc else 'probe')
             binary = build(name, 'root-validation-test', gc=gc)

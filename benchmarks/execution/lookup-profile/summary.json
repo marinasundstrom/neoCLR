@@ -1,0 +1,18 @@
+{
+  "aot-cleared": {
+    "requestsPerSecond": 2946.1000000000004,
+    "cpuMicrosecondsPerResponse": 336.9406922283665
+  },
+  "aot-retained": {
+    "requestsPerSecond": 2949.6000000000004,
+    "cpuMicrosecondsPerResponse": 335.72153298701016
+  },
+  "jit-cleared": {
+    "requestsPerSecond": 1901.9,
+    "cpuMicrosecondsPerResponse": 525.3503733833522
+  },
+  "jit-retained": {
+    "requestsPerSecond": 1905.6,
+    "cpuMicrosecondsPerResponse": 522.9165356545542
+  }
+}

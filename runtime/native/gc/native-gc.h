@@ -14,8 +14,9 @@ enum { NEOCLR_GC_TEXT = 1, NEOCLR_GC_OBJECT = 2, NEOCLR_GC_BYTES = 3, NEOCLR_GC_
  * Native helpers may access admitted payloads but must not overwrite headers.
  * No cross-thread arena operations or ownership handoff are permitted.
  * Allocation and cached exact-base admission may omit full-heap validation;
- * cache misses, GC and release still validate. Positive cache entries are cleared
- * after reclamation and at release; interior/forged pointers are never inserted.
+ * cache misses, GC and release still validate. Reclaimed positive entries are
+ * revoked before reuse; release clears all entries. Interior/forged pointers
+ * are never inserted.
  * Scope storage is thread-local, not part of the context/compiler ABI. External
  * arenas outside this scope retain complete checked allocation semantics.
  * Release clears the scope even when it reports corruption (without repairing it). */
@@ -41,6 +42,16 @@ neoclr_gc_profile neoclr_gc_profile_v1(void);
 /* Reset diagnostics only, between operations; never changes heap/GC state.
  * Disabled builds return zero diagnostics and reset is a no-op. */
 void neoclr_gc_profile_reset_v1(void);
+/* Private lookup diagnostics, enabled with NEOCLR_GC_PROFILE. Counts are
+ * cumulative per native thread, including failed operations. Reset only between
+ * operations; it never changes caches, heap state or ordinary statistics. */
+typedef struct {
+    uint64_t base_calls, base_cache_hits, base_walks, base_spans;
+    uint64_t index_build_spans, index_queries, index_outside, index_probes;
+    uint64_t mark_candidates, payload_matches, newly_marked, object_words;
+} neoclr_gc_lookup_profile;
+neoclr_gc_lookup_profile neoclr_gc_lookup_profile_v1(void);
+void neoclr_gc_lookup_profile_reset_v1(void);
 /* Explicit managed collection uses the current published root chain. */
 int32_t neoclr_gc_collect_managed_v1(neoclr_aot_context *, void *output);
 /* Private current logical-stack capture; names are immutable current-image text.

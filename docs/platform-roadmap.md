@@ -6666,3 +6666,16 @@ cache misses/validation spans and GC candidate/index work separately, before cho
 an index or tracing-layout change. [Current implementation and proposed sequence](design/allocation-metadata-runtime-comparison.md#jit-placement-hot-metadata-and-object-lookup--2026-10-24)
 distinguish implemented caches from proposed precise per-type maps and moving-GC
 requirements. This author-directed investigation does not reorder other milestones.
+
+### Native lookup counters and survivor proofs — 2026-10-24
+
+The lookup investigation now has implemented counters and a bounded reuse change:
+owned-heap exact-base proofs survive collection while their allocations survive;
+matching entries are revoked before reclamation. Four-request plaintext/JSON base
+validation visits fall 42.1%/30.6–31.9%, with unchanged cache storage and checked
+misses. Eight uninstrumented trials show no convincing throughput change. The
+larger temporary index is rejected because its throughput result is mixed.
+[Validation and evidence](../benchmarks/execution/lookup-profile/README.md) cover
+threaded enabled/disabled diagnostics, optimized/sanitized collector/lifecycle
+cases, forced/paced HTTP and ordinary consumers. Precise object reference layouts,
+cold metadata and compaction remain separate work; interpreter heap policy is unchanged.

@@ -1,0 +1,11 @@
+--- a/runtime/native/gc/native-gc.c
++++ b/runtime/native/gc/native-gc.c
+@@ -751,0 +752,6 @@
++            /* Keep positive proofs for survivors. Revoke a reclaimed exact base
++             * before its descriptor/payload can be reused or coalesced. */
++            if (a == owned_heap.arena) {
++                unsigned slot = base_slot(b + 1);
++                if (owned_heap.bases[slot] == (void *)(b + 1)) owned_heap.bases[slot] = NULL;
++            }
+@@ -777 +782,0 @@
+-        memset(owned_heap.bases, 0, sizeof(owned_heap.bases));

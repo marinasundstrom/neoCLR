@@ -22276,3 +22276,15 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   Precise per-type tracing maps, lazy cold metadata and compaction remain proposals,
   not completed changes or permanent roadmap reprioritization.
   [Design comparison and obligations](design/allocation-metadata-runtime-comparison.md#jit-placement-hot-metadata-and-object-lookup--2026-10-24).
+
+- Author then directs: “Continue on this track. Don’t stop”. Assistant continues
+  beyond the placement experiment into native lookup instrumentation and controlled
+  changes. A larger temporary index reduces probes but regresses JIT throughput,
+  so it is not adopted. Retaining exact-base proofs for surviving allocations is
+  implemented with invalidation before reclamation and unchanged cache space.
+- Outcome: four-request plaintext/JSON validation visits fall 42.1%/30.6–31.9%;
+  short uninstrumented throughput differences remain below 1%. Assistant explicitly
+  distinguishes work reduction from a demonstrated speedup. Focused diagnostic,
+  thread/lifetime, sanitizer and forced/paced consumer checks pass. Precise tracing
+  maps and compaction remain open, not implicitly approved implementations.
+  [Implemented slice and retained experiments](../benchmarks/execution/lookup-profile/README.md).

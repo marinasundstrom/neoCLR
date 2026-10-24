@@ -1,0 +1,30 @@
+{
+  "passed": true,
+  "inputs": {
+    "runtime/native/gc/native-gc.c": "b0f062524391219452527b1973a3341f3c87688dbbddd0ce3edd90029ca1227b",
+    "runtime/native/gc/native-gc.h": "947edfe14af184ab5c76cf6311e293cf0a082f2ebaa059d37497e3370266822e",
+    "docs/experiments/aot-console/native-gc-lookup-profile-test.c": "245c22af276c01e3dfef6953a2f38b0f23a67a6ea41c65046132b1c31ea51a2a",
+    "target/lookup-profile/baseline-gc.c": "c8e3624e5e5d0dee10750375a577dfe9191a19648538a1f013d3c1260ac36f0e",
+    "target/root-map/candidate.o": "41954bda6924b168412e7dd0ad458e24f9f31644c4f4628621808ee529d311bc",
+    "target/root-map/json.o": "4f8c66fafef415ce9bc0dd53769c06e6ba74cbe25ccc5dea7f26181235c4ff7c",
+    "target/release/neoclr-codegen": "3aa9b5f94939d51e9e297221dab052118be57bed7ac6452665c95c2b47227213",
+    "benchmarks/execution/lookup-profile/measure-retained.py": "835e8b15a65ac322b0d7da555b695d9699d413e1ecc0a62717f5817b895f591d",
+    "benchmarks/execution/lookup-profile/measure.py": "8fdb0ed5be8197e0cfb71bd85e4bec7f1ff4ce51554cea68ce1b293f54ba6cc9",
+    "benchmarks/execution/lookup-profile/summarize.py": "6b524d255e31482a5816d67d718495a346efe81cb9825c6e1ed2ce5be5bae831",
+    "benchmarks/execution/lookup-profile/validate.py": "cc22da45482d08371e55ff19aa27b10fcc8859fe4ce5f68be5bb0b0b04e97212",
+    "benchmarks/execution/lookup-profile/test_summary.py": "5d8e5211af34b88fd154a32d6df4b3cf29ae6b89d98421b5bde97707867f4690",
+    "benchmarks/execution/lookup-profile/corpus.py": "f627da753766332b5a5a2d8f3e6d7adf53df86054d845bb50a51e4db2f7ca274",
+    "benchmarks/execution/lookup-profile/counts.py": "09f7c6852645a204e232f62c9028eaab8db938f66618837b2dc54b573bc6ed8a",
+    "docs/experiments/aot-console/native-gc-owned-test.c": "4a59fb64abf2743038fcad9617b239b0cbc2c6b161ac652540bce7d955d21d18",
+    "scripts/validate-native-gc.py": "6070373245fcc8239cd8a80cabd7864ae6f5bb3bf008156d34e96a6fc3806511"
+  },
+  "validation": {
+    "diagnosticExecutions": 4,
+    "collectorRegressionExecutions": 16,
+    "collisionProfileExecutions": 2,
+    "hostLifecycleExecutions": 4,
+    "forcedHttpInvocations": 4,
+    "ordinaryConsumerInvocations": 4,
+    "analysisTests": 5
+  }
+}
