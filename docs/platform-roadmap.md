@@ -21,6 +21,10 @@ The [automatic owned-heap experiment](../benchmarks/execution/concurrent-integra
 now passes plain/JSON JIT/AOT execution and shutdown, with sparse lookup reducing
 prototype overhead. Its one-owner plaintext capacity still regresses; keep the
 synchronous default while reducing work and extending safety/measurement coverage.
+[Outer-operation pause profiles](../benchmarks/execution/concurrent-pauses/README.md)
+now include nested waits/rechecks and cancellation. They identify repeated collector
+work as the larger measured blocking cost; removing idle rechecks requires explicit
+cleanup-timing, shutdown and memory qualification.
 
 **Author-directed media types (2026-10-23):** Complete the bounded HTTP value-contract
 slice with cached typed presets, lazy structured projections, shared primitive
