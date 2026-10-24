@@ -22676,3 +22676,23 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   changing collector ownership. Four incompatible JIT hosts are rejected before
   binding. The assistant retains failed and successful evidence and leaves the
   synchronous default in place; optimization/comparison is the next phase.
+
+
+### 2026-10-25 — Optimization priorities after concurrent integration
+
+- **Author:** Directed the next phase toward more HTTP requests, lower CPU use and
+  fewer allocations, using relevant ordinary samples as well as HTTP, existing or
+  new profilers, and comparisons between GC implementations.
+- **Assistant:** Retained those three measures separately. A proof-backed store-range
+  cache reduces lookup work and CPU in matched plaintext/JSON controls without
+  changing managed allocated bytes; absolute rates remain provisional because of
+  background system activity. Synchronous GC is still faster and remains the default.
+- **Actions:** Run cached/uncached safety and negative controls, generated JIT/AOT
+  entry/boxing checks, matched HTTP work and a full JSON JIT consumer. Begin extending
+  the live host qualification to retained ordinary task and collection samples;
+  both expected outputs pass, but neither tiny invocation completes a concurrent
+  epoch, so their timings cannot establish steady-state GC performance.
+  See [cache evidence](../benchmarks/execution/concurrent-store/store-cache-performance.md)
+  and the broader [required workload matrix](../benchmarks/execution/concurrent-gc-investigation/README.md#required-workload-matrix).
+- **Open:** Batched standalone execution, allocation/CPU/outer-pause profiles,
+  metadata-heavy and additional async/I/O workloads, and saturated/worker scaling.

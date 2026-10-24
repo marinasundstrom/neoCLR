@@ -1,0 +1,278 @@
+{
+  "scope": "Sequential AOT fixed work with cache controls; background activity recorded, not capacity or complete GC pauses.",
+  "samples": {
+    "plain": {
+      "modes": {
+        "sync": {
+          "requestsPerSecond": {
+            "median": 3962.270762515501,
+            "min": 3708.008792036474,
+            "max": 4272.122523138902
+          },
+          "processCpuSeconds": {
+            "median": 0.064636,
+            "min": 0.06377,
+            "max": 0.071867
+          },
+          "peakRssBytes": {
+            "median": 9830400,
+            "min": 9830400,
+            "max": 9846784
+          },
+          "allocatedBytes": [
+            4394837
+          ],
+          "peakArenaUsedMedian": 81600
+        },
+        "guarded-sync": {
+          "requestsPerSecond": {
+            "median": 1132.692196218446,
+            "min": 1066.0799540059843,
+            "max": 1211.546370082135
+          },
+          "processCpuSeconds": {
+            "median": 0.22830599999999998,
+            "min": 0.217465,
+            "max": 0.242447
+          },
+          "peakRssBytes": {
+            "median": 11862016,
+            "min": 11845632,
+            "max": 11862016
+          },
+          "allocatedBytes": [
+            4394837
+          ],
+          "peakArenaUsedMedian": 86104,
+          "storeLookupMedian": [
+            442117,
+            175693
+          ]
+        },
+        "live": {
+          "requestsPerSecond": {
+            "median": 1191.1037133644738,
+            "min": 1128.1057351295958,
+            "max": 1205.356536647559
+          },
+          "processCpuSeconds": {
+            "median": 0.23822,
+            "min": 0.23386099999999999,
+            "max": 0.24692
+          },
+          "peakRssBytes": {
+            "median": 12091392,
+            "min": 12075008,
+            "max": 12173312
+          },
+          "allocatedBytes": [
+            4394837
+          ],
+          "peakArenaUsedMedian": 81360,
+          "storeLookupMedian": [
+            419094,
+            155724
+          ]
+        },
+        "live-no-cache": {
+          "requestsPerSecond": {
+            "median": 337.8212686533063,
+            "min": 329.3400140486931,
+            "max": 438.2305355452581
+          },
+          "processCpuSeconds": {
+            "median": 0.8161539999999999,
+            "min": 0.632526,
+            "max": 0.835182
+          },
+          "peakRssBytes": {
+            "median": 12353536,
+            "min": 12353536,
+            "max": 12435456
+          },
+          "allocatedBytes": [
+            4394837
+          ],
+          "peakArenaUsedMedian": 134448,
+          "storeLookupMedian": [
+            0,
+            585349
+          ]
+        },
+        "guarded-sync-no-cache": {
+          "requestsPerSecond": {
+            "median": 608.3438151646008,
+            "min": 606.0305957813162,
+            "max": 613.3579671310151
+          },
+          "processCpuSeconds": {
+            "median": 0.452952,
+            "min": 0.44733100000000003,
+            "max": 0.46512
+          },
+          "peakRssBytes": {
+            "median": 11862016,
+            "min": 11862016,
+            "max": 11894784
+          },
+          "allocatedBytes": [
+            4394837
+          ],
+          "peakArenaUsedMedian": 87800,
+          "storeLookupMedian": [
+            0,
+            617810
+          ]
+        }
+      },
+      "liveSpeedup": 3.525839915623727,
+      "liveCpuReduction": 0.708118810910686,
+      "allocationCountVerification": {
+        "allocations": 57120,
+        "requestsIncludingWarmup": 272,
+        "configurations": 5,
+        "cohort": "Separate allocation-count check, not included in five-round timing medians."
+      }
+    },
+    "json": {
+      "modes": {
+        "sync": {
+          "requestsPerSecond": {
+            "median": 1982.8648718254094,
+            "min": 1810.7346190666647,
+            "max": 2014.701687449611
+          },
+          "processCpuSeconds": {
+            "median": 0.105944,
+            "min": 0.103823,
+            "max": 0.11099
+          },
+          "peakRssBytes": {
+            "median": 11665408,
+            "min": 11665408,
+            "max": 11665408
+          },
+          "allocatedBytes": [
+            7163755
+          ],
+          "peakArenaUsedMedian": 92768
+        },
+        "guarded-sync": {
+          "requestsPerSecond": {
+            "median": 744.5936964087944,
+            "min": 740.187544787854,
+            "max": 753.7725432462278
+          },
+          "processCpuSeconds": {
+            "median": 0.357153,
+            "min": 0.35122600000000004,
+            "max": 0.368067
+          },
+          "peakRssBytes": {
+            "median": 14106624,
+            "min": 14106624,
+            "max": 14106624
+          },
+          "allocatedBytes": [
+            7163755
+          ],
+          "peakArenaUsedMedian": 92768,
+          "storeLookupMedian": [
+            568053,
+            239885
+          ]
+        },
+        "live": {
+          "requestsPerSecond": {
+            "median": 638.1542043746527,
+            "min": 634.0302752626583,
+            "max": 645.9859349987069
+          },
+          "processCpuSeconds": {
+            "median": 0.433492,
+            "min": 0.427825,
+            "max": 0.44618800000000003
+          },
+          "peakRssBytes": {
+            "median": 14368768,
+            "min": 14352384,
+            "max": 14385152
+          },
+          "allocatedBytes": [
+            7163755
+          ],
+          "peakArenaUsedMedian": 100080,
+          "storeLookupMedian": [
+            553720,
+            227799
+          ]
+        },
+        "live-no-cache": {
+          "requestsPerSecond": {
+            "median": 247.94747194065127,
+            "min": 245.467638302626,
+            "max": 259.87003893262255
+          },
+          "processCpuSeconds": {
+            "median": 1.112339,
+            "min": 1.068098,
+            "max": 1.123391
+          },
+          "peakRssBytes": {
+            "median": 14581760,
+            "min": 14548992,
+            "max": 14614528
+          },
+          "allocatedBytes": [
+            7163755
+          ],
+          "peakArenaUsedMedian": 131192,
+          "storeLookupMedian": [
+            0,
+            764945
+          ]
+        },
+        "guarded-sync-no-cache": {
+          "requestsPerSecond": {
+            "median": 343.78953768532455,
+            "min": 342.8712631835529,
+            "max": 344.84111462481496
+          },
+          "processCpuSeconds": {
+            "median": 0.797638,
+            "min": 0.794794,
+            "max": 0.8108960000000001
+          },
+          "peakRssBytes": {
+            "median": 14024704,
+            "min": 14024704,
+            "max": 14057472
+          },
+          "allocatedBytes": [
+            7163755
+          ],
+          "peakArenaUsedMedian": 96400,
+          "storeLookupMedian": [
+            0,
+            807938
+          ]
+        }
+      },
+      "liveSpeedup": 2.5737475739514757,
+      "liveCpuReduction": 0.6102878708738972,
+      "allocationCountVerification": {
+        "allocations": 124873,
+        "requestsIncludingWarmup": 272,
+        "configurations": 5,
+        "cohort": "Separate allocation-count check, not included in five-round timing medians."
+      }
+    }
+  },
+  "inputs": {
+    "target/concurrent-store/cache-plain-matched/results.json": "b3dda2a3da6feef252f39437d9ff1797f90b8d5b456fdb6ed17d4845c96bcc51",
+    "target/concurrent-store/cache-json-matched/results.json": "6dd613da4432765df6a75514468b0b59e702291f7c1a8fc85e6e347e9a1dcd48",
+    "target/concurrent-store/cache-background-activity.txt": "858ebdfe86dca0fae50003b8053d78a672e99cb526c7144f73556676869ba6f5",
+    "target/concurrent-store/cache-plain-allocation-counts/results.json": "f5991fd1c8bc528f3193ec4476c6a06fab61d4975bc2a4ef8ca1a45bea141c6c",
+    "target/concurrent-store/cache-json-allocation-counts/results.json": "2dd0cc67d030379b7970f41282fda78f748ab94dbb0da122085cd11825200000"
+  }
+}

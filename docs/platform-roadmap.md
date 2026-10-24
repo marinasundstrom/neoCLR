@@ -1,5 +1,14 @@
 # neoCLR platform roadmap
 
+**Owned lookup follow-up (2026-10-25):** Retain a private last-allocation range hint
+only while the existing exact-base proof is valid. Cached/uncached safety suites and
+a stale-interior-header negative control pass. Matched plaintext/JSON controls show
+less lookup work and CPU, but ordinary synchronous GC remains faster; background
+activity limits absolute throughput conclusions. See [cache evidence and remaining
+costs](../benchmarks/execution/concurrent-store/store-cache-performance.md). Next
+address proven unnecessary store checks and broaden workload/pause/scaling evidence,
+without weakening ownership or changing the default prematurely.
+
 **Concurrent integration update (2026-10-25):** JSON’s seven type/boxing helpers now
 pass focused JIT/AOT qualification. Full retained plaintext and JSON live AOT
 selections compile, and both serve checked HTTP responses with clean owned-heap

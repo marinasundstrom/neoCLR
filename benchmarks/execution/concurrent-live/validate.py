@@ -9,6 +9,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--output', type=Path, required=True)
 parser.add_argument('--sparse-index', action='store_true')
 parser.add_argument('--batch', action='store_true')
+parser.add_argument('--disable-store-cache', action='store_true')
 parser.add_argument('--gate-words', type=int, default=4096)
 args = parser.parse_args()
 root = Path(__file__).resolve().parents[3]
@@ -27,6 +28,7 @@ try:
     recipe = json.loads((root/'benchmarks/execution/call-layout/results.json').read_text())['builds'][1]['command']
     cc = recipe[:recipe.index('-std=c11')] + [f'-DGATE_WORDS={args.gate_words}']
     if args.sparse_index: cc += ['-DNEOCLR_SHADOW_SPARSE_INDEX']
+    if args.disable_store_cache: cc += ['-DNEOCLR_LIVE_NO_STORE_CACHE']
     if args.batch: cc += ['-DNEOCLR_LIVE_BATCH','-DNEOCLR_LIVE_GATE_PROFILE']
     for sanitizer in [False, True]:
         for case in ['lifetime', 'store-test', 'record-store-test', 'native-gc-test', 'native-gc-scan-test', 'native-gc-dense-test', 'native-gc-seed-test']:
@@ -63,6 +65,18 @@ __attribute__((destructor)) static void drain(void) { uint64_t stats[5]; experim
     result = subprocess.run([str(negative)],capture_output=True,text=True,timeout=30)
     report['negative'] = dict(exitCode=result.returncode,stdout=result.stdout,stderr=result.stderr,expectedSignal='SIGABRT')
     assert result.returncode == -signal.SIGABRT
+    if not args.disable_store_cache:
+        # A plausible stale interior header must not substitute for an exact-base
+        # proof. Deliberately bypass revocation and require the boundary test to fail.
+        unsafe_source=out/'unproven-cache.c'
+        guarded='live_store_last_payload && known_base(live_store_last_payload)'
+        original_source=source.read_text();assert original_source.count(guarded)==1
+        unsafe_source.write_text(original_source.replace(guarded,'live_store_last_payload'))
+        unsafe_exe=out/'unproven-cache'
+        run(cc+['-std=c11','-O2','-Wall','-Wextra','-Werror','-pthread','-DNEOCLR_NATIVE_GC','-DNEOCLR_GC_PROFILE','-DNEOCLR_SHADOW_TEST','-I',base.parent/'concurrent-mutation-gate','-I',root/'runtime/native/gc',base.parent/'concurrent-mutation-gate/gate.c',base/'store-test.c',root/'runtime/native/gc/root-probe.c',unsafe_source,'-o',unsafe_exe])
+        result=subprocess.run([str(unsafe_exe)],capture_output=True,text=True,timeout=30)
+        report['cacheNegative']=dict(exitCode=result.returncode,stdout=result.stdout,stderr=result.stderr,expectedSignal='SIGABRT')
+        assert result.returncode == -signal.SIGABRT
     report['inputs']={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in [source, *base.glob('*.[ch]'), base/'generate.py', base/'validate.py', * (base.parent/'concurrent-shadow').glob('*.[ch]'), *(base.parent/'concurrent-mutation-gate').glob('gate.[ch]')]}
     report['passed']=True
 finally:

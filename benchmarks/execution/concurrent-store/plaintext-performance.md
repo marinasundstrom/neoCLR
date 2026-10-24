@@ -91,6 +91,11 @@ capacity, including its negative control (`gate128-live-regression.json.gz`). No
 
 ## Next work
 
+The 2026-10-25 [store-cache follow-up](store-cache-performance.md) completes the
+first lookup optimization and adds JSON comparisons. The separately recorded
+plaintext/JSON JIT/AOT integration slice is complete; remaining items below retain
+the original measurement context.
+
 Prioritize measured checked-store cost: out-of-arena calls dominate the count, and
 heap stores fall back to a linear allocation walk when no snapshot lookup applies.
 Investigate safe compiler provenance and owner-maintained lookup, preserving root and

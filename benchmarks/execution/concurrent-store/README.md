@@ -1606,3 +1606,25 @@ It does not establish default eligibility, worker/shared-heap support, general r
 safety or a performance improvement. Resume optimization and matched synchronous/live
 comparisons next; retain the synchronous default and broader workload/safety gates.
 The website and public API contract remain unchanged; no website build is required.
+
+
+## Owned store-range lookup cache (2026-10-25)
+
+After full HTTP integration, resume the parked range-cache experiment and retain it
+only behind the existing exact-base proof and unchanged mutation protocol. Both
+cached/uncached native suites, stale-interior-header/deletion negative controls,
+600 generated entry cycles and 720 boxing/type-query cycles pass. The formerly
+broken disabled-cache build is fixed. [Matched plaintext/JSON measurements](store-cache-performance.md)
+show lower lookup work and CPU in both live and guarded-synchronous configurations;
+all 13,600 checked responses pass. Background system activity makes absolute rates
+provisional, and ordinary synchronous GC remains substantially faster. Public APIs,
+compiler emission, native ownership and the production default are unchanged.
+
+
+The full cached JSON JIT consumer passes another 128 responses and 134 completed
+epochs (`cache-json-jit.json.gz`). `qualify-standalone.py` also runs the retained
+ordinary task and order-collection samples through that live JIT host. Both outputs
+and cleanup match their references, but each starts one epoch and cancels it at
+shutdown without a completed epoch. This is compatibility evidence, not a meaningful
+GC performance comparison. See `cache-standalone-admission.json.gz` and the
+[expanded workload inventory](workload-matrix.md) for the next batched profiling phase.

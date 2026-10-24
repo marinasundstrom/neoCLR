@@ -8,6 +8,7 @@ extern int32_t experiment_gc_finish(neoclr_aot_context *,const neoclr_probe_fram
 extern void experiment_gc_live_wait(void);
 extern int experiment_gc_store(neoclr_aot_context *,void *,uint64_t,uint32_t);
 extern void experiment_gc_store_counts(uint64_t *);
+extern void experiment_gc_store_lookup_counts(uint64_t *);
 #define CHECK(x) do { if (!(x)) { fprintf(stderr,"line %d\n",__LINE__); abort(); } } while(0)
 static void *object(neoclr_aot_context *c,uint64_t bytes) {
     void *p; CHECK(!neoclr_gc_allocate_v1(&c->text,bytes,NEOCLR_GC_OBJECT,&p));
@@ -112,9 +113,70 @@ static void detached_identity(void) {
     root=NULL; CHECK(!neoclr_gc_collect_v1(&c,&frame) && !c.text.used);
     CHECK(!neoclr_gc_heap_release_v1(&c.text));
 }
+/* A remembered payload may become interior storage after coalescing and reuse.
+ * Header-looking user bytes must not authorize that stale allocation identity. */
+static void cached_interior_header(void) {
+    uint64_t heap[128]={0};
+    neoclr_aot_context c={.text={(unsigned char *)heap,sizeof(heap),0}};
+    CHECK(!neoclr_gc_heap_acquire_v1(&c.text));
+    void *first=object(&c,32);
+    uint64_t *root=object(&c,24),*tail=object(&c,24);
+    uint64_t saved_header[4];
+    memcpy(saved_header,(unsigned char *)root-sizeof(saved_header),sizeof(saved_header));
+    neoclr_probe_storage slots[]={{&root,8,0},{&tail,8,0}};
+    neoclr_probe_frame frame={.context=&c,.storage=slots,.storage_count=2};
+    CHECK(!experiment_gc_store(&c,root+1,42,8));
+    root=NULL;
+    CHECK(!neoclr_gc_collect_v1(&c,&frame));
+    root=object(&c,88);CHECK((void *)root==first);
+    /* Private descriptor fixture: allocated 32-byte payload, 64-byte span.
+     * It appears at the old header address inside the new 88-byte payload. */
+    saved_header[0]=64;saved_header[1]=32;
+    memcpy((unsigned char *)root+32,saved_header,sizeof(saved_header));
+    unsigned char *last=(unsigned char *)root+87;
+    unsigned char before[2];memcpy(before,last,2);
+    CHECK(experiment_gc_store(&c,last,0x1234,2)==3);
+    CHECK(!memcmp(last,before,2));
+    root=tail=NULL;
+    CHECK(!neoclr_gc_collect_v1(&c,&frame) && !c.text.used);
+    CHECK(!neoclr_gc_heap_release_v1(&c.text));
+    puts("PASS stale cached interior header cannot extend the actual allocation");
+}
+static void cached_range_lifetime(void) {
+    uint64_t heap[128]={0};
+    neoclr_aot_context c={.text={(unsigned char *)heap,sizeof(heap),0}};
+    for(unsigned round=0;round<100;round++) {
+        CHECK(!neoclr_gc_heap_acquire_v1(&c.text));
+        uint64_t *root=object(&c,24),*old=root;
+        neoclr_probe_storage slot={&root,8,0};
+        neoclr_probe_frame frame={.context=&c,.storage=&slot,.storage_count=1};
+        uint64_t before[2],after[2];experiment_gc_store_lookup_counts(before);
+        CHECK(!experiment_gc_store(&c,root+1,42,8));
+        CHECK(!experiment_gc_store(&c,root+2,43,8));
+        experiment_gc_store_lookup_counts(after);
+#if !defined(NEOCLR_LIVE_NO_STORE_CACHE) && !defined(NEOCLR_LIVE_LINEAR_STORE)
+        CHECK(after[0]>before[0]);
+#endif
+        CHECK(experiment_gc_store(&c,(unsigned char *)root+23,44,2)==3);
+        CHECK(root[1]==42 && root[2]==43);
+        /* Sweep removes the exact-base proof before poisoning/coalescing. */
+        root=NULL;CHECK(!neoclr_gc_collect_v1(&c,&frame) && !c.text.used);
+        CHECK(experiment_gc_store(&c,old+1,99,8)==3);
+        /* Reuse the same base with smaller bounds; old tail is not writable. */
+        root=object(&c,16);CHECK(root==old);
+        CHECK(experiment_gc_store(&c,old+2,99,8)==3);
+        CHECK(!experiment_gc_store(&c,root+1,77,8) && root[1]==77);
+        root=NULL;CHECK(!neoclr_gc_collect_v1(&c,&frame) && !c.text.used);
+        CHECK(!neoclr_gc_heap_release_v1(&c.text));
+        /* Reacquiring the same native arena address must not revive old proofs. */
+    }
+    puts("PASS 100 cached store ranges: bounds, reclamation, smaller reuse and owner reacquisition");
+}
 int main(void) {
     ranges(); cancellation(); construction(); detached_identity();
     uint64_t counts[5]; experiment_gc_store_counts(counts);
     CHECK(counts[0]==2 && counts[1]>=5 && counts[2]>=97 && counts[3]==1 && counts[4]==8);
+    cached_range_lifetime();
+    cached_interior_header();
     puts("PASS 97 scalar ranges, stack/byref classification, new array construction and noncollecting overflow recovery");
 }

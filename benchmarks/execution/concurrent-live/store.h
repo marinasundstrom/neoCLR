@@ -1,6 +1,10 @@
 /* Prototype compiler-facing scalar-store adapter. It never collects. The caller
  * supplies a valid native destination; out-of-arena storage is trusted stack or
  * host storage, not permission to mutate a different managed heap. */
+#if !defined(NEOCLR_LIVE_NO_STORE_CACHE) && !defined(NEOCLR_LIVE_LINEAR_STORE)
+static _Thread_local const void *live_store_last_payload;
+#endif
+static _Thread_local uint64_t live_store_lookup_counts[2]; /* cached range, checked walks */
 static _Thread_local uint64_t live_store_counts[5]; /* outside, inactive/new, guarded old, cancelled, rejected */
 static void live_store_cancel_epoch(void) {
         candidate_dispose();
@@ -46,6 +50,25 @@ int experiment_gc_store(neoclr_aot_context *context, void *destination,
         }
     }
 #endif
+#if !defined(NEOCLR_LIVE_NO_STORE_CACHE) && !defined(NEOCLR_LIVE_LINEAR_STORE)
+    /* The owned exact-base cache revokes proofs on reclamation/reset/release.
+     * Never dereference a remembered range unless that current proof survives.
+     * Snapshot identity validation above still owns old-epoch allocations. */
+    if (live_store_last_payload && known_base(live_store_last_payload)) {
+        uintptr_t previous=(uintptr_t)live_store_last_payload;
+        if (previous>=base && previous-base>=sizeof(block) && previous-base<a->used && address>=previous) {
+            uint64_t at=previous-base-sizeof(block);
+            if (!block_valid(a,at)) goto rejected;
+            block *cached=(void *)(a->data+at);
+            if ((cached->state&ALLOCATED) && address-previous<cached->bytes) {
+                b=cached;
+                live_store_lookup_counts[0]++;
+                goto located;
+            }
+        }
+    }
+#endif
+    live_store_lookup_counts[1]++;
     for (uint64_t at=0;at<a->used;) {
         if (!block_valid(a,at)) goto rejected;
         b=(void *)(a->data+at);
@@ -59,6 +82,10 @@ located:;
     uintptr_t payload=(uintptr_t)(b+1);
     uint64_t offset=address-payload;
     if (width>b->bytes-offset) goto rejected;
+#if !defined(NEOCLR_LIVE_NO_STORE_CACHE) && !defined(NEOCLR_LIVE_LINEAR_STORE)
+    remember_base((void *)payload);
+    live_store_last_payload=(void *)payload;
+#endif
     if (!candidate_active || shadow_find(shadow_owner->job,address)==SIZE_MAX) {
         /* New allocations are excluded from marker reads and are all
          * traced at remark. No publication exemption for old objects. */
@@ -86,6 +113,9 @@ located:;
 rejected:
     live_store_counts[4]++;
     return 3;
+}
+void experiment_gc_store_lookup_counts(uint64_t *out) {
+    memcpy(out,live_store_lookup_counts,sizeof(live_store_lookup_counts));
 }
 void experiment_gc_store_counts(uint64_t *out) {
     memcpy(out,live_store_counts,sizeof(live_store_counts));

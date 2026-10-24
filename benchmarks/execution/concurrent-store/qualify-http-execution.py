@@ -15,6 +15,7 @@ p.add_argument('--requests',type=int,default=256)
 p.add_argument('--sample',choices=['plain','json'],default='plain')
 p.add_argument('--execution',choices=['aot','jit','both'],default='aot')
 p.add_argument('--runner',type=Path)
+p.add_argument('--pacing',choices=['forced','paced','both'],default='both')
 a=p.parse_args();assert a.requests>0
 if a.execution!='aot':assert a.runner is not None
 root=Path(__file__).resolve().parents[3];base=Path(__file__).resolve().parent
@@ -46,7 +47,8 @@ static void report_candidate(void) {
 }
 ''')
  modes=['aot','jit'] if a.execution=='both' else [a.execution]
- for execution,paced in [(mode,paced) for mode in modes for paced in [False,True]]:
+ pacing=[False,True] if a.pacing=='both' else [a.pacing=='paced']
+ for execution,paced in [(mode,paced) for mode in modes for paced in pacing]:
   old=root/('target/native-host-ownership/owned-aot' if execution=='aot' else 'target/native-host-ownership/owned.dylib')
   recipe=next(c['command'].copy() for c in previous['commands'] if str(old) in c['command'])
   exe=out/(execution+('-paced' if paced else '-forced')+('.dylib' if execution=='jit' else ''))
