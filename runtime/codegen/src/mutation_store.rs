@@ -12,6 +12,35 @@ pub(crate) struct Lowered {
     pub stack_stores: usize,
 }
 
+// Resolve only compiler-owned addresses and checked constant offsets. A loaded
+// pointer, block parameter or arbitrary arithmetic has no proven stack provenance.
+fn stack_destination(func: &ir::Function, mut value: ir::Value) -> Option<(ir::StackSlot, i64)> {
+    let mut displacement = 0i64;
+    loop {
+        let ir::ValueDef::Result(inst, _) = func.dfg.value_def(value) else {
+            return None;
+        };
+        match func.dfg.insts[inst] {
+            ir::InstructionData::StackLoad {
+                opcode: Opcode::StackAddr,
+                stack_slot,
+                offset,
+            } => {
+                return Some((stack_slot, displacement.checked_add(i64::from(offset))?));
+            }
+            ir::InstructionData::BinaryImm64 {
+                opcode: Opcode::IaddImm,
+                arg,
+                imm,
+            } => {
+                displacement = displacement.checked_add(i64::from(imm))?;
+                value = arg;
+            }
+            _ => return None,
+        }
+    }
+}
+
 /// Run before frame-return cleanup instrumentation so the new fault return also
 /// unlinks roots. The hook is noncollecting, including overflow cancellation.
 /// This pass alone does not admit callees/providers or enable concurrent GC.
@@ -71,6 +100,17 @@ pub(crate) fn lower(
                 Opcode::Istore32 => 4,
                 _ => return Err(format!("unadmitted memory writer: {opcode}").into()),
             };
+            if let Some((slot, displacement)) = stack_destination(func, args[1]) {
+                let start = displacement.checked_add(i64::from(offset));
+                let end = start.and_then(|start| start.checked_add(i64::from(width)));
+                if !matches!((start, end), (Some(start), Some(end))
+                    if start >= 0 && end <= i64::from(func.sized_stack_slots[slot].size))
+                {
+                    return Err("mutation store exceeds proven stack slot".into());
+                }
+                stack_stores += 1;
+                continue;
+            }
             stores.push((inst, args, i64::from(offset), ty, width));
         }
     }

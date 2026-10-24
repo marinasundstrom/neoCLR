@@ -270,3 +270,105 @@ fn native_collector_jit_consumer() {
     let call: Writer = unsafe { std::mem::transmute(module.get_finalized_function(id)) };
     assert_eq!(unsafe { run(call) }, 0);
 }
+
+// This mirrors argument/local copies emitted before a GC frame is linked: they
+// use generic stores through stack_addr, not the dedicated stack_store opcode.
+fn stack_copy(
+    module: &mut impl Module,
+    displacement: i64,
+) -> (
+    cranelift_module::FuncId,
+    cranelift_codegen::Context,
+    ir::Value,
+) {
+    let (id, mut ctx, context) = function(module, "stack_copy", types::I64);
+    let stores: Vec<_> = ctx
+        .func
+        .layout
+        .blocks()
+        .flat_map(|block| ctx.func.layout.block_insts(block))
+        .filter(|&inst| ctx.func.dfg.insts[inst].opcode() == Opcode::Store)
+        .collect();
+    let slot = ctx.func.create_sized_stack_slot(ir::StackSlotData::new(
+        ir::StackSlotKind::ExplicitSlot,
+        32,
+        3,
+    ));
+    let mut cursor = FuncCursor::new(&mut ctx.func).at_inst(stores[0]);
+    let base = cursor.ins().stack_addr(types::I64, slot, 4);
+    let address = cursor.ins().iadd_imm(base, displacement);
+    if let ir::InstructionData::Store { args, .. } = &mut cursor.func.dfg.insts[stores[0]] {
+        args[1] = address;
+    }
+    let mut cursor = FuncCursor::new(&mut ctx.func).at_inst(stores[1]);
+    let loaded = cursor.ins().load(types::I64, MemFlags::new(), address, 8);
+    if let ir::InstructionData::Store { args, .. } = &mut cursor.func.dfg.insts[stores[1]] {
+        args[0] = loaded;
+    }
+    (id, ctx, context)
+}
+
+#[test]
+fn proven_stack_copy_stays_direct_and_byref_remains_checked() {
+    let mut builder = JITBuilder::with_isa(
+        isa(target(), false),
+        cranelift_module::default_libcall_names(),
+    );
+    builder.symbol("experiment_gc_store", hook as *const u8);
+    let mut code = Code(Some(JITModule::new(builder)));
+    let module = code.0.as_mut().unwrap();
+    let (id, mut ctx, context) = stack_copy(module, 4);
+    assert_eq!(
+        lower(module, &mut ctx.func, context).unwrap(),
+        Lowered {
+            stores: 1,
+            stack_stores: 1
+        }
+    );
+    module.define_function(id, &mut ctx).unwrap();
+    module.finalize_definitions().unwrap();
+    let call: unsafe extern "C" fn(*mut State, *mut u8, u64) -> i32 =
+        unsafe { std::mem::transmute(module.get_finalized_function(id)) };
+    for reject_at in [0, 1] {
+        let mut state = State {
+            calls: 0,
+            reject_at,
+            widths: [0; 2],
+            bits: [0; 2],
+        };
+        let mut output = [0xa5; 32];
+        let bits = 0xfedcba9876543210u64;
+        assert_eq!(
+            unsafe { call(&mut state, output.as_mut_ptr(), bits) },
+            if reject_at == 0 { 0 } else { 3 }
+        );
+        assert_eq!(state.calls, 1);
+        assert_eq!(state.bits[0], bits);
+        let mut expected = [0xa5; 32];
+        if reject_at == 0 {
+            expected[16..24].copy_from_slice(&bits.to_le_bytes());
+        }
+        assert_eq!(output, expected);
+    }
+}
+
+#[test]
+fn invalid_proven_stack_extent_rejected_without_edits() {
+    for displacement in [-13, 13] {
+        let mut module = ObjectModule::new(
+            ObjectBuilder::new(
+                isa(target(), true),
+                "bounds",
+                cranelift_module::default_libcall_names(),
+            )
+            .unwrap(),
+        );
+        let (_, mut ctx, context) = stack_copy(&mut module, displacement);
+        let before = ctx.func.display().to_string();
+        assert!(lower(&mut module, &mut ctx.func, context)
+            .unwrap_err()
+            .to_string()
+            .contains("exceeds proven stack slot"));
+        assert_eq!(ctx.func.display().to_string(), before);
+    }
+}

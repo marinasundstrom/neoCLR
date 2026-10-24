@@ -59,6 +59,8 @@ now handles native scalar/byref writes and overflow cancellation without sweepin
 unpublished temporaries. Native width/extent/construction/cleanup checks pass;
 [isolated compiler emission](../benchmarks/execution/concurrent-store/README.md)
 now passes scalar/fault JIT tests and real native-collector JIT/AOT consumers.
+Proven in-slot generic stores remain direct, including pre-frame argument copies;
+unknown byrefs stay checked, with extent-rejection and executable copy tests.
 Ordinary compilation does not invoke the pass; closed-world host/writer admission,
 root-return cleanup integration and managed consumers remain next.
 

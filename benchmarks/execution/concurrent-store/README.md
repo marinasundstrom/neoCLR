@@ -13,9 +13,15 @@ validates all memory-writing instructions before modifying the function. Support
 scalar stores preserve widths and low bits; floats are bitcast, preserving signed
 zero and NaN payloads. Offsets are folded into the destination. Each failed hook
 call returns its status before subsequent stores execute. Proven `stack_store`
-instructions stay direct. Explicit-endian, vector, atomic and other unadmitted
+instructions stay direct. Generic stores through `stack_addr` and checked constant
+`iadd_imm` chains also stay direct when their full extent is inside that slot.
+Known out-of-slot stores are rejected before edits; loaded pointers, block
+parameters and arbitrary arithmetic do not gain a stack exemption. Explicit-endian, vector, atomic and other unadmitted
 writers are rejected; callees and native providers require separate admission.
 
+This provenance handling matters before frame publication: the current value
+compiler uses generic stores for argument copies before linking its GC frame.
+Making those stores fallible would introduce an exit before frame initialization.
 The pass must precede root-frame return cleanup instrumentation, so its added fault
 return also unlinks frames. The isolated consumers have no compiler root frames;
 real compiler pipeline ordering and cleanup still require integration tests.
@@ -92,3 +98,14 @@ An earlier newly built Rust test runner stalled before main at `_dyld_start`;
 successfully; the original waiting processes also later finished. This does not
 establish a signing root cause or a collector failure. The recorded final runner
 is the stable signed copy. No host security policy was disabled.
+
+## Stack-provenance qualification
+
+The follow-up `stack-validation.json.gz` and `stack-compiler-tests.json.gz` record
+qualification of the stack exemption. A JIT consumer stores through a stack address
+with constant displacement, reloads the value and copies it through a caller-provided
+pointer. Exactly one hook invocation remains, including when that byref write is
+rejected. Negative and over-end stack extents fail before any IR edits. This proves
+call elimination for the tested compiler pattern, not application CPU savings.
+Unknown provenance still pays dynamic classification. Full frame-entry dominance,
+return cleanup and complete writer admission remain integration obligations.
