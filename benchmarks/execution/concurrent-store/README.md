@@ -257,3 +257,42 @@ eventually replace conservative coverage where justified. neoCLR owns the privat
 lowering and host protocol; native-writer coverage, automatic epoch scheduling and host
 entry integration are next prerequisites for HTTP measurement. No throughput result
 or default switch is claimed by this correctness qualification.
+
+
+## Managed object construction admission
+
+The internal provider list now admits `neoclr_allocate_object_rooted_v1` with its
+exact `(arena, type, bytes, output) -> status` ABI. This is the first allocation
+provider admitted for ordinary managed bodies. Review of `text-arena.c` establishes
+that it reserves fresh object storage, writes identity/initial zeros and returns
+without callbacks or collection after reservation. Rooted reservation uses the
+published compiler frame; constructor lowering passes a compiler stack result slot.
+These constraints matter: arbitrary output aliases into old heap storage are not
+covered by this native initialization exemption. The marker does not inspect new
+allocations, and remark traces all of them. Field writes in the managed constructor
+and publication into old storage still pass through generated scalar-store lowering.
+
+`construction.neoil` constructs two Nodes holding an existing Node reference and
+publishes them through output borrows into a previously allocated object. It uses
+the actual ordinary compiler and native object provider, with the automatically
+scheduled live host. Forced/paced JIT and optimized/UBSan AOT each run 100 cycles:
+34 ordinary constructions, 33 filled-heap garbage-recovery cases and 33 all-live
+heap exhaustion cases. Checks cover transitive liveness, distinct constructed
+objects, active old-object barrier counts, new-payload writes, pressure triggering,
+unchanged output fields on allocation failure, root-chain restoration and final
+empty-heap reclamation. The failure occurs before the first object is allocated;
+partial multi-object-operation rollback is neither required nor claimed.
+
+`construction-validation.json.gz` records these 600 cycles; `construction.o.gz`
+retains the emitted AOT object. The collector source is identical to the automatic
+candidate retained in concurrent-live; input hashes are in the report.
+`construction-compiler-tests.json.gz` records 12 passing compiler tests plus four
+root-plan/map controls. `construction-regression.json.gz` records passing previous
+scalar/reference-store consumers and host rejection controls with the rebuilt runner.
+
+This follows the existing CLR-style rooted allocation/constructor lifetime model;
+no language, Runtime Contract or CLI representation changes. Conservative tracing
+and owner-thread allocation remain provisional implementation choices. Array/native
+service writers, full host entry and HTTP workloads remain unqualified. This result
+admits object construction to the internal experimental path; it does not enable
+production concurrent GC or demonstrate a throughput gain.

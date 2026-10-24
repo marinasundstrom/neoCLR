@@ -141,6 +141,9 @@ pub(crate) fn root_providers(module: &impl Module) -> Vec<(&'static str, Signatu
     };
     vec![
         ("experiment_gc_store", make(&[I64, I64, I64, I32], &[I32])),
+        // Generated calls publish live values first and pass a stack result slot.
+        // The provider initializes only freshly allocated storage before returning.
+        ("neoclr_allocate_object_rooted_v1", make(&[I64, I32, I32, I64], &[I32])),
         (
             "neoclr_gc_state_enter_v1",
             make(&[I64, I64, I32, I64, I32, I64, I32], &[I64]),

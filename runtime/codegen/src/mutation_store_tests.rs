@@ -756,10 +756,14 @@ fn managed_options() -> crate::fault_details::Options {
 }
 #[test]
 fn ordinary_value_pipeline_lowers_only_when_opted_in() {
-    let input = neoclr::assemble(include_str!(
-        "../../../benchmarks/execution/concurrent-store/managed.neoil"
-    ))
-    .unwrap();
+    emit_managed(include_str!("../../../benchmarks/execution/concurrent-store/managed.neoil"));
+}
+#[test]
+fn managed_construction_emits_guarded_stores() {
+    emit_managed(include_str!("../../../benchmarks/execution/concurrent-store/construction.neoil"));
+}
+fn emit_managed(source: &str) {
+    let input = neoclr::assemble(source).unwrap();
     for enabled in [false, true] {
         let mut module = ObjectModule::new(
             ObjectBuilder::new(
@@ -851,6 +855,14 @@ fn ordinary_value_pipeline_lowers_only_when_opted_in() {
 #[test]
 #[ignore = "requires NEOCLR_MUTATION_TEST_HOST built by concurrent-store/validate.py"]
 fn managed_pipeline_runs_on_live_collector() {
+    run_managed(include_str!("../../../benchmarks/execution/concurrent-store/managed.neoil"));
+}
+#[test]
+#[ignore = "requires construction host built by validate-construction.py"]
+fn managed_construction_runs_on_live_collector() {
+    run_managed(include_str!("../../../benchmarks/execution/concurrent-store/construction.neoil"));
+}
+fn run_managed(source: &str) {
     let path = std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host");
     let library = std::sync::Arc::new(unsafe { libloading::Library::new(path) }.unwrap());
     unsafe { crate::mutation_admission::require_managed_host(&library) }.unwrap();
@@ -867,10 +879,7 @@ fn managed_pipeline_runs_on_live_collector() {
     }));
     let mut code = Code(Some(JITModule::new(builder)));
     let module = code.0.as_mut().unwrap();
-    let input = neoclr::assemble(include_str!(
-        "../../../benchmarks/execution/concurrent-store/managed.neoil"
-    ))
-    .unwrap();
+    let input = neoclr::assemble(source).unwrap();
     crate::compiler::values::compile_into(
         &input,
         "Main",

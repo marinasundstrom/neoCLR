@@ -78,7 +78,9 @@ into the ordinary value compiler. Nested reference writes, fault cleanup and man
 collection boundaries pass forced/paced JIT and optimized/UBSan AOT consumers.
 A separate scheduled live host now qualifies allocation/publication epoch toggles,
 pressure rechecks, idle cleanup and quiescence before retirement/release, including
-managed JIT/AOT consumers. Native services and full host-entry integration remain next.
+managed JIT/AOT consumers. The rooted object allocator now passes actual managed
+constructor/reference-publication tests, including pressure recovery and all-live
+exhaustion. Array/service writers and full host-entry integration remain next.
 The isolated consumers now check call closure against supplied bodies/explicit provider
 ABIs and validate their complete AOT import set. This does not establish provider
 implementation safety. A versioned native query now rejects missing/incompatible

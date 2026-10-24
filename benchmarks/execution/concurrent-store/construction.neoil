@@ -1,0 +1,26 @@
+.module LiveConstruction
+.type class Node
+.field Next Node
+.method instance .ctor(Node next) -> void
+ldarg 0
+ldarg next
+stfld Node::Next
+ret
+.end
+.end
+.function Write(out Node& first,out Node& second,Node value) -> Int32
+ldarg first
+ldarg value
+newobj.ctor instance Node::.ctor(Node)
+stobj Node
+ldarg second
+ldarg value
+newobj.ctor instance Node::.ctor(Node)
+stobj Node
+ldc.i4 0
+ret
+.end
+.function Main(Int32 value) -> Int32
+ldarg value
+ret
+.end
