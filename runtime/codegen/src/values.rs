@@ -456,6 +456,12 @@ pub(crate) fn compile_into(
     module: &mut impl Module,
     long_range_calls: bool,
 ) -> Result<(), Error> {
+    let live_stores = details.is_some_and(|d| d.experimental_live_gc_stores);
+    if live_stores && !details.is_some_and(|d| d.native_gc && d.probe_stack_roots
+        && d.reference_arena && !d.native_worker_safepoints && !d.native_host_bootstrap
+        && !d.entry_host_io && d.entry_task_drain.is_empty()) {
+        return Err("experimental live stores require owned published frames without host bootstrap/services".into());
+    }
     if details.is_some_and(|d| !d.native_gc && !d.string_intern.is_empty()) {
         return Err(
             "native String.Intern requires --native-gc for invocation-scoped strong ownership"
@@ -498,12 +504,17 @@ pub(crate) fn compile_into(
     p.boxed_interfaces = details
         .map(|d| d.boxed_interfaces.clone())
         .unwrap_or_default();
+    if live_stores && input.functions.iter().enumerate().any(|(i,f)|
+        f.is_internal_call() || f.pinvoke.is_some() || gc_points::native_body(&p,i,details)) {
+        return Err("experimental live stores reject unaudited native replacement bodies".into());
+    }
     let bootstrap = details.is_some_and(|d| d.native_host_bootstrap);
     if bootstrap && !details.is_some_and(|d| d.native_gc) {
         return Err("native host bootstrap requires native GC".into());
     }
     let root = p.root(root, bootstrap)?;
     let entry_arguments = p.args[root] == [Ty::StringArray];
+    if live_stores && entry_arguments { return Err("live stores do not admit process-argument providers".into()); }
     if entry_arguments && !details.is_some_and(|d| d.native_gc) {
         return Err("String[] entry requires native GC and a process argument host".into());
     }
@@ -1964,6 +1975,10 @@ pub(crate) fn compile_into(
     if details.is_some_and(|d| d.native_worker_safepoints) && !initialization_guards.is_empty() {
         return Err("worker safepoints do not yet support type initializers".into());
     }
+    if live_stores && !initialization_guards.is_empty() {
+        return Err("live stores do not admit initialization guards yet".into());
+    }
+    let mut live_bodies = Vec::new();
     let root_probes = if details.is_some_and(|d| d.probe_stack_roots) {
         Some(gc_probe::Probes::prepare(module, &p, &flows, details)?)
     } else {
@@ -1978,6 +1993,7 @@ pub(crate) fn compile_into(
             .clone();
         let mut fb = FunctionBuilderContext::new();
         let mut probe_frame = None;
+        let mut mutation_frame_ready = None;
         {
             let mut b = FunctionBuilder::new(&mut context.func, &mut fb);
             let entry = b.create_block();
@@ -2016,7 +2032,7 @@ pub(crate) fn compile_into(
                     }
                     let frame = slot(&mut b, probes.frame_bytes());
                     let table = slot(&mut b, table_bytes);
-                    probes.enter(
+                    mutation_frame_ready = Some(probes.enter(
                         module,
                         &mut b,
                         frame,
@@ -2025,7 +2041,7 @@ pub(crate) fn compile_into(
                         table,
                         &arguments,
                         &[],
-                    );
+                    ));
                     probe_frame = Some(frame);
                     emit_stack_check(
                         module,
@@ -3844,7 +3860,7 @@ pub(crate) fn compile_into(
                 return Err("value profile frame storage exceeds 64 KiB".into());
             }
             if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
-                probes.enter(
+                mutation_frame_ready = Some(probes.enter(
                     module,
                     &mut b,
                     frame,
@@ -3853,7 +3869,7 @@ pub(crate) fn compile_into(
                     storage_table.unwrap(),
                     &arguments,
                     &locals,
-                );
+                ));
                 emit_stack_check(
                     module,
                     &mut b,
@@ -5376,10 +5392,36 @@ pub(crate) fn compile_into(
             b.seal_all_blocks();
             b.finalize();
         }
+        if live_stores {
+            let entry = context.func.layout.entry_block().unwrap();
+            let owner = *context.func.dfg.block_params(entry).last().unwrap();
+            crate::mutation_store::lower_framed(
+                module,
+                &mut context.func,
+                owner,
+                mutation_frame_ready.ok_or("missing live-store frame initialization")?,
+            )?;
+        }
         if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
             probes.finish(module, &mut context.func, frame);
         }
-        define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
+        if live_stores {
+            live_bodies.push((ids[i], context));
+        } else {
+            define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
+        }
+    }
+    if live_stores {
+        if live_bodies.len() != ids.len() {
+            return Err("live stores reject unqualified replacement emission".into());
+        }
+        let bodies: Vec<_> = live_bodies.iter().map(|(id, ctx)| (*id, &ctx.func)).collect();
+        crate::mutation_admission::check_call_closure(
+            module, &bodies, &crate::mutation_admission::root_providers(module),
+        )?;
+        for (id, mut context) in live_bodies {
+            define_checked(module, id, &mut context, stack_budget, long_range_calls)?;
+        }
     }
     let entry_check = if details.is_some_and(|d| d.native_gc) {
         let mut signature = module.make_signature();

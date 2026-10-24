@@ -156,6 +156,16 @@ int experiment_gc_write(neoclr_aot_context *context, void *payload,
     return live_write_known(payload,bytes,kind,patches,count);
 }
 '''
+replace('No collection or arena\n * release is permitted between begin and finish.', 'Published collection completes the epoch; arena\n * release remains forbidden until completion.')
+# A completed capture establishes the pacing baseline for this owned epoch.
+replace('    else candidate_active = 1;', '    else {\n        candidate_active = 1;\n        gc_state.pacing.context=context;\n        gc_state.pacing.allocations=gc_state.statistics.allocations;\n        gc_state.pacing.collections=gc_state.statistics.collections;\n        gc_state.pacing.boundaries=0;\n    }')
+# A published managed boundary may complete the active epoch before continuing.
+# The phase guard prevents recursion during finish's own collection request.
+replace('static int32_t collect_conditional(neoclr_aot_context *context,',
+    'int32_t experiment_gc_finish(neoclr_aot_context *, const neoclr_probe_frame *, neoclr_gc_conditional_root *, uint32_t);\nstatic int32_t collect_conditional(neoclr_aot_context *context,')
+boundary='int32_t neoclr_gc_collect_conditional_v1(neoclr_aot_context *context,\n    const neoclr_probe_frame *head, neoclr_gc_conditional_root *conditional, uint32_t count) {'
+replace(boundary,boundary+'\n    if (candidate_active && !candidate_phase && context == candidate_context && !gc_state.cleanup_active)\n        return experiment_gc_finish(context,head,conditional,count);')
+s+='\nint experiment_gc_live_active(neoclr_aot_context *context) { return candidate_active && candidate_context==context; }\n'
 s+='\n'+(base/'store.h').read_text()
 s+='\n'+(base/'contract.h').read_text()
 a.output.write_text(s)

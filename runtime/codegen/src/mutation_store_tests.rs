@@ -739,4 +739,160 @@ fn incompatible_live_hosts_rejected_before_binding() {
             "{name}"
         );
     }
+    let scalar_host =
+        unsafe { libloading::Library::new(directory.join("noboundary.dylib")) }.unwrap();
+    unsafe { crate::mutation_admission::require_host(&scalar_host) }.unwrap();
+    assert!(unsafe { crate::mutation_admission::require_managed_host(&scalar_host) }.is_err());
+}
+
+fn managed_options() -> crate::fault_details::Options {
+    crate::fault_details::Options {
+        native_gc: true,
+        reference_arena: true,
+        probe_stack_roots: true,
+        experimental_live_gc_stores: true,
+        ..Default::default()
+    }
+}
+#[test]
+fn ordinary_value_pipeline_lowers_only_when_opted_in() {
+    let input = neoclr::assemble(include_str!(
+        "../../../benchmarks/execution/concurrent-store/managed.neoil"
+    ))
+    .unwrap();
+    for enabled in [false, true] {
+        let mut module = ObjectModule::new(
+            ObjectBuilder::new(
+                isa(target(), true),
+                "managed",
+                cranelift_module::default_libcall_names(),
+            )
+            .unwrap(),
+        );
+        let mut options = managed_options();
+        options.experimental_live_gc_stores = enabled;
+        crate::compiler::values::compile_into(
+            &input,
+            "Main",
+            Some(&options),
+            crate::compiler::Target::MacosArm64,
+            &mut module,
+            false,
+        )
+        .unwrap();
+        if enabled {
+            let Some(cranelift_module::FuncOrDataId::Func(writer)) =
+                module.get_name("neoclr_value_1")
+            else {
+                panic!("writer")
+            };
+            let signature = module
+                .declarations()
+                .get_function_decl(writer)
+                .signature
+                .clone();
+            let export = module
+                .declare_function("live_managed_writer", Linkage::Export, &signature)
+                .unwrap();
+            let mut context = module.make_context();
+            context.func.signature = signature;
+            let writer = module.declare_func_in_func(writer, &mut context.func);
+            let mut fb = FunctionBuilderContext::new();
+            {
+                let mut b = FunctionBuilder::new(&mut context.func, &mut fb);
+                let entry = b.create_block();
+                b.append_block_params_for_function_params(entry);
+                b.switch_to_block(entry);
+                let arguments = b.block_params(entry).to_vec();
+                let call = b.ins().call(writer, &arguments);
+                let status = b.inst_results(call)[0];
+                b.ins().return_(&[status]);
+                b.seal_all_blocks();
+                b.finalize();
+            }
+            module.define_function(export, &mut context).unwrap();
+        }
+        let bytes = module.finish().emit().unwrap();
+        if enabled {
+            if let Some(path) = std::env::var_os("NEOCLR_MUTATION_MANAGED_OBJECT") {
+                std::fs::write(path, &bytes).unwrap();
+            }
+        }
+
+        let object = object::File::parse(bytes.as_slice()).unwrap();
+        assert_eq!(
+            object.symbols().any(|s| s.is_undefined()
+                && s.name().unwrap_or("").trim_start_matches('_') == "experiment_gc_store"),
+            enabled
+        );
+    }
+    let mut module = ObjectModule::new(
+        ObjectBuilder::new(
+            isa(target(), true),
+            "reject",
+            cranelift_module::default_libcall_names(),
+        )
+        .unwrap(),
+    );
+    let mut options = managed_options();
+    options.native_worker_safepoints = true;
+    assert!(crate::compiler::values::compile_into(
+        &input,
+        "Main",
+        Some(&options),
+        crate::compiler::Target::MacosArm64,
+        &mut module,
+        false
+    )
+    .unwrap_err()
+    .to_string()
+    .contains("owned published frames"));
+}
+#[test]
+#[ignore = "requires NEOCLR_MUTATION_TEST_HOST built by concurrent-store/validate.py"]
+fn managed_pipeline_runs_on_live_collector() {
+    let path = std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host");
+    let library = std::sync::Arc::new(unsafe { libloading::Library::new(path) }.unwrap());
+    unsafe { crate::mutation_admission::require_managed_host(&library) }.unwrap();
+    let mut builder = JITBuilder::with_isa(
+        isa(target(), false),
+        cranelift_module::default_libcall_names(),
+    );
+    let resolver = library.clone();
+    builder.symbol_lookup_fn(Box::new(move |name| unsafe {
+        resolver
+            .get::<unsafe extern "C" fn()>(name.as_bytes())
+            .ok()
+            .map(|symbol| *symbol as *const u8)
+    }));
+    let mut code = Code(Some(JITModule::new(builder)));
+    let module = code.0.as_mut().unwrap();
+    let input = neoclr::assemble(include_str!(
+        "../../../benchmarks/execution/concurrent-store/managed.neoil"
+    ))
+    .unwrap();
+    crate::compiler::values::compile_into(
+        &input,
+        "Main",
+        Some(&managed_options()),
+        crate::compiler::Target::MacosArm64,
+        module,
+        true,
+    )
+    .unwrap();
+    module.finalize_definitions().unwrap();
+    let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name("neoclr_value_1") else {
+        panic!("managed writer")
+    };
+    type Writer = unsafe extern "C" fn(
+        *mut std::ffi::c_void,
+        *mut std::ffi::c_void,
+        u64,
+        *mut i32,
+        *mut std::ffi::c_void,
+    ) -> i32;
+    type Run = unsafe extern "C" fn(Writer) -> i32;
+    let run: libloading::Symbol<Run> = unsafe { library.get(b"native_managed_consumer") }.unwrap();
+    let call: Writer = unsafe { std::mem::transmute(module.get_finalized_function(id)) };
+    assert_eq!(unsafe { run(call) }, 0);
 }

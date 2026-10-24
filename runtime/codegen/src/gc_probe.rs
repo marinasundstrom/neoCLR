@@ -374,7 +374,7 @@ impl Probes {
         table: StackSlot,
         arguments: &[StackSlot],
         locals: &[StackSlot],
-    ) {
+    ) -> ir::Inst {
         let address = b.ins().stack_addr(types::I64, frame, 0);
         let storage = &self.storage[&function];
         for (n, &(argument, index, lane, width, flags)) in storage.lanes.iter().enumerate() {
@@ -403,7 +403,9 @@ impl Probes {
         );
         if self.state_handle {
             let state = b.inst_results(call)[0];
-            b.ins().stack_store(state, frame, 104);
+            b.ins().stack_store(state, frame, 104)
+        } else {
+            call
         }
     }
     // Lowering emits returns in many fault branches. Instrument the completed IR

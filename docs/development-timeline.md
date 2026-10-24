@@ -22531,3 +22531,9 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   missing/legacy/partial hosts are rejected and matching JIT/AOT consumers pass.
   This is an integration prerequisite, not evidence of an HTTP gain. Ordinary
   execution integration and managed HTTP throughput qualification remain unfinished.
+
+- Follow-up implementation: assistant integrates an internal opt-in into the ordinary
+  value compiler and qualifies nested reference writes and fault cleanup against real
+  forced/paced collection in JIT/AOT. Tests expose and resolve active-boundary completion
+  and capture-pacing issues. [Evidence](../benchmarks/execution/concurrent-store/README.md#managed-value-compiler-integration).
+  This remains a prerequisite; no HTTP gain or default switch has been demonstrated.

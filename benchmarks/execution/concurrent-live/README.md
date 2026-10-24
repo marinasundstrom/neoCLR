@@ -9,7 +9,9 @@ TLS, live allocation headers or changing frame slots. Shared heaps are rejected.
 
 This is an explicit native admission experiment. Every mutation of an existing
 traced payload must go through `experiment_gc_write`; generated code and native
-providers are **not admitted yet**. The production collector/default is unchanged.
+providers require explicit admission. A restricted internal managed compiler path is
+[qualified separately](../concurrent-store/README.md#managed-value-compiler-integration);
+application/native service providers are **not admitted yet**. The production collector/default is unchanged.
 Do not substitute this generated collector into HTTP hosts using unmodified code.
 
 ## Reachability and lifetime

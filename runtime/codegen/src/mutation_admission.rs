@@ -96,6 +96,16 @@ pub(crate) unsafe fn require_host(library: &libloading::Library) -> Result<(), E
     let features = unsafe { query(HOST_VERSION) };
     check_host_features(features)
 }
+pub(crate) unsafe fn require_managed_host(library: &libloading::Library) -> Result<(), Error> {
+    unsafe { require_host(library) }?;
+    type Query = unsafe extern "C" fn(u32) -> u64;
+    let query: libloading::Symbol<Query> =
+        unsafe { library.get(b"experiment_gc_live_capabilities_v1") }?;
+    if unsafe { query(HOST_VERSION) } & 8 == 0 {
+        return Err("host lacks published-boundary epoch completion".into());
+    }
+    Ok(())
+}
 fn check_host_features(features: u64) -> Result<(), Error> {
     if features & REQUIRED_HOST_FEATURES != REQUIRED_HOST_FEATURES {
         return Err("host lacks required version-1 live-GC semantics".into());
@@ -113,4 +123,37 @@ mod tests {
         assert!(check_host_features(7).is_ok());
         assert!(check_host_features(7 | (1 << 63)).is_ok());
     }
+}
+
+/// Initial internal provider set for generated bodies; application/native service
+/// providers must be qualified separately before extending this list.
+pub(crate) fn root_providers(module: &impl Module) -> Vec<(&'static str, Signature)> {
+    use ir::{types::*, AbiParam};
+    let make = |parameters: &[ir::Type], returns: &[ir::Type]| {
+        let mut signature = module.make_signature();
+        signature
+            .params
+            .extend(parameters.iter().copied().map(AbiParam::new));
+        signature
+            .returns
+            .extend(returns.iter().copied().map(AbiParam::new));
+        signature
+    };
+    vec![
+        ("experiment_gc_store", make(&[I64, I64, I64, I32], &[I32])),
+        (
+            "neoclr_gc_state_enter_v1",
+            make(&[I64, I64, I32, I64, I32, I64, I32], &[I64]),
+        ),
+        ("neoclr_gc_state_leave_v1", make(&[I64, I64], &[])),
+        (
+            "neoclr_gc_state_stack_v1",
+            make(&[I64, I64, I32, I64, I32, I64, I32], &[]),
+        ),
+        (
+            "neoclr_gc_state_transient_v1",
+            make(&[I64, I64, I32, I64, I32, I64, I32], &[]),
+        ),
+        ("neoclr_native_stack_check_v1", make(&[], &[I32])),
+    ]
 }

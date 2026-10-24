@@ -73,13 +73,15 @@ Proven in-slot generic stores remain direct, including pre-frame argument copies
 unknown byrefs stay checked, with extent-rejection and executable copy tests.
 Framed lowering now checks initialization dominance and passes real-runtime
 JIT/AOT root-chain restoration on success and rejected writes using shared production
-return cleanup. Ordinary compilation does not invoke the pass; closed-world
-host/writer admission, complete pipeline integration and managed consumers remain next.
+return cleanup. An internal opt-in now integrates lowering and call-closure checking
+into the ordinary value compiler. Nested reference writes, fault cleanup and managed
+collection boundaries pass forced/paced JIT and optimized/UBSan AOT consumers.
+Native services, automatic epoch scheduling and full host-entry integration remain next.
 The isolated consumers now check call closure against supplied bodies/explicit provider
 ABIs and validate their complete AOT import set. This does not establish provider
 implementation safety. A versioned native query now rejects missing/incompatible
 hosts in the isolated JIT/AOT driver, with positive and negative native tests.
-Ordinary compilation and wider native-provider/HTTP integration remain unchanged.
+Default compilation remains unchanged; wider native-provider/HTTP integration remains open.
 [Indexed old-object scalar writes](../benchmarks/execution/concurrent-live/store-index-results.md)
 now remove repeated allocation walks during active epochs, with native/generated
 safety tests and paired lookup-cost evidence. New/inactive fallbacks remain linear;

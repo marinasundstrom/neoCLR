@@ -10,6 +10,8 @@ type Error = Box<dyn std::error::Error>;
 pub struct Options {
     pub probe_stack_roots: bool,
     pub native_gc: bool,
+    // Internal qualification path; no CLI option or implicit runtime enablement.
+    pub experimental_live_gc_stores: bool,
     pub native_worker_safepoints: bool,
     pub native_host_bootstrap: bool,
     pub native_stack_budget: bool,
@@ -200,6 +202,7 @@ impl Options {
                 .collect(),
             probe_stack_roots: false,
             native_gc: false,
+            experimental_live_gc_stores: false,
             native_worker_safepoints: false,
             native_host_bootstrap: false,
             native_stack_budget: false,

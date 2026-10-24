@@ -2,7 +2,8 @@
 
 The private `mutation_store` lowering pass emits the experimental noncollecting
 `experiment_gc_store` hook from scalar Cranelift stores. It is exercised by focused
-JIT/AOT consumers, **not wired into ordinary compilation or exposed by a CLI option**.
+JIT/AOT consumers and an **internal opt-in in the ordinary value compiler**.
+There is no CLI option. See the managed integration qualification below.
 Synchronous GC remains the default. This is a correctness integration step, not a
 performance result or admission of managed HTTP handlers.
 
@@ -25,7 +26,7 @@ Making those stores fallible would introduce an exit before frame initialization
 The pass must precede root-frame return cleanup instrumentation, so its added fault
 return also unlinks frames. The isolated consumers have no compiler root frames;
 the framed entry point now checks ordering and is qualified below. Ordinary pipeline
-admission still requires integration.
+admission now has a restricted internal integration described below.
 The hook cannot collect, including when an overflowing barrier buffer cancels the
 marker. Expression temporaries need not be newly published at each store.
 See [the native boundary](../concurrent-live/store-boundary.md).
@@ -203,3 +204,56 @@ libraries, followed by successful native JIT and optimized/UBSan AOT consumers.
 are explicitly executed by the harness. `host-native-gc.c.gz` retains the generated
 collector including the query. Unknown-version rejection is checked by the native
 consumer. No application throughput measurements or default switch occur here.
+
+## Managed value-compiler integration
+
+The internal `Options.experimental_live_gc_stores` flag now lowers ordinary managed
+bodies before shared root-frame cleanup, then checks the complete supplied call
+closure before defining those bodies. Default compilation leaves the flag off.
+Native replacements, shared-worker safepoints, host bootstrap/services, process
+arguments and initialization guards are rejected. The approved provider list contains
+only scalar stores, state-frame entry/leave/publication and stack checks. Unknown
+service imports fail closure validation. This is not general image admission.
+
+`managed.neoil` is assembled and compiled through the ordinary value pipeline.
+Its `Write` method calls `Put` twice with reference-valued output borrows. The native
+consumer invokes the private compiled writer (through a test export for AOT), with
+native-allocated storage and a published host root frame. It covers changing reference
+roots, nested managed frames, invalid destinations, fault propagation and root-chain
+restoration. It does not exercise managed constructors, the public entry wrapper,
+allocation providers, arrays, suspended tasks or HTTP services.
+
+Published collection now completes an active owned epoch before resuming managed
+execution. The intercept precedes collection profiling to avoid counting nested finish
+work twice; finish's phase guard avoids recursion. Capture establishes the pacing
+baseline, so a paced publication does not immediately finish because of capture's own
+collection. Explicit callers can query active state and must not finish an epoch twice.
+Arena release still requires completion. Host feature bit 8 advertises this additional
+boundary protocol; a host advertising only the earlier three bits is rejected by the
+managed driver. The query is trusted compatibility information, not proof of safety.
+
+`managed-validation.json.gz` records 100 cycles per forced/paced JIT run and per
+forced/paced optimized/UBSan AOT run (600 managed cycles). Counter assertions verify
+exactly two guarded-old heap writes during a paced epoch and two inactive/new writes
+once forced collection has completed it. Each cycle checks reclamation and eventual
+empty-heap collection. Existing scalar/framed consumers and incompatible-host controls
+also pass. `managed-compiler-tests.json.gz` records 11 focused tests and four existing
+root-map/root-plan controls; three host-dependent tests run explicitly in the harness.
+`managed-native-validation.json.gz` retains the broader native suite. Generated
+collector/object inputs are archived with the report's hashes.
+
+Initial fixtures exposed an abort at the first managed collection boundary and an
+unexpected immediate paced completion. The two archived `managed-initial-*-failure`
+reports retain these failures; lifecycle integration and the capture baseline fix them.
+The earlier fixture also needed explicit output-borrow contracts and reference-valued
+arguments so the compiler could publish their roots. Tests do not prove all thread
+interleavings; previously documented race-detector host limitations remain.
+
+This follows CLR's compiler/runtime barrier cooperation, while retaining neoCLR's
+provisional conservative scalar-store coverage and owned nonmoving heap. See the
+existing mutation-audit research above. Raven semantics, Runtime Contract configuration
+and temporary CLI representation are unchanged. Native layout/provenance metadata must
+eventually replace conservative coverage where justified. neoCLR owns the private
+lowering and host protocol; native-writer coverage, automatic epoch scheduling and host
+entry integration are next prerequisites for HTTP measurement. No throughput result
+or default switch is claimed by this correctness qualification.

@@ -85,3 +85,60 @@ int main(void) {
     puts("PASS AOT scalar bits and 200 live-GC mutation/reclamation cycles (100 framed)");
 }
 #endif
+
+typedef int32_t (*managed_writer)(void *,void *,uint64_t,int32_t *,void *);
+extern int experiment_gc_live_active(neoclr_aot_context *);
+extern void experiment_gc_store_counts(uint64_t *);
+int native_managed_consumer(managed_writer write) {
+    CHECK((experiment_gc_live_capabilities_v1(1)&15)==15);
+    for(unsigned round=0;round<100;round++) {
+        uint64_t heap[512]={0};
+        neoclr_aot_context c={.text={(unsigned char *)heap,sizeof(heap),0}};
+        CHECK(!neoclr_gc_heap_acquire_v1(&c.text));
+        uint64_t *root=node(&c),*old=node(&c),*child=node(&c),*next=node(&c),*next_child=node(&c),*dead=node(&c);
+        root[1]=root[2]=(uintptr_t)old; old[1]=(uintptr_t)child; next[1]=(uintptr_t)next_child;
+        neoclr_probe_storage slots[]={{&root,8,0},{&next,8,0}};
+        neoclr_gc_root_map map={NEOCLR_GC_STORAGE_MAP_MAGIC,2};
+        neoclr_probe_frame frame;
+        neoclr_gc_enter_map_v1(&frame,&c,0,slots,2,&map,sizeof(map));
+        CHECK(!experiment_gc_begin(&c,&frame,NULL,0));
+        int32_t result=-1;
+        CHECK(write(root+3,root+4,0,&result,&c)==3);
+        CHECK(neoclr_root_probe_head_v1()==&frame && root[1]==(uintptr_t)old);
+        memset(&c.fault,0,sizeof(c.fault));
+        uint64_t before[5],after[5];
+        experiment_gc_store_counts(before);
+        CHECK(!write(root+1,root+2,(uintptr_t)next,&result,&c) && result==0);
+        experiment_gc_store_counts(after);
+        CHECK(neoclr_root_probe_head_v1()==&frame);
+#ifdef NEOCLR_GC_PACED
+        CHECK(after[2]-before[2]==2);
+        CHECK(experiment_gc_live_active(&c));
+        unsigned boundaries=0;
+        while (experiment_gc_live_active(&c) && boundaries++<4096)
+            CHECK(!neoclr_gc_boundary_v1(&c,&frame));
+        CHECK(!experiment_gc_live_active(&c) && boundaries<=4096);
+#else
+        CHECK(after[1]-before[1]==2);
+        CHECK(!experiment_gc_live_active(&c));
+#endif
+        if (experiment_gc_live_active(&c)) CHECK(!experiment_gc_finish(&c,&frame,NULL,0));
+        CHECK(root[1]==(uintptr_t)next && root[2]==(uintptr_t)next && *next==17 && *next_child==17);
+        CHECK(*dead==UINT64_C(0xdddddddddddddddd));
+        CHECK(!neoclr_gc_collect_v1(&c,&frame));
+        CHECK(*old==UINT64_C(0xdddddddddddddddd) && *child==UINT64_C(0xdddddddddddddddd));
+        root=next=NULL;
+        CHECK(!neoclr_gc_collect_v1(&c,&frame) && !c.text.used);
+        neoclr_gc_leave_v1(&frame);
+        CHECK(!neoclr_gc_heap_release_v1(&c.text));
+    }
+    return 0;
+}
+
+#ifdef MANAGED_MAIN
+extern int32_t live_managed_writer(void *,void *,uint64_t,int32_t *,void *);
+int main(void) {
+    CHECK(!native_managed_consumer(live_managed_writer));
+    puts("PASS managed value compiler: nested calls, byref writes, faults and 100 live-GC cycles");
+}
+#endif

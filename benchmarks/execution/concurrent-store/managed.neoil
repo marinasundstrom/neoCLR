@@ -1,0 +1,25 @@
+.module LiveManagedStores
+.type class Node
+.field Next Node
+.end
+.function Put(out Node& target,Node value) -> Int32
+ldarg target
+ldarg value
+stobj Node
+ldc.i4 0
+ret
+.end
+.function Write(out Node& first,out Node& second,Node value) -> Int32
+ldarg first
+ldarg value
+call Put(Node&,Node)
+pop
+ldarg second
+ldarg value
+call Put(Node&,Node)
+ret
+.end
+.function Main(Int32 value) -> Int32
+ldarg value
+ret
+.end
