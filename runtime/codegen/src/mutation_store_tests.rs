@@ -800,6 +800,10 @@ fn managed_options_for(source: &str) -> crate::fault_details::Options {
         options.runtime_async_startmanaged.push(11);
         options.object_base=Some(0);
     }
+    if source.starts_with(".module LiveAsyncWrappersPump") {
+        options.entry_task_drain.push(14);
+        options.task_queue_drain = Some(15);
+    }
     if source.starts_with(".module LiveQueue") {
         options.task_queue_drain = Some(0);
     }
@@ -997,6 +1001,9 @@ fn emit_managed(source: &str) {
                 exports.extend([(2,"live_async_create"),(3,"live_async_complete"),(4,"live_async_await"),
                     (5,"live_async_release"),(6,"live_async_iscompleted"),(7,"live_async_wait"),(8,"live_async_start"),(9,"live_async_createowned"),
                     (10,"live_async_currentowner"),(11,"live_async_startmanaged")]);
+            }
+            if source.starts_with(".module LiveAsyncWrappersPump") {
+                exports.push((14, "live_async_pump"));
             }
             if source.starts_with(".module LiveSocket") {
                 exports.extend([(0,"live_socket_listen"), (1,"live_socket_local_port"), (2,"live_socket_close"), (3,"live_socket_accept"), (4,"live_socket_connect_result"), (5,"live_socket_cancel"), (6,"live_socket_deadline_after"), (7,"live_socket_deadline_expired"), (8,"live_socket_receive"), (9,"live_socket_send"), (10,"live_socket_transfer_result"), (11,"live_socket_receive_until"), (12,"live_socket_send_until")]);
@@ -1519,4 +1526,53 @@ fn managed_queue_runs_on_live_collector() {
     type Run = unsafe extern "C" fn(*const u8) -> i32;
     let run: libloading::Symbol<Run> = unsafe { library.get(b"managed_queue_consumer") }.unwrap();
     assert_eq!(unsafe { run(module.get_finalized_function(id)) }, 0);
+}
+
+#[test]
+fn managed_async_pump_emits_guarded_results() {
+    emit_managed(include_str!("../../../benchmarks/execution/concurrent-store/async-pump.neoil"));
+}
+#[test]
+#[ignore = "requires async host built by validate-async-pump.py"]
+fn managed_async_pump_runs_on_live_collector() {
+    let library = std::sync::Arc::new(unsafe { libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host")) }.unwrap());
+    unsafe { crate::mutation_admission::require_managed_host(&library) }.unwrap();
+    let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
+    let resolver = library.clone();
+    builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
+    let mut code = Code(Some(JITModule::new(builder)));
+    let module = code.0.as_mut().unwrap();
+    let source=include_str!("../../../benchmarks/execution/concurrent-store/async-pump.neoil");
+    crate::compiler::values::compile_into(&managed_input(source),"Main",Some(&managed_options_for(source)),crate::compiler::Target::MacosArm64,module,true).unwrap();
+    module.finalize_definitions().unwrap();
+    let mut pointers=Vec::new();
+    for name in (2..12).map(|i| format!("neoclr_value_{i}")).chain(["neoclr_invoke_void_callback_v1".into(), "neoclr_value_14".into()]) {
+        let Some(cranelift_module::FuncOrDataId::Func(id))=module.get_name(&name) else { panic!("async wrapper") };
+        pointers.push(module.get_finalized_function(id));
+    }
+    type Run = unsafe extern "C" fn(*const *const u8) -> i32;
+    let run: libloading::Symbol<Run> = unsafe { library.get(b"managed_async_consumer") }.unwrap();
+    assert_eq!(unsafe { run(pointers.as_ptr()) }, 0);
+}
+
+#[test]
+fn live_pump_requires_async_dispatch_and_queue_drain() {
+    let source = include_str!("../../../benchmarks/execution/concurrent-store/async-pump.neoil");
+    let input = managed_input(source);
+    for missing_async in [false, true] {
+        let mut options = managed_options_for(source);
+        if missing_async {
+            options.runtime_async_start.clear();
+            options.runtime_async_startmanaged.clear();
+        } else {
+            options.task_queue_drain = None;
+        }
+        let mut module = ObjectModule::new(ObjectBuilder::new(
+            isa(target(), true), "rejected_pump", cranelift_module::default_libcall_names(),
+        ).unwrap());
+        let error = crate::compiler::values::compile_into(
+            &input, "Main", Some(&options), crate::compiler::Target::MacosArm64, &mut module, false,
+        ).unwrap_err();
+        assert!(error.to_string().contains("owned published frames"));
+    }
 }

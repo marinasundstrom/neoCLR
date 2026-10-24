@@ -131,7 +131,11 @@ and full HTTP admission remain open
 ([entry evidence](../benchmarks/execution/concurrent-store/README.md#generated-public-entry-2026-10-24)). Generated default-queue dispatch now also joins
 store/call-closure checks; 600 real task-scope JIT/AOT cycles cover managed queue
 allocation, retention, rejection and fault cleanup. Pump integration remains next
-([queue evidence](../benchmarks/execution/concurrent-store/README.md#generated-default-queue-dispatch-2026-10-24)).
+([queue evidence](../benchmarks/execution/concurrent-store/README.md#generated-default-queue-dispatch-2026-10-24)). Generated async pumping now passes 600 JIT/AOT cycles
+with real carriers/task scopes, 450 resumptions and 150 abandoned owners; missing
+callback/queue prerequisites are rejected. The scheduler is an idle stub in this
+fixture, so network delivery, host-I/O entry and full HTTP qualification remain open
+([pump evidence](../benchmarks/execution/concurrent-store/README.md#generated-async-pump-2026-10-24)).
 Capability conversions, callable arrays, remaining text/byte services and async/full
 host-entry integration remain next;
 the recorded plaintext import inventory guides that coverage.

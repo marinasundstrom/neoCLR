@@ -459,7 +459,8 @@ pub(crate) fn compile_into(
     let live_stores = details.is_some_and(|d| d.experimental_live_gc_stores);
     if live_stores && !details.is_some_and(|d| d.native_gc && d.probe_stack_roots
         && d.reference_arena && !d.native_worker_safepoints && !d.native_host_bootstrap
-        && !d.entry_host_io && d.entry_task_drain.is_empty()) {
+        && !d.entry_host_io && (d.entry_task_drain.is_empty()
+            || (d.task_queue_drain.is_some() && (!d.runtime_async_start.is_empty() || !d.runtime_async_startmanaged.is_empty())))) {
         return Err("experimental live stores require owned published frames without host bootstrap/services".into());
     }
     if details.is_some_and(|d| !d.native_gc && !d.string_intern.is_empty()) {
@@ -518,7 +519,7 @@ pub(crate) fn compile_into(
             || d.byte_view_set.contains(&i) || d.byte_view_utf8.contains(&i)
             || d.runtime_async_create.contains(&i) || d.runtime_async_start.contains(&i)
             || d.runtime_async_createowned.contains(&i) || d.runtime_async_currentowner.contains(&i)
-            || d.runtime_async_startmanaged.contains(&i)
+            || d.runtime_async_startmanaged.contains(&i) || d.entry_task_drain.contains(&i)
             || d.runtime_async_completeunit.contains(&i)
             || d.runtime_async_awaitunit.contains(&i) || d.runtime_async_release.contains(&i)
             || d.runtime_async_iscompleted.contains(&i) || d.runtime_async_waitcompletion.contains(&i)
@@ -895,7 +896,8 @@ pub(crate) fn compile_into(
             }
         }
     }
-    let entry_drain_services = if details.is_some_and(|d| !d.entry_task_drain.is_empty()) {
+    let entry_drain_services = if details.is_some_and(|d| !d.entry_task_drain.is_empty()
+        && (!live_stores || (d.runtime_async_start.is_empty() && d.runtime_async_startmanaged.is_empty()))) {
         let mut sig = module.make_signature();
         sig.params.extend(
             [types::I64, types::I32, types::I32, types::I32, types::I64].map(AbiParam::new),
@@ -5782,7 +5784,7 @@ pub(crate) fn compile_into(
             long_range_calls,
             if live_stores { Some(&mut live_bodies) } else { None },
         )?;
-        if details.is_some_and(|d| !d.entry_task_drain.is_empty()) {
+        if entry_drain_services.is_some() {
             compile_host_callbacks(
                 module,
                 &p,

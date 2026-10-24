@@ -961,3 +961,38 @@ Temporary CLI/native queue representation is unchanged; neoCLR owns backend vali
 and eventual native metadata replacement. Async/legacy entry pumps, bootstrap,
 remaining providers and full HTTP performance qualification stay open. No default
 or throughput change is claimed.
+
+
+## Generated async pump (2026-10-24)
+
+Live admission now accepts entry-task drain replacement when async startup/callback
+machinery and a generated queue drain are both selected. The pump's exact native
+ABI is admitted; the emitted body already uses ordinary frame/store lowering and
+joins the call closure. Live mode omits unused legacy entry-pump declarations and
+callback emission. Default emission remains unchanged; legacy pumping, host-I/O
+entry and bootstrap restrictions remain. Negative compiler checks reject missing
+async dispatch or queue drain.
+
+`validate-async-pump.py --runner <codegen-test-runner> --output <fresh-directory>`
+passes 600 forced/paced JIT and optimized/undefined-bounds AOT cycles through the
+actual generated pump. The real native async carrier and real task scope park and
+restore the pump's published frame, resume 450 callbacks and discard 150 abandoned
+owners. Tests retain strong/owned startup, self-reference, current-owner observation,
+late completion, pressure allocation, faults and zero retained async stack storage.
+A pre-existing fault rejects pump entry without changing output or losing roots.
+Twenty-seven focused compiler checks pass; 19 host-dependent tests are skipped by
+the general run, with both pump JIT configurations explicitly executed here.
+
+This reuses the async ownership fixture, replacing native pump calls with generated
+calls and the no-op native drain with generated default-queue dispatch. The task
+scope is empty; populated queue behavior is qualified separately by `queue-*`.
+Scheduler acquire remains an idle stub, so socket delivery through the pump and
+full HTTP integration are **not** established. The fixture selects pump/drain
+indices directly; full System binding/selection remains untested by this fixture.
+
+Archive reports and object as `async-pump-*`. The initial assembler fixture wrongly
+marked an unbound private Pump as InternalCall; it failed before compilation. The
+corrected fixture uses a managed placeholder selected for backend replacement.
+Existing CLR suspension/root-transition comparisons, Runtime Contract and temporary
+CLI/native async representation remain unchanged; neoCLR owns backend qualification
+and eventual native metadata replacement. No HTTP throughput or default-switch claim.
