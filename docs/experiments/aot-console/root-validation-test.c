@@ -17,7 +17,16 @@ int main(int argc, char **argv) {
     uint64_t word = 0, lanes[1] = {0};
     neoclr_probe_storage slot = {&word, 8, 0};
     neoclr_probe_frame parent, child;
+    memset(&parent, 0xa5, sizeof(parent));
+    memset(&child, 0xa5, sizeof(child));
     neoclr_probe_enter_v3(&parent, &outer, 0, &slot, 1, "{}", 2);
+    /* Entry must initialize every field even when stack storage is dirty. */
+    if (parent.previous || parent.context != &outer || parent.lanes || parent.plan ||
+        parent.length || parent.lane_count || parent.function || parent.instruction ||
+        parent.storage != &slot || !parent.storage_plan || parent.storage_count != 1 ||
+        parent.storage_length != 2 || parent.transient || parent.transient_plan ||
+        parent.transient_count || parent.transient_length || parent.transient_phase ||
+        parent.reserved) return 3;
 #ifdef NEOCLR_NATIVE_GC
     if (!strncmp(argv[1], "owned-", 6)) {
         const char *plan = "{\"requiredSpillLanes\":[]}";

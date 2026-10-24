@@ -725,3 +725,14 @@ JIT capacity improves about 3%, with similar CPU reduction and overlapping laten
 tails. External heaps, policy and interpreter stay unchanged. Broader heap indexes
 and precise layout work remain distinct architectural tasks.
 [Evidence and validation](../../benchmarks/execution/base-cache-size/README.md).
+
+
+### Rejected frame-helper outlining — 2026-10-24
+
+Using the existing owner-local state comparison, a local ARM64 experiment separates
+small-table validation from a vectorized large-table helper and directly initializes
+frames. It reduces unconditional entry register saves but adds branching/call structure.
+One-owner AOT and JIT capacity remain effectively flat; four-owner AOT gains 2.4%.
+Keep the original implementation. This is evidence against this particular helper
+layout, not against explicit execution-state contracts or authoritative metadata.
+[Tradeoffs, tests and retained source](../../benchmarks/execution/frame-entry/README.md).

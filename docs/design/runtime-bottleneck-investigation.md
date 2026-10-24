@@ -382,3 +382,15 @@ and abandoned native resources before waiting. A [256-entry exact-base cache](..
 reduces checked descriptor walks with about 3% plaintext capacity/CPU gains at
 1.5 KiB/thread cost. Frame/TLS overhead is now the larger remaining native target;
 this does not establish that caching alone can close the framework gap.
+
+
+A [frame-entry outline experiment](../../benchmarks/execution/frame-entry/README.md)
+is rejected. Removing unconditional vector-register saves reduces the entry helper
+stack from 160 to 80 bytes on ARM64, but final matched throughput changes are only
++0.7% AOT one owner, +2.4% four owners and +0.15% owned JIT, with effectively flat
+JIT CPU. The first variant regressed larger descriptor tables; the final version
+restored their vectorization. These results do not justify more scalar/outlined
+helper tuning. Production stays unchanged; poisoned-frame initialization tests and
+all intermediate evidence remain. Investigate explicit execution-state reuse across
+generated hooks with thread/suspension/reentry lifetime proofs next, rather than
+assuming a smaller helper or fewer assembly instructions ensures throughput.

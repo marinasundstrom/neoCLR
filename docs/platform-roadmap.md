@@ -6782,3 +6782,12 @@ throughput with lower CPU. Eviction/reclamation/reuse checks and integrated cons
 pass. Idle cleanup policy remains; frame/TLS architecture and broader heap indexing
 remain open. [Profile](../benchmarks/execution/post-pacing-profile/README.md) and
 [implementation evidence](../benchmarks/execution/base-cache-size/README.md).
+
+
+**Frame-entry experiment (2026-10-24):** Reject outlined descriptor validation and
+aggregate frame initialization after mixed capacity: AOT one/four-owner +0.7%/+2.4%,
+owned JIT +0.15% with flat CPU. Restore production, retain poisoned-frame coverage,
+large-table regression evidence and final matched trials. Explicit execution-state
+reuse across generated hooks remains an architectural investigation with suspension,
+thread and host-reentry proof obligations.
+[Evidence](../benchmarks/execution/frame-entry/README.md).
