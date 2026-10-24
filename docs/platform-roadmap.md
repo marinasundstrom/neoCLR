@@ -1,5 +1,13 @@
 # neoCLR platform roadmap
 
+**Integration before further optimization (author direction, 2026-10-24):** Finish
+concurrent-GC integration/qualification before the next optimization and synchronous
+comparison cycle. Plaintext AOT now executes; prioritize JSON's seven type/boxing
+helpers and full-server JIT, retaining synchronous behavior and the existing safety
+checks. Park the unfinished store-lookup cache experiment rather than changing the
+active candidate further. Earlier measured cost priorities remain follow-up work;
+this does not authorize a default switch without the established acceptance evidence.
+
 **Concurrent GC acceptance clarification (author direction, 2026-10-24):** Make
 concurrent GC the default once correctness is established and it delivers significant,
 repeatable HTTP request throughput improvements over synchronous GC. For this proof

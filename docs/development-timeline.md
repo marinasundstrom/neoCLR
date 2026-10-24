@@ -22639,3 +22639,18 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   costs. JSON, full-server JIT, pause distributions, standalone workloads and saturated
   throughput remain in the goal; no completion or cross-framework win is claimed.
 - [Raw evidence, comparison scope and tradeoffs](../benchmarks/execution/concurrent-store/plaintext-performance.md).
+
+
+### 2026-10-24 — Complete concurrent integration before further optimization
+
+- Author clarifies that after the concurrent-GC experiment is integrated, optimizations
+  and comparison with synchronous/sequential GC can follow.
+- Assistant agrees to prioritize the remaining JSON and full-server JIT integration.
+  Plaintext AOT is already qualified for checked execution; JSON still rejects seven
+  type/boxing helpers. Synchronous GC remains the runtime default and comparison.
+- Assistant parks the unfinished store-lookup-cache experiment and restores only its
+  own three source/test/harness edits. The local patch and evidence locations are saved
+  under `target/concurrent-store/parked-store-cache`; the disabled-cache comparison had
+  a compilation failure, so no completed qualification or adoption is claimed.
+- Existing bounded-log improvements and their evidence remain committed. Further
+  optimization is follow-up work after integration, not the next active slice.
