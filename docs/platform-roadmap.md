@@ -39,6 +39,11 @@ and byref/native aliases that a pointer-only barrier would miss. Next implement 
 bounded epoch/mutation-gate primitive, then qualify all admitted generated/native
 writers before enabling a live-heap candidate. The proposed gate is a correctness
 baseline to measure, not an assumed performance improvement.
+The [bounded mutation gate](../benchmarks/execution/concurrent-mutation-gate/README.md)
+now passes narrow-write, grouped payload/marker, concurrent-reader, overflow and
+epoch tests. It is not yet connected to generated/native writers or reclamation;
+those admission/publication paths are the next integration step. Primitive overhead
+is measured separately and is not an HTTP performance result.
 
 **Author-directed media types (2026-10-23):** Complete the bounded HTTP value-contract
 slice with cached typed presets, lazy structured projections, shared primitive
