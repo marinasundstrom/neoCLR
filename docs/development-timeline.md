@@ -22493,3 +22493,12 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   Assistant retains batching as a disabled experiment; this is a measured policy
   rejection for the fixture, not an author decision against concurrent GC.
   [Scopes, tests and raw evidence](../benchmarks/execution/concurrent-live/batch-results.md).
+
+- Assistant adds a noncollecting scalar-store boundary and then isolated compiler
+  lowering, with bit-preserving floats/narrow stores and early failure exits.
+  Real collector JIT/AOT consumers pass 100 mutation/reclamation cycles per run;
+  optimized and UBSan/bounds AOT runs pass. An initial non-PIC object fixture fails
+  linking and is corrected. This advances writer integration under the existing
+  direction, but does not enable ordinary managed compilation or demonstrate an
+  HTTP gain. Explicit host admission, native-writer coverage and managed workload
+  qualification remain open. [Evidence](../benchmarks/execution/concurrent-store/README.md).

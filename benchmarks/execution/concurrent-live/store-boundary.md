@@ -1,8 +1,8 @@
 # Noncollecting scalar-store boundary — 2026-10-24
 
 `experiment_gc_store(context, destination, bits, width)` is a private native adapter
-for the next generated-store integration. It is **not yet emitted by JIT/AOT** and
-is not a managed API or production runtime import. The caller must own the supplied
+for generated-store integration. [Isolated JIT/AOT consumers](../concurrent-store/README.md)
+now emit it; ordinary compilation does not. It is not a managed API or production runtime import. The caller must own the supplied
 heap/context and provide a valid native destination. Supported widths are 1, 2, 4
 and 8 bytes; low bits are copied in native scalar representation, including unaligned
 addresses. Floating values must eventually arrive as bit patterns, not numerically

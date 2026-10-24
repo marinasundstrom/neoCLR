@@ -57,7 +57,10 @@ blocking; keep batching off. Fewer lock calls alone are not the acceptance crite
 The [noncollecting store boundary](../benchmarks/execution/concurrent-live/store-boundary.md)
 now handles native scalar/byref writes and overflow cancellation without sweeping
 unpublished temporaries. Native width/extent/construction/cleanup checks pass;
-experimental compiler emission, host admission and managed consumers remain next.
+[isolated compiler emission](../benchmarks/execution/concurrent-store/README.md)
+now passes scalar/fault JIT tests and real native-collector JIT/AOT consumers.
+Ordinary compilation does not invoke the pass; closed-world host/writer admission,
+root-return cleanup integration and managed consumers remain next.
 
 **Author-directed media types (2026-10-23):** Complete the bounded HTTP value-contract
 slice with cached typed presets, lazy structured projections, shared primitive
