@@ -1657,3 +1657,94 @@ fn managed_queue_timers_runs_on_live_collector() {
     let run: libloading::Symbol<Run> = unsafe { library.get(b"managed_queue_timers_consumer") }.unwrap();
     assert_eq!(unsafe { run(pointers.as_ptr()) }, 0);
 }
+
+fn integer_format_input() -> (neoclr::Module, crate::fault_details::Options) {
+    let mut input = neoclr::assemble(r#"
+.module LiveIntegerFormat
+.references ()
+.function neoCLR.Runtime.Int32ToString(Int32) -> String
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.Int64ToString(Int64) -> String
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.UInt64ToString(UInt64) -> String
+.methodimpl InternalCall
+.end
+.function Main(Int32 value) -> Int32
+ldarg value
+ret
+.end
+"#).unwrap();
+    let rows: Vec<_> = input.functions.iter().take(3).enumerate().map(|(i,f)|
+        serde_json::json!({"name":f.name,"compiledIndex":i,"definition":{"module":"LiveIntegerFormat","index":i}})).collect();
+    let selection = serde_json::json!({"functions":rows});
+    assert_eq!(crate::bindings::int32_to_string(&mut input,&selection).unwrap().len(),1);
+    assert_eq!(crate::bindings::integer_text(&mut input,&selection).unwrap().len(),2);
+    for i in 0..3 { input.functions[i].name=format!("IntegerFormat{i}"); }
+    let mut options = managed_options();
+    options.int32_to_string.push(0);
+    options.int64_to_string.push(1);
+    options.uint64_to_string.push(2);
+    (input, options)
+}
+
+#[test]
+fn managed_integer_format_emits_guarded_result() {
+    let (input, mut options) = integer_format_input();
+    for enabled in [false, true] {
+        options.experimental_live_gc_stores = enabled;
+        let mut module = ObjectModule::new(ObjectBuilder::new(isa(target(), true), "slice", cranelift_module::default_libcall_names()).unwrap());
+        crate::compiler::values::compile_into(&input,"Main",Some(&options),crate::compiler::Target::MacosArm64,&mut module,false).unwrap();
+        for i in 0..3 {
+        let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name(&format!("neoclr_value_{i}")) else { panic!("slice") };
+        let signature = module.declarations().get_function_decl(id).signature.clone();
+        let export = module.declare_function(&format!("live_integer_format_{i}"), Linkage::Export, &signature).unwrap();
+        let mut context = module.make_context();
+        context.func.signature = signature;
+        let callee = module.declare_func_in_func(id, &mut context.func);
+        let mut fb = FunctionBuilderContext::new();
+        let mut b = FunctionBuilder::new(&mut context.func, &mut fb);
+        let entry = b.create_block();
+        b.append_block_params_for_function_params(entry);
+        b.switch_to_block(entry);
+        let args = b.block_params(entry).to_vec();
+        let call = b.ins().call(callee, &args);
+        let status = b.inst_results(call)[0];
+        b.ins().return_(&[status]);
+        b.seal_all_blocks();
+        b.finalize();
+        module.define_function(export, &mut context).unwrap();
+        }
+        let bytes = module.finish().emit().unwrap();
+        let object = object::File::parse(bytes.as_slice()).unwrap();
+        let imports: Vec<_> = object.symbols().filter(|s| s.is_undefined()).filter_map(|s| s.name().ok()).collect();
+        assert!(imports.iter().any(|s| s.contains("neoclr_int64_to_string_rooted")));
+        assert_eq!(imports.iter().any(|s| s.contains("experiment_gc_store")), enabled);
+        if enabled {
+            if let Some(path) = std::env::var_os("NEOCLR_MUTATION_MANAGED_OBJECT") { std::fs::write(path, bytes).unwrap(); }
+        }
+    }
+}
+
+#[test]
+#[ignore = "requires integer-format host built by validate-integer-format.py"]
+fn managed_integer_format_runs_on_live_collector() {
+    let library = std::sync::Arc::new(unsafe { libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host")) }.unwrap());
+    unsafe { crate::mutation_admission::require_managed_host(&library) }.unwrap();
+    let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
+    let resolver = library.clone();
+    builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
+    let mut code = Code(Some(JITModule::new(builder)));
+    let module = code.0.as_mut().unwrap();
+    let (input, options) = integer_format_input();
+    crate::compiler::values::compile_into(&input,"Main",Some(&options),crate::compiler::Target::MacosArm64,module,true).unwrap();
+    module.finalize_definitions().unwrap();
+    let functions: Vec<_> = (0..3).map(|i| {
+        let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name(&format!("neoclr_value_{i}")) else { panic!("format") };
+        module.get_finalized_function(id)
+    }).collect();
+    type Run = unsafe extern "C" fn(*const u8,*const u8,*const u8) -> i32;
+    let run: libloading::Symbol<Run> = unsafe { library.get(b"integer_format_consumer") }.unwrap();
+    assert_eq!(unsafe { run(functions[0],functions[1],functions[2]) },0);
+}

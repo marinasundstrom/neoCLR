@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-24
 
+- Admit Int32/Int64/UInt64 formatting to internal live GC, publishing native results through stack scratch and guarded stores. Seven hundred twenty forced/paced JIT and optimized/undefined-bounds AOT cycles cover extrema, heap aliases, pressure, exhaustion and retention; 30 compiler checks pass. Preserve integer-format-* evidence including the corrected exhaustion fixture. Retained HTTP import gaps fall to 6/7; native ownership/default emission are unchanged, and full HTTP qualification remains open. Update both bridge documents.
+
 - Admit five queue/timer service providers to internal live GC using existing typed result publication and native scope ownership. Six hundred forced/paced JIT and optimized/undefined-bounds AOT cycles cover heap results, default/current queues, rejection, cancellation, expiry and cleanup; 29 compiler checks pass. Archive queue-timers-* evidence and the corrected reference-comparison fixture failure. Retained plaintext/JSON import gaps fall from 13/14 to 8/9. Native ownership/boundary contracts and default compilation are unchanged; full HTTP qualification remains open. Update both bridge documents.
 
 - Add a reproducible whole-server live-GC dependency audit against retained plaintext/JSON objects: 13/14 native imports remain unadmitted, with JSON adding ordinal comparison; plaintext selection explicitly requires the still-rejected host-I/O entry flag. Record hashes, import classifications, missing JSON selection metadata and grouped next steps in concurrent-store/http-dependencies.json.gz and README. This is integration planning evidence, not a fresh live HTTP build or performance result.

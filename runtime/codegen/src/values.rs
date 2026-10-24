@@ -511,7 +511,9 @@ pub(crate) fn compile_into(
     }
     if live_stores && input.functions.iter().enumerate().any(|(i, f)| {
         let admitted = details.is_some_and(|d|
-            d.string_concat.contains(&i) || d.string_byte_count.contains(&i)
+            d.int32_to_string.contains(&i) || d.int64_to_string.contains(&i)
+            || d.uint64_to_string.contains(&i)
+            || d.string_concat.contains(&i) || d.string_byte_count.contains(&i)
             || d.string_compare_canonical.contains(&i) || d.string_compare_ignore_case.contains(&i)
             || d.string_starts_with_ordinal.contains(&i) || d.string_slice_utf8.contains(&i)
             || d.byte_memory_create.contains(&i) || d.byte_memory_slice.contains(&i)
@@ -3822,6 +3824,13 @@ pub(crate) fn compile_into(
                 || wide_format_services.contains_key(&i)
                 || float_format_services.contains_key(&i)
             {
+                let destination = output;
+                let output = if live_stores {
+                    let scratch = slot(&mut b, 8);
+                    b.ins().stack_addr(types::I64, scratch, 0)
+                } else {
+                    output
+                };
                 let service = module.declare_func_in_func(
                     float_format_services
                         .get(&i)
@@ -3863,6 +3872,10 @@ pub(crate) fn compile_into(
                 );
                 site.capture_frame = false;
                 return_if_detailed(&mut b, failed, status, Some(&site));
+                if live_stores {
+                    let result = b.ins().load(types::I64, MemFlags::new(), output, 0);
+                    write(&mut b, destination, &[result]);
+                }
                 let zero = b.ins().iconst(types::I32, 0);
                 b.ins().return_(&[zero]);
                 b.seal_all_blocks();

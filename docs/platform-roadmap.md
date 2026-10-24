@@ -149,6 +149,10 @@ now pass 600 JIT/AOT cycles using existing ownership contracts; 29 compiler chec
 pass. The same import audit falls to 8/9 missing names for plain/JSON; host-I/O entry
 and whole-program qualification remain open
 ([service evidence](../benchmarks/execution/concurrent-store/README.md#queue-and-timer-service-admission-2026-10-24)).
+Integer formatting now passes 720 forced/paced JIT/AOT cycles after correcting
+heap result publication; 30 compiler checks pass. Native ownership is unchanged.
+The retained import audit falls to 6/7 missing names for plain/JSON
+([formatting evidence](../benchmarks/execution/concurrent-store/README.md#integer-formatting-admission-2026-10-24)).
 Capability conversions, callable arrays, remaining text/byte services and async/full
 host-entry integration remain next;
 the recorded plaintext import inventory guides that coverage.

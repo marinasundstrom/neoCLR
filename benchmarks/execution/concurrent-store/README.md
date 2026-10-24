@@ -1128,3 +1128,44 @@ Existing CLR root/host transition comparisons apply. Temporary CLI/native encodi
 Runtime Contract and consumer-facing APIs remain unchanged. neoCLR owns backend
 qualification and native metadata replacement. Respect the author's clarification:
 change ownership/boundary contracts only when a concrete issue requires it.
+
+
+## Integer formatting admission (2026-10-24)
+
+The generated Int32/Int64/UInt64 formatting wrappers previously handed the native
+helper their caller's output pointer directly. That path was not live-admitted:
+when the result aliases an old heap field, native publication would bypass the
+mutation gate. Live mode now supplies an eight-byte stack result and publishes it
+through the existing guarded store only after success. Ordinary emission and native
+allocation/ownership contracts are unchanged. Exact rooted provider ABIs and the
+three audited replacement bodies are now admitted; float formatting remains gated.
+
+Native audit: integer formatting uses a bounded C stack buffer, one rooted text
+allocation, then initializes the new text without a further safepoint or callback.
+There is no intermediate managed owner to retain. The existing allocator excludes
+new allocations from concurrent marking until owner remark. These facts justify
+using the current boundary without introducing another native fallback scope.
+As with CLR managed references, publishing the resulting reference must obey the
+collector's barrier protocol; neoCLR's private UTF-8 text/native ABI remains its
+existing platform implementation, not a change to .NET-facing formatting semantics.
+
+`validate-integer-format.py --runner <codegen-test-runner> --output <fresh-directory>`
+passes 720 cycles across forced/paced JIT and optimized/undefined-bounds AOT.
+Production binding validation runs before direct backend selection. Cases cover
+signed minima/maxima, unsigned maximum, zero/negative values, old heap result aliases,
+recoverable garbage pressure, all-live exhaustion with unchanged outputs, retained
+text after collection, restored frames and empty-heap cleanup. Store counters check
+that successful heap publications traverse the guard. Thirty focused compiler checks
+pass (22 host-dependent tests skipped by the general filter; this fixture's JIT test
+is run explicitly by the validator).
+
+The initial exhaustion fixture used 24-byte linked nodes, leaving space for a short
+text allocation. Filling with 16-byte linked nodes corrected that assumption; preserve
+both the failing consumer/report and passing `integer-format-*` artifacts. This was
+not a native runtime defect. Website/public API behavior is unchanged.
+
+The retained HTTP import audit now reports 6/7 missing names for plain/JSON, respectively
+(`http-dependencies-integer-format.json.gz`): console, record reservation, string
+interning, TLS and UTF-8 encode/decode, plus JSON ordinal comparison. Host-I/O entry,
+whole-selected-program qualification and live HTTP performance remain open. These
+fixtures establish integration correctness for formatting, not a throughput gain.
