@@ -663,3 +663,16 @@ at the cost of repeated fixed-size validation. CLR GCInfo/PC maps remain the ric
 long-term comparison; this is not binary CLR compatibility or precise object tracing.
 New private imports and format-discriminator flags are the compatibility cost, with
 no frame-size increase. [Qualification and measured tradeoffs](../../benchmarks/execution/slot-maps/README.md).
+
+### Sharing root and collector execution state — 2026-10-24
+
+Extend the owner-local state comparison and earlier GC-state grouping above: root
+publication and collector pacing now share one private per-native-thread record.
+The normal publication poll inlines its existing checks using the resolved state;
+slow collection and ordinary checked native entry stay unchanged. Root, statistics,
+pacing and cleanup lifetimes remain independent, including park/resume. This is not
+a CLR Thread equivalent, new GC policy or cross-thread context transfer. Private
+symbol hiding prevents dynamic interposition; coupling the two translation units
+and increasing publication code size are costs. TLS storage and managed frame sizes
+do not grow. Clean local gains are modest, and JIT latency tails worsen in this
+cohort. [Tests, profiles, preliminary/excluded runs and capacity](../../benchmarks/execution/state-access/README.md).

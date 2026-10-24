@@ -1,4 +1,5 @@
 #include "native-gc.h"
+#include "execution-state.h"
 #include <string.h>
 #include <stdatomic.h>
 #ifdef NEOCLR_GC_PROFILE
@@ -38,14 +39,7 @@ enum { ALLOCATED = 1, MARKED = 2, SCANNED = 4 };
 /* Resolve the related hot GC state through one thread-local object. Individual
  * counters retain their existing lifetimes; no whole-state reset or sharing is
  * introduced. Pacing still checks the current root chain and cleanup guard. */
-static _Thread_local struct {
-    neoclr_gc_statistics statistics;
-    struct {
-        const neoclr_aot_context *context;
-        uint64_t allocations, collections, boundaries;
-    } pacing;
-    int cleanup_active;
-} gc_state;
+#define gc_state (neoclr_execution_state_v1.gc)
 
 /* One exclusive runtime-owned arena per native thread. No per-object metadata
  * or allocation; an address-ordered free list is maintained by allocation and sweep.
@@ -893,22 +887,16 @@ int32_t neoclr_gc_idle_v1(neoclr_aot_context *context, const neoclr_probe_frame 
     }
     return status;
 }
-static int32_t paced_boundary(neoclr_aot_context *context, const neoclr_probe_frame *boundary) {
-    if (gc_state.pacing.context == context && gc_state.statistics.collections == gc_state.pacing.collections &&
-        gc_state.statistics.allocations - gc_state.pacing.allocations < 256 && ++gc_state.pacing.boundaries < 1024) return 0;
-    return neoclr_gc_idle_v1(context, boundary);
-}
 int32_t neoclr_gc_boundary_v1(neoclr_aot_context *context, const neoclr_probe_frame *boundary) {
     if (!context || gc_state.cleanup_active || boundary != neoclr_root_probe_head_v1() ||
         (boundary && boundary->context != context)) return 3;
-    return paced_boundary(context, boundary);
+    return neoclr_paced_boundary(&neoclr_execution_state_v1, context, boundary);
 }
 /* Only root publication may reuse its just-established current-head proof.
  * No guest execution, callback mutation or collection may intervene. Keep the
  * cleanup/context checks here and the general native entry fully checked. */
 int32_t neoclr_gc_published_boundary_v1(neoclr_aot_context *context, const neoclr_probe_frame *boundary) {
-    if (!context || !boundary || gc_state.cleanup_active || boundary->context != context) return 3;
-    return paced_boundary(context, boundary);
+    return neoclr_published_boundary(&neoclr_execution_state_v1, context, boundary);
 }
 neoclr_gc_statistics neoclr_gc_statistics_v1(void) { return gc_state.statistics; }
 

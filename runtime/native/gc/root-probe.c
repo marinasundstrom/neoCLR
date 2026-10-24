@@ -1,4 +1,5 @@
 #include "root-probe.h"
+#include "execution-state.h"
 #include <stdlib.h>
 #include <string.h>
 #ifdef NEOCLR_NATIVE_GC
@@ -11,12 +12,8 @@
 /* Optional diagnostic sink; absent from ordinary runtime builds. */
 extern void neoclr_gc_site_profile_v1(uint32_t function, uint32_t instruction);
 #endif
-static _Thread_local struct {
-    neoclr_probe_frame *head;
-    uint64_t calls;
-    uint32_t depth;
-    uint32_t spill_marker_offsets[256];
-} probe_state;
+_Thread_local neoclr_execution_state neoclr_execution_state_v1;
+#define probe_state (neoclr_execution_state_v1.roots)
 int32_t neoclr_probe_fault_roots_v1(const void *context, neoclr_probe_storage *output,
                                    uint32_t capacity) {
     if (!context) return -1;
@@ -95,12 +92,12 @@ static int has_spill_marker(const char *plan, uint32_t length) {
     const uint32_t size = sizeof(marker) - 1;
     uintptr_t key = (uintptr_t)plan;
     uint32_t bucket = (uint32_t)((key >> 4) ^ (key >> 12)) & 255;
-    uint32_t hint = probe_state.spill_marker_offsets[bucket];
+    uint32_t hint = neoclr_execution_state_v1.spill_marker_offsets[bucket];
     if (hint && length >= size && hint - 1 <= length - size &&
         !memcmp(plan + hint - 1, marker, size)) return 1;
     const char *found = strstr(plan, marker);
     if (!found) return 0;
-    probe_state.spill_marker_offsets[bucket] = (uint32_t)(found - plan) + 1;
+    neoclr_execution_state_v1.spill_marker_offsets[bucket] = (uint32_t)(found - plan) + 1;
     return 1;
 }
 #ifdef NEOCLR_NATIVE_GC
@@ -221,7 +218,7 @@ static void stack_roots(neoclr_probe_frame *frame, uint32_t instruction,
      * checked handoff in instrumented builds rather than extending that proof. */
     if (neoclr_gc_boundary_v1((neoclr_aot_context *)frame->context, probe_state.head)) abort();
 #else
-    if (neoclr_gc_published_boundary_v1((neoclr_aot_context *)frame->context, probe_state.head)) abort();
+    if (neoclr_published_boundary(&neoclr_execution_state_v1, (neoclr_aot_context *)frame->context, probe_state.head)) abort();
 #endif
 #else
     if (neoclr_gc_collect_v1((neoclr_aot_context *)frame->context, probe_state.head)) abort();

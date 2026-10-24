@@ -6739,3 +6739,12 @@ consumers and forced-GC HTTP pass. A scheduling-sensitive shared-worker concurre
 gate failure and three passing identical-binary replays are retained explicitly.
 Image admission, execution-state/TLS redesign and resolved metadata remain open.
 [Contract, measurements and limits](../benchmarks/execution/slot-maps/README.md).
+
+Root/GC execution state now shares a private thread-local record, allowing normal
+publication to reuse its state for the paced poll. Collection budgets, checked
+native entry, worker coordination and independent state lifetimes stay intact.
+Paired local AOT one/four-owner throughput improves 3.6%/2.0%, CPU 3.9%/1.8%; owned
+JIT improves 2.2%/2.5%, with mixed tails. Threaded pacing/cleanup, shared-worker GC,
+async consumers and forced-GC HTTP pass. Initial/excluded runs remain explicit.
+The modest gain and residual collector/frame-entry/TLS profile leave the larger
+execution-state and metadata work open. [Evidence](../benchmarks/execution/state-access/README.md).

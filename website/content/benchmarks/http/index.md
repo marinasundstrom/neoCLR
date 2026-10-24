@@ -448,3 +448,13 @@ matched owned JIT improves 3.4%/2.9%. Objects shrink about 1.3%. These are incre
 development measurements, not peer parity. The validation record includes a
 scheduling-sensitive worker concurrency assertion failure and successful replays.
 See [contract, evidence and limitations](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/execution/slot-maps).
+
+
+## Development: publication state access
+
+Root and GC pacing state now share a private thread-local record, avoiding a redundant
+state lookup during normal publication. Local paired AOT one/four-owner throughput
+improves 3.6%/2.0%, with 3.9%/1.8% lower CPU per response; owned JIT improves
+2.2%/2.5%. Latency tails remain mixed. Collection, frame entry and other state access
+remain material costs. These modest desktop gains do not establish peer parity.
+See [validation, profiles and measurement limits](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/execution/state-access).

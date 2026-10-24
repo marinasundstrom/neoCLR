@@ -1,9 +1,11 @@
 #include "native-gc.h"
 #include <stdio.h>
+#include <string.h>
 #ifdef NEOCLR_TEST_THREADS
 #include <pthread.h>
 #endif
 #define CHECK(x) do { if (!(x)) { fprintf(stderr,"failed line %d\n",__LINE__); return 1; } } while(0)
+static int cleanup_publication;
 enum { ALLOCATION_BUDGET = 256, PUBLICATION_BUDGET = 1024 };
 static void boundary(neoclr_probe_frame *frame) {
     uint64_t empty=0;
@@ -18,6 +20,7 @@ static void check_cleanup_boundary(void *argument) {
     cleanup_check *state = argument;
     state->checked = neoclr_gc_boundary_v1(state->context, state->frame);
     state->published = neoclr_gc_published_boundary_v1(state->context, state->frame);
+    if (cleanup_publication) boundary(state->frame); /* Must abort inside cleanup. */
 }
 static int exercise(void) {
     uint64_t heap[4096]={0};
@@ -46,6 +49,12 @@ static int exercise(void) {
     boundary(&frame);
     CHECK(!neoclr_gc_heap_acquire_v1(&other.text));
     CHECK(!neoclr_gc_heap_release_v1(&other.text));
+    neoclr_parked_roots parked = {0};
+    neoclr_roots_park_v1(&parked);
+    CHECK(!neoclr_root_probe_head_v1() && !neoclr_root_probe_depth_v1());
+    CHECK(neoclr_gc_statistics_v1().collections==before+1);
+    neoclr_roots_resume_v1(&parked);
+    CHECK(neoclr_root_probe_head_v1()==&frame && neoclr_root_probe_depth_v1()==1);
     for(int i=0;i<PUBLICATION_BUDGET-2;i++) boundary(&frame);
     CHECK(neoclr_gc_statistics_v1().collections==before+1);
     boundary(&frame);
@@ -78,7 +87,11 @@ static void *worker(void *argument) {
     return NULL;
 }
 #endif
-int main(void) {
+int main(int argc, char **argv) {
+    if (argc > 1) {
+        if (argc != 2 || strcmp(argv[1], "cleanup-publication")) return 2;
+        cleanup_publication = 1;
+    }
     CHECK(!exercise());
 #ifdef NEOCLR_TEST_THREADS
     neoclr_gc_statistics before = neoclr_gc_statistics_v1();

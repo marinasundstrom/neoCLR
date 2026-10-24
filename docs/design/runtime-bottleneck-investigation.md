@@ -329,3 +329,13 @@ headers, while per-frame tables, TLS, collector work and resolved metadata remai
 This does not establish once-per-image admission, interpreter gains or peer parity.
 The validation record preserves a worker minimum-concurrency assertion failure and
 successful identical-binary replays; the gate remains scheduling-sensitive.
+
+The next [execution-state slice](../../benchmarks/execution/state-access/README.md)
+shares root/GC TLS and reuses it for the normal publication pacing check. Final
+paired AOT one/four-owner throughput improves 3.6%/2.0% with CPU reductions of
+3.9%/1.8%; owned JIT improves 2.2%/2.5%. Initial four-owner evidence was near-flat,
+and latency tails remain mixed. This is a modest measured step, not resolution of
+the server gap. Disassembly verifies one fewer TLS-resolving call on the normal
+publication path. A fresh profile leaves collection, frame entry and other TLS access
+prominent. Full execution-state, immutable metadata graph and precise layout work
+remain open; do not infer that further small TLS groupings will close that gap.

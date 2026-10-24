@@ -22362,3 +22362,13 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   participants and pass. The failure is retained rather than weakening the gate.
   Image-level admission and broader execution-state/metadata redesign remain open.
   [Implementation and evidence](../benchmarks/execution/slot-maps/README.md).
+
+- On further continuation, assistant profiles the binary-header build and tests a
+  shared root/GC thread-local record with an inline paced poll. Initial four-owner
+  gains are weak. Assistant makes the shared symbol private to each runtime library,
+  qualifies root, threaded pacing/cleanup, worker and async lifetimes, and reruns clean
+  paired measurements. Final local AOT one/four-owner gains are 3.6%/2.0%; owned JIT
+  gains 2.2%, with mixed tails. An incomplete standalone link recipe and measurement
+  runs overlapping inspection are retained and excluded from final claims. The result
+  is a modest execution-state improvement, not a solution to the wider throughput gap.
+  [Evidence and remaining costs](../benchmarks/execution/state-access/README.md).
