@@ -339,3 +339,13 @@ the server gap. Disassembly verifies one fewer TLS-resolving call on the normal
 publication path. A fresh profile leaves collection, frame entry and other TLS access
 prominent. Full execution-state, immutable metadata graph and precise layout work
 remain open; do not infer that further small TLS groupings will close that gap.
+
+A [four-word conservative scan experiment](../../benchmarks/execution/scan-batches/README.md)
+now tests the idea of rejecting scalar candidates before full heap lookup. Both
+variants preserve liveness and six tracing counters across exhaustive word/offset
+cases. The initial filter reduces plaintext throughput 1.9–2.0%; the adjustment has
+only overlapping, sub-percent changes. Scalar scanning is restored. Disassembly
+shows added scalar control work rather than the hoped-for SIMD filter. This rejects
+these implementations, not all batching. The useful broader questions remain how to
+avoid scanning scalar fields using authoritative layouts, and how much collection
+work comes from each trigger before adjusting allocation/publication/idle policy.

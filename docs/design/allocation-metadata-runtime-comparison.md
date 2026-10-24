@@ -676,3 +676,15 @@ symbol hiding prevents dynamic interposition; coupling the two translation units
 and increasing publication code size are costs. TLS storage and managed frame sizes
 do not grow. Clean local gains are modest, and JIT latency tails worsen in this
 cohort. [Tests, profiles, preliminary/excluded runs and capacity](../../benchmarks/execution/state-access/README.md).
+
+### Rejected conservative word batching — 2026-10-24
+
+A four-word outside-arena filter preserves the current conservative object contract,
+including interior roots, and needs no new metadata/header. On the tested ARM64 build
+it adds scalar mask/control work: an initial version regresses plaintext throughput
+about 2%, and an adjusted version has no convincing benefit. Production remains
+scalar. This reinforces the distinction in the existing CLR/type-layout comparison:
+reducing candidate-lookup overhead is different from avoiding nonreference fields
+through authoritative physical layouts. It does not prove a precise-layout speedup
+or justify incomplete pointer masks. [Source snapshots, differential tests and paired
+evidence](../../benchmarks/execution/scan-batches/README.md).

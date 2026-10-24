@@ -1,0 +1,150 @@
+{
+  "initial": {
+    "aot1Owner": {
+      "baseline-w1": {
+        "requestsPerSecond": 3730.3,
+        "range": [
+          3694.5,
+          3766.1
+        ],
+        "cpuMicrosecondsPerResponse": 264.07022986468803,
+        "cpuRange": [
+          263.457778467129,
+          264.682681262247
+        ],
+        "p99Milliseconds": [
+          9.003708,
+          10.5775
+        ]
+      },
+      "candidate-w1": {
+        "requestsPerSecond": 3659.8500000000004,
+        "range": [
+          3633.9,
+          3685.8
+        ],
+        "cpuMicrosecondsPerResponse": 268.3606351925761,
+        "cpuRange": [
+          266.5826793024675,
+          270.13859108268474
+        ],
+        "p99Milliseconds": [
+          9.633625,
+          10.249042
+        ]
+      },
+      "throughputGainPercent": -1.8885880492185536,
+      "cpuReductionPercent": -1.6247213213267386
+    },
+    "aot4Owner": {
+      "baseline-w4": {
+        "requestsPerSecond": 10849.5,
+        "range": [
+          10792.3,
+          10906.7
+        ],
+        "cpuMicrosecondsPerResponse": 335.1273048211725,
+        "cpuRange": [
+          333.9026519379546,
+          336.3519577043904
+        ],
+        "p99Milliseconds": [
+          3.449916,
+          3.3555
+        ]
+      },
+      "candidate-w4": {
+        "requestsPerSecond": 10636.8,
+        "range": [
+          10626.6,
+          10647
+        ],
+        "cpuMicrosecondsPerResponse": 340.09581444133687,
+        "cpuRange": [
+          339.51621665925103,
+          340.67541222342265
+        ],
+        "p99Milliseconds": [
+          3.866375,
+          3.554209
+        ]
+      },
+      "throughputGainPercent": -1.9604590073275308,
+      "cpuReductionPercent": -1.482573800668252
+    }
+  },
+  "adjusted": {
+    "aot1Owner": {
+      "baseline-w1": {
+        "requestsPerSecond": 3699.9,
+        "range": [
+          3659,
+          3740.8
+        ],
+        "cpuMicrosecondsPerResponse": 267.0874661417398,
+        "cpuRange": [
+          265.3141785546849,
+          268.8607537287947
+        ],
+        "p99Milliseconds": [
+          9.2295,
+          10.083375
+        ]
+      },
+      "candidate-w1": {
+        "requestsPerSecond": 3677.8500000000004,
+        "range": [
+          3659.9,
+          3695.8
+        ],
+        "cpuMicrosecondsPerResponse": 267.70781785355615,
+        "cpuRange": [
+          267.6513229678117,
+          267.7643127393006
+        ],
+        "p99Milliseconds": [
+          9.658084,
+          9.189333
+        ]
+      },
+      "throughputGainPercent": -0.5959620530284537,
+      "cpuReductionPercent": -0.2322653776224426
+    },
+    "aot4Owner": {
+      "baseline-w4": {
+        "requestsPerSecond": 10629.05,
+        "range": [
+          10352.1,
+          10906
+        ],
+        "cpuMicrosecondsPerResponse": 338.4639585859568,
+        "cpuRange": [
+          333.6974629264318,
+          343.2304542454817
+        ],
+        "p99Milliseconds": [
+          3.364375,
+          4.276
+        ]
+      },
+      "candidate-w4": {
+        "requestsPerSecond": 10682.45,
+        "range": [
+          10671.8,
+          10693.1
+        ],
+        "cpuMicrosecondsPerResponse": 337.6007822142941,
+        "cpuRange": [
+          336.7947197899106,
+          338.40684463867757
+        ],
+        "p99Milliseconds": [
+          3.689917,
+          3.443958
+        ]
+      },
+      "throughputGainPercent": 0.5023967334804258,
+      "cpuReductionPercent": 0.2550275589959128
+    }
+  }
+}

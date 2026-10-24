@@ -22372,3 +22372,11 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   runs overlapping inspection are retained and excluded from final claims. The result
   is a modest execution-state improvement, not a solution to the wider throughput gap.
   [Evidence and remaining costs](../benchmarks/execution/state-access/README.md).
+
+- On continuation into collector costs, assistant tests two four-word conservative
+  scan filters. Both match scalar liveness/counters, but the first loses about 2%
+  plaintext throughput and the adjusted version gives no convincing improvement.
+  Assistant restores production scalar scanning, retains exhaustive payload/partial-
+  word/interior-root tests and archives both experiments. Precise physical layouts
+  and collection-trigger analysis remain proposals for further investigation, not
+  author-approved implementations or measured wins. [Evidence](../benchmarks/execution/scan-batches/README.md).

@@ -6748,3 +6748,10 @@ JIT improves 2.2%/2.5%, with mixed tails. Threaded pacing/cleanup, shared-worker
 async consumers and forced-GC HTTP pass. Initial/excluded runs remain explicit.
 The modest gain and residual collector/frame-entry/TLS profile leave the larger
 execution-state and metadata work open. [Evidence](../benchmarks/execution/state-access/README.md).
+
+A bounded collector scan experiment is rejected: four-word conservative prefilters
+preserve safety but regress or fail to improve paired plaintext capacity. Production
+scalar tracing is restored; exhaustive payload/partial-word/interior-root tests join
+the standard validator. Authoritative physical layouts and collection-trigger cost
+separation remain investigation work, not implemented changes or new priorities.
+[Reproducible evidence](../benchmarks/execution/scan-batches/README.md).
