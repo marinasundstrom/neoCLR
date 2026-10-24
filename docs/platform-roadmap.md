@@ -128,7 +128,10 @@ selection and complete invocation tests were the next step
 store/call-closure checks. Six hundred JIT/AOT integer-entry cycles pass allocation,
 repeated reset, rejection and fault recovery; async/unit pumps, bootstrap/arguments
 and full HTTP admission remain open
-([entry evidence](../benchmarks/execution/concurrent-store/README.md#generated-public-entry-2026-10-24)).
+([entry evidence](../benchmarks/execution/concurrent-store/README.md#generated-public-entry-2026-10-24)). Generated default-queue dispatch now also joins
+store/call-closure checks; 600 real task-scope JIT/AOT cycles cover managed queue
+allocation, retention, rejection and fault cleanup. Pump integration remains next
+([queue evidence](../benchmarks/execution/concurrent-store/README.md#generated-default-queue-dispatch-2026-10-24)).
 Capability conversions, callable arrays, remaining text/byte services and async/full
 host-entry integration remain next;
 the recorded plaintext import inventory guides that coverage.

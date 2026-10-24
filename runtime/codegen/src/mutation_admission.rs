@@ -140,6 +140,7 @@ pub(crate) fn root_providers(module: &impl Module) -> Vec<(&'static str, Signatu
         signature
     };
     vec![
+        ("neoclr_task_queue_host_read_v1", make(&[I64, I64], &[I32])),
         ("experiment_gc_prepare_entry_v1", make(&[I64], &[I32])),
         ("neoclr_gc_complete_invocation_v1", make(&[I64], &[I32])),
         ("experiment_gc_store", make(&[I64, I64, I64, I32], &[I32])),

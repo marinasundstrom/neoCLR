@@ -800,6 +800,9 @@ fn managed_options_for(source: &str) -> crate::fault_details::Options {
         options.runtime_async_startmanaged.push(11);
         options.object_base=Some(0);
     }
+    if source.starts_with(".module LiveQueue") {
+        options.task_queue_drain = Some(0);
+    }
     if source.starts_with(".module LiveSocket") {
         options.socket_listen.push(0);
         options.socket_local_port.push(1);
@@ -1492,5 +1495,28 @@ fn managed_public_entry_runs_on_live_collector() {
     let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name("neoclr_entry_v4") else { panic!("public entry") };
     type Run = unsafe extern "C" fn(*const u8) -> i32;
     let run: libloading::Symbol<Run> = unsafe { library.get(b"managed_entry_consumer") }.unwrap();
+    assert_eq!(unsafe { run(module.get_finalized_function(id)) }, 0);
+}
+
+#[test]
+fn managed_queue_emits_guarded_dispatch() {
+    emit_managed(include_str!("../../../benchmarks/execution/concurrent-store/queue.neoil"));
+}
+#[test]
+#[ignore = "requires entry host built by validate-queue.py"]
+fn managed_queue_runs_on_live_collector() {
+    let library = std::sync::Arc::new(unsafe { libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host")) }.unwrap());
+    unsafe { crate::mutation_admission::require_managed_host(&library) }.unwrap();
+    let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
+    let resolver = library.clone();
+    builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
+    let mut code = Code(Some(JITModule::new(builder)));
+    let module = code.0.as_mut().unwrap();
+    let source = include_str!("../../../benchmarks/execution/concurrent-store/queue.neoil");
+    crate::compiler::values::compile_into(&managed_input(source), "Main", Some(&managed_options_for(source)), crate::compiler::Target::MacosArm64, module, true).unwrap();
+    module.finalize_definitions().unwrap();
+    let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name("neoclr_drain_default_queue_v1") else { panic!("queue dispatch") };
+    type Run = unsafe extern "C" fn(*const u8) -> i32;
+    let run: libloading::Symbol<Run> = unsafe { library.get(b"managed_queue_consumer") }.unwrap();
     assert_eq!(unsafe { run(module.get_finalized_function(id)) }, 0);
 }

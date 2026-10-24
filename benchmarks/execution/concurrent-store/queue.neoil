@@ -1,0 +1,38 @@
+.module LiveQueue
+.type class Queue
+.field Count Int64
+.field Child arrayref<Byte>
+.end
+.function Drain(Queue queue) -> Void
+ldarg queue
+ldarg queue
+ldfld Queue::Count
+ldc.i8 1
+add
+stfld Queue::Count
+ldarg queue
+ldc.i4 16
+newarr Byte
+stfld Queue::Child
+ldarg queue
+ldfld Queue::Count
+ldc.i8 0
+beq bad
+ldvoid
+ret
+bad:
+ldc.i4 1
+ldc.i4 0
+div
+pop
+ldvoid
+ret
+.end
+.function Write(Int32 value) -> Int32
+ldarg value
+ret
+.end
+.function Main(Int32 value) -> Int32
+ldarg value
+ret
+.end

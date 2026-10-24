@@ -930,3 +930,34 @@ services still need qualification; it is not full HTTP server admission. The exi
 CLR root-transition comparison and temporary CLI/native representation remain
 unchanged. neoCLR owns this backend transition and its eventual native metadata
 replacement. No throughput gain or default switch is claimed.
+
+
+## Generated default-queue dispatch (2026-10-24)
+
+`neoclr_drain_default_queue_v1` now joins live-mode store lowering and call-closure
+validation instead of being defined outside that set. Its exact native reader
+contract is admitted: `neoclr_task_queue_host_read_v1` neither allocates nor collects,
+and the real task scope's strong root retains the queue until managed Drain publishes
+its frame. Ordinary emission and native queue semantics remain unchanged.
+
+`validate-queue.py --runner <codegen-test-runner> --output <fresh-directory>` passes
+600 forced/paced JIT and optimized/undefined-bounds AOT cycles against the automatic
+candidate and real task-queue.c provider. A controlled managed Queue/Drain shape
+increments a scalar, allocates/replaces a byte child and can fault after publication.
+Tests cover missing scopes, empty queues, scope-only ownership through collection,
+existing faults, active-frame rejection, fault unwinding, recovery and final release.
+The fixture selects the drain index directly; it does not claim to exercise the full
+System TaskQueue implementation or its binding/selection pipeline.
+
+Twenty-five focused compiler checks pass; 18 host-dependent tests are skipped by
+the general filter, with both JIT configurations run explicitly by this harness.
+Reports and object are archived as `queue-*`. Two initial assembler fixture errors
+(field separator and unsupported branch spelling) are retained; neither reached
+runtime execution. The corrected fixture uses existing accepted syntax.
+
+The existing CLR rooted transition comparison applies: the noncollecting read-to-
+managed-call gap relies on persistent host ownership, not a transient unrooted copy.
+Temporary CLI/native queue representation is unchanged; neoCLR owns backend validation
+and eventual native metadata replacement. Async/legacy entry pumps, bootstrap,
+remaining providers and full HTTP performance qualification stay open. No default
+or throughput change is claimed.

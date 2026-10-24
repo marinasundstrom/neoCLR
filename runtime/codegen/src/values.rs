@@ -5802,6 +5802,7 @@ pub(crate) fn compile_into(
                 stack_check,
                 diagnostic_data.as_ref().unwrap(),
                 long_range_calls,
+                if live_stores { Some(&mut live_bodies) } else { None },
             )?;
         }
     }
@@ -6025,6 +6026,7 @@ fn compile_host_queue(
     stack_check: Option<cranelift_module::FuncId>,
     data: &crate::fault_details::Data,
     long_range_calls: bool,
+    live_bodies: Option<&mut Vec<(cranelift_module::FuncId, cranelift_codegen::Context)>>,
 ) -> Result<(), Error> {
     let mut sig = module.make_signature();
     sig.params
@@ -6068,13 +6070,16 @@ fn compile_host_queue(
         b.seal_all_blocks();
         b.finalize();
     }
-    define_checked(
-        module,
-        export,
-        &mut context,
-        stack_check.is_some(),
-        long_range_calls,
-    )
+    if let Some(bodies) = live_bodies {
+        // The scope's strong root retains the queue until Drain publishes its frame.
+        let entry = context.func.layout.entry_block().ok_or("missing queue entry")?;
+        let owner_context = context.func.dfg.block_params(entry)[0];
+        crate::mutation_store::lower(module, &mut context.func, owner_context)?;
+        bodies.push((export, context));
+        Ok(())
+    } else {
+        define_checked(module, export, &mut context, stack_check.is_some(), long_range_calls)
+    }
 }
 
 #[cfg(test)]
