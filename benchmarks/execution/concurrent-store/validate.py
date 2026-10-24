@@ -23,10 +23,10 @@ try:
  run([runner,'mutation_store::tests::ordinary_value_pipeline_lowers_only_when_opted_in','--exact'],dict(os.environ,NEOCLR_MUTATION_MANAGED_OBJECT=str(managed)))
  assert managed.exists()
  source=out/'native-gc.c'
- run(['python3',base.parent/'concurrent-live/generate.py','--output',source])
+ run(['python3',base.parent/'concurrent-live/automatic.py','--output',source])
  recipe=json.loads((root/'benchmarks/execution/call-layout/results.json').read_text())['builds'][1]['command']
  cc=recipe[:recipe.index('-std=c11')]
- common=cc+['-std=c11','-O2','-Wall','-Wextra','-Werror','-pthread','-DNEOCLR_NATIVE_GC','-DNEOCLR_SHADOW_TEST','-DNEOCLR_SHADOW_SPARSE_INDEX','-I',root/'runtime/native/gc','-I',base.parent/'concurrent-mutation-gate',base/'consumer.c',base.parent/'concurrent-mutation-gate/gate.c',root/'runtime/native/gc/root-probe.c',source]
+ common=cc+['-std=c11','-O2','-Wall','-Wextra','-Werror','-pthread','-DNEOCLR_NATIVE_GC','-DNEOCLR_GC_PROFILE','-DNEOCLR_SHADOW_TEST','-DNEOCLR_SHADOW_SPARSE_INDEX','-I',root/'runtime/native/gc','-I',base.parent/'concurrent-mutation-gate',base/'consumer.c',base.parent/'concurrent-mutation-gate/gate.c',root/'runtime/native/gc/root-probe.c',source]
  for sanitized in [False,True]:
   exe=out/f'aot-{sanitized}'
   cmd=common+[obj,'-DCONSUMER_MAIN','-o',exe]

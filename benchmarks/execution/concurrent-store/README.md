@@ -895,3 +895,38 @@ CLI memory metadata and flattened native representation remain unchanged; neoCLR
 backend qualification and eventual native metadata replacement. Generated pump/queue/
 bootstrap entry, remaining providers and shared heaps remain unqualified. These are
 correctness tests, not throughput measurements or evidence for switching the default.
+
+
+## Generated public entry (2026-10-24)
+
+Internal live-mode public entry now calls `experiment_gc_prepare_entry_v1` instead
+of resetting arena/static-storage cursors directly. The entire wrapper joins store
+lowering and call-closure validation, with exact prepare/completion provider ABIs.
+The Windows final machine-frame limit remains enforced after deferred definition;
+execution evidence here is macOS ARM64. Ordinary compilation is unchanged. Live
+objects require the matching automatic candidate host with the new prepare import;
+the explicit marker-only host is no longer sufficient for generated entry objects.
+The base validation harness now uses automatic.py with required profiling enabled.
+
+`validate-entry.py --runner <codegen-test-runner> --output <fresh-directory>` passes
+600 cycles across forced/paced JIT and optimized/undefined-bounds AOT. Each uses
+`neoclr_entry_v4`, not a private managed function: retained-root rejection preserves
+output and heap; successful integer Main allocates/reads an array; repeat entry
+reuses the same extent; division failure preserves output and unwinds roots; the
+next call clears the fault and succeeds. Invocation completion leaves no active
+epoch. Final collection/release succeeds. Twenty-four focused compiler checks pass;
+17 host-dependent tests are skipped by the general filter, with public-entry JIT
+checks explicitly executed by this harness. The existing mutation/managed/host
+compatibility validator also passes against the automatic candidate.
+
+Reports and emitted object are archived as `entry-*`. The initial fixture hit an
+over-broad test assertion that treated an integer array store as a record store;
+the corrected assertion and initial failure are retained. This was not a collector
+failure. Exact prepare-import selection is checked for live/default compilation.
+
+This qualifies the integer-returning synchronous public entry with managed allocation
+and faults. Unit/async entry pumps, bootstrap, arguments, queues and remaining native
+services still need qualification; it is not full HTTP server admission. The existing
+CLR root-transition comparison and temporary CLI/native representation remain
+unchanged. neoCLR owns this backend transition and its eventual native metadata
+replacement. No throughput gain or default switch is claimed.

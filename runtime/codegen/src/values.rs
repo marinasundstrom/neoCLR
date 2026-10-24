@@ -5527,7 +5527,7 @@ pub(crate) fn compile_into(
         let mut signature = module.make_signature();
         signature.params.push(AbiParam::new(types::I64));
         signature.returns.push(AbiParam::new(types::I32));
-        Some(module.declare_function("neoclr_gc_entry_check_v1", Linkage::Import, &signature)?)
+        Some(module.declare_function(if live_stores { "experiment_gc_prepare_entry_v1" } else { "neoclr_gc_entry_check_v1" }, Linkage::Import, &signature)?)
     } else {
         None
     };
@@ -5663,7 +5663,7 @@ pub(crate) fn compile_into(
                 false,
             );
         }
-        if text_arena {
+        if text_arena && !live_stores {
             // Reset only the cursor; capacity/data belong to the host. Previous
             // dynamic text, including fault messages, expires on this next call.
             let zero = b.ins().iconst(types::I64, 0);
@@ -5759,11 +5759,17 @@ pub(crate) fn compile_into(
         b.seal_all_blocks();
         b.finalize();
     }
-    define_checked(module, export, &mut context, stack_budget, long_range_calls)?;
-    // Entry's prologue runs before its first budget check; keep it below one
-    // page. Hosts still owe a usable stack to call the ABI at all.
-    if platform_target == super::Target::WindowsX64 && frame_charge(&context, true)? > 4096 {
-        return Err("Windows stack experiment entry frame exceeds one page".into());
+    if live_stores {
+        let entry = context.func.layout.entry_block().ok_or("missing public entry")?;
+        let owner_context = context.func.dfg.block_params(entry)[2];
+        crate::mutation_store::lower(module, &mut context.func, owner_context)?;
+        live_bodies.push((export, context));
+    } else {
+        define_checked(module, export, &mut context, stack_budget, long_range_calls)?;
+        // Entry's prologue precedes its first budget check.
+        if platform_target == super::Target::WindowsX64 && frame_charge(&context, true)? > 4096 {
+            return Err("Windows stack experiment entry frame exceeds one page".into());
+        }
     }
     if details.is_some_and(|d| d.native_gc) {
         compile_host_callbacks(
@@ -5806,6 +5812,9 @@ pub(crate) fn compile_into(
         )?;
         for (id, mut context) in live_bodies {
             define_checked(module, id, &mut context, stack_budget, long_range_calls)?;
+            if id == export && platform_target == super::Target::WindowsX64 && frame_charge(&context, true)? > 4096 {
+                return Err("Windows stack experiment entry frame exceeds one page".into());
+            }
         }
     }
     Ok(())

@@ -1039,11 +1039,13 @@ fn emit_managed(source: &str) {
         }
 
         let object = object::File::parse(bytes.as_slice()).unwrap();
+        assert_eq!(object.symbols().any(|s| s.is_undefined()
+            && s.name().unwrap_or("").trim_start_matches('_') == "experiment_gc_prepare_entry_v1"), enabled);
         if source.starts_with(".module LiveStatics") || source.starts_with(".module LiveInitializers") {
             assert_eq!(object.symbols().any(|s| s.is_undefined()
                 && s.name().unwrap_or("").trim_start_matches('_') == "experiment_gc_static_storage_rooted_v1"), enabled);
         }
-        if source.contains("stelem") && !source.starts_with(".module LivePrimitiveArrays") {
+        if source.contains("stelem") && !source.starts_with(".module LivePrimitiveArrays") && !source.starts_with(".module LiveEntry") {
             let helper = if source.contains("stelem String") {
                 "experiment_gc_store_text"
             } else { "experiment_gc_store_record" };
@@ -1468,4 +1470,27 @@ fn managed_socket_memory_run_on_live_collector() {
     type Run = unsafe extern "C" fn(*const *const u8) -> i32;
     let run: libloading::Symbol<Run> = unsafe { library.get(b"managed_socket_consumer") }.unwrap();
     assert_eq!(unsafe { run(pointers.as_ptr()) }, 0);
+}
+
+#[test]
+fn managed_public_entry_emits_guarded_transition() {
+    emit_managed(include_str!("../../../benchmarks/execution/concurrent-store/entry.neoil"));
+}
+#[test]
+#[ignore = "requires entry host built by validate-entry.py"]
+fn managed_public_entry_runs_on_live_collector() {
+    let library = std::sync::Arc::new(unsafe { libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host")) }.unwrap());
+    unsafe { crate::mutation_admission::require_managed_host(&library) }.unwrap();
+    let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
+    let resolver = library.clone();
+    builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
+    let mut code = Code(Some(JITModule::new(builder)));
+    let module = code.0.as_mut().unwrap();
+    let source = include_str!("../../../benchmarks/execution/concurrent-store/entry.neoil");
+    crate::compiler::values::compile_into(&managed_input(source), "Main", Some(&managed_options_for(source)), crate::compiler::Target::MacosArm64, module, true).unwrap();
+    module.finalize_definitions().unwrap();
+    let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name("neoclr_entry_v4") else { panic!("public entry") };
+    type Run = unsafe extern "C" fn(*const u8) -> i32;
+    let run: libloading::Symbol<Run> = unsafe { library.get(b"managed_entry_consumer") }.unwrap();
+    assert_eq!(unsafe { run(module.get_finalized_function(id)) }, 0);
 }

@@ -123,8 +123,12 @@ coordinated reset and complete generated-body qualification
 ([evidence](../benchmarks/execution/concurrent-live/README.md#entry-admission-and-owned-arena-reuse-2026-10-24)). The candidate now has a coordinated owned-entry reset
 provider: 400 cycles cover ownership/frame rejection, free-list and cached-base
 retirement and reuse; omitting cache invalidation fails the control. Compiler
-selection and complete invocation tests are next
-([reset evidence](../benchmarks/execution/concurrent-live/README.md#coordinated-owned-heap-entry-reset-2026-10-24)).
+selection and complete invocation tests were the next step
+([reset evidence](../benchmarks/execution/concurrent-live/README.md#coordinated-owned-heap-entry-reset-2026-10-24)). Live public entry now selects that reset and joins
+store/call-closure checks. Six hundred JIT/AOT integer-entry cycles pass allocation,
+repeated reset, rejection and fault recovery; async/unit pumps, bootstrap/arguments
+and full HTTP admission remain open
+([entry evidence](../benchmarks/execution/concurrent-store/README.md#generated-public-entry-2026-10-24)).
 Capability conversions, callable arrays, remaining text/byte services and async/full
 host-entry integration remain next;
 the recorded plaintext import inventory guides that coverage.

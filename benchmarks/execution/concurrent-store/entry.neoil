@@ -1,0 +1,21 @@
+.module LiveEntry
+.function Write(Int32 value) -> Int32
+ldarg value
+ret
+.end
+.function Main(Int32 value) -> Int32
+.local arrayref<Int32> numbers
+ldc.i4 8
+newarr Int32
+stloc numbers
+ldloc numbers
+ldc.i4 0
+ldc.i4 42
+stelem Int32
+ldloc numbers
+ldc.i4 0
+ldelem Int32
+ldarg value
+div
+ret
+.end
