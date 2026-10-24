@@ -6606,3 +6606,15 @@ selection time about 15%, and HTTP JIT readiness 4.2%. Three AOT objects remain
 byte-identical; warm native throughput is not measured. [Evidence and tradeoffs](../benchmarks/execution/interface-owner-index/README.md).
 The next HTTP performance work should return to warm request-path profiling; these
 common-loading improvements do not establish a GC or scheduler throughput gain.
+
+
+### Warm native host ownership experiment — 2026-10-24
+
+The author-directed performance investigation returns to warm HTTP and separates
+external/owned heaps from JIT/AOT mode. Eight checked trials show large ownership
+gains for the development entry host, with a remaining JIT/AOT gap. Independent
+profiles, fixed-request counts and forced/paced sanitized lifecycle checks retain
+evidence for an explicit owned JIT configuration and call-layout investigation.
+[Results, contract and limits](../benchmarks/execution/native-host-ownership/README.md).
+Production JIT defaults remain unchanged; the already-owned worker server cannot
+claim these gains again. No peer-server parity or new threading capability is claimed.

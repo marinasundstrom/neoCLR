@@ -22235,3 +22235,12 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   process/JIT selection time and 4.2% lower HTTP JIT readiness. Generated AOT objects
   remain byte-identical. [Evidence and fallback tradeoffs](../benchmarks/execution/interface-owner-index/README.md).
   Warm native request-path improvement remains an open, separate objective.
+
+- Warm-path continuation: assistant compares matched JIT/AOT hosts with external
+  and explicitly owned arenas. Eight capacity runs, two separate profiles, four
+  fixed-request runs and four optimized/sanitized lifecycle runs pass. Ownership
+  improves the development host markedly; JIT still trails matched AOT. Allocation
+  and publication counts match in fixed-request checks, while collection counts
+  differ in one case. Assistant retains the candidate as an experiment and proposes
+  explicit host qualification and call-layout isolation; no production default is
+  changed. [Evidence and ownership restrictions](../benchmarks/execution/native-host-ownership/README.md).

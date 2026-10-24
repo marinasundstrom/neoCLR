@@ -1,0 +1,26 @@
+{
+  "aot": {
+    "external": {
+      "requestsPerSecond": 1322.9,
+      "cpuMicrosecondsPerResponse": 758.03408622303
+    },
+    "owned": {
+      "requestsPerSecond": 2821.8999999999996,
+      "cpuMicrosecondsPerResponse": 348.6762883589539
+    },
+    "throughputIncreasePercent": 113.31166376899233,
+    "cpuReductionPercent": 54.0025581044431
+  },
+  "jit": {
+    "external": {
+      "requestsPerSecond": 1043.1,
+      "cpuMicrosecondsPerResponse": 958.4546073407973
+    },
+    "owned": {
+      "requestsPerSecond": 1885.0,
+      "cpuMicrosecondsPerResponse": 527.3747825949416
+    },
+    "throughputIncreasePercent": 80.71134119451635,
+    "cpuReductionPercent": 44.97655094401115
+  }
+}

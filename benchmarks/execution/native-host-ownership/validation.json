@@ -1,0 +1,30 @@
+{
+  "baselineRevision": "f348d4606bddcfe0b8d6974015dcd443410fa35e",
+  "unchangedDependencies": {
+    "/Users/robert/Projects/neoclr/target/transient-handoff-corpus-wrapped/tasks/bin/neoclr/App.dll": "fb3d1f80bd97ce0c15042dfbfed1bfcebfbe0b893f272fe9cca44b74cba7ae19",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.runtime.neox": "0c72a8656e7158d6bb2f31c0b019d8747dd61a6c4127b278155e104de437769b",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Runtime.dll": "ac3ddea188cd6e7970869248c2501acc7f6f7a1bfca598c339ea3257d3fc1d4c",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Data.dll": "846771708d06ae117fd6eb3019fbd7805ba9e3794b456c7b89d637893c7954a6",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Networking.dll": "d2c27984c00e7d89eabcb9ced7a0004557077cbef57fdb4292e264ddf2a4a4b2",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Web.dll": "434d63e3191c7a496c263dcd454807ddd32979cd4bb52bf9005af60178d7313e",
+    "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Data.PostgreSql.dll": "d456bee492ff5836a4e9f1297157f8d4fa2bfacb81cf6d9bfd2e0d99ce89da09",
+    "/Users/robert/Projects/neoclr/target/transient-handoff-corpus-wrapped/collections/bin/neoclr/App.dll": "4fb57fa8447f05a1c775d15ed1a18d33d9adcea65f2d828587cda1b92d8dcd30"
+  },
+  "platform": "Darwin Roberts-MacBook-Pro.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:27 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T8103 arm64",
+  "inputs": {
+    "benchmarks/execution/native-host-ownership/measure.py": "3ce2e84218d2e0836ef0794a1f1475c53550b2e6339ad89ae3b7a85d2f368729",
+    "benchmarks/execution/native-host-ownership/summarize.py": "ecffd49374d231874b2252c03e0b9e5042cdadefc31d1c4f8c57fcfe8bd9e483",
+    "benchmarks/execution/native-host-ownership/lifecycle.py": "97dc9e30129cb130c32384cc9919da016a0d03dbfba79c44e8627d3276d86a5f",
+    "benchmarks/execution/native-host-ownership/counts.py": "ac67789497814406ccb2303c5509d3f70618668f116dcc3670389edb4bbd82ef",
+    "benchmarks/execution/native-host-ownership/lifecycle.c": "e21c3151005565fa266b7874b27a3feda52e194e07820bff5cfacdd6ee2f4f06",
+    "target/native-host-ownership/owned-host.c": "6339fe91de823281ff6b8771f242bab2e3cb6a510daf2126f0211142fdae4142",
+    "target/native-host-counts/counted-host.c": "e2ea9a0eb76af77eed86c9a29af48613030302d80696b9ac3eef7020013539d7",
+    "runtime/codegen/src/compiler.rs": "8a1da0f019353b40fba4f201367bb4df10f4f3a9c33c925d327971f413dd32a0",
+    "runtime/codegen/src/jit.rs": "269bad17190aad1540e63532f3e1b13dba292e16dc04ed787427ff0afe940218",
+    "runtime/codegen/src/values.rs": "a8053c1558f0bdc59c4d5996cfdc0669c9401a799a8cb77d9bf6c0812e1ec0e9",
+    "Cargo.lock": "0196664dc5bc2e6a412a0eb529dba90fab0a6f2b597a119739572b2349fa35b2",
+    "/Users/robert/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cranelift-jit-0.121.2/src/backend.rs": "5c6876f8526c5b3c93bca28a46e80d0d9d32f04d1656cf7e64ccd3cf76376409",
+    "/Users/robert/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cranelift-module-0.121.2/src/module.rs": "e4800b91d14ef7867601d20258770e66c9d00c0d03d27e07a70714a0709545a8",
+    "benchmarks/execution/native-host-ownership/test_summary.py": "7a2d38b4319db4073d01b93a72ca19ec0fbb045718cf540b0b9969f33afe6e58"
+  }
+}

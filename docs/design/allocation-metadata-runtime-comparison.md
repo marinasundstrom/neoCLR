@@ -486,3 +486,21 @@ existing lazy owner map for fewer scoped method scans. A full conformance cache
 would require additional instantiated-identity and lifetime obligations.
 [Profile, validation and measurements](../../benchmarks/execution/interface-owner-index/README.md)
 keep loading/startup improvements separate from native request execution.
+
+
+### Matched native host ownership — 2026-10-24
+
+[Warm HTTP experiments](../../benchmarks/execution/native-host-ownership/README.md)
+separate native host ownership from JIT/AOT mode. Explicitly acquiring the existing
+owned arena improves the external-heap JIT development host's throughput 80.7%
+and CPU/response 45.0% in a short paired cohort; matched AOT improves too. The
+optimized worker host already uses this contract, so these gains are not additive.
+Production JIT host defaults remain unchanged pending broader ownership qualification.
+
+Fixed-request allocation/publication counts match across modes, while a remaining
+owned-host JIT/AOT gap persists. Separate profiles identify root/GC/TLS work; long-range
+JIT calls and dynamic helper layout remain hypotheses requiring controlled isolation.
+Lifecycle tests cover admission, faults, re-entry and independent thread owners in
+forced/paced optimized/sanitized configurations. The existing CoreCLR allocation
+context comparison still applies, but neoCLR's exclusive arena forbids cross-thread
+operations; ownership must not be inferred solely from a consumer API.
