@@ -22425,3 +22425,13 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   Thread/AddressSanitizer startup failures reproduce with empty programs on the host
   and remain explicit validation gaps. Live-heap access, reclamation and the wider
   workload matrix remain open. [Evidence](../benchmarks/execution/concurrent-shadow/README.md).
+
+- Assistant extends the snapshot worker into an explicit begin/finish collector:
+  finish preserves initial marks, traces new/changed blocks and current roots, and
+  reclaims on the owner thread. Delayed mutation, reuse, conditional exposure and
+  recovery tests pass. A longer standalone native graph comparison costs
+  3.69× process CPU and 3.21× wall time. Assistant retains this as a correctness
+  reference and rejects full copying/comparison as the default performance path;
+  automatic execution integration and a cheaper protocol remain unfinished.
+  This is an assistant experiment under continuation, not a new author decision.
+  [Evidence](../benchmarks/execution/concurrent-remark/README.md).

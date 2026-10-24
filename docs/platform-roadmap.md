@@ -13,6 +13,10 @@ The first [immutable concurrent shadow tracer](../benchmarks/execution/concurren
 now matches synchronous marks across native fixtures and checked JIT/AOT HTTP.
 It is diagnostic only: live-heap mutation/read safety, concurrent reclamation,
 race-detector qualification and the complete workload matrix remain open.
+An [explicit snapshot/remark candidate](../benchmarks/execution/concurrent-remark/README.md)
+now performs real owner-thread reclamation with background marks, but its native
+workload CPU regression rejects full copying/comparison as the default performance
+architecture. Retain the reference while developing a cheaper read/mutation protocol.
 
 **Author-directed media types (2026-10-23):** Complete the bounded HTTP value-contract
 slice with cached typed presets, lazy structured projections, shared primitive

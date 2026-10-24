@@ -1,0 +1,32 @@
+{
+  "sync": {
+    "wallMilliseconds": [
+      885.356,
+      857.049
+    ],
+    "cpuMilliseconds": [
+      871.441,
+      857.051
+    ],
+    "peakArenaBytes": [
+      233016,
+      233016
+    ]
+  },
+  "concurrent": {
+    "wallMilliseconds": [
+      2805.369,
+      2788.903
+    ],
+    "cpuMilliseconds": [
+      3193.299,
+      3184.006
+    ],
+    "peakArenaBytes": [
+      236600,
+      236600
+    ]
+  },
+  "wallRatio": 3.21066112643157,
+  "cpuRatio": 3.6895195349472254
+}
