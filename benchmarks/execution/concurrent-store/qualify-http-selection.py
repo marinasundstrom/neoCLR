@@ -11,6 +11,7 @@ p.add_argument('--output',type=Path,required=True)
 p.add_argument('--mode',choices=['both','sync','live'],default='both')
 a=p.parse_args();root=Path(__file__).resolve().parents[3];out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
 r={'passed':False,'commands':[],'inputs':{},'scope':'Compilation only; no host execution or HTTP throughput claim.'}
+r['optimizationLevel']=os.environ.get('NEOCLR_TEST_OPT_LEVEL','none')
 try:
  runner=a.runner.resolve()
  for sample,recipe in [('plain','build.json'),('json','json-build.json')]:
@@ -30,7 +31,7 @@ try:
    for item in command[2:]:
     candidate=Path(item)
     if candidate.is_file():r['inputs'][str(candidate)]=hashlib.sha256(candidate.read_bytes()).hexdigest()
- for path in [runner,Path(__file__),root/'runtime/codegen/src/lib.rs',root/'runtime/codegen/src/values.rs',root/'runtime/codegen/src/mutation_store_tests.rs',root/'runtime/codegen/src/mutation_admission.rs']:
+ for path in [runner,Path(__file__),root/'runtime/codegen/src/lib.rs',root/'runtime/codegen/src/compiler.rs',root/'runtime/codegen/src/values.rs',root/'runtime/codegen/src/mutation_store_tests.rs',root/'runtime/codegen/src/mutation_admission.rs']:
   r['inputs'][str(path)]=hashlib.sha256(path.read_bytes()).hexdigest()
  r['passed']=all(c.get('exitCode')==0 and '1 passed' in c['stdout'] for c in r['commands'])
 finally:(out/'results.json').write_text(json.dumps(r,indent=2)+'\n')

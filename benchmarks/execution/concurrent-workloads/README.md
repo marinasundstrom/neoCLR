@@ -129,3 +129,7 @@ to generated functions and preserve stack provenance across single incoming edge
 Both measurement tools accept `--profile-store-sites` for diagnostic-only cohorts;
 `summarize-sites.py` requires exact symbol/selection reconciliation. CPU comparisons
 use ordinary providers, with HTTP `--previous-live-object` interleaving old/new code.
+
+The [generated-code optimization qualification](optimizer-results.md) compares
+Cranelift settings across both collectors, including native correctness fixtures
+and retained standalone/HTTP selections. Production compilation keeps its defaults.

@@ -15,6 +15,7 @@ def run(cmd,env=None):
  cmd=list(map(str,cmd));x=subprocess.run(cmd,capture_output=True,text=True,timeout=90,env=env)
  r['commands'].append(dict(command=cmd,environment=env and {k:v for k,v in env.items() if k.startswith('NEOCLR_MUTATION_')},exitCode=x.returncode,stdout=x.stdout,stderr=x.stderr))
  x.check_returncode()
+r['optimizationLevel']=os.environ.get('NEOCLR_TEST_OPT_LEVEL','none')
 try:
  runner=a.runner.resolve();obj=out/'entry.o'
  run([runner,'mutation_store::tests::managed_public_entry_emits_guarded_transition','--exact'],dict(os.environ,NEOCLR_MUTATION_MANAGED_OBJECT=str(obj)))
@@ -36,6 +37,6 @@ try:
   run(common+flags+['-dynamiclib','-o',host])
   run([runner,'mutation_store::tests::managed_public_entry_runs_on_live_collector','--exact','--ignored','--nocapture'],dict(os.environ,NEOCLR_MUTATION_TEST_HOST=str(host)))
   assert '1 passed' in r['commands'][-1]['stdout']
- r['inputs']={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in [runner,obj,source,consumer,Path(__file__),root/'runtime/codegen/src/values.rs',base/'entry.neoil',base.parent/'concurrent-live/automatic.py',root/'runtime/codegen/src/mutation_admission.rs',root/'runtime/codegen/src/mutation_store_tests.rs',root/'runtime/native/memory/text-arena.c',root/'runtime/native/gc/root-probe.c']}
+ r['inputs']={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in [runner,obj,source,consumer,Path(__file__),root/'runtime/codegen/src/values.rs',root/'runtime/codegen/src/lib.rs',root/'runtime/codegen/src/jit.rs',base/'entry.neoil',base.parent/'concurrent-live/automatic.py',root/'runtime/codegen/src/mutation_admission.rs',root/'runtime/codegen/src/mutation_store_tests.rs',root/'runtime/native/memory/text-arena.c',root/'runtime/native/gc/root-probe.c']}
  r['passed']=True
 finally:(out/'results.json').write_text(json.dumps(r,indent=2)+'\n')

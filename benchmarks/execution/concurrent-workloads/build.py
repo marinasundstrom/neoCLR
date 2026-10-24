@@ -45,6 +45,7 @@ def record(path):
 def run(command,env):
  command=list(map(str,command));x=subprocess.run(command,cwd=root,env=env,capture_output=True,text=True,timeout=300)
  return {'command':command,'exitCode':x.returncode,'stdout':x.stdout,'stderr':x.stderr}
+r['optimizationLevel']=os.environ.get('NEOCLR_TEST_OPT_LEVEL','none')
 try:
  for name,sources,expected in cases:
   directory=out/name;directory.mkdir();copied=[]

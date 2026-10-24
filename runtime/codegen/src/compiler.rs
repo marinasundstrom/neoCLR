@@ -142,7 +142,7 @@ pub(super) fn compile_for_target_with_imports(
         return values::compile(input, root, details, target);
     }
     let target = target.triple().parse().expect("fixed valid target triple");
-    let mut settings = settings::builder();
+    let mut settings = crate::backend_settings();
     settings.set("is_pic", "true")?;
     let isa = isa::lookup(target)?.finish(settings::Flags::new(settings))?;
     let mut module = ObjectModule::new(ObjectBuilder::new(
@@ -245,7 +245,7 @@ pub(super) fn compile_native_library(
     verification.verify().map_err(|error| error.to_string())?;
     let (selected, exports) = select_native_exports(input, exports)?;
     let input = &selected;
-    let mut flags = settings::builder();
+    let mut flags = crate::backend_settings();
     flags.set("is_pic", "true")?;
     let isa = isa::lookup(Target::MacosArm64.triple().parse().unwrap())?
         .finish(settings::Flags::new(flags))?;

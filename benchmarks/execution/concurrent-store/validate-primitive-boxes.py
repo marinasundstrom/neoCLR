@@ -15,6 +15,7 @@ def run(cmd,env=None):
  cmd=list(map(str,cmd));x=subprocess.run(cmd,capture_output=True,text=True,timeout=90,env=env)
  r['commands'].append(dict(command=cmd,environment=env and {k:v for k,v in env.items() if k.startswith('NEOCLR_MUTATION_')},exitCode=x.returncode,stdout=x.stdout,stderr=x.stderr))
  x.check_returncode()
+r['optimizationLevel']=os.environ.get('NEOCLR_TEST_OPT_LEVEL','none')
 try:
  runner=a.runner.resolve();obj=out/'primitive-boxes.o'
  run([runner,'mutation_store::tests::managed_primitive_boxes_emit_guarded_results','--exact'],dict(os.environ,NEOCLR_MUTATION_MANAGED_OBJECT=str(obj)))

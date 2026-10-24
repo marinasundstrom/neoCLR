@@ -46,6 +46,25 @@ use std::{
     path::Path,
 };
 
+// Private process-wide qualification setting. Production builds always retain
+// Cranelift defaults. Run each comparison in a separate test-runner process;
+// changing this environment variable while compiling is unsupported.
+fn backend_settings() -> cranelift_codegen::settings::Builder {
+    #[allow(unused_mut)]
+    let mut flags = cranelift_codegen::settings::builder();
+    #[cfg(test)]
+    if let Some(level) = std::env::var_os("NEOCLR_TEST_OPT_LEVEL") {
+        use cranelift_codegen::settings::Configurable;
+        let level = level.to_str().expect("optimization level must be UTF-8");
+        assert!(
+            matches!(level, "none" | "speed" | "speed_and_size"),
+            "unsupported qualification optimization level: {level}"
+        );
+        flags.set("opt_level", level).expect("known Cranelift setting");
+    }
+    flags
+}
+
 /// Provisional backend hosting entry point shared with the command-line tool.
 ///
 /// Arguments use the existing backend CLI contract, excluding the executable name.

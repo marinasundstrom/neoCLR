@@ -66,7 +66,7 @@ pub(super) fn execute(
         );
     }
     let started = Instant::now();
-    let mut settings = settings::builder();
+    let mut settings = crate::backend_settings();
     settings.set("is_pic", "false")?;
     settings.set("use_colocated_libcalls", "false")?;
     target.configure_stack(&mut settings)?;
@@ -162,7 +162,7 @@ pub(super) fn execute_managed(
     }
     type Host = unsafe extern "C" fn(*const u8, i32, i32, *const *const EntryChar) -> i32;
     let run: libloading::Symbol<Host> = unsafe { library.get(b"neoclr_jit_run_v1") }?;
-    let mut flags = settings::builder();
+    let mut flags = crate::backend_settings();
     flags.set("is_pic", "false")?;
     flags.set("use_colocated_libcalls", "false")?;
     target.configure_stack(&mut flags)?;

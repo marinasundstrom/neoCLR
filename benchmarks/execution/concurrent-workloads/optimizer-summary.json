@@ -1,0 +1,302 @@
+{
+  "optimizationLevel": "speed",
+  "productionDefaultChanged": false,
+  "standalone": {
+    "tasks": {
+      "sync": {
+        "cpuSeconds": 0.015219,
+        "wallSeconds": 0.01533,
+        "allocations": 65548,
+        "allocatedBytes": 2261361,
+        "peakLiveBytes": 497,
+        "peakArenaUsed": 18424,
+        "storeCounts": null
+      },
+      "guarded-sync": {
+        "cpuSeconds": 0.049574,
+        "wallSeconds": 0.049584,
+        "allocations": 65548,
+        "allocatedBytes": 2261361,
+        "peakLiveBytes": 497,
+        "peakArenaUsed": 18424,
+        "storeCounts": [
+          282668,
+          221214,
+          0,
+          0,
+          0
+        ]
+      },
+      "live": {
+        "cpuSeconds": 0.082322,
+        "wallSeconds": 0.082048,
+        "allocations": 65548,
+        "allocatedBytes": 2261361,
+        "peakLiveBytes": 9329,
+        "peakArenaUsed": 53240,
+        "storeCounts": [
+          282668,
+          220318,
+          896,
+          0,
+          0
+        ]
+      }
+    },
+    "collections": {
+      "sync": {
+        "cpuSeconds": 0.089643,
+        "wallSeconds": 0.090892,
+        "allocations": 237580,
+        "allocatedBytes": 7864689,
+        "peakLiveBytes": 1694,
+        "peakArenaUsed": 20328,
+        "storeCounts": null
+      },
+      "guarded-sync": {
+        "cpuSeconds": 0.257219,
+        "wallSeconds": 0.257784,
+        "allocations": 237580,
+        "allocatedBytes": 7864689,
+        "peakLiveBytes": 1694,
+        "peakArenaUsed": 20328,
+        "storeCounts": [
+          2146348,
+          954398,
+          0,
+          0,
+          0
+        ]
+      },
+      "live": {
+        "cpuSeconds": 0.421685,
+        "wallSeconds": 0.420468,
+        "allocations": 237580,
+        "allocatedBytes": 7864689,
+        "peakLiveBytes": 10113,
+        "peakArenaUsed": 55016,
+        "storeCounts": [
+          2146348,
+          943694,
+          10704,
+          0,
+          0
+        ]
+      }
+    },
+    "arrays": {
+      "sync": {
+        "cpuSeconds": 0.050844,
+        "wallSeconds": 0.052132,
+        "allocations": 86028,
+        "allocatedBytes": 1892721,
+        "peakLiveBytes": 593,
+        "peakArenaUsed": 15952,
+        "storeCounts": null
+      },
+      "guarded-sync": {
+        "cpuSeconds": 0.072714,
+        "wallSeconds": 0.073978,
+        "allocations": 86028,
+        "allocatedBytes": 1892721,
+        "peakLiveBytes": 593,
+        "peakArenaUsed": 15952,
+        "storeCounts": [
+          213036,
+          180254,
+          0,
+          0,
+          0
+        ]
+      },
+      "live": {
+        "cpuSeconds": 0.095401,
+        "wallSeconds": 0.095935,
+        "allocations": 86028,
+        "allocatedBytes": 1892721,
+        "peakLiveBytes": 6239,
+        "peakArenaUsed": 45376,
+        "storeCounts": [
+          213036,
+          179798,
+          456,
+          0,
+          0
+        ]
+      }
+    }
+  },
+  "http": {
+    "plain": {
+      "summary": {
+        "sync": {
+          "requestsPerSecond": 4419.552466104186,
+          "requestSeconds": 0.057924417000000616,
+          "processCpuSeconds": 0.055900000000000005,
+          "peakRssBytes": 9273344
+        },
+        "guarded-sync": {
+          "requestsPerSecond": 1601.7368834329784,
+          "requestSeconds": 0.15982649999999943,
+          "processCpuSeconds": 0.170875,
+          "peakRssBytes": 11124736
+        },
+        "live": {
+          "requestsPerSecond": 1560.9871077587036,
+          "requestSeconds": 0.16399879199999923,
+          "processCpuSeconds": 0.19064,
+          "peakRssBytes": 11386880
+        },
+        "live-previous-code": {
+          "requestsPerSecond": 1483.5193889754566,
+          "requestSeconds": 0.17256262499999941,
+          "processCpuSeconds": 0.194572,
+          "peakRssBytes": 11927552
+        },
+        "guarded-sync-previous-code": {
+          "requestsPerSecond": 1537.33825602655,
+          "requestSeconds": 0.16652158299999975,
+          "processCpuSeconds": 0.17615,
+          "peakRssBytes": 11665408
+        }
+      },
+      "allocations": 57120,
+      "allocatedBytes": 4394837,
+      "liveThroughputGain": 0.052218878539058045,
+      "liveCpuReduction": 0.020208457537569613,
+      "outsideStores": {
+        "live": 2710373,
+        "live-previous-code": 2710373
+      }
+    },
+    "json": {
+      "summary": {
+        "sync": {
+          "requestsPerSecond": 2400.0150000937374,
+          "requestSeconds": 0.1066660000000006,
+          "processCpuSeconds": 0.09141200000000001,
+          "peakRssBytes": 10649600
+        },
+        "guarded-sync": {
+          "requestsPerSecond": 995.0193954350005,
+          "requestSeconds": 0.25728141699999973,
+          "processCpuSeconds": 0.267503,
+          "peakRssBytes": 12943360
+        },
+        "live": {
+          "requestsPerSecond": 933.839084044521,
+          "requestSeconds": 0.27413716599999916,
+          "processCpuSeconds": 0.298326,
+          "peakRssBytes": 13221888
+        },
+        "live-previous-code": {
+          "requestsPerSecond": 899.1530487566625,
+          "requestSeconds": 0.2847123749999998,
+          "processCpuSeconds": 0.31045100000000003,
+          "peakRssBytes": 14172160
+        },
+        "guarded-sync-previous-code": {
+          "requestsPerSecond": 955.2688816030958,
+          "requestSeconds": 0.2679873750000006,
+          "processCpuSeconds": 0.279038,
+          "peakRssBytes": 13893632
+        }
+      },
+      "allocations": 124873,
+      "allocatedBytes": 7163755,
+      "liveThroughputGain": 0.03857634174273428,
+      "liveCpuReduction": 0.039056082924519675,
+      "outsideStores": {
+        "live": 4582821,
+        "live-previous-code": 4582821
+      }
+    }
+  },
+  "inputs": {
+    "target/concurrent-workloads/optimizer-entry/results.json": "9cb5ab5be979e6c4ef75b28627de1b9d169d6dd35c7ff102a7ff794e4af281e0",
+    "target/concurrent-workloads/optimizer-record-arrays/results.json": "dd171227c0615a5c94417dc1b9e3091766959c626007f85999cca837db0e8bc1",
+    "target/concurrent-workloads/optimizer-boxes/results.json": "6b0dea7665cf5ff3a9d6507522169b859367729c5bee34f6474df4657798a4ac",
+    "target/concurrent-workloads/optimizer-build/results.json": "9863d17c77dd3eaec3b71ed50a4ab5c960010dc50a624b6e115c83c46ce33346",
+    "target/concurrent-workloads/optimizer-http-build/results.json": "f6874b8dac52ef26db33ced73e56697eea7a13e710d01ee2c1ced74e0c5ba3c6",
+    "target/concurrent-workloads/optimizer-measure/results.json": "edc0538f98a0e56f8d090a460e31500e5d230735d49618e6f96883b40762b843",
+    "target/concurrent-workloads/optimizer-http-plain/results.json": "c6dde1a00ed840f82265c0da2ad421c3e137a195fb6a7755c7ffca60b62ba230",
+    "target/concurrent-workloads/optimizer-http-json/results.json": "e57a7583e264b0bf9e975e9b9db2072d4731f63c9e23e7f6a6ae48751fb79b7c",
+    "target/concurrent-workloads/optimizer-plain-jit/results.json": "83f742505fc6b1133b6b570ce68fd3b027c95de2cfe1ccd406a8ea2d614ce24a",
+    "runtime/codegen/src/native_layout.rs": "29585d74288b0cac5841135d8b021f75500d90382cc176c3dd8507023650852c",
+    "runtime/codegen/src/flow.rs": "fbf104e56b420d46f40b54b38dc94aedcc4c7a2b7c1eea508e08b42766f18812",
+    "runtime/codegen/src/object_upcasts.rs": "b42566c17872142aeb24cf39ca9be4ebd7a1bab15c966c936075bc195f2c4d29",
+    "runtime/codegen/src/native_exports.rs": "2df8a0b222678aeb29da65323c309ba8dec51c7e3cb26a0f9708f8108f7094f8",
+    "runtime/codegen/src/string_projection.rs": "70ece472ac10f15757df9581ca61b6309bc69a71be84c2935cdbe302134295e7",
+    "runtime/codegen/src/scalar_abi.rs": "86e4d45a9628b61dfa7d8613685c90aa7a6c12804400a1c86d788cb4db06ef87",
+    "runtime/codegen/src/boxing.rs": "256f9a7f782f3e24f2210b0494571859a9211322e6461b7392d32e223ce4aa09",
+    "runtime/codegen/src/reflection_arrays.rs": "117b9e7f65e1c1473057645f0a091589a3642104d8ea037b88aab915f21ab7e2",
+    "runtime/codegen/src/gc_layout.rs": "0a62829cf9825beb2d5327e13b6b18848e1c08bb8f882aa5d532582f0acbbfd1",
+    "runtime/codegen/src/reflection_fields.rs": "ac22de8fe4ce6aafca7f894aef9e24944b426ae4588b2efa16783cbdc01b2c12",
+    "runtime/codegen/src/fault_details.rs": "7c812943cc549ef0dd93d228baffb0cc677602d6aa7067e56d04326b137f4293",
+    "runtime/codegen/src/runtime_context.rs": "0710e3130b49d2051528470acac1d43eb78aa8f8fe48bce8a8f19d0209b95236",
+    "runtime/codegen/src/compiler.rs": "8d011f54683b23f348efc7221d150607199080440ae0d2e0ba7833002992bc4a",
+    "runtime/codegen/src/gc_probe.rs": "1761ebae03291c62ee5d04931f3bd1d7b2c75d90ec1019104e5fc8aa83ea81a4",
+    "runtime/codegen/src/values.rs": "ca1b48ae72db5fa419702c62299c970e0fdbc8af41dfc35570a5ef685c31316c",
+    "runtime/codegen/src/enum_display.rs": "8c1ebd7e5565651a2e8ac67f4b155640ae1e29ebaf7288a4a4e690fe80b5a9e2",
+    "runtime/codegen/src/reflection_constructors.rs": "ce76939981460b0c8298c9212516ae47b0bdb6cc7abda6b953d31101152560b4",
+    "runtime/codegen/src/lib.rs": "4f3e690566bf73dc37688b6e870ed7d6e2e589381b6387151049b93c2bdbbb9e",
+    "runtime/codegen/src/native_raven.rs": "08195116222a15ef096f4fc27e2e94b41fd19194948bc880f05210195d052ca9",
+    "runtime/codegen/src/limits.rs": "c4d47dd6d0333e775dccdc7ac7cb7c1cfa99b7bb1a1e3b2cd6a0083ec4be72d6",
+    "runtime/codegen/src/jit.rs": "33a3dcb9dbfaf2bb575679fc3ef0fb9b130b589a5aef0edac17af6914f533269",
+    "runtime/codegen/src/specialization.rs": "fd713977e4ae68f8ef50e2c070da9e3603636aab21c5f0bf099412ee836c6c6e",
+    "runtime/codegen/src/reflection_collections.rs": "ea49be5d150dc7ea428a3e134edc14ad27e6d9c0e3d6b4f51e4ce6d8bd10616d",
+    "runtime/codegen/src/gc_points.rs": "d9a1e50ffe56656f66b0a88ba541480fad9402e8acff8107ab57152b7becdffb",
+    "runtime/codegen/src/value_profile.rs": "4787edb4a8f5943a1ae937081153360de1f070acb0df252e4dce359975a8e8b7",
+    "runtime/codegen/src/mutation_store_tests.rs": "1cb975cd4c6d21f3c7a06c4e2ef3d9a790054accf18bc96d9e6b21f7a2e76afe",
+    "runtime/codegen/src/native_imports.rs": "7bdf2d9486815149906868e4a38c075585a7be5e90d640071ba2985fabc0ccbf",
+    "runtime/codegen/src/scalar_unions.rs": "915b09aa88314db03729c1235f24b43b4689f09a52cba2bdec15bb5ec91c0b1f",
+    "runtime/codegen/src/enum_queries.rs": "1c72f67459ec8b260a0a2ad5382fdf2b47a3f48cfa5f8cecef62963092f1b39b",
+    "runtime/codegen/src/load_context.rs": "0956b066a4b1db6aee1e2d1dcceee1e4f48c4d2ad2a29c8ca4ffe5ba79b50435",
+    "runtime/codegen/src/reflection_metadata.rs": "a35c2e85f726ca9bd4539824b5067e91efef44e9fd86c1be3cd279297747a8bf",
+    "runtime/codegen/src/selection.rs": "b668688a1658e8ceb6a68a2d7431d2c259325faa9423967d1f245d9011ade089",
+    "runtime/codegen/src/mutation_store.rs": "8746e56ca8303685d8c4dfa83d3ca44ddb60a028459a0b0320e8de4276c60284",
+    "runtime/codegen/src/main.rs": "5703aed11af63d5297f28faa7ec99ed5bf08659bcf3c63fed23aff1d6e8ac140",
+    "runtime/codegen/src/frame_cleanup.rs": "328b279f76dfcb57c165d4cfbb5dd3b5c4bacd58f27ade6d24da9735bc1b33e7",
+    "runtime/codegen/src/linking.rs": "a01116af60d5b497a2c075cf8a0eeae97cef3b0b9a4c414d52cb591cdb0a67a1",
+    "runtime/codegen/src/checked_conversion.rs": "7ce5335ec28e683a22cdb0c1f242bedad534fe9a23bcda82cb03ffc25e7dc795",
+    "runtime/codegen/src/mutation_admission.rs": "97de909026921a1cdaea6efaf93af01ba7e74da159de7317eb4e7802ab42ff39",
+    "runtime/codegen/src/bindings.rs": "461fe5ce251c7b1d0cc8720691d71b4853c7cce0f5e2dcfda1a9dfcca2b83b2a",
+    "runtime/codegen/src/reflection_construction.rs": "3526f19f1ae317f9e423f0464ef28379d5d3e6ee998f3de40f053eb9c0cea2e2",
+    "runtime/codegen/src/function_invocation.rs": "cacfeab35a2dbc83e34fc6cd6c6df5761f3245c1bc021e8a845a3d17be5f2e43",
+    "runtime/codegen/src/reflection_properties.rs": "ce4f382d3c68a5fae63336db4cda24ea799f37757be162846324a104583a67ed",
+    "runtime/codegen/src/inspection.rs": "1c3fefe4820f279bc1ebbe613543cf2cdd3b1295b87a2d55dd84a03d605fbd9a",
+    "runtime/codegen/src/memory_views.rs": "ec4ac0c611efcf95c6e9a90de9c771034f78c3f6695eae87f593561b2a996e96",
+    "runtime/codegen/src/reflection_snapshots.rs": "4bc5df1748937fc65a9377e59bcec5110a820d501a513585acdecd3c960e6804",
+    "runtime/codegen/src/type_initialization.rs": "808837655afa7f5a05b44a7cb79c1b38f3f57311f1d5700405e4d55a4b6e1d09",
+    "runtime/codegen/src/class_dispatch.rs": "6cf7cc9892bfa24404f06412aae543dbf01a20af084c80a7b03f47e9ab5a31aa",
+    "target/concurrent-workloads/optimizer-json-jit/results.json": "0fcc6d12f609449eeb71ac71d3e7176de81d5d22af84e00e2ec1fd8985050ed4"
+  },
+  "scope": "macOS ARM64 owned heap; sequential HTTP, not saturated capacity; compilation excluded",
+  "defaultObjectUnchanged": true,
+  "jit": {
+    "plain": {
+      "passed": true,
+      "requests": 128,
+      "candidateCounts": [
+        135,
+        134,
+        1,
+        133,
+        134,
+        0
+      ]
+    },
+    "json": {
+      "passed": true,
+      "requests": 128,
+      "candidateCounts": [
+        135,
+        134,
+        1,
+        5,
+        134,
+        0
+      ]
+    }
+  }
+}

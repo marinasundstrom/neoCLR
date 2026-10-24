@@ -434,7 +434,7 @@ pub(super) fn compile(
     details: Option<&crate::fault_details::Options>,
     platform_target: super::Target,
 ) -> Result<Vec<u8>, Error> {
-    let mut flags = settings::builder();
+    let mut flags = crate::backend_settings();
     flags.set("is_pic", "true")?;
     platform_target.configure_stack(&mut flags)?;
     let isa = isa::lookup(platform_target.triple().parse().unwrap())?
@@ -6140,7 +6140,7 @@ mod windows_frame_tests {
     #[test]
     fn windows_final_frame_limit_includes_machine_linkage_and_call_space() {
         for (size, accepted) in [(64000, true), (65536, false)] {
-            let mut flags = settings::builder();
+            let mut flags = crate::backend_settings();
             flags.set("enable_probestack", "true").unwrap();
             flags.set("probestack_strategy", "inline").unwrap();
             let isa = isa::lookup("x86_64-pc-windows-msvc".parse().unwrap())
@@ -6235,7 +6235,7 @@ mod structural_jit_tests {
             for source in [structural, nominal] {
                 let input = neoclr::assemble(source).unwrap();
                 let started = Instant::now();
-                let mut flags = settings::builder();
+                let mut flags = crate::backend_settings();
                 flags.set("is_pic", "false").unwrap();
                 flags.set("use_colocated_libcalls", "false").unwrap();
                 let target = super::super::Target::MacosArm64;

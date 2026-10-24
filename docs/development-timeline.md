@@ -22708,3 +22708,12 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   corrects any inference that high call counts alone establish CPU dominance.
   Generated-code optimization settings, broader helper coverage, outer pauses and
   worker scaling remain open. See [analysis and evidence](../benchmarks/execution/concurrent-workloads/transfer-results.md).
+
+- **Generated-code follow-through (same date):** The assistant tested Cranelift
+  `speed` for both collectors and JIT/AOT instead of attributing all execution cost
+  to GC. Correctness fixtures and matched HTTP/ordinary workloads pass, with unchanged
+  allocations and modest live HTTP throughput/CPU gains. Guarded synchronous overhead
+  remains substantial, so the native store adapter is the next concrete profiling
+  target. Record compilation cost separately and retain production defaults; this
+  is evidence within the author's optimization direction, not a new default decision.
+  See [qualification and measurements](../benchmarks/execution/concurrent-workloads/optimizer-results.md).

@@ -868,7 +868,7 @@ pub fn bind(
             ));
         } else if declaring {
             let Type::Constructed { arguments, .. } = &expected else {
-                return Err("TypeDeclaringType requires scoped Option<TypeInfo>".into());
+                return Err("TypeDeclaringType requires scoped Optional<TypeInfo>".into());
             };
             if !matches!(
                 name(source, &expected),
@@ -876,7 +876,7 @@ pub fn bind(
             ) || arguments.len() != 1
                 || name(source, &arguments[0]) != Some("System.Introspection.TypeInfo")
             {
-                return Err("TypeDeclaringType requires scoped Option<TypeInfo>".into());
+                return Err("TypeDeclaringType requires scoped Optional<TypeInfo>".into());
             }
             for row in retention["types"].as_array().unwrap() {
                 let id: TypeDefId = serde_json::from_value(row["definition"].clone())?;
@@ -912,7 +912,7 @@ pub fn bind(
             ));
         } else if base_type {
             let Type::Constructed { arguments, .. } = &expected else {
-                return Err("TypeBaseType requires scoped Option<TypeInfo>".into());
+                return Err("TypeBaseType requires scoped Optional<TypeInfo>".into());
             };
             if !matches!(
                 name(source, &expected),
@@ -920,7 +920,7 @@ pub fn bind(
             ) || arguments.len() != 1
                 || name(source, &arguments[0]) != Some("System.Introspection.TypeInfo")
             {
-                return Err("TypeBaseType requires scoped Option<TypeInfo>".into());
+                return Err("TypeBaseType requires scoped Optional<TypeInfo>".into());
             }
             for t in &base_tokens {
                 let branch = factory.body.len() + 3;

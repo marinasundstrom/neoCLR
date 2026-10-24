@@ -14,7 +14,7 @@ fn target() -> &'static str {
     }
 }
 fn isa(triple: &str, pic: bool) -> std::sync::Arc<dyn isa::TargetIsa> {
-    let mut flags = settings::builder();
+    let mut flags = crate::backend_settings();
     flags
         .set("is_pic", if pic { "true" } else { "false" })
         .unwrap();

@@ -25,6 +25,7 @@ def run(cmd):
  x=subprocess.run(list(map(str,cmd)),cwd=root,capture_output=True,text=True,timeout=120)
  r['commands'].append({'command':list(map(str,cmd)),'exitCode':x.returncode,'stdout':x.stdout,'stderr':x.stderr})
  x.check_returncode()
+r['optimizationLevel']=os.environ.get('NEOCLR_TEST_OPT_LEVEL','none')
 try:
  recipe_path=root/'target/native-host-ownership/results.json'
  previous=json.loads(recipe_path.read_text())
