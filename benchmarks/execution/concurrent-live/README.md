@@ -127,3 +127,51 @@ A [private scalar-store adapter](store-boundary.md) now handles narrow/interior
 writes and cancels an overflowing epoch without collecting unpublished temporaries.
 Native tests verify bounds, construction and deferred cleanup. It is not yet emitted
 by the compiler; complete writer admission and JIT/AOT consumers remain next.
+
+
+## Automatic owned-heap scheduling qualification
+
+`automatic.py` derives a separate scheduled live candidate from `generate.py`.
+It reuses the snapshot integration's policy: allocation/publication budgets alternate
+capture and completion; idle collects synchronously before capturing survivors.
+Explicit/pressure collections finish outstanding work and recheck synchronously,
+so new floating garbage cannot defeat the existing one-retry allocation contract.
+Foreign-context collection, intern retirement and heap release cancel/join detached
+work before changing the owning heap's lifetime. Scalar-store overflow cancellation
+also contributes to scheduling cancellation counts. This prototype requires profiling
+and rejects shared-worker builds. Production source/defaults are unchanged.
+
+The policy is provisional, with the existing 256-allocation/4096-publication budgets.
+It retains idle cleanup semantics and can perform extra synchronous scans. Capture
+still copies compact allocation headers and roots, and each epoch still allocates
+native bookkeeping. Scheduling alone does not demonstrate a throughput benefit.
+The current roots and barrier protocol remain those of the explicit live candidate;
+this does not admit arbitrary native writers or HTTP hosts.
+
+Reproduce with a current codegen test runner:
+
+```sh
+python3 benchmarks/execution/concurrent-live/validate-automatic.py \
+  --runner target/concurrent-store/test-runner-managed-final \
+  --output target/concurrent-live/automatic-qualified-new
+```
+
+The harness checks pressure recovery, idle resource cleanup, foreign contexts,
+intern retirement and release; both allocation and publication budgets start/finish
+live epochs. Optimized/UBSan builds each run 100 guarded graph-mutation cycles and
+existing native collection/root-seeding fixtures. It also reuses the archived managed
+AOT object and current JIT fixture against the scheduled host, replacing explicit
+begin with the normal idle boundary in the native driver. Optimized/UBSan AOT and
+JIT each run 100 managed cycles, retaining the exact two guarded-write checks and
+fault/root restoration assertions. Managed constructors and the full entry wrapper
+remain outside this fixture's scope.
+
+`automatic-validation.json.gz` contains commands/results and input hashes;
+`automatic-native-gc.c.gz` preserves generated source. The initial managed link
+omitted `NEOCLR_SHADOW_TEST`, leaving the fixture's marker-gate symbol unresolved;
+`automatic-initial-link-failure.json.gz` retains it. Correcting the test build flags
+resolved the link without changing runtime behavior. No timing measurements were
+made. Next qualify native allocation/service writers and the full host entry before
+running ordinary standalone and HTTP comparisons. The existing CLR/Go barrier and
+collector research remains applicable; this is reuse of an experimental scheduling
+policy, not a semantic divergence or performance claim.

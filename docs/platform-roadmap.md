@@ -76,7 +76,9 @@ JIT/AOT root-chain restoration on success and rejected writes using shared produ
 return cleanup. An internal opt-in now integrates lowering and call-closure checking
 into the ordinary value compiler. Nested reference writes, fault cleanup and managed
 collection boundaries pass forced/paced JIT and optimized/UBSan AOT consumers.
-Native services, automatic epoch scheduling and full host-entry integration remain next.
+A separate scheduled live host now qualifies allocation/publication epoch toggles,
+pressure rechecks, idle cleanup and quiescence before retirement/release, including
+managed JIT/AOT consumers. Native services and full host-entry integration remain next.
 The isolated consumers now check call closure against supplied bodies/explicit provider
 ABIs and validate their complete AOT import set. This does not establish provider
 implementation safety. A versioned native query now rejects missing/incompatible
