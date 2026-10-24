@@ -1,0 +1,16 @@
+{
+  "plain": {
+    "admitted": true,
+    "objects": 99,
+    "payloadLanes": 1059,
+    "traceSlots": 324,
+    "inspectionSha256": "dbdcea743ccb54d20a1c45aeede1949612d2af752c3bd2089bb85116024755a2"
+  },
+  "json": {
+    "admitted": true,
+    "objects": 152,
+    "payloadLanes": 1263,
+    "traceSlots": 389,
+    "inspectionSha256": "bdb064174691d49a35d8ac627599b347e8a81049b06ec18079067ee470309f1f"
+  }
+}

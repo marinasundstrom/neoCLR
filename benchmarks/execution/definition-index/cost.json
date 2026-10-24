@@ -1,0 +1,26 @@
+[
+  {
+    "trial": 0,
+    "linearSeconds": 0.258061417,
+    "preparationSeconds": 0.002871042,
+    "indexedSeconds": 0.000659875
+  },
+  {
+    "trial": 1,
+    "linearSeconds": 0.244750916,
+    "preparationSeconds": 0.002524042,
+    "indexedSeconds": 0.000666
+  },
+  {
+    "trial": 2,
+    "linearSeconds": 0.244702875,
+    "preparationSeconds": 0.002803167,
+    "indexedSeconds": 0.000692166
+  },
+  {
+    "trial": 3,
+    "linearSeconds": 0.244483125,
+    "preparationSeconds": 0.002481792,
+    "indexedSeconds": 0.000784291
+  }
+]

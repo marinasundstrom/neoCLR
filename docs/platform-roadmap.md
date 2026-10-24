@@ -6679,3 +6679,15 @@ larger temporary index is rejected because its throughput result is mixed.
 threaded enabled/disabled diagnostics, optimized/sanitized collector/lifecycle
 cases, forced/paced HTTP and ordinary consumers. Precise object reference layouts,
 cold metadata and compaction remain separate work; interpreter heap policy is unchanged.
+
+### Scoped definition identity lookup — 2026-10-24
+
+Following the author's partitioned-ID and .NET token questions, exact native type
+definition lookup now lazily indexes module/revision/definition identities inside
+existing immutable scopes. Original tokens, linked ordering and unscoped semantics
+are unchanged. Thirty-two focused tests pass; an isolated repeated-lookup experiment
+shows warm lookup savings with explicit preparation/memory costs. This is not a
+native HTTP throughput claim. [Evidence and source-token distinctions](../benchmarks/execution/definition-index/README.md).
+Ordinary-object recipe inventories identify existing compiler tracing information,
+but GC integration still requires distinguishing static/special allocations and
+owning immutable descriptor lifetimes. Raw-token resolution is a separate API gap.

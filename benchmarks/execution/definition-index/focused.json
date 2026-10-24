@@ -1,0 +1,40 @@
+{
+  "passed": true,
+  "runs": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "--lib",
+        "runtime_lookup"
+      ],
+      "exitCode": 0,
+      "stdout": "\nrunning 5 tests\ntest runtime_lookup::tests::mutations_between_scopes_and_duplicate_candidates_keep_linear_semantics ... ok\ntest runtime_lookup::tests::type_arity_missing_types_and_threads_match_uncached_lookup ... ok\ntest runtime_lookup::tests::definition_index_is_lazy_and_does_not_build_owner_candidates ... ok\ntest runtime_lookup::tests::scopes_restore_after_nested_modules_and_unwinding ... ok\ntest runtime_lookup::tests::owner_index_is_lazy_ordered_and_rebuilt_after_mutation ... ok\n\ntest result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 378 filtered out; finished in 0.07s\n\n",
+      "stderr": "    Finished `release` profile [optimized] target(s) in 3.63s\n     Running unittests src/lib.rs (target/release/deps/neoclr-bb9861456b4daa69)\n"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "--test",
+        "reflection",
+        "--test",
+        "reflection_hierarchy",
+        "--test",
+        "reflection_construction"
+      ],
+      "environment": {
+        "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "DEVELOPER_DIR": "/Applications/Xcode.app/Contents/Developer"
+      },
+      "exitCode": 0,
+      "output": "   Compiling neoclr v0.1.0-preview.13 (/Users/robert/Projects/neoclr)\n    Finished `release` profile [optimized] target(s) in 12.00s\n     Running tests/reflection.rs (target/release/deps/reflection-b068dd59224a8062)\n\nrunning 11 tests\ntest indexed_properties_report_explicit_parameters_and_static_accessors ... ok\ntest methods_distinguish_overloads_receivers_and_output_contracts ... ok\ntest library_generic_interfaces_and_conditional_outputs_are_inspectable ... ok\ntest returned_arrays_copy_and_survive_heap_collection_without_recursive_snapshots ... ok\ntest source_example_and_artifact_round_trip_use_metadata_only ... ok\ntest transitive_private_signature_metadata_does_not_grant_call_access ... ok\ntest invalid_flags_and_descriptor_array_budgets_fault ... ok\ntest properties_report_accessors_without_executing_them ... ok\ntest fields_preserve_closed_reference_types_and_filter_visibility ... ok\ntest shape_queries_and_element_options_preserve_address_modes ... ok\ntest structural_functions_expose_their_synthesized_invoke ... ok\n\ntest result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.95s\n\n     Running tests/reflection_construction.rs (target/release/deps/reflection_construction-462ee4a17ae8d5c2)\n\nrunning 8 tests\ntest host_boundary_does_not_expose_the_private_type_handle_service ... ok\ntest binding_requires_exact_signature ... ok\ntest reachability_reports_dynamic_execution_and_allocation_services ... ok\ntest construction_retains_receiver_during_collection ... ok\ntest executes_real_constructor_and_round_trips_artifact ... ok\ntest constructor_faults_and_frame_limits_are_not_hidden ... ok\ntest imported_construction_requires_explicit_public_source_access ... ok\ntest rejects_unsupported_types_and_nonpublic_or_absent_constructors ... ok\n\ntest result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.62s\n\n     Running tests/reflection_hierarchy.rs (target/release/deps/reflection_hierarchy-eb91c7d7df755dbb)\n\nrunning 6 tests\ntest base_value_slicing_and_abstract_instantiation_remain_rejected ... ok\ntest inherited_properties_are_accessible_but_queries_remain_declared_only ... ok\ntest reference_collection_retains_complete_owners_after_factory_frames_end ... ok\ntest source_base_views_and_heterogeneous_heap_list_roundtrip ... ok\ntest temporary_receiver_evaluates_once_and_explicit_method_lookup_uses_base ... ok\ntest internal_descriptor_constructor_matches_trusted_snapshot_factory ... ok\n\ntest result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s\n\n"
+    }
+  ],
+  "inputs": {
+    "src/runtime_lookup.rs": "2fcc001cc1c0c3a2ecc40e9c249873126010168ed6da6120f67a53687d5eed9f",
+    "src/metadata_tokens.rs": "20e6390c08f48582e190af4fc6b5b3b8cdab0da31b74649ed999d657f206b9bf"
+  }
+}

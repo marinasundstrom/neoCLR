@@ -14,6 +14,7 @@ struct Index {
     types: HashMap<String, Rc<[usize]>>,
     functions: HashMap<String, Rc<[usize]>>,
     owners: OnceCell<HashMap<usize, Rc<[usize]>>>,
+    definitions: OnceCell<HashMap<crate::metadata::TypeDefId, usize>>,
 }
 
 thread_local! {
@@ -46,6 +47,7 @@ pub(crate) fn with_module<R>(module: &Module, operation: impl FnOnce() -> R) -> 
     let index = Rc::new(Index {
         module: address,
         owners: OnceCell::new(),
+        definitions: OnceCell::new(),
         types: grouped(
             module
                 .types
@@ -91,6 +93,32 @@ pub(crate) fn types(module: &Module, name: &str) -> Option<Rc<[usize]>> {
 
 pub(crate) fn functions(module: &Module, name: &str) -> Option<Rc<[usize]>> {
     candidates(module, name, false)
+}
+
+/// Exact source definition identity, including module revision. The outer None
+/// means no matching immutable scope; Some(None) means the identity is absent.
+/// Keep the first row for duplicate identities, matching the linear fallback.
+pub(crate) fn definition_row(
+    module: &Module,
+    identity: &crate::metadata::TypeDefId,
+) -> Option<Option<usize>> {
+    ACTIVE.with(|active| {
+        let active = active.borrow();
+        let index = active.as_ref()?;
+        if index.module != module as *const Module as usize {
+            return None;
+        }
+        let definitions = index.definitions.get_or_init(|| {
+            let mut rows = HashMap::new();
+            for (row, definition) in module.types.iter().enumerate() {
+                if let Some(identity) = &definition.definition {
+                    rows.entry(identity.clone()).or_insert(row);
+                }
+            }
+            rows
+        });
+        Some(definitions.get(identity).copied())
+    })
 }
 
 /// Narrow methods by resolved owner, preserving module order and exact type lookup
@@ -160,6 +188,37 @@ mod tests {
             ".module Example\n.function Main() -> Int32\nldc.i4 {value}\nret\n.end\n.entry Main\n"
         ))
         .unwrap()
+    }
+
+    #[test]
+    fn definition_index_is_lazy_and_does_not_build_owner_candidates() {
+        let module = module(0);
+        let identity = crate::metadata::TypeDefId {
+            module: "absent".into(),
+            revision: None,
+            index: 0,
+        };
+        with_module(&module, || {
+            ACTIVE.with(|active| {
+                assert!(
+                    active
+                        .borrow()
+                        .as_ref()
+                        .unwrap()
+                        .definitions
+                        .get()
+                        .is_none()
+                )
+            });
+            assert_eq!(definition_row(&module, &identity), Some(None));
+            ACTIVE.with(|active| {
+                let active = active.borrow();
+                let index = active.as_ref().unwrap();
+                assert!(index.definitions.get().is_some());
+                assert!(index.owners.get().is_none());
+            });
+        });
+        assert_eq!(definition_row(&module, &identity), None);
     }
 
     #[test]

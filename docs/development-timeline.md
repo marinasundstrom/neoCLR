@@ -22288,3 +22288,23 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   thread/lifetime, sanitizer and forced/paced consumer checks pass. Precise tracing
   maps and compaction remain open, not implicitly approved implementations.
   [Implemented slice and retained experiments](../benchmarks/execution/lookup-profile/README.md).
+
+### 2026-10-24 — Partitioned IDs and .NET metadata tokens
+
+- Author suggests IDs might indicate partitions to make lookup fast, while expressing
+  uncertainty, then asks whether neoCLR metadata tokens are consistent with .NET
+  and usable for lookup.
+- Assistant checks the implementation and primary .NET documentation: exposed
+  definition tokens retain CLI table/row shape and imported origins, but need module
+  scope. Original source tokens, native definition identities and specialized-image
+  ordinals must remain distinct; this does not establish complete CLI token support.
+- Assistant implements a lazy exact TypeDefId-to-row index within existing immutable
+  lookup scopes, preserving module/revision identity and linear fallback semantics.
+  Thirty-two focused tests pass. An isolated repeated-query experiment shows a large
+  warm lookup reduction, with preparation and copied-key memory costs explicitly
+  retained. No HTTP throughput gain is inferred. [Evidence](../benchmarks/execution/definition-index/README.md).
+- The concurrent tracing inventory finds existing typed object recipes, but also
+  finds shared ordinary/static/special allocation kinds that prevent a safe blind
+  type-number-to-GC-map lookup. Producer classification and descriptor lifetime
+  remain open implementation work; the author's exploratory suggestion is not
+  recorded as approval of a particular new ID encoding.

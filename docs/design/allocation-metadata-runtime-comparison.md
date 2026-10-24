@@ -623,3 +623,30 @@ Uninstrumented throughput differences are below 1%, so no speedup is established
 The counters confirm that ordinary-object candidate scanning remains substantial;
 precise shared reference layouts and cold-metadata separation remain the next design
 work, with the .NET comparison and producer/relocation obligations described above.
+
+### Module identities, source tokens and lazy definition lookup — 2026-10-24
+
+The author suggests partition-bearing IDs and asks whether neoCLR metadata tokens
+are consistent with .NET and usable for lookup. The existing exposed definition
+tokens use CLI-shaped table/row encodings, preserving original imported tokens.
+The token is scoped by its source module; generic resolution can require context.
+It must not be confused with a specialized native image's ordinal or a heap identity.
+[Primary sources, implementation distinctions and evidence](../../benchmarks/execution/definition-index/README.md).
+
+The implemented follow-up indexes complete native `TypeDefId` values (module,
+revision, definition index) within existing immutable lookup scopes. This maps
+source definition identities to the current module's rows without rescanning all
+types. It preserves first-row/missing results and structural handling; unscoped
+calls retain linear behavior. The lazy map clones keys and costs preparation/memory
+on first use, but does not load additional assemblies or reflection data. Scope
+exit, nested restoration and mutation-between-scopes prevent stale retained rows.
+Thirty-two focused tests pass. The synthetic repeated-last-row experiment benefits
+strongly after preparation; no general execution or HTTP speedup is established.
+
+The accompanying compiler inspection admits both plaintext/JSON images and records
+99/152 ordinary-object recipes with 1,059/1,263 payload lanes and 324/389 trace slots.
+These unweighted inventories are not dynamic savings estimates. Shared ordinary,
+static and special-carrier allocation kinds currently prevent blindly indexing a
+GC map from the leading word. Future compact descriptors need explicit producer
+classification and image/arena lifetime ownership, with conservative fallback for
+unsupported shapes. That collector integration remains unimplemented.
