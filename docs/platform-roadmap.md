@@ -139,7 +139,12 @@ fixture, so network delivery, host-I/O entry and full HTTP qualification remain 
 including 450 loopback accepts through generated callbacks/pumping and result
 consumption. Preserve the initial unconsumed-result timeout; no scheduler fix was
 needed. Payload exchange, host-I/O/bootstrap and full HTTP performance remain open
-([network evidence](../benchmarks/execution/concurrent-store/README.md#real-scheduler-and-loopback-accept-delivery-2026-10-24)).
+([network evidence](../benchmarks/execution/concurrent-store/README.md#real-scheduler-and-loopback-accept-delivery-2026-10-24)). A retained whole-server object audit now identifies
+13 unadmitted native imports for plaintext and 14 for JSON (additional ordinal
+comparison), plus plaintext's explicitly required host-I/O entry flag. Prioritize
+queue/timer services, text/allocation boundaries and the retained TLS path, then
+whole-selection live compilation; this inventory is not execution qualification
+([dependency audit](../benchmarks/execution/concurrent-store/README.md#whole-server-dependency-audit-2026-10-24)).
 Capability conversions, callable arrays, remaining text/byte services and async/full
 host-entry integration remain next;
 the recorded plaintext import inventory guides that coverage.

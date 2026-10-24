@@ -1030,3 +1030,63 @@ exercise the full System library selection, or measure server throughput. Host-I
 entry/bootstrap, remaining providers and full HTTP qualification remain open. Existing
 CLR ownership/suspension comparison and temporary CLI/native representation apply;
 ordinary code generation and native behavior are unchanged. No default-switch claim.
+
+
+## Whole-server dependency audit (2026-10-24)
+
+`audit-http-dependencies.py --output <fresh-directory>` compares the retained,
+previously measured plain/JSON AOT objects under target/state-integration/final-objects
+against current live-provider names and known compiler substitutions. It records
+object/source hashes, nm commands and selected native binding identities where
+available. This is an audit of that benchmark cohort, not a fresh full-server live
+compilation, execution proof, or statement about today's rebuilt System libraries.
+The plaintext selection report is available (1,131 selected functions); the JSON
+selection report is unavailable at the expected path and is explicitly recorded
+as null. Its actual object imports are still inspected.
+
+| Import classification | Plain | JSON |
+| --- | ---: | ---: |
+| Exact name in current live provider set | 44 | 44 |
+| Replaced by an admitted live provider | 3 | 3 |
+| Unused legacy pump import omitted in live mode | 4 | 4 |
+| Still unadmitted | 13 | 14 |
+| Total retained-object imports | 64 | 65 |
+
+Name membership is only navigation evidence: whole-body validation, precise ABI,
+writer safety and lifetime tests remain separate obligations. The substitutions are
+static storage, scoped string slicing and entry reset. The omitted imports belong
+to legacy entry pumping; these objects also import the async pump.
+
+Remaining groups and next integration work:
+
+- TaskQueue Register/Default/Current and Timer Start/Cancel: qualify generated
+  publication through the existing strong-root/native ownership contracts. Host
+  queue reading, queue dispatch and generated async pumping are already qualified.
+- Int32/Int64 formatting, UTF-8 encode/decode, String.Intern and Console.WriteLine:
+  qualify native result publication and allocation/retirement. Reuse scoped native
+  fallback where its audited contract applies; measure cancellation costs later.
+- Reserved record arrays: qualify allocation/initialization with generated element
+  stores; the existing ordinary record-array evidence does not establish reservation.
+- TLS: the plaintext selection retains CreateSession/Release/Abort/Pump. Do not
+  remove these merely because the measured endpoint is plaintext; investigate the
+  selected graph and either qualify the required path or prove safe specialization.
+- JSON additionally needs ordinal string comparison; its other missing imports
+  match plaintext's set.
+
+The plaintext selection's DrainEntryTasks binding at compiled index 38 explicitly
+requires host I/O. Current live admission rejects that flag. Even after provider
+coverage, host-I/O entry must be integrated and exercised with real delivery. The
+same audit does not qualify capability conversions, callable arrays, all selected
+managed bodies, process arguments, bootstrap or shared heaps. Whole-program live
+compilation must expose those remaining failures rather than assuming import
+membership is sufficient.
+
+Proceed by closing the grouped provider/host-entry dependencies, then compile and
+run the full plaintext selection before expanding isolated fixtures further. Keep
+JSON alongside it to detect additional dependencies. Only after full correctness
+qualification should matched synchronous/live HTTP and standalone runs measure
+throughput, CPU, pause distributions and memory. No new performance result or
+change to the default criteria follows from this inventory.
+
+Evidence: `http-dependencies.json.gz`. The existing CLR rooted-provider and native
+transition research applies; this audit introduces no API or semantic divergence.
