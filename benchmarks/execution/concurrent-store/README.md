@@ -544,3 +544,46 @@ missing native-header include-path failures are retained separately in
 `text-comparisons-setup-failures.json.gz`. No new throughput measurement was taken.
 Mutable byte views, remaining allocation/text services, async/socket providers and
 full HTTP entry still require qualification before a default comparison.
+
+
+## Byte-buffer native boundary
+
+The live scanner's `shadow_scan` reads no BYTES/TEXT payload. Byte views validate the
+managed allocation base and require `NEOCLR_GC_BYTES` before mutable access; array
+headers and allocation kinds stay fixed. Byte contents and reserved initialization
+bytes therefore do not need a marker mutation barrier. This conclusion concerns
+collector concurrency on an owned heap, not concurrent application writers or shared
+heaps. View descriptors contain owner references and remain subject to normal root
+publication and guarded managed writes. Outputs from the C helpers must remain
+compiler/host scratch; admitting arbitrary native result aliases would be unsafe.
+
+This follows the pointer-free-array distinction in the existing
+[CLR/Go GC comparison](../concurrent-mutation-audit/README.md#alternatives-and-research).
+neoCLR currently proves the exemption through a checked coarse allocation kind,
+rather than CLR's precise reference layout. It avoids unnecessary synchronization
+for HTTP byte payloads, but does not exempt conservatively scanned scalar fields in
+OBJECT/RECORDS allocations or relax buffer lifetime requirements.
+
+`byte-views-validation.json.gz` records optimized and undefined/bounds-sanitized
+synchronous/live runs: 800 epochs, 800,000 writes, both ordinary/reserved storage,
+overlapping copies, bounds/readonly rejection, forged OBJECT and interior-owner
+rejection, empty-window owner retention and final reclamation. The existing exhaustive
+native memory-view test also passes against both collectors in both configurations.
+Writes run with the marker delayed, released and completed; the marker reads zero
+payload bytes in these byte-only rooted graphs. Managed allocation counters stay
+unchanged during the operations. Pointer-shaped payload bytes do not retain an
+otherwise dead object, matching the synchronous collector's cleanup behavior.
+
+The intentional negative scanner traces byte payloads; the test rejects its nonzero
+payload-read count. That generated control is retained in `byte-views-negative-gc.c.gz`.
+The positive generated collector is byte-identical to `text-arrays-automatic-gc.c.gz`.
+These native correctness checks are not throughput measurements or a race-detector
+qualification. No compiler provider admission, production behavior or default changes
+in this slice.
+
+The next generated-code integration must cover view factory/slice results, getter
+scalar results and setters through ordinary JIT/AOT wrappers. Existing emission builds
+24-byte C descriptors on the stack and copies owner/bounds back into three managed
+lanes; that publication must pass live lowering and closure checks. Then qualify byte
+allocation/reservation, UTF-8 conversion and socket/async lifetimes before full HTTP
+comparisons. Native helper success alone does not establish those managed paths.
