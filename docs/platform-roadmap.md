@@ -44,6 +44,12 @@ now passes narrow-write, grouped payload/marker, concurrent-reader, overflow and
 epoch tests. It is not yet connected to generated/native writers or reclamation;
 those admission/publication paths are the next integration step. Primitive overhead
 is measured separately and is not an HTTP performance result.
+The [explicit live-heap candidate](../benchmarks/execution/concurrent-live/README.md)
+now connects that gate to background marking and owner reclamation without full
+payload capture. Delayed mutation, array publication, overflow recovery, negative
+barrier controls and 12,000 differential object checks pass. A native graph workload
+still costs 2.59× synchronous CPU; generated/native writer admission and managed
+workload qualification remain required before HTTP or default use.
 
 **Author-directed media types (2026-10-23):** Complete the bounded HTTP value-contract
 slice with cached typed presets, lazy structured projections, shared primitive

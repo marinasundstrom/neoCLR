@@ -1,0 +1,23 @@
+{
+  "means": {
+    "sync": {
+      "wallNanoseconds": 893931000,
+      "processCpuNanoseconds": 851886000
+    },
+    "concurrent": {
+      "wallNanoseconds": 2066599000,
+      "processCpuNanoseconds": 2202436500
+    }
+  },
+  "ratios": {
+    "wallNanoseconds": 2.3118104193724123,
+    "processCpuNanoseconds": 2.585365295356421
+  },
+  "counters": [
+    1331997760,
+    655519984,
+    1280000,
+    10000,
+    0
+  ]
+}
