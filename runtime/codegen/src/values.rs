@@ -1771,7 +1771,9 @@ pub(crate) fn compile_into(
         );
         sig.returns.push(AbiParam::new(types::I32));
         Some(module.declare_function(
-            if details.is_some_and(|d| d.native_gc) {
+            if live_stores {
+                "experiment_gc_static_storage_rooted_v1"
+            } else if details.is_some_and(|d| d.native_gc) {
                 "neoclr_static_storage_rooted_v1"
             } else {
                 "neoclr_static_storage_v1"

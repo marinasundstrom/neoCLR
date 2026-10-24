@@ -780,8 +780,36 @@ fn managed_arrays_emit_grouped_stores() {
 fn managed_text_arrays_emit_grouped_stores() {
     emit_managed(include_str!("../../../benchmarks/execution/concurrent-store/text-arrays.neoil"));
 }
+#[test]
+fn managed_statics_emit_guarded_publication() {
+    emit_managed(include_str!("../../../benchmarks/execution/concurrent-store/statics.neoil"));
+}
+fn managed_input(source: &str) -> neoclr::metadata::Module {
+    use neoclr::metadata::{Instruction as Op, StaticField, Type, Visibility};
+    let mut input = neoclr::assemble(source).unwrap();
+    if source.starts_with(".module LiveStatics") {
+        // Static-field syntax is not exposed by the text assembler. Use the same
+        // metadata construction as the existing static-storage compiler tests.
+        for index in [1, 2] {
+            input.types[index].static_fields.push(StaticField {
+                name: "Value".into(), ty: Type::Named("Node".into()),
+                visibility: Visibility::Public, readonly: false,
+            });
+        }
+        let first = Type::Named("First".into());
+        let second = Type::Named("Second".into());
+        input.functions[1].body = vec![
+            Op::Arg(2), Op::SetStaticField { owner: first.clone(), index: 0 },
+            Op::Arg(2), Op::SetStaticField { owner: second.clone(), index: 0 },
+            Op::Arg(0), Op::StaticField { owner: first, index: 0 }, Op::StoreObject(Type::Named("Node".into())),
+            Op::Arg(1), Op::StaticField { owner: second, index: 0 }, Op::StoreObject(Type::Named("Node".into())),
+            Op::Int(0), Op::Return,
+        ];
+    }
+    input
+}
 fn emit_managed(source: &str) {
-    let input = neoclr::assemble(source).unwrap();
+    let input = managed_input(source);
     for enabled in [false, true] {
         let mut module = ObjectModule::new(
             ObjectBuilder::new(
@@ -842,6 +870,10 @@ fn emit_managed(source: &str) {
         }
 
         let object = object::File::parse(bytes.as_slice()).unwrap();
+        if source.starts_with(".module LiveStatics") {
+            assert_eq!(object.symbols().any(|s| s.is_undefined()
+                && s.name().unwrap_or("").trim_start_matches('_') == "experiment_gc_static_storage_rooted_v1"), enabled);
+        }
         if source.contains("stelem") {
             let helper = if source.contains("stelem String") {
                 "experiment_gc_store_text"
@@ -897,6 +929,11 @@ fn managed_arrays_run_on_live_collector() {
 fn managed_text_arrays_run_on_live_collector() {
     run_managed(include_str!("../../../benchmarks/execution/concurrent-store/text-arrays.neoil"));
 }
+#[test]
+#[ignore = "requires static host built by validate-statics.py"]
+fn managed_statics_run_on_live_collector() {
+    run_managed(include_str!("../../../benchmarks/execution/concurrent-store/statics.neoil"));
+}
 fn run_managed(source: &str) {
     let path = std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host");
     let library = std::sync::Arc::new(unsafe { libloading::Library::new(path) }.unwrap());
@@ -914,7 +951,7 @@ fn run_managed(source: &str) {
     }));
     let mut code = Code(Some(JITModule::new(builder)));
     let module = code.0.as_mut().unwrap();
-    let input = neoclr::assemble(source).unwrap();
+    let input = managed_input(source);
     crate::compiler::values::compile_into(
         &input,
         "Main",

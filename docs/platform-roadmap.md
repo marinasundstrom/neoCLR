@@ -83,8 +83,10 @@ constructor/reference-publication tests, including pressure recovery and all-liv
 exhaustion. Reference-array allocation and grouped element/marker publication now
 pass forced/paced JIT/AOT and native wide/cancellation checks. Grouped text-array
 publication and rooted strings-array allocation also pass JIT/AOT, bounds and overflow
-checks. Callable arrays, static storage, text/byte services and async/full host-entry
-integration remain next; the recorded plaintext import inventory guides that coverage.
+checks. Guarded static-owner publication now passes cold/warm, pressure and lifetime
+JIT/AOT checks through a distinct experimental provider. Callable arrays, static
+initializers, text/byte services and async/full host-entry integration remain next;
+the recorded plaintext import inventory guides that coverage.
 The isolated consumers now check call closure against supplied bodies/explicit provider
 ABIs and validate their complete AOT import set. This does not establish provider
 implementation safety. A versioned native query now rejects missing/incompatible

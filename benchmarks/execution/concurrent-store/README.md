@@ -383,3 +383,49 @@ byte/scalar/reserved allocation, byte views and text helpers; then task/callback
 async/socket services and full entry lifecycle. Internal replacement bodies also need
 qualification: an import list alone does not cover their generated writes. Keep ordinary
 standalone workloads in the qualification matrix as these groups are integrated.
+
+
+## Guarded static-storage publication
+
+Static owner storage can be allocated after its context table has entered a live
+epoch. The production native provider writes the owner pointer directly into that
+table, which would race the live marker. `native-providers.py` generates an explicit
+experimental variant: table-slot publication calls the noncollecting scalar-store
+barrier after allocation and before returning. A new table's initialization and
+context-root assignment need no old-payload barrier; new allocations are excluded
+from marker reads, and remark traces the current context root. No collection may
+occur between allocating an owner and publishing it from the native temporary.
+
+The internal compiler imports `experiment_gc_static_storage_rooted_v1`, with an
+explicit ABI in the provider list. A distinct symbol prevents silent binding to the
+unguarded rooted provider. Ordinary compiler output and production `text-arena.c`
+remain unchanged. The generated provider source is not a general replacement for
+unqualified native callers: its static publication requires an owned heap, and output
+aliases are limited to the generated stack-result contract. Static initializer guards
+remain rejected; this slice qualifies static fields without `.cctor` execution.
+
+`statics.neoil` supplies a skeleton. Because static field syntax is not exposed by
+the text assembler, `managed_input` in `mutation_store_tests.rs` adds two static
+fields and the corresponding ordinary metadata instructions, following the existing
+static-storage compiler tests. Actual generated code stores and reads references in
+two static owners and returns them through output borrows.
+
+`statics-validation.json.gz` records 600 forced/paced JIT and optimized/UBSan AOT
+cycles: existing-table cold-owner publication, garbage-pressure recovery, all-live
+exhaustion and creation of the table during an active epoch. Successful calls repeat
+the warm path. Exact barrier counts distinguish old-table publication from the first
+managed static field write. After native roots are cleared, only static roots retain
+the graph; invocation completion then clears static ownership and collection empties
+the heap. A failed second-owner allocation retains the first completed static assignment
+and leaves output borrows unchanged. Linking against the original provider fails for
+the distinct experimental symbol, as recorded in the same report.
+
+`statics-compiler-tests.json.gz` records 15 compiler tests plus four root controls;
+`statics-construction-regression.json.gz` retains passing construction consumers.
+The emitted object and generated provider are archived; the collector is byte-identical
+to `text-arrays-automatic-gc.c.gz`. This preserves the existing context-scoped static
+semantics rather than introducing process-global roots. The CLR-style root/write-barrier
+cooperation and conservative-layout tradeoffs remain as previously researched. Runtime
+Contract configuration and CLI metadata are unchanged. Native byte/text helpers,
+initializers, async/socket services and full HTTP entry remain unqualified; there is
+no new throughput evidence or default switch.

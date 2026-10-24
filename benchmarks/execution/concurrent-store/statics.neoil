@@ -1,0 +1,20 @@
+.module LiveStatics
+.type class Node
+.field Next Node
+.end
+.type class First
+.end
+.type class Second
+.end
+.function Dummy(Int32 value) -> Int32
+ldarg value
+ret
+.end
+.function Write(out Node& first,out Node& second,Node value) -> Int32
+ldc.i4 0
+ret
+.end
+.function Main(Int32 value) -> Int32
+ldarg value
+ret
+.end
