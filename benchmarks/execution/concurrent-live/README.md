@@ -175,3 +175,45 @@ made. Next qualify native allocation/service writers and the full host entry bef
 running ordinary standalone and HTTP comparisons. The existing CLR/Go barrier and
 collector research remains applicable; this is reuse of an experimental scheduling
 policy, not a semantic divergence or performance claim.
+
+
+## Native-call synchronous fallback prototype (2026-10-24)
+
+`native-scopes.py` extends the automatic candidate with a private, owned-thread
+fallback scope. Entry requires a matching published caller frame and cancels/joins
+an active marker without collecting; this preserves unpublished native inputs.
+While nested, explicit, pressure, idle and publication collections use synchronous
+GC and cannot start a live epoch. Exit does not collect or restart the marker before
+the caller publishes results. Normal scheduling resumes at subsequent boundaries.
+Monotonic tokens enforce LIFO nesting, capped at 64 without heap allocation (512 bytes
+of thread-local token storage plus counters/state). Wrong-thread/context, unframed,
+overflow, stale-token and out-of-order entry/exit requests reject; heap release is
+rejected while scoped. Existing synchronous rooting requirements still apply.
+
+This is a proposed integration mechanism, not general native-provider admission.
+No compiler emits these calls yet. Nonlocal unwinding, asynchronous retained writes,
+shared heaps and callback/fiber transitions remain unqualified. Wrapping an entire
+async pump would suppress concurrent collection for that whole native call and is
+not an acceptable substitute for qualifying its individual transitions. Frequent
+cancellation could erase useful marking work; measure fallback counts and throughput
+before adopting this mechanism for hot providers.
+
+The comparison is with the CLR's explicit GC modes and published frame/root state:
+[CLR threading design](https://github.com/dotnet/runtime/blob/main/docs/design/coreclr/botr/threading.md),
+reviewed 2026-10-24. CLR preemptive mode permits collection while native code that does
+not access managed objects runs; native VM code accessing objects uses cooperative
+mode. This prototype instead cancels concurrent marking and retains synchronous
+collection for a scoped owned heap. It is a conservative experimental implementation
+tradeoff, not a reproduction of CLR transitions or a new managed API contract.
+
+Run `python3 benchmarks/execution/concurrent-live/validate-native-scopes.py --output
+ target/concurrent-live/native-scopes-new` (one shell line, fresh output directory).
+`native-scopes-validation.json.gz` records four optimized/undefined-bounds builds
+across forced/paced scheduling, 16 lifecycle rounds each, existing collector/root
+seeding/automatic regression tests and 120 previously generated managed AOT array
+cycles. All pass. Removing entry cancellation fails the active-marker assertion as
+expected. Generated positive/negative sources are archived alongside the report.
+The initial harness incorrectly ran the forced-collection baseline with pacing;
+its exit 58 is preserved in `native-scopes-initial-harness-failure.json.gz`. Correcting
+that configuration made the baseline pass. There is no new performance result,
+compiler admission, HTTP qualification or production-default change in this slice.

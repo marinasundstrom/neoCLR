@@ -22537,3 +22537,20 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   forced/paced collection in JIT/AOT. Tests expose and resolve active-boundary completion
   and capture-pacing issues. [Evidence](../benchmarks/execution/concurrent-store/README.md#managed-value-compiler-integration).
   This remains a prerequisite; no HTTP gain or default switch has been demonstrated.
+
+
+### 2026-10-24 — Native fallback proposal toward concurrent integration
+
+- Assistant proposes a bounded native-call fallback to permit incremental integration:
+  stop live marking without reclaiming unpublished values, use synchronous collection
+  inside the scope, and resume pacing after result publication. This is an assistant
+  implementation proposal, not a separately approved permanent architecture.
+- Assistant implements and tests the runtime prototype; nesting, ownership, lifetime,
+  pacing, collector regressions and a generated AOT consumer pass. A negative control
+  detects omitted cancellation. The first baseline failure was a harness pacing
+  configuration error, retained with the corrected evidence.
+- Compiler emission, async/callback coverage and actual HTTP comparisons remain open.
+  Frequent cancellation may undermine throughput; this slice provides no evidence
+  for switching defaults. The author's correctness and significant HTTP improvement
+  criteria, with CPU as a reported proof-of-concept tradeoff, remain unchanged.
+- [Protocol, CLR comparison and validation](../benchmarks/execution/concurrent-live/README.md#native-call-synchronous-fallback-prototype-2026-10-24).
