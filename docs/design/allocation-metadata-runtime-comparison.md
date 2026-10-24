@@ -538,3 +538,65 @@ Production compiler policy and JIT branch-reach guarantees remain unchanged.
 The next bounded investigation is generated JIT machine code and hot helper call
 frequency under symbolized profiling, keeping startup/loading separate from warm
 execution and shared collector work. No API, GC-policy or peer-parity claim changes.
+
+
+### JIT placement, hot metadata and object lookup — 2026-10-24
+
+The [placement experiment](../../benchmarks/execution/jit-layout/README.md) uses
+Cranelift's arena provider with unchanged long-range lowering. Four unprofiled
+plaintext trials improve mean throughput 19.4% and CPU/response 16.1%. Separate
+function maps show identical code size but much tighter placement. This changes
+code and static-data placement together; it neither identifies a particular cache
+miss mechanism nor compacts the managed heap. Reservation sizing, error/lifetime
+and broader consumer/platform qualification remain open before production adoption.
+
+The author asks how to reduce metadata/object lookup and avoid loading information
+irrelevant to the current operation, suggesting heap compaction as a possibility.
+The assistant proposes separating these costs and treating compaction as a later
+capability with explicit relocation obligations, not an immediate lookup shortcut.
+
+Current native implementation evidence:
+
+- `native-gc.c::validated_bases` has a 64-entry positive exact-base cache for an
+  exclusively owned heap. A miss performs a validating heap walk; cache hits do
+  not permit arbitrary pointers. Collection/release invalidate cached identities.
+- `build_index` validates allocation spans and builds a temporary sparse index for
+  each collection. `indexed_block` starts at a bucket and walks crossing blocks.
+  These are allocation lookup structures, not reflection metadata lookups.
+- `collect_indexed` conservatively scans every eight-byte ordinary-object payload
+  word after its leading word. Many candidate words can be scalars. Atomic text
+  and byte allocations already skip child scanning; arrays have specialized paths.
+- `native-gc.h` explicitly says root addresses are observed, never rewritten.
+  Interior candidates and native borrowed pointers are supported. Moving objects
+  without precise reference identification and writable relocation/pinning contracts
+  would violate this implementation's safety guarantees.
+
+.NET provides a useful separation: a MethodTable holds operational type information
+such as size and GC layout, with a pointer to colder EEClass data. GCDesc describes
+runs of actual reference fields, avoiding general metadata interpretation while
+tracing. Sources: [MethodTable](https://github.com/dotnet/runtime/blob/main/src/coreclr/vm/methodtable.h),
+[GCDesc](https://github.com/dotnet/runtime/blob/main/src/coreclr/gc/gcdesc.h).
+This supports a neoCLR design direction, not a claim of equivalent current layouts.
+
+Recommended next bounded work is **measurement before changing representation**:
+count exact-base cache hits/misses and validating spans; separately count candidate
+words, out-of-arena rejects, index probes/hops and successful object matches during
+GC. Compile instrumentation out of ordinary builds and collect fixed-request plain,
+JSON and ordinary-program runs across JIT/AOT, with interpreter accounting separate.
+Existing pause/allocation counters do not provide those lookup costs. Use the data
+to choose cache/index changes rather than blindly increasing cache memory.
+
+A following candidate is a small immutable per-type tracing descriptor shared by
+objects, separate from names/reflection/signatures, loaded or resolved only when
+needed. It must cover inheritance, boxed values, arrays, unions, native allocation
+helpers and module lifetime; conservative fallback remains until every producer
+supplies correct layouts. Existing immutable owner indexes and compiler-root
+validation lifetimes should be reused, not replaced with global unbounded caches.
+Keep object headers minimal and measure side-table memory/startup costs too.
+
+Compaction and generational collection remain on the table. First establish exact
+reference maps, writable roots or pinning/handles, interior-reference handling,
+worker stop/suspension invariants and (for generations) write barriers/remembered
+sets. Measure fragmentation and retained live space separately from lookup CPU;
+compaction may improve locality but adds copying, relocation work and pause costs.
+These are proposals and validation needs, not newly implemented contracts.

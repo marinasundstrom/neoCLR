@@ -1,0 +1,20 @@
+{
+  "system": {
+    "requestsPerSecond": 1829.1,
+    "rateRange": [
+      1825,
+      1833.2
+    ],
+    "cpuMicrosecondsPerResponse": 544.532276044197
+  },
+  "arena": {
+    "requestsPerSecond": 2183.2,
+    "rateRange": [
+      2179,
+      2187.4
+    ],
+    "cpuMicrosecondsPerResponse": 457.1015414097189
+  },
+  "throughputGainPercent": 19.359247717456675,
+  "cpuReductionPercent": 16.056116135048313
+}

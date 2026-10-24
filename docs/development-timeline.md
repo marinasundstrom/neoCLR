@@ -22252,3 +22252,27 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   full packaged-source attempt fails on stale collections Option usage before
   execution; the failure is retained rather than reported as full qualification.
   [Implemented configuration, ownership contract and limits](../benchmarks/execution/owned-jit-host/README.md).
+
+### 2026-10-24 — Relevant metadata, object lookup and possible compaction
+
+- Author asks for ways to improve metadata lookup and managed heap object lookup,
+  avoiding unnecessarily loaded data. Suggests compaction as a possibility while
+  explicitly expressing uncertainty about its implementation, and emphasizes that
+  the runtime should use what matters to its work while preserving correctness
+  and safety.
+- Assistant proposes separating immutable type/method facts from cold metadata,
+  measuring object-index/cache work, and considering exact shared tracing layouts
+  before moving objects. Source inspection confirms native exact-base cache misses
+  still validate spans, the collector rebuilds a sparse index, and ordinary objects
+  are conservatively scanned. Current root contracts observe rather than rewrite
+  addresses, so compaction requires additional relocation/pinning guarantees.
+- Concurrent execution investigation: assistant tests Cranelift's existing arena
+  provider. Four plaintext trials show 19.4% higher mean throughput and 16.1% lower
+  CPU/response; two separate profiles gain offline managed-function attribution.
+  This packs JIT code/static data, not managed objects. Production code is restored;
+  reservation/lifetime/platform qualification remains open. [Evidence](../benchmarks/execution/jit-layout/README.md).
+- Proposed next lookup work is opt-in counters for cache misses, validating spans,
+  candidate words and index hops across fixed plain/JSON/ordinary workloads.
+  Precise per-type tracing maps, lazy cold metadata and compaction remain proposals,
+  not completed changes or permanent roadmap reprioritization.
+  [Design comparison and obligations](design/allocation-metadata-runtime-comparison.md#jit-placement-hot-metadata-and-object-lookup--2026-10-24).

@@ -6648,3 +6648,21 @@ Production compiler policy and JIT branch-reach guarantees remain unchanged.
 The next bounded investigation is generated JIT machine code and hot helper call
 frequency under symbolized profiling, keeping startup/loading separate from warm
 execution and shared collector work. No API, GC-policy or peer-parity claim changes.
+
+
+### JIT placement and lookup follow-up — 2026-10-24
+
+The existing Cranelift arena provider improves the experimental owned JIT entry
+host's mean plaintext throughput 19.4% and CPU/response 16.1% in four local trials,
+with unchanged long-range calls. Two separate profiles now resolve managed frames
+using exact function ranges. [Evidence and ten analysis tests](../benchmarks/execution/jit-layout/README.md).
+Production policy remains unchanged pending bounded reservation, failure/lifetime,
+representative consumer and platform qualification. No managed-heap movement or
+worker-server gain is claimed.
+
+The author also directs attention to metadata and managed-object lookup, avoiding
+unneeded data and considering compaction. The next lookup slice should instrument
+cache misses/validation spans and GC candidate/index work separately, before choosing
+an index or tracing-layout change. [Current implementation and proposed sequence](design/allocation-metadata-runtime-comparison.md#jit-placement-hot-metadata-and-object-lookup--2026-10-24)
+distinguish implemented caches from proposed precise per-type maps and moving-GC
+requirements. This author-directed investigation does not reorder other milestones.
