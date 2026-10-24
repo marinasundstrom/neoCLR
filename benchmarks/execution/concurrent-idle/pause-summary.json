@@ -1,0 +1,154 @@
+[
+  {
+    "sample": "plain",
+    "collector": "synchronous",
+    "mode": "aot",
+    "requests": 1024,
+    "operations": 1041,
+    "outerMicrosecondsPerRequest": 20.5068359375,
+    "innerMicrosecondsPerRequest": 20.3544921875,
+    "additionalMicrosecondsPerRequest": 0.15234375,
+    "p99BucketUpperMicroseconds": 65.535,
+    "maximumMicroseconds": 72.0,
+    "operationCounts": [
+      2,
+      1037,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "sample": "plain",
+    "collector": "synchronous",
+    "mode": "jit",
+    "requests": 1024,
+    "operations": 1035,
+    "outerMicrosecondsPerRequest": 17.2060546875,
+    "innerMicrosecondsPerRequest": 17.1103515625,
+    "additionalMicrosecondsPerRequest": 0.095703125,
+    "p99BucketUpperMicroseconds": 32.767,
+    "maximumMicroseconds": 32.0,
+    "operationCounts": [
+      2,
+      1031,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "sample": "plain",
+    "collector": "candidate",
+    "mode": "aot",
+    "requests": 1024,
+    "operations": 1041,
+    "outerMicrosecondsPerRequest": 49.8779296875,
+    "innerMicrosecondsPerRequest": 48.921875,
+    "additionalMicrosecondsPerRequest": 0.9560546875,
+    "p99BucketUpperMicroseconds": 131.071,
+    "maximumMicroseconds": 140.0,
+    "operationCounts": [
+      2,
+      1037,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "sample": "plain",
+    "collector": "candidate",
+    "mode": "jit",
+    "requests": 1024,
+    "operations": 1035,
+    "outerMicrosecondsPerRequest": 42.828125,
+    "innerMicrosecondsPerRequest": 42.025390625,
+    "additionalMicrosecondsPerRequest": 0.802734375,
+    "p99BucketUpperMicroseconds": 65.535,
+    "maximumMicroseconds": 62.0,
+    "operationCounts": [
+      2,
+      1031,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "sample": "json",
+    "collector": "synchronous",
+    "mode": "aot",
+    "requests": 1024,
+    "operations": 2062,
+    "outerMicrosecondsPerRequest": 42.5546875,
+    "innerMicrosecondsPerRequest": 42.314453125,
+    "additionalMicrosecondsPerRequest": 0.240234375,
+    "p99BucketUpperMicroseconds": 65.535,
+    "maximumMicroseconds": 104.0,
+    "operationCounts": [
+      2,
+      2058,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "sample": "json",
+    "collector": "synchronous",
+    "mode": "jit",
+    "requests": 1024,
+    "operations": 2060,
+    "outerMicrosecondsPerRequest": 43.572265625,
+    "innerMicrosecondsPerRequest": 43.3330078125,
+    "additionalMicrosecondsPerRequest": 0.2392578125,
+    "p99BucketUpperMicroseconds": 65.535,
+    "maximumMicroseconds": 113.0,
+    "operationCounts": [
+      2,
+      2056,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "sample": "json",
+    "collector": "candidate",
+    "mode": "aot",
+    "requests": 1024,
+    "operations": 2066,
+    "outerMicrosecondsPerRequest": 74.06640625,
+    "innerMicrosecondsPerRequest": 72.822265625,
+    "additionalMicrosecondsPerRequest": 1.244140625,
+    "p99BucketUpperMicroseconds": 131.071,
+    "maximumMicroseconds": 156.0,
+    "operationCounts": [
+      2,
+      2062,
+      0,
+      1,
+      1
+    ]
+  },
+  {
+    "sample": "json",
+    "collector": "candidate",
+    "mode": "jit",
+    "requests": 1024,
+    "operations": 2067,
+    "outerMicrosecondsPerRequest": 59.904296875,
+    "innerMicrosecondsPerRequest": 58.927734375,
+    "additionalMicrosecondsPerRequest": 0.9765625,
+    "p99BucketUpperMicroseconds": 65.535,
+    "maximumMicroseconds": 89.0,
+    "operationCounts": [
+      2,
+      2063,
+      0,
+      1,
+      1
+    ]
+  }
+]

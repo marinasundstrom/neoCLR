@@ -25,6 +25,10 @@ synchronous default while reducing work and extending safety/measurement coverag
 now include nested waits/rechecks and cancellation. They identify repeated collector
 work as the larger measured blocking cost; removing idle rechecks requires explicit
 cleanup-timing, shutdown and memory qualification.
+The [idle-without-recheck candidate](../benchmarks/execution/concurrent-idle/README.md)
+now passes delayed cleanup, churn and JIT/AOT HTTP checks, but retains more memory
+and still regresses CPU/capacity. Next, reduce blanket marking of new/changed blocks
+while preserving conservative and conditional reachability.
 
 **Author-directed media types (2026-10-23):** Complete the bounded HTTP value-contract
 slice with cached typed presets, lazy structured projections, shared primitive

@@ -1,0 +1,32 @@
+{
+  "baseline": {
+    "requestsPerSecond": [
+      4060.3,
+      3978.4
+    ],
+    "cpuMicrosecondsPerResponse": [
+      236.9048621902347,
+      235.6960075250835
+    ],
+    "p99Milliseconds": [
+      15.680125,
+      22.30925
+    ]
+  },
+  "candidate": {
+    "requestsPerSecond": [
+      3757.8,
+      3866.2
+    ],
+    "cpuMicrosecondsPerResponse": [
+      266.20309611315287,
+      260.0422483148511
+    ],
+    "p99Milliseconds": [
+      18.014583,
+      16.306875
+    ]
+  },
+  "throughputChangePercent": -5.158794332416939,
+  "cpuChangePercent": 11.350904780391069
+}
