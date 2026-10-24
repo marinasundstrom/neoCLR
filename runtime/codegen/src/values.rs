@@ -505,7 +505,7 @@ pub(crate) fn compile_into(
     p.boxed_interfaces = details
         .map(|d| d.boxed_interfaces.clone())
         .unwrap_or_default();
-    if let Some((index, function)) = input.functions.iter().enumerate().find(|&(i, f)| {
+    let unaudited: Vec<_> = input.functions.iter().enumerate().filter(|&(i, f)| {
         if !live_stores { return false; }
         let admitted = details.is_some_and(|d|
             d.int32_to_string.contains(&i) || d.int64_to_string.contains(&i)
@@ -517,6 +517,7 @@ pub(crate) fn compile_into(
             || d.string_starts_with_ordinal.contains(&i) || d.string_slice_utf8.contains(&i)
             || d.byte_memory_create.contains(&i) || d.byte_memory_slice.contains(&i)
             || d.byte_memory_length.contains(&i) || d.byte_view_get.contains(&i)
+            || d.memory_view_bounds_fault.contains(&i) || d.byte_memory_readonly.contains(&i)
             || d.byte_view_set.contains(&i) || d.byte_view_utf8.contains(&i)
             || d.runtime_async_create.contains(&i) || d.runtime_async_start.contains(&i)
             || d.runtime_async_createowned.contains(&i) || d.runtime_async_currentowner.contains(&i)
@@ -534,8 +535,9 @@ pub(crate) fn compile_into(
             || d.socket_transfer_result.contains(&i) || d.socket_receive_until.contains(&i)
             || d.socket_send_until.contains(&i));
         f.pinvoke.is_some() || ((f.is_internal_call() || gc_points::native_body(&p, i, details)) && !admitted)
-    }) {
-        return Err(format!("experimental live stores reject unaudited native replacement bodies: function {index} ({})", function.name).into());
+    }).map(|(index, function)| format!("function {index} ({})", function.name)).collect();
+    if !unaudited.is_empty() {
+        return Err(format!("experimental live stores reject unaudited native replacement bodies: {}", unaudited.join(", ")).into());
     }
     let bootstrap = details.is_some_and(|d| d.native_host_bootstrap);
     if bootstrap && !details.is_some_and(|d| d.native_gc) {

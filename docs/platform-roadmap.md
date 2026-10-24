@@ -183,9 +183,13 @@ to `ViewBoundsFault` (plaintext) and `ObjectTypeHandle` (JSON) admission failure
 **Next: qualify the identified generated
 bodies, then execute full HTTP before performance/default decisions**
 ([full selection evidence](../benchmarks/execution/concurrent-store/README.md#full-http-selection-and-host-io-entry-qualification-2026-10-24)).
-Capability conversions, remaining text/byte services and async/full
-host-entry integration remain next;
-the recorded plaintext import inventory guides that coverage.
+Memory-view conversions/bounds faults now pass 600 JIT/AOT cycles and 45 focused
+checks. A full-body inventory identifies the remaining admission groups: plaintext
+has 20 interface dispatchers; JSON has 84 dispatchers, ObjectTypeHandle and six
+boxing/query helpers. **Next: qualify interface dispatch as a shared generated path,
+then JSON type/boxing helpers and executable HTTP**. These are admission counts, not
+performance measurements
+([view admission and inventory](../benchmarks/execution/concurrent-store/README.md#memory-view-conversion-and-fault-admission-2026-10-24)).
 The isolated consumers now check call closure against supplied bodies/explicit provider
 ABIs and validate their complete AOT import set. This does not establish provider
 implementation safety. A versioned native query now rejects missing/incompatible

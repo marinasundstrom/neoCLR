@@ -1229,6 +1229,10 @@ fn byte_view_input() -> (neoclr::Module, crate::fault_details::Options) {
         ("neoCLR.Runtime.ViewUtf8", vec![Type::String], readonly, false),
         ("neoCLR.Runtime.ViewCreateMemory", vec![bytes.clone()], Type::Named("ByteMemory".into()), false),
         ("neoCLR.Runtime.ViewCreateReadOnlyMemory", vec![bytes], Type::Named("ReadOnlyByteMemory".into()), false),
+        ("neoCLR.Runtime.ViewAsReadOnly", vec![Type::Named("ByteMemory".into())], Type::Named("ReadOnlyByteMemory".into()), false),
+        ("neoCLR.Runtime.ViewAsSlice", vec![Type::Named("ByteMemory".into())], Type::Named("ByteSlice".into()), false),
+        ("neoCLR.Runtime.ViewAsSlice", vec![Type::Named("ReadOnlyByteMemory".into())], Type::Named("ReadOnlyByteSlice".into()), false),
+        ("neoCLR.Runtime.ViewBoundsFault", vec![], Type::Void, true),
     ];
     let mut rows = vec![];
     for (index, (name, parameters, returns, no_result)) in contracts.into_iter().enumerate() {
@@ -1241,7 +1245,7 @@ fn byte_view_input() -> (neoclr::Module, crate::fault_details::Options) {
         })).unwrap());
         rows.push(serde_json::json!({"name":name,"compiledName":compiled,"compiledIndex":index}));
     }
-    assert_eq!(crate::memory_views::bind(&mut input, &serde_json::json!({"functions":rows}), true).unwrap().len(), 9);
+    assert_eq!(crate::memory_views::bind(&mut input, &serde_json::json!({"functions":rows}), true).unwrap().len(), 13);
     input.functions.push(main);
     let mut options = managed_options();
     options.byte_memory_create = vec![0, 1, 7, 8];
@@ -1250,11 +1254,13 @@ fn byte_view_input() -> (neoclr::Module, crate::fault_details::Options) {
     options.byte_view_set = vec![4];
     options.byte_memory_length = vec![5];
     options.byte_view_utf8 = vec![6];
+    options.byte_memory_readonly = vec![9, 10, 11];
+    options.memory_view_bounds_fault = vec![12];
     (input, options)
 }
 
 fn export_byte_views(module: &mut ObjectModule) {
-    for index in 0..9 {
+    for index in 0..13 {
         let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name(&format!("neoclr_value_{index}")) else { panic!("view body") };
         let signature = module.declarations().get_function_decl(id).signature.clone();
         let export = module.declare_function(&format!("live_view_{index}"), Linkage::Export, &signature).unwrap();
@@ -1306,7 +1312,7 @@ fn managed_byte_views_run_on_live_collector() {
     let (input, options) = byte_view_input();
     crate::compiler::values::compile_into(&input,"Main",Some(&options),crate::compiler::Target::MacosArm64,module,true).unwrap();
     module.finalize_definitions().unwrap();
-    let pointers: Vec<_> = (0..9).map(|index| {
+    let pointers: Vec<_> = (0..13).map(|index| {
         let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name(&format!("neoclr_value_{index}")) else { panic!("view body") };
         module.get_finalized_function(id)
     }).collect();
