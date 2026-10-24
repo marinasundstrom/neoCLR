@@ -121,3 +121,33 @@ int experiment_gc_store_record(neoclr_aot_context *context, void *array,
     live_store_counts[1]++;
     return 0;
 }
+
+/* Text/character arrays share the traced pointer-array layout. */
+int experiment_gc_store_text(neoclr_aot_context *context, void *array,
+    uint32_t index, uint64_t value) {
+    if (!context || owned_heap.arena!=&context->text || !array ||
+        (candidate_active && candidate_context!=context)) return 3;
+    uint64_t bytes; uint32_t kind;
+    if (neoclr_gc_allocation_info_v1(context,array,&bytes,&kind) ||
+        kind!=NEOCLR_GC_STRINGS || bytes<16) return 3;
+    uint64_t header[2]; memcpy(header,array,16);
+    uint32_t tag=(uint32_t)header[0];
+    unsigned reserved=tag==UINT32_C(0x80000004);
+    uint64_t length=header[1];
+    if ((!reserved && tag!=UINT32_C(0x80000003)) || index>=length ||
+        length>(bytes-16)/(reserved?9:8)) return 3;
+    unsigned char initialized=1;
+    mutation_patch patches[2]={{16+(uint64_t)index*8,8,&value},
+        {16+length*8+index,1,&initialized}};
+    unsigned count=reserved?2:1;
+    if (candidate_active && shadow_find(shadow_owner->job,(uintptr_t)array)!=SIZE_MAX) {
+        int status=live_write_known(array,bytes,kind,patches,count);
+        if (status==GATE_CANCELLED) live_store_cancel_epoch();
+        else if (status) return 3;
+        else { live_store_counts[2]++; return 0; }
+    }
+    for (unsigned i=0;i<count;i++)
+        memcpy((unsigned char *)array+patches[i].offset,patches[i].source,patches[i].length);
+    live_store_counts[1]++;
+    return 0;
+}

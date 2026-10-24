@@ -344,3 +344,42 @@ The initial assembly fixture incorrectly used value-array syntax `Node[]`; it no
 `arrayref<Node>`. An initial overflow assertion used exactly 64 lanes, which fit the log;
 65 lanes correctly exercise cancellation. Both initial failures are retained. No
 throughput measurements or default switch are claimed.
+
+
+## Grouped text-array publication
+
+The internal compiler now uses `experiment_gc_store_text` for String/Char array
+stores, passing the pointer value directly. The helper validates the traced-array
+allocation and immutable shape. Ordinary arrays publish one pointer; reserved arrays
+publish the pointer and initialization marker in a single gate transaction. It shares
+noncollecting cancellation with record/scalar stores. The rooted strings allocator
+is admitted: it initializes only fresh storage, with no callbacks after reservation.
+Callable array stores remain rejected pending their own qualification. Default
+compilation, public semantics and Runtime Contract/CLI metadata are unchanged.
+
+`text-arrays.neoil` reserves a temporary String array, writes/reads it and publishes
+into existing arrays. `text-arrays-validation.json.gz` records 600 forced/paced JIT
+and optimized/UBSan AOT cycles covering ordinary null slots, reserved uninitialized
+slots and both first/second bounds failures. Native helper checks reject an invalid
+index and wrong allocation kind. Paced successful cases wait for marker completion,
+then repeatedly write until the barrier log forces cancellation; the text and marker
+remain correct and eventual collection empties the heap. Second-write failure retains
+the first completed write. Managed Char-specific behavior is not separately exercised;
+it shares the pointer-array storage protocol. Text views, decoding and other native
+services are not admitted by this allocator/store qualification.
+
+`text-arrays-compiler-tests.json.gz` records 14 compiler tests and four root controls,
+including rejection of callable array stores and opt-in helper-import checks.
+`text-arrays-regression.json.gz` records the prior reference-array consumers against
+the rebuilt compiler/host. The object and generated collector are archived alongside
+the reports. No throughput comparison was performed. Existing CLR/Go bulk-barrier
+research applies; gate/copy costs remain provisional rather than a claimed improvement.
+
+`http-import-inventory.json.gz` records the imports and identity of the previously
+measured plaintext AOT object at `target/state-integration/plain.o`. It is a navigation
+index, not evidence that the current live compiler accepts HTTP or that every imported
+provider writes managed storage. Concrete next groups are static-storage publication;
+byte/scalar/reserved allocation, byte views and text helpers; then task/callback roots,
+async/socket services and full entry lifecycle. Internal replacement bodies also need
+qualification: an import list alone does not cover their generated writes. Keep ordinary
+standalone workloads in the qualification matrix as these groups are integrated.

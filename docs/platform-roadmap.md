@@ -81,8 +81,10 @@ pressure rechecks, idle cleanup and quiescence before retirement/release, includ
 managed JIT/AOT consumers. The rooted object allocator now passes actual managed
 constructor/reference-publication tests, including pressure recovery and all-live
 exhaustion. Reference-array allocation and grouped element/marker publication now
-pass forced/paced JIT/AOT and native wide/cancellation checks. Text/callable arrays,
-other service writers and full host-entry integration remain next.
+pass forced/paced JIT/AOT and native wide/cancellation checks. Grouped text-array
+publication and rooted strings-array allocation also pass JIT/AOT, bounds and overflow
+checks. Callable arrays, static storage, text/byte services and async/full host-entry
+integration remain next; the recorded plaintext import inventory guides that coverage.
 The isolated consumers now check call closure against supplied bodies/explicit provider
 ABIs and validate their complete AOT import set. This does not establish provider
 implementation safety. A versioned native query now rejects missing/incompatible

@@ -766,7 +766,7 @@ fn managed_construction_emits_guarded_stores() {
 fn managed_arrays_emit_grouped_stores() {
     let source = include_str!("../../../benchmarks/execution/concurrent-store/arrays.neoil");
     emit_managed(source);
-    let input = neoclr::assemble(&source.replace("stelem Node", "stelem String")).unwrap();
+    let input = neoclr::assemble(&source.replace("stelem Node", "stelem fn<Int32,Int32>")).unwrap();
     let mut module = ObjectModule::new(ObjectBuilder::new(
         isa(target(), true), "reject-array", cranelift_module::default_libcall_names(),
     ).unwrap());
@@ -774,7 +774,11 @@ fn managed_arrays_emit_grouped_stores() {
         &input, "Main", Some(&managed_options()), crate::compiler::Target::MacosArm64,
         &mut module, false,
     ).unwrap_err();
-    assert!(error.to_string().contains("grouped publication for text/callable arrays"));
+    assert!(error.to_string().contains("qualification for callable arrays"));
+}
+#[test]
+fn managed_text_arrays_emit_grouped_stores() {
+    emit_managed(include_str!("../../../benchmarks/execution/concurrent-store/text-arrays.neoil"));
 }
 fn emit_managed(source: &str) {
     let input = neoclr::assemble(source).unwrap();
@@ -839,8 +843,11 @@ fn emit_managed(source: &str) {
 
         let object = object::File::parse(bytes.as_slice()).unwrap();
         if source.contains("stelem") {
+            let helper = if source.contains("stelem String") {
+                "experiment_gc_store_text"
+            } else { "experiment_gc_store_record" };
             assert_eq!(object.symbols().any(|s| s.is_undefined()
-                && s.name().unwrap_or("").trim_start_matches('_') == "experiment_gc_store_record"), enabled);
+                && s.name().unwrap_or("").trim_start_matches('_') == helper), enabled);
         }
         assert_eq!(
             object.symbols().any(|s| s.is_undefined()
@@ -884,6 +891,11 @@ fn managed_construction_runs_on_live_collector() {
 #[ignore = "requires array host built by validate-arrays.py"]
 fn managed_arrays_run_on_live_collector() {
     run_managed(include_str!("../../../benchmarks/execution/concurrent-store/arrays.neoil"));
+}
+#[test]
+#[ignore = "requires text-array host built by validate-text-arrays.py"]
+fn managed_text_arrays_run_on_live_collector() {
+    run_managed(include_str!("../../../benchmarks/execution/concurrent-store/text-arrays.neoil"));
 }
 fn run_managed(source: &str) {
     let path = std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host");

@@ -505,9 +505,8 @@ pub(crate) fn compile_into(
         .map(|d| d.boxed_interfaces.clone())
         .unwrap_or_default();
     if live_stores && input.functions.iter().any(|f| f.body.iter().any(|op|
-        matches!(op, Op::StoreArrayElement(neoclr::metadata::Type::String
-            | neoclr::metadata::Type::Char | neoclr::metadata::Type::Function(_))))) {
-        return Err("live stores require grouped publication for text/callable arrays".into());
+        matches!(op, Op::StoreArrayElement(neoclr::metadata::Type::Function(_))))) {
+        return Err("live stores require qualification for callable arrays".into());
     }
     if live_stores && input.functions.iter().enumerate().any(|(i,f)|
         f.is_internal_call() || f.pinvoke.is_some() || gc_points::native_body(&p,i,details)) {
@@ -4845,61 +4844,79 @@ pub(crate) fn compile_into(
                         };
                         let data = b.ins().iadd_imm(array, 16);
                         let address = b.ins().iadd(data, offset);
-                        if reservations {
-                            let kind = b.ins().load(types::I64, MemFlags::new(), array, 0);
-                            let kind = b.ins().band_imm(kind, 0xffffffff);
-                            let reserved = b.ins().icmp_imm(
-                                IntCC::Equal,
-                                kind,
-                                if pointers { 0x80000004 } else { 0x80000002 },
+                        if live_stores && pointers && value.is_some() {
+                            let mut signature = module.make_signature();
+                            signature.params.extend(
+                                [types::I64, types::I64, types::I32, types::I64].map(AbiParam::new),
                             );
-                            let check = b.create_block();
-                            let ready = b.create_block();
-                            b.ins().brif(reserved, check, &[], ready, &[]);
-                            b.switch_to_block(check);
-                            let length = b.ins().uextend(types::I64, length);
-                            let marker = if pointers {
-                                let bytes = b.ins().ishl_imm(length, 3);
-                                let markers = b.ins().iadd(data, bytes);
-                                let index = b.ins().uextend(types::I64, index);
-                                b.ins().iadd(markers, index)
-                            } else {
-                                b.ins().iadd(address, length)
-                            };
-                            if value.is_some() {
-                                let initialized = b.ins().iconst(types::I8, 1);
-                                b.ins().store(MemFlags::new(), initialized, marker, 0);
-                            } else {
-                                let initialized =
-                                    b.ins().load(types::I8, MemFlags::new(), marker, 0);
-                                let unreadable = b.ins().icmp_imm(IntCC::Equal, initialized, 0);
-                                let status = b.ins().iconst(types::I32, 3);
-                                return_if_detailed(&mut b, unreadable, status, site.as_ref());
-                            }
-                            b.ins().jump(ready, &[]);
-                            b.switch_to_block(ready);
-                        }
-                        if let Some(value) = value {
-                            let value = if pointers {
-                                value
-                            } else {
-                                b.ins().ireduce(types::I8, value)
-                            };
-                            b.ins().store(MemFlags::new(), value, address, 0);
-                        } else if matches!(op, Op::ArrayAddress(_)) {
-                            stack.push(address);
+                            signature.returns.push(AbiParam::new(types::I32));
+                            let helper = module.declare_function(
+                                "experiment_gc_store_text", Linkage::Import, &signature,
+                            )?;
+                            let helper = module.declare_func_in_func(helper, b.func);
+                            let call = b.ins().call(helper, &[
+                                fault_context.unwrap(), array, index, value.unwrap(),
+                            ]);
+                            let status = b.inst_results(call)[0];
+                            let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                            return_if_detailed(&mut b, failed, status, site.as_ref());
                         } else {
-                            let value = b.ins().load(
-                                if pointers { types::I64 } else { types::I8 },
-                                MemFlags::new(),
-                                address,
-                                0,
-                            );
-                            stack.push(if pointers {
-                                value
+                            if reservations {
+                                let kind = b.ins().load(types::I64, MemFlags::new(), array, 0);
+                                let kind = b.ins().band_imm(kind, 0xffffffff);
+                                let reserved = b.ins().icmp_imm(
+                                    IntCC::Equal,
+                                    kind,
+                                    if pointers { 0x80000004 } else { 0x80000002 },
+                                );
+                                let check = b.create_block();
+                                let ready = b.create_block();
+                                b.ins().brif(reserved, check, &[], ready, &[]);
+                                b.switch_to_block(check);
+                                let length = b.ins().uextend(types::I64, length);
+                                let marker = if pointers {
+                                    let bytes = b.ins().ishl_imm(length, 3);
+                                    let markers = b.ins().iadd(data, bytes);
+                                    let index = b.ins().uextend(types::I64, index);
+                                    b.ins().iadd(markers, index)
+                                } else {
+                                    b.ins().iadd(address, length)
+                                };
+                                if value.is_some() {
+                                    let initialized = b.ins().iconst(types::I8, 1);
+                                    b.ins().store(MemFlags::new(), initialized, marker, 0);
+                                } else {
+                                    let initialized =
+                                        b.ins().load(types::I8, MemFlags::new(), marker, 0);
+                                    let unreadable = b.ins().icmp_imm(IntCC::Equal, initialized, 0);
+                                    let status = b.ins().iconst(types::I32, 3);
+                                    return_if_detailed(&mut b, unreadable, status, site.as_ref());
+                                }
+                                b.ins().jump(ready, &[]);
+                                b.switch_to_block(ready);
+                            }
+                            if let Some(value) = value {
+                                let value = if pointers {
+                                    value
+                                } else {
+                                    b.ins().ireduce(types::I8, value)
+                                };
+                                b.ins().store(MemFlags::new(), value, address, 0);
+                            } else if matches!(op, Op::ArrayAddress(_)) {
+                                stack.push(address);
                             } else {
-                                b.ins().uextend(types::I32, value)
-                            });
+                                let value = b.ins().load(
+                                    if pointers { types::I64 } else { types::I8 },
+                                    MemFlags::new(),
+                                    address,
+                                    0,
+                                );
+                                stack.push(if pointers {
+                                    value
+                                } else {
+                                    b.ins().uextend(types::I32, value)
+                                });
+                            }
                         }
                     }
                     Op::StaticField { owner, index } | Op::SetStaticField { owner, index } => {
