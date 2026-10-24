@@ -62,7 +62,10 @@ int native_managed_consumer(managed_writer write) {
 }
 typedef int32_t (*native_concat)(uint64_t,uint64_t,void *,void *);
 typedef int32_t (*native_count)(uint64_t,void *,void *);
-int native_text_alias_consumer(native_concat concat,native_count count) {
+int native_text_alias_consumer(native_concat concat,native_count count,
+        native_concat canonical,native_concat ignore_case,native_concat starts_with) {
+    static const struct { uint64_t length; unsigned char bytes[8]; } composed={2,{0xc3,0xa9}},
+        decomposed={3,{'e',0xcc,0x81}}, kelvin={3,{0xe2,0x84,0xaa}}, ascii_k={1,{'k'}};
     for(unsigned round=0;round<100;round++) {
         uint64_t heap[128]={0};
         neoclr_aot_context c={.text={(unsigned char *)heap,sizeof(heap),0}};
@@ -80,13 +83,26 @@ int native_text_alias_consumer(native_concat concat,native_count count) {
         uint64_t before[5],after[5];experiment_gc_store_counts(before);
         CHECK(!concat((uintptr_t)text,(uintptr_t)text,owner+1,&c));
         CHECK(!count(owner[1],owner+2,&c));
+        CHECK(*(int32_t *)(owner+2)==6);
+        CHECK(!canonical((uintptr_t)&composed,(uintptr_t)&decomposed,owner+2,&c));
+        CHECK(*(int32_t *)(owner+2)==0);
+        CHECK(!ignore_case((uintptr_t)&kelvin,(uintptr_t)&ascii_k,owner+2,&c));
+        CHECK(*(int32_t *)(owner+2)==0);
+        CHECK(!starts_with(owner[1],(uintptr_t)text,owner+2,&c));
+        CHECK(*(unsigned char *)(owner+2)==1);
+        CHECK(!starts_with((uintptr_t)text,owner[1],owner+2,&c));
+        CHECK(*(unsigned char *)(owner+2)==0);
+        CHECK(canonical(0,(uintptr_t)text,owner+2,&c)==3);
+        CHECK(ignore_case((uintptr_t)text,0,owner+2,&c)==3);
+        CHECK(starts_with(0,(uintptr_t)text,owner+2,&c)==3);
+        CHECK(owner[2]==0);
         experiment_gc_store_counts(after);
 #ifdef NEOCLR_GC_PACED
-        CHECK(after[2]-before[2]==2 && experiment_gc_live_active(&c));
+        CHECK(after[2]-before[2]==6 && experiment_gc_live_active(&c));
 #else
-        CHECK(after[1]-before[1]==2);
+        CHECK(after[1]-before[1]==6);
 #endif
-        CHECK(*(int32_t *)(owner+2)==6);
+        CHECK(owner[2]==0);
         CHECK(neoclr_root_probe_head_v1()==&frame);
         CHECK(!concat((uintptr_t)text,(uintptr_t)text,owner+1,&c));
         text=NULL;
@@ -104,9 +120,12 @@ int native_text_alias_consumer(native_concat concat,native_count count) {
 extern int32_t live_managed_writer(void *,void *,uint64_t,int32_t *,void *);
 extern int32_t live_native_concat(uint64_t,uint64_t,void *,void *);
 extern int32_t live_native_count(uint64_t,void *,void *);
+extern int32_t live_native_canonical(uint64_t,uint64_t,void *,void *);
+extern int32_t live_native_ignore_case(uint64_t,uint64_t,void *,void *);
+extern int32_t live_native_starts_with(uint64_t,uint64_t,void *,void *);
 int main(void) {
     CHECK(!native_managed_consumer(live_managed_writer));
-    CHECK(!native_text_alias_consumer(live_native_concat,live_native_count));
+    CHECK(!native_text_alias_consumer(live_native_concat,live_native_count,live_native_canonical,live_native_ignore_case,live_native_starts_with));
     puts("PASS 100 native text allocation/pressure/fault and 100 heap-result-alias cycles");
 }
 #endif

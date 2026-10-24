@@ -88,7 +88,9 @@ JIT/AOT checks through a distinct experimental provider. Initializer guards now 
 store lowering and closure checks, with live reentry/cached-failure and default-mode
 regression coverage. Rooted text concatenation and byte count now pass native replacement
 frame/store/closure integration, including direct heap-result aliases, pressure and faults
-across JIT/AOT. Callable arrays, remaining text/byte services and async/full host-entry
+across JIT/AOT. Canonical/case-insensitive comparison and ordinal prefix matching now
+also pass Unicode, Boolean/scalar heap-publication and fault checks with the real native
+providers. Callable arrays, remaining text/byte services and async/full host-entry
 integration remain next;
 the recorded plaintext import inventory guides that coverage.
 The isolated consumers now check call closure against supplied bodies/explicit provider

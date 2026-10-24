@@ -6,6 +6,15 @@
 .function neoCLR.Runtime.StringByteCount(String text) -> Int32
 .methodimpl InternalCall
 .end
+.function neoCLR.Runtime.StringCompareCanonical(String left,String right) -> Int32
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.StringCompareOrdinalIgnoreCase(String left,String right) -> Int32
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.StringStartsWithOrdinal(String text,String pattern) -> Boolean
+.methodimpl InternalCall
+.end
 .function Write(out String& first,out String& second,String value) -> Int32
 .local String combined
 ldarg value

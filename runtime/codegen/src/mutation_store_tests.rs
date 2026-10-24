@@ -790,6 +790,9 @@ fn managed_options_for(source: &str) -> crate::fault_details::Options {
     if source.starts_with(".module LiveNativeText") {
         options.string_concat.push(0);
         options.string_byte_count.push(1);
+        options.string_compare_canonical.push(2);
+        options.string_compare_ignore_case.push(3);
+        options.string_starts_with_ordinal.push(4);
     }
     options
 }
@@ -814,18 +817,18 @@ fn managed_input(source: &str) -> neoclr::metadata::Module {
     let mut input = neoclr::assemble(source).unwrap();
     if source.starts_with(".module LiveNativeText") {
         // Exercise production binding validation before value-profile lowering.
-        let rows: Vec<_> = input.functions.iter().take(2).enumerate().map(|(i, f)| {
+        let rows: Vec<_> = input.functions.iter().take(5).enumerate().map(|(i, f)| {
             serde_json::json!({"name": f.name, "compiledIndex": i,
                 "definition": {"module": "LiveNativeText", "index": i}})
         }).collect();
         let bindings = crate::bindings::utf8_text(
             &mut input, &serde_json::json!({"functions": rows}),
         ).unwrap();
-        assert_eq!(bindings.len(), 2);
+        assert_eq!(bindings.len(), 5);
         // This direct backend fixture lacks the production closed-world name
         // projection. Give the validated replacement placeholders private names
         // so verifier loading cannot collide with bundled System declarations.
-        for (index, name) in [(0, "LiveNativeText.Concat"), (1, "LiveNativeText.ByteCount")] {
+        for (index, name) in [(0, "LiveNativeText.Concat"), (1, "LiveNativeText.ByteCount"), (2, "LiveNativeText.Canonical"), (3, "LiveNativeText.IgnoreCase"), (4, "LiveNativeText.StartsWith")] {
             let original = input.functions[index].name.clone();
             input.functions[index].name = name.into();
             for function in &mut input.functions {
@@ -916,7 +919,7 @@ fn emit_managed(source: &str) {
         if enabled {
             let mut exports = vec![(input.functions.iter().position(|f| f.name == "Write").unwrap(), "live_managed_writer")];
             if source.starts_with(".module LiveNativeText") {
-                exports.extend([(0, "live_native_concat"), (1, "live_native_count")]);
+                exports.extend([(0, "live_native_concat"), (1, "live_native_count"), (2, "live_native_canonical"), (3, "live_native_ignore_case"), (4, "live_native_starts_with")]);
             }
             for (index, name) in exports {
                 let Some(cranelift_module::FuncOrDataId::Func(writer)) =
@@ -1076,12 +1079,12 @@ fn run_managed(source: &str) {
     let call: Writer = unsafe { std::mem::transmute(module.get_finalized_function(id)) };
     assert_eq!(unsafe { run(call) }, 0);
     if source.starts_with(".module LiveNativeText") {
-        type NativeRun = unsafe extern "C" fn(*const u8, *const u8) -> i32;
+        type NativeRun = unsafe extern "C" fn(*const u8, *const u8, *const u8, *const u8, *const u8) -> i32;
         let run: libloading::Symbol<NativeRun> = unsafe { library.get(b"native_text_alias_consumer") }.unwrap();
-        let pointers: Vec<_> = (0..2).map(|index| {
+        let pointers: Vec<_> = (0..5).map(|index| {
             let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name(&format!("neoclr_value_{index}")) else { panic!("native wrapper") };
             module.get_finalized_function(id)
         }).collect();
-        assert_eq!(unsafe { run(pointers[0], pointers[1]) }, 0);
+        assert_eq!(unsafe { run(pointers[0], pointers[1], pointers[2], pointers[3], pointers[4]) }, 0);
     }
 }

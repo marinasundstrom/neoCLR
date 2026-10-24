@@ -19,11 +19,13 @@ try:
  runner=a.runner.resolve();obj=out/'native-text.o'
  run([runner,'mutation_store::tests::managed_native_text_emits_guarded_wrappers','--exact'],dict(os.environ,NEOCLR_MUTATION_MANAGED_OBJECT=str(obj)))
  assert obj.exists()
+ text_library=root/'tools/aot-native-text/target/release/libneoclr_aot_native_text.a'
+ run(['cargo','build','--release','--manifest-path',root/'tools/aot-native-text/Cargo.toml','--target-dir',root/'tools/aot-native-text/target'])
  source=out/'native-gc.c'
  run(['python3',base.parent/'concurrent-live/automatic.py','--output',source])
  recipe=json.loads((root/'benchmarks/execution/call-layout/results.json').read_text())['builds'][1]['command']
  cc=recipe[:recipe.index('-std=c11')]
- common=cc+['-std=c11','-O2','-Wall','-Wextra','-Werror','-pthread','-DNEOCLR_NATIVE_GC','-DNEOCLR_GC_PROFILE','-DNEOCLR_SHADOW_SPARSE_INDEX','-I',root/'runtime/native/gc','-I',base.parent/'concurrent-mutation-gate',base/'native-text-consumer.c',base.parent/'concurrent-mutation-gate/gate.c',root/'runtime/native/gc/root-probe.c',root/'runtime/native/memory/text-arena.c',source]
+ common=cc+['-std=c11','-O2','-Wall','-Wextra','-Werror','-pthread','-DNEOCLR_NATIVE_GC','-DNEOCLR_GC_PROFILE','-DNEOCLR_SHADOW_SPARSE_INDEX','-I',root/'runtime/native/gc','-I',root/'runtime/native/memory','-I',base.parent/'concurrent-mutation-gate',base/'native-text-consumer.c',base.parent/'concurrent-mutation-gate/gate.c',root/'runtime/native/gc/root-probe.c',root/'runtime/native/memory/text-arena.c',root/'docs/experiments/aot-console/string-unicode.c',text_library,source]
  for paced in [False,True]:
   flags=['-DNEOCLR_GC_PACED'] if paced else []
   for sanitized in [False,True]:
@@ -35,6 +37,6 @@ try:
   run(common+flags+['-dynamiclib','-o',host])
   run([runner,'mutation_store::tests::managed_native_text_runs_on_live_collector','--exact','--ignored','--nocapture'],dict(os.environ,NEOCLR_MUTATION_TEST_HOST=str(host)))
   assert '1 passed' in r['commands'][-1]['stdout']
- r['inputs']={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in [runner,obj,source,root/'runtime/codegen/src/values.rs',base/'native-text-consumer.c',Path(__file__),base/'native-text.neoil',base.parent/'concurrent-live/automatic.py',root/'runtime/codegen/src/mutation_admission.rs',root/'runtime/codegen/src/mutation_store_tests.rs',root/'runtime/native/memory/text-arena.c',root/'runtime/native/gc/root-probe.c']}
+ r['inputs']={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in [runner,obj,source,root/'runtime/codegen/src/values.rs',base/'native-text-consumer.c',Path(__file__),base/'native-text.neoil',base.parent/'concurrent-live/automatic.py',root/'runtime/codegen/src/mutation_admission.rs',root/'runtime/codegen/src/mutation_store_tests.rs',root/'runtime/native/memory/text-arena.c',root/'runtime/native/gc/root-probe.c',root/'docs/experiments/aot-console/string-unicode.c',root/'tools/aot-native-text/src/lib.rs',root/'src/string_comparison.rs',root/'src/string_case_folding.rs',root/'src/string_normalization.rs',root/'src/string_normalization_data.rs',text_library]}
  r['passed']=True
 finally:(out/'results.json').write_text(json.dumps(r,indent=2)+'\n')

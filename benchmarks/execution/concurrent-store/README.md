@@ -512,3 +512,35 @@ the test expects Optional<TypeInfo>, but the diagnostic says Option<TypeInfo>.
 missing binding preparation, duplicate System identity and reserved-module fixture
 failures. These are corrected fixture setup failures, not collector race evidence.
 No HTTP performance measurement or default switch is claimed.
+
+
+## Read-only HTTP text comparison providers
+
+The live provider set now includes canonical comparison, ordinal case-insensitive
+comparison and ordinal prefix matching, all present in the recorded plaintext HTTP
+import inventory. The private bindings keep their existing UTF-8 policies; neither
+Raven semantics nor the existing .NET comparison/divergence documentation changes.
+These helpers read immutable text, write a scalar result, retain no pointer and do not
+collect or reenter managed code. The C canonical/case wrappers delegate to the same
+pinned Rust normalization/folding kernels used by ordinary execution. Their output
+is the compiler scratch slot; publication to a managed result alias uses the existing
+checked path. Availability of other symbols in the linked native library does not
+admit them: compiler replacement and exact call-closure checks remain mandatory.
+
+The expanded native-text fixture checks composed/decomposed e-acute equality,
+Kelvin-sign/ASCII-k folding, positive/negative prefix matches, null faults without
+result publication, root-chain restoration and final reclamation. Exact counters
+require six successful heap publications per alias cycle, including Boolean results;
+failed comparisons add none. The Rust helper library is rebuilt and hashed alongside
+the C adapters, shared normalization sources and emitted object.
+
+`text-comparisons-validation.json.gz` records 1,200 forced/paced JIT and optimized/UBSan
+AOT cycles (600 allocation/pressure/fault and 600 expanded heap-result-alias cycles).
+`text-comparisons-compiler.json.gz` records 17 focused compiler tests passing, with
+nine host-dependent tests ignored by that run; the text host test runs explicitly in
+the validation harness. The emitted object is archived; generated collector source is
+unchanged from `text-arrays-automatic-gc.c.gz`. Initial incorrect binding spelling and
+missing native-header include-path failures are retained separately in
+`text-comparisons-setup-failures.json.gz`. No new throughput measurement was taken.
+Mutable byte views, remaining allocation/text services, async/socket providers and
+full HTTP entry still require qualification before a default comparison.
