@@ -394,3 +394,16 @@ helper tuning. Production stays unchanged; poisoned-frame initialization tests a
 all intermediate evidence remain. Investigate explicit execution-state reuse across
 generated hooks with thread/suspension/reentry lifetime proofs next, rather than
 assuming a smaller helper or fewer assembly instructions ensures throughput.
+
+
+The [explicit-state prototype](../../benchmarks/execution/state-handle/README.md)
+now tests a per-activation owner-thread handle without changing production. Native
+lifetime tests cover changing roots, same-thread park/resume, foreign-context
+reentry, independent threads and invalid-head/map/fault rejection. A longer native
+hook loop saves 6.6–8.8% CPU in this prototype; short timings remain noisy and no
+HTTP speedup is established. Cached adapters remove their own TLS references, but
+legacy string/collector paths retain theirs. Cross-thread/stale handles are outside
+the trusted contract, not dynamically rejected. The next integration is new typed
+imports plus a compiler-owned eight-byte state slot and explicit stack-budget,
+early-return, suspension and JIT/AOT validation. Production state-pointer retention
+remains prohibited until that contract is implemented and qualified.

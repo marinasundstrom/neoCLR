@@ -1,0 +1,35 @@
+{
+  "1": {
+    "checkedSeconds": [
+      0.368854,
+      0.331846
+    ],
+    "cachedSeconds": [
+      0.319391,
+      0.319515
+    ],
+    "cpuReductionPercent": 8.818895390323966
+  },
+  "4": {
+    "checkedSeconds": [
+      0.904943,
+      0.88904
+    ],
+    "cachedSeconds": [
+      0.839589,
+      0.836274
+    ],
+    "cpuReductionPercent": 6.584231846121169
+  },
+  "16": {
+    "checkedSeconds": [
+      3.208308,
+      3.206589
+    ],
+    "cachedSeconds": [
+      2.955223,
+      2.945335
+    ],
+    "cpuReductionPercent": 8.017883997202135
+  }
+}

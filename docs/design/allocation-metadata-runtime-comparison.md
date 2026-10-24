@@ -736,3 +736,17 @@ One-owner AOT and JIT capacity remain effectively flat; four-owner AOT gains 2.4
 Keep the original implementation. This is evidence against this particular helper
 layout, not against explicit execution-state contracts or authoritative metadata.
 [Tradeoffs, tests and retained source](../../benchmarks/execution/frame-entry/README.md).
+
+
+### Scoped state-handle proof — 2026-10-24
+
+An isolated native prototype reuses a per-thread execution-state pointer within one
+activation, including same-thread cooperative suspension and foreign-context reentry.
+This extends the owner-local state comparison without copying CLR Thread, changing
+object metadata or introducing a managed contract. Explicit arguments plus a separate
+compiler-owned state slot are preferred over embedding thread identity in contexts
+or reserving a machine register. The cost is stack/register traffic and a strict
+nonmigration lifetime contract; wrong-thread/stale handles cannot be accepted as
+ordinary native inputs. Native tests and 6.6–8.8% hook-loop CPU savings support a
+next generated-code experiment, not a production/HTTP performance claim.
+[Contract, alternatives and evidence](../../benchmarks/execution/state-handle/README.md).

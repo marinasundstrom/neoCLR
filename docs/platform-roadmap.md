@@ -6791,3 +6791,13 @@ large-table regression evidence and final matched trials. Explicit execution-sta
 reuse across generated hooks remains an architectural investigation with suspension,
 thread and host-reentry proof obligations.
 [Evidence](../benchmarks/execution/frame-entry/README.md).
+
+
+**Scoped state-handle prototype (2026-10-24):** An isolated native experiment passes
+same-thread suspension/reentry, changing-root, independent-thread and rejection
+checks. Long hook loops save 6.6–8.8% CPU within the prototype, not HTTP throughput.
+Next bounded integration: versioned typed imports, an eight-byte compiler-owned
+state slot and stack-budget/early-return/lifetime qualification in JIT/AOT. Keep
+ordinary checked imports and shared-worker coordination separate; no production
+state-retention or generated-code change is implemented yet.
+[Contract and evidence](../benchmarks/execution/state-handle/README.md).
