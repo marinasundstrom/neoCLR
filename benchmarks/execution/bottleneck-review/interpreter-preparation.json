@@ -1,0 +1,7 @@
+{
+  "passed": false,
+  "phase": "initial input validation; no guest launched",
+  "originalManifest": "benchmarks/execution/candidate-refreshed-20261017/manifest.json",
+  "error": "Benchmark input changed: /Users/robert/Projects/neoclr/runtime/native/async/native-runtime.c",
+  "resolution": "Explicitly scope the interpreter-only replay to retained package/application inputs; keep every original package hash and record excluded build-only source inputs. The qualified replay then fails guest admission, separately retained."
+}

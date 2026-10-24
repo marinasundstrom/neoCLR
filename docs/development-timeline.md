@@ -22322,3 +22322,25 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   during HTTP startup. It remains uncommitted experimental tooling; no successful
   tracing integration or throughput improvement is claimed. The committed native
   collector is unchanged by that experiment.
+
+### 2026-10-24 — Coherent runtime bottleneck investigation
+
+- Author asks for a thorough investigation of metadata loading, GC and other
+  bottlenecks, with concrete data and a coherent picture of required work rather
+  than further disconnected small experiments.
+- Assistant separates startup, steady-state native execution, GC work, scheduling
+  and interpreter execution, and refreshes ordinary-mode, peer HTTP, worker-profile
+  and plain/JSON diagnostic evidence. No runtime optimization is introduced.
+- Measured outcome: JIT selection/verification is about 2.2 seconds for the small
+  ordinary samples versus about 0.1 seconds reading metadata. Current one/four-owner
+  plaintext throughput is 2,887/7,907 requests/s versus Kestrel 22,691/18,299 in the
+  matched local test. Root/frame bookkeeping, collection and TLS remain prominent
+  in exclusive worker wall samples; these are not claimed as exact CPU percentages.
+- Assistant proposes coordinated resolved-metadata and native execution-state/root
+  redesigns as the first workstreams, with layout/address lookup and JIT placement
+  next. Survival/barrier data and writable roots remain prerequisites for choosing
+  generational/moving GC. An attempted interpreter CPU/JSON refresh fails before
+  readiness against an older package; historical batch data is kept distinct.
+- [Full findings, evidence and validation gates](design/runtime-bottleneck-investigation.md).
+  These are assistant recommendations grounded in measurements, not an author
+  selection of a specific new architecture.

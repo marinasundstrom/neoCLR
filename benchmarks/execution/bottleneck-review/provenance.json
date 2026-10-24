@@ -1,0 +1,84 @@
+{
+  "revision": "db0290fb503f99dee7a3ab73e2c832e69585e63d",
+  "commands": [
+    {
+      "command": [
+        "uname",
+        "-sm"
+      ],
+      "stdout": "Darwin arm64\n",
+      "stderr": "",
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "sw_vers"
+      ],
+      "stdout": "ProductName:\t\tmacOS\nProductVersion:\t\t27.0\nBuildVersion:\t\t26A428\n",
+      "stderr": "",
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "sysctl",
+        "-n",
+        "hw.model",
+        "hw.physicalcpu",
+        "hw.logicalcpu",
+        "hw.memsize"
+      ],
+      "stdout": "MacBookPro17,1\n8\n8\n17179869184\n",
+      "stderr": "",
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "rustc",
+        "--version"
+      ],
+      "stdout": "rustc 1.95.0 (59807616e 2026-04-14)\n",
+      "stderr": "",
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "python3",
+        "--version"
+      ],
+      "stdout": "Python 3.9.6\n",
+      "stderr": "",
+      "exitCode": 0
+    }
+  ],
+  "tests": {
+    "newSummaryTests": 5,
+    "jitSymbolizationAndSummaryTests": 10,
+    "workerStackAnalysisTests": 7
+  },
+  "archives": {
+    "prior-tracing-failure-plain.json.gz": "25e580eceace57034f3842e5fb168ab01cfddf3db525624025c1b2c89e679472",
+    "interpreter-run.json.gz": "4ae3e2fb4ef373581e06ac22a61a606b72c807710e5babdf9de96564c188a273",
+    "interpreter-qualified-manifest.json.gz": "975a68ec44c1edacfb3a35920eec2759743dc84f8b653aa645b0f2fb431f87cf",
+    "worker-build.json.gz": "131f55f86329334b6f0dffcf0afbb99a79a42b251f61641b095ce540fe7d5321",
+    "prior-tracing-failure-json.json.gz": "0050726956d3791978b3eefc062b8a0ea05bee21825fe8ac82526f41f921b9e6",
+    "diagnostics.json.gz": "58d9f7f283701a84d1c02b18c696a305b472132c90b88b250d8f73ad1a271531",
+    "interpreter-batches.json.gz": "e2be560c2fc927262f20f2ed142d7594a28e3cc2fd9e2a6b76ddea98eb355d56",
+    "worker-profile/sample.txt.gz": "12f6c0614c9f752cdcdb0456634a11cb0283843097be401c7911e2f62d68f704",
+    "worker-profile/capture.json.gz": "53b89e1fd0f784857f468b15b50c02807b4d826660d5e07deb01c176769ea6ea",
+    "worker-analysis/summary.json.gz": "0693f4bd26ea27e4cff0c7844f62f966aeda2bd3d9aaf315b3438681a5988319",
+    "gc-timing/profile.json.gz": "6245b1fe55cb715d54e6c0f6f4df44035336254bfdc5385581ef1be849cff324",
+    "plain-counts/results.json.gz": "3a67dad75d34e82823dda926b766ea38dbfd4dcc587e2398c45540deafa8362a",
+    "json-counts/results.json.gz": "3ffe7615c5004db3cebdce8d832ac85b6c34db67198426f7127d058dad0c139f",
+    "peers/comparison.json.gz": "520427c9078dd847652bf9687b370ed0052856c757380f0359f77198872eaf47",
+    "startup/results.json.gz": "2a9df1e6b8e4c7deee22771f0273e52763d70cb5679838f644796182f9b05f63",
+    "startup/jit.sample.txt.gz": "2c0e85214964a3fc4672bdd0ff4bdb25bf72ed5480a08607a1a89e50449b6774",
+    "startup/interpreter.sample.txt.gz": "73edfbad19678bb336b11726d232daf64b0025d86b222d60665a3cc6b01645c0"
+  },
+  "scripts": {
+    "startup.py": "796d0d6ca2255d245e200c8fda40c05d465df4e3f8c5c37ad229440e161996a3",
+    "diagnostics.py": "cfed4d2fbb775ad1f870f3ad30848873a670aea62ac72aa9bc8e2ea8b9dc789a",
+    "summarize.py": "876fae09ef177295fbd5d974e6271c5a6ef477e9ffdabca41975b82eff0ddfb7",
+    "interpreter.py": "5b32be1d72a10af2e49d8b1ab4ed7fffc53caad5952de8e41a24cc3f3693da3b",
+    "test_summary.py": "c7f8a691b8e040e9b637f6b076bbd3c322f44add8eb336e7b999fc7aa9335a25"
+  }
+}

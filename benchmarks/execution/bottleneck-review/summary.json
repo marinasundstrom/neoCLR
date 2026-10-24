@@ -1,0 +1,785 @@
+{
+  "startup": [
+    {
+      "sample": "tasks",
+      "mode": "interpreter",
+      "medianWallSeconds": 3.010790708000002,
+      "wallRange": [
+        3.000164916000003,
+        4.123592166
+      ],
+      "medianCpuSeconds": 2.9939509999999965
+    },
+    {
+      "sample": "tasks",
+      "mode": "jit",
+      "medianWallSeconds": 2.402021915999999,
+      "wallRange": [
+        2.388848834000001,
+        3.8644380409999997
+      ],
+      "medianCpuSeconds": 2.3848420000000026,
+      "phases": {
+        "metadataLoadSeconds": 0.099268125,
+        "selectionAndVerificationSeconds": 2.165949625,
+        "compileAndFinalizeSeconds": 0.095332333,
+        "invocationSeconds": 0.0003105
+      }
+    },
+    {
+      "sample": "tasks",
+      "mode": "aot",
+      "medianWallSeconds": 0.004752291999999159,
+      "wallRange": [
+        0.004713665999997119,
+        0.49926962500000016
+      ],
+      "medianCpuSeconds": 0.0031169999999967057
+    },
+    {
+      "sample": "collections",
+      "mode": "interpreter",
+      "medianWallSeconds": 3.042546750000003,
+      "wallRange": [
+        3.012381791000003,
+        3.0670657080000012
+      ],
+      "medianCpuSeconds": 3.0321979999999997
+    },
+    {
+      "sample": "collections",
+      "mode": "jit",
+      "medianWallSeconds": 2.591305208999998,
+      "wallRange": [
+        2.5906724580000002,
+        2.6015066670000024
+      ],
+      "medianCpuSeconds": 2.586541999999999,
+      "phases": {
+        "metadataLoadSeconds": 0.100496,
+        "selectionAndVerificationSeconds": 2.266151791,
+        "compileAndFinalizeSeconds": 0.196790625,
+        "invocationSeconds": 0.00046375
+      }
+    },
+    {
+      "sample": "collections",
+      "mode": "aot",
+      "medianWallSeconds": 0.004753333000000026,
+      "wallRange": [
+        0.004630333999998015,
+        0.24362008400000335
+      ],
+      "medianCpuSeconds": 0.0032070000000037346
+    }
+  ],
+  "peers": {
+    "neoclr-1": {
+      "requestsPerSecond": 2886.7,
+      "range": [
+        2858.8,
+        2914.6
+      ],
+      "cpuMicrosecondsPerResponse": 344.4620145308703,
+      "p99Milliseconds": [
+        12.9245,
+        16.932875
+      ]
+    },
+    "neoclr-4": {
+      "requestsPerSecond": 7907.2,
+      "range": [
+        7879.9,
+        7934.5
+      ],
+      "cpuMicrosecondsPerResponse": 447.61402089975854,
+      "p99Milliseconds": [
+        5.545375,
+        5.774334
+      ]
+    },
+    "go-1": {
+      "requestsPerSecond": 22600.050000000003,
+      "range": [
+        21236.9,
+        23963.2
+      ],
+      "cpuMicrosecondsPerResponse": 30.361830464326047,
+      "p99Milliseconds": [
+        2.010083,
+        2.167792
+      ]
+    },
+    "go-4": {
+      "requestsPerSecond": 21026.85,
+      "range": [
+        20101.2,
+        21952.5
+      ],
+      "cpuMicrosecondsPerResponse": 69.5602480767624,
+      "p99Milliseconds": [
+        2.214917,
+        1.771042
+      ]
+    },
+    "kestrel-1": {
+      "requestsPerSecond": 22691.35,
+      "range": [
+        22181.2,
+        23201.5
+      ],
+      "cpuMicrosecondsPerResponse": 62.240528822468036,
+      "p99Milliseconds": [
+        2.1515,
+        3.187833
+      ]
+    },
+    "kestrel-4": {
+      "requestsPerSecond": 18298.75,
+      "range": [
+        18081.1,
+        18516.4
+      ],
+      "cpuMicrosecondsPerResponse": 162.42859430959908,
+      "p99Milliseconds": [
+        2.88975,
+        2.55775
+      ]
+    },
+    "node-1": {
+      "requestsPerSecond": 22316.4,
+      "range": [
+        21922.9,
+        22709.9
+      ],
+      "cpuMicrosecondsPerResponse": 32.93278171644513,
+      "p99Milliseconds": [
+        1.661,
+        2.168792
+      ]
+    }
+  },
+  "startupProfiles": {
+    "interpreter": {
+      "neoclr::vm::resolve::hbb3b5c0bb510ad38": 103,
+      "_$LT$core..hash..sip..Hasher$LT$S$GT$$u20$as$u20$core..hash..Hasher$GT$::write::h6c1463cf0222bfd0": 78,
+      "_$LT$alloc..vec..Vec$LT$T$C$A$GT$$u20$as$u20$core..clone..Clone$GT$::clone::h001d156a480ea094": 55,
+      "_xzm_free_main": 50,
+      "_xzm_xzone_malloc_tiny": 42,
+      "_platform_memcmp": 24,
+      "_$LT$neoclr..metadata..Type$u20$as$u20$core..clone..Clone$GT$::clone::h9da40af14f3b6033": 23,
+      "_malloc_zone_malloc": 22,
+      "neoclr::metadata::Module::type_definition::h413e2eaf247fde2a": 22,
+      "<deduplicated_symbol>": 21,
+      "_platform_memmove": 20,
+      "neoclr::metadata::Type::substitute_with_self::substitute::hecd4fdaa10481ede": 14,
+      "core::ptr::drop_in_place$LT$neoclr..metadata..Type$GT$::h1bddd49d01a3c215": 12,
+      "_free": 12,
+      "core::ptr::drop_in_place$LT$neoclr..metadata..Instruction$GT$::h31b96a803277fc98": 11,
+      "core::hash::BuildHasher::hash_one::h5579f1c944dcd128": 10,
+      "DYLD-STUB$$free": 9,
+      "std::thread::local::LocalKey$LT$T$GT$::with::hc7d751c5ab486593": 9,
+      "neoclr::access::check_type::visit::h269b091c44b71205": 9,
+      "_RNvXs4_NtCs1OjIl8oxbrv_5alloc6stringNtB5_6StringNtNtCsl8K0bEFm1U0_4core5clone5Clone5clone": 8,
+      "neoclr::inheritance::validate::haf8ed055d3bcf0eb": 8,
+      "_$LT$core..slice..iter..Iter$LT$T$GT$$u20$as$u20$core..iter..traits..iterator..Iterator$GT$::find::h20858dbfee76a1df": 7,
+      "_RNvCsfLfy6EI15iL_7___rustc11___rdl_alloc": 7,
+      "_$LT$alloc..vec..Vec$LT$T$C$A$GT$$u20$as$u20$core..clone..Clone$GT$::clone::h3328b1d17dcebd29": 6,
+      "DYLD-STUB$$malloc": 6,
+      "_$LT$core..iter..adapters..map..Map$LT$I$C$F$GT$$u20$as$u20$core..iter..traits..iterator..Iterator$GT$::try_fold::hab103046467101fd": 6,
+      "neoclr::interfaces::select::h56c9f04f489d77e4": 6,
+      "_tlv_get_addr": 5,
+      "_$LT$core..slice..iter..Iter$LT$T$GT$$u20$as$u20$core..iter..traits..iterator..Iterator$GT$::find::hb0dbf60f4ada27ce": 5,
+      "_$LT$neoclr..metadata..Function$u20$as$u20$core..clone..Clone$GT$::clone::hc036d86d7376c929": 4,
+      "_$LT$neoclr..metadata..Type$u20$as$u20$core..hash..Hash$GT$::hash::h33274a313655b4ae": 4,
+      "DYLD-STUB$$memcmp": 4,
+      "hashbrown::map::HashMap$LT$K$C$V$C$S$C$A$GT$::insert::hd2e120136c5486ee": 3,
+      "core::hash::BuildHasher::hash_one::ha38a93fbd543dd6c": 2,
+      "neoclr::constraints::check_known_type::h8bc7831d9a81ef03": 2,
+      "neoclr::vm::check_type_context_seen::h73c938f60618a590": 2,
+      "core::ops::function::FnOnce::call_once::h30d7f71e6b04e44d": 2,
+      "mach_absolute_time": 2,
+      "neoclr::interfaces::closure::visit::hcc54634ba5a5a125": 2,
+      "neoclr::metadata::Function::map_types::h021100d18069abf3": 2,
+      "_$LT$alloc..vec..Vec$LT$T$GT$$u20$as$u20$alloc..vec..spec_from_iter_nested..SpecFromIterNested$LT$T$C$I$GT$$GT$::from_iter::h2726015273459453": 2,
+      "_xzm_xzone_malloc_from_freelist_chunk": 1,
+      "_xzm_xzone_malloc_freelist_outlined": 1,
+      "_$LT$alloc..vec..Vec$LT$T$C$A$GT$$u20$as$u20$core..clone..Clone$GT$::clone::h2bd5eac5d1428080": 1,
+      "_$LT$alloc..vec..Vec$LT$T$GT$$u20$as$u20$alloc..vec..spec_from_iter..SpecFromIter$LT$T$C$I$GT$$GT$::from_iter::h0d1077d902e535f2": 1,
+      "core::iter::adapters::try_process::h09a89d6455509a7e": 1,
+      "_xzm_xzone_malloc_small_freelist": 1,
+      "neoclr::constraints::check_known_type_seen::hf4c3fbbce5c2b5c0": 1,
+      "neoclr::vm::check_type_context::h02725f53afef3b4d": 1,
+      "core::ptr::drop_in_place$LT$neoclr..metadata..FunctionRef$GT$::h066e61b3e852c9a2": 1,
+      "core::ptr::drop_in_place$LT$neoclr..metadata..Function$GT$::h9bd6f39b77f96a6b": 1,
+      "_xzm_xzone_free_freelist": 1,
+      "neoclr::inheritance::lineage::h1e31755f6efa4705": 1,
+      "neoclr::interfaces::validate::hf64b10d688fe34ab": 1,
+      "_RNvNtNtCsl8K0bEFm1U0_4core5slice6memchr7memrchr": 1,
+      "_$LT$alloc..vec..Vec$LT$T$C$A$GT$$u20$as$u20$core..clone..Clone$GT$::clone::h48eb42dd79699a03": 1,
+      "neoclr::vm::record_fields::h7181f965a56ae711": 1,
+      "core::hash::BuildHasher::hash_one::h57e645f56cb06b2b": 1,
+      "_RNvNtCsl8K0bEFm1U0_4core3fmt5write": 1,
+      "_$LT$hashbrown..raw..RawTable$LT$T$C$A$GT$$u20$as$u20$core..ops..drop..Drop$GT$::drop::h7b07868c7e9c9279": 1,
+      "_$LT$alloc..vec..Vec$LT$T$C$A$GT$$u20$as$u20$core..clone..Clone$GT$::clone::hdfa5fbea204aeb81": 1,
+      "DYLD-STUB$$memcpy": 1,
+      "_RNvCsfLfy6EI15iL_7___rustc13___rdl_dealloc": 1,
+      "neoclr::library::bind_member_references::h513fb45d11d0c3fc": 1,
+      "neoclr::references::check_type::h2da4fb8d35b0b91a": 1,
+      "hashbrown::rustc_entry::_$LT$impl$u20$hashbrown..map..HashMap$LT$K$C$V$C$S$C$A$GT$$GT$::rustc_entry::hf047a7c6b007d39f": 1,
+      "_$LT$neoclr..metadata..FunctionRef$u20$as$u20$core..clone..Clone$GT$::clone::h6e00b84c02904159": 0,
+      "hashbrown::raw::RawTable$LT$T$C$A$GT$::reserve_rehash::h60c4132efbcf23c0": 0,
+      "neoclr::memory_view_contract::contains_borrowed::ha3076226f69db383": 0,
+      "neoclr::memory_view_contract::signature::h13edadfe1c03c51b": 0,
+      "neoclr::access::validate_types::h4a9678162790fa5e": 0,
+      "neoclr::metadata::Function::map_types::h597482f5ca08fe5d": 0,
+      "core::ptr::drop_in_place$LT$neoclr..metadata_origin..MetadataOrigin$GT$::h50eb63024437c998": 0,
+      "mach_vm_reclaim_try_enter": 0,
+      "xzm_reclaim_mark_free_locked": 0,
+      "_xzm_reclaim_mark_free": 0,
+      "_xzm_segment_group_span_mark_free": 0,
+      "xzm_segment_group_free_chunk": 0,
+      "neoclr::vm::validate_linked_indexed::h04bd14540bb52b77": 0,
+      "neoclr::inheritance::declared_method::h8ea55ab400fa664f": 0,
+      "neoclr::interfaces::conformance_owner::hb11442b00a1cd7cf": 0,
+      "neoclr::interfaces::closure::h819d78f5d326fb8a": 0,
+      "neoclr::interfaces::ensure_members::hb72bad7ea9e5557b": 0,
+      "neoclr::interfaces::ensure_implementation::h0d144a5e409f7294": 0,
+      "_RNvXs0_NtNtCsl8K0bEFm1U0_4core3str7patternNtB5_12CharSearcherNtB5_15ReverseSearcher15next_match_back": 0,
+      "core::str::iter::SplitInternal$LT$P$GT$::next_back::h01549192642f4931": 0,
+      "core::ptr::drop_in_place$LT$core..option..Option$LT$neoclr..metadata_origin..MetadataOrigin$GT$$GT$::h336f83beec4d7a75": 0,
+      "neoclr::vm::resolve_constructor_body::h83fc1afbb0e45a96": 0,
+      "neoclr::vm::resolve_constructor::h067138786a222d54": 0,
+      "neoclr::metadata::Type::from_name::hb4416d9dfaf8be72": 0,
+      "neoclr::vm::validate_linked_indexed::_$u7b$$u7b$closure$u7d$$u7d$::haed9ccc18948ec5b": 0,
+      "neoclr::inheritance::fields::h7c8c12ffec1b3c0a": 0,
+      "neoclr::initialization::build_default::build::h07d3fc5119d37f30": 0,
+      "neoclr::inheritance::require_concrete::h538b71f47949ca10": 0,
+      "_$LT$alloc..vec..Vec$LT$T$GT$$u20$as$u20$alloc..vec..spec_from_iter..SpecFromIter$LT$T$C$I$GT$$GT$::from_iter::h776098109d4bb4ab": 0,
+      "core::iter::adapters::try_process::ha38250ee061654c9": 0,
+      "neoclr::initialization::build_default::h5a79006447b1f8d9": 0,
+      "neoclr::access::check_owner::heb9deef98b6646e8": 0,
+      "neoclr::access::check_call::h260dc4e29cc54178": 0,
+      "hashbrown::rustc_entry::_$LT$impl$u20$hashbrown..map..HashMap$LT$K$C$V$C$S$C$A$GT$$GT$::rustc_entry::hc614bc7e4a3bbabd": 0,
+      "std::sync::once::Once::call_once_force::_$u7b$$u7b$closure$u7d$$u7d$::h336cbfc6a591dbef": 0,
+      "_RNvMNtNtNtNtCsg55jX0GwzBC_3std3sys4sync4once5queueNtB2_4Once4call": 0,
+      "std::sync::once_lock::OnceLock$LT$T$GT$::initialize::hd298222384b24750": 0,
+      "neoclr::friend_access::permits::hd3dcaa11b0aee06d": 0,
+      "neoclr::variance::validate::heafd8f3bb2a60a92": 0,
+      "_RNvNvNtCs1OjIl8oxbrv_5alloc3fmt6format12format_inner": 0,
+      "neoclr::native::bind::h783aa93c2b92f39a": 0,
+      "neoclr::metadata::Function::argument_types::h840ba1f05d631c6c": 0,
+      "neoclr::interfaces::interface_definition::hfd2f4d45028f8675": 0,
+      "neoclr::vm::check_type::h2ed30cc1478f26b5": 0,
+      "neoclr::function_objects::validate_binding::h2b8811272cfc0274": 0,
+      "core::hash::BuildHasher::hash_one::h0eea4b229d1b6a76": 0,
+      "hashbrown::map::HashMap$LT$K$C$V$C$S$C$A$GT$::insert::h3fb23d260b79a34e": 0,
+      "neoclr::vm::validate_attribute::hcbef6a749ef30e61": 0,
+      "neoclr::runtime_lookup::with_module::hf8d649ce21845224": 0,
+      "neoclr::library::link_modules_with_object_root::h581722afe3147cbe": 0,
+      "_$LT$alloc..vec..Vec$LT$T$GT$$u20$as$u20$alloc..vec..spec_from_iter..SpecFromIter$LT$T$C$I$GT$$GT$::from_iter::h8b5b5c2bd7d66bff": 0,
+      "core::iter::adapters::try_process::hcd3e5797113fa70e": 0,
+      "neoclr::scope::normalize_type::bind::h4748a78142ce498e": 0,
+      "neoclr::scope::normalize_module::h6b9098194776c1e9": 0,
+      "_$LT$alloc..vec..Vec$LT$T$C$A$GT$$u20$as$u20$core..clone..Clone$GT$::clone::ha9d695a966718199": 0,
+      "_$LT$neoclr..metadata_origin..MetadataOrigin$u20$as$u20$core..clone..Clone$GT$::clone::h0ed9e43b3f3c29f2": 0,
+      "_$LT$neoclr..metadata..Module$u20$as$u20$core..clone..Clone$GT$::clone::hd8ee33ccb376f7c8": 0,
+      "_$LT$alloc..vec..Vec$LT$T$C$A$GT$$u20$as$u20$core..clone..Clone$GT$::clone::h868ba35672cf0ac3": 0,
+      "neoclr::vm::resolve_from::h5571353aaf86addf": 0,
+      "neoclr::references::check_call::h8baf8883b3756f50": 0,
+      "neoclr::references::validate_uses_indexed::h494d1ef15702cb19": 0,
+      "neoclr::metadata::Function::map_types::haa09ff0eb275c2b8": 0,
+      "neoclr::references::check_attributes::h7a652d626881ac60": 0,
+      "neoclr::runtime_lookup::with_module::hf651848c978523cc": 0,
+      "hashbrown::map::HashMap$LT$K$C$V$C$S$C$A$GT$::insert::hdb193eb999179886": 0,
+      "_$LT$std..collections..hash..map..HashMap$LT$K$C$V$C$S$GT$$u20$as$u20$core..iter..traits..collect..FromIterator$LT$$LP$K$C$V$RP$$GT$$GT$::from_iter::h4e365125274c3599": 0,
+      "_$LT$std..collections..hash..map..HashMap$LT$K$C$V$C$S$GT$$u20$as$u20$core..iter..traits..collect..FromIterator$LT$$LP$K$C$V$RP$$GT$$GT$::from_iter::hc20926c8d42b4197": 0,
+      "neoclr::assembler::read_modules_core::h074381dd0bd0f80d": 0,
+      "neoclr::execute::hbbc4723d6ddd0f46": 0,
+      "neoclr::main::h24dc811922fc1db4": 0,
+      "std::sys::backtrace::__rust_begin_short_backtrace::h448bd56b1cfffc17": 0,
+      "std::rt::lang_start::_$u7b$$u7b$closure$u7d$$u7d$::h13efdc6b83d70dce": 0,
+      "_RNvNtCsg55jX0GwzBC_3std2rt19lang_start_internal": 0,
+      "main": 0,
+      "start": 0,
+      "???": 0,
+      "Thread_89572572   DispatchQueue_1: com.apple.main-thread  (serial)": 0
+    },
+    "jit": {
+      "neoclr::vm::resolve::hbb3b5c0bb510ad38": 104,
+      "_$LT$core..hash..sip..Hasher$LT$S$GT$$u20$as$u20$core..hash..Hasher$GT$::write::h6c1463cf0222bfd0": 94,
+      "_$LT$alloc..vec..Vec$LT$T$C$A$GT$$u20$as$u20$core..clone..Clone$GT$::clone::h001d156a480ea094": 62,
+      "_xzm_free_main": 51,
+      "_xzm_xzone_malloc_tiny": 43,
+      "_platform_memcmp": 34,
+      "_platform_memmove": 26,
+      "<deduplicated_symbol>": 23,
+      "_$LT$neoclr..metadata..Type$u20$as$u20$core..clone..Clone$GT$::clone::h9da40af14f3b6033": 20,
+      "neoclr::metadata::Module::type_definition::h413e2eaf247fde2a": 18,
+      "_malloc_zone_malloc": 16,
+      "_free": 15,
+      "core::ptr::drop_in_place$LT$neoclr..metadata..Type$GT$::h1bddd49d01a3c215": 12,
+      "core::hash::BuildHasher::hash_one::h5579f1c944dcd128": 10,
+      "_$LT$core..slice..iter..Iter$LT$T$GT$$u20$as$u20$core..iter..traits..iterator..Iterator$GT$::find::h20858dbfee76a1df": 10,
+      "neoclr::metadata::Type::substitute_with_self::substitute::hecd4fdaa10481ede": 9,
+      "_$LT$core..slice..iter..Iter$LT$T$GT$$u20$as$u20$core..iter..traits..iterator..Iterator$GT$::find::hb0dbf60f4ada27ce": 8,
+      "std::thread::local::LocalKey$LT$T$GT$::with::hc7d751c5ab486593": 7,
+      "core::ptr::drop_in_place$LT$neoclr..metadata..Instruction$GT$::h31b96a803277fc98": 7,
+      "_RNvXs4_NtCs1OjIl8oxbrv_5alloc6stringNtB5_6StringNtNtCsl8K0bEFm1U0_4core5clone5Clone5clone": 6,
+      "DYLD-STUB$$free": 6,
+      "neoclr::inheritance::validate::haf8ed055d3bcf0eb": 5,
+      "_tlv_get_addr": 4,
+      "_RNvCsfLfy6EI15iL_7___rustc11___rdl_alloc": 4,
+      "neoclr::library::bind_member_references::h513fb45d11d0c3fc": 4,
+      "_$LT$neoclr..metadata..Function$u20$as$u20$core..clone..Clone$GT$::clone::hc036d86d7376c929": 3,
+      "DYLD-STUB$$memcpy": 3,
+      "_$LT$core..iter..adapters..map..Map$LT$I$C$F$GT$$u20$as$u20$core..iter..traits..iterator..Iterator$GT$::try_fold::hab103046467101fd": 3,
+      "_RNvCsfLfy6EI15iL_7___rustc35___rust_no_alloc_shim_is_unstable_v2": 3,
+      "core::hash::BuildHasher::hash_one::ha38a93fbd543dd6c": 3,
+      "hashbrown::map::HashMap$LT$K$C$V$C$S$C$A$GT$::insert::hd2e120136c5486ee": 3,
+      "neoclr::access::check_type::visit::h269b091c44b71205": 3,
+      "DYLD-STUB$$memcmp": 3,
+      "_$LT$alloc..vec..Vec$LT$T$C$A$GT$$u20$as$u20$core..clone..Clone$GT$::clone::h3328b1d17dcebd29": 2,
+      "_$LT$alloc..vec..Vec$LT$T$GT$$u20$as$u20$alloc..vec..spec_from_iter..SpecFromIter$LT$T$C$I$GT$$GT$::from_iter::h0d1077d902e535f2": 2,
+      "neoclr::constraints::check::h0c7137ed93519647": 2,
+      "neoclr::vm::check_type_context_seen::h73c938f60618a590": 2,
+      "neoclr::interfaces::select::h56c9f04f489d77e4": 2,
+      "_$LT$alloc..vec..Vec$LT$T$C$A$GT$$u20$as$u20$core..clone..Clone$GT$::clone::h48eb42dd79699a03": 1,
+      "DYLD-STUB$$malloc": 1,
+      "core::iter::adapters::try_process::h09a89d6455509a7e": 1,
+      "neoclr::constraints::check_known_type_seen::hf4c3fbbce5c2b5c0": 1,
+      "_$LT$neoclr..metadata..Type$u20$as$u20$core..hash..Hash$GT$::hash::h33274a313655b4ae": 1,
+      "neoclr::constraints::check_known_type::h8bc7831d9a81ef03": 1,
+      "neoclr::access::validate_types::h4a9678162790fa5e": 1,
+      "_$LT$alloc..vec..Vec$LT$T$C$A$GT$$u20$as$u20$core..clone..Clone$GT$::clone::hb6e620dc2befcf10": 1,
+      "core::ptr::drop_in_place$LT$neoclr..metadata..FunctionRef$GT$::h066e61b3e852c9a2": 1,
+      "core::ptr::drop_in_place$LT$neoclr..metadata_origin..MetadataOrigin$GT$::h50eb63024437c998": 1,
+      "_xzm_segment_group_segment_span_free_coalesce": 1,
+      "neoclr::vm::validate_linked_indexed::h04bd14540bb52b77": 1,
+      "_$LT$neoclr..metadata..Type$u20$as$u20$core..cmp..PartialEq$GT$::eq::h7e6fa2b2a6eb2be7": 1,
+      "neoclr::memory_view_contract::contains_borrowed::ha3076226f69db383": 1,
+      "neoclr::compositions::contains::h1eae4bded29acd6a": 1,
+      "core::ops::function::FnOnce::call_once::h30d7f71e6b04e44d": 1,
+      "neoclr::interfaces::validate::hf64b10d688fe34ab": 1,
+      "_$LT$alloc..vec..Vec$LT$T$GT$$u20$as$u20$alloc..vec..spec_from_iter..SpecFromIter$LT$T$C$I$GT$$GT$::from_iter::h5f6402589e7e967f": 1,
+      "_xzm_xzone_find_and_malloc_from_freelist_chunk": 1,
+      "std::sync::once::Once::call_once_force::_$u7b$$u7b$closure$u7d$$u7d$::h336cbfc6a591dbef": 1,
+      "hashbrown::map::HashMap$LT$K$C$V$C$S$C$A$GT$::insert::h04aaa3b717cd8f23": 1,
+      "neoclr::metadata::validate_slot_names::h96b4a4ad3e1383b5": 1,
+      "_RNvNvNtCs1OjIl8oxbrv_5alloc3fmt6format12format_inner": 1,
+      "_$LT$core..iter..adapters..map..Map$LT$I$C$F$GT$$u20$as$u20$core..iter..traits..iterator..Iterator$GT$::fold::h06fc51e0bdb9b6a8": 1,
+      "neoclr::metadata::Type::contains_self::h81159a3e257306ab": 1,
+      "_$LT$alloc..vec..Vec$LT$T$C$A$GT$$u20$as$u20$core..clone..Clone$GT$::clone::hdfa5fbea204aeb81": 1,
+      "_xzm_xzone_free_freelist": 1,
+      "_$LT$neoclr..metadata..FunctionRef$u20$as$u20$core..clone..Clone$GT$::clone::h6e00b84c02904159": 0,
+      "???": 0,
+      "hashbrown::raw::RawTable$LT$T$C$A$GT$::reserve_rehash::h60c4132efbcf23c0": 0,
+      "neoclr::memory_view_contract::signature::h13edadfe1c03c51b": 0,
+      "neoclr::vm::check_type_context::h02725f53afef3b4d": 0,
+      "neoclr::metadata::Function::map_types::h597482f5ca08fe5d": 0,
+      "core::ptr::drop_in_place$LT$neoclr..metadata..Function$GT$::h9bd6f39b77f96a6b": 0,
+      "xzm_segment_group_free_chunk": 0,
+      "neoclr::metadata::Property::map_types::hbbdbbc02834198b7": 0,
+      "core::ptr::drop_in_place$LT$core..option..Option$LT$neoclr..metadata_origin..MetadataOrigin$GT$$GT$::h336f83beec4d7a75": 0,
+      "neoclr::inheritance::declared_method::h8ea55ab400fa664f": 0,
+      "neoclr::inheritance::base::h1994c0202b0f0143": 0,
+      "neoclr::inheritance::lineage::h1e31755f6efa4705": 0,
+      "alloc::raw_vec::RawVecInner$LT$A$GT$::finish_grow::hbc83dea2dee95b6c": 0,
+      "alloc::raw_vec::RawVec$LT$T$C$A$GT$::grow_one::h50c280358d59cfee": 0,
+      "neoclr::interfaces::closure::visit::hcc54634ba5a5a125": 0,
+      "neoclr::interfaces::closure::h819d78f5d326fb8a": 0,
+      "neoclr::interfaces::conformance_owner::hb11442b00a1cd7cf": 0,
+      "neoclr::interfaces::ensure_members::hb72bad7ea9e5557b": 0,
+      "neoclr::interfaces::ensure_implementation::h0d144a5e409f7294": 0,
+      "core::iter::adapters::try_process::h41b6c63dc9ce7f96": 0,
+      "neoclr::vm::resolve_constructor_body::h83fc1afbb0e45a96": 0,
+      "neoclr::vm::resolve_constructor::h067138786a222d54": 0,
+      "_xzm_xzone_malloc_freelist_outlined": 0,
+      "neoclr::vm::validate_linked_indexed::_$u7b$$u7b$closure$u7d$$u7d$::haed9ccc18948ec5b": 0,
+      "neoclr::vm::check_type::h2ed30cc1478f26b5": 0,
+      "neoclr::access::check_owner::heb9deef98b6646e8": 0,
+      "neoclr::access::check_call::h260dc4e29cc54178": 0,
+      "_RNvMNtNtNtNtCsg55jX0GwzBC_3std3sys4sync4once5queueNtB2_4Once4call": 0,
+      "std::sync::once_lock::OnceLock$LT$T$GT$::initialize::hd298222384b24750": 0,
+      "neoclr::friend_access::permits::hd3dcaa11b0aee06d": 0,
+      "neoclr::inheritance::require_concrete::h538b71f47949ca10": 0,
+      "neoclr::initialization::build_default::build::h07d3fc5119d37f30": 0,
+      "neoclr::inheritance::fields::h7c8c12ffec1b3c0a": 0,
+      "neoclr::vm::record_fields::h7181f965a56ae711": 0,
+      "_$LT$alloc..vec..Vec$LT$T$GT$$u20$as$u20$alloc..vec..spec_from_iter..SpecFromIter$LT$T$C$I$GT$$GT$::from_iter::h776098109d4bb4ab": 0,
+      "core::iter::adapters::try_process::ha38250ee061654c9": 0,
+      "neoclr::initialization::build_default::h5a79006447b1f8d9": 0,
+      "neoclr::variance::validate::heafd8f3bb2a60a92": 0,
+      "neoclr::metadata::Module::is_reference_type::hca44f944b003fc1f": 0,
+      "neoclr::native::bind::h783aa93c2b92f39a": 0,
+      "neoclr::metadata::Function::argument_types::h840ba1f05d631c6c": 0,
+      "neoclr::self_types::signature_has_self::h6727642d62ddc2bc": 0,
+      "neoclr::function_objects::validate_binding::h2b8811272cfc0274": 0,
+      "neoclr::runtime_lookup::with_module::hf8d649ce21845224": 0,
+      "_$LT$hashbrown..raw..RawTable$LT$T$C$A$GT$$u20$as$u20$core..ops..drop..Drop$GT$::drop::h991e758c60f95c59": 0,
+      "alloc::rc::Rc$LT$T$C$A$GT$::drop_slow::h810f926f57df15ae": 0,
+      "std::thread::local::LocalKey$LT$T$GT$::with::h9b3150a67843028b": 0,
+      "neoclr::library::link_modules_with_object_root::h581722afe3147cbe": 0,
+      "neoclr::program::LoadedProgram::with_modules_and_object_root::hb60ea048ee117adb": 0,
+      "neoclr_codegen::linking::prepare::h380d394fee7d509b": 0,
+      "neoclr_codegen::run::hfad6afbdf7473c45": 0,
+      "neoclr_codegen::main::h5637f3a7efdfd87f": 0,
+      "std::sys::backtrace::__rust_begin_short_backtrace::h1434b94f41deb52e": 0,
+      "std::rt::lang_start::_$u7b$$u7b$closure$u7d$$u7d$::hf5b75b0e3b1d5ed7": 0,
+      "_RNvNtCsg55jX0GwzBC_3std2rt19lang_start_internal": 0,
+      "main": 0,
+      "start": 0,
+      "Thread_89572698   DispatchQueue_1: com.apple.main-thread  (serial)": 0
+    }
+  },
+  "workerProfile": {
+    "total": 11044,
+    "scope": "Exclusive wall-clock self samples; not CPU shares or call counts.",
+    "groups": {
+      "root publication and frame bookkeeping": {
+        "samples": 3100,
+        "percent": 28.069540021731257
+      },
+      "managed generated code": {
+        "samples": 2038,
+        "percent": 18.453458891705903
+      },
+      "collector": {
+        "samples": 1975,
+        "percent": 17.88301340094169
+      },
+      "TLS resolution": {
+        "samples": 1403,
+        "percent": 12.703730532415792
+      },
+      "other (retained separately)": {
+        "samples": 1129,
+        "percent": 10.222745382107933
+      },
+      "socket and poll leaves": {
+        "samples": 693,
+        "percent": 6.274900398406374
+      },
+      "allocation and object admission": {
+        "samples": 574,
+        "percent": 5.197392249185078
+      },
+      "native stack checks": {
+        "samples": 132,
+        "percent": 1.1952191235059761
+      }
+    },
+    "topLeaves": [
+      {
+        "symbol": "stack_roots",
+        "name": "stack_roots",
+        "count": 1573,
+        "percent": 14.243027888446216
+      },
+      {
+        "symbol": "collect_indexed",
+        "name": "collect_indexed",
+        "count": 1567,
+        "percent": 14.188699746468671
+      },
+      {
+        "symbol": "_tlv_get_addr",
+        "name": "_tlv_get_addr",
+        "count": 1403,
+        "percent": 12.703730532415792
+      },
+      {
+        "symbol": "neoclr_gc_enter_owned_v1",
+        "name": "neoclr_gc_enter_owned_v1",
+        "count": 854,
+        "percent": 7.732705541470482
+      },
+      {
+        "symbol": "validated_bases",
+        "name": "validated_bases",
+        "count": 317,
+        "percent": 2.870336834480261
+      },
+      {
+        "symbol": "neoclr_gc_collect_conditional_v1",
+        "name": "neoclr_gc_collect_conditional_v1",
+        "count": 303,
+        "percent": 2.7435711698659904
+      },
+      {
+        "symbol": "_platform_strlen",
+        "name": "_platform_strlen",
+        "count": 263,
+        "percent": 2.3813835566823616
+      },
+      {
+        "symbol": "neoclr_gc_allocate_v1",
+        "name": "neoclr_gc_allocate_v1",
+        "count": 242,
+        "percent": 2.191235059760956
+      },
+      {
+        "symbol": "sigprocmask",
+        "name": "sigprocmask",
+        "count": 228,
+        "percent": 2.064469395146686
+      },
+      {
+        "symbol": "neoclr_gc_published_boundary_v1",
+        "name": "neoclr_gc_published_boundary_v1",
+        "count": 226,
+        "percent": 2.0463600144875045
+      },
+      {
+        "symbol": "neoclr_gc_leave_v1",
+        "name": "neoclr_gc_leave_v1",
+        "count": 221,
+        "percent": 2.001086562839551
+      },
+      {
+        "symbol": "close",
+        "name": "close",
+        "count": 179,
+        "percent": 1.6207895689967402
+      },
+      {
+        "symbol": "poll",
+        "name": "poll",
+        "count": 178,
+        "percent": 1.6117348786671495
+      },
+      {
+        "symbol": "__sendto",
+        "name": "__sendto",
+        "count": 164,
+        "percent": 1.4849692140528794
+      },
+      {
+        "symbol": "neoclr_native_stack_check_v1",
+        "name": "neoclr_native_stack_check_v1",
+        "count": 132,
+        "percent": 1.1952191235059761
+      },
+      {
+        "symbol": "neoclr_value_69",
+        "name": "System.Concurrency.CancellationTokenSource.Remove",
+        "count": 127,
+        "percent": 1.1499456718580225
+      },
+      {
+        "symbol": "neoclr_gc_transient_owned_v1",
+        "name": "neoclr_gc_transient_owned_v1",
+        "count": 114,
+        "percent": 1.032234697573343
+      },
+      {
+        "symbol": "__accept",
+        "name": "__accept",
+        "count": 114,
+        "percent": 1.032234697573343
+      },
+      {
+        "symbol": "neoclr_gc_stack_map_v1",
+        "name": "neoclr_gc_stack_map_v1",
+        "count": 112,
+        "percent": 1.0141253169141615
+      },
+      {
+        "symbol": "mark_frames",
+        "name": "mark_frames",
+        "count": 105,
+        "percent": 0.9507424846070265
+      },
+      {
+        "symbol": "neoclr_value_469",
+        "name": "System.Web.Http.HttpRequestDecoder.PushCore",
+        "count": 97,
+        "percent": 0.8783049619703006
+      },
+      {
+        "symbol": "_platform_memset",
+        "name": "_platform_memset",
+        "count": 87,
+        "percent": 0.7877580586743933
+      },
+      {
+        "symbol": "neoclr_value_458",
+        "name": "System.Web.Http.HttpRequestHeaderBuffer.get_Item",
+        "count": 83,
+        "percent": 0.7515392973560304
+      },
+      {
+        "symbol": "neoclr_value_800",
+        "name": "System.Collections.ArrayList`1.Add",
+        "count": 77,
+        "percent": 0.6972111553784861
+      },
+      {
+        "symbol": "__getrlimit",
+        "name": "__getrlimit",
+        "count": 77,
+        "percent": 0.6972111553784861
+      }
+    ],
+    "coordinatorSamples": 2761,
+    "source": "worker-analysis/summary.json"
+  },
+  "lookupPerAdditionalResponse": {
+    "plain": {
+      "aot": {
+        "base_calls": 102.0,
+        "base_cache_hits": 98.5,
+        "base_walks": 3.5,
+        "base_spans": 1801.375,
+        "index_build_spans": 2127.875,
+        "index_queries": 9696.125,
+        "index_outside": 6515.5,
+        "index_probes": 11666.125,
+        "mark_candidates": 9665.125,
+        "payload_matches": 3149.625,
+        "newly_marked": 1865.875,
+        "object_words": 8604.625
+      },
+      "jit": {
+        "base_calls": 102.0,
+        "base_cache_hits": 98.5,
+        "base_walks": 3.5,
+        "base_spans": 1801.375,
+        "index_build_spans": 2186.5,
+        "index_queries": 9966.0,
+        "index_outside": 6689.0,
+        "index_probes": 11901.5,
+        "mark_candidates": 9934.0,
+        "payload_matches": 3245.0,
+        "newly_marked": 1923.0,
+        "object_words": 8861.0
+      }
+    },
+    "json": {
+      "aot": {
+        "base_calls": 233.0,
+        "base_cache_hits": 224.5,
+        "base_walks": 8.5,
+        "base_spans": 4984.625,
+        "index_build_spans": 3533.875,
+        "index_queries": 15970.125,
+        "index_outside": 10843.5,
+        "index_probes": 19158.0,
+        "mark_candidates": 15918.125,
+        "payload_matches": 5074.625,
+        "newly_marked": 2999.875,
+        "object_words": 13730.625
+      },
+      "jit": {
+        "base_calls": 233.0,
+        "base_cache_hits": 224.5,
+        "base_walks": 8.5,
+        "base_spans": 4984.625,
+        "index_build_spans": 3592.125,
+        "index_queries": 16240.0,
+        "index_outside": 11017.0,
+        "index_probes": 19409.5,
+        "mark_candidates": 16187.0,
+        "payload_matches": 5170.0,
+        "newly_marked": 3057.0,
+        "object_words": 13987.0
+      }
+    }
+  },
+  "gcTiming": {
+    "perResponse": {
+      "allocations": 208.05026235846452,
+      "allocatedBytes": 15999.166528583264,
+      "rootPublications": 3676.416459541563,
+      "attempts": 3.5923777961888983,
+      "gcNanoseconds": 80933.25968885206
+    },
+    "totals": {
+      "attempts": 39024,
+      "gcNanoseconds": 879178000,
+      "maximumPauseNanoseconds": 67000,
+      "failures": 0,
+      "allocatedBytes": 173798946,
+      "allocations": 2260050,
+      "reclaimed": 2260050,
+      "peakLiveBytes": 51180,
+      "peakArenaBytes": 85544,
+      "rootPublications": 39936912,
+      "pauseBuckets": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        2,
+        0,
+        1,
+        1,
+        8,
+        38955,
+        56,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "inputs": {
+    "target/bottleneck-review/startup/results.json": "06c550cf205040e6fcdfa8dc9ae755980dbb2bdba3d19d2145b7d5db7f7a094a",
+    "target/bottleneck-review/peers/comparison.json": "eda64808102e6f62d09184c06fb6c1f4b71e6942b9186f668de3b324432e6e17",
+    "target/bottleneck-review/worker-analysis/summary.json": "cbc83321b1a6664a77e4344d1a991239440075a5cc60a63ca04982051fd07c4b",
+    "target/bottleneck-review/plain-counts/results.json": "49bd5d5af2a150e1a7e75f3e3f8639d90becc30a5c20fad04e430dd6962ea266",
+    "target/bottleneck-review/json-counts/results.json": "3128fd70e8c4c33c08eb993b87cda55bde94db2b354d8e5c885fadc97b75f06e",
+    "target/bottleneck-review/gc-timing/profile.json": "4cf43ae7cfcf0940b8589291a471bc11a9dbf02206fe7264c3e17aab9371f196",
+    "/Users/robert/Projects/neoclr/benchmarks/execution/bottleneck-review/summarize.py": "876fae09ef177295fbd5d974e6271c5a6ef477e9ffdabca41975b82eff0ddfb7"
+  }
+}

@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-24
 
+- Consolidate runtime bottlenecks with fresh ordinary-mode/startup, matched HTTP peer, worker-stack and plain/JSON GC evidence. Current one/four-owner plaintext means are 2,887/7,907 requests/s versus Kestrel 22,691/18,299 in the same local connection-close cohort. Separate metadata resolution/copying, root maintenance, collection, TLS, JIT placement and interpreter gaps; record prioritized architectural work and validation gates without claiming an implemented optimization. Retain the failed older interpreter-package refresh, raw evidence and 22 passing analysis tests in benchmarks/execution/bottleneck-review/.
+
 - Record the author's clarification that backward compatibility is not a constraint during experimental neoCLR development, including invasive runtime/metadata/GC interface changes. Preserve correctness, safety and measured validation requirements; no new implementation or performance outcome is implied.
 
 - Lazily index exact metadata definition identities within immutable lookup scopes, preserving module/revision identity, first-row semantics, source tokens and the unscoped fallback. Thirty-two focused tests pass. An isolated repeated-lookup experiment shows a large warm lookup reduction with explicit preparation/memory costs, not an HTTP speedup. Retain evidence and an ordinary-object tracing recipe inventory in benchmarks/execution/definition-index/; raw-token resolution and collector-map registration remain separate work.

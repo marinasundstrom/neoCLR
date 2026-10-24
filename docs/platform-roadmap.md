@@ -6698,3 +6698,23 @@ native HTTP throughput claim. [Evidence and source-token distinctions](../benchm
 Ordinary-object recipe inventories identify existing compiler tracing information,
 but GC integration still requires distinguishing static/special allocations and
 owning immutable descriptor lifetimes. Raw-token resolution is a separate API gap.
+
+### Consolidated runtime bottleneck investigation — 2026-10-24
+
+The author requests concrete, coherent evidence across runtime services rather than
+continuing isolated local experiments. The [consolidated investigation](design/runtime-bottleneck-investigation.md)
+refreshes 18 ordinary-mode runs, two startup profiles, 14 matched HTTP peer trials,
+a four-worker profile, timed GC and plain/JSON lookup counts. Current plaintext
+throughput averages 2,887/7,907 requests/s at one/four owners versus Kestrel's
+22,691/18,299 in the same connection-close cohort; parity remains open. Shared
+selection/verification still dominates startup, while native root/frame bookkeeping,
+collection and TLS remain prominent in worker samples. These are distinct costs.
+
+The resulting author-directed investigation sequence prioritizes a resolved immutable
+metadata graph and a coherent native execution-state/root contract, followed by
+precise layout/address lookup and qualified JIT placement. Generational/moving GC
+needs survival, mutation and relocation evidence; adding threads alone is insufficient.
+An older CPU/JSON package fails current interpreter admission, so its batch results
+remain historical pending a coherent rebuild. This records measured priorities for
+the runtime investigation, not completed architectural changes or a replacement for
+the platform milestones. [Reproducible evidence and limits](../benchmarks/execution/bottleneck-review/README.md).
