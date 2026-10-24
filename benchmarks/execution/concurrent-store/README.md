@@ -181,3 +181,25 @@ native AOT consumers (200 cycles each) and framed real-host JIT (100 cycles).
 The generated object remains byte-identical to `framed-stores.o.gz`: this gate
 adds validation without changing the fixture's emitted code. No timing comparison
 was made during this qualification.
+
+## Versioned experimental host handshake
+
+The private `experiment_gc_live_capabilities_v1(uint32_t version)` query returns a
+64-bit feature mask, or zero for unsupported versions. Version 1 requires bits for
+noncollecting scalar stores, old/new candidate logging and owned nonmoving epochs.
+Unknown additional bits are allowed. The query is side-effect-free: it allocates
+nothing, starts no worker and does not publish roots or collect.
+
+The JIT fixture checks the loaded library before binding providers or defining
+code. The native AOT driver checks before invoking generated writers; a missing
+query is a link failure. Providers still need explicit ABI/call coverage and trusted
+implementation qualification. This declaration is a compatibility handshake, not
+proof that an arbitrary native library implements the protocol or a security boundary.
+It does not grant shared-heap, scheduler, array-provider or HTTP admission.
+
+`host-validation.json.gz` records rejection of missing, legacy and partial-query
+libraries, followed by successful native JIT and optimized/UBSan AOT consumers.
+`host-compiler-tests.json.gz` records ten focused tests; two host-dependent tests
+are explicitly executed by the harness. `host-native-gc.c.gz` retains the generated
+collector including the query. Unknown-version rejection is checked by the native
+consumer. No application throughput measurements or default switch occur here.

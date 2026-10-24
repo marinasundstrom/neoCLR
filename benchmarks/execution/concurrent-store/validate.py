@@ -29,6 +29,13 @@ try:
   cmd=common+[obj,'-DCONSUMER_MAIN','-o',exe]
   if sanitized:cmd+=['-fsanitize=undefined,bounds','-fno-sanitize-recover=all']
   run(cmd);run([exe])
+ for name,value in [('missing',None),('legacy',0),('partial',1)]:
+  stub=out/(name+'.c')
+  query='int inert(void) { return 0; }' if value is None else 'uint64_t experiment_gc_live_capabilities_v1(uint32_t version) { (void)version; return '+str(value)+'; }'
+  stub.write_text('#include <stdint.h>\n'+query+'\n')
+  run(cc+['-std=c11','-Wall','-Wextra','-Werror','-dynamiclib',stub,'-o',out/(name+'.dylib')])
+ run([runner,'mutation_store::tests::incompatible_live_hosts_rejected_before_binding','--exact','--ignored','--nocapture'],dict(os.environ,NEOCLR_MUTATION_TEST_HOST_CASES=str(out)))
+ assert '1 passed' in r['commands'][-1]['stdout']
  host=out/'host.dylib'
  run(common+['-dynamiclib','-o',host])
  run([runner,'mutation_store::tests::native_collector_jit_consumer','--exact','--ignored','--nocapture'],dict(os.environ,NEOCLR_MUTATION_TEST_HOST=str(host)))

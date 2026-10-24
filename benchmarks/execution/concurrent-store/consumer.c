@@ -6,6 +6,7 @@
 extern int32_t experiment_gc_begin(neoclr_aot_context *,const neoclr_probe_frame *,neoclr_gc_conditional_root *,uint32_t);
 extern int32_t experiment_gc_finish(neoclr_aot_context *,const neoclr_probe_frame *,neoclr_gc_conditional_root *,uint32_t);
 extern void experiment_gc_shadow_gate(int);
+extern uint64_t experiment_gc_live_capabilities_v1(uint32_t);
 typedef int32_t (*writer)(void *,void *,uint64_t);
 #define CHECK(x) do { if (!(x)) { fprintf(stderr,"consumer line %d\n",__LINE__); abort(); } } while(0)
 void *frame_enter(neoclr_probe_frame *frame, neoclr_aot_context *context) {
@@ -25,6 +26,9 @@ static uint64_t *node(neoclr_aot_context *c) {
     p[0]=17; return p;
 }
 int native_store_consumer(writer write) {
+    CHECK(!experiment_gc_live_capabilities_v1(0));
+    CHECK(!experiment_gc_live_capabilities_v1(2));
+    CHECK((experiment_gc_live_capabilities_v1(1)&7)==7);
     for(unsigned round=0;round<100;round++) {
         uint64_t heap[512]={0};
         neoclr_aot_context c={.text={(unsigned char *)heap,sizeof(heap),0}};

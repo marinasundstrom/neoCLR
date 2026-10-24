@@ -157,4 +157,5 @@ int experiment_gc_write(neoclr_aot_context *context, void *payload,
 }
 '''
 s+='\n'+(base/'store.h').read_text()
+s+='\n'+(base/'contract.h').read_text()
 a.output.write_text(s)

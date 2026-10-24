@@ -22515,3 +22515,19 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   outstanding. [Affected comparison](../benchmarks/execution/concurrent-live/store-overlap-results.md).
 - Assistant returns to compiler call-closure enforcement as part of writer admission,
   rather than drawing further default-GC conclusions from those noisy timings.
+
+
+### 2026-10-24 — Throughput-led concurrent-GC default decision
+
+- Author clarifies: “our goal should be to get concurrent GC as the default, given
+  that is works and there are significant HTTP request performance improvements -
+  compared to using sync GC.” Author adds that CPU usage “is not that big of a deal
+  for a proof of concept.”
+- Assistant accepts correctness and significant repeatable HTTP throughput gains as
+  the default-switch criteria. CPU remains a reported tradeoff, not a requirement
+  to beat synchronous GC. Synchronous comparison/fallback and the broader standalone,
+  memory, pause and safety qualification remain part of the active goal.
+- Assistant completes the versioned host compatibility check already in progress;
+  missing/legacy/partial hosts are rejected and matching JIT/AOT consumers pass.
+  This is an integration prerequisite, not evidence of an HTTP gain. Ordinary
+  execution integration and managed HTTP throughput qualification remain unfinished.

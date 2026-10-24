@@ -79,3 +79,38 @@ pub(crate) fn check_call_closure(
     }
     Ok(())
 }
+
+// Exact private experimental query ABI. These bits describe required semantics,
+// not optional performance policies or a blanket provider admission.
+const HOST_VERSION: u32 = 1;
+const REQUIRED_HOST_FEATURES: u64 = 1 | 2 | 4;
+
+/// The library is trusted native code and must outlive all bound generated code.
+/// Call before binding providers or defining/invoking the experimental image.
+/// The query is the only host function invoked by this compatibility check.
+pub(crate) unsafe fn require_host(library: &libloading::Library) -> Result<(), Error> {
+    type Query = unsafe extern "C" fn(u32) -> u64;
+    let query: libloading::Symbol<Query> =
+        unsafe { library.get(b"experiment_gc_live_capabilities_v1") }
+            .map_err(|_| "host lacks the experimental live-GC capability query")?;
+    let features = unsafe { query(HOST_VERSION) };
+    check_host_features(features)
+}
+fn check_host_features(features: u64) -> Result<(), Error> {
+    if features & REQUIRED_HOST_FEATURES != REQUIRED_HOST_FEATURES {
+        return Err("host lacks required version-1 live-GC semantics".into());
+    }
+    Ok(())
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn requires_all_semantics_and_allows_additive_features() {
+        for features in 0..7 {
+            assert!(check_host_features(features).is_err());
+        }
+        assert!(check_host_features(7).is_ok());
+        assert!(check_host_features(7 | (1 << 63)).is_ok());
+    }
+}

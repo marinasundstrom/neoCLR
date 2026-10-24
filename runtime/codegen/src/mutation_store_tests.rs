@@ -277,6 +277,7 @@ fn native_collector_jit_consumer() {
     let path = std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("native host fixture");
     // The fixture is built from this checkout; its library outlives generated code.
     let library = unsafe { libloading::Library::new(path) }.unwrap();
+    unsafe { crate::mutation_admission::require_host(&library) }.unwrap();
     type Hook = unsafe extern "C" fn(*mut std::ffi::c_void, *mut u8, u64, u32) -> i32;
     type Writer = unsafe extern "C" fn(*mut std::ffi::c_void, *mut u8, u64) -> i32;
     type Run = unsafe extern "C" fn(Writer) -> i32;
@@ -722,4 +723,20 @@ fn call_closure_rejects_indirect_calls_and_forged_site_signatures() {
     .unwrap_err()
     .to_string()
     .contains("indirect"));
+}
+
+#[test]
+#[ignore = "requires NEOCLR_MUTATION_TEST_HOST_CASES built by concurrent-store/validate.py"]
+fn incompatible_live_hosts_rejected_before_binding() {
+    let directory = std::path::PathBuf::from(
+        std::env::var_os("NEOCLR_MUTATION_TEST_HOST_CASES").expect("host cases"),
+    );
+    for name in ["missing", "legacy", "partial"] {
+        let library =
+            unsafe { libloading::Library::new(directory.join(format!("{name}.dylib"))) }.unwrap();
+        assert!(
+            unsafe { crate::mutation_admission::require_host(&library) }.is_err(),
+            "{name}"
+        );
+    }
 }

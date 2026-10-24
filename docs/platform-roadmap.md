@@ -1,5 +1,15 @@
 # neoCLR platform roadmap
 
+**Concurrent GC acceptance clarification (author direction, 2026-10-24):** Make
+concurrent GC the default once correctness is established and it delivers significant,
+repeatable HTTP request throughput improvements over synchronous GC. For this proof
+of concept, CPU use remains a measured tradeoff, not a requirement to beat synchronous
+GC. Prioritize real HTTP integration and throughput qualification; retain standalone
+workload, memory, pause and safety evidence and synchronous comparison/fallback.
+Native microbenchmark CPU regressions alone do not decide the default. Reported
+video-playback interference makes existing timing conclusions provisional until
+controlled repeats; it does not invalidate deterministic correctness checks.
+
 **Concurrent GC priority (author direction, 2026-10-24):** Work toward concurrent
 native GC as the default, retaining synchronous GC as the comparison and reusing
 existing root, metadata and heap optimizations. Qualify correctness before enabling
@@ -67,7 +77,9 @@ return cleanup. Ordinary compilation does not invoke the pass; closed-world
 host/writer admission, complete pipeline integration and managed consumers remain next.
 The isolated consumers now check call closure against supplied bodies/explicit provider
 ABIs and validate their complete AOT import set. This does not establish provider
-implementation safety or matching host capability; ordinary compilation remains unchanged.
+implementation safety. A versioned native query now rejects missing/incompatible
+hosts in the isolated JIT/AOT driver, with positive and negative native tests.
+Ordinary compilation and wider native-provider/HTTP integration remain unchanged.
 [Indexed old-object scalar writes](../benchmarks/execution/concurrent-live/store-index-results.md)
 now remove repeated allocation walks during active epochs, with native/generated
 safety tests and paired lookup-cost evidence. New/inactive fallbacks remain linear;
