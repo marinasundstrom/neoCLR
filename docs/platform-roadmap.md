@@ -33,6 +33,12 @@ and conditional reachability. Native differential/churn checks and 8,192 checked
 HTTP responses pass, but capacity remains 2.8% lower with 7.5% more CPU/response.
 Keep this as a correctness reference; a cheaper mutation/read protocol and broader
 managed workload qualification remain next, not a default switch.
+The [live-heap mutation audit](../benchmarks/execution/concurrent-mutation-audit/README.md)
+identifies conservative scalar reads, narrow stores, array initialization markers
+and byref/native aliases that a pointer-only barrier would miss. Next implement a
+bounded epoch/mutation-gate primitive, then qualify all admitted generated/native
+writers before enabling a live-heap candidate. The proposed gate is a correctness
+baseline to measure, not an assumed performance improvement.
 
 **Author-directed media types (2026-10-23):** Complete the bounded HTTP value-contract
 slice with cached typed presets, lazy structured projections, shared primitive
