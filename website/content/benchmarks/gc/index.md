@@ -543,3 +543,24 @@ plain/JSON, close/keep-alive/pipeline, and sync/concurrent-control/scalar-candid
 AOT/JIT. There are 598 completed concurrent epochs; paired allocation work matches.
 Two additional JIT cases verify benchmark flag isolation. Repeated HTTP throughput,
 CPU and pause measurements remain pending; qualification timings are not a gain claim.
+
+### Repeated HTTP comparison and release direction
+
+The scalar-store follow-up passes **296,064 responses across 72 native invocations**
+and 32,174 concurrent epochs. HTTP effects are small and mixed: plain close JIT
+shows 5.7% higher CPU and 3.5% lower throughput for the candidate in this cohort.
+Sync remains faster in all measured configurations. The large standalone
+buffer-reuse benefit should not be presented as a general HTTP gain.
+
+| Plain text | Sync AOT | Concurrent control AOT | Scalar candidate AOT |
+| --- | ---: | ---: | ---: |
+| Close, requests/s | 5,388 | 4,115 | 4,198 |
+| Pipeline, requests/s | 7,539 | 6,124 | 6,174 |
+
+Separate pipeline profiles pass 12,480 responses. Concurrent has fewer measured
+outer GC operations and lower aggregate owner-operation wall time here, but its
+p99 bucket is 65.536–131.072 microseconds versus 16.384–32.768 for most sync cases
+(JSON JIT sync: 32.768–65.536). These are diagnostic operation durations, not request
+latency or background collector CPU. One run per cell does not establish a stable
+tail comparison. Synchronous GC remains the default for release preparation while
+runtime improvements and concurrent experiments continue.

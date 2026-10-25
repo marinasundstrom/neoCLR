@@ -53,7 +53,7 @@ if __name__ == '__main__':
         assert data['passed'] and data.get('diagnosticOnly')
         for trial in data['trials']:
             assert trial['exitCode'] == 0
-            key = trial.get('sample', data.get('sample')) + '/' + trial['mode']
+            key = trial.get('sample', data.get('sample')) + ('/' + trial['protocol'] if 'protocol' in trial else '') + '/' + trial['mode']
             group = result['groups'].setdefault(key, dict(trials=0, operations={}))
             rows = parse(trial['stderr'])
             if 'candidateCounts' in trial:

@@ -70,3 +70,70 @@ report both throughput and whole-invocation CPU/memory; invocation includes warm
 and cleanup. Treat small mixed effects honestly. Profile pause distributions
 separately. These qualification timings do not establish an HTTP gain, and no
 collector/default setting changes follow from passing the wire checks.
+
+## Repeated HTTP comparison
+
+All 72 native invocations pass 296,064 responses (4,096 measured plus 16 warmup
+per invocation), with 32,174 completed concurrent epochs and no invalid-state
+reports. Three interleaved rounds cover both payloads, close/pipeline protocols,
+and all six variants. This one-owner/four-client fixed-work cohort is not a
+saturation or external-framework ranking. JIT compilation is excluded from
+invocation CPU; traffic-window throughput and whole-invocation CPU have different
+boundaries. Raw results: `scalar-store-evidence/http-cost.json.gz`.
+
+Median requests/second:
+
+| Payload | Protocol | Execution | Sync | Concurrent control | Scalar candidate |
+| --- | --- | --- | ---: | ---: | ---: |
+| plain | close | AOT | 5388 | 4115 | 4198 |
+| plain | close | JIT | 3195 | 2584 | 2493 |
+| plain | pipeline | AOT | 7539 | 6124 | 6174 |
+| plain | pipeline | JIT | 4314 | 3711 | 3732 |
+| json | close | AOT | 3594 | 2783 | 2780 |
+| json | close | JIT | 2040 | 1742 | 1791 |
+| json | pipeline | AOT | 4107 | 3493 | 3495 |
+| json | pipeline | JIT | 2426 | 2201 | 2191 |
+
+Median invocation CPU milliseconds:
+
+| Payload | Protocol | Execution | Sync | Concurrent control | Scalar candidate |
+| --- | --- | --- | ---: | ---: | ---: |
+| plain | close | AOT | 754.35 | 1003.68 | 985.21 |
+| plain | close | JIT | 1276.29 | 1559.22 | 1647.42 |
+| plain | pipeline | AOT | 545.58 | 692.88 | 686.99 |
+| plain | pipeline | JIT | 954.18 | 1123.03 | 1117.21 |
+| json | close | AOT | 1143.02 | 1473.81 | 1471.73 |
+| json | close | JIT | 1970.82 | 2343.51 | 2292.83 |
+| json | pipeline | AOT | 1005.90 | 1201.73 | 1201.69 |
+| json | pipeline | JIT | 1690.94 | 1888.49 | 1895.77 |
+
+Scalar effects on HTTP are small and mixed, unlike the large standalone
+buffer-reuse gain. Plain close JIT is 5.7% higher CPU and 3.5% lower throughput in
+this cohort; do not hide that regression or declare it proven noise. Other CPU
+changes range from about 2.2% better to 0.4% worse. Sync remains faster in every
+measured configuration. These results support keeping sync as the release default,
+not abandoning continued concurrent/runtime optimization. Configuration and run
+variation remain limitations of three short rounds.
+
+## Separate owner-operation profile
+
+Twelve pipeline plain/JSON AOT/JIT cases pass 12,480 responses. The existing
+owner-operation instrumenter wraps complete collect/begin/finish/cancel calls and
+guarded writes in copied collectors. Its deterministic nested/TLS/histogram and
+negative controls pass with UB/bounds sanitizers. The summarizer now keeps protocol
+in group keys to avoid pooling different connection policies. Begin/finish/cancel
+counts match independent collector counters; all histogram consistency checks pass.
+
+Outermost-GC p99 bucket bounds are 16.384–32.768 microseconds for sync except JSON
+JIT at 32.768–65.536; concurrent control and candidate are 65.536–131.072 throughout.
+Concurrent has fewer outer operations and lower aggregate owner-GC wall time in
+these cases, but longer per-operation p99 intervals. Maxima include scheduler noise
+and one live JSON-JIT outlier of 563 microseconds. This is one diagnostic run per
+cell, not a pause-regression verdict or an HTTP tail-latency comparison.
+
+These measurements exclude background marker CPU and nonwrapped runtime work;
+scalar writes bypass the guarded-write path because primitive payloads are not
+traced. Inclusive rows overlap: use outermost-GC for disjoint selected GC operations,
+never sum all rows. Instrumentation overhead is included. Reports `http-pause-build`,
+`http-pauses` and `http-pause-summary` preserve raw evidence separately from timing.
+The wider multi-owner/shared-worker pause/default qualification remains open.

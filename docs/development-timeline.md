@@ -1,5 +1,38 @@
 # Development conversation record
 
+
+## 2026-10-25 — Prepare a release with a balanced runtime narrative
+
+- **Author:** Asked to integrate the changes and start preparing a new release,
+  questioning whether concurrent GC should become default. Then asked to rewrite
+  the changelog around release themes so GC work would not overshadow other work,
+  while preserving the full detailed GC history. Clarified that general runtime
+  optimization, existing-GC improvements and concurrent-GC experiments all matter.
+- **Assistant:** Recommended retaining synchronous GC as default for this release.
+  Repeated HTTP remains faster with sync, and concurrent pause/scaling acceptance
+  is incomplete. Distinguished implementation integration from a collector-default
+  switch and private qualification tooling from public package capabilities.
+- **Actions:** Preserved the complete former Unreleased history verbatim in a
+  [dated archive](development-history/unreleased-through-2026-10-25.md), rewrote
+  Unreleased and draft notes around platform/API, HTTP/value, runtime/GC and
+  experimental work, and opened the [release-readiness inventory](validation/release-preparation-20261025/README.md).
+  Published changelog sections remain byte-identical. Version, final artifact pins,
+  package qualification and publication remain open. Repeated HTTP and separate
+  owner-operation profiles are retained, including mixed/regressive results.
+
+## 2026-10-25 — Integrate improvements once their benefit is established
+
+- **Author:** “After proven useful, integrate any improvements and update benchmarks”.
+- **Assistant response:** Integrate improvements supported by correctness and
+  measured benefit, updating the standard benchmark evidence in the same slice.
+  For typed scalar stores, finish repeated HTTP and separate pause comparisons
+  before choosing how broadly to enable the optimization. Enabling a qualified
+  optimization within concurrent GC is separate from making concurrent GC the
+  runtime default; the broader acceptance criteria remain open.
+- **Action underway:** The repeated six-variant HTTP comparison is running after
+  standalone AOT/JIT gains and HTTP wire qualification. Pause profiling will run
+  separately. No additional integration outcome is claimed by this entry.
+
 ## 2026-10-25 — Generational concurrent collector proposal
 
 - **Author:** Supplied ChatGPT advice proposing TLAB allocation, parallel copying

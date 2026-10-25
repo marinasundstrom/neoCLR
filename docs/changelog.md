@@ -54,3 +54,30 @@ Follow the [source-release process](source-release.md) for candidate validation,
 archive contents, licenses and release evidence.
 
 Repository agents receive the same per-commit rule in [AGENTS.md](../AGENTS.md).
+
+## Release themes and detailed engineering history (2026-10-25)
+
+Author direction: runtime optimization and concurrent-GC experiments must be
+represented without overshadowing the other release work. Keep Unreleased and
+release notes organized around user-visible themes: platform/API changes and
+migration, HTTP/value handling, general runtime/GC improvements, and clearly labeled
+experiments and evidence. Keep development entries under their current date.
+
+Retain fine-grained GC/runtime experiments, rejected candidates, measurements and
+intermediate decisions in the [development history](development-history/runtime-gc.md)
+and linked design/benchmark records. The former Unreleased entries are preserved
+verbatim in the dated archive; consolidation does not erase them or revise
+published sections. Update a related themed changelog entry in each implementation
+commit instead of appending every micro-experiment to the release narrative.
+Never turn an experimental gain into a general performance claim, or infer package
+availability from source-only qualification. General runtime, synchronous-GC and
+concurrent-GC work remain distinct parts of the release story.
+
+
+Publish the short versioned release notes as the release announcement, with the
+curated changelog as the complete user-facing change list and explicit migration
+reference. Link both from the website's release entry/install guidance when the
+release is actually published. Link the runtime/GC engineering history as further
+reading; do not paste the entire experiment log into the announcement. Development
+benchmark pages may show new evidence before release, but must retain their
+unreleased/experimental labels. Website deployment remains separate from drafting.
