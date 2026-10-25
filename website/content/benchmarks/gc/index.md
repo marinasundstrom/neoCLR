@@ -602,3 +602,30 @@ concurrent HTTP CPU improves 1.2% for plain and 0.18% for JSON; standalone effec
 are mixed, with retained-window 2.35% faster and the others between 0.49% faster
 and 0.67% slower. The switch stays opt-in. These short cohorts do not establish
 statistical significance or a new default.
+
+
+### Current JIT placement experiment
+
+Development measurements on 2026-10-25 pair system allocation with a 64 MiB
+contiguous JIT code/static-data reservation. Three interleaved rounds validate
+98,688 plain/JSON responses with identical native hosts and collector settings.
+
+| Handler | GC | System requests/s | Arena requests/s | Invocation CPU change |
+| --- | --- | ---: | ---: | ---: |
+| Plain | Sync | 4,344 | 7,398 | −41.2% |
+| Plain | Concurrent | 3,762 | 5,672 | −33.2% |
+| JSON | Sync | 2,454 | 3,714 | −34.0% |
+| JSON | Concurrent | 2,219 | 3,190 | −30.2% |
+
+This is a shared runtime-placement improvement in these short loopback cohorts;
+sync still leads. Managed allocation work matches, but this does not measure
+native resident memory or isolate instruction/data cache effects. Both providers
+retain instruction-cache publication and pass 200 active compiler tests. The
+arena remains test-only: large-image, native-memory and additional-platform
+qualification is still required. No collector or JIT placement default changes.
+
+The matched standalone JIT cohort passes 48 invocations across six workloads.
+Concurrent CPU falls roughly 32–35% in steady allocation, bursts, retained-window
+and mixed phases, 4.24% in buffer reuse, and is effectively unchanged in compute
+(+0.04%). Managed allocation counts/bytes match. Native-memory and large-image
+policy remain prerequisites to enabling this outside the test runner.

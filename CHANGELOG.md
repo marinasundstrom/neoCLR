@@ -54,7 +54,12 @@ continues as an experimental native development path.
   1.2% concurrent plaintext CPU and 0.18% JSON), with mixed standalone JIT
   results. Keep the split opt-in; sync remains faster in HTTP.
   Preserve tracing of changing root values and explicit ownership
-  across native boundaries and suspended work. Reuse completed macOS async
+  across native boundaries and suspended work. Requalify test-only contiguous JIT
+  code/static-data placement through the instruction-cache wrapper: matched HTTP
+  shows about 30–33% lower concurrent invocation CPU and four allocation-heavy
+  standalone patterns improve 32–35%, with sync also improving in HTTP.
+  Retain the system provider default pending memory/large-image/platform policy.
+  Reuse completed macOS async
   contexts under their qualified lifetime rules. Explicitly publish macOS ARM64
   JIT instructions through the platform cache API, correcting intermittent
   execution failures when generated-code storage is reused.

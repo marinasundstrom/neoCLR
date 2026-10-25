@@ -1,0 +1,14 @@
+{
+  "command": [
+    "target/jit-arena-current/runner",
+    "mutation_store::tests::unambiguous_stack_transfers_elide_only_proved_stores",
+    "--exact",
+    "--nocapture"
+  ],
+  "environment": {
+    "NEOCLR_TEST_JIT_ARENA": "invalid"
+  },
+  "exitCode": 101,
+  "stdout": "\nrunning 1 test\ntest mutation_store::tests::unambiguous_stack_transfers_elide_only_proved_stores ... FAILED\n\nfailures:\n\nfailures:\n    mutation_store::tests::unambiguous_stack_transfers_elide_only_proved_stores\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 233 filtered out; finished in 0.00s\n\n",
+  "stderr": "\nthread 'mutation_store::tests::unambiguous_stack_transfers_elide_only_proved_stores' (92433450) panicked at runtime/codegen/src/jit_memory.rs:8:13:\nassertion `left == right` failed: NEOCLR_TEST_JIT_ARENA must be 1\n  left: \"invalid\"\n right: \"1\"\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+}

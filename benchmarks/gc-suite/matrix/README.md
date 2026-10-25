@@ -203,3 +203,14 @@ typed stores and qualified stack policy identical in both modes. It validates
 current AOT input hashes and rejects differences in host/object recipes beyond
 the root-validation flag and output path. Compilation and invocation costs remain
 separate, and the first round is excluded as warmup.
+
+
+For experimental JIT placement, `prepare-jit-placement.py --build <qualified-http>
+--runner <current-test-runner> --output <fresh-directory>` pairs the same native
+host with system and 64 MiB arena placement. Run `http.py` with `sync-jit`,
+`arena-sync-jit`, `live-jit`, and `arena-live-jit`. The harness clears the ambient
+placement switch; only arena recipes set it. For standalone work use
+`compare-scalar-jit.py --arena-placement` with the completed root-validation AOT
+cohort: both modes share its unchanged control host and typed-store compiler policy.
+The arena is a test-only JIT code/static-data reservation, not managed-heap sizing
+or a production default. See [qualification and current results](../../../docs/validation/jit-arena-current-20261025/README.md).
