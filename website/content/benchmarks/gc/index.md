@@ -590,3 +590,12 @@ plain/JSON responses across synchronous/concurrent JIT/AOT. Native stack checks,
 frame entry, root publication and TLS remain visible in both collectors; concurrent
 store/index work also remains. These diagnostic captures are not new throughput
 results or CPU percentages, and do not change the synchronous default.
+
+
+An opt-in small-frame descriptor-validation split (development, 2026-10-25)
+reduces concurrent AOT HTTP CPU about 1.6% in a three-round screen and roughly
+4–6% in four allocation-heavy standalone patterns. Compute/reuse effects are
+near flat; buffer reuse is 0.26% slower. All validation checks remain, and matched
+standalone allocation work is unchanged. Sync also improves and remains faster.
+JIT correctness passes; JIT timing and broader qualification remain open. These
+short cohorts do not establish statistical significance or a new default.

@@ -47,7 +47,11 @@ continues as an experimental native development path.
 
 - Reduce repeated native root publication/descriptor validation, metadata and
   managed-allocation lookup work, redundant initialization and allocation
-  bookkeeping. Preserve tracing of changing root values and explicit ownership
+  bookkeeping. Add an opt-in small/large storage-validation split that preserves
+  activation checks while reducing small-frame register-save work; initial AOT
+  HTTP results show modest CPU gains and four allocation-heavy standalone patterns
+  improve about 4–6%, with synchronous GC still faster in HTTP.
+  Preserve tracing of changing root values and explicit ownership
   across native boundaries and suspended work. Reuse completed macOS async
   contexts under their qualified lifetime rules. Explicitly publish macOS ARM64
   JIT instructions through the platform cache API, correcting intermittent

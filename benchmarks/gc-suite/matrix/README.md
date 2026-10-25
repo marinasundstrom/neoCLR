@@ -186,3 +186,11 @@ zero. `wholeProcessCpuSeconds` includes sampler child CPU in this mode, while
 Use `benchmarks/execution/concurrent-workloads/summarize-cpu.py --measurement
 PATH/results.json --output PATH/summary.json` to verify capture hashes and extract
 top frames and TLS callers. Keep unprofiled throughput runs separate.
+
+
+For the opt-in small-frame validation experiment, prepare a fresh standard HTTP
+build, then run `prepare-root-variant.py --build PATH --output NEW_PATH`. It retains
+original recipes and adds `split-sync-aot`, `split-live-aot`, `split-sync-jit` and
+`split-live-jit`, using identical managed objects. Run qualification and timings
+separately through `http.py`. The default root validator and collector policy stay
+unchanged. See [safety and measurements](../../../docs/validation/split-storage-validation-20261025/README.md).

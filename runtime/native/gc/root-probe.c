@@ -106,8 +106,14 @@ static int has_spill_marker(const char *plan, uint32_t length) {
 /* Check current descriptor bytes without reading slot values: once at owned
  * entry, or at every publication for mutable storage/transients. Accumulate
  * failures so the compiler can vectorize the scan. */
-static void validate_storage(const neoclr_probe_storage *storage, uint32_t count,
-                             int check_flags) {
+#ifdef NEOCLR_GC_SPLIT_STORAGE_VALIDATION
+/* Keep SIMD setup outside the common small-frame activation path. Dynamic
+ * addresses, widths and flags are still checked on every admitted lifetime. */
+static __attribute__((noinline)) void validate_storage_large(
+#else
+static void validate_storage(
+#endif
+    const neoclr_probe_storage *storage, uint32_t count, int check_flags) {
     uint32_t invalid = 0;
 #if defined(NEOCLR_GC_SCALAR_STORAGE_VALIDATION) && defined(__clang__)
     /* Experimental small-frame control: preserve every validation predicate. */
@@ -121,6 +127,26 @@ static void validate_storage(const neoclr_probe_storage *storage, uint32_t count
     }
     if (invalid) abort();
 }
+#ifdef NEOCLR_GC_SPLIT_STORAGE_VALIDATION
+static void validate_storage(const neoclr_probe_storage *storage, uint32_t count,
+                             int check_flags) {
+    if (count > 4) {
+        validate_storage_large(storage, count, check_flags);
+        return;
+    }
+    uint32_t invalid = 0;
+#ifdef __clang__
+#pragma clang loop vectorize(disable) interleave(disable)
+#endif
+    for (uint32_t i = 0; i < count; i++) {
+        const neoclr_probe_storage *s = &storage[i];
+        invalid |= (s->address == NULL) |
+            ((s->read_bytes != 4) & (s->read_bytes != 8)) |
+            (check_flags ? (s->flags > 2) : 0);
+    }
+    if (invalid) abort();
+}
+#endif
 static neoclr_execution_state *enter_owned(neoclr_probe_frame *frame, const void *context, uint32_t function,
     const neoclr_probe_storage *storage, uint32_t count, const char *plan, uint32_t length, uint32_t flags) {
     if (!storage) abort();
