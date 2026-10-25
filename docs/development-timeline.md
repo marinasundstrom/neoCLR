@@ -1,5 +1,31 @@
 # Development conversation record
 
+## 2026-10-25 — Profile worker concurrency and reconsider GC scheduling architecture
+
+- **Author:** Asked to measure GC under many workers/threads and include scheduling
+  cost. Hopes concurrent GC benefits highly concurrent workloads, and explicitly
+  requested additional profiles to determine whether the architecture needs to
+  change. Clarified that runtime task switching should be efficient and asked
+  whether neoCLR yet has virtual threads.
+- **Assistant response:** Treat the expected advantage as a hypothesis. Distinguish
+  HTTP client concurrency, independent heap owners, shared-heap mutators, collector
+  threads and cooperative tasks/fibers. Current fibers are pinned to their owner;
+  the shared-heap concurrent experiment overlaps marking only with reviewed read
+  phases and ends epochs before exclusive mutation. Worker hosts currently cap
+  counts at four. These are limitations, not intended permanent semantics.
+- **Action underway:** Finish the active fixed-work HTTP matrix unchanged, then
+  profile one/four-owner sync/concurrent execution and shared-heap coordination
+  separately. Add OS context-switch and user/system CPU reporting to the existing
+  owner profiler. Inspect queue/resume, fiber-switch, root/safepoint, lease and
+  collector-service waits before prioritizing further GC optimizations. Scalar-store
+  prototype validation is deferred behind this author-requested investigation.
+- **Open:** The first twelve owner diagnostic profiles pass 724,344 responses; tuned
+  profiles are running and shared-heap attribution remains pending. Architectural
+  conclusions are not yet established. OS context switches do not count managed task switches or establish
+  runnable latency; missing telemetry must remain explicit. Higher worker counts
+  require qualification rather than silently lifting limits.
+
+
 ## 2026-10-25 — Refresh the execution/collector benchmark matrix
 
 - **Author:** “When this is ready we have to do new benchmarks across Interpreter,

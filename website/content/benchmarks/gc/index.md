@@ -462,4 +462,28 @@ first full-work pass completes compute, reusable-buffer, steady and burst sample
 Retained-window times out after 900 seconds, and mixed-phases is not reached.
 This is an incomplete single-pass cohort, not three-round statistics. Refreshed
 plain/JSON HTTP qualification now passes 600 responses across 30 close/keep-alive/
-pipelined cells. Repeated HTTP measurements and pause profiles remain pending.
+pipelined cells. Repeated HTTP measurements are below; pause and worker scheduling profiles remain pending.
+
+
+### Fresh HTTP matrix (development)
+
+Three rounds across the five supported execution/collector combinations and three
+connection patterns pass 297,504 plaintext/JSON responses. Single-owner native
+median requests/second:
+
+| Payload / connection | AOT sync | AOT concurrent | JIT sync | JIT concurrent |
+| --- | ---: | ---: | ---: | ---: |
+| Plain / close | 5,344 | 4,090 | 3,205 | 2,647 |
+| Plain / keep-alive | 6,328 | 5,134 | 3,707 | 3,346 |
+| Plain / pipeline | 7,395 | 6,038 | 4,432 | 3,749 |
+| JSON / close | 3,555 | 2,819 | 2,165 | 1,822 |
+| JSON / keep-alive | 3,809 | 3,254 | 2,321 | 2,094 |
+| JSON / pipeline | 4,117 | 3,540 | 2,484 | 2,216 |
+
+These private-driver loopback results show reduced HTTP work through reuse and
+pipelining; they establish neither saturation nor a concurrent-over-sync advantage.
+Native runs use 4,096 measured requests plus 16 warmup, four clients and depth-16
+pipelining. Interpreter runs use 64 measured requests plus 16 warmup and only its
+mark-sweep collector. Compilation is excluded from native throughput timing.
+Worker scaling, scheduling contention and GC pause profiles are separate work;
+public connection policy and collector defaults remain unchanged.

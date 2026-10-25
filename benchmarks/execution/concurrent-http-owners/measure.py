@@ -101,6 +101,12 @@ try:
     if sample=='task':assert all(trial['ownerResponses'].values())
     after=resource.getrusage(resource.RUSAGE_CHILDREN);client_after=resource.getrusage(resource.RUSAGE_SELF)
     cpu=server_usage.ru_utime+server_usage.ru_stime
+    trial['scheduling'] = dict(
+        voluntaryContextSwitches=server_usage.ru_nvcsw,
+        involuntaryContextSwitches=server_usage.ru_nivcsw,
+        userCpuSeconds=server_usage.ru_utime,
+        systemCpuSeconds=server_usage.ru_stime,
+        scope='Server process lifetime, all threads; wait4 OS counters, not task/fiber switches or runnable delay. Zero may reflect platform reporting limits.')
     total=sum(x['completedInWindow']+x['drainResponses'] for x in [warmup,trial])
     done=re.findall(r'DONE (\d+) (\d+) (\d+)', ''.join(lines))
     assert all(int(row[1])>0 for row in done)

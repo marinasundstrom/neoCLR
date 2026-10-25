@@ -2,9 +2,8 @@
 
 The author requested fresh Interpreter/JIT/AOT measurements with both collectors
 after persistent HTTP integration. This first completed cohort covers the unchanged
-six standard standalone workloads in native AOT and JIT. HTTP close/persistent/
-pipelined plain/JSON measurements, full interpreter results, and matrix pause
-profiles are still pending. This is not completion of the requested matrix.
+six standard standalone workloads in native AOT and JIT. HTTP close/persistent/pipelined plain/JSON measurements now also pass; remaining
+standalone interpreter results and matrix pause profiles are still pending. This is not completion of the requested matrix.
 
 ## Available combinations
 
@@ -168,5 +167,5 @@ and no invalid-state reports. These small runs are not throughput evidence.
 incorrectly required explicit sync budget macros where the retained recipe used
 identical defaults; the second omitted the JSON model's reflection roots. The final
 build supplies explicit sync budgets and standard Person reflection retention;
-no compiler admission guard was relaxed. Three-round measurements are running,
-with pause profiles still pending.
+no compiler admission guard was relaxed. Three-round measurements now pass all 90 trials and 297,504 responses; see
+[HTTP results](http-results.md). Pause and worker-scheduling profiles remain pending.

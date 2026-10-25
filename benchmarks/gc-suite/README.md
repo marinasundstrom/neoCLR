@@ -161,3 +161,10 @@ The author-requested [execution/collector matrix](matrix/README.md) records a fr
 three-round AOT/JIT standalone cohort, interpreter capability and pilot evidence,
 and the still-pending interpreter/HTTP/profile cells. Keep its timing scopes distinct
 from this original AOT procedure; unsupported combinations are explicit.
+
+## Concurrency and scheduling extension
+
+The author requested dedicated worker/thread contention profiles and an architectural
+review of concurrent GC. Follow the [concurrency procedure](concurrency/README.md),
+which separates independent owners, shared heaps, tasks/fibers and collector threads.
+The single-owner sample matrix does not establish many-worker scaling.
