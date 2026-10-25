@@ -2,7 +2,7 @@
 
 Status: opt-in typed-store optimization passes native and expanded AOT/JIT
 primitive-consumer validation and a matched six-sample AOT comparison. Keep it
-experimental pending full JIT workload and HTTP qualification. Defaults are unchanged.
+experimental pending HTTP qualification and wider default acceptance. Defaults are unchanged.
 
 ## Measured question
 
@@ -165,3 +165,32 @@ trial outputs, counters, hashes and medians are archived in `cost.json.gz`.
 Next: execute the full JIT workload comparison and fresh plain/JSON HTTP controls
 before considering wider enablement. This slice establishes neither HTTP throughput
 nor pause improvements, and does not qualify concurrent GC as the default.
+
+## Full JIT workload follow-up
+
+All 48 invocations pass exact guest output, exit status, epoch invariants and
+allocation-count/byte equality with the AOT cohort. Four alternating rounds,
+first discarded as warmup, leave three observations per variant/sample. Rebuilt
+JIT hosts reuse the qualified AOT native source/flags; JIT compilation, selection
+and metadata loading are reported separately from invocation CPU. Both variants
+use the same compiler and sample assemblies. Raw evidence: `scalar-store-evidence/jit.json.gz`.
+
+| Sample | Control JIT CPU ms | Scalar JIT CPU ms |
+| --- | ---: | ---: |
+| compute | 64.544 | 66.104 |
+| reuse-buffer | 114.116 | 53.908 |
+| steady | 259.717 | 259.223 |
+| bursts | 134.940 | 134.201 |
+| retained-window | 514.079 | 509.128 |
+| mixed-phases | 259.334 | 259.068 |
+
+Reuse-buffer improves 52.8% (114.116 to 53.908 ms CPU), with unchanged allocation
+work. Other effects are small and mixed: compute is 2.4% slower, while other
+median changes are 0.1–1.0% faster. Do not label them general improvements or assume
+noise has been established. This short cohort supports the large store-heavy gain,
+not a universal workload win. No new sync-versus-concurrent comparison is claimed.
+
+Reproduce with `compare-scalar-jit.py --build target/gc-patterns-standard-build
+--aot target/gc-scalar-store-cost-v1 --runner <qualified-runner>
+--output <fresh-directory>`. HTTP qualification and pause effects remain pending;
+concurrent-default acceptance is still open.

@@ -531,3 +531,9 @@ Its 14 allocations, 555 allocated bytes and 1,016-byte peak arena are unchanged.
 Other sample median CPU changes are below 0.3%. Native safety checks and expanded
 AOT/JIT scalar-type tests pass; full JIT workload and HTTP performance checks remain
 pending. This is a same-collector gain, not concurrent-default qualification.
+
+The full JIT follow-up passes 48 invocations with exact output and allocation work
+matching AOT. Reuse-buffer CPU falls **52.8%**, from 114.1 to 53.9 ms. Other effects
+are small and mixed: compute is 2.4% slower in this short cohort. Compilation and
+metadata loading are recorded separately from invocation CPU. HTTP qualification
+and pause effects remain pending; the feature stays opt-in.

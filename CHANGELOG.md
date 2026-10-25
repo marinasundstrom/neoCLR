@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-25
 
+- Qualify typed scalar stores across 48 full JIT standalone invocations with exact output, GC epoch and AOT-matching allocation checks. Concurrent reuse-buffer CPU falls 52.8% (114.1 to 53.9 ms); other effects are small/mixed, including a 2.4% compute regression in this short cohort. Keep compilation costs separate and the feature opt-in; HTTP and pause/default qualification remain pending.
+
 - Add opt-in typed scalar-array stores to the concurrent native backend: admit one primitive element/initialization update once, preserving ownership, allocation identity, shape/extent, normalization and nontracing rules. Native safety/negative controls and expanded paced/unpaced AOT/JIT width tests pass, including sanitized AOT; disabled standard-sample objects remain byte-identical. A matched 84-invocation AOT cohort halves reuse-buffer CPU (114.5 to 56.7 ms) with unchanged allocations/memory and little change elsewhere. Full JIT workload/HTTP performance remain pending; byte/reference/record stores, public APIs and defaults are unchanged.
 
 - Split diagnostic scheduler acquisition into polling, idle GC and delivery-root phases; 16 AOT/JIT sync/concurrent HTTP cases pass 16,640 responses and balanced phase counts. Polling dominates acquisition; idle GC is 0.03–1.19 ms owner CPU per invocation in this cohort. Preserve cleanup semantics and return to measured scalar-store overhead; no runtime/default or throughput claim.
