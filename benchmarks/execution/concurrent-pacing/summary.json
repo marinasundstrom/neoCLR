@@ -1,0 +1,41 @@
+{
+  "passed": true,
+  "cohorts": {
+    "1x": {
+      "sync": {
+        "requestsPerSecond": 4978.39323855632,
+        "requestSeconds": 0.41137770800000073,
+        "processCpuSeconds": 0.418671,
+        "peakRssBytes": 9306112,
+        "medianAllocations": 429856,
+        "medianArenaBytes": 99224
+      },
+      "live-inline-index": {
+        "requestsPerSecond": 3529.6639507603063,
+        "requestSeconds": 0.5802252079999999,
+        "processCpuSeconds": 0.6235660000000001,
+        "peakRssBytes": 11436032,
+        "medianAllocations": 429856,
+        "medianArenaBytes": 146752
+      }
+    },
+    "4x": {
+      "sync": {
+        "requestsPerSecond": 5357.533507513514,
+        "requestSeconds": 0.382265458,
+        "processCpuSeconds": 0.384638,
+        "peakRssBytes": 9371648,
+        "medianAllocations": 429856,
+        "medianArenaBytes": 170120
+      },
+      "live-inline-index": {
+        "requestsPerSecond": 3956.2991217131853,
+        "requestSeconds": 0.5176555,
+        "processCpuSeconds": 0.532213,
+        "peakRssBytes": 11943936,
+        "medianAllocations": 429856,
+        "medianArenaBytes": 471640
+      }
+    }
+  }
+}

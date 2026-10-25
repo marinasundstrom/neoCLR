@@ -25,6 +25,8 @@ p.add_argument('--live-object',type=Path,required=True)
 p.add_argument('--previous-live-object',type=Path)
 p.add_argument('--previous-inline-object',type=Path,help='Compare previous generated code using the same inlined exact-index native host.')
 p.add_argument('--output',type=Path,required=True)
+p.add_argument('--allocation-budget',type=int,default=256)
+p.add_argument('--publication-budget',type=int,default=4096)
 p.add_argument('--requests',type=int,default=256)
 p.add_argument('--allow-allocation-variation',action='store_true',help='Report scheduling-dependent allocation ranges instead of requiring equality.')
 p.add_argument('--concurrency',type=int,default=1, help='Independent connection-close client loops (1..128).')
@@ -57,6 +59,7 @@ p.add_argument('--profile-collection', action='store_true')
 a=p.parse_args();assert not a.profile_collection or a.profile_finish
 assert not a.profile_begin or a.profile_owner_pauses
 assert not a.profile_finish or a.profile_owner_pauses
+assert a.allocation_budget>0 and a.publication_budget>0
 assert a.requests>0 and a.warmup>=0 and a.pairs>0
 assert not a.previous_inline_object or (a.compare_inline_base and not a.previous_live_object)
 assert not a.compare_linear_seed or a.compare_inline_base
@@ -252,7 +255,7 @@ static void report_measurement(void) {
    command.append(item)
   assert '-DNEOCLR_GC_PACED' in command
   command[command.index('-o')+1]=str(exe)
-  command+=['-I',str(root/'runtime/native/memory'),'-DNEOCLR_GC_PROFILE']
+  command+=['-I',str(root/'runtime/native/memory'),'-DNEOCLR_GC_PROFILE',f'-DNEOCLR_GC_ALLOCATION_BUDGET={a.allocation_budget}',f'-DNEOCLR_GC_PUBLICATION_BUDGET={a.publication_budget}']
   if mode!='sync':command+=[f'-DGATE_WORDS={a.gate_words}','-DLIVE_REPORT','-DNEOCLR_SHADOW_SPARSE_INDEX','-I',str(base.parent/'concurrent-mutation-gate'),str(base.parent/'concurrent-mutation-gate/gate.c')]
   if mode!='sync' and (a.disable_store_cache or mode.endswith('-no-cache')):command+=['-DNEOCLR_LIVE_NO_STORE_CACHE']
   if mode.endswith('-index'):command+=['-DNEOCLR_LIVE_ALLOCATION_INDEX']

@@ -1,6 +1,16 @@
 #ifndef NEOCLR_NATIVE_EXECUTION_STATE_H
 #define NEOCLR_NATIVE_EXECUTION_STATE_H
 #include "native-gc.h"
+/* Private owned-heap pacing controls for matched policy experiments. */
+#ifndef NEOCLR_GC_ALLOCATION_BUDGET
+#define NEOCLR_GC_ALLOCATION_BUDGET 256
+#endif
+#ifndef NEOCLR_GC_PUBLICATION_BUDGET
+#define NEOCLR_GC_PUBLICATION_BUDGET 4096
+#endif
+#if NEOCLR_GC_ALLOCATION_BUDGET < 1 || NEOCLR_GC_PUBLICATION_BUDGET < 1
+#error GC pacing budgets must be positive
+#endif
 /* Private per-native-thread state, shared only by the root and collector units.
  * Consolidation does not merge lifetimes: no whole-state reset is permitted.
  * Park/resume changes roots only; pacing epochs and statistics survive it.
@@ -40,8 +50,8 @@ static inline int32_t neoclr_paced_boundary(neoclr_execution_state *state,
     neoclr_aot_context *context, const neoclr_probe_frame *boundary) {
     if (state->gc.pacing.context == context &&
         state->gc.statistics.collections == state->gc.pacing.collections &&
-        state->gc.statistics.allocations - state->gc.pacing.allocations < 256 &&
-        ++state->gc.pacing.boundaries < 4096) return 0;
+        state->gc.statistics.allocations - state->gc.pacing.allocations < NEOCLR_GC_ALLOCATION_BUDGET &&
+        ++state->gc.pacing.boundaries < NEOCLR_GC_PUBLICATION_BUDGET) return 0;
 #ifdef NEOCLR_GC_PROFILE
     return neoclr_gc_paced_collect_v1(context, boundary);
 #else

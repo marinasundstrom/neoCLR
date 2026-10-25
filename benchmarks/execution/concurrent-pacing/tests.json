@@ -1,0 +1,9 @@
+{
+  "command": [
+    "python3",
+    "benchmarks/execution/concurrent-pacing/test-budgets.py"
+  ],
+  "exitCode": 0,
+  "stdout": "PASS default/custom thresholds, epoch/context slow paths, status propagation, invalid budget; UB/bounds\n",
+  "stderr": ""
+}

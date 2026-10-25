@@ -22766,3 +22766,11 @@ Concurrent-default acceptance and broader workload optimization remain open.
 - **Open:** These priorities are recommendations, not a user decision to adopt any particular industry algorithm or a claim of concurrent-default readiness. Next implementation and matched performance evidence remain to be produced.
 
 Evidence: [industry comparison](../benchmarks/execution/concurrent-workloads/industry-gc-comparison.md), [begin/marker profiles](../benchmarks/execution/concurrent-workloads/begin-phases-results.md).
+
+
+## 2026-10-25 — Require an industry-informed advantage before wrap-up
+
+- **Author:** Asked to pursue the industry direction and close this run soon with visible improvements demonstrating an advantage over synchronous/single-threaded GC. Subsequently asked to investigate whether runtime services, rather than GC alone, are the bottleneck before implementing industry techniques and trying them.
+- **Assistant action:** Added matched private pacing controls retaining production defaults; tested larger budgets for both collectors within the same arena capacity. Captured separate current sync/guarded/concurrent runtime stack samples and retained previous CPU/phase evidence.
+- **Outcome:** The screen validates 24,768 responses and improves the concurrent candidate by about 12% throughput/15% CPU with higher arena use; sync also improves and remains faster. 49,248 additional diagnostic responses identify common root/TLS/native-stack work plus store/marker costs. No concurrent-over-sync win is claimed.
+- **Open:** The requested wrap-up criterion remains unmet. Persistent snapshot metadata and safe runtime bookkeeping reductions are proposed next tests; the user has not accepted a smaller success criterion. See the [screen and diagnosis](../benchmarks/execution/concurrent-pacing/README.md).

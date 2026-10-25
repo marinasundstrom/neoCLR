@@ -943,7 +943,7 @@ int32_t neoclr_gc_collect_conditional_v1(neoclr_aot_context *context,
 /* Opt-in generated-boundary pacing; private per-owner-thread state, not ABI.
  * Unexpected global collection epochs force a sweep instead of indefinitely
  * postponing cleanup across contexts. Rooted admission handles actual pressure.
- * The bounded 256-allocation / 4096-publication budget amortizes tracing on the
+ * The default 256-allocation / 4096-publication budget amortizes tracing on the
  * plain HTTP path; see benchmarks/http-server/primitive-comparison/pacing.
  * This is a publication budget, not a wall-clock finalization guarantee. */
 #ifdef NEOCLR_GC_PROFILE
@@ -968,7 +968,7 @@ int32_t neoclr_gc_idle_v1(neoclr_aot_context *context, const neoclr_probe_frame 
 int32_t neoclr_gc_paced_collect_v1(neoclr_aot_context *context, const neoclr_probe_frame *boundary) {
     unsigned reason = gc_state.pacing.context != context ? NEOCLR_GC_TRIGGER_CONTEXT :
         gc_state.statistics.collections != gc_state.pacing.collections ? NEOCLR_GC_TRIGGER_EPOCH :
-        gc_state.statistics.allocations - gc_state.pacing.allocations >= 256 ? NEOCLR_GC_TRIGGER_ALLOCATION :
+        gc_state.statistics.allocations - gc_state.pacing.allocations >= NEOCLR_GC_ALLOCATION_BUDGET ? NEOCLR_GC_TRIGGER_ALLOCATION :
         NEOCLR_GC_TRIGGER_PUBLICATION;
     return collect_idle(context, boundary, reason);
 }
