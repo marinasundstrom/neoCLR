@@ -256,3 +256,13 @@ Run split/grouped sync/live AOT recipes with `http.py`. Add current JIT recipes 
 <jit-build>`; both layouts use fallback placement. For six standalone patterns use
 `compare-root-validation.py --stack-bounds`, keeping root validation unchanged.
 See [qualification and mixed results](../../../docs/validation/grouped-stack-bounds-20261025/README.md).
+
+To test composition, add `--combine-validation` to `prepare-stack-bounds.py`; the
+variant becomes `combined-{sync,live}-aot` and also enables the split small-frame
+storage validator. JIT preparation follows the manifest's layout names. Standalone
+composition uses `compare-root-validation.py --stack-bounds --combine-validation`.
+For a separate pause diagnostic, `prepare-paired-owner-profile.py --build <paired>
+--output <profile-build>` instruments every AOT recipe without changing its options.
+Run `http.py` on that build, then validate `OWNER_PAUSE` rows with
+`benchmarks/execution/concurrent-workloads/summarize-owner-pauses.py`.
+See [combined qualification](../../../docs/validation/combined-runtime-layout-20261025/README.md).

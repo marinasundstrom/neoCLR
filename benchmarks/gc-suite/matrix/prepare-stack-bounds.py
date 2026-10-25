@@ -8,6 +8,7 @@ p=argparse.ArgumentParser(description=__doc__)
 p.add_argument('--build',type=Path,required=True)
 p.add_argument('--baseline-source',type=Path,required=True)
 p.add_argument('--output',type=Path,required=True)
+p.add_argument('--combine-validation',action='store_true',help='Pair grouped bounds with the small-frame storage validator')
 a=p.parse_args();root=Path(__file__).resolve().parents[3]
 base=a.build.resolve();source=root/'docs/experiments/aot-console/native-stack.c'
 baseline=a.baseline_source.resolve();original=base/'build.json'
@@ -16,7 +17,7 @@ for path,digest in built['inputs'].items():
  checked=baseline if Path(path)==source else Path(path)
  assert hashlib.sha256(checked.read_bytes()).hexdigest()==digest,('stale build',path)
 out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
-r=dict(passed=False,scope=__doc__,recipes={},commands=[],inputs=dict(built['inputs']))
+r=dict(passed=False,scope=__doc__,combinedValidation=a.combine_validation,layouts=['split','combined' if a.combine_validation else 'grouped'],recipes={},commands=[],inputs=dict(built['inputs']))
 r['inputs'].pop(str(source),None)
 def run(command):
  x=subprocess.run(command,capture_output=True,text=True,timeout=180)
@@ -26,10 +27,12 @@ try:
   old=next(c['command'] for c in built['commands'] if '-o' in c['command'] and c['command'][c['command'].index('-o')+1]==str(base/mode))
   assert str(source) in old
   for grouped in [False,True]:
-   name=('grouped-' if grouped else 'split-')+mode
+   name=(('combined-' if a.combine_validation else 'grouped-') if grouped else 'split-')+mode
    command=[str(source if grouped else baseline) if v==str(source) else v for v in old]
    command+=['-I',str(source.parent)]
-   if grouped:command+=['-DNEOCLR_GROUP_STACK_BOUNDS']
+   if grouped:
+    command+=['-DNEOCLR_GROUP_STACK_BOUNDS']
+    if a.combine_validation:command+=['-DNEOCLR_GC_SPLIT_STORAGE_VALIDATION']
    command[command.index('-o')+1]=str(out/name);run(command)
    r['recipes'][name+'-aot']=dict(execution='aot',collector=mode,command=[str(out/name)],env={})
    r['inputs'][str(out/name)]=hashlib.sha256((out/name).read_bytes()).hexdigest()

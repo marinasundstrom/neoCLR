@@ -38,6 +38,7 @@ there. Preserve prior claims and corrections in their dated records.
 
 - [JIT arena fallback boundary](../validation/jit-arena-fallback-20261025/README.md): unavailable/exhausted reservation falls back without relocating live code/data; safety and HTTP qualification, production policy still open.
 
+- [Combined native execution layout](../validation/combined-runtime-layout-20261025/README.md): longer matched HTTP, standalone and separate owner-operation histograms evaluate composition rather than adding isolated gains.
 - [Grouped stack-bound TLS](../validation/grouped-stack-bounds-20261025/README.md): one TLS resolution instead of two, unchanged stack admission, matched AOT/JIT and standalone evidence; modest mixed shared-runtime gains remain opt-in.
 - [Native malloc accounting](../validation/native-malloc-accounting-20261025/README.md): direct release removes about 189.6 MiB of live native storage while allocator reservation and RSS remain large; no collector leak or throughput claim.
 - [JIT compilation lifetime](../validation/jit-compilation-lifetime-20261025/README.md): release source/selection inputs before invocation, retain execution ownership, and report mixed RSS/timing results across HTTP and standalone consumers.

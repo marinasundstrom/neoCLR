@@ -58,6 +58,11 @@ continues as an experimental native development path.
   through one TLS lookup while retaining current-owner checks, reserve limits,
   bound replacement and reset. Matched HTTP and standalone qualification reports
   modest, mixed changes; this is shared runtime work, not a collector-default switch.
+  Evaluate composition with small-frame validation in longer matched HTTP and standalone
+  cohorts, with separate checked owner-operation histograms. The combined AOT
+  candidate reduces invocation CPU; matched concurrent JIT CPU also improves about
+  4.8–6.6%. Integration on the qualified macOS ARM64 path is next. Owner-operation
+  p99 buckets remain unchanged; synchronous GC remains the default.
 
 - Reduce repeated native root publication/descriptor validation, metadata and
   managed-allocation lookup work, redundant initialization and allocation

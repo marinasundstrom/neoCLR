@@ -19,7 +19,7 @@ out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
 r=dict(passed=False,scope=__doc__,recipes={},commands=[],inputs=dict(built['inputs']))
 try:
  for mode in ['sync','live']:
-  for layout in ['split','grouped']:
+  for layout in built.get('layouts',['split','grouped']):
    name=layout+'-'+mode
    link=next(c['command'].copy() for c in built['commands'] if c['command'][c['command'].index('-o')+1]==str(base/name))
    link=[v for v in link if not v.endswith('/main.c') and not v.endswith('/'+mode+'.o')]+['-dynamiclib']

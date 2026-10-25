@@ -668,3 +668,12 @@ throughput and standalone reuse regress slightly. This remains a shared-runtime
 candidate, not a default change or a broad concurrent-GC advantage. JIT compilation
 still occurs synchronously before execution; concurrent GC can run alongside the
 resulting application code.
+
+A longer composition study combines grouped stack bounds with small-frame storage
+validation. It passes 590,400 timed HTTP responses and 60 standalone invocations.
+Concurrent invocation CPU falls 2.4–3.0% in AOT and 4.8–6.6% in JIT; allocation-heavy
+standalone patterns improve 3.8–6.4%, while reuse-buffer stays flat. Sync also
+improves and remains faster. A separate 32,896-response profile finds unchanged
+owner-GC p99 buckets, still longer for concurrent. These results support a bounded
+macOS ARM64 runtime integration next; they do not change the default collector or
+establish an industry throughput ranking.

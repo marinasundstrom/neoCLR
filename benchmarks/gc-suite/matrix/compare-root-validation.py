@@ -14,13 +14,15 @@ p.add_argument('--samples',type=Path,required=True)
 p.add_argument('--output',type=Path,required=True)
 p.add_argument('--rounds',type=int,default=5)
 p.add_argument('--stack-bounds',action='store_true',help='Compare split/grouped stack-bound TLS with unchanged root validation')
+p.add_argument('--combine-validation',action='store_true',help='Combine grouped bounds and split storage validation')
 a=p.parse_args();assert a.rounds>=3
-modes=['control','grouped'] if a.stack_bounds else ['control','split']
+assert not a.combine_validation or a.stack_bounds
+modes=['control','combined' if a.combine_validation else 'grouped'] if a.stack_bounds else ['control','split']
 variant='NEOCLR_GROUP_STACK_BOUNDS' if a.stack_bounds else 'NEOCLR_GC_SPLIT_STORAGE_VALIDATION'
 root=Path(__file__).resolve().parents[3];out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
 prior=json.loads(a.prior.read_text());samples=json.loads(a.samples.read_text())
 assert prior['passed'] and samples['passed'] and samples['iterations']==1
-r=dict(passed=False,scope='Matched stack-bound TLS layout; unchanged root validation.' if a.stack_bounds else __doc__,variant=variant,commands=[],trials=[],rows=[],inputs={})
+r=dict(passed=False,scope='Matched grouped stack bounds plus split storage validation.' if a.combine_validation else 'Matched stack-bound TLS layout; unchanged root validation.' if a.stack_bounds else __doc__,variant=variant,combinedValidation=a.combine_validation,commands=[],trials=[],rows=[],inputs={})
 def run(command):
  command=list(map(str,command));x=subprocess.run(command,capture_output=True,text=True,timeout=180)
  r['commands'].append(dict(command=command,exitCode=x.returncode,stdout=x.stdout,stderr=x.stderr));x.check_returncode();return x
@@ -37,7 +39,9 @@ try:
   assert not any('STORAGE_VALIDATION' in v for v in cmd)
   for mode in modes:
    link=cmd.copy();link[link.index('-o')+1]=str(out/(name+'-'+mode))
-   if mode!= 'control':link+=['-D'+variant]
+   if mode!= 'control':
+    link+=['-D'+variant]
+    if a.combine_validation:link+=['-DNEOCLR_GC_SPLIT_STORAGE_VALIDATION']
    print('Build',name,mode,flush=True);run(link)
  # Snapshot current inputs before timing, including canonical transitive sources.
  paths=[Path(__file__),a.prior,a.samples,*root.glob('runtime/native/**/*.c'),*root.glob('runtime/native/**/*.h'),*root.glob('runtime/native/gc/concurrent/*.py')]
