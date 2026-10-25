@@ -1,5 +1,16 @@
 # Development conversation record
 
+## 2026-10-25 — Pipelining after the GC bookkeeping screen
+
+The author said, “After this we should perhaps also investigate HTTP pipelining as
+you identified.” The assistant completed the bitmap-seeding experiment, archived
+its small/mixed performance results without enabling it, then inspected decoder,
+body and exchange lifetimes. A wire probe confirms close-after-one-response in
+retained sync/concurrent hosts even when two requests arrive together. The assistant
+proposes a private connection session with sequential ordered exchanges, preserved
+unread input and separate request disposal. This is investigation and an implementation
+plan, not working pipelining. See [protocol evidence and boundaries](../benchmarks/http-server/pipelining/README.md).
+
 ## 2026-10-25 — TechEmpower reference and connection-policy gap
 
 During the ongoing GC work, the author supplied the TechEmpower Round 23 link.
