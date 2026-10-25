@@ -13,9 +13,10 @@ pub(crate) struct Lowered {
     pub stack_stores: usize,
 }
 
-// Preserve provenance only across a unique incoming edge. Count edges, not
-// predecessor blocks: both arms of a branch can pass different addresses.
-fn single_edge_arguments(func: &ir::Function) -> HashMap<ir::Value, Option<ir::Value>> {
+// Preserve a transfer only when every incoming edge agrees. Distinct SSA
+// expressions may denote the same compiler stack slot/constant offset. Compare
+// only directly anchored expressions here: do not infer circular join proofs.
+fn unambiguous_stack_arguments(func: &ir::Function) -> HashMap<ir::Value, Option<ir::Value>> {
     let mut incoming = HashMap::new();
     for block in func.layout.blocks() {
         for inst in func.layout.block_insts(block) {
@@ -32,10 +33,22 @@ fn single_edge_arguments(func: &ir::Function) -> HashMap<ir::Value, Option<ir::V
                     .iter()
                     .zip(edge.args(&func.dfg.value_lists))
                 {
+                    let argument = argument.as_value().map(|v| func.dfg.resolve_aliases(v));
                     incoming
                         .entry(parameter)
-                        .and_modify(|value| *value = None)
-                        .or_insert(argument.as_value());
+                        .and_modify(|value: &mut Option<ir::Value>| {
+                            let same = match (*value, argument) {
+                                (Some(left), Some(right)) if left == right => true,
+                                (Some(left), Some(right)) => {
+                                    let direct = HashMap::new();
+                                    let left = stack_destination(func, left, &direct);
+                                    left.is_some() && left == stack_destination(func, right, &direct)
+                                }
+                                _ => false,
+                            };
+                            if !same { *value = None; }
+                        })
+                        .or_insert(argument);
                 }
             }
         }
@@ -43,8 +56,8 @@ fn single_edge_arguments(func: &ir::Function) -> HashMap<ir::Value, Option<ir::V
     incoming
 }
 
-// Resolve compiler-owned addresses, checked constant offsets and unique-edge
-// transfers. Loaded pointers, entry parameters, joins and cycles remain unknown.
+// Resolve compiler-owned addresses, checked constant offsets and unambiguous
+// transfers. Loaded pointers, entry parameters and ambiguous joins remain unknown.
 fn stack_destination(
     func: &ir::Function,
     mut value: ir::Value,
@@ -158,7 +171,7 @@ fn lower_impl(
         }
         Ok(())
     };
-    let incoming = single_edge_arguments(func);
+    let incoming = unambiguous_stack_arguments(func);
     let mut stores = Vec::new();
     let mut stack_stores = 0;
     // Validate the entire input before changing any instruction or adding imports.

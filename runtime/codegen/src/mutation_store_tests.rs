@@ -2230,7 +2230,16 @@ fn transferred_stack_copy(
         let next = b.create_block();
         b.append_block_param(first, types::I64);
         b.append_block_param(next, types::I64);
-        if kind == 1 {
+        if kind >= 3 {
+            // Distinct SSA addresses: equal slot/offset may merge, differing
+            // offsets must retain the adapter even though both are on stack.
+            let other_slot = if kind == 5 {
+                b.create_sized_stack_slot(ir::StackSlotData::new(ir::StackSlotKind::ExplicitSlot, 32, 3))
+            } else { slot };
+            let other = b.ins().stack_addr(types::I64, other_slot, if kind == 4 { 8 } else { 4 });
+            let condition = b.ins().icmp_imm(ir::condcodes::IntCC::Equal, args[2], 0);
+            b.ins().brif(condition, first, &[base.into()], first, &[other.into()]);
+        } else if kind == 1 {
             // One predecessor, two edges: a stack pointer and an unknown byref.
             let condition = b.ins().icmp_imm(ir::condcodes::IntCC::Equal, args[2], 0);
             b.ins()
@@ -2256,8 +2265,8 @@ fn transferred_stack_copy(
 }
 
 #[test]
-fn single_edge_stack_transfers_elide_only_proved_stores() {
-    for kind in [0, 1, 2] {
+fn unambiguous_stack_transfers_elide_only_proved_stores() {
+    for kind in [0, 1, 2, 3, 4, 5] {
         let mut builder = JITBuilder::with_isa(
             isa(target(), false),
             cranelift_module::default_libcall_names(),
@@ -2269,8 +2278,8 @@ fn single_edge_stack_transfers_elide_only_proved_stores() {
         assert_eq!(
             lower(module, &mut ctx.func, owner).unwrap(),
             Lowered {
-                stores: if kind != 0 { 2 } else { 1 },
-                stack_stores: if kind != 0 { 0 } else { 1 },
+                stores: if kind == 0 || kind == 3 { 1 } else { 2 },
+                stack_stores: if kind == 0 || kind == 3 { 1 } else { 0 },
             }
         );
         module.define_function(id, &mut ctx).unwrap();
@@ -2290,7 +2299,7 @@ fn single_edge_stack_transfers_elide_only_proved_stores() {
                     unsafe { call(&mut state, output.as_mut_ptr(), bits) },
                     if reject_at == 0 { 0 } else { 3 }
                 );
-                assert_eq!(state.calls, if reject_at == 0 && kind != 0 { 2 } else { 1 });
+                assert_eq!(state.calls, if reject_at == 0 && kind != 0 && kind != 3 { 2 } else { 1 });
                 if reject_at == 0 {
                     assert_eq!(&output[8..16], &bits.to_le_bytes());
                 } else {
@@ -2311,8 +2320,8 @@ fn transferred_stack_bounds_reject_before_mutating_ir() {
         )
         .unwrap(),
     );
-    for displacement in [-13, 13] {
-        let (_, mut ctx, owner) = transferred_stack_copy(&mut module, displacement, 0);
+    for (displacement, kind) in [(-13, 0), (13, 0), (-13, 3), (13, 3)] {
+        let (_, mut ctx, owner) = transferred_stack_copy(&mut module, displacement, kind);
         let before = ctx.func.display().to_string();
         assert!(
             lower(&mut module, &mut ctx.func, owner)
@@ -2341,7 +2350,7 @@ fn single_edge_cycle_does_not_prove_stack_storage() {
         .ins()
         .jump(cycle, &[pointer.into()]);
     assert_eq!(
-        stack_destination(&func, pointer, &single_edge_arguments(&func)),
+        stack_destination(&func, pointer, &unambiguous_stack_arguments(&func)),
         None
     );
 }
@@ -2518,5 +2527,33 @@ fn borrowed_store_object_imports_and_frame_cleanup() {
         let imports:std::collections::BTreeSet<_>=object.symbols().filter(|s|s.is_undefined()).map(|s|s.name().unwrap().trim_start_matches('_').to_owned()).collect();
         assert_eq!(imports,["experiment_gc_store_state_borrow","experiment_gc_store_borrowed","frame_enter","frame_leave"].into_iter().map(str::to_owned).collect());
         if triple==target() { if let Some(path)=std::env::var_os("NEOCLR_BORROWED_STORE_OBJECT") { std::fs::write(path,bytes).unwrap(); } }
+    }
+}
+
+#[test]
+fn conflicting_join_edge_cannot_regain_stack_proof() {
+    for conflict_first in [false, true] {
+        let mut func = ir::Function::new();
+        let entry = func.dfg.make_block();
+        func.layout.append_block(entry);
+        let join = func.dfg.make_block();
+        func.layout.append_block(join);
+        let parameter = func.dfg.append_block_param(join, types::I64);
+        let slot = func.create_sized_stack_slot(ir::StackSlotData::new(ir::StackSlotKind::ExplicitSlot, 32, 3));
+        let mut cursor = FuncCursor::new(&mut func);
+        cursor.goto_bottom(entry);
+        let anchor = cursor.ins().stack_addr(types::I64, slot, 0);
+        let other = cursor.ins().stack_addr(types::I64, slot, 8);
+        let equivalent = cursor.ins().stack_addr(types::I64, slot, 0);
+        // The read-only edge collector must retain conflict independently of
+        // traversal order. Unreachable predecessors still count conservatively.
+        cursor.ins().jump(join, &[anchor.into()]);
+        for value in if conflict_first { [other, equivalent] } else { [equivalent, other] } {
+            let block = cursor.func.dfg.make_block();
+            cursor.func.layout.append_block(block);
+            cursor.goto_bottom(block);
+            cursor.ins().jump(join, &[value.into()]);
+        }
+        assert_eq!(unambiguous_stack_arguments(&func)[&parameter], None);
     }
 }

@@ -1,7 +1,7 @@
 //! Test-only audit and opt-in guard removal for bounded direct stack arguments.
 //! Reporting is read-only; elision requires the complete generated closure.
 //! Address-taken and nonlocal functions are excluded. Forwarding is explicitly test-selected.
-use super::{single_edge_arguments, stack_destination};
+use super::{unambiguous_stack_arguments, stack_destination};
 use cranelift_codegen::cursor::{Cursor, FuncCursor};
 use cranelift_codegen::ir::{
     self, ExternalName, InstBuilder, InstructionData, MemFlags, Opcode, types,
@@ -77,7 +77,7 @@ fn analyze_forwarded(
     let mut calls: HashMap<FuncId, Vec<(FuncId, Vec<StackArgument>)>> = HashMap::new();
     let mut escaped = HashSet::new();
     for &(caller, body) in bodies {
-        let incoming = single_edge_arguments(body);
+        let incoming = unambiguous_stack_arguments(body);
         for block in body.layout.blocks() {
             for inst in body.layout.block_insts(block) {
                 match body.dfg.insts[inst] {
@@ -153,7 +153,7 @@ fn analyze_forwarded(
         let proofs: HashMap<_, _> = (0..body.signature.params.len())
             .filter_map(|index| established.get(&(id, index)).map(|&bytes| (index, bytes)))
             .collect();
-        let incoming_edges = single_edge_arguments(body);
+        let incoming_edges = unambiguous_stack_arguments(body);
         let mut eligible = 0;
         let mut guarded = 0;
         for block in body.layout.blocks() {

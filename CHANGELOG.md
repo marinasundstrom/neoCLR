@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-25
 
+- Preserve experimental stack-store provenance through joins whose incoming SSA addresses prove the same stack slot and constant offset; retain ambiguous/foreign-pointer guards, cycle limits and pre-edit bounds rejection. All 52 focused tests pass, including JIT branch/fault checks. Rebuilt tasks, collections, arrays, plaintext and JSON objects remain byte-identical, so no workload performance/default gain is claimed. Raven emission and Runtime Contract are unchanged.
+
 - Evaluate two private heap-store outlining prototypes while retaining admission checks and barriers. Twelve optimized/UB-bounds fixture runs and 161,817 paired plaintext responses pass. Entry stack usage falls from 192 to 16 bytes, but the plain split costs 1.9% CPU and direct state passing is approximately flat; retain the original implementation. Archive source, disassembly and failed-link correction without a performance/default claim.
 
 - Screen removal of thirteen concurrent-store diagnostic increments without changing ownership checks or barriers. Alternating plaintext runs validate 80,855 responses but show no gain (CPU +1.3%, throughput -1.5%); 30 task/collection/array runs preserve output and allocations with mixed sub-1% CPU effects. Retain counter-enabled behavior and the reproducible rejected candidate; no runtime/default change.

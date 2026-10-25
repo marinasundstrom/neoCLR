@@ -1,5 +1,7 @@
 # neoCLR platform roadmap
 
+**Equal stack-join proof (2026-10-25):** [Compiler checks and workload audit](../benchmarks/execution/concurrent-workloads/equal-join-results.md) qualify equivalent-slot/offset joins with 52 focused tests. All five rebuilt workload objects remain byte-identical, so this adds no demonstrated HTTP/CPU gain. Next attribute remaining dynamic guarded stores before extending provenance across more complex boundaries.
+
 **Store outlining screen (2026-10-25):** [Native safety and paired HTTP evidence](../benchmarks/execution/concurrent-http-owners/split-results.md) reject two outlining variants: a smaller entry frame does not produce a whole-request gain. Twelve optimized/sanitized fixtures and 161,817 responses pass; direct state passing is approximately flat. Keep original stores and prioritize eliminating unnecessary calls or admission work under explicit proofs.
 
 **Store-counter screen (2026-10-25):** [Matched HTTP and standalone evidence](../benchmarks/execution/concurrent-http-owners/counter-results.md) rejects diagnostic counter removal as an optimization: 80,855 responses show no gain, and 30 task/collection/array runs have mixed sub-1% effects with equal allocations. Keep diagnostics; investigate repeated store admission and compiler provenance without weakening ownership or active-epoch barriers.
