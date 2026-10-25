@@ -420,3 +420,13 @@ experiment (`gc-suite/run.py ... --index-only`), not a runtime-default change.
 Separate paired profiling finds matching p99 GC-pause buckets (65.5–131.1 µs),
 but a higher observed JSON maximum for the candidate. No pause improvement is
 claimed. Benchmark throughput and diagnostic pause measurements remain separate.
+
+A longer four-owner comparison (three 15-second windows per policy, 1,016,237
+validated responses) narrows the index-only advantage to **0.5% throughput and
+1.1% CPU**. This supports modest CPU savings, not a large capacity gain.
+
+These connection-close measurements are not directly comparable with
+[TechEmpower Round 23](https://www.techempower.com/benchmarks/#section=data-r23).
+Its [plaintext specification](https://github.com/TechEmpower/FrameworkBenchmarks/wiki/Project-Information-Framework-Tests-Overview#plaintext)
+uses pipelining; neoCLR’s current response encoder closes each exchange’s connection.
+Persistent-connection qualification remains separate future work.

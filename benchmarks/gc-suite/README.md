@@ -152,3 +152,5 @@ cache bookkeeping. Synchronous GC remains unchanged. The normalized report recor
 this policy, and history comparisons flag the policy change. This option does not
 change compiler emission, ownership rules, barriers or the runtime default.
 See [qualification evidence](../execution/concurrent-workloads/index-only-results/README.md).
+
+[TechEmpower comparison boundary and protocol gaps](techempower-comparison.md) records the author-supplied Round 23 reference and the prerequisites for a meaningful external comparison.

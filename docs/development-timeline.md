@@ -1,5 +1,20 @@
 # Development conversation record
 
+## 2026-10-25 — TechEmpower reference and connection-policy gap
+
+During the ongoing GC work, the author supplied the TechEmpower Round 23 link.
+The assistant checked the official workload specification and the current neoCLR
+encoder: pipelined/persistent traffic is not represented by the existing
+close-per-request fixture, and the encoder explicitly emits Connection: close.
+The assistant proposed preserving GC regression workloads while adding a separate
+persistent-connection qualification path and refreshing matched local Kestrel peers.
+This records a proposal, not implemented keep-alive support or a permanent roadmap
+reprioritization. See the [comparison note](../benchmarks/gc-suite/techempower-comparison.md).
+
+The concurrently running longer four-owner comparison completed 1,016,237 responses.
+It narrowed index-only improvements to about 0.5% throughput and 1.1% CPU, supporting
+modest CPU savings rather than the earlier short-run capacity inference.
+
 ## 2026-10-25 — Remove bookkeeping by simplifying structures
 
 After directing the benchmark commit and next concurrent-GC optimization, the author

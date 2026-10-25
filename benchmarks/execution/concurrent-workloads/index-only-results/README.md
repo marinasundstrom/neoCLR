@@ -123,3 +123,19 @@ The standard profile also tests end-to-end policy forwarding and records
 pass. Website prose reports the measured gains; no deployment was performed.
 Remaining work: longer owner/tail-latency measurements and further reduction of
 repeated ownership/extent processing, with the existing safety proofs preserved.
+
+## Longer four-owner check
+
+Three rotated 15-second windows per policy validate 1,016,237 responses including
+warmup/drain. Four-range/index-only medians are 10,578.3/10,632.1 requests/s and
+342.29/338.55 CPU µs/response. The throughput difference is only +0.5%, CPU -1.1%:
+the earlier short-run +3.9% four-owner median is not a sustained-capacity claim.
+Maximum-RSS medians are 25.00/25.30 MB; allocations per response remain about 208.01.
+The result supports modest CPU savings, not a large capacity improvement.
+
+The latest standalone phase profile attributes 27.29 ms of steady-allocation CPU
+to final collection: index construction 4.84 ms, frame roots 0.22 ms, snapshot seed
+7.87 ms, sweep 7.24 ms and remaining work 7.12 ms. Other allocation-heavy cases have
+a similar split. Seed plus index construction is a concrete next GC investigation;
+reusing metadata must preserve complete validation before mark application and
+current root tracing. This profile does not justify omitting ownership checks.
