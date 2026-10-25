@@ -5,6 +5,18 @@ This page owns shared integration/delivery status. The [HTTP tracker](../http-ca
 owns whether its packaged sample passes and whether the POC is complete; do not
 maintain a second HTTP completion checklist here.
 
+## Preview 18 preparation — 2026-10-25
+
+The author directs closing the optimization round and commencing release procedure
+for macOS ARM64 and Windows x64, including docs and website updates. Candidate:
+`0.1.0-preview.18`, SDK/editor `0.1.18-neoclr.20261025.1`, Raven neoCLR branch
+`ed1d08defe2778f965951747d5f48311ce3daf83`. Keep synchronous GC as default and
+private concurrent/placement/layout experiments labeled separately. See the
+[active qualification record](../validation/release-preparation-20261025/README.md)
+and [candidate notes](../next-preview-release-notes.md). Preview 17 remains the
+published download; source, both platform packages, editor, HTTPS and measurements
+must pass against fresh artifacts before publication.
+
 ## Preview 17 candidate — 2026-10-19
 
 The author directs continuation through release after closing the HTTP/JSON gaps,

@@ -1,7 +1,7 @@
 //! Complete-closure guard removal for bounded direct and forwarded stack arguments.
 //! Reporting is read-only; elision requires the complete generated closure.
 //! Address-taken and nonlocal functions are excluded. Reports remain test-only.
-use super::{unambiguous_stack_arguments, stack_destination};
+use super::{stack_destination, unambiguous_stack_arguments};
 use cranelift_codegen::cursor::{Cursor, FuncCursor};
 use cranelift_codegen::ir::{
     self, ExternalName, InstBuilder, InstructionData, MemFlags, Opcode, types,
@@ -66,9 +66,13 @@ fn analyze(
     module: &impl Module,
     bodies: &[(FuncId, &ir::Function)],
 ) -> (serde_json::Value, HashMap<FuncId, Vec<(ir::Inst, i64)>>) {
-    analyze_forwarded(module, bodies,
+    analyze_forwarded(
+        module,
+        bodies,
         std::env::var_os("NEOCLR_LIVE_FORWARD_STACK_ARGUMENTS").is_some()
-            || std::env::var_os("NEOCLR_LIVE_STACK_POLICY").is_some(), true)
+            || std::env::var_os("NEOCLR_LIVE_STACK_POLICY").is_some(),
+        true,
+    )
 }
 
 fn analyze_forwarded(
@@ -100,13 +104,22 @@ fn analyze_forwarded(
                                 .as_slice(&body.dfg.value_lists)
                                 .iter()
                                 .map(|&value| {
-                                    if let Some((slot, offset)) = stack_destination(body, value, &incoming) {
-                                        return u32::try_from(offset).ok()
-                                            .and_then(|offset| body.sized_stack_slots[slot].size.checked_sub(offset))
+                                    if let Some((slot, offset)) =
+                                        stack_destination(body, value, &incoming)
+                                    {
+                                        return u32::try_from(offset)
+                                            .ok()
+                                            .and_then(|offset| {
+                                                body.sized_stack_slots[slot]
+                                                    .size
+                                                    .checked_sub(offset)
+                                            })
                                             .map_or(StackArgument::Unknown, StackArgument::Direct);
                                     }
                                     parameter(body, value, &incoming)
-                                        .map_or(StackArgument::Unknown, |(index, offset)| StackArgument::Forwarded(index, offset))
+                                        .map_or(StackArgument::Unknown, |(index, offset)| {
+                                            StackArgument::Forwarded(index, offset)
+                                        })
                                 })
                                 .collect();
                             calls.entry(id).or_default().push((caller, arguments));
@@ -126,20 +139,28 @@ fn analyze_forwarded(
         let mut changed = false;
         for &(id, body) in bodies {
             if module.declarations().get_function_decl(id).linkage != Linkage::Local
-                || escaped.contains(&id) { continue; }
-            let Some(incoming) = calls.get(&id) else { continue; };
+                || escaped.contains(&id)
+            {
+                continue;
+            }
+            let Some(incoming) = calls.get(&id) else {
+                continue;
+            };
             for index in 0..body.signature.params.len() {
-                if established.contains_key(&(id, index)) { continue; }
-                let sizes: Option<Vec<u32>> = incoming.iter().map(|(caller, args)| {
-                    match args.get(index)? {
+                if established.contains_key(&(id, index)) {
+                    continue;
+                }
+                let sizes: Option<Vec<u32>> = incoming
+                    .iter()
+                    .map(|(caller, args)| match args.get(index)? {
                         StackArgument::Direct(bytes) => Some(*bytes),
                         StackArgument::Forwarded(parameter, offset) if forwarding => {
                             let bytes = established.get(&(*caller, *parameter))?;
                             bytes.checked_sub(u32::try_from(*offset).ok()?)
                         }
                         _ => None,
-                    }
-                }).collect();
+                    })
+                    .collect();
                 if let Some(sizes) = sizes {
                     if let Some(&bytes) = sizes.iter().min() {
                         established.insert((id, index), bytes);
@@ -148,7 +169,9 @@ fn analyze_forwarded(
                 }
             }
         }
-        if !forwarding || !changed { break; }
+        if !forwarding || !changed {
+            break;
+        }
     }
     let mut rows = Vec::new();
     for &(id, body) in bodies {
@@ -173,7 +196,11 @@ fn analyze_forwarded(
                 let Some(callee) = target(body, func_ref) else {
                     continue;
                 };
-                let name = module.declarations().get_function_decl(callee).name.as_deref();
+                let name = module
+                    .declarations()
+                    .get_function_decl(callee)
+                    .name
+                    .as_deref();
                 let raw = args.as_slice(&body.dfg.value_lists);
                 let args = match (name, raw.len()) {
                     (Some("experiment_gc_store"), 4) => raw,
@@ -218,7 +245,11 @@ fn analyze_forwarded(
         }
     }
     (
-        if diagnostics { serde_json::json!({"scope":"Diagnostic only: stack arguments anchored by complete callers; forwarding requires established bounds, never circular assumptions. No code changed by reporting.","forwarding":forwarding,"functions":rows}) } else { serde_json::Value::Null },
+        if diagnostics {
+            serde_json::json!({"scope":"Diagnostic only: stack arguments anchored by complete callers; forwarding requires established bounds, never circular assumptions. No code changed by reporting.","forwarding":forwarding,"functions":rows})
+        } else {
+            serde_json::Value::Null
+        },
         sites,
     )
 }
@@ -233,11 +264,7 @@ pub(crate) fn elide(
     bodies: &mut [(FuncId, cranelift_codegen::Context)],
     forwarding: bool,
 ) -> Result<usize, Box<dyn std::error::Error>> {
-    elide_policy(
-        module,
-        bodies,
-        forwarding,
-    )
+    elide_policy(module, bodies, forwarding)
 }
 
 fn elide_policy(
@@ -252,12 +279,18 @@ fn elide_policy(
         &crate::mutation_admission::root_providers(module),
     )?;
     let supplied: HashSet<_> = refs.iter().map(|(id, _)| *id).collect();
-    let missing: Vec<_> = module.declarations().get_functions()
+    let missing: Vec<_> = module
+        .declarations()
+        .get_functions()
         .filter(|(id, decl)| decl.linkage != Linkage::Import && !supplied.contains(id))
         .map(|(id, decl)| format!("{} ({id:?})", decl.name.as_deref().unwrap_or("<unnamed>")))
         .collect();
     if !missing.is_empty() {
-        return Err(format!("stack-argument elision requires every generated declaration: {}", missing.join(", ")).into());
+        return Err(format!(
+            "stack-argument elision requires every generated declaration: {}",
+            missing.join(", ")
+        )
+        .into());
     }
     // The diagnostic flag alone never selects this transformation.
     let (_, sites) = analyze_forwarded(module, &refs, forwarding, false);
@@ -658,77 +691,135 @@ mod forwarding_tests {
     use cranelift_object::{ObjectBuilder, ObjectModule};
 
     fn chain(offset: i64, extra: &str, reverse: bool) -> (serde_json::Value, serde_json::Value) {
-        let isa = cranelift_codegen::isa::lookup("aarch64-apple-darwin".parse().unwrap()).unwrap()
-            .finish(cranelift_codegen::settings::Flags::new(cranelift_codegen::settings::builder())).unwrap();
-        let mut module = ObjectModule::new(ObjectBuilder::new(isa, "forwarding", cranelift_module::default_libcall_names()).unwrap());
+        let isa = cranelift_codegen::isa::lookup("aarch64-apple-darwin".parse().unwrap())
+            .unwrap()
+            .finish(cranelift_codegen::settings::Flags::new(
+                cranelift_codegen::settings::builder(),
+            ))
+            .unwrap();
+        let mut module = ObjectModule::new(
+            ObjectBuilder::new(isa, "forwarding", cranelift_module::default_libcall_names())
+                .unwrap(),
+        );
         let mut sig = module.make_signature();
         sig.params = vec![AbiParam::new(types::I64); 2];
         sig.returns.push(AbiParam::new(types::I32));
-        let ids: Vec<_> = (0..4).map(|i| module.declare_function(&format!("chain_{i}"),
-            if i == 0 || (i == 1 && extra == "export") { Linkage::Export } else { Linkage::Local }, &sig).unwrap()).collect();
+        let ids: Vec<_> = (0..4)
+            .map(|i| {
+                module
+                    .declare_function(
+                        &format!("chain_{i}"),
+                        if i == 0 || (i == 1 && extra == "export") {
+                            Linkage::Export
+                        } else {
+                            Linkage::Local
+                        },
+                        &sig,
+                    )
+                    .unwrap()
+            })
+            .collect();
         let mut bodies = Vec::new();
         for i in 0..4 {
-            let mut ctx = module.make_context();ctx.func.signature = sig.clone();
-            let next = (i < 3).then(|| module.declare_func_in_func(ids[i+1], &mut ctx.func));
-            let recur = (i == 3 && extra == "cycle").then(|| module.declare_func_in_func(ids[1], &mut ctx.func));
+            let mut ctx = module.make_context();
+            ctx.func.signature = sig.clone();
+            let next = (i < 3).then(|| module.declare_func_in_func(ids[i + 1], &mut ctx.func));
+            let recur = (i == 3 && extra == "cycle")
+                .then(|| module.declare_func_in_func(ids[1], &mut ctx.func));
             let mut fb = FunctionBuilderContext::new();
             let owner;
             {
                 let mut b = FunctionBuilder::new(&mut ctx.func, &mut fb);
-                let entry = b.create_block();b.append_block_params_for_function_params(entry);b.switch_to_block(entry);
-                let args = b.block_params(entry).to_vec();owner = args[0];
+                let entry = b.create_block();
+                b.append_block_params_for_function_params(entry);
+                b.switch_to_block(entry);
+                let args = b.block_params(entry).to_vec();
+                owner = args[0];
                 if let Some(next) = next {
                     let pointer = if i == 0 {
-                        let slot = b.create_sized_stack_slot(StackSlotData::new(StackSlotKind::ExplicitSlot, 32, 3));
+                        let slot = b.create_sized_stack_slot(StackSlotData::new(
+                            StackSlotKind::ExplicitSlot,
+                            32,
+                            3,
+                        ));
                         b.ins().stack_addr(types::I64, slot, 0)
                     } else if i == 1 {
                         b.ins().iadd_imm(args[1], offset)
-                    } else { args[1] };
+                    } else {
+                        args[1]
+                    };
                     b.ins().call(next, &[args[0], pointer]);
-                    if i == 0 && extra == "unknown" { b.ins().call(next, &args); }
-                    if i == 0 && extra == "address" { b.ins().func_addr(types::I64, next); }
+                    if i == 0 && extra == "unknown" {
+                        b.ins().call(next, &args);
+                    }
+                    if i == 0 && extra == "address" {
+                        b.ins().func_addr(types::I64, next);
+                    }
                     if i == 0 && extra == "small" {
-                        let slot = b.create_sized_stack_slot(StackSlotData::new(StackSlotKind::ExplicitSlot, 8, 3));
+                        let slot = b.create_sized_stack_slot(StackSlotData::new(
+                            StackSlotKind::ExplicitSlot,
+                            8,
+                            3,
+                        ));
                         let small = b.ins().stack_addr(types::I64, slot, 0);
                         b.ins().call(next, &[args[0], small]);
                     }
                 } else {
                     let bits = b.ins().iconst(types::I64, 123);
                     b.ins().store(MemFlags::new(), bits, args[1], 8);
-                    if let Some(recur) = recur { b.ins().call(recur, &args); }
+                    if let Some(recur) = recur {
+                        b.ins().call(recur, &args);
+                    }
                 }
-                let zero = b.ins().iconst(types::I32, 0);b.ins().return_(&[zero]);b.seal_all_blocks();b.finalize();
+                let zero = b.ins().iconst(types::I32, 0);
+                b.ins().return_(&[zero]);
+                b.seal_all_blocks();
+                b.finalize();
             }
-            if i == 3 { super::super::lower(&mut module, &mut ctx.func, owner).unwrap(); }
+            if i == 3 {
+                super::super::lower(&mut module, &mut ctx.func, owner).unwrap();
+            }
             bodies.push((ids[i], ctx));
         }
-        if reverse { bodies.reverse(); }
-        let refs: Vec<_> = bodies.iter().map(|(id,ctx)| (*id,&ctx.func)).collect();
+        if reverse {
+            bodies.reverse();
+        }
+        let refs: Vec<_> = bodies.iter().map(|(id, ctx)| (*id, &ctx.func)).collect();
         let direct = analyze_forwarded(&module, &refs, false, true).0;
         let forwarded = analyze_forwarded(&module, &refs, true, true).0;
-        let find = |report: serde_json::Value| report["functions"].as_array().unwrap().iter()
-            .find(|row| row["name"] == "chain_3").unwrap().clone();
-        (find(direct),find(forwarded))
+        let find = |report: serde_json::Value| {
+            report["functions"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|row| row["name"] == "chain_3")
+                .unwrap()
+                .clone()
+        };
+        (find(direct), find(forwarded))
     }
 
     #[test]
     fn forwarding_propagates_anchored_bounds_independent_of_order() {
-        for reverse in [false,true] {
-            let (direct, forwarded) = chain(8,"",reverse);
-            assert_eq!(direct["candidateStores"],0);
-            assert_eq!(forwarded["candidateStores"],1);
-            assert_eq!(forwarded["stackParameters"],serde_json::json!([{"parameter":1,"availableBytes":24}]));
-            assert_eq!(chain(16,"",reverse).1["candidateStores"],1);
-            assert_eq!(chain(17,"",reverse).1["candidateStores"],0);
+        for reverse in [false, true] {
+            let (direct, forwarded) = chain(8, "", reverse);
+            assert_eq!(direct["candidateStores"], 0);
+            assert_eq!(forwarded["candidateStores"], 1);
+            assert_eq!(
+                forwarded["stackParameters"],
+                serde_json::json!([{"parameter":1,"availableBytes":24}])
+            );
+            assert_eq!(chain(16, "", reverse).1["candidateStores"], 1);
+            assert_eq!(chain(17, "", reverse).1["candidateStores"], 0);
         }
     }
     #[test]
     fn forwarding_rejects_unknown_escape_cycles_and_invalid_bounds() {
-        for extra in ["unknown","export","address","cycle","small"] {
-            assert_eq!(chain(8,extra,true).1["candidateStores"],0,"{extra}");
+        for extra in ["unknown", "export", "address", "cycle", "small"] {
+            assert_eq!(chain(8, extra, true).1["candidateStores"], 0, "{extra}");
         }
-        for offset in [-1,i64::MAX] {
-            assert_eq!(chain(offset,"",true).1["candidateStores"],0);
+        for offset in [-1, i64::MAX] {
+            assert_eq!(chain(offset, "", true).1["candidateStores"], 0);
         }
     }
 }

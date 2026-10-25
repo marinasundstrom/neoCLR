@@ -55,7 +55,10 @@ fn format_four_rejects_old_union_encodings_and_instructions() {
             .is_err()
         );
     }
-    for ty in [r#"{"Optional":"Int32"}"#, r#"{"Result":["Int32","String"]}"#] {
+    for ty in [
+        r#"{"Optional":"Int32"}"#,
+        r#"{"Result":["Int32","String"]}"#,
+    ] {
         assert!(serde_json::from_str::<neoclr::metadata::Type>(ty).is_err());
     }
 }

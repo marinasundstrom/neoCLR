@@ -90,8 +90,16 @@ pub(crate) struct StackPolicy {
 }
 
 impl StackPolicy {
-    pub const DISABLED: Self = Self { elide: false, forward: false, preserve_byrefs: false };
-    pub const QUALIFIED: Self = Self { elide: true, forward: true, preserve_byrefs: true };
+    pub const DISABLED: Self = Self {
+        elide: false,
+        forward: false,
+        preserve_byrefs: false,
+    };
+    pub const QUALIFIED: Self = Self {
+        elide: true,
+        forward: true,
+        preserve_byrefs: true,
+    };
 }
 
 pub(crate) fn stack_policy() -> StackPolicy {
@@ -110,7 +118,9 @@ pub(crate) fn stack_policy() -> StackPolicy {
         }
     }
     #[cfg(not(test))]
-    { StackPolicy::QUALIFIED }
+    {
+        StackPolicy::QUALIFIED
+    }
 }
 
 // Typed primitive stores are the normal live-GC path. Qualification retains
@@ -129,9 +139,13 @@ pub(crate) fn scalar_array_stores_enabled() -> bool {
 // Private qualification switch; production binaries never read this variable.
 pub(crate) fn borrowed_stores_enabled() -> bool {
     #[cfg(test)]
-    { std::env::var_os("NEOCLR_LIVE_BORROW_STORES").is_some() }
+    {
+        std::env::var_os("NEOCLR_LIVE_BORROW_STORES").is_some()
+    }
     #[cfg(not(test))]
-    { false }
+    {
+        false
+    }
 }
 
 // Exact private experimental query ABI. These bits describe required semantics,
@@ -184,7 +198,12 @@ mod tests {
     use super::*;
     #[test]
     fn borrowed_store_requires_all_host_semantics() {
-        for bits in 0..64 { assert_eq!(check_borrowed_store_host_features(bits).is_ok(), bits & 47 == 47); }
+        for bits in 0..64 {
+            assert_eq!(
+                check_borrowed_store_host_features(bits).is_ok(),
+                bits & 47 == 47
+            );
+        }
         assert!(check_borrowed_store_host_features(47).is_ok());
         assert!(check_borrowed_store_host_features(47 | (1 << 63)).is_ok());
     }
@@ -201,7 +220,7 @@ mod tests {
 /// Initial internal provider set for generated bodies; application/native service
 /// providers must be qualified separately before extending this list.
 pub(crate) fn root_providers(module: &impl Module) -> Vec<(&'static str, Signature)> {
-    use ir::{types::*, AbiParam};
+    use ir::{AbiParam, types::*};
     let make = |parameters: &[ir::Type], returns: &[ir::Type]| {
         let mut signature = module.make_signature();
         signature
@@ -213,11 +232,23 @@ pub(crate) fn root_providers(module: &impl Module) -> Vec<(&'static str, Signatu
         signature
     };
     let mut providers = vec![
-        ("neoclr_runtime_async_pump_v1", make(&[I64, I64, I64], &[I32])),
-        ("neoclr_schedule_task_managed_v1", make(&[I64, I64, I64], &[I32])),
-        ("neoclr_task_queue_register_v1", make(&[I64, I64, I64], &[I32])),
+        (
+            "neoclr_runtime_async_pump_v1",
+            make(&[I64, I64, I64], &[I32]),
+        ),
+        (
+            "neoclr_schedule_task_managed_v1",
+            make(&[I64, I64, I64], &[I32]),
+        ),
+        (
+            "neoclr_task_queue_register_v1",
+            make(&[I64, I64, I64], &[I32]),
+        ),
         ("neoclr_task_queue_default_v1", make(&[I64, I64], &[I32])),
-        ("neoclr_task_queue_current_v1", make(&[I64, I32, I32, I64], &[I32])),
+        (
+            "neoclr_task_queue_current_v1",
+            make(&[I64, I32, I32, I64], &[I32]),
+        ),
         ("neoclr_timer_start_v1", make(&[I32, I64, I64, I64], &[I32])),
         ("neoclr_timer_cancel_v1", make(&[I64, I64, I64], &[I32])),
         ("neoclr_task_queue_host_read_v1", make(&[I64, I64], &[I32])),
@@ -225,68 +256,233 @@ pub(crate) fn root_providers(module: &impl Module) -> Vec<(&'static str, Signatu
         ("neoclr_gc_complete_invocation_v1", make(&[I64], &[I32])),
         ("experiment_gc_store", make(&[I64, I64, I64, I32], &[I32])),
         ("neoclr_gc_callback_read_v1", make(&[I64, I64, I64], &[I32])),
-        ("neoclr_socket_listen_v1", make(&[I64, I32, I32, I64, I64], &[I32])),
-        ("neoclr_socket_local_port_v1", make(&[I64, I64, I64], &[I32])),
+        (
+            "neoclr_socket_listen_v1",
+            make(&[I64, I32, I32, I64, I64], &[I32]),
+        ),
+        (
+            "neoclr_socket_local_port_v1",
+            make(&[I64, I64, I64], &[I32]),
+        ),
         ("neoclr_socket_close_v1", make(&[I64, I64, I64], &[I32])),
-        ("neoclr_socket_accept_v1", make(&[I64, I64, I64, I64], &[I32])),
-        ("neoclr_socket_connect_result_v1", make(&[I64, I64, I64], &[I32])),
+        (
+            "neoclr_socket_accept_v1",
+            make(&[I64, I64, I64, I64], &[I32]),
+        ),
+        (
+            "neoclr_socket_connect_result_v1",
+            make(&[I64, I64, I64], &[I32]),
+        ),
         ("neoclr_socket_cancel_v1", make(&[I64, I64, I64], &[I32])),
-        ("neoclr_socket_deadline_after_v1", make(&[I32, I64, I64], &[I32])),
-        ("neoclr_socket_deadline_expired_v1", make(&[I64, I64, I64], &[I32])),
-        ("neoclr_socket_receive_v1", make(&[I64, I64, I32, I32, I64, I64, I64], &[I32])),
-        ("neoclr_socket_send_v1", make(&[I64, I64, I32, I32, I64, I64, I64], &[I32])),
-        ("neoclr_socket_transfer_result_v1", make(&[I64, I64, I64], &[I32])),
-        ("neoclr_socket_receive_until_v1", make(&[I64, I64, I32, I32, I64, I64, I64, I64], &[I32])),
-        ("neoclr_socket_send_until_v1", make(&[I64, I64, I32, I32, I64, I64, I64, I64], &[I32])),
-        ("neoclr_socket_receive_memory_v1", make(&[I64, I64, I32, I32, I64, I64, I64], &[I32])),
-        ("neoclr_socket_send_memory_v1", make(&[I64, I64, I32, I32, I64, I64, I64], &[I32])),
-        ("neoclr_socket_receive_until_memory_v1", make(&[I64, I64, I32, I32, I64, I64, I64, I64], &[I32])),
-        ("neoclr_socket_send_until_memory_v1", make(&[I64, I64, I32, I32, I64, I64, I64, I64], &[I32])),
+        (
+            "neoclr_socket_deadline_after_v1",
+            make(&[I32, I64, I64], &[I32]),
+        ),
+        (
+            "neoclr_socket_deadline_expired_v1",
+            make(&[I64, I64, I64], &[I32]),
+        ),
+        (
+            "neoclr_socket_receive_v1",
+            make(&[I64, I64, I32, I32, I64, I64, I64], &[I32]),
+        ),
+        (
+            "neoclr_socket_send_v1",
+            make(&[I64, I64, I32, I32, I64, I64, I64], &[I32]),
+        ),
+        (
+            "neoclr_socket_transfer_result_v1",
+            make(&[I64, I64, I64], &[I32]),
+        ),
+        (
+            "neoclr_socket_receive_until_v1",
+            make(&[I64, I64, I32, I32, I64, I64, I64, I64], &[I32]),
+        ),
+        (
+            "neoclr_socket_send_until_v1",
+            make(&[I64, I64, I32, I32, I64, I64, I64, I64], &[I32]),
+        ),
+        (
+            "neoclr_socket_receive_memory_v1",
+            make(&[I64, I64, I32, I32, I64, I64, I64], &[I32]),
+        ),
+        (
+            "neoclr_socket_send_memory_v1",
+            make(&[I64, I64, I32, I32, I64, I64, I64], &[I32]),
+        ),
+        (
+            "neoclr_socket_receive_until_memory_v1",
+            make(&[I64, I64, I32, I32, I64, I64, I64, I64], &[I32]),
+        ),
+        (
+            "neoclr_socket_send_until_memory_v1",
+            make(&[I64, I64, I32, I32, I64, I64, I64, I64], &[I32]),
+        ),
         ("neoclr_runtime_async_create_v1", make(&[I64, I64], &[I32])),
-        ("neoclr_runtime_async_start_v1", make(&[I64, I64, I64, I64], &[I32])),
-        ("neoclr_runtime_async_createowned_v1", make(&[I64, I64, I64], &[I32])),
-        ("neoclr_runtime_async_currentowner_v1", make(&[I64, I64], &[I32])),
-        ("neoclr_runtime_async_startmanaged_v1", make(&[I64, I64, I64, I64, I64], &[I32])),
-        ("neoclr_runtime_async_completeunit_v1", make(&[I64, I64, I64], &[I32])),
-        ("neoclr_runtime_async_awaitunit_v1", make(&[I64, I64, I64], &[I32])),
-        ("neoclr_runtime_async_release_v1", make(&[I64, I64, I64], &[I32])),
-        ("neoclr_runtime_async_iscompleted_v1", make(&[I64, I64, I64], &[I32])),
-        ("neoclr_runtime_async_waitcompletion_v1", make(&[I64, I64, I64], &[I32])),
-        ("experiment_gc_string_slice_utf8_rooted_v1", make(&[I64, I32, I32, I64, I64], &[I32])),
-        ("neoclr_byte_view_create_all_v1", make(&[I64, I64, I64, I64], &[I32])),
-        ("neoclr_byte_view_create_v1", make(&[I64, I64, I32, I32, I64, I64], &[I32])),
-        ("neoclr_byte_view_slice_v1", make(&[I64, I64, I32, I32, I64], &[I32])),
-        ("neoclr_byte_view_get_v1", make(&[I64, I64, I32, I64], &[I32])),
-        ("neoclr_byte_view_set_v1", make(&[I64, I64, I32, ir::types::I8], &[I32])),
+        (
+            "neoclr_runtime_async_start_v1",
+            make(&[I64, I64, I64, I64], &[I32]),
+        ),
+        (
+            "neoclr_runtime_async_createowned_v1",
+            make(&[I64, I64, I64], &[I32]),
+        ),
+        (
+            "neoclr_runtime_async_currentowner_v1",
+            make(&[I64, I64], &[I32]),
+        ),
+        (
+            "neoclr_runtime_async_startmanaged_v1",
+            make(&[I64, I64, I64, I64, I64], &[I32]),
+        ),
+        (
+            "neoclr_runtime_async_completeunit_v1",
+            make(&[I64, I64, I64], &[I32]),
+        ),
+        (
+            "neoclr_runtime_async_awaitunit_v1",
+            make(&[I64, I64, I64], &[I32]),
+        ),
+        (
+            "neoclr_runtime_async_release_v1",
+            make(&[I64, I64, I64], &[I32]),
+        ),
+        (
+            "neoclr_runtime_async_iscompleted_v1",
+            make(&[I64, I64, I64], &[I32]),
+        ),
+        (
+            "neoclr_runtime_async_waitcompletion_v1",
+            make(&[I64, I64, I64], &[I32]),
+        ),
+        (
+            "experiment_gc_string_slice_utf8_rooted_v1",
+            make(&[I64, I32, I32, I64, I64], &[I32]),
+        ),
+        (
+            "neoclr_byte_view_create_all_v1",
+            make(&[I64, I64, I64, I64], &[I32]),
+        ),
+        (
+            "neoclr_byte_view_create_v1",
+            make(&[I64, I64, I32, I32, I64, I64], &[I32]),
+        ),
+        (
+            "neoclr_byte_view_slice_v1",
+            make(&[I64, I64, I32, I32, I64], &[I32]),
+        ),
+        (
+            "neoclr_byte_view_get_v1",
+            make(&[I64, I64, I32, I64], &[I32]),
+        ),
+        (
+            "neoclr_byte_view_set_v1",
+            make(&[I64, I64, I32, ir::types::I8], &[I32]),
+        ),
         ("neoclr_byte_view_utf8_v1", make(&[I64, I64, I64], &[I32])),
-        ("experiment_gc_static_storage_rooted_v1", make(&[I64, I32, I32, I32, I64], &[I32])),
-        ("neoclr_tls_managed_v2", make(&[I32, I64, I64, I64, I64, I64, I64, I64], &[I32])),
-        ("neoclr_string_intern_rooted_v1", make(&[I64, I64, I64], &[I32])),
-        ("neoclr_string_compare_ordinal_v1", make(&[I64, I64, I64], &[I32])),
-        ("neoclr_console_write_line_utf8_v1", make(&[I64, I64], &[I32])),
-        ("neoclr_utf8_encode_rooted_v1", make(&[I64, I64, I64], &[I32])),
-        ("neoclr_utf8_decode_rooted_v1", make(&[I64, I64, I64], &[I32])),
-        ("neoclr_utf8_decode_slice_rooted_v1", make(&[I64, I64, I32, I32, I64], &[I32])),
-        ("neoclr_int32_to_string_rooted_v1", make(&[I32, I64, I64], &[I32])),
-        ("neoclr_int64_to_string_rooted_v1", make(&[I64, I64, I64], &[I32])),
-        ("neoclr_uint64_to_string_rooted_v1", make(&[I64, I64, I64], &[I32])),
-        ("neoclr_string_concat_rooted_v1", make(&[I64, I64, I64, I64], &[I32])),
+        (
+            "experiment_gc_static_storage_rooted_v1",
+            make(&[I64, I32, I32, I32, I64], &[I32]),
+        ),
+        (
+            "neoclr_tls_managed_v2",
+            make(&[I32, I64, I64, I64, I64, I64, I64, I64], &[I32]),
+        ),
+        (
+            "neoclr_string_intern_rooted_v1",
+            make(&[I64, I64, I64], &[I32]),
+        ),
+        (
+            "neoclr_string_compare_ordinal_v1",
+            make(&[I64, I64, I64], &[I32]),
+        ),
+        (
+            "neoclr_console_write_line_utf8_v1",
+            make(&[I64, I64], &[I32]),
+        ),
+        (
+            "neoclr_utf8_encode_rooted_v1",
+            make(&[I64, I64, I64], &[I32]),
+        ),
+        (
+            "neoclr_utf8_decode_rooted_v1",
+            make(&[I64, I64, I64], &[I32]),
+        ),
+        (
+            "neoclr_utf8_decode_slice_rooted_v1",
+            make(&[I64, I64, I32, I32, I64], &[I32]),
+        ),
+        (
+            "neoclr_int32_to_string_rooted_v1",
+            make(&[I32, I64, I64], &[I32]),
+        ),
+        (
+            "neoclr_int64_to_string_rooted_v1",
+            make(&[I64, I64, I64], &[I32]),
+        ),
+        (
+            "neoclr_uint64_to_string_rooted_v1",
+            make(&[I64, I64, I64], &[I32]),
+        ),
+        (
+            "neoclr_string_concat_rooted_v1",
+            make(&[I64, I64, I64, I64], &[I32]),
+        ),
         ("neoclr_string_byte_count_v1", make(&[I64, I64], &[I32])),
-        ("neoclr_string_compare_canonical_v1", make(&[I64, I64, I64], &[I32])),
-        ("neoclr_string_compare_ignore_case_v1", make(&[I64, I64, I64], &[I32])),
-        ("neoclr_string_starts_with_ordinal_v1", make(&[I64, I64, I64], &[I32])),
-        ("experiment_gc_store_text", make(&[I64, I64, I32, I64], &[I32])),
-        ("experiment_gc_store_scalar", make(&[I64, I64, I32, I64], &[I32])),
-        ("neoclr_allocate_bytes_rooted_v1", make(&[I64, I32, I64], &[I32])),
-        ("neoclr_reserve_records_rooted_v1", make(&[I64, I32, I32, I64], &[I32])),
-        ("neoclr_reserve_bytes_rooted_v1", make(&[I64, I32, I64], &[I32])),
-        ("neoclr_allocate_scalars_rooted_v1", make(&[I64, I32, I32, I64], &[I32])),
-        ("neoclr_allocate_strings_rooted_v1", make(&[I64, I32, I32, I64], &[I32])),
-        ("experiment_gc_store_record", make(&[I64, I64, I32, I64, I32], &[I32])),
-        ("neoclr_allocate_references_rooted_v1", make(&[I64, I32, I64], &[I32])),
+        (
+            "neoclr_string_compare_canonical_v1",
+            make(&[I64, I64, I64], &[I32]),
+        ),
+        (
+            "neoclr_string_compare_ignore_case_v1",
+            make(&[I64, I64, I64], &[I32]),
+        ),
+        (
+            "neoclr_string_starts_with_ordinal_v1",
+            make(&[I64, I64, I64], &[I32]),
+        ),
+        (
+            "experiment_gc_store_text",
+            make(&[I64, I64, I32, I64], &[I32]),
+        ),
+        (
+            "experiment_gc_store_scalar",
+            make(&[I64, I64, I32, I64], &[I32]),
+        ),
+        (
+            "neoclr_allocate_bytes_rooted_v1",
+            make(&[I64, I32, I64], &[I32]),
+        ),
+        (
+            "neoclr_reserve_records_rooted_v1",
+            make(&[I64, I32, I32, I64], &[I32]),
+        ),
+        (
+            "neoclr_reserve_bytes_rooted_v1",
+            make(&[I64, I32, I64], &[I32]),
+        ),
+        (
+            "neoclr_allocate_scalars_rooted_v1",
+            make(&[I64, I32, I32, I64], &[I32]),
+        ),
+        (
+            "neoclr_allocate_strings_rooted_v1",
+            make(&[I64, I32, I32, I64], &[I32]),
+        ),
+        (
+            "experiment_gc_store_record",
+            make(&[I64, I64, I32, I64, I32], &[I32]),
+        ),
+        (
+            "neoclr_allocate_references_rooted_v1",
+            make(&[I64, I32, I64], &[I32]),
+        ),
         // Generated calls publish live values first and pass a stack result slot.
         // The provider initializes only freshly allocated storage before returning.
-        ("neoclr_allocate_object_rooted_v1", make(&[I64, I32, I32, I64], &[I32])),
+        (
+            "neoclr_allocate_object_rooted_v1",
+            make(&[I64, I32, I32, I64], &[I32]),
+        ),
         (
             "neoclr_gc_state_enter_v1",
             make(&[I64, I64, I32, I64, I32, I64, I32], &[I64]),
@@ -304,7 +500,10 @@ pub(crate) fn root_providers(module: &impl Module) -> Vec<(&'static str, Signatu
     ];
     if borrowed_stores_enabled() {
         providers.push(("experiment_gc_store_state_borrow", make(&[], &[I64])));
-        providers.push(("experiment_gc_store_borrowed", make(&[I64,I64,I64,I64,I32], &[I32])));
+        providers.push((
+            "experiment_gc_store_borrowed",
+            make(&[I64, I64, I64, I64, I32], &[I32]),
+        ));
     }
     providers
 }

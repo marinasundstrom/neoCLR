@@ -16,16 +16,16 @@ mod linking;
 mod load_context;
 mod memory_views;
 // Qualified in focused consumers; not wired into ordinary compilation yet.
-#[allow(dead_code)]
-mod mutation_store;
+mod frame_cleanup;
 #[allow(dead_code)]
 mod mutation_admission;
-mod frame_cleanup;
-#[cfg(all(test, target_os = "macos"))]
-mod native_memory_profile;
+#[allow(dead_code)]
+mod mutation_store;
 mod native_exports;
 mod native_imports;
 mod native_layout;
+#[cfg(all(test, target_os = "macos"))]
+mod native_memory_profile;
 mod native_raven;
 mod reflection_arrays;
 mod reflection_collections;
@@ -63,7 +63,9 @@ fn backend_settings() -> cranelift_codegen::settings::Builder {
             matches!(level, "none" | "speed" | "speed_and_size"),
             "unsupported qualification optimization level: {level}"
         );
-        flags.set("opt_level", level).expect("known Cranelift setting");
+        flags
+            .set("opt_level", level)
+            .expect("known Cranelift setting");
     }
     flags
 }
@@ -83,7 +85,10 @@ pub fn run(arguments: Vec<std::ffi::OsString>) -> Result<i32, Box<dyn std::error
 
 // Private qualification route: ordinary hosting never enables live stores.
 // Execution still requires independently qualified host capability/ownership checks.
-fn run_internal(arguments: Vec<std::ffi::OsString>, live_stores: bool) -> Result<i32, Box<dyn std::error::Error>> {
+fn run_internal(
+    arguments: Vec<std::ffi::OsString>,
+    live_stores: bool,
+) -> Result<i32, Box<dyn std::error::Error>> {
     if live_stores && arguments.iter().any(|a| a == "--jit-scalar") {
         return Err("live selection qualification requires managed hosting".into());
     }

@@ -127,12 +127,13 @@ fn scalar_bits_and_fault_exit_execute_in_jit() {
                 stack_stores: 0
             }
         );
-        assert!(!ctx
-            .func
-            .layout
-            .blocks()
-            .flat_map(|b| ctx.func.layout.block_insts(b))
-            .any(|i| ctx.func.dfg.insts[i].opcode() == Opcode::Store));
+        assert!(
+            !ctx.func
+                .layout
+                .blocks()
+                .flat_map(|b| ctx.func.layout.block_insts(b))
+                .any(|i| ctx.func.dfg.insts[i].opcode() == Opcode::Store)
+        );
         module.define_function(id, &mut ctx).unwrap();
         ids.push(id);
     }
@@ -264,10 +265,12 @@ fn rejects_unadmitted_store_before_editing() {
         *flags = flags.with_endianness(ir::Endianness::Big);
     }
     let before = ctx.func.display().to_string();
-    assert!(lower(&mut module, &mut ctx.func, context)
-        .unwrap_err()
-        .to_string()
-        .contains("explicit-endian"));
+    assert!(
+        lower(&mut module, &mut ctx.func, context)
+            .unwrap_err()
+            .to_string()
+            .contains("explicit-endian")
+    );
     assert_eq!(ctx.func.display().to_string(), before);
 }
 
@@ -310,7 +313,6 @@ fn native_collector_jit_consumer() {
     module.finalize_definitions().unwrap();
     let call: Writer = unsafe { std::mem::transmute(module.get_finalized_function(id)) };
     assert_eq!(unsafe { run(call) }, 0);
-
 }
 
 // This mirrors argument/local copies emitted before a GC frame is linked: they
@@ -407,10 +409,12 @@ fn invalid_proven_stack_extent_rejected_without_edits() {
         );
         let (_, mut ctx, context) = stack_copy(&mut module, displacement);
         let before = ctx.func.display().to_string();
-        assert!(lower(&mut module, &mut ctx.func, context)
-            .unwrap_err()
-            .to_string()
-            .contains("exceeds proven stack slot"));
+        assert!(
+            lower(&mut module, &mut ctx.func, context)
+                .unwrap_err()
+                .to_string()
+                .contains("exceeds proven stack slot")
+        );
         assert_eq!(ctx.func.display().to_string(), before);
     }
 }
@@ -571,10 +575,12 @@ fn frame_initialization_must_dominate_stores_and_returns() {
             cursor.ins().return_(&[zero]);
         }
         let before = ctx.func.display().to_string();
-        assert!(lower_framed(&mut module, &mut ctx.func, context, ready)
-            .unwrap_err()
-            .to_string()
-            .contains("must dominate"));
+        assert!(
+            lower_framed(&mut module, &mut ctx.func, context, ready)
+                .unwrap_err()
+                .to_string()
+                .contains("must dominate")
+        );
         assert_eq!(ctx.func.display().to_string(), before);
     }
 }
@@ -639,41 +645,51 @@ fn call_closure_requires_transitive_bodies_and_exact_providers() {
         .call(target, &args);
     let providers = live_providers(&module);
     let check = crate::mutation_admission::check_call_closure;
-    assert!(check(&module, &[(caller, &caller_ctx.func)], &providers)
-        .unwrap_err()
-        .to_string()
-        .contains("no supplied body"));
+    assert!(
+        check(&module, &[(caller, &caller_ctx.func)], &providers)
+            .unwrap_err()
+            .to_string()
+            .contains("no supplied body")
+    );
     let bodies = [(caller, &caller_ctx.func), (callee, &callee_ctx.func)];
     check(&module, &bodies, &providers).unwrap();
-    assert!(check(&module, &bodies, &[])
-        .unwrap_err()
-        .to_string()
-        .contains("no admitted provider"));
+    assert!(
+        check(&module, &bodies, &[])
+            .unwrap_err()
+            .to_string()
+            .contains("no admitted provider")
+    );
     let mut wrong = live_providers(&module);
     wrong[0].1.params[3].value_type = types::I64;
-    assert!(check(&module, &bodies, &wrong)
+    assert!(
+        check(&module, &bodies, &wrong)
+            .unwrap_err()
+            .to_string()
+            .contains("signature mismatch")
+    );
+    assert!(
+        check(
+            &module,
+            &[(callee, &callee_ctx.func), (callee, &callee_ctx.func)],
+            &providers
+        )
         .unwrap_err()
         .to_string()
-        .contains("signature mismatch"));
-    assert!(check(
-        &module,
-        &[(callee, &callee_ctx.func), (callee, &callee_ctx.func)],
-        &providers
-    )
-    .unwrap_err()
-    .to_string()
-    .contains("duplicate generated"));
+        .contains("duplicate generated")
+    );
     if let ir::InstructionData::Call { opcode, .. } = &mut caller_ctx.func.dfg.insts[call] {
         *opcode = Opcode::ReturnCall;
     }
-    assert!(check(
-        &module,
-        &[(caller, &caller_ctx.func), (callee, &callee_ctx.func)],
-        &providers
-    )
-    .unwrap_err()
-    .to_string()
-    .contains("tail"));
+    assert!(
+        check(
+            &module,
+            &[(caller, &caller_ctx.func), (callee, &callee_ctx.func)],
+            &providers
+        )
+        .unwrap_err()
+        .to_string()
+        .contains("tail")
+    );
 }
 
 #[test]
@@ -700,14 +716,16 @@ fn call_closure_rejects_indirect_calls_and_forged_site_signatures() {
     };
     let signature = ctx.func.dfg.ext_funcs[func_ref].signature;
     ctx.func.dfg.signatures[signature].params[3].value_type = types::I64;
-    assert!(crate::mutation_admission::check_call_closure(
-        &module,
-        &[(id, &ctx.func)],
-        &live_providers(&module)
-    )
-    .unwrap_err()
-    .to_string()
-    .contains("call-site signature"));
+    assert!(
+        crate::mutation_admission::check_call_closure(
+            &module,
+            &[(id, &ctx.func)],
+            &live_providers(&module)
+        )
+        .unwrap_err()
+        .to_string()
+        .contains("call-site signature")
+    );
     let args = ctx.func.dfg.block_params(entry).to_vec();
     let signature = ctx.func.signature.clone();
     let signature = ctx.func.import_signature(signature);
@@ -716,14 +734,16 @@ fn call_closure_rejects_indirect_calls_and_forged_site_signatures() {
         .at_inst(first)
         .ins()
         .call_indirect(signature, context, &args);
-    assert!(crate::mutation_admission::check_call_closure(
-        &module,
-        &[(id, &ctx.func)],
-        &live_providers(&module)
-    )
-    .unwrap_err()
-    .to_string()
-    .contains("indirect"));
+    assert!(
+        crate::mutation_admission::check_call_closure(
+            &module,
+            &[(id, &ctx.func)],
+            &live_providers(&module)
+        )
+        .unwrap_err()
+        .to_string()
+        .contains("indirect")
+    );
 }
 
 #[test]
@@ -744,14 +764,22 @@ fn incompatible_live_hosts_rejected_before_binding() {
         unsafe { libloading::Library::new(directory.join("noboundary.dylib")) }.unwrap();
     unsafe { crate::mutation_admission::require_host(&scalar_host) }.unwrap();
     assert!(unsafe { crate::mutation_admission::require_managed_host(&scalar_host) }.is_err());
-    let input = neoclr::assemble(".module HostAdmission\n.function Main(Int32 value) -> Int32\nldarg value\nret\n.end").unwrap();
+    let input = neoclr::assemble(
+        ".module HostAdmission\n.function Main(Int32 value) -> Int32\nldarg value\nret\n.end",
+    )
+    .unwrap();
     let mut options = managed_options();
     options.native_stack_budget = true;
     for name in ["missing", "legacy", "partial", "noboundary"] {
         let error = crate::jit::execute_managed(
-            &input, "Main", &options, &directory.join(format!("{name}.dylib")),
-            &[], crate::compiler::Target::MacosArm64,
-        ).unwrap_err();
+            &input,
+            "Main",
+            &options,
+            &directory.join(format!("{name}.dylib")),
+            &[],
+            crate::compiler::Target::MacosArm64,
+        )
+        .unwrap_err();
         assert!(error.to_string().contains("host lacks"), "{name}: {error}");
     }
 }
@@ -767,32 +795,50 @@ fn managed_options() -> crate::fault_details::Options {
 }
 #[test]
 fn ordinary_value_pipeline_lowers_only_when_opted_in() {
-    emit_managed(include_str!("../../../benchmarks/execution/concurrent-store/managed.neoil"));
+    emit_managed(include_str!(
+        "../../../benchmarks/execution/concurrent-store/managed.neoil"
+    ));
 }
 #[test]
 fn managed_construction_emits_guarded_stores() {
-    emit_managed(include_str!("../../../benchmarks/execution/concurrent-store/construction.neoil"));
+    emit_managed(include_str!(
+        "../../../benchmarks/execution/concurrent-store/construction.neoil"
+    ));
 }
 #[test]
 fn managed_arrays_emit_grouped_stores() {
     let source = include_str!("../../../benchmarks/execution/concurrent-store/arrays.neoil");
     emit_managed(source);
     let input = neoclr::assemble(&source.replace("stelem Node", "stelem fn<Int32,Int32>")).unwrap();
-    let mut module = ObjectModule::new(ObjectBuilder::new(
-        isa(target(), true), "reject-array", cranelift_module::default_libcall_names(),
-    ).unwrap());
+    let mut module = ObjectModule::new(
+        ObjectBuilder::new(
+            isa(target(), true),
+            "reject-array",
+            cranelift_module::default_libcall_names(),
+        )
+        .unwrap(),
+    );
     let _ = crate::compiler::values::compile_into(
-        &input, "Main", Some(&managed_options()), crate::compiler::Target::MacosArm64,
-        &mut module, false,
-    ).unwrap_err();
+        &input,
+        "Main",
+        Some(&managed_options()),
+        crate::compiler::Target::MacosArm64,
+        &mut module,
+        false,
+    )
+    .unwrap_err();
 }
 #[test]
 fn managed_text_arrays_emit_grouped_stores() {
-    emit_managed(include_str!("../../../benchmarks/execution/concurrent-store/text-arrays.neoil"));
+    emit_managed(include_str!(
+        "../../../benchmarks/execution/concurrent-store/text-arrays.neoil"
+    ));
 }
 #[test]
 fn managed_statics_emit_guarded_publication() {
-    emit_managed(include_str!("../../../benchmarks/execution/concurrent-store/statics.neoil"));
+    emit_managed(include_str!(
+        "../../../benchmarks/execution/concurrent-store/statics.neoil"
+    ));
 }
 fn managed_options_for(source: &str) -> crate::fault_details::Options {
     let mut options = managed_options();
@@ -804,8 +850,14 @@ fn managed_options_for(source: &str) -> crate::fault_details::Options {
         let constructed = (0..input.types.len()).collect();
         let mut relations = crate::selection::DispatchRelations::new(&input);
         let targets = crate::selection::dispatch_targets_with_array(
-            &mut relations, 0, &reached, None, &[], Some(&constructed),
-        ).unwrap();
+            &mut relations,
+            0,
+            &reached,
+            None,
+            &[],
+            Some(&constructed),
+        )
+        .unwrap();
         assert_eq!(targets.len(), 3);
         options.interface_dispatch.insert(0, targets);
     }
@@ -820,7 +872,7 @@ fn managed_options_for(source: &str) -> crate::fault_details::Options {
         options.runtime_async_createowned.push(9);
         options.runtime_async_currentowner.push(10);
         options.runtime_async_startmanaged.push(11);
-        options.object_base=Some(0);
+        options.object_base = Some(0);
     }
     if source.starts_with(".module LiveAsyncWrappersPump") {
         options.entry_task_drain.push(14);
@@ -858,7 +910,7 @@ fn managed_options_for(source: &str) -> crate::fault_details::Options {
         options.socket_receive_until.push(11);
         options.socket_send_until.push(12);
         if source.starts_with(".module LiveSocketMemory") {
-            options.socket_memory.extend([8,9,11,12]);
+            options.socket_memory.extend([8, 9, 11, 12]);
         }
     }
     if source.starts_with(".module LiveNativeText") {
@@ -878,37 +930,66 @@ fn managed_native_text_emits_guarded_wrappers() {
     let mut options = managed_options_for(source);
     options.string_concat.clear();
     options.string_upper.push(0);
-    let mut module = ObjectModule::new(ObjectBuilder::new(
-        isa(target(), true), "reject-provider", cranelift_module::default_libcall_names(),
-    ).unwrap());
+    let mut module = ObjectModule::new(
+        ObjectBuilder::new(
+            isa(target(), true),
+            "reject-provider",
+            cranelift_module::default_libcall_names(),
+        )
+        .unwrap(),
+    );
     let error = crate::compiler::values::compile_into(
-        &input, "Main", Some(&options), crate::compiler::Target::MacosArm64, &mut module, false,
-    ).unwrap_err();
-    assert!(error.to_string().contains("unaudited native replacement bodies"));
+        &input,
+        "Main",
+        Some(&options),
+        crate::compiler::Target::MacosArm64,
+        &mut module,
+        false,
+    )
+    .unwrap_err();
+    assert!(
+        error
+            .to_string()
+            .contains("unaudited native replacement bodies")
+    );
 }
 fn managed_input(source: &str) -> neoclr::metadata::Module {
     use neoclr::metadata::{Instruction as Op, StaticField, Type, Visibility};
     let mut input = neoclr::assemble(source).unwrap();
     if source.starts_with(".module LiveNativeText") {
         // Exercise production binding validation before value-profile lowering.
-        let rows: Vec<_> = input.functions.iter().take(5).enumerate().map(|(i, f)| {
-            serde_json::json!({"name": f.name, "compiledIndex": i,
+        let rows: Vec<_> = input
+            .functions
+            .iter()
+            .take(5)
+            .enumerate()
+            .map(|(i, f)| {
+                serde_json::json!({"name": f.name, "compiledIndex": i,
                 "definition": {"module": "LiveNativeText", "index": i}})
-        }).collect();
-        let bindings = crate::bindings::utf8_text(
-            &mut input, &serde_json::json!({"functions": rows}),
-        ).unwrap();
+            })
+            .collect();
+        let bindings =
+            crate::bindings::utf8_text(&mut input, &serde_json::json!({"functions": rows}))
+                .unwrap();
         assert_eq!(bindings.len(), 5);
         // This direct backend fixture lacks the production closed-world name
         // projection. Give the validated replacement placeholders private names
         // so verifier loading cannot collide with bundled System declarations.
-        for (index, name) in [(0, "LiveNativeText.Concat"), (1, "LiveNativeText.ByteCount"), (2, "LiveNativeText.Canonical"), (3, "LiveNativeText.IgnoreCase"), (4, "LiveNativeText.StartsWith")] {
+        for (index, name) in [
+            (0, "LiveNativeText.Concat"),
+            (1, "LiveNativeText.ByteCount"),
+            (2, "LiveNativeText.Canonical"),
+            (3, "LiveNativeText.IgnoreCase"),
+            (4, "LiveNativeText.StartsWith"),
+        ] {
             let original = input.functions[index].name.clone();
             input.functions[index].name = name.into();
             for function in &mut input.functions {
                 for op in &mut function.body {
                     if let Op::Call(target) = op {
-                        if target.name == original { target.name = name.into(); }
+                        if target.name == original {
+                            target.name = name.into();
+                        }
                     }
                 }
             }
@@ -917,36 +998,81 @@ fn managed_input(source: &str) -> neoclr::metadata::Module {
     if source.starts_with(".module LiveSocket") {
         if source.starts_with(".module LiveSocketMemory") {
             use neoclr::metadata::MemoryViewKind;
-            for (kind,name) in [(MemoryViewKind::Memory,"SocketMemory"),(MemoryViewKind::ReadOnlyMemory,"SocketReadOnlyMemory")] {
-                let mut ty=crate::memory_views::test_module(kind,Type::Byte).types.remove(0);
-                ty.name=name.into();ty.definition=None;input.types.push(ty);
+            for (kind, name) in [
+                (MemoryViewKind::Memory, "SocketMemory"),
+                (MemoryViewKind::ReadOnlyMemory, "SocketReadOnlyMemory"),
+            ] {
+                let mut ty = crate::memory_views::test_module(kind, Type::Byte)
+                    .types
+                    .remove(0);
+                ty.name = name.into();
+                ty.definition = None;
+                input.types.push(ty);
             }
-            for i in [8,9,11,12] {
-                let name=if i==8 || i==11 { "SocketMemory" } else { "SocketReadOnlyMemory" };
-                input.functions[i].parameters.splice(1..4,[Type::Named(name.into())]);
+            for i in [8, 9, 11, 12] {
+                let name = if i == 8 || i == 11 {
+                    "SocketMemory"
+                } else {
+                    "SocketReadOnlyMemory"
+                };
+                input.functions[i]
+                    .parameters
+                    .splice(1..4, [Type::Named(name.into())]);
                 input.functions[i].parameter_names.clear();
             }
         }
-        let rows: Vec<_> = (0..13).map(|i| serde_json::json!({"name":input.functions[i].name,
-            "compiledIndex":i,"definition":{"module":"LiveSocketWrappers","index":i}})).collect();
-        let selection=serde_json::json!({"functions":rows});
-        assert_eq!(crate::bindings::socket_listener(&mut input,&selection).unwrap().len(),3);
-        assert_eq!(crate::bindings::socket_accept(&mut input,&selection).unwrap().len(),3);
-        assert_eq!(crate::bindings::socket_transfer(&mut input,&selection).unwrap().len(),7);
-        for i in 0..13 { input.functions[i].name=format!("LiveSocketWrapper{i}"); }
+        let rows: Vec<_> = (0..13)
+            .map(|i| {
+                serde_json::json!({"name":input.functions[i].name,
+            "compiledIndex":i,"definition":{"module":"LiveSocketWrappers","index":i}})
+            })
+            .collect();
+        let selection = serde_json::json!({"functions":rows});
+        assert_eq!(
+            crate::bindings::socket_listener(&mut input, &selection)
+                .unwrap()
+                .len(),
+            3
+        );
+        assert_eq!(
+            crate::bindings::socket_accept(&mut input, &selection)
+                .unwrap()
+                .len(),
+            3
+        );
+        assert_eq!(
+            crate::bindings::socket_transfer(&mut input, &selection)
+                .unwrap()
+                .len(),
+            7
+        );
+        for i in 0..13 {
+            input.functions[i].name = format!("LiveSocketWrapper{i}");
+        }
     }
     if source.starts_with(".module LiveAsyncWrappers") {
-        let rows: Vec<_> = (2..12).map(|i| serde_json::json!({"name":input.functions[i].name,
-            "compiledIndex":i,"definition":{"module":"LiveAsyncWrappers","index":i}})).collect();
-        assert_eq!(crate::bindings::runtime_async(&mut input, &serde_json::json!({"functions":rows})).unwrap().len(),10);
+        let rows: Vec<_> = (2..12)
+            .map(|i| {
+                serde_json::json!({"name":input.functions[i].name,
+            "compiledIndex":i,"definition":{"module":"LiveAsyncWrappers","index":i}})
+            })
+            .collect();
+        assert_eq!(
+            crate::bindings::runtime_async(&mut input, &serde_json::json!({"functions":rows}))
+                .unwrap()
+                .len(),
+            10
+        );
         for i in 2..12 {
-            let original=input.functions[i].name.clone();
-            let name=format!("LiveAsyncWrapper{i}");
-            input.functions[i].name=name.clone();
+            let original = input.functions[i].name.clone();
+            let name = format!("LiveAsyncWrapper{i}");
+            input.functions[i].name = name.clone();
             for f in &mut input.functions {
                 for op in &mut f.body {
-                    if let Op::Call(target)=op {
-                        if target.name==original { target.name=name.clone(); }
+                    if let Op::Call(target) = op {
+                        if target.name == original {
+                            target.name = name.clone();
+                        }
                     }
                 }
             }
@@ -955,12 +1081,19 @@ fn managed_input(source: &str) -> neoclr::metadata::Module {
     if source.starts_with(".module LiveAsyncWrappersPumpNetwork") {
         let original = input.functions[16].name.clone();
         let selection = serde_json::json!({"functions":[{"name":original,"compiledIndex":16}]});
-        assert_eq!(crate::bindings::socket_accept(&mut input, &selection).unwrap().len(), 1);
+        assert_eq!(
+            crate::bindings::socket_accept(&mut input, &selection)
+                .unwrap()
+                .len(),
+            1
+        );
         input.functions[16].name = "LiveNetwork.ConnectResult".into();
         for f in &mut input.functions {
             for op in &mut f.body {
                 if let Op::Call(target) = op {
-                    if target.name == original { target.name = "LiveNetwork.ConnectResult".into(); }
+                    if target.name == original {
+                        target.name = "LiveNetwork.ConnectResult".into();
+                    }
                 }
             }
         }
@@ -970,54 +1103,115 @@ fn managed_input(source: &str) -> neoclr::metadata::Module {
         // metadata construction as the existing static-storage compiler tests.
         for index in [1, 2] {
             input.types[index].static_fields.push(StaticField {
-                name: "Value".into(), ty: Type::Named("Node".into()),
-                visibility: Visibility::Public, readonly: false,
+                name: "Value".into(),
+                ty: Type::Named("Node".into()),
+                visibility: Visibility::Public,
+                readonly: false,
             });
         }
         let first = Type::Named("First".into());
         let second = Type::Named("Second".into());
-        let writer = input.functions.iter().position(|f| f.name == "Write").unwrap();
+        let writer = input
+            .functions
+            .iter()
+            .position(|f| f.name == "Write")
+            .unwrap();
         input.functions[writer].body = vec![
-            Op::Arg(2), Op::SetStaticField { owner: first.clone(), index: 0 },
-            Op::Arg(2), Op::SetStaticField { owner: second.clone(), index: 0 },
-            Op::Arg(0), Op::StaticField { owner: first, index: 0 }, Op::StoreObject(Type::Named("Node".into())),
-            Op::Arg(1), Op::StaticField { owner: second, index: 0 }, Op::StoreObject(Type::Named("Node".into())),
-            Op::Int(0), Op::Return,
+            Op::Arg(2),
+            Op::SetStaticField {
+                owner: first.clone(),
+                index: 0,
+            },
+            Op::Arg(2),
+            Op::SetStaticField {
+                owner: second.clone(),
+                index: 0,
+            },
+            Op::Arg(0),
+            Op::StaticField {
+                owner: first,
+                index: 0,
+            },
+            Op::StoreObject(Type::Named("Node".into())),
+            Op::Arg(1),
+            Op::StaticField {
+                owner: second,
+                index: 0,
+            },
+            Op::StoreObject(Type::Named("Node".into())),
+            Op::Int(0),
+            Op::Return,
         ];
     }
     if source.starts_with(".module LiveInitializers") {
         let owner = Type::Named("First".into());
         input.types[1].static_fields.push(StaticField {
-            name: "Count".into(), ty: Type::Int32,
-            visibility: Visibility::Public, readonly: false,
+            name: "Count".into(),
+            ty: Type::Int32,
+            visibility: Visibility::Public,
+            readonly: false,
         });
-        let initializer = input.functions.iter().position(|f| f.name == "First..cctor").unwrap();
+        let initializer = input
+            .functions
+            .iter()
+            .position(|f| f.name == "First..cctor")
+            .unwrap();
         input.functions[initializer].body = vec![
-            Op::StaticField { owner: owner.clone(), index: 1 }, Op::Int(1), Op::Add,
-            Op::SetStaticField { owner: owner.clone(), index: 1 },
-            Op::Call(neoclr::assembler::parse_function_ref("First::Reenter()").unwrap()), Op::Pop,
+            Op::StaticField {
+                owner: owner.clone(),
+                index: 1,
+            },
+            Op::Int(1),
+            Op::Add,
+            Op::SetStaticField {
+                owner: owner.clone(),
+                index: 1,
+            },
+            Op::Call(neoclr::assembler::parse_function_ref("First::Reenter()").unwrap()),
+            Op::Pop,
             Op::Return,
         ];
         for name in ["Count", "Fail"] {
             input.types[2].static_fields.push(StaticField {
-                name: name.into(), ty: Type::Int32,
-                visibility: Visibility::Public, readonly: false,
+                name: name.into(),
+                ty: Type::Int32,
+                visibility: Visibility::Public,
+                readonly: false,
             });
         }
         let owner = Type::Named("Second".into());
-        let initializer = input.functions.iter().position(|f| f.name == "Second..cctor").unwrap();
+        let initializer = input
+            .functions
+            .iter()
+            .position(|f| f.name == "Second..cctor")
+            .unwrap();
         input.functions[initializer].body = vec![
-            Op::StaticField { owner: owner.clone(), index: 1 }, Op::Int(1), Op::Add,
-            Op::SetStaticField { owner: owner.clone(), index: 1 },
-            Op::StaticField { owner, index: 2 }, Op::BranchFalse(10),
-            Op::Int(i32::MAX), Op::Int(1), Op::AddChecked, Op::Pop, Op::Return,
+            Op::StaticField {
+                owner: owner.clone(),
+                index: 1,
+            },
+            Op::Int(1),
+            Op::Add,
+            Op::SetStaticField {
+                owner: owner.clone(),
+                index: 1,
+            },
+            Op::StaticField { owner, index: 2 },
+            Op::BranchFalse(10),
+            Op::Int(i32::MAX),
+            Op::Int(1),
+            Op::AddChecked,
+            Op::Pop,
+            Op::Return,
         ];
     }
     input
 }
 #[test]
 fn managed_initializers_emit_guarded_stores() {
-    emit_managed(include_str!("../../../benchmarks/execution/concurrent-store/initializers.neoil"));
+    emit_managed(include_str!(
+        "../../../benchmarks/execution/concurrent-store/initializers.neoil"
+    ));
 }
 fn emit_managed(source: &str) {
     let input = managed_input(source);
@@ -1042,24 +1236,66 @@ fn emit_managed(source: &str) {
         )
         .unwrap();
         if enabled {
-            let mut exports = vec![(input.functions.iter().position(|f| f.name == "Write").unwrap(), "live_managed_writer")];
+            let mut exports = vec![(
+                input
+                    .functions
+                    .iter()
+                    .position(|f| f.name == "Write")
+                    .unwrap(),
+                "live_managed_writer",
+            )];
             if source.starts_with(".module LiveNativeText") {
-                exports.extend([(0, "live_native_concat"), (1, "live_native_count"), (2, "live_native_canonical"), (3, "live_native_ignore_case"), (4, "live_native_starts_with")]);
+                exports.extend([
+                    (0, "live_native_concat"),
+                    (1, "live_native_count"),
+                    (2, "live_native_canonical"),
+                    (3, "live_native_ignore_case"),
+                    (4, "live_native_starts_with"),
+                ]);
             }
             if source.starts_with(".module LiveAsyncWrappers") {
-                exports.extend([(2,"live_async_create"),(3,"live_async_complete"),(4,"live_async_await"),
-                    (5,"live_async_release"),(6,"live_async_iscompleted"),(7,"live_async_wait"),(8,"live_async_start"),(9,"live_async_createowned"),
-                    (10,"live_async_currentowner"),(11,"live_async_startmanaged")]);
+                exports.extend([
+                    (2, "live_async_create"),
+                    (3, "live_async_complete"),
+                    (4, "live_async_await"),
+                    (5, "live_async_release"),
+                    (6, "live_async_iscompleted"),
+                    (7, "live_async_wait"),
+                    (8, "live_async_start"),
+                    (9, "live_async_createowned"),
+                    (10, "live_async_currentowner"),
+                    (11, "live_async_startmanaged"),
+                ]);
             }
             if source.starts_with(".module LiveAsyncWrappersPump") {
                 exports.push((14, "live_async_pump"));
             }
             if source.starts_with(".module LiveQueueTimers") {
-                exports.extend([(0,"live_queue_body"),(3,"live_queue_register"),(4,"live_queue_default"),
-                    (5,"live_queue_current"),(6,"live_timer_start"),(7,"live_timer_cancel")]);
+                exports.extend([
+                    (0, "live_queue_body"),
+                    (3, "live_queue_register"),
+                    (4, "live_queue_default"),
+                    (5, "live_queue_current"),
+                    (6, "live_timer_start"),
+                    (7, "live_timer_cancel"),
+                ]);
             }
             if source.starts_with(".module LiveSocket") {
-                exports.extend([(0,"live_socket_listen"), (1,"live_socket_local_port"), (2,"live_socket_close"), (3,"live_socket_accept"), (4,"live_socket_connect_result"), (5,"live_socket_cancel"), (6,"live_socket_deadline_after"), (7,"live_socket_deadline_expired"), (8,"live_socket_receive"), (9,"live_socket_send"), (10,"live_socket_transfer_result"), (11,"live_socket_receive_until"), (12,"live_socket_send_until")]);
+                exports.extend([
+                    (0, "live_socket_listen"),
+                    (1, "live_socket_local_port"),
+                    (2, "live_socket_close"),
+                    (3, "live_socket_accept"),
+                    (4, "live_socket_connect_result"),
+                    (5, "live_socket_cancel"),
+                    (6, "live_socket_deadline_after"),
+                    (7, "live_socket_deadline_expired"),
+                    (8, "live_socket_receive"),
+                    (9, "live_socket_send"),
+                    (10, "live_socket_transfer_result"),
+                    (11, "live_socket_receive_until"),
+                    (12, "live_socket_send_until"),
+                ]);
             }
             for (index, name) in exports {
                 let Some(cranelift_module::FuncOrDataId::Func(writer)) =
@@ -1102,31 +1338,61 @@ fn emit_managed(source: &str) {
         }
 
         let object = object::File::parse(bytes.as_slice()).unwrap();
-        assert_eq!(object.symbols().any(|s| s.is_undefined()
-            && s.name().unwrap_or("").trim_start_matches('_') == "experiment_gc_prepare_entry_v1"), enabled);
-        if source.starts_with(".module LiveStatics") || source.starts_with(".module LiveInitializers") {
-            assert_eq!(object.symbols().any(|s| s.is_undefined()
-                && s.name().unwrap_or("").trim_start_matches('_') == "experiment_gc_static_storage_rooted_v1"), enabled);
+        assert_eq!(
+            object.symbols().any(|s| s.is_undefined()
+                && s.name().unwrap_or("").trim_start_matches('_')
+                    == "experiment_gc_prepare_entry_v1"),
+            enabled
+        );
+        if source.starts_with(".module LiveStatics")
+            || source.starts_with(".module LiveInitializers")
+        {
+            assert_eq!(
+                object.symbols().any(|s| s.is_undefined()
+                    && s.name().unwrap_or("").trim_start_matches('_')
+                        == "experiment_gc_static_storage_rooted_v1"),
+                enabled
+            );
         }
         if source.starts_with(".module LiveAsyncWrappers\n") {
-            assert!(!object.symbols().any(|s| s.name().unwrap_or("").trim_start_matches('_')
-                == "neoclr_drain_default_queue_v1"));
+            assert!(
+                !object
+                    .symbols()
+                    .any(|s| s.name().unwrap_or("").trim_start_matches('_')
+                        == "neoclr_drain_default_queue_v1")
+            );
         }
         if source.starts_with(".module LivePrimitiveArrays") {
-            assert_eq!(object.symbols().any(|s| s.is_undefined()
-                && s.name().unwrap_or("").trim_start_matches('_') == "experiment_gc_store_scalar"),
-                enabled && crate::mutation_admission::scalar_array_stores_enabled());
+            assert_eq!(
+                object.symbols().any(|s| s.is_undefined()
+                    && s.name().unwrap_or("").trim_start_matches('_')
+                        == "experiment_gc_store_scalar"),
+                enabled && crate::mutation_admission::scalar_array_stores_enabled()
+            );
         }
-        if source.contains("stelem") && !source.starts_with(".module LivePrimitiveArrays") && !source.starts_with(".module LiveEntry") {
+        if source.contains("stelem")
+            && !source.starts_with(".module LivePrimitiveArrays")
+            && !source.starts_with(".module LiveEntry")
+        {
             let helper = if source.contains("stelem String") || source.contains("stelem fn<") {
                 "experiment_gc_store_text"
-            } else { "experiment_gc_store_record" };
-            assert_eq!(object.symbols().any(|s| s.is_undefined()
-                && s.name().unwrap_or("").trim_start_matches('_') == helper), enabled);
+            } else {
+                "experiment_gc_store_record"
+            };
+            assert_eq!(
+                object.symbols().any(|s| s.is_undefined()
+                    && s.name().unwrap_or("").trim_start_matches('_') == helper),
+                enabled
+            );
         }
         assert_eq!(
             object.symbols().any(|s| s.is_undefined()
-                && s.name().unwrap_or("").trim_start_matches('_') == if crate::mutation_admission::borrowed_stores_enabled() { "experiment_gc_store_borrowed" } else { "experiment_gc_store" }),
+                && s.name().unwrap_or("").trim_start_matches('_')
+                    == if crate::mutation_admission::borrowed_stores_enabled() {
+                        "experiment_gc_store_borrowed"
+                    } else {
+                        "experiment_gc_store"
+                    }),
             enabled
         );
     }
@@ -1140,52 +1406,68 @@ fn emit_managed(source: &str) {
     );
     let mut options = managed_options_for(source);
     options.native_worker_safepoints = true;
-    assert!(crate::compiler::values::compile_into(
-        &input,
-        "Main",
-        Some(&options),
-        crate::compiler::Target::MacosArm64,
-        &mut module,
-        false
-    )
-    .unwrap_err()
-    .to_string()
-    .contains("owned published frames"));
+    assert!(
+        crate::compiler::values::compile_into(
+            &input,
+            "Main",
+            Some(&options),
+            crate::compiler::Target::MacosArm64,
+            &mut module,
+            false
+        )
+        .unwrap_err()
+        .to_string()
+        .contains("owned published frames")
+    );
 }
 #[test]
 #[ignore = "requires NEOCLR_MUTATION_TEST_HOST built by concurrent-store/validate.py"]
 fn managed_pipeline_runs_on_live_collector() {
-    run_managed(include_str!("../../../benchmarks/execution/concurrent-store/managed.neoil"));
+    run_managed(include_str!(
+        "../../../benchmarks/execution/concurrent-store/managed.neoil"
+    ));
 }
 #[test]
 #[ignore = "requires construction host built by validate-construction.py"]
 fn managed_construction_runs_on_live_collector() {
-    run_managed(include_str!("../../../benchmarks/execution/concurrent-store/construction.neoil"));
+    run_managed(include_str!(
+        "../../../benchmarks/execution/concurrent-store/construction.neoil"
+    ));
 }
 #[test]
 #[ignore = "requires array host built by validate-arrays.py"]
 fn managed_arrays_run_on_live_collector() {
-    run_managed(include_str!("../../../benchmarks/execution/concurrent-store/arrays.neoil"));
+    run_managed(include_str!(
+        "../../../benchmarks/execution/concurrent-store/arrays.neoil"
+    ));
 }
 #[test]
 #[ignore = "requires text-array host built by validate-text-arrays.py"]
 fn managed_text_arrays_run_on_live_collector() {
-    run_managed(include_str!("../../../benchmarks/execution/concurrent-store/text-arrays.neoil"));
+    run_managed(include_str!(
+        "../../../benchmarks/execution/concurrent-store/text-arrays.neoil"
+    ));
 }
 #[test]
 #[ignore = "requires static host built by validate-statics.py"]
 fn managed_statics_run_on_live_collector() {
-    run_managed(include_str!("../../../benchmarks/execution/concurrent-store/statics.neoil"));
+    run_managed(include_str!(
+        "../../../benchmarks/execution/concurrent-store/statics.neoil"
+    ));
 }
 #[test]
 #[ignore = "requires initializer host built by validate-initializers.py"]
 fn managed_initializers_run_on_live_collector() {
-    run_managed(include_str!("../../../benchmarks/execution/concurrent-store/initializers.neoil"));
+    run_managed(include_str!(
+        "../../../benchmarks/execution/concurrent-store/initializers.neoil"
+    ));
 }
 #[test]
 #[ignore = "requires native-text host built by validate-native-text.py"]
 fn managed_native_text_runs_on_live_collector() {
-    run_managed(include_str!("../../../benchmarks/execution/concurrent-store/native-text.neoil"));
+    run_managed(include_str!(
+        "../../../benchmarks/execution/concurrent-store/native-text.neoil"
+    ));
 }
 fn run_managed(source: &str) {
     let path = std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host");
@@ -1215,7 +1497,14 @@ fn run_managed(source: &str) {
     )
     .unwrap();
     module.finalize_definitions().unwrap();
-    let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name(&format!("neoclr_value_{}", input.functions.iter().position(|f| f.name == "Write").unwrap())) else {
+    let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name(&format!(
+        "neoclr_value_{}",
+        input
+            .functions
+            .iter()
+            .position(|f| f.name == "Write")
+            .unwrap()
+    )) else {
         panic!("managed writer")
     };
     type Writer = unsafe extern "C" fn(
@@ -1230,23 +1519,52 @@ fn run_managed(source: &str) {
     let call: Writer = unsafe { std::mem::transmute(module.get_finalized_function(id)) };
     assert_eq!(unsafe { run(call) }, 0);
     if source.starts_with(".module LiveNativeText") {
-        type NativeRun = unsafe extern "C" fn(*const u8, *const u8, *const u8, *const u8, *const u8) -> i32;
-        let run: libloading::Symbol<NativeRun> = unsafe { library.get(b"native_text_alias_consumer") }.unwrap();
-        let pointers: Vec<_> = (0..5).map(|index| {
-            let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name(&format!("neoclr_value_{index}")) else { panic!("native wrapper") };
-            module.get_finalized_function(id)
-        }).collect();
-        assert_eq!(unsafe { run(pointers[0], pointers[1], pointers[2], pointers[3], pointers[4]) }, 0);
+        type NativeRun =
+            unsafe extern "C" fn(*const u8, *const u8, *const u8, *const u8, *const u8) -> i32;
+        let run: libloading::Symbol<NativeRun> =
+            unsafe { library.get(b"native_text_alias_consumer") }.unwrap();
+        let pointers: Vec<_> = (0..5)
+            .map(|index| {
+                let Some(cranelift_module::FuncOrDataId::Func(id)) =
+                    module.get_name(&format!("neoclr_value_{index}"))
+                else {
+                    panic!("native wrapper")
+                };
+                module.get_finalized_function(id)
+            })
+            .collect();
+        assert_eq!(
+            unsafe {
+                run(
+                    pointers[0],
+                    pointers[1],
+                    pointers[2],
+                    pointers[3],
+                    pointers[4],
+                )
+            },
+            0
+        );
     }
 }
 
 fn byte_view_input() -> (neoclr::Module, crate::fault_details::Options) {
     use neoclr::metadata::{MemoryViewKind, Type};
-    let mut input = neoclr::assemble(".module LiveByteViews\n.function Main(Int32 value) -> Int32\nldarg value\nret\n.end").unwrap();
+    let mut input = neoclr::assemble(
+        ".module LiveByteViews\n.function Main(Int32 value) -> Int32\nldarg value\nret\n.end",
+    )
+    .unwrap();
     let mut main = input.functions.pop().unwrap();
     main.definition = None;
-    for (kind, name) in [(MemoryViewKind::Slice, "ByteSlice"), (MemoryViewKind::ReadOnlySlice, "ReadOnlyByteSlice"), (MemoryViewKind::Memory, "ByteMemory"), (MemoryViewKind::ReadOnlyMemory, "ReadOnlyByteMemory")] {
-        let mut ty = crate::memory_views::test_module(kind, Type::Byte).types.remove(0);
+    for (kind, name) in [
+        (MemoryViewKind::Slice, "ByteSlice"),
+        (MemoryViewKind::ReadOnlySlice, "ReadOnlyByteSlice"),
+        (MemoryViewKind::Memory, "ByteMemory"),
+        (MemoryViewKind::ReadOnlyMemory, "ReadOnlyByteMemory"),
+    ] {
+        let mut ty = crate::memory_views::test_module(kind, Type::Byte)
+            .types
+            .remove(0);
         ty.name = name.into();
         ty.definition = None;
         input.types.push(ty);
@@ -1255,18 +1573,73 @@ fn byte_view_input() -> (neoclr::Module, crate::fault_details::Options) {
     let readonly = Type::Named("ReadOnlyByteSlice".into());
     let bytes = Type::ArrayRef(Box::new(Type::Byte));
     let contracts = [
-        ("neoCLR.Runtime.ViewCreateSlice", vec![bytes.clone()], slice.clone(), false),
-        ("neoCLR.Runtime.ViewCreateSlice", vec![bytes.clone(), Type::Int32, Type::Int32], slice.clone(), false),
-        ("neoCLR.Runtime.ViewSlice", vec![slice.clone(), Type::Int32, Type::Int32], slice.clone(), false),
-        ("neoCLR.Runtime.ViewGet", vec![slice.clone(), Type::Int32], Type::Byte, false),
-        ("neoCLR.Runtime.ViewSet", vec![slice.clone(), Type::Int32, Type::Byte], Type::Void, true),
+        (
+            "neoCLR.Runtime.ViewCreateSlice",
+            vec![bytes.clone()],
+            slice.clone(),
+            false,
+        ),
+        (
+            "neoCLR.Runtime.ViewCreateSlice",
+            vec![bytes.clone(), Type::Int32, Type::Int32],
+            slice.clone(),
+            false,
+        ),
+        (
+            "neoCLR.Runtime.ViewSlice",
+            vec![slice.clone(), Type::Int32, Type::Int32],
+            slice.clone(),
+            false,
+        ),
+        (
+            "neoCLR.Runtime.ViewGet",
+            vec![slice.clone(), Type::Int32],
+            Type::Byte,
+            false,
+        ),
+        (
+            "neoCLR.Runtime.ViewSet",
+            vec![slice.clone(), Type::Int32, Type::Byte],
+            Type::Void,
+            true,
+        ),
         ("neoCLR.Runtime.ViewLength", vec![slice], Type::Int32, false),
-        ("neoCLR.Runtime.ViewUtf8", vec![Type::String], readonly, false),
-        ("neoCLR.Runtime.ViewCreateMemory", vec![bytes.clone()], Type::Named("ByteMemory".into()), false),
-        ("neoCLR.Runtime.ViewCreateReadOnlyMemory", vec![bytes], Type::Named("ReadOnlyByteMemory".into()), false),
-        ("neoCLR.Runtime.ViewAsReadOnly", vec![Type::Named("ByteMemory".into())], Type::Named("ReadOnlyByteMemory".into()), false),
-        ("neoCLR.Runtime.ViewAsSlice", vec![Type::Named("ByteMemory".into())], Type::Named("ByteSlice".into()), false),
-        ("neoCLR.Runtime.ViewAsSlice", vec![Type::Named("ReadOnlyByteMemory".into())], Type::Named("ReadOnlyByteSlice".into()), false),
+        (
+            "neoCLR.Runtime.ViewUtf8",
+            vec![Type::String],
+            readonly,
+            false,
+        ),
+        (
+            "neoCLR.Runtime.ViewCreateMemory",
+            vec![bytes.clone()],
+            Type::Named("ByteMemory".into()),
+            false,
+        ),
+        (
+            "neoCLR.Runtime.ViewCreateReadOnlyMemory",
+            vec![bytes],
+            Type::Named("ReadOnlyByteMemory".into()),
+            false,
+        ),
+        (
+            "neoCLR.Runtime.ViewAsReadOnly",
+            vec![Type::Named("ByteMemory".into())],
+            Type::Named("ReadOnlyByteMemory".into()),
+            false,
+        ),
+        (
+            "neoCLR.Runtime.ViewAsSlice",
+            vec![Type::Named("ByteMemory".into())],
+            Type::Named("ByteSlice".into()),
+            false,
+        ),
+        (
+            "neoCLR.Runtime.ViewAsSlice",
+            vec![Type::Named("ReadOnlyByteMemory".into())],
+            Type::Named("ReadOnlyByteSlice".into()),
+            false,
+        ),
         ("neoCLR.Runtime.ViewBoundsFault", vec![], Type::Void, true),
     ];
     let mut rows = vec![];
@@ -1274,13 +1647,21 @@ fn byte_view_input() -> (neoclr::Module, crate::fault_details::Options) {
         // Private compiled names avoid rebinding bundled System. The real binding
         // validator checks each reserved source name and closed view signature.
         let compiled = format!("LiveByteViews.Service{index}");
-        input.functions.push(serde_json::from_value(serde_json::json!({
-            "name":compiled,"parameters":parameters,"returns":returns,
-            "no_result":no_result,"impl_flags":4096
-        })).unwrap());
+        input.functions.push(
+            serde_json::from_value(serde_json::json!({
+                "name":compiled,"parameters":parameters,"returns":returns,
+                "no_result":no_result,"impl_flags":4096
+            }))
+            .unwrap(),
+        );
         rows.push(serde_json::json!({"name":name,"compiledName":compiled,"compiledIndex":index}));
     }
-    assert_eq!(crate::memory_views::bind(&mut input, &serde_json::json!({"functions":rows}), true).unwrap().len(), 13);
+    assert_eq!(
+        crate::memory_views::bind(&mut input, &serde_json::json!({"functions":rows}), true)
+            .unwrap()
+            .len(),
+        13
+    );
     input.functions.push(main);
     let mut options = managed_options();
     options.byte_memory_create = vec![0, 1, 7, 8];
@@ -1300,9 +1681,19 @@ fn export_byte_views(module: &mut ObjectModule) {
 
 fn export_managed_bodies(module: &mut ObjectModule, prefix: &str, indices: &[usize]) {
     for (ordinal, &index) in indices.iter().enumerate() {
-        let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name(&format!("neoclr_value_{index}")) else { panic!("view body") };
-        let signature = module.declarations().get_function_decl(id).signature.clone();
-        let export = module.declare_function(&format!("{prefix}_{ordinal}"), Linkage::Export, &signature).unwrap();
+        let Some(cranelift_module::FuncOrDataId::Func(id)) =
+            module.get_name(&format!("neoclr_value_{index}"))
+        else {
+            panic!("view body")
+        };
+        let signature = module
+            .declarations()
+            .get_function_decl(id)
+            .signature
+            .clone();
+        let export = module
+            .declare_function(&format!("{prefix}_{ordinal}"), Linkage::Export, &signature)
+            .unwrap();
         let mut context = module.make_context();
         context.func.signature = signature;
         let callee = module.declare_func_in_func(id, &mut context.func);
@@ -1326,14 +1717,40 @@ fn managed_byte_views_emit_guarded_results() {
     let (input, mut options) = byte_view_input();
     for enabled in [false, true] {
         options.experimental_live_gc_stores = enabled;
-        let mut module = ObjectModule::new(ObjectBuilder::new(isa(target(), true), "views", cranelift_module::default_libcall_names()).unwrap());
-        crate::compiler::values::compile_into(&input,"Main",Some(&options),crate::compiler::Target::MacosArm64,&mut module,false).unwrap();
+        let mut module = ObjectModule::new(
+            ObjectBuilder::new(
+                isa(target(), true),
+                "views",
+                cranelift_module::default_libcall_names(),
+            )
+            .unwrap(),
+        );
+        crate::compiler::values::compile_into(
+            &input,
+            "Main",
+            Some(&options),
+            crate::compiler::Target::MacosArm64,
+            &mut module,
+            false,
+        )
+        .unwrap();
         export_byte_views(&mut module);
         let bytes = module.finish().emit().unwrap();
         let object = object::File::parse(bytes.as_slice()).unwrap();
-        assert_eq!(object.symbols().any(|s| s.is_undefined() && s.name().unwrap_or("").trim_start_matches('_') == if crate::mutation_admission::borrowed_stores_enabled() { "experiment_gc_store_borrowed" } else { "experiment_gc_store" }), enabled);
+        assert_eq!(
+            object.symbols().any(|s| s.is_undefined()
+                && s.name().unwrap_or("").trim_start_matches('_')
+                    == if crate::mutation_admission::borrowed_stores_enabled() {
+                        "experiment_gc_store_borrowed"
+                    } else {
+                        "experiment_gc_store"
+                    }),
+            enabled
+        );
         if enabled {
-            if let Some(path) = std::env::var_os("NEOCLR_MUTATION_MANAGED_OBJECT") { std::fs::write(path, bytes).unwrap(); }
+            if let Some(path) = std::env::var_os("NEOCLR_MUTATION_MANAGED_OBJECT") {
+                std::fs::write(path, bytes).unwrap();
+            }
         }
     }
 }
@@ -1341,37 +1758,70 @@ fn managed_byte_views_emit_guarded_results() {
 #[test]
 #[ignore = "requires managed byte-view host built by validate-managed-byte-views.py"]
 fn managed_byte_views_run_on_live_collector() {
-    let library = std::sync::Arc::new(unsafe { libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host")) }.unwrap());
+    let library = std::sync::Arc::new(
+        unsafe {
+            libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host"))
+        }
+        .unwrap(),
+    );
     unsafe { crate::mutation_admission::require_managed_host(&library) }.unwrap();
-    let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
+    let mut builder = JITBuilder::with_isa(
+        isa(target(), false),
+        cranelift_module::default_libcall_names(),
+    );
     let resolver = library.clone();
-    builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
+    builder.symbol_lookup_fn(Box::new(move |name| unsafe {
+        resolver
+            .get::<unsafe extern "C" fn()>(name.as_bytes())
+            .ok()
+            .map(|f| *f as *const u8)
+    }));
     let mut code = Code(Some(crate::jit_memory::new_module(builder)));
     let module = code.0.as_mut().unwrap();
     let (input, options) = byte_view_input();
-    crate::compiler::values::compile_into(&input,"Main",Some(&options),crate::compiler::Target::MacosArm64,module,true).unwrap();
+    crate::compiler::values::compile_into(
+        &input,
+        "Main",
+        Some(&options),
+        crate::compiler::Target::MacosArm64,
+        module,
+        true,
+    )
+    .unwrap();
     module.finalize_definitions().unwrap();
-    let pointers: Vec<_> = (0..13).map(|index| {
-        let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name(&format!("neoclr_value_{index}")) else { panic!("view body") };
-        module.get_finalized_function(id)
-    }).collect();
+    let pointers: Vec<_> = (0..13)
+        .map(|index| {
+            let Some(cranelift_module::FuncOrDataId::Func(id)) =
+                module.get_name(&format!("neoclr_value_{index}"))
+            else {
+                panic!("view body")
+            };
+            module.get_finalized_function(id)
+        })
+        .collect();
     type Run = unsafe extern "C" fn(*const *const u8) -> i32;
-    let run: libloading::Symbol<Run> = unsafe { library.get(b"managed_byte_view_consumer") }.unwrap();
+    let run: libloading::Symbol<Run> =
+        unsafe { library.get(b"managed_byte_view_consumer") }.unwrap();
     assert_eq!(unsafe { run(pointers.as_ptr()) }, 0);
 }
 
 #[test]
 fn managed_primitive_arrays_emit_guarded_stores() {
-    emit_managed(include_str!("../../../benchmarks/execution/concurrent-store/primitive-arrays.neoil"));
+    emit_managed(include_str!(
+        "../../../benchmarks/execution/concurrent-store/primitive-arrays.neoil"
+    ));
 }
 #[test]
 #[ignore = "requires primitive-array host built by validate-primitive-arrays.py"]
 fn managed_primitive_arrays_run_on_live_collector() {
-    run_managed(include_str!("../../../benchmarks/execution/concurrent-store/primitive-arrays.neoil"));
+    run_managed(include_str!(
+        "../../../benchmarks/execution/concurrent-store/primitive-arrays.neoil"
+    ));
 }
 
 fn scoped_slice_input() -> (neoclr::Module, crate::fault_details::Options) {
-    let mut input = neoclr::assemble(r#"
+    let mut input = neoclr::assemble(
+        r#"
 .module LiveScopedSlice
 .references ()
 .function neoCLR.Runtime.StringSliceUtf8(String,Int32,Int32) -> Value
@@ -1381,10 +1831,15 @@ fn scoped_slice_input() -> (neoclr::Module, crate::fault_details::Options) {
 ldarg value
 ret
 .end
-"#).unwrap();
+"#,
+    )
+    .unwrap();
     let rows = serde_json::json!({"functions": [{"name": input.functions[0].name,
         "compiledIndex": 0, "definition": {"module": "LiveScopedSlice", "index": 0}}]});
-    assert_eq!(crate::bindings::utf8_text(&mut input, &rows).unwrap().len(), 1);
+    assert_eq!(
+        crate::bindings::utf8_text(&mut input, &rows).unwrap().len(),
+        1
+    );
     input.functions[0].name = "ScopedSlice".into();
     let mut options = managed_options();
     options.string_slice_utf8.push(0);
@@ -1396,11 +1851,35 @@ fn managed_scoped_slice_emits_guarded_result() {
     let (input, mut options) = scoped_slice_input();
     for enabled in [false, true] {
         options.experimental_live_gc_stores = enabled;
-        let mut module = ObjectModule::new(ObjectBuilder::new(isa(target(), true), "slice", cranelift_module::default_libcall_names()).unwrap());
-        crate::compiler::values::compile_into(&input,"Main",Some(&options),crate::compiler::Target::MacosArm64,&mut module,false).unwrap();
-        let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name("neoclr_value_0") else { panic!("slice") };
-        let signature = module.declarations().get_function_decl(id).signature.clone();
-        let export = module.declare_function("live_scoped_slice", Linkage::Export, &signature).unwrap();
+        let mut module = ObjectModule::new(
+            ObjectBuilder::new(
+                isa(target(), true),
+                "slice",
+                cranelift_module::default_libcall_names(),
+            )
+            .unwrap(),
+        );
+        crate::compiler::values::compile_into(
+            &input,
+            "Main",
+            Some(&options),
+            crate::compiler::Target::MacosArm64,
+            &mut module,
+            false,
+        )
+        .unwrap();
+        let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name("neoclr_value_0")
+        else {
+            panic!("slice")
+        };
+        let signature = module
+            .declarations()
+            .get_function_decl(id)
+            .signature
+            .clone();
+        let export = module
+            .declare_function("live_scoped_slice", Linkage::Export, &signature)
+            .unwrap();
         let mut context = module.make_context();
         context.func.signature = signature;
         let callee = module.declare_func_in_func(id, &mut context.func);
@@ -1418,11 +1897,25 @@ fn managed_scoped_slice_emits_guarded_result() {
         module.define_function(export, &mut context).unwrap();
         let bytes = module.finish().emit().unwrap();
         let object = object::File::parse(bytes.as_slice()).unwrap();
-        let imports: Vec<_> = object.symbols().filter(|s| s.is_undefined()).filter_map(|s| s.name().ok()).collect();
-        assert_eq!(imports.iter().any(|s| s.contains("experiment_gc_string_slice")), enabled);
-        assert_eq!(imports.iter().any(|s| s.contains("experiment_gc_store")), enabled);
+        let imports: Vec<_> = object
+            .symbols()
+            .filter(|s| s.is_undefined())
+            .filter_map(|s| s.name().ok())
+            .collect();
+        assert_eq!(
+            imports
+                .iter()
+                .any(|s| s.contains("experiment_gc_string_slice")),
+            enabled
+        );
+        assert_eq!(
+            imports.iter().any(|s| s.contains("experiment_gc_store")),
+            enabled
+        );
         if enabled {
-            if let Some(path) = std::env::var_os("NEOCLR_MUTATION_MANAGED_OBJECT") { std::fs::write(path, bytes).unwrap(); }
+            if let Some(path) = std::env::var_os("NEOCLR_MUTATION_MANAGED_OBJECT") {
+                std::fs::write(path, bytes).unwrap();
+            }
         }
     }
 }
@@ -1430,17 +1923,40 @@ fn managed_scoped_slice_emits_guarded_result() {
 #[test]
 #[ignore = "requires scoped-slice host built by validate-scoped-slice.py"]
 fn managed_scoped_slice_runs_on_live_collector() {
-    let library = std::sync::Arc::new(unsafe { libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host")) }.unwrap());
+    let library = std::sync::Arc::new(
+        unsafe {
+            libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host"))
+        }
+        .unwrap(),
+    );
     unsafe { crate::mutation_admission::require_managed_host(&library) }.unwrap();
-    let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
+    let mut builder = JITBuilder::with_isa(
+        isa(target(), false),
+        cranelift_module::default_libcall_names(),
+    );
     let resolver = library.clone();
-    builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
+    builder.symbol_lookup_fn(Box::new(move |name| unsafe {
+        resolver
+            .get::<unsafe extern "C" fn()>(name.as_bytes())
+            .ok()
+            .map(|f| *f as *const u8)
+    }));
     let mut code = Code(Some(crate::jit_memory::new_module(builder)));
     let module = code.0.as_mut().unwrap();
     let (input, options) = scoped_slice_input();
-    crate::compiler::values::compile_into(&input,"Main",Some(&options),crate::compiler::Target::MacosArm64,module,true).unwrap();
+    crate::compiler::values::compile_into(
+        &input,
+        "Main",
+        Some(&options),
+        crate::compiler::Target::MacosArm64,
+        module,
+        true,
+    )
+    .unwrap();
     module.finalize_definitions().unwrap();
-    let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name("neoclr_value_0") else { panic!("slice") };
+    let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name("neoclr_value_0") else {
+        panic!("slice")
+    };
     type Run = unsafe extern "C" fn(*const u8) -> i32;
     let run: libloading::Symbol<Run> = unsafe { library.get(b"scoped_slice_consumer") }.unwrap();
     assert_eq!(unsafe { run(module.get_finalized_function(id)) }, 0);
@@ -1457,42 +1973,99 @@ fn managed_callbacks_join_live_closure() {
 #[test]
 #[ignore = "requires callback host built by validate-callbacks.py"]
 fn managed_callbacks_run_on_live_collector() {
-    let library = std::sync::Arc::new(unsafe { libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host")) }.unwrap());
+    let library = std::sync::Arc::new(
+        unsafe {
+            libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host"))
+        }
+        .unwrap(),
+    );
     unsafe { crate::mutation_admission::require_managed_host(&library) }.unwrap();
-    let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
+    let mut builder = JITBuilder::with_isa(
+        isa(target(), false),
+        cranelift_module::default_libcall_names(),
+    );
     let resolver = library.clone();
-    builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
+    builder.symbol_lookup_fn(Box::new(move |name| unsafe {
+        resolver
+            .get::<unsafe extern "C" fn()>(name.as_bytes())
+            .ok()
+            .map(|f| *f as *const u8)
+    }));
     let mut code = Code(Some(crate::jit_memory::new_module(builder)));
     let module = code.0.as_mut().unwrap();
-    let input = managed_input(include_str!("../../../benchmarks/execution/concurrent-store/callbacks.neoil"));
-    crate::compiler::values::compile_into(&input,"Main",Some(&managed_options()),crate::compiler::Target::MacosArm64,module,true).unwrap();
+    let input = managed_input(include_str!(
+        "../../../benchmarks/execution/concurrent-store/callbacks.neoil"
+    ));
+    crate::compiler::values::compile_into(
+        &input,
+        "Main",
+        Some(&managed_options()),
+        crate::compiler::Target::MacosArm64,
+        module,
+        true,
+    )
+    .unwrap();
     module.finalize_definitions().unwrap();
-    let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name("neoclr_invoke_void_callback_v1") else { panic!("callback") };
+    let Some(cranelift_module::FuncOrDataId::Func(id)) =
+        module.get_name("neoclr_invoke_void_callback_v1")
+    else {
+        panic!("callback")
+    };
     type Run = unsafe extern "C" fn(*const u8) -> i32;
-    let run: libloading::Symbol<Run> = unsafe { library.get(b"managed_callback_consumer") }.unwrap();
+    let run: libloading::Symbol<Run> =
+        unsafe { library.get(b"managed_callback_consumer") }.unwrap();
     assert_eq!(unsafe { run(module.get_finalized_function(id)) }, 0);
 }
 
 #[test]
 fn managed_async_wrappers_emit_guarded_results() {
-    emit_managed(include_str!("../../../benchmarks/execution/concurrent-store/async-wrappers.neoil"));
+    emit_managed(include_str!(
+        "../../../benchmarks/execution/concurrent-store/async-wrappers.neoil"
+    ));
 }
 #[test]
 #[ignore = "requires async host built by validate-async-wrappers.py"]
 fn managed_async_wrappers_run_on_live_collector() {
-    let library = std::sync::Arc::new(unsafe { libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host")) }.unwrap());
+    let library = std::sync::Arc::new(
+        unsafe {
+            libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host"))
+        }
+        .unwrap(),
+    );
     unsafe { crate::mutation_admission::require_managed_host(&library) }.unwrap();
-    let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
+    let mut builder = JITBuilder::with_isa(
+        isa(target(), false),
+        cranelift_module::default_libcall_names(),
+    );
     let resolver = library.clone();
-    builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
+    builder.symbol_lookup_fn(Box::new(move |name| unsafe {
+        resolver
+            .get::<unsafe extern "C" fn()>(name.as_bytes())
+            .ok()
+            .map(|f| *f as *const u8)
+    }));
     let mut code = Code(Some(crate::jit_memory::new_module(builder)));
     let module = code.0.as_mut().unwrap();
-    let source=include_str!("../../../benchmarks/execution/concurrent-store/async-wrappers.neoil");
-    crate::compiler::values::compile_into(&managed_input(source),"Main",Some(&managed_options_for(source)),crate::compiler::Target::MacosArm64,module,true).unwrap();
+    let source =
+        include_str!("../../../benchmarks/execution/concurrent-store/async-wrappers.neoil");
+    crate::compiler::values::compile_into(
+        &managed_input(source),
+        "Main",
+        Some(&managed_options_for(source)),
+        crate::compiler::Target::MacosArm64,
+        module,
+        true,
+    )
+    .unwrap();
     module.finalize_definitions().unwrap();
-    let mut pointers=Vec::new();
-    for name in (2..12).map(|i| format!("neoclr_value_{i}")).chain(std::iter::once("neoclr_invoke_void_callback_v1".into())) {
-        let Some(cranelift_module::FuncOrDataId::Func(id))=module.get_name(&name) else { panic!("async wrapper") };
+    let mut pointers = Vec::new();
+    for name in (2..12)
+        .map(|i| format!("neoclr_value_{i}"))
+        .chain(std::iter::once("neoclr_invoke_void_callback_v1".into()))
+    {
+        let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name(&name) else {
+            panic!("async wrapper")
+        };
         pointers.push(module.get_finalized_function(id));
     }
     type Run = unsafe extern "C" fn(*const *const u8) -> i32;
@@ -1502,24 +2075,50 @@ fn managed_async_wrappers_run_on_live_collector() {
 
 #[test]
 fn managed_socket_wrappers_emit_guarded_results() {
-    emit_managed(include_str!("../../../benchmarks/execution/concurrent-store/socket-wrappers.neoil"));
+    emit_managed(include_str!(
+        "../../../benchmarks/execution/concurrent-store/socket-wrappers.neoil"
+    ));
 }
 #[test]
 #[ignore = "requires socket host built by validate-socket-wrappers.py"]
 fn managed_socket_wrappers_run_on_live_collector() {
-    let library = std::sync::Arc::new(unsafe { libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host")) }.unwrap());
+    let library = std::sync::Arc::new(
+        unsafe {
+            libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host"))
+        }
+        .unwrap(),
+    );
     unsafe { crate::mutation_admission::require_managed_host(&library) }.unwrap();
-    let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
+    let mut builder = JITBuilder::with_isa(
+        isa(target(), false),
+        cranelift_module::default_libcall_names(),
+    );
     let resolver = library.clone();
-    builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
+    builder.symbol_lookup_fn(Box::new(move |name| unsafe {
+        resolver
+            .get::<unsafe extern "C" fn()>(name.as_bytes())
+            .ok()
+            .map(|f| *f as *const u8)
+    }));
     let mut code = Code(Some(crate::jit_memory::new_module(builder)));
     let module = code.0.as_mut().unwrap();
-    let source=include_str!("../../../benchmarks/execution/concurrent-store/socket-wrappers.neoil");
-    crate::compiler::values::compile_into(&managed_input(source),"Main",Some(&managed_options_for(source)),crate::compiler::Target::MacosArm64,module,true).unwrap();
+    let source =
+        include_str!("../../../benchmarks/execution/concurrent-store/socket-wrappers.neoil");
+    crate::compiler::values::compile_into(
+        &managed_input(source),
+        "Main",
+        Some(&managed_options_for(source)),
+        crate::compiler::Target::MacosArm64,
+        module,
+        true,
+    )
+    .unwrap();
     module.finalize_definitions().unwrap();
-    let mut pointers=Vec::new();
+    let mut pointers = Vec::new();
     for name in (0..13).map(|i| format!("neoclr_value_{i}")) {
-        let Some(cranelift_module::FuncOrDataId::Func(id))=module.get_name(&name) else { panic!("async wrapper") };
+        let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name(&name) else {
+            panic!("async wrapper")
+        };
         pointers.push(module.get_finalized_function(id));
     }
     type Run = unsafe extern "C" fn(*const *const u8) -> i32;
@@ -1529,24 +2128,49 @@ fn managed_socket_wrappers_run_on_live_collector() {
 
 #[test]
 fn managed_socket_memory_emit_guarded_results() {
-    emit_managed(include_str!("../../../benchmarks/execution/concurrent-store/socket-memory.neoil"));
+    emit_managed(include_str!(
+        "../../../benchmarks/execution/concurrent-store/socket-memory.neoil"
+    ));
 }
 #[test]
 #[ignore = "requires socket host built by validate-socket-memory.py"]
 fn managed_socket_memory_run_on_live_collector() {
-    let library = std::sync::Arc::new(unsafe { libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host")) }.unwrap());
+    let library = std::sync::Arc::new(
+        unsafe {
+            libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host"))
+        }
+        .unwrap(),
+    );
     unsafe { crate::mutation_admission::require_managed_host(&library) }.unwrap();
-    let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
+    let mut builder = JITBuilder::with_isa(
+        isa(target(), false),
+        cranelift_module::default_libcall_names(),
+    );
     let resolver = library.clone();
-    builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
+    builder.symbol_lookup_fn(Box::new(move |name| unsafe {
+        resolver
+            .get::<unsafe extern "C" fn()>(name.as_bytes())
+            .ok()
+            .map(|f| *f as *const u8)
+    }));
     let mut code = Code(Some(crate::jit_memory::new_module(builder)));
     let module = code.0.as_mut().unwrap();
-    let source=include_str!("../../../benchmarks/execution/concurrent-store/socket-memory.neoil");
-    crate::compiler::values::compile_into(&managed_input(source),"Main",Some(&managed_options_for(source)),crate::compiler::Target::MacosArm64,module,true).unwrap();
+    let source = include_str!("../../../benchmarks/execution/concurrent-store/socket-memory.neoil");
+    crate::compiler::values::compile_into(
+        &managed_input(source),
+        "Main",
+        Some(&managed_options_for(source)),
+        crate::compiler::Target::MacosArm64,
+        module,
+        true,
+    )
+    .unwrap();
     module.finalize_definitions().unwrap();
-    let mut pointers=Vec::new();
+    let mut pointers = Vec::new();
     for name in (0..13).map(|i| format!("neoclr_value_{i}")) {
-        let Some(cranelift_module::FuncOrDataId::Func(id))=module.get_name(&name) else { panic!("async wrapper") };
+        let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name(&name) else {
+            panic!("async wrapper")
+        };
         pointers.push(module.get_finalized_function(id));
     }
     type Run = unsafe extern "C" fn(*const *const u8) -> i32;
@@ -1556,22 +2180,47 @@ fn managed_socket_memory_run_on_live_collector() {
 
 #[test]
 fn managed_public_entry_emits_guarded_transition() {
-    emit_managed(include_str!("../../../benchmarks/execution/concurrent-store/entry.neoil"));
+    emit_managed(include_str!(
+        "../../../benchmarks/execution/concurrent-store/entry.neoil"
+    ));
 }
 #[test]
 #[ignore = "requires entry host built by validate-entry.py"]
 fn managed_public_entry_runs_on_live_collector() {
-    let library = std::sync::Arc::new(unsafe { libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host")) }.unwrap());
+    let library = std::sync::Arc::new(
+        unsafe {
+            libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host"))
+        }
+        .unwrap(),
+    );
     unsafe { crate::mutation_admission::require_managed_host(&library) }.unwrap();
-    let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
+    let mut builder = JITBuilder::with_isa(
+        isa(target(), false),
+        cranelift_module::default_libcall_names(),
+    );
     let resolver = library.clone();
-    builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
+    builder.symbol_lookup_fn(Box::new(move |name| unsafe {
+        resolver
+            .get::<unsafe extern "C" fn()>(name.as_bytes())
+            .ok()
+            .map(|f| *f as *const u8)
+    }));
     let mut code = Code(Some(crate::jit_memory::new_module(builder)));
     let module = code.0.as_mut().unwrap();
     let source = include_str!("../../../benchmarks/execution/concurrent-store/entry.neoil");
-    crate::compiler::values::compile_into(&managed_input(source), "Main", Some(&managed_options_for(source)), crate::compiler::Target::MacosArm64, module, true).unwrap();
+    crate::compiler::values::compile_into(
+        &managed_input(source),
+        "Main",
+        Some(&managed_options_for(source)),
+        crate::compiler::Target::MacosArm64,
+        module,
+        true,
+    )
+    .unwrap();
     module.finalize_definitions().unwrap();
-    let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name("neoclr_entry_v4") else { panic!("public entry") };
+    let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name("neoclr_entry_v4") else {
+        panic!("public entry")
+    };
     type Run = unsafe extern "C" fn(*const u8) -> i32;
     let run: libloading::Symbol<Run> = unsafe { library.get(b"managed_entry_consumer") }.unwrap();
     assert_eq!(unsafe { run(module.get_finalized_function(id)) }, 0);
@@ -1579,22 +2228,49 @@ fn managed_public_entry_runs_on_live_collector() {
 
 #[test]
 fn managed_queue_emits_guarded_dispatch() {
-    emit_managed(include_str!("../../../benchmarks/execution/concurrent-store/queue.neoil"));
+    emit_managed(include_str!(
+        "../../../benchmarks/execution/concurrent-store/queue.neoil"
+    ));
 }
 #[test]
 #[ignore = "requires entry host built by validate-queue.py"]
 fn managed_queue_runs_on_live_collector() {
-    let library = std::sync::Arc::new(unsafe { libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host")) }.unwrap());
+    let library = std::sync::Arc::new(
+        unsafe {
+            libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host"))
+        }
+        .unwrap(),
+    );
     unsafe { crate::mutation_admission::require_managed_host(&library) }.unwrap();
-    let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
+    let mut builder = JITBuilder::with_isa(
+        isa(target(), false),
+        cranelift_module::default_libcall_names(),
+    );
     let resolver = library.clone();
-    builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
+    builder.symbol_lookup_fn(Box::new(move |name| unsafe {
+        resolver
+            .get::<unsafe extern "C" fn()>(name.as_bytes())
+            .ok()
+            .map(|f| *f as *const u8)
+    }));
     let mut code = Code(Some(crate::jit_memory::new_module(builder)));
     let module = code.0.as_mut().unwrap();
     let source = include_str!("../../../benchmarks/execution/concurrent-store/queue.neoil");
-    crate::compiler::values::compile_into(&managed_input(source), "Main", Some(&managed_options_for(source)), crate::compiler::Target::MacosArm64, module, true).unwrap();
+    crate::compiler::values::compile_into(
+        &managed_input(source),
+        "Main",
+        Some(&managed_options_for(source)),
+        crate::compiler::Target::MacosArm64,
+        module,
+        true,
+    )
+    .unwrap();
     module.finalize_definitions().unwrap();
-    let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name("neoclr_drain_default_queue_v1") else { panic!("queue dispatch") };
+    let Some(cranelift_module::FuncOrDataId::Func(id)) =
+        module.get_name("neoclr_drain_default_queue_v1")
+    else {
+        panic!("queue dispatch")
+    };
     type Run = unsafe extern "C" fn(*const u8) -> i32;
     let run: libloading::Symbol<Run> = unsafe { library.get(b"managed_queue_consumer") }.unwrap();
     assert_eq!(unsafe { run(module.get_finalized_function(id)) }, 0);
@@ -1602,24 +2278,52 @@ fn managed_queue_runs_on_live_collector() {
 
 #[test]
 fn managed_async_pump_emits_guarded_results() {
-    emit_managed(include_str!("../../../benchmarks/execution/concurrent-store/async-pump.neoil"));
+    emit_managed(include_str!(
+        "../../../benchmarks/execution/concurrent-store/async-pump.neoil"
+    ));
 }
 #[test]
 #[ignore = "requires async host built by validate-async-pump.py"]
 fn managed_async_pump_runs_on_live_collector() {
-    let library = std::sync::Arc::new(unsafe { libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host")) }.unwrap());
+    let library = std::sync::Arc::new(
+        unsafe {
+            libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host"))
+        }
+        .unwrap(),
+    );
     unsafe { crate::mutation_admission::require_managed_host(&library) }.unwrap();
-    let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
+    let mut builder = JITBuilder::with_isa(
+        isa(target(), false),
+        cranelift_module::default_libcall_names(),
+    );
     let resolver = library.clone();
-    builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
+    builder.symbol_lookup_fn(Box::new(move |name| unsafe {
+        resolver
+            .get::<unsafe extern "C" fn()>(name.as_bytes())
+            .ok()
+            .map(|f| *f as *const u8)
+    }));
     let mut code = Code(Some(crate::jit_memory::new_module(builder)));
     let module = code.0.as_mut().unwrap();
-    let source=include_str!("../../../benchmarks/execution/concurrent-store/async-pump.neoil");
-    crate::compiler::values::compile_into(&managed_input(source),"Main",Some(&managed_options_for(source)),crate::compiler::Target::MacosArm64,module,true).unwrap();
+    let source = include_str!("../../../benchmarks/execution/concurrent-store/async-pump.neoil");
+    crate::compiler::values::compile_into(
+        &managed_input(source),
+        "Main",
+        Some(&managed_options_for(source)),
+        crate::compiler::Target::MacosArm64,
+        module,
+        true,
+    )
+    .unwrap();
     module.finalize_definitions().unwrap();
-    let mut pointers=Vec::new();
-    for name in (2..12).map(|i| format!("neoclr_value_{i}")).chain(["neoclr_invoke_void_callback_v1".into(), "neoclr_value_14".into()]) {
-        let Some(cranelift_module::FuncOrDataId::Func(id))=module.get_name(&name) else { panic!("async wrapper") };
+    let mut pointers = Vec::new();
+    for name in (2..12).map(|i| format!("neoclr_value_{i}")).chain([
+        "neoclr_invoke_void_callback_v1".into(),
+        "neoclr_value_14".into(),
+    ]) {
+        let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name(&name) else {
+            panic!("async wrapper")
+        };
         pointers.push(module.get_finalized_function(id));
     }
     type Run = unsafe extern "C" fn(*const *const u8) -> i32;
@@ -1640,36 +2344,75 @@ fn live_pump_requires_async_dispatch_and_queue_drain() {
         } else {
             options.task_queue_drain = None;
         }
-        let mut module = ObjectModule::new(ObjectBuilder::new(
-            isa(target(), true), "rejected_pump", cranelift_module::default_libcall_names(),
-        ).unwrap());
+        let mut module = ObjectModule::new(
+            ObjectBuilder::new(
+                isa(target(), true),
+                "rejected_pump",
+                cranelift_module::default_libcall_names(),
+            )
+            .unwrap(),
+        );
         let error = crate::compiler::values::compile_into(
-            &input, "Main", Some(&options), crate::compiler::Target::MacosArm64, &mut module, false,
-        ).unwrap_err();
+            &input,
+            "Main",
+            Some(&options),
+            crate::compiler::Target::MacosArm64,
+            &mut module,
+            false,
+        )
+        .unwrap_err();
         assert!(error.to_string().contains("owned published frames"));
     }
 }
 
 #[test]
 fn managed_network_pump_emits_guarded_results() {
-    emit_managed(include_str!("../../../benchmarks/execution/concurrent-store/network-pump.neoil"));
+    emit_managed(include_str!(
+        "../../../benchmarks/execution/concurrent-store/network-pump.neoil"
+    ));
 }
 #[test]
 #[ignore = "requires async host built by validate-network-pump.py"]
 fn managed_network_pump_runs_on_live_collector() {
-    let library = std::sync::Arc::new(unsafe { libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host")) }.unwrap());
+    let library = std::sync::Arc::new(
+        unsafe {
+            libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host"))
+        }
+        .unwrap(),
+    );
     unsafe { crate::mutation_admission::require_managed_host(&library) }.unwrap();
-    let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
+    let mut builder = JITBuilder::with_isa(
+        isa(target(), false),
+        cranelift_module::default_libcall_names(),
+    );
     let resolver = library.clone();
-    builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
+    builder.symbol_lookup_fn(Box::new(move |name| unsafe {
+        resolver
+            .get::<unsafe extern "C" fn()>(name.as_bytes())
+            .ok()
+            .map(|f| *f as *const u8)
+    }));
     let mut code = Code(Some(crate::jit_memory::new_module(builder)));
     let module = code.0.as_mut().unwrap();
-    let source=include_str!("../../../benchmarks/execution/concurrent-store/network-pump.neoil");
-    crate::compiler::values::compile_into(&managed_input(source),"Main",Some(&managed_options_for(source)),crate::compiler::Target::MacosArm64,module,true).unwrap();
+    let source = include_str!("../../../benchmarks/execution/concurrent-store/network-pump.neoil");
+    crate::compiler::values::compile_into(
+        &managed_input(source),
+        "Main",
+        Some(&managed_options_for(source)),
+        crate::compiler::Target::MacosArm64,
+        module,
+        true,
+    )
+    .unwrap();
     module.finalize_definitions().unwrap();
-    let mut pointers=Vec::new();
-    for name in (2..12).map(|i| format!("neoclr_value_{i}")).chain(["neoclr_invoke_void_callback_v1".into(), "neoclr_value_14".into()]) {
-        let Some(cranelift_module::FuncOrDataId::Func(id))=module.get_name(&name) else { panic!("async wrapper") };
+    let mut pointers = Vec::new();
+    for name in (2..12).map(|i| format!("neoclr_value_{i}")).chain([
+        "neoclr_invoke_void_callback_v1".into(),
+        "neoclr_value_14".into(),
+    ]) {
+        let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name(&name) else {
+            panic!("async wrapper")
+        };
         pointers.push(module.get_finalized_function(id));
     }
     type Run = unsafe extern "C" fn(*const *const u8) -> i32;
@@ -1686,33 +2429,62 @@ fn managed_task_schedule_emits_guarded_unit_wrapper() {
 }
 #[test]
 fn managed_queue_timers_emits_guarded_dispatch() {
-    emit_managed(include_str!("../../../benchmarks/execution/concurrent-store/queue-timers.neoil"));
+    emit_managed(include_str!(
+        "../../../benchmarks/execution/concurrent-store/queue-timers.neoil"
+    ));
 }
 #[test]
 #[ignore = "requires entry host built by validate-queue-timers.py"]
 fn managed_queue_timers_runs_on_live_collector() {
-    let library = std::sync::Arc::new(unsafe { libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host")) }.unwrap());
+    let library = std::sync::Arc::new(
+        unsafe {
+            libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host"))
+        }
+        .unwrap(),
+    );
     unsafe { crate::mutation_admission::require_managed_host(&library) }.unwrap();
-    let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
+    let mut builder = JITBuilder::with_isa(
+        isa(target(), false),
+        cranelift_module::default_libcall_names(),
+    );
     let resolver = library.clone();
-    builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
+    builder.symbol_lookup_fn(Box::new(move |name| unsafe {
+        resolver
+            .get::<unsafe extern "C" fn()>(name.as_bytes())
+            .ok()
+            .map(|f| *f as *const u8)
+    }));
     let mut code = Code(Some(crate::jit_memory::new_module(builder)));
     let module = code.0.as_mut().unwrap();
     let source = include_str!("../../../benchmarks/execution/concurrent-store/queue-timers.neoil");
-    crate::compiler::values::compile_into(&managed_input(source), "Main", Some(&managed_options_for(source)), crate::compiler::Target::MacosArm64, module, true).unwrap();
+    crate::compiler::values::compile_into(
+        &managed_input(source),
+        "Main",
+        Some(&managed_options_for(source)),
+        crate::compiler::Target::MacosArm64,
+        module,
+        true,
+    )
+    .unwrap();
     module.finalize_definitions().unwrap();
     let mut pointers = Vec::new();
-    for i in [0,3,4,5,6,7] {
-        let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name(&format!("neoclr_value_{i}")) else { panic!("queue service") };
+    for i in [0, 3, 4, 5, 6, 7] {
+        let Some(cranelift_module::FuncOrDataId::Func(id)) =
+            module.get_name(&format!("neoclr_value_{i}"))
+        else {
+            panic!("queue service")
+        };
         pointers.push(module.get_finalized_function(id));
     }
     type Run = unsafe extern "C" fn(*const *const u8) -> i32;
-    let run: libloading::Symbol<Run> = unsafe { library.get(b"managed_queue_timers_consumer") }.unwrap();
+    let run: libloading::Symbol<Run> =
+        unsafe { library.get(b"managed_queue_timers_consumer") }.unwrap();
     assert_eq!(unsafe { run(pointers.as_ptr()) }, 0);
 }
 
 fn integer_format_input() -> (neoclr::Module, crate::fault_details::Options) {
-    let mut input = neoclr::assemble(r#"
+    let mut input = neoclr::assemble(
+        r#"
 .module LiveIntegerFormat
 .references ()
 .function neoCLR.Runtime.Int32ToString(Int32) -> String
@@ -1728,13 +2500,27 @@ fn integer_format_input() -> (neoclr::Module, crate::fault_details::Options) {
 ldarg value
 ret
 .end
-"#).unwrap();
+"#,
+    )
+    .unwrap();
     let rows: Vec<_> = input.functions.iter().take(3).enumerate().map(|(i,f)|
         serde_json::json!({"name":f.name,"compiledIndex":i,"definition":{"module":"LiveIntegerFormat","index":i}})).collect();
     let selection = serde_json::json!({"functions":rows});
-    assert_eq!(crate::bindings::int32_to_string(&mut input,&selection).unwrap().len(),1);
-    assert_eq!(crate::bindings::integer_text(&mut input,&selection).unwrap().len(),2);
-    for i in 0..3 { input.functions[i].name=format!("IntegerFormat{i}"); }
+    assert_eq!(
+        crate::bindings::int32_to_string(&mut input, &selection)
+            .unwrap()
+            .len(),
+        1
+    );
+    assert_eq!(
+        crate::bindings::integer_text(&mut input, &selection)
+            .unwrap()
+            .len(),
+        2
+    );
+    for i in 0..3 {
+        input.functions[i].name = format!("IntegerFormat{i}");
+    }
     let mut options = managed_options();
     options.int32_to_string.push(0);
     options.int64_to_string.push(1);
@@ -1747,111 +2533,41 @@ fn managed_integer_format_emits_guarded_result() {
     let (input, mut options) = integer_format_input();
     for enabled in [false, true] {
         options.experimental_live_gc_stores = enabled;
-        let mut module = ObjectModule::new(ObjectBuilder::new(isa(target(), true), "slice", cranelift_module::default_libcall_names()).unwrap());
-        crate::compiler::values::compile_into(&input,"Main",Some(&options),crate::compiler::Target::MacosArm64,&mut module,false).unwrap();
+        let mut module = ObjectModule::new(
+            ObjectBuilder::new(
+                isa(target(), true),
+                "slice",
+                cranelift_module::default_libcall_names(),
+            )
+            .unwrap(),
+        );
+        crate::compiler::values::compile_into(
+            &input,
+            "Main",
+            Some(&options),
+            crate::compiler::Target::MacosArm64,
+            &mut module,
+            false,
+        )
+        .unwrap();
         for i in 0..3 {
-        let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name(&format!("neoclr_value_{i}")) else { panic!("slice") };
-        let signature = module.declarations().get_function_decl(id).signature.clone();
-        let export = module.declare_function(&format!("live_integer_format_{i}"), Linkage::Export, &signature).unwrap();
-        let mut context = module.make_context();
-        context.func.signature = signature;
-        let callee = module.declare_func_in_func(id, &mut context.func);
-        let mut fb = FunctionBuilderContext::new();
-        let mut b = FunctionBuilder::new(&mut context.func, &mut fb);
-        let entry = b.create_block();
-        b.append_block_params_for_function_params(entry);
-        b.switch_to_block(entry);
-        let args = b.block_params(entry).to_vec();
-        let call = b.ins().call(callee, &args);
-        let status = b.inst_results(call)[0];
-        b.ins().return_(&[status]);
-        b.seal_all_blocks();
-        b.finalize();
-        module.define_function(export, &mut context).unwrap();
-        }
-        let bytes = module.finish().emit().unwrap();
-        let object = object::File::parse(bytes.as_slice()).unwrap();
-        let imports: Vec<_> = object.symbols().filter(|s| s.is_undefined()).filter_map(|s| s.name().ok()).collect();
-        assert!(imports.iter().any(|s| s.contains("neoclr_int64_to_string_rooted")));
-        assert_eq!(imports.iter().any(|s| s.contains("experiment_gc_store")), enabled);
-        if enabled {
-            if let Some(path) = std::env::var_os("NEOCLR_MUTATION_MANAGED_OBJECT") { std::fs::write(path, bytes).unwrap(); }
-        }
-    }
-}
-
-#[test]
-#[ignore = "requires integer-format host built by validate-integer-format.py"]
-fn managed_integer_format_runs_on_live_collector() {
-    let library = std::sync::Arc::new(unsafe { libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host")) }.unwrap());
-    unsafe { crate::mutation_admission::require_managed_host(&library) }.unwrap();
-    let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
-    let resolver = library.clone();
-    builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
-    let mut code = Code(Some(crate::jit_memory::new_module(builder)));
-    let module = code.0.as_mut().unwrap();
-    let (input, options) = integer_format_input();
-    crate::compiler::values::compile_into(&input,"Main",Some(&options),crate::compiler::Target::MacosArm64,module,true).unwrap();
-    module.finalize_definitions().unwrap();
-    let functions: Vec<_> = (0..3).map(|i| {
-        let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name(&format!("neoclr_value_{i}")) else { panic!("format") };
-        module.get_finalized_function(id)
-    }).collect();
-    type Run = unsafe extern "C" fn(*const u8,*const u8,*const u8) -> i32;
-    let run: libloading::Symbol<Run> = unsafe { library.get(b"integer_format_consumer") }.unwrap();
-    assert_eq!(unsafe { run(functions[0],functions[1],functions[2]) },0);
-}
-
-fn utf8_conversion_input() -> (neoclr::Module, crate::fault_details::Options) {
-    use neoclr::metadata::{MemoryViewKind, Type};
-    let mut input = neoclr::assemble(r#"
-.module LiveUtf8Conversion
-.references ()
-.function neoCLR.Runtime.Utf8Encode(String) -> arrayref<Byte>
-.methodimpl InternalCall
-.end
-.function neoCLR.Runtime.Utf8Decode(arrayref<Byte>) -> Value
-.methodimpl InternalCall
-.end
-.function Utf8SlicePlaceholder(arrayref<Byte>) -> Value
-ldc.i4 0
-value.pack Int32
-ret
-.end
-.function Main(Int32 value) -> Int32
-ldarg value
-ret
-.end
-"#).unwrap();
-    let mut view = crate::memory_views::test_module(MemoryViewKind::ReadOnlySlice,Type::Byte).types.remove(0);
-    view.name="ReadOnlyBytes".into(); view.definition=None; input.types.push(view);
-    input.functions[2].name="neoCLR.Runtime.Utf8DecodeSlice".into();
-    input.functions[2].impl_flags=0x1000;
-    input.functions[2].body.clear();
-    input.functions[2].parameters=vec![Type::Named("ReadOnlyBytes".into())];
-    let rows: Vec<_> = input.functions.iter().take(3).enumerate().map(|(i,f)|
-        serde_json::json!({"name":f.name,"compiledIndex":i,"definition":{"module":"LiveUtf8Conversion","index":i}})).collect();
-    let selection = serde_json::json!({"functions":rows});
-    assert_eq!(crate::bindings::utf8_text(&mut input,&selection).unwrap().len(),3);
-    for i in 0..3 { input.functions[i].name=format!("Utf8Conversion{i}"); }
-    let mut options = managed_options();
-    options.utf8_encode.push(0);
-    options.utf8_decode.push(1);
-    options.utf8_decode_slice.push(2);
-    (input, options)
-}
-
-#[test]
-fn managed_utf8_conversion_emits_guarded_result() {
-    let (input, mut options) = utf8_conversion_input();
-    for enabled in [false, true] {
-        options.experimental_live_gc_stores = enabled;
-        let mut module = ObjectModule::new(ObjectBuilder::new(isa(target(), true), "utf8", cranelift_module::default_libcall_names()).unwrap());
-        crate::compiler::values::compile_into(&input,"Main",Some(&options),crate::compiler::Target::MacosArm64,&mut module,false).unwrap();
-        for i in 0..3 {
-            let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name(&format!("neoclr_value_{i}")) else { panic!("utf8") };
-            let signature = module.declarations().get_function_decl(id).signature.clone();
-            let export = module.declare_function(&format!("live_utf8_conversion_{i}"), Linkage::Export, &signature).unwrap();
+            let Some(cranelift_module::FuncOrDataId::Func(id)) =
+                module.get_name(&format!("neoclr_value_{i}"))
+            else {
+                panic!("slice")
+            };
+            let signature = module
+                .declarations()
+                .get_function_decl(id)
+                .signature
+                .clone();
+            let export = module
+                .declare_function(
+                    &format!("live_integer_format_{i}"),
+                    Linkage::Export,
+                    &signature,
+                )
+                .unwrap();
             let mut context = module.make_context();
             context.func.signature = signature;
             let callee = module.declare_func_in_func(id, &mut context.func);
@@ -1870,11 +2586,206 @@ fn managed_utf8_conversion_emits_guarded_result() {
         }
         let bytes = module.finish().emit().unwrap();
         let object = object::File::parse(bytes.as_slice()).unwrap();
-        let imports: Vec<_> = object.symbols().filter(|s| s.is_undefined()).filter_map(|s| s.name().ok()).collect();
-        assert!(imports.iter().any(|s| s.contains("neoclr_utf8_decode_slice_rooted")));
-        assert_eq!(imports.iter().any(|s| s.contains("experiment_gc_store")), enabled);
+        let imports: Vec<_> = object
+            .symbols()
+            .filter(|s| s.is_undefined())
+            .filter_map(|s| s.name().ok())
+            .collect();
+        assert!(
+            imports
+                .iter()
+                .any(|s| s.contains("neoclr_int64_to_string_rooted"))
+        );
+        assert_eq!(
+            imports.iter().any(|s| s.contains("experiment_gc_store")),
+            enabled
+        );
         if enabled {
-            if let Some(path) = std::env::var_os("NEOCLR_MUTATION_MANAGED_OBJECT") { std::fs::write(path, bytes).unwrap(); }
+            if let Some(path) = std::env::var_os("NEOCLR_MUTATION_MANAGED_OBJECT") {
+                std::fs::write(path, bytes).unwrap();
+            }
+        }
+    }
+}
+
+#[test]
+#[ignore = "requires integer-format host built by validate-integer-format.py"]
+fn managed_integer_format_runs_on_live_collector() {
+    let library = std::sync::Arc::new(
+        unsafe {
+            libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host"))
+        }
+        .unwrap(),
+    );
+    unsafe { crate::mutation_admission::require_managed_host(&library) }.unwrap();
+    let mut builder = JITBuilder::with_isa(
+        isa(target(), false),
+        cranelift_module::default_libcall_names(),
+    );
+    let resolver = library.clone();
+    builder.symbol_lookup_fn(Box::new(move |name| unsafe {
+        resolver
+            .get::<unsafe extern "C" fn()>(name.as_bytes())
+            .ok()
+            .map(|f| *f as *const u8)
+    }));
+    let mut code = Code(Some(crate::jit_memory::new_module(builder)));
+    let module = code.0.as_mut().unwrap();
+    let (input, options) = integer_format_input();
+    crate::compiler::values::compile_into(
+        &input,
+        "Main",
+        Some(&options),
+        crate::compiler::Target::MacosArm64,
+        module,
+        true,
+    )
+    .unwrap();
+    module.finalize_definitions().unwrap();
+    let functions: Vec<_> = (0..3)
+        .map(|i| {
+            let Some(cranelift_module::FuncOrDataId::Func(id)) =
+                module.get_name(&format!("neoclr_value_{i}"))
+            else {
+                panic!("format")
+            };
+            module.get_finalized_function(id)
+        })
+        .collect();
+    type Run = unsafe extern "C" fn(*const u8, *const u8, *const u8) -> i32;
+    let run: libloading::Symbol<Run> = unsafe { library.get(b"integer_format_consumer") }.unwrap();
+    assert_eq!(unsafe { run(functions[0], functions[1], functions[2]) }, 0);
+}
+
+fn utf8_conversion_input() -> (neoclr::Module, crate::fault_details::Options) {
+    use neoclr::metadata::{MemoryViewKind, Type};
+    let mut input = neoclr::assemble(
+        r#"
+.module LiveUtf8Conversion
+.references ()
+.function neoCLR.Runtime.Utf8Encode(String) -> arrayref<Byte>
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.Utf8Decode(arrayref<Byte>) -> Value
+.methodimpl InternalCall
+.end
+.function Utf8SlicePlaceholder(arrayref<Byte>) -> Value
+ldc.i4 0
+value.pack Int32
+ret
+.end
+.function Main(Int32 value) -> Int32
+ldarg value
+ret
+.end
+"#,
+    )
+    .unwrap();
+    let mut view = crate::memory_views::test_module(MemoryViewKind::ReadOnlySlice, Type::Byte)
+        .types
+        .remove(0);
+    view.name = "ReadOnlyBytes".into();
+    view.definition = None;
+    input.types.push(view);
+    input.functions[2].name = "neoCLR.Runtime.Utf8DecodeSlice".into();
+    input.functions[2].impl_flags = 0x1000;
+    input.functions[2].body.clear();
+    input.functions[2].parameters = vec![Type::Named("ReadOnlyBytes".into())];
+    let rows: Vec<_> = input.functions.iter().take(3).enumerate().map(|(i,f)|
+        serde_json::json!({"name":f.name,"compiledIndex":i,"definition":{"module":"LiveUtf8Conversion","index":i}})).collect();
+    let selection = serde_json::json!({"functions":rows});
+    assert_eq!(
+        crate::bindings::utf8_text(&mut input, &selection)
+            .unwrap()
+            .len(),
+        3
+    );
+    for i in 0..3 {
+        input.functions[i].name = format!("Utf8Conversion{i}");
+    }
+    let mut options = managed_options();
+    options.utf8_encode.push(0);
+    options.utf8_decode.push(1);
+    options.utf8_decode_slice.push(2);
+    (input, options)
+}
+
+#[test]
+fn managed_utf8_conversion_emits_guarded_result() {
+    let (input, mut options) = utf8_conversion_input();
+    for enabled in [false, true] {
+        options.experimental_live_gc_stores = enabled;
+        let mut module = ObjectModule::new(
+            ObjectBuilder::new(
+                isa(target(), true),
+                "utf8",
+                cranelift_module::default_libcall_names(),
+            )
+            .unwrap(),
+        );
+        crate::compiler::values::compile_into(
+            &input,
+            "Main",
+            Some(&options),
+            crate::compiler::Target::MacosArm64,
+            &mut module,
+            false,
+        )
+        .unwrap();
+        for i in 0..3 {
+            let Some(cranelift_module::FuncOrDataId::Func(id)) =
+                module.get_name(&format!("neoclr_value_{i}"))
+            else {
+                panic!("utf8")
+            };
+            let signature = module
+                .declarations()
+                .get_function_decl(id)
+                .signature
+                .clone();
+            let export = module
+                .declare_function(
+                    &format!("live_utf8_conversion_{i}"),
+                    Linkage::Export,
+                    &signature,
+                )
+                .unwrap();
+            let mut context = module.make_context();
+            context.func.signature = signature;
+            let callee = module.declare_func_in_func(id, &mut context.func);
+            let mut fb = FunctionBuilderContext::new();
+            let mut b = FunctionBuilder::new(&mut context.func, &mut fb);
+            let entry = b.create_block();
+            b.append_block_params_for_function_params(entry);
+            b.switch_to_block(entry);
+            let args = b.block_params(entry).to_vec();
+            let call = b.ins().call(callee, &args);
+            let status = b.inst_results(call)[0];
+            b.ins().return_(&[status]);
+            b.seal_all_blocks();
+            b.finalize();
+            module.define_function(export, &mut context).unwrap();
+        }
+        let bytes = module.finish().emit().unwrap();
+        let object = object::File::parse(bytes.as_slice()).unwrap();
+        let imports: Vec<_> = object
+            .symbols()
+            .filter(|s| s.is_undefined())
+            .filter_map(|s| s.name().ok())
+            .collect();
+        assert!(
+            imports
+                .iter()
+                .any(|s| s.contains("neoclr_utf8_decode_slice_rooted"))
+        );
+        assert_eq!(
+            imports.iter().any(|s| s.contains("experiment_gc_store")),
+            enabled
+        );
+        if enabled {
+            if let Some(path) = std::env::var_os("NEOCLR_MUTATION_MANAGED_OBJECT") {
+                std::fs::write(path, bytes).unwrap();
+            }
         }
     }
 }
@@ -1882,62 +2793,128 @@ fn managed_utf8_conversion_emits_guarded_result() {
 #[test]
 #[ignore = "requires utf8-conversion host built by validate-utf8-conversion.py"]
 fn managed_utf8_conversion_runs_on_live_collector() {
-    let library = std::sync::Arc::new(unsafe { libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host")) }.unwrap());
+    let library = std::sync::Arc::new(
+        unsafe {
+            libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host"))
+        }
+        .unwrap(),
+    );
     unsafe { crate::mutation_admission::require_managed_host(&library) }.unwrap();
-    let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
+    let mut builder = JITBuilder::with_isa(
+        isa(target(), false),
+        cranelift_module::default_libcall_names(),
+    );
     let resolver = library.clone();
-    builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
+    builder.symbol_lookup_fn(Box::new(move |name| unsafe {
+        resolver
+            .get::<unsafe extern "C" fn()>(name.as_bytes())
+            .ok()
+            .map(|f| *f as *const u8)
+    }));
     let mut code = Code(Some(crate::jit_memory::new_module(builder)));
     let module = code.0.as_mut().unwrap();
     let (input, options) = utf8_conversion_input();
-    crate::compiler::values::compile_into(&input,"Main",Some(&options),crate::compiler::Target::MacosArm64,module,true).unwrap();
+    crate::compiler::values::compile_into(
+        &input,
+        "Main",
+        Some(&options),
+        crate::compiler::Target::MacosArm64,
+        module,
+        true,
+    )
+    .unwrap();
     module.finalize_definitions().unwrap();
-    let functions: Vec<_> = (0..3).map(|i| {
-        let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name(&format!("neoclr_value_{i}")) else { panic!("utf8") };
-        module.get_finalized_function(id)
-    }).collect();
-    type Run = unsafe extern "C" fn(*const u8,*const u8,*const u8) -> i32;
+    let functions: Vec<_> = (0..3)
+        .map(|i| {
+            let Some(cranelift_module::FuncOrDataId::Func(id)) =
+                module.get_name(&format!("neoclr_value_{i}"))
+            else {
+                panic!("utf8")
+            };
+            module.get_finalized_function(id)
+        })
+        .collect();
+    type Run = unsafe extern "C" fn(*const u8, *const u8, *const u8) -> i32;
     let run: libloading::Symbol<Run> = unsafe { library.get(b"utf8_conversion_consumer") }.unwrap();
-    assert_eq!(unsafe { run(functions[0],functions[1],functions[2]) },0);
+    assert_eq!(unsafe { run(functions[0], functions[1], functions[2]) }, 0);
 }
 
 #[test]
 fn managed_record_arrays_emit_guarded_stores() {
-    emit_managed(include_str!("../../../benchmarks/execution/concurrent-store/record-arrays.neoil"));
+    emit_managed(include_str!(
+        "../../../benchmarks/execution/concurrent-store/record-arrays.neoil"
+    ));
 }
 #[test]
 #[ignore = "requires record-array host built by validate-record-arrays.py"]
 fn managed_record_arrays_run_on_live_collector() {
-    run_managed(include_str!("../../../benchmarks/execution/concurrent-store/record-arrays.neoil"));
+    run_managed(include_str!(
+        "../../../benchmarks/execution/concurrent-store/record-arrays.neoil"
+    ));
 }
 
 fn text_finish_input() -> (neoclr::Module, crate::fault_details::Options) {
     use neoclr::metadata::Type;
-    let mut input = neoclr::assemble(".module LiveTextFinish\n.function Main(Int32 value) -> Int32\nldarg value\nret\n.end").unwrap();
+    let mut input = neoclr::assemble(
+        ".module LiveTextFinish\n.function Main(Int32 value) -> Int32\nldarg value\nret\n.end",
+    )
+    .unwrap();
     let mut main = input.functions.pop().unwrap();
     main.definition = None;
     let contracts = [
-        ("neoCLR.Runtime.StringIntern",vec![Type::String],Type::String,false),
-        ("neoCLR.Runtime.StringCompareOrdinal",vec![Type::String,Type::String],Type::Int32,false),
-        ("neoCLR.Runtime.WriteLine",vec![Type::String],Type::Void,false),
-        ("neoCLR.Runtime.WriteLine",vec![Type::String],Type::Void,true),
+        (
+            "neoCLR.Runtime.StringIntern",
+            vec![Type::String],
+            Type::String,
+            false,
+        ),
+        (
+            "neoCLR.Runtime.StringCompareOrdinal",
+            vec![Type::String, Type::String],
+            Type::Int32,
+            false,
+        ),
+        (
+            "neoCLR.Runtime.WriteLine",
+            vec![Type::String],
+            Type::Void,
+            false,
+        ),
+        (
+            "neoCLR.Runtime.WriteLine",
+            vec![Type::String],
+            Type::Void,
+            true,
+        ),
     ];
-    let mut rows=Vec::new();
-    for (i,(name,parameters,returns,no_result)) in contracts.into_iter().enumerate() {
+    let mut rows = Vec::new();
+    for (i, (name, parameters, returns, no_result)) in contracts.into_iter().enumerate() {
         input.functions.push(serde_json::from_value(serde_json::json!({
             "name":name,"parameters":parameters,"returns":returns,"no_result":no_result,"impl_flags":4096
         })).unwrap());
         rows.push(serde_json::json!({"name":name,"compiledIndex":i}));
     }
-    let selection=serde_json::json!({"functions":rows});
-    assert_eq!(crate::bindings::utf8_text(&mut input,&selection).unwrap().len(),2);
-    assert_eq!(crate::bindings::console_write_line(&mut input,&selection).unwrap().len(),2);
-    for i in 0..4 { input.functions[i].name=format!("TextFinish{i}"); }
+    let selection = serde_json::json!({"functions":rows});
+    assert_eq!(
+        crate::bindings::utf8_text(&mut input, &selection)
+            .unwrap()
+            .len(),
+        2
+    );
+    assert_eq!(
+        crate::bindings::console_write_line(&mut input, &selection)
+            .unwrap()
+            .len(),
+        2
+    );
+    for i in 0..4 {
+        input.functions[i].name = format!("TextFinish{i}");
+    }
     input.functions.push(main);
-    let mut options=managed_options();
+    let mut options = managed_options();
     options.string_intern.push(0);
     options.string_compare_ordinal.push(1);
-    options.console_write_line.extend([2,3]);
+    options.console_write_line.extend([2, 3]);
     (input, options)
 }
 
@@ -1946,35 +2923,77 @@ fn managed_text_finish_emits_guarded_result() {
     let (input, mut options) = text_finish_input();
     for enabled in [false, true] {
         options.experimental_live_gc_stores = enabled;
-        let mut module = ObjectModule::new(ObjectBuilder::new(isa(target(), true), "text-finish", cranelift_module::default_libcall_names()).unwrap());
-        crate::compiler::values::compile_into(&input,"Main",Some(&options),crate::compiler::Target::MacosArm64,&mut module,false).unwrap();
+        let mut module = ObjectModule::new(
+            ObjectBuilder::new(
+                isa(target(), true),
+                "text-finish",
+                cranelift_module::default_libcall_names(),
+            )
+            .unwrap(),
+        );
+        crate::compiler::values::compile_into(
+            &input,
+            "Main",
+            Some(&options),
+            crate::compiler::Target::MacosArm64,
+            &mut module,
+            false,
+        )
+        .unwrap();
         for i in 0..4 {
-        let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name(&format!("neoclr_value_{i}")) else { panic!("text-finish") };
-        let signature = module.declarations().get_function_decl(id).signature.clone();
-        let export = module.declare_function(&format!("live_text_finish_{i}"), Linkage::Export, &signature).unwrap();
-        let mut context = module.make_context();
-        context.func.signature = signature;
-        let callee = module.declare_func_in_func(id, &mut context.func);
-        let mut fb = FunctionBuilderContext::new();
-        let mut b = FunctionBuilder::new(&mut context.func, &mut fb);
-        let entry = b.create_block();
-        b.append_block_params_for_function_params(entry);
-        b.switch_to_block(entry);
-        let args = b.block_params(entry).to_vec();
-        let call = b.ins().call(callee, &args);
-        let status = b.inst_results(call)[0];
-        b.ins().return_(&[status]);
-        b.seal_all_blocks();
-        b.finalize();
-        module.define_function(export, &mut context).unwrap();
+            let Some(cranelift_module::FuncOrDataId::Func(id)) =
+                module.get_name(&format!("neoclr_value_{i}"))
+            else {
+                panic!("text-finish")
+            };
+            let signature = module
+                .declarations()
+                .get_function_decl(id)
+                .signature
+                .clone();
+            let export = module
+                .declare_function(
+                    &format!("live_text_finish_{i}"),
+                    Linkage::Export,
+                    &signature,
+                )
+                .unwrap();
+            let mut context = module.make_context();
+            context.func.signature = signature;
+            let callee = module.declare_func_in_func(id, &mut context.func);
+            let mut fb = FunctionBuilderContext::new();
+            let mut b = FunctionBuilder::new(&mut context.func, &mut fb);
+            let entry = b.create_block();
+            b.append_block_params_for_function_params(entry);
+            b.switch_to_block(entry);
+            let args = b.block_params(entry).to_vec();
+            let call = b.ins().call(callee, &args);
+            let status = b.inst_results(call)[0];
+            b.ins().return_(&[status]);
+            b.seal_all_blocks();
+            b.finalize();
+            module.define_function(export, &mut context).unwrap();
         }
         let bytes = module.finish().emit().unwrap();
         let object = object::File::parse(bytes.as_slice()).unwrap();
-        let imports: Vec<_> = object.symbols().filter(|s| s.is_undefined()).filter_map(|s| s.name().ok()).collect();
-        assert!(imports.iter().any(|s| s.contains("neoclr_string_intern_rooted")));
-        assert_eq!(imports.iter().any(|s| s.contains("experiment_gc_store")), enabled);
+        let imports: Vec<_> = object
+            .symbols()
+            .filter(|s| s.is_undefined())
+            .filter_map(|s| s.name().ok())
+            .collect();
+        assert!(
+            imports
+                .iter()
+                .any(|s| s.contains("neoclr_string_intern_rooted"))
+        );
+        assert_eq!(
+            imports.iter().any(|s| s.contains("experiment_gc_store")),
+            enabled
+        );
         if enabled {
-            if let Some(path) = std::env::var_os("NEOCLR_MUTATION_MANAGED_OBJECT") { std::fs::write(path, bytes).unwrap(); }
+            if let Some(path) = std::env::var_os("NEOCLR_MUTATION_MANAGED_OBJECT") {
+                std::fs::write(path, bytes).unwrap();
+            }
         }
     }
 }
@@ -1982,42 +3001,95 @@ fn managed_text_finish_emits_guarded_result() {
 #[test]
 #[ignore = "requires text-finish host built by validate-text-finish.py"]
 fn managed_text_finish_runs_on_live_collector() {
-    let library = std::sync::Arc::new(unsafe { libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host")) }.unwrap());
+    let library = std::sync::Arc::new(
+        unsafe {
+            libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host"))
+        }
+        .unwrap(),
+    );
     unsafe { crate::mutation_admission::require_managed_host(&library) }.unwrap();
-    let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
+    let mut builder = JITBuilder::with_isa(
+        isa(target(), false),
+        cranelift_module::default_libcall_names(),
+    );
     let resolver = library.clone();
-    builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
+    builder.symbol_lookup_fn(Box::new(move |name| unsafe {
+        resolver
+            .get::<unsafe extern "C" fn()>(name.as_bytes())
+            .ok()
+            .map(|f| *f as *const u8)
+    }));
     let mut code = Code(Some(crate::jit_memory::new_module(builder)));
     let module = code.0.as_mut().unwrap();
     let (input, options) = text_finish_input();
-    crate::compiler::values::compile_into(&input,"Main",Some(&options),crate::compiler::Target::MacosArm64,module,true).unwrap();
+    crate::compiler::values::compile_into(
+        &input,
+        "Main",
+        Some(&options),
+        crate::compiler::Target::MacosArm64,
+        module,
+        true,
+    )
+    .unwrap();
     module.finalize_definitions().unwrap();
-    let functions: Vec<_> = (0..4).map(|i| {
-        let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name(&format!("neoclr_value_{i}")) else { panic!("text-finish") };
-        module.get_finalized_function(id)
-    }).collect();
-    type Run = unsafe extern "C" fn(*const u8,*const u8,*const u8,*const u8) -> i32;
+    let functions: Vec<_> = (0..4)
+        .map(|i| {
+            let Some(cranelift_module::FuncOrDataId::Func(id)) =
+                module.get_name(&format!("neoclr_value_{i}"))
+            else {
+                panic!("text-finish")
+            };
+            module.get_finalized_function(id)
+        })
+        .collect();
+    type Run = unsafe extern "C" fn(*const u8, *const u8, *const u8, *const u8) -> i32;
     let run: libloading::Symbol<Run> = unsafe { library.get(b"text_finish_consumer") }.unwrap();
-    assert_eq!(unsafe { run(functions[0],functions[1],functions[2],functions[3]) },0);
+    assert_eq!(
+        unsafe { run(functions[0], functions[1], functions[2], functions[3]) },
+        0
+    );
 }
 
 fn tls_wrappers_input() -> (neoclr::Module, crate::fault_details::Options) {
     use neoclr::metadata::Type;
-    let mut input = neoclr::assemble(".module LiveTlsWrappers\n.function Main(Int32 value) -> Int32\nldarg value\nret\n.end").unwrap();
-    let mut main=input.functions.pop().unwrap();main.definition=None;
-    let mut rows=Vec::new();
-    for (i,(name,arity)) in [("TlsCreateClient",3),("TlsCreateServer",4),("TlsCreateSession",3),("TlsRelease",1),("TlsAbort",1),("TlsPump",5)].into_iter().enumerate() {
-        let name=format!("neoCLR.Runtime.{name}");
+    let mut input = neoclr::assemble(
+        ".module LiveTlsWrappers\n.function Main(Int32 value) -> Int32\nldarg value\nret\n.end",
+    )
+    .unwrap();
+    let mut main = input.functions.pop().unwrap();
+    main.definition = None;
+    let mut rows = Vec::new();
+    for (i, (name, arity)) in [
+        ("TlsCreateClient", 3),
+        ("TlsCreateServer", 4),
+        ("TlsCreateSession", 3),
+        ("TlsRelease", 1),
+        ("TlsAbort", 1),
+        ("TlsPump", 5),
+    ]
+    .into_iter()
+    .enumerate()
+    {
+        let name = format!("neoCLR.Runtime.{name}");
         input.functions.push(serde_json::from_value(serde_json::json!({
             "name":name,"parameters":vec![Type::ArrayRef(Box::new(Type::Byte));arity],"returns":Type::Int32,"impl_flags":4096
         })).unwrap());
         rows.push(serde_json::json!({"name":name,"compiledIndex":i}));
     }
-    assert_eq!(crate::bindings::tls(&mut input,&serde_json::json!({"functions":rows})).unwrap().len(),6);
-    for i in 0..6 { input.functions[i].name=format!("TlsWrapper{i}"); }
+    assert_eq!(
+        crate::bindings::tls(&mut input, &serde_json::json!({"functions":rows}))
+            .unwrap()
+            .len(),
+        6
+    );
+    for i in 0..6 {
+        input.functions[i].name = format!("TlsWrapper{i}");
+    }
     input.functions.push(main);
-    let mut options=managed_options();
-    for i in 0..6 { options.tls.insert(i,i as i32+1); }
+    let mut options = managed_options();
+    for i in 0..6 {
+        options.tls.insert(i, i as i32 + 1);
+    }
     (input, options)
 }
 
@@ -2026,35 +3098,73 @@ fn managed_tls_wrappers_emits_guarded_result() {
     let (input, mut options) = tls_wrappers_input();
     for enabled in [false, true] {
         options.experimental_live_gc_stores = enabled;
-        let mut module = ObjectModule::new(ObjectBuilder::new(isa(target(), true), "tls-wrappers", cranelift_module::default_libcall_names()).unwrap());
-        crate::compiler::values::compile_into(&input,"Main",Some(&options),crate::compiler::Target::MacosArm64,&mut module,false).unwrap();
+        let mut module = ObjectModule::new(
+            ObjectBuilder::new(
+                isa(target(), true),
+                "tls-wrappers",
+                cranelift_module::default_libcall_names(),
+            )
+            .unwrap(),
+        );
+        crate::compiler::values::compile_into(
+            &input,
+            "Main",
+            Some(&options),
+            crate::compiler::Target::MacosArm64,
+            &mut module,
+            false,
+        )
+        .unwrap();
         for i in 0..6 {
-        let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name(&format!("neoclr_value_{i}")) else { panic!("tls-wrappers") };
-        let signature = module.declarations().get_function_decl(id).signature.clone();
-        let export = module.declare_function(&format!("live_tls_wrappers_{i}"), Linkage::Export, &signature).unwrap();
-        let mut context = module.make_context();
-        context.func.signature = signature;
-        let callee = module.declare_func_in_func(id, &mut context.func);
-        let mut fb = FunctionBuilderContext::new();
-        let mut b = FunctionBuilder::new(&mut context.func, &mut fb);
-        let entry = b.create_block();
-        b.append_block_params_for_function_params(entry);
-        b.switch_to_block(entry);
-        let args = b.block_params(entry).to_vec();
-        let call = b.ins().call(callee, &args);
-        let status = b.inst_results(call)[0];
-        b.ins().return_(&[status]);
-        b.seal_all_blocks();
-        b.finalize();
-        module.define_function(export, &mut context).unwrap();
+            let Some(cranelift_module::FuncOrDataId::Func(id)) =
+                module.get_name(&format!("neoclr_value_{i}"))
+            else {
+                panic!("tls-wrappers")
+            };
+            let signature = module
+                .declarations()
+                .get_function_decl(id)
+                .signature
+                .clone();
+            let export = module
+                .declare_function(
+                    &format!("live_tls_wrappers_{i}"),
+                    Linkage::Export,
+                    &signature,
+                )
+                .unwrap();
+            let mut context = module.make_context();
+            context.func.signature = signature;
+            let callee = module.declare_func_in_func(id, &mut context.func);
+            let mut fb = FunctionBuilderContext::new();
+            let mut b = FunctionBuilder::new(&mut context.func, &mut fb);
+            let entry = b.create_block();
+            b.append_block_params_for_function_params(entry);
+            b.switch_to_block(entry);
+            let args = b.block_params(entry).to_vec();
+            let call = b.ins().call(callee, &args);
+            let status = b.inst_results(call)[0];
+            b.ins().return_(&[status]);
+            b.seal_all_blocks();
+            b.finalize();
+            module.define_function(export, &mut context).unwrap();
         }
         let bytes = module.finish().emit().unwrap();
         let object = object::File::parse(bytes.as_slice()).unwrap();
-        let imports: Vec<_> = object.symbols().filter(|s| s.is_undefined()).filter_map(|s| s.name().ok()).collect();
+        let imports: Vec<_> = object
+            .symbols()
+            .filter(|s| s.is_undefined())
+            .filter_map(|s| s.name().ok())
+            .collect();
         assert!(imports.iter().any(|s| s.contains("neoclr_tls_managed_v2")));
-        assert_eq!(imports.iter().any(|s| s.contains("experiment_gc_store")), enabled);
+        assert_eq!(
+            imports.iter().any(|s| s.contains("experiment_gc_store")),
+            enabled
+        );
         if enabled {
-            if let Some(path) = std::env::var_os("NEOCLR_MUTATION_MANAGED_OBJECT") { std::fs::write(path, bytes).unwrap(); }
+            if let Some(path) = std::env::var_os("NEOCLR_MUTATION_MANAGED_OBJECT") {
+                std::fs::write(path, bytes).unwrap();
+            }
         }
     }
 }
@@ -2062,78 +3172,158 @@ fn managed_tls_wrappers_emits_guarded_result() {
 #[test]
 #[ignore = "requires tls-wrappers host built by validate-tls-wrappers.py"]
 fn managed_tls_wrappers_runs_on_live_collector() {
-    let library = std::sync::Arc::new(unsafe { libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host")) }.unwrap());
+    let library = std::sync::Arc::new(
+        unsafe {
+            libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host"))
+        }
+        .unwrap(),
+    );
     unsafe { crate::mutation_admission::require_managed_host(&library) }.unwrap();
-    let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
+    let mut builder = JITBuilder::with_isa(
+        isa(target(), false),
+        cranelift_module::default_libcall_names(),
+    );
     let resolver = library.clone();
-    builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
+    builder.symbol_lookup_fn(Box::new(move |name| unsafe {
+        resolver
+            .get::<unsafe extern "C" fn()>(name.as_bytes())
+            .ok()
+            .map(|f| *f as *const u8)
+    }));
     let mut code = Code(Some(crate::jit_memory::new_module(builder)));
     let module = code.0.as_mut().unwrap();
     let (input, options) = tls_wrappers_input();
-    crate::compiler::values::compile_into(&input,"Main",Some(&options),crate::compiler::Target::MacosArm64,module,true).unwrap();
+    crate::compiler::values::compile_into(
+        &input,
+        "Main",
+        Some(&options),
+        crate::compiler::Target::MacosArm64,
+        module,
+        true,
+    )
+    .unwrap();
     module.finalize_definitions().unwrap();
-    let functions: Vec<_> = (0..6).map(|i| {
-        let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name(&format!("neoclr_value_{i}")) else { panic!("tls-wrappers") };
-        module.get_finalized_function(id)
-    }).collect();
+    let functions: Vec<_> = (0..6)
+        .map(|i| {
+            let Some(cranelift_module::FuncOrDataId::Func(id)) =
+                module.get_name(&format!("neoclr_value_{i}"))
+            else {
+                panic!("tls-wrappers")
+            };
+            module.get_finalized_function(id)
+        })
+        .collect();
     type Run = unsafe extern "C" fn(*const *const u8) -> i32;
     let run: libloading::Symbol<Run> = unsafe { library.get(b"tls_wrappers_consumer") }.unwrap();
-    assert_eq!(unsafe { run(functions.as_ptr()) },0);
+    assert_eq!(unsafe { run(functions.as_ptr()) }, 0);
 }
 
 #[test]
 #[ignore = "requires retained HTTP inputs and NEOCLR_LIVE_SELECTION_COMMAND"]
 fn full_http_selection_compiles_with_live_gc() {
-    let path=std::env::var_os("NEOCLR_LIVE_SELECTION_COMMAND").expect("selection command JSON");
-    let command: Vec<String>=serde_json::from_slice(&std::fs::read(path).unwrap()).unwrap();
-    let arguments=command.into_iter().skip(1).map(std::ffi::OsString::from).collect();
-    let live=std::env::var("NEOCLR_LIVE_SELECTION_MODE").as_deref()!=Ok("sync");
-    assert_eq!(crate::run_internal(arguments,live).unwrap(),0);
+    let path = std::env::var_os("NEOCLR_LIVE_SELECTION_COMMAND").expect("selection command JSON");
+    let command: Vec<String> = serde_json::from_slice(&std::fs::read(path).unwrap()).unwrap();
+    let arguments = command
+        .into_iter()
+        .skip(1)
+        .map(std::ffi::OsString::from)
+        .collect();
+    let live = std::env::var("NEOCLR_LIVE_SELECTION_MODE").as_deref() != Ok("sync");
+    assert_eq!(crate::run_internal(arguments, live).unwrap(), 0);
 }
 
 #[test]
 fn live_host_io_requires_admitted_pump() {
-    let source=include_str!("../../../benchmarks/execution/concurrent-store/managed.neoil");
-    let mut options=managed_options_for(source);options.entry_host_io=true;
-    let mut module=ObjectModule::new(ObjectBuilder::new(isa(target(),true),"reject_host_io",cranelift_module::default_libcall_names()).unwrap());
-    assert!(crate::compiler::values::compile_into(&managed_input(source),"Main",Some(&options),crate::compiler::Target::MacosArm64,&mut module,false).unwrap_err().to_string().contains("owned published frames"));
-    assert!(crate::run_internal(vec!["--jit-scalar".into()],true).unwrap_err().to_string().contains("requires managed hosting"));
+    let source = include_str!("../../../benchmarks/execution/concurrent-store/managed.neoil");
+    let mut options = managed_options_for(source);
+    options.entry_host_io = true;
+    let mut module = ObjectModule::new(
+        ObjectBuilder::new(
+            isa(target(), true),
+            "reject_host_io",
+            cranelift_module::default_libcall_names(),
+        )
+        .unwrap(),
+    );
+    assert!(
+        crate::compiler::values::compile_into(
+            &managed_input(source),
+            "Main",
+            Some(&options),
+            crate::compiler::Target::MacosArm64,
+            &mut module,
+            false
+        )
+        .unwrap_err()
+        .to_string()
+        .contains("owned published frames")
+    );
+    assert!(
+        crate::run_internal(vec!["--jit-scalar".into()], true)
+            .unwrap_err()
+            .to_string()
+            .contains("requires managed hosting")
+    );
 }
 
 #[test]
 fn managed_callable_arrays_emit_guarded_stores() {
-    emit_managed(include_str!("../../../benchmarks/execution/concurrent-store/callable-arrays.neoil"));
+    emit_managed(include_str!(
+        "../../../benchmarks/execution/concurrent-store/callable-arrays.neoil"
+    ));
 }
 #[test]
 #[ignore = "requires callable-array host built by validate-callable-arrays.py"]
 fn managed_callable_arrays_run_on_live_collector() {
-    run_managed(include_str!("../../../benchmarks/execution/concurrent-store/callable-arrays.neoil"));
+    run_managed(include_str!(
+        "../../../benchmarks/execution/concurrent-store/callable-arrays.neoil"
+    ));
 }
 
 #[test]
 fn managed_interface_dispatch_emits_guarded_results() {
-    let source = include_str!("../../../benchmarks/execution/concurrent-store/interface-dispatch.neoil");
+    let source =
+        include_str!("../../../benchmarks/execution/concurrent-store/interface-dispatch.neoil");
     emit_managed(source);
     let input = managed_input(source);
     let mut options = managed_options();
     options.object_display.insert(0, vec![]);
-    let mut module = ObjectModule::new(ObjectBuilder::new(
-        isa(target(), true), "reject-special-dispatch", cranelift_module::default_libcall_names(),
-    ).unwrap());
+    let mut module = ObjectModule::new(
+        ObjectBuilder::new(
+            isa(target(), true),
+            "reject-special-dispatch",
+            cranelift_module::default_libcall_names(),
+        )
+        .unwrap(),
+    );
     let error = crate::compiler::values::compile_into(
-        &input, "Main", Some(&options), crate::compiler::Target::MacosArm64,
-        &mut module, false,
-    ).unwrap_err();
-    assert!(error.to_string().contains("unaudited native replacement bodies"));
+        &input,
+        "Main",
+        Some(&options),
+        crate::compiler::Target::MacosArm64,
+        &mut module,
+        false,
+    )
+    .unwrap_err();
+    assert!(
+        error
+            .to_string()
+            .contains("unaudited native replacement bodies")
+    );
 }
 #[test]
 #[ignore = "requires interface-dispatch host built by validate-interface-dispatch.py"]
 fn managed_interface_dispatch_runs_on_live_collector() {
-    run_managed(include_str!("../../../benchmarks/execution/concurrent-store/interface-dispatch.neoil"));
+    run_managed(include_str!(
+        "../../../benchmarks/execution/concurrent-store/interface-dispatch.neoil"
+    ));
 }
 
 fn primitive_box_input() -> (neoclr::Module, crate::fault_details::Options, Vec<usize>) {
-    let mut input = neoclr::assemble(include_str!("../../../benchmarks/execution/concurrent-store/primitive-boxes.neoil")).unwrap();
+    let mut input = neoclr::assemble(include_str!(
+        "../../../benchmarks/execution/concurrent-store/primitive-boxes.neoil"
+    ))
+    .unwrap();
     let mut report = serde_json::json!({"referenceArena":true,"objectBaseProjection":{"compiledIndex":0},
         "functions":[{"compiledIndex":0,"name":"neoCLR.Runtime.ObjectTypeHandle"}],
         "sourceMetadata":{"types":[{"compiledTypeIndex":1}]},"nativeBindings":[]});
@@ -2142,9 +3332,21 @@ fn primitive_box_input() -> (neoclr::Module, crate::fault_details::Options, Vec<
     crate::reflection_metadata::bind_object_type(&mut input, &mut report).unwrap();
     input.functions[0].name = "LivePrimitiveBoxes.TypeHandle".into();
     let details = crate::fault_details::Options::from_report(Some(&report));
-    let mut indices = vec![report["int32Boxes"][0]["helperCompiledIndex"].as_u64().unwrap() as usize,
-        report["booleanBoxes"][0]["helperCompiledIndex"].as_u64().unwrap() as usize];
-    indices.extend(report["scalarBoxQueries"].as_array().unwrap().iter().map(|r| r["helperCompiledIndex"].as_u64().unwrap() as usize));
+    let mut indices = vec![
+        report["int32Boxes"][0]["helperCompiledIndex"]
+            .as_u64()
+            .unwrap() as usize,
+        report["booleanBoxes"][0]["helperCompiledIndex"]
+            .as_u64()
+            .unwrap() as usize,
+    ];
+    indices.extend(
+        report["scalarBoxQueries"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|r| r["helperCompiledIndex"].as_u64().unwrap() as usize),
+    );
     assert_eq!(indices.len(), 6);
     indices.extend([0, 1]);
     let mut options = managed_options();
@@ -2162,14 +3364,40 @@ fn managed_primitive_boxes_emit_guarded_results() {
     let (input, mut options, indices) = primitive_box_input();
     for enabled in [false, true] {
         options.experimental_live_gc_stores = enabled;
-        let mut module = ObjectModule::new(ObjectBuilder::new(isa(target(), true), "boxes", cranelift_module::default_libcall_names()).unwrap());
-        crate::compiler::values::compile_into(&input,"Main",Some(&options),crate::compiler::Target::MacosArm64,&mut module,false).unwrap();
+        let mut module = ObjectModule::new(
+            ObjectBuilder::new(
+                isa(target(), true),
+                "boxes",
+                cranelift_module::default_libcall_names(),
+            )
+            .unwrap(),
+        );
+        crate::compiler::values::compile_into(
+            &input,
+            "Main",
+            Some(&options),
+            crate::compiler::Target::MacosArm64,
+            &mut module,
+            false,
+        )
+        .unwrap();
         export_managed_bodies(&mut module, "live_box", &indices);
         let bytes = module.finish().emit().unwrap();
         let object = object::File::parse(bytes.as_slice()).unwrap();
-        assert_eq!(object.symbols().any(|s| s.is_undefined() && s.name().unwrap_or("").trim_start_matches('_') == if crate::mutation_admission::borrowed_stores_enabled() { "experiment_gc_store_borrowed" } else { "experiment_gc_store" }), enabled);
+        assert_eq!(
+            object.symbols().any(|s| s.is_undefined()
+                && s.name().unwrap_or("").trim_start_matches('_')
+                    == if crate::mutation_admission::borrowed_stores_enabled() {
+                        "experiment_gc_store_borrowed"
+                    } else {
+                        "experiment_gc_store"
+                    }),
+            enabled
+        );
         if enabled {
-            if let Some(path) = std::env::var_os("NEOCLR_MUTATION_MANAGED_OBJECT") { std::fs::write(path, bytes).unwrap(); }
+            if let Some(path) = std::env::var_os("NEOCLR_MUTATION_MANAGED_OBJECT") {
+                std::fs::write(path, bytes).unwrap();
+            }
         }
     }
 }
@@ -2177,22 +3405,51 @@ fn managed_primitive_boxes_emit_guarded_results() {
 #[test]
 #[ignore = "requires primitive-box host built by validate-primitive-boxes.py"]
 fn managed_primitive_boxes_run_on_live_collector() {
-    let library = std::sync::Arc::new(unsafe { libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host")) }.unwrap());
+    let library = std::sync::Arc::new(
+        unsafe {
+            libloading::Library::new(std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("host"))
+        }
+        .unwrap(),
+    );
     unsafe { crate::mutation_admission::require_managed_host(&library) }.unwrap();
-    let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
+    let mut builder = JITBuilder::with_isa(
+        isa(target(), false),
+        cranelift_module::default_libcall_names(),
+    );
     let resolver = library.clone();
-    builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
+    builder.symbol_lookup_fn(Box::new(move |name| unsafe {
+        resolver
+            .get::<unsafe extern "C" fn()>(name.as_bytes())
+            .ok()
+            .map(|f| *f as *const u8)
+    }));
     let mut code = Code(Some(crate::jit_memory::new_module(builder)));
     let module = code.0.as_mut().unwrap();
     let (input, options, indices) = primitive_box_input();
-    crate::compiler::values::compile_into(&input,"Main",Some(&options),crate::compiler::Target::MacosArm64,module,true).unwrap();
+    crate::compiler::values::compile_into(
+        &input,
+        "Main",
+        Some(&options),
+        crate::compiler::Target::MacosArm64,
+        module,
+        true,
+    )
+    .unwrap();
     module.finalize_definitions().unwrap();
-    let pointers: Vec<_> = indices.iter().map(|index| {
-        let Some(cranelift_module::FuncOrDataId::Func(id)) = module.get_name(&format!("neoclr_value_{index}")) else { panic!("box body") };
-        module.get_finalized_function(id)
-    }).collect();
+    let pointers: Vec<_> = indices
+        .iter()
+        .map(|index| {
+            let Some(cranelift_module::FuncOrDataId::Func(id)) =
+                module.get_name(&format!("neoclr_value_{index}"))
+            else {
+                panic!("box body")
+            };
+            module.get_finalized_function(id)
+        })
+        .collect();
     type Run = unsafe extern "C" fn(*const *const u8) -> i32;
-    let run: libloading::Symbol<Run> = unsafe { library.get(b"managed_primitive_box_consumer") }.unwrap();
+    let run: libloading::Symbol<Run> =
+        unsafe { library.get(b"managed_primitive_box_consumer") }.unwrap();
     assert_eq!(unsafe { run(pointers.as_ptr()) }, 0);
 }
 
@@ -2234,7 +3491,11 @@ fn transferred_stack_copy(
             32,
             3,
         ));
-        let base = if kind == 2 { args[1] } else { b.ins().stack_addr(types::I64, slot, 4) };
+        let base = if kind == 2 {
+            args[1]
+        } else {
+            b.ins().stack_addr(types::I64, slot, 4)
+        };
         let first = b.create_block();
         let next = b.create_block();
         b.append_block_param(first, types::I64);
@@ -2243,11 +3504,20 @@ fn transferred_stack_copy(
             // Distinct SSA addresses: equal slot/offset may merge, differing
             // offsets must retain the adapter even though both are on stack.
             let other_slot = if kind == 5 {
-                b.create_sized_stack_slot(ir::StackSlotData::new(ir::StackSlotKind::ExplicitSlot, 32, 3))
-            } else { slot };
-            let other = b.ins().stack_addr(types::I64, other_slot, if kind == 4 { 8 } else { 4 });
+                b.create_sized_stack_slot(ir::StackSlotData::new(
+                    ir::StackSlotKind::ExplicitSlot,
+                    32,
+                    3,
+                ))
+            } else {
+                slot
+            };
+            let other = b
+                .ins()
+                .stack_addr(types::I64, other_slot, if kind == 4 { 8 } else { 4 });
             let condition = b.ins().icmp_imm(ir::condcodes::IntCC::Equal, args[2], 0);
-            b.ins().brif(condition, first, &[base.into()], first, &[other.into()]);
+            b.ins()
+                .brif(condition, first, &[base.into()], first, &[other.into()]);
         } else if kind == 1 {
             // One predecessor, two edges: a stack pointer and an unknown byref.
             let condition = b.ins().icmp_imm(ir::condcodes::IntCC::Equal, args[2], 0);
@@ -2308,7 +3578,14 @@ fn unambiguous_stack_transfers_elide_only_proved_stores() {
                     unsafe { call(&mut state, output.as_mut_ptr(), bits) },
                     if reject_at == 0 { 0 } else { 3 }
                 );
-                assert_eq!(state.calls, if reject_at == 0 && kind != 0 && kind != 3 { 2 } else { 1 });
+                assert_eq!(
+                    state.calls,
+                    if reject_at == 0 && kind != 0 && kind != 3 {
+                        2
+                    } else {
+                        1
+                    }
+                );
                 if reject_at == 0 {
                     assert_eq!(&output[8..16], &bits.to_le_bytes());
                 } else {
@@ -2395,13 +3672,19 @@ fn transferred_stack_offset_overflow_remains_guarded() {
 
 thread_local! { static BORROWS: std::cell::Cell<u32> = const { std::cell::Cell::new(0) }; }
 extern "C" fn borrow_test_state() -> usize {
-    BORROWS.with(|count| count.set(count.get()+1));
+    BORROWS.with(|count| count.set(count.get() + 1));
     0x1234
 }
-unsafe extern "C" fn borrowed_test_store(handle: usize, context: *mut State, destination: *mut u8, bits: u64, width: u32) -> i32 {
-    assert_eq!(handle,0x1234);
+unsafe extern "C" fn borrowed_test_store(
+    handle: usize,
+    context: *mut State,
+    destination: *mut u8,
+    bits: u64,
+    width: u32,
+) -> i32 {
+    assert_eq!(handle, 0x1234);
     assert!(unsafe { (*(context as *mut FramedState)).active });
-    unsafe { hook(context,destination,bits,width) }
+    unsafe { hook(context, destination, bits, width) }
 }
 #[test]
 fn borrowed_store_acquires_once_and_cleans_up_faults() {
@@ -2410,8 +3693,14 @@ fn borrowed_store_acquires_once_and_cleans_up_faults() {
             isa(target(), false),
             cranelift_module::default_libcall_names(),
         );
-        builder.symbol("experiment_gc_store_state_borrow", borrow_test_state as *const u8);
-        builder.symbol("experiment_gc_store_borrowed", borrowed_test_store as *const u8);
+        builder.symbol(
+            "experiment_gc_store_state_borrow",
+            borrow_test_state as *const u8,
+        );
+        builder.symbol(
+            "experiment_gc_store_borrowed",
+            borrowed_test_store as *const u8,
+        );
         builder.symbol("frame_enter", frame_enter as *const u8);
         builder.symbol(
             "frame_leave",
@@ -2469,13 +3758,20 @@ fn borrowed_store_acquires_once_and_cleans_up_faults() {
 }
 #[test]
 fn borrowed_store_rejects_missing_or_late_frame_without_mutation() {
-    let mut module=ObjectModule::new(ObjectBuilder::new(isa(target(),true),"borrow-check",cranelift_module::default_libcall_names()).unwrap());
-    let (_,mut ctx,context,_,_,ready)=framed_function(&mut module,true);
-    let before=ctx.func.display().to_string();
-    assert!(lower_impl(&mut module,&mut ctx.func,context,None,true).is_err());
-    assert_eq!(before,ctx.func.display().to_string());
-    assert!(lower_impl(&mut module,&mut ctx.func,context,Some(ready),true).is_err());
-    assert_eq!(before,ctx.func.display().to_string());
+    let mut module = ObjectModule::new(
+        ObjectBuilder::new(
+            isa(target(), true),
+            "borrow-check",
+            cranelift_module::default_libcall_names(),
+        )
+        .unwrap(),
+    );
+    let (_, mut ctx, context, _, _, ready) = framed_function(&mut module, true);
+    let before = ctx.func.display().to_string();
+    assert!(lower_impl(&mut module, &mut ctx.func, context, None, true).is_err());
+    assert_eq!(before, ctx.func.display().to_string());
+    assert!(lower_impl(&mut module, &mut ctx.func, context, Some(ready), true).is_err());
+    assert_eq!(before, ctx.func.display().to_string());
 }
 #[test]
 #[ignore = "requires NEOCLR_MUTATION_TEST_HOST built by concurrent-store/validate.py"]
@@ -2484,12 +3780,20 @@ fn borrowed_store_native_jit_consumer() {
     // The fixture is built from this checkout; its library outlives generated code.
     let library = unsafe { libloading::Library::new(path) }.unwrap();
     unsafe { crate::mutation_admission::require_managed_host(&library) }.unwrap();
-    let query: libloading::Symbol<unsafe extern "C" fn(u32)->u64> = unsafe { library.get(b"experiment_gc_live_capabilities_v1") }.unwrap();
+    let query: libloading::Symbol<unsafe extern "C" fn(u32) -> u64> =
+        unsafe { library.get(b"experiment_gc_live_capabilities_v1") }.unwrap();
     crate::mutation_admission::check_borrowed_store_host_features(unsafe { query(1) }).unwrap();
-    type Hook = unsafe extern "C" fn(*mut std::ffi::c_void, *mut std::ffi::c_void, *mut u8, u64, u32) -> i32;
+    type Hook = unsafe extern "C" fn(
+        *mut std::ffi::c_void,
+        *mut std::ffi::c_void,
+        *mut u8,
+        u64,
+        u32,
+    ) -> i32;
     type Writer = unsafe extern "C" fn(*mut std::ffi::c_void, *mut u8, u64) -> i32;
     type Run = unsafe extern "C" fn(Writer) -> i32;
-    let hook: libloading::Symbol<Hook> = unsafe { library.get(b"experiment_gc_store_borrowed") }.unwrap();
+    let hook: libloading::Symbol<Hook> =
+        unsafe { library.get(b"experiment_gc_store_borrowed") }.unwrap();
     let run: libloading::Symbol<Run> = unsafe { library.get(b"native_store_consumer") }.unwrap();
     type Enter =
         unsafe extern "C" fn(*mut std::ffi::c_void, *mut std::ffi::c_void) -> *mut std::ffi::c_void;
@@ -2500,7 +3804,8 @@ fn borrowed_store_native_jit_consumer() {
         isa(target(), false),
         cranelift_module::default_libcall_names(),
     );
-    let acquire: libloading::Symbol<unsafe extern "C" fn()->*mut std::ffi::c_void> = unsafe { library.get(b"experiment_gc_store_state_borrow") }.unwrap();
+    let acquire: libloading::Symbol<unsafe extern "C" fn() -> *mut std::ffi::c_void> =
+        unsafe { library.get(b"experiment_gc_store_state_borrow") }.unwrap();
     builder.symbol("experiment_gc_store_state_borrow", *acquire as *const u8);
     builder.symbol("experiment_gc_store_borrowed", *hook as *const u8);
     builder.symbol("frame_enter", *enter as *const u8);
@@ -2520,31 +3825,74 @@ fn borrowed_store_native_jit_consumer() {
     module.finalize_definitions().unwrap();
     let call: Writer = unsafe { std::mem::transmute(module.get_finalized_function(id)) };
     assert_eq!(unsafe { run(call) }, 0);
-
 }
 
-
-fn borrowed_providers(module: &impl Module) -> Vec<(&'static str,ir::Signature)> {
-    let mut result=live_providers(module);
-    let mut acquire=module.make_signature();acquire.returns.push(AbiParam::new(types::I64));
-    result.push(("experiment_gc_store_state_borrow",acquire));
-    let mut store=module.make_signature();store.params.extend([types::I64,types::I64,types::I64,types::I64,types::I32].map(AbiParam::new));store.returns.push(AbiParam::new(types::I32));
-    result.push(("experiment_gc_store_borrowed",store));result
+fn borrowed_providers(module: &impl Module) -> Vec<(&'static str, ir::Signature)> {
+    let mut result = live_providers(module);
+    let mut acquire = module.make_signature();
+    acquire.returns.push(AbiParam::new(types::I64));
+    result.push(("experiment_gc_store_state_borrow", acquire));
+    let mut store = module.make_signature();
+    store
+        .params
+        .extend([types::I64, types::I64, types::I64, types::I64, types::I32].map(AbiParam::new));
+    store.returns.push(AbiParam::new(types::I32));
+    result.push(("experiment_gc_store_borrowed", store));
+    result
 }
 #[test]
 fn borrowed_store_object_imports_and_frame_cleanup() {
-    for triple in ["aarch64-apple-darwin","x86_64-pc-windows-msvc"] {
-        let mut module=ObjectModule::new(ObjectBuilder::new(isa(triple,true),"borrow-object",cranelift_module::default_libcall_names()).unwrap());
-        let (id,mut ctx,context,frame,_,ready)=framed_function(&mut module,false);
-        lower_impl(&mut module,&mut ctx.func,context,Some(ready),true).unwrap();
-        finish_native_frame(&mut module,&mut ctx.func,frame);
-        assert!(crate::mutation_admission::check_call_closure(&module,&[(id,&ctx.func)],&live_providers(&module)).is_err());
-        crate::mutation_admission::check_call_closure(&module,&[(id,&ctx.func)],&borrowed_providers(&module)).unwrap();
-        module.define_function(id,&mut ctx).unwrap();
-        let bytes=module.finish().emit().unwrap();let object=object::File::parse(bytes.as_slice()).unwrap();
-        let imports:std::collections::BTreeSet<_>=object.symbols().filter(|s|s.is_undefined()).map(|s|s.name().unwrap().trim_start_matches('_').to_owned()).collect();
-        assert_eq!(imports,["experiment_gc_store_state_borrow","experiment_gc_store_borrowed","frame_enter","frame_leave"].into_iter().map(str::to_owned).collect());
-        if triple==target() { if let Some(path)=std::env::var_os("NEOCLR_BORROWED_STORE_OBJECT") { std::fs::write(path,bytes).unwrap(); } }
+    for triple in ["aarch64-apple-darwin", "x86_64-pc-windows-msvc"] {
+        let mut module = ObjectModule::new(
+            ObjectBuilder::new(
+                isa(triple, true),
+                "borrow-object",
+                cranelift_module::default_libcall_names(),
+            )
+            .unwrap(),
+        );
+        let (id, mut ctx, context, frame, _, ready) = framed_function(&mut module, false);
+        lower_impl(&mut module, &mut ctx.func, context, Some(ready), true).unwrap();
+        finish_native_frame(&mut module, &mut ctx.func, frame);
+        assert!(
+            crate::mutation_admission::check_call_closure(
+                &module,
+                &[(id, &ctx.func)],
+                &live_providers(&module)
+            )
+            .is_err()
+        );
+        crate::mutation_admission::check_call_closure(
+            &module,
+            &[(id, &ctx.func)],
+            &borrowed_providers(&module),
+        )
+        .unwrap();
+        module.define_function(id, &mut ctx).unwrap();
+        let bytes = module.finish().emit().unwrap();
+        let object = object::File::parse(bytes.as_slice()).unwrap();
+        let imports: std::collections::BTreeSet<_> = object
+            .symbols()
+            .filter(|s| s.is_undefined())
+            .map(|s| s.name().unwrap().trim_start_matches('_').to_owned())
+            .collect();
+        assert_eq!(
+            imports,
+            [
+                "experiment_gc_store_state_borrow",
+                "experiment_gc_store_borrowed",
+                "frame_enter",
+                "frame_leave"
+            ]
+            .into_iter()
+            .map(str::to_owned)
+            .collect()
+        );
+        if triple == target() {
+            if let Some(path) = std::env::var_os("NEOCLR_BORROWED_STORE_OBJECT") {
+                std::fs::write(path, bytes).unwrap();
+            }
+        }
     }
 }
 
@@ -2557,7 +3905,11 @@ fn conflicting_join_edge_cannot_regain_stack_proof() {
         let join = func.dfg.make_block();
         func.layout.append_block(join);
         let parameter = func.dfg.append_block_param(join, types::I64);
-        let slot = func.create_sized_stack_slot(ir::StackSlotData::new(ir::StackSlotKind::ExplicitSlot, 32, 3));
+        let slot = func.create_sized_stack_slot(ir::StackSlotData::new(
+            ir::StackSlotKind::ExplicitSlot,
+            32,
+            3,
+        ));
         let mut cursor = FuncCursor::new(&mut func);
         cursor.goto_bottom(entry);
         let anchor = cursor.ins().stack_addr(types::I64, slot, 0);
@@ -2566,7 +3918,11 @@ fn conflicting_join_edge_cannot_regain_stack_proof() {
         // The read-only edge collector must retain conflict independently of
         // traversal order. Unreachable predecessors still count conservatively.
         cursor.ins().jump(join, &[anchor.into()]);
-        for value in if conflict_first { [other, equivalent] } else { [equivalent, other] } {
+        for value in if conflict_first {
+            [other, equivalent]
+        } else {
+            [equivalent, other]
+        } {
             let block = cursor.func.dfg.make_block();
             cursor.func.layout.append_block(block);
             cursor.goto_bottom(block);
@@ -2583,6 +3939,9 @@ fn mutable_byref_bindings_rejected_before_codegen() {
         include_str!("../../../benchmarks/execution/concurrent-store/byref-aliased.neoil"),
     ] {
         let error = neoclr::assemble(source).unwrap_err();
-        assert_eq!(error.message, "cannot rebind or take the address of a managed reference parameter");
+        assert_eq!(
+            error.message,
+            "cannot rebind or take the address of a managed reference parameter"
+        );
     }
 }

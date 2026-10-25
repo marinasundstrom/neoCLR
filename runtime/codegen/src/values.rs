@@ -462,10 +462,20 @@ pub(crate) fn compile_into(
     } else {
         crate::mutation_admission::StackPolicy::DISABLED
     };
-    if live_stores && !details.is_some_and(|d| d.native_gc && d.probe_stack_roots
-        && d.reference_arena && !d.native_worker_safepoints && !d.native_host_bootstrap
-        && (!d.entry_host_io || !d.entry_task_drain.is_empty()) && (d.entry_task_drain.is_empty()
-            || (d.task_queue_drain.is_some() && (!d.runtime_async_start.is_empty() || !d.runtime_async_startmanaged.is_empty())))) {
+    if live_stores
+        && !details.is_some_and(|d| {
+            d.native_gc
+                && d.probe_stack_roots
+                && d.reference_arena
+                && !d.native_worker_safepoints
+                && !d.native_host_bootstrap
+                && (!d.entry_host_io || !d.entry_task_drain.is_empty())
+                && (d.entry_task_drain.is_empty()
+                    || (d.task_queue_drain.is_some()
+                        && (!d.runtime_async_start.is_empty()
+                            || !d.runtime_async_startmanaged.is_empty())))
+        })
+    {
         return Err("experimental live stores require owned published frames without host bootstrap/services".into());
     }
     if details.is_some_and(|d| !d.native_gc && !d.string_intern.is_empty()) {
@@ -510,50 +520,108 @@ pub(crate) fn compile_into(
     p.boxed_interfaces = details
         .map(|d| d.boxed_interfaces.clone())
         .unwrap_or_default();
-    let unaudited: Vec<_> = input.functions.iter().enumerate().filter(|&(i, f)| {
-        if !live_stores { return false; }
-        // Ordinary reference dispatch forwards to already checked generated bodies.
-        // Display/value intrinsics and boxed byref adaptation need separate qualification.
-        let reference_dispatch = p.dispatch.get(&i).is_some_and(|targets|
-            targets.iter().all(|&(_, target)| !input.functions[target].receiver_byref
-                && !details.is_some_and(|d| d.primitive_receivers.contains(&target)))
-            && !details.is_some_and(|d| d.object_display.contains_key(&i)
-                || d.object_value_kinds.contains_key(&i) || d.string_dispatch.contains_key(&i)));
-        let primitive_box = details.is_some_and(|d|
-            d.int32_boxes.contains_key(&i) || d.boolean_boxes.contains_key(&i)
-            || d.scalar_box_queries.get(&i).is_some_and(|(tag, _)| tag.is_some_and(|tag|
-                d.int32_boxes.values().chain(d.boolean_boxes.values()).any(|&known| known == tag))));
-        let admitted = reference_dispatch || primitive_box || details.is_some_and(|d|
-            d.object_type_queries.contains_key(&i) || d.int32_to_string.contains(&i) || d.int64_to_string.contains(&i)
-            || d.uint64_to_string.contains(&i) || d.tls.contains_key(&i)
-            || d.string_intern.contains(&i) || d.string_compare_ordinal.contains(&i) || d.console_write_line.contains(&i)
-            || d.utf8_encode.contains(&i) || d.utf8_decode.contains(&i) || d.utf8_decode_slice.contains(&i)
-            || d.string_concat.contains(&i) || d.string_byte_count.contains(&i)
-            || d.string_compare_canonical.contains(&i) || d.string_compare_ignore_case.contains(&i)
-            || d.string_starts_with_ordinal.contains(&i) || d.string_slice_utf8.contains(&i)
-            || d.byte_memory_create.contains(&i) || d.byte_memory_slice.contains(&i)
-            || d.byte_memory_length.contains(&i) || d.byte_view_get.contains(&i)
-            || d.memory_view_bounds_fault.contains(&i) || d.byte_memory_readonly.contains(&i)
-            || d.byte_view_set.contains(&i) || d.byte_view_utf8.contains(&i)
-            || d.runtime_async_create.contains(&i) || d.runtime_async_start.contains(&i)
-            || d.runtime_async_createowned.contains(&i) || d.runtime_async_currentowner.contains(&i)
-            || d.runtime_async_startmanaged.contains(&i) || d.entry_task_drain.contains(&i)
-            || d.runtime_async_completeunit.contains(&i)
-            || d.runtime_async_awaitunit.contains(&i) || d.runtime_async_release.contains(&i)
-            || d.runtime_async_iscompleted.contains(&i) || d.runtime_async_waitcompletion.contains(&i)
-            || d.task_queue_register.contains(&i) || d.task_queue_default.contains(&i)
-            || d.task_queue_current.contains(&i) || d.task_schedule.contains(&i) || d.timer_start.contains(&i) || d.timer_cancel.contains(&i)
-            || d.socket_listen.contains(&i) || d.socket_local_port.contains(&i)
-            || d.socket_close.contains(&i) || d.socket_accept.contains(&i)
-            || d.socket_connect_result.contains(&i) || d.socket_cancel.contains(&i)
-            || d.socket_deadline_after.contains(&i) || d.socket_deadline_expired.contains(&i)
-            || d.socket_receive.contains(&i) || d.socket_send.contains(&i)
-            || d.socket_transfer_result.contains(&i) || d.socket_receive_until.contains(&i)
-            || d.socket_send_until.contains(&i));
-        f.pinvoke.is_some() || ((f.is_internal_call() || gc_points::native_body(&p, i, details)) && !admitted)
-    }).map(|(index, function)| format!("function {index} ({})", function.name)).collect();
+    let unaudited: Vec<_> = input
+        .functions
+        .iter()
+        .enumerate()
+        .filter(|&(i, f)| {
+            if !live_stores {
+                return false;
+            }
+            // Ordinary reference dispatch forwards to already checked generated bodies.
+            // Display/value intrinsics and boxed byref adaptation need separate qualification.
+            let reference_dispatch = p.dispatch.get(&i).is_some_and(|targets| {
+                targets.iter().all(|&(_, target)| {
+                    !input.functions[target].receiver_byref
+                        && !details.is_some_and(|d| d.primitive_receivers.contains(&target))
+                }) && !details.is_some_and(|d| {
+                    d.object_display.contains_key(&i)
+                        || d.object_value_kinds.contains_key(&i)
+                        || d.string_dispatch.contains_key(&i)
+                })
+            });
+            let primitive_box = details.is_some_and(|d| {
+                d.int32_boxes.contains_key(&i)
+                    || d.boolean_boxes.contains_key(&i)
+                    || d.scalar_box_queries.get(&i).is_some_and(|(tag, _)| {
+                        tag.is_some_and(|tag| {
+                            d.int32_boxes
+                                .values()
+                                .chain(d.boolean_boxes.values())
+                                .any(|&known| known == tag)
+                        })
+                    })
+            });
+            let admitted = reference_dispatch
+                || primitive_box
+                || details.is_some_and(|d| {
+                    d.object_type_queries.contains_key(&i)
+                        || d.int32_to_string.contains(&i)
+                        || d.int64_to_string.contains(&i)
+                        || d.uint64_to_string.contains(&i)
+                        || d.tls.contains_key(&i)
+                        || d.string_intern.contains(&i)
+                        || d.string_compare_ordinal.contains(&i)
+                        || d.console_write_line.contains(&i)
+                        || d.utf8_encode.contains(&i)
+                        || d.utf8_decode.contains(&i)
+                        || d.utf8_decode_slice.contains(&i)
+                        || d.string_concat.contains(&i)
+                        || d.string_byte_count.contains(&i)
+                        || d.string_compare_canonical.contains(&i)
+                        || d.string_compare_ignore_case.contains(&i)
+                        || d.string_starts_with_ordinal.contains(&i)
+                        || d.string_slice_utf8.contains(&i)
+                        || d.byte_memory_create.contains(&i)
+                        || d.byte_memory_slice.contains(&i)
+                        || d.byte_memory_length.contains(&i)
+                        || d.byte_view_get.contains(&i)
+                        || d.memory_view_bounds_fault.contains(&i)
+                        || d.byte_memory_readonly.contains(&i)
+                        || d.byte_view_set.contains(&i)
+                        || d.byte_view_utf8.contains(&i)
+                        || d.runtime_async_create.contains(&i)
+                        || d.runtime_async_start.contains(&i)
+                        || d.runtime_async_createowned.contains(&i)
+                        || d.runtime_async_currentowner.contains(&i)
+                        || d.runtime_async_startmanaged.contains(&i)
+                        || d.entry_task_drain.contains(&i)
+                        || d.runtime_async_completeunit.contains(&i)
+                        || d.runtime_async_awaitunit.contains(&i)
+                        || d.runtime_async_release.contains(&i)
+                        || d.runtime_async_iscompleted.contains(&i)
+                        || d.runtime_async_waitcompletion.contains(&i)
+                        || d.task_queue_register.contains(&i)
+                        || d.task_queue_default.contains(&i)
+                        || d.task_queue_current.contains(&i)
+                        || d.task_schedule.contains(&i)
+                        || d.timer_start.contains(&i)
+                        || d.timer_cancel.contains(&i)
+                        || d.socket_listen.contains(&i)
+                        || d.socket_local_port.contains(&i)
+                        || d.socket_close.contains(&i)
+                        || d.socket_accept.contains(&i)
+                        || d.socket_connect_result.contains(&i)
+                        || d.socket_cancel.contains(&i)
+                        || d.socket_deadline_after.contains(&i)
+                        || d.socket_deadline_expired.contains(&i)
+                        || d.socket_receive.contains(&i)
+                        || d.socket_send.contains(&i)
+                        || d.socket_transfer_result.contains(&i)
+                        || d.socket_receive_until.contains(&i)
+                        || d.socket_send_until.contains(&i)
+                });
+            f.pinvoke.is_some()
+                || ((f.is_internal_call() || gc_points::native_body(&p, i, details)) && !admitted)
+        })
+        .map(|(index, function)| format!("function {index} ({})", function.name))
+        .collect();
     if !unaudited.is_empty() {
-        return Err(format!("experimental live stores reject unaudited native replacement bodies: {}", unaudited.join(", ")).into());
+        return Err(format!(
+            "experimental live stores reject unaudited native replacement bodies: {}",
+            unaudited.join(", ")
+        )
+        .into());
     }
     let bootstrap = details.is_some_and(|d| d.native_host_bootstrap);
     if bootstrap && !details.is_some_and(|d| d.native_gc) {
@@ -561,7 +629,9 @@ pub(crate) fn compile_into(
     }
     let root = p.root(root, bootstrap)?;
     let entry_arguments = p.args[root] == [Ty::StringArray];
-    if live_stores && entry_arguments { return Err("live stores do not admit process-argument providers".into()); }
+    if live_stores && entry_arguments {
+        return Err("live stores do not admit process-argument providers".into());
+    }
     if entry_arguments && !details.is_some_and(|d| d.native_gc) {
         return Err("String[] entry requires native GC and a process argument host".into());
     }
@@ -917,8 +987,11 @@ pub(crate) fn compile_into(
             }
         }
     }
-    let entry_drain_services = if details.is_some_and(|d| !d.entry_task_drain.is_empty()
-        && (!live_stores || (d.runtime_async_start.is_empty() && d.runtime_async_startmanaged.is_empty()))) {
+    let entry_drain_services = if details.is_some_and(|d| {
+        !d.entry_task_drain.is_empty()
+            && (!live_stores
+                || (d.runtime_async_start.is_empty() && d.runtime_async_startmanaged.is_empty()))
+    }) {
         let mut sig = module.make_signature();
         sig.params.extend(
             [types::I64, types::I32, types::I32, types::I32, types::I64].map(AbiParam::new),
@@ -2031,7 +2104,11 @@ pub(crate) fn compile_into(
         static_service,
         stack_budget,
         long_range_calls,
-        if live_stores { Some(&mut live_bodies) } else { None },
+        if live_stores {
+            Some(&mut live_bodies)
+        } else {
+            None
+        },
     )?;
     if details.is_some_and(|d| d.native_worker_safepoints) && !initialization_guards.is_empty() {
         return Err("worker safepoints do not yet support type initializers".into());
@@ -2126,9 +2203,19 @@ pub(crate) fn compile_into(
                 b.seal_all_blocks();
                 b.finalize();
                 finish_value_body(
-                    module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
-                    mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
-                    stack_budget, long_range_calls,
+                    module,
+                    ids[i],
+                    &mut context,
+                    root_probes.as_ref(),
+                    probe_frame,
+                    mutation_frame_ready,
+                    if live_stores {
+                        Some(&mut live_bodies)
+                    } else {
+                        None
+                    },
+                    stack_budget,
+                    long_range_calls,
                 )?;
                 continue;
             }
@@ -2328,9 +2415,19 @@ pub(crate) fn compile_into(
                 b.seal_all_blocks();
                 b.finalize();
                 finish_value_body(
-                    module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
-                    mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
-                    stack_budget, long_range_calls,
+                    module,
+                    ids[i],
+                    &mut context,
+                    root_probes.as_ref(),
+                    probe_frame,
+                    mutation_frame_ready,
+                    if live_stores {
+                        Some(&mut live_bodies)
+                    } else {
+                        None
+                    },
+                    stack_budget,
+                    long_range_calls,
                 )?;
                 continue;
             }
@@ -2426,9 +2523,19 @@ pub(crate) fn compile_into(
                 b.seal_all_blocks();
                 b.finalize();
                 finish_value_body(
-                    module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
-                    mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
-                    stack_budget, long_range_calls,
+                    module,
+                    ids[i],
+                    &mut context,
+                    root_probes.as_ref(),
+                    probe_frame,
+                    mutation_frame_ready,
+                    if live_stores {
+                        Some(&mut live_bodies)
+                    } else {
+                        None
+                    },
+                    stack_budget,
+                    long_range_calls,
                 )?;
                 continue;
             }
@@ -2503,9 +2610,19 @@ pub(crate) fn compile_into(
                 b.seal_all_blocks();
                 b.finalize();
                 finish_value_body(
-                    module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
-                    mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
-                    stack_budget, long_range_calls,
+                    module,
+                    ids[i],
+                    &mut context,
+                    root_probes.as_ref(),
+                    probe_frame,
+                    mutation_frame_ready,
+                    if live_stores {
+                        Some(&mut live_bodies)
+                    } else {
+                        None
+                    },
+                    stack_budget,
+                    long_range_calls,
                 )?;
                 continue;
             }
@@ -2577,9 +2694,19 @@ pub(crate) fn compile_into(
                 b.seal_all_blocks();
                 b.finalize();
                 finish_value_body(
-                    module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
-                    mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
-                    stack_budget, long_range_calls,
+                    module,
+                    ids[i],
+                    &mut context,
+                    root_probes.as_ref(),
+                    probe_frame,
+                    mutation_frame_ready,
+                    if live_stores {
+                        Some(&mut live_bodies)
+                    } else {
+                        None
+                    },
+                    stack_budget,
+                    long_range_calls,
                 )?;
                 continue;
             }
@@ -3127,9 +3254,19 @@ pub(crate) fn compile_into(
                 b.seal_all_blocks();
                 b.finalize();
                 finish_value_body(
-                    module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
-                    mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
-                    stack_budget, long_range_calls,
+                    module,
+                    ids[i],
+                    &mut context,
+                    root_probes.as_ref(),
+                    probe_frame,
+                    mutation_frame_ready,
+                    if live_stores {
+                        Some(&mut live_bodies)
+                    } else {
+                        None
+                    },
+                    stack_budget,
+                    long_range_calls,
                 )?;
                 continue;
             }
@@ -3161,9 +3298,19 @@ pub(crate) fn compile_into(
                 b.seal_all_blocks();
                 b.finalize();
                 finish_value_body(
-                    module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
-                    mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
-                    stack_budget, long_range_calls,
+                    module,
+                    ids[i],
+                    &mut context,
+                    root_probes.as_ref(),
+                    probe_frame,
+                    mutation_frame_ready,
+                    if live_stores {
+                        Some(&mut live_bodies)
+                    } else {
+                        None
+                    },
+                    stack_budget,
+                    long_range_calls,
                 )?;
                 continue;
             }
@@ -3259,9 +3406,19 @@ pub(crate) fn compile_into(
                 b.seal_all_blocks();
                 b.finalize();
                 finish_value_body(
-                    module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
-                    mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
-                    stack_budget, long_range_calls,
+                    module,
+                    ids[i],
+                    &mut context,
+                    root_probes.as_ref(),
+                    probe_frame,
+                    mutation_frame_ready,
+                    if live_stores {
+                        Some(&mut live_bodies)
+                    } else {
+                        None
+                    },
+                    stack_budget,
+                    long_range_calls,
                 )?;
                 continue;
             }
@@ -3346,9 +3503,19 @@ pub(crate) fn compile_into(
                 b.seal_all_blocks();
                 b.finalize();
                 finish_value_body(
-                    module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
-                    mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
-                    stack_budget, long_range_calls,
+                    module,
+                    ids[i],
+                    &mut context,
+                    root_probes.as_ref(),
+                    probe_frame,
+                    mutation_frame_ready,
+                    if live_stores {
+                        Some(&mut live_bodies)
+                    } else {
+                        None
+                    },
+                    stack_budget,
+                    long_range_calls,
                 )?;
                 continue;
             }
@@ -3398,9 +3565,19 @@ pub(crate) fn compile_into(
                 b.seal_all_blocks();
                 b.finalize();
                 finish_value_body(
-                    module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
-                    mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
-                    stack_budget, long_range_calls,
+                    module,
+                    ids[i],
+                    &mut context,
+                    root_probes.as_ref(),
+                    probe_frame,
+                    mutation_frame_ready,
+                    if live_stores {
+                        Some(&mut live_bodies)
+                    } else {
+                        None
+                    },
+                    stack_budget,
+                    long_range_calls,
                 )?;
                 continue;
             }
@@ -3409,7 +3586,9 @@ pub(crate) fn compile_into(
                 let output = if live_stores {
                     let scratch = slot(&mut b, 4);
                     b.ins().stack_addr(types::I64, scratch, 0)
-                } else { output };
+                } else {
+                    output
+                };
                 let service = module.declare_func_in_func(tls_service.unwrap(), b.func);
                 let op = b.ins().iconst(types::I32, i64::from(*operation));
                 let null = b.ins().iconst(types::I64, 0);
@@ -3446,9 +3625,19 @@ pub(crate) fn compile_into(
                 b.seal_all_blocks();
                 b.finalize();
                 finish_value_body(
-                    module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
-                    mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
-                    stack_budget, long_range_calls,
+                    module,
+                    ids[i],
+                    &mut context,
+                    root_probes.as_ref(),
+                    probe_frame,
+                    mutation_frame_ready,
+                    if live_stores {
+                        Some(&mut live_bodies)
+                    } else {
+                        None
+                    },
+                    stack_budget,
+                    long_range_calls,
                 )?;
                 continue;
             }
@@ -3545,9 +3734,19 @@ pub(crate) fn compile_into(
                 b.seal_all_blocks();
                 b.finalize();
                 finish_value_body(
-                    module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
-                    mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
-                    stack_budget, long_range_calls,
+                    module,
+                    ids[i],
+                    &mut context,
+                    root_probes.as_ref(),
+                    probe_frame,
+                    mutation_frame_ready,
+                    if live_stores {
+                        Some(&mut live_bodies)
+                    } else {
+                        None
+                    },
+                    stack_budget,
+                    long_range_calls,
                 )?;
                 continue;
             }
@@ -3572,9 +3771,19 @@ pub(crate) fn compile_into(
                 b.seal_all_blocks();
                 b.finalize();
                 finish_value_body(
-                    module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
-                    mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
-                    stack_budget, long_range_calls,
+                    module,
+                    ids[i],
+                    &mut context,
+                    root_probes.as_ref(),
+                    probe_frame,
+                    mutation_frame_ready,
+                    if live_stores {
+                        Some(&mut live_bodies)
+                    } else {
+                        None
+                    },
+                    stack_budget,
+                    long_range_calls,
                 )?;
                 continue;
             }
@@ -3600,9 +3809,19 @@ pub(crate) fn compile_into(
                 b.seal_all_blocks();
                 b.finalize();
                 finish_value_body(
-                    module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
-                    mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
-                    stack_budget, long_range_calls,
+                    module,
+                    ids[i],
+                    &mut context,
+                    root_probes.as_ref(),
+                    probe_frame,
+                    mutation_frame_ready,
+                    if live_stores {
+                        Some(&mut live_bodies)
+                    } else {
+                        None
+                    },
+                    stack_budget,
+                    long_range_calls,
                 )?;
                 continue;
             }
@@ -3644,9 +3863,19 @@ pub(crate) fn compile_into(
                 b.seal_all_blocks();
                 b.finalize();
                 finish_value_body(
-                    module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
-                    mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
-                    stack_budget, long_range_calls,
+                    module,
+                    ids[i],
+                    &mut context,
+                    root_probes.as_ref(),
+                    probe_frame,
+                    mutation_frame_ready,
+                    if live_stores {
+                        Some(&mut live_bodies)
+                    } else {
+                        None
+                    },
+                    stack_budget,
+                    long_range_calls,
                 )?;
                 continue;
             }
@@ -3695,9 +3924,19 @@ pub(crate) fn compile_into(
                 b.seal_all_blocks();
                 b.finalize();
                 finish_value_body(
-                    module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
-                    mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
-                    stack_budget, long_range_calls,
+                    module,
+                    ids[i],
+                    &mut context,
+                    root_probes.as_ref(),
+                    probe_frame,
+                    mutation_frame_ready,
+                    if live_stores {
+                        Some(&mut live_bodies)
+                    } else {
+                        None
+                    },
+                    stack_budget,
+                    long_range_calls,
                 )?;
                 continue;
             }
@@ -3708,9 +3947,19 @@ pub(crate) fn compile_into(
                 b.seal_all_blocks();
                 b.finalize();
                 finish_value_body(
-                    module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
-                    mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
-                    stack_budget, long_range_calls,
+                    module,
+                    ids[i],
+                    &mut context,
+                    root_probes.as_ref(),
+                    probe_frame,
+                    mutation_frame_ready,
+                    if live_stores {
+                        Some(&mut live_bodies)
+                    } else {
+                        None
+                    },
+                    stack_budget,
+                    long_range_calls,
                 )?;
                 continue;
             }
@@ -3860,9 +4109,19 @@ pub(crate) fn compile_into(
                 b.seal_all_blocks();
                 b.finalize();
                 finish_value_body(
-                    module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
-                    mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
-                    stack_budget, long_range_calls,
+                    module,
+                    ids[i],
+                    &mut context,
+                    root_probes.as_ref(),
+                    probe_frame,
+                    mutation_frame_ready,
+                    if live_stores {
+                        Some(&mut live_bodies)
+                    } else {
+                        None
+                    },
+                    stack_budget,
+                    long_range_calls,
                 )?;
                 continue;
             }
@@ -3927,9 +4186,19 @@ pub(crate) fn compile_into(
                 b.seal_all_blocks();
                 b.finalize();
                 finish_value_body(
-                    module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
-                    mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
-                    stack_budget, long_range_calls,
+                    module,
+                    ids[i],
+                    &mut context,
+                    root_probes.as_ref(),
+                    probe_frame,
+                    mutation_frame_ready,
+                    if live_stores {
+                        Some(&mut live_bodies)
+                    } else {
+                        None
+                    },
+                    stack_budget,
+                    long_range_calls,
                 )?;
                 continue;
             }
@@ -3940,7 +4209,8 @@ pub(crate) fn compile_into(
             let mut at = 0;
             let preserve_byrefs = live_stores && stack_policy.preserve_byrefs;
             for (argument_index, t) in p.args[i].iter().enumerate() {
-                let stable = preserve_byrefs && matches!(t, Ty::Address(_))
+                let stable = preserve_byrefs
+                    && matches!(t, Ty::Address(_))
                     && immutable_argument_binding(&f.body, argument_index);
                 stable_byrefs.push(stable.then(|| parameters[at]));
                 let s = slot(&mut b, p.bytes(t));
@@ -4935,18 +5205,22 @@ pub(crate) fn compile_into(
                                 );
                                 signature.returns.push(AbiParam::new(types::I32));
                                 let helper = module.declare_function(
-                                    "experiment_gc_store_record", Linkage::Import, &signature,
+                                    "experiment_gc_store_record",
+                                    Linkage::Import,
+                                    &signature,
                                 )?;
                                 let helper = module.declare_func_in_func(helper, b.func);
                                 let ordinal = b.ins().ireduce(types::I32, index);
                                 let lanes = b.ins().iconst(types::I32, width as i64);
-                                let call = b.ins().call(helper, &[
-                                    fault_context.unwrap(), array, ordinal, source, lanes,
-                                ]);
+                                let call = b.ins().call(
+                                    helper,
+                                    &[fault_context.unwrap(), array, ordinal, source, lanes],
+                                );
                                 let status = b.inst_results(call)[0];
                                 let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
                                 return_if_detailed(&mut b, failed, status, site.as_ref());
-                            } else if live_stores && crate::selection::scalar_array_element(t)
+                            } else if live_stores
+                                && crate::selection::scalar_array_element(t)
                                 && crate::mutation_admission::scalar_array_stores_enabled()
                             {
                                 // Retain the typed primitive-storage contract before generic
@@ -4965,13 +5239,16 @@ pub(crate) fn compile_into(
                                 );
                                 signature.returns.push(AbiParam::new(types::I32));
                                 let helper = module.declare_function(
-                                    "experiment_gc_store_scalar", Linkage::Import, &signature,
+                                    "experiment_gc_store_scalar",
+                                    Linkage::Import,
+                                    &signature,
                                 )?;
                                 let helper = module.declare_func_in_func(helper, b.func);
                                 let ordinal = b.ins().ireduce(types::I32, index);
-                                let call = b.ins().call(helper, &[
-                                    fault_context.unwrap(), array, ordinal, source,
-                                ]);
+                                let call = b.ins().call(
+                                    helper,
+                                    &[fault_context.unwrap(), array, ordinal, source],
+                                );
                                 let status = b.inst_results(call)[0];
                                 let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
                                 return_if_detailed(&mut b, failed, status, site.as_ref());
@@ -5024,12 +5301,15 @@ pub(crate) fn compile_into(
                             );
                             signature.returns.push(AbiParam::new(types::I32));
                             let helper = module.declare_function(
-                                "experiment_gc_store_text", Linkage::Import, &signature,
+                                "experiment_gc_store_text",
+                                Linkage::Import,
+                                &signature,
                             )?;
                             let helper = module.declare_func_in_func(helper, b.func);
-                            let call = b.ins().call(helper, &[
-                                fault_context.unwrap(), array, index, value.unwrap(),
-                            ]);
+                            let call = b.ins().call(
+                                helper,
+                                &[fault_context.unwrap(), array, index, value.unwrap()],
+                            );
                             let status = b.inst_results(call)[0];
                             let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
                             return_if_detailed(&mut b, failed, status, site.as_ref());
@@ -5617,9 +5897,19 @@ pub(crate) fn compile_into(
             b.finalize();
         }
         finish_value_body(
-            module, ids[i], &mut context, root_probes.as_ref(), probe_frame,
-            mutation_frame_ready, if live_stores { Some(&mut live_bodies) } else { None },
-            stack_budget, long_range_calls,
+            module,
+            ids[i],
+            &mut context,
+            root_probes.as_ref(),
+            probe_frame,
+            mutation_frame_ready,
+            if live_stores {
+                Some(&mut live_bodies)
+            } else {
+                None
+            },
+            stack_budget,
+            long_range_calls,
         )?;
     }
     if live_stores {
@@ -5631,7 +5921,15 @@ pub(crate) fn compile_into(
         let mut signature = module.make_signature();
         signature.params.push(AbiParam::new(types::I64));
         signature.returns.push(AbiParam::new(types::I32));
-        Some(module.declare_function(if live_stores { "experiment_gc_prepare_entry_v1" } else { "neoclr_gc_entry_check_v1" }, Linkage::Import, &signature)?)
+        Some(module.declare_function(
+            if live_stores {
+                "experiment_gc_prepare_entry_v1"
+            } else {
+                "neoclr_gc_entry_check_v1"
+            },
+            Linkage::Import,
+            &signature,
+        )?)
     } else {
         None
     };
@@ -5864,7 +6162,11 @@ pub(crate) fn compile_into(
         b.finalize();
     }
     if live_stores {
-        let entry = context.func.layout.entry_block().ok_or("missing public entry")?;
+        let entry = context
+            .func
+            .layout
+            .entry_block()
+            .ok_or("missing public entry")?;
         let owner_context = context.func.dfg.block_params(entry)[2];
         crate::mutation_store::lower(module, &mut context.func, owner_context)?;
         live_bodies.push((export, context));
@@ -5884,7 +6186,11 @@ pub(crate) fn compile_into(
             diagnostic_data.as_ref(),
             false,
             long_range_calls,
-            if live_stores { Some(&mut live_bodies) } else { None },
+            if live_stores {
+                Some(&mut live_bodies)
+            } else {
+                None
+            },
         )?;
         if entry_drain_services.is_some() {
             compile_host_callbacks(
@@ -5906,27 +6212,48 @@ pub(crate) fn compile_into(
                 stack_check,
                 diagnostic_data.as_ref().unwrap(),
                 long_range_calls,
-                if live_stores { Some(&mut live_bodies) } else { None },
+                if live_stores {
+                    Some(&mut live_bodies)
+                } else {
+                    None
+                },
             )?;
         }
     }
     if live_stores {
-        let bodies: Vec<_> = live_bodies.iter().map(|(id, ctx)| (*id, &ctx.func)).collect();
+        let bodies: Vec<_> = live_bodies
+            .iter()
+            .map(|(id, ctx)| (*id, &ctx.func))
+            .collect();
         crate::mutation_admission::check_call_closure(
-            module, &bodies, &crate::mutation_admission::root_providers(module),
+            module,
+            &bodies,
+            &crate::mutation_admission::root_providers(module),
         )?;
         #[cfg(test)]
         if let Ok(path) = std::env::var("NEOCLR_LIVE_STACK_ARGUMENT_AUDIT") {
-            std::fs::write(path, serde_json::to_vec_pretty(&crate::mutation_store::stack_audit::report(module, &bodies))?)?;
+            std::fs::write(
+                path,
+                serde_json::to_vec_pretty(&crate::mutation_store::stack_audit::report(
+                    module, &bodies,
+                ))?,
+            )?;
         }
         if stack_policy.elide {
-            let _count = crate::mutation_store::stack_audit::elide(module, &mut live_bodies, stack_policy.forward)?;
+            let _count = crate::mutation_store::stack_audit::elide(
+                module,
+                &mut live_bodies,
+                stack_policy.forward,
+            )?;
             #[cfg(test)]
             eprintln!("live stack-argument elision: {_count} stores");
         }
         for (id, mut context) in live_bodies {
             define_checked(module, id, &mut context, stack_budget, long_range_calls)?;
-            if id == export && platform_target == super::Target::WindowsX64 && frame_charge(&context, true)? > 4096 {
+            if id == export
+                && platform_target == super::Target::WindowsX64
+                && frame_charge(&context, true)? > 4096
+            {
                 return Err("Windows stack experiment entry frame exceeds one page".into());
             }
         }
@@ -6057,12 +6384,22 @@ fn compile_host_callbacks(
     if let Some(bodies) = live_bodies {
         // Host ownership roots the descriptor/receiver until the managed callee
         // publishes its own frame. Reader/store hooks do not collect.
-        let entry = context.func.layout.entry_block().ok_or("missing callback entry")?;
+        let entry = context
+            .func
+            .layout
+            .entry_block()
+            .ok_or("missing callback entry")?;
         let owner_context = context.func.dfg.block_params(entry)[1];
         crate::mutation_store::lower(module, &mut context.func, owner_context)?;
         bodies.push((export, context));
     } else {
-        define_checked(module, export, &mut context, stack_check.is_some(), long_range_calls)?;
+        define_checked(
+            module,
+            export,
+            &mut context,
+            stack_check.is_some(),
+            long_range_calls,
+        )?;
     }
     Ok(())
 }
@@ -6185,13 +6522,23 @@ fn compile_host_queue(
     }
     if let Some(bodies) = live_bodies {
         // The scope's strong root retains the queue until Drain publishes its frame.
-        let entry = context.func.layout.entry_block().ok_or("missing queue entry")?;
+        let entry = context
+            .func
+            .layout
+            .entry_block()
+            .ok_or("missing queue entry")?;
         let owner_context = context.func.dfg.block_params(entry)[0];
         crate::mutation_store::lower(module, &mut context.func, owner_context)?;
         bodies.push((export, context));
         Ok(())
     } else {
-        define_checked(module, export, &mut context, stack_check.is_some(), long_range_calls)
+        define_checked(
+            module,
+            export,
+            &mut context,
+            stack_check.is_some(),
+            long_range_calls,
+        )
     }
 }
 
@@ -6533,8 +6880,10 @@ fn compile_initialization_guards(
 // Whole-body exclusion includes unreachable operations: this proof is deliberately
 // independent of CFG simplification and never infers non-aliasing from execution.
 fn immutable_argument_binding(body: &[Op], argument: usize) -> bool {
-    !body.iter().any(|op| matches!(op,
-        Op::StoreArg(n) | Op::ArgumentAddress(n) if *n == argument))
+    !body.iter().any(|op| {
+        matches!(op,
+        Op::StoreArg(n) | Op::ArgumentAddress(n) if *n == argument)
+    })
 }
 
 #[cfg(test)]
@@ -6543,8 +6892,17 @@ mod stable_byref_tests {
     #[test]
     fn mutable_or_addressed_argument_bindings_are_never_cached() {
         assert!(immutable_argument_binding(&[Op::Arg(0)], 0));
-        assert!(!immutable_argument_binding(&[Op::Arg(0), Op::StoreArg(0)], 0));
-        assert!(!immutable_argument_binding(&[Op::ArgumentAddress(0), Op::Arg(0)], 0));
-        assert!(immutable_argument_binding(&[Op::StoreArg(1), Op::ArgumentAddress(1)], 0));
+        assert!(!immutable_argument_binding(
+            &[Op::Arg(0), Op::StoreArg(0)],
+            0
+        ));
+        assert!(!immutable_argument_binding(
+            &[Op::ArgumentAddress(0), Op::Arg(0)],
+            0
+        ));
+        assert!(immutable_argument_binding(
+            &[Op::StoreArg(1), Op::ArgumentAddress(1)],
+            0
+        ));
     }
 }

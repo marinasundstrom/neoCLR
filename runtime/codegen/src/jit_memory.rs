@@ -14,7 +14,9 @@ pub(crate) fn new_module(builder: JITBuilder) -> JITModule {
                 Box::new(arena().expect("reserve experimental JIT arena"))
             } else if value == "fallback" {
                 Box::new(fallback::Fallback::new(
-                    arena().ok().map(|p| Box::new(p) as Box<dyn cranelift_jit::JITMemoryProvider>),
+                    arena()
+                        .ok()
+                        .map(|p| Box::new(p) as Box<dyn cranelift_jit::JITMemoryProvider>),
                     Box::new(cranelift_jit::SystemMemoryProvider::new()),
                 ))
             } else {
@@ -28,7 +30,10 @@ pub(crate) fn new_module(builder: JITBuilder) -> JITModule {
 }
 
 // Both placement policies retain the platform instruction-publication wrapper.
-fn new_with_provider(mut builder: JITBuilder, provider: Box<dyn cranelift_jit::JITMemoryProvider>) -> JITModule {
+fn new_with_provider(
+    mut builder: JITBuilder,
+    provider: Box<dyn cranelift_jit::JITMemoryProvider>,
+) -> JITModule {
     #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
     let provider = Box::new(apple::Memory::new(provider));
     builder.memory_provider(provider);
@@ -52,14 +57,19 @@ mod apple {
 
     impl Memory {
         pub(super) fn new(inner: Box<dyn JITMemoryProvider>) -> Self {
-            Self { inner, pending_code: Vec::new() }
+            Self {
+                inner,
+                pending_code: Vec::new(),
+            }
         }
     }
 
     impl JITMemoryProvider for Memory {
         fn allocate_readexec(&mut self, size: usize, align: u64) -> io::Result<*mut u8> {
             let address = self.inner.allocate_readexec(size, align)?;
-            if size != 0 { self.pending_code.push((address, size)); }
+            if size != 0 {
+                self.pending_code.push((address, size));
+            }
             Ok(address)
         }
 
@@ -140,7 +150,10 @@ mod apple {
                 assert_eq!(unsafe { next() }, value + 1);
                 assert_eq!(unsafe { writable.cast::<u64>().read() }, 99);
                 // No callable pointer is used after owner teardown.
-                unsafe { memory.free_memory(); memory.free_memory(); }
+                unsafe {
+                    memory.free_memory();
+                    memory.free_memory();
+                }
                 assert!(memory.pending_code.is_empty());
             }
         }
@@ -149,17 +162,25 @@ mod apple {
         fn arena_spill_keeps_published_code_and_static_data_alive() {
             for value in 0..64 {
                 let provider = super::super::fallback::Fallback::new(
-                    Some(Box::new(ArenaMemoryProvider::new_with_size(64 * 1024).unwrap())),
+                    Some(Box::new(
+                        ArenaMemoryProvider::new_with_size(64 * 1024).unwrap(),
+                    )),
                     Box::new(cranelift_jit::SystemMemoryProvider::new()),
                 );
                 let mut memory = Memory::new(Box::new(provider));
                 let first = memory.allocate_readexec(8, 4).unwrap();
                 let data = memory.allocate_readonly(8, 8).unwrap();
-                unsafe { write_return(first, value); data.cast::<u64>().write(73); }
+                unsafe {
+                    write_return(first, value);
+                    data.cast::<u64>().write(73);
+                }
                 memory.finalize(BranchProtection::None).unwrap();
                 let large = memory.allocate_readwrite(128 * 1024, 8).unwrap();
                 let second = memory.allocate_readexec(8, 4).unwrap();
-                unsafe { large.cast::<u64>().write(99); write_return(second, value + 1); }
+                unsafe {
+                    large.cast::<u64>().write(99);
+                    write_return(second, value + 1);
+                }
                 memory.finalize(BranchProtection::None).unwrap();
                 let call: unsafe extern "C" fn() -> u32 = unsafe { std::mem::transmute(first) };
                 let next: unsafe extern "C" fn() -> u32 = unsafe { std::mem::transmute(second) };
@@ -167,7 +188,10 @@ mod apple {
                 assert_eq!(unsafe { next() }, value + 1);
                 assert_eq!(unsafe { data.cast::<u64>().read() }, 73);
                 assert_eq!(unsafe { large.cast::<u64>().read() }, 99);
-                unsafe { memory.free_memory(); memory.free_memory(); }
+                unsafe {
+                    memory.free_memory();
+                    memory.free_memory();
+                }
                 assert!(memory.pending_code.is_empty());
             }
         }
@@ -185,5 +209,4 @@ mod apple {
             }
         }
     }
-
 }

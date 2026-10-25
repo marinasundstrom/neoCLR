@@ -95,7 +95,9 @@ impl Query {
             "neoCLR.Runtime.TypeGenericArguments" => {
                 (Self::GenericArguments, false, "System.Type[]")
             }
-            "neoCLR.Runtime.TypeBaseType" => (Self::BaseType, false, "System.Optional<System.Type>"),
+            "neoCLR.Runtime.TypeBaseType" => {
+                (Self::BaseType, false, "System.Optional<System.Type>")
+            }
             "neoCLR.Runtime.TypeElementType" => {
                 (Self::ElementType, false, "System.Optional<System.Type>")
             }

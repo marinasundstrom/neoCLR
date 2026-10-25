@@ -5,6 +5,12 @@ Preview 17 provides matching packages for **Windows x64** and **macOS on Apple s
 JIT is the default on both; interpreter execution remains available explicitly.
 AOT is a separate experimental publishing workflow for supported applications.
 
+**In preparation:** Preview 18 is being qualified for both platforms. It includes
+API migrations (`Optional<T>`, `Result.Failure`), HTTP/value improvements and runtime
+fixes. Synchronous GC remains the default; concurrent GC is still experimental.
+[Candidate scope and migration notes](https://github.com/marinasundstrom/neoCLR/blob/main/docs/next-preview-release-notes.md).
+The downloads below remain the published Preview 17 packages.
+
 ## 1. Install prerequisites
 
 Install the [.NET 11 SDK and .NET 10 SDK](https://dotnet.microsoft.com/download),

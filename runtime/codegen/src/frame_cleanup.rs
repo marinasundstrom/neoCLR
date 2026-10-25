@@ -1,6 +1,6 @@
 //! Shared return instrumentation for compiler-published GC frames.
 use cranelift_codegen::cursor::{Cursor, FuncCursor};
-use cranelift_codegen::ir::{self, types, InstBuilder, StackSlot};
+use cranelift_codegen::ir::{self, InstBuilder, StackSlot, types};
 use cranelift_module::{FuncId, Module};
 
 pub(crate) fn finish(

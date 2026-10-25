@@ -2989,3 +2989,12 @@ The legacy CLI scaffold does not project these development additions; the comple
 native snapshot is authoritative, as for other native-only APIs. No native public
 member is excluded. See the [HTTP contract](../docs/http-client-design.md#structured-media-types--development-2026-10-23)
 and [focused evidence](../docs/experiments/media-types/README.md).
+
+## Preview 18 preparation (2026-10-25)
+
+Regenerated the CLI reference from the current bridge and Raven neoCLR
+`ed1d08defe2778f965951747d5f48311ce3daf83`. The reference assembly/type inventory is
+unchanged; current internal HTTP connection/session implementation fingerprints
+are refreshed. `build-api-docs.py --check` passes. This repairs stale source
+fingerprints before release qualification; it does not add public persistent HTTP
+APIs or claim that the forthcoming SDK packages have passed their gates.

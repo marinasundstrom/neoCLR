@@ -1,7 +1,8 @@
-# Next preview — draft release notes
+# Preview 18 — candidate release notes
 
-Unreleased. Version, publication date and final artifact identities are not yet
-selected. The previous published release is [Preview 17](preview-17-release-notes.md).
+Unreleased candidate selected 2026-10-25: runtime `0.1.0-preview.18`, SDK/editor
+`0.1.18-neoclr.20261025.1`. Publication date and final artifact identities are not
+yet selected. The previous published release is [Preview 17](preview-17-release-notes.md).
 These notes describe the intended release scope; the
 [readiness record](validation/release-preparation-20261025/README.md) tracks what
 still needs integration or qualification.
@@ -44,7 +45,9 @@ releases unused compilation inputs before guest execution while retaining code a
 native-host ownership through cleanup. Memory effects vary and timing results are
 mixed; this is not presented as a throughput gain. A test-only JIT placement
 experiment also identifies a shared code/static-data cost, improving both collector
-paths; production memory policy and additional-platform qualification remain open. Explicit instruction-cache
+paths. Contiguous/fallback placement and the combined stack-bound/small-frame
+layout remain opt-in experiments for this candidate. Production memory policy
+and additional-platform qualification remain open. Explicit instruction-cache
 publication corrects intermittent macOS ARM64 JIT execution failures during code
 storage reuse, across ordinary and experimental concurrent paths.
 

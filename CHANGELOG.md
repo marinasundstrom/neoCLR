@@ -6,12 +6,23 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
-Release preparation is underway; version and publication date are not yet selected.
+Preview 18 candidate preparation is underway for macOS ARM64 and Windows x64;
+publication date and final assets remain pending.
 The theme is clearer platform contracts, more efficient HTTP/value handling, and
 stronger runtime execution. Synchronous GC remains the default; concurrent GC
 continues as an experimental native development path.
 
 ### 2026-10-25
+
+#### Release preparation
+
+- Select runtime `0.1.0-preview.18` and SDK/editor candidate
+  `0.1.18-neoclr.20261025.1`, reconciling the stale Cargo version. Begin fresh macOS
+  ARM64 and Windows x64 qualification with Raven neoCLR `ed1d08defe2778f965951747d5f48311ce3daf83`.
+  Freeze optimization scope, retain sync GC/default JIT placement, update candidate
+  docs and website preparation status, and keep Preview 17 download links until
+  new package acceptance. Refresh the matching API-reference fingerprints and apply
+  required Rust formatting before source qualification. This does not publish a release.
 
 #### Platform APIs and migration
 

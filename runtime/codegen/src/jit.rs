@@ -239,7 +239,10 @@ pub(super) fn prepare_managed(
 
 impl PreparedManaged {
     /// Consumes the owner; code and native libraries outlive synchronous cleanup.
-    pub(super) fn invoke(self, arguments: &[std::ffi::CString]) -> Result<serde_json::Value, Error> {
+    pub(super) fn invoke(
+        self,
+        arguments: &[std::ffi::CString],
+    ) -> Result<serde_json::Value, Error> {
         // The Windows AOT argument helper consumes UTF-16; other hosts consume UTF-8.
         // Keep backing storage alive through the synchronous host invocation.
         #[cfg(windows)]

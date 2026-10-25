@@ -1,8 +1,23 @@
 # Next-preview preparation — 2026-10-25
 
-Status: author-directed preparation, not a frozen or qualified release candidate.
-Latest published baseline: [Preview 17](../release-20261023/README.md). Version,
-publication date, source/compiler pins and final artifact hashes remain unset.
+Status: Preview 18 candidate preparation commenced by author direction, 2026-10-25.
+Latest published baseline: [Preview 17](../release-20261023/README.md).
+Runtime version: `0.1.0-preview.18`; SDK/editor: `0.1.18-neoclr.20261025.1`.
+Raven `codex/neoclr`: `ed1d08defe2778f965951747d5f48311ce3daf83` (clean,
+already on the remote branch). Exact neoCLR qualification revisions and workflow
+runs will be recorded as they start. Publication date and artifact hashes remain
+pending. This is not package acceptance or publication.
+
+## Scope freeze
+
+The author asked to wrap up optimization and commence macOS/Windows release
+procedure. Stop adding optimization experiments during qualification. Keep sync GC
+and production JIT memory placement as defaults. Grouped stack bounds, split-frame
+validation and contiguous/fallback placement remain opt-in; the last composition
+study is retained as development evidence rather than newly enabled release behavior.
+Concurrent native GC remains private qualification tooling. Package current public
+API/value/HTTP changes and integrated runtime fixes with a matching compiler.
+Published Preview 17 downloads stay current until new artifacts pass their gates.
 
 The author asked to integrate the improvements and prepare a release while
 questioning whether concurrent GC should become the default. The assistant
@@ -33,10 +48,8 @@ reproducing negative controls; final packages still need their own qualification
 ## Release gates
 
 1. Complete the selected integration inventory and freeze exact clean neoCLR/Raven
-   inputs. Keep Raven main and its neoCLR line separate. Cargo's source package
-   currently still says preview.13 while the published product is Preview 17;
-   use the release tooling's actual version inputs and reconcile them deliberately,
-   rather than inferring a new release from Cargo.toml alone.
+   inputs. Keep Raven main and its neoCLR line separate. The source package version is reconciled to the explicitly selected Preview 18
+   candidate; this version change does not certify or publish its packages.
 2. Review [draft notes](../../next-preview-release-notes.md), migration guidance and
    API coverage against those exact inputs. Published notes/sections stay frozen.
 3. Run canonical source/archive/notice validation under the
@@ -62,3 +75,16 @@ reproducing negative controls; final packages still need their own qualification
   [scalar HTTP evidence](../../../benchmarks/gc-suite/matrix/scalar-store-http.md)
   retain qualification and repeated comparisons. These are development artifacts,
   not qualification of the forthcoming release packages.
+
+## Candidate preflight
+
+- `cargo metadata --locked --no-deps` accepts the Preview 18 manifest/lock pair.
+- Initial formatting check found accumulated differences in runtime/codegen and
+  two root files; `cargo fmt` applied them and the final check passes. This is
+  release-gate normalization, without intended behavior changes.
+- Initial API snapshot check found stale internal HTTP source fingerprints.
+  Rebuilt the matching bridge/reference with Raven `ed1d08def`; public reference
+  bytes/type inventory are unchanged and the refreshed fingerprint check passes.
+- macOS SDK packaging starts from an isolated Git archive of that Raven revision,
+  with the explicit neoCLR metadata project and candidate version. Packaging and
+  qualification outcomes remain pending until recorded below.

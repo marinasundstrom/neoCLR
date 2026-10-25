@@ -1,5 +1,11 @@
 # Development conversation record
 
+## 2026-10-25 — Close optimization and begin both-platform release qualification
+
+- **Author:** “OK. Wrap this up and commence release procedure for macOS and Windows. Update docs and website.”
+- **Assistant:** Selected Preview 18 candidate and SDK/editor build `0.1.18-neoclr.20261025.1`, pinned the clean Raven neoCLR branch, and retained sync/default JIT placement. New experimental layouts remain opt-in. Updated candidate notes, roadmap and site preparation status; fresh source/macOS/Windows gates are required.
+- **Open:** Actual package validation, checksums, final publication and website deployment. Beginning qualification is not a claim those gates pass.
+
 
 ## 2026-10-25 — Prepare a release with a balanced runtime narrative
 

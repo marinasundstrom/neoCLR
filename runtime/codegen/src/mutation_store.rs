@@ -42,11 +42,14 @@ fn unambiguous_stack_arguments(func: &ir::Function) -> HashMap<ir::Value, Option
                                 (Some(left), Some(right)) => {
                                     let direct = HashMap::new();
                                     let left = stack_destination(func, left, &direct);
-                                    left.is_some() && left == stack_destination(func, right, &direct)
+                                    left.is_some()
+                                        && left == stack_destination(func, right, &direct)
                                 }
                                 _ => false,
                             };
-                            if !same { *value = None; }
+                            if !same {
+                                *value = None;
+                            }
                         })
                         .or_insert(argument);
                 }
@@ -123,7 +126,9 @@ pub(crate) fn lower_framed(
 
 /// Caller must prove a nonmigrating activation and require the borrowed-store host ABI.
 pub(crate) fn lower_framed_borrowed(
-    module: &mut impl Module, func: &mut ir::Function, context: ir::Value,
+    module: &mut impl Module,
+    func: &mut ir::Function,
+    context: ir::Value,
     frame_ready: ir::Inst,
 ) -> Result<Lowered, Error> {
     lower_impl(module, func, context, Some(frame_ready), true)
@@ -244,20 +249,36 @@ fn lower_impl(
     let handle = if borrowed {
         let mut signature = module.make_signature();
         signature.returns.push(AbiParam::new(types::I64));
-        let acquire = module.declare_function("experiment_gc_store_state_borrow", Linkage::Import, &signature)?;
+        let acquire = module.declare_function(
+            "experiment_gc_store_state_borrow",
+            Linkage::Import,
+            &signature,
+        )?;
         let acquire = module.declare_func_in_func(acquire, func);
         let mut cursor = FuncCursor::new(func).at_inst(frame_ready.unwrap());
         cursor.next_inst();
         let call = cursor.ins().call(acquire, &[]);
         Some(cursor.func.dfg.inst_results(call)[0])
-    } else { None };
+    } else {
+        None
+    };
     let mut signature = module.make_signature();
     signature
         .params
         .extend([types::I64, types::I64, types::I64, types::I32].map(AbiParam::new));
     signature.returns.push(AbiParam::new(types::I32));
-    if borrowed { signature.params.insert(0, AbiParam::new(types::I64)); }
-    let hook = module.declare_function(if borrowed { "experiment_gc_store_borrowed" } else { "experiment_gc_store" }, Linkage::Import, &signature)?;
+    if borrowed {
+        signature.params.insert(0, AbiParam::new(types::I64));
+    }
+    let hook = module.declare_function(
+        if borrowed {
+            "experiment_gc_store_borrowed"
+        } else {
+            "experiment_gc_store"
+        },
+        Linkage::Import,
+        &signature,
+    )?;
     let hook = module.declare_func_in_func(hook, func);
     let failure = func.dfg.make_block();
     let status = func.dfg.append_block_param(failure, types::I32);
@@ -285,9 +306,13 @@ fn lower_impl(
         };
         let width = cursor.ins().iconst(types::I32, i64::from(width));
         let call = if let Some(handle) = handle {
-            cursor.ins().call(hook, &[handle, context, destination, bits, width])
+            cursor
+                .ins()
+                .call(hook, &[handle, context, destination, bits, width])
         } else {
-            cursor.ins().call(hook, &[context, destination, bits, width])
+            cursor
+                .ins()
+                .call(hook, &[context, destination, bits, width])
         };
         let status = cursor.func.dfg.inst_results(call)[0];
         cursor
