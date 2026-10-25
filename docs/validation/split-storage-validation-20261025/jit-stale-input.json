@@ -1,0 +1,18 @@
+{
+  "command": [
+    "python3",
+    "benchmarks/gc-suite/matrix/compare-scalar-jit.py",
+    "--root-validation",
+    "--build",
+    "target/gc-patterns-standard-build",
+    "--aot",
+    "target/gc-root-jit-stale-control",
+    "--runner",
+    "target/gc-stack-policy-integration/qualified-runner",
+    "--output",
+    "target/gc-root-jit-stale-output"
+  ],
+  "exitCode": 1,
+  "stderr": "Traceback (most recent call last):\n  File \"/Users/robert/Projects/neoclr/benchmarks/gc-suite/matrix/compare-scalar-jit.py\", line 20, in <module>\n    assert hashlib.sha256(Path(path).read_bytes()).hexdigest()==digest,('stale AOT input',path)\nAssertionError: ('stale AOT input', '/Users/robert/Projects/neoclr/benchmarks/gc-suite/matrix/compare-root-validation.py')\n",
+  "emptyOutput": true
+}

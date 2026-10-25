@@ -597,5 +597,8 @@ reduces concurrent AOT HTTP CPU about 1.6% in a three-round screen and roughly
 4–6% in four allocation-heavy standalone patterns. Compute/reuse effects are
 near flat; buffer reuse is 0.26% slower. All validation checks remain, and matched
 standalone allocation work is unchanged. Sync also improves and remains faster.
-JIT correctness passes; JIT timing and broader qualification remain open. These
-short cohorts do not establish statistical significance or a new default.
+JIT timing follow-up passes 98,688 HTTP responses and 48 standalone invocations:
+concurrent HTTP CPU improves 1.2% for plain and 0.18% for JSON; standalone effects
+are mixed, with retained-window 2.35% faster and the others between 0.49% faster
+and 0.67% slower. The switch stays opt-in. These short cohorts do not establish
+statistical significance or a new default.

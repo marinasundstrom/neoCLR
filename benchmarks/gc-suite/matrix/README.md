@@ -194,3 +194,12 @@ original recipes and adds `split-sync-aot`, `split-live-aot`, `split-sync-jit` a
 `split-live-jit`, using identical managed objects. Run qualification and timings
 separately through `http.py`. The default root validator and collector policy stay
 unchanged. See [safety and measurements](../../../docs/validation/split-storage-validation-20261025/README.md).
+
+For matched standalone JIT root-validation measurements, use
+`compare-scalar-jit.py --root-validation --build <standard-samples>
+--aot <completed-root-validation-cohort> --runner <qualified-runner>
+--output <fresh-directory>`. This reuses the timing/output checks while keeping
+typed stores and qualified stack policy identical in both modes. It validates
+current AOT input hashes and rejects differences in host/object recipes beyond
+the root-validation flag and output path. Compilation and invocation costs remain
+separate, and the first round is excluded as warmup.

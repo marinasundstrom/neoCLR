@@ -50,7 +50,9 @@ continues as an experimental native development path.
   bookkeeping. Add an opt-in small/large storage-validation split that preserves
   activation checks while reducing small-frame register-save work; initial AOT
   HTTP results show modest CPU gains and four allocation-heavy standalone patterns
-  improve about 4–6%, with synchronous GC still faster in HTTP.
+  improve about 4–6%. Matched JIT HTTP follow-up shows smaller gains (about
+  1.2% concurrent plaintext CPU and 0.18% JSON), with mixed standalone JIT
+  results. Keep the split opt-in; sync remains faster in HTTP.
   Preserve tracing of changing root values and explicit ownership
   across native boundaries and suspended work. Reuse completed macOS async
   contexts under their qualified lifetime rules. Explicitly publish macOS ARM64
