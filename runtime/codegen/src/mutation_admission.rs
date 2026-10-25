@@ -230,6 +230,7 @@ pub(crate) fn root_providers(module: &impl Module) -> Vec<(&'static str, Signatu
         ("neoclr_string_compare_ignore_case_v1", make(&[I64, I64, I64], &[I32])),
         ("neoclr_string_starts_with_ordinal_v1", make(&[I64, I64, I64], &[I32])),
         ("experiment_gc_store_text", make(&[I64, I64, I32, I64], &[I32])),
+        ("experiment_gc_store_scalar", make(&[I64, I64, I32, I64], &[I32])),
         ("neoclr_allocate_bytes_rooted_v1", make(&[I64, I32, I64], &[I32])),
         ("neoclr_reserve_records_rooted_v1", make(&[I64, I32, I32, I64], &[I32])),
         ("neoclr_reserve_bytes_rooted_v1", make(&[I64, I32, I64], &[I32])),

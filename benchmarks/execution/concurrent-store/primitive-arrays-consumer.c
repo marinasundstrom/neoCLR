@@ -8,7 +8,8 @@ extern int experiment_gc_live_active(neoclr_aot_context *);
 typedef int32_t (*managed_writer)(void *,void *,uint64_t,int32_t *,void *);
 int native_managed_consumer(managed_writer write) {
     for(unsigned round=0;round<120;round++) {
-        uint64_t heap[128]={0};
+        /* Room for the width matrix; pressure/exhaustion modes explicitly fill it. */
+        uint64_t heap[512]={0};
         neoclr_aot_context c={.text={(unsigned char *)heap,sizeof(heap),0}};
         CHECK(!neoclr_gc_heap_acquire_v1(&c.text));
         uint64_t *owner;

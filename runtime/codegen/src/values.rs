@@ -4937,6 +4937,35 @@ pub(crate) fn compile_into(
                                 let status = b.inst_results(call)[0];
                                 let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
                                 return_if_detailed(&mut b, failed, status, site.as_ref());
+                            } else if live_stores && crate::selection::scalar_array_element(t)
+                                && std::env::var_os("NEOCLR_LIVE_SCALAR_ARRAY_STORES").is_some()
+                            {
+                                // Retain the typed primitive-storage contract before generic
+                                // mutation lowering loses it. The helper admits one complete
+                                // element plus its initialization marker; it never collects.
+                                assert_eq!(width, 1);
+                                let snapshot = slot(&mut b, 8);
+                                let source = b.ins().stack_addr(types::I64, snapshot, 0);
+                                let zero = b.ins().iconst(types::I64, 0);
+                                b.ins().stack_store(zero, snapshot, 0);
+                                write_typed(&mut b, &p, &ty, source, &value);
+                                let mut signature = module.make_signature();
+                                signature.params.extend(
+                                    [types::I64, types::I64, types::I32, types::I64]
+                                        .map(AbiParam::new),
+                                );
+                                signature.returns.push(AbiParam::new(types::I32));
+                                let helper = module.declare_function(
+                                    "experiment_gc_store_scalar", Linkage::Import, &signature,
+                                )?;
+                                let helper = module.declare_func_in_func(helper, b.func);
+                                let ordinal = b.ins().ireduce(types::I32, index);
+                                let call = b.ins().call(helper, &[
+                                    fault_context.unwrap(), array, ordinal, source,
+                                ]);
+                                let status = b.inst_results(call)[0];
+                                let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                                return_if_detailed(&mut b, failed, status, site.as_ref());
                             } else {
                                 write_typed(&mut b, &p, &ty, address, &value);
                                 let initialized = b.ins().iconst(types::I8, 1);

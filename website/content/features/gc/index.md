@@ -19,6 +19,11 @@ mutation barriers and owner-thread reclamation preserve its lifetime boundaries;
 sweeping is not yet concurrent. We tune each collector independently and track
 both its own performance history and comparisons with the other collector.
 
+An opt-in native optimization retains typed primitive-array stores through lowering,
+combining element and initialization admission while preserving ownership checks.
+It reduces CPU in the standalone buffer-reuse comparison; full JIT workload and
+HTTP performance qualification remain pending.
+
 [Current results](/benchmarks/gc/) · [Benchmarking and profiling procedure](/benchmarks/gc/procedure/)
 
 ## Inspect and collect

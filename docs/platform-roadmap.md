@@ -1,5 +1,7 @@
 # neoCLR platform roadmap
 
+**Typed scalar-store improvement (2026-10-25):** [Opt-in native optimization and evidence](../benchmarks/gc-suite/matrix/scalar-store-follow-up.md) preserve one primitive element/initialization update through lowering, replacing two generic store admissions. Native and expanded AOT/JIT tests pass; 84 matched AOT invocations show 50.5% lower concurrent reuse-buffer CPU with unchanged allocation/memory work. Other samples are largely unchanged. Next qualify full JIT workloads and plain/JSON HTTP; defaults remain unchanged.
+
 **Scheduler split (2026-10-25):** [Sixteen nested acquisition profiles](../benchmarks/gc-suite/concurrency/scheduler-phases.md) pass 16,640 responses; polling dominates acquisition and idle GC contributes 0.03–1.19 ms owner CPU per invocation. These services do not explain most concurrent overhead here. Resume qualification of the drafted typed scalar-store optimization against the low-allocation/high-write standalone workload, preserving scheduler/GC ownership semantics. Default and wider scaling remain open.
 
 **Fiber phase attribution (2026-10-25):** [Sixteen native HTTP profiles](../benchmarks/gc-suite/concurrency/fiber-phases.md) pass 16,640 responses; root/resume work accounts for 0.4–1.9% of instrumented invocation CPU and does not explain the concurrent gap. Next separate socket polling from idle GC within scheduler acquisition before changing ownership boundaries.

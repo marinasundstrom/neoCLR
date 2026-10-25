@@ -1108,6 +1108,11 @@ fn emit_managed(source: &str) {
             assert_eq!(object.symbols().any(|s| s.is_undefined()
                 && s.name().unwrap_or("").trim_start_matches('_') == "experiment_gc_static_storage_rooted_v1"), enabled);
         }
+        if source.starts_with(".module LivePrimitiveArrays") {
+            assert_eq!(object.symbols().any(|s| s.is_undefined()
+                && s.name().unwrap_or("").trim_start_matches('_') == "experiment_gc_store_scalar"),
+                enabled && std::env::var_os("NEOCLR_LIVE_SCALAR_ARRAY_STORES").is_some());
+        }
         if source.contains("stelem") && !source.starts_with(".module LivePrimitiveArrays") && !source.starts_with(".module LiveEntry") {
             let helper = if source.contains("stelem String") || source.contains("stelem fn<") {
                 "experiment_gc_store_text"

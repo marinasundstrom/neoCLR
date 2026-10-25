@@ -4,6 +4,211 @@
 .local arrayref<Int64> pending
 .local arrayref<Byte> bytes
 .local arrayref<Byte> reserved
+.local arrayref<SByte> width0
+.local arrayref<Int16> width1
+.local arrayref<UInt16> width2
+.local arrayref<UInt32> width3
+.local arrayref<UInt64> width4
+.local arrayref<IntPtr> width5
+.local arrayref<UIntPtr> width6
+.local arrayref<Boolean> width7
+.local arrayref<Single> width8
+.local arrayref<Double> width9
+ldarg mode
+ldc.i8 0
+ceq
+brfalse widths_done
+ldc.i4 1
+array.reserve SByte
+stloc width0
+ldloc width0
+ldc.i4 0
+ldc.i4 255
+conv.i1
+stelem SByte
+ldloc width0
+ldc.i4 0
+ldelem SByte
+ldc.i4 -1
+ceq
+brtrue width0_ok
+fault "scalar SByte roundtrip"
+width0_ok:
+ldc.i4 1
+array.reserve Int16
+stloc width1
+ldloc width1
+ldc.i4 0
+ldc.i4 65535
+conv.i2
+stelem Int16
+ldloc width1
+ldc.i4 0
+ldelem Int16
+ldc.i4 -1
+ceq
+brtrue width1_ok
+fault "scalar Int16 roundtrip"
+width1_ok:
+ldc.i4 1
+array.reserve UInt16
+stloc width2
+ldloc width2
+ldc.i4 0
+ldc.i4 -1
+conv.u2
+stelem UInt16
+ldloc width2
+ldc.i4 0
+ldelem UInt16
+ldc.i4 65535
+ceq
+brtrue width2_ok
+fault "scalar UInt16 roundtrip"
+width2_ok:
+ldc.i4 1
+array.reserve UInt32
+stloc width3
+ldloc width3
+ldc.i4 0
+ldc.i8 4294967295
+conv.u4
+stelem UInt32
+ldloc width3
+ldc.i4 0
+ldelem UInt32
+ldc.i4 -1
+ceq
+brtrue width3_ok
+fault "scalar UInt32 roundtrip"
+width3_ok:
+ldc.i4 1
+array.reserve UInt64
+stloc width4
+ldloc width4
+ldc.i4 0
+ldc.i8 -1
+conv.u8
+stelem UInt64
+ldloc width4
+ldc.i4 0
+ldelem UInt64
+ldc.i8 -1
+ceq
+brtrue width4_ok
+fault "scalar UInt64 roundtrip"
+width4_ok:
+ldc.i4 1
+array.reserve IntPtr
+stloc width5
+ldloc width5
+ldc.i4 0
+ldc.i8 -17
+conv.i
+stelem IntPtr
+ldloc width5
+ldc.i4 0
+ldelem IntPtr
+conv.i8
+ldc.i8 -17
+ceq
+brtrue width5_ok
+fault "scalar IntPtr roundtrip"
+width5_ok:
+ldc.i4 1
+array.reserve UIntPtr
+stloc width6
+ldloc width6
+ldc.i4 0
+ldc.i8 -1
+conv.u
+stelem UIntPtr
+ldloc width6
+ldc.i4 0
+ldelem UIntPtr
+conv.u8
+ldc.i8 -1
+ceq
+brtrue width6_ok
+fault "scalar UIntPtr roundtrip"
+width6_ok:
+ldc.i4 1
+array.reserve Boolean
+stloc width7
+ldloc width7
+ldc.i4 0
+ldc.i4 2
+ldc.i4 1
+cgt
+stelem Boolean
+ldloc width7
+ldc.i4 0
+ldelem Boolean
+ldc.bool true
+ceq
+brtrue width7_ok
+fault "scalar Boolean roundtrip"
+width7_ok:
+ldc.i4 1
+array.reserve Single
+stloc width8
+ldloc width8
+ldc.i4 0
+ldc.r8 16777217.0
+conv.r4
+stelem Single
+ldloc width8
+ldc.i4 0
+ldelem Single
+ldc.r4 16777216.0
+ceq
+brtrue width8_ok
+fault "scalar Single roundtrip"
+width8_ok:
+ldloc width8
+ldc.i4 0
+ldc.r4 NaN
+stelem Single
+ldloc width8
+ldc.i4 0
+ldelem Single
+ldloc width8
+ldc.i4 0
+ldelem Single
+ceq
+brfalse width8_nan
+fault "scalar NaN"
+width8_nan:
+ldc.i4 1
+array.reserve Double
+stloc width9
+ldloc width9
+ldc.i4 0
+ldc.r8 -1.25
+stelem Double
+ldloc width9
+ldc.i4 0
+ldelem Double
+ldc.r8 -1.25
+ceq
+brtrue width9_ok
+fault "scalar Double roundtrip"
+width9_ok:
+ldloc width9
+ldc.i4 0
+ldc.r8 NaN
+stelem Double
+ldloc width9
+ldc.i4 0
+ldelem Double
+ldloc width9
+ldc.i4 0
+ldelem Double
+ceq
+brfalse width9_nan
+fault "scalar NaN"
+width9_nan:
+widths_done:
 ldc.i4 2
 newarr Int32
 stloc numbers

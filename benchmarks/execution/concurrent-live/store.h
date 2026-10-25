@@ -380,3 +380,26 @@ int experiment_gc_store_text(neoclr_aot_context *context, void *array,
     live_store_counts[1]++;
     return 0;
 }
+
+#ifdef NEOCLR_LIVE_SCALAR_ARRAY_STORES
+/* Typed compiler contract: source is one normalized, zero-padded stack lane.
+ * Primitive allocations are never read by the marker. Keep current ownership,
+ * exact allocation admission and shape/extent checks, but no mutation gate is
+ * needed for this nontraced payload. This is not a raw-address store exemption. */
+int experiment_gc_store_scalar(neoclr_aot_context *context, void *array,
+    uint32_t index, const void *source) {
+    if (!context || owned_heap.arena!=&context->text || !valid(&context->text) ||
+        !array || !source || (candidate_active && candidate_context!=context)) return 3;
+    uint64_t bytes; uint32_t kind;
+    if (neoclr_gc_allocation_info_v1(context,array,&bytes,&kind) ||
+        kind!=NEOCLR_GC_BYTES || bytes<24) return 3;
+    uint64_t header[3]; memcpy(header,array,24);
+    uint64_t length=header[1];
+    if ((uint32_t)header[0]!=UINT32_C(0x80000006) ||
+        (header[0]>>32)>NEOCLR_NATIVE_TYPE_LIMIT || header[2]!=1 ||
+        length>65536 || index>=length || length>(bytes-24)/9) return 3;
+    memcpy((unsigned char *)array+24+(uint64_t)index*8,source,8);
+    ((unsigned char *)array)[24+length*8+index]=1;
+    return 0;
+}
+#endif

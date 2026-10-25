@@ -15,6 +15,8 @@
 
 ## 2026-10-25 — Profile worker concurrency and reconsider GC scheduling architecture
 
+- **Optimization outcome:** After scheduler attribution, assistant resumed the deferred [typed scalar-store optimization](../benchmarks/gc-suite/matrix/scalar-store-follow-up.md). Native and expanded AOT/JIT safety tests pass; 84 matched AOT invocations halve concurrent reuse-buffer CPU with unchanged allocations. This is an opt-in standalone gain; HTTP/full JIT workload and default qualification remain open.
+
 - **Acquisition follow-up:** [Nested scheduler profiles](../benchmarks/gc-suite/concurrency/scheduler-phases.md) pass 16,640 responses and show polling dominates acquisition while idle GC remains a small owner-CPU component. Assistant selected the previously measured scalar-store overhead for the next optimization instead of weakening cleanup/root boundaries. Concurrent-default acceptance remains unproven.
 
 - **Follow-up evidence:** [Root/resume phase profiling](../benchmarks/gc-suite/concurrency/fiber-phases.md) passes 16,640 responses; measured root/resume work is 0.4–1.9% of invocation CPU including clocks. Assistant retained ownership boundaries and selected polling-versus-idle-GC attribution next. No new throughput or default claim.

@@ -521,3 +521,13 @@ A further 16-case profile separates acquisition: native polling consumes roughly
 responses pass. Idle collection here is only one collection trigger; these numbers
 do not measure total GC CPU. The next optimization targets repeated scalar-store
 admission identified in the standalone workload matrix.
+
+### Typed scalar stores (opt-in development result)
+
+A matched 84-invocation AOT comparison preserves all six standard sample outputs
+and allocation counts. Concurrent reuse-buffer CPU falls from **114.5 to 56.7 ms**
+(50.5%) by admitting a primitive element and its initialization marker together.
+Its 14 allocations, 555 allocated bytes and 1,016-byte peak arena are unchanged.
+Other sample median CPU changes are below 0.3%. Native safety checks and expanded
+AOT/JIT scalar-type tests pass; full JIT workload and HTTP performance checks remain
+pending. This is a same-collector gain, not concurrent-default qualification.
