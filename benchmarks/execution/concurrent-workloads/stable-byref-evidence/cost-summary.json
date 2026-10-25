@@ -1,0 +1,194 @@
+{
+  "passed": true,
+  "standalone": {
+    "tasks": {
+      "modes": {
+        "sync": {
+          "cpuSeconds": 0.0140655,
+          "wallSeconds": 0.014159,
+          "allocations": 65548.0,
+          "allocatedBytes": 2261361.0,
+          "peakLiveBytes": 497.0,
+          "peakArenaUsed": 18424.0
+        },
+        "live-previous-hybrid-inline": {
+          "cpuSeconds": 0.0225535,
+          "wallSeconds": 0.022123999999999998,
+          "allocations": 65548.0,
+          "allocatedBytes": 2261361.0,
+          "peakLiveBytes": 9329.0,
+          "peakArenaUsed": 53240.0
+        },
+        "live-hybrid-inline": {
+          "cpuSeconds": 0.021394999999999997,
+          "wallSeconds": 0.020964499999999997,
+          "allocations": 65548.0,
+          "allocatedBytes": 2261361.0,
+          "peakLiveBytes": 9329.0,
+          "peakArenaUsed": 53240.0
+        }
+      },
+      "cpuChangePercent": -5.13667501718138,
+      "wallChangePercent": -5.240914843608757
+    },
+    "collections": {
+      "modes": {
+        "sync": {
+          "cpuSeconds": 0.080805,
+          "wallSeconds": 0.0811685,
+          "allocations": 237580.0,
+          "allocatedBytes": 7864689.0,
+          "peakLiveBytes": 1694.0,
+          "peakArenaUsed": 20328.0
+        },
+        "live-previous-hybrid-inline": {
+          "cpuSeconds": 0.1235835,
+          "wallSeconds": 0.1218045,
+          "allocations": 237580.0,
+          "allocatedBytes": 7864689.0,
+          "peakLiveBytes": 10113.0,
+          "peakArenaUsed": 55016.0
+        },
+        "live-hybrid-inline": {
+          "cpuSeconds": 0.11694199999999999,
+          "wallSeconds": 0.115171,
+          "allocations": 237580.0,
+          "allocatedBytes": 7864689.0,
+          "peakLiveBytes": 10113.0,
+          "peakArenaUsed": 55016.0
+        }
+      },
+      "cpuChangePercent": -5.374099293190437,
+      "wallChangePercent": -5.4460221091995775
+    },
+    "arrays": {
+      "modes": {
+        "sync": {
+          "cpuSeconds": 0.046531,
+          "wallSeconds": 0.047523499999999996,
+          "allocations": 86028.0,
+          "allocatedBytes": 1892721.0,
+          "peakLiveBytes": 593.0,
+          "peakArenaUsed": 15952.0
+        },
+        "live-previous-hybrid-inline": {
+          "cpuSeconds": 0.053687,
+          "wallSeconds": 0.053696,
+          "allocations": 86028.0,
+          "allocatedBytes": 1892721.0,
+          "peakLiveBytes": 6239.0,
+          "peakArenaUsed": 45376.0
+        },
+        "live-hybrid-inline": {
+          "cpuSeconds": 0.053527500000000006,
+          "wallSeconds": 0.05369,
+          "allocations": 86028.0,
+          "allocatedBytes": 1892721.0,
+          "peakLiveBytes": 6239.0,
+          "peakArenaUsed": 45376.0
+        }
+      },
+      "cpuChangePercent": -0.29709240598281283,
+      "wallChangePercent": -0.011174016686532617
+    }
+  },
+  "json": {
+    "sync": {
+      "requestsPerSecond": 3120.975047666686,
+      "requestSeconds": 0.656300104,
+      "processCpuSeconds": 0.6652655000000001,
+      "peakRssBytes": 10665984.0,
+      "cpuUsPerResponse": 322.31855620155045,
+      "allocationRange": [
+        943817,
+        943818
+      ],
+      "allocatedByteRange": [
+        54065775,
+        54066303
+      ],
+      "peakLiveBytes": 52690.0,
+      "peakArenaUsed": 101248.0,
+      "medianTrialP99Ms": 1.402145999999771
+    },
+    "live-inline-index": {
+      "requestsPerSecond": 2355.2792835487494,
+      "requestSeconds": 0.8697828960000007,
+      "processCpuSeconds": 0.9397610000000001,
+      "peakRssBytes": 13369344.0,
+      "cpuUsPerResponse": 455.3105620155039,
+      "allocationRange": [
+        943817,
+        943817
+      ],
+      "allocatedByteRange": [
+        54065775,
+        54065775
+      ],
+      "peakLiveBytes": 67911.0,
+      "peakArenaUsed": 144872.0,
+      "medianTrialP99Ms": 1.838166500000682
+    },
+    "live-previous-inline-index": {
+      "requestsPerSecond": 2005.4954935095625,
+      "requestSeconds": 1.0211949580000006,
+      "processCpuSeconds": 1.0883335,
+      "peakRssBytes": 13516800.0,
+      "cpuUsPerResponse": 527.2933624031008,
+      "allocationRange": [
+        943817,
+        943817
+      ],
+      "allocatedByteRange": [
+        54065775,
+        54065775
+      ],
+      "peakLiveBytes": 67911.0,
+      "peakArenaUsed": 144872.0,
+      "medianTrialP99Ms": 2.119603999999775
+    }
+  },
+  "controls": {
+    "tasks": {
+      "byteIdentical": true,
+      "sha256": "80ff45550afd85e2f2e3c473dd57361947141b26c0cc2a03404a76d808ad9306"
+    },
+    "collections": {
+      "byteIdentical": true,
+      "sha256": "a638fb8fa5557477f5a2aafaa48591645988f0097e964c4b8a2d4a11a778a2e5"
+    },
+    "arrays": {
+      "byteIdentical": true,
+      "sha256": "76c5408508ef7cebad8fed644a36c6cc21cc6b739d80ef5754dd971a64da021f"
+    }
+  },
+  "inputs": {
+    "target/stable-byref-ordinary-build/results.json": "f8afac833a279852ff5916f9695603835643b62d436b99e4e40f06fe2b99b984",
+    "target/stable-byref-ordinary-build/tasks/audit.json": "f0fe99e789dbe9b80a65f25edfdf9252e336b5b7fb574e1f38bc38ad265b32b3",
+    "target/stable-byref-ordinary-build/tasks/command.json": "e84347379b3139aadda22266344f617e189d35de58bb396a01c2fc842fd1431f",
+    "target/stable-byref-ordinary-build/arrays/audit.json": "2393821b701b367150c6af9bb22047038be72e288ed81603f8807872ca5b72ea",
+    "target/stable-byref-ordinary-build/arrays/command.json": "8938c9ba33531e73300b72167c690cce95cda4316f6f2e807b3bafef12eb0210",
+    "target/stable-byref-ordinary-build/collections/audit.json": "a027dfe3a86dfd9d00f24ac534719ddc913cc3f3ab8015ea278d2701032533ff",
+    "target/stable-byref-ordinary-build/collections/command.json": "4fc8f8bb07ecbda37fe17f5de5ec6342a9dc57111725bbc201c5f28088b1f0fd",
+    "target/stable-byref-ordinary-control/results.json": "bc1fff7826457f3534b91cc111921d211df842206d259e0669cca30bb5964a6a",
+    "target/stable-byref-ordinary-control/tasks/audit.json": "d647360d11ddcdcd8515c589a14582299c57998fbb18c32ad918950b476c7d3b",
+    "target/stable-byref-ordinary-control/tasks/command.json": "bc4dc23ae27d4940d4ce457298945c8ba1df83dc868ae646a1a6f90b1d0ef66f",
+    "target/stable-byref-ordinary-control/arrays/audit.json": "262d4b74b45cd0477852e45d76ba2bfdb3db3807c9e24696bf1aa6358b17b10e",
+    "target/stable-byref-ordinary-control/arrays/command.json": "179e10e2df124134cd6913a55433527acfd09da20ea7351e9d3fb0529d530ead",
+    "target/stable-byref-ordinary-control/collections/audit.json": "2743ad2fd099f01cecdb22e7a87122187a0d7afe2dc3aa7c3c2f07f304c53c94",
+    "target/stable-byref-ordinary-control/collections/command.json": "244c11bc4625a9b3e7a1de918a29e61b4e7243503139c2a795b7c8ebe5a70af8",
+    "target/stable-byref-ordinary-measure/results.json": "7eb56d9bce78a45609599a89140dc3e7eed4208fabc54c345242c17717602972",
+    "target/stable-byref-json-build/build.py": "a906c34fe7988771cb3c462baabe346fa18f9a17c270bc660f8d051371c781a0",
+    "target/stable-byref-json-build/off.json": "776230cda36268b2494e5ddcbc44580fe97bce757943b8a6d523a18d353cc767",
+    "target/stable-byref-json-build/results.json": "5a987fa82925345cffbb957c5f3d6b86d7d13350568cfaeb6371ffdc48d50af8",
+    "target/stable-byref-json-build/on-audit.json": "a32d0f113ac5c41bad4e09c468a5a8d8a7afb3c12374b6ea678a3372946095f5",
+    "target/stable-byref-json-build/on.json": "792ec3d77a0312d09b68d3a1379b61c9aba7ec6de866a00293ec034c6c86b2ee",
+    "target/stable-byref-json-build/off-audit.json": "23f0120e1f910a567974486ce00d683527efeae5ff4260d8f0ed75399b4cb53e",
+    "target/stable-byref-json-measure/results.json": "76bdd811c68a56c739322cc2d3193bb2cb16e8ef784fc65144587c66f5c85b92"
+  },
+  "jsonChange": {
+    "throughputPercent": 17.44126532177217,
+    "cpuPercent": -13.651376163648365,
+    "validatedResponses": 24768
+  }
+}

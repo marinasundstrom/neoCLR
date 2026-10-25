@@ -138,3 +138,7 @@ native matrix report contains all six driver commands and their common environme
 Website/API changes are unnecessary: public contracts and production defaults have
 not changed. Broader performance, thread-sanitizer and default qualification remain
 open; this follow-up does not establish another throughput/CPU/allocation gain.
+
+The subsequent [workload cost comparison](stable-byref-cost-results.md) covers
+90 standalone runs and 24,768 JSON responses; it reduces the performance
+qualification gap but leaves JIT JSON, scaling, pause and default acceptance open.

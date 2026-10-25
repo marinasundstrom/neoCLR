@@ -11,6 +11,7 @@ p = argparse.ArgumentParser(description=__doc__)
 p.add_argument('--build', type=Path, required=True)
 p.add_argument('--runner', type=Path, required=True)
 p.add_argument('--output', type=Path, required=True)
+p.add_argument('--stable-byrefs', action='store_true', help='Preserve immutable byref SSA arguments in the test compiler.')
 a = p.parse_args()
 root = Path(__file__).resolve().parents[3]
 source = a.build.resolve()
@@ -19,7 +20,7 @@ out.mkdir(parents=True, exist_ok=False)
 original = json.loads((source / 'results.json').read_text())
 assert original['passed']
 r = dict(passed=False, scope=__doc__, iterations=original['iterations'],
-         optimizationLevel=original['optimizationLevel'], cases=[], inputs={})
+         optimizationLevel=original['optimizationLevel'], stableByrefs=a.stable_byrefs, cases=[], inputs={})
 try:
     for old in original['cases']:
         sample = old['sample']
@@ -36,11 +37,15 @@ try:
         env = dict(os.environ, NEOCLR_TEST_OPT_LEVEL=r['optimizationLevel'],
                    NEOCLR_LIVE_SELECTION_COMMAND=str(recipe), NEOCLR_LIVE_SELECTION_MODE='live',
                    NEOCLR_LIVE_ELIDE_STACK_ARGUMENTS='1', NEOCLR_LIVE_STACK_ARGUMENT_AUDIT=str(audit))
+        env.pop('NEOCLR_LIVE_SSA_BYREF_ARGUMENTS', None)
+        if a.stable_byrefs:
+            env['NEOCLR_LIVE_SSA_BYREF_ARGUMENTS'] = '1'
         invoke = [str(a.runner.resolve()), 'mutation_store::tests::full_http_selection_compiles_with_live_gc', '--exact', '--ignored', '--nocapture']
         x = subprocess.run(invoke, cwd=root, env=env, capture_output=True, text=True, timeout=300)
         case = dict(sample=sample, expectedPerIteration=old['expectedPerIteration'],
                     native=[dict(mode='sync', exitCode=0, reusedFrom=str(source / sample / 'sync.o')),
                             dict(mode='live', command=invoke, selectionCommand=command,
+                                 environment={k:v for k,v in env.items() if k.startswith('NEOCLR_')},
                                  exitCode=x.returncode, stdout=x.stdout, stderr=x.stderr)])
         r['cases'].append(case)
         x.check_returncode()
