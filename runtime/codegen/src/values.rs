@@ -537,7 +537,7 @@ pub(crate) fn compile_into(
             || d.runtime_async_awaitunit.contains(&i) || d.runtime_async_release.contains(&i)
             || d.runtime_async_iscompleted.contains(&i) || d.runtime_async_waitcompletion.contains(&i)
             || d.task_queue_register.contains(&i) || d.task_queue_default.contains(&i)
-            || d.task_queue_current.contains(&i) || d.timer_start.contains(&i) || d.timer_cancel.contains(&i)
+            || d.task_queue_current.contains(&i) || d.task_schedule.contains(&i) || d.timer_start.contains(&i) || d.timer_cancel.contains(&i)
             || d.socket_listen.contains(&i) || d.socket_local_port.contains(&i)
             || d.socket_close.contains(&i) || d.socket_accept.contains(&i)
             || d.socket_connect_result.contains(&i) || d.socket_cancel.contains(&i)

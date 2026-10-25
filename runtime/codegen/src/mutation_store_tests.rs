@@ -840,6 +840,9 @@ fn managed_options_for(source: &str) -> crate::fault_details::Options {
         options.timer_start.push(6);
         options.timer_cancel.push(7);
     }
+    if source.starts_with(".module LiveQueueTimersSchedule") {
+        options.task_schedule.push(8);
+    }
     if source.starts_with(".module LiveSocket") {
         options.socket_listen.push(0);
         options.socket_local_port.push(1);
@@ -1665,6 +1668,13 @@ fn managed_network_pump_runs_on_live_collector() {
     assert_eq!(unsafe { run(pointers.as_ptr()) }, 0);
 }
 
+#[test]
+fn managed_task_schedule_emits_guarded_unit_wrapper() {
+    let source = include_str!("../../../benchmarks/execution/concurrent-store/queue-timers.neoil")
+        .replace(".module LiveQueueTimers", ".module LiveQueueTimersSchedule")
+        + "\n.function Schedule(fn<Void> callback) -> Void\nldvoid\nret\n.end\n";
+    emit_managed(&source);
+}
 #[test]
 fn managed_queue_timers_emits_guarded_dispatch() {
     emit_managed(include_str!("../../../benchmarks/execution/concurrent-store/queue-timers.neoil"));
