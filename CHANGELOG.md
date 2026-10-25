@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-25
 
+- Add a test-only immutable-byref SSA prototype that preserves published root slots while exposing incoming pointer provenance to existing stack-extent proofs. Retain ordinary loads for reassigned/addressed parameter bindings; disabled output stays byte-identical. The policy test, 52 focused checks and six managed-JIT standalone runs pass. In 104,511 paired plaintext responses, throughput rises 16.2% and CPU falls 12.8%, with similar allocations. Broader mutable-alias/root-retention, sanitized, JSON, multi-owner and moving-GC qualification remains open; no default change.
+
 - Restore explicitly selectable, previously qualified direct/forwarded stack-argument elision in the isolated HTTP benchmark builder, clearing ambient proof flags and recording the choice. Three paired live cohorts validate 89,922 responses with 18.3% more throughput and 14.8% less CPU; managed allocations are unchanged in substance. A separate four-owner sync/live check validates 95,412 responses. Refresh bounded store-site attribution, reject mismatched counts and propagate diagnostic-only build status. Result constructors dominate remaining out-of-arena calls; production GC defaults remain unchanged.
 
 - Preserve experimental stack-store provenance through joins whose incoming SSA addresses prove the same stack slot and constant offset; retain ambiguous/foreign-pointer guards, cycle limits and pre-edit bounds rejection. All 52 focused tests pass, including JIT branch/fault checks. Rebuilt tasks, collections, arrays, plaintext and JSON objects remain byte-identical, so no workload performance/default gain is claimed. Raven emission and Runtime Contract are unchanged.

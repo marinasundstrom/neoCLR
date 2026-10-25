@@ -3924,8 +3924,16 @@ pub(crate) fn compile_into(
             let call_result_bytes = p.call_result_bytes();
             let mut frame_bytes = call_result_bytes as usize;
             let mut arguments = vec![];
+            let mut stable_byrefs = vec![];
             let mut at = 0;
-            for t in &p.args[i] {
+            #[cfg(test)]
+            let preserve_byrefs = live_stores && std::env::var_os("NEOCLR_LIVE_SSA_BYREF_ARGUMENTS").is_some();
+            #[cfg(not(test))]
+            let preserve_byrefs = false;
+            for (argument_index, t) in p.args[i].iter().enumerate() {
+                let stable = preserve_byrefs && matches!(t, Ty::Address(_))
+                    && immutable_argument_binding(&f.body, argument_index);
+                stable_byrefs.push(stable.then(|| parameters[at]));
                 let s = slot(&mut b, p.bytes(t));
                 frame_bytes += p.bytes(t) as usize + 7;
                 let address = b.ins().stack_addr(types::I64, s, 0);
@@ -4615,6 +4623,13 @@ pub(crate) fn compile_into(
                             };
                             stack.push(normalize(&mut b, &p, &p.ty(t)?, &[value])[0]);
                         }
+                    }
+                    Op::Arg(n) if stable_byrefs[*n].is_some() => {
+                        // The current native collector is nonmoving. Preserve
+                        // the immutable byref value, but keep its initialized
+                        // published root slot above for liveness. Never reuse
+                        // a parameter whose binding can be modified/aliased.
+                        stack.push(stable_byrefs[*n].unwrap());
                     }
                     Op::Arg(n) | Op::Load(n) => {
                         let (s, t) = if matches!(op, Op::Arg(_)) {
@@ -6475,4 +6490,23 @@ fn compile_initialization_guards(
         }
     }
     Ok(guards)
+}
+
+// Whole-body exclusion includes unreachable operations: this proof is deliberately
+// independent of CFG simplification and never infers non-aliasing from execution.
+fn immutable_argument_binding(body: &[Op], argument: usize) -> bool {
+    !body.iter().any(|op| matches!(op,
+        Op::StoreArg(n) | Op::ArgumentAddress(n) if *n == argument))
+}
+
+#[cfg(test)]
+mod stable_byref_tests {
+    use super::*;
+    #[test]
+    fn mutable_or_addressed_argument_bindings_are_never_cached() {
+        assert!(immutable_argument_binding(&[Op::Arg(0)], 0));
+        assert!(!immutable_argument_binding(&[Op::Arg(0), Op::StoreArg(0)], 0));
+        assert!(!immutable_argument_binding(&[Op::ArgumentAddress(0), Op::Arg(0)], 0));
+        assert!(immutable_argument_binding(&[Op::StoreArg(1), Op::ArgumentAddress(1)], 0));
+    }
 }

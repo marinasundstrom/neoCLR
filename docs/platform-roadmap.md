@@ -1,5 +1,7 @@
 # neoCLR platform roadmap
 
+**Immutable-byref prototype (2026-10-25):** [Origin proof and measured candidate](../benchmarks/execution/concurrent-workloads/stable-byref-results.md) retain published roots while exposing immutable byref SSA values. Focused tests and six standalone JIT runs pass; 104,511 paired plaintext responses show +16.2% throughput/-12.8% CPU with similar allocations. Keep test-only until executable mutable/alias and intervening-GC retention checks, broader JIT/AOT/sanitized/JSON and multi-owner qualification; moving GC needs explicit relocation handling.
+
 **Reuse qualified HTTP compiler options (2026-10-25):** [Isolated-owner integration and caller evidence](../benchmarks/execution/concurrent-http-owners/forward-results.md) restore direct/forwarded stack elision missing from that benchmark builder. 89,922 paired responses show +18.3% throughput/-14.8% CPU with similar allocations; 95,412 additional four-owner responses pass. Result constructors account for 59.4% of remaining out-of-arena calls. Investigate their call-site provenance next; concurrent-default, pause and stable scaling acceptance remain open.
 
 **Equal stack-join proof (2026-10-25):** [Compiler checks and workload audit](../benchmarks/execution/concurrent-workloads/equal-join-results.md) qualify equivalent-slot/offset joins with 52 focused tests. All five rebuilt workload objects remain byte-identical, so this adds no demonstrated HTTP/CPU gain. Next attribute remaining dynamic guarded stores before extending provenance across more complex boundaries.
