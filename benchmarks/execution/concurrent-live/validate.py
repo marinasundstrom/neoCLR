@@ -9,6 +9,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--output', type=Path, required=True)
 parser.add_argument('--sparse-index', action='store_true')
 parser.add_argument('--store-ranges', type=int, choices=range(1,17), default=4)
+parser.add_argument('--allocation-index', action='store_true')
 parser.add_argument('--split-store-tls', action='store_true')
 parser.add_argument('--full-store-walk', action='store_true')
 parser.add_argument('--profile-store-walks', action='store_true')
@@ -36,6 +37,7 @@ try:
     run(['python3', base/'generate.py', '--output', source])
     recipe = json.loads((root/'benchmarks/execution/call-layout/results.json').read_text())['builds'][1]['command']
     cc = recipe[:recipe.index('-std=c11')] + [f'-DGATE_WORDS={args.gate_words}', f'-DNEOCLR_LIVE_STORE_RANGES={args.store_ranges}']
+    if args.allocation_index: cc += ['-DNEOCLR_LIVE_ALLOCATION_INDEX']
     if args.split_store_tls: cc += ['-DNEOCLR_LIVE_SPLIT_STORE_TLS']
     if args.full_store_walk: cc += ['-DNEOCLR_LIVE_FULL_STORE_WALK']
     if args.profile_store_walks: cc += ['-DNEOCLR_LIVE_WALK_PROFILE']
@@ -48,7 +50,7 @@ try:
     if args.disable_store_cache: cc += ['-DNEOCLR_LIVE_NO_STORE_CACHE']
     if args.batch: cc += ['-DNEOCLR_LIVE_BATCH','-DNEOCLR_LIVE_GATE_PROFILE']
     for sanitizer in [False, True]:
-        for case in (['walk-profile-test'] if args.profile_store_walks and not args.disable_store_cache else []) + ['lifetime', 'store-test', 'exact-store-test', 'record-store-test', 'native-gc-test', 'native-gc-scan-test', 'native-gc-dense-test', 'native-gc-seed-test']:
+        for case in (['walk-profile-test'] if args.profile_store_walks and not args.disable_store_cache and not args.allocation_index else []) + ['lifetime', 'store-test', 'exact-store-test', 'record-store-test', 'native-gc-test', 'native-gc-scan-test', 'native-gc-dense-test', 'native-gc-seed-test']:
             fixture = base/(case+'.c')
             if case not in ['walk-profile-test', 'lifetime', 'store-test', 'exact-store-test', 'record-store-test']:
                 fixture = out/(case+'.c')

@@ -1,0 +1,78 @@
+{
+  "plain": [
+    {
+      "mode": "guarded-sync",
+      "visits": [
+        6101524,
+        816,
+        258082
+      ],
+      "searches": 77537
+    },
+    {
+      "mode": "live",
+      "visits": [
+        7852720,
+        1238,
+        237348
+      ],
+      "searches": 68303
+    },
+    {
+      "mode": "live-index",
+      "visits": [
+        68303,
+        1,
+        0
+      ],
+      "searches": 68303
+    },
+    {
+      "mode": "guarded-sync-index",
+      "visits": [
+        77537,
+        1,
+        0
+      ],
+      "searches": 77537
+    }
+  ],
+  "json": [
+    {
+      "mode": "guarded-sync",
+      "visits": [
+        7374234,
+        839,
+        349302
+      ],
+      "searches": 109874
+    },
+    {
+      "mode": "live",
+      "visits": [
+        8710510,
+        1311,
+        288038
+      ],
+      "searches": 98106
+    },
+    {
+      "mode": "live-index",
+      "visits": [
+        98106,
+        1,
+        0
+      ],
+      "searches": 98106
+    },
+    {
+      "mode": "guarded-sync-index",
+      "visits": [
+        109881,
+        1,
+        0
+      ],
+      "searches": 109881
+    }
+  ]
+}

@@ -12,6 +12,28 @@ def replace(old,new,count=1):
     assert s.count(old)==count, (old[:80],s.count(old),count)
     s=s.replace(old,new)
 s='#include "gate.h"\n#ifdef NEOCLR_WORKER_GC\n#error Live shared heaps are not admitted\n#endif\n'+s
+# Optional persistent index belongs to the owned heap, not candidate/marker state.
+replace('    const void *bases[OWNED_BASE_CACHE_SIZE];', """    const void *bases[OWNED_BASE_CACHE_SIZE];
+#ifdef NEOCLR_LIVE_ALLOCATION_INDEX
+    uint64_t *starts, *start_summary, start_words, start_summary_words;
+#endif""")
+replace('/* Positive entries only:', (base/'allocation-index.h').read_text()+'\n/* Positive entries only:')
+replace('    owned_heap.arena = arena;', """#ifdef NEOCLR_LIVE_ALLOCATION_INDEX
+    if (!owned_index_create(arena->capacity)) return 3;
+#endif
+    owned_heap.arena = arena;""")
+replace('    memset(&owned_heap, 0, sizeof(owned_heap));', """#ifdef NEOCLR_LIVE_ALLOCATION_INDEX
+    owned_index_destroy();
+#endif
+    memset(&owned_heap, 0, sizeof(owned_heap));""")
+replace('    if (owned) remember_base(chosen + 1);', """    if (owned) remember_base(chosen + 1);
+#ifdef NEOCLR_LIVE_ALLOCATION_INDEX
+    if (owned) owned_index_set((unsigned char *)(chosen+1)-a->data);
+#endif""")
+replace('                unsigned slot = base_slot(b + 1);', """#ifdef NEOCLR_LIVE_ALLOCATION_INDEX
+                owned_index_clear((unsigned char *)(b+1)-a->data);
+#endif
+                unsigned slot = base_slot(b + 1);""")
 replace('    uint64_t used, *offsets, *pending;', '''    uint64_t used, *offsets, *pending;
     block *headers;
     mutation_gate *gate;

@@ -21,6 +21,7 @@ p.add_argument('--split-tls', action='store_true')
 p.add_argument('--serialized-store', action='store_true')
 p.add_argument('--disable-exact-store', action='store_true')
 p.add_argument('--store-ranges', type=int, choices=range(1,17), default=4)
+p.add_argument('--allocation-index',action='store_true')
 p.add_argument('--split-store-tls', action='store_true')
 p.add_argument('--full-store-walk', action='store_true')
 p.add_argument('--profile-store-walks', action='store_true')
@@ -35,7 +36,7 @@ recipe_file = root / 'target/native-host-ownership/results.json'
 recipe = next(c['command'] for c in json.loads(recipe_file.read_text())['commands']
               if str(root / 'target/native-host-ownership/owned-aot') in c['command'])
 modes = ['sync', 'guarded-sync', 'live'] if a.guarded_control else ['sync', 'live']
-report = {'splitStoreTls':a.split_store_tls,'fullStoreWalk':a.full_store_walk,'repeatSnapshotLookup': a.repeat_snapshot_lookup, 'headerProof': a.header_proof, 'inlineValidation': a.inline_validation, 'splitTls': a.split_tls, 'serializedStore': a.serialized_store, 'optimizationLevel': build.get('optimizationLevel','none'), 'passed': False, 'scope': __doc__, 'iterations': build['iterations'],
+report = {'allocationIndex':a.allocation_index,'splitStoreTls':a.split_store_tls,'fullStoreWalk':a.full_store_walk,'repeatSnapshotLookup': a.repeat_snapshot_lookup, 'headerProof': a.header_proof, 'inlineValidation': a.inline_validation, 'splitTls': a.split_tls, 'serializedStore': a.serialized_store, 'optimizationLevel': build.get('optimizationLevel','none'), 'passed': False, 'scope': __doc__, 'iterations': build['iterations'],
           'commands': [], 'trials': [], 'inputs': {}, 'excluded': []}
 if a.profile_store_walks:report['diagnosticOnly']='Heap-walk instrumentation; timings are not benchmark evidence.'
 def run(command):
@@ -112,6 +113,11 @@ static void report_profile(struct rusage *a, struct rusage *b, struct timespec *
  fprintf(stderr,"\\n");
  experiment_gc_store_lookup_counts(counts);
  fprintf(stderr,"STORE_LOOKUPS %llu %llu\\n",(unsigned long long)counts[0],(unsigned long long)counts[1]);
+#ifdef NEOCLR_LIVE_ALLOCATION_INDEX
+ extern void experiment_gc_index_counts(uint64_t *);
+ experiment_gc_index_counts(counts);
+ fprintf(stderr,"INDEX_METADATA %llu %llu %llu\\n",(unsigned long long)counts[0],(unsigned long long)counts[1],(unsigned long long)counts[2]);
+#endif
 #ifdef NEOCLR_LIVE_WALK_PROFILE
  extern void experiment_gc_store_walk_counts(uint64_t *);
  experiment_gc_store_walk_counts(counts);
@@ -141,6 +147,7 @@ static void report_profile(struct rusage *a, struct rusage *b, struct timespec *
                 gate = root / 'benchmarks/execution/concurrent-mutation-gate'
                 command += ['-DWORKLOAD_LIVE', '-DNEOCLR_SHADOW_SPARSE_INDEX',
                             '-I', str(root / 'runtime/native/memory'), '-I', str(gate), str(gate / 'gate.c')]
+            if a.allocation_index and mode != 'sync': command += ['-DNEOCLR_LIVE_ALLOCATION_INDEX']
             if a.split_store_tls: command += ['-DNEOCLR_LIVE_SPLIT_STORE_TLS']
             if a.full_store_walk: command += ['-DNEOCLR_LIVE_FULL_STORE_WALK']
             if a.profile_store_walks and mode != 'sync': command += ['-DNEOCLR_LIVE_WALK_PROFILE']
@@ -165,7 +172,7 @@ static void report_profile(struct rusage *a, struct rusage *b, struct timespec *
                        'stdout': result.stdout, 'outputMatches': result.stdout == case['expectedPerIteration'] * build['iterations']}
                 report['trials'].append(row)
                 lines = result.stderr.splitlines()
-                for label in ['LOOKUPS', 'STORES', 'STORE_LOOKUPS', 'STORE_WALKS']:
+                for label in ['LOOKUPS', 'STORES', 'STORE_LOOKUPS', 'STORE_WALKS', 'INDEX_METADATA']:
                     row[label] = next((list(map(int, x.split()[1:])) for x in lines if x.startswith(label + ' ')), None)
                 values = next((x.split()[1:] for x in lines if x.startswith('PROFILE ')), None)
                 if values:
@@ -177,6 +184,9 @@ static void report_profile(struct rusage *a, struct rusage *b, struct timespec *
                 row['passed'] = result.returncode == 0 and row['outputMatches'] and values is not None
                 if mode != 'sync': row['passed'] &= len(counts) == 6 and counts[0] == counts[1] + counts[2] and counts[5] == 0
                 if mode == 'guarded-sync': row['passed'] &= counts == [0] * 6
+                if a.allocation_index and mode != 'sync':
+                    metadata = row.get('INDEX_METADATA')
+                    row['passed'] &= metadata is not None and len(metadata) == 3 and metadata[0] > 0 and metadata[1] == 0 and metadata[2] > 0
     report['allocationEquality'] = all(
         len({(t.get('allocations'), t.get('allocatedBytes')) for t in report['trials'] if t['sample'] == c['sample']}) == 1
         for c in admitted)

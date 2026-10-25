@@ -6,11 +6,12 @@ import os
 from pathlib import Path
 import subprocess
 p=argparse.ArgumentParser(description=__doc__)
+p.add_argument('--allocation-index',action='store_true')
 p.add_argument('--runner',type=Path,required=True)
 p.add_argument('--output',type=Path,required=True)
 a=p.parse_args();base=Path(__file__).resolve().parent;root=base.parents[2]
 out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
-r=dict(passed=False,commands=[])
+r=dict(passed=False,allocationIndex=a.allocation_index,commands=[])
 def run(cmd,env=None):
  cmd=list(map(str,cmd));x=subprocess.run(cmd,capture_output=True,text=True,timeout=90,env=env)
  r['commands'].append(dict(command=cmd,environment=env and {k:v for k,v in env.items() if k.startswith('NEOCLR_MUTATION_')},exitCode=x.returncode,stdout=x.stdout,stderr=x.stderr))
@@ -25,6 +26,7 @@ try:
  run(['python3',base.parent/'concurrent-live/automatic.py','--output',source])
  recipe=json.loads((root/'benchmarks/execution/call-layout/results.json').read_text())['builds'][1]['command']
  cc=recipe[:recipe.index('-std=c11')]
+ if a.allocation_index:cc+=['-DNEOCLR_LIVE_ALLOCATION_INDEX']
  common=cc+['-std=c11','-O2','-Wall','-Wextra','-Werror','-pthread','-DNEOCLR_NATIVE_GC','-DNEOCLR_GC_PROFILE','-DNEOCLR_SHADOW_SPARSE_INDEX','-I',root/'runtime/native/gc','-I',base.parent/'concurrent-mutation-gate',consumer,base.parent/'concurrent-mutation-gate/gate.c',root/'runtime/native/gc/root-probe.c',root/'runtime/native/memory/text-arena.c',source]
  for paced in [False,True]:
   flags=['-DNEOCLR_GC_PACED'] if paced else []

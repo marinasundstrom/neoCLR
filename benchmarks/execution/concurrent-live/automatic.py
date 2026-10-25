@@ -88,6 +88,9 @@ int32_t experiment_gc_prepare_entry_v1(neoclr_aot_context *context) {
     context->text.used = 0;
     owned_heap.used = owned_heap.free_head = 0;
     memset(owned_heap.bases, 0, sizeof(owned_heap.bases));
+#ifdef NEOCLR_LIVE_ALLOCATION_INDEX
+    owned_index_reset();
+#endif
     /* Keep aggregate statistics and unrelated root state; force fresh pacing. */
     gc_state.pacing.context = NULL;
     return 0;

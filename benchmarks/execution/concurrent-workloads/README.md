@@ -165,3 +165,7 @@ queued-load gains; full-walk controls preserve the comparison and worst-case gap
 [Private store-state grouping](store-tls-results.md) follows the post-anchor CPU
 profile. It reduces verified TLS resolution while retaining separate heap ownership,
 all hint validation and a split-layout control.
+
+[Owned allocation index](allocation-index-results.md) compares a maintained start
+bitmap with anchored walks. The opt-in includes independent lifecycle/model tests,
+metadata-allocation/cleanup accounting and explicit .NET/Go design comparisons.

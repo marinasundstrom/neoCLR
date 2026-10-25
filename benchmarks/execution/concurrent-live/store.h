@@ -198,6 +198,21 @@ int experiment_gc_store(neoclr_aot_context *context, void *destination,
 #ifdef NEOCLR_LIVE_WALK_PROFILE
     uint64_t walk_steps=0;
 #endif
+#ifdef NEOCLR_LIVE_ALLOCATION_INDEX
+    (void)walk_start;
+    uint64_t indexed=owned_index_before(address-base);
+    if (indexed==UINT64_MAX || indexed<sizeof(block) || indexed>=a->used) goto rejected;
+#ifdef NEOCLR_LIVE_WALK_PROFILE
+    live_store_walk_counts[0]++;
+    if (!live_store_walk_counts[1]) live_store_walk_counts[1]=1;
+    (void)walk_steps;
+#endif
+    uint64_t at=indexed-sizeof(block);
+    if (!block_valid(a,at)) goto rejected;
+    b=(void *)(a->data+at);
+    if (!(b->state&ALLOCATED) || address-base-indexed>=b->bytes) goto rejected;
+    goto located;
+#else
     for (uint64_t at=walk_start;at<a->used;) {
 #ifdef NEOCLR_LIVE_WALK_PROFILE
         live_store_walk_counts[0]++;
@@ -214,6 +229,7 @@ int experiment_gc_store(neoclr_aot_context *context, void *destination,
         at+=b->span;
     }
     goto rejected;
+#endif
 located:;
     uintptr_t payload=(uintptr_t)(b+1);
     uint64_t offset=address-payload;
