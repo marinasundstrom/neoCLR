@@ -86,3 +86,5 @@ matrix was rerun for this isolated primitive because no production behavior chan
 Next integrate the primitive into an opt-in owned-heap marker and all admitted writer
 paths, reject unsupported providers explicitly, then run existing differential GC
 fixtures and batched standalone/HTTP consumers before considering default admission.
+
+[Registered worker protocol](workers-results.md) documents the opt-in multiwriter prerequisite, validation and remaining shared-heap integration boundaries.

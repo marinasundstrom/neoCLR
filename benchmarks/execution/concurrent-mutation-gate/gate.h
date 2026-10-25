@@ -21,11 +21,25 @@ typedef struct {
     unsigned active, cancelled;
     size_t count;
     uint64_t words[GATE_WORDS];
+#ifdef NEOCLR_GATE_WORKERS
+    struct { pthread_t thread; uint64_t generation; unsigned admitted; } writers[16];
+#endif
 } mutation_gate;
 typedef struct {
     size_t offset, length;
     const void *source;
 } mutation_patch;
+#ifdef NEOCLR_GATE_WORKERS
+/* Private epoch-scoped authority, not a transferable managed/heap handle.
+ * Owner publishes tokens to already-created threads via external synchronization.
+ * Revoke before thread exit/reuse. Gate/payload/source lifetimes remain caller-owned.
+ * Stop invalidates all tokens; join all users before destroy/reclaim. */
+typedef struct { mutation_gate *gate; uint64_t epoch, generation; unsigned slot; } gate_writer;
+int gate_register_writer(mutation_gate *, pthread_t, gate_writer *);
+int gate_revoke_writer(mutation_gate *, const gate_writer *);
+int gate_write_registered(mutation_gate *, const gate_writer *, void *, size_t, size_t,
+                          const mutation_patch *, size_t);
+#endif
 int gate_init(mutation_gate *g);
 int gate_begin(mutation_gate *g, uint64_t *epoch);
 /* Owner stops new reads. Caller must join marker before destroying/reclaiming. */
