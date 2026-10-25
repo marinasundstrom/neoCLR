@@ -92,6 +92,49 @@ owner-allocated inputs, and allocation requests from generated execution, comple
 resource roots, persistent-worker fault/cancellation and scheduler routing remain
 unqualified. No throughput improvement follows from this correctness test alone.
 
+## Owner-serviced allocation requests
+
+The private `NEOCLR_GC_ALLOCATION_DISPATCH` build option adds a thread-local adapter
+at the existing `neoclr_gc_allocate_v1` entry, before it inspects arena metadata.
+Absent the option, there is no hook branch. With no installed callback, the existing
+allocator runs unchanged. The adapter is an internal service seam, not a new
+managed allocation API or permission to share an arena without coordination.
+
+The callback must preserve non-collecting allocation, zeroed successful storage,
+error codes and output publication only on success. It must coordinate arena
+identity/lifetime and allocator/sweep access. It must not recursively dispatch to
+itself. The test uses one bounded request slot per worker and a fixed owner whose
+hook is unset. Workers use empty local arenas as request identities, ensuring they
+cannot accidentally allocate against copied owner metadata. Requests contain size
+and storage kind; the owner selects its authoritative arena. Mutex/condition
+handoffs publish the result; the worker initializes it before final rendezvous.
+
+`allocation-validation.json.gz` adds 100 epochs per ordinary/UB-bounds build with
+four workers, 1,600 requests, 800 successful allocations and 1,200 live-object
+checks. Oversized and invalid-kind requests preserve outputs; success returns
+zeroed objects, worker publication through the registered barrier succeeds, and
+removing roots reclaims everything. Bypassing dispatch fails at the successful
+allocation assertion. Several workers may report that same assertion before
+abort; the verifier requires one to four copies and rejects any other diagnostic.
+The initial overly strict verifier report is retained in `allocation-initial.json.gz`.
+Existing temporary/persistent mutator and array tests, including negative controls,
+also rerun with the current source.
+
+This follows the previously recorded .NET comparison at the internal allocation
+service layer while retaining the existing managed contracts. Routing requests to
+one owner is a provisional neoCLR implementation choice: it avoids migrating TLS
+allocator/epoch state, but adds synchronization and can serialize allocation.
+The test services workers sequentially; it is not a fairness or throughput design.
+No per-request native message allocation is needed in this fixture, but no
+application allocation/CPU improvement is established.
+
+Generated calls already use this allocator entry, but the compiler/worker-pool
+adapter does not yet install or serve the hook. Rooted allocation pressure must
+coordinate all participant roots before collection; this non-collecting seam alone
+does not authorize that path. Provider intermediates, owner scheduling, cancellation,
+worker faults and complete persistent dispatch lifetimes still require integration.
+The live shared-heap admission rejection remains in place.
+
 TSan remains unqualified after the previously recorded test and minimal pthread
 control startup failures. No new ASan/TSan, JIT, AOT application, HTTP performance,
 pause, allocation reduction or default-collector claim is made by this test.

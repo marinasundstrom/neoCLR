@@ -359,8 +359,15 @@ int32_t neoclr_gc_owned_roots_check_v1(neoclr_aot_context *context, const uint64
     for (host_root *r = host_head; r; r = r->next) actual += r->context == context;
     return actual == count ? 0 : 3;
 }
+#ifdef NEOCLR_GC_ALLOCATION_DISPATCH
+_Thread_local neoclr_gc_allocation_dispatch neoclr_gc_allocation_dispatch_hook;
+#endif
 int32_t neoclr_gc_allocate_v1(neoclr_aot_text_arena *a, uint64_t bytes,
                              uint32_t kind, void **output) {
+#ifdef NEOCLR_GC_ALLOCATION_DISPATCH
+    if (neoclr_gc_allocation_dispatch_hook)
+        return neoclr_gc_allocation_dispatch_hook(a, bytes, kind, output);
+#endif
     if (!output || !valid(a) || !bytes || kind < NEOCLR_GC_TEXT || kind > NEOCLR_GC_INTERN)
         return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     int oversized = bytes > UINT64_MAX - sizeof(block) - 7;

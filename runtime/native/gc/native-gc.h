@@ -135,6 +135,14 @@ int32_t neoclr_invoke_void_callback_v1(uint64_t handle, neoclr_aot_context *cont
  * Outputs publish only on success; no roots, allocation or collection. */
 int32_t neoclr_gc_allocation_info_v1(neoclr_aot_context *, const void *,
     uint64_t *bytes, uint32_t *kind);
+#ifdef NEOCLR_GC_ALLOCATION_DISPATCH
+/* Private owner-service adapter. Dispatch occurs before inspecting the arena.
+ * The callback must preserve non-collecting allocation semantics and output-on-
+ * success behavior. Caller supplies a valid output pointer; service coordinates
+ * arena lifetime and all allocation/sweep access. No shared-heap admission. */
+typedef int32_t (*neoclr_gc_allocation_dispatch)(neoclr_aot_text_arena *, uint64_t, uint32_t, void **);
+extern _Thread_local neoclr_gc_allocation_dispatch neoclr_gc_allocation_dispatch_hook;
+#endif
 /* Allocation never collects; output is published only on success.
  * Successful storage is fully zeroed, including reused payload and padding.
  * Constructors may rely on this guarantee; non-GC arena reservation differs. */
