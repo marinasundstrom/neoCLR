@@ -11,7 +11,7 @@
   collector configurations, including idle connections, queued handlers and shutdown.
   Testing exposed an idle input array-budget fault and the existing five-second
   socket transfer cap. Smaller initial windows fix the former; the latter remains a
-  policy issue. A subsequent fresh standalone cohort passes 72 AOT/JIT invocations with matching allocation work. Interpreter mark-sweep passes the full steady pilot; the concurrent candidate is unavailable in that backend. Full interpreter, refreshed HTTP and pause-profile cells, and public enablement remain open.
+  policy issue. A subsequent fresh standalone cohort passes 72 AOT/JIT invocations with matching allocation work. Interpreter mark-sweep passes four full-work samples; retained-window times out at 900 seconds and mixed-phases is not reached. The concurrent candidate is unavailable in that backend. The private HTTP matrix fixture preserves the standard JSON model and passes 600 responses across 30 qualification cells (five configurations, two payloads, three connection patterns). Repeated HTTP measurements, remaining interpreter work, pause profiles and public enablement remain open.
 - **Evidence:** [Driver tests and matrix plan](../benchmarks/http-server/pipelining/README.md).
 
 ## 2026-10-25 — Permit HTTP architecture changes during preview

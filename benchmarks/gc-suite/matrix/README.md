@@ -10,7 +10,7 @@ profiles are still pending. This is not completion of the requested matrix.
 
 | Execution | Collector | Evidence/status |
 | --- | --- | --- |
-| Interpreter | mark-sweep | Full steady-allocation pilot passes; full six-sample first pass started |
+| Interpreter | mark-sweep | Four full samples pass; retained-window times out at 900 seconds |
 | Interpreter | concurrent native candidate | Unsupported: src/gc.rs exposes only MarkSweep; CLI rejects concurrent |
 | AOT | synchronous native | 18 measured invocations pass |
 | AOT | concurrent native | 18 measured invocations pass |
@@ -74,8 +74,9 @@ The unchanged steady sample performs 1,048,576 managed Reading allocations and
 passes its exact checksum. It takes 53.60 seconds wall / 53.50 seconds whole-process
 CPU; GC reports 1,048,585 allocated/reclaimed objects, peak 64 and 19,419 collections.
 These metrics include metadata loading/startup and are **not** interchangeable
-with native invocation-only timings. The full fixed-work six-sample first pass is
-being measured without reducing loop counts. Timeout/instruction-budget failures
+with native invocation-only timings. The full fixed-work first pass did not reduce loop counts: compute, reuse-buffer,
+steady and bursts pass; retained-window hits the 900-second timeout and the
+fail-fast runner does not reach mixed-phases. Timeout/instruction-budget failures
 must remain failed measurements, never successful throughput rows. Three-round
 interpreter statistics remain pending.
 
@@ -102,3 +103,70 @@ experiments, not a clean-checkout benchmark bootstrap or portable installed CLI 
 Archives: `aot-run.json.gz`, `aot-results.json.gz`, `jit-results.json.gz`, and
 `interpreter-pilot.json.gz`. Native data is complete; the pilot is one interpreter
 sample/run, not a complete matrix cell set.
+
+### Full interpreter first pass
+
+Single invocation per sample, unchanged work counts. CPU here is whole-process
+seconds, including startup, unlike the native invocation-only table above.
+
+| Sample | Wall seconds | Process CPU seconds | Outcome |
+| --- | ---: | ---: | --- |
+| compute | 637.43 | 633.90 | Checksum passes |
+| reuse-buffer | 95.56 | 95.11 | Checksum passes |
+| steady | 52.51 | 52.24 | Checksum passes |
+| bursts | 92.80 | 92.57 | Checksum passes |
+| retained-window | 900.02 | 896.90 | Timeout, no completed checksum |
+| mixed-phases | — | — | Not reached |
+
+`interpreter-full-first-pass.json.gz` preserves the failed cohort and successful
+preceding trials. Its archive note distinguishes input hashes captured after the
+timeout from the original runner's incomplete result. No builds or competing
+benchmarks were started during this cohort. The retained-object cost needs a
+separate profile; these timings alone do not identify its cause.
+
+## Private persistent HTTP matrix procedure
+
+`prepare-http.py` builds one exact-source System.Web fixture with the canonical
+three-field `Person` JSON model retained for native reflection. It prepares AOT
+executables and JIT hosts for both native collectors before timing. The interpreter
+uses the same assembly and its mark-sweep implementation. Public server APIs and
+collector defaults are unchanged.
+
+```sh
+python3 benchmarks/gc-suite/matrix/prepare-http.py \
+  --output target/gc-matrix-http-build-new
+python3 benchmarks/gc-suite/matrix/http.py \
+  --build target/gc-matrix-http-build-new --output target/gc-matrix-http-smoke-new \
+  --requests 16 --interpreter-requests 16 --warmup 4 --concurrency 2 \
+  --pipeline-depth 4 --rounds 1 --smoke
+```
+
+Run qualification first, then invoke `http.py` with fresh output and without
+`--smoke` for measurements. Defaults are three rounds, 4,096 native/64 interpreter
+requests per invocation, 16 warmup requests, four clients and pipeline depth 16.
+Those different counts must remain explicit in reports. Use `--modes`, `--samples`
+and `--protocols` to select a bounded cohort. Run cohorts sequentially.
+
+Close, sequential keep-alive and pipelined traffic all exercise the new private
+persistent driver. The close column is not the historical public Serve driver.
+Every response validates status, content type, body, length, connection policy and
+expected EOF. Shutdown must report all warmup/measured requests and no failures;
+live collector accounting and JIT exit diagnostics must pass. No forced collection
+occurs in this fixture.
+
+Request throughput times only measured client traffic. Native CPU/allocations cover
+the entire invocation (warmup, readiness and cleanup included); interpreter CPU
+includes process startup. JIT compilation is recorded separately. Client CPU is
+also retained. Pipeline latencies are observed from each batch start, not independent
+request latency or GC pause measurements. These Python loopback clients do not
+establish saturation, TechEmpower compatibility or an external framework ranking.
+
+Qualification evidence: `http-build.json.gz` and `http-smoke.json.gz` pass all
+30 cells (600 responses including warmup), with 95 completed concurrent epochs
+and no invalid-state reports. These small runs are not throughput evidence.
+`http-development-failures.json` preserves two preparation failures: the first
+incorrectly required explicit sync budget macros where the retained recipe used
+identical defaults; the second omitted the JSON model's reflection roots. The final
+build supplies explicit sync budgets and standard Person reflection retention;
+no compiler admission guard was relaxed. Three-round measurements are running,
+with pause profiles still pending.

@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="$(NeoClrBundleRoot)/lib/NeoCLR.ClassLibrary.props" />
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <RavenNeoClrRuntimeAsyncHelper></RavenNeoClrRuntimeAsyncHelper>
+    <AssemblyName>BenchmarkTests</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Remove="System.Web" />
+    <Compile Include="Benchmark.rvn" />
+    <Compile Include="../Model.rvn" />
+    <Compile Include="$(NeoClrBundleRoot)/lib/RuntimeAwait.rvn" />
+    <!-- Compile exact System.Web sources so session/parser internals need no friend grant. -->
+    <Compile Include="../../../runtime/raven/src/System/Web/**/*.rvn" />
+  </ItemGroup>
+</Project>

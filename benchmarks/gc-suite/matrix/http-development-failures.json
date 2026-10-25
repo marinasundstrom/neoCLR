@@ -1,0 +1,27 @@
+[
+  {
+    "version": 1,
+    "passed": false,
+    "log": "Traceback (most recent call last):\n  File \"/Users/robert/Projects/neoclr/benchmarks/gc-suite/matrix/prepare-http.py\", line 53, in <module>\n    assert '-DNEOCLR_GC_ALLOCATION_BUDGET=256' in link\nAssertionError\n",
+    "failedCommands": []
+  },
+  {
+    "version": 2,
+    "passed": false,
+    "log": "Traceback (most recent call last):\n  File \"/Users/robert/Projects/neoclr/benchmarks/gc-suite/matrix/prepare-http.py\", line 48, in <module>\n    run(launch,env)\n  File \"/Users/robert/Projects/neoclr/benchmarks/gc-suite/matrix/prepare-http.py\", line 24, in run\n    x.check_returncode()\n  File \"/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py\", line 460, in check_returncode\n    raise CalledProcessError(self.returncode, self.args, self.stdout,\nsubprocess.CalledProcessError: Command '['/Users/robert/Projects/neoclr/target/release/deps/neoclr_codegen-12f33f26d2ff4df0', 'mutation_store::tests::full_http_selection_compiles_with_live_gc', '--exact', '--ignored', '--nocapture']' returned non-zero exit status 101.\n",
+    "failedCommands": [
+      {
+        "command": [
+          "/Users/robert/Projects/neoclr/target/release/deps/neoclr_codegen-12f33f26d2ff4df0",
+          "mutation_store::tests::full_http_selection_compiles_with_live_gc",
+          "--exact",
+          "--ignored",
+          "--nocapture"
+        ],
+        "exitCode": 101,
+        "stdout": "\nrunning 1 test\ntest mutation_store::tests::full_http_selection_compiles_with_live_gc ... FAILED\n\nfailures:\n\nfailures:\n    mutation_store::tests::full_http_selection_compiles_with_live_gc\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 230 filtered out; finished in 8.47s\n\n",
+        "stderr": "\nthread 'mutation_store::tests::full_http_selection_compiles_with_live_gc' (92061779) panicked at runtime/codegen/src/mutation_store_tests.rs:2082:52:\ncalled `Result::unwrap()` on an `Err` value: \"experimental live stores reject unaudited native replacement bodies: function 1583 ($aot_box_query_1583), function 1584 ($aot_box_query_1584)\"\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+      }
+    ]
+  }
+]

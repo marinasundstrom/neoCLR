@@ -458,5 +458,8 @@ JIT compilation/startup is excluded and recorded separately. These results ident
 an allocation-heavy JIT cost present with either collector, while the low-allocation
 reuse case still exposes concurrent store/runtime overhead. They do not demonstrate
 a concurrent-over-sync advantage. Interpreter exposes only mark-sweep today; its
-full steady-allocation pilot passes, but the full interpreter cohort, refreshed
-plain/JSON persistent HTTP measurements and pause profiles remain pending.
+first full-work pass completes compute, reusable-buffer, steady and burst samples.
+Retained-window times out after 900 seconds, and mixed-phases is not reached.
+This is an incomplete single-pass cohort, not three-round statistics. Refreshed
+plain/JSON HTTP qualification now passes 600 responses across 30 close/keep-alive/
+pipelined cells. Repeated HTTP measurements and pause profiles remain pending.
