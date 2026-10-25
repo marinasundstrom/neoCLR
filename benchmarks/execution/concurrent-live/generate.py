@@ -155,6 +155,18 @@ s=s[:start]+'''            if (!existed) {
             } else if (s->marked[previous] && !(b->state & MARKED)) {
                 b->state=ALLOCATED|MARKED|SCANNED;
             }'''+s[end:]
+# The seed walk already holds a validated allocated header. Reuse the canonical
+# mark transition, including zero-byte exclusion and atomic fixed-point counts.
+mark_start=s.index('static void mark(')
+mark_end=s.index('\nstatic void mark_slots(',mark_start)
+mark_body=s[mark_start:mark_end]
+transition=mark_body[mark_body.index('        LOOKUP_COUNT(newly_marked);'):]
+assert transition.endswith('    }\n}')
+transition=transition[:-len('    }\n}')]
+helper='#ifdef NEOCLR_LIVE_DIRECT_SEED\nstatic void candidate_mark_validated(block *b, block_index *index, block **pending) {\n    LOOKUP_COUNT(mark_candidates);\n    if (b->bytes) LOOKUP_COUNT(payload_matches);\n    if (b->bytes && !(b->state & MARKED)) {\n'+transition+'    }\n}\n#endif\n'
+replace('static int candidate_seed(', helper+'static int candidate_seed(')
+replace('                mark(a,index,(uintptr_t)(b+1),pending);',
+    '#ifdef NEOCLR_LIVE_DIRECT_SEED\n                candidate_mark_validated(b,index,pending);\n#else\n                mark(a,index,(uintptr_t)(b+1),pending);\n#endif')
 # Finish drains after mutations stop; only newly discovered old objects need
 # another worker pass. Never lose barriers published after the first pass idles.
 replace('''    candidate_wait();

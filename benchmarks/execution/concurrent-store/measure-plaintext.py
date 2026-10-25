@@ -13,6 +13,7 @@ import threading
 import time
 p=argparse.ArgumentParser(description=__doc__)
 p.add_argument('--compare-linear-seed',action='store_true')
+p.add_argument('--compare-direct-seed',action='store_true')
 p.add_argument('--compare-worker-tls',action='store_true')
 p.add_argument('--modes',nargs='+',help='Select unique modes from the configurations enabled by the comparison flags.')
 p.add_argument('--compare-inline-base',action='store_true')
@@ -55,6 +56,7 @@ assert not a.profile_finish or a.profile_owner_pauses
 assert a.requests>0 and a.warmup>=0 and a.pairs>0
 assert not a.previous_inline_object or (a.compare_inline_base and not a.previous_live_object)
 assert not a.compare_linear_seed or a.compare_inline_base
+assert not a.compare_direct_seed or a.compare_inline_base
 assert not a.compare_worker_tls or a.compare_inline_base
 assert not a.compare_inline_base or (a.compare_exact_allocation_index and not a.direct_exact_allocation_index)
 assert not a.direct_exact_allocation_index or a.compare_exact_allocation_index
@@ -225,6 +227,9 @@ static void report_measurement(void) {
  if a.compare_linear_seed:
   configurations.append(('live-linear-seed-inline-index',a.live_object))
   if a.include_guarded_sync:configurations.append(('guarded-sync-linear-seed-inline-index',a.live_object))
+ if a.compare_direct_seed:
+  configurations.append(('live-direct-seed-inline-index',a.live_object))
+  if a.include_guarded_sync:configurations.append(('guarded-sync-direct-seed-inline-index',a.live_object))
  if a.modes:
   assert len(set(a.modes))==len(a.modes) and set(a.modes)<=set(mode for mode,_ in configurations)
   configurations=[(mode,obj) for mode,obj in configurations if mode in a.modes]
@@ -262,6 +267,7 @@ static void report_measurement(void) {
   if a.profile_finish and mode!='sync':command+=['-DFINISH_PHASE_PROFILE']
   if a.profile_collection and mode!='sync':command+=['-DCOLLECTION_PART_PROFILE']
   if '-linear-seed-' in mode:command+=['-DNEOCLR_LIVE_LINEAR_SEED']
+  if '-direct-seed-' in mode:command+=['-DNEOCLR_LIVE_DIRECT_SEED']
   run(command);executables[mode]=exe
  # Finish every build before timing. Alternate order to expose systematic drift.
  for pair in range(a.pairs):

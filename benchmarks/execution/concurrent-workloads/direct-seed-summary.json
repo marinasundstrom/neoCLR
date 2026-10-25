@@ -1,0 +1,400 @@
+{
+  "passed": true,
+  "cohorts": {
+    "ordinary": {
+      "trials": 150,
+      "samples": {
+        "arrays": {
+          "guarded-sync-direct-seed-hybrid-inline": {
+            "cpuSeconds": 0.052774,
+            "wallSeconds": 0.0538285,
+            "peakLiveBytes": 593.0,
+            "peakArenaUsed": 15952.0,
+            "allocationsRange": [
+              86028,
+              86028
+            ],
+            "allocatedBytesRange": [
+              1892721,
+              1892721
+            ],
+            "pairedCpuRatio": 0.9997152459521219,
+            "pairedTimeOrThroughputRatio": 1.0002636514045165
+          },
+          "guarded-sync-hybrid-inline": {
+            "cpuSeconds": 0.0527165,
+            "wallSeconds": 0.053775,
+            "peakLiveBytes": 593.0,
+            "peakArenaUsed": 15952.0,
+            "allocationsRange": [
+              86028,
+              86028
+            ],
+            "allocatedBytesRange": [
+              1892721,
+              1892721
+            ]
+          },
+          "live-direct-seed-hybrid-inline": {
+            "cpuSeconds": 0.056812,
+            "wallSeconds": 0.05737,
+            "peakLiveBytes": 6239.0,
+            "peakArenaUsed": 45376.0,
+            "allocationsRange": [
+              86028,
+              86028
+            ],
+            "allocatedBytesRange": [
+              1892721,
+              1892721
+            ],
+            "pairedCpuRatio": 0.9950918455073814,
+            "pairedTimeOrThroughputRatio": 0.9940250937804725
+          },
+          "live-hybrid-inline": {
+            "cpuSeconds": 0.0569745,
+            "wallSeconds": 0.057509,
+            "peakLiveBytes": 6239.0,
+            "peakArenaUsed": 45376.0,
+            "allocationsRange": [
+              86028,
+              86028
+            ],
+            "allocatedBytesRange": [
+              1892721,
+              1892721
+            ]
+          },
+          "sync": {
+            "cpuSeconds": 0.04959,
+            "wallSeconds": 0.0511625,
+            "peakLiveBytes": 593.0,
+            "peakArenaUsed": 15952.0,
+            "allocationsRange": [
+              86028,
+              86028
+            ],
+            "allocatedBytesRange": [
+              1892721,
+              1892721
+            ]
+          }
+        },
+        "collections": {
+          "guarded-sync-direct-seed-hybrid-inline": {
+            "cpuSeconds": 0.11744550000000001,
+            "wallSeconds": 0.1187095,
+            "peakLiveBytes": 1694.0,
+            "peakArenaUsed": 20328.0,
+            "allocationsRange": [
+              237580,
+              237580
+            ],
+            "allocatedBytesRange": [
+              7864689,
+              7864689
+            ],
+            "pairedCpuRatio": 0.996626423896654,
+            "pairedTimeOrThroughputRatio": 0.9954761307813926
+          },
+          "guarded-sync-hybrid-inline": {
+            "cpuSeconds": 0.11777399999999999,
+            "wallSeconds": 0.1191115,
+            "peakLiveBytes": 1694.0,
+            "peakArenaUsed": 20328.0,
+            "allocationsRange": [
+              237580,
+              237580
+            ],
+            "allocatedBytesRange": [
+              7864689,
+              7864689
+            ]
+          },
+          "live-direct-seed-hybrid-inline": {
+            "cpuSeconds": 0.135047,
+            "wallSeconds": 0.13402799999999998,
+            "peakLiveBytes": 10113.0,
+            "peakArenaUsed": 55016.0,
+            "allocationsRange": [
+              237580,
+              237580
+            ],
+            "allocatedBytesRange": [
+              7864689,
+              7864689
+            ],
+            "pairedCpuRatio": 0.9881410366948841,
+            "pairedTimeOrThroughputRatio": 0.9885512248771392
+          },
+          "live-hybrid-inline": {
+            "cpuSeconds": 0.1364405,
+            "wallSeconds": 0.13530999999999999,
+            "peakLiveBytes": 10113.0,
+            "peakArenaUsed": 55016.0,
+            "allocationsRange": [
+              237580,
+              237580
+            ],
+            "allocatedBytesRange": [
+              7864689,
+              7864689
+            ]
+          },
+          "sync": {
+            "cpuSeconds": 0.0887075,
+            "wallSeconds": 0.0900215,
+            "peakLiveBytes": 1694.0,
+            "peakArenaUsed": 20328.0,
+            "allocationsRange": [
+              237580,
+              237580
+            ],
+            "allocatedBytesRange": [
+              7864689,
+              7864689
+            ]
+          }
+        },
+        "tasks": {
+          "guarded-sync-direct-seed-hybrid-inline": {
+            "cpuSeconds": 0.0208075,
+            "wallSeconds": 0.0208745,
+            "peakLiveBytes": 497.0,
+            "peakArenaUsed": 18424.0,
+            "allocationsRange": [
+              65548,
+              65548
+            ],
+            "allocatedBytesRange": [
+              2261361,
+              2261361
+            ],
+            "pairedCpuRatio": 1.0051972307424961,
+            "pairedTimeOrThroughputRatio": 1.0061007820514787
+          },
+          "guarded-sync-hybrid-inline": {
+            "cpuSeconds": 0.0206695,
+            "wallSeconds": 0.020702,
+            "peakLiveBytes": 497.0,
+            "peakArenaUsed": 18424.0,
+            "allocationsRange": [
+              65548,
+              65548
+            ],
+            "allocatedBytesRange": [
+              2261361,
+              2261361
+            ]
+          },
+          "live-direct-seed-hybrid-inline": {
+            "cpuSeconds": 0.023839,
+            "wallSeconds": 0.023559,
+            "peakLiveBytes": 9329.0,
+            "peakArenaUsed": 53240.0,
+            "allocationsRange": [
+              65548,
+              65548
+            ],
+            "allocatedBytesRange": [
+              2261361,
+              2261361
+            ],
+            "pairedCpuRatio": 0.9996272126544222,
+            "pairedTimeOrThroughputRatio": 0.9999365965001268
+          },
+          "live-hybrid-inline": {
+            "cpuSeconds": 0.0238365,
+            "wallSeconds": 0.023547,
+            "peakLiveBytes": 9329.0,
+            "peakArenaUsed": 53240.0,
+            "allocationsRange": [
+              65548,
+              65548
+            ],
+            "allocatedBytesRange": [
+              2261361,
+              2261361
+            ]
+          },
+          "sync": {
+            "cpuSeconds": 0.014994500000000001,
+            "wallSeconds": 0.015137999999999999,
+            "peakLiveBytes": 497.0,
+            "peakArenaUsed": 18424.0,
+            "allocationsRange": [
+              65548,
+              65548
+            ],
+            "allocatedBytesRange": [
+              2261361,
+              2261361
+            ]
+          }
+        }
+      },
+      "allocationEquality": true
+    },
+    "plain": {
+      "trials": 20,
+      "samples": {
+        "plain": {
+          "guarded-sync-direct-seed-inline-index": {
+            "requestsPerSecond": 3397.136085850149,
+            "processCpuSeconds": 0.605143,
+            "peakRssBytes": 11059200.0,
+            "allocationsRange": [
+              429856,
+              429857
+            ],
+            "allocatedBytesRange": [
+              33057881,
+              33058409
+            ],
+            "pairedCpuRatio": 1.0005748829531194,
+            "pairedTimeOrThroughputRatio": 0.9992509702095103
+          },
+          "guarded-sync-inline-index": {
+            "requestsPerSecond": 3389.940266696372,
+            "processCpuSeconds": 0.6045860000000001,
+            "peakRssBytes": 11059200.0,
+            "allocationsRange": [
+              429856,
+              429857
+            ],
+            "allocatedBytesRange": [
+              33057881,
+              33058409
+            ]
+          },
+          "live-direct-seed-inline-index": {
+            "requestsPerSecond": 3111.2588616133144,
+            "processCpuSeconds": 0.7049605,
+            "peakRssBytes": 11624448.0,
+            "allocationsRange": [
+              429856,
+              429856
+            ],
+            "allocatedBytesRange": [
+              33057881,
+              33057881
+            ],
+            "pairedCpuRatio": 0.9904838929734248,
+            "pairedTimeOrThroughputRatio": 1.0203025438523357
+          },
+          "live-inline-index": {
+            "requestsPerSecond": 3051.305346217736,
+            "processCpuSeconds": 0.710091,
+            "peakRssBytes": 11599872.0,
+            "allocationsRange": [
+              429856,
+              429856
+            ],
+            "allocatedBytesRange": [
+              33057881,
+              33057881
+            ]
+          },
+          "sync": {
+            "requestsPerSecond": 5082.974824049174,
+            "processCpuSeconds": 0.4063065,
+            "peakRssBytes": 9306112.0,
+            "allocationsRange": [
+              429856,
+              429857
+            ],
+            "allocatedBytesRange": [
+              33057881,
+              33058409
+            ]
+          }
+        }
+      },
+      "allocationEquality": false,
+      "checkedResponses": 41280
+    },
+    "json": {
+      "trials": 20,
+      "samples": {
+        "json": {
+          "guarded-sync-direct-seed-inline-index": {
+            "requestsPerSecond": 2141.4462704486073,
+            "processCpuSeconds": 0.9467099999999999,
+            "peakRssBytes": 12861440.0,
+            "allocationsRange": [
+              943817,
+              943818
+            ],
+            "allocatedBytesRange": [
+              54065775,
+              54066303
+            ],
+            "pairedCpuRatio": 0.9988417301687696,
+            "pairedTimeOrThroughputRatio": 0.9972080040372355
+          },
+          "guarded-sync-inline-index": {
+            "requestsPerSecond": 2152.801778681305,
+            "processCpuSeconds": 0.9509974999999999,
+            "peakRssBytes": 12861440.0,
+            "allocationsRange": [
+              943817,
+              943817
+            ],
+            "allocatedBytesRange": [
+              54065775,
+              54065775
+            ]
+          },
+          "live-direct-seed-inline-index": {
+            "requestsPerSecond": 1979.875724260611,
+            "processCpuSeconds": 1.098137,
+            "peakRssBytes": 13516800.0,
+            "allocationsRange": [
+              943817,
+              943817
+            ],
+            "allocatedBytesRange": [
+              54065775,
+              54065775
+            ],
+            "pairedCpuRatio": 1.0020914754679318,
+            "pairedTimeOrThroughputRatio": 1.0034786780645741
+          },
+          "live-inline-index": {
+            "requestsPerSecond": 1981.510959403964,
+            "processCpuSeconds": 1.0929319999999998,
+            "peakRssBytes": 13402112.0,
+            "allocationsRange": [
+              943817,
+              943818
+            ],
+            "allocatedBytesRange": [
+              54065775,
+              54066303
+            ]
+          },
+          "sync": {
+            "requestsPerSecond": 3094.5289868864047,
+            "processCpuSeconds": 0.6629195,
+            "peakRssBytes": 10665984.0,
+            "allocationsRange": [
+              943817,
+              943817
+            ],
+            "allocatedBytesRange": [
+              54065775,
+              54065775
+            ]
+          }
+        }
+      },
+      "allocationEquality": false,
+      "checkedResponses": 41280
+    }
+  },
+  "inputs": {
+    "target/concurrent-workloads/direct-seed-ordinary/results.json": "cd53216b342531363e13aa788bbc4c24f7e6b357dff360ac9fd6af1a90b1c5a2",
+    "target/concurrent-workloads/direct-seed-http-plain/results.json": "343144efeb4345bd66e797c9041f98fcdc188762cfe637255c91ba2ee46d7ed3",
+    "target/concurrent-workloads/direct-seed-http-json/results.json": "ff65a4a767750fb1b1a3c18ee5ca3a9f709ac42d9888a07a4805fab5ded0a08b"
+  }
+}

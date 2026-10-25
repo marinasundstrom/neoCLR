@@ -11,6 +11,7 @@ import subprocess
 
 p = argparse.ArgumentParser(description=__doc__)
 p.add_argument('--compare-linear-seed',action='store_true')
+p.add_argument('--compare-direct-seed',action='store_true')
 p.add_argument('--compare-worker-tls',action='store_true')
 p.add_argument('--compare-inline-base',action='store_true')
 p.add_argument('--compare-exact-allocation-index',action='store_true',help='Interleave predecessor-index, hybrid and direct exact-index variants in one cohort.')
@@ -43,6 +44,7 @@ assert not a.profile_finish or a.profile_owner_pauses
 assert a.rounds > 0
 assert not a.previous_build or a.compare_inline_base
 assert not a.compare_linear_seed or a.compare_inline_base
+assert not a.compare_direct_seed or a.compare_inline_base
 assert not a.compare_worker_tls or (a.compare_inline_base and not a.split_tls)
 assert not a.compare_inline_base or a.compare_exact_allocation_index
 assert not a.compare_exact_allocation_index or (a.allocation_index and not a.exact_allocation_index and not a.direct_exact_allocation_index)
@@ -74,6 +76,9 @@ if a.previous_build:
 if a.compare_linear_seed:
     modes += ['live-linear-seed-hybrid-inline']
     if a.guarded_control: modes += ['guarded-sync-linear-seed-hybrid-inline']
+if a.compare_direct_seed:
+    modes += ['live-direct-seed-hybrid-inline']
+    if a.guarded_control: modes += ['guarded-sync-direct-seed-hybrid-inline']
 if a.modes:
     assert len(set(a.modes)) == len(a.modes) and set(a.modes) <= set(modes)
     modes = [m for m in modes if m in a.modes]
@@ -228,6 +233,7 @@ static void report_profile(struct rusage *a, struct rusage *b, struct timespec *
             if a.profile_finish and mode != 'sync': command += ['-DFINISH_PHASE_PROFILE']
             if a.profile_collection and mode != 'sync': command += ['-DCOLLECTION_PART_PROFILE']
             if '-linear-seed-' in mode: command += ['-DNEOCLR_LIVE_LINEAR_SEED']
+            if '-direct-seed-' in mode: command += ['-DNEOCLR_LIVE_DIRECT_SEED']
             run(command)
             for item in command:
                 path = Path(item)

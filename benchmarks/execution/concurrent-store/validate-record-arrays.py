@@ -12,6 +12,7 @@ p.add_argument('--exact-allocation-index',action='store_true')
 p.add_argument('--allocation-index',action='store_true')
 p.add_argument('--runner',type=Path,required=True)
 p.add_argument('--linear-seed',action='store_true')
+p.add_argument('--direct-seed',action='store_true')
 p.add_argument('--output',type=Path,required=True)
 a=p.parse_args();assert not a.exact_allocation_index or a.allocation_index
 base=Path(__file__).resolve().parent;root=base.parents[2]
@@ -31,6 +32,7 @@ try:
  recipe=json.loads((root/'benchmarks/execution/call-layout/results.json').read_text())['builds'][1]['command']
  cc=recipe[:recipe.index('-std=c11')]
  if a.linear_seed: cc += ['-DNEOCLR_LIVE_LINEAR_SEED']
+ if a.direct_seed: cc += ['-DNEOCLR_LIVE_DIRECT_SEED']
  if a.group_worker_tls: cc += ['-DNEOCLR_LIVE_GROUP_WORKER_TLS']
  if a.inline_base: cc += ['-DNEOCLR_LIVE_INLINE_BASE']
  if a.exact_allocation_index: cc += ['-DNEOCLR_LIVE_EXACT_INDEX']
