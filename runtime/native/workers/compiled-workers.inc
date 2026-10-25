@@ -20,7 +20,10 @@ static _Thread_local compiled_participant *compiled_current;
 #endif
 
 /* Caller holds metadata gate and the sole generated execution lease. */
-static int32_t compiled_collect_locked(compiled_participant *self, const neoclr_probe_frame *head) {
+static int32_t compiled_collect_locked_mode(compiled_participant *self, const neoclr_probe_frame *head,unsigned operation) {
+#ifndef NEOCLR_WORKER_READ_EPOCHS
+    if (operation!=2) abort();
+#endif
     neoclr_workers *p = self->job->pool;
     if (p->compiled_exclusive != self || p->compiled_running != 1) abort();
     neoclr_probe_storage slots[POOL_ROOT_SLOTS];
@@ -44,8 +47,8 @@ static int32_t compiled_collect_locked(compiled_participant *self, const neoclr_
         roots[participants++] = (neoclr_gc_participant){&other->context, other->frames};
     }
 #ifdef NEOCLR_WORKER_ROOT_SNAPSHOT
-    /* All participants remain paused. This opt-in equivalence step copies root
-     * values now, but does not yet authorize concurrent marking or reclamation. */
+    /* Copy changing root values while every participant is paused. Only the
+     * explicit read-epoch protocol permits marking after readers resume. */
     roots[participants++] = (neoclr_gc_participant){&self->context, head};
     size_t count_words, copied;
     int32_t status = neoclr_gc_participant_root_count_v1(&self->context, roots, participants, &count_words);
@@ -55,7 +58,7 @@ static int32_t compiled_collect_locked(compiled_participant *self, const neoclr_
     status = neoclr_gc_participant_root_capture_v1(&self->context, roots, participants, values, count_words, &copied);
     if (!status) {
 #ifdef NEOCLR_WORKER_COLLECTION_OWNER
-        status=compiled_collect_on_owner(self,values,(uint32_t)copied);
+        status=compiled_collect_on_owner(self,values,(uint32_t)copied,operation);
 #else
         neoclr_probe_frame snapshot = {.context=&self->context, .lanes=values, .lane_count=(uint32_t)copied};
         status = neoclr_gc_collect_conditional_v1(&self->context, &snapshot, NULL, 0);
@@ -65,7 +68,10 @@ static int32_t compiled_collect_locked(compiled_participant *self, const neoclr_
 #else
     int32_t status = neoclr_gc_collect_participants_v1(&self->context, head, roots, participants);
 #endif
-    if (!status) {
+    if (!status && operation!=3) {
+#ifdef NEOCLR_WORKER_READ_EPOCHS
+        p->allocation.epoch_wanted=0;
+#endif
         ++p->compiled_collections;
 #ifdef NEOCLR_WORKER_PACED
         p->allocation.last_allocations=p->allocation.allocations;
@@ -74,6 +80,9 @@ static int32_t compiled_collect_locked(compiled_participant *self, const neoclr_
 #endif
     }
     return status;
+}
+static int32_t compiled_collect_locked(compiled_participant *self,const neoclr_probe_frame *head) {
+    return compiled_collect_locked_mode(self,head,2);
 }
 static int32_t compiled_collect(neoclr_aot_context *context, const neoclr_probe_frame *head) {
     compiled_participant *self = compiled_current;
@@ -110,6 +119,11 @@ static void compiled_boundary(neoclr_aot_context *context, const neoclr_probe_fr
     compiled_participant *self = compiled_current;
     if (!self || context != &self->context || exclusive > 1) abort();
     if (self->handle && neoclr_gc_worker_roots_check_v1(context, self->handle)) abort();
+#ifdef NEOCLR_WORKER_READ_EPOCHS
+    if (!head && !exclusive) abort();
+    for (const neoclr_probe_frame *f=head;f;f=f->previous)
+        if (!(f->reserved & NEOCLR_GC_WORKER_READ_PHASE)) abort();
+#endif
     neoclr_workers *p = self->job->pool;
     /* Keep the running lease across pure boundaries until an exclusive operation
      * requests quiescence. The collector cannot inspect this thread's changing
@@ -118,6 +132,12 @@ static void compiled_boundary(neoclr_aot_context *context, const neoclr_probe_fr
     if (!exclusive && self->running && !self->exclusive &&
         !atomic_load_explicit(&p->compiled_pause_requested, memory_order_acquire)) return;
     lock(p);
+#ifdef NEOCLR_WORKER_READ_EPOCHS
+    if (!exclusive && self->exclusive && p->allocation.epoch_wanted && !p->allocation.epoch_active) {
+        if (compiled_collect_locked_mode(self,head,3)) abort();
+        p->allocation.epoch_wanted=0;
+    }
+#endif
     compiled_pause_locked(self, head);
     if (exclusive) {
         ++p->compiled_waiters;
@@ -138,6 +158,11 @@ static void compiled_boundary(neoclr_aot_context *context, const neoclr_probe_fr
     self->running = 1;
     ++p->compiled_running;
     if (p->compiled_running > p->compiled_peak) p->compiled_peak = p->compiled_running;
+#ifdef NEOCLR_WORKER_READ_EPOCHS
+    if (exclusive && p->allocation.epoch_active && compiled_collect_locked(self,head)) abort();
+    if (exclusive && p->allocation.epoch_active) abort();
+    if (!exclusive && p->allocation.epoch_active) ++p->allocation.epoch_readers;
+#endif
     if (exclusive && self->handle) {
 #ifdef NEOCLR_WORKER_PACED
         /* Scheduling permission is independent of collection frequency. All
@@ -147,7 +172,11 @@ static void compiled_boundary(neoclr_aot_context *context, const neoclr_probe_fr
         int due=p->allocation.allocations-p->allocation.last_allocations>=256 ||
             p->allocation.allocated_bytes-p->allocation.last_bytes>=byte_budget ||
             ++p->allocation.boundaries>=4096;
+#ifdef NEOCLR_WORKER_READ_EPOCHS
+        if (due) p->allocation.epoch_wanted=1;
+#else
         if (due && compiled_collect_locked(self,head)) abort();
+#endif
 #else
         if (compiled_collect_locked(self, head)) abort();
 #endif

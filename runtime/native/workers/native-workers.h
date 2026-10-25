@@ -138,8 +138,11 @@ int neoclr_workers_compiled_statistics(neoclr_workers *, unsigned *peak, uint64_
  * including allocator failures, not allocation count or GC epochs. */
 int neoclr_workers_allocation_requests(neoclr_workers *, uint64_t *);
 #ifdef NEOCLR_WORKER_COLLECTION_OWNER
-/* Private diagnostic: synchronous collection requests executed by the service. */
+/* Private diagnostic: completed collections executed by the service. */
 int neoclr_workers_collection_requests(neoclr_workers *, uint64_t *);
+#ifdef NEOCLR_WORKER_READ_EPOCHS
+int neoclr_workers_read_epoch_statistics(neoclr_workers *,uint64_t *,uint64_t *,uint64_t *,uint64_t *);
+#endif
 #endif
 #endif
 #endif

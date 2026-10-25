@@ -15,6 +15,9 @@
 #if defined(NEOCLR_WORKER_PACED) && !defined(NEOCLR_WORKER_ALLOCATION_OWNER)
 #error Worker pacing requires pool allocation accounting
 #endif
+#if defined(NEOCLR_WORKER_READ_EPOCHS) && (!defined(NEOCLR_WORKER_COLLECTION_OWNER) || !defined(NEOCLR_WORKER_PACED))
+#error Read epochs require a paced collection owner
+#endif
 #define JOBS 16
 #define ROOTS 32
 #define THREADS 4
@@ -66,6 +69,10 @@ struct neoclr_workers {
         const uint64_t *roots;
         uint32_t root_count;
         uint64_t collections;
+#ifdef NEOCLR_WORKER_READ_EPOCHS
+        int epoch_active, epoch_wanted;
+        uint64_t epoch_started, epoch_finished, epoch_readers, epoch_payload_bytes;
+#endif
 #endif
     } allocation;
 #endif
@@ -88,6 +95,9 @@ static void heap_lock(neoclr_workers *p) {
         || p->compiled_count
 #endif
     ) if (pthread_cond_wait(&p->completion, &p->gate)) abort();
+#ifdef NEOCLR_WORKER_READ_EPOCHS
+    if (p->allocation.epoch_active) abort();
+#endif
     --p->waiting_writers;
     pthread_cond_broadcast(&p->completion);
 }
@@ -320,6 +330,9 @@ const void *neoclr_worker_read_begin(neoclr_worker_job *j) {
         || p->compiled_count
 #endif
     ) if (pthread_cond_wait(&p->completion, &p->gate)) abort();
+#ifdef NEOCLR_WORKER_READ_EPOCHS
+    if (p->allocation.epoch_active) abort();
+#endif
     ++p->readers;
     reading = j;
     const void *capture = j->capture;
@@ -346,6 +359,9 @@ void *neoclr_worker_mutate_begin(neoclr_worker_job *j) {
 #endif
     )
         if (pthread_cond_wait(&p->completion, &p->gate)) abort();
+#ifdef NEOCLR_WORKER_READ_EPOCHS
+    if (p->allocation.epoch_active) abort();
+#endif
     ++p->mutators;
     mutating = j;
     void *capture = j->capture;

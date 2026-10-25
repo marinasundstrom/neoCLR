@@ -71,6 +71,13 @@ static void run(int fault) {
     CHECK(collections);
 #endif
     if (!fault) CHECK(peak > 1);
+#ifdef NEOCLR_WORKER_READ_EPOCHS
+    uint64_t started,finished,readers,payload_bytes;
+    CHECK(neoclr_workers_read_epoch_statistics(p,&started,&finished,&readers,&payload_bytes) && started==finished);
+    if (!fault) CHECK(started && readers && payload_bytes);
+    printf("LIVE PAYLOAD %llu bytes read\n",(unsigned long long)payload_bytes);
+    printf("READ EPOCHS %llu started %llu finished %llu reader admissions\n",(unsigned long long)started,(unsigned long long)finished,(unsigned long long)readers);
+#endif
 #ifdef NEOCLR_WORKER_COLLECTION_OWNER
     uint64_t owner_collections;
     CHECK(neoclr_workers_collection_requests(p,&owner_collections) && owner_collections==collections);

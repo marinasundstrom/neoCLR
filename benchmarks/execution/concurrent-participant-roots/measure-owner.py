@@ -31,6 +31,11 @@ try:
    counts=re.findall(r'PASS compiled shared-heap (graph/GC|fault isolation): 32 invocations, peak [1-4] active participants, (\d+) coordinated collections',x.stdout)
    assert {kind for kind,_ in counts}=={'graph/GC','fault isolation'} and len(counts)==2 and 'PASS close during four running compiled invocations' in x.stdout
    r['trials'][-1]['collections']={kind:int(count) for kind,count in counts}
+   epochs=[tuple(map(int,match)) for match in re.findall(r'READ EPOCHS (\d+) started (\d+) finished (\d+) reader admissions',x.stdout)]
+   if any('-DNEOCLR_WORKER_READ_EPOCHS' in c['command'] for c in manifests[name]['commands']):
+    assert len(epochs)==2 and epochs[0][0]>0
+    assert all(started==finished and (not started or readers>0) for started,finished,readers in epochs)
+   r['trials'][-1]['readEpochs']=epochs
    if name!='control':assert 'OWNER ALLOCATION 3904 requests' in x.stdout and 'OWNER ALLOCATION 128 requests' in x.stdout and 'OWNER CLOSE 488 requests' in x.stdout
  r['medians']={name:{metric:statistics.median(t[metric] for t in r['trials'] if t['name']==name and not t['warmup']) for metric in ['wallSeconds','cpuSeconds']} for name in programs}
  r['ownerOverControl']={metric:r['medians']['owner'][metric]/r['medians']['control'][metric] for metric in ['wallSeconds','cpuSeconds']}

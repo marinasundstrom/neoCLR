@@ -127,3 +127,10 @@ assembly, bundle modules and native code generator listed in its manifest.
 `manifest-initial.json.gz`, `pool-initial.json.gz` and `waiter-diagnostic.json.gz`
 retain failed setup/admission evidence. Root tests and pool tests use matching private
 native contracts; no published platform default changes.
+
+## Restricted compiled live integration follow-up
+
+[Read-phase live epochs](read-epochs.md) now qualify a narrow exception to the
+earlier shared-heap rejection: compiled readers may overlap the marker, with
+finish before any exclusive operation. General concurrent mutation, JIT/HTTP
+provider admission and default/performance acceptance remain open.
