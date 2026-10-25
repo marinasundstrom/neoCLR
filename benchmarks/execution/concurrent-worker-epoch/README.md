@@ -148,8 +148,9 @@ protect existing pacing/measurement behavior; they do not prove scheduling or
 throughput gains. The service primitive must only serve a corresponding public
 requester; using it for an unrelated allocation would bypass accounting.
 
-Generated calls already use this allocator entry, but the compiler/worker-pool
-adapter does not yet install or serve the hook. Rooted allocation pressure must
+The [compiled-pool adapter](../concurrent-participant-roots/allocation-owner.md) now
+installs and serves this hook under its existing exclusive execution lease. Its
+collector remains synchronous; the live shared-worker integration is still open. Rooted allocation pressure must
 coordinate all participant roots before collection; this non-collecting seam alone
 does not authorize that path. Provider intermediates, owner scheduling, cancellation,
 worker faults and complete persistent dispatch lifetimes still require integration.

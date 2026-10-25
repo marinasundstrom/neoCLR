@@ -15,6 +15,9 @@ typedef struct compiled_participant {
 #endif
 } compiled_participant;
 static _Thread_local compiled_participant *compiled_current;
+#ifdef NEOCLR_WORKER_ALLOCATION_OWNER
+#include "allocation-owner.inc"
+#endif
 
 /* Caller holds metadata gate and the sole generated execution lease. */
 static int32_t compiled_collect_locked(compiled_participant *self, const neoclr_probe_frame *head) {
@@ -138,11 +141,25 @@ int32_t neoclr_worker_invoke_capture_parallel(neoclr_worker_job *job) {
     }
     while (p->readers || p->mutators || p->waiting_writers)
         if (pthread_cond_wait(&p->completion, &p->gate)) abort();
+#ifdef NEOCLR_WORKER_ALLOCATION_OWNER
+    if (neoclr_gc_allocation_dispatch_hook) abort();
+    if (!p->allocation.started) {
+        if (pthread_cond_init(&p->allocation.ready,NULL)) { unlock(p); return 3; }
+        if (pthread_create(&p->allocation.thread,NULL,compiled_allocation_owner,p)) {
+            pthread_cond_destroy(&p->allocation.ready);
+            unlock(p); return 3;
+        }
+        p->allocation.started=1;
+    }
+#endif
     if (p->participants[self.slot]) abort();
     p->participants[self.slot] = &self;
     ++p->compiled_count;
     unlock(p);
     compiled_current = &self;
+#ifdef NEOCLR_WORKER_ALLOCATION_OWNER
+    neoclr_gc_allocation_dispatch_hook=compiled_allocate;
+#endif
     neoclr_gc_worker_boundary_hook = compiled_boundary;
     neoclr_gc_worker_collect_hook = compiled_collect;
     compiled_boundary(&self.context, NULL, 1);
@@ -163,6 +180,9 @@ int32_t neoclr_worker_invoke_capture_parallel(neoclr_worker_job *job) {
     unlock(p);
     neoclr_gc_worker_collect_hook = NULL;
     neoclr_gc_worker_boundary_hook = NULL;
+#ifdef NEOCLR_WORKER_ALLOCATION_OWNER
+    neoclr_gc_allocation_dispatch_hook=NULL;
+#endif
     compiled_current = NULL;
     return status;
 }

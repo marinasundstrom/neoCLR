@@ -133,5 +133,10 @@ int neoclr_workers_destroy(neoclr_workers *);
  * fields still require synchronization/disjoint ownership. No Task/I/O migration. */
 int32_t neoclr_worker_invoke_capture_parallel(neoclr_worker_job *);
 int neoclr_workers_compiled_statistics(neoclr_workers *, unsigned *peak, uint64_t *collections);
+#ifdef NEOCLR_WORKER_ALLOCATION_OWNER
+/* Private opt-in adapter diagnostic. Owner only; successful service requests,
+ * including allocator failures, not allocation count or GC epochs. */
+int neoclr_workers_allocation_requests(neoclr_workers *, uint64_t *);
+#endif
 #endif
 #endif

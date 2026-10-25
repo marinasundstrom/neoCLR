@@ -6,6 +6,9 @@
 #include <string.h>
 #include <errno.h>
 #include <time.h>
+#if defined(NEOCLR_WORKER_ALLOCATION_OWNER) && (!defined(NEOCLR_WORKER_GC) || !defined(NEOCLR_GC_ALLOCATION_DISPATCH))
+#error Worker allocation owner requires worker GC and allocation dispatch
+#endif
 #define JOBS 16
 #define ROOTS 32
 #define THREADS 4
@@ -38,6 +41,18 @@ struct neoclr_workers {
     unsigned compiled_count, compiled_running, compiled_waiters, compiled_peak;
     uint64_t compiled_collections;
     struct compiled_participant *participants[JOBS], *compiled_exclusive;
+#endif
+#ifdef NEOCLR_WORKER_ALLOCATION_OWNER
+    struct {
+        pthread_t thread;
+        pthread_cond_t ready;
+        int started, stop, pending;
+        neoclr_aot_text_arena *arena;
+        uint64_t bytes, used, requests;
+        uint32_t kind;
+        int32_t status;
+        void *result;
+    } allocation;
 #endif
     neoclr_aot_context context;
     neoclr_worker_invoke invoke;
@@ -474,6 +489,17 @@ int neoclr_workers_close(neoclr_workers *p) {
     }
     pthread_cond_broadcast(&p->ready); pthread_cond_broadcast(&p->completion); unlock(p);
     for (unsigned i = 0; i < p->thread_count; i++) if (pthread_join(p->threads[i], NULL)) abort();
+#ifdef NEOCLR_WORKER_ALLOCATION_OWNER
+    lock(p);
+    if (p->allocation.pending || p->compiled_count) abort();
+    p->allocation.stop=1;
+    if (p->allocation.started) pthread_cond_signal(&p->allocation.ready);
+    unlock(p);
+    if (p->allocation.started) {
+        if (pthread_join(p->allocation.thread,NULL)) abort();
+        if (pthread_cond_destroy(&p->allocation.ready)) abort();
+    }
+#endif
     p->joined = 1; return 1;
 }
 int neoclr_workers_destroy(neoclr_workers *p) {

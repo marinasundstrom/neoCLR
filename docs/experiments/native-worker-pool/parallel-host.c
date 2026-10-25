@@ -65,8 +65,38 @@ static void run(int fault) {
     CHECK(neoclr_workers_compiled_statistics(p, &peak, &collections) && collections);
     if (!fault) CHECK(peak > 1);
     CHECK(neoclr_workers_collect(p, &extent) && !extent);
+#ifdef NEOCLR_WORKER_ALLOCATION_OWNER
+    uint64_t requests;
+    CHECK(neoclr_workers_allocation_requests(p,&requests) && requests);
+    printf("OWNER ALLOCATION %llu requests\n",(unsigned long long)requests);
+#endif
     CHECK(neoclr_workers_close(p) && neoclr_workers_destroy(p));
     printf("PASS compiled shared-heap %s: 32 invocations, peak %u active participants, %llu coordinated collections\n",
         fault ? "fault isolation" : "graph/GC", peak, (unsigned long long)collections);
 }
-int main(void) { run(0); run(1); }
+static void close_running(void) {
+    neoclr_workers *p=neoclr_workers_create(4,4,32768);
+    neoclr_worker_handle capture,tickets[4];batch b={0};
+    CHECK(p && !neoclr_workers_bootstrap(p,neoclr_bootstrap_callback_v1,
+        neoclr_invoke_void_callback_v1,40,&capture));
+    for(unsigned i=0;i<4;i++)CHECK(neoclr_workers_submit(p,capture,invoke,&b,&tickets[i]));
+    while(atomic_load(&b.ready)<4)sched_yield();
+    atomic_store(&b.release,1);
+    /* Close must leave allocation service available until generated calls drain. */
+    CHECK(neoclr_workers_close(p));
+    for(unsigned i=0;i<4;i++) {
+        neoclr_worker_value value;neoclr_worker_handle root;int outcome;
+        CHECK(neoclr_workers_take(p,tickets[i],&outcome,&value,&root)==1);
+        CHECK(outcome==NEOCLR_WORKER_CANCELLED || outcome==NEOCLR_WORKER_OK);
+        if(root.pool)CHECK(neoclr_workers_root_release(p,root));
+    }
+    CHECK(neoclr_workers_root_release(p,capture));
+#ifdef NEOCLR_WORKER_ALLOCATION_OWNER
+    uint64_t requests;
+    CHECK(neoclr_workers_allocation_requests(p,&requests) && requests);
+    printf("OWNER CLOSE %llu requests drained before shutdown\n",(unsigned long long)requests);
+#endif
+    CHECK(neoclr_workers_close(p) && neoclr_workers_destroy(p));
+    puts("PASS close during four running compiled invocations and repeated close");
+}
+int main(void) { run(0); run(1); close_running(); }

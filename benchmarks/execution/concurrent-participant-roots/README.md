@@ -89,6 +89,14 @@ HTTP worker handling. The earlier TSan test/control startup failures remain an o
 gap; no new TSan/ASan claim is made. Source worker stacks returning is a targeted
 lifetime test, not proof of every scheduling interleaving.
 
+## Compiled allocation routing follow-up
+
+The [owner allocation service](allocation-owner.md) now routes actual generated
+worker allocations through a persistent service under the existing exclusive
+lease. Direct/copied-root controls and shutdown/fault tests pass; collection is
+still synchronous. Measured per-allocation routing remains more expensive than
+local allocation, so this is opt-in integration scaffolding, not a default choice.
+
 ## Next integration boundary
 
 The [native live-epoch integration](../concurrent-worker-epoch/README.md) now connects

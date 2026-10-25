@@ -1,0 +1,46 @@
+/* Existing compiled exclusive lease remains held logically by the requester.
+ * The pool gate publishes request/response; this service never traces roots,
+ * invokes managed code or collects. The external arena is checked by the normal
+ * allocator; it is not acquired as a thread-owned heap with persistent caches. */
+static void *compiled_allocation_owner(void *opaque) {
+    neoclr_workers *p=opaque;
+    lock(p);
+    for (;;) {
+        while (!p->allocation.pending && !p->allocation.stop)
+            if (pthread_cond_wait(&p->allocation.ready,&p->gate)) abort();
+        if (p->allocation.stop) break;
+        if (p->compiled_running!=1 || !p->compiled_exclusive ||
+            p->allocation.arena!=&p->compiled_exclusive->context.text ||
+            neoclr_gc_allocation_dispatch_hook) abort();
+        p->allocation.status=neoclr_gc_allocate_dispatch_storage_v1(
+            p->allocation.arena,p->allocation.bytes,p->allocation.kind,&p->allocation.result);
+        p->allocation.used=p->allocation.arena->used;
+        ++p->allocation.requests;
+        p->allocation.pending=0;
+        pthread_cond_signal(&p->allocation.ready);
+    }
+    if (p->allocation.pending) abort();
+    unlock(p);return NULL;
+}
+static int32_t compiled_allocate(neoclr_aot_text_arena *arena,uint64_t bytes,
+    uint32_t kind,void **output,uint64_t *used) {
+    compiled_participant *self=compiled_current;
+    if (!self || arena!=&self->context.text || !output || !used) return 3;
+    neoclr_workers *p=self->job->pool;
+    lock(p);
+    if (!self->exclusive || p->compiled_exclusive!=self || p->compiled_running!=1 ||
+        !p->allocation.started || p->allocation.pending || p->allocation.stop) abort();
+    p->allocation.arena=arena;p->allocation.bytes=bytes;p->allocation.kind=kind;
+    p->allocation.pending=1;
+    pthread_cond_signal(&p->allocation.ready);
+    while (p->allocation.pending)
+        if (pthread_cond_wait(&p->allocation.ready,&p->gate)) abort();
+    int32_t status=p->allocation.status;
+    if (!status) {*output=p->allocation.result;*used=p->allocation.used;}
+    p->allocation.arena=NULL;p->allocation.result=NULL;
+    unlock(p);return status;
+}
+int neoclr_workers_allocation_requests(neoclr_workers *p,uint64_t *requests) {
+    if (!requests || !pthread_equal(p->owner,pthread_self())) return 0;
+    lock(p);*requests=p->allocation.requests;unlock(p);return 1;
+}
