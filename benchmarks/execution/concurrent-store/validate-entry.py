@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import subprocess
 p=argparse.ArgumentParser(description=__doc__)
+p.add_argument('--group-worker-tls',action='store_true')
 p.add_argument('--inline-base',action='store_true')
 p.add_argument('--exact-allocation-index',action='store_true')
 p.add_argument('--allocation-index',action='store_true')
@@ -29,6 +30,7 @@ try:
  run(['python3',base.parent/'concurrent-live/automatic.py','--output',source])
  recipe=json.loads((root/'benchmarks/execution/call-layout/results.json').read_text())['builds'][1]['command']
  cc=recipe[:recipe.index('-std=c11')]
+ if a.group_worker_tls: cc += ['-DNEOCLR_LIVE_GROUP_WORKER_TLS']
  if a.inline_base: cc += ['-DNEOCLR_LIVE_INLINE_BASE']
  if a.exact_allocation_index: cc += ['-DNEOCLR_LIVE_EXACT_INDEX']
  if a.allocation_index:cc+=['-DNEOCLR_LIVE_ALLOCATION_INDEX']

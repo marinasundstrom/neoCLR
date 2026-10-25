@@ -12,6 +12,7 @@ parser.add_argument('--store-ranges', type=int, choices=range(1,17), default=4)
 parser.add_argument('--allocation-index', action='store_true')
 parser.add_argument('--exact-allocation-index', action='store_true')
 parser.add_argument('--inline-base', action='store_true')
+parser.add_argument('--group-worker-tls', action='store_true')
 parser.add_argument('--split-store-tls', action='store_true')
 parser.add_argument('--full-store-walk', action='store_true')
 parser.add_argument('--profile-store-walks', action='store_true')
@@ -41,6 +42,7 @@ try:
     recipe = json.loads((root/'benchmarks/execution/call-layout/results.json').read_text())['builds'][1]['command']
     cc = recipe[:recipe.index('-std=c11')] + [f'-DGATE_WORDS={args.gate_words}', f'-DNEOCLR_LIVE_STORE_RANGES={args.store_ranges}']
     if args.allocation_index: cc += ['-DNEOCLR_LIVE_ALLOCATION_INDEX']
+    if args.group_worker_tls: cc += ['-DNEOCLR_LIVE_GROUP_WORKER_TLS']
     if args.inline_base: cc += ['-DNEOCLR_LIVE_INLINE_BASE']
     if args.exact_allocation_index: cc += ['-DNEOCLR_LIVE_EXACT_INDEX']
     if args.split_store_tls: cc += ['-DNEOCLR_LIVE_SPLIT_STORE_TLS']

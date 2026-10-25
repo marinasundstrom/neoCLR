@@ -176,3 +176,7 @@ lookup controls, HTTP gains, ordinary CPU regressions and unchanged metadata cos
 [Balanced interleaving and exact-base inlining](inline-base-results.md) isolate
 the ordinary CPU regression and retain HTTP gains, with code-size and allocation
 tradeoffs. The summary tool checks balanced evidence before reporting paired ratios.
+
+[Post-inlining profiles and worker-handle control](worker-tls-results.md) attribute
+TLS work to callers, reject an unsupported layout performance claim and refresh
+exact outside-store sites for the next compiler-provenance investigation.

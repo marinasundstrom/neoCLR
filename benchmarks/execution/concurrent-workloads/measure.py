@@ -10,6 +10,7 @@ from pathlib import Path
 import subprocess
 
 p = argparse.ArgumentParser(description=__doc__)
+p.add_argument('--compare-worker-tls',action='store_true')
 p.add_argument('--compare-inline-base',action='store_true')
 p.add_argument('--compare-exact-allocation-index',action='store_true',help='Interleave predecessor-index, hybrid and direct exact-index variants in one cohort.')
 p.add_argument('--direct-exact-allocation-index',action='store_true')
@@ -32,6 +33,7 @@ p.add_argument('--profile-store-walks', action='store_true')
 p.add_argument('--profile-store-sites', action='store_true')
 a = p.parse_args()
 assert a.rounds > 0
+assert not a.compare_worker_tls or (a.compare_inline_base and not a.split_tls)
 assert not a.compare_inline_base or a.compare_exact_allocation_index
 assert not a.compare_exact_allocation_index or (a.allocation_index and not a.exact_allocation_index and not a.direct_exact_allocation_index)
 assert not a.direct_exact_allocation_index or a.exact_allocation_index
@@ -50,7 +52,10 @@ if a.compare_exact_allocation_index:
 if a.compare_inline_base:
     modes += ['live-hybrid-inline']
     if a.guarded_control: modes += ['guarded-sync-hybrid-inline']
-report = {'compareInlineBase':a.compare_inline_base,'compareExactAllocationIndex':a.compare_exact_allocation_index,'modeOrder':'rotating forward/reverse cycles' if a.compare_exact_allocation_index else 'alternating forward/reverse','directExactAllocationIndex':a.direct_exact_allocation_index,'exactAllocationIndex':a.exact_allocation_index,'allocationIndex':a.allocation_index,'splitStoreTls':a.split_store_tls,'fullStoreWalk':a.full_store_walk,'repeatSnapshotLookup': a.repeat_snapshot_lookup, 'headerProof': a.header_proof, 'inlineValidation': a.inline_validation, 'splitTls': a.split_tls, 'serializedStore': a.serialized_store, 'optimizationLevel': build.get('optimizationLevel','none'), 'passed': False, 'scope': __doc__, 'iterations': build['iterations'],
+if a.compare_worker_tls:
+    modes += ['live-hybrid-worker-inline']
+    if a.guarded_control: modes += ['guarded-sync-hybrid-worker-inline']
+report = {'compareWorkerTls':a.compare_worker_tls,'compareInlineBase':a.compare_inline_base,'compareExactAllocationIndex':a.compare_exact_allocation_index,'modeOrder':'rotating forward/reverse cycles' if a.compare_exact_allocation_index else 'alternating forward/reverse','directExactAllocationIndex':a.direct_exact_allocation_index,'exactAllocationIndex':a.exact_allocation_index,'allocationIndex':a.allocation_index,'splitStoreTls':a.split_store_tls,'fullStoreWalk':a.full_store_walk,'repeatSnapshotLookup': a.repeat_snapshot_lookup, 'headerProof': a.header_proof, 'inlineValidation': a.inline_validation, 'splitTls': a.split_tls, 'serializedStore': a.serialized_store, 'optimizationLevel': build.get('optimizationLevel','none'), 'passed': False, 'scope': __doc__, 'iterations': build['iterations'],
           'commands': [], 'trials': [], 'inputs': {}, 'excluded': []}
 if a.profile_store_walks:report['diagnosticOnly']='Heap-walk instrumentation; timings are not benchmark evidence.'
 def run(command):
@@ -163,6 +168,7 @@ static void report_profile(struct rusage *a, struct rusage *b, struct timespec *
                             '-I', str(root / 'runtime/native/memory'), '-I', str(gate), str(gate / 'gate.c')]
             if (a.direct_exact_allocation_index or mode.endswith('-direct')) and mode != 'sync': command += ['-DNEOCLR_LIVE_DIRECT_EXACT_INDEX']
             if (a.exact_allocation_index or ('-hybrid' in mode or mode.endswith('-direct'))) and mode != 'sync': command += ['-DNEOCLR_LIVE_EXACT_INDEX']
+            if '-worker-' in mode: command += ['-DNEOCLR_LIVE_GROUP_WORKER_TLS']
             if mode.endswith('-inline'): command += ['-DNEOCLR_LIVE_INLINE_BASE']
             if a.allocation_index and mode != 'sync': command += ['-DNEOCLR_LIVE_ALLOCATION_INDEX']
             if a.split_store_tls: command += ['-DNEOCLR_LIVE_SPLIT_STORE_TLS']

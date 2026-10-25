@@ -215,7 +215,11 @@ boundary='int32_t neoclr_gc_collect_conditional_v1(neoclr_aot_context *context,\
 replace(boundary,boundary+'\n    if (candidate_active && !candidate_phase && context == candidate_context && !gc_state.cleanup_active)\n        return experiment_gc_finish(context,head,conditional,count);')
 s+='\nint experiment_gc_live_active(neoclr_aot_context *context) { return candidate_active && candidate_context==context; }\n'
 replace('static _Thread_local neoclr_aot_context *candidate_context;', '')
-replace('static _Thread_local int candidate_active;', (base/'state.h').read_text())
+state=(base/'state.h').read_text()
+replace('static _Thread_local int candidate_active;', 'typedef struct shadow_worker shadow_worker;\n'+state)
+replace('typedef struct {\n    pthread_t thread;', 'struct shadow_worker {\n    pthread_t thread;')
+replace('} shadow_worker;', '};')
+replace('static _Thread_local shadow_worker *shadow_owner;', '#ifndef NEOCLR_LIVE_GROUP_WORKER_TLS\nstatic _Thread_local shadow_worker *shadow_owner;\n#endif')
 s+='\n'+(base/'store.h').read_text()
 s+='\n'+(base/'contract.h').read_text()
 a.output.write_text(s)

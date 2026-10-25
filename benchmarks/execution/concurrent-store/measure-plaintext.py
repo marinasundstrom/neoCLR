@@ -12,6 +12,8 @@ import subprocess
 import threading
 import time
 p=argparse.ArgumentParser(description=__doc__)
+p.add_argument('--compare-worker-tls',action='store_true')
+p.add_argument('--modes',nargs='+',help='Select unique modes from the configurations enabled by the comparison flags.')
 p.add_argument('--compare-inline-base',action='store_true')
 p.add_argument('--direct-exact-allocation-index',action='store_true')
 p.add_argument('--sync-object',type=Path,required=True)
@@ -44,6 +46,7 @@ p.add_argument('--profile-cpu', action='store_true', help='macOS sample capture;
 p.add_argument('--profile-store-walks', action='store_true')
 p.add_argument('--profile-store-sites', action='store_true')
 a=p.parse_args();assert a.requests>0 and a.warmup>=0 and a.pairs>0
+assert not a.compare_worker_tls or a.compare_inline_base
 assert not a.compare_inline_base or (a.compare_exact_allocation_index and not a.direct_exact_allocation_index)
 assert not a.direct_exact_allocation_index or a.compare_exact_allocation_index
 assert not a.compare_exact_allocation_index or a.compare_allocation_index
@@ -64,7 +67,7 @@ assert not (a.previous_live_object and (a.compare_store_ranges or a.compare_stor
 assert not (a.compare_store_ranges and (a.disable_store_cache or a.compare_store_cache or a.compare_exact_store or a.store_ranges==1))
 root=Path(__file__).resolve().parents[3];base=Path(__file__).resolve().parent
 out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
-r={'passed':False,'compareInlineBase':a.compare_inline_base,'directExactAllocationIndex':a.direct_exact_allocation_index,'compareExactAllocationIndex':a.compare_exact_allocation_index,'compareAllocationIndex':a.compare_allocation_index,'compareStoreTls':a.compare_store_tls,'compareStoreWalk':a.compare_store_walk,'allowAllocationVariation':a.allow_allocation_variation,'concurrency':a.concurrency,'compareSnapshotLookup':a.compare_snapshot_lookup,'compareHeaderProof':a.compare_header_proof,'compareInlineValidation':a.compare_inline_validation,'compareSplitTls':a.compare_split_tls,'compareSerializedStore':a.compare_serialized_store,'gateWords':a.gate_words,'storeCache':not a.disable_store_cache,'compareStoreCache':a.compare_store_cache,'compareExactStore':a.compare_exact_store,'storeRanges':a.store_ranges,'compareStoreRanges':a.compare_store_ranges,'sample':a.sample,'scope':'Loopback AOT fixed-work comparison; Python client scheduling and connection-close costs included. No saturation/cross-framework or GC-pause-distribution claim.', 'commands':[],'trials':[],'inputs':{}}
+r={'passed':False,'compareWorkerTls':a.compare_worker_tls,'selectedModes':a.modes,'compareInlineBase':a.compare_inline_base,'directExactAllocationIndex':a.direct_exact_allocation_index,'compareExactAllocationIndex':a.compare_exact_allocation_index,'compareAllocationIndex':a.compare_allocation_index,'compareStoreTls':a.compare_store_tls,'compareStoreWalk':a.compare_store_walk,'allowAllocationVariation':a.allow_allocation_variation,'concurrency':a.concurrency,'compareSnapshotLookup':a.compare_snapshot_lookup,'compareHeaderProof':a.compare_header_proof,'compareInlineValidation':a.compare_inline_validation,'compareSplitTls':a.compare_split_tls,'compareSerializedStore':a.compare_serialized_store,'gateWords':a.gate_words,'storeCache':not a.disable_store_cache,'compareStoreCache':a.compare_store_cache,'compareExactStore':a.compare_exact_store,'storeRanges':a.store_ranges,'compareStoreRanges':a.compare_store_ranges,'sample':a.sample,'scope':'Loopback AOT fixed-work comparison; Python client scheduling and connection-close costs included. No saturation/cross-framework or GC-pause-distribution claim.', 'commands':[],'trials':[],'inputs':{}}
 if a.profile_store_walks:r['diagnosticOnly']='Heap-walk instrumentation; timings are not benchmark evidence.'
 if a.profile_cpu:r['diagnosticOnly']='External CPU sampling affects timings; do not use this cohort for throughput claims.'
 def run(cmd):
@@ -155,6 +158,9 @@ static void report_measurement(void) {
  if a.compare_inline_base:
   configurations.append(('live-inline-index',a.live_object))
   if a.include_guarded_sync: configurations.append(('guarded-sync-inline-index',a.live_object))
+ if a.compare_worker_tls:
+  configurations.append(('live-worker-inline-index',a.live_object))
+  if a.include_guarded_sync: configurations.append(('guarded-sync-worker-inline-index',a.live_object))
  if a.compare_store_tls:
   configurations.append(('live-split-store-tls',a.live_object))
   if a.include_guarded_sync:configurations.append(('guarded-sync-split-store-tls',a.live_object))
@@ -185,6 +191,9 @@ static void report_measurement(void) {
  if a.previous_live_object:
   configurations.append(('live-previous-code',a.previous_live_object))
   if a.include_guarded_sync:configurations.append(('guarded-sync-previous-code',a.previous_live_object))
+ if a.modes:
+  assert len(set(a.modes))==len(a.modes) and set(a.modes)<=set(mode for mode,_ in configurations)
+  configurations=[(mode,obj) for mode,obj in configurations if mode in a.modes]
  for mode,obj in configurations:
   exe=out/mode;command=[]
   for item in recipe:
@@ -200,6 +209,7 @@ static void report_measurement(void) {
   if mode!='sync' and (a.disable_store_cache or mode.endswith('-no-cache')):command+=['-DNEOCLR_LIVE_NO_STORE_CACHE']
   if mode.endswith('-index'):command+=['-DNEOCLR_LIVE_ALLOCATION_INDEX']
   if a.direct_exact_allocation_index and mode.endswith('-exact-index'):command+=['-DNEOCLR_LIVE_DIRECT_EXACT_INDEX']
+  if mode.endswith('-worker-inline-index'):command+=['-DNEOCLR_LIVE_GROUP_WORKER_TLS']
   if mode.endswith('-inline-index'):command+=['-DNEOCLR_LIVE_INLINE_BASE','-DNEOCLR_LIVE_EXACT_INDEX']
   if mode.endswith('-exact-index'):command+=['-DNEOCLR_LIVE_EXACT_INDEX']
   if mode.endswith('-split-store-tls'):command+=['-DNEOCLR_LIVE_SPLIT_STORE_TLS']

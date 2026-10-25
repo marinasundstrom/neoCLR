@@ -1,4 +1,7 @@
 #include "native-gc.h"
+#if defined(NEOCLR_LIVE_GROUP_WORKER_TLS) && defined(NEOCLR_LIVE_SPLIT_TLS)
+#error Grouped worker TLS requires grouped candidate state
+#endif
 /* Private owner-thread state only. The marker receives its snapshot explicitly;
  * it must never discover an owner's state through its own TLS. Heap ownership
  * and allocation proofs remain in the existing owned_heap service. */
@@ -16,6 +19,9 @@ static _Thread_local neoclr_aot_context *candidate_context;
 static _Thread_local uint64_t live_store_counts[5];
 #else
 typedef struct live_owner_state {
+#ifdef NEOCLR_LIVE_GROUP_WORKER_TLS
+    shadow_worker *worker; /* Owner handle; marker still receives its argument explicitly. */
+#endif
     neoclr_aot_context *context;
     int active;
     uint64_t stores[5]; /* outside, inactive/new, guarded old, cancelled, rejected */
@@ -40,6 +46,9 @@ typedef struct live_owner_state {
 #endif
 } live_owner_state;
 static _Thread_local live_owner_state live_owner;
+#ifdef NEOCLR_LIVE_GROUP_WORKER_TLS
+#define shadow_owner (live_owner.worker)
+#endif
 #define candidate_active (live_owner.active)
 #define candidate_context (live_owner.context)
 #define live_store_counts (live_owner.stores)
