@@ -206,3 +206,5 @@ Follow-up: [final-collection attribution and opt-in linear seed validation](coll
 [Seed validation/application split](seed-parts-results.md) narrows the remaining seed work with nested CPU/wall accounting and retained diagnostics.
 
 [Validated seed header reuse](direct-seed-results.md) retains canonical mark semantics and opt-in indexed/direct comparisons; local CPU gains have small mixed application effects.
+
+[Whole-request profiles after seed changes](whole-gap-results.md) compare live/guarded/sync costs and prioritize ownership-safe store and frame/root overhead.

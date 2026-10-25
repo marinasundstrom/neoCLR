@@ -1,0 +1,1058 @@
+{
+  "passed": true,
+  "scope": "Compare measured control CPU gaps; sampled stacks are separate diagnostic evidence.",
+  "samples": {
+    "plain": {
+      "medianCpuSeconds": {
+        "sync": 0.4063065,
+        "guarded-sync-direct-seed-inline-index": 0.605143,
+        "live-direct-seed-inline-index": 0.7049605
+      },
+      "guardedShareOfExcess": 0.6657754458336402,
+      "stacks": [
+        {
+          "mode": "sync",
+          "topFrames": [
+            {
+              "symbol": "_tlv_get_addr",
+              "image": "libdyld.dylib",
+              "observations": 90
+            },
+            {
+              "symbol": "enter_owned",
+              "image": "sync",
+              "observations": 89
+            },
+            {
+              "symbol": "stack_roots",
+              "image": "sync",
+              "observations": 58
+            },
+            {
+              "symbol": "mark",
+              "image": "sync",
+              "observations": 45
+            },
+            {
+              "symbol": "collect_indexed",
+              "image": "sync",
+              "observations": 26
+            },
+            {
+              "symbol": "sigprocmask",
+              "image": "libsystem_kernel.dylib",
+              "observations": 25
+            },
+            {
+              "symbol": "__sendto",
+              "image": "libsystem_kernel.dylib",
+              "observations": 23
+            },
+            {
+              "symbol": "validated_bases",
+              "image": "sync",
+              "observations": 23
+            },
+            {
+              "symbol": "neoclr_gc_allocate_v1",
+              "image": "sync",
+              "observations": 22
+            },
+            {
+              "symbol": "neoclr_gc_state_stack_v1",
+              "image": "sync",
+              "observations": 21
+            },
+            {
+              "symbol": "publish_transient",
+              "image": "sync",
+              "observations": 21
+            },
+            {
+              "symbol": "neoclr_gc_state_leave_v1",
+              "image": "sync",
+              "observations": 17
+            }
+          ],
+          "tlsCallers": [
+            {
+              "symbol": "enter_owned",
+              "image": "sync",
+              "offsets": [
+                796
+              ],
+              "observations": 26
+            },
+            {
+              "symbol": "neoclr_native_stack_check_v1",
+              "image": "sync",
+              "offsets": [
+                36
+              ],
+              "observations": 23
+            },
+            {
+              "symbol": "neoclr_native_stack_check_v1",
+              "image": "sync",
+              "offsets": [
+                56
+              ],
+              "observations": 15
+            },
+            {
+              "symbol": "mark",
+              "image": "sync",
+              "offsets": [
+                28
+              ],
+              "observations": 13
+            },
+            {
+              "symbol": "neoclr_gc_allocate_rooted_values_v1",
+              "image": "sync",
+              "offsets": [
+                88
+              ],
+              "observations": 2
+            },
+            {
+              "symbol": "validated_bases",
+              "image": "sync",
+              "offsets": [
+                28
+              ],
+              "observations": 2
+            },
+            {
+              "symbol": "neoclr_root_probe_head_v1",
+              "image": "sync",
+              "offsets": [
+                24
+              ],
+              "observations": 2
+            },
+            {
+              "symbol": "neoclr_gc_allocate_v1",
+              "image": "sync",
+              "offsets": [
+                836
+              ],
+              "observations": 1
+            },
+            {
+              "symbol": "neoclr_gc_host_root_create_v1",
+              "image": "sync",
+              "offsets": [
+                76
+              ],
+              "observations": 1
+            },
+            {
+              "symbol": "neoclr_gc_allocate_v1",
+              "image": "sync",
+              "offsets": [
+                52
+              ],
+              "observations": 1
+            },
+            {
+              "symbol": "neoclr_gc_allocate_v1",
+              "image": "sync",
+              "offsets": [
+                808
+              ],
+              "observations": 1
+            },
+            {
+              "symbol": "neoclr_gc_host_root_release_v1",
+              "image": "sync",
+              "offsets": [
+                28
+              ],
+              "observations": 1
+            },
+            {
+              "symbol": "yield",
+              "image": "sync",
+              "offsets": [
+                28
+              ],
+              "observations": 1
+            },
+            {
+              "symbol": "neoclr_native_stack_bounds_v1",
+              "image": "sync",
+              "offsets": [
+                28
+              ],
+              "observations": 1
+            }
+          ],
+          "unattributedTls": 0
+        },
+        {
+          "mode": "live-direct-seed-inline-index",
+          "topFrames": [
+            {
+              "symbol": "__psynch_cvwait",
+              "image": "libsystem_kernel.dylib",
+              "observations": 499
+            },
+            {
+              "symbol": "_tlv_get_addr",
+              "image": "libdyld.dylib",
+              "observations": 100
+            },
+            {
+              "symbol": "experiment_gc_store",
+              "image": "live-direct-seed-inline-index",
+              "observations": 74
+            },
+            {
+              "symbol": "enter_owned",
+              "image": "live-direct-seed-inline-index",
+              "observations": 37
+            },
+            {
+              "symbol": "stack_roots",
+              "image": "live-direct-seed-inline-index",
+              "observations": 26
+            },
+            {
+              "symbol": "__psynch_mutexwait",
+              "image": "libsystem_kernel.dylib",
+              "observations": 14
+            },
+            {
+              "symbol": "publish_transient",
+              "image": "live-direct-seed-inline-index",
+              "observations": 14
+            },
+            {
+              "symbol": "close",
+              "image": "libsystem_kernel.dylib",
+              "observations": 13
+            },
+            {
+              "symbol": "neoclr_gc_allocate_v1",
+              "image": "live-direct-seed-inline-index",
+              "observations": 13
+            },
+            {
+              "symbol": "block_valid",
+              "image": "live-direct-seed-inline-index",
+              "observations": 12
+            },
+            {
+              "symbol": "live_words",
+              "image": "live-direct-seed-inline-index",
+              "observations": 11
+            },
+            {
+              "symbol": "candidate_seed",
+              "image": "live-direct-seed-inline-index",
+              "observations": 10
+            }
+          ],
+          "tlsCallers": [
+            {
+              "symbol": "experiment_gc_store",
+              "image": "live-direct-seed-inline-index",
+              "offsets": [
+                304
+              ],
+              "observations": 22
+            },
+            {
+              "symbol": "experiment_gc_store",
+              "image": "live-direct-seed-inline-index",
+              "offsets": [
+                80
+              ],
+              "observations": 19
+            },
+            {
+              "symbol": "neoclr_native_stack_check_v1",
+              "image": "live-direct-seed-inline-index",
+              "offsets": [
+                36
+              ],
+              "observations": 13
+            },
+            {
+              "symbol": "enter_owned",
+              "image": "live-direct-seed-inline-index",
+              "offsets": [
+                796
+              ],
+              "observations": 11
+            },
+            {
+              "symbol": "neoclr_native_stack_check_v1",
+              "image": "live-direct-seed-inline-index",
+              "offsets": [
+                56
+              ],
+              "observations": 8
+            },
+            {
+              "symbol": "experiment_gc_store",
+              "image": "live-direct-seed-inline-index",
+              "offsets": [
+                428
+              ],
+              "observations": 8
+            },
+            {
+              "symbol": "neoclr_root_probe_head_v1",
+              "image": "live-direct-seed-inline-index",
+              "offsets": [
+                24
+              ],
+              "observations": 5
+            },
+            {
+              "symbol": "mark",
+              "image": "live-direct-seed-inline-index",
+              "offsets": [
+                28
+              ],
+              "observations": 4
+            },
+            {
+              "symbol": "neoclr_gc_allocate_rooted_values_v1",
+              "image": "live-direct-seed-inline-index",
+              "offsets": [
+                88
+              ],
+              "observations": 2
+            },
+            {
+              "symbol": "live_write_known",
+              "image": "live-direct-seed-inline-index",
+              "offsets": [
+                48
+              ],
+              "observations": 2
+            },
+            {
+              "symbol": "collect_indexed",
+              "image": "live-direct-seed-inline-index",
+              "offsets": [
+                152
+              ],
+              "observations": 1
+            },
+            {
+              "symbol": "neoclr_gc_allocate_v1",
+              "image": "live-direct-seed-inline-index",
+              "offsets": [
+                876
+              ],
+              "observations": 1
+            },
+            {
+              "symbol": "neoclr_gc_host_root_create_owned_v1",
+              "image": "live-direct-seed-inline-index",
+              "offsets": [
+                196
+              ],
+              "observations": 1
+            },
+            {
+              "symbol": "neoclr_gc_allocate_v1",
+              "image": "live-direct-seed-inline-index",
+              "offsets": [
+                904
+              ],
+              "observations": 1
+            },
+            {
+              "symbol": "neoclr_gc_host_root_release_v1",
+              "image": "live-direct-seed-inline-index",
+              "offsets": [
+                28
+              ],
+              "observations": 1
+            },
+            {
+              "symbol": "resume",
+              "image": "live-direct-seed-inline-index",
+              "offsets": [
+                220
+              ],
+              "observations": 1
+            }
+          ],
+          "unattributedTls": 0
+        },
+        {
+          "mode": "guarded-sync-direct-seed-inline-index",
+          "topFrames": [
+            {
+              "symbol": "_tlv_get_addr",
+              "image": "libdyld.dylib",
+              "observations": 118
+            },
+            {
+              "symbol": "experiment_gc_store",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "observations": 94
+            },
+            {
+              "symbol": "enter_owned",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "observations": 73
+            },
+            {
+              "symbol": "stack_roots",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "observations": 47
+            },
+            {
+              "symbol": "mark",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "observations": 25
+            },
+            {
+              "symbol": "sigprocmask",
+              "image": "libsystem_kernel.dylib",
+              "observations": 21
+            },
+            {
+              "symbol": "neoclr_gc_allocate_v1",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "observations": 17
+            },
+            {
+              "symbol": "neoclr_gc_state_stack_v1",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "observations": 16
+            },
+            {
+              "symbol": "publish_transient",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "observations": 16
+            },
+            {
+              "symbol": "collect_indexed",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "observations": 15
+            },
+            {
+              "symbol": "neoclr_gc_state_leave_v1",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "observations": 13
+            },
+            {
+              "symbol": "block_valid",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "observations": 11
+            }
+          ],
+          "tlsCallers": [
+            {
+              "symbol": "experiment_gc_store",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "offsets": [
+                304
+              ],
+              "observations": 32
+            },
+            {
+              "symbol": "experiment_gc_store",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "offsets": [
+                80
+              ],
+              "observations": 27
+            },
+            {
+              "symbol": "neoclr_native_stack_check_v1",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "offsets": [
+                56
+              ],
+              "observations": 15
+            },
+            {
+              "symbol": "neoclr_native_stack_check_v1",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "offsets": [
+                36
+              ],
+              "observations": 15
+            },
+            {
+              "symbol": "enter_owned",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "offsets": [
+                796
+              ],
+              "observations": 9
+            },
+            {
+              "symbol": "mark",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "offsets": [
+                28
+              ],
+              "observations": 8
+            },
+            {
+              "symbol": "neoclr_root_probe_head_v1",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "offsets": [
+                24
+              ],
+              "observations": 3
+            },
+            {
+              "symbol": "validated_bases",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "offsets": [
+                28
+              ],
+              "observations": 3
+            },
+            {
+              "symbol": "neoclr_gc_allocate_rooted_values_v1",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "offsets": [
+                88
+              ],
+              "observations": 3
+            },
+            {
+              "symbol": "validated_bases",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "offsets": [
+                64
+              ],
+              "observations": 2
+            },
+            {
+              "symbol": "neoclr_roots_park_v1",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "offsets": [
+                116
+              ],
+              "observations": 1
+            }
+          ],
+          "unattributedTls": 0
+        }
+      ],
+      "limitation": "Difference of medians is descriptive, not isolated barrier cost. Modes differ in generated stores, scheduling, live sets and native paths. Wall-stack observations are not CPU percentages."
+    },
+    "json": {
+      "medianCpuSeconds": {
+        "sync": 0.6629195,
+        "guarded-sync-direct-seed-inline-index": 0.9467099999999999,
+        "live-direct-seed-inline-index": 1.098137
+      },
+      "guardedShareOfExcess": 0.6520659210624573,
+      "stacks": [
+        {
+          "mode": "sync",
+          "topFrames": [
+            {
+              "symbol": "enter_owned",
+              "image": "sync",
+              "observations": 84
+            },
+            {
+              "symbol": "_tlv_get_addr",
+              "image": "libdyld.dylib",
+              "observations": 78
+            },
+            {
+              "symbol": "stack_roots",
+              "image": "sync",
+              "observations": 60
+            },
+            {
+              "symbol": "mark",
+              "image": "sync",
+              "observations": 45
+            },
+            {
+              "symbol": "validated_bases",
+              "image": "sync",
+              "observations": 25
+            },
+            {
+              "symbol": "publish_transient",
+              "image": "sync",
+              "observations": 23
+            },
+            {
+              "symbol": "collect_indexed",
+              "image": "sync",
+              "observations": 19
+            },
+            {
+              "symbol": "neoclr_gc_allocate_v1",
+              "image": "sync",
+              "observations": 19
+            },
+            {
+              "symbol": "neoclr_gc_state_stack_v1",
+              "image": "sync",
+              "observations": 19
+            },
+            {
+              "symbol": "neoclr_gc_state_leave_v1",
+              "image": "sync",
+              "observations": 18
+            },
+            {
+              "symbol": "sigprocmask",
+              "image": "libsystem_kernel.dylib",
+              "observations": 18
+            },
+            {
+              "symbol": "neoclr_native_stack_check_v1",
+              "image": "sync",
+              "observations": 17
+            }
+          ],
+          "tlsCallers": [
+            {
+              "symbol": "enter_owned",
+              "image": "sync",
+              "offsets": [
+                796
+              ],
+              "observations": 22
+            },
+            {
+              "symbol": "neoclr_native_stack_check_v1",
+              "image": "sync",
+              "offsets": [
+                36
+              ],
+              "observations": 20
+            },
+            {
+              "symbol": "mark",
+              "image": "sync",
+              "offsets": [
+                28
+              ],
+              "observations": 14
+            },
+            {
+              "symbol": "neoclr_native_stack_check_v1",
+              "image": "sync",
+              "offsets": [
+                56
+              ],
+              "observations": 8
+            },
+            {
+              "symbol": "neoclr_root_probe_head_v1",
+              "image": "sync",
+              "offsets": [
+                24
+              ],
+              "observations": 6
+            },
+            {
+              "symbol": "neoclr_gc_allocate_v1",
+              "image": "sync",
+              "offsets": [
+                808
+              ],
+              "observations": 3
+            },
+            {
+              "symbol": "neoclr_gc_allocate_rooted_values_v1",
+              "image": "sync",
+              "offsets": [
+                88
+              ],
+              "observations": 1
+            },
+            {
+              "symbol": "neoclr_task_queue_current_v1",
+              "image": "sync",
+              "offsets": [
+                40
+              ],
+              "observations": 1
+            },
+            {
+              "symbol": "neoclr_gc_allocate_v1",
+              "image": "sync",
+              "offsets": [
+                52
+              ],
+              "observations": 1
+            },
+            {
+              "symbol": "validated_bases",
+              "image": "sync",
+              "offsets": [
+                28
+              ],
+              "observations": 1
+            },
+            {
+              "symbol": "neoclr_gc_host_root_create_v1",
+              "image": "sync",
+              "offsets": [
+                184
+              ],
+              "observations": 1
+            }
+          ],
+          "unattributedTls": 0
+        },
+        {
+          "mode": "live-direct-seed-inline-index",
+          "topFrames": [
+            {
+              "symbol": "__psynch_cvwait",
+              "image": "libsystem_kernel.dylib",
+              "observations": 497
+            },
+            {
+              "symbol": "_tlv_get_addr",
+              "image": "libdyld.dylib",
+              "observations": 107
+            },
+            {
+              "symbol": "experiment_gc_store",
+              "image": "live-direct-seed-inline-index",
+              "observations": 60
+            },
+            {
+              "symbol": "enter_owned",
+              "image": "live-direct-seed-inline-index",
+              "observations": 41
+            },
+            {
+              "symbol": "stack_roots",
+              "image": "live-direct-seed-inline-index",
+              "observations": 30
+            },
+            {
+              "symbol": "candidate_seed",
+              "image": "live-direct-seed-inline-index",
+              "observations": 17
+            },
+            {
+              "symbol": "collect_indexed",
+              "image": "live-direct-seed-inline-index",
+              "observations": 15
+            },
+            {
+              "symbol": "live_words",
+              "image": "live-direct-seed-inline-index",
+              "observations": 14
+            },
+            {
+              "symbol": "neoclr_gc_state_leave_v1",
+              "image": "live-direct-seed-inline-index",
+              "observations": 14
+            },
+            {
+              "symbol": "__psynch_mutexwait",
+              "image": "libsystem_kernel.dylib",
+              "observations": 13
+            },
+            {
+              "symbol": "publish_transient",
+              "image": "live-direct-seed-inline-index",
+              "observations": 13
+            },
+            {
+              "symbol": "neoclr_gc_allocate_v1",
+              "image": "live-direct-seed-inline-index",
+              "observations": 12
+            }
+          ],
+          "tlsCallers": [
+            {
+              "symbol": "experiment_gc_store",
+              "image": "live-direct-seed-inline-index",
+              "offsets": [
+                304
+              ],
+              "observations": 36
+            },
+            {
+              "symbol": "experiment_gc_store",
+              "image": "live-direct-seed-inline-index",
+              "offsets": [
+                80
+              ],
+              "observations": 31
+            },
+            {
+              "symbol": "enter_owned",
+              "image": "live-direct-seed-inline-index",
+              "offsets": [
+                796
+              ],
+              "observations": 14
+            },
+            {
+              "symbol": "neoclr_native_stack_check_v1",
+              "image": "live-direct-seed-inline-index",
+              "offsets": [
+                36
+              ],
+              "observations": 11
+            },
+            {
+              "symbol": "neoclr_root_probe_head_v1",
+              "image": "live-direct-seed-inline-index",
+              "offsets": [
+                24
+              ],
+              "observations": 3
+            },
+            {
+              "symbol": "neoclr_native_stack_check_v1",
+              "image": "live-direct-seed-inline-index",
+              "offsets": [
+                56
+              ],
+              "observations": 3
+            },
+            {
+              "symbol": "experiment_gc_store",
+              "image": "live-direct-seed-inline-index",
+              "offsets": [
+                428
+              ],
+              "observations": 3
+            },
+            {
+              "symbol": "neoclr_gc_allocate_v1",
+              "image": "live-direct-seed-inline-index",
+              "offsets": [
+                52
+              ],
+              "observations": 2
+            },
+            {
+              "symbol": "neoclr_gc_collect_conditional_v1",
+              "image": "live-direct-seed-inline-index",
+              "offsets": [
+                140
+              ],
+              "observations": 1
+            },
+            {
+              "symbol": "mark",
+              "image": "live-direct-seed-inline-index",
+              "offsets": [
+                28
+              ],
+              "observations": 1
+            },
+            {
+              "symbol": "neoclr_gc_allocate_v1",
+              "image": "live-direct-seed-inline-index",
+              "offsets": [
+                904
+              ],
+              "observations": 1
+            },
+            {
+              "symbol": "validated_bases",
+              "image": "live-direct-seed-inline-index",
+              "offsets": [
+                28
+              ],
+              "observations": 1
+            }
+          ],
+          "unattributedTls": 0
+        },
+        {
+          "mode": "guarded-sync-direct-seed-inline-index",
+          "topFrames": [
+            {
+              "symbol": "_tlv_get_addr",
+              "image": "libdyld.dylib",
+              "observations": 127
+            },
+            {
+              "symbol": "experiment_gc_store",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "observations": 100
+            },
+            {
+              "symbol": "enter_owned",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "observations": 52
+            },
+            {
+              "symbol": "mark",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "observations": 38
+            },
+            {
+              "symbol": "stack_roots",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "observations": 31
+            },
+            {
+              "symbol": "neoclr_gc_state_stack_v1",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "observations": 19
+            },
+            {
+              "symbol": "collect_indexed",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "observations": 18
+            },
+            {
+              "symbol": "neoclr_gc_allocate_v1",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "observations": 15
+            },
+            {
+              "symbol": "block_valid",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "observations": 12
+            },
+            {
+              "symbol": "neoclr_value_92",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "observations": 12
+            },
+            {
+              "symbol": "publish_transient",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "observations": 12
+            },
+            {
+              "symbol": "neoclr_gc_state_leave_v1",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "observations": 11
+            }
+          ],
+          "tlsCallers": [
+            {
+              "symbol": "experiment_gc_store",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "offsets": [
+                80
+              ],
+              "observations": 34
+            },
+            {
+              "symbol": "experiment_gc_store",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "offsets": [
+                304
+              ],
+              "observations": 27
+            },
+            {
+              "symbol": "mark",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "offsets": [
+                28
+              ],
+              "observations": 17
+            },
+            {
+              "symbol": "enter_owned",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "offsets": [
+                796
+              ],
+              "observations": 17
+            },
+            {
+              "symbol": "neoclr_native_stack_check_v1",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "offsets": [
+                36
+              ],
+              "observations": 15
+            },
+            {
+              "symbol": "neoclr_native_stack_check_v1",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "offsets": [
+                56
+              ],
+              "observations": 4
+            },
+            {
+              "symbol": "neoclr_root_probe_head_v1",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "offsets": [
+                24
+              ],
+              "observations": 4
+            },
+            {
+              "symbol": "neoclr_gc_allocate_rooted_values_v1",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "offsets": [
+                88
+              ],
+              "observations": 3
+            },
+            {
+              "symbol": "neoclr_gc_allocate_v1",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "offsets": [
+                876
+              ],
+              "observations": 2
+            },
+            {
+              "symbol": "neoclr_gc_allocate_v1",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "offsets": [
+                52
+              ],
+              "observations": 1
+            },
+            {
+              "symbol": "validated_bases",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "offsets": [
+                28
+              ],
+              "observations": 1
+            },
+            {
+              "symbol": "neoclr_scheduler_acquire_v1",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "offsets": [
+                236
+              ],
+              "observations": 1
+            },
+            {
+              "symbol": "neoclr_roots_park_v1",
+              "image": "guarded-sync-direct-seed-inline-index",
+              "offsets": [
+                116
+              ],
+              "observations": 1
+            }
+          ],
+          "unattributedTls": 0
+        }
+      ],
+      "limitation": "Difference of medians is descriptive, not isolated barrier cost. Modes differ in generated stores, scheduling, live sets and native paths. Wall-stack observations are not CPU percentages."
+    }
+  },
+  "inputs": {
+    "target/concurrent-workloads/direct-seed-http-plain/results.json": "343144efeb4345bd66e797c9041f98fcdc188762cfe637255c91ba2ee46d7ed3",
+    "target/concurrent-workloads/whole-profile-plain-summary.json": "253b6907092f784ecc8a929ee5751a222f7d753291a1b5f6606639911c732359",
+    "target/concurrent-workloads/direct-seed-http-json/results.json": "ff65a4a767750fb1b1a3c18ee5ca3a9f709ac42d9888a07a4805fab5ded0a08b",
+    "target/concurrent-workloads/whole-profile-json-summary.json": "6db725f23850b5c4339be1553f10b78dba3959cb76aa2f466b1c4ab15b16ef51"
+  }
+}
