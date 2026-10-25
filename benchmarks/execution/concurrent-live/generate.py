@@ -241,4 +241,5 @@ replace('} shadow_worker;', '};')
 replace('static _Thread_local shadow_worker *shadow_owner;', '#ifndef NEOCLR_LIVE_GROUP_WORKER_TLS\nstatic _Thread_local shadow_worker *shadow_owner;\n#endif')
 s+='\n'+(base/'store.h').read_text()
 s+='\n'+(base/'contract.h').read_text()
-a.output.write_text(s)
+# Allocation-index helpers occur before the later snapshot headers.
+a.output.write_text('#include <stdlib.h>\n'+s)

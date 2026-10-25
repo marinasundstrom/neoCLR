@@ -208,3 +208,5 @@ Follow-up: [final-collection attribution and opt-in linear seed validation](coll
 [Validated seed header reuse](direct-seed-results.md) retains canonical mark semantics and opt-in indexed/direct comparisons; local CPU gains have small mixed application effects.
 
 [Whole-request profiles after seed changes](whole-gap-results.md) compare live/guarded/sync costs and prioritize ownership-safe store and frame/root overhead.
+
+[Native store-state borrowing](store-handle-results.md) prototypes explicit same-thread state reuse; compiler integration and request-level performance remain unqualified.

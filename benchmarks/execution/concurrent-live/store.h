@@ -76,8 +76,24 @@ static inline void live_store_bits(void *destination, uint64_t bits, uint32_t wi
     else memcpy(destination,&bits,8);
 #endif
 }
+#ifdef NEOCLR_LIVE_STORE_HANDLE
+#ifdef NEOCLR_LIVE_SPLIT_TLS
+#error Store handles require grouped candidate state
+#endif
+/* Trusted generated/fixture contract, like the existing root-state handle:
+ * same native owner thread throughout the borrow; never export or migrate it.
+ * Only the state address is borrowed, not a context, epoch or heap proof.
+ * Heap ownership and all current validation still run on every store. */
+void *experiment_gc_store_state_borrow(void) { return &live_owner; }
+int experiment_gc_store_borrowed(void *opaque, neoclr_aot_context *context,
+                                void *destination, uint64_t bits, uint32_t width) {
+    if (!opaque) return 3;
+    live_owner_state *store_state=opaque;
+#define live_owner (*store_state)
+#else
 int experiment_gc_store(neoclr_aot_context *context, void *destination,
                        uint64_t bits, uint32_t width) {
+#endif
     if (!context || owned_heap.arena != &context->text || !valid(&context->text) ||
         !destination || (width!=1 && width!=2 && width!=4 && width!=8) ||
         (candidate_active && candidate_context!=context)) goto rejected;
@@ -289,6 +305,14 @@ rejected:
     live_store_counts[4]++;
     return 3;
 }
+#ifdef NEOCLR_LIVE_STORE_HANDLE
+#undef live_owner
+/* Ordinary native entry retains current-thread resolution. */
+int experiment_gc_store(neoclr_aot_context *context, void *destination,
+                       uint64_t bits, uint32_t width) {
+    return experiment_gc_store_borrowed(&live_owner,context,destination,bits,width);
+}
+#endif
 void experiment_gc_store_lookup_counts(uint64_t *out) {
     memcpy(out,live_store_lookup_counts,sizeof(live_store_lookup_counts));
 }

@@ -8,6 +8,7 @@ import signal
 parser = argparse.ArgumentParser()
 parser.add_argument('--linear-seed',action='store_true')
 parser.add_argument('--direct-seed',action='store_true')
+parser.add_argument('--store-handle',action='store_true')
 parser.add_argument('--output', type=Path, required=True)
 parser.add_argument('--sparse-index', action='store_true')
 parser.add_argument('--store-ranges', type=int, choices=range(1,17), default=4)
@@ -45,6 +46,7 @@ try:
     cc = recipe[:recipe.index('-std=c11')] + [f'-DGATE_WORDS={args.gate_words}', f'-DNEOCLR_LIVE_STORE_RANGES={args.store_ranges}']
     if args.linear_seed: cc += ['-DNEOCLR_LIVE_LINEAR_SEED']
     if args.direct_seed: cc += ['-DNEOCLR_LIVE_DIRECT_SEED']
+    if args.store_handle: cc += ['-DNEOCLR_LIVE_STORE_HANDLE']
     if args.allocation_index: cc += ['-DNEOCLR_LIVE_ALLOCATION_INDEX']
     if args.group_worker_tls: cc += ['-DNEOCLR_LIVE_GROUP_WORKER_TLS']
     if args.inline_base: cc += ['-DNEOCLR_LIVE_INLINE_BASE']
