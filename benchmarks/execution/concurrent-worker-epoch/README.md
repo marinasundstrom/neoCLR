@@ -23,9 +23,10 @@ requires all users to stop/join before disposal and synchronous recovery.
 The private root-capture service is now independent of `NEOCLR_WORKER_GC`; linking
 it does not install worker collector hooks. The live generator still rejects that
 shared-heap configuration. `NEOCLR_GATE_WORKERS` selects the new experimental API;
-without it, the appended helpers compile out. Target creation currently accepts
-only ordinary objects. Arrays and grouped element/marker updates need separate
-worker qualification; this introduces no new managed record semantics.
+without it, the appended helpers compile out. Target creation accepts ordinary objects and existing reference/value array storage.
+Array shape headers remain immutable; element and initialization-marker writes
+share one logged transaction. Text, byte and intern payloads remain rejected by
+this helper. This introduces no new managed record semantics.
 
 This reuses the [.NET background-collection research and root-service comparison](../concurrent-participant-roots/README.md#contracts-and-service-ownership).
 The current protocol preserves explicit root rendezvous and owner reclamation;
@@ -44,10 +45,23 @@ UB/bounds-sanitized builds each pass:
 - Ten bounded-log overflow cycles: the cancelling write has no partial effect,
   later writes remain cancelled, and synchronous recovery retains the current graph.
 
-Two ordinary negative controls zero deletion or insertion log values while keeping
+Two object negative controls zero deletion or insertion log values while keeping
 log counts/overflow behavior intact. Both abort at the final object-liveness
 assertion. Thus successful overflow tests cannot mask an ineffective barrier.
 These are sensitivity tests, not proof of all thread interleavings.
+
+The subsequent array qualification (`array-validation.json.gz`) adds 300 epochs
+per ordinary/sanitized build across plain reference, reserved reference and two-lane
+value arrays. It checks delayed deletion, late insertion, descendant liveness,
+header protection, all-or-nothing rejection of an out-of-bounds grouped patch and
+complete reclamation. Six additional negative controls (both logs, each layout)
+fail at the expected liveness assertion. Ordinary object/overflow cases also rerun.
+
+The first array harness retained the array as a current root. Its missing-insertion
+control unexpectedly passed because final tracing found the new edge. The corrected
+test removes that current root before finish and relies on the initial snapshot to
+retain the array. The failed sensitivity result is archived in
+`array-initial.json.gz`; it is not counted as qualified evidence.
 
 `root-validation.json.gz` repeats the existing copied-root safety tests with the
 shared-worker macro enabled. `owner-validation.json.gz` repeats live owner-only
@@ -62,6 +76,21 @@ control startup failures. No new ASan/TSan, JIT, AOT application, HTTP performan
 pause, allocation reduction or default-collector claim is made by this test.
 
 ## Remaining integration and measurement
+
+Code inspection identifies a concrete ownership mismatch: `compiled_boundary`
+transfers the pool's exclusive execution lease and context between threads, while
+`candidate_active`, `shadow_owner` and the gate's owner identity belong to the
+thread that began the epoch. Merely enabling `NEOCLR_WORKER_GC` would not transfer
+those resources. The pool also forces collection at exclusive boundaries, so the
+current scheduling policy would not preserve a long-lived concurrent epoch.
+
+The next implementation must explicitly choose a persistent collector owner with
+requests/rendezvous, or a transferable collector state with a validated handoff.
+A persistent owner avoids transferring gate authority but needs scheduling and
+allocation-service requests; handoff requires removing TLS identity assumptions
+without weakening root/resource lifetime checks. Neither option is implemented or
+accepted as a default by this checkpoint. Preserve the rejection until end-to-end
+worker entry, allocation, mutation, final remark, cancellation and exit tests pass.
 
 Connect the protocol to generated worker execution without crossing service
 ownership: allocation handoff, provider store emission, all managed payload forms,

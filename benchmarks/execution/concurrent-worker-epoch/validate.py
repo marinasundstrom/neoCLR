@@ -15,6 +15,9 @@ try:
   cmd=cc+['-std=c11','-O2','-Wall','-Wextra','-Werror','-pthread','-DNEOCLR_NATIVE_GC','-DNEOCLR_GC_PROFILE','-DNEOCLR_GATE_WORKERS','-DNEOCLR_SHADOW_TEST','-DGATE_WORDS=64','-I',gate,'-I',live,'-I',root/'runtime/native/gc',gate/'gate.c',root/'runtime/native/gc/root-probe.c',root/'runtime/native/gc/participant-roots.c',source,base/'test.c','-o',exe]
   if sanitized:cmd+=['-fsanitize=undefined,bounds','-fno-sanitize-recover=all']
   run(cmd);run([exe])
+  array_exe=out/f'arrays-{sanitized}'
+  array_cmd=[array_exe if x==exe else base/'arrays.c' if x==base/'test.c' else x for x in cmd]
+  run(array_cmd);run([array_exe])
  # Zero logged values without changing capacity/overflow behavior. Each variant
  # must reach the final object-liveness assertion, not merely fail setup.
  ordinary=[str(x) for x in cmd if str(x) not in ['-fsanitize=undefined,bounds','-fno-sanitize-recover=all']]
@@ -33,6 +36,15 @@ try:
   expected=next(i for i,line in enumerate((base/'test.c').read_text().splitlines(),1) if 'allocation_info_v1(&context,objects[i][j]' in line)
   r['negative'].append(dict(kind=name,exitCode=x.returncode,stdout=x.stdout,stderr=x.stderr,expectedLivenessLine=expected))
   assert x.returncode==-signal.SIGABRT and x.stderr.strip()==f'line {expected}'
- for path in [source,live/'generate.py',Path(__file__),base/'test.c',*live.glob('*.[h]'),*gate.glob('*.[ch]'),* (root/'runtime/native/gc').glob('*.[ch]')]:r['inputs'][str(path)]=hashlib.sha256(path.read_bytes()).hexdigest()
+  array_exe=out/f'negative-arrays-{name}'
+  array_cmd=[str(base/'arrays.c') if x==str(base/'test.c') else x for x in command]
+  array_cmd[array_cmd.index('-o')+1]=str(array_exe);run(array_cmd)
+  for shape in range(3):
+   x=subprocess.run([str(array_exe),str(shape)],capture_output=True,text=True,timeout=60)
+   child='old_child' if name=='deletion' else 'new_child'
+   expected=next(i for i,line in enumerate((base/'arrays.c').read_text().splitlines(),1) if f'allocation_info_v1(&context,{child},' in line)
+   r['negative'].append(dict(kind='arrays-'+name,shape=shape,exitCode=x.returncode,stdout=x.stdout,stderr=x.stderr,expectedLivenessLine=expected))
+   assert x.returncode==-signal.SIGABRT and x.stderr.strip()==f'line {expected}'
+ for path in [source,live/'generate.py',Path(__file__),base/'test.c',base/'arrays.c',*live.glob('*.[h]'),*gate.glob('*.[ch]'),* (root/'runtime/native/gc').glob('*.[ch]')]:r['inputs'][str(path)]=hashlib.sha256(path.read_bytes()).hexdigest()
  r['passed']=True
 finally:(out/'results.json').write_text(json.dumps(r,indent=2)+'\n')
