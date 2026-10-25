@@ -179,3 +179,43 @@ these are safety checks, not timing comparisons. Source/compiler hashes and exac
 commands are archived. The earlier v2 development run overlapped fixture edits;
 v3 is the authoritative fixed-source result. Initial compilation used an unsupported
 Encoding.UTF8 spelling, corrected to explicit wire bytes before qualification.
+
+
+## Input session implementation
+
+`HttpRequestSession` now separates socket acceptance from reading successive HTTP/1
+messages on an existing transport. It owns one active request/body, rejects overlap,
+and retires that graph only after complete body framing. An unread body closes the
+session instead of becoming the next request. The existing decoder was moved,
+without changing its body, into `HttpRequestDecoder.rvn`.
+
+A session takes the entire retained window directly, including its cursor, before
+parsing. This avoids copying a prefix into a 4 KiB receive buffer while leaving a
+second unread tail in the transport. Subsequent network reads use bounded storage.
+No global input caching or managed-owner migration is introduced.
+
+Task completion observers are queued in neoCLR. The first test exposed a completed
+read still marked busy; the session now observes completed tasks synchronously when
+needed and checks observer identity before clearing state. An old queued observer
+must not clear a newer read. The fixture compiles System.Web sources without its
+binary reference to avoid mixing source and imported identities; the separate
+System.Web library build also validates the extracted decoder and session.
+
+This remains an **input** session. Its driver must apply Connection: close policy,
+write responses in order, and call Retire only after successful response completion.
+It is not yet wired into HttpServer/HttpClient. EOF currently returns the existing
+incomplete-request error; distinguish idle orderly EOF when integrating driver
+accounting. Acceptance/readiness scheduling and independent admission limits remain
+required before enabling persistent connections. No HTTP throughput gain is claimed.
+
+
+Qualification: `session-input-results.json.gz` passes interpreter and sync/concurrent
+AOT/JIT. In addition to the preceding buffer/body checks, each run decodes 128
+alternating `/one` and `/two` requests from a retained window over 4 KiB, rejects
+reads before retirement, checks repeated retirement/close, and exercises consumed
+and unread POST bodies followed immediately by another request. Forced collections
+occur between messages in interpreter/sync; concurrent automatic pacing completes
+1,335 epochs in each native mode, with no invalid-state reports. These immediate
+buffered tests do not qualify suspended network reads, transport cancellation,
+response ordering, fairness or throughput. Existing source-hash/recipe requirements
+apply. The decoder body is unchanged; trailing blank lines were removed after qualification to satisfy the staged whitespace check. The archive retains the measured source hash.

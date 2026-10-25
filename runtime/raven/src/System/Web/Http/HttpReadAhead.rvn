@@ -12,6 +12,9 @@ internal class HttpReadAhead {
     private var closed = false
 
     internal val Count: int => end - position
+    internal val Buffer: byte[]? => buffer
+    internal val Start: int => position
+    internal val End: int => end
 
     internal func Save(value: byte[], start: int, extent: int) -> Result<unit, HttpError> {
         if closed || Count != 0 {

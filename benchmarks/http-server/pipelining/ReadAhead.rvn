@@ -83,6 +83,65 @@ func RejectedBodyWindow() {
     owning.Close()
 }
 
+func SessionWindow() {
+    let Ok(socket) = Socket.Listen("127.0.0.1", 0, 8) else { System.Fail("Fixture listener") }
+    let connection = HttpConnection(socket)
+    let Ok(settings) = HttpServerSettings.Create(HttpServerOptions()) else { System.Fail("Settings") }
+    let session = HttpRequestSession(connection, settings, false)
+    var wire = ""
+    for index in 0..128 {
+        wire += if index % 2 == 0 { "GET /one HTTP/1.1\r\nHost: localhost\r\n\r\n" } else { "GET /two HTTP/1.1\r\nHost: localhost\r\n\r\n" }
+    }
+    let bytes = HttpText.Snapshot(HttpText.Encode(wire))
+    if !(bytes.Length > 4096) { System.Fail("Session check 1") }
+    if !(connection.RetainReadAhead(bytes, 0, bytes.Length) is Ok(_)) { System.Fail("Session check 2") }
+    for index in 0..128 {
+        let read = session.Read(CancellationToken.None)
+        if !(read.IsCompleted) { System.Fail("Session check 3") }
+        let Ok(request) = read.GetResult() else { System.Fail("Session request") }
+        if !(request.Target == (if index % 2 == 0 { "/one" } else { "/two" })) { System.Fail("Session check 4") }
+        if !(session.Read(CancellationToken.None).GetResult() is Failure(_)) { System.Fail("Session check 5") }
+        GC.Collect()
+        if !(session.Retire()) { System.Fail("Session check 6") }
+        if !(!session.Retire()) { System.Fail("Session check 7") }
+    }
+    session.Close()
+    session.Close()
+    if !(session.Read(CancellationToken.None).GetResult() is Failure(_)) { System.Fail("Session check 8") }
+}
+
+
+func SessionBodyWindow(consume: bool) {
+    let Ok(socket) = Socket.Listen("127.0.0.1", 0, 8) else { System.Fail("Fixture listener") }
+    let connection = HttpConnection(socket)
+    let Ok(settings) = HttpServerSettings.Create(HttpServerOptions()) else { System.Fail("Settings") }
+    let session = HttpRequestSession(connection, settings, false)
+    let bytes = HttpText.Snapshot(HttpText.Encode("POST /body HTTP/1.1\r\nHost: localhost\r\nContent-Length: 2\r\n\r\nABGET /tail HTTP/1.1\r\nHost: localhost\r\n\r\n"))
+    Check(connection.RetainReadAhead(bytes, 0, bytes.Length) is Ok(_))
+    let read = session.Read(CancellationToken.None)
+    Check(read.IsCompleted)
+    let Ok(request) = read.GetResult() else { System.Fail("Session body request") }
+    Check(request.Target == "/body")
+    if consume {
+        let Some(stream) = request.Content.TryGetStream() else { System.Fail("Session body stream") }
+        let target: byte[] = [(byte)0, (byte)0]
+        let bodyRead = stream.Read(target, 0, 2)
+        Check(bodyRead.IsCompleted && bodyRead.GetResult() is Ok(2))
+        Check(target[0] == 65 && target[1] == 66)
+        Check(session.Retire())
+        GC.Collect()
+        let next = session.Read(CancellationToken.None)
+        Check(next.IsCompleted)
+        let Ok(tail) = next.GetResult() else { System.Fail("Session tail request") }
+        Check(tail.Target == "/tail")
+        Check(session.Retire())
+    } else {
+        Check(!session.Retire())
+        Check(session.Read(CancellationToken.None).GetResult() is Failure(_))
+    }
+    session.Close()
+}
+
 func Main() {
     var cases = 0
     for start in 0..9 {
@@ -141,5 +200,8 @@ func Main() {
     BodyWindow(false)
     BodyWindow(true)
     RejectedBodyWindow()
+    SessionWindow()
+    SessionBodyWindow(true)
+    SessionBodyWindow(false)
     Console.WriteLine("Read-ahead: 45 windows passed")
 }

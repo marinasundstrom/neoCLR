@@ -71,6 +71,14 @@ internal class HttpConnection {
     private var readAhead: HttpReadAhead? = null
     private var closed = false
 
+    // Move the entire unread window into the protocol session. No prefix copy
+    // may leave a second tail behind when the session finishes one message.
+    internal func TakeReadAhead() -> HttpReadAhead? {
+        let retained = readAhead
+        readAhead = null
+        return retained
+    }
+
     // Transfer only unread input; this private path prepares persistent-session support.
     // The receiving caller relinquishes the buffer after success.
     internal func RetainReadAhead(buffer: byte[], start: int, end: int) -> Result<unit, HttpError> {

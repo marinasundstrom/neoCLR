@@ -1,0 +1,133 @@
+module System.Web.Http
+
+import System.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+import System.Networking.*
+import System.Optional.*
+import System.Result.*
+import System.Runtime.CompilerServices.*
+
+// One owner, one active exchange. Acceptance and response scheduling belong to
+// the server driver; this object owns input framing across successive messages.
+internal class HttpRequestSession {
+    private val connection: HttpConnection
+    private val settings: HttpServerSettings
+    private val secure: bool
+    private var active: HttpRequest? = null
+    private var body: HttpBodyInput? = null
+    private var reading: Task<Result<HttpRequest, HttpError>>? = null
+    private var closed = false
+
+    internal init(connection: HttpConnection, settings: HttpServerSettings, secure: bool) {
+        self.connection = connection
+        self.settings = settings
+        self.secure = secure
+    }
+
+    internal func Read(token: CancellationToken) -> Task<Result<HttpRequest, HttpError>> {
+        ObserveCompletedRead()
+        if closed || active is HttpRequest || reading is Task<Result<HttpRequest, HttpError>> {
+            return Task.FromResult<Result<HttpRequest, HttpError>>(Result<HttpRequest, HttpError>.Failure(HttpError.InvalidRequest("Session is not ready for another request")))
+        }
+        let pending = ReadCore(token)
+        reading = pending
+        // Outcome observation closes cancelled/failed reads before their caller
+        // continues, including cancellation propagated through an awaited receive.
+        if pending.IsCompleted {
+            OnRead(pending)
+        } else {
+            pending.OnCompleted(() => { OnRead(pending) })
+        }
+        return pending
+    }
+
+    private func ObserveCompletedRead() {
+        if reading is Task<Result<HttpRequest, HttpError>> pending {
+            if pending.IsCompleted { OnRead(pending) }
+        }
+    }
+
+    private func OnRead(pending: Task<Result<HttpRequest, HttpError>>) {
+        // A queued observer for a retired read must not clear a newer read.
+        if Object.ReferenceEquals(reading, pending) {
+            reading = null
+            if pending.IsCancelled { Close(); return }
+            if let Failure(_) = pending.GetResult() { Close() }
+        }
+    }
+
+    private async func ReadCore(token: CancellationToken) -> Task<Result<HttpRequest, HttpError>> {
+        if token.IsCancellationRequested {
+            let cancelled = Promise<Result<HttpRequest, HttpError>>()
+            _ = cancelled.Cancel()
+            return await cancelled.Task
+        }
+        let decoder = HttpRequestDecoder(settings, secure)
+        decoder.EnableStreaming()
+        let deadline = NetworkDeadline.AfterMilliseconds(settings.ReadMilliseconds)
+        var buffer = Array<byte>.Empty
+        var start = 0
+        var count = 0
+        if connection.TakeReadAhead() is HttpReadAhead retained {
+            if retained.Buffer is byte[] bytes {
+                buffer = bytes
+                start = retained.Start
+                count = retained.End
+            }
+        }
+        while !decoder.HeadersComplete {
+            if start == count {
+                if buffer.Length == 0 { buffer = CheckedStorage.Reserve<byte>(4096) }
+                start = 0
+                count = (await connection.ReceiveUntil(buffer, 0, buffer.Length, deadline, token))?
+            }
+            if closed { return Failure(HttpError.InvalidRequest("Session is closed")) }
+            if count == 0 { return Failure(HttpError.Protocol("EOF before complete request")) }
+            _ = decoder.Push(buffer[start..count])?
+            start += decoder.Consumed
+            if decoder.HeadersComplete {
+                let request = decoder.FinishHeaders()?
+                let length = decoder.BodyLength
+                if length == 0 {
+                    _ = connection.RetainReadAhead(buffer, start, count)?
+                } else {
+                    let stream = HttpBodyInput(connection, buffer, start, count, length,
+                        settings.BodyBytes, Some(deadline), false,
+                        request.Method.Method == "GET" || request.Method.Method == "DELETE" || request.Method.Method == "HEAD")
+                    body = stream
+                    request.SetContent(HttpContent.Incoming(stream, if length < 0 { -1 } else { length }))
+                }
+                active = request
+                return Ok(request)
+            }
+        }
+        return Failure(HttpError.Protocol("Missing parsed request"))
+    }
+
+    // Call only after the response has completed successfully. Incomplete input
+    // terminates the connection; it must never be parsed as the following request.
+    internal func Retire() -> bool {
+        ObserveCompletedRead()
+        if closed || reading is Task<Result<HttpRequest, HttpError>> { return false }
+        if active is HttpRequest request {
+            if body is HttpBodyInput stream {
+                if !stream.TryReleaseForReuse() { Close(); return false }
+            }
+            body = null
+            active = null
+            request.Dispose()
+            return true
+        }
+        return false
+    }
+
+    internal func Close() {
+        if closed { return }
+        closed = true
+        connection.Close()
+        if active is HttpRequest request { request.Dispose() }
+        active = null
+        body = null
+    }
+}

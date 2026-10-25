@@ -8,12 +8,9 @@
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Remove="System.Web" />
     <Compile Include="ReadAhead.rvn" />
-    <Compile Include="../../../runtime/raven/src/System/Web/Http/HttpBodyInput.rvn" />
-    <Compile Include="../../../runtime/raven/src/System/Web/Http/HttpWire.rvn" />
-    <Compile Include="../../../runtime/raven/src/System/Web/Http/HttpWireLimits.rvn" />
-    <!-- Exact private sources are compiled into this fixture; no friend grant. -->
-    <Compile Include="../../../runtime/raven/src/System/Web/Http/HttpReadAhead.rvn" />
-    <Compile Include="../../../runtime/raven/src/System/Web/Http/HttpConnection.rvn" />
+    <!-- Compile exact System.Web sources so session/parser internals need no friend grant. -->
+    <Compile Include="../../../runtime/raven/src/System/Web/**/*.rvn" />
   </ItemGroup>
 </Project>

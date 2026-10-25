@@ -65,6 +65,7 @@ try:
   r['runs'].append(dict(mode=mode+'-jit',passed=True,collectionPolicy='forced' if mode=='sync' else 'automatic 16/64',stderr=trial['stderr']))
  for path in [Path(__file__),base/'ReadAhead.rvn',base/'ReadAhead.rvnproj',root/'runtime/raven/src/System/Web/Http/HttpBodyInput.rvn',root/'runtime/raven/src/System/Web/Http/HttpWire.rvn',root/'runtime/raven/src/System/Web/Http/HttpWireLimits.rvn',root/'runtime/raven/src/System/Web/Http/HttpReadAhead.rvn',root/'runtime/raven/src/System/Web/Http/HttpConnection.rvn',assembly,runner]:
   r['inputs'][str(path)]=hashlib.sha256(path.read_bytes()).hexdigest()
+ for path in (root/'runtime/raven/src/System/Web').rglob('*.rvn'):r['inputs'][str(path)]=hashlib.sha256(path.read_bytes()).hexdigest()
  for path in out.glob('*.rvn*'):r['inputs'][str(path)]=hashlib.sha256(path.read_bytes()).hexdigest()
  r['passed']=True
 finally:(out/'results.json').write_text(json.dumps(r,indent=2)+'\n')

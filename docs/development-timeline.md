@@ -10,7 +10,7 @@
   to avoid idle persistent connections exhausting acceptance. Client pooling needs
   verified body completion and its own identity/expiry policy.
 - **Action:** Implements and tests an internal completed-body ownership handoff;
-  public API redesign and session scheduling remain open. Compatibility is not a
+  then an input session that qualifies 128 successive requests and consumed/unread body boundaries in interpreter and sync/concurrent AOT/JIT. Testing exposed and fixed completed-task observer state lag. Public API redesign, response completion and session scheduling remain open. Compatibility is not a
   constraint requiring the existing lifetime coupling. This permission does not
   establish that every proposed API or runtime change is necessary.
 - **Evidence:** [Ownership split and qualification](../benchmarks/http-server/pipelining/README.md).
