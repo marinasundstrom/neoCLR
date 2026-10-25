@@ -160,15 +160,15 @@ Miss:
 ldc.i4 0
 ret
 .end
-.function RuntimeTryError(System.Result<Int32,System.OverflowError>& source,out System.Result.Error<System.OverflowError>& destination) -> Int32
+.function RuntimeTryError(System.Result<Int32,System.OverflowError>& source,out System.Result.Failure<System.OverflowError>& destination) -> Int32
 ldarg destination
 newobj System.OverflowError
-newobj System.Result.Error<System.OverflowError>
-stobj System.Result.Error<System.OverflowError>
+newobj System.Result.Failure<System.OverflowError>
+stobj System.Result.Failure<System.OverflowError>
 ldarg source
 ldobj System.Result<Int32,System.OverflowError>
 ldarg destination
-call instance System.Result<Int32,System.OverflowError>::TryGet(System.Result.Error<System.OverflowError>&)
+call instance System.Result<Int32,System.OverflowError>::TryGet(System.Result.Failure<System.OverflowError>&)
 brfalse Miss
 ldc.i4 1
 ret

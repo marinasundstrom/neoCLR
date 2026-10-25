@@ -181,7 +181,7 @@ fn native_bytes_show_initialization_and_frame_ownership() {
 }
 #[test]
 fn debugger_console_accepts_input_while_guest_waits() {
-    let module = frontend::compile("func Main() -> int { return Console.ReadByte() match { Ok(let option) => option match { Some(let byte) => int(byte), None => -1 }, Error(_) => -2 } }").unwrap();
+    let module = frontend::compile("func Main() -> int { return Console.ReadByte() match { Ok(let option) => option match { Some(let byte) => int(byte), None => -1 }, Failure(_) => -2 } }").unwrap();
     let (debugger, worker) = launch(module, Limits::default());
     debugger.command(DebugCommand::Continue).unwrap();
     let waiting = until(&debugger, |s| s.status == "waiting for input");

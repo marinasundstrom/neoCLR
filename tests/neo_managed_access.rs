@@ -36,7 +36,7 @@ fn record_copies_field_references_and_reference_results_need_no_star() {
 
 #[test]
 fn conditions_bounds_and_match_arms_apply_automatic_reads() {
-    let source = "func Main() -> int { var flag = true; let condition = &flag; var end = 3; let bound = &end; var total = 0; if condition && !false { for i in 0..<bound { total = total + i } }; condition = false; while condition { total = 100 }; let r = &total; let copy: int = Int32.Parse(\"42\") match { Ok(_) => r, Error(_) => 0 }; return (Int32.Parse(\"42\") match { Ok(_) => r, Error(_) => 0 }) + copy }";
+    let source = "func Main() -> int { var flag = true; let condition = &flag; var end = 3; let bound = &end; var total = 0; if condition && !false { for i in 0..<bound { total = total + i } }; condition = false; while condition { total = 100 }; let r = &total; let copy: int = Int32.Parse(\"42\") match { Ok(_) => r, Failure(_) => 0 }; return (Int32.Parse(\"42\") match { Ok(_) => r, Failure(_) => 0 }) + copy }";
     assert_eq!(run(source).value, Value::Int32(6));
 }
 

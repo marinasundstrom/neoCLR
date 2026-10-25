@@ -30,11 +30,11 @@ func Purchase(product: Product&, quantity: int,
               notifications: Notifications&) -> Result<Receipt, PurchaseError> {
     if quantity <= 0 {
         let error: PurchaseError = InvalidQuantity(quantity)
-        return Error(error)
+        return Failure(error)
     }
     if product.Stock < quantity {
         let error: PurchaseError = OutOfStock(product.Stock, quantity)
-        return Error(error)
+        return Failure(error)
     }
     product.Stock = product.Stock - quantity
     let receipt = Receipt(product.Name, quantity, product.Price * quantity)
@@ -60,7 +60,7 @@ func Main() -> int {
     restock(4)
     WriteLine(product.Stock)
     WriteLine(receipts[0].Total)
-    if let Error(error) = Purchase(product, 99, &notifications) {
+    if let Failure(error) = Purchase(product, 99, &notifications) {
         if let OutOfStock(details) = error {
             WriteLine("Out of stock")
             if details.available != 7 || details.requested != 99 { return 7 }
@@ -69,7 +69,7 @@ func Main() -> int {
     if product.Stock != 7 { return 3 }
     if receipts[0].Total != 24 { return 4 }
     if let Some(_) = FindProduct(&products, "Milk") { return 6 }
-    let Error(invalid) = Purchase(product, 0, &notifications) else { return 9 }
+    let Failure(invalid) = Purchase(product, 0, &notifications) else { return 9 }
     let InvalidQuantity(details) = invalid else { return 10 }
     if details.quantity != 0 || product.Stock != 7 { return 11 }
     WriteLine("Orders complete")

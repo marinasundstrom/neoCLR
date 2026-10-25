@@ -31,13 +31,13 @@ fn conditions_evaluate_once_and_else_if_has_its_own_binding() {
 func Read(calls: int&, ok: bool) -> Result<int,string> {
     calls = calls + 1
     if ok { return Result<int,string>.Ok(20) }
-    return Result<int,string>.Error("missing")
+    return Result<int,string>.Failure("missing")
 }
 func Main() -> int {
     var calls = 0
     var total = 0
     if let Ok(value) = Read(&calls, false) { total = value }
-    else if let Error(error) = Read(&calls, false) { total = 2 }
+    else if let Failure(error) = Read(&calls, false) { total = 2 }
     let Ok(value) = Read(&calls, true) else { return -1 }
     if calls != 3 { return -2 }
     return total + value + value

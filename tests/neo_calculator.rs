@@ -188,7 +188,7 @@ fn io_errors_are_results_but_execution_limits_are_faults() {
 
 #[test]
 fn instance_calls_and_explicit_byte_conversion_use_typed_il() {
-    let source = "func Main() -> int { let value = 42; Console.WriteLine(value.ToString()); return \"42\".SliceUtf8(0, 2) match { Ok(let s) => Int32.Parse(s) match { Ok(let n) => n, Error(_) => 0 }, Error(_) => 0 } }";
+    let source = "func Main() -> int { let value = 42; Console.WriteLine(value.ToString()); return \"42\".SliceUtf8(0, 2) match { Ok(let s) => Int32.Parse(s) match { Ok(let n) => n, Failure(_) => 0 }, Failure(_) => 0 } }";
     let result = LoadedProgram::new(&frontend::compile(source).unwrap())
         .unwrap()
         .run(Limits::default())
@@ -211,7 +211,7 @@ fn instance_calls_and_explicit_byte_conversion_use_typed_il() {
 
 #[test]
 fn loop_and_match_heap_roots_survive_collection_pressure() {
-    let source = "record Counter(Value: int)\nfunc Main() -> int { var total = 0; for i in 0..<16 { let counter = new Counter(i); Int32.Parse(\"1\") match { Ok(let n) => { total = total + counter.Value + n }, Error(_) => { return -1 } } }; return total }";
+    let source = "record Counter(Value: int)\nfunc Main() -> int { var total = 0; for i in 0..<16 { let counter = new Counter(i); Int32.Parse(\"1\") match { Ok(let n) => { total = total + counter.Value + n }, Failure(_) => { return -1 } } }; return total }";
     let result = LoadedProgram::new(&frontend::compile(source).unwrap())
         .unwrap()
         .run(Limits {

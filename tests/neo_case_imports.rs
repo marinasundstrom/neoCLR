@@ -119,7 +119,7 @@ record Counter(Value: int)
 func Main() -> int {
     let number: Ok<int> = Ok(42)
     let flag: Ok<bool> = Ok(true)
-    let message: Error<string> = Error("no")
+    let message: Failure<string> = Failure("no")
     let result: Result<int, string> = number
     let failure: Result<int, string> = message
     let explicit = Ok<int>(42)
@@ -203,7 +203,7 @@ fn imports_do_not_expand_runtime_or_constructor_contracts() {
     ] {
         assert!(frontend::compile(source).is_err(), "{source}");
     }
-    let module = frontend::compile("import System.Optional.*\nfunc Main() -> Option<int&> { var value = 42; return Some(&value) }").unwrap();
+    let module = frontend::compile("import System.Optional.*\nfunc Main() -> Optional<int&> { var value = 42; return Some(&value) }").unwrap();
     assert!(
         LoadedProgram::new(&module)
             .unwrap()

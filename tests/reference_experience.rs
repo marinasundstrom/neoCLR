@@ -122,11 +122,11 @@ fn rejected_purchases_preserve_inventory_and_do_not_notify() {
 func Main() -> int {
     let product = new Product("Coffee", 12, 5)
     var notifications = ConsoleNotifications()
-    let Error(zero) = Purchase(product, 0, &notifications) else { return 1 }
+    let Failure(zero) = Purchase(product, 0, &notifications) else { return 1 }
     let InvalidQuantity(zeroDetails) = zero else { return 2 }
-    let Error(negative) = Purchase(product, -2, &notifications) else { return 3 }
+    let Failure(negative) = Purchase(product, -2, &notifications) else { return 3 }
     let InvalidQuantity(negativeDetails) = negative else { return 4 }
-    let Error(oversized) = Purchase(product, 6, &notifications) else { return 5 }
+    let Failure(oversized) = Purchase(product, 6, &notifications) else { return 5 }
     let OutOfStock(stockDetails) = oversized else { return 6 }
     if zeroDetails.quantity != 0 || negativeDetails.quantity != -2 { return 7 }
     if stockDetails.available != 5 || stockDetails.requested != 6 { return 8 }
@@ -154,7 +154,7 @@ func Main() -> int {
     let Ok(receipt) = Purchase(found, 3, &notifications) else { return 4 }
     product.Price = 99
     if product.Stock != 0 || receipt.Total != 24 || receipt.Quantity != 3 { return 5 }
-    let Error(error) = Purchase(product, 1, &notifications) else { return 6 }
+    let Failure(error) = Purchase(product, 1, &notifications) else { return 6 }
     let OutOfStock(details) = error else { return 7 }
     if details.available != 0 || details.requested != 1 { return 8 }
     return 0
@@ -169,16 +169,16 @@ func Main() -> int {
 fn nested_domain_error_needs_an_explicit_carrier_boundary() {
     let source = workflow_with_main(
         r#"
-func Reject() -> Result<Receipt, PurchaseError> { return Error(InvalidQuantity(0)) }
+func Reject() -> Result<Receipt, PurchaseError> { return Failure(InvalidQuantity(0)) }
 func Main() -> () {}
 "#,
     );
     assert!(frontend::compile(&source).is_err());
     let source = workflow_with_main(
         r#"
-func Reject() -> Result<Receipt, PurchaseError> { return Error<PurchaseError>(InvalidQuantity(0)) }
+func Reject() -> Result<Receipt, PurchaseError> { return Failure<PurchaseError>(InvalidQuantity(0)) }
 func Main() -> int {
-    let Error(error) = Reject() else { return 1 }
+    let Failure(error) = Reject() else { return 1 }
     let InvalidQuantity(details) = error else { return 2 }
     return details.quantity
 }

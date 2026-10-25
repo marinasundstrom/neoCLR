@@ -15,9 +15,9 @@ func Main() -> int {
             let destination = System.Storage.Path.Combine(args[2], "summary.txt")
             System.Storage.File.WriteAllText(destination, report, 4096) match {
                 Ok(let done) => { System.Console.WriteLine(destination); return 0 },
-                Error(let error) => { System.Console.WriteLine(error.ToString()); return 3 }
+                Failure(let error) => { System.Console.WriteLine(error.ToString()); return 3 }
             }
         },
-        Error(let error) => { System.Console.WriteLine(error.ToString()); return 2 }
+        Failure(let error) => { System.Console.WriteLine(error.ToString()); return 2 }
     }
 }

@@ -50,7 +50,7 @@ func Main() -> int {
     let error = Result<int, string>(System.Result.Failure<string>("no"))
     let Some(value) = some else { return -1 }
     if calls != 1 { return -2 }
-    if let Error(message) = error { if message.Equals("no") { return value } }
+    if let Failure(message) = error { if message.Equals("no") { return value } }
     return -3
 }
 "#;

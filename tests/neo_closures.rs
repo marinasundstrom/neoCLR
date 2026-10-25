@@ -261,7 +261,7 @@ fn match_payload_capture_outlives_its_arm() {
 func Parse(text: string) -> fn<int> {
     return Int32.Parse(text) match {
         Ok(let value) => () => value,
-        Error(_) => () => 0
+        Failure(_) => () => 0
     }
 }
 func Main() -> int { return Parse("42")() }

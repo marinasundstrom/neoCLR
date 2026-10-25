@@ -107,7 +107,7 @@ fn invalid_names_and_non_unicode_values_return_errors() {
 func Main() -> int {
     System.Environment.GetEnvironmentVariable("bad=name") match {
         Ok(let value) => { return 1 },
-        Error(let error) => { return 0 }
+        Failure(let error) => { return 0 }
     }
 }
 "#,

@@ -4,7 +4,7 @@ func ParsedOrZero(text: string) -> int {
     let parsed: Result<int, System.Int32ParseError> = Int32.Parse(text)
     return parsed match {
         Ok(let number) => number,
-        Error(_) => 0
+        Failure(_) => 0
     }
 }
 
@@ -12,7 +12,7 @@ func Main() -> int {
     let answer = ParsedOrZero("42")
     Int32.Parse("not a number") match {
         Ok(let number) => { WriteLine(number) },
-        Error(let error) => {
+        Failure(let error) => {
             error match {
                 InvalidFormat => { WriteLine("Invalid number") },
                 Overflow => { WriteLine("Number out of range") }

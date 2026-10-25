@@ -14,20 +14,20 @@ fn factories_support_explicit_types_nested_results_void_and_reference_identity()
 record Item(Value: int)
 func Main() -> int {
     let explicit = Result<int,string>.Ok(42)
-    let nested = Result<Result<int,string>,string>.Ok(Result<int,string>.Error("inner"))
-    if !(nested match { Ok(let inner) => inner.IsErr, Error(_) => false }) { return -1 }
+    let nested = Result<Result<int,string>,string>.Ok(Result<int,string>.Failure("inner"))
+    if !(nested match { Ok(let inner) => inner.IsErr, Failure(_) => false }) { return -1 }
     let done: Result<void,string> = Result<void,string>.Ok(default(void))
     if !done.IsOk { return -2 }
     let item = new Item(40)
     let reference: Result<Item&,string> = Result<Item&,string>.Ok(item)
-    reference match { Ok(let shared) => { shared.Value = 42 }, Error(_) => { return -3 } }
+    reference match { Ok(let shared) => { shared.Value = 42 }, Failure(_) => { return -3 } }
     if item.Value != 42 { return -4 }
     let readOnly: readonly Item& = item
     let readOnlyResult = Result<readonly Item&,string>.Ok(readOnly)
-    if (readOnlyResult match { Ok(let view) => view.Value, Error(_) => 0 }) != 42 { return -6 }
+    if (readOnlyResult match { Ok(let view) => view.Value, Failure(_) => 0 }) != 42 { return -6 }
     let callback = Result<fn<int>,string>.Ok(() => 42)
-    if (callback match { Ok(let call) => call(), Error(_) => 0 }) != 42 { return -7 }
-    return explicit match { Ok(let n) => n, Error(_) => -5 }
+    if (callback match { Ok(let call) => call(), Failure(_) => 0 }) != 42 { return -7 }
+    return explicit match { Ok(let n) => n, Failure(_) => -5 }
 }
 "#);
     assert_eq!(result.value, Value::Int32(42));
@@ -39,7 +39,7 @@ fn factories_reject_unqualified_owners_bad_payloads_and_wrong_arity() {
         "func Main() -> int { let x = Result.Ok(1); return 0 }",
         "func Main() -> int { return Result.Ok(1) }",
         "func Main() -> Result<int,string> { return Result<int,string>.Ok(true) }",
-        "func Main() -> Result<int,string> { return Result<int,string>.Error(1) }",
+        "func Main() -> Result<int,string> { return Result<int,string>.Failure(1) }",
         "func Main() -> Result<int,string> { return Result<int,string>.Ok() }",
         "func Main() -> Result<int,string> { return Result<int,string>.Ok(1,2) }",
     ] {
@@ -83,8 +83,8 @@ func Main() -> int {
     var calls = 0
     let value: Result<int,string> = Result<int,string>.Ok(Next(&calls))
     if calls != 1 { return -1 }
-    return Wrap<int>(value match { Ok(let n) => n, Error(_) => 0 }) match {
-        Ok(let n) => n, Error(_) => -2
+    return Wrap<int>(value match { Ok(let n) => n, Failure(_) => 0 }) match {
+        Ok(let n) => n, Failure(_) => -2
     }
 }
 "#);

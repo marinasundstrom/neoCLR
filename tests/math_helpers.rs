@@ -105,13 +105,13 @@ fn integer_helpers_do_not_overflow_and_clamp_reports_reversed_bounds() {
 func Main() -> int {
     System.Math.Clamp(0, 2, 1) match {
         Ok(let value) => { return -1 },
-        Error(let error) => {
+        Failure(let error) => {
             if !error.ToString().Equals("InvalidRange") { return -2 }
         }
     }
     System.Math.Clamp(-100, 7, 7) match {
         Ok(let value) => { return value },
-        Error(let error) => { return -3 }
+        Failure(let error) => { return -3 }
     }
 }
 "#;

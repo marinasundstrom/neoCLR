@@ -22,7 +22,9 @@ continues as an experimental native development path.
   Freeze optimization scope, retain sync GC/default JIT placement, update candidate
   docs and website preparation status, and keep Preview 17 download links until
   new package acceptance. Refresh the matching API-reference fingerprints and apply
-  required Rust formatting before source qualification. This does not publish a release.
+  required Rust formatting before source qualification. Repair legacy source tests
+  and imported IL fixtures left behind by the Optional/Failure migration, including
+  a nonexistent fixture filename. This does not publish a release.
 
 #### Platform APIs and migration
 

@@ -19,22 +19,22 @@ ret
 .function Method_06000005(Int32) -> void
 .local System.Result<Int32,System.OverflowError> local0
 .local System.Result.Ok<Int32> local1
-.local System.Result.Error<System.OverflowError> local2
+.local System.Result.Failure<System.OverflowError> local2
 .local System.Result<Int32,System.OverflowError> local3
 .local System.Result.Ok<Int32> local4
 .local System.Result<Int32,System.OverflowError> local5
-.local System.Result.Error<System.OverflowError> local6
+.local System.Result.Failure<System.OverflowError> local6
 ldc.i4 0
 newobj System.Result.Ok<Int32>
 stloc local1
 newobj System.OverflowError
-newobj System.Result.Error<System.OverflowError>
+newobj System.Result.Failure<System.OverflowError>
 stloc local2
 ldc.i4 0
 newobj System.Result.Ok<Int32>
 stloc local4
 newobj System.OverflowError
-newobj System.Result.Error<System.OverflowError>
+newobj System.Result.Failure<System.OverflowError>
 stloc local6
 IL_0000:
 IL_0001:
@@ -90,7 +90,7 @@ ldloca local5
 IL_0047:
 ldloca local6
 IL_0049:
-call RuntimeTryError(System.Result<Int32,System.OverflowError>&,System.Result.Error<System.OverflowError>&)
+call RuntimeTryError(System.Result<Int32,System.OverflowError>&,System.Result.Failure<System.OverflowError>&)
 IL_004e:
 brfalse IL_005c
 IL_0053:
@@ -134,15 +134,15 @@ Miss:
 ldc.i4 0
 ret
 .end
-.function RuntimeTryError(System.Result<Int32,System.OverflowError>& source,out System.Result.Error<System.OverflowError>& destination) -> Int32
+.function RuntimeTryError(System.Result<Int32,System.OverflowError>& source,out System.Result.Failure<System.OverflowError>& destination) -> Int32
 ldarg destination
 newobj System.OverflowError
-newobj System.Result.Error<System.OverflowError>
-stobj System.Result.Error<System.OverflowError>
+newobj System.Result.Failure<System.OverflowError>
+stobj System.Result.Failure<System.OverflowError>
 ldarg source
 ldobj System.Result<Int32,System.OverflowError>
 ldarg destination
-call instance System.Result<Int32,System.OverflowError>::TryGet(System.Result.Error<System.OverflowError>&)
+call instance System.Result<Int32,System.OverflowError>::TryGet(System.Result.Failure<System.OverflowError>&)
 brfalse Miss
 ldc.i4 1
 ret

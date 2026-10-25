@@ -88,3 +88,33 @@ reproducing negative controls; final packages still need their own qualification
 - macOS SDK packaging starts from an isolated Git archive of that Raven revision,
   with the explicit neoCLR metadata project and candidate version. Packaging and
   qualification outcomes remain pending until recorded below.
+
+## Started qualification and first repairs
+
+- Runtime/code source candidate: `179a2d8763a0541aea6594faa233012d95a68e55`, pushed
+  to main. [Windows SDK/editor qualification](https://github.com/marinasundstrom/neoCLR/actions/runs/40213940464)
+  uses the exact Raven pin and `0.1.18-neoclr.20261025.1`; no prior bundle is reused.
+- [First source run](https://github.com/marinasundstrom/neoCLR/actions/runs/40213931017)
+  exposes a nonexistent `CoreOptional.neoil` include. Canonical/minimum-Rust jobs
+  fail on it; this run is not acceptance. The prior source run also exposed legacy
+  examples/test strings still using Error instead of Failure.
+- Repair scope: use the retained `CoreOption.neoil` filename (artifact identity,
+  not a public type), port three retained IL fixtures' Result case references to
+  Failure, and update active legacy source examples/test strings to Optional and
+  Failure. Their source maps remain historical emission provenance; these fixture
+  spellings are adapted to the current runtime, not newly emitted compiler output.
+- Focused run passes 125 tests and initially fails the imported corpus; after its
+  IL spelling repair the remaining test passes. This gives 126 passing affected
+  tests, with the failed attempt retained separately. Broader source CI must rerun.
+- Website validation passes all 6,133 pages, including local links and shared API
+  navigation. This is a local build, not website deployment. Preview 17 downloads
+  remain unchanged.
+- Fresh local runtime/backend release binaries build successfully. macOS SDK
+  packaging's first bootstrap attempt exits 1 without a useful error diagnostic;
+  the same bootstrap command with normal logging then succeeds. Packaging resumes
+  against the same pinned sources; no completed SDK acceptance is claimed yet.
+
+`migration-first.txt.gz`, `import-retest.txt.gz` and `website.txt.gz` retain the local
+results. Source-only fixture/docs repairs do not change the runtime/compiler bytes
+being built by the original package job; final artifact lineage must list the exact
+source/test revisions rather than relabeling old artifacts with a newer commit.

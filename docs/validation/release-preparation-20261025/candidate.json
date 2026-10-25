@@ -1,0 +1,23 @@
+{
+  "status": "qualification started; not published",
+  "selectedDate": "2026-10-25",
+  "proposedReleaseTag": "v0.1.0-preview.18",
+  "runtimeVersion": "0.1.0-preview.18",
+  "sdkEditorVersion": "0.1.18-neoclr.20261025.1",
+  "runtimeCodeRevision": "179a2d8763a0541aea6594faa233012d95a68e55",
+  "ravenRevision": "ed1d08defe2778f965951747d5f48311ce3daf83",
+  "ravenBranch": "codex/neoclr",
+  "firstSourceRun": 40213931017,
+  "windowsPackageRun": 40213940464,
+  "macOSOutput": "target/preview18-release",
+  "defaultCollector": "synchronous",
+  "experimentalDefaultsUnchanged": true,
+  "remaining": [
+    "rerun source qualification after fixture repairs",
+    "complete macOS and Windows SDK/editor packages and extracted acceptance",
+    "matching native build kits and HTTPS gates",
+    "final-artifact release benchmarks",
+    "artifact and notice audits",
+    "publication and website deployment"
+  ]
+}

@@ -20,11 +20,11 @@ fn match_expressions_statements_and_error_cases() {
     assert_eq!(result.value, Value::Int32(42));
     for (text, expected) in [("42", 42), ("bad", -1), ("2147483648", -2)] {
         let source = format!(
-            "func Main() -> int {{ return System.Int32.Parse(\"{text}\") match {{ Ok(let n) => n, Error(let e) => e match {{ InvalidFormat => -1, Overflow => -2 }} }} }}"
+            "func Main() -> int {{ return System.Int32.Parse(\"{text}\") match {{ Ok(let n) => n, Failure(let e) => e match {{ InvalidFormat => -1, Overflow => -2 }} }} }}"
         );
         assert_eq!(run(&source).value, Value::Int32(expected));
     }
-    assert_eq!(run("func Main() -> int { Int32.Parse(\"42\") match { Ok(let n) => { return n }, Error(_) => { return 0 } } }").value, Value::Int32(42));
+    assert_eq!(run("func Main() -> int { Int32.Parse(\"42\") match { Ok(let n) => { return n }, Failure(_) => { return 0 } } }").value, Value::Int32(42));
     assert_eq!(
         run("func Main() -> int { return Int32.Parse(\"x\") match { Ok(let n) => n, _ => 7 } }")
             .value,
@@ -34,9 +34,9 @@ fn match_expressions_statements_and_error_cases() {
 
 #[test]
 fn single_evaluation_arm_scopes_and_loop_transfers() {
-    let source = "func Parse(n: int&) -> System.Result<int,System.Int32ParseError> { n = n + 1; return Int32.Parse(\"1\") }\nfunc Main() -> int { var n = 0; var count = 0; loop { Parse(&n) match { Ok(let v) => { count = count + v; if count < 3 { continue }; break }, Error(_) => { return -1 } } }; return n }";
+    let source = "func Parse(n: int&) -> System.Result<int,System.Int32ParseError> { n = n + 1; return Int32.Parse(\"1\") }\nfunc Main() -> int { var n = 0; var count = 0; loop { Parse(&n) match { Ok(let v) => { count = count + v; if count < 3 { continue }; break }, Failure(_) => { return -1 } } }; return n }";
     assert_eq!(run(source).value, Value::Int32(3));
-    assert_eq!(run("func Main() -> int { var x = 1; let result = Int32.Parse(\"42\") match { Ok(_) => &x, Error(_) => &x }; result = 42; return x }").value, Value::Int32(42));
+    assert_eq!(run("func Main() -> int { var x = 1; let result = Int32.Parse(\"42\") match { Ok(_) => &x, Failure(_) => &x }; result = 42; return x }").value, Value::Int32(42));
 }
 
 #[derive(Debug)]
@@ -52,7 +52,7 @@ impl Console for Input {
 
 #[test]
 fn nested_result_option_handles_input_eof_and_unavailable() {
-    let source = "func Read() -> Result<Option<byte>,System.ConsoleReadError> { return Console.ReadByte() }\nfunc Main() -> int { return Read() match { Ok(let option) => option match { Some(_) => 1, None => 0 }, Error(let e) => e match { Unavailable => -1, ReadFailed => -2 } } }";
+    let source = "func Read() -> Result<Optional<byte>,System.ConsoleReadError> { return Console.ReadByte() }\nfunc Main() -> int { return Read() match { Ok(let option) => option match { Some(_) => 1, None => 0 }, Failure(let e) => e match { Unavailable => -1, ReadFailed => -2 } } }";
     let module = frontend::compile(source).unwrap();
     let program = LoadedProgram::new(&module).unwrap();
     assert_eq!(
@@ -72,14 +72,14 @@ fn nested_result_option_handles_input_eof_and_unavailable() {
 fn rejected_patterns_types_and_lifetimes() {
     for arms in [
         "Ok(let n) => n",
-        "Ok(_) => 1, Ok(_) => 2, Error(_) => 3",
-        "_ => 1, Error(_) => 2",
-        "Ok(_) => 1, Error(_) => 2, _ => 3",
+        "Ok(_) => 1, Ok(_) => 2, Failure(_) => 3",
+        "_ => 1, Failure(_) => 2",
+        "Ok(_) => 1, Failure(_) => 2, _ => 3",
         "Missing => 1, _ => 2",
-        "Ok => 1, Error(_) => 2",
-        "Ok(_) => true, Error(_) => 2",
-        "Ok(let n) => { return n }, Error(_) => 0",
-        "Ok(let n) => &n, Error(_) => 0",
+        "Ok => 1, Failure(_) => 2",
+        "Ok(_) => true, Failure(_) => 2",
+        "Ok(let n) => { return n }, Failure(_) => 0",
+        "Ok(let n) => &n, Failure(_) => 0",
     ] {
         let source =
             format!("func Main() -> int {{ return Int32.Parse(\"1\") match {{ {arms} }} }}");
@@ -88,10 +88,10 @@ fn rejected_patterns_types_and_lifetimes() {
     for source in [
         "func Main() -> int { return 1 match { _ => 0 } }",
         "record Result(Value: int)\nfunc Main() -> int { return 0 }",
-        "func Main() -> int { Int32.Parse(\"1\") match { Ok(let n) => {}, Error(_) => {} }; return n }",
+        "func Main() -> int { Int32.Parse(\"1\") match { Ok(let n) => {}, Failure(_) => {} }; return n }",
         "func Main() -> int { let System = 1; return System.Int32.Parse(\"1\") }",
         "func Main() -> int { return Int32.Parse(true) }",
-        "func Main() -> () { let x: Option<int&> = Console.ReadByte() }",
+        "func Main() -> () { let x: Optional<int&> = Console.ReadByte() }",
     ] {
         assert!(frontend::compile(source).is_err(), "accepted {source}");
     }
@@ -110,14 +110,14 @@ fn rejected_patterns_types_and_lifetimes() {
 
 #[test]
 fn runtime_rejects_frame_escape_through_match_result() {
-    let module = frontend::compile("func Main() -> int& { var x = 1; return Int32.Parse(\"1\") match { Ok(_) => &x, Error(_) => &x } }").unwrap();
+    let module = frontend::compile("func Main() -> int& { var x = 1; return Int32.Parse(\"1\") match { Ok(_) => &x, Failure(_) => &x } }").unwrap();
     let error = LoadedProgram::new(&module)
         .unwrap()
         .run(Limits::default())
         .unwrap_err();
     assert!(error.message.contains("current frame"), "{error}");
     let result = run(
-        "record Counter(Age: int)\nfunc Main() -> int& { let value = new Counter(42); return Int32.Parse(\"1\") match { Ok(_) => &value.Age, Error(_) => &value.Age } }",
+        "record Counter(Age: int)\nfunc Main() -> int& { let value = new Counter(42); return Int32.Parse(\"1\") match { Ok(_) => &value.Age, Failure(_) => &value.Age } }",
     );
     let Value::SlotReference(reference) = &result.value else {
         panic!("expected managed reference")

@@ -11,6 +11,6 @@ func Main() -> int {
             System.Console.WriteLine("Triangle, rounding, power and clamping checked")
             return value
         },
-        Error(let error) => { System.Console.WriteLine(error.ToString()); return -5 }
+        Failure(let error) => { System.Console.WriteLine(error.ToString()); return -5 }
     }
 }

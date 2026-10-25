@@ -137,7 +137,7 @@ fn cli_assembles_and_runs_interface_example() {
 #[test]
 fn concrete_references_implicitly_project_in_all_contextual_positions() {
     let source = format!(
-        "{COUNTER}\nfunc Project(value: SimpleCounter&) -> Counter& {{ return value }}\nfunc Read(value: Counter&) -> int {{ return value.Read() }}\nfunc Main() -> int {{ var local = SimpleCounter(40); let reference = &local; let view: Counter& = reference; view.Add(2); let fromMatch: Counter& = Int32.Parse(\"1\") match {{ Ok(_) => reference, Error(_) => view }}; return Read(reference) + Read(&local) + Read(Project(reference)) + fromMatch.Read() }}"
+        "{COUNTER}\nfunc Project(value: SimpleCounter&) -> Counter& {{ return value }}\nfunc Read(value: Counter&) -> int {{ return value.Read() }}\nfunc Main() -> int {{ var local = SimpleCounter(40); let reference = &local; let view: Counter& = reference; view.Add(2); let fromMatch: Counter& = Int32.Parse(\"1\") match {{ Ok(_) => reference, Failure(_) => view }}; return Read(reference) + Read(&local) + Read(Project(reference)) + fromMatch.Read() }}"
     );
     assert_eq!(run(&source).value, Value::Int32(168));
 }
