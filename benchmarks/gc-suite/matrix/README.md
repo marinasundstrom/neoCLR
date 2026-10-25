@@ -220,3 +220,11 @@ reservation/system-fallback experiment. Its modes are `fallback-sync-jit` and
 `fallback-live-jit`; `sync-jit`/`live-jit` remain the matched system controls. The
 manifest records policy identity and the fallback implementation hash. Fixed-arena
 performance reports do not automatically qualify fallback performance or memory.
+
+
+Use `http.py --process-memory` on macOS for separate whole-process RSS and virtual
+size snapshots at readiness, after warmup and after traffic. These include the
+compiler/test runner, metadata and libraries; they are neither allocator attribution
+nor peak-memory measurements. The report is diagnostic-only, and child CPU includes
+`ps`. Run this separately from throughput cohorts. Validate the helper with
+`python3 -m unittest discover -s benchmarks/gc-suite/matrix -p test_process_memory.py`.

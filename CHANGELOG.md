@@ -61,6 +61,9 @@ continues as an experimental native development path.
   Add a test-only system fallback for unavailable/exhausted JIT reservations,
   retaining existing code/data through publication and teardown. Retain the
   system provider default pending memory/large-image/platform qualification.
+  Repeated fallback HTTP preserves the CPU gain; separate whole-process RSS
+  snapshots expose substantial JIT-host residency for compilation-lifetime
+  investigation. Add checked, diagnostic-only process-memory profiling.
   Reuse completed macOS async
   contexts under their qualified lifetime rules. Explicitly publish macOS ARM64
   JIT instructions through the platform cache API, correcting intermittent

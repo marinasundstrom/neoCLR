@@ -20,6 +20,7 @@ import subprocess
 import threading
 import time
 import traceback
+from process_memory import snapshot as memory_snapshot
 
 p=argparse.ArgumentParser(description=__doc__)
 p.add_argument('--build',type=Path,required=True)
@@ -35,7 +36,9 @@ p.add_argument('--pipeline-depth',type=int,default=16)
 p.add_argument('--rounds',type=int,default=3)
 p.add_argument('--smoke',action='store_true',help='Label these runs as qualification, not timing evidence')
 p.add_argument('--sample-stacks',action='store_true',help='macOS one-second stack capture after warmup; diagnostic timings only')
+p.add_argument('--process-memory',action='store_true',help='macOS whole-process RSS/virtual snapshots; diagnostic timings only')
 a=p.parse_args()
+if a.process_memory:assert platform.system()=='Darwin', 'macOS ps memory semantics required'
 if a.sample_stacks:
     assert platform.system()=='Darwin' and shutil.which('sample'), 'macOS sample is required'
     assert a.requests>=32768 and 'interpreter' not in a.modes, 'use at least 32768 native requests for sampling'
@@ -48,12 +51,17 @@ build_path=a.build.resolve()/'build.json';built=json.loads(build_path.read_text(
 assert built['passed'] and all(mode in built['recipes'] for mode in a.modes)
 for path,digest in built['inputs'].items():
     assert hashlib.sha256(Path(path).read_bytes()).hexdigest()==digest,('stale build input',path)
-r=dict(passed=False,kind='profile' if a.sample_stacks or built.get('diagnosticOnly') else 'qualification' if a.smoke else 'benchmark',scope=__doc__,system=platform.platform(),
+r=dict(passed=False,kind='profile' if a.process_memory or a.sample_stacks or built.get('diagnosticOnly') else 'qualification' if a.smoke else 'benchmark',scope=__doc__,system=platform.platform(),
        rounds=a.rounds,concurrency=a.concurrency,pipelineDepth=a.pipeline_depth,trials=[],rows=[],
        inputs={str(build_path):hashlib.sha256(build_path.read_bytes()).hexdigest()})
 if built.get('diagnosticOnly'):r['diagnosticOnly']=built['diagnosticOnly']
 if a.sample_stacks:
     r['diagnosticOnly']='Wall-clock stack samples include sleeping threads, not CPU percentages. Sampling perturbs timing. wholeProcessCpuSeconds includes the sampler child; invocationCpuSeconds remains server-reported.'
+
+if a.process_memory:
+    r['diagnosticOnly']=r.get('diagnosticOnly','')+' Whole-process RSS/virtual snapshots include compiler, metadata and libraries; not allocator attribution or peaks. Child CPU includes ps; timings are diagnostic.'
+    source=Path(__file__).with_name('process_memory.py').resolve()
+    r['inputs'][str(source)]=hashlib.sha256(source.read_bytes()).hexdigest()
 
 
 def traffic(port,sample,protocol,count):
@@ -139,7 +147,9 @@ def trial(mode,sample,protocol,repetition):
             if line.strip()=='READY':break
         port=int(lines.get(timeout=10));control=int(lines.get(timeout=10))
         row['readySeconds']=time.perf_counter()-began
+        if a.process_memory:row['processMemory']={'ready':memory_snapshot(process.pid)}
         traffic(port,sample,protocol,a.warmup)
+        if a.process_memory:row['processMemory']['afterWarmup']=memory_snapshot(process.pid)
         if a.sample_stacks:
             profile_path=out/f'{sample}-{protocol}-{mode}-{repetition}-stacks.txt'
             command=['sample',str(process.pid),'1','1','-file',str(profile_path)]
@@ -151,6 +161,7 @@ def trial(mode,sample,protocol,repetition):
             latencies=[latency for future in futures for latency in future.result()]
         duration=time.perf_counter()-started
         assert len(latencies)==count
+        if a.process_memory:row['processMemory']['afterTraffic']=memory_snapshot(process.pid)
         if profiler is not None:
             profile_stdout,profile_stderr=profiler.communicate(timeout=30)
             row['stackProfile'].update(exitCode=profiler.returncode,stdout=profile_stdout,stderr=profile_stderr)

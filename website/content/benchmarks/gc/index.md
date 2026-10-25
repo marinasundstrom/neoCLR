@@ -636,3 +636,10 @@ configuration passes 203 active compiler tests; HTTP qualification passes 640
 responses. Direct spill tests cover mixed-provider publication and cleanup. Native
 memory and fallback-policy performance still need measurement; this is safety
 evidence, not an additional speedup or a change of default.
+
+Fallback-policy follow-up validates another 49,344 timed responses and preserves
+the concurrent CPU improvement (32.9% plaintext, 30.3% JSON). A separate 8,320-response
+profile finds roughly 960–1,098 MiB whole-process RSS in these JIT test hosts; fallback
+is 6.9–31.4 MiB higher in the individual cases. These snapshots include compilation
+state, metadata and libraries and are not isolated GC/JIT allocation or peak memory.
+They motivate a compilation-lifetime audit before production placement promotion.
