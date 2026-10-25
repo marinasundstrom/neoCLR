@@ -256,3 +256,7 @@ fn lower_impl(
 #[cfg(test)]
 #[path = "mutation_store_tests.rs"]
 mod tests;
+
+#[cfg(test)]
+#[path = "mutation_stack_audit.rs"]
+pub(crate) mod stack_audit;

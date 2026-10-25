@@ -180,3 +180,7 @@ tradeoffs. The summary tool checks balanced evidence before reporting paired rat
 [Post-inlining profiles and worker-handle control](worker-tls-results.md) attribute
 TLS work to callers, reject an unsupported layout performance claim and refresh
 exact outside-store sites for the next compiler-provenance investigation.
+
+[Bounded stack-argument audit](stack-argument-audit-results.md) follows those sites
+into the checked compiler closure. Read-only reports preserve byte-identical
+objects and distinguish candidate static stores from qualified guard elimination.

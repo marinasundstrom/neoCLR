@@ -5862,6 +5862,10 @@ pub(crate) fn compile_into(
         crate::mutation_admission::check_call_closure(
             module, &bodies, &crate::mutation_admission::root_providers(module),
         )?;
+        #[cfg(test)]
+        if let Ok(path) = std::env::var("NEOCLR_LIVE_STACK_ARGUMENT_AUDIT") {
+            std::fs::write(path, serde_json::to_vec_pretty(&crate::mutation_store::stack_audit::report(module, &bodies))?)?;
+        }
         for (id, mut context) in live_bodies {
             define_checked(module, id, &mut context, stack_budget, long_range_calls)?;
             if id == export && platform_target == super::Target::WindowsX64 && frame_charge(&context, true)? > 4096 {

@@ -1,0 +1,6 @@
+
+running 2 tests
+test mutation_store::stack_audit::tests::external_address_taken_and_unreferenced_functions_are_excluded ... ok
+test mutation_store::stack_audit::tests::all_callers_must_provide_bounded_stack_storage ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 216 filtered out; finished in 0.01s
