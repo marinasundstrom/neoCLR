@@ -10,6 +10,8 @@ from pathlib import Path
 import subprocess
 
 p = argparse.ArgumentParser(description=__doc__)
+p.add_argument('--compare-index-only',action='store_true',help='Pair each live budget with an allocation-index-only store variant.')
+p.add_argument('--disable-store-cache',action='store_true',help='Use checked allocation-index lookup without store range hints.')
 p.add_argument('--compare-watermarks',type=int,nargs='+',choices=range(1,100),default=[])
 p.add_argument('--finish-watermark',type=int,choices=range(1,100))
 p.add_argument('--live-budgets',nargs='+',default=[],metavar='ALLOCATIONS:PUBLICATIONS')
@@ -55,6 +57,9 @@ for pair in a.live_budgets:
     name=f'live-budget-{allocation}-{publication}-hybrid-inline'
     if name in live_budgets:p.error('duplicate live budget')
     live_budgets[name]=(allocation,publication)
+if a.compare_index_only:
+    assert live_budgets and a.allocation_index and not a.disable_store_cache
+    live_budgets.update({name.replace('-hybrid','-index-only-hybrid'):budgets for name,budgets in list(live_budgets.items())})
 assert not(a.finish_watermark and a.compare_watermarks)
 assert len(set(a.compare_watermarks))==len(a.compare_watermarks)
 assert not a.compare_watermarks or a.compare_inline_base
@@ -107,7 +112,7 @@ modes += list(live_budgets)
 if a.modes:
     assert len(set(a.modes)) == len(a.modes) and set(a.modes) <= set(modes)
     modes = [m for m in modes if m in a.modes]
-report = {'compareWorkerTls':a.compare_worker_tls,'compareInlineBase':a.compare_inline_base,'compareExactAllocationIndex':a.compare_exact_allocation_index,'modeOrder':'rotating forward/reverse cycles' if a.compare_exact_allocation_index else 'alternating forward/reverse','directExactAllocationIndex':a.direct_exact_allocation_index,'exactAllocationIndex':a.exact_allocation_index,'allocationIndex':a.allocation_index,'splitStoreTls':a.split_store_tls,'fullStoreWalk':a.full_store_walk,'repeatSnapshotLookup': a.repeat_snapshot_lookup, 'headerProof': a.header_proof, 'inlineValidation': a.inline_validation, 'splitTls': a.split_tls, 'serializedStore': a.serialized_store, 'optimizationLevel': build.get('optimizationLevel','none'), 'passed': False, 'scope': __doc__, 'iterations': build['iterations'],
+report = {'storeCache':not a.disable_store_cache,'compareIndexOnly':a.compare_index_only,'compareWorkerTls':a.compare_worker_tls,'compareInlineBase':a.compare_inline_base,'compareExactAllocationIndex':a.compare_exact_allocation_index,'modeOrder':'rotating forward/reverse cycles' if a.compare_exact_allocation_index else 'alternating forward/reverse','directExactAllocationIndex':a.direct_exact_allocation_index,'exactAllocationIndex':a.exact_allocation_index,'allocationIndex':a.allocation_index,'splitStoreTls':a.split_store_tls,'fullStoreWalk':a.full_store_walk,'repeatSnapshotLookup': a.repeat_snapshot_lookup, 'headerProof': a.header_proof, 'inlineValidation': a.inline_validation, 'splitTls': a.split_tls, 'serializedStore': a.serialized_store, 'optimizationLevel': build.get('optimizationLevel','none'), 'passed': False, 'scope': __doc__, 'iterations': build['iterations'],
           'commands': [], 'trials': [], 'inputs': {}, 'excluded': []}
 if a.profile_store_walks:report['diagnosticOnly']='Heap-walk instrumentation; timings are not benchmark evidence.'
 if a.profile_owner_pauses:report['diagnosticOnly']='Owner-operation wall histograms; timings are not throughput evidence.'
@@ -263,6 +268,7 @@ static void report_profile(struct rusage *a, struct rusage *b, struct timespec *
             if a.inline_validation: command += ['-DNEOCLR_LIVE_INLINE_VALIDATION']
             if a.split_tls: command += ['-DNEOCLR_LIVE_SPLIT_TLS']
             if a.serialized_store: command += ['-DNEOCLR_LIVE_SERIALIZED_STORE']
+            if (a.disable_store_cache or '-index-only-' in mode) and mode != 'sync': command += ['-DNEOCLR_LIVE_NO_STORE_CACHE']
             if a.disable_exact_store: command += ['-DNEOCLR_LIVE_NO_EXACT_STORE']
             if a.profile_owner_pauses: command += ['-DOWNER_PAUSE_PROFILE', '-I', str(root / 'runtime/native/gc')]
             if a.profile_finish and mode != 'sync': command += ['-DFINISH_PHASE_PROFILE']

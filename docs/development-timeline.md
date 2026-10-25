@@ -1,5 +1,19 @@
 # Development conversation record
 
+## 2026-10-25 — Remove bookkeeping by simplifying structures
+
+After directing the benchmark commit and next concurrent-GC optimization, the author
+said: “Removing unnecessary bookkeeping is probably one of the first things to do.”
+The author asked whether simpler structures could achieve the same purpose.
+The assistant first screened duplicate cache insertion (no meaningful gain), then
+compared removing recent store-range hints while retaining the authoritative
+allocation index, current ownership checks and snapshot/barrier rules. Five
+interleaved rounds pass 60 standalone invocations with 8–10% CPU reductions in
+three allocation-heavy cases, 3.6% for retained-window work, and less than 1%
+differences for compute/reuse. Native safety validation passes. HTTP and JIT
+qualification remain open; no collector default changed. See the
+[index-only evidence](../benchmarks/execution/concurrent-workloads/index-only-results/README.md).
+
 ## 2026-10-25 — Standard GC samples, website results and both comparison axes
 
 The author requested recurring plain HTTP and HTTP JSON comparisons, then directed
