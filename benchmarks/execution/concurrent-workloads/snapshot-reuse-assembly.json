@@ -1,0 +1,12 @@
+{
+  "live": {
+    "binarySha256": "fd1f77492c78febe8997aaf15aff73084443be364445b139e811ba24c65316af",
+    "shadowFindCallSites": 1,
+    "instructions": 421
+  },
+  "live-repeat-lookup": {
+    "binarySha256": "744f94b75ab01e84deb99a574159b0d05b7a25da76ac7c59bbbc2012ccc23e36",
+    "shadowFindCallSites": 2,
+    "instructions": 436
+  }
+}

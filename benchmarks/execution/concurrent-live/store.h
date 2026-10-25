@@ -63,6 +63,9 @@ int experiment_gc_store(neoclr_aot_context *context, void *destination,
     if (address<base || address-base>=context->text.used) goto rejected;
     neoclr_aot_text_arena *a=&context->text;
     block *b=NULL;
+#if !defined(NEOCLR_LIVE_LINEAR_STORE) && !defined(NEOCLR_LIVE_REPEAT_SNAPSHOT_LOOKUP)
+    int snapshot_allocation=0;
+#endif
 #if !defined(NEOCLR_LIVE_NO_STORE_CACHE) && !defined(NEOCLR_LIVE_LINEAR_STORE) && defined(NEOCLR_LIVE_HEADER_PROOF)
     int reused_header=0;
 #endif
@@ -71,6 +74,9 @@ int experiment_gc_store(neoclr_aot_context *context, void *destination,
         shadow_snapshot *snapshot=shadow_owner->job;
         size_t index=shadow_find(snapshot,address);
         if (index!=SIZE_MAX) {
+#ifndef NEOCLR_LIVE_REPEAT_SNAPSHOT_LOOKUP
+            snapshot_allocation=1;
+#endif
             uint64_t at=snapshot->offsets[index];
             const block *saved=&snapshot->headers[index];
             if (!block_valid(a,at)) goto rejected;
@@ -180,7 +186,15 @@ located:;
 #endif
     live_store_last_payload=(void *)payload;
 #endif
-    if (!candidate_active || shadow_find(shadow_owner->job,address)==SIZE_MAX) {
+    /* No callback, allocation or epoch transition occurs between lookup and
+     * this store. Reuse its result; the marker cannot change snapshot identity.
+     * Linear lookup and the measurement control retain the original search. */
+#if defined(NEOCLR_LIVE_LINEAR_STORE) || defined(NEOCLR_LIVE_REPEAT_SNAPSHOT_LOOKUP)
+    int new_allocation=!candidate_active || shadow_find(shadow_owner->job,address)==SIZE_MAX;
+#else
+    int new_allocation=!snapshot_allocation;
+#endif
+    if (new_allocation) {
         /* New allocations are excluded from marker reads and are all
          * traced at remark. No publication exemption for old objects. */
         live_store_counts[1]++;
