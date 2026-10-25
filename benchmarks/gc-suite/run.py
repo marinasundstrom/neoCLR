@@ -2,6 +2,7 @@
 import argparse,hashlib,json,os,platform,statistics,subprocess
 from pathlib import Path
 p=argparse.ArgumentParser(description=__doc__)
+p.add_argument('--index-only',action='store_true',help='Evaluate concurrent store lookup without range-cache bookkeeping.')
 p.add_argument('kind',choices=['benchmark','profile'])
 p.add_argument('--output',type=Path,required=True)
 p.add_argument('--suite',choices=['all','http','standalone'],default='all')
@@ -19,7 +20,7 @@ hardware=dict(cpu=platform.processor(),logicalCpus=os.cpu_count(),memoryBytes=No
 if platform.system()=='Darwin':
  values=subprocess.check_output(['sysctl','-n','machdep.cpu.brand_string','hw.ncpu','hw.memsize'],text=True).splitlines()
  hardware=dict(cpu=values[0],logicalCpus=int(values[1]),memoryBytes=int(values[2]))
-r=dict(passed=False,hardware=hardware,schemaVersion=1,kind=a.kind,suite=a.suite,sampleDefinitionSha256=h.hexdigest(),system=platform.platform(),rounds=a.rounds,requests=a.requests,policies={'sync':{'allocationBudget':256,'publicationBudget':4096},'concurrent':{'allocationBudget':1024,'publicationBudget':16384,'finishWatermark':50}},commands=[],rows=[],reports={})
+r=dict(passed=False,hardware=hardware,schemaVersion=1,kind=a.kind,suite=a.suite,sampleDefinitionSha256=h.hexdigest(),system=platform.platform(),rounds=a.rounds,requests=a.requests,policies={'sync':{'allocationBudget':256,'publicationBudget':4096},'concurrent':{'allocationBudget':1024,'publicationBudget':16384,'finishWatermark':50,'indexOnly':a.index_only}},commands=[],rows=[],reports={})
 def run(cmd):
  cmd=list(map(str,cmd));print('Run:', ' '.join(cmd),flush=True)
  env=dict(os.environ,NEOCLR_TEST_OPT_LEVEL='speed')
@@ -33,12 +34,14 @@ def median(ts,key):return statistics.median(t[key] for t in ts)
 try:
  if a.suite in ['all','http']:
   command=['python3',root/'benchmarks/execution/concurrent-tuning/benchmark-http.py','--output',out/'http','--rounds',a.rounds,'--requests',a.requests]
+  if a.index_only:command+=['--index-only']
   if a.kind=='profile':command+=['--profile-owner-pauses']
   run(command);keep('http',out/'http/results.json')
   for sample in ['plain','json']:
    data=keep('http-'+sample,out/'http'/sample/'results.json')
    assert all(t['requests']==a.requests and t['warmup']==16 and t['clientConcurrency']==4 for t in data['trials'])
-   for mode in ['sync','live-budget-1024-16384-inline-index']:
+   live_mode='live-budget-1024-16384-'+('index-only-' if a.index_only else '')+'inline-index'
+   for mode in ['sync',live_mode]:
     ts=[t for t in data['trials'] if t['mode']==mode]
     r['rows'].append(dict(sample='http-'+sample,collector='sync' if mode=='sync' else 'concurrent',cpuSeconds=median(ts,'processCpuSeconds'),unitsPerSecond=median(ts,'requestsPerSecond'),unit='requests',allocations=median(ts,'allocations'),peakArenaBytes=statistics.median(t['gcProfile']['peakArenaUsed'] for t in ts),allocatedBytes=statistics.median(t['gcProfile']['allocatedBytes'] for t in ts)))
  if a.suite in ['all','standalone']:
@@ -52,6 +55,7 @@ try:
    src=root/'benchmarks/gc-suite'/case['source']
    assert built['inputs'][str(src.resolve())]==hashlib.sha256(src.read_bytes()).hexdigest(),('stale sample build',src)
   command=['python3',root/'benchmarks/execution/concurrent-workloads/measure.py','--build',build,'--output',out/'standalone','--rounds',a.rounds,'--allocation-index','--compare-exact-allocation-index','--compare-inline-base','--live-budgets','1024:16384','--finish-watermark',50,'--modes','sync','live-budget-1024-16384-hybrid-inline']
+  if a.index_only:command+=['--disable-store-cache']
   if a.kind=='profile':command+=['--profile-owner-pauses','--profile-begin','--profile-finish','--profile-collection']
   run(command);data=keep('standalone',out/'standalone/results.json');assert not data['excluded']
   for case in spec['cases']:

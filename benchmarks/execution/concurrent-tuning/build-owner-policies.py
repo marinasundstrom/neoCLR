@@ -4,7 +4,7 @@ from pathlib import Path
 p=argparse.ArgumentParser(description=__doc__)
 p.add_argument('--build',type=Path,required=True,help='Qualified immutable-byref owner build manifest')
 p.add_argument('--output',type=Path,required=True)
-p.add_argument('--modes',nargs='+',choices=['live','live-moderate','live-watermark'],default=['live','live-moderate','live-watermark'])
+p.add_argument('--modes',nargs='+',choices=['live','live-moderate','live-watermark','live-index-only'],default=['live','live-moderate','live-watermark'])
 p.add_argument('--owners',nargs='+',type=int,choices=[1,4],default=[1,4])
 p.add_argument('--sanitize',action='store_true')
 a=p.parse_args();assert len(set(a.modes))==len(a.modes) and len(set(a.owners))==len(a.owners)
@@ -20,9 +20,9 @@ try:
  source=out/'native-gc.c';provider=out/'text-arena.c'
  run(['python3',root/'benchmarks/execution/concurrent-live/native-scopes.py','--output',source])
  run(['python3',root/'benchmarks/execution/concurrent-store/native-providers.py','--output',provider])
- for mode,allocation,publication,watermark in [('live',256,4096,0),('live-moderate',1024,16384,0),('live-watermark',1024,16384,50)]:
+ for mode,allocation,publication,watermark in [('live',256,4096,0),('live-moderate',1024,16384,0),('live-watermark',1024,16384,50),('live-index-only',1024,16384,50)]:
   if mode not in a.modes:continue
-  r['policies'][mode]=dict(allocations=allocation,publications=publication,watermark=watermark)
+  r['policies'][mode]=dict(allocations=allocation,publications=publication,watermark=watermark,indexOnly=mode=='live-index-only')
   for owners in a.owners:
    cmd=[]
    for item in recipe:
@@ -33,6 +33,7 @@ try:
    cmd[cmd.index('-o')+1]=str(out/f'{mode}-{owners}')
    cmd += [f'-DOWNERS={owners}',f'-DNEOCLR_HTTP_WORKERS={owners}',f'-DNEOCLR_GC_ALLOCATION_BUDGET={allocation}',f'-DNEOCLR_GC_PUBLICATION_BUDGET={publication}']
    if watermark:cmd += [f'-DNEOCLR_LIVE_FINISH_WATERMARK={watermark}']
+   if mode=='live-index-only':cmd += ['-DNEOCLR_LIVE_NO_STORE_CACHE']
    if a.sanitize:cmd += ['-fsanitize=undefined,bounds','-fno-sanitize-recover=all']
    run(cmd)
  for path in [Path(__file__),a.build/'results.json',*[Path(x) for c in r['commands'] for x in c['command'] if Path(x).is_file()]]:

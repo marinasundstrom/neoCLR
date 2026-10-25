@@ -9,6 +9,7 @@ import socket
 import subprocess
 import threading
 p=argparse.ArgumentParser(description=__doc__)
+p.add_argument('--index-only',action='store_true',help='Use checked allocation-index lookup without recent store ranges.')
 p.add_argument('--finish-watermark',type=int,choices=range(1,100))
 p.add_argument('--allocation-budget',type=int,default=256)
 p.add_argument('--publication-budget',type=int,default=4096)
@@ -26,6 +27,7 @@ p.add_argument('--execution',choices=['aot','jit','both'],default='aot')
 p.add_argument('--runner',type=Path)
 p.add_argument('--pacing',choices=['forced','paced','both'],default='both')
 a=p.parse_args();assert a.requests>0
+assert not a.index_only or a.inline_index
 assert a.allocation_budget>0 and a.publication_budget>0
 if a.execution!='aot':assert a.runner is not None
 assert not a.stable_byrefs or (a.execution=='jit' and a.elide_forwarded_stack_arguments)
@@ -33,7 +35,7 @@ assert not a.elide_stack_arguments or a.execution=='jit'
 assert not a.elide_forwarded_stack_arguments or a.elide_stack_arguments
 root=Path(__file__).resolve().parents[3];base=Path(__file__).resolve().parent
 out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
-r={'passed':False,'stableByrefs':a.stable_byrefs,'scalarValidation':a.scalar_validation,'forwardedElision':a.elide_forwarded_stack_arguments,'borrowStores':a.borrow_stores,'elideStackArguments':a.elide_stack_arguments,'inlineIndex':a.inline_index,'scope':f'{a.execution} {a.sample} correctness/lifecycle only, not a capacity benchmark.','commands':[],'trials':[],'inputs':{}}
+r={'passed':False,'indexOnly':a.index_only,'stableByrefs':a.stable_byrefs,'scalarValidation':a.scalar_validation,'forwardedElision':a.elide_forwarded_stack_arguments,'borrowStores':a.borrow_stores,'elideStackArguments':a.elide_stack_arguments,'inlineIndex':a.inline_index,'scope':f'{a.execution} {a.sample} correctness/lifecycle only, not a capacity benchmark.','commands':[],'trials':[],'inputs':{}}
 def run(cmd):
  x=subprocess.run(list(map(str,cmd)),cwd=root,capture_output=True,text=True,timeout=120)
  r['commands'].append({'command':list(map(str,cmd)),'exitCode':x.returncode,'stdout':x.stdout,'stderr':x.stderr})
@@ -83,6 +85,7 @@ static void report_candidate(void) {
   command+=['-I',str(root/'runtime/native/memory'),'-DNEOCLR_GC_PROFILE','-DNEOCLR_SHADOW_SPARSE_INDEX','-I',str(base.parent/'concurrent-mutation-gate'),str(base.parent/'concurrent-mutation-gate/gate.c')]
   command += [f'-DNEOCLR_GC_ALLOCATION_BUDGET={a.allocation_budget}',f'-DNEOCLR_GC_PUBLICATION_BUDGET={a.publication_budget}']
   if a.finish_watermark:command += [f'-DNEOCLR_LIVE_FINISH_WATERMARK={a.finish_watermark}']
+  if a.index_only:command+=['-DNEOCLR_LIVE_NO_STORE_CACHE']
   if a.scalar_validation:command+=['-DNEOCLR_GC_SCALAR_STORAGE_VALIDATION']
   if a.borrow_stores:command+=['-DNEOCLR_LIVE_STORE_HANDLE']
   if a.inline_index:command+=['-DNEOCLR_LIVE_ALLOCATION_INDEX','-DNEOCLR_LIVE_EXACT_INDEX','-DNEOCLR_LIVE_INLINE_BASE']

@@ -402,3 +402,21 @@ result.
 Dated runs, including slower samples, remain in [benchmark history](/benchmarks/history/).
 New workloads or measurement conditions form separate series; results are not
 silently replaced when performance changes.
+
+## Development follow-up: simpler store lookup
+
+A 2026-10-25 interleaved experiment removes the concurrent store adapter’s recent
+range cache and uses its existing allocation index directly. With the same
+concurrent pacing, plaintext/JSON throughput increases **2.7%/3.1%** and CPU falls
+**2.7%/2.5%** across 82,240 validated responses. Allocation-heavy standalone
+samples show larger CPU reductions of 8–10%; compute and reusable-buffer work stay
+within 1%. This compares concurrent GC with its previous policy, not with sync GC.
+
+Managed JIT validates another 1,024 responses. Isolated-owner runs validate 520,953
+responses with about 2.0%/1.6% less CPU per response at one/four owners; four-owner
+throughput varies and requires longer measurement. This remains an opt-in
+experiment (`gc-suite/run.py ... --index-only`), not a runtime-default change.
+
+Separate paired profiling finds matching p99 GC-pause buckets (65.5–131.1 µs),
+but a higher observed JSON maximum for the candidate. No pause improvement is
+claimed. Benchmark throughput and diagnostic pause measurements remain separate.

@@ -12,6 +12,7 @@ import subprocess
 import threading
 import time
 p=argparse.ArgumentParser(description=__doc__)
+p.add_argument('--compare-index-only',action='store_true',help='Pair live pacing variants with checked index-only store lookup.')
 p.add_argument('--compare-watermarks',type=int,nargs='+',choices=range(1,100),default=[])
 p.add_argument('--finish-watermark',type=int,choices=range(1,100))
 p.add_argument('--compare-scalar-validation',action='store_true')
@@ -74,6 +75,9 @@ for pair in a.live_budgets:
  name=f'live-budget-{allocation}-{publication}-inline-index'
  if name in live_budgets:p.error('duplicate live budget')
  live_budgets[name]=(allocation,publication)
+if a.compare_index_only:
+ assert live_budgets and a.compare_inline_base and not a.disable_store_cache
+ live_budgets.update({name.replace('-inline-index','-index-only-inline-index'):budgets for name,budgets in list(live_budgets.items())})
 assert not(a.finish_watermark and a.compare_watermarks)
 assert len(set(a.compare_watermarks))==len(a.compare_watermarks)
 assert not a.compare_watermarks or a.compare_inline_base
@@ -106,6 +110,7 @@ root=Path(__file__).resolve().parents[3];base=Path(__file__).resolve().parent
 out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
 r={'passed':False,'compareWorkerTls':a.compare_worker_tls,'selectedModes':a.modes,'compareInlineBase':a.compare_inline_base,'directExactAllocationIndex':a.direct_exact_allocation_index,'compareExactAllocationIndex':a.compare_exact_allocation_index,'compareAllocationIndex':a.compare_allocation_index,'compareStoreTls':a.compare_store_tls,'compareStoreWalk':a.compare_store_walk,'allowAllocationVariation':a.allow_allocation_variation,'concurrency':a.concurrency,'compareSnapshotLookup':a.compare_snapshot_lookup,'compareHeaderProof':a.compare_header_proof,'compareInlineValidation':a.compare_inline_validation,'compareSplitTls':a.compare_split_tls,'compareSerializedStore':a.compare_serialized_store,'gateWords':a.gate_words,'storeCache':not a.disable_store_cache,'compareStoreCache':a.compare_store_cache,'compareExactStore':a.compare_exact_store,'storeRanges':a.store_ranges,'compareStoreRanges':a.compare_store_ranges,'sample':a.sample,'scope':'Loopback AOT fixed-work comparison; Python client scheduling and connection-close costs included. No saturation/cross-framework or GC-pause-distribution claim.', 'commands':[],'trials':[],'inputs':{}}
 r['liveHeapBytes']=a.live_heap_bytes
+r['compareIndexOnly']=a.compare_index_only
 if a.profile_store_walks:r['diagnosticOnly']='Heap-walk instrumentation; timings are not benchmark evidence.'
 if a.profile_owner_pauses:r['diagnosticOnly']='Owner-operation wall histograms; timings are not throughput evidence.'
 if a.profile_cpu:r['diagnosticOnly']='External CPU sampling affects timings; do not use this cohort for throughput claims.'
@@ -287,7 +292,7 @@ static void report_measurement(void) {
   if mode!='sync' and a.finish_watermark:command+=[f'-DNEOCLR_LIVE_FINISH_WATERMARK={a.finish_watermark}']
   if mode.startswith('live-watermark-'):command+=[f'-DNEOCLR_LIVE_FINISH_WATERMARK={mode.split("-")[2]}']
   if mode=='live-scratch-inline-index':command+=['-DNEOCLR_LIVE_REUSE_SCRATCH']
-  if mode!='sync' and (a.disable_store_cache or mode.endswith('-no-cache')):command+=['-DNEOCLR_LIVE_NO_STORE_CACHE']
+  if mode!='sync' and (a.disable_store_cache or mode.endswith('-no-cache') or '-index-only-' in mode):command+=['-DNEOCLR_LIVE_NO_STORE_CACHE']
   if mode.endswith('-index'):command+=['-DNEOCLR_LIVE_ALLOCATION_INDEX']
   if a.direct_exact_allocation_index and mode.endswith('-exact-index'):command+=['-DNEOCLR_LIVE_DIRECT_EXACT_INDEX']
   if mode.endswith('-worker-inline-index'):command+=['-DNEOCLR_LIVE_GROUP_WORKER_TLS']
@@ -400,7 +405,7 @@ static void report_measurement(void) {
      assert trial['storeCounts'][4]==0
      if mode.startswith('guarded-sync'):assert counts==[0]*6
      else:assert counts[1]>0
-     if a.disable_store_cache or mode.endswith('-no-cache'):assert trial['storeLookupCounts'][0]==0
+     if a.disable_store_cache or mode.endswith('-no-cache') or '-index-only-' in mode:assert trial['storeLookupCounts'][0]==0
      else:assert trial['storeLookupCounts'][0]>0
    finally:
     if profiler is not None and profiler.poll() is None:

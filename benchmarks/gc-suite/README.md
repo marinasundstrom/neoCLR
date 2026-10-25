@@ -143,3 +143,12 @@ Website publication is the repository's separate manual workflow. A local build 
 not a deployment. Default promotion additionally needs sustained workload coverage,
 resource/latency evidence, supported execution modes and ownership qualification;
 a single fast sample is not that decision.
+
+### Store-lookup policy experiment
+
+Pass `--index-only` to either `benchmark` or `profile` to use the existing
+allocation index directly for concurrent managed stores, without recent-range
+cache bookkeeping. Synchronous GC remains unchanged. The normalized report records
+this policy, and history comparisons flag the policy change. This option does not
+change compiler emission, ownership rules, barriers or the runtime default.
+See [qualification evidence](../execution/concurrent-workloads/index-only-results/README.md).

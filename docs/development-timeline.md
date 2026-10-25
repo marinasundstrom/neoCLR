@@ -11,7 +11,12 @@ allocation index, current ownership checks and snapshot/barrier rules. Five
 interleaved rounds pass 60 standalone invocations with 8–10% CPU reductions in
 three allocation-heavy cases, 3.6% for retained-window work, and less than 1%
 differences for compute/reuse. Native safety validation passes. HTTP and JIT
-qualification remain open; no collector default changed. See the
+qualification were initially open. Follow-up validates 82,240 paired AOT HTTP
+responses with about 3% throughput gains, 1,024 JIT responses and 520,953 isolated-owner
+responses. The standard suite gains an explicit index-only option and reports its
+policy. Four-owner throughput remains variable. Paired diagnostic p99 buckets match,
+but the candidate has a higher JSON maximum; no pause improvement or collector
+default change is claimed. See the
 [index-only evidence](../benchmarks/execution/concurrent-workloads/index-only-results/README.md).
 
 ## 2026-10-25 — Standard GC samples, website results and both comparison axes

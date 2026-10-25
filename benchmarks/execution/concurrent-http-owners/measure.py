@@ -1,7 +1,7 @@
 """Paired bounded HTTP owner measurement; whole-process CPU includes warmup/cleanup."""
 import argparse,asyncio,os,hashlib,json,math,queue,re,resource,socket,statistics,subprocess,threading,time
 from pathlib import Path
-p=argparse.ArgumentParser();p.add_argument('--build',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--seconds',type=float,default=3);p.add_argument('--rounds',type=int,default=3);p.add_argument('--concurrency',type=int,default=32);p.add_argument('--go-client',type=Path);p.add_argument('--owners',type=int,nargs='+',choices=[1,4],default=[1,4]);p.add_argument('--modes',nargs='+',choices=['sync','guarded','live','live-moderate','live-watermark'],default=['sync','live']);p.add_argument('--capture-failure',action='store_true');p.add_argument('--profile-seconds',type=int,default=0);a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--build',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--seconds',type=float,default=3);p.add_argument('--rounds',type=int,default=3);p.add_argument('--concurrency',type=int,default=32);p.add_argument('--go-client',type=Path);p.add_argument('--owners',type=int,nargs='+',choices=[1,4],default=[1,4]);p.add_argument('--modes',nargs='+',choices=['sync','guarded','live','live-moderate','live-watermark','live-index-only'],default=['sync','live']);p.add_argument('--capture-failure',action='store_true');p.add_argument('--profile-seconds',type=int,default=0);a=p.parse_args()
 assert 0<=a.profile_seconds<=a.seconds
 assert a.seconds>0 and a.rounds>0 and a.concurrency>0
 assert len(set(a.owners))==len(a.owners) and len(set(a.modes))==len(a.modes)
