@@ -1,0 +1,37 @@
+module System.Web.Http
+
+import System.*
+
+internal static class HttpConnectionPolicy {
+    internal static func CanReuse(request: HttpRequest) -> bool {
+        for header in request.Headers {
+            // Protocol switching is not supported by this HTTP/1 session.
+            if String.CompareOrdinalIgnoreCase(header.Name, "upgrade") == 0 { return false }
+            if String.CompareOrdinalIgnoreCase(header.Name, "connection") == 0 {
+                let bytes = HttpText.Encode(header.Value)
+                var start = 0
+                var end = 0
+                while end <= bytes.Count {
+                    if end == bytes.Count || bytes[end] == 44 {
+                        var first = start
+                        var last = end
+                        while first < last && (bytes[first] == 32 || bytes[first] == 9) { first += 1 }
+                        while last > first && (bytes[last - 1] == 32 || bytes[last - 1] == 9) { last -= 1 }
+                        if last - first == 5 && Lower(bytes[first]) == 99 &&
+                            Lower(bytes[first + 1]) == 108 && Lower(bytes[first + 2]) == 111 &&
+                            Lower(bytes[first + 3]) == 115 && Lower(bytes[first + 4]) == 101 {
+                            return false
+                        }
+                        start = end + 1
+                    }
+                    end += 1
+                }
+            }
+        }
+        return true
+    }
+
+    private static func Lower(value: byte) -> int {
+        return if value >= 65 && value <= 90 { value + 32 } else { value }
+    }
+}

@@ -284,6 +284,10 @@ public class HttpServer {
     }
 
     internal static func EncodeResponse(response: HttpResponse, headOnly: int) -> Result<byte[], HttpError> {
+        return EncodeResponse(response, headOnly, true)
+    }
+
+    internal static func EncodeResponse(response: HttpResponse, headOnly: int, closeConnection: bool) -> Result<byte[], HttpError> {
         let status = (int)response.StatusCode
         if !(status >= 200 && status <= 599) {
             return Failure(HttpError.InvalidRequest("A final response status from 200 through 599 is required"))
@@ -314,7 +318,12 @@ public class HttpServer {
             AppendLengthPrefix(result)
             AppendDecimal(result, count)
         }
-        AppendConnectionClose(result)
+        if closeConnection {
+            AppendConnectionClose(result)
+        } else {
+            result.Add((byte)13)
+            result.Add((byte)10)
+        }
         _ = MediaTypeSyntax.ValidateHeaders(fields)?
         var index = 0
         while index < fields.Count {
@@ -482,6 +491,12 @@ public class HttpServer {
 
 // A context owns one exchange, not a reusable physical connection contract.
 public class HttpContext : Disposable {
+    private var session: HttpRequestSession? = null
+    private var reuse = false
+    private var reused = false
+    internal val ConnectionReused: bool => reused
+
+    internal func AttachSession(value: HttpRequestSession) { session = value }
     private var owner: HttpServer
     private var connection: HttpConnection
     private var request: HttpRequest
@@ -564,7 +579,10 @@ public class HttpContext : Disposable {
             _ = source.Cancel()
             return source.Task
         }
-        let encoded = HttpServer.EncodeResponse(response, if request.Method.Method == "HEAD" { 1 } else { 0 })
+        if session is HttpRequestSession input {
+            reuse = HttpConnectionPolicy.CanReuse(request) && input.PrepareReuse()
+        }
+        let encoded = HttpServer.EncodeResponse(response, if request.Method.Method == "HEAD" { 1 } else { 0 }, !reuse)
         if let Ok(bytes) = encoded {
             if let Failure(reason) = response.Content.BeginUpload() {
                 Finish(Failure(reason))
@@ -610,7 +628,11 @@ public class HttpContext : Disposable {
         closed = true
         request.Dispose()
         response.Dispose()
-        connection.Close()
+        if session is HttpRequestSession input {
+            if !reused { input.Close() }
+        } else {
+            connection.Close()
+        }
         let caller = writeCaller
         writeCaller = null
         if caller is CancellationRegistration callerSubscription {
@@ -634,7 +656,7 @@ public class HttpContext : Disposable {
         if registration is CancellationRegistration active {
             active.Dispose()
         }
-        owner.Release()
+        if session is null { owner.Release() }
     }
 
     /// Equivalent to Close; await Respond separately to observe send completion.
@@ -643,6 +665,9 @@ public class HttpContext : Disposable {
     }
 
     private func Finish(result: Result<System.Void, HttpError>) {
+        if !closed && reuse && result is Ok(_) {
+            if session is HttpRequestSession input { reused = input.Retire() }
+        }
         Close()
         outgoing = Array<byte>.Empty
         _ = source.Complete(result)
@@ -681,6 +706,7 @@ public class HttpContext : Disposable {
             return
         }
         if sent == outgoing.Length {
+            if reuse { Finish(Ok(())); return }
             let shutdownTask = connection.Shutdown(token)
             finishing = shutdownTask
             shutdownTask.OnCompleted(self.OnShutdown)

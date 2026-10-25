@@ -431,5 +431,7 @@ Its [plaintext specification](https://github.com/TechEmpower/FrameworkBenchmarks
 uses pipelining; neoCLR’s current response encoder closes each exchange’s connection.
 Private read-ahead and input-session ownership now pass interpreter and
 sync/concurrent AOT/JIT checks, including 128 successive request messages and
-consumed/unread body boundaries. Persistent sessions and pipelined response handling remain unimplemented;
-these checks establish no additional throughput gain.
+consumed/unread body boundaries. A private session-aware sender also passes 30 checked real-wire responses across
+those modes, including pipelined/sequential requests and consumed/unread POST bodies.
+Public Accept/Serve still closes each exchange; scheduling/admission integration
+and throughput measurements remain pending.

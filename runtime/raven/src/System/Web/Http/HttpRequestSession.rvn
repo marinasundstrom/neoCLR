@@ -18,6 +18,7 @@ internal class HttpRequestSession {
     private var body: HttpBodyInput? = null
     private var reading: Task<Result<HttpRequest, HttpError>>? = null
     private var closed = false
+    private var inputReleased = false
 
     internal init(connection: HttpConnection, settings: HttpServerSettings, secure: bool) {
         self.connection = connection
@@ -111,15 +112,26 @@ internal class HttpRequestSession {
         ObserveCompletedRead()
         if closed || reading is Task<Result<HttpRequest, HttpError>> { return false }
         if active is HttpRequest request {
-            if body is HttpBodyInput stream {
-                if !stream.TryReleaseForReuse() { Close(); return false }
-            }
+            if !PrepareReuse() { Close(); return false }
             body = null
             active = null
+            inputReleased = false
             request.Dispose()
             return true
         }
         return false
+    }
+
+    // Check before encoding a persistent response, but retire only after sending.
+    internal func PrepareReuse() -> bool {
+        ObserveCompletedRead()
+        if closed || active is null || reading is Task<Result<HttpRequest, HttpError>> { return false }
+        if inputReleased { return true }
+        if body is HttpBodyInput stream {
+            if !stream.TryReleaseForReuse() { return false }
+        }
+        inputReleased = true
+        return true
     }
 
     internal func Close() {

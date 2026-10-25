@@ -219,3 +219,49 @@ occur between messages in interpreter/sync; concurrent automatic pacing complete
 buffered tests do not qualify suspended network reads, transport cancellation,
 response ordering, fairness or throughput. Existing source-hash/recipe requirements
 apply. The decoder body is unchanged; trailing blank lines were removed after qualification to satisfy the staged whitespace check. The archive retains the measured source hash.
+
+
+## Response/session integration prototype
+
+An internally attached `HttpContext` now prepares complete request input before
+encoding a persistent response and retires the request only after the response send
+succeeds. It omits Connection: close for reusable HTTP/1.1 messages, retaining
+Content-Length/status/HEAD framing rules. It skips TLS shutdown only on that reuse
+path. Failure, cancellation, incomplete bodies and explicit close use terminal
+cleanup; disposing a successfully completed context does not close the next
+exchange's transport. The ordinary public Accept/Serve path still uses its existing
+close-per-exchange behavior and admission accounting.
+
+`HttpConnectionPolicy` recognizes a case-insensitive close token within comma lists
+across Connection fields; Upgrade requests cannot reuse this HTTP/1-only path.
+The session driver owns connection admission separately; attached contexts do not
+release the old per-exchange acceptance counter. A complete production driver,
+independent connection/handler limits and idle-read scheduling are still required.
+
+The wire fixture drives the actual socket, parser, content and HttpContext sender:
+
+```sh
+python3 benchmarks/http-server/pipelining/validate-read-ahead.py --wire \
+  --output target/http-session-wire-new
+```
+
+Its entry adapter explicitly selects the already-qualified owned runtime-await
+pump while request handling and System.Web use native state machines. The initial
+native async entry compiled for sync but concurrent admission rejected its different
+host bootstrap path. The adapter uses the retained SDK RuntimeAwait provider; no
+compiler/collector admission rule was weakened and no bridge contract changed.
+The real asynchronous entry/read/write tests are distinct from immediate buffered
+input tests and their timing is not a throughput benchmark.
+
+
+`session-wire-results.json.gz` validates six responses on three real connections
+per mode (30 total): two coalesced GETs then a sequential GET with mixed-case close
+in a comma list; a consumed POST followed by a GET; and an unread POST that closes
+without processing its pipelined successor. All five configurations pass. Forced
+collections run before/after sends in interpreter/sync; automatically paced native
+concurrent AOT/JIT complete 161/162 epochs respectively, each with one cancellation
+and zero invalid-state reports. The separate `response-regression-results.json.gz`
+reruns the buffer/body/128-message input suite in all five modes; native concurrent
+runs each complete 1,337 epochs with zero invalid-state reports. System.Web builds.
+TLS persistence, send failures, cancellation races, shutdown races, idle fairness
+and sustained multi-connection load remain unqualified. Defaults are unchanged.
