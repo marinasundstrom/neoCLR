@@ -41,6 +41,12 @@ continues as an experimental native development path.
 
 #### Runtime execution, GC and concurrency
 
+- Release managed JIT compilation/selection inputs before guest invocation while
+  retaining executable code, static data and native-library ownership through host
+  cleanup. Qualification covers 203 compiler tests, HTTP and six standalone
+  patterns. Process-memory reductions vary by collector; invocation timings are
+  mixed, so this is a lifetime improvement without a throughput claim.
+
 - Extend the standard native HTTP matrix with optional macOS stack sampling,
   separating diagnostic timings from benchmarks and retaining capture hashes,
   TLS caller attribution, handler, protocol and execution-mode identities.

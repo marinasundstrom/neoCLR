@@ -643,3 +643,12 @@ profile finds roughly 960–1,098 MiB whole-process RSS in these JIT test hosts;
 is 6.9–31.4 MiB higher in the individual cases. These snapshots include compilation
 state, metadata and libraries and are not isolated GC/JIT allocation or peak memory.
 They motivate a compilation-lifetime audit before production placement promotion.
+
+The subsequent compilation-lifetime change releases unused compilation and selection
+inputs before managed JIT invocation, while retaining executable and native-host
+ownership. It passes 203 compiler tests, 48 standalone invocations and 57,664 HTTP
+responses. Separate snapshots show about 57–62 MiB less RSS with sync and 0–13 MiB
+with concurrent GC. Invocation timings are mixed: concurrent plain HTTP CPU −1.14%,
+JSON +2.00%, standalone −0.34% to +1.26%. This is runtime lifetime cleanup, not a
+collector throughput claim. Native allocation versus resident-page attribution
+remains open; collector and placement defaults are unchanged.

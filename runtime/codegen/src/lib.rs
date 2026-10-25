@@ -878,19 +878,36 @@ fn run_internal(arguments: Vec<std::ffi::OsString>, live_stores: bool) -> Result
                 "--jit-managed requires closed-world compilation without bootstrap bindings".into(),
             );
         }
-        let details = details
+        let details_ref = details
             .as_ref()
             .ok_or("--jit-managed requires explicit GC/context bindings")?;
-        let mut result = jit::execute_managed(
+        let executable = jit::prepare_managed(
             compile_input,
             root,
-            details,
+            details_ref,
             Path::new(&args[3]),
-            &jit_arguments,
             target,
         )?;
+        let release_started = std::time::Instant::now();
+        #[cfg(test)]
+        let release_compilation = std::env::var_os("NEOCLR_TEST_KEEP_JIT_COMPILATION").is_none();
+        #[cfg(not(test))]
+        let release_compilation = true;
+        if release_compilation {
+            // All emitted code and static data are owned by executable. These
+            // source/selection containers are no longer needed by native code.
+            drop(details);
+            drop(selection);
+            drop(context);
+            drop(dependencies);
+            drop(input);
+        }
+        let release_seconds = release_started.elapsed().as_secs_f64();
+        let mut result = executable.invoke(&jit_arguments)?;
+        result["compilationStateReleased"] = serde_json::json!(release_compilation);
+        result["compilationStateReleaseSeconds"] = serde_json::json!(release_seconds);
         if jit_run {
-            // execute_managed has released all native resources before returning.
+            // invoke has released all native resources before returning.
             return Ok(result["guestExitCode"]
                 .as_i64()
                 .ok_or("missing JIT guest status")? as i32);

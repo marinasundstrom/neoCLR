@@ -29,6 +29,13 @@
   maintenance. The assistant fixed the shared JIT memory boundary and retained
   negative-control evidence; this is runtime correctness work, not a GC throughput claim.
 
+- **Further runtime work:** Separated managed JIT preparation from invocation so
+  compilation inputs can be released before guest execution. Retained code/static
+  data and host ownership through cleanup. [Qualification](validation/jit-compilation-lifetime-20261025/README.md)
+  passes compiler, HTTP and standalone checks; memory and timing effects are mixed.
+  This follows the author's explicit inclusion of general runtime optimization,
+  without claiming an advantage for concurrent GC or changing collector defaults.
+
 ## 2026-10-25 — Integrate improvements once their benefit is established
 
 - **Author:** “After proven useful, integrate any improvements and update benchmarks”.

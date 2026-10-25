@@ -39,7 +39,10 @@ they do not impose a blanket ban on allocations or change Path semantics.
 Native execution improves repeated root/descriptor work, managed-heap lookup,
 allocation bookkeeping and redundant initialization. Async context reuse and
 ownership/suspension checks are qualified within their documented host boundaries.
-These changes benefit runtime execution beyond HTTP. A test-only JIT placement
+These changes benefit runtime execution beyond HTTP. Managed JIT preparation now
+releases unused compilation inputs before guest execution while retaining code and
+native-host ownership through cleanup. Memory effects vary and timing results are
+mixed; this is not presented as a throughput gain. A test-only JIT placement
 experiment also identifies a shared code/static-data cost, improving both collector
 paths; production memory policy and additional-platform qualification remain open. Explicit instruction-cache
 publication corrects intermittent macOS ARM64 JIT execution failures during code

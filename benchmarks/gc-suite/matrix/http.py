@@ -125,7 +125,7 @@ def trial(mode,sample,protocol,repetition):
     for flag in ['NEOCLR_LIVE_ELIDE_STACK_ARGUMENTS','NEOCLR_LIVE_FORWARD_STACK_ARGUMENTS',
                  'NEOCLR_LIVE_ELIDE_FORWARDED_STACK_ARGUMENTS','NEOCLR_LIVE_SSA_BYREF_ARGUMENTS',
                  'NEOCLR_LIVE_SCALAR_ARRAY_STORES','NEOCLR_LIVE_GENERIC_SCALAR_ARRAY_STORES','NEOCLR_LIVE_STACK_POLICY',
-                 'NEOCLR_TEST_JIT_ARENA']:
+                 'NEOCLR_TEST_JIT_ARENA','NEOCLR_TEST_KEEP_JIT_COMPILATION']:
         env.pop(flag,None)
     env.update(recipe['env'])
     client_before=resource.getrusage(resource.RUSAGE_SELF)
@@ -210,6 +210,8 @@ def trial(mode,sample,protocol,repetition):
         if recipe['execution']=='jit':
             row['jit']=json.loads(next(line[len('JIT_RESULT '):] for line in errors if line.startswith('JIT_RESULT ')))
             assert row['jit']['guestExitCode']==0
+            if 'compilationStateReleased' in recipe:
+                assert row['jit']['compilationStateReleased']==recipe['compilationStateReleased']
         row['passed']=True
     except Exception:
         row['failure']=traceback.format_exc()

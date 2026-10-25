@@ -228,3 +228,14 @@ compiler/test runner, metadata and libraries; they are neither allocator attribu
 nor peak-memory measurements. The report is diagnostic-only, and child CPU includes
 `ps`. Run this separately from throughput cohorts. Validate the helper with
 `python3 -m unittest discover -s benchmarks/gc-suite/matrix -p test_process_memory.py`.
+
+For compilation lifetime, use `prepare-jit-lifetime.py --build <qualified-http>
+--runner <current-test-runner> --output <fresh-directory>`. Run its
+`retained-sync-jit`, `released-sync-jit`, `retained-live-jit`, and `released-live-jit`
+recipes with `http.py`. Each uses identical fallback placement; only retained
+recipes set the test-only compilation-retention switch. The harness checks the
+reported release policy. Use `compare-scalar-jit.py --compilation-lifetime` for the
+six standalone patterns with the existing root-validation AOT control host.
+Keep memory diagnostics separate from timing. Compilation, early release and guest
+invocation have separate timings; release does not eliminate cleanup cost.
+See [qualification and limitations](../../../docs/validation/jit-compilation-lifetime-20261025/README.md).

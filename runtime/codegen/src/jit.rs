@@ -131,8 +131,21 @@ pub(super) fn execute(
     }))
 }
 
-/// Synchronous development host: code, native helpers and the invocation heap do
-/// not escape this call. The host must reject outstanding roots before returning.
+type ManagedHost = unsafe extern "C" fn(*const u8, i32, i32, *const *const EntryChar) -> i32;
+
+/// Finalized executable owns all code/static data and its native host. Field
+/// order releases code before the library; no compilation-input borrow escapes.
+pub(super) struct PreparedManaged {
+    _code: CodeOwner,
+    _library: std::sync::Arc<libloading::Library>,
+    run: ManagedHost,
+    entry: *const u8,
+    with_args: i32,
+    target: crate::compiler::Target,
+    compile_seconds: f64,
+}
+
+#[cfg(test)]
 pub(super) fn execute_managed(
     input: &neoclr::Module,
     root: &str,
@@ -141,6 +154,18 @@ pub(super) fn execute_managed(
     arguments: &[std::ffi::CString],
     target: crate::compiler::Target,
 ) -> Result<serde_json::Value, Error> {
+    prepare_managed(input, root, details, host, target)?.invoke(arguments)
+}
+
+/// Prepare a synchronous managed invocation without retaining compilation inputs.
+/// The host must reject outstanding roots before invocation returns.
+pub(super) fn prepare_managed(
+    input: &neoclr::Module,
+    root: &str,
+    details: &crate::fault_details::Options,
+    host: &std::path::Path,
+    target: crate::compiler::Target,
+) -> Result<PreparedManaged, Error> {
     if target != host_target()? {
         return Err("JIT target must match the executing host".into());
     }
@@ -160,8 +185,7 @@ pub(super) fn execute_managed(
         // Check the explicit host before binding or executing generated code.
         unsafe { crate::mutation_admission::require_managed_host(&library) }?;
     }
-    type Host = unsafe extern "C" fn(*const u8, i32, i32, *const *const EntryChar) -> i32;
-    let run: libloading::Symbol<Host> = unsafe { library.get(b"neoclr_jit_run_v1") }?;
+    let run: libloading::Symbol<ManagedHost> = unsafe { library.get(b"neoclr_jit_run_v1") }?;
     let mut flags = crate::backend_settings();
     flags.set("is_pic", "false")?;
     flags.set("use_colocated_libcalls", "false")?;
@@ -201,24 +225,40 @@ pub(super) fn execute_managed(
     };
     let entry = module.get_finalized_function(entry);
     let compile_seconds = started.elapsed().as_secs_f64();
-    // The Windows AOT argument helper consumes UTF-16; other hosts consume UTF-8.
-    // Keep backing storage alive through the synchronous host invocation.
-    #[cfg(windows)]
-    let wide_arguments: Vec<Vec<u16>> = arguments
-        .iter()
-        .map(|arg| Ok(arg.to_str()?.encode_utf16().chain([0]).collect()))
-        .collect::<Result<_, std::str::Utf8Error>>()?;
-    #[cfg(windows)]
-    let argv: Vec<_> = wide_arguments.iter().map(|arg| arg.as_ptr()).collect();
-    #[cfg(not(windows))]
-    let argv: Vec<_> = arguments.iter().map(|arg| arg.as_ptr()).collect();
-    let argc = i32::try_from(argv.len())?;
-    let started = Instant::now();
-    // SAFETY: only the validated entry ABI is passed. argv and the helper library
-    // remain alive; the synchronous host must complete cleanup before returning.
-    let exit_code = unsafe { run(entry, with_args, argc, argv.as_ptr()) };
-    Ok(
-        serde_json::json!({"profile": match target { crate::compiler::Target::MacosArm64 => "macos-arm64-jit-managed-v1", crate::compiler::Target::WindowsX64 => "windows-x64-jit-managed-v1" }, "guestExitCode": exit_code,
-        "compileAndFinalizeSeconds": compile_seconds, "invocationSeconds": started.elapsed().as_secs_f64()}),
-    )
+    let run = *run;
+    Ok(PreparedManaged {
+        _code: owner,
+        _library: library,
+        run,
+        entry,
+        with_args,
+        target,
+        compile_seconds,
+    })
+}
+
+impl PreparedManaged {
+    /// Consumes the owner; code and native libraries outlive synchronous cleanup.
+    pub(super) fn invoke(self, arguments: &[std::ffi::CString]) -> Result<serde_json::Value, Error> {
+        // The Windows AOT argument helper consumes UTF-16; other hosts consume UTF-8.
+        // Keep backing storage alive through the synchronous host invocation.
+        #[cfg(windows)]
+        let wide_arguments: Vec<Vec<u16>> = arguments
+            .iter()
+            .map(|arg| Ok(arg.to_str()?.encode_utf16().chain([0]).collect()))
+            .collect::<Result<_, std::str::Utf8Error>>()?;
+        #[cfg(windows)]
+        let argv: Vec<_> = wide_arguments.iter().map(|arg| arg.as_ptr()).collect();
+        #[cfg(not(windows))]
+        let argv: Vec<_> = arguments.iter().map(|arg| arg.as_ptr()).collect();
+        let argc = i32::try_from(argv.len())?;
+        let started = Instant::now();
+        // SAFETY: only the validated entry ABI is passed. argv and the helper library
+        // remain alive; the synchronous host must complete cleanup before returning.
+        let exit_code = unsafe { (self.run)(self.entry, self.with_args, argc, argv.as_ptr()) };
+        Ok(
+            serde_json::json!({"profile": match self.target { crate::compiler::Target::MacosArm64 => "macos-arm64-jit-managed-v1", crate::compiler::Target::WindowsX64 => "windows-x64-jit-managed-v1" }, "guestExitCode": exit_code,
+            "compileAndFinalizeSeconds": self.compile_seconds, "invocationSeconds": started.elapsed().as_secs_f64()}),
+        )
+    }
 }
