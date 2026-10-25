@@ -84,26 +84,26 @@ ownership boundary. The comparison uses identical managed objects. Disabling
 Nagle can reduce small-write delay at the cost of more packets; that tradeoff
 needs qualification rather than blanket adoption.
 
-The experiment **does not resolve the stalls**. It also fails on the final
-four-owner synchronous trial. The newly retained error is specific: HTTP 200,
-correct length and complete `Hello, World!` body, with `Connection: close`, followed
-by an I/O timeout while waiting for EOF. The server had no diagnostic error before
-harness termination. This localizes that failure to finishing the connection,
-but does not prove whether managed completion, native socket lifetime or the OS
-is responsible. Keep `nodelay-incomplete.json.gz` and do not calculate a successful
-cohort median or promote TCP_NODELAY from this evidence.
+**Correction (2026-10-25):** the original relink did not activate its generated
+socket header: the original header's include guard took precedence. Therefore
+`nodelay-incomplete.json.gz` establishes an EOF failure, but says nothing about
+TCP_NODELAY. The corrected generator includes its header first and requires an
+activation marker. Removing that include deliberately fails compilation.
+
+A fresh, active NoDelay cohort passes 288,459 responses but still shows unstable
+four-owner sync throughput (5,037–13,228 requests/s). See the
+[close investigation](close-results.md) for corrected build evidence, failure
+correlation and limitations. No runtime default changes.
 
 ## Next investigation
 
-Trace successful send completion through `HttpServeOperation.OnSent`/`Cleanup`
-to native socket close, and distinguish close-call timing from FIN/EOF delivery.
-Capture per-connection timing and OS state on failure before terminating the
-server. Preserve the EOF check; accepting a correct body alone would hide the
-observed defect. Resolve or characterize this before capacity comparisons with
-Kestrel or other servers. Separately, profile the consistent live CPU penalty,
-using guarded-sync controls to distinguish mutation/root bookkeeping from marking.
-JSON, broader standalone and multi-owner JIT comparisons, full pause distributions,
-retention budgets and concurrent-default acceptance remain incomplete.
+The [native close trace](close-results.md) correlates a reproduced EOF timeout with
+a successful close just 44 microseconds after the last send. Investigate the
+transport/OS/client boundary further before cross-framework capacity acceptance.
+Separately, profile the consistent live CPU penalty using guarded-sync controls
+to distinguish mutation/root bookkeeping from marking. JSON, broader standalone
+and multi-owner JIT comparisons, full pause distributions, retention budgets and
+concurrent-default acceptance remain incomplete.
 
 ## Reproduction
 

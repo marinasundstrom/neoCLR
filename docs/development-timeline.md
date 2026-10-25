@@ -22739,3 +22739,19 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
 - **HTTP integration follow-through:** The assistant found that shared-heap provider gaps need not block the existing isolated HTTP owners. A real Task.Run fixture exposed an unadmitted scheduling provider; after checking rooted callback ownership and its unit-result adapter, the assistant qualified the exact provider and one/four-owner sync/live hosts. [Evidence](../benchmarks/execution/concurrent-http-owners/README.md) covers 3,840 responses and 2,400 live epochs with fault/shutdown cleanup. This is an AOT integration checkpoint, not a throughput result or change to the author’s default-promotion criteria.
 
 - **Measurement correction and unresolved failure:** The assistant moved from the task-bearing/Python fixture to minimal plaintext with the existing Go client, separating server and client CPU. Two complete cohorts validate 568,621 responses, but four-owner throughput varies. Phase timing points to post-connect waits; a TCP_NODELAY hypothesis did not resolve them, and retained error output shows a complete response body followed by timeout waiting for EOF. [Evidence](../benchmarks/execution/concurrent-http-owners/measurement-results.md) preserves failed cohorts and identifies connection-close tracing as the next step. No throughput/default success is inferred from favorable rounds.
+
+## 2026-10-25 — Correcting transport evidence before GC comparisons
+
+The author asks to optimize concurrent GC after integration, considering throughput,
+CPU and allocations across relevant HTTP and standalone samples. The assistant
+continues the plaintext baseline investigation and discovers that its earlier
+TCP_NODELAY relink used the original header because of include order. The earlier
+inference about NoDelay is withdrawn; the original response failure remains valid.
+The generator is corrected with an activation check and deliberate compile-failure
+control. A fresh active cohort still has stalls. Native tracing then correlates a
+full-body EOF timeout with successful close 44 microseconds after the last send,
+while the client waits 9.998 seconds. This narrows that failure's investigation to
+transport/OS/client delivery without establishing its cause or a GC performance win.
+The assistant retains the failed report and endpoint traces in the
+[close evidence](../benchmarks/execution/concurrent-http-owners/close-results.md).
+Concurrent-default acceptance and broader workload optimization remain open.

@@ -103,3 +103,6 @@ this AOT checkpoint does not imply either. Default promotion remains open.
 retain synchronous/live CPU, allocations, RSS, client phase timing and both passed
 and incomplete cohorts. The live CPU penalty remains; EOF failures prevent a
 clean four-owner capacity claim or default promotion.
+
+See the [native close investigation](close-results.md) for corrected NoDelay evidence,
+EOF-phase timing, bounded traces and a timeout correlated with prompt native close.

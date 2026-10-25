@@ -41,6 +41,7 @@ func main() {
 		drained                                                  int
 		err                                                      error
 		connectSeconds, responseSeconds, maxConnect, maxResponse float64
+		eofSeconds, maxEof                                       float64
 	}
 	results := make(chan result, 32)
 	startCPU := cpu()
@@ -98,16 +99,30 @@ func main() {
 					}
 				}
 				var body []byte
+				var eofWait float64
 				if err == nil {
 					// Read through server EOF before closing locally. Otherwise
 					// early client closes can exhaust ephemeral ports in TIME_WAIT.
-					body, err = io.ReadAll(io.LimitReader(reader, int64(len(expected)+1)))
+					body = make([]byte, len(expected))
+					n, readError := io.ReadFull(reader, body)
+					body, err = body[:n], readError
+					if err == nil {
+						bodyDone := time.Now()
+						var extra [1]byte
+						n, eofError := io.ReadFull(reader, extra[:])
+						eofWait = time.Since(bodyDone).Seconds()
+						r.eofSeconds += eofWait
+						r.maxEof = math.Max(r.maxEof, eofWait)
+						if n != 0 || eofError != io.EOF {
+							err = fmt.Errorf("expected EOF after body: extra=%d error=%v", n, eofError)
+						}
+					}
 				}
 				connection.Close()
 				if err != nil || !strings.HasPrefix(status, "HTTP/1.1 200 ") || length != len(expected) ||
 					!bytes.Equal(body, expected) || !closeHeader {
-					r.err = fmt.Errorf("invalid response: status=%q length=%d body=%q close=%v error=%v",
-						status, length, body, closeHeader, err)
+					r.err = fmt.Errorf("invalid response: status=%q length=%d body=%q close=%v eofWaitSeconds=%f error=%v",
+						status, length, body, closeHeader, eofWait, err)
 					break
 				}
 				finished := time.Now()
@@ -130,6 +145,7 @@ func main() {
 	var latencies []float64
 	drained := 0
 	var connectSeconds, responseSeconds, maxConnect, maxResponse float64
+	var eofSeconds, maxEof float64
 	for r := range results {
 		if r.err != nil {
 			panic(r.err)
@@ -140,6 +156,8 @@ func main() {
 		responseSeconds += r.responseSeconds
 		maxConnect = math.Max(maxConnect, r.maxConnect)
 		maxResponse = math.Max(maxResponse, r.maxResponse)
+		eofSeconds += r.eofSeconds
+		maxEof = math.Max(maxEof, r.maxEof)
 	}
 	if len(latencies) == 0 {
 		panic("no completed responses")
@@ -151,6 +169,7 @@ func main() {
 	}
 	output := map[string]any{"completed": len(latencies), "drained": drained, "requestsPerSecond": float64(len(latencies)) / seconds,
 		"latencyMilliseconds": percentiles, "clientCpuSeconds": usedCPU, "windowAndDrainSeconds": elapsed,
+		"eofSeconds": eofSeconds, "maxEofMilliseconds": maxEof * 1000,
 		"connectSeconds": connectSeconds, "responseSeconds": responseSeconds,
 		"maxConnectMilliseconds": maxConnect * 1000, "maxResponseMilliseconds": maxResponse * 1000,
 		"clientCpuPerWall": usedCPU / elapsed, "clientProcessCpuSeconds": cpu()}

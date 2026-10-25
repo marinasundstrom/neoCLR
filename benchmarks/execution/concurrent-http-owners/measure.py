@@ -1,7 +1,7 @@
 """Paired bounded HTTP owner measurement; whole-process CPU includes warmup/cleanup."""
 import argparse,asyncio,os,hashlib,json,math,queue,re,resource,socket,statistics,subprocess,threading,time
 from pathlib import Path
-p=argparse.ArgumentParser();p.add_argument('--build',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--seconds',type=float,default=3);p.add_argument('--rounds',type=int,default=3);p.add_argument('--concurrency',type=int,default=32);p.add_argument('--go-client',type=Path);p.add_argument('--owners',type=int,nargs='+',choices=[1,4],default=[1,4]);p.add_argument('--modes',nargs='+',choices=['sync','live'],default=['sync','live']);a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--build',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--seconds',type=float,default=3);p.add_argument('--rounds',type=int,default=3);p.add_argument('--concurrency',type=int,default=32);p.add_argument('--go-client',type=Path);p.add_argument('--owners',type=int,nargs='+',choices=[1,4],default=[1,4]);p.add_argument('--modes',nargs='+',choices=['sync','live'],default=['sync','live']);p.add_argument('--capture-failure',action='store_true');a=p.parse_args()
 assert a.seconds>0 and a.rounds>0 and a.concurrency>0
 assert len(set(a.owners))==len(a.owners) and len(set(a.modes))==len(a.modes)
 build=a.build.resolve();out=a.output.resolve();assert not out.exists()
@@ -62,7 +62,7 @@ try:
     for line in stream:result.append(line);events.put(line)
    readers=[threading.Thread(target=read,args=(proc.stdout,lines)),threading.Thread(target=read,args=(proc.stderr,errors))]
    for reader in readers:reader.start()
-   trial=dict(mode=mode,workers=workers,repeat=repeat,stdout=lines,stderr=errors);r['trials'].append(trial)
+   trial=dict(mode=mode,workers=workers,repeat=repeat,pid=proc.pid,stdout=lines,stderr=errors);r['trials'].append(trial)
    try:
     ready=[];deadline=time.monotonic()+30
     while len(ready)<workers and time.monotonic()<deadline:
@@ -106,6 +106,16 @@ try:
      assert all(len(i)==3 and i[0]>0 and i[1]==0 for i in indices)
      trial.update(candidateCounts=counts,indexMetadata=indices)
     print(json.dumps({k:trial[k] for k in ['mode','workers','repeat','requestsPerSecond','cpuMicrosecondsPerResponse','allocationsPerResponse']}),flush=True)
+   except Exception as error:
+    trial['failure']=repr(error)
+    if a.capture_failure and proc.poll() is None:
+     trial['failureState']=[]
+     for command in [['lsof','-nP','-a','-p',str(proc.pid),'-iTCP'],['sample',str(proc.pid),'1','-file',str(out)+'.sample.txt']]:
+      try:
+       x=subprocess.run(command,capture_output=True,text=True,timeout=10)
+       trial['failureState'].append(dict(command=command,exitCode=x.returncode,stdout=x.stdout,stderr=x.stderr))
+      except Exception as diagnostic_error:trial['failureState'].append(dict(command=command,error=repr(diagnostic_error)))
+    raise
    finally:
     if proc.poll() is None:proc.kill()
     proc.wait()
