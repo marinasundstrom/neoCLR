@@ -166,6 +166,8 @@ replace('static int32_t collect_conditional(neoclr_aot_context *context,',
 boundary='int32_t neoclr_gc_collect_conditional_v1(neoclr_aot_context *context,\n    const neoclr_probe_frame *head, neoclr_gc_conditional_root *conditional, uint32_t count) {'
 replace(boundary,boundary+'\n    if (candidate_active && !candidate_phase && context == candidate_context && !gc_state.cleanup_active)\n        return experiment_gc_finish(context,head,conditional,count);')
 s+='\nint experiment_gc_live_active(neoclr_aot_context *context) { return candidate_active && candidate_context==context; }\n'
+replace('static _Thread_local neoclr_aot_context *candidate_context;', '')
+replace('static _Thread_local int candidate_active;', (base/'state.h').read_text())
 s+='\n'+(base/'store.h').read_text()
 s+='\n'+(base/'contract.h').read_text()
 a.output.write_text(s)

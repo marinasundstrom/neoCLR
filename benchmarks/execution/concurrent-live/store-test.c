@@ -1,6 +1,7 @@
 #include "native-gc.h"
 #include "gate.h"
 #include <stdio.h>
+#include <pthread.h>
 #include <stdlib.h>
 #include <string.h>
 extern int32_t experiment_gc_begin(neoclr_aot_context *,const neoclr_probe_frame *,neoclr_gc_conditional_root *,uint32_t);
@@ -215,6 +216,61 @@ static void cached_range_lifetime(void) {
     }
     puts("PASS 100 cached store ranges: bounds, reclamation, smaller reuse and owner reacquisition");
 }
+typedef struct isolated_owners {
+    pthread_mutex_t mutex;
+    pthread_cond_t changed;
+    unsigned arrived, phase;
+    neoclr_aot_context *contexts[2];
+} isolated_owners;
+typedef struct isolated_argument { isolated_owners *owners; unsigned index; } isolated_argument;
+static void rendezvous(isolated_owners *owners) {
+    CHECK(!pthread_mutex_lock(&owners->mutex));
+    unsigned phase=owners->phase;
+    if(++owners->arrived==2) {
+        owners->arrived=0; owners->phase++;
+        CHECK(!pthread_cond_broadcast(&owners->changed));
+    } else while(owners->phase==phase)
+        CHECK(!pthread_cond_wait(&owners->changed,&owners->mutex));
+    CHECK(!pthread_mutex_unlock(&owners->mutex));
+}
+static void *isolated_thread(void *argument) {
+    isolated_argument *arg=argument;
+    uint64_t counts[5]; experiment_gc_store_counts(counts);
+    for(unsigned i=0;i<5;i++) CHECK(!counts[i]);
+    uint64_t heap[256]={0}, outside=0;
+    neoclr_aot_context c={.text={(unsigned char *)heap,sizeof(heap),0}};
+    CHECK(!neoclr_gc_heap_acquire_v1(&c.text));
+    uint64_t *root=object(&c,24);
+    neoclr_probe_storage slot={&root,8,0};
+    neoclr_probe_frame frame={.context=&c,.storage=&slot,.storage_count=1};
+    CHECK(!experiment_gc_begin(&c,&frame,NULL,0));
+    experiment_gc_live_wait();
+    arg->owners->contexts[arg->index]=&c;
+    rendezvous(arg->owners);
+    CHECK(experiment_gc_store(arg->owners->contexts[1-arg->index],&outside,42,8)==3);
+    CHECK(!outside);
+    CHECK(!experiment_gc_store(&c,&outside,10+arg->index,8));
+    CHECK(!experiment_gc_store(&c,root+1,20+arg->index,8));
+    CHECK(outside==10+arg->index && root[1]==20+arg->index);
+    experiment_gc_store_counts(counts);
+    CHECK(counts[0]==1 && counts[1]==0 && counts[2]==1 && counts[3]==0 && counts[4]==1);
+    rendezvous(arg->owners); /* Keep both foreign context addresses live. */
+    CHECK(!experiment_gc_finish(&c,&frame,NULL,0));
+    root=NULL; CHECK(!neoclr_gc_collect_v1(&c,&frame) && !c.text.used);
+    CHECK(!neoclr_gc_heap_release_v1(&c.text));
+    return NULL;
+}
+static void isolated_threads(void) {
+    uint64_t before[5],after[5]; experiment_gc_store_counts(before);
+    isolated_owners owners={.mutex=PTHREAD_MUTEX_INITIALIZER,.changed=PTHREAD_COND_INITIALIZER};
+    isolated_argument args[2]={{&owners,0},{&owners,1}};
+    pthread_t threads[2];
+    for(unsigned i=0;i<2;i++) CHECK(!pthread_create(&threads[i],NULL,isolated_thread,&args[i]));
+    for(unsigned i=0;i<2;i++) CHECK(!pthread_join(threads[i],NULL));
+    CHECK(!pthread_cond_destroy(&owners.changed)); CHECK(!pthread_mutex_destroy(&owners.mutex));
+    experiment_gc_store_counts(after); CHECK(!memcmp(before,after,sizeof(before)));
+    puts("PASS isolated owner threads: concurrent epochs, foreign-context rejection and private counters");
+}
 int main(void) {
     ranges(); cancellation(); construction(); detached_identity();
     uint64_t counts[5]; experiment_gc_store_counts(counts);
@@ -223,5 +279,6 @@ int main(void) {
     cached_range_lifetime();
     cached_interior_header(0);
     cached_interior_header(1);
+    isolated_threads();
     puts("PASS 97 scalar ranges, stack/byref classification, new array construction and noncollecting overflow recovery");
 }

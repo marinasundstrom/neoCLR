@@ -15,7 +15,6 @@ static _Thread_local unsigned live_store_recent_next;
 #endif
 #endif
 static _Thread_local uint64_t live_store_lookup_counts[2]; /* proved range/base, checked walks */
-static _Thread_local uint64_t live_store_counts[5]; /* outside, inactive/new, guarded old, cancelled, rejected */
 static void live_store_cancel_epoch(void) {
         candidate_dispose();
         candidate_context=NULL;

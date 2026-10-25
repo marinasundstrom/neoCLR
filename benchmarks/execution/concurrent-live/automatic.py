@@ -19,7 +19,7 @@ assert s.count(old) == 1
 replace(old, '')
 
 s = '#include <stdint.h>\n#ifndef NEOCLR_GC_PROFILE\n#error Experimental pacing requires profiling\n#endif\n#ifdef NEOCLR_WORKER_GC\n#error Shared heaps are not qualified\n#endif\n' + s
-replace('static _Thread_local int candidate_active;', 'static _Thread_local int candidate_active, candidate_autostart;\nstatic void candidate_cancel(void);\nstatic _Thread_local uint64_t candidate_counts[5];',1)
+s = '#include <stdint.h>\nstatic _Thread_local int candidate_autostart;\nstatic void candidate_cancel(void);\nstatic _Thread_local uint64_t candidate_counts[5];\n' + s
 replace('    if (candidate_active) return 3;\n    shadow_stop();', '    if (candidate_active) candidate_cancel();\n    shadow_stop();',1)
 replace('    /* Removing pool ownership never frees an exposed String.', '    if (candidate_active) candidate_cancel();\n    /* Removing pool ownership never frees an exposed String.', 1)
 # A successful public entry is followed by arena reset in generated code. Join

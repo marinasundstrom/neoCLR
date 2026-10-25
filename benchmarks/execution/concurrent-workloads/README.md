@@ -136,3 +136,7 @@ and retained standalone/HTTP selections. Production compilation keeps its defaul
 
 [Fixed-width native stores](direct-store-results.md) compare scalar copy strategies
 without changing generated managed objects or weakening mutation/ownership checks.
+
+[Private TLS and CPU sampling](packed-tls-results.md) retain ownership isolation and
+compare identical generated code. Sampled cohorts are diagnostic-only; their wall
+stack observations, including waits, are not CPU-time percentages.

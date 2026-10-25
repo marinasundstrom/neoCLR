@@ -9,6 +9,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--output', type=Path, required=True)
 parser.add_argument('--sparse-index', action='store_true')
 parser.add_argument('--store-ranges', type=int, choices=range(1,17), default=4)
+parser.add_argument('--split-tls', action='store_true')
 parser.add_argument('--serialized-store', action='store_true')
 parser.add_argument('--batch', action='store_true')
 parser.add_argument('--disable-store-cache', action='store_true')
@@ -29,6 +30,7 @@ try:
     run(['python3', base/'generate.py', '--output', source])
     recipe = json.loads((root/'benchmarks/execution/call-layout/results.json').read_text())['builds'][1]['command']
     cc = recipe[:recipe.index('-std=c11')] + [f'-DGATE_WORDS={args.gate_words}', f'-DNEOCLR_LIVE_STORE_RANGES={args.store_ranges}']
+    if args.split_tls: cc += ['-DNEOCLR_LIVE_SPLIT_TLS']
     if args.serialized_store: cc += ['-DNEOCLR_LIVE_SERIALIZED_STORE']
     if args.sparse_index: cc += ['-DNEOCLR_SHADOW_SPARSE_INDEX']
     if args.disable_store_cache: cc += ['-DNEOCLR_LIVE_NO_STORE_CACHE']

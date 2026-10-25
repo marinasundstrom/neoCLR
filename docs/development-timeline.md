@@ -22717,3 +22717,12 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   target. Record compilation cost separately and retain production defaults; this
   is evidence within the author's optimization direction, not a new default decision.
   See [qualification and measurements](../benchmarks/execution/concurrent-workloads/optimizer-results.md).
+
+- **Native profiling follow-through (same date):** The assistant reduced scalar
+  serialization and grouped related private TLS fields, retaining native ownership
+  and negative controls. New sustained stack samples across sync, guarded-sync and
+  live HTTP corroborate mutator store/header-validation costs and common execution
+  state/root work; worker waits in the sequential sample do not establish behavior
+  under saturated load. The next investigation follows these measured paths rather
+  than assuming additional marker parallelism is the answer. See
+  [profiles and limits](../benchmarks/execution/concurrent-workloads/packed-tls-results.md).

@@ -1,0 +1,213 @@
+{
+  "scope": "Packed private candidate TLS; unchanged owned heap and speed objects",
+  "standalone": {
+    "packed-tls-measure": {
+      "tasks": {
+        "sync": {
+          "cpuSeconds": 0.014952,
+          "allocations": 65548,
+          "allocatedBytes": 2261361
+        },
+        "guarded-sync": {
+          "cpuSeconds": 0.045847,
+          "allocations": 65548,
+          "allocatedBytes": 2261361
+        },
+        "live": {
+          "cpuSeconds": 0.078374,
+          "allocations": 65548,
+          "allocatedBytes": 2261361
+        }
+      },
+      "collections": {
+        "sync": {
+          "cpuSeconds": 0.088334,
+          "allocations": 237580,
+          "allocatedBytes": 7864689
+        },
+        "guarded-sync": {
+          "cpuSeconds": 0.231663,
+          "allocations": 237580,
+          "allocatedBytes": 7864689
+        },
+        "live": {
+          "cpuSeconds": 0.3961,
+          "allocations": 237580,
+          "allocatedBytes": 7864689
+        }
+      },
+      "arrays": {
+        "sync": {
+          "cpuSeconds": 0.049518,
+          "allocations": 86028,
+          "allocatedBytes": 1892721
+        },
+        "guarded-sync": {
+          "cpuSeconds": 0.067842,
+          "allocations": 86028,
+          "allocatedBytes": 1892721
+        },
+        "live": {
+          "cpuSeconds": 0.089767,
+          "allocations": 86028,
+          "allocatedBytes": 1892721
+        }
+      }
+    },
+    "split-tls-measure": {
+      "tasks": {
+        "sync": {
+          "cpuSeconds": 0.014968,
+          "allocations": 65548,
+          "allocatedBytes": 2261361
+        },
+        "guarded-sync": {
+          "cpuSeconds": 0.04706,
+          "allocations": 65548,
+          "allocatedBytes": 2261361
+        },
+        "live": {
+          "cpuSeconds": 0.080025,
+          "allocations": 65548,
+          "allocatedBytes": 2261361
+        }
+      },
+      "collections": {
+        "sync": {
+          "cpuSeconds": 0.088231,
+          "allocations": 237580,
+          "allocatedBytes": 7864689
+        },
+        "guarded-sync": {
+          "cpuSeconds": 0.242014,
+          "allocations": 237580,
+          "allocatedBytes": 7864689
+        },
+        "live": {
+          "cpuSeconds": 0.405905,
+          "allocations": 237580,
+          "allocatedBytes": 7864689
+        }
+      },
+      "arrays": {
+        "sync": {
+          "cpuSeconds": 0.049451,
+          "allocations": 86028,
+          "allocatedBytes": 1892721
+        },
+        "guarded-sync": {
+          "cpuSeconds": 0.068809,
+          "allocations": 86028,
+          "allocatedBytes": 1892721
+        },
+        "live": {
+          "cpuSeconds": 0.09089,
+          "allocations": 86028,
+          "allocatedBytes": 1892721
+        }
+      }
+    }
+  },
+  "http": {
+    "packed-tls-http-plain": {
+      "summary": {
+        "sync": {
+          "requestsPerSecond": 4400.250951812136,
+          "requestSeconds": 0.05817849999999947,
+          "processCpuSeconds": 0.05587,
+          "peakRssBytes": 9273344
+        },
+        "guarded-sync": {
+          "requestsPerSecond": 1905.9300668843784,
+          "requestSeconds": 0.13431762499999955,
+          "processCpuSeconds": 0.147089,
+          "peakRssBytes": 11108352
+        },
+        "live": {
+          "requestsPerSecond": 1772.2758213352747,
+          "requestSeconds": 0.14444704199999947,
+          "processCpuSeconds": 0.167072,
+          "peakRssBytes": 11370496
+        },
+        "live-split-tls": {
+          "requestsPerSecond": 1723.3477073995814,
+          "requestSeconds": 0.14854808399999975,
+          "processCpuSeconds": 0.168598,
+          "peakRssBytes": 11370496
+        },
+        "guarded-sync-split-tls": {
+          "requestsPerSecond": 1760.591640218495,
+          "requestSeconds": 0.1454056659999985,
+          "processCpuSeconds": 0.15037699999999998,
+          "peakRssBytes": 11108352
+        }
+      },
+      "allocations": 57120,
+      "allocatedBytes": 4394837
+    },
+    "packed-tls-http-json": {
+      "summary": {
+        "sync": {
+          "requestsPerSecond": 2381.3408992006707,
+          "requestSeconds": 0.10750245799999902,
+          "processCpuSeconds": 0.091056,
+          "peakRssBytes": 10649600
+        },
+        "guarded-sync": {
+          "requestsPerSecond": 1155.545794002214,
+          "requestSeconds": 0.2215403330000001,
+          "processCpuSeconds": 0.22938,
+          "peakRssBytes": 12943360
+        },
+        "live": {
+          "requestsPerSecond": 1058.512263081651,
+          "requestSeconds": 0.24184887499999874,
+          "processCpuSeconds": 0.258725,
+          "peakRssBytes": 13205504
+        },
+        "live-split-tls": {
+          "requestsPerSecond": 1013.5064942962387,
+          "requestSeconds": 0.25258841600000004,
+          "processCpuSeconds": 0.27452699999999997,
+          "peakRssBytes": 13189120
+        },
+        "guarded-sync-split-tls": {
+          "requestsPerSecond": 1070.1041891059372,
+          "requestSeconds": 0.23922904199999984,
+          "processCpuSeconds": 0.24587299999999998,
+          "peakRssBytes": 12910592
+        }
+      },
+      "allocations": 124873,
+      "allocatedBytes": 7163755
+    }
+  },
+  "inputs": {
+    "target/concurrent-workloads/packed-tls-safety/results.json": "7a8361e0c45fd1a88b5185c095920657ecfd9d23ecb450cbdb43492ebc08f0a9",
+    "target/concurrent-workloads/packed-tls-safety-fixed/results.json": "a1ec63e0cea44633d2644f5745ca1c6a3fcd8e2b19dd2cd5c2129c0953736c59",
+    "target/concurrent-workloads/split-tls-safety/results.json": "a7981d8f6b62ede2566764303adeb5998d41cc7a8bea2284424a178e6017d6af",
+    "target/concurrent-workloads/packed-tls-entry/results.json": "a2e859461474686669b194c8529daf9770568089457c9919d3c23ad8b4db3c95",
+    "target/concurrent-workloads/packed-tls-records/results.json": "412224bcd8f34d94de074930d17b9acd172270668b1126fc600fe287b7021501",
+    "target/concurrent-workloads/packed-tls-measure/results.json": "89c5f7a746d7a2bf3651ab64ba8866b7313c3e843c711c308b26342cd8474728",
+    "target/concurrent-workloads/split-tls-measure/results.json": "32c9d1fadb050aa910d06da633064d229ffda28f4aab879c47ff2a6fff5aa9df",
+    "target/concurrent-workloads/packed-tls-http-plain/results.json": "a2044043dbcc967d7d521b2f662f89cc3b86579e9a83cc55ac17657e058d3cc3",
+    "target/concurrent-workloads/packed-tls-http-json/results.json": "414f1d3643a4e4044bf79075ad3c1a488112219ed4411d4e222a5fd0cff46afd",
+    "benchmarks/execution/concurrent-live/state.h": "b156b86d2f4c076c06024443960da50edd3302ae9eeb7f6c36113e3896f1ed98",
+    "benchmarks/execution/concurrent-live/generate.py": "ce8e967da22cdeccac22e9a58e79360cd52a087270f94fa19c492667feaaef2a",
+    "benchmarks/execution/concurrent-live/automatic.py": "af566d9f0ec92c3524f3452e3079e0477372bf577d511cccc55a6b986a64a0f6",
+    "benchmarks/execution/concurrent-live/store-test.c": "0f5af939296d362d84a0c2785cf797f81c63962c0a1721bb6f169fc4f972bfc2",
+    "target/concurrent-workloads/packed-tls-json-jit/results.json": "31301d3065bfdba3fdf8e0d4fc8b8d3e98690e088c81a802eb33526166e7fc39"
+  },
+  "jit": {
+    "passed": true,
+    "requests": 128,
+    "candidateCounts": [
+      136,
+      135,
+      1,
+      6,
+      135,
+      0
+    ]
+  }
+}
