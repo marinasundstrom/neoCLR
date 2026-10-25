@@ -10,6 +10,7 @@ manifest=json.loads((build/'results.json').read_text());assert manifest['passed'
 sample=manifest.get('sample','task')
 assert not a.go_client or (sample=='plain' and a.concurrency==32)
 r={'passed':False,'sample':sample,'scope':'HTTP owner fixture, closed-loop connections. Whole-process CPU/allocations include startup/warmup/drain/shutdown.','seconds':a.seconds,'concurrency':a.concurrency,'trials':[],'inputs':{}}
+if manifest.get('diagnosticOnly'):r['diagnosticOnly']='Instrumented build; timings are not capacity evidence'
 if a.profile_seconds:r['diagnosticOnly']='macOS wall-stack sampling; timings are not capacity evidence'
 programs={(mode,workers):build/f'{mode}-{workers}' for mode in a.modes for workers in a.owners}
 for path in [Path(__file__),build/'results.json',*programs.values(),*([a.go_client] if a.go_client else [])]:r['inputs'][str(path)]=hashlib.sha256(path.read_bytes()).hexdigest()

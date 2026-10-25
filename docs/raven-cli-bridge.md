@@ -15857,3 +15857,20 @@ controls: this bounded extension has no demonstrated workload speedup. Concurren
 GC remains experimental and default/shared-worker qualification remains open.
 
 See [proof and retained evidence](../benchmarks/execution/concurrent-workloads/equal-join-results.md).
+
+## Isolated HTTP reuse of stack elision (2026-10-25)
+
+The neoCLR isolated-owner benchmark builder now explicitly selects the existing
+complete-closure direct/forwarded stack-argument proof with `--elide-stack-arguments`.
+The initial isolated baseline had omitted these options. It clears ambient proof
+flags, retains an unelided control and records selection. No Raven emission, Runtime
+Contract configuration, native/CLI encoding or provider capability changes. The
+previously qualified neoCLR backend owns this optimization; GC ownership remains
+unchanged and native metadata replacement is unaffected.
+
+89,922 paired plaintext responses show 18.3% more throughput and 14.8% less CPU,
+with similar managed allocations. Another 95,412 four-owner sync/live responses
+pass, without stable-capacity or default claims. Retained JSON/standalone/JIT proof
+qualification is reused, not presented as a new multi-owner matrix. Evidence:
+neoCLR `benchmarks/execution/concurrent-http-owners/forward-results.md` on main.
+Raven remains `codex/neoclr`; no compiler binary update is required.

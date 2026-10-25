@@ -10,7 +10,7 @@ p.add_argument('--source', type=Path, required=True)
 a = p.parse_args()
 code = a.source.read_text()
 anchor = 'int experiment_gc_store(neoclr_aot_context *context, void *destination,'
-assert code.count(anchor) == 1
+assert code.count(anchor) in [1, 2]
 helpers = r'''
 #include <stdio.h>
 extern const char _mh_execute_header;
@@ -39,7 +39,7 @@ void experiment_store_sites_report(void) {
         (unsigned long long)store_site_overflow);
 }
 '''
-code = code.replace(anchor, helpers + '\n' + anchor)
+code = '#ifdef NEOCLR_LIVE_STORE_HANDLE\n#error Store-site profiling requires ordinary checked stores\n#endif\n' + code.replace(anchor, helpers + '\n' + anchor, 1)
 anchor = 'live_store_counts[0]++;'
 assert code.count(anchor) == 1
 code = code.replace(anchor, anchor + '\n        store_site_note((uintptr_t)__builtin_return_address(0));')

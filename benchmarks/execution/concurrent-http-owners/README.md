@@ -115,3 +115,6 @@ gain across plaintext, tasks, collections and arrays; counter-enabled behavior s
 
 [Heap-store outlining](split-results.md) reduced the entry stack frame but did not
 improve whole-request cost; both screened variants remain unpromoted.
+
+Use `build.py --elide-stack-arguments` for the [qualified compiler-option comparison](forward-results.md).
+The unelided control remains available; instrumented call-site timing is diagnostic-only.

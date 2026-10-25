@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-25
 
+- Restore explicitly selectable, previously qualified direct/forwarded stack-argument elision in the isolated HTTP benchmark builder, clearing ambient proof flags and recording the choice. Three paired live cohorts validate 89,922 responses with 18.3% more throughput and 14.8% less CPU; managed allocations are unchanged in substance. A separate four-owner sync/live check validates 95,412 responses. Refresh bounded store-site attribution, reject mismatched counts and propagate diagnostic-only build status. Result constructors dominate remaining out-of-arena calls; production GC defaults remain unchanged.
+
 - Preserve experimental stack-store provenance through joins whose incoming SSA addresses prove the same stack slot and constant offset; retain ambiguous/foreign-pointer guards, cycle limits and pre-edit bounds rejection. All 52 focused tests pass, including JIT branch/fault checks. Rebuilt tasks, collections, arrays, plaintext and JSON objects remain byte-identical, so no workload performance/default gain is claimed. Raven emission and Runtime Contract are unchanged.
 
 - Evaluate two private heap-store outlining prototypes while retaining admission checks and barriers. Twelve optimized/UB-bounds fixture runs and 161,817 paired plaintext responses pass. Entry stack usage falls from 192 to 16 bytes, but the plain split costs 1.9% CPU and direct state passing is approximately flat; retain the original implementation. Archive source, disassembly and failed-link correction without a performance/default claim.

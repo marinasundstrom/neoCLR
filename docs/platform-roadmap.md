@@ -1,5 +1,7 @@
 # neoCLR platform roadmap
 
+**Reuse qualified HTTP compiler options (2026-10-25):** [Isolated-owner integration and caller evidence](../benchmarks/execution/concurrent-http-owners/forward-results.md) restore direct/forwarded stack elision missing from that benchmark builder. 89,922 paired responses show +18.3% throughput/-14.8% CPU with similar allocations; 95,412 additional four-owner responses pass. Result constructors account for 59.4% of remaining out-of-arena calls. Investigate their call-site provenance next; concurrent-default, pause and stable scaling acceptance remain open.
+
 **Equal stack-join proof (2026-10-25):** [Compiler checks and workload audit](../benchmarks/execution/concurrent-workloads/equal-join-results.md) qualify equivalent-slot/offset joins with 52 focused tests. All five rebuilt workload objects remain byte-identical, so this adds no demonstrated HTTP/CPU gain. Next attribute remaining dynamic guarded stores before extending provenance across more complex boundaries.
 
 **Store outlining screen (2026-10-25):** [Native safety and paired HTTP evidence](../benchmarks/execution/concurrent-http-owners/split-results.md) reject two outlining variants: a smaller entry frame does not produce a whole-request gain. Twelve optimized/sanitized fixtures and 161,817 responses pass; direct state passing is approximately flat. Keep original stores and prioritize eliminating unnecessary calls or admission work under explicit proofs.

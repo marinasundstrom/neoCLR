@@ -1,15 +1,15 @@
 """Qualify live GC with isolated HTTP application owners, not shared managed heaps."""
 import argparse,gzip,json,os,subprocess,hashlib
 from pathlib import Path
-p=argparse.ArgumentParser();p.add_argument('--output',type=Path,required=True);p.add_argument('--runner',type=Path,required=True);p.add_argument('--sync-object',type=Path);p.add_argument('--sample',choices=['task','plain'],default='task');a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--output',type=Path,required=True);p.add_argument('--runner',type=Path,required=True);p.add_argument('--sync-object',type=Path);p.add_argument('--sample',choices=['task','plain'],default='task');p.add_argument('--elide-stack-arguments',action='store_true');a=p.parse_args()
 root=Path(__file__).resolve().parents[3];out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
-r={'passed':False,'sample':a.sample,'commands':[],'inputs':{}}
+r={'passed':False,'sample':a.sample,'elideStackArguments':a.elide_stack_arguments,'commands':[],'inputs':{}}
 def record(path):
  path=Path(path)
  if path.is_file():r['inputs'][str(path.resolve())]=hashlib.sha256(path.read_bytes()).hexdigest()
 def run(cmd,env=None):
  cmd=list(map(str,cmd));x=subprocess.run(cmd,env=env,capture_output=True,text=True,timeout=300)
- r['commands'].append(dict(command=cmd,exitCode=x.returncode,stdout=x.stdout,stderr=x.stderr));x.check_returncode()
+ r['commands'].append(dict(command=cmd,compilerOptions={key:env.get(key) for key in ['NEOCLR_TEST_OPT_LEVEL','NEOCLR_LIVE_SELECTION_MODE','NEOCLR_LIVE_ELIDE_STACK_ARGUMENTS','NEOCLR_LIVE_FORWARD_STACK_ARGUMENTS','NEOCLR_LIVE_ELIDE_FORWARDED_STACK_ARGUMENTS']} if env else None,exitCode=x.returncode,stdout=x.stdout,stderr=x.stderr));x.check_returncode()
  for item in cmd:record(item)
 try:
  fixture=root/'docs/experiments/http-worker-integration/build-summary.json';record(fixture)
@@ -35,7 +35,13 @@ try:
    import shutil
    record(a.sync_object);shutil.copy2(a.sync_object,out/'sync.o')
    r['reusedSyncObject']=str(a.sync_object.resolve())
-  else:run(compiler,dict(os.environ,NEOCLR_TEST_OPT_LEVEL='speed',NEOCLR_LIVE_SELECTION_MODE=mode,NEOCLR_LIVE_SELECTION_COMMAND=str(path)))
+  else:
+   env=dict(os.environ,NEOCLR_TEST_OPT_LEVEL='speed',NEOCLR_LIVE_SELECTION_MODE=mode,NEOCLR_LIVE_SELECTION_COMMAND=str(path))
+   # Keep the previously qualified complete-closure proof explicitly selectable.
+   for option in ['NEOCLR_LIVE_ELIDE_STACK_ARGUMENTS','NEOCLR_LIVE_FORWARD_STACK_ARGUMENTS','NEOCLR_LIVE_ELIDE_FORWARDED_STACK_ARGUMENTS']:
+    env.pop(option,None)
+    if a.elide_stack_arguments and mode=='live':env[option]='1'
+   run(compiler,env)
   for item in command:record(item)
  run(['python3',root/'benchmarks/execution/concurrent-live/native-scopes.py','--output',out/'native-gc.c'])
  run(['python3',root/'benchmarks/execution/concurrent-store/native-providers.py','--output',out/'text-arena.c'])
