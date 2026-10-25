@@ -1,0 +1,11 @@
+    Checking ring v0.17.14
+    Checking object v0.36.7
+    Checking unicode-segmentation v1.13.2
+    Checking rustls-webpki v0.103.15
+    Checking neoclr-security-provider v0.0.0 (/Users/robert/Projects/neoclr/tools/security-provider)
+    Checking rustls v0.23.45
+    Checking cranelift-object v0.121.2
+    Checking neoclr-native-tls v0.0.0 (/Users/robert/Projects/neoclr/tools/native-tls)
+    Checking neoclr v0.1.0-preview.13 (/Users/robert/Projects/neoclr)
+    Checking neoclr-codegen v0.0.0 (/Users/robert/Projects/neoclr/runtime/codegen)
+    Finished `release` profile [optimized] target(s) in 14.43s

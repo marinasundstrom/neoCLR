@@ -565,3 +565,10 @@ p99 bucket is 65.536–131.072 microseconds versus 16.384–32.768 for most sync
 latency or background collector CPU. One run per cell does not establish a stable
 tail comparison. Synchronous GC remains the default for release preparation while
 runtime improvements and concurrent experiments continue.
+
+### Shared JIT correctness follow-up
+
+An intermittent macOS ARM64 stack-transfer failure was traced to missing explicit
+instruction-cache publication. The shared JIT memory provider now performs the
+platform operation before exposing compiled code. This strengthens ordinary and
+concurrent JIT qualification; it is a correctness fix, not a new throughput claim.

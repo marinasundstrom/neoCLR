@@ -451,7 +451,7 @@ mod tests {
     #[test]
     #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
     fn jit_preserves_unaligned_bits_and_mixed_pointer_guards() {
-        use cranelift_jit::{JITBuilder, JITModule};
+        use cranelift_jit::JITBuilder;
         use std::sync::atomic::{AtomicUsize, Ordering};
         static CALLS: AtomicUsize = AtomicUsize::new(0);
         unsafe extern "C" fn hook(_: u64, destination: *mut u8, bits: u64, width: u32) -> i32 {
@@ -494,7 +494,7 @@ mod tests {
                         builder.symbol("experiment_gc_store", hook as *const u8);
                         builder.symbol("experiment_gc_store_state_borrow", acquire as *const u8);
                         builder.symbol("experiment_gc_store_borrowed", borrowed as *const u8);
-                        let mut module = JITModule::new(builder);
+                        let mut module = crate::jit_memory::new_module(builder);
                         let mut callee = module.make_context();
                         callee.func.signature.params = vec![AbiParam::new(types::I64); 2];
                         callee.func.signature.returns = vec![AbiParam::new(types::I32)];

@@ -84,7 +84,7 @@ pub(super) fn execute(
         );
     }
     // Shared validation rejects other external services before finalization.
-    let mut owner = CodeOwner(Some(JITModule::new(builder)));
+    let mut owner = CodeOwner(Some(crate::jit_memory::new_module(builder)));
     let module = owner.0.as_mut().expect("owned module");
     if native_imports {
         crate::compiler::compile_scalar_with_imports(
@@ -176,7 +176,7 @@ pub(super) fn execute_managed(
             .ok()
             .map(|symbol| *symbol)
     }));
-    let mut owner = CodeOwner(Some(JITModule::new(builder)));
+    let mut owner = CodeOwner(Some(crate::jit_memory::new_module(builder)));
     let module = owner.0.as_mut().expect("owned module");
     crate::compiler::values::compile_into(input, root, Some(details), target, module, true)?;
     // Bind every declared import explicitly. Missing helpers fail before any guest

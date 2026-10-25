@@ -45,7 +45,9 @@ continues as an experimental native development path.
   managed-allocation lookup work, redundant initialization and allocation
   bookkeeping. Preserve tracing of changing root values and explicit ownership
   across native boundaries and suspended work. Reuse completed macOS async
-  contexts under their qualified lifetime rules.
+  contexts under their qualified lifetime rules. Explicitly publish macOS ARM64
+  JIT instructions through the platform cache API, correcting intermittent
+  execution failures when generated-code storage is reused.
 - Continue the **concurrent native GC experiment**, including live marking,
   mutation/root safety, JIT/AOT consumer integration and tunable collection policy.
   Integrate qualified typed scalar stores within the private concurrent candidate,

@@ -107,7 +107,7 @@ fn scalar_bits_and_fault_exit_execute_in_jit() {
         cranelift_module::default_libcall_names(),
     );
     builder.symbol("experiment_gc_store", hook as *const u8);
-    let mut code = Code(Some(JITModule::new(builder)));
+    let mut code = Code(Some(crate::jit_memory::new_module(builder)));
     let module = code.0.as_mut().unwrap();
     let cases = [
         types::I8,
@@ -295,7 +295,7 @@ fn native_collector_jit_consumer() {
     builder.symbol("experiment_gc_store", *hook as *const u8);
     builder.symbol("frame_enter", *enter as *const u8);
     builder.symbol("frame_leave", *leave as *const u8);
-    let mut code = Code(Some(JITModule::new(builder)));
+    let mut code = Code(Some(crate::jit_memory::new_module(builder)));
     let module = code.0.as_mut().unwrap();
     let (id, mut ctx, context, frame, _, ready) = framed_function(module, false);
     lower_framed(module, &mut ctx.func, context, ready).unwrap();
@@ -357,7 +357,7 @@ fn proven_stack_copy_stays_direct_and_byref_remains_checked() {
         cranelift_module::default_libcall_names(),
     );
     builder.symbol("experiment_gc_store", hook as *const u8);
-    let mut code = Code(Some(JITModule::new(builder)));
+    let mut code = Code(Some(crate::jit_memory::new_module(builder)));
     let module = code.0.as_mut().unwrap();
     let (id, mut ctx, context) = stack_copy(module, 4);
     assert_eq!(
@@ -495,7 +495,7 @@ fn framed_fault_and_normal_returns_use_production_cleanup() {
                 frame_leave as *const u8
             },
         );
-        let mut code = Code(Some(JITModule::new(builder)));
+        let mut code = Code(Some(crate::jit_memory::new_module(builder)));
         let module = code.0.as_mut().unwrap();
         let (id, mut ctx, context, frame, _, ready) = framed_function(module, false);
         assert_eq!(
@@ -1198,7 +1198,7 @@ fn run_managed(source: &str) {
             .ok()
             .map(|symbol| *symbol as *const u8)
     }));
-    let mut code = Code(Some(JITModule::new(builder)));
+    let mut code = Code(Some(crate::jit_memory::new_module(builder)));
     let module = code.0.as_mut().unwrap();
     let input = managed_input(source);
     crate::compiler::values::compile_into(
@@ -1342,7 +1342,7 @@ fn managed_byte_views_run_on_live_collector() {
     let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
     let resolver = library.clone();
     builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
-    let mut code = Code(Some(JITModule::new(builder)));
+    let mut code = Code(Some(crate::jit_memory::new_module(builder)));
     let module = code.0.as_mut().unwrap();
     let (input, options) = byte_view_input();
     crate::compiler::values::compile_into(&input,"Main",Some(&options),crate::compiler::Target::MacosArm64,module,true).unwrap();
@@ -1431,7 +1431,7 @@ fn managed_scoped_slice_runs_on_live_collector() {
     let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
     let resolver = library.clone();
     builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
-    let mut code = Code(Some(JITModule::new(builder)));
+    let mut code = Code(Some(crate::jit_memory::new_module(builder)));
     let module = code.0.as_mut().unwrap();
     let (input, options) = scoped_slice_input();
     crate::compiler::values::compile_into(&input,"Main",Some(&options),crate::compiler::Target::MacosArm64,module,true).unwrap();
@@ -1458,7 +1458,7 @@ fn managed_callbacks_run_on_live_collector() {
     let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
     let resolver = library.clone();
     builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
-    let mut code = Code(Some(JITModule::new(builder)));
+    let mut code = Code(Some(crate::jit_memory::new_module(builder)));
     let module = code.0.as_mut().unwrap();
     let input = managed_input(include_str!("../../../benchmarks/execution/concurrent-store/callbacks.neoil"));
     crate::compiler::values::compile_into(&input,"Main",Some(&managed_options()),crate::compiler::Target::MacosArm64,module,true).unwrap();
@@ -1481,7 +1481,7 @@ fn managed_async_wrappers_run_on_live_collector() {
     let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
     let resolver = library.clone();
     builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
-    let mut code = Code(Some(JITModule::new(builder)));
+    let mut code = Code(Some(crate::jit_memory::new_module(builder)));
     let module = code.0.as_mut().unwrap();
     let source=include_str!("../../../benchmarks/execution/concurrent-store/async-wrappers.neoil");
     crate::compiler::values::compile_into(&managed_input(source),"Main",Some(&managed_options_for(source)),crate::compiler::Target::MacosArm64,module,true).unwrap();
@@ -1508,7 +1508,7 @@ fn managed_socket_wrappers_run_on_live_collector() {
     let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
     let resolver = library.clone();
     builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
-    let mut code = Code(Some(JITModule::new(builder)));
+    let mut code = Code(Some(crate::jit_memory::new_module(builder)));
     let module = code.0.as_mut().unwrap();
     let source=include_str!("../../../benchmarks/execution/concurrent-store/socket-wrappers.neoil");
     crate::compiler::values::compile_into(&managed_input(source),"Main",Some(&managed_options_for(source)),crate::compiler::Target::MacosArm64,module,true).unwrap();
@@ -1535,7 +1535,7 @@ fn managed_socket_memory_run_on_live_collector() {
     let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
     let resolver = library.clone();
     builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
-    let mut code = Code(Some(JITModule::new(builder)));
+    let mut code = Code(Some(crate::jit_memory::new_module(builder)));
     let module = code.0.as_mut().unwrap();
     let source=include_str!("../../../benchmarks/execution/concurrent-store/socket-memory.neoil");
     crate::compiler::values::compile_into(&managed_input(source),"Main",Some(&managed_options_for(source)),crate::compiler::Target::MacosArm64,module,true).unwrap();
@@ -1562,7 +1562,7 @@ fn managed_public_entry_runs_on_live_collector() {
     let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
     let resolver = library.clone();
     builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
-    let mut code = Code(Some(JITModule::new(builder)));
+    let mut code = Code(Some(crate::jit_memory::new_module(builder)));
     let module = code.0.as_mut().unwrap();
     let source = include_str!("../../../benchmarks/execution/concurrent-store/entry.neoil");
     crate::compiler::values::compile_into(&managed_input(source), "Main", Some(&managed_options_for(source)), crate::compiler::Target::MacosArm64, module, true).unwrap();
@@ -1585,7 +1585,7 @@ fn managed_queue_runs_on_live_collector() {
     let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
     let resolver = library.clone();
     builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
-    let mut code = Code(Some(JITModule::new(builder)));
+    let mut code = Code(Some(crate::jit_memory::new_module(builder)));
     let module = code.0.as_mut().unwrap();
     let source = include_str!("../../../benchmarks/execution/concurrent-store/queue.neoil");
     crate::compiler::values::compile_into(&managed_input(source), "Main", Some(&managed_options_for(source)), crate::compiler::Target::MacosArm64, module, true).unwrap();
@@ -1608,7 +1608,7 @@ fn managed_async_pump_runs_on_live_collector() {
     let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
     let resolver = library.clone();
     builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
-    let mut code = Code(Some(JITModule::new(builder)));
+    let mut code = Code(Some(crate::jit_memory::new_module(builder)));
     let module = code.0.as_mut().unwrap();
     let source=include_str!("../../../benchmarks/execution/concurrent-store/async-pump.neoil");
     crate::compiler::values::compile_into(&managed_input(source),"Main",Some(&managed_options_for(source)),crate::compiler::Target::MacosArm64,module,true).unwrap();
@@ -1658,7 +1658,7 @@ fn managed_network_pump_runs_on_live_collector() {
     let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
     let resolver = library.clone();
     builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
-    let mut code = Code(Some(JITModule::new(builder)));
+    let mut code = Code(Some(crate::jit_memory::new_module(builder)));
     let module = code.0.as_mut().unwrap();
     let source=include_str!("../../../benchmarks/execution/concurrent-store/network-pump.neoil");
     crate::compiler::values::compile_into(&managed_input(source),"Main",Some(&managed_options_for(source)),crate::compiler::Target::MacosArm64,module,true).unwrap();
@@ -1692,7 +1692,7 @@ fn managed_queue_timers_runs_on_live_collector() {
     let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
     let resolver = library.clone();
     builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
-    let mut code = Code(Some(JITModule::new(builder)));
+    let mut code = Code(Some(crate::jit_memory::new_module(builder)));
     let module = code.0.as_mut().unwrap();
     let source = include_str!("../../../benchmarks/execution/concurrent-store/queue-timers.neoil");
     crate::compiler::values::compile_into(&managed_input(source), "Main", Some(&managed_options_for(source)), crate::compiler::Target::MacosArm64, module, true).unwrap();
@@ -1784,7 +1784,7 @@ fn managed_integer_format_runs_on_live_collector() {
     let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
     let resolver = library.clone();
     builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
-    let mut code = Code(Some(JITModule::new(builder)));
+    let mut code = Code(Some(crate::jit_memory::new_module(builder)));
     let module = code.0.as_mut().unwrap();
     let (input, options) = integer_format_input();
     crate::compiler::values::compile_into(&input,"Main",Some(&options),crate::compiler::Target::MacosArm64,module,true).unwrap();
@@ -1883,7 +1883,7 @@ fn managed_utf8_conversion_runs_on_live_collector() {
     let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
     let resolver = library.clone();
     builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
-    let mut code = Code(Some(JITModule::new(builder)));
+    let mut code = Code(Some(crate::jit_memory::new_module(builder)));
     let module = code.0.as_mut().unwrap();
     let (input, options) = utf8_conversion_input();
     crate::compiler::values::compile_into(&input,"Main",Some(&options),crate::compiler::Target::MacosArm64,module,true).unwrap();
@@ -1983,7 +1983,7 @@ fn managed_text_finish_runs_on_live_collector() {
     let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
     let resolver = library.clone();
     builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
-    let mut code = Code(Some(JITModule::new(builder)));
+    let mut code = Code(Some(crate::jit_memory::new_module(builder)));
     let module = code.0.as_mut().unwrap();
     let (input, options) = text_finish_input();
     crate::compiler::values::compile_into(&input,"Main",Some(&options),crate::compiler::Target::MacosArm64,module,true).unwrap();
@@ -2063,7 +2063,7 @@ fn managed_tls_wrappers_runs_on_live_collector() {
     let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
     let resolver = library.clone();
     builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
-    let mut code = Code(Some(JITModule::new(builder)));
+    let mut code = Code(Some(crate::jit_memory::new_module(builder)));
     let module = code.0.as_mut().unwrap();
     let (input, options) = tls_wrappers_input();
     crate::compiler::values::compile_into(&input,"Main",Some(&options),crate::compiler::Target::MacosArm64,module,true).unwrap();
@@ -2178,7 +2178,7 @@ fn managed_primitive_boxes_run_on_live_collector() {
     let mut builder = JITBuilder::with_isa(isa(target(), false), cranelift_module::default_libcall_names());
     let resolver = library.clone();
     builder.symbol_lookup_fn(Box::new(move |name| unsafe { resolver.get::<unsafe extern "C" fn()>(name.as_bytes()).ok().map(|f| *f as *const u8) }));
-    let mut code = Code(Some(JITModule::new(builder)));
+    let mut code = Code(Some(crate::jit_memory::new_module(builder)));
     let module = code.0.as_mut().unwrap();
     let (input, options, indices) = primitive_box_input();
     crate::compiler::values::compile_into(&input,"Main",Some(&options),crate::compiler::Target::MacosArm64,module,true).unwrap();
@@ -2277,7 +2277,7 @@ fn unambiguous_stack_transfers_elide_only_proved_stores() {
             cranelift_module::default_libcall_names(),
         );
         builder.symbol("experiment_gc_store", hook as *const u8);
-        let mut code = Code(Some(JITModule::new(builder)));
+        let mut code = Code(Some(crate::jit_memory::new_module(builder)));
         let module = code.0.as_mut().unwrap();
         let (id, mut ctx, owner) = transferred_stack_copy(module, 4, kind);
         assert_eq!(
@@ -2312,6 +2312,15 @@ fn unambiguous_stack_transfers_elide_only_proved_stores() {
                 }
             }
         }
+    }
+}
+
+// Reused executable addresses must observe the newly published instructions,
+// including branches, native calls and fault returns with different frame sizes.
+#[test]
+fn repeated_stack_transfer_code_publication() {
+    for _ in 0..32 {
+        unambiguous_stack_transfers_elide_only_proved_stores();
     }
 }
 
@@ -2408,7 +2417,7 @@ fn borrowed_store_acquires_once_and_cleans_up_faults() {
                 frame_leave as *const u8
             },
         );
-        let mut code = Code(Some(JITModule::new(builder)));
+        let mut code = Code(Some(crate::jit_memory::new_module(builder)));
         let module = code.0.as_mut().unwrap();
         let (id, mut ctx, context, frame, _, ready) = framed_function(module, false);
         assert_eq!(
@@ -2492,7 +2501,7 @@ fn borrowed_store_native_jit_consumer() {
     builder.symbol("experiment_gc_store_borrowed", *hook as *const u8);
     builder.symbol("frame_enter", *enter as *const u8);
     builder.symbol("frame_leave", *leave as *const u8);
-    let mut code = Code(Some(JITModule::new(builder)));
+    let mut code = Code(Some(crate::jit_memory::new_module(builder)));
     let module = code.0.as_mut().unwrap();
     let (id, mut ctx, context, frame, _, ready) = framed_function(module, false);
     lower_impl(module, &mut ctx.func, context, Some(ready), true).unwrap();

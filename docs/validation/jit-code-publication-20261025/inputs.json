@@ -1,0 +1,8 @@
+{
+  "runtime/codegen/src/jit_memory.rs": "70950144711f35eee4fae4a541c0ce36218d6f329dbd7a4324fd7ea4bf99e1ee",
+  "runtime/codegen/src/mutation_store_tests.rs": "0c93c81b40937f81016bac0d27bdedf3f1ca6331eb1d0c4cb44462af0c7245e0",
+  "runtime/codegen/Cargo.toml": "3f89fd53fe276321929b05c49f3ae14802994888149a7eca418e9bb75b031e46",
+  "Cargo.lock": "0196664dc5bc2e6a412a0eb529dba90fab0a6f2b597a119739572b2349fa35b2",
+  "target/release/deps/neoclr_codegen-12f33f26d2ff4df0": "e5ef6be14dea617883e8ca442a6a0a61397eaa0bf6b96e998b0f3b11cf3fb83a",
+  "docs/validation/jit-code-publication-20261025/validate.py": "17af5faf0717805379522c1fe051cd5da402778f4fcaf66aa06ee9a0756387b1"
+}

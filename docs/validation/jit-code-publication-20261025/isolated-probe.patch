@@ -1,0 +1,15 @@
+--- a/runtime/codegen/src/mutation_store_tests.rs
++++ b/runtime/codegen/src/mutation_store_tests.rs
+@@ -2289,6 +2289,12 @@
+         );
+         module.define_function(id, &mut ctx).unwrap();
+         module.finalize_definitions().unwrap();
++        #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
++        if std::env::var_os("NEOCLR_TEST_FLUSH_TRANSFER_CODE").is_some() {
++            unsafe extern "C" { fn sys_icache_invalidate(start: *const std::ffi::c_void, len: usize); }
++            unsafe { sys_icache_invalidate(module.get_finalized_function(id).cast(), ctx.compiled_code().unwrap().code_buffer().len()); }
++        }
++
+         let call: unsafe extern "C" fn(*mut State, *mut u8, u64) -> i32 =
+             unsafe { std::mem::transmute(module.get_finalized_function(id)) };
+         for bits in [0, 0x123456789abcdef0] {

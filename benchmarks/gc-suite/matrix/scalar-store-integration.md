@@ -52,3 +52,10 @@ and two passes and one abort in the current runner. This is not a clean full-sui
 pass. The retained comparison includes stdout/stderr; cause and correction remain
 open and must be resolved or explicitly assessed before release qualification.
 The focused scalar/native/HTTP evidence does not certify this separate stack path.
+
+### Follow-up
+
+The [code-publication investigation](../../../docs/validation/jit-code-publication-20261025/README.md)
+traces the failure to missing instruction-cache maintenance on macOS ARM64 and
+corrects it in the shared JIT memory provider. The original failure evidence above
+is retained; the later record contains the passing tests and negative controls.

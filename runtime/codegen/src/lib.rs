@@ -10,6 +10,7 @@ mod fault_details;
 mod function_invocation;
 mod inspection;
 mod jit;
+mod jit_memory;
 mod limits;
 mod linking;
 mod load_context;

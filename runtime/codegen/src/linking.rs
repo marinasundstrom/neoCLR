@@ -1944,7 +1944,7 @@ pub(crate) mod descriptor_token_tests {
             .unwrap()
             .finish(settings::Flags::new(flags))
             .unwrap();
-        let mut owner = Owner(Some(JITModule::new(JITBuilder::with_isa(
+        let mut owner = Owner(Some(crate::jit_memory::new_module(JITBuilder::with_isa(
             isa,
             cranelift_module::default_libcall_names(),
         ))));

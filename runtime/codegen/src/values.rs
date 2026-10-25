@@ -6298,7 +6298,7 @@ mod structural_jit_tests {
                     .finish(settings::Flags::new(flags))
                     .unwrap();
                 let builder = JITBuilder::with_isa(isa, cranelift_module::default_libcall_names());
-                let mut owner = OwnedCode(Some(JITModule::new(builder)));
+                let mut owner = OwnedCode(Some(crate::jit_memory::new_module(builder)));
                 let module = owner.0.as_mut().unwrap();
                 compile_into(&input, "Main", None, target, module, true).unwrap();
                 module.finalize_definitions().unwrap();

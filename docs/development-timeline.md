@@ -23,7 +23,11 @@
   the private concurrent candidate, preserving a generic-store comparison. This
   reduces runtime admission work; it does not change ordinary hosting to concurrent
   GC. [Integration evidence](../benchmarks/gc-suite/matrix/scalar-store-integration.md)
-  distinguishes fresh safety checks from prior performance measurements.
+  distinguishes fresh safety checks from prior performance measurements. A later
+  [JIT publication investigation](validation/jit-code-publication-20261025/README.md)
+  traced an intermittent test failure to missing macOS ARM64 instruction-cache
+  maintenance. The assistant fixed the shared JIT memory boundary and retained
+  negative-control evidence; this is runtime correctness work, not a GC throughput claim.
 
 ## 2026-10-25 — Integrate improvements once their benefit is established
 

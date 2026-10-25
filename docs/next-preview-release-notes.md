@@ -39,7 +39,9 @@ they do not impose a blanket ban on allocations or change Path semantics.
 Native execution improves repeated root/descriptor work, managed-heap lookup,
 allocation bookkeeping and redundant initialization. Async context reuse and
 ownership/suspension checks are qualified within their documented host boundaries.
-These changes benefit runtime execution beyond HTTP.
+These changes benefit runtime execution beyond HTTP. Explicit instruction-cache
+publication corrects intermittent macOS ARM64 JIT execution failures during code
+storage reuse, across ordinary and experimental concurrent paths.
 
 Concurrent native GC continues as a separate experimental track. Work includes
 live marking, mutation/root safety, JIT/AOT consumers, worker coordination and

@@ -23,8 +23,10 @@ improvements and clearly labeled concurrent experiments, rather than a GC diary.
 | Concurrent execution exposure | `runtime/codegen/src/lib.rs::run` passes `live_stores=false`; private qualification entry enables it | Decide package exposure explicitly; do not describe a public selector that does not exist. Sync stays default |
 | Persistent HTTP | Private close/keep-alive/pipeline matrix qualifies the internal driver | Resolve public timeout/resource/ownership policy separately before claiming public persistent-server support |
 
-An intermittent pre-existing stack-transfer JIT assertion is reproduced in both
-the preserved and integrated runners; see the [integration record](../../../benchmarks/gc-suite/matrix/scalar-store-integration.md). Resolve or explicitly assess this before release qualification.
+The pre-existing stack-transfer JIT failure was traced to missing macOS ARM64
+instruction-cache publication and corrected at the shared JIT memory boundary.
+[Investigation and validation](../jit-code-publication-20261025/README.md) include
+reproducing negative controls; final packages still need their own qualification.
 
 ## Release gates
 
