@@ -96,3 +96,7 @@ object audits; the JSON build driver is archived too. No failed measurement was
 excluded. These observations reuse the existing compiler-proven stack-address
 design and its CLR comparison; no new API, Raven emission, metadata encoding,
 Runtime Contract, ownership or native ABI change is proposed here.
+
+The subsequent [JIT and owner-operation profile](stable-byref-pause-results.md)
+qualifies JSON JIT and provides guarded controls and pause histograms. It finds no
+pause advantage and leaves concurrent-default acceptance open.
