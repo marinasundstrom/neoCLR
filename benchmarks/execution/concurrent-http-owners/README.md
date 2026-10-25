@@ -96,3 +96,10 @@ CPU, allocations, memory and pause distributions. Retain standalone tasks,
 collections and arrays to separate HTTP scheduling cost from common GC services.
 JIT multi-owner hosting and shared-heap HTTP admission require independent evidence;
 this AOT checkpoint does not imply either. Default promotion remains open.
+
+## Performance follow-up
+
+[Plaintext measurements and the connection-close stall](measurement-results.md)
+retain synchronous/live CPU, allocations, RSS, client phase timing and both passed
+and incomplete cohorts. The live CPU penalty remains; EOF failures prevent a
+clean four-owner capacity claim or default promotion.

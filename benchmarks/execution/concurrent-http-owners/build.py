@@ -1,9 +1,9 @@
 """Qualify live GC with isolated HTTP application owners, not shared managed heaps."""
 import argparse,gzip,json,os,subprocess,hashlib
 from pathlib import Path
-p=argparse.ArgumentParser();p.add_argument('--output',type=Path,required=True);p.add_argument('--runner',type=Path,required=True);p.add_argument('--sync-object',type=Path);a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--output',type=Path,required=True);p.add_argument('--runner',type=Path,required=True);p.add_argument('--sync-object',type=Path);p.add_argument('--sample',choices=['task','plain'],default='task');a=p.parse_args()
 root=Path(__file__).resolve().parents[3];out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
-r={'passed':False,'commands':[],'inputs':{}}
+r={'passed':False,'sample':a.sample,'commands':[],'inputs':{}}
 def record(path):
  path=Path(path)
  if path.is_file():r['inputs'][str(path.resolve())]=hashlib.sha256(path.read_bytes()).hexdigest()
@@ -16,6 +16,14 @@ try:
  build=json.loads(fixture.read_text());selection=next(c['command'].copy() for c in build['commands'] if c.get('phase')=='native-compilation')
  recipe_file=root/'benchmarks/execution/concurrent-workloads/scalar-frame-http-plain.json.gz';record(recipe_file)
  recipes=json.loads(gzip.decompress(recipe_file.read_bytes()))
+ if a.sample=='plain':
+  from xml.sax.saxutils import escape
+  source=root/'benchmarks/execution/concurrent-http-owners/Plain.rvn';record(source)
+  bundle=Path(selection[selection.index('--system')+1]).parent.parent
+  project=out/'Plain.rvnproj'
+  project.write_text('<Project Sdk="Microsoft.NET.Sdk"><Import Project="'+escape(str(bundle/'lib/NeoCLR.ClassLibrary.props'))+'"/><PropertyGroup><TargetFramework>net10.0</TargetFramework><OutputType>Exe</OutputType><AssemblyName>Plain</AssemblyName><EnableDefaultCompileItems>false</EnableDefaultCompileItems></PropertyGroup><ItemGroup><Compile Include="'+escape(str(source))+'"/></ItemGroup></Project>')
+  run(['dotnet',bundle/'sdk/tools/rvnc/rvnc.dll','neoclr','--project',project],dict(os.environ,NeoClrBundleRoot=str(bundle)))
+  selection[2]=str(out/'bin/neoclr/Plain.dll');assert Path(selection[2]).is_file()
  compiler_file=root/'benchmarks/execution/concurrent-workloads/forward-elision-http-build.json.gz';record(compiler_file)
  compiler=json.loads(gzip.decompress(compiler_file.read_bytes()))['commands'][0]['command']
  if a.runner:compiler[0]=str(a.runner.resolve())
@@ -23,6 +31,7 @@ try:
   command=selection.copy();command[4]=str(out/(mode+'.o'))
   path=out/(mode+'-selection.json');path.write_text(json.dumps(command))
   if mode=='sync' and a.sync_object:
+   assert a.sample=='task'
    import shutil
    record(a.sync_object);shutil.copy2(a.sync_object,out/'sync.o')
    r['reusedSyncObject']=str(a.sync_object.resolve())
