@@ -169,3 +169,6 @@ all hint validation and a split-layout control.
 [Owned allocation index](allocation-index-results.md) compares a maintained start
 bitmap with anchored walks. The opt-in includes independent lifecycle/model tests,
 metadata-allocation/cleanup accounting and explicit .NET/Go design comparisons.
+
+See [exact-base index reuse](exact-index-results.md) for direct and hybrid
+lookup controls, HTTP gains, ordinary CPU regressions and unchanged metadata cost.

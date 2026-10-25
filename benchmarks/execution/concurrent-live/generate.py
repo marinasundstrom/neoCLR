@@ -18,6 +18,18 @@ replace('    const void *bases[OWNED_BASE_CACHE_SIZE];', """    const void *base
     uint64_t *starts, *start_summary, start_words, start_summary_words;
 #endif""")
 replace('/* Positive entries only:', (base/'allocation-index.h').read_text()+'\n/* Positive entries only:')
+replace('    return !value || owned_heap.bases[base_slot(value)] == value;', """#ifdef NEOCLR_LIVE_EXACT_INDEX
+    if (!value) return 1;
+#ifndef NEOCLR_LIVE_DIRECT_EXACT_INDEX
+    if (owned_heap.bases[base_slot(value)] == value) return 1;
+#endif
+    uintptr_t address=(uintptr_t)value, base=(uintptr_t)owned_heap.data;
+    if (address<base || address-base>=owned_heap.used || ((address-base)&7)) return 0;
+    uint64_t bit=(address-base)/8;
+    return !!(owned_heap.starts[bit/64] & (UINT64_C(1)<<(bit%64)));
+#else
+    return !value || owned_heap.bases[base_slot(value)] == value;
+#endif""")
 replace('    owned_heap.arena = arena;', """#ifdef NEOCLR_LIVE_ALLOCATION_INDEX
     if (!owned_index_create(arena->capacity)) return 3;
 #endif

@@ -1,3 +1,6 @@
+#if defined(NEOCLR_LIVE_EXACT_INDEX) && !defined(NEOCLR_LIVE_ALLOCATION_INDEX)
+#error Exact allocation lookup requires the owned allocation index
+#endif
 /* Experimental owner-local allocation-start index. Never read by the marker.
  * Entries describe allocated payload bases, not arbitrary observed addresses. */
 #ifdef NEOCLR_LIVE_ALLOCATION_INDEX

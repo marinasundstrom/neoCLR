@@ -11,6 +11,11 @@ extern int32_t experiment_gc_prepare_entry_v1(neoclr_aot_context *);
 static uint64_t random_state=1;
 static uint64_t random_word(void) { random_state=random_state*UINT64_C(6364136223846793005)+1; return random_state; }
 static void check(neoclr_aot_context *c,void **objects,uint64_t *sizes,unsigned count) {
+    for(unsigned i=0;i<count;i++) if(objects[i]) {
+        uint64_t bytes=0;uint32_t kind=0;
+        CHECK(!neoclr_gc_allocation_info_v1(c,objects[i],&bytes,&kind));
+        CHECK(bytes==sizes[i] && kind==NEOCLR_GC_OBJECT);
+    }
     for(unsigned n=0;n<12000;n++) {
         uint64_t offset=random_word()%c->text.used;
         uintptr_t address=(uintptr_t)c->text.data+offset,expected=0;
@@ -20,6 +25,10 @@ static void check(neoclr_aot_context *c,void **objects,uint64_t *sizes,unsigned 
             if (p && p<=address && p>expected) { expected=p; bytes=sizes[i]; }
         }
         CHECK((uintptr_t)experiment_gc_index_before(c,offset)==expected);
+        uint64_t reported_bytes=0;uint32_t kind=0;
+        int exact=expected && address==expected;
+        CHECK(neoclr_gc_allocation_info_v1(c,(void *)address,&reported_bytes,&kind)==(exact?0:3));
+        if(exact) CHECK(reported_bytes==bytes && kind==NEOCLR_GC_OBJECT);
         int writable=expected && address-expected<bytes;
         CHECK(experiment_gc_store(c,(void *)address,0,1)==(writable?0:3));
     }

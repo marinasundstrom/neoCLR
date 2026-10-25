@@ -10,6 +10,8 @@ from pathlib import Path
 import subprocess
 
 p = argparse.ArgumentParser(description=__doc__)
+p.add_argument('--direct-exact-allocation-index',action='store_true')
+p.add_argument('--exact-allocation-index',action='store_true')
 p.add_argument('--build', type=Path, required=True)
 p.add_argument('--output', type=Path, required=True)
 p.add_argument('--rounds', type=int, default=5)
@@ -28,6 +30,8 @@ p.add_argument('--profile-store-walks', action='store_true')
 p.add_argument('--profile-store-sites', action='store_true')
 a = p.parse_args()
 assert a.rounds > 0
+assert not a.direct_exact_allocation_index or a.exact_allocation_index
+assert not a.exact_allocation_index or a.allocation_index
 root = Path(__file__).resolve().parents[3]
 out = a.output.resolve()
 out.mkdir(parents=True, exist_ok=False)
@@ -36,7 +40,7 @@ recipe_file = root / 'target/native-host-ownership/results.json'
 recipe = next(c['command'] for c in json.loads(recipe_file.read_text())['commands']
               if str(root / 'target/native-host-ownership/owned-aot') in c['command'])
 modes = ['sync', 'guarded-sync', 'live'] if a.guarded_control else ['sync', 'live']
-report = {'allocationIndex':a.allocation_index,'splitStoreTls':a.split_store_tls,'fullStoreWalk':a.full_store_walk,'repeatSnapshotLookup': a.repeat_snapshot_lookup, 'headerProof': a.header_proof, 'inlineValidation': a.inline_validation, 'splitTls': a.split_tls, 'serializedStore': a.serialized_store, 'optimizationLevel': build.get('optimizationLevel','none'), 'passed': False, 'scope': __doc__, 'iterations': build['iterations'],
+report = {'directExactAllocationIndex':a.direct_exact_allocation_index,'exactAllocationIndex':a.exact_allocation_index,'allocationIndex':a.allocation_index,'splitStoreTls':a.split_store_tls,'fullStoreWalk':a.full_store_walk,'repeatSnapshotLookup': a.repeat_snapshot_lookup, 'headerProof': a.header_proof, 'inlineValidation': a.inline_validation, 'splitTls': a.split_tls, 'serializedStore': a.serialized_store, 'optimizationLevel': build.get('optimizationLevel','none'), 'passed': False, 'scope': __doc__, 'iterations': build['iterations'],
           'commands': [], 'trials': [], 'inputs': {}, 'excluded': []}
 if a.profile_store_walks:report['diagnosticOnly']='Heap-walk instrumentation; timings are not benchmark evidence.'
 def run(command):
@@ -147,6 +151,8 @@ static void report_profile(struct rusage *a, struct rusage *b, struct timespec *
                 gate = root / 'benchmarks/execution/concurrent-mutation-gate'
                 command += ['-DWORKLOAD_LIVE', '-DNEOCLR_SHADOW_SPARSE_INDEX',
                             '-I', str(root / 'runtime/native/memory'), '-I', str(gate), str(gate / 'gate.c')]
+            if a.direct_exact_allocation_index and mode != 'sync': command += ['-DNEOCLR_LIVE_DIRECT_EXACT_INDEX']
+            if a.exact_allocation_index and mode != 'sync': command += ['-DNEOCLR_LIVE_EXACT_INDEX']
             if a.allocation_index and mode != 'sync': command += ['-DNEOCLR_LIVE_ALLOCATION_INDEX']
             if a.split_store_tls: command += ['-DNEOCLR_LIVE_SPLIT_STORE_TLS']
             if a.full_store_walk: command += ['-DNEOCLR_LIVE_FULL_STORE_WALK']
