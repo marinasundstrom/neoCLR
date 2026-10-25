@@ -1,0 +1,2 @@
+PASS: paired owner CPU/wall, optional phase count, histogram, same-event maximum; UB/bounds sanitizer
+PASS: parser/attribution negative controls and definition guards

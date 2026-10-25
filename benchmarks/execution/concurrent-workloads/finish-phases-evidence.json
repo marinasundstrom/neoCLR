@@ -1,0 +1,329 @@
+{
+  "passed": true,
+  "scope": "Diagnostic only; pooled finish subphase CPU/wall, not throughput evidence.",
+  "samples": {
+    "tasks": {
+      "phases": {
+        "initial-wait": {
+          "count": 384,
+          "wallNs": 182000,
+          "cpuNs": 84160
+        },
+        "log-drain-mark": {
+          "count": 384,
+          "wallNs": 160000,
+          "cpuNs": 88260
+        },
+        "remark-dispatch-wait": {
+          "count": 0,
+          "wallNs": 0,
+          "cpuNs": 0
+        },
+        "final-collection": {
+          "count": 384,
+          "wallNs": 6908000,
+          "cpuNs": 6827008
+        },
+        "dispose": {
+          "count": 384,
+          "wallNs": 359000,
+          "cpuNs": 275210
+        },
+        "whole-finish": {
+          "count": 384,
+          "wallNs": 7854000,
+          "cpuNs": 7770047
+        }
+      },
+      "slowestFinish": {
+        "mask": 59,
+        "phases": [
+          {
+            "wallNs": 1000,
+            "cpuNs": 500
+          },
+          {
+            "wallNs": 1000,
+            "cpuNs": 584
+          },
+          {
+            "wallNs": 0,
+            "cpuNs": 0
+          },
+          {
+            "wallNs": 63000,
+            "cpuNs": 62417
+          },
+          {
+            "wallNs": 5000,
+            "cpuNs": 4666
+          },
+          {
+            "wallNs": 72000,
+            "cpuNs": 71375
+          }
+        ]
+      }
+    },
+    "collections": {
+      "phases": {
+        "initial-wait": {
+          "count": 1392,
+          "wallNs": 509000,
+          "cpuNs": 249401
+        },
+        "log-drain-mark": {
+          "count": 1392,
+          "wallNs": 488000,
+          "cpuNs": 288449
+        },
+        "remark-dispatch-wait": {
+          "count": 0,
+          "wallNs": 0,
+          "cpuNs": 0
+        },
+        "final-collection": {
+          "count": 1392,
+          "wallNs": 29023000,
+          "cpuNs": 28758430
+        },
+        "dispose": {
+          "count": 1392,
+          "wallNs": 1114000,
+          "cpuNs": 835495
+        },
+        "whole-finish": {
+          "count": 1392,
+          "wallNs": 31828000,
+          "cpuNs": 31567084
+        }
+      },
+      "slowestFinish": {
+        "mask": 59,
+        "phases": [
+          {
+            "wallNs": 1000,
+            "cpuNs": 750
+          },
+          {
+            "wallNs": 1000,
+            "cpuNs": 1083
+          },
+          {
+            "wallNs": 0,
+            "cpuNs": 0
+          },
+          {
+            "wallNs": 86000,
+            "cpuNs": 85709
+          },
+          {
+            "wallNs": 6000,
+            "cpuNs": 5125
+          },
+          {
+            "wallNs": 97000,
+            "cpuNs": 96750
+          }
+        ]
+      }
+    },
+    "arrays": {
+      "phases": {
+        "initial-wait": {
+          "count": 504,
+          "wallNs": 210000,
+          "cpuNs": 96466
+        },
+        "log-drain-mark": {
+          "count": 504,
+          "wallNs": 184000,
+          "cpuNs": 100911
+        },
+        "remark-dispatch-wait": {
+          "count": 0,
+          "wallNs": 0,
+          "cpuNs": 0
+        },
+        "final-collection": {
+          "count": 504,
+          "wallNs": 8286000,
+          "cpuNs": 8177866
+        },
+        "dispose": {
+          "count": 504,
+          "wallNs": 443000,
+          "cpuNs": 339364
+        },
+        "whole-finish": {
+          "count": 504,
+          "wallNs": 9398000,
+          "cpuNs": 9288288
+        }
+      },
+      "slowestFinish": {
+        "mask": 59,
+        "phases": [
+          {
+            "wallNs": 1000,
+            "cpuNs": 500
+          },
+          {
+            "wallNs": 2000,
+            "cpuNs": 542
+          },
+          {
+            "wallNs": 0,
+            "cpuNs": 0
+          },
+          {
+            "wallNs": 55000,
+            "cpuNs": 54708
+          },
+          {
+            "wallNs": 5000,
+            "cpuNs": 4417
+          },
+          {
+            "wallNs": 65000,
+            "cpuNs": 63458
+          }
+        ]
+      }
+    },
+    "plain": {
+      "phases": {
+        "initial-wait": {
+          "count": 967,
+          "wallNs": 395000,
+          "cpuNs": 181507
+        },
+        "log-drain-mark": {
+          "count": 967,
+          "wallNs": 2784000,
+          "cpuNs": 2582040
+        },
+        "remark-dispatch-wait": {
+          "count": 0,
+          "wallNs": 0,
+          "cpuNs": 0
+        },
+        "final-collection": {
+          "count": 967,
+          "wallNs": 44015000,
+          "cpuNs": 43655360
+        },
+        "dispose": {
+          "count": 967,
+          "wallNs": 1114000,
+          "cpuNs": 939085
+        },
+        "whole-finish": {
+          "count": 967,
+          "wallNs": 48907000,
+          "cpuNs": 48373494
+        }
+      },
+      "slowestFinish": {
+        "mask": 59,
+        "phases": [
+          {
+            "wallNs": 1000,
+            "cpuNs": 417
+          },
+          {
+            "wallNs": 5000,
+            "cpuNs": 4416
+          },
+          {
+            "wallNs": 0,
+            "cpuNs": 0
+          },
+          {
+            "wallNs": 91000,
+            "cpuNs": 90542
+          },
+          {
+            "wallNs": 3000,
+            "cpuNs": 2333
+          },
+          {
+            "wallNs": 101000,
+            "cpuNs": 99834
+          }
+        ]
+      }
+    },
+    "json": {
+      "phases": {
+        "initial-wait": {
+          "count": 1899,
+          "wallNs": 763000,
+          "cpuNs": 342834
+        },
+        "log-drain-mark": {
+          "count": 1899,
+          "wallNs": 3615000,
+          "cpuNs": 3272725
+        },
+        "remark-dispatch-wait": {
+          "count": 0,
+          "wallNs": 0,
+          "cpuNs": 0
+        },
+        "final-collection": {
+          "count": 1899,
+          "wallNs": 86509000,
+          "cpuNs": 86208222
+        },
+        "dispose": {
+          "count": 1899,
+          "wallNs": 1912000,
+          "cpuNs": 1594537
+        },
+        "whole-finish": {
+          "count": 1899,
+          "wallNs": 94026000,
+          "cpuNs": 93318205
+        }
+      },
+      "slowestFinish": {
+        "mask": 59,
+        "phases": [
+          {
+            "wallNs": 54000,
+            "cpuNs": 291
+          },
+          {
+            "wallNs": 4000,
+            "cpuNs": 3292
+          },
+          {
+            "wallNs": 0,
+            "cpuNs": 0
+          },
+          {
+            "wallNs": 56000,
+            "cpuNs": 56167
+          },
+          {
+            "wallNs": 2000,
+            "cpuNs": 1458
+          },
+          {
+            "wallNs": 116000,
+            "cpuNs": 64958
+          }
+        ]
+      }
+    }
+  },
+  "inputs": {
+    "benchmarks/execution/concurrent-workloads/finish-phases.py": "18d03918c15bcefe4158a7031fbfbe0f992ce1d4b3b657f2230572edec6aeb6d",
+    "benchmarks/execution/concurrent-workloads/owner-pauses.py": "f7dbee6000f7f120dc9802c77306ef71b7b0eadb1cd001ca5c9744a523a932c5",
+    "benchmarks/execution/concurrent-workloads/summarize-finish-phases.py": "7500e613146f7a8a342b099d8b2313d67ac2b53fe0526ab9dbd3e652f740d510",
+    "benchmarks/execution/concurrent-workloads/test-finish-phases.py": "480fb6b63d72886e11e725e5ee440a2c3f66cae26b9a171884f4cbce800ffb7c",
+    "target/concurrent-workloads/finish-phases-commands.json": "3637be45c4a746f16b980ae3e2e6e32626a7e67ac1b954bc7d458c44c5862565",
+    "target/concurrent-workloads/finish-phases-summary.json": "43ff6537cceef498b2c058b06941aa35c4a26af96aa59e4a16d48627dcc66217"
+  }
+}

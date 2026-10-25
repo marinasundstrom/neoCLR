@@ -34,7 +34,9 @@ p.add_argument('--full-store-walk', action='store_true')
 p.add_argument('--profile-store-walks', action='store_true')
 p.add_argument('--profile-store-sites', action='store_true')
 p.add_argument('--profile-owner-pauses', action='store_true')
+p.add_argument('--profile-finish', action='store_true')
 a = p.parse_args()
+assert not a.profile_finish or a.profile_owner_pauses
 assert a.rounds > 0
 assert not a.previous_build or a.compare_inline_base
 assert not a.compare_worker_tls or (a.compare_inline_base and not a.split_tls)
@@ -100,7 +102,7 @@ try:
         profiler = root / 'benchmarks/execution/concurrent-workloads/owner-pauses.py'
         run(['python3', profiler, '--source', root / 'runtime/native/gc/native-gc.c', '--output', sync_profile])
         for source in [collector] + ([guarded] if a.guarded_control else []):
-            run(['python3', profiler, '--source', source, '--output', source, '--live'])
+            run(['python3', profiler, '--source', source, '--output', source, '--live'] + (['--finish-details'] if a.profile_finish else []))
     host = out / 'owned-host.c'
     source = (root / 'target/native-host-ownership/owned-host.c').read_text()
     boundary = '    int32_t status = run_entry(entry, with_args, argc, argv);'
@@ -126,6 +128,10 @@ static void report_profile(struct rusage *a, struct rusage *b, struct timespec *
 #ifdef OWNER_PAUSE_PROFILE
  extern void experiment_owner_pauses_report(void);
  experiment_owner_pauses_report();
+#endif
+#ifdef FINISH_PHASE_PROFILE
+ extern void experiment_finish_phases_report(void);
+ experiment_finish_phases_report();
 #endif
  neoclr_gc_statistics stats = neoclr_gc_statistics_v1();
  neoclr_gc_profile profile = neoclr_gc_profile_v1();
@@ -208,6 +214,7 @@ static void report_profile(struct rusage *a, struct rusage *b, struct timespec *
             if a.serialized_store: command += ['-DNEOCLR_LIVE_SERIALIZED_STORE']
             if a.disable_exact_store: command += ['-DNEOCLR_LIVE_NO_EXACT_STORE']
             if a.profile_owner_pauses: command += ['-DOWNER_PAUSE_PROFILE', '-I', str(root / 'runtime/native/gc')]
+            if a.profile_finish and mode != 'sync': command += ['-DFINISH_PHASE_PROFILE']
             run(command)
             for item in command:
                 path = Path(item)

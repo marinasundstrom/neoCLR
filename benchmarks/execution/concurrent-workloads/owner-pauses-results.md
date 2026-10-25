@@ -118,3 +118,7 @@ and concurrent-default acceptance remain open.
 invocation commands, generated first/final collectors and test logs accompany this
 report. Reproduce with the retained commands and `summarize-owner-pauses.py`; these
 recipes require the retained compiler bundle, native host recipes and objects.
+
+The subsequent [finish subphase investigation](finish-phases-results.md) adds
+owner CPU/wall attribution and shifts the next target toward active final
+collection work; it does not retrospectively explain the outlier above.

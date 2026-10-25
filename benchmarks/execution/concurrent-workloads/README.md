@@ -196,3 +196,7 @@ remaining owner-pause measurement boundaries.
 [Complete owner-operation pause diagnostics](owner-pauses-results.md) close the
 phase-timer coverage gap for selected operations, separate overlapping phases
 from outer GC stalls, and retain synchronous controls and overhead limitations.
+
+[Finish CPU/wall attribution](finish-phases-results.md) separates waiting from
+active collection and retains components of the same slowest invocation. The
+observed dominant cost is final collection, guiding index/root/seed/sweep work.
