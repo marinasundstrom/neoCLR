@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "case": "changed-object",
+      "rejected": true,
+      "exitCode": 1
+    },
+    {
+      "case": "inconsistent-sites",
+      "rejected": true,
+      "exitCode": 1
+    },
+    {
+      "case": "inconsistent-profile",
+      "rejected": true,
+      "exitCode": 1
+    }
+  ]
+}

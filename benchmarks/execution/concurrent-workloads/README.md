@@ -220,3 +220,5 @@ See [complete managed borrowing](borrowed-managed-results.md) for test-only inte
 [Acquisition caller attribution](acquisition-sites-results.md) maps hot callers, rejects an ineffective cleanup and identifies conditional fault-path acquisition as the next target.
 
 [Conditional borrowing evaluation](conditional-borrow-results.md) retains a rejected compiler patch and full correctness/performance evidence: fewer acquisitions did not beat checked stores. Profiling/comparison tools accept `--prefix` to reuse the same validation across cohorts.
+
+[Forwarded stack provenance](forward-stack-results.md) extends the read-only audit through fully known caller chains. Additional guard removal remains disabled pending transformed execution qualification.

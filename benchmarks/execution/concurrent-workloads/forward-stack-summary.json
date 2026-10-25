@@ -1,0 +1,569 @@
+{
+  "passed": true,
+  "scope": "Static sites and affected-function acquisition observations, not executed-store counts or performance.",
+  "samples": {
+    "tasks": {
+      "directCandidates": 64,
+      "forwardedCandidates": 64,
+      "additionalSites": 0,
+      "affectedFunctions": 0,
+      "observedAcquisitionsInAffectedFunctions": 0,
+      "observedAcquisitionShare": 0.0,
+      "observedSites": []
+    },
+    "collections": {
+      "directCandidates": 159,
+      "forwardedCandidates": 195,
+      "additionalSites": 36,
+      "affectedFunctions": 22,
+      "observedAcquisitionsInAffectedFunctions": 258048,
+      "observedAcquisitionShare": 0.12752733914776188,
+      "observedSites": [
+        {
+          "address": 4297467172,
+          "count": 45056,
+          "symbol": "_neoclr_value_188",
+          "offset": 180
+        },
+        {
+          "address": 4297475852,
+          "count": 36864,
+          "symbol": "_neoclr_value_190",
+          "offset": 144
+        },
+        {
+          "address": 4297021948,
+          "count": 32768,
+          "symbol": "_neoclr_value_68",
+          "offset": 152
+        },
+        {
+          "address": 4297471068,
+          "count": 16384,
+          "symbol": "_neoclr_value_189",
+          "offset": 180
+        },
+        {
+          "address": 4297019332,
+          "count": 16384,
+          "symbol": "_neoclr_value_67",
+          "offset": 160
+        },
+        {
+          "address": 4297100036,
+          "count": 16384,
+          "symbol": "_neoclr_value_78",
+          "offset": 184
+        },
+        {
+          "address": 4297062776,
+          "count": 16384,
+          "symbol": "_neoclr_value_75",
+          "offset": 152
+        },
+        {
+          "address": 4297481656,
+          "count": 12288,
+          "symbol": "_neoclr_value_191",
+          "offset": 144
+        },
+        {
+          "address": 4297445504,
+          "count": 12288,
+          "symbol": "_neoclr_value_181",
+          "offset": 144
+        },
+        {
+          "address": 4297004956,
+          "count": 8192,
+          "symbol": "_neoclr_value_63",
+          "offset": 180
+        },
+        {
+          "address": 4297292340,
+          "count": 8192,
+          "symbol": "_neoclr_value_129",
+          "offset": 244
+        },
+        {
+          "address": 4297257828,
+          "count": 8192,
+          "symbol": "_neoclr_value_123",
+          "offset": 316
+        },
+        {
+          "address": 4297269128,
+          "count": 4096,
+          "symbol": "_neoclr_value_124",
+          "offset": 144
+        },
+        {
+          "address": 4297008816,
+          "count": 4096,
+          "symbol": "_neoclr_value_64",
+          "offset": 144
+        },
+        {
+          "address": 4297281808,
+          "count": 4096,
+          "symbol": "_neoclr_value_127",
+          "offset": 144
+        },
+        {
+          "address": 4297302080,
+          "count": 4096,
+          "symbol": "_neoclr_value_130",
+          "offset": 144
+        },
+        {
+          "address": 4296982672,
+          "count": 4096,
+          "symbol": "_neoclr_value_59",
+          "offset": 144
+        },
+        {
+          "address": 4297247224,
+          "count": 4096,
+          "symbol": "_neoclr_value_121",
+          "offset": 144
+        },
+        {
+          "address": 4297449352,
+          "count": 4096,
+          "symbol": "_neoclr_value_182",
+          "offset": 144
+        }
+      ]
+    },
+    "arrays": {
+      "directCandidates": 86,
+      "forwardedCandidates": 103,
+      "additionalSites": 17,
+      "affectedFunctions": 15,
+      "observedAcquisitionsInAffectedFunctions": 57344,
+      "observedAcquisitionShare": 0.12067746388767299,
+      "observedSites": [
+        {
+          "address": 4296854832,
+          "count": 16384,
+          "symbol": "_neoclr_value_34",
+          "offset": 180
+        },
+        {
+          "address": 4296859616,
+          "count": 12288,
+          "symbol": "_neoclr_value_35",
+          "offset": 144
+        },
+        {
+          "address": 4296841396,
+          "count": 8192,
+          "symbol": "_neoclr_value_30",
+          "offset": 152
+        },
+        {
+          "address": 4297147540,
+          "count": 4096,
+          "symbol": "_neoclr_value_120",
+          "offset": 152
+        },
+        {
+          "address": 4297172992,
+          "count": 4096,
+          "symbol": "_neoclr_value_128",
+          "offset": 152
+        },
+        {
+          "address": 4296848696,
+          "count": 4096,
+          "symbol": "_neoclr_value_32",
+          "offset": 144
+        },
+        {
+          "address": 4297065900,
+          "count": 4096,
+          "symbol": "_neoclr_value_84",
+          "offset": 144
+        },
+        {
+          "address": 4297073140,
+          "count": 4096,
+          "symbol": "_neoclr_value_87",
+          "offset": 144
+        }
+      ]
+    },
+    "plain": {
+      "directCandidates": 13807,
+      "forwardedCandidates": 13883,
+      "additionalSites": 76,
+      "affectedFunctions": 37,
+      "observedAcquisitionsInAffectedFunctions": 486912,
+      "observedAcquisitionShare": 0.24502353808489813,
+      "observedSites": [
+        {
+          "address": 4299436452,
+          "count": 122368,
+          "symbol": "_neoclr_value_458",
+          "offset": 152
+        },
+        {
+          "address": 4299428944,
+          "count": 108544,
+          "symbol": "_neoclr_value_456",
+          "offset": 144
+        },
+        {
+          "address": 4297027424,
+          "count": 84992,
+          "symbol": "_neoclr_value_78",
+          "offset": 152
+        },
+        {
+          "address": 4297025568,
+          "count": 53248,
+          "symbol": "_neoclr_value_77",
+          "offset": 144
+        },
+        {
+          "address": 4303866164,
+          "count": 52736,
+          "symbol": "_neoclr_value_801",
+          "offset": 144
+        },
+        {
+          "address": 4304395000,
+          "count": 50688,
+          "symbol": "_neoclr_value_933",
+          "offset": 152
+        },
+        {
+          "address": 4303935452,
+          "count": 3584,
+          "symbol": "_neoclr_value_812",
+          "offset": 144
+        },
+        {
+          "address": 4297410436,
+          "count": 2560,
+          "symbol": "_neoclr_value_190",
+          "offset": 180
+        },
+        {
+          "address": 4297394360,
+          "count": 2048,
+          "symbol": "_neoclr_value_189",
+          "offset": 388
+        },
+        {
+          "address": 4297104824,
+          "count": 2048,
+          "symbol": "_neoclr_value_105",
+          "offset": 180
+        },
+        {
+          "address": 4304741676,
+          "count": 1024,
+          "symbol": "_neoclr_value_1035",
+          "offset": 152
+        },
+        {
+          "address": 4297097632,
+          "count": 1024,
+          "symbol": "_neoclr_value_103",
+          "offset": 144
+        },
+        {
+          "address": 4297108684,
+          "count": 1024,
+          "symbol": "_neoclr_value_106",
+          "offset": 144
+        },
+        {
+          "address": 4302049536,
+          "count": 512,
+          "symbol": "_neoclr_value_577",
+          "offset": 684
+        },
+        {
+          "address": 4302060104,
+          "count": 512,
+          "symbol": "_neoclr_value_578",
+          "offset": 684
+        }
+      ]
+    },
+    "json": {
+      "directCandidates": 20543,
+      "forwardedCandidates": 20727,
+      "additionalSites": 184,
+      "affectedFunctions": 121,
+      "observedAcquisitionsInAffectedFunctions": 582144,
+      "observedAcquisitionShare": 0.1947498134109285,
+      "observedSites": [
+        {
+          "address": 4301667964,
+          "count": 122368,
+          "symbol": "_neoclr_value_680",
+          "offset": 152
+        },
+        {
+          "address": 4301660456,
+          "count": 108544,
+          "symbol": "_neoclr_value_678",
+          "offset": 144
+        },
+        {
+          "address": 4297587880,
+          "count": 108032,
+          "symbol": "_neoclr_value_103",
+          "offset": 152
+        },
+        {
+          "address": 4297586024,
+          "count": 59392,
+          "symbol": "_neoclr_value_102",
+          "offset": 144
+        },
+        {
+          "address": 4306222564,
+          "count": 55808,
+          "symbol": "_neoclr_value_1023",
+          "offset": 144
+        },
+        {
+          "address": 4307213160,
+          "count": 53760,
+          "symbol": "_neoclr_value_1279",
+          "offset": 152
+        },
+        {
+          "address": 4298414736,
+          "count": 16384,
+          "symbol": "_neoclr_value_329",
+          "offset": 372
+        },
+        {
+          "address": 4298386128,
+          "count": 5632,
+          "symbol": "_neoclr_value_322",
+          "offset": 176
+        },
+        {
+          "address": 4306291852,
+          "count": 3584,
+          "symbol": "_neoclr_value_1034",
+          "offset": 144
+        },
+        {
+          "address": 4306776316,
+          "count": 3584,
+          "symbol": "_neoclr_value_1157",
+          "offset": 144
+        },
+        {
+          "address": 4307787680,
+          "count": 3072,
+          "symbol": "_neoclr_value_1458",
+          "offset": 180
+        },
+        {
+          "address": 4298288468,
+          "count": 3072,
+          "symbol": "_neoclr_value_294",
+          "offset": 144
+        },
+        {
+          "address": 4297675884,
+          "count": 2560,
+          "symbol": "_neoclr_value_132",
+          "offset": 180
+        },
+        {
+          "address": 4298085936,
+          "count": 2560,
+          "symbol": "_neoclr_value_245",
+          "offset": 388
+        },
+        {
+          "address": 4298102012,
+          "count": 2560,
+          "symbol": "_neoclr_value_246",
+          "offset": 180
+        },
+        {
+          "address": 4307769436,
+          "count": 2048,
+          "symbol": "_neoclr_value_1455",
+          "offset": 180
+        },
+        {
+          "address": 4298260980,
+          "count": 1536,
+          "symbol": "_neoclr_value_289",
+          "offset": 144
+        },
+        {
+          "address": 4307239960,
+          "count": 1536,
+          "symbol": "_neoclr_value_1286",
+          "offset": 144
+        },
+        {
+          "address": 4306786680,
+          "count": 1536,
+          "symbol": "_neoclr_value_1159",
+          "offset": 152
+        },
+        {
+          "address": 4297679744,
+          "count": 1536,
+          "symbol": "_neoclr_value_133",
+          "offset": 144
+        },
+        {
+          "address": 4307780712,
+          "count": 1536,
+          "symbol": "_neoclr_value_1457",
+          "offset": 144
+        },
+        {
+          "address": 4298280156,
+          "count": 1536,
+          "symbol": "_neoclr_value_292",
+          "offset": 144
+        },
+        {
+          "address": 4298289864,
+          "count": 1536,
+          "symbol": "_neoclr_value_295",
+          "offset": 144
+        },
+        {
+          "address": 4298423448,
+          "count": 1536,
+          "symbol": "_neoclr_value_330",
+          "offset": 144
+        },
+        {
+          "address": 4298292768,
+          "count": 1536,
+          "symbol": "_neoclr_value_297",
+          "offset": 264
+        },
+        {
+          "address": 4307796360,
+          "count": 1536,
+          "symbol": "_neoclr_value_1460",
+          "offset": 144
+        },
+        {
+          "address": 4306359176,
+          "count": 1536,
+          "symbol": "_neoclr_value_1050",
+          "offset": 144
+        },
+        {
+          "address": 4298299560,
+          "count": 1536,
+          "symbol": "_neoclr_value_298",
+          "offset": 144
+        },
+        {
+          "address": 4306360580,
+          "count": 1536,
+          "symbol": "_neoclr_value_1051",
+          "offset": 152
+        },
+        {
+          "address": 4307232748,
+          "count": 1536,
+          "symbol": "_neoclr_value_1284",
+          "offset": 144
+        },
+        {
+          "address": 4307294988,
+          "count": 1024,
+          "symbol": "_neoclr_value_1301",
+          "offset": 152
+        },
+        {
+          "address": 4297668692,
+          "count": 1024,
+          "symbol": "_neoclr_value_130",
+          "offset": 144
+        },
+        {
+          "address": 4298402552,
+          "count": 512,
+          "symbol": "_neoclr_value_324",
+          "offset": 144
+        },
+        {
+          "address": 4304366436,
+          "count": 512,
+          "symbol": "_neoclr_value_799",
+          "offset": 684
+        },
+        {
+          "address": 4298409544,
+          "count": 512,
+          "symbol": "_neoclr_value_327",
+          "offset": 144
+        },
+        {
+          "address": 4304377004,
+          "count": 512,
+          "symbol": "_neoclr_value_800",
+          "offset": 684
+        },
+        {
+          "address": 4298425552,
+          "count": 512,
+          "symbol": "_neoclr_value_331",
+          "offset": 144
+        },
+        {
+          "address": 4298427656,
+          "count": 512,
+          "symbol": "_neoclr_value_332",
+          "offset": 144
+        },
+        {
+          "address": 4298429764,
+          "count": 512,
+          "symbol": "_neoclr_value_333",
+          "offset": 144
+        },
+        {
+          "address": 4298431872,
+          "count": 512,
+          "symbol": "_neoclr_value_334",
+          "offset": 144
+        },
+        {
+          "address": 4298433980,
+          "count": 512,
+          "symbol": "_neoclr_value_335",
+          "offset": 144
+        },
+        {
+          "address": 4298440292,
+          "count": 512,
+          "symbol": "_neoclr_value_338",
+          "offset": 144
+        },
+        {
+          "address": 4307229384,
+          "count": 512,
+          "symbol": "_neoclr_value_1283",
+          "offset": 144
+        }
+      ]
+    }
+  },
+  "inputs": {
+    "target/concurrent-workloads/forward-stack-audit/results.json": "89f2fa995f28a860ca51dc9251ca89054c2c6b01590ff1e1ff192ebbe5416f7d",
+    "target/concurrent-workloads/store-acquisition-sites-v2/results.json": "007c810d322a7a0615cfd6594406743a96012a0363d341a8f85fa6fe27b2114e"
+  }
+}
