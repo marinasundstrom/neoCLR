@@ -26,6 +26,7 @@ p.add_argument('--include-guarded-sync',action='store_true')
 p.add_argument('--gate-words',type=int,default=4096)
 p.add_argument('--disable-store-cache',action='store_true')
 p.add_argument('--compare-store-cache',action='store_true')
+p.add_argument('--compare-store-tls',action='store_true')
 p.add_argument('--compare-store-walk',action='store_true')
 p.add_argument('--compare-snapshot-lookup',action='store_true')
 p.add_argument('--compare-header-proof',action='store_true')
@@ -42,6 +43,7 @@ a=p.parse_args();assert a.requests>0 and a.warmup>=0 and a.pairs>0
 assert 1<=a.concurrency<=min(128,a.requests)
 if a.profile_cpu:
  assert shutil.which('sample') and a.requests>=8192 and not a.profile_store_sites and not a.profile_store_walks
+assert not (a.compare_store_tls and (a.compare_store_walk or a.compare_snapshot_lookup or a.compare_header_proof or a.compare_inline_validation or a.compare_split_tls or a.compare_serialized_store or a.previous_live_object or a.compare_store_ranges or a.compare_store_cache or a.compare_exact_store or a.disable_store_cache))
 assert not (a.compare_store_walk and (a.compare_snapshot_lookup or a.compare_header_proof or a.compare_inline_validation or a.compare_split_tls or a.compare_serialized_store or a.previous_live_object or a.compare_store_ranges or a.compare_store_cache or a.compare_exact_store or a.disable_store_cache))
 assert not (a.compare_snapshot_lookup and (a.compare_header_proof or a.compare_inline_validation or a.compare_split_tls or a.compare_serialized_store or a.previous_live_object or a.compare_store_ranges or a.compare_store_cache or a.compare_exact_store or a.disable_store_cache))
 assert not (a.compare_header_proof and (a.compare_inline_validation or a.compare_split_tls or a.compare_serialized_store or a.previous_live_object or a.compare_store_ranges or a.compare_store_cache or a.compare_exact_store or a.disable_store_cache))
@@ -54,7 +56,7 @@ assert not (a.previous_live_object and (a.compare_store_ranges or a.compare_stor
 assert not (a.compare_store_ranges and (a.disable_store_cache or a.compare_store_cache or a.compare_exact_store or a.store_ranges==1))
 root=Path(__file__).resolve().parents[3];base=Path(__file__).resolve().parent
 out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
-r={'passed':False,'compareStoreWalk':a.compare_store_walk,'allowAllocationVariation':a.allow_allocation_variation,'concurrency':a.concurrency,'compareSnapshotLookup':a.compare_snapshot_lookup,'compareHeaderProof':a.compare_header_proof,'compareInlineValidation':a.compare_inline_validation,'compareSplitTls':a.compare_split_tls,'compareSerializedStore':a.compare_serialized_store,'gateWords':a.gate_words,'storeCache':not a.disable_store_cache,'compareStoreCache':a.compare_store_cache,'compareExactStore':a.compare_exact_store,'storeRanges':a.store_ranges,'compareStoreRanges':a.compare_store_ranges,'sample':a.sample,'scope':'Loopback AOT fixed-work comparison; Python client scheduling and connection-close costs included. No saturation/cross-framework or GC-pause-distribution claim.', 'commands':[],'trials':[],'inputs':{}}
+r={'passed':False,'compareStoreTls':a.compare_store_tls,'compareStoreWalk':a.compare_store_walk,'allowAllocationVariation':a.allow_allocation_variation,'concurrency':a.concurrency,'compareSnapshotLookup':a.compare_snapshot_lookup,'compareHeaderProof':a.compare_header_proof,'compareInlineValidation':a.compare_inline_validation,'compareSplitTls':a.compare_split_tls,'compareSerializedStore':a.compare_serialized_store,'gateWords':a.gate_words,'storeCache':not a.disable_store_cache,'compareStoreCache':a.compare_store_cache,'compareExactStore':a.compare_exact_store,'storeRanges':a.store_ranges,'compareStoreRanges':a.compare_store_ranges,'sample':a.sample,'scope':'Loopback AOT fixed-work comparison; Python client scheduling and connection-close costs included. No saturation/cross-framework or GC-pause-distribution claim.', 'commands':[],'trials':[],'inputs':{}}
 if a.profile_store_walks:r['diagnosticOnly']='Heap-walk instrumentation; timings are not benchmark evidence.'
 if a.profile_cpu:r['diagnosticOnly']='External CPU sampling affects timings; do not use this cohort for throughput claims.'
 def run(cmd):
@@ -131,6 +133,9 @@ static void report_measurement(void) {
  if a.compare_store_cache:
   configurations.append(('live-no-cache',a.live_object))
   if a.include_guarded_sync:configurations.append(('guarded-sync-no-cache',a.live_object))
+ if a.compare_store_tls:
+  configurations.append(('live-split-store-tls',a.live_object))
+  if a.include_guarded_sync:configurations.append(('guarded-sync-split-store-tls',a.live_object))
  if a.compare_store_walk:
   configurations.append(('live-full-walk',a.live_object))
   if a.include_guarded_sync:configurations.append(('guarded-sync-full-walk',a.live_object))
@@ -171,6 +176,7 @@ static void report_measurement(void) {
   command+=['-I',str(root/'runtime/native/memory'),'-DNEOCLR_GC_PROFILE']
   if mode!='sync':command+=[f'-DGATE_WORDS={a.gate_words}','-DLIVE_REPORT','-DNEOCLR_SHADOW_SPARSE_INDEX','-I',str(base.parent/'concurrent-mutation-gate'),str(base.parent/'concurrent-mutation-gate/gate.c')]
   if mode!='sync' and (a.disable_store_cache or mode.endswith('-no-cache')):command+=['-DNEOCLR_LIVE_NO_STORE_CACHE']
+  if mode.endswith('-split-store-tls'):command+=['-DNEOCLR_LIVE_SPLIT_STORE_TLS']
   if mode.endswith('-full-walk'):command+=['-DNEOCLR_LIVE_FULL_STORE_WALK']
   if mode.endswith('-repeat-lookup'):command+=['-DNEOCLR_LIVE_REPEAT_SNAPSHOT_LOOKUP']
   if mode.endswith('-header-proof'):command+=['-DNEOCLR_LIVE_HEADER_PROOF']

@@ -1,0 +1,12 @@
+{
+  "live": {
+    "binarySha256": "ef4f0dcc7cc3db0848c55435b114b0babacef8aeb8b6e21a8c014aa37ef45936",
+    "instructions": 433,
+    "indirectCallSites": 5
+  },
+  "live-split-store-tls": {
+    "binarySha256": "6eba5459824403b78583aa078eddd7a7e080b0083d6bc01b6813fb34bc59897b",
+    "instructions": 446,
+    "indirectCallSites": 12
+  }
+}

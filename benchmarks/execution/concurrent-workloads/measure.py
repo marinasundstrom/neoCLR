@@ -21,6 +21,7 @@ p.add_argument('--split-tls', action='store_true')
 p.add_argument('--serialized-store', action='store_true')
 p.add_argument('--disable-exact-store', action='store_true')
 p.add_argument('--store-ranges', type=int, choices=range(1,17), default=4)
+p.add_argument('--split-store-tls', action='store_true')
 p.add_argument('--full-store-walk', action='store_true')
 p.add_argument('--profile-store-walks', action='store_true')
 p.add_argument('--profile-store-sites', action='store_true')
@@ -34,7 +35,7 @@ recipe_file = root / 'target/native-host-ownership/results.json'
 recipe = next(c['command'] for c in json.loads(recipe_file.read_text())['commands']
               if str(root / 'target/native-host-ownership/owned-aot') in c['command'])
 modes = ['sync', 'guarded-sync', 'live'] if a.guarded_control else ['sync', 'live']
-report = {'fullStoreWalk':a.full_store_walk,'repeatSnapshotLookup': a.repeat_snapshot_lookup, 'headerProof': a.header_proof, 'inlineValidation': a.inline_validation, 'splitTls': a.split_tls, 'serializedStore': a.serialized_store, 'optimizationLevel': build.get('optimizationLevel','none'), 'passed': False, 'scope': __doc__, 'iterations': build['iterations'],
+report = {'splitStoreTls':a.split_store_tls,'fullStoreWalk':a.full_store_walk,'repeatSnapshotLookup': a.repeat_snapshot_lookup, 'headerProof': a.header_proof, 'inlineValidation': a.inline_validation, 'splitTls': a.split_tls, 'serializedStore': a.serialized_store, 'optimizationLevel': build.get('optimizationLevel','none'), 'passed': False, 'scope': __doc__, 'iterations': build['iterations'],
           'commands': [], 'trials': [], 'inputs': {}, 'excluded': []}
 if a.profile_store_walks:report['diagnosticOnly']='Heap-walk instrumentation; timings are not benchmark evidence.'
 def run(command):
@@ -140,6 +141,7 @@ static void report_profile(struct rusage *a, struct rusage *b, struct timespec *
                 gate = root / 'benchmarks/execution/concurrent-mutation-gate'
                 command += ['-DWORKLOAD_LIVE', '-DNEOCLR_SHADOW_SPARSE_INDEX',
                             '-I', str(root / 'runtime/native/memory'), '-I', str(gate), str(gate / 'gate.c')]
+            if a.split_store_tls: command += ['-DNEOCLR_LIVE_SPLIT_STORE_TLS']
             if a.full_store_walk: command += ['-DNEOCLR_LIVE_FULL_STORE_WALK']
             if a.profile_store_walks and mode != 'sync': command += ['-DNEOCLR_LIVE_WALK_PROFILE']
             if a.profile_store_sites and mode != 'sync': command += ['-DNEOCLR_STORE_SITES']

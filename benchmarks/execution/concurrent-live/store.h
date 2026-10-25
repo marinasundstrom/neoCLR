@@ -1,6 +1,9 @@
 /* Prototype compiler-facing scalar-store adapter. It never collects. The caller
  * supplies a valid native destination; out-of-arena storage is trusted stack or
  * host storage, not permission to mutate a different managed heap. */
+/* These private hints/counters share storage, not lifetimes or admission.
+ * The explicit split control preserves the former TLS layout. */
+#if defined(NEOCLR_LIVE_SPLIT_TLS) || defined(NEOCLR_LIVE_SPLIT_STORE_TLS)
 #if !defined(NEOCLR_LIVE_NO_STORE_CACHE) && !defined(NEOCLR_LIVE_LINEAR_STORE)
 #ifndef NEOCLR_LIVE_HEADER_PROOF
 static _Thread_local const void *live_store_last_payload;
@@ -24,11 +27,31 @@ static _Thread_local unsigned live_store_recent_next;
 #endif
 #ifdef NEOCLR_LIVE_WALK_PROFILE
 static _Thread_local uint64_t live_store_walk_counts[3]; /* headers visited, max per walk, free headers */
+#endif
+static _Thread_local uint64_t live_store_lookup_counts[2]; /* proved range/base, checked walks */
+#else
+#define live_store_lookup_counts (live_owner.store.lookups)
+#ifdef NEOCLR_LIVE_WALK_PROFILE
+#define live_store_walk_counts (live_owner.store.walks)
+#endif
+#if !defined(NEOCLR_LIVE_NO_STORE_CACHE) && !defined(NEOCLR_LIVE_LINEAR_STORE)
+#ifdef NEOCLR_LIVE_HEADER_PROOF
+#define live_store_last_header (live_owner.store.header)
+#define live_store_last_payload (live_owner.store.header.payload)
+#else
+#define live_store_last_payload (live_owner.store.payload)
+#endif
+#if NEOCLR_LIVE_STORE_RANGES > 1
+#define live_store_recent (live_owner.store.recent)
+#define live_store_recent_next (live_owner.store.next)
+#endif
+#endif
+#endif
+#ifdef NEOCLR_LIVE_WALK_PROFILE
 void experiment_gc_store_walk_counts(uint64_t *out) {
     memcpy(out,live_store_walk_counts,sizeof(live_store_walk_counts));
 }
 #endif
-static _Thread_local uint64_t live_store_lookup_counts[2]; /* proved range/base, checked walks */
 static void live_store_cancel_epoch(void) {
         candidate_dispose();
         candidate_context=NULL;

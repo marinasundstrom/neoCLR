@@ -1,0 +1,296 @@
+{
+  "standalone": {
+    "packed": {
+      "tasks": {
+        "sync": {
+          "cpuSeconds": 0.015236,
+          "allocations": 65548,
+          "allocatedBytes": 2261361
+        },
+        "guarded-sync": {
+          "cpuSeconds": 0.027446,
+          "allocations": 65548,
+          "allocatedBytes": 2261361
+        },
+        "live": {
+          "cpuSeconds": 0.037006,
+          "allocations": 65548,
+          "allocatedBytes": 2261361
+        }
+      },
+      "collections": {
+        "sync": {
+          "cpuSeconds": 0.088393,
+          "allocations": 237580,
+          "allocatedBytes": 7864689
+        },
+        "guarded-sync": {
+          "cpuSeconds": 0.139275,
+          "allocations": 237580,
+          "allocatedBytes": 7864689
+        },
+        "live": {
+          "cpuSeconds": 0.183235,
+          "allocations": 237580,
+          "allocatedBytes": 7864689
+        }
+      },
+      "arrays": {
+        "sync": {
+          "cpuSeconds": 0.050174,
+          "allocations": 86028,
+          "allocatedBytes": 1892721
+        },
+        "guarded-sync": {
+          "cpuSeconds": 0.056279,
+          "allocations": 86028,
+          "allocatedBytes": 1892721
+        },
+        "live": {
+          "cpuSeconds": 0.063812,
+          "allocations": 86028,
+          "allocatedBytes": 1892721
+        }
+      }
+    },
+    "split": {
+      "tasks": {
+        "sync": {
+          "cpuSeconds": 0.015158,
+          "allocations": 65548,
+          "allocatedBytes": 2261361
+        },
+        "guarded-sync": {
+          "cpuSeconds": 0.028944,
+          "allocations": 65548,
+          "allocatedBytes": 2261361
+        },
+        "live": {
+          "cpuSeconds": 0.038847,
+          "allocations": 65548,
+          "allocatedBytes": 2261361
+        }
+      },
+      "collections": {
+        "sync": {
+          "cpuSeconds": 0.089351,
+          "allocations": 237580,
+          "allocatedBytes": 7864689
+        },
+        "guarded-sync": {
+          "cpuSeconds": 0.147656,
+          "allocations": 237580,
+          "allocatedBytes": 7864689
+        },
+        "live": {
+          "cpuSeconds": 0.192332,
+          "allocations": 237580,
+          "allocatedBytes": 7864689
+        }
+      },
+      "arrays": {
+        "sync": {
+          "cpuSeconds": 0.049881,
+          "allocations": 86028,
+          "allocatedBytes": 1892721
+        },
+        "guarded-sync": {
+          "cpuSeconds": 0.057913,
+          "allocations": 86028,
+          "allocatedBytes": 1892721
+        },
+        "live": {
+          "cpuSeconds": 0.064993,
+          "allocations": 86028,
+          "allocatedBytes": 1892721
+        }
+      }
+    }
+  },
+  "http": {
+    "plain": {
+      "summary": {
+        "sync": {
+          "requestsPerSecond": 5165.104820178215,
+          "requestSeconds": 0.3965069579999998,
+          "processCpuSeconds": 0.404221,
+          "peakRssBytes": 9306112
+        },
+        "guarded-sync": {
+          "requestsPerSecond": 2324.6397847781345,
+          "requestSeconds": 0.8809967089999979,
+          "processCpuSeconds": 0.884722,
+          "peakRssBytes": 11124736
+        },
+        "live": {
+          "requestsPerSecond": 1988.641053202948,
+          "requestSeconds": 1.0298489999999987,
+          "processCpuSeconds": 1.066967,
+          "peakRssBytes": 11698176
+        },
+        "live-split-store-tls": {
+          "requestsPerSecond": 1887.848610765118,
+          "requestSeconds": 1.0848327499999986,
+          "processCpuSeconds": 1.112331,
+          "peakRssBytes": 11780096
+        },
+        "guarded-sync-split-store-tls": {
+          "requestsPerSecond": 2250.1419720924523,
+          "requestSeconds": 0.9101647920000016,
+          "processCpuSeconds": 0.9198350000000001,
+          "peakRssBytes": 11124736
+        }
+      },
+      "allocationEquality": false,
+      "details": {
+        "sync": {
+          "allocations": [
+            429856,
+            429856
+          ],
+          "allocatedBytes": [
+            33057881,
+            33057881
+          ],
+          "p99Ms": 0.8450840000016058
+        },
+        "guarded-sync": {
+          "allocations": [
+            429856,
+            429856
+          ],
+          "allocatedBytes": [
+            33057881,
+            33057881
+          ],
+          "p99Ms": 1.8540410000014163
+        },
+        "live": {
+          "allocations": [
+            429856,
+            429856
+          ],
+          "allocatedBytes": [
+            33057881,
+            33057881
+          ],
+          "p99Ms": 2.2349169999991148
+        },
+        "live-split-store-tls": {
+          "allocations": [
+            429856,
+            429857
+          ],
+          "allocatedBytes": [
+            33057881,
+            33058409
+          ],
+          "p99Ms": 2.760792000000123
+        },
+        "guarded-sync-split-store-tls": {
+          "allocations": [
+            429856,
+            429856
+          ],
+          "allocatedBytes": [
+            33057881,
+            33057881
+          ],
+          "p99Ms": 2.063500000000218
+        }
+      }
+    },
+    "json": {
+      "summary": {
+        "sync": {
+          "requestsPerSecond": 3072.78759233337,
+          "requestSeconds": 0.6664957919999992,
+          "processCpuSeconds": 0.6714429999999999,
+          "peakRssBytes": 10665984
+        },
+        "guarded-sync": {
+          "requestsPerSecond": 1492.8555875111363,
+          "requestSeconds": 1.3718674580000005,
+          "processCpuSeconds": 1.367686,
+          "peakRssBytes": 12959744
+        },
+        "live": {
+          "requestsPerSecond": 1328.6687915501786,
+          "requestSeconds": 1.5413924170000008,
+          "processCpuSeconds": 1.622684,
+          "peakRssBytes": 13533184
+        },
+        "live-split-store-tls": {
+          "requestsPerSecond": 1288.4568404262682,
+          "requestSeconds": 1.5894983329999999,
+          "processCpuSeconds": 1.659756,
+          "peakRssBytes": 13565952
+        },
+        "guarded-sync-split-store-tls": {
+          "requestsPerSecond": 1437.9587161589186,
+          "requestSeconds": 1.424241167,
+          "processCpuSeconds": 1.418937,
+          "peakRssBytes": 12959744
+        }
+      },
+      "allocationEquality": false,
+      "details": {
+        "sync": {
+          "allocations": [
+            943817,
+            943818
+          ],
+          "allocatedBytes": [
+            54065775,
+            54066303
+          ],
+          "p99Ms": 1.382749999999433
+        },
+        "guarded-sync": {
+          "allocations": [
+            943817,
+            943817
+          ],
+          "allocatedBytes": [
+            54065775,
+            54065775
+          ],
+          "p99Ms": 2.840374999999895
+        },
+        "live": {
+          "allocations": [
+            943817,
+            943817
+          ],
+          "allocatedBytes": [
+            54065775,
+            54065775
+          ],
+          "p99Ms": 3.2319580000006454
+        },
+        "live-split-store-tls": {
+          "allocations": [
+            943817,
+            943817
+          ],
+          "allocatedBytes": [
+            54065775,
+            54065775
+          ],
+          "p99Ms": 3.3871249999997133
+        },
+        "guarded-sync-split-store-tls": {
+          "allocations": [
+            943817,
+            943817
+          ],
+          "allocatedBytes": [
+            54065775,
+            54065775
+          ],
+          "p99Ms": 2.9403329999997396
+        }
+      }
+    }
+  }
+}

@@ -9,6 +9,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--output', type=Path, required=True)
 parser.add_argument('--sparse-index', action='store_true')
 parser.add_argument('--store-ranges', type=int, choices=range(1,17), default=4)
+parser.add_argument('--split-store-tls', action='store_true')
 parser.add_argument('--full-store-walk', action='store_true')
 parser.add_argument('--profile-store-walks', action='store_true')
 parser.add_argument('--repeat-snapshot-lookup', action='store_true')
@@ -35,6 +36,7 @@ try:
     run(['python3', base/'generate.py', '--output', source])
     recipe = json.loads((root/'benchmarks/execution/call-layout/results.json').read_text())['builds'][1]['command']
     cc = recipe[:recipe.index('-std=c11')] + [f'-DGATE_WORDS={args.gate_words}', f'-DNEOCLR_LIVE_STORE_RANGES={args.store_ranges}']
+    if args.split_store_tls: cc += ['-DNEOCLR_LIVE_SPLIT_STORE_TLS']
     if args.full_store_walk: cc += ['-DNEOCLR_LIVE_FULL_STORE_WALK']
     if args.profile_store_walks: cc += ['-DNEOCLR_LIVE_WALK_PROFILE']
     if args.repeat_snapshot_lookup: cc += ['-DNEOCLR_LIVE_REPEAT_SNAPSHOT_LOOKUP']

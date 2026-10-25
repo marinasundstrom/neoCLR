@@ -161,3 +161,7 @@ store cost despite fewer concurrent epochs. This does not admit shared-worker GC
 [Checked walk anchors](walk-anchor-results.md) use current allocation proofs to
 skip redundant heap prefixes. Optional header-visit diagnostics explain the larger
 queued-load gains; full-walk controls preserve the comparison and worst-case gaps.
+
+[Private store-state grouping](store-tls-results.md) follows the post-anchor CPU
+profile. It reduces verified TLS resolution while retaining separate heap ownership,
+all hint validation and a split-layout control.
