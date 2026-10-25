@@ -22726,3 +22726,10 @@ precision. See [evidence](../benchmarks/http-server/primitive-comparison/owned-b
   under saturated load. The next investigation follows these measured paths rather
   than assuming additional marker parallelism is the answer. See
   [profiles and limits](../benchmarks/execution/concurrent-workloads/packed-tls-results.md).
+
+
+## 2026-10-25 — Concurrent integration and balanced optimization
+
+- **Author direction:** After integration, optimize concurrent GC for HTTP throughput, CPU usage and allocations, using relevant standalone samples as well as HTTP workloads and comparing collectors when useful. Existing profiling may be extended.
+- **Assistant action:** Connected copied initial/current roots and registered object mutations to the real live marker in a bounded native test, with owner-only allocation and joined-mutator reclamation. [Evidence and limits](../benchmarks/execution/concurrent-worker-epoch/README.md) distinguish this checkpoint from persistent managed-worker integration.
+- **Open:** Complete worker/allocator/scheduler boundaries before claiming integration or default readiness; then compare tasks, collections, arrays, plaintext and JSON across relevant modes. No new performance improvement is established by the native safety tests.

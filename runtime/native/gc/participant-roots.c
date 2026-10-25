@@ -1,6 +1,5 @@
 #include "participant-roots.h"
 #include <string.h>
-#ifdef NEOCLR_WORKER_GC
 
 static int append(uint64_t *output, size_t *count, uint64_t value) {
     if (*count == SIZE_MAX) return 3;
@@ -68,5 +67,3 @@ int neoclr_gc_participant_root_capture_v1(const neoclr_aot_context *owner, const
     *result=used;
     return 0;
 }
-
-#endif

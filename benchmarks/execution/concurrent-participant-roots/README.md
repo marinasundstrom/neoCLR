@@ -6,8 +6,8 @@ shared-heap marking; it does not enable the concurrent collector on shared heaps
 
 ## Contracts and service ownership
 
-The GC service owns `runtime/native/gc/participant-roots.[ch]`, exposed only for the
-private `NEOCLR_WORKER_GC` configuration. The worker pool owns its participant
+The GC service owns private `runtime/native/gc/participant-roots.[ch]`. Root capture
+is now independent of `NEOCLR_WORKER_GC`; collector hooks still require that flag. The worker pool owns its participant
 rendezvous and buffer lifetime. Neither service owns the other's state. There is
 no managed API, object-layout, compiler-emission or Runtime Contract change.
 
@@ -90,6 +90,10 @@ gap; no new TSan/ASan claim is made. Source worker stacks returning is a targete
 lifetime test, not proof of every scheduling interleaving.
 
 ## Next integration boundary
+
+The [native live-epoch integration](../concurrent-worker-epoch/README.md) now connects
+copied roots and registered object writes with owner-only allocation and joined
+mutators. Persistent compiled-worker admission remains open.
 
 Connect stable initial roots and the [registered writer protocol](../concurrent-mutation-gate/workers-results.md)
 to one shared epoch while preserving allocation identity and payload lifetime.

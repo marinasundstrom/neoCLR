@@ -1,7 +1,6 @@
 #ifndef EXPERIMENT_PARTICIPANT_ROOTS_H
 #define EXPERIMENT_PARTICIPANT_ROOTS_H
 #include "native-gc.h"
-#ifdef NEOCLR_WORKER_GC
 /* Private experiment. All input contexts, descriptors and slot/lane values must
  * remain valid and quiescent throughout either call. No foreign TLS enumeration.
  * Output must not alias input storage. Values are conservative roots, not copied
@@ -12,5 +11,4 @@ int neoclr_gc_participant_root_count_v1(const neoclr_aot_context *, const neoclr
                            unsigned, size_t *);
 int neoclr_gc_participant_root_capture_v1(const neoclr_aot_context *, const neoclr_gc_participant *,
                              unsigned, uint64_t *, size_t, size_t *);
-#endif
 #endif

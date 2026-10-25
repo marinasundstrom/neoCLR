@@ -88,9 +88,11 @@ __attribute__((destructor)) static void drain(void) { uint64_t stats[5]; experim
     # Deliberately drop deletion candidates. The delayed sole-edge test must fail.
     gate_source = (base.parent/'concurrent-mutation-gate/gate.c').read_text()
     original = 'memcpy(&g->words[g->count++], (unsigned char *)payload + at, 8);'
-    assert gate_source.count(original) == 2
+    # Select the preserved owner-only implementation, not registered workers.
+    owner_source, worker_source = gate_source.split('static int write_locked(', 1)
+    assert owner_source.count(original) == 2
     negative_gate = out/'negative-gate.c'
-    negative_gate.write_text(gate_source.replace(original,'g->words[g->count++] = 0;',1))
+    negative_gate.write_text(owner_source.replace(original,'g->words[g->count++] = 0;',1) + 'static int write_locked(' + worker_source)
     negative = out/'negative'
     command = cc+['-std=c11','-O2','-Wall','-Wextra','-Werror','-pthread','-DNEOCLR_NATIVE_GC','-DNEOCLR_GC_PROFILE','-DNEOCLR_SHADOW_TEST','-I',base.parent/'concurrent-mutation-gate','-I',root/'runtime/native/gc',negative_gate,base/'lifetime.c',root/'runtime/native/gc/root-probe.c',source,'-o',negative]
     run(command)

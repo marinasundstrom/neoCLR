@@ -204,11 +204,12 @@ int32_t neoclr_string_intern_v1(const neoclr_aot_text *text, neoclr_aot_text_are
                                const neoclr_aot_text **output);
 /* Private entry-pump reader: the owner must validate its saved suspension boundary. */
 int32_t neoclr_gc_callback_read_suspended_v1(neoclr_aot_context *, uint64_t, void **, const neoclr_probe_frame *);
+/* Root capture input; independent of collector/worker admission. */
+typedef struct { neoclr_aot_context *context; const neoclr_probe_frame *frames; } neoclr_gc_participant;
 #ifdef NEOCLR_WORKER_GC
 /* Private synchronous worker collector attachment. Caller coordinates all
  * participants, whose frames/diagnostics remain paused for the whole collection.
  * Foreign TLS roots/resources are not enumerated by this contract. */
-typedef struct { neoclr_aot_context *context; const neoclr_probe_frame *frames; } neoclr_gc_participant;
 typedef int32_t (*neoclr_gc_worker_collector)(neoclr_aot_context *, const neoclr_probe_frame *);
 typedef void (*neoclr_gc_worker_boundary)(neoclr_aot_context *, const neoclr_probe_frame *, unsigned);
 extern _Thread_local neoclr_gc_worker_collector neoclr_gc_worker_collect_hook;
