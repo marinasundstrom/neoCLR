@@ -457,6 +457,11 @@ pub(crate) fn compile_into(
     long_range_calls: bool,
 ) -> Result<(), Error> {
     let live_stores = details.is_some_and(|d| d.experimental_live_gc_stores);
+    let stack_policy = if live_stores {
+        crate::mutation_admission::stack_policy()
+    } else {
+        crate::mutation_admission::StackPolicy::DISABLED
+    };
     if live_stores && !details.is_some_and(|d| d.native_gc && d.probe_stack_roots
         && d.reference_arena && !d.native_worker_safepoints && !d.native_host_bootstrap
         && (!d.entry_host_io || !d.entry_task_drain.is_empty()) && (d.entry_task_drain.is_empty()
@@ -947,15 +952,22 @@ pub(crate) fn compile_into(
         sig.returns.push(AbiParam::new(types::I32));
         let callback =
             module.declare_function("neoclr_invoke_void_callback_v1", Linkage::Export, &sig)?;
-        sig.params.pop();
-        let drain =
-            module.declare_function("neoclr_drain_default_queue_v1", Linkage::Export, &sig)?;
-        sig.params = [types::I64, types::I64, types::I64]
-            .map(AbiParam::new)
-            .to_vec();
-        let pump =
-            module.declare_function("neoclr_runtime_async_pump_v1", Linkage::Import, &sig)?;
-        Some((callback, drain, pump))
+        // A callback-only selection has no queue-drain body. Do not create an
+        // undefined generated export merely because async start is available.
+        let pump = if details.is_some_and(|d| !d.entry_task_drain.is_empty()) {
+            sig.params.pop();
+            let drain =
+                module.declare_function("neoclr_drain_default_queue_v1", Linkage::Export, &sig)?;
+            sig.params = [types::I64, types::I64, types::I64]
+                .map(AbiParam::new)
+                .to_vec();
+            let pump =
+                module.declare_function("neoclr_runtime_async_pump_v1", Linkage::Import, &sig)?;
+            Some((drain, pump))
+        } else {
+            None
+        };
+        Some((callback, pump))
     } else {
         None
     };
@@ -3122,7 +3134,7 @@ pub(crate) fn compile_into(
                 continue;
             }
             if details.is_some_and(|d| d.entry_task_drain.contains(&i))
-                && let Some((callback, drain, pump)) = runtime_async_callbacks
+                && let Some((callback, Some((drain, pump)))) = runtime_async_callbacks
             {
                 let callback = module.declare_func_in_func(callback, b.func);
                 let drain = module.declare_func_in_func(drain, b.func);
@@ -3926,10 +3938,7 @@ pub(crate) fn compile_into(
             let mut arguments = vec![];
             let mut stable_byrefs = vec![];
             let mut at = 0;
-            #[cfg(test)]
-            let preserve_byrefs = live_stores && std::env::var_os("NEOCLR_LIVE_SSA_BYREF_ARGUMENTS").is_some();
-            #[cfg(not(test))]
-            let preserve_byrefs = false;
+            let preserve_byrefs = live_stores && stack_policy.preserve_byrefs;
             for (argument_index, t) in p.args[i].iter().enumerate() {
                 let stable = preserve_byrefs && matches!(t, Ty::Address(_))
                     && immutable_argument_binding(&f.body, argument_index);
@@ -5910,10 +5919,10 @@ pub(crate) fn compile_into(
         if let Ok(path) = std::env::var("NEOCLR_LIVE_STACK_ARGUMENT_AUDIT") {
             std::fs::write(path, serde_json::to_vec_pretty(&crate::mutation_store::stack_audit::report(module, &bodies))?)?;
         }
-        #[cfg(test)]
-        if std::env::var_os("NEOCLR_LIVE_ELIDE_STACK_ARGUMENTS").is_some() {
-            let count = crate::mutation_store::stack_audit::elide(module, &mut live_bodies)?;
-            eprintln!("live stack-argument elision: {count} stores");
+        if stack_policy.elide {
+            let _count = crate::mutation_store::stack_audit::elide(module, &mut live_bodies, stack_policy.forward)?;
+            #[cfg(test)]
+            eprintln!("live stack-argument elision: {_count} stores");
         }
         for (id, mut context) in live_bodies {
             define_checked(module, id, &mut context, stack_budget, long_range_calls)?;

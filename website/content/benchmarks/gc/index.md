@@ -572,3 +572,8 @@ An intermittent macOS ARM64 stack-transfer failure was traced to missing explici
 instruction-cache publication. The shared JIT memory provider now performs the
 platform operation before exposing compiled code. This strengthens ordinary and
 concurrent JIT qualification; it is a correctness fix, not a new throughput claim.
+
+The qualified complete-caller stack proofs and immutable-byref policy are now
+integrated into the private concurrent backend. Standard HTTP qualification selects
+that policy explicitly. This preserves the earlier candidate's scoped results; it
+does not enable concurrent GC in ordinary hosting or admit moving/shared heaps.

@@ -80,6 +80,39 @@ pub(crate) fn check_call_closure(
     Ok(())
 }
 
+/// Qualified policy for the nonmoving, complete-closure live backend. This does
+/// not select concurrent GC or admit additional native providers/worker sharing.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) struct StackPolicy {
+    pub elide: bool,
+    pub forward: bool,
+    pub preserve_byrefs: bool,
+}
+
+impl StackPolicy {
+    pub const DISABLED: Self = Self { elide: false, forward: false, preserve_byrefs: false };
+    pub const QUALIFIED: Self = Self { elide: true, forward: true, preserve_byrefs: true };
+}
+
+pub(crate) fn stack_policy() -> StackPolicy {
+    #[cfg(test)]
+    {
+        // Retain historical experiment controls. The explicit qualified mode
+        // exercises exactly the same policy as the non-test backend.
+        if let Some(policy) = std::env::var_os("NEOCLR_LIVE_STACK_POLICY") {
+            assert_eq!(policy, "qualified", "unknown live stack policy");
+            return StackPolicy::QUALIFIED;
+        }
+        StackPolicy {
+            elide: std::env::var_os("NEOCLR_LIVE_ELIDE_STACK_ARGUMENTS").is_some(),
+            forward: std::env::var_os("NEOCLR_LIVE_ELIDE_FORWARDED_STACK_ARGUMENTS").is_some(),
+            preserve_byrefs: std::env::var_os("NEOCLR_LIVE_SSA_BYREF_ARGUMENTS").is_some(),
+        }
+    }
+    #[cfg(not(test))]
+    { StackPolicy::QUALIFIED }
+}
+
 // Typed primitive stores are the normal live-GC path. Qualification retains
 // the former generic lowering as an explicit same-compiler comparison.
 pub(crate) fn scalar_array_stores_enabled() -> bool {

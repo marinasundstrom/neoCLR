@@ -1,6 +1,6 @@
-//! Test-only audit and opt-in guard removal for bounded direct stack arguments.
+//! Complete-closure guard removal for bounded direct and forwarded stack arguments.
 //! Reporting is read-only; elision requires the complete generated closure.
-//! Address-taken and nonlocal functions are excluded. Forwarding is explicitly test-selected.
+//! Address-taken and nonlocal functions are excluded. Reports remain test-only.
 use super::{unambiguous_stack_arguments, stack_destination};
 use cranelift_codegen::cursor::{Cursor, FuncCursor};
 use cranelift_codegen::ir::{
@@ -46,6 +46,7 @@ fn parameter(
     None
 }
 
+#[cfg(test)]
 pub(crate) fn report(
     module: &impl Module,
     bodies: &[(FuncId, &ir::Function)],
@@ -60,18 +61,21 @@ enum StackArgument {
     Unknown,
 }
 
+#[cfg(test)]
 fn analyze(
     module: &impl Module,
     bodies: &[(FuncId, &ir::Function)],
 ) -> (serde_json::Value, HashMap<FuncId, Vec<(ir::Inst, i64)>>) {
     analyze_forwarded(module, bodies,
-        std::env::var_os("NEOCLR_LIVE_FORWARD_STACK_ARGUMENTS").is_some())
+        std::env::var_os("NEOCLR_LIVE_FORWARD_STACK_ARGUMENTS").is_some()
+            || std::env::var_os("NEOCLR_LIVE_STACK_POLICY").is_some(), true)
 }
 
 fn analyze_forwarded(
     module: &impl Module,
     bodies: &[(FuncId, &ir::Function)],
     forwarding: bool,
+    diagnostics: bool,
 ) -> (serde_json::Value, HashMap<FuncId, Vec<(ir::Inst, i64)>>) {
     let mut sites: HashMap<FuncId, Vec<(ir::Inst, i64)>> = HashMap::new();
     let mut calls: HashMap<FuncId, Vec<(FuncId, Vec<StackArgument>)>> = HashMap::new();
@@ -207,17 +211,19 @@ fn analyze_forwarded(
                 }
             }
         }
-        let mut proofs: Vec<_> = proofs.into_iter().map(|(parameter, bytes)| serde_json::json!({"parameter":parameter,"availableBytes":bytes})).collect();
-        proofs.sort_by_key(|p| p["parameter"].as_u64());
-        rows.push(serde_json::json!({"id":id.as_u32(),"name":declaration.name,"addressTaken":escaped.contains(&id),"local":declaration.linkage==Linkage::Local,"callSites":incoming.map_or(0,Vec::len),"stackParameters":proofs,"guardedStores":guarded,"candidateStores":eligible}));
+        if diagnostics {
+            let mut proofs: Vec<_> = proofs.into_iter().map(|(parameter, bytes)| serde_json::json!({"parameter":parameter,"availableBytes":bytes})).collect();
+            proofs.sort_by_key(|p| p["parameter"].as_u64());
+            rows.push(serde_json::json!({"id":id.as_u32(),"name":declaration.name,"addressTaken":escaped.contains(&id),"local":declaration.linkage==Linkage::Local,"callSites":incoming.map_or(0,Vec::len),"stackParameters":proofs,"guardedStores":guarded,"candidateStores":eligible}));
+        }
     }
     (
-        serde_json::json!({"scope":"Diagnostic only: stack arguments anchored by complete callers; forwarding requires established bounds, never circular assumptions. No code changed by reporting.","forwarding":forwarding,"functions":rows}),
+        if diagnostics { serde_json::json!({"scope":"Diagnostic only: stack arguments anchored by complete callers; forwarding requires established bounds, never circular assumptions. No code changed by reporting.","forwarding":forwarding,"functions":rows}) } else { serde_json::Value::Null },
         sites,
     )
 }
 
-/// Test-only experiment. The caller must supply every generated function before
+/// The caller must supply every generated function before
 /// definition and must not embed function addresses in data. values.rs satisfies
 /// this for its deferred live closure: all function addresses are explicit IR.
 /// Local direct callees execute while their callers' stack slots remain alive.
@@ -225,11 +231,12 @@ fn analyze_forwarded(
 pub(crate) fn elide(
     module: &impl Module,
     bodies: &mut [(FuncId, cranelift_codegen::Context)],
+    forwarding: bool,
 ) -> Result<usize, Box<dyn std::error::Error>> {
     elide_policy(
         module,
         bodies,
-        std::env::var_os("NEOCLR_LIVE_ELIDE_FORWARDED_STACK_ARGUMENTS").is_some(),
+        forwarding,
     )
 }
 
@@ -245,15 +252,15 @@ fn elide_policy(
         &crate::mutation_admission::root_providers(module),
     )?;
     let supplied: HashSet<_> = refs.iter().map(|(id, _)| *id).collect();
-    if module
-        .declarations()
-        .get_functions()
-        .any(|(id, decl)| decl.linkage != Linkage::Import && !supplied.contains(&id))
-    {
-        return Err("stack-argument elision requires every generated declaration".into());
+    let missing: Vec<_> = module.declarations().get_functions()
+        .filter(|(id, decl)| decl.linkage != Linkage::Import && !supplied.contains(id))
+        .map(|(id, decl)| format!("{} ({id:?})", decl.name.as_deref().unwrap_or("<unnamed>")))
+        .collect();
+    if !missing.is_empty() {
+        return Err(format!("stack-argument elision requires every generated declaration: {}", missing.join(", ")).into());
     }
     // The diagnostic flag alone never selects this transformation.
-    let (_, sites) = analyze_forwarded(module, &refs, forwarding);
+    let (_, sites) = analyze_forwarded(module, &refs, forwarding, false);
     let count = sites.values().map(Vec::len).sum();
     for (id, ctx) in bodies {
         for &(inst, width) in sites.get(id).into_iter().flatten() {
@@ -391,12 +398,12 @@ mod tests {
             .map(|r| r["candidateStores"].as_u64().unwrap() as usize)
             .sum::<usize>();
         let mut bodies = vec![(id, callee), (caller_id, caller)];
-        assert_eq!(elide(&module, &mut bodies).unwrap(), expected);
+        assert_eq!(elide(&module, &mut bodies, false).unwrap(), expected);
         for (_, ctx) in &mut bodies {
             cranelift_codegen::verify_function(&ctx.func, module.isa()).unwrap();
         }
         // Applying the pass twice must not add stores or disturb cleanup branches.
-        assert_eq!(elide(&module, &mut bodies).unwrap(), 0);
+        assert_eq!(elide(&module, &mut bodies, false).unwrap(), 0);
         let unchanged: Vec<_> = bodies
             .iter()
             .map(|(_, c)| c.func.display().to_string())
@@ -405,7 +412,7 @@ mod tests {
             .declare_function("missing_body", Linkage::Local, &bodies[0].1.func.signature)
             .unwrap();
         assert!(
-            elide(&module, &mut bodies)
+            elide(&module, &mut bodies, false)
                 .unwrap_err()
                 .to_string()
                 .contains("every generated declaration")
@@ -697,8 +704,8 @@ mod forwarding_tests {
         }
         if reverse { bodies.reverse(); }
         let refs: Vec<_> = bodies.iter().map(|(id,ctx)| (*id,&ctx.func)).collect();
-        let direct = analyze_forwarded(&module, &refs, false).0;
-        let forwarded = analyze_forwarded(&module, &refs, true).0;
+        let direct = analyze_forwarded(&module, &refs, false, true).0;
+        let forwarded = analyze_forwarded(&module, &refs, true, true).0;
         let find = |report: serde_json::Value| report["functions"].as_array().unwrap().iter()
             .find(|row| row["name"] == "chain_3").unwrap().clone();
         (find(direct),find(forwarded))

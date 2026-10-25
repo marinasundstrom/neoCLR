@@ -49,7 +49,10 @@ continues as an experimental native development path.
   JIT instructions through the platform cache API, correcting intermittent
   execution failures when generated-code storage is reused.
 - Continue the **concurrent native GC experiment**, including live marking,
-  mutation/root safety, JIT/AOT consumer integration and tunable collection policy.
+  mutation/root safety and tunable collection policy. Integrate qualified
+  complete-caller stack proofs and immutable byref handling into the private
+  JIT/AOT backend, retaining roots and guards for unknown destinations. Avoid
+  unused async queue-drain declarations and discarded compiler audit reports.
   Integrate qualified typed scalar stores within the private concurrent candidate,
   retaining a generic-store comparison. Earlier qualification halves CPU in the
   standalone buffer-reuse workload; HTTP effects are small and mixed. These

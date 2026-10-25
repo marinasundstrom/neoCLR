@@ -12,12 +12,13 @@ p.add_argument('--reuse-assembly',action='store_true',help='Use an existing comp
 p.add_argument('--scalar-array-stores',action='store_true',default=True,help='Retained alias for the normal typed path')
 p.add_argument('--generic-scalar-stores',dest='scalar_array_stores',action='store_false',help='Build the former generic-store comparison')
 p.add_argument('--output',type=Path,required=True)
+p.add_argument('--runner',type=Path,help='Pinned codegen test runner; defaults to the local release runner')
 a=p.parse_args()
 root=Path(__file__).resolve().parents[3]
 base=root/'benchmarks/http-server/pipelining'
 out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
 bundle=root/'target/uri-efficiency-bundle/bundle'
-runner=root/'target/release/deps/neoclr_codegen-12f33f26d2ff4df0'
+runner=(a.runner or root/'target/release/deps/neoclr_codegen-12f33f26d2ff4df0').resolve()
 assembly=base/'bin/neoclr/BenchmarkTests.dll'
 r=dict(passed=False,scalarArrayStores=a.scalar_array_stores,scope='Build only; execute smoke and measured clients separately',commands=[],recipes={},inputs={})
 
@@ -53,11 +54,12 @@ try:
         env=dict(os.environ)
         env.pop('NEOCLR_LIVE_SCALAR_ARRAY_STORES',None)
         env.pop('NEOCLR_LIVE_GENERIC_SCALAR_ARRAY_STORES',None)
+        env.pop('NEOCLR_LIVE_STACK_POLICY',None)
         if mode=='live' and not a.scalar_array_stores:settings['NEOCLR_LIVE_GENERIC_SCALAR_ARRAY_STORES']='1'
         for flag in ['NEOCLR_LIVE_ELIDE_STACK_ARGUMENTS','NEOCLR_LIVE_FORWARD_STACK_ARGUMENTS',
                      'NEOCLR_LIVE_ELIDE_FORWARDED_STACK_ARGUMENTS','NEOCLR_LIVE_SSA_BYREF_ARGUMENTS']:
             env.pop(flag,None)
-            if mode=='live':settings[flag]='1'
+        if mode=='live':settings['NEOCLR_LIVE_STACK_POLICY']='qualified'
         env.update(settings)
         launch=list(map(str,[runner,'mutation_store::tests::full_http_selection_compiles_with_live_gc','--exact','--ignored','--nocapture']))
         run(launch,env)

@@ -45,7 +45,9 @@ storage reuse, across ordinary and experimental concurrent paths.
 
 Concurrent native GC continues as a separate experimental track. Work includes
 live marking, mutation/root safety, JIT/AOT consumers, worker coordination and
-collection-policy tuning. Typed scalar stores are integrated within that private candidate and reduce CPU
+collection-policy tuning. Qualified stack-bound proofs and immutable byref handling
+are integrated into this private backend while preserving roots and guarded unknown
+destinations. Typed scalar stores are integrated within that private candidate and reduce CPU
 substantially in a reusable-buffer workload, while HTTP effects are small and mixed. The synchronous
 collector remains the default; this draft does not announce a broad concurrent-GC
 throughput or latency advantage, generations, compaction or general virtual threads.

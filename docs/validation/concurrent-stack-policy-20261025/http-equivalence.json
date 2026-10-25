@@ -1,0 +1,12 @@
+{
+  "sync.o": {
+    "identical": true,
+    "sha256": "75460fbce00aa54fb99882d705a30932312c8c0ab42f3a51ed1edc28c85bcad6",
+    "prior": "target/gc-stack-transfer-investigation/http-build/sync.o"
+  },
+  "live.o": {
+    "identical": true,
+    "sha256": "ddb835ce245a3ee1c0d56a8a2a59ce0f25af2de721e0ab04ee8990a91a441e8e",
+    "prior": "target/gc-stack-transfer-investigation/http-build/live.o"
+  }
+}

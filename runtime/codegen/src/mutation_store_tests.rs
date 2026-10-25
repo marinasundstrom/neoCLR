@@ -1108,6 +1108,10 @@ fn emit_managed(source: &str) {
             assert_eq!(object.symbols().any(|s| s.is_undefined()
                 && s.name().unwrap_or("").trim_start_matches('_') == "experiment_gc_static_storage_rooted_v1"), enabled);
         }
+        if source.starts_with(".module LiveAsyncWrappers\n") {
+            assert!(!object.symbols().any(|s| s.name().unwrap_or("").trim_start_matches('_')
+                == "neoclr_drain_default_queue_v1"));
+        }
         if source.starts_with(".module LivePrimitiveArrays") {
             assert_eq!(object.symbols().any(|s| s.is_undefined()
                 && s.name().unwrap_or("").trim_start_matches('_') == "experiment_gc_store_scalar"),

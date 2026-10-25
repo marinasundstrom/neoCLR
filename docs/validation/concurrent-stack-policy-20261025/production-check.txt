@@ -1,0 +1,3 @@
+    Checking neoclr v0.1.0-preview.13 (/Users/robert/Projects/neoclr)
+    Checking neoclr-codegen v0.0.0 (/Users/robert/Projects/neoclr/runtime/codegen)
+    Finished `release` profile [optimized] target(s) in 11.63s
