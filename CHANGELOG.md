@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-25
 
+- Split diagnostic scheduler acquisition into polling, idle GC and delivery-root phases; 16 AOT/JIT sync/concurrent HTTP cases pass 16,640 responses and balanced phase counts. Polling dominates acquisition; idle GC is 0.03–1.19 ms owner CPU per invocation in this cohort. Preserve cleanup semantics and return to measured scalar-store overhead; no runtime/default or throughput claim.
+
 - Extend copied-carrier diagnostics with root/resume, scheduler acquisition and readiness-wait phases. Sanitized lifetime/failure controls and 16 native HTTP cells pass 16,640 responses; root/resume accounts for 0.4–1.9% of invocation CPU including instrumentation. Acquisition includes idle GC and needs finer attribution; no runtime/default change.
 
 - Record the author-supplied generational concurrent GC proposal against CoreCLR allocation/background collection guidance, separating TLAB, remembered-set and relocation prerequisites from current implementation. Keep measured runtime optimization active; no collector/default change.

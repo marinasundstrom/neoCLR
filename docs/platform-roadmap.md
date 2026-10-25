@@ -1,5 +1,7 @@
 # neoCLR platform roadmap
 
+**Scheduler split (2026-10-25):** [Sixteen nested acquisition profiles](../benchmarks/gc-suite/concurrency/scheduler-phases.md) pass 16,640 responses; polling dominates acquisition and idle GC contributes 0.03–1.19 ms owner CPU per invocation. These services do not explain most concurrent overhead here. Resume qualification of the drafted typed scalar-store optimization against the low-allocation/high-write standalone workload, preserving scheduler/GC ownership semantics. Default and wider scaling remain open.
+
 **Fiber phase attribution (2026-10-25):** [Sixteen native HTTP profiles](../benchmarks/gc-suite/concurrency/fiber-phases.md) pass 16,640 responses; root/resume work accounts for 0.4–1.9% of instrumented invocation CPU and does not explain the concurrent gap. Next separate socket polling from idle GC within scheduler acquisition before changing ownership boundaries.
 
 **Generational architecture input (2026-10-25):** The author supplied an external recommendation for TLABs, copying young collections and concurrent old marking. [Evaluation and prerequisites](design/generational-concurrent-gc-direction.md) distinguish that proposal from current nonmoving behavior. Continue measured root/queue/boundary work; evaluate allocation regions, survival and relocation safety before committing to generation or compaction policies. No default or milestone replacement.

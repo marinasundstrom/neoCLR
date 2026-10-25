@@ -163,6 +163,14 @@ def trial(mode,sample,protocol,repetition):
             assert len(row['fiberPhases'])==5
             for name in ['resume_prepare','resume_finish','yield_roots']:
                 assert row['fiberPhases'][name]['count']==row['fiberSwitch']['resumes']
+        if built.get('schedulerPhaseProfile'):
+            matches=re.findall(r'^SCHEDULER_PHASE (\w+) (\d+) (\d+) (\d+)$',''.join(errors),re.M)
+            assert len(matches)==3,matches
+            phases={name:dict(count=int(count),wallNs=int(wall),threadCpuNs=int(cpu)) for name,count,wall,cpu in matches}
+            assert set(phases)=={'poll','idle_gc','delivery_roots'}
+            assert phases['poll']['count']==row['fiberPhases']['scheduler_acquire']['count']
+            assert phases['poll']['count']==phases['idle_gc']['count']+phases['delivery_roots']['count']
+            row['schedulerPhases']=phases
         if recipe['collector']=='live':
             counts=next(list(map(int,line.split()[1:])) for line in errors if line.startswith('CANDIDATE '))
             assert counts[0]==counts[1]+counts[2] and counts[5]==0

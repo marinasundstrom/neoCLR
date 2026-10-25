@@ -83,3 +83,6 @@ from surrounding root/dispatch work; 16 checked HTTP cases pass.
 
 [Root/resume and scheduler phase profiles](fiber-phases.md) further separate carrier
 coordination from guest work; acquisition still includes idle GC.
+
+[Scheduler acquisition split](scheduler-phases.md) attributes most acquisition CPU
+to polling, with idle GC a small component in the checked HTTP cohort.

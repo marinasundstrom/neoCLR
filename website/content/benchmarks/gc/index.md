@@ -515,3 +515,9 @@ both collectors. Root parking and resume preparation/cleanup account for about
 acquisition costs more but includes idle GC; that internal split remains under
 investigation. These are attribution profiles, not new throughput benchmarks or
 a collector-default qualification.
+
+A further 16-case profile separates acquisition: native polling consumes roughly
+7.5–15.3 ms owner CPU per invocation, versus 0.03–1.19 ms for idle GC. All 16,640
+responses pass. Idle collection here is only one collection trigger; these numbers
+do not measure total GC CPU. The next optimization targets repeated scalar-store
+admission identified in the standalone workload matrix.
