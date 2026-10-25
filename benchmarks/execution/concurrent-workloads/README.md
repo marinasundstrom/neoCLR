@@ -152,3 +152,8 @@ validation as the default; the extra native TLS is opt-in only.
 [Within-store snapshot reuse](snapshot-reuse-results.md) removes a duplicate search
 without new cache state. Native assembly verifies the elimination; matched runs
 show modest CPU/throughput gains with equal allocations.
+
+[Concurrent client matrix](client-concurrency-results.md) compares one, four and
+sixteen connection-close clients. It separates client/server CPU, response latency,
+allocation variation and diagnostic profiles; queued load exposes a larger guarded
+store cost despite fewer concurrent epochs. This does not admit shared-worker GC.

@@ -1,5 +1,6 @@
-"""Matched sequential HTTP work: sync versus live GC, not saturated capacity."""
+"""Matched fixed-work HTTP clients: sync versus live GC; not cross-framework capacity."""
 import argparse
+import concurrent.futures
 import hashlib
 import json
 import queue
@@ -16,6 +17,8 @@ p.add_argument('--live-object',type=Path,required=True)
 p.add_argument('--previous-live-object',type=Path)
 p.add_argument('--output',type=Path,required=True)
 p.add_argument('--requests',type=int,default=256)
+p.add_argument('--allow-allocation-variation',action='store_true',help='Report scheduling-dependent allocation ranges instead of requiring equality.')
+p.add_argument('--concurrency',type=int,default=1, help='Independent connection-close client loops (1..128).')
 p.add_argument('--sample',choices=['plain','json'],default='plain')
 p.add_argument('--warmup',type=int,default=16)
 p.add_argument('--pairs',type=int,default=3)
@@ -34,6 +37,7 @@ p.add_argument('--compare-store-ranges',action='store_true')
 p.add_argument('--profile-cpu', action='store_true', help='macOS sample capture; diagnostic timings only.')
 p.add_argument('--profile-store-sites', action='store_true')
 a=p.parse_args();assert a.requests>0 and a.warmup>=0 and a.pairs>0
+assert 1<=a.concurrency<=min(128,a.requests)
 if a.profile_cpu:
  assert shutil.which('sample') and a.requests>=8192 and not a.profile_store_sites
 assert not (a.compare_snapshot_lookup and (a.compare_header_proof or a.compare_inline_validation or a.compare_split_tls or a.compare_serialized_store or a.previous_live_object or a.compare_store_ranges or a.compare_store_cache or a.compare_exact_store or a.disable_store_cache))
@@ -47,7 +51,7 @@ assert not (a.previous_live_object and (a.compare_store_ranges or a.compare_stor
 assert not (a.compare_store_ranges and (a.disable_store_cache or a.compare_store_cache or a.compare_exact_store or a.store_ranges==1))
 root=Path(__file__).resolve().parents[3];base=Path(__file__).resolve().parent
 out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
-r={'passed':False,'compareSnapshotLookup':a.compare_snapshot_lookup,'compareHeaderProof':a.compare_header_proof,'compareInlineValidation':a.compare_inline_validation,'compareSplitTls':a.compare_split_tls,'compareSerializedStore':a.compare_serialized_store,'gateWords':a.gate_words,'storeCache':not a.disable_store_cache,'compareStoreCache':a.compare_store_cache,'compareExactStore':a.compare_exact_store,'storeRanges':a.store_ranges,'compareStoreRanges':a.compare_store_ranges,'sample':a.sample,'scope':'Sequential loopback AOT fixed-work comparison; no saturation/cross-framework or GC-pause-distribution claim.', 'commands':[],'trials':[],'inputs':{}}
+r={'passed':False,'allowAllocationVariation':a.allow_allocation_variation,'concurrency':a.concurrency,'compareSnapshotLookup':a.compare_snapshot_lookup,'compareHeaderProof':a.compare_header_proof,'compareInlineValidation':a.compare_inline_validation,'compareSplitTls':a.compare_split_tls,'compareSerializedStore':a.compare_serialized_store,'gateWords':a.gate_words,'storeCache':not a.disable_store_cache,'compareStoreCache':a.compare_store_cache,'compareExactStore':a.compare_exact_store,'storeRanges':a.store_ranges,'compareStoreRanges':a.compare_store_ranges,'sample':a.sample,'scope':'Loopback AOT fixed-work comparison; Python client scheduling and connection-close costs included. No saturation/cross-framework or GC-pause-distribution claim.', 'commands':[],'trials':[],'inputs':{}}
 if a.profile_cpu:r['diagnosticOnly']='External CPU sampling affects timings; do not use this cohort for throughput claims.'
 def run(cmd):
  x=subprocess.run(list(map(str,cmd)),cwd=root,capture_output=True,text=True,timeout=120)
@@ -180,15 +184,7 @@ static void report_measurement(void) {
      line=events.get(timeout=30)
      if line.startswith('READY '):break
     _,port,control=line.split();trial['startupSeconds']=time.perf_counter()-started
-    latencies=[]
-    for index in range(a.warmup+a.requests):
-     if index==a.warmup:
-      if a.profile_cpu:
-       profile_path=out/f'{mode}-{pair}-cpu.txt'
-       profile_command=['sample',str(proc.pid),'1','-file',str(profile_path)]
-       profiler=subprocess.Popen(profile_command,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
-       trial['cpuProfile']={'command':profile_command,'path':str(profile_path)}
-      measured=time.perf_counter()
+    def request():
      before=time.perf_counter()
      with socket.create_connection(('127.0.0.1',int(port)),timeout=10) as connection:
       connection.sendall(b'GET / HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n')
@@ -201,7 +197,32 @@ static void report_measurement(void) {
       assert header.startswith(b'HTTP/1.1 200 ')
       if a.sample=='plain':assert body==b'xxxxxxxxxx'
       else:assert json.loads(body)=={'id':42,'name':'Café team','active':True}
-     if index>=a.warmup:latencies.append(time.perf_counter()-before)
+     return time.perf_counter()-before
+    for _ in range(a.warmup):request()
+    if a.profile_cpu:
+     profile_path=out/f'{mode}-{pair}-cpu.txt'
+     profile_command=['sample',str(proc.pid),'1','-file',str(profile_path)]
+     profiler=subprocess.Popen(profile_command,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
+     trial['cpuProfile']={'command':profile_command,'path':str(profile_path)}
+    if a.concurrency==1:
+     client_cpu=time.process_time();measured=time.perf_counter()
+     latencies=[request() for _ in range(a.requests)]
+    else:
+     ready=threading.Barrier(a.concurrency+1,timeout=10)
+     start_requests=threading.Event()
+     def client(count):
+      ready.wait()
+      assert start_requests.wait(timeout=10)
+      return [request() for _ in range(count)]
+     with concurrent.futures.ThreadPoolExecutor(max_workers=a.concurrency) as pool:
+      futures=[pool.submit(client,a.requests//a.concurrency+(worker<a.requests%a.concurrency)) for worker in range(a.concurrency)]
+      ready.wait()
+      client_cpu=time.process_time();measured=time.perf_counter()
+      start_requests.set()
+      latencies=[latency for future in futures for latency in future.result()]
+    trial['clientCpuSeconds']=time.process_time()-client_cpu
+    trial['clientConcurrency']=a.concurrency
+    assert len(latencies)==a.requests
     trial['requestSeconds']=time.perf_counter()-measured
     trial['requestsPerSecond']=a.requests/trial['requestSeconds']
     trial['clientLatencyMs']={str(q):quantile(latencies,q)*1000 for q in [.5,.95,.99,1]}
@@ -240,8 +261,8 @@ static void report_measurement(void) {
     for reader in readers:reader.join(timeout=2)
     trial.update(exitCode=proc.returncode,stdout=lines,stderr=errors,processWallSeconds=time.perf_counter()-started)
     (out/'progress.json').write_text(json.dumps(r,indent=2)+'\n')
- assert len({t['allocations'] for t in r['trials']})==1
- assert len({t['gcProfile']['allocatedBytes'] for t in r['trials']})==1
+ r['allocationEquality']=len({(t['allocations'],t['gcProfile']['allocatedBytes']) for t in r['trials']})==1
+ if not a.allow_allocation_variation:assert r['allocationEquality']
  r['summary']={mode:{field:statistics.median(t[field] for t in r['trials'] if t['mode']==mode) for field in ['requestsPerSecond','requestSeconds','processCpuSeconds','peakRssBytes']} for mode in executables}
  for path in [a.sync_object.resolve(),a.live_object.resolve(),Path(__file__),recipe_path,host,source,provider,base/'native-providers.py',base.parent/'concurrent-live/native-scopes.py',base.parent/'concurrent-mutation-gate/gate.c',base.parent/'concurrent-mutation-gate/gate.h',base.parent/'concurrent-live/store.h',*[Path(x) for x in recipe if Path(x).is_file()],*[p for p in (root/'runtime/native').rglob('*') if p.suffix in ['.c','.h']]]:
   r['inputs'][str(path)]=hashlib.sha256(path.read_bytes()).hexdigest()

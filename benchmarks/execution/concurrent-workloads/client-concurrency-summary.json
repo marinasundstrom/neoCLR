@@ -1,0 +1,701 @@
+{
+  "scope": "Summarize matched HTTP client concurrency without claiming GC pause distributions.",
+  "notes": [
+    "Median trial values; latency percentiles are medians of trial percentiles, not pooled percentiles.",
+    "Client latency includes connection setup, queueing, response validation and client scheduling.",
+    "Server process CPU includes startup, warmup and cleanup; client CPU covers the measured request interval.",
+    "Collection timing is collector instrumentation, not application pause time.",
+    "Concurrent clients do not imply multiple server workers or qualified shared heaps."
+  ],
+  "cohorts": [
+    {
+      "sample": "plain",
+      "concurrency": 1,
+      "allocationEquality": true,
+      "modes": {
+        "guarded-sync": {
+          "requestsPerSecond": 1894.727516298498,
+          "processCpuSeconds": 1.009465,
+          "clientCpuSeconds": 0.11808700000000003,
+          "peakRssBytes": 11108352,
+          "allocations": 429856,
+          "trialCount": 3,
+          "allocationRange": [
+            429856,
+            429856
+          ],
+          "allocatedBytesRange": [
+            33057881,
+            33057881
+          ],
+          "clientLatencyMs": {
+            "0.5": 0.5199170000000919,
+            "0.95": 0.5606250000003143,
+            "0.99": 0.6147079999996308,
+            "1": 7.574625000000168
+          },
+          "gcProfile": {
+            "attempts": 2078,
+            "nanoseconds": 39373000,
+            "maximumNanoseconds": 34000,
+            "allocatedBytes": 33057881,
+            "peakLiveBytes": 46231,
+            "peakArenaUsed": 89264
+          },
+          "candidateCounts": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "live": {
+          "requestsPerSecond": 1867.3552432142133,
+          "processCpuSeconds": 1.1286749999999999,
+          "clientCpuSeconds": 0.1264369999999999,
+          "peakRssBytes": 11354112,
+          "allocations": 429856,
+          "trialCount": 3,
+          "allocationRange": [
+            429856,
+            429856
+          ],
+          "allocatedBytesRange": [
+            33057881,
+            33057881
+          ],
+          "clientLatencyMs": {
+            "0.5": 0.5272080000002788,
+            "0.95": 0.5565829999998329,
+            "0.99": 0.608750000001379,
+            "1": 6.598207999999772
+          },
+          "gcProfile": {
+            "attempts": 6226,
+            "nanoseconds": 104780000,
+            "maximumNanoseconds": 54000,
+            "allocatedBytes": 33057881,
+            "peakLiveBytes": 57866,
+            "peakArenaUsed": 81624
+          },
+          "candidateCounts": [
+            2075,
+            2074,
+            1,
+            2073,
+            2074,
+            0
+          ]
+        },
+        "sync": {
+          "requestsPerSecond": 4839.68113165357,
+          "processCpuSeconds": 0.388744,
+          "clientCpuSeconds": 0.09059600000000001,
+          "peakRssBytes": 9273344,
+          "allocations": 429856,
+          "trialCount": 3,
+          "allocationRange": [
+            429856,
+            429856
+          ],
+          "allocatedBytesRange": [
+            33057881,
+            33057881
+          ],
+          "clientLatencyMs": {
+            "0.5": 0.20033300000044107,
+            "0.95": 0.228165999999419,
+            "0.99": 0.27441699999997127,
+            "1": 0.9950419999995574
+          },
+          "gcProfile": {
+            "attempts": 2078,
+            "nanoseconds": 36720000,
+            "maximumNanoseconds": 34000,
+            "allocatedBytes": 33057881,
+            "peakLiveBytes": 41815,
+            "peakArenaUsed": 81752
+          }
+        }
+      }
+    },
+    {
+      "sample": "json",
+      "concurrency": 1,
+      "allocationEquality": true,
+      "modes": {
+        "guarded-sync": {
+          "requestsPerSecond": 1181.1186817377527,
+          "processCpuSeconds": 1.6586480000000001,
+          "clientCpuSeconds": 0.14598799999999998,
+          "peakRssBytes": 12943360,
+          "allocations": 943817,
+          "trialCount": 3,
+          "allocationRange": [
+            943817,
+            943817
+          ],
+          "allocatedBytesRange": [
+            54065775,
+            54065775
+          ],
+          "clientLatencyMs": {
+            "0.5": 0.8390000000000342,
+            "0.95": 0.8650000000001157,
+            "0.99": 0.8862919999996777,
+            "1": 7.556208000000453
+          },
+          "gcProfile": {
+            "attempts": 4150,
+            "nanoseconds": 100464000,
+            "maximumNanoseconds": 40000,
+            "allocatedBytes": 54065775,
+            "peakLiveBytes": 51065,
+            "peakArenaUsed": 92768
+          },
+          "candidateCounts": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "live": {
+          "requestsPerSecond": 1095.1276025464172,
+          "processCpuSeconds": 1.8782510000000001,
+          "clientCpuSeconds": 0.14786299999999997,
+          "peakRssBytes": 13254656,
+          "allocations": 943817,
+          "trialCount": 3,
+          "allocationRange": [
+            943817,
+            943817
+          ],
+          "allocatedBytesRange": [
+            54065775,
+            54065775
+          ],
+          "clientLatencyMs": {
+            "0.5": 0.9032920000002775,
+            "0.95": 0.9307920000001246,
+            "0.99": 0.9831249999994185,
+            "1": 7.953833000000188
+          },
+          "gcProfile": {
+            "attempts": 6238,
+            "nanoseconds": 126671000,
+            "maximumNanoseconds": 36000,
+            "allocatedBytes": 54065775,
+            "peakLiveBytes": 56941,
+            "peakArenaUsed": 100344
+          },
+          "candidateCounts": [
+            2079,
+            2078,
+            1,
+            13,
+            2078,
+            0
+          ]
+        },
+        "sync": {
+          "requestsPerSecond": 2438.777759084186,
+          "processCpuSeconds": 0.6512070000000001,
+          "clientCpuSeconds": 0.130084,
+          "peakRssBytes": 10649600,
+          "allocations": 943817,
+          "trialCount": 3,
+          "allocationRange": [
+            943817,
+            943817
+          ],
+          "allocatedBytesRange": [
+            54065775,
+            54065775
+          ],
+          "clientLatencyMs": {
+            "0.5": 0.40370899999953025,
+            "0.95": 0.4264160000007067,
+            "0.99": 0.4491670000001946,
+            "1": 9.588707999999002
+          },
+          "gcProfile": {
+            "attempts": 4144,
+            "nanoseconds": 90810000,
+            "maximumNanoseconds": 40000,
+            "allocatedBytes": 54065775,
+            "peakLiveBytes": 51065,
+            "peakArenaUsed": 92768
+          }
+        }
+      }
+    },
+    {
+      "sample": "plain",
+      "concurrency": 4,
+      "allocationEquality": true,
+      "modes": {
+        "guarded-sync": {
+          "requestsPerSecond": 1625.2317224916835,
+          "processCpuSeconds": 1.259057,
+          "clientCpuSeconds": 0.11780600000000008,
+          "peakRssBytes": 11124736,
+          "allocations": 429856,
+          "trialCount": 3,
+          "allocationRange": [
+            429856,
+            429856
+          ],
+          "allocatedBytesRange": [
+            33057881,
+            33057881
+          ],
+          "clientLatencyMs": {
+            "0.5": 2.409916999999595,
+            "0.95": 2.629291000000755,
+            "0.99": 2.7318750000002723,
+            "1": 20.315667000000204
+          },
+          "gcProfile": {
+            "attempts": 1888,
+            "nanoseconds": 53333000,
+            "maximumNanoseconds": 45000,
+            "allocatedBytes": 33057881,
+            "peakLiveBytes": 49657,
+            "peakArenaUsed": 99296
+          },
+          "candidateCounts": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "live": {
+          "requestsPerSecond": 1294.040984422495,
+          "processCpuSeconds": 1.609649,
+          "clientCpuSeconds": 0.122336,
+          "peakRssBytes": 11730944,
+          "allocations": 429856,
+          "trialCount": 3,
+          "allocationRange": [
+            429856,
+            429856
+          ],
+          "allocatedBytesRange": [
+            33057881,
+            33057881
+          ],
+          "clientLatencyMs": {
+            "0.5": 3.0266660000002332,
+            "0.95": 3.3295420000003517,
+            "0.99": 3.42095799999953,
+            "1": 20.437540999999726
+          },
+          "gcProfile": {
+            "attempts": 1954,
+            "nanoseconds": 64532000,
+            "maximumNanoseconds": 54000,
+            "allocatedBytes": 33057881,
+            "peakLiveBytes": 67767,
+            "peakArenaUsed": 146936
+          },
+          "candidateCounts": [
+            959,
+            958,
+            1,
+            32,
+            34,
+            0
+          ]
+        },
+        "sync": {
+          "requestsPerSecond": 4963.3835346779515,
+          "processCpuSeconds": 0.40759500000000004,
+          "clientCpuSeconds": 0.09850800000000004,
+          "peakRssBytes": 9306112,
+          "allocations": 429856,
+          "trialCount": 3,
+          "allocationRange": [
+            429856,
+            429856
+          ],
+          "allocatedBytesRange": [
+            33057881,
+            33057881
+          ],
+          "clientLatencyMs": {
+            "0.5": 0.7735000000002046,
+            "0.95": 0.8504579999986106,
+            "0.99": 0.8987920000009808,
+            "1": 11.835208000000819
+          },
+          "gcProfile": {
+            "attempts": 1883,
+            "nanoseconds": 54150000,
+            "maximumNanoseconds": 60000,
+            "allocatedBytes": 33057881,
+            "peakLiveBytes": 49657,
+            "peakArenaUsed": 99200
+          }
+        }
+      }
+    },
+    {
+      "sample": "json",
+      "concurrency": 4,
+      "allocationEquality": true,
+      "modes": {
+        "guarded-sync": {
+          "requestsPerSecond": 1023.7393093916907,
+          "processCpuSeconds": 1.983981,
+          "clientCpuSeconds": 0.13708600000000004,
+          "peakRssBytes": 12959744,
+          "allocations": 943817,
+          "trialCount": 3,
+          "allocationRange": [
+            943817,
+            943817
+          ],
+          "allocatedBytesRange": [
+            54065775,
+            54065775
+          ],
+          "clientLatencyMs": {
+            "0.5": 3.816290999999694,
+            "0.95": 4.02895799999925,
+            "0.99": 4.469916999999768,
+            "1": 15.929958000000966
+          },
+          "gcProfile": {
+            "attempts": 3765,
+            "nanoseconds": 119729000,
+            "maximumNanoseconds": 98000,
+            "allocatedBytes": 54065775,
+            "peakLiveBytes": 52690,
+            "peakArenaUsed": 101248
+          },
+          "candidateCounts": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "live": {
+          "requestsPerSecond": 817.8698436395839,
+          "processCpuSeconds": 2.567839,
+          "clientCpuSeconds": 0.15806700000000018,
+          "peakRssBytes": 13582336,
+          "allocations": 943817,
+          "trialCount": 3,
+          "allocationRange": [
+            943817,
+            943817
+          ],
+          "allocatedBytesRange": [
+            54065775,
+            54065775
+          ],
+          "clientLatencyMs": {
+            "0.5": 4.840749999999616,
+            "0.95": 5.305250000002815,
+            "0.99": 5.7939999999980785,
+            "1": 22.99437499999968
+          },
+          "gcProfile": {
+            "attempts": 3832,
+            "nanoseconds": 138347000,
+            "maximumNanoseconds": 149000,
+            "allocatedBytes": 54065775,
+            "peakLiveBytes": 67911,
+            "peakArenaUsed": 144936
+          },
+          "candidateCounts": [
+            1895,
+            1894,
+            1,
+            21,
+            40,
+            0
+          ]
+        },
+        "sync": {
+          "requestsPerSecond": 3069.05792434727,
+          "processCpuSeconds": 0.669042,
+          "clientCpuSeconds": 0.11551199999999999,
+          "peakRssBytes": 10665984,
+          "allocations": 943817,
+          "trialCount": 3,
+          "allocationRange": [
+            943817,
+            943817
+          ],
+          "allocatedBytesRange": [
+            54065775,
+            54065775
+          ],
+          "clientLatencyMs": {
+            "0.5": 1.2807910000010025,
+            "0.95": 1.3635409999999126,
+            "0.99": 1.4324580000000253,
+            "1": 1.6889999999989413
+          },
+          "gcProfile": {
+            "attempts": 3756,
+            "nanoseconds": 118707000,
+            "maximumNanoseconds": 64000,
+            "allocatedBytes": 54065775,
+            "peakLiveBytes": 52690,
+            "peakArenaUsed": 101248
+          }
+        }
+      }
+    },
+    {
+      "sample": "plain",
+      "concurrency": 16,
+      "allocationEquality": false,
+      "modes": {
+        "guarded-sync": {
+          "requestsPerSecond": 1639.9640888543327,
+          "processCpuSeconds": 1.268522,
+          "clientCpuSeconds": 0.11999799999999994,
+          "peakRssBytes": 11124736,
+          "allocations": 429857,
+          "trialCount": 3,
+          "allocationRange": [
+            429856,
+            429861
+          ],
+          "allocatedBytesRange": [
+            33057881,
+            33060521
+          ],
+          "clientLatencyMs": {
+            "0.5": 9.73237500000046,
+            "0.95": 10.219375000000142,
+            "0.99": 10.653583000001632,
+            "1": 16.220957999999897
+          },
+          "gcProfile": {
+            "attempts": 1876,
+            "nanoseconds": 53574000,
+            "maximumNanoseconds": 62000,
+            "allocatedBytes": 33058409,
+            "peakLiveBytes": 50666,
+            "peakArenaUsed": 99264
+          },
+          "candidateCounts": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "live": {
+          "requestsPerSecond": 1296.0311971415817,
+          "processCpuSeconds": 1.624754,
+          "clientCpuSeconds": 0.12428100000000003,
+          "peakRssBytes": 11698176,
+          "allocations": 429856,
+          "trialCount": 3,
+          "allocationRange": [
+            429856,
+            429857
+          ],
+          "allocatedBytesRange": [
+            33057881,
+            33058409
+          ],
+          "clientLatencyMs": {
+            "0.5": 12.331582999999924,
+            "0.95": 12.669084000000552,
+            "0.99": 13.001834000000656,
+            "1": 17.483834000000087
+          },
+          "gcProfile": {
+            "attempts": 1918,
+            "nanoseconds": 64639000,
+            "maximumNanoseconds": 53000,
+            "allocatedBytes": 33057881,
+            "peakLiveBytes": 67767,
+            "peakArenaUsed": 146968
+          },
+          "candidateCounts": [
+            947,
+            946,
+            1,
+            20,
+            22,
+            0
+          ]
+        },
+        "sync": {
+          "requestsPerSecond": 5084.551675167627,
+          "processCpuSeconds": 0.404759,
+          "clientCpuSeconds": 0.10185599999999995,
+          "peakRssBytes": 9322496,
+          "allocations": 429860,
+          "trialCount": 3,
+          "allocationRange": [
+            429857,
+            429865
+          ],
+          "allocatedBytesRange": [
+            33058409,
+            33062633
+          ],
+          "clientLatencyMs": {
+            "0.5": 3.0971669999999563,
+            "0.95": 3.282999999999703,
+            "0.99": 3.4556659999989137,
+            "1": 4.649834000000297
+          },
+          "gcProfile": {
+            "attempts": 1879,
+            "nanoseconds": 53635000,
+            "maximumNanoseconds": 71000,
+            "allocatedBytes": 33059993,
+            "peakLiveBytes": 63484,
+            "peakArenaUsed": 115744
+          }
+        }
+      }
+    },
+    {
+      "sample": "json",
+      "concurrency": 16,
+      "allocationEquality": false,
+      "modes": {
+        "guarded-sync": {
+          "requestsPerSecond": 1054.3749160113546,
+          "processCpuSeconds": 1.960468,
+          "clientCpuSeconds": 0.13765100000000008,
+          "peakRssBytes": 12959744,
+          "allocations": 943818,
+          "trialCount": 3,
+          "allocationRange": [
+            943817,
+            943819
+          ],
+          "allocatedBytesRange": [
+            54065775,
+            54066831
+          ],
+          "clientLatencyMs": {
+            "0.5": 15.139542000000006,
+            "0.95": 15.46529200000002,
+            "0.99": 16.06179100000027,
+            "1": 23.843082999999154
+          },
+          "gcProfile": {
+            "attempts": 3755,
+            "nanoseconds": 118605000,
+            "maximumNanoseconds": 48000,
+            "allocatedBytes": 54066303,
+            "peakLiveBytes": 56088,
+            "peakArenaUsed": 101544
+          },
+          "candidateCounts": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "live": {
+          "requestsPerSecond": 840.0061113725875,
+          "processCpuSeconds": 2.517538,
+          "clientCpuSeconds": 0.14454699999999998,
+          "peakRssBytes": 13565952,
+          "allocations": 943817,
+          "trialCount": 3,
+          "allocationRange": [
+            943817,
+            943817
+          ],
+          "allocatedBytesRange": [
+            54065775,
+            54065775
+          ],
+          "clientLatencyMs": {
+            "0.5": 19.02575000000084,
+            "0.95": 19.533541999997794,
+            "0.99": 20.250874999998558,
+            "1": 26.212333000000143
+          },
+          "gcProfile": {
+            "attempts": 3782,
+            "nanoseconds": 134253000,
+            "maximumNanoseconds": 56000,
+            "allocatedBytes": 54065775,
+            "peakLiveBytes": 67911,
+            "peakArenaUsed": 144872
+          },
+          "candidateCounts": [
+            1879,
+            1878,
+            1,
+            5,
+            22,
+            0
+          ]
+        },
+        "sync": {
+          "requestsPerSecond": 3080.277089574324,
+          "processCpuSeconds": 0.671544,
+          "clientCpuSeconds": 0.12256500000000004,
+          "peakRssBytes": 10682368,
+          "allocations": 943821,
+          "trialCount": 3,
+          "allocationRange": [
+            943817,
+            943823
+          ],
+          "allocatedBytesRange": [
+            54065775,
+            54068943
+          ],
+          "clientLatencyMs": {
+            "0.5": 5.153750000000734,
+            "0.95": 5.297083999999508,
+            "0.99": 5.73133299999995,
+            "1": 10.959624999999917
+          },
+          "gcProfile": {
+            "attempts": 3758,
+            "nanoseconds": 118564000,
+            "maximumNanoseconds": 78000,
+            "allocatedBytes": 54067887,
+            "peakLiveBytes": 67791,
+            "peakArenaUsed": 117040
+          }
+        }
+      }
+    }
+  ],
+  "inputs": {
+    "/Users/robert/Projects/neoclr/target/concurrent-workloads/client-concurrency-1-plain/results.json": "a9f98a337ea27939f16d0f99a907d50e6eff05109047926063344c4d62a5cbb6",
+    "/Users/robert/Projects/neoclr/target/concurrent-workloads/client-concurrency-1-json/results.json": "a595036c614decf85301dfe475d0108b0b61660b24764a40ace0df032d3989a6",
+    "/Users/robert/Projects/neoclr/target/concurrent-workloads/client-concurrency-4-plain/results.json": "b189f92ff8fe8ceeefe57f3816deeffab88316b368ca9082001e19d7aa91fe72",
+    "/Users/robert/Projects/neoclr/target/concurrent-workloads/client-concurrency-4-json/results.json": "2cf7d50d6743ad239147111bc8d3459b49ac825475dbd951b23621bdcff09796",
+    "/Users/robert/Projects/neoclr/target/concurrent-workloads/client-concurrency-16-plain-ranges/results.json": "e13f5973f56952fbeb6ea18efaf2d8e52251f38dc1ee00094a9aab2e21db82b5",
+    "/Users/robert/Projects/neoclr/target/concurrent-workloads/client-concurrency-16-json-ranges/results.json": "5447c5f4164d13a49d463e38367049234c55752ea947722a5a1edd64a0e2b838",
+    "/Users/robert/Projects/neoclr/benchmarks/execution/concurrent-workloads/summarize-concurrency.py": "69d1bc6a2ab96485486b908de8257b93ff406fdceb2d82f31621e7d8460b18bd"
+  },
+  "requests": 2048,
+  "warmup": 16
+}

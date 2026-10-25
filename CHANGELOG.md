@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-25
 
+- Add bounded concurrent HTTP client loops, client CPU reporting and a checked concurrency summary. A 1/4/16-client plaintext/JSON matrix validates 111,456 responses and reveals worse guarded/live CPU and throughput under overlap despite fewer concurrent epochs; retain end-to-end latency, allocation ranges and a separate 24,624-response CPU profile. Preserve the initial strict allocation-equality failure and keep equality as default, with explicit range reporting for scheduling-dependent variation. Runtime ownership, GC policy and defaults are unchanged; prioritize heap/store lookup under queued load.
+
 - Reuse concurrent snapshot allocation classification within each scalar store, eliminating a second lookup without extra cache state or weaker validation/barriers. Native safety controls, 1,440 JIT/AOT cycles, 90 standalone runs and 61,920 HTTP responses pass with equal allocations. ARM64 confirms two lookup call sites become one; measured live plaintext/JSON throughput rises about 2.5%/1.5% with 2.4%/1.1% less CPU. Preserve a repeated-lookup control and evidence; synchronous GC remains faster and the platform default.
 
 - Qualify cached allocation-header constraints as an opt-in concurrent-GC experiment. Add corruption, extent-shrink and legitimate intern-kind-transition tests plus a deliberately broken proof control; native safety, 1,440 JIT/AOT cycles, 90 standalone runs and 61,920 HTTP responses pass with unchanged allocations. Mixed CPU/throughput effects do not justify enabling the extra 24 TLS bytes; preserve full validation by default and archive results and reproduction controls.
