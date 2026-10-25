@@ -10,6 +10,8 @@ import subprocess
 import threading
 p=argparse.ArgumentParser(description=__doc__)
 p.add_argument('--object',type=Path,required=True)
+p.add_argument('--elide-stack-arguments',action='store_true',help='Require transformed managed JIT execution')
+p.add_argument('--inline-index',action='store_true',help='Use the inlined exact allocation-index native candidate')
 p.add_argument('--output',type=Path,required=True)
 p.add_argument('--requests',type=int,default=256)
 p.add_argument('--sample',choices=['plain','json'],default='plain')
@@ -18,9 +20,10 @@ p.add_argument('--runner',type=Path)
 p.add_argument('--pacing',choices=['forced','paced','both'],default='both')
 a=p.parse_args();assert a.requests>0
 if a.execution!='aot':assert a.runner is not None
+assert not a.elide_stack_arguments or a.execution=='jit'
 root=Path(__file__).resolve().parents[3];base=Path(__file__).resolve().parent
 out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
-r={'passed':False,'scope':f'{a.execution} {a.sample} correctness/lifecycle only, not a capacity benchmark.','commands':[],'trials':[],'inputs':{}}
+r={'passed':False,'elideStackArguments':a.elide_stack_arguments,'inlineIndex':a.inline_index,'scope':f'{a.execution} {a.sample} correctness/lifecycle only, not a capacity benchmark.','commands':[],'trials':[],'inputs':{}}
 def run(cmd):
  x=subprocess.run(list(map(str,cmd)),cwd=root,capture_output=True,text=True,timeout=120)
  r['commands'].append({'command':list(map(str,cmd)),'exitCode':x.returncode,'stdout':x.stdout,'stderr':x.stderr})
@@ -45,6 +48,11 @@ static void report_candidate(void) {
  fprintf(stderr,"CANDIDATE");
  for(unsigned i=0;i<6;i++) fprintf(stderr," %llu",(unsigned long long)counts[i]);
  fprintf(stderr,"\\n");
+#ifdef NEOCLR_LIVE_ALLOCATION_INDEX
+ extern void experiment_gc_index_counts(uint64_t *);
+ experiment_gc_index_counts(counts);
+ fprintf(stderr,"INDEX_METADATA %llu %llu %llu\\n",(unsigned long long)counts[0],(unsigned long long)counts[1],(unsigned long long)counts[2]);
+#endif
 }
 ''')
  modes=['aot','jit'] if a.execution=='both' else [a.execution]
@@ -63,6 +71,7 @@ static void report_candidate(void) {
    command.append(item)
   command[command.index('-o')+1]=str(exe)
   command+=['-I',str(root/'runtime/native/memory'),'-DNEOCLR_GC_PROFILE','-DNEOCLR_SHADOW_SPARSE_INDEX','-I',str(base.parent/'concurrent-mutation-gate'),str(base.parent/'concurrent-mutation-gate/gate.c')]
+  if a.inline_index:command+=['-DNEOCLR_LIVE_ALLOCATION_INDEX','-DNEOCLR_LIVE_EXACT_INDEX','-DNEOCLR_LIVE_INLINE_BASE']
   if paced:command+=['-DNEOCLR_GC_PACED']
   run(command)
   launch=[str(exe)];env=None
@@ -73,6 +82,8 @@ static void report_candidate(void) {
    selection=[original[0],'--jit-managed',*original[1:4],str(exe),*original[5:]]
    selection_file=out/f'jit-{paced}-command.json';selection_file.write_text(json.dumps(selection,indent=2)+'\n')
    env=dict(os.environ,NEOCLR_LIVE_SELECTION_COMMAND=str(selection_file),NEOCLR_LIVE_SELECTION_MODE='live')
+   env.pop('NEOCLR_LIVE_ELIDE_STACK_ARGUMENTS',None)
+   if a.elide_stack_arguments:env['NEOCLR_LIVE_ELIDE_STACK_ARGUMENTS']='1'
    launch=[str(a.runner.resolve()),'mutation_store::tests::full_http_selection_compiles_with_live_gc','--exact','--ignored','--nocapture']
    for path in [a.runner.resolve(),selection_path,*[Path(x) for x in original if Path(x).is_file()]]:
     r['inputs'][str(path)]=hashlib.sha256(path.read_bytes()).hexdigest()
@@ -114,6 +125,14 @@ static void report_candidate(void) {
    assert len(counts)==6 and counts[0]==counts[1]+counts[2] and counts[5]==0
    if paced:assert counts[1]>0
    trial['candidateCounts']=counts
+   if a.elide_stack_arguments:
+    removed=[int(s.split(':')[1].split()[0]) for s in errors if s.startswith('live stack-argument elision:')]
+    assert len(removed)==1 and removed[0]>0
+    trial['removedStores']=removed[0]
+   if a.inline_index:
+    metadata=list(map(int,next(s for s in errors if s.startswith('INDEX_METADATA ')).split()[1:]))
+    assert len(metadata)==3 and metadata[0]>0 and metadata[1]==0
+    trial['indexMetadata']=metadata
   finally:
    if proc.poll() is None:proc.kill()
    proc.wait()

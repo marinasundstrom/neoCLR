@@ -188,3 +188,7 @@ objects and distinguish candidate static stores from qualified guard elimination
 [Bounded stack-store experiment](stack-elision-results.md) adds test-only guard
 removal, mixed-pointer exclusion tests and matched previous-code controls across
 ordinary and HTTP workloads. The native collector settings remain identical.
+
+[Managed-JIT follow-up](stack-jit-results.md) qualifies transformed HTTP and
+standalone execution, retains a rejected zero-epoch control and identifies the
+remaining owner-pause measurement boundaries.

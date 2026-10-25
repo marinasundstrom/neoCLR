@@ -114,3 +114,7 @@ before summarizing. Three negative controls reject mismatched native flags,
 unbalanced ordinary trials and failed HTTP execution; evidence is retained in
 `stack-elision-summary-negative.json.gz`. Existing retained bundle/host recipes
 are required.
+
+The subsequent [managed-JIT qualification](stack-jit-results.md) closes the
+bounded transformed HTTP/standalone JIT execution gap identified above. Broader
+boundary stress and full pause/default qualification remain open.

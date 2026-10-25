@@ -1,0 +1,217 @@
+{
+  "passed": true,
+  "http": [
+    {
+      "sample": "plain",
+      "requested": 512,
+      "paced": false,
+      "removedStores": 13807,
+      "candidateCounts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "indexMetadata": [
+        1,
+        0,
+        16640
+      ],
+      "guestExitCode": 0
+    },
+    {
+      "sample": "plain",
+      "requested": 512,
+      "paced": true,
+      "removedStores": 13807,
+      "candidateCounts": [
+        522,
+        521,
+        1,
+        520,
+        521,
+        0
+      ],
+      "indexMetadata": [
+        1,
+        0,
+        16640
+      ],
+      "guestExitCode": 0
+    },
+    {
+      "sample": "json",
+      "requested": 512,
+      "paced": false,
+      "removedStores": 20543,
+      "candidateCounts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "indexMetadata": [
+        1,
+        0,
+        16640
+      ],
+      "guestExitCode": 0
+    },
+    {
+      "sample": "json",
+      "requested": 512,
+      "paced": true,
+      "removedStores": 20543,
+      "candidateCounts": [
+        517,
+        516,
+        1,
+        3,
+        516,
+        0
+      ],
+      "indexMetadata": [
+        1,
+        0,
+        16640
+      ],
+      "guestExitCode": 0
+    }
+  ],
+  "ordinary": [
+    {
+      "sample": "tasks",
+      "elision": false,
+      "candidateCounts": [
+        129,
+        128,
+        1,
+        0,
+        1,
+        0
+      ],
+      "indexMetadata": [
+        1,
+        0,
+        16640
+      ],
+      "removedStores": [],
+      "outputMatches": true
+    },
+    {
+      "sample": "tasks",
+      "elision": true,
+      "candidateCounts": [
+        129,
+        128,
+        1,
+        0,
+        1,
+        0
+      ],
+      "indexMetadata": [
+        1,
+        0,
+        16640
+      ],
+      "removedStores": [
+        64
+      ],
+      "outputMatches": true
+    },
+    {
+      "sample": "collections",
+      "elision": false,
+      "candidateCounts": [
+        465,
+        464,
+        1,
+        0,
+        1,
+        0
+      ],
+      "indexMetadata": [
+        1,
+        0,
+        16640
+      ],
+      "removedStores": [],
+      "outputMatches": true
+    },
+    {
+      "sample": "collections",
+      "elision": true,
+      "candidateCounts": [
+        465,
+        464,
+        1,
+        0,
+        1,
+        0
+      ],
+      "indexMetadata": [
+        1,
+        0,
+        16640
+      ],
+      "removedStores": [
+        159
+      ],
+      "outputMatches": true
+    },
+    {
+      "sample": "arrays",
+      "elision": false,
+      "candidateCounts": [
+        169,
+        168,
+        1,
+        0,
+        1,
+        0
+      ],
+      "indexMetadata": [
+        1,
+        0,
+        16640
+      ],
+      "removedStores": [],
+      "outputMatches": true
+    },
+    {
+      "sample": "arrays",
+      "elision": true,
+      "candidateCounts": [
+        169,
+        168,
+        1,
+        0,
+        1,
+        0
+      ],
+      "indexMetadata": [
+        1,
+        0,
+        16640
+      ],
+      "removedStores": [
+        86
+      ],
+      "outputMatches": true
+    }
+  ],
+  "inputs": {
+    "target/concurrent-workloads/stack-elision-plain-managed-jit/results.json": "887a641a3b87d2c78df541d2873064959df463410f42ffc975d14f539ce49c57",
+    "target/concurrent-workloads/stack-elision-json-managed-jit/results.json": "18c1b4b25d48919aec39658eb74d6bf1845186edbeb34410a8926893d0e29774",
+    "target/concurrent-workloads/stack-elision-ordinary-managed-jit-paced/results.json": "da093baba4d5f808140654184c58a2ffdbb71aef9ff3ea1c9f01de742c8e055b",
+    "benchmarks/execution/concurrent-store/qualify-http-execution.py": "545a7fd3082e47115ae15b4c1637505cbba3e0305415fb9584b2f49e17fb7008",
+    "benchmarks/execution/concurrent-workloads/qualify-stack-jit.py": "f97fcb83a1d667b47eb68ec5384fcdc623c6804729d5f9807db64dfc84709b44",
+    "target/concurrent-workloads/test-runner-stack-elision-final": "fc9197f6a51fa78de6ca64d532ec78b3030200a9ac6df97abee5bce1f3867d52"
+  },
+  "httpResponses": 2048,
+  "completedEpochs": 2557
+}
