@@ -24,7 +24,10 @@
 - **Open:** The first twelve owner diagnostic profiles pass 724,344 responses; tuned
   profiles subsequently pass another 513,811 responses. Six shared-pool diagnostics
   expose 4,520 allocation handoffs and over 33,000 boundary waits per test; a
-  requester-local allocation experiment is proposed, not yet implemented. Architectural
+  requester-local allocation experiment subsequently passes sync/live safety, pressure
+  and negative controls. Matched-source timing reduces concurrent lifecycle elapsed
+  about 70% and CPU 61%, removing 4,520 allocation-service waits per test while
+  preserving exclusive leases and collection ownership. This is not an HTTP gain. Architectural
   conclusions are not yet established. OS context switches do not count managed task switches or establish
   runnable latency; missing telemetry must remain explicit. Higher worker counts
   require qualification rather than silently lifting limits.

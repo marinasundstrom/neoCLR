@@ -1,6 +1,6 @@
 import argparse,json,subprocess,hashlib
 from pathlib import Path
-p=argparse.ArgumentParser();p.add_argument('--output',type=Path,required=True);p.add_argument('--read-epochs',action='store_true');p.add_argument('--reuse-roots',action='store_true');a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--output',type=Path,required=True);p.add_argument('--read-epochs',action='store_true');p.add_argument('--reuse-roots',action='store_true');p.add_argument('--local-allocation',action='store_true');a=p.parse_args()
 base=Path(__file__).resolve().parent;root=base.parents[2];out=a.output.resolve();out.mkdir(exist_ok=False)
 r={'passed':False,'commands':[],'inputs':{}}
 try:
@@ -12,6 +12,7 @@ try:
  for sanitized in [False,True]:
   exe=out/f'pressure-{sanitized}'
   cmd=cc+['-std=c11','-O2','-Wall','-Wextra','-Werror','-pthread','-DNEOCLR_NATIVE_GC','-DNEOCLR_WORKER_GC','-DNEOCLR_GC_ALLOCATION_DISPATCH','-DNEOCLR_WORKER_ALLOCATION_OWNER','-DNEOCLR_WORKER_COLLECTION_OWNER','-DNEOCLR_WORKER_ROOT_SNAPSHOT','-DNEOCLR_WORKER_PACED','-I',root/'runtime/native/gc','-I',root/'runtime/native/workers',root/'runtime/native/gc/native-gc.c',root/'runtime/native/gc/root-probe.c',root/'runtime/native/gc/participant-roots.c',root/'runtime/native/workers/native-workers.c',base/'pressure-test.c','-o',exe]
+  if a.local_allocation:cmd+=['-DNEOCLR_WORKER_LOCAL_ALLOCATION']
   if a.reuse_roots:cmd+=['-DNEOCLR_WORKER_ROOT_REUSE']
   if a.read_epochs:
    cmd=[out/'native-gc.c' if str(x)==str(root/'runtime/native/gc/native-gc.c') else x for x in cmd]

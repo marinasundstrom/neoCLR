@@ -74,3 +74,6 @@ Existing evidence: [independent owners](../../execution/concurrent-http-owners/R
 
 The author clarified that virtual threads are not required: measure context-switch
 and handoff cost, then decide whether tuning or redesign is justified.
+
+[Requester-local allocation](local-allocation.md) now qualifies an opt-in reduction
+in shared-pool handoffs, with matched-source timings and separate wait diagnostics.

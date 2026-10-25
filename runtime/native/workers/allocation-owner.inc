@@ -82,6 +82,25 @@ static int32_t compiled_allocate(neoclr_aot_text_arena *arena,uint64_t bytes,
     lock(p);
     if (!self->exclusive || p->compiled_exclusive!=self || p->compiled_running!=1 ||
         !p->allocation.started || p->allocation.pending || p->allocation.stop) abort();
+#ifdef NEOCLR_WORKER_LOCAL_ALLOCATION
+    /* Exclusive execution already excludes every other heap reader/writer.
+     * This is an external arena: no participant acquires owned-heap cache state.
+     * Keep collection on its service owner and never allocate during an epoch. */
+#ifdef NEOCLR_WORKER_READ_EPOCHS
+    if (p->allocation.epoch_active) abort();
+#endif
+    void *result=NULL;
+    int32_t status=neoclr_gc_allocate_dispatch_storage_v1(arena,bytes,kind,&result);
+    ++p->allocation.requests;
+    if (!status) {
+        *output=result;*used=arena->used;
+#ifdef NEOCLR_WORKER_PACED
+        ++p->allocation.allocations;
+        p->allocation.allocated_bytes+=bytes;
+#endif
+    }
+    unlock(p);return status;
+#else
     p->allocation.arena=arena;p->allocation.bytes=bytes;p->allocation.kind=kind;
     p->allocation.pending=1;
     pthread_cond_signal(&p->allocation.ready);
@@ -91,6 +110,7 @@ static int32_t compiled_allocate(neoclr_aot_text_arena *arena,uint64_t bytes,
     if (!status) {*output=p->allocation.result;*used=p->allocation.used;}
     p->allocation.arena=NULL;p->allocation.result=NULL;
     unlock(p);return status;
+#endif
 }
 int neoclr_workers_allocation_requests(neoclr_workers *p,uint64_t *requests) {
     if (!requests || !pthread_equal(p->owner,pthread_self())) return 0;

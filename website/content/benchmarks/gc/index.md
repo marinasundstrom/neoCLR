@@ -487,3 +487,14 @@ pipelining. Interpreter runs use 64 measured requests plus 16 warmup and only it
 mark-sweep collector. Compilation is excluded from native throughput timing.
 Worker scaling, scheduling contention and GC pause profiles are separate work;
 public connection policy and collector defaults remain unchanged.
+
+
+### Worker scheduling experiment (development)
+
+Separate shared-heap profiling found thousands of allocation-service round trips
+under an already exclusive execution lease. An opt-in requester-local allocation
+path preserves collection ownership, pressure handling and root safety while
+removing those handoffs. Matched-source four-worker lifecycle tests reduce concurrent
+elapsed time about 70% and CPU 61%; sync improves too. Sanitized correctness and
+negative controls pass. This is a shared-pool scheduling result, not an HTTP gain,
+virtual-thread implementation or promotion of concurrent GC to default.

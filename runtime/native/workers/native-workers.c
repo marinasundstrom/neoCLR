@@ -9,6 +9,9 @@
 #if defined(NEOCLR_WORKER_ALLOCATION_OWNER) && (!defined(NEOCLR_WORKER_GC) || !defined(NEOCLR_GC_ALLOCATION_DISPATCH))
 #error Worker allocation owner requires worker GC and allocation dispatch
 #endif
+#if defined(NEOCLR_WORKER_LOCAL_ALLOCATION) && !defined(NEOCLR_WORKER_COLLECTION_OWNER)
+#error Local allocation requires the separate collection owner contract
+#endif
 #if defined(NEOCLR_WORKER_COLLECTION_OWNER) && (!defined(NEOCLR_WORKER_ALLOCATION_OWNER) || !defined(NEOCLR_WORKER_ROOT_SNAPSHOT))
 #error Worker collection owner requires allocation owner and copied roots
 #endif

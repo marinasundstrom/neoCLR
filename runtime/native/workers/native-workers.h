@@ -6,6 +6,9 @@
  * Outside these intervals callbacks may compute on copied primitives or block, but may not dereference
  * pool-managed pointers. Independent invocation arenas need their own ownership
  * and entry/cleanup qualification; they are never collected by this pool.
+ * NEOCLR_WORKER_LOCAL_ALLOCATION optionally uses the exclusive participant for
+ * checked storage allocation while retaining the separate collection owner. It
+ * does not permit allocation during a read epoch or concurrent heap mutation.
  * The pool roots capture/result slots through owner collection.
  * Never call pool APIs recursively while entered except capture/allocate/result/local-root operations.
  * Do not use ordinary TLS host-root, socket, fiber or compiler GC hooks on the
