@@ -1,5 +1,7 @@
 # neoCLR platform roadmap
 
+**Store outlining screen (2026-10-25):** [Native safety and paired HTTP evidence](../benchmarks/execution/concurrent-http-owners/split-results.md) reject two outlining variants: a smaller entry frame does not produce a whole-request gain. Twelve optimized/sanitized fixtures and 161,817 responses pass; direct state passing is approximately flat. Keep original stores and prioritize eliminating unnecessary calls or admission work under explicit proofs.
+
 **Store-counter screen (2026-10-25):** [Matched HTTP and standalone evidence](../benchmarks/execution/concurrent-http-owners/counter-results.md) rejects diagnostic counter removal as an optimization: 80,855 responses show no gain, and 30 task/collection/array runs have mixed sub-1% effects with equal allocations. Keep diagnostics; investigate repeated store admission and compiler provenance without weakening ownership or active-epoch barriers.
 
 **Isolated-owner CPU attribution (2026-10-25):** [Guarded control and loaded profiles](../benchmarks/execution/concurrent-http-owners/cpu-results.md) validate 159,593 unprofiled and 56,713 profiled plaintext responses. About 74% of live excess CPU persists without marking; allocation counts remain about 208/response. Prioritize repeated scalar-store admission/TLS and frame/root work, qualifying changes across standalone and JSON/JIT/AOT controls. No default or capacity acceptance.

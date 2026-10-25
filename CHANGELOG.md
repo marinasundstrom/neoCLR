@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-25
 
+- Evaluate two private heap-store outlining prototypes while retaining admission checks and barriers. Twelve optimized/UB-bounds fixture runs and 161,817 paired plaintext responses pass. Entry stack usage falls from 192 to 16 bytes, but the plain split costs 1.9% CPU and direct state passing is approximately flat; retain the original implementation. Archive source, disassembly and failed-link correction without a performance/default claim.
+
 - Screen removal of thirteen concurrent-store diagnostic increments without changing ownership checks or barriers. Alternating plaintext runs validate 80,855 responses but show no gain (CPU +1.3%, throughput -1.5%); 30 task/collection/array runs preserve output and allocations with mixed sub-1% CPU effects. Retain counter-enabled behavior and the reproducible rejected candidate; no runtime/default change.
 
 - Add a guarded-synchronous control and separate loaded stack sampling for isolated HTTP owners. Three one-owner rounds validate 159,593 responses: sync/guarded/live median CPU is 194/342/393 us per response with about 208 managed allocations each; 74% of excess persists without marking. Another 56,713 profiled responses identify scalar-store/TLS and frame/root work. Reject a live executable mislabeled as guarded; preserve diagnostic-only timing and teardown checks. No runtime/default change or new performance gain is claimed.

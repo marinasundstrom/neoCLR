@@ -112,3 +112,6 @@ remaining checked-store/generated-code cost and retains separate loaded stack pr
 
 [Diagnostic counter removal](counter-results.md) did not demonstrate a performance
 gain across plaintext, tasks, collections and arrays; counter-enabled behavior stays.
+
+[Heap-store outlining](split-results.md) reduced the entry stack frame but did not
+improve whole-request cost; both screened variants remain unpromoted.
