@@ -8,13 +8,15 @@ import subprocess
 p=argparse.ArgumentParser(description=__doc__)
 p.add_argument('--runner',type=Path,required=True)
 p.add_argument('--output',type=Path,required=True)
-p.add_argument('--scalar-array-stores',action='store_true')
+p.add_argument('--scalar-array-stores',action='store_true',default=True,help='Retained alias for the normal typed path')
+p.add_argument('--generic-scalar-stores',dest='scalar_array_stores',action='store_false',help='Qualify the former generic-store comparison')
 a=p.parse_args();base=Path(__file__).resolve().parent;root=base.parents[2]
 out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
 r=dict(passed=False,commands=[],scalarArrayStores=a.scalar_array_stores)
 compiler_env=dict(os.environ)
 compiler_env.pop('NEOCLR_LIVE_SCALAR_ARRAY_STORES',None)
-if a.scalar_array_stores:compiler_env['NEOCLR_LIVE_SCALAR_ARRAY_STORES']='1'
+compiler_env.pop('NEOCLR_LIVE_GENERIC_SCALAR_ARRAY_STORES',None)
+if not a.scalar_array_stores:compiler_env['NEOCLR_LIVE_GENERIC_SCALAR_ARRAY_STORES']='1'
 def run(cmd,env=None):
  cmd=list(map(str,cmd));x=subprocess.run(cmd,capture_output=True,text=True,timeout=90,env=env)
  r['commands'].append(dict(command=cmd,environment=env and {k:v for k,v in env.items() if k.startswith(('NEOCLR_MUTATION_','NEOCLR_LIVE_'))},exitCode=x.returncode,stdout=x.stdout,stderr=x.stderr))
@@ -30,7 +32,6 @@ try:
  common=cc+['-std=c11','-O2','-Wall','-Wextra','-Werror','-pthread','-DNEOCLR_NATIVE_GC','-DNEOCLR_GC_PROFILE','-DNEOCLR_SHADOW_SPARSE_INDEX','-I',root/'runtime/native/gc','-I',base.parent/'concurrent-mutation-gate',base/'primitive-arrays-consumer.c',base.parent/'concurrent-mutation-gate/gate.c',root/'runtime/native/gc/root-probe.c',root/'runtime/native/memory/text-arena.c',source]
  for paced in [False,True]:
   flags=['-DNEOCLR_GC_PACED'] if paced else []
-  if a.scalar_array_stores:flags+=['-DNEOCLR_LIVE_SCALAR_ARRAY_STORES']
   for sanitized in [False,True]:
    exe=out/f'aot-{paced}-{sanitized}'
    cmd=common+flags+[obj,'-DMANAGED_MAIN','-o',exe]

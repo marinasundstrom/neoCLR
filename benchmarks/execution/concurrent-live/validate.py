@@ -52,7 +52,6 @@ try:
     if args.linear_seed: cc += ['-DNEOCLR_LIVE_LINEAR_SEED']
     if args.direct_seed: cc += ['-DNEOCLR_LIVE_DIRECT_SEED']
     if args.store_handle: cc += ['-DNEOCLR_LIVE_STORE_HANDLE']
-    if args.scalar_array_stores: cc += ['-DNEOCLR_LIVE_SCALAR_ARRAY_STORES']
     if args.allocation_index: cc += ['-DNEOCLR_LIVE_ALLOCATION_INDEX']
     if args.group_worker_tls: cc += ['-DNEOCLR_LIVE_GROUP_WORKER_TLS']
     if args.inline_base: cc += ['-DNEOCLR_LIVE_INLINE_BASE']
@@ -69,7 +68,7 @@ try:
     if args.disable_store_cache: cc += ['-DNEOCLR_LIVE_NO_STORE_CACHE']
     if args.batch: cc += ['-DNEOCLR_LIVE_BATCH','-DNEOCLR_LIVE_GATE_PROFILE']
     for sanitizer in [False, True]:
-        for case in (['scalar-store-test'] if args.scalar_array_stores else []) + (['walk-profile-test'] if args.profile_store_walks and not args.disable_store_cache and not args.allocation_index else []) + ['lifetime', 'store-test', 'exact-store-test', 'record-store-test', 'native-gc-test', 'native-gc-scan-test', 'native-gc-dense-test', 'native-gc-seed-test']:
+        for case in ['scalar-store-test'] + (['walk-profile-test'] if args.profile_store_walks and not args.disable_store_cache and not args.allocation_index else []) + ['lifetime', 'store-test', 'exact-store-test', 'record-store-test', 'native-gc-test', 'native-gc-scan-test', 'native-gc-dense-test', 'native-gc-seed-test']:
             fixture = base/(case+'.c')
             if case not in ['scalar-store-test', 'walk-profile-test', 'lifetime', 'store-test', 'exact-store-test', 'record-store-test']:
                 fixture = out/(case+'.c')

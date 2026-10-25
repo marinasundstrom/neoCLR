@@ -1,9 +1,10 @@
 # Typed scalar-store HTTP qualification — 2026-10-25
 
-The standalone optimization remains opt-in. `prepare-http.py` now rebuilds the
-concurrent collector/provider from current sources and records compiler settings;
-`--scalar-array-stores` selects the same compiler and native-host flag. It explicitly
-clears ambient scalar selection for control/sync compilation. `--reuse-assembly`
+Typed scalar stores are now the normal path within the private concurrent
+candidate. `prepare-http.py` rebuilds the collector/provider from current sources
+and records compiler settings; `--generic-scalar-stores` selects the former
+generic lowering for comparison. The old `--scalar-array-stores` spelling remains
+an alias for the normal path. Ambient selection is cleared before compilation. `--reuse-assembly`
 allows the second build to use the exact same compiled benchmark assembly.
 
 `pair-scalar-http.py` validates current input hashes, requires control/candidate
@@ -18,10 +19,14 @@ shutdown counts, completed concurrent epochs and zero invalid-state reports.
 Close, keep-alive and pipeline coverage are distinct. One owner/four clients does
 not establish multi-owner scaling, shared-heap safety, saturation or peer parity.
 
+The measurements below predate default integration and retain their original
+opt-in flags and input hashes. See [integration validation](scalar-store-integration.md)
+for the selection change; no new performance result is inferred from it.
+
 ## Reproduce
 
 ```sh
-python3 benchmarks/gc-suite/matrix/prepare-http.py --output target/new-http-control
+python3 benchmarks/gc-suite/matrix/prepare-http.py --generic-scalar-stores --output target/new-http-control
 python3 benchmarks/gc-suite/matrix/prepare-http.py --reuse-assembly \
   --scalar-array-stores --output target/new-http-candidate
 python3 benchmarks/gc-suite/matrix/pair-scalar-http.py \

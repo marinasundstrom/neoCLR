@@ -1,8 +1,10 @@
 # Scalar-store follow-up from the execution matrix — 2026-10-25
 
-Status: opt-in typed-store optimization passes native and expanded AOT/JIT
-primitive-consumer validation and a matched six-sample AOT comparison. Keep it
-experimental pending HTTP qualification and wider default acceptance. Defaults are unchanged.
+Status: typed stores are integrated into the private concurrent candidate after
+native, expanded AOT/JIT, standalone and HTTP qualification. The generic-store
+control remains available to qualification tools. Ordinary hosting still uses
+synchronous GC. [Integration validation](scalar-store-integration.md) records the
+selection change; the sections below retain the original experiment history.
 
 ## Measured question
 

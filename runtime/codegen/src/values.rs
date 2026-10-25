@@ -4938,7 +4938,7 @@ pub(crate) fn compile_into(
                                 let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
                                 return_if_detailed(&mut b, failed, status, site.as_ref());
                             } else if live_stores && crate::selection::scalar_array_element(t)
-                                && std::env::var_os("NEOCLR_LIVE_SCALAR_ARRAY_STORES").is_some()
+                                && crate::mutation_admission::scalar_array_stores_enabled()
                             {
                                 // Retain the typed primitive-storage contract before generic
                                 // mutation lowering loses it. The helper admits one complete

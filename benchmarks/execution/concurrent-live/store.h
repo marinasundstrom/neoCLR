@@ -381,7 +381,6 @@ int experiment_gc_store_text(neoclr_aot_context *context, void *array,
     return 0;
 }
 
-#ifdef NEOCLR_LIVE_SCALAR_ARRAY_STORES
 /* Typed compiler contract: source is one normalized, zero-padded stack lane.
  * Primitive allocations are never read by the marker. Keep current ownership,
  * exact allocation admission and shape/extent checks, but no mutation gate is
@@ -402,4 +401,3 @@ int experiment_gc_store_scalar(neoclr_aot_context *context, void *array,
     ((unsigned char *)array)[24+length*8+index]=1;
     return 0;
 }
-#endif

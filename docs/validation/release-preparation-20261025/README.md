@@ -18,10 +18,13 @@ improvements and clearly labeled concurrent experiments, rather than a GC diary.
 | Optional / Result.Failure / Error | Source/API migrations and focused validation recorded in the archived development history; Optional compiler evidence pins Raven main `694bbeae8` and neoCLR `5b9298b62` | Resolve current matching Raven/neoCLR revisions; preserve separate Raven branches and rerun affected package consumers |
 | Environment / MediaType / Uri | Implemented source contracts and focused three-engine/macOS checks; public API documentation was refreshed | Rebuild matching reference/SDK snapshots and validate packaged consumers on claimed hosts |
 | Ordinary runtime / synchronous GC | Root-publication, metadata/heap lookup, initialization and async-context improvements are in source with focused evidence | Audit active defaults versus opt-in flags; qualify the exact source and packaged native hosts |
-| Concurrent scalar stores | Opt-in AOT/JIT safety and standalone gains; repeated HTTP is small/mixed | Integrate the selected optimization within the candidate, retain an explicit generic-store control, and verify matching compiler/host selection |
+| Concurrent scalar stores | Integrated within the private candidate, with explicit generic-store control; [validation](../../../benchmarks/gc-suite/matrix/scalar-store-integration.md) retains matching compiler/host evidence. Earlier standalone gains and small/mixed HTTP effects remain scoped | Qualify exact candidate/package inputs; this does not expose a public concurrent selector |
 | Other concurrent/worker policies | Multiple qualified and rejected experiments, different ownership/topology limits | Select only coherent supported combinations; do not enable every experimental flag or treat restricted shared access as arbitrary mutators |
 | Concurrent execution exposure | `runtime/codegen/src/lib.rs::run` passes `live_stores=false`; private qualification entry enables it | Decide package exposure explicitly; do not describe a public selector that does not exist. Sync stays default |
 | Persistent HTTP | Private close/keep-alive/pipeline matrix qualifies the internal driver | Resolve public timeout/resource/ownership policy separately before claiming public persistent-server support |
+
+An intermittent pre-existing stack-transfer JIT assertion is reproduced in both
+the preserved and integrated runners; see the [integration record](../../../benchmarks/gc-suite/matrix/scalar-store-integration.md). Resolve or explicitly assess this before release qualification.
 
 ## Release gates
 

@@ -9,7 +9,8 @@ import runpy
 
 p=argparse.ArgumentParser(description=__doc__)
 p.add_argument('--reuse-assembly',action='store_true',help='Use an existing compiled benchmark assembly for matched builds')
-p.add_argument('--scalar-array-stores',action='store_true')
+p.add_argument('--scalar-array-stores',action='store_true',default=True,help='Retained alias for the normal typed path')
+p.add_argument('--generic-scalar-stores',dest='scalar_array_stores',action='store_false',help='Build the former generic-store comparison')
 p.add_argument('--output',type=Path,required=True)
 a=p.parse_args()
 root=Path(__file__).resolve().parents[3]
@@ -51,7 +52,8 @@ try:
         settings=dict(NEOCLR_TEST_OPT_LEVEL='speed',NEOCLR_LIVE_SELECTION_COMMAND=str(path),NEOCLR_LIVE_SELECTION_MODE=mode)
         env=dict(os.environ)
         env.pop('NEOCLR_LIVE_SCALAR_ARRAY_STORES',None)
-        if mode=='live' and a.scalar_array_stores:settings['NEOCLR_LIVE_SCALAR_ARRAY_STORES']='1'
+        env.pop('NEOCLR_LIVE_GENERIC_SCALAR_ARRAY_STORES',None)
+        if mode=='live' and not a.scalar_array_stores:settings['NEOCLR_LIVE_GENERIC_SCALAR_ARRAY_STORES']='1'
         for flag in ['NEOCLR_LIVE_ELIDE_STACK_ARGUMENTS','NEOCLR_LIVE_FORWARD_STACK_ARGUMENTS',
                      'NEOCLR_LIVE_ELIDE_FORWARDED_STACK_ARGUMENTS','NEOCLR_LIVE_SSA_BYREF_ARGUMENTS']:
             env.pop(flag,None)
@@ -67,7 +69,6 @@ try:
             link += ['-DNEOCLR_GC_ALLOCATION_BUDGET=256', '-DNEOCLR_GC_PUBLICATION_BUDGET=4096']
         if mode=='live':
             link=[str(collector) if v.endswith('/native-gc.c') else str(provider) if v.endswith('/text-arena.c') else v for v in link]
-            if a.scalar_array_stores:link+=['-DNEOCLR_LIVE_SCALAR_ARRAY_STORES']
             assert '-DNEOCLR_GC_ALLOCATION_BUDGET=1024' in link
             assert '-DNEOCLR_GC_PUBLICATION_BUDGET=16384' in link
             assert '-DNEOCLR_LIVE_NO_STORE_CACHE' in link

@@ -19,6 +19,11 @@
   Published changelog sections remain byte-identical. Version, final artifact pins,
   package qualification and publication remain open. Repeated HTTP and separate
   owner-operation profiles are retained, including mixed/regressive results.
+- **Follow-through:** Integrated the qualified typed primitive-store path within
+  the private concurrent candidate, preserving a generic-store comparison. This
+  reduces runtime admission work; it does not change ordinary hosting to concurrent
+  GC. [Integration evidence](../benchmarks/gc-suite/matrix/scalar-store-integration.md)
+  distinguishes fresh safety checks from prior performance measurements.
 
 ## 2026-10-25 — Integrate improvements once their benefit is established
 

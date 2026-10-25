@@ -34,7 +34,7 @@ URI parsing and resolution reuse UTF-8 storage and validated components to reduc
 temporary work. These changes preserve validation and value-object contracts;
 they do not impose a blanket ban on allocations or change Path semantics.
 
-## Runtime execution and garbage collection
+## Runtime optimization, GC improvements and concurrent experiments
 
 Native execution improves repeated root/descriptor work, managed-heap lookup,
 allocation bookkeeping and redundant initialization. Async context reuse and
@@ -43,8 +43,8 @@ These changes benefit runtime execution beyond HTTP.
 
 Concurrent native GC continues as a separate experimental track. Work includes
 live marking, mutation/root safety, JIT/AOT consumers, worker coordination and
-collection-policy tuning. Typed scalar stores reduce CPU substantially in a
-reusable-buffer workload, while HTTP effects are small and mixed. The synchronous
+collection-policy tuning. Typed scalar stores are integrated within that private candidate and reduce CPU
+substantially in a reusable-buffer workload, while HTTP effects are small and mixed. The synchronous
 collector remains the default; this draft does not announce a broad concurrent-GC
 throughput or latency advantage, generations, compaction or general virtual threads.
 

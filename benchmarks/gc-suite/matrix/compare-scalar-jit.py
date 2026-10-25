@@ -32,8 +32,9 @@ try:
     selection=[original[0],'--jit-managed',*original[1:4],str(out/(mode+'.dylib')),*original[5:]]
     path=out/(name+'-'+mode+'.json');path.write_text(json.dumps(selection))
     env=dict(os.environ,**native['environment']);env.pop('NEOCLR_LIVE_SCALAR_ARRAY_STORES',None)
+    env.pop('NEOCLR_LIVE_GENERIC_SCALAR_ARRAY_STORES',None)
     env['NEOCLR_LIVE_SELECTION_COMMAND']=str(path)
-    if mode=='scalar':env['NEOCLR_LIVE_SCALAR_ARRAY_STORES']='1'
+    if mode=='control':env['NEOCLR_LIVE_GENERIC_SCALAR_ARRAY_STORES']='1'
     x=run([a.runner.resolve(),'mutation_store::tests::full_http_selection_compiles_with_live_gc','--exact','--ignored','--nocapture'],env)
     guest=x.stdout.split('running 1 test\n',1)[1].split('test mutation_store::tests::full_http_selection_compiles_with_live_gc ... ok',1)[0]
     assert guest==case['expectedPerIteration'],repr(guest)

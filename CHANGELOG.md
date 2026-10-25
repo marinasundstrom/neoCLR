@@ -48,9 +48,11 @@ continues as an experimental native development path.
   contexts under their qualified lifetime rules.
 - Continue the **concurrent native GC experiment**, including live marking,
   mutation/root safety, JIT/AOT consumer integration and tunable collection policy.
-  Typed scalar-store qualification halves CPU in the standalone buffer-reuse
-  workload; HTTP effects are small and mixed. These results do not establish a
-  universal throughput win or justify changing the synchronous default.
+  Integrate qualified typed scalar stores within the private concurrent candidate,
+  retaining a generic-store comparison. Earlier qualification halves CPU in the
+  standalone buffer-reuse workload; HTTP effects are small and mixed. These
+  results do not establish a universal throughput win or justify changing the
+  synchronous default.
 - Develop bounded worker coordination and internal persistent HTTP handling,
   with separate shared-heap and independent-owner experiments. These are not
   general virtual threads or new public persistent-server guarantees; public

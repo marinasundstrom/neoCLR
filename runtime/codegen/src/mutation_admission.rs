@@ -80,6 +80,19 @@ pub(crate) fn check_call_closure(
     Ok(())
 }
 
+// Typed primitive stores are the normal live-GC path. Qualification retains
+// the former generic lowering as an explicit same-compiler comparison.
+pub(crate) fn scalar_array_stores_enabled() -> bool {
+    #[cfg(test)]
+    {
+        std::env::var_os("NEOCLR_LIVE_GENERIC_SCALAR_ARRAY_STORES").is_none()
+    }
+    #[cfg(not(test))]
+    {
+        true
+    }
+}
+
 // Private qualification switch; production binaries never read this variable.
 pub(crate) fn borrowed_stores_enabled() -> bool {
     #[cfg(test)]
