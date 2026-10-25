@@ -109,3 +109,6 @@ EOF-phase timing, bounded traces and a timeout correlated with prompt native clo
 
 The [guarded CPU comparison](cpu-results.md) separates automatic marking from the
 remaining checked-store/generated-code cost and retains separate loaded stack profiles.
+
+[Diagnostic counter removal](counter-results.md) did not demonstrate a performance
+gain across plaintext, tasks, collections and arrays; counter-enabled behavior stays.
