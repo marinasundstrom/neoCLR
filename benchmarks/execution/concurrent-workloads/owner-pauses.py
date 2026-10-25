@@ -60,13 +60,14 @@ void experiment_owner_pauses_report(void) {
 }
 '''
 
-def instrument(source, live, finish_details=False):
+def instrument(source, live, finish_details=False, collection_details=False):
+    assert not collection_details or finish_details
     if finish_details:
         assert live
         import importlib.util
         spec=importlib.util.spec_from_file_location("finish_phases",Path(__file__).with_name("finish-phases.py"))
         module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
-        source=module.instrument(source)
+        source=module.instrument(source,collection_details)
     assert 'owner_pause_impl_' not in source
     specs = [('neoclr_gc_collect_conditional_v1', 'context, head, conditional, count', 0, False)]
     if live:
@@ -95,5 +96,6 @@ if __name__ == '__main__':
     p.add_argument('--output', type=Path, required=True)
     p.add_argument('--live', action='store_true')
     p.add_argument('--finish-details', action='store_true')
+    p.add_argument('--collection-details', action='store_true')
     a = p.parse_args()
-    a.output.write_text(instrument(a.source.read_text(), a.live, a.finish_details))
+    a.output.write_text(instrument(a.source.read_text(), a.live, a.finish_details, a.collection_details))

@@ -72,6 +72,13 @@ replace('static int block_valid(const neoclr_aot_text_arena *a, uint64_t at) {',
     '#endif', '{']))
 # All descriptor accesses use compact detached headers.
 replace('(const void *)(s->data + s->offsets[i])','&s->headers[i]',5)
+# Optional monotonic old-header validation; the default indexed proof is retained.
+start=s.index('    for (size_t i = 0; i < s->count; i++) {',s.index('static int candidate_seed('))
+end=s.index('    size_t previous = 0;',start)
+original=s[start:end]
+s=s[:start]+'#ifdef NEOCLR_LIVE_LINEAR_SEED\n    if (candidate_validate_old_linear(a,s)) return 3;\n#else\n'+original+'#endif\n'+s[end:]
+replace('static int candidate_seed(', (base/'seed-linear.h').read_text()+'\nstatic int candidate_seed(')
+
 replace('''    s->data = shadow_alloc(s->used, 1);
     if (s->used) memcpy(s->data, context->text.data, s->used);''','''    s->gate = shadow_alloc(1, sizeof(*s->gate));
     if (gate_init(s->gate) || gate_begin(s->gate, &s->epoch)) abort();''')

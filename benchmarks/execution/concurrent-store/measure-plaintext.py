@@ -12,6 +12,7 @@ import subprocess
 import threading
 import time
 p=argparse.ArgumentParser(description=__doc__)
+p.add_argument('--compare-linear-seed',action='store_true')
 p.add_argument('--compare-worker-tls',action='store_true')
 p.add_argument('--modes',nargs='+',help='Select unique modes from the configurations enabled by the comparison flags.')
 p.add_argument('--compare-inline-base',action='store_true')
@@ -48,9 +49,12 @@ p.add_argument('--profile-store-walks', action='store_true')
 p.add_argument('--profile-store-sites', action='store_true')
 p.add_argument('--profile-owner-pauses', action='store_true')
 p.add_argument('--profile-finish', action='store_true')
-a=p.parse_args();assert not a.profile_finish or a.profile_owner_pauses
+p.add_argument('--profile-collection', action='store_true')
+a=p.parse_args();assert not a.profile_collection or a.profile_finish
+assert not a.profile_finish or a.profile_owner_pauses
 assert a.requests>0 and a.warmup>=0 and a.pairs>0
 assert not a.previous_inline_object or (a.compare_inline_base and not a.previous_live_object)
+assert not a.compare_linear_seed or a.compare_inline_base
 assert not a.compare_worker_tls or a.compare_inline_base
 assert not a.compare_inline_base or (a.compare_exact_allocation_index and not a.direct_exact_allocation_index)
 assert not a.direct_exact_allocation_index or a.compare_exact_allocation_index
@@ -101,7 +105,7 @@ try:
   profiler=base.parent/'concurrent-workloads/owner-pauses.py'
   run(['python3',profiler,'--source',root/'runtime/native/gc/native-gc.c','--output',sync_profile])
   for candidate in [source]+([guarded_source] if a.include_guarded_sync else []):
-   run(['python3',profiler,'--source',candidate,'--output',candidate,'--live']+(['--finish-details'] if a.profile_finish else []))
+   run(['python3',profiler,'--source',candidate,'--output',candidate,'--live']+(['--finish-details'] if a.profile_finish else []) + (['--collection-details'] if a.profile_collection else []))
  host=out/'owned-host.c'
  host_source=(root/'target/native-host-ownership/owned-host.c').read_text()
  boundary='    int32_t status = run_entry(entry, with_args, argc, argv);'
@@ -117,6 +121,10 @@ static void report_measurement(void) {
 #ifdef FINISH_PHASE_PROFILE
  extern void experiment_finish_phases_report(void);
  experiment_finish_phases_report();
+#endif
+#ifdef COLLECTION_PART_PROFILE
+ extern void experiment_collection_parts_report(void);
+ experiment_collection_parts_report();
 #endif
  struct rusage usage; if(getrusage(RUSAGE_SELF,&usage)) abort();
  fprintf(stderr,"PROCESS %.9f %.9f %ld\\n",
@@ -214,6 +222,9 @@ static void report_measurement(void) {
  if a.previous_inline_object:
   configurations.append(('live-previous-inline-index',a.previous_inline_object))
   if a.include_guarded_sync: configurations.append(('guarded-sync-previous-inline-index',a.previous_inline_object))
+ if a.compare_linear_seed:
+  configurations.append(('live-linear-seed-inline-index',a.live_object))
+  if a.include_guarded_sync:configurations.append(('guarded-sync-linear-seed-inline-index',a.live_object))
  if a.modes:
   assert len(set(a.modes))==len(a.modes) and set(a.modes)<=set(mode for mode,_ in configurations)
   configurations=[(mode,obj) for mode,obj in configurations if mode in a.modes]
@@ -249,6 +260,8 @@ static void report_measurement(void) {
   if a.profile_store_sites and mode!='sync':command+=['-DNEOCLR_STORE_SITES']
   if a.profile_owner_pauses:command+=['-DOWNER_PAUSE_PROFILE','-I',str(root/'runtime/native/gc')]
   if a.profile_finish and mode!='sync':command+=['-DFINISH_PHASE_PROFILE']
+  if a.profile_collection and mode!='sync':command+=['-DCOLLECTION_PART_PROFILE']
+  if '-linear-seed-' in mode:command+=['-DNEOCLR_LIVE_LINEAR_SEED']
   run(command);executables[mode]=exe
  # Finish every build before timing. Alternate order to expose systematic drift.
  for pair in range(a.pairs):

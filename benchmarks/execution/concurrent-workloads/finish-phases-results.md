@@ -92,3 +92,5 @@ generated collector accompany it. Reproduce using the retained commands with
 `summarize-finish-phases.py` for validation. Existing bundles/native recipes and
 objects are required. This reuses the existing .NET/CLR profiling comparison;
 it introduces no managed API divergence.
+
+Follow-up: [final-collection attribution and opt-in linear seed validation](collection-seed-results.md) retain disjoint CPU accounting, native/JIT/AOT safety, and modest uninstrumented HTTP gains with unchanged defaults.

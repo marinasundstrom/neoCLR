@@ -200,3 +200,5 @@ from outer GC stalls, and retain synchronous controls and overhead limitations.
 [Finish CPU/wall attribution](finish-phases-results.md) separates waiting from
 active collection and retains components of the same slowest invocation. The
 observed dominant cost is final collection, guiding index/root/seed/sweep work.
+
+Follow-up: [final-collection attribution and opt-in linear seed validation](collection-seed-results.md) retain disjoint CPU accounting, native/JIT/AOT safety, and modest uninstrumented HTTP gains with unchanged defaults.

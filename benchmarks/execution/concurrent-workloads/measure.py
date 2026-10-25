@@ -10,6 +10,7 @@ from pathlib import Path
 import subprocess
 
 p = argparse.ArgumentParser(description=__doc__)
+p.add_argument('--compare-linear-seed',action='store_true')
 p.add_argument('--compare-worker-tls',action='store_true')
 p.add_argument('--compare-inline-base',action='store_true')
 p.add_argument('--compare-exact-allocation-index',action='store_true',help='Interleave predecessor-index, hybrid and direct exact-index variants in one cohort.')
@@ -35,10 +36,13 @@ p.add_argument('--profile-store-walks', action='store_true')
 p.add_argument('--profile-store-sites', action='store_true')
 p.add_argument('--profile-owner-pauses', action='store_true')
 p.add_argument('--profile-finish', action='store_true')
+p.add_argument('--profile-collection', action='store_true')
 a = p.parse_args()
+assert not a.profile_collection or a.profile_finish
 assert not a.profile_finish or a.profile_owner_pauses
 assert a.rounds > 0
 assert not a.previous_build or a.compare_inline_base
+assert not a.compare_linear_seed or a.compare_inline_base
 assert not a.compare_worker_tls or (a.compare_inline_base and not a.split_tls)
 assert not a.compare_inline_base or a.compare_exact_allocation_index
 assert not a.compare_exact_allocation_index or (a.allocation_index and not a.exact_allocation_index and not a.direct_exact_allocation_index)
@@ -67,6 +71,9 @@ if a.previous_build:
     assert {c['sample']: c['expectedPerIteration'] for c in previous['cases']} == {c['sample']: c['expectedPerIteration'] for c in build['cases']}
     modes += ['live-previous-hybrid-inline']
     if a.guarded_control: modes += ['guarded-sync-previous-hybrid-inline']
+if a.compare_linear_seed:
+    modes += ['live-linear-seed-hybrid-inline']
+    if a.guarded_control: modes += ['guarded-sync-linear-seed-hybrid-inline']
 if a.modes:
     assert len(set(a.modes)) == len(a.modes) and set(a.modes) <= set(modes)
     modes = [m for m in modes if m in a.modes]
@@ -102,7 +109,7 @@ try:
         profiler = root / 'benchmarks/execution/concurrent-workloads/owner-pauses.py'
         run(['python3', profiler, '--source', root / 'runtime/native/gc/native-gc.c', '--output', sync_profile])
         for source in [collector] + ([guarded] if a.guarded_control else []):
-            run(['python3', profiler, '--source', source, '--output', source, '--live'] + (['--finish-details'] if a.profile_finish else []))
+            run(['python3', profiler, '--source', source, '--output', source, '--live'] + (['--finish-details'] if a.profile_finish else []) + (['--collection-details'] if a.profile_collection else []))
     host = out / 'owned-host.c'
     source = (root / 'target/native-host-ownership/owned-host.c').read_text()
     boundary = '    int32_t status = run_entry(entry, with_args, argc, argv);'
@@ -132,6 +139,10 @@ static void report_profile(struct rusage *a, struct rusage *b, struct timespec *
 #ifdef FINISH_PHASE_PROFILE
  extern void experiment_finish_phases_report(void);
  experiment_finish_phases_report();
+#endif
+#ifdef COLLECTION_PART_PROFILE
+ extern void experiment_collection_parts_report(void);
+ experiment_collection_parts_report();
 #endif
  neoclr_gc_statistics stats = neoclr_gc_statistics_v1();
  neoclr_gc_profile profile = neoclr_gc_profile_v1();
@@ -215,6 +226,8 @@ static void report_profile(struct rusage *a, struct rusage *b, struct timespec *
             if a.disable_exact_store: command += ['-DNEOCLR_LIVE_NO_EXACT_STORE']
             if a.profile_owner_pauses: command += ['-DOWNER_PAUSE_PROFILE', '-I', str(root / 'runtime/native/gc')]
             if a.profile_finish and mode != 'sync': command += ['-DFINISH_PHASE_PROFILE']
+            if a.profile_collection and mode != 'sync': command += ['-DCOLLECTION_PART_PROFILE']
+            if '-linear-seed-' in mode: command += ['-DNEOCLR_LIVE_LINEAR_SEED']
             run(command)
             for item in command:
                 path = Path(item)

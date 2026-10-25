@@ -1,0 +1,75 @@
+{
+  "passed": true,
+  "collectionCpu": {
+    "tasks": {
+      "build-index": 1232956,
+      "frame-roots": 211377,
+      "snapshot-seed": 2224288,
+      "sweep": 2058258,
+      "total": 7813719,
+      "remainder": 2086840
+    },
+    "collections": {
+      "build-index": 3845633,
+      "frame-roots": 1014382,
+      "snapshot-seed": 9592151,
+      "sweep": 8028545,
+      "total": 29254398,
+      "remainder": 6773687
+    },
+    "arrays": {
+      "build-index": 1495337,
+      "frame-roots": 329265,
+      "snapshot-seed": 3148099,
+      "sweep": 2877551,
+      "total": 9355857,
+      "remainder": 1505605
+    },
+    "plain": {
+      "build-index": 4761666,
+      "frame-roots": 2575603,
+      "snapshot-seed": 16225254,
+      "sweep": 9291365,
+      "total": 46541785,
+      "remainder": 13687897
+    },
+    "json": {
+      "build-index": 9141030,
+      "frame-roots": 7550600,
+      "snapshot-seed": 33852252,
+      "sweep": 18655712,
+      "total": 90831357,
+      "remainder": 21631763
+    }
+  },
+  "seedCpuPerFinishNs": {
+    "tasks": {
+      "live-hybrid-inline": 4280.494791666667,
+      "live-linear-seed-hybrid-inline": 4563.765625
+    },
+    "collections": {
+      "live-hybrid-inline": 7064.665229885058,
+      "live-linear-seed-hybrid-inline": 6577.972701149425
+    },
+    "arrays": {
+      "live-hybrid-inline": 5374.732142857143,
+      "live-linear-seed-hybrid-inline": 5079.0515873015875
+    },
+    "plain": {
+      "live-inline-index": 16572.752066115703,
+      "live-linear-seed-inline-index": 12583.731958762886
+    },
+    "json": {
+      "live-inline-index": 18536.212933753945,
+      "live-linear-seed-inline-index": 13528.682105263159
+    }
+  },
+  "inputs": {
+    "benchmarks/execution/concurrent-workloads/collection-parts.py": "35dcaab4ca06432f267ebfa5e9b32543db21ea81694ed380dfd36c63db203048",
+    "benchmarks/execution/concurrent-workloads/summarize-collection-parts.py": "aa738dc5f0fd157b67f18c7a4623fb304b58f87b7b1c57442bdb57a45d9ddb89",
+    "benchmarks/execution/concurrent-workloads/test-collection-parts.py": "0ca65a8888bbf65e08e7f0457748682473063ae4d37cf8ff4eac08e3c745b612",
+    "benchmarks/execution/concurrent-workloads/summarize-linear-seed.py": "cae8e402c1d3efeea0574a46b5b8656916a3ec4b4dc97071f7c198f2dca2a726",
+    "benchmarks/execution/concurrent-live/seed-linear.h": "ce47e640b72e94f1aaa5202e6d49248ae690e411ae33455bd96972c261559830",
+    "benchmarks/execution/concurrent-live/generate.py": "d33b090adabff6bd5c9b57f8e8e6131e91461381fc371aac6a7d2ce0a428ff75"
+  }
+}

@@ -56,7 +56,14 @@ void experiment_finish_phases_report(void) {
 }
 '''
 
-def instrument(source):
+def instrument(source, collection_details=False):
+    extra=""
+    if collection_details:
+        import importlib.util
+        from pathlib import Path
+        spec=importlib.util.spec_from_file_location("collection_parts",Path(__file__).with_name("collection-parts.py"))
+        module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+        source=module.instrument(source);extra=module.HEADER
     assert 'experiment_finish_phases_report' not in source
     matches=list(re.finditer(r'(?m)^int32_t experiment_gc_finish\(neoclr_aot_context \*context,[^;{]*\) \{',source))
     assert len(matches)==1, ('finish definitions',len(matches))
@@ -83,4 +90,7 @@ def instrument(source):
     replace('    if (!status) candidate_counts[1]++;', '''    finish_end(4,phase,event);
     if (!status) candidate_counts[1]++;
     finish_end(5,whole,event); finish_event(event,phase_mask);''')
-    return HEADER+'\n'+source[:start]+body+source[end:]
+    if collection_details:
+        replace('    candidate_phase = 2;', '    finish_parts_active=1;\n    candidate_phase = 2;')
+        replace('    finish_end(3,phase,event);', '    finish_parts_active=0;\n    finish_end(3,phase,event);')
+    return HEADER+'\n'+extra+'\n'+source[:start]+body+source[end:]
