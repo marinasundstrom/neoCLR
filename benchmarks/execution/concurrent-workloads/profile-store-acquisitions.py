@@ -1,11 +1,12 @@
 """Count same-thread acquisitions/stores in retained workloads; diagnostic timings are not evidence."""
-import argparse, hashlib, json, queue, socket, subprocess, threading
+import argparse, bisect, hashlib, json, queue, socket, subprocess, threading
 from pathlib import Path
 p=argparse.ArgumentParser(description=__doc__)
 p.add_argument('--root',type=Path,required=True)
 p.add_argument('--output',type=Path,required=True)
+p.add_argument('--sites',action='store_true',help='macOS acquisition caller counts; diagnostic only')
 a=p.parse_args();out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
-r=dict(passed=False,diagnosticOnly=True,commands=[],trials=[],inputs={})
+r=dict(passed=False,diagnosticOnly=True,sites=a.sites,commands=[],trials=[],inputs={})
 def record(path):
  r['inputs'][str(path)]=hashlib.sha256(path.read_bytes()).hexdigest()
 def run(command):
@@ -25,6 +26,25 @@ void *experiment_gc_store_state_borrow(void) { acquisition_calls++; return &live
 __attribute__((destructor)) static void report_acquisitions(void) {
     fprintf(stderr,"ACQUISITIONS %llu %llu\\n",(unsigned long long)acquisition_calls,(unsigned long long)borrowed_calls);
 }''')
+  if a.sites:
+   text=text.replace('void *experiment_gc_store_state_borrow(void) { acquisition_calls++; return &live_owner; }', r'''#include <mach-o/dyld.h>
+static _Thread_local struct { uintptr_t caller; uint64_t count; } acquisition_sites[16384];
+void *experiment_gc_store_state_borrow(void) {
+    uintptr_t caller=(uintptr_t)__builtin_return_address(0);
+    size_t index=(caller>>2)&16383;
+    size_t probes=0;
+    while (acquisition_sites[index].caller && acquisition_sites[index].caller!=caller) {
+        if (++probes==16384) abort();
+        index=(index+1)&16383;
+    }
+    acquisition_sites[index].caller=caller; acquisition_sites[index].count++;
+    acquisition_calls++; return &live_owner;
+}
+__attribute__((destructor)) static void report_acquisition_sites(void) {
+    uintptr_t slide=(uintptr_t)_dyld_get_image_vmaddr_slide(0);
+    for(size_t i=0;i<16384;i++) if(acquisition_sites[i].count)
+        fprintf(stderr,"ACQUISITION_SITE %llx %llu\n",(unsigned long long)(acquisition_sites[i].caller-slide),(unsigned long long)acquisition_sites[i].count);
+}''')
   needle='    live_owner_state *store_state=opaque;';assert text.count(needle)==1
   text=text.replace(needle,'    borrowed_calls++;\n'+needle)
   modified=out/(sample+'-gc.c');modified.write_text(text);record(modified)
@@ -32,7 +52,7 @@ __attribute__((destructor)) static void report_acquisitions(void) {
   for x in command:
    path=Path(x)
    if path.is_file():record(path)
-  run(command)
+  run(command);record(exe)
   if ordinary:
    x=run([str(exe)]);stdout=x.stdout;stderr=x.stderr
    expected=next(t['stdout'] for t in data['trials'] if t['sample']==sample and t['mode']=='live-hybrid-inline')
@@ -68,6 +88,20 @@ __attribute__((destructor)) static void report_acquisitions(void) {
   def counts(label):return list(map(int,next(x.split()[1:] for x in stderr.splitlines() if x.startswith(label+' '))))
   acquired,stores=counts('ACQUISITIONS');epochs=counts('CANDIDATE');metadata=counts('INDEX_METADATA')
   assert acquired>0 and stores>0 and epochs[1]>0 and epochs[0]==epochs[1]+epochs[2] and epochs[5]==0 and metadata[1]==0
-  r['trials'].append(dict(sample=sample,acquisitions=acquired,stores=stores,storesPerAcquisition=stores/acquired,candidateCounts=epochs,stdout=stdout,stderr=stderr))
+  row=dict(sample=sample,acquisitions=acquired,stores=stores,storesPerAcquisition=stores/acquired,candidateCounts=epochs,stdout=stdout,stderr=stderr)
+  if a.sites:
+   symbols=[]
+   for line in run(['nm','-n',str(exe)]).stdout.splitlines():
+    fields=line.split()
+    if len(fields)==3 and fields[1] in ['t','T']:symbols.append((int(fields[0],16),fields[2]))
+   symbols.sort();addresses=[x[0] for x in symbols];sites=[]
+   for line in stderr.splitlines():
+    if not line.startswith('ACQUISITION_SITE '):continue
+    _,address,count=line.split();address=int(address,16);index=bisect.bisect_right(addresses,address)-1
+    assert index>=0
+    sites.append(dict(address=address,count=int(count),symbol=symbols[index][1],offset=address-symbols[index][0]))
+   assert sum(site['count'] for site in sites)==acquired
+   row['sites']=sorted(sites,key=lambda x:x['count'],reverse=True)
+  r['trials'].append(row)
  record(Path(__file__));r['passed']=True
 finally:(out/'results.json').write_text(json.dumps(r,indent=2)+'\n')

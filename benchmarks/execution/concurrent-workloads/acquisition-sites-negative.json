@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "case": "bad-count",
+      "exitCode": 1,
+      "rejected": true,
+      "stderr": "Traceback (most recent call last):\n  File \"/Users/robert/Projects/neoclr/benchmarks/execution/concurrent-workloads/summarize-acquisition-sites.py\", line 26, in <module>\n    assert sum(site['count'] for site in trial['sites'])==trial['acquisitions']\nAssertionError\n"
+    },
+    {
+      "case": "bad-input-hash",
+      "exitCode": 1,
+      "rejected": true,
+      "stderr": "Traceback (most recent call last):\n  File \"/Users/robert/Projects/neoclr/benchmarks/execution/concurrent-workloads/summarize-acquisition-sites.py\", line 17, in <module>\n    retained=read(a.root/('borrowed-managed-ordinary-measure' if ordinary else 'borrowed-managed-http-'+sample)/'results.json')\n  File \"/Users/robert/Projects/neoclr/benchmarks/execution/concurrent-workloads/summarize-acquisition-sites.py\", line 12, in read\n    assert next(value for key,value in d['inputs'].items() if Path(key).resolve()==path.resolve())==digest\nAssertionError\n"
+    }
+  ]
+}

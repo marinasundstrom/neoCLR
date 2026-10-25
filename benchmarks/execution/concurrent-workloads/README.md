@@ -216,3 +216,5 @@ Follow-up: [final-collection attribution and opt-in linear seed validation](coll
 See [complete managed borrowing](borrowed-managed-results.md) for test-only integration, capability correction and a measured performance regression; borrowing is not promoted.
 
 [Acquisition cost and workload density](store-acquisition-results.md) explains the next investigation using diagnostic counts and acquisition-inclusive controls.
+
+[Acquisition caller attribution](acquisition-sites-results.md) maps hot callers, rejects an ineffective cleanup and identifies conditional fault-path acquisition as the next target.
