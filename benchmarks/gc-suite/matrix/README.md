@@ -169,3 +169,20 @@ identical defaults; the second omitted the JSON model's reflection roots. The fi
 build supplies explicit sync budgets and standard Person reflection retention;
 no compiler admission guard was relaxed. Three-round measurements now pass all 90 trials and 297,504 responses; see
 [HTTP results](http-results.md). Pause and worker-scheduling profiles remain pending.
+
+
+## Stack profiling the current native matrix
+
+On macOS, add `--sample-stacks --requests 32768 --rounds 1` and select native
+modes. The harness starts a one-second `sample` capture after warmup, records
+its command and report hash, validates the capture, and cleans up the sampler
+on failure. Plain and JSON, sync/live, JIT/AOT and connection policy remain
+separate report dimensions. Build inputs must match before execution.
+
+These reports are diagnostic, never benchmark evidence. Stack observations
+include sleeping threads and are not CPU percentages; omitted frames are not
+zero. `wholeProcessCpuSeconds` includes sampler child CPU in this mode, while
+`invocationCpuSeconds` remains server-reported (with sampling interference).
+Use `benchmarks/execution/concurrent-workloads/summarize-cpu.py --measurement
+PATH/results.json --output PATH/summary.json` to verify capture hashes and extract
+top frames and TLS callers. Keep unprofiled throughput runs separate.

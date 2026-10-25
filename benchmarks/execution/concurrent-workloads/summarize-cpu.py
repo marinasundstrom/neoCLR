@@ -12,9 +12,9 @@ p.add_argument('--output', type=Path, required=True)
 a = p.parse_args()
 data = json.loads(a.measurement.read_text())
 assert data['passed'] and data.get('diagnosticOnly')
-report = {'scope': __doc__, 'sample': data['sample'], 'trials': [], 'inputs': {}}
+report = {'scope': __doc__, 'sample': data.get('sample', 'per-trial'), 'trials': [], 'inputs': {}}
 for trial in data['trials']:
-    profile = trial['cpuProfile']
+    profile = trial.get('stackProfile') or trial['cpuProfile']
     path = Path(profile['path'])
     digest = hashlib.sha256(path.read_bytes()).hexdigest()
     assert profile['exitCode'] == 0 and digest == profile['sha256']
@@ -57,7 +57,9 @@ for trial in data['trials']:
                 callers[parent[1:]] += count
             else: unknown += count
         stack.append((depth, match[3], match[4], tuple(map(int, (match[5] or '0').split(',')))))
-    report['trials'].append({'mode': trial['mode'], 'pair': trial['pair'],
+    report['trials'].append({'mode': trial['mode'], 'pair': trial.get('pair', trial.get('round')),
+                            'sample': trial.get('sample', data.get('sample')),
+                            'protocol': trial.get('protocol'),
                             'threads': threads, 'topFrames': top,
                             'tlsCallers': [{'symbol': key[0], 'image': key[1], 'offsets': key[2], 'observations': count} for key, count in callers.most_common()],
                             'unattributedTlsObservations': unknown,

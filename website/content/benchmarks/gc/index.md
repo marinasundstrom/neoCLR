@@ -583,3 +583,10 @@ configuration. Source generation and compilation no longer require benchmark
 files. Historical experiments forward to those sources; ordinary hosting and the
 public collector selection remain unchanged. This is integration evidence, not a
 new throughput result.
+
+
+Current integrated stack profiling (development, 2026-10-25) validates 262,272
+plain/JSON responses across synchronous/concurrent JIT/AOT. Native stack checks,
+frame entry, root publication and TLS remain visible in both collectors; concurrent
+store/index work also remains. These diagnostic captures are not new throughput
+results or CPU percentages, and do not change the synchronous default.

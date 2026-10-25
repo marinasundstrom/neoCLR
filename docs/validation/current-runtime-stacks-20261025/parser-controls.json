@@ -1,0 +1,5 @@
+{
+  "legacyFormatPassed": true,
+  "changedHashRejected": true,
+  "negativeStderr": "Traceback (most recent call last):\n  File \"/Users/robert/Projects/neoclr/benchmarks/execution/concurrent-workloads/summarize-cpu.py\", line 20, in <module>\n    assert profile['exitCode'] == 0 and digest == profile['sha256']\nAssertionError\n"
+}

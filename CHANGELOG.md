@@ -41,6 +41,10 @@ continues as an experimental native development path.
 
 #### Runtime execution, GC and concurrency
 
+- Extend the standard native HTTP matrix with optional macOS stack sampling,
+  separating diagnostic timings from benchmarks and retaining capture hashes,
+  TLS caller attribution, handler, protocol and execution-mode identities.
+
 - Reduce repeated native root publication/descriptor validation, metadata and
   managed-allocation lookup work, redundant initialization and allocation
   bookkeeping. Preserve tracing of changing root values and explicit ownership

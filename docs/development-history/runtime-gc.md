@@ -29,3 +29,5 @@ Keep new fine-grained investigations in their existing evidence/design records,
 linked here when a new track starts. Update release-facing changelog themes when
 behavior or demonstrated outcomes change; do not recreate a per-experiment diary
 there. Preserve prior claims and corrections in their dated records.
+
+- [Current integrated runtime stack profiles](../validation/current-runtime-stacks-20261025/README.md): eight plain/JSON JIT/AOT sync/concurrent captures, 262,272 checked responses; common root-state/TLS work remains visible.

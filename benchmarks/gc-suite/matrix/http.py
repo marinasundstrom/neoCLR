@@ -14,6 +14,7 @@ import queue
 import resource
 import re
 import socket
+import shutil
 import statistics
 import subprocess
 import threading
@@ -33,7 +34,11 @@ p.add_argument('--concurrency',type=int,default=4)
 p.add_argument('--pipeline-depth',type=int,default=16)
 p.add_argument('--rounds',type=int,default=3)
 p.add_argument('--smoke',action='store_true',help='Label these runs as qualification, not timing evidence')
+p.add_argument('--sample-stacks',action='store_true',help='macOS one-second stack capture after warmup; diagnostic timings only')
 a=p.parse_args()
+if a.sample_stacks:
+    assert platform.system()=='Darwin' and shutil.which('sample'), 'macOS sample is required'
+    assert a.requests>=32768 and 'interpreter' not in a.modes, 'use at least 32768 native requests for sampling'
 assert a.rounds>0 and a.requests>0 and a.interpreter_requests>0 and a.concurrency>0
 assert a.requests%a.concurrency==0 and a.interpreter_requests%a.concurrency==0
 assert a.pipeline_depth>0 and a.warmup>0
@@ -43,10 +48,12 @@ build_path=a.build.resolve()/'build.json';built=json.loads(build_path.read_text(
 assert built['passed'] and all(mode in built['recipes'] for mode in a.modes)
 for path,digest in built['inputs'].items():
     assert hashlib.sha256(Path(path).read_bytes()).hexdigest()==digest,('stale build input',path)
-r=dict(passed=False,kind='profile' if built.get('diagnosticOnly') else 'qualification' if a.smoke else 'benchmark',scope=__doc__,system=platform.platform(),
+r=dict(passed=False,kind='profile' if a.sample_stacks or built.get('diagnosticOnly') else 'qualification' if a.smoke else 'benchmark',scope=__doc__,system=platform.platform(),
        rounds=a.rounds,concurrency=a.concurrency,pipelineDepth=a.pipeline_depth,trials=[],rows=[],
        inputs={str(build_path):hashlib.sha256(build_path.read_bytes()).hexdigest()})
 if built.get('diagnosticOnly'):r['diagnosticOnly']=built['diagnosticOnly']
+if a.sample_stacks:
+    r['diagnosticOnly']='Wall-clock stack samples include sleeping threads, not CPU percentages. Sampling perturbs timing. wholeProcessCpuSeconds includes the sampler child; invocationCpuSeconds remains server-reported.'
 
 
 def traffic(port,sample,protocol,count):
@@ -105,6 +112,7 @@ def trial(mode,sample,protocol,repetition):
              protocol=protocol,round=repetition,requests=count,warmup=a.warmup,command=recipe['command'],
              environment=recipe['env'],passed=False)
     output=[];errors=[];lines=queue.Queue()
+    profiler=None
     env=dict(os.environ)
     for flag in ['NEOCLR_LIVE_ELIDE_STACK_ARGUMENTS','NEOCLR_LIVE_FORWARD_STACK_ARGUMENTS',
                  'NEOCLR_LIVE_ELIDE_FORWARDED_STACK_ARGUMENTS','NEOCLR_LIVE_SSA_BYREF_ARGUMENTS',
@@ -131,12 +139,23 @@ def trial(mode,sample,protocol,repetition):
         port=int(lines.get(timeout=10));control=int(lines.get(timeout=10))
         row['readySeconds']=time.perf_counter()-began
         traffic(port,sample,protocol,a.warmup)
+        if a.sample_stacks:
+            profile_path=out/f'{sample}-{protocol}-{mode}-{repetition}-stacks.txt'
+            command=['sample',str(process.pid),'1','1','-file',str(profile_path)]
+            row['stackProfile']=dict(command=command,path=str(profile_path))
+            profiler=subprocess.Popen(command,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
         started=time.perf_counter()
         with ThreadPoolExecutor(max_workers=a.concurrency) as pool:
             futures=[pool.submit(traffic,port,sample,protocol,count//a.concurrency) for _ in range(a.concurrency)]
             latencies=[latency for future in futures for latency in future.result()]
         duration=time.perf_counter()-started
         assert len(latencies)==count
+        if profiler is not None:
+            profile_stdout,profile_stderr=profiler.communicate(timeout=30)
+            row['stackProfile'].update(exitCode=profiler.returncode,stdout=profile_stdout,stderr=profile_stderr)
+            assert profiler.returncode==0 and profile_path.is_file()
+            assert 'Call graph:' in profile_path.read_text(), 'missing stack capture'
+            row['stackProfile']['sha256']=hashlib.sha256(profile_path.read_bytes()).hexdigest()
         with socket.create_connection(('127.0.0.1',control),timeout=15):pass
         process.wait(timeout=30)
         for thread in threads:thread.join(timeout=5)
@@ -183,6 +202,8 @@ def trial(mode,sample,protocol,repetition):
     except Exception:
         row['failure']=traceback.format_exc()
     finally:
+        if profiler is not None and profiler.poll() is None:
+            profiler.kill();profiler.communicate(timeout=10)
         if process.poll() is None:
             process.kill();process.wait(timeout=5)
         for thread in threads:thread.join(timeout=5)
