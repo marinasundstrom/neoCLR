@@ -154,3 +154,10 @@ change compiler emission, ownership rules, barriers or the runtime default.
 See [qualification evidence](../execution/concurrent-workloads/index-only-results/README.md).
 
 [TechEmpower comparison boundary and protocol gaps](techempower-comparison.md) records the author-supplied Round 23 reference and the prerequisites for a meaningful external comparison.
+
+## Execution-mode expansion
+
+The author-requested [execution/collector matrix](matrix/README.md) records a fresh
+three-round AOT/JIT standalone cohort, interpreter capability and pilot evidence,
+and the still-pending interpreter/HTTP/profile cells. Keep its timing scopes distinct
+from this original AOT procedure; unsupported combinations are explicit.

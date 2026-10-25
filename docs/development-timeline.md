@@ -11,7 +11,7 @@
   collector configurations, including idle connections, queued handlers and shutdown.
   Testing exposed an idle input array-budget fault and the existing five-second
   socket transfer cap. Smaller initial windows fix the former; the latter remains a
-  policy issue. Public enablement and fresh benchmark matrix remain open.
+  policy issue. A subsequent fresh standalone cohort passes 72 AOT/JIT invocations with matching allocation work. Interpreter mark-sweep passes the full steady pilot; the concurrent candidate is unavailable in that backend. Full interpreter, refreshed HTTP and pause-profile cells, and public enablement remain open.
 - **Evidence:** [Driver tests and matrix plan](../benchmarks/http-server/pipelining/README.md).
 
 ## 2026-10-25 — Permit HTTP architecture changes during preview

@@ -437,3 +437,26 @@ An internal bounded driver additionally passes 55 wire responses across these mo
 including idle-client admission, a two-handler limit and idle-read shutdown. Public
 Accept/Serve still closes each exchange; public enablement and the refreshed
 Interpreter/JIT/AOT collector benchmark matrix remain pending.
+
+
+## Fresh execution-mode comparison (development)
+
+The new standalone cohort runs the same six workloads under synchronous/concurrent
+AOT and JIT, with three rounds per cell. All 72 checksums pass and corresponding
+allocation counts/bytes match. Median invocation CPU in milliseconds:
+
+| Sample | AOT sync | AOT concurrent | JIT sync | JIT concurrent |
+| --- | ---: | ---: | ---: | ---: |
+| compute | 64.74 | 64.69 | 64.87 | 64.53 |
+| reuse-buffer | 18.04 | 111.19 | 19.20 | 111.78 |
+| steady | 98.23 | 151.80 | 200.41 | 256.33 |
+| bursts | 55.49 | 82.88 | 105.38 | 133.23 |
+| retained-window | 222.62 | 327.09 | 390.20 | 525.50 |
+| mixed-phases | 106.62 | 156.70 | 205.43 | 257.79 |
+
+JIT compilation/startup is excluded and recorded separately. These results identify
+an allocation-heavy JIT cost present with either collector, while the low-allocation
+reuse case still exposes concurrent store/runtime overhead. They do not demonstrate
+a concurrent-over-sync advantage. Interpreter exposes only mark-sweep today; its
+full steady-allocation pilot passes, but the full interpreter cohort, refreshed
+plain/JSON persistent HTTP measurements and pause profiles remain pending.
