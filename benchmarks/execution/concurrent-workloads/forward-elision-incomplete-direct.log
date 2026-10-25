@@ -1,0 +1,13 @@
+running 1 test
+
+thread 'mutation_store::tests::managed_async_wrappers_emit_guarded_results' (91269369) panicked at runtime/codegen/src/mutation_store_tests.rs:1040:10:
+called `Result::unwrap()` on an `Err` value: "stack-argument elision requires every generated declaration"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test mutation_store::tests::managed_async_wrappers_emit_guarded_results ... FAILED
+
+failures:
+
+failures:
+    mutation_store::tests::managed_async_wrappers_emit_guarded_results
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 225 filtered out; finished in 0.59s

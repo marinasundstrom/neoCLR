@@ -1,0 +1,65 @@
+{
+  "runner": "target/concurrent-workloads/test-runner-forward-elision",
+  "runnerSha256": "b863794a125bbcd3f98001f900e430c69d23d26ef34fde6232885bc0f4c1eb0b",
+  "nativeFixtureEnvironment": {
+    "NEOCLR_TEST_OPT_LEVEL": "speed",
+    "NEOCLR_LIVE_ELIDE_STACK_ARGUMENTS": "1",
+    "NEOCLR_LIVE_ELIDE_FORWARDED_STACK_ARGUMENTS": "1"
+  },
+  "qualification": [
+    {
+      "driver": "concurrent-store/validate-entry.py",
+      "allocationIndex": true,
+      "exactAllocationIndex": true,
+      "inlineBase": true,
+      "output": "forward-elision-entry"
+    },
+    {
+      "driver": "concurrent-store/validate-record-arrays.py",
+      "allocationIndex": true,
+      "exactAllocationIndex": true,
+      "inlineBase": true,
+      "output": "forward-elision-record"
+    },
+    {
+      "driver": "concurrent-store/qualify-http-execution.py",
+      "sample": "plain",
+      "execution": "jit",
+      "pacing": "paced",
+      "requests": 512,
+      "elideStackArguments": true,
+      "elideForwardedStackArguments": true,
+      "inlineIndex": true,
+      "optimizationLevel": "speed",
+      "object": "target/concurrent-workloads/stack-elision-http-build/plain.o",
+      "output": "forward-elision-plain-jit"
+    },
+    {
+      "driver": "concurrent-store/qualify-http-execution.py",
+      "sample": "json",
+      "execution": "jit",
+      "pacing": "paced",
+      "requests": 512,
+      "elideStackArguments": true,
+      "elideForwardedStackArguments": true,
+      "inlineIndex": true,
+      "optimizationLevel": "speed",
+      "object": "target/concurrent-workloads/stack-elision-http-build/json.o",
+      "output": "forward-elision-json-jit"
+    },
+    {
+      "driver": "concurrent-workloads/qualify-stack-jit.py",
+      "elideForwardedStackArguments": true,
+      "build": "target/concurrent-workloads/forward-elision-ordinary-build",
+      "expectedAuditRoot": "target/concurrent-workloads/forward-elision-ordinary-build",
+      "host": "target/concurrent-workloads/forward-elision-plain-jit/jit-paced.dylib",
+      "output": "forward-elision-ordinary-jit-v2"
+    }
+  ],
+  "incompleteFixtureControl": {
+    "directRejected": true,
+    "forwardingRejected": true,
+    "withoutElisionPassed": true
+  },
+  "originalSummaryReproduced": true
+}

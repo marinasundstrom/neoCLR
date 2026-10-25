@@ -10,6 +10,7 @@ import subprocess
 import threading
 p=argparse.ArgumentParser(description=__doc__)
 p.add_argument('--object',type=Path,required=True)
+p.add_argument('--elide-forwarded-stack-arguments',action='store_true')
 p.add_argument('--elide-stack-arguments',action='store_true',help='Require transformed managed JIT execution')
 p.add_argument('--borrow-stores',action='store_true')
 p.add_argument('--inline-index',action='store_true',help='Use the inlined exact allocation-index native candidate')
@@ -22,9 +23,10 @@ p.add_argument('--pacing',choices=['forced','paced','both'],default='both')
 a=p.parse_args();assert a.requests>0
 if a.execution!='aot':assert a.runner is not None
 assert not a.elide_stack_arguments or a.execution=='jit'
+assert not a.elide_forwarded_stack_arguments or a.elide_stack_arguments
 root=Path(__file__).resolve().parents[3];base=Path(__file__).resolve().parent
 out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
-r={'passed':False,'borrowStores':a.borrow_stores,'elideStackArguments':a.elide_stack_arguments,'inlineIndex':a.inline_index,'scope':f'{a.execution} {a.sample} correctness/lifecycle only, not a capacity benchmark.','commands':[],'trials':[],'inputs':{}}
+r={'passed':False,'forwardedElision':a.elide_forwarded_stack_arguments,'borrowStores':a.borrow_stores,'elideStackArguments':a.elide_stack_arguments,'inlineIndex':a.inline_index,'scope':f'{a.execution} {a.sample} correctness/lifecycle only, not a capacity benchmark.','commands':[],'trials':[],'inputs':{}}
 def run(cmd):
  x=subprocess.run(list(map(str,cmd)),cwd=root,capture_output=True,text=True,timeout=120)
  r['commands'].append({'command':list(map(str,cmd)),'exitCode':x.returncode,'stdout':x.stdout,'stderr':x.stderr})
@@ -84,6 +86,8 @@ static void report_candidate(void) {
    selection=[original[0],'--jit-managed',*original[1:4],str(exe),*original[5:]]
    selection_file=out/f'jit-{paced}-command.json';selection_file.write_text(json.dumps(selection,indent=2)+'\n')
    env=dict(os.environ,NEOCLR_LIVE_SELECTION_COMMAND=str(selection_file),NEOCLR_LIVE_SELECTION_MODE='live')
+   env.pop('NEOCLR_LIVE_ELIDE_FORWARDED_STACK_ARGUMENTS',None)
+   if a.elide_forwarded_stack_arguments: env['NEOCLR_LIVE_ELIDE_FORWARDED_STACK_ARGUMENTS']='1'
    env.pop('NEOCLR_LIVE_BORROW_STORES',None)
    if a.borrow_stores:env['NEOCLR_LIVE_BORROW_STORES']='1'
    env.pop('NEOCLR_LIVE_ELIDE_STACK_ARGUMENTS',None)

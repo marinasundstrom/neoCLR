@@ -98,3 +98,5 @@ static counts with prior caller observations. Recreate it using
 <prior-sites>/results.json --output <summary.json>`. The prior profile is retained
 as `store-acquisition-sites.json.gz`. `forward-stack-negative.json` records the
 three invalid-data controls. These tools report opportunities, not GC acceptance.
+
+Follow-up: [transformed forwarding qualification](forward-elision-results.md) adds a separate removal flag with JIT/native and matched performance evidence. The audit flag remains read-only; the direct-only control remains available.

@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "case": "native-options",
+      "rejected": true,
+      "exitCode": 1
+    },
+    {
+      "case": "missing-trial",
+      "rejected": true,
+      "exitCode": 1
+    },
+    {
+      "case": "failed-response",
+      "rejected": true,
+      "exitCode": 1
+    },
+    {
+      "case": "metadata-leak",
+      "rejected": true,
+      "exitCode": 1
+    }
+  ]
+}

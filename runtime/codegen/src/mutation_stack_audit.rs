@@ -1,6 +1,6 @@
 //! Test-only audit and opt-in guard removal for bounded direct stack arguments.
 //! Reporting is read-only; elision requires the complete generated closure.
-//! Address-taken and nonlocal functions are excluded. Forwarding is audit-only.
+//! Address-taken and nonlocal functions are excluded. Forwarding is explicitly test-selected.
 use super::{single_edge_arguments, stack_destination};
 use cranelift_codegen::cursor::{Cursor, FuncCursor};
 use cranelift_codegen::ir::{
@@ -226,6 +226,18 @@ pub(crate) fn elide(
     module: &impl Module,
     bodies: &mut [(FuncId, cranelift_codegen::Context)],
 ) -> Result<usize, Box<dyn std::error::Error>> {
+    elide_policy(
+        module,
+        bodies,
+        std::env::var_os("NEOCLR_LIVE_ELIDE_FORWARDED_STACK_ARGUMENTS").is_some(),
+    )
+}
+
+fn elide_policy(
+    module: &impl Module,
+    bodies: &mut [(FuncId, cranelift_codegen::Context)],
+    forwarding: bool,
+) -> Result<usize, Box<dyn std::error::Error>> {
     let refs: Vec<_> = bodies.iter().map(|(id, ctx)| (*id, &ctx.func)).collect();
     crate::mutation_admission::check_call_closure(
         module,
@@ -240,8 +252,8 @@ pub(crate) fn elide(
     {
         return Err("stack-argument elision requires every generated declaration".into());
     }
-    // Forwarding remains read-only until transformed execution is qualified.
-    let (_, sites) = analyze_forwarded(module, &refs, false);
+    // The diagnostic flag alone never selects this transformation.
+    let (_, sites) = analyze_forwarded(module, &refs, forwarding);
     let count = sites.values().map(Vec::len).sum();
     for (id, ctx) in bodies {
         for &(inst, width) in sites.get(id).into_iter().flatten() {
@@ -456,124 +468,174 @@ mod tests {
         for width in [1, 2, 4, 8] {
             for mixed in [false, true] {
                 for enabled in [false, true] {
-                    let isa =
-                        cranelift_codegen::isa::lookup("aarch64-apple-darwin".parse().unwrap())
-                            .unwrap()
-                            .finish(cranelift_codegen::settings::Flags::new(
-                                cranelift_codegen::settings::builder(),
-                            ))
-                            .unwrap();
-                    let mut builder =
-                        JITBuilder::with_isa(isa, cranelift_module::default_libcall_names());
-                    extern "C" fn acquire() -> u64 { 0x1234 }
-                    unsafe extern "C" fn borrowed(handle: u64, context: u64, destination: *mut u8, bits: u64, width: u32) -> i32 {
-                        assert_eq!(handle, 0x1234);
-                        unsafe { hook(context, destination, bits, width) }
-                    }
-                    builder.symbol("experiment_gc_store", hook as *const u8);
-                    builder.symbol("experiment_gc_store_state_borrow", acquire as *const u8);
-                    builder.symbol("experiment_gc_store_borrowed", borrowed as *const u8);
-                    let mut module = JITModule::new(builder);
-                    let mut callee = module.make_context();
-                    callee.func.signature.params = vec![AbiParam::new(types::I64); 2];
-                    callee.func.signature.returns = vec![AbiParam::new(types::I32)];
-                    let id = module
-                        .declare_function("store", Linkage::Local, &callee.func.signature)
-                        .unwrap();
-                    let ty = match width {
-                        1 => types::I8,
-                        2 => types::I16,
-                        4 => types::I32,
-                        _ => types::I64,
-                    };
-                    let payload = 0xfedcba9876543210u64;
-                    let context;
-                    {
-                        let mut fb = FunctionBuilderContext::new();
-                        let mut b = FunctionBuilder::new(&mut callee.func, &mut fb);
-                        let block = b.create_block();
-                        b.append_block_params_for_function_params(block);
-                        b.switch_to_block(block);
-                        let args = b.block_params(block).to_vec();
-                        context = args[0];
-                        let bits = b.ins().iconst(ty, payload as i64);
-                        b.ins().store(MemFlags::new(), bits, args[1], 1);
-                        let status = b.ins().iconst(types::I32, 0);
-                        b.ins().return_(&[status]);
-                        b.seal_all_blocks();
-                        b.finalize();
-                    }
-                    if crate::mutation_admission::borrowed_stores_enabled() {
-                        // Isolated IR fixture: the first constant is the stand-in
-                        // readiness point. Real generated consumers use linked frames.
-                        let ready=callee.func.layout.first_inst(callee.func.layout.entry_block().unwrap()).unwrap();
-                        super::super::lower_framed_borrowed(&mut module, &mut callee.func, context, ready).unwrap();
-                    } else {
-                        super::super::lower(&mut module, &mut callee.func, context).unwrap();
-                    }
-                    let mut caller = module.make_context();
-                    caller.func.signature.params = vec![AbiParam::new(types::I64); 2];
-                    caller.func.signature.returns = vec![AbiParam::new(types::I64)];
-                    let entry = module
-                        .declare_function("entry", Linkage::Export, &caller.func.signature)
-                        .unwrap();
-                    let target = module.declare_func_in_func(id, &mut caller.func);
-                    {
-                        let mut fb = FunctionBuilderContext::new();
-                        let mut b = FunctionBuilder::new(&mut caller.func, &mut fb);
-                        let block = b.create_block();
-                        b.append_block_params_for_function_params(block);
-                        b.switch_to_block(block);
-                        let args = b.block_params(block).to_vec();
-                        let slot = b.create_sized_stack_slot(StackSlotData::new(
-                            StackSlotKind::ExplicitSlot,
-                            16,
-                            3,
-                        ));
-                        let address = b.ins().stack_addr(types::I64, slot, 0);
-                        b.ins().call(target, &[args[0], address]);
-                        if mixed {
-                            b.ins().call(target, &args);
+                    for forwarded in [false, true] {
+                        let isa =
+                            cranelift_codegen::isa::lookup("aarch64-apple-darwin".parse().unwrap())
+                                .unwrap()
+                                .finish(cranelift_codegen::settings::Flags::new(
+                                    cranelift_codegen::settings::builder(),
+                                ))
+                                .unwrap();
+                        let mut builder =
+                            JITBuilder::with_isa(isa, cranelift_module::default_libcall_names());
+                        extern "C" fn acquire() -> u64 {
+                            0x1234
                         }
-                        let loaded = b.ins().load(ty, MemFlags::new(), address, 1);
-                        let result = if width == 8 {
-                            loaded
-                        } else {
-                            b.ins().uextend(types::I64, loaded)
+                        unsafe extern "C" fn borrowed(
+                            handle: u64,
+                            context: u64,
+                            destination: *mut u8,
+                            bits: u64,
+                            width: u32,
+                        ) -> i32 {
+                            assert_eq!(handle, 0x1234);
+                            unsafe { hook(context, destination, bits, width) }
+                        }
+                        builder.symbol("experiment_gc_store", hook as *const u8);
+                        builder.symbol("experiment_gc_store_state_borrow", acquire as *const u8);
+                        builder.symbol("experiment_gc_store_borrowed", borrowed as *const u8);
+                        let mut module = JITModule::new(builder);
+                        let mut callee = module.make_context();
+                        callee.func.signature.params = vec![AbiParam::new(types::I64); 2];
+                        callee.func.signature.returns = vec![AbiParam::new(types::I32)];
+                        let id = module
+                            .declare_function("store", Linkage::Local, &callee.func.signature)
+                            .unwrap();
+                        let ty = match width {
+                            1 => types::I8,
+                            2 => types::I16,
+                            4 => types::I32,
+                            _ => types::I64,
                         };
-                        b.ins().return_(&[result]);
-                        b.seal_all_blocks();
-                        b.finalize();
-                    }
-                    let mut bodies = vec![(id, callee), (entry, caller)];
-                    if enabled {
-                        assert_eq!(elide(&module, &mut bodies).unwrap(), usize::from(!mixed));
-                    }
-                    for (id, ctx) in &mut bodies {
-                        module.define_function(*id, ctx).unwrap();
-                    }
-                    module.finalize_definitions().unwrap();
-                    let run: unsafe extern "C" fn(u64, *mut u8) -> u64 =
-                        unsafe { std::mem::transmute(module.get_finalized_function(entry)) };
-                    let mut bytes = [0xa5u8; 16];
-                    CALLS.store(0, Ordering::SeqCst);
-                    let mask = if width == 8 {
-                        u64::MAX
-                    } else {
-                        (1u64 << (width * 8)) - 1
-                    };
-                    assert_eq!(unsafe { run(0, bytes.as_mut_ptr()) }, payload & mask);
-                    assert_eq!(
-                        CALLS.load(Ordering::SeqCst),
-                        if mixed { 2 } else { usize::from(!enabled) }
-                    );
-                    if mixed {
-                        assert_eq!(&bytes[1..1 + width], &payload.to_ne_bytes()[..width]);
-                    }
-                    assert_eq!(bytes[0], 0xa5);
-                    assert_eq!(bytes[1 + width], 0xa5);
-                    unsafe {
-                        module.free_memory();
+                        let payload = 0xfedcba9876543210u64;
+                        let context;
+                        {
+                            let mut fb = FunctionBuilderContext::new();
+                            let mut b = FunctionBuilder::new(&mut callee.func, &mut fb);
+                            let block = b.create_block();
+                            b.append_block_params_for_function_params(block);
+                            b.switch_to_block(block);
+                            let args = b.block_params(block).to_vec();
+                            context = args[0];
+                            let bits = b.ins().iconst(ty, payload as i64);
+                            b.ins().store(MemFlags::new(), bits, args[1], 1);
+                            let status = b.ins().iconst(types::I32, 0);
+                            b.ins().return_(&[status]);
+                            b.seal_all_blocks();
+                            b.finalize();
+                        }
+                        if crate::mutation_admission::borrowed_stores_enabled() {
+                            // Isolated IR fixture: the first constant is the stand-in
+                            // readiness point. Real generated consumers use linked frames.
+                            let ready = callee
+                                .func
+                                .layout
+                                .first_inst(callee.func.layout.entry_block().unwrap())
+                                .unwrap();
+                            super::super::lower_framed_borrowed(
+                                &mut module,
+                                &mut callee.func,
+                                context,
+                                ready,
+                            )
+                            .unwrap();
+                        } else {
+                            super::super::lower(&mut module, &mut callee.func, context).unwrap();
+                        }
+                        let mut forwarding_body = None;
+                        let called = if forwarded {
+                            let mut ctx = module.make_context();
+                            ctx.func.signature = callee.func.signature.clone();
+                            let wrapper = module
+                                .declare_function("forward", Linkage::Local, &ctx.func.signature)
+                                .unwrap();
+                            let target = module.declare_func_in_func(id, &mut ctx.func);
+                            let mut fb = FunctionBuilderContext::new();
+                            let mut b = FunctionBuilder::new(&mut ctx.func, &mut fb);
+                            let block = b.create_block();
+                            b.append_block_params_for_function_params(block);
+                            b.switch_to_block(block);
+                            let args = b.block_params(block).to_vec();
+                            let call = b.ins().call(target, &args);
+                            let status = b.inst_results(call)[0];
+                            b.ins().return_(&[status]);
+                            b.seal_all_blocks();
+                            b.finalize();
+                            forwarding_body = Some((wrapper, ctx));
+                            wrapper
+                        } else {
+                            id
+                        };
+                        let mut caller = module.make_context();
+                        caller.func.signature.params = vec![AbiParam::new(types::I64); 2];
+                        caller.func.signature.returns = vec![AbiParam::new(types::I64)];
+                        let entry = module
+                            .declare_function("entry", Linkage::Export, &caller.func.signature)
+                            .unwrap();
+                        let target = module.declare_func_in_func(called, &mut caller.func);
+                        {
+                            let mut fb = FunctionBuilderContext::new();
+                            let mut b = FunctionBuilder::new(&mut caller.func, &mut fb);
+                            let block = b.create_block();
+                            b.append_block_params_for_function_params(block);
+                            b.switch_to_block(block);
+                            let args = b.block_params(block).to_vec();
+                            let slot = b.create_sized_stack_slot(StackSlotData::new(
+                                StackSlotKind::ExplicitSlot,
+                                16,
+                                3,
+                            ));
+                            let address = b.ins().stack_addr(types::I64, slot, 0);
+                            b.ins().call(target, &[args[0], address]);
+                            if mixed {
+                                b.ins().call(target, &args);
+                            }
+                            let loaded = b.ins().load(ty, MemFlags::new(), address, 1);
+                            let result = if width == 8 {
+                                loaded
+                            } else {
+                                b.ins().uextend(types::I64, loaded)
+                            };
+                            b.ins().return_(&[result]);
+                            b.seal_all_blocks();
+                            b.finalize();
+                        }
+                        let mut bodies = vec![(id, callee), (entry, caller)];
+                        if let Some(body) = forwarding_body {
+                            bodies.push(body);
+                        }
+                        if enabled {
+                            assert_eq!(
+                                elide_policy(&module, &mut bodies, forwarded).unwrap(),
+                                usize::from(!mixed)
+                            );
+                        }
+                        for (id, ctx) in &mut bodies {
+                            module.define_function(*id, ctx).unwrap();
+                        }
+                        module.finalize_definitions().unwrap();
+                        let run: unsafe extern "C" fn(u64, *mut u8) -> u64 =
+                            unsafe { std::mem::transmute(module.get_finalized_function(entry)) };
+                        let mut bytes = [0xa5u8; 16];
+                        CALLS.store(0, Ordering::SeqCst);
+                        let mask = if width == 8 {
+                            u64::MAX
+                        } else {
+                            (1u64 << (width * 8)) - 1
+                        };
+                        assert_eq!(unsafe { run(0, bytes.as_mut_ptr()) }, payload & mask);
+                        assert_eq!(
+                            CALLS.load(Ordering::SeqCst),
+                            if mixed { 2 } else { usize::from(!enabled) }
+                        );
+                        if mixed {
+                            assert_eq!(&bytes[1..1 + width], &payload.to_ne_bytes()[..width]);
+                        }
+                        assert_eq!(bytes[0], 0xa5);
+                        assert_eq!(bytes[1 + width], 0xa5);
+                        unsafe {
+                            module.free_memory();
+                        }
                     }
                 }
             }

@@ -10,20 +10,31 @@ from pathlib import Path
 import subprocess
 
 p = argparse.ArgumentParser(description=__doc__)
+p.add_argument('--elide-forwarded-stack-arguments',action='store_true')
+p.add_argument('--expected-audit-root',type=Path,help='Matching forwarding audit directory for exact transformed-store counts')
 p.add_argument('--borrow-stores',action='store_true')
 p.add_argument('--build', type=Path, required=True)
 p.add_argument('--runner', type=Path, required=True)
 p.add_argument('--host', type=Path, required=True)
 p.add_argument('--output', type=Path, required=True)
 a = p.parse_args()
+assert not a.elide_forwarded_stack_arguments or a.expected_audit_root is not None
 root = Path(__file__).resolve().parents[3]
 build = json.loads((a.build / 'results.json').read_text())
 assert build['passed']
 out = a.output.resolve()
 out.mkdir(parents=True, exist_ok=False)
-r = dict(passed=False, borrowedStores=a.borrow_stores, scope=__doc__, trials=[], inputs={}, iterations=build['iterations'])
+r = dict(passed=False, forwardedElision=a.elide_forwarded_stack_arguments, borrowedStores=a.borrow_stores, scope=__doc__, trials=[], inputs={}, iterations=build['iterations'])
 try:
     for case in build['cases']:
+        if a.elide_forwarded_stack_arguments:
+            audit_path = a.expected_audit_root / (case['sample'] + '-audit.json')
+            audit = json.loads(audit_path.read_text())
+            assert audit['forwarding']
+            expected_removed = sum(f['candidateStores'] for f in audit['functions'])
+            r['inputs'][str(audit_path.resolve())] = hashlib.sha256(audit_path.read_bytes()).hexdigest()
+        else:
+            expected_removed = case['removedStores']
         original = next(x['selectionCommand'] for x in case['native'] if x['mode'] == 'live')
         assert original[1] == '--closed-world'
         command = [original[0], '--jit-managed', *original[1:4], str(a.host.resolve()), *original[5:]]
@@ -34,6 +45,9 @@ try:
                        NEOCLR_LIVE_SELECTION_COMMAND=str(recipe), NEOCLR_LIVE_SELECTION_MODE='live')
             env.pop('NEOCLR_LIVE_BORROW_STORES', None)
             if a.borrow_stores: env['NEOCLR_LIVE_BORROW_STORES']='1'
+            env.pop('NEOCLR_LIVE_ELIDE_FORWARDED_STACK_ARGUMENTS', None)
+            if enabled and a.elide_forwarded_stack_arguments:
+                env['NEOCLR_LIVE_ELIDE_FORWARDED_STACK_ARGUMENTS'] = '1'
             env.pop('NEOCLR_LIVE_ELIDE_STACK_ARGUMENTS', None)
             if enabled:
                 env['NEOCLR_LIVE_ELIDE_STACK_ARGUMENTS'] = '1'
@@ -56,7 +70,7 @@ try:
             metadata = numbers('INDEX_METADATA')
             assert len(metadata) == 3 and metadata[0] > 0 and metadata[1] == 0
             removed = [int(s.split(':')[1].split()[0]) for s in x.stderr.splitlines() if s.startswith('live stack-argument elision:')]
-            assert removed == ([case['removedStores']] if enabled else [])
+            assert removed == ([expected_removed] if enabled else [])
             row.update(candidateCounts=counts, indexMetadata=metadata, removedStores=removed, outputMatches=True)
         for path in [Path(x) for x in original if Path(x).is_file()]:
             r['inputs'][str(path)] = hashlib.sha256(path.read_bytes()).hexdigest()

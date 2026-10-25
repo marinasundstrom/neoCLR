@@ -20,7 +20,7 @@ try:
   command=original['selectionCommand'].copy();command[4]=str(out/(sample+'.o'))
   selection=out/(sample+'-command.json');selection.write_text(json.dumps(command,indent=2)+'\n');audit=out/(sample+'-audit.json')
   env=dict(os.environ,NEOCLR_TEST_OPT_LEVEL='speed',NEOCLR_LIVE_FORWARD_STACK_ARGUMENTS='1',NEOCLR_LIVE_ELIDE_STACK_ARGUMENTS='1',NEOCLR_LIVE_SELECTION_COMMAND=str(selection),NEOCLR_LIVE_SELECTION_MODE='live',NEOCLR_LIVE_STACK_ARGUMENT_AUDIT=str(audit))
-  for key in ['NEOCLR_LIVE_BORROW_STORES','NEOCLR_LIVE_CONDITIONAL_BORROW']:env.pop(key,None)
+  for key in ['NEOCLR_LIVE_BORROW_STORES','NEOCLR_LIVE_CONDITIONAL_BORROW','NEOCLR_LIVE_ELIDE_FORWARDED_STACK_ARGUMENTS']:env.pop(key,None)
   invoke=[str(runner),'mutation_store::tests::full_http_selection_compiles_with_live_gc','--exact','--ignored','--nocapture']
   x=subprocess.run(invoke,env=env,capture_output=True,text=True,timeout=300)
   row=dict(sample=sample,command=invoke,selectionCommand=command,environment={k:v for k,v in env.items() if k.startswith('NEOCLR_')},exitCode=x.returncode,stdout=x.stdout,stderr=x.stderr);r['commands'].append(row);x.check_returncode()
