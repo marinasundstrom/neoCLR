@@ -15,6 +15,9 @@ try:
   cmd=cc+['-std=c11','-O2','-Wall','-Wextra','-Werror','-pthread','-DNEOCLR_NATIVE_GC','-DNEOCLR_GC_PROFILE','-DNEOCLR_GATE_WORKERS','-DNEOCLR_SHADOW_TEST','-DGATE_WORDS=64','-I',gate,'-I',live,'-I',root/'runtime/native/gc',gate/'gate.c',root/'runtime/native/gc/root-probe.c',root/'runtime/native/gc/participant-roots.c',source,base/'test.c','-o',exe]
   if sanitized:cmd+=['-fsanitize=undefined,bounds','-fno-sanitize-recover=all']
   run(cmd);run([exe])
+  persistent_exe=out/f'persistent-{sanitized}'
+  persistent_cmd=[persistent_exe if x==exe else x for x in cmd]+['-DNEOCLR_PERSISTENT_MUTATORS']
+  run(persistent_cmd);run([persistent_exe])
   array_exe=out/f'arrays-{sanitized}'
   array_cmd=[array_exe if x==exe else base/'arrays.c' if x==base/'test.c' else x for x in cmd]
   run(array_cmd);run([array_exe])
@@ -35,6 +38,12 @@ try:
   x=subprocess.run([str(exe)],capture_output=True,text=True,timeout=60)
   expected=next(i for i,line in enumerate((base/'test.c').read_text().splitlines(),1) if 'allocation_info_v1(&context,objects[i][j]' in line)
   r['negative'].append(dict(kind=name,exitCode=x.returncode,stdout=x.stdout,stderr=x.stderr,expectedLivenessLine=expected))
+  assert x.returncode==-signal.SIGABRT and x.stderr.strip()==f'line {expected}'
+  persistent_exe=out/f'negative-persistent-{name}'
+  persistent_cmd=command+['-DNEOCLR_PERSISTENT_MUTATORS']
+  persistent_cmd[persistent_cmd.index('-o')+1]=str(persistent_exe);run(persistent_cmd)
+  x=subprocess.run([str(persistent_exe)],capture_output=True,text=True,timeout=60)
+  r['negative'].append(dict(kind='persistent-'+name,exitCode=x.returncode,stdout=x.stdout,stderr=x.stderr,expectedLivenessLine=expected))
   assert x.returncode==-signal.SIGABRT and x.stderr.strip()==f'line {expected}'
   array_exe=out/f'negative-arrays-{name}'
   array_cmd=[str(base/'arrays.c') if x==str(base/'test.c') else x for x in command]

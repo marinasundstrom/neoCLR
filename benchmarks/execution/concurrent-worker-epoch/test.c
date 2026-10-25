@@ -49,6 +49,62 @@ static void *mutate(void *opaque) {
     for(size_t i=0;i<sizeof(frame);i++)bytes[i]=0xa5;
     return NULL;
 }
+#ifdef NEOCLR_PERSISTENT_MUTATORS
+/* An acknowledged completed invocation has returned from mutate(), including
+ * its source root frames, and will not access the epoch again. The owner keeps
+ * the dispatcher alive across collections; its lock publishes that quiescence. */
+typedef struct {
+    pthread_mutex_t mutex;
+    pthread_cond_t condition;
+    pthread_t thread;
+    worker *job;
+    int stop, complete;
+} dispatcher;
+static void *dispatch_loop(void *opaque) {
+    dispatcher *d=opaque;
+    CHECK(!pthread_mutex_lock(&d->mutex));
+    for (;;) {
+        while(!d->job && !d->stop) CHECK(!pthread_cond_wait(&d->condition,&d->mutex));
+        if(d->stop) break;
+        worker *job=d->job;
+        CHECK(!pthread_mutex_unlock(&d->mutex));
+        mutate(job);
+        job=NULL;
+        CHECK(!pthread_mutex_lock(&d->mutex));
+        d->job=NULL;d->complete=1;
+        CHECK(!pthread_cond_signal(&d->condition));
+    }
+    CHECK(!pthread_mutex_unlock(&d->mutex));
+    return NULL;
+}
+static void dispatch_start(dispatcher *d) {
+    CHECK(!pthread_mutex_init(&d->mutex,NULL));
+    CHECK(!pthread_cond_init(&d->condition,NULL));
+    CHECK(!pthread_create(&d->thread,NULL,dispatch_loop,d));
+}
+static void dispatch_submit(dispatcher *d,worker *w) {
+    CHECK(!pthread_mutex_lock(&d->mutex));
+    CHECK(!d->job && !d->stop);
+    d->complete=0;d->job=w;
+    CHECK(!pthread_cond_signal(&d->condition));
+    CHECK(!pthread_mutex_unlock(&d->mutex));
+}
+static void dispatch_wait(dispatcher *d) {
+    CHECK(!pthread_mutex_lock(&d->mutex));
+    while(!d->complete) CHECK(!pthread_cond_wait(&d->condition,&d->mutex));
+    CHECK(!d->job);
+    CHECK(!pthread_mutex_unlock(&d->mutex));
+}
+static void dispatch_stop(dispatcher *d) {
+    CHECK(!pthread_mutex_lock(&d->mutex));
+    CHECK(d->complete && !d->job);d->stop=1;
+    CHECK(!pthread_cond_signal(&d->condition));
+    CHECK(!pthread_mutex_unlock(&d->mutex));
+    CHECK(!pthread_join(d->thread,NULL));
+    CHECK(!pthread_cond_destroy(&d->condition));
+    CHECK(!pthread_mutex_destroy(&d->mutex));
+}
+#endif
 static uint64_t *object(neoclr_aot_context *c) {
     uint64_t *p=NULL;CHECK(!neoclr_gc_allocate_v1(&c->text,24,NEOCLR_GC_OBJECT,(void **)&p));p[0]=17;return p;
 }
@@ -101,6 +157,10 @@ static void overflow_recovery(void) {
 }
 int main(void) {
     for(unsigned i=0;i<10;i++)overflow_recovery();
+#ifdef NEOCLR_PERSISTENT_MUTATORS
+    dispatcher dispatchers[4]={0};
+    for(unsigned i=0;i<4;i++)dispatch_start(&dispatchers[i]);
+#endif
     for(unsigned cycle=0;cycle<100;cycle++) {
         uint64_t heap[4096]={0},initial[16],current[16];
         neoclr_aot_context context={.text={(void *)heap,sizeof(heap),0}};
@@ -115,7 +175,14 @@ int main(void) {
             CHECK(!pthread_mutex_init(&workers[i].mutex,NULL));CHECK(!pthread_cond_init(&workers[i].condition,NULL));
         }
         uint64_t *dead=object(&context);
-        for(unsigned i=0;i<4;i++)CHECK(!pthread_create(&threads[i],NULL,mutate,&workers[i]));
+        for(unsigned i=0;i<4;i++) {
+#ifdef NEOCLR_PERSISTENT_MUTATORS
+            threads[i]=dispatchers[i].thread;
+            dispatch_submit(&dispatchers[i],&workers[i]);
+#else
+            CHECK(!pthread_create(&threads[i],NULL,mutate,&workers[i]));
+#endif
+        }
         neoclr_gc_participant parts[4];
         for(unsigned i=0;i<4;i++){lock_ready(&workers[i],1);parts[i]=workers[i].participant;}
         size_t initial_count,current_count;
@@ -139,7 +206,12 @@ int main(void) {
         CHECK(!neoclr_gc_participant_root_capture_v1(&context,parts,4,current,16,&current_count));
         for(unsigned i=0;i<4;i++) {
             CHECK(!experiment_gc_worker_revoke(&context,&workers[i].writer));
-            release(&workers[i],3);CHECK(!pthread_join(threads[i],NULL));
+            release(&workers[i],3);
+#ifdef NEOCLR_PERSISTENT_MUTATORS
+            dispatch_wait(&dispatchers[i]);
+#else
+            CHECK(!pthread_join(threads[i],NULL));
+#endif
         }
         frame.lanes=current;frame.lane_count=(uint32_t)current_count;
         CHECK(!experiment_gc_finish(&context,&frame,NULL,0));
@@ -151,5 +223,9 @@ int main(void) {
         CHECK(!neoclr_gc_heap_release_v1(&context.text));
         for(unsigned i=0;i<4;i++){CHECK(!pthread_cond_destroy(&workers[i].condition));CHECK(!pthread_mutex_destroy(&workers[i].mutex));}
     }
+#ifdef NEOCLR_PERSISTENT_MUTATORS
+    for(unsigned i=0;i<4;i++)dispatch_stop(&dispatchers[i]);
+    puts("PASS four persistent mutators acknowledged completion across 100 epochs before final shutdown");
+#endif
     puts("PASS 100 live epochs, 400 mutators, 2900 liveness checks, current roots, deletion and late insertion, owner allocation and teardown; 10 overflow/recovery cycles");
 }

@@ -14,11 +14,15 @@ allocates; no participant reclaims objects during the epoch. New owner allocatio
 are handled by the existing final new-object closure.
 
 At final rendezvous the owner copies current roots, revokes registrations, releases
-and joins every mutator, then finishes marking and reclaims on the owning thread.
-The source root frames have returned before finish. Descriptors are trusted native
+every mutator and waits for invocation completion, then finishes marking and
+reclaims on the owning thread. Completion is proven by joining temporary workers
+or by a synchronized acknowledgement after returning from `mutate` on persistent
+workers.
+The source root frames have returned before finish. Persistent dispatchers retain
+no outstanding job and perform no further epoch access after acknowledging return. Descriptors are trusted native
 data, not roots or a protection boundary against arbitrary native code. No token
 or descriptor may be used after finish disposes the gate. Cancellation similarly
-requires all users to stop/join before disposal and synchronous recovery.
+requires all users to complete before disposal and synchronous recovery.
 
 The private root-capture service is now independent of `NEOCLR_WORKER_GC`; linking
 it does not install worker collector hooks. The live generator still rejects that
@@ -71,6 +75,23 @@ sites; adding the worker implementation made four. It now explicitly selects the
 owner implementation for its deliberate fault. The initial report is retained as
 `owner-initial.json.gz`, not counted as a passing validation run.
 
+
+`persistent-validation.json.gz` additionally keeps four native dispatcher threads
+alive across 100 epochs in each ordinary/UB-bounds build. Every epoch retains the
+same initial/current root, liveness, revocation and teardown checks. The owner
+waits for acknowledged invocation return before disposing the gate or reclaiming;
+only after all epochs does it join the dispatcher threads. Both deliberately
+missing logs also fail on this persistent path. Temporary-worker and array tests
+rerun alongside it. Acknowledgement replaces thread destruction, not quiescence.
+No thread is permitted to reuse the old descriptor after acknowledging completion.
+
+This selects a fixed collector owner for the native integration experiment. It
+avoids transferring TLS allocator/epoch state while establishing reusable worker
+lifetime. It does not settle the final managed-pool design: workers still receive
+owner-allocated inputs, and allocation requests from generated execution, complete
+resource roots, persistent-worker fault/cancellation and scheduler routing remain
+unqualified. No throughput improvement follows from this correctness test alone.
+
 TSan remains unqualified after the previously recorded test and minimal pthread
 control startup failures. No new ASan/TSan, JIT, AOT application, HTTP performance,
 pause, allocation reduction or default-collector claim is made by this test.
@@ -95,7 +116,7 @@ worker entry, allocation, mutation, final remark, cancellation and exit tests pa
 Connect the protocol to generated worker execution without crossing service
 ownership: allocation handoff, provider store emission, all managed payload forms,
 complete suspended/task/resource roots, scheduler rendezvous and fault/exit cleanup
-remain to be qualified. The test's owner-only allocation and joined native mutators
+remain to be qualified. The test's owner-only allocation and explicitly completed native invocations
 are narrower than a persistent managed worker pool.
 
 After that integration, compare synchronous and concurrent collectors using the

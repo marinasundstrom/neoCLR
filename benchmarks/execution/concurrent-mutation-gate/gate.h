@@ -33,7 +33,8 @@ typedef struct {
 /* Private epoch-scoped authority, not a transferable managed/heap handle.
  * Owner publishes tokens to already-created threads via external synchronization.
  * Revoke before thread exit/reuse. Gate/payload/source lifetimes remain caller-owned.
- * Stop invalidates all tokens; join all users before destroy/reclaim. */
+ * Stop invalidates all tokens; establish completion of every user before
+ * destroy/reclaim (join or acknowledged invocation return with no later access). */
 typedef struct { mutation_gate *gate; uint64_t epoch, generation; unsigned slot; } gate_writer;
 int gate_register_writer(mutation_gate *, pthread_t, gate_writer *);
 int gate_revoke_writer(mutation_gate *, const gate_writer *);

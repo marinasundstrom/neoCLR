@@ -5,7 +5,8 @@
 #ifdef NEOCLR_GATE_WORKERS
 /* Immutable, owner-issued bounds for one allocation in one active epoch. This
  * trusted native descriptor is not a root or a managed capability. All users must be
- * quiescent and joined before finish disposes the gate; no use after that point. */
+ * quiescent before finish disposes the gate, proven by join or an acknowledged
+ * invocation return with no later epoch access; no use after that point. */
 typedef struct {
     mutation_gate *gate;
     uint64_t epoch;
