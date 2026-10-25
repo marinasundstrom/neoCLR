@@ -60,7 +60,13 @@ void experiment_owner_pauses_report(void) {
 }
 '''
 
-def instrument(source, live, finish_details=False, collection_details=False):
+def instrument(source, live, finish_details=False, collection_details=False, begin_details=False):
+    if begin_details:
+        assert live
+        import importlib.util
+        spec=importlib.util.spec_from_file_location("begin_phases",Path(__file__).with_name("begin-phases.py"))
+        module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+        source=module.instrument(source)
     assert not collection_details or finish_details
     if finish_details:
         assert live
@@ -92,10 +98,11 @@ def instrument(source, live, finish_details=False, collection_details=False):
 
 if __name__ == '__main__':
     p = argparse.ArgumentParser(description=__doc__)
+    p.add_argument('--begin-details', action='store_true')
     p.add_argument('--source', type=Path, required=True)
     p.add_argument('--output', type=Path, required=True)
     p.add_argument('--live', action='store_true')
     p.add_argument('--finish-details', action='store_true')
     p.add_argument('--collection-details', action='store_true')
     a = p.parse_args()
-    a.output.write_text(instrument(a.source.read_text(), a.live, a.finish_details, a.collection_details))
+    a.output.write_text(instrument(a.source.read_text(), a.live, a.finish_details, a.collection_details, a.begin_details))

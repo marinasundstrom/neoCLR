@@ -22755,3 +22755,14 @@ transport/OS/client delivery without establishing its cause or a GC performance 
 The assistant retains the failed report and endpoint traces in the
 [close evidence](../benchmarks/execution/concurrent-http-owners/close-results.md).
 Concurrent-default acceptance and broader workload optimization remain open.
+
+
+## 2026-10-25 — Compare industry collectors against measured neoCLR costs
+
+- **Author:** “I want you to look at comparable industry gcs and how they increase performance”. This arrived during begin/snapshot/marker profiling, steering the investigation toward external designs rather than cancelling the concurrent-GC objective.
+- **Assistant action:** Reviewed primary .NET background GC, CoreCLR allocator and DATAS material; Go runtime/GC guide/Green Tea; and Oracle G1/ZGC documentation. Distinguished shipped versions from proposals, GC-overhead gains from application throughput, and diagnostic costs from capacity claims. Direct ZGC JEP retrieval was unavailable; detailed secondary barrier descriptions were not treated as specifications.
+- **Measured outcome:** Added and tested owner begin/capture timing with existing joined-marker counters. 6,240 HTTP responses and nine standalone runs pass. Snapshot capture/dispatch exceeds half of begin CPU; marker cost is much larger for HTTP than the selected standalone samples.
+- **Assistant proposal:** Prioritize bounded-memory pacing and native snapshot allocation/metadata reuse, then reclamation structure; retain generations as a substantial design direction requiring complete old-to-young tracking. Keep ownership, root and mutation proofs and the synchronous control.
+- **Open:** These priorities are recommendations, not a user decision to adopt any particular industry algorithm or a claim of concurrent-default readiness. Next implementation and matched performance evidence remain to be produced.
+
+Evidence: [industry comparison](../benchmarks/execution/concurrent-workloads/industry-gc-comparison.md), [begin/marker profiles](../benchmarks/execution/concurrent-workloads/begin-phases-results.md).

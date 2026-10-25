@@ -51,9 +51,11 @@ p.add_argument('--profile-cpu', action='store_true', help='macOS sample capture;
 p.add_argument('--profile-store-walks', action='store_true')
 p.add_argument('--profile-store-sites', action='store_true')
 p.add_argument('--profile-owner-pauses', action='store_true')
+p.add_argument('--profile-begin', action='store_true')
 p.add_argument('--profile-finish', action='store_true')
 p.add_argument('--profile-collection', action='store_true')
 a=p.parse_args();assert not a.profile_collection or a.profile_finish
+assert not a.profile_begin or a.profile_owner_pauses
 assert not a.profile_finish or a.profile_owner_pauses
 assert a.requests>0 and a.warmup>=0 and a.pairs>0
 assert not a.previous_inline_object or (a.compare_inline_base and not a.previous_live_object)
@@ -109,7 +111,7 @@ try:
   profiler=base.parent/'concurrent-workloads/owner-pauses.py'
   run(['python3',profiler,'--source',root/'runtime/native/gc/native-gc.c','--output',sync_profile])
   for candidate in [source]+([guarded_source] if a.include_guarded_sync else []):
-   run(['python3',profiler,'--source',candidate,'--output',candidate,'--live']+(['--finish-details'] if a.profile_finish else []) + (['--collection-details'] if a.profile_collection else []))
+   run(['python3',profiler,'--source',candidate,'--output',candidate,'--live']+(['--finish-details'] if a.profile_finish else []) + (['--collection-details'] if a.profile_collection else []) + (['--begin-details'] if a.profile_begin else []))
  host=out/'owned-host.c'
  host_source=(root/'target/native-host-ownership/owned-host.c').read_text()
  boundary='    int32_t status = run_entry(entry, with_args, argc, argv);'
@@ -121,6 +123,10 @@ static void report_measurement(void) {
 #ifdef OWNER_PAUSE_PROFILE
  extern void experiment_owner_pauses_report(void);
  experiment_owner_pauses_report();
+#endif
+#ifdef BEGIN_PHASE_PROFILE
+ extern void experiment_begin_phases_report(void);
+ experiment_begin_phases_report();
 #endif
 #ifdef FINISH_PHASE_PROFILE
  extern void experiment_finish_phases_report(void);
@@ -267,6 +273,7 @@ static void report_measurement(void) {
   if a.profile_store_sites and mode!='sync':command+=['-DNEOCLR_STORE_SITES']
   if a.profile_owner_pauses:command+=['-DOWNER_PAUSE_PROFILE','-I',str(root/'runtime/native/gc')]
   if a.profile_finish and mode!='sync':command+=['-DFINISH_PHASE_PROFILE']
+  if a.profile_begin and mode!='sync':command+=['-DBEGIN_PHASE_PROFILE']
   if a.profile_collection and mode!='sync':command+=['-DCOLLECTION_PART_PROFILE']
   if '-linear-seed-' in mode:command+=['-DNEOCLR_LIVE_LINEAR_SEED']
   if '-direct-seed-' in mode:command+=['-DNEOCLR_LIVE_DIRECT_SEED']
