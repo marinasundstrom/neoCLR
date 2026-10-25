@@ -9,7 +9,7 @@ body and exchange lifetimes. A wire probe confirms close-after-one-response in
 retained sync/concurrent hosts even when two requests arrive together. The assistant
 proposes a private connection session with sequential ordered exchanges, preserved
 unread input and separate request disposal. This is investigation and an implementation
-plan, not working pipelining. See [protocol evidence and boundaries](../benchmarks/http-server/pipelining/README.md).
+plan, not working pipelining. The assistant subsequently implemented private read-ahead ownership and validated 45 windows plus connection cancellation/close behavior in interpreter and sync/concurrent AOT/JIT. Concurrent runs each complete 40 automatically paced epochs; explicit collection remains outside that test compiler admission boundary. Session/framing integration remains open. See [protocol evidence and boundaries](../benchmarks/http-server/pipelining/README.md).
 
 ## 2026-10-25 — TechEmpower reference and connection-policy gap
 

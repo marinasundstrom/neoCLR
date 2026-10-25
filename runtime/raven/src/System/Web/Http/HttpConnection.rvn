@@ -68,6 +68,27 @@ internal class HttpSocketStream : InputStream, OutputStream {
 internal class HttpConnection {
     private val transport: HttpSocketStream
     private var ssl: SslStream? = null
+    private var readAhead: HttpReadAhead? = null
+    private var closed = false
+
+    // Transfer only unread input; this private path prepares persistent-session support.
+    // The receiving caller relinquishes the buffer after success.
+    internal func RetainReadAhead(buffer: byte[], start: int, end: int) -> Result<unit, HttpError> {
+        if closed || start < 0 || end < start || end > buffer.Length {
+            return Failure(HttpError.InvalidRequest("Invalid connection read-ahead"))
+        }
+        if readAhead is HttpReadAhead retained {
+            return retained.Save(buffer, start, end)
+        }
+        if start == end {
+            return Ok(())
+        }
+        let created = HttpReadAhead()
+        _ = created.Save(buffer, start, end)?
+        readAhead = created
+        return Ok(())
+    }
+
     internal init(socket: Socket) { transport = HttpSocketStream(socket) }
     internal async func AuthenticateClient(options: SslClientAuthenticationOptions, host: string, token: CancellationToken) -> Task<Result<unit, HttpError>> {
         let stream = SslStream(transport, transport)
@@ -105,6 +126,19 @@ internal class HttpConnection {
         return Receive(buffer, offset, count, token)
     }
     internal async func Receive(buffer: byte[], offset: int, count: int, token: CancellationToken) -> Task<Result<int, HttpError>> {
+        if readAhead is HttpReadAhead retained {
+            if retained.Count > 0 {
+                if token.IsCancellationRequested {
+                    let cancelled = Promise<Result<int, HttpError>>()
+                    _ = cancelled.Cancel()
+                    return await cancelled.Task
+                }
+                if let Some(deadline) = transport.Deadline {
+                    if deadline.IsExpired { return Failure(HttpError.TimedOut) }
+                }
+                return retained.Read(buffer, offset, count)
+            }
+        }
         let input: InputStream = if ssl is SslStream secure { secure } else { transport }
         let result = await input.Read(buffer, offset, count, token)
         if let Ok(read) = result {
@@ -133,6 +167,10 @@ internal class HttpConnection {
         return Ok(())
     }
     internal func Close() {
+        if closed { return }
+        closed = true
+        if readAhead is HttpReadAhead retained { retained.Close() }
+        readAhead = null
         if ssl is SslStream secure { secure.Close() }
         transport.Close()
     }

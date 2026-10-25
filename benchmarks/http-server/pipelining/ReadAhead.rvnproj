@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="$(NeoClrBundleRoot)/lib/NeoCLR.ClassLibrary.props" />
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <RavenNeoClrRuntimeAsyncHelper></RavenNeoClrRuntimeAsyncHelper>
+    <AssemblyName>ReadAheadTests</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="ReadAhead.rvn" />
+    <!-- Exact private sources are compiled into this fixture; no friend grant. -->
+    <Compile Include="../../../runtime/raven/src/System/Web/Http/HttpReadAhead.rvn" />
+    <Compile Include="../../../runtime/raven/src/System/Web/Http/HttpConnection.rvn" />
+  </ItemGroup>
+</Project>

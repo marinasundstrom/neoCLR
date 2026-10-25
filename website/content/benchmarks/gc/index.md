@@ -429,4 +429,6 @@ These connection-close measurements are not directly comparable with
 [TechEmpower Round 23](https://www.techempower.com/benchmarks/#section=data-r23).
 Its [plaintext specification](https://github.com/TechEmpower/FrameworkBenchmarks/wiki/Project-Information-Framework-Tests-Overview#plaintext)
 uses pipelining; neoCLR’s current response encoder closes each exchange’s connection.
-Persistent-connection qualification remains separate future work.
+Private read-ahead ownership now passes interpreter and sync/concurrent AOT/JIT
+checks. Persistent sessions and pipelined response handling remain unimplemented;
+these checks establish no additional throughput gain.

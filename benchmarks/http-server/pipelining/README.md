@@ -85,6 +85,46 @@ must not monopolize all Serve lanes indefinitely.
 6. Measure close, sequential keep-alive and pipelined traffic separately with matched
    Kestrel peers, checked response framing/order and client saturation reporting.
 
-No API signature, compiler bridge or runtime protocol behavior changes in this
-investigation. The next implementation unit is private session/input ownership,
-with executable framing tests before changing public close/completion behavior.
+No public API signature, compiler bridge or wire protocol changes are made here.
+
+## Implemented read-ahead foundation
+
+`HttpConnection` can now privately retain an unread input window, consume it before
+transport reads, and release it when drained or closed. Transfer retains the original
+array without a copy; the caller must relinquish writing/pooling it. The helper is
+allocated only for nonempty read-ahead and reused after draining. Invalid ranges,
+replacement of unread bytes and destination aliasing fail without consuming input.
+Buffered reads preserve cancellation and transport deadlines. Connection close is
+idempotent and clears retained input.
+
+The server exchange does not yet call this path. Body/exchange/session ownership
+and response completion still need integration before keep-alive or pipelining can
+be enabled. This is an internal prerequisite, with no throughput improvement claim.
+
+### Validation
+
+`ReadAhead.rvn` compiles the exact private sources without friend grants. It checks
+45 input windows, partial and zero-length reads, invalid ranges, alias rejection,
+replacement rejection, reuse and repeated close. A helper returns before collection
+so the input wrapper is the sole holder of its source array. A real connection test
+checks buffered completion, cancellation without consumption, and close behavior.
+Explicit task observation in that test asserts immediate buffered completion.
+
+All five runs in `read-ahead-results.json.gz` pass: interpreter, synchronous AOT/JIT,
+and concurrent AOT/JIT. Interpreter and synchronous tests force collection between
+reads; concurrent tests use automatic 16-allocation/64-publication pacing and each
+complete 40 epochs with zero invalid-state reports. Explicit GC.Collect is outside
+this concurrent test compiler's admission boundary, so its generated fixture omits
+only those calls. This does not establish every possible concurrent interleaving.
+
+Reproduce with the retained toolchain and native recipes documented by the harness:
+
+```sh
+python3 benchmarks/http-server/pipelining/validate-read-ahead.py \
+  --output target/http-read-ahead-qualification-new
+```
+
+This developer harness requires existing `target/gc-patterns-standard-build`,
+`target/gc-suite-standard-v1`, `target/gc-index-only-paired`, the retained bundle
+and qualified native test runner. It is not a clean-checkout bootstrap command.
+Next qualify framing/session ownership before changing public completion behavior.

@@ -1,0 +1,100 @@
+import System.*
+import System.Runtime.*
+import System.Concurrency.*
+import System.Networking.Sockets.*
+import System.Result.*
+import System.Web.Http.*
+
+func Check(value: bool) {
+    if !value { System.Fail("Read-ahead contract failed") }
+}
+
+func OwnedWindow(start: int, end: int) -> HttpReadAhead {
+    let bytes: byte[] = [for index in 0..8 => (byte)(10 + index)]
+    let input = HttpReadAhead()
+    Check(input.Save(bytes, start, end) is Ok(_))
+    return input
+}
+
+func ConnectionWindow() {
+    let Ok(socket) = Socket.Listen("127.0.0.1", 0, 8) else { System.Fail("Fixture listener") }
+    let connection = HttpConnection(socket)
+    let bytes: byte[] = [(byte)7, (byte)8, (byte)9]
+    let target: byte[] = [(byte)0, (byte)0]
+    Check(connection.RetainReadAhead(bytes, 1, 3) is Ok(_))
+    Check(connection.RetainReadAhead(bytes, 0, 1) is Failure(_))
+    // This path must complete synchronously from buffered input without socket I/O.
+    // Observing completion directly makes an unintended transport read fail the test.
+    let cancellation = CancellationTokenSource()
+    cancellation.Cancel()
+    Check(connection.Receive(target, 0, 1, cancellation.Token).IsCancelled)
+    let first = connection.Receive(target, 0, 1, CancellationToken.None)
+    Check(first.IsCompleted && first.GetResult() is Ok(1))
+    Check(target[0] == 8)
+    let second = connection.Receive(target, 1, 1, CancellationToken.None)
+    Check(second.IsCompleted && second.GetResult() is Ok(1))
+    Check(target[1] == 9)
+    Check(connection.RetainReadAhead(bytes, 0, 1) is Ok(_))
+    connection.Close()
+    connection.Close()
+    Check(connection.RetainReadAhead(bytes, 0, 0) is Failure(_))
+    cancellation.Dispose()
+}
+
+func Main() {
+    var cases = 0
+    for start in 0..9 {
+        for end in start..9 {
+            let source: byte[] = [for index in 0..8 => (byte)(10 + index)]
+            let target: byte[] = [for index in 0..4 => (byte)99]
+            // OwnedWindow has returned; only input retains its source array.
+            let input = OwnedWindow(start, end)
+            Check(input.Count == end - start)
+            if end > start {
+                Check(input.Save(source, 0, 1) is Failure(_))
+                Check(input.Read(target, 4, 1) is Failure(_))
+                Check(input.Count == end - start)
+                Check(input.Read(target, 4, 0) is Ok(0))
+            }
+            GC.Collect()
+            var position = start
+            while input.Count > 0 {
+                let Ok(count) = input.Read(target, 1, 2) else { System.Fail("Read failed") }
+                Check(count > 0 && count <= 2)
+                var index = 0
+                while index < count {
+                    Check(target[index + 1] == source[position + index])
+                    index += 1
+                }
+                Check(target[0] == 99 && target[3] == 99)
+                position += count
+                GC.Collect()
+            }
+            Check(position == end)
+            Check(input.Read(target, 0, 4) is Ok(0))
+            Check(input.Save(source, 7, 8) is Ok(_))
+            Check(input.Read(target, 0, 4) is Ok(1))
+            Check(target[0] == 17)
+            input.Close()
+            input.Close()
+            Check(input.Count == 0)
+            Check(input.Save(source, 0, 0) is Failure(_))
+            Check(input.Read(target, 0, 0) is Failure(_))
+            cases += 1
+        }
+    }
+    let invalid = HttpReadAhead()
+    let bytes: byte[] = [(byte)1, (byte)2]
+    Check(invalid.Save(bytes, -1, 1) is Failure(_))
+    Check(invalid.Save(bytes, 2, 1) is Failure(_))
+    Check(invalid.Save(bytes, 0, 3) is Failure(_))
+    Check(invalid.Read(bytes, -1, 1) is Failure(_))
+    Check(invalid.Read(bytes, 0, -1) is Failure(_))
+    Check(invalid.Count == 0)
+    Check(invalid.Save(bytes, 0, 2) is Ok(_))
+    Check(invalid.Read(bytes, 0, 1) is Failure(_))
+    Check(invalid.Count == 2)
+    Check(cases == 45)
+    ConnectionWindow()
+    Console.WriteLine("Read-ahead: 45 windows passed")
+}

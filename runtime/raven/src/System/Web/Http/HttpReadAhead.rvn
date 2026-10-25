@@ -1,0 +1,66 @@
+module System.Web.Http
+
+import System.*
+import System.Result.*
+
+// A connection owns the transferred buffer until drained or closed. Callers must
+// stop writing/pooling that buffer after Save succeeds. No copy on ownership transfer.
+internal class HttpReadAhead {
+    private var buffer: byte[]? = null
+    private var position = 0
+    private var end = 0
+    private var closed = false
+
+    internal val Count: int => end - position
+
+    internal func Save(value: byte[], start: int, extent: int) -> Result<unit, HttpError> {
+        if closed || Count != 0 {
+            return Failure(HttpError.InvalidRequest("Read-ahead is unavailable"))
+        }
+        if start < 0 || extent < start || extent > value.Length {
+            return Failure(HttpError.InvalidRequest("Invalid read-ahead range"))
+        }
+        if start != extent {
+            buffer = value
+            position = start
+            end = extent
+        }
+        return Ok(())
+    }
+
+    internal func Read(destination: byte[], offset: int, count: int) -> Result<int, HttpError> {
+        if closed {
+            return Failure(HttpError.InvalidRequest("Read-ahead is closed"))
+        }
+        if offset < 0 || count < 0 || offset > destination.Length || count > destination.Length - offset {
+            return Failure(HttpError.InvalidRequest("Invalid read-ahead destination"))
+        }
+        if buffer is byte[] source {
+            // An alias could overwrite bytes belonging to the following request.
+            if Object.ReferenceEquals(source, destination) {
+                return Failure(HttpError.InvalidRequest("Read-ahead destination aliases owned input"))
+            }
+            let length = if count < Count { count } else { Count }
+            var index = 0
+            while index < length {
+                destination[offset + index] = source[position + index]
+                index += 1
+            }
+            position += length
+            if position == end {
+                buffer = null
+                position = 0
+                end = 0
+            }
+            return Ok(length)
+        }
+        return Ok(0)
+    }
+
+    internal func Close() {
+        closed = true
+        buffer = null
+        position = 0
+        end = 0
+    }
+}
