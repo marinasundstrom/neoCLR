@@ -214,3 +214,9 @@ placement switch; only arena recipes set it. For standalone work use
 cohort: both modes share its unchanged control host and typed-store compiler policy.
 The arena is a test-only JIT code/static-data reservation, not managed-heap sizing
 or a production default. See [qualification and current results](../../../docs/validation/jit-arena-current-20261025/README.md).
+
+Use `prepare-jit-placement.py --policy fallback` to select the separate bounded
+reservation/system-fallback experiment. Its modes are `fallback-sync-jit` and
+`fallback-live-jit`; `sync-jit`/`live-jit` remain the matched system controls. The
+manifest records policy identity and the fallback implementation hash. Fixed-arena
+performance reports do not automatically qualify fallback performance or memory.

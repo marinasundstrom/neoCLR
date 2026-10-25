@@ -58,7 +58,9 @@ continues as an experimental native development path.
   code/static-data placement through the instruction-cache wrapper: matched HTTP
   shows about 30–33% lower concurrent invocation CPU and four allocation-heavy
   standalone patterns improve 32–35%, with sync also improving in HTTP.
-  Retain the system provider default pending memory/large-image/platform policy.
+  Add a test-only system fallback for unavailable/exhausted JIT reservations,
+  retaining existing code/data through publication and teardown. Retain the
+  system provider default pending memory/large-image/platform qualification.
   Reuse completed macOS async
   contexts under their qualified lifetime rules. Explicitly publish macOS ARM64
   JIT instructions through the platform cache API, correcting intermittent

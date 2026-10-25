@@ -35,3 +35,5 @@ there. Preserve prior claims and corrections in their dated records.
 - [Split small-frame validation](../validation/split-storage-validation-20261025/README.md): opt-in scalar small-table/vectorized large-table separation, preserving dynamic checks; matched HTTP and standalone evidence.
 
 - [Current JIT arena qualification](../validation/jit-arena-current-20261025/README.md): shared placement cost with instruction-cache publication retained; 30–33% lower concurrent HTTP CPU and 32–35% in four standalone patterns, pending production memory policy.
+
+- [JIT arena fallback boundary](../validation/jit-arena-fallback-20261025/README.md): unavailable/exhausted reservation falls back without relocating live code/data; safety and HTTP qualification, production policy still open.

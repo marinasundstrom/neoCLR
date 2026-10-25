@@ -1,15 +1,26 @@
 //! Publish generated instructions through the platform cache-maintenance contract.
 use cranelift_jit::{JITBuilder, JITModule};
 
+#[cfg(test)]
+#[path = "jit_memory_fallback.rs"]
+mod fallback;
+
 pub(crate) fn new_module(builder: JITBuilder) -> JITModule {
     let provider: Box<dyn cranelift_jit::JITMemoryProvider> = {
         #[cfg(test)]
         if let Some(value) = std::env::var_os("NEOCLR_TEST_JIT_ARENA") {
-            assert_eq!(value, "1", "NEOCLR_TEST_JIT_ARENA must be 1");
-            return new_with_provider(builder, Box::new(
-                cranelift_jit::ArenaMemoryProvider::new_with_size(64 * 1024 * 1024)
-                    .expect("reserve experimental JIT arena"),
-            ));
+            let arena = || cranelift_jit::ArenaMemoryProvider::new_with_size(64 * 1024 * 1024);
+            let provider: Box<dyn cranelift_jit::JITMemoryProvider> = if value == "1" {
+                Box::new(arena().expect("reserve experimental JIT arena"))
+            } else if value == "fallback" {
+                Box::new(fallback::Fallback::new(
+                    arena().ok().map(|p| Box::new(p) as Box<dyn cranelift_jit::JITMemoryProvider>),
+                    Box::new(cranelift_jit::SystemMemoryProvider::new()),
+                ))
+            } else {
+                panic!("NEOCLR_TEST_JIT_ARENA must be 1 or fallback");
+            };
+            return new_with_provider(builder, provider);
         }
         Box::new(cranelift_jit::SystemMemoryProvider::new())
     };
@@ -129,6 +140,33 @@ mod apple {
                 assert_eq!(unsafe { next() }, value + 1);
                 assert_eq!(unsafe { writable.cast::<u64>().read() }, 99);
                 // No callable pointer is used after owner teardown.
+                unsafe { memory.free_memory(); memory.free_memory(); }
+                assert!(memory.pending_code.is_empty());
+            }
+        }
+
+        #[test]
+        fn arena_spill_keeps_published_code_and_static_data_alive() {
+            for value in 0..64 {
+                let provider = super::super::fallback::Fallback::new(
+                    Some(Box::new(ArenaMemoryProvider::new_with_size(64 * 1024).unwrap())),
+                    Box::new(cranelift_jit::SystemMemoryProvider::new()),
+                );
+                let mut memory = Memory::new(Box::new(provider));
+                let first = memory.allocate_readexec(8, 4).unwrap();
+                let data = memory.allocate_readonly(8, 8).unwrap();
+                unsafe { write_return(first, value); data.cast::<u64>().write(73); }
+                memory.finalize(BranchProtection::None).unwrap();
+                let large = memory.allocate_readwrite(128 * 1024, 8).unwrap();
+                let second = memory.allocate_readexec(8, 4).unwrap();
+                unsafe { large.cast::<u64>().write(99); write_return(second, value + 1); }
+                memory.finalize(BranchProtection::None).unwrap();
+                let call: unsafe extern "C" fn() -> u32 = unsafe { std::mem::transmute(first) };
+                let next: unsafe extern "C" fn() -> u32 = unsafe { std::mem::transmute(second) };
+                assert_eq!(unsafe { call() }, value);
+                assert_eq!(unsafe { next() }, value + 1);
+                assert_eq!(unsafe { data.cast::<u64>().read() }, 73);
+                assert_eq!(unsafe { large.cast::<u64>().read() }, 99);
                 unsafe { memory.free_memory(); memory.free_memory(); }
                 assert!(memory.pending_code.is_empty());
             }

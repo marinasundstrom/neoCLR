@@ -629,3 +629,10 @@ Concurrent CPU falls roughly 32–35% in steady allocation, bursts, retained-win
 and mixed phases, 4.24% in buffer reuse, and is effectively unchanged in compute
 (+0.04%). Managed allocation counts/bytes match. Native-memory and large-image
 policy remain prerequisites to enabling this outside the test runner.
+
+A subsequent test-only fallback policy retains already published arena code/data
+and uses system allocation after reservation or allocation failure. Each provider
+configuration passes 203 active compiler tests; HTTP qualification passes 640
+responses. Direct spill tests cover mixed-provider publication and cleanup. Native
+memory and fallback-policy performance still need measurement; this is safety
+evidence, not an additional speedup or a change of default.
