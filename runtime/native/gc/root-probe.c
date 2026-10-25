@@ -213,7 +213,8 @@ static void stack_roots(neoclr_probe_frame *frame, uint32_t instruction,
 #ifdef NEOCLR_WORKER_GC
     if (neoclr_gc_worker_boundary_hook) {
         uint32_t worker_state = frame->reserved & ~(NEOCLR_GC_OWNED_STORAGE | NEOCLR_GC_TYPED_PLAN | NEOCLR_GC_OWNED_CHAIN | NEOCLR_GC_STORAGE_MAP);
-        if (worker_state < 0x100 || worker_state > 0x101) abort();
+        if ((worker_state & ~NEOCLR_GC_WORKER_READ_PHASE) < 0x100 ||
+            (worker_state & ~NEOCLR_GC_WORKER_READ_PHASE) > 0x101) abort();
         neoclr_gc_worker_boundary_hook((neoclr_aot_context *)frame->context, state->roots.head, frame->reserved & 1);
         return;
     }
@@ -254,6 +255,13 @@ void neoclr_gc_worker_stack_map_v1(neoclr_probe_frame *frame, uint32_t instructi
     const uint64_t *lanes, uint32_t count, const void *map, uint32_t length, uint32_t exclusive) {
     if (!frame || exclusive > 1) abort();
     frame->reserved = (frame->reserved & (NEOCLR_GC_OWNED_STORAGE | NEOCLR_GC_OWNED_CHAIN | NEOCLR_GC_STORAGE_MAP)) | 0x100 | exclusive;
+    neoclr_gc_stack_map_v1(frame, instruction, lanes, count, map, length);
+}
+void neoclr_gc_worker_read_phase_map_v1(neoclr_probe_frame *frame, uint32_t instruction,
+    const uint64_t *lanes, uint32_t count, const void *map, uint32_t length, uint32_t exclusive) {
+    if (!frame || exclusive > 1) abort();
+    frame->reserved = (frame->reserved & (NEOCLR_GC_OWNED_STORAGE | NEOCLR_GC_OWNED_CHAIN | NEOCLR_GC_STORAGE_MAP)) |
+        NEOCLR_GC_WORKER_READ_PHASE | 0x100 | exclusive;
     neoclr_gc_stack_map_v1(frame, instruction, lanes, count, map, length);
 }
 #endif

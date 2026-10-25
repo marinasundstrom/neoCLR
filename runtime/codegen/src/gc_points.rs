@@ -191,6 +191,104 @@ pub(super) fn point(p: &Profile<'_>, op: &Op, stack: &[Ty]) -> Result<Option<Val
     stack_plan(p, stack, consumed, kind, result, receiver).map(Some)
 }
 
+/// Worker scheduling is stricter than collection-point selection. Operations
+/// without a collection point can still write through a heap/interior address.
+/// Keep unreviewed operations exclusive: new IL must not silently gain permission
+/// to run beside a marker. Stack-local writes never follow a borrowed address.
+pub(super) fn worker_exclusive(op: &Op, collection_point: bool) -> bool {
+    collection_point
+        || !matches!(
+            op,
+            Op::Unaligned(_)
+                | Op::Int(_)
+                | Op::Int64(_)
+                | Op::Float32 { .. }
+                | Op::Float64 { .. }
+                | Op::Bool(_)
+                | Op::Void
+                | Op::Arg(_)
+                | Op::Load(_)
+                | Op::Store(_)
+                | Op::StoreArg(_)
+                | Op::LocalAddress(_)
+                | Op::ArgumentAddress(_)
+                | Op::Receiver { .. }
+                | Op::Dup
+                | Op::Pop
+                | Op::BitAnd
+                | Op::BitOr
+                | Op::BitXor
+                | Op::BitNot
+                | Op::Negate
+                | Op::ShiftLeft
+                | Op::ShiftRight
+                | Op::ShiftRightUnsigned
+                | Op::Add
+                | Op::Sub
+                | Op::Mul
+                | Op::Divide
+                | Op::DivideUnsigned
+                | Op::Remainder
+                | Op::RemainderUnsigned
+                | Op::Equal
+                | Op::Greater
+                | Op::GreaterUnsigned
+                | Op::Less
+                | Op::LessUnsigned
+                | Op::Branch(_)
+                | Op::BranchTrue(_)
+                | Op::BranchFalse(_)
+                | Op::BranchEqual(_)
+                | Op::BranchNotEqual(_)
+                | Op::BranchGreater(_)
+                | Op::BranchGreaterUnsigned(_)
+                | Op::BranchLess(_)
+                | Op::BranchLessUnsigned(_)
+                | Op::BranchGreaterEqual(_)
+                | Op::BranchGreaterEqualUnsigned(_)
+                | Op::BranchLessEqual(_)
+                | Op::BranchLessEqualUnsigned(_)
+                | Op::Switch(_)
+                | Op::ConvertInt8
+                | Op::ConvertInt16
+                | Op::ConvertInt32
+                | Op::ConvertInt64
+                | Op::ConvertUInt8
+                | Op::ConvertUInt16
+                | Op::ConvertUInt32
+                | Op::ConvertUInt64
+                | Op::ConvertNativeInt
+                | Op::ConvertNativeUInt
+                | Op::ConvertFloat32
+                | Op::ConvertFloat64
+                | Op::ConvertFloatUnsigned
+                | Op::LoadIndirectInt8
+                | Op::LoadIndirectUInt8
+                | Op::LoadIndirectInt16
+                | Op::LoadIndirectUInt16
+                | Op::LoadIndirectInt32
+                | Op::LoadIndirectUInt32
+                | Op::LoadIndirectInt64
+                | Op::LoadIndirectNative
+                | Op::LoadIndirectFloat32
+                | Op::LoadIndirectFloat64
+                | Op::LoadObject(_)
+                | Op::Field(_)
+                | Op::FieldAddress(_)
+                | Op::ArrayElement(_)
+                | Op::ArrayAddress(_)
+                | Op::ArrayLength
+                | Op::ReferenceEqual
+                | Op::ReferenceIsNull
+                | Op::NullPointer(_)
+                | Op::PointerCast(_)
+                | Op::PointerFromInt(_)
+                | Op::PointerAdd
+                | Op::SizeOf(_)
+                | Op::AlignOf(_)
+        )
+}
+
 pub(super) fn worker_point(p: &Profile<'_>, stack: &[Ty]) -> Result<Value, Error> {
     stack_plan(p, stack, 0, "worker-safepoint", None, None)
 }
@@ -284,7 +382,7 @@ pub(super) fn report(
                 continue;
             };
             let candidate = point_at(p, i, pc, shape)?;
-            let exclusive = candidate.is_some();
+            let exclusive = worker_exclusive(&f.body[pc], candidate.is_some());
             let plan = if candidate.is_none() && details.is_some_and(|d| d.native_worker_safepoints)
             {
                 Some(worker_point(p, shape)?)
@@ -305,7 +403,7 @@ pub(super) fn report(
         json!({"schema": "neoclr-pre-operation-roots-v1", "functions": functions,
         "collection": if details.is_some_and(|d| d.native_worker_safepoints) { "worker-coordinated-nonmoving" } else if details.is_some_and(|d| d.native_gc) { "nonmoving-conservative-pre-operation" } else { "disabled" },
         "notice": if details.is_some_and(|d| d.native_worker_safepoints) {
-            "Private synchronous worker profile: every reachable IL boundary publishes roots; shared GC waits for participants, and allocating/native operations execute exclusively. No async resources or type initializers."
+            "Private synchronous worker profile: every reachable IL boundary publishes roots; shared GC waits for participants, and allocating/native operations and potentially mutating or unreviewed operations execute exclusively. No async resources or type initializers."
         } else if details.is_some_and(|d| d.native_gc) {
             "Collection runs only at published pre-operation boundaries; allocation services never collect. In-buffer descriptors recover interior owners, caller storage covers stack borrows, and fault contexts retain messages. Conservative candidates can over-retain. General host handles and concurrent collection are unsupported."
         } else {
@@ -317,6 +415,70 @@ pub(super) fn report(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn worker_mutations_are_exclusive_without_becoming_gc_points() {
+        use neoclr::metadata::Type;
+        let mutations = [
+            Op::SetField(0),
+            Op::StoreArrayElement(Type::Int32),
+            Op::StoreObject(Type::Int32),
+            Op::InitializeObject(Type::Int32),
+            Op::CopyObject(Type::Int32),
+            Op::CopyBlock,
+            Op::InitializeBlock,
+            Op::StoreIndirectInt8,
+            Op::StoreIndirectInt16,
+            Op::StoreIndirectInt32,
+            Op::StoreIndirectInt64,
+            Op::StoreIndirectNative,
+            Op::StoreIndirectFloat32,
+            Op::StoreIndirectFloat64,
+        ];
+        for op in mutations {
+            assert!(worker_exclusive(&op, false), "{op:?}");
+        }
+        for op in [
+            Op::Field(0),
+            Op::LoadObject(Type::Int32),
+            Op::ArrayElement(Type::Int32),
+            Op::LoadIndirectInt32,
+            Op::Add,
+            Op::Load(0),
+            Op::Store(0),
+        ] {
+            assert!(!worker_exclusive(&op, false), "{op:?}");
+            assert!(
+                worker_exclusive(&op, true),
+                "collection admission wins: {op:?}"
+            );
+        }
+        assert!(worker_exclusive(&Op::AllocateLocal, false));
+        assert!(worker_exclusive(&Op::Return, false));
+        let module = neoclr::assemble(".module WorkerStores\n.function Main(out Int32& value) -> Int32\nldarg value\nldc.i4 7\nstobj Int32\nldc.i4 0\nret\n.end").unwrap();
+        let p = Profile::new(
+            &module,
+            false,
+            None,
+            None,
+            &[],
+            None,
+            None,
+            None,
+            None,
+            false,
+        )
+        .unwrap();
+        assert!(point(&p, &Op::StoreIndirectInt32, &[]).unwrap().is_none());
+        let details = crate::fault_details::Options {
+            native_worker_safepoints: true,
+            ..Default::default()
+        };
+        let report = report(&p, Some(&details)).unwrap();
+        let points = report["functions"][0]["points"].as_array().unwrap();
+        assert_eq!(points[2]["exclusiveHeapOperation"], true);
+        assert_eq!(points[0]["exclusiveHeapOperation"], false);
+    }
 
     #[test]
     fn root_plans_stage_constructor_receivers_arrays_and_output_borrows() {

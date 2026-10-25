@@ -90,7 +90,7 @@ impl Probes {
         }
         let callback = module.declare_function(
             if workers {
-                "neoclr_gc_worker_stack_map_v1"
+                "neoclr_gc_worker_read_phase_map_v1"
             } else if state_handle {
                 "neoclr_gc_state_stack_v1"
             } else if gc {
@@ -231,7 +231,7 @@ impl Probes {
                     continue;
                 };
                 let candidate = gc_points::point_at(p, i, pc, stack)?;
-                let exclusive = candidate.is_some();
+                let exclusive = gc_points::worker_exclusive(op, candidate.is_some());
                 let plan = if let Some(plan) = candidate {
                     plan
                 } else if workers {

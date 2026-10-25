@@ -1,0 +1,9 @@
+{
+  "command": [
+    "nm",
+    "-u",
+    "target/worker-read-phase-owner/code.o"
+  ],
+  "sha256": "47fea73714133ca67be48c74eb2a726e034bd9c7253d6c08ac8734e2d65f8944",
+  "symbols": "_neoclr_allocate_object_rooted_v1\n_neoclr_gc_callback_read_v1\n_neoclr_gc_enter_map_v1\n_neoclr_gc_entry_check_v1\n_neoclr_gc_host_root_create_v1\n_neoclr_gc_leave_v1\n_neoclr_gc_transient_map_v1\n_neoclr_gc_worker_read_phase_map_v1\n_neoclr_int32_to_string_rooted_v1\n_neoclr_string_concat_rooted_v1\n"
+}

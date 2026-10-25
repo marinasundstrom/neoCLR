@@ -11,7 +11,7 @@
 #define neoclr_probe_stack_roots_v2 neoclr_gc_stack_roots_v1
 #define neoclr_probe_transient_v2 neoclr_gc_transient_v1
 #endif
-enum { NEOCLR_GC_OWNED_STORAGE = 0x200, NEOCLR_GC_OWNED_TRANSIENT = 0x400, NEOCLR_GC_TYPED_PLAN = 0x800,
+enum { NEOCLR_GC_WORKER_READ_PHASE = 0x80, NEOCLR_GC_OWNED_STORAGE = 0x200, NEOCLR_GC_OWNED_TRANSIENT = 0x400, NEOCLR_GC_TYPED_PLAN = 0x800,
        NEOCLR_GC_OWNED_CHAIN = 0x1000, NEOCLR_GC_STORAGE_MAP = 0x2000, NEOCLR_GC_TRANSIENT_MAP = 0x4000 };
 /* Private published frame chain, not a stable hosting ABI.
  * Frame storage belongs to the active native function. Diagnostic mode forbids
@@ -100,6 +100,10 @@ void neoclr_gc_stack_map_v1(neoclr_probe_frame *, uint32_t,
     const uint64_t *, uint32_t, const void *, uint32_t);
 #ifdef NEOCLR_WORKER_GC
 void neoclr_gc_worker_stack_map_v1(neoclr_probe_frame *, uint32_t,
+    const uint64_t *, uint32_t, const void *, uint32_t, uint32_t);
+/* New compiler contract: non-exclusive operations are audited local work/reads,
+ * not merely operations without an allocation/collection point. */
+void neoclr_gc_worker_read_phase_map_v1(neoclr_probe_frame *, uint32_t,
     const uint64_t *, uint32_t, const void *, uint32_t, uint32_t);
 #endif
 #endif
