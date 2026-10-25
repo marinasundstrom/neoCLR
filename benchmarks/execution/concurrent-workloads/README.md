@@ -214,3 +214,5 @@ Follow-up: [final-collection attribution and opt-in linear seed validation](coll
 [Borrowed-store lowering qualification](borrowed-lowering-results.md) covers explicitly selected framed AOT/JIT functions and host rejection; complete application admission remains next.
 
 See [complete managed borrowing](borrowed-managed-results.md) for test-only integration, capability correction and a measured performance regression; borrowing is not promoted.
+
+[Acquisition cost and workload density](store-acquisition-results.md) explains the next investigation using diagnostic counts and acquisition-inclusive controls.

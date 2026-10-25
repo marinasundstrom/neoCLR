@@ -1,0 +1,161 @@
+{
+  "passed": true,
+  "cells": [
+    {
+      "destination": "outside",
+      "storesPerActivation": 1,
+      "storesPerTrial": 1048576,
+      "pairedCpuRatio": 1.0716934912683294
+    },
+    {
+      "destination": "outside",
+      "storesPerActivation": 2,
+      "storesPerTrial": 1048576,
+      "pairedCpuRatio": 0.9667338859114787
+    },
+    {
+      "destination": "outside",
+      "storesPerActivation": 4,
+      "storesPerTrial": 1048576,
+      "pairedCpuRatio": 0.9307879198496698
+    },
+    {
+      "destination": "outside",
+      "storesPerActivation": 8,
+      "storesPerTrial": 1048576,
+      "pairedCpuRatio": 0.8987400928492348
+    },
+    {
+      "destination": "outside",
+      "storesPerActivation": 16,
+      "storesPerTrial": 1048576,
+      "pairedCpuRatio": 0.9932733526009985
+    },
+    {
+      "destination": "outside",
+      "storesPerActivation": 64,
+      "storesPerTrial": 1048576,
+      "pairedCpuRatio": 0.8891377063651785
+    },
+    {
+      "destination": "outside",
+      "storesPerActivation": 1024,
+      "storesPerTrial": 1048576,
+      "pairedCpuRatio": 0.8803422274045023
+    },
+    {
+      "destination": "inactive-heap",
+      "storesPerActivation": 1,
+      "storesPerTrial": 1048576,
+      "pairedCpuRatio": 1.0405403905321835
+    },
+    {
+      "destination": "inactive-heap",
+      "storesPerActivation": 2,
+      "storesPerTrial": 1048576,
+      "pairedCpuRatio": 1.0665735959770237
+    },
+    {
+      "destination": "inactive-heap",
+      "storesPerActivation": 4,
+      "storesPerTrial": 1048576,
+      "pairedCpuRatio": 1.0395841849749778
+    },
+    {
+      "destination": "inactive-heap",
+      "storesPerActivation": 8,
+      "storesPerTrial": 1048576,
+      "pairedCpuRatio": 0.9530678222875646
+    },
+    {
+      "destination": "inactive-heap",
+      "storesPerActivation": 16,
+      "storesPerTrial": 1048576,
+      "pairedCpuRatio": 0.941607398008543
+    },
+    {
+      "destination": "inactive-heap",
+      "storesPerActivation": 64,
+      "storesPerTrial": 1048576,
+      "pairedCpuRatio": 0.9354007443375364
+    },
+    {
+      "destination": "inactive-heap",
+      "storesPerActivation": 1024,
+      "storesPerTrial": 1048576,
+      "pairedCpuRatio": 0.9255509811510323
+    }
+  ],
+  "workloads": [
+    {
+      "sample": "tasks",
+      "acquisitions": 319536,
+      "stores": 331819,
+      "storesPerAcquisition": 1.038440113164088,
+      "candidateCounts": [
+        129,
+        128,
+        1,
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "sample": "collections",
+      "acquisitions": 2023472,
+      "stores": 2035755,
+      "storesPerAcquisition": 1.0060702594352677,
+      "candidateCounts": [
+        465,
+        464,
+        1,
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "sample": "arrays",
+      "acquisitions": 475184,
+      "stores": 233515,
+      "storesPerAcquisition": 0.4914201656621435,
+      "candidateCounts": [
+        169,
+        168,
+        1,
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "sample": "plain",
+      "acquisitions": 1987205,
+      "stores": 3765452,
+      "storesPerAcquisition": 1.8948482919477356,
+      "candidateCounts": [
+        518,
+        517,
+        1,
+        516,
+        517,
+        0
+      ]
+    },
+    {
+      "sample": "json",
+      "acquisitions": 2989189,
+      "stores": 5626572,
+      "storesPerAcquisition": 1.8823072077409626,
+      "candidateCounts": [
+        517,
+        516,
+        1,
+        3,
+        516,
+        0
+      ]
+    }
+  ]
+}

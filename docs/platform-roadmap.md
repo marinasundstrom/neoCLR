@@ -1,5 +1,7 @@
 # neoCLR platform roadmap
 
+**Borrow acquisition attribution (2026-10-25):** [Controlled cost and workload counts](../benchmarks/execution/concurrent-workloads/store-acquisition-results.md) show fewer than two store calls per acquisition across five samples. Low-density acquisition can erase native-store savings. Investigate unnecessary/store-light acquisitions before adding a cross-service association; no production/default change or demonstrated gain.
+
 **Complete managed borrowing (2026-10-25):** [Integration and matched evidence](../benchmarks/execution/concurrent-workloads/borrowed-managed-results.md) pass native/JIT/AOT checks and 150 ordinary runs/82,560 HTTP responses, but CPU rises and HTTP throughput falls. Keep the path test-only; investigate acquisition reuse through existing root-state contracts before another optimization. Native scopes and borrow capabilities now have distinct bits. Shared-worker/default qualification remains open.
 
 **Borrowed-store lowering qualification (2026-10-25):** [Explicit framed emission](../benchmarks/execution/concurrent-workloads/borrowed-lowering-results.md) passes four focused tests, 50 regressions and 300 native AOT/sanitized-AOT/JIT concurrent cycles, including legacy-host rejection. Ordinary call-closure admission remains unchanged. Next integrate only complete already-admitted nonmigrating closures and qualify binding/acquisition cost across HTTP and standalone workloads; shared-worker/default acceptance remains open.
