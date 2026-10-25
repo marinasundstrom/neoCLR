@@ -1,0 +1,7 @@
+{
+  "sdkHeader": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk/usr/include/malloc/malloc.h",
+  "sha256": "ce7bb0a678ec56d1d2eb989e3006d15de4c513faba859d571af79a6fd0dd5c9d",
+  "cLayoutProbe": "#include <malloc/malloc.h>\n#include <stddef.h>\n#include <stdio.h>\nint main(void) {\n    printf(\"%zu %zu %zu %zu %zu\\n\", sizeof(malloc_statistics_t),\n        offsetof(malloc_statistics_t, blocks_in_use),\n        offsetof(malloc_statistics_t, size_in_use),\n        offsetof(malloc_statistics_t, max_size_in_use),\n        offsetof(malloc_statistics_t, size_allocated));\n}\n",
+  "result": "32 0 8 16 24",
+  "scope": "sizeof and offsets: blocks_in_use, size_in_use, max_size_in_use, size_allocated; current macOS ARM64 only"
+}

@@ -21,6 +21,8 @@ mod mutation_store;
 #[allow(dead_code)]
 mod mutation_admission;
 mod frame_cleanup;
+#[cfg(all(test, target_os = "macos"))]
+mod native_memory_profile;
 mod native_exports;
 mod native_imports;
 mod native_layout;
@@ -881,6 +883,10 @@ fn run_internal(arguments: Vec<std::ffi::OsString>, live_stores: bool) -> Result
         let details_ref = details
             .as_ref()
             .ok_or("--jit-managed requires explicit GC/context bindings")?;
+        #[cfg(all(test, target_os = "macos"))]
+        let profile_memory = std::env::var_os("NEOCLR_TEST_NATIVE_MEMORY").is_some();
+        #[cfg(all(test, target_os = "macos"))]
+        let memory_before_prepare = profile_memory.then(native_memory_profile::snapshot);
         let executable = jit::prepare_managed(
             compile_input,
             root,
@@ -888,6 +894,8 @@ fn run_internal(arguments: Vec<std::ffi::OsString>, live_stores: bool) -> Result
             Path::new(&args[3]),
             target,
         )?;
+        #[cfg(all(test, target_os = "macos"))]
+        let memory_before_release = profile_memory.then(native_memory_profile::snapshot);
         let release_started = std::time::Instant::now();
         #[cfg(test)]
         let release_compilation = std::env::var_os("NEOCLR_TEST_KEEP_JIT_COMPILATION").is_none();
@@ -903,7 +911,20 @@ fn run_internal(arguments: Vec<std::ffi::OsString>, live_stores: bool) -> Result
             drop(input);
         }
         let release_seconds = release_started.elapsed().as_secs_f64();
+        #[cfg(all(test, target_os = "macos"))]
+        let memory_after_release = profile_memory.then(native_memory_profile::snapshot);
         let mut result = executable.invoke(&jit_arguments)?;
+        #[cfg(all(test, target_os = "macos"))]
+        if profile_memory {
+            let memory_after_invoke = native_memory_profile::snapshot();
+            result["nativeMemory"] = serde_json::json!({
+                "scope": "macOS malloc zones; not RSS, direct mmap, or managed heap attribution",
+                "beforePrepare": memory_before_prepare.as_ref().map(|s| s.json()),
+                "beforeRelease": memory_before_release.as_ref().map(|s| s.json()),
+                "afterRelease": memory_after_release.as_ref().map(|s| s.json()),
+                "afterInvoke": memory_after_invoke.json(),
+            });
+        }
         result["compilationStateReleased"] = serde_json::json!(release_compilation);
         result["compilationStateReleaseSeconds"] = serde_json::json!(release_seconds);
         if jit_run {

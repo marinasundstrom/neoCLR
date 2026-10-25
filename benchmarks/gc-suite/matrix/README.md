@@ -239,3 +239,11 @@ six standalone patterns with the existing root-validation AOT control host.
 Keep memory diagnostics separate from timing. Compilation, early release and guest
 invocation have separate timings; release does not eliminate cleanup cost.
 See [qualification and limitations](../../../docs/validation/jit-compilation-lifetime-20261025/README.md).
+
+Current macOS JIT memory profiles also require test-runner malloc-zone snapshots
+before preparation, before/after compilation-state release, and after host cleanup.
+`sizeInUse` counts live malloc storage; `sizeAllocated` counts allocator reservation.
+Neither is RSS or direct-mapping attribution. The harness sets the test-only native
+memory switch only for memory profiles and clears it for ordinary runs. Rebuild
+older runners before requesting JIT `--process-memory`; missing stages are errors.
+See [native accounting](../../../docs/validation/native-malloc-accounting-20261025/README.md).

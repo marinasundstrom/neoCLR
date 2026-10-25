@@ -652,3 +652,10 @@ with concurrent GC. Invocation timings are mixed: concurrent plain HTTP CPU −1
 JSON +2.00%, standalone −0.34% to +1.26%. This is runtime lifetime cleanup, not a
 collector throughput claim. Native allocation versus resident-page attribution
 remains open; collector and placement defaults are unchanged.
+
+A follow-up allocator profile passes another 8,320 responses and confirms that early
+release removes about 189.6 MiB of live native malloc storage. It leaves roughly
+11–14 MiB before invocation and 3.5 MiB after cleanup. Allocator reservation remains
+much larger and RSS varies; one released sync case has higher RSS than its control.
+This explains why live-data cleanup and resident-memory reduction must be measured
+separately. It does not identify a managed-heap leak or establish a GC speedup.

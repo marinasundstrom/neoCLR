@@ -21,6 +21,6 @@ for mode in ['sync','live']:
   if retained:selected['NEOCLR_TEST_KEEP_JIT_COMPILATION']='1'
   r['recipes'][('retained-' if retained else 'released-')+mode+'-jit']=dict(old,command=command,env=selected,compilationStateReleased=not retained)
 paths=[source,a.runner.resolve(),Path(__file__).resolve()]
-paths += [root/'runtime/codegen/src'/name for name in ['lib.rs','jit.rs','jit_memory.rs','jit_memory_fallback.rs']]
+paths += [root/'runtime/codegen/src'/name for name in ['lib.rs','jit.rs','jit_memory.rs','jit_memory_fallback.rs','native_memory_profile.rs']]
 for path in paths:r['inputs'][str(path)]=hashlib.sha256(path.read_bytes()).hexdigest()
 (out/'build.json').write_text(json.dumps(r,indent=2)+'\n')

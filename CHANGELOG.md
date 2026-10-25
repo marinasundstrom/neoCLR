@@ -45,7 +45,10 @@ continues as an experimental native development path.
   retaining executable code, static data and native-library ownership through host
   cleanup. Qualification covers 203 compiler tests, HTTP and six standalone
   patterns. Process-memory reductions vary by collector; invocation timings are
-  mixed, so this is a lifetime improvement without a throughput claim.
+  mixed, so this is a lifetime improvement without a throughput claim. Add opt-in
+  macOS test-runner malloc accounting around preparation, release and cleanup,
+  separating live native allocations from allocator reservation and RSS. Memory
+  profiles require complete snapshots; ordinary timing runs clear the switch.
 
 - Extend the standard native HTTP matrix with optional macOS stack sampling,
   separating diagnostic timings from benchmarks and retaining capture hashes,
