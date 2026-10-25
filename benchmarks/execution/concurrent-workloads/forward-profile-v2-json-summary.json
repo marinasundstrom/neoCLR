@@ -1,0 +1,741 @@
+{
+  "scope": "Summarize macOS wall-stack samples without treating waiting ticks as CPU time.",
+  "sample": "json",
+  "trials": [
+    {
+      "mode": "sync",
+      "pair": 0,
+      "threads": [
+        {
+          "observations": 709,
+          "thread": "91294478",
+          "description": "DispatchQueue_1: com.apple.main-thread  (serial)"
+        }
+      ],
+      "topFrames": [
+        {
+          "symbol": "_tlv_get_addr",
+          "image": "libdyld.dylib",
+          "observations": 79
+        },
+        {
+          "symbol": "enter_owned",
+          "image": "sync",
+          "observations": 74
+        },
+        {
+          "symbol": "stack_roots",
+          "image": "sync",
+          "observations": 66
+        },
+        {
+          "symbol": "mark",
+          "image": "sync",
+          "observations": 53
+        },
+        {
+          "symbol": "validated_bases",
+          "image": "sync",
+          "observations": 31
+        },
+        {
+          "symbol": "neoclr_gc_allocate_v1",
+          "image": "sync",
+          "observations": 28
+        },
+        {
+          "symbol": "neoclr_gc_state_leave_v1",
+          "image": "sync",
+          "observations": 26
+        },
+        {
+          "symbol": "collect_indexed",
+          "image": "sync",
+          "observations": 23
+        },
+        {
+          "symbol": "publish_transient",
+          "image": "sync",
+          "observations": 23
+        },
+        {
+          "symbol": "neoclr_gc_collect_conditional_v1",
+          "image": "sync",
+          "observations": 16
+        },
+        {
+          "symbol": "neoclr_gc_state_stack_v1",
+          "image": "sync",
+          "observations": 16
+        },
+        {
+          "symbol": "neoclr_value_48",
+          "image": "sync",
+          "observations": 16
+        },
+        {
+          "symbol": "neoclr_value_92",
+          "image": "sync",
+          "observations": 16
+        },
+        {
+          "symbol": "_platform_memset",
+          "image": "libsystem_platform.dylib",
+          "observations": 14
+        },
+        {
+          "symbol": "neoclr_native_stack_check_v1",
+          "image": "sync",
+          "observations": 9
+        },
+        {
+          "symbol": "sigprocmask",
+          "image": "libsystem_kernel.dylib",
+          "observations": 9
+        },
+        {
+          "symbol": "__sigaltstack",
+          "image": "libsystem_kernel.dylib",
+          "observations": 8
+        },
+        {
+          "symbol": "__accept",
+          "image": "libsystem_kernel.dylib",
+          "observations": 7
+        },
+        {
+          "symbol": "poll",
+          "image": "libsystem_kernel.dylib",
+          "observations": 7
+        },
+        {
+          "symbol": "close",
+          "image": "libsystem_kernel.dylib",
+          "observations": 6
+        },
+        {
+          "symbol": "neoclr_gc_state_transient_v1",
+          "image": "sync",
+          "observations": 6
+        },
+        {
+          "symbol": "neoclr_value_459",
+          "image": "sync",
+          "observations": 6
+        },
+        {
+          "symbol": "__sendto",
+          "image": "libsystem_kernel.dylib",
+          "observations": 5
+        },
+        {
+          "symbol": "neoclr_value_456",
+          "image": "sync",
+          "observations": 5
+        }
+      ],
+      "tlsCallers": [
+        {
+          "symbol": "neoclr_native_stack_check_v1",
+          "image": "sync",
+          "offsets": [
+            36
+          ],
+          "observations": 25
+        },
+        {
+          "symbol": "mark",
+          "image": "sync",
+          "offsets": [
+            28
+          ],
+          "observations": 21
+        },
+        {
+          "symbol": "enter_owned",
+          "image": "sync",
+          "offsets": [
+            796
+          ],
+          "observations": 15
+        },
+        {
+          "symbol": "neoclr_native_stack_check_v1",
+          "image": "sync",
+          "offsets": [
+            56
+          ],
+          "observations": 9
+        },
+        {
+          "symbol": "validated_bases",
+          "image": "sync",
+          "offsets": [
+            28
+          ],
+          "observations": 2
+        },
+        {
+          "symbol": "neoclr_root_probe_head_v1",
+          "image": "sync",
+          "offsets": [
+            24
+          ],
+          "observations": 2
+        },
+        {
+          "symbol": "transfer",
+          "image": "sync",
+          "offsets": [
+            56
+          ],
+          "observations": 1
+        },
+        {
+          "symbol": "neoclr_gc_allocate_v1",
+          "image": "sync",
+          "offsets": [
+            808
+          ],
+          "observations": 1
+        },
+        {
+          "symbol": "neoclr_roots_park_v1",
+          "image": "sync",
+          "offsets": [
+            116
+          ],
+          "observations": 1
+        },
+        {
+          "symbol": "socket_poll",
+          "image": "sync",
+          "offsets": [
+            52
+          ],
+          "observations": 1
+        },
+        {
+          "symbol": "neoclr_native_stack_bounds_v1",
+          "image": "sync",
+          "offsets": [
+            28
+          ],
+          "observations": 1
+        }
+      ],
+      "unattributedTlsObservations": 0,
+      "minimumReportedObservations": 5,
+      "note": "All threads, including waits. Missing functions are not zero; observations are not CPU percentages."
+    },
+    {
+      "mode": "live-inline-index",
+      "pair": 0,
+      "threads": [
+        {
+          "observations": 502,
+          "thread": "91294665",
+          "description": "DispatchQueue_1: com.apple.main-thread  (serial)"
+        },
+        {
+          "observations": 502,
+          "thread": "91294735",
+          "description": ""
+        }
+      ],
+      "topFrames": [
+        {
+          "symbol": "__psynch_cvwait",
+          "image": "libsystem_kernel.dylib",
+          "observations": 468
+        },
+        {
+          "symbol": "_tlv_get_addr",
+          "image": "libdyld.dylib",
+          "observations": 76
+        },
+        {
+          "symbol": "experiment_gc_store",
+          "image": "live-inline-index",
+          "observations": 58
+        },
+        {
+          "symbol": "enter_owned",
+          "image": "live-inline-index",
+          "observations": 42
+        },
+        {
+          "symbol": "stack_roots",
+          "image": "live-inline-index",
+          "observations": 25
+        },
+        {
+          "symbol": "live_words",
+          "image": "live-inline-index",
+          "observations": 17
+        },
+        {
+          "symbol": "candidate_seed",
+          "image": "live-inline-index",
+          "observations": 16
+        },
+        {
+          "symbol": "live_store_bits",
+          "image": "live-inline-index",
+          "observations": 14
+        },
+        {
+          "symbol": "neoclr_gc_state_leave_v1",
+          "image": "live-inline-index",
+          "observations": 11
+        },
+        {
+          "symbol": "__psynch_mutexwait",
+          "image": "libsystem_kernel.dylib",
+          "observations": 10
+        },
+        {
+          "symbol": "__sendto",
+          "image": "libsystem_kernel.dylib",
+          "observations": 10
+        },
+        {
+          "symbol": "block_valid",
+          "image": "live-inline-index",
+          "observations": 9
+        },
+        {
+          "symbol": "sigprocmask",
+          "image": "libsystem_kernel.dylib",
+          "observations": 9
+        },
+        {
+          "symbol": "collect_indexed",
+          "image": "live-inline-index",
+          "observations": 8
+        },
+        {
+          "symbol": "neoclr_gc_allocate_v1",
+          "image": "live-inline-index",
+          "observations": 8
+        },
+        {
+          "symbol": "neoclr_value_92",
+          "image": "live-inline-index",
+          "observations": 8
+        },
+        {
+          "symbol": "shadow_find",
+          "image": "live-inline-index",
+          "observations": 8
+        },
+        {
+          "symbol": "mark",
+          "image": "live-inline-index",
+          "observations": 7
+        },
+        {
+          "symbol": "neoclr_gc_state_stack_v1",
+          "image": "live-inline-index",
+          "observations": 7
+        },
+        {
+          "symbol": "neoclr_native_stack_check_v1",
+          "image": "live-inline-index",
+          "observations": 7
+        },
+        {
+          "symbol": "neoclr_value_48",
+          "image": "live-inline-index",
+          "observations": 7
+        },
+        {
+          "symbol": "publish_transient",
+          "image": "live-inline-index",
+          "observations": 7
+        },
+        {
+          "symbol": "shadow_begin",
+          "image": "live-inline-index",
+          "observations": 7
+        },
+        {
+          "symbol": "__accept",
+          "image": "libsystem_kernel.dylib",
+          "observations": 5
+        },
+        {
+          "symbol": "__psynch_mutexdrop",
+          "image": "libsystem_kernel.dylib",
+          "observations": 5
+        },
+        {
+          "symbol": "experiment_gc_finish",
+          "image": "live-inline-index",
+          "observations": 5
+        },
+        {
+          "symbol": "fcntl",
+          "image": "libsystem_kernel.dylib",
+          "observations": 5
+        },
+        {
+          "symbol": "neoclr_gc_state_transient_v1",
+          "image": "live-inline-index",
+          "observations": 5
+        },
+        {
+          "symbol": "neoclr_value_451",
+          "image": "live-inline-index",
+          "observations": 5
+        }
+      ],
+      "tlsCallers": [
+        {
+          "symbol": "experiment_gc_store",
+          "image": "live-inline-index",
+          "offsets": [
+            80
+          ],
+          "observations": 20
+        },
+        {
+          "symbol": "experiment_gc_store",
+          "image": "live-inline-index",
+          "offsets": [
+            304
+          ],
+          "observations": 14
+        },
+        {
+          "symbol": "neoclr_native_stack_check_v1",
+          "image": "live-inline-index",
+          "offsets": [
+            36
+          ],
+          "observations": 9
+        },
+        {
+          "symbol": "neoclr_native_stack_check_v1",
+          "image": "live-inline-index",
+          "offsets": [
+            56
+          ],
+          "observations": 9
+        },
+        {
+          "symbol": "enter_owned",
+          "image": "live-inline-index",
+          "offsets": [
+            796
+          ],
+          "observations": 8
+        },
+        {
+          "symbol": "experiment_gc_store",
+          "image": "live-inline-index",
+          "offsets": [
+            428
+          ],
+          "observations": 4
+        },
+        {
+          "symbol": "neoclr_root_probe_head_v1",
+          "image": "live-inline-index",
+          "offsets": [
+            24
+          ],
+          "observations": 4
+        },
+        {
+          "symbol": "mark",
+          "image": "live-inline-index",
+          "offsets": [
+            28
+          ],
+          "observations": 3
+        },
+        {
+          "symbol": "neoclr_gc_allocate_rooted_values_v1",
+          "image": "live-inline-index",
+          "offsets": [
+            88
+          ],
+          "observations": 1
+        },
+        {
+          "symbol": "owned_index_before",
+          "image": "live-inline-index",
+          "offsets": [
+            40
+          ],
+          "observations": 1
+        },
+        {
+          "symbol": "neoclr_gc_allocate_v1",
+          "image": "live-inline-index",
+          "offsets": [
+            52
+          ],
+          "observations": 1
+        },
+        {
+          "symbol": "neoclr_gc_allocate_v1",
+          "image": "live-inline-index",
+          "offsets": [
+            876
+          ],
+          "observations": 1
+        },
+        {
+          "symbol": "yield",
+          "image": "live-inline-index",
+          "offsets": [
+            28
+          ],
+          "observations": 1
+        }
+      ],
+      "unattributedTlsObservations": 0,
+      "minimumReportedObservations": 5,
+      "note": "All threads, including waits. Missing functions are not zero; observations are not CPU percentages."
+    },
+    {
+      "mode": "guarded-sync-inline-index",
+      "pair": 0,
+      "threads": [
+        {
+          "observations": 676,
+          "thread": "91294913",
+          "description": "DispatchQueue_1: com.apple.main-thread  (serial)"
+        }
+      ],
+      "topFrames": [
+        {
+          "symbol": "_tlv_get_addr",
+          "image": "libdyld.dylib",
+          "observations": 136
+        },
+        {
+          "symbol": "experiment_gc_store",
+          "image": "guarded-sync-inline-index",
+          "observations": 95
+        },
+        {
+          "symbol": "enter_owned",
+          "image": "guarded-sync-inline-index",
+          "observations": 60
+        },
+        {
+          "symbol": "stack_roots",
+          "image": "guarded-sync-inline-index",
+          "observations": 43
+        },
+        {
+          "symbol": "mark",
+          "image": "guarded-sync-inline-index",
+          "observations": 35
+        },
+        {
+          "symbol": "block_valid",
+          "image": "guarded-sync-inline-index",
+          "observations": 20
+        },
+        {
+          "symbol": "neoclr_gc_state_leave_v1",
+          "image": "guarded-sync-inline-index",
+          "observations": 19
+        },
+        {
+          "symbol": "collect_indexed",
+          "image": "guarded-sync-inline-index",
+          "observations": 18
+        },
+        {
+          "symbol": "neoclr_gc_allocate_v1",
+          "image": "guarded-sync-inline-index",
+          "observations": 17
+        },
+        {
+          "symbol": "publish_transient",
+          "image": "guarded-sync-inline-index",
+          "observations": 17
+        },
+        {
+          "symbol": "neoclr_value_48",
+          "image": "guarded-sync-inline-index",
+          "observations": 12
+        },
+        {
+          "symbol": "_platform_memset",
+          "image": "libsystem_platform.dylib",
+          "observations": 10
+        },
+        {
+          "symbol": "sigprocmask",
+          "image": "libsystem_kernel.dylib",
+          "observations": 10
+        },
+        {
+          "symbol": "collect_conditional",
+          "image": "guarded-sync-inline-index",
+          "observations": 9
+        },
+        {
+          "symbol": "neoclr_gc_state_stack_v1",
+          "image": "guarded-sync-inline-index",
+          "observations": 9
+        },
+        {
+          "symbol": "neoclr_native_stack_check_v1",
+          "image": "guarded-sync-inline-index",
+          "observations": 8
+        },
+        {
+          "symbol": "close",
+          "image": "libsystem_kernel.dylib",
+          "observations": 6
+        },
+        {
+          "symbol": "__sendto",
+          "image": "libsystem_kernel.dylib",
+          "observations": 5
+        },
+        {
+          "symbol": "neoclr_gc_state_enter_v1",
+          "image": "guarded-sync-inline-index",
+          "observations": 5
+        },
+        {
+          "symbol": "neoclr_value_459",
+          "image": "guarded-sync-inline-index",
+          "observations": 5
+        }
+      ],
+      "tlsCallers": [
+        {
+          "symbol": "experiment_gc_store",
+          "image": "guarded-sync-inline-index",
+          "offsets": [
+            304
+          ],
+          "observations": 34
+        },
+        {
+          "symbol": "experiment_gc_store",
+          "image": "guarded-sync-inline-index",
+          "offsets": [
+            80
+          ],
+          "observations": 33
+        },
+        {
+          "symbol": "mark",
+          "image": "guarded-sync-inline-index",
+          "offsets": [
+            28
+          ],
+          "observations": 16
+        },
+        {
+          "symbol": "neoclr_native_stack_check_v1",
+          "image": "guarded-sync-inline-index",
+          "offsets": [
+            36
+          ],
+          "observations": 15
+        },
+        {
+          "symbol": "enter_owned",
+          "image": "guarded-sync-inline-index",
+          "offsets": [
+            796
+          ],
+          "observations": 12
+        },
+        {
+          "symbol": "neoclr_native_stack_check_v1",
+          "image": "guarded-sync-inline-index",
+          "offsets": [
+            56
+          ],
+          "observations": 10
+        },
+        {
+          "symbol": "neoclr_gc_allocate_v1",
+          "image": "guarded-sync-inline-index",
+          "offsets": [
+            876
+          ],
+          "observations": 5
+        },
+        {
+          "symbol": "neoclr_gc_allocate_v1",
+          "image": "guarded-sync-inline-index",
+          "offsets": [
+            904
+          ],
+          "observations": 2
+        },
+        {
+          "symbol": "neoclr_root_probe_head_v1",
+          "image": "guarded-sync-inline-index",
+          "offsets": [
+            24
+          ],
+          "observations": 2
+        },
+        {
+          "symbol": "neoclr_gc_allocate_rooted_values_v1",
+          "image": "guarded-sync-inline-index",
+          "offsets": [
+            88
+          ],
+          "observations": 2
+        },
+        {
+          "symbol": "validated_bases",
+          "image": "guarded-sync-inline-index",
+          "offsets": [
+            28
+          ],
+          "observations": 2
+        },
+        {
+          "symbol": "neoclr_gc_allocate_v1",
+          "image": "guarded-sync-inline-index",
+          "offsets": [
+            52
+          ],
+          "observations": 1
+        },
+        {
+          "symbol": "neoclr_socket_accept_v1",
+          "image": "guarded-sync-inline-index",
+          "offsets": [
+            40
+          ],
+          "observations": 1
+        },
+        {
+          "symbol": "owned_index_before",
+          "image": "guarded-sync-inline-index",
+          "offsets": [
+            40
+          ],
+          "observations": 1
+        }
+      ],
+      "unattributedTlsObservations": 0,
+      "minimumReportedObservations": 5,
+      "note": "All threads, including waits. Missing functions are not zero; observations are not CPU percentages."
+    }
+  ],
+  "inputs": {
+    "/Users/robert/Projects/neoclr/target/concurrent-workloads/forward-profile-v2-json/sync-0-cpu.txt": "bb465fb57100e4b7cea4f885581c9b0b4dd38396bf94e3d2019a6be926af3f02",
+    "/Users/robert/Projects/neoclr/target/concurrent-workloads/forward-profile-v2-json/live-inline-index-0-cpu.txt": "33211dd86bc7b2527c2952b5f798a0bac05bf63c8d8b1f5d8e1ba35a14a17baf",
+    "/Users/robert/Projects/neoclr/target/concurrent-workloads/forward-profile-v2-json/guarded-sync-inline-index-0-cpu.txt": "904233ea66cc520ee0da8304160a8c6dc4717713ec42cbbb3eca655e3b228aaa",
+    "target/concurrent-workloads/forward-profile-v2-json/results.json": "ea84a262d54c0193373c22ac08ebffb22ae862cc6038f70cbdd05296edfe65be",
+    "/Users/robert/Projects/neoclr/benchmarks/execution/concurrent-workloads/summarize-cpu.py": "ed6e25872d0bfd40b711b49b11596d52b047c0471a237d456dc2a64c87b20da5"
+  }
+}

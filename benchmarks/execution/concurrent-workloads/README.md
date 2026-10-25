@@ -224,3 +224,5 @@ See [complete managed borrowing](borrowed-managed-results.md) for test-only inte
 [Forwarded stack provenance](forward-stack-results.md) extends the read-only audit through fully known caller chains. Additional guard removal remains disabled pending transformed execution qualification.
 
 [Forwarded-stack guard removal](forward-elision-results.md) qualifies the separate opt-in transformation. Matched live HTTP throughput improves about 2–3% with about 2% less CPU; allocation reduction and concurrent-default acceptance are not claimed.
+
+[Post-forwarding profiles](forward-gap-results.md) match diagnostic builds to uninstrumented controls and identify remaining frame/store work and the separate shared-worker integration boundary.

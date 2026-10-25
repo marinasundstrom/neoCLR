@@ -1,0 +1,30 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "case": "none",
+      "exitCode": 0,
+      "expectedResult": true
+    },
+    {
+      "case": "profile-options",
+      "exitCode": 1,
+      "expectedResult": true
+    },
+    {
+      "case": "profile-input-hash",
+      "exitCode": 1,
+      "expectedResult": true
+    },
+    {
+      "case": "profile-response",
+      "exitCode": 1,
+      "expectedResult": true
+    },
+    {
+      "case": "measurement-pair",
+      "exitCode": 1,
+      "expectedResult": true
+    }
+  ]
+}
