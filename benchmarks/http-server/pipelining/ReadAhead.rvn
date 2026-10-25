@@ -1,5 +1,6 @@
 import System.*
 import System.Runtime.*
+import System.Optional.*
 import System.Concurrency.*
 import System.Networking.Sockets.*
 import System.Result.*
@@ -39,6 +40,47 @@ func ConnectionWindow() {
     connection.Close()
     Check(connection.RetainReadAhead(bytes, 0, 0) is Failure(_))
     cancellation.Dispose()
+}
+
+
+func BodyWindow(chunked: bool) {
+    let Ok(socket) = Socket.Listen("127.0.0.1", 0, 8) else { System.Fail("Fixture listener") }
+    let connection = HttpConnection(socket)
+    let bytes: byte[] = if chunked { [(byte)50, (byte)13, (byte)10, (byte)65, (byte)66, (byte)13, (byte)10, (byte)48, (byte)13, (byte)10, (byte)13, (byte)10, (byte)78, (byte)69, (byte)88, (byte)84] } else { [(byte)65, (byte)66, (byte)78, (byte)69, (byte)88, (byte)84] }
+    let body = HttpBodyInput(connection, bytes, 0, bytes.Length,
+        if chunked { -3 } else { 2 }, 32, None(), false, false)
+    let target: byte[] = [(byte)0, (byte)0, (byte)0, (byte)0]
+    Check(!body.TryReleaseForReuse())
+    // Immediate observation verifies that the coalesced body never reads the socket.
+    let read = body.Read(target, 0, 4)
+    Check(read.IsCompleted && read.GetResult() is Ok(2))
+    Check(target[0] == 65 && target[1] == 66)
+    Check(body.TryReleaseForReuse())
+    Check(!body.TryReleaseForReuse())
+    body.Close()
+    GC.Collect()
+    let next = connection.Receive(target, 0, 4, CancellationToken.None)
+    Check(next.IsCompleted && next.GetResult() is Ok(4))
+    Check(target[0] == 78 && target[1] == 69 && target[2] == 88 && target[3] == 84)
+    connection.Close()
+}
+
+func RejectedBodyWindow() {
+    let Ok(socket) = Socket.Listen("127.0.0.1", 0, 8) else { System.Fail("Fixture listener") }
+    let connection = HttpConnection(socket)
+    let bytes: byte[] = [(byte)65]
+    let owning = HttpBodyInput(connection, bytes, 0, 0, 0, 32, None(), true, false)
+    Check(!owning.TryReleaseForReuse())
+    let body = HttpBodyInput(connection, bytes, 0, 1, 0, 32, None(), false, false)
+    Check(connection.RetainReadAhead(bytes, 0, 1) is Ok(_))
+    // Collision must not retire the body or replace the previously retained input.
+    Check(!body.TryReleaseForReuse())
+    let target: byte[] = [(byte)0]
+    let next = connection.Receive(target, 0, 1, CancellationToken.None)
+    Check(next.IsCompleted && next.GetResult() is Ok(1) && target[0] == 65)
+    Check(body.TryReleaseForReuse())
+    body.Close()
+    owning.Close()
 }
 
 func Main() {
@@ -96,5 +138,8 @@ func Main() {
     Check(invalid.Count == 2)
     Check(cases == 45)
     ConnectionWindow()
+    BodyWindow(false)
+    BodyWindow(true)
+    RejectedBodyWindow()
     Console.WriteLine("Read-ahead: 45 windows passed")
 }

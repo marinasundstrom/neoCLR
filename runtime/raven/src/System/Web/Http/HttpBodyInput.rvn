@@ -83,6 +83,19 @@ internal class HttpBodyInput : InputStream {
         connection.Close()
     }
 
+    // Session-only handoff after complete self-delimited input. Ordinary Close
+    // still aborts the transport. A failed handoff leaves this body owning it.
+    internal func TryReleaseForReuse() -> bool {
+        if closed || busy || !ended || ownsConnection || remaining == -2 {
+            return false
+        }
+        if let Failure(_) = connection.RetainReadAhead(buffer, position, extent) {
+            return false
+        }
+        closed = true
+        return true
+    }
+
     private func Finish(result: Result<int, StreamError>) {
         let completion = source
         source = null

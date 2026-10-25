@@ -128,3 +128,54 @@ This developer harness requires existing `target/gc-patterns-standard-build`,
 `target/gc-suite-standard-v1`, `target/gc-index-only-paired`, the retained bundle
 and qualified native test runner. It is not a clean-checkout bootstrap command.
 Next qualify framing/session ownership before changing public completion behavior.
+
+
+## Ownership split after author clarification
+
+The author explicitly permits architectural changes to server/client APIs and the
+Rust runtime during experimental preview (2026-10-25). Compatibility is not a
+reason to preserve the current exchange/connection coupling. The following is the
+implementation direction, not an already supported public API:
+
+- Transport owns the socket/TLS state, deadlines, pending I/O and unread bytes.
+  Keep it shared between HTTP client and server, on one managed owner heap.
+- A protocol session owns connection admission and HTTP/1 framing across messages.
+  It runs one exchange at a time initially and decides reuse only after both input
+  framing and response completion succeed. EOF-delimited bodies cannot be reused.
+- An exchange owns request/response content and handler completion. Successful
+  completion retires its graph; abort terminates its session. Message disposal
+  must not implicitly terminate a successfully detached transport.
+
+This follows the Kestrel connection/protocol/request separation described above,
+without importing framework middleware or requiring parallel handlers on one
+connection. The current `Accept` creates an exchange by accepting a new socket;
+continuing to use that operation for each message would repeat admission and TLS
+work. Split socket acceptance from reading the next request. The current fixed 16
+Serve lanes also conflate active exchanges and connections: merely looping within
+a lane would let 16 idle persistent clients prevent all new acceptance. Connection
+limits, active-handler limits, idle timeouts and readiness scheduling must be
+separate, with bounded pending work. A Rust readiness/continuation change is
+justified if the existing socket/task primitives cannot represent that separation;
+it must not migrate managed references between isolated heaps.
+
+For the client, distinguish disposing response content from returning a verified
+fully consumed connection to a pool. Do not share a connection across overlapping
+requests initially. Pool key, TLS identity and expiry policy remain separate design
+work; the body handoff alone does not establish client pooling.
+
+The first implemented seam is `HttpBodyInput.TryReleaseForReuse`: only complete,
+self-delimited, nonbusy, non-owning bodies may transfer trailing bytes to the
+connection. Failed transfers preserve body ownership; subsequent ordinary Close
+still aborts it. Successful transfer makes later body disposal harmless to the
+transport. No server/client session calls this method yet.
+
+
+The expanded `body-handoff-results.json.gz` fixture passes all five execution
+configurations with Content-Length and chunked input followed by `NEXT`, premature
+handoff rejection, owning-body rejection, retained-input collision/retry, repeated
+handoff rejection and disposal after transfer. Native concurrent runs each report
+45 candidate starts, 44 completions, one cancellation and zero invalid states;
+these are safety checks, not timing comparisons. Source/compiler hashes and exact
+commands are archived. The earlier v2 development run overlapped fixture edits;
+v3 is the authoritative fixed-source result. Initial compilation used an unsupported
+Encoding.UTF8 spelling, corrected to explicit wire bytes before qualification.

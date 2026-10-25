@@ -1,5 +1,20 @@
 # Development conversation record
 
+## 2026-10-25 — Permit HTTP architecture changes during preview
+
+- **Author:** Explicitly permits architectural/design changes to HttpServer and
+  HttpClient APIs and Rust runtime code, suggesting a split and emphasizing early
+  experimental development.
+- **Assistant response:** Proposes distinct transport, protocol-session and exchange
+  lifetimes. Existing fixed Serve lanes need separate connection/handler admission
+  to avoid idle persistent connections exhausting acceptance. Client pooling needs
+  verified body completion and its own identity/expiry policy.
+- **Action:** Implements and tests an internal completed-body ownership handoff;
+  public API redesign and session scheduling remain open. Compatibility is not a
+  constraint requiring the existing lifetime coupling. This permission does not
+  establish that every proposed API or runtime change is necessary.
+- **Evidence:** [Ownership split and qualification](../benchmarks/http-server/pipelining/README.md).
+
 ## 2026-10-25 — Pipelining after the GC bookkeeping screen
 
 The author said, “After this we should perhaps also investigate HTTP pipelining as

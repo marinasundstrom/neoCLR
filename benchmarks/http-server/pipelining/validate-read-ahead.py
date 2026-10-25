@@ -63,7 +63,7 @@ try:
    counts=list(map(int,next(x.split()[1:] for x in trial['stderr'].splitlines() if x.startswith('CANDIDATE '))))
    assert counts[1]>0 and counts[5]==0
   r['runs'].append(dict(mode=mode+'-jit',passed=True,collectionPolicy='forced' if mode=='sync' else 'automatic 16/64',stderr=trial['stderr']))
- for path in [Path(__file__),base/'ReadAhead.rvn',base/'ReadAhead.rvnproj',root/'runtime/raven/src/System/Web/Http/HttpReadAhead.rvn',root/'runtime/raven/src/System/Web/Http/HttpConnection.rvn',assembly,runner]:
+ for path in [Path(__file__),base/'ReadAhead.rvn',base/'ReadAhead.rvnproj',root/'runtime/raven/src/System/Web/Http/HttpBodyInput.rvn',root/'runtime/raven/src/System/Web/Http/HttpWire.rvn',root/'runtime/raven/src/System/Web/Http/HttpWireLimits.rvn',root/'runtime/raven/src/System/Web/Http/HttpReadAhead.rvn',root/'runtime/raven/src/System/Web/Http/HttpConnection.rvn',assembly,runner]:
   r['inputs'][str(path)]=hashlib.sha256(path.read_bytes()).hexdigest()
  for path in out.glob('*.rvn*'):r['inputs'][str(path)]=hashlib.sha256(path.read_bytes()).hexdigest()
  r['passed']=True
