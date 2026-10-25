@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-25
 
+- Record the author-supplied generational concurrent GC proposal against CoreCLR allocation/background collection guidance, separating TLAB, remembered-set and relocation prerequisites from current implementation. Keep measured runtime optimization active; no collector/default change.
+
 - Add diagnostic native fiber-transfer timing that excludes guest execution and checks balanced arrivals/resumes. Sanitized owned-body validation passes and a missing-arrival control aborts; 16 AOT/JIT sync/concurrent HTTP cases pass 16,640 responses. Carrier transfers account for roughly 1–5.5% of instrumented invocation CPU, with pipelining cutting transfer count about 60%. Label profiles separately from benchmarks; root/queue/resumption overhead remains a separate investigation. No carrier/default change.
 
 - Add opt-in requester-local allocation for compiled shared worker pools while retaining exclusive leases, separate collection ownership, pressure/root handling and accounting. Sync/live optimized and UB/bounds-sanitized graph, fault, shutdown and pressure checks pass; missing-dispatch/root controls still abort. Matched-source interleaved runs reduce concurrent lifecycle elapsed time about 70% and CPU 61%; sync also improves. Separate profiles eliminate 4,520 allocation-service waits per invocation. This does not change defaults, admit general shared mutation or establish an HTTP gain.

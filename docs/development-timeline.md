@@ -1,5 +1,18 @@
 # Development conversation record
 
+## 2026-10-25 — Generational concurrent collector proposal
+
+- **Author:** Supplied ChatGPT advice proposing TLAB allocation, parallel copying
+  young collections, concurrent old marking, card barriers and safepoints. This
+  was external design input, not a claim that neoCLR already implements it.
+- **Assistant:** Considered it a credible target and checked CoreCLR primary
+  documentation. Distinguished requester-local allocation from TLABs, remembered
+  sets from concurrent marking barriers, and tracing safety from relocation safety.
+- **Action:** Recorded [mechanisms, costs and a staged evaluation](design/generational-concurrent-gc-direction.md).
+  Keep root/queue/boundary attribution and the measured concurrent optimization
+  work active; generation, relocation and parallel-young choices remain proposals.
+  No collector renaming, default change or new performance claim was made.
+
 ## 2026-10-25 — Profile worker concurrency and reconsider GC scheduling architecture
 
 - **Author:** Asked to measure GC under many workers/threads and include scheduling
