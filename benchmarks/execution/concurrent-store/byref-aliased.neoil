@@ -1,0 +1,21 @@
+.module LiveByrefAliased
+.type class Node
+.field Next Node
+.end
+.function Write(out Node& first,out Node& second,Node value) -> Int32
+ldarg first
+ldarg value
+stobj Node
+ldarga first
+ldarg second
+stobj Node&
+ldarg first
+ldarg value
+stobj Node
+ldc.i4 0
+ret
+.end
+.function Main(Int32 value) -> Int32
+ldarg value
+ret
+.end

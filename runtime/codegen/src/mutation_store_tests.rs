@@ -2557,3 +2557,14 @@ fn conflicting_join_edge_cannot_regain_stack_proof() {
         assert_eq!(unambiguous_stack_arguments(&func)[&parameter], None);
     }
 }
+
+#[test]
+fn mutable_byref_bindings_rejected_before_codegen() {
+    for source in [
+        include_str!("../../../benchmarks/execution/concurrent-store/byref-reassigned.neoil"),
+        include_str!("../../../benchmarks/execution/concurrent-store/byref-aliased.neoil"),
+    ] {
+        let error = neoclr::assemble(source).unwrap_err();
+        assert_eq!(error.message, "cannot rebind or take the address of a managed reference parameter");
+    }
+}

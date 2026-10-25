@@ -89,7 +89,39 @@ int main(void) {
 typedef int32_t (*managed_writer)(void *,void *,uint64_t,int32_t *,void *);
 extern int experiment_gc_live_active(neoclr_aot_context *);
 extern void experiment_gc_store_counts(uint64_t *);
+#ifndef NEOCLR_GC_PACED
+/* No C roots mask missing compiled argument roots. The pending empty-root
+ * snapshot must be reconciled with the frames published by Write and Put. */
+static void compiled_argument_roots(managed_writer write) {
+    for (unsigned round=0; round<100; round++) {
+        uint64_t heap[512]={0};
+        neoclr_aot_context c={.text={(unsigned char *)heap,sizeof(heap),0}};
+        CHECK(!neoclr_gc_heap_acquire_v1(&c.text));
+        uint64_t *root=node(&c), *second=node(&c), *next=node(&c), *child=node(&c), *dead=node(&c);
+        next[1]=(uintptr_t)child;
+        neoclr_probe_frame frame;
+        void *state=frame_enter(&frame,&c);
+        CHECK(!experiment_gc_begin(&c,&frame,NULL,0));
+        int32_t result=-1;
+        CHECK(!write(root+1,second+1,(uintptr_t)next,&result,&c) && result==0);
+        CHECK(neoclr_root_probe_head_v1()==&frame);
+        /* Completion must occur while the generated frames are still live. */
+        CHECK(!experiment_gc_live_active(&c));
+        CHECK(*root==17 && root[1]==(uintptr_t)next);
+        CHECK(*second==17 && second[1]==(uintptr_t)next);
+        CHECK(*next==17 && next[1]==(uintptr_t)child && *child==17);
+        CHECK(*dead==UINT64_C(0xdddddddddddddddd));
+        CHECK(!neoclr_gc_collect_v1(&c,&frame) && !c.text.used);
+        frame_leave(state,&frame);
+        CHECK(!neoclr_gc_heap_release_v1(&c.text));
+    }
+}
+#endif
+
 int native_managed_consumer(managed_writer write) {
+#ifndef NEOCLR_GC_PACED
+    compiled_argument_roots(write);
+#endif
     CHECK((experiment_gc_live_capabilities_v1(1)&15)==15);
     for(unsigned round=0;round<100;round++) {
         uint64_t heap[512]={0};
@@ -139,6 +171,6 @@ int native_managed_consumer(managed_writer write) {
 extern int32_t live_managed_writer(void *,void *,uint64_t,int32_t *,void *);
 int main(void) {
     CHECK(!native_managed_consumer(live_managed_writer));
-    puts("PASS managed value compiler: nested calls, byref writes, faults and 100 live-GC cycles");
+    puts("PASS managed value compiler: nested calls, byref roots/writes, faults and live-GC cycles");
 }
 #endif

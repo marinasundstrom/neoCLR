@@ -10,10 +10,10 @@ p.add_argument('--runner',type=Path,required=True)
 p.add_argument('--output',type=Path,required=True)
 a=p.parse_args();base=Path(__file__).resolve().parent;root=base.parents[2]
 out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
-r=dict(passed=False,commands=[])
+r=dict(passed=False,commands=[], compilerEnvironment={k:v for k,v in os.environ.items() if k.startswith('NEOCLR_LIVE_')})
 def run(cmd,env=None):
  cmd=list(map(str,cmd));x=subprocess.run(cmd,capture_output=True,text=True,timeout=90,env=env)
- r['commands'].append(dict(command=cmd,environment=env and {k:v for k,v in env.items() if k.startswith('NEOCLR_MUTATION_')},exitCode=x.returncode,stdout=x.stdout,stderr=x.stderr))
+ r['commands'].append(dict(command=cmd,environment=env and {k:v for k,v in env.items() if k.startswith(('NEOCLR_MUTATION_', 'NEOCLR_LIVE_'))},exitCode=x.returncode,stdout=x.stdout,stderr=x.stderr))
  x.check_returncode()
 try:
  runner=a.runner.resolve();obj=out/'stores.o'
