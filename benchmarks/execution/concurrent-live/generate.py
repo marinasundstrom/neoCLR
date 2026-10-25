@@ -22,6 +22,14 @@ replace('    uint64_t used, *offsets, *pending;', '''    uint64_t used, *offsets
     uint64_t hold_start, hold_max, hold_total;
 #endif''')
 replace('static _Thread_local uint64_t shadow_stats[5];', 'static _Thread_local uint64_t live_counts[5], live_batch_counts[5], live_time_counts[5];\nstatic _Thread_local uint64_t shadow_stats[5];')
+# Keep the predicate identical; expose its loads to the caller's optimizer.
+# The qualified candidate uses Clang/GCC; ordinary native GC is unchanged.
+replace('static int block_valid(const neoclr_aot_text_arena *a, uint64_t at) {', '\n'.join([
+    '#ifdef NEOCLR_LIVE_INLINE_VALIDATION',
+    'static inline __attribute__((always_inline)) int block_valid(const neoclr_aot_text_arena *a, uint64_t at)',
+    '#else',
+    'static int block_valid(const neoclr_aot_text_arena *a, uint64_t at)',
+    '#endif', '{']))
 # All descriptor accesses use compact detached headers.
 replace('(const void *)(s->data + s->offsets[i])','&s->headers[i]',5)
 replace('''    s->data = shadow_alloc(s->used, 1);

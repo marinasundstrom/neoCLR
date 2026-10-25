@@ -140,3 +140,7 @@ without changing generated managed objects or weakening mutation/ownership check
 [Private TLS and CPU sampling](packed-tls-results.md) retain ownership isolation and
 compare identical generated code. Sampled cohorts are diagnostic-only; their wall
 stack observations, including waits, are not CPU-time percentages.
+
+[Header-validation inlining](inline-header-results.md) is retained as an opt-in
+experiment: safety passes, but mixed/small performance effects leave the default
+outlined. The report separates initial and final control labels explicitly.

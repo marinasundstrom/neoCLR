@@ -1,0 +1,279 @@
+{
+  "scope": "Header inlining experiment; initial short reports use live=inlined and live-outlined=control; final generator defaults to outlined",
+  "standalone": {
+    "inline-header-measure": {
+      "tasks": {
+        "sync": {
+          "cpuSeconds": 0.015196,
+          "allocations": 65548,
+          "allocatedBytes": 2261361
+        },
+        "guarded-sync": {
+          "cpuSeconds": 0.04493,
+          "allocations": 65548,
+          "allocatedBytes": 2261361
+        },
+        "live": {
+          "cpuSeconds": 0.077373,
+          "allocations": 65548,
+          "allocatedBytes": 2261361
+        }
+      },
+      "collections": {
+        "sync": {
+          "cpuSeconds": 0.089222,
+          "allocations": 237580,
+          "allocatedBytes": 7864689
+        },
+        "guarded-sync": {
+          "cpuSeconds": 0.229052,
+          "allocations": 237580,
+          "allocatedBytes": 7864689
+        },
+        "live": {
+          "cpuSeconds": 0.391291,
+          "allocations": 237580,
+          "allocatedBytes": 7864689
+        }
+      },
+      "arrays": {
+        "sync": {
+          "cpuSeconds": 0.050127,
+          "allocations": 86028,
+          "allocatedBytes": 1892721
+        },
+        "guarded-sync": {
+          "cpuSeconds": 0.068468,
+          "allocations": 86028,
+          "allocatedBytes": 1892721
+        },
+        "live": {
+          "cpuSeconds": 0.090278,
+          "allocations": 86028,
+          "allocatedBytes": 1892721
+        }
+      }
+    },
+    "outlined-header-measure": {
+      "tasks": {
+        "sync": {
+          "cpuSeconds": 0.015308,
+          "allocations": 65548,
+          "allocatedBytes": 2261361
+        },
+        "guarded-sync": {
+          "cpuSeconds": 0.045841,
+          "allocations": 65548,
+          "allocatedBytes": 2261361
+        },
+        "live": {
+          "cpuSeconds": 0.078503,
+          "allocations": 65548,
+          "allocatedBytes": 2261361
+        }
+      },
+      "collections": {
+        "sync": {
+          "cpuSeconds": 0.089171,
+          "allocations": 237580,
+          "allocatedBytes": 7864689
+        },
+        "guarded-sync": {
+          "cpuSeconds": 0.231839,
+          "allocations": 237580,
+          "allocatedBytes": 7864689
+        },
+        "live": {
+          "cpuSeconds": 0.396553,
+          "allocations": 237580,
+          "allocatedBytes": 7864689
+        }
+      },
+      "arrays": {
+        "sync": {
+          "cpuSeconds": 0.050524,
+          "allocations": 86028,
+          "allocatedBytes": 1892721
+        },
+        "guarded-sync": {
+          "cpuSeconds": 0.069249,
+          "allocations": 86028,
+          "allocatedBytes": 1892721
+        },
+        "live": {
+          "cpuSeconds": 0.090492,
+          "allocations": 86028,
+          "allocatedBytes": 1892721
+        }
+      }
+    }
+  },
+  "http": {
+    "inline-header-http-plain": {
+      "summary": {
+        "sync": {
+          "requestsPerSecond": 4426.4141074659055,
+          "requestSeconds": 0.05783462499999992,
+          "processCpuSeconds": 0.055702,
+          "peakRssBytes": 9273344
+        },
+        "guarded-sync": {
+          "requestsPerSecond": 1887.0393200761546,
+          "requestSeconds": 0.13566224999999932,
+          "processCpuSeconds": 0.145149,
+          "peakRssBytes": 11124736
+        },
+        "live": {
+          "requestsPerSecond": 1801.3321850685184,
+          "requestSeconds": 0.14211704099999878,
+          "processCpuSeconds": 0.164301,
+          "peakRssBytes": 11403264
+        },
+        "live-outlined": {
+          "requestsPerSecond": 1840.366746559918,
+          "requestSeconds": 0.13910270899999944,
+          "processCpuSeconds": 0.158525,
+          "peakRssBytes": 11354112
+        },
+        "guarded-sync-outlined": {
+          "requestsPerSecond": 1906.388987904871,
+          "requestSeconds": 0.13428529099999942,
+          "processCpuSeconds": 0.138005,
+          "peakRssBytes": 11091968
+        }
+      },
+      "allocations": 57120,
+      "allocatedBytes": 4394837
+    },
+    "inline-header-http-json": {
+      "summary": {
+        "sync": {
+          "requestsPerSecond": 2414.3958503476597,
+          "requestSeconds": 0.10603066600000055,
+          "processCpuSeconds": 0.090636,
+          "peakRssBytes": 10649600
+        },
+        "guarded-sync": {
+          "requestsPerSecond": 1172.1540179427332,
+          "requestSeconds": 0.21840133300000097,
+          "processCpuSeconds": 0.22553199999999998,
+          "peakRssBytes": 12943360
+        },
+        "live": {
+          "requestsPerSecond": 1089.3524310431415,
+          "requestSeconds": 0.2350019999999997,
+          "processCpuSeconds": 0.256142,
+          "peakRssBytes": 13221888
+        },
+        "live-outlined": {
+          "requestsPerSecond": 1077.476412862838,
+          "requestSeconds": 0.2375922079999988,
+          "processCpuSeconds": 0.258678,
+          "peakRssBytes": 13221888
+        },
+        "guarded-sync-outlined": {
+          "requestsPerSecond": 1169.6641213526548,
+          "requestSeconds": 0.2188662499999996,
+          "processCpuSeconds": 0.227133,
+          "peakRssBytes": 12943360
+        }
+      },
+      "allocations": 124873,
+      "allocatedBytes": 7163755
+    }
+  },
+  "inputs": {
+    "target/concurrent-workloads/inline-header-safety/results.json": "0899697a7d209265263989ac101795af45ccff98fe4cdeb0fa700fc28015eb66",
+    "target/concurrent-workloads/outlined-header-safety/results.json": "15cd70ede494c6d56b629fb4dc07cb857241334a47fd87105ecbbf85674111ef",
+    "target/concurrent-workloads/inline-header-entry/results.json": "a5e7b5a8601f8db2c025ae57f990a3577b6eaed2b762489ff6c0c809d260e191",
+    "target/concurrent-workloads/inline-header-records/results.json": "be8995e6a1f1000911d79f5d601cd383320a1a0e83ecfd37cb786eb2a04dd550",
+    "target/concurrent-workloads/inline-header-measure/results.json": "9a72e43f1b1a8416acebd0ab59a6e100ee28a99d30c13478086a4a0e06032d94",
+    "target/concurrent-workloads/outlined-header-measure/results.json": "e6c8ca944456d8cf5119fcb401d08fcda68e06747a567316b41ee8021c14f4f8",
+    "target/concurrent-workloads/inline-header-http-plain/results.json": "24c9fd794b5ce5a5dec1038e519d6b818f653fd4fb0463d378b3d0714f1d1d65",
+    "target/concurrent-workloads/inline-header-http-json/results.json": "769f23b8afc9a1c3e4a7877df355b12ee7e5ae0b88db207eced9bac2854a10c1",
+    "target/concurrent-workloads/header-long-plain/results.json": "209536bd9f5bc9a306b212deb37ff2f3e6fcb653678b322937b8dd84357bf736",
+    "target/concurrent-workloads/header-long-json/results.json": "6c0ec1ecadf49a2f2d40805020ce55b2676e3ab5831475629beb1a5c86a83ba0"
+  },
+  "codeSize": {
+    "inline-header-safety": "Segment __PAGEZERO: 4294967296 (zero fill) \nSegment __TEXT: 49152\n\tSection __text: 44360\n\tSection __stubs: 336\n\tSection __const: 131\n\tSection __cstring: 507\n\tSection __unwind_info: 400\n\ttotal 45734\nSegment __DATA_CONST: 16384\n\tSection __got: 248\n\ttotal 248\nSegment __DATA: 32768\n\tSection __data: 8\n\tSection __thread_vars: 480\n\tSection __thread_bss: 18664 (zerofill)\n\tSection __bss: 4 (zerofill)\n\ttotal 19156\nSegment __LINKEDIT: 16384\ntotal 4295081984\n",
+    "outlined-header-safety": "Segment __PAGEZERO: 4294967296 (zero fill) \nSegment __TEXT: 49152\n\tSection __text: 44032\n\tSection __stubs: 336\n\tSection __const: 131\n\tSection __cstring: 507\n\tSection __unwind_info: 408\n\ttotal 45414\nSegment __DATA_CONST: 16384\n\tSection __got: 248\n\ttotal 248\nSegment __DATA: 32768\n\tSection __data: 8\n\tSection __thread_vars: 480\n\tSection __thread_bss: 18664 (zerofill)\n\tSection __bss: 4 (zerofill)\n\ttotal 19156\nSegment __LINKEDIT: 16384\ntotal 4295081984\n"
+  },
+  "entryAndRecordSourceEqual": true,
+  "longHttp": {
+    "plain": {
+      "summary": {
+        "sync": {
+          "requestsPerSecond": 4809.359931210377,
+          "requestSeconds": 0.4258362919999996,
+          "processCpuSeconds": 0.389093,
+          "peakRssBytes": 9273344
+        },
+        "guarded-sync": {
+          "requestsPerSecond": 1899.8420083779047,
+          "requestSeconds": 1.0779843749999998,
+          "processCpuSeconds": 1.000636,
+          "peakRssBytes": 11091968
+        },
+        "live": {
+          "requestsPerSecond": 1844.7684677170337,
+          "requestSeconds": 1.1101664170000003,
+          "processCpuSeconds": 1.1428770000000001,
+          "peakRssBytes": 11386880
+        },
+        "live-inline": {
+          "requestsPerSecond": 1857.4766829922557,
+          "requestSeconds": 1.102571041000001,
+          "processCpuSeconds": 1.139172,
+          "peakRssBytes": 11386880
+        },
+        "guarded-sync-inline": {
+          "requestsPerSecond": 1918.4535465864321,
+          "requestSeconds": 1.0675264999999996,
+          "processCpuSeconds": 0.97907,
+          "peakRssBytes": 11108352
+        }
+      },
+      "allocations": 429856,
+      "allocatedBytes": 33057881,
+      "checkedResponses": 30960
+    },
+    "json": {
+      "summary": {
+        "sync": {
+          "requestsPerSecond": 2440.592850749198,
+          "requestSeconds": 0.8391403749999995,
+          "processCpuSeconds": 0.64734,
+          "peakRssBytes": 10649600
+        },
+        "guarded-sync": {
+          "requestsPerSecond": 1175.7223950552966,
+          "requestSeconds": 1.7419077909999992,
+          "processCpuSeconds": 1.657542,
+          "peakRssBytes": 12943360
+        },
+        "live": {
+          "requestsPerSecond": 1072.9781437333208,
+          "requestSeconds": 1.9087061669999983,
+          "processCpuSeconds": 1.903235,
+          "peakRssBytes": 13320192
+        },
+        "live-inline": {
+          "requestsPerSecond": 1091.1354745904118,
+          "requestSeconds": 1.8769438329999986,
+          "processCpuSeconds": 1.8867379999999998,
+          "peakRssBytes": 13271040
+        },
+        "guarded-sync-inline": {
+          "requestsPerSecond": 1178.4044441571873,
+          "requestSeconds": 1.7379432080000008,
+          "processCpuSeconds": 1.636897,
+          "peakRssBytes": 12943360
+        }
+      },
+      "allocations": 943817,
+      "allocatedBytes": 54065775,
+      "checkedResponses": 30960
+    }
+  },
+  "decision": "Keep validation outlined by default; inline remains an opt-in diagnostic control. Mixed short-run results and small sustained effects do not establish a useful default gain."
+}
