@@ -18,6 +18,12 @@ replace('    const void *bases[OWNED_BASE_CACHE_SIZE];', """    const void *base
     uint64_t *starts, *start_summary, start_words, start_summary_words;
 #endif""")
 replace('/* Positive entries only:', (base/'allocation-index.h').read_text()+'\n/* Positive entries only:')
+replace('static int known_base(const void *value) {', """#ifdef NEOCLR_LIVE_INLINE_BASE
+static inline __attribute__((always_inline)) int known_base(const void *value)
+#else
+static int known_base(const void *value)
+#endif
+{""")
 replace('    return !value || owned_heap.bases[base_slot(value)] == value;', """#ifdef NEOCLR_LIVE_EXACT_INDEX
     if (!value) return 1;
 #ifndef NEOCLR_LIVE_DIRECT_EXACT_INDEX

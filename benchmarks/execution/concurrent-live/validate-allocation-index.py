@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import subprocess
 p=argparse.ArgumentParser(description=__doc__)
+p.add_argument('--inline-base',action='store_true')
 p.add_argument('--exact-allocation-index',action='store_true')
 p.add_argument('--address-sanitizer',action='store_true',help='Also run ASan where the host sanitizer runtime can initialize.')
 p.add_argument('--output',type=Path,required=True)
@@ -24,6 +25,7 @@ try:
  source=out/'native-gc.c';run(['python3',base/'automatic.py','--output',source])
  recipe=json.loads((root/'benchmarks/execution/call-layout/results.json').read_text())['builds'][1]['command']
  cc=recipe[:recipe.index('-std=c11')]+['-std=c11','-O2','-Wall','-Wextra','-Werror','-pthread','-DNEOCLR_NATIVE_GC','-DNEOCLR_GC_PROFILE','-DNEOCLR_SHADOW_TEST','-DNEOCLR_LIVE_ALLOCATION_INDEX','-DNEOCLR_SHADOW_SPARSE_INDEX','-I',root/'runtime/native/gc','-I',base.parent/'concurrent-mutation-gate',base.parent/'concurrent-mutation-gate/gate.c',root/'runtime/native/gc/root-probe.c']
+ if a.inline_base: cc += ['-DNEOCLR_LIVE_INLINE_BASE']
  if a.exact_allocation_index: cc += ['-DNEOCLR_LIVE_EXACT_INDEX']
  for sanitize in ['none','undefined']+(['address'] if a.address_sanitizer else []):
   exe=out/f'model-{sanitize}'

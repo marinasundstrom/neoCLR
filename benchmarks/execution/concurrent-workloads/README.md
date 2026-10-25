@@ -172,3 +172,7 @@ metadata-allocation/cleanup accounting and explicit .NET/Go design comparisons.
 
 See [exact-base index reuse](exact-index-results.md) for direct and hybrid
 lookup controls, HTTP gains, ordinary CPU regressions and unchanged metadata cost.
+
+[Balanced interleaving and exact-base inlining](inline-base-results.md) isolate
+the ordinary CPU regression and retain HTTP gains, with code-size and allocation
+tradeoffs. The summary tool checks balanced evidence before reporting paired ratios.

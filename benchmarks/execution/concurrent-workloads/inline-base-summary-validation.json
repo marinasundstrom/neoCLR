@@ -1,0 +1,44 @@
+{
+  "passed": true,
+  "negativeControls": [
+    {
+      "case": "duplicate",
+      "command": [
+        "python3",
+        "benchmarks/execution/concurrent-workloads/summarize-index-interleaving.py",
+        "--measurement",
+        "target/concurrent-workloads/inline-base-interleaved/duplicate.json",
+        "--output",
+        "target/concurrent-workloads/inline-base-interleaved/duplicate-summary.json"
+      ],
+      "exitCode": 1,
+      "stderr": "Traceback (most recent call last):\n  File \"/Users/robert/Projects/neoclr/benchmarks/execution/concurrent-workloads/summarize-index-interleaving.py\", line 35, in <module>\n    assert len(trial) == len(modes) and {t['mode'] for t in trial} == modes\nAssertionError\n"
+    },
+    {
+      "case": "unbalanced",
+      "command": [
+        "python3",
+        "benchmarks/execution/concurrent-workloads/summarize-index-interleaving.py",
+        "--measurement",
+        "target/concurrent-workloads/inline-base-interleaved/unbalanced.json",
+        "--output",
+        "target/concurrent-workloads/inline-base-interleaved/unbalanced-summary.json"
+      ],
+      "exitCode": 1,
+      "stderr": "Traceback (most recent call last):\n  File \"/Users/robert/Projects/neoclr/benchmarks/execution/concurrent-workloads/summarize-index-interleaving.py\", line 40, in <module>\n    assert set(positions.values()) == {len(rounds) // len(modes)}\nAssertionError\n"
+    },
+    {
+      "case": "instrumented",
+      "command": [
+        "python3",
+        "benchmarks/execution/concurrent-workloads/summarize-index-interleaving.py",
+        "--measurement",
+        "target/concurrent-workloads/inline-base-interleaved/instrumented.json",
+        "--output",
+        "target/concurrent-workloads/inline-base-interleaved/instrumented-summary.json"
+      ],
+      "exitCode": 1,
+      "stderr": "Traceback (most recent call last):\n  File \"/Users/robert/Projects/neoclr/benchmarks/execution/concurrent-workloads/summarize-index-interleaving.py\", line 19, in <module>\n    assert r['passed'] and r['allocationEquality'] and not r.get('diagnosticOnly')\nAssertionError\n"
+    }
+  ]
+}

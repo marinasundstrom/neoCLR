@@ -10,6 +10,8 @@ from pathlib import Path
 import subprocess
 
 p = argparse.ArgumentParser(description=__doc__)
+p.add_argument('--compare-inline-base',action='store_true')
+p.add_argument('--compare-exact-allocation-index',action='store_true',help='Interleave predecessor-index, hybrid and direct exact-index variants in one cohort.')
 p.add_argument('--direct-exact-allocation-index',action='store_true')
 p.add_argument('--exact-allocation-index',action='store_true')
 p.add_argument('--build', type=Path, required=True)
@@ -30,6 +32,8 @@ p.add_argument('--profile-store-walks', action='store_true')
 p.add_argument('--profile-store-sites', action='store_true')
 a = p.parse_args()
 assert a.rounds > 0
+assert not a.compare_inline_base or a.compare_exact_allocation_index
+assert not a.compare_exact_allocation_index or (a.allocation_index and not a.exact_allocation_index and not a.direct_exact_allocation_index)
 assert not a.direct_exact_allocation_index or a.exact_allocation_index
 assert not a.exact_allocation_index or a.allocation_index
 root = Path(__file__).resolve().parents[3]
@@ -40,7 +44,13 @@ recipe_file = root / 'target/native-host-ownership/results.json'
 recipe = next(c['command'] for c in json.loads(recipe_file.read_text())['commands']
               if str(root / 'target/native-host-ownership/owned-aot') in c['command'])
 modes = ['sync', 'guarded-sync', 'live'] if a.guarded_control else ['sync', 'live']
-report = {'directExactAllocationIndex':a.direct_exact_allocation_index,'exactAllocationIndex':a.exact_allocation_index,'allocationIndex':a.allocation_index,'splitStoreTls':a.split_store_tls,'fullStoreWalk':a.full_store_walk,'repeatSnapshotLookup': a.repeat_snapshot_lookup, 'headerProof': a.header_proof, 'inlineValidation': a.inline_validation, 'splitTls': a.split_tls, 'serializedStore': a.serialized_store, 'optimizationLevel': build.get('optimizationLevel','none'), 'passed': False, 'scope': __doc__, 'iterations': build['iterations'],
+if a.compare_exact_allocation_index:
+    modes += ['live-hybrid', 'live-direct']
+    if a.guarded_control: modes += ['guarded-sync-hybrid', 'guarded-sync-direct']
+if a.compare_inline_base:
+    modes += ['live-hybrid-inline']
+    if a.guarded_control: modes += ['guarded-sync-hybrid-inline']
+report = {'compareInlineBase':a.compare_inline_base,'compareExactAllocationIndex':a.compare_exact_allocation_index,'modeOrder':'rotating forward/reverse cycles' if a.compare_exact_allocation_index else 'alternating forward/reverse','directExactAllocationIndex':a.direct_exact_allocation_index,'exactAllocationIndex':a.exact_allocation_index,'allocationIndex':a.allocation_index,'splitStoreTls':a.split_store_tls,'fullStoreWalk':a.full_store_walk,'repeatSnapshotLookup': a.repeat_snapshot_lookup, 'headerProof': a.header_proof, 'inlineValidation': a.inline_validation, 'splitTls': a.split_tls, 'serializedStore': a.serialized_store, 'optimizationLevel': build.get('optimizationLevel','none'), 'passed': False, 'scope': __doc__, 'iterations': build['iterations'],
           'commands': [], 'trials': [], 'inputs': {}, 'excluded': []}
 if a.profile_store_walks:report['diagnosticOnly']='Heap-walk instrumentation; timings are not benchmark evidence.'
 def run(command):
@@ -142,7 +152,7 @@ static void report_profile(struct rusage *a, struct rusage *b, struct timespec *
                 if item.endswith('/owned-host.c'): item = str(host)
                 elif item == str(root / 'target/root-map/candidate.o'):
                     item = str(a.build.resolve() / case['sample'] / (('sync' if mode == 'sync' else 'live') + '.o'))
-                elif mode != 'sync' and item.endswith('/native-gc.c'): item = str(guarded if mode == 'guarded-sync' else collector)
+                elif mode != 'sync' and item.endswith('/native-gc.c'): item = str(guarded if mode.startswith('guarded-sync') else collector)
                 elif mode != 'sync' and item.endswith('/text-arena.c'): item = str(provider)
                 command.append(item)
             command[command.index('-o') + 1] = str(out / (case['sample'] + '-' + mode))
@@ -151,8 +161,9 @@ static void report_profile(struct rusage *a, struct rusage *b, struct timespec *
                 gate = root / 'benchmarks/execution/concurrent-mutation-gate'
                 command += ['-DWORKLOAD_LIVE', '-DNEOCLR_SHADOW_SPARSE_INDEX',
                             '-I', str(root / 'runtime/native/memory'), '-I', str(gate), str(gate / 'gate.c')]
-            if a.direct_exact_allocation_index and mode != 'sync': command += ['-DNEOCLR_LIVE_DIRECT_EXACT_INDEX']
-            if a.exact_allocation_index and mode != 'sync': command += ['-DNEOCLR_LIVE_EXACT_INDEX']
+            if (a.direct_exact_allocation_index or mode.endswith('-direct')) and mode != 'sync': command += ['-DNEOCLR_LIVE_DIRECT_EXACT_INDEX']
+            if (a.exact_allocation_index or ('-hybrid' in mode or mode.endswith('-direct'))) and mode != 'sync': command += ['-DNEOCLR_LIVE_EXACT_INDEX']
+            if mode.endswith('-inline'): command += ['-DNEOCLR_LIVE_INLINE_BASE']
             if a.allocation_index and mode != 'sync': command += ['-DNEOCLR_LIVE_ALLOCATION_INDEX']
             if a.split_store_tls: command += ['-DNEOCLR_LIVE_SPLIT_STORE_TLS']
             if a.full_store_walk: command += ['-DNEOCLR_LIVE_FULL_STORE_WALK']
@@ -169,8 +180,13 @@ static void report_profile(struct rusage *a, struct rusage *b, struct timespec *
                 path = Path(item)
                 if path.is_file(): report['inputs'][str(path)] = hashlib.sha256(path.read_bytes()).hexdigest()
     for repetition in range(a.rounds):
+        order = modes if repetition % 2 == 0 else list(reversed(modes))
+        if a.compare_exact_allocation_index:
+            cycle = modes if (repetition // len(modes)) % 2 == 0 else list(reversed(modes))
+            offset = repetition % len(modes)
+            order = cycle[offset:] + cycle[:offset]
         for case in admitted:
-            for mode in (modes if repetition % 2 == 0 else list(reversed(modes))):
+            for mode in order:
                 result = subprocess.run([str(out / (case['sample'] + '-' + mode))],
                                         capture_output=True, text=True, timeout=120)
                 row = {'sample': case['sample'], 'mode': mode, 'round': repetition,
@@ -189,7 +205,7 @@ static void report_profile(struct rusage *a, struct rusage *b, struct timespec *
                     row['candidateCounts'] = counts
                 row['passed'] = result.returncode == 0 and row['outputMatches'] and values is not None
                 if mode != 'sync': row['passed'] &= len(counts) == 6 and counts[0] == counts[1] + counts[2] and counts[5] == 0
-                if mode == 'guarded-sync': row['passed'] &= counts == [0] * 6
+                if mode.startswith('guarded-sync'): row['passed'] &= counts == [0] * 6
                 if a.allocation_index and mode != 'sync':
                     metadata = row.get('INDEX_METADATA')
                     row['passed'] &= metadata is not None and len(metadata) == 3 and metadata[0] > 0 and metadata[1] == 0 and metadata[2] > 0

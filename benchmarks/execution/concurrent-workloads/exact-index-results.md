@@ -1,5 +1,9 @@
 # Exact-base allocation index experiment (2026-10-25)
 
+Follow-up: [balanced measurement and inlining](inline-base-results.md) confirm the
+ordinary CPU penalty and remove it in the tested samples through explicit inlining.
+The original results below remain the evidence for the out-of-line variants.
+
 ## Scope and safety
 
 Extend the [owned allocation-start index](allocation-index-results.md) behind

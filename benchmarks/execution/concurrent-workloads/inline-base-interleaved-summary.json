@@ -1,0 +1,537 @@
+{
+  "measurementSha256": "84b30e2aefdcd98147e968616bcda8a6247566d3d124a6112c92d5d7d4eb0f75",
+  "scope": "Validate balanced index-variant cohorts and summarize paired CPU ratios.\n\nRatios pair variants with the indexed live baseline in the same sample/round.\nThey describe observed runs, not independent confidence intervals.\n",
+  "samples": {
+    "arrays": {
+      "rounds": 18,
+      "positionCountPerMode": 2,
+      "modes": {
+        "guarded-sync": {
+          "cpuMedianSeconds": 0.0526075,
+          "cpuPairedRatioMedian": 0.9232379180604794,
+          "cpuPairedRatioQuartiles": [
+            0.9188396250849223,
+            0.9232379180604794,
+            0.9334443486491056
+          ],
+          "allocations": 86028,
+          "allocatedBytes": 1892721,
+          "lookupCounts": [
+            [
+              4101,
+              4101,
+              0,
+              0
+            ]
+          ]
+        },
+        "guarded-sync-direct": {
+          "cpuMedianSeconds": 0.053527,
+          "cpuPairedRatioMedian": 0.9388440302153238,
+          "cpuPairedRatioQuartiles": [
+            0.9331084198609939,
+            0.9388440302153238,
+            0.9460486451492162
+          ],
+          "allocations": 86028,
+          "allocatedBytes": 1892721,
+          "lookupCounts": [
+            [
+              4101,
+              4101,
+              0,
+              0
+            ]
+          ]
+        },
+        "guarded-sync-hybrid": {
+          "cpuMedianSeconds": 0.053408,
+          "cpuPairedRatioMedian": 0.9399774695117119,
+          "cpuPairedRatioQuartiles": [
+            0.9340576898131507,
+            0.9399774695117119,
+            0.9480531356604782
+          ],
+          "allocations": 86028,
+          "allocatedBytes": 1892721,
+          "lookupCounts": [
+            [
+              4101,
+              4101,
+              0,
+              0
+            ]
+          ]
+        },
+        "guarded-sync-hybrid-inline": {
+          "cpuMedianSeconds": 0.0524935,
+          "cpuPairedRatioMedian": 0.9243775193822933,
+          "cpuPairedRatioQuartiles": [
+            0.9177512369160729,
+            0.9243775193822933,
+            0.9312547646887546
+          ],
+          "allocations": 86028,
+          "allocatedBytes": 1892721,
+          "lookupCounts": [
+            [
+              4101,
+              4101,
+              0,
+              0
+            ]
+          ]
+        },
+        "live": {
+          "cpuMedianSeconds": 0.056858,
+          "cpuPairedRatioMedian": 1.0,
+          "cpuPairedRatioQuartiles": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "allocations": 86028,
+          "allocatedBytes": 1892721,
+          "lookupCounts": [
+            [
+              4101,
+              4101,
+              0,
+              0
+            ]
+          ]
+        },
+        "live-direct": {
+          "cpuMedianSeconds": 0.0571295,
+          "cpuPairedRatioMedian": 1.0088441447323606,
+          "cpuPairedRatioQuartiles": [
+            1.0028646769969978,
+            1.0088441447323606,
+            1.021366582557208
+          ],
+          "allocations": 86028,
+          "allocatedBytes": 1892721,
+          "lookupCounts": [
+            [
+              4101,
+              4101,
+              0,
+              0
+            ]
+          ]
+        },
+        "live-hybrid": {
+          "cpuMedianSeconds": 0.057352,
+          "cpuPairedRatioMedian": 1.0095293292425966,
+          "cpuPairedRatioQuartiles": [
+            1.0032567053173596,
+            1.0095293292425966,
+            1.0174386192676632
+          ],
+          "allocations": 86028,
+          "allocatedBytes": 1892721,
+          "lookupCounts": [
+            [
+              4101,
+              4101,
+              0,
+              0
+            ]
+          ]
+        },
+        "live-hybrid-inline": {
+          "cpuMedianSeconds": 0.0567205,
+          "cpuPairedRatioMedian": 0.9983024878915255,
+          "cpuPairedRatioQuartiles": [
+            0.9909382369129389,
+            0.9983024878915255,
+            1.0026381742355772
+          ],
+          "allocations": 86028,
+          "allocatedBytes": 1892721,
+          "lookupCounts": [
+            [
+              4101,
+              4101,
+              0,
+              0
+            ]
+          ]
+        },
+        "sync": {
+          "cpuMedianSeconds": 0.04825,
+          "cpuPairedRatioMedian": 0.8490641170417896,
+          "cpuPairedRatioQuartiles": [
+            0.8442784888756645,
+            0.8490641170417896,
+            0.856266809133116
+          ],
+          "allocations": 86028,
+          "allocatedBytes": 1892721,
+          "lookupCounts": [
+            [
+              5,
+              5,
+              0,
+              0
+            ]
+          ]
+        }
+      }
+    },
+    "collections": {
+      "rounds": 18,
+      "positionCountPerMode": 2,
+      "modes": {
+        "guarded-sync": {
+          "cpuMedianSeconds": 0.115022,
+          "cpuPairedRatioMedian": 0.856923823096176,
+          "cpuPairedRatioQuartiles": [
+            0.8542961619651432,
+            0.856923823096176,
+            0.8602504241622793
+          ],
+          "allocations": 237580,
+          "allocatedBytes": 7864689,
+          "lookupCounts": [
+            [
+              49157,
+              49093,
+              64,
+              16576
+            ]
+          ]
+        },
+        "guarded-sync-direct": {
+          "cpuMedianSeconds": 0.119165,
+          "cpuPairedRatioMedian": 0.8877099741832878,
+          "cpuPairedRatioQuartiles": [
+            0.8857294605185979,
+            0.8877099741832878,
+            0.8898803718435502
+          ],
+          "allocations": 237580,
+          "allocatedBytes": 7864689,
+          "lookupCounts": [
+            [
+              49157,
+              49157,
+              0,
+              0
+            ]
+          ]
+        },
+        "guarded-sync-hybrid": {
+          "cpuMedianSeconds": 0.119259,
+          "cpuPairedRatioMedian": 0.8879953876632465,
+          "cpuPairedRatioQuartiles": [
+            0.885962404413066,
+            0.8879953876632465,
+            0.8894831394409306
+          ],
+          "allocations": 237580,
+          "allocatedBytes": 7864689,
+          "lookupCounts": [
+            [
+              49157,
+              49157,
+              0,
+              0
+            ]
+          ]
+        },
+        "guarded-sync-hybrid-inline": {
+          "cpuMedianSeconds": 0.1154035,
+          "cpuPairedRatioMedian": 0.8593334536569568,
+          "cpuPairedRatioQuartiles": [
+            0.8573103727028217,
+            0.8593334536569568,
+            0.8610555625948187
+          ],
+          "allocations": 237580,
+          "allocatedBytes": 7864689,
+          "lookupCounts": [
+            [
+              49157,
+              49157,
+              0,
+              0
+            ]
+          ]
+        },
+        "live": {
+          "cpuMedianSeconds": 0.13437100000000002,
+          "cpuPairedRatioMedian": 1.0,
+          "cpuPairedRatioQuartiles": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "allocations": 237580,
+          "allocatedBytes": 7864689,
+          "lookupCounts": [
+            [
+              49157,
+              49032,
+              125,
+              68749
+            ]
+          ]
+        },
+        "live-direct": {
+          "cpuMedianSeconds": 0.1381095,
+          "cpuPairedRatioMedian": 1.0293501621141419,
+          "cpuPairedRatioQuartiles": [
+            1.0256371026147222,
+            1.0293501621141419,
+            1.0309379414938635
+          ],
+          "allocations": 237580,
+          "allocatedBytes": 7864689,
+          "lookupCounts": [
+            [
+              49157,
+              49157,
+              0,
+              0
+            ]
+          ]
+        },
+        "live-hybrid": {
+          "cpuMedianSeconds": 0.138359,
+          "cpuPairedRatioMedian": 1.0301236503019768,
+          "cpuPairedRatioQuartiles": [
+            1.0292754299904852,
+            1.0301236503019768,
+            1.0315931386434465
+          ],
+          "allocations": 237580,
+          "allocatedBytes": 7864689,
+          "lookupCounts": [
+            [
+              49157,
+              49157,
+              0,
+              0
+            ]
+          ]
+        },
+        "live-hybrid-inline": {
+          "cpuMedianSeconds": 0.1346475,
+          "cpuPairedRatioMedian": 1.00315803228338,
+          "cpuPairedRatioQuartiles": [
+            1.0006054164642377,
+            1.00315803228338,
+            1.0070100854462694
+          ],
+          "allocations": 237580,
+          "allocatedBytes": 7864689,
+          "lookupCounts": [
+            [
+              49157,
+              49157,
+              0,
+              0
+            ]
+          ]
+        },
+        "sync": {
+          "cpuMedianSeconds": 0.0824975,
+          "cpuPairedRatioMedian": 0.6156579056894632,
+          "cpuPairedRatioQuartiles": [
+            0.6115233052051344,
+            0.6156579056894632,
+            0.6179306983465596
+          ],
+          "allocations": 237580,
+          "allocatedBytes": 7864689,
+          "lookupCounts": [
+            [
+              5,
+              5,
+              0,
+              0
+            ]
+          ]
+        }
+      }
+    },
+    "tasks": {
+      "rounds": 18,
+      "positionCountPerMode": 2,
+      "modes": {
+        "guarded-sync": {
+          "cpuMedianSeconds": 0.0202515,
+          "cpuPairedRatioMedian": 0.8573003409706109,
+          "cpuPairedRatioQuartiles": [
+            0.8564095019390692,
+            0.8573003409706109,
+            0.8591165811619695
+          ],
+          "allocations": 65548,
+          "allocatedBytes": 2261361,
+          "lookupCounts": [
+            [
+              28677,
+              28677,
+              0,
+              0
+            ]
+          ]
+        },
+        "guarded-sync-direct": {
+          "cpuMedianSeconds": 0.021097499999999998,
+          "cpuPairedRatioMedian": 0.8916691046979646,
+          "cpuPairedRatioQuartiles": [
+            0.8885113331887076,
+            0.8916691046979646,
+            0.8969245996478286
+          ],
+          "allocations": 65548,
+          "allocatedBytes": 2261361,
+          "lookupCounts": [
+            [
+              28677,
+              28677,
+              0,
+              0
+            ]
+          ]
+        },
+        "guarded-sync-hybrid": {
+          "cpuMedianSeconds": 0.021131,
+          "cpuPairedRatioMedian": 0.8931063889215187,
+          "cpuPairedRatioQuartiles": [
+            0.8910389630366152,
+            0.8931063889215187,
+            0.8989858421131522
+          ],
+          "allocations": 65548,
+          "allocatedBytes": 2261361,
+          "lookupCounts": [
+            [
+              28677,
+              28677,
+              0,
+              0
+            ]
+          ]
+        },
+        "guarded-sync-hybrid-inline": {
+          "cpuMedianSeconds": 0.020312,
+          "cpuPairedRatioMedian": 0.8597153773279038,
+          "cpuPairedRatioQuartiles": [
+            0.8570158334917388,
+            0.8597153773279038,
+            0.86205029632856
+          ],
+          "allocations": 65548,
+          "allocatedBytes": 2261361,
+          "lookupCounts": [
+            [
+              28677,
+              28677,
+              0,
+              0
+            ]
+          ]
+        },
+        "live": {
+          "cpuMedianSeconds": 0.023637,
+          "cpuPairedRatioMedian": 1.0,
+          "cpuPairedRatioQuartiles": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "allocations": 65548,
+          "allocatedBytes": 2261361,
+          "lookupCounts": [
+            [
+              28677,
+              28677,
+              0,
+              0
+            ]
+          ]
+        },
+        "live-direct": {
+          "cpuMedianSeconds": 0.0246875,
+          "cpuPairedRatioMedian": 1.0453262844465798,
+          "cpuPairedRatioQuartiles": [
+            1.04058920765561,
+            1.0453262844465798,
+            1.0483507989085874
+          ],
+          "allocations": 65548,
+          "allocatedBytes": 2261361,
+          "lookupCounts": [
+            [
+              28677,
+              28677,
+              0,
+              0
+            ]
+          ]
+        },
+        "live-hybrid": {
+          "cpuMedianSeconds": 0.024657,
+          "cpuPairedRatioMedian": 1.044623630859045,
+          "cpuPairedRatioQuartiles": [
+            1.0389860760598728,
+            1.044623630859045,
+            1.0469211803699727
+          ],
+          "allocations": 65548,
+          "allocatedBytes": 2261361,
+          "lookupCounts": [
+            [
+              28677,
+              28677,
+              0,
+              0
+            ]
+          ]
+        },
+        "live-hybrid-inline": {
+          "cpuMedianSeconds": 0.023677999999999998,
+          "cpuPairedRatioMedian": 1.0010778868817642,
+          "cpuPairedRatioQuartiles": [
+            0.9998204978250378,
+            1.0010778868817642,
+            1.0060267624569035
+          ],
+          "allocations": 65548,
+          "allocatedBytes": 2261361,
+          "lookupCounts": [
+            [
+              28677,
+              28677,
+              0,
+              0
+            ]
+          ]
+        },
+        "sync": {
+          "cpuMedianSeconds": 0.014356500000000001,
+          "cpuPairedRatioMedian": 0.6074350174273044,
+          "cpuPairedRatioQuartiles": [
+            0.6032793836079151,
+            0.6074350174273044,
+            0.6116628988917834
+          ],
+          "allocations": 65548,
+          "allocatedBytes": 2261361,
+          "lookupCounts": [
+            [
+              5,
+              5,
+              0,
+              0
+            ]
+          ]
+        }
+      }
+    }
+  }
+}
