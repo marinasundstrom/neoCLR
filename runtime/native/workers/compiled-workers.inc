@@ -54,8 +54,12 @@ static int32_t compiled_collect_locked(compiled_participant *self, const neoclr_
     if (count_words && !values) return 3;
     status = neoclr_gc_participant_root_capture_v1(&self->context, roots, participants, values, count_words, &copied);
     if (!status) {
+#ifdef NEOCLR_WORKER_COLLECTION_OWNER
+        status=compiled_collect_on_owner(self,values,(uint32_t)copied);
+#else
         neoclr_probe_frame snapshot = {.context=&self->context, .lanes=values, .lane_count=(uint32_t)copied};
         status = neoclr_gc_collect_conditional_v1(&self->context, &snapshot, NULL, 0);
+#endif
     }
     free(values);
 #else

@@ -64,6 +64,11 @@ static void run(int fault) {
     unsigned peak; uint64_t collections, extent;
     CHECK(neoclr_workers_compiled_statistics(p, &peak, &collections) && collections);
     if (!fault) CHECK(peak > 1);
+#ifdef NEOCLR_WORKER_COLLECTION_OWNER
+    uint64_t owner_collections;
+    CHECK(neoclr_workers_collection_requests(p,&owner_collections) && owner_collections==collections);
+    printf("OWNER COLLECTION %llu requests\n",(unsigned long long)owner_collections);
+#endif
     CHECK(neoclr_workers_collect(p, &extent) && !extent);
 #ifdef NEOCLR_WORKER_ALLOCATION_OWNER
     uint64_t requests;

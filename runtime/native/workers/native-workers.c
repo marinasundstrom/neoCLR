@@ -9,6 +9,9 @@
 #if defined(NEOCLR_WORKER_ALLOCATION_OWNER) && (!defined(NEOCLR_WORKER_GC) || !defined(NEOCLR_GC_ALLOCATION_DISPATCH))
 #error Worker allocation owner requires worker GC and allocation dispatch
 #endif
+#if defined(NEOCLR_WORKER_COLLECTION_OWNER) && (!defined(NEOCLR_WORKER_ALLOCATION_OWNER) || !defined(NEOCLR_WORKER_ROOT_SNAPSHOT))
+#error Worker collection owner requires allocation owner and copied roots
+#endif
 #define JOBS 16
 #define ROOTS 32
 #define THREADS 4
@@ -52,6 +55,12 @@ struct neoclr_workers {
         uint32_t kind;
         int32_t status;
         void *result;
+#ifdef NEOCLR_WORKER_COLLECTION_OWNER
+        neoclr_aot_context collector_context;
+        const uint64_t *roots;
+        uint32_t root_count;
+        uint64_t collections;
+#endif
     } allocation;
 #endif
     neoclr_aot_context context;

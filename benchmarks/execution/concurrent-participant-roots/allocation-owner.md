@@ -86,6 +86,13 @@ not a performance improvement over the existing allocator or justification for a
 default change. Results and source/executable hashes are retained. The initial
 broadcast sources are archived separately; the default remains local allocation.
 
+## Stable-context follow-up
+
+The [collection-owner option](collection-owner.md) now executes copied-root
+synchronous collection on the service's stable context, with matching compiled
+controls and deliberate lost-root failures. It has substantial per-collection
+handoff overhead and does not yet retain a live epoch across worker execution.
+
 ## Next boundary
 
 Connect collector ownership and final remark to the compiled scheduler without

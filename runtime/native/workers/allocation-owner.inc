@@ -1,6 +1,6 @@
 /* Existing compiled exclusive lease remains held logically by the requester.
- * The pool gate publishes request/response; this service never traces roots,
- * invokes managed code or collects. The external arena is checked by the normal
+ * The pool gate publishes request/response; this service never invokes managed
+ * code. Collection-owner mode consumes only copied root values while paused. The external arena is checked by the normal
  * allocator; it is not acquired as a thread-owned heap with persistent caches. */
 static void *compiled_allocation_owner(void *opaque) {
     neoclr_workers *p=opaque;
@@ -12,10 +12,24 @@ static void *compiled_allocation_owner(void *opaque) {
         if (p->compiled_running!=1 || !p->compiled_exclusive ||
             p->allocation.arena!=&p->compiled_exclusive->context.text ||
             neoclr_gc_allocation_dispatch_hook) abort();
-        p->allocation.status=neoclr_gc_allocate_dispatch_storage_v1(
-            p->allocation.arena,p->allocation.bytes,p->allocation.kind,&p->allocation.result);
+#ifdef NEOCLR_WORKER_COLLECTION_OWNER
+        if (p->allocation.pending==2) {
+            neoclr_aot_context *context=&p->allocation.collector_context;
+            context->text=*p->allocation.arena;
+            neoclr_probe_frame frame={.context=context,.lanes=p->allocation.roots,
+                .lane_count=p->allocation.root_count};
+            p->allocation.status=neoclr_gc_collect_conditional_v1(context,&frame,NULL,0);
+            *p->allocation.arena=context->text;
+            ++p->allocation.collections;
+        } else
+#endif
+        {
+            if (p->allocation.pending!=1) abort();
+            p->allocation.status=neoclr_gc_allocate_dispatch_storage_v1(
+                p->allocation.arena,p->allocation.bytes,p->allocation.kind,&p->allocation.result);
+            ++p->allocation.requests;
+        }
         p->allocation.used=p->allocation.arena->used;
-        ++p->allocation.requests;
         p->allocation.pending=0;
         pthread_cond_signal(&p->allocation.ready);
     }
@@ -44,3 +58,24 @@ int neoclr_workers_allocation_requests(neoclr_workers *p,uint64_t *requests) {
     if (!requests || !pthread_equal(p->owner,pthread_self())) return 0;
     lock(p);*requests=p->allocation.requests;unlock(p);return 1;
 }
+
+#ifdef NEOCLR_WORKER_COLLECTION_OWNER
+/* Caller holds pool gate and exclusive lease; values stay valid until response. */
+static int32_t compiled_collect_on_owner(compiled_participant *self,const uint64_t *values,uint32_t count) {
+    neoclr_workers *p=self->job->pool;
+    if (!self->exclusive || p->compiled_exclusive!=self || p->compiled_running!=1 ||
+        !p->allocation.started || p->allocation.pending || p->allocation.stop) abort();
+    p->allocation.arena=&self->context.text;
+    p->allocation.roots=values;p->allocation.root_count=count;p->allocation.pending=2;
+    pthread_cond_signal(&p->allocation.ready);
+    while (p->allocation.pending)
+        if (pthread_cond_wait(&p->allocation.ready,&p->gate)) abort();
+    int32_t status=p->allocation.status;
+    p->allocation.arena=NULL;p->allocation.roots=NULL;p->allocation.root_count=0;
+    return status;
+}
+int neoclr_workers_collection_requests(neoclr_workers *p,uint64_t *requests) {
+    if (!requests || !pthread_equal(p->owner,pthread_self())) return 0;
+    lock(p);*requests=p->allocation.collections;unlock(p);return 1;
+}
+#endif

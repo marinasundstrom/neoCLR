@@ -1,7 +1,8 @@
 """Rebuild and compare copied-root and direct-root compiled worker pools."""
 import argparse,json,subprocess,hashlib,signal
 from pathlib import Path
-p=argparse.ArgumentParser();p.add_argument('--output',type=Path,required=True);p.add_argument('--allocation-owner',action='store_true');a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--output',type=Path,required=True);p.add_argument('--allocation-owner',action='store_true');p.add_argument('--collection-owner',action='store_true');a=p.parse_args()
+if a.collection_owner:a.allocation_owner=True
 root=Path(__file__).resolve().parents[3];out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
 prior=json.loads((root/'docs/experiments/native-worker-pool/compiled-parallel-validation.json').read_text());r={'passed':False,'commands':[],'inputs':{}}
 def run(cmd):
@@ -14,11 +15,12 @@ try:
  old_object=next(x for x in compile_command if x.endswith('.o'));compile_command[compile_command.index(old_object)]=str(out/'code.o');run(compile_command)
  for old in prior['commands']:
   if '-o' not in old['command']:continue
-  for snapshot in [False,True]:
+  for snapshot in ([True] if a.collection_owner else [False,True]):
    cmd=[str(out/'code.o') if x==old_object else x for x in old['command']]
    name=Path(cmd[cmd.index('-o')+1]).name+('-snapshot' if snapshot else '-control');exe=out/name;cmd[cmd.index('-o')+1]=str(exe)
    if snapshot:cmd+=['-DNEOCLR_WORKER_ROOT_SNAPSHOT',str(root/'runtime/native/gc/participant-roots.c')]
    if a.allocation_owner:cmd+=['-DNEOCLR_WORKER_ALLOCATION_OWNER','-DNEOCLR_GC_ALLOCATION_DISPATCH']
+   if a.collection_owner:cmd+=['-DNEOCLR_WORKER_COLLECTION_OWNER']
    run(cmd);run([str(exe)])
  if a.allocation_owner:
   # Keep a reference to the callback so disabling its installation cannot be
@@ -35,6 +37,15 @@ try:
   x=subprocess.run([str(out/'negative-dispatch')],capture_output=True,text=True,timeout=120)
   r['negative']=dict(exitCode=x.returncode,stdout=x.stdout,stderr=x.stderr)
   assert x.returncode==-signal.SIGABRT and 'neoclr_workers_allocation_requests(p,&requests) && requests' in x.stderr
+ if a.collection_owner:
+  (out/'compiled-workers.inc').write_text((worker_dir/'compiled-workers.inc').read_text())
+  text=(worker_dir/'allocation-owner.inc').read_text();needle='.lane_count=p->allocation.root_count'
+  assert text.count(needle)==1
+  (out/'allocation-owner.inc').write_text(text.replace(needle,'.lane_count=0'))
+  negative[negative.index('-o')+1]=str(out/'negative-roots');run(negative)
+  x=subprocess.run([str(out/'negative-roots')],capture_output=True,text=True,timeout=120)
+  r['negativeRoots']=dict(exitCode=x.returncode,stdout=x.stdout,stderr=x.stderr)
+  assert x.returncode==-signal.SIGABRT and 'status == (b->fault ?' in x.stderr
  for path in [Path(__file__),*(root/'runtime/native/workers').glob('*'),* (root/'runtime/native/gc').glob('*.[ch]')]:r['inputs'][str(path)]=hashlib.sha256(path.read_bytes()).hexdigest()
  r['passed']=True
 finally:(out/'results.json').write_text(json.dumps(r,indent=2)+'\n')
