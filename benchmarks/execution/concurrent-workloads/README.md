@@ -192,3 +192,7 @@ ordinary and HTTP workloads. The native collector settings remain identical.
 [Managed-JIT follow-up](stack-jit-results.md) qualifies transformed HTTP and
 standalone execution, retains a rejected zero-epoch control and identifies the
 remaining owner-pause measurement boundaries.
+
+[Complete owner-operation pause diagnostics](owner-pauses-results.md) close the
+phase-timer coverage gap for selected operations, separate overlapping phases
+from outer GC stalls, and retain synchronous controls and overhead limitations.

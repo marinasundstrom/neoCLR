@@ -97,3 +97,7 @@ qualification reports, together with `automatic.py`, `generate.py` and
 This slice does not establish cross-worker GC, new pause distributions, an
 allocation improvement or concurrent-default acceptance. Existing broader sample
 coverage gaps remain documented in the workload README.
+
+The subsequent [owner-operation profiler](owner-pauses-results.md) implements
+these diagnostic wrappers and records the first matched pause/control cohorts.
+Finish subphase and broader ownership qualification remain open.

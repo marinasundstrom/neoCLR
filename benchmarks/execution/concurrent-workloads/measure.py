@@ -33,6 +33,7 @@ p.add_argument('--split-store-tls', action='store_true')
 p.add_argument('--full-store-walk', action='store_true')
 p.add_argument('--profile-store-walks', action='store_true')
 p.add_argument('--profile-store-sites', action='store_true')
+p.add_argument('--profile-owner-pauses', action='store_true')
 a = p.parse_args()
 assert a.rounds > 0
 assert not a.previous_build or a.compare_inline_base
@@ -70,6 +71,7 @@ if a.modes:
 report = {'compareWorkerTls':a.compare_worker_tls,'compareInlineBase':a.compare_inline_base,'compareExactAllocationIndex':a.compare_exact_allocation_index,'modeOrder':'rotating forward/reverse cycles' if a.compare_exact_allocation_index else 'alternating forward/reverse','directExactAllocationIndex':a.direct_exact_allocation_index,'exactAllocationIndex':a.exact_allocation_index,'allocationIndex':a.allocation_index,'splitStoreTls':a.split_store_tls,'fullStoreWalk':a.full_store_walk,'repeatSnapshotLookup': a.repeat_snapshot_lookup, 'headerProof': a.header_proof, 'inlineValidation': a.inline_validation, 'splitTls': a.split_tls, 'serializedStore': a.serialized_store, 'optimizationLevel': build.get('optimizationLevel','none'), 'passed': False, 'scope': __doc__, 'iterations': build['iterations'],
           'commands': [], 'trials': [], 'inputs': {}, 'excluded': []}
 if a.profile_store_walks:report['diagnosticOnly']='Heap-walk instrumentation; timings are not benchmark evidence.'
+if a.profile_owner_pauses:report['diagnosticOnly']='Owner-operation wall histograms; timings are not throughput evidence.'
 def run(command):
     result = subprocess.run(list(map(str, command)), cwd=root, capture_output=True,
                             text=True, timeout=180)
@@ -93,6 +95,12 @@ try:
         idle = 'if (!status && !native_scope_depth && reason == NEOCLR_GC_TRIGGER_IDLE && owned_heap.arena == &context->text)'
         assert code.count(start) == 1 and code.count(idle) == 1
         guarded.write_text(code.replace(start, 'candidate_autostart = 0; /* Synchronous control. */').replace(idle, 'if (0 && !status && !native_scope_depth && reason == NEOCLR_GC_TRIGGER_IDLE && owned_heap.arena == &context->text)'))
+    sync_profile = out / 'sync-profile-gc.c'
+    if a.profile_owner_pauses:
+        profiler = root / 'benchmarks/execution/concurrent-workloads/owner-pauses.py'
+        run(['python3', profiler, '--source', root / 'runtime/native/gc/native-gc.c', '--output', sync_profile])
+        for source in [collector] + ([guarded] if a.guarded_control else []):
+            run(['python3', profiler, '--source', source, '--output', source, '--live'])
     host = out / 'owned-host.c'
     source = (root / 'target/native-host-ownership/owned-host.c').read_text()
     boundary = '    int32_t status = run_entry(entry, with_args, argc, argv);'
@@ -115,6 +123,10 @@ static double cpu(struct rusage *r) {
         (r->ru_utime.tv_usec + r->ru_stime.tv_usec) / 1000000.0;
 }
 static void report_profile(struct rusage *a, struct rusage *b, struct timespec *s, struct timespec *e) {
+#ifdef OWNER_PAUSE_PROFILE
+ extern void experiment_owner_pauses_report(void);
+ experiment_owner_pauses_report();
+#endif
  neoclr_gc_statistics stats = neoclr_gc_statistics_v1();
  neoclr_gc_profile profile = neoclr_gc_profile_v1();
  neoclr_gc_lookup_profile lookup = neoclr_gc_lookup_profile_v1();
@@ -170,6 +182,7 @@ static void report_profile(struct rusage *a, struct rusage *b, struct timespec *
                 elif item == str(root / 'target/root-map/candidate.o'):
                     origin = a.previous_build if '-previous-' in mode else a.build
                     item = str(origin.resolve() / case['sample'] / (('sync' if mode == 'sync' else 'live') + '.o'))
+                elif mode == 'sync' and a.profile_owner_pauses and item.endswith('/native-gc.c'): item = str(sync_profile)
                 elif mode != 'sync' and item.endswith('/native-gc.c'): item = str(guarded if mode.startswith('guarded-sync') else collector)
                 elif mode != 'sync' and item.endswith('/text-arena.c'): item = str(provider)
                 command.append(item)
@@ -194,6 +207,7 @@ static void report_profile(struct rusage *a, struct rusage *b, struct timespec *
             if a.split_tls: command += ['-DNEOCLR_LIVE_SPLIT_TLS']
             if a.serialized_store: command += ['-DNEOCLR_LIVE_SERIALIZED_STORE']
             if a.disable_exact_store: command += ['-DNEOCLR_LIVE_NO_EXACT_STORE']
+            if a.profile_owner_pauses: command += ['-DOWNER_PAUSE_PROFILE', '-I', str(root / 'runtime/native/gc')]
             run(command)
             for item in command:
                 path = Path(item)

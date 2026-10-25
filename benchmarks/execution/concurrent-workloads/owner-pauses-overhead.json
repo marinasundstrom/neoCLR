@@ -1,0 +1,80 @@
+{
+  "scope": "Sequential control then instrumented cohorts; exploratory overhead, not balanced performance evidence.",
+  "groups": {
+    "arrays/guarded-sync-hybrid-inline": {
+      "profiledCpuMedian": 0.052201,
+      "controlCpuMedian": 0.053027,
+      "ratio": 0.9844230297772832
+    },
+    "collections/guarded-sync-hybrid-inline": {
+      "profiledCpuMedian": 0.111369,
+      "controlCpuMedian": 0.117319,
+      "ratio": 0.949283577255176
+    },
+    "tasks/guarded-sync-hybrid-inline": {
+      "profiledCpuMedian": 0.019589,
+      "controlCpuMedian": 0.02083,
+      "ratio": 0.9404224675948151
+    },
+    "arrays/live-hybrid-inline": {
+      "profiledCpuMedian": 0.056002,
+      "controlCpuMedian": 0.057211,
+      "ratio": 0.9788677002674312
+    },
+    "collections/live-hybrid-inline": {
+      "profiledCpuMedian": 0.132849,
+      "controlCpuMedian": 0.136754,
+      "ratio": 0.9714450765608319
+    },
+    "tasks/live-hybrid-inline": {
+      "profiledCpuMedian": 0.023285,
+      "controlCpuMedian": 0.023918,
+      "ratio": 0.9735345764696045
+    },
+    "arrays/sync": {
+      "profiledCpuMedian": 0.048822,
+      "controlCpuMedian": 0.049158,
+      "ratio": 0.9931648968631758
+    },
+    "collections/sync": {
+      "profiledCpuMedian": 0.086432,
+      "controlCpuMedian": 0.088494,
+      "ratio": 0.9766989852419372
+    },
+    "tasks/sync": {
+      "profiledCpuMedian": 0.014261,
+      "controlCpuMedian": 0.015041,
+      "ratio": 0.9481417458945548
+    },
+    "plain/guarded-sync-inline-index": {
+      "profiledCpuMedian": 0.3181875,
+      "controlCpuMedian": 0.314326,
+      "ratio": 1.012285016193379
+    },
+    "plain/live-inline-index": {
+      "profiledCpuMedian": 0.38290650000000004,
+      "controlCpuMedian": 0.3621775,
+      "ratio": 1.0572343671266162
+    },
+    "plain/sync": {
+      "profiledCpuMedian": 0.2213505,
+      "controlCpuMedian": 0.21552,
+      "ratio": 1.0270531737193764
+    },
+    "json/guarded-sync-inline-index": {
+      "profiledCpuMedian": 0.479105,
+      "controlCpuMedian": 0.4830115,
+      "ratio": 0.99191220084822
+    },
+    "json/live-inline-index": {
+      "profiledCpuMedian": 0.5755735,
+      "controlCpuMedian": 0.5589115,
+      "ratio": 1.02981151756584
+    },
+    "json/sync": {
+      "profiledCpuMedian": 0.3432335,
+      "controlCpuMedian": 0.3514195,
+      "ratio": 0.9767059027743197
+    }
+  }
+}

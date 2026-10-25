@@ -46,6 +46,7 @@ p.add_argument('--compare-store-ranges',action='store_true')
 p.add_argument('--profile-cpu', action='store_true', help='macOS sample capture; diagnostic timings only.')
 p.add_argument('--profile-store-walks', action='store_true')
 p.add_argument('--profile-store-sites', action='store_true')
+p.add_argument('--profile-owner-pauses', action='store_true')
 a=p.parse_args();assert a.requests>0 and a.warmup>=0 and a.pairs>0
 assert not a.previous_inline_object or (a.compare_inline_base and not a.previous_live_object)
 assert not a.compare_worker_tls or a.compare_inline_base
@@ -71,6 +72,7 @@ root=Path(__file__).resolve().parents[3];base=Path(__file__).resolve().parent
 out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
 r={'passed':False,'compareWorkerTls':a.compare_worker_tls,'selectedModes':a.modes,'compareInlineBase':a.compare_inline_base,'directExactAllocationIndex':a.direct_exact_allocation_index,'compareExactAllocationIndex':a.compare_exact_allocation_index,'compareAllocationIndex':a.compare_allocation_index,'compareStoreTls':a.compare_store_tls,'compareStoreWalk':a.compare_store_walk,'allowAllocationVariation':a.allow_allocation_variation,'concurrency':a.concurrency,'compareSnapshotLookup':a.compare_snapshot_lookup,'compareHeaderProof':a.compare_header_proof,'compareInlineValidation':a.compare_inline_validation,'compareSplitTls':a.compare_split_tls,'compareSerializedStore':a.compare_serialized_store,'gateWords':a.gate_words,'storeCache':not a.disable_store_cache,'compareStoreCache':a.compare_store_cache,'compareExactStore':a.compare_exact_store,'storeRanges':a.store_ranges,'compareStoreRanges':a.compare_store_ranges,'sample':a.sample,'scope':'Loopback AOT fixed-work comparison; Python client scheduling and connection-close costs included. No saturation/cross-framework or GC-pause-distribution claim.', 'commands':[],'trials':[],'inputs':{}}
 if a.profile_store_walks:r['diagnosticOnly']='Heap-walk instrumentation; timings are not benchmark evidence.'
+if a.profile_owner_pauses:r['diagnosticOnly']='Owner-operation wall histograms; timings are not throughput evidence.'
 if a.profile_cpu:r['diagnosticOnly']='External CPU sampling affects timings; do not use this cohort for throughput claims.'
 def run(cmd):
  x=subprocess.run(list(map(str,cmd)),cwd=root,capture_output=True,text=True,timeout=120)
@@ -92,6 +94,12 @@ try:
   assert code.count(start)==1 and code.count(idle)==1
   guarded_source.write_text(code.replace(start,'candidate_autostart = 0; /* Measurement control: synchronous scheduling. */').replace(idle,'if (0 && !status && !native_scope_depth && reason == NEOCLR_GC_TRIGGER_IDLE && owned_heap.arena == &context->text)'))
  provider=out/'text-arena.c';run(['python3',base/'native-providers.py','--output',provider])
+ sync_profile=out/'sync-profile-gc.c'
+ if a.profile_owner_pauses:
+  profiler=base.parent/'concurrent-workloads/owner-pauses.py'
+  run(['python3',profiler,'--source',root/'runtime/native/gc/native-gc.c','--output',sync_profile])
+  for candidate in [source]+([guarded_source] if a.include_guarded_sync else []):
+   run(['python3',profiler,'--source',candidate,'--output',candidate,'--live'])
  host=out/'owned-host.c'
  host_source=(root/'target/native-host-ownership/owned-host.c').read_text()
  boundary='    int32_t status = run_entry(entry, with_args, argc, argv);'
@@ -100,6 +108,10 @@ try:
  host.write_text('static void report_measurement(void);\n'+host_source+'''
 #include <sys/resource.h>
 static void report_measurement(void) {
+#ifdef OWNER_PAUSE_PROFILE
+ extern void experiment_owner_pauses_report(void);
+ experiment_owner_pauses_report();
+#endif
  struct rusage usage; if(getrusage(RUSAGE_SELF,&usage)) abort();
  fprintf(stderr,"PROCESS %.9f %.9f %ld\\n",
    usage.ru_utime.tv_sec+usage.ru_utime.tv_usec/1e6,
@@ -203,6 +215,7 @@ static void report_measurement(void) {
   exe=out/mode;command=[]
   for item in recipe:
    if item.endswith('/owned-host.c'):item=str(host)
+   elif item.endswith('/native-gc.c') and mode=='sync' and a.profile_owner_pauses:item=str(sync_profile)
    elif item.endswith('/native-gc.c') and mode!='sync':item=str(guarded_source if mode.startswith('guarded-sync') else source)
    elif item.endswith('/text-arena.c') and mode!='sync':item=str(provider)
    elif item==str(root/'target/root-map/candidate.o'):item=str(obj.resolve())
@@ -228,6 +241,7 @@ static void report_measurement(void) {
   command += [f'-DNEOCLR_LIVE_STORE_RANGES={1 if mode.endswith("-one-range") else a.store_ranges}']
   if a.profile_store_walks and mode!='sync':command+=['-DNEOCLR_LIVE_WALK_PROFILE']
   if a.profile_store_sites and mode!='sync':command+=['-DNEOCLR_STORE_SITES']
+  if a.profile_owner_pauses:command+=['-DOWNER_PAUSE_PROFILE','-I',str(root/'runtime/native/gc')]
   run(command);executables[mode]=exe
  # Finish every build before timing. Alternate order to expose systematic drift.
  for pair in range(a.pairs):
