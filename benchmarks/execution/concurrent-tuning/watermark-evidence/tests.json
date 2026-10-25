@@ -1,0 +1,20 @@
+[
+  {
+    "command": [
+      "python3",
+      "benchmarks/execution/concurrent-tuning/test-watermark.py"
+    ],
+    "exitCode": 0,
+    "stdout": "PASS threshold, deferred completion, sticky drain, retained deletion edge, next-epoch reset\nPASS threshold, deferred completion, sticky drain, retained deletion edge, next-epoch reset\nPASS disabled hint negative control\nPASS shared-writer admission and invalid threshold rejected\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "python3",
+      "benchmarks/execution/concurrent-workloads/test-owner-pauses.py"
+    ],
+    "exitCode": 0,
+    "stdout": "PASS: nested inclusive/outer timing, failure counts, bucket boundaries, TLS isolation, definition guards, summary/negative controls; UB/bounds sanitizer\n",
+    "stderr": ""
+  }
+]

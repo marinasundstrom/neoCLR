@@ -10,6 +10,8 @@ from pathlib import Path
 import subprocess
 
 p = argparse.ArgumentParser(description=__doc__)
+p.add_argument('--compare-watermarks',type=int,nargs='+',choices=range(1,100),default=[])
+p.add_argument('--finish-watermark',type=int,choices=range(1,100))
 p.add_argument('--live-budgets',nargs='+',default=[],metavar='ALLOCATIONS:PUBLICATIONS')
 p.add_argument('--compare-scratch',action='store_true')
 p.add_argument('--compare-scalar-validation',action='store_true')
@@ -53,6 +55,9 @@ for pair in a.live_budgets:
     name=f'live-budget-{allocation}-{publication}-hybrid-inline'
     if name in live_budgets:p.error('duplicate live budget')
     live_budgets[name]=(allocation,publication)
+assert not(a.finish_watermark and a.compare_watermarks)
+assert len(set(a.compare_watermarks))==len(a.compare_watermarks)
+assert not a.compare_watermarks or a.compare_inline_base
 assert not a.profile_collection or a.profile_finish
 assert not a.profile_begin or a.profile_owner_pauses
 assert not a.profile_finish or a.profile_owner_pauses
@@ -97,6 +102,7 @@ if a.compare_direct_seed:
     if a.guarded_control: modes += ['guarded-sync-direct-seed-hybrid-inline']
 if a.compare_scratch:
     modes += ['live-scratch-hybrid-inline']
+modes += [f'live-watermark-{w}-hybrid-inline' for w in a.compare_watermarks]
 modes += list(live_budgets)
 if a.modes:
     assert len(set(a.modes)) == len(a.modes) and set(a.modes) <= set(modes)
@@ -242,6 +248,8 @@ static void report_profile(struct rusage *a, struct rusage *b, struct timespec *
             if mode in live_budgets:
                 allocation,publication=live_budgets[mode]
                 command += [f'-DNEOCLR_GC_ALLOCATION_BUDGET={allocation}',f'-DNEOCLR_GC_PUBLICATION_BUDGET={publication}']
+            if mode!='sync' and a.finish_watermark:command += [f'-DNEOCLR_LIVE_FINISH_WATERMARK={a.finish_watermark}']
+            if mode.startswith('live-watermark-'):command += [f'-DNEOCLR_LIVE_FINISH_WATERMARK={mode.split("-")[2]}']
             if mode=='live-scratch-hybrid-inline': command += ['-DNEOCLR_LIVE_REUSE_SCRATCH']
             if '-worker-' in mode: command += ['-DNEOCLR_LIVE_GROUP_WORKER_TLS']
             if mode.endswith('-inline'): command += ['-DNEOCLR_LIVE_INLINE_BASE']

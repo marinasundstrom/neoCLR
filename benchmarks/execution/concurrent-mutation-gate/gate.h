@@ -10,6 +10,14 @@
 #if GATE_WORDS < 8 || GATE_WORDS > 16384
 #error Experimental gate log must contain 8 to 16384 words
 #endif
+#ifdef NEOCLR_LIVE_FINISH_WATERMARK
+#if NEOCLR_LIVE_FINISH_WATERMARK < 1 || NEOCLR_LIVE_FINISH_WATERMARK > 99
+#error Finish watermark must be a percentage from 1 to 99
+#endif
+#ifdef NEOCLR_GATE_WORKERS
+#error Finish watermark requires the owner-only gate
+#endif
+#endif
 #define GATE_SCRATCH 256
 #define GATE_PATCHES 8
 /* Private experimental protocol. No managed ABI or collector admission implied. */
@@ -20,6 +28,10 @@ typedef struct {
     uint64_t epoch;
     unsigned active, cancelled;
     size_t count;
+#ifdef NEOCLR_LIVE_FINISH_WATERMARK
+    /* Sticky owner-written hint. Marker drain never accesses this field. */
+    unsigned finish_requested;
+#endif
     uint64_t words[GATE_WORDS];
 #ifdef NEOCLR_GATE_WORKERS
     struct { pthread_t thread; uint64_t generation; unsigned admitted; } writers[16];

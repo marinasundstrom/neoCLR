@@ -80,6 +80,7 @@ def instrument(source, live, finish_details=False, collection_details=False, beg
         specs += [('experiment_gc_begin', 'context, head, conditional, count', 1, False),
                   ('experiment_gc_finish', 'context, head, conditional, count', 2, False),
                   ('candidate_cancel', '', 3, True),
+                  ('live_store_cancel_epoch', '', 3, True),
                   ('live_write_known', 'payload, bytes, kind, patches, count', 4, False)]
     wrappers = []
     for name, args, kind, void in specs:

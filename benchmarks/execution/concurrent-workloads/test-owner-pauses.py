@@ -31,6 +31,8 @@ int32_t experiment_gc_finish(neoclr_aot_context *context, const neoclr_probe_fra
 }
 static void candidate_cancel(void) {
 }
+static void live_store_cancel_epoch(void) {
+}
 static int live_write_known(void *payload, uint64_t bytes, uint32_t kind, const mutation_patch *patches, size_t count) {
  return 0;
 }
@@ -56,6 +58,10 @@ int main(void) {
  assert(!pthread_create(&thread,0,other_owner,0)); assert(!pthread_join(thread,0));
  assert(owner_pauses[5].count==4);
  experiment_owner_pauses_report();
+ memset(owner_pauses,0,sizeof(owner_pauses));
+ live_store_cancel_epoch();
+ assert(owner_pauses[3].count==1 && owner_pauses[3].total==8);
+ assert(owner_pauses[6].count==1 && owner_pauses[6].total==8);
  memset(owner_pauses,0,sizeof(owner_pauses));
  uint64_t values[]={0,1,2,7,8,UINT64_C(1)<<63};
  for(unsigned i=0;i<6;i++) owner_pause_record(0,values[i],0);

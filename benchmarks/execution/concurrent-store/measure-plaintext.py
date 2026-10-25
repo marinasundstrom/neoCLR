@@ -12,6 +12,8 @@ import subprocess
 import threading
 import time
 p=argparse.ArgumentParser(description=__doc__)
+p.add_argument('--compare-watermarks',type=int,nargs='+',choices=range(1,100),default=[])
+p.add_argument('--finish-watermark',type=int,choices=range(1,100))
 p.add_argument('--compare-scalar-validation',action='store_true')
 p.add_argument('--compare-linear-seed',action='store_true')
 p.add_argument('--compare-direct-seed',action='store_true')
@@ -72,6 +74,9 @@ for pair in a.live_budgets:
  name=f'live-budget-{allocation}-{publication}-inline-index'
  if name in live_budgets:p.error('duplicate live budget')
  live_budgets[name]=(allocation,publication)
+assert not(a.finish_watermark and a.compare_watermarks)
+assert len(set(a.compare_watermarks))==len(a.compare_watermarks)
+assert not a.compare_watermarks or a.compare_inline_base
 assert a.live_heap_bytes>0 and a.live_heap_bytes%8==0
 assert a.requests>0 and a.warmup>=0 and a.pairs>0
 assert not a.previous_inline_object or (a.compare_inline_base and not a.previous_live_object)
@@ -258,6 +263,7 @@ static void report_measurement(void) {
   if a.include_guarded_sync:configurations.append(('guarded-sync-direct-seed-inline-index',a.live_object))
  if a.compare_scratch:
   configurations.append(('live-scratch-inline-index',a.live_object))
+ for watermark in a.compare_watermarks:configurations.append((f'live-watermark-{watermark}-inline-index',a.live_object))
  for budget_mode in live_budgets:configurations.append((budget_mode,a.live_object))
  if a.modes:
   assert len(set(a.modes))==len(a.modes) and set(a.modes)<=set(mode for mode,_ in configurations)
@@ -278,6 +284,8 @@ static void report_measurement(void) {
   r.setdefault('budgetsByMode',{})[mode]=dict(allocations=allocation_budget,publications=publication_budget)
   command+=['-I',str(root/'runtime/native/memory'),'-DNEOCLR_GC_PROFILE',f'-DNEOCLR_GC_ALLOCATION_BUDGET={allocation_budget}',f'-DNEOCLR_GC_PUBLICATION_BUDGET={publication_budget}']
   if mode!='sync':command+=[f'-DNEOCLR_HTTP_HEAP_BYTES={a.live_heap_bytes}',f'-DGATE_WORDS={a.gate_words}','-DLIVE_REPORT','-DNEOCLR_SHADOW_SPARSE_INDEX','-I',str(base.parent/'concurrent-mutation-gate'),str(base.parent/'concurrent-mutation-gate/gate.c')]
+  if mode!='sync' and a.finish_watermark:command+=[f'-DNEOCLR_LIVE_FINISH_WATERMARK={a.finish_watermark}']
+  if mode.startswith('live-watermark-'):command+=[f'-DNEOCLR_LIVE_FINISH_WATERMARK={mode.split("-")[2]}']
   if mode=='live-scratch-inline-index':command+=['-DNEOCLR_LIVE_REUSE_SCRATCH']
   if mode!='sync' and (a.disable_store_cache or mode.endswith('-no-cache')):command+=['-DNEOCLR_LIVE_NO_STORE_CACHE']
   if mode.endswith('-index'):command+=['-DNEOCLR_LIVE_ALLOCATION_INDEX']

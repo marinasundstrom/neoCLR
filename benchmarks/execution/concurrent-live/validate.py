@@ -6,6 +6,7 @@ import subprocess
 import signal
 
 parser = argparse.ArgumentParser()
+parser.add_argument('--finish-watermark',type=int,choices=range(1,100))
 parser.add_argument('--reuse-scratch',action='store_true')
 parser.add_argument('--linear-seed',action='store_true')
 parser.add_argument('--direct-seed',action='store_true')
@@ -45,6 +46,7 @@ try:
     run(['python3', base/'generate.py', '--output', source])
     recipe = json.loads((root/'benchmarks/execution/call-layout/results.json').read_text())['builds'][1]['command']
     cc = recipe[:recipe.index('-std=c11')] + [f'-DGATE_WORDS={args.gate_words}', f'-DNEOCLR_LIVE_STORE_RANGES={args.store_ranges}']
+    if args.finish_watermark: cc += [f'-DNEOCLR_LIVE_FINISH_WATERMARK={args.finish_watermark}']
     if args.reuse_scratch: cc += ['-DNEOCLR_LIVE_REUSE_SCRATCH']
     if args.linear_seed: cc += ['-DNEOCLR_LIVE_LINEAR_SEED']
     if args.direct_seed: cc += ['-DNEOCLR_LIVE_DIRECT_SEED']

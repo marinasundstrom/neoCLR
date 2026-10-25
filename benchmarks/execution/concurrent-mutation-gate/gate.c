@@ -19,6 +19,9 @@ int gate_begin(mutation_gate *g, uint64_t *epoch) {
         g->active = 1;
         g->cancelled = 0;
         g->count = 0;
+#ifdef NEOCLR_LIVE_FINISH_WATERMARK
+        g->finish_requested = 0;
+#endif
 #ifdef NEOCLR_GATE_WORKERS
         for (unsigned i = 0; i < 16; i++) g->writers[i].admitted = 0;
 #endif
@@ -99,6 +102,10 @@ int gate_write(mutation_gate *g, void *payload, size_t bytes, size_t scan_start,
                 memcpy(&g->words[g->count++], (unsigned char *)payload + at, 8);
         }
     }
+#ifdef NEOCLR_LIVE_FINISH_WATERMARK
+    if (result==GATE_OK && g->count >= (GATE_WORDS * NEOCLR_LIVE_FINISH_WATERMARK + 99) / 100)
+        g->finish_requested=1;
+#endif
     pthread_mutex_unlock(&g->mutex);
     return result;
 }

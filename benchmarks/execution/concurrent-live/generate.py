@@ -206,6 +206,12 @@ static int live_write_known(void *payload, uint64_t bytes, uint32_t kind,
     uint64_t start=shadow_clock(CLOCK_MONOTONIC), cpu=shadow_clock(CLOCK_THREAD_CPUTIME_ID);
 #endif
     int result=gate_write(s->gate,payload,bytes,kind==NEOCLR_GC_OBJECT?8:0,patches,count);
+#ifdef NEOCLR_LIVE_FINISH_WATERMARK
+    /* Do not collect inside a store: roots/results may not be published yet.
+     * Request the existing slow path at the next qualified publication. */
+    if (result==GATE_OK && s->gate->finish_requested)
+        gc_state.pacing.boundaries=NEOCLR_GC_PUBLICATION_BUDGET;
+#endif
 #ifdef NEOCLR_LIVE_GATE_PROFILE
     live_time_counts[4]+=shadow_clock(CLOCK_THREAD_CPUTIME_ID)-cpu;
     uint64_t elapsed=shadow_clock(CLOCK_MONOTONIC)-start;

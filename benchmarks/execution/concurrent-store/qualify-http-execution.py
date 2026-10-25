@@ -9,6 +9,9 @@ import socket
 import subprocess
 import threading
 p=argparse.ArgumentParser(description=__doc__)
+p.add_argument('--finish-watermark',type=int,choices=range(1,100))
+p.add_argument('--allocation-budget',type=int,default=256)
+p.add_argument('--publication-budget',type=int,default=4096)
 p.add_argument('--object',type=Path,required=True)
 p.add_argument('--scalar-validation',action='store_true')
 p.add_argument('--stable-byrefs',action='store_true',help='Qualify immutable-byref SSA preservation in managed JIT execution')
@@ -23,6 +26,7 @@ p.add_argument('--execution',choices=['aot','jit','both'],default='aot')
 p.add_argument('--runner',type=Path)
 p.add_argument('--pacing',choices=['forced','paced','both'],default='both')
 a=p.parse_args();assert a.requests>0
+assert a.allocation_budget>0 and a.publication_budget>0
 if a.execution!='aot':assert a.runner is not None
 assert not a.stable_byrefs or (a.execution=='jit' and a.elide_forwarded_stack_arguments)
 assert not a.elide_stack_arguments or a.execution=='jit'
@@ -77,6 +81,8 @@ static void report_candidate(void) {
    command.append(item)
   command[command.index('-o')+1]=str(exe)
   command+=['-I',str(root/'runtime/native/memory'),'-DNEOCLR_GC_PROFILE','-DNEOCLR_SHADOW_SPARSE_INDEX','-I',str(base.parent/'concurrent-mutation-gate'),str(base.parent/'concurrent-mutation-gate/gate.c')]
+  command += [f'-DNEOCLR_GC_ALLOCATION_BUDGET={a.allocation_budget}',f'-DNEOCLR_GC_PUBLICATION_BUDGET={a.publication_budget}']
+  if a.finish_watermark:command += [f'-DNEOCLR_LIVE_FINISH_WATERMARK={a.finish_watermark}']
   if a.scalar_validation:command+=['-DNEOCLR_GC_SCALAR_STORAGE_VALIDATION']
   if a.borrow_stores:command+=['-DNEOCLR_LIVE_STORE_HANDLE']
   if a.inline_index:command+=['-DNEOCLR_LIVE_ALLOCATION_INDEX','-DNEOCLR_LIVE_EXACT_INDEX','-DNEOCLR_LIVE_INLINE_BASE']

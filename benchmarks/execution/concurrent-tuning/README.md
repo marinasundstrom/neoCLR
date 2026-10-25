@@ -1,5 +1,8 @@
 # Concurrent-specific tuning and scratch reuse
 
+Follow-up: [log-pressure completion at the next safe boundary](watermark.md)
+eliminates the observed store cancellations without enlarging the log.
+
 2026-10-25. Author direction: tune concurrent GC against its own baseline; sync is
 an informative reference, not a requirement for identical CPU, memory or pacing.
 This refines the earlier concurrent-over-sync wrap-up target. No default changes.
