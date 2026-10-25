@@ -15,14 +15,14 @@ typedef struct {
     gate_writer writer;
     live_worker_target target;
     neoclr_aot_text_arena *arena;
-    uint64_t bytes;
+    uint64_t bytes, used;
     uint32_t kind;
     int32_t status;
     void *result;
     uint64_t *objects[2];
 } request_slot;
 static _Thread_local request_slot *current;
-static int32_t request_allocation(neoclr_aot_text_arena *arena,uint64_t bytes,uint32_t kind,void **out) {
+static int32_t request_allocation(neoclr_aot_text_arena *arena,uint64_t bytes,uint32_t kind,void **out,uint64_t *used) {
     request_slot *s=current;
     CHECK(s && arena==&s->context.text);
     if(!out)return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
@@ -32,7 +32,7 @@ static int32_t request_allocation(neoclr_aot_text_arena *arena,uint64_t bytes,ui
     CHECK(!pthread_cond_signal(&s->condition));
     while(s->pending)CHECK(!pthread_cond_wait(&s->condition,&s->mutex));
     int32_t status=s->status;
-    if(!status)*out=s->result;
+    if(!status){*out=s->result;*used=s->used;}
     CHECK(!pthread_mutex_unlock(&s->mutex));return status;
 }
 static void *allocate_and_publish(void *opaque) {
@@ -54,6 +54,10 @@ static void *allocate_and_publish(void *opaque) {
     s->objects[0][1]=(uintptr_t)s->objects[1];
     uint64_t value=(uintptr_t)s->objects[0];mutation_patch patch={8,8,&value};
     CHECK(!experiment_gc_worker_write(&s->writer,&s->target,&patch,1));
+    CHECK(neoclr_gc_statistics_v1().allocations==2);
+#ifdef NEOCLR_GC_PROFILE
+    CHECK(neoclr_gc_profile_v1().allocated_bytes==48 && neoclr_gc_profile_v1().peak_arena_used>0);
+#endif
     neoclr_gc_allocation_dispatch_hook=NULL;current=NULL;
     CHECK(!pthread_mutex_lock(&s->mutex));s->done=1;
     CHECK(!pthread_cond_signal(&s->condition));CHECK(!pthread_mutex_unlock(&s->mutex));
@@ -69,6 +73,10 @@ int main(void) {
             uint64_t *p=NULL;CHECK(!neoclr_gc_allocate_v1(&owner.text,24,NEOCLR_GC_OBJECT,(void **)&p));
             p[0]=17;roots[i]=(uintptr_t)p;
         }
+        uint64_t owner_allocations=neoclr_gc_statistics_v1().allocations;
+#ifdef NEOCLR_GC_PROFILE
+        uint64_t owner_bytes=neoclr_gc_profile_v1().allocated_bytes;
+#endif
         neoclr_probe_frame frame={.context=&owner,.lanes=roots,.lane_count=4};
         CHECK(!experiment_gc_begin(&owner,&frame,NULL,0));
         for(unsigned i=0;i<4;i++) {
@@ -92,13 +100,18 @@ int main(void) {
                 if(s->done)break;
                 CHECK(s->arena==&s->context.text);
                 CHECK(!neoclr_gc_allocation_dispatch_hook);
-                s->status=neoclr_gc_allocate_v1(&owner.text,s->bytes,s->kind,&s->result);
+                s->status=neoclr_gc_allocate_dispatch_storage_v1(&owner.text,s->bytes,s->kind,&s->result);
+                s->used=owner.text.used;
                 s->pending=0;CHECK(!pthread_cond_signal(&s->condition));
             }
             CHECK(!pthread_mutex_unlock(&s->mutex));
             CHECK(!pthread_join(threads[i],NULL));
             CHECK(!experiment_gc_worker_revoke(&owner,&s->writer));
         }
+        CHECK(neoclr_gc_statistics_v1().allocations==owner_allocations);
+#ifdef NEOCLR_GC_PROFILE
+        CHECK(neoclr_gc_profile_v1().allocated_bytes==owner_bytes);
+#endif
         frame.lane_count=0;CHECK(!experiment_gc_finish(&owner,&frame,NULL,0));
         for(unsigned i=0;i<4;i++) {
             uint64_t bytes;uint32_t kind;
@@ -109,5 +122,5 @@ int main(void) {
         CHECK(!neoclr_gc_collect_v1(&owner,&frame) && !owner.text.used);
         CHECK(!neoclr_gc_heap_release_v1(&owner.text));
     }
-    puts("PASS 100 epochs, 1600 owner-dispatched requests, 800 successful allocations, pressure/invalid failures preserve output, 1200 live objects and complete reclamation");
+    puts("PASS 100 epochs, 1600 owner-dispatched requests, 800 successful allocations, pressure/invalid failures preserve output, 1200 live objects, requester-only accounting and complete reclamation");
 }

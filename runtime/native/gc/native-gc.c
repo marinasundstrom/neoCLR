@@ -362,11 +362,12 @@ int32_t neoclr_gc_owned_roots_check_v1(neoclr_aot_context *context, const uint64
 #ifdef NEOCLR_GC_ALLOCATION_DISPATCH
 _Thread_local neoclr_gc_allocation_dispatch neoclr_gc_allocation_dispatch_hook;
 #endif
+#ifdef NEOCLR_GC_ALLOCATION_DISPATCH
+int32_t neoclr_gc_allocate_dispatch_storage_v1(neoclr_aot_text_arena *a, uint64_t bytes,
+                             uint32_t kind, void **output) {
+#else
 int32_t neoclr_gc_allocate_v1(neoclr_aot_text_arena *a, uint64_t bytes,
                              uint32_t kind, void **output) {
-#ifdef NEOCLR_GC_ALLOCATION_DISPATCH
-    if (neoclr_gc_allocation_dispatch_hook)
-        return neoclr_gc_allocation_dispatch_hook(a, bytes, kind, output);
 #endif
     if (!output || !valid(a) || !bytes || kind < NEOCLR_GC_TEXT || kind > NEOCLR_GC_INTERN)
         return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
@@ -420,13 +421,40 @@ int32_t neoclr_gc_allocate_v1(neoclr_aot_text_arena *a, uint64_t bytes,
     memset(chosen + 1, 0, (size_t)(chosen->span - sizeof(block)));
     if (owned) remember_base(chosen + 1);
     *output = chosen + 1;
+#ifndef NEOCLR_GC_ALLOCATION_DISPATCH
     gc_state.statistics.allocations++;
 #ifdef NEOCLR_GC_PROFILE
     profile.allocated_bytes += bytes;
     if (a->used > profile.peak_arena_used) profile.peak_arena_used = a->used;
 #endif
+#endif
     return 0;
 }
+#ifdef NEOCLR_GC_ALLOCATION_DISPATCH
+int32_t neoclr_gc_allocate_v1(neoclr_aot_text_arena *a, uint64_t bytes,
+                             uint32_t kind, void **output) {
+    uint64_t used=0;
+    int32_t status;
+    if (neoclr_gc_allocation_dispatch_hook)
+        status=neoclr_gc_allocation_dispatch_hook(a,bytes,kind,output,&used);
+    else {
+        status=neoclr_gc_allocate_dispatch_storage_v1(a,bytes,kind,output);
+        if (!status) used=a->used;
+    }
+    if (!status) {
+        /* Count on the requester so its root-boundary pacing remains correct.
+         * The service storage primitive deliberately does not count again. */
+        gc_state.statistics.allocations++;
+#ifdef NEOCLR_GC_PROFILE
+        profile.allocated_bytes+=bytes;
+        if (used>profile.peak_arena_used) profile.peak_arena_used=used;
+#else
+        (void)used;
+#endif
+    }
+    return status;
+}
+#endif
 /* Opt-in admission for callers that have published every live reference.
  * Keep the arena-only allocator non-collecting: native helpers may retain
  * unregistered intermediates between its calls. Never retry a whole operation. */

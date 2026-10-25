@@ -139,9 +139,16 @@ int32_t neoclr_gc_allocation_info_v1(neoclr_aot_context *, const void *,
 /* Private owner-service adapter. Dispatch occurs before inspecting the arena.
  * The callback must preserve non-collecting allocation semantics and output-on-
  * success behavior. Caller supplies a valid output pointer; service coordinates
- * arena lifetime and all allocation/sweep access. No shared-heap admission. */
-typedef int32_t (*neoclr_gc_allocation_dispatch)(neoclr_aot_text_arena *, uint64_t, uint32_t, void **);
+ * arena lifetime and all allocation/sweep access. No shared-heap admission.
+ * Successful callbacks also return the authoritative post-allocation used extent
+ * for requester-local profiling. Use the storage primitive on the service thread
+ * to avoid double-counting; public allocation attributes pacing to the requester.
+ */
+typedef int32_t (*neoclr_gc_allocation_dispatch)(neoclr_aot_text_arena *, uint64_t, uint32_t, void **, uint64_t *);
 extern _Thread_local neoclr_gc_allocation_dispatch neoclr_gc_allocation_dispatch_hook;
+/* Owner-service operation only: checked allocation, no dispatch, collection or
+ * accounting. Exactly one public requester accounts for each successful call. */
+int32_t neoclr_gc_allocate_dispatch_storage_v1(neoclr_aot_text_arena *, uint64_t, uint32_t, void **);
 #endif
 /* Allocation never collects; output is published only on success.
  * Successful storage is fully zeroed, including reused payload and padding.

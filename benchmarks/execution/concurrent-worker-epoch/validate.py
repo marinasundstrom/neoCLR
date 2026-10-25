@@ -70,6 +70,18 @@ try:
  expected=next(i for i,line in enumerate((base/'allocation.c').read_text().splitlines(),1) if 'CHECK(!neoclr_gc_allocate_v1(&s->context.text' in line)
  r['negative'].append(dict(kind='allocation-dispatch',exitCode=x.returncode,stdout=x.stdout,stderr=x.stderr,expectedLine=expected))
  assert x.returncode==-signal.SIGABRT and 1<=len(x.stderr.splitlines())<=4 and set(x.stderr.splitlines())=={f'line {expected}'}
+ # Pacing counters must belong to the requesting worker, not the owner service.
+ broken_counts=out/'no-requester-count.c'
+ needle='        gc_state.statistics.allocations++;'
+ assert source.read_text().count(needle)==1
+ broken_counts.write_text(source.read_text().replace(needle,'        /* deliberately missing requester count */'))
+ exe=out/'negative-allocation-count'
+ command=[str(broken_counts) if str(x)==str(source) else str(x) for x in allocation_cmd if str(x) not in ['-fsanitize=undefined,bounds','-fno-sanitize-recover=all']]
+ command[command.index('-o')+1]=str(exe);run(command)
+ x=subprocess.run([str(exe)],capture_output=True,text=True,timeout=60)
+ expected=next(i for i,line in enumerate((base/'allocation.c').read_text().splitlines(),1) if 'CHECK(neoclr_gc_statistics_v1().allocations==2)' in line)
+ r['negative'].append(dict(kind='requester-accounting',exitCode=x.returncode,stdout=x.stdout,stderr=x.stderr,expectedLine=expected))
+ assert x.returncode==-signal.SIGABRT and 1<=len(x.stderr.splitlines())<=4 and set(x.stderr.splitlines())=={f'line {expected}'}
  for path in [source,live/'generate.py',Path(__file__),base/'test.c',base/'arrays.c',base/'allocation.c',*live.glob('*.[h]'),*gate.glob('*.[ch]'),* (root/'runtime/native/gc').glob('*.[ch]')]:r['inputs'][str(path)]=hashlib.sha256(path.read_bytes()).hexdigest()
  r['passed']=True
 finally:(out/'results.json').write_text(json.dumps(r,indent=2)+'\n')

@@ -101,10 +101,11 @@ allocator runs unchanged. The adapter is an internal service seam, not a new
 managed allocation API or permission to share an arena without coordination.
 
 The callback must preserve non-collecting allocation, zeroed successful storage,
-error codes and output publication only on success. It must coordinate arena
+error codes and output publication only on success. On success it also returns the
+authoritative used extent for requester-local peak profiling. It must coordinate arena
 identity/lifetime and allocator/sweep access. It must not recursively dispatch to
-itself. The test uses one bounded request slot per worker and a fixed owner whose
-hook is unset. Workers use empty local arenas as request identities, ensuring they
+itself. The test uses one bounded request slot per worker and a fixed owner using the private non-dispatching
+storage primitive. Workers use empty local arenas as request identities, ensuring they
 cannot accidentally allocate against copied owner metadata. Requests contain size
 and storage kind; the owner selects its authoritative arena. Mutex/condition
 handoffs publish the result; the worker initializes it before final rendezvous.
@@ -127,6 +128,25 @@ allocator/epoch state, but adds synchronization and can serialize allocation.
 The test services workers sequentially; it is not a fairness or throughput design.
 No per-request native message allocation is needed in this fixture, but no
 application allocation/CPU improvement is established.
+
+The accounting follow-up (`allocation-accounting-validation.json.gz`) corrects a
+pacing issue in the initial seam: physically allocating on the service thread also
+attributed the allocation to that thread. The requester now counts exactly one
+successful allocation, its bytes and the returned arena extent. The owner calls
+`neoclr_gc_allocate_dispatch_storage_v1`, which retains all allocation validation,
+zeroing, free-list/index updates and output semantics but neither dispatches nor
+counts. Failure counts no successful allocation. This is a private experimental
+callback signature change; rebuild adapters with the matching header.
+
+Each test worker verifies two allocations/48 bytes and a nonzero reported extent;
+the owner verifies its own allocation/byte counters do not change when serving
+requests. Omitting the requester count fails deliberately. Ordinary and
+UB/bounds-sanitized full native integration fixtures pass. Clang ARM64 assembly
+with the dispatch option disabled remains byte-identical to `4701e799c`, both with
+and without profiling (`allocation-accounting-assembly.json.gz`). These facts
+protect existing pacing/measurement behavior; they do not prove scheduling or
+throughput gains. The service primitive must only serve a corresponding public
+requester; using it for an unrelated allocation would bypass accounting.
 
 Generated calls already use this allocator entry, but the compiler/worker-pool
 adapter does not yet install or serve the hook. Rooted allocation pressure must
