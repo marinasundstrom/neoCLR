@@ -9,6 +9,7 @@ import statistics
 p = argparse.ArgumentParser(description=__doc__)
 p.add_argument('--root', type=Path, required=True)
 p.add_argument('--prefix', default='stack-elision')
+p.add_argument('--scalar-validation',action='store_true',help='Require identical objects and exactly one scalar-validation define on current controls.')
 p.add_argument('--output', type=Path, required=True)
 a = p.parse_args()
 result = dict(passed=False, cohorts={}, inputs={})
@@ -52,6 +53,12 @@ for cohort, suffix in [('ordinary', 'ordinary-measure'), ('plain', 'http-plain')
                 assert len(ordered) == 5 and {t['mode'] for t in ordered} == set(modes)
                 for rank, t in enumerate(ordered): ranks[t['mode']][rank] += 1
             assert all(set(counts) == set(range(5)) and set(counts.values()) == {2} for counts in ranks.values())
+        if not ordinary:
+            assert {t['pair'] for t in rows} == set(range(4))
+            for pair in range(4):
+                selected = [t for t in rows if t['pair'] == pair]
+                assert len(selected) == 5 and {t['mode'] for t in selected} == set(modes)
+                assert len({(t['requests'], t['warmup'], t['clientConcurrency']) for t in selected}) == 1
         groups[sample] = {}
         for mode in modes:
             selected = [t for t in rows if t['mode'] == mode]
@@ -66,7 +73,15 @@ for cohort, suffix in [('ordinary', 'ordinary-measure'), ('plain', 'http-plain')
             def command(mode):
                 suffix = sample + '-' + mode if ordinary else mode
                 return next(c['command'] for c in data['commands'] if '-o' in c['command'] and Path(c['command'][c['command'].index('-o') + 1]).name == suffix)
-            assert normalized(command(new)) == normalized(command(old)), 'Native controls differ beyond generated object'
+            if a.scalar_validation:
+                current=command(new).copy(); previous=command(old).copy()
+                flag='-DNEOCLR_GC_SCALAR_STORAGE_VALIDATION'
+                assert current.count(flag)==1 and flag not in previous
+                current.remove(flag)
+                assert [x for x in current if x.endswith('.o')]==[x for x in previous if x.endswith('.o')]
+                assert normalized(current)==normalized(previous), 'Native scalar controls differ'
+            else:
+                assert normalized(command(new)) == normalized(command(old)), 'Native controls differ beyond generated object'
             key = 'round' if ordinary else 'pair'
             old_rows = {t[key]: t for t in rows if t['mode'] == old}
             new_rows = {t[key]: t for t in rows if t['mode'] == new}

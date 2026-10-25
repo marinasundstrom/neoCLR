@@ -1,0 +1,19 @@
+{
+  "scope": "ARM64 Clang enter_owned assembly; instruction/register evidence, not CPU attribution",
+  "variants": {
+    "vector": {
+      "executable": "target/concurrent-workloads/forward-elision-http-plain/live-inline-index",
+      "sha256": "17c7dbed1acff8820547319d0e8e719e6497261c018c90a91e21f8cc4582196c",
+      "instructionLines": 259,
+      "frameBytes": 160,
+      "savedSimdRegisters": 8
+    },
+    "scalar": {
+      "executable": "target/concurrent-workloads/scalar-frame-http-plain/live-inline-index",
+      "sha256": "d774f61797319a7778fd8f7788a630898d7b2f25c747e4743048cae9203493f0",
+      "instructionLines": 97,
+      "frameBytes": 96,
+      "savedSimdRegisters": 0
+    }
+  }
+}

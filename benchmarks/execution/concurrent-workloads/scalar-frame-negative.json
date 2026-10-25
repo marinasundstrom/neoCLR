@@ -1,0 +1,30 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "case": "none",
+      "exitCode": 0,
+      "expectedResult": true
+    },
+    {
+      "case": "missing-flag",
+      "exitCode": 1,
+      "expectedResult": true
+    },
+    {
+      "case": "flag-on-control",
+      "exitCode": 1,
+      "expectedResult": true
+    },
+    {
+      "case": "different-object",
+      "exitCode": 1,
+      "expectedResult": true
+    },
+    {
+      "case": "missing-trial",
+      "exitCode": 1,
+      "expectedResult": true
+    }
+  ]
+}

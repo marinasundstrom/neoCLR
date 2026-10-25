@@ -10,6 +10,7 @@ from pathlib import Path
 import subprocess
 
 p = argparse.ArgumentParser(description=__doc__)
+p.add_argument('--compare-scalar-validation',action='store_true')
 p.add_argument('--compare-linear-seed',action='store_true')
 p.add_argument('--compare-direct-seed',action='store_true')
 p.add_argument('--borrow-stores',action='store_true',help='Use borrowed native stores for current live objects; retain checked previous-object controls.')
@@ -236,6 +237,8 @@ static void report_profile(struct rusage *a, struct rusage *b, struct timespec *
             if '-linear-seed-' in mode: command += ['-DNEOCLR_LIVE_LINEAR_SEED']
             if '-direct-seed-' in mode: command += ['-DNEOCLR_LIVE_DIRECT_SEED']
             if a.borrow_stores and mode != 'sync' and '-previous-' not in mode: command += ['-DNEOCLR_LIVE_STORE_HANDLE']
+            if a.compare_scalar_validation and mode != 'sync' and 'previous' not in mode:
+                command += ['-DNEOCLR_GC_SCALAR_STORAGE_VALIDATION']
             run(command)
             for item in command:
                 path = Path(item)

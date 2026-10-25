@@ -109,6 +109,10 @@ static int has_spill_marker(const char *plan, uint32_t length) {
 static void validate_storage(const neoclr_probe_storage *storage, uint32_t count,
                              int check_flags) {
     uint32_t invalid = 0;
+#if defined(NEOCLR_GC_SCALAR_STORAGE_VALIDATION) && defined(__clang__)
+    /* Experimental small-frame control: preserve every validation predicate. */
+#pragma clang loop vectorize(disable) interleave(disable)
+#endif
     for (uint32_t i = 0; i < count; i++) {
         const neoclr_probe_storage *s = &storage[i];
         invalid |= (s->address == NULL) |

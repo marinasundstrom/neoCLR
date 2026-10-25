@@ -226,3 +226,5 @@ See [complete managed borrowing](borrowed-managed-results.md) for test-only inte
 [Forwarded-stack guard removal](forward-elision-results.md) qualifies the separate opt-in transformation. Matched live HTTP throughput improves about 2–3% with about 2% less CPU; allocation reduction and concurrent-default acceptance are not claimed.
 
 [Post-forwarding profiles](forward-gap-results.md) match diagnostic builds to uninstrumented controls and identify remaining frame/store work and the separate shared-worker integration boundary.
+
+[Small-frame validation](scalar-frame-results.md) records dynamic descriptor counts, the opt-in scalar native loop, safety checks and matched standalone/HTTP controls.

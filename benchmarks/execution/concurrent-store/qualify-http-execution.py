@@ -10,6 +10,7 @@ import subprocess
 import threading
 p=argparse.ArgumentParser(description=__doc__)
 p.add_argument('--object',type=Path,required=True)
+p.add_argument('--scalar-validation',action='store_true')
 p.add_argument('--elide-forwarded-stack-arguments',action='store_true')
 p.add_argument('--elide-stack-arguments',action='store_true',help='Require transformed managed JIT execution')
 p.add_argument('--borrow-stores',action='store_true')
@@ -26,7 +27,7 @@ assert not a.elide_stack_arguments or a.execution=='jit'
 assert not a.elide_forwarded_stack_arguments or a.elide_stack_arguments
 root=Path(__file__).resolve().parents[3];base=Path(__file__).resolve().parent
 out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
-r={'passed':False,'forwardedElision':a.elide_forwarded_stack_arguments,'borrowStores':a.borrow_stores,'elideStackArguments':a.elide_stack_arguments,'inlineIndex':a.inline_index,'scope':f'{a.execution} {a.sample} correctness/lifecycle only, not a capacity benchmark.','commands':[],'trials':[],'inputs':{}}
+r={'passed':False,'scalarValidation':a.scalar_validation,'forwardedElision':a.elide_forwarded_stack_arguments,'borrowStores':a.borrow_stores,'elideStackArguments':a.elide_stack_arguments,'inlineIndex':a.inline_index,'scope':f'{a.execution} {a.sample} correctness/lifecycle only, not a capacity benchmark.','commands':[],'trials':[],'inputs':{}}
 def run(cmd):
  x=subprocess.run(list(map(str,cmd)),cwd=root,capture_output=True,text=True,timeout=120)
  r['commands'].append({'command':list(map(str,cmd)),'exitCode':x.returncode,'stdout':x.stdout,'stderr':x.stderr})
@@ -74,6 +75,7 @@ static void report_candidate(void) {
    command.append(item)
   command[command.index('-o')+1]=str(exe)
   command+=['-I',str(root/'runtime/native/memory'),'-DNEOCLR_GC_PROFILE','-DNEOCLR_SHADOW_SPARSE_INDEX','-I',str(base.parent/'concurrent-mutation-gate'),str(base.parent/'concurrent-mutation-gate/gate.c')]
+  if a.scalar_validation:command+=['-DNEOCLR_GC_SCALAR_STORAGE_VALIDATION']
   if a.borrow_stores:command+=['-DNEOCLR_LIVE_STORE_HANDLE']
   if a.inline_index:command+=['-DNEOCLR_LIVE_ALLOCATION_INDEX','-DNEOCLR_LIVE_EXACT_INDEX','-DNEOCLR_LIVE_INLINE_BASE']
   if paced:command+=['-DNEOCLR_GC_PACED']
