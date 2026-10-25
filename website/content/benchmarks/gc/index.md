@@ -506,3 +506,12 @@ invocation CPU; pipelining cuts transfer count about 60%. These measurements inc
 clock overhead and exclude surrounding root and queue work. They support examining
 handoff frequency and resumption bookkeeping before replacing the carrier, without
 establishing a precise task-switch cost or a virtual-thread requirement.
+
+### Additional scheduling attribution (development)
+
+Sixteen plain/JSON native HTTP profiles pass 16,640 responses across AOT/JIT and
+both collectors. Root parking and resume preparation/cleanup account for about
+0.4–1.9% of invocation CPU, including diagnostic clock overhead. Scheduler
+acquisition costs more but includes idle GC; that internal split remains under
+investigation. These are attribution profiles, not new throughput benchmarks or
+a collector-default qualification.

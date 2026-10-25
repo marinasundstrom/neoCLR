@@ -15,6 +15,8 @@
 
 ## 2026-10-25 — Profile worker concurrency and reconsider GC scheduling architecture
 
+- **Follow-up evidence:** [Root/resume phase profiling](../benchmarks/gc-suite/concurrency/fiber-phases.md) passes 16,640 responses; measured root/resume work is 0.4–1.9% of invocation CPU including clocks. Assistant retained ownership boundaries and selected polling-versus-idle-GC attribution next. No new throughput or default claim.
+
 - **Author:** Asked to measure GC under many workers/threads and include scheduling
   cost. Hopes concurrent GC benefits highly concurrent workloads, and explicitly
   requested additional profiles to determine whether the architecture needs to

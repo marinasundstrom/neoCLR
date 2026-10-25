@@ -4,12 +4,13 @@ Diagnostic only: clock costs remain included; never use this build for timings.
 import argparse,hashlib,json,re,subprocess
 from pathlib import Path
 p=argparse.ArgumentParser(description=__doc__)
+p.add_argument('--phases',action='store_true',help='Also time root/resume and scheduler intervals')
 p.add_argument('--build',type=Path,required=True)
 p.add_argument('--output',type=Path,required=True)
 a=p.parse_args();root=Path(__file__).resolve().parents[3];base=Path(__file__).resolve().parent
 out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
 prior=json.loads((a.build/'build.json').read_text());assert prior['passed']
-r=dict(passed=False,fiberSwitchProfile=True,diagnosticOnly=__doc__,commands=[],recipes={},inputs={})
+r=dict(passed=False,fiberSwitchProfile=True,fiberPhaseProfile=a.phases,diagnosticOnly=__doc__,commands=[],recipes={},inputs={})
 def run(cmd,expected=0):
  cmd=list(map(str,cmd));x=subprocess.run(cmd,capture_output=True,text=True,timeout=120)
  r['commands'].append(dict(command=cmd,exitCode=x.returncode,stdout=x.stdout,stderr=x.stderr));assert x.returncode==expected,x.stderr
@@ -24,6 +25,24 @@ try:
  s=s.replace('static void body(void) {','static void body(void) {\n    switch_arrive();')
  assert s.count('    memset(&state, 0, sizeof(state));')==1
  s=s.replace('    memset(&state, 0, sizeof(state));','    switch_dump(statistics.resumes);\n    memset(&state, 0, sizeof(state));')
+ if a.phases:
+  s=s.replace('#include "'+str(base/'fiber-clock.h')+'"','#include "'+str(base/'fiber-clock.h')+'"\n#include "'+str(base/'fiber-phases.h')+'"')
+  start=s.index('static int resume(fiber *f) {');end=s.index('int32_t neoclr_runtime_async_create_v1',start)
+  body=s[start:end]
+  body=body.replace('    if (f->roots.expired)', '    phase_stamp prepare = phase_begin();\n    if (f->roots.expired)',1)
+  body=body.replace('    switch_begin();','    phase_end(0, prepare);\n    switch_begin();',1)
+  body=body.replace('    state.current = parent;','    phase_stamp finish = phase_begin();\n    state.current = parent;',1)
+  split=body.index('    phase_stamp finish')
+  body=body[:split]+body[split:].replace('return status;', 'phase_end(1, finish); return status;')
+  s=s[:start]+body+s[end:]
+  s=s.replace('static void yield(void) {','static void yield(void) {\n    phase_stamp stamp = phase_begin();',1)
+  s=s.replace('    f->parked = 1;','    phase_end(2, stamp);\n    f->parked = 1;',1)
+  call='int progress = neoclr_scheduler_acquire_v1(c, &delivery, NULL);'
+  assert s.count(call)==1
+  s=s.replace(call,'phase_stamp acquire = phase_begin();\n        '+call+'\n        phase_end(3, acquire);')
+  call='if (!ready) neoclr_scheduler_wait_v1(c);';assert s.count(call)==1
+  s=s.replace(call,'if (!ready) { phase_stamp wait = phase_begin(); neoclr_scheduler_wait_v1(c); phase_end(4, wait); }')
+  s=s.replace('    switch_dump(statistics.resumes);','    phase_dump();\n    switch_dump(statistics.resumes);',1)
  source=out/'native-runtime.c';source.write_text(s)
  validation=json.loads((root/'docs/experiments/runtime-async/owned-native-body-validation.json').read_text())
  test=next(c['command'].copy() for c in validation['commands'] if any(v.endswith('native-owned-body-test.c') for v in c['command']))
@@ -52,7 +71,7 @@ try:
   for value in c['command']:
    path=Path(value)
    if path.is_file():r['inputs'][str(path.resolve())]=hashlib.sha256(path.read_bytes()).hexdigest()
- for path in [Path(__file__),base/'fiber-clock.h',original,source,a.build/'build.json',*out.glob('*.dylib'),out/'sync',out/'live',*out.glob('*selection.json')]:
+ for path in [Path(__file__),base/'fiber-clock.h',base/'fiber-phases.h',original,source,a.build/'build.json',*out.glob('*.dylib'),out/'sync',out/'live',*out.glob('*selection.json')]:
   r['inputs'][str(path.resolve())]=hashlib.sha256(path.read_bytes()).hexdigest()
  r['passed']=True
 finally:(out/'build.json').write_text(json.dumps(r,indent=2)+'\n')

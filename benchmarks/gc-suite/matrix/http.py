@@ -156,6 +156,13 @@ def trial(mode,sample,protocol,repetition):
             assert len(matches)==1,matches
             resumes,transfers,wall,cpu=map(int,matches[0]);assert transfers==2*resumes and resumes>0
             row['fiberSwitch']=dict(resumes=resumes,transfers=transfers,wallNs=wall,threadCpuNs=cpu)
+        if built.get('fiberPhaseProfile'):
+            matches=re.findall(r'^FIBER_PHASE (\w+) (\d+) (\d+) (\d+)$',''.join(errors),re.M)
+            assert len(matches)==5,matches
+            row['fiberPhases']={name:dict(count=int(count),wallNs=int(wall),threadCpuNs=int(cpu)) for name,count,wall,cpu in matches}
+            assert len(row['fiberPhases'])==5
+            for name in ['resume_prepare','resume_finish','yield_roots']:
+                assert row['fiberPhases'][name]['count']==row['fiberSwitch']['resumes']
         if recipe['collector']=='live':
             counts=next(list(map(int,line.split()[1:])) for line in errors if line.startswith('CANDIDATE '))
             assert counts[0]==counts[1]+counts[2] and counts[5]==0

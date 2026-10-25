@@ -80,3 +80,6 @@ in shared-pool handoffs, with matched-source timings and separate wait diagnosti
 
 [Native fiber-transfer profiles](fiber-results.md) now distinguish carrier switching
 from surrounding root/dispatch work; 16 checked HTTP cases pass.
+
+[Root/resume and scheduler phase profiles](fiber-phases.md) further separate carrier
+coordination from guest work; acquisition still includes idle GC.

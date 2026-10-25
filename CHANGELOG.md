@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-25
 
+- Extend copied-carrier diagnostics with root/resume, scheduler acquisition and readiness-wait phases. Sanitized lifetime/failure controls and 16 native HTTP cells pass 16,640 responses; root/resume accounts for 0.4–1.9% of invocation CPU including instrumentation. Acquisition includes idle GC and needs finer attribution; no runtime/default change.
+
 - Record the author-supplied generational concurrent GC proposal against CoreCLR allocation/background collection guidance, separating TLAB, remembered-set and relocation prerequisites from current implementation. Keep measured runtime optimization active; no collector/default change.
 
 - Add diagnostic native fiber-transfer timing that excludes guest execution and checks balanced arrivals/resumes. Sanitized owned-body validation passes and a missing-arrival control aborts; 16 AOT/JIT sync/concurrent HTTP cases pass 16,640 responses. Carrier transfers account for roughly 1–5.5% of instrumented invocation CPU, with pipelining cutting transfer count about 60%. Label profiles separately from benchmarks; root/queue/resumption overhead remains a separate investigation. No carrier/default change.

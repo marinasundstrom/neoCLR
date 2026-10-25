@@ -1,5 +1,7 @@
 # neoCLR platform roadmap
 
+**Fiber phase attribution (2026-10-25):** [Sixteen native HTTP profiles](../benchmarks/gc-suite/concurrency/fiber-phases.md) pass 16,640 responses; root/resume work accounts for 0.4–1.9% of instrumented invocation CPU and does not explain the concurrent gap. Next separate socket polling from idle GC within scheduler acquisition before changing ownership boundaries.
+
 **Generational architecture input (2026-10-25):** The author supplied an external recommendation for TLABs, copying young collections and concurrent old marking. [Evaluation and prerequisites](design/generational-concurrent-gc-direction.md) distinguish that proposal from current nonmoving behavior. Continue measured root/queue/boundary work; evaluate allocation regions, survival and relocation safety before committing to generation or compaction policies. No default or milestone replacement.
 
 **Worker handoff improvement (2026-10-25):** Author-directed scheduling investigation led to [opt-in requester-local allocation](../benchmarks/gc-suite/concurrency/local-allocation.md). Shared-pool sync/live safety and pressure controls pass; matched-source concurrent lifecycle CPU falls 61% and elapsed 70%, eliminating 4,520 allocation handoffs per test. Separate collection ownership and exclusive leases remain. This is not an HTTP gain or general shared-mutator/default qualification; continue boundary/task/fiber cost investigation.
