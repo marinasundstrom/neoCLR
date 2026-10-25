@@ -106,3 +106,6 @@ clean four-owner capacity claim or default promotion.
 
 See the [native close investigation](close-results.md) for corrected NoDelay evidence,
 EOF-phase timing, bounded traces and a timeout correlated with prompt native close.
+
+The [guarded CPU comparison](cpu-results.md) separates automatic marking from the
+remaining checked-store/generated-code cost and retains separate loaded stack profiles.

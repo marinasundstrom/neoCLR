@@ -1,7 +1,8 @@
 """Paired bounded HTTP owner measurement; whole-process CPU includes warmup/cleanup."""
 import argparse,asyncio,os,hashlib,json,math,queue,re,resource,socket,statistics,subprocess,threading,time
 from pathlib import Path
-p=argparse.ArgumentParser();p.add_argument('--build',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--seconds',type=float,default=3);p.add_argument('--rounds',type=int,default=3);p.add_argument('--concurrency',type=int,default=32);p.add_argument('--go-client',type=Path);p.add_argument('--owners',type=int,nargs='+',choices=[1,4],default=[1,4]);p.add_argument('--modes',nargs='+',choices=['sync','live'],default=['sync','live']);p.add_argument('--capture-failure',action='store_true');a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--build',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--seconds',type=float,default=3);p.add_argument('--rounds',type=int,default=3);p.add_argument('--concurrency',type=int,default=32);p.add_argument('--go-client',type=Path);p.add_argument('--owners',type=int,nargs='+',choices=[1,4],default=[1,4]);p.add_argument('--modes',nargs='+',choices=['sync','guarded','live'],default=['sync','live']);p.add_argument('--capture-failure',action='store_true');p.add_argument('--profile-seconds',type=int,default=0);a=p.parse_args()
+assert 0<=a.profile_seconds<=a.seconds
 assert a.seconds>0 and a.rounds>0 and a.concurrency>0
 assert len(set(a.owners))==len(a.owners) and len(set(a.modes))==len(a.modes)
 build=a.build.resolve();out=a.output.resolve();assert not out.exists()
@@ -9,6 +10,7 @@ manifest=json.loads((build/'results.json').read_text());assert manifest['passed'
 sample=manifest.get('sample','task')
 assert not a.go_client or (sample=='plain' and a.concurrency==32)
 r={'passed':False,'sample':sample,'scope':'HTTP owner fixture, closed-loop connections. Whole-process CPU/allocations include startup/warmup/drain/shutdown.','seconds':a.seconds,'concurrency':a.concurrency,'trials':[],'inputs':{}}
+if a.profile_seconds:r['diagnosticOnly']='macOS wall-stack sampling; timings are not capacity evidence'
 programs={(mode,workers):build/f'{mode}-{workers}' for mode in a.modes for workers in a.owners}
 for path in [Path(__file__),build/'results.json',*programs.values(),*([a.go_client] if a.go_client else [])]:r['inputs'][str(path)]=hashlib.sha256(path.read_bytes()).hexdigest()
 async def load(port, controls, seconds):
@@ -63,6 +65,7 @@ try:
    readers=[threading.Thread(target=read,args=(proc.stdout,lines)),threading.Thread(target=read,args=(proc.stderr,errors))]
    for reader in readers:reader.start()
    trial=dict(mode=mode,workers=workers,repeat=repeat,pid=proc.pid,stdout=lines,stderr=errors);r['trials'].append(trial)
+   profiler=None
    try:
     ready=[];deadline=time.monotonic()+30
     while len(ready)<workers and time.monotonic()<deadline:
@@ -74,7 +77,15 @@ try:
     assert len(ready)==workers and len({x for x,y in ready})==1
     port=ready[0][0];controls={y for x,y in ready};assert len(controls)==workers
     warmup=asyncio.run(load(port,controls,1));trial['warmup']=warmup
+    if a.profile_seconds:
+     profile=Path(str(out)+f'.{mode}-{workers}-{repeat}.sample.txt')
+     profiler=subprocess.Popen(['sample',str(proc.pid),str(a.profile_seconds),'-file',str(profile)],stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
     trial.update(asyncio.run(load(port,controls,a.seconds)))
+    if profiler:
+     stdout_profile,stderr_profile=profiler.communicate(timeout=15)
+     trial['cpuProfile']=dict(path=str(profile),exitCode=profiler.returncode,stdout=stdout_profile,stderr=stderr_profile,sha256=hashlib.sha256(profile.read_bytes()).hexdigest())
+     assert profiler.returncode==0
+
     for control in controls:
      with socket.create_connection(('127.0.0.1',control),timeout=5):pass
     deadline=time.monotonic()+30
@@ -99,10 +110,10 @@ try:
     profiles=[list(map(int,line.split())) for line in re.findall(r'^PROFILE ([\d ]+)$',stderr,re.M)];assert len(profiles)==workers and all(len(row)==7 for row in profiles)
     trial.update(loadClient='go' if a.go_client else 'python',totalResponses=total,processCpuSeconds=cpu,cpuMicrosecondsPerResponse=cpu/total*1e6,allocations=sum(allocations),allocationsPerResponse=sum(allocations)/total,maxRssBytes=max(int(row[2]) for row in process),profiles=profiles,clientCpuSeconds=client_after.ru_utime+client_after.ru_stime-client_before.ru_utime-client_before.ru_stime)
     if a.go_client:trial['clientCpuSeconds']=warmup['clientProcessCpuSeconds']+trial['clientProcessCpuSeconds']
-    if mode=='live':
+    if mode!='sync':
      counts=[list(map(int,line.split())) for line in re.findall(r'^CANDIDATE ([\d ]+)$',stderr,re.M)]
      indices=[list(map(int,line.split())) for line in re.findall(r'^INDEX_METADATA ([\d ]+)$',stderr,re.M)]
-     assert len(counts)==len(indices)==workers and all(len(c)==6 and c[0]==c[1]+c[2] and c[1]>0 and c[5]==0 for c in counts)
+     assert len(counts)==len(indices)==workers and all(len(c)==6 and c[0]==c[1]+c[2] and (c[1]>0 if mode=='live' else c==[0]*6) and c[5]==0 for c in counts)
      assert all(len(i)==3 and i[0]>0 and i[1]==0 for i in indices)
      trial.update(candidateCounts=counts,indexMetadata=indices)
     print(json.dumps({k:trial[k] for k in ['mode','workers','repeat','requestsPerSecond','cpuMicrosecondsPerResponse','allocationsPerResponse']}),flush=True)
@@ -117,6 +128,7 @@ try:
       except Exception as diagnostic_error:trial['failureState'].append(dict(command=command,error=repr(diagnostic_error)))
     raise
    finally:
+    if profiler and profiler.poll() is None:profiler.kill();profiler.communicate(timeout=10)
     if proc.poll() is None:proc.kill()
     proc.wait()
     for reader in readers:reader.join(timeout=2)
