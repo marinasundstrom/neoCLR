@@ -19,6 +19,11 @@
   owner profiler. Inspect queue/resume, fiber-switch, root/safepoint, lease and
   collector-service waits before prioritizing further GC optimizations. Scalar-store
   prototype validation is deferred behind this author-requested investigation.
+- **Further measurement:** Instrumented carrier transfers across 16 native HTTP
+  cases pass 16,640 responses and account for roughly 1–5.5% of invocation CPU,
+  including clock overhead. Pipelining reduces transfer count about 60%. Assistant
+  inference: prioritize handoff frequency and surrounding root/dispatch work before
+  replacing the carrier; this does not attribute all scheduling costs.
 - **Author clarification:** Virtual threads are not necessary; evaluate context-switch
   cost and decide whether to tune or redesign. Commit each completed slice.
 - **Open:** The first twelve owner diagnostic profiles pass 724,344 responses; tuned

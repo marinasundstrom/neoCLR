@@ -77,3 +77,6 @@ and handoff cost, then decide whether tuning or redesign is justified.
 
 [Requester-local allocation](local-allocation.md) now qualifies an opt-in reduction
 in shared-pool handoffs, with matched-source timings and separate wait diagnostics.
+
+[Native fiber-transfer profiles](fiber-results.md) now distinguish carrier switching
+from surrounding root/dispatch work; 16 checked HTTP cases pass.

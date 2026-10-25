@@ -498,3 +498,11 @@ removing those handoffs. Matched-source four-worker lifecycle tests reduce concu
 elapsed time about 70% and CPU 61%; sync improves too. Sanitized correctness and
 negative controls pass. This is a shared-pool scheduling result, not an HTTP gain,
 virtual-thread implementation or promotion of concurrent GC to default.
+
+
+Separate fiber diagnostics validate 16,640 HTTP responses across AOT/JIT and both
+native collectors. Raw carrier transfer accounts for roughly 1–5.5% of instrumented
+invocation CPU; pipelining cuts transfer count about 60%. These measurements include
+clock overhead and exclude surrounding root and queue work. They support examining
+handoff frequency and resumption bookkeeping before replacing the carrier, without
+establishing a precise task-switch cost or a virtual-thread requirement.

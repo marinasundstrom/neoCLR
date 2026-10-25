@@ -12,6 +12,7 @@ from pathlib import Path
 import platform
 import queue
 import resource
+import re
 import socket
 import statistics
 import subprocess
@@ -42,9 +43,10 @@ build_path=a.build.resolve()/'build.json';built=json.loads(build_path.read_text(
 assert built['passed'] and all(mode in built['recipes'] for mode in a.modes)
 for path,digest in built['inputs'].items():
     assert hashlib.sha256(Path(path).read_bytes()).hexdigest()==digest,('stale build input',path)
-r=dict(passed=False,kind='qualification' if a.smoke else 'benchmark',scope=__doc__,system=platform.platform(),
+r=dict(passed=False,kind='profile' if built.get('diagnosticOnly') else 'qualification' if a.smoke else 'benchmark',scope=__doc__,system=platform.platform(),
        rounds=a.rounds,concurrency=a.concurrency,pipelineDepth=a.pipeline_depth,trials=[],rows=[],
        inputs={str(build_path):hashlib.sha256(build_path.read_bytes()).hexdigest()})
+if built.get('diagnosticOnly'):r['diagnosticOnly']=built['diagnosticOnly']
 
 
 def traffic(port,sample,protocol,count):
@@ -149,6 +151,11 @@ def trial(mode,sample,protocol,repetition):
             row.update(invocationCpuSeconds=float(profile[0]),invocationWallSeconds=float(profile[1]),
                        allocations=int(profile[2]),allocatedBytes=int(profile[3]),collections=int(profile[4]),
                        peakLiveBytes=int(profile[5]),peakArenaBytes=int(profile[6]))
+        if built.get('fiberSwitchProfile'):
+            matches=re.findall(r'^FIBER_SWITCH (\d+) (\d+) (\d+) (\d+)$',''.join(errors),re.M)
+            assert len(matches)==1,matches
+            resumes,transfers,wall,cpu=map(int,matches[0]);assert transfers==2*resumes and resumes>0
+            row['fiberSwitch']=dict(resumes=resumes,transfers=transfers,wallNs=wall,threadCpuNs=cpu)
         if recipe['collector']=='live':
             counts=next(list(map(int,line.split()[1:])) for line in errors if line.startswith('CANDIDATE '))
             assert counts[0]==counts[1]+counts[2] and counts[5]==0
