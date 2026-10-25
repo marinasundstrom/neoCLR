@@ -6332,10 +6332,15 @@ fn finish_value_body(
         }
         let entry = context.func.layout.entry_block().unwrap();
         let owner = *context.func.dfg.block_params(entry).last().unwrap();
-        crate::mutation_store::lower_framed(
-            module, &mut context.func, owner,
-            ready.ok_or("missing live-store frame initialization")?,
-        )?;
+        let ready = ready.ok_or("missing live-store frame initialization")?;
+        if crate::mutation_admission::borrowed_stores_enabled() {
+            if !probes.is_some_and(|p| p.supports_store_borrow()) {
+                return Err("borrowed stores require same-thread owned state handles".into());
+            }
+            crate::mutation_store::lower_framed_borrowed(module, &mut context.func, owner, ready)?;
+        } else {
+            crate::mutation_store::lower_framed(module, &mut context.func, owner, ready)?;
+        }
     }
     if let (Some(probes), Some(frame)) = (probes, frame) {
         probes.finish(module, &mut context.func, frame);

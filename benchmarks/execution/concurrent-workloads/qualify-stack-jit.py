@@ -10,6 +10,7 @@ from pathlib import Path
 import subprocess
 
 p = argparse.ArgumentParser(description=__doc__)
+p.add_argument('--borrow-stores',action='store_true')
 p.add_argument('--build', type=Path, required=True)
 p.add_argument('--runner', type=Path, required=True)
 p.add_argument('--host', type=Path, required=True)
@@ -20,7 +21,7 @@ build = json.loads((a.build / 'results.json').read_text())
 assert build['passed']
 out = a.output.resolve()
 out.mkdir(parents=True, exist_ok=False)
-r = dict(passed=False, scope=__doc__, trials=[], inputs={}, iterations=build['iterations'])
+r = dict(passed=False, borrowedStores=a.borrow_stores, scope=__doc__, trials=[], inputs={}, iterations=build['iterations'])
 try:
     for case in build['cases']:
         original = next(x['selectionCommand'] for x in case['native'] if x['mode'] == 'live')
@@ -31,6 +32,8 @@ try:
         for enabled in [False, True]:
             env = dict(os.environ, NEOCLR_TEST_OPT_LEVEL=build['optimizationLevel'],
                        NEOCLR_LIVE_SELECTION_COMMAND=str(recipe), NEOCLR_LIVE_SELECTION_MODE='live')
+            env.pop('NEOCLR_LIVE_BORROW_STORES', None)
+            if a.borrow_stores: env['NEOCLR_LIVE_BORROW_STORES']='1'
             env.pop('NEOCLR_LIVE_ELIDE_STACK_ARGUMENTS', None)
             if enabled:
                 env['NEOCLR_LIVE_ELIDE_STACK_ARGUMENTS'] = '1'

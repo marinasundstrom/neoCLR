@@ -37,6 +37,10 @@ pub(super) struct Probes {
     publish: FuncId,
 }
 impl Probes {
+    pub(super) fn supports_store_borrow(&self) -> bool {
+        self.state_handle && !self.workers
+    }
+
     pub fn prepare(
         module: &mut impl Module,
         p: &Profile<'_>,

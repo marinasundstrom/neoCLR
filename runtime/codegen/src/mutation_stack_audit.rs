@@ -128,20 +128,14 @@ fn analyze(
                 let Some(callee) = target(body, func_ref) else {
                     continue;
                 };
-                if module
-                    .declarations()
-                    .get_function_decl(callee)
-                    .name
-                    .as_deref()
-                    != Some("experiment_gc_store")
-                {
-                    continue;
-                }
+                let name = module.declarations().get_function_decl(callee).name.as_deref();
+                let raw = args.as_slice(&body.dfg.value_lists);
+                let args = match (name, raw.len()) {
+                    (Some("experiment_gc_store"), 4) => raw,
+                    (Some("experiment_gc_store_borrowed"), 5) => &raw[1..],
+                    _ => continue,
+                };
                 guarded += 1;
-                let args = args.as_slice(&body.dfg.value_lists);
-                if args.len() != 4 {
-                    continue;
-                }
                 let Some((index, offset)) = parameter(body, args[1], &incoming_edges) else {
                     continue;
                 };
@@ -212,7 +206,9 @@ pub(crate) fn elide(
             let InstructionData::Call { args, .. } = ctx.func.dfg.insts[inst] else {
                 unreachable!()
             };
-            let args = args.as_slice(&ctx.func.dfg.value_lists).to_vec();
+            let raw = args.as_slice(&ctx.func.dfg.value_lists);
+            // analyze admits only the exact four- or five-argument store ABIs.
+            let args = if raw.len() == 5 { &raw[1..] } else { raw }.to_vec();
             let mut cursor = FuncCursor::new(&mut ctx.func).at_inst(inst);
             let bits = match width {
                 1 => cursor.ins().ireduce(types::I8, args[2]),
@@ -427,7 +423,14 @@ mod tests {
                             .unwrap();
                     let mut builder =
                         JITBuilder::with_isa(isa, cranelift_module::default_libcall_names());
+                    extern "C" fn acquire() -> u64 { 0x1234 }
+                    unsafe extern "C" fn borrowed(handle: u64, context: u64, destination: *mut u8, bits: u64, width: u32) -> i32 {
+                        assert_eq!(handle, 0x1234);
+                        unsafe { hook(context, destination, bits, width) }
+                    }
                     builder.symbol("experiment_gc_store", hook as *const u8);
+                    builder.symbol("experiment_gc_store_state_borrow", acquire as *const u8);
+                    builder.symbol("experiment_gc_store_borrowed", borrowed as *const u8);
                     let mut module = JITModule::new(builder);
                     let mut callee = module.make_context();
                     callee.func.signature.params = vec![AbiParam::new(types::I64); 2];
@@ -458,7 +461,14 @@ mod tests {
                         b.seal_all_blocks();
                         b.finalize();
                     }
-                    super::super::lower(&mut module, &mut callee.func, context).unwrap();
+                    if crate::mutation_admission::borrowed_stores_enabled() {
+                        // Isolated IR fixture: the first constant is the stand-in
+                        // readiness point. Real generated consumers use linked frames.
+                        let ready=callee.func.layout.first_inst(callee.func.layout.entry_block().unwrap()).unwrap();
+                        super::super::lower_framed_borrowed(&mut module, &mut callee.func, context, ready).unwrap();
+                    } else {
+                        super::super::lower(&mut module, &mut callee.func, context).unwrap();
+                    }
                     let mut caller = module.make_context();
                     caller.func.signature.params = vec![AbiParam::new(types::I64); 2];
                     caller.func.signature.returns = vec![AbiParam::new(types::I64)];

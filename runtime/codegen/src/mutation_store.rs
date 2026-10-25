@@ -108,6 +108,14 @@ pub(crate) fn lower_framed(
     lower_impl(module, func, context, Some(frame_ready), false)
 }
 
+/// Caller must prove a nonmigrating activation and require the borrowed-store host ABI.
+pub(crate) fn lower_framed_borrowed(
+    module: &mut impl Module, func: &mut ir::Function, context: ir::Value,
+    frame_ready: ir::Inst,
+) -> Result<Lowered, Error> {
+    lower_impl(module, func, context, Some(frame_ready), true)
+}
+
 fn lower_impl(
     module: &mut impl Module,
     func: &mut ir::Function,

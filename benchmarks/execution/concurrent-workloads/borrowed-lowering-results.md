@@ -78,3 +78,7 @@ Reproduce with `concurrent-store/validate-borrowed.py --runner <signed-test-runn
 The validation report records native sources, object, runner and command hashes.
 A comment-only clarification to lowering followed compilation; emitted behavior was
 unchanged. Full compiler admission/performance is intentionally not represented as done.
+
+Follow-up: [complete managed qualification](borrowed-managed-results.md) corrects
+the experimental borrow bit from 16 to 32 and records acquisition-inclusive regressions.
+The earlier bit/admission description above describes this historical slice.

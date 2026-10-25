@@ -28,7 +28,7 @@ replace(needle,needle+'''
         if (context != native_scope_context) return 3;
         native_scope_counts[2]++;
     }''')
-replace('NEOCLR_LIVE_REQUIRED | NEOCLR_LIVE_BOUNDARY_FINISH)', 'NEOCLR_LIVE_REQUIRED | NEOCLR_LIVE_BOUNDARY_FINISH | UINT64_C(16))')
+replace('#define NEOCLR_LIVE_NATIVE_SCOPES UINT64_C(0)', '#define NEOCLR_LIVE_NATIVE_SCOPES UINT64_C(16)')
 s+='''
 /* Entry cancels without collection: native inputs/results may be unpublished.
  * Collection explicitly requested inside a scope uses existing synchronous roots.

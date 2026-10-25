@@ -12,6 +12,7 @@ import subprocess
 p = argparse.ArgumentParser(description=__doc__)
 p.add_argument('--compare-linear-seed',action='store_true')
 p.add_argument('--compare-direct-seed',action='store_true')
+p.add_argument('--borrow-stores',action='store_true',help='Use borrowed native stores for current live objects; retain checked previous-object controls.')
 p.add_argument('--compare-worker-tls',action='store_true')
 p.add_argument('--compare-inline-base',action='store_true')
 p.add_argument('--compare-exact-allocation-index',action='store_true',help='Interleave predecessor-index, hybrid and direct exact-index variants in one cohort.')
@@ -234,6 +235,7 @@ static void report_profile(struct rusage *a, struct rusage *b, struct timespec *
             if a.profile_collection and mode != 'sync': command += ['-DCOLLECTION_PART_PROFILE']
             if '-linear-seed-' in mode: command += ['-DNEOCLR_LIVE_LINEAR_SEED']
             if '-direct-seed-' in mode: command += ['-DNEOCLR_LIVE_DIRECT_SEED']
+            if a.borrow_stores and mode != 'sync' and '-previous-' not in mode: command += ['-DNEOCLR_LIVE_STORE_HANDLE']
             run(command)
             for item in command:
                 path = Path(item)

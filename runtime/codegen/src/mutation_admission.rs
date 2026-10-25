@@ -80,6 +80,14 @@ pub(crate) fn check_call_closure(
     Ok(())
 }
 
+// Private qualification switch; production binaries never read this variable.
+pub(crate) fn borrowed_stores_enabled() -> bool {
+    #[cfg(test)]
+    { std::env::var_os("NEOCLR_LIVE_BORROW_STORES").is_some() }
+    #[cfg(not(test))]
+    { false }
+}
+
 // Exact private experimental query ABI. These bits describe required semantics,
 // not optional performance policies or a blanket provider admission.
 const HOST_VERSION: u32 = 1;
@@ -104,13 +112,17 @@ pub(crate) unsafe fn require_managed_host(library: &libloading::Library) -> Resu
     if unsafe { query(HOST_VERSION) } & 8 == 0 {
         return Err("host lacks published-boundary epoch completion".into());
     }
+    #[cfg(test)]
+    if borrowed_stores_enabled() {
+        check_borrowed_store_host_features(unsafe { query(HOST_VERSION) })?;
+    }
     Ok(())
 }
-// Explicit test-only admission. Ordinary provider lists and JIT binding remain unchanged.
+// Explicit test-only admission; production provider lists and binding remain unchanged.
 #[cfg(test)]
 pub(crate) fn check_borrowed_store_host_features(features: u64) -> Result<(), Error> {
     check_host_features(features)?;
-    if features & (8 | 16) != (8 | 16) {
+    if features & (8 | 32) != (8 | 32) {
         return Err("host lacks boundary completion or same-thread borrowed stores".into());
     }
     Ok(())
@@ -126,9 +138,9 @@ mod tests {
     use super::*;
     #[test]
     fn borrowed_store_requires_all_host_semantics() {
-        for bits in 0..31 { assert!(check_borrowed_store_host_features(bits).is_err()); }
-        assert!(check_borrowed_store_host_features(31).is_ok());
-        assert!(check_borrowed_store_host_features(31 | (1 << 63)).is_ok());
+        for bits in 0..64 { assert_eq!(check_borrowed_store_host_features(bits).is_ok(), bits & 47 == 47); }
+        assert!(check_borrowed_store_host_features(47).is_ok());
+        assert!(check_borrowed_store_host_features(47 | (1 << 63)).is_ok());
     }
     #[test]
     fn requires_all_semantics_and_allows_additive_features() {
@@ -154,7 +166,7 @@ pub(crate) fn root_providers(module: &impl Module) -> Vec<(&'static str, Signatu
             .extend(returns.iter().copied().map(AbiParam::new));
         signature
     };
-    vec![
+    let mut providers = vec![
         ("neoclr_runtime_async_pump_v1", make(&[I64, I64, I64], &[I32])),
         ("neoclr_task_queue_register_v1", make(&[I64, I64, I64], &[I32])),
         ("neoclr_task_queue_default_v1", make(&[I64, I64], &[I32])),
@@ -241,5 +253,10 @@ pub(crate) fn root_providers(module: &impl Module) -> Vec<(&'static str, Signatu
             make(&[I64, I64, I32, I64, I32, I64, I32], &[]),
         ),
         ("neoclr_native_stack_check_v1", make(&[], &[I32])),
-    ]
+    ];
+    if borrowed_stores_enabled() {
+        providers.push(("experiment_gc_store_state_borrow", make(&[], &[I64])));
+        providers.push(("experiment_gc_store_borrowed", make(&[I64,I64,I64,I64,I32], &[I32])));
+    }
+    providers
 }

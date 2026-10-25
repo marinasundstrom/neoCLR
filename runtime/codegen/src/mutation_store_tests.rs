@@ -1114,7 +1114,7 @@ fn emit_managed(source: &str) {
         }
         assert_eq!(
             object.symbols().any(|s| s.is_undefined()
-                && s.name().unwrap_or("").trim_start_matches('_') == "experiment_gc_store"),
+                && s.name().unwrap_or("").trim_start_matches('_') == if crate::mutation_admission::borrowed_stores_enabled() { "experiment_gc_store_borrowed" } else { "experiment_gc_store" }),
             enabled
         );
     }
@@ -1319,7 +1319,7 @@ fn managed_byte_views_emit_guarded_results() {
         export_byte_views(&mut module);
         let bytes = module.finish().emit().unwrap();
         let object = object::File::parse(bytes.as_slice()).unwrap();
-        assert_eq!(object.symbols().any(|s| s.is_undefined() && s.name().unwrap_or("").trim_start_matches('_') == "experiment_gc_store"), enabled);
+        assert_eq!(object.symbols().any(|s| s.is_undefined() && s.name().unwrap_or("").trim_start_matches('_') == if crate::mutation_admission::borrowed_stores_enabled() { "experiment_gc_store_borrowed" } else { "experiment_gc_store" }), enabled);
         if enabled {
             if let Some(path) = std::env::var_os("NEOCLR_MUTATION_MANAGED_OBJECT") { std::fs::write(path, bytes).unwrap(); }
         }
@@ -2148,7 +2148,7 @@ fn managed_primitive_boxes_emit_guarded_results() {
         export_managed_bodies(&mut module, "live_box", &indices);
         let bytes = module.finish().emit().unwrap();
         let object = object::File::parse(bytes.as_slice()).unwrap();
-        assert_eq!(object.symbols().any(|s| s.is_undefined() && s.name().unwrap_or("").trim_start_matches('_') == "experiment_gc_store"), enabled);
+        assert_eq!(object.symbols().any(|s| s.is_undefined() && s.name().unwrap_or("").trim_start_matches('_') == if crate::mutation_admission::borrowed_stores_enabled() { "experiment_gc_store_borrowed" } else { "experiment_gc_store" }), enabled);
         if enabled {
             if let Some(path) = std::env::var_os("NEOCLR_MUTATION_MANAGED_OBJECT") { std::fs::write(path, bytes).unwrap(); }
         }

@@ -22,7 +22,7 @@ try:
  host=out/'host.dylib';run(common+['-dynamiclib','-o',host])
  x=run([runner,'mutation_store::tests::borrowed_store_native_jit_consumer','--exact','--ignored'],dict(os.environ,NEOCLR_MUTATION_TEST_HOST=str(host)))
  assert '1 passed' in x.stdout
- stub=out/'legacy.c';stub.write_text('#include <stdint.h>\nuint64_t experiment_gc_live_capabilities_v1(uint32_t v) { return v==1?15:0; }\n')
+ stub=out/'legacy.c';stub.write_text('#include <stdint.h>\nuint64_t experiment_gc_live_capabilities_v1(uint32_t v) { return v==1?31:0; }\n')
  legacy=out/'legacy.dylib';run(recipe[:recipe.index('-std=c11')]+['-dynamiclib',stub,'-o',legacy])
  cmd=[str(runner),'mutation_store::tests::borrowed_store_native_jit_consumer','--exact','--ignored','--nocapture']
  x=subprocess.run(cmd,capture_output=True,text=True,timeout=120,env=dict(os.environ,NEOCLR_MUTATION_TEST_HOST=str(legacy)))
