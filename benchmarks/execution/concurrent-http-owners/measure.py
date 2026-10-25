@@ -1,7 +1,7 @@
 """Paired bounded HTTP owner measurement; whole-process CPU includes warmup/cleanup."""
 import argparse,asyncio,os,hashlib,json,math,queue,re,resource,socket,statistics,subprocess,threading,time
 from pathlib import Path
-p=argparse.ArgumentParser();p.add_argument('--build',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--seconds',type=float,default=3);p.add_argument('--rounds',type=int,default=3);p.add_argument('--concurrency',type=int,default=32);p.add_argument('--go-client',type=Path);p.add_argument('--owners',type=int,nargs='+',choices=[1,4],default=[1,4]);p.add_argument('--modes',nargs='+',choices=['sync','guarded','live'],default=['sync','live']);p.add_argument('--capture-failure',action='store_true');p.add_argument('--profile-seconds',type=int,default=0);a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--build',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--seconds',type=float,default=3);p.add_argument('--rounds',type=int,default=3);p.add_argument('--concurrency',type=int,default=32);p.add_argument('--go-client',type=Path);p.add_argument('--owners',type=int,nargs='+',choices=[1,4],default=[1,4]);p.add_argument('--modes',nargs='+',choices=['sync','guarded','live','live-moderate','live-watermark'],default=['sync','live']);p.add_argument('--capture-failure',action='store_true');p.add_argument('--profile-seconds',type=int,default=0);a=p.parse_args()
 assert 0<=a.profile_seconds<=a.seconds
 assert a.seconds>0 and a.rounds>0 and a.concurrency>0
 assert len(set(a.owners))==len(a.owners) and len(set(a.modes))==len(a.modes)
@@ -108,13 +108,13 @@ try:
     stderr=''.join(errors);allocations=list(map(int,re.findall(r'^ALLOCATIONS (\d+)$',stderr,re.M)))
     assert len(allocations)==workers
     process=[line.split() for line in re.findall(r'^PROCESS (.+)$',stderr,re.M)];assert len(process)==workers
-    profiles=[list(map(int,line.split())) for line in re.findall(r'^PROFILE ([\d ]+)$',stderr,re.M)];assert len(profiles)==workers and all(len(row)==7 for row in profiles)
+    profiles=[list(map(int,line.split())) for line in re.findall(r'^PROFILE ([\d ]+)$',stderr,re.M)];assert len(profiles)==workers and all(len(row)==7 and row[3]==0 for row in profiles)
     trial.update(loadClient='go' if a.go_client else 'python',totalResponses=total,processCpuSeconds=cpu,cpuMicrosecondsPerResponse=cpu/total*1e6,allocations=sum(allocations),allocationsPerResponse=sum(allocations)/total,maxRssBytes=max(int(row[2]) for row in process),profiles=profiles,clientCpuSeconds=client_after.ru_utime+client_after.ru_stime-client_before.ru_utime-client_before.ru_stime)
     if a.go_client:trial['clientCpuSeconds']=warmup['clientProcessCpuSeconds']+trial['clientProcessCpuSeconds']
     if mode!='sync':
      counts=[list(map(int,line.split())) for line in re.findall(r'^CANDIDATE ([\d ]+)$',stderr,re.M)]
      indices=[list(map(int,line.split())) for line in re.findall(r'^INDEX_METADATA ([\d ]+)$',stderr,re.M)]
-     assert len(counts)==len(indices)==workers and all(len(c)==6 and c[0]==c[1]+c[2] and (c[1]>0 if mode=='live' else c==[0]*6) and c[5]==0 for c in counts)
+     assert len(counts)==len(indices)==workers and all(len(c)==6 and c[0]==c[1]+c[2] and (c[1]>0 if mode.startswith('live') else c==[0]*6) and c[5]==0 for c in counts)
      assert all(len(i)==3 and i[0]>0 and i[1]==0 for i in indices)
      trial.update(candidateCounts=counts,indexMetadata=indices)
     print(json.dumps({k:trial[k] for k in ['mode','workers','repeat','requestsPerSecond','cpuMicrosecondsPerResponse','allocationsPerResponse']}),flush=True)

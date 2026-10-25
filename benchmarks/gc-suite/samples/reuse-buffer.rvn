@@ -1,0 +1,29 @@
+import System.*
+import System.Collections.*
+
+class Reading {
+    val Value: int
+
+    init(value: int) {
+        Value = value
+    }
+}
+
+// A reusable fixed buffer; writes without per-item object creation.
+func Main() {
+    let values: int[] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    var total = 0
+    var phase = 0
+    while phase < 4096 {
+        var offset = 0
+        while offset < 1024 {
+            let step = phase * 1024 + offset
+            let slot = step % 16
+            values[slot] = (values[slot] + step) % 1024
+            total += values[slot]
+            offset += 1
+        }
+        phase += 1
+    }
+    Console.WriteLine(total)
+}

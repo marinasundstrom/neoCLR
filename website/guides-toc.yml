@@ -64,6 +64,8 @@
       href: benchmarks/http/index.md
     - name: Garbage collector benchmarks
       href: benchmarks/gc/index.md
+    - name: GC benchmarking and profiling
+      href: benchmarks/gc/procedure/index.md
     - name: General execution benchmarks
       href: benchmarks/execution/index.md
     - name: Benchmark history

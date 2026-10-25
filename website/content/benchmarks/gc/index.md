@@ -9,6 +9,76 @@ These are development measurements, not release guarantees. See
 [garbage collection](/features/gc/) for the runtime model. Each historical series
 retains its own conditions and raw evidence.
 
+<!-- GC_SUITE_RESULTS_START -->
+
+## Current collector comparison — 2026-10-25
+
+**Development candidate, Apple M1, 8 logical CPUs,
+16 GiB RAM, macOS ARM64.** Our intention is to make concurrent GC the
+general-purpose default, with better overall application performance. Sync remains
+the current default and a useful option for small, resource-constrained devices.
+These measurements do not yet establish a general concurrent advantage.
+
+Each collector keeps its own result history. Cross-collector runs use the same
+application inputs, while allowing different policies. Here sync uses allocation /
+publication budgets 256/4096; concurrent uses 1024/16384 and a 50% mutation-log
+watermark. Both use a 1 MiB arena; the concurrent log has 4096 words.
+
+### Plain HTTP and HTTP JSON
+
+5 alternating rounds, four clients, 4,096 measured requests plus 16 warmups
+per run, HTTP loopback with connection close and checked response bodies/EOF.
+CPU includes the server process and collector worker through shutdown. These are
+AOT experiments, separate from published-package and cross-framework results.
+
+| Sample | Collector | Median requests/s | Process CPU µs/response | Peak arena bytes |
+| --- | --- | ---: | ---: | ---: |
+| Plain text | Sync | 5,139 | 194.8 | 99,280 |
+| Plain text | Concurrent | 4,076 | 249.0 | 309,768 |
+| JSON | Sync | 3,130 | 316.4 | 101,248 |
+| JSON | Concurrent | 2,730 | 370.1 | 353,408 |
+
+Concurrent-specific tuning previously improved plain/JSON throughput by about
+13%/17% with lower CPU, at the cost of more arena space. Log-pressure completion
+removes observed store cancellations. These are gains against earlier concurrent
+settings; sync remains ahead in the paired table above.
+
+### Applications with different allocation patterns
+
+The same non-HTTP sources run under both collectors. Each prints a checked checksum.
+Different rows have different work counts: compare collectors **within a row**.
+Invocation CPU excludes process startup and compilation, includes cleanup and
+collector threads. 5 alternating rounds; allocation counts match across modes.
+
+| Sample | Managed allocations | Sync CPU ms | Concurrent CPU ms | Concurrent / sync CPU |
+| --- | ---: | ---: | ---: | ---: |
+| Compute only | 13 | 62.07 | 62.11 | 1.00× |
+| Reusable buffer | 14 | 17.43 | 104.81 | 6.01× |
+| Steady allocation | 1,048,589 | 96.16 | 161.90 | 1.68× |
+| Allocation bursts | 524,301 | 53.50 | 85.91 | 1.61× |
+| Retained window | 1,049,615 | 218.27 | 346.48 | 1.59× |
+| Mixed phases | 1,048,589 | 107.66 | 166.87 | 1.55× |
+
+![Concurrent CPU relative to sync for six non-HTTP samples; numerical values are in the table.](/gc-allocation-cpu.svg)
+
+The reusable-buffer case allocates only 14 managed objects and completes no
+concurrent collection cycle, yet its CPU cost is much higher. That points toward
+runtime store/barrier work rather than repeated collection. Compute-only work is
+approximately equal. Allocation-heavy and retained-object cases still cost more
+with concurrent GC. These cases guide the next improvements; the default will not
+change merely because HTTP tuning improved.
+
+Benchmark and profile runs remain separate. Diagnostic runs capture owner pauses,
+begin/capture, marker, finish and collection-phase costs. No instrumented timing is
+used as a throughput improvement. The suite records build inputs and policies;
+self-comparison rejects mismatched workloads, hardware or diagnostic runs.
+
+[Standard samples and procedure](/benchmarks/gc/procedure/) ·
+[Raw reports and interpretation](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/gc-suite/results-20261025) ·
+[Concurrent tuning and worker evidence](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/execution/concurrent-tuning/combined.md)
+
+<!-- GC_SUITE_RESULTS_END -->
+
 ## Direct leaf marking — 2026-10-14
 
 Text and byte buffers contain no references. The native collector now marks them

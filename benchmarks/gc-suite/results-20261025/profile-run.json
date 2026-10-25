@@ -1,0 +1,283 @@
+{
+  "passed": true,
+  "schemaVersion": 1,
+  "kind": "profile",
+  "suite": "all",
+  "sampleDefinitionSha256": "edc79c4b7e87a06653cdb041c20e49f5b966f9b96dd2ab76bc0d74077f626530",
+  "system": "macOS-27.0-arm64-arm-64bit",
+  "rounds": 3,
+  "requests": 1024,
+  "policies": {
+    "sync": {
+      "allocationBudget": 256,
+      "publicationBudget": 4096
+    },
+    "concurrent": {
+      "allocationBudget": 1024,
+      "publicationBudget": 16384,
+      "finishWatermark": 50
+    }
+  },
+  "commands": [
+    {
+      "command": [
+        "python3",
+        "/Users/robert/Projects/neoclr/benchmarks/execution/concurrent-tuning/benchmark-http.py",
+        "--output",
+        "/Users/robert/Projects/neoclr/target/gc-suite-profile/http",
+        "--rounds",
+        "3",
+        "--requests",
+        "1024",
+        "--profile-owner-pauses"
+      ],
+      "exitCode": 0,
+      "stdout": "Benchmark plain\nBenchmark json\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "/Users/robert/Projects/neoclr/benchmarks/execution/concurrent-workloads/measure.py",
+        "--build",
+        "/Users/robert/Projects/neoclr/target/gc-patterns-standard-build",
+        "--output",
+        "/Users/robert/Projects/neoclr/target/gc-suite-profile/standalone",
+        "--rounds",
+        "3",
+        "--allocation-index",
+        "--compare-exact-allocation-index",
+        "--compare-inline-base",
+        "--live-budgets",
+        "1024:16384",
+        "--finish-watermark",
+        "50",
+        "--modes",
+        "sync",
+        "live-budget-1024-16384-hybrid-inline",
+        "--profile-owner-pauses",
+        "--profile-begin",
+        "--profile-finish",
+        "--profile-collection"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "/Users/robert/Projects/neoclr/benchmarks/execution/concurrent-workloads/summarize-owner-pauses.py",
+        "--inputs",
+        "/Users/robert/Projects/neoclr/target/gc-suite-profile/http/plain/results.json",
+        "/Users/robert/Projects/neoclr/target/gc-suite-profile/http/json/results.json",
+        "/Users/robert/Projects/neoclr/target/gc-suite-profile/standalone/results.json",
+        "--output",
+        "/Users/robert/Projects/neoclr/target/gc-suite-profile/owner-pauses.json"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "rows": [
+    {
+      "sample": "http-plain",
+      "collector": "sync",
+      "cpuSeconds": 0.202798,
+      "unitsPerSecond": 5222.265004449627,
+      "unit": "requests",
+      "allocations": 216864,
+      "peakArenaBytes": 99176,
+      "allocatedBytes": 16679001
+    },
+    {
+      "sample": "http-plain",
+      "collector": "concurrent",
+      "cpuSeconds": 0.272279,
+      "unitsPerSecond": 3991.344302145137,
+      "unit": "requests",
+      "allocations": 216864,
+      "peakArenaBytes": 308624,
+      "allocatedBytes": 16679001
+    },
+    {
+      "sample": "http-json",
+      "collector": "sync",
+      "cpuSeconds": 0.33892700000000003,
+      "unitsPerSecond": 3104.501799252826,
+      "unit": "requests",
+      "allocations": 475849,
+      "peakArenaBytes": 101248,
+      "allocatedBytes": 27264623
+    },
+    {
+      "sample": "http-json",
+      "collector": "concurrent",
+      "cpuSeconds": 0.409012,
+      "unitsPerSecond": 2619.7653085295037,
+      "unit": "requests",
+      "allocations": 475849,
+      "peakArenaBytes": 352800,
+      "allocatedBytes": 27264623
+    },
+    {
+      "sample": "compute",
+      "collector": "sync",
+      "cpuSeconds": 0.064861,
+      "unitsPerSecond": 1034544983.6591232,
+      "unit": "items",
+      "allocations": 13,
+      "allocatedBytes": 386,
+      "peakArenaBytes": 816,
+      "completedConcurrentEpochs": 0
+    },
+    {
+      "sample": "compute",
+      "collector": "concurrent",
+      "cpuSeconds": 0.064927,
+      "unitsPerSecond": 1033811874.1719815,
+      "unit": "items",
+      "allocations": 13,
+      "allocatedBytes": 386,
+      "peakArenaBytes": 816,
+      "completedConcurrentEpochs": 0
+    },
+    {
+      "sample": "reuse-buffer",
+      "collector": "sync",
+      "cpuSeconds": 0.018207,
+      "unitsPerSecond": 230380314.18213776,
+      "unit": "items",
+      "allocations": 14,
+      "allocatedBytes": 555,
+      "peakArenaBytes": 1016,
+      "completedConcurrentEpochs": 0
+    },
+    {
+      "sample": "reuse-buffer",
+      "collector": "concurrent",
+      "cpuSeconds": 0.109568,
+      "unitsPerSecond": 38284217.34804714,
+      "unit": "items",
+      "allocations": 14,
+      "allocatedBytes": 555,
+      "peakArenaBytes": 1016,
+      "completedConcurrentEpochs": 0
+    },
+    {
+      "sample": "steady",
+      "collector": "sync",
+      "cpuSeconds": 0.102838,
+      "unitsPerSecond": 10196485.700671937,
+      "unit": "items",
+      "allocations": 1048589,
+      "allocatedBytes": 25166208,
+      "peakArenaBytes": 15208,
+      "completedConcurrentEpochs": 0
+    },
+    {
+      "sample": "steady",
+      "collector": "concurrent",
+      "cpuSeconds": 0.168744,
+      "unitsPerSecond": 6261276.6465635635,
+      "unit": "items",
+      "allocations": 1048589,
+      "allocatedBytes": 25166208,
+      "peakArenaBytes": 172904,
+      "completedConcurrentEpochs": 512
+    },
+    {
+      "sample": "bursts",
+      "collector": "sync",
+      "cpuSeconds": 0.055953,
+      "unitsPerSecond": 74962539.31941664,
+      "unit": "items",
+      "allocations": 524301,
+      "allocatedBytes": 12583297,
+      "peakArenaBytes": 15208,
+      "completedConcurrentEpochs": 0
+    },
+    {
+      "sample": "bursts",
+      "collector": "concurrent",
+      "cpuSeconds": 0.090178,
+      "unitsPerSecond": 46863208.23231026,
+      "unit": "items",
+      "allocations": 524301,
+      "allocatedBytes": 12583297,
+      "peakArenaBytes": 172904,
+      "completedConcurrentEpochs": 256
+    },
+    {
+      "sample": "retained-window",
+      "collector": "sync",
+      "cpuSeconds": 0.223485,
+      "unitsPerSecond": 4691762.158098912,
+      "unit": "items",
+      "allocations": 1049615,
+      "allocatedBytes": 25200056,
+      "peakArenaBytes": 81832,
+      "completedConcurrentEpochs": 0
+    },
+    {
+      "sample": "retained-window",
+      "collector": "concurrent",
+      "cpuSeconds": 0.368295,
+      "unitsPerSecond": 3204909.8655777588,
+      "unit": "items",
+      "allocations": 1049615,
+      "allocatedBytes": 25200056,
+      "peakArenaBytes": 214832,
+      "completedConcurrentEpochs": 631
+    },
+    {
+      "sample": "mixed-phases",
+      "collector": "sync",
+      "cpuSeconds": 0.104825,
+      "unitsPerSecond": 20006410.74563077,
+      "unit": "items",
+      "allocations": 1048589,
+      "allocatedBytes": 25166209,
+      "peakArenaBytes": 15208,
+      "completedConcurrentEpochs": 0
+    },
+    {
+      "sample": "mixed-phases",
+      "collector": "concurrent",
+      "cpuSeconds": 0.171564,
+      "unitsPerSecond": 12313733.779578418,
+      "unit": "items",
+      "allocations": 1048589,
+      "allocatedBytes": 25166209,
+      "peakArenaBytes": 172904,
+      "completedConcurrentEpochs": 512
+    }
+  ],
+  "reports": {
+    "http": {
+      "path": "/Users/robert/Projects/neoclr/target/gc-suite-profile/http/results.json",
+      "sha256": "bbca8d2cb76a2784b9d69a293c0af44ab040b67758f435aec2b2a7d572cdceda"
+    },
+    "http-plain": {
+      "path": "/Users/robert/Projects/neoclr/target/gc-suite-profile/http/plain/results.json",
+      "sha256": "26ff0136e83907df719e2e7bb8bf478ee697a994653dad2fcdf0081f04fba89c"
+    },
+    "http-json": {
+      "path": "/Users/robert/Projects/neoclr/target/gc-suite-profile/http/json/results.json",
+      "sha256": "a624ad22aabcfdf5039c2b0ebdc1cc2e02aeb1527b3de4bf8b45ab287e258b3b"
+    },
+    "build": {
+      "path": "/Users/robert/Projects/neoclr/target/gc-patterns-standard-build/results.json",
+      "sha256": "a2fff80a58673493f45a1b3756516b60144fae5da59ec553251cc7c29616b431"
+    },
+    "standalone": {
+      "path": "/Users/robert/Projects/neoclr/target/gc-suite-profile/standalone/results.json",
+      "sha256": "28f6b57ac5520922cd73a7a6b67e319055b0021a2d1da2addc11d07da32d3237"
+    },
+    "owner-pauses": {
+      "path": "/Users/robert/Projects/neoclr/target/gc-suite-profile/owner-pauses.json",
+      "sha256": "9f94a60babd073af7d4edb1dfb12f91027b4b3d5ed36f2d813d3f538594ff49f"
+    }
+  }
+}

@@ -6,6 +6,21 @@ neoCLR uses a non-moving tracing collector. It reclaims unreachable objects unde
 allocation pressure and when an execution completes. `GC.Collect()` also requests
 one synchronous full collection, preserving reachable objects and task state.
 
+## Concurrent collection direction
+
+Our intention is to make concurrent GC the general-purpose default, with better
+overall application performance. The current default remains synchronous while
+we qualify the candidate across HTTP and non-HTTP workloads. Synchronous collection
+will remain useful for small, resource-constrained or single-thread environments
+where a collector worker and extra memory headroom may be poor tradeoffs.
+
+The native candidate overlaps marking with application execution. Root publication,
+mutation barriers and owner-thread reclamation preserve its lifetime boundaries;
+sweeping is not yet concurrent. We tune each collector independently and track
+both its own performance history and comparisons with the other collector.
+
+[Current results](/benchmarks/gc/) · [Benchmarking and profiling procedure](/benchmarks/gc/procedure/)
+
 ## Inspect and collect
 
 This excerpt comes from the executable GC consumer. `MakeGarbage()` allocates two

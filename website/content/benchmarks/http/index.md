@@ -1,5 +1,9 @@
 # HTTP request-processing benchmarks
 
+[Current development sync/concurrent GC comparison](/benchmarks/gc/#plain-http-and-http-json)
+tracks plain HTTP and HTTP JSON using the [standard procedure](/benchmarks/gc/procedure/).
+Those experimental AOT results are separate from the published-package series below.
+
 ## Preview 17 — 22–23 October 2026
 
 The matching macOS ARM64 and Windows x64 packages each pass all five stages:

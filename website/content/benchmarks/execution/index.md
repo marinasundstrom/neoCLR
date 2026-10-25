@@ -1,5 +1,10 @@
 # General execution benchmarks
 
+[Allocation-pattern samples](/benchmarks/gc/#applications-with-different-allocation-patterns)
+compare low-allocation work, object churn, bursts and retained windows under sync
+and concurrent GC. The [standard procedure](/benchmarks/gc/procedure/) supports
+separate benchmark and profiling runs.
+
 ## Preview 17 — 22–23 October 2026
 
 The matching macOS ARM64 and Windows x64 packages each pass all five stages:

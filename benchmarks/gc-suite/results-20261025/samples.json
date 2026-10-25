@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "itemsPerPhase": 1024,
+  "cases": [
+    {
+      "name": "compute",
+      "purpose": "Scalar processing with no objects allocated inside the work loop",
+      "source": "samples/compute.rvn",
+      "expected": "536870886\n",
+      "phases": 65536,
+      "itemsPerInvocation": 67108864
+    },
+    {
+      "name": "reuse-buffer",
+      "purpose": "A reusable fixed buffer; writes without per-item object creation",
+      "source": "samples/reuse-buffer.rvn",
+      "expected": "2111832064\n",
+      "phases": 4096,
+      "itemsPerInvocation": 4194304
+    },
+    {
+      "name": "steady",
+      "purpose": "One short-lived object per item throughout execution",
+      "source": "samples/steady.rvn",
+      "expected": "8388600\n",
+      "phases": 1024,
+      "itemsPerInvocation": 1048576
+    },
+    {
+      "name": "bursts",
+      "purpose": "Allocation bursts during the first eighth of every phase",
+      "source": "samples/bursts.rvn",
+      "expected": "33554406\n",
+      "phases": 4096,
+      "itemsPerInvocation": 4194304
+    },
+    {
+      "name": "retained-window",
+      "purpose": "A rolling window of 1024 survivors replaced over time",
+      "source": "samples/retained-window.rvn",
+      "expected": "8388552\n",
+      "phases": 1024,
+      "itemsPerInvocation": 1048576
+    },
+    {
+      "name": "mixed-phases",
+      "purpose": "Alternating eight-phase allocation-heavy and compute-only periods",
+      "source": "samples/mixed-phases.rvn",
+      "expected": "16777201\n",
+      "phases": 2048,
+      "itemsPerInvocation": 2097152
+    }
+  ]
+}

@@ -1,0 +1,264 @@
+{
+  "passed": true,
+  "hardware": {
+    "cpu": "Apple M1",
+    "logicalCpus": 8,
+    "memoryBytes": 17179869184
+  },
+  "schemaVersion": 1,
+  "kind": "benchmark",
+  "suite": "all",
+  "sampleDefinitionSha256": "edc79c4b7e87a06653cdb041c20e49f5b966f9b96dd2ab76bc0d74077f626530",
+  "system": "macOS-27.0-arm64-arm-64bit",
+  "rounds": 5,
+  "requests": 4096,
+  "policies": {
+    "sync": {
+      "allocationBudget": 256,
+      "publicationBudget": 4096
+    },
+    "concurrent": {
+      "allocationBudget": 1024,
+      "publicationBudget": 16384,
+      "finishWatermark": 50
+    }
+  },
+  "commands": [
+    {
+      "command": [
+        "python3",
+        "/Users/robert/Projects/neoclr/benchmarks/execution/concurrent-tuning/benchmark-http.py",
+        "--output",
+        "/Users/robert/Projects/neoclr/target/gc-suite-standard-v1/http",
+        "--rounds",
+        "5",
+        "--requests",
+        "4096"
+      ],
+      "exitCode": 0,
+      "stdout": "Benchmark plain\nBenchmark json\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "/Users/robert/Projects/neoclr/benchmarks/execution/concurrent-workloads/measure.py",
+        "--build",
+        "/Users/robert/Projects/neoclr/target/gc-patterns-standard-build",
+        "--output",
+        "/Users/robert/Projects/neoclr/target/gc-suite-standard-v1/standalone",
+        "--rounds",
+        "5",
+        "--allocation-index",
+        "--compare-exact-allocation-index",
+        "--compare-inline-base",
+        "--live-budgets",
+        "1024:16384",
+        "--finish-watermark",
+        "50",
+        "--modes",
+        "sync",
+        "live-budget-1024-16384-hybrid-inline"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "rows": [
+    {
+      "sample": "http-plain",
+      "collector": "sync",
+      "cpuSeconds": 0.800978,
+      "unitsPerSecond": 5139.499582635242,
+      "unit": "requests",
+      "allocations": 855840,
+      "peakArenaBytes": 99280,
+      "allocatedBytes": 65815641
+    },
+    {
+      "sample": "http-plain",
+      "collector": "concurrent",
+      "cpuSeconds": 1.023834,
+      "unitsPerSecond": 4076.3896795574324,
+      "unit": "requests",
+      "allocations": 855840,
+      "peakArenaBytes": 309768,
+      "allocatedBytes": 65815641
+    },
+    {
+      "sample": "http-json",
+      "collector": "sync",
+      "cpuSeconds": 1.301032,
+      "unitsPerSecond": 3130.4514976672313,
+      "unit": "requests",
+      "allocations": 1879754,
+      "peakArenaBytes": 101248,
+      "allocatedBytes": 107668607
+    },
+    {
+      "sample": "http-json",
+      "collector": "concurrent",
+      "cpuSeconds": 1.521849,
+      "unitsPerSecond": 2730.177964810964,
+      "unit": "requests",
+      "allocations": 1879753,
+      "peakArenaBytes": 353408,
+      "allocatedBytes": 107668079
+    },
+    {
+      "sample": "compute",
+      "collector": "sync",
+      "cpuSeconds": 0.062072,
+      "unitsPerSecond": 1081145508.4418094,
+      "unit": "items",
+      "allocations": 13,
+      "allocatedBytes": 386,
+      "peakArenaBytes": 816,
+      "completedConcurrentEpochs": 0
+    },
+    {
+      "sample": "compute",
+      "collector": "concurrent",
+      "cpuSeconds": 0.06211,
+      "unitsPerSecond": 1080501441.0149899,
+      "unit": "items",
+      "allocations": 13,
+      "allocatedBytes": 386,
+      "peakArenaBytes": 816,
+      "completedConcurrentEpochs": 0
+    },
+    {
+      "sample": "reuse-buffer",
+      "collector": "sync",
+      "cpuSeconds": 0.01743,
+      "unitsPerSecond": 240650869.2409203,
+      "unit": "items",
+      "allocations": 14,
+      "allocatedBytes": 555,
+      "peakArenaBytes": 1016,
+      "completedConcurrentEpochs": 0
+    },
+    {
+      "sample": "reuse-buffer",
+      "collector": "concurrent",
+      "cpuSeconds": 0.104809,
+      "unitsPerSecond": 40019311.68719646,
+      "unit": "items",
+      "allocations": 14,
+      "allocatedBytes": 555,
+      "peakArenaBytes": 1016,
+      "completedConcurrentEpochs": 0
+    },
+    {
+      "sample": "steady",
+      "collector": "sync",
+      "cpuSeconds": 0.096161,
+      "unitsPerSecond": 10879940.2347033,
+      "unit": "items",
+      "allocations": 1048589,
+      "allocatedBytes": 25166208,
+      "peakArenaBytes": 15208,
+      "completedConcurrentEpochs": 0
+    },
+    {
+      "sample": "steady",
+      "collector": "concurrent",
+      "cpuSeconds": 0.161898,
+      "unitsPerSecond": 6554296.393991862,
+      "unit": "items",
+      "allocations": 1048589,
+      "allocatedBytes": 25166208,
+      "peakArenaBytes": 172904,
+      "completedConcurrentEpochs": 512
+    },
+    {
+      "sample": "bursts",
+      "collector": "sync",
+      "cpuSeconds": 0.053496,
+      "unitsPerSecond": 78380624.90656301,
+      "unit": "items",
+      "allocations": 524301,
+      "allocatedBytes": 12583297,
+      "peakArenaBytes": 15208,
+      "completedConcurrentEpochs": 0
+    },
+    {
+      "sample": "bursts",
+      "collector": "concurrent",
+      "cpuSeconds": 0.085913,
+      "unitsPerSecond": 49350558.889281094,
+      "unit": "items",
+      "allocations": 524301,
+      "allocatedBytes": 12583297,
+      "peakArenaBytes": 172904,
+      "completedConcurrentEpochs": 256
+    },
+    {
+      "sample": "retained-window",
+      "collector": "sync",
+      "cpuSeconds": 0.218273,
+      "unitsPerSecond": 4803987.685090163,
+      "unit": "items",
+      "allocations": 1049615,
+      "allocatedBytes": 25200056,
+      "peakArenaBytes": 81832,
+      "completedConcurrentEpochs": 0
+    },
+    {
+      "sample": "retained-window",
+      "collector": "concurrent",
+      "cpuSeconds": 0.346483,
+      "unitsPerSecond": 3468809.4426819547,
+      "unit": "items",
+      "allocations": 1049615,
+      "allocatedBytes": 25200056,
+      "peakArenaBytes": 238240,
+      "completedConcurrentEpochs": 591
+    },
+    {
+      "sample": "mixed-phases",
+      "collector": "sync",
+      "cpuSeconds": 0.107662,
+      "unitsPerSecond": 19479036.243056975,
+      "unit": "items",
+      "allocations": 1048589,
+      "allocatedBytes": 25166209,
+      "peakArenaBytes": 15208,
+      "completedConcurrentEpochs": 0
+    },
+    {
+      "sample": "mixed-phases",
+      "collector": "concurrent",
+      "cpuSeconds": 0.166866,
+      "unitsPerSecond": 12630858.739776192,
+      "unit": "items",
+      "allocations": 1048589,
+      "allocatedBytes": 25166209,
+      "peakArenaBytes": 172904,
+      "completedConcurrentEpochs": 512
+    }
+  ],
+  "reports": {
+    "http": {
+      "path": "/Users/robert/Projects/neoclr/target/gc-suite-standard-v1/http/results.json",
+      "sha256": "acfe05f0c34d2fffe49da6078a9ef2c698248d04518e6f9bd549c4c50d6a65e3"
+    },
+    "http-plain": {
+      "path": "/Users/robert/Projects/neoclr/target/gc-suite-standard-v1/http/plain/results.json",
+      "sha256": "b556bb6e32a2a7dc7fff824c6d9ede353f80d608f54d8543a2a60053e128e1e2"
+    },
+    "http-json": {
+      "path": "/Users/robert/Projects/neoclr/target/gc-suite-standard-v1/http/json/results.json",
+      "sha256": "9d666586c1d358c2ec7c7fa3f0866c8b57912c9fa2c8799970105ec7ac5b2ff1"
+    },
+    "build": {
+      "path": "/Users/robert/Projects/neoclr/target/gc-patterns-standard-build/results.json",
+      "sha256": "a2fff80a58673493f45a1b3756516b60144fae5da59ec553251cc7c29616b431"
+    },
+    "standalone": {
+      "path": "/Users/robert/Projects/neoclr/target/gc-suite-standard-v1/standalone/results.json",
+      "sha256": "7e1582580c3123c5241d62f4efa35038b6e982ea89286b886d53f2d7054ae4ee"
+    }
+  }
+}

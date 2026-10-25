@@ -1,0 +1,31 @@
+import System.*
+import System.Collections.*
+
+class Reading {
+    val Value: int
+
+    init(value: int) {
+        Value = value
+    }
+}
+
+// Allocation bursts during the first eighth of every phase.
+func Main() {
+    var total = 0
+    var phase = 0
+    while phase < 4096 {
+        var offset = 0
+        while offset < 1024 {
+            let step = phase * 1024 + offset
+            if offset < 128 {
+                let reading = Reading(step % 17)
+                total += reading.Value
+            } else {
+                total += step % 17
+            }
+            offset += 1
+        }
+        phase += 1
+    }
+    Console.WriteLine(total)
+}

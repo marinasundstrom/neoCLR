@@ -1,0 +1,34 @@
+import System.*
+import System.Collections.*
+
+class Reading {
+    val Value: int
+
+    init(value: int) {
+        Value = value
+    }
+}
+
+// A rolling window of 1024 survivors replaced over time.
+func Main() {
+    let window = ArrayList<Reading>(1024)
+    var index = 0
+    while index < 1024 {
+        window.Add(Reading(index % 17))
+        index += 1
+    }
+    var total = 0
+    var phase = 0
+    while phase < 1024 {
+        var offset = 0
+        while offset < 1024 {
+            let step = phase * 1024 + offset
+            let slot = step % 1024
+            total += window[slot].Value
+            window[slot] = Reading(step % 17)
+            offset += 1
+        }
+        phase += 1
+    }
+    Console.WriteLine(total)
+}

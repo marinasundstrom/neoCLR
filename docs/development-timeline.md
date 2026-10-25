@@ -1,5 +1,32 @@
 # Development conversation record
 
+## 2026-10-25 — Standard GC samples, website results and both comparison axes
+
+The author requested recurring plain HTTP and HTTP JSON comparisons, then directed
+that the website show results and that non-HTTP samples cover few allocations over
+time, many allocations, and different GC policies. The author said, “Standardize
+this procedure and samples to run” and “This is both for profiling and benchmarking.”
+
+The author clarified that each collector should compare with itself; concurrent GC
+is intended to become the general-purpose default and perform better overall, while
+sync remains useful for smaller resource-constrained or effectively single-thread
+hosts. This retains the earlier independent-tuning direction and the cross-collector
+goal, without requiring every workload to favor concurrency.
+
+The assistant implemented a versioned eight-sample procedure, separate benchmark and
+profile commands, checked source/build reuse, same-collector history comparisons and
+website-generated tables/chart. The first standard baseline passes 82,240 HTTP
+responses and 60 standalone invocations; separate profiles pass 12,480 responses and
+36 invocations. Current sync performance remains ahead except essentially equal
+compute-only work. A low-allocation reusable buffer exposes roughly 8.39 million
+managed stores with negligible begin/marker work, directing the next optimization
+toward repeated runtime store checks rather than assuming more GC scheduling is enough.
+
+The website build passes locally; publication remains separate. The author then
+directed committing the benchmarks before starting the next viable concurrent-GC
+optimization. [Procedure and evidence](../benchmarks/gc-suite/README.md).
+
+
 ## 2026-10-25 — Concurrent-specific tuning, phase handoffs and headroom
 
 The author asked for industry techniques and investigation of collector versus runtime

@@ -1,0 +1,27 @@
+import System.*
+import System.Collections.*
+
+class Reading {
+    val Value: int
+
+    init(value: int) {
+        Value = value
+    }
+}
+
+// One short-lived object per item throughout execution.
+func Main() {
+    var total = 0
+    var phase = 0
+    while phase < 1024 {
+        var offset = 0
+        while offset < 1024 {
+            let step = phase * 1024 + offset
+            let reading = Reading(step % 17)
+            total += reading.Value
+            offset += 1
+        }
+        phase += 1
+    }
+    Console.WriteLine(total)
+}

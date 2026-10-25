@@ -12,6 +12,8 @@ import subprocess
 from xml.sax.saxutils import escape
 
 p=argparse.ArgumentParser(description=__doc__)
+p.add_argument('--suite',choices=['existing','allocation-patterns'],default='existing')
+p.add_argument('--stable-byrefs',action='store_true')
 p.add_argument('--runner',type=Path,required=True)
 p.add_argument('--output',type=Path,required=True)
 p.add_argument('--iterations',type=int,default=128)
@@ -35,10 +37,13 @@ cases=[
  ('cancellation',[samples/'library-async-cancellation.rvn'],'Cancelled\n'),
  ('json',[root/'docs/experiments/json-object-mapping/Main.rvn',root/'docs/experiments/json-object-mapping/Mapping.rvn'],'JSON object mapping checks passed\n'),
 ]
+if a.suite=='allocation-patterns':
+ manifest=json.loads((root/'benchmarks/gc-suite/samples.json').read_text())
+ cases=[(c['name'],[root/'benchmarks/gc-suite'/c['source']],c['expected']) for c in manifest['cases']]
 if a.only:
  assert set(a.only)<=set(c[0] for c in cases)
  cases=[c for c in cases if c[0] in a.only]
-r={'passed':False,'scope':__doc__,'iterations':a.iterations,'cases':[],'inputs':{}}
+r={'passed':False,'suite':a.suite,'stableByrefs':a.stable_byrefs,'scope':__doc__,'iterations':a.iterations,'cases':[],'inputs':{}}
 def record(path):
  path=Path(path)
  if path.is_file():r['inputs'][str(path.resolve())]=hashlib.sha256(path.read_bytes()).hexdigest()
@@ -73,8 +78,12 @@ try:
    command=recipe.copy();command.pop(1);command[2]=str(assembly);command[4]=str(directory/(mode+'.o'))
    path=directory/(mode+'-command.json');path.write_text(json.dumps(command,indent=2)+'\n');record(path)
    env=dict(os.environ,NEOCLR_LIVE_SELECTION_COMMAND=str(path),NEOCLR_LIVE_SELECTION_MODE=mode)
+   for key in ['NEOCLR_LIVE_ELIDE_STACK_ARGUMENTS','NEOCLR_LIVE_FORWARD_STACK_ARGUMENTS','NEOCLR_LIVE_ELIDE_FORWARDED_STACK_ARGUMENTS','NEOCLR_LIVE_SSA_BYREF_ARGUMENTS']:
+    env.pop(key,None)
+    if mode=='live' and a.stable_byrefs:env[key]='1'
+
    invocation=[a.runner.resolve(),'mutation_store::tests::full_http_selection_compiles_with_live_gc','--exact','--ignored','--nocapture']
-   result=run(invocation,env);result.update(mode=mode,selectionCommand=command);row['native'].append(result)
+   result=run(invocation,env);result.update(mode=mode,selectionCommand=command,environment={k:env[k] for k in ['NEOCLR_TEST_OPT_LEVEL','NEOCLR_LIVE_SELECTION_COMMAND','NEOCLR_LIVE_SELECTION_MODE','NEOCLR_LIVE_ELIDE_STACK_ARGUMENTS','NEOCLR_LIVE_FORWARD_STACK_ARGUMENTS','NEOCLR_LIVE_ELIDE_FORWARDED_STACK_ARGUMENTS','NEOCLR_LIVE_SSA_BYREF_ARGUMENTS'] if k in env});row['native'].append(result)
    for item in command:record(item)
   (out/'results.json').write_text(json.dumps(r,indent=2)+'\n')
  for path in [reference_path,source_recipe[1],a.runner,Path(__file__),bundle/'manifest.json']:record(path)
