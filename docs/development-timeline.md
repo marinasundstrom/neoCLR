@@ -19,8 +19,12 @@
   owner profiler. Inspect queue/resume, fiber-switch, root/safepoint, lease and
   collector-service waits before prioritizing further GC optimizations. Scalar-store
   prototype validation is deferred behind this author-requested investigation.
+- **Author clarification:** Virtual threads are not necessary; evaluate context-switch
+  cost and decide whether to tune or redesign. Commit each completed slice.
 - **Open:** The first twelve owner diagnostic profiles pass 724,344 responses; tuned
-  profiles are running and shared-heap attribution remains pending. Architectural
+  profiles subsequently pass another 513,811 responses. Six shared-pool diagnostics
+  expose 4,520 allocation handoffs and over 33,000 boundary waits per test; a
+  requester-local allocation experiment is proposed, not yet implemented. Architectural
   conclusions are not yet established. OS context switches do not count managed task switches or establish
   runnable latency; missing telemetry must remain explicit. Higher worker counts
   require qualification rather than silently lifting limits.

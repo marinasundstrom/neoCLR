@@ -1,8 +1,8 @@
 # Concurrency, scheduling and GC architecture investigation
 
 2026-10-25, author-directed extension of the standard benchmark/profile procedure.
-Status: [initial owner profiles](initial-profiles.md) pass; tuned profiles are running,
-with shared-heap attribution and wider scaling still pending. Concurrent
+Status: [initial owner profiles](initial-profiles.md) pass; [tuned owner and shared-pool profiles](pool-results.md) also pass. Wider scaling
+and task/fiber attribution remain pending. Concurrent
 GC's advantage under concurrency is a hypothesis, not an assumed acceptance result.
 
 ## Keep different kinds of concurrency separate
@@ -71,3 +71,6 @@ Existing evidence: [independent owners](../../execution/concurrent-http-owners/R
 [guarded CPU profiles](../../execution/concurrent-http-owners/cpu-results.md),
 [shared-heap read epochs](../../execution/concurrent-participant-roots/read-epochs.md),
 [worker design and .NET comparison](../../../docs/design/native-http-worker-threads.md).
+
+The author clarified that virtual threads are not required: measure context-switch
+and handoff cost, then decide whether tuning or redesign is justified.
