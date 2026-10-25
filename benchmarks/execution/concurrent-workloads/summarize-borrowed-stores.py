@@ -8,6 +8,7 @@ import statistics
 
 p = argparse.ArgumentParser(description=__doc__)
 p.add_argument('--root', type=Path, required=True)
+p.add_argument('--prefix', default='borrowed-managed', help='Retained cohort filename prefix')
 p.add_argument('--output', type=Path, required=True)
 a = p.parse_args()
 result = dict(passed=False, cohorts={}, inputs={})
@@ -17,7 +18,8 @@ def normalized(command):
     c[c.index('-o') + 1] = '<executable>'
     return ['<managed-object>' if x.endswith('.o') else x for x in c]
 
-for cohort, filename in [('ordinary', 'borrowed-managed-ordinary-measure'), ('plain', 'borrowed-managed-http-plain'), ('json', 'borrowed-managed-http-json')]:
+for cohort, suffix in [('ordinary', 'ordinary-measure'), ('plain', 'http-plain'), ('json', 'http-json')]:
+    filename = a.prefix + '-' + suffix
     path = a.root / filename / 'results.json'
     data = json.loads(path.read_text())
     assert data['passed'] and not data.get('diagnosticOnly')

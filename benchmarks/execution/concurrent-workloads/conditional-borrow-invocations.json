@@ -1,0 +1,57 @@
+{
+  "environment": {
+    "NEOCLR_TEST_OPT_LEVEL": "speed",
+    "NEOCLR_LIVE_CONDITIONAL_BORROW": "1"
+  },
+  "runner": "target/concurrent-workloads/test-runner-conditional-borrow",
+  "runnerSha256": "2430b7eda0eb6923ca436b010f70ba2c1ca440668e7bca4c6676d6aca45a573b",
+  "qualification": [
+    {
+      "driver": "concurrent-store/validate-entry.py",
+      "borrowStores": true,
+      "allocationIndex": true,
+      "exactAllocationIndex": true,
+      "inlineBase": true,
+      "output": "conditional-borrow-entry"
+    },
+    {
+      "driver": "concurrent-store/validate-record-arrays.py",
+      "borrowStores": true,
+      "allocationIndex": true,
+      "exactAllocationIndex": true,
+      "inlineBase": true,
+      "output": "conditional-borrow-record"
+    },
+    {
+      "driver": "concurrent-store/qualify-http-execution.py",
+      "sample": "plain",
+      "execution": "jit",
+      "pacing": "paced",
+      "requests": 512,
+      "borrowStores": true,
+      "elideStackArguments": true,
+      "inlineIndex": true,
+      "object": "target/concurrent-workloads/borrowed-managed-http-build/plain.o",
+      "output": "conditional-borrow-plain-jit"
+    },
+    {
+      "driver": "concurrent-store/qualify-http-execution.py",
+      "sample": "json",
+      "execution": "jit",
+      "pacing": "paced",
+      "requests": 512,
+      "borrowStores": true,
+      "elideStackArguments": true,
+      "inlineIndex": true,
+      "object": "target/concurrent-workloads/borrowed-managed-http-build/json.o",
+      "output": "conditional-borrow-json-jit"
+    },
+    {
+      "driver": "concurrent-workloads/qualify-stack-jit.py",
+      "borrowStores": true,
+      "build": "target/concurrent-workloads/borrowed-managed-ordinary-build",
+      "host": "target/concurrent-workloads/borrowed-managed-plain-jit-v2/jit-paced.dylib",
+      "output": "conditional-borrow-ordinary-jit"
+    }
+  ]
+}

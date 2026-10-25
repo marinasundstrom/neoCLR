@@ -218,3 +218,5 @@ See [complete managed borrowing](borrowed-managed-results.md) for test-only inte
 [Acquisition cost and workload density](store-acquisition-results.md) explains the next investigation using diagnostic counts and acquisition-inclusive controls.
 
 [Acquisition caller attribution](acquisition-sites-results.md) maps hot callers, rejects an ineffective cleanup and identifies conditional fault-path acquisition as the next target.
+
+[Conditional borrowing evaluation](conditional-borrow-results.md) retains a rejected compiler patch and full correctness/performance evidence: fewer acquisitions did not beat checked stores. Profiling/comparison tools accept `--prefix` to reuse the same validation across cohorts.

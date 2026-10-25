@@ -4,6 +4,7 @@ from pathlib import Path
 p=argparse.ArgumentParser(description=__doc__)
 p.add_argument('--profile',type=Path,required=True)
 p.add_argument('--root',type=Path,required=True)
+p.add_argument('--prefix',default='borrowed-managed',help='Retained workload/measurement prefix')
 p.add_argument('--output',type=Path,required=True)
 a=p.parse_args();d=json.loads(a.profile.read_text());assert d['passed'] and d['diagnosticOnly'] and d['sites']
 r=dict(passed=False,diagnosticOnly=True,samples={},inputs={})
@@ -14,9 +15,9 @@ def read(path):
  return json.loads(raw)
 for trial in d['trials']:
  sample=trial['sample'];ordinary=sample not in ['plain','json']
- retained=read(a.root/('borrowed-managed-ordinary-measure' if ordinary else 'borrowed-managed-http-'+sample)/'results.json')
+ retained=read(a.root/(a.prefix+'-ordinary-measure' if ordinary else a.prefix+'-http-'+sample)/'results.json')
  # The build's selected object must be one of the hashed native input objects.
- build=a.root/('borrowed-managed-ordinary-build' if ordinary else 'borrowed-managed-http-build')/'results.json'
+ build=a.root/(a.prefix+'-ordinary-build' if ordinary else a.prefix+'-http-build')/'results.json'
  data=json.loads(build.read_text())
  entry=next(n for c in data['cases'] if c['sample']==sample for n in c['native'] if n['mode']=='live') if ordinary else next(c for c in data['commands'] if c['sample']==sample)
  obj=Path(entry['selectionCommand'][4]);assert hashlib.sha256(obj.read_bytes()).hexdigest()==d['inputs'][str(obj)]

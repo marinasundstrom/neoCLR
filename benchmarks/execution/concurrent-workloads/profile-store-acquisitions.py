@@ -3,6 +3,7 @@ import argparse, bisect, hashlib, json, queue, socket, subprocess, threading
 from pathlib import Path
 p=argparse.ArgumentParser(description=__doc__)
 p.add_argument('--root',type=Path,required=True)
+p.add_argument('--prefix',default='borrowed-managed',help='Retained workload/measurement prefix')
 p.add_argument('--output',type=Path,required=True)
 p.add_argument('--sites',action='store_true',help='macOS acquisition caller counts; diagnostic only')
 a=p.parse_args();out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
@@ -15,7 +16,7 @@ def run(command):
 try:
  for sample in ['tasks','collections','arrays','plain','json']:
   ordinary=sample not in ['plain','json']
-  report=a.root/('borrowed-managed-ordinary-measure' if ordinary else 'borrowed-managed-http-'+sample)/'results.json'
+  report=a.root/(a.prefix+'-ordinary-measure' if ordinary else a.prefix+'-http-'+sample)/'results.json'
   record(report);data=json.loads(report.read_text())
   name=sample+'-live-hybrid-inline' if ordinary else 'live-inline-index'
   command=next(c['command'].copy() for c in data['commands'] if '-o' in c['command'] and Path(c['command'][c['command'].index('-o')+1]).name==name)
