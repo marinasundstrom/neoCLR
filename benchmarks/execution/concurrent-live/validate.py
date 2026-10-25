@@ -91,7 +91,7 @@ __attribute__((destructor)) static void drain(void) { uint64_t stats[5]; experim
             if sanitizer: command+=['-fsanitize=undefined,bounds','-fno-sanitize-recover=all']
             run(command); run([exe])
     # Deliberately drop deletion candidates. The delayed sole-edge test must fail.
-    gate_source = (base.parent/'concurrent-mutation-gate/gate.c').read_text()
+    gate_source = (root/'runtime/native/gc/concurrent/gate.c').read_text()
     original = 'memcpy(&g->words[g->count++], (unsigned char *)payload + at, 8);'
     # Select the preserved owner-only implementation, not registered workers.
     owner_source, worker_source = gate_source.split('static int write_locked(', 1)

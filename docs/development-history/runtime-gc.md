@@ -20,6 +20,8 @@ are distinct tracks; an experimental result is not a published capability.
 - [Typed scalar-store evidence](../../benchmarks/gc-suite/matrix/scalar-store-follow-up.md)
   and [HTTP qualification](../../benchmarks/gc-suite/matrix/scalar-store-http.md)
   track the current optimization, controls and limitations.
+- [Canonical concurrent runtime sources](../validation/concurrent-native-integration-20261025/README.md) own the selected
+  native candidate and preserve compatibility forwards for earlier experiments.
 - [Generational concurrent design input](../design/generational-concurrent-gc-direction.md)
   remains a proposal, not an implemented generational or moving collector.
 

@@ -18,7 +18,7 @@ try:
  for sanitized in [False,True]:
   exe=out/str(sanitized);flags=['-fsanitize=undefined,bounds','-fno-sanitize-recover=all'] if sanitized else []
   run(cc+flags+[base/'seed-linear-test.c','-o',exe]);run([exe])
- header=(base/'seed-linear.h').read_text();assert header.count('now->kind!=old->kind')==1
+ header=(base.parents[2]/'runtime/native/gc/concurrent/seed-linear.h').read_text();assert header.count('now->kind!=old->kind')==1
  (out/'seed-linear.h').write_text(header.replace('now->kind!=old->kind','0'))
  (out/'negative.c').write_text((base/'seed-linear-test.c').read_text())
  run(cc+[out/'negative.c','-o',out/'negative']);run([out/'negative'],True)

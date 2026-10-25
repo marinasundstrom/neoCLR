@@ -52,7 +52,7 @@ int main(int argc,char **argv) {
 }
 '''
 with tempfile.TemporaryDirectory() as d:
- p=Path(d);source=p/'test.c';source.write_text(prefix+(base/'scratch.h').read_text()+main)
+ p=Path(d);source=p/'test.c';source.write_text(prefix+(base.parents[2]/'runtime/native/gc/concurrent/scratch.h').read_text()+main)
  for sanitized in [False,True]:
   exe=p/str(sanitized)
   command=recipe[:recipe.index('-std=c11')]+['-std=c11','-O2','-Wall','-Wextra','-Werror']

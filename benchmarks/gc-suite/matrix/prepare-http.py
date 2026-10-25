@@ -16,11 +16,12 @@ p.add_argument('--runner',type=Path,help='Pinned codegen test runner; defaults t
 a=p.parse_args()
 root=Path(__file__).resolve().parents[3]
 base=root/'benchmarks/http-server/pipelining'
+policy=runpy.run_path(str(root/'runtime/native/gc/concurrent/policy.py'))
 out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
 bundle=root/'target/uri-efficiency-bundle/bundle'
 runner=(a.runner or root/'target/release/deps/neoclr_codegen-12f33f26d2ff4df0').resolve()
 assembly=base/'bin/neoclr/BenchmarkTests.dll'
-r=dict(passed=False,scalarArrayStores=a.scalar_array_stores,scope='Build only; execute smoke and measured clients separately',commands=[],recipes={},inputs={})
+r=dict(passed=False,scalarArrayStores=a.scalar_array_stores,scope='Build only; execute smoke and measured clients separately',nativePolicy=policy['POLICY'],commands=[],recipes={},inputs={})
 
 def run(command,env=None):
     command=list(map(str,command))
@@ -31,8 +32,8 @@ def run(command,env=None):
 try:
     collector=out/'native-gc.c'
     provider=out/'text-arena.c'
-    run(['python3',root/'benchmarks/execution/concurrent-live/native-scopes.py','--output',collector])
-    run(['python3',root/'benchmarks/execution/concurrent-store/native-providers.py','--output',provider])
+    run(['python3',root/'runtime/native/gc/concurrent/generate.py','--output',collector])
+    run(['python3',root/'runtime/native/gc/concurrent/native-providers.py','--output',provider])
     if not a.reuse_assembly:
         run(['dotnet',bundle/'sdk/tools/rvnc/rvnc.dll','neoclr','--project',base/'Benchmark.rvnproj'],dict(os.environ,NeoClrBundleRoot=str(bundle)))
     assert assembly.is_file()
@@ -59,7 +60,7 @@ try:
         for flag in ['NEOCLR_LIVE_ELIDE_STACK_ARGUMENTS','NEOCLR_LIVE_FORWARD_STACK_ARGUMENTS',
                      'NEOCLR_LIVE_ELIDE_FORWARDED_STACK_ARGUMENTS','NEOCLR_LIVE_SSA_BYREF_ARGUMENTS']:
             env.pop(flag,None)
-        if mode=='live':settings['NEOCLR_LIVE_STACK_POLICY']='qualified'
+        if mode=='live':settings['NEOCLR_LIVE_STACK_POLICY']=policy['POLICY']['compilerStackPolicy']
         env.update(settings)
         launch=list(map(str,[runner,'mutation_store::tests::full_http_selection_compiles_with_live_gc','--exact','--ignored','--nocapture']))
         run(launch,env)
@@ -70,10 +71,12 @@ try:
             assert not any(v.startswith(('-DNEOCLR_GC_ALLOCATION_BUDGET=', '-DNEOCLR_GC_PUBLICATION_BUDGET=')) for v in link)
             link += ['-DNEOCLR_GC_ALLOCATION_BUDGET=256', '-DNEOCLR_GC_PUBLICATION_BUDGET=4096']
         if mode=='live':
+            link=[v.replace(str(root/'benchmarks/execution/concurrent-mutation-gate'), str(root/'runtime/native/gc/concurrent')) for v in link]
             link=[str(collector) if v.endswith('/native-gc.c') else str(provider) if v.endswith('/text-arena.c') else v for v in link]
             assert '-DNEOCLR_GC_ALLOCATION_BUDGET=1024' in link
             assert '-DNEOCLR_GC_PUBLICATION_BUDGET=16384' in link
             assert '-DNEOCLR_LIVE_NO_STORE_CACHE' in link
+            policy['validate_flags'](link)
         run(link)
         r['recipes'][mode+'-aot']=dict(execution='aot',collector=mode,command=[str(out/mode)],env={})
         shared=[v for v in link if not v.endswith('/main.c') and v!=str(out/(mode+'.o'))]+['-dynamiclib']
@@ -88,7 +91,10 @@ try:
     paths+=list((root/'runtime/raven/src/System/Web').rglob('*.rvn'))
     paths+=[out/'sync',out/'live']
     paths+=list(out.glob('*.o'))+list(out.glob('*.dylib'))+list(out.glob('*selection.json'))
-    paths += [collector,provider,root/'benchmarks/execution/concurrent-live/store.h']
+    paths += [collector,provider,root/'runtime/native/gc/native-gc.c',root/'runtime/native/memory/text-arena.c']
+    paths += sorted((root/'runtime/native/gc/concurrent').glob('*.[ch]'))
+    paths += sorted((root/'runtime/native/gc/concurrent').glob('*.py'))
+    paths += [root/'runtime/native/gc/concurrent/policy.json']
     for command in r['commands']:
         paths += [Path(value) for value in command['command'] if Path(value).is_file()]
     for path in paths:r['inputs'][str(path)]=hashlib.sha256(path.read_bytes()).hexdigest()

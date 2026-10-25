@@ -23003,3 +23003,10 @@ Evidence: [industry comparison](../benchmarks/execution/concurrent-workloads/ind
 - **Assistant action:** Added matched private pacing controls retaining production defaults; tested larger budgets for both collectors within the same arena capacity. Captured separate current sync/guarded/concurrent runtime stack samples and retained previous CPU/phase evidence.
 - **Outcome:** The screen validates 24,768 responses and improves the concurrent candidate by about 12% throughput/15% CPU with higher arena use; sync also improves and remains faster. 49,248 additional diagnostic responses identify common root/TLS/native-stack work plus store/marker costs. No concurrent-over-sync win is claimed.
 - **Open:** The requested wrap-up criterion remains unmet. Persistent snapshot metadata and safe runtime bookkeeping reductions are proposed next tests; the user has not accepted a smaller success criterion. See the [screen and diagnosis](../benchmarks/execution/concurrent-pacing/README.md).
+
+
+## 2026-10-25 — General runtime optimization remains part of the release
+
+- **Author clarification:** Release work includes optimizing GC, developing concurrent-GC experiments, and optimizing the runtime in general. Concurrent GC must not eclipse the other improvements or be presumed to explain every runtime cost.
+- **Assistant response and action:** Retained separate general runtime and experimental concurrent claims in the draft release notes. Completed canonical native-source integration with unchanged generated C, native safety checks and 640 HTTP smoke responses across both collectors and JIT/AOT.
+- **Limits:** This source integration is not a new performance result. Synchronous GC remains the ordinary default; concurrent default readiness and final package qualification remain open. See [integration evidence](validation/concurrent-native-integration-20261025/README.md) and [draft release themes](next-preview-release-notes.md).

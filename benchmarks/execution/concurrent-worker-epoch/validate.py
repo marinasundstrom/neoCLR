@@ -28,7 +28,7 @@ try:
  # must reach the final object-liveness assertion, not merely fail setup.
  ordinary=[str(x) for x in cmd if str(x) not in ['-fsanitize=undefined,bounds','-fno-sanitize-recover=all']]
  original='memcpy(&g->words[g->count++], (unsigned char *)payload + at, 8);'
- prefix,body=(gate/'gate.c').read_text().split('static int write_locked(',1)
+ prefix,body=(root/'runtime/native/gc/concurrent/gate.c').read_text().split('static int write_locked(',1)
  assert body.count(original)==2
  r['negative']=[]
  for index,name in enumerate(['deletion','insertion']):

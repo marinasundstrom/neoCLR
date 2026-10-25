@@ -577,3 +577,9 @@ The qualified complete-caller stack proofs and immutable-byref policy are now
 integrated into the private concurrent backend. Standard HTTP qualification selects
 that policy explicitly. This preserves the earlier candidate's scoped results; it
 does not enable concurrent GC in ordinary hosting or admit moving/shared heaps.
+
+The native candidate sources now live under the runtime, with a checked owned-heap
+configuration. Source generation and compilation no longer require benchmark
+files. Historical experiments forward to those sources; ordinary hosting and the
+public collector selection remain unchanged. This is integration evidence, not a
+new throughput result.

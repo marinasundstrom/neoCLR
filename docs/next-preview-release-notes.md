@@ -55,7 +55,9 @@ throughput or latency advantage, generations, compaction or general virtual thre
 The current concurrent execution route is private qualification tooling, not a
 supported public GC selector in ordinary hosting. Internal persistent HTTP drivers
 and shared-worker experiments likewise do not imply new public server guarantees.
-Final release packaging must distinguish supported execution from retained experiments.
+The native candidate implementation now belongs to the runtime source tree, with
+a checked owned-heap policy and benchmark-independent source generation. Final
+release packaging must distinguish supported execution from retained experiments.
 
 ## Better evidence and documentation
 

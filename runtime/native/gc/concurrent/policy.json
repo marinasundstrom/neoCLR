@@ -1,0 +1,20 @@
+{
+  "name": "owned-nonmoving-v1",
+  "status": "private-candidate",
+  "ownership": "one mutator owner per heap; background marker; owner reclamation",
+  "compilerStackPolicy": "qualified",
+  "defines": [
+    "NEOCLR_NATIVE_GC",
+    "NEOCLR_GC_PROFILE",
+    "NEOCLR_GC_PACED",
+    "NEOCLR_SHADOW_SPARSE_INDEX",
+    "NEOCLR_LIVE_STORE_RANGES=4",
+    "NEOCLR_LIVE_ALLOCATION_INDEX",
+    "NEOCLR_LIVE_EXACT_INDEX",
+    "NEOCLR_LIVE_INLINE_BASE",
+    "NEOCLR_LIVE_NO_STORE_CACHE",
+    "NEOCLR_GC_ALLOCATION_BUDGET=1024",
+    "NEOCLR_GC_PUBLICATION_BUDGET=16384",
+    "NEOCLR_LIVE_FINISH_WATERMARK=50"
+  ]
+}
