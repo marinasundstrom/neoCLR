@@ -36,6 +36,10 @@ try:
     assert len(epochs)==2 and epochs[0][0]>0
     assert all(started==finished and (not started or readers>0) for started,finished,readers in epochs)
    r['trials'][-1]['readEpochs']=epochs
+   buffers=[tuple(map(int,match)) for match in re.findall(r'ROOT BUFFER (\d+) captures (\d+) growths (\d+) bytes retained',x.stdout)]
+   if any('-DNEOCLR_WORKER_ROOT_REUSE' in c['command'] for c in manifests[name]['commands']):
+    assert len(buffers)==2 and buffers[0][0]>buffers[0][1]>0 and buffers[0][2]>0
+   r['trials'][-1]['rootBuffers']=buffers
    if name!='control':assert 'OWNER ALLOCATION 3904 requests' in x.stdout and 'OWNER ALLOCATION 128 requests' in x.stdout and 'OWNER CLOSE 488 requests' in x.stdout
  r['medians']={name:{metric:statistics.median(t[metric] for t in r['trials'] if t['name']==name and not t['warmup']) for metric in ['wallSeconds','cpuSeconds']} for name in programs}
  r['ownerOverControl']={metric:r['medians']['owner'][metric]/r['medians']['control'][metric] for metric in ['wallSeconds','cpuSeconds']}

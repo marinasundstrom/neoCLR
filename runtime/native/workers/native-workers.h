@@ -146,4 +146,9 @@ int neoclr_workers_read_epoch_statistics(neoclr_workers *,uint64_t *,uint64_t *,
 #endif
 #endif
 #endif
+
+#ifdef NEOCLR_WORKER_ROOT_REUSE
+/* Private retained native buffer diagnostic; values are not root publications. */
+int neoclr_workers_root_buffer_statistics(neoclr_workers *,uint64_t *,uint64_t *,size_t *);
+#endif
 #endif

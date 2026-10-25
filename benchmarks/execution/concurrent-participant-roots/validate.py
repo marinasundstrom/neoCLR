@@ -1,5 +1,5 @@
 """Qualify copied participant roots against the actual synchronous native collector."""
-import argparse,hashlib,json,subprocess
+import argparse,hashlib,json,subprocess,signal
 from pathlib import Path
 p=argparse.ArgumentParser();p.add_argument('--output',type=Path,required=True);a=p.parse_args()
 root=Path(__file__).resolve().parents[3];base=Path(__file__).resolve().parent
@@ -13,6 +13,17 @@ try:
   if sanitized:cmd+=['-fsanitize=undefined,bounds','-fno-sanitize-recover=all']
   for command in [cmd,[str(exe)]]:
    x=subprocess.run(command,capture_output=True,text=True,timeout=60);r['commands'].append(dict(command=command,exitCode=x.returncode,stdout=x.stdout,stderr=x.stderr));x.check_returncode()
+ source=root/'runtime/native/gc/participant-roots.c'
+ text=source.read_text();needle='if (walk(owner,parts,count,buffer->values,&used)) abort();'
+ assert text.count(needle)==1
+ broken=out/'stale-roots.c';broken.write_text(text.replace(needle,'if (0) abort();'))
+ negative=[str(broken) if x==str(source) else x for x in cmd if not x.startswith('-fsanitize=') and x!='-fno-sanitize-recover=all']
+ negative[negative.index('-o')+1]=str(out/'stale-roots')
+ x=subprocess.run(negative,capture_output=True,text=True,timeout=60)
+ r['commands'].append(dict(command=negative,exitCode=x.returncode,stdout=x.stdout,stderr=x.stderr));x.check_returncode()
+ x=subprocess.run([str(out/'stale-roots')],capture_output=True,text=True,timeout=60)
+ r['negativeStaleRoots']=dict(exitCode=x.returncode,stdout=x.stdout,stderr=x.stderr)
+ assert x.returncode==-signal.SIGABRT
  for path in [*base.glob('*.[ch]'),Path(__file__),* (root/'runtime/native/gc').glob('*.[ch]')]:r['inputs'][str(path)]=hashlib.sha256(path.read_bytes()).hexdigest()
  r['passed']=True
 finally:(out/'results.json').write_text(json.dumps(r,indent=2)+'\n')

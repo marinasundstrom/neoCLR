@@ -134,3 +134,7 @@ native contracts; no published platform default changes.
 earlier shared-heap rejection: compiled readers may overlap the marker, with
 finish before any exclusive operation. General concurrent mutation, JIT/HTTP
 provider admission and default/performance acceptance remain open.
+
+[Reusable root storage](root-reuse.md) now provides an opt-in two-pass capture path
+for both collectors, with changing-root/lifetime tests and retained-memory costs.
+Timing does not establish a throughput improvement.

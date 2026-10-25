@@ -59,7 +59,34 @@ static void invalid_inputs(neoclr_aot_context *owner) {
     CHECK(neoclr_gc_participant_root_count_v1(owner,&part,18,&written)==3);
     CHECK(written==999 && out[0]==777);
 }
+static void reusable_buffer(void) {
+    uint64_t heap[8]={0},lanes[300],expected[301];
+    neoclr_aot_context owner={.text={(unsigned char *)heap,sizeof(heap),0}};
+    neoclr_probe_frame frame={.context=&owner,.lanes=lanes};
+    neoclr_gc_participant part={&owner,&frame};
+    neoclr_gc_root_buffer buffer={0};size_t count=999,written;
+    for (unsigned pass=0;pass<100;pass++) {
+        frame.lane_count=pass<2?pass+1:300-pass;
+        for(unsigned i=0;i<frame.lane_count;i++) lanes[i]=1000*pass+i;
+        CHECK(!neoclr_gc_participant_root_capture_v1(&owner,&part,1,expected,301,&written));
+        CHECK(!neoclr_gc_participant_root_snapshot_v1(&owner,&part,1,&buffer,&count));
+        CHECK(count==written && !memcmp(expected,buffer.values,count*sizeof(uint64_t)));
+    }
+    CHECK(buffer.captures==100 && buffer.growths==2 && buffer.capacity==512);
+    uint64_t *saved=buffer.values;size_t capacity=buffer.capacity;
+    frame.previous=&frame;count=999;
+    CHECK(neoclr_gc_participant_root_snapshot_v1(&owner,&part,1,&buffer,&count)==3);
+    CHECK(count==999 && buffer.values==saved && buffer.capacity==capacity && buffer.captures==100);
+    frame.previous=NULL;frame.lane_count=0;
+    CHECK(!neoclr_gc_participant_root_snapshot_v1(&owner,&part,1,&buffer,&count) && count==1);
+    CHECK(buffer.growths==2 && buffer.values==saved);
+    neoclr_gc_root_buffer_dispose_v1(&buffer);
+    CHECK(!buffer.values && !buffer.capacity && !buffer.captures && !buffer.growths);
+    neoclr_gc_root_buffer_dispose_v1(&buffer);
+    puts("PASS reusable roots: changing values, growth, shrink, malformed preservation and disposal");
+}
 int main(void) {
+    reusable_buffer();
     for(unsigned cycle=0;cycle<100;cycle++) {
         uint64_t heap[1024]={0},snapshot[32];
         neoclr_aot_context owner={.text={(unsigned char *)heap,sizeof(heap),0}};
@@ -81,6 +108,11 @@ int main(void) {
         size_t required=0,written=0;
         CHECK(!neoclr_gc_participant_root_count_v1(&owner,parts,4,&required));CHECK(required==28);
         CHECK(!neoclr_gc_participant_root_capture_v1(&owner,parts,4,snapshot,32,&written));CHECK(written==required);
+        neoclr_gc_root_buffer buffer={0};size_t reused;
+        CHECK(!neoclr_gc_participant_root_snapshot_v1(&owner,parts,4,&buffer,&reused));
+        CHECK(reused==written && !memcmp(buffer.values,snapshot,written*sizeof(uint64_t)));
+        memcpy(snapshot,buffer.values,written*sizeof(uint64_t));
+        neoclr_gc_root_buffer_dispose_v1(&buffer);
         for(unsigned w=0;w<4;w++) {
             h[w].resume=1;CHECK(!pthread_cond_signal(&h[w].condition));CHECK(!pthread_mutex_unlock(&h[w].mutex));
             CHECK(!pthread_join(workers[w],NULL));

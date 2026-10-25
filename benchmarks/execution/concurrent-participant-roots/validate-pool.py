@@ -1,9 +1,10 @@
 """Rebuild and compare copied-root and direct-root compiled worker pools."""
 import argparse,json,subprocess,hashlib,signal
 from pathlib import Path
-p=argparse.ArgumentParser();p.add_argument('--output',type=Path,required=True);p.add_argument('--allocation-owner',action='store_true');p.add_argument('--collection-owner',action='store_true');p.add_argument('--paced',action='store_true');p.add_argument('--read-epochs',action='store_true');p.add_argument('--legacy-object',type=Path);a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--output',type=Path,required=True);p.add_argument('--allocation-owner',action='store_true');p.add_argument('--collection-owner',action='store_true');p.add_argument('--paced',action='store_true');p.add_argument('--read-epochs',action='store_true');p.add_argument('--legacy-object',type=Path);p.add_argument('--reuse-roots',action='store_true');a=p.parse_args()
 if a.read_epochs:a.collection_owner=a.paced=True
 if a.collection_owner or a.paced:a.allocation_owner=True
+if a.reuse_roots:assert a.collection_owner
 root=Path(__file__).resolve().parents[3];out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
 prior=json.loads((root/'docs/experiments/native-worker-pool/compiled-parallel-validation.json').read_text());r={'passed':False,'commands':[],'inputs':{}}
 def run(cmd):
@@ -25,6 +26,7 @@ try:
    if a.allocation_owner:cmd+=['-DNEOCLR_WORKER_ALLOCATION_OWNER','-DNEOCLR_GC_ALLOCATION_DISPATCH']
    if a.collection_owner:cmd+=['-DNEOCLR_WORKER_COLLECTION_OWNER']
    if a.paced:cmd+=['-DNEOCLR_WORKER_PACED']
+   if a.reuse_roots:cmd+=['-DNEOCLR_WORKER_ROOT_REUSE']
    if a.read_epochs:
     cmd=[str(out/'native-gc.c') if x==str(root/'runtime/native/gc/native-gc.c') else x for x in cmd]
     cmd+=['-DNEOCLR_WORKER_READ_EPOCHS','-DNEOCLR_GC_PROFILE','-I',str(root/'benchmarks/execution/concurrent-mutation-gate'),str(root/'benchmarks/execution/concurrent-mutation-gate/gate.c')]

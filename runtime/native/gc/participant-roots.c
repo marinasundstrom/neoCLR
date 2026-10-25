@@ -1,5 +1,6 @@
 #include "participant-roots.h"
 #include <string.h>
+#include <stdlib.h>
 
 static int append(uint64_t *output, size_t *count, uint64_t value) {
     if (*count == SIZE_MAX) return 3;
@@ -66,4 +67,27 @@ int neoclr_gc_participant_root_capture_v1(const neoclr_aot_context *owner, const
     if(walk(owner,parts,count,output,&used)) return 3;
     *result=used;
     return 0;
+}
+
+int neoclr_gc_participant_root_snapshot_v1(const neoclr_aot_context *owner,
+    const neoclr_gc_participant *parts, unsigned count, neoclr_gc_root_buffer *buffer, size_t *result) {
+    size_t used;
+    if (!buffer || !result || (!!buffer->values != !!buffer->capacity) ||
+        walk(owner,parts,count,NULL,&used) || used>UINT32_MAX || used>SIZE_MAX/sizeof(uint64_t)) return 3;
+    if (used>buffer->capacity) {
+        size_t capacity=64;
+        while (capacity<used && capacity<=SIZE_MAX/2/sizeof(uint64_t)) capacity*=2;
+        if (capacity<used) capacity=used;
+        uint64_t *values=realloc(buffer->values,capacity*sizeof(uint64_t));
+        if (!values) return 3;
+        buffer->values=values;buffer->capacity=capacity;++buffer->growths;
+    }
+    /* Under the required rendezvous the validated graph cannot change between
+     * sizing and copying. A failed second pass means the caller broke ownership. */
+    if (walk(owner,parts,count,buffer->values,&used)) abort();
+    ++buffer->captures;*result=used;return 0;
+}
+void neoclr_gc_root_buffer_dispose_v1(neoclr_gc_root_buffer *buffer) {
+    if (!buffer) return;
+    free(buffer->values);memset(buffer,0,sizeof(*buffer));
 }

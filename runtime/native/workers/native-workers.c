@@ -18,6 +18,12 @@
 #if defined(NEOCLR_WORKER_READ_EPOCHS) && (!defined(NEOCLR_WORKER_COLLECTION_OWNER) || !defined(NEOCLR_WORKER_PACED))
 #error Read epochs require a paced collection owner
 #endif
+#if defined(NEOCLR_WORKER_ROOT_REUSE) && !defined(NEOCLR_WORKER_ROOT_SNAPSHOT)
+#error Root buffer reuse requires copied participant roots
+#endif
+#ifdef NEOCLR_WORKER_ROOT_REUSE
+#include "../gc/participant-roots.h"
+#endif
 #define JOBS 16
 #define ROOTS 32
 #define THREADS 4
@@ -49,6 +55,9 @@ struct neoclr_workers {
     _Atomic unsigned compiled_pause_requested;
     unsigned compiled_count, compiled_running, compiled_waiters, compiled_peak;
     uint64_t compiled_collections;
+#ifdef NEOCLR_WORKER_ROOT_REUSE
+    neoclr_gc_root_buffer root_buffer;
+#endif
     struct compiled_participant *participants[JOBS], *compiled_exclusive;
 #endif
 #ifdef NEOCLR_WORKER_ALLOCATION_OWNER
@@ -544,6 +553,9 @@ int neoclr_workers_destroy(neoclr_workers *p) {
     uint64_t extent;
     if (!neoclr_workers_collect(p, &extent) || extent) return 0;
 #ifdef NEOCLR_WORKER_GC
+#ifdef NEOCLR_WORKER_ROOT_REUSE
+    neoclr_gc_root_buffer_dispose_v1(&p->root_buffer);
+#endif
     pthread_cond_destroy(&p->compiled_ready);
 #endif
     pthread_cond_destroy(&p->completion); pthread_cond_destroy(&p->ready); pthread_mutex_destroy(&p->gate);

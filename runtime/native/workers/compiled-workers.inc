@@ -50,12 +50,18 @@ static int32_t compiled_collect_locked_mode(compiled_participant *self, const ne
     /* Copy changing root values while every participant is paused. Only the
      * explicit read-epoch protocol permits marking after readers resume. */
     roots[participants++] = (neoclr_gc_participant){&self->context, head};
-    size_t count_words, copied;
+    size_t copied;
+#ifdef NEOCLR_WORKER_ROOT_REUSE
+    int32_t status=neoclr_gc_participant_root_snapshot_v1(&self->context,roots,participants,&p->root_buffer,&copied);
+    uint64_t *values=p->root_buffer.values;
+#else
+    size_t count_words;
     int32_t status = neoclr_gc_participant_root_count_v1(&self->context, roots, participants, &count_words);
     if (status || count_words > UINT32_MAX || count_words > SIZE_MAX / sizeof(uint64_t)) return 3;
     uint64_t *values = malloc(count_words * sizeof(uint64_t));
     if (count_words && !values) return 3;
     status = neoclr_gc_participant_root_capture_v1(&self->context, roots, participants, values, count_words, &copied);
+#endif
     if (!status) {
 #ifdef NEOCLR_WORKER_COLLECTION_OWNER
         status=compiled_collect_on_owner(self,values,(uint32_t)copied,operation);
@@ -64,7 +70,9 @@ static int32_t compiled_collect_locked_mode(compiled_participant *self, const ne
         status = neoclr_gc_collect_conditional_v1(&self->context, &snapshot, NULL, 0);
 #endif
     }
+#ifndef NEOCLR_WORKER_ROOT_REUSE
     free(values);
+#endif
 #else
     int32_t status = neoclr_gc_collect_participants_v1(&self->context, head, roots, participants);
 #endif
@@ -246,3 +254,11 @@ int neoclr_workers_compiled_statistics(neoclr_workers *p, unsigned *peak, uint64
     unlock(p);
     return 1;
 }
+
+#ifdef NEOCLR_WORKER_ROOT_REUSE
+int neoclr_workers_root_buffer_statistics(neoclr_workers *p,uint64_t *captures,uint64_t *growths,size_t *bytes) {
+    if (!captures || !growths || !bytes || !pthread_equal(p->owner,pthread_self())) return 0;
+    lock(p);*captures=p->root_buffer.captures;*growths=p->root_buffer.growths;
+    *bytes=p->root_buffer.capacity*sizeof(uint64_t);unlock(p);return 1;
+}
+#endif

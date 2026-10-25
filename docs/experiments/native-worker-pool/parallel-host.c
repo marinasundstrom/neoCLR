@@ -71,6 +71,12 @@ static void run(int fault) {
     CHECK(collections);
 #endif
     if (!fault) CHECK(peak > 1);
+#ifdef NEOCLR_WORKER_ROOT_REUSE
+    uint64_t captures,growths;size_t buffer_bytes;
+    CHECK(neoclr_workers_root_buffer_statistics(p,&captures,&growths,&buffer_bytes));
+    if (!fault) CHECK(captures && growths && growths<captures && buffer_bytes);
+    printf("ROOT BUFFER %llu captures %llu growths %zu bytes retained\n",(unsigned long long)captures,(unsigned long long)growths,buffer_bytes);
+#endif
 #ifdef NEOCLR_WORKER_READ_EPOCHS
     uint64_t started,finished,readers,payload_bytes;
     CHECK(neoclr_workers_read_epoch_statistics(p,&started,&finished,&readers,&payload_bytes) && started==finished);
