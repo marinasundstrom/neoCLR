@@ -93,7 +93,7 @@ pub(crate) fn lower(
     func: &mut ir::Function,
     context: ir::Value,
 ) -> Result<Lowered, Error> {
-    lower_impl(module, func, context, None)
+    lower_impl(module, func, context, None, false)
 }
 
 /// The caller identifies the instruction completing frame linkage and saved-state
@@ -105,7 +105,7 @@ pub(crate) fn lower_framed(
     context: ir::Value,
     frame_ready: ir::Inst,
 ) -> Result<Lowered, Error> {
-    lower_impl(module, func, context, Some(frame_ready))
+    lower_impl(module, func, context, Some(frame_ready), false)
 }
 
 fn lower_impl(
@@ -113,6 +113,7 @@ fn lower_impl(
     func: &mut ir::Function,
     context: ir::Value,
     frame_ready: Option<ir::Inst>,
+    borrowed: bool,
 ) -> Result<Lowered, Error> {
     let entry = func.layout.entry_block().ok_or("missing entry block")?;
     if func.signature.returns.len() != 1 || func.signature.returns[0].value_type != types::I32 {
@@ -122,6 +123,13 @@ fn lower_impl(
         || !matches!(func.dfg.value_def(context), ir::ValueDef::Param(block, _) if block == entry)
     {
         return Err("mutation context must be an I64 entry parameter".into());
+    }
+    if borrowed {
+        let ready = frame_ready.ok_or("store borrow requires a linked frame")?;
+        let cfg = cranelift_codegen::flowgraph::ControlFlowGraph::with_function(func);
+        if func.layout.inst_block(ready) != Some(entry) || cfg.pred_iter(entry).next().is_some() {
+            return Err("store borrow requires a non-reentrant entry frame".into());
+        }
     }
     let dominance = if let Some(ready) = frame_ready {
         if func.layout.inst_block(ready).is_none() {
@@ -210,12 +218,25 @@ fn lower_impl(
     if stores.is_empty() {
         return Ok(result);
     }
+    // Tests opt in explicitly only after establishing a same-thread activation.
+    // No managed escape: the handle is passed only to the borrowed-store hook.
+    let handle = if borrowed {
+        let mut signature = module.make_signature();
+        signature.returns.push(AbiParam::new(types::I64));
+        let acquire = module.declare_function("experiment_gc_store_state_borrow", Linkage::Import, &signature)?;
+        let acquire = module.declare_func_in_func(acquire, func);
+        let mut cursor = FuncCursor::new(func).at_inst(frame_ready.unwrap());
+        cursor.next_inst();
+        let call = cursor.ins().call(acquire, &[]);
+        Some(cursor.func.dfg.inst_results(call)[0])
+    } else { None };
     let mut signature = module.make_signature();
     signature
         .params
         .extend([types::I64, types::I64, types::I64, types::I32].map(AbiParam::new));
     signature.returns.push(AbiParam::new(types::I32));
-    let hook = module.declare_function("experiment_gc_store", Linkage::Import, &signature)?;
+    if borrowed { signature.params.insert(0, AbiParam::new(types::I64)); }
+    let hook = module.declare_function(if borrowed { "experiment_gc_store_borrowed" } else { "experiment_gc_store" }, Linkage::Import, &signature)?;
     let hook = module.declare_func_in_func(hook, func);
     let failure = func.dfg.make_block();
     let status = func.dfg.append_block_param(failure, types::I32);
@@ -242,9 +263,11 @@ fn lower_impl(
             args[0]
         };
         let width = cursor.ins().iconst(types::I32, i64::from(width));
-        let call = cursor
-            .ins()
-            .call(hook, &[context, destination, bits, width]);
+        let call = if let Some(handle) = handle {
+            cursor.ins().call(hook, &[handle, context, destination, bits, width])
+        } else {
+            cursor.ins().call(hook, &[context, destination, bits, width])
+        };
         let status = cursor.func.dfg.inst_results(call)[0];
         cursor
             .ins()

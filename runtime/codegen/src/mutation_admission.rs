@@ -106,6 +106,15 @@ pub(crate) unsafe fn require_managed_host(library: &libloading::Library) -> Resu
     }
     Ok(())
 }
+// Explicit test-only admission. Ordinary provider lists and JIT binding remain unchanged.
+#[cfg(test)]
+pub(crate) fn check_borrowed_store_host_features(features: u64) -> Result<(), Error> {
+    check_host_features(features)?;
+    if features & (8 | 16) != (8 | 16) {
+        return Err("host lacks boundary completion or same-thread borrowed stores".into());
+    }
+    Ok(())
+}
 fn check_host_features(features: u64) -> Result<(), Error> {
     if features & REQUIRED_HOST_FEATURES != REQUIRED_HOST_FEATURES {
         return Err("host lacks required version-1 live-GC semantics".into());
@@ -115,6 +124,12 @@ fn check_host_features(features: u64) -> Result<(), Error> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn borrowed_store_requires_all_host_semantics() {
+        for bits in 0..31 { assert!(check_borrowed_store_host_features(bits).is_err()); }
+        assert!(check_borrowed_store_host_features(31).is_ok());
+        assert!(check_borrowed_store_host_features(31 | (1 << 63)).is_ok());
+    }
     #[test]
     fn requires_all_semantics_and_allows_additive_features() {
         for features in 0..7 {

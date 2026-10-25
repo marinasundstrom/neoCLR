@@ -1,0 +1,84 @@
+running 81 tests
+test mutation_store::tests::borrowed_store_native_jit_consumer ... ignored, requires NEOCLR_MUTATION_TEST_HOST built by concurrent-store/validate.py
+test mutation_admission::tests::requires_all_semantics_and_allows_additive_features ... ok
+test mutation_admission::tests::borrowed_store_requires_all_host_semantics ... ok
+test mutation_store::tests::borrowed_store_rejects_missing_or_late_frame_without_mutation ... ok
+test mutation_store::tests::call_closure_rejects_indirect_calls_and_forged_site_signatures ... ok
+test mutation_store::tests::call_closure_requires_transitive_bodies_and_exact_providers ... ok
+test mutation_store::tests::frame_initialization_must_dominate_stores_and_returns ... ok
+test mutation_store::tests::full_http_selection_compiles_with_live_gc ... ignored, requires retained HTTP inputs and NEOCLR_LIVE_SELECTION_COMMAND
+test mutation_store::tests::incompatible_live_hosts_rejected_before_binding ... ignored, requires NEOCLR_MUTATION_TEST_HOST_CASES built by concurrent-store/validate.py
+test mutation_store::tests::invalid_proven_stack_extent_rejected_without_edits ... ok
+test mutation_store::tests::borrowed_store_acquires_once_and_cleans_up_faults ... ok
+test mutation_store::tests::framed_fault_and_normal_returns_use_production_cleanup ... ok
+test mutation_store::stack_audit::tests::external_address_taken_and_unreferenced_functions_are_excluded ... ok
+test mutation_store::tests::managed_arrays_run_on_live_collector ... ignored, requires array host built by validate-arrays.py
+test mutation_store::tests::borrowed_store_object_imports_and_frame_cleanup ... ok
+test mutation_store::tests::managed_async_pump_runs_on_live_collector ... ignored, requires async host built by validate-async-pump.py
+test mutation_store::stack_audit::tests::all_callers_must_provide_bounded_stack_storage ... ok
+test mutation_store::tests::managed_async_wrappers_run_on_live_collector ... ignored, requires async host built by validate-async-wrappers.py
+test mutation_store::tests::emits_aot_hook_import_for_both_targets ... ok
+test mutation_store::tests::managed_byte_views_run_on_live_collector ... ignored, requires managed byte-view host built by validate-managed-byte-views.py
+test mutation_store::stack_audit::tests::jit_preserves_unaligned_bits_and_mixed_pointer_guards ... ok
+test mutation_store::tests::managed_callable_arrays_run_on_live_collector ... ignored, requires callable-array host built by validate-callable-arrays.py
+test mutation_store::tests::live_host_io_requires_admitted_pump ... ok
+test mutation_store::tests::managed_callbacks_run_on_live_collector ... ignored, requires callback host built by validate-callbacks.py
+test mutation_store::tests::live_pump_requires_async_dispatch_and_queue_drain ... ok
+test mutation_store::tests::managed_construction_runs_on_live_collector ... ignored, requires construction host built by validate-construction.py
+test mutation_store::tests::managed_byte_views_emit_guarded_results ... ok
+test mutation_store::tests::managed_initializers_run_on_live_collector ... ignored, requires initializer host built by validate-initializers.py
+test mutation_store::tests::managed_async_wrappers_emit_guarded_results ... ok
+test mutation_store::tests::managed_integer_format_runs_on_live_collector ... ignored, requires integer-format host built by validate-integer-format.py
+test mutation_store::tests::managed_async_pump_emits_guarded_results ... ok
+test mutation_store::tests::managed_interface_dispatch_runs_on_live_collector ... ignored, requires interface-dispatch host built by validate-interface-dispatch.py
+test mutation_store::tests::managed_callable_arrays_emit_guarded_stores ... ok
+test mutation_store::tests::managed_native_text_runs_on_live_collector ... ignored, requires native-text host built by validate-native-text.py
+test mutation_store::tests::managed_construction_emits_guarded_stores ... ok
+test mutation_store::tests::managed_network_pump_runs_on_live_collector ... ignored, requires async host built by validate-network-pump.py
+test mutation_store::tests::managed_pipeline_runs_on_live_collector ... ignored, requires NEOCLR_MUTATION_TEST_HOST built by concurrent-store/validate.py
+test mutation_store::tests::managed_arrays_emit_grouped_stores ... ok
+test mutation_store::tests::managed_primitive_arrays_run_on_live_collector ... ignored, requires primitive-array host built by validate-primitive-arrays.py
+test mutation_store::tests::managed_callbacks_join_live_closure ... ok
+test mutation_store::tests::managed_primitive_boxes_run_on_live_collector ... ignored, requires primitive-box host built by validate-primitive-boxes.py
+test mutation_store::tests::managed_initializers_emit_guarded_stores ... ok
+test mutation_store::tests::managed_public_entry_runs_on_live_collector ... ignored, requires entry host built by validate-entry.py
+test mutation_store::tests::managed_integer_format_emits_guarded_result ... ok
+test mutation_store::tests::managed_queue_runs_on_live_collector ... ignored, requires entry host built by validate-queue.py
+test mutation_store::tests::managed_primitive_arrays_emit_guarded_stores ... ok
+test mutation_store::tests::managed_queue_timers_runs_on_live_collector ... ignored, requires entry host built by validate-queue-timers.py
+test mutation_store::tests::managed_network_pump_emits_guarded_results ... ok
+test mutation_store::tests::managed_record_arrays_run_on_live_collector ... ignored, requires record-array host built by validate-record-arrays.py
+test mutation_store::tests::managed_primitive_boxes_emit_guarded_results ... ok
+test mutation_store::tests::managed_scoped_slice_runs_on_live_collector ... ignored, requires scoped-slice host built by validate-scoped-slice.py
+test mutation_store::tests::managed_native_text_emits_guarded_wrappers ... ok
+test mutation_store::tests::managed_socket_memory_run_on_live_collector ... ignored, requires socket host built by validate-socket-memory.py
+test mutation_store::tests::managed_queue_emits_guarded_dispatch ... ok
+test mutation_store::tests::managed_socket_wrappers_run_on_live_collector ... ignored, requires socket host built by validate-socket-wrappers.py
+test mutation_store::tests::managed_public_entry_emits_guarded_transition ... ok
+test mutation_store::tests::managed_statics_run_on_live_collector ... ignored, requires static host built by validate-statics.py
+test mutation_store::tests::managed_queue_timers_emits_guarded_dispatch ... ok
+test mutation_store::tests::managed_text_arrays_run_on_live_collector ... ignored, requires text-array host built by validate-text-arrays.py
+test mutation_store::tests::managed_scoped_slice_emits_guarded_result ... ok
+test mutation_store::tests::managed_text_finish_runs_on_live_collector ... ignored, requires text-finish host built by validate-text-finish.py
+test mutation_store::tests::managed_interface_dispatch_emits_guarded_results ... ok
+test mutation_store::tests::managed_tls_wrappers_runs_on_live_collector ... ignored, requires tls-wrappers host built by validate-tls-wrappers.py
+test mutation_store::tests::managed_statics_emit_guarded_publication ... ok
+test mutation_store::tests::managed_utf8_conversion_runs_on_live_collector ... ignored, requires utf8-conversion host built by validate-utf8-conversion.py
+test mutation_store::tests::native_collector_jit_consumer ... ignored, requires NEOCLR_MUTATION_TEST_HOST built by concurrent-store/validate.py
+test mutation_store::tests::managed_socket_wrappers_emit_guarded_results ... ok
+test mutation_store::tests::proven_stack_copy_stays_direct_and_byref_remains_checked ... ok
+test mutation_store::tests::rejects_unadmitted_store_before_editing ... ok
+test mutation_store::tests::managed_record_arrays_emit_guarded_stores ... ok
+test mutation_store::tests::single_edge_cycle_does_not_prove_stack_storage ... ok
+test mutation_store::tests::single_edge_stack_transfers_elide_only_proved_stores ... ok
+test mutation_store::tests::transferred_stack_bounds_reject_before_mutating_ir ... ok
+test mutation_store::tests::transferred_stack_offset_overflow_remains_guarded ... ok
+test mutation_store::tests::scalar_bits_and_fault_exit_execute_in_jit ... ok
+test mutation_store::tests::managed_text_arrays_emit_grouped_stores ... ok
+test mutation_store::tests::managed_socket_memory_emit_guarded_results ... ok
+test mutation_store::tests::managed_text_finish_emits_guarded_result ... ok
+test mutation_store::tests::managed_tls_wrappers_emits_guarded_result ... ok
+test mutation_store::tests::managed_utf8_conversion_emits_guarded_result ... ok
+test mutation_store::tests::ordinary_value_pipeline_lowers_only_when_opted_in ... ok
+
+test result: ok. 50 passed; 0 failed; 31 ignored; 0 measured; 143 filtered out; finished in 3.74s

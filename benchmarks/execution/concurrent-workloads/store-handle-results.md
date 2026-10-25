@@ -99,3 +99,5 @@ Next implement a test-only compiler emission path only for existing admitted
 same-thread activations, with explicit versioned host capability/binding checks.
 Qualify it before considering any production contract. Concurrent default and
 shared-worker acceptance remain open.
+
+Follow-up: [explicit framed compiler lowering](borrowed-lowering-results.md) qualifies native AOT/JIT consumers and additive host capability checks; complete managed/HTTP admission remains open.

@@ -210,3 +210,5 @@ Follow-up: [final-collection attribution and opt-in linear seed validation](coll
 [Whole-request profiles after seed changes](whole-gap-results.md) compare live/guarded/sync costs and prioritize ownership-safe store and frame/root overhead.
 
 [Native store-state borrowing](store-handle-results.md) prototypes explicit same-thread state reuse; compiler integration and request-level performance remain unqualified.
+
+[Borrowed-store lowering qualification](borrowed-lowering-results.md) covers explicitly selected framed AOT/JIT functions and host rejection; complete application admission remains next.

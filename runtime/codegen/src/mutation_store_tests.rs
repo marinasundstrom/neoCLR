@@ -2355,3 +2355,158 @@ fn transferred_stack_offset_overflow_remains_guarded() {
         }
     );
 }
+
+thread_local! { static BORROWS: std::cell::Cell<u32> = const { std::cell::Cell::new(0) }; }
+extern "C" fn borrow_test_state() -> usize {
+    BORROWS.with(|count| count.set(count.get()+1));
+    0x1234
+}
+unsafe extern "C" fn borrowed_test_store(handle: usize, context: *mut State, destination: *mut u8, bits: u64, width: u32) -> i32 {
+    assert_eq!(handle,0x1234);
+    assert!(unsafe { (*(context as *mut FramedState)).active });
+    unsafe { hook(context,destination,bits,width) }
+}
+#[test]
+fn borrowed_store_acquires_once_and_cleans_up_faults() {
+    for state_handle in [false, true] {
+        let mut builder = JITBuilder::with_isa(
+            isa(target(), false),
+            cranelift_module::default_libcall_names(),
+        );
+        builder.symbol("experiment_gc_store_state_borrow", borrow_test_state as *const u8);
+        builder.symbol("experiment_gc_store_borrowed", borrowed_test_store as *const u8);
+        builder.symbol("frame_enter", frame_enter as *const u8);
+        builder.symbol(
+            "frame_leave",
+            if state_handle {
+                state_frame_leave as *const u8
+            } else {
+                frame_leave as *const u8
+            },
+        );
+        let mut code = Code(Some(JITModule::new(builder)));
+        let module = code.0.as_mut().unwrap();
+        let (id, mut ctx, context, frame, _, ready) = framed_function(module, false);
+        assert_eq!(
+            lower_impl(module, &mut ctx.func, context, Some(ready), true)
+                .unwrap()
+                .stores,
+            2
+        );
+        let mut signature = module.make_signature();
+        signature.params.extend(vec![
+            AbiParam::new(types::I64);
+            if state_handle { 2 } else { 1 }
+        ]);
+        let leave = module
+            .declare_function("frame_leave", Linkage::Import, &signature)
+            .unwrap();
+        crate::frame_cleanup::finish(module, &mut ctx.func, frame, leave, state_handle);
+        module.define_function(id, &mut ctx).unwrap();
+        module.finalize_definitions().unwrap();
+        let call: unsafe extern "C" fn(*mut FramedState, *mut u8, u64) -> i32 =
+            unsafe { std::mem::transmute(module.get_finalized_function(id)) };
+        for reject_at in [0, 1, 2] {
+            let mut state = FramedState {
+                stores: State {
+                    calls: 0,
+                    reject_at,
+                    widths: [0; 2],
+                    bits: [0; 2],
+                },
+                enters: 0,
+                leaves: 0,
+                active: false,
+            };
+            BORROWS.with(|count| count.set(0));
+            let mut output = [0; 32];
+            assert_eq!(
+                unsafe { call(&mut state, output.as_mut_ptr(), 42) },
+                if reject_at == 0 { 0 } else { 3 }
+            );
+            assert_eq!((state.enters, state.leaves, state.active), (1, 1, false));
+            BORROWS.with(|count| assert_eq!(count.get(), 1));
+            assert_eq!(state.stores.calls, if reject_at == 1 { 1 } else { 2 });
+        }
+    }
+}
+#[test]
+fn borrowed_store_rejects_missing_or_late_frame_without_mutation() {
+    let mut module=ObjectModule::new(ObjectBuilder::new(isa(target(),true),"borrow-check",cranelift_module::default_libcall_names()).unwrap());
+    let (_,mut ctx,context,_,_,ready)=framed_function(&mut module,true);
+    let before=ctx.func.display().to_string();
+    assert!(lower_impl(&mut module,&mut ctx.func,context,None,true).is_err());
+    assert_eq!(before,ctx.func.display().to_string());
+    assert!(lower_impl(&mut module,&mut ctx.func,context,Some(ready),true).is_err());
+    assert_eq!(before,ctx.func.display().to_string());
+}
+#[test]
+#[ignore = "requires NEOCLR_MUTATION_TEST_HOST built by concurrent-store/validate.py"]
+fn borrowed_store_native_jit_consumer() {
+    let path = std::env::var_os("NEOCLR_MUTATION_TEST_HOST").expect("native host fixture");
+    // The fixture is built from this checkout; its library outlives generated code.
+    let library = unsafe { libloading::Library::new(path) }.unwrap();
+    unsafe { crate::mutation_admission::require_managed_host(&library) }.unwrap();
+    let query: libloading::Symbol<unsafe extern "C" fn(u32)->u64> = unsafe { library.get(b"experiment_gc_live_capabilities_v1") }.unwrap();
+    crate::mutation_admission::check_borrowed_store_host_features(unsafe { query(1) }).unwrap();
+    type Hook = unsafe extern "C" fn(*mut std::ffi::c_void, *mut std::ffi::c_void, *mut u8, u64, u32) -> i32;
+    type Writer = unsafe extern "C" fn(*mut std::ffi::c_void, *mut u8, u64) -> i32;
+    type Run = unsafe extern "C" fn(Writer) -> i32;
+    let hook: libloading::Symbol<Hook> = unsafe { library.get(b"experiment_gc_store_borrowed") }.unwrap();
+    let run: libloading::Symbol<Run> = unsafe { library.get(b"native_store_consumer") }.unwrap();
+    type Enter =
+        unsafe extern "C" fn(*mut std::ffi::c_void, *mut std::ffi::c_void) -> *mut std::ffi::c_void;
+    type Leave = unsafe extern "C" fn(*mut std::ffi::c_void, *mut std::ffi::c_void);
+    let enter: libloading::Symbol<Enter> = unsafe { library.get(b"frame_enter") }.unwrap();
+    let leave: libloading::Symbol<Leave> = unsafe { library.get(b"frame_leave") }.unwrap();
+    let mut builder = JITBuilder::with_isa(
+        isa(target(), false),
+        cranelift_module::default_libcall_names(),
+    );
+    let acquire: libloading::Symbol<unsafe extern "C" fn()->*mut std::ffi::c_void> = unsafe { library.get(b"experiment_gc_store_state_borrow") }.unwrap();
+    builder.symbol("experiment_gc_store_state_borrow", *acquire as *const u8);
+    builder.symbol("experiment_gc_store_borrowed", *hook as *const u8);
+    builder.symbol("frame_enter", *enter as *const u8);
+    builder.symbol("frame_leave", *leave as *const u8);
+    let mut code = Code(Some(JITModule::new(builder)));
+    let module = code.0.as_mut().unwrap();
+    let (id, mut ctx, context, frame, _, ready) = framed_function(module, false);
+    lower_impl(module, &mut ctx.func, context, Some(ready), true).unwrap();
+    finish_native_frame(module, &mut ctx.func, frame);
+    crate::mutation_admission::check_call_closure(
+        module,
+        &[(id, &ctx.func)],
+        &borrowed_providers(module),
+    )
+    .unwrap();
+    module.define_function(id, &mut ctx).unwrap();
+    module.finalize_definitions().unwrap();
+    let call: Writer = unsafe { std::mem::transmute(module.get_finalized_function(id)) };
+    assert_eq!(unsafe { run(call) }, 0);
+
+}
+
+
+fn borrowed_providers(module: &impl Module) -> Vec<(&'static str,ir::Signature)> {
+    let mut result=live_providers(module);
+    let mut acquire=module.make_signature();acquire.returns.push(AbiParam::new(types::I64));
+    result.push(("experiment_gc_store_state_borrow",acquire));
+    let mut store=module.make_signature();store.params.extend([types::I64,types::I64,types::I64,types::I64,types::I32].map(AbiParam::new));store.returns.push(AbiParam::new(types::I32));
+    result.push(("experiment_gc_store_borrowed",store));result
+}
+#[test]
+fn borrowed_store_object_imports_and_frame_cleanup() {
+    for triple in ["aarch64-apple-darwin","x86_64-pc-windows-msvc"] {
+        let mut module=ObjectModule::new(ObjectBuilder::new(isa(triple,true),"borrow-object",cranelift_module::default_libcall_names()).unwrap());
+        let (id,mut ctx,context,frame,_,ready)=framed_function(&mut module,false);
+        lower_impl(&mut module,&mut ctx.func,context,Some(ready),true).unwrap();
+        finish_native_frame(&mut module,&mut ctx.func,frame);
+        assert!(crate::mutation_admission::check_call_closure(&module,&[(id,&ctx.func)],&live_providers(&module)).is_err());
+        crate::mutation_admission::check_call_closure(&module,&[(id,&ctx.func)],&borrowed_providers(&module)).unwrap();
+        module.define_function(id,&mut ctx).unwrap();
+        let bytes=module.finish().emit().unwrap();let object=object::File::parse(bytes.as_slice()).unwrap();
+        let imports:std::collections::BTreeSet<_>=object.symbols().filter(|s|s.is_undefined()).map(|s|s.name().unwrap().trim_start_matches('_').to_owned()).collect();
+        assert_eq!(imports,["experiment_gc_store_state_borrow","experiment_gc_store_borrowed","frame_enter","frame_leave"].into_iter().map(str::to_owned).collect());
+        if triple==target() { if let Some(path)=std::env::var_os("NEOCLR_BORROWED_STORE_OBJECT") { std::fs::write(path,bytes).unwrap(); } }
+    }
+}

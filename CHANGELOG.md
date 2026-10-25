@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-25
 
+- Qualify explicit framed borrowed-store lowering with one post-linkage acquisition, internal SSA reuse and production fault cleanup. Four focused tests, 50 mutation/admission regressions and 300 native concurrent AOT/sanitized-AOT/JIT cycles pass; a legacy host is rejected before binding. Add private optional host bit 16. Ordinary provider admission, complete managed/HTTP emission, Runtime Contract and Raven semantics remain unchanged; request-level performance and default qualification remain open.
+
 - Prototype opt-in native store-state borrowing under the existing same-thread trusted-handle model, retaining current heap/context/destination validation and separate heap ownership. Native and retained-handle sanitized tests pass; removing ownership checks fails a negative control. An amortized 24-million-store microbenchmark observes 12%/9% lower outside-heap/inactive-heap CPU, excluding acquisition. No compiler/HTTP/default admission yet. Fix allocation-index generation to declare calloc/free before use in non-profiled builds; record handle lifetime limitations and compiler qualification work.
 
 - Refresh whole-request stack profiles after concurrent seed optimizations: all 49,248 plaintext/JSON responses pass. Hash-checked TLS attribution and four invalid-evidence controls pass. Reusing uninstrumented controls shows 65–67% of the live-versus-sync CPU excess persists with concurrent marking disabled; store/TLS and frame/root work remain prominent. Document noncausal comparison limits and explicit owner-lifetime constraints for the next optimization; no runtime/default change.
