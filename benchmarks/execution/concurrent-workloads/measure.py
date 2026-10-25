@@ -21,6 +21,8 @@ p.add_argument('--split-tls', action='store_true')
 p.add_argument('--serialized-store', action='store_true')
 p.add_argument('--disable-exact-store', action='store_true')
 p.add_argument('--store-ranges', type=int, choices=range(1,17), default=4)
+p.add_argument('--full-store-walk', action='store_true')
+p.add_argument('--profile-store-walks', action='store_true')
 p.add_argument('--profile-store-sites', action='store_true')
 a = p.parse_args()
 assert a.rounds > 0
@@ -32,8 +34,9 @@ recipe_file = root / 'target/native-host-ownership/results.json'
 recipe = next(c['command'] for c in json.loads(recipe_file.read_text())['commands']
               if str(root / 'target/native-host-ownership/owned-aot') in c['command'])
 modes = ['sync', 'guarded-sync', 'live'] if a.guarded_control else ['sync', 'live']
-report = {'repeatSnapshotLookup': a.repeat_snapshot_lookup, 'headerProof': a.header_proof, 'inlineValidation': a.inline_validation, 'splitTls': a.split_tls, 'serializedStore': a.serialized_store, 'optimizationLevel': build.get('optimizationLevel','none'), 'passed': False, 'scope': __doc__, 'iterations': build['iterations'],
+report = {'fullStoreWalk':a.full_store_walk,'repeatSnapshotLookup': a.repeat_snapshot_lookup, 'headerProof': a.header_proof, 'inlineValidation': a.inline_validation, 'splitTls': a.split_tls, 'serializedStore': a.serialized_store, 'optimizationLevel': build.get('optimizationLevel','none'), 'passed': False, 'scope': __doc__, 'iterations': build['iterations'],
           'commands': [], 'trials': [], 'inputs': {}, 'excluded': []}
+if a.profile_store_walks:report['diagnosticOnly']='Heap-walk instrumentation; timings are not benchmark evidence.'
 def run(command):
     result = subprocess.run(list(map(str, command)), cwd=root, capture_output=True,
                             text=True, timeout=180)
@@ -108,6 +111,11 @@ static void report_profile(struct rusage *a, struct rusage *b, struct timespec *
  fprintf(stderr,"\\n");
  experiment_gc_store_lookup_counts(counts);
  fprintf(stderr,"STORE_LOOKUPS %llu %llu\\n",(unsigned long long)counts[0],(unsigned long long)counts[1]);
+#ifdef NEOCLR_LIVE_WALK_PROFILE
+ extern void experiment_gc_store_walk_counts(uint64_t *);
+ experiment_gc_store_walk_counts(counts);
+ fprintf(stderr,"STORE_WALKS %llu %llu %llu\\n",(unsigned long long)counts[0],(unsigned long long)counts[1],(unsigned long long)counts[2]);
+#endif
 #endif
 }
 ''')
@@ -132,6 +140,8 @@ static void report_profile(struct rusage *a, struct rusage *b, struct timespec *
                 gate = root / 'benchmarks/execution/concurrent-mutation-gate'
                 command += ['-DWORKLOAD_LIVE', '-DNEOCLR_SHADOW_SPARSE_INDEX',
                             '-I', str(root / 'runtime/native/memory'), '-I', str(gate), str(gate / 'gate.c')]
+            if a.full_store_walk: command += ['-DNEOCLR_LIVE_FULL_STORE_WALK']
+            if a.profile_store_walks and mode != 'sync': command += ['-DNEOCLR_LIVE_WALK_PROFILE']
             if a.profile_store_sites and mode != 'sync': command += ['-DNEOCLR_STORE_SITES']
             if a.repeat_snapshot_lookup: command += ['-DNEOCLR_LIVE_REPEAT_SNAPSHOT_LOOKUP']
             if a.header_proof: command += ['-DNEOCLR_LIVE_HEADER_PROOF']
@@ -153,7 +163,7 @@ static void report_profile(struct rusage *a, struct rusage *b, struct timespec *
                        'stdout': result.stdout, 'outputMatches': result.stdout == case['expectedPerIteration'] * build['iterations']}
                 report['trials'].append(row)
                 lines = result.stderr.splitlines()
-                for label in ['LOOKUPS', 'STORES', 'STORE_LOOKUPS']:
+                for label in ['LOOKUPS', 'STORES', 'STORE_LOOKUPS', 'STORE_WALKS']:
                     row[label] = next((list(map(int, x.split()[1:])) for x in lines if x.startswith(label + ' ')), None)
                 values = next((x.split()[1:] for x in lines if x.startswith('PROFILE ')), None)
                 if values:

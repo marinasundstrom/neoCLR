@@ -1,0 +1,134 @@
+{
+  "walk-anchor-profile-ordinary": [
+    {
+      "mode": "guarded-sync",
+      "sample": "tasks",
+      "headers": 1904337,
+      "maximum": 257,
+      "freeHeaders": 512,
+      "fallbackSearches": 61453,
+      "meanHeaders": 30.988511545408688
+    },
+    {
+      "mode": "live",
+      "sample": "tasks",
+      "headers": 4285097,
+      "maximum": 769,
+      "freeHeaders": 256,
+      "fallbackSearches": 61197,
+      "meanHeaders": 70.02135725607464
+    },
+    {
+      "mode": "guarded-sync",
+      "sample": "collections",
+      "headers": 6301661,
+      "maximum": 284,
+      "freeHeaders": 19246,
+      "fallbackSearches": 286733,
+      "meanHeaders": 21.97745289171459
+    },
+    {
+      "mode": "live",
+      "sample": "collections",
+      "headers": 15248303,
+      "maximum": 799,
+      "freeHeaders": 75888,
+      "fallbackSearches": 282177,
+      "meanHeaders": 54.038078936270495
+    },
+    {
+      "mode": "guarded-sync",
+      "sample": "arrays",
+      "headers": 631767,
+      "maximum": 261,
+      "freeHeaders": 540,
+      "fallbackSearches": 32861,
+      "meanHeaders": 19.225434405526308
+    },
+    {
+      "mode": "live",
+      "sample": "arrays",
+      "headers": 1430797,
+      "maximum": 771,
+      "freeHeaders": 1637,
+      "fallbackSearches": 32693,
+      "meanHeaders": 43.76462851374912
+    }
+  ],
+  "walk-anchor-profile-4-plain": [
+    {
+      "mode": "guarded-sync",
+      "sample": "plain",
+      "headers": 6101524,
+      "maximum": 816,
+      "freeHeaders": 258082,
+      "fallbackSearches": 77537,
+      "meanHeaders": 78.69177296000619
+    },
+    {
+      "mode": "live",
+      "sample": "plain",
+      "headers": 7852720,
+      "maximum": 1238,
+      "freeHeaders": 237348,
+      "fallbackSearches": 68303,
+      "meanHeaders": 114.96888862861076
+    },
+    {
+      "mode": "live-full-walk",
+      "sample": "plain",
+      "headers": 34162149,
+      "maximum": 1264,
+      "freeHeaders": 613542,
+      "fallbackSearches": 68303,
+      "meanHeaders": 500.1559082324349
+    },
+    {
+      "mode": "guarded-sync-full-walk",
+      "sample": "plain",
+      "headers": 23741271,
+      "maximum": 835,
+      "freeHeaders": 606722,
+      "fallbackSearches": 77537,
+      "meanHeaders": 306.19279827695163
+    }
+  ],
+  "walk-anchor-profile-4-json": [
+    {
+      "mode": "guarded-sync",
+      "sample": "json",
+      "headers": 7374234,
+      "maximum": 839,
+      "freeHeaders": 349302,
+      "fallbackSearches": 109874,
+      "meanHeaders": 67.11536851302401
+    },
+    {
+      "mode": "live",
+      "sample": "json",
+      "headers": 8710510,
+      "maximum": 1311,
+      "freeHeaders": 288038,
+      "fallbackSearches": 98106,
+      "meanHeaders": 88.78672048600494
+    },
+    {
+      "mode": "live-full-walk",
+      "sample": "json",
+      "headers": 55876481,
+      "maximum": 1354,
+      "freeHeaders": 612846,
+      "fallbackSearches": 98106,
+      "meanHeaders": 569.5521272908894
+    },
+    {
+      "mode": "guarded-sync-full-walk",
+      "sample": "json",
+      "headers": 36903898,
+      "maximum": 854,
+      "freeHeaders": 831587,
+      "fallbackSearches": 109874,
+      "meanHeaders": 335.8747110326374
+    }
+  ]
+}

@@ -157,3 +157,7 @@ show modest CPU/throughput gains with equal allocations.
 sixteen connection-close clients. It separates client/server CPU, response latency,
 allocation variation and diagnostic profiles; queued load exposes a larger guarded
 store cost despite fewer concurrent epochs. This does not admit shared-worker GC.
+
+[Checked walk anchors](walk-anchor-results.md) use current allocation proofs to
+skip redundant heap prefixes. Optional header-visit diagnostics explain the larger
+queued-load gains; full-walk controls preserve the comparison and worst-case gaps.

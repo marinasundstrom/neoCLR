@@ -22,6 +22,12 @@ static _Thread_local const void *live_store_recent[NEOCLR_LIVE_STORE_RANGES-1];
 static _Thread_local unsigned live_store_recent_next;
 #endif
 #endif
+#ifdef NEOCLR_LIVE_WALK_PROFILE
+static _Thread_local uint64_t live_store_walk_counts[3]; /* headers visited, max per walk, free headers */
+void experiment_gc_store_walk_counts(uint64_t *out) {
+    memcpy(out,live_store_walk_counts,sizeof(live_store_walk_counts));
+}
+#endif
 static _Thread_local uint64_t live_store_lookup_counts[2]; /* proved range/base, checked walks */
 static void live_store_cancel_epoch(void) {
         candidate_dispose();
@@ -63,6 +69,7 @@ int experiment_gc_store(neoclr_aot_context *context, void *destination,
     if (address<base || address-base>=context->text.used) goto rejected;
     neoclr_aot_text_arena *a=&context->text;
     block *b=NULL;
+    uint64_t walk_start=0;
 #if !defined(NEOCLR_LIVE_LINEAR_STORE) && !defined(NEOCLR_LIVE_REPEAT_SNAPSHOT_LOOKUP)
     int snapshot_allocation=0;
 #endif
@@ -121,6 +128,9 @@ int experiment_gc_store(neoclr_aot_context *context, void *destination,
                 live_store_lookup_counts[0]++;
                 goto located;
             }
+#ifndef NEOCLR_LIVE_FULL_STORE_WALK
+            if (cached->state&ALLOCATED) walk_start=at;
+#endif
         }
     }
     /* Allocation-base writes can use the existing current owned proof directly.
@@ -152,13 +162,29 @@ int experiment_gc_store(neoclr_aot_context *context, void *destination,
             live_store_lookup_counts[0]++;
             goto located;
         }
+#ifndef NEOCLR_LIVE_FULL_STORE_WALK
+        if ((cached->state&ALLOCATED) && at>walk_start) walk_start=at;
+#endif
     }
 #endif
 #endif
+    /* An admitted, validated allocation below the destination is also a safe
+     * walk anchor. Current ownership revoked stale hints before header access;
+     * retain checked span traversal from this boundary, never from user bytes. */
     live_store_lookup_counts[1]++;
-    for (uint64_t at=0;at<a->used;) {
+#ifdef NEOCLR_LIVE_WALK_PROFILE
+    uint64_t walk_steps=0;
+#endif
+    for (uint64_t at=walk_start;at<a->used;) {
+#ifdef NEOCLR_LIVE_WALK_PROFILE
+        live_store_walk_counts[0]++;
+        if (++walk_steps>live_store_walk_counts[1]) live_store_walk_counts[1]=walk_steps;
+#endif
         if (!block_valid(a,at)) goto rejected;
         b=(void *)(a->data+at);
+#ifdef NEOCLR_LIVE_WALK_PROFILE
+        live_store_walk_counts[2]+=!(b->state&ALLOCATED);
+#endif
         uintptr_t payload=(uintptr_t)(b+1);
         if (address>=payload && address-payload<b->bytes && (b->state&ALLOCATED))
             goto located;
