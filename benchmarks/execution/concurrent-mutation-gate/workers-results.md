@@ -114,3 +114,5 @@ and deliberate-fault checks; `workers-initial-controls.json.gz` records the reje
 assembly-changing refactor. `workers-tsan.json.gz` preserves the unresolved sanitizer
 runs including the minimal control. None of these results marks concurrent GC as
 default or the shared-worker integration as complete.
+
+Follow-up: [participant-root capture](../concurrent-participant-roots/README.md) now has an opt-in synchronous pool integration. It does not yet combine writer registration with concurrent marking.

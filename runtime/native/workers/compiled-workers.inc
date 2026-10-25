@@ -1,3 +1,6 @@
+#ifdef NEOCLR_WORKER_ROOT_SNAPSHOT
+#include "../gc/participant-roots.h"
+#endif
 /* Included only by the opt-in NEOCLR_WORKER_GC pool. Generated frames live on
  * their originating stacks; a participant publishes them only while paused. */
 typedef struct compiled_participant {
@@ -7,6 +10,9 @@ typedef struct compiled_participant {
     uint64_t handle;
     unsigned slot;
     int running, exclusive;
+#ifdef NEOCLR_WORKER_ROOT_SNAPSHOT
+    int snapshot_attached;
+#endif
 } compiled_participant;
 static _Thread_local compiled_participant *compiled_current;
 
@@ -24,9 +30,34 @@ static int32_t compiled_collect_locked(compiled_participant *self, const neoclr_
         compiled_participant *other = p->participants[i];
         if (!other || other == self) continue;
         if (other->running) abort();
+#ifdef NEOCLR_WORKER_ROOT_SNAPSHOT
+        /* Registered waiters have no invocation roots until their first heap
+         * lease. Their captures/locals are already present in pool_slots. */
+        if (!other->snapshot_attached) {
+            if (other->frames || other->context.text.data || other->context.static_storage || other->context.fault.code) abort();
+            continue;
+        }
+#endif
         roots[participants++] = (neoclr_gc_participant){&other->context, other->frames};
     }
+#ifdef NEOCLR_WORKER_ROOT_SNAPSHOT
+    /* All participants remain paused. This opt-in equivalence step copies root
+     * values now, but does not yet authorize concurrent marking or reclamation. */
+    roots[participants++] = (neoclr_gc_participant){&self->context, head};
+    size_t count_words, copied;
+    int32_t status = neoclr_gc_participant_root_count_v1(&self->context, roots, participants, &count_words);
+    if (status || count_words > UINT32_MAX || count_words > SIZE_MAX / sizeof(uint64_t)) return 3;
+    uint64_t *values = malloc(count_words * sizeof(uint64_t));
+    if (count_words && !values) return 3;
+    status = neoclr_gc_participant_root_capture_v1(&self->context, roots, participants, values, count_words, &copied);
+    if (!status) {
+        neoclr_probe_frame snapshot = {.context=&self->context, .lanes=values, .lane_count=(uint32_t)copied};
+        status = neoclr_gc_collect_conditional_v1(&self->context, &snapshot, NULL, 0);
+    }
+    free(values);
+#else
     int32_t status = neoclr_gc_collect_participants_v1(&self->context, head, roots, participants);
+#endif
     if (!status) ++p->compiled_collections;
     return status;
 }
@@ -83,6 +114,9 @@ static void compiled_boundary(neoclr_aot_context *context, const neoclr_probe_fr
         self->exclusive = 1;
         self->context.text = p->context.text;
         self->context.static_storage = p->context.static_storage;
+#ifdef NEOCLR_WORKER_ROOT_SNAPSHOT
+        self->snapshot_attached = 1;
+#endif
     } else {
         while (p->compiled_exclusive || p->compiled_waiters)
             if (pthread_cond_wait(&p->compiled_ready, &p->gate)) abort();
