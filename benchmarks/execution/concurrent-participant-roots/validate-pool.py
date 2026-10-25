@@ -1,8 +1,8 @@
 """Rebuild and compare copied-root and direct-root compiled worker pools."""
 import argparse,json,subprocess,hashlib,signal
 from pathlib import Path
-p=argparse.ArgumentParser();p.add_argument('--output',type=Path,required=True);p.add_argument('--allocation-owner',action='store_true');p.add_argument('--collection-owner',action='store_true');a=p.parse_args()
-if a.collection_owner:a.allocation_owner=True
+p=argparse.ArgumentParser();p.add_argument('--output',type=Path,required=True);p.add_argument('--allocation-owner',action='store_true');p.add_argument('--collection-owner',action='store_true');p.add_argument('--paced',action='store_true');a=p.parse_args()
+if a.collection_owner or a.paced:a.allocation_owner=True
 root=Path(__file__).resolve().parents[3];out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
 prior=json.loads((root/'docs/experiments/native-worker-pool/compiled-parallel-validation.json').read_text());r={'passed':False,'commands':[],'inputs':{}}
 def run(cmd):
@@ -21,6 +21,7 @@ try:
    if snapshot:cmd+=['-DNEOCLR_WORKER_ROOT_SNAPSHOT',str(root/'runtime/native/gc/participant-roots.c')]
    if a.allocation_owner:cmd+=['-DNEOCLR_WORKER_ALLOCATION_OWNER','-DNEOCLR_GC_ALLOCATION_DISPATCH']
    if a.collection_owner:cmd+=['-DNEOCLR_WORKER_COLLECTION_OWNER']
+   if a.paced:cmd+=['-DNEOCLR_WORKER_PACED']
    run(cmd);run([str(exe)])
  if a.allocation_owner:
   # Keep a reference to the callback so disabling its installation cannot be
@@ -32,7 +33,7 @@ try:
     needle='neoclr_gc_allocation_dispatch_hook=compiled_allocate;';assert text.count(needle)==1
     text=text.replace(needle,'neoclr_gc_allocation_dispatch_hook=0?compiled_allocate:NULL;')
    (out/name).write_text(text)
-  negative=[str(out/'native-workers.c') if x==str(worker_dir/'native-workers.c') else x for x in cmd if not x.startswith('-fsanitize=') and x!='-fno-sanitize-recover=all']
+  negative=[str(out/'native-workers.c') if x==str(worker_dir/'native-workers.c') else x for x in cmd if not x.startswith('-fsanitize=') and x not in ['-fno-sanitize-recover=all','-DNEOCLR_WORKER_PACED']]
   negative[negative.index('-o')+1]=str(out/'negative-dispatch');run(negative)
   x=subprocess.run([str(out/'negative-dispatch')],capture_output=True,text=True,timeout=120)
   r['negative']=dict(exitCode=x.returncode,stdout=x.stdout,stderr=x.stderr)

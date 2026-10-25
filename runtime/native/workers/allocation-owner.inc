@@ -28,6 +28,12 @@ static void *compiled_allocation_owner(void *opaque) {
             p->allocation.status=neoclr_gc_allocate_dispatch_storage_v1(
                 p->allocation.arena,p->allocation.bytes,p->allocation.kind,&p->allocation.result);
             ++p->allocation.requests;
+#ifdef NEOCLR_WORKER_PACED
+            if (!p->allocation.status) {
+                ++p->allocation.allocations;
+                p->allocation.allocated_bytes+=p->allocation.bytes;
+            }
+#endif
         }
         p->allocation.used=p->allocation.arena->used;
         p->allocation.pending=0;

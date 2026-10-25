@@ -12,6 +12,9 @@
 #if defined(NEOCLR_WORKER_COLLECTION_OWNER) && (!defined(NEOCLR_WORKER_ALLOCATION_OWNER) || !defined(NEOCLR_WORKER_ROOT_SNAPSHOT))
 #error Worker collection owner requires allocation owner and copied roots
 #endif
+#if defined(NEOCLR_WORKER_PACED) && !defined(NEOCLR_WORKER_ALLOCATION_OWNER)
+#error Worker pacing requires pool allocation accounting
+#endif
 #define JOBS 16
 #define ROOTS 32
 #define THREADS 4
@@ -52,6 +55,9 @@ struct neoclr_workers {
         int started, stop, pending;
         neoclr_aot_text_arena *arena;
         uint64_t bytes, used, requests;
+#ifdef NEOCLR_WORKER_PACED
+        uint64_t allocations, allocated_bytes, last_allocations, last_bytes, boundaries;
+#endif
         uint32_t kind;
         int32_t status;
         void *result;

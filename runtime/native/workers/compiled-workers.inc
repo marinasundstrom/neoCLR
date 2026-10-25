@@ -65,7 +65,14 @@ static int32_t compiled_collect_locked(compiled_participant *self, const neoclr_
 #else
     int32_t status = neoclr_gc_collect_participants_v1(&self->context, head, roots, participants);
 #endif
-    if (!status) ++p->compiled_collections;
+    if (!status) {
+        ++p->compiled_collections;
+#ifdef NEOCLR_WORKER_PACED
+        p->allocation.last_allocations=p->allocation.allocations;
+        p->allocation.last_bytes=p->allocation.allocated_bytes;
+        p->allocation.boundaries=0;
+#endif
+    }
     return status;
 }
 static int32_t compiled_collect(neoclr_aot_context *context, const neoclr_probe_frame *head) {
@@ -131,7 +138,20 @@ static void compiled_boundary(neoclr_aot_context *context, const neoclr_probe_fr
     self->running = 1;
     ++p->compiled_running;
     if (p->compiled_running > p->compiled_peak) p->compiled_peak = p->compiled_running;
-    if (exclusive && self->handle && compiled_collect_locked(self, head)) abort();
+    if (exclusive && self->handle) {
+#ifdef NEOCLR_WORKER_PACED
+        /* Scheduling permission is independent of collection frequency. All
+         * dispatched allocations are counted pool-wide; explicit/pressure GC bypasses this
+         * opportunistic budget through compiled_collect. No timer guarantee. */
+        uint64_t byte_budget=self->context.text.capacity/8;
+        int due=p->allocation.allocations-p->allocation.last_allocations>=256 ||
+            p->allocation.allocated_bytes-p->allocation.last_bytes>=byte_budget ||
+            ++p->allocation.boundaries>=4096;
+        if (due && compiled_collect_locked(self,head)) abort();
+#else
+        if (compiled_collect_locked(self, head)) abort();
+#endif
+    }
     unlock(p);
 }
 int32_t neoclr_worker_invoke_capture_parallel(neoclr_worker_job *job) {

@@ -62,7 +62,14 @@ static void run(int fault) {
         }
     }
     unsigned peak; uint64_t collections, extent;
-    CHECK(neoclr_workers_compiled_statistics(p, &peak, &collections) && collections);
+    CHECK(neoclr_workers_compiled_statistics(p, &peak, &collections));
+#ifdef NEOCLR_WORKER_PACED
+    /* Small fault-only batches may never exhaust a budget; host cleanup still
+     * collects their retained faults/results. The graph must exercise pacing. */
+    if (!fault) CHECK(collections>0 && collections<100);
+#else
+    CHECK(collections);
+#endif
     if (!fault) CHECK(peak > 1);
 #ifdef NEOCLR_WORKER_COLLECTION_OWNER
     uint64_t owner_collections;

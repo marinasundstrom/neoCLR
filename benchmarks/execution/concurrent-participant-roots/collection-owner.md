@@ -62,6 +62,13 @@ using that request frequency for throughput. It is not an HTTP or ordinary paced
 result, and it establishes no concurrent performance gain. TSan, JIT worker paths,
 forced allocation exhaustion and complete resource/finalizer lifetimes remain open.
 
+## Scheduling follow-up
+
+[Budgeted collection](paced-collection.md) now separates exclusive mutation
+permission from forced collection frequency, retaining explicit/pressure paths and
+the forced mode as a control. Its improvement is measured against this stress
+fixture; live epochs and broad HTTP/memory/pause acceptance are still open.
+
 ## Next integration boundary
 
 A stable service context is now available for a live epoch, but worker mutation
