@@ -21,6 +21,20 @@ public class HttpServer {
     private var shutdown: CancellationTokenSource = CancellationTokenSource()
     private var active: int = 0
     private var serving: HttpServerRun? = null
+    private var persistent: HttpPersistentRun? = null
+
+    // Experimental driver admission remains internal until shutdown/fairness and
+    // the public option contract have been qualified together.
+    internal func ServePersistent(handler: (HttpRequest) -> Task<Result<HttpResponse, HttpError>>,
+        connections: int, handlers: int, token: CancellationToken) -> Task<Result<unit, HttpError>> {
+        if closed || serving is HttpServerRun || persistent is HttpPersistentRun || active != 0 ||
+            connections < 1 || connections > 1024 || handlers < 1 || handlers > connections {
+            return Task.FromResult<Result<unit, HttpError>>(Result<unit, HttpError>.Failure(HttpError.InvalidRequest("Invalid persistent Serve admission")))
+        }
+        let run = HttpPersistentRun(self, listener, handler, connections, handlers, token)
+        persistent = run
+        return run.Start()
+    }
     private var completedRequests: long = 0L
     private var failedRequests: long = 0L
     private var lastRequestError: Optional<HttpError> = None()
@@ -202,7 +216,7 @@ public class HttpServer {
     }
 
     private func AcceptCore(cancellationToken: CancellationToken, streaming: bool, managed: bool) -> Task<Result<HttpContext, HttpError>> {
-        if !managed && serving is HttpServerRun {
+        if persistent is HttpPersistentRun || (!managed && serving is HttpServerRun) {
             return Task.FromResult<Result<HttpContext, HttpError>>(Result<HttpContext, HttpError>.Failure(HttpError.InvalidRequest("Serve owns request acceptance")))
         }
         if cancellationToken.IsCancellationRequested {
@@ -253,7 +267,7 @@ public class HttpServer {
             _ = cancelled.Cancel()
             return cancelled.Task
         }
-        if closed || serving is HttpServerRun || active != 0 {
+        if closed || serving is HttpServerRun || persistent is HttpPersistentRun || active != 0 {
             return Task.FromResult<Result<System.Void, HttpError>>(Result<System.Void, HttpError>.Failure(HttpError.InvalidRequest("Serve requires an open idle server")))
         }
         let run = HttpServerRun(self, handler, cancellationToken)

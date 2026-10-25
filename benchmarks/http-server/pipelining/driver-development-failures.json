@@ -1,0 +1,101 @@
+[
+  {
+    "subject": "4 KiB idle input hits interpreter array budget",
+    "passed": false,
+    "lastCommand": {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/benchmarks/http-server/pipelining/bin/neoclr/DriverTests.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "200000000",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Runtime.dll"
+      ],
+      "exitCode": 1,
+      "stdout": "READY\n50664\n50665\n",
+      "stderr": "ArrayLimitExceeded: Array limit exceeded\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E364536353646343334433532324535323735364537343639364436355F353236353733363537323736363534313732373236313739 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_436865636B656453746F72616765.M_52657365727665 [instruction 1]\n   at NeoMetadata_F38ACFA23BA52A5824CD85287C57B85132961A89157DB315E92D37B4BB2DF65F.T_53797374656D2E5765622E48747470_487474705265717565737453657373696F6E.N_3C3E635F5F4173796E6353746174654D616368696E6538.M_4D6F76654E657874 [instruction 206]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_4173796E635461736B4D6574686F644275696C6465726031.M_5374617274 [instruction 1]\n   at NeoMetadata_F38ACFA23BA52A5824CD85287C57B85132961A89157DB315E92D37B4BB2DF65F.T_53797374656D2E5765622E48747470_487474705265717565737453657373696F6E.M_52656164436F7265 [instruction 35]\n   at NeoMetadata_F38ACFA23BA52A5824CD85287C57B85132961A89157DB315E92D37B4BB2DF65F.T_53797374656D2E5765622E48747470_487474705265717565737453657373696F6E.M_52656164 [instruction 29]\n   at NeoMetadata_F38ACFA23BA52A5824CD85287C57B85132961A89157DB315E92D37B4BB2DF65F.T_53797374656D2E5765622E48747470_4874747050657273697374656E74436F6E6E656374696F6E.N_3C3E635F5F4173796E6353746174654D616368696E6535.M_4D6F76654E657874 [instruction 178]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_4173796E635461736B4D6574686F644275696C6465726031.M_5374617274 [instruction 1]\n   at NeoMetadata_F38ACFA23BA52A5824CD85287C57B85132961A89157DB315E92D37B4BB2DF65F.T_53797374656D2E5765622E48747470_4874747050657273697374656E74436F6E6E656374696F6E.M_52756E [instruction 27]\n   at NeoMetadata_F38ACFA23BA52A5824CD85287C57B85132961A89157DB315E92D37B4BB2DF65F.T_53797374656D2E5765622E48747470_4874747050657273697374656E74436F6E6E656374696F6E.M_5374617274 [instruction 1]\n   at NeoMetadata_F38ACFA23BA52A5824CD85287C57B85132961A89157DB315E92D37B4BB2DF65F.T_53797374656D2E5765622E48747470_4874747050657273697374656E7452756E.N_3C3E635F5F4173796E6353746174654D616368696E6534.M_4D6F76654E657874 [instruction 302]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_526176656E2E47656E657261746564_556E697443616C6C6261636B.M_496E766F6B65 [instruction 2]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6E63757272656E63792E5461736B73_5461736B5175657565.M_447261696E [instruction 33]\nTraceback (most recent call last):\n  File \"/Users/robert/Projects/neoclr/benchmarks/http-server/pipelining/wire_probe.py\", line 75, in run_wire\n    response(b\"/first\", False)\n  File \"/Users/robert/Projects/neoclr/benchmarks/http-server/pipelining/wire_probe.py\", line 51, in response\n    block = client.recv(8192)\nConnectionResetError: [Errno 54] Connection reset by peer\n"
+    },
+    "scope": "Development failure capture; temporary diagnostics were removed. Final source hashes are in driver-results.json.gz."
+  },
+  {
+    "subject": "idle reads exceed existing five-second transfer cap",
+    "passed": false,
+    "lastCommand": {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/benchmarks/http-server/pipelining/bin/neoclr/DriverTests.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "200000000",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Runtime.dll"
+      ],
+      "exitCode": 1,
+      "stdout": "READY\n50736\n50737\nHELD\nSTATS 10 20 4 2\nTimedOut\n",
+      "stderr": "UserFault: Driver accounting\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_F38ACFA23BA52A5824CD85287C57B85132961A89157DB315E92D37B4BB2DF65F.T__3C3E635F5F4173796E6353746174654D616368696E653131.M_4D6F76654E657874 [instruction 466]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_526176656E2E47656E657261746564_556E697443616C6C6261636B.M_496E766F6B65 [instruction 2]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6E63757272656E63792E5461736B73_5461736B5175657565.M_447261696E [instruction 33]\n"
+    },
+    "scope": "Development failure capture; temporary diagnostics were removed. Final source hashes are in driver-results.json.gz."
+  },
+  {
+    "subject": "shutdown before queued sockets have been accepted",
+    "passed": false,
+    "lastCommand": {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/benchmarks/http-server/pipelining/bin/neoclr/DriverTests.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "200000000",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/uri-efficiency-bundle/bundle/lib/System.Runtime.dll"
+      ],
+      "exitCode": 1,
+      "stdout": "READY\n50789\n50790\nHELD\nSTATS 10 0 4 2\nSession wire passed\n",
+      "stderr": "Traceback (most recent call last):\n  File \"/Users/robert/Projects/neoclr/benchmarks/http-server/pipelining/wire_probe.py\", line 124, in run_wire\n    assert client.recv(1) == b\"\", \"idle connection survives shutdown\"\nConnectionResetError: [Errno 54] Connection reset by peer\n"
+    },
+    "scope": "Development failure capture; temporary diagnostics were removed. Final source hashes are in driver-results.json.gz."
+  }
+]

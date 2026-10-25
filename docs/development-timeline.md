@@ -1,5 +1,19 @@
 # Development conversation record
 
+## 2026-10-25 — Refresh the execution/collector benchmark matrix
+
+- **Author:** “When this is ready we have to do new benchmarks across Interpreter,
+  JIT, AOT and the two GCs”.
+- **Assistant response:** Will rerun plain/JSON HTTP and standalone workloads with
+  execution and collector modes reported separately; unsupported combinations must
+  be explicit. Existing correctness runs do not satisfy the benchmark request.
+- **Current action:** Qualifies a bounded persistent driver across five execution/
+  collector configurations, including idle connections, queued handlers and shutdown.
+  Testing exposed an idle input array-budget fault and the existing five-second
+  socket transfer cap. Smaller initial windows fix the former; the latter remains a
+  policy issue. Public enablement and fresh benchmark matrix remain open.
+- **Evidence:** [Driver tests and matrix plan](../benchmarks/http-server/pipelining/README.md).
+
 ## 2026-10-25 — Permit HTTP architecture changes during preview
 
 - **Author:** Explicitly permits architectural/design changes to HttpServer and

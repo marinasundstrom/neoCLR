@@ -4,19 +4,21 @@ from pathlib import Path
 p=argparse.ArgumentParser(description=__doc__)
 p.add_argument('--output',type=Path,required=True)
 p.add_argument('--wire',action='store_true',help='Qualify real connection response persistence')
+p.add_argument('--driver',action='store_true',help='Qualify persistent driver admission and shutdown')
 a=p.parse_args();root=Path(__file__).resolve().parents[3];base=Path(__file__).resolve().parent
 out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
 r=dict(passed=False,commands=[],runs=[],inputs={})
 runner=root/'target/release/deps/neoclr_codegen-12f33f26d2ff4df0'
 bundle=root/'target/uri-efficiency-bundle/bundle'
-stem='Wire' if a.wire else 'ReadAhead'
+stem='Driver' if a.driver else 'Wire' if a.wire else 'ReadAhead'
+a.wire = a.wire or a.driver
 assembly=base/('bin/neoclr/'+stem+'Tests.dll')
 expected='Session wire passed\n' if a.wire else 'Read-ahead: 45 windows passed\n'
 def run(cmd,env=None,wire=False):
  cmd=list(map(str,cmd))
  if wire:
   from wire_probe import run_wire
-  x=run_wire(cmd,root,env)
+  x=run_wire(cmd,root,env,driver=a.driver)
  else:x=subprocess.run(cmd,cwd=root,env=env,capture_output=True,text=True,timeout=300)
  row=dict(command=cmd,exitCode=x.returncode,stdout=x.stdout,stderr=x.stderr);r['commands'].append(row)
  x.check_returncode();return row

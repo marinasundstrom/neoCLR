@@ -1,0 +1,240 @@
+module System.Web.Http
+
+import System.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+import System.Networking.*
+import System.Networking.Security.*
+import System.Networking.Sockets.*
+import System.Result.*
+import System.Optional.*
+
+// All state belongs to one dispatcher/managed owner. Idle reads consume a bounded
+// connection slot, never a handler permit. A full connection table stops acceptance.
+internal class HttpPersistentRun {
+    private val server: HttpServer
+    private val listener: Socket
+    private val handler: (HttpRequest) -> Task<Result<HttpResponse, HttpError>>
+    private val slots: HttpPersistentConnection?[]
+    private val handlerLimit: int
+    private val token: CancellationToken
+    private val source = Promise<Result<unit, HttpError>>()
+    private val ready = Task.FromResult<unit>(())
+    private var count = 0
+    private var handlers = 0
+    private var stopping = false
+    private var acceptDone = false
+    private var accepting: Task<Result<unit, HttpError>>? = null
+    private var capacity: Promise<unit>? = null
+    private var head: HttpPersistentConnection? = null
+    private var tail: HttpPersistentConnection? = null
+    private var failure: Optional<HttpError> = None()
+    private var caller: CancellationRegistration? = null
+    private var shutdown: CancellationRegistration? = null
+
+    internal init(server: HttpServer, listener: Socket,
+        handler: (HttpRequest) -> Task<Result<HttpResponse, HttpError>>,
+        connectionLimit: int, handlerLimit: int, token: CancellationToken) {
+        self.server = server
+        self.listener = listener
+        self.handler = handler
+        self.handlerLimit = handlerLimit
+        self.token = token
+        slots = [for index in 0..connectionLimit => null]
+    }
+
+    internal func Start() -> Task<Result<unit, HttpError>> {
+        shutdown = server.StopToken.Register(self.Stop)
+        caller = token.Register(server.Close)
+        let pending = AcceptLoop()
+        accepting = pending
+        // Lifetime outcome adapter observes cancellation and waits for sessions.
+        pending.OnCompleted(self.OnAccepted)
+        return source.Task
+    }
+
+    private async func AcceptLoop() -> Task<Result<unit, HttpError>> {
+        while !server.IsClosed {
+            if count == slots.Length {
+                let available = Promise<unit>()
+                capacity = available
+                await available.Task
+                capacity = null
+                if server.IsClosed { break }
+            }
+            let result = await listener.Accept(server.StopToken)
+            let Ok(socket) = result else {
+                let Failure(error) = result else { System.Fail("Accept outcome") }
+                return Failure(HttpError.Transport(error))
+            }
+            if server.IsClosed { socket.Close(); break }
+            var slot = 0
+            while slots[slot] is HttpPersistentConnection { slot += 1 }
+            let operation = HttpPersistentConnection(self, server, HttpConnection(socket), handler, slot)
+            slots[slot] = operation
+            count += 1
+            operation.Start()
+        }
+        return Ok(())
+    }
+
+    private func OnAccepted() {
+        if accepting is Task<Result<unit, HttpError>> pending {
+            accepting = null
+            acceptDone = true
+            if !pending.IsCancelled {
+                if let Failure(error) = pending.GetResult() {
+                    if !server.IsClosed { failure = Some(error); server.Close() }
+                }
+            }
+            Finish()
+        }
+    }
+
+    internal func Acquire(operation: HttpPersistentConnection) -> Task<unit> {
+        if stopping {
+            let cancelled = Promise<unit>()
+            _ = cancelled.Cancel()
+            return cancelled.Task
+        }
+        if handlers < handlerLimit {
+            handlers += 1
+            operation.HasPermit = true
+            return ready
+        }
+        let waiting = Promise<unit>()
+        operation.Waiting = waiting
+        if tail is HttpPersistentConnection last { last.Next = operation }
+        else { head = operation }
+        tail = operation
+        return waiting.Task
+    }
+
+    internal func Release(operation: HttpPersistentConnection) {
+        if !operation.HasPermit { return }
+        operation.HasPermit = false
+        if !stopping && head is HttpPersistentConnection next {
+            head = next.Next
+            next.Next = null
+            if head is null { tail = null }
+            next.HasPermit = true
+            let waiting = next.Waiting
+            next.Waiting = null
+            if waiting is Promise<unit> pending { _ = pending.Complete(()) }
+        } else { handlers -= 1 }
+    }
+
+    internal func End(slot: int, error: Optional<HttpError>) {
+        slots[slot] = null
+        count -= 1
+        if !server.IsClosed && error is Some(let reason) { server.RecordFailure(reason) }
+        let available = capacity
+        capacity = null
+        if available is Promise<unit> pending { _ = pending.Complete(()) }
+        Finish()
+    }
+
+    private func Stop() {
+        if stopping { return }
+        stopping = true
+        if capacity is Promise<unit> available { _ = available.Cancel() }
+        capacity = null
+        while head is HttpPersistentConnection next {
+            head = next.Next
+            next.Next = null
+            if next.Waiting is Promise<unit> pending { _ = pending.Cancel() }
+            next.Waiting = null
+        }
+        tail = null
+        for operation in slots {
+            if operation is HttpPersistentConnection active { active.Close() }
+        }
+    }
+
+    private func Finish() {
+        if !acceptDone || count != 0 { return }
+        if caller is CancellationRegistration registration { registration.Dispose() }
+        caller = null
+        if shutdown is CancellationRegistration registration { registration.Dispose() }
+        shutdown = null
+        if failure is Some(let error) { _ = source.Complete(Failure(error)) }
+        else if token.IsCancellationRequested { _ = source.Cancel() }
+        else { _ = source.Complete(Ok(())) }
+    }
+}
+
+internal class HttpPersistentConnection {
+    private val owner: HttpPersistentRun
+    private val server: HttpServer
+    private val connection: HttpConnection
+    private val session: HttpRequestSession
+    private val handler: (HttpRequest) -> Task<Result<HttpResponse, HttpError>>
+    private val slot: int
+    private var task: Task<Result<unit, HttpError>>? = null
+    private var context: HttpContext? = null
+    internal var HasPermit: bool = false
+    internal var Next: HttpPersistentConnection? = null
+    internal var Waiting: Promise<unit>? = null
+
+    internal init(owner: HttpPersistentRun, server: HttpServer, connection: HttpConnection,
+        handler: (HttpRequest) -> Task<Result<HttpResponse, HttpError>>, slot: int) {
+        self.owner = owner
+        self.server = server
+        self.connection = connection
+        self.handler = handler
+        self.slot = slot
+        session = HttpRequestSession(connection, server.Settings, server.SslOptions is SslServerAuthenticationOptions)
+    }
+
+    internal func Start() {
+        let pending = self.Run()
+        task = pending
+        // Observe the task even after shutdown; late handler responses are disposed.
+        pending.OnCompleted(self.Completed)
+    }
+
+    private async func Run() -> Task<Result<unit, HttpError>> {
+        if server.SslOptions is SslServerAuthenticationOptions options {
+            _ = (await connection.AuthenticateServer(options,
+                NetworkDeadline.AfterMilliseconds(server.Settings.ReadMilliseconds), server.StopToken))?
+        }
+        while !server.IsClosed {
+            let request = (await session.Read(server.StopToken))?
+            await owner.Acquire(self)
+            if server.IsClosed { break }
+            let exchange = HttpContext(server, connection, request)
+            exchange.AttachSession(session)
+            context = exchange
+            let response = (await handler(request))?
+            if server.IsClosed { response.Dispose(); break }
+            _ = (await exchange.Send(response, server.StopToken))?
+            server.RecordServed()
+            let again = exchange.ConnectionReused
+            context = null
+            owner.Release(self)
+            if !again { break }
+        }
+        return Ok(())
+    }
+
+    internal func Close() {
+        if context is HttpContext exchange { exchange.Close() }
+        session.Close()
+    }
+
+    private func Completed() {
+        if task is Task<Result<unit, HttpError>> pending {
+            task = null
+            Close()
+            context = null
+            owner.Release(self)
+            var error: Optional<HttpError> = None()
+            if !pending.IsCancelled {
+                if let Failure(reason) = pending.GetResult() {
+                    if !session.OrderlyEof { error = Some(reason) }
+                }
+            } else if !server.IsClosed { error = Some(HttpError.Handler("Session cancelled")) }
+            owner.End(slot, error)
+        }
+    }
+}

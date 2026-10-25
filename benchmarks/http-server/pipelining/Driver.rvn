@@ -1,0 +1,77 @@
+import System.*
+import System.Runtime.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+import System.Networking.Sockets.*
+import System.Result.*
+import System.Optional.*
+import System.Collections.*
+import System.Web.Http.*
+
+// Entry adapter selects the already qualified owned runtime-await pump while
+// System.Web and Run keep native state-machine lowering. No GC admission bypass.
+func Main() -> Task<unit> {
+    return RuntimeAwaitProvider.Bridge.Start<unit>(() => {
+        let pending = Run()
+        if !RuntimeAwaitProvider.Bridge.Wait(pending) {
+            return TaskOutcome<unit>.Cancelled
+        }
+        pending.GetResult()
+        return TaskOutcome<unit>.Completed(())
+    })
+}
+
+class DriverApplication {
+    private val gate = Promise<unit>()
+    var Started: int = 0
+    var Peak: int = 0
+    private var active = 0
+
+    func Release() { _ = gate.Complete(()) }
+
+    async func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+        if request.Target == "/body" {
+            let Some(stream) = request.Content.TryGetStream() else { System.Fail("Body stream") }
+            let bytes: byte[] = [(byte)0, (byte)0]
+            let Ok(count) = await stream.Read(bytes, 0, 2) else { System.Fail("Body read") }
+            if count != 2 || bytes[0] != 65 || bytes[1] != 66 { System.Fail("Body bytes") }
+        }
+        if request.Target == "/hold" {
+            Started += 1
+            active += 1
+            if active > Peak { Peak = active }
+            if Started == 2 { Console.WriteLine("HELD") }
+            await gate.Task
+            active -= 1
+        }
+        GC.Collect()
+        return Ok(HttpResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), HttpStringContent(request.Target)))
+    }
+}
+
+async func Run() -> Task<unit> {
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 64) else { System.Fail("Listen") }
+    let Ok(control) = Socket.Listen("127.0.0.1", 0, 8) else { System.Fail("Control") }
+    let Ok(port) = server.GetLocalPort() else { System.Fail("Port") }
+    let Ok(controlPort) = control.GetLocalPort() else { System.Fail("Control port") }
+    let application = DriverApplication()
+    let lifetime = server.ServePersistent(application.Respond, 32, 2, CancellationToken.None)
+    Console.WriteLine("READY")
+    Console.WriteLine(port)
+    Console.WriteLine(controlPort)
+    let Ok(release) = await control.Accept() else { System.Fail("Release signal") }
+    release.Close()
+    if application.Started != 2 || application.Peak != 2 { System.Fail("Handler admission") }
+    application.Release()
+    let Ok(stop) = await control.Accept() else { System.Fail("Stop signal") }
+    stop.Close()
+    control.Close()
+    server.Close()
+    let Ok(_) = await lifetime else { System.Fail("Serve lifetime") }
+    Console.WriteLine("STATS " + server.CompletedRequests.ToString() + " " + server.FailedRequests.ToString() + " " + application.Started.ToString() + " " + application.Peak.ToString())
+    if let Some(error) = server.LastRequestError { Console.WriteLine(error.ToString()) }
+    if server.CompletedRequests != 11L || server.FailedRequests != 0L || application.Started != 4 || application.Peak != 2 {
+        System.Fail("Driver accounting")
+    }
+    Console.WriteLine("Session wire passed")
+}

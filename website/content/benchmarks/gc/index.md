@@ -433,5 +433,7 @@ Private read-ahead and input-session ownership now pass interpreter and
 sync/concurrent AOT/JIT checks, including 128 successive request messages and
 consumed/unread body boundaries. A private session-aware sender also passes 30 checked real-wire responses across
 those modes, including pipelined/sequential requests and consumed/unread POST bodies.
-Public Accept/Serve still closes each exchange; scheduling/admission integration
-and throughput measurements remain pending.
+An internal bounded driver additionally passes 55 wire responses across these modes,
+including idle-client admission, a two-handler limit and idle-read shutdown. Public
+Accept/Serve still closes each exchange; public enablement and the refreshed
+Interpreter/JIT/AOT collector benchmark matrix remain pending.

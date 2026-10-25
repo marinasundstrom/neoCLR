@@ -265,3 +265,63 @@ reruns the buffer/body/128-message input suite in all five modes; native concurr
 runs each complete 1,337 epochs with zero invalid-state reports. System.Web builds.
 TLS persistence, send failures, cancellation races, shutdown races, idle fairness
 and sustained multi-connection load remain unqualified. Defaults are unchanged.
+
+
+## Bounded persistent driver
+
+Internal `HttpServer.ServePersistent` now drives the session-aware path with
+independent connection and handler limits. A single accept loop fills a fixed
+connection table, then waits for capacity. Only requests with complete headers join
+the FIFO handler queue. An already completed permit task is reused when capacity
+is available; queued requests retain one promise and an intrusive link. Each
+connection remains on its original dispatcher/managed owner. Handler completion
+releases its permit before that connection competes for another one.
+
+Shutdown stops acceptance, cancels capacity/permit waits, closes pending reads and
+sends, and observes active handler tasks before finishing the lifetime task. A late
+response after shutdown is disposed. Orderly EOF before the next request is not
+recorded as a failed request; partial-request EOF still is. Public Serve/Accept
+continue to use the existing close-per-exchange driver while API options and
+resource/timeout policies remain under qualification.
+
+The admission fixture uses 32 connection slots and two handler permits:
+
+```sh
+python3 benchmarks/http-server/pipelining/validate-read-ahead.py --driver \
+  --output target/http-persistent-driver-new
+```
+
+`driver-results.json.gz` passes interpreter, sync AOT/JIT and concurrent AOT/JIT:
+11 responses per mode (55 total), two pipelined and sequential traffic phases,
+consumed/unread bodies, 20 idle clients during admission, four delayed handlers
+with measured maximum concurrency two, and a new batch of 20 accepted idle clients
+during shutdown. A later sentinel connection establishes acceptance before the
+shutdown signal. All modes report 11 completed requests, zero failures, four delayed
+handlers and maximum concurrency two. Concurrent native modes each complete 532
+GC epochs, with one cancellation and zero invalid-state reports. This is lifecycle
+qualification, not a throughput result or proof of all interleavings.
+
+The first test exposed excessive idle storage: 4 KiB per waiting input session hit
+an interpreter array budget. New network windows are now 256 bytes (retained
+coalesced windows still transfer whole). The test then exposed the existing
+five-second per-transfer cap in both socket backends, which overrides longer HTTP
+deadlines. Idle admission and shutdown are now separate bounded test phases; a
+longer HTTP timeout alone cannot qualify long-idle persistence. That policy, maximum
+resource pressure, TLS, handler failures, cancellation races and multi-owner loads
+remain open. Development failures are retained in `driver-development-failures.json`.
+No collector default or public persistent API is promoted by these results.
+
+### Requested next benchmark matrix
+
+The author explicitly requests fresh Interpreter/JIT/AOT measurements with both GCs
+after this integration (2026-10-25). Use the standard plain/JSON HTTP and six
+standalone patterns; keep connection-close, sequential persistence and pipelining
+separate. Record each actual execution/collector combination and any unsupported
+pair explicitly, preserving same-collector historical comparisons and independent
+GC policies. Existing five-mode correctness qualification is not that benchmark
+matrix. Include throughput, CPU, allocations, memory and diagnostic pause evidence;
+keep compilation/startup separate from steady execution and profiling separate from
+benchmark timing. Public enablement and benchmark results remain pending.
+
+The unchanged buffer/body/128-message suite also passes all five configurations in
+`driver-regression-results.json.gz`, and the separate System.Web build succeeds.

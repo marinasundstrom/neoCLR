@@ -19,6 +19,8 @@ internal class HttpRequestSession {
     private var reading: Task<Result<HttpRequest, HttpError>>? = null
     private var closed = false
     private var inputReleased = false
+    private var orderlyEof = false
+    internal val OrderlyEof: bool => orderlyEof
 
     internal init(connection: HttpConnection, settings: HttpServerSettings, secure: bool) {
         self.connection = connection
@@ -70,6 +72,7 @@ internal class HttpRequestSession {
         var buffer = Array<byte>.Empty
         var start = 0
         var count = 0
+        var receivedAny = false
         if connection.TakeReadAhead() is HttpReadAhead retained {
             if retained.Buffer is byte[] bytes {
                 buffer = bytes
@@ -79,12 +82,16 @@ internal class HttpRequestSession {
         }
         while !decoder.HeadersComplete {
             if start == count {
-                if buffer.Length == 0 { buffer = CheckedStorage.Reserve<byte>(4096) }
+                if buffer.Length == 0 { buffer = CheckedStorage.Reserve<byte>(256) }
                 start = 0
                 count = (await connection.ReceiveUntil(buffer, 0, buffer.Length, deadline, token))?
             }
             if closed { return Failure(HttpError.InvalidRequest("Session is closed")) }
-            if count == 0 { return Failure(HttpError.Protocol("EOF before complete request")) }
+            if count == 0 {
+                orderlyEof = !receivedAny
+                return Failure(HttpError.Protocol("EOF before complete request"))
+            }
+            receivedAny = true
             _ = decoder.Push(buffer[start..count])?
             start += decoder.Consumed
             if decoder.HeadersComplete {
