@@ -26,6 +26,22 @@ def parse(stderr, final):
     assert min(remainder.values())>=0
     return rows,remainder
 
+def parse_seed(stderr, seed):
+    # Reuse the checked histogram parser with two zero rows. Seed rows are
+    # nested within the snapshot-seed row, not disjoint collection work.
+    lines=stderr.splitlines() if isinstance(stderr,str) else stderr
+    selected=[line for line in lines if line.startswith('SEED_PART ')]
+    assert len(selected)==2
+    converted=[]
+    for line in selected:
+        fields=line.split();kind=int(fields[1]);assert kind in (0,1)
+        fields[0]='COLLECTION_PART';fields[1]=str(kind+2)
+        converted.append(' '.join(fields))
+    zero=' '.join(['0']*69)
+    converted += ['COLLECTION_PART '+str(i)+' '+zero for i in (0,1)]
+    rows,remainder=parse(converted,seed)
+    return dict(validation=rows[2],application=rows[3]),remainder
+
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--inputs',type=Path,nargs='+',required=True)
@@ -41,6 +57,7 @@ if __name__=='__main__':
             phases,event=finish.parse(trial['stderr'])
             assert phases[3]['count']==trial['candidateCounts'][1]
             rows,remainder=parse(trial['stderr'],phases[3])
-            result['trials'].append(dict(sample=trial.get('sample',data.get('sample')),mode=trial['mode'],round=trial.get('round',trial.get('pair')),parts={NAMES[k]:v for k,v in rows.items()},finalCollection=phases[3],remainder=remainder))
+            seed_parts,seed_remainder=parse_seed(trial['stderr'],rows[2]) if any(line.startswith('SEED_PART ') for line in (trial['stderr'].splitlines() if isinstance(trial['stderr'],str) else trial['stderr'])) else (None,None)
+            result['trials'].append(dict(sample=trial.get('sample',data.get('sample')),mode=trial['mode'],round=trial.get('round',trial.get('pair')),parts={NAMES[k]:v for k,v in rows.items()},finalCollection=phases[3],remainder=remainder,seedParts=seed_parts,seedRemainder=seed_remainder))
     result['passed']=True
     a.output.write_text(json.dumps(result,indent=2)+'\n')

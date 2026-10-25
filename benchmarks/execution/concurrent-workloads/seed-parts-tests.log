@@ -1,0 +1,3 @@
+PASS: final-phase gating, argument/result preservation, paired accounting and source guards; UB/bounds sanitizer
+PASS: part parser and negative accounting controls
+PASS: nested seed parser and negative accounting controls

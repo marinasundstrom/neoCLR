@@ -202,3 +202,5 @@ active collection and retains components of the same slowest invocation. The
 observed dominant cost is final collection, guiding index/root/seed/sweep work.
 
 Follow-up: [final-collection attribution and opt-in linear seed validation](collection-seed-results.md) retain disjoint CPU accounting, native/JIT/AOT safety, and modest uninstrumented HTTP gains with unchanged defaults.
+
+[Seed validation/application split](seed-parts-results.md) narrows the remaining seed work with nested CPU/wall accounting and retained diagnostics.
