@@ -186,6 +186,39 @@ static void cached_interior_header(int recent) {
     CHECK(!neoclr_gc_heap_release_v1(&c.text));
     puts("PASS stale cached interior header cannot extend the actual allocation");
 }
+/* Reuse is a proof of unchanged constraints, not permission to trust stale
+ * bytes. Invalid changes reject; a valid runtime kind transition refreshes. */
+static void cached_header_changes(void) {
+    uint64_t heap[256]={0};
+    neoclr_aot_context c={.text={(unsigned char *)heap,sizeof(heap),0}};
+    CHECK(!neoclr_gc_heap_acquire_v1(&c.text));
+    uint64_t *root=object(&c,24),*header=root-4;
+    CHECK(!experiment_gc_store(&c,root+1,42,8));
+    uint64_t original[4];memcpy(original,header,sizeof(original));
+    struct { unsigned field; uint64_t value; } corruptions[]={
+        {0,41},{0,UINT64_MAX},{1,0},{1,UINT64_MAX},{2,0},{2,7},{3,8},{3,2}
+    };
+    for(unsigned i=0;i<sizeof(corruptions)/sizeof(corruptions[0]);i++) {
+        header[corruptions[i].field]=corruptions[i].value;
+        CHECK(experiment_gc_store(&c,root+1,99,8)==3 && root[1]==42);
+        memcpy(header,original,sizeof(original));
+        CHECK(!experiment_gc_store(&c,root+1,42,8));
+    }
+    /* A valid shorter descriptor must not inherit its former writable extent. */
+    header[1]=8;
+    CHECK(experiment_gc_store(&c,root+2,99,8)==3 && root[2]==0);
+    memcpy(header,original,sizeof(original));
+    void *cell; CHECK(!neoclr_gc_allocate_v1(&c.text,8,NEOCLR_GC_INTERN,&cell));
+    CHECK(!experiment_gc_store(&c,cell,0,8));
+    CHECK(!neoclr_gc_complete_invocation_v1(&c));
+    CHECK(((uint64_t *)cell)[-2]==NEOCLR_GC_BYTES);
+    CHECK(!experiment_gc_store(&c,cell,17,8) && *(uint64_t *)cell==17);
+    CHECK(!experiment_gc_store(&c,cell,18,8) && *(uint64_t *)cell==18);
+    neoclr_probe_frame frame={.context=&c};
+    CHECK(!neoclr_gc_collect_v1(&c,&frame) && !c.text.used);
+    CHECK(!neoclr_gc_heap_release_v1(&c.text));
+    puts("PASS cached header constraints: mutation rejection, extent shrink and intern conversion");
+}
 static void cached_range_lifetime(void) {
     uint64_t heap[128]={0};
     neoclr_aot_context c={.text={(unsigned char *)heap,sizeof(heap),0}};
@@ -276,6 +309,7 @@ int main(void) {
     uint64_t counts[5]; experiment_gc_store_counts(counts);
     CHECK(counts[0]==2 && counts[1]>=5 && counts[2]>=97 && counts[3]==1 && counts[4]==8);
     direct_ranges();
+    cached_header_changes();
     cached_range_lifetime();
     cached_interior_header(0);
     cached_interior_header(1);

@@ -144,3 +144,7 @@ stack observations, including waits, are not CPU-time percentages.
 [Header-validation inlining](inline-header-results.md) is retained as an opt-in
 experiment: safety passes, but mixed/small performance effects leave the default
 outlined. The report separates initial and final control labels explicitly.
+
+[Cached header constraints](header-proof-results.md) test reuse under current owned
+allocation admission. Safety passes, but mixed sub-1% live effects leave full
+validation as the default; the extra native TLS is opt-in only.

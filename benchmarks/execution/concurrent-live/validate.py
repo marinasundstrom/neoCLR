@@ -9,6 +9,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--output', type=Path, required=True)
 parser.add_argument('--sparse-index', action='store_true')
 parser.add_argument('--store-ranges', type=int, choices=range(1,17), default=4)
+parser.add_argument('--header-proof', action='store_true')
 parser.add_argument('--inline-validation', action='store_true')
 parser.add_argument('--split-tls', action='store_true')
 parser.add_argument('--serialized-store', action='store_true')
@@ -31,6 +32,7 @@ try:
     run(['python3', base/'generate.py', '--output', source])
     recipe = json.loads((root/'benchmarks/execution/call-layout/results.json').read_text())['builds'][1]['command']
     cc = recipe[:recipe.index('-std=c11')] + [f'-DGATE_WORDS={args.gate_words}', f'-DNEOCLR_LIVE_STORE_RANGES={args.store_ranges}']
+    if args.header_proof: cc += ['-DNEOCLR_LIVE_HEADER_PROOF']
     if args.inline_validation: cc += ['-DNEOCLR_LIVE_INLINE_VALIDATION']
     if args.split_tls: cc += ['-DNEOCLR_LIVE_SPLIT_TLS']
     if args.serialized_store: cc += ['-DNEOCLR_LIVE_SERIALIZED_STORE']
@@ -93,6 +95,17 @@ __attribute__((destructor)) static void drain(void) { uint64_t stats[5]; experim
         run(cc+['-std=c11','-O2','-Wall','-Wextra','-Werror','-pthread','-DNEOCLR_NATIVE_GC','-DNEOCLR_GC_PROFILE','-DNEOCLR_SHADOW_TEST','-I',base.parent/'concurrent-mutation-gate','-I',root/'runtime/native/gc',base.parent/'concurrent-mutation-gate/gate.c',base/'store-test.c',root/'runtime/native/gc/root-probe.c',unsafe_source,'-o',unsafe_exe])
         result=subprocess.run([str(unsafe_exe)],capture_output=True,text=True,timeout=30)
         report['recentNegative']=dict(exitCode=result.returncode,stdout=result.stdout,stderr=result.stderr,expectedSignal='SIGABRT')
+        assert result.returncode == -signal.SIGABRT
+    if args.header_proof and not args.disable_store_cache:
+        unsafe_source=out/'unchecked-header-proof.c'
+        original_source=source.read_text()
+        guarded='int same_header=cached->span==live_store_last_header.span &&\n                cached->bytes==live_store_last_header.bytes &&\n                cached->kind==live_store_last_header.kind;'
+        assert original_source.count(guarded)==1
+        unsafe_source.write_text(original_source.replace(guarded,'int same_header=1;'))
+        unsafe_exe=out/'unchecked-header-proof'
+        run(cc+['-std=c11','-O2','-Wall','-Wextra','-Werror','-pthread','-DNEOCLR_NATIVE_GC','-DNEOCLR_GC_PROFILE','-DNEOCLR_SHADOW_TEST','-I',base.parent/'concurrent-mutation-gate','-I',root/'runtime/native/gc',base.parent/'concurrent-mutation-gate/gate.c',base/'store-test.c',root/'runtime/native/gc/root-probe.c',unsafe_source,'-o',unsafe_exe])
+        result=subprocess.run([str(unsafe_exe)],capture_output=True,text=True,timeout=30)
+        report['headerProofNegative']=dict(exitCode=result.returncode,stdout=result.stdout,stderr=result.stderr,expectedSignal='SIGABRT')
         assert result.returncode == -signal.SIGABRT
     report['inputs']={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in [source, *base.glob('*.[ch]'), base/'generate.py', base/'validate.py', * (base.parent/'concurrent-shadow').glob('*.[ch]'), *(base.parent/'concurrent-mutation-gate').glob('gate.[ch]')]}
     report['passed']=True

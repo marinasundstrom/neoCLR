@@ -14,6 +14,7 @@ p.add_argument('--build', type=Path, required=True)
 p.add_argument('--output', type=Path, required=True)
 p.add_argument('--rounds', type=int, default=5)
 p.add_argument('--guarded-control', action='store_true')
+p.add_argument('--header-proof', action='store_true')
 p.add_argument('--inline-validation', action='store_true')
 p.add_argument('--split-tls', action='store_true')
 p.add_argument('--serialized-store', action='store_true')
@@ -30,7 +31,7 @@ recipe_file = root / 'target/native-host-ownership/results.json'
 recipe = next(c['command'] for c in json.loads(recipe_file.read_text())['commands']
               if str(root / 'target/native-host-ownership/owned-aot') in c['command'])
 modes = ['sync', 'guarded-sync', 'live'] if a.guarded_control else ['sync', 'live']
-report = {'inlineValidation': a.inline_validation, 'splitTls': a.split_tls, 'serializedStore': a.serialized_store, 'optimizationLevel': build.get('optimizationLevel','none'), 'passed': False, 'scope': __doc__, 'iterations': build['iterations'],
+report = {'headerProof': a.header_proof, 'inlineValidation': a.inline_validation, 'splitTls': a.split_tls, 'serializedStore': a.serialized_store, 'optimizationLevel': build.get('optimizationLevel','none'), 'passed': False, 'scope': __doc__, 'iterations': build['iterations'],
           'commands': [], 'trials': [], 'inputs': {}, 'excluded': []}
 def run(command):
     result = subprocess.run(list(map(str, command)), cwd=root, capture_output=True,
@@ -131,6 +132,7 @@ static void report_profile(struct rusage *a, struct rusage *b, struct timespec *
                 command += ['-DWORKLOAD_LIVE', '-DNEOCLR_SHADOW_SPARSE_INDEX',
                             '-I', str(root / 'runtime/native/memory'), '-I', str(gate), str(gate / 'gate.c')]
             if a.profile_store_sites and mode != 'sync': command += ['-DNEOCLR_STORE_SITES']
+            if a.header_proof: command += ['-DNEOCLR_LIVE_HEADER_PROOF']
             if a.inline_validation: command += ['-DNEOCLR_LIVE_INLINE_VALIDATION']
             if a.split_tls: command += ['-DNEOCLR_LIVE_SPLIT_TLS']
             if a.serialized_store: command += ['-DNEOCLR_LIVE_SERIALIZED_STORE']

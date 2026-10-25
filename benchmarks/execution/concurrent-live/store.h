@@ -2,7 +2,15 @@
  * supplies a valid native destination; out-of-arena storage is trusted stack or
  * host storage, not permission to mutate a different managed heap. */
 #if !defined(NEOCLR_LIVE_NO_STORE_CACHE) && !defined(NEOCLR_LIVE_LINEAR_STORE)
+#ifndef NEOCLR_LIVE_HEADER_PROOF
 static _Thread_local const void *live_store_last_payload;
+#else
+static _Thread_local struct {
+    const void *payload;
+    uint64_t span, bytes, kind;
+} live_store_last_header;
+#define live_store_last_payload (live_store_last_header.payload)
+#endif
 #ifndef NEOCLR_LIVE_STORE_RANGES
 #define NEOCLR_LIVE_STORE_RANGES 4
 #endif
@@ -55,6 +63,9 @@ int experiment_gc_store(neoclr_aot_context *context, void *destination,
     if (address<base || address-base>=context->text.used) goto rejected;
     neoclr_aot_text_arena *a=&context->text;
     block *b=NULL;
+#if !defined(NEOCLR_LIVE_NO_STORE_CACHE) && !defined(NEOCLR_LIVE_LINEAR_STORE) && defined(NEOCLR_LIVE_HEADER_PROOF)
+    int reused_header=0;
+#endif
 #ifndef NEOCLR_LIVE_LINEAR_STORE
     if (candidate_active) {
         shadow_snapshot *snapshot=shadow_owner->job;
@@ -80,9 +91,26 @@ int experiment_gc_store(neoclr_aot_context *context, void *destination,
         uintptr_t previous=(uintptr_t)live_store_last_payload;
         if (previous>=base && previous-base>=sizeof(block) && previous-base<a->used && address>=previous) {
             uint64_t at=previous-base-sizeof(block);
-            if (!block_valid(a,at)) goto rejected;
             block *cached=(void *)(a->data+at);
+#ifdef NEOCLR_LIVE_HEADER_PROOF
+            /* The tuple was validated when this hint was installed. Current
+             * owned-base admission above protects its address; matching fields
+             * preserve the immutable constraints. State and extent stay live.
+             * A legitimate metadata transition is revalidated, never assumed. */
+            int same_header=cached->span==live_store_last_header.span &&
+                cached->bytes==live_store_last_header.bytes &&
+                cached->kind==live_store_last_header.kind;
+            if (same_header) {
+                if (!(cached->state&ALLOCATED) || cached->state>7 ||
+                    cached->span>a->used-at) goto rejected;
+            } else if (!block_valid(a,at)) goto rejected;
+#else
+            if (!block_valid(a,at)) goto rejected;
+#endif
             if ((cached->state&ALLOCATED) && address-previous<cached->bytes) {
+#ifdef NEOCLR_LIVE_HEADER_PROOF
+                reused_header=same_header;
+#endif
                 b=cached;
                 live_store_lookup_counts[0]++;
                 goto located;
@@ -141,6 +169,13 @@ located:;
     if (live_store_last_payload!=(void *)payload) {
         live_store_recent[live_store_recent_next]=live_store_last_payload;
         live_store_recent_next=(live_store_recent_next+1)%(NEOCLR_LIVE_STORE_RANGES-1);
+    }
+#endif
+#ifdef NEOCLR_LIVE_HEADER_PROOF
+    if (!reused_header) {
+        live_store_last_header.span=b->span;
+        live_store_last_header.bytes=b->bytes;
+        live_store_last_header.kind=b->kind;
     }
 #endif
     live_store_last_payload=(void *)payload;
