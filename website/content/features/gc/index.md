@@ -21,8 +21,8 @@ both its own performance history and comparisons with the other collector.
 
 An opt-in native optimization retains typed primitive-array stores through lowering,
 combining element and initialization admission while preserving ownership checks.
-It reduces CPU in the standalone AOT/JIT buffer-reuse comparisons; HTTP
-performance qualification remains pending.
+It reduces CPU in the standalone AOT/JIT buffer-reuse comparisons. Plain/JSON
+HTTP correctness checks pass; repeated HTTP performance measurements remain pending.
 
 [Current results](/benchmarks/gc/) · [Benchmarking and profiling procedure](/benchmarks/gc/procedure/)
 

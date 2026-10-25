@@ -194,3 +194,11 @@ Reproduce with `compare-scalar-jit.py --build target/gc-patterns-standard-build
 --aot target/gc-scalar-store-cost-v1 --runner <qualified-runner>
 --output <fresh-directory>`. HTTP qualification and pause effects remain pending;
 concurrent-default acceptance is still open.
+
+## HTTP qualification follow-up
+
+[Fresh paired HTTP hosts](scalar-store-http.md) pass 36 cells/2,880 responses across
+plain/JSON, close/keep-alive/pipeline and six AOT/JIT variants, with 598 concurrent
+epochs and equal control/candidate allocation work. Two additional JIT cases verify
+ambient feature flags cannot leak into controls. Repeated HTTP performance and
+pause measurements remain open; the qualification result is not a throughput gain.

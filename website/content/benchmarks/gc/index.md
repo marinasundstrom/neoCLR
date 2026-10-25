@@ -537,3 +537,9 @@ matching AOT. Reuse-buffer CPU falls **52.8%**, from 114.1 to 53.9 ms. Other eff
 are small and mixed: compute is 2.4% slower in this short cohort. Compilation and
 metadata loading are recorded separately from invocation CPU. HTTP qualification
 and pause effects remain pending; the feature stays opt-in.
+
+Fresh HTTP correctness qualification now passes **2,880 responses across 36 cells**:
+plain/JSON, close/keep-alive/pipeline, and sync/concurrent-control/scalar-candidate
+AOT/JIT. There are 598 completed concurrent epochs; paired allocation work matches.
+Two additional JIT cases verify benchmark flag isolation. Repeated HTTP throughput,
+CPU and pause measurements remain pending; qualification timings are not a gain claim.

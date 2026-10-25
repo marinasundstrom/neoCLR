@@ -8,6 +8,8 @@ import subprocess
 import runpy
 
 p=argparse.ArgumentParser(description=__doc__)
+p.add_argument('--reuse-assembly',action='store_true',help='Use an existing compiled benchmark assembly for matched builds')
+p.add_argument('--scalar-array-stores',action='store_true')
 p.add_argument('--output',type=Path,required=True)
 a=p.parse_args()
 root=Path(__file__).resolve().parents[3]
@@ -16,16 +18,22 @@ out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
 bundle=root/'target/uri-efficiency-bundle/bundle'
 runner=root/'target/release/deps/neoclr_codegen-12f33f26d2ff4df0'
 assembly=base/'bin/neoclr/BenchmarkTests.dll'
-r=dict(passed=False,scope='Build only; execute smoke and measured clients separately',commands=[],recipes={},inputs={})
+r=dict(passed=False,scalarArrayStores=a.scalar_array_stores,scope='Build only; execute smoke and measured clients separately',commands=[],recipes={},inputs={})
 
 def run(command,env=None):
     command=list(map(str,command))
     x=subprocess.run(command,cwd=root,env=env,capture_output=True,text=True,timeout=300)
-    r['commands'].append(dict(command=command,exitCode=x.returncode,stdout=x.stdout,stderr=x.stderr))
+    r['commands'].append(dict(command=command,environment=None if env is None else {k:v for k,v in env.items() if k.startswith('NEOCLR_')},exitCode=x.returncode,stdout=x.stdout,stderr=x.stderr))
     x.check_returncode()
 
 try:
-    run(['dotnet',bundle/'sdk/tools/rvnc/rvnc.dll','neoclr','--project',base/'Benchmark.rvnproj'],dict(os.environ,NeoClrBundleRoot=str(bundle)))
+    collector=out/'native-gc.c'
+    provider=out/'text-arena.c'
+    run(['python3',root/'benchmarks/execution/concurrent-live/native-scopes.py','--output',collector])
+    run(['python3',root/'benchmarks/execution/concurrent-store/native-providers.py','--output',provider])
+    if not a.reuse_assembly:
+        run(['dotnet',bundle/'sdk/tools/rvnc/rvnc.dll','neoclr','--project',base/'Benchmark.rvnproj'],dict(os.environ,NeoClrBundleRoot=str(bundle)))
+    assert assembly.is_file()
     reflection=list(map(str,runpy.run_path(str(bundle/'tools/run-native-sample.py'))['reflection_roots'](
         bundle/'bin/neoclr',assembly,['Person'],run)))
     original=json.loads((root/'target/gc-patterns-standard-build/compute/live-command.json').read_text())
@@ -42,6 +50,8 @@ try:
         path=out/(mode+'-selection.json');path.write_text(json.dumps(selection,indent=2)+'\n')
         settings=dict(NEOCLR_TEST_OPT_LEVEL='speed',NEOCLR_LIVE_SELECTION_COMMAND=str(path),NEOCLR_LIVE_SELECTION_MODE=mode)
         env=dict(os.environ)
+        env.pop('NEOCLR_LIVE_SCALAR_ARRAY_STORES',None)
+        if mode=='live' and a.scalar_array_stores:settings['NEOCLR_LIVE_SCALAR_ARRAY_STORES']='1'
         for flag in ['NEOCLR_LIVE_ELIDE_STACK_ARGUMENTS','NEOCLR_LIVE_FORWARD_STACK_ARGUMENTS',
                      'NEOCLR_LIVE_ELIDE_FORWARDED_STACK_ARGUMENTS','NEOCLR_LIVE_SSA_BYREF_ARGUMENTS']:
             env.pop(flag,None)
@@ -56,6 +66,8 @@ try:
             assert not any(v.startswith(('-DNEOCLR_GC_ALLOCATION_BUDGET=', '-DNEOCLR_GC_PUBLICATION_BUDGET=')) for v in link)
             link += ['-DNEOCLR_GC_ALLOCATION_BUDGET=256', '-DNEOCLR_GC_PUBLICATION_BUDGET=4096']
         if mode=='live':
+            link=[str(collector) if v.endswith('/native-gc.c') else str(provider) if v.endswith('/text-arena.c') else v for v in link]
+            if a.scalar_array_stores:link+=['-DNEOCLR_LIVE_SCALAR_ARRAY_STORES']
             assert '-DNEOCLR_GC_ALLOCATION_BUDGET=1024' in link
             assert '-DNEOCLR_GC_PUBLICATION_BUDGET=16384' in link
             assert '-DNEOCLR_LIVE_NO_STORE_CACHE' in link
@@ -73,6 +85,9 @@ try:
     paths+=list((root/'runtime/raven/src/System/Web').rglob('*.rvn'))
     paths+=[out/'sync',out/'live']
     paths+=list(out.glob('*.o'))+list(out.glob('*.dylib'))+list(out.glob('*selection.json'))
+    paths += [collector,provider,root/'benchmarks/execution/concurrent-live/store.h']
+    for command in r['commands']:
+        paths += [Path(value) for value in command['command'] if Path(value).is_file()]
     for path in paths:r['inputs'][str(path)]=hashlib.sha256(path.read_bytes()).hexdigest()
     r['passed']=True
 finally:

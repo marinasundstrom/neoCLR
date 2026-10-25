@@ -107,7 +107,8 @@ def trial(mode,sample,protocol,repetition):
     output=[];errors=[];lines=queue.Queue()
     env=dict(os.environ)
     for flag in ['NEOCLR_LIVE_ELIDE_STACK_ARGUMENTS','NEOCLR_LIVE_FORWARD_STACK_ARGUMENTS',
-                 'NEOCLR_LIVE_ELIDE_FORWARDED_STACK_ARGUMENTS','NEOCLR_LIVE_SSA_BYREF_ARGUMENTS']:
+                 'NEOCLR_LIVE_ELIDE_FORWARDED_STACK_ARGUMENTS','NEOCLR_LIVE_SSA_BYREF_ARGUMENTS',
+                 'NEOCLR_LIVE_SCALAR_ARRAY_STORES']:
         env.pop(flag,None)
     env.update(recipe['env'])
     client_before=resource.getrusage(resource.RUSAGE_SELF)

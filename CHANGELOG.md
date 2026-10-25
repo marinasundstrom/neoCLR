@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-25
 
+- Qualify opt-in scalar stores on fresh paired HTTP hosts: 36 plain/JSON close/keep-alive/pipeline cells across sync/control/candidate AOT/JIT pass 2,880 responses and 598 concurrent epochs, with matching paired allocation work. Record compiler flags and current native sources, verify unchanged sync objects, and prevent ambient scalar flags leaking into JIT controls (two additional cases pass). This is correctness qualification; repeated HTTP performance/pause measurement remains pending.
+
 - Qualify typed scalar stores across 48 full JIT standalone invocations with exact output, GC epoch and AOT-matching allocation checks. Concurrent reuse-buffer CPU falls 52.8% (114.1 to 53.9 ms); other effects are small/mixed, including a 2.4% compute regression in this short cohort. Keep compilation costs separate and the feature opt-in; HTTP and pause/default qualification remain pending.
 
 - Add opt-in typed scalar-array stores to the concurrent native backend: admit one primitive element/initialization update once, preserving ownership, allocation identity, shape/extent, normalization and nontracing rules. Native safety/negative controls and expanded paced/unpaced AOT/JIT width tests pass, including sanitized AOT; disabled standard-sample objects remain byte-identical. A matched 84-invocation AOT cohort halves reuse-buffer CPU (114.5 to 56.7 ms) with unchanged allocations/memory and little change elsewhere. Full JIT workload/HTTP performance remain pending; byte/reference/record stores, public APIs and defaults are unchanged.
