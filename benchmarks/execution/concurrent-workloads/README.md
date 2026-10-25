@@ -184,3 +184,7 @@ exact outside-store sites for the next compiler-provenance investigation.
 [Bounded stack-argument audit](stack-argument-audit-results.md) follows those sites
 into the checked compiler closure. Read-only reports preserve byte-identical
 objects and distinguish candidate static stores from qualified guard elimination.
+
+[Bounded stack-store experiment](stack-elision-results.md) adds test-only guard
+removal, mixed-pointer exclusion tests and matched previous-code controls across
+ordinary and HTTP workloads. The native collector settings remain identical.

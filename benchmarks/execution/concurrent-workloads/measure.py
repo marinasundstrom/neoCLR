@@ -16,6 +16,8 @@ p.add_argument('--compare-exact-allocation-index',action='store_true',help='Inte
 p.add_argument('--direct-exact-allocation-index',action='store_true')
 p.add_argument('--exact-allocation-index',action='store_true')
 p.add_argument('--build', type=Path, required=True)
+p.add_argument('--previous-build', type=Path, help='Previous generated objects with the same inlined native host')
+p.add_argument('--modes', nargs='+', help='Select unique enabled modes')
 p.add_argument('--output', type=Path, required=True)
 p.add_argument('--rounds', type=int, default=5)
 p.add_argument('--guarded-control', action='store_true')
@@ -33,6 +35,7 @@ p.add_argument('--profile-store-walks', action='store_true')
 p.add_argument('--profile-store-sites', action='store_true')
 a = p.parse_args()
 assert a.rounds > 0
+assert not a.previous_build or a.compare_inline_base
 assert not a.compare_worker_tls or (a.compare_inline_base and not a.split_tls)
 assert not a.compare_inline_base or a.compare_exact_allocation_index
 assert not a.compare_exact_allocation_index or (a.allocation_index and not a.exact_allocation_index and not a.direct_exact_allocation_index)
@@ -55,6 +58,15 @@ if a.compare_inline_base:
 if a.compare_worker_tls:
     modes += ['live-hybrid-worker-inline']
     if a.guarded_control: modes += ['guarded-sync-hybrid-worker-inline']
+if a.previous_build:
+    previous = json.loads((a.previous_build / 'results.json').read_text())
+    assert previous['passed'] and previous['iterations'] == build['iterations']
+    assert {c['sample']: c['expectedPerIteration'] for c in previous['cases']} == {c['sample']: c['expectedPerIteration'] for c in build['cases']}
+    modes += ['live-previous-hybrid-inline']
+    if a.guarded_control: modes += ['guarded-sync-previous-hybrid-inline']
+if a.modes:
+    assert len(set(a.modes)) == len(a.modes) and set(a.modes) <= set(modes)
+    modes = [m for m in modes if m in a.modes]
 report = {'compareWorkerTls':a.compare_worker_tls,'compareInlineBase':a.compare_inline_base,'compareExactAllocationIndex':a.compare_exact_allocation_index,'modeOrder':'rotating forward/reverse cycles' if a.compare_exact_allocation_index else 'alternating forward/reverse','directExactAllocationIndex':a.direct_exact_allocation_index,'exactAllocationIndex':a.exact_allocation_index,'allocationIndex':a.allocation_index,'splitStoreTls':a.split_store_tls,'fullStoreWalk':a.full_store_walk,'repeatSnapshotLookup': a.repeat_snapshot_lookup, 'headerProof': a.header_proof, 'inlineValidation': a.inline_validation, 'splitTls': a.split_tls, 'serializedStore': a.serialized_store, 'optimizationLevel': build.get('optimizationLevel','none'), 'passed': False, 'scope': __doc__, 'iterations': build['iterations'],
           'commands': [], 'trials': [], 'inputs': {}, 'excluded': []}
 if a.profile_store_walks:report['diagnosticOnly']='Heap-walk instrumentation; timings are not benchmark evidence.'
@@ -156,7 +168,8 @@ static void report_profile(struct rusage *a, struct rusage *b, struct timespec *
             for item in recipe:
                 if item.endswith('/owned-host.c'): item = str(host)
                 elif item == str(root / 'target/root-map/candidate.o'):
-                    item = str(a.build.resolve() / case['sample'] / (('sync' if mode == 'sync' else 'live') + '.o'))
+                    origin = a.previous_build if '-previous-' in mode else a.build
+                    item = str(origin.resolve() / case['sample'] / (('sync' if mode == 'sync' else 'live') + '.o'))
                 elif mode != 'sync' and item.endswith('/native-gc.c'): item = str(guarded if mode.startswith('guarded-sync') else collector)
                 elif mode != 'sync' and item.endswith('/text-arena.c'): item = str(provider)
                 command.append(item)
@@ -219,6 +232,9 @@ static void report_profile(struct rusage *a, struct rusage *b, struct timespec *
         len({(t.get('allocations'), t.get('allocatedBytes')) for t in report['trials'] if t['sample'] == c['sample']}) == 1
         for c in admitted)
     report['passed'] = report['allocationEquality'] and bool(report['trials']) and all(t['passed'] for t in report['trials'])
+    if a.previous_build:
+        path = a.previous_build / 'results.json'
+        report['inputs'][str(path.resolve())] = hashlib.sha256(path.read_bytes()).hexdigest()
     for path in [Path(__file__), a.build / 'results.json', recipe_file]:
         report['inputs'][str(path.resolve())] = hashlib.sha256(path.read_bytes()).hexdigest()
 finally:

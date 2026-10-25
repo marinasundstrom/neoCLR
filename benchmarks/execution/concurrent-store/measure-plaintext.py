@@ -19,6 +19,7 @@ p.add_argument('--direct-exact-allocation-index',action='store_true')
 p.add_argument('--sync-object',type=Path,required=True)
 p.add_argument('--live-object',type=Path,required=True)
 p.add_argument('--previous-live-object',type=Path)
+p.add_argument('--previous-inline-object',type=Path,help='Compare previous generated code using the same inlined exact-index native host.')
 p.add_argument('--output',type=Path,required=True)
 p.add_argument('--requests',type=int,default=256)
 p.add_argument('--allow-allocation-variation',action='store_true',help='Report scheduling-dependent allocation ranges instead of requiring equality.')
@@ -46,6 +47,7 @@ p.add_argument('--profile-cpu', action='store_true', help='macOS sample capture;
 p.add_argument('--profile-store-walks', action='store_true')
 p.add_argument('--profile-store-sites', action='store_true')
 a=p.parse_args();assert a.requests>0 and a.warmup>=0 and a.pairs>0
+assert not a.previous_inline_object or (a.compare_inline_base and not a.previous_live_object)
 assert not a.compare_worker_tls or a.compare_inline_base
 assert not a.compare_inline_base or (a.compare_exact_allocation_index and not a.direct_exact_allocation_index)
 assert not a.direct_exact_allocation_index or a.compare_exact_allocation_index
@@ -191,6 +193,9 @@ static void report_measurement(void) {
  if a.previous_live_object:
   configurations.append(('live-previous-code',a.previous_live_object))
   if a.include_guarded_sync:configurations.append(('guarded-sync-previous-code',a.previous_live_object))
+ if a.previous_inline_object:
+  configurations.append(('live-previous-inline-index',a.previous_inline_object))
+  if a.include_guarded_sync: configurations.append(('guarded-sync-previous-inline-index',a.previous_inline_object))
  if a.modes:
   assert len(set(a.modes))==len(a.modes) and set(a.modes)<=set(mode for mode,_ in configurations)
   configurations=[(mode,obj) for mode,obj in configurations if mode in a.modes]
@@ -327,6 +332,7 @@ static void report_measurement(void) {
  for path in [a.sync_object.resolve(),a.live_object.resolve(),Path(__file__),recipe_path,host,source,provider,base/'native-providers.py',base.parent/'concurrent-live/native-scopes.py',base.parent/'concurrent-mutation-gate/gate.c',base.parent/'concurrent-mutation-gate/gate.h',base.parent/'concurrent-live/store.h',*[Path(x) for x in recipe if Path(x).is_file()],*[p for p in (root/'runtime/native').rglob('*') if p.suffix in ['.c','.h']]]:
   r['inputs'][str(path)]=hashlib.sha256(path.read_bytes()).hexdigest()
  if a.previous_live_object:r['inputs'][str(a.previous_live_object.resolve())]=hashlib.sha256(a.previous_live_object.read_bytes()).hexdigest()
+ if a.previous_inline_object:r['inputs'][str(a.previous_inline_object.resolve())]=hashlib.sha256(a.previous_inline_object.read_bytes()).hexdigest()
  if a.include_guarded_sync:r['inputs'][str(guarded_source)]=hashlib.sha256(guarded_source.read_bytes()).hexdigest()
  r['passed']=True
 finally:(out/'results.json').write_text(json.dumps(r,indent=2)+'\n')

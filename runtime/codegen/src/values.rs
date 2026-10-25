@@ -5866,6 +5866,11 @@ pub(crate) fn compile_into(
         if let Ok(path) = std::env::var("NEOCLR_LIVE_STACK_ARGUMENT_AUDIT") {
             std::fs::write(path, serde_json::to_vec_pretty(&crate::mutation_store::stack_audit::report(module, &bodies))?)?;
         }
+        #[cfg(test)]
+        if std::env::var_os("NEOCLR_LIVE_ELIDE_STACK_ARGUMENTS").is_some() {
+            let count = crate::mutation_store::stack_audit::elide(module, &mut live_bodies)?;
+            eprintln!("live stack-argument elision: {count} stores");
+        }
         for (id, mut context) in live_bodies {
             define_checked(module, id, &mut context, stack_budget, long_range_calls)?;
             if id == export && platform_target == super::Target::WindowsX64 && frame_charge(&context, true)? > 4096 {
