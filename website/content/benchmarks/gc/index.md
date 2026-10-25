@@ -659,3 +659,12 @@ release removes about 189.6 MiB of live native malloc storage. It leaves roughly
 much larger and RSS varies; one released sync case has higher RSS than its control.
 This explains why live-data cleanup and resident-memory reduction must be measured
 separately. It does not identify a managed-heap leak or establish a GC speedup.
+
+An opt-in macOS ARM64 stack-bound layout reduces two TLS lookups to one while
+preserving current bounds, reserve limits, reset and thread isolation. Matched
+AOT/JIT cohorts pass 148,032 responses plus 60 standalone runs. Concurrent HTTP
+invocation CPU improves about 1–3.4% in AOT and 1.2–4.5% in JIT, but AOT JSON wall
+throughput and standalone reuse regress slightly. This remains a shared-runtime
+candidate, not a default change or a broad concurrent-GC advantage. JIT compilation
+still occurs synchronously before execution; concurrent GC can run alongside the
+resulting application code.

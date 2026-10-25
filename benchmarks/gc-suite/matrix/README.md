@@ -247,3 +247,12 @@ Neither is RSS or direct-mapping attribution. The harness sets the test-only nat
 memory switch only for memory profiles and clears it for ordinary runs. Rebuild
 older runners before requesting JIT `--process-memory`; missing stages are errors.
 See [native accounting](../../../docs/validation/native-malloc-accounting-20261025/README.md).
+
+For stack-bound TLS layout, use `prepare-stack-bounds.py --build <qualified-http>
+--baseline-source <preserved-native-stack.c> --output <paired-build>`. The preserved
+source must match the base manifest; all other inputs are checked unchanged.
+Run split/grouped sync/live AOT recipes with `http.py`. Add current JIT recipes via
+`prepare-stack-jit.py --build <paired-build> --runner <pinned-runner> --output
+<jit-build>`; both layouts use fallback placement. For six standalone patterns use
+`compare-root-validation.py --stack-bounds`, keeping root validation unchanged.
+See [qualification and mixed results](../../../docs/validation/grouped-stack-bounds-20261025/README.md).

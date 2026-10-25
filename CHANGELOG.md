@@ -54,6 +54,11 @@ continues as an experimental native development path.
   separating diagnostic timings from benchmarks and retaining capture hashes,
   TLS caller attribution, handler, protocol and execution-mode identities.
 
+- Add an opt-in macOS ARM64 stack-bound layout that resolves lower/upper bounds
+  through one TLS lookup while retaining current-owner checks, reserve limits,
+  bound replacement and reset. Matched HTTP and standalone qualification reports
+  modest, mixed changes; this is shared runtime work, not a collector-default switch.
+
 - Reduce repeated native root publication/descriptor validation, metadata and
   managed-allocation lookup work, redundant initialization and allocation
   bookkeeping. Add an opt-in small/large storage-validation split that preserves

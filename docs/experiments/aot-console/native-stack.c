@@ -5,7 +5,14 @@
 #error "native stack probe requires macOS ARM64"
 #endif
 
+/* Keep the same per-activation bounds; grouping only shares TLS resolution. */
+#ifdef NEOCLR_GROUP_STACK_BOUNDS
+static _Thread_local struct { uintptr_t lower, upper; } retained_bounds;
+#define retained_lower (retained_bounds.lower)
+#define retained_upper (retained_bounds.upper)
+#else
 static _Thread_local uintptr_t retained_lower, retained_upper;
+#endif
 void neoclr_native_stack_bounds_v1(uintptr_t lower, uintptr_t upper) {
     retained_lower = lower;
     retained_upper = upper;

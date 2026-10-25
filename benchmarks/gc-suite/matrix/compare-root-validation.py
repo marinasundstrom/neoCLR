@@ -13,11 +13,14 @@ p.add_argument('--objects',type=Path,required=True)
 p.add_argument('--samples',type=Path,required=True)
 p.add_argument('--output',type=Path,required=True)
 p.add_argument('--rounds',type=int,default=5)
+p.add_argument('--stack-bounds',action='store_true',help='Compare split/grouped stack-bound TLS with unchanged root validation')
 a=p.parse_args();assert a.rounds>=3
+modes=['control','grouped'] if a.stack_bounds else ['control','split']
+variant='NEOCLR_GROUP_STACK_BOUNDS' if a.stack_bounds else 'NEOCLR_GC_SPLIT_STORAGE_VALIDATION'
 root=Path(__file__).resolve().parents[3];out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
 prior=json.loads(a.prior.read_text());samples=json.loads(a.samples.read_text())
 assert prior['passed'] and samples['passed'] and samples['iterations']==1
-r=dict(passed=False,scope=__doc__,commands=[],trials=[],rows=[],inputs={})
+r=dict(passed=False,scope='Matched stack-bound TLS layout; unchanged root validation.' if a.stack_bounds else __doc__,variant=variant,commands=[],trials=[],rows=[],inputs={})
 def run(command):
  command=list(map(str,command));x=subprocess.run(command,capture_output=True,text=True,timeout=180)
  r['commands'].append(dict(command=command,exitCode=x.returncode,stdout=x.stdout,stderr=x.stderr));x.check_returncode();return x
@@ -32,9 +35,9 @@ try:
   obj=a.objects.resolve()/(suffix+'.o');assert obj.read_bytes()==old.read_bytes()
   cmd=[str(obj) if v==str(old) else str(gc) if v.endswith('/native-gc.c') else str(provider) if v.endswith('/text-arena.c') else v.replace(str(root/'benchmarks/execution/concurrent-mutation-gate'),str(root/'runtime/native/gc/concurrent')) for v in cmd]
   assert not any('STORAGE_VALIDATION' in v for v in cmd)
-  for mode in ['control','split']:
+  for mode in modes:
    link=cmd.copy();link[link.index('-o')+1]=str(out/(name+'-'+mode))
-   if mode=='split':link+=['-DNEOCLR_GC_SPLIT_STORAGE_VALIDATION']
+   if mode!= 'control':link+=['-D'+variant]
    print('Build',name,mode,flush=True);run(link)
  # Snapshot current inputs before timing, including canonical transitive sources.
  paths=[Path(__file__),a.prior,a.samples,*root.glob('runtime/native/**/*.c'),*root.glob('runtime/native/**/*.h'),*root.glob('runtime/native/gc/concurrent/*.py')]
@@ -43,7 +46,7 @@ try:
  for iteration in range(a.rounds):
   for case in samples['cases']:
    name=case['sample']
-   for mode in (['control','split'] if iteration%2==0 else ['split','control']):
+   for mode in (modes if iteration%2==0 else list(reversed(modes))):
     x=run([out/(name+'-'+mode)]);assert x.stdout==case['expectedPerIteration']
     v=next(line.split()[1:] for line in x.stderr.splitlines() if line.startswith('PROFILE '))
     counts=list(map(int,next(line.split()[1:] for line in x.stderr.splitlines() if line.startswith('CANDIDATE '))))
@@ -52,7 +55,7 @@ try:
  for case in samples['cases']:
   ts=[t for t in r['trials'] if t['sample']==case['sample']]
   assert len({(t['allocations'],t['allocatedBytes']) for t in ts})==1
-  for mode in ['control','split']:
+  for mode in modes:
    xs=[t for t in ts if t['mode']==mode and not t['warmup']]
    r['rows'].append(dict(sample=case['sample'],mode=mode,**{k:statistics.median(t[k] for t in xs) for k in ['cpuSeconds','wallSeconds','allocations','allocatedBytes','peakArenaBytes']}))
  r['passed']=True

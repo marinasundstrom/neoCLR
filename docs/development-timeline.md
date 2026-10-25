@@ -36,6 +36,14 @@
   This follows the author's explicit inclusion of general runtime optimization,
   without claiming an advantage for concurrent GC or changing collector defaults.
 
+## 2026-10-25 — Concurrent GC with JIT is not concurrent compilation
+
+- **Author:** Asked, “So you have made JIT concurrent as well?”
+- **Assistant clarification:** The background collector runs alongside JIT-compiled
+  application code; compilation itself remains synchronous before invocation.
+  The stack-bound TLS experiment optimizes execution in JIT/AOT and does not add
+  background compilation. No new compiler scheduling direction was inferred.
+
 ## 2026-10-25 — Integrate improvements once their benefit is established
 
 - **Author:** “After proven useful, integrate any improvements and update benchmarks”.
