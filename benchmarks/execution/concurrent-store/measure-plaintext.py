@@ -18,6 +18,9 @@ p.add_argument('--compare-direct-seed',action='store_true')
 p.add_argument('--borrow-stores',action='store_true',help='Use borrowed native stores for current live objects; retain checked previous-object controls.')
 p.add_argument('--compare-worker-tls',action='store_true')
 p.add_argument('--modes',nargs='+',help='Select unique modes from the configurations enabled by the comparison flags.')
+p.add_argument('--live-heap-bytes',type=int,default=1048576,help='Concurrent arena capacity; sync retains its host default.')
+p.add_argument('--live-budgets',nargs='+',default=[],metavar='ALLOCATIONS:PUBLICATIONS',help='Additional concurrent-only pacing variants; sync and the live control keep their baseline budgets.')
+p.add_argument('--compare-scratch',action='store_true')
 p.add_argument('--compare-inline-base',action='store_true')
 p.add_argument('--direct-exact-allocation-index',action='store_true')
 p.add_argument('--sync-object',type=Path,required=True)
@@ -60,11 +63,22 @@ a=p.parse_args();assert not a.profile_collection or a.profile_finish
 assert not a.profile_begin or a.profile_owner_pauses
 assert not a.profile_finish or a.profile_owner_pauses
 assert a.allocation_budget>0 and a.publication_budget>0
+live_budgets={}
+for pair in a.live_budgets:
+ values=pair.split(':')
+ if len(values)!=2 or not all(v.isdecimal() and 0<int(v)<=2**63-1 for v in values):
+  p.error('--live-budgets requires positive ALLOCATIONS:PUBLICATIONS pairs')
+ allocation,publication=map(int,values)
+ name=f'live-budget-{allocation}-{publication}-inline-index'
+ if name in live_budgets:p.error('duplicate live budget')
+ live_budgets[name]=(allocation,publication)
+assert a.live_heap_bytes>0 and a.live_heap_bytes%8==0
 assert a.requests>0 and a.warmup>=0 and a.pairs>0
 assert not a.previous_inline_object or (a.compare_inline_base and not a.previous_live_object)
 assert not a.compare_linear_seed or a.compare_inline_base
 assert not a.compare_direct_seed or a.compare_inline_base
 assert not a.compare_worker_tls or a.compare_inline_base
+assert not (a.compare_scratch or live_budgets) or a.compare_inline_base
 assert not a.compare_inline_base or (a.compare_exact_allocation_index and not a.direct_exact_allocation_index)
 assert not a.direct_exact_allocation_index or a.compare_exact_allocation_index
 assert not a.compare_exact_allocation_index or a.compare_allocation_index
@@ -86,6 +100,7 @@ assert not (a.compare_store_ranges and (a.disable_store_cache or a.compare_store
 root=Path(__file__).resolve().parents[3];base=Path(__file__).resolve().parent
 out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
 r={'passed':False,'compareWorkerTls':a.compare_worker_tls,'selectedModes':a.modes,'compareInlineBase':a.compare_inline_base,'directExactAllocationIndex':a.direct_exact_allocation_index,'compareExactAllocationIndex':a.compare_exact_allocation_index,'compareAllocationIndex':a.compare_allocation_index,'compareStoreTls':a.compare_store_tls,'compareStoreWalk':a.compare_store_walk,'allowAllocationVariation':a.allow_allocation_variation,'concurrency':a.concurrency,'compareSnapshotLookup':a.compare_snapshot_lookup,'compareHeaderProof':a.compare_header_proof,'compareInlineValidation':a.compare_inline_validation,'compareSplitTls':a.compare_split_tls,'compareSerializedStore':a.compare_serialized_store,'gateWords':a.gate_words,'storeCache':not a.disable_store_cache,'compareStoreCache':a.compare_store_cache,'compareExactStore':a.compare_exact_store,'storeRanges':a.store_ranges,'compareStoreRanges':a.compare_store_ranges,'sample':a.sample,'scope':'Loopback AOT fixed-work comparison; Python client scheduling and connection-close costs included. No saturation/cross-framework or GC-pause-distribution claim.', 'commands':[],'trials':[],'inputs':{}}
+r['liveHeapBytes']=a.live_heap_bytes
 if a.profile_store_walks:r['diagnosticOnly']='Heap-walk instrumentation; timings are not benchmark evidence.'
 if a.profile_owner_pauses:r['diagnosticOnly']='Owner-operation wall histograms; timings are not throughput evidence.'
 if a.profile_cpu:r['diagnosticOnly']='External CPU sampling affects timings; do not use this cohort for throughput claims.'
@@ -241,12 +256,16 @@ static void report_measurement(void) {
  if a.compare_direct_seed:
   configurations.append(('live-direct-seed-inline-index',a.live_object))
   if a.include_guarded_sync:configurations.append(('guarded-sync-direct-seed-inline-index',a.live_object))
+ if a.compare_scratch:
+  configurations.append(('live-scratch-inline-index',a.live_object))
+ for budget_mode in live_budgets:configurations.append((budget_mode,a.live_object))
  if a.modes:
   assert len(set(a.modes))==len(a.modes) and set(a.modes)<=set(mode for mode,_ in configurations)
   configurations=[(mode,obj) for mode,obj in configurations if mode in a.modes]
  for mode,obj in configurations:
   exe=out/mode;command=[]
   for item in recipe:
+   if mode!='sync' and item.startswith('-DNEOCLR_HTTP_HEAP_BYTES='):continue
    if item.endswith('/owned-host.c'):item=str(host)
    elif item.endswith('/native-gc.c') and mode=='sync' and a.profile_owner_pauses:item=str(sync_profile)
    elif item.endswith('/native-gc.c') and mode!='sync':item=str(guarded_source if mode.startswith('guarded-sync') else source)
@@ -255,8 +274,11 @@ static void report_measurement(void) {
    command.append(item)
   assert '-DNEOCLR_GC_PACED' in command
   command[command.index('-o')+1]=str(exe)
-  command+=['-I',str(root/'runtime/native/memory'),'-DNEOCLR_GC_PROFILE',f'-DNEOCLR_GC_ALLOCATION_BUDGET={a.allocation_budget}',f'-DNEOCLR_GC_PUBLICATION_BUDGET={a.publication_budget}']
-  if mode!='sync':command+=[f'-DGATE_WORDS={a.gate_words}','-DLIVE_REPORT','-DNEOCLR_SHADOW_SPARSE_INDEX','-I',str(base.parent/'concurrent-mutation-gate'),str(base.parent/'concurrent-mutation-gate/gate.c')]
+  allocation_budget,publication_budget=live_budgets.get(mode,(a.allocation_budget,a.publication_budget))
+  r.setdefault('budgetsByMode',{})[mode]=dict(allocations=allocation_budget,publications=publication_budget)
+  command+=['-I',str(root/'runtime/native/memory'),'-DNEOCLR_GC_PROFILE',f'-DNEOCLR_GC_ALLOCATION_BUDGET={allocation_budget}',f'-DNEOCLR_GC_PUBLICATION_BUDGET={publication_budget}']
+  if mode!='sync':command+=[f'-DNEOCLR_HTTP_HEAP_BYTES={a.live_heap_bytes}',f'-DGATE_WORDS={a.gate_words}','-DLIVE_REPORT','-DNEOCLR_SHADOW_SPARSE_INDEX','-I',str(base.parent/'concurrent-mutation-gate'),str(base.parent/'concurrent-mutation-gate/gate.c')]
+  if mode=='live-scratch-inline-index':command+=['-DNEOCLR_LIVE_REUSE_SCRATCH']
   if mode!='sync' and (a.disable_store_cache or mode.endswith('-no-cache')):command+=['-DNEOCLR_LIVE_NO_STORE_CACHE']
   if mode.endswith('-index'):command+=['-DNEOCLR_LIVE_ALLOCATION_INDEX']
   if a.direct_exact_allocation_index and mode.endswith('-exact-index'):command+=['-DNEOCLR_LIVE_DIRECT_EXACT_INDEX']

@@ -10,6 +10,8 @@ from pathlib import Path
 import subprocess
 
 p = argparse.ArgumentParser(description=__doc__)
+p.add_argument('--live-budgets',nargs='+',default=[],metavar='ALLOCATIONS:PUBLICATIONS')
+p.add_argument('--compare-scratch',action='store_true')
 p.add_argument('--compare-scalar-validation',action='store_true')
 p.add_argument('--compare-linear-seed',action='store_true')
 p.add_argument('--compare-direct-seed',action='store_true')
@@ -42,6 +44,15 @@ p.add_argument('--profile-begin', action='store_true')
 p.add_argument('--profile-finish', action='store_true')
 p.add_argument('--profile-collection', action='store_true')
 a = p.parse_args()
+live_budgets={}
+for pair in a.live_budgets:
+    values=pair.split(':')
+    if len(values)!=2 or not all(v.isdecimal() and 0<int(v)<=2**63-1 for v in values):
+        p.error('--live-budgets requires positive ALLOCATIONS:PUBLICATIONS pairs')
+    allocation,publication=map(int,values)
+    name=f'live-budget-{allocation}-{publication}-hybrid-inline'
+    if name in live_budgets:p.error('duplicate live budget')
+    live_budgets[name]=(allocation,publication)
 assert not a.profile_collection or a.profile_finish
 assert not a.profile_begin or a.profile_owner_pauses
 assert not a.profile_finish or a.profile_owner_pauses
@@ -49,6 +60,7 @@ assert a.rounds > 0
 assert not a.previous_build or a.compare_inline_base
 assert not a.compare_linear_seed or a.compare_inline_base
 assert not a.compare_direct_seed or a.compare_inline_base
+assert not (a.compare_scratch or live_budgets) or a.compare_inline_base
 assert not a.compare_worker_tls or (a.compare_inline_base and not a.split_tls)
 assert not a.compare_inline_base or a.compare_exact_allocation_index
 assert not a.compare_exact_allocation_index or (a.allocation_index and not a.exact_allocation_index and not a.direct_exact_allocation_index)
@@ -83,6 +95,9 @@ if a.compare_linear_seed:
 if a.compare_direct_seed:
     modes += ['live-direct-seed-hybrid-inline']
     if a.guarded_control: modes += ['guarded-sync-direct-seed-hybrid-inline']
+if a.compare_scratch:
+    modes += ['live-scratch-hybrid-inline']
+modes += list(live_budgets)
 if a.modes:
     assert len(set(a.modes)) == len(a.modes) and set(a.modes) <= set(modes)
     modes = [m for m in modes if m in a.modes]
@@ -224,6 +239,10 @@ static void report_profile(struct rusage *a, struct rusage *b, struct timespec *
                             '-I', str(root / 'runtime/native/memory'), '-I', str(gate), str(gate / 'gate.c')]
             if (a.direct_exact_allocation_index or mode.endswith('-direct')) and mode != 'sync': command += ['-DNEOCLR_LIVE_DIRECT_EXACT_INDEX']
             if (a.exact_allocation_index or ('-hybrid' in mode or mode.endswith('-direct'))) and mode != 'sync': command += ['-DNEOCLR_LIVE_EXACT_INDEX']
+            if mode in live_budgets:
+                allocation,publication=live_budgets[mode]
+                command += [f'-DNEOCLR_GC_ALLOCATION_BUDGET={allocation}',f'-DNEOCLR_GC_PUBLICATION_BUDGET={publication}']
+            if mode=='live-scratch-hybrid-inline': command += ['-DNEOCLR_LIVE_REUSE_SCRATCH']
             if '-worker-' in mode: command += ['-DNEOCLR_LIVE_GROUP_WORKER_TLS']
             if mode.endswith('-inline'): command += ['-DNEOCLR_LIVE_INLINE_BASE']
             if a.allocation_index and mode != 'sync': command += ['-DNEOCLR_LIVE_ALLOCATION_INDEX']

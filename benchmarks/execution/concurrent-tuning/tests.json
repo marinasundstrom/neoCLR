@@ -1,0 +1,163 @@
+[
+  {
+    "command": [
+      "python3",
+      "benchmarks/execution/concurrent-live/test-scratch.py"
+    ],
+    "exitCode": 0,
+    "stdout": "PASS scratch: 100 reuse cycles, growth, aggregate cap, spill, zero count, shutdown\nPASS scratch: 100 reuse cycles, growth, aggregate cap, spill, zero count, shutdown\nPASS active shutdown and duplicate lease rejected\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "python3",
+      "benchmarks/execution/concurrent-store/measure-plaintext.py",
+      "--sync-object",
+      "unused",
+      "--live-object",
+      "unused",
+      "--output",
+      "target/should-not-create-tuning",
+      "--live-budgets",
+      "0:1"
+    ],
+    "exitCode": 2,
+    "stderr": "usage: measure-plaintext.py [-h] [--compare-scalar-validation]\n                            [--compare-linear-seed] [--compare-direct-seed]\n                            [--borrow-stores] [--compare-worker-tls]\n                            [--modes MODES [MODES ...]]\n                            [--live-heap-bytes LIVE_HEAP_BYTES]\n                            [--live-budgets ALLOCATIONS:PUBLICATIONS [ALLOCATIONS:PUBLICATIONS ...]]\n                            [--compare-scratch] [--compare-inline-base]\n                            [--direct-exact-allocation-index] --sync-object\n                            SYNC_OBJECT --live-object LIVE_OBJECT\n                            [--previous-live-object PREVIOUS_LIVE_OBJECT]\n                            [--previous-inline-object PREVIOUS_INLINE_OBJECT]\n                            --output OUTPUT\n                            [--allocation-budget ALLOCATION_BUDGET]\n                            [--publication-budget PUBLICATION_BUDGET]\n                            [--requests REQUESTS]\n                            [--allow-allocation-variation]\n                            [--concurrency CONCURRENCY]\n                            [--sample {plain,json}] [--warmup WARMUP]\n                            [--pairs PAIRS] [--include-guarded-sync]\n                            [--gate-words GATE_WORDS] [--disable-store-cache]\n                            [--compare-store-cache]\n                            [--compare-allocation-index]\n                            [--compare-exact-allocation-index]\n                            [--compare-store-tls] [--compare-store-walk]\n                            [--compare-snapshot-lookup]\n                            [--compare-header-proof]\n                            [--compare-inline-validation]\n                            [--compare-split-tls] [--compare-serialized-store]\n                            [--compare-exact-store]\n                            [--store-ranges {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16}]\n                            [--compare-store-ranges] [--profile-cpu]\n                            [--profile-store-walks] [--profile-store-sites]\n                            [--profile-owner-pauses] [--profile-begin]\n                            [--profile-finish] [--profile-collection]\nmeasure-plaintext.py: error: --live-budgets requires positive ALLOCATIONS:PUBLICATIONS pairs\n"
+  },
+  {
+    "command": [
+      "python3",
+      "benchmarks/execution/concurrent-store/measure-plaintext.py",
+      "--sync-object",
+      "unused",
+      "--live-object",
+      "unused",
+      "--output",
+      "target/should-not-create-tuning",
+      "--live-budgets",
+      "1:0"
+    ],
+    "exitCode": 2,
+    "stderr": "usage: measure-plaintext.py [-h] [--compare-scalar-validation]\n                            [--compare-linear-seed] [--compare-direct-seed]\n                            [--borrow-stores] [--compare-worker-tls]\n                            [--modes MODES [MODES ...]]\n                            [--live-heap-bytes LIVE_HEAP_BYTES]\n                            [--live-budgets ALLOCATIONS:PUBLICATIONS [ALLOCATIONS:PUBLICATIONS ...]]\n                            [--compare-scratch] [--compare-inline-base]\n                            [--direct-exact-allocation-index] --sync-object\n                            SYNC_OBJECT --live-object LIVE_OBJECT\n                            [--previous-live-object PREVIOUS_LIVE_OBJECT]\n                            [--previous-inline-object PREVIOUS_INLINE_OBJECT]\n                            --output OUTPUT\n                            [--allocation-budget ALLOCATION_BUDGET]\n                            [--publication-budget PUBLICATION_BUDGET]\n                            [--requests REQUESTS]\n                            [--allow-allocation-variation]\n                            [--concurrency CONCURRENCY]\n                            [--sample {plain,json}] [--warmup WARMUP]\n                            [--pairs PAIRS] [--include-guarded-sync]\n                            [--gate-words GATE_WORDS] [--disable-store-cache]\n                            [--compare-store-cache]\n                            [--compare-allocation-index]\n                            [--compare-exact-allocation-index]\n                            [--compare-store-tls] [--compare-store-walk]\n                            [--compare-snapshot-lookup]\n                            [--compare-header-proof]\n                            [--compare-inline-validation]\n                            [--compare-split-tls] [--compare-serialized-store]\n                            [--compare-exact-store]\n                            [--store-ranges {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16}]\n                            [--compare-store-ranges] [--profile-cpu]\n                            [--profile-store-walks] [--profile-store-sites]\n                            [--profile-owner-pauses] [--profile-begin]\n                            [--profile-finish] [--profile-collection]\nmeasure-plaintext.py: error: --live-budgets requires positive ALLOCATIONS:PUBLICATIONS pairs\n"
+  },
+  {
+    "command": [
+      "python3",
+      "benchmarks/execution/concurrent-store/measure-plaintext.py",
+      "--sync-object",
+      "unused",
+      "--live-object",
+      "unused",
+      "--output",
+      "target/should-not-create-tuning",
+      "--live-budgets",
+      "1"
+    ],
+    "exitCode": 2,
+    "stderr": "usage: measure-plaintext.py [-h] [--compare-scalar-validation]\n                            [--compare-linear-seed] [--compare-direct-seed]\n                            [--borrow-stores] [--compare-worker-tls]\n                            [--modes MODES [MODES ...]]\n                            [--live-heap-bytes LIVE_HEAP_BYTES]\n                            [--live-budgets ALLOCATIONS:PUBLICATIONS [ALLOCATIONS:PUBLICATIONS ...]]\n                            [--compare-scratch] [--compare-inline-base]\n                            [--direct-exact-allocation-index] --sync-object\n                            SYNC_OBJECT --live-object LIVE_OBJECT\n                            [--previous-live-object PREVIOUS_LIVE_OBJECT]\n                            [--previous-inline-object PREVIOUS_INLINE_OBJECT]\n                            --output OUTPUT\n                            [--allocation-budget ALLOCATION_BUDGET]\n                            [--publication-budget PUBLICATION_BUDGET]\n                            [--requests REQUESTS]\n                            [--allow-allocation-variation]\n                            [--concurrency CONCURRENCY]\n                            [--sample {plain,json}] [--warmup WARMUP]\n                            [--pairs PAIRS] [--include-guarded-sync]\n                            [--gate-words GATE_WORDS] [--disable-store-cache]\n                            [--compare-store-cache]\n                            [--compare-allocation-index]\n                            [--compare-exact-allocation-index]\n                            [--compare-store-tls] [--compare-store-walk]\n                            [--compare-snapshot-lookup]\n                            [--compare-header-proof]\n                            [--compare-inline-validation]\n                            [--compare-split-tls] [--compare-serialized-store]\n                            [--compare-exact-store]\n                            [--store-ranges {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16}]\n                            [--compare-store-ranges] [--profile-cpu]\n                            [--profile-store-walks] [--profile-store-sites]\n                            [--profile-owner-pauses] [--profile-begin]\n                            [--profile-finish] [--profile-collection]\nmeasure-plaintext.py: error: --live-budgets requires positive ALLOCATIONS:PUBLICATIONS pairs\n"
+  },
+  {
+    "command": [
+      "python3",
+      "benchmarks/execution/concurrent-store/measure-plaintext.py",
+      "--sync-object",
+      "unused",
+      "--live-object",
+      "unused",
+      "--output",
+      "target/should-not-create-tuning",
+      "--live-budgets",
+      "-1:2"
+    ],
+    "exitCode": 2,
+    "stderr": "usage: measure-plaintext.py [-h] [--compare-scalar-validation]\n                            [--compare-linear-seed] [--compare-direct-seed]\n                            [--borrow-stores] [--compare-worker-tls]\n                            [--modes MODES [MODES ...]]\n                            [--live-heap-bytes LIVE_HEAP_BYTES]\n                            [--live-budgets ALLOCATIONS:PUBLICATIONS [ALLOCATIONS:PUBLICATIONS ...]]\n                            [--compare-scratch] [--compare-inline-base]\n                            [--direct-exact-allocation-index] --sync-object\n                            SYNC_OBJECT --live-object LIVE_OBJECT\n                            [--previous-live-object PREVIOUS_LIVE_OBJECT]\n                            [--previous-inline-object PREVIOUS_INLINE_OBJECT]\n                            --output OUTPUT\n                            [--allocation-budget ALLOCATION_BUDGET]\n                            [--publication-budget PUBLICATION_BUDGET]\n                            [--requests REQUESTS]\n                            [--allow-allocation-variation]\n                            [--concurrency CONCURRENCY]\n                            [--sample {plain,json}] [--warmup WARMUP]\n                            [--pairs PAIRS] [--include-guarded-sync]\n                            [--gate-words GATE_WORDS] [--disable-store-cache]\n                            [--compare-store-cache]\n                            [--compare-allocation-index]\n                            [--compare-exact-allocation-index]\n                            [--compare-store-tls] [--compare-store-walk]\n                            [--compare-snapshot-lookup]\n                            [--compare-header-proof]\n                            [--compare-inline-validation]\n                            [--compare-split-tls] [--compare-serialized-store]\n                            [--compare-exact-store]\n                            [--store-ranges {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16}]\n                            [--compare-store-ranges] [--profile-cpu]\n                            [--profile-store-walks] [--profile-store-sites]\n                            [--profile-owner-pauses] [--profile-begin]\n                            [--profile-finish] [--profile-collection]\nmeasure-plaintext.py: error: argument --live-budgets: expected at least one argument\n"
+  },
+  {
+    "command": [
+      "python3",
+      "benchmarks/execution/concurrent-store/measure-plaintext.py",
+      "--sync-object",
+      "unused",
+      "--live-object",
+      "unused",
+      "--output",
+      "target/should-not-create-tuning",
+      "--live-budgets",
+      "2:3",
+      "2:3"
+    ],
+    "exitCode": 2,
+    "stderr": "usage: measure-plaintext.py [-h] [--compare-scalar-validation]\n                            [--compare-linear-seed] [--compare-direct-seed]\n                            [--borrow-stores] [--compare-worker-tls]\n                            [--modes MODES [MODES ...]]\n                            [--live-heap-bytes LIVE_HEAP_BYTES]\n                            [--live-budgets ALLOCATIONS:PUBLICATIONS [ALLOCATIONS:PUBLICATIONS ...]]\n                            [--compare-scratch] [--compare-inline-base]\n                            [--direct-exact-allocation-index] --sync-object\n                            SYNC_OBJECT --live-object LIVE_OBJECT\n                            [--previous-live-object PREVIOUS_LIVE_OBJECT]\n                            [--previous-inline-object PREVIOUS_INLINE_OBJECT]\n                            --output OUTPUT\n                            [--allocation-budget ALLOCATION_BUDGET]\n                            [--publication-budget PUBLICATION_BUDGET]\n                            [--requests REQUESTS]\n                            [--allow-allocation-variation]\n                            [--concurrency CONCURRENCY]\n                            [--sample {plain,json}] [--warmup WARMUP]\n                            [--pairs PAIRS] [--include-guarded-sync]\n                            [--gate-words GATE_WORDS] [--disable-store-cache]\n                            [--compare-store-cache]\n                            [--compare-allocation-index]\n                            [--compare-exact-allocation-index]\n                            [--compare-store-tls] [--compare-store-walk]\n                            [--compare-snapshot-lookup]\n                            [--compare-header-proof]\n                            [--compare-inline-validation]\n                            [--compare-split-tls] [--compare-serialized-store]\n                            [--compare-exact-store]\n                            [--store-ranges {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16}]\n                            [--compare-store-ranges] [--profile-cpu]\n                            [--profile-store-walks] [--profile-store-sites]\n                            [--profile-owner-pauses] [--profile-begin]\n                            [--profile-finish] [--profile-collection]\nmeasure-plaintext.py: error: duplicate live budget\n"
+  },
+  {
+    "command": [
+      "python3",
+      "benchmarks/execution/concurrent-workloads/measure.py",
+      "--build",
+      "unused",
+      "--output",
+      "target/should-not-create-tuning",
+      "--live-budgets",
+      "0:1"
+    ],
+    "exitCode": 2,
+    "stderr": "usage: measure.py [-h]\n                  [--live-budgets ALLOCATIONS:PUBLICATIONS [ALLOCATIONS:PUBLICATIONS ...]]\n                  [--compare-scratch] [--compare-scalar-validation]\n                  [--compare-linear-seed] [--compare-direct-seed]\n                  [--borrow-stores] [--compare-worker-tls]\n                  [--compare-inline-base] [--compare-exact-allocation-index]\n                  [--direct-exact-allocation-index] [--exact-allocation-index]\n                  --build BUILD [--previous-build PREVIOUS_BUILD]\n                  [--modes MODES [MODES ...]] --output OUTPUT\n                  [--rounds ROUNDS] [--guarded-control]\n                  [--repeat-snapshot-lookup] [--header-proof]\n                  [--inline-validation] [--split-tls] [--serialized-store]\n                  [--disable-exact-store]\n                  [--store-ranges {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16}]\n                  [--allocation-index] [--split-store-tls] [--full-store-walk]\n                  [--profile-store-walks] [--profile-store-sites]\n                  [--profile-owner-pauses] [--profile-begin]\n                  [--profile-finish] [--profile-collection]\nmeasure.py: error: --live-budgets requires positive ALLOCATIONS:PUBLICATIONS pairs\n"
+  },
+  {
+    "command": [
+      "python3",
+      "benchmarks/execution/concurrent-workloads/measure.py",
+      "--build",
+      "unused",
+      "--output",
+      "target/should-not-create-tuning",
+      "--live-budgets",
+      "1:0"
+    ],
+    "exitCode": 2,
+    "stderr": "usage: measure.py [-h]\n                  [--live-budgets ALLOCATIONS:PUBLICATIONS [ALLOCATIONS:PUBLICATIONS ...]]\n                  [--compare-scratch] [--compare-scalar-validation]\n                  [--compare-linear-seed] [--compare-direct-seed]\n                  [--borrow-stores] [--compare-worker-tls]\n                  [--compare-inline-base] [--compare-exact-allocation-index]\n                  [--direct-exact-allocation-index] [--exact-allocation-index]\n                  --build BUILD [--previous-build PREVIOUS_BUILD]\n                  [--modes MODES [MODES ...]] --output OUTPUT\n                  [--rounds ROUNDS] [--guarded-control]\n                  [--repeat-snapshot-lookup] [--header-proof]\n                  [--inline-validation] [--split-tls] [--serialized-store]\n                  [--disable-exact-store]\n                  [--store-ranges {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16}]\n                  [--allocation-index] [--split-store-tls] [--full-store-walk]\n                  [--profile-store-walks] [--profile-store-sites]\n                  [--profile-owner-pauses] [--profile-begin]\n                  [--profile-finish] [--profile-collection]\nmeasure.py: error: --live-budgets requires positive ALLOCATIONS:PUBLICATIONS pairs\n"
+  },
+  {
+    "command": [
+      "python3",
+      "benchmarks/execution/concurrent-workloads/measure.py",
+      "--build",
+      "unused",
+      "--output",
+      "target/should-not-create-tuning",
+      "--live-budgets",
+      "1"
+    ],
+    "exitCode": 2,
+    "stderr": "usage: measure.py [-h]\n                  [--live-budgets ALLOCATIONS:PUBLICATIONS [ALLOCATIONS:PUBLICATIONS ...]]\n                  [--compare-scratch] [--compare-scalar-validation]\n                  [--compare-linear-seed] [--compare-direct-seed]\n                  [--borrow-stores] [--compare-worker-tls]\n                  [--compare-inline-base] [--compare-exact-allocation-index]\n                  [--direct-exact-allocation-index] [--exact-allocation-index]\n                  --build BUILD [--previous-build PREVIOUS_BUILD]\n                  [--modes MODES [MODES ...]] --output OUTPUT\n                  [--rounds ROUNDS] [--guarded-control]\n                  [--repeat-snapshot-lookup] [--header-proof]\n                  [--inline-validation] [--split-tls] [--serialized-store]\n                  [--disable-exact-store]\n                  [--store-ranges {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16}]\n                  [--allocation-index] [--split-store-tls] [--full-store-walk]\n                  [--profile-store-walks] [--profile-store-sites]\n                  [--profile-owner-pauses] [--profile-begin]\n                  [--profile-finish] [--profile-collection]\nmeasure.py: error: --live-budgets requires positive ALLOCATIONS:PUBLICATIONS pairs\n"
+  },
+  {
+    "command": [
+      "python3",
+      "benchmarks/execution/concurrent-workloads/measure.py",
+      "--build",
+      "unused",
+      "--output",
+      "target/should-not-create-tuning",
+      "--live-budgets",
+      "-1:2"
+    ],
+    "exitCode": 2,
+    "stderr": "usage: measure.py [-h]\n                  [--live-budgets ALLOCATIONS:PUBLICATIONS [ALLOCATIONS:PUBLICATIONS ...]]\n                  [--compare-scratch] [--compare-scalar-validation]\n                  [--compare-linear-seed] [--compare-direct-seed]\n                  [--borrow-stores] [--compare-worker-tls]\n                  [--compare-inline-base] [--compare-exact-allocation-index]\n                  [--direct-exact-allocation-index] [--exact-allocation-index]\n                  --build BUILD [--previous-build PREVIOUS_BUILD]\n                  [--modes MODES [MODES ...]] --output OUTPUT\n                  [--rounds ROUNDS] [--guarded-control]\n                  [--repeat-snapshot-lookup] [--header-proof]\n                  [--inline-validation] [--split-tls] [--serialized-store]\n                  [--disable-exact-store]\n                  [--store-ranges {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16}]\n                  [--allocation-index] [--split-store-tls] [--full-store-walk]\n                  [--profile-store-walks] [--profile-store-sites]\n                  [--profile-owner-pauses] [--profile-begin]\n                  [--profile-finish] [--profile-collection]\nmeasure.py: error: argument --live-budgets: expected at least one argument\n"
+  },
+  {
+    "command": [
+      "python3",
+      "benchmarks/execution/concurrent-workloads/measure.py",
+      "--build",
+      "unused",
+      "--output",
+      "target/should-not-create-tuning",
+      "--live-budgets",
+      "2:3",
+      "2:3"
+    ],
+    "exitCode": 2,
+    "stderr": "usage: measure.py [-h]\n                  [--live-budgets ALLOCATIONS:PUBLICATIONS [ALLOCATIONS:PUBLICATIONS ...]]\n                  [--compare-scratch] [--compare-scalar-validation]\n                  [--compare-linear-seed] [--compare-direct-seed]\n                  [--borrow-stores] [--compare-worker-tls]\n                  [--compare-inline-base] [--compare-exact-allocation-index]\n                  [--direct-exact-allocation-index] [--exact-allocation-index]\n                  --build BUILD [--previous-build PREVIOUS_BUILD]\n                  [--modes MODES [MODES ...]] --output OUTPUT\n                  [--rounds ROUNDS] [--guarded-control]\n                  [--repeat-snapshot-lookup] [--header-proof]\n                  [--inline-validation] [--split-tls] [--serialized-store]\n                  [--disable-exact-store]\n                  [--store-ranges {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16}]\n                  [--allocation-index] [--split-store-tls] [--full-store-walk]\n                  [--profile-store-walks] [--profile-store-sites]\n                  [--profile-owner-pauses] [--profile-begin]\n                  [--profile-finish] [--profile-collection]\nmeasure.py: error: duplicate live budget\n"
+  }
+]

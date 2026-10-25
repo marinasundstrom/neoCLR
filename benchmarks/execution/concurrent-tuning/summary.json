@@ -1,0 +1,609 @@
+{
+  "scratch-plain": {
+    "runs": 15,
+    "responses": 61680,
+    "medians": {
+      ":sync": {
+        "requestsPerSecond": 5009.625427762823,
+        "processCpuSeconds": 0.817791,
+        "peakRssBytes": 9306112,
+        "allocations": 855841,
+        "allocatedBytes": 65816169,
+        "peakLiveBytes": 49657,
+        "peakArenaUsed": 99360,
+        "attempts": 3732
+      },
+      ":live-inline-index": {
+        "requestsPerSecond": 3550.3697166582897,
+        "processCpuSeconds": 1.227682,
+        "peakRssBytes": 11468800,
+        "allocations": 855841,
+        "allocatedBytes": 65816169,
+        "peakLiveBytes": 68882,
+        "peakArenaUsed": 147488,
+        "attempts": 3792,
+        "begun": 1880,
+        "completed": 1879,
+        "canceled": 1,
+        "storeCanceled": 0
+      },
+      ":live-scratch-inline-index": {
+        "requestsPerSecond": 3536.148051584753,
+        "processCpuSeconds": 1.22926,
+        "peakRssBytes": 11321344,
+        "allocations": 855840,
+        "allocatedBytes": 65815641,
+        "peakLiveBytes": 68882,
+        "peakArenaUsed": 147576,
+        "attempts": 3789,
+        "begun": 1879,
+        "completed": 1878,
+        "canceled": 1,
+        "storeCanceled": 0
+      }
+    }
+  },
+  "scratch-json": {
+    "runs": 15,
+    "responses": 61680,
+    "medians": {
+      ":sync": {
+        "requestsPerSecond": 3019.381243818816,
+        "processCpuSeconds": 1.3580580000000002,
+        "peakRssBytes": 10665984,
+        "allocations": 1879755,
+        "allocatedBytes": 107669135,
+        "peakLiveBytes": 60661,
+        "peakArenaUsed": 109944,
+        "attempts": 7476
+      },
+      ":live-inline-index": {
+        "requestsPerSecond": 2248.446987071542,
+        "processCpuSeconds": 1.935176,
+        "peakRssBytes": 13352960,
+        "allocations": 1879753,
+        "allocatedBytes": 107668079,
+        "peakLiveBytes": 67911,
+        "peakArenaUsed": 144872,
+        "attempts": 7565,
+        "begun": 3758,
+        "completed": 3757,
+        "canceled": 1,
+        "storeCanceled": 0
+      },
+      ":live-scratch-inline-index": {
+        "requestsPerSecond": 2244.9203436246303,
+        "processCpuSeconds": 1.9402,
+        "peakRssBytes": 13352960,
+        "allocations": 1879753,
+        "allocatedBytes": 107668079,
+        "peakLiveBytes": 67911,
+        "peakArenaUsed": 145080,
+        "attempts": 7556,
+        "begun": 3755,
+        "completed": 3754,
+        "canceled": 1,
+        "storeCanceled": 0
+      }
+    }
+  },
+  "scratch-final-plain": {
+    "runs": 9,
+    "responses": 37008,
+    "medians": {
+      ":sync": {
+        "requestsPerSecond": 5111.786796308364,
+        "processCpuSeconds": 0.797821,
+        "peakRssBytes": 9306112,
+        "allocations": 855840,
+        "allocatedBytes": 65815641,
+        "peakLiveBytes": 49657,
+        "peakArenaUsed": 99360,
+        "attempts": 3733
+      },
+      ":live-inline-index": {
+        "requestsPerSecond": 3566.3483783164406,
+        "processCpuSeconds": 1.222381,
+        "peakRssBytes": 11436032,
+        "allocations": 855840,
+        "allocatedBytes": 65815641,
+        "peakLiveBytes": 67767,
+        "peakArenaUsed": 147224,
+        "attempts": 3789,
+        "begun": 1879,
+        "completed": 1878,
+        "canceled": 1,
+        "storeCanceled": 0
+      },
+      ":live-scratch-inline-index": {
+        "requestsPerSecond": 3523.6604880788354,
+        "processCpuSeconds": 1.241323,
+        "peakRssBytes": 11255808,
+        "allocations": 855840,
+        "allocatedBytes": 65815641,
+        "peakLiveBytes": 67767,
+        "peakArenaUsed": 147032,
+        "attempts": 3780,
+        "begun": 1876,
+        "completed": 1875,
+        "canceled": 1,
+        "storeCanceled": 0
+      }
+    }
+  },
+  "scratch-ordinary": {
+    "runs": 90,
+    "responses": 0,
+    "medians": {
+      "tasks:sync": {
+        "cpuSeconds": 0.015203000000000001,
+        "allocations": 65548.0,
+        "allocatedBytes": 2261361.0,
+        "peakArenaUsed": 18424.0
+      },
+      "tasks:live-hybrid-inline": {
+        "cpuSeconds": 0.022970499999999998,
+        "allocations": 65548.0,
+        "allocatedBytes": 2261361.0,
+        "peakArenaUsed": 53240.0,
+        "begun": 129.0,
+        "completed": 128.0,
+        "canceled": 1.0
+      },
+      "tasks:live-scratch-hybrid-inline": {
+        "cpuSeconds": 0.022939,
+        "allocations": 65548.0,
+        "allocatedBytes": 2261361.0,
+        "peakArenaUsed": 53240.0,
+        "begun": 129.0,
+        "completed": 128.0,
+        "canceled": 1.0
+      },
+      "collections:sync": {
+        "cpuSeconds": 0.0884125,
+        "allocations": 237580.0,
+        "allocatedBytes": 7864689.0,
+        "peakArenaUsed": 20328.0
+      },
+      "collections:live-hybrid-inline": {
+        "cpuSeconds": 0.125786,
+        "allocations": 237580.0,
+        "allocatedBytes": 7864689.0,
+        "peakArenaUsed": 55016.0,
+        "begun": 465.0,
+        "completed": 464.0,
+        "canceled": 1.0
+      },
+      "collections:live-scratch-hybrid-inline": {
+        "cpuSeconds": 0.12575350000000002,
+        "allocations": 237580.0,
+        "allocatedBytes": 7864689.0,
+        "peakArenaUsed": 55016.0,
+        "begun": 465.0,
+        "completed": 464.0,
+        "canceled": 1.0
+      },
+      "arrays:sync": {
+        "cpuSeconds": 0.0499945,
+        "allocations": 86028.0,
+        "allocatedBytes": 1892721.0,
+        "peakArenaUsed": 15952.0
+      },
+      "arrays:live-hybrid-inline": {
+        "cpuSeconds": 0.057892,
+        "allocations": 86028.0,
+        "allocatedBytes": 1892721.0,
+        "peakArenaUsed": 45376.0,
+        "begun": 169.0,
+        "completed": 168.0,
+        "canceled": 1.0
+      },
+      "arrays:live-scratch-hybrid-inline": {
+        "cpuSeconds": 0.0574145,
+        "allocations": 86028.0,
+        "allocatedBytes": 1892721.0,
+        "peakArenaUsed": 45376.0,
+        "begun": 169.0,
+        "completed": 168.0,
+        "canceled": 1.0
+      }
+    }
+  },
+  "concurrent-knobs-plain": {
+    "runs": 18,
+    "responses": 37152,
+    "medians": {
+      ":sync": {
+        "requestsPerSecond": 5076.544248198308,
+        "processCpuSeconds": 0.408724,
+        "peakRssBytes": 9306112,
+        "allocations": 429856,
+        "allocatedBytes": 33057881,
+        "peakLiveBytes": 49657,
+        "peakArenaUsed": 99200,
+        "attempts": 1876
+      },
+      ":live-inline-index": {
+        "requestsPerSecond": 3622.655391295629,
+        "processCpuSeconds": 0.6054240000000001,
+        "peakRssBytes": 11436032,
+        "allocations": 429856,
+        "allocatedBytes": 33057881,
+        "peakLiveBytes": 67767,
+        "peakArenaUsed": 146968,
+        "attempts": 1930,
+        "begun": 951,
+        "completed": 950,
+        "canceled": 1,
+        "storeCanceled": 0
+      },
+      ":live-budget-256-16384-inline-index": {
+        "requestsPerSecond": 3655.629739770286,
+        "processCpuSeconds": 0.59914,
+        "peakRssBytes": 11436032,
+        "allocations": 429856,
+        "allocatedBytes": 33057881,
+        "peakLiveBytes": 69244,
+        "peakArenaUsed": 157800,
+        "attempts": 1735,
+        "begun": 855,
+        "completed": 854,
+        "canceled": 1,
+        "storeCanceled": 0
+      },
+      ":live-budget-1024-4096-inline-index": {
+        "requestsPerSecond": 3668.568094944418,
+        "processCpuSeconds": 0.597625,
+        "peakRssBytes": 11468800,
+        "allocations": 429856,
+        "allocatedBytes": 33057881,
+        "peakLiveBytes": 68882,
+        "peakArenaUsed": 146816,
+        "attempts": 1910,
+        "begun": 942,
+        "completed": 941,
+        "canceled": 1,
+        "storeCanceled": 0
+      },
+      ":live-budget-1024-16384-inline-index": {
+        "requestsPerSecond": 4078.594938701078,
+        "processCpuSeconds": 0.516066,
+        "peakRssBytes": 11845632,
+        "allocations": 429856,
+        "allocatedBytes": 33057881,
+        "peakLiveBytes": 119461,
+        "peakArenaUsed": 472176,
+        "attempts": 537,
+        "begun": 258,
+        "completed": 249,
+        "canceled": 9,
+        "storeCanceled": 8
+      },
+      ":live-budget-4096-65536-inline-index": {
+        "requestsPerSecond": 4424.2570052276915,
+        "processCpuSeconds": 0.476637,
+        "peakRssBytes": 12599296,
+        "allocations": 429856,
+        "allocatedBytes": 33057881,
+        "peakLiveBytes": 57866,
+        "peakArenaUsed": 1048576,
+        "attempts": 253,
+        "begun": 116,
+        "completed": 19,
+        "canceled": 97,
+        "storeCanceled": 96
+      }
+    }
+  },
+  "concurrent-knobs-json": {
+    "runs": 18,
+    "responses": 37152,
+    "medians": {
+      ":sync": {
+        "requestsPerSecond": 3079.9119102483974,
+        "processCpuSeconds": 0.667222,
+        "peakRssBytes": 10665984,
+        "allocations": 943817,
+        "allocatedBytes": 54065775,
+        "peakLiveBytes": 52690,
+        "peakArenaUsed": 101248,
+        "attempts": 3760
+      },
+      ":live-inline-index": {
+        "requestsPerSecond": 2324.4912621601707,
+        "processCpuSeconds": 0.935149,
+        "peakRssBytes": 13352960,
+        "allocations": 943817,
+        "allocatedBytes": 54065775,
+        "peakLiveBytes": 67911,
+        "peakArenaUsed": 144872,
+        "attempts": 3831,
+        "begun": 1895,
+        "completed": 1894,
+        "canceled": 1,
+        "storeCanceled": 0
+      },
+      ":live-budget-256-16384-inline-index": {
+        "requestsPerSecond": 2328.1544919758962,
+        "processCpuSeconds": 0.935882,
+        "peakRssBytes": 13336576,
+        "allocations": 943817,
+        "allocatedBytes": 54065775,
+        "peakLiveBytes": 69971,
+        "peakArenaUsed": 146048,
+        "attempts": 3775,
+        "begun": 1867,
+        "completed": 1866,
+        "canceled": 1,
+        "storeCanceled": 0
+      },
+      ":live-budget-1024-4096-inline-index": {
+        "requestsPerSecond": 2490.860712175748,
+        "processCpuSeconds": 0.8778140000000001,
+        "peakRssBytes": 13369344,
+        "allocations": 943817,
+        "allocatedBytes": 54065775,
+        "peakLiveBytes": 69248,
+        "peakArenaUsed": 164200,
+        "attempts": 2892,
+        "begun": 1424,
+        "completed": 1423,
+        "canceled": 1,
+        "storeCanceled": 0
+      },
+      ":live-budget-1024-16384-inline-index": {
+        "requestsPerSecond": 2728.051073133558,
+        "processCpuSeconds": 0.7748790000000001,
+        "peakRssBytes": 13697024,
+        "allocations": 943817,
+        "allocatedBytes": 54065775,
+        "peakLiveBytes": 111741,
+        "peakArenaUsed": 353728,
+        "attempts": 1007,
+        "begun": 487,
+        "completed": 486,
+        "canceled": 1,
+        "storeCanceled": 0
+      },
+      ":live-budget-4096-65536-inline-index": {
+        "requestsPerSecond": 2889.384914074129,
+        "processCpuSeconds": 0.714499,
+        "peakRssBytes": 14565376,
+        "allocations": 943817,
+        "allocatedBytes": 54065775,
+        "peakLiveBytes": 206621,
+        "peakArenaUsed": 1048576,
+        "attempts": 429,
+        "begun": 200,
+        "completed": 27,
+        "canceled": 172,
+        "storeCanceled": 171
+      }
+    }
+  },
+  "concurrent-knobs-ordinary": {
+    "runs": 120,
+    "responses": 0,
+    "medians": {
+      "tasks:sync": {
+        "cpuSeconds": 0.015174,
+        "allocations": 65548.0,
+        "allocatedBytes": 2261361.0,
+        "peakArenaUsed": 18424.0
+      },
+      "tasks:live-hybrid-inline": {
+        "cpuSeconds": 0.0228165,
+        "allocations": 65548.0,
+        "allocatedBytes": 2261361.0,
+        "peakArenaUsed": 53240.0,
+        "begun": 129.0,
+        "completed": 128.0,
+        "canceled": 1.0
+      },
+      "tasks:live-budget-1024-16384-hybrid-inline": {
+        "cpuSeconds": 0.022407499999999997,
+        "allocations": 65548.0,
+        "allocatedBytes": 2261361.0,
+        "peakArenaUsed": 209912.0,
+        "begun": 33.0,
+        "completed": 32.0,
+        "canceled": 1.0
+      },
+      "tasks:live-budget-4096-65536-hybrid-inline": {
+        "cpuSeconds": 0.0221485,
+        "allocations": 65548.0,
+        "allocatedBytes": 2261361.0,
+        "peakArenaUsed": 836600.0,
+        "begun": 9.0,
+        "completed": 8.0,
+        "canceled": 1.0
+      },
+      "collections:sync": {
+        "cpuSeconds": 0.0887185,
+        "allocations": 237580.0,
+        "allocatedBytes": 7864689.0,
+        "peakArenaUsed": 20328.0
+      },
+      "collections:live-hybrid-inline": {
+        "cpuSeconds": 0.1247045,
+        "allocations": 237580.0,
+        "allocatedBytes": 7864689.0,
+        "peakArenaUsed": 55016.0,
+        "begun": 465.0,
+        "completed": 464.0,
+        "canceled": 1.0
+      },
+      "collections:live-budget-1024-16384-hybrid-inline": {
+        "cpuSeconds": 0.1154565,
+        "allocations": 237580.0,
+        "allocatedBytes": 7864689.0,
+        "peakArenaUsed": 208704.0,
+        "begun": 117.0,
+        "completed": 116.0,
+        "canceled": 1.0
+      },
+      "collections:live-budget-4096-65536-hybrid-inline": {
+        "cpuSeconds": 0.1135095,
+        "allocations": 237580.0,
+        "allocatedBytes": 7864689.0,
+        "peakArenaUsed": 823672.0,
+        "begun": 30.0,
+        "completed": 29.0,
+        "canceled": 1.0
+      },
+      "arrays:sync": {
+        "cpuSeconds": 0.049493999999999996,
+        "allocations": 86028.0,
+        "allocatedBytes": 1892721.0,
+        "peakArenaUsed": 15952.0
+      },
+      "arrays:live-hybrid-inline": {
+        "cpuSeconds": 0.0572825,
+        "allocations": 86028.0,
+        "allocatedBytes": 1892721.0,
+        "peakArenaUsed": 45376.0,
+        "begun": 169.0,
+        "completed": 168.0,
+        "canceled": 1.0
+      },
+      "arrays:live-budget-1024-16384-hybrid-inline": {
+        "cpuSeconds": 0.055667,
+        "allocations": 86028.0,
+        "allocatedBytes": 1892721.0,
+        "peakArenaUsed": 176896.0,
+        "begun": 43.0,
+        "completed": 42.0,
+        "canceled": 1.0
+      },
+      "arrays:live-budget-4096-65536-hybrid-inline": {
+        "cpuSeconds": 0.054982500000000004,
+        "allocations": 86028.0,
+        "allocatedBytes": 1892721.0,
+        "peakArenaUsed": 703512.0,
+        "begun": 12.0,
+        "completed": 11.0,
+        "canceled": 1.0
+      }
+    }
+  },
+  "knob-plain-heap1048576-log16384": {
+    "runs": 3,
+    "responses": 6192,
+    "medians": {
+      ":live-budget-4096-65536-inline-index": {
+        "requestsPerSecond": 4288.069798788147,
+        "processCpuSeconds": 0.48801700000000003,
+        "peakRssBytes": 12812288,
+        "allocations": 429856,
+        "allocatedBytes": 33057881,
+        "peakLiveBytes": 331214,
+        "peakArenaUsed": 1048576,
+        "attempts": 272,
+        "begun": 90,
+        "completed": 89,
+        "canceled": 1,
+        "storeCanceled": 0
+      }
+    }
+  },
+  "knob-plain-heap4194304-log4096-v2": {
+    "runs": 3,
+    "responses": 6192,
+    "medians": {
+      ":live-budget-4096-65536-inline-index": {
+        "requestsPerSecond": 4201.651217333963,
+        "processCpuSeconds": 0.501224,
+        "peakRssBytes": 17432576,
+        "allocations": 429856,
+        "allocatedBytes": 33057881,
+        "peakLiveBytes": 85085,
+        "peakArenaUsed": 4194288,
+        "attempts": 216,
+        "begun": 136,
+        "completed": 32,
+        "canceled": 104,
+        "storeCanceled": 103
+      }
+    }
+  },
+  "knob-plain-heap4194304-log16384-v2": {
+    "runs": 3,
+    "responses": 6192,
+    "medians": {
+      ":live-budget-4096-65536-inline-index": {
+        "requestsPerSecond": 4202.791529020027,
+        "processCpuSeconds": 0.494247,
+        "peakRssBytes": 13123584,
+        "allocations": 429856,
+        "allocatedBytes": 33057881,
+        "peakLiveBytes": 332825,
+        "peakArenaUsed": 1292208,
+        "attempts": 188,
+        "begun": 81,
+        "completed": 80,
+        "canceled": 1,
+        "storeCanceled": 0
+      }
+    }
+  },
+  "knob-json-heap1048576-log16384-v2": {
+    "runs": 3,
+    "responses": 6192,
+    "medians": {
+      ":live-budget-4096-65536-inline-index": {
+        "requestsPerSecond": 2785.5462623448443,
+        "processCpuSeconds": 0.741716,
+        "peakRssBytes": 14712832,
+        "allocations": 943817,
+        "allocatedBytes": 54065775,
+        "peakLiveBytes": 287887,
+        "peakArenaUsed": 1048576,
+        "attempts": 461,
+        "begun": 153,
+        "completed": 152,
+        "canceled": 1,
+        "storeCanceled": 0
+      }
+    }
+  },
+  "knob-json-heap4194304-log4096-v2": {
+    "runs": 3,
+    "responses": 6192,
+    "medians": {
+      ":live-budget-4096-65536-inline-index": {
+        "requestsPerSecond": 2611.951719704931,
+        "processCpuSeconds": 0.797605,
+        "peakRssBytes": 19628032,
+        "allocations": 943817,
+        "allocatedBytes": 54065775,
+        "peakLiveBytes": 114880,
+        "peakArenaUsed": 4194304,
+        "attempts": 374,
+        "begun": 254,
+        "completed": 48,
+        "canceled": 206,
+        "storeCanceled": 205
+      }
+    }
+  },
+  "knob-json-heap4194304-log16384-v2": {
+    "runs": 3,
+    "responses": 6192,
+    "medians": {
+      ":live-budget-4096-65536-inline-index": {
+        "requestsPerSecond": 2707.382870751324,
+        "processCpuSeconds": 0.7602990000000001,
+        "peakRssBytes": 14909440,
+        "allocations": 943817,
+        "allocatedBytes": 54065775,
+        "peakLiveBytes": 287863,
+        "peakArenaUsed": 1192232,
+        "attempts": 318,
+        "begun": 143,
+        "completed": 142,
+        "canceled": 1,
+        "storeCanceled": 0
+      }
+    }
+  }
+}

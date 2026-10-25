@@ -242,5 +242,18 @@ replace('static _Thread_local shadow_worker *shadow_owner;', '#ifndef NEOCLR_LIV
 s+='\n'+(base/'store.h').read_text()
 s+='\n'+(base/'contract.h').read_text()
 s+='\n'+(base/'workers.h').read_text()
+# Reuse only detached per-job arrays, after the worker completion handshake.
+# Keep ordinary allocation as the control; gates and snapshots retain their lifetimes.
+position=s.index('static void *shadow_alloc(')
+position=s.index('\n}',position)+2
+s=s[:position]+'\n'+(base/'scratch.h').read_text()+s[position:]
+for slot, (field, count, width) in enumerate([
+    ('headers','s->count','sizeof(block)'), ('offsets','s->count','sizeof(uint64_t)'),
+    ('pending','s->count','sizeof(uint64_t)'), ('marked','s->count','1'),
+    ('expected','s->count','1'), ('starts','s->index_capacity','sizeof(size_t)')]):
+    replace(f's->{field} = shadow_alloc({count}, {width});',
+            f's->{field} = live_scratch_alloc({slot}, {count}, {width});')
+    replace(f'free(s->{field});', f'live_scratch_free({slot}, s->{field});', 2)
+replace('    shadow_owner = NULL;', '    shadow_owner = NULL;\n    live_scratch_stop();')
 # Allocation-index helpers occur before the later snapshot headers.
 a.output.write_text('#include <stdlib.h>\n'+s)

@@ -1,5 +1,34 @@
 # Development conversation record
 
+## 2026-10-25 — Concurrent-specific tuning, phase handoffs and headroom
+
+The author asked for industry techniques and investigation of collector versus runtime
+cost before implementation, then clarified that sync and concurrent GC need not have
+the same parameters or resource use. The author asked where marking hands off work
+and whether phases can be spread out. The assistant described the current owner
+capture → persistent marker → owner remark/reclamation protocol, distinguishing
+final-collection CPU from marker waiting and sweep alone.
+
+The author then directed: “we should work more on turning the knobs” and “I don't
+think we should make very strict comparisons” with sync at this point. This refines
+the earlier requested concurrent-over-sync wrap-up advantage: concurrent self-tuning
+and measured tradeoffs now guide this slice; sync remains an informative reference.
+It does not authorize claiming an unmeasured concurrent-default or capacity win.
+
+Actions: implemented separate concurrent budget variants and heap capacity selection;
+measured plaintext, JSON and standalone task/collection/array workloads. Moderate
+budgets improve HTTP throughput/CPU while using more arena space. Longer epochs expose
+mutation-log cancellations; increasing log capacity removes them, whereas larger heap
+alone does not improve the screen. Implemented bounded scratch reuse with ownership
+checks and tests, but measured HTTP performance is flat/slightly worse; retain only
+as an opt-in experiment. AddressSanitizer startup stalls before main; UB/bounds passes.
+
+[Commands, raw evidence, tradeoffs and open work](../benchmarks/execution/concurrent-tuning/README.md).
+Next proposals are coupled epoch/log/headroom policy and a separately qualified
+bounded-sweep design. Neither adaptive scheduling nor concurrent sweeping was
+implemented in this slice. Existing ownership, roots and safety fallbacks remain.
+
+
 This is a record of conversations in which the project author directs neoCLR's
 development with an AI coding assistant. Through this concrete project, readers should
 gain insight into how the author works with AI and approaches software development as
