@@ -143,3 +143,8 @@ without a CDN. The generic implementation and demonstration site live in Raven.
 through RavenDoc's optional `googleAnalyticsId` setting. The Google tag is included
 once on authored pages and generated API pages. Remove the setting to disable it.
 Local builds include the same tag; omit the ID for an unmeasured preview.
+
+Escaped Raven identifiers use the same whole-name highlighting as the compiler
+editor grammar: backtick-delimited names and `@`-escaped keywords retain their
+function/type/identifier role. The pinned RavenDoc publisher owns this lexer and
+its light/dark styles; refresh `tools/ravendoc` when updating that behavior.
