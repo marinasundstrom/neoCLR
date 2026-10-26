@@ -148,3 +148,14 @@ failures; macOS success does not certify MSVC.
 
 All five previously failing task tests pass locally after the filename repair
 ([focused retest](task-fixtures-retest.log.gz)). Production runtime source is unchanged.
+
+The macOS packaged async gate passes 24 executions and JSON passes all three
+engines. Header acceptance initially failed to compile a retained `Error` pattern;
+the header fixture and both release HTTP benchmark fixtures now use `Failure`.
+The repaired header gate passes 132 cases. Both HTTP benchmark preparations compile
+successfully; preparation is not a measurement result. Source requalification run
+[40295956669](https://github.com/marinasundstrom/neoCLR/actions/runs/40295956669)
+and Windows reused-package run
+[40295956855](https://github.com/marinasundstrom/neoCLR/actions/runs/40295956855)
+were started at `802cae647`; the latter predates the header-fixture repair and must
+not be treated as validating it.

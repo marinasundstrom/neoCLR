@@ -20,8 +20,11 @@ continues as an experimental native development path.
   use a bounded, NUL-inclusive copy in the root-validation test so Windows can
   compile it with warnings-as-errors. Record macOS extracted JIT/interpreter
   acceptance and the remaining source/Windows qualification failures separately;
-  All five affected task tests and the 188-command macOS native GC gate pass;
-  hosted requalification remains required. Preview 18 is not yet published.
+  all five affected task tests and the 188-command macOS native GC gate pass;
+  hosted requalification remains required. Migrate the header and plain/JSON
+  release benchmark fixtures to `Failure`; all 132 macOS header cases pass and
+  both benchmark inputs compile. Packaged async (24 executions) and JSON (three
+  modes) also pass. Preview 18 is not yet published.
 
 ### 2026-10-25
 

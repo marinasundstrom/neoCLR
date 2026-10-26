@@ -26,7 +26,7 @@ async func Main() -> Task<()> {
     var count = 0
     while count < 32 {
         let result = await server.ServeOne(Respond)
-        if let Error(error) = result {
+        if let Failure(error) = result {
             server.Close()
             System.Fail(error.ToString())
         }
