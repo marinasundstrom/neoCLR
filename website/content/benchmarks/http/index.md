@@ -4,9 +4,32 @@
 tracks plain HTTP and HTTP JSON using the [standard procedure](/benchmarks/gc/procedure/).
 Those experimental AOT results are separate from the published-package series below.
 
-## Development: lazy JIT — 26 October 2026
+## Development: shared metadata selection — 26 October 2026
 
-Fresh three-round medians on Apple M1/macOS 27.0.1 use production-default backend
+A follow-up reuses temporary metadata indexes during native method selection,
+without skipping verification or compiling unused methods. Three alternating
+baseline/candidate pairs use the same JSON guest, hosts and production-default
+backend: 4,096 requests after 16 warmups, four clients, pipeline depth 16.
+
+| Mode / GC | Ready before → after (s) | Selection + verification before → after (s) | Warm req/s before → after |
+| --- | ---: | ---: | ---: |
+| Eager / sync | 13.390 → 12.531 | 9.390 → 8.396 | 1,764 → 1,876 |
+| Lazy / sync | 9.906 → 9.682 | 8.724 → 8.480 | 1,996 → 2,088 |
+| Eager / concurrent | 15.556 → 15.817 | 9.089 → 9.132 | 1,731 → 1,679 |
+| Lazy / concurrent | 11.296 → 9.781 | 9.904 → 8.451 | 1,361 → 1,401 |
+
+Readiness improves in three group medians; eager/concurrent is 1.7% slower.
+Pairwise results and warm throughput vary, so this is a modest shared preparation
+optimization, not a universal speedup or a special concurrent-GC benefit. Every
+lazy run still leaves 729 of 1,599 selected methods uncompiled. These are local
+fresh-process measurements with warm host caches, not production capacity.
+Separate memory snapshots show unchanged live allocator bytes after selection,
+but 4–32 MiB more allocator-reserved memory after invocation. RSS is variable.
+[Full ranges, paired changes and validation](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/metadata-selection-20261026/README.md).
+
+## Earlier development cohort: lazy JIT — 26 October 2026
+
+Before the metadata-selection follow-up, three-round medians on Apple M1/macOS 27.0.1 use production-default backend
 optimization, 4,096 measured requests per process, four clients and pipeline depth
 16 after 16 warmup responses. Eager uses system code placement; lazy uses its new
 bounded macOS ARM64 arena. These are development fixtures, separate from Preview 18.

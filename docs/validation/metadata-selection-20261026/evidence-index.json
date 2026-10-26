@@ -1,0 +1,159 @@
+{
+  "baseline-qualification.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/metadata-lookup-20261026/baseline-http-runs/results.json",
+    "sourceSha256": "47909d7dee06300118c421bd9417a3b7b30e67d7662167294a56cc164ba58d0f",
+    "archiveSha256": "41cfbf295cbc9cae2b5e8ec0b9edd4e5e97d9c4a8402b7d0b274fc660bc3efd5"
+  },
+  "baseline-build.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/metadata-lookup-20261026/baseline/build.json",
+    "sourceSha256": "8e5aef5ac25c88134e47cdf80e02429a39e58bf1c55a7c96428a58b60149f22b",
+    "archiveSha256": "f84f6009b920a187e2f8d094bfffbfdaee8d1234714de63f5bb671691de21c30"
+  },
+  "paired-build.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/metadata-lookup-20261026/paired/build.json",
+    "sourceSha256": "cbd437a855ef60d80b1a187f6b76fc482402cc40d23e7834161e10c048ac4a13",
+    "archiveSha256": "d54bffdd870840cd9c247bb1ac8fefdd9032a902bbc0d89e31d1222061f6145b"
+  },
+  "timing-results.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/metadata-lookup-20261026/paired-http/results.json",
+    "sourceSha256": "ad01998133dcee03700f42e09096e58feb00ff640ccf972071571b0cc3c30621",
+    "archiveSha256": "b69bf88ff35be0491943ea4f91e853d15f28120b7663d2d3a093dae4e96f8464"
+  },
+  "memory-results.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/metadata-lookup-20261026/paired-memory/results.json",
+    "sourceSha256": "c1f6a5cdb5a367908aeaaa01f927f3e150d6038470703dec8d0908471071472e",
+    "archiveSha256": "fa132b7cba3e65c30a76e7f9f6ad403006db6fc7d2f3a62d1e37575abce8dd10"
+  },
+  "profile-results.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/metadata-lookup-20261026/startup-profile/results.json",
+    "sourceSha256": "44b9c616644c39a003b0bcad4f1322388bd795f6608a60e518ab79384dccdc75",
+    "archiveSha256": "3fb322cac3fae8cdb52570f9b1db467943b5c15737fcc392b99005b8432f27c4"
+  },
+  "summary.json": {
+    "source": "/Users/robert/Projects/neoclr/target/metadata-lookup-20261026/summary.json",
+    "sourceSha256": "ff6f9dd85ecfff1d19382531a19d91fb81864e74ed52171f538249f5c9b90a2c",
+    "archiveSha256": "ff6f9dd85ecfff1d19382531a19d91fb81864e74ed52171f538249f5c9b90a2c"
+  },
+  "memory-summary.json": {
+    "source": "/Users/robert/Projects/neoclr/target/metadata-lookup-20261026/memory-summary.json",
+    "sourceSha256": "684cc3e6fea1204036577e4812cd72cfc44d303bf45cfabae8e2b5d98924c99f",
+    "archiveSha256": "684cc3e6fea1204036577e4812cd72cfc44d303bf45cfabae8e2b5d98924c99f"
+  },
+  "cpu-summary.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/metadata-lookup-20261026/cpu-summary.json",
+    "sourceSha256": "f465d4e847c262240ee94d0cdfc12edd25f09ff5fb843b8674534623c37f5251",
+    "archiveSha256": "6aed8ebbc394cad983ddca66b3991d318e3048e93c20fce401c8cc8096e3ae88"
+  },
+  "type-lookup-callers.json": {
+    "source": "/Users/robert/Projects/neoclr/target/metadata-lookup-20261026/type-lookup-callers.json",
+    "sourceSha256": "6de14dc1c41eac14f6c60a954d0a1d1d388e625bcaf9807bf2e32516df76b59c",
+    "archiveSha256": "6de14dc1c41eac14f6c60a954d0a1d1d388e625bcaf9807bf2e32516df76b59c"
+  },
+  "environment.json": {
+    "source": "/Users/robert/Projects/neoclr/target/metadata-lookup-20261026/environment.json",
+    "sourceSha256": "d72c70828b90c0eb5ba894c2351279e28724e4a46bf4ad279de8cbff167b7f15",
+    "archiveSha256": "d72c70828b90c0eb5ba894c2351279e28724e4a46bf4ad279de8cbff167b7f15"
+  },
+  "lookup-tests.txt.gz": {
+    "source": "/tmp/neoclr-metadata-lookup-tests-fixed-sdk.log",
+    "sourceSha256": "e8c52464d3f33627a42f19d87ce567cdc62b7a876f39181cd3c75840855557f4",
+    "archiveSha256": "81240d193efb1f847caf20b1578426c19797698a4d7b98627b94c55a4eae78bb"
+  },
+  "codegen-tests.txt.gz": {
+    "source": "/tmp/neoclr-metadata-codegen-tests.log",
+    "sourceSha256": "a3f84bddbbf3970e440d2ad0baf0f0d7dc2ce00df3f6426fe9251943872c40aa",
+    "archiveSha256": "6d63116479843e463a71b61b75c8caf2fa8e4264a447b8d1cb75e45937f08603"
+  },
+  "release-build.txt.gz": {
+    "source": "/tmp/neoclr-metadata-release-build.log",
+    "sourceSha256": "aea5abd9e0eebe5bc45948928c928fa6ec47b961a121c6e837a3236cb027fbc6",
+    "archiveSha256": "4931d888eae09ef77e4cfad2a7f140f9aa0f35a1efae1b7ba568a716b86f563f"
+  },
+  "initial-sdk-failure.txt.gz": {
+    "source": "/tmp/neoclr-metadata-lookup-tests.log",
+    "sourceSha256": "213d12e870856b8e371ed33e472b8e082df8b146c45b6455587b7361d395331a",
+    "archiveSha256": "5e818ca619bd118c5cb0a83cb50ec87d76df793ed6ffd91eaac1fcf150c5d224"
+  },
+  "prepare-pairs.py": {
+    "source": "/tmp/neoclr-metadata-prepare-pairs.py",
+    "sourceSha256": "7abe48d3802d8e2d27689739a0289feb16f98250df91c3ea00324d7306eefbcb",
+    "archiveSha256": "7abe48d3802d8e2d27689739a0289feb16f98250df91c3ea00324d7306eefbcb"
+  },
+  "measure.py": {
+    "source": "/tmp/neoclr-metadata-measure.py",
+    "sourceSha256": "bc5932fda01cc3c4bd220cd01a8e5b97e55c04dec09f94f35c8ee705d01449ad",
+    "archiveSha256": "bc5932fda01cc3c4bd220cd01a8e5b97e55c04dec09f94f35c8ee705d01449ad"
+  },
+  "summarize.py": {
+    "source": "/tmp/neoclr-metadata-summarize.py",
+    "sourceSha256": "41ecf53c675c4c04e799a5b74e0673a635e9a6ac86650072afae5b3b7c5b5f10",
+    "archiveSha256": "41ecf53c675c4c04e799a5b74e0673a635e9a6ac86650072afae5b3b7c5b5f10"
+  },
+  "baseline-executed-jit_lazy.rs.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/metadata-lookup-20261026/baseline/executed-jit_lazy.rs",
+    "sourceSha256": "259162541ddd07ed0600188009caec713c72eadf2e77afaf8d39f669c0027d02",
+    "archiveSha256": "f1a9dabef984e9929d69ea31d2a23fef98359ba4097ac53e5d7409bf5d4b36cb"
+  },
+  "baseline-runtime_lookup.rs.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/metadata-lookup-20261026/baseline/runtime_lookup.rs",
+    "sourceSha256": "2fcc001cc1c0c3a2ecc40e9c249873126010168ed6da6120f67a53687d5eed9f",
+    "archiveSha256": "9c63c772252311702ca49e084b291349fadea3f4f823dc88c2ab51e1e3048e4e"
+  },
+  "baseline-metadata.rs.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/metadata-lookup-20261026/baseline/metadata.rs",
+    "sourceSha256": "453e626d73f5c8ba4913462dcb4943f38d63ec5fabe147718af26731e6989bf9",
+    "archiveSha256": "d31109e2ec6e8e36640e05e7dabd13c3319c027f899c609162989487cf2abbe7"
+  },
+  "baseline-selection.rs.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/metadata-lookup-20261026/baseline/selection.rs",
+    "sourceSha256": "b668688a1658e8ceb6a68a2d7431d2c259325faa9423967d1f245d9011ade089",
+    "archiveSha256": "d11fe010358cd30a7d170c93f2b7b483a5aac1fd24811d40ea0849b0c6b78ad7"
+  },
+  "indexed-runtime_lookup.rs.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/metadata-lookup-20261026/paired/runtime_lookup.rs",
+    "sourceSha256": "bd8d3d75252d786f019c48c014e6c1b01d944b1c914d9871927e8caa4116c499",
+    "archiveSha256": "d1fc9f2a104145ba5e8685c0f2262c539abeb63f1054240e9f6e6c9d649b1491"
+  },
+  "indexed-metadata.rs.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/metadata-lookup-20261026/paired/metadata.rs",
+    "sourceSha256": "031d2dd356b05cdb3ab2f3ac49b69627379ca1878075355af9acb72570af483d",
+    "archiveSha256": "450a432a0f2038835b12cb58ad586edc63bfeb5ff171722cd6f2434119eb6dea"
+  },
+  "indexed-jit_lazy.rs.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/metadata-lookup-20261026/paired/jit_lazy.rs",
+    "sourceSha256": "f7ab552064e8e995a3ee6a16a944b12219f7564898e707fcea2bfccddaa15fce",
+    "archiveSha256": "9a3e74fb9f8f1eb10da283ce7d7678766522e0da55c412cacffdb3cc29c706a0"
+  },
+  "indexed-selection.rs.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/metadata-lookup-20261026/paired/selection.rs",
+    "sourceSha256": "249db3a88b835cec09af15c4b476f836610e042b2217ec5d0f790c87fa3de257",
+    "archiveSha256": "a37129735d6f81cf7f8d5d41340b15a7c705bc99d338c3963513aeead8334dab"
+  },
+  "baseline-lazy-live-jit.cpu.xml.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/metadata-lookup-20261026/startup-profile/baseline-lazy-live-jit.cpu.xml",
+    "sourceSha256": "72f785d9369377fae71a3b5298d392f913fd9ff77f12b4a6c64a07e74c457437",
+    "archiveSha256": "8f3579d290aaeae74919ed381be2e2d5fd55e405ed1c722b028f94f9b24022b6"
+  },
+  "indexed-lazy-live-jit.cpu.xml.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/metadata-lookup-20261026/startup-profile/indexed-lazy-live-jit.cpu.xml",
+    "sourceSha256": "624e0b55d75c86d16c23365955309a25bda4108fa6cc2dcb831f221c638ab6e8",
+    "archiveSha256": "ce30eef6e2d5d68c36199863f28754640414fa59db795f30eab70051277d6fb7"
+  },
+  "website-tests.txt.gz": {
+    "source": "/tmp/neoclr-metadata-website-tests.log",
+    "sourceSha256": "bbc97c9048f3f733aa7782ce04d1cc193f965784d209e3b33808965797637203",
+    "archiveSha256": "2739202d1b44167783e0823cbdb0c1bbbba35774825f5ef46fd17b725b3dc677"
+  },
+  "website-build.txt.gz": {
+    "source": "/tmp/neoclr-metadata-website-build.log",
+    "sourceSha256": "dfb5bf7207d1ffcb1f206be93be2dd0e373cb0101717d7d5d68339cac26ad96e",
+    "archiveSha256": "a54db98b2c49aefaccb615b68e61227b6ee7188c77821d996444f1b26bebaed9"
+  },
+  "website-toolchain.json": {
+    "archiveSha256": "71a32ad6262f5803ed6200bdabbc8acd77984f88cce05696f0801bd9036ace2b"
+  },
+  "candidate.patch.gz": {
+    "sourceSha256": "87c5b73e6bec73ee3469071d2affd6e6b5039b6be34409a185286ad0091ddaf7",
+    "archiveSha256": "c4d6d797a48c5a5acae995ccfeb92d623a94de3dd70399526a18cf36709ff418"
+  }
+}

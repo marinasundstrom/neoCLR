@@ -1123,6 +1123,19 @@ pub enum Instruction {
 }
 
 impl Module {
+    /// Run a read-only metadata phase with temporary lookup indexes on this thread.
+    ///
+    /// Lookups retain their usual identity, arity and ordering rules. Nested phases
+    /// for this module reuse the index; another module temporarily replaces it.
+    /// The index is released when the outer phase returns or unwinds, so mutation
+    /// between phases cannot leave stale rows. The operation must not move work to
+    /// another thread expecting to share this scope.
+    ///
+    /// This is a Rust compiler/runtime integration facility, not a managed API.
+    pub fn with_metadata_lookups<R>(&self, operation: impl FnOnce(&Self) -> R) -> R {
+        crate::runtime_lookup::with_module(self, || operation(self))
+    }
+
     pub fn is_reference_type(&self, ty: &Type) -> bool {
         matches!(ty, Type::ArrayRef(_) | Type::Function(_))
             || self

@@ -198,7 +198,7 @@ mod tests {
             revision: None,
             index: 0,
         };
-        with_module(&module, || {
+        module.with_metadata_lookups(|module| {
             ACTIVE.with(|active| {
                 assert!(
                     active
@@ -254,7 +254,7 @@ mod tests {
             }
         };
         assert!(owned_functions(&module, &module.types[0]).is_none());
-        with_module(&module, || {
+        module.with_metadata_lookups(|module| {
             ACTIVE.with(|active| assert!(active.borrow().as_ref().unwrap().owners.get().is_none()));
             check(&module);
             let rows = owned_functions(&module, &module.types[0]).unwrap();
@@ -265,7 +265,7 @@ mod tests {
             ));
             let other = super::tests::module(1);
             let caught = std::panic::catch_unwind(|| {
-                with_module(&other, || {
+                other.with_metadata_lookups(|_other| {
                     assert!(owned_functions(&module, &module.types[0]).is_none());
                     panic!("restore owner scope");
                 })
@@ -279,14 +279,14 @@ mod tests {
                 scope
                     .spawn(|| {
                         assert!(owned_functions(&module, &module.types[0]).is_none());
-                        with_module(&module, || check(&module));
+                        module.with_metadata_lookups(|module| check(&module));
                     })
                     .join()
                     .unwrap();
             });
         });
         module.functions[2].owner = Some(crate::assembler::parse_type("Cell<Int32>").unwrap());
-        with_module(&module, || {
+        module.with_metadata_lookups(|module| {
             check(&module);
             assert_eq!(&*owned_functions(&module, &module.types[0]).unwrap(), &[4]);
         });
@@ -297,11 +297,15 @@ mod tests {
         let first = module(1);
         let second = module(2);
         assert!(functions(&first, "Main").is_none());
-        with_module(&first, || {
+        first.with_metadata_lookups(|first| {
             assert_eq!(&*functions(&first, "Main").unwrap(), &[0]);
+            let rows = functions(first, "Main").unwrap();
+            first.with_metadata_lookups(|first| {
+                assert!(Rc::ptr_eq(&rows, &functions(first, "Main").unwrap()));
+            });
             assert!(functions(&second, "Main").is_none());
             let caught = std::panic::catch_unwind(|| {
-                with_module(&second, || {
+                second.with_metadata_lookups(|_second| {
                     assert!(functions(&first, "Main").is_none());
                     panic!("unwind nested lookup");
                 })
@@ -323,7 +327,7 @@ mod tests {
             generic_arguments: vec![],
             parameters: vec![],
         };
-        with_module(&module, || {
+        module.with_metadata_lookups(|module| {
             assert_eq!(
                 crate::vm::resolve(&module, &target).unwrap().returns,
                 Type::Int32
@@ -331,7 +335,7 @@ mod tests {
         });
         module.functions.push(module.functions[0].clone());
         let expected = crate::vm::resolve(&module, &target).unwrap_err();
-        with_module(&module, || {
+        module.with_metadata_lookups(|module| {
             assert_eq!(&*functions(&module, "Main").unwrap(), &[0, 1]);
             assert_eq!(
                 crate::vm::resolve(&module, &target).unwrap_err().message,
@@ -357,7 +361,7 @@ mod tests {
                     .map(|definition| serde_json::to_value(definition).unwrap())
             })
             .collect();
-        with_module(&module, || {
+        module.with_metadata_lookups(|module| {
             for (ty, expected) in types.iter().zip(&expected) {
                 assert_eq!(
                     module
@@ -370,7 +374,7 @@ mod tests {
                 scope
                     .spawn(|| {
                         assert!(super::types(&module, "Cell").is_none());
-                        with_module(&module, || {
+                        module.with_metadata_lookups(|module| {
                             assert_eq!(&*super::types(&module, "Cell").unwrap(), &[0, 1])
                         });
                     })

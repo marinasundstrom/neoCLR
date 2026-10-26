@@ -1,5 +1,12 @@
 # Development conversation record
 
+## 2026-10-26 — Optimize shared metadata selection after the lazy-JIT load study
+
+- **Author:** Asked to commit the measured slice when ready and pick the next best-bet optimization, then directed continuing.
+- **Assistant:** Committed the arena-placement/load/website slice as `15beb09c1` and chose shared metadata lookup, based on the startup CPU profiles. Proposed reusing existing indexes within immutable native selection phases, preserving verification and measuring both collectors.
+- **Actions:** Added a scoped Rust metadata-lookup entry point and used it during native method selection. Reused lifetime, mutation, nesting/unwinding and thread-isolation tests; compared indexed and linear selection metadata/reports. Five lookup tests and 208 code-generation tests pass, with 35 manual probes ignored. A local SDK/linker mismatch was corrected by choosing Xcode's matching SDK for builds, without a runtime workaround.
+- **Validation:** All 24 timed eager/lazy, sync/concurrent HTTP invocations pass. Three readiness medians improve; eager/concurrent is 1.7% slower, and warm throughput is mixed. Separate memory pairs show equal live allocator bytes but 4–32 MiB more reserved memory; CPU captures reduce selection/type-lookup shares. The assistant retained the bounded change and identified remaining generic-conformance/interface lookup work as a future candidate. [Evidence and contract](validation/metadata-selection-20261026/README.md) distinguish the shared startup target from first-call scheduling and warm-request work. Website publication remains deferred as directed.
+
 ## 2026-10-26 — Implement lazy JIT and measure startup with both collectors
 
 - **Author:** Asked to add lazy JIT with a trampoline, investigate synchronous versus concurrent GC, and check HttpServer benchmark changes, expecting faster JIT startup. Clarified that median startup across sample cases and HttpServer throughput are the desired measurements.

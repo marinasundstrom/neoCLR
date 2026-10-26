@@ -1135,6 +1135,19 @@ pub(super) fn select_inventory_with_host_roots(
     reference_backings: &[usize],
 ) -> Result<(neoclr::Module, Value), Error> {
     validate_source(input, single_assembly)?;
+    // Only the immutable source is indexed. The selected projection is a new
+    // module and keeps its own identity/validation rules as it is rewritten.
+    input.with_metadata_lookups(|input| {
+        select_validated_inventory(input, root, host_roots, reference_backings)
+    })
+}
+
+fn select_validated_inventory(
+    input: &neoclr::Module,
+    root: &str,
+    host_roots: &[usize],
+    reference_backings: &[usize],
+) -> Result<(neoclr::Module, Value), Error> {
     if host_roots.iter().any(|i| *i >= input.functions.len()) {
         return Err("host root index out of range".into());
     }
@@ -1467,7 +1480,14 @@ ret
 "#,
         )
         .unwrap();
-        let (selected, _) = select(&module, "Main").unwrap();
+        let (linear, linear_report) =
+            select_validated_inventory(&module, "Main", &[], &[]).unwrap();
+        let (selected, report) = select(&module, "Main").unwrap();
+        assert_eq!(
+            serde_json::to_value(&selected).unwrap(),
+            serde_json::to_value(&linear).unwrap()
+        );
+        assert_eq!(report, linear_report);
         let contract = selected
             .functions
             .iter()

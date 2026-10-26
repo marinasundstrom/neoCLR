@@ -1,0 +1,9 @@
+{
+  "repository": "https://github.com/marinasundstrom/raven.git",
+  "revision": "047f6b95e5c76b339fa48c9f9996a635a413029f",
+  "framework": "net10.0",
+  "archive": "ravendoc-net10.0.zip",
+  "sha256": "9d90b4662507520a69fd58e7d10a5b507843be26b765b08232940145007e3d7d",
+  "note": "Existing working-tree RavenDoc update observed before website build; not modified or staged by the metadata-selection task.",
+  "archiveHashVerified": true
+}

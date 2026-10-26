@@ -1,0 +1,76 @@
+[
+  {
+    "path": "target/metadata-lookup-20261026/startup-profile/baseline-lazy-live-jit.cpu.xml",
+    "rows": [
+      {
+        "callers": "neoclr::variance::compatible_at::hf010bb3a7a617257 \u2192 neoclr::variance::implemented_view::h43616500b673c15c \u2192 neoclr::type_relationships::assignable::h8f86a033ca8eab2c",
+        "shareOfTypeLookupCycles": 15.282300395973193
+      },
+      {
+        "callers": "neoclr::interfaces::closure::visit::hdcdc4c5417eb11a1 \u2192 neoclr::interfaces::closure::visit::hdcdc4c5417eb11a1 \u2192 neoclr::interfaces::closure::visit::hdcdc4c5417eb11a1",
+        "shareOfTypeLookupCycles": 11.559993474657118
+      },
+      {
+        "callers": "neoclr::type_relationships::assignable::h8f86a033ca8eab2c \u2192 neoclr_codegen::selection::implements_interface::h92477437da4a50f8 \u2192 neoclr_codegen::specialization::expand_with_conformance::h2be6a415a1c4bc5c",
+        "shareOfTypeLookupCycles": 10.205209885164544
+      },
+      {
+        "callers": "neoclr::interfaces::closure::visit::hdcdc4c5417eb11a1 \u2192 neoclr::interfaces::closure::visit::hdcdc4c5417eb11a1 \u2192 neoclr::interfaces::closure::ha528811cfd5f913b",
+        "shareOfTypeLookupCycles": 9.009953237606787
+      },
+      {
+        "callers": "neoclr::interfaces::closure::visit::hdcdc4c5417eb11a1 \u2192 neoclr::interfaces::closure::ha528811cfd5f913b \u2192 neoclr::variance::implemented_view::h43616500b673c15c",
+        "shareOfTypeLookupCycles": 8.755432965494709
+      },
+      {
+        "callers": "neoclr::type_relationships::object::he6cb7b6f9460ed6a \u2192 neoclr::type_relationships::assignable::h8f86a033ca8eab2c \u2192 neoclr_codegen::selection::implements_interface::h92477437da4a50f8",
+        "shareOfTypeLookupCycles": 7.053977178861164
+      },
+      {
+        "callers": "neoclr_codegen::selection::implements_interface::h92477437da4a50f8 \u2192 neoclr_codegen::specialization::expand_with_conformance::h2be6a415a1c4bc5c \u2192 neoclr_codegen::linking::prepare::h242d0bb57253fb39",
+        "shareOfTypeLookupCycles": 5.6821960788195245
+      },
+      {
+        "callers": "neoclr::interfaces::closure::ha528811cfd5f913b \u2192 neoclr::variance::implemented_view::h43616500b673c15c \u2192 neoclr::type_relationships::assignable::h8f86a033ca8eab2c",
+        "shareOfTypeLookupCycles": 4.850529431495998
+      }
+    ]
+  },
+  {
+    "path": "target/metadata-lookup-20261026/startup-profile/indexed-lazy-live-jit.cpu.xml",
+    "rows": [
+      {
+        "callers": "neoclr::variance::compatible_at::hf010bb3a7a617257 \u2192 neoclr::variance::implemented_view::h43616500b673c15c \u2192 neoclr::type_relationships::assignable::h8f86a033ca8eab2c",
+        "shareOfTypeLookupCycles": 17.264599536726916
+      },
+      {
+        "callers": "neoclr::type_relationships::assignable::h8f86a033ca8eab2c \u2192 neoclr_codegen::selection::implements_interface::h92477437da4a50f8 \u2192 neoclr_codegen::specialization::expand_with_conformance::h2be6a415a1c4bc5c",
+        "shareOfTypeLookupCycles": 12.654926806243441
+      },
+      {
+        "callers": "neoclr::interfaces::closure::visit::hdcdc4c5417eb11a1 \u2192 neoclr::interfaces::closure::visit::hdcdc4c5417eb11a1 \u2192 neoclr::interfaces::closure::visit::hdcdc4c5417eb11a1",
+        "shareOfTypeLookupCycles": 9.271239361866728
+      },
+      {
+        "callers": "neoclr::interfaces::closure::visit::hdcdc4c5417eb11a1 \u2192 neoclr::interfaces::closure::ha528811cfd5f913b \u2192 neoclr::variance::implemented_view::h43616500b673c15c",
+        "shareOfTypeLookupCycles": 9.031339372752553
+      },
+      {
+        "callers": "neoclr_codegen::selection::implements_interface::h92477437da4a50f8 \u2192 neoclr_codegen::specialization::expand_with_conformance::h2be6a415a1c4bc5c \u2192 neoclr_codegen::linking::prepare::h242d0bb57253fb39",
+        "shareOfTypeLookupCycles": 8.2219926383277
+      },
+      {
+        "callers": "neoclr::interfaces::closure::visit::hdcdc4c5417eb11a1 \u2192 neoclr::interfaces::closure::visit::hdcdc4c5417eb11a1 \u2192 neoclr::interfaces::closure::ha528811cfd5f913b",
+        "shareOfTypeLookupCycles": 8.08865062976936
+      },
+      {
+        "callers": "neoclr::type_relationships::object::he6cb7b6f9460ed6a \u2192 neoclr::type_relationships::assignable::h8f86a033ca8eab2c \u2192 neoclr_codegen::selection::implements_interface::h92477437da4a50f8",
+        "shareOfTypeLookupCycles": 7.436664357247928
+      },
+      {
+        "callers": "neoclr::interfaces::closure::ha528811cfd5f913b \u2192 neoclr::variance::implemented_view::h43616500b673c15c \u2192 neoclr::type_relationships::assignable::h8f86a033ca8eab2c",
+        "shareOfTypeLookupCycles": 5.649042200811367
+      }
+    ]
+  }
+]
