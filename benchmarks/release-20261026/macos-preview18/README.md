@@ -1,5 +1,9 @@
 # Preview 18 candidate macOS measurements — 2026-10-26
 
+**Superseded candidate:** this archive omitted the optional PostgreSQL provider.
+Use the [final provider-inclusive measurements](../macos-preview18-final/README.md)
+for Preview 18. The raw results below remain unchanged.
+
 All five stages pass against the extracted Preview 18 candidate, SDK/editor
 `0.1.18-neoclr.20261025.1`, Raven `ed1d08def`: 55 CPU/JSON processes and
 1,152 validated HTTP responses. Apple M1, macOS 27.0.1; source `f2ca92260`.

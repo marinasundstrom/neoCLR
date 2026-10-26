@@ -1,0 +1,29 @@
+{
+  "passed": true,
+  "sdkVersion": "0.1.18-neoclr.20261025.1",
+  "includesPostgreSQL": true,
+  "reports": {
+    "aggregate": {
+      "file": "aggregate.json.gz",
+      "rawSha256": "47c75f701e29494c638e1566c8481b3327bb42796b09ff6c8d0d9ae6e1d36f24"
+    },
+    "execution": {
+      "file": "execution.json.gz",
+      "rawSha256": "d250fbd6ca3ce460e16d37bb9a645294e4e76987242afaf609ea021e4dce6ae5"
+    },
+    "cpu-native": {
+      "file": "cpu-native.json.gz",
+      "rawSha256": "a03f4abc9e4e9d84a40ef3b7b13d1156c02105e230b1a00e06c4b84b0e766c49"
+    },
+    "http-plain": {
+      "file": "http-plain.json.gz",
+      "rawSha256": "9475e05dbf882045cf6a38ee8556d93743a33f6e7d654ee5a7ebbce0dc2d1423"
+    },
+    "http-json": {
+      "file": "http-json.json.gz",
+      "rawSha256": "8676ebf22b99f7ce03f81d28b0f34d149da0bfbdf524e5ffc101ba700ec07db8"
+    }
+  },
+  "bundleManifestSha256": "6bf84ed3a21f30f348b6c72af70adb3e94eaf903c4dbae02249787d32fc52fb5",
+  "archiveSha256": "a3f60527e9a0b17ec93bc9cac67369b31a1905660a39d633c4dbe2de52311bea"
+}

@@ -1,15 +1,14 @@
 # Install neoCLR
 
 The matched bundle includes the runtime, Raven compiler, VS Code extension and samples.
-Preview 17 provides matching packages for **Windows x64** and **macOS on Apple silicon**.
+Preview 18 provides matching packages for **Windows x64** and **macOS on Apple silicon**.
 JIT is the default on both; interpreter execution remains available explicitly.
 AOT is a separate experimental publishing workflow for supported applications.
 
-**In preparation:** Preview 18 is being qualified for both platforms. It includes
-API migrations (`Optional<T>`, `Result.Failure`), HTTP/value improvements and runtime
-fixes. Synchronous GC remains the default; concurrent GC is still experimental.
-[Candidate scope and migration notes](https://github.com/marinasundstrom/neoCLR/blob/main/docs/next-preview-release-notes.md).
-The downloads below remain the published Preview 17 packages.
+This release includes API migrations (`Optional<T>`, `Result.Failure`), HTTP/value
+improvements and runtime fixes. Synchronous GC remains the default; concurrent GC
+is experimental. Keep compiler, libraries and extension versions together.
+[Release scope and migration notes](https://github.com/marinasundstrom/neoCLR/blob/v0.1.0-preview.18/docs/preview-18-release-notes.md).
 
 ## 1. Install prerequisites
 
@@ -23,8 +22,8 @@ not by neoCLR itself.
 
 ## 2. Download and extract
 
-- [Download for macOS ARM64](https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.17/neoclr-preview17-osx-arm64.tar.gz)
-- [Download for Windows x64](https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.17/neoclr-preview17-win-x64.tar.gz)
+- [Download for macOS ARM64](https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.18/neoclr-preview18-osx-arm64.tar.gz)
+- [Download for Windows x64](https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.18/neoclr-preview18-win-x64.tar.gz)
 
 Extract the archive and keep its folders together.
 
@@ -44,7 +43,7 @@ sample folders next.
 
 **neoCLR: Build and Run (JIT)** is also the default build task. The separate
 **neoCLR: Compile to Native** action requires the matching
-[macOS ARM64 build kit](https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.17/neoclr-native-build-kit-osx-arm64.tar.gz),
+[macOS ARM64 build kit](https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.18/neoclr-native-build-kit-osx-arm64.tar.gz),
 Apple build tools and a fresh output directory. It builds without launching the result.
 
 [Learn Raven →](../raven/) · [Explore the APIs →](../docs/)
@@ -80,7 +79,7 @@ python3 tools/verify-native-bundle.py --report ../acceptance.json
 On Windows, use `python` in place of `python3`. It compiles and runs the bundled
 collections, Tasks, JSON and HTTP examples.
 
-[Release notes and downloads](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.17)
+[Release notes and downloads](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.18)
 include the exact supported toolchain and limitations.
 
 <a id="development"></a>
@@ -100,9 +99,9 @@ bundle contains the four base libraries without that provider. Start with the
 [PostgreSQL sample](/cases/postgresql/) for local database queries.
 
 For native publishing, follow the
-[project build instructions](https://github.com/marinasundstrom/neoCLR/blob/v0.1.0-preview.17/docs/native-poc-bundle.md)
+[project build instructions](https://github.com/marinasundstrom/neoCLR/blob/v0.1.0-preview.18/docs/native-poc-bundle.md)
 with the matching compiler, runtime, libraries and host tools. AOT remains bounded;
 JIT package acceptance does not imply every application can be published natively.
 
-[Preview 17 release notes](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.17) ·
-[Qualification results](https://github.com/marinasundstrom/neoCLR/blob/v0.1.0-preview.17/docs/validation/release-20261023/README.md)
+[Preview 18 release notes](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.18) ·
+[Qualification results](https://github.com/marinasundstrom/neoCLR/blob/v0.1.0-preview.18/docs/validation/release-20261026/README.md)

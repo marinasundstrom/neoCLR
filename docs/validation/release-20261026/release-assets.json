@@ -1,0 +1,54 @@
+{
+  "release": "v0.1.0-preview.18",
+  "qualificationPassed": true,
+  "releaseDate": "2026-10-26",
+  "packageVersion": "0.1.18-neoclr.20261025.1",
+  "ravenRevision": "ed1d08defe2778f965951747d5f48311ce3daf83",
+  "runtimeCodeRevision": "179a2d8763a0541aea6594faa233012d95a68e55",
+  "qualifiedSourceRevision": "fc100795855180fa1e58124bac17102317203f96",
+  "windowsQualificationRevision": "f2ca92260672cd48748fc70c6cc8ac64aec3f698",
+  "macOSBenchmarkRevision": "dce8207ca0125ccb5b1b93d3fc0d45ba41a07647",
+  "sourceDelta": "Later changes repair validation harnesses and update documentation/evidence; production runtime, library and compiler sources are unchanged. The source asset is the exact archive accepted by canonical CI.",
+  "assetsSha256": {
+    "neoclr-native-build-kit-osx-arm64.tar.gz": "807fc5a4d607f3952489d9fe9a852bb10e718ae5a245ca7f1e3d27adf295b075",
+    "neoclr-preview18-osx-arm64.tar.gz": "a3f60527e9a0b17ec93bc9cac67369b31a1905660a39d633c4dbe2de52311bea",
+    "neoclr-preview18-qualified-source.tar": "435836d37c832bc899e81d931e678ea578d718676f14de39c62754447060a8c6",
+    "neoclr-preview18-win-x64.tar.gz": "5b10d49eab088962ed244740a13eb9ee90aade234bef0a0c89ff780d6ab71a0d",
+    "raven-0.1.18-neoclr.20261025.1-osx-arm64.vsix": "a6f700af735411fe648d2a0ee2a5acb69e468cdad41f259aa03817a23be77dca",
+    "raven-0.1.18-neoclr.20261025.1-win-x64.vsix": "3db55fd6500f730de66bf3848b85ef2b845b6df168d81f10e87b03734ba064ba",
+    "raven-sdk-0.1.18-neoclr.20261025.1-osx-arm64.tar.gz": "82b366c9868feca1732f17b882b960de6bea86da2d9bd03564335472f43880af",
+    "raven-sdk-0.1.18-neoclr.20261025.1-win-x64.tar.gz": "77becbc0a76fc64fb67ac4ecb954aba198d106e0190fd6c64c9a740400ef7faa",
+    "raven-tool-notices-osx-arm64.tar.gz": "1ff87957ec6eeef1fcfce0684e4bc8db7b1af3f61a349e734c72b7866d6c9d8f",
+    "raven-tool-notices-win-x64.tar.gz": "1ff87957ec6eeef1fcfce0684e4bc8db7b1af3f61a349e734c72b7866d6c9d8f"
+  },
+  "platforms": {
+    "osx-arm64": {
+      "manifestSha256": "6bf84ed3a21f30f348b6c72af70adb3e94eaf903c4dbae02249787d32fc52fb5",
+      "manifestFilesVerified": 2418,
+      "includesPostgreSQL": true,
+      "sdkMatchedFiles": 469
+    },
+    "win-x64": {
+      "manifestSha256": "c947749f58da2797674b0c7cb71374c9e0bacb8a46196be7ad7f9a0aa8dc4a7c",
+      "manifestFilesVerified": 2413,
+      "includesPostgreSQL": false
+    }
+  },
+  "checks": {
+    "canonicalSource": 40296297625,
+    "windowsOriginalPackage": 40213940464,
+    "windowsPackageQualification": 40298792405,
+    "windowsHttps": 40298850434,
+    "windowsBenchmarks": 40298846341
+  },
+  "macOSMeasurements": "benchmarks/release-20261026/macos-preview18-final/summary.json",
+  "windowsMeasurements": "benchmarks/release-20261026/windows-preview18/summary.json",
+  "evidence": "docs/validation/release-preparation-20261025/README.md",
+  "limitations": [
+    "Synchronous GC default; concurrent GC remains private experimental qualification tooling.",
+    "HTTP measurements are sequential loopback connection-close tests, not peak server concurrency.",
+    "Windows hosted results are lower than the prior release and use a different CPU model; no controlled speedup claim.",
+    "Backticked identifiers and lazy JIT compilation are not included in the compiler/runtime pin.",
+    "Separate SDK and VSIX attribution is supplied in companion raven-tool-notices archives."
+  ]
+}

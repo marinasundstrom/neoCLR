@@ -1,5 +1,5 @@
 {
-  "status": "qualification started; not published",
+  "status": "all qualification and measurement gates passed; publication pending",
   "selectedDate": "2026-10-25",
   "proposedReleaseTag": "v0.1.0-preview.18",
   "runtimeVersion": "0.1.0-preview.18",
@@ -13,12 +13,7 @@
   "defaultCollector": "synchronous",
   "experimentalDefaultsUnchanged": true,
   "remaining": [
-    "rerun source qualification after fixture repairs",
-    "complete macOS and Windows SDK/editor packages and extracted acceptance",
-    "matching native build kits and HTTPS gates",
-    "final-artifact release benchmarks",
-    "artifact and notice audits",
-    "publication and website deployment"
+    "Verified release upload and website deployment"
   ],
   "repairedSourceRun": 40214540493,
   "qualificationUpdateDate": "2026-10-26",
@@ -37,8 +32,7 @@
     }
   },
   "currentBlockers": [
-    "Final macOS provider-inclusive benchmark refresh",
-    "Publication and website deployment"
+    "Verified release upload and website deployment"
   ],
   "localFixtureRetest": {
     "taskTestsPassed": 5,
@@ -67,5 +61,6 @@
   "sourceArchiveSha256": "435836d37c832bc899e81d931e678ea578d718676f14de39c62754447060a8c6",
   "finalMacOSArchive": "a3f60527e9a0b17ec93bc9cac67369b31a1905660a39d633c4dbe2de52311bea",
   "finalMacOSManifest": "6bf84ed3a21f30f348b6c72af70adb3e94eaf903c4dbae02249787d32fc52fb5",
-  "windowsBenchmarkPassed": true
+  "windowsBenchmarkPassed": true,
+  "finalMacOSBenchmark": "benchmarks/release-20261026/macos-preview18-final/summary.json"
 }

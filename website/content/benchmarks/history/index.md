@@ -5,6 +5,16 @@ workload, machine and measurement settings match; a newer date alone does not ma
 two runs comparable. These first Preview 14 measurements are exploratory baselines,
 not established performance regression gates.
 
+## 2026-10-26 — Preview 18
+
+Final macOS ARM64 (with PostgreSQL) and Windows x64 packages pass the same five-stage
+release measurement suite. Each validates 55 CPU/JSON processes and 1,152 HTTP
+responses. Retain startup, ranges and slower Windows results; its CPU model differs
+from the prior hosted run, so no controlled speedup is claimed.
+[macOS evidence](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/release-20261026/macos-preview18-final) ·
+[Windows evidence](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/release-20261026/windows-preview18).
+The earlier base-only macOS candidate remains separate historical evidence.
+
 ## 2026-10-13 — Preview 14, macOS ARM64
 
 Apple M1, macOS 27.0, with desktop and indexing activity. Every recorded case passed

@@ -1,88 +1,10 @@
-# Preview 18 — candidate release notes
+# Next preview release notes
 
-Unreleased candidate selected 2026-10-25: runtime `0.1.0-preview.18`, SDK/editor
-`0.1.18-neoclr.20261025.1`. Publication date and final artifact identities are not
-yet selected. The previous published release is [Preview 17](preview-17-release-notes.md).
-These notes describe the intended release scope; the
-[readiness record](validation/release-preparation-20261025/README.md) tracks what
-still needs integration or qualification.
+No subsequent release version is selected. The current release is
+[Preview 18](preview-18-release-notes.md), with [qualification evidence](validation/release-20261026/README.md).
 
-## Clearer platform contracts
-
-`Optional<T>` replaces `Option<T>`, keeping `Some` and `None`. `Result.Failure`
-replaces `Result.Error`, keeping `Ok`: the failure is the outcome, and the error is
-its payload. Update constructors, patterns and affected imports, then rebuild
-consumers against matching libraries and compiler tooling.
-
-`System.Error` and typed context decorators provide optional diagnostics and
-failure-context helpers without requiring every Result or union to implement an
-error interface. Capture is off by default. ConditionalAttribute support and
-bounded formatting accompany this work; source file/line resolution remains open.
-
-`System.Environment` becomes a static class with fallible OS discovery, process
-and OS architecture, NewLine and structured version information. Qualified calls
-continue to work; former module-function imports need migration. Additional-host
-qualification and Linux distribution discovery remain open.
-
-## Efficient HTTP and value handling
-
-Structured MediaType values, cached presets and typed HTTP content overloads make
-media metadata easier to use. HTTP internals retain validated primitives and expose
-structured views lazily. Raw outbound media strings now receive full syntax
-validation before I/O; Accept ranges/weights are not accepted as MediaType values.
-
-URI parsing and resolution reuse UTF-8 storage and validated components to reduce
-temporary work. These changes preserve validation and value-object contracts;
-they do not impose a blanket ban on allocations or change Path semantics.
-
-## Runtime optimization, GC improvements and concurrent experiments
-
-Native execution improves repeated root/descriptor work, managed-heap lookup,
-allocation bookkeeping and redundant initialization. Async context reuse and
-ownership/suspension checks are qualified within their documented host boundaries.
-These changes benefit runtime execution beyond HTTP. Managed JIT preparation now
-releases unused compilation inputs before guest execution while retaining code and
-native-host ownership through cleanup. Memory effects vary and timing results are
-mixed; this is not presented as a throughput gain. A test-only JIT placement
-experiment also identifies a shared code/static-data cost, improving both collector
-paths. Contiguous/fallback placement and the combined stack-bound/small-frame
-layout remain opt-in experiments for this candidate. Production memory policy
-and additional-platform qualification remain open. Explicit instruction-cache
-publication corrects intermittent macOS ARM64 JIT execution failures during code
-storage reuse, across ordinary and experimental concurrent paths.
-
-Concurrent native GC continues as a separate experimental track. Work includes
-live marking, mutation/root safety, JIT/AOT consumers, worker coordination and
-collection-policy tuning. Qualified stack-bound proofs and immutable byref handling
-are integrated into this private backend while preserving roots and guarded unknown
-destinations. Typed scalar stores are integrated within that private candidate and reduce CPU
-substantially in a reusable-buffer workload, while HTTP effects are small and mixed. The synchronous
-collector remains the default; this draft does not announce a broad concurrent-GC
-throughput or latency advantage, generations, compaction or general virtual threads.
-
-The current concurrent execution route is private qualification tooling, not a
-supported public GC selector in ordinary hosting. Internal persistent HTTP drivers
-and shared-worker experiments likewise do not imply new public server guarantees.
-The native candidate implementation now belongs to the runtime source tree, with
-a checked owned-heap policy and benchmark-independent source generation. Final
-release packaging must distinguish supported execution from retained experiments.
-
-## Better evidence and documentation
-
-A standard suite now covers plain HTTP, JSON HTTP and six standalone allocation
-patterns, with separate throughput and profiling runs. Measurements retain CPU,
-allocation/memory, collector policy and execution-mode identities. Owner-operation
-histograms and metadata/scheduling diagnostics help explain costs without treating
-instrumented timings as benchmarks. Results include regressions and limitations.
-
-API references, navigation, migration examples and error-handling guidance are
-updated alongside the contracts. Detailed engineering experiments remain in the
-[runtime/GC record](development-history/runtime-gc.md), while the
-[changelog](../CHANGELOG.md) presents the release themes.
-
-## Before publication
-
-Fresh matching source/compiler/API, macOS ARM64 and Windows x64 package/editor
-checks, release benchmarks and artifact identities are still required. Development
-macOS evidence does not certify new packages or additional platforms. No tag,
-release upload or website publication has been performed for this draft.
+Post-release investigation includes lazy JIT compilation through trampolines,
+first-call/steady-state costs and coordination with concurrent GC. The newer Raven
+backtick-identifier work is outside Preview 18's compiler pin and needs separate
+native metadata, discovery and execution qualification. These are follow-up
+investigations, not implemented release promises; follow the [roadmap](platform-roadmap.md).

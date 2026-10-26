@@ -4,26 +4,49 @@
 tracks plain HTTP and HTTP JSON using the [standard procedure](/benchmarks/gc/procedure/).
 Those experimental AOT results are separate from the published-package series below.
 
-## Preview 18 candidate — 26 October 2026
+## Preview 18 — 26 October 2026
 
-The macOS ARM64 candidate passes all five stages: 55 CPU/JSON processes and
-1,152 HTTP responses. SDK/editor `0.1.18-neoclr.20261025.1`, Raven `ed1d08def`,
-Apple M1/macOS 27.0.1, synchronous GC. Five measured rounds use sequential
-loopback HTTP with connection close; startup is separate and native CPU batches
-are longer. The checkout stayed clean and no unrelated builds overlapped timing.
-These are candidate measurements, not peak concurrent throughput or a controlled
-speedup comparison. Windows measurements and release publication remain pending.
+Both packages pass all five measurement stages: 55 CPU/JSON processes and 1,152
+HTTP responses per platform. SDK/editor `0.1.18-neoclr.20261025.1`, Raven `ed1d08def`,
+synchronous GC. Five measured rounds retain ranges; startup is separate. Native CPU
+uses longer batches, and HTTP uses sequential loopback requests with connection close.
+These results do not measure peak concurrency, allocation rates or collector comparisons.
+
+### macOS ARM64
+
+Apple M1/macOS 27.0.1; the final archive includes PostgreSQL. Git stayed clean and
+no unrelated builds overlapped timing. Ordinary desktop activity remained present.
 
 | Workload | Mode | Median requests/s | Range | Median startup s |
 | --- | --- | ---: | ---: | ---: |
-| http-plain | interpreter | 3.85 | 3.76–3.97 | 2.811 |
-| http-plain | jit | 190.08 | 183.04–195.91 | 6.275 |
-| http-plain | aot | 200.06 | 192.50–205.16 | 0.005 |
-| http-json | interpreter | 2.06 | 2.00–2.24 | 2.796 |
-| http-json | jit | 110.67 | 107.69–111.70 | 10.747 |
-| http-json | aot | 114.99 | 113.46–116.16 | 0.005 |
+| http-plain | interpreter | 3.53 | 3.43–3.67 | 3.314 |
+| http-plain | jit | 185.20 | 164.70–188.13 | 6.950 |
+| http-plain | aot | 192.97 | 178.38–193.74 | 0.005 |
+| http-json | interpreter | 2.00 | 1.92–2.06 | 3.179 |
+| http-json | jit | 103.27 | 90.92–106.06 | 13.283 |
+| http-json | aot | 107.20 | 77.14–108.29 | 0.016 |
 
-[Raw macOS reports and conditions](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/release-20261026/macos-preview18).
+[Final macOS reports](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/release-20261026/macos-preview18-final).
+The earlier base-only candidate is retained separately.
+
+### Windows x64
+
+Windows Server 2025 on AMD Family 25 Model 1. The prior series used Model 17;
+CPU-control and HTTP results are lower in this hosted run. The host difference
+prevents attributing the change solely to the runtime and does not rule out a
+runtime regression. Only generated Python caches changed during measurement.
+
+| Workload | Mode | Median requests/s | Range | Median startup s |
+| --- | --- | ---: | ---: | ---: |
+| http-plain | interpreter | 2.71 | 2.65–2.76 | 5.408 |
+| http-plain | jit | 42.10 | 37.55–42.15 | 11.416 |
+| http-plain | aot | 37.59 | 36.93–39.86 | 0.009 |
+| http-json | interpreter | 1.59 | 1.59–1.62 | 5.422 |
+| http-json | jit | 27.30 | 26.55–28.14 | 18.664 |
+| http-json | aot | 27.55 | 24.46–30.76 | 0.009 |
+
+[Windows reports and conditions](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/release-20261026/windows-preview18).
+No controlled before/after or cross-platform speedup is claimed.
 
 ## Preview 17 — 22–23 October 2026
 

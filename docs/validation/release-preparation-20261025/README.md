@@ -222,3 +222,12 @@ corrected harness, not erased. Windows HTTPS separately passes 27 cases.
 The exact canonical source archive also matches its hosted SHA-256. Final Windows
 measurements and publication remain open. Lazy JIT compilation with trampolines
 is an author-requested post-release investigation, with no candidate-code change.
+
+### Qualification closed — 2026-10-26
+
+The final PostgreSQL-inclusive macOS archive passes all five benchmark stages
+with clean Git status before/after. Windows final measurements also pass.
+[Preview 18 qualification and final asset identities](../release-20261026/README.md)
+now supersede candidate status above. Earlier failures and the base-only macOS
+archive remain historical evidence. Verified release upload and website deployment
+remain separate publication steps.
