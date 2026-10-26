@@ -23050,6 +23050,40 @@ compiler is pinned to the previous version, then directed continued release work
 The release pin remains unchanged; backticked test integration and validation are
 deferred, not completed. See the [release record](validation/release-preparation-20261025/README.md).
 
+Later the same day, the author asked to review test and benchmark method names
+and consider moving attribute descriptions into backtick identifiers. The
+assistant inspected the Raven lexical/compiler documentation and neoCLR discovery
+and registration code. A source scan found 453 Test markers in runtime Raven
+tests (450 with arguments) and five Benchmark markers in benchmark Raven sources
+(two with arguments). Both discovery tools currently reject non-ASCII/plain
+identifiers and emit unquoted qualified calls. Test descriptions reach runtime
+display; benchmark descriptions reach the discovery manifest, while benchmark
+registration uses the qualified function name.
+
+The assistant recommends descriptive backtick names as the eventual default for
+behavior tests, and concise, stable workload names for benchmarks, retaining
+optional description overrides. This removes duplicate naming, but renaming
+changes IDs, selectors and ordinal execution order; benchmark history needs an
+explicit old/new mapping. Adapter generation must preserve namespace/member
+boundaries rather than split a flattened name on punctuation. A compiler update
+and focused native discovery, filtering and interpreter/JIT/AOT execution checks
+must precede migration. This is a recommendation, not an adopted convention or
+completed implementation; no compiler pin or test/benchmark source was changed.
+
+The author confirmed that this is post-release work with the unreleased compiler,
+directed continuation, and clarified that neoCLR already supports Unicode names
+including spaces. The assistant corrected the distinction: the restriction is in
+the discovery source adapters, not a missing runtime naming capability. The author
+then requested a commit after migrating suitable tests. The bounded migration
+covers seven IP-address behavior tests and the test/benchmark discovery fixtures;
+description-contract tests retain their overrides. Adapter work also fixes
+JSON-surrogate literal generation and outdated generated range syntax. Validation
+and migration details are recorded in the [qualification record](validation/backtick-discovery-20261026/README.md).
+
+Evidence: [test discovery](../tools/testing/NeoCLR.TestDiscovery/Program.cs),
+[benchmark discovery](../tools/benchmarking/NeoCLR.BenchmarkDiscovery/Program.cs),
+[test API](../api-docs/testing.md), [benchmark API](../api-docs/benchmarking.md).
+
 ## 2026-10-26 — Lazy JIT follow-up after Preview 18
 
 Looking at median JIT startup measurements, the author proposed lazy compilation

@@ -7,6 +7,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="../../discovery/RavenNames.cs" Link="RavenNames.cs" />
     <ProjectReference Include="../../metadata/NeoCLR.Metadata.Experimental/NeoCLR.Metadata.Experimental.csproj" />
   </ItemGroup>
 </Project>

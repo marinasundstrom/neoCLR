@@ -57,3 +57,25 @@ and [runner configuration and limitations](https://github.com/marinasundstrom/ne
 
 See the [benchmarking project guide](https://github.com/marinasundstrom/neoCLR/blob/main/tools/benchmarking/README.md)
 for preparation, runner commands, configuration and result interpretation.
+
+## Descriptive identifiers (development)
+
+Use `[Benchmark]` with a concise, stable backtick function name where the name
+already describes the workload. For example, the discovery sample declares
+``func `Sum a sequence of integers`() -> int``. Optional Description overrides
+remain supported in discovery manifests; worker registration and exact filtering
+continue to use qualified function names, not descriptions.
+
+The unreleased compiler is required. The adapter quotes complete function names,
+including spaces, Unicode and periods, and resolves data providers by their logical
+names without source backticks. Renaming changes selectors, IDs and ordinal order;
+record old/new selectors when comparing historical benchmark results. Native
+metadata already supports these names. See [source limitations](testing.md#escaped-names-and-source-adapters-development)
+and the three-mode qualifier `benchmarks/framework/validate_names.py`.
+
+The discovery sample's renamed selectors are `Benchmarks.Discovery.Sum` →
+`Benchmarks.Discovery.Sum a sequence of integers`, `Benchmarks.Discovery.Inline` →
+`Benchmarks.Discovery.Add café. 世界 😀`, and `Benchmarks.Discovery.FromSource` →
+`Benchmarks.Discovery.Accept source rows`. Its provider is now
+`Benchmarks.Discovery.Inputs with spaces. λ`; argument values and source indices
+are unchanged. These are qualification workloads, not new performance evidence.

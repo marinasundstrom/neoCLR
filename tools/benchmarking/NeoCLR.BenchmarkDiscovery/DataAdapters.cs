@@ -1,12 +1,11 @@
 using System.Text.Json;
-using System.Text.RegularExpressions;
 using NeoCLR.Metadata.Experimental.Introspection;
 using NeoCLR.Metadata.Experimental.Model;
 
 // Owned by this framework. No dependency on the other framework or its contracts.
 internal static class DataAdapters
 {
-    internal record Registration(string Suffix, string Callback, string? Provider = null);
+    internal record Registration(string Suffix, string Callback, string? Provider = null, string? ProviderReference = null);
     internal static List<Registration> Read(MethodDefinition definition, MethodInfo method,
         AssemblyDefinition snapshot, MetadataLoadContext context, string scope, string sourceAttribute)
     {
@@ -29,24 +28,27 @@ internal static class DataAdapters
                     if (parameters[i].ParameterType is not PrimitiveTypeInfo primitive || primitive.Kind != kind)
                         throw new InvalidDataException(method.Name + ": argument row has wrong parameter type");
                 }
-                var literals = string.Join(", ", values.Select(v => JsonSerializer.Serialize(v.Value)));
-                rows.Add(new("(" + literals + ")", literals));
+                var literals = string.Join(", ", values.Select(v => v.Value is string text ? RavenNames.StringLiteral(text) : JsonSerializer.Serialize(v.Value)));
+                var identity = string.Join(", ", values.Select(v => JsonSerializer.Serialize(v.Value)));
+                rows.Add(new("(" + identity + ")", literals));
             }
             else
             {
                 if (values.Count != 1 || values[0].Value is not string provider || parameters.Count != 1)
                     throw new InvalidDataException(method.Name + ": a method source requires a name and one input parameter");
-                if (!provider.Contains('.') && method.Namespace.Length != 0) provider = method.Namespace + "." + provider;
-                if (!provider.Split('.').All(p => Regex.IsMatch(p, "^[A-Za-z_][A-Za-z0-9_]*$")))
-                    throw new InvalidDataException("Data source requires a plain qualified function name");
-                var candidates = snapshot.MainModule.Methods.Where(d => d.Name == provider.Split('.').Last()).Select(context.Resolve).Where(d => (d.Namespace.Length == 0 ? d.Name : d.Namespace + "." + d.Name) == provider).ToArray();
+                // Resolve metadata names before generating source. A dot inside a method
+                // name belongs to that name, not necessarily to a namespace separator.
+                var candidates = snapshot.MainModule.Methods.Where(d => d.Name == provider || provider.EndsWith("." + d.Name, StringComparison.Ordinal)).Select(context.Resolve).Where(d =>
+                    (d.Namespace == method.Namespace && d.Name == provider) ||
+                    (d.Namespace.Length == 0 ? d.Name : d.Namespace + "." + d.Name) == provider).ToArray();
                 if (candidates.Length != 1) throw new InvalidDataException("Missing or ambiguous data source: " + provider);
                 var source = candidates[0];
                 if (source.DeclaringType is not null || !source.IsStatic || source.IsAbstract || source.IsGenericMethodDefinition ||
                     source.Accessibility is not (MetadataAccessibility.Public or MetadataAccessibility.Assembly) || source.GetParameters().Count != 0 ||
                     source.ReturnType is not ArrayTypeInfo array || !ReferenceEquals(array.ElementType, parameters[0].ParameterType))
                     throw new InvalidDataException(provider + ": source must be an accessible parameterless module function returning an array of the input type");
-                rows.Add(new("/" + provider, "value", provider));
+                provider = source.Namespace.Length == 0 ? source.Name : source.Namespace + "." + source.Name;
+                rows.Add(new("/" + provider, "value", provider, RavenNames.Reference(source.Namespace, source.Name)));
             }
         }
         if (rows.Count == 0)

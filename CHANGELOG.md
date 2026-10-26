@@ -8,6 +8,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-26
 
+- Support descriptive backtick names in development test/benchmark discovery, generated calls and data-source references, preserving Unicode/emoji in generated Raven literals. Migrate seven IP-address tests and discovery fixtures; retain description overrides and document changed IDs/selectors/order. Requires the unreleased compiler; Preview 18 remains unchanged. Give the IP-address suite its own entry point to avoid collection-specific guard dependencies.
 - Record completed Preview 18 publication: all 12 release asset hashes and the public checksum download match, manual website deployment passes, and live installation/benchmark pages are verified. Close release tracking while retaining published release notes and changelog sections unchanged.
 
 ## 0.1.0-preview.18 — 2026-10-26

@@ -24,14 +24,23 @@ and takes precedence over constructor data. Discovery reads metadata without
 executing the constructor or setter. Empty text selects the qualified function
 name for display. Changing the description does not change the test ID or order.
 
+Prefer a descriptive function name when it supplies the test's whole description:
+
 ```raven
-[Test("ArrayQueue preserves FIFO")]
-func QueueOrder() -> Result<unit, TestFailure> {
-    let queue = ArrayQueue<int>()
-    queue.Enqueue(4)
-    return Assert.True(queue.Dequeue() is Some(4), "First input must be removed first")
+[Test]
+func `IPv4 parsing and canonical formatting round trip`() -> Result<unit, TestFailure> {
+    _ = CheckAddress("0.0.0.0", "0.0.0.0", false)?
+    _ = CheckAddress("127.0.0.1", "127.0.0.1", false)?
+    _ = CheckAddress("255.255.255.255", "255.255.255.255", false)?
+    return Assert.True(true, "Valid address corpus completed")
 }
 ```
+
+See the executable [IP address tests](https://github.com/marinasundstrom/neoCLR/blob/main/runtime/raven/tests/ip-address-values/Tests.rvn)
+for the helper and complete corpus. Optional descriptions remain useful as display
+overrides. Moving description text into the function name changes its ID,
+name-based filters and ordinal registration order. Backticks themselves are absent
+from metadata, selectors and reports.
 
 The marker uses .NET Method targeting, AllowMultiple=false and Inherited=true
 usage defaults. The current discovery adapter inspects declarations only; it does
@@ -50,8 +59,13 @@ the declaration when its signature is available.
 Supported tests are public/internal, nongeneric module functions
 returning exactly `System.Result<System.Void, NeoClr.Testing.TestFailure>` from the
 selected runtime/test catalogs. Other attributed declarations fail rather than
-being ignored. Plain ASCII declaration identifiers are required by this first
-source adapter; class fixtures and async tests remain gaps. Parameterized tests require data attributes.
+being ignored. Development discovery accepts Unicode and spaced function names,
+including Raven backtick identifiers. Generated references quote namespace
+components and the complete function name separately, so a period in a function
+name is preserved. This requires the unreleased backtick-capable Raven compiler;
+Preview 18's compiler predates that syntax. neoCLR metadata already carries these
+names; this is a source-adapter change. Class fixtures and async tests remain gaps.
+Parameterized tests require data attributes.
 
 `scripts/discover-runtime-tests.py` compiles an inspection artifact and generates
 `RegisterDiscoveredTests(suite: TestSuite)` plus `tests.json`. Include its output via
@@ -142,3 +156,17 @@ exit code 2. Execution remains serial; categories are not concurrency constraint
 
 See the [testing project guide](https://github.com/marinasundstrom/neoCLR/blob/main/tools/testing/README.md)
 for build/discovery commands, runner selection and project ownership.
+
+### Escaped names and source adapters (development)
+
+Data-source attributes take logical metadata names without backticks, either a
+local function name or its qualified name. Ambiguous matches are rejected.
+Generated adapters preserve Unicode text, including supplementary characters,
+in both source references and string literals. Inline-row ID suffixes retain
+canonical JSON spelling independently of Raven literal spelling.
+
+Raven identifiers cannot contain a backtick or line break; discovery rejects names
+it cannot represent in generated Raven source. These are source limitations, not
+neoCLR metadata restrictions. Namespace metadata is still interpreted as dotted
+qualification. Flattened qualified-name collisions are rejected as duplicate IDs;
+this change does not introduce a new identity format.

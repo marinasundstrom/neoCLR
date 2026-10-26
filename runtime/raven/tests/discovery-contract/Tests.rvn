@@ -22,7 +22,7 @@ func BFailure() -> Result<unit, TestFailure> {
 }
 
 [Test]
-func DWithoutDescription() -> Result<unit, TestFailure> {
+func `D preserves café. 世界 😀`() -> Result<unit, TestFailure> {
     return Ok(())
 }
 
@@ -50,15 +50,15 @@ func Main(arguments: string[]) -> int {
 [Category("fast")]
 [Arguments(5, 6, 11)]
 [Arguments(2, 3, 5)]
-func EInline(a: int, b: int, expected: int) -> Result<unit, TestFailure> {
+func `E adds integers`(a: int, b: int, expected: int) -> Result<unit, TestFailure> {
     return Assert.Equal(expected, a + b)
 }
 
-func Inputs() -> int[] => [13, 27]
+func `Inputs with spaces. λ`() -> int[] => [13, 27]
 
 [Test]
 [Category("data")]
-[MethodDataSource("Inputs")]
-func FSource(value: int) -> Result<unit, TestFailure> {
+[MethodDataSource("Inputs with spaces. λ")]
+func `F accepts data rows`(value: int) -> Result<unit, TestFailure> {
     return Assert.True(value == 13 || value == 27, "source value")
 }

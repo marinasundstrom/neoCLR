@@ -516,6 +516,7 @@ def main():
     bundle, out = args.bundle.resolve(), args.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
     inputs = [Path(__file__).resolve(), ROOT / 'scripts/build-native-project.py', ROOT / 'scripts/run-native-sample.py', ROOT / 'scripts/discover-runtime-tests.py', ROOT / 'scripts/validate-test-discovery.py',
+              ROOT / 'tools/discovery/RavenNames.cs',
               *sorted((ROOT / 'tools/testing/NeoCLR.TestDiscovery').glob('*.cs')),
               *sorted((ROOT / 'tools/testing/NeoCLR.TestDiscovery').glob('*.csproj')),
               *sorted(TESTS.rglob('*.rvn')), *sorted(TESTS.rglob('*.rvnproj')),
@@ -577,13 +578,13 @@ def main():
         ('http-method-values', 0, ''.join('PASS ' + n + '\n' for n in HTTP_METHOD_VALUES_NAMES) + f'Tests: {len(HTTP_METHOD_VALUES_NAMES)}, passed: {len(HTTP_METHOD_VALUES_NAMES)}, failed: 0, skipped: 0\n'),
         ('http-header-values', 0, ''.join('PASS ' + n + '\n' for n in HTTP_HEADER_VALUES_NAMES) + f'Tests: {len(HTTP_HEADER_VALUES_NAMES)}, passed: {len(HTTP_HEADER_VALUES_NAMES)}, failed: 0, skipped: 0\n'),
         ('http-route-matching', 0, ''.join('PASS ' + n + '\n' for n in HTTP_ROUTE_MATCHING_NAMES) + f'Tests: {len(HTTP_ROUTE_MATCHING_NAMES)}, passed: {len(HTTP_ROUTE_MATCHING_NAMES)}, failed: 0, skipped: 0\n'),
-        ('ip-address-values', 0, ''.join('PASS ' + n + '\n' for n in IP_ADDRESS_VALUES_NAMES) + f'Tests: {len(IP_ADDRESS_VALUES_NAMES)}, passed: {len(IP_ADDRESS_VALUES_NAMES)}, failed: 0, skipped: 0\n'),
+        ('ip-address-values', 0, ''.join('PASS ' + n + '\n' for n in sorted('NeoClr.RuntimeTests.' + name for name in IP_ADDRESS_VALUES_NAMES)) + f'Tests: {len(IP_ADDRESS_VALUES_NAMES)}, passed: {len(IP_ADDRESS_VALUES_NAMES)}, failed: 0, skipped: 0\n'),
         ('uri-resolution', 0, ''.join('PASS ' + n + '\n' for n in URI_RESOLUTION_NAMES) + f'Tests: {len(URI_RESOLUTION_NAMES)}, passed: {len(URI_RESOLUTION_NAMES)}, failed: 0, skipped: 0\n'),
         ('zoned-time-parsing', 0, ''.join('PASS ' + n + '\n' for n in ZONED_TIME_PARSING_NAMES) + f'Tests: {len(ZONED_TIME_PARSING_NAMES)}, passed: {len(ZONED_TIME_PARSING_NAMES)}, failed: 0, skipped: 0\n'),
         ('instant-parsing', 0, ''.join('PASS ' + n + '\n' for n in INSTANT_PARSING_NAMES) + f'Tests: {len(INSTANT_PARSING_NAMES)}, passed: {len(INSTANT_PARSING_NAMES)}, failed: 0, skipped: 0\n'),
         ('duration-offset-parsing', 0, ''.join('PASS ' + n + '\n' for n in DURATION_OFFSET_PARSING_NAMES) + f'Tests: {len(DURATION_OFFSET_PARSING_NAMES)}, passed: {len(DURATION_OFFSET_PARSING_NAMES)}, failed: 0, skipped: 0\n'),
         ('time-parsing', 0, ''.join('PASS ' + n + '\n' for n in TIME_PARSING_NAMES) + f'Tests: {len(TIME_PARSING_NAMES)}, passed: {len(TIME_PARSING_NAMES)}, failed: 0, skipped: 0\n'),
-        ('discovery-contract', 1, 'PASS first discovered test\nFAIL discovered failure: Expected 1, actual 2\nPASS after discovered failure\nPASS NeoClr.DiscoveryTests.DWithoutDescription\nPASS NeoClr.DiscoveryTests.EInline(2, 3, 5)\nPASS NeoClr.DiscoveryTests.EInline(5, 6, 11)\nPASS NeoClr.DiscoveryTests.FSource/NeoClr.DiscoveryTests.Inputs[0]\nPASS NeoClr.DiscoveryTests.FSource/NeoClr.DiscoveryTests.Inputs[1]\nPASS manually registered companion\nTests: 9, passed: 8, failed: 1, skipped: 0\n'),
+        ('discovery-contract', 1, 'PASS first discovered test\nFAIL discovered failure: Expected 1, actual 2\nPASS after discovered failure\nPASS NeoClr.DiscoveryTests.D preserves café. 世界 😀\nPASS NeoClr.DiscoveryTests.E adds integers(2, 3, 5)\nPASS NeoClr.DiscoveryTests.E adds integers(5, 6, 11)\nPASS NeoClr.DiscoveryTests.F accepts data rows/NeoClr.DiscoveryTests.Inputs with spaces. λ[0]\nPASS NeoClr.DiscoveryTests.F accepts data rows/NeoClr.DiscoveryTests.Inputs with spaces. λ[1]\nPASS manually registered companion\nTests: 9, passed: 8, failed: 1, skipped: 0\n'),
         ('runner-contract', 1, 'PASS before failure\nFAIL intentional assertion failure: Expected 1, actual 2\nPASS after failure\nSKIP intentional skip: contract probe\nTests: 4, passed: 2, failed: 1, skipped: 1\n'),
     ]
     try:
@@ -819,10 +820,10 @@ def main():
             selections = {
                 'collections': [(['--filter', 'ArrayQueue preserves FIFO'], 0, 'PASS ArrayQueue preserves FIFO\nTests: 1, passed: 1, failed: 0, skipped: 0\n'),
                                 (['--filter', 'Map'], 0, ''.join('PASS ' + n + '\n' for n in MAP_NAMES) + f'Tests: {len(MAP_NAMES)}, passed: {len(MAP_NAMES)}, failed: 0, skipped: 0\n')],
-                'discovery-contract': [(['--category', 'fast'], 0, 'PASS first discovered test\nPASS NeoClr.DiscoveryTests.EInline(2, 3, 5)\nPASS NeoClr.DiscoveryTests.EInline(5, 6, 11)\nTests: 3, passed: 3, failed: 0, skipped: 0\n'),
-                                       (['--category', 'data'], 0, 'PASS NeoClr.DiscoveryTests.FSource/NeoClr.DiscoveryTests.Inputs[0]\nPASS NeoClr.DiscoveryTests.FSource/NeoClr.DiscoveryTests.Inputs[1]\nTests: 2, passed: 2, failed: 0, skipped: 0\n'),
+                'discovery-contract': [(['--id', '21:TestDiscoveryContract21:NeoClr.DiscoveryTests45:NeoClr.DiscoveryTests.D preserves café. 世界 😀()'], 0, 'PASS NeoClr.DiscoveryTests.D preserves café. 世界 😀\nTests: 1, passed: 1, failed: 0, skipped: 0\n'), (['--filter', 'café. 世界 😀'], 0, 'PASS NeoClr.DiscoveryTests.D preserves café. 世界 😀\nTests: 1, passed: 1, failed: 0, skipped: 0\n'), (['--category', 'fast'], 0, 'PASS first discovered test\nPASS NeoClr.DiscoveryTests.E adds integers(2, 3, 5)\nPASS NeoClr.DiscoveryTests.E adds integers(5, 6, 11)\nTests: 3, passed: 3, failed: 0, skipped: 0\n'),
+                                       (['--category', 'data'], 0, 'PASS NeoClr.DiscoveryTests.F accepts data rows/NeoClr.DiscoveryTests.Inputs with spaces. λ[0]\nPASS NeoClr.DiscoveryTests.F accepts data rows/NeoClr.DiscoveryTests.Inputs with spaces. λ[1]\nTests: 2, passed: 2, failed: 0, skipped: 0\n'),
                                        (['--category', 'FAST'], 2, 'ERROR No tests matched the selection\n'),
-                                       (['--category', ''], 2, 'ERROR Expected --filter <text>, --id <id> or --category <name>\n'), (['--filter', 'Inputs[1]'], 0, 'PASS NeoClr.DiscoveryTests.FSource/NeoClr.DiscoveryTests.Inputs[1]\nTests: 1, passed: 1, failed: 0, skipped: 0\n'), (['--filter', 'EInline(2, 3, 5)'], 0, 'PASS NeoClr.DiscoveryTests.EInline(2, 3, 5)\nTests: 1, passed: 1, failed: 0, skipped: 0\n'), (['--id', 'manual'], 0, 'PASS manually registered companion\nTests: 1, passed: 1, failed: 0, skipped: 0\n'),
+                                       (['--category', ''], 2, 'ERROR Expected --filter <text>, --id <id> or --category <name>\n'), (['--filter', 'Inputs with spaces. λ[1]'], 0, 'PASS NeoClr.DiscoveryTests.F accepts data rows/NeoClr.DiscoveryTests.Inputs with spaces. λ[1]\nTests: 1, passed: 1, failed: 0, skipped: 0\n'), (['--filter', 'E adds integers(2, 3, 5)'], 0, 'PASS NeoClr.DiscoveryTests.E adds integers(2, 3, 5)\nTests: 1, passed: 1, failed: 0, skipped: 0\n'), (['--id', 'manual'], 0, 'PASS manually registered companion\nTests: 1, passed: 1, failed: 0, skipped: 0\n'),
                                        (['--filter', 'after discovered'], 0, 'PASS after discovered failure\nTests: 1, passed: 1, failed: 0, skipped: 0\n')],
                 'runner-contract': [
                     (['--entry-probe', '', 'two words', 'Räven ☕ 😀', 'quote"slash\\', '--id'], 0, 'PASS entry arguments preserve text\nTests: 1, passed: 1, failed: 0, skipped: 0\n'),

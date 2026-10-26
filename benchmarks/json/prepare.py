@@ -94,7 +94,8 @@ def main():
                 if result.returncode:
                     raise RuntimeError(result.stdout+result.stderr)
                 discovered = discover(verified=True)
-                for path in [registry,discovery,attribute,* (ROOT/'tools/benchmarking/NeoCLR.BenchmarkDiscovery').glob('*.cs*')]:
+                for path in [registry, discovery, attribute, ROOT/'tools/discovery/RavenNames.cs',
+                             *(ROOT/'tools/benchmarking/NeoCLR.BenchmarkDiscovery').glob('*.cs*')]:
                     report['inputs'][str(path)] = sha(path)
 
         commands = {mode:replace(command) for mode,command in recipe['artifacts']['client']['commands'].items()}

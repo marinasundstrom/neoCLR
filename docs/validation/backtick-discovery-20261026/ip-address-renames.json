@@ -1,0 +1,30 @@
+[
+  [
+    "IpValidIPv4",
+    "IPv4 parsing and canonical formatting round trip"
+  ],
+  [
+    "IpInvalidIPv4",
+    "IPv4 parsing rejects malformed and unsupported corpus forms"
+  ],
+  [
+    "IpValidIPv6",
+    "IPv6 parsing and canonical formatting round trip"
+  ],
+  [
+    "IpInvalidIPv6",
+    "IPv6 parsing rejects malformed and unsupported corpus forms"
+  ],
+  [
+    "IpObject",
+    "IPAddress Object dispatch preserves value equality hashes and family distinctions"
+  ],
+  [
+    "IpAllocationChurn",
+    "IPAddress values survive subsequent parse allocations"
+  ],
+  [
+    "IpTypedErrors",
+    "IPAddress parsing distinguishes unsupported scope from invalid format"
+  ]
+]

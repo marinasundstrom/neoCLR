@@ -66,10 +66,10 @@ other return types and async functions remain unsupported, rather than silently
 omitted. For example, from the executable discovery sample:
 
 ```raven
-[Benchmark("Sum a sequence of integers")]
-func Sum() -> int {
+[Benchmark]
+func `Sum a sequence of integers`() -> int {
     var total = 0
-    for value in 0..<100 {
+    for value in 0..100 {
         total += value
     }
     if total != 4950 {
@@ -207,3 +207,13 @@ cases in all three modes; [six final source checks](data-evidence/source-executi
 qualify the scoped adapter correction. [Eleven discovery checks](data-evidence/discovery.json)
 cover invalid signatures/data and metadata-only inspection. These macOS ARM64 checks
 establish behavior, not benchmark rankings or Windows qualification.
+
+### Escaped-name qualification
+
+Development discovery uses Raven backtick references; use the unreleased compiler,
+not Preview 18's compiler. Run `python3 benchmarks/framework/validate_names.py
+--bundle <matching-development-bundle> --output <fresh-directory>` to verify
+metadata rediscovery, exact case listing and all selectors in interpreter, JIT
+and AOT execution. The fixture includes Unicode/emoji, periods within method
+names, inline rows and a named source with spaces. This is correctness validation,
+not a benchmark timing comparison. See the [API migration notes](../../api-docs/benchmarking.md#descriptive-identifiers-development).

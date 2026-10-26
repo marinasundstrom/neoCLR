@@ -1,0 +1,1040 @@
+{
+  "compilerRevision": "4981768ebcc346ddb78cb34fa2714d73934d6019",
+  "platform": "macOS ARM64",
+  "bundleManifestSha256": "2fd5da788f8a610b0081a562182c52a899a948b4b36450106cad38a4393a84ab",
+  "testDiscoveryPassed": true,
+  "testDiscoveryCases": [
+    {
+      "suite": "discovery-contract",
+      "mode": "interpreter",
+      "repetition": 1,
+      "exitCode": 1,
+      "elapsedSeconds": 3.901,
+      "stdout": "PASS first discovered test\nFAIL discovered failure: Expected 1, actual 2\nPASS after discovered failure\nPASS NeoClr.DiscoveryTests.D preserves café. 世界 😀\nPASS NeoClr.DiscoveryTests.E adds integers(2, 3, 5)\nPASS NeoClr.DiscoveryTests.E adds integers(5, 6, 11)\nPASS NeoClr.DiscoveryTests.F accepts data rows/NeoClr.DiscoveryTests.Inputs with spaces. λ[0]\nPASS NeoClr.DiscoveryTests.F accepts data rows/NeoClr.DiscoveryTests.Inputs with spaces. λ[1]\nPASS manually registered companion\nTests: 9, passed: 8, failed: 1, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "discovery-contract",
+      "mode": "jit",
+      "repetition": 1,
+      "exitCode": 1,
+      "elapsedSeconds": 3.907,
+      "stdout": "PASS first discovered test\nFAIL discovered failure: Expected 1, actual 2\nPASS after discovered failure\nPASS NeoClr.DiscoveryTests.D preserves café. 世界 😀\nPASS NeoClr.DiscoveryTests.E adds integers(2, 3, 5)\nPASS NeoClr.DiscoveryTests.E adds integers(5, 6, 11)\nPASS NeoClr.DiscoveryTests.F accepts data rows/NeoClr.DiscoveryTests.Inputs with spaces. λ[0]\nPASS NeoClr.DiscoveryTests.F accepts data rows/NeoClr.DiscoveryTests.Inputs with spaces. λ[1]\nPASS manually registered companion\nTests: 9, passed: 8, failed: 1, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "discovery-contract",
+      "mode": "native",
+      "repetition": 1,
+      "exitCode": 1,
+      "elapsedSeconds": 0.058,
+      "stdout": "PASS first discovered test\nFAIL discovered failure: Expected 1, actual 2\nPASS after discovered failure\nPASS NeoClr.DiscoveryTests.D preserves café. 世界 😀\nPASS NeoClr.DiscoveryTests.E adds integers(2, 3, 5)\nPASS NeoClr.DiscoveryTests.E adds integers(5, 6, 11)\nPASS NeoClr.DiscoveryTests.F accepts data rows/NeoClr.DiscoveryTests.Inputs with spaces. λ[0]\nPASS NeoClr.DiscoveryTests.F accepts data rows/NeoClr.DiscoveryTests.Inputs with spaces. λ[1]\nPASS manually registered companion\nTests: 9, passed: 8, failed: 1, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "discovery-contract",
+      "mode": "interpreter",
+      "arguments": [
+        "--id",
+        "21:TestDiscoveryContract21:NeoClr.DiscoveryTests45:NeoClr.DiscoveryTests.D preserves café. 世界 😀()"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 4.255631,
+      "stdout": "PASS NeoClr.DiscoveryTests.D preserves café. 世界 😀\nTests: 1, passed: 1, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "discovery-contract",
+      "mode": "jit",
+      "arguments": [
+        "--id",
+        "21:TestDiscoveryContract21:NeoClr.DiscoveryTests45:NeoClr.DiscoveryTests.D preserves café. 世界 😀()"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 2.981686,
+      "stdout": "PASS NeoClr.DiscoveryTests.D preserves café. 世界 😀\nTests: 1, passed: 1, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "discovery-contract",
+      "mode": "native",
+      "arguments": [
+        "--id",
+        "21:TestDiscoveryContract21:NeoClr.DiscoveryTests45:NeoClr.DiscoveryTests.D preserves café. 世界 😀()"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.004895,
+      "stdout": "PASS NeoClr.DiscoveryTests.D preserves café. 世界 😀\nTests: 1, passed: 1, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "discovery-contract",
+      "mode": "interpreter",
+      "arguments": [
+        "--filter",
+        "café. 世界 😀"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 4.195136,
+      "stdout": "PASS NeoClr.DiscoveryTests.D preserves café. 世界 😀\nTests: 1, passed: 1, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "discovery-contract",
+      "mode": "jit",
+      "arguments": [
+        "--filter",
+        "café. 世界 😀"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 2.91516,
+      "stdout": "PASS NeoClr.DiscoveryTests.D preserves café. 世界 😀\nTests: 1, passed: 1, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "discovery-contract",
+      "mode": "native",
+      "arguments": [
+        "--filter",
+        "café. 世界 😀"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.005342,
+      "stdout": "PASS NeoClr.DiscoveryTests.D preserves café. 世界 😀\nTests: 1, passed: 1, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "discovery-contract",
+      "mode": "interpreter",
+      "arguments": [
+        "--category",
+        "fast"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 3.78575,
+      "stdout": "PASS first discovered test\nPASS NeoClr.DiscoveryTests.E adds integers(2, 3, 5)\nPASS NeoClr.DiscoveryTests.E adds integers(5, 6, 11)\nTests: 3, passed: 3, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "discovery-contract",
+      "mode": "jit",
+      "arguments": [
+        "--category",
+        "fast"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 2.94681,
+      "stdout": "PASS first discovered test\nPASS NeoClr.DiscoveryTests.E adds integers(2, 3, 5)\nPASS NeoClr.DiscoveryTests.E adds integers(5, 6, 11)\nTests: 3, passed: 3, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "discovery-contract",
+      "mode": "native",
+      "arguments": [
+        "--category",
+        "fast"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.007172,
+      "stdout": "PASS first discovered test\nPASS NeoClr.DiscoveryTests.E adds integers(2, 3, 5)\nPASS NeoClr.DiscoveryTests.E adds integers(5, 6, 11)\nTests: 3, passed: 3, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "discovery-contract",
+      "mode": "interpreter",
+      "arguments": [
+        "--category",
+        "data"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 3.57665,
+      "stdout": "PASS NeoClr.DiscoveryTests.F accepts data rows/NeoClr.DiscoveryTests.Inputs with spaces. λ[0]\nPASS NeoClr.DiscoveryTests.F accepts data rows/NeoClr.DiscoveryTests.Inputs with spaces. λ[1]\nTests: 2, passed: 2, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "discovery-contract",
+      "mode": "jit",
+      "arguments": [
+        "--category",
+        "data"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 3.026769,
+      "stdout": "PASS NeoClr.DiscoveryTests.F accepts data rows/NeoClr.DiscoveryTests.Inputs with spaces. λ[0]\nPASS NeoClr.DiscoveryTests.F accepts data rows/NeoClr.DiscoveryTests.Inputs with spaces. λ[1]\nTests: 2, passed: 2, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "discovery-contract",
+      "mode": "native",
+      "arguments": [
+        "--category",
+        "data"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.006887,
+      "stdout": "PASS NeoClr.DiscoveryTests.F accepts data rows/NeoClr.DiscoveryTests.Inputs with spaces. λ[0]\nPASS NeoClr.DiscoveryTests.F accepts data rows/NeoClr.DiscoveryTests.Inputs with spaces. λ[1]\nTests: 2, passed: 2, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "discovery-contract",
+      "mode": "interpreter",
+      "arguments": [
+        "--category",
+        "FAST"
+      ],
+      "exitCode": 2,
+      "elapsedSeconds": 3.468695,
+      "stdout": "ERROR No tests matched the selection\n",
+      "stderr": ""
+    },
+    {
+      "suite": "discovery-contract",
+      "mode": "jit",
+      "arguments": [
+        "--category",
+        "FAST"
+      ],
+      "exitCode": 2,
+      "elapsedSeconds": 2.793999,
+      "stdout": "ERROR No tests matched the selection\n",
+      "stderr": ""
+    },
+    {
+      "suite": "discovery-contract",
+      "mode": "native",
+      "arguments": [
+        "--category",
+        "FAST"
+      ],
+      "exitCode": 2,
+      "elapsedSeconds": 0.004542,
+      "stdout": "ERROR No tests matched the selection\n",
+      "stderr": ""
+    },
+    {
+      "suite": "discovery-contract",
+      "mode": "interpreter",
+      "arguments": [
+        "--category",
+        ""
+      ],
+      "exitCode": 2,
+      "elapsedSeconds": 3.606101,
+      "stdout": "ERROR Expected --filter <text>, --id <id> or --category <name>\n",
+      "stderr": ""
+    },
+    {
+      "suite": "discovery-contract",
+      "mode": "jit",
+      "arguments": [
+        "--category",
+        ""
+      ],
+      "exitCode": 2,
+      "elapsedSeconds": 2.676378,
+      "stdout": "ERROR Expected --filter <text>, --id <id> or --category <name>\n",
+      "stderr": ""
+    },
+    {
+      "suite": "discovery-contract",
+      "mode": "native",
+      "arguments": [
+        "--category",
+        ""
+      ],
+      "exitCode": 2,
+      "elapsedSeconds": 0.005067,
+      "stdout": "ERROR Expected --filter <text>, --id <id> or --category <name>\n",
+      "stderr": ""
+    },
+    {
+      "suite": "discovery-contract",
+      "mode": "interpreter",
+      "arguments": [
+        "--filter",
+        "Inputs with spaces. λ[1]"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 3.214431,
+      "stdout": "PASS NeoClr.DiscoveryTests.F accepts data rows/NeoClr.DiscoveryTests.Inputs with spaces. λ[1]\nTests: 1, passed: 1, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "discovery-contract",
+      "mode": "jit",
+      "arguments": [
+        "--filter",
+        "Inputs with spaces. λ[1]"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 2.633534,
+      "stdout": "PASS NeoClr.DiscoveryTests.F accepts data rows/NeoClr.DiscoveryTests.Inputs with spaces. λ[1]\nTests: 1, passed: 1, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "discovery-contract",
+      "mode": "native",
+      "arguments": [
+        "--filter",
+        "Inputs with spaces. λ[1]"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.00425,
+      "stdout": "PASS NeoClr.DiscoveryTests.F accepts data rows/NeoClr.DiscoveryTests.Inputs with spaces. λ[1]\nTests: 1, passed: 1, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "discovery-contract",
+      "mode": "interpreter",
+      "arguments": [
+        "--filter",
+        "E adds integers(2, 3, 5)"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 3.300453,
+      "stdout": "PASS NeoClr.DiscoveryTests.E adds integers(2, 3, 5)\nTests: 1, passed: 1, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "discovery-contract",
+      "mode": "jit",
+      "arguments": [
+        "--filter",
+        "E adds integers(2, 3, 5)"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 2.796748,
+      "stdout": "PASS NeoClr.DiscoveryTests.E adds integers(2, 3, 5)\nTests: 1, passed: 1, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "discovery-contract",
+      "mode": "native",
+      "arguments": [
+        "--filter",
+        "E adds integers(2, 3, 5)"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.004928,
+      "stdout": "PASS NeoClr.DiscoveryTests.E adds integers(2, 3, 5)\nTests: 1, passed: 1, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "discovery-contract",
+      "mode": "interpreter",
+      "arguments": [
+        "--id",
+        "manual"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 3.700878,
+      "stdout": "PASS manually registered companion\nTests: 1, passed: 1, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "discovery-contract",
+      "mode": "jit",
+      "arguments": [
+        "--id",
+        "manual"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 2.802186,
+      "stdout": "PASS manually registered companion\nTests: 1, passed: 1, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "discovery-contract",
+      "mode": "native",
+      "arguments": [
+        "--id",
+        "manual"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.006058,
+      "stdout": "PASS manually registered companion\nTests: 1, passed: 1, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "discovery-contract",
+      "mode": "interpreter",
+      "arguments": [
+        "--filter",
+        "after discovered"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 3.322978,
+      "stdout": "PASS after discovered failure\nTests: 1, passed: 1, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "discovery-contract",
+      "mode": "jit",
+      "arguments": [
+        "--filter",
+        "after discovered"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 2.719538,
+      "stdout": "PASS after discovered failure\nTests: 1, passed: 1, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "discovery-contract",
+      "mode": "native",
+      "arguments": [
+        "--filter",
+        "after discovered"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.006189,
+      "stdout": "PASS after discovered failure\nTests: 1, passed: 1, failed: 0, skipped: 0\n",
+      "stderr": ""
+    }
+  ],
+  "ipAddressCases": [
+    {
+      "suite": "ip-address-values",
+      "mode": "interpreter",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 8.595,
+      "stdout": "PASS NeoClr.RuntimeTests.IPAddress Object dispatch preserves value equality hashes and family distinctions\nPASS NeoClr.RuntimeTests.IPAddress parsing distinguishes unsupported scope from invalid format\nPASS NeoClr.RuntimeTests.IPAddress values survive subsequent parse allocations\nPASS NeoClr.RuntimeTests.IPv4 parsing and canonical formatting round trip\nPASS NeoClr.RuntimeTests.IPv4 parsing rejects malformed and unsupported corpus forms\nPASS NeoClr.RuntimeTests.IPv6 parsing and canonical formatting round trip\nPASS NeoClr.RuntimeTests.IPv6 parsing rejects malformed and unsupported corpus forms\nTests: 7, passed: 7, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "ip-address-values",
+      "mode": "jit",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 3.186,
+      "stdout": "PASS NeoClr.RuntimeTests.IPAddress Object dispatch preserves value equality hashes and family distinctions\nPASS NeoClr.RuntimeTests.IPAddress parsing distinguishes unsupported scope from invalid format\nPASS NeoClr.RuntimeTests.IPAddress values survive subsequent parse allocations\nPASS NeoClr.RuntimeTests.IPv4 parsing and canonical formatting round trip\nPASS NeoClr.RuntimeTests.IPv4 parsing rejects malformed and unsupported corpus forms\nPASS NeoClr.RuntimeTests.IPv6 parsing and canonical formatting round trip\nPASS NeoClr.RuntimeTests.IPv6 parsing rejects malformed and unsupported corpus forms\nTests: 7, passed: 7, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "ip-address-values",
+      "mode": "native",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 0.34,
+      "stdout": "PASS NeoClr.RuntimeTests.IPAddress Object dispatch preserves value equality hashes and family distinctions\nPASS NeoClr.RuntimeTests.IPAddress parsing distinguishes unsupported scope from invalid format\nPASS NeoClr.RuntimeTests.IPAddress values survive subsequent parse allocations\nPASS NeoClr.RuntimeTests.IPv4 parsing and canonical formatting round trip\nPASS NeoClr.RuntimeTests.IPv4 parsing rejects malformed and unsupported corpus forms\nPASS NeoClr.RuntimeTests.IPv6 parsing and canonical formatting round trip\nPASS NeoClr.RuntimeTests.IPv6 parsing rejects malformed and unsupported corpus forms\nTests: 7, passed: 7, failed: 0, skipped: 0\n",
+      "stderr": ""
+    }
+  ],
+  "ipAddressEvidenceNote": "Reused validated IP-address executions from tests-v3; that combined run later failed on the discovery adapter range syntax, repaired and qualified in discovery-final.",
+  "benchmarkPassed": true,
+  "benchmarkNames": [
+    "manual",
+    "Benchmarks.Discovery.Accept source rows/Benchmarks.Discovery.Inputs with spaces. λ[0]",
+    "Benchmarks.Discovery.Accept source rows/Benchmarks.Discovery.Inputs with spaces. λ[1]",
+    "Benchmarks.Discovery.Add café. 世界 😀(5)",
+    "Benchmarks.Discovery.Add café. 世界 😀(9)",
+    "Benchmarks.Discovery.Multiply",
+    "Benchmarks.Discovery.Sum a sequence of integers"
+  ],
+  "benchmarkExecutions": [
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/benchmarks/native/app.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Runtime.dll",
+        "--execution",
+        "interpreter",
+        "--",
+        "--list"
+      ],
+      "exitCode": 0,
+      "stdout": "NEOBENCH/1 CASES\nmanual\nBenchmarks.Discovery.Accept source rows/Benchmarks.Discovery.Inputs with spaces. λ[0]\nBenchmarks.Discovery.Accept source rows/Benchmarks.Discovery.Inputs with spaces. λ[1]\nBenchmarks.Discovery.Add café. 世界 😀(5)\nBenchmarks.Discovery.Add café. 世界 😀(9)\nBenchmarks.Discovery.Multiply\nBenchmarks.Discovery.Sum a sequence of integers\nNEOBENCH/1 END\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/benchmarks/native/app.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Runtime.dll",
+        "--execution",
+        "interpreter",
+        "--",
+        "manual",
+        "1",
+        "2"
+      ],
+      "exitCode": 0,
+      "stdout": "NEOBENCH/1 READY\nNEOBENCH/1 BEGIN\nNEOBENCH/1 END\n2\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/benchmarks/native/app.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Runtime.dll",
+        "--execution",
+        "interpreter",
+        "--",
+        "Benchmarks.Discovery.Accept source rows/Benchmarks.Discovery.Inputs with spaces. λ[0]",
+        "1",
+        "2"
+      ],
+      "exitCode": 0,
+      "stdout": "NEOBENCH/1 READY\nNEOBENCH/1 BEGIN\nNEOBENCH/1 END\n2\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/benchmarks/native/app.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Runtime.dll",
+        "--execution",
+        "interpreter",
+        "--",
+        "Benchmarks.Discovery.Accept source rows/Benchmarks.Discovery.Inputs with spaces. λ[1]",
+        "1",
+        "2"
+      ],
+      "exitCode": 0,
+      "stdout": "NEOBENCH/1 READY\nNEOBENCH/1 BEGIN\nNEOBENCH/1 END\n2\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/benchmarks/native/app.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Runtime.dll",
+        "--execution",
+        "interpreter",
+        "--",
+        "Benchmarks.Discovery.Add café. 世界 😀(5)",
+        "1",
+        "2"
+      ],
+      "exitCode": 0,
+      "stdout": "NEOBENCH/1 READY\nNEOBENCH/1 BEGIN\nNEOBENCH/1 END\n2\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/benchmarks/native/app.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Runtime.dll",
+        "--execution",
+        "interpreter",
+        "--",
+        "Benchmarks.Discovery.Add café. 世界 😀(9)",
+        "1",
+        "2"
+      ],
+      "exitCode": 0,
+      "stdout": "NEOBENCH/1 READY\nNEOBENCH/1 BEGIN\nNEOBENCH/1 END\n2\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/benchmarks/native/app.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Runtime.dll",
+        "--execution",
+        "interpreter",
+        "--",
+        "Benchmarks.Discovery.Multiply",
+        "1",
+        "2"
+      ],
+      "exitCode": 0,
+      "stdout": "NEOBENCH/1 READY\nNEOBENCH/1 BEGIN\nNEOBENCH/1 END\n2\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/benchmarks/native/app.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Runtime.dll",
+        "--execution",
+        "interpreter",
+        "--",
+        "Benchmarks.Discovery.Sum a sequence of integers",
+        "1",
+        "2"
+      ],
+      "exitCode": 0,
+      "stdout": "NEOBENCH/1 READY\nNEOBENCH/1 BEGIN\nNEOBENCH/1 END\n2\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/benchmarks/native/app.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Runtime.dll",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/bin/neoclr-jit-host.dylib",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/bin/neoclr-codegen",
+        "--",
+        "--list"
+      ],
+      "exitCode": 0,
+      "stdout": "NEOBENCH/1 CASES\nmanual\nBenchmarks.Discovery.Accept source rows/Benchmarks.Discovery.Inputs with spaces. λ[0]\nBenchmarks.Discovery.Accept source rows/Benchmarks.Discovery.Inputs with spaces. λ[1]\nBenchmarks.Discovery.Add café. 世界 😀(5)\nBenchmarks.Discovery.Add café. 世界 😀(9)\nBenchmarks.Discovery.Multiply\nBenchmarks.Discovery.Sum a sequence of integers\nNEOBENCH/1 END\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/benchmarks/native/app.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Runtime.dll",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/bin/neoclr-jit-host.dylib",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/bin/neoclr-codegen",
+        "--",
+        "manual",
+        "1",
+        "2"
+      ],
+      "exitCode": 0,
+      "stdout": "NEOBENCH/1 READY\nNEOBENCH/1 BEGIN\nNEOBENCH/1 END\n2\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/benchmarks/native/app.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Runtime.dll",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/bin/neoclr-jit-host.dylib",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/bin/neoclr-codegen",
+        "--",
+        "Benchmarks.Discovery.Accept source rows/Benchmarks.Discovery.Inputs with spaces. λ[0]",
+        "1",
+        "2"
+      ],
+      "exitCode": 0,
+      "stdout": "NEOBENCH/1 READY\nNEOBENCH/1 BEGIN\nNEOBENCH/1 END\n2\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/benchmarks/native/app.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Runtime.dll",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/bin/neoclr-jit-host.dylib",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/bin/neoclr-codegen",
+        "--",
+        "Benchmarks.Discovery.Accept source rows/Benchmarks.Discovery.Inputs with spaces. λ[1]",
+        "1",
+        "2"
+      ],
+      "exitCode": 0,
+      "stdout": "NEOBENCH/1 READY\nNEOBENCH/1 BEGIN\nNEOBENCH/1 END\n2\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/benchmarks/native/app.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Runtime.dll",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/bin/neoclr-jit-host.dylib",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/bin/neoclr-codegen",
+        "--",
+        "Benchmarks.Discovery.Add café. 世界 😀(5)",
+        "1",
+        "2"
+      ],
+      "exitCode": 0,
+      "stdout": "NEOBENCH/1 READY\nNEOBENCH/1 BEGIN\nNEOBENCH/1 END\n2\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/benchmarks/native/app.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Runtime.dll",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/bin/neoclr-jit-host.dylib",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/bin/neoclr-codegen",
+        "--",
+        "Benchmarks.Discovery.Add café. 世界 😀(9)",
+        "1",
+        "2"
+      ],
+      "exitCode": 0,
+      "stdout": "NEOBENCH/1 READY\nNEOBENCH/1 BEGIN\nNEOBENCH/1 END\n2\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/benchmarks/native/app.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Runtime.dll",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/bin/neoclr-jit-host.dylib",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/bin/neoclr-codegen",
+        "--",
+        "Benchmarks.Discovery.Multiply",
+        "1",
+        "2"
+      ],
+      "exitCode": 0,
+      "stdout": "NEOBENCH/1 READY\nNEOBENCH/1 BEGIN\nNEOBENCH/1 END\n2\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/benchmarks/native/app.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/lib/System.Runtime.dll",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/bin/neoclr-jit-host.dylib",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/bundle/bin/neoclr-codegen",
+        "--",
+        "Benchmarks.Discovery.Sum a sequence of integers",
+        "1",
+        "2"
+      ],
+      "exitCode": 0,
+      "stdout": "NEOBENCH/1 READY\nNEOBENCH/1 BEGIN\nNEOBENCH/1 END\n2\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/benchmarks/native/app",
+        "--list"
+      ],
+      "exitCode": 0,
+      "stdout": "NEOBENCH/1 CASES\nmanual\nBenchmarks.Discovery.Accept source rows/Benchmarks.Discovery.Inputs with spaces. λ[0]\nBenchmarks.Discovery.Accept source rows/Benchmarks.Discovery.Inputs with spaces. λ[1]\nBenchmarks.Discovery.Add café. 世界 😀(5)\nBenchmarks.Discovery.Add café. 世界 😀(9)\nBenchmarks.Discovery.Multiply\nBenchmarks.Discovery.Sum a sequence of integers\nNEOBENCH/1 END\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/benchmarks/native/app",
+        "manual",
+        "1",
+        "2"
+      ],
+      "exitCode": 0,
+      "stdout": "NEOBENCH/1 READY\nNEOBENCH/1 BEGIN\nNEOBENCH/1 END\n2\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/benchmarks/native/app",
+        "Benchmarks.Discovery.Accept source rows/Benchmarks.Discovery.Inputs with spaces. λ[0]",
+        "1",
+        "2"
+      ],
+      "exitCode": 0,
+      "stdout": "NEOBENCH/1 READY\nNEOBENCH/1 BEGIN\nNEOBENCH/1 END\n2\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/benchmarks/native/app",
+        "Benchmarks.Discovery.Accept source rows/Benchmarks.Discovery.Inputs with spaces. λ[1]",
+        "1",
+        "2"
+      ],
+      "exitCode": 0,
+      "stdout": "NEOBENCH/1 READY\nNEOBENCH/1 BEGIN\nNEOBENCH/1 END\n2\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/benchmarks/native/app",
+        "Benchmarks.Discovery.Add café. 世界 😀(5)",
+        "1",
+        "2"
+      ],
+      "exitCode": 0,
+      "stdout": "NEOBENCH/1 READY\nNEOBENCH/1 BEGIN\nNEOBENCH/1 END\n2\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/benchmarks/native/app",
+        "Benchmarks.Discovery.Add café. 世界 😀(9)",
+        "1",
+        "2"
+      ],
+      "exitCode": 0,
+      "stdout": "NEOBENCH/1 READY\nNEOBENCH/1 BEGIN\nNEOBENCH/1 END\n2\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/benchmarks/native/app",
+        "Benchmarks.Discovery.Multiply",
+        "1",
+        "2"
+      ],
+      "exitCode": 0,
+      "stdout": "NEOBENCH/1 READY\nNEOBENCH/1 BEGIN\nNEOBENCH/1 END\n2\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/backtick-names-20261026/benchmarks/native/app",
+        "Benchmarks.Discovery.Sum a sequence of integers",
+        "1",
+        "2"
+      ],
+      "exitCode": 0,
+      "stdout": "NEOBENCH/1 READY\nNEOBENCH/1 BEGIN\nNEOBENCH/1 END\n2\n",
+      "stderr": ""
+    }
+  ],
+  "rejectionCases": [
+    {
+      "name": "missing-source",
+      "rejected": "Test discovery failed: Missing or ambiguous data source: Missing",
+      "sourceSha256": "9c57c9d145012c0798690374ab695a35774a515339c57787ec9a8dbccc871c79"
+    },
+    {
+      "name": "source-type",
+      "rejected": "Test discovery failed: Inputs: source must be an accessible parameterless module function returning an array of the input type",
+      "sourceSha256": "faaa7bf2881af801eec4ff8ecb861319487de8b4b427c1f1341f3532f76f0e59"
+    },
+    {
+      "name": "duplicate-row",
+      "rejected": "Test discovery failed: Invalid: duplicate data row or source",
+      "sourceSha256": "847fe247a660c9052f7a78b76a13725f4f003efd280abdd495736081d5001f94"
+    }
+  ],
+  "apiSnapshotCheck": "PASS",
+  "adapterSourceSha256": {
+    "tools/discovery/RavenNames.cs": "b97c92bab538fbddc3c5460033c3750ba4169f8e9d04a94c47299842975bcb22",
+    "tools/testing/NeoCLR.TestDiscovery/DataAdapters.cs": "cd270ba37f6e98af4215a29847af956d57215a2a184d5844511828376379ebbe",
+    "tools/testing/NeoCLR.TestDiscovery/Program.cs": "9325a6838123dd63011ff358ef5479d85be62aa06c3f51c267631c14f61b6d30",
+    "tools/benchmarking/NeoCLR.BenchmarkDiscovery/DataAdapters.cs": "cd270ba37f6e98af4215a29847af956d57215a2a184d5844511828376379ebbe",
+    "tools/benchmarking/NeoCLR.BenchmarkDiscovery/Program.cs": "60394bd6cc8bb6046a9b772b29a3fc9b1d06e32b792ff932f109f9cfb207ad6a"
+  }
+}

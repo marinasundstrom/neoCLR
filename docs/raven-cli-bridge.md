@@ -15917,3 +15917,33 @@ selects byref preservation explicitly and records its environment. Further match
 guarded controls and owner-operation profiles show no pause advantage or default
 qualification; see neoCLR `benchmarks/execution/concurrent-workloads/stable-byref-pause-results.md`.
 Raven emission, Runtime Contract, native ABI and metadata representation remain unchanged.
+
+
+## Backtick discovery adapters (2026-10-26, development)
+
+Native neoCLR names already carry Unicode, spaces and punctuation. Raven's
+backticks delimit source identifiers and are not part of metadata names. The
+post-Preview-18 integration uses Raven `codex/neoclr`
+`4981768ebcc346ddb78cb34fa2714d73934d6019` with a matching rebuilt native library
+bundle. It changes test/benchmark source generation, not runtime name storage,
+Runtime Contract configuration, compiler binding/emission, native ABI or the
+release compiler pin. Ordinary .NET identifier semantics remain Raven's shared
+language behavior; .NET test-framework display-name overrides remain the API
+comparison for the retained Description property.
+
+Discovery now quotes each namespace component and the entire function name,
+resolves logical data-source names before generating calls, and emits Raven
+string literals preserving supplementary Unicode instead of JSON surrogate
+escapes. The adapter owns these source spelling choices. Existing ASCII names
+retain their IDs and selectors; renamed fixtures intentionally change theirs.
+Generated source-row iteration uses current half-open `..` syntax.
+
+The temporary CLI bridge needs no new encoding or target-specific mangling.
+Native metadata/codegen already preserves logical names, so no runtime replacement
+is required for this capability. Raven source still cannot represent backticks or
+line breaks inside identifiers; the adapter rejects these without declaring a
+native metadata restriction. Dotted namespace interpretation and flattened
+qualified-name collision detection remain current adapter limitations.
+
+See [qualification and migration evidence](validation/backtick-discovery-20261026/README.md).
+No Windows execution or performance improvement is claimed by this macOS slice.

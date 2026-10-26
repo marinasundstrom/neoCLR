@@ -3,8 +3,8 @@ module Benchmarks.Discovery
 import System.*
 import NeoClr.Benchmarking.*
 
-[Benchmark("Sum a sequence of integers")]
-func Sum() -> int {
+[Benchmark]
+func `Sum a sequence of integers`() -> int {
     var total = 0
     for value in 0..100 {
         total += value
@@ -37,18 +37,18 @@ func Main(arguments: string[]) {
 [Benchmark]
 [Arguments(5)]
 [Arguments(9)]
-func Inline(value: int) -> int {
+func `Add café. 世界 😀`(value: int) -> int {
     if value != 5 {
         if value != 9 { System.Fail("Wrong inline argument") }
     }
     return 1
 }
 
-func Inputs() -> int[] => [3, 7]
+func `Inputs with spaces. λ`() -> int[] => [3, 7]
 
 [Benchmark]
-[ArgumentsSource("Inputs")]
-func FromSource(value: int) -> int {
+[ArgumentsSource("Inputs with spaces. λ")]
+func `Accept source rows`(value: int) -> int {
     if value != 3 {
         if value != 7 { System.Fail("Wrong source argument") }
     }

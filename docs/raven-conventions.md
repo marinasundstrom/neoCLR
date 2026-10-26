@@ -529,3 +529,21 @@ neoCLR async compiler protocol is `AsyncStateMachine` and `TaskAwaiter`; Raven's
 .NET target continues to use .NET's own identities. This is a naming consistency
 choice, not a new dispatch or performance capability. Migrating old neoCLR
 artifacts requires recompilation with a matching compiler/runtime bundle.
+
+## Descriptive test and benchmark names (2026-10-26)
+
+With the unreleased backtick-capable compiler, prefer `[Test]` and a descriptive
+backtick function name when the attribute description merely restates the test's
+behavior. Keep helper functions conventionally named. Keep explicit descriptions
+when testing description behavior or providing an independent display override.
+For benchmarks, choose concise, stable workload names; avoid changing identifiers
+for editorial changes to reports. Attributes still mark discovery and carry data
+rows/categories; they are not replaced by naming conventions.
+
+neoCLR metadata already preserves Unicode and spaces. The discovery adapter must
+quote source references and preserve scalar text in generated literals. Renames
+change IDs, selectors and ordinal order. Migrate bounded suites with execution
+checks and retain historical evidence under its original selectors. The initial
+migration covers IP-address behavior tests and discovery fixtures; other suites
+can migrate as maintained. See [testing](../api-docs/testing.md) and
+[benchmarking](../api-docs/benchmarking.md) for the development-only contract.

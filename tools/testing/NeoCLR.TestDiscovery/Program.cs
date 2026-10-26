@@ -1,5 +1,4 @@
 using System.Text.Json;
-using System.Text.RegularExpressions;
 using NeoCLR.Metadata.Experimental.Introspection;
 using NeoCLR.Metadata.Experimental.Model;
 
@@ -52,8 +51,7 @@ try
                 throw new InvalidDataException(name + ": only the string Description property is supported");
             description = text.Length == 0 ? name : text;
         }
-        if (!name.Split('.').All(part => Regex.IsMatch(part, "^[A-Za-z_][A-Za-z0-9_]*$")))
-            throw new InvalidDataException(name + ": this adapter requires plain Raven identifiers");
+        var reference = RavenNames.Reference(method.Namespace, method.Name);
         var categories = new List<string>();
         foreach (var category in definition.CustomAttributes.Where(a => a.AttributeType.Namespace == "NeoClr.Testing" && a.AttributeType.Name == "CategoryAttribute"))
         {
@@ -75,19 +73,19 @@ try
             var rowName = name + row.Suffix;
             var rowId = id + row.Suffix;
             var display = description + row.Suffix;
-            var callback = row.Suffix.Length == 0 ? name : "() => " + name + "(" + row.Callback + ")";
+            var callback = row.Suffix.Length == 0 ? reference : "() => " + reference + "(" + row.Callback + ")";
             string Registration(string suffix) => "suite.Add(" + Quote(rowId) + suffix + ", " + Quote(display) + suffix + ", " + callback + ", [" + string.Join(", ", categories.Select(Quote)) + "])";
             var code = row.Provider is null ? "    " + Registration("") + "\n" :
-                "    if true {\n        let rows = " + row.Provider + "()\n" +
+                "    if true {\n        let rows = " + row.ProviderReference + "()\n" +
                 "        if rows.Length == 0 { System.Fail(\"Data source returned no rows\") }\n" +
                 "        if rows.Length > 10000 { System.Fail(\"Data source exceeded 10000 rows\") }\n" +
-                "        for index in 0..<rows.Length {\n            let value = rows[index]\n            " + Registration(" + \"[\" + index.ToString() + \"]\"") + "\n        }\n    }\n";
+                "        for index in 0..rows.Length {\n            let value = rows[index]\n            " + Registration(" + \"[\" + index.ToString() + \"]\"") + "\n        }\n    }\n";
             tests.Add((rowId, rowName, display, code, row.Provider is not null, categories.ToArray()));
         }
     }
     if (tests.Count == 0) throw new InvalidDataException("No tests discovered");
     tests.Sort((left, right) => StringComparer.Ordinal.Compare(left.Name, right.Name));
-    static string Quote(string value) => JsonSerializer.Serialize(value);
+    static string Quote(string value) => RavenNames.StringLiteral(value);
     var source = "// Generated from native metadata. Do not edit.\nmodule NeoClr.Testing\n\nfunc RegisterDiscoveredTests(suite: TestSuite) {\n" +
         string.Concat(tests.Select(item => item.Code)) + "}\n";
     File.WriteAllText(args[1], source);

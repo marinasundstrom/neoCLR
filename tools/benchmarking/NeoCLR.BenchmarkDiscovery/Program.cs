@@ -1,5 +1,4 @@
 using System.Text.Json;
-using System.Text.RegularExpressions;
 using NeoCLR.Metadata.Experimental.Introspection;
 using NeoCLR.Metadata.Experimental.Model;
 
@@ -48,8 +47,7 @@ try
                 throw new InvalidDataException(name + ": only the string Description property is supported");
             description = text.Length == 0 ? name : text;
         }
-        if (!name.Split('.').All(part => Regex.IsMatch(part, "^[A-Za-z_][A-Za-z0-9_]*$")))
-            throw new InvalidDataException(name + ": this adapter requires plain Raven identifiers");
+        var reference = RavenNames.Reference(method.Namespace, method.Name);
         // Length-prefixed components avoid punctuation ambiguities. Versions are intentionally
         // excluded: IDs remain stable across rebuilds and assembly version increments.
         static string Part(string value) => value.Length + ":" + value;
@@ -60,19 +58,19 @@ try
             var rowName = name + row.Suffix;
             var rowId = id + row.Suffix;
             var display = description + row.Suffix;
-            var callback = row.Suffix.Length == 0 ? name : "() => " + name + "(" + row.Callback + ")";
+            var callback = row.Suffix.Length == 0 ? reference : "() => " + reference + "(" + row.Callback + ")";
             string Registration(string suffix) => "suite.Add(" + Quote(rowName) + suffix + ", " + callback + ")";
             var code = row.Provider is null ? "    " + Registration("") + "\n" :
-                "    if true {\n        let rows = " + row.Provider + "()\n" +
+                "    if true {\n        let rows = " + row.ProviderReference + "()\n" +
                 "        if rows.Length == 0 { System.Fail(\"Data source returned no rows\") }\n" +
                 "        if rows.Length > 10000 { System.Fail(\"Data source exceeded 10000 rows\") }\n" +
-                "        for index in 0..<rows.Length {\n            let value = rows[index]\n            " + Registration(" + \"[\" + index.ToString() + \"]\"") + "\n        }\n    }\n";
+                "        for index in 0..rows.Length {\n            let value = rows[index]\n            " + Registration(" + \"[\" + index.ToString() + \"]\"") + "\n        }\n    }\n";
             benchmarks.Add((rowId, rowName, display, code, row.Provider is not null));
         }
     }
     if (benchmarks.Count == 0) throw new InvalidDataException("No benchmarks discovered");
     benchmarks.Sort((left, right) => StringComparer.Ordinal.Compare(left.Name, right.Name));
-    static string Quote(string value) => JsonSerializer.Serialize(value);
+    static string Quote(string value) => RavenNames.StringLiteral(value);
     var source = "// Generated from native metadata. Do not edit.\nmodule NeoClr.Benchmarking\n\nfunc RegisterDiscoveredBenchmarks(suite: BenchmarkSuite) {\n" +
         string.Concat(benchmarks.Select(item => item.Code)) + "}\n";
     File.WriteAllText(args[1], source);
