@@ -37,11 +37,24 @@
     }
   },
   "currentBlockers": [
-    "Source and Windows gates must rerun with validated fixture repairs"
+    "Windows editor harness requalification",
+    "Final measurements and artifact/publication audit"
   ],
   "localFixtureRetest": {
     "taskTestsPassed": 5,
     "nativeGcPassed": true,
     "nativeGcCommands": 188
-  }
+  },
+  "sourceQualificationRun": 40296297625,
+  "windowsRequalificationRun": 40296298072,
+  "macOSAccepted": [
+    "extracted JIT/interpreter and HTTP",
+    "native GC: 188 commands",
+    "runtime await: 24 executions",
+    "JSON: three modes",
+    "headers: 132 cases",
+    "native kit: console/HTTP and C/C++ interop",
+    "editor inlays",
+    "editor: 26 checks on fresh workspace"
+  ]
 }

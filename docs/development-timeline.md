@@ -23031,3 +23031,15 @@ Evidence: [industry comparison](../benchmarks/execution/concurrent-workloads/ind
 - **Author clarification:** Release work includes optimizing GC, developing concurrent-GC experiments, and optimizing the runtime in general. Concurrent GC must not eclipse the other improvements or be presumed to explain every runtime cost.
 - **Assistant response and action:** Retained separate general runtime and experimental concurrent claims in the draft release notes. Completed canonical native-source integration with unchanged generated C, native safety checks and 640 HTTP smoke responses across both collectors and JIT/AOT.
 - **Limits:** This source integration is not a new performance result. Synchronous GC remains the ordinary default; concurrent default readiness and final package qualification remain open. See [integration evidence](validation/concurrent-native-integration-20261025/README.md) and [draft release themes](next-preview-release-notes.md).
+
+## 2026-10-26 — Backticked test names and the release compiler pin
+
+The author described Raven's new backtick-delimited identifiers as a way for a
+`[Test]` method to carry a descriptive name directly, avoiding a redundant test
+description. The assistant proposed preserving the exact method name through
+metadata, discovery, filtering and reports, with execution checks in all three
+modes before claiming neoCLR support. Inspection found Raven `036111ec0` adds
+the syntax after the release pin `ed1d08def`. The author clarified that the
+compiler is pinned to the previous version, then directed continued release work.
+The release pin remains unchanged; backticked test integration and validation are
+deferred, not completed. See the [release record](validation/release-preparation-20261025/README.md).

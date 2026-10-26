@@ -159,3 +159,33 @@ and Windows reused-package run
 [40295956855](https://github.com/marinasundstrom/neoCLR/actions/runs/40295956855)
 were started at `802cae647`; the latter predates the header-fixture repair and must
 not be treated as validating it.
+
+Native-kit console/HTTP and C/C++ interop acceptance pass. HTTPS passes 15
+security, recovery and cleartext-isolation cases. All 320 packaged notice/source
+inputs match the checkout. The packaged editor passes inlays; its full suite first
+stopped after 18 checks because the harness still expected `Option<Order>`.
+The harness now expects `Optional<Order>`. A retry in the previously mutated
+workspace timed out at its initial `VersionOne` probe (the prior run had changed
+it to `VersionTwo`); preserve that harness-state failure and use a freshly prepared
+workspace for acceptance. The 87 SDK/VSIX server files include 81 byte-identical
+files and six differences: SDK publishing uses the osx-arm64 RID, while VSIX
+publishing is RID-independent. Both builds use the same archived Raven revision
+and explicit metadata project; do not claim byte identity between separate builds.
+Installed editor execution remains the acceptance gate.
+
+### Compiler pin reaffirmed — 2026-10-26
+
+The author clarified that this release remains pinned to the previous Raven
+compiler. Backtick-delimited identifiers landed afterward in Raven `036111ec0`
+and are deferred from this release; retain `ed1d08defe2778f965951747d5f48311ce3daf83`
+for every candidate artifact and do not migrate release tests to that new syntax.
+Source run [40296297625](https://github.com/marinasundstrom/neoCLR/actions/runs/40296297625)
+passes canonical archive/full tests, strict Clippy/formatting, minimum Rust on
+three hosts and both macOS/Windows host boundaries. Windows run `40296298072`
+passes runtime/SDK contracts but fails editor acceptance; inspect its retained
+report before treating the corrected local harness as Windows evidence.
+
+The fresh macOS editor workspace passes all 26 checks with the Optional expectation
+repair ([report](editor-final.json.gz)). Windows
+[failed at the identical stale expectation](windows-editor-first.json.gz), after
+18 successful checks; rerun against the same archive with this harness repair.

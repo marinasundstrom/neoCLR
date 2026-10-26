@@ -24,7 +24,11 @@ continues as an experimental native development path.
   hosted requalification remains required. Migrate the header and plain/JSON
   release benchmark fixtures to `Failure`; all 132 macOS header cases pass and
   both benchmark inputs compile. Packaged async (24 executions) and JSON (three
-  modes) also pass. Preview 18 is not yet published.
+  modes) also pass. Correct the editor hover harness to expect `Optional`; all
+  26 macOS editor checks pass on a fresh workspace. Record source-CI, HTTPS,
+  native-kit and notice-audit acceptance, while keeping Windows editor rerun and
+  final measurements pending. Retain the release compiler pin; backticked test
+  names are deferred. Preview 18 is not yet published.
 
 ### 2026-10-25
 

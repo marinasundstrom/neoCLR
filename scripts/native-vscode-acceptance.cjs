@@ -169,22 +169,22 @@ exports.run = async function () {
     assert(!vscode.languages.getDiagnostics(main.uri).some(d => d.severity === 0));
     record('unchanged broad sample imports source-built class library');
     report.unionHovers = {};
-    for (const term of ['Option<Order>', 'Result<Order, SingleError>']) {
+    for (const term of ['Optional<Order>', 'Result<Order, SingleError>']) {
       const result = await measuredHover(main.uri, main.positionAt(main.getText().indexOf(term) + 2));
       const signature = hoverText(result);
       assert(signature.includes('union struct ' + term), signature);
       report.unionHovers[term] = signature;
     }
-    record('native Option and Result type hovers retain union kind and constructed arguments');
+    record('native Optional and Result type hovers retain union kind and constructed arguments');
     if (config.systemDocumentation) {
-      assert(report.unionHovers['Option<Order>'].includes('A nominal union containing Some'));
+      assert(report.unionHovers['Optional<Order>'].includes('A nominal union containing Some'));
       assert(report.unionHovers['Result<Order, SingleError>'].includes('A nominal union containing a successful value'));
       assert(!Object.values(report.unionHovers).some(text => text.includes('generated IUnion contract')));
-      record('source-built Option and Result display shared authored API documentation');
+      record('source-built Optional and Result display shared authored API documentation');
     }
     report.repeatedMainHovers = [];
     for (let round = 0; round < 3; round++) {
-      for (const term of ['ArrayList', 'Option<Order>', 'Result<Order, SingleError>', 'Filter(', '.Map(']) {
+      for (const term of ['ArrayList', 'Optional<Order>', 'Result<Order, SingleError>', 'Filter(', '.Map(']) {
         const offset = main.getText().indexOf(term);
         assert(offset >= 0, term);
         const position = main.positionAt(offset + 2);
