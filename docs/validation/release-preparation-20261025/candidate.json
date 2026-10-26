@@ -37,7 +37,8 @@
     }
   },
   "currentBlockers": [
-    "Windows final benchmark and final artifact/publication audit"
+    "Final macOS provider-inclusive benchmark refresh",
+    "Publication and website deployment"
   ],
   "localFixtureRetest": {
     "taskTestsPassed": 5,
@@ -63,5 +64,8 @@
   "windowsBenchmarkRun": 40298846341,
   "macOSBenchmark": "benchmarks/release-20261026/macos-preview18/summary.json",
   "windowsQualificationPassed": true,
-  "sourceArchiveSha256": "435836d37c832bc899e81d931e678ea578d718676f14de39c62754447060a8c6"
+  "sourceArchiveSha256": "435836d37c832bc899e81d931e678ea578d718676f14de39c62754447060a8c6",
+  "finalMacOSArchive": "a3f60527e9a0b17ec93bc9cac67369b31a1905660a39d633c4dbe2de52311bea",
+  "finalMacOSManifest": "6bf84ed3a21f30f348b6c72af70adb3e94eaf903c4dbae02249787d32fc52fb5",
+  "windowsBenchmarkPassed": true
 }

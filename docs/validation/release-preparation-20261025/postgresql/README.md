@@ -21,3 +21,9 @@ executions, 132 header cases and native-kit console/HTTP/C/C++ checks pass with
 the provider-inclusive package. The earlier timeout is preserved; a successful
 retry does not establish its cause. Editor, HTTPS and final measurements remain
 pending. Final assets are staged separately under `target/preview18-release/final-artifacts`.
+
+All remaining functional gates pass: 26 editor checks, inlays, two ten-cycle
+configuration recovery runs, and 15 HTTPS/security/recovery/cleartext cases. The
+archive audit verifies 2,418 manifest-listed files and all 469 standalone SDK files.
+The provider-inclusive archive's final benchmark refresh remains the last
+measurement gate before publication. Windows final measurements have passed.

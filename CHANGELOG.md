@@ -38,7 +38,10 @@ continues as an experimental native development path.
   import native SDK runtime contracts. Live queries pass interpreter/JIT/AOT and
   all ten protocol-peer cases pass. Final macOS package checks and measurements
   are being repeated for the provider-inclusive archive; extracted JIT/interpreter,
-  24 async executions, 132 headers and native-kit HTTP/C/C++ checks pass. Preview 18 is not yet published.
+  24 async executions, 132 headers and native-kit HTTP/C/C++ checks pass. The
+  rebuilt package also passes all 26 editor checks, inlays, twenty recovery cycles,
+  15 HTTPS cases and the 2,418-file archive audit. Its final measurements remain
+  pending. Preview 18 is not yet published.
 
 ### 2026-10-25
 
