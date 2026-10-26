@@ -8,12 +8,13 @@ Eager JIT and synchronous GC remain the defaults in the current implementation.
 
 ## Shared startup optimization follow-up
 
-Native method selection now reuses temporary immutable metadata indexes. The
-[updated paired HTTP table](/benchmarks/http/)
-reports all four eager/lazy and sync/concurrent modes. Readiness improves in three
-medians, while eager/concurrent is 1.7% slower; warm throughput remains mixed.
-Verification and lazy method counts are unchanged. The earlier placement/load
-cohort below remains separate from that follow-up.
+Native selection and generic expansion now reuse temporary immutable metadata
+indexes. The [updated paired HTTP table](/benchmarks/http/) reports the latest
+increment: all 12 eager/lazy and sync/concurrent startup pairs improve. A longer
+lazy/sync throughput check gives 2,105 → 2,099 req/s; no warm-throughput gain is
+claimed. Verification and lazy method counts are unchanged. Memory diagnostics
+and remaining first-call waits are documented separately. The earlier placement
+and load cohort below is not pooled with this follow-up.
 
 ## Startup and warm execution
 

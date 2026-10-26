@@ -1,0 +1,19 @@
+[
+  "python3",
+  "benchmarks/gc-suite/matrix/http.py",
+  "--build",
+  "target/specialization-lookup-20261026/paired",
+  "--output",
+  "target/specialization-lookup-20261026/long-warm",
+  "--modes",
+  "baseline-lazy-sync-jit",
+  "indexed-lazy-sync-jit",
+  "--samples",
+  "json",
+  "--protocols",
+  "pipeline",
+  "--requests",
+  "65536",
+  "--rounds",
+  "3"
+]

@@ -1,0 +1,53 @@
+{
+  "scope": "One separate diagnostic pair per mode; RSS/malloc reservation are not peaks or managed-heap attribution. Lazy/sync beforeRelease differs by three blocks/208 bytes; afterRelease and afterInvoke match exactly.",
+  "rows": [
+    {
+      "mode": "eager-sync-jit",
+      "liveAllocatorCountsAndBytesMatchAfterReleaseAndInvocation": true,
+      "baseline": {
+        "rssReadyMiB": 953.578125,
+        "mallocReservedAfterInvokeMiB": 936.0
+      },
+      "indexed": {
+        "rssReadyMiB": 954.0625,
+        "mallocReservedAfterInvokeMiB": 924.0
+      }
+    },
+    {
+      "mode": "lazy-sync-jit",
+      "liveAllocatorCountsAndBytesMatchAfterReleaseAndInvocation": true,
+      "baseline": {
+        "rssReadyMiB": 929.953125,
+        "mallocReservedAfterInvokeMiB": 920.0
+      },
+      "indexed": {
+        "rssReadyMiB": 846.171875,
+        "mallocReservedAfterInvokeMiB": 836.0
+      }
+    },
+    {
+      "mode": "eager-live-jit",
+      "liveAllocatorCountsAndBytesMatchAfterReleaseAndInvocation": true,
+      "baseline": {
+        "rssReadyMiB": 1058.34375,
+        "mallocReservedAfterInvokeMiB": 1072.0
+      },
+      "indexed": {
+        "rssReadyMiB": 1024.953125,
+        "mallocReservedAfterInvokeMiB": 1032.0
+      }
+    },
+    {
+      "mode": "lazy-live-jit",
+      "liveAllocatorCountsAndBytesMatchAfterReleaseAndInvocation": true,
+      "baseline": {
+        "rssReadyMiB": 930.421875,
+        "mallocReservedAfterInvokeMiB": 924.0
+      },
+      "indexed": {
+        "rssReadyMiB": 847.03125,
+        "mallocReservedAfterInvokeMiB": 836.0
+      }
+    }
+  ]
+}

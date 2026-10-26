@@ -890,6 +890,17 @@ pub(crate) fn expand_with_conformance(
     {
         return Err("specialization input exceeds metadata limits".into());
     }
+    // Only the immutable source participates in lookup reuse. The growing
+    // expanded inventory is separate, as is any original conformance proof.
+    input.with_metadata_lookups(|input| expand_validated(input, conformance, root, host_roots))
+}
+
+fn expand_validated(
+    input: &neoclr::Module,
+    conformance: &neoclr::Module,
+    root: &str,
+    host_roots: &[usize],
+) -> Result<(neoclr::Module, Value), Error> {
     let roots: Vec<_> = input
         .functions
         .iter()
@@ -1746,7 +1757,14 @@ ret
         ))
         .unwrap();
         let original = serde_json::to_value(&source).unwrap();
-        let (expanded, _) = super::expand(&source, "Main").unwrap();
+        let (expanded, report) = super::expand(&source, "Main").unwrap();
+        let (linear, linear_report) =
+            super::expand_validated(&source, &source, "Main", &[]).unwrap();
+        assert_eq!(
+            serde_json::to_value(&expanded).unwrap(),
+            serde_json::to_value(&linear).unwrap()
+        );
+        assert_eq!(report, linear_report);
         let (selected, _) = super::super::selection::select(&expanded, "Main").unwrap();
         let program = neoclr::LoadedProgram::new(&selected).unwrap();
         program.verify().unwrap();
@@ -1771,8 +1789,15 @@ ret
             .unwrap()
             .implements
             .clear();
-        let (expanded, _) =
+        let (expanded, report) =
             super::expand_with_conformance(&projected, &source, "Main", &[]).unwrap();
+        let (linear, linear_report) =
+            super::expand_validated(&projected, &source, "Main", &[]).unwrap();
+        assert_eq!(
+            serde_json::to_value(&expanded).unwrap(),
+            serde_json::to_value(&linear).unwrap()
+        );
+        assert_eq!(report, linear_report);
         let (selected, _) = super::super::selection::select(&expanded, "Main").unwrap();
         assert_eq!(
             neoclr::LoadedProgram::new(&selected)
@@ -1821,9 +1846,12 @@ ret
                     ))
                 }
             }
-            assert!(
-                super::expand(&invalid, "Main").is_err(),
-                "mutation {mutation} accepted"
+            assert_eq!(
+                super::expand(&invalid, "Main").unwrap_err().to_string(),
+                super::expand_validated(&invalid, &invalid, "Main", &[])
+                    .unwrap_err()
+                    .to_string(),
+                "mutation {mutation} changed diagnostics"
             );
         }
     }

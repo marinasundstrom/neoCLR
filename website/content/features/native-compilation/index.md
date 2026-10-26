@@ -37,7 +37,7 @@ compare both collectors and explain why startup, tail latency, CPU and sustainab
 load must be considered separately.
 
 
-Shared native selection also reuses temporary immutable metadata indexes, preserving
+Shared native selection and generic expansion reuse temporary immutable metadata indexes, preserving
 verification and lazy method counts. The [paired startup follow-up](/benchmarks/http/)
 records improvements and regressions separately for eager/lazy JIT and both collectors.
 

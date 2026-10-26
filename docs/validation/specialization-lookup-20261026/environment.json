@@ -1,0 +1,6 @@
+{
+  "runtimeBaseline": "7396dfe74",
+  "sdkRoot": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+  "currentHead": "b057da8fba3e233b76ba54feef34e70068d6ba43",
+  "scope": "Sequential local development-host runs; no task-owned build/profiler overlaps timing. Background desktop or independent work is not controlled."
+}

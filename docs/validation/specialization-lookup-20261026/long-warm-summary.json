@@ -1,0 +1,44 @@
+{
+  "scope": "Separate lazy/sync-only regression check, 65,536 measured responses per process; three alternating pairs, not pooled with the 4,096-request cohort.",
+  "rows": [
+    {
+      "sample": "json",
+      "protocol": "pipeline",
+      "mode": "baseline-lazy-sync-jit",
+      "requestsPerSecond": 2104.7791780891025,
+      "readySeconds": 9.546435332999991,
+      "firstResponseSeconds": 1.7491720000000015,
+      "readyThroughFirstResponseSeconds": 11.240196249999983,
+      "coldObservedP99Seconds": 1.7491720000000015,
+      "invocationCpuSeconds": 33.081194,
+      "allocations": 24033963,
+      "allocatedBytes": 1374175035,
+      "peakLiveBytes": 47068,
+      "peakArenaBytes": 88248,
+      "wholeProcessCpuSeconds": 42.36963400000001
+    },
+    {
+      "sample": "json",
+      "protocol": "pipeline",
+      "mode": "indexed-lazy-sync-jit",
+      "requestsPerSecond": 2099.3843341452584,
+      "readySeconds": 8.373628249999996,
+      "firstResponseSeconds": 1.6818122080000109,
+      "readyThroughFirstResponseSeconds": 10.050447208000008,
+      "coldObservedP99Seconds": 1.6818122080000109,
+      "invocationCpuSeconds": 32.911992,
+      "allocations": 24033963,
+      "allocatedBytes": 1374175035,
+      "peakLiveBytes": 47068,
+      "peakArenaBytes": 88040,
+      "wholeProcessCpuSeconds": 40.94046699999999
+    }
+  ],
+  "pairedThroughputChangePercent": [
+    -1.9980239785843956,
+    -0.2563140114651863,
+    2.7370491127302055
+  ],
+  "pairedMedianThroughputChangePercent": -0.2563140114651863,
+  "checkedResponses": 393312
+}

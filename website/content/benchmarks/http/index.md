@@ -4,28 +4,35 @@
 tracks plain HTTP and HTTP JSON using the [standard procedure](/benchmarks/gc/procedure/).
 Those experimental AOT results are separate from the published-package series below.
 
-## Development: shared metadata selection — 26 October 2026
+## Development: specialization source lookups — 26 October 2026
 
-A follow-up reuses temporary metadata indexes during native method selection,
-without skipping verification or compiling unused methods. Three alternating
-baseline/candidate pairs use the same JSON guest, hosts and production-default
-backend: 4,096 requests after 16 warmups, four clients, pipeline depth 16.
+Generic expansion now reuses immutable source metadata indexes, preserving
+constraint checks and separate original conformance metadata. Baseline already
+includes the [preceding selection-index change](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/metadata-selection-20261026/README.md).
+Three alternating pairs per mode use the same JSON guest and native hosts,
+production-default codegen, 4,096 requests after 16 warmups, four clients and
+pipeline depth 16. Medians:
 
-| Mode / GC | Ready before → after (s) | Selection + verification before → after (s) | Warm req/s before → after |
+| Mode / GC | READY before → after (s) | Selection + verification before → after (s) | Warm req/s before → after |
 | --- | ---: | ---: | ---: |
-| Eager / sync | 13.390 → 12.531 | 9.390 → 8.396 | 1,764 → 1,876 |
-| Lazy / sync | 9.906 → 9.682 | 8.724 → 8.480 | 1,996 → 2,088 |
-| Eager / concurrent | 15.556 → 15.817 | 9.089 → 9.132 | 1,731 → 1,679 |
-| Lazy / concurrent | 11.296 → 9.781 | 9.904 → 8.451 | 1,361 → 1,401 |
+| Eager / sync | 12.681 → 11.848 | 8.607 → 7.432 | 1,859 → 1,831 |
+| Lazy / sync | 9.887 → 8.798 | 8.687 → 7.617 | 2,130 → 2,014 |
+| Eager / concurrent | 14.475 → 13.234 | 8.175 → 6.918 | 1,743 → 1,760 |
+| Lazy / concurrent | 9.327 → 8.097 | 7.985 → 6.802 | 1,483 → 1,528 |
 
-Readiness improves in three group medians; eager/concurrent is 1.7% slower.
-Pairwise results and warm throughput vary, so this is a modest shared preparation
-optimization, not a universal speedup or a special concurrent-GC benefit. Every
-lazy run still leaves 729 of 1,599 selected methods uncompiled. These are local
-fresh-process measurements with warm host caches, not production capacity.
-Separate memory snapshots show unchanged live allocator bytes after selection,
-but 4–32 MiB more allocator-reserved memory after invocation. RSS is variable.
-[Full ranges, paired changes and validation](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/metadata-selection-20261026/README.md).
+All 12 startup pairs improve. Warm results are mixed, so the suspected lazy/sync
+regression received a longer check: three pairs of 65,536 requests give **2,105 →
+2,099 req/s**, with paired changes from −2.0% to +2.7%. The larger short-run gap
+was not reproduced; no warm-throughput gain or exact equivalence is claimed.
+Every lazy run still leaves 729 of 1,599 selected methods uncompiled. First-call
+latency remains about 1.7 seconds with sync and 2.9 seconds with concurrent GC.
+
+Separate memory snapshots show equal live allocator bytes after release and
+invocation, with 12–88 MiB less allocator reservation. These are single diagnostic
+pairs, not peak-memory guarantees. The results describe fresh processes with warm
+host caches on a shared development machine, not production capacity or a special
+concurrent-GC benefit.
+[Full ranges, profiles, validation and tradeoffs](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/specialization-lookup-20261026/README.md).
 
 ## Earlier development cohort: lazy JIT — 26 October 2026
 
