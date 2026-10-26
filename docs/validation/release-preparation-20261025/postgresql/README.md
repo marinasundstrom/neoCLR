@@ -15,3 +15,9 @@ ordinary sample/server checks but timed out waiting for its second HTTP server
 while other validations ran; isolated retry remains required, without assuming
 its cause. Final package, editor/native-kit and measurement gates are pending.
 The disposable local PostgreSQL 18 container was stopped after SQL acceptance.
+
+The isolated retry passes extracted JIT and interpreter samples/HTTP. All 24 async
+executions, 132 header cases and native-kit console/HTTP/C/C++ checks pass with
+the provider-inclusive package. The earlier timeout is preserved; a successful
+retry does not establish its cause. Editor, HTTPS and final measurements remain
+pending. Final assets are staged separately under `target/preview18-release/final-artifacts`.

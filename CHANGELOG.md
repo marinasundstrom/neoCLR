@@ -31,13 +31,14 @@ continues as an experimental native development path.
   names are deferred. Add retained macOS candidate benchmark tables on the
   website (five stages, 55 CPU/JSON processes and 1,152 HTTP responses), plus
   editor recovery, standalone SDK attribution and Windows HTTPS evidence.
-  Windows package/editor qualification now passes; its final measurements remain
-  pending. Verify the qualified source archive checksum and record lazy JIT with
+  Windows package/editor qualification and all five final benchmark stages pass.
+  Retain the slower hosted measurements and changed CPU-model conditions. Verify the qualified source archive checksum and record lazy JIT with
   trampolines as a post-release investigation. Preserve the macOS PostgreSQL
   provider by rebuilding its candidate; update the SQL qualification harness to
   import native SDK runtime contracts. Live queries pass interpreter/JIT/AOT and
   all ten protocol-peer cases pass. Final macOS package checks and measurements
-  are being repeated for the provider-inclusive archive. Preview 18 is not yet published.
+  are being repeated for the provider-inclusive archive; extracted JIT/interpreter,
+  24 async executions, 132 headers and native-kit HTTP/C/C++ checks pass. Preview 18 is not yet published.
 
 ### 2026-10-25
 
