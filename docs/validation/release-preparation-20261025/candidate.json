@@ -46,7 +46,7 @@
     "nativeGcCommands": 188
   },
   "sourceQualificationRun": 40296297625,
-  "windowsRequalificationRun": 40296298072,
+  "windowsRequalificationRun": 40298792405,
   "macOSAccepted": [
     "extracted JIT/interpreter and HTTP",
     "native GC: 188 commands",
@@ -55,6 +55,12 @@
     "headers: 132 cases",
     "native kit: console/HTTP and C/C++ interop",
     "editor inlays",
-    "editor: 26 checks on fresh workspace"
-  ]
+    "editor: 26 checks on fresh workspace",
+    "two ten-cycle editor configuration recovery runs",
+    "five-stage release benchmark",
+    "standalone SDK/notice audits"
+  ],
+  "windowsHttpsRun": 40298850434,
+  "windowsBenchmarkRun": 40298846341,
+  "macOSBenchmark": "benchmarks/release-20261026/macos-preview18/summary.json"
 }

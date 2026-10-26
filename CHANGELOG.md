@@ -28,7 +28,10 @@ continues as an experimental native development path.
   26 macOS editor checks pass on a fresh workspace. Record source-CI, HTTPS,
   native-kit and notice-audit acceptance, while keeping Windows editor rerun and
   final measurements pending. Retain the release compiler pin; backticked test
-  names are deferred. Preview 18 is not yet published.
+  names are deferred. Add retained macOS candidate benchmark tables on the
+  website (five stages, 55 CPU/JSON processes and 1,152 HTTP responses), plus
+  editor recovery, standalone SDK attribution and Windows HTTPS evidence.
+  Windows final acceptance/measurements remain pending. Preview 18 is not yet published.
 
 ### 2026-10-25
 

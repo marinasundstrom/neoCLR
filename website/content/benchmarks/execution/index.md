@@ -5,6 +5,30 @@ compare low-allocation work, object churn, bursts and retained windows under syn
 and concurrent GC. The [standard procedure](/benchmarks/gc/procedure/) supports
 separate benchmark and profiling runs.
 
+## Preview 18 candidate — 26 October 2026
+
+The macOS ARM64 candidate passes all five stages: 55 CPU/JSON processes and
+1,152 HTTP responses. SDK/editor `0.1.18-neoclr.20261025.1`, Raven `ed1d08def`,
+Apple M1/macOS 27.0.1, synchronous GC. Five measured rounds use sequential
+loopback HTTP with connection close; startup is separate and native CPU batches
+are longer. The checkout stayed clean and no unrelated builds overlapped timing.
+These are candidate measurements, not peak concurrent throughput or a controlled
+speedup comparison. Windows measurements and release publication remain pending.
+
+| Workload | Mode | Median operations/s | Range | Median startup s |
+| --- | --- | ---: | ---: | ---: |
+| cpu.sum | interpreter | 5.04 | 4.99–5.13 | 3.038 |
+| cpu.sum | jit | 41600.54 | 41521.33–42140.65 | 2.823 |
+| cpu.sum | aot | 41846.66 | 40502.36–42425.25 | 0.005 |
+| json.serialize | interpreter | 14.56 | 12.81–14.79 | 2.925 |
+| json.serialize | jit | 1014.35 | 933.26–1019.33 | 2.759 |
+| json.serialize | aot | 1069.03 | 984.58–1075.47 | 0.005 |
+| json.deserialize | interpreter | 14.45 | 13.37–14.63 | 2.921 |
+| json.deserialize | jit | 665.86 | 626.83–681.79 | 2.784 |
+| json.deserialize | aot | 718.65 | 661.65–719.91 | 0.005 |
+
+[Raw macOS reports and conditions](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/release-20261026/macos-preview18).
+
 ## Preview 17 — 22–23 October 2026
 
 The matching macOS ARM64 and Windows x64 packages each pass all five stages:

@@ -189,3 +189,24 @@ The fresh macOS editor workspace passes all 26 checks with the Optional expectat
 repair ([report](editor-final.json.gz)). Windows
 [failed at the identical stale expectation](windows-editor-first.json.gz), after
 18 successful checks; rerun against the same archive with this harness repair.
+
+### Final measurements and remaining gates — 2026-10-26
+
+The [macOS candidate measurements](../../../benchmarks/release-20261026/macos-preview18/README.md)
+pass all five stages: 55 CPU/JSON processes and 1,152 HTTP responses, with clean
+Git status before and after. Startup, ranges and limitations are retained on the
+website. Both ten-cycle macOS editor recovery runs pass. All 469 standalone SDK
+files match the bundle, 27 NuGet dependencies have reviewed attribution, and the
+production extension JavaScript is reproduced with five bundled npm packages
+covered by the existing eight-package inventory.
+
+Windows HTTPS run [40298850434](https://github.com/marinasundstrom/neoCLR/actions/runs/40298850434)
+passes against the original package archive. Windows package requalification
+[40298792405](https://github.com/marinasundstrom/neoCLR/actions/runs/40298792405)
+uses the repaired editor harness; benchmark run
+[40298846341](https://github.com/marinasundstrom/neoCLR/actions/runs/40298846341)
+waits for its success. Windows final acceptance/measurements and publication remain
+pending; macOS success is not substituted for them.
+
+The refreshed benchmark website builds and checks all 6,133 pages. This is local
+validation; no website deployment or Preview 18 publication has occurred.

@@ -4,6 +4,27 @@
 tracks plain HTTP and HTTP JSON using the [standard procedure](/benchmarks/gc/procedure/).
 Those experimental AOT results are separate from the published-package series below.
 
+## Preview 18 candidate — 26 October 2026
+
+The macOS ARM64 candidate passes all five stages: 55 CPU/JSON processes and
+1,152 HTTP responses. SDK/editor `0.1.18-neoclr.20261025.1`, Raven `ed1d08def`,
+Apple M1/macOS 27.0.1, synchronous GC. Five measured rounds use sequential
+loopback HTTP with connection close; startup is separate and native CPU batches
+are longer. The checkout stayed clean and no unrelated builds overlapped timing.
+These are candidate measurements, not peak concurrent throughput or a controlled
+speedup comparison. Windows measurements and release publication remain pending.
+
+| Workload | Mode | Median requests/s | Range | Median startup s |
+| --- | --- | ---: | ---: | ---: |
+| http-plain | interpreter | 3.85 | 3.76–3.97 | 2.811 |
+| http-plain | jit | 190.08 | 183.04–195.91 | 6.275 |
+| http-plain | aot | 200.06 | 192.50–205.16 | 0.005 |
+| http-json | interpreter | 2.06 | 2.00–2.24 | 2.796 |
+| http-json | jit | 110.67 | 107.69–111.70 | 10.747 |
+| http-json | aot | 114.99 | 113.46–116.16 | 0.005 |
+
+[Raw macOS reports and conditions](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/release-20261026/macos-preview18).
+
 ## Preview 17 — 22–23 October 2026
 
 The matching macOS ARM64 and Windows x64 packages each pass all five stages:
