@@ -5,6 +5,30 @@ compare low-allocation work, object churn, bursts and retained windows under syn
 and concurrent GC. The [standard procedure](/benchmarks/gc/procedure/) supports
 separate benchmark and profiling runs.
 
+## Development: lazy JIT — 26 October 2026
+
+Post-Preview-18 source builds can opt into lazy method lowering and compilation.
+Five alternating rounds on Apple M1/macOS 27.0.1, with normal system code placement,
+compare identical HTTP inputs and retained native hosts. Four clients use pipeline
+depth 16, after 16 cold/warmup responses. These are loopback measurements, not
+saturation or framework rankings; concurrent GC remains an experimental candidate.
+
+| Handler / GC | Eager ready s | Lazy ready s | Eager req/s | Lazy req/s |
+| --- | ---: | ---: | ---: | ---: |
+| Plain / sync | 13.554 | 10.664 | 4,315 | 3,793 |
+| Plain / concurrent | 15.942 | 10.246 | 3,685 | 2,301 |
+| JSON / sync | 12.878 | 10.159 | 2,513 | 2,106 |
+| JSON / concurrent | 16.780 | 10.490 | 2,023 | 1,321 |
+
+Readiness improves 21–37%, but first responses take 1.24–3.21 seconds and
+post-warmup throughput falls 12–38%. Compute/allocation samples remain around
+2.3–2.6 seconds at startup with mixed changes. All 164,480 checked HTTP responses
+and 40 standalone processes pass. Eager JIT and synchronous GC remain defaults;
+this is an opt-in baseline for the next optimization work, not a published release.
+
+[Full results, ranges, cold latencies and limitations](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/lazy-jit-20261026/README.md).
+The report retains all runs, including a 21.425-second lazy plaintext/sync startup.
+
 ## Preview 18 — 26 October 2026
 
 Both packages pass all five measurement stages: 55 CPU/JSON processes and 1,152

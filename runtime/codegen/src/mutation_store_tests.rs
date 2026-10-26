@@ -651,6 +651,14 @@ fn call_closure_requires_transitive_bodies_and_exact_providers() {
             .to_string()
             .contains("no supplied body")
     );
+    crate::mutation_admission::check_call_closure_deferred(
+        &module, &[(caller, &caller_ctx.func)], &providers, &[callee],
+    ).unwrap();
+    let import = module.declarations().get_functions()
+        .find(|(_, declaration)| declaration.linkage == Linkage::Import).unwrap().0;
+    assert!(crate::mutation_admission::check_call_closure_deferred(
+        &module, &[(caller, &caller_ctx.func)], &providers, &[callee, import],
+    ).unwrap_err().to_string().contains("declared generated method"));
     let bodies = [(caller, &caller_ctx.func), (callee, &callee_ctx.func)];
     check(&module, &bodies, &providers).unwrap();
     assert!(

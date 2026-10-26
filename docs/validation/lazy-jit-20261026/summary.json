@@ -1,0 +1,1205 @@
+{
+  "http": [
+    {
+      "sample": "json",
+      "collector": "sync",
+      "eager": {
+        "runs": 5,
+        "readySeconds": {
+          "median": 12.877663667000036,
+          "min": 12.685487582999997,
+          "max": 15.219508457999993
+        },
+        "firstResponseSeconds": {
+          "median": 0.002381667000008747,
+          "min": 0.0020565419999911683,
+          "max": 0.0024832920000221748
+        },
+        "readyThroughFirstResponseSeconds": {
+          "median": 12.880146959000058,
+          "min": 12.687908665999942,
+          "max": 15.22183679199999
+        },
+        "coldObservedP99Seconds": {
+          "median": 0.002381667000008747,
+          "min": 0.0020565419999911683,
+          "max": 0.0024832920000221748
+        },
+        "requestsPerSecond": {
+          "median": 2512.972148124728,
+          "min": 2287.3557161730178,
+          "max": 2537.747392429985
+        },
+        "wholeProcessCpuSeconds": {
+          "median": 14.52098199999998,
+          "min": 14.300178999999973,
+          "max": 16.421856
+        },
+        "invocationCpuSeconds": {
+          "median": 1.637069,
+          "min": 1.628766,
+          "max": 1.789964
+        },
+        "allocations": {
+          "median": 1508523,
+          "min": 1508523,
+          "max": 1508523
+        },
+        "allocatedBytes": {
+          "median": 86258231,
+          "min": 86258231,
+          "max": 86258231
+        },
+        "collections": {
+          "median": 5928,
+          "min": 5928,
+          "max": 5928
+        }
+      },
+      "lazy": {
+        "runs": 5,
+        "readySeconds": {
+          "median": 10.159200749999997,
+          "min": 9.913909750000016,
+          "max": 11.475232208000008
+        },
+        "firstResponseSeconds": {
+          "median": 1.8788508749999835,
+          "min": 1.7369319999999675,
+          "max": 2.543601625000008
+        },
+        "readyThroughFirstResponseSeconds": {
+          "median": 12.03805162499998,
+          "min": 11.676931792000005,
+          "max": 13.857044250000015
+        },
+        "coldObservedP99Seconds": {
+          "median": 1.8788508749999835,
+          "min": 1.7369319999999675,
+          "max": 2.543601625000008
+        },
+        "requestsPerSecond": {
+          "median": 2105.9651545781744,
+          "min": 1872.103403891042,
+          "max": 2150.031773464525
+        },
+        "wholeProcessCpuSeconds": {
+          "median": 13.897639000000051,
+          "min": 13.787834000000014,
+          "max": 15.595278000000013
+        },
+        "invocationCpuSeconds": {
+          "median": 4.194699,
+          "min": 3.980323,
+          "max": 4.611194
+        },
+        "allocations": {
+          "median": 1508523,
+          "min": 1508523,
+          "max": 1508523
+        },
+        "allocatedBytes": {
+          "median": 86258231,
+          "min": 86258231,
+          "max": 86258231
+        },
+        "collections": {
+          "median": 5926,
+          "min": 5926,
+          "max": 5926
+        },
+        "lazyJit": {
+          "compiledMethods": {
+            "median": 870,
+            "min": 870,
+            "max": 870
+          },
+          "entryFinalizationSeconds": {
+            "median": 0.000444166,
+            "min": 0.000418792,
+            "max": 0.000467042
+          },
+          "firstCallCodegenAndPublishSeconds": {
+            "median": 1.8481977770000013,
+            "min": 1.816475263999999,
+            "max": 2.523318335999999
+          },
+          "firstCallCompilationSeconds": {
+            "median": 2.189047538999997,
+            "min": 2.0977367490000005,
+            "max": 2.8973297120000026
+          },
+          "firstCallLoweringSeconds": {
+            "median": 0.3408634440000005,
+            "min": 0.28127568699999966,
+            "max": 0.3740177639999999
+          },
+          "loweredMethods": {
+            "median": 870,
+            "min": 870,
+            "max": 870
+          },
+          "modulePreparationSeconds": {
+            "median": 0.709204125,
+            "min": 0.698923167,
+            "max": 0.805648625
+          },
+          "selectedMethods": {
+            "median": 1599,
+            "min": 1599,
+            "max": 1599
+          },
+          "trampolinePreparationSeconds": {
+            "median": 0.0714745,
+            "min": 0.069956042,
+            "max": 0.077339792
+          },
+          "uncompiledMethods": {
+            "median": 729,
+            "min": 729,
+            "max": 729
+          }
+        }
+      },
+      "changePercent": {
+        "readySeconds": -21.109907723140044,
+        "firstResponseSeconds": 78788.05928759491,
+        "readyThroughFirstResponseSeconds": -6.5379326546554655,
+        "coldObservedP99Seconds": 78788.05928759491,
+        "requestsPerSecond": -16.19623973350748,
+        "wholeProcessCpuSeconds": -4.292705548425923,
+        "invocationCpuSeconds": 156.23226632475476
+      }
+    },
+    {
+      "sample": "json",
+      "collector": "live",
+      "eager": {
+        "runs": 5,
+        "readySeconds": {
+          "median": 16.780142082999987,
+          "min": 15.850885749999975,
+          "max": 17.173428374999958
+        },
+        "firstResponseSeconds": {
+          "median": 0.002625749999992877,
+          "min": 0.002464083000006667,
+          "max": 0.003536832999998296
+        },
+        "readyThroughFirstResponseSeconds": {
+          "median": 16.783282790999976,
+          "min": 15.853349832999982,
+          "max": 17.17605412499995
+        },
+        "coldObservedP99Seconds": {
+          "median": 0.002625749999992877,
+          "min": 0.002464083000006667,
+          "max": 0.003536832999998296
+        },
+        "requestsPerSecond": {
+          "median": 2022.7461818080558,
+          "min": 1906.634492209629,
+          "max": 2153.2876458335004
+        },
+        "wholeProcessCpuSeconds": {
+          "median": 18.371892999999993,
+          "min": 17.51617899999998,
+          "max": 18.73989600000007
+        },
+        "invocationCpuSeconds": {
+          "median": 2.035522,
+          "min": 1.907877,
+          "max": 2.082325
+        },
+        "allocations": {
+          "median": 1508523,
+          "min": 1508523,
+          "max": 1508523
+        },
+        "allocatedBytes": {
+          "median": 86258231,
+          "min": 86258231,
+          "max": 86258231
+        },
+        "collections": {
+          "median": 804,
+          "min": 796,
+          "max": 809
+        }
+      },
+      "lazy": {
+        "runs": 5,
+        "readySeconds": {
+          "median": 10.490394041999991,
+          "min": 10.124743082999998,
+          "max": 10.784064917000023
+        },
+        "firstResponseSeconds": {
+          "median": 3.207123499999966,
+          "min": 3.1472224590000337,
+          "max": 3.2426174160000016
+        },
+        "readyThroughFirstResponseSeconds": {
+          "median": 13.680569251000009,
+          "min": 13.313824833000012,
+          "max": 14.026682333000025
+        },
+        "coldObservedP99Seconds": {
+          "median": 3.207123499999966,
+          "min": 3.1472224590000337,
+          "max": 3.2426174160000016
+        },
+        "requestsPerSecond": {
+          "median": 1320.6877413315035,
+          "min": 1203.7530735583296,
+          "max": 1414.5619561578733
+        },
+        "wholeProcessCpuSeconds": {
+          "median": 16.76415999999997,
+          "min": 16.531973999999977,
+          "max": 17.078627999999988
+        },
+        "invocationCpuSeconds": {
+          "median": 6.895995,
+          "min": 6.641931,
+          "max": 7.01976
+        },
+        "allocations": {
+          "median": 1508523,
+          "min": 1508523,
+          "max": 1508523
+        },
+        "allocatedBytes": {
+          "median": 86258231,
+          "min": 86258231,
+          "max": 86258231
+        },
+        "collections": {
+          "median": 803,
+          "min": 803,
+          "max": 804
+        },
+        "lazyJit": {
+          "compiledMethods": {
+            "median": 870,
+            "min": 870,
+            "max": 870
+          },
+          "entryFinalizationSeconds": {
+            "median": 0.000441125,
+            "min": 0.000410917,
+            "max": 0.000530333
+          },
+          "firstCallCodegenAndPublishSeconds": {
+            "median": 3.3794983320000003,
+            "min": 3.3261937440000064,
+            "max": 3.447216070000001
+          },
+          "firstCallCompilationSeconds": {
+            "median": 3.821949168999997,
+            "min": 3.7621841620000027,
+            "max": 3.903345201000003
+          },
+          "firstCallLoweringSeconds": {
+            "median": 0.44552295199999997,
+            "min": 0.43599927199999994,
+            "max": 0.45613826999999985
+          },
+          "loweredMethods": {
+            "median": 870,
+            "min": 870,
+            "max": 870
+          },
+          "modulePreparationSeconds": {
+            "median": 0.705029875,
+            "min": 0.690114667,
+            "max": 0.722391333
+          },
+          "selectedMethods": {
+            "median": 1599,
+            "min": 1599,
+            "max": 1599
+          },
+          "trampolinePreparationSeconds": {
+            "median": 0.071125875,
+            "min": 0.069992417,
+            "max": 0.072833417
+          },
+          "uncompiledMethods": {
+            "median": 729,
+            "min": 729,
+            "max": 729
+          }
+        }
+      },
+      "changePercent": {
+        "readySeconds": -37.48328238157267,
+        "firstResponseSeconds": 122041.23583770986,
+        "readyThroughFirstResponseSeconds": -18.486928800745684,
+        "coldObservedP99Seconds": 122041.23583770986,
+        "requestsPerSecond": -34.70818270678968,
+        "wholeProcessCpuSeconds": -8.751047047792104,
+        "invocationCpuSeconds": 238.78263167875372
+      }
+    },
+    {
+      "sample": "plain",
+      "collector": "sync",
+      "eager": {
+        "runs": 5,
+        "readySeconds": {
+          "median": 13.553921416000009,
+          "min": 12.667556584,
+          "max": 17.909823707999976
+        },
+        "firstResponseSeconds": {
+          "median": 0.0016772500000001855,
+          "min": 0.0015928329999894686,
+          "max": 0.003913917000000211
+        },
+        "readyThroughFirstResponseSeconds": {
+          "median": 13.555514248999998,
+          "min": 12.671470501,
+          "max": 17.911624665999966
+        },
+        "coldObservedP99Seconds": {
+          "median": 0.0016772500000001855,
+          "min": 0.0015928329999894686,
+          "max": 0.003913917000000211
+        },
+        "requestsPerSecond": {
+          "median": 4315.288773872878,
+          "min": 4136.862897485584,
+          "max": 4422.634994506031
+        },
+        "wholeProcessCpuSeconds": {
+          "median": 14.136499000000008,
+          "min": 13.591567,
+          "max": 17.194386000000037
+        },
+        "invocationCpuSeconds": {
+          "median": 0.947607,
+          "min": 0.930722,
+          "max": 0.992727
+        },
+        "allocations": {
+          "median": 620331,
+          "min": 620331,
+          "max": 620331
+        },
+        "allocatedBytes": {
+          "median": 46647335,
+          "min": 46647335,
+          "max": 46647335
+        },
+        "collections": {
+          "median": 2841,
+          "min": 2828,
+          "max": 2842
+        }
+      },
+      "lazy": {
+        "runs": 5,
+        "readySeconds": {
+          "median": 10.664181125000027,
+          "min": 10.013640124999995,
+          "max": 21.425234708000005
+        },
+        "firstResponseSeconds": {
+          "median": 1.2424604999999929,
+          "min": 1.21246108400004,
+          "max": 1.480028500000003
+        },
+        "readyThroughFirstResponseSeconds": {
+          "median": 11.90664162500002,
+          "min": 11.239013999999969,
+          "max": 22.905263208000008
+        },
+        "coldObservedP99Seconds": {
+          "median": 1.2424604999999929,
+          "min": 1.21246108400004,
+          "max": 1.480028500000003
+        },
+        "requestsPerSecond": {
+          "median": 3793.251434707295,
+          "min": 3665.715558461164,
+          "max": 3850.248578430533
+        },
+        "wholeProcessCpuSeconds": {
+          "median": 13.023809999999974,
+          "min": 12.391835999999998,
+          "max": 18.800192999999933
+        },
+        "invocationCpuSeconds": {
+          "median": 2.641123,
+          "min": 2.619835,
+          "max": 2.771842
+        },
+        "allocations": {
+          "median": 620331,
+          "min": 620331,
+          "max": 620331
+        },
+        "allocatedBytes": {
+          "median": 46647335,
+          "min": 46647335,
+          "max": 46647335
+        },
+        "collections": {
+          "median": 2839,
+          "min": 2839,
+          "max": 2839
+        },
+        "lazyJit": {
+          "compiledMethods": {
+            "median": 692,
+            "min": 692,
+            "max": 692
+          },
+          "entryFinalizationSeconds": {
+            "median": 0.0004195,
+            "min": 0.000409417,
+            "max": 0.000481125
+          },
+          "firstCallCodegenAndPublishSeconds": {
+            "median": 1.4054745230000012,
+            "min": 1.3789322070000007,
+            "max": 1.666337824999999
+          },
+          "firstCallCompilationSeconds": {
+            "median": 1.6028631789999992,
+            "min": 1.571968998000001,
+            "max": 1.878693794000001
+          },
+          "firstCallLoweringSeconds": {
+            "median": 0.19739680199999984,
+            "min": 0.1930447270000001,
+            "max": 0.21237257799999973
+          },
+          "loweredMethods": {
+            "median": 692,
+            "min": 692,
+            "max": 692
+          },
+          "modulePreparationSeconds": {
+            "median": 0.709223083,
+            "min": 0.6991855,
+            "max": 0.860128291
+          },
+          "selectedMethods": {
+            "median": 1599,
+            "min": 1599,
+            "max": 1599
+          },
+          "trampolinePreparationSeconds": {
+            "median": 0.071260833,
+            "min": 0.070248208,
+            "max": 0.07543525
+          },
+          "uncompiledMethods": {
+            "median": 907,
+            "min": 907,
+            "max": 907
+          }
+        }
+      },
+      "changePercent": {
+        "readySeconds": -21.320326437695936,
+        "firstResponseSeconds": 73977.23952898229,
+        "readyThroughFirstResponseSeconds": -12.163851505092227,
+        "coldObservedP99Seconds": 73977.23952898229,
+        "requestsPerSecond": -12.097390615577863,
+        "wholeProcessCpuSeconds": -7.87103652750255,
+        "invocationCpuSeconds": 178.7150158240705
+      }
+    },
+    {
+      "sample": "plain",
+      "collector": "live",
+      "eager": {
+        "runs": 5,
+        "readySeconds": {
+          "median": 15.942425833000016,
+          "min": 15.301774125000009,
+          "max": 17.936417291999987
+        },
+        "firstResponseSeconds": {
+          "median": 0.0022935839999718155,
+          "min": 0.0019375410000037618,
+          "max": 0.002737708000040584
+        },
+        "readyThroughFirstResponseSeconds": {
+          "median": 15.945163541000056,
+          "min": 15.304420916000026,
+          "max": 17.93871087599996
+        },
+        "coldObservedP99Seconds": {
+          "median": 0.0022935839999718155,
+          "min": 0.0019375410000037618,
+          "max": 0.014921958000002178
+        },
+        "requestsPerSecond": {
+          "median": 3684.579264051283,
+          "min": 3546.8326655706683,
+          "max": 3782.197820730302
+        },
+        "wholeProcessCpuSeconds": {
+          "median": 16.91615799999997,
+          "min": 16.337334999999996,
+          "max": 18.718638000000027
+        },
+        "invocationCpuSeconds": {
+          "median": 1.130076,
+          "min": 1.102979,
+          "max": 1.174643
+        },
+        "allocations": {
+          "median": 620331,
+          "min": 620331,
+          "max": 620331
+        },
+        "allocatedBytes": {
+          "median": 46647335,
+          "min": 46647335,
+          "max": 46647335
+        },
+        "collections": {
+          "median": 477,
+          "min": 474,
+          "max": 485
+        }
+      },
+      "lazy": {
+        "runs": 5,
+        "readySeconds": {
+          "median": 10.245700917000022,
+          "min": 10.128090208000003,
+          "max": 10.737710584000013
+        },
+        "firstResponseSeconds": {
+          "median": 2.249072749999982,
+          "min": 2.22447895800002,
+          "max": 2.34236237500005
+        },
+        "readyThroughFirstResponseSeconds": {
+          "median": 12.588063292000072,
+          "min": 12.37135416600006,
+          "max": 12.986783333999995
+        },
+        "coldObservedP99Seconds": {
+          "median": 2.249072749999982,
+          "min": 2.22447895800002,
+          "max": 2.34236237500005
+        },
+        "requestsPerSecond": {
+          "median": 2301.3521145990203,
+          "min": 2209.35007903101,
+          "max": 2509.102529015578
+        },
+        "wholeProcessCpuSeconds": {
+          "median": 14.454045000000061,
+          "min": 14.195670999999944,
+          "max": 14.724221999999987
+        },
+        "invocationCpuSeconds": {
+          "median": 4.5723,
+          "min": 4.462552,
+          "max": 4.797857
+        },
+        "allocations": {
+          "median": 620331,
+          "min": 620331,
+          "max": 620331
+        },
+        "allocatedBytes": {
+          "median": 46647335,
+          "min": 46647335,
+          "max": 46647335
+        },
+        "collections": {
+          "median": 473,
+          "min": 469,
+          "max": 478
+        },
+        "lazyJit": {
+          "compiledMethods": {
+            "median": 692,
+            "min": 692,
+            "max": 692
+          },
+          "entryFinalizationSeconds": {
+            "median": 0.000442167,
+            "min": 0.000412334,
+            "max": 0.000468667
+          },
+          "firstCallCodegenAndPublishSeconds": {
+            "median": 2.5625812810000035,
+            "min": 2.5469123290000013,
+            "max": 2.654441536000001
+          },
+          "firstCallCompilationSeconds": {
+            "median": 2.879103248,
+            "min": 2.8606694109999995,
+            "max": 2.992110414000002
+          },
+          "firstCallLoweringSeconds": {
+            "median": 0.31652963000000006,
+            "min": 0.313764458,
+            "max": 0.33767995199999973
+          },
+          "loweredMethods": {
+            "median": 692,
+            "min": 692,
+            "max": 692
+          },
+          "modulePreparationSeconds": {
+            "median": 0.707543292,
+            "min": 0.692140583,
+            "max": 0.731525625
+          },
+          "selectedMethods": {
+            "median": 1599,
+            "min": 1599,
+            "max": 1599
+          },
+          "trampolinePreparationSeconds": {
+            "median": 0.072615625,
+            "min": 0.070489417,
+            "max": 0.073697042
+          },
+          "uncompiledMethods": {
+            "median": 907,
+            "min": 907,
+            "max": 907
+          }
+        }
+      },
+      "changePercent": {
+        "readySeconds": -35.73311223570544,
+        "firstResponseSeconds": 97959.31459356273,
+        "readyThroughFirstResponseSeconds": -21.05403460032139,
+        "coldObservedP99Seconds": 97959.31459356273,
+        "requestsPerSecond": -37.54097958884379,
+        "wholeProcessCpuSeconds": -14.554800209361451,
+        "invocationCpuSeconds": 304.60110647425483
+      }
+    }
+  ],
+  "samples": [
+    {
+      "sample": "compute",
+      "collector": "sync",
+      "eager": {
+        "runs": 5,
+        "readySeconds": {
+          "median": 2.3504959580000104,
+          "min": 2.314182125000002,
+          "max": 2.5945916250000067
+        },
+        "wholeProcessCpuSeconds": {
+          "median": 2.414933999999997,
+          "min": 2.3737989999999978,
+          "max": 2.4459510000000106
+        },
+        "invocationCpuSeconds": {
+          "median": 0.062571,
+          "min": 0.062406,
+          "max": 0.063472
+        },
+        "allocations": {
+          "median": 13,
+          "min": 13,
+          "max": 13
+        },
+        "allocatedBytes": {
+          "median": 386,
+          "min": 386,
+          "max": 386
+        },
+        "collections": {
+          "median": 4,
+          "min": 4,
+          "max": 4
+        }
+      },
+      "lazy": {
+        "runs": 5,
+        "readySeconds": {
+          "median": 2.303336209,
+          "min": 2.2735674580000023,
+          "max": 2.3225293329999985
+        },
+        "wholeProcessCpuSeconds": {
+          "median": 2.371916,
+          "min": 2.3469219999999957,
+          "max": 2.3941060000000043
+        },
+        "invocationCpuSeconds": {
+          "median": 0.091968,
+          "min": 0.091738,
+          "max": 0.093054
+        },
+        "allocations": {
+          "median": 13,
+          "min": 13,
+          "max": 13
+        },
+        "allocatedBytes": {
+          "median": 386,
+          "min": 386,
+          "max": 386
+        },
+        "collections": {
+          "median": 4,
+          "min": 4,
+          "max": 4
+        },
+        "lazyJit": {
+          "compiledMethods": {
+            "median": 45,
+            "min": 45,
+            "max": 45
+          },
+          "entryFinalizationSeconds": {
+            "median": 5.3625e-05,
+            "min": 4.9875e-05,
+            "max": 9.3708e-05
+          },
+          "firstCallCodegenAndPublishSeconds": {
+            "median": 0.026826671,
+            "min": 0.026729879,
+            "max": 0.027067422
+          },
+          "firstCallCompilationSeconds": {
+            "median": 0.028829254,
+            "min": 0.028732666999999996,
+            "max": 0.029125540999999998
+          },
+          "firstCallLoweringSeconds": {
+            "median": 0.0020045010000000005,
+            "min": 0.0019536699999999994,
+            "max": 0.002058538999999999
+          },
+          "loweredMethods": {
+            "median": 45,
+            "min": 45,
+            "max": 45
+          },
+          "modulePreparationSeconds": {
+            "median": 0.034104916,
+            "min": 0.034100917,
+            "max": 0.034655375
+          },
+          "selectedMethods": {
+            "median": 68,
+            "min": 68,
+            "max": 68
+          },
+          "trampolinePreparationSeconds": {
+            "median": 0.002628375,
+            "min": 0.002618542,
+            "max": 0.002838041
+          },
+          "uncompiledMethods": {
+            "median": 23,
+            "min": 23,
+            "max": 23
+          }
+        }
+      },
+      "changePercent": {
+        "readySeconds": -2.006374392582999,
+        "wholeProcessCpuSeconds": -1.7813323262663494,
+        "invocationCpuSeconds": 46.98182864266192
+      }
+    },
+    {
+      "sample": "compute",
+      "collector": "live",
+      "eager": {
+        "runs": 5,
+        "readySeconds": {
+          "median": 2.404102082999998,
+          "min": 2.353260750000004,
+          "max": 2.572668292000003
+        },
+        "wholeProcessCpuSeconds": {
+          "median": 2.459603999999983,
+          "min": 2.412294000000003,
+          "max": 2.5706399999999996
+        },
+        "invocationCpuSeconds": {
+          "median": 0.063187,
+          "min": 0.062542,
+          "max": 0.065762
+        },
+        "allocations": {
+          "median": 13,
+          "min": 13,
+          "max": 13
+        },
+        "allocatedBytes": {
+          "median": 386,
+          "min": 386,
+          "max": 386
+        },
+        "collections": {
+          "median": 4,
+          "min": 4,
+          "max": 4
+        }
+      },
+      "lazy": {
+        "runs": 5,
+        "readySeconds": {
+          "median": 2.3488861670000034,
+          "min": 2.310993791999998,
+          "max": 2.4675294999999977
+        },
+        "wholeProcessCpuSeconds": {
+          "median": 2.4253310000000017,
+          "min": 2.389327999999999,
+          "max": 2.4628190000000005
+        },
+        "invocationCpuSeconds": {
+          "median": 0.113232,
+          "min": 0.111893,
+          "max": 0.120342
+        },
+        "allocations": {
+          "median": 13,
+          "min": 13,
+          "max": 13
+        },
+        "allocatedBytes": {
+          "median": 386,
+          "min": 386,
+          "max": 386
+        },
+        "collections": {
+          "median": 4,
+          "min": 4,
+          "max": 4
+        },
+        "lazyJit": {
+          "compiledMethods": {
+            "median": 45,
+            "min": 45,
+            "max": 45
+          },
+          "entryFinalizationSeconds": {
+            "median": 5.0209e-05,
+            "min": 4.95e-05,
+            "max": 5.1916e-05
+          },
+          "firstCallCodegenAndPublishSeconds": {
+            "median": 0.045455042,
+            "min": 0.044501997999999994,
+            "max": 0.04728504699999999
+          },
+          "firstCallCompilationSeconds": {
+            "median": 0.049556917000000006,
+            "min": 0.048547668,
+            "max": 0.05149450000000001
+          },
+          "firstCallLoweringSeconds": {
+            "median": 0.004101872999999999,
+            "min": 0.004045791000000001,
+            "max": 0.004209879
+          },
+          "loweredMethods": {
+            "median": 45,
+            "min": 45,
+            "max": 45
+          },
+          "modulePreparationSeconds": {
+            "median": 0.033951083,
+            "min": 0.033878375,
+            "max": 0.034816416
+          },
+          "selectedMethods": {
+            "median": 68,
+            "min": 68,
+            "max": 68
+          },
+          "trampolinePreparationSeconds": {
+            "median": 0.002630792,
+            "min": 0.002622167,
+            "max": 0.002646917
+          },
+          "uncompiledMethods": {
+            "median": 23,
+            "min": 23,
+            "max": 23
+          }
+        }
+      },
+      "changePercent": {
+        "readySeconds": -2.296737579923913,
+        "wholeProcessCpuSeconds": -1.393435691273126,
+        "invocationCpuSeconds": 79.20141801319893
+      }
+    },
+    {
+      "sample": "steady",
+      "collector": "sync",
+      "eager": {
+        "runs": 5,
+        "readySeconds": {
+          "median": 2.3307354169999996,
+          "min": 2.3163506249999983,
+          "max": 2.3841713339999995
+        },
+        "wholeProcessCpuSeconds": {
+          "median": 2.521659000000001,
+          "min": 2.508771000000002,
+          "max": 2.5684830000000014
+        },
+        "invocationCpuSeconds": {
+          "median": 0.194927,
+          "min": 0.194371,
+          "max": 0.19804
+        },
+        "allocations": {
+          "median": 1048589,
+          "min": 1048589,
+          "max": 1048589
+        },
+        "allocatedBytes": {
+          "median": 25166208,
+          "min": 25166208,
+          "max": 25166208
+        },
+        "collections": {
+          "median": 4100,
+          "min": 4100,
+          "max": 4100
+        }
+      },
+      "lazy": {
+        "runs": 5,
+        "readySeconds": {
+          "median": 2.350059625,
+          "min": 2.2761914589999996,
+          "max": 2.5486725419999914
+        },
+        "wholeProcessCpuSeconds": {
+          "median": 2.560056999999999,
+          "min": 2.484291999999998,
+          "max": 2.7299179999999907
+        },
+        "invocationCpuSeconds": {
+          "median": 0.226184,
+          "min": 0.223019,
+          "max": 0.233094
+        },
+        "allocations": {
+          "median": 1048589,
+          "min": 1048589,
+          "max": 1048589
+        },
+        "allocatedBytes": {
+          "median": 25166208,
+          "min": 25166208,
+          "max": 25166208
+        },
+        "collections": {
+          "median": 4100,
+          "min": 4100,
+          "max": 4100
+        },
+        "lazyJit": {
+          "compiledMethods": {
+            "median": 47,
+            "min": 47,
+            "max": 47
+          },
+          "entryFinalizationSeconds": {
+            "median": 5.3166e-05,
+            "min": 5.175e-05,
+            "max": 5.5e-05
+          },
+          "firstCallCodegenAndPublishSeconds": {
+            "median": 0.028357582000000006,
+            "min": 0.02814070699999999,
+            "max": 0.030052249000000007
+          },
+          "firstCallCompilationSeconds": {
+            "median": 0.030476125,
+            "min": 0.030296836,
+            "max": 0.032390834
+          },
+          "firstCallLoweringSeconds": {
+            "median": 0.0021564199999999996,
+            "min": 0.002109288000000001,
+            "max": 0.0025672900000000003
+          },
+          "loweredMethods": {
+            "median": 47,
+            "min": 47,
+            "max": 47
+          },
+          "modulePreparationSeconds": {
+            "median": 0.034405709,
+            "min": 0.033698875,
+            "max": 0.036022541
+          },
+          "selectedMethods": {
+            "median": 70,
+            "min": 70,
+            "max": 70
+          },
+          "trampolinePreparationSeconds": {
+            "median": 0.00271425,
+            "min": 0.002705542,
+            "max": 0.002994125
+          },
+          "uncompiledMethods": {
+            "median": 23,
+            "min": 23,
+            "max": 23
+          }
+        }
+      },
+      "changePercent": {
+        "readySeconds": 0.8291034606096037,
+        "wholeProcessCpuSeconds": 1.5227276963299952,
+        "invocationCpuSeconds": 16.035233702873384
+      }
+    },
+    {
+      "sample": "steady",
+      "collector": "live",
+      "eager": {
+        "runs": 5,
+        "readySeconds": {
+          "median": 2.644028000000006,
+          "min": 2.3498623330000044,
+          "max": 2.932345125000001
+        },
+        "wholeProcessCpuSeconds": {
+          "median": 2.7849880000000047,
+          "min": 2.599420999999989,
+          "max": 2.9747670000000026
+        },
+        "invocationCpuSeconds": {
+          "median": 0.255482,
+          "min": 0.252268,
+          "max": 0.279802
+        },
+        "allocations": {
+          "median": 1048589,
+          "min": 1048589,
+          "max": 1048589
+        },
+        "allocatedBytes": {
+          "median": 25166208,
+          "min": 25166208,
+          "max": 25166208
+        },
+        "collections": {
+          "median": 516,
+          "min": 516,
+          "max": 516
+        }
+      },
+      "lazy": {
+        "runs": 5,
+        "readySeconds": {
+          "median": 2.3303802089999976,
+          "min": 2.3059438750000005,
+          "max": 2.5832986249999976
+        },
+        "wholeProcessCpuSeconds": {
+          "median": 2.6322879999999977,
+          "min": 2.590892000000001,
+          "max": 2.756137999999997
+        },
+        "invocationCpuSeconds": {
+          "median": 0.319422,
+          "min": 0.315461,
+          "max": 0.336805
+        },
+        "allocations": {
+          "median": 1048589,
+          "min": 1048589,
+          "max": 1048589
+        },
+        "allocatedBytes": {
+          "median": 25166208,
+          "min": 25166208,
+          "max": 25166208
+        },
+        "collections": {
+          "median": 516,
+          "min": 516,
+          "max": 516
+        },
+        "lazyJit": {
+          "compiledMethods": {
+            "median": 47,
+            "min": 47,
+            "max": 47
+          },
+          "entryFinalizationSeconds": {
+            "median": 5.2666e-05,
+            "min": 5.1375e-05,
+            "max": 7.6167e-05
+          },
+          "firstCallCodegenAndPublishSeconds": {
+            "median": 0.046888827,
+            "min": 0.046630002,
+            "max": 0.050673209999999996
+          },
+          "firstCallCompilationSeconds": {
+            "median": 0.05107754599999999,
+            "min": 0.050803126,
+            "max": 0.055378624999999994
+          },
+          "firstCallLoweringSeconds": {
+            "median": 0.004189003,
+            "min": 0.004173289999999999,
+            "max": 0.004706458
+          },
+          "loweredMethods": {
+            "median": 47,
+            "min": 47,
+            "max": 47
+          },
+          "modulePreparationSeconds": {
+            "median": 0.034247417,
+            "min": 0.033855833,
+            "max": 0.147764584
+          },
+          "selectedMethods": {
+            "median": 70,
+            "min": 70,
+            "max": 70
+          },
+          "trampolinePreparationSeconds": {
+            "median": 0.002712291,
+            "min": 0.002688542,
+            "max": 0.007740167
+          },
+          "uncompiledMethods": {
+            "median": 23,
+            "min": 23,
+            "max": 23
+          }
+        }
+      },
+      "changePercent": {
+        "readySeconds": -11.862498846457282,
+        "wholeProcessCpuSeconds": -5.482967969700647,
+        "invocationCpuSeconds": 25.0272034820457
+      }
+    }
+  ],
+  "inputs": {
+    "/Users/robert/Projects/neoclr/target/lazy-jit-final-http-medians/results.json": "f2f62bd42ab2192ad746d39b2e90edd955302c91d3521e14ba66f9e991e19204",
+    "/Users/robert/Projects/neoclr/target/lazy-jit-final-sample-medians/results.json": "beda7424fc2c06aa92e5f42e12f5f07d12396cdbfc1ca8ba7eb2ba669a3bb4f7",
+    "/Users/robert/Projects/neoclr/benchmarks/gc-suite/matrix/summarize-lazy-jit.py": "56b79f6854e0e507b9ecb6735fbc52900594eee03174e4a890f941c4bb2bef16"
+  },
+  "checkedHttpResponses": 164480,
+  "standaloneInvocations": 40
+}

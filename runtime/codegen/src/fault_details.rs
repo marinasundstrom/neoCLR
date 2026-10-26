@@ -6,7 +6,7 @@ use neoclr::metadata::Instruction as Op;
 use std::collections::{HashMap, HashSet};
 type Error = Box<dyn std::error::Error>;
 
-#[derive(Default)]
+#[derive(Clone, Default)]
 pub struct Options {
     pub probe_stack_roots: bool,
     pub native_gc: bool,

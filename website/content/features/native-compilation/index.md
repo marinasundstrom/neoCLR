@@ -18,6 +18,17 @@ A matching development JIT bundle selects JIT by default. Select interpreter mod
 explicitly when needed. API support in one mode does not automatically establish
 support in every other mode or target.
 
+## Development: lazy JIT
+
+Post-Preview-18 source builds have an opt-in lazy backend (`NEOCLR_JIT_LAZY=1`).
+Method bodies are lowered and compiled to machine code on first call through
+stable trampolines; metadata verification remains eager. This can reduce preparation work but adds cold-call
+latency and retains an indirect call after warmup. Eager compilation and synchronous
+GC remain the defaults. This is not a published Preview 18 capability.
+
+[Design and matched startup/HTTP measurements](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/lazy-jit-20261026/README.md)
+cover synchronous and concurrent GC separately, including limitations.
+
 ## Build a native application
 
 Raven produces neoCLR metadata and instructions. The AOT tool lowers them to object

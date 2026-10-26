@@ -4,6 +4,9 @@ use cranelift_jit::{JITBuilder, JITModule};
 use cranelift_module::{FuncOrDataId, Module};
 use std::time::Instant;
 
+#[path = "jit_lazy.rs"]
+pub(crate) mod lazy;
+
 type Error = Box<dyn std::error::Error>;
 
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
@@ -133,9 +136,11 @@ pub(super) fn execute(
 
 type ManagedHost = unsafe extern "C" fn(*const u8, i32, i32, *const *const EntryChar) -> i32;
 
-/// Finalized executable owns all code/static data and its native host. Field
-/// order releases code before the library; no compilation-input borrow escapes.
+/// Invocation owner retains executable storage and its native host. Lazy mode
+/// keeps lowering inputs on its compiler worker through host cleanup. No borrowed
+/// compilation inputs escape preparation.
 pub(super) struct PreparedManaged {
+    worker: Option<lazy::Worker>,
     _code: CodeOwner,
     _library: std::sync::Arc<libloading::Library>,
     run: ManagedHost,
@@ -157,7 +162,8 @@ pub(super) fn execute_managed(
     prepare_managed(input, root, details, host, target)?.invoke(arguments)
 }
 
-/// Prepare a synchronous managed invocation without retaining compilation inputs.
+/// Prepare a synchronous managed invocation. Eager mode releases compilation
+/// inputs; lazy mode owns the selected inputs on a dedicated compiler worker.
 /// The host must reject outstanding roots before invocation returns.
 pub(super) fn prepare_managed(
     input: &neoclr::Module,
@@ -166,6 +172,19 @@ pub(super) fn prepare_managed(
     host: &std::path::Path,
     target: crate::compiler::Target,
 ) -> Result<PreparedManaged, Error> {
+    match std::env::var("NEOCLR_JIT_LAZY").as_deref() {
+        Ok("1") => return lazy::prepare(input, root, details, host, target),
+        Ok("0") | Err(_) => {}
+        _ => return Err("NEOCLR_JIT_LAZY must be 0 or 1".into()),
+    }
+    prepare_inner(input, root, details, host, target)
+}
+
+fn new_managed_module(
+    details: &crate::fault_details::Options,
+    host: &std::path::Path,
+    target: crate::compiler::Target,
+) -> Result<(CodeOwner, std::sync::Arc<libloading::Library>, ManagedHost), Error> {
     if target != host_target()? {
         return Err("JIT target must match the executing host".into());
     }
@@ -177,7 +196,6 @@ pub(super) fn prepare_managed(
     {
         return Err("managed JIT requires a GC/stack host without bootstrap services".into());
     }
-    let started = Instant::now();
     // SAFETY: this explicit development host path is trusted native code, like a
     // statically linked AOT adapter. Keep the library alive longer than JIT code.
     let library = std::sync::Arc::new(unsafe { libloading::Library::new(host) }?);
@@ -193,6 +211,7 @@ pub(super) fn prepare_managed(
     let isa = isa::lookup(target.triple().parse().expect("fixed triple"))?
         .finish(settings::Flags::new(flags))?;
     let mut builder = JITBuilder::with_isa(isa, cranelift_module::default_libcall_names());
+    builder.symbol("neoclr_lazy_resolve_v1", lazy::resolve as *const u8);
     let symbols = library.clone();
     builder.symbol_lookup_fn(Box::new(move |name| unsafe {
         symbols
@@ -200,12 +219,21 @@ pub(super) fn prepare_managed(
             .ok()
             .map(|symbol| *symbol)
     }));
-    let mut owner = CodeOwner(Some(crate::jit_memory::new_module(builder)));
-    let module = owner.0.as_mut().expect("owned module");
-    crate::compiler::values::compile_into(input, root, Some(details), target, module, true)?;
+    let run = *run;
+    Ok((
+        CodeOwner(Some(crate::jit_memory::new_module(builder))),
+        library,
+        run,
+    ))
+}
+
+fn validate_imports(module: &JITModule, library: &libloading::Library) -> Result<(), Error> {
     // Bind every declared import explicitly. Missing helpers fail before any guest
     // code runs; do not let default process-symbol lookup hide a host mismatch.
     for (_, declaration) in module.declarations().get_functions() {
+        if declaration.name.as_deref() == Some("neoclr_lazy_resolve_v1") {
+            continue;
+        }
         if declaration.linkage == cranelift_module::Linkage::Import {
             let name = declaration.name.as_ref().ok_or("anonymous native import")?;
             let symbol: libloading::Symbol<*const u8> = unsafe { library.get(name.as_bytes()) }
@@ -215,6 +243,10 @@ pub(super) fn prepare_managed(
             let _ = *symbol;
         }
     }
+    Ok(())
+}
+
+fn finalize_entry(module: &mut JITModule) -> Result<(*const u8, i32), Error> {
     module.finalize_definitions()?;
     let (entry, with_args) = match module.get_name("neoclr_entry_args_v1") {
         Some(FuncOrDataId::Func(id)) => (id, 1),
@@ -224,23 +256,38 @@ pub(super) fn prepare_managed(
         },
     };
     let entry = module.get_finalized_function(entry);
-    let compile_seconds = started.elapsed().as_secs_f64();
-    let run = *run;
+    Ok((entry, with_args))
+}
+
+fn prepare_inner(
+    input: &neoclr::Module,
+    root: &str,
+    details: &crate::fault_details::Options,
+    host: &std::path::Path,
+    target: crate::compiler::Target,
+) -> Result<PreparedManaged, Error> {
+    let started = Instant::now();
+    let (mut owner, library, run) = new_managed_module(details, host, target)?;
+    let module = owner.0.as_mut().expect("owned module");
+    crate::compiler::values::compile_into(input, root, Some(details), target, module, true)?;
+    validate_imports(module, &library)?;
+    let (entry, with_args) = finalize_entry(module)?;
     Ok(PreparedManaged {
+        worker: None,
         _code: owner,
         _library: library,
         run,
         entry,
         with_args,
         target,
-        compile_seconds,
+        compile_seconds: started.elapsed().as_secs_f64(),
     })
 }
 
 impl PreparedManaged {
     /// Consumes the owner; code and native libraries outlive synchronous cleanup.
     pub(super) fn invoke(
-        self,
+        mut self,
         arguments: &[std::ffi::CString],
     ) -> Result<serde_json::Value, Error> {
         // The Windows AOT argument helper consumes UTF-16; other hosts consume UTF-8.
@@ -258,10 +305,17 @@ impl PreparedManaged {
         let started = Instant::now();
         // SAFETY: only the validated entry ABI is passed. argv and the helper library
         // remain alive; the synchronous host must complete cleanup before returning.
+        let _active = lazy::Active::enter(self.worker.as_ref())?;
         let exit_code = unsafe { (self.run)(self.entry, self.with_args, argc, argv.as_ptr()) };
+        let invocation_seconds = started.elapsed().as_secs_f64();
+        drop(_active);
+        if let Some(worker) = &mut self.worker {
+            worker.finish()?;
+        }
         Ok(
             serde_json::json!({"profile": match self.target { crate::compiler::Target::MacosArm64 => "macos-arm64-jit-managed-v1", crate::compiler::Target::WindowsX64 => "windows-x64-jit-managed-v1" }, "guestExitCode": exit_code,
-            "compileAndFinalizeSeconds": self.compile_seconds, "invocationSeconds": started.elapsed().as_secs_f64()}),
+            "compileAndFinalizeSeconds": self.compile_seconds, "invocationSeconds": invocation_seconds,
+            "lazyJit": self.worker.as_ref().map(lazy::Worker::report)}),
         )
     }
 }

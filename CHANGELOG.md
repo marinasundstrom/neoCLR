@@ -8,6 +8,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-26
 
+- Add opt-in managed lazy JIT (`NEOCLR_JIT_LAZY=1`): stable typed trampolines request first-call method lowering and machine-code compilation from an invocation-owned compiler thread, preserving published roots and existing nonmoving GC ownership. Keep metadata verification eager and retain the eager default; document first-use failures, retained lowering state, conservative concurrent-GC store checks and trampoline overhead. Qualify both collectors and failure/panic cleanup. Five-round macOS HTTP medians improve readiness 21–37% but reduce post-warmup throughput 12–38%, with 1.24–3.21-second first responses; retain the opt-in baseline and document standalone results and optimization follow-up.
 - Support descriptive backtick names in development test/benchmark discovery, generated calls and data-source references, preserving Unicode/emoji in generated Raven literals. Migrate seven IP-address tests and discovery fixtures; retain description overrides and document changed IDs/selectors/order. Requires the unreleased compiler; Preview 18 remains unchanged. Give the IP-address suite its own entry point to avoid collection-specific guard dependencies.
 - Record completed Preview 18 publication: all 12 release asset hashes and the public checksum download match, manual website deployment passes, and live installation/benchmark pages are verified. Close release tracking while retaining published release notes and changelog sections unchanged.
 

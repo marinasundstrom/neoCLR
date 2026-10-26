@@ -930,7 +930,9 @@ fn run_internal(
                 "afterInvoke": memory_after_invoke.json(),
             });
         }
-        result["compilationStateReleased"] = serde_json::json!(release_compilation);
+        result["parentCompilationStateReleased"] = serde_json::json!(release_compilation);
+        result["compilationStateReleased"] =
+            serde_json::json!(release_compilation && result["lazyJit"].is_null());
         result["compilationStateReleaseSeconds"] = serde_json::json!(release_seconds);
         if jit_run {
             // invoke has released all native resources before returning.

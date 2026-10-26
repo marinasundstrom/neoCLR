@@ -1,0 +1,34 @@
+.module LazyRecursive
+.function First(Int32 depth) -> Int32
+ldarg depth
+ldc.i4 0
+ceq
+brtrue Done
+ldarg depth
+ldc.i4 1
+sub
+call Second(Int32)
+ret
+Done:
+ldc.i4 0
+ret
+.end
+.function Second(Int32 depth) -> Int32
+ldarg depth
+call First(Int32)
+ret
+.end
+.function Unused() -> Int32
+ldc.i4 99
+ret
+.end
+.function Main(Int32 unused) -> Int32
+ldarg unused
+brtrue Cold
+ldc.i4 32
+call First(Int32)
+ret
+Cold:
+call Unused()
+ret
+.end

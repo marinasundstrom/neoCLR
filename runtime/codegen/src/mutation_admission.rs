@@ -11,7 +11,27 @@ pub(crate) fn check_call_closure(
     bodies: &[(FuncId, &ir::Function)],
     providers: &[(&str, Signature)],
 ) -> Result<(), Error> {
+    check_call_closure_deferred(module, bodies, providers, &[])
+}
+
+/// Deferred targets are verified module-owned trampolines. Their bodies must
+/// pass this same gate before target publication; this does not admit imports.
+pub(crate) fn check_call_closure_deferred(
+    module: &impl Module,
+    bodies: &[(FuncId, &ir::Function)],
+    providers: &[(&str, Signature)],
+    deferred: &[FuncId],
+) -> Result<(), Error> {
     let declarations: HashMap<_, _> = module.declarations().get_functions().collect();
+    let deferred: std::collections::HashSet<_> = deferred.iter().copied().collect();
+    for id in &deferred {
+        if declarations
+            .get(id)
+            .is_none_or(|d| d.linkage == Linkage::Import)
+        {
+            return Err("deferred target must be a declared generated method".into());
+        }
+    }
     let mut generated = HashMap::new();
     for &(id, body) in bodies {
         let declaration = declarations
@@ -60,7 +80,7 @@ pub(crate) fn check_call_closure(
                 if body.dfg.signatures[external.signature] != declaration.signature {
                     return Err("call-site signature does not match target".into());
                 }
-                if generated.contains_key(&target) {
+                if generated.contains_key(&target) || deferred.contains(&target) {
                     continue;
                 }
                 if declaration.linkage != Linkage::Import {

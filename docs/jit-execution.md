@@ -112,7 +112,8 @@ Like .NET, code generation and runtime services are separate concerns; see the
 AOT libraries and rooted operation scope avoids a second HTTP implementation. The
 current optional compiler process keeps Cranelift out of interpreter-only builds,
 at the cost of process startup and an explicit host/tool installation. In-process
-integration, lazy compilation and tiering remain future work.
+integration and tiering remain future work. The post-Preview-18 opt-in lazy
+backend below retains the optional compiler process.
 
 ## Test policy and the eventual default
 
@@ -194,3 +195,37 @@ private runtime plumbing beneath the bounded .NET-style managed facade described
 in the [cryptography reference](../api-docs/cryptography.md). Source AOT projects also link the provider on
 demand; allocating/streaming overloads and packaged build kits remain separate gates. Windows uses the same preparation path and explicit DLL
 exports; execution of this new checkpoint is pending its CI job.
+
+## Opt-in lazy method compilation (development, 2026-10-26)
+
+Set `NEOCLR_JIT_LAZY=1` on a source-built managed JIT invocation to lower and compile
+method bodies on first use through stable typed trampolines. Unset it or use `0`
+for eager compilation; other text values are rejected. This is not included in
+published Preview 18 packages and does not change the collector default.
+
+Selection, metadata/flow verification, GC maps and static-data preparation remain
+eager. The compiler worker retains lowering state; called bodies are lowered,
+compiled and published once, then their IR is released. Unused method IR is never
+materialized. Lazy concurrent GC retains runtime store checks where the eager
+compiler uses whole-program IR proofs to remove them. The mutator waits with existing roots
+published. Native code and host ownership last through invocation cleanup. This
+supports the existing single-mutator, nonmoving-heap contract, not arbitrary
+concurrent managed callers or a moving collector. First-use compilation failures
+are reported after host cleanup. The typed trampoline retains an indirect call
+and extra frame even after warming up.
+
+The diagnostic `JIT_RESULT` retains initial `compileAndFinalizeSeconds`, with
+first-call compilation included in `invocationSeconds`. `lazyJit` reports selected,
+lowered, compiled and uncompiled method counts plus first-call compilation time; it is
+null for eager execution. `compilationStateReleased` is false for lazy mode because
+the worker retains lowering state; `parentCompilationStateReleased` separately
+records release of the caller's source containers. Initial preparation time alone is not process startup:
+measure process-to-readiness and first response separately.
+
+See the [design, GC contract and matched measurements](validation/lazy-jit-20261026/README.md).
+Windows execution and broader concurrent-caller support remain unqualified.
+
+On the qualified Apple M1 cohort, five-round HttpServer readiness medians improve
+21–37%, while post-warmup throughput falls 12–38% and first responses take
+1.24–3.21 seconds. Small standalone startup changes are mixed. This is a bounded
+opt-in baseline, not a recommendation to replace eager JIT by default.

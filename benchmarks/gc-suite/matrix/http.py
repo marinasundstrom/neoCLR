@@ -64,9 +64,9 @@ if a.process_memory:
     r['inputs'][str(source)]=hashlib.sha256(source.read_bytes()).hexdigest()
 
 
-def traffic(port,sample,protocol,count):
+def traffic(port,sample,protocol,count,depth_override=None):
     expected=b'Hello, World!' if sample=='plain' else {'id':42,'name':'Café team','active':True}
-    depth=a.pipeline_depth if protocol=='pipeline' else 1
+    depth=depth_override or (a.pipeline_depth if protocol=='pipeline' else 1)
     client=None
     pending=b''
     latencies=[]
@@ -125,7 +125,7 @@ def trial(mode,sample,protocol,repetition):
     for flag in ['NEOCLR_LIVE_ELIDE_STACK_ARGUMENTS','NEOCLR_LIVE_FORWARD_STACK_ARGUMENTS',
                  'NEOCLR_LIVE_ELIDE_FORWARDED_STACK_ARGUMENTS','NEOCLR_LIVE_SSA_BYREF_ARGUMENTS',
                  'NEOCLR_LIVE_SCALAR_ARRAY_STORES','NEOCLR_LIVE_GENERIC_SCALAR_ARRAY_STORES','NEOCLR_LIVE_STACK_POLICY',
-                 'NEOCLR_TEST_JIT_ARENA','NEOCLR_TEST_KEEP_JIT_COMPILATION','NEOCLR_TEST_NATIVE_MEMORY']:
+                 'NEOCLR_JIT_LAZY','NEOCLR_TEST_LAZY_PANIC_AFTER','NEOCLR_TEST_LAZY_FAIL_AFTER','NEOCLR_TEST_JIT_ARENA','NEOCLR_TEST_KEEP_JIT_COMPILATION','NEOCLR_TEST_NATIVE_MEMORY']:
         env.pop(flag,None)
     env.update(recipe['env'])
     if a.process_memory and recipe['execution']=='jit':env['NEOCLR_TEST_NATIVE_MEMORY']='1'
@@ -149,7 +149,14 @@ def trial(mode,sample,protocol,repetition):
         port=int(lines.get(timeout=10));control=int(lines.get(timeout=10))
         row['readySeconds']=time.perf_counter()-began
         if a.process_memory:row['processMemory']={'ready':memory_snapshot(process.pid)}
-        traffic(port,sample,protocol,a.warmup)
+        cold_started=time.perf_counter()
+        cold=traffic(port,sample,protocol,a.warmup,depth_override=1)
+        row['coldWarmupSeconds']=time.perf_counter()-cold_started
+        row['coldRequestLatenciesSeconds']=cold
+        row['firstResponseSeconds']=cold[0]
+        # Observed nearest-rank p99 over this small cold sample, not a population estimate.
+        row['coldObservedP99Seconds']=sorted(cold)[max(0,(99*len(cold)+99)//100-1)]
+        row['readyThroughFirstResponseSeconds']=row['readySeconds']+row['firstResponseSeconds']
         if a.process_memory:row['processMemory']['afterWarmup']=memory_snapshot(process.pid)
         if a.sample_stacks:
             profile_path=out/f'{sample}-{protocol}-{mode}-{repetition}-stacks.txt'
@@ -247,7 +254,7 @@ try:
             for mode in a.modes:
                 trials=[t for t in r['trials'] if (t['sample'],t['protocol'],t['mode'])==(sample,protocol,mode)]
                 row=dict(sample=sample,protocol=protocol,mode=mode,requestsPerSecond=statistics.median(t['requestsPerSecond'] for t in trials))
-                for key in ['invocationCpuSeconds','allocations','allocatedBytes','peakLiveBytes','peakArenaBytes','wholeProcessCpuSeconds']:
+                for key in ['readySeconds','firstResponseSeconds','readyThroughFirstResponseSeconds','coldObservedP99Seconds','invocationCpuSeconds','allocations','allocatedBytes','peakLiveBytes','peakArenaBytes','wholeProcessCpuSeconds']:
                     if all(key in t for t in trials):row[key]=statistics.median(t[key] for t in trials)
                 r['rows'].append(row)
     r['inputs'][str(Path(__file__).resolve())]=hashlib.sha256(Path(__file__).read_bytes()).hexdigest()

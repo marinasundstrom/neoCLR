@@ -448,6 +448,16 @@ pub(super) fn compile(
     super::finish(module)
 }
 
+/// Runs while lowering state is alive, without materializing unused bodies.
+pub(crate) trait LazyDriver<M: Module> {
+    fn run(
+        &mut self,
+        module: &mut M,
+        methods: &[cranelift_module::FuncId],
+        lower: &mut dyn FnMut(&mut M, usize) -> Result<(), Error>,
+    ) -> Result<(), Error>;
+}
+
 pub(crate) fn compile_into(
     input: &neoclr::Module,
     root: &str,
@@ -455,6 +465,45 @@ pub(crate) fn compile_into(
     platform_target: super::Target,
     module: &mut impl Module,
     long_range_calls: bool,
+) -> Result<(), Error> {
+    compile_with_driver(
+        input,
+        root,
+        details,
+        platform_target,
+        module,
+        long_range_calls,
+        None,
+    )
+}
+
+pub(crate) fn compile_lazy<M: Module>(
+    input: &neoclr::Module,
+    root: &str,
+    details: Option<&crate::fault_details::Options>,
+    platform_target: super::Target,
+    module: &mut M,
+    driver: &mut dyn LazyDriver<M>,
+) -> Result<(), Error> {
+    compile_with_driver(
+        input,
+        root,
+        details,
+        platform_target,
+        module,
+        true,
+        Some(driver),
+    )
+}
+
+fn compile_with_driver<M: Module>(
+    input: &neoclr::Module,
+    root: &str,
+    details: Option<&crate::fault_details::Options>,
+    platform_target: super::Target,
+    module: &mut M,
+    long_range_calls: bool,
+    lazy: Option<&mut dyn LazyDriver<M>>,
 ) -> Result<(), Error> {
     let live_stores = details.is_some_and(|d| d.experimental_live_gc_stores);
     let stack_policy = if live_stores {
@@ -2118,178 +2167,89 @@ pub(crate) fn compile_into(
     } else {
         None
     };
-    for (i, f) in input.functions.iter().enumerate() {
-        let mut context = module.make_context();
-        context.func.signature = module
-            .declarations()
-            .get_function_decl(ids[i])
-            .signature
-            .clone();
-        let mut fb = FunctionBuilderContext::new();
-        let mut probe_frame = None;
-        let mut mutation_frame_ready = None;
-        {
-            let mut b = FunctionBuilder::new(&mut context.func, &mut fb);
-            let entry = b.create_block();
-            b.append_block_params_for_function_params(entry);
-            b.switch_to_block(entry);
-            let parameters = b.block_params(entry).to_vec();
-            let output = parameters[parameters.len() - 1 - usize::from(details.is_some())];
-            let fault_context = details.map(|_| *parameters.last().unwrap());
-            if gc_points::native_body(&p, i, details) {
-                if crate::type_initialization::entry_owner(input, f)
-                    .and_then(|owner| owner.definition_name())
-                    .is_some_and(|name| initialization_guards.contains_key(name))
-                {
-                    return Err(
-                        "type initialization on a native replacement body is not supported".into(),
-                    );
-                }
-                if let Some(probes) = &root_probes {
-                    // Native wrappers keep typed argument copies visible across service
-                    // calls/dispatch. These frames do not enter the guest fault trace.
-                    let table_bytes = probes.table_bytes(i);
-                    let mut frame_bytes =
-                        probes.frame_bytes() as usize + 7 + table_bytes as usize + 7;
-                    let mut arguments = vec![];
-                    let mut at = 0;
-                    for t in &p.args[i] {
-                        let storage = slot(&mut b, p.bytes(t));
-                        frame_bytes += p.bytes(t) as usize + 7;
-                        let address = b.ins().stack_addr(types::I64, storage, 0);
-                        write_typed(&mut b, &p, t, address, &parameters[at..at + p.lanes(t)]);
-                        arguments.push(storage);
-                        at += p.lanes(t);
-                    }
-                    if frame_bytes > 65536 {
-                        return Err("native probe frame storage exceeds 64 KiB".into());
-                    }
-                    let frame = slot(&mut b, probes.frame_bytes());
-                    let table = slot(&mut b, table_bytes);
-                    mutation_frame_ready = Some(probes.enter(
-                        module,
-                        &mut b,
-                        frame,
-                        fault_context.unwrap(),
-                        i,
-                        table,
-                        &arguments,
-                        &[],
-                    ));
-                    probe_frame = Some(frame);
-                    emit_stack_check(
-                        module,
-                        &mut b,
-                        stack_check,
-                        diagnostic_data.as_ref(),
-                        fault_context.unwrap(),
-                        i,
-                        false,
-                    );
-                }
-            }
-            if details.is_some_and(|d| d.memory_view_bounds_fault.contains(&i)) {
-                let status = b.ins().iconst(types::I32, 8);
-                let mut site = diagnostic_data.as_ref().unwrap().site(
-                    module,
-                    &mut b,
-                    fault_context.unwrap(),
-                    i,
-                    0,
-                );
-                site.capture_frame = false;
-                site.record(&mut b, status);
-                b.ins().return_(&[status]);
-                b.seal_all_blocks();
-                b.finalize();
-                finish_value_body(
-                    module,
-                    ids[i],
-                    &mut context,
-                    root_probes.as_ref(),
-                    probe_frame,
-                    mutation_frame_ready,
-                    if live_stores {
-                        Some(&mut live_bodies)
-                    } else {
-                        None
-                    },
-                    stack_budget,
-                    long_range_calls,
-                )?;
+    let lower_methods = |module: &mut M,
+                         selected: Option<usize>,
+                         live_bodies: &mut Vec<(
+        cranelift_module::FuncId,
+        cranelift_codegen::Context,
+    )>|
+     -> Result<(), Error> {
+        for (i, f) in input.functions.iter().enumerate() {
+            if selected.is_some_and(|selected| selected != i) {
                 continue;
             }
-            if details.is_some_and(|d| {
-                d.byte_view_get.contains(&i)
-                    || d.byte_view_set.contains(&i)
-                    || d.byte_memory_create.contains(&i)
-                    || d.byte_view_utf8.contains(&i)
-                    || d.byte_memory_length.contains(&i)
-                    || d.byte_memory_slice.contains(&i)
-                    || d.byte_memory_readonly.contains(&i)
-            }) {
-                if details.unwrap().byte_memory_readonly.contains(&i) {
-                    let ([Ty::ByteMemory(source)], Some(Ty::ByteMemory(target))) =
-                        (p.args[i].as_slice(), p.results[i].as_ref())
-                    else {
-                        return Err(
-                            "byte-memory readonly conversion requires exact persistent views"
-                                .into(),
-                        );
-                    };
-                    let source_type =
-                        neoclr::metadata::Type::Named(input.types[*source].name.clone());
-                    let target_type =
-                        neoclr::metadata::Type::Named(input.types[*target].name.clone());
-                    if !crate::memory_views::conversion(input, &source_type, &target_type, false)
-                        && !crate::memory_views::conversion(input, &source_type, &target_type, true)
+            let mut context = module.make_context();
+            context.func.signature = module
+                .declarations()
+                .get_function_decl(ids[i])
+                .signature
+                .clone();
+            let mut fb = FunctionBuilderContext::new();
+            let mut probe_frame = None;
+            let mut mutation_frame_ready = None;
+            {
+                let mut b = FunctionBuilder::new(&mut context.func, &mut fb);
+                let entry = b.create_block();
+                b.append_block_params_for_function_params(entry);
+                b.switch_to_block(entry);
+                let parameters = b.block_params(entry).to_vec();
+                let output = parameters[parameters.len() - 1 - usize::from(details.is_some())];
+                let fault_context = details.map(|_| *parameters.last().unwrap());
+                if gc_points::native_body(&p, i, details) {
+                    if crate::type_initialization::entry_owner(input, f)
+                        .and_then(|owner| owner.definition_name())
+                        .is_some_and(|name| initialization_guards.contains_key(name))
                     {
                         return Err(
-                            "byte-view conversion cannot grant writable access or extend lifetime"
+                            "type initialization on a native replacement body is not supported"
                                 .into(),
                         );
                     }
-                    // Exact binding restricts the nominal capability; owner and
-                    // bounds retain the same representation and GC root lane.
-                    write(&mut b, output, &parameters[..3]);
-                } else if details.unwrap().byte_view_get.contains(&i)
-                    || details.unwrap().byte_view_set.contains(&i)
-                {
-                    let Ty::ByteMemory(view) = p.args[i][0] else {
-                        return Err("byte-view access requires a byte view".into());
-                    };
-                    let set = details.unwrap().byte_view_set.contains(&i);
-                    let kind = match input.types[view].memory_view {
-                        Some(neoclr::metadata::MemoryViewKind::Slice) => 0,
-                        Some(neoclr::metadata::MemoryViewKind::ReadOnlySlice) if !set => 1,
-                        _ => {
-                            return Err(
-                                "byte-view access requires the matching borrowed capability".into(),
-                            );
+                    if let Some(probes) = &root_probes {
+                        // Native wrappers keep typed argument copies visible across service
+                        // calls/dispatch. These frames do not enter the guest fault trace.
+                        let table_bytes = probes.table_bytes(i);
+                        let mut frame_bytes =
+                            probes.frame_bytes() as usize + 7 + table_bytes as usize + 7;
+                        let mut arguments = vec![];
+                        let mut at = 0;
+                        for t in &p.args[i] {
+                            let storage = slot(&mut b, p.bytes(t));
+                            frame_bytes += p.bytes(t) as usize + 7;
+                            let address = b.ins().stack_addr(types::I64, storage, 0);
+                            write_typed(&mut b, &p, t, address, &parameters[at..at + p.lanes(t)]);
+                            arguments.push(storage);
+                            at += p.lanes(t);
                         }
-                    };
-                    let storage = slot(&mut b, 24);
-                    let address = b.ins().stack_addr(types::I64, storage, 0);
-                    b.ins().store(MemFlags::new(), parameters[0], address, 0);
-                    b.ins().store(MemFlags::new(), parameters[1], address, 8);
-                    b.ins().store(MemFlags::new(), parameters[2], address, 12);
-                    let kind = b.ins().iconst(types::I64, kind);
-                    b.ins().store(MemFlags::new(), kind, address, 16);
-                    let result_slot = slot(&mut b, 8);
-                    let result_address = b.ins().stack_addr(types::I64, result_slot, 0);
-                    let last = if set {
-                        b.ins().ireduce(types::I8, parameters[4])
-                    } else {
-                        result_address
-                    };
-                    let service = module
-                        .declare_func_in_func(byte_view_access[usize::from(set)].unwrap(), b.func);
-                    let call = b.ins().call(
-                        service,
-                        &[fault_context.unwrap(), address, parameters[3], last],
-                    );
-                    let status = b.inst_results(call)[0];
-                    let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                        if frame_bytes > 65536 {
+                            return Err("native probe frame storage exceeds 64 KiB".into());
+                        }
+                        let frame = slot(&mut b, probes.frame_bytes());
+                        let table = slot(&mut b, table_bytes);
+                        mutation_frame_ready = Some(probes.enter(
+                            module,
+                            &mut b,
+                            frame,
+                            fault_context.unwrap(),
+                            i,
+                            table,
+                            &arguments,
+                            &[],
+                        ));
+                        probe_frame = Some(frame);
+                        emit_stack_check(
+                            module,
+                            &mut b,
+                            stack_check,
+                            diagnostic_data.as_ref(),
+                            fault_context.unwrap(),
+                            i,
+                            false,
+                        );
+                    }
+                }
+                if details.is_some_and(|d| d.memory_view_bounds_fault.contains(&i)) {
+                    let status = b.ins().iconst(types::I32, 8);
                     let mut site = diagnostic_data.as_ref().unwrap().site(
                         module,
                         &mut b,
@@ -2298,251 +2258,258 @@ pub(crate) fn compile_into(
                         0,
                     );
                     site.capture_frame = false;
-                    return_if_detailed(&mut b, failed, status, Some(&site));
-                    if !set {
-                        let byte = b.ins().load(types::I8, MemFlags::new(), result_address, 0);
-                        let result = b.ins().uextend(types::I32, byte);
-                        write(&mut b, output, &[result]);
-                    }
-                } else if !details.unwrap().byte_memory_length.contains(&i) {
-                    let Ty::ByteMemory(owner) =
-                        p.results[i].as_ref().ok_or("missing memory result")?
-                    else {
-                        return Err("byte-memory factory requires a persistent byte result".into());
-                    };
-                    let kind = match input.types[*owner].memory_view {
-                        Some(neoclr::metadata::MemoryViewKind::Slice) => 0,
-                        Some(neoclr::metadata::MemoryViewKind::ReadOnlySlice) => 1,
-                        Some(neoclr::metadata::MemoryViewKind::Memory) => 2,
-                        Some(neoclr::metadata::MemoryViewKind::ReadOnlyMemory) => 3,
-                        _ => return Err("invalid persistent memory kind".into()),
-                    };
-                    let kind = b.ins().iconst(types::I64, kind);
-                    let storage = slot(&mut b, 24);
-                    let address = b.ins().stack_addr(types::I64, storage, 0);
-                    let call = if details.unwrap().byte_view_utf8.contains(&i) {
-                        let service = module.declare_func_in_func(byte_view_utf8.unwrap(), b.func);
-                        b.ins()
-                            .call(service, &[fault_context.unwrap(), parameters[0], address])
-                    } else if details.unwrap().byte_memory_create.contains(&i) {
-                        if p.args[i].len() == 3 {
-                            let service = module
-                                .declare_func_in_func(byte_view_create_window.unwrap(), b.func);
+                    site.record(&mut b, status);
+                    b.ins().return_(&[status]);
+                    b.seal_all_blocks();
+                    b.finalize();
+                    finish_value_body(
+                        module,
+                        ids[i],
+                        &mut context,
+                        root_probes.as_ref(),
+                        probe_frame,
+                        mutation_frame_ready,
+                        if live_stores {
+                            Some(&mut *live_bodies)
+                        } else {
+                            None
+                        },
+                        stack_budget,
+                        long_range_calls,
+                    )?;
+                    continue;
+                }
+                if details.is_some_and(|d| {
+                    d.byte_view_get.contains(&i)
+                        || d.byte_view_set.contains(&i)
+                        || d.byte_memory_create.contains(&i)
+                        || d.byte_view_utf8.contains(&i)
+                        || d.byte_memory_length.contains(&i)
+                        || d.byte_memory_slice.contains(&i)
+                        || d.byte_memory_readonly.contains(&i)
+                }) {
+                    if details.unwrap().byte_memory_readonly.contains(&i) {
+                        let ([Ty::ByteMemory(source)], Some(Ty::ByteMemory(target))) =
+                            (p.args[i].as_slice(), p.results[i].as_ref())
+                        else {
+                            return Err(
+                                "byte-memory readonly conversion requires exact persistent views"
+                                    .into(),
+                            );
+                        };
+                        let source_type =
+                            neoclr::metadata::Type::Named(input.types[*source].name.clone());
+                        let target_type =
+                            neoclr::metadata::Type::Named(input.types[*target].name.clone());
+                        if !crate::memory_views::conversion(
+                            input,
+                            &source_type,
+                            &target_type,
+                            false,
+                        ) && !crate::memory_views::conversion(
+                            input,
+                            &source_type,
+                            &target_type,
+                            true,
+                        ) {
+                            return Err(
+                            "byte-view conversion cannot grant writable access or extend lifetime"
+                                .into(),
+                        );
+                        }
+                        // Exact binding restricts the nominal capability; owner and
+                        // bounds retain the same representation and GC root lane.
+                        write(&mut b, output, &parameters[..3]);
+                    } else if details.unwrap().byte_view_get.contains(&i)
+                        || details.unwrap().byte_view_set.contains(&i)
+                    {
+                        let Ty::ByteMemory(view) = p.args[i][0] else {
+                            return Err("byte-view access requires a byte view".into());
+                        };
+                        let set = details.unwrap().byte_view_set.contains(&i);
+                        let kind = match input.types[view].memory_view {
+                            Some(neoclr::metadata::MemoryViewKind::Slice) => 0,
+                            Some(neoclr::metadata::MemoryViewKind::ReadOnlySlice) if !set => 1,
+                            _ => {
+                                return Err(
+                                    "byte-view access requires the matching borrowed capability"
+                                        .into(),
+                                );
+                            }
+                        };
+                        let storage = slot(&mut b, 24);
+                        let address = b.ins().stack_addr(types::I64, storage, 0);
+                        b.ins().store(MemFlags::new(), parameters[0], address, 0);
+                        b.ins().store(MemFlags::new(), parameters[1], address, 8);
+                        b.ins().store(MemFlags::new(), parameters[2], address, 12);
+                        let kind = b.ins().iconst(types::I64, kind);
+                        b.ins().store(MemFlags::new(), kind, address, 16);
+                        let result_slot = slot(&mut b, 8);
+                        let result_address = b.ins().stack_addr(types::I64, result_slot, 0);
+                        let last = if set {
+                            b.ins().ireduce(types::I8, parameters[4])
+                        } else {
+                            result_address
+                        };
+                        let service = module.declare_func_in_func(
+                            byte_view_access[usize::from(set)].unwrap(),
+                            b.func,
+                        );
+                        let call = b.ins().call(
+                            service,
+                            &[fault_context.unwrap(), address, parameters[3], last],
+                        );
+                        let status = b.inst_results(call)[0];
+                        let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                        let mut site = diagnostic_data.as_ref().unwrap().site(
+                            module,
+                            &mut b,
+                            fault_context.unwrap(),
+                            i,
+                            0,
+                        );
+                        site.capture_frame = false;
+                        return_if_detailed(&mut b, failed, status, Some(&site));
+                        if !set {
+                            let byte = b.ins().load(types::I8, MemFlags::new(), result_address, 0);
+                            let result = b.ins().uextend(types::I32, byte);
+                            write(&mut b, output, &[result]);
+                        }
+                    } else if !details.unwrap().byte_memory_length.contains(&i) {
+                        let Ty::ByteMemory(owner) =
+                            p.results[i].as_ref().ok_or("missing memory result")?
+                        else {
+                            return Err(
+                                "byte-memory factory requires a persistent byte result".into()
+                            );
+                        };
+                        let kind = match input.types[*owner].memory_view {
+                            Some(neoclr::metadata::MemoryViewKind::Slice) => 0,
+                            Some(neoclr::metadata::MemoryViewKind::ReadOnlySlice) => 1,
+                            Some(neoclr::metadata::MemoryViewKind::Memory) => 2,
+                            Some(neoclr::metadata::MemoryViewKind::ReadOnlyMemory) => 3,
+                            _ => return Err("invalid persistent memory kind".into()),
+                        };
+                        let kind = b.ins().iconst(types::I64, kind);
+                        let storage = slot(&mut b, 24);
+                        let address = b.ins().stack_addr(types::I64, storage, 0);
+                        let call = if details.unwrap().byte_view_utf8.contains(&i) {
+                            let service =
+                                module.declare_func_in_func(byte_view_utf8.unwrap(), b.func);
+                            b.ins()
+                                .call(service, &[fault_context.unwrap(), parameters[0], address])
+                        } else if details.unwrap().byte_memory_create.contains(&i) {
+                            if p.args[i].len() == 3 {
+                                let service = module
+                                    .declare_func_in_func(byte_view_create_window.unwrap(), b.func);
+                                b.ins().call(
+                                    service,
+                                    &[
+                                        fault_context.unwrap(),
+                                        parameters[0],
+                                        parameters[1],
+                                        parameters[2],
+                                        kind,
+                                        address,
+                                    ],
+                                )
+                            } else {
+                                let service = module
+                                    .declare_func_in_func(byte_memory_create.unwrap(), b.func);
+                                b.ins().call(
+                                    service,
+                                    &[fault_context.unwrap(), parameters[0], kind, address],
+                                )
+                            }
+                        } else {
+                            b.ins().store(MemFlags::new(), parameters[0], address, 0);
+                            b.ins().store(MemFlags::new(), parameters[1], address, 8);
+                            b.ins().store(MemFlags::new(), parameters[2], address, 12);
+                            b.ins().store(MemFlags::new(), kind, address, 16);
+                            let service =
+                                module.declare_func_in_func(byte_memory_slice.unwrap(), b.func);
+                            let count = if p.args[i].len() == 2 {
+                                // An unsigned comparison rejects negative starts too.
+                                // Subtract only after proving 0 <= start <= length.
+                                let invalid = b.ins().icmp(
+                                    IntCC::UnsignedGreaterThan,
+                                    parameters[3],
+                                    parameters[2],
+                                );
+                                let status = b.ins().iconst(types::I32, 8);
+                                let mut site = diagnostic_data.as_ref().unwrap().site(
+                                    module,
+                                    &mut b,
+                                    fault_context.unwrap(),
+                                    i,
+                                    0,
+                                );
+                                site.capture_frame = false;
+                                return_if_detailed(&mut b, invalid, status, Some(&site));
+                                b.ins().isub(parameters[2], parameters[3])
+                            } else {
+                                parameters[4]
+                            };
                             b.ins().call(
                                 service,
                                 &[
                                     fault_context.unwrap(),
-                                    parameters[0],
-                                    parameters[1],
-                                    parameters[2],
-                                    kind,
+                                    address,
+                                    parameters[3],
+                                    count,
                                     address,
                                 ],
                             )
-                        } else {
-                            let service =
-                                module.declare_func_in_func(byte_memory_create.unwrap(), b.func);
-                            b.ins().call(
-                                service,
-                                &[fault_context.unwrap(), parameters[0], kind, address],
-                            )
-                        }
-                    } else {
-                        b.ins().store(MemFlags::new(), parameters[0], address, 0);
-                        b.ins().store(MemFlags::new(), parameters[1], address, 8);
-                        b.ins().store(MemFlags::new(), parameters[2], address, 12);
-                        b.ins().store(MemFlags::new(), kind, address, 16);
-                        let service =
-                            module.declare_func_in_func(byte_memory_slice.unwrap(), b.func);
-                        let count = if p.args[i].len() == 2 {
-                            // An unsigned comparison rejects negative starts too.
-                            // Subtract only after proving 0 <= start <= length.
-                            let invalid = b.ins().icmp(
-                                IntCC::UnsignedGreaterThan,
-                                parameters[3],
-                                parameters[2],
-                            );
-                            let status = b.ins().iconst(types::I32, 8);
-                            let mut site = diagnostic_data.as_ref().unwrap().site(
-                                module,
-                                &mut b,
-                                fault_context.unwrap(),
-                                i,
-                                0,
-                            );
-                            site.capture_frame = false;
-                            return_if_detailed(&mut b, invalid, status, Some(&site));
-                            b.ins().isub(parameters[2], parameters[3])
-                        } else {
-                            parameters[4]
                         };
-                        b.ins().call(
-                            service,
-                            &[
-                                fault_context.unwrap(),
-                                address,
-                                parameters[3],
-                                count,
-                                address,
-                            ],
-                        )
-                    };
-                    let status = b.inst_results(call)[0];
-                    let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
-                    let mut site = diagnostic_data.as_ref().unwrap().site(
-                        module,
-                        &mut b,
-                        fault_context.unwrap(),
-                        i,
-                        0,
-                    );
-                    site.capture_frame = false;
-                    return_if_detailed(&mut b, failed, status, Some(&site));
-                    // C kernel packs two bounds into one word. Private generated
-                    // storage has one eight-byte slot per logical lane, no kind word.
-                    let owner = b.ins().load(types::I64, MemFlags::new(), address, 0);
-                    let offset = b.ins().load(types::I32, MemFlags::new(), address, 8);
-                    let length = b.ins().load(types::I32, MemFlags::new(), address, 12);
-                    write(&mut b, output, &[owner, offset, length]);
-                } else {
-                    if !matches!(p.args[i].as_slice(), [Ty::ByteMemory(_)]) {
-                        return Err("byte-memory length requires one persistent byte view".into());
-                    }
-                    write(&mut b, output, &[parameters[2]]);
-                }
-                let zero = b.ins().iconst(types::I32, 0);
-                b.ins().return_(&[zero]);
-                b.seal_all_blocks();
-                b.finalize();
-                finish_value_body(
-                    module,
-                    ids[i],
-                    &mut context,
-                    root_probes.as_ref(),
-                    probe_frame,
-                    mutation_frame_ready,
-                    if live_stores {
-                        Some(&mut live_bodies)
+                        let status = b.inst_results(call)[0];
+                        let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                        let mut site = diagnostic_data.as_ref().unwrap().site(
+                            module,
+                            &mut b,
+                            fault_context.unwrap(),
+                            i,
+                            0,
+                        );
+                        site.capture_frame = false;
+                        return_if_detailed(&mut b, failed, status, Some(&site));
+                        // C kernel packs two bounds into one word. Private generated
+                        // storage has one eight-byte slot per logical lane, no kind word.
+                        let owner = b.ins().load(types::I64, MemFlags::new(), address, 0);
+                        let offset = b.ins().load(types::I32, MemFlags::new(), address, 8);
+                        let length = b.ins().load(types::I32, MemFlags::new(), address, 12);
+                        write(&mut b, output, &[owner, offset, length]);
                     } else {
-                        None
-                    },
-                    stack_budget,
-                    long_range_calls,
-                )?;
-                continue;
-            }
-            if let Some(targets) = details.and_then(|d| d.object_type_queries.get(&i)) {
-                let receiver = parameters[0];
-                let null = b.ins().icmp_imm(IntCC::Equal, receiver, 0);
-                let mut site = diagnostic_data.as_ref().unwrap().site(
-                    module,
-                    &mut b,
-                    fault_context.unwrap(),
-                    i,
-                    0,
-                );
-                site.capture_frame = false;
-                let status = b.ins().iconst(types::I32, 6);
-                return_if_detailed(&mut b, null, status, Some(&site));
-                let text_block = b.create_block();
-                let object_block = b.create_block();
-                let bits = b.ins().band_imm(receiver, 1);
-                let text = b.ins().icmp_imm(IntCC::NotEqual, bits, 0);
-                b.ins().brif(text, text_block, &[], object_block, &[]);
-                b.switch_to_block(text_block);
-                let identity = type_tokens
-                    .iter()
-                    .position(|t| *t == neoclr::metadata::Type::String)
-                    .expect("String token producer")
-                    + 1;
-                let value = b.ins().iconst(types::I64, identity as i64);
-                write(&mut b, output, &[value]);
-                let zero = b.ins().iconst(types::I32, 0);
-                b.ins().return_(&[zero]);
-                b.switch_to_block(object_block);
-                let tag = b.ins().load(types::I64, MemFlags::new(), receiver, 0);
-                if let Some(tokens) = details.and_then(|d| d.object_function_queries.get(&i)) {
-                    let function = b.create_block();
-                    let ordinary = b.create_block();
-                    let callable = b.ins().icmp_imm(IntCC::Equal, tag, u32::MAX as i64);
-                    b.ins().brif(callable, function, &[], ordinary, &[]);
-                    b.switch_to_block(function);
-                    let target = b.ins().load(types::I64, MemFlags::new(), receiver, 8);
-                    for token in tokens {
-                        let mut exact = b.ins().iconst(types::I8, 0);
-                        for index in p.callable_targets(token)? {
-                            let equal = b.ins().icmp_imm(IntCC::Equal, target, (index + 1) as i64);
-                            exact = b.ins().bor(exact, equal);
+                        if !matches!(p.args[i].as_slice(), [Ty::ByteMemory(_)]) {
+                            return Err(
+                                "byte-memory length requires one persistent byte view".into()
+                            );
                         }
-                        let matched = b.create_block();
-                        let next = b.create_block();
-                        b.ins().brif(exact, matched, &[], next, &[]);
-                        b.switch_to_block(matched);
-                        let identity = type_tokens
-                            .iter()
-                            .position(|t| t == token)
-                            .ok_or("missing function token producer")?
-                            + 1;
-                        let value = b.ins().iconst(types::I64, identity as i64);
-                        write(&mut b, output, &[value]);
-                        let zero = b.ins().iconst(types::I32, 0);
-                        b.ins().return_(&[zero]);
-                        b.switch_to_block(next);
+                        write(&mut b, output, &[parameters[2]]);
                     }
-                    b.ins().jump(ordinary, &[]);
-                    b.switch_to_block(ordinary);
-                }
-                for (index, token) in targets {
-                    let matched = b.create_block();
-                    let next = b.create_block();
-                    let exact = matches_type(&mut b, &p, tag, *index);
-                    b.ins().brif(exact, matched, &[], next, &[]);
-                    b.switch_to_block(matched);
-                    let identity = type_tokens
-                        .iter()
-                        .position(|t| t == token)
-                        .expect("object token producer")
-                        + 1;
-                    let value = b.ins().iconst(types::I64, identity as i64);
-                    write(&mut b, output, &[value]);
                     let zero = b.ins().iconst(types::I32, 0);
                     b.ins().return_(&[zero]);
-                    b.switch_to_block(next);
+                    b.seal_all_blocks();
+                    b.finalize();
+                    finish_value_body(
+                        module,
+                        ids[i],
+                        &mut context,
+                        root_probes.as_ref(),
+                        probe_frame,
+                        mutation_frame_ready,
+                        if live_stores {
+                            Some(&mut *live_bodies)
+                        } else {
+                            None
+                        },
+                        stack_budget,
+                        long_range_calls,
+                    )?;
+                    continue;
                 }
-                let mut site = diagnostic_data.as_ref().unwrap().site(
-                    module,
-                    &mut b,
-                    fault_context.unwrap(),
-                    i,
-                    1,
-                );
-                site.capture_frame = false;
-                let status = b.ins().iconst(types::I32, 3);
-                site.record(&mut b, status);
-                b.ins().return_(&[status]);
-                b.seal_all_blocks();
-                b.finalize();
-                finish_value_body(
-                    module,
-                    ids[i],
-                    &mut context,
-                    root_probes.as_ref(),
-                    probe_frame,
-                    mutation_frame_ready,
-                    if live_stores {
-                        Some(&mut live_bodies)
-                    } else {
-                        None
-                    },
-                    stack_budget,
-                    long_range_calls,
-                )?;
-                continue;
-            }
-            if let Some(&(tag_index, unbox)) = details.and_then(|d| d.scalar_box_queries.get(&i)) {
-                let receiver = parameters[0];
-                let null = b.ins().icmp_imm(IntCC::Equal, receiver, 0);
-                if unbox {
+                if let Some(targets) = details.and_then(|d| d.object_type_queries.get(&i)) {
+                    let receiver = parameters[0];
+                    let null = b.ins().icmp_imm(IntCC::Equal, receiver, 0);
                     let mut site = diagnostic_data.as_ref().unwrap().site(
                         module,
                         &mut b,
@@ -2553,43 +2520,72 @@ pub(crate) fn compile_into(
                     site.capture_frame = false;
                     let status = b.ins().iconst(types::I32, 6);
                     return_if_detailed(&mut b, null, status, Some(&site));
-                }
-                let read_tag = b.create_block();
-                let matched = b.create_block();
-                let absent = b.create_block();
-                let bits = b.ins().band_imm(receiver, 1);
-                let text = b.ins().icmp_imm(IntCC::NotEqual, bits, 0);
-                let invalid = b.ins().bor(null, text);
-                b.ins().brif(invalid, absent, &[], read_tag, &[]);
-                b.switch_to_block(read_tag);
-                let tag = b.ins().load(types::I64, MemFlags::new(), receiver, 0);
-                let valid = if let Some(index) = tag_index {
-                    matches_type(&mut b, &p, tag, index)
-                } else {
-                    b.ins().iconst(types::I8, 0)
-                };
-                b.ins().brif(valid, matched, &[], absent, &[]);
-                b.switch_to_block(matched);
-                if unbox {
-                    let payload = b.ins().iadd_imm(receiver, 8);
-                    let result = p.results[i].as_ref().unwrap();
-                    let values = if matches!(result, Ty::Record(index) if input.types[*index].fields.is_empty())
-                    {
-                        lanes(&p, result)
-                            .into_iter()
-                            .map(|ty| zero(&mut b, ty))
-                            .collect()
-                    } else {
-                        read(&mut b, &p, result, payload)
-                    };
-                    write(&mut b, output, &values);
-                } else {
-                    write(&mut b, output, &[receiver]);
-                }
-                let zero = b.ins().iconst(types::I32, 0);
-                b.ins().return_(&[zero]);
-                b.switch_to_block(absent);
-                if unbox {
+                    let text_block = b.create_block();
+                    let object_block = b.create_block();
+                    let bits = b.ins().band_imm(receiver, 1);
+                    let text = b.ins().icmp_imm(IntCC::NotEqual, bits, 0);
+                    b.ins().brif(text, text_block, &[], object_block, &[]);
+                    b.switch_to_block(text_block);
+                    let identity = type_tokens
+                        .iter()
+                        .position(|t| *t == neoclr::metadata::Type::String)
+                        .expect("String token producer")
+                        + 1;
+                    let value = b.ins().iconst(types::I64, identity as i64);
+                    write(&mut b, output, &[value]);
+                    let zero = b.ins().iconst(types::I32, 0);
+                    b.ins().return_(&[zero]);
+                    b.switch_to_block(object_block);
+                    let tag = b.ins().load(types::I64, MemFlags::new(), receiver, 0);
+                    if let Some(tokens) = details.and_then(|d| d.object_function_queries.get(&i)) {
+                        let function = b.create_block();
+                        let ordinary = b.create_block();
+                        let callable = b.ins().icmp_imm(IntCC::Equal, tag, u32::MAX as i64);
+                        b.ins().brif(callable, function, &[], ordinary, &[]);
+                        b.switch_to_block(function);
+                        let target = b.ins().load(types::I64, MemFlags::new(), receiver, 8);
+                        for token in tokens {
+                            let mut exact = b.ins().iconst(types::I8, 0);
+                            for index in p.callable_targets(token)? {
+                                let equal =
+                                    b.ins().icmp_imm(IntCC::Equal, target, (index + 1) as i64);
+                                exact = b.ins().bor(exact, equal);
+                            }
+                            let matched = b.create_block();
+                            let next = b.create_block();
+                            b.ins().brif(exact, matched, &[], next, &[]);
+                            b.switch_to_block(matched);
+                            let identity = type_tokens
+                                .iter()
+                                .position(|t| t == token)
+                                .ok_or("missing function token producer")?
+                                + 1;
+                            let value = b.ins().iconst(types::I64, identity as i64);
+                            write(&mut b, output, &[value]);
+                            let zero = b.ins().iconst(types::I32, 0);
+                            b.ins().return_(&[zero]);
+                            b.switch_to_block(next);
+                        }
+                        b.ins().jump(ordinary, &[]);
+                        b.switch_to_block(ordinary);
+                    }
+                    for (index, token) in targets {
+                        let matched = b.create_block();
+                        let next = b.create_block();
+                        let exact = matches_type(&mut b, &p, tag, *index);
+                        b.ins().brif(exact, matched, &[], next, &[]);
+                        b.switch_to_block(matched);
+                        let identity = type_tokens
+                            .iter()
+                            .position(|t| t == token)
+                            .expect("object token producer")
+                            + 1;
+                        let value = b.ins().iconst(types::I64, identity as i64);
+                        write(&mut b, output, &[value]);
+                        let zero = b.ins().iconst(types::I32, 0);
+                        b.ins().return_(&[zero]);
+                        b.switch_to_block(next);
+                    }
                     let mut site = diagnostic_data.as_ref().unwrap().site(
                         module,
                         &mut b,
@@ -2598,339 +2594,383 @@ pub(crate) fn compile_into(
                         1,
                     );
                     site.capture_frame = false;
-                    let status = b.ins().iconst(types::I32, 11);
+                    let status = b.ins().iconst(types::I32, 3);
                     site.record(&mut b, status);
                     b.ins().return_(&[status]);
-                } else {
-                    let pointer = b.ins().iconst(types::I64, 0);
-                    write(&mut b, output, &[pointer]);
+                    b.seal_all_blocks();
+                    b.finalize();
+                    finish_value_body(
+                        module,
+                        ids[i],
+                        &mut context,
+                        root_probes.as_ref(),
+                        probe_frame,
+                        mutation_frame_ready,
+                        if live_stores {
+                            Some(&mut *live_bodies)
+                        } else {
+                            None
+                        },
+                        stack_budget,
+                        long_range_calls,
+                    )?;
+                    continue;
+                }
+                if let Some(&(tag_index, unbox)) =
+                    details.and_then(|d| d.scalar_box_queries.get(&i))
+                {
+                    let receiver = parameters[0];
+                    let null = b.ins().icmp_imm(IntCC::Equal, receiver, 0);
+                    if unbox {
+                        let mut site = diagnostic_data.as_ref().unwrap().site(
+                            module,
+                            &mut b,
+                            fault_context.unwrap(),
+                            i,
+                            0,
+                        );
+                        site.capture_frame = false;
+                        let status = b.ins().iconst(types::I32, 6);
+                        return_if_detailed(&mut b, null, status, Some(&site));
+                    }
+                    let read_tag = b.create_block();
+                    let matched = b.create_block();
+                    let absent = b.create_block();
+                    let bits = b.ins().band_imm(receiver, 1);
+                    let text = b.ins().icmp_imm(IntCC::NotEqual, bits, 0);
+                    let invalid = b.ins().bor(null, text);
+                    b.ins().brif(invalid, absent, &[], read_tag, &[]);
+                    b.switch_to_block(read_tag);
+                    let tag = b.ins().load(types::I64, MemFlags::new(), receiver, 0);
+                    let valid = if let Some(index) = tag_index {
+                        matches_type(&mut b, &p, tag, index)
+                    } else {
+                        b.ins().iconst(types::I8, 0)
+                    };
+                    b.ins().brif(valid, matched, &[], absent, &[]);
+                    b.switch_to_block(matched);
+                    if unbox {
+                        let payload = b.ins().iadd_imm(receiver, 8);
+                        let result = p.results[i].as_ref().unwrap();
+                        let values = if matches!(result, Ty::Record(index) if input.types[*index].fields.is_empty())
+                        {
+                            lanes(&p, result)
+                                .into_iter()
+                                .map(|ty| zero(&mut b, ty))
+                                .collect()
+                        } else {
+                            read(&mut b, &p, result, payload)
+                        };
+                        write(&mut b, output, &values);
+                    } else {
+                        write(&mut b, output, &[receiver]);
+                    }
                     let zero = b.ins().iconst(types::I32, 0);
                     b.ins().return_(&[zero]);
-                }
-                b.seal_all_blocks();
-                b.finalize();
-                finish_value_body(
-                    module,
-                    ids[i],
-                    &mut context,
-                    root_probes.as_ref(),
-                    probe_frame,
-                    mutation_frame_ready,
-                    if live_stores {
-                        Some(&mut live_bodies)
-                    } else {
-                        None
-                    },
-                    stack_budget,
-                    long_range_calls,
-                )?;
-                continue;
-            }
-            if let Some(&record) = details.and_then(|d| {
-                d.empty_record_boxes
-                    .get(&i)
-                    .or_else(|| d.int32_boxes.get(&i))
-                    .or_else(|| d.int64_boxes.get(&i))
-                    .or_else(|| d.boolean_boxes.get(&i))
-            }) {
-                // Native allocation must not publish directly into a possible heap
-                // alias. Initialize the new box first, then use the guarded store.
-                let destination = output;
-                let output = if live_stores {
-                    let scratch = slot(&mut b, 8);
-                    b.ins().stack_addr(types::I64, scratch, 0)
-                } else {
-                    output
-                };
-                let service = module.declare_func_in_func(object_service.unwrap(), b.func);
-                let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
-                let tag = b.ins().iconst(types::I32, record as i64);
-                let primitive = details.unwrap().int32_boxes.contains_key(&i)
-                    || details.unwrap().int64_boxes.contains_key(&i)
-                    || details.unwrap().boolean_boxes.contains_key(&i);
-                let payload = if primitive {
-                    8
-                } else if input.types[record].fields.is_empty()
-                    && input.types[record].memory_view.is_none()
-                {
-                    0
-                } else {
-                    p.bytes(&p.args[i][0])
-                };
-                let bytes = b.ins().iconst(types::I32, (8 + payload) as i64);
-                let call = b.ins().call(service, &[arena, tag, bytes, output]);
-                let raw = b.inst_results(call)[0];
-                let exhausted = b.ins().icmp_imm(IntCC::Equal, raw, 5);
-                let memory = b.ins().iconst(types::I32, 5);
-                let runtime = b.ins().iconst(types::I32, 3);
-                let status = b.ins().select(exhausted, memory, runtime);
-                let failed = b.ins().icmp_imm(IntCC::NotEqual, raw, 0);
-                let mut site = diagnostic_data.as_ref().unwrap().site(
-                    module,
-                    &mut b,
-                    fault_context.unwrap(),
-                    i,
-                    0,
-                );
-                site.capture_frame = false;
-                return_if_detailed(&mut b, failed, status, Some(&site));
-                if payload != 0 {
-                    let pointer = b.ins().load(types::I64, MemFlags::new(), output, 0);
-                    let pointer = b.ins().iadd_imm(pointer, 8);
-                    write_typed(
-                        &mut b,
-                        &p,
-                        &p.args[i][0],
-                        pointer,
-                        &parameters[..p.lanes(&p.args[i][0])],
-                    );
-                }
-                if live_stores {
-                    let pointer = b.ins().load(types::I64, MemFlags::new(), output, 0);
-                    write(&mut b, destination, &[pointer]);
-                }
-                let zero = b.ins().iconst(types::I32, 0);
-                b.ins().return_(&[zero]);
-                b.seal_all_blocks();
-                b.finalize();
-                finish_value_body(
-                    module,
-                    ids[i],
-                    &mut context,
-                    root_probes.as_ref(),
-                    probe_frame,
-                    mutation_frame_ready,
-                    if live_stores {
-                        Some(&mut live_bodies)
-                    } else {
-                        None
-                    },
-                    stack_budget,
-                    long_range_calls,
-                )?;
-                continue;
-            }
-            if let Some(targets) = p.dispatch.get(&i) {
-                // Caller checks null. Forward the original receiver, result slot and
-                // context; no synthetic interface frame enters the managed trace.
-                let value_kind = details.and_then(|d| d.object_value_kinds.get(&i));
-                let display = details.is_some_and(|d| d.object_display.contains_key(&i))
-                    && value_kind.is_none();
-                let string_target = details.and_then(|d| d.string_dispatch.get(&i));
-                if text_identity {
-                    let text = b.create_block();
-                    let object = b.create_block();
-                    let tagged = b.ins().band_imm(parameters[0], 1);
-                    b.ins().brif(tagged, text, &[], object, &[]);
-                    b.switch_to_block(text);
-                    let pointer = b.ins().band_imm(parameters[0], -2);
-                    if let Some(&target) = string_target {
-                        let mut args = parameters.clone();
-                        args[0] = pointer;
-                        let target = module.declare_func_in_func(ids[target], b.func);
-                        let call = b.ins().call(target, &args);
-                        let status = b.inst_results(call)[0];
+                    b.switch_to_block(absent);
+                    if unbox {
+                        let mut site = diagnostic_data.as_ref().unwrap().site(
+                            module,
+                            &mut b,
+                            fault_context.unwrap(),
+                            i,
+                            1,
+                        );
+                        site.capture_frame = false;
+                        let status = b.ins().iconst(types::I32, 11);
+                        site.record(&mut b, status);
                         b.ins().return_(&[status]);
-                    } else if display {
+                    } else {
+                        let pointer = b.ins().iconst(types::I64, 0);
                         write(&mut b, output, &[pointer]);
                         let zero = b.ins().iconst(types::I32, 0);
                         b.ins().return_(&[zero]);
+                    }
+                    b.seal_all_blocks();
+                    b.finalize();
+                    finish_value_body(
+                        module,
+                        ids[i],
+                        &mut context,
+                        root_probes.as_ref(),
+                        probe_frame,
+                        mutation_frame_ready,
+                        if live_stores {
+                            Some(&mut *live_bodies)
+                        } else {
+                            None
+                        },
+                        stack_budget,
+                        long_range_calls,
+                    )?;
+                    continue;
+                }
+                if let Some(&record) = details.and_then(|d| {
+                    d.empty_record_boxes
+                        .get(&i)
+                        .or_else(|| d.int32_boxes.get(&i))
+                        .or_else(|| d.int64_boxes.get(&i))
+                        .or_else(|| d.boolean_boxes.get(&i))
+                }) {
+                    // Native allocation must not publish directly into a possible heap
+                    // alias. Initialize the new box first, then use the guarded store.
+                    let destination = output;
+                    let output = if live_stores {
+                        let scratch = slot(&mut b, 8);
+                        b.ins().stack_addr(types::I64, scratch, 0)
                     } else {
-                        let status = b.ins().iconst(types::I32, 3);
-                        if let Some(d) = &diagnostic_data {
-                            let mut site = d.site(module, &mut b, fault_context.unwrap(), i, 0);
-                            site.capture_frame = false;
-                            site.record(&mut b, status);
-                        }
-                        b.ins().return_(&[status]);
-                    }
-                    b.switch_to_block(object);
-                }
-                let tag = b.ins().load(types::I64, MemFlags::new(), parameters[0], 0);
-                if display
-                    && details.is_some_and(|d| d.boxed_int32_display || d.boxed_int64_display)
-                {
-                    for (type_index, wide) in details
-                        .unwrap()
-                        .int32_boxes
-                        .values()
-                        .map(|i| (*i, false))
-                        .chain(details.unwrap().int64_boxes.values().map(|i| (*i, true)))
+                        output
+                    };
+                    let service = module.declare_func_in_func(object_service.unwrap(), b.func);
+                    let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
+                    let tag = b.ins().iconst(types::I32, record as i64);
+                    let primitive = details.unwrap().int32_boxes.contains_key(&i)
+                        || details.unwrap().int64_boxes.contains_key(&i)
+                        || details.unwrap().boolean_boxes.contains_key(&i);
+                    let payload = if primitive {
+                        8
+                    } else if input.types[record].fields.is_empty()
+                        && input.types[record].memory_view.is_none()
                     {
-                        let matched = b.create_block();
-                        let next = b.create_block();
-                        let equal = matches_type(&mut b, &p, tag, type_index);
-                        b.ins().brif(equal, matched, &[], next, &[]);
-                        b.switch_to_block(matched);
-                        let value = b.ins().load(
-                            if wide { types::I64 } else { types::I32 },
-                            MemFlags::new(),
-                            parameters[0],
-                            8,
-                        );
-                        let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
-                        let service = module.declare_func_in_func(
-                            if wide {
-                                boxed_wide_format_service.unwrap()
-                            } else {
-                                format_service.unwrap()
-                            },
-                            b.func,
-                        );
-                        let call = b.ins().call(service, &[value, arena, output]);
-                        let raw = b.inst_results(call)[0];
-                        let exhausted = b.ins().icmp_imm(IntCC::Equal, raw, 5);
-                        let memory = b.ins().iconst(types::I32, 5);
-                        let runtime = b.ins().iconst(types::I32, 3);
-                        let status = b.ins().select(exhausted, memory, runtime);
-                        let failed = b.ins().icmp_imm(IntCC::NotEqual, raw, 0);
-                        let mut site = diagnostic_data.as_ref().unwrap().site(
-                            module,
+                        0
+                    } else {
+                        p.bytes(&p.args[i][0])
+                    };
+                    let bytes = b.ins().iconst(types::I32, (8 + payload) as i64);
+                    let call = b.ins().call(service, &[arena, tag, bytes, output]);
+                    let raw = b.inst_results(call)[0];
+                    let exhausted = b.ins().icmp_imm(IntCC::Equal, raw, 5);
+                    let memory = b.ins().iconst(types::I32, 5);
+                    let runtime = b.ins().iconst(types::I32, 3);
+                    let status = b.ins().select(exhausted, memory, runtime);
+                    let failed = b.ins().icmp_imm(IntCC::NotEqual, raw, 0);
+                    let mut site = diagnostic_data.as_ref().unwrap().site(
+                        module,
+                        &mut b,
+                        fault_context.unwrap(),
+                        i,
+                        0,
+                    );
+                    site.capture_frame = false;
+                    return_if_detailed(&mut b, failed, status, Some(&site));
+                    if payload != 0 {
+                        let pointer = b.ins().load(types::I64, MemFlags::new(), output, 0);
+                        let pointer = b.ins().iadd_imm(pointer, 8);
+                        write_typed(
                             &mut b,
-                            fault_context.unwrap(),
-                            i,
-                            0,
+                            &p,
+                            &p.args[i][0],
+                            pointer,
+                            &parameters[..p.lanes(&p.args[i][0])],
                         );
-                        site.capture_frame = false;
-                        return_if_detailed(&mut b, failed, status, Some(&site));
-                        let zero = b.ins().iconst(types::I32, 0);
-                        b.ins().return_(&[zero]);
-                        b.switch_to_block(next);
                     }
+                    if live_stores {
+                        let pointer = b.ins().load(types::I64, MemFlags::new(), output, 0);
+                        write(&mut b, destination, &[pointer]);
+                    }
+                    let zero = b.ins().iconst(types::I32, 0);
+                    b.ins().return_(&[zero]);
+                    b.seal_all_blocks();
+                    b.finalize();
+                    finish_value_body(
+                        module,
+                        ids[i],
+                        &mut context,
+                        root_probes.as_ref(),
+                        probe_frame,
+                        mutation_frame_ready,
+                        if live_stores {
+                            Some(&mut *live_bodies)
+                        } else {
+                            None
+                        },
+                        stack_budget,
+                        long_range_calls,
+                    )?;
+                    continue;
                 }
-                if display && details.is_some_and(|d| d.boxed_boolean_display) {
-                    for &type_index in details.unwrap().boolean_boxes.values() {
+                if let Some(targets) = p.dispatch.get(&i) {
+                    // Caller checks null. Forward the original receiver, result slot and
+                    // context; no synthetic interface frame enters the managed trace.
+                    let value_kind = details.and_then(|d| d.object_value_kinds.get(&i));
+                    let display = details.is_some_and(|d| d.object_display.contains_key(&i))
+                        && value_kind.is_none();
+                    let string_target = details.and_then(|d| d.string_dispatch.get(&i));
+                    if text_identity {
+                        let text = b.create_block();
+                        let object = b.create_block();
+                        let tagged = b.ins().band_imm(parameters[0], 1);
+                        b.ins().brif(tagged, text, &[], object, &[]);
+                        b.switch_to_block(text);
+                        let pointer = b.ins().band_imm(parameters[0], -2);
+                        if let Some(&target) = string_target {
+                            let mut args = parameters.clone();
+                            args[0] = pointer;
+                            let target = module.declare_func_in_func(ids[target], b.func);
+                            let call = b.ins().call(target, &args);
+                            let status = b.inst_results(call)[0];
+                            b.ins().return_(&[status]);
+                        } else if display {
+                            write(&mut b, output, &[pointer]);
+                            let zero = b.ins().iconst(types::I32, 0);
+                            b.ins().return_(&[zero]);
+                        } else {
+                            let status = b.ins().iconst(types::I32, 3);
+                            if let Some(d) = &diagnostic_data {
+                                let mut site = d.site(module, &mut b, fault_context.unwrap(), i, 0);
+                                site.capture_frame = false;
+                                site.record(&mut b, status);
+                            }
+                            b.ins().return_(&[status]);
+                        }
+                        b.switch_to_block(object);
+                    }
+                    let tag = b.ins().load(types::I64, MemFlags::new(), parameters[0], 0);
+                    if display
+                        && details.is_some_and(|d| d.boxed_int32_display || d.boxed_int64_display)
+                    {
+                        for (type_index, wide) in details
+                            .unwrap()
+                            .int32_boxes
+                            .values()
+                            .map(|i| (*i, false))
+                            .chain(details.unwrap().int64_boxes.values().map(|i| (*i, true)))
+                        {
+                            let matched = b.create_block();
+                            let next = b.create_block();
+                            let equal = matches_type(&mut b, &p, tag, type_index);
+                            b.ins().brif(equal, matched, &[], next, &[]);
+                            b.switch_to_block(matched);
+                            let value = b.ins().load(
+                                if wide { types::I64 } else { types::I32 },
+                                MemFlags::new(),
+                                parameters[0],
+                                8,
+                            );
+                            let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
+                            let service = module.declare_func_in_func(
+                                if wide {
+                                    boxed_wide_format_service.unwrap()
+                                } else {
+                                    format_service.unwrap()
+                                },
+                                b.func,
+                            );
+                            let call = b.ins().call(service, &[value, arena, output]);
+                            let raw = b.inst_results(call)[0];
+                            let exhausted = b.ins().icmp_imm(IntCC::Equal, raw, 5);
+                            let memory = b.ins().iconst(types::I32, 5);
+                            let runtime = b.ins().iconst(types::I32, 3);
+                            let status = b.ins().select(exhausted, memory, runtime);
+                            let failed = b.ins().icmp_imm(IntCC::NotEqual, raw, 0);
+                            let mut site = diagnostic_data.as_ref().unwrap().site(
+                                module,
+                                &mut b,
+                                fault_context.unwrap(),
+                                i,
+                                0,
+                            );
+                            site.capture_frame = false;
+                            return_if_detailed(&mut b, failed, status, Some(&site));
+                            let zero = b.ins().iconst(types::I32, 0);
+                            b.ins().return_(&[zero]);
+                            b.switch_to_block(next);
+                        }
+                    }
+                    if display && details.is_some_and(|d| d.boxed_boolean_display) {
+                        for &type_index in details.unwrap().boolean_boxes.values() {
+                            let matched = b.create_block();
+                            let next = b.create_block();
+                            let equal = matches_type(&mut b, &p, tag, type_index);
+                            b.ins().brif(equal, matched, &[], next, &[]);
+                            b.switch_to_block(matched);
+                            let value = b.ins().load(types::I32, MemFlags::new(), parameters[0], 8);
+                            let no =
+                                module.declare_data_in_func(boolean_display_literals[0], b.func);
+                            let yes =
+                                module.declare_data_in_func(boolean_display_literals[1], b.func);
+                            let no = b.ins().global_value(types::I64, no);
+                            let yes = b.ins().global_value(types::I64, yes);
+                            let text = b.ins().select(value, yes, no);
+                            write(&mut b, output, &[text]);
+                            let zero = b.ins().iconst(types::I32, 0);
+                            b.ins().return_(&[zero]);
+                            b.switch_to_block(next);
+                        }
+                    }
+                    for &(type_index, target) in targets {
                         let matched = b.create_block();
                         let next = b.create_block();
                         let equal = matches_type(&mut b, &p, tag, type_index);
                         b.ins().brif(equal, matched, &[], next, &[]);
                         b.switch_to_block(matched);
-                        let value = b.ins().load(types::I32, MemFlags::new(), parameters[0], 8);
-                        let no = module.declare_data_in_func(boolean_display_literals[0], b.func);
-                        let yes = module.declare_data_in_func(boolean_display_literals[1], b.func);
-                        let no = b.ins().global_value(types::I64, no);
-                        let yes = b.ins().global_value(types::I64, yes);
-                        let text = b.ins().select(value, yes, no);
-                        write(&mut b, output, &[text]);
-                        let zero = b.ins().iconst(types::I32, 0);
-                        b.ins().return_(&[zero]);
-                        b.switch_to_block(next);
-                    }
-                }
-                for &(type_index, target) in targets {
-                    let matched = b.create_block();
-                    let next = b.create_block();
-                    let equal = matches_type(&mut b, &p, tag, type_index);
-                    b.ins().brif(equal, matched, &[], next, &[]);
-                    b.switch_to_block(matched);
-                    let mut adapted = parameters.clone();
-                    if input.functions[target].receiver_byref
-                        || details.is_some_and(|d| d.primitive_receivers.contains(&target))
-                    {
-                        // A value override borrows the payload of the rooted box.
-                        adapted[0] = b.ins().iadd_imm(parameters[0], 8);
-                    }
-                    let mut offset = 0;
-                    for (from, to) in p.args[i].iter().zip(&p.args[target]) {
-                        if *from == Ty::Literal && from != to {
-                            if !string_view(to) {
-                                return Err(
+                        let mut adapted = parameters.clone();
+                        if input.functions[target].receiver_byref
+                            || details.is_some_and(|d| d.primitive_receivers.contains(&target))
+                        {
+                            // A value override borrows the payload of the rooted box.
+                            adapted[0] = b.ins().iadd_imm(parameters[0], 8);
+                        }
+                        let mut offset = 0;
+                        for (from, to) in p.args[i].iter().zip(&p.args[target]) {
+                            if *from == Ty::Literal && from != to {
+                                if !string_view(to) {
+                                    return Err(
                                     "variant String argument requires a verified reference view"
                                         .into(),
                                 );
+                                }
+                                adapted[offset] = text_object_view(&mut b, adapted[offset]);
                             }
-                            adapted[offset] = text_object_view(&mut b, adapted[offset]);
+                            offset += p.lanes(from);
                         }
-                        offset += p.lanes(from);
-                    }
-                    let string_result =
-                        p.results[target] == Some(Ty::Literal) && p.results[i] != Some(Ty::Literal);
-                    if string_result && !p.results[i].as_ref().is_some_and(&string_view) {
-                        return Err(
-                            "variant String result requires a verified reference view".into()
-                        );
-                    }
-                    let target = module.declare_func_in_func(ids[target], b.func);
-                    let call = b.ins().call(target, &adapted);
-                    let status = b.inst_results(call)[0];
-                    if string_result {
-                        // A failed call has no initialized result to read or convert.
-                        let success = b.create_block();
-                        let failed = b.create_block();
-                        b.ins().brif(status, failed, &[], success, &[]);
-                        b.switch_to_block(failed);
-                        b.ins().return_(&[status]);
-                        b.switch_to_block(success);
-                        let value = b.ins().load(types::I64, MemFlags::new(), output, 0);
-                        let view = text_object_view(&mut b, value);
-                        b.ins().store(MemFlags::new(), view, output, 0);
-                    }
-                    b.ins().return_(&[status]);
-                    b.switch_to_block(next);
-                }
-                if display {
-                    for &(index, wide) in &details.unwrap().floating_boxes {
-                        let matched = b.create_block();
-                        let next = b.create_block();
-                        let equal = matches_type(&mut b, &p, tag, index);
-                        b.ins().brif(equal, matched, &[], next, &[]);
-                        b.switch_to_block(matched);
-                        let value = b.ins().load(
-                            if wide { types::F64 } else { types::F32 },
-                            MemFlags::new(),
-                            parameters[0],
-                            8,
-                        );
-                        let code = b.ins().iconst(types::I32, 71);
-                        let precision = b.ins().iconst(types::I32, -1);
-                        let swedish = b.ins().iconst(types::I32, 0);
-                        let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
-                        let service = module
-                            .declare_func_in_func(floating_display[usize::from(wide)], b.func);
-                        let call = b
-                            .ins()
-                            .call(service, &[value, code, precision, swedish, arena, output]);
+                        let string_result = p.results[target] == Some(Ty::Literal)
+                            && p.results[i] != Some(Ty::Literal);
+                        if string_result && !p.results[i].as_ref().is_some_and(&string_view) {
+                            return Err(
+                                "variant String result requires a verified reference view".into()
+                            );
+                        }
+                        let target = module.declare_func_in_func(ids[target], b.func);
+                        let call = b.ins().call(target, &adapted);
                         let status = b.inst_results(call)[0];
-                        let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
-                        let mut site = diagnostic_data.as_ref().unwrap().site(
-                            module,
-                            &mut b,
-                            fault_context.unwrap(),
-                            i,
-                            0,
-                        );
-                        site.capture_frame = false;
-                        return_if_detailed(&mut b, failed, status, Some(&site));
+                        if string_result {
+                            // A failed call has no initialized result to read or convert.
+                            let success = b.create_block();
+                            let failed = b.create_block();
+                            b.ins().brif(status, failed, &[], success, &[]);
+                            b.switch_to_block(failed);
+                            b.ins().return_(&[status]);
+                            b.switch_to_block(success);
+                            let value = b.ins().load(types::I64, MemFlags::new(), output, 0);
+                            let view = text_object_view(&mut b, value);
+                            b.ins().store(MemFlags::new(), view, output, 0);
+                        }
                         b.ins().return_(&[status]);
                         b.switch_to_block(next);
                     }
-                    if let Some((signed_service, unsigned_service)) = integral_display {
-                        for &(index, wide, signed) in &details.unwrap().integral_boxes {
+                    if display {
+                        for &(index, wide) in &details.unwrap().floating_boxes {
                             let matched = b.create_block();
                             let next = b.create_block();
                             let equal = matches_type(&mut b, &p, tag, index);
                             b.ins().brif(equal, matched, &[], next, &[]);
                             b.switch_to_block(matched);
-                            let payload = b.ins().iadd_imm(parameters[0], 8);
-                            let scalar = p.ty(&input.types[index].fields[0].ty)?;
-                            let value = read(&mut b, &p, &scalar, payload)[0];
-                            let value = if wide {
-                                value
-                            } else if signed {
-                                b.ins().sextend(types::I64, value)
-                            } else {
-                                b.ins().uextend(types::I64, value)
-                            };
-                            let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
-                            let service = module.declare_func_in_func(
-                                if signed {
-                                    signed_service
-                                } else {
-                                    unsigned_service
-                                },
-                                b.func,
+                            let value = b.ins().load(
+                                if wide { types::F64 } else { types::F32 },
+                                MemFlags::new(),
+                                parameters[0],
+                                8,
                             );
-                            let call = b.ins().call(service, &[value, arena, output]);
+                            let code = b.ins().iconst(types::I32, 71);
+                            let precision = b.ins().iconst(types::I32, -1);
+                            let swedish = b.ins().iconst(types::I32, 0);
+                            let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
+                            let service = module
+                                .declare_func_in_func(floating_display[usize::from(wide)], b.func);
+                            let call = b
+                                .ins()
+                                .call(service, &[value, code, precision, swedish, arena, output]);
                             let status = b.inst_results(call)[0];
                             let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
                             let mut site = diagnostic_data.as_ref().unwrap().site(
@@ -2945,18 +2985,323 @@ pub(crate) fn compile_into(
                             b.ins().return_(&[status]);
                             b.switch_to_block(next);
                         }
-                    }
-                    if let Some(enums) = &enum_display {
-                        for &index in enums.types() {
+                        if let Some((signed_service, unsigned_service)) = integral_display {
+                            for &(index, wide, signed) in &details.unwrap().integral_boxes {
+                                let matched = b.create_block();
+                                let next = b.create_block();
+                                let equal = matches_type(&mut b, &p, tag, index);
+                                b.ins().brif(equal, matched, &[], next, &[]);
+                                b.switch_to_block(matched);
+                                let payload = b.ins().iadd_imm(parameters[0], 8);
+                                let scalar = p.ty(&input.types[index].fields[0].ty)?;
+                                let value = read(&mut b, &p, &scalar, payload)[0];
+                                let value = if wide {
+                                    value
+                                } else if signed {
+                                    b.ins().sextend(types::I64, value)
+                                } else {
+                                    b.ins().uextend(types::I64, value)
+                                };
+                                let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
+                                let service = module.declare_func_in_func(
+                                    if signed {
+                                        signed_service
+                                    } else {
+                                        unsigned_service
+                                    },
+                                    b.func,
+                                );
+                                let call = b.ins().call(service, &[value, arena, output]);
+                                let status = b.inst_results(call)[0];
+                                let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                                let mut site = diagnostic_data.as_ref().unwrap().site(
+                                    module,
+                                    &mut b,
+                                    fault_context.unwrap(),
+                                    i,
+                                    0,
+                                );
+                                site.capture_frame = false;
+                                return_if_detailed(&mut b, failed, status, Some(&site));
+                                b.ins().return_(&[status]);
+                                b.switch_to_block(next);
+                            }
+                        }
+                        if let Some(enums) = &enum_display {
+                            for &index in enums.types() {
+                                let matched = b.create_block();
+                                let next = b.create_block();
+                                let equal = matches_type(&mut b, &p, tag, index);
+                                b.ins().brif(equal, matched, &[], next, &[]);
+                                b.switch_to_block(matched);
+                                let value =
+                                    b.ins().load(types::I32, MemFlags::new(), parameters[0], 8);
+                                let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
+                                let status =
+                                    enums.emit(module, &mut b, index, value, arena, output);
+                                let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                                let mut site = diagnostic_data.as_ref().unwrap().site(
+                                    module,
+                                    &mut b,
+                                    fault_context.unwrap(),
+                                    i,
+                                    0,
+                                );
+                                site.capture_frame = false;
+                                return_if_detailed(&mut b, failed, status, Some(&site));
+                                b.ins().return_(&[status]);
+                                b.switch_to_block(next);
+                            }
+                        }
+                        for &(index, literal) in &default_display_literals {
                             let matched = b.create_block();
                             let next = b.create_block();
                             let equal = matches_type(&mut b, &p, tag, index);
                             b.ins().brif(equal, matched, &[], next, &[]);
                             b.switch_to_block(matched);
-                            let value = b.ins().load(types::I32, MemFlags::new(), parameters[0], 8);
-                            let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
-                            let status = enums.emit(module, &mut b, index, value, arena, output);
-                            let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                            let data = module.declare_data_in_func(literal, b.func);
+                            let pointer = b.ins().global_value(types::I64, data);
+                            write(&mut b, output, &[pointer]);
+                            let zero = b.ins().iconst(types::I32, 0);
+                            b.ins().return_(&[zero]);
+                            b.switch_to_block(next);
+                        }
+                    }
+                    if let Some(kind) = value_kind {
+                        let d = details.unwrap();
+                        // Persistent views share region identity across writable/readonly
+                        // projections. Their payload is the existing owner/offset/length ABI.
+                        let memory_boxes: Vec<_> = d
+                            .empty_record_boxes
+                            .values()
+                            .copied()
+                            .filter(|index| {
+                                input.types[*index]
+                                    .memory_view
+                                    .is_some_and(|k| !k.is_borrowed())
+                            })
+                            .collect();
+                        for &index in &memory_boxes {
+                            let matched = b.create_block();
+                            let next = b.create_block();
+                            let equal = matches_type(&mut b, &p, tag, index);
+                            b.ins().brif(equal, matched, &[], next, &[]);
+                            b.switch_to_block(matched);
+                            let left_owner =
+                                b.ins().load(types::I64, MemFlags::new(), parameters[0], 8);
+                            let left_start =
+                                b.ins().load(types::I32, MemFlags::new(), parameters[0], 16);
+                            let left_length =
+                                b.ins().load(types::I32, MemFlags::new(), parameters[0], 24);
+                            let value = if kind == "Equals" {
+                                let inspect = b.create_block();
+                                let compare = b.create_block();
+                                let different = b.create_block();
+                                let done = b.create_block();
+                                b.append_block_param(done, types::I32);
+                                let nonnull = b.ins().icmp_imm(IntCC::NotEqual, parameters[1], 0);
+                                let low = b.ins().band_imm(parameters[1], 1);
+                                let untagged = b.ins().icmp_imm(IntCC::Equal, low, 0);
+                                let boxed = b.ins().band(nonnull, untagged);
+                                b.ins().brif(boxed, inspect, &[], different, &[]);
+                                b.switch_to_block(inspect);
+                                let right_tag =
+                                    b.ins().load(types::I64, MemFlags::new(), parameters[1], 0);
+                                // Keep element identity explicit even though the current profile
+                                // admits Byte views only. Access mode does not affect the region.
+                                let mut compatible = b.ins().iconst(types::I8, 0);
+                                for &candidate in &memory_boxes {
+                                    if neoclr::native_metadata::memory_view_element(
+                                        &input.types[candidate],
+                                    ) != neoclr::native_metadata::memory_view_element(
+                                        &input.types[index],
+                                    ) {
+                                        continue;
+                                    }
+                                    let matches = matches_type(&mut b, &p, right_tag, candidate);
+                                    compatible = b.ins().bor(compatible, matches);
+                                }
+                                b.ins().brif(compatible, compare, &[], different, &[]);
+                                b.switch_to_block(compare);
+                                let right_owner =
+                                    b.ins().load(types::I64, MemFlags::new(), parameters[1], 8);
+                                let right_start =
+                                    b.ins().load(types::I32, MemFlags::new(), parameters[1], 16);
+                                let right_length =
+                                    b.ins().load(types::I32, MemFlags::new(), parameters[1], 24);
+                                let owner = b.ins().icmp(IntCC::Equal, left_owner, right_owner);
+                                let start = b.ins().icmp(IntCC::Equal, left_start, right_start);
+                                let length = b.ins().icmp(IntCC::Equal, left_length, right_length);
+                                let same = b.ins().band(owner, start);
+                                let same = b.ins().band(same, length);
+                                let same = b.ins().uextend(types::I32, same);
+                                b.ins().jump(done, &[same.into()]);
+                                b.switch_to_block(different);
+                                let no = b.ins().iconst(types::I32, 0);
+                                b.ins().jump(done, &[no.into()]);
+                                b.switch_to_block(done);
+                                b.block_params(done)[0]
+                            } else {
+                                // The current collector does not move payload addresses.
+                                // Hashes are process-local and need not match interpreter numbers.
+                                let high = b.ins().ushr_imm(left_owner, 32);
+                                let bits = b.ins().bxor(left_owner, high);
+                                let hash = b.ins().ireduce(types::I32, bits);
+                                let hash = b.ins().imul_imm(hash, 31);
+                                let hash = b.ins().bxor(hash, left_start);
+                                let hash = b.ins().imul_imm(hash, 31);
+                                let hash = b.ins().bxor(hash, left_length);
+                                let empty = b.ins().icmp_imm(IntCC::Equal, left_owner, 0);
+                                let zero = b.ins().iconst(types::I32, 0);
+                                b.ins().select(empty, zero, hash)
+                            };
+                            write(&mut b, output, &[value]);
+                            let status = b.ins().iconst(types::I32, 0);
+                            b.ins().return_(&[status]);
+                            b.switch_to_block(next);
+                        }
+                        // Primitive and enum boxes preserve value semantics through the ordinary
+                        // Object slots, including calls made from generic code.
+                        for (index, wide, floating) in d
+                            .int32_boxes
+                            .values()
+                            .chain(d.boolean_boxes.values())
+                            .chain(
+                                d.empty_record_boxes
+                                    .values()
+                                    .filter(|index| input.types[**index].enum_info.is_some()),
+                            )
+                            .map(|index| (*index, false, false))
+                            .chain(d.int64_boxes.values().map(|index| (*index, true, false)))
+                            .chain(
+                                d.integral_boxes
+                                    .iter()
+                                    .map(|(index, wide, _)| (*index, *wide, false)),
+                            )
+                            .chain(
+                                d.floating_boxes
+                                    .iter()
+                                    .map(|(index, wide)| (*index, *wide, true)),
+                            )
+                        {
+                            let matched = b.create_block();
+                            let next = b.create_block();
+                            let equal = matches_type(&mut b, &p, tag, index);
+                            b.ins().brif(equal, matched, &[], next, &[]);
+                            b.switch_to_block(matched);
+                            let payload_type = match (floating, wide) {
+                                (true, true) => types::F64,
+                                (true, false) => types::F32,
+                                (false, true) => types::I64,
+                                (false, false) => types::I32,
+                            };
+                            let integral_ty = d
+                                .integral_boxes
+                                .iter()
+                                .any(|(i, _, _)| *i == index)
+                                .then(|| p.ty(&input.types[index].fields[0].ty))
+                                .transpose()?;
+                            let left = if let Some(scalar) = &integral_ty {
+                                let payload = b.ins().iadd_imm(parameters[0], 8);
+                                read(&mut b, &p, scalar, payload)[0]
+                            } else {
+                                b.ins()
+                                    .load(payload_type, MemFlags::new(), parameters[0], 8)
+                            };
+                            let result = if kind == "Equals" {
+                                let compare = b.create_block();
+                                let different = b.create_block();
+                                let same_type = b.create_block();
+                                let result = b.create_block();
+                                b.append_block_param(result, types::I32);
+                                // Null and tagged String views have no box header.
+                                let nonnull = b.ins().icmp_imm(IntCC::NotEqual, parameters[1], 0);
+                                let tagged = b.ins().band_imm(parameters[1], 1);
+                                let untagged = b.ins().icmp_imm(IntCC::Equal, tagged, 0);
+                                let boxed = b.ins().band(nonnull, untagged);
+                                b.ins().brif(boxed, compare, &[], different, &[]);
+                                b.switch_to_block(compare);
+                                let right_tag =
+                                    b.ins().load(types::I64, MemFlags::new(), parameters[1], 0);
+                                let same = matches_type(&mut b, &p, right_tag, index);
+                                b.ins().brif(same, same_type, &[], different, &[]);
+                                b.switch_to_block(same_type);
+                                let right = if let Some(scalar) = &integral_ty {
+                                    let payload = b.ins().iadd_imm(parameters[1], 8);
+                                    read(&mut b, &p, scalar, payload)[0]
+                                } else {
+                                    b.ins()
+                                        .load(payload_type, MemFlags::new(), parameters[1], 8)
+                                };
+                                let equal = if floating {
+                                    let equal = b.ins().fcmp(FloatCC::Equal, left, right);
+                                    let left_nan = b.ins().fcmp(FloatCC::Unordered, left, left);
+                                    let right_nan = b.ins().fcmp(FloatCC::Unordered, right, right);
+                                    let both_nan = b.ins().band(left_nan, right_nan);
+                                    b.ins().bor(equal, both_nan)
+                                } else {
+                                    b.ins().icmp(IntCC::Equal, left, right)
+                                };
+                                let equal = b.ins().uextend(types::I32, equal);
+                                b.ins().jump(result, &[equal.into()]);
+                                b.switch_to_block(different);
+                                let no = b.ins().iconst(types::I32, 0);
+                                b.ins().jump(result, &[no.into()]);
+                                b.switch_to_block(result);
+                                b.block_params(result)[0]
+                            } else if floating {
+                                let integer = if wide { types::I64 } else { types::I32 };
+                                let bits = b.ins().bitcast(integer, MemFlags::new(), left);
+                                let magnitude = b
+                                    .ins()
+                                    .band_imm(bits, if wide { i64::MAX } else { i32::MAX as i64 });
+                                let is_zero = b.ins().icmp_imm(IntCC::Equal, magnitude, 0);
+                                let zero = b.ins().iconst(integer, 0);
+                                let bits = b.ins().select(is_zero, zero, bits);
+                                let nan = b.ins().fcmp(FloatCC::Unordered, left, left);
+                                let canonical = b.ins().iconst(
+                                    integer,
+                                    if wide {
+                                        0x7ff0_0000_0000_0000
+                                    } else {
+                                        0x7f80_0000
+                                    },
+                                );
+                                let bits = b.ins().select(nan, canonical, bits);
+                                if wide {
+                                    let high = b.ins().ushr_imm(bits, 32);
+                                    let mixed = b.ins().bxor(bits, high);
+                                    b.ins().ireduce(types::I32, mixed)
+                                } else {
+                                    bits
+                                }
+                            } else if wide {
+                                let high = b.ins().ushr_imm(left, 32);
+                                let mixed = b.ins().bxor(left, high);
+                                b.ins().ireduce(types::I32, mixed)
+                            } else {
+                                left
+                            };
+                            write(&mut b, output, &[result]);
+                            let status = b.ins().iconst(types::I32, 0);
+                            b.ins().return_(&[status]);
+                            b.switch_to_block(next);
+                        }
+                        // Other value boxes still need a verified override; never
+                        // silently apply reference identity to them.
+                        let mut boxes: Vec<_> = d
+                            .int32_boxes
+                            .values()
+                            .chain(d.int64_boxes.values())
+                            .chain(d.boolean_boxes.values())
+                            .chain(d.empty_record_boxes.values())
+                            .copied()
+                            .collect();
+                        boxes.sort_unstable();
+                        boxes.dedup();
+                        for index in boxes {
+                            let boxed = matches_type(&mut b, &p, tag, index);
+                            let status = b.ins().iconst(types::I32, 3);
                             let mut site = diagnostic_data.as_ref().unwrap().site(
                                 module,
                                 &mut b,
@@ -2965,707 +3310,60 @@ pub(crate) fn compile_into(
                                 0,
                             );
                             site.capture_frame = false;
-                            return_if_detailed(&mut b, failed, status, Some(&site));
-                            b.ins().return_(&[status]);
-                            b.switch_to_block(next);
+                            return_if_detailed(&mut b, boxed, status, Some(&site));
                         }
-                    }
-                    for &(index, literal) in &default_display_literals {
-                        let matched = b.create_block();
-                        let next = b.create_block();
-                        let equal = matches_type(&mut b, &p, tag, index);
-                        b.ins().brif(equal, matched, &[], next, &[]);
-                        b.switch_to_block(matched);
-                        let data = module.declare_data_in_func(literal, b.func);
-                        let pointer = b.ins().global_value(types::I64, data);
-                        write(&mut b, output, &[pointer]);
-                        let zero = b.ins().iconst(types::I32, 0);
-                        b.ins().return_(&[zero]);
-                        b.switch_to_block(next);
-                    }
-                }
-                if let Some(kind) = value_kind {
-                    let d = details.unwrap();
-                    // Persistent views share region identity across writable/readonly
-                    // projections. Their payload is the existing owner/offset/length ABI.
-                    let memory_boxes: Vec<_> = d
-                        .empty_record_boxes
-                        .values()
-                        .copied()
-                        .filter(|index| {
-                            input.types[*index]
-                                .memory_view
-                                .is_some_and(|k| !k.is_borrowed())
-                        })
-                        .collect();
-                    for &index in &memory_boxes {
-                        let matched = b.create_block();
-                        let next = b.create_block();
-                        let equal = matches_type(&mut b, &p, tag, index);
-                        b.ins().brif(equal, matched, &[], next, &[]);
-                        b.switch_to_block(matched);
-                        let left_owner =
-                            b.ins().load(types::I64, MemFlags::new(), parameters[0], 8);
-                        let left_start =
-                            b.ins().load(types::I32, MemFlags::new(), parameters[0], 16);
-                        let left_length =
-                            b.ins().load(types::I32, MemFlags::new(), parameters[0], 24);
                         let value = if kind == "Equals" {
-                            let inspect = b.create_block();
-                            let compare = b.create_block();
-                            let different = b.create_block();
-                            let done = b.create_block();
-                            b.append_block_param(done, types::I32);
-                            let nonnull = b.ins().icmp_imm(IntCC::NotEqual, parameters[1], 0);
-                            let low = b.ins().band_imm(parameters[1], 1);
-                            let untagged = b.ins().icmp_imm(IntCC::Equal, low, 0);
-                            let boxed = b.ins().band(nonnull, untagged);
-                            b.ins().brif(boxed, inspect, &[], different, &[]);
-                            b.switch_to_block(inspect);
-                            let right_tag =
-                                b.ins().load(types::I64, MemFlags::new(), parameters[1], 0);
-                            // Keep element identity explicit even though the current profile
-                            // admits Byte views only. Access mode does not affect the region.
-                            let mut compatible = b.ins().iconst(types::I8, 0);
-                            for &candidate in &memory_boxes {
-                                if neoclr::native_metadata::memory_view_element(
-                                    &input.types[candidate],
-                                ) != neoclr::native_metadata::memory_view_element(
-                                    &input.types[index],
-                                ) {
-                                    continue;
-                                }
-                                let matches = matches_type(&mut b, &p, right_tag, candidate);
-                                compatible = b.ins().bor(compatible, matches);
-                            }
-                            b.ins().brif(compatible, compare, &[], different, &[]);
-                            b.switch_to_block(compare);
-                            let right_owner =
-                                b.ins().load(types::I64, MemFlags::new(), parameters[1], 8);
-                            let right_start =
-                                b.ins().load(types::I32, MemFlags::new(), parameters[1], 16);
-                            let right_length =
-                                b.ins().load(types::I32, MemFlags::new(), parameters[1], 24);
-                            let owner = b.ins().icmp(IntCC::Equal, left_owner, right_owner);
-                            let start = b.ins().icmp(IntCC::Equal, left_start, right_start);
-                            let length = b.ins().icmp(IntCC::Equal, left_length, right_length);
-                            let same = b.ins().band(owner, start);
-                            let same = b.ins().band(same, length);
-                            let same = b.ins().uextend(types::I32, same);
-                            b.ins().jump(done, &[same.into()]);
-                            b.switch_to_block(different);
-                            let no = b.ins().iconst(types::I32, 0);
-                            b.ins().jump(done, &[no.into()]);
-                            b.switch_to_block(done);
-                            b.block_params(done)[0]
+                            let equal = b.ins().icmp(IntCC::Equal, parameters[0], parameters[1]);
+                            b.ins().uextend(types::I32, equal)
                         } else {
-                            // The current collector does not move payload addresses.
-                            // Hashes are process-local and need not match interpreter numbers.
-                            let high = b.ins().ushr_imm(left_owner, 32);
-                            let bits = b.ins().bxor(left_owner, high);
-                            let hash = b.ins().ireduce(types::I32, bits);
-                            let hash = b.ins().imul_imm(hash, 31);
-                            let hash = b.ins().bxor(hash, left_start);
-                            let hash = b.ins().imul_imm(hash, 31);
-                            let hash = b.ins().bxor(hash, left_length);
-                            let empty = b.ins().icmp_imm(IntCC::Equal, left_owner, 0);
-                            let zero = b.ins().iconst(types::I32, 0);
-                            b.ins().select(empty, zero, hash)
+                            // The native collector is nonmoving: this hash is stable
+                            // for the object's lifetime, with no cross-process promise.
+                            let high = b.ins().ushr_imm(parameters[0], 32);
+                            let mixed = b.ins().bxor(parameters[0], high);
+                            b.ins().ireduce(types::I32, mixed)
                         };
                         write(&mut b, output, &[value]);
                         let status = b.ins().iconst(types::I32, 0);
                         b.ins().return_(&[status]);
-                        b.switch_to_block(next);
-                    }
-                    // Primitive and enum boxes preserve value semantics through the ordinary
-                    // Object slots, including calls made from generic code.
-                    for (index, wide, floating) in d
-                        .int32_boxes
-                        .values()
-                        .chain(d.boolean_boxes.values())
-                        .chain(
-                            d.empty_record_boxes
-                                .values()
-                                .filter(|index| input.types[**index].enum_info.is_some()),
-                        )
-                        .map(|index| (*index, false, false))
-                        .chain(d.int64_boxes.values().map(|index| (*index, true, false)))
-                        .chain(
-                            d.integral_boxes
-                                .iter()
-                                .map(|(index, wide, _)| (*index, *wide, false)),
-                        )
-                        .chain(
-                            d.floating_boxes
-                                .iter()
-                                .map(|(index, wide)| (*index, *wide, true)),
-                        )
-                    {
-                        let matched = b.create_block();
-                        let next = b.create_block();
-                        let equal = matches_type(&mut b, &p, tag, index);
-                        b.ins().brif(equal, matched, &[], next, &[]);
-                        b.switch_to_block(matched);
-                        let payload_type = match (floating, wide) {
-                            (true, true) => types::F64,
-                            (true, false) => types::F32,
-                            (false, true) => types::I64,
-                            (false, false) => types::I32,
-                        };
-                        let integral_ty = d
-                            .integral_boxes
-                            .iter()
-                            .any(|(i, _, _)| *i == index)
-                            .then(|| p.ty(&input.types[index].fields[0].ty))
-                            .transpose()?;
-                        let left = if let Some(scalar) = &integral_ty {
-                            let payload = b.ins().iadd_imm(parameters[0], 8);
-                            read(&mut b, &p, scalar, payload)[0]
-                        } else {
-                            b.ins()
-                                .load(payload_type, MemFlags::new(), parameters[0], 8)
-                        };
-                        let result = if kind == "Equals" {
-                            let compare = b.create_block();
-                            let different = b.create_block();
-                            let same_type = b.create_block();
-                            let result = b.create_block();
-                            b.append_block_param(result, types::I32);
-                            // Null and tagged String views have no box header.
-                            let nonnull = b.ins().icmp_imm(IntCC::NotEqual, parameters[1], 0);
-                            let tagged = b.ins().band_imm(parameters[1], 1);
-                            let untagged = b.ins().icmp_imm(IntCC::Equal, tagged, 0);
-                            let boxed = b.ins().band(nonnull, untagged);
-                            b.ins().brif(boxed, compare, &[], different, &[]);
-                            b.switch_to_block(compare);
-                            let right_tag =
-                                b.ins().load(types::I64, MemFlags::new(), parameters[1], 0);
-                            let same = matches_type(&mut b, &p, right_tag, index);
-                            b.ins().brif(same, same_type, &[], different, &[]);
-                            b.switch_to_block(same_type);
-                            let right = if let Some(scalar) = &integral_ty {
-                                let payload = b.ins().iadd_imm(parameters[1], 8);
-                                read(&mut b, &p, scalar, payload)[0]
-                            } else {
-                                b.ins()
-                                    .load(payload_type, MemFlags::new(), parameters[1], 8)
-                            };
-                            let equal = if floating {
-                                let equal = b.ins().fcmp(FloatCC::Equal, left, right);
-                                let left_nan = b.ins().fcmp(FloatCC::Unordered, left, left);
-                                let right_nan = b.ins().fcmp(FloatCC::Unordered, right, right);
-                                let both_nan = b.ins().band(left_nan, right_nan);
-                                b.ins().bor(equal, both_nan)
-                            } else {
-                                b.ins().icmp(IntCC::Equal, left, right)
-                            };
-                            let equal = b.ins().uextend(types::I32, equal);
-                            b.ins().jump(result, &[equal.into()]);
-                            b.switch_to_block(different);
-                            let no = b.ins().iconst(types::I32, 0);
-                            b.ins().jump(result, &[no.into()]);
-                            b.switch_to_block(result);
-                            b.block_params(result)[0]
-                        } else if floating {
-                            let integer = if wide { types::I64 } else { types::I32 };
-                            let bits = b.ins().bitcast(integer, MemFlags::new(), left);
-                            let magnitude = b
-                                .ins()
-                                .band_imm(bits, if wide { i64::MAX } else { i32::MAX as i64 });
-                            let is_zero = b.ins().icmp_imm(IntCC::Equal, magnitude, 0);
-                            let zero = b.ins().iconst(integer, 0);
-                            let bits = b.ins().select(is_zero, zero, bits);
-                            let nan = b.ins().fcmp(FloatCC::Unordered, left, left);
-                            let canonical = b.ins().iconst(
-                                integer,
-                                if wide {
-                                    0x7ff0_0000_0000_0000
-                                } else {
-                                    0x7f80_0000
-                                },
-                            );
-                            let bits = b.ins().select(nan, canonical, bits);
-                            if wide {
-                                let high = b.ins().ushr_imm(bits, 32);
-                                let mixed = b.ins().bxor(bits, high);
-                                b.ins().ireduce(types::I32, mixed)
-                            } else {
-                                bits
-                            }
-                        } else if wide {
-                            let high = b.ins().ushr_imm(left, 32);
-                            let mixed = b.ins().bxor(left, high);
-                            b.ins().ireduce(types::I32, mixed)
-                        } else {
-                            left
-                        };
-                        write(&mut b, output, &[result]);
-                        let status = b.ins().iconst(types::I32, 0);
-                        b.ins().return_(&[status]);
-                        b.switch_to_block(next);
-                    }
-                    // Other value boxes still need a verified override; never
-                    // silently apply reference identity to them.
-                    let mut boxes: Vec<_> = d
-                        .int32_boxes
-                        .values()
-                        .chain(d.int64_boxes.values())
-                        .chain(d.boolean_boxes.values())
-                        .chain(d.empty_record_boxes.values())
-                        .copied()
-                        .collect();
-                    boxes.sort_unstable();
-                    boxes.dedup();
-                    for index in boxes {
-                        let boxed = matches_type(&mut b, &p, tag, index);
+                    } else {
                         let status = b.ins().iconst(types::I32, 3);
-                        let mut site = diagnostic_data.as_ref().unwrap().site(
-                            module,
-                            &mut b,
-                            fault_context.unwrap(),
-                            i,
-                            0,
-                        );
-                        site.capture_frame = false;
-                        return_if_detailed(&mut b, boxed, status, Some(&site));
+                        if let Some(d) = &diagnostic_data {
+                            let mut site = d.site(module, &mut b, fault_context.unwrap(), i, 0);
+                            site.capture_frame = false;
+                            site.record(&mut b, status);
+                        }
+                        b.ins().return_(&[status]);
                     }
-                    let value = if kind == "Equals" {
-                        let equal = b.ins().icmp(IntCC::Equal, parameters[0], parameters[1]);
-                        b.ins().uextend(types::I32, equal)
-                    } else {
-                        // The native collector is nonmoving: this hash is stable
-                        // for the object's lifetime, with no cross-process promise.
-                        let high = b.ins().ushr_imm(parameters[0], 32);
-                        let mixed = b.ins().bxor(parameters[0], high);
-                        b.ins().ireduce(types::I32, mixed)
-                    };
-                    write(&mut b, output, &[value]);
-                    let status = b.ins().iconst(types::I32, 0);
-                    b.ins().return_(&[status]);
-                } else {
-                    let status = b.ins().iconst(types::I32, 3);
-                    if let Some(d) = &diagnostic_data {
-                        let mut site = d.site(module, &mut b, fault_context.unwrap(), i, 0);
-                        site.capture_frame = false;
-                        site.record(&mut b, status);
-                    }
-                    b.ins().return_(&[status]);
+                    b.seal_all_blocks();
+                    b.finalize();
+                    finish_value_body(
+                        module,
+                        ids[i],
+                        &mut context,
+                        root_probes.as_ref(),
+                        probe_frame,
+                        mutation_frame_ready,
+                        if live_stores {
+                            Some(&mut *live_bodies)
+                        } else {
+                            None
+                        },
+                        stack_budget,
+                        long_range_calls,
+                    )?;
+                    continue;
                 }
-                b.seal_all_blocks();
-                b.finalize();
-                finish_value_body(
-                    module,
-                    ids[i],
-                    &mut context,
-                    root_probes.as_ref(),
-                    probe_frame,
-                    mutation_frame_ready,
-                    if live_stores {
-                        Some(&mut live_bodies)
-                    } else {
-                        None
-                    },
-                    stack_budget,
-                    long_range_calls,
-                )?;
-                continue;
-            }
-            if details.is_some_and(|d| d.entry_task_drain.contains(&i))
-                && let Some((callback, Some((drain, pump)))) = runtime_async_callbacks
-            {
-                let callback = module.declare_func_in_func(callback, b.func);
-                let drain = module.declare_func_in_func(drain, b.func);
-                let callback = b.ins().func_addr(types::I64, callback);
-                let drain = b.ins().func_addr(types::I64, drain);
-                let pump = module.declare_func_in_func(pump, b.func);
-                let call = b
-                    .ins()
-                    .call(pump, &[fault_context.unwrap(), callback, drain]);
-                let status = b.inst_results(call)[0];
-                let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
-                let mut site = diagnostic_data.as_ref().unwrap().site(
-                    module,
-                    &mut b,
-                    fault_context.unwrap(),
-                    i,
-                    0,
-                );
-                site.capture_frame = false;
-                return_if_detailed(&mut b, failed, status, Some(&site));
-                let zero = b.ins().iconst(types::I32, 0);
-                b.ins().store(MemFlags::new(), zero, output, 0);
-                b.ins().return_(&[zero]);
-                b.seal_all_blocks();
-                b.finalize();
-                finish_value_body(
-                    module,
-                    ids[i],
-                    &mut context,
-                    root_probes.as_ref(),
-                    probe_frame,
-                    mutation_frame_ready,
-                    if live_stores {
-                        Some(&mut live_bodies)
-                    } else {
-                        None
-                    },
-                    stack_budget,
-                    long_range_calls,
-                )?;
-                continue;
-            }
-            if details.is_some_and(|d| d.entry_task_drain.contains(&i)) {
-                let d = details.unwrap();
-                let ctx = fault_context.unwrap();
-                let (begin, end, poll, callback, queue_read) = entry_drain_services.unwrap();
-                let begin = module.declare_func_in_func(begin, b.func);
-                let end = module.declare_func_in_func(end, b.func);
-                let entry = b.ins().iconst(types::I32, root as i64);
-                let run = b
-                    .ins()
-                    .iconst(types::I32, d.task_queue_run.map_or(-1, |i| i as i64));
-                let drain = b
-                    .ins()
-                    .iconst(types::I32, d.task_queue_drain.map_or(-1, |i| i as i64));
-                let storage = slot(&mut b, 16);
-                let queue_output = b.ins().stack_addr(types::I64, storage, 0);
-                let call = b.ins().call(begin, &[ctx, entry, run, drain, queue_output]);
-                let status = b.inst_results(call)[0];
-                let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
-                let mut site = diagnostic_data
-                    .as_ref()
-                    .unwrap()
-                    .site(module, &mut b, ctx, i, 0);
-                site.capture_frame = false;
-                return_if_detailed(&mut b, failed, status, Some(&site));
-                let done = b.create_block();
-                b.append_block_param(done, types::I32);
-                let zero = b.ins().iconst(types::I32, 0);
-                let cycle = b.create_block();
-                let poll_work = b.create_block();
-                b.ins().jump(cycle, &[]);
-                b.switch_to_block(cycle);
-                if let Some(drain) = d.task_queue_drain {
-                    let reader = module.declare_func_in_func(queue_read, b.func);
-                    let call = b.ins().call(reader, &[ctx, queue_output]);
-                    let status = b.inst_results(call)[0];
-                    let loaded = b.create_block();
-                    let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
-                    b.ins().brif(failed, done, &[status.into()], loaded, &[]);
-                    b.switch_to_block(loaded);
-                    let queue = b.ins().load(types::I64, MemFlags::new(), queue_output, 0);
-                    let absent = b.ins().icmp_imm(IntCC::Equal, queue, 0);
-                    let work = b.create_block();
-                    b.ins().brif(absent, poll_work, &[], work, &[]);
-                    b.switch_to_block(work);
-                    // Ordinary managed Drain publishes its own frame; startup remains rooted.
-                    let result = b.ins().stack_addr(types::I64, storage, 8);
-                    let callee = module.declare_func_in_func(ids[drain], b.func);
-                    let call = b.ins().call(callee, &[queue, result, ctx]);
-                    let status = b.inst_results(call)[0];
-                    let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
-                    b.ins().brif(failed, done, &[status.into()], poll_work, &[]);
-                } else {
-                    b.ins().jump(poll_work, &[]);
-                }
-                b.switch_to_block(poll_work);
-                let poll = module.declare_func_in_func(poll, b.func);
-                let required = b.ins().iconst(types::I32, i64::from(d.entry_host_io));
-                let call = b.ins().call(poll, &[ctx, required, queue_output]);
-                let ready = b.inst_results(call)[0];
-                let pending = b.create_block();
-                let idle = b.ins().icmp_imm(IntCC::Equal, ready, 0);
-                b.ins().brif(idle, done, &[zero.into()], pending, &[]);
-                b.switch_to_block(pending);
-                let dispatch = b.create_block();
-                let waiting = b.ins().icmp_imm(IntCC::Equal, ready, 2);
-                b.ins().brif(waiting, cycle, &[], dispatch, &[]);
-                b.switch_to_block(dispatch);
-                let invoke = b.create_block();
-                let fault = b.create_block();
-                let available = b.ins().icmp_imm(IntCC::Equal, ready, 1);
-                b.ins().brif(available, invoke, &[], fault, &[]);
-                b.switch_to_block(fault);
-                let error = b.ins().iconst(types::I32, 3);
-                site.record(&mut b, error);
-                b.ins().jump(done, &[error.into()]);
-                b.switch_to_block(invoke);
-                let handle = b.ins().load(types::I64, MemFlags::new(), queue_output, 0);
-                let callback = module.declare_func_in_func(callback, b.func);
-                let call = b.ins().call(callback, &[handle, ctx]);
-                let status = b.inst_results(call)[0];
-                let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
-                b.ins().brif(failed, done, &[status.into()], cycle, &[]);
-                b.switch_to_block(done);
-                let status = b.block_params(done)[0];
-                b.ins().call(end, &[ctx]);
-                let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
-                return_if_detailed(&mut b, failed, status, None);
-                b.ins().store(MemFlags::new(), zero, output, 0);
-                b.ins().return_(&[zero]);
-                b.seal_all_blocks();
-                b.finalize();
-                finish_value_body(
-                    module,
-                    ids[i],
-                    &mut context,
-                    root_probes.as_ref(),
-                    probe_frame,
-                    mutation_frame_ready,
-                    if live_stores {
-                        Some(&mut live_bodies)
-                    } else {
-                        None
-                    },
-                    stack_budget,
-                    long_range_calls,
-                )?;
-                continue;
-            }
-            if let Some(service) = socket_services.get(&i) {
-                let destination = output;
-                let output = if live_stores {
-                    let bytes = p.results[i].as_ref().map_or(8, |ty| p.bytes(ty));
-                    let scratch = slot(&mut b, bytes);
-                    b.ins().stack_addr(types::I64, scratch, 0)
-                } else {
-                    output
-                };
-                let service = module.declare_func_in_func(*service, b.func);
-                let argument_lanes: usize = p.args[i].iter().map(|t| lanes(&p, t).len()).sum();
-                let mut args = parameters[..argument_lanes].to_vec();
-                args.push(fault_context.unwrap());
-                if details.unwrap().task_queue_current.contains(&i) {
-                    let run = b.ins().iconst(
-                        types::I32,
-                        details.unwrap().task_queue_run.map_or(-1, |i| i as i64),
-                    );
-                    let drain = b.ins().iconst(
-                        types::I32,
-                        details.unwrap().task_queue_drain.map_or(-1, |i| i as i64),
-                    );
-                    args.extend([run, drain]);
-                }
-                args.push(output);
-                if details.unwrap().stack_trace_capture.contains(&i) {
-                    // Unlike interpreter intrinsics, the native service wrapper publishes
-                    // its own probe frame. Hide it without changing managed skip semantics.
-                    // Preserve negative input for validation and saturate at Int32::MAX.
-                    let valid = b
-                        .ins()
-                        .icmp_imm(IntCC::SignedGreaterThanOrEqual, args[0], 0);
-                    let bounded = b
-                        .ins()
-                        .icmp_imm(IntCC::SignedLessThan, args[0], i32::MAX as i64);
-                    let increment = b.ins().band(valid, bounded);
-                    let next = b.ins().iadd_imm(args[0], 1);
-                    args[0] = b.ins().select(increment, next, args[0]);
-                    args.extend(
-                        diagnostic_data
-                            .as_ref()
-                            .unwrap()
-                            .stack_names(module, &mut b),
-                    );
-                }
-                if details.unwrap().runtime_async_start.contains(&i)
-                    || details.unwrap().runtime_async_startmanaged.contains(&i)
+                if details.is_some_and(|d| d.entry_task_drain.contains(&i))
+                    && let Some((callback, Some((drain, pump)))) = runtime_async_callbacks
                 {
-                    let callback =
-                        module.declare_func_in_func(runtime_async_callbacks.unwrap().0, b.func);
-                    args.push(b.ins().func_addr(types::I64, callback));
-                }
-                let call = b.ins().call(service, &args);
-                let raw = b.inst_results(call)[0];
-                let failed = b.ins().icmp_imm(IntCC::NotEqual, raw, 0);
-                let exhausted = b.ins().icmp_imm(IntCC::Equal, raw, 5);
-                let memory = b.ins().iconst(types::I32, 5);
-                let runtime = b.ins().iconst(types::I32, 3);
-                let status = b.ins().select(exhausted, memory, runtime);
-                let mut site = diagnostic_data.as_ref().unwrap().site(
-                    module,
-                    &mut b,
-                    fault_context.unwrap(),
-                    i,
-                    0,
-                );
-                site.capture_frame = false;
-                return_if_detailed(&mut b, failed, status, Some(&site));
-                if live_stores && let Some(ty) = &p.results[i] {
-                    let result = read(&mut b, &p, ty, output);
-                    write(&mut b, destination, &result);
-                }
-                if let Some(ty @ Ty::StringArray) = &p.results[i] {
-                    let array = b.ins().load(types::I64, MemFlags::new(), output, 0);
-                    tag_array(&mut b, &p, ty, array);
-                }
-                let zero = b.ins().iconst(types::I32, 0);
-                b.ins().return_(&[zero]);
-                b.seal_all_blocks();
-                b.finalize();
-                finish_value_body(
-                    module,
-                    ids[i],
-                    &mut context,
-                    root_probes.as_ref(),
-                    probe_frame,
-                    mutation_frame_ready,
-                    if live_stores {
-                        Some(&mut live_bodies)
-                    } else {
-                        None
-                    },
-                    stack_budget,
-                    long_range_calls,
-                )?;
-                continue;
-            }
-            if let Some(operation) = details.and_then(|d| d.cryptography.get(&i)) {
-                let service = module.declare_func_in_func(cryptography_service.unwrap(), b.func);
-                let op = b.ins().iconst(types::I32, i64::from(*operation));
-                let null = b.ins().iconst(types::I64, 0);
-                let mut args = vec![op, fault_context.unwrap()];
-                let arity = match operation {
-                    1 => 2,
-                    4 => 1,
-                    _ => 3,
-                };
-                for position in 0..arity {
-                    let storage = slot(&mut b, 24);
-                    let address = b.ins().stack_addr(types::I64, storage, 0);
-                    let start = position * 3;
-                    b.ins()
-                        .store(MemFlags::new(), parameters[start], address, 0);
-                    b.ins()
-                        .store(MemFlags::new(), parameters[start + 1], address, 8);
-                    b.ins()
-                        .store(MemFlags::new(), parameters[start + 2], address, 12);
-                    let writable = *operation == 4 || *operation != 3 && position == arity - 1;
-                    let kind = b.ins().iconst(types::I64, if writable { 0 } else { 1 });
-                    b.ins().store(MemFlags::new(), kind, address, 16);
-                    args.push(address);
-                }
-                while args.len() < 5 {
-                    args.push(null);
-                }
-                args.push(output);
-                let call = b.ins().call(service, &args);
-                let status = b.inst_results(call)[0];
-                let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
-                let mut site = diagnostic_data.as_ref().unwrap().site(
-                    module,
-                    &mut b,
-                    fault_context.unwrap(),
-                    i,
-                    0,
-                );
-                site.capture_frame = false;
-                return_if_detailed(&mut b, failed, status, Some(&site));
-                let zero = b.ins().iconst(types::I32, 0);
-                b.ins().return_(&[zero]);
-                b.seal_all_blocks();
-                b.finalize();
-                finish_value_body(
-                    module,
-                    ids[i],
-                    &mut context,
-                    root_probes.as_ref(),
-                    probe_frame,
-                    mutation_frame_ready,
-                    if live_stores {
-                        Some(&mut live_bodies)
-                    } else {
-                        None
-                    },
-                    stack_budget,
-                    long_range_calls,
-                )?;
-                continue;
-            }
-            if let Some(operation) = details.and_then(|d| d.tls.get(&i)) {
-                let destination = output;
-                let output = if live_stores {
-                    let scratch = slot(&mut b, 4);
-                    b.ins().stack_addr(types::I64, scratch, 0)
-                } else {
-                    output
-                };
-                let service = module.declare_func_in_func(tls_service.unwrap(), b.func);
-                let op = b.ins().iconst(types::I32, i64::from(*operation));
-                let null = b.ins().iconst(types::I64, 0);
-                let mut args = vec![op, fault_context.unwrap()];
-                let arity = match operation {
-                    2 => 4,
-                    4 | 5 => 1,
-                    6 => 5,
-                    _ => 3,
-                };
-                args.extend(parameters.iter().take(arity).copied());
-                while args.len() < 7 {
-                    args.push(null);
-                }
-                args.push(output);
-                let call = b.ins().call(service, &args);
-                let status = b.inst_results(call)[0];
-                let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
-                let mut site = diagnostic_data.as_ref().unwrap().site(
-                    module,
-                    &mut b,
-                    fault_context.unwrap(),
-                    i,
-                    0,
-                );
-                site.capture_frame = false;
-                return_if_detailed(&mut b, failed, status, Some(&site));
-                if live_stores {
-                    let result = b.ins().load(types::I32, MemFlags::new(), output, 0);
-                    write(&mut b, destination, &[result]);
-                }
-                let zero = b.ins().iconst(types::I32, 0);
-                b.ins().return_(&[zero]);
-                b.seal_all_blocks();
-                b.finalize();
-                finish_value_body(
-                    module,
-                    ids[i],
-                    &mut context,
-                    root_probes.as_ref(),
-                    probe_frame,
-                    mutation_frame_ready,
-                    if live_stores {
-                        Some(&mut live_bodies)
-                    } else {
-                        None
-                    },
-                    stack_budget,
-                    long_range_calls,
-                )?;
-                continue;
-            }
-            if let Some(service) = stream_services.get(&i) {
-                let service = module.declare_func_in_func(*service, b.func);
-                let mut call_args = vec![parameters[0]];
-                if details.unwrap().console_write_memory.contains(&i) {
-                    // Resolve a checked synchronous window. The provider neither
-                    // retains this pointer nor calls back into managed code.
-                    let storage = slot(&mut b, 24);
-                    let view = b.ins().stack_addr(types::I64, storage, 0);
-                    b.ins().store(MemFlags::new(), parameters[1], view, 0);
-                    b.ins().store(MemFlags::new(), parameters[2], view, 8);
-                    b.ins().store(MemFlags::new(), parameters[3], view, 12);
-                    let borrowed = input
-                        .type_definition(&input.functions[i].parameters[1])
-                        .is_some_and(|t| {
-                            t.memory_view == Some(neoclr::metadata::MemoryViewKind::ReadOnlySlice)
-                        });
-                    let kind = b.ins().iconst(types::I64, if borrowed { 1 } else { 3 });
-                    b.ins().store(MemFlags::new(), kind, view, 16);
-                    let storage = slot(&mut b, 24);
-                    let access = b.ins().stack_addr(types::I64, storage, 0);
-                    let readonly = b.ins().iconst(types::I32, 0);
-                    let check = module.declare_func_in_func(console_memory_access.unwrap(), b.func);
+                    let callback = module.declare_func_in_func(callback, b.func);
+                    let drain = module.declare_func_in_func(drain, b.func);
+                    let callback = b.ins().func_addr(types::I64, callback);
+                    let drain = b.ins().func_addr(types::I64, drain);
+                    let pump = module.declare_func_in_func(pump, b.func);
                     let call = b
                         .ins()
-                        .call(check, &[fault_context.unwrap(), view, readonly, access]);
+                        .call(pump, &[fault_context.unwrap(), callback, drain]);
                     let status = b.inst_results(call)[0];
                     let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
                     let mut site = diagnostic_data.as_ref().unwrap().site(
@@ -3677,15 +3375,195 @@ pub(crate) fn compile_into(
                     );
                     site.capture_frame = false;
                     return_if_detailed(&mut b, failed, status, Some(&site));
-                    let bytes = b.ins().load(types::I64, MemFlags::new(), access, 0);
-                    let count = b.ins().load(types::I32, MemFlags::new(), access, 16);
-                    let length = b.ins().uextend(types::I64, count);
                     let zero = b.ins().iconst(types::I32, 0);
-                    call_args.extend([bytes, length, zero, count]);
-                } else if details.unwrap().console_write_bytes.contains(&i) {
-                    let array = parameters[1];
-                    let null = b.ins().icmp_imm(IntCC::Equal, array, 0);
-                    let status = b.ins().iconst(types::I32, 3);
+                    b.ins().store(MemFlags::new(), zero, output, 0);
+                    b.ins().return_(&[zero]);
+                    b.seal_all_blocks();
+                    b.finalize();
+                    finish_value_body(
+                        module,
+                        ids[i],
+                        &mut context,
+                        root_probes.as_ref(),
+                        probe_frame,
+                        mutation_frame_ready,
+                        if live_stores {
+                            Some(&mut *live_bodies)
+                        } else {
+                            None
+                        },
+                        stack_budget,
+                        long_range_calls,
+                    )?;
+                    continue;
+                }
+                if details.is_some_and(|d| d.entry_task_drain.contains(&i)) {
+                    let d = details.unwrap();
+                    let ctx = fault_context.unwrap();
+                    let (begin, end, poll, callback, queue_read) = entry_drain_services.unwrap();
+                    let begin = module.declare_func_in_func(begin, b.func);
+                    let end = module.declare_func_in_func(end, b.func);
+                    let entry = b.ins().iconst(types::I32, root as i64);
+                    let run = b
+                        .ins()
+                        .iconst(types::I32, d.task_queue_run.map_or(-1, |i| i as i64));
+                    let drain = b
+                        .ins()
+                        .iconst(types::I32, d.task_queue_drain.map_or(-1, |i| i as i64));
+                    let storage = slot(&mut b, 16);
+                    let queue_output = b.ins().stack_addr(types::I64, storage, 0);
+                    let call = b.ins().call(begin, &[ctx, entry, run, drain, queue_output]);
+                    let status = b.inst_results(call)[0];
+                    let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                    let mut site = diagnostic_data
+                        .as_ref()
+                        .unwrap()
+                        .site(module, &mut b, ctx, i, 0);
+                    site.capture_frame = false;
+                    return_if_detailed(&mut b, failed, status, Some(&site));
+                    let done = b.create_block();
+                    b.append_block_param(done, types::I32);
+                    let zero = b.ins().iconst(types::I32, 0);
+                    let cycle = b.create_block();
+                    let poll_work = b.create_block();
+                    b.ins().jump(cycle, &[]);
+                    b.switch_to_block(cycle);
+                    if let Some(drain) = d.task_queue_drain {
+                        let reader = module.declare_func_in_func(queue_read, b.func);
+                        let call = b.ins().call(reader, &[ctx, queue_output]);
+                        let status = b.inst_results(call)[0];
+                        let loaded = b.create_block();
+                        let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                        b.ins().brif(failed, done, &[status.into()], loaded, &[]);
+                        b.switch_to_block(loaded);
+                        let queue = b.ins().load(types::I64, MemFlags::new(), queue_output, 0);
+                        let absent = b.ins().icmp_imm(IntCC::Equal, queue, 0);
+                        let work = b.create_block();
+                        b.ins().brif(absent, poll_work, &[], work, &[]);
+                        b.switch_to_block(work);
+                        // Ordinary managed Drain publishes its own frame; startup remains rooted.
+                        let result = b.ins().stack_addr(types::I64, storage, 8);
+                        let callee = module.declare_func_in_func(ids[drain], b.func);
+                        let call = b.ins().call(callee, &[queue, result, ctx]);
+                        let status = b.inst_results(call)[0];
+                        let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                        b.ins().brif(failed, done, &[status.into()], poll_work, &[]);
+                    } else {
+                        b.ins().jump(poll_work, &[]);
+                    }
+                    b.switch_to_block(poll_work);
+                    let poll = module.declare_func_in_func(poll, b.func);
+                    let required = b.ins().iconst(types::I32, i64::from(d.entry_host_io));
+                    let call = b.ins().call(poll, &[ctx, required, queue_output]);
+                    let ready = b.inst_results(call)[0];
+                    let pending = b.create_block();
+                    let idle = b.ins().icmp_imm(IntCC::Equal, ready, 0);
+                    b.ins().brif(idle, done, &[zero.into()], pending, &[]);
+                    b.switch_to_block(pending);
+                    let dispatch = b.create_block();
+                    let waiting = b.ins().icmp_imm(IntCC::Equal, ready, 2);
+                    b.ins().brif(waiting, cycle, &[], dispatch, &[]);
+                    b.switch_to_block(dispatch);
+                    let invoke = b.create_block();
+                    let fault = b.create_block();
+                    let available = b.ins().icmp_imm(IntCC::Equal, ready, 1);
+                    b.ins().brif(available, invoke, &[], fault, &[]);
+                    b.switch_to_block(fault);
+                    let error = b.ins().iconst(types::I32, 3);
+                    site.record(&mut b, error);
+                    b.ins().jump(done, &[error.into()]);
+                    b.switch_to_block(invoke);
+                    let handle = b.ins().load(types::I64, MemFlags::new(), queue_output, 0);
+                    let callback = module.declare_func_in_func(callback, b.func);
+                    let call = b.ins().call(callback, &[handle, ctx]);
+                    let status = b.inst_results(call)[0];
+                    let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                    b.ins().brif(failed, done, &[status.into()], cycle, &[]);
+                    b.switch_to_block(done);
+                    let status = b.block_params(done)[0];
+                    b.ins().call(end, &[ctx]);
+                    let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                    return_if_detailed(&mut b, failed, status, None);
+                    b.ins().store(MemFlags::new(), zero, output, 0);
+                    b.ins().return_(&[zero]);
+                    b.seal_all_blocks();
+                    b.finalize();
+                    finish_value_body(
+                        module,
+                        ids[i],
+                        &mut context,
+                        root_probes.as_ref(),
+                        probe_frame,
+                        mutation_frame_ready,
+                        if live_stores {
+                            Some(&mut *live_bodies)
+                        } else {
+                            None
+                        },
+                        stack_budget,
+                        long_range_calls,
+                    )?;
+                    continue;
+                }
+                if let Some(service) = socket_services.get(&i) {
+                    let destination = output;
+                    let output = if live_stores {
+                        let bytes = p.results[i].as_ref().map_or(8, |ty| p.bytes(ty));
+                        let scratch = slot(&mut b, bytes);
+                        b.ins().stack_addr(types::I64, scratch, 0)
+                    } else {
+                        output
+                    };
+                    let service = module.declare_func_in_func(*service, b.func);
+                    let argument_lanes: usize = p.args[i].iter().map(|t| lanes(&p, t).len()).sum();
+                    let mut args = parameters[..argument_lanes].to_vec();
+                    args.push(fault_context.unwrap());
+                    if details.unwrap().task_queue_current.contains(&i) {
+                        let run = b.ins().iconst(
+                            types::I32,
+                            details.unwrap().task_queue_run.map_or(-1, |i| i as i64),
+                        );
+                        let drain = b.ins().iconst(
+                            types::I32,
+                            details.unwrap().task_queue_drain.map_or(-1, |i| i as i64),
+                        );
+                        args.extend([run, drain]);
+                    }
+                    args.push(output);
+                    if details.unwrap().stack_trace_capture.contains(&i) {
+                        // Unlike interpreter intrinsics, the native service wrapper publishes
+                        // its own probe frame. Hide it without changing managed skip semantics.
+                        // Preserve negative input for validation and saturate at Int32::MAX.
+                        let valid = b
+                            .ins()
+                            .icmp_imm(IntCC::SignedGreaterThanOrEqual, args[0], 0);
+                        let bounded =
+                            b.ins()
+                                .icmp_imm(IntCC::SignedLessThan, args[0], i32::MAX as i64);
+                        let increment = b.ins().band(valid, bounded);
+                        let next = b.ins().iadd_imm(args[0], 1);
+                        args[0] = b.ins().select(increment, next, args[0]);
+                        args.extend(
+                            diagnostic_data
+                                .as_ref()
+                                .unwrap()
+                                .stack_names(module, &mut b),
+                        );
+                    }
+                    if details.unwrap().runtime_async_start.contains(&i)
+                        || details.unwrap().runtime_async_startmanaged.contains(&i)
+                    {
+                        let callback =
+                            module.declare_func_in_func(runtime_async_callbacks.unwrap().0, b.func);
+                        args.push(b.ins().func_addr(types::I64, callback));
+                    }
+                    let call = b.ins().call(service, &args);
+                    let raw = b.inst_results(call)[0];
+                    let failed = b.ins().icmp_imm(IntCC::NotEqual, raw, 0);
+                    let exhausted = b.ins().icmp_imm(IntCC::Equal, raw, 5);
+                    let memory = b.ins().iconst(types::I32, 5);
+                    let runtime = b.ins().iconst(types::I32, 3);
+                    let status = b.ins().select(exhausted, memory, runtime);
                     let mut site = diagnostic_data.as_ref().unwrap().site(
                         module,
                         &mut b,
@@ -3694,1544 +3572,1868 @@ pub(crate) fn compile_into(
                         0,
                     );
                     site.capture_frame = false;
-                    return_if_detailed(&mut b, null, status, Some(&site));
-                    if let Some(check) = initialized_service {
-                        let check = module.declare_func_in_func(check, b.func);
-                        let call = b.ins().call(check, &[array, parameters[2], parameters[3]]);
-                        let status = b.inst_results(call)[0];
-                        let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
-                        return_if_detailed(&mut b, failed, status, Some(&site));
+                    return_if_detailed(&mut b, failed, status, Some(&site));
+                    if live_stores && let Some(ty) = &p.results[i] {
+                        let result = read(&mut b, &p, ty, output);
+                        write(&mut b, destination, &result);
                     }
-                    let bytes = b.ins().iadd_imm(array, 16);
-                    let length = b.ins().load(types::I64, MemFlags::new(), array, 8);
-                    call_args.extend([bytes, length, parameters[2], parameters[3]]);
-                }
-                let call = b.ins().call(service, &call_args);
-                let raw = b.inst_results(call)[0];
-                let negative = b.ins().icmp_imm(IntCC::SignedLessThan, raw, 0);
-                let oversized = if details.unwrap().console_write_bytes.contains(&i) {
-                    b.ins().icmp(IntCC::SignedGreaterThan, raw, parameters[3])
-                } else {
-                    b.ins().icmp_imm(IntCC::NotEqual, raw, 0)
-                };
-                let failed = b.ins().bor(negative, oversized);
-                let byte_tag = b.ins().iconst(types::I32, 2);
-                let int_tag = b.ins().iconst(types::I32, 1);
-                let tag = b.ins().select(failed, byte_tag, int_tag);
-                let mut code = b.ins().iconst(types::I32, 10);
-                if details.unwrap().console_write_bytes.contains(&i) {
-                    for status in [7, 8] {
-                        let matches = b.ins().icmp_imm(IntCC::Equal, raw, -status);
-                        let value = b.ins().iconst(types::I32, status);
-                        code = b.ins().select(matches, value, code);
-                    }
-                }
-                let payload = b.ins().select(failed, code, raw);
-                let payload = b.ins().uextend(types::I64, payload);
-                write(&mut b, output, &[tag, payload]);
-                let zero = b.ins().iconst(types::I32, 0);
-                b.ins().return_(&[zero]);
-                b.seal_all_blocks();
-                b.finalize();
-                finish_value_body(
-                    module,
-                    ids[i],
-                    &mut context,
-                    root_probes.as_ref(),
-                    probe_frame,
-                    mutation_frame_ready,
-                    if live_stores {
-                        Some(&mut live_bodies)
-                    } else {
-                        None
-                    },
-                    stack_budget,
-                    long_range_calls,
-                )?;
-                continue;
-            }
-            if let Some((_, kind)) =
-                details.and_then(|d| d.console_terminal.iter().find(|(index, _)| *index == i))
-            {
-                let service = module.declare_func_in_func(terminal_services[*kind], b.func);
-                let mut args = vec![fault_context.unwrap()];
-                for parameter in parameters.iter().take(f.parameters.len()) {
-                    let value = if b.func.dfg.value_type(*parameter) == types::I32 {
-                        *parameter
-                    } else {
-                        b.ins().uextend(types::I32, *parameter)
-                    };
-                    args.push(value);
-                }
-                let call = b.ins().call(service, &args);
-                let value = b.inst_results(call)[0];
-                write(&mut b, output, &[value]);
-                let zero = b.ins().iconst(types::I32, 0);
-                b.ins().return_(&[zero]);
-                b.seal_all_blocks();
-                b.finalize();
-                finish_value_body(
-                    module,
-                    ids[i],
-                    &mut context,
-                    root_probes.as_ref(),
-                    probe_frame,
-                    mutation_frame_ready,
-                    if live_stores {
-                        Some(&mut live_bodies)
-                    } else {
-                        None
-                    },
-                    stack_budget,
-                    long_range_calls,
-                )?;
-                continue;
-            }
-            if details.is_some_and(|d| d.console_read_byte.contains(&i)) {
-                let service = module.declare_func_in_func(input_service.unwrap(), b.func);
-                let call = b.ins().call(service, &[]);
-                let value = b.inst_results(call)[0];
-                let byte = b.ins().icmp_imm(IntCC::UnsignedLessThan, value, 256);
-                let eof = b.ins().icmp_imm(IntCC::Equal, value, -1);
-                let unavailable = b.ins().icmp_imm(IntCC::Equal, value, -2);
-                let failed = b.ins().icmp_imm(IntCC::Equal, value, -3);
-                let zero = b.ins().iconst(types::I32, 0);
-                let one = b.ins().iconst(types::I32, 1);
-                let two = b.ins().iconst(types::I32, 2);
-                let tag = b.ins().select(eof, zero, one);
-                let tag = b.ins().select(byte, two, tag);
-                let error = b.ins().select(failed, two, zero);
-                let error = b.ins().select(unavailable, one, error);
-                let payload = b.ins().select(byte, value, error);
-                let payload = b.ins().uextend(types::I64, payload);
-                write(&mut b, output, &[tag, payload]);
-                b.ins().return_(&[zero]);
-                b.seal_all_blocks();
-                b.finalize();
-                finish_value_body(
-                    module,
-                    ids[i],
-                    &mut context,
-                    root_probes.as_ref(),
-                    probe_frame,
-                    mutation_frame_ready,
-                    if live_stores {
-                        Some(&mut live_bodies)
-                    } else {
-                        None
-                    },
-                    stack_budget,
-                    long_range_calls,
-                )?;
-                continue;
-            }
-            if details.is_some_and(|d| d.console_write_line.contains(&i)) {
-                let service = module.declare_func_in_func(output_service.unwrap(), b.func);
-                // Preserve the interpreter's invalid-native-argument RuntimeError
-                // for default/null String instead of dereferencing address zero.
-                let null = b.ins().icmp_imm(IntCC::Equal, parameters[0], 0);
-                let null_status = b.ins().iconst(types::I32, 3);
-                let mut null_site = diagnostic_data.as_ref().unwrap().site(
-                    module,
-                    &mut b,
-                    fault_context.unwrap(),
-                    i,
-                    0,
-                );
-                null_site.capture_frame = false;
-                return_if_detailed(&mut b, null, null_status, Some(&null_site));
-                let length = b.ins().load(types::I64, MemFlags::new(), parameters[0], 0);
-                let bytes = b.ins().iadd_imm(parameters[0], 8);
-                let call = b.ins().call(service, &[bytes, length]);
-                let result = b.inst_results(call)[0];
-                let failed = b.ins().icmp_imm(IntCC::NotEqual, result, 0);
-                let status = b.ins().iconst(types::I32, 3); // RuntimeError, same as interpreter
-                let mut site = diagnostic_data.as_ref().unwrap().site(
-                    module,
-                    &mut b,
-                    fault_context.unwrap(),
-                    i,
-                    0,
-                );
-                site.capture_frame = false; // InternalCall has no managed frame
-                return_if_detailed(&mut b, failed, status, Some(&site));
-                let zero = b.ins().iconst(types::I32, 0);
-                if !f.no_result {
-                    write(&mut b, output, &[zero]);
-                }
-                b.ins().return_(&[zero]);
-                b.seal_all_blocks();
-                b.finalize();
-                finish_value_body(
-                    module,
-                    ids[i],
-                    &mut context,
-                    root_probes.as_ref(),
-                    probe_frame,
-                    mutation_frame_ready,
-                    if live_stores {
-                        Some(&mut live_bodies)
-                    } else {
-                        None
-                    },
-                    stack_budget,
-                    long_range_calls,
-                )?;
-                continue;
-            }
-            if details.is_some_and(|d| d.char_from_string.contains(&i) || d.char_text.contains(&i))
-            {
-                let pointer = parameters[0];
-                let mut site = diagnostic_data.as_ref().unwrap().site(
-                    module,
-                    &mut b,
-                    fault_context.unwrap(),
-                    i,
-                    0,
-                );
-                site.capture_frame = false;
-                let status = b.ins().iconst(types::I32, 3);
-                let null = b.ins().icmp_imm(IntCC::Equal, pointer, 0);
-                return_if_detailed(&mut b, null, status, Some(&site));
-                if details.unwrap().char_from_string.contains(&i) {
-                    let length = b.ins().load(types::I64, MemFlags::new(), pointer, 0);
-                    let bytes = b.ins().iadd_imm(pointer, 8);
-                    let service = module.declare_func_in_func(character_service.unwrap(), b.func);
-                    let call = b.ins().call(service, &[bytes, length]);
-                    let valid = b.inst_results(call)[0];
-                    let invalid = b.ins().icmp_imm(IntCC::NotEqual, valid, 1);
-                    return_if_detailed(&mut b, invalid, status, Some(&site));
-                }
-                let pointer = if details.unwrap().char_text.contains(&i) {
-                    if let Some(binding) = text_copy {
-                        copy_text(
-                            module,
-                            &mut b,
-                            binding,
-                            pointer,
-                            fault_context.unwrap(),
-                            Some(&site),
-                        )
-                    } else {
-                        pointer
-                    }
-                } else {
-                    pointer
-                };
-                write(&mut b, output, &[pointer]);
-                let zero = b.ins().iconst(types::I32, 0);
-                b.ins().return_(&[zero]);
-                b.seal_all_blocks();
-                b.finalize();
-                finish_value_body(
-                    module,
-                    ids[i],
-                    &mut context,
-                    root_probes.as_ref(),
-                    probe_frame,
-                    mutation_frame_ready,
-                    if live_stores {
-                        Some(&mut live_bodies)
-                    } else {
-                        None
-                    },
-                    stack_budget,
-                    long_range_calls,
-                )?;
-                continue;
-            }
-            if details.is_some_and(|d| d.native_integer_to64.contains(&i)) {
-                write(&mut b, output, &[parameters[0]]);
-                let zero = b.ins().iconst(types::I32, 0);
-                b.ins().return_(&[zero]);
-                b.seal_all_blocks();
-                b.finalize();
-                finish_value_body(
-                    module,
-                    ids[i],
-                    &mut context,
-                    root_probes.as_ref(),
-                    probe_frame,
-                    mutation_frame_ready,
-                    if live_stores {
-                        Some(&mut live_bodies)
-                    } else {
-                        None
-                    },
-                    stack_budget,
-                    long_range_calls,
-                )?;
-                continue;
-            }
-            if let Some(service) = utf8_services.get(&i) {
-                // Native helpers must not write directly through an arbitrary
-                // managed result alias while the marker reads old payloads.
-                let destination = output;
-                let output = if live_stores {
-                    let ty = p.results[i].as_ref().ok_or("missing native text result")?;
-                    let scratch = slot(&mut b, p.bytes(ty));
-                    b.ins().stack_addr(types::I64, scratch, 0)
-                } else {
-                    output
-                };
-                let service = module.declare_func_in_func(*service, b.func);
-                let args = if details.unwrap().utf8_decode_slice.contains(&i) {
-                    vec![
-                        fault_context.unwrap(),
-                        parameters[0],
-                        parameters[1],
-                        parameters[2],
-                        output,
-                    ]
-                } else if details.unwrap().file_input.contains(&i) {
-                    let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
-                    vec![parameters[0], parameters[1], arena, output]
-                } else if details.unwrap().file_output.contains(&i) {
-                    vec![parameters[0], parameters[1], parameters[2], output]
-                } else if details.unwrap().string_join_parts.contains(&i) {
-                    let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
-                    vec![
-                        parameters[0],
-                        parameters[1],
-                        parameters[2],
-                        parameters[3],
-                        arena,
-                        output,
-                    ]
-                } else if details.unwrap().string_slice_graphemes.contains(&i)
-                    || details.unwrap().string_slice_utf8.contains(&i)
-                    || details.unwrap().string_replace_ordinal.contains(&i)
-                {
-                    let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
-                    vec![parameters[0], parameters[1], parameters[2], arena, output]
-                } else if details.unwrap().system_culture.contains(&i)
-                    || details.unwrap().time_zone_version.contains(&i)
-                {
-                    let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
-                    vec![arena, output]
-                } else if details.unwrap().string_grapheme_at.contains(&i)
-                    || details.unwrap().string_replace_line_endings.contains(&i)
-                    || details.unwrap().string_concat.contains(&i)
-                    || details.unwrap().path_combine.contains(&i)
-                {
-                    let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
-                    vec![parameters[0], parameters[1], arena, output]
-                } else if details.unwrap().string_graphemes.contains(&i)
-                    || details.unwrap().string_scalars.contains(&i)
-                    || details.unwrap().string_from_chars.contains(&i)
-                    || details.unwrap().string_upper.contains(&i)
-                    || details.unwrap().string_lower.contains(&i)
-                    || details.unwrap().string_intern.contains(&i)
-                    || details.unwrap().utf8_encode.contains(&i)
-                    || details.unwrap().utf8_decode.contains(&i)
-                    || details.unwrap().path_file_name.contains(&i)
-                    || details.unwrap().environment_platform.contains(&i)
-                {
-                    let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
-                    vec![parameters[0], arena, output]
-                } else if details.unwrap().time_zone_offset.contains(&i)
-                    || details.unwrap().string_compare_canonical.contains(&i)
-                    || details.unwrap().string_compare_ignore_case.contains(&i)
-                    || details.unwrap().string_compare_ordinal.contains(&i)
-                    || details.unwrap().string_contains_canonical.contains(&i)
-                    || details.unwrap().string_starts_with_canonical.contains(&i)
-                    || details.unwrap().string_ends_with_canonical.contains(&i)
-                    || details.unwrap().string_contains_ignore_case.contains(&i)
-                    || details.unwrap().string_starts_with_ignore_case.contains(&i)
-                    || details.unwrap().string_ends_with_ignore_case.contains(&i)
-                    || details.unwrap().string_contains_ordinal.contains(&i)
-                    || details.unwrap().string_starts_with_ordinal.contains(&i)
-                    || details.unwrap().string_ends_with_ordinal.contains(&i)
-                {
-                    vec![parameters[0], parameters[1], output]
-                } else {
-                    vec![parameters[0], output]
-                };
-                let call = b.ins().call(service, &args);
-                let raw = b.inst_results(call)[0];
-                let exhausted = b.ins().icmp_imm(IntCC::Equal, raw, 5);
-                let memory = b.ins().iconst(types::I32, 5);
-                let runtime = b.ins().iconst(types::I32, 3);
-                let status = b.ins().select(exhausted, memory, runtime);
-                let status = if details.unwrap().utf8_encode.contains(&i)
-                    || details.unwrap().string_graphemes.contains(&i)
-                    || details.unwrap().string_scalars.contains(&i)
-                {
-                    let limited = b.ins().icmp_imm(IntCC::Equal, raw, 7);
-                    let array_limit = b.ins().iconst(types::I32, 7);
-                    b.ins().select(limited, array_limit, status)
-                } else {
-                    status
-                };
-                let status = if details.unwrap().string_grapheme_at.contains(&i)
-                    || details.unwrap().string_slice_graphemes.contains(&i)
-                {
-                    let bounded = b.ins().icmp_imm(IntCC::Equal, raw, 8);
-                    let index = b.ins().iconst(types::I32, 8);
-                    b.ins().select(bounded, index, status)
-                } else if details.unwrap().string_intern.contains(&i) {
-                    let limited = b.ins().icmp_imm(IntCC::Equal, raw, 10);
-                    let intern = b.ins().iconst(types::I32, 10);
-                    b.ins().select(limited, intern, status)
-                } else {
-                    status
-                };
-                let failed = b.ins().icmp_imm(IntCC::NotEqual, raw, 0);
-                let mut site = diagnostic_data.as_ref().unwrap().site(
-                    module,
-                    &mut b,
-                    fault_context.unwrap(),
-                    i,
-                    0,
-                );
-                site.capture_frame = false;
-                return_if_detailed(&mut b, failed, status, Some(&site));
-                if live_stores {
-                    let ty = p.results[i].as_ref().ok_or("missing native text result")?;
-                    let result = read(&mut b, &p, ty, output);
-                    write(&mut b, destination, &result);
-                }
-                if let Some(ty) = &p.results[i] {
-                    // The legacy helper produces an immutable value snapshot. A native
-                    // Byte[] result owns this fresh allocation as an ordinary array.
-                    if *ty == Ty::ByteArray && details.unwrap().utf8_encode.contains(&i) {
-                        let array = b.ins().load(types::I64, MemFlags::new(), output, 0);
-                        let kind = b.ins().iconst(types::I64, 0x80000001);
-                        b.ins().store(MemFlags::new(), kind, array, 0);
-                    }
-                    if p.backing_for_array(ty).is_some() {
+                    if let Some(ty @ Ty::StringArray) = &p.results[i] {
                         let array = b.ins().load(types::I64, MemFlags::new(), output, 0);
                         tag_array(&mut b, &p, ty, array);
                     }
-                }
-                let zero = b.ins().iconst(types::I32, 0);
-                b.ins().return_(&[zero]);
-                b.seal_all_blocks();
-                b.finalize();
-                finish_value_body(
-                    module,
-                    ids[i],
-                    &mut context,
-                    root_probes.as_ref(),
-                    probe_frame,
-                    mutation_frame_ready,
-                    if live_stores {
-                        Some(&mut live_bodies)
-                    } else {
-                        None
-                    },
-                    stack_budget,
-                    long_range_calls,
-                )?;
-                continue;
-            }
-            if details.is_some_and(|d| d.int32_to_string.contains(&i))
-                || wide_format_services.contains_key(&i)
-                || float_format_services.contains_key(&i)
-            {
-                let destination = output;
-                let output = if live_stores {
-                    let scratch = slot(&mut b, 8);
-                    b.ins().stack_addr(types::I64, scratch, 0)
-                } else {
-                    output
-                };
-                let service = module.declare_func_in_func(
-                    float_format_services
-                        .get(&i)
-                        .or_else(|| wide_format_services.get(&i))
-                        .copied()
-                        .or(format_service)
-                        .unwrap(),
-                    b.func,
-                );
-                let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
-                let args = if float_format_services.contains_key(&i) {
-                    let swedish = parameters[3];
-                    vec![
-                        parameters[0],
-                        parameters[1],
-                        parameters[2],
-                        swedish,
-                        arena,
-                        output,
-                    ]
-                } else {
-                    vec![parameters[0], arena, output]
-                };
-                let call = b.ins().call(service, &args);
-                let raw = b.inst_results(call)[0];
-                // Only success and resource exhaustion are service outcomes. Other
-                // failures become RuntimeError; adapters cannot manufacture UserFault.
-                let exhausted = b.ins().icmp_imm(IntCC::Equal, raw, 5);
-                let memory = b.ins().iconst(types::I32, 5);
-                let runtime = b.ins().iconst(types::I32, 3);
-                let status = b.ins().select(exhausted, memory, runtime);
-                let failed = b.ins().icmp_imm(IntCC::NotEqual, raw, 0);
-                let mut site = diagnostic_data.as_ref().unwrap().site(
-                    module,
-                    &mut b,
-                    fault_context.unwrap(),
-                    i,
-                    0,
-                );
-                site.capture_frame = false;
-                return_if_detailed(&mut b, failed, status, Some(&site));
-                if live_stores {
-                    let result = b.ins().load(types::I64, MemFlags::new(), output, 0);
-                    write(&mut b, destination, &[result]);
-                }
-                let zero = b.ins().iconst(types::I32, 0);
-                b.ins().return_(&[zero]);
-                b.seal_all_blocks();
-                b.finalize();
-                finish_value_body(
-                    module,
-                    ids[i],
-                    &mut context,
-                    root_probes.as_ref(),
-                    probe_frame,
-                    mutation_frame_ready,
-                    if live_stores {
-                        Some(&mut live_bodies)
-                    } else {
-                        None
-                    },
-                    stack_budget,
-                    long_range_calls,
-                )?;
-                continue;
-            }
-            let call_result_bytes = p.call_result_bytes();
-            let mut frame_bytes = call_result_bytes as usize;
-            let mut arguments = vec![];
-            let mut stable_byrefs = vec![];
-            let mut at = 0;
-            let preserve_byrefs = live_stores && stack_policy.preserve_byrefs;
-            for (argument_index, t) in p.args[i].iter().enumerate() {
-                let stable = preserve_byrefs
-                    && matches!(t, Ty::Address(_))
-                    && immutable_argument_binding(&f.body, argument_index);
-                stable_byrefs.push(stable.then(|| parameters[at]));
-                let s = slot(&mut b, p.bytes(t));
-                frame_bytes += p.bytes(t) as usize + 7;
-                let address = b.ins().stack_addr(types::I64, s, 0);
-                write_typed(&mut b, &p, t, address, &parameters[at..at + p.lanes(t)]);
-                arguments.push(s);
-                at += p.lanes(t);
-            }
-            let locals: Vec<_> = p.locals[i]
-                .iter()
-                .map(|t| {
-                    frame_bytes += p.bytes(t) as usize + 7;
-                    slot(&mut b, p.bytes(t))
-                })
-                .collect();
-            for (ty, local) in p.locals[i].iter().zip(&locals) {
-                // Keep not-yet-assigned reference storage safe for future root
-                // registration. The verifier still rejects guest reads before assignment.
-                // This includes ByteValues' existing internal unassigned marker.
-                for lane in gc_layout::seed_lanes(&p, ty) {
-                    let zero = b.ins().iconst(types::I64, 0);
-                    b.ins().stack_store(zero, *local, (lane * 8) as i32);
-                }
-            }
-            // Size scratch for the selected layouts (up to sixty-four lanes); snapshots are read
-            // immediately after each successful call, before this storage can be reused.
-            let call_result = slot(&mut b, call_result_bytes);
-            let mut constructors = std::collections::HashMap::new();
-            for (pc, op) in f.body.iter().enumerate() {
-                if let Op::Construct(target) = op {
-                    let bytes = p.bytes(&p.ty(target.owner.as_ref().unwrap())?);
-                    frame_bytes += bytes as usize + 7;
-                    constructors.insert(pc, slot(&mut b, bytes));
-                }
-            }
-            let root_spill = root_probes
-                .as_ref()
-                .and_then(|probes| probes.storage_bytes(i))
-                .map(|bytes| {
-                    frame_bytes += bytes as usize + 7;
-                    slot(&mut b, bytes)
-                });
-            let storage_table = root_probes.as_ref().map(|probes| {
-                let bytes = probes.table_bytes(i);
-                frame_bytes += probes.frame_bytes() as usize + 7 + bytes as usize + 7;
-                probe_frame = Some(slot(&mut b, probes.frame_bytes()));
-                slot(&mut b, bytes)
-            });
-            let transient_table = root_probes
-                .as_ref()
-                .and_then(|probes| probes.transient_bytes(i))
-                .map(|bytes| {
-                    frame_bytes += bytes as usize + 7;
-                    slot(&mut b, bytes)
-                });
-            if frame_bytes > 65536 {
-                return Err("value profile frame storage exceeds 64 KiB".into());
-            }
-            if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
-                mutation_frame_ready = Some(probes.enter(
-                    module,
-                    &mut b,
-                    frame,
-                    fault_context.unwrap(),
-                    i,
-                    storage_table.unwrap(),
-                    &arguments,
-                    &locals,
-                ));
-                emit_stack_check(
-                    module,
-                    &mut b,
-                    stack_check,
-                    diagnostic_data.as_ref(),
-                    fault_context.unwrap(),
-                    i,
-                    true,
-                );
-            }
-            if let Some(guard) = crate::type_initialization::entry_owner(input, f)
-                .and_then(|owner| owner.definition_name())
-                .and_then(|name| initialization_guards.get(name))
-            {
-                if let (Some(probes), Some(spill)) = (&root_probes, root_spill) {
-                    probes.emit(module, &mut b, i, 0, spill, probe_frame.unwrap(), &[]);
-                }
-                let callee = module.declare_func_in_func(*guard, b.func);
-                let call = b.ins().call(callee, &[fault_context.unwrap()]);
-                let status = b.inst_results(call)[0];
-                let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
-                let site = diagnostic_data
-                    .as_ref()
-                    .map(|d| d.site(module, &mut b, fault_context.unwrap(), i, 0));
-                return_if_detailed(&mut b, failed, status, site.as_ref());
-            }
-            let blocks: Vec<_> = f.body.iter().map(|_| b.create_block()).collect();
-            for (pc, stack) in flows[i].iter().enumerate() {
-                if let Some(stack) = stack {
-                    for t in stack {
-                        for lane in lanes(&p, t) {
-                            b.append_block_param(blocks[pc], lane);
-                        }
-                    }
-                }
-            }
-            b.ins().jump(blocks[0], &[]);
-            for (pc, op) in f.body.iter().enumerate() {
-                let Some(shape) = &flows[i][pc] else {
+                    let zero = b.ins().iconst(types::I32, 0);
+                    b.ins().return_(&[zero]);
+                    b.seal_all_blocks();
+                    b.finalize();
+                    finish_value_body(
+                        module,
+                        ids[i],
+                        &mut context,
+                        root_probes.as_ref(),
+                        probe_frame,
+                        mutation_frame_ready,
+                        if live_stores {
+                            Some(&mut *live_bodies)
+                        } else {
+                            None
+                        },
+                        stack_budget,
+                        long_range_calls,
+                    )?;
                     continue;
-                };
-                b.switch_to_block(blocks[pc]);
-                let mut stack = b.block_params(blocks[pc]).to_vec();
-                let top = || shape.last().unwrap();
-                let pop = |s: &mut Vec<ir::Value>| s.pop().expect("checked stack");
-                let mut site = diagnostic_data
-                    .as_ref()
-                    .map(|d| d.site(module, &mut b, fault_context.unwrap(), i, pc));
-                if let Some(&adapter_pc) =
-                    details.and_then(|d| d.reflection_array_sites.get(&(i, pc)))
-                    && let Some(site) = site.as_mut()
-                {
-                    site.remap_instruction(adapter_pc);
                 }
-                if matches!(op, Op::Construct(_))
-                    && details.is_some_and(|d| d.reflection_construction.contains(&i))
-                {
-                    // The interpreter's checked construction adapter is newobj/ret.
-                    if let Some(site) = site.as_mut() {
-                        site.remap_instruction(0);
-                    }
-                }
-
-                if (!matches!(op, Op::StaticField { .. } | Op::SetStaticField { .. })
-                    || details.is_some_and(|d| d.native_worker_safepoints))
-                    && let (Some(probes), Some(spill)) = (&root_probes, root_spill)
-                {
-                    probes.emit(module, &mut b, i, pc, spill, probe_frame.unwrap(), &stack);
-                }
-                if !initialization_guards.is_empty() {
-                    let initialization_owner = match op {
-                        Op::StaticField { owner, .. } | Op::SetStaticField { owner, .. } => {
-                            Some(owner)
-                        }
-                        Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target)
-                            if crate::selection::callable_invoke(target).is_none() =>
-                        {
-                            crate::type_initialization::entry_owner(
-                                input,
-                                &input.functions[p.callee(target)?],
-                            )
-                        }
-                        _ => None,
+                if let Some(operation) = details.and_then(|d| d.cryptography.get(&i)) {
+                    let service =
+                        module.declare_func_in_func(cryptography_service.unwrap(), b.func);
+                    let op = b.ins().iconst(types::I32, i64::from(*operation));
+                    let null = b.ins().iconst(types::I64, 0);
+                    let mut args = vec![op, fault_context.unwrap()];
+                    let arity = match operation {
+                        1 => 2,
+                        4 => 1,
+                        _ => 3,
                     };
-                    if let Some(guard) = initialization_owner
-                        .and_then(|owner| owner.definition_name())
-                        .and_then(|name| initialization_guards.get(name))
-                    {
-                        if matches!(op, Op::StaticField { .. } | Op::SetStaticField { .. })
-                            && let (Some(probes), Some(spill)) = (&root_probes, root_spill)
-                        {
-                            probes.emit(module, &mut b, i, pc, spill, probe_frame.unwrap(), &stack);
-                        }
-                        let callee = module.declare_func_in_func(*guard, b.func);
-                        let call = b.ins().call(callee, &[fault_context.unwrap()]);
+                    for position in 0..arity {
+                        let storage = slot(&mut b, 24);
+                        let address = b.ins().stack_addr(types::I64, storage, 0);
+                        let start = position * 3;
+                        b.ins()
+                            .store(MemFlags::new(), parameters[start], address, 0);
+                        b.ins()
+                            .store(MemFlags::new(), parameters[start + 1], address, 8);
+                        b.ins()
+                            .store(MemFlags::new(), parameters[start + 2], address, 12);
+                        let writable = *operation == 4 || *operation != 3 && position == arity - 1;
+                        let kind = b.ins().iconst(types::I64, if writable { 0 } else { 1 });
+                        b.ins().store(MemFlags::new(), kind, address, 16);
+                        args.push(address);
+                    }
+                    while args.len() < 5 {
+                        args.push(null);
+                    }
+                    args.push(output);
+                    let call = b.ins().call(service, &args);
+                    let status = b.inst_results(call)[0];
+                    let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                    let mut site = diagnostic_data.as_ref().unwrap().site(
+                        module,
+                        &mut b,
+                        fault_context.unwrap(),
+                        i,
+                        0,
+                    );
+                    site.capture_frame = false;
+                    return_if_detailed(&mut b, failed, status, Some(&site));
+                    let zero = b.ins().iconst(types::I32, 0);
+                    b.ins().return_(&[zero]);
+                    b.seal_all_blocks();
+                    b.finalize();
+                    finish_value_body(
+                        module,
+                        ids[i],
+                        &mut context,
+                        root_probes.as_ref(),
+                        probe_frame,
+                        mutation_frame_ready,
+                        if live_stores {
+                            Some(&mut *live_bodies)
+                        } else {
+                            None
+                        },
+                        stack_budget,
+                        long_range_calls,
+                    )?;
+                    continue;
+                }
+                if let Some(operation) = details.and_then(|d| d.tls.get(&i)) {
+                    let destination = output;
+                    let output = if live_stores {
+                        let scratch = slot(&mut b, 4);
+                        b.ins().stack_addr(types::I64, scratch, 0)
+                    } else {
+                        output
+                    };
+                    let service = module.declare_func_in_func(tls_service.unwrap(), b.func);
+                    let op = b.ins().iconst(types::I32, i64::from(*operation));
+                    let null = b.ins().iconst(types::I64, 0);
+                    let mut args = vec![op, fault_context.unwrap()];
+                    let arity = match operation {
+                        2 => 4,
+                        4 | 5 => 1,
+                        6 => 5,
+                        _ => 3,
+                    };
+                    args.extend(parameters.iter().take(arity).copied());
+                    while args.len() < 7 {
+                        args.push(null);
+                    }
+                    args.push(output);
+                    let call = b.ins().call(service, &args);
+                    let status = b.inst_results(call)[0];
+                    let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                    let mut site = diagnostic_data.as_ref().unwrap().site(
+                        module,
+                        &mut b,
+                        fault_context.unwrap(),
+                        i,
+                        0,
+                    );
+                    site.capture_frame = false;
+                    return_if_detailed(&mut b, failed, status, Some(&site));
+                    if live_stores {
+                        let result = b.ins().load(types::I32, MemFlags::new(), output, 0);
+                        write(&mut b, destination, &[result]);
+                    }
+                    let zero = b.ins().iconst(types::I32, 0);
+                    b.ins().return_(&[zero]);
+                    b.seal_all_blocks();
+                    b.finalize();
+                    finish_value_body(
+                        module,
+                        ids[i],
+                        &mut context,
+                        root_probes.as_ref(),
+                        probe_frame,
+                        mutation_frame_ready,
+                        if live_stores {
+                            Some(&mut *live_bodies)
+                        } else {
+                            None
+                        },
+                        stack_budget,
+                        long_range_calls,
+                    )?;
+                    continue;
+                }
+                if let Some(service) = stream_services.get(&i) {
+                    let service = module.declare_func_in_func(*service, b.func);
+                    let mut call_args = vec![parameters[0]];
+                    if details.unwrap().console_write_memory.contains(&i) {
+                        // Resolve a checked synchronous window. The provider neither
+                        // retains this pointer nor calls back into managed code.
+                        let storage = slot(&mut b, 24);
+                        let view = b.ins().stack_addr(types::I64, storage, 0);
+                        b.ins().store(MemFlags::new(), parameters[1], view, 0);
+                        b.ins().store(MemFlags::new(), parameters[2], view, 8);
+                        b.ins().store(MemFlags::new(), parameters[3], view, 12);
+                        let borrowed = input
+                            .type_definition(&input.functions[i].parameters[1])
+                            .is_some_and(|t| {
+                                t.memory_view
+                                    == Some(neoclr::metadata::MemoryViewKind::ReadOnlySlice)
+                            });
+                        let kind = b.ins().iconst(types::I64, if borrowed { 1 } else { 3 });
+                        b.ins().store(MemFlags::new(), kind, view, 16);
+                        let storage = slot(&mut b, 24);
+                        let access = b.ins().stack_addr(types::I64, storage, 0);
+                        let readonly = b.ins().iconst(types::I32, 0);
+                        let check =
+                            module.declare_func_in_func(console_memory_access.unwrap(), b.func);
+                        let call = b
+                            .ins()
+                            .call(check, &[fault_context.unwrap(), view, readonly, access]);
                         let status = b.inst_results(call)[0];
                         let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
-                        return_if_detailed(&mut b, failed, status, site.as_ref());
+                        let mut site = diagnostic_data.as_ref().unwrap().site(
+                            module,
+                            &mut b,
+                            fault_context.unwrap(),
+                            i,
+                            0,
+                        );
+                        site.capture_frame = false;
+                        return_if_detailed(&mut b, failed, status, Some(&site));
+                        let bytes = b.ins().load(types::I64, MemFlags::new(), access, 0);
+                        let count = b.ins().load(types::I32, MemFlags::new(), access, 16);
+                        let length = b.ins().uextend(types::I64, count);
+                        let zero = b.ins().iconst(types::I32, 0);
+                        call_args.extend([bytes, length, zero, count]);
+                    } else if details.unwrap().console_write_bytes.contains(&i) {
+                        let array = parameters[1];
+                        let null = b.ins().icmp_imm(IntCC::Equal, array, 0);
+                        let status = b.ins().iconst(types::I32, 3);
+                        let mut site = diagnostic_data.as_ref().unwrap().site(
+                            module,
+                            &mut b,
+                            fault_context.unwrap(),
+                            i,
+                            0,
+                        );
+                        site.capture_frame = false;
+                        return_if_detailed(&mut b, null, status, Some(&site));
+                        if let Some(check) = initialized_service {
+                            let check = module.declare_func_in_func(check, b.func);
+                            let call = b.ins().call(check, &[array, parameters[2], parameters[3]]);
+                            let status = b.inst_results(call)[0];
+                            let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                            return_if_detailed(&mut b, failed, status, Some(&site));
+                        }
+                        let bytes = b.ins().iadd_imm(array, 16);
+                        let length = b.ins().load(types::I64, MemFlags::new(), array, 8);
+                        call_args.extend([bytes, length, parameters[2], parameters[3]]);
                     }
-                }
-                match op {
-                    Op::Int(v) => stack.push(b.ins().iconst(types::I32, i64::from(*v))),
-                    Op::Int64(v) => stack.push(b.ins().iconst(types::I64, *v)),
-                    Op::Float32 { bits } => {
-                        stack.push(b.ins().f32const(ir::immediates::Ieee32::with_bits(*bits)))
+                    let call = b.ins().call(service, &call_args);
+                    let raw = b.inst_results(call)[0];
+                    let negative = b.ins().icmp_imm(IntCC::SignedLessThan, raw, 0);
+                    let oversized = if details.unwrap().console_write_bytes.contains(&i) {
+                        b.ins().icmp(IntCC::SignedGreaterThan, raw, parameters[3])
+                    } else {
+                        b.ins().icmp_imm(IntCC::NotEqual, raw, 0)
+                    };
+                    let failed = b.ins().bor(negative, oversized);
+                    let byte_tag = b.ins().iconst(types::I32, 2);
+                    let int_tag = b.ins().iconst(types::I32, 1);
+                    let tag = b.ins().select(failed, byte_tag, int_tag);
+                    let mut code = b.ins().iconst(types::I32, 10);
+                    if details.unwrap().console_write_bytes.contains(&i) {
+                        for status in [7, 8] {
+                            let matches = b.ins().icmp_imm(IntCC::Equal, raw, -status);
+                            let value = b.ins().iconst(types::I32, status);
+                            code = b.ins().select(matches, value, code);
+                        }
                     }
-                    Op::ConvertFloat32 | Op::ConvertFloat64 | Op::ConvertFloatUnsigned => {
-                        let value = pop(&mut stack);
-                        let target = if matches!(op, Op::ConvertFloat32) {
-                            types::F32
+                    let payload = b.ins().select(failed, code, raw);
+                    let payload = b.ins().uextend(types::I64, payload);
+                    write(&mut b, output, &[tag, payload]);
+                    let zero = b.ins().iconst(types::I32, 0);
+                    b.ins().return_(&[zero]);
+                    b.seal_all_blocks();
+                    b.finalize();
+                    finish_value_body(
+                        module,
+                        ids[i],
+                        &mut context,
+                        root_probes.as_ref(),
+                        probe_frame,
+                        mutation_frame_ready,
+                        if live_stores {
+                            Some(&mut *live_bodies)
                         } else {
-                            types::F64
+                            None
+                        },
+                        stack_budget,
+                        long_range_calls,
+                    )?;
+                    continue;
+                }
+                if let Some((_, kind)) =
+                    details.and_then(|d| d.console_terminal.iter().find(|(index, _)| *index == i))
+                {
+                    let service = module.declare_func_in_func(terminal_services[*kind], b.func);
+                    let mut args = vec![fault_context.unwrap()];
+                    for parameter in parameters.iter().take(f.parameters.len()) {
+                        let value = if b.func.dfg.value_type(*parameter) == types::I32 {
+                            *parameter
+                        } else {
+                            b.ins().uextend(types::I32, *parameter)
                         };
-                        let converted = match top() {
-                            Ty::Single if target == types::F64 => b.ins().fpromote(target, value),
-                            Ty::Double if target == types::F32 => b.ins().fdemote(target, value),
-                            Ty::Single | Ty::Double => value,
-                            _ if matches!(op, Op::ConvertFloatUnsigned) => {
-                                b.ins().fcvt_from_uint(target, value)
-                            }
-                            _ => b.ins().fcvt_from_sint(target, value),
-                        };
-                        stack.push(converted);
+                        args.push(value);
                     }
-                    Op::Float64 { bits } => {
-                        stack.push(b.ins().f64const(ir::immediates::Ieee64::with_bits(*bits)))
+                    let call = b.ins().call(service, &args);
+                    let value = b.inst_results(call)[0];
+                    write(&mut b, output, &[value]);
+                    let zero = b.ins().iconst(types::I32, 0);
+                    b.ins().return_(&[zero]);
+                    b.seal_all_blocks();
+                    b.finalize();
+                    finish_value_body(
+                        module,
+                        ids[i],
+                        &mut context,
+                        root_probes.as_ref(),
+                        probe_frame,
+                        mutation_frame_ready,
+                        if live_stores {
+                            Some(&mut *live_bodies)
+                        } else {
+                            None
+                        },
+                        stack_budget,
+                        long_range_calls,
+                    )?;
+                    continue;
+                }
+                if details.is_some_and(|d| d.console_read_byte.contains(&i)) {
+                    let service = module.declare_func_in_func(input_service.unwrap(), b.func);
+                    let call = b.ins().call(service, &[]);
+                    let value = b.inst_results(call)[0];
+                    let byte = b.ins().icmp_imm(IntCC::UnsignedLessThan, value, 256);
+                    let eof = b.ins().icmp_imm(IntCC::Equal, value, -1);
+                    let unavailable = b.ins().icmp_imm(IntCC::Equal, value, -2);
+                    let failed = b.ins().icmp_imm(IntCC::Equal, value, -3);
+                    let zero = b.ins().iconst(types::I32, 0);
+                    let one = b.ins().iconst(types::I32, 1);
+                    let two = b.ins().iconst(types::I32, 2);
+                    let tag = b.ins().select(eof, zero, one);
+                    let tag = b.ins().select(byte, two, tag);
+                    let error = b.ins().select(failed, two, zero);
+                    let error = b.ins().select(unavailable, one, error);
+                    let payload = b.ins().select(byte, value, error);
+                    let payload = b.ins().uextend(types::I64, payload);
+                    write(&mut b, output, &[tag, payload]);
+                    b.ins().return_(&[zero]);
+                    b.seal_all_blocks();
+                    b.finalize();
+                    finish_value_body(
+                        module,
+                        ids[i],
+                        &mut context,
+                        root_probes.as_ref(),
+                        probe_frame,
+                        mutation_frame_ready,
+                        if live_stores {
+                            Some(&mut *live_bodies)
+                        } else {
+                            None
+                        },
+                        stack_budget,
+                        long_range_calls,
+                    )?;
+                    continue;
+                }
+                if details.is_some_and(|d| d.console_write_line.contains(&i)) {
+                    let service = module.declare_func_in_func(output_service.unwrap(), b.func);
+                    // Preserve the interpreter's invalid-native-argument RuntimeError
+                    // for default/null String instead of dereferencing address zero.
+                    let null = b.ins().icmp_imm(IntCC::Equal, parameters[0], 0);
+                    let null_status = b.ins().iconst(types::I32, 3);
+                    let mut null_site = diagnostic_data.as_ref().unwrap().site(
+                        module,
+                        &mut b,
+                        fault_context.unwrap(),
+                        i,
+                        0,
+                    );
+                    null_site.capture_frame = false;
+                    return_if_detailed(&mut b, null, null_status, Some(&null_site));
+                    let length = b.ins().load(types::I64, MemFlags::new(), parameters[0], 0);
+                    let bytes = b.ins().iadd_imm(parameters[0], 8);
+                    let call = b.ins().call(service, &[bytes, length]);
+                    let result = b.inst_results(call)[0];
+                    let failed = b.ins().icmp_imm(IntCC::NotEqual, result, 0);
+                    let status = b.ins().iconst(types::I32, 3); // RuntimeError, same as interpreter
+                    let mut site = diagnostic_data.as_ref().unwrap().site(
+                        module,
+                        &mut b,
+                        fault_context.unwrap(),
+                        i,
+                        0,
+                    );
+                    site.capture_frame = false; // InternalCall has no managed frame
+                    return_if_detailed(&mut b, failed, status, Some(&site));
+                    let zero = b.ins().iconst(types::I32, 0);
+                    if !f.no_result {
+                        write(&mut b, output, &[zero]);
                     }
-                    Op::String(_) => {
-                        let data = module.declare_data_in_func(literals[&(i, pc)], b.func);
-                        let pointer = b.ins().global_value(types::I64, data);
+                    b.ins().return_(&[zero]);
+                    b.seal_all_blocks();
+                    b.finalize();
+                    finish_value_body(
+                        module,
+                        ids[i],
+                        &mut context,
+                        root_probes.as_ref(),
+                        probe_frame,
+                        mutation_frame_ready,
+                        if live_stores {
+                            Some(&mut *live_bodies)
+                        } else {
+                            None
+                        },
+                        stack_budget,
+                        long_range_calls,
+                    )?;
+                    continue;
+                }
+                if details
+                    .is_some_and(|d| d.char_from_string.contains(&i) || d.char_text.contains(&i))
+                {
+                    let pointer = parameters[0];
+                    let mut site = diagnostic_data.as_ref().unwrap().site(
+                        module,
+                        &mut b,
+                        fault_context.unwrap(),
+                        i,
+                        0,
+                    );
+                    site.capture_frame = false;
+                    let status = b.ins().iconst(types::I32, 3);
+                    let null = b.ins().icmp_imm(IntCC::Equal, pointer, 0);
+                    return_if_detailed(&mut b, null, status, Some(&site));
+                    if details.unwrap().char_from_string.contains(&i) {
+                        let length = b.ins().load(types::I64, MemFlags::new(), pointer, 0);
+                        let bytes = b.ins().iadd_imm(pointer, 8);
+                        let service =
+                            module.declare_func_in_func(character_service.unwrap(), b.func);
+                        let call = b.ins().call(service, &[bytes, length]);
+                        let valid = b.inst_results(call)[0];
+                        let invalid = b.ins().icmp_imm(IntCC::NotEqual, valid, 1);
+                        return_if_detailed(&mut b, invalid, status, Some(&site));
+                    }
+                    let pointer = if details.unwrap().char_text.contains(&i) {
                         if let Some(binding) = text_copy {
-                            let owned = copy_text(
+                            copy_text(
                                 module,
                                 &mut b,
                                 binding,
                                 pointer,
                                 fault_context.unwrap(),
-                                site.as_ref(),
-                            );
-                            stack.push(owned);
+                                Some(&site),
+                            )
                         } else {
-                            stack.push(pointer);
+                            pointer
+                        }
+                    } else {
+                        pointer
+                    };
+                    write(&mut b, output, &[pointer]);
+                    let zero = b.ins().iconst(types::I32, 0);
+                    b.ins().return_(&[zero]);
+                    b.seal_all_blocks();
+                    b.finalize();
+                    finish_value_body(
+                        module,
+                        ids[i],
+                        &mut context,
+                        root_probes.as_ref(),
+                        probe_frame,
+                        mutation_frame_ready,
+                        if live_stores {
+                            Some(&mut *live_bodies)
+                        } else {
+                            None
+                        },
+                        stack_budget,
+                        long_range_calls,
+                    )?;
+                    continue;
+                }
+                if details.is_some_and(|d| d.native_integer_to64.contains(&i)) {
+                    write(&mut b, output, &[parameters[0]]);
+                    let zero = b.ins().iconst(types::I32, 0);
+                    b.ins().return_(&[zero]);
+                    b.seal_all_blocks();
+                    b.finalize();
+                    finish_value_body(
+                        module,
+                        ids[i],
+                        &mut context,
+                        root_probes.as_ref(),
+                        probe_frame,
+                        mutation_frame_ready,
+                        if live_stores {
+                            Some(&mut *live_bodies)
+                        } else {
+                            None
+                        },
+                        stack_budget,
+                        long_range_calls,
+                    )?;
+                    continue;
+                }
+                if let Some(service) = utf8_services.get(&i) {
+                    // Native helpers must not write directly through an arbitrary
+                    // managed result alias while the marker reads old payloads.
+                    let destination = output;
+                    let output = if live_stores {
+                        let ty = p.results[i].as_ref().ok_or("missing native text result")?;
+                        let scratch = slot(&mut b, p.bytes(ty));
+                        b.ins().stack_addr(types::I64, scratch, 0)
+                    } else {
+                        output
+                    };
+                    let service = module.declare_func_in_func(*service, b.func);
+                    let args = if details.unwrap().utf8_decode_slice.contains(&i) {
+                        vec![
+                            fault_context.unwrap(),
+                            parameters[0],
+                            parameters[1],
+                            parameters[2],
+                            output,
+                        ]
+                    } else if details.unwrap().file_input.contains(&i) {
+                        let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
+                        vec![parameters[0], parameters[1], arena, output]
+                    } else if details.unwrap().file_output.contains(&i) {
+                        vec![parameters[0], parameters[1], parameters[2], output]
+                    } else if details.unwrap().string_join_parts.contains(&i) {
+                        let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
+                        vec![
+                            parameters[0],
+                            parameters[1],
+                            parameters[2],
+                            parameters[3],
+                            arena,
+                            output,
+                        ]
+                    } else if details.unwrap().string_slice_graphemes.contains(&i)
+                        || details.unwrap().string_slice_utf8.contains(&i)
+                        || details.unwrap().string_replace_ordinal.contains(&i)
+                    {
+                        let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
+                        vec![parameters[0], parameters[1], parameters[2], arena, output]
+                    } else if details.unwrap().system_culture.contains(&i)
+                        || details.unwrap().time_zone_version.contains(&i)
+                    {
+                        let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
+                        vec![arena, output]
+                    } else if details.unwrap().string_grapheme_at.contains(&i)
+                        || details.unwrap().string_replace_line_endings.contains(&i)
+                        || details.unwrap().string_concat.contains(&i)
+                        || details.unwrap().path_combine.contains(&i)
+                    {
+                        let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
+                        vec![parameters[0], parameters[1], arena, output]
+                    } else if details.unwrap().string_graphemes.contains(&i)
+                        || details.unwrap().string_scalars.contains(&i)
+                        || details.unwrap().string_from_chars.contains(&i)
+                        || details.unwrap().string_upper.contains(&i)
+                        || details.unwrap().string_lower.contains(&i)
+                        || details.unwrap().string_intern.contains(&i)
+                        || details.unwrap().utf8_encode.contains(&i)
+                        || details.unwrap().utf8_decode.contains(&i)
+                        || details.unwrap().path_file_name.contains(&i)
+                        || details.unwrap().environment_platform.contains(&i)
+                    {
+                        let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
+                        vec![parameters[0], arena, output]
+                    } else if details.unwrap().time_zone_offset.contains(&i)
+                        || details.unwrap().string_compare_canonical.contains(&i)
+                        || details.unwrap().string_compare_ignore_case.contains(&i)
+                        || details.unwrap().string_compare_ordinal.contains(&i)
+                        || details.unwrap().string_contains_canonical.contains(&i)
+                        || details.unwrap().string_starts_with_canonical.contains(&i)
+                        || details.unwrap().string_ends_with_canonical.contains(&i)
+                        || details.unwrap().string_contains_ignore_case.contains(&i)
+                        || details.unwrap().string_starts_with_ignore_case.contains(&i)
+                        || details.unwrap().string_ends_with_ignore_case.contains(&i)
+                        || details.unwrap().string_contains_ordinal.contains(&i)
+                        || details.unwrap().string_starts_with_ordinal.contains(&i)
+                        || details.unwrap().string_ends_with_ordinal.contains(&i)
+                    {
+                        vec![parameters[0], parameters[1], output]
+                    } else {
+                        vec![parameters[0], output]
+                    };
+                    let call = b.ins().call(service, &args);
+                    let raw = b.inst_results(call)[0];
+                    let exhausted = b.ins().icmp_imm(IntCC::Equal, raw, 5);
+                    let memory = b.ins().iconst(types::I32, 5);
+                    let runtime = b.ins().iconst(types::I32, 3);
+                    let status = b.ins().select(exhausted, memory, runtime);
+                    let status = if details.unwrap().utf8_encode.contains(&i)
+                        || details.unwrap().string_graphemes.contains(&i)
+                        || details.unwrap().string_scalars.contains(&i)
+                    {
+                        let limited = b.ins().icmp_imm(IntCC::Equal, raw, 7);
+                        let array_limit = b.ins().iconst(types::I32, 7);
+                        b.ins().select(limited, array_limit, status)
+                    } else {
+                        status
+                    };
+                    let status = if details.unwrap().string_grapheme_at.contains(&i)
+                        || details.unwrap().string_slice_graphemes.contains(&i)
+                    {
+                        let bounded = b.ins().icmp_imm(IntCC::Equal, raw, 8);
+                        let index = b.ins().iconst(types::I32, 8);
+                        b.ins().select(bounded, index, status)
+                    } else if details.unwrap().string_intern.contains(&i) {
+                        let limited = b.ins().icmp_imm(IntCC::Equal, raw, 10);
+                        let intern = b.ins().iconst(types::I32, 10);
+                        b.ins().select(limited, intern, status)
+                    } else {
+                        status
+                    };
+                    let failed = b.ins().icmp_imm(IntCC::NotEqual, raw, 0);
+                    let mut site = diagnostic_data.as_ref().unwrap().site(
+                        module,
+                        &mut b,
+                        fault_context.unwrap(),
+                        i,
+                        0,
+                    );
+                    site.capture_frame = false;
+                    return_if_detailed(&mut b, failed, status, Some(&site));
+                    if live_stores {
+                        let ty = p.results[i].as_ref().ok_or("missing native text result")?;
+                        let result = read(&mut b, &p, ty, output);
+                        write(&mut b, destination, &result);
+                    }
+                    if let Some(ty) = &p.results[i] {
+                        // The legacy helper produces an immutable value snapshot. A native
+                        // Byte[] result owns this fresh allocation as an ordinary array.
+                        if *ty == Ty::ByteArray && details.unwrap().utf8_encode.contains(&i) {
+                            let array = b.ins().load(types::I64, MemFlags::new(), output, 0);
+                            let kind = b.ins().iconst(types::I64, 0x80000001);
+                            b.ins().store(MemFlags::new(), kind, array, 0);
+                        }
+                        if p.backing_for_array(ty).is_some() {
+                            let array = b.ins().load(types::I64, MemFlags::new(), output, 0);
+                            tag_array(&mut b, &p, ty, array);
                         }
                     }
-                    Op::IsInstance(neoclr::metadata::Type::String)
-                    | Op::CastClass(neoclr::metadata::Type::String)
-                        if *top() == Ty::Literal => {}
-                    Op::IsInstance(target) | Op::UnboxAny(target)
-                        if crate::scalar_unions::value_only(input, target) =>
-                    {
-                        let start = stack.len() - p.lanes(top());
-                        let tag = stack[start];
-                        if matches!(op, Op::IsInstance(_)) {
-                            stack.truncate(start);
-                            let present = b.ins().icmp_imm(IntCC::NotEqual, tag, 0);
-                            stack.push(b.ins().uextend(types::I32, present));
-                        }
-                        // Identity unboxing preserves the default/null union, matching
-                        // the interpreter; extracting a concrete value still faults.
+                    let zero = b.ins().iconst(types::I32, 0);
+                    b.ins().return_(&[zero]);
+                    b.seal_all_blocks();
+                    b.finalize();
+                    finish_value_body(
+                        module,
+                        ids[i],
+                        &mut context,
+                        root_probes.as_ref(),
+                        probe_frame,
+                        mutation_frame_ready,
+                        if live_stores {
+                            Some(&mut *live_bodies)
+                        } else {
+                            None
+                        },
+                        stack_budget,
+                        long_range_calls,
+                    )?;
+                    continue;
+                }
+                if details.is_some_and(|d| d.int32_to_string.contains(&i))
+                    || wide_format_services.contains_key(&i)
+                    || float_format_services.contains_key(&i)
+                {
+                    let destination = output;
+                    let output = if live_stores {
+                        let scratch = slot(&mut b, 8);
+                        b.ins().stack_addr(types::I64, scratch, 0)
+                    } else {
+                        output
+                    };
+                    let service = module.declare_func_in_func(
+                        float_format_services
+                            .get(&i)
+                            .or_else(|| wide_format_services.get(&i))
+                            .copied()
+                            .or(format_service)
+                            .unwrap(),
+                        b.func,
+                    );
+                    let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
+                    let args = if float_format_services.contains_key(&i) {
+                        let swedish = parameters[3];
+                        vec![
+                            parameters[0],
+                            parameters[1],
+                            parameters[2],
+                            swedish,
+                            arena,
+                            output,
+                        ]
+                    } else {
+                        vec![parameters[0], arena, output]
+                    };
+                    let call = b.ins().call(service, &args);
+                    let raw = b.inst_results(call)[0];
+                    // Only success and resource exhaustion are service outcomes. Other
+                    // failures become RuntimeError; adapters cannot manufacture UserFault.
+                    let exhausted = b.ins().icmp_imm(IntCC::Equal, raw, 5);
+                    let memory = b.ins().iconst(types::I32, 5);
+                    let runtime = b.ins().iconst(types::I32, 3);
+                    let status = b.ins().select(exhausted, memory, runtime);
+                    let failed = b.ins().icmp_imm(IntCC::NotEqual, raw, 0);
+                    let mut site = diagnostic_data.as_ref().unwrap().site(
+                        module,
+                        &mut b,
+                        fault_context.unwrap(),
+                        i,
+                        0,
+                    );
+                    site.capture_frame = false;
+                    return_if_detailed(&mut b, failed, status, Some(&site));
+                    if live_stores {
+                        let result = b.ins().load(types::I64, MemFlags::new(), output, 0);
+                        write(&mut b, destination, &[result]);
                     }
-                    Op::BoxValue(_) => {
-                        // The adjacent admitted union cast consumes this scalar;
-                        // no Object box exists or escapes in the native program.
+                    let zero = b.ins().iconst(types::I32, 0);
+                    b.ins().return_(&[zero]);
+                    b.seal_all_blocks();
+                    b.finalize();
+                    finish_value_body(
+                        module,
+                        ids[i],
+                        &mut context,
+                        root_probes.as_ref(),
+                        probe_frame,
+                        mutation_frame_ready,
+                        if live_stores {
+                            Some(&mut *live_bodies)
+                        } else {
+                            None
+                        },
+                        stack_budget,
+                        long_range_calls,
+                    )?;
+                    continue;
+                }
+                let call_result_bytes = p.call_result_bytes();
+                let mut frame_bytes = call_result_bytes as usize;
+                let mut arguments = vec![];
+                let mut stable_byrefs = vec![];
+                let mut at = 0;
+                let preserve_byrefs = live_stores && stack_policy.preserve_byrefs;
+                for (argument_index, t) in p.args[i].iter().enumerate() {
+                    let stable = preserve_byrefs
+                        && matches!(t, Ty::Address(_))
+                        && immutable_argument_binding(&f.body, argument_index);
+                    stable_byrefs.push(stable.then(|| parameters[at]));
+                    let s = slot(&mut b, p.bytes(t));
+                    frame_bytes += p.bytes(t) as usize + 7;
+                    let address = b.ins().stack_addr(types::I64, s, 0);
+                    write_typed(&mut b, &p, t, address, &parameters[at..at + p.lanes(t)]);
+                    arguments.push(s);
+                    at += p.lanes(t);
+                }
+                let locals: Vec<_> = p.locals[i]
+                    .iter()
+                    .map(|t| {
+                        frame_bytes += p.bytes(t) as usize + 7;
+                        slot(&mut b, p.bytes(t))
+                    })
+                    .collect();
+                for (ty, local) in p.locals[i].iter().zip(&locals) {
+                    // Keep not-yet-assigned reference storage safe for future root
+                    // registration. The verifier still rejects guest reads before assignment.
+                    // This includes ByteValues' existing internal unassigned marker.
+                    for lane in gc_layout::seed_lanes(&p, ty) {
+                        let zero = b.ins().iconst(types::I64, 0);
+                        b.ins().stack_store(zero, *local, (lane * 8) as i32);
                     }
-                    Op::CastClass(target)
-                        if crate::scalar_unions::inline(input, target)
-                            && p.widens_union(top(), &p.ty(target)?) =>
-                    {
-                        let values = stack.split_off(stack.len() - p.lanes(top()));
-                        stack.extend(widen_union(&p, &mut b, top(), &p.ty(target)?, values));
+                }
+                // Size scratch for the selected layouts (up to sixty-four lanes); snapshots are read
+                // immediately after each successful call, before this storage can be reused.
+                let call_result = slot(&mut b, call_result_bytes);
+                let mut constructors = std::collections::HashMap::new();
+                for (pc, op) in f.body.iter().enumerate() {
+                    if let Op::Construct(target) = op {
+                        let bytes = p.bytes(&p.ty(target.owner.as_ref().unwrap())?);
+                        frame_bytes += bytes as usize + 7;
+                        constructors.insert(pc, slot(&mut b, bytes));
                     }
-                    Op::CastClass(target)
-                        if matches!(p.ty(target)?, Ty::ValueUnion(_))
-                            && (matches!(
-                                top(),
-                                Ty::PendingUnionScalar(_) | Ty::Callable(_) | Ty::Literal
-                            ) || *top() == p.ty(target)?) =>
-                    {
-                        if matches!(
-                            top(),
-                            Ty::PendingUnionScalar(_) | Ty::Callable(_) | Ty::Literal
-                        ) {
-                            let payload_type = match top() {
-                                Ty::PendingUnionScalar(t) => p.ty(t)?,
-                                other => other.clone(),
-                            };
-                            let Ty::ValueUnion(parts) = p.ty(target)? else {
-                                unreachable!()
-                            };
-                            let payload = stack.split_off(stack.len() - p.lanes(&payload_type));
-                            let active = parts
-                                .iter()
-                                .position(|part| *part == payload_type)
-                                .expect("admitted exact payload");
-                            let tag = b.ins().iconst(types::I32, active as i64 + 1);
-                            let tag = if matches!(payload_type, Ty::Callable(_) | Ty::Literal) {
-                                let null = b.ins().icmp_imm(IntCC::Equal, payload[0], 0);
-                                let empty = b.ins().iconst(types::I32, 0);
-                                b.ins().select(null, empty, tag)
-                            } else {
-                                tag
-                            };
-                            stack.push(tag);
-                            for (index, part) in parts.iter().enumerate() {
-                                if index == active {
-                                    stack.extend(payload.iter().copied());
-                                } else {
-                                    stack.extend(
-                                        lanes(&p, part).into_iter().map(|ty| zero(&mut b, ty)),
-                                    );
-                                }
+                }
+                let root_spill = root_probes
+                    .as_ref()
+                    .and_then(|probes| probes.storage_bytes(i))
+                    .map(|bytes| {
+                        frame_bytes += bytes as usize + 7;
+                        slot(&mut b, bytes)
+                    });
+                let storage_table = root_probes.as_ref().map(|probes| {
+                    let bytes = probes.table_bytes(i);
+                    frame_bytes += probes.frame_bytes() as usize + 7 + bytes as usize + 7;
+                    probe_frame = Some(slot(&mut b, probes.frame_bytes()));
+                    slot(&mut b, bytes)
+                });
+                let transient_table = root_probes
+                    .as_ref()
+                    .and_then(|probes| probes.transient_bytes(i))
+                    .map(|bytes| {
+                        frame_bytes += bytes as usize + 7;
+                        slot(&mut b, bytes)
+                    });
+                if frame_bytes > 65536 {
+                    return Err("value profile frame storage exceeds 64 KiB".into());
+                }
+                if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
+                    mutation_frame_ready = Some(probes.enter(
+                        module,
+                        &mut b,
+                        frame,
+                        fault_context.unwrap(),
+                        i,
+                        storage_table.unwrap(),
+                        &arguments,
+                        &locals,
+                    ));
+                    emit_stack_check(
+                        module,
+                        &mut b,
+                        stack_check,
+                        diagnostic_data.as_ref(),
+                        fault_context.unwrap(),
+                        i,
+                        true,
+                    );
+                }
+                if let Some(guard) = crate::type_initialization::entry_owner(input, f)
+                    .and_then(|owner| owner.definition_name())
+                    .and_then(|name| initialization_guards.get(name))
+                {
+                    if let (Some(probes), Some(spill)) = (&root_probes, root_spill) {
+                        probes.emit(module, &mut b, i, 0, spill, probe_frame.unwrap(), &[]);
+                    }
+                    let callee = module.declare_func_in_func(*guard, b.func);
+                    let call = b.ins().call(callee, &[fault_context.unwrap()]);
+                    let status = b.inst_results(call)[0];
+                    let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                    let site = diagnostic_data
+                        .as_ref()
+                        .map(|d| d.site(module, &mut b, fault_context.unwrap(), i, 0));
+                    return_if_detailed(&mut b, failed, status, site.as_ref());
+                }
+                let blocks: Vec<_> = f.body.iter().map(|_| b.create_block()).collect();
+                for (pc, stack) in flows[i].iter().enumerate() {
+                    if let Some(stack) = stack {
+                        for t in stack {
+                            for lane in lanes(&p, t) {
+                                b.append_block_param(blocks[pc], lane);
                             }
                         }
                     }
-                    Op::IsInstance(
-                        target @ (neoclr::metadata::Type::Function(_)
-                        | neoclr::metadata::Type::String),
-                    )
-                    | Op::CastClass(
-                        target @ (neoclr::metadata::Type::Function(_)
-                        | neoclr::metadata::Type::String),
-                    ) if matches!(top(), Ty::ValueUnion(_)) => {
-                        let Ty::ValueUnion(parts) = top() else {
-                            unreachable!()
-                        };
-                        let values = stack.split_off(stack.len() - p.lanes(top()));
-                        let target_type = p.ty(target)?;
-                        let active = parts.iter().position(|part| *part == target_type);
-                        let expected = active.map_or(-1, |i| i as i64 + 1);
-                        let matched = b.ins().icmp_imm(IntCC::Equal, values[0], expected);
-                        let null = b.ins().iconst(types::I64, 0);
-                        if matches!(op, Op::CastClass(_)) {
-                            let occupied = b.ins().icmp_imm(IntCC::NotEqual, values[0], 0);
-                            let mismatch = b.ins().icmp_imm(IntCC::NotEqual, values[0], expected);
-                            let invalid = b.ins().band(occupied, mismatch);
-                            let status = b.ins().iconst(types::I32, 11);
-                            return_if_detailed(&mut b, invalid, status, site.as_ref());
-                        }
-                        let payload = if let Some(index) = active {
-                            let offset = 1 + parts[..index]
-                                .iter()
-                                .map(|part| p.lanes(part))
-                                .sum::<usize>();
-                            values[offset]
-                        } else {
-                            null
-                        };
-                        stack.push(b.ins().select(matched, payload, null));
-                    }
-                    Op::IsInstance(target) | Op::UnboxAny(target)
-                        if matches!(top(), Ty::ValueUnion(_))
-                            && (crate::scalar_unions::tag(target).is_some()
-                                || crate::scalar_unions::bank_scalar(target)
-                                || crate::scalar_unions::record(input, target)) =>
+                }
+                b.ins().jump(blocks[0], &[]);
+                for (pc, op) in f.body.iter().enumerate() {
+                    let Some(shape) = &flows[i][pc] else {
+                        continue;
+                    };
+                    b.switch_to_block(blocks[pc]);
+                    let mut stack = b.block_params(blocks[pc]).to_vec();
+                    let top = || shape.last().unwrap();
+                    let pop = |s: &mut Vec<ir::Value>| s.pop().expect("checked stack");
+                    let mut site = diagnostic_data
+                        .as_ref()
+                        .map(|d| d.site(module, &mut b, fault_context.unwrap(), i, pc));
+                    if let Some(&adapter_pc) =
+                        details.and_then(|d| d.reflection_array_sites.get(&(i, pc)))
+                        && let Some(site) = site.as_mut()
                     {
-                        let Ty::ValueUnion(parts) = top() else {
-                            unreachable!()
+                        site.remap_instruction(adapter_pc);
+                    }
+                    if matches!(op, Op::Construct(_))
+                        && details.is_some_and(|d| d.reflection_construction.contains(&i))
+                    {
+                        // The interpreter's checked construction adapter is newobj/ret.
+                        if let Some(site) = site.as_mut() {
+                            site.remap_instruction(0);
+                        }
+                    }
+
+                    if (!matches!(op, Op::StaticField { .. } | Op::SetStaticField { .. })
+                        || details.is_some_and(|d| d.native_worker_safepoints))
+                        && let (Some(probes), Some(spill)) = (&root_probes, root_spill)
+                    {
+                        probes.emit(module, &mut b, i, pc, spill, probe_frame.unwrap(), &stack);
+                    }
+                    if !initialization_guards.is_empty() {
+                        let initialization_owner = match op {
+                            Op::StaticField { owner, .. } | Op::SetStaticField { owner, .. } => {
+                                Some(owner)
+                            }
+                            Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target)
+                                if crate::selection::callable_invoke(target).is_none() =>
+                            {
+                                crate::type_initialization::entry_owner(
+                                    input,
+                                    &input.functions[p.callee(target)?],
+                                )
+                            }
+                            _ => None,
                         };
-                        let values = stack.split_off(stack.len() - p.lanes(top()));
-                        let target_type = p.ty(target)?;
-                        let active = parts.iter().position(|part| *part == target_type);
-                        let expected = active.map_or(-1, |i| i as i64 + 1);
-                        if matches!(op, Op::IsInstance(_)) {
+                        if let Some(guard) = initialization_owner
+                            .and_then(|owner| owner.definition_name())
+                            .and_then(|name| initialization_guards.get(name))
+                        {
+                            if matches!(op, Op::StaticField { .. } | Op::SetStaticField { .. })
+                                && let (Some(probes), Some(spill)) = (&root_probes, root_spill)
+                            {
+                                probes.emit(
+                                    module,
+                                    &mut b,
+                                    i,
+                                    pc,
+                                    spill,
+                                    probe_frame.unwrap(),
+                                    &stack,
+                                );
+                            }
+                            let callee = module.declare_func_in_func(*guard, b.func);
+                            let call = b.ins().call(callee, &[fault_context.unwrap()]);
+                            let status = b.inst_results(call)[0];
+                            let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                            return_if_detailed(&mut b, failed, status, site.as_ref());
+                        }
+                    }
+                    match op {
+                        Op::Int(v) => stack.push(b.ins().iconst(types::I32, i64::from(*v))),
+                        Op::Int64(v) => stack.push(b.ins().iconst(types::I64, *v)),
+                        Op::Float32 { bits } => {
+                            stack.push(b.ins().f32const(ir::immediates::Ieee32::with_bits(*bits)))
+                        }
+                        Op::ConvertFloat32 | Op::ConvertFloat64 | Op::ConvertFloatUnsigned => {
+                            let value = pop(&mut stack);
+                            let target = if matches!(op, Op::ConvertFloat32) {
+                                types::F32
+                            } else {
+                                types::F64
+                            };
+                            let converted = match top() {
+                                Ty::Single if target == types::F64 => {
+                                    b.ins().fpromote(target, value)
+                                }
+                                Ty::Double if target == types::F32 => {
+                                    b.ins().fdemote(target, value)
+                                }
+                                Ty::Single | Ty::Double => value,
+                                _ if matches!(op, Op::ConvertFloatUnsigned) => {
+                                    b.ins().fcvt_from_uint(target, value)
+                                }
+                                _ => b.ins().fcvt_from_sint(target, value),
+                            };
+                            stack.push(converted);
+                        }
+                        Op::Float64 { bits } => {
+                            stack.push(b.ins().f64const(ir::immediates::Ieee64::with_bits(*bits)))
+                        }
+                        Op::String(_) => {
+                            let data = module.declare_data_in_func(literals[&(i, pc)], b.func);
+                            let pointer = b.ins().global_value(types::I64, data);
+                            if let Some(binding) = text_copy {
+                                let owned = copy_text(
+                                    module,
+                                    &mut b,
+                                    binding,
+                                    pointer,
+                                    fault_context.unwrap(),
+                                    site.as_ref(),
+                                );
+                                stack.push(owned);
+                            } else {
+                                stack.push(pointer);
+                            }
+                        }
+                        Op::IsInstance(neoclr::metadata::Type::String)
+                        | Op::CastClass(neoclr::metadata::Type::String)
+                            if *top() == Ty::Literal => {}
+                        Op::IsInstance(target) | Op::UnboxAny(target)
+                            if crate::scalar_unions::value_only(input, target) =>
+                        {
+                            let start = stack.len() - p.lanes(top());
+                            let tag = stack[start];
+                            if matches!(op, Op::IsInstance(_)) {
+                                stack.truncate(start);
+                                let present = b.ins().icmp_imm(IntCC::NotEqual, tag, 0);
+                                stack.push(b.ins().uextend(types::I32, present));
+                            }
+                            // Identity unboxing preserves the default/null union, matching
+                            // the interpreter; extracting a concrete value still faults.
+                        }
+                        Op::BoxValue(_) => {
+                            // The adjacent admitted union cast consumes this scalar;
+                            // no Object box exists or escapes in the native program.
+                        }
+                        Op::CastClass(target)
+                            if crate::scalar_unions::inline(input, target)
+                                && p.widens_union(top(), &p.ty(target)?) =>
+                        {
+                            let values = stack.split_off(stack.len() - p.lanes(top()));
+                            stack.extend(widen_union(&p, &mut b, top(), &p.ty(target)?, values));
+                        }
+                        Op::CastClass(target)
+                            if matches!(p.ty(target)?, Ty::ValueUnion(_))
+                                && (matches!(
+                                    top(),
+                                    Ty::PendingUnionScalar(_) | Ty::Callable(_) | Ty::Literal
+                                ) || *top() == p.ty(target)?) =>
+                        {
+                            if matches!(
+                                top(),
+                                Ty::PendingUnionScalar(_) | Ty::Callable(_) | Ty::Literal
+                            ) {
+                                let payload_type = match top() {
+                                    Ty::PendingUnionScalar(t) => p.ty(t)?,
+                                    other => other.clone(),
+                                };
+                                let Ty::ValueUnion(parts) = p.ty(target)? else {
+                                    unreachable!()
+                                };
+                                let payload = stack.split_off(stack.len() - p.lanes(&payload_type));
+                                let active = parts
+                                    .iter()
+                                    .position(|part| *part == payload_type)
+                                    .expect("admitted exact payload");
+                                let tag = b.ins().iconst(types::I32, active as i64 + 1);
+                                let tag = if matches!(payload_type, Ty::Callable(_) | Ty::Literal) {
+                                    let null = b.ins().icmp_imm(IntCC::Equal, payload[0], 0);
+                                    let empty = b.ins().iconst(types::I32, 0);
+                                    b.ins().select(null, empty, tag)
+                                } else {
+                                    tag
+                                };
+                                stack.push(tag);
+                                for (index, part) in parts.iter().enumerate() {
+                                    if index == active {
+                                        stack.extend(payload.iter().copied());
+                                    } else {
+                                        stack.extend(
+                                            lanes(&p, part).into_iter().map(|ty| zero(&mut b, ty)),
+                                        );
+                                    }
+                                }
+                            }
+                        }
+                        Op::IsInstance(
+                            target @ (neoclr::metadata::Type::Function(_)
+                            | neoclr::metadata::Type::String),
+                        )
+                        | Op::CastClass(
+                            target @ (neoclr::metadata::Type::Function(_)
+                            | neoclr::metadata::Type::String),
+                        ) if matches!(top(), Ty::ValueUnion(_)) => {
+                            let Ty::ValueUnion(parts) = top() else {
+                                unreachable!()
+                            };
+                            let values = stack.split_off(stack.len() - p.lanes(top()));
+                            let target_type = p.ty(target)?;
+                            let active = parts.iter().position(|part| *part == target_type);
+                            let expected = active.map_or(-1, |i| i as i64 + 1);
                             let matched = b.ins().icmp_imm(IntCC::Equal, values[0], expected);
-                            stack.push(b.ins().uextend(types::I32, matched));
-                        } else {
-                            let null = b.ins().icmp_imm(IntCC::Equal, values[0], 0);
-                            let status = b.ins().iconst(types::I32, 6);
-                            return_if_detailed(&mut b, null, status, site.as_ref());
-                            let mismatch = b.ins().icmp_imm(IntCC::NotEqual, values[0], expected);
-                            let status = b.ins().iconst(types::I32, 11);
-                            return_if_detailed(&mut b, mismatch, status, site.as_ref());
-                            if let Some(index) = active {
+                            let null = b.ins().iconst(types::I64, 0);
+                            if matches!(op, Op::CastClass(_)) {
+                                let occupied = b.ins().icmp_imm(IntCC::NotEqual, values[0], 0);
+                                let mismatch =
+                                    b.ins().icmp_imm(IntCC::NotEqual, values[0], expected);
+                                let invalid = b.ins().band(occupied, mismatch);
+                                let status = b.ins().iconst(types::I32, 11);
+                                return_if_detailed(&mut b, invalid, status, site.as_ref());
+                            }
+                            let payload = if let Some(index) = active {
                                 let offset = 1 + parts[..index]
                                     .iter()
                                     .map(|part| p.lanes(part))
                                     .sum::<usize>();
-                                stack.extend_from_slice(
-                                    &values[offset..offset + p.lanes(&target_type)],
-                                );
+                                values[offset]
                             } else {
-                                stack.extend(
-                                    lanes(&p, &target_type)
-                                        .into_iter()
-                                        .map(|ty| zero(&mut b, ty)),
-                                );
-                            }
-                        }
-                    }
-                    Op::CastClass(target)
-                        if crate::scalar_unions::supported(target)
-                            && (matches!(
-                                top(),
-                                Ty::PendingUnionScalar(_) | Ty::ScalarUnion(_)
-                            ) || *top() == p.ty(target)?) =>
-                    {
-                        if let Ty::PendingUnionScalar(scalar) = top() {
-                            let value = pop(&mut stack);
-                            let payload = if b.func.dfg.value_type(value) == types::I64 {
-                                value
-                            } else {
-                                b.ins().uextend(types::I64, value)
+                                null
                             };
-                            stack.push(
-                                b.ins()
-                                    .iconst(types::I32, crate::scalar_unions::tag(scalar).unwrap()),
-                            );
-                            stack.push(payload);
-                            if matches!(p.ty(target)?, Ty::MixedUnion(_)) {
-                                stack.push(b.ins().iconst(types::I64, 0));
-                            }
+                            stack.push(b.ins().select(matched, payload, null));
                         }
-                    }
-                    Op::IsInstance(target) if crate::scalar_unions::tag(target).is_some() => {
-                        if matches!(top(), Ty::MixedUnion(_)) {
-                            pop(&mut stack);
-                        }
-                        pop(&mut stack); // Numeric payload is not needed for the test.
-                        let tag = pop(&mut stack);
-                        let matched = b.ins().icmp_imm(
-                            IntCC::Equal,
-                            tag,
-                            crate::scalar_unions::tag(target).unwrap(),
-                        );
-                        stack.push(b.ins().uextend(types::I32, matched));
-                    }
-                    Op::UnboxAny(target) => {
-                        if matches!(top(), Ty::MixedUnion(_)) {
-                            pop(&mut stack);
-                        }
-                        let payload = pop(&mut stack);
-                        let tag = pop(&mut stack);
-                        let null = b.ins().icmp_imm(IntCC::Equal, tag, 0);
-                        let null_status = b.ins().iconst(types::I32, 6);
-                        return_if_detailed(&mut b, null, null_status, site.as_ref());
-                        let mismatch = b.ins().icmp_imm(
-                            IntCC::NotEqual,
-                            tag,
-                            crate::scalar_unions::tag(target).unwrap(),
-                        );
-                        let cast_status = b.ins().iconst(types::I32, 11);
-                        return_if_detailed(&mut b, mismatch, cast_status, site.as_ref());
-                        stack.push(if *target == neoclr::metadata::Type::Int64 {
-                            payload
-                        } else {
-                            b.ins().ireduce(types::I32, payload)
-                        });
-                    }
-                    Op::IsInstance(target) | Op::CastClass(target) => {
-                        let (value, record_tag) = if let Ty::ValueUnion(parts) = top() {
+                        Op::IsInstance(target) | Op::UnboxAny(target)
+                            if matches!(top(), Ty::ValueUnion(_))
+                                && (crate::scalar_unions::tag(target).is_some()
+                                    || crate::scalar_unions::bank_scalar(target)
+                                    || crate::scalar_unions::record(input, target)) =>
+                        {
+                            let Ty::ValueUnion(parts) = top() else {
+                                unreachable!()
+                            };
                             let values = stack.split_off(stack.len() - p.lanes(top()));
-                            let mut reference = b.ins().iconst(types::I64, 0);
-                            let mut offset = 1;
-                            for part in parts {
-                                if matches!(part, Ty::Reference(_) | Ty::Interface(_)) {
-                                    reference = b.ins().bor(reference, values[offset]);
-                                }
-                                offset += p.lanes(part);
-                            }
-                            (reference, Some(values[0]))
-                        } else {
-                            (pop(&mut stack), None)
-                        };
-                        let source_tag = if matches!(top(), Ty::MixedUnion(_)) {
-                            pop(&mut stack); // Scalar bits never become an object address.
-                            Some(pop(&mut stack))
-                        } else {
-                            record_tag
-                        };
-                        let probe = b.create_block();
-                        let joined = b.create_block();
-                        b.append_block_param(joined, types::I64);
-                        let null = b.ins().icmp_imm(IntCC::Equal, value, 0);
-                        b.ins().brif(null, joined, &[value.into()], probe, &[]);
-                        b.switch_to_block(probe);
-                        let null_reference = b.ins().iconst(types::I64, 0);
-                        let target_ty = p.ty(target)?;
-                        let cast = if *top() == Ty::Literal {
-                            if string_view(&target_ty) {
-                                text_object_view(&mut b, value)
+                            let target_type = p.ty(target)?;
+                            let active = parts.iter().position(|part| *part == target_type);
+                            let expected = active.map_or(-1, |i| i as i64 + 1);
+                            if matches!(op, Op::IsInstance(_)) {
+                                let matched = b.ins().icmp_imm(IntCC::Equal, values[0], expected);
+                                stack.push(b.ins().uextend(types::I32, matched));
                             } else {
-                                null_reference
-                            }
-                        } else {
-                            let text = b.create_block();
-                            let object = b.create_block();
-                            let merged = b.create_block();
-                            b.append_block_param(merged, types::I64);
-                            let tagged = b.ins().band_imm(value, 1);
-                            b.ins().brif(tagged, text, &[], object, &[]);
-                            b.switch_to_block(text);
-                            let result = if target_ty == Ty::Literal {
-                                b.ins().band_imm(value, -2)
-                            } else if string_view(&target_ty) {
-                                value
-                            } else {
-                                null_reference
-                            };
-                            b.ins().jump(merged, &[result.into()]);
-                            b.switch_to_block(object);
-                            let result = if target_ty == Ty::Literal {
-                                null_reference
-                            } else {
-                                let tag = b.ins().load(types::I64, MemFlags::new(), value, 0);
-                                let mut matches = b.ins().iconst(types::I8, 0);
-                                let callable = b.ins().icmp_imm(IntCC::Equal, tag, u32::MAX as i64);
-                                if p.is_object_base(&target_ty) {
-                                    matches = callable;
-                                }
-                                if let Ty::Callable(shape) = &target_ty {
-                                    // Check the descriptor header before reading its target slot:
-                                    // an ordinary empty Object need not have payload storage.
-                                    let function = b.create_block();
-                                    let done = b.create_block();
-                                    b.append_block_param(done, types::I8);
-                                    b.ins()
-                                        .brif(callable, function, &[], done, &[matches.into()]);
-                                    b.switch_to_block(function);
-                                    let identity =
-                                        b.ins().load(types::I64, MemFlags::new(), value, 8);
-                                    for index in p.callable_targets(shape)? {
-                                        let equal = b.ins().icmp_imm(
-                                            IntCC::Equal,
-                                            identity,
-                                            (index + 1) as i64,
-                                        );
-                                        matches = b.ins().bor(matches, equal);
-                                    }
-                                    b.ins().jump(done, &[matches.into()]);
-                                    b.switch_to_block(done);
-                                    matches = b.block_params(done)[0];
-                                }
-                                for index in p.cast_targets(&target_ty) {
-                                    let matched = matches_type(&mut b, &p, tag, index);
-                                    matches = b.ins().bor(matches, matched);
-                                }
-                                b.ins().select(matches, value, null_reference)
-                            };
-                            b.ins().jump(merged, &[result.into()]);
-                            b.switch_to_block(merged);
-                            b.block_params(merged)[0]
-                        };
-                        b.ins().jump(joined, &[cast.into()]);
-                        b.switch_to_block(joined);
-                        let result = b.block_params(joined)[0];
-                        if matches!(op, Op::CastClass(_)) {
-                            let absent = b.ins().icmp_imm(IntCC::Equal, result, 0);
-                            let present =
-                                b.ins()
-                                    .icmp_imm(IntCC::NotEqual, source_tag.unwrap_or(value), 0);
-                            let invalid = b.ins().band(absent, present);
-                            // Every failed checked reference cast has InvalidCast semantics,
-                            // including nominal targets reached from structural views.
-                            let status = b.ins().iconst(types::I32, 11);
-                            return_if_detailed(&mut b, invalid, status, site.as_ref());
-                        }
-                        if matches!(target_ty, Ty::MixedUnion(_)) {
-                            let present = b.ins().icmp_imm(IntCC::NotEqual, result, 0);
-                            let reference_tag = b.ins().iconst(types::I32, 4);
-                            let null_tag = b.ins().iconst(types::I32, 0);
-                            stack.push(b.ins().select(present, reference_tag, null_tag));
-                            stack.push(b.ins().iconst(types::I64, 0));
-                        }
-                        if let Ty::ValueUnion(parts) = &target_ty {
-                            // All reference alternatives share the first reference bank;
-                            // nominal membership is checked against the actual object.
-                            let active = parts
-                                .iter()
-                                .position(|part| {
-                                    matches!(part, Ty::Reference(_) | Ty::Interface(_))
-                                })
-                                .expect("reference alternative");
-                            let present = b.ins().icmp_imm(IntCC::NotEqual, result, 0);
-                            let tag = b.ins().iconst(types::I32, active as i64 + 1);
-                            let null = b.ins().iconst(types::I32, 0);
-                            stack.push(b.ins().select(present, tag, null));
-                            for (index, part) in parts.iter().enumerate() {
-                                if index == active {
-                                    stack.push(result);
+                                let null = b.ins().icmp_imm(IntCC::Equal, values[0], 0);
+                                let status = b.ins().iconst(types::I32, 6);
+                                return_if_detailed(&mut b, null, status, site.as_ref());
+                                let mismatch =
+                                    b.ins().icmp_imm(IntCC::NotEqual, values[0], expected);
+                                let status = b.ins().iconst(types::I32, 11);
+                                return_if_detailed(&mut b, mismatch, status, site.as_ref());
+                                if let Some(index) = active {
+                                    let offset = 1 + parts[..index]
+                                        .iter()
+                                        .map(|part| p.lanes(part))
+                                        .sum::<usize>();
+                                    stack.extend_from_slice(
+                                        &values[offset..offset + p.lanes(&target_type)],
+                                    );
                                 } else {
                                     stack.extend(
-                                        lanes(&p, part).into_iter().map(|ty| zero(&mut b, ty)),
+                                        lanes(&p, &target_type)
+                                            .into_iter()
+                                            .map(|ty| zero(&mut b, ty)),
                                     );
                                 }
                             }
-                        } else {
-                            stack.push(result);
                         }
-                    }
-                    Op::ReferenceIsNull => {
-                        if matches!(top(), Ty::ValueUnion(_)) {
-                            stack.truncate(stack.len() - p.lanes(top()) + 1);
-                        }
-                        if matches!(top(), Ty::MixedUnion(_)) {
-                            pop(&mut stack);
-                        }
-                        if matches!(top(), Ty::ScalarUnion(_) | Ty::MixedUnion(_)) {
-                            pop(&mut stack);
-                        }
-                        let value = pop(&mut stack);
-                        let is_null = b.ins().icmp_imm(IntCC::Equal, value, 0);
-                        stack.push(b.ins().uextend(types::I32, is_null));
-                    }
-                    Op::ReferenceEqual => {
-                        let mut right = pop(&mut stack);
-                        let mut left = pop(&mut stack);
-                        if shape[shape.len() - 1] == Ty::Literal {
-                            right = text_object_view(&mut b, right);
-                        }
-                        if shape[shape.len() - 2] == Ty::Literal {
-                            left = text_object_view(&mut b, left);
-                        }
-                        let equal = b.ins().icmp(IntCC::Equal, left, right);
-                        stack.push(b.ins().uextend(types::I32, equal));
-                    }
-                    _ if crate::checked_conversion::spec(op).is_some() => {
-                        let value = pop(&mut stack);
-                        stack.push(crate::checked_conversion::emit(
-                            &mut b,
-                            op,
-                            value,
-                            site.as_ref(),
-                        ));
-                    }
-                    Op::ConvertInt32 | Op::ConvertUInt32 => {
-                        if matches!(top(), Ty::Size | Ty::Wide) {
-                            let value = pop(&mut stack);
-                            stack.push(b.ins().ireduce(types::I32, value));
-                        }
-                    }
-                    Op::ConvertInt64
-                    | Op::ConvertUInt64
-                    | Op::ConvertNativeInt
-                    | Op::ConvertNativeUInt => {
-                        if matches!(top(), Ty::Int) {
-                            let value = pop(&mut stack);
-                            stack.push(
-                                if matches!(op, Op::ConvertUInt64 | Op::ConvertNativeUInt) {
-                                    b.ins().uextend(types::I64, value)
+                        Op::CastClass(target)
+                            if crate::scalar_unions::supported(target)
+                                && (matches!(
+                                    top(),
+                                    Ty::PendingUnionScalar(_) | Ty::ScalarUnion(_)
+                                ) || *top() == p.ty(target)?) =>
+                        {
+                            if let Ty::PendingUnionScalar(scalar) = top() {
+                                let value = pop(&mut stack);
+                                let payload = if b.func.dfg.value_type(value) == types::I64 {
+                                    value
                                 } else {
-                                    b.ins().sextend(types::I64, value)
-                                },
-                            );
-                        }
-                    }
-                    Op::ConvertUInt8 | Op::ConvertInt8 | Op::ConvertInt16 | Op::ConvertUInt16 => {
-                        let value = pop(&mut stack);
-                        let value = if matches!(top(), Ty::Size | Ty::Wide) {
-                            b.ins().ireduce(types::I32, value)
-                        } else {
-                            value
-                        };
-                        let narrow = b.ins().ireduce(
-                            if matches!(op, Op::ConvertUInt8 | Op::ConvertInt8) {
-                                types::I8
-                            } else {
-                                types::I16
-                            },
-                            value,
-                        );
-                        stack.push(if matches!(op, Op::ConvertInt8 | Op::ConvertInt16) {
-                            b.ins().sextend(types::I32, narrow)
-                        } else {
-                            b.ins().uextend(types::I32, narrow)
-                        });
-                    }
-                    Op::Bool(v) => stack.push(b.ins().iconst(types::I32, i64::from(*v))),
-                    Op::Void => stack.push(b.ins().iconst(types::I32, 0)),
-                    Op::LoadMetadataToken(index) => {
-                        let identity = type_tokens.len()
-                            + metadata_tokens
-                                .iter()
-                                .position(|i| i == index)
-                                .expect("collected metadata token")
-                            + 1;
-                        stack.push(b.ins().iconst(types::I64, identity as i64));
-                    }
-                    Op::LoadTypeToken(t) => {
-                        let identity = type_tokens
-                            .iter()
-                            .position(|v| v == t)
-                            .expect("collected token")
-                            + 1;
-                        stack.push(b.ins().iconst(types::I64, identity as i64));
-                    }
-                    Op::PackValue(t) => {
-                        let payload = pop(&mut stack);
-                        let payload = normalize(&mut b, &p, &p.ty(t)?, &[payload])[0];
-                        let payload = match p.ty(t)? {
-                            Ty::Literal | Ty::Wide => payload,
-                            Ty::Double => b.ins().bitcast(types::I64, MemFlags::new(), payload),
-                            Ty::Single => {
-                                let bits = b.ins().bitcast(types::I32, MemFlags::new(), payload);
-                                b.ins().uextend(types::I64, bits)
-                            }
-                            _ => b.ins().uextend(types::I64, payload),
-                        };
-                        stack.push(b.ins().iconst(types::I32, profile::erased_tag(t)?));
-                        stack.push(payload);
-                    }
-                    Op::IsValue(t) | Op::UnpackValue(t) => {
-                        let payload = pop(&mut stack);
-                        let tag = pop(&mut stack);
-                        let matches = b.ins().icmp_imm(IntCC::Equal, tag, profile::erased_tag(t)?);
-                        if matches!(op, Op::IsValue(_)) {
-                            stack.push(b.ins().uextend(types::I32, matches));
-                        } else {
-                            let wrong = b.ins().icmp_imm(IntCC::Equal, matches, 0);
-                            let status = b.ins().iconst(types::I32, 3); // RuntimeError
-                            return_if_detailed(&mut b, wrong, status, site.as_ref());
-                            let value = match p.ty(t)? {
-                                Ty::Literal | Ty::Wide => payload,
-                                Ty::Double => b.ins().bitcast(types::F64, MemFlags::new(), payload),
-                                Ty::Single => {
-                                    let bits = b.ins().ireduce(types::I32, payload);
-                                    b.ins().bitcast(types::F32, MemFlags::new(), bits)
+                                    b.ins().uextend(types::I64, value)
+                                };
+                                stack.push(b.ins().iconst(
+                                    types::I32,
+                                    crate::scalar_unions::tag(scalar).unwrap(),
+                                ));
+                                stack.push(payload);
+                                if matches!(p.ty(target)?, Ty::MixedUnion(_)) {
+                                    stack.push(b.ins().iconst(types::I64, 0));
                                 }
-                                _ => b.ins().ireduce(types::I32, payload),
-                            };
-                            stack.push(normalize(&mut b, &p, &p.ty(t)?, &[value])[0]);
+                            }
                         }
-                    }
-                    Op::Arg(n) if stable_byrefs[*n].is_some() => {
-                        // The current native collector is nonmoving. Preserve
-                        // the immutable byref value, but keep its initialized
-                        // published root slot above for liveness. Never reuse
-                        // a parameter whose binding can be modified/aliased.
-                        stack.push(stable_byrefs[*n].unwrap());
-                    }
-                    Op::Arg(n) | Op::Load(n) => {
-                        let (s, t) = if matches!(op, Op::Arg(_)) {
-                            (arguments[*n], &p.args[i][*n])
-                        } else {
-                            (locals[*n], &p.locals[i][*n])
-                        };
-                        let address = b.ins().stack_addr(types::I64, s, 0);
-                        stack.extend(read(&mut b, &p, t, address));
-                    }
-                    Op::ArgumentAddress(n) | Op::LocalAddress(n) => {
-                        if details.is_some_and(|d| d.boxed_property_receivers.contains(&(i, pc))) {
-                            // The validated adapter has checked exact box identity. Its
-                            // Object argument stays rooted while the getter borrows payload.
-                            stack.push(b.ins().iadd_imm(parameters[2], 8));
-                        } else {
-                            let s = if matches!(op, Op::ArgumentAddress(_)) {
+                        Op::IsInstance(target) if crate::scalar_unions::tag(target).is_some() => {
+                            if matches!(top(), Ty::MixedUnion(_)) {
+                                pop(&mut stack);
+                            }
+                            pop(&mut stack); // Numeric payload is not needed for the test.
+                            let tag = pop(&mut stack);
+                            let matched = b.ins().icmp_imm(
+                                IntCC::Equal,
+                                tag,
+                                crate::scalar_unions::tag(target).unwrap(),
+                            );
+                            stack.push(b.ins().uextend(types::I32, matched));
+                        }
+                        Op::UnboxAny(target) => {
+                            if matches!(top(), Ty::MixedUnion(_)) {
+                                pop(&mut stack);
+                            }
+                            let payload = pop(&mut stack);
+                            let tag = pop(&mut stack);
+                            let null = b.ins().icmp_imm(IntCC::Equal, tag, 0);
+                            let null_status = b.ins().iconst(types::I32, 6);
+                            return_if_detailed(&mut b, null, null_status, site.as_ref());
+                            let mismatch = b.ins().icmp_imm(
+                                IntCC::NotEqual,
+                                tag,
+                                crate::scalar_unions::tag(target).unwrap(),
+                            );
+                            let cast_status = b.ins().iconst(types::I32, 11);
+                            return_if_detailed(&mut b, mismatch, cast_status, site.as_ref());
+                            stack.push(if *target == neoclr::metadata::Type::Int64 {
+                                payload
+                            } else {
+                                b.ins().ireduce(types::I32, payload)
+                            });
+                        }
+                        Op::IsInstance(target) | Op::CastClass(target) => {
+                            let (value, record_tag) = if let Ty::ValueUnion(parts) = top() {
+                                let values = stack.split_off(stack.len() - p.lanes(top()));
+                                let mut reference = b.ins().iconst(types::I64, 0);
+                                let mut offset = 1;
+                                for part in parts {
+                                    if matches!(part, Ty::Reference(_) | Ty::Interface(_)) {
+                                        reference = b.ins().bor(reference, values[offset]);
+                                    }
+                                    offset += p.lanes(part);
+                                }
+                                (reference, Some(values[0]))
+                            } else {
+                                (pop(&mut stack), None)
+                            };
+                            let source_tag = if matches!(top(), Ty::MixedUnion(_)) {
+                                pop(&mut stack); // Scalar bits never become an object address.
+                                Some(pop(&mut stack))
+                            } else {
+                                record_tag
+                            };
+                            let probe = b.create_block();
+                            let joined = b.create_block();
+                            b.append_block_param(joined, types::I64);
+                            let null = b.ins().icmp_imm(IntCC::Equal, value, 0);
+                            b.ins().brif(null, joined, &[value.into()], probe, &[]);
+                            b.switch_to_block(probe);
+                            let null_reference = b.ins().iconst(types::I64, 0);
+                            let target_ty = p.ty(target)?;
+                            let cast = if *top() == Ty::Literal {
+                                if string_view(&target_ty) {
+                                    text_object_view(&mut b, value)
+                                } else {
+                                    null_reference
+                                }
+                            } else {
+                                let text = b.create_block();
+                                let object = b.create_block();
+                                let merged = b.create_block();
+                                b.append_block_param(merged, types::I64);
+                                let tagged = b.ins().band_imm(value, 1);
+                                b.ins().brif(tagged, text, &[], object, &[]);
+                                b.switch_to_block(text);
+                                let result = if target_ty == Ty::Literal {
+                                    b.ins().band_imm(value, -2)
+                                } else if string_view(&target_ty) {
+                                    value
+                                } else {
+                                    null_reference
+                                };
+                                b.ins().jump(merged, &[result.into()]);
+                                b.switch_to_block(object);
+                                let result = if target_ty == Ty::Literal {
+                                    null_reference
+                                } else {
+                                    let tag = b.ins().load(types::I64, MemFlags::new(), value, 0);
+                                    let mut matches = b.ins().iconst(types::I8, 0);
+                                    let callable =
+                                        b.ins().icmp_imm(IntCC::Equal, tag, u32::MAX as i64);
+                                    if p.is_object_base(&target_ty) {
+                                        matches = callable;
+                                    }
+                                    if let Ty::Callable(shape) = &target_ty {
+                                        // Check the descriptor header before reading its target slot:
+                                        // an ordinary empty Object need not have payload storage.
+                                        let function = b.create_block();
+                                        let done = b.create_block();
+                                        b.append_block_param(done, types::I8);
+                                        b.ins().brif(
+                                            callable,
+                                            function,
+                                            &[],
+                                            done,
+                                            &[matches.into()],
+                                        );
+                                        b.switch_to_block(function);
+                                        let identity =
+                                            b.ins().load(types::I64, MemFlags::new(), value, 8);
+                                        for index in p.callable_targets(shape)? {
+                                            let equal = b.ins().icmp_imm(
+                                                IntCC::Equal,
+                                                identity,
+                                                (index + 1) as i64,
+                                            );
+                                            matches = b.ins().bor(matches, equal);
+                                        }
+                                        b.ins().jump(done, &[matches.into()]);
+                                        b.switch_to_block(done);
+                                        matches = b.block_params(done)[0];
+                                    }
+                                    for index in p.cast_targets(&target_ty) {
+                                        let matched = matches_type(&mut b, &p, tag, index);
+                                        matches = b.ins().bor(matches, matched);
+                                    }
+                                    b.ins().select(matches, value, null_reference)
+                                };
+                                b.ins().jump(merged, &[result.into()]);
+                                b.switch_to_block(merged);
+                                b.block_params(merged)[0]
+                            };
+                            b.ins().jump(joined, &[cast.into()]);
+                            b.switch_to_block(joined);
+                            let result = b.block_params(joined)[0];
+                            if matches!(op, Op::CastClass(_)) {
+                                let absent = b.ins().icmp_imm(IntCC::Equal, result, 0);
+                                let present = b.ins().icmp_imm(
+                                    IntCC::NotEqual,
+                                    source_tag.unwrap_or(value),
+                                    0,
+                                );
+                                let invalid = b.ins().band(absent, present);
+                                // Every failed checked reference cast has InvalidCast semantics,
+                                // including nominal targets reached from structural views.
+                                let status = b.ins().iconst(types::I32, 11);
+                                return_if_detailed(&mut b, invalid, status, site.as_ref());
+                            }
+                            if matches!(target_ty, Ty::MixedUnion(_)) {
+                                let present = b.ins().icmp_imm(IntCC::NotEqual, result, 0);
+                                let reference_tag = b.ins().iconst(types::I32, 4);
+                                let null_tag = b.ins().iconst(types::I32, 0);
+                                stack.push(b.ins().select(present, reference_tag, null_tag));
+                                stack.push(b.ins().iconst(types::I64, 0));
+                            }
+                            if let Ty::ValueUnion(parts) = &target_ty {
+                                // All reference alternatives share the first reference bank;
+                                // nominal membership is checked against the actual object.
+                                let active = parts
+                                    .iter()
+                                    .position(|part| {
+                                        matches!(part, Ty::Reference(_) | Ty::Interface(_))
+                                    })
+                                    .expect("reference alternative");
+                                let present = b.ins().icmp_imm(IntCC::NotEqual, result, 0);
+                                let tag = b.ins().iconst(types::I32, active as i64 + 1);
+                                let null = b.ins().iconst(types::I32, 0);
+                                stack.push(b.ins().select(present, tag, null));
+                                for (index, part) in parts.iter().enumerate() {
+                                    if index == active {
+                                        stack.push(result);
+                                    } else {
+                                        stack.extend(
+                                            lanes(&p, part).into_iter().map(|ty| zero(&mut b, ty)),
+                                        );
+                                    }
+                                }
+                            } else {
+                                stack.push(result);
+                            }
+                        }
+                        Op::ReferenceIsNull => {
+                            if matches!(top(), Ty::ValueUnion(_)) {
+                                stack.truncate(stack.len() - p.lanes(top()) + 1);
+                            }
+                            if matches!(top(), Ty::MixedUnion(_)) {
+                                pop(&mut stack);
+                            }
+                            if matches!(top(), Ty::ScalarUnion(_) | Ty::MixedUnion(_)) {
+                                pop(&mut stack);
+                            }
+                            let value = pop(&mut stack);
+                            let is_null = b.ins().icmp_imm(IntCC::Equal, value, 0);
+                            stack.push(b.ins().uextend(types::I32, is_null));
+                        }
+                        Op::ReferenceEqual => {
+                            let mut right = pop(&mut stack);
+                            let mut left = pop(&mut stack);
+                            if shape[shape.len() - 1] == Ty::Literal {
+                                right = text_object_view(&mut b, right);
+                            }
+                            if shape[shape.len() - 2] == Ty::Literal {
+                                left = text_object_view(&mut b, left);
+                            }
+                            let equal = b.ins().icmp(IntCC::Equal, left, right);
+                            stack.push(b.ins().uextend(types::I32, equal));
+                        }
+                        _ if crate::checked_conversion::spec(op).is_some() => {
+                            let value = pop(&mut stack);
+                            stack.push(crate::checked_conversion::emit(
+                                &mut b,
+                                op,
+                                value,
+                                site.as_ref(),
+                            ));
+                        }
+                        Op::ConvertInt32 | Op::ConvertUInt32 => {
+                            if matches!(top(), Ty::Size | Ty::Wide) {
+                                let value = pop(&mut stack);
+                                stack.push(b.ins().ireduce(types::I32, value));
+                            }
+                        }
+                        Op::ConvertInt64
+                        | Op::ConvertUInt64
+                        | Op::ConvertNativeInt
+                        | Op::ConvertNativeUInt => {
+                            if matches!(top(), Ty::Int) {
+                                let value = pop(&mut stack);
+                                stack.push(
+                                    if matches!(op, Op::ConvertUInt64 | Op::ConvertNativeUInt) {
+                                        b.ins().uextend(types::I64, value)
+                                    } else {
+                                        b.ins().sextend(types::I64, value)
+                                    },
+                                );
+                            }
+                        }
+                        Op::ConvertUInt8
+                        | Op::ConvertInt8
+                        | Op::ConvertInt16
+                        | Op::ConvertUInt16 => {
+                            let value = pop(&mut stack);
+                            let value = if matches!(top(), Ty::Size | Ty::Wide) {
+                                b.ins().ireduce(types::I32, value)
+                            } else {
+                                value
+                            };
+                            let narrow = b.ins().ireduce(
+                                if matches!(op, Op::ConvertUInt8 | Op::ConvertInt8) {
+                                    types::I8
+                                } else {
+                                    types::I16
+                                },
+                                value,
+                            );
+                            stack.push(if matches!(op, Op::ConvertInt8 | Op::ConvertInt16) {
+                                b.ins().sextend(types::I32, narrow)
+                            } else {
+                                b.ins().uextend(types::I32, narrow)
+                            });
+                        }
+                        Op::Bool(v) => stack.push(b.ins().iconst(types::I32, i64::from(*v))),
+                        Op::Void => stack.push(b.ins().iconst(types::I32, 0)),
+                        Op::LoadMetadataToken(index) => {
+                            let identity = type_tokens.len()
+                                + metadata_tokens
+                                    .iter()
+                                    .position(|i| i == index)
+                                    .expect("collected metadata token")
+                                + 1;
+                            stack.push(b.ins().iconst(types::I64, identity as i64));
+                        }
+                        Op::LoadTypeToken(t) => {
+                            let identity = type_tokens
+                                .iter()
+                                .position(|v| v == t)
+                                .expect("collected token")
+                                + 1;
+                            stack.push(b.ins().iconst(types::I64, identity as i64));
+                        }
+                        Op::PackValue(t) => {
+                            let payload = pop(&mut stack);
+                            let payload = normalize(&mut b, &p, &p.ty(t)?, &[payload])[0];
+                            let payload = match p.ty(t)? {
+                                Ty::Literal | Ty::Wide => payload,
+                                Ty::Double => b.ins().bitcast(types::I64, MemFlags::new(), payload),
+                                Ty::Single => {
+                                    let bits =
+                                        b.ins().bitcast(types::I32, MemFlags::new(), payload);
+                                    b.ins().uextend(types::I64, bits)
+                                }
+                                _ => b.ins().uextend(types::I64, payload),
+                            };
+                            stack.push(b.ins().iconst(types::I32, profile::erased_tag(t)?));
+                            stack.push(payload);
+                        }
+                        Op::IsValue(t) | Op::UnpackValue(t) => {
+                            let payload = pop(&mut stack);
+                            let tag = pop(&mut stack);
+                            let matches =
+                                b.ins().icmp_imm(IntCC::Equal, tag, profile::erased_tag(t)?);
+                            if matches!(op, Op::IsValue(_)) {
+                                stack.push(b.ins().uextend(types::I32, matches));
+                            } else {
+                                let wrong = b.ins().icmp_imm(IntCC::Equal, matches, 0);
+                                let status = b.ins().iconst(types::I32, 3); // RuntimeError
+                                return_if_detailed(&mut b, wrong, status, site.as_ref());
+                                let value = match p.ty(t)? {
+                                    Ty::Literal | Ty::Wide => payload,
+                                    Ty::Double => {
+                                        b.ins().bitcast(types::F64, MemFlags::new(), payload)
+                                    }
+                                    Ty::Single => {
+                                        let bits = b.ins().ireduce(types::I32, payload);
+                                        b.ins().bitcast(types::F32, MemFlags::new(), bits)
+                                    }
+                                    _ => b.ins().ireduce(types::I32, payload),
+                                };
+                                stack.push(normalize(&mut b, &p, &p.ty(t)?, &[value])[0]);
+                            }
+                        }
+                        Op::Arg(n) if stable_byrefs[*n].is_some() => {
+                            // The current native collector is nonmoving. Preserve
+                            // the immutable byref value, but keep its initialized
+                            // published root slot above for liveness. Never reuse
+                            // a parameter whose binding can be modified/aliased.
+                            stack.push(stable_byrefs[*n].unwrap());
+                        }
+                        Op::Arg(n) | Op::Load(n) => {
+                            let (s, t) = if matches!(op, Op::Arg(_)) {
+                                (arguments[*n], &p.args[i][*n])
+                            } else {
+                                (locals[*n], &p.locals[i][*n])
+                            };
+                            let address = b.ins().stack_addr(types::I64, s, 0);
+                            stack.extend(read(&mut b, &p, t, address));
+                        }
+                        Op::ArgumentAddress(n) | Op::LocalAddress(n) => {
+                            if details
+                                .is_some_and(|d| d.boxed_property_receivers.contains(&(i, pc)))
+                            {
+                                // The validated adapter has checked exact box identity. Its
+                                // Object argument stays rooted while the getter borrows payload.
+                                stack.push(b.ins().iadd_imm(parameters[2], 8));
+                            } else {
+                                let s = if matches!(op, Op::ArgumentAddress(_)) {
+                                    arguments[*n]
+                                } else {
+                                    locals[*n]
+                                };
+                                stack.push(b.ins().stack_addr(types::I64, s, 0));
+                            }
+                        }
+                        Op::StoreArg(n) | Op::Store(n) => {
+                            let s = if matches!(op, Op::StoreArg(_)) {
                                 arguments[*n]
                             } else {
                                 locals[*n]
                             };
-                            stack.push(b.ins().stack_addr(types::I64, s, 0));
-                        }
-                    }
-                    Op::StoreArg(n) | Op::Store(n) => {
-                        let s = if matches!(op, Op::StoreArg(_)) {
-                            arguments[*n]
-                        } else {
-                            locals[*n]
-                        };
-                        let value = stack.split_off(stack.len() - p.lanes(top()));
-                        let address = b.ins().stack_addr(types::I64, s, 0);
-                        let ty = if matches!(op, Op::StoreArg(_)) {
-                            &p.args[i][*n]
-                        } else {
-                            &p.locals[i][*n]
-                        };
-                        if matches!(ty, Ty::ByteValues | Ty::CharacterValues) {
-                            check_value_array_replacement(&mut b, address, value[0], site.as_ref());
-                        }
-                        write_typed(&mut b, &p, ty, address, &value);
-                    }
-                    Op::Dup => {
-                        let value = stack[stack.len() - p.lanes(top())..].to_vec();
-                        stack.extend(value);
-                    }
-                    Op::Pop => {
-                        stack.truncate(stack.len() - p.lanes(top()));
-                    }
-                    Op::InitializeObject(t) => {
-                        let address = pop(&mut stack);
-                        let ty = p.ty(t)?;
-                        let values = if ty == Ty::Character {
-                            let data = module.declare_data_in_func(default_character, b.func);
-                            vec![b.ins().global_value(types::I64, data)]
-                        } else {
-                            lanes(&p, &ty)
-                                .into_iter()
-                                .map(|t| zero(&mut b, t))
-                                .collect()
-                        };
-                        write(&mut b, address, &values);
-                    }
-                    Op::LoadObject(t) => {
-                        let address = pop(&mut stack);
-                        stack.extend(read(&mut b, &p, &p.ty(t)?, address));
-                    }
-                    Op::StoreObject(t) => {
-                        let value = stack.split_off(stack.len() - p.lanes(&p.ty(t)?));
-                        let address = pop(&mut stack);
-                        if matches!(p.ty(t)?, Ty::ByteValues | Ty::CharacterValues) {
-                            check_value_array_replacement(&mut b, address, value[0], site.as_ref());
-                        }
-                        write_typed(&mut b, &p, &p.ty(t)?, address, &value);
-                    }
-                    Op::New(t) => {
-                        let ty = p.ty(t)?;
-                        // Structural elements and nominal fields are ordered snapshots.
-                        if matches!(&ty, Ty::Record(owner) if input.types[*owner].fields.is_empty())
-                        {
-                            stack.push(b.ins().iconst(types::I32, 0));
-                        }
-                        let value = stack.split_off(stack.len() - p.lanes(&ty));
-                        stack.extend(normalize(&mut b, &p, &ty, &value));
-                    }
-                    Op::NewArray(t) | Op::ReserveArray(t)
-                        if crate::selection::scalar_array_element(t) =>
-                    {
-                        let count = pop(&mut stack);
-                        let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
-                        let output = b.ins().stack_addr(types::I64, call_result, 0);
-                        let reserved = b
-                            .ins()
-                            .iconst(types::I32, i64::from(matches!(op, Op::ReserveArray(_))));
-                        let service =
-                            module.declare_func_in_func(scalar_array_service.unwrap(), b.func);
-                        let call = b.ins().call(service, &[arena, count, reserved, output]);
-                        let status = b.inst_results(call)[0];
-                        let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
-                        return_if_detailed(&mut b, failed, status, site.as_ref());
-                        let array = b.ins().load(types::I64, MemFlags::new(), output, 0);
-                        tag_array(
-                            &mut b,
-                            &p,
-                            &p.ty(&neoclr::metadata::Type::ArrayRef(Box::new(t.clone())))?,
-                            array,
-                        );
-                        stack.push(array);
-                    }
-                    Op::NewArray(t)
-                        if matches!(
-                            t,
-                            neoclr::metadata::Type::Named(_) | neoclr::metadata::Type::ArrayRef(_)
-                        ) =>
-                    {
-                        let count = pop(&mut stack);
-                        let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
-                        let output = b.ins().stack_addr(types::I64, call_result, 0);
-                        let service = module
-                            .declare_func_in_func(default_reference_array_service.unwrap(), b.func);
-                        let call = b.ins().call(service, &[arena, count, output]);
-                        let status = b.inst_results(call)[0];
-                        let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
-                        return_if_detailed(&mut b, failed, status, site.as_ref());
-                        let array = b.ins().load(types::I64, MemFlags::new(), output, 0);
-                        if let Some(index) = p.backing_for_array(
-                            &p.ty(&neoclr::metadata::Type::ArrayRef(Box::new(t.clone())))?,
-                        ) {
-                            let tag = b.ins().iconst(
-                                types::I64,
-                                (((index as u64 + 1) << 32) | 0x80000005) as i64,
-                            );
-                            b.ins().store(MemFlags::new(), tag, array, 0);
-                        }
-                        stack.push(array);
-                    }
-                    Op::ReserveArray(t)
-                        if matches!(
-                            t,
-                            neoclr::metadata::Type::Named(_)
-                                | neoclr::metadata::Type::Tuple(_)
-                                | neoclr::metadata::Type::Union(_)
-                                | neoclr::metadata::Type::Intersection(_)
-                                | neoclr::metadata::Type::ArrayRef(_)
-                        ) =>
-                    {
-                        let count = pop(&mut stack);
-                        let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
-                        let output = b.ins().stack_addr(types::I64, call_result, 0);
-                        let width = b.ins().iconst(types::I32, p.lanes(&p.ty(t)?) as i64);
-                        let service =
-                            module.declare_func_in_func(record_array_service.unwrap(), b.func);
-                        let call = b.ins().call(service, &[arena, count, width, output]);
-                        let status = b.inst_results(call)[0];
-                        let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
-                        return_if_detailed(&mut b, failed, status, site.as_ref());
-                        let array = b.ins().load(types::I64, MemFlags::new(), output, 0);
-                        if let Some(index) = p.backing_for_array(
-                            &p.ty(&neoclr::metadata::Type::ArrayRef(Box::new(t.clone())))?,
-                        ) {
-                            let tag = b.ins().iconst(
-                                types::I64,
-                                (((index as u64 + 1) << 32) | 0x80000005) as i64,
-                            );
-                            b.ins().store(MemFlags::new(), tag, array, 0);
-                        }
-                        stack.push(array);
-                    }
-                    Op::NewArray(t) | Op::ReserveArray(t)
-                        if matches!(
-                            t,
-                            neoclr::metadata::Type::String
-                                | neoclr::metadata::Type::Char
-                                | neoclr::metadata::Type::Function(_)
-                        ) =>
-                    {
-                        let count = pop(&mut stack);
-                        let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
-                        let output = b.ins().stack_addr(types::I64, call_result, 0);
-                        let reserved = b
-                            .ins()
-                            .iconst(types::I32, i64::from(matches!(op, Op::ReserveArray(_))));
-                        let service =
-                            module.declare_func_in_func(reference_array_service.unwrap(), b.func);
-                        let call = b.ins().call(service, &[arena, count, reserved, output]);
-                        let status = b.inst_results(call)[0];
-                        let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
-                        return_if_detailed(&mut b, failed, status, site.as_ref());
-                        let array = b.ins().load(types::I64, MemFlags::new(), output, 0);
-                        tag_array(
-                            &mut b,
-                            &p,
-                            &p.ty(&neoclr::metadata::Type::ArrayRef(Box::new(t.clone())))?,
-                            array,
-                        );
-                        if matches!(op, Op::NewArray(neoclr::metadata::Type::Char)) {
-                            let data = module.declare_data_in_func(default_character, b.func);
-                            let character = b.ins().global_value(types::I64, data);
-                            let loop_block = b.create_block();
-                            b.append_block_param(loop_block, types::I32);
-                            let body = b.create_block();
-                            let done = b.create_block();
-                            let zero = b.ins().iconst(types::I32, 0);
-                            b.ins().jump(loop_block, &[zero.into()]);
-                            b.switch_to_block(loop_block);
-                            let index = b.block_params(loop_block)[0];
-                            let more = b.ins().icmp(IntCC::SignedLessThan, index, count);
-                            b.ins().brif(more, body, &[], done, &[]);
-                            b.switch_to_block(body);
-                            let wide = b.ins().uextend(types::I64, index);
-                            let offset = b.ins().imul_imm(wide, 8);
-                            let slot = b.ins().iadd(array, offset);
-                            b.ins().store(MemFlags::new(), character, slot, 16);
-                            let next = b.ins().iadd_imm(index, 1);
-                            b.ins().jump(loop_block, &[next.into()]);
-                            b.switch_to_block(done);
-                        }
-                        stack.push(array);
-                    }
-                    Op::NewArray(neoclr::metadata::Type::Byte)
-                    | Op::ReserveArray(neoclr::metadata::Type::Byte) => {
-                        let count = pop(&mut stack);
-                        let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
-                        let output = b.ins().stack_addr(types::I64, call_result, 0);
-                        let service = module.declare_func_in_func(
-                            if matches!(op, Op::ReserveArray(_)) {
-                                reserve_service.unwrap()
+                            let value = stack.split_off(stack.len() - p.lanes(top()));
+                            let address = b.ins().stack_addr(types::I64, s, 0);
+                            let ty = if matches!(op, Op::StoreArg(_)) {
+                                &p.args[i][*n]
                             } else {
-                                array_service.unwrap()
-                            },
-                            b.func,
-                        );
-                        let call = b.ins().call(service, &[arena, count, output]);
-                        let status = b.inst_results(call)[0];
-                        let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
-                        return_if_detailed(&mut b, failed, status, site.as_ref());
-                        stack.push(b.ins().load(types::I64, MemFlags::new(), output, 0));
-                    }
-                    Op::ArrayLength => {
-                        let array = pop(&mut stack);
-                        null_reference(&mut b, array, site.as_ref());
-                        stack.push(b.ins().load(types::I64, MemFlags::new(), array, 8));
-                    }
-                    Op::ArrayElement(t) | Op::StoreArrayElement(t)
-                        if matches!(
-                            t,
-                            neoclr::metadata::Type::Named(_)
-                                | neoclr::metadata::Type::Tuple(_)
-                                | neoclr::metadata::Type::Union(_)
-                                | neoclr::metadata::Type::Intersection(_)
-                                | neoclr::metadata::Type::ArrayRef(_)
-                        ) || crate::selection::scalar_array_element(t) =>
-                    {
-                        let ty = p.ty(t)?;
-                        let width = p.lanes(&ty);
-                        let value = if matches!(op, Op::StoreArrayElement(_)) {
-                            Some(stack.split_off(stack.len() - width))
-                        } else {
-                            None
-                        };
-                        let index = pop(&mut stack);
-                        let array = pop(&mut stack);
-                        null_reference(&mut b, array, site.as_ref());
-                        let length = b.ins().load(types::I32, MemFlags::new(), array, 8);
-                        let outside =
-                            b.ins()
-                                .icmp(IntCC::UnsignedGreaterThanOrEqual, index, length);
-                        let status = b.ins().iconst(types::I32, 8);
-                        return_if_detailed(&mut b, outside, status, site.as_ref());
-                        let index = b.ins().uextend(types::I64, index);
-                        let length = b.ins().uextend(types::I64, length);
-                        let offset = b.ins().imul_imm(index, (width * 8) as i64);
-                        let data = b.ins().iadd_imm(array, 24);
-                        let address = b.ins().iadd(data, offset);
-                        let bytes = b.ins().imul_imm(length, (width * 8) as i64);
-                        let markers = b.ins().iadd(data, bytes);
-                        let marker = b.ins().iadd(markers, index);
-                        if let Some(value) = value {
-                            // Publish initialization only after the complete snapshot is stored.
-                            // There is no collector boundary between these instructions.
-                            if live_stores && !crate::selection::scalar_array_element(t) {
-                                let snapshot = slot(&mut b, (width * 8) as u32);
-                                let source = b.ins().stack_addr(types::I64, snapshot, 0);
-                                // Narrow lanes must not copy uninitialized stack padding.
-                                let zero = b.ins().iconst(types::I64, 0);
-                                for lane in 0..width {
-                                    b.ins().stack_store(zero, snapshot, (lane * 8) as i32);
-                                }
-                                write_typed(&mut b, &p, &ty, source, &value);
-                                let mut signature = module.make_signature();
-                                signature.params.extend(
-                                    [types::I64, types::I64, types::I32, types::I64, types::I32]
-                                        .map(AbiParam::new),
+                                &p.locals[i][*n]
+                            };
+                            if matches!(ty, Ty::ByteValues | Ty::CharacterValues) {
+                                check_value_array_replacement(
+                                    &mut b,
+                                    address,
+                                    value[0],
+                                    site.as_ref(),
                                 );
-                                signature.returns.push(AbiParam::new(types::I32));
-                                let helper = module.declare_function(
-                                    "experiment_gc_store_record",
-                                    Linkage::Import,
-                                    &signature,
-                                )?;
-                                let helper = module.declare_func_in_func(helper, b.func);
-                                let ordinal = b.ins().ireduce(types::I32, index);
-                                let lanes = b.ins().iconst(types::I32, width as i64);
-                                let call = b.ins().call(
-                                    helper,
-                                    &[fault_context.unwrap(), array, ordinal, source, lanes],
+                            }
+                            write_typed(&mut b, &p, ty, address, &value);
+                        }
+                        Op::Dup => {
+                            let value = stack[stack.len() - p.lanes(top())..].to_vec();
+                            stack.extend(value);
+                        }
+                        Op::Pop => {
+                            stack.truncate(stack.len() - p.lanes(top()));
+                        }
+                        Op::InitializeObject(t) => {
+                            let address = pop(&mut stack);
+                            let ty = p.ty(t)?;
+                            let values = if ty == Ty::Character {
+                                let data = module.declare_data_in_func(default_character, b.func);
+                                vec![b.ins().global_value(types::I64, data)]
+                            } else {
+                                lanes(&p, &ty)
+                                    .into_iter()
+                                    .map(|t| zero(&mut b, t))
+                                    .collect()
+                            };
+                            write(&mut b, address, &values);
+                        }
+                        Op::LoadObject(t) => {
+                            let address = pop(&mut stack);
+                            stack.extend(read(&mut b, &p, &p.ty(t)?, address));
+                        }
+                        Op::StoreObject(t) => {
+                            let value = stack.split_off(stack.len() - p.lanes(&p.ty(t)?));
+                            let address = pop(&mut stack);
+                            if matches!(p.ty(t)?, Ty::ByteValues | Ty::CharacterValues) {
+                                check_value_array_replacement(
+                                    &mut b,
+                                    address,
+                                    value[0],
+                                    site.as_ref(),
                                 );
-                                let status = b.inst_results(call)[0];
-                                let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
-                                return_if_detailed(&mut b, failed, status, site.as_ref());
-                            } else if live_stores
-                                && crate::selection::scalar_array_element(t)
-                                && crate::mutation_admission::scalar_array_stores_enabled()
+                            }
+                            write_typed(&mut b, &p, &p.ty(t)?, address, &value);
+                        }
+                        Op::New(t) => {
+                            let ty = p.ty(t)?;
+                            // Structural elements and nominal fields are ordered snapshots.
+                            if matches!(&ty, Ty::Record(owner) if input.types[*owner].fields.is_empty())
                             {
-                                // Retain the typed primitive-storage contract before generic
-                                // mutation lowering loses it. The helper admits one complete
-                                // element plus its initialization marker; it never collects.
-                                assert_eq!(width, 1);
-                                let snapshot = slot(&mut b, 8);
-                                let source = b.ins().stack_addr(types::I64, snapshot, 0);
-                                let zero = b.ins().iconst(types::I64, 0);
-                                b.ins().stack_store(zero, snapshot, 0);
-                                write_typed(&mut b, &p, &ty, source, &value);
+                                stack.push(b.ins().iconst(types::I32, 0));
+                            }
+                            let value = stack.split_off(stack.len() - p.lanes(&ty));
+                            stack.extend(normalize(&mut b, &p, &ty, &value));
+                        }
+                        Op::NewArray(t) | Op::ReserveArray(t)
+                            if crate::selection::scalar_array_element(t) =>
+                        {
+                            let count = pop(&mut stack);
+                            let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
+                            let output = b.ins().stack_addr(types::I64, call_result, 0);
+                            let reserved = b
+                                .ins()
+                                .iconst(types::I32, i64::from(matches!(op, Op::ReserveArray(_))));
+                            let service =
+                                module.declare_func_in_func(scalar_array_service.unwrap(), b.func);
+                            let call = b.ins().call(service, &[arena, count, reserved, output]);
+                            let status = b.inst_results(call)[0];
+                            let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                            return_if_detailed(&mut b, failed, status, site.as_ref());
+                            let array = b.ins().load(types::I64, MemFlags::new(), output, 0);
+                            tag_array(
+                                &mut b,
+                                &p,
+                                &p.ty(&neoclr::metadata::Type::ArrayRef(Box::new(t.clone())))?,
+                                array,
+                            );
+                            stack.push(array);
+                        }
+                        Op::NewArray(t)
+                            if matches!(
+                                t,
+                                neoclr::metadata::Type::Named(_)
+                                    | neoclr::metadata::Type::ArrayRef(_)
+                            ) =>
+                        {
+                            let count = pop(&mut stack);
+                            let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
+                            let output = b.ins().stack_addr(types::I64, call_result, 0);
+                            let service = module.declare_func_in_func(
+                                default_reference_array_service.unwrap(),
+                                b.func,
+                            );
+                            let call = b.ins().call(service, &[arena, count, output]);
+                            let status = b.inst_results(call)[0];
+                            let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                            return_if_detailed(&mut b, failed, status, site.as_ref());
+                            let array = b.ins().load(types::I64, MemFlags::new(), output, 0);
+                            if let Some(index) = p.backing_for_array(
+                                &p.ty(&neoclr::metadata::Type::ArrayRef(Box::new(t.clone())))?,
+                            ) {
+                                let tag = b.ins().iconst(
+                                    types::I64,
+                                    (((index as u64 + 1) << 32) | 0x80000005) as i64,
+                                );
+                                b.ins().store(MemFlags::new(), tag, array, 0);
+                            }
+                            stack.push(array);
+                        }
+                        Op::ReserveArray(t)
+                            if matches!(
+                                t,
+                                neoclr::metadata::Type::Named(_)
+                                    | neoclr::metadata::Type::Tuple(_)
+                                    | neoclr::metadata::Type::Union(_)
+                                    | neoclr::metadata::Type::Intersection(_)
+                                    | neoclr::metadata::Type::ArrayRef(_)
+                            ) =>
+                        {
+                            let count = pop(&mut stack);
+                            let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
+                            let output = b.ins().stack_addr(types::I64, call_result, 0);
+                            let width = b.ins().iconst(types::I32, p.lanes(&p.ty(t)?) as i64);
+                            let service =
+                                module.declare_func_in_func(record_array_service.unwrap(), b.func);
+                            let call = b.ins().call(service, &[arena, count, width, output]);
+                            let status = b.inst_results(call)[0];
+                            let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                            return_if_detailed(&mut b, failed, status, site.as_ref());
+                            let array = b.ins().load(types::I64, MemFlags::new(), output, 0);
+                            if let Some(index) = p.backing_for_array(
+                                &p.ty(&neoclr::metadata::Type::ArrayRef(Box::new(t.clone())))?,
+                            ) {
+                                let tag = b.ins().iconst(
+                                    types::I64,
+                                    (((index as u64 + 1) << 32) | 0x80000005) as i64,
+                                );
+                                b.ins().store(MemFlags::new(), tag, array, 0);
+                            }
+                            stack.push(array);
+                        }
+                        Op::NewArray(t) | Op::ReserveArray(t)
+                            if matches!(
+                                t,
+                                neoclr::metadata::Type::String
+                                    | neoclr::metadata::Type::Char
+                                    | neoclr::metadata::Type::Function(_)
+                            ) =>
+                        {
+                            let count = pop(&mut stack);
+                            let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
+                            let output = b.ins().stack_addr(types::I64, call_result, 0);
+                            let reserved = b
+                                .ins()
+                                .iconst(types::I32, i64::from(matches!(op, Op::ReserveArray(_))));
+                            let service = module
+                                .declare_func_in_func(reference_array_service.unwrap(), b.func);
+                            let call = b.ins().call(service, &[arena, count, reserved, output]);
+                            let status = b.inst_results(call)[0];
+                            let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                            return_if_detailed(&mut b, failed, status, site.as_ref());
+                            let array = b.ins().load(types::I64, MemFlags::new(), output, 0);
+                            tag_array(
+                                &mut b,
+                                &p,
+                                &p.ty(&neoclr::metadata::Type::ArrayRef(Box::new(t.clone())))?,
+                                array,
+                            );
+                            if matches!(op, Op::NewArray(neoclr::metadata::Type::Char)) {
+                                let data = module.declare_data_in_func(default_character, b.func);
+                                let character = b.ins().global_value(types::I64, data);
+                                let loop_block = b.create_block();
+                                b.append_block_param(loop_block, types::I32);
+                                let body = b.create_block();
+                                let done = b.create_block();
+                                let zero = b.ins().iconst(types::I32, 0);
+                                b.ins().jump(loop_block, &[zero.into()]);
+                                b.switch_to_block(loop_block);
+                                let index = b.block_params(loop_block)[0];
+                                let more = b.ins().icmp(IntCC::SignedLessThan, index, count);
+                                b.ins().brif(more, body, &[], done, &[]);
+                                b.switch_to_block(body);
+                                let wide = b.ins().uextend(types::I64, index);
+                                let offset = b.ins().imul_imm(wide, 8);
+                                let slot = b.ins().iadd(array, offset);
+                                b.ins().store(MemFlags::new(), character, slot, 16);
+                                let next = b.ins().iadd_imm(index, 1);
+                                b.ins().jump(loop_block, &[next.into()]);
+                                b.switch_to_block(done);
+                            }
+                            stack.push(array);
+                        }
+                        Op::NewArray(neoclr::metadata::Type::Byte)
+                        | Op::ReserveArray(neoclr::metadata::Type::Byte) => {
+                            let count = pop(&mut stack);
+                            let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
+                            let output = b.ins().stack_addr(types::I64, call_result, 0);
+                            let service = module.declare_func_in_func(
+                                if matches!(op, Op::ReserveArray(_)) {
+                                    reserve_service.unwrap()
+                                } else {
+                                    array_service.unwrap()
+                                },
+                                b.func,
+                            );
+                            let call = b.ins().call(service, &[arena, count, output]);
+                            let status = b.inst_results(call)[0];
+                            let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                            return_if_detailed(&mut b, failed, status, site.as_ref());
+                            stack.push(b.ins().load(types::I64, MemFlags::new(), output, 0));
+                        }
+                        Op::ArrayLength => {
+                            let array = pop(&mut stack);
+                            null_reference(&mut b, array, site.as_ref());
+                            stack.push(b.ins().load(types::I64, MemFlags::new(), array, 8));
+                        }
+                        Op::ArrayElement(t) | Op::StoreArrayElement(t)
+                            if matches!(
+                                t,
+                                neoclr::metadata::Type::Named(_)
+                                    | neoclr::metadata::Type::Tuple(_)
+                                    | neoclr::metadata::Type::Union(_)
+                                    | neoclr::metadata::Type::Intersection(_)
+                                    | neoclr::metadata::Type::ArrayRef(_)
+                            ) || crate::selection::scalar_array_element(t) =>
+                        {
+                            let ty = p.ty(t)?;
+                            let width = p.lanes(&ty);
+                            let value = if matches!(op, Op::StoreArrayElement(_)) {
+                                Some(stack.split_off(stack.len() - width))
+                            } else {
+                                None
+                            };
+                            let index = pop(&mut stack);
+                            let array = pop(&mut stack);
+                            null_reference(&mut b, array, site.as_ref());
+                            let length = b.ins().load(types::I32, MemFlags::new(), array, 8);
+                            let outside =
+                                b.ins()
+                                    .icmp(IntCC::UnsignedGreaterThanOrEqual, index, length);
+                            let status = b.ins().iconst(types::I32, 8);
+                            return_if_detailed(&mut b, outside, status, site.as_ref());
+                            let index = b.ins().uextend(types::I64, index);
+                            let length = b.ins().uextend(types::I64, length);
+                            let offset = b.ins().imul_imm(index, (width * 8) as i64);
+                            let data = b.ins().iadd_imm(array, 24);
+                            let address = b.ins().iadd(data, offset);
+                            let bytes = b.ins().imul_imm(length, (width * 8) as i64);
+                            let markers = b.ins().iadd(data, bytes);
+                            let marker = b.ins().iadd(markers, index);
+                            if let Some(value) = value {
+                                // Publish initialization only after the complete snapshot is stored.
+                                // There is no collector boundary between these instructions.
+                                if live_stores && !crate::selection::scalar_array_element(t) {
+                                    let snapshot = slot(&mut b, (width * 8) as u32);
+                                    let source = b.ins().stack_addr(types::I64, snapshot, 0);
+                                    // Narrow lanes must not copy uninitialized stack padding.
+                                    let zero = b.ins().iconst(types::I64, 0);
+                                    for lane in 0..width {
+                                        b.ins().stack_store(zero, snapshot, (lane * 8) as i32);
+                                    }
+                                    write_typed(&mut b, &p, &ty, source, &value);
+                                    let mut signature = module.make_signature();
+                                    signature.params.extend(
+                                        [
+                                            types::I64,
+                                            types::I64,
+                                            types::I32,
+                                            types::I64,
+                                            types::I32,
+                                        ]
+                                        .map(AbiParam::new),
+                                    );
+                                    signature.returns.push(AbiParam::new(types::I32));
+                                    let helper = module.declare_function(
+                                        "experiment_gc_store_record",
+                                        Linkage::Import,
+                                        &signature,
+                                    )?;
+                                    let helper = module.declare_func_in_func(helper, b.func);
+                                    let ordinal = b.ins().ireduce(types::I32, index);
+                                    let lanes = b.ins().iconst(types::I32, width as i64);
+                                    let call = b.ins().call(
+                                        helper,
+                                        &[fault_context.unwrap(), array, ordinal, source, lanes],
+                                    );
+                                    let status = b.inst_results(call)[0];
+                                    let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                                    return_if_detailed(&mut b, failed, status, site.as_ref());
+                                } else if live_stores
+                                    && crate::selection::scalar_array_element(t)
+                                    && crate::mutation_admission::scalar_array_stores_enabled()
+                                {
+                                    // Retain the typed primitive-storage contract before generic
+                                    // mutation lowering loses it. The helper admits one complete
+                                    // element plus its initialization marker; it never collects.
+                                    assert_eq!(width, 1);
+                                    let snapshot = slot(&mut b, 8);
+                                    let source = b.ins().stack_addr(types::I64, snapshot, 0);
+                                    let zero = b.ins().iconst(types::I64, 0);
+                                    b.ins().stack_store(zero, snapshot, 0);
+                                    write_typed(&mut b, &p, &ty, source, &value);
+                                    let mut signature = module.make_signature();
+                                    signature.params.extend(
+                                        [types::I64, types::I64, types::I32, types::I64]
+                                            .map(AbiParam::new),
+                                    );
+                                    signature.returns.push(AbiParam::new(types::I32));
+                                    let helper = module.declare_function(
+                                        "experiment_gc_store_scalar",
+                                        Linkage::Import,
+                                        &signature,
+                                    )?;
+                                    let helper = module.declare_func_in_func(helper, b.func);
+                                    let ordinal = b.ins().ireduce(types::I32, index);
+                                    let call = b.ins().call(
+                                        helper,
+                                        &[fault_context.unwrap(), array, ordinal, source],
+                                    );
+                                    let status = b.inst_results(call)[0];
+                                    let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                                    return_if_detailed(&mut b, failed, status, site.as_ref());
+                                } else {
+                                    write_typed(&mut b, &p, &ty, address, &value);
+                                    let initialized = b.ins().iconst(types::I8, 1);
+                                    b.ins().store(MemFlags::new(), initialized, marker, 0);
+                                }
+                            } else {
+                                let initialized =
+                                    b.ins().load(types::I8, MemFlags::new(), marker, 0);
+                                let unreadable = b.ins().icmp_imm(IntCC::Equal, initialized, 0);
+                                let status = b.ins().iconst(types::I32, 3);
+                                return_if_detailed(&mut b, unreadable, status, site.as_ref());
+                                stack.extend(read(&mut b, &p, &ty, address));
+                            }
+                        }
+                        Op::ArrayElement(t) | Op::StoreArrayElement(t) | Op::ArrayAddress(t) => {
+                            let pointers = matches!(
+                                t,
+                                neoclr::metadata::Type::String
+                                    | neoclr::metadata::Type::Char
+                                    | neoclr::metadata::Type::Function(_)
+                            );
+                            let value = if matches!(op, Op::StoreArrayElement(_)) {
+                                Some(pop(&mut stack))
+                            } else {
+                                None
+                            };
+                            let index = pop(&mut stack);
+                            let array = pop(&mut stack);
+                            null_reference(&mut b, array, site.as_ref());
+                            let length = b.ins().load(types::I32, MemFlags::new(), array, 8);
+                            let outside =
+                                b.ins()
+                                    .icmp(IntCC::UnsignedGreaterThanOrEqual, index, length);
+                            let status = b.ins().iconst(types::I32, 8);
+                            return_if_detailed(&mut b, outside, status, site.as_ref());
+                            let offset = b.ins().uextend(types::I64, index);
+                            let offset = if pointers {
+                                b.ins().ishl_imm(offset, 3)
+                            } else {
+                                offset
+                            };
+                            let data = b.ins().iadd_imm(array, 16);
+                            let address = b.ins().iadd(data, offset);
+                            if live_stores && pointers && value.is_some() {
                                 let mut signature = module.make_signature();
                                 signature.params.extend(
                                     [types::I64, types::I64, types::I32, types::I64]
@@ -5239,681 +5441,653 @@ pub(crate) fn compile_into(
                                 );
                                 signature.returns.push(AbiParam::new(types::I32));
                                 let helper = module.declare_function(
-                                    "experiment_gc_store_scalar",
+                                    "experiment_gc_store_text",
                                     Linkage::Import,
                                     &signature,
                                 )?;
                                 let helper = module.declare_func_in_func(helper, b.func);
-                                let ordinal = b.ins().ireduce(types::I32, index);
                                 let call = b.ins().call(
                                     helper,
-                                    &[fault_context.unwrap(), array, ordinal, source],
+                                    &[fault_context.unwrap(), array, index, value.unwrap()],
                                 );
                                 let status = b.inst_results(call)[0];
                                 let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
                                 return_if_detailed(&mut b, failed, status, site.as_ref());
                             } else {
-                                write_typed(&mut b, &p, &ty, address, &value);
-                                let initialized = b.ins().iconst(types::I8, 1);
-                                b.ins().store(MemFlags::new(), initialized, marker, 0);
+                                if reservations {
+                                    let kind = b.ins().load(types::I64, MemFlags::new(), array, 0);
+                                    let kind = b.ins().band_imm(kind, 0xffffffff);
+                                    let reserved = b.ins().icmp_imm(
+                                        IntCC::Equal,
+                                        kind,
+                                        if pointers { 0x80000004 } else { 0x80000002 },
+                                    );
+                                    let check = b.create_block();
+                                    let ready = b.create_block();
+                                    b.ins().brif(reserved, check, &[], ready, &[]);
+                                    b.switch_to_block(check);
+                                    let length = b.ins().uextend(types::I64, length);
+                                    let marker = if pointers {
+                                        let bytes = b.ins().ishl_imm(length, 3);
+                                        let markers = b.ins().iadd(data, bytes);
+                                        let index = b.ins().uextend(types::I64, index);
+                                        b.ins().iadd(markers, index)
+                                    } else {
+                                        b.ins().iadd(address, length)
+                                    };
+                                    if value.is_some() {
+                                        let initialized = b.ins().iconst(types::I8, 1);
+                                        b.ins().store(MemFlags::new(), initialized, marker, 0);
+                                    } else {
+                                        let initialized =
+                                            b.ins().load(types::I8, MemFlags::new(), marker, 0);
+                                        let unreadable =
+                                            b.ins().icmp_imm(IntCC::Equal, initialized, 0);
+                                        let status = b.ins().iconst(types::I32, 3);
+                                        return_if_detailed(
+                                            &mut b,
+                                            unreadable,
+                                            status,
+                                            site.as_ref(),
+                                        );
+                                    }
+                                    b.ins().jump(ready, &[]);
+                                    b.switch_to_block(ready);
+                                }
+                                if let Some(value) = value {
+                                    let value = if pointers {
+                                        value
+                                    } else {
+                                        b.ins().ireduce(types::I8, value)
+                                    };
+                                    b.ins().store(MemFlags::new(), value, address, 0);
+                                } else if matches!(op, Op::ArrayAddress(_)) {
+                                    stack.push(address);
+                                } else {
+                                    let value = b.ins().load(
+                                        if pointers { types::I64 } else { types::I8 },
+                                        MemFlags::new(),
+                                        address,
+                                        0,
+                                    );
+                                    stack.push(if pointers {
+                                        value
+                                    } else {
+                                        b.ins().uextend(types::I32, value)
+                                    });
+                                }
                             }
-                        } else {
-                            let initialized = b.ins().load(types::I8, MemFlags::new(), marker, 0);
-                            let unreadable = b.ins().icmp_imm(IntCC::Equal, initialized, 0);
-                            let status = b.ins().iconst(types::I32, 3);
-                            return_if_detailed(&mut b, unreadable, status, site.as_ref());
-                            stack.extend(read(&mut b, &p, &ty, address));
                         }
-                    }
-                    Op::ArrayElement(t) | Op::StoreArrayElement(t) | Op::ArrayAddress(t) => {
-                        let pointers = matches!(
-                            t,
-                            neoclr::metadata::Type::String
-                                | neoclr::metadata::Type::Char
-                                | neoclr::metadata::Type::Function(_)
-                        );
-                        let value = if matches!(op, Op::StoreArrayElement(_)) {
-                            Some(pop(&mut stack))
-                        } else {
-                            None
-                        };
-                        let index = pop(&mut stack);
-                        let array = pop(&mut stack);
-                        null_reference(&mut b, array, site.as_ref());
-                        let length = b.ins().load(types::I32, MemFlags::new(), array, 8);
-                        let outside =
-                            b.ins()
-                                .icmp(IntCC::UnsignedGreaterThanOrEqual, index, length);
-                        let status = b.ins().iconst(types::I32, 8);
-                        return_if_detailed(&mut b, outside, status, site.as_ref());
-                        let offset = b.ins().uextend(types::I64, index);
-                        let offset = if pointers {
-                            b.ins().ishl_imm(offset, 3)
-                        } else {
-                            offset
-                        };
-                        let data = b.ins().iadd_imm(array, 16);
-                        let address = b.ins().iadd(data, offset);
-                        if live_stores && pointers && value.is_some() {
-                            let mut signature = module.make_signature();
-                            signature.params.extend(
-                                [types::I64, types::I64, types::I32, types::I64].map(AbiParam::new),
+                        Op::StaticField { owner, index } | Op::SetStaticField { owner, index } => {
+                            let (owner_index, ty, offset, bytes) = p.static_field(owner, *index)?;
+                            // Dense static-owner ordinals avoid retaining/scanning empty
+                            // slots for every unrelated selected type on each collection.
+                            let type_index = input.types[..owner_index]
+                                .iter()
+                                .filter(|t| crate::type_initialization::needs_storage(input, t))
+                                .count();
+                            let static_count = input
+                                .types
+                                .iter()
+                                .filter(|t| crate::type_initialization::needs_storage(input, t))
+                                .count();
+                            // Warm static access neither allocates nor calls managed code.
+                            // Publish the pending operands only on the cold allocation path.
+                            let cold = b.create_block();
+                            let lookup = b.create_block();
+                            let ready = b.create_block();
+                            b.append_block_param(ready, types::I64);
+                            let table = b.ins().load(
+                                types::I64,
+                                MemFlags::new(),
+                                fault_context.unwrap(),
+                                1072,
                             );
-                            signature.returns.push(AbiParam::new(types::I32));
-                            let helper = module.declare_function(
-                                "experiment_gc_store_text",
-                                Linkage::Import,
-                                &signature,
-                            )?;
-                            let helper = module.declare_func_in_func(helper, b.func);
+                            let missing = b.ins().icmp_imm(IntCC::Equal, table, 0);
+                            b.ins().brif(missing, cold, &[], lookup, &[]);
+                            b.switch_to_block(lookup);
+                            let cached = b.ins().load(
+                                types::I64,
+                                MemFlags::new(),
+                                table,
+                                ((type_index + 1) * 8) as i32,
+                            );
+                            let missing = b.ins().icmp_imm(IntCC::Equal, cached, 0);
+                            b.ins().brif(missing, cold, &[], ready, &[cached.into()]);
+                            b.switch_to_block(cold);
+                            if let (Some(probes), Some(spill)) = (&root_probes, root_spill) {
+                                probes.emit(
+                                    module,
+                                    &mut b,
+                                    i,
+                                    pc,
+                                    spill,
+                                    probe_frame.unwrap(),
+                                    &stack,
+                                );
+                            }
+                            let output_slot = slot(&mut b, 8);
+                            let output = b.ins().stack_addr(types::I64, output_slot, 0);
+                            let service =
+                                module.declare_func_in_func(static_service.unwrap(), b.func);
+                            let type_id = b.ins().iconst(types::I32, type_index as i64);
+                            let count = b.ins().iconst(types::I32, static_count as i64);
+                            let bytes = b.ins().iconst(types::I32, bytes as i64);
                             let call = b.ins().call(
-                                helper,
-                                &[fault_context.unwrap(), array, index, value.unwrap()],
+                                service,
+                                &[fault_context.unwrap(), type_id, count, bytes, output],
                             );
                             let status = b.inst_results(call)[0];
                             let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
                             return_if_detailed(&mut b, failed, status, site.as_ref());
-                        } else {
-                            if reservations {
-                                let kind = b.ins().load(types::I64, MemFlags::new(), array, 0);
-                                let kind = b.ins().band_imm(kind, 0xffffffff);
-                                let reserved = b.ins().icmp_imm(
-                                    IntCC::Equal,
-                                    kind,
-                                    if pointers { 0x80000004 } else { 0x80000002 },
-                                );
-                                let check = b.create_block();
-                                let ready = b.create_block();
-                                b.ins().brif(reserved, check, &[], ready, &[]);
-                                b.switch_to_block(check);
-                                let length = b.ins().uextend(types::I64, length);
-                                let marker = if pointers {
-                                    let bytes = b.ins().ishl_imm(length, 3);
-                                    let markers = b.ins().iadd(data, bytes);
-                                    let index = b.ins().uextend(types::I64, index);
-                                    b.ins().iadd(markers, index)
+                            let storage = b.ins().load(types::I64, MemFlags::new(), output, 0);
+                            b.ins().jump(ready, &[storage.into()]);
+                            b.switch_to_block(ready);
+                            let storage = b.block_params(ready)[0];
+                            let address = b.ins().iadd_imm(storage, offset as i64);
+                            if matches!(op, Op::SetStaticField { .. }) {
+                                let value = stack.split_off(stack.len() - p.lanes(top()));
+                                let value = normalize(&mut b, &p, &ty, &value);
+                                write_typed(&mut b, &p, &ty, address, &value);
+                            } else {
+                                stack.extend(read(&mut b, &p, &ty, address));
+                            }
+                        }
+                        Op::Field(n) | Op::FieldAddress(n) => {
+                            let field = p.field(top(), *n)?;
+                            let offset = p.field_offset(top(), *n);
+                            if matches!(top(), Ty::Address(_) | Ty::Reference(_)) {
+                                let owner = pop(&mut stack);
+                                let header = if matches!(top(), Ty::Reference(_)) {
+                                    null_reference(&mut b, owner, site.as_ref());
+                                    8
                                 } else {
-                                    b.ins().iadd(address, length)
+                                    0
                                 };
-                                if value.is_some() {
-                                    let initialized = b.ins().iconst(types::I8, 1);
-                                    b.ins().store(MemFlags::new(), initialized, marker, 0);
+                                let address = b.ins().iadd_imm(owner, (header + offset * 8) as i64);
+                                if matches!(top(), Ty::Reference(i) if p.is_array_backing(*i)) {
+                                    // The verified backing's sole field denotes this same array,
+                                    // not storage at the length-header offset.
+                                    stack.push(owner);
+                                } else if matches!(op, Op::FieldAddress(_)) {
+                                    stack.push(address);
                                 } else {
-                                    let initialized =
-                                        b.ins().load(types::I8, MemFlags::new(), marker, 0);
-                                    let unreadable = b.ins().icmp_imm(IntCC::Equal, initialized, 0);
-                                    let status = b.ins().iconst(types::I32, 3);
-                                    return_if_detailed(&mut b, unreadable, status, site.as_ref());
+                                    stack.extend(read(&mut b, &p, &field, address));
                                 }
-                                b.ins().jump(ready, &[]);
-                                b.switch_to_block(ready);
+                            } else {
+                                let value = stack.split_off(stack.len() - p.lanes(top()));
+                                stack.extend_from_slice(&value[offset..offset + p.lanes(&field)]);
                             }
-                            if let Some(value) = value {
-                                let value = if pointers {
-                                    value
+                        }
+                        Op::SetField(n) => {
+                            let value = stack.split_off(stack.len() - p.lanes(top()));
+                            let owner = &shape[shape.len() - 2];
+                            let offset = p.field_offset(owner, *n);
+                            let value = normalize(&mut b, &p, &p.field(owner, *n)?, &value);
+                            if matches!(owner, Ty::Address(_) | Ty::Reference(_)) {
+                                let is_reference = matches!(owner, Ty::Reference(_));
+                                let owner = pop(&mut stack);
+                                let header = if is_reference {
+                                    null_reference(&mut b, owner, site.as_ref());
+                                    8
                                 } else {
-                                    b.ins().ireduce(types::I8, value)
+                                    0
                                 };
-                                b.ins().store(MemFlags::new(), value, address, 0);
-                            } else if matches!(op, Op::ArrayAddress(_)) {
-                                stack.push(address);
-                            } else {
-                                let value = b.ins().load(
-                                    if pointers { types::I64 } else { types::I8 },
-                                    MemFlags::new(),
+                                let address = b.ins().iadd_imm(owner, (header + offset * 8) as i64);
+                                write_typed(
+                                    &mut b,
+                                    &p,
+                                    &p.field(&shape[shape.len() - 2], *n)?,
                                     address,
-                                    0,
+                                    &value,
                                 );
-                                stack.push(if pointers {
-                                    value
+                                if !is_reference {
+                                    stack.push(b.ins().iconst(types::I32, 0));
+                                } // borrowed value store returns Void
+                            } else {
+                                let start = stack.len() - p.lanes(owner) + offset;
+                                stack[start..start + value.len()].copy_from_slice(&value);
+                            }
+                        }
+                        Op::BindFunction { target, .. } => {
+                            let c = p.callee(target)?;
+                            let receiver = if target.instance {
+                                let receiver = pop(&mut stack);
+                                // Binding uses the interpreter's invalid-receiver fault;
+                                // invoking a null function separately uses NullReference.
+                                let null = b.ins().icmp_imm(IntCC::Equal, receiver, 0);
+                                let invalid = b.ins().iconst(types::I32, 3);
+                                return_if_detailed(&mut b, null, invalid, site.as_ref());
+                                receiver
+                            } else {
+                                b.ins().iconst(types::I64, 0)
+                            };
+                            let service =
+                                module.declare_func_in_func(object_service.unwrap(), b.func);
+                            let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
+                            // Private descriptor header, never exposed as a nominal class.
+                            let type_id = b.ins().iconst(types::I32, u32::MAX as i64);
+                            let bytes = b.ins().iconst(types::I32, 24);
+                            let output = b.ins().stack_addr(types::I64, call_result, 0);
+                            let call = b.ins().call(service, &[arena, type_id, bytes, output]);
+                            let raw = b.inst_results(call)[0];
+                            let exhausted = b.ins().icmp_imm(IntCC::Equal, raw, 5);
+                            let memory = b.ins().iconst(types::I32, 5);
+                            let runtime = b.ins().iconst(types::I32, 3);
+                            let status = b.ins().select(exhausted, memory, runtime);
+                            let failed = b.ins().icmp_imm(IntCC::NotEqual, raw, 0);
+                            return_if_detailed(&mut b, failed, status, site.as_ref());
+                            let descriptor = b.ins().load(types::I64, MemFlags::new(), output, 0);
+                            let identity = b.ins().iconst(types::I64, (c + 1) as i64);
+                            b.ins().store(MemFlags::new(), identity, descriptor, 8);
+                            b.ins().store(MemFlags::new(), receiver, descriptor, 16);
+                            stack.push(descriptor);
+                        }
+                        Op::Call(target) | Op::CallVirtual(target)
+                            if crate::selection::callable_invoke(target).is_some() =>
+                        {
+                            let signature = crate::selection::callable_invoke(target).unwrap();
+                            let owner = target.owner.as_ref().unwrap();
+                            let count = signature
+                                .parameters
+                                .iter()
+                                .map(|t| p.ty(t).map(|t| p.lanes(&t)))
+                                .collect::<Result<Vec<_>, _>>()?
+                                .into_iter()
+                                .sum::<usize>();
+                            let actual = stack.split_off(stack.len() - count);
+                            let descriptor = pop(&mut stack);
+                            null_reference(&mut b, descriptor, site.as_ref());
+                            let identity = b.ins().load(types::I64, MemFlags::new(), descriptor, 8);
+                            let result = b.ins().stack_addr(types::I64, call_result, 0);
+                            let result_type = if signature.no_result {
+                                None
+                            } else {
+                                Some(p.ty(&signature.returns)?)
+                            };
+                            if let (Some(probes), Some(t)) = (&root_probes, &result_type) {
+                                let zero = b.ins().iconst(types::I64, 0);
+                                for lane in gc_layout::seed_lanes(&p, t) {
+                                    b.ins()
+                                        .store(MemFlags::new(), zero, result, (lane * 8) as i32);
+                                }
+                                probes.publish(
+                                    module,
+                                    &mut b,
+                                    i,
+                                    pc,
+                                    3,
+                                    probe_frame.unwrap(),
+                                    transient_table.unwrap(),
+                                    result,
+                                );
+                            }
+                            let join = b.create_block();
+                            b.append_block_param(join, types::I32);
+                            for c in p.callable_targets(owner)? {
+                                let matched = b.create_block();
+                                let next = b.create_block();
+                                let equal =
+                                    b.ins().icmp_imm(IntCC::Equal, identity, (c + 1) as i64);
+                                b.ins().brif(equal, matched, &[], next, &[]);
+                                b.switch_to_block(matched);
+                                let mut args = Vec::new();
+                                if input.functions[c].instance {
+                                    args.push(b.ins().load(
+                                        types::I64,
+                                        MemFlags::new(),
+                                        descriptor,
+                                        16,
+                                    ));
+                                }
+                                args.extend_from_slice(&actual);
+                                args.push(result);
+                                if let Some(context) = fault_context {
+                                    args.push(context);
+                                }
+                                let callee = module.declare_func_in_func(ids[c], b.func);
+                                let call = b.ins().call(callee, &args);
+                                let status = b.inst_results(call)[0];
+                                b.ins().jump(join, &[status.into()]);
+                                b.switch_to_block(next);
+                            }
+                            let invalid = b.ins().iconst(types::I32, 3);
+                            b.ins().jump(join, &[invalid.into()]);
+                            b.switch_to_block(join);
+                            let status = b.block_params(join)[0];
+                            let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                            return_if_detailed(&mut b, failed, status, site.as_ref());
+                            if let Some(t) = &result_type {
+                                if let Some(probes) = &root_probes {
+                                    probes.publish(
+                                        module,
+                                        &mut b,
+                                        i,
+                                        pc,
+                                        2,
+                                        probe_frame.unwrap(),
+                                        transient_table.unwrap(),
+                                        result,
+                                    );
+                                }
+                                stack.extend(read(&mut b, &p, t, result));
+                            }
+                        }
+                        Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) => {
+                            let c = p.callee(target)?;
+                            let construct = matches!(op, Op::Construct(_));
+                            let count: usize = p.args[c]
+                                .iter()
+                                .skip(usize::from(construct))
+                                .map(|t| p.lanes(t))
+                                .sum();
+                            let mut call_args = stack.split_off(stack.len() - count);
+                            let constructed = if construct {
+                                let t = p.ty(target.owner.as_ref().unwrap())?;
+                                let address = b.ins().stack_addr(types::I64, constructors[&pc], 0);
+                                let receiver = if let Ty::Reference(index) = t {
+                                    let service = module
+                                        .declare_func_in_func(object_service.unwrap(), b.func);
+                                    let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
+                                    let type_id = b.ins().iconst(types::I32, index as i64);
+                                    let bytes =
+                                        b.ins().iconst(types::I32, p.object_bytes(index) as i64);
+                                    let call =
+                                        b.ins().call(service, &[arena, type_id, bytes, address]);
+                                    let raw = b.inst_results(call)[0];
+                                    let exhausted = b.ins().icmp_imm(IntCC::Equal, raw, 5);
+                                    let memory = b.ins().iconst(types::I32, 5);
+                                    let runtime = b.ins().iconst(types::I32, 3);
+                                    let status = b.ins().select(exhausted, memory, runtime);
+                                    let failed = b.ins().icmp_imm(IntCC::NotEqual, raw, 0);
+                                    return_if_detailed(&mut b, failed, status, site.as_ref());
+                                    b.ins().load(types::I64, MemFlags::new(), address, 0)
                                 } else {
-                                    b.ins().uextend(types::I32, value)
-                                });
-                            }
-                        }
-                    }
-                    Op::StaticField { owner, index } | Op::SetStaticField { owner, index } => {
-                        let (owner_index, ty, offset, bytes) = p.static_field(owner, *index)?;
-                        // Dense static-owner ordinals avoid retaining/scanning empty
-                        // slots for every unrelated selected type on each collection.
-                        let type_index = input.types[..owner_index]
-                            .iter()
-                            .filter(|t| crate::type_initialization::needs_storage(input, t))
-                            .count();
-                        let static_count = input
-                            .types
-                            .iter()
-                            .filter(|t| crate::type_initialization::needs_storage(input, t))
-                            .count();
-                        // Warm static access neither allocates nor calls managed code.
-                        // Publish the pending operands only on the cold allocation path.
-                        let cold = b.create_block();
-                        let lookup = b.create_block();
-                        let ready = b.create_block();
-                        b.append_block_param(ready, types::I64);
-                        let table =
-                            b.ins()
-                                .load(types::I64, MemFlags::new(), fault_context.unwrap(), 1072);
-                        let missing = b.ins().icmp_imm(IntCC::Equal, table, 0);
-                        b.ins().brif(missing, cold, &[], lookup, &[]);
-                        b.switch_to_block(lookup);
-                        let cached = b.ins().load(
-                            types::I64,
-                            MemFlags::new(),
-                            table,
-                            ((type_index + 1) * 8) as i32,
-                        );
-                        let missing = b.ins().icmp_imm(IntCC::Equal, cached, 0);
-                        b.ins().brif(missing, cold, &[], ready, &[cached.into()]);
-                        b.switch_to_block(cold);
-                        if let (Some(probes), Some(spill)) = (&root_probes, root_spill) {
-                            probes.emit(module, &mut b, i, pc, spill, probe_frame.unwrap(), &stack);
-                        }
-                        let output_slot = slot(&mut b, 8);
-                        let output = b.ins().stack_addr(types::I64, output_slot, 0);
-                        let service = module.declare_func_in_func(static_service.unwrap(), b.func);
-                        let type_id = b.ins().iconst(types::I32, type_index as i64);
-                        let count = b.ins().iconst(types::I32, static_count as i64);
-                        let bytes = b.ins().iconst(types::I32, bytes as i64);
-                        let call = b.ins().call(
-                            service,
-                            &[fault_context.unwrap(), type_id, count, bytes, output],
-                        );
-                        let status = b.inst_results(call)[0];
-                        let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
-                        return_if_detailed(&mut b, failed, status, site.as_ref());
-                        let storage = b.ins().load(types::I64, MemFlags::new(), output, 0);
-                        b.ins().jump(ready, &[storage.into()]);
-                        b.switch_to_block(ready);
-                        let storage = b.block_params(ready)[0];
-                        let address = b.ins().iadd_imm(storage, offset as i64);
-                        if matches!(op, Op::SetStaticField { .. }) {
-                            let value = stack.split_off(stack.len() - p.lanes(top()));
-                            let value = normalize(&mut b, &p, &ty, &value);
-                            write_typed(&mut b, &p, &ty, address, &value);
-                        } else {
-                            stack.extend(read(&mut b, &p, &ty, address));
-                        }
-                    }
-                    Op::Field(n) | Op::FieldAddress(n) => {
-                        let field = p.field(top(), *n)?;
-                        let offset = p.field_offset(top(), *n);
-                        if matches!(top(), Ty::Address(_) | Ty::Reference(_)) {
-                            let owner = pop(&mut stack);
-                            let header = if matches!(top(), Ty::Reference(_)) {
-                                null_reference(&mut b, owner, site.as_ref());
-                                8
+                                    let zeros: Vec<_> = lanes(&p, &t)
+                                        .into_iter()
+                                        .map(|t| zero(&mut b, t))
+                                        .collect();
+                                    write(&mut b, address, &zeros);
+                                    address
+                                };
+                                if let Some(probes) = &root_probes {
+                                    probes.publish(
+                                        module,
+                                        &mut b,
+                                        i,
+                                        pc,
+                                        1,
+                                        probe_frame.unwrap(),
+                                        transient_table.unwrap(),
+                                        address,
+                                    );
+                                }
+                                call_args.insert(0, receiver);
+                                Some((t, address))
                             } else {
-                                0
+                                None
                             };
-                            let address = b.ins().iadd_imm(owner, (header + offset * 8) as i64);
-                            if matches!(top(), Ty::Reference(i) if p.is_array_backing(*i)) {
-                                // The verified backing's sole field denotes this same array,
-                                // not storage at the length-header offset.
-                                stack.push(owner);
-                            } else if matches!(op, Op::FieldAddress(_)) {
-                                stack.push(address);
-                            } else {
-                                stack.extend(read(&mut b, &p, &field, address));
+                            if matches!(op, Op::CallVirtual(_))
+                                || details
+                                    .is_some_and(|d| d.string_virtual_calls.contains(&(i, pc)))
+                            {
+                                // Unlike direct call, callvirt checks null before entering
+                                // even a nonvirtual target; capture the caller's site.
+                                null_reference(&mut b, call_args[0], site.as_ref());
                             }
-                        } else {
-                            let value = stack.split_off(stack.len() - p.lanes(top()));
-                            stack.extend_from_slice(&value[offset..offset + p.lanes(&field)]);
-                        }
-                    }
-                    Op::SetField(n) => {
-                        let value = stack.split_off(stack.len() - p.lanes(top()));
-                        let owner = &shape[shape.len() - 2];
-                        let offset = p.field_offset(owner, *n);
-                        let value = normalize(&mut b, &p, &p.field(owner, *n)?, &value);
-                        if matches!(owner, Ty::Address(_) | Ty::Reference(_)) {
-                            let is_reference = matches!(owner, Ty::Reference(_));
-                            let owner = pop(&mut stack);
-                            let header = if is_reference {
-                                null_reference(&mut b, owner, site.as_ref());
-                                8
-                            } else {
-                                0
-                            };
-                            let address = b.ins().iadd_imm(owner, (header + offset * 8) as i64);
-                            write_typed(
-                                &mut b,
-                                &p,
-                                &p.field(&shape[shape.len() - 2], *n)?,
-                                address,
-                                &value,
-                            );
-                            if !is_reference {
-                                stack.push(b.ins().iconst(types::I32, 0));
-                            } // borrowed value store returns Void
-                        } else {
-                            let start = stack.len() - p.lanes(owner) + offset;
-                            stack[start..start + value.len()].copy_from_slice(&value);
-                        }
-                    }
-                    Op::BindFunction { target, .. } => {
-                        let c = p.callee(target)?;
-                        let receiver = if target.instance {
-                            let receiver = pop(&mut stack);
-                            // Binding uses the interpreter's invalid-receiver fault;
-                            // invoking a null function separately uses NullReference.
-                            let null = b.ins().icmp_imm(IntCC::Equal, receiver, 0);
-                            let invalid = b.ins().iconst(types::I32, 3);
-                            return_if_detailed(&mut b, null, invalid, site.as_ref());
-                            receiver
-                        } else {
-                            b.ins().iconst(types::I64, 0)
-                        };
-                        let service = module.declare_func_in_func(object_service.unwrap(), b.func);
-                        let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
-                        // Private descriptor header, never exposed as a nominal class.
-                        let type_id = b.ins().iconst(types::I32, u32::MAX as i64);
-                        let bytes = b.ins().iconst(types::I32, 24);
-                        let output = b.ins().stack_addr(types::I64, call_result, 0);
-                        let call = b.ins().call(service, &[arena, type_id, bytes, output]);
-                        let raw = b.inst_results(call)[0];
-                        let exhausted = b.ins().icmp_imm(IntCC::Equal, raw, 5);
-                        let memory = b.ins().iconst(types::I32, 5);
-                        let runtime = b.ins().iconst(types::I32, 3);
-                        let status = b.ins().select(exhausted, memory, runtime);
-                        let failed = b.ins().icmp_imm(IntCC::NotEqual, raw, 0);
-                        return_if_detailed(&mut b, failed, status, site.as_ref());
-                        let descriptor = b.ins().load(types::I64, MemFlags::new(), output, 0);
-                        let identity = b.ins().iconst(types::I64, (c + 1) as i64);
-                        b.ins().store(MemFlags::new(), identity, descriptor, 8);
-                        b.ins().store(MemFlags::new(), receiver, descriptor, 16);
-                        stack.push(descriptor);
-                    }
-                    Op::Call(target) | Op::CallVirtual(target)
-                        if crate::selection::callable_invoke(target).is_some() =>
-                    {
-                        let signature = crate::selection::callable_invoke(target).unwrap();
-                        let owner = target.owner.as_ref().unwrap();
-                        let count = signature
-                            .parameters
-                            .iter()
-                            .map(|t| p.ty(t).map(|t| p.lanes(&t)))
-                            .collect::<Result<Vec<_>, _>>()?
-                            .into_iter()
-                            .sum::<usize>();
-                        let actual = stack.split_off(stack.len() - count);
-                        let descriptor = pop(&mut stack);
-                        null_reference(&mut b, descriptor, site.as_ref());
-                        let identity = b.ins().load(types::I64, MemFlags::new(), descriptor, 8);
-                        let result = b.ins().stack_addr(types::I64, call_result, 0);
-                        let result_type = if signature.no_result {
-                            None
-                        } else {
-                            Some(p.ty(&signature.returns)?)
-                        };
-                        if let (Some(probes), Some(t)) = (&root_probes, &result_type) {
-                            let zero = b.ins().iconst(types::I64, 0);
-                            for lane in gc_layout::seed_lanes(&p, t) {
-                                b.ins()
-                                    .store(MemFlags::new(), zero, result, (lane * 8) as i32);
+                            let result = b.ins().stack_addr(types::I64, call_result, 0);
+                            if !construct
+                                && let (Some(probes), Some(t)) = (&root_probes, &p.results[c])
+                            {
+                                // Seed only traceable scratch lanes; this does not publish
+                                // a guest result. The caller retains their addresses while
+                                // the callee writes and removes its diagnostic frame.
+                                let zero = b.ins().iconst(types::I64, 0);
+                                for lane in gc_layout::seed_lanes(&p, t) {
+                                    b.ins()
+                                        .store(MemFlags::new(), zero, result, (lane * 8) as i32);
+                                }
+                                probes.publish(
+                                    module,
+                                    &mut b,
+                                    i,
+                                    pc,
+                                    3,
+                                    probe_frame.unwrap(),
+                                    transient_table.unwrap(),
+                                    result,
+                                );
                             }
-                            probes.publish(
-                                module,
-                                &mut b,
-                                i,
-                                pc,
-                                3,
-                                probe_frame.unwrap(),
-                                transient_table.unwrap(),
-                                result,
-                            );
-                        }
-                        let join = b.create_block();
-                        b.append_block_param(join, types::I32);
-                        for c in p.callable_targets(owner)? {
-                            let matched = b.create_block();
-                            let next = b.create_block();
-                            let equal = b.ins().icmp_imm(IntCC::Equal, identity, (c + 1) as i64);
-                            b.ins().brif(equal, matched, &[], next, &[]);
-                            b.switch_to_block(matched);
-                            let mut args = Vec::new();
-                            if input.functions[c].instance {
-                                args.push(b.ins().load(
-                                    types::I64,
-                                    MemFlags::new(),
-                                    descriptor,
-                                    16,
-                                ));
-                            }
-                            args.extend_from_slice(&actual);
-                            args.push(result);
+                            call_args.push(result);
                             if let Some(context) = fault_context {
-                                args.push(context);
+                                call_args.push(context);
                             }
-                            let callee = module.declare_func_in_func(ids[c], b.func);
-                            let call = b.ins().call(callee, &args);
+                            let target = module.declare_func_in_func(ids[c], b.func);
+                            let call = b.ins().call(target, &call_args);
                             let status = b.inst_results(call)[0];
-                            b.ins().jump(join, &[status.into()]);
-                            b.switch_to_block(next);
-                        }
-                        let invalid = b.ins().iconst(types::I32, 3);
-                        b.ins().jump(join, &[invalid.into()]);
-                        b.switch_to_block(join);
-                        let status = b.block_params(join)[0];
-                        let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
-                        return_if_detailed(&mut b, failed, status, site.as_ref());
-                        if let Some(t) = &result_type {
-                            if let Some(probes) = &root_probes {
-                                probes.publish(
-                                    module,
-                                    &mut b,
-                                    i,
-                                    pc,
-                                    2,
-                                    probe_frame.unwrap(),
-                                    transient_table.unwrap(),
-                                    result,
-                                );
+                            let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                            return_if_detailed(&mut b, failed, status, site.as_ref());
+                            if let Some((t, address)) = constructed {
+                                if let Some(probes) = &root_probes {
+                                    probes.publish(
+                                        module,
+                                        &mut b,
+                                        i,
+                                        pc,
+                                        2,
+                                        probe_frame.unwrap(),
+                                        transient_table.unwrap(),
+                                        address,
+                                    );
+                                }
+                                stack.extend(read(&mut b, &p, &t, address));
+                            } else if let Some(t) = &p.results[c] {
+                                if let Some(probes) = &root_probes {
+                                    probes.publish(
+                                        module,
+                                        &mut b,
+                                        i,
+                                        pc,
+                                        2,
+                                        probe_frame.unwrap(),
+                                        transient_table.unwrap(),
+                                        result,
+                                    );
+                                }
+                                stack.extend(read(&mut b, &p, t, result));
                             }
-                            stack.extend(read(&mut b, &p, t, result));
                         }
-                    }
-                    Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) => {
-                        let c = p.callee(target)?;
-                        let construct = matches!(op, Op::Construct(_));
-                        let count: usize = p.args[c]
-                            .iter()
-                            .skip(usize::from(construct))
-                            .map(|t| p.lanes(t))
-                            .sum();
-                        let mut call_args = stack.split_off(stack.len() - count);
-                        let constructed = if construct {
-                            let t = p.ty(target.owner.as_ref().unwrap())?;
-                            let address = b.ins().stack_addr(types::I64, constructors[&pc], 0);
-                            let receiver = if let Ty::Reference(index) = t {
-                                let service =
-                                    module.declare_func_in_func(object_service.unwrap(), b.func);
-                                let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
-                                let type_id = b.ins().iconst(types::I32, index as i64);
-                                let bytes =
-                                    b.ins().iconst(types::I32, p.object_bytes(index) as i64);
-                                let call = b.ins().call(service, &[arena, type_id, bytes, address]);
-                                let raw = b.inst_results(call)[0];
-                                let exhausted = b.ins().icmp_imm(IntCC::Equal, raw, 5);
-                                let memory = b.ins().iconst(types::I32, 5);
-                                let runtime = b.ins().iconst(types::I32, 3);
-                                let status = b.ins().select(exhausted, memory, runtime);
-                                let failed = b.ins().icmp_imm(IntCC::NotEqual, raw, 0);
-                                return_if_detailed(&mut b, failed, status, site.as_ref());
-                                b.ins().load(types::I64, MemFlags::new(), address, 0)
+                        Op::Fault(_) => {
+                            if details.is_some_and(|d| d.user_faults.contains(&i)) {
+                                let pointer = b.ins().stack_load(types::I64, arguments[0], 0);
+                                let diagnostic = site.as_mut().unwrap();
+                                diagnostic.message = None;
+                                diagnostic.capture_frame = false;
+                                let null = b.ins().icmp_imm(IntCC::Equal, pointer, 0);
+                                let invalid = b.ins().iconst(types::I32, 3);
+                                return_if_detailed(&mut b, null, invalid, Some(diagnostic));
+                                diagnostic.message = Some(pointer);
+                                // The interpreter reports the managed call site, not an
+                                // artificial frame for an InternalCall implementation.
+                                site.as_mut().unwrap().capture_frame = false;
+                            }
+                            let descriptor_query =
+                                details.is_some_and(|d| d.descriptor_queries.contains(&i));
+                            if descriptor_query {
+                                // InternalCall errors belong to the managed call site.
+                                if let Some(site) = site.as_mut() {
+                                    site.capture_frame = false;
+                                }
+                            }
+                            let status = b
+                                .ins()
+                                .iconst(types::I32, if descriptor_query { 3 } else { 4 });
+                            if let Some(site) = &site {
+                                site.record(&mut b, status);
+                            }
+                            b.ins().return_(&[status]);
+                            continue;
+                        }
+                        Op::Return => {
+                            if let Some(t) = &p.results[i] {
+                                write_typed(&mut b, &p, t, output, &stack);
+                            }
+                            let success = b.ins().iconst(types::I32, 0);
+                            b.ins().return_(&[success]);
+                            continue;
+                        }
+                        Op::Negate => {
+                            let value = pop(&mut stack);
+                            stack.push(if matches!(top(), Ty::Single | Ty::Double) {
+                                b.ins().fneg(value)
                             } else {
-                                let zeros: Vec<_> =
-                                    lanes(&p, &t).into_iter().map(|t| zero(&mut b, t)).collect();
-                                write(&mut b, address, &zeros);
-                                address
+                                b.ins().ineg(value)
+                            });
+                        }
+                        Op::BitNot => {
+                            let value = pop(&mut stack);
+                            stack.push(b.ins().bnot(value));
+                        }
+                        Op::ShiftLeft | Op::ShiftRight | Op::ShiftRightUnsigned => {
+                            let count = pop(&mut stack);
+                            let value = pop(&mut stack);
+                            let mask = b.func.dfg.value_type(value).bits() - 1;
+                            let count = b.ins().band_imm(count, i64::from(mask));
+                            stack.push(match op {
+                                Op::ShiftLeft => b.ins().ishl(value, count),
+                                Op::ShiftRight => b.ins().sshr(value, count),
+                                _ => b.ins().ushr(value, count),
+                            });
+                        }
+                        Op::BitAnd | Op::BitOr | Op::BitXor => {
+                            let right = pop(&mut stack);
+                            let left = pop(&mut stack);
+                            stack.push(match op {
+                                Op::BitAnd => b.ins().band(left, right),
+                                Op::BitOr => b.ins().bor(left, right),
+                                _ => b.ins().bxor(left, right),
+                            });
+                        }
+                        Op::Add | Op::Sub | Op::Mul | Op::Divide
+                            if matches!(top(), Ty::Single | Ty::Double) =>
+                        {
+                            let r = pop(&mut stack);
+                            let l = pop(&mut stack);
+                            stack.push(match op {
+                                Op::Add => b.ins().fadd(l, r),
+                                Op::Sub => b.ins().fsub(l, r),
+                                Op::Mul => b.ins().fmul(l, r),
+                                _ => b.ins().fdiv(l, r),
+                            });
+                        }
+                        Op::Add | Op::Sub | Op::Mul => {
+                            let r = pop(&mut stack);
+                            let l = pop(&mut stack);
+                            stack.push(match op {
+                                Op::Add => b.ins().iadd(l, r),
+                                Op::Sub => b.ins().isub(l, r),
+                                _ => b.ins().imul(l, r),
+                            });
+                        }
+                        Op::Equal if *top() == Ty::Literal => {
+                            let right = pop(&mut stack);
+                            let left = pop(&mut stack);
+                            stack.push(string_equal(&mut b, left, right));
+                        }
+                        Op::Equal
+                        | Op::Greater
+                        | Op::GreaterUnsigned
+                        | Op::Less
+                        | Op::LessUnsigned => {
+                            let r = pop(&mut stack);
+                            let l = pop(&mut stack);
+                            let cc = match op {
+                                Op::Equal => IntCC::Equal,
+                                Op::Greater => IntCC::SignedGreaterThan,
+                                Op::GreaterUnsigned => IntCC::UnsignedGreaterThan,
+                                Op::Less => IntCC::SignedLessThan,
+                                _ => IntCC::UnsignedLessThan,
                             };
-                            if let Some(probes) = &root_probes {
-                                probes.publish(
-                                    module,
-                                    &mut b,
-                                    i,
-                                    pc,
-                                    1,
-                                    probe_frame.unwrap(),
-                                    transient_table.unwrap(),
-                                    address,
-                                );
-                            }
-                            call_args.insert(0, receiver);
-                            Some((t, address))
-                        } else {
-                            None
-                        };
-                        if matches!(op, Op::CallVirtual(_))
-                            || details.is_some_and(|d| d.string_virtual_calls.contains(&(i, pc)))
-                        {
-                            // Unlike direct call, callvirt checks null before entering
-                            // even a nonvirtual target; capture the caller's site.
-                            null_reference(&mut b, call_args[0], site.as_ref());
+                            let bool8 = if matches!(top(), Ty::Single | Ty::Double) {
+                                float_compare(&mut b, cc, l, r)
+                            } else {
+                                b.ins().icmp(cc, l, r)
+                            };
+                            stack.push(b.ins().uextend(types::I32, bool8));
                         }
-                        let result = b.ins().stack_addr(types::I64, call_result, 0);
-                        if !construct && let (Some(probes), Some(t)) = (&root_probes, &p.results[c])
-                        {
-                            // Seed only traceable scratch lanes; this does not publish
-                            // a guest result. The caller retains their addresses while
-                            // the callee writes and removes its diagnostic frame.
-                            let zero = b.ins().iconst(types::I64, 0);
-                            for lane in gc_layout::seed_lanes(&p, t) {
-                                b.ins()
-                                    .store(MemFlags::new(), zero, result, (lane * 8) as i32);
-                            }
-                            probes.publish(
-                                module,
-                                &mut b,
-                                i,
-                                pc,
-                                3,
-                                probe_frame.unwrap(),
-                                transient_table.unwrap(),
-                                result,
+                        Op::Branch(n) => {
+                            b.ins().jump(blocks[*n], &args(&stack));
+                            continue;
+                        }
+                        Op::BranchTrue(n) | Op::BranchFalse(n) => {
+                            let v = pop(&mut stack);
+                            let cc = if matches!(op, Op::BranchTrue(_)) {
+                                IntCC::NotEqual
+                            } else {
+                                IntCC::Equal
+                            };
+                            let condition = b.ins().icmp_imm(cc, v, 0);
+                            b.ins().brif(
+                                condition,
+                                blocks[*n],
+                                &args(&stack),
+                                blocks[pc + 1],
+                                &args(&stack),
                             );
+                            continue;
                         }
-                        call_args.push(result);
-                        if let Some(context) = fault_context {
-                            call_args.push(context);
+                        _ if flow::comparison(op).is_some() => {
+                            let (n, cc) = flow::comparison(op).unwrap();
+                            let r = pop(&mut stack);
+                            let l = pop(&mut stack);
+                            let condition = if matches!(top(), Ty::Single | Ty::Double) {
+                                float_compare(&mut b, cc, l, r)
+                            } else {
+                                b.ins().icmp(cc, l, r)
+                            };
+                            b.ins().brif(
+                                condition,
+                                blocks[n],
+                                &args(&stack),
+                                blocks[pc + 1],
+                                &args(&stack),
+                            );
+                            continue;
                         }
-                        let target = module.declare_func_in_func(ids[c], b.func);
-                        let call = b.ins().call(target, &call_args);
-                        let status = b.inst_results(call)[0];
-                        let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
-                        return_if_detailed(&mut b, failed, status, site.as_ref());
-                        if let Some((t, address)) = constructed {
-                            if let Some(probes) = &root_probes {
-                                probes.publish(
-                                    module,
-                                    &mut b,
-                                    i,
-                                    pc,
-                                    2,
-                                    probe_frame.unwrap(),
-                                    transient_table.unwrap(),
-                                    address,
-                                );
-                            }
-                            stack.extend(read(&mut b, &p, &t, address));
-                        } else if let Some(t) = &p.results[c] {
-                            if let Some(probes) = &root_probes {
-                                probes.publish(
-                                    module,
-                                    &mut b,
-                                    i,
-                                    pc,
-                                    2,
-                                    probe_frame.unwrap(),
-                                    transient_table.unwrap(),
-                                    result,
-                                );
-                            }
-                            stack.extend(read(&mut b, &p, t, result));
+                        _ => {
+                            let r = pop(&mut stack);
+                            let l = pop(&mut stack);
+                            stack.push(checked_arithmetic(&mut b, op, l, r, site.as_ref()));
                         }
                     }
-                    Op::Fault(_) => {
-                        if details.is_some_and(|d| d.user_faults.contains(&i)) {
-                            let pointer = b.ins().stack_load(types::I64, arguments[0], 0);
-                            let diagnostic = site.as_mut().unwrap();
-                            diagnostic.message = None;
-                            diagnostic.capture_frame = false;
-                            let null = b.ins().icmp_imm(IntCC::Equal, pointer, 0);
-                            let invalid = b.ins().iconst(types::I32, 3);
-                            return_if_detailed(&mut b, null, invalid, Some(diagnostic));
-                            diagnostic.message = Some(pointer);
-                            // The interpreter reports the managed call site, not an
-                            // artificial frame for an InternalCall implementation.
-                            site.as_mut().unwrap().capture_frame = false;
-                        }
-                        let descriptor_query =
-                            details.is_some_and(|d| d.descriptor_queries.contains(&i));
-                        if descriptor_query {
-                            // InternalCall errors belong to the managed call site.
-                            if let Some(site) = site.as_mut() {
-                                site.capture_frame = false;
-                            }
-                        }
-                        let status = b
-                            .ins()
-                            .iconst(types::I32, if descriptor_query { 3 } else { 4 });
-                        if let Some(site) = &site {
-                            site.record(&mut b, status);
-                        }
-                        b.ins().return_(&[status]);
-                        continue;
-                    }
-                    Op::Return => {
-                        if let Some(t) = &p.results[i] {
-                            write_typed(&mut b, &p, t, output, &stack);
-                        }
-                        let success = b.ins().iconst(types::I32, 0);
-                        b.ins().return_(&[success]);
-                        continue;
-                    }
-                    Op::Negate => {
-                        let value = pop(&mut stack);
-                        stack.push(if matches!(top(), Ty::Single | Ty::Double) {
-                            b.ins().fneg(value)
-                        } else {
-                            b.ins().ineg(value)
-                        });
-                    }
-                    Op::BitNot => {
-                        let value = pop(&mut stack);
-                        stack.push(b.ins().bnot(value));
-                    }
-                    Op::ShiftLeft | Op::ShiftRight | Op::ShiftRightUnsigned => {
-                        let count = pop(&mut stack);
-                        let value = pop(&mut stack);
-                        let mask = b.func.dfg.value_type(value).bits() - 1;
-                        let count = b.ins().band_imm(count, i64::from(mask));
-                        stack.push(match op {
-                            Op::ShiftLeft => b.ins().ishl(value, count),
-                            Op::ShiftRight => b.ins().sshr(value, count),
-                            _ => b.ins().ushr(value, count),
-                        });
-                    }
-                    Op::BitAnd | Op::BitOr | Op::BitXor => {
-                        let right = pop(&mut stack);
-                        let left = pop(&mut stack);
-                        stack.push(match op {
-                            Op::BitAnd => b.ins().band(left, right),
-                            Op::BitOr => b.ins().bor(left, right),
-                            _ => b.ins().bxor(left, right),
-                        });
-                    }
-                    Op::Add | Op::Sub | Op::Mul | Op::Divide
-                        if matches!(top(), Ty::Single | Ty::Double) =>
-                    {
-                        let r = pop(&mut stack);
-                        let l = pop(&mut stack);
-                        stack.push(match op {
-                            Op::Add => b.ins().fadd(l, r),
-                            Op::Sub => b.ins().fsub(l, r),
-                            Op::Mul => b.ins().fmul(l, r),
-                            _ => b.ins().fdiv(l, r),
-                        });
-                    }
-                    Op::Add | Op::Sub | Op::Mul => {
-                        let r = pop(&mut stack);
-                        let l = pop(&mut stack);
-                        stack.push(match op {
-                            Op::Add => b.ins().iadd(l, r),
-                            Op::Sub => b.ins().isub(l, r),
-                            _ => b.ins().imul(l, r),
-                        });
-                    }
-                    Op::Equal if *top() == Ty::Literal => {
-                        let right = pop(&mut stack);
-                        let left = pop(&mut stack);
-                        stack.push(string_equal(&mut b, left, right));
-                    }
-                    Op::Equal | Op::Greater | Op::GreaterUnsigned | Op::Less | Op::LessUnsigned => {
-                        let r = pop(&mut stack);
-                        let l = pop(&mut stack);
-                        let cc = match op {
-                            Op::Equal => IntCC::Equal,
-                            Op::Greater => IntCC::SignedGreaterThan,
-                            Op::GreaterUnsigned => IntCC::UnsignedGreaterThan,
-                            Op::Less => IntCC::SignedLessThan,
-                            _ => IntCC::UnsignedLessThan,
-                        };
-                        let bool8 = if matches!(top(), Ty::Single | Ty::Double) {
-                            float_compare(&mut b, cc, l, r)
-                        } else {
-                            b.ins().icmp(cc, l, r)
-                        };
-                        stack.push(b.ins().uextend(types::I32, bool8));
-                    }
-                    Op::Branch(n) => {
-                        b.ins().jump(blocks[*n], &args(&stack));
-                        continue;
-                    }
-                    Op::BranchTrue(n) | Op::BranchFalse(n) => {
-                        let v = pop(&mut stack);
-                        let cc = if matches!(op, Op::BranchTrue(_)) {
-                            IntCC::NotEqual
-                        } else {
-                            IntCC::Equal
-                        };
-                        let condition = b.ins().icmp_imm(cc, v, 0);
-                        b.ins().brif(
-                            condition,
-                            blocks[*n],
-                            &args(&stack),
-                            blocks[pc + 1],
-                            &args(&stack),
-                        );
-                        continue;
-                    }
-                    _ if flow::comparison(op).is_some() => {
-                        let (n, cc) = flow::comparison(op).unwrap();
-                        let r = pop(&mut stack);
-                        let l = pop(&mut stack);
-                        let condition = if matches!(top(), Ty::Single | Ty::Double) {
-                            float_compare(&mut b, cc, l, r)
-                        } else {
-                            b.ins().icmp(cc, l, r)
-                        };
-                        b.ins().brif(
-                            condition,
-                            blocks[n],
-                            &args(&stack),
-                            blocks[pc + 1],
-                            &args(&stack),
-                        );
-                        continue;
-                    }
-                    _ => {
-                        let r = pop(&mut stack);
-                        let l = pop(&mut stack);
-                        stack.push(checked_arithmetic(&mut b, op, l, r, site.as_ref()));
-                    }
+                    b.ins().jump(blocks[pc + 1], &args(&stack));
                 }
-                b.ins().jump(blocks[pc + 1], &args(&stack));
+                b.seal_all_blocks();
+                b.finalize();
             }
-            b.seal_all_blocks();
-            b.finalize();
+            finish_value_body(
+                module,
+                ids[i],
+                &mut context,
+                root_probes.as_ref(),
+                probe_frame,
+                mutation_frame_ready,
+                if live_stores {
+                    Some(&mut *live_bodies)
+                } else {
+                    None
+                },
+                stack_budget,
+                long_range_calls,
+            )?;
         }
-        finish_value_body(
-            module,
-            ids[i],
-            &mut context,
-            root_probes.as_ref(),
-            probe_frame,
-            mutation_frame_ready,
-            if live_stores {
-                Some(&mut live_bodies)
-            } else {
-                None
-            },
-            stack_budget,
-            long_range_calls,
-        )?;
+        Ok(())
+    };
+    if lazy.is_none() {
+        lower_methods(module, None, &mut live_bodies)?;
     }
     if live_stores {
-        if live_bodies.len() != ids.len() + initialization_guards.len() {
+        if lazy.is_none() && live_bodies.len() != ids.len() + initialization_guards.len() {
             return Err("live stores reject unqualified replacement emission".into());
         }
     }
@@ -6225,10 +6399,11 @@ pub(crate) fn compile_into(
             .iter()
             .map(|(id, ctx)| (*id, &ctx.func))
             .collect();
-        crate::mutation_admission::check_call_closure(
+        crate::mutation_admission::check_call_closure_deferred(
             module,
             &bodies,
             &crate::mutation_admission::root_providers(module),
+            if lazy.is_some() { &ids } else { &[] },
         )?;
         #[cfg(test)]
         if let Ok(path) = std::env::var("NEOCLR_LIVE_STACK_ARGUMENT_AUDIT") {
@@ -6239,7 +6414,7 @@ pub(crate) fn compile_into(
                 ))?,
             )?;
         }
-        if stack_policy.elide {
+        if stack_policy.elide && lazy.is_none() {
             let _count = crate::mutation_store::stack_audit::elide(
                 module,
                 &mut live_bodies,
@@ -6258,6 +6433,42 @@ pub(crate) fn compile_into(
             }
         }
     }
+    if let Some(driver) = lazy {
+        // Every deferred target belongs to this verified selected module. A body
+        // can run only after its own store lowering and provider/call checks.
+        let contracts: Vec<_> = module
+            .declarations()
+            .get_functions()
+            .filter_map(|(id, declaration)| (declaration.linkage != Linkage::Import).then_some(id))
+            .collect();
+        let mut lower_one = |module: &mut M, index: usize| -> Result<(), Error> {
+            if index >= ids.len() {
+                return Err("invalid deferred method index".into());
+            }
+            let mut bodies = Vec::new();
+            lower_methods(module, Some(index), &mut bodies)?;
+            if live_stores {
+                if bodies.len() != 1 || bodies[0].0 != ids[index] {
+                    return Err("lazy live lowering did not supply the requested body".into());
+                }
+                let refs: Vec<_> = bodies.iter().map(|(id, ctx)| (*id, &ctx.func)).collect();
+                crate::mutation_admission::check_call_closure_deferred(
+                    module,
+                    &refs,
+                    &crate::mutation_admission::root_providers(module),
+                    &contracts,
+                )?;
+                // Whole-closure stack-argument guard elision is deliberately not
+                // inferred from a partial body set. Retain the checked stores.
+                for (id, mut context) in bodies {
+                    define_checked(module, id, &mut context, stack_budget, long_range_calls)?;
+                }
+            }
+            Ok(())
+        };
+        driver.run(module, &ids, &mut lower_one)?;
+    }
+
     Ok(())
 }
 
@@ -6435,7 +6646,18 @@ fn define_checked(
     long_range_calls: bool,
 ) -> Result<(), Error> {
     super::prepare_calls(context, long_range_calls);
+    if crate::jit::lazy::capture(id, context, stack_budget) {
+        return Ok(());
+    }
     module.define_function(id, context)?;
+    check_frame(module, context, stack_budget)
+}
+
+pub(crate) fn check_frame(
+    module: &impl Module,
+    context: &cranelift_codegen::Context,
+    stack_budget: bool,
+) -> Result<(), Error> {
     if stack_budget {
         let windows =
             module.isa().default_call_conv() == cranelift_codegen::isa::CallConv::WindowsFastcall;
@@ -6447,7 +6669,10 @@ fn define_checked(
     Ok(())
 }
 
-fn frame_charge(context: &cranelift_codegen::Context, windows: bool) -> Result<u64, Error> {
+pub(crate) fn frame_charge(
+    context: &cranelift_codegen::Context,
+    windows: bool,
+) -> Result<u64, Error> {
     // Cranelift 0.121.2 frame_size excludes linkage and ephemeral outgoing args.
     // Charge every argument, including register args, plus Windows shadow space.
     // Both targets require 16-byte alignment; this intentionally overestimates.
