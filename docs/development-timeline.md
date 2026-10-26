@@ -23043,3 +23043,12 @@ the syntax after the release pin `ed1d08def`. The author clarified that the
 compiler is pinned to the previous version, then directed continued release work.
 The release pin remains unchanged; backticked test integration and validation are
 deferred, not completed. See the [release record](validation/release-preparation-20261025/README.md).
+
+## 2026-10-26 — Lazy JIT follow-up after Preview 18
+
+Looking at median JIT startup measurements, the author proposed lazy compilation
+through trampolines and investigating its interaction with concurrent GC, while
+explicitly directing that the current release proceed. The assistant proposed
+measuring startup, first-call latency, steady-state throughput and GC coordination
+in a later experiment. No lazy compiler or trampoline change is included in
+Preview 18; the current release scope and compiler pin remain unchanged.

@@ -37,8 +37,7 @@
     }
   },
   "currentBlockers": [
-    "Windows editor harness requalification",
-    "Final measurements and artifact/publication audit"
+    "Windows final benchmark and final artifact/publication audit"
   ],
   "localFixtureRetest": {
     "taskTestsPassed": 5,
@@ -62,5 +61,7 @@
   ],
   "windowsHttpsRun": 40298850434,
   "windowsBenchmarkRun": 40298846341,
-  "macOSBenchmark": "benchmarks/release-20261026/macos-preview18/summary.json"
+  "macOSBenchmark": "benchmarks/release-20261026/macos-preview18/summary.json",
+  "windowsQualificationPassed": true,
+  "sourceArchiveSha256": "435836d37c832bc899e81d931e678ea578d718676f14de39c62754447060a8c6"
 }

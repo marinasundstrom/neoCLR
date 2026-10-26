@@ -210,3 +210,15 @@ pending; macOS success is not substituted for them.
 
 The refreshed benchmark website builds and checks all 6,133 pages. This is local
 validation; no website deployment or Preview 18 publication has occurred.
+
+### Windows qualification complete — 2026-10-26
+
+Run [40298792405](https://github.com/marinasundstrom/neoCLR/actions/runs/40298792405)
+passes against the unchanged archive from `40213940464`. The retained
+[Windows reports](windows-final/) cover extracted JIT/HTTP, GC, 24 async executions,
+three JSON modes, 132 headers, all 26 editor checks, inlays and two ten-cycle
+configuration recovery runs. The earlier editor failure is superseded by the
+corrected harness, not erased. Windows HTTPS separately passes 27 cases.
+The exact canonical source archive also matches its hosted SHA-256. Final Windows
+measurements and publication remain open. Lazy JIT compilation with trampolines
+is an author-requested post-release investigation, with no candidate-code change.

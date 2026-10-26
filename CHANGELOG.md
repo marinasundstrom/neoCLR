@@ -31,7 +31,9 @@ continues as an experimental native development path.
   names are deferred. Add retained macOS candidate benchmark tables on the
   website (five stages, 55 CPU/JSON processes and 1,152 HTTP responses), plus
   editor recovery, standalone SDK attribution and Windows HTTPS evidence.
-  Windows final acceptance/measurements remain pending. Preview 18 is not yet published.
+  Windows package/editor qualification now passes; its final measurements remain
+  pending. Verify the qualified source archive checksum and record lazy JIT with
+  trampolines as a post-release investigation. Preview 18 is not yet published.
 
 ### 2026-10-25
 
