@@ -1,4 +1,4 @@
-//! Experimental placement: retain arena allocations while spilling future requests.
+//! Bounded placement: retain arena allocations while spilling future requests.
 use cranelift_jit::{BranchProtection, JITMemoryProvider};
 use cranelift_module::ModuleResult;
 use std::io;

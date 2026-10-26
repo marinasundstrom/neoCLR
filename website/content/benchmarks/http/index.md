@@ -4,6 +4,27 @@
 tracks plain HTTP and HTTP JSON using the [standard procedure](/benchmarks/gc/procedure/).
 Those experimental AOT results are separate from the published-package series below.
 
+## Development: lazy JIT — 26 October 2026
+
+Fresh three-round medians on Apple M1/macOS 27.0.1 use production-default backend
+optimization, 4,096 measured requests per process, four clients and pipeline depth
+16 after 16 warmup responses. Eager uses system code placement; lazy uses its new
+bounded macOS ARM64 arena. These are development fixtures, separate from Preview 18.
+
+| Handler / GC | Eager ready s | Lazy ready s | Eager req/s | Lazy req/s | Lazy first response s |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Plain / sync | 13.436 | 11.129 | 3,315.3 | 3,670.5 | 1.213 |
+| Plain / concurrent | 15.585 | 10.206 | 2,842.3 | 2,292.0 | 2.111 |
+| JSON / sync | 12.800 | 9.954 | 1,936.2 | 2,123.1 | 1.697 |
+| JSON / concurrent | 15.517 | 10.321 | 1,712.8 | 1,477.3 | 3.083 |
+
+Earlier readiness defers work into the first request. Matched lazy placement
+controls improve throughput by 22–30% in paired medians, but collector tradeoffs
+depend on load. [Complex handlers, I/O, multiple apps and cold-traffic tables and
+charts](/benchmarks/lazy-jit/) show where concurrent GC helps, its CPU cost, and
+where sync remains favorable. The full evidence retains all ranges and target
+failures. Older `speed`-override measurements are not pooled with this series.
+
 ## Preview 18 — 26 October 2026
 
 Both packages pass all five measurement stages: 55 CPU/JSON processes and 1,152
@@ -539,7 +560,17 @@ matching hosts. This does not make GC concurrent or establish framework parity.
 See [qualification and measurements](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/execution/state-integration).
 
 
-Concurrent GC is the next development investigation. Collection currently blocks
-its owning heap. Qualification will compare synchronous and concurrent collectors
-across plaintext, complex handlers and standalone workloads, considering CPU,
-pauses and memory alongside throughput. No concurrent collector result is claimed.
+## Development: lazy JIT and collector tradeoffs
+
+Lazy JIT defers method lowering and native compilation until first use. The current
+resolver still blocks managed execution during that first call. Development
+measurements compare synchronous and concurrent GC across plaintext, JSON,
+retained objects, overlapping I/O and complex handlers under offered load. Results
+separate startup, first-request latency, warm throughput, CPU and memory; a
+throughput gain does not imply better tail latency or lower resource use.
+
+The initial profiling cohorts use an explicit Cranelift `speed` override, while
+production codegen defaults are measured separately. Multiple-app cases use
+isolated processes sharing one desktop host, not hard resource quotas or a
+production capacity claim. See the
+[application-load report and charts](/benchmarks/lazy-jit/).

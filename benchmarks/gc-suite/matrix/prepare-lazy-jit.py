@@ -12,7 +12,7 @@ p = argparse.ArgumentParser(description=__doc__)
 p.add_argument('--build', type=Path, required=True)
 p.add_argument('--runner', type=Path, required=True)
 p.add_argument('--output', type=Path, required=True)
-p.add_argument('--placement', choices=['system','fallback'], default='system')
+p.add_argument('--placement', choices=['default','system','fallback'], default='default')
 a = p.parse_args()
 root = Path(__file__).resolve().parents[3]
 source = a.build.resolve() / 'build.json'
@@ -50,9 +50,9 @@ for collector in ['sync', 'live']:
         command[0] = str(a.runner.resolve())
         env = dict(old['env'], NEOCLR_JIT_LAZY=str(int(lazy)))
         env.pop('NEOCLR_TEST_JIT_ARENA', None)
-        if a.placement == 'fallback': env['NEOCLR_TEST_JIT_ARENA'] = 'fallback'
+        if a.placement != 'default': env['NEOCLR_TEST_JIT_ARENA'] = a.placement
         r['recipes'][('lazy-' if lazy else 'eager-') + collector + '-jit'] = dict(old, command=command, env=env)
-for path in [source, a.runner, Path(__file__), root/'Cargo.lock', *[root/'runtime/codegen/src'/n for n in ['jit.rs','jit_lazy.rs','values.rs','fault_details.rs','jit_memory.rs','jit_memory_fallback.rs','lib.rs','mutation_admission.rs','mutation_store_tests.rs','gc_probe.rs']]]:
+for path in [source, a.runner, Path(__file__), root/'Cargo.lock', *[root/'runtime/codegen/src'/n for n in ['jit.rs','jit_lazy.rs','values.rs','fault_details.rs','jit_memory.rs','jit_memory_fallback.rs','lib.rs','mutation_admission.rs','mutation_store_tests.rs','gc_probe.rs','gc_points.rs']]]:
     pin(path)
 r['passed'] = True
 (out/'build.json').write_text(json.dumps(r, indent=2)+'\n')

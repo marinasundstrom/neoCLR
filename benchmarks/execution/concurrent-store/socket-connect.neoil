@@ -1,0 +1,13 @@
+.module LiveConnect
+.references ()
+.function neoCLR.Runtime.SocketConnect(String address,Int32 port,fn<Void> callback) -> Value
+.methodimpl InternalCall
+.end
+.function Write(Int32 value) -> Int32
+ldarg value
+ret
+.end
+.function Main(Int32 value) -> Int32
+ldarg value
+ret
+.end

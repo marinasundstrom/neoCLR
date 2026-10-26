@@ -62,6 +62,8 @@
       href: benchmarks/index.md
     - name: HTTP request benchmarks
       href: benchmarks/http/index.md
+    - name: Lazy JIT and application load
+      href: benchmarks/lazy-jit/index.md
     - name: Garbage collector benchmarks
       href: benchmarks/gc/index.md
     - name: GC benchmarking and profiling

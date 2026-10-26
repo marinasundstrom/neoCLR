@@ -338,7 +338,8 @@ def main():
         shutil.rmtree(OUTPUT)
     OUTPUT.mkdir(parents=True)
     for name in ('custom.css', 'mark.svg', 'favicon.svg', 'architecture.svg',
-                 'runtime-layers.svg', 'metadata-format.svg', 'gc-allocation-cpu.svg'):
+                 'runtime-layers.svg', 'metadata-format.svg', 'gc-allocation-cpu.svg',
+                 'lazy-jit-load-curves.svg', 'lazy-jit-cold-traffic.svg'):
         shutil.copyfile(SOURCE / name, OUTPUT / name)
     raven = 'docs/experiments/raven-target/samples/'
     samples = {

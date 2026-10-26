@@ -226,6 +226,31 @@ See the [design, GC contract and matched measurements](validation/lazy-jit-20261
 Windows execution and broader concurrent-caller support remain unqualified.
 
 On the qualified Apple M1 cohort, five-round HttpServer readiness medians improve
-21–37%, while post-warmup throughput falls 12–38% and first responses take
+21–37% with the private Cranelift `speed` benchmark override, while post-warmup throughput falls 12–38% and first responses take
 1.24–3.21 seconds. Small standalone startup changes are mixed. This is a bounded
 opt-in baseline, not a recommendation to replace eager JIT by default.
+
+### Lazy placement and processing continuity (development follow-up)
+
+On macOS ARM64, opt-in managed lazy JIT now uses a bounded 64 MiB code/data arena
+with system-allocation fallback. Reservation failure or exhaustion does not free
+already published entries; both owners survive through native cleanup. The shared
+instruction-cache publication boundary still applies. Eager JIT and other hosts
+retain system placement. This is a host-qualified policy, not a portable speedup claim.
+
+The resolver reports total mutator compilation wait and longest individual wait.
+It still blocks the managed execution thread on first use; a compiler worker alone
+does not permit other managed fibers to run during that wait. Warm direct-call
+binding is a test-only experiment because paired results were inconsistent.
+No unused method is lowered or compiled by the placement policy.
+
+[Profiling, GC tradeoffs and HTTP load cases](validation/lazy-jit-optimization-20261026/README.md)
+separate readiness, cold requests, warm throughput, CPU, memory and scheduling.
+[CoreCLR, HotSpot, V8 and ORC comparison](lazy-jit-runtime-research.md) describes
+alternative initial tiers and the ownership requirements for background work.
+
+The downstream-I/O qualification also repairs single-address socket-connect
+replacement lowering: its checked result publication now has the required GC
+frame and exact admitted provider signature. Address bytes are copied into native
+operation storage and callbacks remain host-rooted through completion/cleanup.
+This does not qualify DNS or multi-address native providers for concurrent GC.

@@ -181,6 +181,7 @@ pub(super) fn prepare_managed(
 }
 
 fn new_managed_module(
+    lazy: bool,
     details: &crate::fault_details::Options,
     host: &std::path::Path,
     target: crate::compiler::Target,
@@ -221,7 +222,11 @@ fn new_managed_module(
     }));
     let run = *run;
     Ok((
-        CodeOwner(Some(crate::jit_memory::new_module(builder))),
+        CodeOwner(Some(if lazy {
+            crate::jit_memory::new_lazy_module(builder)
+        } else {
+            crate::jit_memory::new_module(builder)
+        })),
         library,
         run,
     ))
@@ -267,7 +272,7 @@ fn prepare_inner(
     target: crate::compiler::Target,
 ) -> Result<PreparedManaged, Error> {
     let started = Instant::now();
-    let (mut owner, library, run) = new_managed_module(details, host, target)?;
+    let (mut owner, library, run) = new_managed_module(false, details, host, target)?;
     let module = owner.0.as_mut().expect("owned module");
     crate::compiler::values::compile_into(input, root, Some(details), target, module, true)?;
     validate_imports(module, &library)?;

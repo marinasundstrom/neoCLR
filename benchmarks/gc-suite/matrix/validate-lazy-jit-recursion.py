@@ -28,12 +28,12 @@ try:
             system=http[http.index('--system')+1];library=http[http.index('--object-root')+1]
             command=['unused','--jit-managed','--closed-world',str(selected),'Main',host,'--reference-arena','--native-gc','--native-stack-budget','--compile-system','--system',system,'--module',library,'--object-root',library]
             path=out/(('overflow-' if overflow else 'bounded-')+mode+'.json');path.write_text(json.dumps(command))
-            providers=['fallback','system'] if mode.startswith('lazy-') else ['fallback']
+            providers=['default','system'] if mode.startswith('lazy-') else ['fallback']
             for provider in providers:
                 env={k:v for k,v in os.environ.items() if not k.startswith('NEOCLR_')};env.update(recipe['env'])
                 env['NEOCLR_LIVE_SELECTION_COMMAND']=str(path)
-                if provider=='system':env.pop('NEOCLR_TEST_JIT_ARENA',None)
-                else:env['NEOCLR_TEST_JIT_ARENA']='fallback'
+                if provider=='default':env.pop('NEOCLR_TEST_JIT_ARENA',None)
+                else:env['NEOCLR_TEST_JIT_ARENA']=provider
                 x=subprocess.run(recipe['command'],env=env,capture_output=True,text=True,timeout=45)
                 row=dict(mode=mode,overflow=overflow,provider=provider,exitCode=x.returncode,stdout=x.stdout,stderr=x.stderr,selection=command)
                 r['cases'].append(row);assert x.returncode==0,row

@@ -6,6 +6,7 @@ Each report identifies the measured build, workload, machine and execution mode.
 | Report | What it measures |
 | --- | --- |
 | [HTTP request processing](/benchmarks/http/) | Plain text and typed JSON across interpreter, JIT and AOT |
+| [Lazy JIT and application load](/benchmarks/lazy-jit/) | Development startup, complex handlers, I/O pressure and sync/concurrent GC tradeoffs |
 | [Garbage collection](/benchmarks/gc/) | Matched collector-path HTTP comparisons, allocation/reclamation diagnostics and correctness evidence |
 | [General execution](/benchmarks/execution/) | CPU work, JSON serialization/deserialization and startup across interpreter, JIT and AOT |
 

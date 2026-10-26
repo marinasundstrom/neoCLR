@@ -5,6 +5,14 @@ as an external comparison reference during concurrent-GC qualification. The rank
 page is dynamically rendered; no Round 23 throughput figures were extracted or
 used as measured neoCLR peers in this investigation.
 
+**Review update, 2026-10-26:** The sections below preserve the original protocol
+boundary. Internal `ServePersistent` has since been implemented and qualified;
+public serving and the older close-per-request measurements remain distinct.
+The [current workload review](workload-review-20261026.md) checks the official
+specification, database/load realism, required reruns and remaining compatibility
+gaps. The official repository is now archived; this does not invalidate its
+preserved workload definitions or make our local measurements comparable scores.
+
 ## Primary specification
 
 The [official test specification](https://github.com/TechEmpower/FrameworkBenchmarks/wiki/Project-Information-Framework-Tests-Overview)

@@ -8,26 +8,35 @@ separate benchmark and profiling runs.
 ## Development: lazy JIT — 26 October 2026
 
 Post-Preview-18 source builds can opt into lazy method lowering and compilation.
-Five alternating rounds on Apple M1/macOS 27.0.1, with normal system code placement,
-compare identical HTTP inputs and retained native hosts. Four clients use pipeline
-depth 16, after 16 cold/warmup responses. These are loopback measurements, not
-saturation or framework rankings; concurrent GC remains an experimental candidate.
+Fresh production-default-codegen measurements on Apple M1/macOS 27.0.1 separate
+process readiness, first use and steady execution. Each standalone row is the
+median of three launches; all 24 invocations pass.
 
-| Handler / GC | Eager ready s | Lazy ready s | Eager req/s | Lazy req/s |
-| --- | ---: | ---: | ---: | ---: |
-| Plain / sync | 13.554 | 10.664 | 4,315 | 3,793 |
-| Plain / concurrent | 15.942 | 10.246 | 3,685 | 2,301 |
-| JSON / sync | 12.878 | 10.159 | 2,513 | 2,106 |
-| JSON / concurrent | 16.780 | 10.490 | 2,023 | 1,321 |
+| Sample / GC | Eager median ready s | Lazy median ready s |
+| --- | ---: | ---: |
+| Compute / sync | 2.489 | 2.465 |
+| Compute / concurrent | 2.548 | 2.585 |
+| Allocation / sync | 2.494 | 2.350 |
+| Allocation / concurrent | 2.605 | 2.515 |
 
-Readiness improves 21–37%, but first responses take 1.24–3.21 seconds and
-post-warmup throughput falls 12–38%. Compute/allocation samples remain around
-2.3–2.6 seconds at startup with mixed changes. All 164,480 checked HTTP responses
-and 40 standalone processes pass. Eager JIT and synchronous GC remain defaults;
-this is an opt-in baseline for the next optimization work, not a published release.
+Small-program startup is mixed. These samples leave 23 selected methods uncompiled;
+metadata preparation still consumes much of startup. The [HTTP tables](/benchmarks/http/)
+show larger readiness gains, but also substantial first-request latency. Lazy JIT
+now uses bounded arena placement on macOS ARM64; matched placement controls improve
+HTTP throughput by 22–30% in paired medians. Eager and other-host policies are unchanged.
 
-[Full results, ranges, cold latencies and limitations](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/lazy-jit-20261026/README.md).
-The report retains all runs, including a 21.425-second lazy plaintext/sync startup.
+The [application-load report](/benchmarks/lazy-jit/) compares complex handlers,
+downstream I/O, cold traffic and multiple apps. Lazy concurrent GC remains the
+intended direction where it improves broad workload coverage; current first-call
+blocking, checking overhead and CPU costs direct the next optimizations. Shared
+metadata and execution bookkeeping improvements can help all modes.
+
+The [earlier five-round lazy baseline](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/lazy-jit-20261026/README.md)
+and initial factorial profiles use a private Cranelift `speed` override. Their
+results remain separate historical development evidence. [Current raw results,
+ranges and profiling](https://github.com/marinasundstrom/neoCLR/tree/main/docs/validation/lazy-jit-optimization-20261026)
+record the production-default codegen series. Eager JIT and synchronous GC remain
+defaults; published release tables below are unchanged.
 
 ## Preview 18 — 26 October 2026
 

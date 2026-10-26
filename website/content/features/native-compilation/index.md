@@ -29,6 +29,14 @@ GC remain the defaults. This is not a published Preview 18 capability.
 [Design and matched startup/HTTP measurements](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/lazy-jit-20261026/README.md)
 cover synchronous and concurrent GC separately, including limitations.
 
+The development follow-up uses a bounded arena with system fallback for lazy JIT
+on macOS ARM64. It improves measured warm HTTP throughput while retaining first-use
+compilation waits. A compiler worker does not yet let other managed tasks proceed
+during that wait. [Profiling and workload tradeoffs](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/lazy-jit-optimization-20261026/README.md)
+compare both collectors and explain why startup, tail latency, CPU and sustainable
+load must be considered separately.
+
+
 ## Build a native application
 
 Raven produces neoCLR metadata and instructions. The AOT tool lowers them to object

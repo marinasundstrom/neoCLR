@@ -650,6 +650,10 @@ fn compile_with_driver<M: Module>(
                         || d.socket_local_port.contains(&i)
                         || d.socket_close.contains(&i)
                         || d.socket_accept.contains(&i)
+                        // The single-address provider copies the address and
+                        // retains callbacks through the same host-root boundary
+                        // as accept. Its checked result needs a published frame.
+                        || d.socket_connect.contains(&i)
                         || d.socket_connect_result.contains(&i)
                         || d.socket_cancel.contains(&i)
                         || d.socket_deadline_after.contains(&i)

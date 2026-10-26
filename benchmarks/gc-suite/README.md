@@ -168,3 +168,11 @@ The author requested dedicated worker/thread contention profiles and an architec
 review of concurrent GC. Follow the [concurrency procedure](concurrency/README.md),
 which separates independent owners, shared heaps, tasks/fibers and collector threads.
 The single-owner sample matrix does not establish many-worker scaling.
+
+## Workload review — 2026-10-26
+
+The [coverage and TechEmpower review](workload-review-20261026.md) distinguishes
+mechanism tests from production-shaped pressure, records fresh production-default
+lazy-JIT reruns, and identifies real database/pooling, mixed cold routes, resource
+quotas and longer recovery runs as remaining gaps. Keep historical release scores
+separate from changed workloads and codegen configurations.

@@ -1,32 +1,58 @@
 //! Publish generated instructions through the platform cache-maintenance contract.
 use cranelift_jit::{JITBuilder, JITModule};
 
-#[cfg(test)]
+#[cfg(any(test, all(target_os = "macos", target_arch = "aarch64")))]
 #[path = "jit_memory_fallback.rs"]
 mod fallback;
 
 pub(crate) fn new_module(builder: JITBuilder) -> JITModule {
-    let provider: Box<dyn cranelift_jit::JITMemoryProvider> = {
-        #[cfg(test)]
-        if let Some(value) = std::env::var_os("NEOCLR_TEST_JIT_ARENA") {
-            let arena = || cranelift_jit::ArenaMemoryProvider::new_with_size(64 * 1024 * 1024);
-            let provider: Box<dyn cranelift_jit::JITMemoryProvider> = if value == "1" {
-                Box::new(arena().expect("reserve experimental JIT arena"))
-            } else if value == "fallback" {
-                Box::new(fallback::Fallback::new(
-                    arena()
-                        .ok()
-                        .map(|p| Box::new(p) as Box<dyn cranelift_jit::JITMemoryProvider>),
-                    Box::new(cranelift_jit::SystemMemoryProvider::new()),
-                ))
-            } else {
-                panic!("NEOCLR_TEST_JIT_ARENA must be 1 or fallback");
-            };
-            return new_with_provider(builder, provider);
-        }
-        Box::new(cranelift_jit::SystemMemoryProvider::new())
-    };
-    new_with_provider(builder, provider)
+    new_module_with_policy(builder, false)
+}
+
+pub(crate) fn new_lazy_module(builder: JITBuilder) -> JITModule {
+    new_module_with_policy(builder, true)
+}
+
+#[cfg(any(test, all(target_os = "macos", target_arch = "aarch64")))]
+fn arena_with_fallback() -> Box<dyn cranelift_jit::JITMemoryProvider> {
+    Box::new(fallback::Fallback::new(
+        cranelift_jit::ArenaMemoryProvider::new_with_size(64 * 1024 * 1024)
+            .ok()
+            .map(|p| Box::new(p) as Box<dyn cranelift_jit::JITMemoryProvider>),
+        Box::new(cranelift_jit::SystemMemoryProvider::new()),
+    ))
+}
+
+fn new_module_with_policy(builder: JITBuilder, lazy: bool) -> JITModule {
+    #[cfg(test)]
+    if let Some(value) = std::env::var_os("NEOCLR_TEST_JIT_ARENA") {
+        let provider: Box<dyn cranelift_jit::JITMemoryProvider> = if value == "1" {
+            Box::new(
+                cranelift_jit::ArenaMemoryProvider::new_with_size(64 * 1024 * 1024)
+                    .expect("reserve experimental JIT arena"),
+            )
+        } else if value == "fallback" {
+            arena_with_fallback()
+        } else if value == "system" {
+            Box::new(cranelift_jit::SystemMemoryProvider::new())
+        } else {
+            panic!("NEOCLR_TEST_JIT_ARENA must be 1, fallback or system");
+        };
+        return new_with_provider(builder, provider);
+    }
+    // First-call compilation creates many separately finalized allocations.
+    // The qualified Apple ARM64 policy bounds the reservation, then spills
+    // without invalidating published code. Other hosts retain system placement.
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    if lazy {
+        return new_with_provider(builder, arena_with_fallback());
+    }
+    #[cfg(not(all(target_os = "macos", target_arch = "aarch64")))]
+    let _ = lazy;
+    new_with_provider(
+        builder,
+        Box::new(cranelift_jit::SystemMemoryProvider::new()),
+    )
 }
 
 // Both placement policies retain the platform instruction-publication wrapper.

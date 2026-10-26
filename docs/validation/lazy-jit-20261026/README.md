@@ -1,5 +1,11 @@
 # Lazy JIT through stable trampolines — 2026-10-26
 
+> Configuration clarification (2026-10-26 follow-up): these development measurements
+> use the private `NEOCLR_TEST_OPT_LEVEL=speed` override recorded in their recipes.
+> Production retains Cranelift's default optimization setting. See the
+> [separate production-default comparison](../lazy-jit-optimization-20261026/README.md)
+> before interpreting these values as ordinary CLI startup or throughput.
+
 Author-directed post-Preview-18 implementation and investigation. Published Preview 18
 packages are unchanged. `NEOCLR_JIT_LAZY=1` opts managed JIT into first-call method
 lowering and machine-code compilation; unset or `0` retains eager compilation. This does

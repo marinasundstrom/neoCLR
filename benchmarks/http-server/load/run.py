@@ -87,7 +87,7 @@ async def request(port, path, expected_size, timeout, timings=None):
         mark('closedSeconds')
 
 
-async def window(port, path, size, rate, duration, concurrency, timeout, pid=None, diagnostics=False):
+async def window(port, path, size, rate, duration, concurrency, timeout, pid=None, diagnostics=False, request_fn=None):
     loop = asyncio.get_running_loop()
     start = loop.time()
     unix_start = time.time() if diagnostics else None
@@ -111,10 +111,11 @@ async def window(port, path, size, rate, duration, concurrency, timeout, pid=Non
     async def arrival(index, intended, inflight):
         actual = loop.time()
         phases = {}
+        exchange = request_fn or request
         if diagnostics:
-            result = await request(port, path, size, timeout, phases)
+            result = await exchange(port, path, size, timeout, phases)
         else:
-            result = await request(port, path, size, timeout)
+            result = await exchange(port, path, size, timeout)
         finished = loop.time()
         records.append(dict(index=index, intendedSeconds=intended-start,
                             startSeconds=actual-start, endSeconds=finished-start,

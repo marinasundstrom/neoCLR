@@ -1,0 +1,15 @@
+{
+  "matplotlib": "3.9.4",
+  "numpy": "2.0.2",
+  "inputsAndOutputs": {
+    "benchmarks/gc-suite/matrix/plot-lazy-load.py": "3cc3e91d75650e743043474bb6a9426e5c66f66aa7a9e11563a28ae22b822bfd",
+    "target/lazy-jit-production-default-cases/complex-load/summary.json": "a97d77f92ba353cf79c530f33cb0e4478a0ff55b40e519fbcaae9989adbde630",
+    "target/lazy-jit-production-default-cases/service-load/summary.json": "e54531ed560f905137c65a1dcb16a4dc8ee63dcd1e8a2d98076eec02865060b5",
+    "target/lazy-jit-production-default-cases/cold-load/summary.json": "4392e524257d17d61139addd8f3fa2e60ff7df49373b716b2d19cc549df81351",
+    "docs/validation/lazy-jit-optimization-20261026/load-curves.png": "fa9bce4ca58e41f973ae9d9c20620f85688ad9bda37c18ae88b88e4b20738b25",
+    "docs/validation/lazy-jit-optimization-20261026/load-curves.svg": "d0f5df687399389481280cc27dc558c522086e2ffa8cf035ec6044ef7dc0992c",
+    "docs/validation/lazy-jit-optimization-20261026/cold-traffic.png": "263b194c270baf5c86f959aa19bb12ee2b01a9c1631f9352873fc584be7c3d66",
+    "docs/validation/lazy-jit-optimization-20261026/cold-traffic.svg": "d749228895f8ea6ddf391128514ce8260092dd80925a594222e5f2418612cb6a"
+  },
+  "svgNormalization": "Trailing whitespace removed after rendering; geometry and PNGs unchanged."
+}

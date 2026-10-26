@@ -14,7 +14,7 @@ data = json.loads(a.measurement.read_text())
 assert data['passed'] and data.get('diagnosticOnly')
 report = {'scope': __doc__, 'sample': data.get('sample', 'per-trial'), 'trials': [], 'inputs': {}}
 for trial in data['trials']:
-    profile = trial.get('stackProfile') or trial['cpuProfile']
+    profile = trial.get('stackProfile') or trial.get('cpuProfile') or trial['profile']
     path = Path(profile['path'])
     digest = hashlib.sha256(path.read_bytes()).hexdigest()
     assert profile['exitCode'] == 0 and digest == profile['sha256']

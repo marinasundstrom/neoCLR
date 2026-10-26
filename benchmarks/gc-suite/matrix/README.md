@@ -266,3 +266,34 @@ For a separate pause diagnostic, `prepare-paired-owner-profile.py --build <paire
 Run `http.py` on that build, then validate `OWNER_PAUSE` rows with
 `benchmarks/execution/concurrent-workloads/summarize-owner-pauses.py`.
 See [combined qualification](../../../docs/validation/combined-runtime-layout-20261025/README.md).
+
+## Lazy JIT, I/O and offered load
+
+`prepare-lazy-jit.py` prepares eager/lazy collector pairs. On macOS ARM64 the lazy
+default uses bounded arena placement with system fallback; `--placement system`
+is an explicit control. `prepare-lazy-profile.py` adds factorial placement and
+test-only direct-binding controls. Direct binding is not enabled in production.
+Retained recipes may set `NEOCLR_TEST_OPT_LEVEL=speed`; use
+`prepare-lazy-production.py --build <pinned-build> --output <fresh-directory>` to
+remove that override for production-default codegen measurements. Never pool the
+two configurations. Preparation verifies pinned input hashes before generating
+recipes; build and profile separately from timed cohorts.
+
+`prepare-lazy-retained-http.py --workload retained|complex|service` prepares compiled
+Raven fixtures. Complex handlers retain 4,096 objects and perform checked JSON and
+record processing. Service handlers additionally await a checked socket dependency.
+`lazy-load.py --build <prepared-build> --output <fresh-directory> --apps 1 2
+--rates 100 200 400 --rounds 2 --duration 10 --reuse-processes` measures fixed offered
+arrival rates in long-lived processes. Add `--dependency-ms 20` for the service
+fixture, `--warmup-requests 0` for cold traffic, or `--apps 2 --shares .9 .1` for
+uneven app traffic. Client limits, fragmented-header delay and target latency are
+explicit options. Missed arrivals remain in the offered-load denominator; no
+hidden client queue reduces demand to server speed.
+
+Use `summarize-lazy-load.py --measurement <results.json> --output <summary.json>`
+for per-app and aggregate ranges, tails, completion rates, CPU and RSS. A highest
+passing tested rate is not an estimated capacity boundary. Separate server
+processes share the machine but have no hard CPU or memory quota. The client and
+optional dependency also run on that host. See the
+[evidence and profiling report](../../../docs/validation/lazy-jit-optimization-20261026/README.md)
+and [runtime comparison](../../../docs/lazy-jit-runtime-research.md).

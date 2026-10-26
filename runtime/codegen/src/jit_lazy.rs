@@ -8,6 +8,8 @@ use cranelift_codegen::{
 };
 use cranelift_frontend::{FunctionBuilder, FunctionBuilderContext};
 use cranelift_module::{FuncId, Linkage};
+#[cfg(test)]
+use std::collections::HashMap;
 use std::{
     cell::{Cell, RefCell},
     sync::{
@@ -151,6 +153,52 @@ pub(super) fn emit_trampolines(
     Ok(())
 }
 
+// Only direct calls may bypass stable entry points. Address-taken references
+// retain trampoline identity. Targets are immutable for this module's lifetime;
+// a published target has already passed lowering/GC validation and relocation.
+#[cfg(test)]
+fn bind_compiled_calls(
+    module: &mut impl Module,
+    context: &mut Context,
+    published: &HashMap<FuncId, FuncId>,
+) -> usize {
+    use cranelift_codegen::ir::{ExternalName, InstructionData, Opcode};
+    let mut replacements = Vec::new();
+    for block in context.func.layout.blocks() {
+        for inst in context.func.layout.block_insts(block) {
+            let InstructionData::Call {
+                opcode: Opcode::Call,
+                func_ref,
+                ..
+            } = context.func.dfg.insts[inst]
+            else {
+                continue;
+            };
+            let ExternalName::User(name) = context.func.dfg.ext_funcs[func_ref].name else {
+                continue;
+            };
+            let name = &context.func.params.user_named_funcs()[name];
+            if name.namespace == 0 {
+                if let Some(&body) = published.get(&FuncId::from_u32(name.index)) {
+                    replacements.push((inst, body));
+                }
+            }
+        }
+    }
+    let mut references = HashMap::new();
+    for &(inst, body) in &replacements {
+        let reference = *references
+            .entry(body)
+            .or_insert_with(|| module.declare_func_in_func(body, &mut context.func));
+        // Independently published code need not be in direct branch range.
+        context.func.dfg.ext_funcs[reference].colocated = false;
+        if let InstructionData::Call { func_ref, .. } = &mut context.func.dfg.insts[inst] {
+            *func_ref = reference;
+        }
+    }
+    replacements.len()
+}
+
 enum Request {
     Compile(usize, mpsc::SyncSender<usize>),
     Stop,
@@ -165,6 +213,9 @@ pub(super) struct Worker {
 struct Stats {
     total: usize,
     compiled: usize,
+    bound_calls: usize,
+    resolver_seconds: f64,
+    longest_resolver_seconds: f64,
     lowered: usize,
     seconds: f64,
     lowering_seconds: f64,
@@ -177,7 +228,9 @@ impl Worker {
     pub(super) fn report(&self) -> serde_json::Value {
         let s = self.stats.lock().unwrap();
         serde_json::json!({"selectedMethods": s.total, "compiledMethods": s.compiled, "loweredMethods": s.lowered,
-            "uncompiledMethods": s.total - s.compiled, "firstCallCompilationSeconds": s.seconds,
+            "uncompiledMethods": s.total - s.compiled, "boundDirectCalls": s.bound_calls,
+            "mutatorCompilationWaitSeconds": s.resolver_seconds,
+            "longestCompilationWaitSeconds": s.longest_resolver_seconds, "firstCallCompilationSeconds": s.seconds,
             "firstCallLoweringSeconds": s.lowering_seconds,
             "firstCallCodegenAndPublishSeconds": s.codegen_seconds,
             "modulePreparationSeconds": s.module_preparation_seconds,
@@ -238,11 +291,17 @@ pub(super) unsafe extern "C" fn resolve(index: usize) -> usize {
             // SAFETY: Active borrows the invocation-owned worker until host cleanup;
             // callbacks are admitted only on that same mutator thread.
             let worker = unsafe { &*pointer };
+            let started = Instant::now();
             let (send, recv) = mpsc::sync_channel(0);
             if worker.requests.send(Request::Compile(index, send)).is_err() {
                 return 0;
             }
-            recv.recv().unwrap_or(0)
+            let result = recv.recv().unwrap_or(0);
+            let elapsed = started.elapsed().as_secs_f64();
+            let mut stats = worker.stats.lock().unwrap();
+            stats.resolver_seconds += elapsed;
+            stats.longest_resolver_seconds = stats.longest_resolver_seconds.max(elapsed);
+            result
         })
     })
     .unwrap_or(0)
@@ -273,7 +332,7 @@ pub(super) fn prepare(
             let result =
                 std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| -> Result<(), Error> {
                     let (mut owner, library, run) =
-                        super::new_managed_module(&details, &host, target)?;
+                        super::new_managed_module(true, &details, &host, target)?;
                     let mut driver = Driver {
                         ready: &ready,
                         receive,
@@ -376,6 +435,8 @@ impl crate::compiler::values::LazyDriver<JITModule> for Driver<'_> {
         {
             return Ok(());
         }
+        #[cfg(test)]
+        let mut published_bodies = HashMap::new();
         let mut terminal_failure = false;
         while let Ok(request) = self.receive.recv() {
             let Request::Compile(index, response) = request else {
@@ -425,6 +486,18 @@ impl crate::compiler::values::LazyDriver<JITModule> for Driver<'_> {
                     let lowering_seconds = started.elapsed().as_secs_f64();
                     let codegen_started = Instant::now();
                     let mut context = captured.pop().unwrap().context.unwrap();
+                    // Retained as an explicit experiment: paired measurements
+                    // did not justify production direct binding.
+                    #[cfg(test)]
+                    let bound_calls = if std::env::var_os("NEOCLR_TEST_LAZY_BIND_COMPILED")
+                        .is_some_and(|value| value == "1")
+                    {
+                        bind_compiled_calls(module, &mut context, &published_bodies)
+                    } else {
+                        0
+                    };
+                    #[cfg(not(test))]
+                    let bound_calls = 0;
                     super::validate_imports(module, &self.library)?;
                     module.define_function(body.id, &mut context)?;
                     crate::compiler::values::check_frame(module, &context, body.stack_budget)?;
@@ -442,6 +515,9 @@ impl crate::compiler::values::LazyDriver<JITModule> for Driver<'_> {
                     let pointer = module.get_finalized_function(body.id) as usize;
                     body.slot.store(pointer, Ordering::Release);
                     let mut stats = self.stats.lock().unwrap();
+                    #[cfg(test)]
+                    published_bodies.insert(methods[index], body.id);
+                    stats.bound_calls += bound_calls;
                     stats.compiled += 1;
                     stats.seconds += started.elapsed().as_secs_f64();
                     stats.lowering_seconds += lowering_seconds;
@@ -470,6 +546,8 @@ impl crate::compiler::values::LazyDriver<JITModule> for Driver<'_> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[cfg(test)]
+    use std::collections::HashMap;
 
     #[test]
     #[cfg(any(
@@ -536,6 +614,89 @@ mod tests {
         for _ in 0..8 {
             assert_eq!(unsafe { entry(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12) }, 78);
         }
+    }
+
+    #[test]
+    #[cfg(any(
+        all(target_os = "macos", target_arch = "aarch64"),
+        all(target_os = "windows", target_arch = "x86_64")
+    ))]
+    fn binding_preserves_addresses_and_unpublished_calls() {
+        use cranelift_codegen::ir::InstructionData;
+        use cranelift_object::{ObjectBuilder, ObjectModule};
+        let isa = isa::lookup(host_target().unwrap().triple().parse().unwrap())
+            .unwrap()
+            .finish(settings::Flags::new(crate::backend_settings()))
+            .unwrap();
+        let mut module = ObjectModule::new(
+            ObjectBuilder::new(isa, "binding", cranelift_module::default_libcall_names()).unwrap(),
+        );
+        let mut sig = module.make_signature();
+        sig.returns.push(AbiParam::new(types::I32));
+        let stable = module
+            .declare_function("stable", Linkage::Local, &sig)
+            .unwrap();
+        let compiled = module
+            .declare_function("compiled", Linkage::Local, &sig)
+            .unwrap();
+        let cold = module
+            .declare_function("cold", Linkage::Local, &sig)
+            .unwrap();
+        let mut ctx = module.make_context();
+        ctx.func.signature = sig;
+        let stable_ref = module.declare_func_in_func(stable, &mut ctx.func);
+        let cold_ref = module.declare_func_in_func(cold, &mut ctx.func);
+        let mut fb = FunctionBuilderContext::new();
+        let (warm_call, cold_call, address);
+        {
+            let mut b = FunctionBuilder::new(&mut ctx.func, &mut fb);
+            let block = b.create_block();
+            b.switch_to_block(block);
+            address = b.ins().func_addr(types::I64, stable_ref);
+            warm_call = b.ins().call(stable_ref, &[]);
+            cold_call = b.ins().call(cold_ref, &[]);
+            let result = b.inst_results(cold_call)[0];
+            b.ins().return_(&[result]);
+            b.seal_all_blocks();
+            b.finalize();
+        }
+        assert_eq!(
+            bind_compiled_calls(&mut module, &mut ctx, &HashMap::new()),
+            0
+        );
+        assert_eq!(
+            bind_compiled_calls(&mut module, &mut ctx, &HashMap::from([(stable, compiled)])),
+            1
+        );
+        let InstructionData::Call {
+            func_ref: warm_ref, ..
+        } = ctx.func.dfg.insts[warm_call]
+        else {
+            panic!()
+        };
+        let expected = module.declare_func_in_func(compiled, &mut ctx.func);
+        assert_eq!(
+            ctx.func.dfg.ext_funcs[warm_ref].name,
+            ctx.func.dfg.ext_funcs[expected].name
+        );
+        assert_ne!(warm_ref, stable_ref);
+        assert!(!ctx.func.dfg.ext_funcs[warm_ref].colocated);
+        let InstructionData::Call { func_ref, .. } = ctx.func.dfg.insts[cold_call] else {
+            panic!()
+        };
+        assert_eq!(func_ref, cold_ref);
+        let cranelift_codegen::ir::ValueDef::Result(inst, _) = ctx.func.dfg.value_def(address)
+        else {
+            panic!()
+        };
+        let InstructionData::FuncAddr { func_ref, .. } = ctx.func.dfg.insts[inst] else {
+            panic!()
+        };
+        assert_eq!(func_ref, stable_ref);
+        assert_eq!(
+            bind_compiled_calls(&mut module, &mut ctx, &HashMap::from([(stable, compiled)])),
+            0
+        );
     }
 
     #[test]

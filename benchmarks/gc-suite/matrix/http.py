@@ -36,8 +36,15 @@ p.add_argument('--pipeline-depth',type=int,default=16)
 p.add_argument('--rounds',type=int,default=3)
 p.add_argument('--smoke',action='store_true',help='Label these runs as qualification, not timing evidence')
 p.add_argument('--sample-stacks',action='store_true',help='macOS one-second stack capture after warmup; diagnostic timings only')
+p.add_argument('--cpu-trace',action='store_true',help='macOS five-second CPU Profiler trace after warmup; diagnostic only')
+p.add_argument('--header-gap-ms',type=float,default=0,help='Split request line/headers with client delay to exercise pending server reads; included in latency')
+p.add_argument('--io-gap-ms',type=float,default=0,help='Client wait between request batches, simulating I/O slack; included in throughput wall time')
 p.add_argument('--process-memory',action='store_true',help='macOS whole-process RSS/virtual snapshots; diagnostic timings only')
 a=p.parse_args()
+assert a.io_gap_ms>=0 and a.header_gap_ms>=0
+if a.cpu_trace:
+    assert platform.system()=='Darwin' and shutil.which('xcrun')
+    assert not a.sample_stacks and a.requests>=65536 and 'interpreter' not in a.modes
 if a.process_memory:assert platform.system()=='Darwin', 'macOS ps memory semantics required'
 if a.sample_stacks:
     assert platform.system()=='Darwin' and shutil.which('sample'), 'macOS sample is required'
@@ -51,12 +58,15 @@ build_path=a.build.resolve()/'build.json';built=json.loads(build_path.read_text(
 assert built['passed'] and all(mode in built['recipes'] for mode in a.modes)
 for path,digest in built['inputs'].items():
     assert hashlib.sha256(Path(path).read_bytes()).hexdigest()==digest,('stale build input',path)
-r=dict(passed=False,kind='profile' if a.process_memory or a.sample_stacks or built.get('diagnosticOnly') else 'qualification' if a.smoke else 'benchmark',scope=__doc__,system=platform.platform(),
-       rounds=a.rounds,concurrency=a.concurrency,pipelineDepth=a.pipeline_depth,trials=[],rows=[],
-       inputs={str(build_path):hashlib.sha256(build_path.read_bytes()).hexdigest()})
+r=dict(passed=False,kind='profile' if a.process_memory or a.sample_stacks or a.cpu_trace or built.get('diagnosticOnly') else 'qualification' if a.smoke else 'benchmark',scope=__doc__,system=platform.platform(),
+       workload=built.get('workload','standard-http'),backendOptimization=built.get('backendOptimization','explicit retained recipe'),rounds=a.rounds,concurrency=a.concurrency,ioGapMs=a.io_gap_ms,headerGapMs=a.header_gap_ms,pipelineDepth=a.pipeline_depth,trials=[],rows=[],
+       inputs={str(build_path):hashlib.sha256(build_path.read_bytes()).hexdigest(),str(Path(__file__).resolve()):hashlib.sha256(Path(__file__).read_bytes()).hexdigest()})
 if built.get('diagnosticOnly'):r['diagnosticOnly']=built['diagnosticOnly']
 if a.sample_stacks:
     r['diagnosticOnly']='Wall-clock stack samples include sleeping threads, not CPU percentages. Sampling perturbs timing. wholeProcessCpuSeconds includes the sampler child; invocationCpuSeconds remains server-reported.'
+
+if a.cpu_trace:
+    r['diagnosticOnly']='CPU Profiler recording perturbs timing. Invocation CPU includes all server threads; tracing is a separate diagnostic cohort.'
 
 if a.process_memory:
     r['diagnosticOnly']=r.get('diagnosticOnly','')+' Whole-process RSS/virtual snapshots include compiler, metadata and libraries; not allocator attribution or peaks. Child CPU includes ps; timings are diagnostic.'
@@ -72,6 +82,7 @@ def traffic(port,sample,protocol,count,depth_override=None):
     latencies=[]
     try:
         for start in range(0,count,depth):
+            if start and a.io_gap_ms:time.sleep(a.io_gap_ms/1000)
             stop=min(start+depth,count)
             began=time.perf_counter()
             if client is None:
@@ -83,7 +94,13 @@ def traffic(port,sample,protocol,count,depth_override=None):
                 request+=b'GET /'+sample.encode()+b' HTTP/1.1\r\nHost: localhost\r\n'
                 if close:request+=b'Connection: close\r\n'
                 request+=b'\r\n'
-            client.sendall(request)
+            if a.header_gap_ms:
+                split=request.index(b'\r\n')+2
+                client.sendall(request[:split])
+                time.sleep(a.header_gap_ms/1000)
+                client.sendall(request[split:])
+            else:
+                client.sendall(request)
             for index in range(start,stop):
                 while b'\r\n\r\n' not in pending:
                     chunk=client.recv(65536);assert chunk,'EOF in headers';pending+=chunk
@@ -125,7 +142,7 @@ def trial(mode,sample,protocol,repetition):
     for flag in ['NEOCLR_LIVE_ELIDE_STACK_ARGUMENTS','NEOCLR_LIVE_FORWARD_STACK_ARGUMENTS',
                  'NEOCLR_LIVE_ELIDE_FORWARDED_STACK_ARGUMENTS','NEOCLR_LIVE_SSA_BYREF_ARGUMENTS',
                  'NEOCLR_LIVE_SCALAR_ARRAY_STORES','NEOCLR_LIVE_GENERIC_SCALAR_ARRAY_STORES','NEOCLR_LIVE_STACK_POLICY',
-                 'NEOCLR_JIT_LAZY','NEOCLR_TEST_LAZY_PANIC_AFTER','NEOCLR_TEST_LAZY_FAIL_AFTER','NEOCLR_TEST_JIT_ARENA','NEOCLR_TEST_KEEP_JIT_COMPILATION','NEOCLR_TEST_NATIVE_MEMORY']:
+                 'NEOCLR_JIT_LAZY','NEOCLR_TEST_OPT_LEVEL','NEOCLR_TEST_LAZY_BIND_COMPILED','NEOCLR_TEST_LAZY_PANIC_AFTER','NEOCLR_TEST_LAZY_FAIL_AFTER','NEOCLR_TEST_JIT_ARENA','NEOCLR_TEST_KEEP_JIT_COMPILATION','NEOCLR_TEST_NATIVE_MEMORY']:
         env.pop(flag,None)
     env.update(recipe['env'])
     if a.process_memory and recipe['execution']=='jit':env['NEOCLR_TEST_NATIVE_MEMORY']='1'
@@ -163,6 +180,11 @@ def trial(mode,sample,protocol,repetition):
             command=['sample',str(process.pid),'1','1','-file',str(profile_path)]
             row['stackProfile']=dict(command=command,path=str(profile_path))
             profiler=subprocess.Popen(command,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
+        if a.cpu_trace:
+            profile_path=out/f'{sample}-{protocol}-{mode}-{repetition}.trace'
+            command=['xcrun','xctrace','record','--template','CPU Profiler','--attach',str(process.pid),'--time-limit','5s','--output',str(profile_path)]
+            row['cpuTrace']=dict(command=command,path=str(profile_path))
+            profiler=subprocess.Popen(command,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
         started=time.perf_counter()
         with ThreadPoolExecutor(max_workers=a.concurrency) as pool:
             futures=[pool.submit(traffic,port,sample,protocol,count//a.concurrency) for _ in range(a.concurrency)]
@@ -172,10 +194,14 @@ def trial(mode,sample,protocol,repetition):
         if a.process_memory:row['processMemory']['afterTraffic']=memory_snapshot(process.pid)
         if profiler is not None:
             profile_stdout,profile_stderr=profiler.communicate(timeout=30)
-            row['stackProfile'].update(exitCode=profiler.returncode,stdout=profile_stdout,stderr=profile_stderr)
-            assert profiler.returncode==0 and profile_path.is_file()
-            assert 'Call graph:' in profile_path.read_text(), 'missing stack capture'
-            row['stackProfile']['sha256']=hashlib.sha256(profile_path.read_bytes()).hexdigest()
+            profile=row['cpuTrace'] if a.cpu_trace else row['stackProfile']
+            profile.update(exitCode=profiler.returncode,stdout=profile_stdout,stderr=profile_stderr)
+            assert profiler.returncode==0 and profile_path.exists(), profile
+            if a.sample_stacks:
+                assert 'Call graph:' in profile_path.read_text(), 'missing stack capture'
+                profile['sha256']=hashlib.sha256(profile_path.read_bytes()).hexdigest()
+            else:
+                profile['files']={str(p.relative_to(profile_path)):hashlib.sha256(p.read_bytes()).hexdigest() for p in profile_path.rglob('*') if p.is_file()}
         with socket.create_connection(('127.0.0.1',control),timeout=15):pass
         process.wait(timeout=30)
         for thread in threads:thread.join(timeout=5)

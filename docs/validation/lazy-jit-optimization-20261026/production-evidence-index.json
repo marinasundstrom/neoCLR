@@ -1,0 +1,257 @@
+{
+  "default-http-results.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-production-default-cases/http/results.json",
+    "sourceSha256": "cf67a2cbcfff3dca549d9467103eee9150ddcfa173fae47860e33184c92bebdf",
+    "archiveSha256": "cb77d742fdbad9c7f4ad18bffac230176aabcce93883d40c93062547ea3eb5b8"
+  },
+  "default-placement-summary.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-production-default-cases/placement-summary.json",
+    "sourceSha256": "8c2fbd50d81e9fbab081bf2b772929163a172269b94daaa02e292c64da633ff7",
+    "archiveSha256": "db5495476c0eabfa8b8250e4caf1de7dc2ab2185297168b7116b55bea75ab560"
+  },
+  "default-samples-results.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-production-default-cases/samples/results.json",
+    "sourceSha256": "70c53bb51d00a067975316fff3e98d3b93d501a28eb54ce2501e85d0a249ae1e",
+    "archiveSha256": "58d9d18f821d69b456a1f07a39d2ac1496576125fdb73b1e20d35af9bd32ad56"
+  },
+  "default-summary.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-production-default-cases/default-summary.json",
+    "sourceSha256": "f69c20b0dbfa6afb7f01565eeeda7f20ae5886c394a2297eacd3b4d17adf3161",
+    "archiveSha256": "249a6e01cc6b16d8660a5fcbb66068cffb8cf337fd14e68799161a93eb20b4bb"
+  },
+  "default-failure.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-production-default-cases/failure.json",
+    "sourceSha256": "ff9150a7f99afbdc08ad847a516d782f139c99dd243e0cc8beaca61ff1346edc",
+    "archiveSha256": "e97374dec901bb068ab0b0b5c3afbfce6612f846f39ec09eaf9c77a2c081c4c1"
+  },
+  "default-host-activity.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-production-default-cases/host-activity-observation.json",
+    "sourceSha256": "ba0f784d317bec0259ec3e1418fca01172e48017e34ad03e3b6718425cd7fb7a",
+    "archiveSha256": "8598de1ed49cff8328bd3330ff42cfb999bc75b2578e8ff24392cefa0f180715"
+  },
+  "default-queue.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-production-default-cases/queue.json",
+    "sourceSha256": "3a7677137f6d8c2fa609e9d8b8c2f3f6faaec6f3b87c497c15ec8f4618aa0b4e",
+    "archiveSha256": "e8c99d919bed63a4044773a4f65c330846020b3b0c7024859e2329c477584001"
+  },
+  "normal-input-queue.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-normal-input-cases/queue.json",
+    "sourceSha256": "0e8d74ccef78e2cc19543ed17192f70a58d4daa275a1aec44da8cdb676b78f8a",
+    "archiveSha256": "7d027f38da2c9c5573b0ce02cb4c57a2279779b7db8113c7f85c307e6725c33a"
+  },
+  "qualified-tests.txt.gz": {
+    "source": "/tmp/neoclr-lazy-connect-tests.log",
+    "sourceSha256": "2ae8b01f3b26edfa55bef180a4ebf85735b22464fd50a88b7724649b633ebc65",
+    "archiveSha256": "9a9439a85c5b3318d001a3aef2d1d2ed5f34c9c34d277191e1cae1d13d1e53f2"
+  },
+  "production-check.txt.gz": {
+    "source": "/tmp/neoclr-lazy-qualified-check.log",
+    "sourceSha256": "fc5fd40757309676943f06b855eaa34ed21df088243df50421cbc3269d98795b",
+    "archiveSha256": "e6b833b864b4d9a49259d5823f99d59b15f4aaf4e3dcab7538af0ad9231af4b5"
+  },
+  "executed-jit_lazy.rs.gz": {
+    "source": "/Users/robert/Projects/neoclr/runtime/codegen/src/jit_lazy.rs",
+    "sourceSha256": "259162541ddd07ed0600188009caec713c72eadf2e77afaf8d39f669c0027d02",
+    "archiveSha256": "f1a9dabef984e9929d69ea31d2a23fef98359ba4097ac53e5d7409bf5d4b36cb"
+  },
+  "default-service-qualification-results.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-production-default-cases/service-qualification/results.json",
+    "sourceSha256": "587f03472e0f84f4dd953cb73404069b21c706d5df06147b8952b171a58334c4",
+    "archiveSha256": "93732f7349766786d8a6ac9f844edb659b4322b4bdb29ad51bb729369e1574a5"
+  },
+  "default-complex-load-results.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-production-default-cases/complex-load/results.json",
+    "sourceSha256": "ee4a19936a48df797064cbbc46cd0121714e5568cef5fcd74584f4aec6274c75",
+    "archiveSha256": "ae796a88e62bbf8e8ba9d0999288a811ffd99f6bd1131bfbabce2a526d6ab6a7"
+  },
+  "default-complex-load-summary.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-production-default-cases/complex-load/summary.json",
+    "sourceSha256": "a97d77f92ba353cf79c530f33cb0e4478a0ff55b40e519fbcaae9989adbde630",
+    "archiveSha256": "7e2951e2d90027d72f84b5a2e3692c6f04067f1954d989f6591409983c374854"
+  },
+  "default-service-load-results.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-production-default-cases/service-load/results.json",
+    "sourceSha256": "dc90c010d854dacd8ab6591fb6531ab6d159a181bf41943c913f6e68484aff05",
+    "archiveSha256": "767234c801f7046035eae2cd2728de11ea2ba5361b39f001901bc7fc99063d80"
+  },
+  "default-service-load-summary.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-production-default-cases/service-load/summary.json",
+    "sourceSha256": "e54531ed560f905137c65a1dcb16a4dc8ee63dcd1e8a2d98076eec02865060b5",
+    "archiveSha256": "a44f781f00647aaaac84b7d49093abdb8c74e40ff7c43429573752386f76eb3c"
+  },
+  "default-cold-load-results.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-production-default-cases/cold-load/results.json",
+    "sourceSha256": "02539df4e5c2243e809d7c66e0d604c13e9f3a814b68c284f1a43ae27b277100",
+    "archiveSha256": "5e852e1111f55b4b26122ce18b3837514207a9c9e915ec75ad9d3d1916845acf"
+  },
+  "default-cold-load-summary.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-production-default-cases/cold-load/summary.json",
+    "sourceSha256": "4392e524257d17d61139addd8f3fa2e60ff7df49373b716b2d19cc549df81351",
+    "archiveSha256": "20a049bca726bcf9763d2c0acff619fdcba909f93fb76dbb03afb365da5d6649"
+  },
+  "default-uneven-load-results.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-production-default-cases/uneven-load/results.json",
+    "sourceSha256": "f410196d47efe387fcf59cb730781c66a2a0b843d32fd7c33cfcd910efaeb438",
+    "archiveSha256": "963979f89fe8004b59205f6ca9553a5cc9769766576763f7e9aed0408302e084"
+  },
+  "default-uneven-load-summary.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-production-default-cases/uneven-load/summary.json",
+    "sourceSha256": "38f0ff2390b6561bba0f39ac8d2ed76f4319beeda2bfebfac6a85d8fed22fc28",
+    "archiveSha256": "d4d393ed239bf6d864164e910695c8416d01b2ea79fcab2d791ca5a1ad32e5d2"
+  },
+  "normal-input-complex-results.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-normal-input-cases/complex/results.json",
+    "sourceSha256": "fc8ec8d472b0a7cb709946de2c87a2914814916bc7128a18e4995f5348a737a3",
+    "archiveSha256": "fe0ba30a959757cc8d9aab71e5ba477dd041688b2b7e940da1acfe4c3fb374b6"
+  },
+  "normal-input-complex-summary.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-normal-input-cases/complex/summary.json",
+    "sourceSha256": "07e724e57b8d7f0ae1789281c6924da10c08eff4ba62d9ff9aa9b59a6bdddc6e",
+    "archiveSha256": "ce2829cfdc3b54ecc76be9e4d81e1ddbd97a59cf4b1b792b341ac0c1267c3879"
+  },
+  "normal-input-service-results.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-normal-input-cases/service/results.json",
+    "sourceSha256": "67f8cecfaec598d466368ba6b24428187269980ab2e29f9fdc75b373ad7eeb5b",
+    "archiveSha256": "e3f2f69d6352949ca8fa977a8d496c9fe293c6a7b229e34bb4f354fe72084863"
+  },
+  "normal-input-service-summary.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-normal-input-cases/service/summary.json",
+    "sourceSha256": "fecb12450b81bcd02e31d5c200871573da7fe51fc9b18cbf0e53b27c0ca72caf",
+    "archiveSha256": "32503d1321bcd40568d347a094990ca0531a1e9d09ca9297e0f5fd920ad1e100"
+  },
+  "qualified-build.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-qualified-build/build.json",
+    "sourceSha256": "f462f9dfcdb097ebd8c44356f3181610d550b3a1405b93e899070bde8d73153f",
+    "archiveSha256": "b269451276583a295dd08ca864913e0d19bface4119712b73a70f7b850757aca"
+  },
+  "qualified-system-build.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-qualified-system-build/build.json",
+    "sourceSha256": "280a716c60f57f1594ba2bec76e752a13cd20f9cb56a980781be0652b71479da",
+    "archiveSha256": "c6bdd4775df04c920a44a864146cdb82777af9a787192f911318fc124a8115e3"
+  },
+  "qualified-factorial-build.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-qualified-factorial-build/build.json",
+    "sourceSha256": "17b67e38bded229d4dfd6a0c9723977703e151b84375ae8c9aa6587115ffc507",
+    "archiveSha256": "ca371f41a7ea33b432cb70738eb93b98f5edbff6e824063cc310644d8c6ee5d9"
+  },
+  "qualified-complex-build.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-qualified-complex-build/build.json",
+    "sourceSha256": "b8c3c143d4890945416041cba341c434848076a8804b958d3dfdc57c2aa1da34",
+    "archiveSha256": "7defcd795067f59213f4f9cf6755f095403f2f37e130c776f6eb73b1fe6d6bbb"
+  },
+  "qualified-service-build.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-qualified-service-build/build.json",
+    "sourceSha256": "ed82b4f9e4dc23e8334efb91d9d83885ba87fc5143b75c6f06e417477380a72f",
+    "archiveSha256": "55862cfb4516c6e45982414e9b32db67ad0b646194f52eb4a22d2397b7deee0e"
+  },
+  "qualified-samples-build.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-qualified-samples-build/build.json",
+    "sourceSha256": "1a9dfbd5c58ae1b1118044434b8fe30b1f66bbe1b038b2e742a60b65b8b46284",
+    "archiveSha256": "cd6e744de36c5ec4b66b48af736868d8e458424995edc30881ea2b773947fe22"
+  },
+  "default-build.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-default-build/build.json",
+    "sourceSha256": "74f6347c2c897976cd01e50d997b8d3cf1525c3edee2a1b9a441c728dcd27811",
+    "archiveSha256": "ff4c7c01555da97a30d4543942ee65fe6be07b91b6c27201ee0dbe7ae958abcd"
+  },
+  "default-factorial-build.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-default-factorial-build/build.json",
+    "sourceSha256": "d0b6b67cb9ffaf366901fbb4977d325da24b24125b006b3a805e7ac92f94f342",
+    "archiveSha256": "a73c33c4ebad279c0ecd7c1cb4e55933f6e27ac22d74ccf25373301d2eda2bf4"
+  },
+  "default-comparison-build.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-default-comparison-build/build.json",
+    "sourceSha256": "f312ad0006a9fbb51616131914261100819ff374f677a82aae6d3eeb9646d2b8",
+    "archiveSha256": "e3482276d1955f6e7c03ce051d593aadecc8e48814ead2f1b154f9447a1d694f"
+  },
+  "default-complex-build.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-default-complex-build/build.json",
+    "sourceSha256": "0170e22adfdd7169111ddf44ff6225a8bdc47a558087bf0a3a41367358261136",
+    "archiveSha256": "dc459e8364108272fa47ad1491653e20eee2d539a05d767b392ea0e0a3a0aa7c"
+  },
+  "default-service-build.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-default-service-build/build.json",
+    "sourceSha256": "4f898e71f7509d34cdf704b80a60b14afe0ad80627a1ef2cea3f0981228173e3",
+    "archiveSha256": "e4389934dbdfa571a32c11cb5cba3c8364fb659888cf761eece6fa34459c0a84"
+  },
+  "default-samples-build.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-default-samples-build/build.json",
+    "sourceSha256": "aa58bebcf4bbd39b02b9deb87e02b09262e521611ee2e5c2c6845b3ab3727590",
+    "archiveSha256": "c9938dc1bf95e88a9da4f43f2771ea6bb6b9ab6ebf1df0062381d0ef7afff4d6"
+  },
+  "default-recursion-results.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-production-default-cases/recursion/results.json",
+    "sourceSha256": "ab09c2450cdaeee7b8a3760aa7f13c77551fde3e4ca1840111b7545f850fe23d",
+    "archiveSha256": "8f38b13bb7aa82b9c3aea67492b2139936455bb59b72f6057502ca9ceee001d3"
+  },
+  "default-recursion-overflow-eager-sync-jit.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-production-default-cases/recursion/overflow-eager-sync-jit.json",
+    "sourceSha256": "678b701cf6338420cf513b4590f001c51baca938093dfbaf5bf2c5f3715c34f7",
+    "archiveSha256": "fd5e550ea7bbe6bc8219d25999160c09544f4d0aa7b27b0152831c6443a00147"
+  },
+  "default-recursion-bounded-lazy-sync-jit.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-production-default-cases/recursion/bounded-lazy-sync-jit.json",
+    "sourceSha256": "544c7de71a5cca5455a15cc938b3aa119416c1b48a9fbdb0d86e0e7cf41a47cf",
+    "archiveSha256": "377ed4c7c9bf49dc453e24e9f919d9280cc1aa70b9f9cd5c56fb762c8382b4d8"
+  },
+  "default-recursion-bounded-eager-live-jit.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-production-default-cases/recursion/bounded-eager-live-jit.json",
+    "sourceSha256": "072905718d6ad842ea1bf67ec0c92bde178c88210a25e1b7af35fffe96f25665",
+    "archiveSha256": "4c8cf91d557bb45a23d31eb899be3823f9e7edf9993f08e9013a3731497613ca"
+  },
+  "default-recursion-overflow-lazy-sync-jit.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-production-default-cases/recursion/overflow-lazy-sync-jit.json",
+    "sourceSha256": "678b701cf6338420cf513b4590f001c51baca938093dfbaf5bf2c5f3715c34f7",
+    "archiveSha256": "fd5e550ea7bbe6bc8219d25999160c09544f4d0aa7b27b0152831c6443a00147"
+  },
+  "default-recursion-overflow-eager-live-jit.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-production-default-cases/recursion/overflow-eager-live-jit.json",
+    "sourceSha256": "6a960a80a9d09157e2944a4a3632bf2cc5c33961740b9a7f2c742abcc610fb9d",
+    "archiveSha256": "93131b5c8c369398129a1dd6d8814136a6eba59336042856e1c1a710bcc0ac21"
+  },
+  "default-recursion-bounded-eager-sync-jit.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-production-default-cases/recursion/bounded-eager-sync-jit.json",
+    "sourceSha256": "544c7de71a5cca5455a15cc938b3aa119416c1b48a9fbdb0d86e0e7cf41a47cf",
+    "archiveSha256": "377ed4c7c9bf49dc453e24e9f919d9280cc1aa70b9f9cd5c56fb762c8382b4d8"
+  },
+  "default-recursion-bounded-lazy-live-jit.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-production-default-cases/recursion/bounded-lazy-live-jit.json",
+    "sourceSha256": "072905718d6ad842ea1bf67ec0c92bde178c88210a25e1b7af35fffe96f25665",
+    "archiveSha256": "4c8cf91d557bb45a23d31eb899be3823f9e7edf9993f08e9013a3731497613ca"
+  },
+  "default-recursion-overflow-lazy-live-jit.json.gz": {
+    "source": "/Users/robert/Projects/neoclr/target/lazy-jit-production-default-cases/recursion/overflow-lazy-live-jit.json",
+    "sourceSha256": "6a960a80a9d09157e2944a4a3632bf2cc5c33961740b9a7f2c742abcc610fb9d",
+    "archiveSha256": "93131b5c8c369398129a1dd6d8814136a6eba59336042856e1c1a710bcc0ac21"
+  },
+  "default-queue.py.gz": {
+    "source": "/tmp/neoclr-lazy-production-default-queue.py",
+    "sourceSha256": "9396b5f75f166e846c621d43a6ce356443ec8b91e3a97f9be9f61470209f311a",
+    "archiveSha256": "fd9235afc76d53582a68f95d7fbc49a04b1477d295d75ce9c6f02352fcc226f6"
+  },
+  "normal-input-queue.py.gz": {
+    "source": "/tmp/neoclr-lazy-normal-input-queue.py",
+    "sourceSha256": "7636a7b9f1be5ecdd52aacdd5cd151f5d81e1942f28e8d8cda7b93fd256e5e62",
+    "archiveSha256": "8a6decb0f227aa8a0f540229a7b8f5fb9138ae1fc47e2ea45de9cdfc3dc5f67d"
+  },
+  "final-binding-test.txt.gz": {
+    "source": "/tmp/neoclr-lazy-final-lib-test.log",
+    "sourceSha256": "90b42d938e6f01414acfb8bf987bc352beaa3ce31493ba9e702e73856fb33d1f",
+    "archiveSha256": "0a13bea9fe2db26104c287dcb483c2f232d40276faef0b85caab0a2b86e5309b"
+  },
+  "load-harness-tests.txt.gz": {
+    "source": "/tmp/neoclr-lazy-load-tests.log",
+    "sourceSha256": "05a08a70605c22394f698e426c232e84c49ca1a203cbda2dd728be5503345c0c",
+    "archiveSha256": "3a994dcbe141239ac3fb0a92cb1a8d7cf44837909276681cae9602d0b29c5a5b"
+  },
+  "website-contract-tests.txt.gz": {
+    "source": "/tmp/neoclr-lazy-website-tests.log",
+    "sourceSha256": "58511b444ac31117023555c75eefb2660035122434577d02b7e398d8c22d83ab",
+    "archiveSha256": "b107cd8fcf133117ffc528cd0a3e58b4464317635d4ace5580dc60d2eb9f905d"
+  },
+  "website-build.txt.gz": {
+    "source": "/tmp/neoclr-lazy-website-build.log",
+    "sourceSha256": "4d583cbb7cb9d27f72e68485fe1a9e08a001aeb5ac015291b81ffd2725b74661",
+    "archiveSha256": "ac655435569d20767b82cf1b459ba043d18a616e2b0e37f1f0797691838c7a01"
+  }
+}

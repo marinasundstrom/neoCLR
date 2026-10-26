@@ -652,13 +652,29 @@ fn call_closure_requires_transitive_bodies_and_exact_providers() {
             .contains("no supplied body")
     );
     crate::mutation_admission::check_call_closure_deferred(
-        &module, &[(caller, &caller_ctx.func)], &providers, &[callee],
-    ).unwrap();
-    let import = module.declarations().get_functions()
-        .find(|(_, declaration)| declaration.linkage == Linkage::Import).unwrap().0;
-    assert!(crate::mutation_admission::check_call_closure_deferred(
-        &module, &[(caller, &caller_ctx.func)], &providers, &[callee, import],
-    ).unwrap_err().to_string().contains("declared generated method"));
+        &module,
+        &[(caller, &caller_ctx.func)],
+        &providers,
+        &[callee],
+    )
+    .unwrap();
+    let import = module
+        .declarations()
+        .get_functions()
+        .find(|(_, declaration)| declaration.linkage == Linkage::Import)
+        .unwrap()
+        .0;
+    assert!(
+        crate::mutation_admission::check_call_closure_deferred(
+            &module,
+            &[(caller, &caller_ctx.func)],
+            &providers,
+            &[callee, import],
+        )
+        .unwrap_err()
+        .to_string()
+        .contains("declared generated method")
+    );
     let bodies = [(caller, &caller_ctx.func), (callee, &callee_ctx.func)];
     check(&module, &bodies, &providers).unwrap();
     assert!(
@@ -903,6 +919,9 @@ fn managed_options_for(source: &str) -> crate::fault_details::Options {
     if source.starts_with(".module LiveQueueTimersSchedule") {
         options.task_schedule.push(8);
     }
+    if source.starts_with(".module LiveConnect") {
+        options.socket_connect.push(0);
+    }
     if source.starts_with(".module LiveSocket") {
         options.socket_listen.push(0);
         options.socket_local_port.push(1);
@@ -930,6 +949,13 @@ fn managed_options_for(source: &str) -> crate::fault_details::Options {
     }
     options
 }
+#[test]
+fn managed_socket_connect_emits_rooted_checked_wrapper() {
+    emit_managed(include_str!(
+        "../../../benchmarks/execution/concurrent-store/socket-connect.neoil"
+    ));
+}
+
 #[test]
 fn managed_native_text_emits_guarded_wrappers() {
     let source = include_str!("../../../benchmarks/execution/concurrent-store/native-text.neoil");
@@ -964,6 +990,19 @@ fn managed_native_text_emits_guarded_wrappers() {
 fn managed_input(source: &str) -> neoclr::metadata::Module {
     use neoclr::metadata::{Instruction as Op, StaticField, Type, Visibility};
     let mut input = neoclr::assemble(source).unwrap();
+    if source.starts_with(".module LiveConnect") {
+        let selection = serde_json::json!({"functions": [{
+            "name": input.functions[0].name, "compiledIndex": 0,
+            "definition": {"module": "LiveConnect", "index": 0}
+        }]});
+        assert_eq!(
+            crate::bindings::socket_client(&mut input, &selection)
+                .unwrap()
+                .len(),
+            1
+        );
+        input.functions[0].name = "LiveConnectWrapper".into();
+    }
     if source.starts_with(".module LiveNativeText") {
         // Exercise production binding validation before value-profile lowering.
         let rows: Vec<_> = input

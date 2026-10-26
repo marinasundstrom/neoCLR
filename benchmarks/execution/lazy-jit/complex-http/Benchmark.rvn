@@ -1,0 +1,152 @@
+import System.*
+import System.Runtime.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+import System.Networking.Sockets.*
+import System.Result.*
+import System.Optional.*
+import System.Collections.*
+import System.Data.Json.*
+import System.Web.Http.*
+
+// Entry adapter selects the already qualified owned runtime-await pump while
+// System.Web and Run keep native state-machine lowering. No GC admission bypass.
+func Main() -> Task<unit> {
+    return RuntimeAwaitProvider.Bridge.Start<unit>(() => {
+        let pending = Run()
+        if !RuntimeAwaitProvider.Bridge.Wait(pending) {
+            return TaskOutcome<unit>.Cancelled
+        }
+        pending.GetResult()
+        return TaskOutcome<unit>.Completed(())
+    })
+}
+
+// Retain a rolling window while serving the standard checked HTTP payloads.
+class BenchmarkApplication {
+    private val retained = ArrayList<Person>(4096)
+    private var cursor = 0
+    private var requests = 0
+
+    init() {
+        var index = 0
+        while index < 4096 {
+            let person = Person()
+            person.id = index
+            retained.Add(person)
+            index += 1
+        }
+    }
+
+    func RetainPerson() -> Person {
+        let person = Person()
+        person.id = 42
+        person.name = "Café team"
+        person.active = true
+        retained[cursor] = person
+        cursor = (cursor + 1) % 4096
+        requests += 1
+        return person
+    }
+
+    func Verify() {
+        if retained.Count != 4096 || cursor != requests % 4096 {
+            System.Fail("Retained window accounting")
+        }
+        var index = 0
+        while index < 4096 {
+            var expected = index
+            if requests >= 4096 || index < requests {
+                expected = 42
+            }
+            if retained[index].id != expected {
+                System.Fail("Retained window survival")
+            }
+            index += 1
+        }
+    }
+
+    // Synthetic request pipeline: parse/validate a nested document, perform
+    // bounded calculations over temporary records, then serialize a response.
+    private func ProcessDocument() {
+        let input = "{\"station\":\"Café\",\"readings\":[1,-2,0],\"flags\":[true,false,null],\"metadata\":{\"text\":\"雪\"}}"
+        let Ok(document) = JsonSerializer.DeserializeNode(input) else {
+            System.Fail("Parse request model")
+        }
+        let Ok(output) = JsonSerializer.SerializeNode(document) else {
+            System.Fail("Serialize request model")
+        }
+        if output != input {
+            System.Fail("Request model round trip")
+        }
+        let records = ArrayList<Person>(32)
+        var index = 0
+        while index < 32 {
+            let item = Person()
+            item.id = index * 3 + 1
+            item.name = "record-" + index.ToString()
+            records.Add(item)
+            index += 1
+        }
+        var checksum = 0
+        index = 0
+        while index < records.Count {
+            var step = 0
+            while step < 16 {
+                checksum += (records[index].id + step) % 97
+                step += 1
+            }
+            index += 1
+        }
+        if checksum != 24765 {
+            System.Fail("Request calculation")
+        }
+    }
+
+    func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+        if request.Method.Method != "GET" {
+            System.Fail("Benchmark method")
+        }
+        ProcessDocument()
+        let person = RetainPerson()
+        if request.Target == "/json" {
+            return Task.FromResult(RespondWithPerson(person))
+        }
+        if request.Target != "/plain" {
+            System.Fail("Benchmark route")
+        }
+        return Task.FromResult<Result<HttpResponse, HttpError>>(Result<HttpResponse, HttpError>.Ok(
+            HttpResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), HttpStringContent("Hello, World!"))))
+    }
+}
+
+async func Run() -> Task<unit> {
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 64) else {
+        System.Fail("Listen")
+    }
+    let Ok(control) = Socket.Listen("127.0.0.1", 0, 8) else {
+        System.Fail("Control")
+    }
+    let Ok(port) = server.GetLocalPort() else {
+        System.Fail("Port")
+    }
+    let Ok(controlPort) = control.GetLocalPort() else {
+        System.Fail("Control port")
+    }
+    let application = BenchmarkApplication()
+    let lifetime = server.ServePersistent(application.Respond, 32, 16, CancellationToken.None)
+    Console.WriteLine("READY")
+    Console.WriteLine(port)
+    Console.WriteLine(controlPort)
+    let Ok(stop) = await control.Accept() else {
+        System.Fail("Stop signal")
+    }
+    stop.Close()
+    control.Close()
+    server.Close()
+    let Ok(_) = await lifetime else {
+        System.Fail("Serve lifetime")
+    }
+    application.Verify()
+    Console.WriteLine("DONE " + server.CompletedRequests.ToString() + " " + server.FailedRequests.ToString())
+}
