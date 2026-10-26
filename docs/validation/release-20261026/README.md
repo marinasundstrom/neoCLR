@@ -32,3 +32,13 @@ base-only macOS candidate measurements do not identify the final archive.
 
 The release website builds and checks all 6,133 pages ([build log](website-build.log.gz)).
 Website deployment is a separate manual workflow after artifact publication.
+
+## Published — 2026-10-26
+
+[Preview 18](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.18)
+is published at `280b52e728d8671578b1945fa57a1a3ef1c67f7d`. All 12 uploaded
+asset sizes and GitHub SHA-256 digests match the qualified local files; the
+public checksum download also matches. [Website deployment](https://github.com/marinasundstrom/neoCLR/actions/runs/40307428309)
+passes at the same commit. Live homepage, installation and HTTP/execution benchmark
+pages contain the release links and final measurements.
+[Publication evidence](publication.json) records the checks and asset URLs.

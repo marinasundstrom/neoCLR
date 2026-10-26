@@ -1,5 +1,11 @@
 # Development conversation record
 
+## 2026-10-26 — Preserve PostgreSQL and complete Preview 18
+
+- **Author:** Answered “Preserve PostgreSQL support” when the macOS candidate's optional provider omission was identified. Directed continuation of the release with the previous compiler pin; lazy JIT/trampolines remain post-release work.
+- **Assistant/actions:** Rebuilt and requalified the PostgreSQL-inclusive macOS package, including live SQL execution and final measurements. Completed Windows and source qualification, consolidated release themes while preserving detailed engineering history, and published Preview 18 with 12 verified assets and the updated website.
+- **Outcome:** [Publication evidence](validation/release-20261026/publication.json) records uploaded hashes and live website checks. Synchronous GC remains default; concurrent GC, lazy JIT and newer backticked identifiers are not claimed as release defaults or newly shipped capabilities. Windows measurements remain visibly lower with changed-host limitations.
+
 ## 2026-10-25 — Close optimization and begin both-platform release qualification
 
 - **Author:** “OK. Wrap this up and commence release procedure for macOS and Windows. Update docs and website.”

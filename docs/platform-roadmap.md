@@ -1,6 +1,6 @@
 # neoCLR platform roadmap
 
-**Author-directed Preview 18 release (2026-10-26):** All macOS ARM64 and Windows x64 qualification and final benchmark gates pass, with PostgreSQL preserved on macOS. [Final release evidence](validation/release-20261026/README.md) records exact inputs and limits. Complete verified artifact publication and manual website deployment before resuming experiments. Sync remains default; lazy JIT and newer Raven backticked identifiers remain post-release investigations.
+**Author-directed Preview 18 release (2026-10-26):** All macOS ARM64 and Windows x64 qualification and final benchmark gates pass, with PostgreSQL preserved on macOS. [Final release evidence](validation/release-20261026/README.md) records exact inputs and limits. [Release publication and manual website deployment](validation/release-20261026/publication.json) are complete; all 12 asset hashes match and live installation/benchmark pages are verified. Sync remains default; lazy JIT and newer Raven backticked identifiers remain post-release investigations.
 
 **Post-release investigation (author direction, 2026-10-26):** Evaluate lazy JIT compilation through trampolines to reduce measured startup cost, including first-call latency and interaction with concurrent GC. Compare with the current eager pipeline and .NET's entry-point/compilation approach before selecting a design. This is a follow-up investigation, not an implementation commitment or a change to the active Preview 18 release scope.
 

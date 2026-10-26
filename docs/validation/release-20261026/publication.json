@@ -1,0 +1,129 @@
+{
+  "verifiedAt": "2026-10-26T10:30:28.219878+00:00",
+  "releaseUrl": "https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.18",
+  "tag": "v0.1.0-preview.18",
+  "commit": "280b52e728d8671578b1945fa57a1a3ef1c67f7d",
+  "publishedAt": "2026-10-26T10:26:25Z",
+  "prerelease": true,
+  "allAssetHashesAndSizesMatch": true,
+  "publicChecksumDownloadMatches": true,
+  "assets": [
+    {
+      "name": "neoclr-native-build-kit-osx-arm64.tar.gz",
+      "size": 76974856,
+      "digest": "sha256:807fc5a4d607f3952489d9fe9a852bb10e718ae5a245ca7f1e3d27adf295b075",
+      "url": "https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.18/neoclr-native-build-kit-osx-arm64.tar.gz"
+    },
+    {
+      "name": "neoclr-preview18-osx-arm64.tar.gz",
+      "size": 62623252,
+      "digest": "sha256:a3f60527e9a0b17ec93bc9cac67369b31a1905660a39d633c4dbe2de52311bea",
+      "url": "https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.18/neoclr-preview18-osx-arm64.tar.gz"
+    },
+    {
+      "name": "neoclr-preview18-qualified-source.tar",
+      "size": 687411200,
+      "digest": "sha256:435836d37c832bc899e81d931e678ea578d718676f14de39c62754447060a8c6",
+      "url": "https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.18/neoclr-preview18-qualified-source.tar"
+    },
+    {
+      "name": "neoclr-preview18-win-x64.tar.gz",
+      "size": 56068172,
+      "digest": "sha256:5b10d49eab088962ed244740a13eb9ee90aade234bef0a0c89ff780d6ab71a0d",
+      "url": "https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.18/neoclr-preview18-win-x64.tar.gz"
+    },
+    {
+      "name": "raven-0.1.18-neoclr.20261025.1-osx-arm64.vsix",
+      "size": 10875177,
+      "digest": "sha256:a6f700af735411fe648d2a0ee2a5acb69e468cdad41f259aa03817a23be77dca",
+      "url": "https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.18/raven-0.1.18-neoclr.20261025.1-osx-arm64.vsix"
+    },
+    {
+      "name": "raven-0.1.18-neoclr.20261025.1-win-x64.vsix",
+      "size": 10899491,
+      "digest": "sha256:3db55fd6500f730de66bf3848b85ef2b845b6df168d81f10e87b03734ba064ba",
+      "url": "https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.18/raven-0.1.18-neoclr.20261025.1-win-x64.vsix"
+    },
+    {
+      "name": "raven-sdk-0.1.18-neoclr.20261025.1-osx-arm64.tar.gz",
+      "size": 39230962,
+      "digest": "sha256:82b366c9868feca1732f17b882b960de6bea86da2d9bd03564335472f43880af",
+      "url": "https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.18/raven-sdk-0.1.18-neoclr.20261025.1-osx-arm64.tar.gz"
+    },
+    {
+      "name": "raven-sdk-0.1.18-neoclr.20261025.1-win-x64.tar.gz",
+      "size": 33165394,
+      "digest": "sha256:77becbc0a76fc64fb67ac4ecb954aba198d106e0190fd6c64c9a740400ef7faa",
+      "url": "https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.18/raven-sdk-0.1.18-neoclr.20261025.1-win-x64.tar.gz"
+    },
+    {
+      "name": "raven-tool-notices-osx-arm64.tar.gz",
+      "size": 139285,
+      "digest": "sha256:1ff87957ec6eeef1fcfce0684e4bc8db7b1af3f61a349e734c72b7866d6c9d8f",
+      "url": "https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.18/raven-tool-notices-osx-arm64.tar.gz"
+    },
+    {
+      "name": "raven-tool-notices-win-x64.tar.gz",
+      "size": 139285,
+      "digest": "sha256:1ff87957ec6eeef1fcfce0684e4bc8db7b1af3f61a349e734c72b7866d6c9d8f",
+      "url": "https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.18/raven-tool-notices-win-x64.tar.gz"
+    },
+    {
+      "name": "release-manifest.json",
+      "size": 3339,
+      "digest": "sha256:083f723bb3f869800e3d97fd70ddbb6bef2687c0e48eb60fcfff48ac0b3d107e",
+      "url": "https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.18/release-manifest.json"
+    },
+    {
+      "name": "SHA256SUMS",
+      "size": 1155,
+      "digest": "sha256:0e0977023ddef748caa08ac55540d97ef51ed4e8154f620abb46fb1735404004",
+      "url": "https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.18/SHA256SUMS"
+    }
+  ],
+  "websiteDeployment": {
+    "conclusion": "success",
+    "headSha": "280b52e728d8671578b1945fa57a1a3ef1c67f7d",
+    "status": "completed",
+    "url": "https://github.com/marinasundstrom/neoCLR/actions/runs/40307428309"
+  },
+  "liveWebsiteChecks": [
+    {
+      "url": "https://marinasundstrom.github.io/neoCLR/try/",
+      "status": 200,
+      "contains": [
+        "v0.1.0-preview.18",
+        "neoclr-preview18-osx-arm64.tar.gz",
+        "neoclr-preview18-win-x64.tar.gz",
+        "PostgreSQL"
+      ],
+      "sha256": "28e93b62c0880d667c3c6e66ca69135d42dc7ee82889ff81c25d940cf1e47a9b"
+    },
+    {
+      "url": "https://marinasundstrom.github.io/neoCLR/benchmarks/http/",
+      "status": 200,
+      "contains": [
+        "Preview 18",
+        "185.20",
+        "42.10"
+      ],
+      "sha256": "57f99e81f742208d06ac8fd2ba97fd600d29d1858d9b69a2c27f2ff18b8120e8"
+    },
+    {
+      "url": "https://marinasundstrom.github.io/neoCLR/benchmarks/execution/",
+      "status": 200,
+      "contains": [
+        "Preview 18"
+      ],
+      "sha256": "e2bd283dcb490fd6c7689d91338c7c1dd000410697383803b1fe785203102d80"
+    },
+    {
+      "url": "https://marinasundstrom.github.io/neoCLR/",
+      "status": 200,
+      "contains": [
+        "v0.1.0-preview.18"
+      ],
+      "sha256": "41b0e26cd2b0b725d013f3463aefaf8472f26ceedc66efdd90ba3ba34852ea1d"
+    }
+  ]
+}

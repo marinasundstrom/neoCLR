@@ -5,7 +5,7 @@ This page owns shared integration/delivery status. The [HTTP tracker](../http-ca
 owns whether its packaged sample passes and whether the POC is complete; do not
 maintain a second HTTP completion checklist here.
 
-## Preview 18 qualification complete — 2026-10-26
+## Preview 18 published — 2026-10-26
 
 Runtime `0.1.0-preview.18`, SDK/editor `0.1.18-neoclr.20261025.1`, pinned Raven
 `ed1d08defe2778f965951747d5f48311ce3daf83`. All source, both-platform package/editor,
@@ -13,7 +13,7 @@ HTTPS and final measurement gates pass. macOS preserves PostgreSQL; Windows ship
 the four base libraries. Sync remains default and concurrent/layout experiments
 remain private/opt-in. [Final evidence and asset identities](../validation/release-20261026/README.md)
 and [release notes](../preview-18-release-notes.md) supersede candidate preparation.
-Publication/upload verification and website deployment close the release procedure.
+[Publication evidence](../validation/release-20261026/publication.json) confirms all 12 uploaded hashes, the public checksum download and successful manual website deployment. Live download and benchmark pages are verified; the release procedure is complete.
 Backticked identifiers and lazy JIT/trampolines are deferred investigations.
 
 ## Preview 17 candidate — 2026-10-19

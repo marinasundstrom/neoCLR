@@ -231,3 +231,9 @@ with clean Git status before/after. Windows final measurements also pass.
 now supersede candidate status above. Earlier failures and the base-only macOS
 archive remain historical evidence. Verified release upload and website deployment
 remain separate publication steps.
+
+### Publication closed — 2026-10-26
+
+Preview 18 and the website are published. [Final publication evidence](../release-20261026/publication.json)
+records all 12 verified uploaded assets, the public checksum download, successful
+manual deployment and live download/benchmark page checks.

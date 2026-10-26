@@ -6,7 +6,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
-No unreleased changes.
+### 2026-10-26
+
+- Record completed Preview 18 publication: all 12 release asset hashes and the public checksum download match, manual website deployment passes, and live installation/benchmark pages are verified. Close release tracking while retaining published release notes and changelog sections unchanged.
 
 ## 0.1.0-preview.18 — 2026-10-26
 
