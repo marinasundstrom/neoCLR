@@ -12,6 +12,17 @@ The theme is clearer platform contracts, more efficient HTTP/value handling, and
 stronger runtime execution. Synchronous GC remains the default; concurrent GC
 continues as an experimental native development path.
 
+### 2026-10-26
+
+#### Release qualification
+
+- Repair task-test references to the renamed generated `Optional` fixtures and
+  use a bounded, NUL-inclusive copy in the root-validation test so Windows can
+  compile it with warnings-as-errors. Record macOS extracted JIT/interpreter
+  acceptance and the remaining source/Windows qualification failures separately;
+  All five affected task tests and the 188-command macOS native GC gate pass;
+  hosted requalification remains required. Preview 18 is not yet published.
+
 ### 2026-10-25
 
 #### Release preparation

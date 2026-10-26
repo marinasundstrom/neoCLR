@@ -19,5 +19,29 @@
     "final-artifact release benchmarks",
     "artifact and notice audits",
     "publication and website deployment"
-  ]
+  ],
+  "repairedSourceRun": 40214540493,
+  "qualificationUpdateDate": "2026-10-26",
+  "macOSPackageEvidence": {
+    "archive.json": {
+      "sha256": "7270f557d110546fe727c269b4187e6cf4f667aebc772611916bb255f3a13bc8",
+      "report": "archive.json.gz"
+    },
+    "extracted-jit.json": {
+      "sha256": "d5caa488c0aac7dcc247406fee1cc1c333dac436181ed6c75ffec8c48f25b018",
+      "report": "extracted-jit.json.gz"
+    },
+    "extracted-interpreter.json": {
+      "sha256": "49b890bd139511a55bb7d485debb3b788dfe1e3981642a2f538bd61709b6c6a1",
+      "report": "extracted-interpreter.json.gz"
+    }
+  },
+  "currentBlockers": [
+    "Source and Windows gates must rerun with validated fixture repairs"
+  ],
+  "localFixtureRetest": {
+    "taskTestsPassed": 5,
+    "nativeGcPassed": true,
+    "nativeGcCommands": 188
+  }
 }

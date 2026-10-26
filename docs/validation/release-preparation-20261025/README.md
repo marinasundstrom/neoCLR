@@ -118,3 +118,33 @@ reproducing negative controls; final packages still need their own qualification
 results. Source-only fixture/docs repairs do not change the runtime/compiler bytes
 being built by the original package job; final artifact lineage must list the exact
 source/test revisions rather than relabeling old artifacts with a newer commit.
+
+## Qualification follow-up — 2026-10-26
+
+The macOS SDK, matching VSIX, libraries, runtime and JIT-host packaging completed.
+The archived/extracted bundle passes default-JIT and interpreter sample/HTTP
+verification. Exact archive and manifest hashes and compressed reports are linked
+from [candidate.json](candidate.json). The initial temporary extraction no longer
+existed on resumption; interpreter validation uses a fresh extraction of the same
+archive under `target/preview18-release/extracted-20261026`. Local strict Clippy
+passed. This is partial package acceptance, not publication.
+
+[Repaired source CI](https://github.com/marinasundstrom/neoCLR/actions/runs/40214540493)
+passes minimum Rust on all three hosts and both macOS/Windows host checks, but
+canonical tests expose five task-fixture failures: references to removed
+`Option.methods.neoil`/`Option.helpers.neoil`. Update the fixture to `Optional`.
+[Windows packaging](https://github.com/marinasundstrom/neoCLR/actions/runs/40213940464)
+passes SDK/editor construction and extracted JIT samples, then stops at MSVC C4996
+in the root-validation fixture. Replace its fixed-literal `strcpy` with the same
+NUL-inclusive bounded `memcpy` used by adjacent cases; keep warnings-as-errors.
+These are validation-fixture repairs; production package inputs remain unchanged.
+Rerun both gates before claiming acceptance. Windows editor execution and the
+remaining package/API, HTTPS, native-kit and benchmark gates remain pending.
+
+The repaired macOS [native GC gate](native-gc-retest.json.gz) passes all 188
+commands, including intentional rejection cases. Retained [source failure log](source-repaired-failure.log.gz)
+and [Windows compiler diagnostic](windows-root-build.log.gz) establish the original
+failures; macOS success does not certify MSVC.
+
+All five previously failing task tests pass locally after the filename repair
+([focused retest](task-fixtures-retest.log.gz)). Production runtime source is unchanged.
