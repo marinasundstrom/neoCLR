@@ -23052,3 +23052,13 @@ explicitly directing that the current release proceed. The assistant proposed
 measuring startup, first-call latency, steady-state throughput and GC coordination
 in a later experiment. No lazy compiler or trampoline change is included in
 Preview 18; the current release scope and compiler pin remain unchanged.
+
+## 2026-10-26 — Preserve the macOS PostgreSQL package
+
+Final release-content review found that the initial Preview 18 macOS candidate
+contained only the four base libraries, omitting the optional PostgreSQL provider
+included with Preview 17. The assistant surfaced the omission and offered a
+rebuild or an explicitly documented reduced package. The author directed:
+“Preserve PostgreSQL support.” Rebuild and requalify macOS with the provider,
+including affected final-artifact measurements. Keep the earlier base-only
+candidate evidence separately; Windows remains a base-library package.

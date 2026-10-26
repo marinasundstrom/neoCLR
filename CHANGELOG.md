@@ -33,7 +33,11 @@ continues as an experimental native development path.
   editor recovery, standalone SDK attribution and Windows HTTPS evidence.
   Windows package/editor qualification now passes; its final measurements remain
   pending. Verify the qualified source archive checksum and record lazy JIT with
-  trampolines as a post-release investigation. Preview 18 is not yet published.
+  trampolines as a post-release investigation. Preserve the macOS PostgreSQL
+  provider by rebuilding its candidate; update the SQL qualification harness to
+  import native SDK runtime contracts. Live queries pass interpreter/JIT/AOT and
+  all ten protocol-peer cases pass. Final macOS package checks and measurements
+  are being repeated for the provider-inclusive archive. Preview 18 is not yet published.
 
 ### 2026-10-25
 

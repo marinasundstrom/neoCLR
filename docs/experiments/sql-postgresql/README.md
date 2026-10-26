@@ -16,6 +16,18 @@ invalid UTF-8, mismatched columns, excessive rows and fragmented successful mess
 Peers verify separate Parse/Bind frames, connection retirement after failures and
 scoped `use` cleanup after the fragmented successful response.
 
+## Current native package qualification (2026-10-26)
+
+For a native-source-core bundle, `validate.py` now compiles each consumer through
+an SDK project importing `NeoCLR.ClassLibrary.props`. This preserves the matching
+native core, runtime contracts and runtime-async provider instead of selecting the
+historical CLI bootstrap flags. The old recipe below remains historical evidence.
+Pass the extracted bundle's compiler, `lib`, runtime, JIT compiler and JIT host,
+plus the disposable local database port; `--aot` includes native execution.
+The Preview 18 requalification covers live PostgreSQL in all three execution modes,
+SQL contracts and all ten malformed/fragmented protocol peers. See the
+[release record](../../validation/release-preparation-20261025/README.md).
+
 ## Initial protocol qualification
 
 The following recipe records the original protocol milestone; the common-query

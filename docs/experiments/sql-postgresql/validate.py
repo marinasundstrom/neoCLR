@@ -10,6 +10,8 @@ import socket
 import struct
 import subprocess
 import threading
+import shutil
+import xml.etree.ElementTree as ET
 import time
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -50,9 +52,11 @@ def run(label, command, expected=None):
 
 
 modules = [lib / (name + '.dll') for name in ('System.Runtime', 'System.Data', 'System.Networking', 'System.Data.PostgreSql')]
+catalog = json.loads((lib / 'bundle.json').read_text())
 base = ['dotnet', a.compiler.resolve(), 'neoclr', '--core-reference', lib / 'Core.dll',
         '--runtime-seed', lib / 'System.runtime.neox', '--bootstrap-intrinsics',
-        '--bootstrap-ownership', lib / 'ownership.json', '--object-library', 'System.Runtime', '--async-library', 'System.Runtime']
+        '--bootstrap-ownership', lib / 'ownership.json', '--object-library', 'System.Runtime',
+        '--async-library', 'System.Runtime']
 for path in modules:
     base += ['--reference', path]
 flags = ['--compile-system', '--bind-user-fault', '--reference-arena', '--native-gc',
@@ -150,9 +154,26 @@ def peer(listener, mode, errors):
 
 try:
     for case in (['Main', 'Contracts'] if a.queries_only else ['Main', 'Failures', 'Contracts']):
-        args = base + ['-o', out / (case + '.dll'), HERE / (case + '.rvn')]
-        args += ['--runtime-async-poc', 'RuntimeAwaitProvider.Bridge', ROOT / 'runtime/raven/compiler-services/RuntimeAwait.rvn']
-        run(case + '-compile', args)
+        if catalog.get('kind') == 'native-source-core-class-library':
+            # Import the current native core, runtime contracts and async provider
+            # together, just as an installed SDK consumer does.
+            project_dir = out / (case + '-project')
+            project_dir.mkdir()
+            project = ET.Element('Project', Sdk='Microsoft.NET.Sdk')
+            ET.SubElement(project, 'Import', Project=str(lib / 'NeoCLR.ClassLibrary.props'))
+            properties = ET.SubElement(project, 'PropertyGroup')
+            for key, value in dict(TargetFramework='net10.0', OutputType='Exe',
+                                   AssemblyName=case, EnableDefaultCompileItems='false').items():
+                ET.SubElement(properties, key).text = value
+            ET.SubElement(ET.SubElement(project, 'ItemGroup'), 'Compile', Include=str(HERE / (case + '.rvn')))
+            project_path = project_dir / (case + '.rvnproj')
+            ET.ElementTree(project).write(project_path, encoding='unicode')
+            run(case + '-compile', ['dotnet', a.compiler.resolve(), 'neoclr', '--project', project_path])
+            shutil.copyfile(project_dir / 'bin/neoclr' / (case + '.dll'), out / (case + '.dll'))
+        else:
+            args = base + ['-o', out / (case + '.dll'), HERE / (case + '.rvn')]
+            args += ['--runtime-async-poc', 'RuntimeAwaitProvider.Bridge', ROOT / 'runtime/raven/compiler-services/RuntimeAwait.rvn']
+            run(case + '-compile', args)
     disassembly = out / 'Main.neoil'
     run('metadata', [a.runtime.resolve(), 'disassemble', out / 'Main.dll', disassembly])
     listing = disassembly.read_text()
