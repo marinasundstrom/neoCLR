@@ -1,5 +1,7 @@
 # Runtime scheduling and async suspension
 
+**2026-10-28 author-directed investigation:** Explore [Go-inspired concurrency and scheduling](design/go-inspired-scheduling.md): lightweight execution contexts, local/global queues, work stealing, configurable workers and suspension that releases workers. Preserve Task semantics and language-independent scheduling. The design audits existing owner-local fibers and private parallel compiled callbacks, defines GC/JIT/I/O migration gates, and links a fresh native worker baseline. This is the next investigation, not an adopted production architecture; earlier dated restrictions below remain historical context.
+
 **Public Scheduler clarification (2026-10-11):** expose a managed `Scheduler`
 contract, with scheduling implemented by the runtime. Task/Promise APIs stay in the
 managed domain; queue storage and pumping remain implementation details. This selects

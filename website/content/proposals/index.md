@@ -7,6 +7,26 @@ start with the [guides](../guides/). The repository's
 [roadmap](https://github.com/marinasundstrom/neoCLR/blob/main/docs/platform-roadmap.md)
 tracks priorities and implementation work; the ideas here are not release commitments.
 
+## Concurrency and scheduling
+
+A new investigation explores Go-inspired lightweight execution contexts,
+worker-local/global queues, work stealing and configurable parallelism. The goal
+is better throughput, scheduling latency and resource use while preserving Task
+semantics and supporting explicit await or future implicit suspension.
+
+Existing owner-local async fibers and a private parallel worker experiment provide
+a foundation. General context migration, nonblocking lazy-JIT waits and shared-heap
+HTTP execution still need ownership and performance qualification with both sync
+and concurrent GC. Adoption will be incremental and measurement-driven; this is
+not an announced runtime capability or a commitment to replicate Go.
+
+A proposed opt-in execution tracer would show runnable, executing and waiting work
+alongside I/O, lazy compilation and GC phases. The first planned slice is bounded
+recording and timeline export, with explicit event-loss and overhead measurements,
+to guide the scheduler comparison. The tracer is not implemented yet.
+
+[Investigation and benchmark plan](https://github.com/marinasundstrom/neoCLR/blob/main/docs/design/go-inspired-scheduling.md)
+
 <a id="http-poc"></a>
 
 ## HTTP and networking

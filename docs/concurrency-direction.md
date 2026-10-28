@@ -1,5 +1,7 @@
 # Concurrency and tracked threads — post-release direction
 
+**2026-10-28 author-directed investigation:** Explore [Go-inspired concurrency and scheduling](design/go-inspired-scheduling.md): lightweight execution contexts, local/global queues, work stealing, configurable workers and suspension that releases workers. Preserve Task semantics and language-independent scheduling. The design audits existing owner-local fibers and private parallel compiled callbacks, defines GC/JIT/I/O migration gates, and links a fresh native worker baseline. This is the next investigation, not an adopted production architecture; earlier dated restrictions below remain historical context.
+
 **2026-10-23 native prototype checkpoint:** the author authorized the experiment
 directly in main runtime code. The [bounded pool](experiments/native-worker-pool/README.md)
 now provides explicit shared capture/result roots, gated managed access, bounded
