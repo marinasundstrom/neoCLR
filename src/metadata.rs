@@ -1124,6 +1124,7 @@ pub enum Instruction {
 
 impl Module {
     /// Run a read-only metadata phase with temporary lookup indexes on this thread.
+    /// Successful transitive interface views may also be reused within this scope.
     ///
     /// Lookups retain their usual identity, arity and ordering rules. Nested phases
     /// for this module reuse the index; another module temporarily replaces it.

@@ -1,8 +1,8 @@
 //! Scope-local candidate indexes for an immutably borrowed module.
-//! Indexes only narrow the search; signature, identity and access checks stay in
-//! their existing callers. Loading/verification and execution each hold immutable
+//! Candidate indexes and bounded successful interface views avoid repeated work;
+//! signature, identity and access checks stay in their existing callers. Loading/verification and execution each hold immutable
 //! scopes; mutation between scopes rebuilds indexes rather than retaining stale rows.
-use crate::metadata::Module;
+use crate::metadata::{Module, Type};
 use std::{
     cell::{OnceCell, RefCell},
     collections::HashMap,
@@ -15,7 +15,17 @@ struct Index {
     functions: HashMap<String, Rc<[usize]>>,
     owners: OnceCell<HashMap<usize, Rc<[usize]>>>,
     definitions: OnceCell<HashMap<crate::metadata::TypeDefId, usize>>,
+    interfaces: RefCell<InterfaceClosures>,
 }
+
+#[derive(Default)]
+struct InterfaceClosures {
+    views: HashMap<Type, Rc<[Type]>>,
+    retained_views: usize,
+}
+
+const INTERFACE_OWNERS: usize = 1024;
+const INTERFACE_VIEWS: usize = 4096;
 
 thread_local! {
     static ACTIVE: RefCell<Option<Rc<Index>>> = const { RefCell::new(None) };
@@ -48,6 +58,7 @@ pub(crate) fn with_module<R>(module: &Module, operation: impl FnOnce() -> R) -> 
         module: address,
         owners: OnceCell::new(),
         definitions: OnceCell::new(),
+        interfaces: RefCell::new(InterfaceClosures::default()),
         types: grouped(
             module
                 .types
@@ -93,6 +104,41 @@ pub(crate) fn types(module: &Module, name: &str) -> Option<Rc<[usize]>> {
 
 pub(crate) fn functions(module: &Module, name: &str) -> Option<Rc<[usize]>> {
     candidates(module, name, false)
+}
+
+// Successful transitive views depend only on the complete owner type and the
+// immutably borrowed module. Keep errors and traversal in interfaces::closure;
+// do not hold a cache borrow while that traversal calls other metadata helpers.
+pub(crate) fn interface_closure(module: &Module, owner: &Type) -> Option<Rc<[Type]>> {
+    ACTIVE.with(|active| {
+        let active = active.borrow();
+        let index = active.as_ref()?;
+        if index.module != module as *const Module as usize {
+            return None;
+        }
+        index.interfaces.borrow().views.get(owner).cloned()
+    })
+}
+
+pub(crate) fn remember_interface_closure(module: &Module, owner: &Type, views: &[Type]) {
+    ACTIVE.with(|active| {
+        let active = active.borrow();
+        let Some(index) = active.as_ref() else {
+            return;
+        };
+        if index.module != module as *const Module as usize {
+            return;
+        }
+        let mut cache = index.interfaces.borrow_mut();
+        if cache.views.len() >= INTERFACE_OWNERS
+            || views.len() > INTERFACE_VIEWS.saturating_sub(cache.retained_views)
+            || cache.views.contains_key(owner)
+        {
+            return;
+        }
+        cache.retained_views += views.len();
+        cache.views.insert(owner.clone(), views.into());
+    });
 }
 
 /// Exact source definition identity, including module revision. The outer None
@@ -182,6 +228,110 @@ mod tests {
         assemble,
         metadata::{FunctionRef, Type},
     };
+
+    #[test]
+    fn interface_views_preserve_substitution_errors_and_scope_lifetimes() {
+        let mut module = assemble(
+            ".module Views\n.interface Root<T>\n.end\n.interface Left<T>\n.implements Root<T>\n.end\n.interface Right<T>\n.implements Root<T>\n.end\n.interface Diamond<T>\n.implements Left<T>\n.implements Right<T>\n.end\n.interface Related\n.implements Root<Self>\n.end\n.type class Cell<T>\n.implements Diamond<T>\n.implements Related\n.end\n.interface Cycle\n.end\n",
+        ).unwrap();
+        module
+            .types
+            .iter_mut()
+            .find(|t| t.name == "Cycle")
+            .unwrap()
+            .implements
+            .push(Type::Named("Cycle".into()));
+        let other =
+            assemble(".module Other\n.interface Root<T>\n.end\n.type class Cell<T>\n.end\n")
+                .unwrap();
+        let parse = |s| crate::assembler::parse_type(s).unwrap();
+        let owners = [
+            parse("Cell<Int32>"),
+            parse("Cell<String>"),
+            parse("Related"),
+            parse("Cycle"),
+            parse("Missing"),
+            parse("arrayref<Int32>"),
+        ];
+        let results: Vec<_> = owners
+            .iter()
+            .map(|ty| crate::interfaces::closure(&module, ty).map_err(|e| e.message))
+            .collect();
+        assert!(
+            results[0]
+                .as_ref()
+                .unwrap()
+                .contains(&parse("Root<Cell<Int32>>"))
+        );
+        assert!(results[2].as_ref().unwrap().contains(&parse("Root<Self>")));
+        assert!(results[3].is_err());
+        with_module(&module, || {
+            for _ in 0..2 {
+                for (ty, expected) in owners.iter().zip(&results) {
+                    assert_eq!(
+                        &crate::interfaces::closure(&module, ty).map_err(|e| e.message),
+                        expected
+                    );
+                    assert_eq!(interface_closure(&module, ty).is_some(), expected.is_ok());
+                }
+            }
+            with_module(&other, || {
+                assert!(
+                    crate::interfaces::closure(&other, &owners[0])
+                        .unwrap()
+                        .is_empty()
+                );
+                assert!(interface_closure(&module, &owners[0]).is_none());
+            });
+            assert_eq!(
+                crate::interfaces::closure(&module, &owners[0]).unwrap(),
+                *results[0].as_ref().unwrap()
+            );
+        });
+        assert!(interface_closure(&module, &owners[0]).is_none());
+        module
+            .types
+            .iter_mut()
+            .find(|t| t.name == "Cell")
+            .unwrap()
+            .implements
+            .clear();
+        with_module(&module, || {
+            assert!(
+                crate::interfaces::closure(&module, &owners[0])
+                    .unwrap()
+                    .is_empty()
+            );
+        });
+    }
+
+    #[test]
+    fn interface_view_limits_fall_back_without_changing_results() {
+        let module = assemble(".module Limits\n.interface Root<T>\n.end\n").unwrap();
+        with_module(&module, || {
+            for index in 0..=INTERFACE_OWNERS {
+                let ty = Type::Constructed {
+                    definition: "Root".into(),
+                    arguments: vec![Type::TypeParameter(index as u16)],
+                };
+                assert_eq!(
+                    crate::interfaces::closure(&module, &ty).unwrap(),
+                    vec![ty.clone()]
+                );
+                assert_eq!(
+                    interface_closure(&module, &ty).is_some(),
+                    index < INTERFACE_OWNERS
+                );
+            }
+        });
+        with_module(&module, || {
+            let large = vec![Type::Int32; INTERFACE_VIEWS];
+            remember_interface_closure(&module, &Type::Int32, &large);
+            remember_interface_closure(&module, &Type::String, &[Type::String]);
+            assert!(interface_closure(&module, &Type::String).is_none());
+            assert!(interface_closure(&module, &Type::Int32).is_some());
+        });
+    }
 
     fn module(value: i32) -> Module {
         assemble(&format!(

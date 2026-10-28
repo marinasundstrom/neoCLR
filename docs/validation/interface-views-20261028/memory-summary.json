@@ -1,0 +1,624 @@
+{
+  "rows": [
+    {
+      "mode": "eager-sync-jit",
+      "nativeMemory": {
+        "baseline": {
+          "afterInvoke": {
+            "blocksInUse": 9611,
+            "maxSizeInUse": 0,
+            "sizeAllocated": 1002438656,
+            "sizeInUse": 3693072
+          },
+          "afterRelease": {
+            "blocksInUse": 43661,
+            "maxSizeInUse": 0,
+            "sizeAllocated": 1002438656,
+            "sizeInUse": 25981056
+          },
+          "beforePrepare": {
+            "blocksInUse": 891114,
+            "maxSizeInUse": 0,
+            "sizeAllocated": 973078528,
+            "sizeInUse": 208439440
+          },
+          "beforeRelease": {
+            "blocksInUse": 925183,
+            "maxSizeInUse": 0,
+            "sizeAllocated": 1006632960,
+            "sizeInUse": 230908816
+          },
+          "scope": "macOS malloc zones; not RSS, direct mmap, or managed heap attribution"
+        },
+        "indexed": {
+          "afterInvoke": {
+            "blocksInUse": 9611,
+            "maxSizeInUse": 0,
+            "sizeAllocated": 1019215872,
+            "sizeInUse": 3693072
+          },
+          "afterRelease": {
+            "blocksInUse": 43661,
+            "maxSizeInUse": 0,
+            "sizeAllocated": 1019215872,
+            "sizeInUse": 25981056
+          },
+          "beforePrepare": {
+            "blocksInUse": 891114,
+            "maxSizeInUse": 0,
+            "sizeAllocated": 985661440,
+            "sizeInUse": 208439440
+          },
+          "beforeRelease": {
+            "blocksInUse": 925183,
+            "maxSizeInUse": 0,
+            "sizeAllocated": 1023410176,
+            "sizeInUse": 230908816
+          },
+          "scope": "macOS malloc zones; not RSS, direct mmap, or managed heap attribution"
+        }
+      },
+      "processMemory": {
+        "baseline": {
+          "ready": {
+            "pid": 60800,
+            "rssBytes": 995246080,
+            "virtualBytes": 500549206016,
+            "command": [
+              "/bin/ps",
+              "-p",
+              "60800",
+              "-o",
+              "pid=,rss=,vsz="
+            ],
+            "stdout": "60800 971920 488817584\n",
+            "stderr": "",
+            "exitCode": 0
+          },
+          "afterWarmup": {
+            "pid": 60800,
+            "rssBytes": 995295232,
+            "virtualBytes": 500549206016,
+            "command": [
+              "/bin/ps",
+              "-p",
+              "60800",
+              "-o",
+              "pid=,rss=,vsz="
+            ],
+            "stdout": "60800 971968 488817584\n",
+            "stderr": "",
+            "exitCode": 0
+          },
+          "afterTraffic": {
+            "pid": 60800,
+            "rssBytes": 995295232,
+            "virtualBytes": 500549206016,
+            "command": [
+              "/bin/ps",
+              "-p",
+              "60800",
+              "-o",
+              "pid=,rss=,vsz="
+            ],
+            "stdout": "60800 971968 488817584\n",
+            "stderr": "",
+            "exitCode": 0
+          }
+        },
+        "indexed": {
+          "ready": {
+            "pid": 60857,
+            "rssBytes": 876249088,
+            "virtualBytes": 500549042176,
+            "command": [
+              "/bin/ps",
+              "-p",
+              "60857",
+              "-o",
+              "pid=,rss=,vsz="
+            ],
+            "stdout": "60857 855712 488817424\n",
+            "stderr": "",
+            "exitCode": 0
+          },
+          "afterWarmup": {
+            "pid": 60857,
+            "rssBytes": 876298240,
+            "virtualBytes": 500549042176,
+            "command": [
+              "/bin/ps",
+              "-p",
+              "60857",
+              "-o",
+              "pid=,rss=,vsz="
+            ],
+            "stdout": "60857 855760 488817424\n",
+            "stderr": "",
+            "exitCode": 0
+          },
+          "afterTraffic": {
+            "pid": 60857,
+            "rssBytes": 876298240,
+            "virtualBytes": 500549042176,
+            "command": [
+              "/bin/ps",
+              "-p",
+              "60857",
+              "-o",
+              "pid=,rss=,vsz="
+            ],
+            "stdout": "60857 855760 488817424\n",
+            "stderr": "",
+            "exitCode": 0
+          }
+        }
+      }
+    },
+    {
+      "mode": "lazy-sync-jit",
+      "nativeMemory": {
+        "baseline": {
+          "afterInvoke": {
+            "blocksInUse": 9629,
+            "maxSizeInUse": 0,
+            "sizeAllocated": 914358272,
+            "sizeInUse": 3695600
+          },
+          "afterRelease": {
+            "blocksInUse": 186155,
+            "maxSizeInUse": 0,
+            "sizeAllocated": 919437312,
+            "sizeInUse": 56587328
+          },
+          "beforePrepare": {
+            "blocksInUse": 891114,
+            "maxSizeInUse": 0,
+            "sizeAllocated": 884998144,
+            "sizeInUse": 208439440
+          },
+          "beforeRelease": {
+            "blocksInUse": 1067677,
+            "maxSizeInUse": 0,
+            "sizeAllocated": 923631616,
+            "sizeInUse": 261515088
+          },
+          "scope": "macOS malloc zones; not RSS, direct mmap, or managed heap attribution"
+        },
+        "indexed": {
+          "afterInvoke": {
+            "blocksInUse": 9629,
+            "maxSizeInUse": 0,
+            "sizeAllocated": 905969664,
+            "sizeInUse": 3695600
+          },
+          "afterRelease": {
+            "blocksInUse": 186155,
+            "maxSizeInUse": 0,
+            "sizeAllocated": 906854400,
+            "sizeInUse": 56587328
+          },
+          "beforePrepare": {
+            "blocksInUse": 891114,
+            "maxSizeInUse": 0,
+            "sizeAllocated": 872415232,
+            "sizeInUse": 208439440
+          },
+          "beforeRelease": {
+            "blocksInUse": 1067677,
+            "maxSizeInUse": 0,
+            "sizeAllocated": 911048704,
+            "sizeInUse": 261515088
+          },
+          "scope": "macOS malloc zones; not RSS, direct mmap, or managed heap attribution"
+        }
+      },
+      "processMemory": {
+        "baseline": {
+          "ready": {
+            "pid": 60914,
+            "rssBytes": 917635072,
+            "virtualBytes": 500633387008,
+            "command": [
+              "/bin/ps",
+              "-p",
+              "60914",
+              "-o",
+              "pid=,rss=,vsz="
+            ],
+            "stdout": "60914 896128 488899792\n",
+            "stderr": "",
+            "exitCode": 0
+          },
+          "afterWarmup": {
+            "pid": 60914,
+            "rssBytes": 948502528,
+            "virtualBytes": 500670660608,
+            "command": [
+              "/bin/ps",
+              "-p",
+              "60914",
+              "-o",
+              "pid=,rss=,vsz="
+            ],
+            "stdout": "60914 926272 488936192\n",
+            "stderr": "",
+            "exitCode": 0
+          },
+          "afterTraffic": {
+            "pid": 60914,
+            "rssBytes": 939130880,
+            "virtualBytes": 500670660608,
+            "command": [
+              "/bin/ps",
+              "-p",
+              "60914",
+              "-o",
+              "pid=,rss=,vsz="
+            ],
+            "stdout": "60914 917120 488936192\n",
+            "stderr": "",
+            "exitCode": 0
+          }
+        },
+        "indexed": {
+          "ready": {
+            "pid": 60965,
+            "rssBytes": 908771328,
+            "virtualBytes": 500632633344,
+            "command": [
+              "/bin/ps",
+              "-p",
+              "60965",
+              "-o",
+              "pid=,rss=,vsz="
+            ],
+            "stdout": "60965 887472 488899056\n",
+            "stderr": "",
+            "exitCode": 0
+          },
+          "afterWarmup": {
+            "pid": 60965,
+            "rssBytes": 948666368,
+            "virtualBytes": 500669906944,
+            "command": [
+              "/bin/ps",
+              "-p",
+              "60965",
+              "-o",
+              "pid=,rss=,vsz="
+            ],
+            "stdout": "60965 926432 488935456\n",
+            "stderr": "",
+            "exitCode": 0
+          },
+          "afterTraffic": {
+            "pid": 60965,
+            "rssBytes": 948961280,
+            "virtualBytes": 500669906944,
+            "command": [
+              "/bin/ps",
+              "-p",
+              "60965",
+              "-o",
+              "pid=,rss=,vsz="
+            ],
+            "stdout": "60965 926720 488935456\n",
+            "stderr": "",
+            "exitCode": 0
+          }
+        }
+      }
+    },
+    {
+      "mode": "eager-live-jit",
+      "nativeMemory": {
+        "baseline": {
+          "afterInvoke": {
+            "blocksInUse": 9612,
+            "maxSizeInUse": 0,
+            "sizeAllocated": 1098907648,
+            "sizeInUse": 3693136
+          },
+          "afterRelease": {
+            "blocksInUse": 43844,
+            "maxSizeInUse": 0,
+            "sizeAllocated": 1098907648,
+            "sizeInUse": 35566544
+          },
+          "beforePrepare": {
+            "blocksInUse": 891114,
+            "maxSizeInUse": 0,
+            "sizeAllocated": 880803840,
+            "sizeInUse": 208439440
+          },
+          "beforeRelease": {
+            "blocksInUse": 925366,
+            "maxSizeInUse": 0,
+            "sizeAllocated": 1103101952,
+            "sizeInUse": 240494304
+          },
+          "scope": "macOS malloc zones; not RSS, direct mmap, or managed heap attribution"
+        },
+        "indexed": {
+          "afterInvoke": {
+            "blocksInUse": 9612,
+            "maxSizeInUse": 0,
+            "sizeAllocated": 1140850688,
+            "sizeInUse": 3693136
+          },
+          "afterRelease": {
+            "blocksInUse": 43844,
+            "maxSizeInUse": 0,
+            "sizeAllocated": 1140850688,
+            "sizeInUse": 35566544
+          },
+          "beforePrepare": {
+            "blocksInUse": 891114,
+            "maxSizeInUse": 0,
+            "sizeAllocated": 981467136,
+            "sizeInUse": 208439440
+          },
+          "beforeRelease": {
+            "blocksInUse": 925366,
+            "maxSizeInUse": 0,
+            "sizeAllocated": 1145044992,
+            "sizeInUse": 240494304
+          },
+          "scope": "macOS malloc zones; not RSS, direct mmap, or managed heap attribution"
+        }
+      },
+      "processMemory": {
+        "baseline": {
+          "ready": {
+            "pid": 61009,
+            "rssBytes": 1060274176,
+            "virtualBytes": 500560429056,
+            "command": [
+              "/bin/ps",
+              "-p",
+              "61009",
+              "-o",
+              "pid=,rss=,vsz="
+            ],
+            "stdout": "61009 1035424 488828544\n",
+            "stderr": "",
+            "exitCode": 0
+          },
+          "afterWarmup": {
+            "pid": 61009,
+            "rssBytes": 1060323328,
+            "virtualBytes": 500560429056,
+            "command": [
+              "/bin/ps",
+              "-p",
+              "61009",
+              "-o",
+              "pid=,rss=,vsz="
+            ],
+            "stdout": "61009 1035472 488828544\n",
+            "stderr": "",
+            "exitCode": 0
+          },
+          "afterTraffic": {
+            "pid": 61009,
+            "rssBytes": 1060339712,
+            "virtualBytes": 500560429056,
+            "command": [
+              "/bin/ps",
+              "-p",
+              "61009",
+              "-o",
+              "pid=,rss=,vsz="
+            ],
+            "stdout": "61009 1035488 488828544\n",
+            "stderr": "",
+            "exitCode": 0
+          }
+        },
+        "indexed": {
+          "ready": {
+            "pid": 61096,
+            "rssBytes": 1055604736,
+            "virtualBytes": 500560969728,
+            "command": [
+              "/bin/ps",
+              "-p",
+              "61096",
+              "-o",
+              "pid=,rss=,vsz="
+            ],
+            "stdout": "61096 1030864 488829072\n",
+            "stderr": "",
+            "exitCode": 0
+          },
+          "afterWarmup": {
+            "pid": 61096,
+            "rssBytes": 1055653888,
+            "virtualBytes": 500560969728,
+            "command": [
+              "/bin/ps",
+              "-p",
+              "61096",
+              "-o",
+              "pid=,rss=,vsz="
+            ],
+            "stdout": "61096 1030912 488829072\n",
+            "stderr": "",
+            "exitCode": 0
+          },
+          "afterTraffic": {
+            "pid": 61096,
+            "rssBytes": 1055703040,
+            "virtualBytes": 500560969728,
+            "command": [
+              "/bin/ps",
+              "-p",
+              "61096",
+              "-o",
+              "pid=,rss=,vsz="
+            ],
+            "stdout": "61096 1030960 488829072\n",
+            "stderr": "",
+            "exitCode": 0
+          }
+        }
+      }
+    },
+    {
+      "mode": "lazy-live-jit",
+      "nativeMemory": {
+        "baseline": {
+          "afterInvoke": {
+            "blocksInUse": 9629,
+            "maxSizeInUse": 0,
+            "sizeAllocated": 998244352,
+            "sizeInUse": 3695600
+          },
+          "afterRelease": {
+            "blocksInUse": 186111,
+            "maxSizeInUse": 0,
+            "sizeAllocated": 1007566848,
+            "sizeInUse": 56564608
+          },
+          "beforePrepare": {
+            "blocksInUse": 891114,
+            "maxSizeInUse": 0,
+            "sizeAllocated": 968884224,
+            "sizeInUse": 208439440
+          },
+          "beforeRelease": {
+            "blocksInUse": 1067633,
+            "maxSizeInUse": 0,
+            "sizeAllocated": 1011761152,
+            "sizeInUse": 261492368
+          },
+          "scope": "macOS malloc zones; not RSS, direct mmap, or managed heap attribution"
+        },
+        "indexed": {
+          "afterInvoke": {
+            "blocksInUse": 9629,
+            "maxSizeInUse": 0,
+            "sizeAllocated": 1015021568,
+            "sizeInUse": 3695600
+          },
+          "afterRelease": {
+            "blocksInUse": 186111,
+            "maxSizeInUse": 0,
+            "sizeAllocated": 1020149760,
+            "sizeInUse": 56564608
+          },
+          "beforePrepare": {
+            "blocksInUse": 891114,
+            "maxSizeInUse": 0,
+            "sizeAllocated": 977272832,
+            "sizeInUse": 208439440
+          },
+          "beforeRelease": {
+            "blocksInUse": 1067633,
+            "maxSizeInUse": 0,
+            "sizeAllocated": 1024344064,
+            "sizeInUse": 261492368
+          },
+          "scope": "macOS malloc zones; not RSS, direct mmap, or managed heap attribution"
+        }
+      },
+      "processMemory": {
+        "baseline": {
+          "ready": {
+            "pid": 61154,
+            "rssBytes": 1005207552,
+            "virtualBytes": 500632977408,
+            "command": [
+              "/bin/ps",
+              "-p",
+              "61154",
+              "-o",
+              "pid=,rss=,vsz="
+            ],
+            "stdout": "61154 981648 488899392\n",
+            "stderr": "",
+            "exitCode": 0
+          },
+          "afterWarmup": {
+            "pid": 61154,
+            "rssBytes": 1073561600,
+            "virtualBytes": 500699168768,
+            "command": [
+              "/bin/ps",
+              "-p",
+              "61154",
+              "-o",
+              "pid=,rss=,vsz="
+            ],
+            "stdout": "61154 1048400 488964032\n",
+            "stderr": "",
+            "exitCode": 0
+          },
+          "afterTraffic": {
+            "pid": 61154,
+            "rssBytes": 1016872960,
+            "virtualBytes": 500699168768,
+            "command": [
+              "/bin/ps",
+              "-p",
+              "61154",
+              "-o",
+              "pid=,rss=,vsz="
+            ],
+            "stdout": "61154 993040 488964032\n",
+            "stderr": "",
+            "exitCode": 0
+          }
+        },
+        "indexed": {
+          "ready": {
+            "pid": 61220,
+            "rssBytes": 1017397248,
+            "virtualBytes": 500632780800,
+            "command": [
+              "/bin/ps",
+              "-p",
+              "61220",
+              "-o",
+              "pid=,rss=,vsz="
+            ],
+            "stdout": "61220 993552 488899200\n",
+            "stderr": "",
+            "exitCode": 0
+          },
+          "afterWarmup": {
+            "pid": 61220,
+            "rssBytes": 1090043904,
+            "virtualBytes": 500698972160,
+            "command": [
+              "/bin/ps",
+              "-p",
+              "61220",
+              "-o",
+              "pid=,rss=,vsz="
+            ],
+            "stdout": "61220 1064496 488963840\n",
+            "stderr": "",
+            "exitCode": 0
+          },
+          "afterTraffic": {
+            "pid": 61220,
+            "rssBytes": 1090437120,
+            "virtualBytes": 500698972160,
+            "command": [
+              "/bin/ps",
+              "-p",
+              "61220",
+              "-o",
+              "pid=,rss=,vsz="
+            ],
+            "stdout": "61220 1064880 488963840\n",
+            "stderr": "",
+            "exitCode": 0
+          }
+        }
+      }
+    }
+  ]
+}

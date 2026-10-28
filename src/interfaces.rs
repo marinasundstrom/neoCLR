@@ -72,6 +72,15 @@ fn arguments(ty: &Type) -> &[Type] {
 
 /// Transitive, substituted interface identities, with diamonds deduplicated.
 pub(crate) fn closure(module: &Module, ty: &Type) -> Result<Vec<Type>, Fault> {
+    if let Some(views) = crate::runtime_lookup::interface_closure(module, ty) {
+        return Ok(views.to_vec());
+    }
+    let views = closure_uncached(module, ty)?;
+    crate::runtime_lookup::remember_interface_closure(module, ty, &views);
+    Ok(views)
+}
+
+fn closure_uncached(module: &Module, ty: &Type) -> Result<Vec<Type>, Fault> {
     if let Some(nominal) = module.array_nominal(ty) {
         return closure(module, &nominal);
     }

@@ -1,0 +1,14 @@
+{
+  "recordedDate": "2026-10-28",
+  "head": "67e111ab156151917dc3d20a0b44ff3f6bfcc7ae",
+  "os": "ProductName:\t\tmacOS\nProductVersion:\t\t27.0.1\nBuildVersion:\t\t26A434\n",
+  "machine": "arm64",
+  "cpu": "Apple M1",
+  "cpus": "8",
+  "memoryBytes": "17179869184",
+  "releaseSha256": "a3f60527e9a0b17ec93bc9cac67369b31a1905660a39d633c4dbe2de52311bea",
+  "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+  "rustc": "rustc 1.95.0 (59807616e 2026-04-14)",
+  "unrelatedDirtyFile": "scripts/build-native-project.py (not used by experiment)",
+  "retainedInputs": "docs/validation/selection-box-scan-20261028"
+}

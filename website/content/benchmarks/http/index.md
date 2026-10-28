@@ -4,38 +4,35 @@
 tracks plain HTTP and HTTP JSON using the [standard procedure](/benchmarks/gc/procedure/).
 Those experimental AOT results are separate from the published-package series below.
 
-## Development: shared selection scan - 28 October 2026
+## Development: immutable interface views - 28 October 2026
 
-Native selection now scans selected bodies for boxed `Char` once per dispatch
-pass, recomputing after new methods are discovered. This reduces repeated startup
-work for both collectors and eager/lazy JIT.
-
-A fresh Apple M1/macOS 27.0.1 cohort uses Preview 18 libraries, rebuilt current
-HTTP guest/native hosts, and production-default codegen. Three alternating pairs
-per mode measure 4,096 JSON requests after 16 warmups, four clients and pipeline
-depth 16. Libraries differ from the earlier development cohort; compare variants
-within this table. Medians:
+The runtime reuses successfully computed interface inheritance within bounded,
+immutable metadata scopes. Baseline includes the preceding per-pass boxing scan.
+Three alternating pairs per mode use identical Preview 18 libraries and current
+HTTP guest/native hosts on Apple M1/macOS 27.0.1, production-default codegen,
+4,096 JSON requests after 16 warmups, four clients and pipeline depth 16. Medians:
 
 | Mode / GC | READY before / after (s) | Selection + verification before / after (s) | Warm req/s before / after |
 | --- | ---: | ---: | ---: |
-| Eager / sync | 11.488 / 10.619 | 7.262 / 6.323 | 1,997 / 2,004 |
-| Lazy / sync | 8.522 / 7.726 | 7.315 / 6.507 | 2,218 / 2,190 |
-| Eager / concurrent | 14.225 / 13.112 | 7.202 / 6.445 | 1,809 / 1,803 |
-| Lazy / concurrent | 8.629 / 7.657 | 7.245 / 6.330 | 1,562 / 1,545 |
+| Eager / sync | 10.942 / 10.689 | 6.614 / 6.156 | 1,922 / 1,667 |
+| Lazy / sync | 8.010 / 7.547 | 6.774 / 6.310 | 2,142 / 2,134 |
+| Eager / concurrent | 13.429 / 13.131 | 6.639 / 6.239 | 1,747 / 1,779 |
+| Lazy / concurrent | 7.875 / 7.831 | 6.504 / 6.285 | 1,510 / 1,465 |
 
-Eleven of twelve readiness pairs improve; one lazy/sync pair is 2.37% slower.
-Warm-throughput medians are mixed (+0.4%, -1.3%, -0.3%, -1.1% respectively), so
-this is a shared startup improvement, with no claimed warm-throughput or special
-concurrent-GC advantage. Lazy runs compile 870 methods and leave 811 uncompiled.
-First-call compilation still blocks the managed caller. Separate memory snapshots
-show mixed allocator reservation (-16 to +84 MiB); no memory saving is claimed.
+Eight of twelve readiness pairs improve; gains are modest and variable.
+The short eager/sync throughput regression receives a separate longer check:
+three pairs of 65,536 requests give **1,891 / 1,886 req/s**, with paired differences
+from -0.25% to +1.68%. The larger short-run gap is not reproduced; no warm-throughput
+or special concurrent-GC gain is claimed. Post-invocation live allocations match,
+while allocator reservation remains mixed.
 
-These are fresh processes with warm host caches on a shared development machine,
-not production capacity measurements.
-[Full ranges, first-response timings, profiles and validation](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/selection-box-scan-20261028/README.md).
-The [preceding specialization-source cohort](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/specialization-lookup-20261026/README.md)
-retains its startup/memory results and longer lazy/sync throughput check. The
-unretained name-index experiment has no auditable published performance result.
+Lazy runs still compile 870 methods and leave 811 uncompiled. First-call compilation
+still blocks the managed caller. These shared-host measurements do not establish
+production capacity or exact throughput equivalence.
+[Full ranges, profiles, validation and tradeoffs](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/interface-views-20261028/README.md).
+The [preceding selection-scan cohort](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/selection-box-scan-20261028/README.md)
+and [specialization-source cohort](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/specialization-lookup-20261026/README.md)
+retain their independent results. The latter used different libraries.
 
 ## Earlier development cohort: lazy JIT — 26 October 2026
 

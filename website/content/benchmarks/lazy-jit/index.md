@@ -9,13 +9,14 @@ Eager JIT and synchronous GC remain the defaults in the current implementation.
 ## Shared startup optimization follow-up
 
 Native selection and generic expansion reuse temporary immutable metadata
-indexes. A further change scans selected bodies once per dispatch pass. The
-[updated paired HTTP table](/benchmarks/http/) reports a fresh 28 October cohort:
-median readiness improves 7.6-11.3% across eager/lazy JIT and both collectors;
-eleven of twelve pairs improve. Warm throughput is mixed, with no gain claimed.
-First-call waits remain. The new library cohort leaves 811 methods uncompiled;
-the earlier placement/load cohort below used different inputs and left 729.
-These independent cohorts are not pooled.
+indexes, selected-body scans run once per dispatch pass, and successful interface
+inheritance lists are now reused within bounded immutable scopes. The
+[updated paired HTTP table](/benchmarks/http/) reports the latest incremental
+comparison: modest, variable startup gains, with mixed short-run throughput.
+A longer eager/sync check does not reproduce its short-run throughput regression.
+No warm-throughput gain is claimed. First-call waits remain. The latest cohort
+leaves 811 methods uncompiled; the earlier placement/load cohort below used
+different inputs and left 729. Independent cohorts are not pooled.
 
 ## Startup and warm execution
 

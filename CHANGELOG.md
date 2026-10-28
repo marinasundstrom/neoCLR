@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-28
 
+- Reuse successful transitive interface views within immutable metadata scopes, capped at 1,024 owner types and 4,096 interface entries, preserving errors, generic/Self substitutions and mutation isolation. Qualify runtime/contract/codegen behavior and 525,280 HTTP responses with both collectors. Readiness gains are modest and variable; a longer eager/sync check does not reproduce the short throughput regression. Record mixed allocator reservation and refresh website tables for the next publication.
+
 - Scan selected method bodies for boxed `Char` once per dispatch pass instead of once per selected function, recomputing after newly reachable methods are processed. Preserve late-discovered primitive dispatch and unused-method exclusion; all 209 codegen tests pass. A fresh paired HTTP cohort improves readiness medians 7.6-11.3% across eager/lazy JIT and both collectors; warm throughput and allocator reservation remain mixed. Archive 131,968 checked responses, CPU profiles and restored input metadata, and refresh website tables for the next publication. Record the unretained function-name experiment and the loss of its unarchived temporary evidence.
 
 ### 2026-10-26

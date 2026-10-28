@@ -1,0 +1,19 @@
+[
+  "python3",
+  "benchmarks/gc-suite/matrix/http.py",
+  "--build",
+  "/Users/robert/Projects/neoclr/target/interface-views-20261028/paired",
+  "--modes",
+  "baseline-eager-sync-jit",
+  "indexed-eager-sync-jit",
+  "--samples",
+  "json",
+  "--protocols",
+  "pipeline",
+  "--requests",
+  "65536",
+  "--rounds",
+  "3",
+  "--output",
+  "/Users/robert/Projects/neoclr/target/interface-views-20261028/long-eager-sync"
+]
