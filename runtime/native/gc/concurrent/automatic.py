@@ -35,6 +35,7 @@ int32_t experiment_gc_finish(neoclr_aot_context *, const neoclr_probe_frame *, n
 static void candidate_cancel(void) {
     candidate_dispose();
     candidate_counts[2]++;
+    NEOCLR_TRACE(NEOCLR_TRACE_GC, NEOCLR_TRACE_GC_EPOCH_CANCEL, 0, candidate_counts[0], 0, 0);
     candidate_context = NULL;
     candidate_active = 0;
 }
@@ -71,11 +72,11 @@ replace(needle, '''    /* Owned allocation/publication budgets toggle asynchrono
 #endif
 ''',1)
 assert s.count('        candidate_active = 1;') == 1
-replace('        candidate_active = 1;', '        candidate_active = 1; candidate_counts[0]++;', 1)
-replace('    candidate_dispose();\n    return status;', '    candidate_dispose();\n    if (!status) candidate_counts[1]++;\n    return status;', 1)
+replace('        candidate_active = 1;', '        candidate_active = 1; candidate_counts[0]++;\n        NEOCLR_TRACE(NEOCLR_TRACE_GC, NEOCLR_TRACE_GC_EPOCH_BEGIN, 0, candidate_counts[0], 0, 0);', 1)
+replace('    candidate_dispose();\n    return status;', '    candidate_dispose();\n    NEOCLR_TRACE(NEOCLR_TRACE_GC, NEOCLR_TRACE_GC_EPOCH_END, 0, candidate_counts[0], 0, (unsigned)status);\n    if (!status) candidate_counts[1]++;\n    return status;', 1)
 s += '\nvoid experiment_gc_candidate_counts(uint64_t *out) { memcpy(out, candidate_counts, sizeof(candidate_counts)); out[5] = candidate_active; }\n'
 assert s.count('        candidate_active=0;') == 1
-replace('        candidate_active=0;', '        candidate_active=0; candidate_counts[2]++;', 1)
+replace('        candidate_active=0;', '        candidate_active=0; candidate_counts[2]++;\n        NEOCLR_TRACE(NEOCLR_TRACE_GC, NEOCLR_TRACE_GC_EPOCH_CANCEL, 0, candidate_counts[0], 0, 1);', 1)
 s += r"""
 /* Internal live-entry transition. Admission rejects all outstanding ownership;
  * the successful check joins the marker before any storage is invalidated. */

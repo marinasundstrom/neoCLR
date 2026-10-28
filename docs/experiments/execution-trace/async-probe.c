@@ -104,4 +104,5 @@ int main(int argc,char **argv) {
     }
     puts("]}");CHECK(neoclr_async_trace_dispose());
     CHECK(neoclr_async_trace_begin(1)); CHECK(neoclr_async_trace_finish(&view)); CHECK(neoclr_async_trace_dispose());
+    return 0;
 }

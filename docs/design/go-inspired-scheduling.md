@@ -8,6 +8,29 @@ pieces only when they improve measured efficiency, scalability or useful runtime
 capabilities without disproportionate complexity. This becomes the next bounded
 investigation after the interface-view optimization, not a commitment to copy Go.
 
+## Execution roles and shared runtime direction
+
+**Author clarification, 2026-10-28:** JIT is the development execution path;
+Native AOT is the publish/distribution target. Both use GC and scheduling services,
+with concurrent GC the preferred direction. The author expects the main lazy-JIT
+and concurrent-GC gains to emerge from scheduler/work-queue optimization. This is
+a performance hypothesis to test, not an established gain or a collector-default
+change.
+
+Treat scheduling and collection as shared runtime investments. Keep AOT code
+generation/packaging optimization and JIT cold-compilation costs distinct from
+common steady-state execution costs. Representative published HTTP/load tests
+must include Native AOT with sync and concurrent GC, alongside development JIT
+startup and warm-run controls. Use matching source, resource budgets and current
+codegen settings; improvements should be attributed to the layer actually changed.
+
+After the shared-tracing commit, the next bounded slice compares queue policies
+and scheduling latency against the existing FIFO baseline. Use the current
+recorders and add provider hooks where measurement requires them. Tiny native-job
+results alone cannot select the shared scheduler or establish HTTP/GC gains.
+Compiler wait/publication tracing remains open; lazy JIT's synchronous first-call
+wait is a separate blocking limitation that queue policy alone cannot fix.
+
 ## Existing foundation and gaps
 
 | Area | Current evidence | Constraint for the proposal |
@@ -123,9 +146,10 @@ code-lifetime ownership. Do not compile unused methods merely to hide contention
    worker defaults, migration or preemption policy. Adopt one proven component at
    a time; retain reference modes and report losing cases.
 
-Following the author's execution-tracer suggestion, the immediate next implementation
-is joining step 0's worker and qualified owner-async recorders into a shared
-session and adding JIT/GC hooks, followed by step 1's queue-policy harness and selectable prototype. Neither replaces Task.Run or the production scheduler. A single worker
+Following the author's scheduling-priority clarification, the immediate next
+implementation is step 1's queue-policy harness and selectable prototype, using
+the worker and [shared async/GC trace session](../experiments/execution-trace/session-README.md)
+controls and adding providers as needed. Neither replaces Task.Run or the production scheduler. A single worker
 must not lose materially on tiny jobs; extra workers must earn their CPU/memory
 cost on parallel work. Do not choose a fixed percentage success threshold after
 seeing results: predeclare the workload, repetition count, acceptable tail/error
@@ -139,8 +163,10 @@ tracing the first implementation slice. The first [bounded worker recorder and o
 are now implemented in the private native pool. The broader correlated runtime
 timeline below remains intended behavior. A separate [owner-thread async recorder](../experiments/execution-trace/async-README.md)
 now captures suspension/resumption, nested execution and abandonment with sync and
-concurrent GC qualification. Shared session correlation and JIT/GC phase hooks
-are not implemented.
+concurrent GC qualification. The [shared native session](../experiments/execution-trace/session-README.md) now
+correlates async transitions, owner collection requests and published concurrent
+epoch lifetime. Compiler/worker registration and fine-grained GC phases remain
+open; epoch duration is not a pause or marker CPU measurement.
 
 The central question is why ready application work is not progressing. Existing
 startup timings, compiler-wait diagnostics, aggregate GC measurements and CPU
@@ -226,7 +252,7 @@ Research comparison, reviewed 28 October 2026:
 | Mixed work | CPU hogs alongside latency-sensitive I/O; bounded cooperative polls; deliberate blocking native calls | I/O tails, starvation, fairness across work groups, CPU/idle time, cancellation delay |
 | Managed allocation | Short-lived and retained graphs, shared immutable captures and disjoint mutable graphs; explicit memory caps | Sync/concurrent throughput, pause/owner-stall distribution, live/peak/reserved memory, root publication cost |
 | Lazy compilation | Cold routes amid warmed traffic; recursive and duplicate first calls; compiler contention | Warm-route progress during cold compilation, first response, startup median, compiled/uncompiled counts, compiler waits |
-| HTTP production shapes | Plain/JSON plus complex handlers, downstream I/O, multiple apps sharing resources; paced and saturation loads | Offered/completed/error rates, p99 latency, CPU/request, per-app fairness and sustainable capacity |
+| HTTP production shapes | Native AOT publication target plus JIT development controls, plain/JSON and complex handlers, downstream I/O, multiple apps sharing resources; paced and saturation loads | Offered/completed/error rates, p99 latency, CPU/request, per-app fairness and sustainable capacity |
 | Resource limits | Available CPU/affinity/quota, oversubscription and memory limits; fixed and automatic worker policies | Effective parallelism, throttling/idle time, total threads, GC/compiler competition and tail behavior |
 
 Use repeated interleaved runs with fixed work, warmup, offered-load semantics and

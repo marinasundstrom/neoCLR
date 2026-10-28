@@ -74,5 +74,6 @@ and desktop load make this a diagnostic screen, not HTTP capacity evidence.
 [Retained qualification and overhead measurements](../../validation/execution-trace-20261028/README.md).
 The next [owner-thread async slice](async-README.md) now records suspension,
 resumption, nested execution and abandonment, qualified with both collectors.
-Shared session identity and correlated JIT/GC events remain next. Queue-policy comparisons must retain
+The [shared-session slice](session-README.md) now joins async and GC events.
+Actual worker-pool session registration and JIT hooks remain next. Queue-policy comparisons must retain
 untraced controls; tracing overhead must not be mistaken for scheduler behavior.

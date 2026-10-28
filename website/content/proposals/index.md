@@ -9,6 +9,12 @@ tracks priorities and implementation work; the ideas here are not release commit
 
 ## Concurrency and scheduling
 
+The execution direction is JIT for development and Native AOT for publishing and
+distribution. Both use the runtime’s GC and scheduling services. Concurrent GC is
+the preferred direction, with adoption/default choices governed by correctness
+and representative measurements. Scheduler improvements should benefit both
+paths; JIT compilation and AOT code-generation costs remain separate concerns.
+
 A new investigation explores Go-inspired lightweight execution contexts,
 worker-local/global queues, work stealing and configurable parallelism. The goal
 is better throughput, scheduling latency and resource use while preserving Task
@@ -26,8 +32,10 @@ export. It reports lost events and requires an instrumented build plus per-pool 
 tiny-job overhead is material, so normal builds compile out the recorder.
 A second private macOS slice records owner-thread async suspension/resumption,
 nested execution and abandonment, qualified with sync and active concurrent GC.
-A unified overview including real I/O, lazy compilation and GC phases is still
-planned; these diagnostic fixtures do not establish production HTTP performance.
+Shared native sessions now correlate async transitions with owner GC requests and
+concurrent epoch lifetimes, including cancellation. Epoch lifetime is not a GC
+pause measurement. Compiler/worker integration, real I/O and finer GC phases
+remain planned; these fixtures do not establish production HTTP performance.
 [Implementation and qualification](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/execution-trace/README.md).
 
 [Investigation and benchmark plan](https://github.com/marinasundstrom/neoCLR/blob/main/docs/design/go-inspired-scheduling.md)

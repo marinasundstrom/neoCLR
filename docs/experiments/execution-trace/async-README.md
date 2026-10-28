@@ -80,3 +80,5 @@ and nonoverlapping nested execution intervals are checked.
 This is diagnostic qualification, not an HTTP comparison or evidence of a winning
 collector. Next unify sessions and add JIT wait/publication and GC phase events;
 then correlate real I/O and cold/warm HTTP traffic with both collectors.
+The [subsequent shared-session slice](session-README.md) now implements the first
+async/GC correlation bridge; compiler and worker producers remain open.

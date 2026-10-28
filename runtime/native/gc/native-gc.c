@@ -1,5 +1,13 @@
 #include "native-gc.h"
 #include "execution-state.h"
+#ifdef NEOCLR_EXECUTION_TRACE
+#include "session.h"
+#else
+#define NEOCLR_TRACE(domain, kind, source, subject, related, detail) ((void)0)
+#endif
+#if defined(NEOCLR_EXECUTION_TRACE) && defined(NEOCLR_GC_PROFILE)
+static _Thread_local uint64_t gc_trace_requests;
+#endif
 #include <string.h>
 #include <stdatomic.h>
 #ifdef NEOCLR_GC_PROFILE
@@ -632,8 +640,13 @@ int32_t neoclr_gc_collect_v1(neoclr_aot_context *context, const neoclr_probe_fra
 #ifdef NEOCLR_GC_PROFILE
 static int32_t collect_requested(neoclr_aot_context *context, const neoclr_probe_frame *head, unsigned reason) {
     trigger_profile.requests[reason]++;
+#ifdef NEOCLR_EXECUTION_TRACE
+    uint64_t trace_request = ++gc_trace_requests;
+    NEOCLR_TRACE(NEOCLR_TRACE_GC, NEOCLR_TRACE_GC_REQUEST_BEGIN, 0, trace_request, 0, reason);
+#endif
     int32_t status = collect_dispatch(context, head);
     trigger_profile.failures[reason] += status != 0;
+    NEOCLR_TRACE(NEOCLR_TRACE_GC, NEOCLR_TRACE_GC_REQUEST_END, 0, trace_request, 0, (unsigned)status);
     return status;
 }
 int32_t neoclr_gc_collect_v1(neoclr_aot_context *context, const neoclr_probe_frame *head) {
