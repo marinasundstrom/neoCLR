@@ -235,8 +235,16 @@ pub fn prepare(
             assembly.array_backing = Some(type_id(index));
         }
     }
+    // Use the existing checked binders to identify executable policy roots.
+    // Metadata-only requests must not become analysis roots or invocation grants.
+    let explicit_bodies = context
+        .and_then(|c| c.reflection_roots.as_ref())
+        .map(|policy| retained_analysis_bodies(&joined, &source_metadata, &types, &methods, policy))
+        .transpose()?
+        .unwrap_or_default();
     let dynamic_access =
-        neoclr::dynamic_access::analyze(&joined, root).map_err(|e| e.to_string())?;
+        neoclr::dynamic_access::analyze_with_roots(&joined, root, &explicit_bodies)
+            .map_err(|e| e.to_string())?;
     // Definition-token operands describe metadata; they never instantiate an
     // executable generic type or consume the caller's type parameter scope.
     for fi in 0..joined.functions.len() {
@@ -351,20 +359,11 @@ pub fn prepare(
     // Conformance was verified in original scopes. Metadata-only relationships
     // must not consume executable specialization shapes (Option and Result share
     // Propagatable with different arguments, including metadata-only Void).
-    let mut reflection_roots: Vec<usize> = reflection_retention
+    let mut reflection_roots = reflection_retention
         .as_ref()
-        .and_then(|r| r["types"].as_array())
-        .into_iter()
-        .flatten()
-        .filter(|r| r["construct"] == true && r["checkStatus"] == 0)
-        .map(|r| -> Result<usize, Error> {
-            let id: MemberId = serde_json::from_value(r["constructor"].clone())?;
-            methods
-                .iter()
-                .position(|m| *m == id)
-                .ok_or_else(|| "missing retained constructor identity".into())
-        })
-        .collect::<Result<_, _>>()?;
+        .map(|retention| retained_parameterless_bodies(retention, &methods))
+        .transpose()?
+        .unwrap_or_default();
     if let Some(retention) = reflection_retention.as_mut() {
         reflection_roots.extend(super::reflection_properties::bind(
             &mut joined,
@@ -2064,5 +2063,116 @@ mod inventory_bounds_tests {
             .to_string();
         assert!(types.contains("including System"));
         assert!(types.contains("1025/1024 types"));
+    }
+}
+
+// Validate and bind on a disposable copy: the final merged policy must bind the
+// original reserved services exactly once. Accessor/constructor admission stays
+// owned by the same binders as code generation, including source access checks.
+fn retained_analysis_bodies(
+    input: &neoclr::Module,
+    source: &neoclr::Module,
+    definitions: &[TypeDefId],
+    methods: &[MemberId],
+    policy: &Value,
+) -> Result<Vec<usize>, Error> {
+    let mut preview = input.clone();
+    let mut retention =
+        super::reflection_construction::bind(&mut preview, source, definitions, methods, policy)?;
+    let mut roots = retained_parameterless_bodies(&retention, methods)?;
+    roots.extend(super::reflection_properties::bind(
+        &mut preview,
+        source,
+        definitions,
+        methods,
+        &mut retention,
+    )?);
+    roots.extend(super::reflection_constructors::bind(
+        &mut preview,
+        source,
+        definitions,
+        methods,
+        &retention,
+    )?);
+    roots.sort_unstable();
+    roots.dedup();
+    Ok(roots)
+}
+
+fn retained_parameterless_bodies(
+    retention: &Value,
+    methods: &[MemberId],
+) -> Result<Vec<usize>, Error> {
+    retention["types"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter(|r| r["construct"] == true && r["checkStatus"] == 0)
+        .map(|r| -> Result<usize, Error> {
+            let id: MemberId = serde_json::from_value(r["constructor"].clone())?;
+            methods
+                .iter()
+                .position(|m| *m == id)
+                .ok_or_else(|| "missing retained constructor identity".into())
+        })
+        .collect()
+}
+
+#[cfg(test)]
+mod explicit_retention_analysis_tests {
+    use super::*;
+
+    #[test]
+    fn explicit_invocation_seeds_bodies_but_metadata_does_not() {
+        let mut source = neoclr::assemble(".module Policy\n.type Item\n.end\n").unwrap();
+        source.types[0].is_reference_type = true;
+        let definition = source.types[0].definition.clone().unwrap();
+        let method = MemberId {
+            module: source.name.clone(),
+            revision: source.revision.clone(),
+            index: 0,
+        };
+        source.functions.push(
+            serde_json::from_value(json!({
+                "name":"Item..ctor", "owner":{"Named":"Item"}, "instance":true,
+                "parameters":[], "returns":"Void", "no_result":true,
+                "definition":method, "body":[Op::Return]
+            }))
+            .unwrap(),
+        );
+        let policy =
+            json!({"schemaVersion":1,"types":[{"definition":definition,"construct":true}]});
+        let definitions = [definition.clone()];
+        let methods = [method];
+        assert_eq!(
+            retained_analysis_bodies(&source, &source, &definitions, &methods, &policy).unwrap(),
+            vec![0]
+        );
+        let mut metadata = policy.clone();
+        metadata["types"][0]["construct"] = json!(false);
+        assert!(
+            retained_analysis_bodies(&source, &source, &definitions, &methods, &metadata)
+                .unwrap()
+                .is_empty()
+        );
+        let methods_only = json!({"schemaVersion":8,"types":[],"moduleCatalogs":[],
+            "moduleFunctions":[],"typeCatalogs":[],"methodTypes":[definition]});
+        assert!(
+            retained_analysis_bodies(&source, &source, &definitions, &methods, &methods_only)
+                .unwrap()
+                .is_empty()
+        );
+        // Access validation remains authoritative before a body becomes a seed.
+        source.functions[0].visibility = neoclr::metadata::Visibility::Private;
+        assert!(
+            retained_analysis_bodies(&source, &source, &definitions, &methods, &policy)
+                .unwrap()
+                .is_empty()
+        );
+        let mut invalid = policy;
+        invalid["types"][0]["construct"] = json!("true");
+        assert!(
+            retained_analysis_bodies(&source, &source, &definitions, &methods, &invalid).is_err()
+        );
     }
 }

@@ -1,0 +1,139 @@
+{
+  "date": "2026-10-28",
+  "host": "macOS ARM64",
+  "compilerRevision": "ed1d08def",
+  "tests": {
+    "analysis": 12,
+    "explicitPolicySeeds": 1,
+    "constructionPolicy": 6,
+    "apiFingerprint": "pass"
+  },
+  "cases": {
+    "explicit-before": {
+      "buildPassed": true,
+      "profile": "macos-arm64-http-v1",
+      "backendSha256": "b0c6c0a723f022d93ed5833ba1ed1d14f2f5ed938c959779e08d75280e95bdf8",
+      "artifacts": {
+        "app.dll": "a4cb7e02349c0023b94b35e9308de498f092318f961bee8e9cc4dc68f62b71d6",
+        "app.o": "2a7ae1726ce8741f8a06b5caa7835ff7eeb626436713a3641825f5d09272f53a",
+        "app": "400c10f5952f643f40c199ab73f7bb78ec38b637a9d6565b449c30d717d33843"
+      },
+      "dynamicAccess": {
+        "diagnostics": [
+          "DAM2001: ReadUnannotated instruction 2 -> System.Data.Json.JsonSerializer.Deserialize parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention",
+          "DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 244 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention",
+          "DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 388 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention",
+          "DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 538 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention",
+          "DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 691 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention",
+          "DAM2004: dynamic-dispatch implementation bodies are not analyzed; reflection inside them may require explicit retention"
+        ],
+        "types": {}
+      },
+      "retainedTypes": [
+        {
+          "checkStatus": 0,
+          "construct": true,
+          "constructor": {
+            "index": 16,
+            "module": "NeoMetadata_ABA4D369647F45877F4AE4FE8AB03E6986D031BC12468F445310036B5EAFBD0D",
+            "revision": "1.0.0.0"
+          },
+          "constructors": true,
+          "customAttributes": false,
+          "definition": {
+            "index": 0,
+            "module": "NeoMetadata_ABA4D369647F45877F4AE4FE8AB03E6986D031BC12468F445310036B5EAFBD0D",
+            "revision": "1.0.0.0"
+          },
+          "fieldGetters": false,
+          "fieldSetters": false,
+          "fields": false,
+          "getters": true,
+          "policy": "explicit source identity; metadata check does not retain constructor body unless invocation is requested",
+          "properties": true,
+          "setters": true,
+          "sourceName": "NeoMetadata_ABA4D369647F45877F4AE4FE8AB03E6986D031BC12468F445310036B5EAFBD0D.T__4D657373616765"
+        }
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "RuntimeError: native reflection property metadata was not retained; configure --reflection-roots\n   at System.Introspection.RuntimeNominalTypeInfo.GetProperties [instruction 3]\n   at System.Data.Json.ObjectMapper.ReadValue [instruction 607]\n   at System.Data.Json.ObjectMapper.Read [instruction 4]\n   at System.Data.Json.JsonSerializer.Deserialize [instruction 20]\n   at Read [instruction 2]\n   at Message..ctor [instruction 12]\n   at neoCLR.Runtime.ReflectionConstruct [instruction 0]\n   at System.Runtime.CompilerServices.NativeReflection.ReflectionConstruct [instruction 1]\n   at System.Runtime.Reflection.TypeReflectionExtensions.CreateInstance [instruction 22]\n   at System.Data.Json.ObjectMapper.ReadValue [instruction 741]\n   at System.Data.Json.ObjectMapper.Read [instruction 23]\n   at System.Data.Json.JsonSerializer.Deserialize [instruction 20]\n   at ReadUnannotated [instruction 2]\n   at Main [instruction 3]\n"
+    },
+    "explicit-after": {
+      "buildPassed": true,
+      "profile": "macos-arm64-http-v1",
+      "backendSha256": "6fec8b5ab649b510031e4ca617921a12688d0a24ad73e0c0b7172f39e5a89088",
+      "artifacts": {
+        "app.dll": "a504e1bd38c436ddfd8c9e9a721ca4b3ba7400197d7ca255810c4d5424e2fdf7",
+        "app.o": "469dffa3a05fe60c6aa693f0b818e87252ab1f651376e3abf4cbf4181e4b6cbb",
+        "app": "c51b855215b6d60a4c1c12da252f31acb07f877347ae34ff3c73b147f79dfadf"
+      },
+      "dynamicAccess": {
+        "diagnostics": [
+          "DAM2001: ReadUnannotated instruction 2 -> System.Data.Json.JsonSerializer.Deserialize parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention",
+          "DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 244 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention",
+          "DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 388 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention",
+          "DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 538 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention",
+          "DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 691 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention",
+          "DAM2004: dynamic-dispatch implementation bodies are not analyzed; reflection inside them may require explicit retention"
+        ],
+        "types": {
+          "4": 513
+        }
+      },
+      "retainedTypes": [
+        {
+          "checkStatus": 0,
+          "construct": true,
+          "constructor": {
+            "index": 26,
+            "module": "NeoMetadata_ABA4D369647F45877F4AE4FE8AB03E6986D031BC12468F445310036B5EAFBD0D",
+            "revision": "1.0.0.0"
+          },
+          "constructors": true,
+          "customAttributes": false,
+          "definition": {
+            "index": 3,
+            "module": "NeoMetadata_ABA4D369647F45877F4AE4FE8AB03E6986D031BC12468F445310036B5EAFBD0D",
+            "revision": "1.0.0.0"
+          },
+          "fieldGetters": false,
+          "fieldSetters": false,
+          "fields": false,
+          "getters": true,
+          "policy": "explicit source identity; metadata check does not retain constructor body unless invocation is requested",
+          "properties": true,
+          "setters": true,
+          "sourceName": "NeoMetadata_ABA4D369647F45877F4AE4FE8AB03E6986D031BC12468F445310036B5EAFBD0D.T__4D657373616765"
+        },
+        {
+          "checkStatus": 0,
+          "construct": true,
+          "constructor": {
+            "index": 29,
+            "module": "NeoMetadata_ABA4D369647F45877F4AE4FE8AB03E6986D031BC12468F445310036B5EAFBD0D",
+            "revision": "1.0.0.0"
+          },
+          "constructors": true,
+          "customAttributes": false,
+          "definition": {
+            "index": 4,
+            "module": "NeoMetadata_ABA4D369647F45877F4AE4FE8AB03E6986D031BC12468F445310036B5EAFBD0D",
+            "revision": "1.0.0.0"
+          },
+          "fieldGetters": false,
+          "fieldSetters": false,
+          "fields": false,
+          "getters": true,
+          "policy": "explicit source identity; metadata check does not retain constructor body unless invocation is requested",
+          "properties": true,
+          "setters": true,
+          "sourceName": "NeoMetadata_ABA4D369647F45877F4AE4FE8AB03E6986D031BC12468F445310036B5EAFBD0D.T__4F74686572"
+        }
+      ],
+      "exitCode": 0,
+      "stdout": "retained\nretained\n",
+      "stderr": ""
+    }
+  }
+}

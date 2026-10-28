@@ -125,7 +125,9 @@ annotations remain unsupported. Explicit files are still needed for unsupported
 flows. [Attribute API reference](/docs/api/System/Diagnostics/CodeAnalysis/DynamicallyAccessedMembersAttribute/).
 Inferred constructors and property accessors are also analyzed for
 further annotated calls, including cycles; types discovered through arbitrary
-storage or reflection descriptors still need explicit retention.
+storage or reflection descriptors still need explicit retention. Executable bodies
+admitted by project retention files also seed annotation analysis; metadata-only
+policies do not gain invocation rights.
 
 Use matching compiler and library builds for native JSON, attributes and reflection.
 Qualified examples cover specific supported shapes; they do not imply unrestricted

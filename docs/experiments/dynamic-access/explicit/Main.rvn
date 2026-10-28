@@ -1,0 +1,39 @@
+import System.*
+import System.Data.Json.*
+import System.Diagnostics.CodeAnalysis.*
+import System.Introspection.*
+import System.Result.*
+
+public class Message {
+    var Text: string { get; set; } = ""
+    init() {
+        let Ok(value) = Read(typeof(Other)) else {
+            Console.WriteLine("nested mapping failed")
+            return
+        }
+        Console.WriteLine(((Other)value).Text)
+    }
+}
+
+public class Other {
+    var Text: string { get; set; } = ""
+    init() { }
+}
+
+func Read([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | DynamicallyAccessedMemberTypes.PublicProperties)] type: TypeInfo) -> Result<Object, JsonError> {
+    return JsonSerializer.Deserialize("{\"Text\":\"retained\"}", type)
+}
+
+func ReadUnannotated(type: TypeInfo) -> Result<Object, JsonError> {
+    return JsonSerializer.Deserialize("{\"Text\":\"retained\"}", type)
+}
+
+func Main() -> int {
+    let Ok(value) = ReadUnannotated(typeof(Message)) else {
+        Console.WriteLine("mapping failed")
+        return 1
+    }
+    let message = (Message)value
+    Console.WriteLine(message.Text)
+    return if message.Text == "retained" { 0 } else { 1 }
+}

@@ -26,3 +26,9 @@ maps `Other` through the same annotated `Read` function and prints `retained` tw
 Use `--project docs/experiments/dynamic-access/closure/App.rvnproj` to exercise the
 retained-body follow-up. The pre-follow-up backend fails at runtime because Other's
 property metadata is missing; see [comparison](../../validation/dynamic-access-closure-20261028/README.md).
+
+The `explicit` project moves Message's retention to `App.retention.json` and calls
+an unannotated forwarding function from Main. Its constructor still calls the
+annotated helper for Other. With explicit-policy analysis seeds it prints `retained`
+twice; the pre-follow-up backend trims Other's property metadata. Existing unknown
+flow diagnostics remain visible. See [policy-seed evidence](../../validation/dynamic-access-explicit-20261028/README.md).

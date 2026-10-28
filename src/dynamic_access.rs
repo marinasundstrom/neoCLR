@@ -139,16 +139,36 @@ fn require(module: &Module, value: &Value, flags: u32, site: &str, report: &mut 
 /// parameter contracts for public constructors and properties. Other targets/flags
 /// fail explicitly rather than becoming inert annotations.
 pub fn analyze(module: &Module, root: &str) -> Result<Analysis, Fault> {
-    crate::runtime_lookup::with_module(module, || analyze_indexed(module, root))
+    analyze_with_roots(module, root, &[])
 }
 
-fn analyze_indexed(module: &Module, root: &str) -> Result<Analysis, Fault> {
+/// Include executable bodies admitted by a validated explicit retention policy.
+/// These seeds do not imply member requirements on their declaring types.
+pub fn analyze_with_roots(
+    module: &Module,
+    root: &str,
+    retained_bodies: &[usize],
+) -> Result<Analysis, Fault> {
+    if retained_bodies.iter().any(|i| *i >= module.functions.len()) {
+        return Err(Fault::new(
+            "DAM analysis retained body is outside the module",
+        ));
+    }
+    crate::runtime_lookup::with_module(module, || analyze_indexed(module, root, retained_bodies))
+}
+
+fn analyze_indexed(
+    module: &Module,
+    root: &str,
+    retained_bodies: &[usize],
+) -> Result<Analysis, Fault> {
     let root = module
         .functions
         .iter()
         .position(|f| f.name == root)
         .ok_or_else(|| Fault::new("DAM analysis root is missing"))?;
     let mut roots = BTreeSet::from([root]);
+    roots.extend(retained_bodies.iter().copied());
     loop {
         let report = analyze_roots(module, &roots)?;
         let before = roots.len();
@@ -743,5 +763,20 @@ mod tests {
                 .iter()
                 .any(|d| d.contains("DAM2001") && d.contains("Model..ctor"))
         );
+    }
+    #[test]
+    fn explicit_body_seeds_infer_dependencies_without_granting_owner_members() {
+        let mut m = fixture();
+        let mut retained = m.functions[0].clone();
+        retained.name = "ExplicitBody".into();
+        retained.body[0] = Op::LoadTypeToken(Type::Named("Other".into()));
+        m.functions.push(retained);
+        m.functions[0].body = vec![Op::Return];
+        assert!(analyze(&m, "Main").unwrap().types.is_empty());
+        assert_eq!(
+            analyze_with_roots(&m, "Main", &[3]).unwrap().types,
+            BTreeMap::from([(4, 3)])
+        );
+        assert!(analyze_with_roots(&m, "Main", &[m.functions.len()]).is_err());
     }
 }

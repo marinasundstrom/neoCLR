@@ -112,3 +112,12 @@ not an annotation implementation in the current change.
 
 [Recorded qualification](validation/project-retention-20261028/README.md) covers
 file validation, fresh identities, combined policies and a native DI consumer.
+
+### Retained bodies and dynamic member analysis (development)
+
+Executable constructor/property bodies admitted by a project policy also seed
+[DynamicallyAccessedMembers analysis](dynamically-accessed-members.md). Known types
+passed to annotated APIs inside those bodies may retain further members. This does
+not turn method/property metadata inspection into invocation rights or suppress
+unknown-flow warnings. Generic-owner body specialization remains a gap. See
+[the explicit-policy consumer](validation/dynamic-access-explicit-20261028/README.md).

@@ -60,7 +60,11 @@ not communicate the type that reflection will inspect.
 The report's `dynamicAccess` entry records inferred source rows/flags and
 warnings. The backend also writes warnings to stderr. Project-build logs retain
 stderr in `build.json`. Automatically inferred roots merge with validated explicit
-policies; they do not remove explicitly requested capabilities. Inferred reflection
+policies; they do not remove explicitly requested capabilities. Executable bodies
+admitted by explicit policies also seed the analysis. The native construction,
+constructor and property binders validate the policy on a temporary copy and provide
+the exact admitted body rows. Metadata-only policies do not seed bodies or acquire
+invocation rights; the final union binds the original services once. Inferred reflection
 requires the existing `--compile-system` and `--reference-arena` runtime context.
 
 ## Annotated runtime APIs
@@ -119,6 +123,22 @@ bodies to a fixed point brings this subset closer to .NET's dependency propagati
 without inventing new attribute semantics. The implementation conservatively considers
 all public constructors for the existing constructor policy; unsupported reflection
 shapes remain subject to backend admission. Re-running the bounded flow pass costs
-additional compilation work; no performance improvement is claimed. Policies supplied
-only through explicit retention files are not analysis seeds in this follow-up.
+additional compilation work; no performance improvement is claimed. The subsequent explicit-policy follow-up also seeds bodies admitted for execution
+by a validated policy, while retaining metadata-only requests as descriptive data.
 See [native before/after and regression evidence](validation/dynamic-access-closure-20261028/README.md).
+
+## Explicit-policy analysis seeds (2026-10-28)
+
+A type can enter execution through a project retention file even when its caller's
+TypeInfo flow is unknown. Public parameterless constructors, admitted constructor
+invocation bodies and admitted property accessors now participate in annotation
+analysis. Reusing the code-generation binders avoids a separate interpretation of
+access checks, policy versions and invocation rights. Known dependencies inside
+those bodies can therefore be inferred using the same bounded closure as annotation
+roots. Validation and binding on a disposable copy add build-time work and allocation;
+this is a correctness extension, not a performance claim.
+
+Generic-owner body specialization remains outside this analysis; the existing
+constructor binder does not supply those as ordinary body seeds. Explicit policies
+still do not prove unknown type flow or suppress DAM2001/DAM2004 diagnostics. See
+[policy-seed qualification](validation/dynamic-access-explicit-20261028/README.md).
