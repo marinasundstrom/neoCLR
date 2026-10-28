@@ -118,5 +118,5 @@ Structural union propagation does not establish that a union satisfies the Error
 generic constraint. Use per-alternative typed wrappers or explicitly project to
 Error at a reporting boundary until that separate contract is qualified.
 
-Use the [executable contract suite](https://github.com/marinasundstrom/neoCLR/blob/main/runtime/raven/tests/error-context/Tests.rvn)
+Use the [executable contract suite](https://github.com/marinasundstrom/neoCLR/blob/main/runtime/System.Runtime/test/ErrorContextTests/NeoClr/RuntimeTests/Tests.rvn)
 for examples of typed causes, lazy construction, propagation and trace reuse.

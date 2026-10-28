@@ -36,7 +36,7 @@ gaps, not permanent restrictions. The shared ring provider supplies SHA-256, HMA
 and operating-system randomness on macOS and Windows. No FIPS certification or
 secret-zeroization guarantee is implied.
 
-See [the tested runtime suite](https://github.com/marinasundstrom/neoCLR/tree/main/runtime/raven/tests/cryptography)
+See [the tested runtime suite](https://github.com/marinasundstrom/neoCLR/tree/main/runtime/System.Runtime/test/CryptographyTests)
 and [provider design and evidence](https://github.com/marinasundstrom/neoCLR/blob/main/docs/shared-security-provider.md).
 
 Development migration (2026-10-19): the four methods replace their former array

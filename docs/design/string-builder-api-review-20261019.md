@@ -8,7 +8,7 @@ boundaries and immutable snapshots, without copying Swift's storage ABI.
 
 ## Current contract
 
-[StringBuilder.rvn](../../runtime/raven/src/System/Text/StringBuilder.rvn) exposes
+[StringBuilder.rvn](../../runtime/System.Runtime/src/System.Runtime/System/Text/StringBuilder.rvn) exposes
 Append(string), both AppendLine forms, Clear, ToString, Utf8ByteCount and MaxUtf8Bytes.
 Appends are fluent. The constructor selects a byte quota, not initial capacity;
 the default and maximum are 65536 bytes. Overflow faults before content mutation.

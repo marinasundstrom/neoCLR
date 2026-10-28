@@ -6,7 +6,7 @@
 # Tuple support (development, 2026-09-28)
 
 The [contract](../../tuples.md) records `System.Tuple` as neoCLR's value tuple name.
-The Raven source is `runtime/raven/src/System/Tuple.rvn`; its imported generic
+The Raven source is `runtime/System.Runtime/src/System.Runtime/System/Tuple.rvn`; its imported generic
 constructors live in the generated Tuple library slice. No Rust runtime change is
 needed: field layout, copying, boxing, GC and arrays use existing value machinery.
 

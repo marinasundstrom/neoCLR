@@ -32,7 +32,7 @@ def main():
     common = ['dotnet', args.compiler.resolve(), 'neoclr', '--core-reference', args.core.resolve(),
               '--runtime-seed', args.seed.resolve(), '--bootstrap-intrinsics',
               '--bootstrap-ownership', args.ownership.resolve(), '--reference', args.base_library.resolve()]
-    sources = [ROOT / 'runtime/raven/src/System/Text/UnicodeScalar.rvn', HERE / 'text-service-contracts.rvn']
+    sources = [ROOT / 'runtime/System.Runtime/src/System.Runtime/System/Text/UnicodeScalar.rvn', HERE / 'text-service-contracts.rvn']
     library = output / 'TextServices.dll'
     run(common + ['--library', '-o', library] + sources)
     app = output / 'Consumer.dll'

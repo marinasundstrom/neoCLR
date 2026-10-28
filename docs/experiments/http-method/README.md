@@ -1,9 +1,9 @@
 # HTTP method values and wire spelling
 
 Development validation for `System.Web.Http.HttpMethod`. The framework suite in
-[`runtime/raven/tests/http-method-values`](../../../runtime/raven/tests/http-method-values/Tests.rvn)
+[`runtime/System.Web/test/HttpMethodValuesTests`](../../../runtime/System.Web/test/HttpMethodValuesTests/NeoClr/RuntimeTests/Tests.rvn)
 checks predefined values, parsing, custom construction, equality/hash behavior and
-request factories. [Its evidence](../../../runtime/raven/tests/http-method-values/validation.json)
+request factories. [Its evidence](../../../runtime/System.Web/test/HttpMethodValuesTests/validation.json)
 records eight passing cases in both interpreted and macOS ARM64 native execution.
 
 `Client.rvn` and `Server.rvn` exchange the custom token `m-SEARCH` with independent

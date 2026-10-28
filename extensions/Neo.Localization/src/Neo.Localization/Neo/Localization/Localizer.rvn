@@ -1,0 +1,18 @@
+module Neo.Localization
+
+import System.*
+
+/// An immutable catalogue of localized strings, selected explicitly by the caller.
+/// Keys use case-sensitive ordinal identity; values preserve their original Unicode text.
+public interface Localizer {
+    /// Culture used for formatting resolved templates; independent of the fallback resource language.
+    val Culture: Globalization.Culture { get; }
+    /// Returns the stored translation, or the key itself when absent. Empty translations are present.
+    val self[key: string]: string { get; }
+    /// Finds a translation without substituting the key when absent.
+    func Find(key: string) -> Optional<string>
+}
+
+/// A catalogue associated with resource type T. Lookup behavior is the same as Localizer.
+/// A provider determines how the type maps to a resource scope.
+public interface Localizer<T> : Localizer { }

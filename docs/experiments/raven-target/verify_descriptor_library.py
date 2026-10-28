@@ -26,7 +26,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-descriptor-library-') as tempora
     (root / 'demo').mkdir()
     core = root / 'demo/NeoCLR.CoreProbe.dll'
     run(['dotnet', args.bridge.resolve(), '--reference-library-core', core])
-    source = (ROOT / 'runtime/raven/src/System/Introspection/Descriptors.rvn').read_text()
+    source = (ROOT / 'runtime/System.Runtime/src/System.Runtime/System/Introspection/Descriptors.rvn').read_text()
     cases = [
         ('Descriptors', source, None),
         ('MissingPermittedCase', source.replace('RuntimeMemberInfo, FieldInfo', 'RuntimeMemberInfo'), 'Introspection sealed hierarchy'),

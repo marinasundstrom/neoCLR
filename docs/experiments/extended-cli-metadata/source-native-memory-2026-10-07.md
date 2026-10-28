@@ -6,7 +6,7 @@ module-function pointer contracts from identity/digest/signature facts. No impor
 objects enter emission, no native dependency falls back to a CLI projection, and no
 new runtime format or service is introduced.
 
-The unchanged `runtime/raven/src/System/Runtime/InteropServices/NativeMemory/Functions.rvn`
+The unchanged `runtime/System.Runtime/src/System.Runtime/System/Runtime/InteropServices/NativeMemory/Functions.rvn`
 is compiled with two internal adapters into NativeMemory.dll. Separate consumers import
 that artifact with library sources absent. They exercise both Alloc overloads, explicit
 Void-pointer parameter/result identity, locals and Free. The successful case exits 42;

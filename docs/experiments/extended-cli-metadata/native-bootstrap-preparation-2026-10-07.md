@@ -4,7 +4,7 @@ prepare-native-bootstrap.py generates Core.dll, a compile-time System.neox and t
 retained System JSON model from checked-in sources. It needs a built runtime,
 metadata translator and the existing narrow CoreDeclarations generator, but no old
 Numbers/Http assembly or previous Runtime output. See the exact commands in
-[runtime projects](../../../runtime/raven/projects/README.md).
+[runtime projects](../../../runtime/class-library-projects.md).
 
 Core remains the permitted CLI bootstrap, generated with source-owned Fail selection.
 The seed source removes the source-owned Void, Value and RuntimeTypeHandle declarations.

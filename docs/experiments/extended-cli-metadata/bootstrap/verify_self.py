@@ -35,7 +35,7 @@ def main():
               '--runtime-seed', args.seed.resolve(), '--reference', args.base_library.resolve()]
     configured = common + ['--bootstrap-ownership', ownership]
     contracts = output / 'SelfContracts.dll'
-    source = ROOT / 'runtime/raven/src/System/Clonable.rvn'
+    source = ROOT / 'runtime/System.Runtime/src/System.Runtime/System/Clonable.rvn'
     run(configured + ['--library', '-o', contracts, source])
     implementation = output / 'SelfImplementation.dll'
     run(configured + ['--reference', contracts, '--library', '-o', implementation, HERE / 'self-implementation.rvn'])

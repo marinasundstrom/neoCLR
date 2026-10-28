@@ -1,0 +1,5 @@
+import System.Runtime.CompilerServices.*
+
+// The localization JSON provider reuses the bounded flat-map parser without
+// exposing parser implementation helpers as public API. See docs/application-services.md.
+[assembly: InternalsVisibleTo("Neo.Localization")]

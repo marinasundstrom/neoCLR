@@ -30,7 +30,7 @@ def main():
     project = out / 'projects'
     shutil.copytree(ROOT / 'docs/experiments/obsolete-runtime', project,
                     ignore=shutil.ignore_patterns('bin', 'obj'))
-    source_files = [ROOT / 'runtime/raven/src/System/ObsoleteAttribute.rvn', ROOT / 'runtime/raven/src/System/String.rvn', ROOT / 'docs/experiments/obsolete-runtime/Main.rvn']
+    source_files = [ROOT / 'runtime/System.Runtime/src/System.Runtime/System/ObsoleteAttribute.rvn', ROOT / 'runtime/System.Runtime/src/System.Runtime/System/String.rvn', ROOT / 'docs/experiments/obsolete-runtime/Main.rvn']
     report = {'passed': False, 'platform': platform.system() + '-' + platform.machine(),
               'sourceFiles': {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in source_files},
               'runtimeSha256': hashlib.sha256(args.runtime.read_bytes()).hexdigest(),

@@ -145,7 +145,7 @@ it predates the final runtime source simplification commit.
 
 The Map iteration/materialization checks in `CheckMaps` and `CheckMapConstruction`
 now also live as five focused `[Test]` module functions in
-[MapMaterialization.rvn](../../../runtime/raven/tests/collections/MapMaterialization.rvn).
+[MapMaterialization.rvn](../../../runtime/System.Runtime/test/RuntimeLibraryTests/NeoClr/RuntimeTests/MapMaterialization.rvn).
 They report individual assertion failures through the Raven runner, and can be
 selected with `--filter Map`. The first port preserves snapshot timing, comparer
 behavior, independent storage and shared reference values; it also uses `use` for
@@ -157,15 +157,15 @@ suite rather than duplicated here. Terminal duplicate-key fault/disposal program
 and compiler rejection cases still require their specialized harnesses.
 
 The queue/stack entry checks and `CheckSnapshots` are also ported into six
-[QueueStack.rvn tests](../../../runtime/raven/tests/collections/QueueStack.rvn).
+[QueueStack.rvn tests](../../../runtime/System.Runtime/test/RuntimeLibraryTests/NeoClr/RuntimeTests/QueueStack.rvn).
 They retain FIFO/LIFO growth, wrapped contents, shared reference identity, clear/reuse
 and mutation-after-snapshot cases. Explicit small capacities guarantee that growth
 is exercised; the tests do not pin an internal growth factor.
 
 The remaining `CheckSets`, `CheckCollectionConstruction`, `CheckForCleanup` and
 `CheckQueryCleanup` scenarios now have focused assertion-based counterparts in the
-[construction/set](../../../runtime/raven/tests/collection-construction/) and
-[query/iterator](../../../runtime/raven/tests/collection-iteration/) suites. Together
+[construction/set](../../../runtime/System.Runtime/test/CollectionConstructionTests/) and
+[query/iterator](../../../runtime/System.Runtime/test/CollectionIterationTests/) suites. Together
 with the earlier ports they cover this program's observable checks. Keep this smoke
 consumer until Windows equivalence is established; fault and compiler rejection
 fixtures retain their separate purpose.

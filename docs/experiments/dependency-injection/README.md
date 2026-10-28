@@ -8,7 +8,7 @@ for the current API and limits.
 
 ## Constructor plans
 
-[ConstructorPlan.rvn](../../../runtime/raven/src/System/DependencyInjection/ConstructorPlan.rvn) separates availability checks from
+[ConstructorPlan.rvn](../../../extensions/Neo.DependencyInjection/src/Neo.DependencyInjection/Neo/DependencyInjection/ConstructorPlan.rvn) separates availability checks from
 activation. Preparation selects the most-parameter public instance constructor
 whose dependency types are available, then checks competing applicable
 constructors. It retains the selected constructor and parameter metadata for reuse.
@@ -33,7 +33,7 @@ intermediate list and reflection snapshot. Plans are cached per provider snapsho
 
 ## Class-library integration
 
-[Services.rvn](../../../runtime/raven/src/System/DependencyInjection/Services.rvn)
+[Services.rvn](../../../extensions/Neo.DependencyInjection/src/Neo.DependencyInjection/Neo/DependencyInjection/Services.rvn)
 provides public ServiceCollection, ServiceProvider and immutable ServiceDescriptor
 contracts. Registrations accept implementation types, factories or caller-owned
 instances, including module-level functions and bound instance methods. Generic

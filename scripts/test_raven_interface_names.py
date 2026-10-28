@@ -9,7 +9,9 @@ ROOT = Path(__file__).resolve().parents[1]
 class InterfaceNamesTests(unittest.TestCase):
     def test_runtime_interfaces_do_not_use_dotnet_i_prefix(self):
         declarations = []
-        for path in sorted((ROOT / 'runtime/raven/src').rglob('*.rvn')):
+        sources = [path for parent, pattern in (('runtime', 'System.*'), ('extensions', 'Neo.*'))
+                   for project in (ROOT / parent).glob(pattern) for path in (project / 'src').rglob('*.rvn')]
+        for path in sorted(sources):
             for match in re.finditer(r'^\s*(?:(?:public|internal|private|sealed)\s+)*interface\s+(\w+)',
                                      path.read_text(), re.MULTILINE):
                 declarations.append((str(path.relative_to(ROOT)), match.group(1)))

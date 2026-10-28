@@ -21,11 +21,11 @@ def main():
     args = parser.parse_args()
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
-    original = json.loads((ROOT / 'runtime/raven/native/poc-ownership.json').read_text())
+    original = json.loads((ROOT / 'runtime/System.Runtime/src/System.Runtime/native/poc-ownership.json').read_text())
     baseline = original['libraries'][0]['sources']
-    production = sorted(str(p.relative_to(ROOT)) for p in (ROOT / 'runtime/raven/src/System').rglob('*.rvn'))
+    production = sorted(str(p.relative_to(ROOT)) for project in (ROOT / 'runtime').glob('System.*') for p in (project / 'src' / project.name / 'System').rglob('*.rvn'))
     network = [s for s in production if '/Networking/' in s or '/Web/' in s or s.endswith(('/Uri.rvn', '/UriError.rvn'))]
-    network += ['runtime/raven/native/' + n + '.rvn' for n in ('RuntimeNetworkCalls',)]
+    network += ['runtime/System.Networking/src/System.Networking/neoCLR/Runtime/RuntimeNetworkCalls.rvn']
     selected = set(baseline + network)
     omitted = sorted(set(production) - selected)
     groups = {
@@ -37,8 +37,8 @@ def main():
     groups['contracts'] = sorted(set(omitted) - set(sum(groups.values(), [])))
     cases = [('baseline', baseline, False), ('network', network, True)]
     cases += [(name, sources, True) for name, sources in groups.items()]
-    adapters = sorted(str(p.relative_to(ROOT)) for p in (ROOT / 'runtime/raven/native').glob('*.rvn'))
-    storage_adapters = ['runtime/raven/native/' + n + '.rvn' for n in ('RuntimeStorageCalls', 'RuntimeStorageServices', 'RuntimeFileTextServices')]
+    adapters = sorted(str(p.relative_to(ROOT)) for p in (ROOT / 'runtime/System.Runtime/src/System.Runtime/neoCLR/Runtime').glob('*.rvn'))
+    storage_adapters = ['runtime/System.Runtime/src/System.Runtime/neoCLR/Runtime/' + n + '.rvn' for n in ('RuntimeStorageCalls', 'RuntimeStorageServices', 'RuntimeFileTextServices')]
     cases += [('storage-with-adapters', groups['storage'] + storage_adapters, True)]
     # The source Object supplies GetType; the seed-only extension is not a second owner.
     full_sources = production + [s for s in adapters if not s.endswith('/ObjectIntrospection.rvn')]
@@ -56,11 +56,11 @@ def main():
         cases = [case for case in cases if case[0] in args.case]
     if any(name in ('full-owned-handle', 'runtime-owned') for name, _, _ in cases) and not args.runtime:
         parser.error('Owned-root cases require --runtime to assemble their retained seed')
-    inputs = [args.compiler, args.core, args.seed, args.libraries / 'Numbers.dll', args.libraries / 'Http.dll', Path(__file__), ROOT / 'runtime/raven/native/poc-ownership.json']
+    inputs = [args.compiler, args.core, args.seed, args.libraries / 'Numbers.dll', args.libraries / 'Http.dll', Path(__file__), ROOT / 'runtime/System.Runtime/src/System.Runtime/native/poc-ownership.json']
     inputs += [args.compiler.parent / name for name in ('Raven.CodeAnalysis.dll', 'Raven.CodeAnalysis.NeoClr.dll', 'NeoCLR.Metadata.Experimental.dll')]
     inputs += [ROOT / s for s in production + adapters]
     if args.runtime:
-        inputs += [args.runtime, ROOT / 'runtime/raven/native/poc-seed.neoil']
+        inputs += [args.runtime, ROOT / 'runtime/System.Runtime/src/System.Runtime/native/poc-seed.neoil']
     report = dict(sourceRevision=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
         controlsIncluded=[name for name, _, _ in cases if name in ('baseline', 'network')], declaredCompilerRevision=args.compiler_revision, productionFiles=len(production), selectedProductionFiles=len(set(production) & selected),
         omitted=omitted, groups=groups, scope='Compilation frontier only. Bootstrap inputs retained; full-source owner is diagnostic, not a proposed production layout.',
@@ -92,7 +92,7 @@ def main():
             manifest['nativePrimitives']['System.Value'] = library['assemblyName']
             # Reuse the already implemented source-handle ownership contract. The
             # exact empty seed declaration must disappear when this owner is selected.
-            seed_text = (ROOT / 'runtime/raven/native/poc-seed.neoil').read_text()
+            seed_text = (ROOT / 'runtime/System.Runtime/src/System.Runtime/native/poc-seed.neoil').read_text()
             declaration = '.type System.RuntimeTypeHandle\n.sealed\n.end\n'
             if seed_text.count(declaration) != 1:
                 raise ValueError('Expected exactly one retained handle declaration')

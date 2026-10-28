@@ -14,7 +14,17 @@ import sys
 import time
 
 ROOT = Path(__file__).resolve().parents[1]
-TESTS = ROOT / 'runtime/raven/tests'
+TEST_PROJECTS = json.loads((ROOT / 'scripts/runtime-test-projects.json').read_text())
+
+
+def suite_project(name):
+    return ROOT / TEST_PROJECTS[name]
+
+
+def suite_directory(name):
+    return suite_project(name).parent
+
+
 ERROR_CONTEXT_NAMES = ['Platform and author errors opt into message and absent diagnostics', 'Context preserves typed payload and interface cause without capturing', 'Successful results skip lazy context and capture', 'Failure context evaluates once and propagates the typed wrapper', 'Nested context formats each cause once and keeps concise display', 'Explicit capture survives collection and later wrappers reuse its snapshot', 'Domain causes preserve trace and explicit mapping remains available', 'Malformed cyclic cause chains have bounded formatting and lookup', 'Unrelated result error types remain unconstrained', 'Application capture policy is opt in and explicit overrides win', 'Conditional startup configures capture only when DEBUG is defined', 'Interface result boundaries preserve runtime errors without automatic context']
 ENVIRONMENT_NAMES = ['Platform version types retain distinct readable representations', 'Every OS case formats through base Object and interpolation', 'Distribution identity and release remain independently optional', 'Architecture cases preserve readable and unknown names', 'OS record equality preserves payload and runtime case identity', 'Live discovery returns execution platform architecture and newline', 'Discovered platform values survive garbage collection', 'Nested OS patterns select characteristics and cover every case']
 
@@ -519,10 +529,13 @@ def main():
               ROOT / 'tools/discovery/RavenNames.cs',
               *sorted((ROOT / 'tools/testing/NeoCLR.TestDiscovery').glob('*.cs')),
               *sorted((ROOT / 'tools/testing/NeoCLR.TestDiscovery').glob('*.csproj')),
-              *sorted(TESTS.rglob('*.rvn')), *sorted(TESTS.rglob('*.rvnproj')),
-              *sorted((TESTS / 'localization').rglob('*.json')),
+              ROOT / 'scripts/runtime-test-projects.json',
+              *[p for name in TEST_PROJECTS for p in suite_directory(name).rglob('*')
+                if p.suffix in ('.rvn', '.rvnproj') and not {'bin', 'obj'}.intersection(p.parts)],
+              *sorted((ROOT / 'tools/testing/NeoCLR.Testing').rglob('*.rvn')),
+              *sorted(suite_directory('localization').rglob('*.json')),
               *sorted((ROOT / 'docs/experiments/dependency-injection/sample').glob('*.rvn')),
-              *sorted((ROOT / 'runtime/raven/src/System/DependencyInjection').glob('*.rvn'))]
+              *sorted((ROOT / 'extensions/Neo.DependencyInjection/src/Neo.DependencyInjection/Neo/DependencyInjection').glob('*.rvn'))]
     report = dict(passed=False, modes=modes, jitHostSha256=sha(args.jit_host.resolve()) if args.jit_host else None, platform=platform.platform(), cases=[], phases=[], executionRepetitions=args.execution_repetitions,
                   inputs={str(p.relative_to(ROOT)): sha(p) for p in inputs},
                   bundleManifestSha256=sha(bundle / 'manifest.json'),
@@ -615,11 +628,11 @@ def main():
                     raise ValueError('native-callbacks currently requires the Unix interpreter profile')
                 fixture = out / ('native-callback-fixture.dylib' if sys.platform == 'darwin' else 'native-callback-fixture.so')
                 subprocess.run([os.environ.get('CC', 'cc'), '-dynamiclib' if sys.platform == 'darwin' else '-shared',
-                                '-fPIC', str(TESTS / name / 'fixture.c'), '-o', str(fixture)], check=True)
+                                '-fPIC', str(suite_directory(name) / 'fixture.c'), '-o', str(fixture)], check=True)
                 imports = out / 'NativeCallbackImports.rvn'
-                template = TESTS / name / 'Imports.rvn'
+                template = suite_directory(name) / 'Imports.rvn'
                 imports.write_text(template.read_text().replace('"native-callback-fixture"', json.dumps(str(fixture.resolve()))))
-                for source in (TESTS / name).iterdir():
+                for source in (suite_directory(name)).iterdir():
                     if source.is_file():
                         report['inputs'][str(source.relative_to(ROOT))] = sha(source)
                 fixture_environment['NeoClrNativeCallbackImports'] = str(imports.resolve())
@@ -630,7 +643,7 @@ def main():
                     raise ValueError('native-buffers currently requires the Unix interpreter profile')
                 fixture = out / ('native-buffer-fixture.dylib' if sys.platform == 'darwin' else 'native-buffer-fixture.so')
                 subprocess.run([os.environ.get('CC', 'cc'), '-dynamiclib' if sys.platform == 'darwin' else '-shared',
-                                '-fPIC', str(TESTS / name / 'fixture.c'), '-o', str(fixture)], check=True)
+                                '-fPIC', str(suite_directory(name) / 'fixture.c'), '-o', str(fixture)], check=True)
                 imports = out / 'NativeBufferImports.rvn'
                 imports.write_text('import System.Runtime.InteropServices.*\n[NativeImport(' + json.dumps(str(fixture.resolve())) +
                                    ', EntryPoint: "native_buffer_increment")]\nunsafe extern func Increment(buffer: *byte, count: int) -> System.Void;\n')
@@ -639,7 +652,7 @@ def main():
                 report['nativeBufferFixtureSha256'] = sha(fixture)
             if name not in ('runner-contract', 'memory-lifetimes', 'http-content-copy'):
                 started = time.perf_counter()
-                registry = DISCOVERY.discover(TESTS / name / 'Tests.rvnproj', bundle, out / (name + '-discovery'), fixture_environment)
+                registry = DISCOVERY.discover(suite_project(name), bundle, out / (name + '-discovery'), fixture_environment)
                 report['phases'].append(dict(suite=name, phase='discovery', elapsedSeconds=round(time.perf_counter() - started, 6), details=json.loads((out / (name + '-discovery') / 'timings.json').read_text())))
                 environment['NeoClrTestRegistry'] = str(registry)
             # Async memory tests need lifecycle bindings; JSON DOM fixtures also select HTTP content/socket handlers.
@@ -665,7 +678,7 @@ def main():
                 if name == 'dependency-injection':
                     di_types = reflection_names
                 elif name == 'localization':
-                    localization_types = reflection_names + ["System.Localization.DefaultLocalizer`1"]
+                    localization_types = reflection_names + ["Neo.Localization.DefaultLocalizer`1"]
                 else:
                     method_types = reflection_names
             if name == "json-streams":
@@ -682,7 +695,7 @@ def main():
                     construct=False, properties=False, getters=False, setters=False)]), indent=2) + '\n')
             if 'native' in modes:
                 command = [sys.executable, ROOT / 'scripts/build-native-project.py', '--profile',
-                           profile, '--project', TESTS / name / 'Tests.rvnproj',
+                           profile, '--project', suite_project(name),
                            '--bundle', bundle, '--aot', args.aot.resolve(), '--output', build]
                 if name in ("encoding-buffer-limits", "http-text", "localization"):
                     command += ["--byte-array-limit", "131072"]
@@ -707,7 +720,7 @@ def main():
                 build.mkdir()
                 environment['NeoClrBundleRoot'] = str(bundle)
                 command = ['dotnet', bundle / 'sdk/tools/rvnc/rvnc.dll', 'neoclr',
-                           '--project', TESTS / name / 'Tests.rvnproj']
+                           '--project', suite_project(name)]
                 phase = 'source-compilation'
             started = time.perf_counter()
             result = subprocess.run(list(map(str, command)), cwd=ROOT, env=environment, capture_output=True, timeout=600)
@@ -745,8 +758,8 @@ def main():
             isolated.mkdir()
             if name == 'localization':
                 for fixture in ('catalogue.json', 'invalid.json'):
-                    shutil.copyfile(ROOT / 'runtime/raven/tests/localization' / fixture, isolated / fixture)
-                shutil.copytree(ROOT / 'runtime/raven/tests/localization/resources', isolated / 'resources')
+                    shutil.copyfile(ROOT / 'extensions/Neo.Localization/test/Neo.Localization.Tests' / fixture, isolated / fixture)
+                shutil.copytree(ROOT / 'extensions/Neo.Localization/test/Neo.Localization.Tests/resources', isolated / 'resources')
             exe = isolated / ('app.exe' if os.name == 'nt' else 'app')
             if 'native' in modes:
                 shutil.copy2(build / exe.name, exe)

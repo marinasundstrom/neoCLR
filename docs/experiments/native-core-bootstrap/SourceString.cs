@@ -17,7 +17,7 @@ static class SourceString
             .WithRuntimeIterationContract(new("NativeString", "System.Collections.Iterable`1", "System.Collections.Iterator`1", ArraysImplementIterable: true, ArrayShapeTypeName: "System.Array`1"))
             .WithMetadataImportOptions(new MetadataImportOptions(core.Identity.Name, null, [SpecialType.System_String])
                 .WithObjectAssemblyName(core.Identity.Name).WithNativeMetadata());
-        var trees = sources.Select(s => { var path = Path.Combine(root, "runtime/raven/src/System", s + ".rvn"); return SyntaxTree.ParseText(File.ReadAllText(path), path: path); }).ToArray();
+        var trees = sources.Select(s => { var path = Path.Combine(root, "runtime/System.Runtime/src/System.Runtime/System", s + ".rvn"); return SyntaxTree.ParseText(File.ReadAllText(path), path: path); }).ToArray();
         var compilation = Compilation.Create("NativeString", trees, catalog.References.ToArray(), options);
         using var image = new MemoryStream();
         var emitted = compilation.Emit(image, null, new EmitOptions().WithBackend(new NeoClrEmissionBackend(

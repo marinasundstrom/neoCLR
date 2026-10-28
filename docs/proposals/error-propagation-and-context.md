@@ -19,7 +19,7 @@ interface implementations for nominal unions; it does not make every union an er
 These are source observations, not fresh execution qualification.
 
 neoCLR's FileReadError and StreamError currently provide case-based ToString without
-this interface. Its [StackTrace](../../runtime/raven/src/System/Diagnostics/StackTrace.rvn)
+this interface. Its [StackTrace](../../runtime/System.Runtime/src/System.Runtime/System/Diagnostics/StackTrace.rvn)
 already captures an owned current guest-stack text snapshot at construction: at most
 64 frames, method names and IL instruction indexes, no source lines or suspended
 async callers. See [diagnostic scope](../stack-traces.md). Structural propagation

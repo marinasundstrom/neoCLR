@@ -2,7 +2,7 @@
 
 The runtime framework's `time-parsing` suite tests Date, TimeOfDay and LocalDateTime
 Parse against boundaries, malformed input, fraction precision and culture profiles.
-[Eight-case evidence](../../../runtime/raven/tests/time-parsing-validation.json)
+[Eight-case evidence](../../../runtime/System.Runtime/test/TimeParsingTests-validation.json)
 records native macOS ARM64 and interpreted passes. See [the design](../../date-time.md)
 for grammar, .NET comparison and remaining parser gaps.
 

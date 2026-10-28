@@ -506,7 +506,7 @@ the existing native layout traces the shared backing owner. Captured receiver
 access uses a defensive local descriptor without exposing a closure-field address.
 Borrowed Slice/ReadOnlySlice captures remain rejected.
 
-The [pending-transfer fixture](../runtime/raven/tests/memory-lifetimes/README.md)
+The [pending-transfer fixture](../runtime/System.Runtime/test/MemoryLifetimeTests/README.md)
 qualifies four cases in interpreter, JIT and AOT on macOS ARM64: sole-owner buffers
 after creator return, two pending awaits and explicit collections, readonly reads,
 writable subwindows and sentinels, cancellation/recoverable rejection, and empty

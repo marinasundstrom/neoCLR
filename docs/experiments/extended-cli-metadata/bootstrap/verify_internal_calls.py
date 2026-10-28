@@ -46,7 +46,7 @@ ret
     run([args.runtime.resolve(), 'assemble', seed_source, seed, '--format', 'neox'])
     common = ['dotnet', args.compiler.resolve(), 'neoclr', '--core-reference', args.core.resolve(),
               '--runtime-seed', seed, '--bootstrap-intrinsics', '--bootstrap-ownership', args.ownership.resolve(), '--reference', args.base_library.resolve()]
-    services = ROOT / 'runtime/raven/native/RuntimeHandleServices.rvn'
+    services = ROOT / 'runtime/System.Runtime/src/System.Runtime/neoCLR/Runtime/RuntimeHandleServices.rvn'
     provider_source = HERE / 'internal-call-provider.rvn'
     consumer_source = HERE / 'internal-call-consumer.rvn'
     library = output / 'HandleServices.dll'

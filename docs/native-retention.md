@@ -56,7 +56,7 @@ module/revision/index identities in the project file: they can change on rebuild
 
 ## Generics and current boundaries
 
-An exact definition such as `System.Localization.DefaultLocalizer` followed by
+An exact definition such as `Neo.Localization.DefaultLocalizer` followed by
 its metadata arity suffix `` `1 `` can use `constructors` retention. As with the
 existing command-line option, only supported closed shapes observed by the native
 specializer are retained. This does not enable arbitrary runtime generic

@@ -22,10 +22,10 @@ def main():
     common = ['dotnet', compiler, 'neoclr', '--core-reference', core, '--runtime-seed', seed,
               '--bootstrap-intrinsics', '--bootstrap-ownership', ownership, '--reference', library]
     sources = [ROOT / path for path in (
-        'runtime/raven/src/System/Environment/Functions.rvn',
-        'runtime/raven/src/System/EnvironmentError.rvn',
-        'runtime/raven/native/RuntimeEnvironmentCalls.rvn',
-        'runtime/raven/native/RuntimeEnvironmentServices.rvn')]
+        'runtime/System.Runtime/src/System.Runtime/System/Environment/Functions.rvn',
+        'runtime/System.Runtime/src/System.Runtime/System/EnvironmentError.rvn',
+        'runtime/System.Runtime/src/System.Runtime/neoCLR/Runtime/RuntimeEnvironmentCalls.rvn',
+        'runtime/System.Runtime/src/System.Runtime/native/RuntimeEnvironmentServices.rvn')]
     sample = Path(__file__).resolve().parent / 'bootstrap/environment-consumer.rvn'
     environment, app = output / 'Environment.dll', output / 'EnvironmentConsumer.dll'
     commands = []

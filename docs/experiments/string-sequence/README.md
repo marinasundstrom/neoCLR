@@ -56,5 +56,5 @@ signatures remain compatible; named callers must migrate to these names. Referen
 metadata, authored bodies, runtime parameter introspection and API docs now agree.
 
 Development test migration (2026-10-10): String character-sequence copying, graphemes and named arguments now also run as 5
-attributed framework tests in `runtime/raven/tests/string-construction`. The framework README
+attributed framework tests in `runtime/System.Runtime/test/StringConstructionTests`. The framework README
 links native/interpreted evidence. This original consumer retains its integration purpose.

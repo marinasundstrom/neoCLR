@@ -1,0 +1,79 @@
+module Neo.Localization
+
+import System.*
+import System.Collections.*
+import Neo.DependencyInjection.*
+import System.Globalization.*
+import System.Introspection.*
+import System.Optional.*
+import System.Result.*
+
+/// A configured JSON factory with lazy, reusable catalogues per resource type.
+/// Invocation-owned; concurrent shared access is not supported.
+public class JsonLocalizerFactory : LocalizerFactory {
+    private val provider: JsonLocalizerProvider
+    private val culture: Culture
+    private val entries = ArrayList<LocalizerFactoryEntry>()
+
+    /// Configures loading without performing I/O. The selected culture is fixed for this factory.
+    init(provider: JsonLocalizerProvider, culture: Culture) {
+        self.provider = provider
+        self.culture = culture
+    }
+
+    /// Reuses the selected resource localizer; the first lookup performs file I/O.
+    /// Lookup faults on invalid/unreadable catalogues. Use provider.Load for recoverable loading.
+    func Create(resourceType: TypeInfo) -> Localizer {
+        for entry in entries {
+            if entry.Type.Equals(resourceType) { return entry.Localizer }
+        }
+        let localizer: Localizer = LazyJsonLocalizer(provider, culture, resourceType)
+        entries.Add(LocalizerFactoryEntry(resourceType, localizer))
+        return localizer
+    }
+}
+
+internal class LocalizerFactoryEntry {
+    val Type: TypeInfo
+    val Localizer: Localizer
+    init(type: TypeInfo, localizer: Localizer) {
+        Type = type
+        Localizer = localizer
+    }
+}
+
+internal class LazyJsonLocalizer : Localizer {
+    private val provider: JsonLocalizerProvider
+    private val resourceType: TypeInfo
+    private var loaded: Optional<Localizer> = None
+    val Culture: Culture
+
+    init(provider: JsonLocalizerProvider, culture: Culture, resourceType: TypeInfo) {
+        self.provider = provider
+        self.resourceType = resourceType
+        Culture = culture
+    }
+
+    private func Load() -> Localizer {
+        if loaded is Some(let value) { return value }
+        let Ok(value) = provider.Load(Culture, resourceType) else {
+            System.Fail("Unable to load localization resources; use JsonLocalizerProvider.Load to handle loading errors")
+            return self
+        }
+        loaded = Some(value)
+        return value
+    }
+
+    val self[key: string]: string => Load()[key]
+    func Find(key: string) -> Optional<string> => Load().Find(key)
+}
+
+/// Registers the factory and the ordinary open generic typed adapter.
+public extension LocalizationServices for ServiceCollection {
+    /// Preserves explicit overrides. The supplied factory remains caller-owned.
+    func AddLocalization(factory: LocalizerFactory) -> Result<unit, ServiceError> {
+        _ = self.TryAdd(ServiceDescriptor(typeof(LocalizerFactory), ServiceSource.Instance(factory), ServiceLifetime.Singleton))?
+        _ = self.TryAdd(ServiceDescriptor(typeof(Localizer<>), ServiceSource.Constructor(typeof(DefaultLocalizer<>)), ServiceLifetime.Transient))?
+        return Ok(())
+    }
+}

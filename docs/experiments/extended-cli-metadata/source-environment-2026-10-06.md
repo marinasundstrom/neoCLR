@@ -42,7 +42,7 @@ remain. See [audit](native-bootstrap-environment-2026-10-06.json).
 ```sh
 python3 docs/experiments/extended-cli-metadata/verify_source_environment.py \
   --compiler /path/to/rvnc.dll --compiler-revision d19c6e4a3 \
-  --library /path/to/Numbers.dll --ownership runtime/raven/native/poc-ownership.json \
+  --library /path/to/Numbers.dll --ownership runtime/System.Runtime/src/System.Runtime/native/poc-ownership.json \
   --seed /path/to/System.neox --core /path/to/Core.dll \
   --runtime target/debug/neoclr --output /tmp/environment-gate
 cargo test --test environment

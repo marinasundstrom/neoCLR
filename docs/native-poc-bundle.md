@@ -339,12 +339,12 @@ Publication remains separate from local packaging and does not expand the transl
 
 ## Preview 12 bootstrap provenance
 
-The retained seed is now pinned at `runtime/raven/native/poc-seed.neoil`. It is the
+The retained seed is now pinned at `runtime/System.Runtime/src/System.Runtime/native/poc-seed.neoil`. It is the
 bounded primitive/service selection previously assembled by the source JSON gate,
 not a replacement implementation of application or source-library APIs. Build it:
 
 ```sh
-neoclr assemble runtime/raven/native/poc-seed.neoil System.neox --format neox
+neoclr assemble runtime/System.Runtime/src/System.Runtime/native/poc-seed.neoil System.neox --format neox
 ```
 
 The primitive CLI reference is reproduced by the existing declaration generator:

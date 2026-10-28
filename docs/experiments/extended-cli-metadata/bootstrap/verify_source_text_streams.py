@@ -29,7 +29,7 @@ def main():
             raise RuntimeError(json.dumps(commands[-1], indent=2))
 
     names = ('StreamReader', 'StreamWriter', 'TextReader', 'TextWriter', 'TextReadError')
-    sources = [ROOT / 'runtime/raven/src/System/IO' / (name + '.rvn') for name in names]
+    sources = [ROOT / 'runtime/System.Runtime/src/System.Runtime/System/IO' / (name + '.rvn') for name in names]
     manifest = json.loads(args.ownership.read_text())
     manifest['libraries'].append(dict(assemblyName='TextStreams', sources=[str(p.relative_to(ROOT)) for p in sources],
         types=['System.IO.' + name for name in names]))

@@ -20,11 +20,11 @@ def main():
     output.mkdir(parents=True, exist_ok=False)
     common = ['dotnet', compiler, 'neoclr', '--core-reference', core, '--runtime-seed', seed,
               '--bootstrap-intrinsics', '--bootstrap-ownership', ownership, '--reference', library]
-    sources = sorted((ROOT / 'runtime/raven/src/System/Networking').rglob('*.rvn'))
-    sources += [ROOT / 'runtime/raven/native' / name for name in
+    sources = sorted((ROOT / 'runtime/System.Networking/src/System.Networking/System/Networking').rglob('*.rvn'))
+    sources += [ROOT / 'runtime/System.Runtime/src/System.Runtime/native' / name for name in
                 ('RuntimeNetworkCalls.rvn',)]
-    sources += sorted((ROOT / 'runtime/raven/src/System/Web').rglob('*.rvn'))
-    sources += [ROOT / 'runtime/raven/src/System' / name for name in ('Uri.rvn', 'UriError.rvn')]
+    sources += sorted((ROOT / 'runtime/System.Web/src/System.Web/System/Web').rglob('*.rvn'))
+    sources += [ROOT / 'runtime/System.Runtime/src/System.Runtime/System' / name for name in ('Uri.rvn', 'UriError.rvn')]
     samples = {
         'headers': (['http-headers/Main.rvn'], 'HTTP header lookup checks passed\n'),
         'base': (['http-base/Main.rvn'], 'HTTP base address and overload checks passed\n'),

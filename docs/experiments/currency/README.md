@@ -51,7 +51,7 @@ record emission and Runtime Contract configuration are unchanged.
 
 ## Validation
 
-`runtime/raven/tests/currency/Tests.rvn` uses the built-in framework. It covers all
+`runtime/System.Runtime/test/CurrencyTests/NeoClr/RuntimeTests/Tests.rvn` uses the built-in framework. It covers all
 five cultures, six named currencies, exact parsing, monetary record construction,
 copy/deconstruction, equality/hash/boxing, Formattable and preservation of precision.
 The Decimal suite provides arithmetic and numeric-format regression coverage.

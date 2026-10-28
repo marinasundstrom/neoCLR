@@ -27,7 +27,7 @@ try:
     library=Path(original[original.index('--system')+1]).parent
     sample=root/('benchmarks/execution/lazy-jit/'+a.workload+'-http/Benchmark.rvn')
     model=root/'benchmarks/http-server/Model.rvn'
-    web=root/'runtime/raven/src/System/Web'
+    web=root/'runtime/System.Web/src/System.Web/System/Web'
     project=out/'Retained.rvnproj'
     project.write_text(f'''<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="{library}/NeoCLR.ClassLibrary.props" />

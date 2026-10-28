@@ -20,7 +20,7 @@ def main():
     args = parser.parse_args()
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
-    project = ROOT / 'runtime/raven/projects/System.Runtime/System.Runtime.rvnproj'
+    project = ROOT / 'runtime/System.Runtime/src/System.Runtime/System.Runtime.rvnproj'
     ownership = project.parent / 'ownership.json'
     bootstrap = args.bootstrap_directory.resolve()
     library = project.parent / 'bin/neoclr/System.Runtime.dll'

@@ -33,8 +33,8 @@ for path in [Path(__file__), *HERE.glob('*.rvn'), a.compiler, a.runtime, a.jit_c
              ROOT / 'runtime/raven/compiler-services/RuntimeAwait.rvn',
              *(a.compiler.parent / name for name in ('Raven.CodeAnalysis.dll', 'Raven.CodeAnalysis.NeoClr.dll', 'NeoCLR.Metadata.Experimental.dll')),
              *lib.glob('*.dll'), lib / 'System.runtime.neox', lib / 'bundle.json',
-             *(ROOT / 'runtime/raven/src/System/Data/Sql').glob('*.rvn'),
-             *(ROOT / 'runtime/raven/providers/System.Data.PostgreSql').glob('*.rvn')]:
+             *(ROOT / 'runtime/System.Data/src/System.Data/System/Data/Sql').glob('*.rvn'),
+             *(ROOT / 'runtime/System.Data.PostgreSql/src/System.Data.PostgreSql/System/Data/PostgreSql').glob('*.rvn')]:
     report['inputs'][str(path.resolve())] = sha(path)
 
 

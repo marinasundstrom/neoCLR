@@ -147,7 +147,7 @@ point; no .NET RuntimeInformation compatibility is claimed. The earlier
 [.NET prototype and research](experiments/environment-discovery/README.md) retain
 historical evidence separately from the native implementation.
 
-The built-in framework suite is `runtime/raven/tests/environment-discovery` and
+The built-in framework suite is `runtime/System.Runtime/test/EnvironmentDiscoveryTests` and
 runs through `scripts/test-runtime-library.py --suite environment-discovery`.
 It exercises string dispatch, equality, nested patterns, exhaustive matches, live
 host facts and GC lifetime. See the [retained integration evidence](experiments/environment-discovery/integration.json)

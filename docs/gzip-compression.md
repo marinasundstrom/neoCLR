@@ -124,7 +124,7 @@ throughput claim. The selected interpreter pending-input/cancellation/text-compo
 contract passes. Full interpreter runs exceed both the initial 180-second and extended
 600-second allowances; the complete interpreter suite is **not qualified**. Retain
 this gap rather than inferring interpreter coverage from native results. See
-[execution evidence](../runtime/raven/tests/gzip-validation.json). Aggregate reference
+[execution evidence](../runtime/System.Runtime/test/GZipTests-validation.json). Aggregate reference
 fingerprints, native type/member rendering and both native snapshot unit checks pass.
 No full website build or publication was performed.
 

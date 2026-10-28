@@ -78,7 +78,7 @@ def main():
         report['scope'] = ('HTTP TLS rejection/recovery, client timeout/cancellation and server deadline'
                            if args.http_failures else 'Managed lifetime and HTTPS nested-JSON exchange with GC')
         report['timingNote'] = 'Timings include compilation and are not benchmarks.'
-        sources = list((ROOT / 'runtime/raven/src/System/Networking/Security').glob('*.rvn'))
+        sources = list((ROOT / 'runtime/System.Networking/src/System.Networking/System/Networking/Security').glob('*.rvn'))
         sources += list(source_project.glob('*'))
         report['sourceHashes'] = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in sources if path.is_file()}
     except Exception as error:

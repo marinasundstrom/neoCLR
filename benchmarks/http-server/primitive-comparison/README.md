@@ -42,7 +42,7 @@ GOMAXPROCS=2 in every final trial. Extra CPUs can contend on this desktop; this 
 not a production capacity measurement or a ranking of languages.
 
 Connection-close is deliberately the common supported baseline: neoCLR's
-[response encoder](../../../runtime/raven/src/System/Web/Http/HttpServer.rvn)
+[response encoder](../../../runtime/System.Web/src/System.Web/System/Web/Http/HttpServer.rvn)
 currently emits Connection: close. Persistent connections are a separate support
 gap and essential future comparison, not a reason to compare unlike connection
 policies now. No keep-alive throughput claim follows.

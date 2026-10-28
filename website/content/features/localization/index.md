@@ -1,6 +1,8 @@
 # Localization: strings for your application
 
-`System.Localization` separates resource lookup from cultural formatting.
+Development (2026-10-28): this API now has its own `Neo.Localization.dll` assembly. Update former `System` imports and rebuild consumers with the matching libraries.
+
+`Neo.Localization` separates resource lookup from cultural formatting.
 Load a JSON catalogue from a directory you choose, then use `Localizer` for
 key-based lookup. `Localizer<T>` associates resources with a feature type.
 
@@ -104,7 +106,7 @@ constructor entry:
 
 ```json
 {
-  "name": "System.Localization.DefaultLocalizer`1",
+  "name": "Neo.Localization.DefaultLocalizer`1",
   "retain": ["constructors"]
 }
 ```

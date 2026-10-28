@@ -28,28 +28,28 @@ def main():
     sources = [Path(__file__).resolve().parent / ('bootstrap/' + name) for name in
                ('source-object-root.rvn', 'generic-object-root.rvn')]
     if args.core_attributes:
-        sources = [sources[0], ROOT / 'runtime/raven/src/System/Introspection/BindingFlags.rvn',
+        sources = [sources[0], ROOT / 'runtime/System.Runtime/src/System.Runtime/System/Introspection/BindingFlags.rvn',
                    sources[0].parent / 'core-attributes-source-root.rvn']
     if args.source_attributes:
-        sources = [sources[0], ROOT / 'runtime/raven/src/System/Attribute.rvn',
-                   ROOT / 'runtime/raven/src/System/Runtime/CompilerServices/UnionAttribute.rvn',
+        sources = [sources[0], ROOT / 'runtime/System.Runtime/src/System.Runtime/System/Attribute.rvn',
+                   ROOT / 'runtime/System.Runtime/src/System.Runtime/System/Runtime/CompilerServices/UnionAttribute.rvn',
                    sources[0].parent / 'source-union-marker.rvn']
     if args.closed_root:
         sources = [sources[0], sources[0].parent / 'closed-object-root.rvn']
     if args.object_handles or args.reflection_construction:
-        sources = [sources[0], ROOT / 'runtime/raven/src/System/RuntimeTypeHandle.rvn',
-                   ROOT / 'runtime/raven/native/RuntimeObjectServices.rvn',
-                   ROOT / 'runtime/raven/native/NativeObject.rvn',
-                   ROOT / 'runtime/raven/native/RuntimeObjectCalls.rvn',
-                   ROOT / 'runtime/raven/native/RuntimeHandleServices.rvn',
+        sources = [sources[0], ROOT / 'runtime/System.Runtime/src/System.Runtime/System/RuntimeTypeHandle.rvn',
+                   ROOT / 'runtime/System.Runtime/src/System.Runtime/native/RuntimeObjectServices.rvn',
+                   ROOT / 'runtime/System.Runtime/src/System.Runtime/System/Runtime/CompilerServices/NativeObject.rvn',
+                   ROOT / 'runtime/System.Runtime/src/System.Runtime/neoCLR/Runtime/RuntimeObjectCalls.rvn',
+                   ROOT / 'runtime/System.Runtime/src/System.Runtime/neoCLR/Runtime/RuntimeHandleServices.rvn',
                    sources[0].parent / 'object-handles.rvn']
     if args.reflection_construction:
-        sources = sources[:-1] + [ROOT / 'runtime/raven/native/NativeReflection.rvn',
-                   ROOT / 'runtime/raven/native/RuntimeConstructionCalls.rvn',
+        sources = sources[:-1] + [ROOT / 'runtime/System.Runtime/src/System.Runtime/System/Runtime/CompilerServices/NativeReflection.rvn',
+                   ROOT / 'runtime/System.Runtime/src/System.Runtime/neoCLR/Runtime/RuntimeConstructionCalls.rvn',
                    sources[0].parent / 'reflection-construction.rvn']
     if args.erased_value:
-        sources = [sources[0], ROOT / 'runtime/raven/src/System/Value.rvn',
-                   ROOT / 'runtime/raven/native/RuntimeEnvironmentCalls.rvn',
+        sources = [sources[0], ROOT / 'runtime/System.Runtime/src/System.Runtime/System/Value.rvn',
+                   ROOT / 'runtime/System.Runtime/src/System.Runtime/neoCLR/Runtime/RuntimeEnvironmentCalls.rvn',
                    sources[0].parent / 'erased-value.rvn']
     library, app = args.output / 'Root.dll', args.output / 'App.pe'
     runtime_seed = args.output / 'System.neoil'

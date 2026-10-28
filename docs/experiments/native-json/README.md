@@ -81,6 +81,6 @@ continues to run both reflection and JSON projects. The validator builds the cur
 interpreter for matching private service support.
 
 The public DOM/document portion also has focused tests in the
-[Raven JSON DOM suite](../../../runtime/raven/tests/json-dom/JsonDom.rvn).
+[Raven JSON DOM suite](../../../runtime/System.Data/test/JsonDomTests/NeoClr/RuntimeTests/JsonDom.rvn).
 Typed object mapping and reflection retention checks remain in this acceptance
 consumer. The framework migration does not imply those checks have moved yet.

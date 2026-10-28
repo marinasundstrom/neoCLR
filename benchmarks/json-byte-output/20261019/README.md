@@ -21,7 +21,7 @@ The prerequisite native String.Utf8Bytes gap is fixed separately in cc972be22.
 The initial native attempt failed on ViewUtf8 and an intermediate token-encoding
 fallback was not adopted. The final writer uses borrowed string bytes. Native
 kernel, exact-binding and three-mode consumer evidence is in
-[runtime string views](../../../runtime/raven/tests/string-utf8-views/README.md).
+[runtime string views](../../../runtime/System.Runtime/test/StringUtf8Views/README.md).
 No Raven source compiler changes or string representation changes are required.
 
 ## Allocation result

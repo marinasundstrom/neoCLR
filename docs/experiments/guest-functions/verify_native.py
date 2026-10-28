@@ -20,7 +20,7 @@ runner = args.runner.resolve() if args.runner else bundle / 'bin/neoclr'
 output.mkdir(parents=True, exist_ok=False)
 sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
 inputs = [Path(__file__), HERE / 'verify.py', HERE / 'Main.rvn', HERE / 'GuestFunctions.rvnproj',
-          ROOT / 'runtime/raven/tests/framework/TestAttribute.rvn', compiler, backend, runner,
+          ROOT / 'tools/testing/NeoCLR.Testing/NeoClr/Testing/TestAttribute.rvn', compiler, backend, runner,
           bundle / 'lib/System.Runtime.dll', bundle / 'bin/neoclr-jit-host.dylib',
           ROOT / 'docs/experiments/runtime-async/generic-cleanup/mac-shared-gc-validation.json']
 report = dict(passed=False, platform=platform.platform(), commands=[], inputs={str(p): sha(p) for p in inputs})

@@ -26,7 +26,7 @@ def run(command):
 repository = Path(__file__).resolve().parents[3]
 extra_checks = []
 extra_functions = []
-for path in sorted((repository / 'runtime/raven/src').rglob('*.rvn')):
+for path in sorted(path for project in (repository / 'runtime').glob('System.*') for path in (project / 'src').rglob('*.rvn')):
     source = path.read_text()
     declaration = re.search(r'public union (\w+) \{', source)
     if declaration is None or declaration[1] in ('SocketError', 'DnsError', 'UriError'):

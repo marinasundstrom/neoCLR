@@ -26,7 +26,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-flags-library-') as temporary:
     (root / 'demo').mkdir()
     core = root / 'demo/NeoCLR.CoreProbe.dll'
     run(['dotnet', args.bridge.resolve(), '--reference-library-core', core])
-    source = (ROOT / 'runtime/raven/src/System/Array.rvn').read_text()
+    source = (ROOT / 'runtime/System.Runtime/src/System.Runtime/System/Array.rvn').read_text()
     cases = [
         ('Array', source, None),
         ('WrongStorage', source.replace('m_value', 'other'), 'Unsupported intrinsic array storage'),

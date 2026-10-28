@@ -1,0 +1,27 @@
+module Neo.Localization
+
+import System.Data.Json.*
+import System.IO.*
+import System.Storage.*
+
+/// Recoverable catalogue loading failures; no partial catalogue is returned.
+public union LocalizationError {
+    /// Invalid JSON, duplicate keys, unsupported structure or a catalogue quota violation.
+    case Json(reason: JsonError)
+    /// The resource file could not be read or decoded within the byte limit.
+    case File(reason: FileReadError)
+    /// The stream could not be decoded or read within the byte limit.
+    case Read(reason: TextReadError)
+    /// The optional scope contains path separators, a colon, NUL or a dot-only path component.
+    case InvalidScope
+
+    override func ToString() -> string {
+        return self match {
+            Json(let reason) => reason.ToString()
+            File(let reason) => reason.ToString()
+            Read(let reason) => reason.ToString()
+            InvalidScope => "Invalid localization scope"
+            _ => "Empty"
+        }
+    }
+}

@@ -26,7 +26,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-native-library-') as temporary:
     (root / 'demo').mkdir()
     core = root / 'demo/NeoCLR.CoreProbe.dll'
     run(['dotnet', args.bridge.resolve(), '--reference-library-core', core])
-    source = (ROOT / 'runtime/raven/src/System/Runtime/InteropServices/NativeMemory/Functions.rvn').read_text()
+    source = (ROOT / 'runtime/System.Runtime/src/System.Runtime/System/Runtime/InteropServices/NativeMemory/Functions.rvn').read_text()
     cases = [
         ('NativeMemory', source, None),
         ('WrongParameterName', source.replace('byteCount', 'bytes'), 'export does not match'),

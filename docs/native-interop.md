@@ -458,7 +458,7 @@ wrapper conversions, ownership leases and pointer-to-Slice conversion remain ope
 Native lowering retains the generic pointer target and emits `ptr.cast` for
 explicit reinterpretation or implicit void erasure. Temporary CLI metadata uses
 PTR/VAR/MVAR and `conv.u`; the native backend preserves target identity. No Runtime
-Contract setting changes. Built-in tests live in `runtime/raven/tests/native-pointers`.
+Contract setting changes. Built-in tests live in `runtime/System.Runtime/test/NativePointerTests`.
 
 
 ## Explicit native byte copies (development, 2026-10-22)

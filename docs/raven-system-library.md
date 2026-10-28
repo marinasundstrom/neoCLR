@@ -219,7 +219,7 @@ rejects class/interface substitutions, inherited/generic interfaces, storage, ev
 default/static implementations and added or changed members. Unsupported forms remain
 out of scope rather than being copied through unchecked.
 
-`runtime/raven/src/System/Clock.rvn` is the first integrated contract: the Raven
+`runtime/System.Runtime/src/System.Runtime/System/Clock.rvn` is the first integrated contract: the Raven
 profile uses its generated declaration while the original neoIL profile retains
 its existing declaration. SystemClock still implements the wall-clock service;
 Clock.Now still returns Instant. The public API, namespace and runtime behavior
@@ -882,7 +882,7 @@ private construction. Their current executable IL and public behavior remain in 
 
 ### Time value implementation — 2026-09-15
 
-The Raven profile now uses `runtime/raven/src/System/Time.rvn`, compiled into checked-in
+The Raven profile now uses `runtime/System.Runtime/src/System.Runtime/System/Time.rvn`, compiled into checked-in
 Time fragments. Existing Create/FromTicks Result factories, parameter names, tick
 bounds, component properties, equality and comparison remain unchanged. The original
 Neo profile still uses its existing IL implementation. Date has not been ported.

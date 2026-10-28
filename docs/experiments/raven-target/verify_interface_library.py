@@ -31,7 +31,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-interface-library-') as temporar
     (root / 'demo').mkdir()
     core = root / 'demo/NeoCLR.CoreProbe.dll'
     run(['dotnet', args.bridge.resolve(), '--reference-library-core', core])
-    source = (ROOT / 'runtime/raven/src/System/Time/Clock.rvn').read_text()
+    source = (ROOT / 'runtime/System.Runtime/src/System.Runtime/System/Time/Clock.rvn').read_text()
     unsupported = 'Unsupported library interface contract'
     mismatch = 'Library interface does not match reference contract'
     cases = [

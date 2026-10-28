@@ -22,7 +22,7 @@ record the extracted native-enabled Raven SDK from `5f6298c1237ecc34d8f00d0ee3c6
   Both rounds pass with the rebuilt native libraries. These are execution results,
   not reference-only metadata checks.
 
-`runtime/raven/native/poc-ownership.json` pins the selected cumulative source group and
+`runtime/System.Runtime/src/System.Runtime/native/poc-ownership.json` pins the selected cumulative source group and
 its canonical semantic identities. `Numbers` remains the existing provisional assembly
 name; this is not a new public package-name commitment. The HTTP group references that
 assembly and compiles its own unchanged production sources plus native runtime adapters.

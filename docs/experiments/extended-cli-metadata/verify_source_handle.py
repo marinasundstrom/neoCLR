@@ -20,7 +20,7 @@ def main():
     if len(manifest['libraries']) != 1:
         raise ValueError('Expected the combined single-library ownership manifest')
     library = manifest['libraries'][0]
-    source = 'runtime/raven/src/System/RuntimeTypeHandle.rvn'
+    source = 'runtime/System.Runtime/src/System.Runtime/System/RuntimeTypeHandle.rvn'
     library['sources'] = sorted(set(library['sources']) | {source})
     library['types'] = sorted(set(library['types']) | {'System.RuntimeTypeHandle'})
     manifest.setdefault('nativePrimitives', {})['System.RuntimeTypeHandle'] = library['assemblyName']

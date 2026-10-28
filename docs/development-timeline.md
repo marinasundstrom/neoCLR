@@ -19,6 +19,59 @@
   claimed. The app's prior paused goal prevented creating a replacement tracking
   entry; new work is authorized and recorded in the repository objectives.
 
+## 2026-10-28 — Optional application-service namespaces
+
+- **Author:** Proposed moving dependency injection and localization out of System
+  because they are optional application services, suggesting
+  `Neo.DependencyInjection` and `Neo.Localization`. Explicitly left open whether
+  localization should remain part of System.Runtime.
+- **Assistant recommendation:** Use those two namespaces for application-service
+  APIs, while retaining culture and general formatting primitives in
+  `System.Globalization`. Namespace identity and assembly packaging are separate:
+  a namespace rename alone does not make a service independently optional.
+  Prefer eventual separate service libraries; do not infer an approved assembly
+  split from this discussion.
+- **Evidence:** Current DI resides in System.Runtime. Localization contracts,
+  formatting and diagnostics reside in System.Runtime; JSON providers and
+  AddLocalization reside in System.Data, all under System.Localization.
+  [.NET DI](https://learn.microsoft.com/en-us/dotnet/api/microsoft.extensions.dependencyinjection)
+  uses an application-extension namespace; [.NET globalization guidance](https://learn.microsoft.com/en-us/dotnet/core/extensions/globalization-and-localization)
+  retains culture primitives under System.Globalization. Optionality alone is not
+  a universal rule for excluding APIs from System.
+- **Outcome/open:** Recorded the direction and recommendation; no API rename or
+  assembly extraction performed in this exchange. Localization packaging remains
+  open. A rename changes qualified type identity and requires consumer imports,
+  metadata/retention references, samples and API snapshots to migrate together,
+  with focused DI/localization consumer validation. This discussion does not
+  permanently reprioritize the active roadmap milestone.
+
+- **Author follow-up:** Approved implementation, then clarified that each API must
+  have its own project and assembly, with files under src/Neo/DependencyInjection
+  and src/Neo/Localization. Asked for docs, website updates and a commit when the
+  slice is complete. Named Neo.Configuration and Neo.Logging as subsequent work.
+- **Author layout corrections:** Rejected the separate runtime/raven/projects tree;
+  requested project files at project roots and a nested src directory matching
+  namespace hierarchy. Refined the runtime location to runtime/System.Runtime/src/System/IO
+  and directed optional Neo APIs into a sibling folder because they reference,
+  but are not themselves, the runtime. The assistant selected extensions/Neo.*.
+- **Author component refinement:** Requested extensions/Neo.DependencyInjection/src/Neo.DependencyInjection
+  for the source project and namespace folders, and test/Neo.DependencyInjection.Tests
+  for tests. Explained that source/test groups may contain multiple projects, with
+  zero tests also allowed. The assistant applied this to both Neo components and
+  kept the previously specified runtime project layout.
+- **Author final convention:** Applied `<runtime/extensions>/<component>/<src/test>/<project>/<namespace folders>`
+  to both runtime and extensions, and explicitly required Raven test-framework
+  suites under the appropriate component's test folder. Explained that a component
+  could be its own solution without requiring solution files. Reconfirmed committing
+  this refactoring slice after verification.
+- **Assistant outcome:** Implemented the component layout, separate Neo service
+  assemblies, relocated Raven suites and shared framework, and migrated imports,
+  retention names, tooling and API/website references. Seven libraries build;
+  62 service executions and 47 representative runtime tests pass, along with layout,
+  snapshot and website checks (6,185 pages). Preserved localization parsing with
+  a documented Data-to-Localization friend grant. Configuration and Logging remain
+  future work. [Evidence and JIT diagnostic limitation](validation/neo-services-20261028/README.md).
+
 ## 2026-10-28 — Scheduling integration decision and wrap-up
 
 - **Author:** Asked whether current changes were worth integrating and whether

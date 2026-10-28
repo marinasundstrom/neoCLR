@@ -82,14 +82,14 @@ def main():
     for name in ('runtime', 'translator', 'output'):
         parser.add_argument('--' + name, type=Path, required=True)
     args = parser.parse_args()
-    ownership_path = ROOT / 'runtime/raven/projects/System.Runtime/ownership.json'
+    ownership_path = ROOT / 'runtime/System.Runtime/src/System.Runtime/ownership.json'
     ownership = json.loads(ownership_path.read_text())
     if ownership['unit'] != {'assemblyName': 'System.Runtime', 'typeName': 'System.Void'}:
         raise ValueError('Unsupported unit ownership')
     for name in ('System.Value', 'System.RuntimeTypeHandle'):
         if ownership['nativePrimitives'].get(name) != 'System.Runtime':
             raise ValueError('Unsupported source primitive ownership: ' + name)
-    source = ROOT / 'runtime/raven/native/poc-seed.neoil'
+    source = ROOT / 'runtime/System.Runtime/src/System.Runtime/native/poc-seed.neoil'
     seed_text = source.read_text()
     for name in ('System.RuntimeTypeHandle', 'System.Void', 'System.Value'):
         declaration = '.type ' + name + '\n.sealed\n.end\n'

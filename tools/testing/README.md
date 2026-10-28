@@ -9,7 +9,7 @@ when required, without promising full TUnit compatibility.
 
 | Component | Owner and contract |
 | --- | --- |
-| Raven library | [`runtime/raven/tests/framework`](../../runtime/raven/tests/framework): assertions, result reports, suite and runner |
+| Raven library | [`tools/testing/NeoCLR.Testing`](../../tools/testing/NeoCLR.Testing): assertions, result reports, suite and runner |
 | Discovery | [`NeoCLR.TestDiscovery`](NeoCLR.TestDiscovery): native metadata inspection and typed registration generation |
 | Repository harness | [`scripts/test-runtime-library.py`](../../scripts/test-runtime-library.py): build and validate named suites in selected modes |
 | API reference | [Testing APIs](../../api-docs/testing.md), published on the site at `/docs/testing.html` |
@@ -50,7 +50,7 @@ Intentional failure fixtures are successful harness checks only when they match.
 Use a fresh output directory. Native builds need the platform's supported C toolchain.
 
 For a new source-included test project, follow
-[`discovery-contract/Tests.rvnproj`](../../runtime/raven/tests/discovery-contract/Tests.rvnproj):
+[`discovery-contract/Tests.rvnproj`](../../runtime/System.Runtime/test/TestDiscoveryContract/TestDiscoveryContract.rvnproj):
 include Assertions, TestSuite, TestAttribute and `$(NeoClrTestRegistry)`. Generate
 that file with:
 

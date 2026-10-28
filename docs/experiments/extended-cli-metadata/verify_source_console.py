@@ -19,13 +19,13 @@ def main():
         ('compiler', 'probe', 'library', 'integers', 'ownership', 'runtime', 'output'))
     output.mkdir(parents=True, exist_ok=False)
     sources = [ROOT / path for path in (
-        'runtime/raven/src/System/Console/Functions.rvn',
-        'runtime/raven/src/System/Console/Streams.rvn',
-        'runtime/raven/src/System/ConsoleReadError.rvn',
-        'runtime/raven/native/RuntimeConsoleCalls.rvn',
-        'runtime/raven/native/RuntimeConsoleServices.rvn',
-        'runtime/raven/native/RuntimeNativeIntegerCalls.rvn',
-        'runtime/raven/native/RuntimeNativeIntegerServices.rvn')]
+        'runtime/System.Runtime/src/System.Runtime/System/Console/Functions.rvn',
+        'runtime/System.Runtime/src/System.Runtime/System/Console/Streams.rvn',
+        'runtime/System.Runtime/src/System.Runtime/System/ConsoleReadError.rvn',
+        'runtime/System.Runtime/src/System.Runtime/neoCLR/Runtime/RuntimeConsoleCalls.rvn',
+        'runtime/System.Runtime/src/System.Runtime/native/RuntimeConsoleServices.rvn',
+        'runtime/System.Runtime/src/System.Runtime/neoCLR/Runtime/RuntimeNativeIntegerCalls.rvn',
+        'runtime/System.Runtime/src/System.Runtime/native/RuntimeNativeIntegerServices.rvn')]
     manifest = json.loads(ownership.read_text())
     manifest['libraries'].append(dict(assemblyName='Console',
         sources=[str(path.relative_to(ROOT)) for path in sources],
@@ -33,7 +33,7 @@ def main():
                'System.IO.ConsoleOutputStream']))
     selected = output / 'ownership.json'
     selected.write_text(json.dumps(manifest, indent=2) + '\n')
-    seed_source = ROOT / 'runtime/raven/native/poc-seed.neoil'
+    seed_source = ROOT / 'runtime/System.Runtime/src/System.Runtime/native/poc-seed.neoil'
     seed_text = seed_source.read_text()
     # Remove this exact legacy owner and service together. All other seed services remain.
     legacy = '''.type System.Console

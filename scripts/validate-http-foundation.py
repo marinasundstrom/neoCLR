@@ -50,7 +50,7 @@ def main():
     sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
     report = dict(passed=False, platform=platform.platform(), cases=[], skips=[],
                   sources={str(p.relative_to(ROOT)): sha(p) for p in [Path(__file__), *fixture.glob('*.rvn'), *fixture.glob('*.rvnproj'), *fixture.glob('*.json'),
-                           * (ROOT / 'runtime/raven/src/System/Web/Http').rglob('*.rvn')]},
+                           * (ROOT / 'runtime/System.Web/src/System.Web/System/Web/Http').rglob('*.rvn')]},
                   runtimeSha256=sha(args.runtime), aotSha256=sha(args.aot),
                   bundleManifestSha256=sha(bundle / 'manifest.json'))
     commands = {}

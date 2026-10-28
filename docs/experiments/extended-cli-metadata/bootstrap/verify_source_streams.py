@@ -28,7 +28,7 @@ def main():
         if result.returncode != expected or expected == 42 and result.stdout:
             raise RuntimeError(json.dumps(commands[-1], indent=2))
 
-    sources = [ROOT / 'runtime/raven/src/System/IO' / (name + '.rvn')
+    sources = [ROOT / 'runtime/System.Runtime/src/System.Runtime/System/IO' / (name + '.rvn')
                for name in ('InputStream', 'OutputStream', 'SeekableStream', 'StreamError', 'MemoryStream')]
     manifest = json.loads(args.ownership.read_text())
     manifest['unit'] = dict(assemblyName='NeoCLR.CoreProbe', typeName='System.Void')

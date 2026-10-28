@@ -21,9 +21,9 @@ def main():
     common = ['dotnet', compiler, 'neoclr', '--core-reference', core, '--runtime-seed', seed,
               '--bootstrap-intrinsics', '--bootstrap-ownership', ownership, '--reference', library]
     sources = [ROOT / path for path in (
-        'runtime/raven/src/System/Runtime/GC.rvn',
-        'runtime/raven/native/RuntimeHeapCalls.rvn',
-        'runtime/raven/native/RuntimeHeapServices.rvn')]
+        'runtime/System.Runtime/src/System.Runtime/System/Runtime/GC.rvn',
+        'runtime/System.Runtime/src/System.Runtime/neoCLR/Runtime/RuntimeHeapCalls.rvn',
+        'runtime/System.Runtime/src/System.Runtime/native/RuntimeHeapServices.rvn')]
     sample = Path(__file__).resolve().parent / 'bootstrap/heap-retention-consumer.rvn'
     heap, app = output / 'Heap.dll', output / 'HeapConsumer.dll'
     commands = []

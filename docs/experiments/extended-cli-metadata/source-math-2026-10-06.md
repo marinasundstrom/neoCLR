@@ -41,7 +41,7 @@ interpreting generic/scope diagnostics as independent compiler defects.
 ```sh
 python3 docs/experiments/extended-cli-metadata/verify_source_math.py \
   --compiler /path/to/rvnc.dll --library /path/to/Numbers.dll \
-  --ownership runtime/raven/native/poc-ownership.json \
+  --ownership runtime/System.Runtime/src/System.Runtime/native/poc-ownership.json \
   --seed /path/to/System.neox --core /path/to/Core.dll \
   --runtime target/release/neoclr --output /tmp/source-math-gate
 ```

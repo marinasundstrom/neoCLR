@@ -29,7 +29,7 @@ sha = lambda p: hashlib.sha256(Path(p).read_bytes()).hexdigest()
 for value in [*base, *native, *link, str(a.host), __file__]:
     path = Path(value)
     if path.is_file(): report['inputsSha256'][str(path.resolve())] = sha(path)
-for path in [*HERE.glob('*'), *(ROOT / 'docs/experiments/aot-console').glob('*.h'), ROOT / 'runtime/raven/src/System/Diagnostics/StackTrace.rvn', ROOT / 'runtime/raven/native/RuntimeDiagnosticsCalls.rvn']:
+for path in [*HERE.glob('*'), *(ROOT / 'docs/experiments/aot-console').glob('*.h'), ROOT / 'runtime/System.Runtime/src/System.Runtime/System/Diagnostics/StackTrace.rvn', ROOT / 'runtime/System.Runtime/src/System.Runtime/neoCLR/Runtime/RuntimeDiagnosticsCalls.rvn']:
     if path.is_file(): report['inputsSha256'][str(path.resolve())] = sha(path)
 
 def run(label, command):

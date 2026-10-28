@@ -53,7 +53,7 @@ its complete member reference. These are documented gaps, not new platform rules
 
 ## Validation
 
-The common built-in suite is `runtime/raven/tests/decimal/Tests.rvnproj`. It covers
+The common built-in suite is `runtime/System.Runtime/test/DecimalTests/DecimalTests.rvnproj`. It covers
 exact arithmetic, representation, equality/hash, literals and conversions, boxing,
 generic Number calls, rounding/overflow parsing and Swedish culture integration.
 `Oracle.cs` generates 51 successful CLR arithmetic boundary expectations; `Oracle.rvn`

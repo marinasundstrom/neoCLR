@@ -6,69 +6,69 @@
   </PropertyGroup>
   <Import Project="../../build/NeoCLR.Raven.props" />
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'GC'">
-    <Compile Include="src/System/Runtime/GC.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Runtime/GC.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Cancellation'">
-    <Compile Include="src/System/Concurrency/Cancellation.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Concurrency/Cancellation.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'IPAddress'">
-    <Compile Include="src/System/Networking/IPAddress.rvn" />
+    <Compile Include="../System.Networking/src/System.Networking/System/Networking/IPAddress.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'IPAddressError'">
-    <Compile Include="src/System/Networking/IPAddressError.rvn" />
+    <Compile Include="../System.Networking/src/System.Networking/System/Networking/IPAddressError.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Uri'">
-    <Compile Include="src/System/Uri.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Uri.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'UriError'">
-    <Compile Include="src/System/UriError.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/UriError.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'HttpStatusCode'">
-    <Compile Include="src/System/Web/Http/HttpStatusCode.rvn" />
+    <Compile Include="../System.Web/src/System.Web/System/Web/Http/HttpStatusCode.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'HttpError'">
-    <Compile Include="src/System/Web/Http/HttpError.rvn" />
+    <Compile Include="../System.Web/src/System.Web/System/Web/Http/HttpError.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'HttpClient'">
-    <Compile Include="src/System/Web/Http/HttpClient.rvn" />
-    <Compile Include="src/System/Web/Http/Routes.rvn" />
-    <Compile Include="src/System/Web/Http/HttpServer.rvn" />
+    <Compile Include="../System.Web/src/System.Web/System/Web/Http/HttpClient.rvn" />
+    <Compile Include="../System.Web/src/System.Web/System/Web/Http/Routes.rvn" />
+    <Compile Include="../System.Web/src/System.Web/System/Web/Http/HttpServer.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Dns'">
-    <Compile Include="src/System/Networking/Dns.rvn" />
+    <Compile Include="../System.Networking/src/System.Networking/System/Networking/Dns.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'DnsError'">
-    <Compile Include="src/System/Networking/DnsError.rvn" />
+    <Compile Include="../System.Networking/src/System.Networking/System/Networking/DnsError.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Socket'">
-    <Compile Include="src/System/Networking/Sockets/Socket.rvn" />
+    <Compile Include="../System.Networking/src/System.Networking/System/Networking/Sockets/Socket.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'SocketError'">
-    <Compile Include="src/System/Networking/Sockets/SocketError.rvn" />
+    <Compile Include="../System.Networking/src/System.Networking/System/Networking/Sockets/SocketError.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'TaskState'">
-    <Compile Include="src/System/Concurrency/Tasks/TaskState.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Concurrency/Tasks/TaskState.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'TaskOutcome'">
-    <Compile Include="src/System/Concurrency/Tasks/TaskOutcome.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Concurrency/Tasks/TaskOutcome.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'FileSystem'">
-    <Compile Include="src/System/Storage/FileSystem.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Storage/FileSystem.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'TextReadError'">
-    <Compile Include="src/System/IO/TextReadError.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/IO/TextReadError.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'TextReader'">
-    <Compile Include="src/System/IO/TextReader.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/IO/TextReader.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'StreamReader'">
-    <Compile Include="src/System/IO/StreamReader.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/IO/StreamReader.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'SeekableStream'">
-    <Compile Include="src/System/IO/SeekableStream.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/IO/SeekableStream.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'HashCode'">
-    <Compile Include="src/System/HashCode.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/HashCode.rvn" />
   </ItemGroup>
   <!-- Declaration slices shadow core types; JSON uses the target typeof contract. -->
   <PropertyGroup>
@@ -80,394 +80,394 @@
     <RavenTypeOfContextType Condition="'$(NeoCLRLibrarySlice)' != 'JsonValue'"></RavenTypeOfContextType>
   </PropertyGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == ''">
-    <Compile Include="src/System/Math/Functions.rvn" />
-    <Compile Include="src/System/Linq/Operators.rvn" />
-    <Compile Include="src/System/OptionalOperators.rvn" />
-    <Compile Include="src/System/ResultOperators.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Math/Functions.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Linq/Operators.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/OptionalOperators.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/ResultOperators.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'FileText'">
-    <Compile Include="src/System/Storage/FileText.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Storage/FileText.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'StorageItems'">
-    <Compile Include="src/System/Storage/StorageItems.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Storage/StorageItems.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Clock'">
-    <Compile Include="src/System/Time/Clock.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Time/Clock.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'ArrayList'">
-    <Compile Include="src/System/Collections/ArrayList.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Collections/ArrayList.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'HashMap'">
-    <Compile Include="src/System/Collections/HashMap.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Collections/HashMap.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Time'">
-    <Compile Include="src/System/Time/TimeOfDay.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Time/TimeOfDay.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Date'">
-    <Compile Include="src/System/Time/Date.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Time/Date.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Int64'">
-    <Compile Include="src/System/Int64.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Int64.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'SByte'">
-    <Compile Include="src/System/SByte.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/SByte.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Byte'">
-    <Compile Include="src/System/Byte.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Byte.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Int16'">
-    <Compile Include="src/System/Int16.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Int16.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'UInt16'">
-    <Compile Include="src/System/UInt16.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/UInt16.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'UInt32'">
-    <Compile Include="src/System/UInt32.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/UInt32.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'UInt64'">
-    <Compile Include="src/System/UInt64.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/UInt64.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Single'">
-    <Compile Include="src/System/Single.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Single.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Double'">
-    <Compile Include="src/System/Double.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Double.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Boolean'">
-    <Compile Include="src/System/Boolean.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Boolean.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Char'">
-    <Compile Include="src/System/Character.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Character.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Value'">
-    <Compile Include="src/System/Value.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Value.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'RuntimeTypeHandle'">
-    <Compile Include="src/System/RuntimeTypeHandle.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/RuntimeTypeHandle.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'RuntimeContext'">
-    <Compile Include="src/System/Runtime/RuntimeContext.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Runtime/RuntimeContext.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'ParameterInfo'">
-    <Compile Include="src/System/Introspection/ParameterInfo.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Introspection/ParameterInfo.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Instant'">
-    <Compile Include="src/System/Time/Instant.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Time/Instant.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Duration'">
-    <Compile Include="src/System/Time/Duration.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Time/Duration.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'SystemClock'">
-    <Compile Include="src/System/Time/SystemClock.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Time/SystemClock.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'LocalDateTime'">
-    <Compile Include="src/System/Time/LocalDateTime.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Time/LocalDateTime.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Disposable'">
-    <Compile Include="src/System/Disposable.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Disposable.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'EquatableTo'">
-    <Compile Include="src/System/EquatableTo.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/EquatableTo.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'ComparableTo'">
-    <Compile Include="src/System/ComparableTo.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/ComparableTo.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'ConvertibleInto'">
-    <Compile Include="src/System/ConvertibleInto.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/ConvertibleInto.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Clonable'">
-    <Compile Include="src/System/Clonable.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Clonable.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Closable'">
-    <Compile Include="src/System/Closable.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Closable.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Iterable'">
-    <Compile Include="src/System/Collections/Iterable.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Collections/Iterable.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Iterator'">
-    <Compile Include="src/System/Collections/Iterator.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Collections/Iterator.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Collection'">
-    <Compile Include="src/System/Collections/Collection.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Collections/Collection.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Sequence'">
-    <Compile Include="src/System/Collections/Sequence.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Collections/Sequence.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'MutableSequence'">
-    <Compile Include="src/System/Collections/MutableSequence.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Collections/MutableSequence.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'List'">
-    <Compile Include="src/System/Collections/List.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Collections/List.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Map'">
-    <Compile Include="src/System/Collections/Map.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Collections/Map.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'MutableMap'">
-    <Compile Include="src/System/Collections/MutableMap.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Collections/MutableMap.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'IntPtr'">
-    <Compile Include="src/System/IntPtr.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/IntPtr.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'UIntPtr'">
-    <Compile Include="src/System/UIntPtr.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/UIntPtr.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Int32'">
-    <Compile Include="src/System/Int32.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Int32.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Environment'">
-    <Compile Include="src/System/Environment/Functions.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Environment/Functions.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Console'">
-    <Compile Include="src/System/Console/Console.rvn" />
-    <Compile Include="src/System/Console/Streams.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Console/Console.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Console/Streams.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'StringBuilder'">
-    <Compile Include="src/System/Text/StringBuilder.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Text/StringBuilder.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'String'">
-    <Compile Include="src/System/String.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/String.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'InvalidRangeError'">
-    <Compile Include="src/System/InvalidRangeError.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/InvalidRangeError.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'InvalidDateError'">
-    <Compile Include="src/System/Time/InvalidDateError.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Time/InvalidDateError.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'InvalidTimeError'">
-    <Compile Include="src/System/Time/InvalidTimeError.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Time/InvalidTimeError.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'OverflowError'">
-    <Compile Include="src/System/OverflowError.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/OverflowError.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'EnvironmentError'">
-    <Compile Include="src/System/EnvironmentError.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/EnvironmentError.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Void'">
-    <Compile Include="src/System/Void.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Void.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Utf8SliceError'">
-    <Compile Include="src/System/Text/Utf8SliceError.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Text/Utf8SliceError.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'FileReadError'">
-    <Compile Include="src/System/Storage/FileReadError.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Storage/FileReadError.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'FileWriteError'">
-    <Compile Include="src/System/Storage/FileWriteError.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Storage/FileWriteError.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'ConsoleReadError'">
-    <Compile Include="src/System/ConsoleReadError.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/ConsoleReadError.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'SingleError'">
-    <Compile Include="src/System/Linq/SingleError.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Linq/SingleError.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'IntegerDivisionError'">
-    <Compile Include="src/System/IntegerDivisionError.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/IntegerDivisionError.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Propagatable'">
-    <Compile Include="src/System/Propagatable.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Propagatable.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Optional'">
-    <Compile Include="src/System/Optional.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Optional.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Result'">
-    <Compile Include="src/System/Result.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Result.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Descriptors'">
-    <Compile Include="src/System/Introspection/Descriptors.rvn" />
-    <Compile Include="src/System/Runtime/Reflection/ReflectionExtensions.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Introspection/Descriptors.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Runtime/Reflection/ReflectionExtensions.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'NativeMemory'">
-    <Compile Include="src/System/Runtime/InteropServices/NativeMemory/Functions.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Runtime/InteropServices/NativeMemory/Functions.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Fault'">
-    <Compile Include="src/System/Functions.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Functions.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'BindingFlags'">
-    <Compile Include="src/System/Introspection/BindingFlags.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Introspection/BindingFlags.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Object'">
-    <Compile Include="src/System/Object.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Object.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'UnionAttribute'">
-    <Compile Include="src/System/Runtime/CompilerServices/UnionAttribute.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Runtime/CompilerServices/UnionAttribute.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Array'">
-    <Compile Include="src/System/Array.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Array.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'AssemblyInfo'">
-    <Compile Include="src/System/Introspection/AssemblyInfo.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Introspection/AssemblyInfo.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'ModuleInfo'">
-    <Compile Include="src/System/Introspection/ModuleInfo.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Introspection/ModuleInfo.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Utf8'">
-    <Compile Include="src/System/Text/Utf8.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Text/Utf8.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'InvalidUtf8Error'">
-    <Compile Include="src/System/Text/InvalidUtf8Error.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Text/InvalidUtf8Error.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'UnicodeScalar'">
-    <Compile Include="src/System/Text/UnicodeScalar.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Text/UnicodeScalar.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Tasks'">
-    <Compile Include="src/System/Concurrency/Tasks/Tasks.rvn" />
-    <Compile Include="src/System/Concurrency/Tasks/TaskOperators.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Concurrency/Tasks/Tasks.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Concurrency/Tasks/TaskOperators.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Workers'">
-    <Compile Include="src/System/Concurrency/Workers.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Concurrency/Workers.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'StreamError'">
-    <Compile Include="src/System/IO/StreamError.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/IO/StreamError.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'FileInputStream'">
-    <Compile Include="src/System/IO/FileInputStream.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/IO/FileInputStream.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'FileOutputStream'">
-    <Compile Include="src/System/IO/FileOutputStream.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/IO/FileOutputStream.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'EntryKind'">
-    <Compile Include="src/System/Storage/EntryKind.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Storage/EntryKind.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'StorageLookupError'">
-    <Compile Include="src/System/Storage/StorageLookupError.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Storage/StorageLookupError.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'StorageMetadata'">
-    <Compile Include="src/System/Storage/Metadata.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Storage/Metadata.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Path'">
-    <Compile Include="src/System/Storage/Path.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Storage/Path.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'InvalidPathError'">
-    <Compile Include="src/System/Storage/InvalidPathError.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Storage/InvalidPathError.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'StorageProvider'">
-    <Compile Include="src/System/Storage/StorageProvider.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Storage/StorageProvider.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'InputStream'">
-    <Compile Include="src/System/IO/InputStream.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/IO/InputStream.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'OutputStream'">
-    <Compile Include="src/System/IO/OutputStream.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/IO/OutputStream.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'TextWriter'">
-    <Compile Include="src/System/IO/TextWriter.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/IO/TextWriter.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'StreamWriter'">
-    <Compile Include="src/System/IO/StreamWriter.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/IO/StreamWriter.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'MemoryStream'">
-    <Compile Include="src/System/IO/MemoryStream.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/IO/MemoryStream.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'JsonError'">
-    <Compile Include="src/System/Data/Json/JsonError.rvn" />
+    <Compile Include="../System.Data/src/System.Data/System/Data/Json/JsonError.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'JsonValue'">
-    <Compile Include="src/System/Data/Json/JsonValue.rvn" />
-    <Compile Include="src/System/Data/Json/JsonDocument.rvn" />
-    <Compile Include="src/System/Data/Json/JsonSyntax.rvn" />
-    <Compile Include="src/System/Data/Json/JsonSerializer.rvn" />
-    <Compile Include="src/System/Data/Json/ObjectMapper.rvn" />
-    <Compile Include="src/System/Web/Http/Json/JsonContent.rvn" />
-    <Compile Include="src/System/Web/Http/Json/HttpClientJsonExtensions.rvn" />
-    <Compile Include="src/System/Web/Http/Json/JsonClientOperations.rvn" />
+    <Compile Include="../System.Data/src/System.Data/System/Data/Json/JsonValue.rvn" />
+    <Compile Include="../System.Data/src/System.Data/System/Data/Json/JsonDocument.rvn" />
+    <Compile Include="../System.Data/src/System.Data/System/Data/Json/JsonSyntax.rvn" />
+    <Compile Include="../System.Data/src/System.Data/System/Data/Json/JsonSerializer.rvn" />
+    <Compile Include="../System.Data/src/System.Data/System/Data/Json/ObjectMapper.rvn" />
+    <Compile Include="../System.Web/src/System.Web/System/Web/Http/Json/JsonContent.rvn" />
+    <Compile Include="../System.Web/src/System.Web/System/Web/Http/Json/HttpClientJsonExtensions.rvn" />
+    <Compile Include="../System.Web/src/System.Web/System/Web/Http/Json/JsonClientOperations.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'ReflectionError'">
-    <Compile Include="src/System/Runtime/Reflection/ReflectionError.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Runtime/Reflection/ReflectionError.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'HttpJsonError'">
-    <Compile Include="src/System/Web/Http/Json/HttpJsonError.rvn" />
+    <Compile Include="../System.Web/src/System.Web/System/Web/Http/Json/HttpJsonError.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'EqualityComparer'">
-    <Compile Include="src/System/Collections/EqualityComparer.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Collections/EqualityComparer.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Comparer'">
-    <Compile Include="src/System/Collections/Comparer.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Collections/Comparer.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'FunctionEqualityComparer'">
-    <Compile Include="src/System/Collections/FunctionEqualityComparer.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Collections/FunctionEqualityComparer.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'FunctionComparer'">
-    <Compile Include="src/System/Collections/FunctionComparer.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Collections/FunctionComparer.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'StringComparison'">
-    <Compile Include="src/System/StringComparison.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/StringComparison.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'StringComparer'">
-    <Compile Include="src/System/StringComparer.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/StringComparer.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Calendar'">
-    <Compile Include="src/System/Time/Calendar.rvn" />
-    <Compile Include="src/System/Time/GregorianCalendar.rvn" />
-    <Compile Include="src/System/Time/HebrewCalendar.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Time/Calendar.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Time/GregorianCalendar.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Time/HebrewCalendar.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Culture'">
-    <Compile Include="src/System/Globalization/Culture.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Globalization/Culture.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'DateTimeFormat'">
-    <Compile Include="src/System/Globalization/DateTimeFormat.rvn" />
-    <Compile Include="src/System/Globalization/InvariantDateTimeFormat.rvn" />
-    <Compile Include="src/System/Globalization/SwedishDateTimeFormat.rvn" />
-    <Compile Include="src/System/Globalization/HebrewDateTimeFormat.rvn" />
-    <Compile Include="src/System/Globalization/DateTimeFormatDigits.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Globalization/DateTimeFormat.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Globalization/InvariantDateTimeFormat.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Globalization/SwedishDateTimeFormat.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Globalization/HebrewDateTimeFormat.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Globalization/DateTimeFormatDigits.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Language'">
-    <Compile Include="src/System/Globalization/Language.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Globalization/Language.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'CultureProvider'">
-    <Compile Include="src/System/Globalization/CultureProvider.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Globalization/CultureProvider.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'FixedCultureProvider'">
-    <Compile Include="src/System/Globalization/FixedCultureProvider.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Globalization/FixedCultureProvider.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'SystemCultureProvider'">
-    <Compile Include="src/System/Globalization/SystemCultureProvider.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Globalization/SystemCultureProvider.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'TimeOffset'">
-    <Compile Include="src/System/Time/TimeOffset.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Time/TimeOffset.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'TimeZone'">
-    <Compile Include="src/System/Time/TimeZone.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Time/TimeZone.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'TimeZoneError'">
-    <Compile Include="src/System/Time/TimeZoneError.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Time/TimeZoneError.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'LocalTimeMapping'">
-    <Compile Include="src/System/Time/LocalTimeMapping.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Time/LocalTimeMapping.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'ZonedDateTime'">
-    <Compile Include="src/System/Time/ZonedDateTime.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Time/ZonedDateTime.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'DateTime'">
-    <Compile Include="src/System/Time/DateTime.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Time/DateTime.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Encoding'">
-    <Compile Include="src/System/Text/Encoding.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Text/Encoding.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Decoder'">
-    <Compile Include="src/System/Text/Decoder.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Text/Decoder.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'EncodingError'">
-    <Compile Include="src/System/Text/EncodingError.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Text/EncodingError.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Encodings'">
-    <Compile Include="src/System/Text/Encodings.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Text/Encodings.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Encoder'">
-    <Compile Include="src/System/Text/Encoder.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Text/Encoder.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'EncoderProgress'">
-    <Compile Include="src/System/Text/EncoderProgress.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Text/EncoderProgress.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'EncoderState'">
-    <Compile Include="src/System/Text/EncoderState.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Text/EncoderState.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Number'">
-    <Compile Include="src/System/Number.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/Number.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'NumberParseError'">
-    <Compile Include="src/System/NumberParseError.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/NumberParseError.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'BooleanParseError'">
-    <Compile Include="src/System/BooleanParseError.rvn" />
+    <Compile Include="../System.Runtime/src/System.Runtime/System/BooleanParseError.rvn" />
   </ItemGroup>
 </Project>

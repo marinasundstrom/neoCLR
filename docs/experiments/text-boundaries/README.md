@@ -11,7 +11,7 @@ The later public-encoder and encoding probes in this directory preserve their
 2026-09-27 array/offset/count contracts and matching bridge evidence. Since
 2026-10-19, the production incremental codecs take Slice/ReadOnlySlice and the
 legacy CLI scaffold no longer exposes those old members. Run the maintained
-`runtime/raven/tests/encoding*` suites with a matching native bundle for current
+`runtime/System.Runtime/test/EncodingTests*` suites with a matching native bundle for current
 codec and stream-adapter qualification. These historical probes are not current
 class-library examples; the independent application-only experiments remain
 separate from that API migration.
@@ -258,13 +258,13 @@ earlier application-only Encoder probe. No full suite or website build is needed
 
 Provider/decoder and encoder-progress checks from EncodingMain.rvn and
 PublicEncoderMain.rvn now have an attributed counterpart in the
-[encoding suite](../../../runtime/raven/tests/encoding/Tests.rvn). The new batch
+[encoding suite](../../../runtime/System.Runtime/test/EncodingTests/NeoClr/RuntimeTests/Tests.rvn). The new batch
 also exercises every byte split of a mixed-width UTF-8 string. Retain these
 historical programs: writer completion, quotas and reader integration have not
 all migrated. See the [API review](../../design/encoding-api-review.md).
 
-Follow-up [stream adapter](../../../runtime/raven/tests/encoding-streams/Tests.rvn)
-and [boundary](../../../runtime/raven/tests/encoding-boundaries/Tests.rvn) batches add
+Follow-up [stream adapter](../../../runtime/System.Runtime/test/EncodingStreamTests/NeoClr/RuntimeTests/Tests.rvn)
+and [boundary](../../../runtime/System.Runtime/test/EncodingBoundaryTests/NeoClr/RuntimeTests/Tests.rvn) batches add
 16 passing native/interpreted cases. These migrate custom finalization, short/failed
 transfers, reader line/EOF/custom-codec behavior and maximum writer/input quotas.
 Keep the historical probes for remaining cases and original comparison evidence.

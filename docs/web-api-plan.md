@@ -31,7 +31,7 @@ infrastructure and automatic discovery are not needed to prove these endpoints.
 The [HTTP matrix](http-capabilities.md#capability-matrix) records verbs, headers,
 status handling, buffered bodies, cancellation and server-context completion.
 Application routing and WebApplication do not yet exist. The
-[object mapper](../runtime/raven/src/System/Data/Json/ObjectMapper.rvn) handles
+[object mapper](../runtime/System.Data/src/System.Data/System/Data/Json/ObjectMapper.rvn) handles
 String, Int32 and Boolean properties on nongeneric reference classes, with public
 accessors and exact property names. Typed nesting is now implemented in development; see the
 [nested mapping evidence](experiments/json-object-mapping/nested-validation.json). The [JSON design](json-dom-design.md) records the existing mapping policies.

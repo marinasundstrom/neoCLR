@@ -1,7 +1,7 @@
 module Examples.DependencyInjection
 
 import System.*
-import System.DependencyInjection.*
+import Neo.DependencyInjection.*
 import System.Result.*
 
 public class GreetingSettings {

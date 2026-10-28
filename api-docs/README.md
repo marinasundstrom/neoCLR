@@ -2031,7 +2031,7 @@ The native audit now carries `website/site.json`'s `sourceRepository` into Raven
 including its root relative to the website configuration. Previously the themed
 native snapshot copied presentation settings but lost this setting, and replaced
 the normal reference's linked pages with unlinked ones. Source paths include both
-`runtime/raven/src` and `runtime/raven/providers`, covering PostgreSQL.
+`runtime/*/src/*` and `extensions/*/src/*`, covering PostgreSQL.
 
 The refreshed snapshot keeps the same native library artifact hashes. The publisher
 resolves configured declaration files and links type/member pages to those files;
@@ -2833,12 +2833,12 @@ are documented; no corresponding native type/member exclusion is intended.
 The [monetary guide](text-numbers.md#monetary-values-development) supplies contracts,
 strict parsing limitations and the distinction between identity and presentation.
 
-Development (2026-10-21): System.Localization interfaces, diagnostics, JSON provider
+Development (2026-10-21): Neo.Localization interfaces, diagnostics, JSON provider
 and error union are rendered from the native snapshot. The legacy CLI scaffold
 does not project these types; [the localization guide](localization.md) records
-contracts, assembly split, fallback and native host limits.
+contracts, current assembly ownership, fallback and native host limits.
 
-The development System.DependencyInjection reference is rendered from production
+The development Neo.DependencyInjection reference is rendered from production
 native metadata, with a linked [contract guide](dependency-injection.md). It is
 not added to the older CLI scaffold's selected type list: structural function
 factory signatures and native class-library types are represented by the matching
@@ -3027,3 +3027,11 @@ and enum constants. The type selection and matching reference snapshot are refre
 diagnostics, conservative constructor retention and unimplemented targets. Runtime
 JSON and DI annotations are source/API contracts; this is not complete .NET trimming
 analysis. No renderer exclusion is added.
+
+## Neo application-service assemblies (2026-10-28)
+
+DI and localization now render under Neo.DependencyInjection and Neo.Localization
+with their own declaring assemblies and src/Neo source links. The native audit
+includes both libraries in the same API tree. The older CLI scaffold still omits
+these APIs; no new exclusion is introduced. Imports, retention examples and
+consumer references must migrate together; see [the boundary](https://github.com/marinasundstrom/neoCLR/blob/main/docs/application-services.md).

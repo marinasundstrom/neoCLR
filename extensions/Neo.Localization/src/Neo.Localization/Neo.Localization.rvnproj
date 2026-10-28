@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../../../runtime/NativeLibrary.props" />
+  <PropertyGroup>
+    <AssemblyName>Neo.Localization</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Neo/**/*.rvn" />
+    <ProjectReference Include="../../../../runtime/System.Runtime/src/System.Runtime/System.Runtime.rvnproj" />
+    <ProjectReference Include="../../../../runtime/System.Data/src/System.Data/System.Data.rvnproj" />
+    <ProjectReference Include="../../../Neo.DependencyInjection/src/Neo.DependencyInjection/Neo.DependencyInjection.rvnproj" />
+  </ItemGroup>
+</Project>

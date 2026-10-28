@@ -23,10 +23,10 @@ def main():
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
     original = json.loads(args.ownership.read_text())
-    files = sorted((ROOT / 'runtime/raven/src/System').rglob('*.rvn'))
+    files = sorted((ROOT / 'runtime/System.Runtime/src/System.Runtime/System').rglob('*.rvn'))
     all_sources = [str(p.relative_to(ROOT)) for p in files]
     baseline = sorted({p for lib in original['libraries'] for p in lib['sources']})
-    operators = 'runtime/raven/src/System/ResultOperators.rvn'
+    operators = 'runtime/System.Runtime/src/System.Runtime/System/ResultOperators.rvn'
     known = set(baseline) | {operators}
     adapters = [s for s in baseline if '/native/' in s]
     cases = []
@@ -41,7 +41,7 @@ def main():
                            ('http', ('Networking', 'Web', 'Tasks', 'Concurrency'))]:
         extra = {s for s in all_sources if any('/System/' + folder + '/' in s for folder in folders)}
         if label == 'http':
-            extra.update('runtime/raven/src/System/' + n + '.rvn' for n in ('Uri', 'UriError'))
+            extra.update('runtime/System.Runtime/src/System.Runtime/System/' + n + '.rvn' for n in ('Uri', 'UriError'))
         cases.append(('cumulative-' + label, sorted(known | extra), False))
         cases.append(('imported-' + label, sorted(extra - known), True))
 
@@ -59,12 +59,12 @@ def main():
                             if set(lib['sources']).issubset(sources) for t in lib['types']})
             manifest['libraries'] = [dict(assemblyName='Numbers', sources=sources, types=types)]
             manifest['nativePrimitives'] = {k: 'Numbers' for k in manifest['nativePrimitives']}
-            if 'runtime/raven/src/System/Boolean.rvn' not in sources:
+            if 'runtime/System.Runtime/src/System.Runtime/System/Boolean.rvn' not in sources:
                 manifest['nativePrimitives'].pop('System.Boolean', None)
             manifest['typeOf'] = (dict(assemblyName='Numbers',
                 typeInfoTypeName='System.Introspection.TypeInfo',
                 contextTypeName='System.Runtime.RuntimeContext')
-                if 'runtime/raven/src/System/Runtime/RuntimeContext.rvn' in sources else None)
+                if 'runtime/System.Runtime/src/System.Runtime/System/Runtime/RuntimeContext.rvn' in sources else None)
         manifest_path = directory / 'ownership.json'
         manifest_path.write_text(json.dumps(manifest, indent=2) + '\n')
         artifact = directory / ('Additional.dll' if imported else 'Numbers.dll')

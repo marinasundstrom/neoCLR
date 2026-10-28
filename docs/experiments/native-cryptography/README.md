@@ -6,7 +6,7 @@ and AOT. It requires `--compile-system`, `--reference-arena` and a host exportin
 `neoclr_cryptography_slices_v1`. Ordinary managed method bodies are never replaced. Missing
 binding permission fails compilation; missing JIT host exports fail before execution.
 
-Production contracts are in `runtime/raven/native/RuntimeCryptographyCalls.rvn`;
+Production contracts are in `runtime/System.Runtime/src/System.Runtime/neoCLR/Runtime/RuntimeCryptographyCalls.rvn`;
 low-level regression declarations live in `tests/fixtures/cryptography.neoil`: SHA-256,
 HMAC-SHA-256, verification and secure random fill. The adapter does not collect,
 call guest code, retain buffers or run a separate scheduler. It passes byte payloads

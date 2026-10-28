@@ -192,7 +192,7 @@ publication remains a separate action.
 ## GitHub API source links
 
 The publisher at Raven revision `75cf59e24` supports site/per-API
-`sourceRepository` configuration. neoCLR indexes `runtime/raven/src` using Raven's
+`sourceRepository` configuration. neoCLR indexes the runtime and extension component source trees using Raven's
 parser and matches declarations to metadata types by namespace, nesting and
 generic arity. Type and member pages link the actual declaring files, preserving
 `NeoCLR.CoreProbe.dll` as assembly identity. Metadata links omit line numbers;

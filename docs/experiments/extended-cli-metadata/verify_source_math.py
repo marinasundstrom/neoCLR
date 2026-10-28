@@ -20,10 +20,10 @@ def main():
     common = ['dotnet', compiler, 'neoclr', '--core-reference', core, '--runtime-seed', seed,
               '--bootstrap-intrinsics', '--bootstrap-ownership', ownership, '--reference', library]
     sources = [ROOT / path for path in (
-        'runtime/raven/src/System/Math/Functions.rvn',
-        'runtime/raven/src/System/InvalidRangeError.rvn',
-        'runtime/raven/native/RuntimeMathCalls.rvn',
-        'runtime/raven/native/RuntimeMathServices.rvn')]
+        'runtime/System.Runtime/src/System.Runtime/System/Math/Functions.rvn',
+        'runtime/System.Runtime/src/System.Runtime/System/InvalidRangeError.rvn',
+        'runtime/System.Runtime/src/System.Runtime/neoCLR/Runtime/RuntimeMathCalls.rvn',
+        'runtime/System.Runtime/src/System.Runtime/native/RuntimeMathServices.rvn')]
     sample = Path(__file__).resolve().parent / 'bootstrap/math-consumer.rvn'
     math, app = output / 'Math.dll', output / 'MathConsumer.dll'
     commands = []

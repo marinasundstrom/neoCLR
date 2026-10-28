@@ -66,12 +66,12 @@ def main():
     core = artifacts / 'NativeCore.dll'
     library = artifacts / 'Input.dll'
     consumer = artifacts / 'Consumer.dll'
-    production_sources = [ROOT / 'runtime/raven/src/System' / name for name in (
+    production_sources = [ROOT / 'runtime/System.Runtime/src/System.Runtime/System' / name for name in (
         'Propagatable.rvn', 'Optional.rvn', 'Result.rvn', 'Runtime/CompilerServices/UnionAttribute.rvn')]
     union_library = artifacts / 'ProductionValues.dll'
-    attribute_source = ROOT / 'runtime/raven/src/System/Attribute.rvn'
+    attribute_source = ROOT / 'runtime/System.Runtime/src/System.Runtime/System/Attribute.rvn'
     contracts = artifacts / 'StringContracts.dll'
-    contract_sources = [ROOT / 'runtime/raven/src/System' / name for name in (
+    contract_sources = [ROOT / 'runtime/System.Runtime/src/System.Runtime/System' / name for name in (
         'EquatableTo.rvn', 'Disposable.rvn', 'Collections/Iterator.rvn',
         'Collections/Iterable.rvn', 'Collections/Collection.rvn', 'Collections/Sequence.rvn')]
     if args.string_contracts:
@@ -215,7 +215,7 @@ def main():
         rejected = artifacts / 'ProductionString.dll'
         diagnostic = run(['dotnet', args.driver.resolve(), 'neoclr', '--native-core-reference', core,
             '--reference', contracts, '--library', '-o', rejected,
-            ROOT / 'runtime/raven/src/System/String.rvn'], expected=1, include_stderr=True)
+            ROOT / 'runtime/System.Runtime/src/System.Runtime/System/String.rvn'], expected=1, include_stderr=True)
         if rejected.exists() or 'StringFromChars' not in diagnostic or "'RuntimeServices' is not in scope" in diagnostic:
             raise AssertionError('Expected unresolved vector services, with RuntimeServices resolved and no output')
         report['stringFrontier'] = {'complete': False, 'diagnostics': diagnostic,
@@ -226,7 +226,7 @@ def main():
     inputs += list((HERE / 'bin/Debug/net10.0').glob('*.dll'))
     inputs += [core, library, consumer, seed, artifacts / 'consumer', *production_sources, *adapters]
     if args.string_contracts:
-        inputs += [contracts, *contract_sources, ROOT / 'runtime/raven/src/System/String.rvn']
+        inputs += [contracts, *contract_sources, ROOT / 'runtime/System.Runtime/src/System.Runtime/System/String.rvn']
     if args.unions:
         inputs += [union_library, attribute_source]
     if args.driver:

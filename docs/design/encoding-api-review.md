@@ -31,11 +31,11 @@ ergonomic choices; neither follows necessarily from UTF-8 storage.
 
 ## Implemented behavior
 
-Source reviewed: [Encoding](../../runtime/raven/src/System/Text/Encoding.rvn),
-[Encoder](../../runtime/raven/src/System/Text/Encoder.rvn),
-[Decoder](../../runtime/raven/src/System/Text/Decoder.rvn),
-[providers](../../runtime/raven/src/System/Text/Encodings.rvn), and
-[StreamWriter](../../runtime/raven/src/System/IO/StreamWriter.rvn).
+Source reviewed: [Encoding](../../runtime/System.Runtime/src/System.Runtime/System/Text/Encoding.rvn),
+[Encoder](../../runtime/System.Runtime/src/System.Runtime/System/Text/Encoder.rvn),
+[Decoder](../../runtime/System.Runtime/src/System.Runtime/System/Text/Decoder.rvn),
+[providers](../../runtime/System.Runtime/src/System.Runtime/System/Text/Encodings.rvn), and
+[StreamWriter](../../runtime/System.Runtime/src/System.Runtime/System/IO/StreamWriter.rvn).
 
 | Area | Current contract | Consequence |
 | --- | --- | --- |
@@ -154,7 +154,7 @@ makes no throughput claim.
 
 ## First migration slice
 
-The new [encoding framework project](../../runtime/raven/tests/encoding/Tests.rvn)
+The new [encoding framework project](../../runtime/System.Runtime/test/EncodingTests/NeoClr/RuntimeTests/Tests.rvn)
 translates the provider/decoder and encoder-progress probes into eight discoverable
 tests. It covers all byte split positions of Aé€😀, strict malformed input,
 copied pending bytes, independent sessions, preserved BOM/NUL data, retryable
@@ -167,13 +167,13 @@ until their own attributed batch is qualified. Conversion symmetry and completio
 API proposals are unchanged.
 
 All eight cases pass native macOS ARM64 and interpreter execution
-([qualification](../../runtime/raven/tests/encoding-validation.json)); no library
+([qualification](../../runtime/System.Runtime/test/EncodingTests-validation.json)); no library
 implementation changes were needed. Windows qualification remains pending.
 
-The second [framework batch](../../runtime/raven/tests/encoding-streams/Tests.rvn)
+The second [framework batch](../../runtime/System.Runtime/test/EncodingStreamTests/NeoClr/RuntimeTests/Tests.rvn)
 adds eight passing native/interpreted cases for writer short transfers, whole-line
 preflight, final trailers, ownership, partial failures and selected readers
-([evidence](../../runtime/raven/tests/encoding-streams-validation.json)). These
+([evidence](../../runtime/System.Runtime/test/EncodingStreamTests-validation.json)). These
 pin current Flush/Close behavior for review; they do not endorse it as the final API.
 The author emphasized coverage of encoding, streams, StreamReader and StreamWriter.
 Unicode reader boundaries, custom decoded output and maximum quotas remain next.
@@ -193,7 +193,7 @@ Track the layers separately so codec tests do not stand in for adapter behavior:
 The new boundary batch targets Unicode line endings and EOF, one-byte input,
 custom decoded expansion, zero-progress output, input-error propagation and
 maximum writer/input quotas. All eight pass native macOS ARM64 and interpreted execution
-([qualification](../../runtime/raven/tests/encoding-boundaries-validation.json)). Existing unaffected MemoryStream/JSON
+([qualification](../../runtime/System.Runtime/test/EncodingBoundaryTests-validation.json)). Existing unaffected MemoryStream/JSON
 evidence is reused; no blanket platform parity or complete encoding matrix is claimed.
 
 ## Why Utf8 is public — author question, 2026-10-10

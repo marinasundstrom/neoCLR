@@ -65,7 +65,7 @@ non-Gregorian parsing, timezone rules and bidirectional layout remain unsupporte
 
 ## Localization is independent
 
-`System.Localization` provides string lookup independently of cultural formatting.
+`Neo.Localization` provides string lookup independently of cultural formatting.
 See [localization](/features/localization/) for JSON resources, typed scopes,
 per-key fallback and optional missing-key diagnostics.
 

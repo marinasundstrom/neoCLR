@@ -39,9 +39,9 @@ def main():
     for group in groups:
         if group == 'Web' and any(case['exitCode'] != 0 for case in report['cases']):
             raise RuntimeError('Data and Networking must compile before the Web audit')
-        sources = sorted((ROOT / 'runtime/raven/src/System' / group).rglob('*.rvn'))
+        sources = sorted((ROOT / ('runtime/System.' + group + '/src/System.' + group + '/System') / group).rglob('*.rvn'))
         if group == 'Networking':
-            sources += [ROOT / 'runtime/raven/native' / (name + '.rvn')
+            sources += [ROOT / 'runtime/System.Networking/src/System.Networking/native' / (name + '.rvn')
                         for name in ('RuntimeNetworkCalls',)]
         inputs += sources
         artifact = output / ('System.' + group + '.dll')

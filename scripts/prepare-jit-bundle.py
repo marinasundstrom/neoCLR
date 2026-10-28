@@ -193,6 +193,8 @@ try:
     shutil.copy2(helper, bundle / 'bin' / helper_name)
     original_metadata = {key: value for key, value in manifest.items() if key != 'files'}
     manifest = {key: manifest[key] for key in ('format', 'objectRoot', 'runtimeSeed', 'modules', 'samples') if key in manifest}
+    if a.libraries:
+        manifest['modules'] = ['lib/' + name + '.dll' for name in catalog['assemblyNames']]
     manifest['baseManifestProvenance'] = original_metadata
     manifest['developmentComposition'] = 'Installed default JIT; binaries and compiler/library inputs identified by file hashes'
     manifest['platform'] = platform.platform()

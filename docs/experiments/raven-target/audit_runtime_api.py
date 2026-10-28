@@ -82,13 +82,13 @@ for file in source['sourceFiles']:
         continue
     if file == 'runtime/System/Collections/ArrayList.neoil':
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-class-bootstrap',
-                     'replacementFiles': ['runtime/raven/ArrayList.neoil', 'runtime/raven/src/System/Collections/ArrayList.rvn'],
+                     'replacementFiles': ['runtime/raven/ArrayList.neoil', 'runtime/System.Runtime/src/System.Runtime/System/Collections/ArrayList.rvn'],
                      'samples': ['library-list-filters.rvn', 'library-delegates.rvn', 'library-maps.rvn'],
                      'note': 'The complete class and private iterator are Raven-authored. Direct checked array storage replaces the legacy state wrapper; searches preserve captured buffer/extent and Option outcomes. Historical Neo profile unchanged.'})
         continue
     if file in ('runtime/System/Time.neoil', 'runtime/System/Date.neoil'):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-value-bootstrap',
-                     'replacementFiles': ['runtime/raven/' + Path(file).name, 'runtime/raven/src/System/' + Path(file).stem + '.rvn'],
+                     'replacementFiles': ['runtime/raven/' + Path(file).name, 'runtime/System.Runtime/src/System.Runtime/System/' + Path(file).stem + '.rvn'],
                      'samples': ['library-calendar.rvn', 'library-clock.rvn'],
                      'tests': ['tests/raven_calendar.rs'],
                      'note': 'Existing factories, calendar/tick boundaries, comparison and readonly access preserved. Historical Neo profile unchanged.'})
@@ -173,7 +173,7 @@ for file in source['sourceFiles']:
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-math-bootstrap',
                      'samples': ['library-math.rvn', 'library-clamp.rvn'],
                      'tests': ['docs/experiments/raven-target/verify_math_library.py', 'tests/math_helpers.rs', 'tests/math_typed.rs'],
-                     'note': 'All twenty Math functions are Raven-authored; Double operations retain native services behind checked bootstrap-only bindings. Source authority is runtime/raven/src/System/Math/Functions.rvn.'})
+                     'note': 'All twenty Math functions are Raven-authored; Double operations retain native services behind checked bootstrap-only bindings. Source authority is runtime/System.Runtime/src/System.Runtime/System/Math/Functions.rvn.'})
         continue
     slice_name = Path(file).name.split('.')[0]
     if file.startswith('runtime/raven/generated/') and slice_name in SOURCES:
@@ -192,13 +192,13 @@ for file in source['sourceFiles']:
 result = {'purpose': 'Explicit source-by-source API audit. Samples and signature checks are evidence, not a claim of arbitrary generic/compiler support.',
           'declarationCount': sum(r['declarations'] for r in rows), 'sources': rows}
 result['targetProfileAdditions'] = [{
-    'file': 'runtime/raven/src/System/Concurrency/Workers.rvn',
+    'file': 'runtime/System.Runtime/src/System.Runtime/System/Concurrency/Workers.rvn',
     'disposition': 'provisional-isolated-workers',
     'samples': ['library-workers.rvn'],
     'tests': ['tests/workers.rs', 'docs/experiments/task-contract/verify_workers.py'],
     'note': 'Dedicated and pooled OS workers exchange text and return caller-owned Tasks. Queue pumping may block for results; no shared guest state. See docs/isolated-workers.md.'
 }, {
-    'file': 'runtime/raven/src/System/Concurrency/Tasks/Tasks.rvn',
+    'file': 'runtime/System.Runtime/src/System.Runtime/System/Concurrency/Tasks/Tasks.rvn',
     'disposition': 'provisional-raven-task-completion',
     'samples': ['library-tasks.rvn', 'library-async.rvn'],
     'tests': ['tests/tasks.rs', 'docs/experiments/task-contract/verify_tasks.py', 'docs/experiments/task-contract/verify_async.py'],
@@ -210,7 +210,7 @@ result['targetProfileAdditions'] = [{
     'tests': ['docs/experiments/raven-target/verify_interface_library.py', 'tests/instant_clock.rs'],
     'note': 'Checked nongeneric interface declaration with unchanged Now property. SystemClock remains runtime-backed; Info interface identity migration is separate.'
 }, {
-    'file': 'runtime/raven/src/System/Introspection/Descriptors.rvn',
+    'file': 'runtime/System.Runtime/src/System.Runtime/System/Introspection/Descriptors.rvn',
     'disposition': 'raven-authored-type-info',
     'samples': ['library-reflection.rvn', 'library-flags.rvn'],
     'tests': ['docs/experiments/raven-target/verify_type_library.py', 'docs/experiments/raven-target/verify_introspection_namespace.py'],
@@ -253,7 +253,7 @@ result['targetProfileAdditions'] += [{
     'samples': ['library-query-terminals.rvn'],
     'tests': ['tests/query_terminals.rs', 'docs/experiments/raven-target/verify_queries.py'],
     'note': 'Operators, SingleError case/formatting bodies and private deferred iterator classes are authored in Raven with generated bootstrap bodies; First/Last return Option and Single returns Result with Empty/Multiple. Checked storage retains generic cached elements. Normal-outcome cleanup only. See docs/raven-query-api.md.'
-} for file in ('runtime/raven/Linq.neoil', 'runtime/raven/SingleError.neoil', 'runtime/raven/src/System/Linq/Operators.rvn',
+} for file in ('runtime/raven/Linq.neoil', 'runtime/raven/SingleError.neoil', 'runtime/System.Runtime/src/System.Runtime/System/Linq/Operators.rvn',
                  'runtime/raven/generated/Linq.methods.neoil', 'runtime/raven/generated/Linq.helpers.neoil')]
 result['targetProfileAdditions'] += [{
     'file': 'runtime/raven/' + name + '.neoil',

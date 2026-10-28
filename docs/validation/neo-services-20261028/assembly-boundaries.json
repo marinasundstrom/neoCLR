@@ -1,0 +1,65 @@
+{
+  "passed": true,
+  "assemblies": [
+    {
+      "assembly": "System.Runtime",
+      "sha256": "f4e75dae178757e528d72210faab566dfaec3d5d91508f324bd26c3505623981",
+      "ownedTypes": 494,
+      "serviceTypes": []
+    },
+    {
+      "assembly": "System.Data",
+      "sha256": "8488b74456eb99f58afbc40818fcb355d60a4f710c1de58efc5d417f67dd5633",
+      "ownedTypes": 63,
+      "serviceTypes": []
+    },
+    {
+      "assembly": "Neo.DependencyInjection",
+      "sha256": "e4f8fe8e052fb646827f5fdf6e897eb0f2cfd1a26dce17b3270de1819ec42f71",
+      "ownedTypes": 48,
+      "serviceTypes": [
+        "Neo.DependencyInjection.ActivationError",
+        "Neo.DependencyInjection.ConstructorPlan",
+        "Neo.DependencyInjection.ServiceLifetime",
+        "Neo.DependencyInjection.ServiceError",
+        "Neo.DependencyInjection.ServiceSource",
+        "Neo.DependencyInjection.ServiceDescriptor",
+        "Neo.DependencyInjection.ServiceEntry",
+        "Neo.DependencyInjection.DefaultServiceCollection",
+        "Neo.DependencyInjection.ServiceSlot",
+        "Neo.DependencyInjection.ClosedServiceSlot",
+        "Neo.DependencyInjection.DefaultServiceProvider",
+        "Neo.DependencyInjection.ServiceProviderExtensions",
+        "Neo.DependencyInjection.ServiceResults`1",
+        "Neo.DependencyInjection.ServiceResultsIterator`1",
+        "Neo.DependencyInjection.ServiceCollectionExtensions",
+        "Neo.DependencyInjection.ServiceProvider",
+        "Neo.DependencyInjection.ServiceCollection"
+      ]
+    },
+    {
+      "assembly": "Neo.Localization",
+      "sha256": "52c98fb0b89fd4ed668dfe86a4b5aa06fdef16bce37ce21795b8772fc2ceb5c4",
+      "ownedTypes": 26,
+      "serviceTypes": [
+        "Neo.Localization.LocalizationError",
+        "Neo.Localization.DefaultLocalizer`1",
+        "Neo.Localization.JsonLocalizerFactory",
+        "Neo.Localization.LocalizerFactoryEntry",
+        "Neo.Localization.LazyJsonLocalizer",
+        "Neo.Localization.LocalizationServices",
+        "Neo.Localization.CatalogueLocalizer",
+        "Neo.Localization.JsonLocalizerProvider",
+        "Neo.Localization.FallbackLocalizer",
+        "Neo.Localization.TypedLocalizer`1",
+        "Neo.Localization.CultureLocalizer",
+        "Neo.Localization.LocalizerFormatting",
+        "Neo.Localization.ReportingLocalizer",
+        "Neo.Localization.LocalizerDiagnostics",
+        "Neo.Localization.LocalizerFactory",
+        "Neo.Localization.Localizer",
+        "Neo.Localization.Localizer`1"
+      ]
+    }
+  ]
+}

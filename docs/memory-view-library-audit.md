@@ -209,7 +209,7 @@ The .NET comparison remains persistent Memory for potentially retained operation
 and temporary borrowing under controlled heap access. Native JIT/AOT file-service
 execution, asynchronous OS completion and public stream/socket signatures are not
 qualified by this interpreter work. See the
-[consumer](../runtime/raven/tests/file-memory/README.md) and
+[consumer](../runtime/System.Runtime/test/FileMemoryTests/README.md) and
 [evidence](validation/memory-views-20261019/file-integration-validation.json).
 
 Validation passes five host-adapter tests, twelve legacy file-service tests and
@@ -239,7 +239,7 @@ Memory while immediate native access borrows under runtime control. No public
 AsSlice adapter or array compatibility overload is added. Interpreter snapshots
 remain a copying cost; native access makes no performance claim. Legacy four-argument
 internal bindings remain bootstrap/test-only. See the
-[consumer](../runtime/raven/tests/console-memory/README.md) and
+[consumer](../runtime/System.Runtime/test/ConsoleMemoryTests/README.md) and
 [evidence](validation/memory-views-20261019/console-integration-validation.json).
 
 ## Socket memory contracts (2026-10-19)
@@ -267,7 +267,7 @@ Removing compatibility-only array forms makes buffer contracts consistent at a s
 compatibility cost. Copying remains part of send semantics; no speedup or zero-copy
 claim is made. No public Native API or asynchronous raw-pointer lifetime is introduced.
 
-The [three-mode consumer](../runtime/raven/tests/socket-memory/README.md) exercises
+The [three-mode consumer](../runtime/System.Networking/test/SocketMemoryTests/README.md) exercises
 owner-only retention, selected windows, snapshots, GC, empty operations, cancellation
 and EOF. [Evidence](validation/memory-views-20261019/socket-integration-validation.json)
 also records interpreter contracts, exact native binding rejection and the native
@@ -290,7 +290,7 @@ public compatibility adapters or extra data copies and makes no performance clai
 Public InputStream/OutputStream and higher HTTP upload contracts still await their
 coordinated migration; existing range-error and cancellation precedence is preserved.
 
-The [public consumer](../runtime/raven/tests/http-memory/README.md) covers fixed and
+The [public consumer](../runtime/System.Web/test/HttpMemoryTests/README.md) covers fixed and
 chunked request bodies, streaming client responses, selected output windows, GC,
 cancellation and EOF in interpreter/JIT/AOT. See the
 [evidence](validation/memory-views-20261019/http-integration-validation.json).

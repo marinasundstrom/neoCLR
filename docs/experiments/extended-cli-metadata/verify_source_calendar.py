@@ -21,13 +21,13 @@ def main():
     common = ['dotnet', compiler, 'neoclr', '--core-reference', core, '--runtime-seed', seed,
               '--bootstrap-intrinsics', '--bootstrap-ownership', ownership, '--reference', library]
     sources = [ROOT / path for path in (
-        'runtime/raven/src/System/Time/TimeZone.rvn',
-        'runtime/raven/src/System/Time/TimeZoneError.rvn',
-        'runtime/raven/src/System/Time/ZonedDateTime.rvn',
-        'runtime/raven/src/System/Time/LocalTimeMapping.rvn',
-        'runtime/raven/src/System/Time/DateTime.rvn',
-        'runtime/raven/native/RuntimeTimeZoneCalls.rvn',
-        'runtime/raven/native/RuntimeTimeZoneServices.rvn')]
+        'runtime/System.Runtime/src/System.Runtime/System/Time/TimeZone.rvn',
+        'runtime/System.Runtime/src/System.Runtime/System/Time/TimeZoneError.rvn',
+        'runtime/System.Runtime/src/System.Runtime/System/Time/ZonedDateTime.rvn',
+        'runtime/System.Runtime/src/System.Runtime/System/Time/LocalTimeMapping.rvn',
+        'runtime/System.Runtime/src/System.Runtime/System/Time/DateTime.rvn',
+        'runtime/System.Runtime/src/System.Runtime/neoCLR/Runtime/RuntimeTimeZoneCalls.rvn',
+        'runtime/System.Runtime/src/System.Runtime/native/RuntimeTimeZoneServices.rvn')]
     sample = Path(__file__).resolve().parent / 'bootstrap/calendar-consumer.rvn'
     calendar, app = output / 'Calendar.dll', output / 'CalendarConsumer.dll'
     commands = []

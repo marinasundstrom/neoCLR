@@ -14,7 +14,7 @@ output.mkdir(parents=True, exist_ok=False)
 spec = importlib.util.spec_from_file_location('discovery', root / 'scripts/discover-runtime-tests.py')
 discovery = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(discovery)
-project = root / 'runtime/raven/tests/decimal/StorageTests.rvnproj'
+project = root / 'runtime/System.Runtime/test/DecimalStorageTests/DecimalStorageTests.rvnproj'
 registry = discovery.discover(project, bundle, output / 'discovery')
 environment = dict(os.environ, NeoClrBundleRoot=str(bundle), NeoClrTestRegistry=str(registry))
 compiled = subprocess.run(['dotnet', str(bundle / 'sdk/tools/rvnc/rvnc.dll'), 'neoclr', '--project', str(project)], env=environment, capture_output=True, text=True, check=True)

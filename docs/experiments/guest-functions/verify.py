@@ -18,7 +18,7 @@ parser.add_argument('--jit-compiler', type=Path, help='Explicit development JIT 
 args = parser.parse_args()
 bundle, compiler, runner, output = (getattr(args, name).resolve() for name in ('bundle', 'compiler', 'runner', 'output'))
 output.mkdir(parents=True, exist_ok=False)
-inputs = [Path(__file__), HERE / 'Main.rvn', HERE / 'GuestFunctions.rvnproj', ROOT / 'runtime/raven/tests/framework/TestAttribute.rvn']
+inputs = [Path(__file__), HERE / 'Main.rvn', HERE / 'GuestFunctions.rvnproj', ROOT / 'tools/testing/NeoCLR.Testing/NeoClr/Testing/TestAttribute.rvn']
 sha = lambda path: hashlib.sha256(path.read_bytes()).hexdigest()
 report = dict(passed=False, execution=args.execution, platform=platform.platform(), commands=[],
               inputs={str(p.relative_to(ROOT)): sha(p) for p in inputs},

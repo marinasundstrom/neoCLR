@@ -21,15 +21,15 @@ def main():
     args = parser.parse_args()
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
-    ownership_source = ROOT / 'runtime/raven/native/poc-ownership.json'
+    ownership_source = ROOT / 'runtime/System.Runtime/src/System.Runtime/native/poc-ownership.json'
     ownership = output / 'ownership.json'
     ownership.write_bytes(ownership_source.read_bytes())
     manifest = json.loads(ownership.read_text())
     numbers = [ROOT / p for p in manifest['libraries'][0]['sources']]
-    http = sorted((ROOT / 'runtime/raven/src/System/Networking').rglob('*.rvn'))
-    http += sorted((ROOT / 'runtime/raven/src/System/Web').rglob('*.rvn'))
-    http += [ROOT / 'runtime/raven/src/System' / n for n in ('Uri.rvn', 'UriError.rvn')]
-    http += [ROOT / 'runtime/raven/native' / n for n in ('RuntimeNetworkCalls.rvn',)]
+    http = sorted((ROOT / 'runtime/System.Networking/src/System.Networking/System/Networking').rglob('*.rvn'))
+    http += sorted((ROOT / 'runtime/System.Web/src/System.Web/System/Web').rglob('*.rvn'))
+    http += [ROOT / 'runtime/System.Runtime/src/System.Runtime/System' / n for n in ('Uri.rvn', 'UriError.rvn')]
+    http += [ROOT / 'runtime/System.Networking/src/System.Networking/neoCLR/Runtime' / n for n in ('RuntimeNetworkCalls.rvn',)]
     inputs = [args.compiler.resolve(), args.core.resolve(), args.seed.resolve(), ownership_source, Path(__file__)]
     inputs += [args.compiler.resolve().parent / n for n in ('Raven.CodeAnalysis.dll', 'Raven.CodeAnalysis.NeoClr.dll', 'NeoCLR.Metadata.Experimental.dll')]
     sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()

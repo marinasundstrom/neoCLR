@@ -1,0 +1,84 @@
+{
+  "passed": true,
+  "date": "2026-10-28",
+  "compilerRevision": "91c1edca8",
+  "sourceRevision": "b9ff92ad7d3fa50209c10a2f11a4ccffe6796f05",
+  "sourceState": "Working-tree refactor; exact source and tool hashes retained in library-build.json.gz",
+  "assemblies": [
+    "System.Runtime",
+    "System.Data",
+    "System.Networking",
+    "System.Web",
+    "Neo.DependencyInjection",
+    "Neo.Localization",
+    "System.Data.PostgreSql"
+  ],
+  "libraryHashes": {
+    "System.Runtime.dll": "f4e75dae178757e528d72210faab566dfaec3d5d91508f324bd26c3505623981",
+    "System.Data.dll": "8488b74456eb99f58afbc40818fcb355d60a4f710c1de58efc5d417f67dd5633",
+    "System.Networking.dll": "a54a879bb0b81ff7008da72da4cad64e0b4492ed90d7758dd211f3a03d802c9e",
+    "System.Web.dll": "3af28a5c1245d38bb1eeaa96514733ab6e1c0995141944d7178341bb9da88dd7",
+    "Neo.DependencyInjection.dll": "e4f8fe8e052fb646827f5fdf6e897eb0f2cfd1a26dce17b3270de1819ec42f71",
+    "Neo.Localization.dll": "52c98fb0b89fd4ed668dfe86a4b5aa06fdef16bce37ce21795b8772fc2ceb5c4",
+    "System.Data.PostgreSql.dll": "eb8d27dcd02c8c849c93a8a5152df43d4824873dfdf1692bbd3141f8f5e4deb8",
+    "System.runtime.neox": "0c72a8656e7158d6bb2f31c0b019d8747dd61a6c4127b278155e104de437769b"
+  },
+  "serviceExecutions": [
+    {
+      "suite": "dependency-injection",
+      "mode": "interpreter",
+      "exitCode": 0
+    },
+    {
+      "suite": "dependency-injection",
+      "mode": "native",
+      "exitCode": 0
+    },
+    {
+      "suite": "localization",
+      "mode": "interpreter",
+      "exitCode": 0
+    },
+    {
+      "suite": "localization",
+      "mode": "native",
+      "exitCode": 0
+    }
+  ],
+  "componentExecutions": [
+    {
+      "suite": "collection-construction",
+      "mode": "interpreter",
+      "exitCode": 0
+    },
+    {
+      "suite": "json-dom",
+      "mode": "interpreter",
+      "exitCode": 0
+    },
+    {
+      "suite": "http-method-values",
+      "mode": "interpreter",
+      "exitCode": 0
+    },
+    {
+      "suite": "ip-address-values",
+      "mode": "interpreter",
+      "exitCode": 0
+    }
+  ],
+  "checks": {
+    "projectLayout": 3,
+    "nativeSnapshot": 4,
+    "websiteUnit": 26,
+    "interfaceNames": 2,
+    "websitePages": 6185,
+    "pythonSyntaxFiles": 97
+  },
+  "evidence": {
+    "assembly-boundaries.json": "614016bd764eff236390448c0a6c64d2569526ff59eab3d984e72c29c8e990a0",
+    "component-tests.json.gz": "c8b6b0fb015ddb5039b532f39f5f671fd375e66e56a3fd61f1c2ac51a2215c58",
+    "library-build.json.gz": "cad3b1a91cf0f4de5b6500c2920e1583d7cec85c16a94959da9d4b0524bd715b",
+    "service-tests.json.gz": "46b9dfc975bb3b1b12727b36e664235d800507f41b5bb34a4df5ae395d2f560a"
+  }
+}

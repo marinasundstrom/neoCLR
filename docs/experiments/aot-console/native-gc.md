@@ -770,7 +770,7 @@ file/network/TLS/SQL conflated distinct layers. Reviewed current implementations
   Calls do not collect or invoke managed code while borrowing array bytes.
 - `cryptography.c` synchronously fills caller-provided arrays and retains no borrowed
   pointers. It has no managed allocation needing retry.
-- `runtime/raven/providers/System.Data.PostgreSql` implements the wire protocol in
+- `runtime/System.Data.PostgreSql/src/System.Data.PostgreSql/System/Data/PostgreSql` implements the wire protocol in
   managed Raven over sockets and encoding. There is no native SQL result allocator.
 
 This is a source-level ownership audit of unchanged socket/TLS/crypto/SQL behavior,

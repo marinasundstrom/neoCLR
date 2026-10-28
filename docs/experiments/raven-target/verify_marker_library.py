@@ -26,8 +26,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-flags-library-') as temporary:
     (root / 'demo').mkdir()
     core = root / 'demo/NeoCLR.CoreProbe.dll'
     run(['dotnet', args.bridge.resolve(), '--reference-library-core', core])
-    object_source = (ROOT / 'runtime/raven/src/System/Object.rvn').read_text()
-    marker_source = (ROOT / 'runtime/raven/src/System/Runtime/CompilerServices/UnionAttribute.rvn').read_text()
+    object_source = (ROOT / 'runtime/System.Runtime/src/System.Runtime/System/Object.rvn').read_text()
+    marker_source = (ROOT / 'runtime/System.Runtime/src/System.Runtime/System/Runtime/CompilerServices/UnionAttribute.rvn').read_text()
     bad = 'Unsupported empty marker declaration'
     cases = [
         ('Object', 'System.Object', object_source, None),

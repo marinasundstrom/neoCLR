@@ -30,7 +30,7 @@ def main():
     common = ['dotnet', args.compiler.resolve(), 'neoclr', '--core-reference', args.core.resolve(),
               '--runtime-seed', args.seed.resolve(), '--bootstrap-intrinsics', '--bootstrap-ownership', args.ownership.resolve(),
               '--reference', args.base_library.resolve()]
-    provider = ROOT / 'runtime/raven/src/System/Introspection/BindingFlags.rvn'
+    provider = ROOT / 'runtime/System.Runtime/src/System.Runtime/System/Introspection/BindingFlags.rvn'
     consumer = HERE / 'flags-consumer.rvn'
     library = output / 'Flags.dll'
     app = output / 'Consumer.dll'

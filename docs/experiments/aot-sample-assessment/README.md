@@ -418,7 +418,7 @@ Recommended next bounded work:
    without filesystem handles, and are a smaller AOT slice than file I/O. Keep the
    Raven sample unchanged and use its interpreter output plus edge-case controls.
 2. **Raven Math target resolution.** `System.Math.Sign` is present in
-   `runtime/raven/src/System/Math/Functions.rvn`; the emitted diagnostic does not prove
+   `runtime/System.Runtime/src/System.Runtime/System/Math/Functions.rvn`; the emitted diagnostic does not prove
    a missing runtime API. Trace target namespace/function lookup versus the host
    System.Math class and compare with ordinary .NET compilation/main before choosing
    a compiler fix. Avoid renaming the API or hand-patching this sample to hide lookup.

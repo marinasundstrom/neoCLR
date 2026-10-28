@@ -26,7 +26,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-fault-library-') as temporary:
     (root / 'demo').mkdir()
     core = root / 'demo/NeoCLR.CoreProbe.dll'
     run(['dotnet', args.bridge.resolve(), '--reference-library-core', core])
-    source = (ROOT / 'runtime/raven/src/System/Functions.rvn').read_text()
+    source = (ROOT / 'runtime/System.Runtime/src/System.Runtime/System/Functions.rvn').read_text()
     cases = [
         ('Fail', source, None),
         ('OldName', source.replace('func Fail(', 'func Fault('), 'export does not match'),

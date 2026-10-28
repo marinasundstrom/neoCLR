@@ -37,5 +37,5 @@ the same separation already used for String, not a promise of Object dispatch in
 the archived profile.
 
 Development test migration (2026-10-10): Path equality, hashing, display and colliding map behavior now also run as 5
-attributed framework tests in `runtime/raven/tests/path-values`. The framework README
+attributed framework tests in `runtime/System.Runtime/test/PathValuesTests`. The framework README
 links native/interpreted evidence. This original consumer retains its integration purpose.

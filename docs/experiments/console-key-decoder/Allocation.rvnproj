@@ -9,6 +9,6 @@
   <ItemGroup>
     <Compile Include="Allocation.rvn" />
     <!-- Internal kernel qualification without a production friend assembly. -->
-    <Compile Include="../../../runtime/raven/src/System/Console/TerminalKeyDecoder.rvn" Link="TerminalKeyDecoder.rvn" />
+    <Compile Include="../../../runtime/System.Runtime/src/System.Runtime/System/Console/TerminalKeyDecoder.rvn" Link="TerminalKeyDecoder.rvn" />
   </ItemGroup>
 </Project>

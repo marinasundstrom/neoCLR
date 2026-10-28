@@ -29,7 +29,7 @@ def main():
             raise RuntimeError(json.dumps(commands[-1], indent=2))
 
     names = ('Decoder', 'Encoder', 'EncoderProgress', 'EncoderState', 'Encoding', 'EncodingError', 'Encodings')
-    sources = [ROOT / 'runtime/raven/src/System/Text' / (name + '.rvn') for name in names]
+    sources = [ROOT / 'runtime/System.Runtime/src/System.Runtime/System/Text' / (name + '.rvn') for name in names]
     manifest = json.loads(args.ownership.read_text())
     manifest['libraries'].append(dict(assemblyName='Encoding', sources=[str(p.relative_to(ROOT)) for p in sources],
         types=['System.Text.' + name for name in (*names, 'Utf8Encoding', 'AsciiEncoding', 'Utf8Decoder', 'AsciiDecoder', 'TextEncoder')]))

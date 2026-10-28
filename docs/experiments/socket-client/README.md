@@ -13,7 +13,7 @@ checks exact output, peer-observed close, send snapshots and compile-time reject
 of private constructor/completion types. All network access is loopback with
 watchdogs. The earlier 256-object-heap/zero-retained-object measurements used the
 historical CLI runner; the current verifier does not claim those measurements.
-Pending memory ownership is qualified separately by runtime/raven/tests/socket-memory.
+Pending memory ownership is qualified separately by runtime/System.Networking/test/SocketMemoryTests.
 
 Run `python3 docs/experiments/socket-client/verify.py --bundle /path/to/current/bundle`.
 The current source uses Memory/ReadOnlyMemory socket signatures and requires a

@@ -32,11 +32,11 @@ def main():
     common = ['dotnet', args.compiler.resolve(), 'neoclr', '--core-reference', args.core.resolve(),
               '--runtime-seed', args.seed.resolve(), '--bootstrap-intrinsics',
               '--bootstrap-ownership', output / 'ownership.json']
-    sources = [ROOT / 'runtime/raven/src/System/IO' / (name + '.rvn')
+    sources = [ROOT / 'runtime/System.Runtime/src/System.Runtime/System/IO' / (name + '.rvn')
                for name in ('InputStream', 'OutputStream', 'SeekableStream', 'StreamError', 'MemoryStream')]
     if args.services:
-        sources += [ROOT / 'runtime/raven/src/System/IO' / (name + '.rvn') for name in ('FileInputStream', 'FileOutputStream')]
-        sources += [ROOT / 'runtime/raven/src/System/Text' / (name + '.rvn') for name in ('Utf8', 'InvalidUtf8Error')]
+        sources += [ROOT / 'runtime/System.Runtime/src/System.Runtime/System/IO' / (name + '.rvn') for name in ('FileInputStream', 'FileOutputStream')]
+        sources += [ROOT / 'runtime/System.Runtime/src/System.Runtime/System/Text' / (name + '.rvn') for name in ('Utf8', 'InvalidUtf8Error')]
     manifest = json.loads(args.ownership.read_text())
     declaration = manifest['libraries'][0]
     declaration['sources'] += [str(p.relative_to(ROOT)) for p in sources]

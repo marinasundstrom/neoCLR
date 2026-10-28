@@ -16,7 +16,7 @@ python3 scripts/test-runtime-library.py --bundle /absolute/path/to/bundle \
 cargo test --lib native_byte_copy
 ```
 
-The harness builds `runtime/raven/tests/native-buffers/fixture.c`, emits an absolute
+The harness builds `runtime/System.Runtime/test/NativeBufferTests/fixture.c`, emits an absolute
 NativeImport declaration, discovers the tests through the framework, and records
 fixture/runtime/library hashes. Unix is the currently admitted harness profile.
 Use CC and SDKROOT to select a matching compiler/SDK when the host defaults disagree;

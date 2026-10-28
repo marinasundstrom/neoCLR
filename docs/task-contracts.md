@@ -117,7 +117,7 @@ corresponding contracts.
 
 ## Implementation and validation
 
-[Tasks.rvn](../runtime/raven/src/System/Tasks/Tasks.rvn) is the source of
+[Tasks.rvn](../runtime/System.Runtime/src/System.Runtime/System/Tasks/Tasks.rvn) is the source of
 truth. The producer and consumer compile together so internal access stays inside
 the library. ArrayList<T> supplies an occupied result slot; the queue and registrations
 also use ArrayList. This intentionally favors existing verified storage over a new

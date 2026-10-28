@@ -81,7 +81,7 @@ Dispose calls remain where the fixture tests early close and idempotency.
 
 The author asks whether foreign calls should replace runtime implementations,
 identifying PostgreSQL as a possible candidate if it uses native code. Source review
-finds the current provider in `runtime/raven/providers/System.Data.PostgreSql`:
+finds the current provider in `runtime/System.Data.PostgreSql/src/System.Data.PostgreSql/System/Data/PostgreSql`:
 `PostgresConnection` implements protocol framing and SQL behavior in Raven and
 awaits shared Socket operations. It declares no extern/InternalCall methods and
 has no libpq dependency. There is no database-specific runtime service to extract.

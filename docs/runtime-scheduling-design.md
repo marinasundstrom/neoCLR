@@ -719,7 +719,7 @@ is neither a fairness nor a performance improvement.
 
 The inspected dependencies define the next migration, rather than a cosmetic rename:
 
-- `runtime/raven/src/System/Tasks/Tasks.rvn` captures `TaskQueue.Current` in Promise,
+- `runtime/System.Runtime/src/System.Runtime/System/Tasks/Tasks.rvn` captures `TaskQueue.Current` in Promise,
   exposes explicit queue construction, posts completion callbacks to that producer
   queue and forwards Task.Dispatcher to the producer. Move resumption registration
   toward the awaiting execution's runtime-owned destination, separately from outcome
@@ -1444,7 +1444,7 @@ integration gates. Cross-thread publication and native/JIT qualification remain 
 ### Awaiters remain the language-facing contract
 
 The author asked how neoCLR handles .NET's task awaiter concept. Today
-`runtime/raven/src/System/Tasks/Tasks.rvn` makes Task<T> its own awaiter:
+`runtime/System.Runtime/src/System.Runtime/System/Tasks/Tasks.rvn` makes Task<T> its own awaiter:
 GetAwaiter returns self, IsCompleted observes completion, GetResult reads the
 producer's result, and OnCompleted registers a callback. The provisional
 System.Runtime.CompilerServices.TaskAwaiter interface contains only OnCompleted;

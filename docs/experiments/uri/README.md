@@ -43,6 +43,6 @@ publication is claimed.
 
 Development migration (2026-10-10): eleven attributed framework tests now cover the
 46 resolution pairs, 14 invalid inputs, value dispatch and byte quotas in
-`runtime/raven/tests/uri-resolution`. Native macOS ARM64 and interpreted execution
+`runtime/System.Runtime/test/UriResolutionTests`. Native macOS ARM64 and interpreted execution
 pass; Windows object emission passes but execution remains pending. The original
 probe retains its forced-GC and independent .NET-comparison purpose.

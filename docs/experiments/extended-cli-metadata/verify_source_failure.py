@@ -18,8 +18,8 @@ def main():
         getattr(args, name).resolve() for name in
         ('compiler', 'probe', 'library', 'ownership', 'seed', 'runtime', 'output'))
     output.mkdir(parents=True, exist_ok=False)
-    sources = [ROOT / path for path in ('runtime/raven/src/System/Functions.rvn',
-        'runtime/raven/native/RuntimeFailure.rvn', 'runtime/raven/native/RuntimeFailureCalls.rvn')]
+    sources = [ROOT / path for path in ('runtime/System.Runtime/src/System.Runtime/System/Functions.rvn',
+        'runtime/System.Runtime/src/System.Runtime/System/Runtime/CompilerServices/RuntimeFailure.rvn', 'runtime/System.Runtime/src/System.Runtime/neoCLR/Runtime/RuntimeFailureCalls.rvn')]
     manifest = json.loads(ownership.read_text())
     manifest['libraries'].append(dict(assemblyName='Failure',
         sources=[str(path.relative_to(ROOT)) for path in sources],

@@ -1,7 +1,7 @@
 # Internal Raven terminal key decoder — 2026-10-20
 
 This is a tested internal kernel, **not** a public Console.ReadKey implementation.
-The production source is `runtime/raven/src/System/Console/TerminalKeyDecoder.rvn`.
+The production source is `runtime/System.Runtime/src/System.Runtime/System/Console/TerminalKeyDecoder.rvn`.
 The consumer compiles that same source privately, avoiding a friend-assembly grant.
 The complete source class library also builds with matching Raven `100f98a2f`.
 

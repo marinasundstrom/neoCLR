@@ -88,7 +88,7 @@ try:
     paths=[Path(__file__),base/'Benchmark.rvn',base/'Benchmark.rvnproj',base.parent/'Model.rvn',assembly,assembly.with_suffix('.reflection.json'),runner,
            bundle/'tools/run-native-sample.py',
            root/'target/gc-patterns-standard-build/compute/live-command.json']
-    paths+=list((root/'runtime/raven/src/System/Web').rglob('*.rvn'))
+    paths+=list((root/'runtime/System.Web/src/System.Web/System/Web').rglob('*.rvn'))
     paths+=[out/'sync',out/'live']
     paths+=list(out.glob('*.o'))+list(out.glob('*.dylib'))+list(out.glob('*selection.json'))
     paths += [collector,provider,root/'runtime/native/gc/native-gc.c',root/'runtime/native/memory/text-arena.c']

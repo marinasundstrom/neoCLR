@@ -10,7 +10,7 @@ this review does not silently replace previously recorded choices.
 
 ## Current API and implementation
 
-[Source](../../runtime/raven/src/System/String.rvn) and
+[Source](../../runtime/System.Runtime/src/System.Runtime/System/String.rvn) and
 [runtime services](../../src/native.rs) establish the following inventory.
 
 | Area | Implemented | Gap or cost |

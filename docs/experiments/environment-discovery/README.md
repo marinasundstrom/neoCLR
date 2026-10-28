@@ -118,15 +118,15 @@ that the prototype runs on those systems.
 ## Native integration follow-up (2026-10-23)
 
 The prototype files and validation.json above preserve the initial .NET experiment.
-The integrated API now lives in [Platform.rvn](../../../runtime/raven/src/System/Environment/Platform.rvn)
-and [Functions.rvn](../../../runtime/raven/src/System/Environment/Functions.rvn).
+The integrated API now lives in [Platform.rvn](../../../runtime/System.Runtime/src/System.Runtime/System/Environment/Platform.rvn)
+and [Functions.rvn](../../../runtime/System.Runtime/src/System.Runtime/System/Environment/Functions.rvn).
 Cases are nested (`OperatingSystem.Linux`, `Architecture.Arm64`); GetOperatingSystem
 returns Result. Native Android API-level binding exists but has not been qualified
 on Android. Earlier statements about pending integration/compiler changes describe
 the prototype stage, not the current development implementation.
 
 The authoritative [contract](../../environment.md) and built-in framework suite
-in `runtime/raven/tests/environment-discovery` supersede the prototype for native
+in `runtime/System.Runtime/test/EnvironmentDiscoveryTests` supersede the prototype for native
 behavior. Raven main a271da192 and codex/neoclr bf2acea78 fix the isolated abstract
 override/empty record issues; native nested-case support is a subsequent branch
 extension. Explicit permits naming nested cases still diagnoses before their base

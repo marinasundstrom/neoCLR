@@ -35,7 +35,7 @@ def main():
     source_library['assemblyName'] = 'Numbers'
     numeric = ('SByte', 'Byte', 'Int16', 'UInt16', 'Int32', 'UInt32', 'Int64', 'UInt64', 'Single', 'Double')
     additions = numeric + ('Number', 'NumberParseError', 'IntegerDivisionError')
-    source_library['sources'] += ['runtime/raven/src/System/' + name + '.rvn' for name in additions]
+    source_library['sources'] += ['runtime/System.Runtime/src/System.Runtime/System/' + name + '.rvn' for name in additions]
     source_library['types'] += ['System.' + name for name in additions]
     sources = source_library['sources']
     ownership['nativePrimitives'] = {'System.' + name: 'Numbers' for name in numeric}

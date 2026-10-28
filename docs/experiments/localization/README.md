@@ -33,9 +33,11 @@ UTF-8, whitespace and string escape validation is reused; the internal string
 reader accepts a caller-supplied byte limit while general JSON retains its existing
 1024-byte default. The resource limit is 65536 bytes/4096 entries per file.
 
-Localizer and typed Localizer<T> live in System.Runtime. JSON provider and error
-union live in System.Data under the same System.Localization namespace to avoid
-a Runtime-to-Data dependency. No public implementation map or mutable DOM escapes.
+Development migration (2026-10-28): Localizer, typed Localizer<T>, the JSON provider
+and error union now live together in Neo.Localization, with a reference to Data
+and DI. See the [assembly boundary](../../application-services.md), including the
+internal parser exception. Earlier evidence below retains the original split.
+No public implementation map or mutable DOM escapes.
 
 FileInputStream's native/JIT binding is not implemented yet. File loading instead
 uses the existing, correctly synchronous FileText.ReadAllText contract. Stream

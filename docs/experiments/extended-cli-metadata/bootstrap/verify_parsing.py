@@ -30,7 +30,7 @@ def main():
     common = ['dotnet', args.compiler.resolve(), 'neoclr', '--core-reference', args.core.resolve(),
               '--runtime-seed', args.seed.resolve(), '--bootstrap-intrinsics',
               '--bootstrap-ownership', args.ownership.resolve(), '--reference', args.base_library.resolve()]
-    sources = [ROOT / 'runtime/raven/src/System/Boolean.rvn', ROOT / 'runtime/raven/src/System/BooleanParseError.rvn']
+    sources = [ROOT / 'runtime/System.Runtime/src/System.Runtime/System/Boolean.rvn', ROOT / 'runtime/System.Runtime/src/System.Runtime/System/BooleanParseError.rvn']
     library = output / 'BooleanLibrary.dll'
     run(common + ['--library', '-o', library] + sources)
     app = output / 'Consumer.dll'

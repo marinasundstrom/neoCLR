@@ -220,7 +220,7 @@ def main():
             # broader native collection gate does not imply full .NET library parity.
             dotnet_output = output / 'dotnet-duration'
             dotnet_output.mkdir()
-            duration_sources = [ROOT / ('runtime/raven/src/System/' + name + '.rvn')
+            duration_sources = [ROOT / ('runtime/System.Runtime/src/System.Runtime/System/' + name + '.rvn')
                                 for name in ['ComparableTo', 'EquatableTo', 'Duration']]
             duration_library = dotnet_output / 'NeoCLR.Duration.dll'
             duration_app = dotnet_output / 'Consumer.dll'

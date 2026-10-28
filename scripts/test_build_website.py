@@ -363,12 +363,12 @@ class NativePreviewPublication(unittest.TestCase):
             shared.parent.mkdir(parents=True)
             panel = '<nav class="api-navigation-panel" aria-label="API modules and types">'
             canonical = (panel + '<ul><li><details class="api-namespace">'
-                         '<summary title="System.Localization"><span>System.Localization</span></summary>'
-                         '<ul><li><a href="System/Localization/index.html">Module overview</a></li>'
+                         '<summary title="Neo.Localization"><span>Neo.Localization</span></summary>'
+                         '<ul><li><a href="Neo/Localization/index.html">Module overview</a></li>'
                          '</ul></details></li></ul></nav>')
             shared.write_text(canonical)
             pages = ['docs/index.html', 'docs/functions.html',
-                     'docs/api/System/Localization/index.html', 'docs/api/legacy.html']
+                     'docs/api/Neo/Localization/index.html', 'docs/api/legacy.html']
             for name in pages:
                 page = site / name
                 page.parent.mkdir(parents=True, exist_ok=True)
@@ -379,7 +379,7 @@ class NativePreviewPublication(unittest.TestCase):
                 page = site / name
                 content = page.read_text()
                 self.assertNotIn('Old menu', content)
-                self.assertIn('System.Localization', content)
+                self.assertIn('Neo.Localization', content)
                 self.assertIn('<main>Preserved API content</main>', content)
                 source = content.split('data-navigation-src="', 1)[1].split('"', 1)[0]
                 path, version = source.split('?v=')
@@ -387,12 +387,12 @@ class NativePreviewPublication(unittest.TestCase):
                 versions.add(version)
             self.assertEqual(len(versions), 1)
             self.assertEqual(shared.read_text(), canonical)
-            shared.write_text(canonical.replace('System.Localization', 'System.DependencyInjection'))
+            shared.write_text(canonical.replace('Neo.Localization', 'Neo.DependencyInjection'))
             build.share_api_navigation(site)
             refreshed = (site / pages[0]).read_text()
             self.assertNotIn(next(iter(versions)), refreshed)
-            self.assertIn('System.DependencyInjection', refreshed)
-            self.assertNotIn('System.Localization', refreshed)
+            self.assertIn('Neo.DependencyInjection', refreshed)
+            self.assertNotIn('Neo.Localization', refreshed)
 
 
     def test_snapshot_banner_uses_current_release_without_rewriting_content(self):

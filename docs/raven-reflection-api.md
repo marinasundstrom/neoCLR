@@ -112,7 +112,7 @@ identity and context equivalence still need implementation and tests.
 ### TypeInfo Raven port
 
 TypeInfo's existing base/interface, enum and member queries are now authored in
-`runtime/raven/src/System/Introspection/Descriptors.rvn`. The same runtime metadata
+`runtime/System.Runtime/src/System.Runtime/System/Introspection/Descriptors.rvn`. The same runtime metadata
 services produce the snapshots. Bootstrap-only adapters copy their results into
 managed arrays and retain the existing filtering behavior (default flags 28).
 Flag overloads now name their parameter `flags` instead of `arg0`; positional calls
@@ -130,7 +130,7 @@ runtime reflection suites, bootstrap freshness and website checks.
 
 ### ParameterInfo Raven port
 
-`runtime/raven/src/System/Introspection/ParameterInfo.rvn` now implements all six
+`runtime/System.Runtime/src/System.Runtime/System/Introspection/ParameterInfo.rvn` now implements all six
 ParameterInfo readers in the Raven profile. Runtime factories still supply the
 snapshot data. The importer validates the exact six-field order, types and core
 Type identity before admitting the implementation; added or reordered storage is
@@ -167,7 +167,7 @@ of the old descriptor namespace), plus regenerated bootstrap and coverage checks
 
 ## Type source and metadata boundary (2026-09-15)
 
-`runtime/raven/src/System/Type.rvn` now owns the Raven target's Type implementation.
+`runtime/System.Runtime/src/System.Runtime/System/Type.rvn` now owns the Raven target's Type implementation.
 Type exposes identity, names, category/shape flags, element type and closed generic
 arguments. `type.Info` returns `System.Introspection.TypeInfo`, which retains the same
 opaque RuntimeTypeHandle and exposes member enumeration, base/interface discovery

@@ -1,5 +1,12 @@
 # Raven runtime-library tests
 
+**Layout migration (2026-10-28):** Active suite projects now live under
+`<runtime|extensions>/<component>/test/<project>`, with Raven sources in namespace
+folders. The [suite catalog](../../../scripts/runtime-test-projects.json) preserves
+existing `--suite` names. Shared source lives in
+[NeoCLR.Testing](../../../tools/testing/NeoCLR.Testing). This directory retains
+historical validation receipts; their recorded source paths are not current inputs.
+
 Development tooling, written in Raven and executed by neoCLR. Tests are ordinary
 module-level functions; a class is not required to group them. The host tooling compiles, discovers metadata, builds adapters, launches suites
 and verifies their output. Assertions,
@@ -306,7 +313,7 @@ final success message. New library behavior belongs here by default.
 
 The first port takes `CheckMaps` and `CheckMapConstruction` from
 [the standalone collection consumer](../../../docs/experiments/native-collections/Main.rvn)
-into [five map tests](collections/MapMaterialization.rvn): pair snapshots and
+into [five map tests](../../System.Runtime/test/RuntimeLibraryTests/NeoClr/RuntimeTests/MapMaterialization.rvn): pair snapshots and
 iteration/deconstruction, independent copy construction, ToMap queries/selectors,
 collisions/empty input, and reference values/comparer behavior. The old executable
 remains a broader integration smoke test pending cross-platform equivalence; it
@@ -318,7 +325,7 @@ cases pass natively on macOS ARM64 and in the interpreter, and `--filter Map`
 selects exactly the five ported tests. Windows execution is pending its action.
 
 The next port splits queue/stack entry checks and `CheckSnapshots` into six tests in
-[QueueStack.rvn](collections/QueueStack.rvn): wrapped queue growth, stack growth,
+[QueueStack.rvn](../../System.Runtime/test/RuntimeLibraryTests/NeoClr/RuntimeTests/QueueStack.rvn): wrapped queue growth, stack growth,
 reference identity and clear/reuse for each, and FIFO/LIFO captured iterators. Small
 explicit capacities force growth; assertions do not require a particular growth
 factor. Captured iterators use `use` with explicit advances, preserving the original

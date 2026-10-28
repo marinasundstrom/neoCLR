@@ -27,7 +27,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-foundation-library-') as tempora
     core = root / 'demo/NeoCLR.CoreProbe.dll'
     run(['dotnet', args.bridge.resolve(), '--reference-library-core', core])
     names = ['Text.Utf8SliceError', 'NumberParseError', 'IntegerDivisionError', 'Linq.SingleError', 'Storage.FileReadError', 'Storage.FileWriteError', 'ConsoleReadError']
-    sources = {name: (ROOT / ('runtime/raven/src/System/' + name.replace('.', '/') + '.rvn')).read_text() for name in names}
+    sources = {name: (ROOT / ('runtime/System.Runtime/src/System.Runtime/System/' + name.replace('.', '/') + '.rvn')).read_text() for name in names}
     sample = sources['Text.Utf8SliceError']
     cases = [(name.replace('.', ''), name, sources[name], None) for name in names]
     cases += [

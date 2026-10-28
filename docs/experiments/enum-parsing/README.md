@@ -42,7 +42,7 @@ reference declarations exist only for documentation fixtures, not as runtime bod
 
 ## Validation
 
-`runtime/raven/tests/enum-parsing` uses the built-in TestAttribute discovery,
+`runtime/System.Runtime/test/EnumParsingTests` uses the built-in TestAttribute discovery,
 assertions and runner. Four tests cover names/aliases/case, imported enums, lists,
 Int32 endpoints/overflow, unnamed values, empty enums, malformed/null input, output
 reset and ordinary display after collection. Run with `scripts/test-runtime-library.py

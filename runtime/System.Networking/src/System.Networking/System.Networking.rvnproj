@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../../NativeLibrary.props" />
+  <PropertyGroup>
+    <AssemblyName>System.Networking</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="System/**/*.rvn" />
+    <Compile Include="neoCLR/**/*.rvn" />
+    <ProjectReference Include="../../../System.Runtime/src/System.Runtime/System.Runtime.rvnproj" />
+  </ItemGroup>
+</Project>

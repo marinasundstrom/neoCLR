@@ -84,6 +84,8 @@ def main():
     if compiler_directory is not None:
         shutil.rmtree(bundle / 'sdk/tools/rvnc')
         shutil.copytree(compiler_directory, bundle / 'sdk/tools/rvnc')
+    catalog = json.loads((bundle / 'lib/bundle.json').read_text())
+    manifest['modules'] = ['lib/' + name + '.dll' for name in catalog['assemblyNames']]
     manifest['files'] = {p.relative_to(bundle).as_posix(): sha(p) for p in sorted(bundle.rglob('*')) if p.is_file()}
     manifest['developmentLibraries'] = dict(sourceRevision=report['sourceRevision'], originalManifestSha256=report['originalManifestSha256'])
     (bundle / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')

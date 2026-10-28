@@ -11,44 +11,44 @@
     <PackageReference Include="Mono.Cecil" Version="0.11.6" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="../../../runtime/raven/src/System/Networking/Security/SslError.rvn" LogicalName="NeoCLR.SslError.rvn" />
-    <EmbeddedResource Include="../../../runtime/raven/src/System/Security/Cryptography/CryptographyError.rvn" LogicalName="NeoCLR.CryptographyError.rvn" />
-    <EmbeddedResource Include="../../../runtime/raven/src/System/Concurrency/Tasks/TaskOutcome.rvn" LogicalName="NeoCLR.TaskOutcome.rvn" />
-    <EmbeddedResource Include="../../../runtime/raven/src/System/Optional.rvn" LogicalName="NeoCLR.Optional.rvn" />
-    <EmbeddedResource Include="../../../runtime/raven/src/System/Result.rvn" LogicalName="NeoCLR.Result.rvn" />
-    <EmbeddedResource Include="../../../runtime/raven/src/System/Web/Http/HttpError.rvn" LogicalName="NeoCLR.HttpError.rvn" />
-    <EmbeddedResource Include="../../../runtime/raven/src/System/Networking/Sockets/SocketError.rvn" LogicalName="NeoCLR.SocketError.rvn" />
-    <EmbeddedResource Include="../../../runtime/raven/src/System/Networking/DnsError.rvn" LogicalName="NeoCLR.DnsError.rvn" />
-    <EmbeddedResource Include="../../../runtime/raven/src/System/UriError.rvn" LogicalName="NeoCLR.UriError.rvn" />
-    <EmbeddedResource Include="../../../runtime/raven/src/System/Storage/StorageLookupError.rvn" LogicalName="NeoCLR.StorageLookupError.rvn" />
-    <EmbeddedResource Include="../../../runtime/raven/src/System/Text/EncoderState.rvn" LogicalName="NeoCLR.EncoderState.rvn" />
-    <EmbeddedResource Include="../../../runtime/raven/src/System/Text/EncodingError.rvn" LogicalName="NeoCLR.EncodingError.rvn" />
-    <EmbeddedResource Include="../../../runtime/raven/src/System/IO/TextReadError.rvn" LogicalName="NeoCLR.TextReadError.rvn" />
-    <EmbeddedResource Include="../../../runtime/raven/src/System/IO/StreamError.rvn" LogicalName="NeoCLR.StreamError.rvn" />
-    <EmbeddedResource Include="../../../runtime/raven/src/System/Storage/FileReadError.rvn" LogicalName="NeoCLR.FileReadError.rvn" />
-    <EmbeddedResource Include="../../../runtime/raven/src/System/Storage/FileWriteError.rvn" LogicalName="NeoCLR.FileWriteError.rvn" />
-    <EmbeddedResource Include="../../../runtime/raven/src/System/ConsoleReadError.rvn" LogicalName="NeoCLR.ConsoleReadError.rvn" />
-    <EmbeddedResource Include="../../../runtime/raven/src/System/Console/ConsoleKeyError.rvn" LogicalName="NeoCLR.ConsoleKeyError.rvn" />
-    <EmbeddedResource Include="../../../runtime/raven/src/System/Text/Utf8SliceError.rvn" LogicalName="NeoCLR.Utf8SliceError.rvn" />
-    <EmbeddedResource Include="../../../runtime/raven/src/System/Linq/SingleError.rvn" LogicalName="NeoCLR.SingleError.rvn" />
-    <EmbeddedResource Include="../../../runtime/raven/src/System/IntegerDivisionError.rvn" LogicalName="NeoCLR.IntegerDivisionError.rvn" />
+    <EmbeddedResource Include="../../../runtime/System.Networking/src/System.Networking/System/Networking/Security/SslError.rvn" LogicalName="NeoCLR.SslError.rvn" />
+    <EmbeddedResource Include="../../../runtime/System.Runtime/src/System.Runtime/System/Security/Cryptography/CryptographyError.rvn" LogicalName="NeoCLR.CryptographyError.rvn" />
+    <EmbeddedResource Include="../../../runtime/System.Runtime/src/System.Runtime/System/Concurrency/Tasks/TaskOutcome.rvn" LogicalName="NeoCLR.TaskOutcome.rvn" />
+    <EmbeddedResource Include="../../../runtime/System.Runtime/src/System.Runtime/System/Optional.rvn" LogicalName="NeoCLR.Optional.rvn" />
+    <EmbeddedResource Include="../../../runtime/System.Runtime/src/System.Runtime/System/Result.rvn" LogicalName="NeoCLR.Result.rvn" />
+    <EmbeddedResource Include="../../../runtime/System.Web/src/System.Web/System/Web/Http/HttpError.rvn" LogicalName="NeoCLR.HttpError.rvn" />
+    <EmbeddedResource Include="../../../runtime/System.Networking/src/System.Networking/System/Networking/Sockets/SocketError.rvn" LogicalName="NeoCLR.SocketError.rvn" />
+    <EmbeddedResource Include="../../../runtime/System.Networking/src/System.Networking/System/Networking/DnsError.rvn" LogicalName="NeoCLR.DnsError.rvn" />
+    <EmbeddedResource Include="../../../runtime/System.Runtime/src/System.Runtime/System/UriError.rvn" LogicalName="NeoCLR.UriError.rvn" />
+    <EmbeddedResource Include="../../../runtime/System.Runtime/src/System.Runtime/System/Storage/StorageLookupError.rvn" LogicalName="NeoCLR.StorageLookupError.rvn" />
+    <EmbeddedResource Include="../../../runtime/System.Runtime/src/System.Runtime/System/Text/EncoderState.rvn" LogicalName="NeoCLR.EncoderState.rvn" />
+    <EmbeddedResource Include="../../../runtime/System.Runtime/src/System.Runtime/System/Text/EncodingError.rvn" LogicalName="NeoCLR.EncodingError.rvn" />
+    <EmbeddedResource Include="../../../runtime/System.Runtime/src/System.Runtime/System/IO/TextReadError.rvn" LogicalName="NeoCLR.TextReadError.rvn" />
+    <EmbeddedResource Include="../../../runtime/System.Runtime/src/System.Runtime/System/IO/StreamError.rvn" LogicalName="NeoCLR.StreamError.rvn" />
+    <EmbeddedResource Include="../../../runtime/System.Runtime/src/System.Runtime/System/Storage/FileReadError.rvn" LogicalName="NeoCLR.FileReadError.rvn" />
+    <EmbeddedResource Include="../../../runtime/System.Runtime/src/System.Runtime/System/Storage/FileWriteError.rvn" LogicalName="NeoCLR.FileWriteError.rvn" />
+    <EmbeddedResource Include="../../../runtime/System.Runtime/src/System.Runtime/System/ConsoleReadError.rvn" LogicalName="NeoCLR.ConsoleReadError.rvn" />
+    <EmbeddedResource Include="../../../runtime/System.Runtime/src/System.Runtime/System/Console/ConsoleKeyError.rvn" LogicalName="NeoCLR.ConsoleKeyError.rvn" />
+    <EmbeddedResource Include="../../../runtime/System.Runtime/src/System.Runtime/System/Text/Utf8SliceError.rvn" LogicalName="NeoCLR.Utf8SliceError.rvn" />
+    <EmbeddedResource Include="../../../runtime/System.Runtime/src/System.Runtime/System/Linq/SingleError.rvn" LogicalName="NeoCLR.SingleError.rvn" />
+    <EmbeddedResource Include="../../../runtime/System.Runtime/src/System.Runtime/System/IntegerDivisionError.rvn" LogicalName="NeoCLR.IntegerDivisionError.rvn" />
     <None Update="samples/*.rvn" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
-  <ItemGroup><EmbeddedResource Include="../../../runtime/raven/src/System/NumberParseError.rvn" LogicalName="NeoCLR.NumberParseError.rvn" /></ItemGroup>
-  <ItemGroup><EmbeddedResource Include="../../../runtime/raven/src/System/Time/DateTimeParseError.rvn" LogicalName="NeoCLR.DateTimeParseError.rvn" /></ItemGroup>
-  <ItemGroup><EmbeddedResource Include="../../../runtime/raven/src/System/BooleanParseError.rvn" LogicalName="NeoCLR.BooleanParseError.rvn" /></ItemGroup>
+  <ItemGroup><EmbeddedResource Include="../../../runtime/System.Runtime/src/System.Runtime/System/NumberParseError.rvn" LogicalName="NeoCLR.NumberParseError.rvn" /></ItemGroup>
+  <ItemGroup><EmbeddedResource Include="../../../runtime/System.Runtime/src/System.Runtime/System/Time/DateTimeParseError.rvn" LogicalName="NeoCLR.DateTimeParseError.rvn" /></ItemGroup>
+  <ItemGroup><EmbeddedResource Include="../../../runtime/System.Runtime/src/System.Runtime/System/BooleanParseError.rvn" LogicalName="NeoCLR.BooleanParseError.rvn" /></ItemGroup>
   <Target Name="RequireRaven" BeforeTargets="Restore;PrepareForBuild" Condition="'$(RavenRoot)' == ''">
     <Error Text="Pass -p:RavenRoot=/absolute/path/to/Raven at the documented revision." />
   </Target>
-<ItemGroup><EmbeddedResource Include="../../../runtime/raven/src/System/Networking/IPAddressError.rvn" LogicalName="NeoCLR.IPAddressError.rvn" /></ItemGroup>
-<ItemGroup><EmbeddedResource Include="../../../runtime/raven/src/System/Data/Json/JsonError.rvn" LogicalName="NeoCLR.JsonError.rvn" /></ItemGroup>
-<ItemGroup><EmbeddedResource Include="../../../runtime/raven/src/System/Runtime/Reflection/ReflectionError.rvn" LogicalName="NeoCLR.ReflectionError.rvn" /></ItemGroup>
-<ItemGroup><EmbeddedResource Include="../../../runtime/raven/src/System/Web/Http/Json/HttpJsonError.rvn" LogicalName="NeoCLR.HttpJsonError.rvn" /></ItemGroup>
-<ItemGroup><EmbeddedResource Include="../../../runtime/raven/src/System/Time/TimeZoneError.rvn" LogicalName="NeoCLR.TimeZoneError.rvn" /></ItemGroup>
-<ItemGroup><EmbeddedResource Include="../../../runtime/raven/src/System/Time/LocalTimeMapping.rvn" LogicalName="NeoCLR.LocalTimeMapping.rvn" /></ItemGroup>
-<ItemGroup><EmbeddedResource Include="../../../runtime/raven/src/System/Time/DateTime.rvn" LogicalName="NeoCLR.DateTime.rvn" /></ItemGroup>
+<ItemGroup><EmbeddedResource Include="../../../runtime/System.Networking/src/System.Networking/System/Networking/IPAddressError.rvn" LogicalName="NeoCLR.IPAddressError.rvn" /></ItemGroup>
+<ItemGroup><EmbeddedResource Include="../../../runtime/System.Data/src/System.Data/System/Data/Json/JsonError.rvn" LogicalName="NeoCLR.JsonError.rvn" /></ItemGroup>
+<ItemGroup><EmbeddedResource Include="../../../runtime/System.Runtime/src/System.Runtime/System/Runtime/Reflection/ReflectionError.rvn" LogicalName="NeoCLR.ReflectionError.rvn" /></ItemGroup>
+<ItemGroup><EmbeddedResource Include="../../../runtime/System.Web/src/System.Web/System/Web/Http/Json/HttpJsonError.rvn" LogicalName="NeoCLR.HttpJsonError.rvn" /></ItemGroup>
+<ItemGroup><EmbeddedResource Include="../../../runtime/System.Runtime/src/System.Runtime/System/Time/TimeZoneError.rvn" LogicalName="NeoCLR.TimeZoneError.rvn" /></ItemGroup>
+<ItemGroup><EmbeddedResource Include="../../../runtime/System.Runtime/src/System.Runtime/System/Time/LocalTimeMapping.rvn" LogicalName="NeoCLR.LocalTimeMapping.rvn" /></ItemGroup>
+<ItemGroup><EmbeddedResource Include="../../../runtime/System.Runtime/src/System.Runtime/System/Time/DateTime.rvn" LogicalName="NeoCLR.DateTime.rvn" /></ItemGroup>
 <ItemGroup>
-    <EmbeddedResource Include="../../../runtime/raven/src/System/Data/Sql/SqlError.rvn" LogicalName="NeoCLR.SqlError.rvn" />
-    <EmbeddedResource Include="../../../runtime/raven/src/System/Data/Sql/SqlValue.rvn" LogicalName="NeoCLR.SqlValue.rvn" />
+    <EmbeddedResource Include="../../../runtime/System.Data/src/System.Data/System/Data/Sql/SqlError.rvn" LogicalName="NeoCLR.SqlError.rvn" />
+    <EmbeddedResource Include="../../../runtime/System.Data/src/System.Data/System/Data/Sql/SqlValue.rvn" LogicalName="NeoCLR.SqlValue.rvn" />
   </ItemGroup>
 </Project>

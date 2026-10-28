@@ -76,13 +76,13 @@ earlier results above describe their original, smaller fixtures.
 ## Raven framework migration — 2026-10-10
 
 The in-memory DOM assertions in `DomContracts` now also run as focused attributed
-module functions in [the JSON DOM suite](../../../runtime/raven/tests/json-dom/JsonDom.rvn),
+module functions in [the JSON DOM suite](../../../runtime/System.Data/test/JsonDomTests/NeoClr/RuntimeTests/JsonDom.rvn),
 alongside document round trips from the native JSON consumer. The framework reports
 individual assertion failures and runs the same source in native and interpreted
 modes. Stream failures, ownership, memory stream behavior and quota boundaries remain
 in this consumer; this migration does not replace its broader integration coverage.
 
-The subsequent [JSON stream batch](../../../runtime/raven/tests/json-streams/JsonStreams.rvn)
+The subsequent [JSON stream batch](../../../runtime/System.Data/test/JsonStreamTests/NeoClr/RuntimeTests/JsonStreams.rvn)
 ports partial UTF-8 I/O, memory round trips, borrowed ownership, nested error causes,
 zero-progress output, preflight cycles and quota checks. The original consumer still
 covers the acknowledgement sample and independent MemoryStream contracts; corpus
@@ -90,5 +90,5 @@ validation also remains separate. Native/interpreted evidence is linked from the
 framework README.
 
 Development test migration (2026-10-10): MemoryStream seek, range, quota, overwrite and closed-state behavior now also run as 5
-attributed framework tests in `runtime/raven/tests/memory-stream`. The framework README
+attributed framework tests in `runtime/System.Runtime/test/MemoryStreamTests`. The framework README
 links native/interpreted evidence. This original consumer retains its integration purpose.

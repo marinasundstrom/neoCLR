@@ -46,7 +46,7 @@ def validate(bundle, output, selected=None):
                 ET.SubElement(properties, key).text = value
             items = ET.SubElement(project, 'ItemGroup')
             for file in ['Assertions.rvn', 'TestSuite.rvn', 'TestAttribute.rvn']:
-                ET.SubElement(items, 'Compile', Include=str(ROOT / 'runtime/raven/tests/framework' / file))
+                ET.SubElement(items, 'Compile', Include=str(ROOT / 'tools/testing/NeoCLR.Testing/NeoClr/Testing' / file))
             ET.SubElement(items, 'Compile', Include=str(source.resolve()))
             ET.SubElement(items, 'Compile', Include='$(NeoClrTestRegistry)')
             project_path = case / 'Tests.rvnproj'

@@ -27,7 +27,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-parameter-info-') as temporary:
     core = root / 'demo/NeoCLR.CoreProbe.dll'
     run(['dotnet', args.bridge.resolve(), '--reference-library-core', core])
     for contract in ('AssemblyInfo', 'ModuleInfo'):
-        source = (ROOT / f'runtime/raven/src/System/Introspection/{contract}.rvn').read_text()
+        source = (ROOT / f'runtime/System.Runtime/src/System.Runtime/System/Introspection/{contract}.rvn').read_text()
         for name, text, diagnostic in [
             ('Valid', source, None),
             ('Extra', source.replace('private field StoredIdentity:', 'private field Extra: int = 0\n    private field StoredIdentity:'), 'Assembly/module descriptor storage'),

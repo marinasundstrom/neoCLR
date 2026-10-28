@@ -29,7 +29,7 @@ def main():
             raise RuntimeError(json.dumps(commands[-1], indent=2))
 
     ownership = json.loads(args.ownership.read_text())
-    sources = ['runtime/raven/src/System/' + name + '.rvn' for name in ('Single', 'Double', 'NumberParseError')]
+    sources = ['runtime/System.Runtime/src/System.Runtime/System/' + name + '.rvn' for name in ('Single', 'Double', 'NumberParseError')]
     ownership['libraries'].append(dict(assemblyName='FloatingNumbers', sources=sources,
                                       types=['System.Single', 'System.Double', 'System.NumberParseError']))
     ownership['nativePrimitives'] = {'System.Single': 'FloatingNumbers', 'System.Double': 'FloatingNumbers'}

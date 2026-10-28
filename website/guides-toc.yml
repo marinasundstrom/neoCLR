@@ -132,6 +132,8 @@
       href: docs/json-error-payloads.md
     - name: "Runtime reflection"
       href: docs/reflection.md
+    - name: "Dynamic member requirements"
+      href: docs/dynamic-access.md
     - name: "Route matching and parameters"
       href: docs/routes.md
     - name: "Experimental runtime hosting"

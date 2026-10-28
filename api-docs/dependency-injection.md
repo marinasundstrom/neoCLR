@@ -3,9 +3,9 @@ title: Dependency injection
 ---
 # Dependency injection (development)
 
-`System.DependencyInjection` lives in System.Runtime. `ServiceCollection` and
+`Neo.DependencyInjection` lives in its own `Neo.DependencyInjection.dll` assembly. `ServiceCollection` and
 `ServiceProvider` define registration and resolution; `DefaultServiceCollection`
-is the default implementation. Import `System.DependencyInjection.*` for typed
+is the default implementation. Import `Neo.DependencyInjection.*` for typed
 registration and lookup extensions. This development API follows .NET DI's
 service identities, registration order, constructor selection and lifetimes,
 using neoCLR `Result` and `Optional` contracts.
@@ -182,3 +182,9 @@ InvalidRegistration; constructor-plan failures return Activation. Native program
 must retain the generic implementation constructors and the required closed
 service shapes. Unretained construction is an explicit failure, not dynamic code
 generation. Collection injection and keyed constructor annotations remain gaps.
+
+## Namespace and assembly migration (2026-10-28)
+
+Replace System.DependencyInjection imports with Neo.DependencyInjection and rebuild
+against the new assembly. No old-name compatibility shim is provided. See the
+[application-service boundary](https://github.com/marinasundstrom/neoCLR/blob/main/docs/application-services.md) for dependencies and migration.

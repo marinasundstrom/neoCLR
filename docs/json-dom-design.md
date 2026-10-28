@@ -607,7 +607,7 @@ indexed access would avoid that copy but leave ordinary collection consumers una
 to enumerate JSON arrays. Live/fail-fast enumeration is an alternative for a future
 coordinated DOM review. No throughput improvement is claimed.
 
-The compiled [JSON DOM suite](../runtime/raven/tests/json-dom/JsonDom.rvn) covers empty
+The compiled [JSON DOM suite](../runtime/System.Data/test/JsonDomTests/NeoClr/RuntimeTests/JsonDom.rvn) covers empty
 snapshots, interface/concrete indexing, original node identity, shared child mutation,
 append-after-capture, for iteration, and serializer precedence. The separate
 [bounds consumer](experiments/json-sequence/README.md) covers terminal faults, which

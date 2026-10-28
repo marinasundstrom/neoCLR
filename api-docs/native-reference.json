@@ -5,25 +5,27 @@
     "url": "https://github.com/marinasundstrom/neoCLR",
     "revision": "main"
   },
-  "sha256": "3351b376b706b419151e0d9e7bbcb354b518331a5cd04fab657abec46809442c",
-  "librarySourceRevision": "8ea34b8dac451dd11a0b6b3aa52cae1f0014ce3d",
-  "compilerRevision": "a9aeb8aa4+generic-worktree",
+  "sha256": "42448c9989562ba7e815b8f0e9d76dda8386096ac65076afe8c8f302cbd72926",
+  "librarySourceRevision": "b9ff92ad7d3fa50209c10a2f11a4ccffe6796f05",
+  "compilerRevision": "91c1edca8",
   "libraryBuildEvidence": {
     "file": "build-evidence.json",
-    "sha256": "e723d6d368cb50223b9450accd75d23c1c85f0a183b6a21212625107ecbcbf1a"
+    "sha256": "bf6bacd8bb6b0dbc84c86d9feabc2495f7f7b96e51a3f26bd8baa4d5e02ae2c7"
   },
-  "rendererRevision": "a9aeb8aa4+generic-worktree",
+  "rendererRevision": "91c1edca8",
   "libraryArtifacts": {
-    "System.Runtime.dll": "5325532d2070715dbfda217aef7396599bf3193928d2127dff24c0fdede1625b",
-    "System.Data.dll": "bfe2e781258663363b803aee0ab8f64e9b6f9a001f605e5cb0ca8181a4519b41",
-    "System.Networking.dll": "96ff082d916d29194e3913f8b089489100319729ec32dd67874cf0bd286e63d8",
-    "System.Web.dll": "894520324fb3470a15dc6ae9f8d15a848a678464ec8cd19ddf0fe7f247a7ac00",
-    "System.Data.PostgreSql.dll": "9f97cec36f5e24655572a34fa2c0104c50b815a38ebeb8c9f60433a0b9bf756e",
+    "System.Runtime.dll": "f4e75dae178757e528d72210faab566dfaec3d5d91508f324bd26c3505623981",
+    "System.Data.dll": "8488b74456eb99f58afbc40818fcb355d60a4f710c1de58efc5d417f67dd5633",
+    "System.Networking.dll": "a54a879bb0b81ff7008da72da4cad64e0b4492ed90d7758dd211f3a03d802c9e",
+    "System.Web.dll": "3af28a5c1245d38bb1eeaa96514733ab6e1c0995141944d7178341bb9da88dd7",
+    "Neo.DependencyInjection.dll": "e4f8fe8e052fb646827f5fdf6e897eb0f2cfd1a26dce17b3270de1819ec42f71",
+    "Neo.Localization.dll": "52c98fb0b89fd4ed668dfe86a4b5aa06fdef16bce37ce21795b8772fc2ceb5c4",
+    "System.Data.PostgreSql.dll": "eb8d27dcd02c8c849c93a8a5152df43d4824873dfdf1692bbd3141f8f5e4deb8",
     "System.runtime.neox": "0c72a8656e7158d6bb2f31c0b019d8747dd61a6c4127b278155e104de437769b"
   },
   "renderingEvidence": {
     "normalized-sidecars.json": "810497e62e044ae6a1c650278bc7cc5657696681da09374d63b6450fb37d9bc4",
-    "restored-xml-comments.json": "7e7b786a8d290f3338e264e30a9d6dbd1bc540ec9d1639c59acb8f08e94454bc"
+    "restored-xml-comments.json": "3526f5493e16e41a2775ec283ac8f4e389b652f057e517c915d161afad8f48e1"
   },
   "scope": "Reviewed native API rendering; legacy coverage gaps remain explicitly marked by the website overlay."
 }

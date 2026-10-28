@@ -51,7 +51,7 @@ Sources: [GC](../../runtime/native/gc/native-gc.c),
 [roots](../../runtime/native/gc/root-probe.c),
 [fibers](../../runtime/native/async/native-runtime.c),
 [sockets](../experiments/aot-console/socket-listener.c),
-[Tasks](../../runtime/raven/src/System/Concurrency/Tasks/Tasks.rvn),
+[Tasks](../../runtime/System.Runtime/src/System.Runtime/System/Concurrency/Tasks/Tasks.rvn),
 [VM shared heap](../../src/shared_heap.rs),
 [VM task work](../../src/task_work.rs),
 [VM atomic regions](../../src/vm_task_atomic.rs).

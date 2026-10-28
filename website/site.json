@@ -64,8 +64,13 @@
     "revision": "main",
     "root": "..",
     "paths": [
-      "runtime/raven/src",
-      "runtime/raven/providers"
+      "runtime/System.Runtime/src",
+      "runtime/System.Data/src",
+      "runtime/System.Networking/src",
+      "runtime/System.Web/src",
+      "runtime/System.Data.PostgreSql/src",
+      "extensions/Neo.DependencyInjection/src",
+      "extensions/Neo.Localization/src"
     ]
   },
   "moduleTerminology": true,

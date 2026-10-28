@@ -47,7 +47,7 @@ descriptor. Inspection passes with the deliberately nonexistent library name
 `nonexistent-native-library`; this follow-through does not execute native code.
 
 ```sh
-dotnet /path/to/Raven/tools/NeoClrMetadataProbe/bin/Debug/net10.0/NeoClrMetadataProbe.dll --native-foreign-source target/foreign-api/NeoCLR.CoreProbe.dll nonexistent-native-library target/foreign-symbol-validation runtime/raven/src/System/Runtime/InteropServices/NativeImportAttribute.rvn
+dotnet /path/to/Raven/tools/NeoClrMetadataProbe/bin/Debug/net10.0/NeoClrMetadataProbe.dll --native-foreign-source target/foreign-api/NeoCLR.CoreProbe.dll nonexistent-native-library target/foreign-symbol-validation runtime/System.Runtime/src/System.Runtime/System/Runtime/InteropServices/NativeImportAttribute.rvn
 dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests/NeoCLR.Metadata.Experimental.Tests.csproj --no-restore /property:WarningLevel=0 -- --foreign-imports
 ```
 

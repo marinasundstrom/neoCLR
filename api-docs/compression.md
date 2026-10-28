@@ -38,7 +38,7 @@ not a live HTTP connection. Incremental decoding and automatic HTTP integration 
 gaps, not implemented behavior. Compression has no whole-stream size bound and uses
 bounded blocks; it can expand incompressible data.
 
-The [compiled suite](https://github.com/marinasundstrom/neoCLR/blob/main/runtime/raven/tests/gzip/Tests.rvn) demonstrates creation,
+The [compiled suite](https://github.com/marinasundstrom/neoCLR/blob/main/runtime/System.Runtime/test/GZipTests/NeoClr/RuntimeTests/Tests.rvn) demonstrates creation,
 Write/Finish/Read ordering, ownership and error handling. The factories avoid ambiguous
 .NET-style constructors when a stream supports both input and output capabilities.
 

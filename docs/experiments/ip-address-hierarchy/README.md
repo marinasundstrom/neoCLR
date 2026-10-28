@@ -84,7 +84,7 @@ Public mode uses 13 valid and 29 invalid literals from cases.json. It also
 checks socket overloads, explicit IPv6 rejection, mapped-family inequality and the
 imported family's closure. Reference.cs compares the same corpus with .NET 10,
 including the five deliberately different accepted forms. The runtime source is
-`runtime/raven/src/System/Networking/IPAddress.rvn`; public callers compile against
+`runtime/System.Networking/src/System.Networking/System/Networking/IPAddress.rvn`; public callers compile against
 the core reference instead of including that implementation in their application.
 
 Public integration validation (2026-09-25): 460 managed allocations, 9 collections,
@@ -96,5 +96,5 @@ checks reject malformed public calls and external inheritance metadata. Generate
 library and API snapshot checks pass. No website build was run.
 
 Development test migration (2026-10-10): public IPAddress parsing corpus, canonical formatting, equality and allocation churn now also run as 7
-attributed framework tests in `runtime/raven/tests/ip-address-values`. The framework README
+attributed framework tests in `runtime/System.Networking/test/IpAddressValuesTests`. The framework README
 links native/interpreted evidence. This original consumer retains its integration purpose.

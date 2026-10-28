@@ -29,7 +29,7 @@ def main():
     project = out / 'projects'
     shutil.copytree(ROOT / 'docs/experiments/friend-runtime', project,
                     ignore=shutil.ignore_patterns('bin', 'obj'))
-    source_files = [ROOT / 'runtime/raven/src/System/Runtime/CompilerServices/InternalsVisibleToAttribute.rvn',
+    source_files = [ROOT / 'runtime/System.Runtime/src/System.Runtime/System/Runtime/CompilerServices/InternalsVisibleToAttribute.rvn',
                     ROOT / 'docs/experiments/friend-runtime/Provider.rvn', ROOT / 'docs/experiments/friend-runtime/Main.rvn']
     report = {'passed': False, 'platform': platform.system() + '-' + platform.machine(),
               'sourceFiles': {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in source_files},

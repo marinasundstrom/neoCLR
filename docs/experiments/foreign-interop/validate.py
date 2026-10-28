@@ -26,7 +26,7 @@ library = output / ('foreign_fixture.dll' if os.name == 'nt' else 'libforeign_fi
 fixture = run(['rustc', '--edition=2024', '--crate-type=cdylib', '--crate-name=foreign_fixture', ROOT / 'examples/native/library.rs', '-o', library])
 assert fixture.returncode == 0, fixture.stderr
 probe = a.raven.resolve() / 'tools/NeoClrMetadataProbe/bin/Debug/net10.0/NeoClrMetadataProbe.dll'
-attribute = ROOT / 'runtime/raven/src/System/Runtime/InteropServices/NativeImportAttribute.rvn'
+attribute = ROOT / 'runtime/System.Runtime/src/System.Runtime/System/Runtime/InteropServices/NativeImportAttribute.rvn'
 emitted = run(['dotnet', probe, '--native-foreign-source', a.core.resolve(), library, output, attribute])
 assert emitted.returncode == 0, emitted.stdout + emitted.stderr
 runtime = ROOT / 'target/debug' / ('neoclr.exe' if os.name == 'nt' else 'neoclr')

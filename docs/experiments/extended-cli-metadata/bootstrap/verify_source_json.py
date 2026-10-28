@@ -29,9 +29,9 @@ def main():
         if result.returncode != expected or expected == 42 and result.stdout:
             raise RuntimeError(json.dumps(commands[-1], indent=2))
 
-    sources = [ROOT / 'runtime/raven/src/System/Data/Json' / (name + '.rvn')
+    sources = [ROOT / 'runtime/System.Data/src/System.Data/System/Data/Json' / (name + '.rvn')
                for name in ('JsonDocument', 'JsonSyntax', 'JsonValue', 'JsonError')]
-    sources.append(ROOT / 'runtime/raven/src/System/Runtime/Reflection/ReflectionError.rvn')
+    sources.append(ROOT / 'runtime/System.Runtime/src/System.Runtime/System/Runtime/Reflection/ReflectionError.rvn')
     dependencies = [args.base_library.resolve(), args.encoding_library.resolve(),
                     args.streams_library.resolve()]
     common = ['dotnet', args.compiler.resolve(), 'neoclr',

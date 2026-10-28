@@ -35,7 +35,7 @@ Primary sources retrieved 2026-10-25:
 
 ## Current ownership seams
 
-In `runtime/raven/src/System/Web/Http/HttpServer.rvn`:
+In `runtime/System.Web/src/System.Web/System/Web/Http/HttpServer.rvn`:
 
 - `HttpRequestDecoder.PushCore` records `Consumed`, so the parser already exposes a
   message boundary. It need not discard or reinterpret the next request's bytes.

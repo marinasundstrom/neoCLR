@@ -29,7 +29,9 @@ def main():
             raise ValueError('Split bundle owns its core and seed; omit --core and --seed')
         catalog = json.loads((args.libraries / 'bundle.json').read_text())
         core_assemblies = ['System.Runtime', 'System.Data', 'System.Networking', 'System.Web']
-        if catalog['assemblyNames'] not in (core_assemblies, core_assemblies + ['System.Data.PostgreSql']):
+        if catalog['assemblyNames'] not in (core_assemblies, core_assemblies + ['System.Data.PostgreSql'],
+                core_assemblies + ['Neo.DependencyInjection', 'Neo.Localization'],
+                core_assemblies + ['Neo.DependencyInjection', 'Neo.Localization', 'System.Data.PostgreSql']):
             raise ValueError('Unsupported split class-library selection')
         for relative, expected in catalog['files'].items():
             path = (args.libraries / relative).resolve()
@@ -81,7 +83,7 @@ def main():
             original = str(Path(first[1]).parent / name)
             if sha(args.sdk / 'tools/rvnc' / name) != build['inputs'][original]:
                 raise ValueError('SDK compiler differs from library producer: ' + name)
-        if sha(args.libraries / 'ownership.json') != sha(ROOT / 'runtime/raven/native/poc-ownership.json'):
+        if sha(args.libraries / 'ownership.json') != sha(ROOT / 'runtime/System.Runtime/src/System.Runtime/native/poc-ownership.json'):
             raise ValueError('Unexpected ownership selection')
         library_names = ['Numbers', 'Http']
         seed_name = 'System.neox'
@@ -93,7 +95,7 @@ def main():
     (staged / 'editor').mkdir()
     (staged / 'tools').mkdir()
     if not split:
-        shutil.copy2(ROOT / 'runtime/raven/native/poc-seed.neoil', staged / 'lib/System.neoil')
+        shutil.copy2(ROOT / 'runtime/System.Runtime/src/System.Runtime/native/poc-seed.neoil', staged / 'lib/System.neoil')
     shutil.copytree(args.sdk, staged / 'sdk')
     executable = 'neoclr.exe' if platform.system() == 'Windows' else 'neoclr'
     shutil.copy2(args.runtime, staged / 'bin' / executable)

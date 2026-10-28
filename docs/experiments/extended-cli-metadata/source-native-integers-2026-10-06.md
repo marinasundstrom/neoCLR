@@ -55,7 +55,7 @@ python3 docs/experiments/extended-cli-metadata/verify_source_native_integers.py 
   --core /tmp/preview12-bootstrap/Core.dll \
   --seed /tmp/preview12-bootstrap/System.neox \
   --library /tmp/native-poc-libraries1005/Numbers.dll \
-  --ownership runtime/raven/native/poc-ownership.json \
+  --ownership runtime/System.Runtime/src/System.Runtime/native/poc-ownership.json \
   --runtime target/debug/neoclr --output /tmp/native-width-fresh
 ```
 

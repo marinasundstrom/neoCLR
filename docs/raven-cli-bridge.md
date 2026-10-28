@@ -2678,7 +2678,7 @@ See the [state assessment](experiments/extended-cli-metadata/state-assessment-20
 
 
 Whole-source Language acceptance (2026-10-01): the complete unchanged
-runtime/raven/src/System/Globalization/Language.rvn now executes through Raven's shared
+runtime/System.Runtime/src/System.Runtime/System/Globalization/Language.rvn now executes through Raven's shared
 accessor-call lowering. Static computed properties map to ordinary static calls and
 existing CLI Property/MethodSemantics/native associations. The independent metadata
 API and runtime need no change. Static setters and constructed generic static getters
@@ -5976,7 +5976,7 @@ Raven consumes the configured core's explicit MethodImpl(InternalCall) marker fo
 internal nongeneric functions in neoCLR.Runtime. Runtime implementations are selected
 by exact native signatures; ordinary extern/PInvoke and .NET emission are unchanged.
 The marker's CLI bootstrap constructor never executes. Runtime handle-service source
-now lives in runtime/raven/native and is compiled beside its source-owned callers.
+now lives in runtime/System.Runtime/src/System.Runtime/native and is compiled beside its source-owned callers.
 Public wrappers can be separately imported. Public/generic/type-owned service
 contracts and production descriptor factory/snapshot ownership are still pending.
 See [the integration and validation record](experiments/extended-cli-metadata/source-internal-calls-2026-10-05.md).
@@ -6830,7 +6830,7 @@ and retains primitive/async ownership. Introspection follows the ownership manif
 there is no implicit seed introspection facade for a source-root bootstrap. Invalid
 boolean values, executable selection and conflicting imported roots reject.
 
-The [native Runtime project](../runtime/raven/projects/README.md) now builds the
+The [native Runtime project](../runtime/class-library-projects.md) now builds the
 175 audited sources and executes unchanged orders through a separate native consumer.
 The primitive Core and compile-time retained seed are explicit inputs. Runtime execution
 requires a retained seed finalized against the new artifact. These are native semantic
@@ -6852,7 +6852,7 @@ once in dependency order. It rejects any changed Runtime artifact and publishes 
 bundle manifest last. An earlier attempt that rebuilt Runtime after finalization changed
 its bytes and was rejected; deterministic output is not assumed. No importer/emitter
 coupling, new metadata encoding or CLI projection is involved. See the
-[project instructions](../runtime/raven/projects/README.md) and
+[project instructions](../runtime/class-library-projects.md) and
 [executable evidence](experiments/extended-cli-metadata/native-class-library-bundle-2026-10-07.md).
 
 The staged artifacts pass five verify/run consumers and the ordinary-project HTTP
@@ -7848,7 +7848,7 @@ The temporary adapter writes private erased lanes (Int64 tag 5 or Byte tag 2);
 these are not metadata type ordinals or a public ABI. It allocates no text and
 uses unsigned arithmetic to preserve Int64.MinValue without signed overflow.
 The native backend owns this bridge until native service lowering replaces it.
-Five [public tests](../runtime/raven/tests/int64-parsing-validation.json) pass
+Five [public tests](../runtime/System.Runtime/test/Int64ParsingTests-validation.json) pass
 both local modes; backend checks cover all ASCII trailing characters after a long
 digit sequence, format-before-overflow and null faults. Windows remains pending.
 
@@ -7870,7 +7870,7 @@ No Raven Runtime Contract option, semantic rule, CLI encoding or emission change
 are required. Compiler pin 1a0c4e62734b2d4f17dc9f8af1f5d02c566f8cf4 remains valid.
 neoCLR's native linker owns these private receiver/factory transformations; eventual
 intrinsic native String construction will replace them. General chained String
-constructors remain unsupported. See [test evidence](../runtime/raven/tests/string-construction-validation.json).
+constructors remain unsupported. See [test evidence](../runtime/System.Runtime/test/StringConstructionTests-validation.json).
 
 ### Literal-pattern compiler gap closure — 2026-10-10
 
@@ -7912,7 +7912,7 @@ are not claimed by this slice.
 
 Raven configuration, semantic binding, CLI signatures and public APIs are unchanged.
 The matching compiler remains b2f3ba0f8b8e92f0c516155f563b332b0a6fad54. All twelve
-[public parser tests](../runtime/raven/tests/primitive-parsing-validation.json) pass
+[public parser tests](../runtime/System.Runtime/test/PrimitiveParsingTests-validation.json) pass
 both local modes. Three interpreter parser tests, six adapter tests, eight erased
 transport tests and one five-case conversion check pass; no-std release linking
 and Windows x64 object emission succeed. Windows execution remains pending.
@@ -8023,7 +8023,7 @@ also remains a separate gap; civil parsing directly consumes bounded UTF-8 bytes
 Eight framework cases and a standalone host-preference parity probe pass native
 macOS ARM64 and interpreted execution. Exact-signature and missing-context checks
 pass. The Windows action includes both consumers; Windows execution remains pending.
-See runtime/raven/tests/time-parsing-validation.json and the time-parsing probe.
+See runtime/System.Runtime/test/TimeParsingTests-validation.json and the time-parsing probe.
 
 
 ### Duration/offset Parse and native negation (2026-10-10)
@@ -12549,7 +12549,7 @@ the existing .NET-compatible implementation flag and generic method metadata rat
 than adding a new runtime operation. No Runtime Contract default changes.
 
 Production queue services are now native source declarations in
-`runtime/raven/native/RuntimeQueueCalls.rvn`; TaskQueue and workers call those exact
+`runtime/System.Runtime/src/System.Runtime/neoCLR/Runtime/RuntimeQueueCalls.rvn`; TaskQueue and workers call those exact
 functions. Staged preparation removes their three CLI facade methods and retained
 seed declarations, so a duplicate definition cannot silently supply execution.
 Raven unit returns lower to no-result control signatures. RegisterTaskQueue accepts
@@ -13337,7 +13337,7 @@ scalar; text decoding still rejects invalid windows and grapheme indexing is unc
 This encoding belongs to neoCLR's current bounded native backend, not Raven's CLI
 metadata or a permanent platform ABI. A future native view representation may replace
 the storage discriminator; a moving collector must preserve/update the owner lane.
-Validation is retained under runtime/raven/tests/string-utf8-views and native memory
+Validation is retained under runtime/System.Runtime/test/StringUtf8Views and native memory
 kernel/binding tests. No Raven source compiler or reference signature changes occur.
 
 ### Native base-constructor argument calls (2026-10-19)
@@ -14613,7 +14613,7 @@ No Runtime Contract setting changes. The bounded metadata SDK records the conven
 per callback; Raven currently inherits it from the import. Each adapted unit parameter
 allocates an adapter object and Function binding per call. Retained callbacks, foreign
 threads, returned-function source projection and JIT/AOT callback stubs remain open.
-Built-in evidence and reproduction: [native callback tests](../runtime/raven/tests/native-callbacks/README.md).
+Built-in evidence and reproduction: [native callback tests](../runtime/System.Runtime/test/NativeCallbackTests/README.md).
 
 ### Native function results (2026-10-22 follow-through)
 
@@ -14635,7 +14635,7 @@ of null/data addresses is retained. JIT/AOT callable support, retained registrat
 foreign threads and richer ABI conversions remain open. All seven built-in Raven
 native-callback tests pass, including both return directions after GC and unit value
 assignment. Metadata roundtrip/rejection checks cover FunctionReturn. See neoCLR
-runtime/raven/tests/native-callbacks/README.md for reproduction and bundle limits.
+runtime/System.Runtime/test/NativeCallbackTests/README.md for reproduction and bundle limits.
 
 ### Raven scalar NativeImport AOT qualification (2026-10-22)
 

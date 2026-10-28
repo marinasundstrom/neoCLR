@@ -32,5 +32,5 @@ collections, zero live objects). Public/internal signature checks and the regene
 library/API snapshot checks passed. Website build skipped by author direction.
 
 Development test migration (2026-10-10): HTTP header repetition, lookup validation, snapshots and request metadata now also run as 5
-attributed framework tests in `runtime/raven/tests/http-header-values`. The framework README
+attributed framework tests in `runtime/System.Web/test/HttpHeaderValuesTests`. The framework README
 links native/interpreted evidence. This original consumer retains its integration purpose.

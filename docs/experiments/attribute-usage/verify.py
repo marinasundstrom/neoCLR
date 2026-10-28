@@ -54,7 +54,7 @@ rejected = run(['dotnet', compiler, 'neoclr', '--project', negative / 'Native.rv
 assert 'RAV0502' in rejected.stderr + rejected.stdout, rejected.stderr + rejected.stdout
 assert not (negative / 'bin/neoclr/AttributeUsageConsumer.dll').exists()
 inputs = [Path(__file__), HERE / 'Main.rvn', HERE / 'Native.rvnproj',
-          ROOT / 'runtime/raven/src/System/AttributeTargets.rvn', ROOT / 'runtime/raven/src/System/AttributeUsageAttribute.rvn',
+          ROOT / 'runtime/System.Runtime/src/System.Runtime/System/AttributeTargets.rvn', ROOT / 'runtime/System.Runtime/src/System.Runtime/System/AttributeUsageAttribute.rvn',
           lib / 'System.Runtime.dll', lib / 'System.runtime.neox', lib / 'Core.dll', lib / 'ownership.json',
           lib / 'build-evidence.json', bundle / 'manifest.json', build / 'app.dll', exe, aot, runtime, compiler,
           compiler.parent / 'Raven.CodeAnalysis.dll', compiler.parent / 'Raven.CodeAnalysis.NeoClr.dll']

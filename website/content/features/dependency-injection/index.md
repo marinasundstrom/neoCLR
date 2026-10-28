@@ -1,6 +1,8 @@
 # Dependency injection: explicit ownership and lifetimes
 
-The development `System.DependencyInjection` API lets you register services,
+Development (2026-10-28): this API now has its own `Neo.DependencyInjection.dll` assembly. Update former `System` imports and rebuild consumers with the matching libraries.
+
+The development `Neo.DependencyInjection` API lets you register services,
 build a provider and choose transient, scoped or singleton lifetimes. Automatic
 constructor injection uses public constructors; explicit factories and existing
 instances use the same registration model.
@@ -21,7 +23,7 @@ returns, including an early error return.
 module Examples.DependencyInjection
 
 import System.*
-import System.DependencyInjection.*
+import Neo.DependencyInjection.*
 import System.Result.*
 
 public class GreetingSettings {

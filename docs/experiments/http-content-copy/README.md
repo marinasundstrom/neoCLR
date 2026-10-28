@@ -32,7 +32,7 @@ does not add framing or replace the existing socket upload/server-response adapt
 
 ## Focused validation
 
-`runtime/raven/tests/http-content-copy` uses an async entry point because the current
+`runtime/System.Web/test/HttpContentCopyTests` uses an async entry point because the current
 shared discovery runner only invokes synchronous tests. The six cases cover pending
 backpressure with explicit GC, array/direct and sequence/staged output, exact lengths,
 empty bodies, stream errors and invalid counts, cancellation and disposal/replay.

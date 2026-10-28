@@ -17,7 +17,7 @@ GC-enabled native execution agree. Existing class property checks also pass.
 
 The author raised `ValueType : Object` as a familiar semantic model while leaving
 its long-term implementation open. Source inspection found ValueType already
-present in runtime/raven/core/Foundations.rvn. Struct ancestry/query behavior is a
+present in runtime/System.Runtime/src/System.Runtime/System/Foundations.rvn. Struct ancestry/query behavior is a
 separate follow-up; the property/JSON repair is needed independently of it.
 
 ## JSON validation

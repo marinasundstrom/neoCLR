@@ -16,8 +16,8 @@ SOURCES = [
      ('AssemblyInfo', 'BindingFlags', 'Descriptors', 'ModuleInfo', 'ParameterInfo')
 ] + ['System/Runtime/Reflection/ReflectionError.rvn', 'System/Runtime/Reflection/ReflectionExtensions.rvn',
      'System/Runtime/RuntimeContext.rvn', 'System/HashCode.rvn', 'System/Boolean.rvn', 'System/BooleanParseError.rvn']
-SOURCES = [ROOT / 'runtime/raven/src' / name for name in SOURCES] + [
-    ROOT / 'runtime/raven/native' / (name + '.rvn') for name in
+SOURCES = [ROOT / ('runtime/System.Data/src' if name.startswith('System/Data/') else 'runtime/System.Runtime/src') / name for name in SOURCES] + [
+    ROOT / 'runtime/System.Runtime/src/System.Runtime/native' / (name + '.rvn') for name in
     ('RuntimeIntrospectionCalls', 'ParameterSnapshot', 'ObjectIntrospection')]
 
 
@@ -95,7 +95,7 @@ ret
     run(common + ['--library', '-o', provider] + SOURCES)
     common += ['--reference', provider]
     operators = output / 'ResultOperators.dll'
-    operator_source = ROOT / 'runtime/raven/src/System/ResultOperators.rvn'
+    operator_source = ROOT / 'runtime/System.Runtime/src/System.Runtime/System/ResultOperators.rvn'
     run(common + ['--library', '-o', operators, operator_source])
     deps = ['--system', seed]
     for library in libraries + [provider, operators]:

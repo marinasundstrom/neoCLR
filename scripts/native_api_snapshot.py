@@ -11,16 +11,19 @@ import zipfile
 
 
 SOURCE_LINK_CHECKS = {
-    'System/Data/Json/JsonValue/index.html': 'runtime/raven/src/System/Data/Json/JsonValue.rvn',
-    'System/Data/Json/JsonValue/method_ToJsonString.html': 'runtime/raven/src/System/Data/Json/JsonValue.rvn',
-    'System/Data/Json/JsonSerializerOptions/index.html': 'runtime/raven/src/System/Data/Json/JsonSerializerOptions.rvn',
-    'System/Data/Json/JsonSerializerOptions/property_WriteIndented.html': 'runtime/raven/src/System/Data/Json/JsonSerializerOptions.rvn',
-    'System/Concurrency/Tasks/Task`1/index.html': 'runtime/raven/src/System/Concurrency/Tasks/Tasks.rvn',
-    'System/Data/PostgreSql/PostgresDatabase/index.html': 'runtime/raven/providers/System.Data.PostgreSql/PostgresDatabase.rvn',
-    'System/Object/index.html': 'runtime/raven/src/System/Object.rvn',
-    'System/Object/method_GetHashCode.html': 'runtime/raven/src/System/Object.rvn',
-    'System/Web/Http/HttpClient/index.html': 'runtime/raven/src/System/Web/Http/HttpClient.rvn',
-    'System/Web/Http/HttpClient/method_Send.html': 'runtime/raven/src/System/Web/Http/HttpClient.rvn',
+    'Neo/DependencyInjection/ServiceCollection/index.html': 'extensions/Neo.DependencyInjection/src/Neo.DependencyInjection/Neo/DependencyInjection/Services.rvn',
+    'Neo/Localization/Localizer/index.html': 'extensions/Neo.Localization/src/Neo.Localization/Neo/Localization/Localizer.rvn',
+    'Neo/Localization/JsonLocalizerProvider/index.html': 'extensions/Neo.Localization/src/Neo.Localization/Neo/Localization/JsonLocalizerProvider.rvn',
+    'System/Data/Json/JsonValue/index.html': 'runtime/System.Data/src/System.Data/System/Data/Json/JsonValue.rvn',
+    'System/Data/Json/JsonValue/method_ToJsonString.html': 'runtime/System.Data/src/System.Data/System/Data/Json/JsonValue.rvn',
+    'System/Data/Json/JsonSerializerOptions/index.html': 'runtime/System.Data/src/System.Data/System/Data/Json/JsonSerializerOptions.rvn',
+    'System/Data/Json/JsonSerializerOptions/property_WriteIndented.html': 'runtime/System.Data/src/System.Data/System/Data/Json/JsonSerializerOptions.rvn',
+    'System/Concurrency/Tasks/Task`1/index.html': 'runtime/System.Runtime/src/System.Runtime/System/Concurrency/Tasks/Tasks.rvn',
+    'System/Data/PostgreSql/PostgresDatabase/index.html': 'runtime/System.Data.PostgreSql/src/System.Data.PostgreSql/System/Data/PostgreSql/PostgresDatabase.rvn',
+    'System/Object/index.html': 'runtime/System.Runtime/src/System.Runtime/System/Object.rvn',
+    'System/Object/method_GetHashCode.html': 'runtime/System.Runtime/src/System.Runtime/System/Object.rvn',
+    'System/Web/Http/HttpClient/index.html': 'runtime/System.Web/src/System.Web/System/Web/Http/HttpClient.rvn',
+    'System/Web/Http/HttpClient/method_Send.html': 'runtime/System.Web/src/System.Web/System/Web/Http/HttpClient.rvn',
 }
 
 

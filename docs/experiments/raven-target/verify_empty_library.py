@@ -27,7 +27,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-foundation-library-') as tempora
     core = root / 'demo/NeoCLR.CoreProbe.dll'
     run(['dotnet', args.bridge.resolve(), '--reference-library-core', core])
     names = ['InvalidRangeError', 'InvalidDateError', 'InvalidTimeError', 'OverflowError', 'EnvironmentError', 'Void']
-    sources = {name: (ROOT / f'runtime/raven/src/System/{name}.rvn').read_text() for name in names}
+    sources = {name: (ROOT / f'runtime/System.Runtime/src/System.Runtime/System/{name}.rvn').read_text() for name in names}
     cases = [(name, name, sources[name], None) for name in names]
     cases += [
         ('Storage', 'InvalidRangeError', sources['InvalidRangeError'].replace('public struct InvalidRangeError {', 'public struct InvalidRangeError {\n    private field extra: int'), 'value library layout'),

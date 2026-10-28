@@ -36,7 +36,7 @@ python3 scripts/verify-native-runtime-project.py \
 The output directory must be fresh. The harness records the two MSBuild environment
 properties supplying Core and compile-time seed, all commands and dependency hashes.
 It builds the checked-in project; it does not regenerate a substitute source-list project.
-See [project instructions](../../../runtime/raven/projects/README.md) for direct commands.
+See [project instructions](../../../runtime/class-library-projects.md) for direct commands.
 
 ## Remaining boundaries
 

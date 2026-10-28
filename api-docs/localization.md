@@ -3,16 +3,19 @@ title: Localization
 ---
 # Localization (development)
 
-`System.Localization.Localizer` provides `strings[key]` and `Find(key)`.
+`Neo.Localization.Localizer` provides `strings[key]` and `Find(key)`.
 The indexer returns the key when absent; Find returns `Optional<string>`.
 Empty translations are present. Keys are ordinal and case-sensitive; stored UTF-8
 text is preserved. `Localizer<T>` associates a catalogue with a resource type.
 
 ## JSON provider
 
-`JsonLocalizerProvider` lives in System.Data, while the lookup interfaces and
-`LocalizerDiagnostics` extension live in System.Runtime. The namespace is
-System.Localization for all of them. The native reference includes their members.
+`JsonLocalizerProvider`, lookup interfaces, formatting, diagnostics and DI registration
+live in the separate `Neo.Localization.dll` assembly under `Neo.Localization`.
+It references System.Runtime, System.Data and Neo.DependencyInjection. The native
+reference includes their members. Replace old System.Localization imports and
+retention names and rebuild consumers; there is no old-name compatibility shim.
+See the [assembly boundary and migration](https://github.com/marinasundstrom/neoCLR/blob/main/docs/application-services.md).
 
 Construct `JsonLocalizerProvider(directory)` to enable invariant fallback, or
 `JsonLocalizerProvider(directory, fallbackToInvariant: false)` to disable it.
@@ -73,7 +76,7 @@ lookup preserves the raw template. Null arguments produce empty text. Templates
 use `String.Format` composite syntax, alignment and format specifiers; malformed
 formats retain its terminal failure contract, rather than becoming missing keys.
 Fixed overloads avoid an argument array; value arguments may box and formatting
-can allocate output text. Import `System.Localization.*` to use the extensions.
+can allocate output text. Import `Neo.Localization.*` to use the extensions.
 
 ## Missing-key diagnostics
 
@@ -119,7 +122,7 @@ constructors. No ambient culture, reload or plural rules are introduced.
 For a native project, add the adapter retention alongside your consumer roots:
 
 ```sh
---reflection-constructor-type 'System.Localization.DefaultLocalizer`1'
+--reflection-constructor-type 'Neo.Localization.DefaultLocalizer`1'
 ```
 
 The native project builder resolves this exact metadata name from the supplied

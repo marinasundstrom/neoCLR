@@ -26,8 +26,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-foundation-library-') as tempora
     (root / 'demo').mkdir()
     core = root / 'demo/NeoCLR.CoreProbe.dll'
     run(['dotnet', args.bridge.resolve(), '--reference-library-core', core])
-    option = (ROOT / 'runtime/raven/src/System/Optional.rvn').read_text()
-    result = (ROOT / 'runtime/raven/src/System/Result.rvn').read_text()
+    option = (ROOT / 'runtime/System.Runtime/src/System.Runtime/System/Optional.rvn').read_text()
+    result = (ROOT / 'runtime/System.Runtime/src/System.Runtime/System/Result.rvn').read_text()
     cases = [
         ('Option', 'Option', option, None),
         ('Result', 'Result', result, None),

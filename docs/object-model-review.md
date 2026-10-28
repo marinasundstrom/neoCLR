@@ -19,10 +19,10 @@ cover class identity/display, record classes, boxed Int32 and the first
 | `System.Value` | Intrinsic, explicitly erased complete payload; pack/is/unpack operations | Carries exact type and value-copy behavior; not .NET ValueType or Object |
 | `System.ValueType` | Compiler/reference metadata role | Not a replacement name for System.Value and not a complete executable .NET ValueType implementation |
 
-Source evidence: [Object](../runtime/raven/src/System/Object.rvn),
-[Optional](../runtime/raven/src/System/Optional.rvn),
-[Result](../runtime/raven/src/System/Result.rvn),
-[TaskOutcome](../runtime/raven/src/System/Tasks/TaskOutcome.rvn),
+Source evidence: [Object](../runtime/System.Runtime/src/System.Runtime/System/Object.rvn),
+[Optional](../runtime/System.Runtime/src/System.Runtime/System/Optional.rvn),
+[Result](../runtime/System.Runtime/src/System.Runtime/System/Result.rvn),
+[TaskOutcome](../runtime/System.Runtime/src/System.Runtime/System/Tasks/TaskOutcome.rvn),
 [class semantics](class-semantics.md) and [boxing](boxed-interface-values.md).
 The raw/legacy value-and-managed-byref profile is not proof of the Raven class
 contract; preserve that distinction in tests and documentation.

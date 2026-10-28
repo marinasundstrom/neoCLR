@@ -29,7 +29,7 @@ The proposed namespaces are:
 System.Globalization: Culture, CultureId, Language, Region, Script,
   CultureResolver, CultureProvider, NumberFormat, DateTimeFormat, Collation
 System.Time: Date, Time, Calendar, Instant, LocalDateTime, ZonedDateTime
-System.Localization: resources and messages (later proposal)
+Neo.Localization: resource lookup (development; broader message features remain proposals)
 ```
 
 `Calendar` remains a Time-domain semantic type. A culture may select a default calendar,

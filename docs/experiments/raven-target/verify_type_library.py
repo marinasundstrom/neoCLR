@@ -29,7 +29,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-declaration-library-') as tempor
     run(['dotnet', args.bridge.resolve(), '--reference-library-core', core])
     owner = 'System.Introspection.TypeInfo'
     source_path = 'Introspection/Descriptors.rvn'
-    source = (ROOT / 'runtime/raven/src/System' / source_path).read_text()
+    source = (ROOT / 'runtime/System.Runtime/src/System.Runtime/System' / source_path).read_text()
     prefix, source = source.split('public sealed interface TypeInfo', 1)
     source = 'public sealed interface TypeInfo' + source
     for name, text, diagnostic in [

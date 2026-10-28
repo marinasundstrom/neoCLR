@@ -51,6 +51,7 @@ def main():
                 raise ValueError('Library hash mismatch: ' + name)
         shutil.rmtree(bundle / 'lib')
         shutil.copytree(libraries, bundle / 'lib')
+        manifest['modules'] = ['lib/' + name + '.dll' for name in library_manifest['assemblyNames']]
     props = ET.parse(bundle / 'lib/NeoCLR.ClassLibrary.props')
     native_core = props.getroot().find('.//RavenNeoClrNativeCoreReference') is not None
     if native_core:
@@ -75,7 +76,7 @@ def main():
     for key, value in settings.items():
         ET.SubElement(properties, key).text = value
     items = ET.SubElement(project, 'ItemGroup')
-    ET.SubElement(items, 'Compile', Include=str(ROOT / 'runtime/raven/src/System/Web/**/*.rvn'))
+    ET.SubElement(items, 'Compile', Include=str(ROOT / 'runtime/System.Web/src/System.Web/System/Web/**/*.rvn'))
     project_path = out / 'Web.rvnproj'
     ET.ElementTree(project).write(project_path, encoding='unicode')
     command = ['dotnet', str(bundle / 'sdk/tools/rvnc/rvnc.dll'), 'neoclr', '--project', str(project_path)]
@@ -85,7 +86,7 @@ def main():
                     originalLibraryManifestSha256=sha(args.libraries / 'bundle.json') if args.libraries else None,
                     compilerSha256=sha(bundle / 'sdk/tools/rvnc/rvnc.dll'), command=command,
                     exitCode=result.returncode, stdout=result.stdout, stderr=result.stderr,
-                    sources={str(p.relative_to(ROOT)): sha(p) for p in (ROOT / 'runtime/raven/src/System/Web').rglob('*.rvn')})
+                    sources={str(p.relative_to(ROOT)): sha(p) for p in (ROOT / 'runtime/System.Web/src/System.Web/System/Web').rglob('*.rvn')})
     (out / 'build-evidence.json').write_text(json.dumps(evidence, indent=2) + '\n')
     if result.returncode:
         raise RuntimeError('System.Web build failed; see build-evidence.json')

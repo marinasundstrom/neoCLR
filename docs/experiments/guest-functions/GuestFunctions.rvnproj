@@ -7,7 +7,7 @@
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="../../../runtime/raven/tests/framework/TestAttribute.rvn" />
+    <Compile Include="../../../tools/testing/NeoCLR.Testing/NeoClr/Testing/TestAttribute.rvn" />
     <Compile Include="Main.rvn" />
   </ItemGroup>
 </Project>

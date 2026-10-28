@@ -89,7 +89,7 @@ source_names = ["String", "Array", "EquatableTo", "Disposable", "Collections/Ite
                 "Collections/Iterable", "Collections/Collection", "Collections/Sequence",
                 "Collections/MutableSequence", "StringComparison", "Propagatable", "Option",
                 "Result", "Attribute", "Runtime/CompilerServices/UnionAttribute", "Text/Utf8SliceError"]
-report['sourceHashes'] = {name: hashlib.sha256((ROOT / 'runtime/raven/src/System' / (name + '.rvn')).read_bytes()).hexdigest()
+report['sourceHashes'] = {name: hashlib.sha256((ROOT / 'runtime/System.Runtime/src/System.Runtime/System' / (name + '.rvn')).read_bytes()).hexdigest()
                           for name in source_names}
 report['ravenRevision'] = run(['git', '-C', args.raven.resolve(), 'rev-parse', 'HEAD']).strip()
 report['neoClrRevision'] = run(['git', 'rev-parse', 'HEAD']).strip()

@@ -23,7 +23,7 @@ concatenation, malformed data, both quotas, finalization, pending I/O, cancellat
 and StreamReader composition. The fixture generator lives beside the suite.
 
 See [validation.json](validation.json), the
-[contract evidence](../../../runtime/raven/tests/gzip-validation.json) and
+[contract evidence](../../../runtime/System.Runtime/test/GZipTests-validation.json) and
 [design](../../gzip-compression.md). Results are local development evidence; Windows
 and packaging qualification are not inferred. No HTTP content negotiation, automatic
 decompression or response-compression middleware is implemented by this experiment.

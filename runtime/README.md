@@ -1,9 +1,28 @@
 # Runtime source ownership
 
-The current class library is written in Raven. Edit `raven/src/**/*.rvn`, with
-primitive/core declarations in `raven/core` and runtime service declarations in
-`raven/native`. Build the native projects under `raven/projects`; their
-[build instructions](raven/projects/README.md) are authoritative.
+The current class library is written in Raven. Components follow:
+
+```text
+<runtime|extensions>/<component>/<src|test>/<project>/<namespace folders>
+```
+
+For example, `runtime/System.Runtime/src/System.Runtime/System.Runtime.rvnproj`
+builds sources under `System/` and `neoCLR/`. IO APIs live in
+`runtime/System.Runtime/src/System.Runtime/System/IO`. Core primitives and runtime
+service declarations follow their own namespaces in that source project.
+
+Optional application components live under sibling `extensions/Neo.*` and reference
+the runtime; runtime projects do not reference extensions. A component groups one
+or more source projects and zero or more test projects, without requiring a solution
+file. See the [build instructions](class-library-projects.md).
+
+Raven suites live under the component they exercise: core suites in System.Runtime,
+JSON suites in System.Data, HTTP suites in System.Web, networking suites in
+System.Networking, and DI/localization suites in their Neo components. The
+[suite catalog](../scripts/runtime-test-projects.json) maps stable command-line
+suite names to project files. Shared test-framework source lives under
+`tools/testing/NeoCLR.Testing`. `runtime/raven` retains compiler-service templates,
+legacy bridge fixtures and historical validation receipts, not active API projects.
 
 ## Obsolete class-library mirrors
 
@@ -25,7 +44,7 @@ The neoIL language and low-level assembler tests are not deprecated. Examples,
 interpreter/verifier fixtures and deliberately isolated runtime contract probes
 can continue to use it. `neoCLR/Runtime/*.neoil` provides older bootstrap service
 bindings; their use by fixtures is distinct from authoring the source library's
-service declarations in `raven/native/*.rvn`.
+service declarations in `System.Runtime/src/System.Runtime/neoCLR/Runtime/*.rvn`.
 
 New library work—including Slice and Memory—starts in Raven source and its
 explicit compiler/runtime metadata contracts. Runtime support remains in Rust;

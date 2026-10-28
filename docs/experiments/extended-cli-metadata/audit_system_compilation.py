@@ -23,13 +23,13 @@ def main():
     parser.add_argument('--ownership', type=Path, default=HERE / 'bootstrap/offset-ownership.json')
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=False)
-    files = sorted((ROOT / 'runtime/raven/src/System').rglob('*.rvn'))
+    files = sorted((ROOT / 'runtime/System.Runtime/src/System.Runtime/System').rglob('*.rvn'))
     relative = lambda p: str(p.relative_to(ROOT))
     source = {relative(p): p.read_text() for p in files}
     manifest = args.ownership.resolve()
     library = json.loads(manifest.read_text())['libraries'][0]
     baseline = [relative(Path(p)) if Path(p).is_absolute() else p for p in library['sources']]
-    prefix = 'runtime/raven/src/System/'
+    prefix = 'runtime/System.Runtime/src/System.Runtime/System/'
     names = lambda *xs: [prefix + x + '.rvn' for x in xs]
     folder = lambda name: [p for p in source if p.startswith(prefix + name + '/')]
     primitives = names('Object', 'Value', 'Void', 'String', 'Char', 'Boolean', 'Byte',

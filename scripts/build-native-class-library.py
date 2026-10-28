@@ -10,8 +10,11 @@ import subprocess
 import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parent.parent
-PROJECTS = ROOT / 'runtime/raven/projects'
-NAMES = ('System.Runtime', 'System.Data', 'System.Networking', 'System.Web')
+def project_directory(name):
+    if name.startswith('Neo.'):
+        return ROOT / 'extensions' / name / 'src' / name
+    return ROOT / 'runtime' / name / 'src' / name
+NAMES = ('System.Runtime', 'System.Data', 'System.Networking', 'System.Web', 'Neo.DependencyInjection', 'Neo.Localization')
 
 
 def sha(path):
@@ -48,9 +51,9 @@ def main():
         return result
 
     def artifact(name):
-        return PROJECTS / name / 'bin/neoclr' / (name + '.dll')
+        return project_directory(name) / 'bin/neoclr' / (name + '.dll')
 
-    run(['dotnet', args.compiler.resolve(), 'neoclr', '--project', PROJECTS / 'System.Runtime/System.Runtime.rvnproj'])
+    run(['dotnet', args.compiler.resolve(), 'neoclr', '--project', project_directory('System.Runtime') / 'System.Runtime.rvnproj'])
     runtime_hash = sha(artifact('System.Runtime'))
     # The reserved System module is empty; all core definitions belong to System.Runtime.
     seed_source = output / 'System.runtime.neoil'
@@ -58,7 +61,7 @@ def main():
     run([args.runtime.resolve(), 'assemble', seed_source, seed, '--format', 'neox'])
     # Build ordering is explicit; imports still validate each native reference.
     for name in names[1:]:
-        run(['dotnet', args.compiler.resolve(), 'neoclr', '--project', PROJECTS / name / (name + '.rvnproj'), '--no-build-references'])
+        run(['dotnet', args.compiler.resolve(), 'neoclr', '--project', project_directory(name) / (name + '.rvnproj'), '--no-build-references'])
     if sha(artifact('System.Runtime')) != runtime_hash:
         raise RuntimeError('Runtime changed during dependent project builds; finalized seed cannot be published')
     documentation = {}
@@ -74,7 +77,7 @@ def main():
         shutil.copytree(markdown, output / markdown.name)
         documentation[name] = dict(xml=xml.name, markdown=markdown.name)
 
-    shutil.copyfile(PROJECTS / 'System.Runtime/ownership.json', output / 'ownership.json')
+    shutil.copyfile(project_directory('System.Runtime') / 'ownership.json', output / 'ownership.json')
     configuration = ET.Element('Project')
     properties = ET.SubElement(configuration, 'PropertyGroup')
     for name, value in dict(RavenTargetPlatform='NeoCLR', RavenMetadataFormat='NeoCLR',
@@ -112,12 +115,13 @@ def main():
                     documentation=documentation,
                     files={path.relative_to(output).as_posix(): sha(path) for path in artifacts})
     inputs = [Path(__file__), args.compiler, args.runtime]
-    inputs += list(PROJECTS.glob('*/*.rvnproj')) + [PROJECTS / 'NativeLibrary.props', PROJECTS / 'System.Runtime/ownership.json']
-    inputs += list((ROOT / 'runtime/raven/src/System').rglob('*.rvn')) + list((ROOT / 'runtime/raven/native').glob('*.rvn'))
+    inputs += [ROOT / 'runtime/NativeLibrary.props', project_directory('System.Runtime') / 'ownership.json']
+    for name in names:
+        directory = project_directory(name)
+        inputs.append(directory / (name + '.rvnproj'))
+        inputs += list((directory / ('Neo' if name.startswith('Neo.') else 'System')).rglob('*.rvn'))
+        inputs += list((directory / 'neoCLR').rglob('*.rvn'))
     inputs += list((ROOT / 'runtime/raven/compiler-services').glob('*.rvn'))
-    if args.with_postgresql:
-        inputs += list((ROOT / 'runtime/raven/providers/System.Data.PostgreSql').glob('*.rvn'))
-    inputs += list((ROOT / 'runtime/raven/core').glob('*.rvn'))
     inputs += [args.compiler.parent / name for name in ('Raven.CodeAnalysis.dll', 'Raven.CodeAnalysis.NeoClr.dll', 'NeoCLR.Metadata.Experimental.dll')]
     report['hashes'] = {str(path.resolve()): sha(path) for path in inputs + artifacts}
     (output / 'build-evidence.json').write_text(json.dumps(report, indent=2) + '\n')

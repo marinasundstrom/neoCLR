@@ -2,6 +2,15 @@
 
 **Author-directed optimization objectives (2026-10-28):** Pursue [root-publication bookkeeping, concurrent store checks, then shared I/O completion wakeups](experiments/shared-scheduling/optimization-objectives.md), with safety and measured benefit as gates. Prior shared-queue/default decisions remain intact. Standardize diagnostic data independently of a future GUI: the [session contract](diagnostic-session-format.md) now exports existing owner GC snapshots; timeline/heap-graph adapters remain unimplemented.
 
+**Author-directed application-service boundary (2026-10-28):** Move DI and
+localization into `Neo.DependencyInjection` and `Neo.Localization`, each with its
+own project and assembly under `extensions`, with source and test projects in their component folders.
+Runtime components follow the same `src/<project>` and `test/<project>` convention. See [the scope and migration](application-services.md) and
+[completed build/test/site evidence](validation/neo-services-20261028/README.md).
+The author identifies `Neo.Configuration` and `Neo.Logging` as subsequent work;
+these remain planned, with API design and implementation still outstanding.
+This bounded slice does not replace the broader active milestone.
+
 **Author-directed scheduling wrap-up (2026-10-28):** [Repeated HTTP comparison and integration decision](validation/shared-scheduling-decision-20261028/README.md) retain enabled DNS/native GC correctness fixes and leave shared queues opt-in, with scheduling/collector defaults unchanged. Three untraced rounds show +5.3% sync and −7.5% concurrent throughput medians for shared queues, with overlapping ranges. Separate native profiles point to root/store/binding costs but do not close managed attribution. The author directs wrapping up and enabling only justified defaults; full AOT/capacity/context-profile and cross-thread HTTP ownership gates remain explicitly deferred, not completed.
 
 **Mixed HTTP correctness and pressure (2026-10-28):** [24-endpoint qualification](validation/shared-scheduling-mixed-20261028/README.md) now passes nested/shared-capture tasks, files and downstream HTTP under both collectors after correcting native provider frame/admission gaps. Queue peaks reach 12–15; the single traced shared-queue cohort is slower. The author additionally directs HTTP-stack/binding blocking investigation. Next separate untraced load/AOT comparisons from phase profiling, including synchronous owner file work and DNS polling; this does not close the capacity/context-profile gate.
@@ -794,7 +803,7 @@ scalar and unit-returning Raven Function parameters and results in the interpret
 Raven syntax, emitted as System.Void; native-boundary adaptation preserves generic
 value-return ABI. Seven built-in tests pass, including forced GC, generic unit and returned functions
 passed back as callbacks.
-[Evidence, allocation cost and remaining gaps](../runtime/raven/tests/native-callbacks/README.md).
+[Evidence, allocation cost and remaining gaps](../runtime/System.Runtime/test/NativeCallbackTests/README.md).
 AOT/JIT callbacks, true pinning and full NativeImport qualification remain open.
 
 **Void IL migration (2026-10-22):** Active no-result producers and fixtures now use
@@ -1536,7 +1545,7 @@ Windows managed qualification and packaged build kits remain gates.
 **Gzip foundation (2026-10-12):** the author requests System.IO.Compression and
 identifies HTTP as a likely consumer. [GZipStream](gzip-compression.md) adds incremental
 async compression and bounded validated decompression over existing stream contracts.
-[Local qualification](../runtime/raven/tests/gzip-validation.json) covers native/JIT
+[Local qualification](../runtime/System.Runtime/test/GZipTests-validation.json) covers native/JIT
 contracts and external interoperability; interpreter qualification is recorded separately.
 Automatic HTTP encoding/negotiation and incremental decoding remain follow-through;
 this author-directed slice does not reorder the active milestone.
@@ -2106,11 +2115,11 @@ Author follow-up: use this framework for new runtime-library behavior tests and 
 focused tests alongside feature/fix work. Preserve compiler/backend coverage where
 behavior is not observable in Raven; migrate existing tests as their areas are touched.
 Author follow-up explicitly starts migration of existing program-form checks. The
-[first five map ports](../runtime/raven/tests/collections/MapMaterialization.rvn) pass
+[first five map ports](../runtime/System.Runtime/test/RuntimeLibraryTests/NeoClr/RuntimeTests/MapMaterialization.rvn) pass
 within the 12-case native/interpreted collection suite and through `--filter Map`.
 [Migration evidence](../runtime/raven/tests/map-migration-validation.json); retain the
 old integration smoke consumer until Windows equivalence is qualified. Six subsequent
-[queue/stack ports](../runtime/raven/tests/collections/QueueStack.rvn) cover growth,
+[queue/stack ports](../runtime/System.Runtime/test/RuntimeLibraryTests/NeoClr/RuntimeTests/QueueStack.rvn) cover growth,
 reference identity, clear/reuse and snapshots; the expanded 18-test suite and existing
 selectors pass both modes ([evidence](../runtime/raven/tests/queue-stack-migration-validation.json)).
 Author-directed batch migration adds the remaining collection scenarios together,
@@ -2120,31 +2129,31 @@ encoder envelope. This packaging limit remains a separate gap, not a test API ru
 tests and existing selectors pass native macOS ARM64 and interpreted execution.
 Windows qualification remains pending.
 The next batch ports 12 public JSON DOM/document checks; all pass native macOS ARM64
-and interpreted execution ([evidence](../runtime/raven/tests/json-dom-batch-validation.json)).
+and interpreted execution ([evidence](../runtime/System.Data/test/JsonDomTests-batch-validation.json)).
 A further 12 JSON stream tests cover partial I/O, borrowed ownership, errors and
 byte quotas; all pass native macOS ARM64 and release-interpreted execution
-([evidence](../runtime/raven/tests/json-streams-batch-validation.json)). Independent
+([evidence](../runtime/System.Data/test/JsonStreamTests-batch-validation.json)). Independent
 MemoryStream and reflection-mapping migration remain follow-ups.
 Batch `memory-stream` adds 5 passing native/interpreted tests for MemoryStream seek, range, quota, overwrite and closed-state behavior
-([evidence](../runtime/raven/tests/memory-stream-validation.json)).
+([evidence](../runtime/System.Runtime/test/MemoryStreamTests-validation.json)).
 Batch `string-construction` adds 5 tests for String character-sequence copying, graphemes and named arguments qualified in native macOS ARM64 and release-interpreted execution after fixing Char projection and String factory initialization
-([evidence](../runtime/raven/tests/string-construction-validation.json)).
+([evidence](../runtime/System.Runtime/test/StringConstructionTests-validation.json)).
 Batch `unicode-casing` adds 6 tests for Unicode casing expansions, contextual sigma and text preservation qualified in native macOS ARM64 and release-interpreted execution
-([evidence](../runtime/raven/tests/unicode-casing-validation.json)).
+([evidence](../runtime/System.Runtime/test/UnicodeCasingTests-validation.json)).
 Batch `int64-parsing` adds 5 tests for Int64 boundary parsing, lexical errors, overflow and formatting qualified in native macOS ARM64 and release-interpreted execution after implementing the missing native binding
-([evidence](../runtime/raven/tests/int64-parsing-validation.json)).
+([evidence](../runtime/System.Runtime/test/Int64ParsingTests-validation.json)).
 Batch `primitive-parsing` adds 12 tests for primitive numeric and Boolean parsing values, format errors and overflow qualified in native macOS ARM64 and release-interpreted execution after fixing floating generic storage and parser bindings
-([evidence](../runtime/raven/tests/primitive-parsing-validation.json)).
+([evidence](../runtime/System.Runtime/test/PrimitiveParsingTests-validation.json)).
 Batch `path-values` adds 5 tests for Path equality, hashing, display and colliding map behavior qualified in native macOS ARM64 and release-interpreted execution
-([evidence](../runtime/raven/tests/path-values-validation.json)).
+([evidence](../runtime/System.Runtime/test/PathValuesTests-validation.json)).
 Batch `http-header-values` adds 5 tests for HTTP header repetition, lookup validation, snapshots and request metadata qualified in native macOS ARM64 and release-interpreted execution
-([evidence](../runtime/raven/tests/http-header-values-validation.json)).
+([evidence](../runtime/System.Web/test/HttpHeaderValuesTests-validation.json)).
 Batch `http-route-matching` adds 8 tests for HTTP route parsing, captures, decoding, numeric conversion and quotas qualified in native macOS ARM64 and release-interpreted execution
-([evidence](../runtime/raven/tests/http-route-matching-validation.json)).
+([evidence](../runtime/System.Web/test/HttpRouteMatchingTests-validation.json)).
 Batch `ip-address-values` adds 7 tests for public IPAddress parsing corpus, canonical formatting, equality and allocation churn qualified in native macOS ARM64 and release-interpreted execution
-([evidence](../runtime/raven/tests/ip-address-values-validation.json)).
+([evidence](../runtime/System.Networking/test/IpAddressValuesTests-validation.json)).
 Batch `uri-resolution` adds 11 passing native/interpreted tests for URI resolution,
-grammar, equality and byte quotas ([evidence](../runtime/raven/tests/uri-resolution-validation.json)).
+grammar, equality and byte quotas ([evidence](../runtime/System.Runtime/test/UriResolutionTests-validation.json)).
 This completes local migration of the ten selected batches: 69 added cases, 139 total
 library tests. The Windows action at 898fc8a4 subsequently completed successfully
 ([run](https://github.com/marinasundstrom/neoCLR/actions/runs/38067140698));
@@ -2161,7 +2170,7 @@ isolated missing-field checks. Native serializer fallback admission and retained
 conformance gaps exposed by the new tests are fixed; nominal reflection still needs
 explicit retention. The subsequent civil parsing slice adds current/explicit-culture Parse on Date,
 TimeOfDay and LocalDateTime; all eight cases pass both local execution modes
-([evidence](../runtime/raven/tests/time-parsing-validation.json)). Native host-culture
+([evidence](../runtime/System.Runtime/test/TimeParsingTests-validation.json)). Native host-culture
 lookup now has the same preference source as the interpreter and a parity gate.
 Keep Windows qualification and duplicate-name/reference-order coverage visible as
 validation work; do not redesign module semantics to address those checks.
@@ -2435,8 +2444,8 @@ remain open. Duration and TimeOffset add invariant parsing with full tick-bounda
 checks and the existing offset domain. Instant now composes invariant civil text
 with an explicit offset or Z; it never guesses the host zone. Eight Duration/offset
 cases and six Instant cases pass both local modes
-([duration/offset evidence](../runtime/raven/tests/duration-offset-parsing-validation.json),
-[instant evidence](../runtime/raven/tests/instant-parsing-validation.json)). No TryParse alias is added.
+([duration/offset evidence](../runtime/System.Runtime/test/DurationOffsetParsingTests-validation.json),
+[instant evidence](../runtime/System.Runtime/test/InstantParsingTests-validation.json)). No TryParse alias is added.
 ZonedDateTime.Parse(value, zone) now validates the stated offset against pinned zone
 rules; correct offsets select overlap candidates, while gaps/mismatches return
 OffsetMismatch. Native lookup/offset/version queries share the interpreter's rule
@@ -2448,13 +2457,13 @@ host-culture parity probe.
 [review](design/encoding-api-review.md) is recorded after the time-zone slice. It
 retains the established UTF-8/strict-ASCII baseline and compares role, completion,
 error, quota and buffer contracts with System.Text. Eight provider/session checks have migrated into attributed tests; all pass
-both local modes ([evidence](../runtime/raven/tests/encoding-validation.json)).
-Eight further [stream adapter cases](../runtime/raven/tests/encoding-streams-validation.json)
-cover writer completion/failure and selected readers in both local modes. Eight [boundary cases](../runtime/raven/tests/encoding-boundaries-validation.json)
+both local modes ([evidence](../runtime/System.Runtime/test/EncodingTests-validation.json)).
+Eight further [stream adapter cases](../runtime/System.Runtime/test/EncodingStreamTests-validation.json)
+cover writer completion/failure and selected readers in both local modes. Eight [boundary cases](../runtime/System.Runtime/test/EncodingBoundaryTests-validation.json)
 also pass both local modes: Unicode reader boundaries, custom decoded output,
 zero-progress transfers, failures and maximum input/write quotas. Direct decoder/drain
 buffer-limit fixtures now add five passing native/interpreted cases
-([evidence](../runtime/raven/tests/encoding-buffer-limits-validation.json)), with explicit
+([evidence](../runtime/System.Runtime/test/EncodingBufferLimitTests-validation.json)), with explicit
 host budgets and a byte-write accounting fix exposed by the large inputs. Windows
 qualification remains. Paired one-shot decoding and general writer completion follow
 as proposals. This review does not
@@ -5823,7 +5832,7 @@ parsing and custom construction before returning to Index/Range.
 constructor, typed Parse and .NET-style case-insensitive value equality. HttpRequest
 now exposes the value and Create overloads; custom wire spelling survives client and
 server processing. Eight framework cases and six wire/guard cases pass in each local
-mode ([values](../runtime/raven/tests/http-method-values/validation.json),
+mode ([values](../runtime/System.Web/test/HttpMethodValuesTests/validation.json),
 [wire](experiments/http-method/validation.json)). CONNECT tunnelling remains unsupported.
 Windows CI is configured, execution pending. The requested timeout/HttpMethod increment
 is complete locally; Index/Range remains the next author-directed feature.

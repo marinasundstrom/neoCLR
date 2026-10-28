@@ -1,0 +1,95 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import Neo.DependencyInjection.*
+import System.Globalization.*
+import System.Introspection.*
+import Neo.Localization.*
+import System.Optional.*
+import System.Result.*
+import NeoClr.Testing.*
+
+public class Feature { }
+public class Strings : Localizer<Feature> {
+    val Culture: Culture => System.Globalization.Culture.Invariant
+    val self[key: string]: string => "Hello"
+    func Find(key: string) -> Optional<string> => Some("Hello")
+}
+public class Greeting {
+    val Text: string
+    init() { Text = "Default" }
+    init(strings: Localizer<Feature>) { Text = strings["Greeting"] }
+}
+public class Ambiguous {
+    init(strings: Localizer<Feature>) { }
+    init(feature: Feature) { }
+}
+public class Missing {
+    init(feature: Feature) { }
+}
+public class PrivateOnly {
+    private init() { }
+}
+
+[Test("DI selects the greediest available public constructor")]
+func ASelect() -> Result<unit, TestFailure> {
+    let services: ServiceCollection = DefaultServiceCollection()
+    _ = services.AddSingleton<Localizer<Feature>>(Strings())
+    _ = services.AddTransient<Greeting>()
+    let Ok(provider) = services.Build() else { return Assert.True(false, "Build typed localizer constructor") }
+    let Ok(greeting) = provider.GetRequiredService<Greeting>() else { return Assert.True(false, "Resolve greediest constructor") }
+    _ = Assert.Equal("Hello", greeting.Text)?
+    provider.Dispose()
+    let fallback: ServiceCollection = DefaultServiceCollection()
+    _ = fallback.AddTransient<Greeting>()
+    let Ok(other) = fallback.Build() else { return Assert.True(false, "Build fallback") }
+    let Ok(empty) = other.GetRequiredService<Greeting>() else { return Assert.True(false, "Resolve fallback") }
+    other.Dispose()
+    return Assert.Equal("Default", empty.Text)
+}
+
+[Test("DI activates typed localizer dependencies through a retained plan")]
+func BActivate() -> Result<unit, TestFailure> {
+    let services: ServiceCollection = DefaultServiceCollection()
+    _ = services.AddSingleton<Localizer<Feature>>(Strings())
+    _ = services.AddTransient<Greeting>()
+    let Ok(provider) = services.Build() else { return Assert.True(false, "Build") }
+    let Ok(first) = provider.GetRequiredService<Greeting>() else { return Assert.True(false, "First activation") }
+    let Ok(second) = provider.GetRequiredService<Greeting>() else { return Assert.True(false, "Reuse plan") }
+    _ = Assert.Equal("Hello", first.Text)?
+    provider.Dispose()
+    return Assert.True(!Object.ReferenceEquals(first, second), "Fresh transient instances")
+}
+
+[Test("DI rejects ambiguous missing and inaccessible constructors")]
+func CReject() -> Result<unit, TestFailure> {
+    let ambiguous: ServiceCollection = DefaultServiceCollection()
+    _ = ambiguous.AddSingleton<Localizer<Feature>>(Strings())
+    _ = ambiguous.AddTransient<Feature>()
+    _ = ambiguous.AddTransient<Ambiguous>()
+    _ = Assert.True(ambiguous.Build() is Failure(ServiceError.Activation(_, ActivationError.AmbiguousConstructor)), "Ambiguous")?
+    let missing: ServiceCollection = DefaultServiceCollection()
+    _ = missing.AddTransient<Missing>()
+    _ = Assert.True(missing.Build() is Failure(ServiceError.Activation(_, ActivationError.MissingConstructor)), "Missing")?
+    let inaccessible: ServiceCollection = DefaultServiceCollection()
+    _ = inaccessible.AddTransient<PrivateOnly>()
+    _ = Assert.True(inaccessible.Build() is Failure(ServiceError.Activation(_, ActivationError.MissingConstructor)), "Private")?
+    return Assert.True(inaccessible.AddTransient<Localizer>() is Failure(ServiceError.InvalidRegistration(_)), "Interface")
+}
+
+[Test("DI builds plans without executing constructors or factories")]
+func DErrors() -> Result<unit, TestFailure> {
+    let log = DisposalLog()
+    let services: ServiceCollection = DefaultServiceCollection()
+    _ = services.AddTransient<Localizer<Feature>>(provider => {
+        log.Append("F")
+        return Ok<Localizer<Feature>>(Strings())
+    })
+    _ = services.AddTransient<Greeting>()
+    let Ok(provider) = services.Build() else { return Assert.True(false, "Build") }
+    _ = Assert.Equal("", log.Text)?
+    let Ok(value) = provider.GetRequiredService<Greeting>() else { return Assert.True(false, "Activate") }
+    _ = Assert.Equal("Hello", value.Text)?
+    provider.Dispose()
+    return Assert.Equal("F", log.Text)
+}

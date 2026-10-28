@@ -4,7 +4,7 @@
 
 `NeoClr.Testing` is a source-included repository test framework, not a released
 System.Runtime assembly or an installed test SDK. Include the framework Raven
-sources from `runtime/raven/tests/framework`. These types are outside the guest
+sources from `tools/testing/NeoCLR.Testing`. These types are outside the guest
 CoreProbe/RavenDoc selection; this manual reference covers that separate surface.
 
 ## TestAttribute
@@ -36,7 +36,7 @@ func `IPv4 parsing and canonical formatting round trip`() -> Result<unit, TestFa
 }
 ```
 
-See the executable [IP address tests](https://github.com/marinasundstrom/neoCLR/blob/main/runtime/raven/tests/ip-address-values/Tests.rvn)
+See the executable [IP address tests](https://github.com/marinasundstrom/neoCLR/blob/main/runtime/System.Networking/test/IpAddressValuesTests/NeoClr/RuntimeTests/Tests.rvn)
 for the helper and complete corpus. Optional descriptions remain useful as display
 overrides. Moving description text into the function name changes its ID,
 name-based filters and ordinal registration order. Backticks themselves are absent
@@ -132,7 +132,7 @@ Each row is a separately reported/filterable test. Inline selectors append `(val
 source selectors append `/Qualified.Provider[index]`. Indices are zero-based and
 change meaning if source order changes. Source entries in the metadata inventory
 have `dynamic: true`; they describe registration templates rather than enumerated
-runtime cases. See the [tested data examples](https://github.com/marinasundstrom/neoCLR/blob/main/runtime/raven/tests/discovery-contract/Tests.rvn).
+runtime cases. See the [tested data examples](https://github.com/marinasundstrom/neoCLR/blob/main/runtime/System.Runtime/test/TestDiscoveryContract/NeoClr/DiscoveryTests/Tests.rvn).
 
 
 <a id="categoryattribute-development"></a>

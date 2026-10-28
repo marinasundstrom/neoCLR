@@ -29,7 +29,7 @@ def main():
         interpreted += ['--module', library / (name + '.dll')]
     interpreted += ['--object-root', library / 'System.Runtime.dll', '--']
     inputs = [Path(__file__), Path(__file__).with_name('Bounds.rvn'), Path(__file__).with_name('Bounds.rvnproj'),
-              ROOT / 'runtime/raven/src/System/Data/Json/JsonValue.rvn']
+              ROOT / 'runtime/System.Data/src/System.Data/System/Data/Json/JsonValue.rvn']
     report = dict(passed=False, platform=platform.platform(), cases=[],
                   inputs={str(p.relative_to(ROOT)): sha(p) for p in inputs},
                   artifacts={str(p): sha(p) for p in (bundle / 'manifest.json', runtime, executable, build / 'app.dll')})

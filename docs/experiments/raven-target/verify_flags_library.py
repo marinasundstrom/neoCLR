@@ -26,7 +26,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-flags-library-') as temporary:
     (root / 'demo').mkdir()
     core = root / 'demo/NeoCLR.CoreProbe.dll'
     run(['dotnet', args.bridge.resolve(), '--reference-library-core', core])
-    source = (ROOT / 'runtime/raven/src/System/Introspection/BindingFlags.rvn').read_text()
+    source = (ROOT / 'runtime/System.Runtime/src/System.Runtime/System/Introspection/BindingFlags.rvn').read_text()
     cases = [
         ('BindingFlags', source, None),
         ('WrongValue', source.replace('Public = 16', 'Public = 64'), 'Unsupported BindingFlags enum metadata'),

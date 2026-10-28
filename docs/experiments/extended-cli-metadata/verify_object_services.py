@@ -18,8 +18,8 @@ def main():
         ('compiler', 'library', 'ownership', 'seed', 'core', 'runtime', 'output'))
     output.mkdir(parents=True, exist_ok=False)
     sources = [ROOT / path for path in (
-        'runtime/raven/native/RuntimeObjectCalls.rvn',
-        'runtime/raven/native/RuntimeObjectServices.rvn',
+        'runtime/System.Runtime/src/System.Runtime/neoCLR/Runtime/RuntimeObjectCalls.rvn',
+        'runtime/System.Runtime/src/System.Runtime/native/RuntimeObjectServices.rvn',
         'docs/experiments/extended-cli-metadata/bootstrap/object-services-library.rvn')]
     consumer = ROOT / 'docs/experiments/extended-cli-metadata/bootstrap/object-services-consumer.rvn'
     support, app = output / 'ObjectServices.dll', output / 'App.dll'

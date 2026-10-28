@@ -1,0 +1,219 @@
+module Neo.Localization
+
+import System.*
+import System.Collections.*
+import System.Concurrency.Tasks.*
+import System.Data.Json.*
+import System.IO.*
+import System.Globalization.*
+import System.Introspection.*
+import System.Storage.*
+import System.Storage.FileText.*
+import System.Optional.*
+import System.Result.*
+
+internal class CatalogueLocalizer : Localizer {
+    val Culture: Culture => System.Globalization.Culture.Invariant
+
+    private val entries: HashMap<string, string>
+
+    init(entries: HashMap<string, string>) {
+        self.entries = entries
+    }
+
+    val self[key: string]: string {
+        get {
+            if entries.Find(key) is Some(let value) {
+                return value
+            }
+            return key
+        }
+    }
+
+    func Find(key: string) -> Optional<string> => entries.Find(key)
+}
+
+/// Loads one explicit catalogue in the flat JSON string-map format.
+/// Each key and value must be a string. Dots are literal; no pluralization or interpolation is performed.
+/// Limits: 65536 UTF-8 bytes and 4096 entries. Duplicate ordinal keys are errors.
+public class JsonLocalizerProvider {
+    private val directory: string
+    private val fallbackToInvariant: bool
+
+    /// Configures an explicit resource directory, with invariant fallback enabled.
+    init(directory: string) {
+        self.directory = directory
+        fallbackToInvariant = true
+    }
+
+    /// Configures the directory and automatic invariant fallback. Construction performs no I/O.
+    /// Explicit Culture.Invariant selection always reads the invariant catalogue.
+    init(directory: string, fallbackToInvariant: bool) {
+        self.directory = directory
+        self.fallbackToInvariant = fallbackToInvariant
+    }
+
+    /// Creates an owned, immutable catalogue from a borrowed complete UTF-8 document.
+    /// The input is not retained; parsing allocates stored keys, values and the lookup map.
+    static func Create(utf8: ReadOnlySlice<byte>) -> Result<Localizer, LocalizationError> {
+        return match StringMapReader().Read(utf8) {
+            Ok(let entries) => {
+                let localizer: Localizer = CatalogueLocalizer(entries)
+                Ok(localizer)
+            }
+            Failure(let error) => Failure(LocalizationError.Json(error))
+        }
+    }
+
+    /// Creates a catalogue from JSON text without encoding it into a temporary byte array.
+    static func Create(json: string) -> Result<Localizer, LocalizationError> => Create(json.Utf8Bytes)
+
+    /// Reads a UTF-8 catalogue from the current stream position through EOF; leaves the stream open.
+    /// Loading buffers at most 65536 UTF-8 bytes. The resulting catalogue does not retain the stream.
+    async static func Read(input: InputStream) -> Task<Result<Localizer, LocalizationError>> {
+        let reader = match StreamReader.Create(input, true) {
+            Ok(let value) => value
+            Failure(let error) => return Failure(LocalizationError.Read(error))
+        }
+        let result = await reader.ReadToEnd(65536)
+        reader.Close()
+        return match result {
+            Ok(let text) => Create(text)
+            Failure(let error) => Failure(LocalizationError.Read(error))
+        }
+    }
+
+    /// Reads one explicit UTF-8 file synchronously using the bounded blocking storage provider.
+    /// The provider closes the file before returning. No ambient culture, path inference or caching is applied.
+    /// Use Read with an InputStream for asynchronous input.
+    static func Load(path: string) -> Result<Localizer, LocalizationError> {
+        return match ReadAllText(path, 65536) {
+            Ok(let text) => Create(text)
+            Failure(let error) => Failure(LocalizationError.File(error))
+        }
+    }
+
+    /// Loads unscoped culture, language and invariant catalogues from an explicit directory.
+    /// Fallback is per key. Missing files are skipped; all other failures are returned.
+    func Load(culture: Culture) -> Result<Localizer, LocalizationError> {
+        return Load(culture, "")
+    }
+
+    /// Loads scope.culture.json, scope.language.json and scope.json, with per-key fallback.
+    /// An empty scope uses culture.json, language.json and invariant.json instead.
+    /// Invariant selects only the invariant file. Scope must be a filename component, not a path.
+    /// Missing files yield an empty catalogue if no files exist. Each file has the documented byte and entry limits.
+    func Load(culture: Culture, scope: string) -> Result<Localizer, LocalizationError> {
+        if scope == "." || scope == ".." {
+            return Failure(LocalizationError.InvalidScope)
+        }
+        let scopeBytes = scope.Utf8Bytes
+        for index in 0..scopeBytes.Length {
+            let value = scopeBytes[index]
+            if value == 0 || value == 47 || value == 92 || value == 58 {
+                return Failure(LocalizationError.InvalidScope)
+            }
+        }
+        var prefix = directory
+        if directory != "" { prefix += "/" }
+        var invariant = "invariant.json"
+        var scopePrefix = ""
+        if scope != "" {
+            invariant = scope + ".json"
+            scopePrefix = scope + "."
+        }
+        let empty = Create("{}")?
+        var result = empty
+        if fallbackToInvariant || culture.Name == "" {
+            result = Layer(prefix + invariant, result)?
+        }
+        if culture.Name != "" {
+            result = Layer(prefix + scopePrefix + culture.Language.Code + ".json", result)?
+            result = Layer(prefix + scopePrefix + culture.Name + ".json", result)?
+        }
+        let selected: Localizer = CultureLocalizer(result, culture)
+        return Ok(selected)
+    }
+
+    /// Loads using T's simple type name as the optional resource scope, retaining typed catalogue identity.
+    /// Types with the same simple name share a scope; use explicit scope loading to avoid collisions.
+    func Load<T>(culture: Culture) -> Result<Localizer<T>, LocalizationError> {
+        let catalogue = Load(culture, typeof(T))?
+        let typed: Localizer<T> = TypedLocalizer<T>(catalogue)
+        return Ok(typed)
+    }
+
+    /// Loads resources for a nominal runtime type using the same simple-name scope as the generic Load overload.
+    func Load(culture: Culture, resourceType: TypeInfo) -> Result<Localizer, LocalizationError> {
+        if !(resourceType is NominalTypeInfo) {
+            return Failure(LocalizationError.InvalidScope)
+        }
+        // Native nominal names currently retain their namespace/nesting path.
+        // Resource scope is deliberately the final nominal name component.
+        let name = ((NominalTypeInfo)resourceType).Name
+        let bytes = name.Utf8Bytes
+        var start = 0
+        for index in 0..bytes.Length {
+            if bytes[index] == 46 || bytes[index] == 43 {
+                start = index + 1
+            }
+        }
+        let scope = match name.SliceUtf8(start, bytes.Length - start) {
+            Ok(let value) => value
+            Failure(_) => return Failure(LocalizationError.InvalidScope)
+        }
+        return Load(culture, scope)
+    }
+
+    private static func Layer(path: string, fallback: Localizer) -> Result<Localizer, LocalizationError> {
+        return match Load(path) {
+            Ok(let value) => {
+                let combined: Localizer = FallbackLocalizer(value, fallback)
+                Ok(combined)
+            }
+            Failure(LocalizationError.File(FileReadError.NotFound)) => Ok(fallback)
+            Failure(let error) => Failure(error)
+        }
+    }
+
+}
+
+
+internal class FallbackLocalizer : Localizer {
+    val Culture: Culture => primary.Culture
+    private val primary: Localizer
+    private val fallback: Localizer
+    init(primary: Localizer, fallback: Localizer) {
+        self.primary = primary
+        self.fallback = fallback
+    }
+    func Find(key: string) -> Optional<string> {
+        if primary.Find(key) is Some(let value) { return Some(value) }
+        return fallback.Find(key)
+    }
+    val self[key: string]: string {
+        get {
+            if Find(key) is Some(let value) { return value }
+            return key
+        }
+    }
+}
+
+internal class TypedLocalizer<T> : Localizer<T> {
+    val Culture: Culture => inner.Culture
+    private val inner: Localizer
+    init(inner: Localizer) { self.inner = inner }
+    func Find(key: string) -> Optional<string> => inner.Find(key)
+    val self[key: string]: string => inner[key]
+}
+
+internal class CultureLocalizer : Localizer {
+    private val inner: Localizer
+    val Culture: Culture
+    init(inner: Localizer, culture: Culture) {
+        self.inner = inner
+        Culture = culture
+    }
+    func Find(key: string) -> Optional<string> => inner.Find(key)
+    val self[key: string]: string => inner[key]
+}

@@ -10,6 +10,10 @@
 /scripts/__pycache__/
 
 # Native class-library project outputs.
+/runtime/System.*/**/bin/
+/runtime/System.*/**/obj/
+/extensions/**/bin/
+/extensions/**/obj/
 /runtime/raven/projects/**/bin/
 /runtime/raven/projects/**/obj/
 

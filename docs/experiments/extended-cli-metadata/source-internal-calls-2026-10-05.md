@@ -2,7 +2,7 @@
 
 Raven now compiles explicitly marked internal service declarations directly to the
 [metadata InternalCall contract](internal-call-authoring-2026-10-05.md). The runtime
-library owns `runtime/raven/native/RuntimeHandleServices.rvn`; its TypeArgumentCount
+library owns `runtime/System.Runtime/src/System.Runtime/neoCLR/Runtime/RuntimeHandleServices.rvn`; its TypeArgumentCount
 and ObjectTypeHandle declarations execute through a separate native consumer.
 No descriptor duplicates or new runtime type representation are needed for this gate.
 

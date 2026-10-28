@@ -23,8 +23,8 @@ def main():
               '--bootstrap-intrinsics', '--bootstrap-ownership', ownership, '--reference', library]
     names = ('EntryKind', 'FileReadError', 'FileSystem', 'FileText', 'FileWriteError',
              'InvalidPathError', 'Metadata', 'Path', 'StorageItems', 'StorageLookupError', 'StorageProvider')
-    sources = [ROOT / 'runtime/raven/src/System/Storage' / (name + '.rvn') for name in names]
-    sources += [ROOT / 'runtime/raven/native' / (name + '.rvn') for name in
+    sources = [ROOT / 'runtime/System.Runtime/src/System.Runtime/System/Storage' / (name + '.rvn') for name in names]
+    sources += [ROOT / 'runtime/System.Runtime/src/System.Runtime/native' / (name + '.rvn') for name in
                 ('RuntimeStorageCalls', 'RuntimeStorageServices', 'RuntimeFileTextServices')]
     sample = ROOT / 'docs/experiments/storage-poc/Main.rvn'
     storage, app = output / 'Storage.dll', output / 'StorageSample.dll'

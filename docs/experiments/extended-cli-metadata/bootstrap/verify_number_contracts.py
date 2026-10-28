@@ -35,7 +35,7 @@ def main():
               '--runtime-seed', args.seed.resolve(), '--reference', args.base_library.resolve()]
     configured = common + ['--bootstrap-ownership', ownership]
     contracts = output / 'NumberContracts.dll'
-    source = ROOT / 'runtime/raven/src/System/Number.rvn'
+    source = ROOT / 'runtime/System.Runtime/src/System.Runtime/System/Number.rvn'
     run(configured + ['--library', '-o', contracts, source])
     implementation = output / 'NumberImplementation.dll'
     run(configured + ['--reference', contracts, '--library', '-o', implementation, HERE / 'number-scalar.rvn'])

@@ -19,10 +19,10 @@ def main():
         setattr(args, name, getattr(args, name).resolve())
     output = args.output
     output.mkdir(parents=True, exist_ok=False)
-    sources = [ROOT / p for p in ('runtime/raven/src/System/Runtime/InteropServices/NativeMemory/Functions.rvn',
-        'runtime/raven/native/NativeAllocation.rvn', 'runtime/raven/native/RuntimeNativeAllocationCalls.rvn')]
+    sources = [ROOT / p for p in ('runtime/System.Runtime/src/System.Runtime/System/Runtime/InteropServices/NativeMemory/Functions.rvn',
+        'runtime/System.Runtime/src/System.Runtime/System/Runtime/CompilerServices/NativeAllocation.rvn', 'runtime/System.Runtime/src/System.Runtime/neoCLR/Runtime/RuntimeNativeAllocationCalls.rvn')]
     if args.source_unit:
-        sources.append(ROOT / 'runtime/raven/src/System/Void.rvn')
+        sources.append(ROOT / 'runtime/System.Runtime/src/System.Runtime/System/Void.rvn')
         sources.append(Path(__file__).resolve().parent / 'bootstrap/unit-interface.rvn')
     manifest = json.loads(args.ownership.read_text())
     if args.source_unit:

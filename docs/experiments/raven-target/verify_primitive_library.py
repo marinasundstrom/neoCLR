@@ -26,7 +26,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-primitive-library-') as temporar
     (root / 'demo').mkdir()
     core = root / 'demo/NeoCLR.CoreProbe.dll'
     run(['dotnet', args.bridge.resolve(), '--reference-library-core', core])
-    source = (ROOT / 'runtime/raven/src/System/Int64.rvn').read_text()
+    source = (ROOT / 'runtime/System.Runtime/src/System.Runtime/System/Int64.rvn').read_text()
     for name, text, diagnostic in [
         ('Valid', source, None),
         ('WrongStorage', source.replace('m_value: long', 'm_value: int'), 'Unsupported primitive library storage'),

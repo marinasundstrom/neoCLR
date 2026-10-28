@@ -27,11 +27,11 @@ with tempfile.TemporaryDirectory(prefix='neoclr-foundation-library-') as tempora
     (root / 'demo').mkdir()
     core = root / 'demo/NeoCLR.CoreProbe.dll'
     run(['dotnet', args.bridge.resolve(), '--reference-library-core', core])
-    source = (ROOT / 'runtime/raven/src/System/EquatableTo.rvn').read_text()
-    local = (ROOT / 'runtime/raven/src/System/Time/LocalDateTime.rvn').read_text()
-    file_source = (ROOT / 'runtime/raven/src/System/Storage/FileText.rvn').read_text()
-    mapping = (ROOT / 'runtime/raven/src/System/Collections/Map.rvn').read_text()
-    mutable = (ROOT / 'runtime/raven/src/System/Collections/MutableMap.rvn').read_text()
+    source = (ROOT / 'runtime/System.Runtime/src/System.Runtime/System/EquatableTo.rvn').read_text()
+    local = (ROOT / 'runtime/System.Runtime/src/System.Runtime/System/Time/LocalDateTime.rvn').read_text()
+    file_source = (ROOT / 'runtime/System.Runtime/src/System.Runtime/System/Storage/FileText.rvn').read_text()
+    mapping = (ROOT / 'runtime/System.Runtime/src/System.Runtime/System/Collections/Map.rvn').read_text()
+    mutable = (ROOT / 'runtime/System.Runtime/src/System.Runtime/System/Collections/MutableMap.rvn').read_text()
     mismatch = 'Library interface does not match reference contract'
     cases = [
         ('Equality', 'EquatableTo', source, None),

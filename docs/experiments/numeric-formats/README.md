@@ -3,8 +3,8 @@
 The author requested Formattable on the remaining numeric primitives, then explicit
 culture parsing, and directed using the built-in test framework instead of standalone
 applications where possible. Public API tests live in
-[`numeric-formatting`](../../../runtime/raven/tests/numeric-formatting/Tests.rvn).
-The seven-test [`globalization`](../../../runtime/raven/tests/globalization/Tests.rvn)
+[`numeric-formatting`](../../../runtime/System.Runtime/test/NumericFormattingTests/NeoClr/RuntimeTests/Tests.rvn).
+The seven-test [`globalization`](../../../runtime/System.Runtime/test/GlobalizationTests/NeoClr/RuntimeTests/Tests.rvn)
 suite checks all five profiles, UK/US clock boundaries, preference resolution and
 isolation of returned calendar/grouping arrays. The existing primitive-parsing suite
 is the invariant regression. All three use discovery,

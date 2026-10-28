@@ -350,7 +350,7 @@ Run edited samples through the saved-project runner, regenerate changed Raven
 runtime slices, and check source admission when declarations change. The
 [Optional sample](experiments/raven-target/samples/library-option.rvn),
 [nested type sample](experiments/raven-target/samples/library-nested-type-info.rvn)
-and [runtime descriptors](../runtime/raven/src/System/Introspection/Descriptors.rvn)
+and [runtime descriptors](../runtime/System.Runtime/src/System.Runtime/System/Introspection/Descriptors.rvn)
 provide executable examples of these conventions.
 
 ## Query operator terminology
@@ -447,7 +447,7 @@ no alias is needed. After extracting `Failure(let error)`, narrow with a typed p
 such as `error is FileReadError fileError`, then inspect the nominal error's cases.
 
 See the [configuration loader](experiments/adhoc-error-unions/Config.rvn), the
-[HTTP JSON implementation](../runtime/raven/src/System/Web/Http/Json/JsonClientOperations.rvn),
+[HTTP JSON implementation](../runtime/System.Web/src/System.Web/System/Web/Http/Json/JsonClientOperations.rvn),
 the [async composition regression](experiments/http-json-client/PropagationChecks.rvn),
 and [JSON mapping orchestration](experiments/json-object-mapping/Main.rvn).
 HTTP JSON is a strong existing API example: it combines transport and serialization

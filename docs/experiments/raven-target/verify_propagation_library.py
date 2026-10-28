@@ -26,7 +26,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-foundation-library-') as tempora
     (root / 'demo').mkdir()
     core = root / 'demo/NeoCLR.CoreProbe.dll'
     run(['dotnet', args.bridge.resolve(), '--reference-library-core', core])
-    source = (ROOT / 'runtime/raven/src/System/Propagatable.rvn').read_text()
+    source = (ROOT / 'runtime/System.Runtime/src/System.Runtime/System/Propagatable.rvn').read_text()
     cases = [
         ('Protocol', 'Propagatable', source, None),
         ('RefParameter', 'Propagatable', source.replace('out output:', 'ref output:'), 'Unsupported library interface contract'),

@@ -129,7 +129,7 @@ InputStream reads, including pending reads, before sending the next body chunk.
 
 See [the design and current qualification](https://github.com/marinasundstrom/neoCLR/blob/main/docs/stream-design.md) and the tested
 memory-stream, encoding-streams, encoding-boundaries and json-streams suites under
-`runtime/raven/tests`. Native library support does not imply that the historical
+the owning components’ `test` projects. Native library support does not imply that the historical
 synchronous CLI execution bridge supports these new signatures.
 
 <a id="gzip-composition-development"></a>

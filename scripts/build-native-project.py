@@ -323,7 +323,9 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
         catalog = json.loads(catalog_path.read_text())
         core_assemblies = ['System.Runtime', 'System.Data', 'System.Networking', 'System.Web']
         if catalog.get('version') != 1 or catalog.get('assemblyNames') not in (
-                core_assemblies, core_assemblies + ['System.Data.PostgreSql']):
+                core_assemblies, core_assemblies + ['System.Data.PostgreSql'],
+                core_assemblies + ['Neo.DependencyInjection', 'Neo.Localization'],
+                core_assemblies + ['Neo.DependencyInjection', 'Neo.Localization', 'System.Data.PostgreSql']):
             raise ValueError('This profile requires the split native class-library bundle v1 (optionally with PostgreSql)')
         if catalog.get('objectAssembly') != 'System.Runtime':
             raise ValueError('Unsupported bundle Object owner')

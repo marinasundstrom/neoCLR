@@ -111,7 +111,7 @@ cryptography crates. HTTPS build manifests now include only their TLS dependenci
 
 ## Typed interpreter boundary
 
-`runtime/raven/native/RuntimeCryptographyCalls.rvn` declares the private SHA-256, HMAC,
+`runtime/System.Runtime/src/System.Runtime/neoCLR/Runtime/RuntimeCryptographyCalls.rvn` declares the private SHA-256, HMAC,
 verification and random-fill operations. Their readonly/writable byte-slice arguments and exact
 result signatures are checked before dispatch. The interpreter uses the same safe
 provider crate as the native wrappers, copies initialized inputs and writes into
@@ -161,7 +161,7 @@ contains declaration-only stubs and projects the error union from Raven source;
 all executable bodies come from the native managed library.
 
 [API contracts](../api-docs/cryptography.md) and the
-[managed test suite](../runtime/raven/tests/cryptography/Tests.rvn) document borrowed
+[managed test suite](../runtime/System.Runtime/test/CryptographyTests/NeoClr/RuntimeTests/Tests.rvn) document borrowed
 buffers, overlapping inputs, preserved tails, short destinations, exact tags,
 empty inputs and provider failure. Lower-level fault/RNG-injection evidence remains
 in the provider and runtime tests; the managed API adds no recoverable Fault path.

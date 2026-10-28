@@ -62,7 +62,7 @@ def main():
         artifacts.append(native_manifest)
         sources = [ROOT / p for p in json.loads(manifest.read_text())['libraries'][0]['sources']]
         # The library's real namespace function delegates to the target service adapter.
-        sources.append(ROOT / 'runtime/raven/src/System/Functions.rvn')
+        sources.append(ROOT / 'runtime/System.Runtime/src/System.Runtime/System/Functions.rvn')
         library = output / 'NeoCLR.Collections.dll'
         artifacts += [manifest, library] + sources
         configured = common + ['--bootstrap-ownership', str(manifest)]

@@ -40,9 +40,9 @@ source checklist remains blocked by its pre-existing caller-discovery drift
 The current public metadata inventory and API snapshot are independently checked.
 
 Development test migration (2026-10-10): Unicode casing expansions, contextual sigma and text preservation now also run as 6
-attributed framework tests in `runtime/raven/tests/unicode-casing`. The framework README
+attributed framework tests in `runtime/System.Runtime/test/UnicodeCasingTests`. The framework README
 links native/interpreted evidence. This original consumer retains its integration purpose.
 
 Development test migration (2026-10-10): Int64 boundary parsing, lexical errors, overflow and formatting now also run as 5
-attributed framework tests in `runtime/raven/tests/int64-parsing`. The framework README
+attributed framework tests in `runtime/System.Runtime/test/Int64ParsingTests`. The framework README
 links native/interpreted evidence. This original consumer retains its integration purpose.

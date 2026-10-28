@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="$(NeoClrBundleRoot)/lib/NeoCLR.ClassLibrary.props" />
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>MediaTypeAllocationTests</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../../../tools/testing/NeoCLR.Testing/NeoClr/Testing/Assertions.rvn" />
+    <Compile Include="../../../../tools/testing/NeoCLR.Testing/NeoClr/Testing/TestSuite.rvn" />
+    <Compile Include="../../../../tools/testing/NeoCLR.Testing/NeoClr/Testing/TestAttribute.rvn" />
+    <Compile Include="$(NeoClrTestRegistry)" />
+    <Compile Include="../../../../tools/testing/NeoCLR.Testing/NeoClr/RuntimeTests/Main.rvn" />
+    <Compile Include="NeoClr/RuntimeTests/Tests.rvn" />
+    <!-- Compile the exact internal scanner/bounds for allocation measurement without a friend grant or public test hook. -->
+    <Compile Include="../../src/System.Web/System/Web/Http/MediaTypeSyntax.rvn" />
+    <Compile Include="../../src/System.Web/System/Web/Http/HttpWireLimits.rvn" />
+  </ItemGroup>
+</Project>

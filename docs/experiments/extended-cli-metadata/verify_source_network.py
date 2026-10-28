@@ -19,8 +19,8 @@ def main():
     output.mkdir(parents=True, exist_ok=False)
     common = ['dotnet', compiler, 'neoclr', '--core-reference', core, '--runtime-seed', seed,
               '--bootstrap-intrinsics', '--bootstrap-ownership', ownership, '--reference', library]
-    sources = sorted((ROOT / 'runtime/raven/src/System/Networking').rglob('*.rvn'))
-    sources += [ROOT / 'runtime/raven/native' / name for name in
+    sources = sorted((ROOT / 'runtime/System.Networking/src/System.Networking/System/Networking').rglob('*.rvn'))
+    sources += [ROOT / 'runtime/System.Runtime/src/System.Runtime/native' / name for name in
                 ('RuntimeNetworkCalls.rvn',)]
     sample = ROOT / 'docs/experiments/network-cancellation/Main.rvn'
     network, app = output / 'Sockets.dll', output / 'NetworkCancellation.dll'

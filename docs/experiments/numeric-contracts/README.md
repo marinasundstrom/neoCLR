@@ -44,5 +44,5 @@ with `RavenTargetPlatform=NeoCLR`. It does not depend on structural Function typ
 Refresh `native-self-validation.json` from matching rebuilt artifacts.
 
 Development test migration (2026-10-10): primitive numeric and Boolean parsing values, format errors and overflow now also run as 12
-attributed framework tests in `runtime/raven/tests/primitive-parsing`. The framework README
+attributed framework tests in `runtime/System.Runtime/test/PrimitiveParsingTests`. The framework README
 links native/interpreted evidence. This original consumer retains its integration purpose.

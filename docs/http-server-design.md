@@ -296,9 +296,9 @@ or implementation placement is selected by this review.
 ### Existing implementation and evidence
 
 - HTTP protocol and exchange control are already managed Raven code:
-  [HttpServer](../runtime/raven/src/System/Web/Http/HttpServer.rvn),
-  [HttpWire](../runtime/raven/src/System/Web/Http/HttpWire.rvn) and
-  [HttpBodyInput](../runtime/raven/src/System/Web/Http/HttpBodyInput.rvn).
+  [HttpServer](../runtime/System.Web/src/System.Web/System/Web/Http/HttpServer.rvn),
+  [HttpWire](../runtime/System.Web/src/System.Web/System/Web/Http/HttpWire.rvn) and
+  [HttpBodyInput](../runtime/System.Web/src/System.Web/System/Web/Http/HttpBodyInput.rvn).
   Preserve byte-oriented incremental parsing and framing checks when optimizing.
 - [Server options](http-server-options.md) bound headers, bodies and read/write
   deadlines; the current exchange cap is 16. These are bounded development

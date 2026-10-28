@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="$(NeoClrBundleRoot)/lib/NeoCLR.ClassLibrary.props" />
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>RuntimeRunnerContractTests</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../../../tools/testing/NeoCLR.Testing/NeoClr/Testing/Assertions.rvn" />
+    <Compile Include="../../../../tools/testing/NeoCLR.Testing/NeoClr/Testing/TestSuite.rvn" />
+    <Compile Include="NeoClr/RunnerTests/Main.rvn" />
+  </ItemGroup>
+</Project>

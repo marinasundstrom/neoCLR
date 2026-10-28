@@ -147,7 +147,7 @@ or packaged-release validation.
 
 ## Raven implementation — 2026-09-15
 
-The HashMap implementation now lives in `runtime/raven/src/System/Collections/HashMap.rvn`; the map
+The HashMap implementation now lives in `runtime/System.Runtime/src/System.Runtime/System/Collections/HashMap.rvn`; the map
 interface declarations remain in `runtime/raven/Map.neoil`. Generated bootstrap IL
 preserves the algorithms and contracts described here. Private implementation helpers
 remain private. The class owns equality/hash delegates directly and uses the
@@ -256,6 +256,6 @@ The missing-key channel follows neoCLR's existing terminal Fault model rather th
 .NET's catchable KeyNotFoundException. That makes Find especially important for
 recoverable lookup. No new error type or exception subsystem is introduced.
 
-Validation: [framework tests](../runtime/raven/tests/collection-construction/MapIndexers.rvn)
+Validation: [framework tests](../runtime/System.Runtime/test/CollectionConstructionTests/NeoClr/RuntimeTests/MapIndexers.rvn)
 and [missing-key probe](experiments/map-indexers/README.md). JsonObject's proposed map
 conformance remains a separate follow-up.

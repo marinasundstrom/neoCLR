@@ -31,9 +31,9 @@ def main():
     common = ['dotnet', args.compiler.resolve(), 'neoclr', '--core-reference', args.core.resolve(),
               '--runtime-seed', args.seed.resolve(), '--bootstrap-intrinsics',
               '--bootstrap-ownership', args.ownership.resolve(), '--reference', args.base_library.resolve()]
-    sources = [ROOT / 'runtime/raven/src/System/IO' / (name + '.rvn')
+    sources = [ROOT / 'runtime/System.Runtime/src/System.Runtime/System/IO' / (name + '.rvn')
                for name in ('InputStream', 'OutputStream', 'SeekableStream', 'StreamError', 'MemoryStream', 'FileInputStream', 'FileOutputStream')]
-    sources += [ROOT / 'runtime/raven/src/System/Text' / (name + '.rvn') for name in ('Utf8', 'InvalidUtf8Error')]
+    sources += [ROOT / 'runtime/System.Runtime/src/System.Runtime/System/Text' / (name + '.rvn') for name in ('Utf8', 'InvalidUtf8Error')]
     library = output / 'ServiceLibrary.dll'
     run(common + ['--library', '-o', library] + sources)
     fixture = output / 'file.bin'

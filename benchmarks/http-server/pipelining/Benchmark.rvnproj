@@ -13,6 +13,6 @@
     <Compile Include="../Model.rvn" />
     <Compile Include="$(NeoClrBundleRoot)/lib/RuntimeAwait.rvn" />
     <!-- Compile exact System.Web sources so session/parser internals need no friend grant. -->
-    <Compile Include="../../../runtime/raven/src/System/Web/**/*.rvn" />
+    <Compile Include="../../../runtime/System.Web/src/System.Web/System/Web/**/*.rvn" />
   </ItemGroup>
 </Project>

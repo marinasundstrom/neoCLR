@@ -53,7 +53,7 @@ Raven integration documentation is committed as 7221a99ea.
 ```sh
 python3 docs/experiments/extended-cli-metadata/verify_source_heap.py \
   --compiler /path/to/rvnc.dll --compiler-revision <revision> \
-  --library /path/to/Numbers.dll --ownership runtime/raven/native/poc-ownership.json \
+  --library /path/to/Numbers.dll --ownership runtime/System.Runtime/src/System.Runtime/native/poc-ownership.json \
   --seed /path/to/System.neox --core /path/to/Core.dll \
   --runtime target/debug/neoclr --output /tmp/source-heap-gate
 cargo test --test runtime_gc

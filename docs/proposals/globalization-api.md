@@ -5,7 +5,7 @@ The goal is a .NET-inspired globalization model that keeps the familiar ergonomi
 The globalization domain is separate from the Time API and from the future localization/resource API.
 
 ```text
-System.Time              System.Globalization          System.Localization
+System.Time              System.Globalization          Neo.Localization
 ───────────              ────────────────────          ───────────────────
 Instant                  Culture                       resources
 Date                     CultureId                     messages
@@ -21,7 +21,9 @@ Clock                    CultureProvider
                          CultureResolver
 ```
 
-`System.Localization` remains a later proposal.
+`Neo.Localization` now has a development lookup/provider implementation; broader
+message features in this proposal remain exploratory. See the
+[current reference](../../api-docs/localization.md).
 
 ### 1. `Culture`
 

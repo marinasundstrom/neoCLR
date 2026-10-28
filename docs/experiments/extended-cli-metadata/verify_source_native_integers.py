@@ -19,10 +19,10 @@ def main():
         ('compiler', 'library', 'ownership', 'seed', 'core', 'runtime', 'output'))
     output.mkdir(parents=True, exist_ok=False)
     sources = [ROOT / path for path in (
-        'runtime/raven/src/System/IntPtr.rvn',
-        'runtime/raven/src/System/UIntPtr.rvn',
-        'runtime/raven/native/RuntimeNativeIntegerCalls.rvn',
-        'runtime/raven/native/RuntimeNativeIntegerServices.rvn')]
+        'runtime/System.Runtime/src/System.Runtime/System/IntPtr.rvn',
+        'runtime/System.Runtime/src/System.Runtime/System/UIntPtr.rvn',
+        'runtime/System.Runtime/src/System.Runtime/neoCLR/Runtime/RuntimeNativeIntegerCalls.rvn',
+        'runtime/System.Runtime/src/System.Runtime/native/RuntimeNativeIntegerServices.rvn')]
     manifest = json.loads(ownership.read_text())
     manifest['libraries'].append(dict(assemblyName='NativeIntegers',
         sources=[str(path.relative_to(ROOT)) for path in sources], types=['System.IntPtr', 'System.UIntPtr']))

@@ -20,8 +20,8 @@ creating text merely to feed the next byte-oriented parser or output operation.
 | DocumentWriter.Append | Bounded UTF-8 byte storage | Final owned copy for byte-returning API |
 | ObjectMapper.Read | Builds/consumes JsonValue DOM and its property names first | Potential unused DOM/string materialization when mapping directly; separate from the initial byte-path migration |
 
-Source: runtime/raven/src/System/Data/Json/{JsonSerializer,JsonDocument,JsonSyntax,ObjectMapper}.rvn
-and runtime/raven/src/System/Web/Http/Json/JsonContent.rvn. Current JSON limits
+Source: runtime/System.Data/src/System.Data/System/Data/Json/{JsonSerializer,JsonDocument,JsonSyntax,ObjectMapper}.rvn
+and runtime/System.Web/src/System.Web/System/Web/Http/Json/JsonContent.rvn. Current JSON limits
 (1024 encoded bytes, 32 values, depth four) and formatting/validation behavior are
 existing provisional contracts, not new limits introduced by this direction.
 
