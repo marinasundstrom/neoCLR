@@ -75,6 +75,9 @@ typedef struct fiber {
     size_t mapping_bytes;
     uintptr_t lower, upper;
     uint64_t callback, operation, waiting;
+#ifdef NEOCLR_ASYNC_TRACE
+    uint64_t trace_id;
+#endif
     void *owner;
     uint64_t active_owner, active_callback, ready_owner;
     int done, status, drain, parked, managed;
@@ -110,6 +113,7 @@ static _Thread_local struct {
 #endif
 } state;
 static _Thread_local uint64_t next_id;
+#include "native-async-trace-impl.h"
 static operation *find(uint64_t id) {
     for (unsigned i = 0; i < LIMIT; ++i)
         if (id && state.operations[i].id == id) return &state.operations[i];
@@ -132,6 +136,8 @@ static void yield(void) {
         if (neoclr_gc_roots_park_owned_v1(state.context, f->owner, &f->roots)) abort();
     } else neoclr_roots_park_v1(&f->roots);
     f->parked = 1;
+    ASYNC_TRACE(f->done ? NEOCLR_ASYNC_TRACE_FINISH : NEOCLR_ASYNC_TRACE_PARK, f,
+        f->done ? f->operation : f->waiting, (unsigned)f->status);
 #ifdef _WIN32
     SwitchToFiber(f->caller);
 #else
@@ -152,7 +158,10 @@ static void body(void) {
     if (f->callback && neoclr_gc_host_root_release_v1(state.context, f->callback)) abort();
     f->callback = 0;
     operation *op = find(f->operation);
-    if (op && !f->status) op->complete = 1;
+    if (op && !f->status) {
+        op->complete = 1;
+        ASYNC_TRACE(NEOCLR_ASYNC_TRACE_COMPLETE, f, op->id, 0);
+    }
     f->done = 1;
     yield();
 #if NEOCLR_ASYNC_CONTEXT_REUSE
@@ -258,6 +267,7 @@ static void reap_expired(void) {
         fiber *f = &state.fibers[i];
         if (!f->mapping || !f->parked || !f->roots.expired) continue;
         if (!f->owner || f == state.current || f->active_owner || f->active_callback) abort();
+        ASYNC_TRACE(NEOCLR_ASYNC_TRACE_ABANDON, f, f->waiting, 1);
         neoclr_roots_discard_v1(&f->roots);
         if (neoclr_gc_host_root_release_v1(state.context, f->callback)) abort();
         operation *op = find(f->operation);
@@ -324,11 +334,13 @@ static int resume(fiber *f) {
     f->caller = &caller;
 #endif
     bounds(f);
+    async_trace_enter(f, parent);
 #ifdef _WIN32
     SwitchToFiber(f->mapping);
 #else
     if (swapcontext(&caller, &f->machine)) abort();
 #endif
+    ASYNC_TRACE(NEOCLR_ASYNC_TRACE_LEAVE, f, parent ? parent->trace_id : 0, 0);
     state.current = parent;
     bounds(parent);
     neoclr_roots_resume_v1(&caller_roots);
@@ -348,6 +360,9 @@ static int resume(fiber *f) {
             f->done = f->status = f->drain = f->parked = f->managed = 0;
             f->caller = NULL;
             f->reusable = 1;
+#ifdef NEOCLR_ASYNC_TRACE
+            f->trace_id = 0;
+#endif
             ++state.cached;
             return status;
         }
@@ -370,6 +385,7 @@ int32_t neoclr_runtime_async_create_v1(neoclr_aot_context *c, uint64_t *out) {
     for (unsigned i = 0; i < LIMIT; ++i) if (!state.operations[i].id) {
         state.operations[i] = (operation){.id = ++next_id};
         *out = next_id;
+        ASYNC_TRACE(NEOCLR_ASYNC_TRACE_CREATE, state.current, next_id, 0);
         return 0;
     }
     return 5;
@@ -460,6 +476,7 @@ int32_t neoclr_runtime_async_completeunit_v1(uint64_t id, neoclr_aot_context *c,
             }
         }
         op->complete = 1;
+        ASYNC_TRACE(NEOCLR_ASYNC_TRACE_COMPLETE, state.current, id, 0);
     }
     return 0;
 }
@@ -560,7 +577,11 @@ int32_t neoclr_runtime_async_pump_v1(neoclr_aot_context *c, neoclr_async_callbac
         } else if (progress == NEOCLR_SCHEDULER_PENDING) {
             /* Wait only after checking ready continuations. The scheduler wait
              * observes socket readiness without consuming results or roots. */
-            if (!ready) neoclr_scheduler_wait_v1(c);
+            if (!ready) {
+                ASYNC_TRACE(NEOCLR_ASYNC_TRACE_WAIT_BEGIN, state.current, 0, 0);
+                neoclr_scheduler_wait_v1(c);
+                ASYNC_TRACE(NEOCLR_ASYNC_TRACE_WAIT_END, state.current, 0, 0);
+            }
         }
         else if (progress == NEOCLR_SCHEDULER_IDLE) {
             if (ready) continue;
@@ -581,6 +602,7 @@ int32_t neoclr_runtime_async_shutdown_v1(neoclr_aot_context *c) {
         fiber *f = &state.fibers[i];
         if (f->mapping) {
             leaked |= active(f);
+            if (active(f)) ASYNC_TRACE(NEOCLR_ASYNC_TRACE_ABANDON, f, f->waiting, 2);
             if (f->parked) neoclr_roots_discard_v1(&f->roots);
             if (f->callback && neoclr_gc_host_root_release_v1(c, f->callback)) abort();
             if (f->ready_owner && neoclr_gc_host_root_release_v1(c, f->ready_owner)) abort();

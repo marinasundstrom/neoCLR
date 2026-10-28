@@ -72,6 +72,7 @@ buffer touches during execution are included. Retain all raw samples: short runs
 and desktop load make this a diagnostic screen, not HTTP capacity evidence.
 
 [Retained qualification and overhead measurements](../../validation/execution-trace-20261028/README.md).
-Next extend the recorder contract to owner-local async contexts and correlated
-JIT/GC events, with both collectors tested. Queue-policy comparisons must retain
+The next [owner-thread async slice](async-README.md) now records suspension,
+resumption, nested execution and abandonment, qualified with both collectors.
+Shared session identity and correlated JIT/GC events remain next. Queue-policy comparisons must retain
 untraced controls; tracing overhead must not be mistaken for scheduler behavior.

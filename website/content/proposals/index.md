@@ -24,8 +24,10 @@ The first private execution-tracer slice records worker activity, queue transiti
 callback intervals and cancellation with bounded buffers and offline timeline
 export. It reports lost events and requires an instrumented build plus per-pool opt-in:
 tiny-job overhead is material, so normal builds compile out the recorder.
-A correlated overview including async suspension, I/O, lazy compilation and GC
-phases is still planned; the worker trace does not yet cover production HTTP.
+A second private macOS slice records owner-thread async suspension/resumption,
+nested execution and abandonment, qualified with sync and active concurrent GC.
+A unified overview including real I/O, lazy compilation and GC phases is still
+planned; these diagnostic fixtures do not establish production HTTP performance.
 [Implementation and qualification](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/execution-trace/README.md).
 
 [Investigation and benchmark plan](https://github.com/marinasundstrom/neoCLR/blob/main/docs/design/go-inspired-scheduling.md)

@@ -124,8 +124,8 @@ code-lifetime ownership. Do not compile unused methods merely to hide contention
    a time; retain reference modes and report losing cases.
 
 Following the author's execution-tracer suggestion, the immediate next implementation
-is extending step 0's implemented worker recorder to qualified async/JIT/GC
-hooks, followed by step 1's queue-policy harness and selectable prototype. Neither replaces Task.Run or the production scheduler. A single worker
+is joining step 0's worker and qualified owner-async recorders into a shared
+session and adding JIT/GC hooks, followed by step 1's queue-policy harness and selectable prototype. Neither replaces Task.Run or the production scheduler. A single worker
 must not lose materially on tiny jobs; extra workers must earn their CPU/memory
 cost on parallel work. Do not choose a fixed percentage success threshold after
 seeing results: predeclare the workload, repetition count, acceptable tail/error
@@ -137,7 +137,10 @@ budget and target host constraints for each experiment.
 provide an overview of execution. The assistant proposes making bounded runtime
 tracing the first implementation slice. The first [bounded worker recorder and offline export](../experiments/execution-trace/README.md)
 are now implemented in the private native pool. The broader correlated runtime
-timeline below remains intended behavior; async/JIT/GC hooks are not implemented.
+timeline below remains intended behavior. A separate [owner-thread async recorder](../experiments/execution-trace/async-README.md)
+now captures suspension/resumption, nested execution and abandonment with sync and
+concurrent GC qualification. Shared session correlation and JIT/GC phase hooks
+are not implemented.
 
 The central question is why ready application work is not progressing. Existing
 startup timings, compiler-wait diagnostics, aggregate GC measurements and CPU
