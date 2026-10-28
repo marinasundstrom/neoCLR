@@ -16,6 +16,20 @@
 - **Assistant response/open work:** Include relevant introspection, DI and object-mapping API annotations, propagation and caller diagnostics in the attribute follow-up. [Scope and tradeoffs](native-retention.md) distinguish this plan from implemented file support. Data-flow analysis, library-provided requirements and new generic instantiation syntax remain open; this task does not permanently reorder the platform roadmap.
 
 
+## 2026-10-28 — Dynamic member contracts on runtime APIs
+
+The author continued the project-retention discussion by directing implementation
+of `DynamicallyAccessedMembers`, asking that runtime methods which benefit from it
+be annotated, and requesting commits. The assistant implemented a bounded
+TypeInfo-parameter contract for public constructors and properties, annotated JSON
+mapping and DI registration/planning APIs, and refreshed the reference snapshot.
+The native backend propagates known tokens and annotated inputs into retention;
+unknown flows warn and unsupported contracts fail. The assistant qualified a JSON
+consumer without a retention file and recorded remaining analysis/profile limits
+in [the validation record](validation/dynamic-access-20261028/README.md).
+Generic, field, return and receiver contracts remain open; continuation is not
+recorded as approval of a complete .NET trimming implementation.
+
 ## 2026-10-28 - Continue profiling shared lazy-JIT startup work
 
 - **Author:** Directed continuing the measured optimization sequence, retaining the earlier priorities of both collectors, HTTP performance and website updates.

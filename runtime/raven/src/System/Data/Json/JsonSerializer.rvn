@@ -1,6 +1,7 @@
 module System.Data.Json
 
 import System.*
+import System.Diagnostics.CodeAnalysis.*
 import System.Concurrency.Tasks.*
 import System.IO.*
 import System.Introspection.*
@@ -121,7 +122,7 @@ public class JsonSerializer {
         return Ok((T)instance)
     }
 
-    static func Deserialize(text: string, type: TypeInfo) -> Result<Object, JsonError> {
+    static func Deserialize(text: string, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | DynamicallyAccessedMemberTypes.PublicProperties)] type: TypeInfo) -> Result<Object, JsonError> {
         let document = DeserializeNode(text)?
         return ObjectMapper.Read(document, type)
     }
@@ -130,12 +131,12 @@ public class JsonSerializer {
     /// <param name="utf8">The complete document, borrowed only during this call.</param>
     /// <param name="type">The supported target type.</param>
     /// <returns>An independently owned object or a quota, UTF-8, syntax or mapping error.</returns>
-    static func Deserialize(utf8: ReadOnlySlice<byte>, type: TypeInfo) -> Result<Object, JsonError> {
+    static func Deserialize(utf8: ReadOnlySlice<byte>, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | DynamicallyAccessedMemberTypes.PublicProperties)] type: TypeInfo) -> Result<Object, JsonError> {
         let document = DeserializeNode(utf8)?
         return ObjectMapper.Read(document, type)
     }
 
-    async static func Deserialize(input: InputStream, type: TypeInfo) -> Task<Result<Object, JsonError>> {
+    async static func Deserialize(input: InputStream, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | DynamicallyAccessedMemberTypes.PublicProperties)] type: TypeInfo) -> Task<Result<Object, JsonError>> {
         let document = await DeserializeNode(input)?
         return ObjectMapper.Read(document, type)
     }

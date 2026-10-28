@@ -3016,3 +3016,14 @@ PostgreSQL provider is retained unchanged from Preview 18 for complete documenta
 The native render and four checksum/source-link snapshot tests pass. The legacy
 aggregate snapshot is unaffected by the compiler-facing core declarations; a concurrent
 DynamicallyAccessedMembers workstream changes other source fingerprints separately.
+
+
+## Dynamic member requirements (development, 2026-10-28)
+
+The native reference includes `System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembersAttribute`
+and `DynamicallyAccessedMemberTypes`, including the constructor, MemberTypes property
+and enum constants. The type selection and matching reference snapshot are refreshed.
+[Manual contract](dynamic-access.md) records supported parameter/flag combinations,
+diagnostics, conservative constructor retention and unimplemented targets. Runtime
+JSON and DI annotations are source/API contracts; this is not complete .NET trimming
+analysis. No renderer exclusion is added.

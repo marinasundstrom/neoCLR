@@ -39,7 +39,7 @@ Media type structure, typed presets and Content-Type parsing are available in th
 | JSON | [System.Data.Json](xref:System.Data.Json) · [Serialization and HTTP content](json.md) |
 | Native libraries | [Foreign-function attributes](native-interop.md) · [NativeImportAttribute](xref:System.Runtime.InteropServices.NativeImportAttribute) · [MarshalAsAttribute](xref:System.Runtime.InteropServices.MarshalAsAttribute) |
 | Runtime diagnostics | [StackTrace](xref:System.Diagnostics.StackTrace) · [Capture and limits](stack-trace.md) · [GC](gc.md) |
-| Introspection and reflection | [System.Introspection](xref:System.Introspection) · [Descriptor contracts](introspection.md) · [Runtime reflection](reflection.md) |
+| Introspection and reflection | [System.Introspection](xref:System.Introspection) · [Descriptor contracts](introspection.md) · [Runtime reflection](reflection.md) · [Dynamic member requirements](dynamic-access.md) |
 
 Development interpreter APIs: [System.Slice, ReadOnlySlice, Memory and ReadOnlyMemory](memory-views.md).
 

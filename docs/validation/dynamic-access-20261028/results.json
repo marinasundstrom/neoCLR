@@ -1,0 +1,217 @@
+{
+  "date": "2026-10-28",
+  "host": "macOS ARM64",
+  "compilerRevision": "ed1d08def",
+  "rendererRevision": "256019f66",
+  "tests": {
+    "dynamicAccess": 8,
+    "reflectionConstruction": 6,
+    "nativeApiSnapshot": 4,
+    "referenceFingerprint": "pass"
+  },
+  "cases": {
+    "qualified-http": {
+      "buildPassed": true,
+      "profile": "macos-arm64-http-v1",
+      "backendExitCode": 0,
+      "diagnostics": "warning: DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 244 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention\nwarning: DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 388 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention\nwarning: DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 538 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention\nwarning: DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 691 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention\nwarning: DAM2004: dynamic-dispatch implementation bodies are not analyzed; reflection inside them may require explicit retention\n",
+      "execution": {
+        "exitCode": 0,
+        "stdout": "retained\n",
+        "stderr": ""
+      },
+      "artifacts": {
+        "app.dll": "da38c6df18063ff7275fc16ee0af8fecf9efca470dfdaeb9eda4d734c38349de",
+        "app.o": "cfa8354836e5485ac626f97d87bd7e99b8c484e3a517dec87336b1ed53bc8c9e",
+        "app": "5dfdd7a5defd23aa324345338e7194c1aa05d2f7e63e84aae04fd59ad3199f35"
+      },
+      "dynamicAccess": {
+        "diagnostics": [
+          "DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 244 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention",
+          "DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 388 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention",
+          "DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 538 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention",
+          "DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 691 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention",
+          "DAM2004: dynamic-dispatch implementation bodies are not analyzed; reflection inside them may require explicit retention"
+        ],
+        "types": {
+          "6": 513
+        }
+      },
+      "retention": {
+        "schemaVersion": 8,
+        "types": [
+          {
+            "checkStatus": 0,
+            "construct": true,
+            "constructor": {
+              "index": 38,
+              "module": "NeoMetadata_ABA4D369647F45877F4AE4FE8AB03E6986D031BC12468F445310036B5EAFBD0D",
+              "revision": "1.0.0.0"
+            },
+            "constructors": true,
+            "customAttributes": false,
+            "definition": {
+              "index": 6,
+              "module": "NeoMetadata_ABA4D369647F45877F4AE4FE8AB03E6986D031BC12468F445310036B5EAFBD0D",
+              "revision": "1.0.0.0"
+            },
+            "fieldGetters": false,
+            "fieldSetters": false,
+            "fields": false,
+            "getters": true,
+            "policy": "explicit source identity; metadata check does not retain constructor body unless invocation is requested",
+            "properties": true,
+            "setters": true,
+            "sourceName": "NeoMetadata_ABA4D369647F45877F4AE4FE8AB03E6986D031BC12468F445310036B5EAFBD0D.T__4D657373616765"
+          }
+        ],
+        "methodTypes": [],
+        "accessorRoots": [
+          {
+            "index": 36,
+            "module": "NeoMetadata_ABA4D369647F45877F4AE4FE8AB03E6986D031BC12468F445310036B5EAFBD0D",
+            "revision": "1.0.0.0"
+          },
+          {
+            "index": 37,
+            "module": "NeoMetadata_ABA4D369647F45877F4AE4FE8AB03E6986D031BC12468F445310036B5EAFBD0D",
+            "revision": "1.0.0.0"
+          }
+        ]
+      }
+    },
+    "merged-final": {
+      "buildPassed": true,
+      "profile": "macos-arm64-http-v1",
+      "backendExitCode": 0,
+      "diagnostics": "warning: DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 244 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention\nwarning: DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 388 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention\nwarning: DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 538 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention\nwarning: DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 691 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention\nwarning: DAM2004: dynamic-dispatch implementation bodies are not analyzed; reflection inside them may require explicit retention\n",
+      "execution": {
+        "exitCode": 0,
+        "stdout": "retained\n",
+        "stderr": ""
+      },
+      "artifacts": {
+        "app.dll": "6ca3d9504fa3b3e0941afe31db35a821e06c20e563cce5bb133071d76ea70b2e",
+        "app.o": "cfa8354836e5485ac626f97d87bd7e99b8c484e3a517dec87336b1ed53bc8c9e",
+        "app": "5dfdd7a5defd23aa324345338e7194c1aa05d2f7e63e84aae04fd59ad3199f35"
+      },
+      "dynamicAccess": {
+        "diagnostics": [
+          "DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 244 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention",
+          "DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 388 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention",
+          "DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 538 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention",
+          "DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 691 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention",
+          "DAM2004: dynamic-dispatch implementation bodies are not analyzed; reflection inside them may require explicit retention"
+        ],
+        "types": {
+          "6": 513
+        }
+      },
+      "retention": {
+        "schemaVersion": 8,
+        "types": [
+          {
+            "checkStatus": 0,
+            "construct": true,
+            "constructor": {
+              "index": 38,
+              "module": "NeoMetadata_ABA4D369647F45877F4AE4FE8AB03E6986D031BC12468F445310036B5EAFBD0D",
+              "revision": "1.0.0.0"
+            },
+            "constructors": true,
+            "customAttributes": false,
+            "definition": {
+              "index": 6,
+              "module": "NeoMetadata_ABA4D369647F45877F4AE4FE8AB03E6986D031BC12468F445310036B5EAFBD0D",
+              "revision": "1.0.0.0"
+            },
+            "fieldGetters": false,
+            "fieldSetters": false,
+            "fields": false,
+            "getters": true,
+            "policy": "explicit source identity; metadata check does not retain constructor body unless invocation is requested",
+            "properties": true,
+            "setters": true,
+            "sourceName": "NeoMetadata_ABA4D369647F45877F4AE4FE8AB03E6986D031BC12468F445310036B5EAFBD0D.T__4D657373616765"
+          }
+        ],
+        "methodTypes": [
+          {
+            "index": 6,
+            "module": "NeoMetadata_ABA4D369647F45877F4AE4FE8AB03E6986D031BC12468F445310036B5EAFBD0D",
+            "revision": "1.0.0.0"
+          }
+        ],
+        "accessorRoots": [
+          {
+            "index": 36,
+            "module": "NeoMetadata_ABA4D369647F45877F4AE4FE8AB03E6986D031BC12468F445310036B5EAFBD0D",
+            "revision": "1.0.0.0"
+          },
+          {
+            "index": 37,
+            "module": "NeoMetadata_ABA4D369647F45877F4AE4FE8AB03E6986D031BC12468F445310036B5EAFBD0D",
+            "revision": "1.0.0.0"
+          }
+        ]
+      }
+    },
+    "negative-methods": {
+      "buildPassed": true,
+      "profile": "macos-arm64-http-v1",
+      "backendExitCode": 0,
+      "diagnostics": "warning: DAM2001: Read instruction 2 -> System.Data.Json.JsonSerializer.Deserialize parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention\nwarning: DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 244 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention\nwarning: DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 388 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention\nwarning: DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 538 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention\nwarning: DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 691 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention\nwarning: DAM2004: dynamic-dispatch implementation bodies are not analyzed; reflection inside them may require explicit retention\n",
+      "execution": {
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "RuntimeError: native reflection property metadata was not retained; configure --reflection-roots\n   at System.Introspection.RuntimeNominalTypeInfo.GetProperties [instruction 3]\n   at System.Data.Json.ObjectMapper.ReadValue [instruction 607]\n   at System.Data.Json.ObjectMapper.Read [instruction 4]\n   at System.Data.Json.JsonSerializer.Deserialize [instruction 20]\n   at Read [instruction 2]\n   at Main [instruction 3]\n"
+      },
+      "artifacts": {
+        "app.dll": "795e150bf4e36886be128498181f9c15f31c1f34b0b979ca7268b97bb09b151f",
+        "app.o": "4d37169bc3eb0a9aba8dda2cc665efe95ceae2093872b632491dfafa5b59b8cf",
+        "app": "ce4730e37f37b5fb0fa1c719e0e58c69a2ea2e72eabf468dee7115846de1e710"
+      },
+      "dynamicAccess": {
+        "diagnostics": [
+          "DAM2001: Read instruction 2 -> System.Data.Json.JsonSerializer.Deserialize parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention",
+          "DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 244 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention",
+          "DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 388 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention",
+          "DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 538 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention",
+          "DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 691 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention",
+          "DAM2004: dynamic-dispatch implementation bodies are not analyzed; reflection inside them may require explicit retention"
+        ],
+        "types": {}
+      },
+      "retention": {
+        "schemaVersion": 8,
+        "types": [],
+        "methodTypes": [
+          {
+            "index": 3,
+            "module": "NeoMetadata_ABA4D369647F45877F4AE4FE8AB03E6986D031BC12468F445310036B5EAFBD0D",
+            "revision": "1.0.0.0"
+          }
+        ],
+        "accessorRoots": []
+      }
+    },
+    "unsupported": {
+      "buildPassed": false,
+      "profile": "macos-arm64-http-v1",
+      "backendExitCode": 1,
+      "diagnostics": "neoclr-codegen: Fault: DAM1001: unsupported DynamicallyAccessedMembers contract on NeoMetadata_ABA4D369647F45877F4AE4FE8AB03E6986D031BC12468F445310036B5EAFBD0D.F_52656164 [code=RuntimeError]\n"
+    },
+    "negative": {
+      "buildPassed": false,
+      "profile": "macos-arm64-http-v1",
+      "backendExitCode": 1,
+      "diagnostics": "warning: DAM2001: Read instruction 2 -> System.Data.Json.JsonSerializer.Deserialize parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention\nwarning: DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 244 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention\nwarning: DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 388 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention\nwarning: DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 538 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention\nwarning: DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 691 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention\nwarning: DAM2004: dynamic-dispatch implementation bodies are not analyzed; reflection inside them may require explicit retention\nneoclr-codegen: $aot_linked_32: unsupported value member contract (owner None, virtual false, abstract false, override false, impl 4096, generics 0/0, readonly []/false)\n"
+    },
+    "qualified": {
+      "buildPassed": false,
+      "profile": "macos-arm64-console-v1",
+      "backendExitCode": 1,
+      "diagnostics": "warning: DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 244 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention\nwarning: DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 388 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention\nwarning: DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 538 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention\nwarning: DAM2001: System.Data.Json.ObjectMapper.ReadValue instruction 691 -> System.Data.Json.ObjectMapper.ReadValue parameter 1: cannot prove dynamic member requirement 513; annotate the incoming TypeInfo parameter or supply explicit retention\nwarning: DAM2004: dynamic-dispatch implementation bodies are not analyzed; reflection inside them may require explicit retention\nneoclr-codegen: neoCLR.Runtime.SocketClose: unsupported value member contract (owner None, virtual false, abstract false, override false, impl 4096, generics 0/0, readonly []/false)\n"
+    }
+  }
+}

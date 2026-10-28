@@ -287,6 +287,26 @@ fn analyze_function(
     function: &Function,
     constructing: bool,
 ) -> Result<FunctionVerification, Fault> {
+    analyze_function_recording(module, index, function, constructing, None)
+}
+
+/// Exact stack effects after typed verification (notably reference field stores).
+pub(crate) fn instruction_effects(
+    module: &Module,
+    function: &Function,
+) -> Result<Vec<Option<(usize, usize)>>, Fault> {
+    let mut effects = vec![None; function.body.len()];
+    analyze_function_recording(module, 0, function, false, Some(&mut effects))?;
+    Ok(effects)
+}
+
+fn analyze_function_recording(
+    module: &Module,
+    index: usize,
+    function: &Function,
+    constructing: bool,
+    mut effects: Option<&mut Vec<Option<(usize, usize)>>>,
+) -> Result<FunctionVerification, Fault> {
     let fault = |pc, message: &str| Fault {
         code: crate::FaultCode::InvalidProgram,
         message: format!("verification: {message}"),
@@ -540,6 +560,9 @@ fn analyze_function(
         } else {
             pushes
         };
+        if let Some(effects) = effects.as_mut() {
+            effects[pc] = Some((pops, pushes));
+        }
         debug_assert_eq!(outputs.len(), pushes);
         state.stack.extend(outputs);
         maximum_stack = maximum_stack.max(state.stack.len());

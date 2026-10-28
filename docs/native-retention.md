@@ -80,7 +80,10 @@ existing retention pipeline and bounded capability policies; it avoids XML/MSBui
 integration for this slice, at the cost of a neoCLR-specific format and less granular
 member selection. The compiled backend format stays private.
 
-`DynamicallyAccessedMembers` is **not implemented** by this change. Repository
+`DynamicallyAccessedMembers` was not implemented by the initial file-support change.
+A subsequent [parameter-contract slice](dynamically-accessed-members.md) adds
+constructor/property analysis and selected runtime API annotations; the remaining
+work below is not a claim of complete support. Repository
 inspection found no existing implementation in the runtime/Raven library. The
 [.NET attribute](https://learn.microsoft.com/dotnet/api/system.diagnostics.codeanalysis.dynamicallyaccessedmembersattribute)
 communicates member requirements through type-bearing locations and generic

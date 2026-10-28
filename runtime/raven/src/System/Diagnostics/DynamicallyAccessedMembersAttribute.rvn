@@ -1,0 +1,39 @@
+module System.Diagnostics.CodeAnalysis
+
+/// Specifies members required by a dynamically accessed type.
+/// Development native analysis currently supports public constructors and public properties.
+[System.Flags]
+public enum DynamicallyAccessedMemberTypes {
+    None = 0,
+    PublicParameterlessConstructor = 1,
+    PublicConstructors = 3,
+    NonPublicConstructors = 4,
+    PublicMethods = 8,
+    NonPublicMethods = 16,
+    PublicFields = 32,
+    NonPublicFields = 64,
+    PublicNestedTypes = 128,
+    NonPublicNestedTypes = 256,
+    PublicProperties = 512,
+    NonPublicProperties = 1024,
+    PublicEvents = 2048,
+    NonPublicEvents = 4096,
+    Interfaces = 8192,
+    All = -1
+}
+
+/// Declares the members required on a TypeInfo parameter during native compilation.
+/// Unknown flows produce diagnostics; unsupported member flags are rejected.
+/// Generic parameters, returns, fields, strings and receiver annotations remain unsupported.
+[System.AttributeUsage(System.AttributeTargets.Parameter)]
+public class DynamicallyAccessedMembersAttribute : System.Attribute {
+    private val memberTypes: DynamicallyAccessedMemberTypes
+
+    /// Records the required member categories using the standard .NET flag values.
+    init(memberTypes: DynamicallyAccessedMemberTypes) {
+        self.memberTypes = memberTypes
+    }
+
+    /// Gets the member requirements declared by this annotation.
+    val MemberTypes: DynamicallyAccessedMemberTypes => memberTypes
+}

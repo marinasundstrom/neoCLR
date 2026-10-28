@@ -1,6 +1,7 @@
 module System.DependencyInjection
 
 import System.*
+import System.Diagnostics.CodeAnalysis.*
 import System.Collections.*
 import System.Introspection.*
 import System.Optional.*
@@ -27,7 +28,7 @@ internal class ConstructorPlan {
     internal val ParameterCount: int => storedParameters.Count
 
     // Availability is metadata-only: never resolve services while choosing a constructor.
-    internal static func Prepare(type: TypeInfo, available: (TypeInfo) -> bool) -> Result<ConstructorPlan, ActivationError> {
+    internal static func Prepare([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] type: TypeInfo, available: (TypeInfo) -> bool) -> Result<ConstructorPlan, ActivationError> {
         if type.IsAbstract || type.IsInterface || type.ContainsGenericParameters || type.IsValueType {
             return Failure(ActivationError.UnsupportedType)
         }

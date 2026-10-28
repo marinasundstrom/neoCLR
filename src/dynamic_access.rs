@@ -1,0 +1,608 @@
+//! Conservative native retention analysis for type-bearing parameter contracts.
+//! Unknown flows are diagnostics, never evidence that metadata is retained.
+use crate::{
+    Fault, Module,
+    metadata::{AttributeArgument, Function, Instruction as Op, Type},
+};
+use std::collections::{BTreeMap, BTreeSet, VecDeque};
+
+const ATTRIBUTE: &str = "System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembersAttribute";
+pub const PUBLIC_CONSTRUCTORS: u32 = 3;
+pub const PUBLIC_PROPERTIES: u32 = 512;
+const SUPPORTED: u32 = PUBLIC_CONSTRUCTORS | PUBLIC_PROPERTIES;
+
+#[derive(Debug, Default, serde::Serialize)]
+pub struct Analysis {
+    /// Source type row and the union of proven member requirements.
+    pub types: BTreeMap<usize, u32>,
+    pub diagnostics: BTreeSet<String>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+enum Value {
+    Unknown,
+    Types(Vec<Type>),
+    Required(u32),
+}
+
+fn source_name<'a>(module: &'a Module, ty: &Type) -> Option<&'a str> {
+    let declaration = module.type_definition(ty)?;
+    Some(
+        declaration
+            .origin
+            .as_ref()
+            .map_or(declaration.name.as_str(), |o| o.name.as_str()),
+    )
+}
+
+fn display_name(module: &Module, function: &Function) -> String {
+    match &function.origin {
+        Some(origin) => match function.owner.as_ref().and_then(|t| source_name(module, t)) {
+            Some(owner) => format!("{owner}.{}", origin.name),
+            None => origin.full_name.as_ref().unwrap_or(&origin.name).clone(),
+        },
+        None => function.name.clone(),
+    }
+}
+
+fn requirements(module: &Module, function: &Function) -> Result<Vec<u32>, Fault> {
+    let mut result = vec![0; function.parameters.len()];
+    for attribute in &function.custom_attributes {
+        if attribute
+            .constructor
+            .owner
+            .as_ref()
+            .and_then(|t| source_name(module, t))
+            != Some(ATTRIBUTE)
+        {
+            continue;
+        }
+        let fail = || {
+            Fault::new(format!(
+                "DAM1001: unsupported DynamicallyAccessedMembers contract on {}",
+                function.name
+            ))
+        };
+        let token = attribute.target_token.ok_or_else(fail)?;
+        let position = function
+            .origin
+            .as_ref()
+            .and_then(|o| o.parameter_tokens.iter().position(|t| *t == token))
+            .ok_or_else(fail)?;
+        if source_name(module, &function.parameters[position])
+            != Some("System.Introspection.TypeInfo")
+        {
+            return Err(fail());
+        }
+        let [AttributeArgument::Int32(flags)] = attribute.arguments.as_slice() else {
+            return Err(fail());
+        };
+        if *flags < 0 || (*flags as u32 & !SUPPORTED) != 0 || !attribute.named_arguments.is_empty()
+        {
+            return Err(fail());
+        }
+        result[position] |= *flags as u32;
+    }
+    Ok(result)
+}
+
+#[derive(Clone, PartialEq, Eq)]
+struct State {
+    stack: Vec<Value>,
+    locals: Vec<Value>,
+    arguments: Vec<Value>,
+}
+
+fn merge_value(target: &mut Value, incoming: &Value) {
+    if target == incoming {
+        return;
+    }
+    *target = match (&*target, incoming) {
+        (Value::Types(a), Value::Types(b)) if a.len() + b.len() <= 64 => {
+            let mut types = a.clone();
+            for ty in b {
+                if !types.contains(ty) {
+                    types.push(ty.clone());
+                }
+            }
+            Value::Types(types)
+        }
+        (Value::Required(a), Value::Required(b)) => Value::Required(a & b),
+        _ => Value::Unknown,
+    };
+}
+
+fn require(module: &Module, value: &Value, flags: u32, site: &str, report: &mut Analysis) {
+    if flags == 0 {
+        return;
+    }
+    match value {
+        Value::Required(available) if available & flags == flags => (),
+        Value::Types(types) => {
+            for ty in types {
+                if let Some(index) = module.types.iter().position(|d| {
+                    ty == &Type::Named(d.name.clone()) && d.generic_parameters.is_empty()
+                }) {
+                    *report.types.entry(index).or_default() |= flags;
+                } else {
+                    report.diagnostics.insert(format!("DAM2002: {site}: unsupported dynamic member target {ty:?}; explicit retention is required"));
+                }
+            }
+        }
+        _ => {
+            report.diagnostics.insert(format!("DAM2001: {site}: cannot prove dynamic member requirement {flags}; annotate the incoming TypeInfo parameter or supply explicit retention"));
+        }
+    }
+}
+
+/// Analyze a verified, linked module. This initial implementation admits TypeInfo
+/// parameter contracts for public constructors and properties. Other targets/flags
+/// fail explicitly rather than becoming inert annotations.
+pub fn analyze(module: &Module, root: &str) -> Result<Analysis, Fault> {
+    crate::runtime_lookup::with_module(module, || analyze_indexed(module, root))
+}
+
+fn analyze_indexed(module: &Module, root: &str) -> Result<Analysis, Fault> {
+    let mut report = Analysis::default();
+    for ty in &module.types {
+        if ty.custom_attributes.iter().any(|a| {
+            a.constructor
+                .owner
+                .as_ref()
+                .and_then(|t| source_name(module, t))
+                == Some(ATTRIBUTE)
+        }) {
+            return Err(Fault::new(
+                "DAM1001: only TypeInfo parameter annotations are currently supported",
+            ));
+        }
+    }
+    let contracts = module
+        .functions
+        .iter()
+        .map(|f| requirements(module, f))
+        .collect::<Result<Vec<_>, _>>()?;
+    if contracts.iter().all(|c| c.iter().all(|f| *f == 0)) {
+        return Ok(report);
+    }
+    let root = module
+        .functions
+        .iter()
+        .position(|f| f.name == root)
+        .ok_or_else(|| Fault::new("DAM analysis root is missing"))?;
+    let mut reachable = BTreeSet::new();
+    let mut pending = vec![root];
+    while let Some(index) = pending.pop() {
+        if !reachable.insert(index) {
+            continue;
+        }
+        for op in &module.functions[index].body {
+            let target = match op {
+                Op::Call(t)
+                | Op::CallVirtual(t)
+                | Op::Construct(t)
+                | Op::BindFunction { target: t, .. }
+                | Op::CallSelf { target: t, .. } => t,
+                _ => continue,
+            };
+            let resolved = crate::vm::resolve(module, target)?;
+            let targets = vec![resolved.clone()];
+            // Dynamic implementations are selected after specialization. The first
+            // slice checks the declared call contract, but never roots every
+            // same-named implementation in the input libraries.
+            if matches!(op, Op::CallVirtual(_) | Op::CallSelf { .. }) {
+                report.diagnostics.insert("DAM2004: dynamic-dispatch implementation bodies are not analyzed; reflection inside them may require explicit retention".into());
+                continue;
+            }
+            for resolved in targets {
+                let candidates =
+                    crate::runtime_lookup::functions(module, &resolved.name).unwrap_or_default();
+                for &candidate in candidates.iter() {
+                    let f = &module.functions[candidate];
+                    if resolved.definition.as_ref().is_some_and(|id| {
+                        f.definition.as_ref().map_or(
+                            id.module == module.name && id.index as usize == candidate,
+                            |d| d == id,
+                        )
+                    }) {
+                        pending.push(candidate);
+                    }
+                }
+            }
+        }
+    }
+    for index in reachable {
+        let function = &module.functions[index];
+        let contract = &contracts[index];
+        if function.body.is_empty() {
+            continue;
+        }
+        let mut arguments = vec![Value::Unknown; usize::from(function.instance)];
+        arguments.extend(contract.iter().copied().map(Value::Required));
+        let initial = State {
+            stack: vec![],
+            locals: vec![Value::Unknown; function.locals.len()],
+            arguments,
+        };
+        let mut states = vec![None; function.body.len()];
+        states[0] = Some(initial);
+        let mut queue = VecDeque::from([0]);
+        let mut relevant = false;
+        for op in &function.body {
+            if let Op::Call(t)
+            | Op::CallVirtual(t)
+            | Op::CallSelf { target: t, .. }
+            | Op::Construct(t)
+            | Op::BindFunction { target: t, .. } = op
+            {
+                let callee = crate::vm::resolve(module, t)?;
+                relevant |= requirements(module, &callee)?.iter().any(|r| *r != 0);
+            }
+        }
+        if !relevant {
+            continue;
+        }
+        let mut escaped_locals = BTreeSet::new();
+        let mut escaped_arguments = BTreeSet::new();
+        for op in &function.body {
+            match op {
+                Op::LocalAddress(i)
+                | Op::Receiver {
+                    argument: false,
+                    index: i,
+                    readonly_value: false,
+                } => {
+                    escaped_locals.insert(*i);
+                }
+                Op::ArgumentAddress(i)
+                | Op::Receiver {
+                    argument: true,
+                    index: i,
+                    readonly_value: false,
+                } => {
+                    escaped_arguments.insert(*i);
+                }
+                _ => (),
+            }
+        }
+        let effects = crate::verifier::instruction_effects(module, function)?;
+        while let Some(pc) = queue.pop_front() {
+            let mut state = states[pc].clone().unwrap();
+            let op = &function.body[pc];
+            let (pops, pushes) = effects[pc]
+                .ok_or_else(|| Fault::new("DAM analysis reached an unverified instruction"))?;
+            if state.stack.len() < pops {
+                return Err(Fault::new("DAM analysis stack underflow"));
+            }
+            let values = state.stack.split_off(state.stack.len() - pops);
+            let mut produced = vec![Value::Unknown; pushes];
+            match op {
+                Op::LoadTypeToken(ty) => produced[0] = Value::Types(vec![ty.clone()]),
+                Op::Arg(index) if !escaped_arguments.contains(index) => {
+                    produced[0] = state.arguments[*index].clone()
+                }
+                Op::Load(index) if !escaped_locals.contains(index) => {
+                    produced[0] = state.locals[*index].clone()
+                }
+                Op::Store(index) => state.locals[*index] = values[0].clone(),
+                Op::StoreArg(index) => state.arguments[*index] = values[0].clone(),
+                Op::ResetLocal(index) => state.locals[*index] = Value::Unknown,
+                Op::Dup => produced.fill(values[0].clone()),
+                Op::CastClass(_) | Op::BorrowInterface(_) => produced[0] = values[0].clone(),
+                Op::Call(target)
+                | Op::CallVirtual(target)
+                | Op::CallSelf { target, .. }
+                | Op::Construct(target) => {
+                    let callee = crate::vm::resolve(module, target)?;
+                    for (index, flags) in requirements(module, &callee)?.into_iter().enumerate() {
+                        require(
+                            module,
+                            &values[index
+                                + usize::from(target.instance && !matches!(op, Op::Construct(_)))],
+                            flags,
+                            &format!(
+                                "{} instruction {pc} -> {} parameter {index}",
+                                display_name(module, function),
+                                display_name(module, &callee)
+                            ),
+                            &mut report,
+                        );
+                    }
+                    // The exact runtime bridge turns a type token into its TypeInfo view.
+                    let bridge = callee
+                        .origin
+                        .as_ref()
+                        .zip(callee.owner.as_ref())
+                        .is_some_and(|(origin, owner)| match source_name(module, owner) {
+                            Some("System.Introspection.RuntimeTypeInfo") => {
+                                !callee.instance && origin.name == "FromHandle"
+                            }
+                            Some("System.Runtime.RuntimeContext") => {
+                                callee.instance && origin.name == "GetTypeInfoFromHandle"
+                            }
+                            _ => false,
+                        });
+                    if bridge
+                        && callee.parameters == [Type::RuntimeTypeHandle]
+                        && pushes == 1
+                        && source_name(module, &callee.returns)
+                            == Some("System.Introspection.TypeInfo")
+                    {
+                        produced[0] = values.last().unwrap().clone();
+                    }
+                }
+                Op::BindFunction { target, .. } => {
+                    let callee = crate::vm::resolve(module, target)?;
+                    if requirements(module, &callee)?.iter().any(|r| *r != 0) {
+                        report.diagnostics.insert(format!("DAM2003: {} instruction {pc}: indirect call to annotated {} requires explicit retention", display_name(module, function), display_name(module, &callee)));
+                    }
+                }
+                _ => (),
+            }
+            state.stack.extend(produced);
+            let successors = match op {
+                Op::Return | Op::Fault(_) => vec![],
+                Op::Branch(t) => vec![*t],
+                Op::BranchTrue(t)
+                | Op::BranchFalse(t)
+                | Op::BranchEqual(t)
+                | Op::BranchNotEqual(t)
+                | Op::BranchGreater(t)
+                | Op::BranchGreaterUnsigned(t)
+                | Op::BranchLess(t)
+                | Op::BranchLessUnsigned(t)
+                | Op::BranchGreaterEqual(t)
+                | Op::BranchGreaterEqualUnsigned(t)
+                | Op::BranchLessEqual(t)
+                | Op::BranchLessEqualUnsigned(t) => vec![*t, pc + 1],
+                Op::Switch(targets) => targets.iter().copied().chain([pc + 1]).collect(),
+                _ => vec![pc + 1],
+            };
+            for next in successors {
+                if next >= states.len() {
+                    return Err(Fault::new("DAM analysis branch outside body"));
+                }
+                if let Some(previous) = &mut states[next] {
+                    if previous.stack.len() != state.stack.len() {
+                        return Err(Fault::new(format!(
+                            "DAM analysis inconsistent stack in {} at {pc} -> {next}: {} vs {}",
+                            function.name,
+                            previous.stack.len(),
+                            state.stack.len()
+                        )));
+                    }
+                    let old = previous.clone();
+                    for (a, b) in previous
+                        .stack
+                        .iter_mut()
+                        .zip(&state.stack)
+                        .chain(previous.locals.iter_mut().zip(&state.locals))
+                        .chain(previous.arguments.iter_mut().zip(&state.arguments))
+                    {
+                        merge_value(a, b);
+                    }
+                    if old != *previous {
+                        queue.push_back(next);
+                    }
+                } else {
+                    states[next] = Some(state.clone());
+                    queue.push_back(next);
+                }
+            }
+        }
+    }
+    Ok(report)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::metadata::{CustomAttribute, FunctionRef};
+    use serde_json::json;
+
+    fn function(name: &str, parameters: Vec<Type>, body: Vec<Op>) -> Function {
+        serde_json::from_value(json!({"name":name,"parameters":parameters,"returns":"Void","no_result":true,"body":body})).unwrap()
+    }
+
+    fn call(f: &Function) -> Op {
+        Op::Call(
+            serde_json::from_value::<FunctionRef>(json!({"name":f.name,"parameters":f.parameters}))
+                .unwrap(),
+        )
+    }
+
+    fn fixture() -> Module {
+        let mut m = crate::assemble(&".module Test\n.type Attr\n.end\n.type Info\n.end\n.type RuntimeInfo\n.end\n.type Model\n.end\n.type Other\n.end\n").unwrap();
+        for (i, name) in [
+            ATTRIBUTE,
+            "System.Introspection.TypeInfo",
+            "System.Introspection.RuntimeTypeInfo",
+        ]
+        .iter()
+        .enumerate()
+        {
+            m.types[i].origin = Some(
+                serde_json::from_value(
+                    json!({"assembly":"Test","module":"Test.dll","name":name,"token":33554433+i}),
+                )
+                .unwrap(),
+            );
+        }
+        let info = Type::Named("Info".into());
+        let mut required = function("Require", vec![info.clone()], vec![Op::Return]);
+        required.origin = Some(serde_json::from_value(json!({"assembly":"Test","module":"Test.dll","name":"Require","token":100663297,"parameter_tokens":[134217729]})).unwrap());
+        required.custom_attributes.push(serde_json::from_value::<CustomAttribute>(json!({
+            "constructor":{"name":".ctor","owner":{"Named":"Attr"},"instance":true,"parameters":["Int32"]},
+            "arguments":[{"Int32":3}],"target_token":134217729})).unwrap());
+        let mut bridge = function("FromHandle", vec![Type::RuntimeTypeHandle], vec![]);
+        bridge.owner = Some(Type::Named("RuntimeInfo".into()));
+        bridge.origin = Some(serde_json::from_value(json!({"assembly":"System.Runtime","module":"System.Runtime.dll","name":"FromHandle","token":100663298})).unwrap());
+        bridge.no_result = false;
+        bridge.returns = info;
+        let bridge_call = Op::Call(
+            serde_json::from_value(
+                json!({"name":"FromHandle","owner":bridge.owner,"parameters":bridge.parameters}),
+            )
+            .unwrap(),
+        );
+        let main = function(
+            "Main",
+            vec![],
+            vec![
+                Op::LoadTypeToken(Type::Named("Model".into())),
+                bridge_call,
+                call(&required),
+                Op::Return,
+            ],
+        );
+        m.functions = vec![main, required, bridge];
+        m
+    }
+
+    #[test]
+    fn known_type_retains_constructors_and_unknown_input_diagnoses() {
+        let mut m = fixture();
+        let result = analyze(&m, "Main").unwrap();
+        assert_eq!(result.types.get(&3), Some(&3));
+        assert!(result.diagnostics.is_empty());
+        m.functions[0].parameters.push(Type::RuntimeTypeHandle);
+        m.functions[0].body[0] = Op::Arg(0);
+        let result = analyze(&m, "Main").unwrap();
+        assert!(result.types.is_empty());
+        assert!(result.diagnostics.iter().any(|d| d.contains("DAM2001")));
+    }
+
+    #[test]
+    fn contracts_propagate_through_parameters_and_locals() {
+        let mut m = fixture();
+        let target = m.functions[1].clone();
+        let mut forward = target.clone();
+        forward.name = "Forward".into();
+        forward.origin.as_mut().unwrap().name = "Forward".into();
+        forward.origin.as_mut().unwrap().full_name = Some("Forward".into());
+        forward.locals = target.parameters.clone();
+        forward.body = vec![
+            Op::Arg(0),
+            Op::Store(0),
+            Op::Load(0),
+            call(&target),
+            Op::Return,
+        ];
+        m.functions[0].body[2] = call(&forward);
+        m.functions.push(forward);
+        let result = analyze(&m, "Main").unwrap();
+        assert_eq!(result.types.get(&3), Some(&3));
+        assert!(result.diagnostics.is_empty());
+        m.functions[3].custom_attributes.clear();
+        assert!(
+            analyze(&m, "Main")
+                .unwrap()
+                .diagnostics
+                .iter()
+                .any(|d| d.contains("Forward"))
+        );
+    }
+
+    #[test]
+    fn branches_union_known_types_but_unknown_arm_diagnoses() {
+        let mut m = fixture();
+        let bridge = m.functions[0].body[1].clone();
+        let target = m.functions[0].body[2].clone();
+        m.functions[0].body = vec![
+            Op::Bool(true),
+            Op::BranchFalse(4),
+            Op::LoadTypeToken(Type::Named("Model".into())),
+            Op::Branch(5),
+            Op::LoadTypeToken(Type::Named("Other".into())),
+            bridge,
+            target,
+            Op::Return,
+        ];
+        let result = analyze(&m, "Main").unwrap();
+        assert_eq!(result.types.len(), 2);
+        assert!(result.diagnostics.is_empty());
+        m.functions[0].parameters.push(Type::RuntimeTypeHandle);
+        m.functions[0].body[4] = Op::Arg(0);
+        assert!(!analyze(&m, "Main").unwrap().diagnostics.is_empty());
+    }
+
+    #[test]
+    fn unsupported_flags_and_targets_are_never_silent() {
+        let mut m = fixture();
+        m.functions[1].custom_attributes[0].arguments = vec![AttributeArgument::Int32(8)];
+        assert!(
+            analyze(&m, "Main")
+                .unwrap_err()
+                .to_string()
+                .contains("DAM1001")
+        );
+        m.functions[1].custom_attributes[0].arguments = vec![AttributeArgument::Int32(3)];
+        m.functions[1].custom_attributes[0].target_token = None;
+        assert!(analyze(&m, "Main").is_err());
+    }
+
+    #[test]
+    fn no_annotations_leave_existing_programs_unchanged() {
+        let mut m = fixture();
+        m.functions[1].custom_attributes.clear();
+        let result = analyze(&m, "Main").unwrap();
+        assert!(result.types.is_empty());
+        assert!(result.diagnostics.is_empty());
+    }
+    #[test]
+    fn unused_callers_do_not_retain_types() {
+        let mut m = fixture();
+        let mut unused = m.functions[0].clone();
+        unused.name = "Unused".into();
+        unused.body[0] = Op::LoadTypeToken(Type::Named("Other".into()));
+        m.functions.push(unused);
+        let result = analyze(&m, "Main").unwrap();
+        assert_eq!(result.types.len(), 1);
+        assert!(result.types.contains_key(&3));
+    }
+
+    #[test]
+    fn reference_field_stores_use_verified_stack_effects() {
+        let mut m = fixture();
+        m.types[3].is_reference_type = true;
+        m.types[3]
+            .fields
+            .push(serde_json::from_value(json!({"name":"Value","ty":"Int32"})).unwrap());
+        let prefix = vec![
+            Op::Int(0),
+            Op::New(Type::Named("Model".into())),
+            Op::Dup,
+            Op::Int(2),
+            Op::SetField(0),
+            Op::Pop,
+        ];
+        m.functions[0].body.splice(0..0, prefix);
+        let result = analyze(&m, "Main").unwrap();
+        assert!(result.diagnostics.is_empty());
+        assert_eq!(result.types.get(&3), Some(&3));
+    }
+    #[test]
+    fn unrelated_addressed_local_does_not_erase_parameter_contract() {
+        let mut m = fixture();
+        let target = m.functions[1].clone();
+        let mut forward = target.clone();
+        forward.name = "Forward".into();
+        forward.origin.as_mut().unwrap().name = "Forward".into();
+        forward.origin.as_mut().unwrap().full_name = Some("Forward".into());
+        forward.locals = vec![Type::Int32];
+        forward.body = vec![
+            Op::Int(0),
+            Op::Store(0),
+            Op::LocalAddress(0),
+            Op::Pop,
+            Op::Arg(0),
+            call(&target),
+            Op::Return,
+        ];
+        m.functions[0].body[2] = call(&forward);
+        m.functions.push(forward);
+        assert!(analyze(&m, "Main").unwrap().diagnostics.is_empty());
+        m.functions[3].body[2] = Op::ArgumentAddress(0);
+        assert!(!analyze(&m, "Main").unwrap().diagnostics.is_empty());
+    }
+}

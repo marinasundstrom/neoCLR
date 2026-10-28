@@ -4291,5 +4291,36 @@ A method remains in metadata; an omitted call evaluates neither its receiver nor
     <member name="T:System.ResultErrorContextExtensions">
       <summary>Context attachment only transforms Result&apos;s failure channel.</summary>
     </member>
+    <member name="T:System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembersAttribute">
+      <summary>Declares native member-retention requirements on a TypeInfo parameter.</summary>
+      <remarks>Development support covers public constructors and properties. Unknown flows produce diagnostics; unsupported targets and flags are rejected.</remarks>
+    </member>
+    <member name="M:System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembersAttribute.#ctor(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes)">
+      <summary>Records the required member categories.</summary>
+      <param name="memberTypes">Required public constructor/property flags.</param>
+    </member>
+    <member name="P:System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembersAttribute.MemberTypes">
+      <summary>Gets the declared member requirements.</summary>
+    </member>
+    <member name="T:System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes">
+      <summary>Standard member category flags used by native retention analysis.</summary>
+      <remarks>Only None, PublicParameterlessConstructor, PublicConstructors, PublicProperties and their combinations are currently supported.</remarks>
+    </member>
+    <member name="F:System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None"><summary>None member category. Supported by development native analysis.</summary></member>
+    <member name="F:System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor"><summary>PublicParameterlessConstructor member category. Supported by development native analysis.</summary></member>
+    <member name="F:System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors"><summary>PublicConstructors member category. Supported by development native analysis.</summary></member>
+    <member name="F:System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.NonPublicConstructors"><summary>NonPublicConstructors member category. Not yet supported by native analysis; requests are rejected.</summary></member>
+    <member name="F:System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods"><summary>PublicMethods member category. Not yet supported by native analysis; requests are rejected.</summary></member>
+    <member name="F:System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.NonPublicMethods"><summary>NonPublicMethods member category. Not yet supported by native analysis; requests are rejected.</summary></member>
+    <member name="F:System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields"><summary>PublicFields member category. Not yet supported by native analysis; requests are rejected.</summary></member>
+    <member name="F:System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.NonPublicFields"><summary>NonPublicFields member category. Not yet supported by native analysis; requests are rejected.</summary></member>
+    <member name="F:System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicNestedTypes"><summary>PublicNestedTypes member category. Not yet supported by native analysis; requests are rejected.</summary></member>
+    <member name="F:System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.NonPublicNestedTypes"><summary>NonPublicNestedTypes member category. Not yet supported by native analysis; requests are rejected.</summary></member>
+    <member name="F:System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties"><summary>PublicProperties member category. Supported by development native analysis.</summary></member>
+    <member name="F:System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.NonPublicProperties"><summary>NonPublicProperties member category. Not yet supported by native analysis; requests are rejected.</summary></member>
+    <member name="F:System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicEvents"><summary>PublicEvents member category. Not yet supported by native analysis; requests are rejected.</summary></member>
+    <member name="F:System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.NonPublicEvents"><summary>NonPublicEvents member category. Not yet supported by native analysis; requests are rejected.</summary></member>
+    <member name="F:System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.Interfaces"><summary>Interfaces member category. Not yet supported by native analysis; requests are rejected.</summary></member>
+    <member name="F:System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All"><summary>All member category. Not yet supported by native analysis; requests are rejected.</summary></member>
 </members>
 </doc>

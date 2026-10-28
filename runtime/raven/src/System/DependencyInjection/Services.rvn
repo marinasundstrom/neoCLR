@@ -1,6 +1,7 @@
 module System.DependencyInjection
 
 import System.*
+import System.Diagnostics.CodeAnalysis.*
 import System.Collections.*
 import System.Introspection.*
 import System.Optional.*
@@ -46,7 +47,7 @@ public interface ServiceCollection {
     /// Adds only if the exact service type/key is absent; never invokes factories.
     func TryAdd(descriptor: ServiceDescriptor) -> Result<bool, ServiceError>
     /// Registers an implementation for an exact type/key pair; null is the unkeyed identity.
-    func AddKeyed(service: TypeInfo, key: Object?, implementation: TypeInfo, lifetime: ServiceLifetime) -> Result<unit, ServiceError>
+    func AddKeyed(service: TypeInfo, key: Object?, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] implementation: TypeInfo, lifetime: ServiceLifetime) -> Result<unit, ServiceError>
     /// Registers a factory receiving the current provider and the registration key.
     func AddKeyedFactory(service: TypeInfo, key: Object?, factory: (ServiceProvider, Object?) -> Result<Object, ServiceError>, lifetime: ServiceLifetime) -> Result<unit, ServiceError>
     /// Registers a caller-owned instance for an exact type/key pair.
@@ -54,7 +55,7 @@ public interface ServiceCollection {
     /// Adds a checked immutable descriptor; instance descriptors must have singleton lifetime.
     func Add(descriptor: ServiceDescriptor) -> Result<unit, ServiceError>
     /// Registers a concrete reference implementation assignable to the requested service.
-    func Add(service: TypeInfo, implementation: TypeInfo, lifetime: ServiceLifetime) -> Result<unit, ServiceError>
+    func Add(service: TypeInfo, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] implementation: TypeInfo, lifetime: ServiceLifetime) -> Result<unit, ServiceError>
     /// Registers a factory whose non-null result is validated and owned by its resolving provider.
     func AddFactory(service: TypeInfo, factory: (ServiceProvider) -> Result<Object, ServiceError>, lifetime: ServiceLifetime) -> Result<unit, ServiceError>
     /// Registers an assignable caller-owned instance; provider disposal never disposes this registration.
@@ -170,11 +171,11 @@ public class DefaultServiceCollection : ServiceCollection {
     }
 
     /// Registers an unkeyed implementation.
-    func Add(service: TypeInfo, implementation: TypeInfo, lifetime: ServiceLifetime) -> Result<unit, ServiceError> {
+    func Add(service: TypeInfo, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] implementation: TypeInfo, lifetime: ServiceLifetime) -> Result<unit, ServiceError> {
         return Add(ServiceDescriptor(service, ServiceSource.Constructor(implementation), lifetime))
     }
     /// Registers a keyed implementation.
-    func AddKeyed(service: TypeInfo, key: Object?, implementation: TypeInfo, lifetime: ServiceLifetime) -> Result<unit, ServiceError> {
+    func AddKeyed(service: TypeInfo, key: Object?, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] implementation: TypeInfo, lifetime: ServiceLifetime) -> Result<unit, ServiceError> {
         return Add(ServiceDescriptor(service, key, ServiceSource.Constructor(implementation), lifetime))
     }
     /// Registers an unkeyed factory whose result becomes provider-owned.
@@ -598,11 +599,11 @@ public extension ServiceCollectionExtensions for ServiceCollection {
     }
 
     /// Adds an implementation only when its exact unkeyed service is absent.
-    func TryAdd(service: TypeInfo, implementation: TypeInfo, lifetime: ServiceLifetime) -> Result<bool, ServiceError> {
+    func TryAdd(service: TypeInfo, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] implementation: TypeInfo, lifetime: ServiceLifetime) -> Result<bool, ServiceError> {
         return self.TryAdd(ServiceDescriptor(service, ServiceSource.Constructor(implementation), lifetime))
     }
     /// Adds an implementation only when its exact service type/key is absent.
-    func TryAddKeyed(service: TypeInfo, key: Object?, implementation: TypeInfo, lifetime: ServiceLifetime) -> Result<bool, ServiceError> {
+    func TryAddKeyed(service: TypeInfo, key: Object?, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] implementation: TypeInfo, lifetime: ServiceLifetime) -> Result<bool, ServiceError> {
         return self.TryAdd(ServiceDescriptor(service, key, ServiceSource.Constructor(implementation), lifetime))
     }
     /// Adds a factory without invoking it, only when the service is absent.

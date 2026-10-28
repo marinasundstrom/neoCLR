@@ -115,7 +115,14 @@ combined. `--retention-file config/native.json` selects a different file relativ
 to the project directory. Invalid declarations and conflicts with legacy
 reflection-policy arguments fail the build. Generic definitions retain only the
 supported closed shapes known to compilation. This does not add automatic JIT
-file discovery or `DynamicallyAccessedMembers` analysis.
+file discovery.
+
+Development `DynamicallyAccessedMembers` analysis can now infer constructor/property
+retention from known type tokens passed to annotated `TypeInfo` parameters. JSON
+deserialization and DI registration APIs carry corresponding requirements.
+Unknown flows produce diagnostics; generic-parameter, return, field and receiver
+annotations remain unsupported. Explicit files are still needed for unsupported
+flows. [Attribute API reference](/docs/api/System/Diagnostics/CodeAnalysis/DynamicallyAccessedMembersAttribute/).
 
 Use matching compiler and library builds for native JSON, attributes and reflection.
 Qualified examples cover specific supported shapes; they do not imply unrestricted

@@ -235,6 +235,8 @@ pub fn prepare(
             assembly.array_backing = Some(type_id(index));
         }
     }
+    let dynamic_access =
+        neoclr::dynamic_access::analyze(&joined, root).map_err(|e| e.to_string())?;
     // Definition-token operands describe metadata; they never instantiate an
     // executable generic type or consume the caller's type parameter scope.
     for fi in 0..joined.functions.len() {
@@ -265,15 +267,87 @@ pub fn prepare(
     let mut reflection_retention = context
         .and_then(|c| c.reflection_roots.as_ref())
         .map(|roots| {
-            super::reflection_construction::bind(
-                &mut joined,
-                &source_metadata,
-                &types,
-                &methods,
-                roots,
-            )
+            // Binding rewrites InternalCalls. Validate explicit input on a copy
+            // when inferred roots still need merging, then bind the union once.
+            let mut validation_input;
+            let input = if dynamic_access.types.is_empty() {
+                &mut joined
+            } else {
+                validation_input = joined.clone();
+                &mut validation_input
+            };
+            super::reflection_construction::bind(input, &source_metadata, &types, &methods, roots)
         })
         .transpose()?;
+    for diagnostic in &dynamic_access.diagnostics {
+        eprintln!("warning: {diagnostic}");
+    }
+    if !dynamic_access.types.is_empty() {
+        if !context.is_some_and(|c| c.compile_system && c.reference_arena) {
+            return Err("DynamicallyAccessedMembers retention requires --compile-system and --reference-arena".into());
+        }
+        // The explicit policy was validated above before upgrading its shape.
+        let mut policy = context
+            .and_then(|c| c.reflection_roots.clone())
+            .unwrap_or_else(|| json!({"schemaVersion":8,"types":[]}));
+        policy["schemaVersion"] = json!(8);
+        for key in [
+            "moduleCatalogs",
+            "moduleFunctions",
+            "typeCatalogs",
+            "methodTypes",
+        ] {
+            if policy.get(key).is_none() {
+                policy[key] = json!([]);
+            }
+        }
+        let rows = policy["types"].as_array_mut().unwrap();
+        for row in rows.iter_mut() {
+            for key in [
+                "properties",
+                "getters",
+                "setters",
+                "customAttributes",
+                "fields",
+                "fieldGetters",
+                "fieldSetters",
+                "constructors",
+            ] {
+                if row.get(key).is_none() {
+                    row[key] = json!(false);
+                }
+            }
+        }
+        for (&index, &flags) in &dynamic_access.types {
+            let definition = json!(types[index]);
+            let row = if let Some(at) = rows.iter().position(|r| r["definition"] == definition) {
+                &mut rows[at]
+            } else {
+                rows.push(
+                    json!({"definition":definition,"construct":false,"constructors":false,
+                    "properties":false,"getters":false,"setters":false,"customAttributes":false,
+                    "fields":false,"fieldGetters":false,"fieldSetters":false}),
+                );
+                rows.last_mut().unwrap()
+            };
+            if flags & neoclr::dynamic_access::PUBLIC_CONSTRUCTORS != 0 {
+                row["construct"] = json!(true);
+                row["constructors"] = json!(true);
+            }
+            if flags & neoclr::dynamic_access::PUBLIC_PROPERTIES != 0 {
+                for key in ["properties", "getters", "setters"] {
+                    row[key] = json!(true);
+                }
+            }
+        }
+        reflection_retention = Some(super::reflection_construction::bind(
+            &mut joined,
+            &source_metadata,
+            &types,
+            &methods,
+            &policy,
+        )?);
+    }
     // Conformance was verified in original scopes. Metadata-only relationships
     // must not consume executable specialization shapes (Option and Result share
     // Propagatable with different arguments, including metadata-only Void).
@@ -591,6 +665,7 @@ pub fn prepare(
     }
     report["sourceMetadata"] =
         super::reflection_metadata::catalogue(&source_metadata, &types, &methods, &report)?;
+    report["dynamicAccess"] = serde_json::to_value(&dynamic_access)?;
     if let Some(retention) = reflection_retention {
         report["reflectionRetention"] = retention;
     }

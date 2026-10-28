@@ -15958,3 +15958,22 @@ MethodImplAttributes bits, while its throwing bodies remain non-executable refer
 Future metadata/backend replacement must preserve the hints and NoInlining precedence;
 ordinary .NET emission remains unchanged. Unsupported flags and InternalCall combinations
 are rejected. See [bounded default JIT/AOT inlining and validation](validation/inlining-20261028/README.md).
+
+## Dynamic member parameter metadata (2026-10-28 development)
+
+The runtime declares `System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembersAttribute`
+and annotates TypeInfo parameters in JSON and DI APIs. Raven's existing native
+custom-attribute transport preserves the constructor, enum argument and parameter
+token; no Runtime Contract configuration or new emitter rule is needed. The native
+backend owns the bounded constructor/property flow analysis and retention. The
+runtime owns API contracts. Generic, return, field and receiver contracts remain
+unsupported; dynamic implementation bodies and recursively discovered reflection
+roots are not analyzed by this slice.
+
+The CLI documentation reference projects the attribute and enum as ordinary C#
+declarations. It is a documentation bridge, not executable reflection support.
+Native metadata is authoritative; future broader transport/analysis must preserve
+exact target identity and diagnostics rather than interpreting CLI names as a
+permanent semantic rule. Compiler bundle ed1d08def emitted the qualified native
+libraries; RavenDoc 256019f66 rendered their API reference. See
+[implementation and qualification](validation/dynamic-access-20261028/README.md).

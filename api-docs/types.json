@@ -134,6 +134,8 @@
   "System.Data.Sql.SqlValue.Null",
   "System.Data.Sql.SqlValue.Text",
   "System.Delegate",
+  "System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes",
+  "System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembersAttribute",
   "System.Diagnostics.ConditionalAttribute",
   "System.Diagnostics.StackTrace",
   "System.Disposable",

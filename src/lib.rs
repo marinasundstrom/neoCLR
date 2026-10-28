@@ -1,3 +1,4 @@
+pub mod dynamic_access;
 mod arrays;
 // Checked opaque memory views; native backend lowering remains separate.
 mod memory_view_contract;

@@ -1,6 +1,7 @@
 module System.Data.Json
 
 import System.*
+import System.Diagnostics.CodeAnalysis.*
 import System.Collections.*
 import System.Introspection.*
 import System.Optional.*
@@ -156,7 +157,7 @@ internal class ObjectMapper {
         return Ok(document)
     }
 
-    static func Read(value: JsonValue, type: TypeInfo) -> Result<Object, JsonError> {
+    static func Read(value: JsonValue, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | DynamicallyAccessedMemberTypes.PublicProperties)] type: TypeInfo) -> Result<Object, JsonError> {
         // Validate the entire input tree before executing any model user code.
         _ = ReadValue(value, type, 0, 0)?
         return ReadValue(value, type, 0, 1)
@@ -164,7 +165,7 @@ internal class ObjectMapper {
 
     // Pass 0 validates; pass 1 constructs. Integer mode avoids the current bridge
     // limitation on Boolean conversions at multi-argument private calls.
-    private static func ReadValue(value: JsonValue, type: TypeInfo, depth: int, construct: int) -> Result<Object, JsonError> {
+    private static func ReadValue(value: JsonValue, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | DynamicallyAccessedMemberTypes.PublicProperties)] type: TypeInfo, depth: int, construct: int) -> Result<Object, JsonError> {
         _ = CheckType(type)?
         if IsNodeType(type) {
             if MatchesNode(value, type) {
