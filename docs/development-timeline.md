@@ -1,5 +1,22 @@
 # Development conversation record
 
+## 2026-10-28 — Fix the neoCLR callback overload gap
+
+- **Author:** Asked whether explicit overload selection was a compiler gap, then
+  directed: “Fix the compiler gap. It's specific for the neoCLR target”.
+- **Assistant investigation/action:** Reduced the ambiguity to a Box<T> callback;
+  .NET passed while neoCLR failed in both declaration orders. Extended Raven's
+  generic specificity comparison through structural function signatures, avoiding
+  any Task.Run special case; committed Raven `codex/neoclr` fix `91c1edca8`.
+- **Outcome:** 21 focused tests pass; the broad overload suite retains the same
+  two pre-existing failures (419 pass). Removed the explicit type argument from
+  the working HTTP fixture; native emission and 80 fanout requests pass across
+  sync/concurrent GC and baseline/shared queues. No task-relationship tracking
+  was added. [Evidence and limits](validation/task-overload-20261028/README.md).
+- **Open:** The broader mixed-I/O DNS/concurrent-GC failure and unrelated capture
+  emitter limitations remain. This compiler slice does not claim throughput
+  gains, complete scheduler qualification or a published SDK/website.
+
 ## 2026-10-28 — Shared scheduler predictability and context profiling
 
 - **Author direction:** Task.Run and other scheduled work should share scheduling

@@ -1,0 +1,28 @@
+/usr/local/share/dotnet/sdk/11.0.100-rc.1.26425.128/Sdks/Microsoft.NET.Sdk/targets/Microsoft.NET.RuntimeIdentifierInference.targets(385,5): message NETSDK1057: You are using a preview version of .NET. See: https://aka.ms/dotnet-support-policy [/Users/robert/Projects/Raven/test/Raven.CodeAnalysis.Tests/Raven.CodeAnalysis.Tests.csproj]
+  Raven.CodeAnalysis.Tests -> /Users/robert/Projects/Raven/test/Raven.CodeAnalysis.Tests/bin/Debug/net11.0/Raven.CodeAnalysis.Tests.dll
+  Tool 'dotnet-ilverify' (version '9.0.9') was restored. Available commands: ilverify
+  Tool 'ilspycmd' (version '9.1.0.7988') was restored. Available commands: ilspycmd
+
+  Restore was successful.
+Test run for /Users/robert/Projects/Raven/test/Raven.CodeAnalysis.Tests/bin/Debug/net11.0/Raven.CodeAnalysis.Tests.dll (.NETCoreApp,Version=v11.0)
+A total of 1 test files matched the specified pattern.
+[xUnit.net 00:00:03.11]     Raven.CodeAnalysis.Tests.StructuralFunctionOverloadSpecificityTests.ConstructedCallbackResultIsMoreSpecificThanBareTypeParameter(target: NeoCLR, reverse: True) [FAIL]
+[xUnit.net 00:00:03.43]     Raven.CodeAnalysis.Tests.StructuralFunctionOverloadSpecificityTests.ConstructedCallbackResultIsMoreSpecificThanBareTypeParameter(target: NeoCLR, reverse: False) [FAIL]
+  Failed Raven.CodeAnalysis.Tests.StructuralFunctionOverloadSpecificityTests.ConstructedCallbackResultIsMoreSpecificThanBareTypeParameter(target: NeoCLR, reverse: True) [369 ms]
+  Error Message:
+   Assert.Empty() Failure
+Collection: [error RAV0121: This call matches both 'static Choose<int>(callback: () -> Box<int>) -> int' and 'static Choose<Box<int>>(callback: () -> Box<int>) -> int'.]
+  Stack Trace:
+     at Raven.CodeAnalysis.Tests.StructuralFunctionOverloadSpecificityTests.ConstructedCallbackResultIsMoreSpecificThanBareTypeParameter(TargetPlatform target, Boolean reverse) in /Users/robert/Projects/Raven/test/Raven.CodeAnalysis.Tests/Semantics/Functions/StructuralFunctionOverloadSpecificityTests.cs:line 29
+   at InvokeStub_StructuralFunctionOverloadSpecificityTests.ConstructedCallbackResultIsMoreSpecificThanBareTypeParameter(Object, Span`1)
+   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+  Failed Raven.CodeAnalysis.Tests.StructuralFunctionOverloadSpecificityTests.ConstructedCallbackResultIsMoreSpecificThanBareTypeParameter(target: NeoCLR, reverse: False) [322 ms]
+  Error Message:
+   Assert.Empty() Failure
+Collection: [error RAV0121: This call matches both 'static Choose<Box<int>>(callback: () -> Box<int>) -> int' and 'static Choose<int>(callback: () -> Box<int>) -> int'.]
+  Stack Trace:
+     at Raven.CodeAnalysis.Tests.StructuralFunctionOverloadSpecificityTests.ConstructedCallbackResultIsMoreSpecificThanBareTypeParameter(TargetPlatform target, Boolean reverse) in /Users/robert/Projects/Raven/test/Raven.CodeAnalysis.Tests/Semantics/Functions/StructuralFunctionOverloadSpecificityTests.cs:line 29
+   at InvokeStub_StructuralFunctionOverloadSpecificityTests.ConstructedCallbackResultIsMoreSpecificThanBareTypeParameter(Object, Span`1)
+   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+
+Failed!  - Failed:     2, Passed:     2, Skipped:     0, Total:     4, Duration: 1 s - Raven.CodeAnalysis.Tests.dll (net11.0)

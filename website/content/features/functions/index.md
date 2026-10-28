@@ -114,3 +114,11 @@ do not match. The shared Raven syntax also works on .NET using standard delegate
 Functions can be arguments and results of other functions. Reflective invocation
 preserves their signature identity; native metadata retention still determines
 which reflective member queries are available.
+
+### Callback overload inference (development)
+
+The neoCLR compiler compares declared structural callback signatures when generic
+overloads accept the same constructed callback type. A function returning
+`Task<T>` selects Task.Run's async-unwrapping overload without an explicit result
+type, matching ordinary .NET delegate selection. Conflicting specificity remains
+ambiguous. See the [compiler qualification](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/task-overload-20261028/README.md).

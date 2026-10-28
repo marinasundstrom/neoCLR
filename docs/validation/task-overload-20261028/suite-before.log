@@ -1,0 +1,78 @@
+  Determining projects to restore...
+  Restored /Users/robert/Projects/Raven/src/Raven.CodeAnalysis/Raven.CodeAnalysis.csproj (in 324 ms).
+  Restored /Users/robert/Projects/Raven/src/RavenDoc/RavenDoc.csproj (in 305 ms).
+  Restored /Users/robert/Projects/Raven/src/Raven.Compiler/Raven.Compiler.csproj (in 324 ms).
+  7 of 10 projects are up-to-date for restore.
+/usr/local/share/dotnet/sdk/11.0.100-rc.1.26425.128/Sdks/Microsoft.NET.Sdk/targets/Microsoft.NET.RuntimeIdentifierInference.targets(385,5): message NETSDK1057: You are using a preview version of .NET. See: https://aka.ms/dotnet-support-policy [/Users/robert/Projects/Raven/test/Raven.CodeAnalysis.Tests/Raven.CodeAnalysis.Tests.csproj]
+/usr/local/share/dotnet/sdk/11.0.100-rc.1.26425.128/Sdks/Microsoft.NET.Sdk/targets/Microsoft.NET.RuntimeIdentifierInference.targets(385,5): message NETSDK1057: You are using a preview version of .NET. See: https://aka.ms/dotnet-support-policy [/Users/robert/Projects/Raven/src/Raven.CodeAnalysis/Raven.CodeAnalysis.csproj::TargetFramework=net11.0]
+/usr/local/share/dotnet/sdk/11.0.100-rc.1.26425.128/Sdks/Microsoft.NET.Sdk/targets/Microsoft.NET.RuntimeIdentifierInference.targets(385,5): message NETSDK1057: You are using a preview version of .NET. See: https://aka.ms/dotnet-support-policy [/Users/robert/Projects/Raven/src/Raven.Compiler/Raven.Compiler.csproj::TargetFramework=net11.0]
+/usr/local/share/dotnet/sdk/11.0.100-rc.1.26425.128/Sdks/Microsoft.NET.Sdk/targets/Microsoft.NET.RuntimeIdentifierInference.targets(385,5): message NETSDK1057: You are using a preview version of .NET. See: https://aka.ms/dotnet-support-policy [/Users/robert/Projects/Raven/src/Raven.Core/Raven.Core.rvnproj::TargetFramework=net11.0]
+/usr/local/share/dotnet/sdk/11.0.100-rc.1.26425.128/Sdks/Microsoft.NET.Sdk/targets/Microsoft.NET.RuntimeIdentifierInference.targets(385,5): message NETSDK1057: You are using a preview version of .NET. See: https://aka.ms/dotnet-support-policy [/Users/robert/Projects/Raven/src/Raven.CodeAnalysis.Console/Raven.CodeAnalysis.Console.csproj::TargetFramework=net11.0]
+/usr/local/share/dotnet/sdk/11.0.100-rc.1.26425.128/Sdks/Microsoft.NET.Sdk/targets/Microsoft.NET.RuntimeIdentifierInference.targets(385,5): message NETSDK1057: You are using a preview version of .NET. See: https://aka.ms/dotnet-support-policy [/Users/robert/Projects/Raven/src/Raven.Analyzers/Raven.Analyzers.csproj::TargetFramework=net11.0]
+  Raven CoreCompile: Raven.Core.rvnproj -> obj/Debug/net11.0/Raven.Core.dll
+  Model unchanged. Skipping generation.
+  Model unchanged. Skipping generation.
+  Diagnostics unchanged. Skipping generation.
+  Diagnostics unchanged. Skipping generation.
+/usr/local/share/dotnet/sdk/11.0.100-rc.1.26425.128/Microsoft.Common.CurrentVersion.targets(4934,5): warning MSB3026: Could not copy "obj/Debug/net11.0/Raven.CodeAnalysis.dll" to "bin/Debug/net11.0/Raven.CodeAnalysis.dll". Beginning retry 1 in 1000ms. The process cannot access the file '/Users/robert/Projects/Raven/src/Raven.CodeAnalysis/obj/Debug/net11.0/Raven.CodeAnalysis.dll' because it is being used by another process.  [/Users/robert/Projects/Raven/src/Raven.CodeAnalysis/Raven.CodeAnalysis.csproj::TargetFramework=net11.0]
+  Raven.CodeAnalysis -> /Users/robert/Projects/Raven/src/Raven.CodeAnalysis/bin/Debug/net11.0/Raven.CodeAnalysis.dll
+  Raven.CodeAnalysis.Console -> /Users/robert/Projects/Raven/src/Raven.CodeAnalysis.Console/bin/Debug/net11.0/Raven.CodeAnalysis.Console.dll
+  Raven.CodeAnalysis -> /Users/robert/Projects/Raven/src/Raven.CodeAnalysis/bin/Debug/net11.0/Raven.CodeAnalysis.dll
+  Raven.CodeAnalysis.Testing -> /Users/robert/Projects/Raven/src/Raven.CodeAnalysis.Testing/bin/Debug/net11.0/Raven.CodeAnalysis.Testing.dll
+  RavenDoc -> /Users/robert/Projects/Raven/src/RavenDoc/bin/Debug/net11.0/RavenDoc.dll
+  Raven.Analyzers -> /Users/robert/Projects/Raven/src/Raven.Analyzers/bin/Debug/net11.0/Raven.Analyzers.dll
+  Raven.CodeAnalysis.Console -> /Users/robert/Projects/Raven/src/Raven.CodeAnalysis.Console/bin/Debug/net11.0/Raven.CodeAnalysis.Console.dll
+  RavenDoc -> /Users/robert/Projects/Raven/src/RavenDoc/bin/Debug/net11.0/RavenDoc.dll
+  Raven.Compiler -> /Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll
+  Raven CoreCompile: Raven.Macros.rvnproj -> obj/Debug/net11.0/Raven.Macros.dll
+  Documentation written to
+  '/Users/robert/Projects/Raven/src/Raven.Core/obj/Debug/net11.0/Raven.Core.docs'.
+  Documentation written to
+  '/Users/robert/Projects/Raven/src/Raven.Core/obj/Debug/net11.0/Raven.Core.xml'.
+
+  Build succeeded in 57,9s
+  Raven.Core -> /Users/robert/Projects/Raven/src/Raven.Core/bin/Debug/net11.0/Raven.Core.dll
+  Documentation written to
+  '/Users/robert/Projects/Raven/src/Raven.Macros/obj/Debug/net11.0/Raven.Macros.do
+  cs'.
+  Documentation written to
+  '/Users/robert/Projects/Raven/src/Raven.Macros/obj/Debug/net11.0/Raven.Macros.xm
+  l'.
+
+  Build succeeded in 65,4s
+  Raven.Macros -> /Users/robert/Projects/Raven/src/Raven.Macros/bin/Debug/net11.0/Raven.Macros.dll
+  ExtensionMethodsFixture -> /Users/robert/Projects/Raven/test/MetadataFixtures/ExtensionMethodsFixture/bin/Debug/net10.0/Raven.ExtensionMethodsFixture.dll
+  Raven.CodeAnalysis.Tests -> /Users/robert/Projects/Raven/test/Raven.CodeAnalysis.Tests/bin/Debug/net11.0/Raven.CodeAnalysis.Tests.dll
+  Tool 'dotnet-ilverify' (version '9.0.9') was restored. Available commands: ilverify
+  Tool 'ilspycmd' (version '9.1.0.7988') was restored. Available commands: ilspycmd
+
+  Restore was successful.
+Test run for /Users/robert/Projects/Raven/test/Raven.CodeAnalysis.Tests/bin/Debug/net11.0/Raven.CodeAnalysis.Tests.dll (.NETCoreApp,Version=v11.0)
+A total of 1 test files matched the specified pattern.
+[xUnit.net 00:00:26.77]     Raven.CodeAnalysis.Semantics.Tests.ExtensionMethodSemanticTests.Lowerer_WithLoweringTrace_RecordsNestedQueryPipelinesAcrossExtensionSources [FAIL]
+  Failed Raven.CodeAnalysis.Semantics.Tests.ExtensionMethodSemanticTests.Lowerer_WithLoweringTrace_RecordsNestedQueryPipelinesAcrossExtensionSources [268 ms]
+  Error Message:
+   Assert.Contains() Failure
+Not found: (filter expression)
+In value:  ExtensionInvocationLoweringTrace[] [ExtensionInvocationLoweringTrace { ArgumentTypes = [...], ContainingSymbol = func Run() -> IEnumerable<int>, Method = static func Where<int>(source: IEnumerable<int>, predicate: int -> bool) -> IEnumerable<int>, ReceiverCameFromInvocation = False, ReceiverType = interface IEnumerable<int> }, ExtensionInvocationLoweringTrace { ArgumentTypes = [...], ContainingSymbol = func Run() -> IEnumerable<int>, Method = static func Where<int>(source: IEnumerable<int>, predicate: int -> bool) -> IEnumerable<int>, ReceiverCameFromInvocation = False, ReceiverType = interface IEnumerable<int> }, ExtensionInvocationLoweringTrace { ArgumentTypes = [...], ContainingSymbol = func Run() -> IEnumerable<int>, Method = static func ProjectSquaresAndFilter(values: IEnumerable<int>, projector: int -> int) -> IEnumerable<int>, ReceiverCameFromInvocation = False, ReceiverType = interface IEnumerable<int> }, ExtensionInvocationLoweringTrace { ArgumentTypes = [...], ContainingSymbol = func Run() -> IEnumerable<int>, Method = static func Where<int>(source: IEnumerable<int>, predicate: int -> bool) -> IEnumerable<int>, ReceiverCameFromInvocation = False, ReceiverType = interface IEnumerable<int> }, ExtensionInvocationLoweringTrace { ArgumentTypes = [...], ContainingSymbol = func Run() -> IEnumerable<int>, Method = static func Where<int>(source: IEnumerable<int>, predicate: int -> bool) -> IEnumerable<int>, ReceiverCameFromInvocation = False, ReceiverType = interface IEnumerable<int> }, ...]
+  Stack Trace:
+     at Raven.CodeAnalysis.Semantics.Tests.ExtensionMethodSemanticTests.Lowerer_WithLoweringTrace_RecordsNestedQueryPipelinesAcrossExtensionSources() in /Users/robert/Projects/Raven/test/Raven.CodeAnalysis.Tests/Semantics/Extensions/ExtensionMethodSemanticTests.cs:line 1219
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+[xUnit.net 00:00:27.64]     Raven.CodeAnalysis.Semantics.Tests.ExtensionMethodSemanticTests.Lowerer_WithLoweringTrace_RecordsNestedExtensionInvocations [FAIL]
+  Failed Raven.CodeAnalysis.Semantics.Tests.ExtensionMethodSemanticTests.Lowerer_WithLoweringTrace_RecordsNestedExtensionInvocations [292 ms]
+  Error Message:
+   Assert.Contains() Failure
+Not found: (filter expression)
+In value:  ExtensionInvocationLoweringTrace[] [ExtensionInvocationLoweringTrace { ArgumentTypes = [...], ContainingSymbol = func Run() -> IEnumerable<int>, Method = static func Where<int>(source: IEnumerable<int>, predicate: int -> bool) -> IEnumerable<int>, ReceiverCameFromInvocation = False, ReceiverType = interface IEnumerable<int> }, ExtensionInvocationLoweringTrace { ArgumentTypes = [...], ContainingSymbol = func Run() -> IEnumerable<int>, Method = static func Where<int>(source: IEnumerable<int>, predicate: int -> bool) -> IEnumerable<int>, ReceiverCameFromInvocation = False, ReceiverType = interface IEnumerable<int> }, ExtensionInvocationLoweringTrace { ArgumentTypes = [...], ContainingSymbol = func Run() -> IEnumerable<int>, Method = static func ProjectSquares(values: IEnumerable<int>, projector: int -> int) -> IEnumerable<int>, ReceiverCameFromInvocation = False, ReceiverType = interface IEnumerable<int> }, ExtensionInvocationLoweringTrace { ArgumentTypes = [...], ContainingSymbol = func Run() -> IEnumerable<int>, Method = static func Where<int>(source: IEnumerable<int>, predicate: int -> bool) -> IEnumerable<int>, ReceiverCameFromInvocation = False, ReceiverType = interface IEnumerable<int> }, ExtensionInvocationLoweringTrace { ArgumentTypes = [...], ContainingSymbol = func Run() -> IEnumerable<int>, Method = static func Where<int>(source: IEnumerable<int>, predicate: int -> bool) -> IEnumerable<int>, ReceiverCameFromInvocation = False, ReceiverType = interface IEnumerable<int> }, ...]
+  Stack Trace:
+     at Raven.CodeAnalysis.Semantics.Tests.ExtensionMethodSemanticTests.Lowerer_WithLoweringTrace_RecordsNestedExtensionInvocations() in /Users/robert/Projects/Raven/test/Raven.CodeAnalysis.Tests/Semantics/Extensions/ExtensionMethodSemanticTests.cs:line 1107
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+Data collector 'Blame' message: All tests finished running, Sequence file will not be generated.
+
+Failed!  - Failed:     2, Passed:   419, Skipped:     0, Total:   421, Duration: 1 m 6 s - Raven.CodeAnalysis.Tests.dll (net11.0)

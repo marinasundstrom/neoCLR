@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-28
 
+- Integrate Raven neoCLR compiler fix `91c1edca8` for structural callback overload specificity. Task.Run infers async unwrapping without explicit type arguments; 21 focused compiler tests and 80 nested-task HTTP requests pass across both collectors and ready-queue variants. Record the unchanged two pre-existing broader compiler-test failures and remaining mixed-I/O limits; packaged SDK replacement and website publication are separate.
+
 - Extend bounded execution tracing to shared scheduler runnable admission/dequeue and dispatch-root ownership, including queued abandonment. Use an explicitly labeled precise macOS session clock and preserve compiled-out adapter assembly. Qualify lifetime/loss checks and eight HTTP diagnostic cases under both collectors; each captures all 132 submissions but reaches only queue depth one. Retain the concurrent JSON regression and clock/overhead limits; pressure, retained-memory and mixed-I/O/AOT profiling remain open.
 
 - Qualify generated persistent HTTP handlers that await Task.Run and preserve capture mutations/aliases with baseline/shared ready storage under both collectors. Add matched lazy-JIT host preparation, bounded async/GC trace export, carrier/OS-switch counters and actual carrier layout accounting. Eight smoke and eight diagnostic cases pass; retain the debug-runner timeout separately. Document microsecond trace resolution, incomplete managed-queue coverage and instrumentation memory; no throughput gain or complete scheduling profile is claimed.

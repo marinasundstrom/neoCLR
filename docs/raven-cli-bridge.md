@@ -5,6 +5,19 @@
 
 # Raven CLI bridge
 
+## Structural callback overload inference (2026-10-28)
+
+Raven `codex/neoclr` **91c1edca8** compares generic specificity through native
+structural function signatures. Task-returning lambdas select Task.Run's
+async-unwrapping overload without explicit result types, matching the existing
+.NET delegate rule. This is target-symbol binder behavior, with unchanged Runtime
+Contract settings, native metadata/Function ABI and legacy CLI projection.
+No new temporary encoding or native replacement is necessary. The semantic model
+reports the selected constructed method; runtime scheduling semantics are unchanged.
+[Compiler and native HTTP evidence](validation/task-overload-20261028/README.md)
+covers both collectors. Existing capture-emission and mixed-I/O qualification gaps
+are separate. Use the rebuilt compiler; older packaged SDK compilers retain the gap.
+
 ## Native production core (2026-10-17)
 
 Production native projects now use source-owned System.Runtime and explicit
