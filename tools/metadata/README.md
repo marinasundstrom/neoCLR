@@ -415,3 +415,8 @@ provides metadata-only discovery. CLI output uses the sequence-zero Param row;
 native output uses optional `origin.return_token` and matching attribute target tokens.
 Roundtrip, reference projection and malformed-target checks run with
 `dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --return-attributes`.
+
+Native emission now preserves custom attributes on ordinary static fields, using
+existing exact field tokens. Literal/enum-field annotations remain outside this
+writer extension. `--storage-attributes` tests instance/static fields and properties
+through native/CLI reading, projection and introspection.

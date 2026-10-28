@@ -1,6 +1,7 @@
 module System.Web.Http.Json
 
 import System.*
+import System.Diagnostics.CodeAnalysis.*
 import System.Concurrency.*
 import System.Data.Json.*
 import System.Introspection.*
@@ -40,12 +41,12 @@ public extension HttpContentJsonExtensions for HttpContent {
     }
 
     /// Reads a model using a runtime type; consumes streaming content without closing it.
-    func ReadFromJson(type: TypeInfo) -> Task<Result<Object, JsonError>> {
+    func ReadFromJson([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | DynamicallyAccessedMemberTypes.PublicProperties)] type: TypeInfo) -> Task<Result<Object, JsonError>> {
         return self.ReadFromJson(type, CancellationToken.None)
     }
 
     /// Reads JSON using a runtime type; cancellation applies to asynchronous stream reads.
-    func ReadFromJson(type: TypeInfo, cancellationToken: CancellationToken) -> Task<Result<Object, JsonError>> {
+    func ReadFromJson([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | DynamicallyAccessedMemberTypes.PublicProperties)] type: TypeInfo, cancellationToken: CancellationToken) -> Task<Result<Object, JsonError>> {
         if !cancellationToken.IsCancellationRequested && !self.IsBuffered {
             if self.IsDisposed || self.BeginUpload() is Failure(_) {
                 return Task.FromResult<Result<Object, JsonError>>(Result<Object, JsonError>.Failure(JsonError.Read(TextReadError.IoFailure)))

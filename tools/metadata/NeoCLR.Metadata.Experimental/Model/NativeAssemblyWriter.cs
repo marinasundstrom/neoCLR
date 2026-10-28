@@ -464,11 +464,11 @@ public sealed partial class AssemblyBuilder
         object[]? TypeAttributes(TypeBuilder type)
         {
             var attributes = type.Definition.CustomAttributes.Where(a => !type.Definition.IsFlagsAttribute(a)).Select(a => Attribute(a)).ToList();
-            foreach (var field in type.Fields)
+            foreach (var field in type.Fields.Concat(type.StaticFields))
                 attributes.AddRange(field.Definition.CustomAttributes.Select(a => Attribute(a, fieldTokens[field])));
             foreach (var property in type.Properties)
                 attributes.AddRange(property.Definition.CustomAttributes.Select(a => Attribute(a, propertyTokens[property])));
-            if (type.MetadataFields.Any(f => !type.Fields.Contains(f) && f.Definition.CustomAttributes.Count != 0))
+            if (type.MetadataFields.Any(f => !type.Fields.Contains(f) && !type.StaticFields.Contains(f) && f.Definition.CustomAttributes.Count != 0))
                 throw new NotSupportedException("native literal-field attributes require metadata tokens for enum members");
             return attributes.Count == 0 ? null : attributes.ToArray();
         }

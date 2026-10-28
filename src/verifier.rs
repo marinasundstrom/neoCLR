@@ -290,11 +290,18 @@ fn analyze_function(
     analyze_function_recording(module, index, function, constructing, None)
 }
 
-/// Exact stack effects after typed verification (notably reference field stores).
+#[derive(Clone)]
+pub(crate) struct InstructionEffect {
+    pub pops: usize,
+    pub pushes: usize,
+    pub receiver: Option<Type>,
+}
+
+/// Exact stack effects and field receiver type after typed verification.
 pub(crate) fn instruction_effects(
     module: &Module,
     function: &Function,
-) -> Result<Vec<Option<(usize, usize)>>, Fault> {
+) -> Result<Vec<Option<InstructionEffect>>, Fault> {
     let mut effects = vec![None; function.body.len()];
     analyze_function_recording(module, 0, function, false, Some(&mut effects))?;
     Ok(effects)
@@ -305,7 +312,7 @@ fn analyze_function_recording(
     index: usize,
     function: &Function,
     constructing: bool,
-    mut effects: Option<&mut Vec<Option<(usize, usize)>>>,
+    mut effects: Option<&mut Vec<Option<InstructionEffect>>>,
 ) -> Result<FunctionVerification, Fault> {
     let fault = |pc, message: &str| Fault {
         code: crate::FaultCode::InvalidProgram,
@@ -561,7 +568,21 @@ fn analyze_function_recording(
             pushes
         };
         if let Some(effects) = effects.as_mut() {
-            effects[pc] = Some((pops, pushes));
+            effects[pc] = Some(InstructionEffect {
+                pops,
+                pushes,
+                receiver: if matches!(op, Op::Field(_) | Op::SetField(_) | Op::FieldAddress(_)) {
+                    inputs
+                        .first()
+                        .and_then(|v| exact(v).ok())
+                        .map(|ty| match ty {
+                            Type::ByRef(target) => target.as_ref().clone(),
+                            _ => ty.clone(),
+                        })
+                } else {
+                    None
+                },
+            });
         }
         debug_assert_eq!(outputs.len(), pushes);
         state.stack.extend(outputs);

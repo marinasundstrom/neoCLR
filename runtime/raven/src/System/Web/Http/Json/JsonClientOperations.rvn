@@ -1,6 +1,7 @@
 module System.Web.Http.Json
 
 import System.*
+import System.Diagnostics.CodeAnalysis.*
 import System.Concurrency.*
 import System.Data.Json.*
 import System.Introspection.*
@@ -21,7 +22,7 @@ internal class JsonClientOperations {
         return Ok(response)
     }
 
-    static func Get(client: HttpClient, url: string, type: TypeInfo, token: CancellationToken) -> Task<Result<Object, HttpError | JsonError>> {
+    static func Get(client: HttpClient, url: string, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | DynamicallyAccessedMemberTypes.PublicProperties)] type: TypeInfo, token: CancellationToken) -> Task<Result<Object, HttpError | JsonError>> {
         return client.Get(url, token).Map(JsonClientRead(type).Decode)
     }
 
@@ -42,7 +43,7 @@ internal class JsonClientOperations {
         System.Fail("JSON creation returned no outcome")
     }
 
-    static func Get(client: HttpClient, url: Uri, type: TypeInfo, token: CancellationToken) -> Task<Result<Object, HttpError | JsonError>> {
+    static func Get(client: HttpClient, url: Uri, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | DynamicallyAccessedMemberTypes.PublicProperties)] type: TypeInfo, token: CancellationToken) -> Task<Result<Object, HttpError | JsonError>> {
         return client.Get(url, token).Map(JsonClientRead(type).Decode)
     }
 
@@ -65,8 +66,9 @@ internal class JsonClientOperations {
 }
 
 internal class JsonClientRead {
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | DynamicallyAccessedMemberTypes.PublicProperties)]
     private var type: TypeInfo
-    init(type: TypeInfo) {
+    init([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | DynamicallyAccessedMemberTypes.PublicProperties)] type: TypeInfo) {
         self.type = type
     }
 

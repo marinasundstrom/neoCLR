@@ -56,6 +56,161 @@ impl Contract {
     }
 }
 
+fn flags(
+    module: &Module,
+    attribute: &crate::metadata::CustomAttribute,
+) -> Result<Option<u32>, Fault> {
+    if attribute
+        .constructor
+        .owner
+        .as_ref()
+        .and_then(|t| source_name(module, t))
+        != Some(ATTRIBUTE)
+    {
+        return Ok(None);
+    }
+    let [AttributeArgument::Int32(value)] = attribute.arguments.as_slice() else {
+        return Err(Fault::new(
+            "DAM1001: member requirements must be Int32 flags",
+        ));
+    };
+    if *value < 0 || (*value as u32 & !SUPPORTED) != 0 || !attribute.named_arguments.is_empty() {
+        return Err(Fault::new("DAM1001: unsupported dynamic member flags"));
+    }
+    Ok(Some(*value as u32))
+}
+
+fn property_flags(
+    module: &Module,
+    owner: &crate::metadata::TypeDef,
+    index: usize,
+) -> Result<u32, Fault> {
+    let token = owner
+        .origin
+        .as_ref()
+        .and_then(|o| o.property_tokens.get(index));
+    let mut result = 0;
+    for attribute in &owner.custom_attributes {
+        if token.is_some() && attribute.target_token.as_ref() == token {
+            if let Some(value) = flags(module, attribute)? {
+                result |= value;
+            }
+        }
+    }
+    Ok(result)
+}
+
+fn field_flags(module: &Module, owner: &Type, index: usize, is_static: bool) -> Result<u32, Fault> {
+    // Tuple/function carriers have structural fields but no source declaration
+    // on which a field annotation can reside.
+    if module.type_definition(owner).is_none() {
+        return Ok(0);
+    }
+    let (owner, index) = if is_static {
+        (owner.clone(), index)
+    } else {
+        crate::inheritance::field_owner(module, owner, index)?
+    };
+    let definition = module
+        .type_definition(&owner)
+        .ok_or_else(|| Fault::new("missing field owner"))?;
+    let offset = if is_static {
+        definition.fields.len()
+    } else {
+        0
+    };
+    let token = definition
+        .origin
+        .as_ref()
+        .and_then(|o| o.field_tokens.get(offset + index));
+    let mut result = 0;
+    for attribute in &definition.custom_attributes {
+        if token.is_some() && attribute.target_token.as_ref() == token {
+            if let Some(value) = flags(module, attribute)? {
+                result |= value;
+            }
+        }
+    }
+    // A getter that returns exactly one field establishes its storage contract.
+    // Arbitrary computed getters still have their return flow checked normally.
+    for (property_index, property) in definition.properties.iter().enumerate() {
+        let value = property_flags(module, definition, property_index)?;
+        if value == 0 {
+            continue;
+        }
+        let Some(getter) = &property.getter else {
+            continue;
+        };
+        let getter = crate::vm::resolve(module, getter)?;
+        let matches = match getter.body.as_slice() {
+            [Op::Arg(0), Op::Field(field), Op::Return] if !is_static => {
+                let (field_owner, field_index) = crate::inheritance::field_owner(
+                    module,
+                    getter.owner.as_ref().unwrap(),
+                    *field,
+                )?;
+                module
+                    .type_definition(&field_owner)
+                    .is_some_and(|t| std::ptr::eq(t, definition))
+                    && field_index == index
+            }
+            [
+                Op::StaticField {
+                    owner: field_owner,
+                    index: field,
+                },
+                Op::Return,
+            ] if is_static => {
+                module
+                    .type_definition(field_owner)
+                    .is_some_and(|t| std::ptr::eq(t, definition))
+                    && *field == index
+            }
+            _ => false,
+        };
+        if matches {
+            result |= value;
+        }
+    }
+    Ok(result)
+}
+
+fn validate_storage_contracts(module: &Module) -> Result<bool, Fault> {
+    let mut any = false;
+    for ty in &module.types {
+        for attribute in &ty.custom_attributes {
+            let Some(_) = flags(module, attribute)? else {
+                continue;
+            };
+            any = true;
+            let fail = || {
+                Fault::new(format!(
+                    "DAM1001: unsupported dynamic member target on {}",
+                    ty.name
+                ))
+            };
+            let origin = ty.origin.as_ref().ok_or_else(fail)?;
+            let token = attribute.target_token.ok_or_else(fail)?;
+            let target = if let Some(index) = origin.field_tokens.iter().position(|t| *t == token) {
+                ty.fields
+                    .iter()
+                    .map(|f| &f.ty)
+                    .chain(ty.static_fields.iter().map(|f| &f.ty))
+                    .nth(index)
+                    .ok_or_else(fail)?
+            } else if let Some(index) = origin.property_tokens.iter().position(|t| *t == token) {
+                &ty.properties.get(index).ok_or_else(fail)?.ty
+            } else {
+                return Err(fail());
+            };
+            if source_name(module, target) != Some("System.Introspection.TypeInfo") {
+                return Err(fail());
+            }
+        }
+    }
+    Ok(any)
+}
+
 fn requirements(module: &Module, function: &Function) -> Result<Contract, Fault> {
     let mut result = Contract {
         parameters: vec![0; function.parameters.len()],
@@ -106,6 +261,33 @@ fn requirements(module: &Module, function: &Function) -> Result<Contract, Fault>
             return Err(fail());
         }
         *target_flags |= *flags as u32;
+    }
+    if let Some(owner) = function
+        .owner
+        .as_ref()
+        .and_then(|t| module.type_definition(t))
+    {
+        for (index, property) in owner.properties.iter().enumerate() {
+            let value = property_flags(module, owner, index)?;
+            if value == 0 {
+                continue;
+            }
+            let matches = |target: &crate::metadata::FunctionRef| {
+                target.name == function.name
+                    && target.instance == function.instance
+                    && target.parameters == function.parameters
+            };
+            if property.getter.as_ref().is_some_and(matches) {
+                result.returns |= value;
+            }
+            if property.setter.as_ref().is_some_and(matches) {
+                let slot = result
+                    .parameters
+                    .last_mut()
+                    .ok_or_else(|| Fault::new("DAM1001: property setter lacks value parameter"))?;
+                *slot |= value;
+            }
+        }
     }
     Ok(result)
 }
@@ -361,25 +543,13 @@ fn analyze_indexed(
 
 fn analyze_roots(module: &Module, roots: &BTreeSet<usize>) -> Result<Analysis, Fault> {
     let mut report = Analysis::default();
-    for ty in &module.types {
-        if ty.custom_attributes.iter().any(|a| {
-            a.constructor
-                .owner
-                .as_ref()
-                .and_then(|t| source_name(module, t))
-                == Some(ATTRIBUTE)
-        }) {
-            return Err(Fault::new(
-                "DAM1001: only TypeInfo parameter and return annotations are currently supported",
-            ));
-        }
-    }
+    let storage_contracts = validate_storage_contracts(module)?;
     let contracts = module
         .functions
         .iter()
         .map(|f| requirements(module, f))
         .collect::<Result<Vec<_>, _>>()?;
-    if contracts.iter().all(Contract::is_empty) {
+    if !storage_contracts && contracts.iter().all(Contract::is_empty) {
         return Ok(report);
     }
     let mut reachable = BTreeSet::new();
@@ -388,7 +558,31 @@ fn analyze_roots(module: &Module, roots: &BTreeSet<usize>) -> Result<Analysis, F
         if !reachable.insert(index) {
             continue;
         }
-        for op in &module.functions[index].body {
+        // Static field access and strict type entry can execute initializers even
+        // though the IL contains no direct call to .cctor.
+        let function = &module.functions[index];
+        let owners = crate::type_initialization::entry_owner(module, function)
+            .into_iter()
+            .chain(function.body.iter().filter_map(|op| match op {
+                Op::StaticField { owner, .. } | Op::SetStaticField { owner, .. } => Some(owner),
+                _ => None,
+            }));
+        for owner in owners {
+            if let Some(initializer) = crate::type_initialization::initializer(module, owner)? {
+                for (candidate, f) in module.functions.iter().enumerate() {
+                    if f.name == initializer.name
+                        && f.owner
+                            .as_ref()
+                            .and_then(|t| module.type_definition(t))
+                            .zip(module.type_definition(owner))
+                            .is_some_and(|(a, b)| std::ptr::eq(a, b))
+                    {
+                        pending.push(candidate);
+                    }
+                }
+            }
+        }
+        for op in &function.body {
             let target = match op {
                 Op::Call(t)
                 | Op::CallVirtual(t)
@@ -439,7 +633,7 @@ fn analyze_roots(module: &Module, roots: &BTreeSet<usize>) -> Result<Analysis, F
         let mut states = vec![None; function.body.len()];
         states[0] = Some(initial);
         let mut queue = VecDeque::from([0]);
-        let mut relevant = contract.returns != 0;
+        let mut relevant = storage_contracts || contract.returns != 0;
         for op in &function.body {
             if let Op::Call(t)
             | Op::CallVirtual(t)
@@ -481,14 +675,67 @@ fn analyze_roots(module: &Module, roots: &BTreeSet<usize>) -> Result<Analysis, F
         while let Some(pc) = queue.pop_front() {
             let mut state = states[pc].clone().unwrap();
             let op = &function.body[pc];
-            let (pops, pushes) = effects[pc]
+            let effect = effects[pc]
+                .as_ref()
                 .ok_or_else(|| Fault::new("DAM analysis reached an unverified instruction"))?;
+            let (pops, pushes) = (effect.pops, effect.pushes);
             if state.stack.len() < pops {
                 return Err(Fault::new("DAM analysis stack underflow"));
             }
             let values = state.stack.split_off(state.stack.len() - pops);
             let mut produced = vec![Value::Unknown; pushes];
             match op {
+                Op::Field(index) | Op::SetField(index) | Op::FieldAddress(index) => {
+                    let owner = effect
+                        .receiver
+                        .as_ref()
+                        .ok_or_else(|| Fault::new("DAM field receiver missing"))?;
+                    let value = field_flags(module, owner, *index, false)?;
+                    match op {
+                        Op::Field(_) => produced[0] = Value::Required(value),
+                        Op::SetField(_) => require(
+                            module,
+                            &values[1],
+                            value,
+                            &format!(
+                                "{} instruction {pc} field store",
+                                display_name(module, function)
+                            ),
+                            &mut report,
+                        ),
+                        _ if value != 0 => {
+                            report.diagnostics.insert(format!("DAM2007: {} instruction {pc}: address of annotated field escapes flow analysis; writes through it require explicit retention", display_name(module, function)));
+                        }
+                        _ => (),
+                    }
+                }
+                Op::StaticField { owner, index } => {
+                    produced[0] = Value::Required(field_flags(module, owner, *index, true)?)
+                }
+                Op::SetStaticField { owner, index } => require(
+                    module,
+                    &values[0],
+                    field_flags(module, owner, *index, true)?,
+                    &format!(
+                        "{} instruction {pc} static field store",
+                        display_name(module, function)
+                    ),
+                    &mut report,
+                ),
+                Op::New(owner) => {
+                    for (index, value) in values.iter().enumerate() {
+                        require(
+                            module,
+                            value,
+                            field_flags(module, owner, index, false)?,
+                            &format!(
+                                "{} instruction {pc} field {index} initialization",
+                                display_name(module, function)
+                            ),
+                            &mut report,
+                        );
+                    }
+                }
                 Op::LoadTypeToken(ty) => produced[0] = Value::Types(vec![ty.clone()]),
                 Op::Arg(index) if !escaped_arguments.contains(index) => {
                     produced[0] = state.arguments[*index].clone()
@@ -747,6 +994,203 @@ mod tests {
                 .to_string()
                 .contains("DAM1001")
         );
+    }
+
+    fn storage_fixture(property: bool) -> Module {
+        let mut m = fixture();
+        m.types[3].is_reference_type = true;
+        m.types[3]
+            .fields
+            .push(serde_json::from_value(json!({"name":"Stored", "ty":{"Named":"Info"}})).unwrap());
+        m.types[3].origin = Some(serde_json::from_value(json!({"assembly":"Test","module":"Test.dll","name":"Model","token":33554436,"field_tokens":[67108865],"property_tokens":if property {vec![385875969]} else {vec![]}})).unwrap());
+        let mut attribute = m.functions[1].custom_attributes[0].clone();
+        attribute.target_token = Some(if property { 385875969 } else { 67108865 });
+        m.types[3].custom_attributes.push(attribute);
+        let mut getter = function(
+            "Model.get_Type",
+            vec![],
+            vec![Op::Arg(0), Op::Field(0), Op::Return],
+        );
+        getter.owner = Some(Type::Named("Model".into()));
+        getter.instance = true;
+        getter.returns = Type::Named("Info".into());
+        getter.no_result = false;
+        let mut setter = function(
+            "Model.set_Type",
+            vec![Type::Named("Info".into())],
+            vec![Op::Arg(0), Op::Arg(1), Op::SetField(0), Op::Return],
+        );
+        setter.owner = getter.owner.clone();
+        setter.instance = true;
+        let reference = |f: &Function| {
+            serde_json::from_value::<FunctionRef>(
+                json!({"name":f.name,"owner":f.owner,"instance":true,"parameters":f.parameters}),
+            )
+            .unwrap()
+        };
+        if property {
+            m.types[3].properties.push(serde_json::from_value(json!({"name":"Type","instance":true,"parameters":[],"ty":{"Named":"Info"},"getter":reference(&getter),"setter":reference(&setter)})).unwrap());
+        }
+        m.functions[0].body = vec![
+            Op::LoadTypeToken(Type::Named("Other".into())),
+            m.functions[0].body[1].clone(),
+            Op::New(Type::Named("Model".into())),
+            if property {
+                Op::Call(reference(&getter))
+            } else {
+                Op::Field(0)
+            },
+            call(&m.functions[1]),
+            Op::Return,
+        ];
+        m.functions.extend([getter, setter]);
+        m
+    }
+
+    #[test]
+    fn field_and_property_storage_infer_types_and_check_unknown_writes() {
+        for property in [false, true] {
+            let mut m = storage_fixture(property);
+            let report = analyze(&m, "Main").unwrap();
+            assert_eq!(report.types, BTreeMap::from([(4, 3)]));
+            assert!(report.diagnostics.is_empty(), "{:?}", report.diagnostics);
+            m.functions[0].parameters.push(Type::RuntimeTypeHandle);
+            m.functions[0].body[0] = Op::Arg(0);
+            assert!(
+                analyze(&m, "Main")
+                    .unwrap()
+                    .diagnostics
+                    .iter()
+                    .any(|d| d.contains("DAM2001") && d.contains("initialization"))
+            );
+            // Unannotated field stores must warn; a property setter has the
+            // property's incoming contract and can safely forward to its storage.
+            let report = analyze(&m, "Model.set_Type").unwrap();
+            assert_eq!(report.diagnostics.is_empty(), property);
+        }
+    }
+
+    #[test]
+    fn property_caller_must_satisfy_setter_value_contract() {
+        let mut m = storage_fixture(true);
+        m.functions[0].parameters = vec![Type::Named("Model".into()), Type::Named("Info".into())];
+        m.functions[0].body = vec![
+            Op::Arg(0),
+            Op::Arg(1),
+            Op::Call(m.types[3].properties[0].setter.clone().unwrap()),
+            Op::Return,
+        ];
+        let report = analyze(&m, "Main").unwrap();
+        assert!(
+            report
+                .diagnostics
+                .iter()
+                .any(|d| d.contains("DAM2001") && d.contains("parameter 0"))
+        );
+    }
+
+    #[test]
+    fn computed_property_getter_does_not_invent_backing_field_contract() {
+        let mut m = storage_fixture(true);
+        m.functions[3].parameters.push(Type::Named("Info".into()));
+        m.functions[3].body = vec![Op::Arg(1), Op::Return];
+        m.types[3].properties[0]
+            .parameters
+            .push(Type::Named("Info".into()));
+        m.types[3].properties[0]
+            .getter
+            .as_mut()
+            .unwrap()
+            .parameters
+            .push(Type::Named("Info".into()));
+        let report = analyze(&m, "Model.get_Type").unwrap();
+        assert!(
+            report
+                .diagnostics
+                .iter()
+                .any(|d| d.contains("DAM2001") && d.contains("return"))
+        );
+    }
+
+    #[test]
+    fn structural_fields_have_no_nominal_attribute_owner() {
+        let mut m = storage_fixture(true);
+        let tuple = Type::Tuple(
+            crate::tuple_signature::TupleSignature::new(vec![Type::Int32], vec![]).unwrap(),
+        );
+        m.functions[0]
+            .body
+            .splice(0..0, [Op::Int(7), Op::New(tuple), Op::Field(0), Op::Pop]);
+        let report = analyze(&m, "Main").unwrap();
+        assert!(report.diagnostics.is_empty());
+        assert_eq!(report.types, BTreeMap::from([(4, 3)]));
+    }
+
+    #[test]
+    fn inherited_storage_uses_the_declaring_field_contract() {
+        let mut m = storage_fixture(false);
+        m.types[4].is_reference_type = true;
+        m.types[4].base = Some(Type::Named("Model".into()));
+        m.functions[0].body[2] = Op::New(Type::Named("Other".into()));
+        assert_eq!(analyze(&m, "Main").unwrap().types, BTreeMap::from([(4, 3)]));
+        m.types[3].fields[0].ty = Type::Int32;
+        assert!(
+            analyze(&m, "Main")
+                .unwrap_err()
+                .to_string()
+                .contains("DAM1001")
+        );
+    }
+
+    #[test]
+    fn annotated_field_address_is_explicitly_diagnosed() {
+        let mut m = storage_fixture(false);
+        m.functions[0].body[3] = Op::FieldAddress(0);
+        m.functions[0].body[4] = Op::Pop;
+        assert!(
+            analyze(&m, "Main")
+                .unwrap()
+                .diagnostics
+                .iter()
+                .any(|d| d.contains("DAM2007"))
+        );
+    }
+
+    #[test]
+    fn static_field_initialization_is_analyzed_without_an_explicit_call() {
+        let mut m = storage_fixture(false);
+        m.types[3].fields.clear();
+        m.types[3]
+            .static_fields
+            .push(serde_json::from_value(json!({"name":"Stored","ty":{"Named":"Info"}})).unwrap());
+        let mut init = function(
+            "Model..cctor",
+            vec![],
+            vec![
+                Op::LoadTypeToken(Type::Named("Other".into())),
+                m.functions[0].body[1].clone(),
+                Op::SetStaticField {
+                    owner: Type::Named("Model".into()),
+                    index: 0,
+                },
+                Op::Return,
+            ],
+        );
+        init.owner = Some(Type::Named("Model".into()));
+        init.visibility = crate::metadata::Visibility::Private;
+        m.functions.truncate(3);
+        m.functions.push(init);
+        m.functions[0].body = vec![
+            Op::StaticField {
+                owner: Type::Named("Model".into()),
+                index: 0,
+            },
+            call(&m.functions[1]),
+            Op::Return,
+        ];
+        let report = analyze(&m, "Main").unwrap();
+        assert_eq!(report.types, BTreeMap::from([(4, 3)]));
+        assert!(report.diagnostics.is_empty(), "{:?}", report.diagnostics);
     }
 
     #[test]

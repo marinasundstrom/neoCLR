@@ -22,10 +22,10 @@ public enum DynamicallyAccessedMemberTypes {
     All = -1
 }
 
-/// Declares the members required on a TypeInfo parameter or return value during native compilation.
+/// Declares the members required on a TypeInfo parameter, return value, field or property during native compilation.
 /// Unknown flows produce diagnostics; unsupported member flags are rejected.
-/// Generic parameters, fields, strings and receiver annotations remain unsupported.
-[System.AttributeUsage(System.AttributeTargets.Parameter | System.AttributeTargets.ReturnValue)]
+/// Generic parameters, strings and receiver annotations remain unsupported.
+[System.AttributeUsage(System.AttributeTargets.Parameter | System.AttributeTargets.ReturnValue | System.AttributeTargets.Field | System.AttributeTargets.Property)]
 public class DynamicallyAccessedMembersAttribute : System.Attribute {
     private val memberTypes: DynamicallyAccessedMemberTypes
 

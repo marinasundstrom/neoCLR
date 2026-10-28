@@ -1,7 +1,7 @@
 # Dynamically accessed members (development)
 
 The native backend recognizes `System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembersAttribute`
-on `System.Introspection.TypeInfo` parameters and return values. This is an initial subset of the
+on `System.Introspection.TypeInfo` parameters, return values, fields and properties. This is an initial subset of the
 .NET contract, not general trim analysis. It adds inferred roots to the same
 retention pipeline used by [project retention files](native-retention.md).
 
@@ -28,7 +28,7 @@ not communicate the type that reflection will inspect.
   `PublicConstructors`, `PublicProperties`, and their combinations. The enum
   exposes the conventional .NET values through `Interfaces` and `All`; unsupported
   flag requests fail with `DAM1001` rather than acting as inert annotations.
-- Valid targets are currently `TypeInfo` parameters and return values. Native
+- Valid targets are currently `TypeInfo` parameters, return values, fields and properties. Native
   analysis validates each target identity and type; malformed and unsupported contracts fail with `DAM1001`.
 - Exact nongeneric nominal type tokens are recognized through the runtime's
   `RuntimeContext.GetTypeInfoFromHandle` and `RuntimeTypeInfo.FromHandle` bridges.
@@ -98,7 +98,7 @@ build-time analysis and metadata storage; it does not change interpreter behavio
 or introduce runtime code generation. More conservative retention and warnings
 are costs of the initial implementation, not improvements in .NET semantics.
 
-Generic-parameter/field/property annotations, string type-name resolution,
+Generic-parameter annotations, string type-name resolution,
 receiver annotations, arbitrary generic target retention, richer member flags,
 class/base annotation inheritance and complete interprocedural inference remain
 unimplemented. Nongeneric nominal reference-class parameter override compatibility
@@ -231,3 +231,33 @@ Runtime Contract configuration and ordinary .NET emission remain unchanged.
 The author has also requested fields/properties, generic parameters, receivers and
 all member categories. Those remain implementation work; this return extension does
 not make currently rejected flags usable. See [qualification](validation/dynamic-access-returns-20261028/README.md).
+
+## Field and property contracts (2026-10-28)
+
+Annotated instance/static TypeInfo fields check values stored by constructors,
+ordinary stores and record construction. Reads provide the declared member
+requirements. Inherited fields use their declaring field identity; structural tuple
+storage has no nominal field annotation. Property requirements apply to getter
+returns and the setter's value parameter, including indexers. A getter consisting
+of a direct field read also establishes that field's contract, so ordinary
+field-backed and auto-properties check constructor writes without extra annotations.
+Computed getters still have their return paths checked. Unknown or weaker inputs
+warn with DAM2001; taking an annotated field's address warns with DAM2007 because
+indirect writes are not tracked. Warnings remain visible even if other inputs root
+the same type.
+
+Static field access and strict type-entry triggers include the corresponding type
+initializer in the analysis graph; unused initializers are not blanket roots.
+This mirrors .NET's write-validation/read-guarantee model described in its
+[ILLink diagnostics](https://github.com/dotnet/runtime/blob/main/docs/tools/illink/error-codes.md).
+The older [reflection-flow design](https://github.com/dotnet/runtime/blob/main/docs/design/tools/illink/reflection-flow.md)
+is background rationale, not an assertion that every proposed flow is implemented.
+
+HTTP JSON TypeInfo overloads now carry the mapper's constructor/property contract.
+JsonClientRead's stored type and constructor carry the same contract through callback
+storage. Collections, arbitrary computed backing associations, indirect writes and
+compiler-generated async state-machine storage are not automatically inferred.
+This adds build-time typed-flow work; no performance improvement is claimed.
+[Native auto-property and focused storage qualification](validation/dynamic-access-storage-20261028/README.md)
+records the supported scope. Generic parameters, receivers and the remaining member
+categories are still the next requested layers.

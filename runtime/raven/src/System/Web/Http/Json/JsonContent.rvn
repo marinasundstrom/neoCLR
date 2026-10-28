@@ -1,6 +1,7 @@
 module System.Web.Http.Json
 
 import System.*
+import System.Diagnostics.CodeAnalysis.*
 import System.Data.Json.*
 import System.Introspection.*
 import System.IO.*
@@ -30,7 +31,7 @@ public class JsonContent {
         return JsonSerializer.DeserializeNode(bytes)
     }
 
-    static func Read(content: HttpContent, type: TypeInfo) -> Result<Object, JsonError> {
+    static func Read(content: HttpContent, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | DynamicallyAccessedMemberTypes.PublicProperties)] type: TypeInfo) -> Result<Object, JsonError> {
         if content is HttpMemoryContent buffered {
             return JsonSerializer.Deserialize(buffered.Memory, type)
         }

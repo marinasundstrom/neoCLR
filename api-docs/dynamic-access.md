@@ -3,7 +3,7 @@
 Development API in `System.Diagnostics.CodeAnalysis`, owned by System.Runtime.
 
 - `DynamicallyAccessedMembersAttribute(memberTypes: DynamicallyAccessedMemberTypes)`
-  declares required members on a `TypeInfo` parameter or return value (`[return: ...]`). Read-only `MemberTypes`
+  declares required members on a `TypeInfo` parameter, return value (`[return: ...]`), field or property. Read-only `MemberTypes`
   returns those flags. The attribute constructor stores metadata; runtime execution
   of the constructor is not the retention mechanism.
 - `DynamicallyAccessedMemberTypes` uses standard .NET flag values. Current native
@@ -16,7 +16,7 @@ See the generated [attribute reference](api/System/Diagnostics/CodeAnalysis/Dyna
 and [flag reference](api/System/Diagnostics/CodeAnalysis/DynamicallyAccessedMemberTypes/index.html).
 [Supported flow, diagnostics and annotated runtime APIs](https://github.com/marinasundstrom/neoCLR/blob/main/docs/dynamically-accessed-members.md)
 describe the current boundaries. Unknown-flow warnings mean retention has not been
-proven. Generic parameters, fields, receiver annotations and string
+proven. Generic parameters, receiver annotations and string
 resolution remain unsupported; project retention files remain available.
 
 Nongeneric class/interface implementations should repeat the same parameter and return
@@ -30,3 +30,8 @@ remain outside these checks. This does not add generic-parameter annotations.
 
 Annotated returns validate the producer and propagate declared requirements to callers.
 Unknown or insufficient returned values produce DAM2001; known type tokens infer roots.
+
+Field writes and property setter values must satisfy their declared requirements;
+reads and getter returns carry them to consumers. Direct field-backed getters also
+propagate the property contract to storage. Indirect field addresses warn with
+DAM2007. HTTP JSON TypeInfo overloads declare the same flags as JsonSerializer.
