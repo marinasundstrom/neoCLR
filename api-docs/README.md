@@ -3023,7 +3023,7 @@ DynamicallyAccessedMembers workstream changes other source fingerprints separate
 The native reference includes `System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembersAttribute`
 and `DynamicallyAccessedMemberTypes`, including the constructor, MemberTypes property
 and enum constants. The type selection and matching reference snapshot are refreshed.
-[Manual contract](dynamic-access.md) records supported parameter/return/field/property/flag combinations,
+[Manual contract](dynamic-access.md) records supported parameter/return/field/property/receiver/flag combinations,
 diagnostics, conservative constructor retention and unimplemented targets. Runtime
 JSON and DI annotations are source/API contracts; this is not complete .NET trimming
 analysis. No renderer exclusion is added.

@@ -1,6 +1,7 @@
 module System.Introspection
 
 import System.*
+import System.Diagnostics.CodeAnalysis.*
 import System.Collections.*
 import System.Optional.*
 import System.Result.*
@@ -514,12 +515,14 @@ public sealed interface TypeInfo : EquatableTo<TypeInfo> {
     func GetEnumUnderlyingType() -> TypeInfo
     func GetFields() -> Sequence<FieldInfo>
     func GetFields(flags: BindingFlags) -> Sequence<FieldInfo>
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
     func GetConstructors() -> Sequence<ConstructorInfo>
     func GetConstructors(flags: BindingFlags) -> Sequence<ConstructorInfo>
     /// <summary>Describes declared methods, including generic definitions and open owner signatures.</summary>
     /// <remarks>Native discovery requires explicit methodTypes retention; it describes the definition and closed owner tokens present in the compiled program, without granting invocation.</remarks>
     func GetMethods() -> Sequence<MethodInfo>
     func GetMethods(flags: BindingFlags) -> Sequence<MethodInfo>
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)]
     func GetProperties() -> Sequence<PropertyInfo>
     func GetProperties(flags: BindingFlags) -> Sequence<PropertyInfo>
 }
@@ -633,6 +636,7 @@ internal open class RuntimeTypeInfo : TypeInfo {
         return neoCLR.Runtime.TypeFields(Handle, (int)flags)
     }
 
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
     func GetConstructors() -> Sequence<ConstructorInfo> {
         return neoCLR.Runtime.TypeConstructors(Handle, 20)
     }
@@ -649,6 +653,7 @@ internal open class RuntimeTypeInfo : TypeInfo {
         return neoCLR.Runtime.TypeMethods(Handle, (int)flags)
     }
 
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)]
     func GetProperties() -> Sequence<PropertyInfo> {
         return neoCLR.Runtime.TypeProperties(Handle, 28)
     }
@@ -807,6 +812,7 @@ internal class RuntimeNominalTypeInfo : NominalTypeInfo {
         return neoCLR.Runtime.TypeFields(Handle, (int)flags)
     }
 
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
     func GetConstructors() -> Sequence<ConstructorInfo> {
         return neoCLR.Runtime.TypeConstructors(Handle, 20)
     }
@@ -823,6 +829,7 @@ internal class RuntimeNominalTypeInfo : NominalTypeInfo {
         return neoCLR.Runtime.TypeMethods(Handle, (int)flags)
     }
 
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)]
     func GetProperties() -> Sequence<PropertyInfo> {
         return neoCLR.Runtime.TypeProperties(Handle, 28)
     }
@@ -1128,6 +1135,7 @@ internal class RuntimeFunctionTypeInfo : FunctionTypeInfo {
         return neoCLR.Runtime.TypeFields(Handle, (int)flags)
     }
 
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
     func GetConstructors() -> Sequence<ConstructorInfo> {
         return neoCLR.Runtime.TypeConstructors(Handle, 20)
     }
@@ -1144,6 +1152,7 @@ internal class RuntimeFunctionTypeInfo : FunctionTypeInfo {
         return neoCLR.Runtime.TypeMethods(Handle, (int)flags)
     }
 
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)]
     func GetProperties() -> Sequence<PropertyInfo> {
         return neoCLR.Runtime.TypeProperties(Handle, 28)
     }

@@ -1,0 +1,22 @@
+import System.*
+import System.Introspection.*
+
+public class Message {
+    var Text: string { get; set; } = ""
+    init() { }
+}
+
+func Main() -> int {
+    let type = typeof(Message)
+    var constructors = 0
+    for item in type.GetConstructors() {
+        constructors += 1
+    }
+    var properties = 0
+    for item in type.GetProperties() {
+        properties += 1
+    }
+    Console.WriteLine(constructors)
+    Console.WriteLine(properties)
+    return if constructors == 1 && properties == 1 { 0 } else { 1 }
+}

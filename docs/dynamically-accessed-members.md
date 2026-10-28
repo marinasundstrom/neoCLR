@@ -1,7 +1,7 @@
 # Dynamically accessed members (development)
 
 The native backend recognizes `System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembersAttribute`
-on `System.Introspection.TypeInfo` parameters, return values, fields and properties. This is an initial subset of the
+on `System.Introspection.TypeInfo` parameters, return values, fields, properties and descriptor method receivers. This is an initial subset of the
 .NET contract, not general trim analysis. It adds inferred roots to the same
 retention pipeline used by [project retention files](native-retention.md).
 
@@ -98,8 +98,7 @@ build-time analysis and metadata storage; it does not change interpreter behavio
 or introduce runtime code generation. More conservative retention and warnings
 are costs of the initial implementation, not improvements in .NET semantics.
 
-Generic-parameter annotations, string type-name resolution,
-receiver annotations, arbitrary generic target retention, richer member flags,
+Generic-parameter annotations, string type-name resolution, arbitrary generic target retention, richer member flags,
 class/base annotation inheritance and complete interprocedural inference remain
 unimplemented. Nongeneric nominal reference-class parameter override compatibility
 is checked; generic/value-type virtual contracts remain unqualified. Do not treat an annotation as a blanket no-trim promise.
@@ -261,3 +260,21 @@ This adds build-time typed-flow work; no performance improvement is claimed.
 [Native auto-property and focused storage qualification](validation/dynamic-access-storage-20261028/README.md)
 records the supported scope. Generic parameters, receivers and the remaining member
 categories are still the next requested layers.
+
+## Descriptor receiver contracts (2026-10-28)
+
+A method-level DAM annotation on an instance method of TypeInfo or a type implementing
+TypeInfo specifies the requirement on `self`. Known caller type values infer roots;
+unknown receiver values warn with DAM2001. Within the method, `self` carries that
+requirement. Static methods, constructors and unrelated instance owners reject this
+placement with DAM1001. Interface/override checks compare receiver flags as well as
+parameter and return flags within their existing scope, matching the .NET
+[IL2041/IL2094 rules](https://github.com/dotnet/runtime/blob/main/docs/tools/illink/error-codes.md).
+
+Parameterless TypeInfo.GetConstructors/GetProperties and their runtime implementations
+now declare PublicConstructors/PublicProperties. The BindingFlags overloads await
+broader member-category support rather than declaring an insufficient public-only
+contract. The [native direct-introspection consumer](experiments/dynamic-access/receiver/Main.rvn)
+needs neither user-authored annotations nor a retention file. [Qualification](validation/dynamic-access-receiver-20261028/README.md)
+records inferred flags 515 and matching counts. Runtime Contract settings and metadata
+transport are unchanged; method attributes already carried this information.

@@ -41,7 +41,7 @@ static class ErrorContextDeclarations
                 NonPublicNestedTypes = 256, PublicProperties = 512, NonPublicProperties = 1024,
                 PublicEvents = 2048, NonPublicEvents = 4096, Interfaces = 8192, All = -1
             }
-            [System.AttributeUsage(System.AttributeTargets.Parameter | System.AttributeTargets.ReturnValue | System.AttributeTargets.Field | System.AttributeTargets.Property)]
+            [System.AttributeUsage(System.AttributeTargets.Parameter | System.AttributeTargets.ReturnValue | System.AttributeTargets.Field | System.AttributeTargets.Property | System.AttributeTargets.Method)]
             public class DynamicallyAccessedMembersAttribute : System.Attribute {
                 public DynamicallyAccessedMembersAttribute(DynamicallyAccessedMemberTypes memberTypes) { }
                 public DynamicallyAccessedMemberTypes MemberTypes => default;

@@ -49,10 +49,11 @@ fn display_name(module: &Module, function: &Function) -> String {
 struct Contract {
     parameters: Vec<u32>,
     returns: u32,
+    receiver: u32,
 }
 impl Contract {
     fn is_empty(&self) -> bool {
-        self.returns == 0 && self.parameters.iter().all(|f| *f == 0)
+        self.receiver == 0 && self.returns == 0 && self.parameters.iter().all(|f| *f == 0)
     }
 }
 
@@ -211,28 +212,45 @@ fn validate_storage_contracts(module: &Module) -> Result<bool, Fault> {
     Ok(any)
 }
 
+fn descriptor_receiver(module: &Module, ty: &Type) -> Result<bool, Fault> {
+    if source_name(module, ty) == Some("System.Introspection.TypeInfo") {
+        return Ok(true);
+    }
+    Ok(crate::interfaces::closure(module, ty)?
+        .iter()
+        .any(|interface| source_name(module, interface) == Some("System.Introspection.TypeInfo")))
+}
+
 fn requirements(module: &Module, function: &Function) -> Result<Contract, Fault> {
     let mut result = Contract {
         parameters: vec![0; function.parameters.len()],
-        returns: 0,
+        ..Contract::default()
     };
     for attribute in &function.custom_attributes {
-        if attribute
-            .constructor
-            .owner
-            .as_ref()
-            .and_then(|t| source_name(module, t))
-            != Some(ATTRIBUTE)
-        {
+        let Some(value) = flags(module, attribute)? else {
             continue;
-        }
+        };
         let fail = || {
             Fault::new(format!(
                 "DAM1001: unsupported DynamicallyAccessedMembers contract on {}",
                 function.name
             ))
         };
-        let token = attribute.target_token.ok_or_else(fail)?;
+        let Some(token) = attribute.target_token else {
+            if !function.instance
+                || function.name.ends_with("..ctor")
+                || !function
+                    .owner
+                    .as_ref()
+                    .map(|owner| descriptor_receiver(module, owner))
+                    .transpose()?
+                    .unwrap_or(false)
+            {
+                return Err(fail());
+            }
+            result.receiver |= value;
+            continue;
+        };
         let origin = function.origin.as_ref().ok_or_else(fail)?;
         let (target_type, target_flags) = if origin.return_token == Some(token) {
             if function.no_result {
@@ -253,14 +271,7 @@ fn requirements(module: &Module, function: &Function) -> Result<Contract, Fault>
         if source_name(module, target_type) != Some("System.Introspection.TypeInfo") {
             return Err(fail());
         }
-        let [AttributeArgument::Int32(flags)] = attribute.arguments.as_slice() else {
-            return Err(fail());
-        };
-        if *flags < 0 || (*flags as u32 & !SUPPORTED) != 0 || !attribute.named_arguments.is_empty()
-        {
-            return Err(fail());
-        }
-        *target_flags |= *flags as u32;
+        *target_flags |= value;
     }
     if let Some(owner) = function
         .owner
@@ -336,6 +347,9 @@ pub fn interface_contract_diagnostics(module: &Module) -> Result<BTreeSet<String
                         crate::interfaces::implementation(module, &concrete, &interface, contract)?;
                     let declared = requirements(module, contract)?;
                     let actual = requirements(module, &implementation)?;
+                    if declared.receiver != actual.receiver {
+                        diagnostics.insert(format!("DAM2005: {} receiver requires {}, but interface {} requires {}; corresponding receiver annotations must match", display_name(module, &implementation), actual.receiver, display_name(module, contract), declared.receiver));
+                    }
                     if declared.returns != actual.returns {
                         diagnostics.insert(format!("DAM2005: {} return requires {}, but interface {} requires {}; corresponding return annotations must match", display_name(module, &implementation), actual.returns, display_name(module, contract), declared.returns));
                     }
@@ -392,6 +406,9 @@ pub fn override_contract_diagnostics(module: &Module) -> Result<BTreeSet<String>
             }
             let declared = requirements(module, &contract)?;
             let actual = requirements(module, implementation)?;
+            if declared.receiver != actual.receiver {
+                diagnostics.insert(format!("DAM2006: {} receiver requires {}, but overridden {} requires {}; corresponding receiver annotations must match", display_name(module, implementation), actual.receiver, display_name(module, &contract), declared.receiver));
+            }
             if declared.returns != actual.returns {
                 diagnostics.insert(format!("DAM2006: {} return requires {}, but overridden {} requires {}; corresponding return annotations must match", display_name(module, implementation), actual.returns, display_name(module, &contract), declared.returns));
             }
@@ -623,7 +640,8 @@ fn analyze_roots(module: &Module, roots: &BTreeSet<usize>) -> Result<Analysis, F
         if function.body.is_empty() {
             continue;
         }
-        let mut arguments = vec![Value::Unknown; usize::from(function.instance)];
+        let mut arguments =
+            vec![Value::Required(contract.receiver); usize::from(function.instance)];
         arguments.extend(contract.parameters.iter().copied().map(Value::Required));
         let initial = State {
             stack: vec![],
@@ -754,6 +772,19 @@ fn analyze_roots(module: &Module, roots: &BTreeSet<usize>) -> Result<Analysis, F
                 | Op::Construct(target) => {
                     let callee = crate::vm::resolve(module, target)?;
                     let callee_contract = requirements(module, &callee)?;
+                    if callee_contract.receiver != 0 {
+                        require(
+                            module,
+                            &values[0],
+                            callee_contract.receiver,
+                            &format!(
+                                "{} instruction {pc} -> {} receiver",
+                                display_name(module, function),
+                                display_name(module, &callee)
+                            ),
+                            &mut report,
+                        );
+                    }
                     if callee_contract.returns != 0 && pushes == 1 {
                         produced[0] = Value::Required(callee_contract.returns);
                     }
@@ -1191,6 +1222,90 @@ mod tests {
         let report = analyze(&m, "Main").unwrap();
         assert_eq!(report.types, BTreeMap::from([(4, 3)]));
         assert!(report.diagnostics.is_empty(), "{:?}", report.diagnostics);
+    }
+
+    #[test]
+    fn receiver_contract_retains_known_type_and_flows_through_self() {
+        let mut m = fixture();
+        m.types[1].is_reference_type = true;
+        let mut method = function(
+            "Info.Use",
+            vec![],
+            vec![Op::Arg(0), call(&m.functions[1]), Op::Return],
+        );
+        method.owner = Some(Type::Named("Info".into()));
+        method.instance = true;
+        let mut attribute = m.functions[1].custom_attributes[0].clone();
+        attribute.target_token = None;
+        method.custom_attributes.push(attribute);
+        let target = serde_json::from_value(
+            json!({"name":method.name,"owner":method.owner,"instance":true,"parameters":[]}),
+        )
+        .unwrap();
+        m.functions[0].body[2] = Op::Call(target);
+        m.functions.push(method);
+        let report = analyze(&m, "Main").unwrap();
+        assert_eq!(report.types, BTreeMap::from([(3, 3)]));
+        assert!(report.diagnostics.is_empty(), "{:?}", report.diagnostics);
+        m.functions[0].parameters.push(Type::RuntimeTypeHandle);
+        m.functions[0].body[0] = Op::Arg(0);
+        assert!(
+            analyze(&m, "Main")
+                .unwrap()
+                .diagnostics
+                .iter()
+                .any(|d| d.contains("DAM2001") && d.contains("receiver"))
+        );
+        m.functions[3].instance = false;
+        assert!(
+            analyze(&m, "Main")
+                .unwrap_err()
+                .to_string()
+                .contains("DAM1001")
+        );
+    }
+
+    #[test]
+    fn override_receiver_requirements_match_inherited_descriptor_contract() {
+        let mut m = override_fixture();
+        let mut interface = interface_fixture().types.pop().unwrap();
+        interface.origin=Some(serde_json::from_value(json!({"assembly":"Test","module":"Test.dll","name":"System.Introspection.TypeInfo","token":33554438})).unwrap());
+        m.types.push(interface);
+        m.types[4].implements.push(Type::Named("Sink".into()));
+        for f in &mut m.functions[3..5] {
+            f.custom_attributes[0].target_token = None;
+        }
+        assert!(override_contract_diagnostics(&m).unwrap().is_empty());
+        m.functions[4].custom_attributes.clear();
+        let diagnostics = override_contract_diagnostics(&m).unwrap();
+        assert_eq!(diagnostics.len(), 1);
+        assert!(
+            diagnostics
+                .iter()
+                .next()
+                .unwrap()
+                .contains("receiver requires")
+        );
+    }
+
+    #[test]
+    fn interface_receiver_requirements_match_descriptor_implementations() {
+        let mut m = interface_fixture();
+        m.types[5].origin=Some(serde_json::from_value(json!({"assembly":"Test","module":"Test.dll","name":"System.Introspection.TypeInfo","token":33554438})).unwrap());
+        for f in &mut m.functions[3..5] {
+            f.custom_attributes[0].target_token = None;
+        }
+        assert!(interface_contract_diagnostics(&m).unwrap().is_empty());
+        m.functions[4].custom_attributes[0].arguments = vec![AttributeArgument::Int32(512)];
+        let diagnostics = interface_contract_diagnostics(&m).unwrap();
+        assert_eq!(diagnostics.len(), 1);
+        assert!(
+            diagnostics
+                .iter()
+                .next()
+                .unwrap()
+                .contains("receiver requires")
+        );
     }
 
     #[test]
