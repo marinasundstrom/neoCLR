@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-28
 
+- Compare owner-affine TCP acknowledgement with inline/offloaded primitive CPU work across neoCLR sync/concurrent GC, .NET 10 and Go 1.26.3. Retain long/tiny cohorts, common-peer timings, independent checksums, native optimized/UBSan checks and separate profiles. Long-job offload improves I/O responsiveness with near-unchanged batch time; tiny work has mixed tails/costs. Document helper-thread, generated-code and GC-configuration limits; no runtime ranking or defaults change. Record the confirmed Task.Run schedules / await suspends model and update website measurements for the next publication.
+
 - Add a real TCP completion-to-resume baseline through the existing owner-local socket scheduler and rooted async carrier, comparing idle, CPU, allocation and long-callback shapes under both collectors. Qualify optimized/UBSan behavior and retain separate traces/profiles plus all timing cohorts. Equal-loop-count long callbacks trade lower batch time for higher I/O latency; no production/GC winner is claimed. Record authority to redesign without backward compatibility, and prioritize cooperative execution/offload investigation. Update website evidence for the next publication.
 
 - Enable Cranelift speed optimization by default for scalar/managed eager and lazy JIT and AOT, independently of method inlining. Retain the test-only comparison override. Inspect ARM64 shifted-add and x64 scaled-LEA lowering for constant multiplication; record mixed short-loop timing/code-size results without claiming a universal speedup.

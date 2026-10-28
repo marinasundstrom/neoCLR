@@ -1,5 +1,14 @@
 # Development conversation record
 
+## 2026-10-28 — Cross-runtime handoff and Task.Run execution model
+
+- **Author context:** Previously asked for competitive tradeoffs against other runtimes and willingness to change architecture; directed continuation.
+- **Assistant action:** Compared an owner-affine TCP acknowledgement pattern using the same external peer and checked CPU loop in native neoCLR (both collectors), .NET 10 and Go 1.26.3. Long-job offload reduces median acknowledgement latency from roughly 5.8 ms to 116–130 µs with little change in batch duration. Tiny-job tails/costs are mixed. Both cohorts pass 18 controls and 36 timing invocations; separate stack profiles are retained. [Evidence](validation/runtime-handoff-20261028/README.md) distinguishes native fixtures, different helper-thread/GC policies and one-job barriers from managed Task.Run or capacity qualification.
+- **Author proposal:** Identified Task.Run as the counterpart to Go's go statement, initially describing it as suspending the submitted block.
+- **Assistant clarification:** Task.Run schedules the function and returns a Task; await parks the awaiting execution when pending. The scheduled function can itself await without occupying a worker. Separate the runnable/parked execution context from its completion object; shared capture identity and GC roots remain required.
+- **Author confirmation:** “Yeah right. Await suspends. Task.Run schedules and gives us the task which we can suspend.” **Assistant response:** Recorded the distinction as agreed; awaiting a Task suspends the awaiting execution, not the completion object. No new API spelling or suspension-on-Task.Run behavior is selected.
+- **Next bounded proposal:** Investigate worker-to-owner completion delivery with bounded admission, lifetime/cancellation and exactly-once settlement, preserving Task.Run shared-capture intent. Copied native work is only an internal transport test, not a replacement product contract. Keep cooperation and common runtime optimizations as alternatives; no general managed execution or collector default switch follows yet.
+
 ## 2026-10-28 — Real I/O handoff and redesign authority
 
 - **Author:** Directed continuing immediately, then explicitly permitted refactoring/redesign without regard to backward compatibility.

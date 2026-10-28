@@ -57,6 +57,15 @@ behavior remain open.
 
 ## Task.Run with shared captures — author direction, 2026-09-27
 
+**Author confirmation, 2026-10-28:** Task.Run is the work-launch counterpart in
+role to Go's go statement: it schedules the function and returns a Task. Await
+suspends the awaiting execution while that Task is pending; the Task itself
+represents completion. A scheduled function can also await without tying up a
+worker. This reaffirms shared captures and .NET-like launch/unwrapping intent,
+not a copied-values-only contract, a new API or a claim that compiled managed
+workers already meet every requirement. See
+[execution/context distinction and measurements](design/go-inspired-scheduling.md#taskrun-schedules-await-suspends--confirmed-2026-10-28).
+
 `Task.Run` is selected as the canonical API for submitting new work with lexical
 captures, including shared managed objects. The runtime selects how to execute
 that work. This direction supersedes a noncapturing/transferable-values-only first

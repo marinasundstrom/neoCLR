@@ -59,6 +59,29 @@ The direction includes optional workload-specific JIT/GC/scheduling tuning with
 balanced defaults. Settings must account for actual handler CPU work, allocations
 and waits; no universal high-load preset or new configuration API is announced.
 
+The intended model is **Task.Run schedules; await suspends the awaiting execution**.
+Task.Run returns the completion handle for independently scheduled work. A submitted
+function can itself await; shared captures remain part of the intended contract.
+A Task and its execution context have distinct lifetimes.
+
+A development comparison uses one I/O owner plus one independent CPU job. For
+roughly 6 ms of CPU work, offloading lowers median TCP acknowledgement latency:
+
+| Configuration | CPU work on owner | CPU work offloaded |
+| --- | --- | --- |
+| neoCLR native fixture, sync GC | 5,772 µs | 130 µs |
+| neoCLR native fixture, concurrent GC | 5,798 µs | 126 µs |
+| Go 1.26.3, owner-affine fixture | 5,779 µs | 128 µs |
+| .NET 10, custom owner context | 5,777 µs | 116 µs |
+
+Batch time stays nearly unchanged; tiny-job benefits/costs are mixed. These are
+common-peer closed-loop measurements, with different helper threads, collector
+policies and implementation languages. They are not generated neoCLR JIT/AOT, HTTP
+capacity, strict equal-core rankings or a general Task.Run qualification.
+[Full tables, tiny controls, profiles and limitations](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/runtime-handoff-20261028/README.md).
+Next investigate bounded worker-to-owner completion delivery, preserving affinity
+and shared-capture semantics before measuring several independent requests.
+
 [Investigation and benchmark plan](https://github.com/marinasundstrom/neoCLR/blob/main/docs/design/go-inspired-scheduling.md)
 
 <a id="http-poc"></a>

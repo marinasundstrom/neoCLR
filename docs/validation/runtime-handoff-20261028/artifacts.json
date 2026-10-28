@@ -1,0 +1,34 @@
+{
+  "initial-failed-report.json.gz": {
+    "source": "target/runtime-handoff-20261028/report.json",
+    "sha256": "9dc7a2606eb266612c0f773f2ca0144bfb40dbbc687680bb0f0241935c46dd92"
+  },
+  "long-report.json.gz": {
+    "source": "target/runtime-handoff-20261028-v2/report.json",
+    "sha256": "9e2eca7fd3ff5d6e5ec457c436b3d30c05d5b52c51a258a7c96ba445a7633b4e"
+  },
+  "tiny-report.json.gz": {
+    "source": "target/runtime-handoff-20261028-tiny/report.json",
+    "sha256": "6f69e6939359efe9ba914f7994b01b3939f9e18d0fd528d2f4a4d4fb15606406"
+  },
+  "profiles-neo-sync.sample.txt.gz": {
+    "source": "target/runtime-handoff-20261028-profiles/neo-sync.sample.txt",
+    "sha256": "35a630524136d742bd152698ec10f6c37ea6a3417d71d5bc1d998c3c8c373d4a"
+  },
+  "profiles-report.json.gz": {
+    "source": "target/runtime-handoff-20261028-profiles/report.json",
+    "sha256": "4910244631cbbcd0e2f766ef9f0a4d82b733ccd280ddaca25f20fb58126e10a3"
+  },
+  "profiles-neo-concurrent.sample.txt.gz": {
+    "source": "target/runtime-handoff-20261028-profiles/neo-concurrent.sample.txt",
+    "sha256": "cee183fe7a3af1bfb02967bf11ec233aefbcb0524d7908cf444af8811dc2aa8f"
+  },
+  "profiles-go.sample.txt.gz": {
+    "source": "target/runtime-handoff-20261028-profiles/go.sample.txt",
+    "sha256": "29b3098fb08c92f55779072745be2348e4b3bcac2a6821773ed24f0dd40ed1b4"
+  },
+  "profiles-dotnet.sample.txt.gz": {
+    "source": "target/runtime-handoff-20261028-profiles/dotnet.sample.txt",
+    "sha256": "cb8cb7512d6eec23fba7043251731a8877613b40921360eada60f100eb32d2ad"
+  }
+}

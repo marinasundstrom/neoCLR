@@ -24,8 +24,9 @@ must include Native AOT with sync and concurrent GC, alongside development JIT
 startup and warm-run controls. Use matching source, resource budgets and current
 codegen settings; improvements should be attributed to the layer actually changed.
 
-After the shared-tracing commit, the next bounded slice compares queue policies
-and scheduling latency against the existing FIFO baseline. Use the current
+The queue-policy and real-I/O baselines are now followed by a
+[cross-runtime owner-affine handoff comparison](../validation/runtime-handoff-20261028/README.md).
+Next investigate bounded worker-to-owner completion delivery; retain the existing
 recorders and add provider hooks where measurement requires them. Tiny native-job
 results alone cannot select the shared scheduler or establish HTTP/GC gains.
 Compiler wait/publication tracing remains open; lazy JIT's synchronous first-call
@@ -36,7 +37,7 @@ wait is a separate blocking limitation that queue policy alone cannot fix.
 | Area | Current evidence | Constraint for the proposal |
 | --- | --- | --- |
 | Native async contexts | `runtime/native/async/native-runtime.c` parks roots and uses owner-thread fibers; contexts/stacks can be reused | Scheduler state, stack bounds, roots and operation ownership are thread-local. Existing suspended machine contexts cannot simply be copied or stolen. |
-| Native worker pool | `runtime/native/workers/native-workers.c` admits bounded rooted jobs, scans queued slots in submission order under a shared gate, and joins workers on teardown | Current pool supports 1-4 workers and at most 16 job slots. It has no worker-local ready queues or work stealing. Arbitrary callback blocking can occupy a worker. |
+| Native worker pool | `runtime/native/workers/native-workers.c` admits bounded rooted jobs, scans queued slots in submission order under a shared gate, and joins workers on teardown | Current pool supports 1-4 workers and at most 16 job slots. The opt-in local/global/stealing prototype has no demonstrated broad win; FIFO remains default. Arbitrary callback blocking can occupy a worker. |
 | Shared compiled execution | Private `NEOCLR_WORKER_GC` and compiler worker safepoints support parallel pure regions, coordinated collection, exclusive helper boundaries and job-local faults | Tested subset excludes parked async roots, TLS services and unaudited helpers. Earlier shared-heap graph tests scale poorly despite coordination improvements. This is a useful prototype, not a general Task/HTTP backend. |
 | Ordinary concurrent collector | Standard HTTP/JIT path uses an owned heap with a background marker and owner reclamation | Multiple managed mutators require explicit additional coordination. A background GC thread is not parallel managed execution. |
 | Lazy JIT | A compiler worker owns compiler state; the requesting managed thread waits for a result through `recv()` | Queueing compilation on another thread has not made the caller nonblocking. Suspending that caller must publish arguments/roots, preserve faults, and resume exactly once. |
@@ -71,6 +72,36 @@ ExecutionContext/AsyncLocal flow and affinity must be specified separately rathe
 than assumed. Sources: [.NET work queues](https://github.com/dotnet/runtime/blob/main/src/libraries/System.Private.CoreLib/src/System/Threading/ThreadPoolWorkQueue.cs),
 [thread-pool configuration](https://learn.microsoft.com/en-us/dotnet/core/runtime-config/threading),
 and [existing NeoCLR Task.Run contract](../concurrency-direction.md#taskrun-with-shared-captures--author-direction-2026-09-27).
+
+## Task.Run schedules; await suspends — confirmed 2026-10-28
+
+The author identifies Task.Run as neoCLR's counterpart in role to Go's go
+statement, then explicitly confirms that Task.Run schedules and await suspends.
+Retain [the existing shared-capture contract](../concurrency-direction.md#taskrun-with-shared-captures--author-direction-2026-09-27):
+Task.Run returns a completion handle without waiting for the submitted function.
+Awaiting a pending Task parks the awaiting execution; an already-completed Task
+need not suspend. The submitted function can itself await. A Task is not the
+parked stack/context, nor does every Task represent newly scheduled work.
+
+Task.Run work does not implicitly inherit the caller's UI-thread affinity. Returning
+an awaiting caller to its appropriate context is a separate scheduling contract.
+Async callback unwrapping, capture identity, result/fault/cancellation and invocation
+lifetime must survive a backend redesign. No launch-order, immediate parallelism,
+new keyword or new public signature is selected. Go's statement launches a function
+without returning a Task-like result handle; the analogy is about launching work,
+not identical completion/error semantics. Sources reviewed 28 October 2026:
+[.NET Task.Run](https://learn.microsoft.com/en-us/dotnet/api/system.threading.tasks.task.run?view=net-10.0),
+[Go statements](https://go.dev/ref/spec#Go_statements).
+
+The cross-runtime fixture preserves an I/O owner's affinity while CPU work may run
+elsewhere. It demonstrates the benefit of independent progress for long jobs, with
+mixed tiny-job costs; it does not implement general managed Task.Run in the compiled
+runtime. A copied-native-payload completion bridge can test transport mechanics,
+but cannot replace shared captures as the product contract. The next gate is
+bounded delivery with cancellation/shutdown races and root ownership, followed by
+managed integration and paced multi-request load. Continue evaluating cooperative
+slicing and ordinary runtime overhead reductions rather than committing to a
+wholesale architecture from this one pattern.
 
 ## Proposed architecture boundaries
 
