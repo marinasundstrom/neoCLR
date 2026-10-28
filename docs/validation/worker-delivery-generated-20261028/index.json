@@ -1,0 +1,42 @@
+{
+  "initial.json.gz": {
+    "source": "target/worker-delivery-generated-20261028/generated-validation.json",
+    "sha256": "c82678d60946f6fcc81777e2087ff13c74dbfaeb13af301d83b9641fcf096cba"
+  },
+  "corrected.json.gz": {
+    "source": "target/worker-delivery-generated-20261028-v2/generated-validation.json",
+    "sha256": "b87db5b38b7d63b27c55c88ecd716f49b8501ab50daaf0ccf0147f608e520ae1"
+  },
+  "allocation-check.json.gz": {
+    "source": "target/worker-delivery-generated-20261028-final/generated-validation.json",
+    "sha256": "a2885f0bb1a68606343fbcf9bf42b6090518e16cb2914f6a65e5b81cc7c8c7c2"
+  },
+  "epoch-check.json.gz": {
+    "source": "target/worker-delivery-generated-20261028-epochs/generated-validation.json",
+    "sha256": "18a533c032860fbd59025a11a0f864bacdcec473177e77ea7482118038b922cd"
+  },
+  "pressure-epoch-check.json.gz": {
+    "source": "target/worker-delivery-generated-20261028-pressure/generated-validation.json",
+    "sha256": "6de299ace25970c45d82cc9c37a261033ac7633d9e5c6aa95f311c3d32ced2dc"
+  },
+  "qualified.json.gz": {
+    "source": "target/worker-delivery-generated-20261028-qualified/generated-validation.json",
+    "sha256": "62c6c4312e3f50c643e8eda9f36831327b8b249490acf12646ba9db8b41272d7"
+  },
+  "code.o.gz": {
+    "source": "target/worker-delivery-generated-20261028-qualified/code.o",
+    "sha256": "1469b01a2ec34453383af6f5a3882f4a6905442f3ed811ea78563c1c5697555f"
+  },
+  "WorkerGenerated.dll.gz": {
+    "source": "target/worker-delivery-generated-20261028-qualified/bin/neoclr/WorkerGenerated.dll",
+    "sha256": "8e9a654e222697e39970fb0148fe80529c56e100f66189bf4ecba26fe2942583"
+  },
+  "command-2.stdout.gz": {
+    "source": "target/worker-delivery-generated-20261028-qualified/command-2.stdout",
+    "sha256": "cbea00ac909dd0c4ace59f496dfe94bde5a7d4ad7d3b59d1875c2fad75c21bfa"
+  },
+  "live-gc.c.gz": {
+    "source": "target/worker-delivery-generated-20261028-qualified/live-gc.c",
+    "sha256": "f11391be7e52b1a62c5b6879b83874f53e5f1c0b237da13f9c981e938d605423"
+  }
+}

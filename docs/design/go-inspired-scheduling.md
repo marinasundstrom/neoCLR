@@ -251,6 +251,15 @@ source polling after resumed executions can submit new work. This isolates wait 
 not generated HTTP throughput, collector superiority or the cost of all pipe
 bookkeeping against an unmodified build. Default builds remain unchanged.
 
+The [generated closure follow-up](../validation/worker-delivery-generated-20261028/README.md)
+qualifies 64 chained owner deliveries, collection, shared graph/static mutation,
+fault diagnostics and recovery under both collector configurations. The concurrent
+build runs owner epochs, but generated worker callbacks use synchronous fallback:
+the serialized pool bridge never registers its borrowed arena as an owned heap.
+The parked owner retains a separate heap. Actual concurrent worker marking is
+still unqualified. HTTP integration requires owner/worker heap participation and
+service admission, not closure copying.
+
 **Author adoption gate:** prove the candidate applies to HTTP, then run a new
 benchmark after integration. Qualify captures, service ownership, faults,
 cancellation, overload and shutdown in the real handler path before claiming an

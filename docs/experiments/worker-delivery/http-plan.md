@@ -16,6 +16,30 @@ consumer-root pressure, disconnected clients, concurrent collection and shutdown
 No worker invokes owner-bound socket/async services or touches unaudited foreign
 heap references. Keep cancellation settlement distinct from forced interruption.
 
+## Audited boundary and next implementation gate (2026-10-28)
+
+The current compiled callback bridge temporarily transfers the pool-owned arena
+and static storage to a fresh invocation context under its heap gate. It rejects
+parked/TLS roots and does not admit async/socket services. The separately compiled
+HTTP worker experiment creates independent whole applications/heaps; it cannot
+satisfy shared-capture Task.Run semantics. Copying owner closures to the pool would
+also change those semantics.
+
+Generated closure delivery is now [qualified](../../validation/worker-delivery-generated-20261028/README.md)
+within that restricted bridge under both collector configurations. Worker
+callbacks use synchronous fallback in the concurrent build: the borrowed pool
+arena is not registered as the worker's owned heap. The owner does run concurrent
+epochs. Actual concurrent marking of worker-accessed objects remains unqualified.
+The next design slice must coordinate an existing HTTP owner heap with workers: register both active and
+parked roots, retain closure/static identity, serialize or coordinate allocation
+and collection, and keep socket/async operations owner-affine. Admission must
+reject unsupported services before execution. Decide whether to extend the
+existing compiler participant protocol or introduce an exclusive heap lease that
+can safely coexist with parked owner roots; measure owner blocking as part of the
+choice. A lease that blocks the I/O owner for the whole handler could erase the
+benefit. No heap attachment or managed scheduling default changes are qualified by
+this prerequisite.
+
 ## Fresh benchmark after integration
 
 Retain a build of the previous HTTP implementation as control and build the

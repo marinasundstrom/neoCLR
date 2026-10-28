@@ -94,6 +94,13 @@ cohorts remain archived separately. These are worker
 return-to-owner-resume times, not HTTP request latencies. General managed captures
 across the HTTP owner/worker boundary remain unqualified.
 [Correctness, traces, profiles and all cohorts](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/worker-delivery-20261028/README.md).
+A subsequent compiled Raven check passes shared graph/static mutation, rooted
+closure handoff, collection, fault delivery and recovery across 64 owner resumptions
+under both collector configurations (optimized and UBSan runtime builds). Owner
+concurrent epochs run, but compiled worker callbacks still collect synchronously:
+the restricted pool bridge lacks owned-heap registration. Concurrent worker marking
+and HTTP owner-heap integration remain open.
+[Generated closure qualification](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/worker-delivery-generated-20261028/README.md).
 Adoption requires proving the change in the real HTTP path and running a **new
 HTTP benchmark after integration**, with both collectors and matched workload/resource
 controls. Existing HTTP performance tables are not replaced by these native results.
