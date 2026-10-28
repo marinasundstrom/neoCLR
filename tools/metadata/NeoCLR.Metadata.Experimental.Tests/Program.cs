@@ -4,6 +4,8 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args is ["--inlining"]) { InliningChecks.Run(); return 0; }
+
 if (args is ["--pointer-memory-access"])
 {
     PointerSignatureChecks.Run();
@@ -752,6 +754,7 @@ var tests = new (string Name, Action Body)[]
     ("Native dependency identity and snapshot ownership", NativeReaderChecks.References),
     ("Native declaration reader and reference-only projection", NativeReaderChecks.Run),
     ("Bodyless runtime internal-call authoring", InternalCallChecks.Run),
+    ("Method inlining flags", InliningChecks.Run),
     ("Sealed class definitions, CLI and native facade", SealedClassChecks.Run),
     ("Consistent authored and reader type-row limits", DefinitionLimitChecks.Run),
     ("Inherited public interface implementation dispatch", InheritedInterfaceChecks.Run),

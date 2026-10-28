@@ -6,6 +6,15 @@ JIT execution and an interpreter for testing and constrained environments.
 
 <a id="jit-investigation"></a>
 
+## Development: default method inlining
+
+JIT and AOT automatically inline small, safe integer/Boolean leaf methods.
+`MethodImplOptions.NoInlining` opts out; `AggressiveInlining` permits a larger
+candidate budget but cannot bypass safety limits. There is no `Inlining` flag.
+Calls, branches, allocation, virtual dispatch and faulting operations currently
+remain ordinary calls. Small SDK helpers benefit without annotations. These are
+unreleased development changes; see the [contract and validation](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/inlining-20261028/README.md).
+
 ## Choose an execution mode
 
 | Mode | Use it for | Compilation happens |

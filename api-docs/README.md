@@ -2371,8 +2371,8 @@ service qualification does not establish production core migration.
 The production native snapshot now includes source-owned ValueType/Enum/Array,
 FlagsAttribute, Self, MethodImplAttribute/MethodImplOptions, CheckedStorage and
 RuntimeHelpers.DrainEntryTasks in System.Runtime. No native renderer core projection
-is required. The MethodImplOptions subset contains only InternalCall; other .NET
-flags are not implied. Reserve creates checked uninitialized slots; reads before
+is required. The MethodImplOptions subset contains InternalCall, NoInlining and
+AggressiveInlining; other .NET flags are not implied. Reserve creates checked uninitialized slots; reads before
 writes fault. DrainEntryTasks is a compiler startup hook, not a scheduling API;
 reentrancy and callback failures fault. All new public declarations have source XML
 and native rendered type/member entries. Self denotes a native signature marker.
@@ -2998,3 +2998,21 @@ unchanged; current internal HTTP connection/session implementation fingerprints
 are refreshed. `build-api-docs.py --check` passes. This repairs stale source
 fingerprints before release qualification; it does not add public persistent HTTP
 APIs or claim that the forthcoming SDK packages have passed their gates.
+
+### Method inlining controls (development, 2026-10-28)
+
+System.Runtime.CompilerServices.MethodImplOptions now documents NoInlining (8) and
+AggressiveInlining (256), with FlagsAttribute. The existing selected type is rendered
+from the rebuilt source-owned native System.Runtime; no new exclusion is required.
+MethodImplAttribute controls implementation metadata and is not an executable
+custom attribute. The host-only SetImplementationFlags methods retain the existing
+C# host-library RavenDoc exclusion and are covered in the
+[manual metadata reference](experimental-metadata.md#method-inlining-options-development-2026-10-28).
+See [validation and limits](../docs/validation/inlining-20261028/README.md).
+
+The inlining snapshot was refreshed from `target/inlining/libraries` with Raven
+`256019f66` (matching production binaries built from that change). The optional
+PostgreSQL provider is retained unchanged from Preview 18 for complete documentation.
+The native render and four checksum/source-link snapshot tests pass. The legacy
+aggregate snapshot is unaffected by the compiler-facing core declarations; a concurrent
+DynamicallyAccessedMembers workstream changes other source fingerprints separately.

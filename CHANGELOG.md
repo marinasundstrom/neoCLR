@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-28
 
+- Add bounded default leaf-method inlining shared by JIT/AOT, with CLR-compatible MethodImplOptions.NoInlining/AggressiveInlining overrides, metadata/import/reference preservation and Raven core-marker validation. NoInlining wins; unsafe or unsupported candidates remain calls. Refresh the SDK/API reference and document the initial Int32/Boolean scope; small SDK methods require no blanket annotations.
+
 - Record the author-directed Go-inspired concurrency/scheduling investigation, comparing Go and .NET with existing fibers, private parallel compiled workers, lazy-JIT waits and GC ownership. Define staged queue-policy, suspension, managed-parallelism and application-load gates without adopting a scheduler or changing defaults. Refresh the existing native pool baseline with 11 optimized/UBSan safety groups and 1/2/4-worker copied-primitive measurements; add the proposal to the website direction page. Incorporate the author’s execution-tracer suggestion as the first implementation slice, with a correlated task/worker/I/O/JIT/GC timeline, bounded recording, loss reporting and measured overhead; tracer implementation remains planned.
 
 - Add project-local `<project>.retention.json` support to the native project builder, with an optional project-relative `--retention-file`, strict validation and combined constructor/property/method-inspection policies resolved from final compiled identities. Migrate the DI sample and document boundaries; 15 focused tooling tests and two positive native DI runs pass, while method-only retention correctly rejects activation. Record DynamicallyAccessedMembers analysis and runtime API annotation as follow-up work.

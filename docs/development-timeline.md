@@ -1,5 +1,12 @@
 # Development conversation record
 
+## 2026-10-28 — Default inlining and backend optimization
+
+- **Author:** Requested MethodImplOptions inlining flags, JIT/AOT support and SDK use where relevant; acknowledged that .NET has no Inlining option, then prioritized default inlining. Suggested architecture-dependent instruction heuristics, such as cheaper alternatives to some multiplies, and clarified that backend optimization and inlining are separate and both should be enabled. Requested a commit for each slice.
+- **Assistant:** Selected .NET-compatible NoInlining/AggressiveInlining with automatic bounded leaf inlining as the default, avoiding blanket SDK annotations. Found Cranelift already implements constant-multiplication simplifications and target-specific lowering, while production optimization remains at none. Proposed separate inlining and speed-optimization commits.
+- **Actions:** Added native metadata/compiler flag support and shared scalar/managed leaf lowering; focused interpreter, compiler, metadata and ARM64/x64 AOT/JIT checks pass. Rebuilt the four SDK libraries. [Qualification and limits](validation/inlining-20261028/README.md) record measured outcomes as they complete. Backend speed qualification is the next slice; this one-off direction does not replace the platform roadmap.
+
+
 ## 2026-10-28 — Project-local AOT retention and runtime annotation direction
 
 - **Author, 2026-10-26:** Asked whether the explicit localization adapter retention option implied a need for a file declaring types that must survive AOT trimming. Then directed adding support so declarations stay with the project instead of repeating command-line arguments, and suggested DynamicallyAccessedMembers if useful.

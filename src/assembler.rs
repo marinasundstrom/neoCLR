@@ -561,15 +561,21 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                         .interface_implementations
                         .push(parse_function_ref(rest)?);
                 } else if word == ".methodimpl" {
-                    if rest != "InternalCall" || pending.function.impl_flags != 0 {
+                    if pending.function.impl_flags != 0 {
                         return Err(Fault::new(
-                            "expected one .methodimpl InternalCall directive",
+                            "expected one .methodimpl directive",
                         ));
                     }
                     if !pending.function.body.is_empty() || !pending.labels.is_empty() {
                         return Err(Fault::new(".methodimpl must precede any body"));
                     }
-                    pending.function.impl_flags = crate::metadata::INTERNAL_CALL;
+                    pending.function.impl_flags = match rest {
+                        "InternalCall" => crate::metadata::INTERNAL_CALL,
+                        "NoInlining" => crate::metadata::NO_INLINING,
+                        "AggressiveInlining" => crate::metadata::AGGRESSIVE_INLINING,
+                        "NoInlining|AggressiveInlining" | "AggressiveInlining|NoInlining" => crate::metadata::INLINING_FLAGS,
+                        _ => return Err(Fault::new("unsupported method implementation flags")),
+                    };
                 } else if word == ".param" || word == ".local" {
                     if !pending.function.body.is_empty() || !pending.labels.is_empty() {
                         return Err(Fault::new(

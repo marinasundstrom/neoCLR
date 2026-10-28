@@ -90,7 +90,7 @@ public sealed partial class AssemblyBuilder
         if (types.Sum(type => type.Properties.Count) > 4096) throw new InvalidDataException("too many properties");
         if (types.Sum(type => type.MetadataFields.Count()) > 4096) throw new InvalidDataException("too many fields");
         if (methods.Length > 4096) throw new InvalidDataException("too many methods");
-        if (EntryPoint is not null && (!methods.Contains(EntryPoint) || EntryPoint.IsTypeInitializer || EntryPoint.Definition.NativeImport is not null || EntryPoint.Definition.ImplementationAttributes != 0 || !EntryPoint.IsStatic || EntryPoint.Signature.GenericParameterNames.Count != 0 || EntryPoint.DeclaringType?.GenericParameterNames.Count > 0 || (EntryPoint.ParameterCount != 0 && EntryPoint.Signature.ParameterTypes is not [{ ArrayElement.Primitive: PrimitiveType.String }]) || EntryPoint.Signature.ReturnType.Primitive is not (PrimitiveType.Int32 or PrimitiveType.Void)))
+        if (EntryPoint is not null && (!methods.Contains(EntryPoint) || EntryPoint.IsTypeInitializer || EntryPoint.Definition.NativeImport is not null || (EntryPoint.Definition.ImplementationAttributes & ~0x108) != 0 || !EntryPoint.IsStatic || EntryPoint.Signature.GenericParameterNames.Count != 0 || EntryPoint.DeclaringType?.GenericParameterNames.Count > 0 || (EntryPoint.ParameterCount != 0 && EntryPoint.Signature.ParameterTypes is not [{ ArrayElement.Primitive: PrimitiveType.String }]) || EntryPoint.Signature.ReturnType.Primitive is not (PrimitiveType.Int32 or PrimitiveType.Void)))
             throw new InvalidDataException("entry point must be a local Int32 or no-result method with no parameters or one String vector");
         var importedTargets = importedReferences.Values.Concat(authoredCallableReferences).Select(reference => reference.Target).ToHashSet();
         foreach (var target in methods.SelectMany(m => m.Instructions).Select(i => i.Target).OfType<MethodBuilder>())
@@ -994,7 +994,7 @@ public sealed partial class AssemblyBuilder
             int body = bodyEncoder.AddMethodBody(new InstructionEncoder(code), maxStack: referenceOnly ? 1 : Math.Max(method.IsConstructor ? 1 : 0, method.MaxStack),
                 localVariablesSignature: locals, attributes: MethodBodyAttributes.InitLocals);
             metadata.AddMethodDefinition((MethodAttributes)method.GetAttributes(accessors.Contains(method)),
-                MethodImplAttributes.IL | MethodImplAttributes.Managed, metadata.GetOrAddString(method.CliName), Signature(method), body, firstParameter);
+                (MethodImplAttributes)method.Definition.ImplementationAttributes, metadata.GetOrAddString(method.CliName), Signature(method), body, firstParameter);
             genericRows.Add((handles[method], MetadataTokens.GetRowNumber(handles[method]) * 2 + 1, method.Signature.GenericParameterNames));
             nextMethod++;
         }

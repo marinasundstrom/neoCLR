@@ -199,6 +199,7 @@ public sealed partial class AssemblyBuilder
         {
             reference.Target.SetInternalCall();
         }
+        else reference.Target.SetImplementationFlags((System.Reflection.MethodImplAttributes)(definition.ImplementationAttributes & 0x108));
         foreach (var constraint in definition.SpecialConstraints)
             reference.Target.SetSpecialConstraints(constraint.Key, constraint.Value);
         if (definition.TypeConstraints.Count != 0)

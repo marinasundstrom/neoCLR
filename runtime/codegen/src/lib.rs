@@ -9,6 +9,7 @@ mod enum_queries;
 mod fault_details;
 mod function_invocation;
 mod inspection;
+mod inlining;
 mod jit;
 mod jit_memory;
 mod limits;

@@ -209,7 +209,7 @@ pub(super) fn sealed_member(input: &neoclr::Module, f: &neoclr::metadata::Functi
     f.instance
         && !f.is_abstract
         && !f.receiver_byref
-        && f.impl_flags == 0
+        && f.impl_flags & !neoclr::metadata::INLINING_FLAGS == 0
         && f.owner
             .as_ref()
             .and_then(|t| input.type_definition(t))
@@ -236,7 +236,7 @@ pub(super) fn inherited_object_member(
         || !f.is_virtual
         || !f.is_override
         || f.is_abstract
-        || f.impl_flags != 0
+        || f.impl_flags & !neoclr::metadata::INLINING_FLAGS != 0
         || f.no_result
         || !f.generic_parameters.is_empty()
         || !f.generic_arguments.is_empty()
@@ -303,7 +303,7 @@ pub(super) fn object_value_contract(f: &neoclr::metadata::Function) -> bool {
         && !f.receiver_byref
         && !f.receiver_readonly
         && !f.no_result
-        && f.impl_flags == 0
+        && f.impl_flags & !neoclr::metadata::INLINING_FLAGS == 0
         && f.generic_parameters.is_empty()
         && f.generic_arguments.is_empty()
         && f.generic_constraints.is_empty()
@@ -422,7 +422,7 @@ pub(super) fn object_display_contract(f: &neoclr::metadata::Function) -> bool {
         && f.parameters.is_empty()
         && f.returns == Type::String
         && !f.no_result
-        && f.impl_flags == 0
+        && f.impl_flags & !neoclr::metadata::INLINING_FLAGS == 0
         && f.generic_parameters.is_empty()
         && f.generic_constraints.is_empty()
 }

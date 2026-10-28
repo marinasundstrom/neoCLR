@@ -386,7 +386,7 @@ impl<'a> Profile<'a> {
                     });
             if ((f.is_virtual || f.is_abstract) && !interface && !class)
                 || f.is_override && !class
-                || f.impl_flags != 0
+                || f.impl_flags & !neoclr::metadata::INLINING_FLAGS != 0
                 || f.pinvoke.is_some()
                 || !f.generic_parameters.is_empty()
                 || !f.generic_arguments.is_empty()
@@ -531,7 +531,7 @@ impl<'a> Profile<'a> {
                     if ((!interface_callback && (bound.is_virtual || bound.is_abstract))
                         || bound.is_override)
                         || bound.receiver_byref
-                        || bound.impl_flags != 0
+                        || bound.impl_flags & !neoclr::metadata::INLINING_FLAGS != 0
                         || (bound.instance
                             && !matches!(p.args[callee].first(), Some(Ty::Reference(_)))
                             && !interface_callback)

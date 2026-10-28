@@ -835,7 +835,7 @@ public sealed partial class NativeAssemblyDefinition
                 {
                     fields.Add("impl_flags");
                     implementationAttributes = implementation.GetUInt16();
-                    Require(implementationAttributes is 0 or 0x1000, "unsupported method implementation flags");
+                    Require(implementationAttributes == 0x1000 || (implementationAttributes & ~0x108) == 0, "unsupported method implementation flags");
                 }
                 NativeImportDefinition? nativeImport = null;
                 if (method.TryGetProperty("pinvoke", out var importMetadata))
@@ -1165,7 +1165,7 @@ public sealed partial class NativeAssemblyDefinition
             uint entryPointToken = 0;
             if (entry.Length != 0)
             {
-                var candidates = methodNames.Select((name, index) => (name, index)).Where(p => p.name == entry && methods[p.index].Name != ".cctor" && methods[p.index].ImplementationAttributes == 0 && methods[p.index].NativeImport is null && !methods[p.index].Instance && (methods[p.index].Owner < 0 || types[methods[p.index].Owner].GenericNames.Length == 0) && methods[p.index].Signature.GenericParameterNames.Count == 0 && (methods[p.index].Signature.ParameterTypes.Count == 0 || methods[p.index].Signature.ParameterTypes is [{ ArrayElement.Primitive: PrimitiveType.String }]) && methods[p.index].Signature.ReturnType.Primitive is PrimitiveType.Int32 or PrimitiveType.Void).ToArray();
+                var candidates = methodNames.Select((name, index) => (name, index)).Where(p => p.name == entry && methods[p.index].Name != ".cctor" && (methods[p.index].ImplementationAttributes & ~0x108) == 0 && methods[p.index].NativeImport is null && !methods[p.index].Instance && (methods[p.index].Owner < 0 || types[methods[p.index].Owner].GenericNames.Length == 0) && methods[p.index].Signature.GenericParameterNames.Count == 0 && (methods[p.index].Signature.ParameterTypes.Count == 0 || methods[p.index].Signature.ParameterTypes is [{ ArrayElement.Primitive: PrimitiveType.String }]) && methods[p.index].Signature.ReturnType.Primitive is PrimitiveType.Int32 or PrimitiveType.Void).ToArray();
                 Require(candidates.Length == 1, "invalid native entry point");
                 entryPointToken = 0x06000001u + (uint)candidates[0].index;
             }
@@ -1285,6 +1285,7 @@ public sealed partial class NativeAssemblyDefinition
                     output.Definition.GetParameterCustomAttributes(position).Add(new(reference, attribute.Arguments.Select(a => new CustomAttributeArgument(Remap(a.Type), a.Value)), attribute.Named));
                 }
             if (method.ImplementationAttributes == 0x1000) output.SetInternalCall();
+            else output.SetImplementationFlags((System.Reflection.MethodImplAttributes)method.ImplementationAttributes);
             if (method.NativeImport is not null) output.SetNativeImport(method.NativeImport);
             foreach (var pair in method.NullableAnnotations) output.SetNullableAnnotation(pair.Key, pair.Value);
             foreach (var pair in method.ParameterNames) output.SetParameterName(pair.Key, pair.Value);

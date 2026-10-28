@@ -606,7 +606,7 @@ pub struct Function {
     pub locals: Vec<Type>,
     #[serde(default)]
     pub local_names: Vec<Option<String>>,
-    /// CLR MethodImplAttributes values: IL = 0, InternalCall = 0x1000.
+    /// CLR MethodImplAttributes: NoInlining = 8, AggressiveInlining = 256, InternalCall = 4096.
     #[serde(default)]
     pub impl_flags: u16,
     #[serde(default)]
@@ -722,6 +722,9 @@ pub enum CallingConvention {
 }
 
 pub const INTERNAL_CALL: u16 = 0x1000;
+pub const NO_INLINING: u16 = 0x0008;
+pub const AGGRESSIVE_INLINING: u16 = 0x0100;
+pub const INLINING_FLAGS: u16 = NO_INLINING | AGGRESSIVE_INLINING;
 
 impl Function {
     pub fn argument_types(&self) -> Vec<Type> {

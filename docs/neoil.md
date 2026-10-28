@@ -61,6 +61,11 @@ escapes. Identifiers contain ASCII letters, digits, underscores, and dots.
 - `.methodimpl InternalCall` marks a runtime-provided function with no IL body or
   locals. It lowers to `impl_flags: 4096`; ordinary functions default to zero.
   Unknown flags and missing or mismatched native bindings are rejected.
+- `.methodimpl NoInlining` (8) or `.methodimpl AggressiveInlining` (256) controls
+  managed JIT/AOT inlining. The combined spelling `NoInlining|AggressiveInlining`
+  (264; reverse order also accepted) gives NoInlining precedence. Omit the directive
+  for automatic inlining. One directive precedes the body; it cannot be combined
+  with InternalCall or a foreign import. The interpreter accepts these hints.
 - `.foreign "library" "entry_point" cdecl|system [utf8|utf16]` declares a native C ABI
   import with no body or locals. `system` selects the platform system ABI. It is separate from InternalCall and supports
   scalar/pointer signatures. Calls remain ordinary signature-based calls.

@@ -15947,3 +15947,14 @@ qualified-name collision detection remain current adapter limitations.
 
 See [qualification and migration evidence](validation/backtick-discovery-20261026/README.md).
 No Windows execution or performance improvement is claimed by this macOS slice.
+
+## Method inlining metadata (2026-10-28 development)
+
+Raven's neoCLR backend now recognizes the exact configured core MethodImplAttribute
+on managed methods, emitting native impl_flags 8/256/264. No Runtime Contract switch
+is added. The SDK owns the flags in System.Runtime; native codegen owns decisions.
+Native metadata is authoritative. The temporary CLI declaration projection retains
+MethodImplAttributes bits, while its throwing bodies remain non-executable references.
+Future metadata/backend replacement must preserve the hints and NoInlining precedence;
+ordinary .NET emission remains unchanged. Unsupported flags and InternalCall combinations
+are rejected. See [bounded default JIT/AOT inlining and validation](validation/inlining-20261028/README.md).

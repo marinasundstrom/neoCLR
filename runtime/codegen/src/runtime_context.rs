@@ -26,7 +26,7 @@ fn forwarding_target<'a>(module: &'a Module, function: &Function) -> Result<&'a 
         return Err("ExecutingAssembly requires the exact source forwarding facade".into());
     };
     if !function.locals.is_empty()
-        || function.impl_flags != 0
+        || function.impl_flags & !neoclr::metadata::INLINING_FLAGS != 0
         || function.pinvoke.is_some()
         || !function.parameters.is_empty()
         || function.no_result

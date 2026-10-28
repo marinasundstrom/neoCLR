@@ -53,7 +53,7 @@ pub(crate) fn validate_contract(function: &Function) -> Result<(), Fault> {
                 Visibility::Public
             }
         || function.name.ends_with(".ctor")
-        || function.impl_flags != 0
+        || function.impl_flags & !crate::metadata::INLINING_FLAGS != 0
         || function.pinvoke.is_some()
         || function.is_override
         || (function.body.is_empty() && !function.locals.is_empty())

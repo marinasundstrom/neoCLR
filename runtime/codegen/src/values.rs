@@ -428,7 +428,7 @@ fn check_value_array_replacement(
     b.switch_to_block(ready);
 }
 
-pub(super) fn compile(
+pub(crate) fn compile(
     input: &neoclr::Module,
     root: &str,
     details: Option<&crate::fault_details::Options>,
@@ -5779,6 +5779,19 @@ fn compile_with_driver<M: Module>(
                         }
                         Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) => {
                             let c = p.callee(target)?;
+                            if matches!(op, Op::Call(_))
+                                && crate::inlining::eligible(&input.functions[c])
+                            {
+                                let actual = stack
+                                    .split_off(stack.len() - input.functions[c].parameters.len());
+                                stack.push(crate::inlining::emit(
+                                    &mut b,
+                                    &input.functions[c],
+                                    &actual,
+                                ));
+                                b.ins().jump(blocks[pc + 1], &args(&stack));
+                                continue;
+                            }
                             let construct = matches!(op, Op::Construct(_));
                             let count: usize = p.args[c]
                                 .iter()

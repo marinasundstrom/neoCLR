@@ -4,11 +4,17 @@ module System.Runtime.CompilerServices
 public struct Self {}
 
 /// Supported runtime method implementation flags.
+[System.Flags]
 public enum MethodImplOptions {
+    /// Prevents method inlining in JIT and AOT compilation.
+    NoInlining = 8,
+    /// Requests inlining when the backend can safely inline the method.
+    AggressiveInlining = 256,
     InternalCall = 4096
 }
 
-/// Declares a runtime-supplied implementation. The compiler validates supported targets and flags.
+/// Controls method inlining or declares a runtime-supplied implementation.
+/// NoInlining takes precedence over AggressiveInlining; neither changes interpreter behavior.
 public class MethodImplAttribute : System.Attribute {
     init(options: MethodImplOptions) {}
 }

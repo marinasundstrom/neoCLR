@@ -50,7 +50,7 @@ pub fn support_root(input: &neoclr::Module) -> Result<usize, Error> {
         || f.no_result
         || f.receiver_byref
         || f.receiver_readonly
-        || f.impl_flags != 0
+        || f.impl_flags & !neoclr::metadata::INLINING_FLAGS != 0
         || f.is_virtual
         || f.is_abstract
         || f.is_override

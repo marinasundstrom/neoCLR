@@ -83,7 +83,7 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
             || f.is_virtual
             || f.is_override
             || f.is_abstract
-            || f.impl_flags != 0
+            || f.impl_flags & !crate::metadata::INLINING_FLAGS != 0
             || f.pinvoke.is_some()
             || !f.interface_implementations.is_empty()
             || d.primitive_reference

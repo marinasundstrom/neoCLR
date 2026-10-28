@@ -15,6 +15,18 @@ public sealed partial class MethodDefinition
         ImplementationAttributes = 0x1000;
     }
 
+    /// <summary>Sets managed method inlining options using CLR MethodImplAttributes bits.</summary>
+    /// <param name="flags">Zero, NoInlining, AggressiveInlining or their combination. NoInlining wins.</param>
+    /// <exception cref="ArgumentOutOfRangeException">Flags outside the inlining subset.</exception>
+    /// <exception cref="InvalidOperationException">Loaded method or externally supplied implementation.</exception>
+    public void SetImplementationFlags(MethodImplAttributes flags)
+    {
+        if (((int)flags & ~0x108) != 0) throw new ArgumentOutOfRangeException(nameof(flags));
+        if (AuthoredSignature is null || NativeImport is not null || ImplementationAttributes == 0x1000)
+            throw new InvalidOperationException("inlining options require an authored managed method");
+        ImplementationAttributes = (ushort)flags;
+    }
+
     internal MethodBuilder? Producer { get; set; }
     internal bool IsTypeDeclaration { get; }
     private readonly string? authoredNamespace;
@@ -106,6 +118,8 @@ public sealed partial class MethodBuilder
     /// <summary>Marks this assembly function as a bodyless runtime internal call.</summary>
     /// <exception cref="InvalidOperationException">Type-owned or nonempty declaration.</exception>
     public void SetInternalCall() => Definition.SetInternalCall();
+    /// <summary>Sets managed NoInlining/AggressiveInlining options; NoInlining takes precedence.</summary>
+    public void SetImplementationFlags(MethodImplAttributes flags) => Definition.SetImplementationFlags(flags);
 
     /// <summary>Gets the canonical declaration shared with the authored assembly's method views.</summary>
     public MethodDefinition Definition { get; }

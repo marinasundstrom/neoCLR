@@ -8746,12 +8746,11 @@ See [the runtime contract](https://github.com/marinasundstrom/neoCLR/blob/main/d
 
 `Introspection.MethodInfo.GetMethodImplementationFlags(): System.Reflection.MethodImplAttributes`
 returns recorded implementation bits without loading code. Native snapshots currently
-admit zero or InternalCall; CLI snapshots expose their recorded bits without promising
+admit zero, NoInlining, AggressiveInlining, their combination, or InternalCall; CLI snapshots expose their recorded bits without promising
 native execution support. InternalCall identifies a runtime service and has no
 NativeImport descriptor. Foreign imports have a descriptor and zero implementation
-flags; ordinary native managed methods have neither. This follows .NET's inspection
-API without treating Unmanaged, Native, NoInlining or other flags as implemented neoCLR
-features. Abstract methods must still be identified through IsAbstract; the absence
+flags; ordinary native managed methods may carry inlining hints. This follows .NET's inspection
+API without treating Unmanaged, Native or other flags as implemented neoCLR features. Abstract methods must still be identified through IsAbstract; the absence
 of a foreign descriptor does not imply an executable managed body.
 
 
@@ -10577,3 +10576,23 @@ within the SDK's current single-bound and nongeneric-bound limits. It does not
 provide general structural-union constraint satisfaction. Synthesized Raven closure
 owners currently require owned nominal bounds; imported nominal closure bounds
 remain unsupported. See [error diagnostics](error-context.md) for the consumer.
+
+## Method inlining options (development, 2026-10-28)
+
+`MethodDefinition.SetImplementationFlags(System.Reflection.MethodImplAttributes flags)`
+and `MethodBuilder.SetImplementationFlags(System.Reflection.MethodImplAttributes flags)`
+set an authored managed method's implementation flags. Accepted values are zero,
+NoInlining (8), AggressiveInlining (256), or both (264). NoInlining wins when combined.
+Zero restores automatic policy. The method returns void; unsupported bits throw
+ArgumentOutOfRangeException, and loaded methods, native imports or existing InternalCall
+declarations throw InvalidOperationException. Neither method creates an executable body.
+
+Native serialization, import and CLI reference projection retain these flags.
+`MethodInfo.GetMethodImplementationFlags()` reports them without executing code.
+InternalCall remains a separate bodyless runtime-service contract. JIT and AOT
+share a bounded leaf inliner; aggressive hints do not override safety restrictions.
+The interpreter ignores inlining hints. See the [contract and validation](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/inlining-20261028/README.md).
+
+```csharp
+method.SetImplementationFlags(System.Reflection.MethodImplAttributes.NoInlining);
+```

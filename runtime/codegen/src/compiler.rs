@@ -776,6 +776,16 @@ fn compile_scalar_impl<M: Module>(
                     }
                     Op::Call(target) => {
                         let callee = names[target.name.as_str()];
+                        if crate::inlining::eligible(&input.functions[callee]) {
+                            let args = stack.split_off(stack.len() - target.parameters.len());
+                            stack.push(crate::inlining::emit(
+                                &mut builder,
+                                &input.functions[callee],
+                                &args,
+                            ));
+                            builder.ins().jump(blocks[pc + 1], &block_args(&stack));
+                            continue;
+                        }
                         let reference = module.declare_func_in_func(ids[callee], builder.func);
                         let mut arguments = stack.split_off(stack.len() - target.parameters.len());
                         arguments.push(builder.ins().stack_addr(types::I64, call_result, 0));
@@ -938,7 +948,7 @@ fn check_function(
         || !function.readonly_parameters.is_empty()
         || function.receiver_byref
         || function.receiver_readonly
-        || function.impl_flags != 0
+        || function.impl_flags & !neoclr::metadata::INLINING_FLAGS != 0
         || function.body.len() > 8192
     {
         return Err(format!("{}: scalar profile requires nongeneric free functions with admitted scalar types (pointers require native-import opt-in)", function.name).into());
@@ -1059,7 +1069,7 @@ fn check_console_wrapper() -> Result<(), Error> {
         || wrapper.instance
         || wrapper.returns != Type::Void
         || wrapper.no_result
-        || wrapper.impl_flags != 0
+        || wrapper.impl_flags & !neoclr::metadata::INLINING_FLAGS != 0
         || wrapper.pinvoke.is_some()
         || !wrapper.locals.is_empty()
         || !wrapper.generic_parameters.is_empty()

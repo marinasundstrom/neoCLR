@@ -977,7 +977,10 @@ fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
             let contract = resolve(module, target)?;
             crate::access::check_call(module, Some(function), &contract)?;
         }
-        if arity > 0 && (function.pinvoke.is_some() || function.impl_flags != 0) {
+        if arity > 0
+            && (function.pinvoke.is_some()
+                || function.impl_flags & !crate::metadata::INLINING_FLAGS != 0)
+        {
             return Err(Fault::new("generic owners require IL methods"));
         }
         if crate::function_objects::is_contract(module, function) {
@@ -1008,7 +1011,7 @@ fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
                 crate::native::bind_in(module, function)?;
                 continue;
             }
-            0 => (),
+            flags if flags & !crate::metadata::INLINING_FLAGS == 0 => (),
             _ => return Err(Fault::new("unsupported method implementation flags")),
         }
         if function.body.is_empty() {

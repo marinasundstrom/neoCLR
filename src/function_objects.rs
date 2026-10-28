@@ -315,7 +315,7 @@ pub(crate) fn validate_binding(
     compatible(&signature, &callee)?;
     if callee.name.ends_with("..ctor")
         || callee.pinvoke.is_some()
-        || callee.impl_flags != 0
+        || callee.impl_flags & !crate::metadata::INLINING_FLAGS != 0
         || is_contract(module, &callee)
         || (callee.instance
             && !callee.receiver_byref
@@ -412,7 +412,7 @@ pub(crate) fn bind(
         if callee.is_abstract
             || (slot.is_readonly() && !callee.receiver_readonly)
             || callee.pinvoke.is_some()
-            || callee.impl_flags != 0
+            || callee.impl_flags & !crate::metadata::INLINING_FLAGS != 0
             || (!callee.receiver_byref && !crate::interfaces::is_contract(module, &callee))
         {
             return Err(Fault::new(
