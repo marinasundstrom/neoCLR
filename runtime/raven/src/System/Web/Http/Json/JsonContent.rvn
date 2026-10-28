@@ -39,7 +39,7 @@ public class JsonContent {
         return JsonSerializer.Deserialize(bytes, type)
     }
 
-    static func Read<T>(content: HttpContent) -> Result<T, JsonError> {
+    static func Read<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | DynamicallyAccessedMemberTypes.PublicProperties)] T>(content: HttpContent) -> Result<T, JsonError> {
         let instance = Read(content, typeof(T))?
         return Ok((T)instance)
     }

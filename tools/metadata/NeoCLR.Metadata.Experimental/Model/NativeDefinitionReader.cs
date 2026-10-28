@@ -120,6 +120,10 @@ public sealed partial class NativeAssemblyDefinition
         var methodAttributes = methods.Select(method => method.Attributes.Select(a => (Owner: Copy(a.Owner), Arguments: a.Arguments.Select(argument => (Type: Copy(argument.Type), argument.Value)).ToArray(), a.Named)).ToArray()).ToArray();
         var memberAttributes = types.SelectMany(type => type.MemberAttributes)
             .ToDictionary(pair => pair.Key, pair => pair.Value.Select(a => (Owner: Copy(a.Owner), Arguments: a.Arguments.Select(argument => (Type: Copy(argument.Type), argument.Value)).ToArray(), a.Named)).ToArray());
+        var typeGenericAttributes = types.Select(type => type.GenericAttributes.ToDictionary(p => p.Key,
+            p => p.Value.Select(a => (Owner: Copy(a.Owner), Arguments: a.Arguments.Select(argument => (Type: Copy(argument.Type), argument.Value)).ToArray(), a.Named)).ToArray())).ToArray();
+        var methodGenericAttributes = methods.Select(method => method.GenericAttributes.ToDictionary(p => p.Key,
+            p => p.Value.Select(a => (Owner: Copy(a.Owner), Arguments: a.Arguments.Select(argument => (Type: Copy(argument.Type), argument.Value)).ToArray(), a.Named)).ToArray())).ToArray();
         var parameterAttributes = methods.Select(method => method.ParameterAttributes.ToDictionary(p => p.Key,
             p => p.Value.Select(a => (Owner: Copy(a.Owner), Arguments: a.Arguments.Select(argument => (Type: Copy(argument.Type), argument.Value)).ToArray(), a.Named)).ToArray())).ToArray();
         var manifestAttributes = assemblyAttributes.Select(a => (Owner: Copy(a.Owner), Arguments: a.Arguments.Select(argument => (Type: Copy(argument.Type), argument.Value)).ToArray(), a.Named)).ToArray();
@@ -155,6 +159,14 @@ public sealed partial class NativeAssemblyDefinition
             foreach (var (position, attributesForParameter) in parameterAttributes[i])
                 result.MainModule.GetMethodDefinition(0x06000001u + (uint)i)!.SetLoadedParameterAttributes(position,
                     attributesForParameter.Select(a => new CustomAttributeDefinition(a.Owner.Materialize(result.MainModule).ReferencedType!, a.Arguments.Select(argument => new CustomAttributeArgument(argument.Type.Materialize(result.MainModule), argument.Value)), a.Named)));
+        for (int i = 0; i < types.Length; i++)
+            foreach (var (position, values) in typeGenericAttributes[i])
+                result.MainModule.GetTypeDefinition(0x02000002u + (uint)i)!.SetLoadedGenericParameterAttributes(position,
+                    values.Select(a => new CustomAttributeDefinition(a.Owner.Materialize(result.MainModule).ReferencedType!, a.Arguments.Select(argument => new CustomAttributeArgument(argument.Type.Materialize(result.MainModule), argument.Value)), a.Named)));
+        for (int i = 0; i < methods.Length; i++)
+            foreach (var (position, values) in methodGenericAttributes[i])
+                result.MainModule.GetMethodDefinition(0x06000001u + (uint)i)!.SetLoadedGenericParameterAttributes(position,
+                    values.Select(a => new CustomAttributeDefinition(a.Owner.Materialize(result.MainModule).ReferencedType!, a.Arguments.Select(argument => new CustomAttributeArgument(argument.Type.Materialize(result.MainModule), argument.Value)), a.Named)));
         result.MainModule.SetConstants(assemblyConstants);
         result.DeclaredModuleNames = declarationModuleNames;
         return result;

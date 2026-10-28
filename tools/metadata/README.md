@@ -420,3 +420,12 @@ Native emission now preserves custom attributes on ordinary static fields, using
 existing exact field tokens. Literal/enum-field annotations remain outside this
 writer extension. `--storage-attributes` tests instance/static fields and properties
 through native/CLI reading, projection and introspection.
+
+## Generic parameter custom attributes (development, 2026-10-28)
+
+TypeDefinition and MethodDefinition expose `GetGenericParameterCustomAttributes`
+by ordinal, with mutable authored/read-only loaded collections. Generic parameter
+introspection exposes `GetCustomAttributes`. Native/CLI read, write and reference
+projection preserve attributes through optional GenericParam origin tokens.
+See the [API contract](../../api-docs/experimental-metadata.md#generic-parameter-custom-attributes-development-2026-10-28).
+Run `--generic-attributes` for roundtrip, immutability and malformed-identity checks.

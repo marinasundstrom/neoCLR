@@ -71,8 +71,8 @@ public sealed class JsonSerializer {
     public static Concurrency.Tasks.Task<Result<PropagationUnit, JsonError>> Serialize(IO.OutputStream output, object value, JsonSerializerOptions options) => default;
     public static Result<string, JsonError> SerializeNode(JsonValue value, JsonSerializerOptions options) => default;
     public static Concurrency.Tasks.Task<Result<PropagationUnit, JsonError>> SerializeNode(IO.OutputStream output, JsonValue value, JsonSerializerOptions options) => default;
-    public static Result<T, JsonError> Deserialize<T>(string text) => default;
-    public static Concurrency.Tasks.Task<Result<T, JsonError>> Deserialize<T>(IO.InputStream input) => default;
+    public static Result<T, JsonError> Deserialize<[Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)] T>(string text) => default;
+    public static Concurrency.Tasks.Task<Result<T, JsonError>> Deserialize<[Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)] T>(IO.InputStream input) => default;
     public static Result<object, JsonError> Deserialize(string text, [Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)] Introspection.TypeInfo type) => default;
     public static Concurrency.Tasks.Task<Result<object, JsonError>> Deserialize(IO.InputStream input, [Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)] Introspection.TypeInfo type) => default;
     public static Result<string, JsonError> Serialize(object value) => default;
@@ -108,16 +108,16 @@ public sealed class JsonContent {
     public static Result<HttpContent, Data.Json.JsonError> CreateNode(Data.Json.JsonValue value) => default;
     public static Result<Data.Json.JsonValue, Data.Json.JsonError> ReadNode(HttpContent content) => default;
     public static Result<object, Data.Json.JsonError> Read(HttpContent content, [Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)] Introspection.TypeInfo type) => default;
-    public static Result<T, Data.Json.JsonError> Read<T>(HttpContent content) => default;
+    public static Result<T, Data.Json.JsonError> Read<[Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)] T>(HttpContent content) => default;
 }
 }
 namespace Web.Http.Json {
 public struct HttpJsonError { public struct Http { } public struct Json { } }
 public static class HttpClientJsonExtensions {
-    public static Concurrency.Tasks.Task<Result<T, Union<HttpError, Data.Json.JsonError>>> GetFromJson<T>(this HttpClient self, string url) => default;
-    public static Concurrency.Tasks.Task<Result<T, Union<HttpError, Data.Json.JsonError>>> GetFromJson<T>(this HttpClient self, string url, Concurrency.CancellationToken cancellationToken) => default;
-    public static Concurrency.Tasks.Task<Result<T, Union<HttpError, Data.Json.JsonError>>> GetFromJson<T>(this HttpClient self, Uri url) => default;
-    public static Concurrency.Tasks.Task<Result<T, Union<HttpError, Data.Json.JsonError>>> GetFromJson<T>(this HttpClient self, Uri url, Concurrency.CancellationToken cancellationToken) => default;
+    public static Concurrency.Tasks.Task<Result<T, Union<HttpError, Data.Json.JsonError>>> GetFromJson<[Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)] T>(this HttpClient self, string url) => default;
+    public static Concurrency.Tasks.Task<Result<T, Union<HttpError, Data.Json.JsonError>>> GetFromJson<[Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)] T>(this HttpClient self, string url, Concurrency.CancellationToken cancellationToken) => default;
+    public static Concurrency.Tasks.Task<Result<T, Union<HttpError, Data.Json.JsonError>>> GetFromJson<[Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)] T>(this HttpClient self, Uri url) => default;
+    public static Concurrency.Tasks.Task<Result<T, Union<HttpError, Data.Json.JsonError>>> GetFromJson<[Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)] T>(this HttpClient self, Uri url, Concurrency.CancellationToken cancellationToken) => default;
     public static Concurrency.Tasks.Task<Result<HttpResponse, Union<HttpError, Data.Json.JsonError>>> PostAsJson<T>(this HttpClient self, string url, T value) => default;
     public static Concurrency.Tasks.Task<Result<HttpResponse, Union<HttpError, Data.Json.JsonError>>> PostAsJson<T>(this HttpClient self, string url, T value, Concurrency.CancellationToken cancellationToken) => default;
     public static Concurrency.Tasks.Task<Result<HttpResponse, Union<HttpError, Data.Json.JsonError>>> PostAsJson<T>(this HttpClient self, Uri url, T value) => default;
@@ -125,8 +125,8 @@ public static class HttpClientJsonExtensions {
 }
 // Reference surface only; execution uses native System.Web metadata.
 public static class HttpContentJsonExtensions {
-    public static Concurrency.Tasks.Task<Result<T, Data.Json.JsonError>> ReadFromJson<T>(this HttpContent self) => default;
-    public static Concurrency.Tasks.Task<Result<T, Data.Json.JsonError>> ReadFromJson<T>(this HttpContent self, Concurrency.CancellationToken cancellationToken) => default;
+    public static Concurrency.Tasks.Task<Result<T, Data.Json.JsonError>> ReadFromJson<[Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)] T>(this HttpContent self) => default;
+    public static Concurrency.Tasks.Task<Result<T, Data.Json.JsonError>> ReadFromJson<[Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)] T>(this HttpContent self, Concurrency.CancellationToken cancellationToken) => default;
     public static Concurrency.Tasks.Task<Result<object, Data.Json.JsonError>> ReadFromJson(this HttpContent self, [Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)] Introspection.TypeInfo type) => default;
     public static Concurrency.Tasks.Task<Result<object, Data.Json.JsonError>> ReadFromJson(this HttpContent self, [Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)] Introspection.TypeInfo type, Concurrency.CancellationToken cancellationToken) => default;
     public static Concurrency.Tasks.Task<Result<Data.Json.JsonValue, Data.Json.JsonError>> ReadJsonNode(this HttpContent self) => default;

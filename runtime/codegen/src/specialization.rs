@@ -579,6 +579,14 @@ impl Specializer<'_> {
             result.local_names.clear();
         }
         result.generic_parameters.clear();
+        if let Some(origin) = &mut result.origin {
+            // Contracts were consumed on the source generic definition. The closed
+            // executable body has no generic parameter slots to own these tokens.
+            let tokens = std::mem::take(&mut origin.generic_parameter_tokens);
+            result
+                .custom_attributes
+                .retain(|a| a.target_token.is_none_or(|t| !tokens.contains(&t)));
+        }
         result.owner = f
             .owner
             .as_ref()
@@ -1372,6 +1380,11 @@ fn expand_validated(
         )
         .map_err(|e| e.to_string())?;
         t.generic_parameters.clear();
+        if let Some(origin) = &mut t.origin {
+            let tokens = std::mem::take(&mut origin.generic_parameter_tokens);
+            t.custom_attributes
+                .retain(|a| a.target_token.is_none_or(|t| !tokens.contains(&t)));
+        }
         t.generic_variance.clear();
         t.generic_constraints.clear();
         for field in &mut t.fields {
@@ -1590,6 +1603,33 @@ pub fn restore_methods(report: &mut Value, specialization: &Value) {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn closed_execution_shapes_drop_source_generic_parameter_slots() {
+        use serde_json::json;
+        let source = neoclr::assemble(".module GenericOrigins\n.type Holder<T>\n.end\n.function Echo<T>(T value) -> T\nldarg value\nret\n.end\n.function Main() -> Int32\n.local Holder<Int32> holder\nldc.i4 42\ncall Echo<Int32>(Int32)\nret\n.end").unwrap();
+        let mut value = serde_json::to_value(source).unwrap();
+        value["assemblies"] = json!([{"name":"GenericOrigins","full_name":"GenericOrigins","modules":["GenericOrigins.dll"],"references":[]}]);
+        value["types"][0]["origin"] = json!({"assembly":"GenericOrigins","module":"GenericOrigins.dll","name":"Holder`1","token":0x02000001,"generic_parameter_tokens":[0x2a000001]});
+        value["functions"][0]["origin"] = json!({"assembly":"GenericOrigins","module":"GenericOrigins.dll","name":"Echo","token":0x06000001,"parameter_tokens":[0],"generic_parameter_tokens":[0x2a000002]});
+        let input = serde_json::from_value(value).unwrap();
+        let (selected, _) = crate::selection::prepare(&input, "Main").unwrap();
+        neoclr::verify(&selected).unwrap();
+        assert!(
+            selected
+                .types
+                .iter()
+                .filter_map(|t| t.origin.as_ref())
+                .all(|o| o.generic_parameter_tokens.is_empty())
+        );
+        assert!(
+            selected
+                .functions
+                .iter()
+                .filter_map(|f| f.origin.as_ref())
+                .all(|o| o.generic_parameter_tokens.is_empty())
+        );
+    }
+
     #[test]
     #[ignore = "focused specialization timing probe; run explicitly with --nocapture"]
     fn specialization_lookup_timing() {

@@ -1,0 +1,40 @@
+import System.*
+import System.Data.Json.*
+import System.Diagnostics.CodeAnalysis.*
+import System.Introspection.*
+import System.Result.*
+
+public class Message {
+    var Text: string { get; set; } = ""
+    init() { }
+}
+
+public class Inspector<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T> {
+    static func Count() -> int {
+        var count = 0
+        for item in typeof(T).GetConstructors() {
+            count += 1
+        }
+        return count
+    }
+}
+
+func CountProperties<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T>() -> int {
+    var count = 0
+    for item in typeof(T).GetProperties() {
+        count += 1
+    }
+    return count
+}
+
+func Main() -> int {
+    let Ok(message) = JsonSerializer.Deserialize<Message>("{\"Text\":\"retained\"}") else {
+        return 1
+    }
+    let constructors = Inspector<Message>.Count()
+    let properties = CountProperties<Message>()
+    Console.WriteLine(message.Text)
+    Console.WriteLine(constructors)
+    Console.WriteLine(properties)
+    return if message.Text == "retained" && constructors == 1 && properties == 1 { 0 } else { 1 }
+}

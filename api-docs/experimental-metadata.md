@@ -10596,3 +10596,20 @@ The interpreter ignores inlining hints. See the [contract and validation](https:
 ```csharp
 method.SetImplementationFlags(System.Reflection.MethodImplAttributes.NoInlining);
 ```
+
+## Generic parameter custom attributes (development, 2026-10-28)
+
+`Model.TypeDefinition.GetGenericParameterCustomAttributes(int position)` and
+`Model.MethodDefinition.GetGenericParameterCustomAttributes(int position)` return
+`IList<CustomAttributeDefinition>` for a zero-based parameter ordinal. Authored
+collections are mutable (maximum 256 attributes per parameter); loaded collections
+are read-only. An ordinal outside `GenericArity` throws `ArgumentOutOfRangeException`.
+Attribute ownership and value validation follow ordinary custom attributes.
+
+`Introspection.GenericParameterTypeInfo.GetCustomAttributes()` and
+`Introspection.MethodGenericParameterTypeInfo.GetCustomAttributes()` expose
+metadata-only views without running attribute constructors. CLI output uses
+GenericParam rows; native output uses optional `origin.generic_parameter_tokens`.
+Absent tokens preserve legacy compatibility. Invalid arity, duplicate identities,
+zero tokens and other token tables reject. CLI projection preserves owner/ordinal.
+The focused metadata test group is `--generic-attributes`.

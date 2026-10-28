@@ -28,6 +28,12 @@ public sealed partial class AssemblyBuilder
         var methods = ValidateGraph();
         if (externalGrapheme is not null && types.Any(t => t.NativeGrapheme))
             throw new InvalidDataException("native Char cannot have both a local and external owner");
+        int nextGenericParameterToken = 0x2a000001;
+        int[] GenericTokens(int count) => Enumerable.Range(0, count).Select(_ => nextGenericParameterToken++).ToArray();
+        var typeGenericTokens = types.Where(t => t.Definition.GenericParameterAttributes.Any(p => p.Value.Count != 0))
+            .ToDictionary(t => t, t => GenericTokens(t.Definition.GenericArity));
+        var methodGenericTokens = methods.Where(m => m.Definition.GenericParameterAttributes.Any(p => p.Value.Count != 0))
+            .ToDictionary(m => m, m => GenericTokens(m.Definition.GenericArity));
         int nextParameterToken = 0x08000001;
         var parameterTokens = new Dictionary<MethodBuilder, int[]>();
         var returnTokens = new Dictionary<MethodBuilder, int>();
@@ -93,10 +99,10 @@ public sealed partial class AssemblyBuilder
                     ? ImportTypeIdentity(scope, reference.Namespace, reference.Name, 0)
                     : reference.Resolve().Producer ?? throw new InvalidDataException("detached attribute owner");
             }
-        var memberAttributes = methods.SelectMany(method => method.Definition.CustomAttributes.Concat(method.Definition.ReturnCustomAttributes).Concat(method.Definition.ParameterAttributes.SelectMany(p => p.Value)))
+        var memberAttributes = types.SelectMany(t => t.Definition.GenericParameterAttributes.SelectMany(p => p.Value)).Concat(methods.SelectMany(method => method.Definition.CustomAttributes.Concat(method.Definition.ReturnCustomAttributes).Concat(method.Definition.GenericParameterAttributes.SelectMany(p => p.Value)).Concat(method.Definition.ParameterAttributes.SelectMany(p => p.Value)))
             .Concat(types.SelectMany(type => type.MetadataFields.SelectMany(field => field.Definition.CustomAttributes)))
             .Concat(types.SelectMany(type => type.Properties.SelectMany(property => property.Definition.CustomAttributes)))
-            .Concat(Definition.CustomAttributes);
+            .Concat(Definition.CustomAttributes));
         foreach (var attribute in memberAttributes)
         {
             attribute.ValidateContract(Definition.MainModule);
@@ -181,6 +187,7 @@ public sealed partial class AssemblyBuilder
                 origin["member_access"] = method.Visibility == MethodVisibility.Internal ? "Assembly" : method.Visibility == MethodVisibility.Protected ? "Family" : method.Visibility.ToString();
                 origin["parameter_tokens"] = parameterTokens[method];
                 if (returnTokens.TryGetValue(method, out var returnToken)) origin["return_token"] = returnToken;
+                if (methodGenericTokens.TryGetValue(method, out var genericTokens)) origin["generic_parameter_tokens"] = genericTokens;
                 if (method.Definition.NullableAnnotations.Count != 0)
                     origin["nullable_annotations"] = method.Definition.NullableAnnotations.OrderBy(p => p.Key).Select(p => new { position = p.Key, flags = p.Value.Flags.Select(f => (int)f).ToArray(), uniform = p.Value.IsUniform }).ToArray();
             }
@@ -366,7 +373,7 @@ public sealed partial class AssemblyBuilder
         object TypeOrigin(TypeBuilder type, int index)
         {
             var name = type.Namespace.Length == 0 ? type.Name : type.Namespace + "." + type.Name;
-            if (!type.MetadataFields.Any() && type.Properties.Count == 0 && type.Definition.DeclaringType is null)
+            if (!type.MetadataFields.Any() && type.Properties.Count == 0 && type.Definition.DeclaringType is null && !typeGenericTokens.ContainsKey(type))
                 return Origin(name, 0x02000002 + index, publiclyVisible: type.Visibility == TypeVisibility.Public);
             var origin = new Dictionary<string, object>
             {
@@ -379,6 +386,7 @@ public sealed partial class AssemblyBuilder
                 ["field_access"] = type.Fields.Select(f => f.Visibility == FieldVisibility.Internal ? "Assembly" : f.Visibility.ToString()).ToArray(),
                 ["field_readonly"] = type.Fields.Select(f => f.IsReadOnly).ToArray()
             };
+            if (typeGenericTokens.TryGetValue(type, out var genericTokens)) origin["generic_parameter_tokens"] = genericTokens;
             if (type.Definition.DeclaringType is { } parent) origin["declaring_type_token"] = 0x02000002 + types.IndexOf(parent.Producer!);
             if (type.Properties.Count != 0) origin["property_tokens"] = type.Properties.Select(p => propertyTokens[p]).ToArray();
             return origin;
@@ -464,6 +472,9 @@ public sealed partial class AssemblyBuilder
         object[]? TypeAttributes(TypeBuilder type)
         {
             var attributes = type.Definition.CustomAttributes.Where(a => !type.Definition.IsFlagsAttribute(a)).Select(a => Attribute(a)).ToList();
+            if (typeGenericTokens.TryGetValue(type, out var genericTokens))
+                foreach (var (position, values) in type.Definition.GenericParameterAttributes)
+                    attributes.AddRange(values.Select(a => Attribute(a, genericTokens[position])));
             foreach (var field in type.Fields.Concat(type.StaticFields))
                 attributes.AddRange(field.Definition.CustomAttributes.Select(a => Attribute(a, fieldTokens[field])));
             foreach (var property in type.Properties)
@@ -475,6 +486,9 @@ public sealed partial class AssemblyBuilder
         object[]? MethodAttributes(MethodBuilder method)
         {
             var attributes = method.Definition.CustomAttributes.Select(a => Attribute(a)).ToList();
+            if (methodGenericTokens.TryGetValue(method, out var genericTokens))
+                foreach (var (position, values) in method.Definition.GenericParameterAttributes)
+                    attributes.AddRange(values.Select(a => Attribute(a, genericTokens[position])));
             if (returnTokens.TryGetValue(method, out var returnToken))
                 attributes.AddRange(method.Definition.ReturnCustomAttributes.Select(a => Attribute(a, returnToken)));
             foreach (var (position, values) in method.Definition.ParameterAttributes)

@@ -1,0 +1,2 @@
+PASS native source type/member/parameter/function annotation emission
+PASS native attribute import, all supported member kinds, typed/named values and cross-assembly usage diagnostics

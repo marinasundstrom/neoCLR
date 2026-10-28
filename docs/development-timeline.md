@@ -78,6 +78,14 @@ recorded as approval of a complete .NET trimming implementation.
   [Return qualification](validation/dynamic-access-returns-20261028/README.md) records
   this implemented layer. The broader requested targets/categories remain work in
   progress; the existing initial subset is not presented as fulfilling that scope.
+- **Further author direction:** "We should fix Raven gaps."
+- **Assistant action:** Implemented field/property and receiver layers, then fixed
+  Raven generic parameter syntax, semantic-symbol lookup, diagnostics and CLR
+  metadata emission/import on main (`80550fa23`), carrying that focused change to
+  the neoCLR line (`a9aeb8aa4`). Added native generic attribute transport and bounded
+  argument/typeof analysis with runtime JSON annotations. [Generic validation](validation/dynamic-access-generic-20261028/README.md)
+  records the evidence and remaining member-category/generic-graph gaps. These
+  changes do not claim completion of the broader requested categories.
 
 
 ## 2026-10-28 - Continue profiling shared lazy-JIT startup work

@@ -16,13 +16,13 @@ import System.Web.Http.*
 public extension HttpContentJsonExtensions for HttpContent {
     /// Deserializes UTF-8 JSON, retaining the original content and JsonError.
     /// Does not check HTTP status or Content-Type. Stream content is consumed once.
-    func ReadFromJson<T>() -> Task<Result<T, JsonError>> {
+    func ReadFromJson<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | DynamicallyAccessedMemberTypes.PublicProperties)] T>() -> Task<Result<T, JsonError>> {
         return self.ReadFromJson<T>(CancellationToken.None)
     }
 
     /// Pre-cancellation skips conversion and returns a cancelled task.
     /// Buffered conversion is synchronous and cannot be interrupted once started.
-    func ReadFromJson<T>(cancellationToken: CancellationToken) -> Task<Result<T, JsonError>> {
+    func ReadFromJson<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | DynamicallyAccessedMemberTypes.PublicProperties)] T>(cancellationToken: CancellationToken) -> Task<Result<T, JsonError>> {
         if !cancellationToken.IsCancellationRequested && !self.IsBuffered {
             if self.IsDisposed || self.BeginUpload() is Failure(_) {
                 return Task.FromResult<Result<T, JsonError>>(Result<T, JsonError>.Failure(JsonError.Read(TextReadError.IoFailure)))

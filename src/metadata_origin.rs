@@ -118,6 +118,9 @@ pub struct MetadataOrigin {
     /// Source Param-row identity of the return slot, when it has metadata.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub return_token: Option<u32>,
+    /// GenericParam source identities in declaration ordinal order; absent on legacy images.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub generic_parameter_tokens: Vec<u32>,
     /// Explicit .NET nullable transform facts; -1 denotes the return value.
     /// These annotations do not affect physical signatures or runtime checks.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
@@ -354,7 +357,7 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
         }
         Ok(())
     };
-    for (origin, fields, all_fields, properties, parameters, table) in module
+    for (origin, fields, all_fields, properties, parameters, generic_parameters, table) in module
         .types
         .iter()
         .filter_map(|t| {
@@ -365,14 +368,23 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
                     t.fields.len() + t.static_fields.len() + t.literal_fields.len(),
                     t.properties.len(),
                     0,
+                    t.generic_parameters.len(),
                     0x02,
                 )
             })
         })
         .chain(module.functions.iter().filter_map(|f| {
-            f.origin
-                .as_ref()
-                .map(|o| (o, 0, 0, 0, f.parameters.len(), 0x06))
+            f.origin.as_ref().map(|o| {
+                (
+                    o,
+                    0,
+                    0,
+                    0,
+                    f.parameters.len(),
+                    f.generic_parameters.len(),
+                    0x06,
+                )
+            })
         }))
     {
         if !text(&origin.name)
@@ -385,6 +397,8 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
             || (origin.field_tokens.len() != fields && origin.field_tokens.len() != all_fields)
             || origin.property_tokens.len() != properties
             || origin.parameter_tokens.len() != parameters
+            || !origin.generic_parameter_tokens.is_empty()
+                && origin.generic_parameter_tokens.len() != generic_parameters
         {
             return Err(Fault::new(
                 "metadata origin does not match its definition or assembly",
@@ -434,6 +448,9 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
                 return Err(Fault::new("return token requires a method origin"));
             }
             check(origin, token, 0x08)?;
+        }
+        for &token in &origin.generic_parameter_tokens {
+            check(origin, token, 0x2a)?;
         }
         for &token in &origin.parameter_tokens {
             if token != 0 {

@@ -1,5 +1,6 @@
 module System.Web.Http.Json
 
+import System.Diagnostics.CodeAnalysis.*
 import System.*
 import System.Concurrency.*
 import System.Data.Json.*
@@ -11,13 +12,13 @@ import System.Web.Http.*
 /// Buffered JSON client conveniences using the configured HTTP handler.
 public extension HttpClientJsonExtensions for HttpClient {
     /// Sends GET and decodes a successful response as a supported flat model.
-    func GetFromJson<T>(url: string) -> Task<Result<T, HttpError | JsonError>> {
+    func GetFromJson<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | DynamicallyAccessedMemberTypes.PublicProperties)] T>(url: string) -> Task<Result<T, HttpError | JsonError>> {
         let transform: (Result<Object, HttpError | JsonError>) -> Result<T, HttpError | JsonError> = JsonClientOperations.Convert<T>
         return JsonClientOperations.Get(self, url, typeof(T), CancellationToken.None).Map(transform)
     }
 
     /// Sends GET and decodes a successful response as a supported flat model.
-    func GetFromJson<T>(url: string, cancellationToken: CancellationToken) -> Task<Result<T, HttpError | JsonError>> {
+    func GetFromJson<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | DynamicallyAccessedMemberTypes.PublicProperties)] T>(url: string, cancellationToken: CancellationToken) -> Task<Result<T, HttpError | JsonError>> {
         if cancellationToken.IsCancellationRequested {
             let cancelled = Promise<Result<T, HttpError | JsonError>>()
             _ = cancelled.Cancel()
@@ -28,13 +29,13 @@ public extension HttpClientJsonExtensions for HttpClient {
     }
 
     /// Sends GET and decodes a successful response as a supported flat model.
-    func GetFromJson<T>(url: Uri) -> Task<Result<T, HttpError | JsonError>> {
+    func GetFromJson<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | DynamicallyAccessedMemberTypes.PublicProperties)] T>(url: Uri) -> Task<Result<T, HttpError | JsonError>> {
         let transform: (Result<Object, HttpError | JsonError>) -> Result<T, HttpError | JsonError> = JsonClientOperations.Convert<T>
         return JsonClientOperations.Get(self, url, typeof(T), CancellationToken.None).Map(transform)
     }
 
     /// Sends GET and decodes a successful response as a supported flat model.
-    func GetFromJson<T>(url: Uri, cancellationToken: CancellationToken) -> Task<Result<T, HttpError | JsonError>> {
+    func GetFromJson<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | DynamicallyAccessedMemberTypes.PublicProperties)] T>(url: Uri, cancellationToken: CancellationToken) -> Task<Result<T, HttpError | JsonError>> {
         if cancellationToken.IsCancellationRequested {
             let cancelled = Promise<Result<T, HttpError | JsonError>>()
             _ = cancelled.Cancel()

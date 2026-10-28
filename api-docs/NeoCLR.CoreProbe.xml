@@ -4292,7 +4292,7 @@ A method remains in metadata; an omitted call evaluates neither its receiver nor
       <summary>Context attachment only transforms Result&apos;s failure channel.</summary>
     </member>
     <member name="T:System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembersAttribute">
-      <summary>Declares native member-retention requirements on a TypeInfo parameter, return value, field, property or TypeInfo method receiver.</summary>
+      <summary>Declares native member-retention requirements on a TypeInfo parameter, return value, field, property, generic parameter or TypeInfo method receiver.</summary>
       <remarks>Development support covers public constructors and properties. Unknown flows produce diagnostics; unsupported targets and flags are rejected.</remarks>
     </member>
     <member name="M:System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembersAttribute.#ctor(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes)">

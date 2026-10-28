@@ -118,10 +118,10 @@ supported closed shapes known to compilation. This does not add automatic JIT
 file discovery.
 
 Development `DynamicallyAccessedMembers` analysis can now infer constructor/property
-retention from known type tokens passed to annotated `TypeInfo` parameters or returned from annotated factories, fields and properties. Parameterless constructor/property introspection also declares receiver requirements. JSON
+retention from known type tokens passed through annotated `TypeInfo` parameters, returns, fields, properties and method receivers, or supplied to annotated type/method generic parameters. Parameterless constructor/property introspection declares receiver requirements. JSON
 deserialization and DI registration APIs carry corresponding requirements.
-Unknown flows produce diagnostics; generic-parameter, return, field and receiver
-annotations remain unsupported. Explicit files are still needed for unsupported
+Unknown flows produce diagnostics. Additional member categories, arbitrary closed
+generic reflection targets and dynamic implementation analysis remain incomplete. Explicit files are still needed for unsupported
 flows. [Attribute API reference](/docs/api/System/Diagnostics/CodeAnalysis/DynamicallyAccessedMembersAttribute/).
 Inferred constructors and property accessors are also analyzed for
 further annotated calls, including cycles; types discovered through arbitrary

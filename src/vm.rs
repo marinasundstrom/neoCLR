@@ -1471,6 +1471,7 @@ fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
                         .chain(&origin.property_tokens)
                         .chain(&origin.parameter_tokens)
                         .chain(&origin.return_token)
+                        .chain(&origin.generic_parameter_tokens)
                         .any(|t| *t == token)
                 {
                     return Err(Fault::new(

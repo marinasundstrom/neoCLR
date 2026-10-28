@@ -1,7 +1,7 @@
 # Dynamically accessed members (development)
 
 The native backend recognizes `System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembersAttribute`
-on `System.Introspection.TypeInfo` parameters, return values, fields, properties and descriptor method receivers. This is an initial subset of the
+on `System.Introspection.TypeInfo` parameters, return values, fields, properties, generic parameters and descriptor method receivers. This is an initial subset of the
 .NET contract, not general trim analysis. It adds inferred roots to the same
 retention pipeline used by [project retention files](native-retention.md).
 
@@ -28,7 +28,7 @@ not communicate the type that reflection will inspect.
   `PublicConstructors`, `PublicProperties`, and their combinations. The enum
   exposes the conventional .NET values through `Interfaces` and `All`; unsupported
   flag requests fail with `DAM1001` rather than acting as inert annotations.
-- Valid targets are currently `TypeInfo` parameters, return values, fields and properties. Native
+- Valid targets are currently `TypeInfo` parameters, return values, fields, properties and receivers, plus type/method generic parameters. Native
   analysis validates each target identity and type; malformed and unsupported contracts fail with `DAM1001`.
 - Exact nongeneric nominal type tokens are recognized through the runtime's
   `RuntimeContext.GetTypeInfoFromHandle` and `RuntimeTypeInfo.FromHandle` bridges.
@@ -98,7 +98,7 @@ build-time analysis and metadata storage; it does not change interpreter behavio
 or introduce runtime code generation. More conservative retention and warnings
 are costs of the initial implementation, not improvements in .NET semantics.
 
-Generic-parameter annotations, string type-name resolution, arbitrary generic target retention, richer member flags,
+String type-name resolution, arbitrary generic target retention, richer member flags,
 class/base annotation inheritance and complete interprocedural inference remain
 unimplemented. Nongeneric nominal reference-class parameter override compatibility
 is checked; generic/value-type virtual contracts remain unqualified. Do not treat an annotation as a blanket no-trim promise.
@@ -278,3 +278,29 @@ contract. The [native direct-introspection consumer](experiments/dynamic-access/
 needs neither user-authored annotations nor a retention file. [Qualification](validation/dynamic-access-receiver-20261028/README.md)
 records inferred flags 515 and matching counts. Runtime Contract settings and metadata
 transport are unchanged; method attributes already carried this information.
+
+## Generic parameter contracts (2026-10-28)
+
+Type and method parameters accept `[DynamicallyAccessedMembers(...)]` before their
+name. At reachable generic method calls and constructed type uses in function
+signatures/bodies, known argument types infer the requested roots. Forwarding a
+generic parameter requires an equal or stronger annotation; missing guarantees
+produce DAM2001. `typeof(T)` carries T's declared requirements into TypeInfo flow.
+This does not make arbitrary constructed types eligible reflection targets: the
+existing exact nongeneric target restriction and DAM2002 remain.
+
+Generic JsonSerializer.Deserialize overloads and generic HTTP JSON readers now
+carry the same constructor/property requirement as their TypeInfo counterparts.
+Generic virtual/interface contract matching, arbitrary descriptor-discovered
+arguments, and full generic field/ancestry graph propagation remain gaps. An
+annotation does not enable arbitrary runtime specialization.
+
+Raven main now supports generic parameter attribute syntax, binding, semantic
+queries, CLR emission and PE import. The focused change is carried separately to
+Raven's neoCLR branch. Native metadata adds optional ordinal-ordered
+`origin.generic_parameter_tokens` using GenericParam identities; native/CLI
+readers, reference projection and compiler symbols preserve the exact owner.
+Old artifacts omit the field; older strict readers reject new annotated artifacts.
+Rebuild compiler, metadata SDK, runtime libraries and backend together. Runtime
+Contract configuration is unchanged. See the [generic consumer](experiments/dynamic-access/generic/Main.rvn)
+and [validation](validation/dynamic-access-generic-20261028/README.md).

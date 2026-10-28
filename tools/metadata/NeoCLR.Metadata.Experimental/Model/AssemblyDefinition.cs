@@ -426,6 +426,20 @@ public sealed partial class AssemblyDefinition
                         result.MainModule.GetMethodDefinition((uint)MetadataTokens.GetToken(handle))!
                             .SetLoadedParameterAttributes(parameter.SequenceNumber - 1, ReadAttributes(parameter.GetCustomAttributes()));
                 }
+            foreach (var handle in reader.TypeDefinitions)
+                foreach (var parameterHandle in reader.GetTypeDefinition(handle).GetGenericParameters())
+                {
+                    var parameter = reader.GetGenericParameter(parameterHandle);
+                    result.MainModule.GetTypeDefinition((uint)MetadataTokens.GetToken(handle))!
+                        .SetLoadedGenericParameterAttributes(parameter.Index, ReadAttributes(parameter.GetCustomAttributes()));
+                }
+            foreach (var handle in reader.MethodDefinitions)
+                foreach (var parameterHandle in reader.GetMethodDefinition(handle).GetGenericParameters())
+                {
+                    var parameter = reader.GetGenericParameter(parameterHandle);
+                    result.MainModule.GetMethodDefinition((uint)MetadataTokens.GetToken(handle))!
+                        .SetLoadedGenericParameterAttributes(parameter.Index, ReadAttributes(parameter.GetCustomAttributes()));
+                }
             foreach (var handle in reader.FieldDefinitions)
                 result.MainModule.GetFieldDefinition((uint)MetadataTokens.GetToken(handle))!.SetLoadedAttributes(ReadAttributes(reader.GetFieldDefinition(handle).GetCustomAttributes()));
             foreach (var handle in reader.PropertyDefinitions)

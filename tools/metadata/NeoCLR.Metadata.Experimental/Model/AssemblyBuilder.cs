@@ -1068,6 +1068,9 @@ public sealed partial class AssemblyBuilder
                 if (row.Owner.Kind == HandleKind.TypeDefinition)
                     attributes |= (GenericParameterAttributes)(types[MetadataTokens.GetRowNumber(row.Owner) - 2].Definition.GenericParameterVariance?[i] ?? GenericVariance.Invariant);
                 var parameter = metadata.AddGenericParameter(row.Owner, attributes, metadata.GetOrAddString(row.Names[i]), i);
+                WriteAttributes(parameter, row.Owner.Kind == HandleKind.TypeDefinition
+                    ? types[MetadataTokens.GetRowNumber(row.Owner) - 2].Definition.GetGenericParameterCustomAttributes(i)
+                    : methods[MetadataTokens.GetRowNumber(row.Owner) - 1].Definition.GetGenericParameterCustomAttributes(i));
                 if (row.Owner.Kind == HandleKind.TypeDefinition)
                 {
                     var owner = types[MetadataTokens.GetRowNumber(row.Owner) - 2];

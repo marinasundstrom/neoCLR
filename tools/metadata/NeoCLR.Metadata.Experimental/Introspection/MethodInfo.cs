@@ -139,6 +139,9 @@ public sealed class MethodGenericParameterTypeInfo : TypeInfo
 {
     internal MethodGenericParameterTypeInfo(MetadataLoadContext context, MethodInfo method, int position) : base(context)
     { DeclaringMethod = method; Position = position; }
+    /// <summary>Gets metadata-only custom attributes on this generic parameter.</summary>
+    public IReadOnlyList<CustomAttributeInfo> GetCustomAttributes() => DeclaringMethod.Definition.GetGenericParameterCustomAttributes(Position)
+        .Select(a => new CustomAttributeInfo(Context, a)).ToArray();
     /// <summary>Gets the canonical method view that declares this parameter.</summary>
     public MethodInfo DeclaringMethod { get; }
     /// <summary>Gets its zero-based method scope ordinal.</summary>

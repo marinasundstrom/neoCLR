@@ -50,10 +50,13 @@ struct Contract {
     parameters: Vec<u32>,
     returns: u32,
     receiver: u32,
+    generic: Vec<u32>,
 }
 impl Contract {
     fn is_empty(&self) -> bool {
-        self.receiver == 0 && self.returns == 0 && self.parameters.iter().all(|f| *f == 0)
+        self.receiver == 0
+            && self.returns == 0
+            && self.parameters.iter().chain(&self.generic).all(|f| *f == 0)
     }
 }
 
@@ -192,6 +195,9 @@ fn validate_storage_contracts(module: &Module) -> Result<bool, Fault> {
             };
             let origin = ty.origin.as_ref().ok_or_else(fail)?;
             let token = attribute.target_token.ok_or_else(fail)?;
+            if origin.generic_parameter_tokens.contains(&token) {
+                continue;
+            }
             let target = if let Some(index) = origin.field_tokens.iter().position(|t| *t == token) {
                 ty.fields
                     .iter()
@@ -212,6 +218,139 @@ fn validate_storage_contracts(module: &Module) -> Result<bool, Fault> {
     Ok(any)
 }
 
+fn type_requirements(module: &Module, ty: &crate::metadata::TypeDef) -> Result<Vec<u32>, Fault> {
+    let mut result = vec![0; ty.generic_parameters.len()];
+    if let Some(origin) = &ty.origin {
+        for attribute in &ty.custom_attributes {
+            let Some(token) = attribute.target_token else {
+                continue;
+            };
+            if let Some(index) = origin
+                .generic_parameter_tokens
+                .iter()
+                .position(|t| *t == token)
+            {
+                if let Some(value) = flags(module, attribute)? {
+                    *result.get_mut(index).ok_or_else(|| {
+                        Fault::new("DAM1001: generic parameter ordinal is outside type")
+                    })? |= value;
+                }
+            }
+        }
+    }
+    Ok(result)
+}
+
+fn type_value(module: &Module, function: &Function, ty: &Type) -> Result<Value, Fault> {
+    Ok(match ty {
+        Type::MethodTypeParameter(index) => Value::Required(
+            requirements(module, function)?
+                .generic
+                .get(*index as usize)
+                .copied()
+                .unwrap_or(0),
+        ),
+        Type::TypeParameter(index) => Value::Required(
+            function
+                .owner
+                .as_ref()
+                .and_then(|t| module.type_definition(t))
+                .map(|t| type_requirements(module, t))
+                .transpose()?
+                .and_then(|v| v.get(*index as usize).copied())
+                .unwrap_or(0),
+        ),
+        _ => Value::Types(vec![ty.clone()]),
+    })
+}
+
+fn check_type_arguments(
+    module: &Module,
+    function: &Function,
+    ty: &Type,
+    report: &mut Analysis,
+) -> Result<(), Fault> {
+    if let Type::Constructed { arguments, .. } | Type::Scoped { arguments, .. } = ty {
+        if let Some(definition) = module.type_definition(ty) {
+            for (index, flags) in type_requirements(module, definition)?
+                .into_iter()
+                .enumerate()
+            {
+                if let Some(argument) = arguments.get(index) {
+                    require(
+                        module,
+                        &type_value(module, function, argument)?,
+                        flags,
+                        &format!(
+                            "{} -> {} generic parameter {index}",
+                            display_name(module, function),
+                            definition.name
+                        ),
+                        report,
+                    );
+                }
+            }
+        }
+        for argument in arguments {
+            check_type_arguments(module, function, argument, report)?;
+        }
+    }
+    match ty {
+        Type::Array(t)
+        | Type::ArrayRef(t)
+        | Type::ByRef(t)
+        | Type::ReadOnlyByRef(t)
+        | Type::Ptr(t)
+        | Type::InterfaceRef(t) => check_type_arguments(module, function, t, report)?,
+        Type::Union(types) | Type::Intersection(types) => {
+            for ty in types {
+                check_type_arguments(module, function, ty, report)?;
+            }
+        }
+        Type::Tuple(tuple) => {
+            for ty in tuple.iter() {
+                check_type_arguments(module, function, ty, report)?;
+            }
+        }
+        Type::Function(shape) => {
+            for ty in shape.parameters.iter().chain([&shape.returns]) {
+                check_type_arguments(module, function, ty, report)?;
+            }
+        }
+        _ => (),
+    }
+    Ok(())
+}
+
+fn check_method_arguments(
+    module: &Module,
+    function: &Function,
+    target: &crate::metadata::FunctionRef,
+    callee: &Function,
+    report: &mut Analysis,
+) -> Result<(), Fault> {
+    for (index, flags) in requirements(module, callee)?
+        .generic
+        .into_iter()
+        .enumerate()
+    {
+        if let Some(argument) = target.generic_arguments.get(index) {
+            require(
+                module,
+                &type_value(module, function, argument)?,
+                flags,
+                &format!(
+                    "{} -> {} generic parameter {index}",
+                    display_name(module, function),
+                    display_name(module, callee)
+                ),
+                report,
+            );
+        }
+    }
+    Ok(())
+}
+
 fn descriptor_receiver(module: &Module, ty: &Type) -> Result<bool, Fault> {
     if source_name(module, ty) == Some("System.Introspection.TypeInfo") {
         return Ok(true);
@@ -224,6 +363,7 @@ fn descriptor_receiver(module: &Module, ty: &Type) -> Result<bool, Fault> {
 fn requirements(module: &Module, function: &Function) -> Result<Contract, Fault> {
     let mut result = Contract {
         parameters: vec![0; function.parameters.len()],
+        generic: vec![0; function.generic_parameters.len()],
         ..Contract::default()
     };
     for attribute in &function.custom_attributes {
@@ -252,6 +392,14 @@ fn requirements(module: &Module, function: &Function) -> Result<Contract, Fault>
             continue;
         };
         let origin = function.origin.as_ref().ok_or_else(fail)?;
+        if let Some(position) = origin
+            .generic_parameter_tokens
+            .iter()
+            .position(|t| *t == token)
+        {
+            *result.generic.get_mut(position).ok_or_else(fail)? |= value;
+            continue;
+        }
         let (target_type, target_flags) = if origin.return_token == Some(token) {
             if function.no_result {
                 return Err(fail());
@@ -637,6 +785,10 @@ fn analyze_roots(module: &Module, roots: &BTreeSet<usize>) -> Result<Analysis, F
     for index in reachable {
         let function = &module.functions[index];
         let contract = &contracts[index];
+        let _ = function.map_types(|ty| {
+            check_type_arguments(module, function, ty, &mut report)?;
+            Ok(ty.clone())
+        })?;
         if function.body.is_empty() {
             continue;
         }
@@ -754,7 +906,7 @@ fn analyze_roots(module: &Module, roots: &BTreeSet<usize>) -> Result<Analysis, F
                         );
                     }
                 }
-                Op::LoadTypeToken(ty) => produced[0] = Value::Types(vec![ty.clone()]),
+                Op::LoadTypeToken(ty) => produced[0] = type_value(module, function, ty)?,
                 Op::Arg(index) if !escaped_arguments.contains(index) => {
                     produced[0] = state.arguments[*index].clone()
                 }
@@ -771,6 +923,7 @@ fn analyze_roots(module: &Module, roots: &BTreeSet<usize>) -> Result<Analysis, F
                 | Op::CallSelf { target, .. }
                 | Op::Construct(target) => {
                     let callee = crate::vm::resolve(module, target)?;
+                    check_method_arguments(module, function, target, &callee, &mut report)?;
                     let callee_contract = requirements(module, &callee)?;
                     if callee_contract.receiver != 0 {
                         require(
@@ -836,6 +989,7 @@ fn analyze_roots(module: &Module, roots: &BTreeSet<usize>) -> Result<Analysis, F
                 }
                 Op::BindFunction { target, .. } => {
                     let callee = crate::vm::resolve(module, target)?;
+                    check_method_arguments(module, function, target, &callee, &mut report)?;
                     if !requirements(module, &callee)?.is_empty() {
                         report.diagnostics.insert(format!("DAM2003: {} instruction {pc}: indirect call to annotated {} requires explicit retention", display_name(module, function), display_name(module, &callee)));
                     }
@@ -960,6 +1114,86 @@ mod tests {
         );
         m.functions = vec![main, required, bridge];
         m
+    }
+
+    fn generic_fixture() -> Module {
+        let mut m = fixture();
+        let mut generic = function("Generic", vec![], m.functions[0].body.clone());
+        generic.generic_parameters = vec![Some("T".into())];
+        generic.body[0] = Op::LoadTypeToken(Type::MethodTypeParameter(0));
+        generic.origin = Some(serde_json::from_value(json!({"assembly":"Test","module":"Test.dll","name":"Generic","token":100663299,"generic_parameter_tokens":[704643073]})).unwrap());
+        let mut attr = m.functions[1].custom_attributes[0].clone();
+        attr.target_token = Some(704643073);
+        generic.custom_attributes.push(attr);
+        m.functions[0].body = vec![Op::Call(serde_json::from_value(json!({"name":"Generic","parameters":[],"generic_arguments":[{"Named":"Model"}]})).unwrap()), Op::Return];
+        m.functions.push(generic);
+        m
+    }
+
+    #[test]
+    fn generic_method_argument_retains_members_and_typeof_satisfies_consumer() {
+        let m = generic_fixture();
+        let report = analyze(&m, "Main").unwrap();
+        assert_eq!(report.types.get(&3), Some(&3));
+        assert!(report.diagnostics.is_empty(), "{:?}", report.diagnostics);
+    }
+
+    #[test]
+    fn unannotated_generic_parameter_does_not_satisfy_typeof_consumer() {
+        let mut m = generic_fixture();
+        m.functions[3].custom_attributes.clear();
+        let report = analyze(&m, "Main").unwrap();
+        assert!(report.types.is_empty());
+        assert!(
+            report.diagnostics.iter().any(|d| d.contains("DAM2001")),
+            "{:?}",
+            report.diagnostics
+        );
+    }
+
+    #[test]
+    fn generic_forwarding_requires_matching_annotation() {
+        let mut m = generic_fixture();
+        let mut forward = function("Forward", vec![], vec![Op::Call(serde_json::from_value(json!({"name":"Generic","parameters":[],"generic_arguments":[{"MethodTypeParameter":0}]})).unwrap()), Op::Return]);
+        forward.generic_parameters = vec![Some("U".into())];
+        m.functions[0].body = vec![Op::Call(serde_json::from_value(json!({"name":"Forward","parameters":[],"generic_arguments":[{"Named":"Model"}]})).unwrap()), Op::Return];
+        m.functions.push(forward);
+        let report = analyze(&m, "Main").unwrap();
+        assert!(report.types.is_empty());
+        assert!(
+            report
+                .diagnostics
+                .iter()
+                .any(|d| d.contains("DAM2001") && d.contains("generic parameter 0"))
+        );
+        m.functions[4].origin = m.functions[3].origin.clone();
+        m.functions[4].origin.as_mut().unwrap().name = "Forward".into();
+        m.functions[4].custom_attributes = m.functions[3].custom_attributes.clone();
+        let report = analyze(&m, "Main").unwrap();
+        assert_eq!(report.types.get(&3), Some(&3));
+        assert!(report.diagnostics.is_empty(), "{:?}", report.diagnostics);
+    }
+
+    #[test]
+    fn constructed_type_argument_retains_generic_contract_without_method_contracts() {
+        let mut m = fixture();
+        m.types[4].generic_parameters = vec![Some("T".into())];
+        m.types[4].origin = Some(serde_json::from_value(json!({"assembly":"Test","module":"Test.dll","name":"Other`1","token":33554437,"generic_parameter_tokens":[704643073]})).unwrap());
+        let mut attr = m.functions[1].custom_attributes[0].clone();
+        attr.target_token = Some(704643073);
+        m.types[4].custom_attributes.push(attr);
+        m.functions.truncate(1);
+        m.functions[0].body = vec![
+            Op::LoadTypeToken(Type::Constructed {
+                definition: "Other".into(),
+                arguments: vec![Type::Named("Model".into())],
+            }),
+            Op::Pop,
+            Op::Return,
+        ];
+        let report = analyze(&m, "Main").unwrap();
+        assert_eq!(report.types.get(&3), Some(&3));
+        assert!(report.diagnostics.is_empty(), "{:?}", report.diagnostics);
     }
 
     fn return_fixture() -> Module {

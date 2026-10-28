@@ -104,7 +104,7 @@ public class JsonSerializer {
         return DocumentWriter(options.WriteIndented).WriteBytes(ObjectMapper.Write(value)?)
     }
 
-    static func Deserialize<T>(text: string) -> Result<T, JsonError> {
+    static func Deserialize<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | DynamicallyAccessedMemberTypes.PublicProperties)] T>(text: string) -> Result<T, JsonError> {
         let instance = Deserialize(text, typeof(T))?
         return Ok((T)instance)
     }
@@ -112,12 +112,12 @@ public class JsonSerializer {
     /// <summary>Deserializes a complete borrowed UTF-8 document using the supported object mapping contract.</summary>
     /// <param name="utf8">The complete document, borrowed only during this call.</param>
     /// <returns>An independently owned value or a quota, UTF-8, syntax or mapping error.</returns>
-    static func Deserialize<T>(utf8: ReadOnlySlice<byte>) -> Result<T, JsonError> {
+    static func Deserialize<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | DynamicallyAccessedMemberTypes.PublicProperties)] T>(utf8: ReadOnlySlice<byte>) -> Result<T, JsonError> {
         let instance = Deserialize(utf8, typeof(T))?
         return Ok((T)instance)
     }
 
-    async static func Deserialize<T>(input: InputStream) -> Task<Result<T, JsonError>> {
+    async static func Deserialize<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | DynamicallyAccessedMemberTypes.PublicProperties)] T>(input: InputStream) -> Task<Result<T, JsonError>> {
         let instance = await Deserialize(input, typeof(T))?
         return Ok((T)instance)
     }

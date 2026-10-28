@@ -3,7 +3,7 @@
 Development API in `System.Diagnostics.CodeAnalysis`, owned by System.Runtime.
 
 - `DynamicallyAccessedMembersAttribute(memberTypes: DynamicallyAccessedMemberTypes)`
-  declares required members on a `TypeInfo` parameter, return value (`[return: ...]`), field, property or TypeInfo method receiver. Read-only `MemberTypes`
+  declares required members on a `TypeInfo` parameter, return value (`[return: ...]`), field, property, type/method generic parameter or TypeInfo method receiver. Read-only `MemberTypes`
   returns those flags. The attribute constructor stores metadata; runtime execution
   of the constructor is not the retention mechanism.
 - `DynamicallyAccessedMemberTypes` uses standard .NET flag values. Current native
@@ -16,8 +16,8 @@ See the generated [attribute reference](api/System/Diagnostics/CodeAnalysis/Dyna
 and [flag reference](api/System/Diagnostics/CodeAnalysis/DynamicallyAccessedMemberTypes/index.html).
 [Supported flow, diagnostics and annotated runtime APIs](https://github.com/marinasundstrom/neoCLR/blob/main/docs/dynamically-accessed-members.md)
 describe the current boundaries. Unknown-flow warnings mean retention has not been
-proven. Generic parameters and string
-resolution remain unsupported; project retention files remain available.
+proven. String resolution and arbitrary closed generic reflection targets remain
+unsupported; project retention files remain available.
 
 Nongeneric class/interface implementations should repeat the same parameter and return
 requirements as their interface declarations. The native backend reports `DAM2005`
@@ -26,7 +26,7 @@ interface contract or retain extra implementation bodies. Nongeneric reference-c
 overrides are checked against their nearest base declaration with `DAM2006`, including
 abstract declarations and closed generic base classes of nongeneric derived classes.
 Generic derived classes, generic methods/interface mappings and value-type overrides
-remain outside these checks. This does not add generic-parameter annotations.
+remain outside these checks. Generic parameter annotations do not extend this compatibility-check scope.
 
 Annotated returns validate the producer and propagate declared requirements to callers.
 Unknown or insufficient returned values produce DAM2001; known type tokens infer roots.
@@ -40,3 +40,10 @@ A method-level annotation on an instance method of TypeInfo or its implementatio
 applies to the receiver. Static methods and unrelated instance owners reject this
 target with DAM1001. Parameterless GetConstructors/GetProperties declare public
 constructor/property receiver requirements; corresponding implementations match.
+
+Type and method generic parameters accept attributes before their names. Known
+arguments at reachable generic calls and constructed type uses infer roots;
+`typeof(T)` carries T's requirements. Unannotated or weaker forwarding parameters
+warn with DAM2001. Generic JSON/HTTP JSON readers declare public parameterless
+construction and public properties, matching their TypeInfo overloads. Complete
+generic field/ancestry propagation and generic dispatch matching remain open.

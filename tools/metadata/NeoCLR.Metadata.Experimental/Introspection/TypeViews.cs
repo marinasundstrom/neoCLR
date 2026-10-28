@@ -73,6 +73,9 @@ public sealed class GenericParameterTypeInfo : TypeInfo
 {
     internal GenericParameterTypeInfo(MetadataLoadContext context, NominalTypeInfo owner, int position) : base(context)
     { DeclaringType = owner; Position = position; }
+    /// <summary>Gets metadata-only custom attributes on this generic parameter.</summary>
+    public IReadOnlyList<CustomAttributeInfo> GetCustomAttributes() => DeclaringType.Definition.GetGenericParameterCustomAttributes(Position)
+        .Select(a => new CustomAttributeInfo(Context, a)).ToArray();
     /// <summary>Gets the canonical declaring definition.</summary>
     public NominalTypeInfo DeclaringType { get; }
     /// <summary>Gets the zero-based declaration ordinal.</summary>

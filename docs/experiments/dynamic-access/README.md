@@ -50,3 +50,7 @@ nongeneric DefaultReader : Reader<int>. Its second parameter exercises substitut
 from T to int. Matching annotations print `7`; changing only the override's annotation
 to PublicProperties now reports DAM2006, which the previous backend skipped.
 See [closed-base qualification](../../validation/dynamic-access-generic-base-20261028/README.md).
+
+The `generic` project uses generic JsonSerializer.Deserialize, a generic type
+Inspector<T>, and an annotated generic method. It prints `retained`, `1`, `1`
+without a retention file; see [generic qualification](../../validation/dynamic-access-generic-20261028/README.md).
