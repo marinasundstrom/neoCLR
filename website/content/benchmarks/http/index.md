@@ -4,6 +4,29 @@
 tracks plain HTTP and HTTP JSON using the [standard procedure](/benchmarks/gc/procedure/).
 Those experimental AOT results are separate from the published-package series below.
 
+## Development: mixed scheduling and I/O qualification — 28 October 2026
+
+Twenty-four endpoint methods exercise nested/shared-capture tasks, allocation,
+synchronous files and delayed downstream HTTP. Four clients, matched 1 MiB heaps,
+lazy JIT and bounded tracing; **one diagnostic run per mode**:
+
+| Mode | Checked requests | 96-request warm batch (ms) | Queue peak | Queue residence median / p95 (µs) |
+| --- | ---: | ---: | ---: | ---: |
+| baseline-sync | 120 | 141.7 | 13 | 289.8 / 928.1 |
+| shared-sync | 120 | 150.2 | 14 | 399.4 / 949.2 |
+| baseline-live | 120 | 206.5 | 12 | 265.6 / 1326.7 |
+| shared-live | 120 | 220.9 | 15 | 556.6 / 1369.5 |
+
+Queue residence includes first-use and warm requests, so lazy compilation can
+contribute to those intervals.
+
+All 480 requests and shutdown checks pass after qualifying DNS/multi-address and
+file native boundaries for concurrent GC. These are traced observations, not
+median throughput or production-capacity results. Shared queues do not improve
+this cohort. Synchronous file work still blocks the owner; DNS completion still
+uses polling. Untraced pressure, HTTP/binding phase profiles and AOT remain next.
+[Evidence and limitations](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/shared-scheduling-mixed-20261028/README.md).
+
 ## Development: immutable interface views - 28 October 2026
 
 The runtime reuses successfully computed interface inheritance within bounded,

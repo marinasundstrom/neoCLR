@@ -1,5 +1,7 @@
 # neoCLR platform roadmap
 
+**Mixed HTTP correctness and pressure (2026-10-28):** [24-endpoint qualification](validation/shared-scheduling-mixed-20261028/README.md) now passes nested/shared-capture tasks, files and downstream HTTP under both collectors after correcting native provider frame/admission gaps. Queue peaks reach 12–15; the single traced shared-queue cohort is slower. The author additionally directs HTTP-stack/binding blocking investigation. Next separate untraced load/AOT comparisons from phase profiling, including synchronous owner file work and DNS polling; this does not close the capacity/context-profile gate.
+
 **Shared queue profiling (2026-10-28):** [Precise session/queue traces](validation/shared-scheduler-queue-trace-20261028/README.md)
 now capture all HTTP Task.Run admissions and dispatch-root lifetimes under both
 collectors, with teardown and compiled-out checks. Every short case reaches only

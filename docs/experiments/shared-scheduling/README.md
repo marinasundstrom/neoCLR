@@ -85,3 +85,15 @@ events and summarizes native carrier/GC intervals. It does not report those
 intervals as managed task-queue latency. See the
 [first HTTP qualification](../../validation/shared-scheduling-http-20261028/README.md)
 for retained recipes and the remaining coverage/resolution gaps.
+
+
+## Mixed HTTP and native-provider qualification
+
+`Mixed.rvnproj`, `prepare-http.py --mixed`, and `mixed-http.py` cover 24 endpoints
+including short/allocating/nested tasks, synchronous files and delayed loopback
+HTTP. Use the fixed Raven neoCLR compiler (`91c1edca8` or later); the standard
+library bundle alone does not replace its packaged compiler. `validate-files.py`
+also qualifies DNS and multi-address socket providers during active epochs.
+[Results, reproducible recipes and blocking audit](../../validation/shared-scheduling-mixed-20261028/README.md)
+retain all four diagnostic cases and their regressions. These checks are not a
+production throughput benchmark; untraced/load/AOT and phase profiling remain open.

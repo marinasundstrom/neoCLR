@@ -3,6 +3,13 @@
 #include <string.h>
 #include <stdio.h>
 #define CHECK(x) do { if (!(x)) { fprintf(stderr, "client contract line %d\n", __LINE__); return __LINE__; } } while (0)
+#ifdef NEOCLR_CLIENT_LIVE
+extern int32_t experiment_gc_begin(neoclr_aot_context *, const neoclr_probe_frame *, neoclr_gc_conditional_root *, uint32_t);
+extern void experiment_gc_candidate_counts(uint64_t *);
+#define BEGIN_LIVE(c) do { uint64_t counts[6]; CHECK(!experiment_gc_begin(c, NULL, NULL, 0)); experiment_gc_candidate_counts(counts); CHECK(counts[5]); } while (0)
+#else
+#define BEGIN_LIVE(c) ((void)0)
+#endif
 void neoclr_dns_test_hold(unsigned);
 unsigned neoclr_dns_test_workers(void);
 static int poll(neoclr_aot_context *c, uint64_t *root) {
@@ -32,6 +39,7 @@ int main(void) {
     CHECK(neoclr_dns_result_v1(id, &c, out) == 3);
     CHECK(poll(&c, &root) == 1);
     CHECK(!neoclr_socket_poll_v1(&c, &root));
+    BEGIN_LIVE(&c);
     int32_t dns_status = neoclr_dns_result_v1(id, &c, out);
     if (dns_status || out[0] != 7) fprintf(stderr, "dns status %d tag %llu value %llu\n", dns_status, (unsigned long long)out[0], (unsigned long long)out[1]);
     CHECK(!dns_status && out[0] == 7);
@@ -39,13 +47,18 @@ int main(void) {
     uint64_t snapshot_root;
     CHECK(!neoclr_gc_host_root_create_v1(&c, snapshot, &snapshot_root));
     CHECK(!neoclr_gc_collect_v1(&c, NULL));
+    BEGIN_LIVE(&c);
     CHECK(!neoclr_dns_addresses_v1((uint32_t)out[0], out[1], &c, &copy) && copy != snapshot);
+    uint64_t copy_root;
+    CHECK(!neoclr_gc_host_root_create_v1(&c, copy, &copy_root));
+    CHECK(!neoclr_gc_collect_v1(&c, NULL));
     uint64_t *strings = copy;
     CHECK(strings[1] == 1);
     const neoclr_aot_text *text = (const void *)(uintptr_t)strings[2];
     CHECK(text->length == 9 && !memcmp(text + 1, "127.0.0.1", 9));
     CHECK(neoclr_dns_result_v1(id, &c, out) == 3);
     CHECK(!neoclr_gc_host_root_release_v1(&c, snapshot_root));
+    CHECK(!neoclr_gc_host_root_release_v1(&c, copy_root));
     /* Frozen worker proves cancellation/deadline delivery and scope teardown do
      * not join blocking work or let workers retain the guest context. */
     neoclr_dns_test_hold(1);

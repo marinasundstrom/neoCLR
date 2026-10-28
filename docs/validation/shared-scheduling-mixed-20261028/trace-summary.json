@@ -1,0 +1,405 @@
+{
+  "scope": "Summarize bounded native carrier/GC traces; not managed task-queue residence.",
+  "source": "/Users/robert/Projects/neoclr/target/shared-scheduling-mixed-dns-run-20261028/results.json",
+  "rows": [
+    {
+      "mode": "baseline-sync",
+      "sample": "mixed",
+      "events": 5710,
+      "kinds": {
+        "3:100": 177,
+        "3:101": 177,
+        "2:1": 2,
+        "2:3": 1152,
+        "2:5": 1,
+        "2:4": 1152,
+        "2:6": 1151,
+        "4:202": 574,
+        "4:203": 574,
+        "4:200": 240,
+        "4:201": 240,
+        "2:8": 134,
+        "2:9": 134,
+        "2:2": 2
+      },
+      "clock": "mach_absolute_time/ns",
+      "schedulerAdmitted": 240,
+      "schedulerAbandoned": 0,
+      "schedulerQueueHighWater": 13,
+      "otherDispatches": 334,
+      "schedulerQueueResidence": {
+        "count": 240,
+        "minNs": 5958,
+        "medianNs": 289750.5,
+        "p95Ns": 928125,
+        "p99Ns": 18075458,
+        "maxNs": 19671083
+      },
+      "schedulerDequeueToDispatch": {
+        "count": 240,
+        "minNs": 0,
+        "medianNs": 20.5,
+        "p95Ns": 42,
+        "p99Ns": 42,
+        "maxNs": 83
+      },
+      "schedulerDispatchRootHold": {
+        "count": 574,
+        "minNs": 208,
+        "medianNs": 333.0,
+        "p95Ns": 5500,
+        "p99Ns": 6500,
+        "maxNs": 6959
+      },
+      "instrumentationEventStorageBytes": 6291456,
+      "parkedCarrierReturn": {
+        "count": 1,
+        "minNs": 5500,
+        "medianNs": 5500,
+        "p95Ns": 5500,
+        "p99Ns": 5500,
+        "maxNs": 5500
+      },
+      "finishedCarrierReturn": {
+        "count": 1151,
+        "minNs": 625,
+        "medianNs": 917,
+        "p95Ns": 1625,
+        "p99Ns": 3750,
+        "maxNs": 6792
+      },
+      "completedOperationToCarrierEnter": {
+        "count": 1,
+        "minNs": 9958,
+        "medianNs": 9958,
+        "p95Ns": 9958,
+        "p99Ns": 9958,
+        "maxNs": 9958
+      },
+      "gcRequest": {
+        "count": 177,
+        "minNs": 125,
+        "medianNs": 35917,
+        "p95Ns": 63500,
+        "p99Ns": 67583,
+        "maxNs": 73916
+      },
+      "carrierCounters": [
+        1151,
+        1152,
+        2,
+        2,
+        2162688,
+        0
+      ],
+      "osSwitchCounters": [
+        0,
+        2616
+      ],
+      "processMemory": null
+    },
+    {
+      "mode": "shared-sync",
+      "sample": "mixed",
+      "events": 5700,
+      "kinds": {
+        "3:100": 171,
+        "3:101": 171,
+        "2:1": 2,
+        "2:3": 1156,
+        "2:5": 1,
+        "2:4": 1156,
+        "2:6": 1155,
+        "4:202": 576,
+        "4:203": 576,
+        "4:200": 240,
+        "4:201": 240,
+        "2:8": 127,
+        "2:9": 127,
+        "2:2": 2
+      },
+      "clock": "mach_absolute_time/ns",
+      "schedulerAdmitted": 240,
+      "schedulerAbandoned": 0,
+      "schedulerQueueHighWater": 14,
+      "otherDispatches": 336,
+      "schedulerQueueResidence": {
+        "count": 240,
+        "minNs": 5875,
+        "medianNs": 399354.0,
+        "p95Ns": 949250,
+        "p99Ns": 20576958,
+        "maxNs": 22397709
+      },
+      "schedulerDequeueToDispatch": {
+        "count": 240,
+        "minNs": 0,
+        "medianNs": 41.0,
+        "p95Ns": 42,
+        "p99Ns": 42,
+        "maxNs": 84
+      },
+      "schedulerDispatchRootHold": {
+        "count": 576,
+        "minNs": 208,
+        "medianNs": 334.0,
+        "p95Ns": 6000,
+        "p99Ns": 7042,
+        "maxNs": 7334
+      },
+      "instrumentationEventStorageBytes": 6291456,
+      "parkedCarrierReturn": {
+        "count": 1,
+        "minNs": 5042,
+        "medianNs": 5042,
+        "p95Ns": 5042,
+        "p99Ns": 5042,
+        "maxNs": 5042
+      },
+      "finishedCarrierReturn": {
+        "count": 1155,
+        "minNs": 625,
+        "medianNs": 917,
+        "p95Ns": 1667,
+        "p99Ns": 4333,
+        "maxNs": 6167
+      },
+      "completedOperationToCarrierEnter": {
+        "count": 1,
+        "minNs": 9833,
+        "medianNs": 9833,
+        "p95Ns": 9833,
+        "p99Ns": 9833,
+        "maxNs": 9833
+      },
+      "gcRequest": {
+        "count": 171,
+        "minNs": 125,
+        "medianNs": 36084,
+        "p95Ns": 63500,
+        "p99Ns": 77208,
+        "maxNs": 79334
+      },
+      "carrierCounters": [
+        1155,
+        1156,
+        2,
+        2,
+        2162688,
+        0
+      ],
+      "osSwitchCounters": [
+        0,
+        2720
+      ],
+      "processMemory": null
+    },
+    {
+      "mode": "baseline-live",
+      "sample": "mixed",
+      "events": 6006,
+      "kinds": {
+        "3:100": 181,
+        "3:101": 181,
+        "2:1": 2,
+        "2:3": 1158,
+        "2:5": 1,
+        "2:4": 1158,
+        "2:6": 1157,
+        "4:202": 577,
+        "4:203": 577,
+        "4:200": 240,
+        "4:201": 240,
+        "3:110": 148,
+        "2:8": 118,
+        "2:9": 118,
+        "3:111": 136,
+        "3:112": 12,
+        "2:2": 2
+      },
+      "clock": "mach_absolute_time/ns",
+      "schedulerAdmitted": 240,
+      "schedulerAbandoned": 0,
+      "schedulerQueueHighWater": 12,
+      "otherDispatches": 337,
+      "schedulerQueueResidence": {
+        "count": 240,
+        "minNs": 7833,
+        "medianNs": 265625.0,
+        "p95Ns": 1326666,
+        "p99Ns": 30100667,
+        "maxNs": 32795000
+      },
+      "schedulerDequeueToDispatch": {
+        "count": 240,
+        "minNs": 0,
+        "medianNs": 41.0,
+        "p95Ns": 42,
+        "p99Ns": 42,
+        "maxNs": 125
+      },
+      "schedulerDispatchRootHold": {
+        "count": 577,
+        "minNs": 208,
+        "medianNs": 292,
+        "p95Ns": 500,
+        "p99Ns": 791,
+        "maxNs": 875
+      },
+      "instrumentationEventStorageBytes": 6291456,
+      "parkedCarrierReturn": {
+        "count": 1,
+        "minNs": 3459,
+        "medianNs": 3459,
+        "p95Ns": 3459,
+        "p99Ns": 3459,
+        "maxNs": 3459
+      },
+      "finishedCarrierReturn": {
+        "count": 1157,
+        "minNs": 625,
+        "medianNs": 834,
+        "p95Ns": 1583,
+        "p99Ns": 3333,
+        "maxNs": 5625
+      },
+      "completedOperationToCarrierEnter": {
+        "count": 1,
+        "minNs": 26750,
+        "medianNs": 26750,
+        "p95Ns": 26750,
+        "p99Ns": 26750,
+        "maxNs": 26750
+      },
+      "gcRequest": {
+        "count": 181,
+        "minNs": 209,
+        "medianNs": 41084,
+        "p95Ns": 91583,
+        "p99Ns": 100916,
+        "maxNs": 125166
+      },
+      "carrierCounters": [
+        1157,
+        1158,
+        2,
+        2,
+        2162688,
+        0
+      ],
+      "osSwitchCounters": [
+        0,
+        2883
+      ],
+      "processMemory": null
+    },
+    {
+      "mode": "shared-live",
+      "sample": "mixed",
+      "events": 6054,
+      "kinds": {
+        "3:100": 192,
+        "3:101": 192,
+        "2:1": 2,
+        "2:3": 1154,
+        "2:5": 1,
+        "2:4": 1154,
+        "2:6": 1153,
+        "4:202": 575,
+        "4:203": 575,
+        "4:200": 240,
+        "4:201": 240,
+        "3:110": 158,
+        "2:8": 129,
+        "2:9": 129,
+        "3:111": 146,
+        "3:112": 12,
+        "2:2": 2
+      },
+      "clock": "mach_absolute_time/ns",
+      "schedulerAdmitted": 240,
+      "schedulerAbandoned": 0,
+      "schedulerQueueHighWater": 15,
+      "otherDispatches": 335,
+      "schedulerQueueResidence": {
+        "count": 240,
+        "minNs": 7375,
+        "medianNs": 556562.5,
+        "p95Ns": 1369500,
+        "p99Ns": 30142792,
+        "maxNs": 32889125
+      },
+      "schedulerDequeueToDispatch": {
+        "count": 240,
+        "minNs": 0,
+        "medianNs": 41.0,
+        "p95Ns": 42,
+        "p99Ns": 42,
+        "maxNs": 42
+      },
+      "schedulerDispatchRootHold": {
+        "count": 575,
+        "minNs": 208,
+        "medianNs": 292,
+        "p95Ns": 500,
+        "p99Ns": 792,
+        "maxNs": 1417
+      },
+      "instrumentationEventStorageBytes": 6291456,
+      "parkedCarrierReturn": {
+        "count": 1,
+        "minNs": 3541,
+        "medianNs": 3541,
+        "p95Ns": 3541,
+        "p99Ns": 3541,
+        "maxNs": 3541
+      },
+      "finishedCarrierReturn": {
+        "count": 1153,
+        "minNs": 625,
+        "medianNs": 875,
+        "p95Ns": 3958,
+        "p99Ns": 5625,
+        "maxNs": 7833
+      },
+      "completedOperationToCarrierEnter": {
+        "count": 1,
+        "minNs": 28667,
+        "medianNs": 28667,
+        "p95Ns": 28667,
+        "p99Ns": 28667,
+        "maxNs": 28667
+      },
+      "gcRequest": {
+        "count": 192,
+        "minNs": 208,
+        "medianNs": 43729.0,
+        "p95Ns": 91834,
+        "p99Ns": 105167,
+        "maxNs": 110167
+      },
+      "carrierCounters": [
+        1153,
+        1154,
+        2,
+        2,
+        2162688,
+        0
+      ],
+      "osSwitchCounters": [
+        0,
+        2832
+      ],
+      "processMemory": null
+    }
+  ],
+  "limitations": [
+    "Traced short qualification runs, not headline performance or capacity.",
+    "Park/finish to leave includes trace emission and swapcontext return; root parking occurs before its start.",
+    "Completion to enter includes pump selection; not pure CPU context-switch cost.",
+    "Runnable queue events cover shared scheduler submissions, not every state-machine await or external I/O wait.",
+    "Dispatch-root release can precede callback execution; root-hold duration is not execution time.",
+    "OS switches cover the whole process including JIT/GC helper threads.",
+    "Process RSS includes JIT/compiler memory; virtual stack reservation is not resident memory."
+  ]
+}

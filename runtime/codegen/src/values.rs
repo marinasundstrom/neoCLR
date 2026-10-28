@@ -626,6 +626,7 @@ fn compile_with_driver<M: Module>(
                         || d.string_compare_canonical.contains(&i)
                         || d.string_compare_ignore_case.contains(&i)
                         || d.string_starts_with_ordinal.contains(&i)
+                        || d.string_contains_ordinal.contains(&i)
                         || d.string_slice_utf8.contains(&i)
                         || d.byte_memory_create.contains(&i)
                         || d.byte_memory_slice.contains(&i)
@@ -659,6 +660,16 @@ fn compile_with_driver<M: Module>(
                         // The single-address provider copies the address and
                         // retains callbacks through the same host-root boundary
                         // as accept. Its checked result needs a published frame.
+                        // DNS workers retain only native copies. Managed results
+                        // initialize fresh noncollecting allocations, traced at
+                        // owner remark; callbacks use host roots like accept.
+                        || d.dns_lookup.contains(&i)
+                        || d.dns_lookup_until.contains(&i)
+                        || d.dns_cancel.contains(&i)
+                        || d.dns_result.contains(&i)
+                        || d.dns_addresses.contains(&i)
+                        || d.socket_connect_addresses.contains(&i)
+                        || d.socket_connect_addresses_until.contains(&i)
                         || d.socket_connect.contains(&i)
                         || d.socket_connect_result.contains(&i)
                         || d.socket_cancel.contains(&i)
@@ -669,6 +680,11 @@ fn compile_with_driver<M: Module>(
                         || d.socket_transfer_result.contains(&i)
                         || d.socket_receive_until.contains(&i)
                         || d.socket_send_until.contains(&i)
+                        // Blocking owner-host file services copy paths before
+                        // allocation; read publishes fresh atomic UTF-8 storage,
+                        // write borrows rooted inputs without managed mutation.
+                        || d.file_input.contains(&i)
+                        || d.file_output.contains(&i)
                 });
             // The exclusive callback lease admits no owner-affine scheduling,
             // socket, TLS or arbitrary native service. Broader live HTTP providers

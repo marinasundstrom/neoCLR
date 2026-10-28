@@ -293,6 +293,25 @@ pub(crate) fn root_providers(module: &impl Module) -> Vec<(&'static str, Signatu
             "neoclr_socket_accept_v1",
             make(&[I64, I64, I64, I64], &[I32]),
         ),
+        ("neoclr_dns_lookup_v1", make(&[I64, I64, I64, I64], &[I32])),
+        (
+            "neoclr_dns_lookup_until_v1",
+            make(&[I64, I64, I64, I64, I64], &[I32]),
+        ),
+        ("neoclr_dns_cancel_v1", make(&[I64, I64, I64], &[I32])),
+        ("neoclr_dns_result_v1", make(&[I64, I64, I64], &[I32])),
+        (
+            "neoclr_dns_addresses_v1",
+            make(&[I32, I64, I64, I64], &[I32]),
+        ),
+        (
+            "neoclr_socket_connect_addresses_v1",
+            make(&[I64, I32, I64, I64, I64], &[I32]),
+        ),
+        (
+            "neoclr_socket_connect_addresses_until_v1",
+            make(&[I64, I32, I64, I64, I64, I64], &[I32]),
+        ),
         (
             "neoclr_socket_connect_v1",
             make(&[I64, I32, I64, I64, I64], &[I32]),
@@ -470,6 +489,10 @@ pub(crate) fn root_providers(module: &impl Module) -> Vec<(&'static str, Signatu
             make(&[I64, I64, I64], &[I32]),
         ),
         (
+            "neoclr_string_contains_ordinal_v1",
+            make(&[I64, I64, I64], &[I32]),
+        ),
+        (
             "experiment_gc_store_text",
             make(&[I64, I64, I32, I64], &[I32]),
         ),
@@ -525,6 +548,16 @@ pub(crate) fn root_providers(module: &impl Module) -> Vec<(&'static str, Signatu
             make(&[I64, I64, I32, I64, I32, I64, I32], &[]),
         ),
         ("neoclr_native_stack_check_v1", make(&[], &[I32])),
+        // File reads close the descriptor before rooted fresh-text allocation.
+        // File writes allocate no managed objects and write only stack status.
+        (
+            "neoclr_file_read_utf8_rooted_v1",
+            make(&[I64, I32, I64, I64], &[I32]),
+        ),
+        (
+            "neoclr_file_write_utf8_v1",
+            make(&[I64, I64, I32, I64], &[I32]),
+        ),
     ];
     if borrowed_stores_enabled() {
         providers.push(("experiment_gc_store_state_borrow", make(&[], &[I64])));

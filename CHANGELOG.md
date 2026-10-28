@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-28
 
+- Qualify 24-endpoint mixed HTTP with nested/shared-capture tasks, files and downstream network I/O under both collectors and ready-queue variants. Fix missing DNS/multi-address native frame classification and owner-host provider admission; admit audited file/Contains providers while retaining restricted worker service boundaries. Twelve optimized/UBSan native executions and 480 diagnostic HTTP requests pass. Preserve slower shared-queue observations and record HTTP/binding blocking candidates; no capacity or throughput gain is claimed.
+
 - Integrate Raven neoCLR compiler fix `91c1edca8` for structural callback overload specificity. Task.Run infers async unwrapping without explicit type arguments; 21 focused compiler tests and 80 nested-task HTTP requests pass across both collectors and ready-queue variants. Record the unchanged two pre-existing broader compiler-test failures and remaining mixed-I/O limits; packaged SDK replacement and website publication are separate.
 
 - Extend bounded execution tracing to shared scheduler runnable admission/dequeue and dispatch-root ownership, including queued abandonment. Use an explicitly labeled precise macOS session clock and preserve compiled-out adapter assembly. Qualify lifetime/loss checks and eight HTTP diagnostic cases under both collectors; each captures all 132 submissions but reaches only queue depth one. Retain the concurrent JSON regression and clock/overhead limits; pressure, retained-memory and mixed-I/O/AOT profiling remain open.

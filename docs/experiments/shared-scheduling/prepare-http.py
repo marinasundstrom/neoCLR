@@ -16,6 +16,7 @@ p.add_argument('--host-recipes', type=Path, required=True)
 p.add_argument('--selection', type=Path, required=True)
 p.add_argument('--output', type=Path, required=True)
 p.add_argument('--trace', action='store_true', help='Separate diagnostic builds, never headline timings')
+p.add_argument('--mixed', action='store_true', help='Mixed file/network/nested-task workload')
 a = p.parse_args()
 here = Path(__file__).resolve().parent
 root = here.parents[2]
@@ -28,6 +29,7 @@ report = dict(passed=False, recipes={}, inputs={}, commands=[],
               scope='Matched lazy JIT HTTP queues; owner affinity unchanged. '
                     'Both collectors use 1 MiB heaps and 1024/16384 pacing budgets.')
 if a.trace: report['diagnosticOnly'] = 'Bounded owner async/GC tracing enabled; includes instrumentation overhead'
+if a.mixed: report['workload'] = 'twenty-four-route-mixed-http'
 
 def record(path):
     path = Path(path).resolve()
@@ -45,7 +47,7 @@ try:
         record(path)
     run(['python3', live/'generate.py', '--output', out/'live-gc.c'])
     run(['python3', live/'native-providers.py', '--output', out/'text-arena.c'])
-    guest = here/'bin/neoclr/SharedSchedulingHttp.dll'
+    guest = here/'bin/neoclr'/('SharedSchedulingMixed.dll' if a.mixed else 'SharedSchedulingHttp.dll')
     assert guest.is_file(), 'Compile Http.rvnproj with the supplied bundle first'
     roots = runpy.run_path(str(bundle/'tools/run-native-sample.py'))['reflection_roots'](
         a.runtime.resolve(), guest, ['Person'], run)
@@ -69,6 +71,7 @@ try:
                 c.append(item)
             c[c.index('-o')+1] = str(host)
             if policy == 'shared': c.append('-DNEOCLR_SHARED_READY_QUEUE')
+            if a.mixed: c.append(str(root/'docs/experiments/aot-console/file-output.c'))
             if a.trace: c += ['-DNEOCLR_ASYNC_TRACE', '-DNEOCLR_EXECUTION_TRACE',
                              '-I', str(native/'trace'), str(native/'trace/session.c')]
             run(c)
@@ -78,6 +81,7 @@ try:
             selection[3] = str(guest); selection[5] = str(host)
             i = selection.index('--reflection-roots'); del selection[i:i+2]
             selection += list(map(str, roots))
+            if a.mixed: selection.append('--bind-file-output')
             for i, item in enumerate(selection):
                 if i and selection[i-1] in ('--system', '--module', '--object-root'):
                     selection[i] = str(bundle/'lib'/Path(item).name)
@@ -98,7 +102,8 @@ try:
     for directory in (native, root/'runtime/codegen/src', root/'docs/experiments/aot-console'):
         for path in directory.rglob('*'):
             if path.suffix in ('.c', '.h', '.inc', '.rs', '.py', '.json'): record(path)
-    for path in (here/'Http.rvn', here/'Http.rvnproj', here/'jit-host.c'): record(path)
+    for path in (here/('Mixed.rvn' if a.mixed else 'Http.rvn'),
+                 here/('Mixed.rvnproj' if a.mixed else 'Http.rvnproj'), here/'jit-host.c'): record(path)
     report['passed'] = True
 finally:
     (out/'build.json').write_text(json.dumps(report, indent=2)+'\n')

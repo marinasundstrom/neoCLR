@@ -1,5 +1,25 @@
 # Development conversation record
 
+## 2026-10-28 — Mixed HTTP provider boundaries and blocking audit
+
+- **Author:** Asked to investigate what happens in the HTTP stack and its native
+  bindings, including blocking work and extra time/resources. The available
+  message ends mid-sentence; no further requirement is inferred.
+- **Assistant action:** Resumed the full mixed-I/O workload after the compiler
+  overload fix. Found DNS/multi-address services missing native-body framing and
+  live-provider admission; audited native copying, host roots and fresh-array
+  initialization, then qualified active epochs and enabled owner-host admission.
+  No broader owned-worker service permission or task relationship graph was added.
+- **Outcome:** Twelve optimized/UBSan provider executions and 480 checked requests
+  across 24 endpoints pass under sync/concurrent GC and baseline/shared queues.
+  Queue peaks reach 12–15. Single diagnostic runs are slower with shared queues;
+  these are not production capacity or throughput-gain claims.
+- **Findings/open:** Synchronous file operations run on the owner; DNS completion
+  is polled and HttpClient performs a lookup per exchange. These are source-backed
+  blocking/cost candidates, not measured bottleneck attribution. Next gather
+  untraced load/AOT controls and HTTP/binding phase/CPU profiles before choosing an
+  optimization. [Evidence](validation/shared-scheduling-mixed-20261028/README.md).
+
 ## 2026-10-28 — Fix the neoCLR callback overload gap
 
 - **Author:** Asked whether explicit overload selection was a compiler gap, then
@@ -16,6 +36,27 @@
 - **Open:** The broader mixed-I/O DNS/concurrent-GC failure and unrelated capture
   emitter limitations remain. This compiler slice does not claim throughput
   gains, complete scheduler qualification or a published SDK/website.
+
+## 2026-10-28 — Evidence before task-relationship tracking
+
+- **Author question:** Asked whether a scheduler should know that a task spawns
+  subtasks which may enter other queues, and use their relationship in decisions.
+- **Assistant proposal:** Distinguished parentage, await dependencies and explicit
+  lifetime/cancellation groups; suggested initially recording IDs/dependencies and
+  measuring locality/stealing/fairness. Compared .NET local queues and the separate
+  Task.Run DenyChildAttach contract in the
+  [scheduling research](design/go-inspired-scheduling.md#task-relationships-and-scheduling-author-question-2026-10-28).
+- **Author correction:** Only track relationships if there is a demonstrated
+  advantage; do not add complexity speculatively.
+- **Assistant revised plan/action:** Retain the existing relationship-neutral
+  scheduler and test nested fan-out/fan-in workloads first. No new parent graph,
+  dependency tracking or inherited scheduling policy was implemented. Any later
+  tracking proposal must demonstrate benefit and account for memory/bookkeeping/GC.
+- **Compiler question:** The author asked whether explicit overload selection is a
+  compiler gap. The assistant explained that Raven reports both Task.Run generic
+  sync and async overloads as applicable for a task-returning lambda; an explicit
+  result type selects async unwrapping. This is a fixture workaround, not a new
+  scheduling requirement or a completed compiler fix.
 
 ## 2026-10-28 — Shared scheduler predictability and context profiling
 

@@ -138,6 +138,41 @@ to prevent local reuse from starving external completions. Lock-free deques,
 async preemption, stack copying and automatic worker growth are later alternatives,
 not prerequisites or assumed improvements.
 
+### Task relationships and scheduling (author question, 2026-10-28)
+
+The author asked whether the scheduler should know that a task spawns subtasks
+which may enter different worker queues, and use that relationship in placement.
+The proposed answer separates diagnostic parentage, actual await/dependency edges,
+and explicit lifetime/cancellation groups. Parentage can inform an initial locality
+hint; an await edge identifies why a continuation is parked. Neither should impose
+automatic priority inheritance, task attachment, heap isolation or cross-thread
+migration. A dependency graph is not necessarily a tree: multiple consumers may
+await the same result. Diagnostic identities must not keep captures/ancestors alive.
+
+.NET's documented default scheduler uses local queues for nested work and stealing
+for load balancing; it does not require a global parent tree to place every task.
+Locality competes with fairness for unrelated requests.
+[TaskScheduler documentation](https://learn.microsoft.com/en-us/dotnet/fundamentals/runtime-libraries/system-threading-tasks-taskscheduler).
+Separately, Task.Run specifies DenyChildAttach: spawning work does not implicitly
+make its completion or exceptions part of the parent's lifecycle.
+[Task.Run contract](https://learn.microsoft.com/en-us/dotnet/api/system.threading.tasks.task.run).
+Preserve that distinction when comparing neoCLR semantics; incomplete support is
+a gap, not permission to silently introduce structured lifetime semantics.
+
+The author subsequently clarified that relationship tracking should be added only
+when it brings a proven benefit, not speculative complexity. This supersedes the
+assistant's initial suggestion to add parent/dependency diagnostic tracking first.
+Do not add runtime relationship metadata as a prerequisite for this investigation.
+First measure nested fan-out/fan-in alongside unrelated short HTTP requests using
+the existing scheduler, with bounded admission, all workers occupied, mixed CPU/I/O
+children and cancellation. A later bounded prototype must demonstrate a concrete
+placement/stealing/fairness advantage and account for bookkeeping, memory and GC
+costs before relationship tracking can be adopted. Awaiting
+must release the worker; do not replace it with blocking joins or unrestricted
+inline execution that changes reentrancy. This is a research/measurement proposal,
+not an adopted scheduling policy or a claim that current owner-affine Task.Run
+already supports parallel child migration.
+
 Suspending on async I/O or compilation should leave the worker available for
 other runnable work. I/O completion enqueues to the permitted destination, never
 runs arbitrary managed code on the completion thread. Keep blocking native calls
