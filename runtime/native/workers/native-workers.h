@@ -27,6 +27,13 @@ enum { NEOCLR_WORKER_OK, NEOCLR_WORKER_CANCELLED, NEOCLR_WORKER_FAILED };
 /* Caller-owned native_state must remain alive until completion/join. No managed
  * pointers in it. Worker count 1..4, capacity 1..16, consumer root capacity 32.
  * Constructor owns its arena; only the creating thread may collect/close/destroy. */
+/* NEOCLR_WORKER_OWNED_CALLBACKS is a private opt-in lease for this serialized
+ * bridge. It requires EXCLUSIVE_HEAP_ADOPTION and a matching compiled image
+ * neoclr_callback_gc_contract_v1 (ordinary=0, qualified live stores=1), checked
+ * against the linked collector before bootstrap. Acquire before root publication;
+ * release/join marking before root withdrawal/context teardown. Do not combine
+ * it with parallel worker participants or use it for HTTP owner-heap migration.
+ * The callback service whitelist excludes async/socket/TLS owner services. */
 /* Private synchronous generated-callback bridge. Bootstrap once on an empty
  * owner pool; both exports must belong to the same compiled image. No async,
  * resources, retained TLS roots or nested pool calls. Invoke owns the heap gate

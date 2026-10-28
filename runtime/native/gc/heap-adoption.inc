@@ -1,4 +1,11 @@
 #ifdef NEOCLR_EXCLUSIVE_HEAP_ADOPTION
+int32_t neoclr_gc_heap_callback_contract_v1(void) {
+#ifdef NEOCLR_OWNED_CONCURRENT_COLLECTOR
+    return 1;
+#else
+    return 0;
+#endif
+}
 int32_t neoclr_gc_heap_adopt_exclusive_v1(neoclr_aot_text_arena *target) {
     if (owned_heap.arena || gc_state.cleanup_active || host_head || resource_head ||
         neoclr_root_probe_head_v1() || neoclr_roots_parked_v1() || !blocks_valid(target)) return 3;

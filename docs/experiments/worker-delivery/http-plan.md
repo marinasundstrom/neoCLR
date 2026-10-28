@@ -79,3 +79,30 @@ Update development HTTP measurement tables from that cohort; leave native fixtur
 results labeled separately and preserve published-release evidence. Adoption
 requires correctness and a useful application tradeoff, not just a large synthetic
 wake-latency gain. Website publication remains a separate manual operation.
+
+The [restricted owned callback profile](../../validation/worker-owned-callback-20261028/README.md)
+now supplies the compiler barrier/image-contract prerequisite and completes actual
+worker marking epochs. Owner-affine services remain excluded from those callbacks.
+The next HTTP step should reuse this qualified boundary or improve owner scheduling
+without pretending the existing isolated heaps share captures. Evaluate the smallest
+useful path first; a general simultaneous-mutator redesign is not an acceptance
+requirement unless the chosen HTTP integration needs it.
+
+## Bounded acceptance target (author clarification, 2026-10-28)
+
+The author wants a useful integration that is "good enough for now", with further
+optimization left for later. This supersedes treating every possible scheduler or
+heap optimization as a prerequisite. Preserve shared captures, safe roots/barriers,
+bounded admission, cancellation and shutdown; reject unsupported services explicitly.
+Use the smallest real HTTP path that meets those contracts and measure both collectors.
+
+Before declaring this goal complete, retain matching before/after HTTP runs for
+small I/O handlers and heavier allocation/CPU handlers, including mixed traffic
+where short requests compete with long work. Verify responses and errors, compare
+throughput and p95/p99 at matched offered load, and record CPU/memory. Keep supported
+.NET/other-runtime controls where comparable; do not claim a runtime ranking from
+unmatched implementations. Investigate a substantial regression or clearly poor
+performance in a representative case. Defer small improvements, advanced work
+stealing, broad migration and ownership-metadata tuning unless they block safety
+or an acceptable measured result. Record the achieved boundary and remaining work
+rather than promising universally best performance.

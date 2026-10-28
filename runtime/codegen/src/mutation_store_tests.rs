@@ -3992,3 +3992,31 @@ fn mutable_byref_bindings_rejected_before_codegen() {
         );
     }
 }
+
+#[test]
+fn live_host_callbacks_reject_owner_bound_services() {
+    let (input, mut options) = tls_wrappers_input();
+    options.native_host_bootstrap = true;
+    let mut module = ObjectModule::new(
+        ObjectBuilder::new(
+            isa(target(), true),
+            "reject_callback_services",
+            cranelift_module::default_libcall_names(),
+        )
+        .unwrap(),
+    );
+    let error = crate::compiler::values::compile_into(
+        &input,
+        "Main",
+        Some(&options),
+        crate::compiler::Target::MacosArm64,
+        &mut module,
+        false,
+    )
+    .unwrap_err()
+    .to_string();
+    assert!(
+        error.contains("unaudited native replacement bodies"),
+        "{error}"
+    );
+}

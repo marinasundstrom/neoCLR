@@ -11,7 +11,7 @@ def replace(old,new,count=1):
     global s
     assert s.count(old)==count, (old[:80],s.count(old),count)
     s=s.replace(old,new)
-s='#include "gate.h"\n#if defined(NEOCLR_WORKER_GC) && !defined(NEOCLR_WORKER_READ_EPOCHS)\n#error Live shared heaps require the explicit read-epoch pool protocol\n#endif\n'+s
+s='#define NEOCLR_OWNED_CONCURRENT_COLLECTOR 1\n#include "gate.h"\n#if defined(NEOCLR_WORKER_GC) && !defined(NEOCLR_WORKER_READ_EPOCHS)\n#error Live shared heaps require the explicit read-epoch pool protocol\n#endif\n'+s
 # Optional persistent index belongs to the owned heap, not candidate/marker state.
 replace('    const void *bases[OWNED_BASE_CACHE_SIZE];', """    const void *bases[OWNED_BASE_CACHE_SIZE];
 #ifdef NEOCLR_LIVE_ALLOCATION_INDEX

@@ -98,14 +98,21 @@ A subsequent compiled Raven check passes shared graph/static mutation, rooted
 closure handoff, collection, fault delivery and recovery across 64 owner resumptions
 under both collector configurations (optimized and UBSan runtime builds). Owner
 concurrent epochs run, but compiled worker callbacks still collect synchronously:
-the restricted pool bridge lacks owned-heap registration. Concurrent worker marking
-and HTTP owner-heap integration remain open.
+the initial pool bridge lacked owned-heap registration. That check did not qualify
+concurrent worker marking or HTTP owner-heap integration.
 [Generated closure qualification](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/worker-delivery-generated-20261028/README.md).
 A separate native prototype now checks exclusive heap transfer and marker join.
 Rebuilding ownership metadata costs about 1 µs for 128 blocks and 7.4–7.6 µs for
-1,024 blocks in a short microbenchmark. It is not enabled for generated callbacks:
-their compiler profile must first admit concurrent store barriers.
+1,024 blocks in a short microbenchmark. Its initial qualification excluded generated
+callbacks until their compiler profile could admit concurrent store barriers.
 [Lease checks, cost table and limitations](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/heap-adoption-20261028/README.md).
+The restricted generated-callback profile now supplies those barriers and checks
+that the compiler image matches the collector. Both collectors pass shared-state,
+fault-recovery and cancellation checks; concurrent runs complete 64 worker marking
+epochs. HTTP owner-heap integration remains open.
+[Generated worker qualification](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/worker-owned-callback-20261028/README.md).
+The current target is a useful, measured HTTP integration that is good enough to
+ship incrementally; smaller tuning opportunities can follow later.
 Adoption requires proving the change in the real HTTP path and running a **new
 HTTP benchmark after integration**, with both collectors and matched workload/resource
 controls. Existing HTTP performance tables are not replaced by these native results.

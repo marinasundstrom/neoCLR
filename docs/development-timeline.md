@@ -1,5 +1,12 @@
 # Development conversation record
 
+## 2026-10-28 — Bounded worker/HTTP integration goal
+
+- **Author:** Explicitly asked to pursue integrating improved worker infrastructure and changes that improve HTTP processing. Subsequently clarified the target as “good enough for now”, leaving further improvement for later and avoiding over-optimization while seeking credible performance relative to other runtimes.
+- **Assistant response:** Pursue the safety gates through real HTTP integration and fresh sync/concurrent measurements; use a bounded acceptance target rather than a complete scheduler redesign or every possible micro-optimization. Preserve response correctness, shared captures, GC roots/barriers, overload/shutdown behavior, and compare throughput/tails and CPU/memory on representative small and heavier handlers. Unmatched tests cannot establish runtime rankings.
+- **Implemented prerequisite:** Restricted native callbacks now compile with live-store barriers and reject owner-affine services. The owned pool bridge checks image/collector compatibility before bootstrap, retains shared roots and joins marking before lease release. Both collectors pass optimized/UBSan generated consumers; concurrent cases start and finish 64 worker epochs. Existing shared-host cancellation, admission recovery, faults and teardown pass. [Evidence](validation/worker-owned-callback-20261028/README.md).
+- **Open:** The HTTP owner heap is not yet attached. The assistant will select the smallest useful safe integration or owner-scheduling improvement, then run fresh HTTP measurements; no application performance gain or completed integration goal is reported. Metadata/queue tuning is deferred unless evidence makes it necessary.
+
 ## 2026-10-28 — Exclusive heap prerequisite and compiler admission
 
 - **Author context:** Continued the bounded worker-delivery/shared-capture work, with both collectors and eventual HTTP proof/new benchmarks remaining the objective.

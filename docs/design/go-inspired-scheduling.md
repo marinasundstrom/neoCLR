@@ -268,6 +268,15 @@ the host-bootstrap compiler path does not yet admit live-store barriers. This is
 an implementation gap against the shared-capture Task.Run intent, not a new API
 semantic. Qualify the compiler/service/root boundary before worker marking.
 
+The [restricted owned callback profile](../validation/worker-owned-callback-20261028/README.md)
+now closes the generated-store barrier prerequisite: the image/collector contract
+must match, shared pool roots remain published, and each marker settles before
+handoff. Concurrent qualification completes 64 worker epochs with retained graph/
+static identity and fault recovery. Async/socket/TLS callback services remain
+excluded; this does not attach the HTTP owner's heap. Author clarification: target
+"good enough for now", use real HTTP evidence to find major regressions, and defer
+minor tuning or a complete scheduler redesign.
+
 **Author adoption gate:** prove the candidate applies to HTTP, then run a new
 benchmark after integration. Qualify captures, service ownership, faults,
 cancellation, overload and shutdown in the real handler path before claiming an

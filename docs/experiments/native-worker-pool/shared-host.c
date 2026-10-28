@@ -102,7 +102,12 @@ static int exhaust_callback_handles(neoclr_worker_job *job, void *state) {
     uint64_t handles[NEOCLR_GC_HOST_ROOT_LIMIT];
     for (unsigned i = 0; i < NEOCLR_GC_HOST_ROOT_LIMIT; i++)
         CHECK(!neoclr_gc_host_root_create_v1(&foreign, value, &handles[i]));
+#ifdef NEOCLR_WORKER_OWNED_CALLBACKS
+    /* Exclusive adoption rejects foreign TLS roots before requesting a handle. */
+    CHECK(neoclr_worker_invoke_capture(job) == NEOCLR_AOT_FAULT_RUNTIME_ERROR);
+#else
     CHECK(neoclr_worker_invoke_capture(job) == NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT);
+#endif
     neoclr_worker_enter(job);
     CHECK(heap_owner->text.data == heap_data && !heap_owner->fault.code);
     neoclr_worker_leave(job);

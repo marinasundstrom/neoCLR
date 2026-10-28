@@ -10,6 +10,8 @@
  * Release with heap_release on this thread BEFORE withdrawing roots, destroying
  * the invocation context or unlocking. Concurrent release joins/cancels marking.
  * Native state is not transferred and this does not admit async/socket services. */
+/* Compiler image must match this collector before generated callbacks run. */
+int32_t neoclr_gc_heap_callback_contract_v1(void);
 int32_t neoclr_gc_heap_adopt_exclusive_v1(neoclr_aot_text_arena *);
 #endif
 #endif

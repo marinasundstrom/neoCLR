@@ -1,3 +1,13 @@
+#include "../gc/heap-adoption.h"
+#if defined(NEOCLR_WORKER_OWNED_CALLBACKS) && !defined(NEOCLR_EXCLUSIVE_HEAP_ADOPTION)
+#error Owned callbacks require exclusive heap adoption
+#endif
+#if defined(NEOCLR_WORKER_OWNED_CALLBACKS) && defined(NEOCLR_WORKER_GC)
+#error Exclusive callback leases cannot use parallel worker participants
+#endif
+#ifdef NEOCLR_WORKER_OWNED_CALLBACKS
+extern int32_t neoclr_callback_gc_contract_v1(void);
+#endif
 #define _POSIX_C_SOURCE 200809L
 #include "native-worker-trace.h"
 #ifdef NEOCLR_WORKER_QUEUES
@@ -430,12 +440,22 @@ neoclr_workers *neoclr_workers_create(unsigned workers, unsigned capacity, size_
 int32_t neoclr_workers_bootstrap(neoclr_workers *p, neoclr_worker_bootstrap bootstrap,
     neoclr_worker_invoke invoke, int32_t argument, neoclr_worker_handle *out) {
     if (!pthread_equal(p->owner, pthread_self()) || !bootstrap || !invoke || !out) return 3;
+#ifdef NEOCLR_WORKER_OWNED_CALLBACKS
+    if (neoclr_callback_gc_contract_v1() != neoclr_gc_heap_callback_contract_v1()) return 3;
+#endif
     heap_lock(p);
     if (p->closing || p->invoke || p->context.text.used || neoclr_root_probe_head_v1() || neoclr_roots_parked_v1()) {
         unlock(p); return 3;
     }
     uint64_t handle = 0;
+#ifdef NEOCLR_WORKER_OWNED_CALLBACKS
+    int32_t status = neoclr_gc_heap_adopt_exclusive_v1(&p->context.text);
+    if (status) { unlock(p); return status; }
+    status = bootstrap(argument, &handle, &p->context);
+    if (neoclr_gc_heap_release_v1(&p->context.text)) abort();
+#else
     int32_t status = bootstrap(argument, &handle, &p->context);
+#endif
     if (neoclr_gc_owned_roots_check_v1(&p->context, handle ? &handle : NULL, handle ? 1 : 0)) abort();
     if (!status) {
         void *value = NULL;
@@ -483,7 +503,13 @@ int32_t neoclr_worker_invoke_capture(neoclr_worker_job *j) {
     p->context.text = (neoclr_aot_text_arena){0};
     p->context.static_storage = NULL;
     uint64_t handle = 0;
+#ifdef NEOCLR_WORKER_OWNED_CALLBACKS
+    int32_t status = neoclr_gc_heap_adopt_exclusive_v1(&invocation.text);
+    int heap_adopted = !status;
+    if (!status) status = neoclr_gc_host_root_create_v1(&invocation, j->capture, &handle);
+#else
     int32_t status = neoclr_gc_host_root_create_v1(&invocation, j->capture, &handle);
+#endif
     if (!status) {
         neoclr_probe_storage slots[POOL_ROOT_SLOTS];
         unsigned count = pool_slots(p, slots);
@@ -494,12 +520,20 @@ int32_t neoclr_worker_invoke_capture(neoclr_worker_job *j) {
         neoclr_gc_enter_v1(&frame, &invocation, 0, slots, count, "[]", 2);
         neoclr_roots_park_v1(&parked);
         status = p->invoke(handle, &invocation);
+#ifdef NEOCLR_WORKER_OWNED_CALLBACKS
+        /* Join before withdrawing the pool roots or ending this context's life. */
+        if (neoclr_gc_heap_release_v1(&invocation.text)) abort();
+        heap_adopted = 0;
+#endif
         if (neoclr_root_probe_head_v1() || neoclr_roots_parked_v1() != &parked) abort();
         neoclr_roots_resume_v1(&parked);
         neoclr_gc_leave_v1(&frame);
         if (neoclr_gc_owned_roots_check_v1(&invocation, &handle, 1)) abort();
         if (neoclr_gc_host_root_release_v1(&invocation, handle)) abort();
     }
+#ifdef NEOCLR_WORKER_OWNED_CALLBACKS
+    if (heap_adopted && neoclr_gc_heap_release_v1(&invocation.text)) abort();
+#endif
     if (invocation.text.data != arena || invocation.text.capacity != capacity ||
         invocation.text.used > capacity || p->context.text.data ||
         p->context.text.capacity || p->context.text.used || p->context.static_storage) abort();

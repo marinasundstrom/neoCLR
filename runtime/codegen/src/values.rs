@@ -517,7 +517,10 @@ fn compile_with_driver<M: Module>(
                 && d.probe_stack_roots
                 && d.reference_arena
                 && !d.native_worker_safepoints
-                && !d.native_host_bootstrap
+                && (!d.native_host_bootstrap
+                    || (platform_target == super::Target::MacosArm64
+                        && !d.entry_host_io
+                        && d.entry_task_drain.is_empty()))
                 && (!d.entry_host_io || !d.entry_task_drain.is_empty())
                 && (d.entry_task_drain.is_empty()
                     || (d.task_queue_drain.is_some()
@@ -525,7 +528,10 @@ fn compile_with_driver<M: Module>(
                             || !d.runtime_async_startmanaged.is_empty())))
         })
     {
-        return Err("experimental live stores require owned published frames without host bootstrap/services".into());
+        return Err(
+            "experimental live stores require owned published frames and admitted host services"
+                .into(),
+        );
     }
     if details.is_some_and(|d| !d.native_gc && !d.string_intern.is_empty()) {
         return Err(
@@ -664,8 +670,24 @@ fn compile_with_driver<M: Module>(
                         || d.socket_receive_until.contains(&i)
                         || d.socket_send_until.contains(&i)
                 });
+            // The exclusive callback lease admits no owner-affine scheduling,
+            // socket, TLS or arbitrary native service. Broader live HTTP providers
+            // remain valid only for their separately qualified owner host.
+            let callback_admitted = !details.is_some_and(|d| d.native_host_bootstrap)
+                || reference_dispatch
+                || primitive_box
+                || details.is_some_and(|d| {
+                    d.object_type_queries.contains_key(&i)
+                        || d.int32_to_string.contains(&i)
+                        || d.int64_to_string.contains(&i)
+                        || d.uint64_to_string.contains(&i)
+                        || d.string_concat.contains(&i)
+                        || d.string_byte_count.contains(&i)
+                        || d.string_compare_ordinal.contains(&i)
+                });
             f.pinvoke.is_some()
-                || ((f.is_internal_call() || gc_points::native_body(&p, i, details)) && !admitted)
+                || ((f.is_internal_call() || gc_points::native_body(&p, i, details))
+                    && !(admitted && callback_admitted))
         })
         .map(|(index, function)| format!("function {index} ({})", function.name))
         .collect();
@@ -6366,6 +6388,36 @@ fn compile_with_driver<M: Module>(
         // Entry's prologue precedes its first budget check.
         if platform_target == super::Target::WindowsX64 && frame_charge(&context, true)? > 4096 {
             return Err("Windows stack experiment entry frame exceeds one page".into());
+        }
+    }
+    if bootstrap {
+        // The private worker adapter must reject an ordinary image before it
+        // can enable owned concurrent marking on that image's callbacks.
+        let mut contract = module.make_context();
+        contract
+            .func
+            .signature
+            .returns
+            .push(AbiParam::new(types::I32));
+        let id = module.declare_function(
+            "neoclr_callback_gc_contract_v1",
+            Linkage::Export,
+            &contract.func.signature,
+        )?;
+        let mut fb = FunctionBuilderContext::new();
+        {
+            let mut b = FunctionBuilder::new(&mut contract.func, &mut fb);
+            let entry = b.create_block();
+            b.switch_to_block(entry);
+            let mode = b.ins().iconst(types::I32, i64::from(live_stores));
+            b.ins().return_(&[mode]);
+            b.seal_all_blocks();
+            b.finalize();
+        }
+        if live_stores {
+            live_bodies.push((id, contract));
+        } else {
+            define_checked(module, id, &mut contract, false, long_range_calls)?;
         }
     }
     if details.is_some_and(|d| d.native_gc) {

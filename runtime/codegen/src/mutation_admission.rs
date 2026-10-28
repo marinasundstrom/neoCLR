@@ -277,6 +277,10 @@ pub(crate) fn root_providers(module: &impl Module) -> Vec<(&'static str, Signatu
         ("experiment_gc_store", make(&[I64, I64, I64, I32], &[I32])),
         ("neoclr_gc_callback_read_v1", make(&[I64, I64, I64], &[I32])),
         (
+            "neoclr_gc_host_root_create_v1",
+            make(&[I64, I64, I64], &[I32]),
+        ),
+        (
             "neoclr_socket_listen_v1",
             make(&[I64, I32, I32, I64, I64], &[I32]),
         ),

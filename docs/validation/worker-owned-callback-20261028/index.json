@@ -1,0 +1,34 @@
+{
+  "accepted.json.gz": {
+    "source": "target/worker-owned-callback-20261028-accepted/report.json",
+    "sha256": "e83864f7cbb0d0d3e66c848015d1db2249766fa263362fc6e058ec15200ca54c"
+  },
+  "assembly.json.gz": {
+    "source": "target/worker-owned-callback-20261028-assembly/report.json",
+    "sha256": "9759eeeb7b66833ff100aaa643fc1accb8945f346029430ef4346643bdd42fc3"
+  },
+  "compiler-tests.log.gz": {
+    "source": "target/worker-live-callback-20261028/final-compiler-tests.log",
+    "sha256": "e5b3698ddafa79db9271a00d157f7965fabd6a4074a52a4bf65473c467eaa69f"
+  },
+  "prior-admission-expectation.json.gz": {
+    "source": "target/worker-owned-callback-20261028-shared/report.json",
+    "sha256": "bb2dafe042f076699bcbf0ee776fd7170c67252bab4d392332ce6b1a3ca01c2e"
+  },
+  "command-4.log.gz": {
+    "source": "target/worker-owned-callback-20261028-accepted/command-4.log",
+    "sha256": "0048741a8872b0e73317ad67c0f814224dab0c700ea4241e0bb5a7809672a398"
+  },
+  "command-13.log.gz": {
+    "source": "target/worker-owned-callback-20261028-accepted/command-13.log",
+    "sha256": "015dbbcd124058bbd109946c1a8302d44630fd3b45b66078bf08e10b24f5136b"
+  },
+  "sync.o.gz": {
+    "source": "target/worker-owned-callback-20261028-accepted/sync.o",
+    "sha256": "f79e4d84460b558da43a866509b665e976d98b5e2eaa1aa8c50f4097f12a8c68"
+  },
+  "concurrent.o.gz": {
+    "source": "target/worker-owned-callback-20261028-accepted/concurrent.o",
+    "sha256": "65fbff57ac480f5c02dc0208f768d2984f7fd562c17f8dc704149e1ce5ef0fde"
+  }
+}

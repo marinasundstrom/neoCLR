@@ -83,3 +83,21 @@ prevent epochs even after ownership registration. The next prerequisite is a
 restricted barrier-instrumented callback contract; copying HTTP captures or merely
 registering their heap is insufficient. Persistent ownership metadata is a later
 cost-reduction candidate, subject to the HTTP integration gate.
+
+## Restricted generated owned callbacks
+
+`NEOCLR_WORKER_OWNED_CALLBACKS` now connects the exclusive lease to the serialized
+callback bridge. Its compiler profile instruments live stores and rejects owner-bound
+async/socket/TLS services. The compiled image and collector contracts must match
+before bootstrap; marker release precedes root withdrawal. Parallel participant
+mode cannot be combined with this lease.
+
+[Accepted generated checks](../../validation/worker-owned-callback-20261028/README.md)
+run 64 chained deliveries and complete 64 worker epochs in the concurrent cases,
+with shared cyclic captures/static state and fault recovery. Existing four-worker
+cancellation/admission/teardown checks pass under both collectors. Use
+`validate-owned-callbacks.py` with the matching compiler library test executable and
+bootstrap selection command. This supersedes the earlier worker-fallback limit
+only for this private profile; ordinary callbacks and HTTP owner heaps are unchanged.
+The author's "good enough for now" scope defers metadata/queue micro-optimization
+until useful HTTP integration and fresh measurements establish a need.

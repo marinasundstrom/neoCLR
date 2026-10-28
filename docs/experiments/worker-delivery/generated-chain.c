@@ -11,7 +11,7 @@ static neoclr_workers *pool;
 static neoclr_worker_handle capture;
 static uint64_t signal_id;
 static int pending, finished, faults;
-static atomic_uint_fast64_t allocations, collections, epochs_started;
+static atomic_uint_fast64_t allocations, collections, epochs_started, epochs_finished, epochs_cancelled;
 #ifdef DELIVERY_CONCURRENT
 extern void experiment_gc_candidate_counts(uint64_t *);
 #endif
@@ -30,7 +30,12 @@ static int work(neoclr_worker_job *j,void *state) {
     atomic_fetch_add(&collections,after.collections-before.collections);
 #ifdef DELIVERY_CONCURRENT
     experiment_gc_candidate_counts(epochs_after);
+#ifdef NEOCLR_WORKER_OWNED_CALLBACKS
+    CHECK(!epochs_after[5] && epochs_after[0]==epochs_after[1]+epochs_after[2]);
+#endif
     atomic_fetch_add(&epochs_started,epochs_after[0]-epochs_before[0]);
+    atomic_fetch_add(&epochs_finished,epochs_after[1]-epochs_before[1]);
+    atomic_fetch_add(&epochs_cancelled,epochs_after[2]-epochs_before[2]);
 #endif
     neoclr_worker_enter(j);
     neoclr_worker_result(j,(neoclr_worker_value){3,status,neoclr_worker_capture(j)});
@@ -79,7 +84,20 @@ static int32_t invoke(uint64_t h,neoclr_aot_context *c) {
 }
 static int32_t drain(neoclr_aot_context *c) { (void)c; return 0; }
 int main(void) {
+    #ifdef NEOCLR_WORKER_OWNED_CALLBACKS
+    pool=neoclr_workers_create(2,1,131072);
+#else
     pool=neoclr_workers_create(2,1,8192);
+#endif
+#ifdef NEOCLR_EXPECT_IMAGE_REJECTION
+    CHECK(pool && neoclr_workers_bootstrap(pool,neoclr_bootstrap_callback_v1,
+        neoclr_invoke_void_callback_v1,32,&capture)==3 && !capture.pool);
+    uint64_t untouched;
+    CHECK(neoclr_workers_collect(pool,&untouched) && !untouched);
+    CHECK(neoclr_workers_close(pool) && neoclr_workers_destroy(pool));
+    puts("PASS ordinary callback image rejected before owned live bootstrap");
+    return 0;
+#endif
     CHECK(pool && !neoclr_workers_bootstrap(pool,neoclr_bootstrap_callback_v1,
         neoclr_invoke_void_callback_v1,32,&capture));
     neoclr_async_external_source source={neoclr_workers_completion_descriptor(pool),poll_source,pool};
@@ -102,7 +120,11 @@ int main(void) {
     CHECK(neoclr_workers_close(pool) && neoclr_workers_destroy(pool));
 #ifdef DELIVERY_CONCURRENT
     /* Borrowed pool arenas have no owned-heap registration: synchronous fallback. */
+#ifdef NEOCLR_WORKER_OWNED_CALLBACKS
+    CHECK(atomic_load(&epochs_started)>0);
+#else
     CHECK(!atomic_load(&epochs_started));
+#endif
     uint64_t owner_epochs[6];
     experiment_gc_candidate_counts(owner_epochs);
     CHECK(owner_epochs[0] && !owner_epochs[5]);
@@ -111,8 +133,9 @@ int main(void) {
         (unsigned long long)owner_epochs[0],(unsigned long long)owner_epochs[1],
         (unsigned long long)owner_epochs[2]);
 #endif
-    printf("worker allocations=%llu collections=%llu epochsStarted=%llu\n",
+    printf("worker allocations=%llu collections=%llu epochsStarted=%llu finished=%llu cancelled=%llu\n",
         (unsigned long long)atomic_load(&allocations),(unsigned long long)atomic_load(&collections),
-        (unsigned long long)atomic_load(&epochs_started));
+        (unsigned long long)atomic_load(&epochs_started),
+        (unsigned long long)atomic_load(&epochs_finished),(unsigned long long)atomic_load(&epochs_cancelled));
     puts("PASS 64 generated shared closures: owner resume, ticket-only roots, collections, fault delivery and recovery");
 }
