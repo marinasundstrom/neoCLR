@@ -1046,3 +1046,6 @@ int32_t neoclr_gc_collect_managed_v1(neoclr_aot_context *c, void *out) {
     (void)out;
     return GC_REQUEST(c, neoclr_root_probe_head_v1(), NEOCLR_GC_TRIGGER_MANAGED);
 }
+
+/* Private worker experiment; compiled out of ordinary builds. */
+#include "heap-adoption.inc"

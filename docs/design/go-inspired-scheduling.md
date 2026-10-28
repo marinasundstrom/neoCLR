@@ -260,6 +260,14 @@ The parked owner retains a separate heap. Actual concurrent worker marking is
 still unqualified. HTTP integration requires owner/worker heap participation and
 service admission, not closure copying.
 
+The [exclusive heap lease prototype](../validation/heap-adoption-20261028/README.md)
+validates sequential native transfer and marker join. It rebuilds metadata at each
+lease (about 7.4–7.6 µs for 1,024 blocks in the short cost screen). A persistent heap
+control block may avoid that cost. It remains outside generated worker execution:
+the host-bootstrap compiler path does not yet admit live-store barriers. This is
+an implementation gap against the shared-capture Task.Run intent, not a new API
+semantic. Qualify the compiler/service/root boundary before worker marking.
+
 **Author adoption gate:** prove the candidate applies to HTTP, then run a new
 benchmark after integration. Qualify captures, service ownership, faults,
 cancellation, overload and shutdown in the real handler path before claiming an

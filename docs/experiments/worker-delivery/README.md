@@ -67,3 +67,19 @@ epochs and verifies actual owner epochs settle before teardown. Increasing from
 ownership/admission limitation, not proof that the workload cannot benefit from
 concurrent marking. Do not interpret collector build selection as concurrent
 worker-heap qualification.
+
+## Exclusive live-arena adoption prerequisite
+
+A separate `NEOCLR_EXCLUSIVE_HEAP_ADOPTION` experiment validates and adopts an
+existing unowned arena under a caller-proven exclusive lease. It rebuilds ownership
+metadata, rejects current TLS roots/resources and releases/joins the marker before
+handoff. [Contract, sync/concurrent checks and cost screen](../../validation/heap-adoption-20261028/README.md)
+cover sequential native-thread transfer. Run `validate-adoption.py --output <new-dir>`
+with the explicit SDKROOT above.
+
+This primitive is not enabled in the generated worker bridge. That bridge still
+lacks an admitted live-store-barrier compiler profile, and small-heap pressure can
+prevent epochs even after ownership registration. The next prerequisite is a
+restricted barrier-instrumented callback contract; copying HTTP captures or merely
+registering their heap is insufficient. Persistent ownership metadata is a later
+cost-reduction candidate, subject to the HTTP integration gate.

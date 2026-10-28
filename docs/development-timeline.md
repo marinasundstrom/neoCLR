@@ -1,5 +1,12 @@
 # Development conversation record
 
+## 2026-10-28 — Exclusive heap prerequisite and compiler admission
+
+- **Author context:** Continued the bounded worker-delivery/shared-capture work, with both collectors and eventual HTTP proof/new benchmarks remaining the objective.
+- **Assistant action:** Implemented a private exclusive live-arena adoption primitive and qualified native sequential handoff, full-validation rejection, free-list/index reconstruction and marker join under sync/concurrent GC in optimized/UBSan builds. The default native collector assembly is unchanged. A small lease-cost screen measures roughly 1 µs at 128 blocks and 7.4–7.6 µs at 1,024 blocks; these are not HTTP/task throughput results.
+- **Finding/correction:** A temporary generated-worker registration probe still produced no epochs in its small heap. Pressure/pacing can suppress epochs independently of ownership. Code inspection also showed host-bootstrap callbacks are excluded from the live-store-barrier compiler profile. The assistant withdrew worker integration rather than permitting uninstrumented writes alongside a marker; only the native primitive is retained. [Evidence and limits](validation/heap-adoption-20261028/README.md).
+- **Next bounded proposal:** Qualify a restricted barrier-instrumented callback profile, including shared/static/fault roots and native-service restrictions, before enabling worker marking. Later evaluate persistent heap ownership metadata to avoid per-callback rebuilding. HTTP owner participation, application qualification and a fresh benchmark remain open; no production adoption is inferred from continuation.
+
 ## 2026-10-28 — Bounded completion delivery and HTTP adoption gate
 
 - **Author:** Requested bounded worker-to-owner completion delivery, preserving shared captures and GC safety, with measurements under both collectors.

@@ -40,6 +40,14 @@ choice. A lease that blocks the I/O owner for the whole handler could erase the
 benefit. No heap attachment or managed scheduling default changes are qualified by
 this prerequisite.
 
+The [exclusive native lease prerequisite](../../validation/heap-adoption-20261028/README.md)
+now validates sequential transfer and marker join with both collectors. It remains
+outside the generated worker bridge: host-bootstrap callbacks are not admitted by
+the live-store-barrier compiler profile. Next qualify that restricted compiler path
+before enabling any worker marker. Preserve static initialization, captured graph
+identity, fault roots and native-service restrictions. Ownership alone does not
+establish barrier coverage; pressure collections can also suppress epochs.
+
 ## Fresh benchmark after integration
 
 Retain a build of the previous HTTP implementation as control and build the

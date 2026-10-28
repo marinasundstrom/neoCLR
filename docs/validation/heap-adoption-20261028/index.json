@@ -1,0 +1,22 @@
+{
+  "qualified.json.gz": {
+    "source": "target/heap-adoption-qualified-20261028-v2/report.json",
+    "sha256": "19f5701f3b0cd00ccb5b8af2b895797065e4d081dd3b038d7f64895d9547033e"
+  },
+  "initial-contract.json.gz": {
+    "source": "target/heap-adoption-contract-20261028/report.json",
+    "sha256": "e400657e2914375bb1ff1240ebec29ff03e02d43fd77cd281519c85e77f4d918"
+  },
+  "invalid-fixture.json.gz": {
+    "source": "target/heap-adoption-qualified-20261028/report.json",
+    "sha256": "77732bc22f8e18d0b802b13c1e1c39c2546376a055c7fb6acfc83f8e4c7ae020"
+  },
+  "withdrawn-worker-probe.json.gz": {
+    "source": "target/worker-heap-adoption-20261028/generated-validation.json",
+    "sha256": "b9dcd1c1c983d48878eae843f9d358ee30207539ab0a99a9139611a213ea279d"
+  },
+  "default-assembly.json.gz": {
+    "source": "target/heap-adoption-default-20261028/report.json",
+    "sha256": "96aa1cf6efdb67aff6ac471bf7084637bf1f3cc79fb5eb8a999336e0109abe7d"
+  }
+}

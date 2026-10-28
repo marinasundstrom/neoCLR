@@ -101,6 +101,11 @@ concurrent epochs run, but compiled worker callbacks still collect synchronously
 the restricted pool bridge lacks owned-heap registration. Concurrent worker marking
 and HTTP owner-heap integration remain open.
 [Generated closure qualification](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/worker-delivery-generated-20261028/README.md).
+A separate native prototype now checks exclusive heap transfer and marker join.
+Rebuilding ownership metadata costs about 1 µs for 128 blocks and 7.4–7.6 µs for
+1,024 blocks in a short microbenchmark. It is not enabled for generated callbacks:
+their compiler profile must first admit concurrent store barriers.
+[Lease checks, cost table and limitations](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/heap-adoption-20261028/README.md).
 Adoption requires proving the change in the real HTTP path and running a **new
 HTTP benchmark after integration**, with both collectors and matched workload/resource
 controls. Existing HTTP performance tables are not replaced by these native results.
