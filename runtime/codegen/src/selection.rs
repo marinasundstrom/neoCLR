@@ -1350,7 +1350,9 @@ fn select_validated_inventory(
     // A value constructed only on the stack cannot receive an interface call.
     // Source-wide boxing may have kept its conformance alive before reachability;
     // only boxes in the final selected bodies require executable interface views.
-    let boxed_values: BTreeSet<_> = projected.functions.iter()
+    let boxed_values: BTreeSet<_> = projected
+        .functions
+        .iter()
         .flat_map(|f| &f.body)
         .filter_map(|op| match op {
             Op::BoxValue(ty) => ty.definition_name(),
@@ -1682,7 +1684,8 @@ ret
 
     #[test]
     fn unboxed_value_conformance_is_not_an_executable_interface_view() {
-        let module = neoclr::assemble(r#"
+        let module = neoclr::assemble(
+            r#"
 .module UnboxedInterface
 .type class System.Object
 .end
@@ -1724,7 +1727,9 @@ pop
 ldc.i4 0
 ret
 .end
-"#).unwrap();
+"#,
+        )
+        .unwrap();
         neoclr::verify(&module).unwrap();
         let (expanded, _) = crate::specialization::expand(&module, "Main").unwrap();
         let (selected, _) = prepare(&expanded, "Main").unwrap();
