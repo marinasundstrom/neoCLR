@@ -1,0 +1,324 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "neoCLR diagnostic session v1 (GC snapshot adapter)",
+  "type": "object",
+  "required": [
+    "format",
+    "version",
+    "sessionId",
+    "producer",
+    "capabilities",
+    "sources",
+    "metricDefinitions",
+    "observations",
+    "limitations"
+  ],
+  "properties": {
+    "format": {
+      "const": "neoclr.diagnostics.session"
+    },
+    "version": {
+      "const": 1
+    },
+    "sessionId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "producer": {
+      "type": "string"
+    },
+    "capabilities": {
+      "const": {
+        "gcMetrics": true,
+        "executionTimeline": false,
+        "heapSnapshots": false
+      }
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "scope",
+          "pid",
+          "instance",
+          "clock"
+        ],
+        "properties": {
+          "id": {
+            "const": "owner"
+          },
+          "scope": {
+            "const": "runtime-owner-thread"
+          },
+          "pid": {
+            "$ref": "#/$defs/uint64"
+          },
+          "instance": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
+          },
+          "clock": {
+            "const": "monotonic-nanoseconds"
+          }
+        }
+      }
+    },
+    "metricDefinitions": {
+      "const": {
+        "collections": {
+          "unit": "count",
+          "kind": "counter"
+        },
+        "allocations": {
+          "unit": "count",
+          "kind": "counter"
+        },
+        "reclaimedAllocations": {
+          "unit": "count",
+          "kind": "counter"
+        },
+        "reclaimedPayloadBytes": {
+          "unit": "bytes",
+          "kind": "counter"
+        },
+        "gcAttempts": {
+          "unit": "count",
+          "kind": "counter"
+        },
+        "gcFailures": {
+          "unit": "count",
+          "kind": "counter"
+        },
+        "gcNanoseconds": {
+          "unit": "ns",
+          "kind": "counter"
+        },
+        "gcMaximumNanoseconds": {
+          "unit": "ns",
+          "kind": "maximum"
+        },
+        "allocatedPayloadBytes": {
+          "unit": "bytes",
+          "kind": "counter"
+        },
+        "livePayloadBytesAfterCollection": {
+          "unit": "bytes",
+          "kind": "gauge"
+        },
+        "liveBlocksAfterCollection": {
+          "unit": "count",
+          "kind": "gauge"
+        },
+        "peakLivePayloadBytesAfterCollection": {
+          "unit": "bytes",
+          "kind": "maximum"
+        },
+        "peakArenaUsedBytes": {
+          "unit": "bytes",
+          "kind": "maximum"
+        }
+      }
+    },
+    "observations": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 10000,
+      "items": {
+        "$ref": "#/$defs/observation"
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "$defs": {
+    "uint64": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)$",
+      "maxLength": 20,
+      "description": "Decimal uint64; consumers must range-check to 18446744073709551615."
+    },
+    "metrics": {
+      "type": "object",
+      "required": [
+        "collections",
+        "allocations",
+        "reclaimedAllocations",
+        "reclaimedPayloadBytes",
+        "gcAttempts",
+        "gcFailures",
+        "gcNanoseconds",
+        "gcMaximumNanoseconds",
+        "allocatedPayloadBytes",
+        "livePayloadBytesAfterCollection",
+        "liveBlocksAfterCollection",
+        "peakLivePayloadBytesAfterCollection",
+        "peakArenaUsedBytes"
+      ],
+      "properties": {
+        "collections": {
+          "$ref": "#/$defs/uint64"
+        },
+        "allocations": {
+          "$ref": "#/$defs/uint64"
+        },
+        "reclaimedAllocations": {
+          "$ref": "#/$defs/uint64"
+        },
+        "reclaimedPayloadBytes": {
+          "$ref": "#/$defs/uint64"
+        },
+        "gcAttempts": {
+          "$ref": "#/$defs/uint64"
+        },
+        "gcFailures": {
+          "$ref": "#/$defs/uint64"
+        },
+        "gcNanoseconds": {
+          "$ref": "#/$defs/uint64"
+        },
+        "gcMaximumNanoseconds": {
+          "$ref": "#/$defs/uint64"
+        },
+        "allocatedPayloadBytes": {
+          "$ref": "#/$defs/uint64"
+        },
+        "livePayloadBytesAfterCollection": {
+          "$ref": "#/$defs/uint64"
+        },
+        "liveBlocksAfterCollection": {
+          "$ref": "#/$defs/uint64"
+        },
+        "peakLivePayloadBytesAfterCollection": {
+          "$ref": "#/$defs/uint64"
+        },
+        "peakArenaUsedBytes": {
+          "$ref": "#/$defs/uint64"
+        }
+      },
+      "additionalProperties": false
+    },
+    "observation": {
+      "type": "object",
+      "required": [
+        "source",
+        "runtimeSequence",
+        "timestampNanoseconds",
+        "ageNanoseconds",
+        "availability",
+        "metrics",
+        "collectionDurationBuckets"
+      ],
+      "properties": {
+        "source": {
+          "const": "owner"
+        },
+        "runtimeSequence": {
+          "$ref": "#/$defs/uint64"
+        },
+        "timestampNanoseconds": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/uint64"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "ageNanoseconds": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/uint64"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "availability": {
+          "enum": [
+            "fresh",
+            "cached",
+            "unavailable"
+          ]
+        },
+        "metrics": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/metrics"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "collectionDurationBuckets": {
+          "anyOf": [
+            {
+              "type": "array",
+              "minItems": 64,
+              "maxItems": 64,
+              "items": {
+                "$ref": "#/$defs/uint64"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "availability": {
+                "const": "unavailable"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "metrics": {
+                "type": "null"
+              },
+              "timestampNanoseconds": {
+                "type": "null"
+              },
+              "ageNanoseconds": {
+                "type": "null"
+              },
+              "collectionDurationBuckets": {
+                "type": "null"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "metrics": {
+                "$ref": "#/$defs/metrics"
+              },
+              "timestampNanoseconds": {
+                "$ref": "#/$defs/uint64"
+              },
+              "ageNanoseconds": {
+                "$ref": "#/$defs/uint64"
+              },
+              "collectionDurationBuckets": {
+                "type": "array"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

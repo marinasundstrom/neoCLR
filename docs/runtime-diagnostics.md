@@ -6,6 +6,15 @@ the runtime must expose trustworthy information and provisional tools should hel
 make it work. The architecture below is a working proposal, not a settled endpoint
 or packaging requirement. Tool names and protocol encodings remain provisional.
 
+## Versioned capture contract (2026-10-28)
+
+The standalone profiler now exports a [GUI-neutral diagnostic session](diagnostic-session-format.md)
+with `--session capture.json`. The existing local socket service remains the source;
+this adds explicit schema/version, source scope, freshness, units and lossless uint64
+values. GC metrics are supported. Heap graphs/root paths and execution timelines
+are declared unavailable until their adapters are implemented. Screenshot-inspired
+views are presentation references, not an adopted third-party tool or .NET GC model.
+
 ## Current implementation and next boundary
 
 The [terminal debugger](debugger.md) runs inside the interpreter command. The

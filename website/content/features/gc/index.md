@@ -190,3 +190,23 @@ retained as that cohort's evidence, not relabeled as a measurement of current HE
 Further work targets snapshot and validation costs, pacing, and broader workload
 qualification. HTTP parsing, task completion, encoding and transport must also be
 measured: collection is not assumed to be the entire server bottleneck.
+
+
+## Development diagnostic sessions
+
+An opt-in native diagnostics service serves read-only owner-thread GC snapshots
+over a local Unix socket. The standalone profiler can export a versioned session
+for independent analysis and future GUI visualization:
+
+```sh
+python3 tools/profiler/neoclr-profiler.py --socket /private/path/neoclr-PID.sock \
+  --count 100 --interval 0.1 --session capture.json
+```
+
+Sessions preserve metric units, source identity, snapshot age and unavailable data.
+Large counters and timestamps retain full precision for browser-based viewers.
+This development adapter supports GC metrics; heap objects/root paths and execution
+timelines are not yet exported through this session format. It neither forces a
+collection nor enables diagnostics in an uninstrumented host.
+
+[Enable the service and inspect the schema](https://github.com/marinasundstrom/neoCLR/blob/main/docs/diagnostic-session-format.md).

@@ -123,3 +123,11 @@ small run. An earlier local run showed a different relative ordering of instrume
 variants. Treat these as exploratory overhead data, not a negligible-overhead claim.
 Future tuning should separate timer/histogram cost, publication frequency and transport
 CPU time under a longer matched workload. Collection pacing is unchanged.
+
+
+## GUI-neutral session export
+
+Add `--session capture.json` to the profiler command to save a versioned recording
+alongside its existing NDJSON stdout. Export preserves owner scope, stale/unavailable
+states and 64-bit precision. See the [contract and schema](../../diagnostic-session-format.md).
+The runtime socket and its opt-in/nonblocking publication behavior are unchanged.

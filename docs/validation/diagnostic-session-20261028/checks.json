@@ -1,0 +1,33 @@
+[
+  {
+    "name": "export",
+    "command": [
+      "python3",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tools/profiler",
+      "-p",
+      "test_*.py"
+    ],
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ".....\n----------------------------------------------------------------------\nRan 5 tests in 0.001s\n\nOK\n"
+  },
+  {
+    "name": "schema",
+    "command": [
+      "/tmp/neoclr-diagnostic-schema-20261028/bin/python",
+      "tools/profiler/validate_schema.py"
+    ],
+    "exitCode": 0,
+    "stdout": "PASS Draft 2020-12 schema, large integer strings and availability shapes\n",
+    "stderr": ""
+  },
+  {
+    "name": "native-attach",
+    "command": "CC=clang CFLAGS=\"-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk\" python3 docs/experiments/runtime-diagnostics/test_attach.py",
+    "output": "..\n----------------------------------------------------------------------\nRan 2 tests in 1.662s\n\nOK\n"
+  }
+]

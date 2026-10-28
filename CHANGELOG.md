@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-28
 
+- Add a versioned GUI-neutral diagnostic session export and JSON Schema over the existing opt-in local GC snapshot service. Preserve owner scope, freshness/unavailable values and full uint64 precision; validate real CLI capture and malformed/reset data. Record root-publication, concurrent-store and shared-I/O-wakeup optimization objectives. Heap graph/timeline adapters and a GUI remain future work.
+
 - Wrap up the shared-scheduling slice with repeated untraced mixed HTTP measurements and separate native stack samples. Record readiness/first-use/per-family tails and reject sampled runs from benchmark summaries. Keep enabled correctness fixes and existing scheduling/GC defaults; shared queues remain opt-in because the sync improvement is variable and concurrent median throughput regresses. Update website tables and explicitly defer the remaining capacity/AOT/context-profile gates.
 
 - Qualify 24-endpoint mixed HTTP with nested/shared-capture tasks, files and downstream network I/O under both collectors and ready-queue variants. Fix missing DNS/multi-address native frame classification and owner-host provider admission; admit audited file/Contains providers while retaining restricted worker service boundaries. Twelve optimized/UBSan native executions and 480 diagnostic HTTP requests pass. Preserve slower shared-queue observations and record HTTP/binding blocking candidates; no capacity or throughput gain is claimed.

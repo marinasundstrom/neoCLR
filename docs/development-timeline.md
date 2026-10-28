@@ -1,5 +1,24 @@
 # Development conversation record
 
+## 2026-10-28 — Optimization objectives and GUI-neutral diagnostics
+
+- **Author:** Directed adopting root-publication overhead, concurrent-store checks
+  and shared I/O completion wakeups as objectives and continuing work. Supplied
+  profiling-tool screenshots, then requested a standardized way to serve the data
+  for future GUI visualization.
+- **Assistant action:** Recorded the ordered [optimization objectives](experiments/shared-scheduling/optimization-objectives.md)
+  and reran 138 owned-root baseline checks. Reviewed earlier mixed small-frame/TLS
+  experiments rather than presenting them as new proven improvements.
+- **Diagnostics action/outcome:** Reused the existing opt-in read-only local socket
+  and added a versioned session export/schema with owner identity, units, freshness,
+  availability and lossless uint64 strings. Five exporter tests, two native attachment
+  tests and schema checks pass. [Contract](diagnostic-session-format.md).
+- **Limits/open:** Screenshots are presentation references, not compatibility proof
+  for the pictured .NET tool. Heap objects/root paths and execution timelines are
+  unsupported in the first session adapter. No GUI or new runtime optimization is
+  claimed. The app's prior paused goal prevented creating a replacement tracking
+  entry; new work is authorized and recorded in the repository objectives.
+
 ## 2026-10-28 — Scheduling integration decision and wrap-up
 
 - **Author:** Asked whether current changes were worth integrating and whether

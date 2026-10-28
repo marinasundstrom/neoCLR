@@ -91,10 +91,19 @@ class AttachTests(unittest.TestCase):
                 with socket.socket(socket.AF_UNIX) as gone:
                     gone.connect(endpoint); gone.sendall(b'NEOCLR/1 SNAPSHOT\n')
                 cli = subprocess.run([sys.executable, str(ROOT / 'tools/profiler/neoclr-profiler.py'),
-                                      '--socket', endpoint, '--count', '2', '--interval', '0'],
+                                      '--socket', endpoint, '--count', '2', '--interval', '0',
+                                      '--session', str(Path(directory) / 'session.json')],
                                      capture_output=True, text=True, timeout=5)
                 self.assertEqual(cli.returncode, 0, cli.stderr)
                 self.assertEqual(len(cli.stdout.splitlines()), 2)
+                session = json.loads((Path(directory) / 'session.json').read_text())
+                self.assertEqual(session['format'], 'neoclr.diagnostics.session')
+                self.assertEqual(session['version'], 1)
+                self.assertEqual(session['sources'][0]['instance'], stale['instance'])
+                self.assertEqual(len(session['observations']), 2)
+                self.assertEqual(session['observations'][0]['availability'], 'cached')
+                self.assertEqual(session['observations'][0]['metrics']['allocations'],
+                                 str(json.loads(cli.stdout.splitlines()[0])['allocations']))
                 process.stdin.write('q'); process.stdin.flush()
                 stdout, stderr = process.communicate(timeout=5)
                 self.assertEqual((process.returncode, stderr), (0, ''))
