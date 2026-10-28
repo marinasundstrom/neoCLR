@@ -16106,3 +16106,38 @@ components together. Generic virtual/interface comparisons, arbitrary closed gen
 reflection targets and complete generic field/ancestry graph propagation remain
 unqualified; no arbitrary runtime code generation is enabled. See neoCLR's
 `docs/validation/dynamic-access-generic-20261028/README.md` for focused and native evidence.
+
+## Generic interface methods for logging (2026-10-28 development)
+
+Compiler integration: Raven `codex/neoclr` commit `9724897ce`; see the
+[logging qualification](validation/neo-logging-20261028/README.md).
+
+Author direction: preserve Microsoft.Extensions.Logging's generic Log<TState>
+and BeginScope<TState> boundary rather than introducing object-state provider
+contracts. The native backend now admits unconstrained bodyless instance generic
+methods on invariant nominal interfaces and public nonvirtual class implementations.
+Method and declaring-type parameter spaces remain distinct. Generic class virtual
+methods, generic static interface contracts and generic default interface bodies
+remain unsupported; this is a bounded addition, not full generic virtual support.
+
+Native metadata stores method parameters and call-site method arguments. The CLI
+metadata writer uses GenericParam rows and a MethodSpec operand to callvirt;
+abstract methods also need their GenericParam rows. Interface signature projection
+preserves method arity across owned and imported contracts. The interpreter
+substitutes method arguments when selecting an implementation. Native specialization
+closes both the contract and its implementation with the same method arguments and
+matching private member names, before the existing dispatch-table lowering.
+No public object-state erasure or additional boxing contract is introduced.
+
+Owners: Raven portable capability admission and native emitter; neoCLR metadata
+builder, verifier, interface selection and native specialization. Ordinary .NET
+emission is unchanged. The Raven host-CLI comparison exposed a separate pre-existing
+generic implicit implementation TypeLoadException; it is not claimed as validated
+and is a general Raven-main candidate. The metadata builder's own constructed
+callvirt probe separately exercises its CLI encoding.
+
+Focused sources: `tests/generic_interfaces.rs`,
+`examples/generic-interfaces.neoil`, native specialization's generic-interface test,
+and Raven's `NeoClrMetadataProbe --generic-interface-runtime`. The native model
+retains method arguments directly; CLI MethodSpec is bridge encoding, not a native
+runtime dependency or permanent platform limit.

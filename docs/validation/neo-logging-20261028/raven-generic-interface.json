@@ -1,0 +1,19 @@
+{
+  "contractsSha256": "8E2102B25D3F7A7D5CF0E29A80855B0B60C1C4D0930CA353091388BA26CE9CEB",
+  "consumerSha256": "0B8AC5C6D7A170AABB0EC1CC28D0180C667A69A965CD28C0A45A47319FCA39F2",
+  "runtimeSha256": "89354675786F3D81BB92DF34A92765CC058907A2413CB72B23D2B49FAE9A49C1",
+  "sourceOrders": [
+    "forward",
+    "reverse"
+  ],
+  "nativeResult": 42,
+  "nativeVerified": true,
+  "interfaceDispatch": true,
+  "inheritedContract": true,
+  "genericMethodForwarding": true,
+  "stateTypes": [
+    "Int32",
+    "String"
+  ],
+  "limitations": "Owned interfaces and implicit public root-class implementations; host-core bootstrap. Unconstrained generic instance interface methods; generic class virtual methods and constrained/static generic interface contracts remain outside this slice."
+}

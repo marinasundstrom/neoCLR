@@ -34,6 +34,7 @@
   "ip-address-values": "runtime/System.Networking/test/IpAddressValuesTests/IpAddressValuesTests.rvnproj",
   "json-dom": "runtime/System.Data/test/JsonDomTests/JsonDomTests.rvnproj",
   "json-streams": "runtime/System.Data/test/JsonStreamTests/JsonStreamTests.rvnproj",
+  "logging": "extensions/Neo.Logging/test/Neo.Logging.Tests/Neo.Logging.Tests.rvnproj",
   "localization": "extensions/Neo.Localization/test/Neo.Localization.Tests/Neo.Localization.Tests.rvnproj",
   "media-type-allocations": "runtime/System.Web/test/MediaTypeAllocationTests/MediaTypeAllocationTests.rvnproj",
   "media-type-values": "runtime/System.Web/test/MediaTypeValuesTests/MediaTypeValuesTests.rvnproj",

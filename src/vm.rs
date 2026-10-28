@@ -816,9 +816,13 @@ fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
         if !function.generic_parameters.is_empty() {
             let mut names = HashSet::new();
             if function.generic_parameters.len() > 1024
-                || (function.instance && !class_owner)
-                || function.is_virtual
-                || function.is_abstract
+                || (nominal_interface_contract
+                    && (!function.instance
+                        || !function.body.is_empty()
+                        || !function.generic_constraints.is_empty()))
+                || (function.instance && !class_owner && !nominal_interface_contract)
+                || (function.is_virtual && !nominal_interface_contract)
+                || (function.is_abstract && !nominal_interface_contract)
                 || (function.is_internal_call()
                     && !matches!(
                         crate::native::bind_in(module, function)?,
@@ -831,7 +835,7 @@ fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
                 || !function.interface_implementations.is_empty()
             {
                 return Err(Fault::new(
-                    "generic methods require concrete nonvirtual IL bodies and ordinary class receivers",
+                    "generic methods require nonvirtual class bodies or unconstrained bodyless instance interface contracts",
                 ));
             }
             for name in function.generic_parameters.iter().flatten() {

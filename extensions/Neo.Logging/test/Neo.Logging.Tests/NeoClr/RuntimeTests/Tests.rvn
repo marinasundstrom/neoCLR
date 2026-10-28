@@ -1,0 +1,307 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Collections.*
+import System.Diagnostics.*
+import System.Optional.*
+import System.Result.*
+import Neo.Logging.*
+import Neo.DependencyInjection.*
+import NeoClr.Testing.*
+
+class LoggingCounter {
+    var Count: int = 0
+}
+
+public class LoggingFeature { }
+public class OtherLoggingFeature { }
+public class LoggingConsumer {
+    val Logger: Logger<LoggingFeature>
+    init(logger: Logger<LoggingFeature>) {
+        Logger = logger
+    }
+}
+
+class LoggingError : Error {
+    val Message: string => "failed ä"
+    val Cause: Optional<Error> => None
+    val StackTrace: Optional<StackTrace> => None
+}
+
+class LoggingProbe : LoggerProvider, Logger {
+    var Creates = 0
+    var Writes = 0
+    var Disposals = 0
+    var ScopeStarts = 0
+    var ScopeEnds = 0
+    var LastScope: Object? = null
+    var LastState: Object? = null
+    var LastError: Error? = null
+    var LastEvent = EventId(0)
+    var LastLevel = LogLevel.None
+    var LastCategory = ""
+    var LastText = ""
+    var Enabled = true
+    var SupportsScopes = true
+
+    func CreateLogger(categoryName: string) -> Logger {
+        Creates += 1
+        LastCategory = categoryName
+        return self
+    }
+    func IsEnabled(level: LogLevel) -> bool => Enabled && level != LogLevel.None
+    func Log<TState>(level: LogLevel, eventId: EventId, state: TState, error: Error?, formatter: (TState, Error?) -> string) {
+        Writes += 1
+        LastLevel = level
+        LastEvent = eventId
+        LastState = state
+        LastError = error
+        LastText = formatter(state, error)
+    }
+    func BeginScope<TState>(state: TState) -> Disposable? {
+        if !SupportsScopes {
+            return null
+        }
+        ScopeStarts += 1
+        LastScope = state
+        return ProbeScope(self)
+    }
+    func Dispose() {
+        Disposals += 1
+    }
+}
+
+class ProbeScope : Disposable {
+    private val probe: LoggingProbe
+    init(probe: LoggingProbe) {
+        self.probe = probe
+    }
+    func Dispose() {
+        probe.ScopeEnds += 1
+    }
+}
+
+[Test("Logging levels and event identity follow the Microsoft baseline")]
+func AIdentity() -> Result<unit, TestFailure> {
+    _ = Assert.Equal(0, (int)LogLevel.Trace)?
+    _ = Assert.Equal(6, (int)LogLevel.None)?
+    let first = EventId(7, "first")
+    let second = EventId(7, "second")
+    _ = Assert.True(first.Equals(second) && first == second, "Name is not identity")?
+    let boxed: Object = first
+    _ = Assert.True(boxed.Equals(second), "Boxed identity")?
+    _ = Assert.Equal(7, first.GetHashCode())?
+    _ = Assert.Equal("first", first.ToString())?
+    _ = Assert.Equal("", EventId(7, "").ToString())?
+    return Assert.Equal("0", default(EventId).ToString())
+}
+
+[Test("Null logging skips formatting and returns reusable scope handles")]
+func BNull() -> Result<unit, TestFailure> {
+    let logger: Logger = NullLogger.Instance
+    let formats = LoggingCounter()
+    logger.Log<int>(LogLevel.Critical, EventId(1), 42, null, (value, error) => {
+        formats.Count += 1
+        return value.ToString()
+    })
+    _ = Assert.True(!logger.IsEnabled(LogLevel.Critical), "Disabled")?
+    _ = Assert.Equal(0, formats.Count)?
+    let scope = logger.BeginScope<string>("scope")
+    if scope is Disposable handle {
+        handle.Dispose()
+        handle.Dispose()
+    }
+    _ = Assert.True(Object.ReferenceEquals(scope, NullLogger<LoggingFeature>.Instance.BeginScope<int>(9)), "Reusable handle")?
+    let provider = LoggingProbe()
+    NullLoggerFactory.Instance.AddProvider(provider)
+    NullLoggerFactory.Instance.Dispose()
+    return Assert.Equal(0, provider.Disposals)
+}
+
+[Test("Default logging filters before evaluating formatters")]
+func CFiltering() -> Result<unit, TestFailure> {
+    let factory = DefaultLoggerFactory()
+    let logger = factory.CreateLogger("category")
+    _ = Assert.True(!logger.IsEnabled(LogLevel.Critical), "Empty factory")?
+    let probe = LoggingProbe()
+    factory.AddProvider(probe)
+    let formats = LoggingCounter()
+    logger.Log<int>(LogLevel.Debug, EventId(0), 1, null, (value, error) => {
+        formats.Count += 1
+        return value.ToString()
+    })
+    logger.LogInformation("enabled")
+    logger.Log(LogLevel.None, "disabled")
+    logger.Log((LogLevel)99, "invalid")
+    _ = Assert.Equal(0, formats.Count)?
+    _ = Assert.Equal(1, probe.Writes)?
+    probe.Enabled = false
+    _ = Assert.True(!logger.IsEnabled(LogLevel.Error), "Provider filter")?
+    logger.LogError("disabled by provider")
+    _ = Assert.Equal(1, probe.Writes)?
+    factory.Dispose()
+    let disabled = DefaultLoggerFactory(LogLevel.None)
+    disabled.AddProvider(probe)
+    _ = Assert.True(!disabled.CreateLogger("").IsEnabled(LogLevel.Critical), "None minimum")?
+    disabled.Dispose()
+    return Ok(())
+}
+
+[Test("Logging forwards structured state event and error to every enabled provider")]
+func DState() -> Result<unit, TestFailure> {
+    let factory = DefaultLoggerFactory(LogLevel.Trace)
+    let first = LoggingProbe()
+    let second = LoggingProbe()
+    factory.AddProvider(first)
+    factory.AddProvider(second)
+    let state = LoggingFeature()
+    let error = LoggingError()
+    factory.CreateLogger("state").Log<LoggingFeature>(LogLevel.Warning, EventId(18, "named"), state, error, (value, failure) => "formatted")
+    _ = Assert.True(Object.ReferenceEquals(state, first.LastState), "Original typed state")?
+    _ = Assert.True(Object.ReferenceEquals(error, second.LastError), "Original diagnostic value")?
+    _ = Assert.Equal(18, second.LastEvent.Id)?
+    _ = Assert.Equal("named", second.LastEvent.ToString())?
+    _ = Assert.Equal((int)LogLevel.Warning, (int)first.LastLevel)?
+    _ = Assert.Equal("formatted", second.LastText)?
+    _ = Assert.Equal(1, first.Writes)?
+    factory.Dispose()
+    return Assert.Equal(1, second.Writes)
+}
+
+[Test("Logger factories cache ordinal categories and update existing loggers")]
+func ECategories() -> Result<unit, TestFailure> {
+    let factory = DefaultLoggerFactory()
+    let first = LoggingProbe()
+    factory.AddProvider(first)
+    let a = factory.CreateLogger("App")
+    let b = factory.CreateLogger("App")
+    _ = Assert.True(Object.ReferenceEquals(a, b), "Cached category")?
+    _ = Assert.True(!Object.ReferenceEquals(a, factory.CreateLogger("app")), "Ordinal category")?
+    _ = Assert.Equal(2, first.Creates)?
+    let late = LoggingProbe()
+    factory.AddProvider(late)
+    a.LogInformation("late provider")
+    _ = Assert.Equal(1, late.Writes)?
+    _ = Assert.Equal(2, late.Creates)?
+    factory.Dispose()
+    return Ok(())
+}
+
+[Test("Logging scopes preserve provider state and dispose each handle once")]
+func FScopes() -> Result<unit, TestFailure> {
+    let factory = DefaultLoggerFactory()
+    let first = LoggingProbe()
+    let second = LoggingProbe()
+    let unsupported = LoggingProbe()
+    unsupported.SupportsScopes = false
+    factory.AddProvider(first)
+    factory.AddProvider(second)
+    factory.AddProvider(unsupported)
+    let state = LoggingFeature()
+    let scope = factory.CreateLogger("scope").BeginScope<LoggingFeature>(state)
+    _ = Assert.True(Object.ReferenceEquals(state, second.LastScope), "Scope state preserved")?
+    if scope is Disposable handle {
+        handle.Dispose()
+        handle.Dispose()
+    } else {
+        return Assert.True(false, "Combined scope")
+    }
+    _ = Assert.Equal(1, first.ScopeEnds)?
+    _ = Assert.Equal(1, second.ScopeEnds)?
+    _ = Assert.Equal(0, unsupported.ScopeStarts)?
+    factory.Dispose()
+    return Ok(())
+}
+
+[Test("Factory disposal owns provider registrations and disables cached loggers")]
+func GDisposal() -> Result<unit, TestFailure> {
+    let factory = DefaultLoggerFactory()
+    let probe = LoggingProbe()
+    factory.AddProvider(probe)
+    factory.AddProvider(probe)
+    let logger = factory.CreateLogger("ownership")
+    logger.LogWarning("twice")
+    _ = Assert.Equal(2, probe.Writes)?
+    factory.Dispose()
+    factory.Dispose()
+    _ = Assert.Equal(2, probe.Disposals)?
+    _ = Assert.True(!logger.IsEnabled(LogLevel.Critical), "Disposed logger disabled")?
+    logger.LogCritical("ignored")
+    return Assert.Equal(2, probe.Writes)
+}
+
+[Test("Console logging renders UTF8 messages and explicit diagnostic errors")]
+func HConsole() -> Result<unit, TestFailure> {
+    let lines = ArrayList<string>()
+    let console = ConsoleLoggerProvider(text => lines.Add(text))
+    let logger = console.CreateLogger("Demo")
+    logger.Log(LogLevel.Warning, EventId(9, "event"), LoggingError(), "Hej världen")
+    _ = Assert.Equal("warn: Demo[9] Hej världen\nfailed ä", lines[0])?
+    logger.LogInformation("literal {OrderId}")
+    _ = Assert.Equal("info: Demo[0] literal {OrderId}", lines[1])?
+    console.Dispose()
+    let formats = LoggingCounter()
+    logger.Log<int>(LogLevel.Critical, EventId(0), 9, null, (value, error) => {
+        formats.Count += 1
+        return value.ToString()
+    })
+    _ = Assert.Equal(0, formats.Count)?
+    return Assert.Equal(2, lines.Count)
+}
+
+[Test("Typed logging creates a category from the declared type")]
+func ITyped() -> Result<unit, TestFailure> {
+    let factory: LoggerFactory = DefaultLoggerFactory()
+    let probe = LoggingProbe()
+    factory.AddProvider(probe)
+    let logger = factory.CreateLogger<LoggingFeature>()
+    logger.LogInformation("typed")
+    _ = Assert.Equal(typeof(LoggingFeature).DisplayName, probe.LastCategory)?
+    _ = Assert.Equal("typed", probe.LastText)?
+    factory.Dispose()
+    return Ok(())
+}
+
+[Test("Logging DI resolves singleton typed categories and preserves supplied factory ownership")]
+func JDependencyInjection() -> Result<unit, TestFailure> {
+    let factory = DefaultLoggerFactory()
+    let probe = LoggingProbe()
+    factory.AddProvider(probe)
+    let services: ServiceCollection = DefaultServiceCollection()
+    _ = services.AddLogging(factory)
+    _ = services.AddLogging(NullLoggerFactory.Instance)
+    let Ok(_) = services.AddTransient<LoggingConsumer>() else { return Assert.True(false, "Register consumer") }
+    let Ok(provider) = services.Build() else { return Assert.True(false, "Build logging services") }
+    let Ok(first) = provider.GetRequiredService<Logger<LoggingFeature>>() else { return Assert.True(false, "Resolve typed logger") }
+    let Ok(second) = provider.GetRequiredService<Logger<LoggingFeature>>() else { return Assert.True(false, "Resolve cached typed logger") }
+    _ = Assert.True(Object.ReferenceEquals(first, second), "Singleton typed logger")?
+    let Ok(consumer) = provider.GetRequiredService<LoggingConsumer>() else { return Assert.True(false, "Resolve consumer") }
+    consumer.Logger.LogInformation("injected")
+    let Ok(other) = provider.GetRequiredService<Logger<OtherLoggingFeature>>() else { return Assert.True(false, "Separate category") }
+    other.LogWarning("other")
+    _ = Assert.Equal(2, probe.Writes)?
+    provider.Dispose()
+    _ = Assert.Equal(0, probe.Disposals)?
+    factory.Dispose()
+    return Assert.Equal(1, probe.Disposals)
+}
+
+[Test("Logging DI owns the default factory and preserves explicit logger overrides")]
+func KDefaultRegistration() -> Result<unit, TestFailure> {
+    let services: ServiceCollection = DefaultServiceCollection()
+    let Ok(_) = services.AddSingleton<Logger<LoggingFeature>>(NullLogger<LoggingFeature>.Instance) else { return Assert.True(false, "Register override") }
+    _ = services.AddLogging()
+    _ = services.AddLogging()
+    let Ok(provider) = services.Build() else { return Assert.True(false, "Build default logging") }
+    let Ok(factory) = provider.GetRequiredService<LoggerFactory>() else { return Assert.True(false, "Default factory") }
+    let probe = LoggingProbe()
+    factory.AddProvider(probe)
+    let Ok(overridden) = provider.GetRequiredService<Logger<LoggingFeature>>() else { return Assert.True(false, "Explicit override") }
+    _ = Assert.True(!overridden.IsEnabled(LogLevel.Critical), "Explicit null logger retained")?
+    let Ok(logger) = provider.GetRequiredService<Logger<OtherLoggingFeature>>() else { return Assert.True(false, "Default typed registration") }
+    logger.LogInformation("default")
+    _ = Assert.Equal(1, probe.Writes)?
+    provider.Dispose()
+    _ = Assert.Equal(1, probe.Disposals)?
+    return Assert.True(!logger.IsEnabled(LogLevel.Information), "Container disposed factory")
+}

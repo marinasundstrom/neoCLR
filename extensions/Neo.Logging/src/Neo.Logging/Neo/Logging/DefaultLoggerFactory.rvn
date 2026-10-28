@@ -1,0 +1,173 @@
+module Neo.Logging
+
+import System.*
+import System.Collections.*
+import System.Optional.*
+
+/// Default provider fan-out with ordinal category caching and a fixed minimum level.
+/// Owner-thread use only in this foundation; concurrent mutation and ambient scopes are not implemented.
+public class DefaultLoggerFactory : LoggerFactory {
+    private var providers = ArrayList<LoggerProvider>()
+    private var categories = HashMap<string, AggregateLogger>(StringComparer.Ordinal)
+    private var loggers = ArrayList<AggregateLogger>()
+    private val minimum: LogLevel
+    private var disposed = false
+
+    /// Creates an empty factory with minimum Information. Add providers explicitly.
+    init() {
+        minimum = LogLevel.Information
+    }
+
+    /// Creates an empty factory with a fixed minimum; invalid enum values fault.
+    init(minimumLevel: LogLevel) {
+        LogLevels.ValidateMinimum(minimumLevel)
+        minimum = minimumLevel
+    }
+
+    /// Returns the same logger for the same ordinal category name.
+    func CreateLogger(categoryName: string) -> Logger {
+        CheckActive()
+        if categories.Find(categoryName) is Some(let existing) {
+            return existing
+        }
+        let logger = AggregateLogger(self, minimum, categoryName)
+        for provider in providers {
+            logger.Attach(provider.CreateLogger(categoryName))
+        }
+        _ = categories.TryAdd(categoryName, logger)
+        loggers.Add(logger)
+        return logger
+    }
+
+    /// Transfers provider disposal ownership to this factory and updates cached categories.
+    /// Each registration participates independently, including repeated instances.
+    func AddProvider(provider: LoggerProvider) {
+        CheckActive()
+        for logger in loggers {
+            logger.Attach(provider.CreateLogger(logger.Category))
+        }
+        providers.Add(provider)
+    }
+
+    /// Disposes each owned provider registration once. Previously returned default loggers become disabled.
+    func Dispose() {
+        if disposed {
+            return
+        }
+        disposed = true
+        for provider in providers {
+            provider.Dispose()
+        }
+        providers = ArrayList<LoggerProvider>()
+        categories = HashMap<string, AggregateLogger>(StringComparer.Ordinal)
+        for logger in loggers {
+            logger.Detach()
+        }
+        loggers = ArrayList<AggregateLogger>()
+    }
+
+    internal val Active: bool => !disposed
+
+    private func CheckActive() {
+        if disposed {
+            System.Fail("LoggerFactory is disposed")
+        }
+    }
+}
+
+internal class AggregateLogger : Logger {
+    private val factory: DefaultLoggerFactory
+    private val minimum: LogLevel
+    private var targets = ArrayList<Logger>()
+    internal val Category: string
+
+    init(factory: DefaultLoggerFactory, minimum: LogLevel, category: string) {
+        self.factory = factory
+        self.minimum = minimum
+        Category = category
+    }
+
+    internal func Attach(logger: Logger) {
+        targets.Add(logger)
+    }
+
+    internal func Detach() {
+        targets = ArrayList<Logger>()
+    }
+
+    func IsEnabled(level: LogLevel) -> bool {
+        if !factory.Active || !LogLevels.Enabled(level, minimum) {
+            return false
+        }
+        for logger in targets {
+            if logger.IsEnabled(level) {
+                return true
+            }
+        }
+        return false
+    }
+
+    func Log<TState>(level: LogLevel, eventId: EventId, state: TState, error: Error?, formatter: (TState, Error?) -> string) {
+        if !factory.Active || !LogLevels.Enabled(level, minimum) {
+            return
+        }
+        for logger in targets {
+            if logger.IsEnabled(level) {
+                logger.Log<TState>(level, eventId, state, error, formatter)
+            }
+        }
+    }
+
+    func BeginScope<TState>(state: TState) -> Disposable? {
+        if !factory.Active || targets.Count == 0 {
+            return null
+        }
+        let handles = ArrayList<Disposable>()
+        for logger in targets {
+            if logger.BeginScope<TState>(state) is Disposable scope {
+                handles.Add(scope)
+            }
+        }
+        if handles.Count == 0 {
+            return null
+        }
+        return AggregateScope(handles)
+    }
+}
+
+internal class AggregateScope : Disposable {
+    private var handles: ArrayList<Disposable>
+    private var disposed = false
+
+    init(handles: ArrayList<Disposable>) {
+        self.handles = handles
+    }
+
+    func Dispose() {
+        if disposed {
+            return
+        }
+        disposed = true
+        for handle in handles {
+            handle.Dispose()
+        }
+        handles = ArrayList<Disposable>()
+    }
+}
+
+/// Typed adapter that obtains its category once from TypeInfo.DisplayName.
+/// Generic/nested category spelling follows neoCLR's current type display contract.
+public class DefaultLogger<T> : Logger<T> {
+    private val inner: Logger
+
+    /// Creates a typed logger through the supplied factory; does not own the factory.
+    init(factory: LoggerFactory) {
+        inner = factory.CreateLogger(typeof(T).DisplayName)
+    }
+
+    func IsEnabled(level: LogLevel) -> bool => inner.IsEnabled(level)
+    func Log<TState>(level: LogLevel, eventId: EventId, state: TState, error: Error?, formatter: (TState, Error?) -> string) {
+        inner.Log<TState>(level, eventId, state, error, formatter)
+    }
+    func BeginScope<TState>(state: TState) -> Disposable? => inner.BeginScope<TState>(state)
+}

@@ -23418,3 +23418,32 @@ rebuild or an explicitly documented reduced package. The author directed:
 “Preserve PostgreSQL support.” Rebuild and requalify macOS with the provider,
 including affected final-artifact measurements. Keep the earlier base-only
 candidate evidence separately; Windows remains a base-library package.
+
+
+## 2026-10-28 — Logging foundation and generic interface support
+
+The author asked to continue Neo.Logging, corrected the baseline to
+Microsoft.Extensions.Logging, and emphasized fundamental abstractions plus a
+default implementation to build on. The author briefly proposed a shared artifacts
+folder, then explicitly deferred it: “Skip the artifact folder for now.”
+
+The assistant found native generic interface methods were rejected and asked
+whether to preserve the API by adding compiler/runtime support or use a provisional
+object-state provider interface with generic caller helpers. The author chose:
+“Preserve the API; add generic interface support”. The implementation therefore
+retains Log<TState> and BeginScope<TState>, with metadata emission, runtime dispatch
+and native specialization changes alongside the separate Neo.Logging component.
+See [design and gaps](logging.md) and [bridge ownership](raven-cli-bridge.md).
+
+The factory/provider/typed-logger shape follows Microsoft.Extensions.Logging;
+configuration binding, concurrent mutation, ambient async scopes and template
+parsing remain open. No artifact-output change was made. A host-CLI generic
+implicit implementation issue found by comparison remains a separate Raven-main
+candidate; native success does not imply that ordinary .NET path is fixed.
+
+The logging foundation passed all 11 Raven contracts in interpreter and native
+execution, with [pinned toolchain evidence](validation/neo-logging-20261028/README.md)
+and a refreshed API reference. The author then requested a second slice extracting
+`.Abstractions` projects so consumers and
+logging/localization DI integrations can depend on contracts without implementations,
+with minimal verification.

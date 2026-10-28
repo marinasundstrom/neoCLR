@@ -171,11 +171,11 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
     public void Emit(OpCode opCode, GenericMethodInstance operand)
     {
         ArgumentNullException.ThrowIfNull(operand);
-        RequireCall(opCode);
+        if (opCode != (operand.Definition.IsAbstract ? OpCode.Callvirt : OpCode.Call)) throw OperandError(opCode);
         if (!ReferenceEquals(operand.Definition.Assembly, Assembly)) throw new ArgumentException("generic calls require an owned definition", nameof(operand));
         foreach (var type in operand.TypeArguments) type.ValidateOwner(Assembly, Signature.GenericParameterNames.Count, DeclaringType?.GenericParameterNames.Count ?? 0);
         operand.Definition.ValidateMethodArguments(operand.TypeArguments, bodyBuilder);
-        Append(new("call.generic", Target: operand.Definition, GenericTarget: operand));
+        Append(new(opCode == OpCode.Callvirt ? "call.virtual.generic" : "call.generic", Target: operand.Definition, GenericTarget: operand));
     }
 
     public void NewObject(ImportedMethodReference constructor) => Emit(OpCode.Newobj, constructor);
@@ -231,12 +231,12 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
     public void Emit(OpCode opCode, ImportedGenericMethodReference operand)
     {
         ArgumentNullException.ThrowIfNull(operand);
-        RequireCall(opCode);
+        if (opCode != (operand.Definition.RequiresVirtualDispatch ? OpCode.Callvirt : OpCode.Call)) throw OperandError(opCode);
         if (!ReferenceEquals(operand.Definition.Owner, Assembly)) throw new ArgumentException("reference belongs to another output builder", nameof(operand));
         foreach (var type in operand.TypeArguments)
             type.ValidateOwner(Assembly, Signature.GenericParameterNames.Count, DeclaringType?.GenericParameterNames.Count ?? 0);
         operand.Target.Definition.ValidateMethodArguments(operand.TypeArguments, bodyBuilder);
-        Append(new("call.generic", Target: operand.Target.Definition, GenericTarget: operand.Target,
+        Append(new(opCode == OpCode.Callvirt ? "call.virtual.generic" : "call.generic", Target: operand.Target.Definition, GenericTarget: operand.Target,
             Type: operand.Definition.IsStatic ? null : (SignatureType)operand.Definition.DeclaringReference!));
     }
 

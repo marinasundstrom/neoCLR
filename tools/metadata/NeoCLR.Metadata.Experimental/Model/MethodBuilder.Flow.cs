@@ -448,6 +448,7 @@ public sealed partial class MethodBuilder
                 case "call":
                 case "call.constructed":
                 case "call.generic":
+                case "call.virtual.generic":
                     var callSignature = instruction.ConstructedTarget?.Signature ?? instruction.GenericTarget?.Signature ?? instruction.Target!.Signature;
                     if (instruction.ConstrainedOwner is { } implementingType)
                         callSignature = new MethodSignature(implementingType.ResolveImplementationSelf(callSignature.ReturnType),

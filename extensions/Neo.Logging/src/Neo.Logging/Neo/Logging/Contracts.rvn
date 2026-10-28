@@ -1,0 +1,92 @@
+module Neo.Logging
+
+import System.*
+
+/// Severity ordered from detailed tracing to critical failure; None disables output.
+public enum LogLevel {
+    Trace = 0
+    Debug = 1
+    Information = 2
+    Warning = 3
+    Error = 4
+    Critical = 5
+    None = 6
+}
+
+/// Identifies an event by numeric Id. Name is optional display metadata, not identity.
+public struct EventId : EquatableTo<EventId> {
+    /// Numeric event identity; zero is the default event.
+    val Id: int
+    /// Optional display name, including an explicitly empty name.
+    val Name: string?
+
+    /// Creates an unnamed event identifier.
+    init(id: int) {
+        Id = id
+        Name = null
+    }
+
+    /// Creates an event identifier with optional display metadata.
+    init(id: int, name: string?) {
+        Id = id
+        Name = name
+    }
+
+    /// Compares numeric identity only, as in Microsoft.Extensions.Logging.
+    func Equals(other: EventId) -> bool => Id == other.Id
+    /// Compares boxed event identifiers by numeric identity.
+    override func Equals(other: Object?) -> bool => other is EventId value && Equals(value)
+    /// Returns the numeric identity hash.
+    override func GetHashCode() -> int => Id
+    /// Returns Name when supplied, otherwise the numeric Id.
+    override func ToString() -> string {
+        if Name is string name {
+            return name
+        }
+        return Id.ToString()
+    }
+    static func ==(left: EventId, right: EventId) -> bool => left.Equals(right)
+    static func !=(left: EventId, right: EventId) -> bool => !left.Equals(right)
+}
+
+/// Provider-neutral structured logging. Providers receive state and its formatter separately.
+public interface Logger {
+    /// Writes an entry. Disabled default loggers do not evaluate formatter.
+    /// Error is the optional neoCLR diagnostic value; no stack is captured implicitly.
+    func Log<TState>(level: LogLevel, eventId: EventId, state: TState, error: Error?, formatter: (TState, Error?) -> string)
+    /// Reports whether this severity may be written. None is never enabled.
+    func IsEnabled(level: LogLevel) -> bool
+    /// Begins a provider-owned scope. Dispose the returned handle to end it; null means unsupported.
+    /// The foundation forwards scope state but supplies no ambient async scope storage.
+    func BeginScope<TState>(state: TState) -> Disposable?
+}
+
+/// A logger whose category is associated with T.
+public interface Logger<T> : Logger { }
+
+/// Creates category loggers. Dispose releases provider-owned resources, not application resources.
+public interface LoggerProvider : Disposable {
+    /// Creates a logger for the exact ordinal category name, which may be empty.
+    func CreateLogger(categoryName: string) -> Logger
+}
+
+/// Creates and caches category loggers and owns providers added through AddProvider.
+public interface LoggerFactory : Disposable {
+    /// Returns the logger for an exact ordinal category. Creation after disposal faults.
+    func CreateLogger(categoryName: string) -> Logger
+    /// Adds an owned provider, including to existing category loggers. Configure before logging callbacks.
+    func AddProvider(provider: LoggerProvider)
+}
+
+internal static class LogLevels {
+    static func Enabled(level: LogLevel, minimum: LogLevel) -> bool {
+        let value = (int)level
+        return value >= 0 && value <= 5 && value >= (int)minimum
+    }
+
+    static func ValidateMinimum(level: LogLevel) {
+        if (int)level < 0 || (int)level > 6 {
+            System.Fail("Logging minimum level must be Trace through None")
+        }
+    }
+}

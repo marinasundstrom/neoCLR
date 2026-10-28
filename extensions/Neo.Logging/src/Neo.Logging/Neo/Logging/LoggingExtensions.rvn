@@ -1,0 +1,55 @@
+module Neo.Logging
+
+import System.*
+import Neo.DependencyInjection.*
+import System.Introspection.*
+import System.Result.*
+
+/// Literal-message conveniences. Strings are not parsed as message templates.
+public extension LoggerExtensions for Logger {
+    /// Writes a literal message with default event identity and no error.
+    func Log(level: LogLevel, message: string) {
+        self.Log<string>(level, EventId(0), message, null, (state, error) => state)
+    }
+    /// Writes a literal message with explicit event identity and optional diagnostic value.
+    func Log(level: LogLevel, eventId: EventId, error: Error?, message: string) {
+        self.Log<string>(level, eventId, message, error, (state, failure) => state)
+    }
+    func LogTrace(message: string) { self.Log(LogLevel.Trace, message) }
+    func LogDebug(message: string) { self.Log(LogLevel.Debug, message) }
+    func LogInformation(message: string) { self.Log(LogLevel.Information, message) }
+    func LogWarning(message: string) { self.Log(LogLevel.Warning, message) }
+    func LogError(message: string) { self.Log(LogLevel.Error, message) }
+    func LogCritical(message: string) { self.Log(LogLevel.Critical, message) }
+}
+
+/// Common factory composition independent of configuration services.
+public extension LoggerFactoryExtensions for LoggerFactory {
+    /// Creates an ordinary typed adapter using T's type-display category.
+    func CreateLogger<T>() -> Logger<T> => DefaultLogger<T>(self)
+    /// Adds an owned synchronous console provider.
+    func AddConsole() {
+        self.AddProvider(ConsoleLoggerProvider())
+    }
+}
+
+/// DI registration for the factory and ordinary open-generic typed logger adapter.
+public extension LoggingServices for ServiceCollection {
+    /// Registers a container-owned default factory and singleton typed loggers; preserves overrides.
+    /// The default factory has no providers. Resolve LoggerFactory and configure it at startup.
+    func AddLogging() -> Result<unit, ServiceError> {
+        _ = self.TryAdd(ServiceDescriptor(typeof(LoggerFactory), ServiceSource.Constructor(typeof(DefaultLoggerFactory)), ServiceLifetime.Singleton))?
+        return self.RegisterTypedLoggers()
+    }
+
+    /// Registers a caller-owned factory and singleton typed loggers; preserves existing overrides.
+    func AddLogging(factory: LoggerFactory) -> Result<unit, ServiceError> {
+        _ = self.TryAdd(ServiceDescriptor(typeof(LoggerFactory), ServiceSource.Instance(factory), ServiceLifetime.Singleton))?
+        return self.RegisterTypedLoggers()
+    }
+
+    private func RegisterTypedLoggers() -> Result<unit, ServiceError> {
+        _ = self.TryAdd(ServiceDescriptor(typeof(Logger<>), ServiceSource.Constructor(typeof(DefaultLogger<>)), ServiceLifetime.Singleton))?
+        return Ok(())
+    }
+}

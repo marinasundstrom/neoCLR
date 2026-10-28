@@ -46,6 +46,8 @@
       href: features/time/index.md
     - name: "Localization"
       href: features/localization/index.md
+    - name: "Logging"
+      href: features/logging/index.md
     - name: "Dependency injection"
       href: features/dependency-injection/index.md
     - name: "Globalization"
@@ -188,3 +190,6 @@
       href: features/modules/index.md
     - name: "Library modules"
       href: docs/namespaces.md
+
+- name: Logging (development)
+  href: docs/logging.md

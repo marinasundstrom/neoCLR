@@ -293,7 +293,13 @@ fn member(
             name: format!("{}.{name}", owner.definition_name().unwrap()),
             owner: Some(owner.clone()),
             instance: contract.instance,
-            generic_arguments: vec![],
+            generic_arguments: if contract.generic_arguments.is_empty() {
+                (0..contract.generic_parameters.len())
+                    .map(|i| Type::MethodTypeParameter(i as u16))
+                    .collect()
+            } else {
+                contract.generic_arguments.clone()
+            },
             parameters: contract.parameters.clone(),
         };
         let resolved = crate::vm::resolve(module, &target).or_else(|original| {
@@ -335,7 +341,9 @@ fn check_signature(
             .owner
             .as_ref()
             .is_some_and(|owner| !module.is_reference_type(owner));
-    if implementation.instance != contract.instance
+    if implementation.generic_parameters.len() != contract.generic_parameters.len()
+        || implementation.generic_constraints != contract.generic_constraints
+        || implementation.instance != contract.instance
         || implementation.parameters != contract.parameters
     {
         return Err(Fault::new(

@@ -91,7 +91,7 @@ public sealed partial class MethodDefinition
             throw new ArgumentException("invalid type-method declaration");
         var slotFlags = attributes & 0x540;
         if (slotFlags is not (0 or 0x40 or 0x140 or 0x540) ||
-            slotFlags != 0 && ((attributes & 7) != 6 || name is (".ctor" or ".cctor") || signature.GenericParameterNames.Count != 0 ||
+            slotFlags != 0 && ((attributes & 7) != 6 || name is (".ctor" or ".cctor") || signature.GenericParameterNames.Count != 0 && slotFlags != 0x540 ||
                 (attributes & 0x10) != 0 && slotFlags != 0x540))
             throw new ArgumentException("invalid virtual method flags or signature");
         bool constructor = name == ".ctor";

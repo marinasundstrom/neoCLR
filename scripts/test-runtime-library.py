@@ -348,6 +348,20 @@ DEPENDENCY_INJECTION_NAMES = [
     'DI website sample resolves a scoped constructor graph and disposes scopes',
 ]
 
+LOGGING_NAMES = [
+    'Logging levels and event identity follow the Microsoft baseline',
+    'Null logging skips formatting and returns reusable scope handles',
+    'Default logging filters before evaluating formatters',
+    'Logging forwards structured state event and error to every enabled provider',
+    'Logger factories cache ordinal categories and update existing loggers',
+    'Logging scopes preserve provider state and dispose each handle once',
+    'Factory disposal owns provider registrations and disables cached loggers',
+    'Console logging renders UTF8 messages and explicit diagnostic errors',
+    'Typed logging creates a category from the declared type',
+    'Logging DI resolves singleton typed categories and preserves supplied factory ownership',
+    'Logging DI owns the default factory and preserves explicit logger overrides',
+]
+
 LOCALIZATION_NAMES = [
     'Localizer preserves strings and distinguishes missing from empty',
     'Localizer uses ordinal keys and decodes JSON escapes',
@@ -500,7 +514,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True, help='Fresh build/evidence directory')
     parser.add_argument('--aot', type=Path, default=ROOT / 'target/debug' / ('neoclr-codegen.exe' if os.name == 'nt' else 'neoclr-codegen'))
     parser.add_argument('--runtime', type=Path, default=ROOT / 'target/release' / ('neoclr.exe' if os.name == 'nt' else 'neoclr'))
-    parser.add_argument('--suite', action='append', choices=('error-context', 'environment-discovery', 'native-callbacks', 'native-buffers', 'native-pointers', 'method-state', 'type-relations', 'collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'memory-lifetimes', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'cryptography', 'gzip', 'encoding-boundaries', 'encoding-buffer-limits', 'int64-parsing', 'primitive-parsing', 'numeric-formatting', 'globalization', 'enum-parsing', 'record-formatting', 'record-allocations', 'floating-special-values', 'decimal', 'currency', 'deconstruction', 'localization', 'dependency-injection', 'path-values', 'http-header-values', 'http-method-values', 'media-type-values', 'media-type-allocations', 'uri-path-allocations', 'index-range', 'http-text', 'http-content-copy', 'http-lifetime', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
+    parser.add_argument('--suite', action='append', choices=('error-context', 'environment-discovery', 'native-callbacks', 'native-buffers', 'native-pointers', 'method-state', 'type-relations', 'collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'memory-lifetimes', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'cryptography', 'gzip', 'encoding-boundaries', 'encoding-buffer-limits', 'int64-parsing', 'primitive-parsing', 'numeric-formatting', 'globalization', 'enum-parsing', 'record-formatting', 'record-allocations', 'floating-special-values', 'decimal', 'currency', 'deconstruction', 'logging', 'localization', 'dependency-injection', 'path-values', 'http-header-values', 'http-method-values', 'media-type-values', 'media-type-allocations', 'uri-path-allocations', 'index-range', 'http-text', 'http-content-copy', 'http-lifetime', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
                         help='Run only this suite (repeatable); default runs qualified suites')
     parser.add_argument("--execution-repetitions", type=int, default=1, help="Repeat the full suite process in each mode for timing; guards/selectors still run once")
     parser.add_argument('--mode', action='append', choices=('native', 'interpreter', 'jit'),
@@ -567,6 +581,7 @@ def main():
         ('unicode-casing', 0, ''.join('PASS ' + n + '\n' for n in UNICODE_CASING_NAMES) + f'Tests: {len(UNICODE_CASING_NAMES)}, passed: {len(UNICODE_CASING_NAMES)}, failed: 0, skipped: 0\n'),
         ('int64-parsing', 0, ''.join('PASS ' + n + '\n' for n in INT64_PARSING_NAMES) + f'Tests: {len(INT64_PARSING_NAMES)}, passed: {len(INT64_PARSING_NAMES)}, failed: 0, skipped: 0\n'),
         ('dependency-injection', 0, ''.join('PASS ' + n + '\n' for n in DEPENDENCY_INJECTION_NAMES) + f'Tests: {len(DEPENDENCY_INJECTION_NAMES)}, passed: {len(DEPENDENCY_INJECTION_NAMES)}, failed: 0, skipped: 0\n'),
+        ('logging', 0, ''.join('PASS ' + n + '\n' for n in LOGGING_NAMES) + f'Tests: {len(LOGGING_NAMES)}, passed: {len(LOGGING_NAMES)}, failed: 0, skipped: 0\n'),
         ('localization', 0, ''.join('PASS ' + n + '\n' for n in LOCALIZATION_NAMES) + f'Tests: {len(LOCALIZATION_NAMES)}, passed: {len(LOCALIZATION_NAMES)}, failed: 0, skipped: 0\n'),
         ('deconstruction', 0, ''.join('PASS ' + n + '\n' for n in DECONSTRUCTION_NAMES) + f'Tests: {len(DECONSTRUCTION_NAMES)}, passed: {len(DECONSTRUCTION_NAMES)}, failed: 0, skipped: 0\n'),
         ('currency', 0, ''.join('PASS ' + n + '\n' for n in CURRENCY_NAMES) + f'Tests: {len(CURRENCY_NAMES)}, passed: {len(CURRENCY_NAMES)}, failed: 0, skipped: 0\n'),
@@ -659,7 +674,7 @@ def main():
             profile = 'http' if name in ('http-text', 'http-content-copy', 'http-lifetime', 'memory-stream', 'memory-lifetimes', 'gzip', 'json-dom', 'json-streams', 'localization', 'encoding-streams', 'encoding-boundaries') else 'console'
             if os.name == 'nt':
                 profile = 'windows-' + profile
-            if name in ('dependency-injection', 'method-state', 'localization'):
+            if name in ('dependency-injection', 'method-state', 'localization', 'logging'):
                 # Derive exact identities from the discovered application, never from
                 # hard-coded metadata ordinals. Only public test service fixtures
                 # receive constructor metadata and executable retention.
@@ -672,13 +687,13 @@ def main():
                 metadata, _ = json.JSONDecoder().raw_decode(text[text.index('{'):])
                 reflection_names = [declaration['origin']['name'] for declaration in metadata['types']
                                     if declaration.get('origin', {}).get('name', '').startswith(('NeoClr.RuntimeTests.', 'Examples.DependencyInjection.'))
-                                    and (declaration.get('origin', {}).get('publicly_visible') if name == 'dependency-injection'
+                                    and (declaration.get('origin', {}).get('publicly_visible') if name in ('dependency-injection', 'logging')
                                          else declaration['origin']['name'].endswith('.LocalizedGreeting') if name == 'localization'
                                          else any(marker in declaration['origin']['name'] for marker in ('MethodOwner', 'MethodValue')))]
                 if name == 'dependency-injection':
                     di_types = reflection_names
-                elif name == 'localization':
-                    localization_types = reflection_names + ["Neo.Localization.DefaultLocalizer`1"]
+                elif name in ('localization', 'logging'):
+                    service_adapter_types = reflection_names + (["Neo.Localization.DefaultLocalizer`1"] if name == 'localization' else ["Neo.Logging.DefaultLogger`1", "Neo.Logging.DefaultLoggerFactory"])
                 else:
                     method_types = reflection_names
             if name == "json-streams":
@@ -704,8 +719,8 @@ def main():
                 if name == "json-streams":
                     # Scalar mapping needs a reflection scope, but no retained model constructors.
                     command += ["--reflection-roots", json_roots, "--command-timeout", "600"]
-                if name == "localization":
-                    command += [arg for type_name in localization_types for arg in ("--reflection-constructor-type", type_name)]
+                if name in ("localization", "logging"):
+                    command += [arg for type_name in service_adapter_types for arg in ("--reflection-constructor-type", type_name)]
                     command += ["--command-timeout", "600"]
                 if name == "method-state":
                     command += [arg for type_name in method_types for arg in ("--reflection-method-type", type_name)]
@@ -746,9 +761,9 @@ def main():
                 di_roots = runpy.run_path(str(ROOT / 'scripts/run-native-sample.py'))['reflection_roots'](
                     args.runtime.resolve(), build / 'app.dll', di_types,
                     lambda command: subprocess.run(list(map(str, command)), check=True, capture_output=True), constructors=True)[1]
-            if name == 'localization':
-                localization_roots = runpy.run_path(str(ROOT / 'scripts/run-native-sample.py'))['reflection_roots'](
-                    args.runtime.resolve(), build / 'app.dll', localization_types,
+            if name in ('localization', 'logging'):
+                service_adapter_roots = runpy.run_path(str(ROOT / 'scripts/run-native-sample.py'))['reflection_roots'](
+                    args.runtime.resolve(), build / 'app.dll', service_adapter_types,
                     lambda command: subprocess.run(list(map(str, command)), check=True, capture_output=True), constructors=True, modules=[bundle / path for path in json.loads((bundle / "manifest.json").read_text())["modules"]])[1]
             if name == 'method-state':
                 method_roots = runpy.run_path(str(ROOT / 'scripts/run-native-sample.py'))['reflection_roots'](
@@ -788,8 +803,8 @@ def main():
                         jit += ["--reflection-roots", di_roots]
                     if name == "method-state":
                         jit += ["--reflection-roots", method_roots]
-                    if name == "localization":
-                        jit += ["--reflection-roots", localization_roots]
+                    if name in ("localization", "logging"):
+                        jit += ["--reflection-roots", service_adapter_roots]
                     executions.append((mode, jit, isolated if name == 'localization' else ROOT, None))
             repeated_executions = [(repetition, *execution) for repetition in range(1, args.execution_repetitions + 1) for execution in executions]
             for repetition, mode, command, cwd, environment in repeated_executions:

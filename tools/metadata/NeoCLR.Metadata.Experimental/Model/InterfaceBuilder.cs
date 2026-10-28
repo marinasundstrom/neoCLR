@@ -136,11 +136,18 @@ public sealed partial class TypeBuilder
         InheritedContracts().SelectMany(owner =>
             (owner.ImportedType is { } external ? Assembly.ExternalInterfaceMethods(external) :
                 (owner.GenericInstance?.Definition ?? owner.ClassType!).Methods.Where(method => !method.IsTypeInitializer).Select(method => (method.Name, Signature:
-                    owner.GenericInstance is { } instance ? new ConstructedMethodReference(method, instance.TypeArguments.ToArray(), []).Signature : method.Signature,
+                    owner.GenericInstance is { } instance ? ProjectInterfaceSignature(method, instance) : method.Signature,
                     method.IsStatic, Declaration: method)))
             .Select(contract => (contract.Name, new MethodSignature(ResolveImplementationSelf(contract.Signature.ReturnType),
-                contract.Signature.ParameterTypes.Select(ResolveImplementationSelf), outParameters: contract.Signature.OutParameters),
+                contract.Signature.ParameterTypes.Select(ResolveImplementationSelf), contract.Signature.GenericParameterNames, outParameters: contract.Signature.OutParameters),
                 contract.IsStatic, contract.Declaration, owner)));
+
+    private static MethodSignature ProjectInterfaceSignature(MethodBuilder method, GenericTypeInstance owner)
+    {
+        var projected = new ConstructedMethodReference(method, owner.TypeArguments.ToArray(),
+            Enumerable.Range(0, method.Signature.GenericParameterNames.Count).Select(SignatureType.MethodParameter).ToArray()).Signature;
+        return new(projected.ReturnType, projected.ParameterTypes, method.Signature.GenericParameterNames, projected.OutParameters);
+    }
 
     internal SignatureType ResolveImplementationSelf(SignatureType type) => type.IsSelf && !IsInterface
         ? GenericParameterNames.Count == 0 ? this : MakeGenericInstance(Enumerable.Range(0, GenericParameterNames.Count).Select(SignatureType.TypeParameter).ToArray())
@@ -206,17 +213,17 @@ public sealed partial class TypeBuilder
 
     /// <summary>Adds a public abstract instance method to an interface.</summary>
     /// <param name="name">Nonempty simple method name; constructors are forbidden.</param>
-    /// <param name="signature">Supported value parameters/result; declaring-type parameters and native Self are allowed, method parameters are not.</param>
+    /// <param name="signature">Supported value parameters/result; declaring-type and method parameters and native Self are allowed.</param>
     /// <returns>A bodyless declaration; adding instructions or locals makes writing fail.</returns>
     /// <exception cref="ArgumentNullException">Null signature.</exception>
-    /// <exception cref="ArgumentException">Invalid/duplicate signature, generic method or exceeded limit.</exception>
+    /// <exception cref="ArgumentException">Invalid/duplicate signature or exceeded limit.</exception>
     /// <exception cref="InvalidOperationException">Owner is not an interface.</exception>
     public MethodBuilder AddInterfaceMethod(string name, MethodSignature signature)
         => AddInterfaceMethod(name, signature, false);
 
     /// <summary>Adds a public abstract instance or static interface contract.</summary>
     /// <param name="name">Nonempty simple metadata name.</param>
-    /// <param name="signature">Nongeneric signature; native Self is allowed.</param>
+    /// <param name="signature">Signature with optional instance-method parameters; native Self is allowed.</param>
     /// <param name="isStatic">True for a contract with no receiver.</param>
     /// <returns>A bodyless declaration.</returns>
     /// <exception cref="ArgumentNullException">Null signature.</exception>
@@ -227,7 +234,7 @@ public sealed partial class TypeBuilder
     public MethodBuilder AddInterfaceMethod(string name, MethodSignature signature, bool isStatic)
     {
         ArgumentNullException.ThrowIfNull(signature);
-        if (signature.GenericParameterNames.Count != 0) throw new ArgumentException("generic interface methods are not supported yet", nameof(signature));
+        if (isStatic && signature.GenericParameterNames.Count != 0) throw new ArgumentException("generic static interface methods are not supported yet", nameof(signature));
         return AddMethodCore(name, signature, MethodVisibility.Public, isStatic, false, abstractContract: true);
     }
 }

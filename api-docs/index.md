@@ -31,6 +31,7 @@ Media type structure, typed presets and Content-Type parsing are available in th
 | Console and environment | [Console](xref:System.Console) · [Environment](xref:System.Environment) · [Standard streams](console.md) |
 | Tasks and concurrency | [System.Concurrency.Tasks](xref:System.Concurrency.Tasks) · [System.Concurrency](xref:System.Concurrency) |
 | Dependency injection | [Registration, resolution and lifetimes](dependency-injection.md) · Neo.DependencyInjection |
+| Logging | [Structured state, factories and providers](logging.md) · Neo.Logging |
 | Localization | [Catalogue loading and fallback](localization.md) · Neo.Localization |
 | Dates and globalization | [System.Time](xref:System.Time) · [System.Globalization](xref:System.Globalization) |
 | Networking and HTTP | [System.Networking](xref:System.Networking) · [System.Web.Http](xref:System.Web.Http) · [Sockets](sockets.md) · [HTTP server](http-server.md) · [Body streams](http-body-streams.md) · [Routes](routes.md) |

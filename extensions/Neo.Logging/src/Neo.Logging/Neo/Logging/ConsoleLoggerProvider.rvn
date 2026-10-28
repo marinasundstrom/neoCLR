@@ -1,0 +1,75 @@
+module Neo.Logging
+
+import System.*
+
+/// Synchronous console provider with no ambient scope storage or implicit stack capture.
+/// Owner-thread use only. The optional callback receives one complete formatted entry.
+public class ConsoleLoggerProvider : LoggerProvider {
+    private val writeLine: (string) -> unit
+    private var disposed = false
+
+    /// Writes entries through Console.WriteLine. The factory supplies severity filtering.
+    init() {
+        writeLine = text => Console.WriteLine(text)
+    }
+
+    /// Uses a caller-owned synchronous line sink, enabling redirection without changing Logger.
+    init(writeLine: (string) -> unit) {
+        self.writeLine = writeLine
+    }
+
+    func CreateLogger(categoryName: string) -> Logger {
+        if disposed {
+            System.Fail("ConsoleLoggerProvider is disposed")
+        }
+        return ConsoleLogger(self, categoryName)
+    }
+
+    /// Disables existing loggers. Does not close the console or the caller's line sink.
+    func Dispose() {
+        disposed = true
+    }
+
+    internal val Active: bool => !disposed
+    internal func Write(text: string) {
+        if !disposed {
+            writeLine(text)
+        }
+    }
+}
+
+internal class ConsoleLogger : Logger {
+    private val provider: ConsoleLoggerProvider
+    private val category: string
+
+    init(provider: ConsoleLoggerProvider, category: string) {
+        self.provider = provider
+        self.category = category
+    }
+
+    func IsEnabled(level: LogLevel) -> bool => provider.Active && LogLevels.Enabled(level, LogLevel.Trace)
+
+    func Log<TState>(level: LogLevel, eventId: EventId, state: TState, error: Error?, formatter: (TState, Error?) -> string) {
+        if !IsEnabled(level) {
+            return
+        }
+        let message = formatter(state, error)
+        var text = LevelName(level) + ": " + category + "[" + eventId.Id.ToString() + "] " + message
+        if error is Error failure {
+            text = text + "\n" + failure.FormatError()
+        }
+        provider.Write(text)
+    }
+
+    func BeginScope<TState>(state: TState) -> Disposable? => EmptyScope.Instance
+
+    private static func LevelName(level: LogLevel) -> string => level match {
+        LogLevel.Trace => "trace"
+        LogLevel.Debug => "debug"
+        LogLevel.Information => "info"
+        LogLevel.Warning => "warn"
+        LogLevel.Error => "error"
+        LogLevel.Critical => "critical"
+        _ => "none"
+    }
+}

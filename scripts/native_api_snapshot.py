@@ -11,6 +11,8 @@ import zipfile
 
 
 SOURCE_LINK_CHECKS = {
+    'Neo/Logging/Logger/index.html': 'extensions/Neo.Logging/src/Neo.Logging/Neo/Logging/Contracts.rvn',
+    'Neo/Logging/DefaultLoggerFactory/index.html': 'extensions/Neo.Logging/src/Neo.Logging/Neo/Logging/DefaultLoggerFactory.rvn',
     'Neo/DependencyInjection/ServiceCollection/index.html': 'extensions/Neo.DependencyInjection/src/Neo.DependencyInjection/Neo/DependencyInjection/Services.rvn',
     'Neo/Localization/Localizer/index.html': 'extensions/Neo.Localization/src/Neo.Localization/Neo/Localization/Localizer.rvn',
     'Neo/Localization/JsonLocalizerProvider/index.html': 'extensions/Neo.Localization/src/Neo.Localization/Neo/Localization/JsonLocalizerProvider.rvn',

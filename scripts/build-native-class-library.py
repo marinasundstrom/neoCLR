@@ -14,7 +14,7 @@ def project_directory(name):
     if name.startswith('Neo.'):
         return ROOT / 'extensions' / name / 'src' / name
     return ROOT / 'runtime' / name / 'src' / name
-NAMES = ('System.Runtime', 'System.Data', 'System.Networking', 'System.Web', 'Neo.DependencyInjection', 'Neo.Localization')
+NAMES = ('System.Runtime', 'System.Data', 'System.Networking', 'System.Web', 'Neo.DependencyInjection', 'Neo.Localization', 'Neo.Logging')
 
 
 def sha(path):

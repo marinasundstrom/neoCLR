@@ -754,7 +754,14 @@ impl Specializer<'_> {
                         index: instance.row as u32,
                     });
                     let method_clone = !instance.methods.is_empty();
-                    let instance_row = instance.row;
+                    // Use one private name suffix per argument vector so interface
+                    // contracts and implementations retain the same specialized slot.
+                    let method_key = self
+                        .instances
+                        .iter()
+                        .find(|candidate| candidate.methods == instance.methods)
+                        .unwrap()
+                        .row;
                     let source_function = self.source.functions[instance.source].clone();
                     target.generic_arguments.clear();
                     pending.push(instance);
@@ -765,7 +772,7 @@ impl Specializer<'_> {
                         .transpose()?;
                     target.name = lowered_member_name(&source_function, target.owner.as_ref());
                     if method_clone {
-                        target.name = clone_name(&target.name, instance_row);
+                        target.name = clone_name(&target.name, method_key);
                     }
                     target.parameters = closed
                         .parameters
@@ -1008,7 +1015,13 @@ fn expand_validated(
             )?;
             neoclr::native_metadata::retain_interface_slot(&mut function, input, instance.source);
             if !instance.methods.is_empty() {
-                function.name = clone_name(&function.name, instance.row);
+                let method_key = context
+                    .instances
+                    .iter()
+                    .find(|candidate| candidate.methods == instance.methods)
+                    .unwrap()
+                    .row;
+                function.name = clone_name(&function.name, method_key);
             }
             if instance.row != instance.source
                 && let Some(origin) = &mut function.origin
@@ -1083,17 +1096,26 @@ fn expand_validated(
                 if !original.instance
                     || original.receiver_byref
                     || (!display && !class && !original.body.is_empty())
-                    || !original.generic_parameters.is_empty()
+                    || (!original.generic_parameters.is_empty() && (display || class))
                 {
                     return Err(
-                        "interface dispatch requires a bodyless nongeneric instance contract"
+                        "interface dispatch requires a bodyless instance contract; class virtual methods must be nongeneric"
                             .into(),
                     );
                 }
-                contracts.push(super::selection::closed_signature(
-                    original,
-                    &instance.types,
-                )?);
+                let mut contract = super::selection::closed_signature(original, &instance.types)?;
+                contract.parameters = contract
+                    .parameters
+                    .iter()
+                    .map(|ty| ty.substitute_method_parameters(&instance.methods))
+                    .collect::<Result<_, _>>()
+                    .map_err(|e| e.to_string())?;
+                contract.returns = contract
+                    .returns
+                    .substitute_method_parameters(&instance.methods)
+                    .map_err(|e| e.to_string())?;
+                contract.generic_arguments = instance.methods.clone();
+                contracts.push(contract);
             }
             if display {
                 continue;
@@ -2210,6 +2232,36 @@ ret
         program.verify().unwrap();
         let outcome = program.run(neoclr::Limits::default()).unwrap();
         assert_eq!(outcome.value, neoclr::Value::Int32(42));
+    }
+
+    #[test]
+    fn generic_interface_calls_with_identical_erased_signatures_remain_distinct() {
+        let source = include_str!("../../../examples/generic-interfaces.neoil")
+            .replace("Apply<T>(T value) -> T", "Apply<T>() -> Int32")
+            .replace("ldarg value", "ldc.i4 21")
+            .replace("ldc.i4 42\ncallvirt instance Echo::Apply<Int32>(Int32)",
+                "callvirt instance Echo::Apply<Int32>()\nnewobj Identity\ncastclass Echo\ncallvirt instance Echo::Apply<String>()\nadd");
+        let input = neoclr::assemble(&source).unwrap();
+        let (selected, _) = super::super::selection::prepare(&input, "Main").unwrap();
+        let program = neoclr::LoadedProgram::new(&selected).unwrap();
+        program.verify().unwrap();
+        assert_eq!(
+            program.run(neoclr::Limits::default()).unwrap().value,
+            neoclr::Value::Int32(42)
+        );
+    }
+
+    #[test]
+    fn generic_interface_dispatch_closes_method_state() {
+        let input =
+            neoclr::assemble(include_str!("../../../examples/generic-interfaces.neoil")).unwrap();
+        let (selected, _) = super::super::selection::prepare(&input, "Main").unwrap();
+        let program = neoclr::LoadedProgram::new(&selected).unwrap();
+        program.verify().unwrap();
+        assert_eq!(
+            program.run(neoclr::Limits::default()).unwrap().value,
+            neoclr::Value::Int32(42)
+        );
     }
 
     #[test]

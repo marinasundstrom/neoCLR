@@ -31,7 +31,9 @@ def main():
         core_assemblies = ['System.Runtime', 'System.Data', 'System.Networking', 'System.Web']
         if catalog['assemblyNames'] not in (core_assemblies, core_assemblies + ['System.Data.PostgreSql'],
                 core_assemblies + ['Neo.DependencyInjection', 'Neo.Localization'],
-                core_assemblies + ['Neo.DependencyInjection', 'Neo.Localization', 'System.Data.PostgreSql']):
+                core_assemblies + ['Neo.DependencyInjection', 'Neo.Localization', 'System.Data.PostgreSql'],
+                core_assemblies + ['Neo.DependencyInjection', 'Neo.Localization', 'Neo.Logging'],
+                core_assemblies + ['Neo.DependencyInjection', 'Neo.Localization', 'Neo.Logging', 'System.Data.PostgreSql']):
             raise ValueError('Unsupported split class-library selection')
         for relative, expected in catalog['files'].items():
             path = (args.libraries / relative).resolve()

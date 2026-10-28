@@ -88,7 +88,7 @@ public sealed partial class TypeBuilder
             return body;
         }
         var declared = Methods.SingleOrDefault(m => m.IsStatic == isStatic && m.Visibility == MethodVisibility.Public &&
-            m.Name == name && m.Signature.GenericParameterNames.Count == 0 && Matches(m.Signature));
+            m.Name == name && Matches(m.Signature));
         if (declared is not null) return declared;
         var inherited = LocalBase?.FindInterfaceImplementation(name, signature, isStatic, owner, LocalBaseSignature is { } parent ? Project(parent).GenericInstance : null)
             ?? (ExternalBase is { } external ? Assembly.ExternalClassMethods(external).FirstOrDefault(m =>

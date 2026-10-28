@@ -1,12 +1,13 @@
 # Optional application services (development)
 
 Author direction, 2026-10-28: application services use the `Neo` root namespace.
-Each API family has its own project and assembly. `Neo.Configuration` and
-`Neo.Logging` are the next planned families; neither is implemented by this slice.
+Each API family has its own project and assembly. Neo.Logging now adds the
+[logging foundation](logging.md); Neo.Configuration remains a planned follow-up.
 
 | Namespace and assembly | Project | Dependencies |
 | --- | --- | --- |
 | `Neo.DependencyInjection` | `extensions/Neo.DependencyInjection/src/Neo.DependencyInjection/Neo.DependencyInjection.rvnproj` | System.Runtime |
+| `Neo.Logging` | `extensions/Neo.Logging/src/Neo.Logging/Neo.Logging.rvnproj` | System.Runtime, Neo.DependencyInjection |
 | `Neo.Localization` | `extensions/Neo.Localization/src/Neo.Localization/Neo.Localization.rvnproj` | System.Runtime, System.Data, Neo.DependencyInjection |
 
 Both runtime and extension components use
@@ -23,8 +24,8 @@ DI and localization sources live under `extensions/Neo.DependencyInjection/src/N
 and `extensions/Neo.Localization/src/Neo.Localization/Neo/Localization`. Localization includes lookup contracts,
 formatting extensions, JSON providers, diagnostics and DI registration in one
 assembly. Culture and general formatting primitives remain in System.Globalization
-in System.Runtime. System.Runtime and System.Data do not reference either Neo library.
-The development SDK ships and references both libraries through its generated
+in System.Runtime. System.Runtime and System.Data do not reference the Neo libraries.
+The development SDK ships and references the Neo libraries through its generated
 class-library props; consumers selecting references themselves can omit them.
 
 ## Comparison and tradeoffs

@@ -3035,3 +3035,14 @@ with their own declaring assemblies and src/Neo source links. The native audit
 includes both libraries in the same API tree. The older CLI scaffold still omits
 these APIs; no new exclusion is introduced. Imports, retention examples and
 consumer references must migrate together; see [the boundary](https://github.com/marinasundstrom/neoCLR/blob/main/docs/application-services.md).
+
+
+### Neo.Logging foundation (2026-10-28)
+
+The native snapshot includes every public Neo.Logging contract and implementation,
+including generic Log/BeginScope members, EventId, literal helpers and DI registration.
+The native audit discovers Neo.Logging.dll alongside the other optional components.
+Source navigation covers its component project; [the guide](logging.md) describes
+ownership, errors, serialized access and current .NET gaps. The CLI scaffold still
+omits these native application services; their public reference is the production
+native rendering, not a silent type exclusion.

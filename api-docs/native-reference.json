@@ -5,27 +5,28 @@
     "url": "https://github.com/marinasundstrom/neoCLR",
     "revision": "main"
   },
-  "sha256": "42448c9989562ba7e815b8f0e9d76dda8386096ac65076afe8c8f302cbd72926",
-  "librarySourceRevision": "b9ff92ad7d3fa50209c10a2f11a4ccffe6796f05",
-  "compilerRevision": "91c1edca8",
+  "sha256": "3ff46dc9a592089372778650efd36272f77ebda1f7b80c60a659aff7f4a16ea3",
+  "librarySourceRevision": "8053a1b6320d9fd0c92e20f8858df5abd08ba446",
+  "compilerRevision": "9724897ce",
   "libraryBuildEvidence": {
     "file": "build-evidence.json",
-    "sha256": "bf6bacd8bb6b0dbc84c86d9feabc2495f7f7b96e51a3f26bd8baa4d5e02ae2c7"
+    "sha256": "6aa500e6006ce73b340ccb33b295ce4d01d4b83a2f963f249473d31038a62204"
   },
-  "rendererRevision": "91c1edca8",
+  "rendererRevision": "9724897ce",
   "libraryArtifacts": {
-    "System.Runtime.dll": "f4e75dae178757e528d72210faab566dfaec3d5d91508f324bd26c3505623981",
-    "System.Data.dll": "8488b74456eb99f58afbc40818fcb355d60a4f710c1de58efc5d417f67dd5633",
-    "System.Networking.dll": "a54a879bb0b81ff7008da72da4cad64e0b4492ed90d7758dd211f3a03d802c9e",
-    "System.Web.dll": "3af28a5c1245d38bb1eeaa96514733ab6e1c0995141944d7178341bb9da88dd7",
+    "System.Runtime.dll": "a995209829e591ac8b5da8477261c3c3bc843d8669ce684e8f1d7292c4f27b5f",
+    "System.Data.dll": "a30392cd1a78aefddcde5ec3af4482eb23cedcfb10f8ae6fb249099f54c36f5a",
+    "System.Networking.dll": "689eb9ed349e49b4d39b8e1ff31664e916f82ff06e21331c0899e34558233170",
+    "System.Web.dll": "de48d8a23c7e473ea9c35dfd39c7926ab36d2fc74ffb385ff11978750b0d3e46",
     "Neo.DependencyInjection.dll": "e4f8fe8e052fb646827f5fdf6e897eb0f2cfd1a26dce17b3270de1819ec42f71",
-    "Neo.Localization.dll": "52c98fb0b89fd4ed668dfe86a4b5aa06fdef16bce37ce21795b8772fc2ceb5c4",
-    "System.Data.PostgreSql.dll": "eb8d27dcd02c8c849c93a8a5152df43d4824873dfdf1692bbd3141f8f5e4deb8",
+    "Neo.Localization.dll": "c217a43072a302aadcabf1f596b2f9985cc3eaf580659bf72031f2ce0fe6ae24",
+    "Neo.Logging.dll": "dbe706e8446de50b276265d668e0b0e4ebdebb92ea00b70ace740790e92ff2bc",
+    "System.Data.PostgreSql.dll": "c4ee6904f74ec2aabdf2183c09d228cde2bfb4c684d828d527213059be8be1d6",
     "System.runtime.neox": "0c72a8656e7158d6bb2f31c0b019d8747dd61a6c4127b278155e104de437769b"
   },
   "renderingEvidence": {
     "normalized-sidecars.json": "810497e62e044ae6a1c650278bc7cc5657696681da09374d63b6450fb37d9bc4",
-    "restored-xml-comments.json": "3526f5493e16e41a2775ec283ac8f4e389b652f057e517c915d161afad8f48e1"
+    "restored-xml-comments.json": "1fe46659fb3e11e05b254e6a38e1d144b81ea5f7e69bfbddabca0a74bcd889b8"
   },
   "scope": "Reviewed native API rendering; legacy coverage gaps remain explicitly marked by the website overlay."
 }

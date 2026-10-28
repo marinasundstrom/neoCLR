@@ -272,9 +272,9 @@ public sealed partial class AssemblyBuilder
                     parameters = instruction.ConstructedTarget.Signature.ParameterTypes.Select(SignatureValue).ToArray()
                 }
             },
-            "call.generic" => new
+            "call.generic" or "call.virtual.generic" => new
             {
-                op = "call",
+                op = instruction.Op == "call.virtual.generic" ? "callvirt" : "call",
                 arg = (object)new
                 {
                     name = FunctionName(instruction.Target!),
@@ -324,7 +324,7 @@ public sealed partial class AssemblyBuilder
         };
         IEnumerable<object> NativeInstructions(MethodBuilder.Operation instruction)
         {
-            if (instruction.Target is { DiscardNativeImportResult: true } && instruction.Op is "call" or "call.virtual" or "call.constructed" or "call.virtual.constructed" or "call.generic")
+            if (instruction.Target is { DiscardNativeImportResult: true } && instruction.Op is "call" or "call.virtual" or "call.constructed" or "call.virtual.constructed" or "call.generic" or "call.virtual.generic")
                 return new[] { Instruction(instruction), new { op = "pop" } };
             // Legacy native stores through managed references return an inhabited Void.
             // The producer contract follows CLI stfld, which leaves no stack value.
@@ -356,7 +356,7 @@ public sealed partial class AssemblyBuilder
         {
             var offsets = new int[method.Instructions.Count + 1];
             for (int i = 0; i < method.Instructions.Count; i++)
-                offsets[i + 1] = offsets[i] + (method.Instructions[i].Op switch { "label" => 0, "console.line" => 3, "console.write" => 2, "call" or "call.virtual" or "call.constructed" or "call.virtual.constructed" or "call.generic" when method.Instructions[i].Target?.DiscardNativeImportResult == true => 2, "field.store" when method.Instructions[i].Field!.DeclaringType.IsValueType => 2, _ => 1 });
+                offsets[i + 1] = offsets[i] + (method.Instructions[i].Op switch { "label" => 0, "console.line" => 3, "console.write" => 2, "call" or "call.virtual" or "call.constructed" or "call.virtual.constructed" or "call.generic" or "call.virtual.generic" when method.Instructions[i].Target?.DiscardNativeImportResult == true => 2, "field.store" when method.Instructions[i].Field!.DeclaringType.IsValueType => 2, _ => 1 });
             var labels = method.LabelPositions();
             return method.Instructions.SelectMany(instruction => instruction.Op switch
             {

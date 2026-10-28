@@ -36,7 +36,7 @@ public sealed partial class AssemblyBuilder
         if (!completedInterfaceContracts.TryGetValue(InterfaceDefinition(reference), out var methods))
             throw new InvalidDataException("external interface contract is incomplete: " + reference);
         return methods.Select(m => (m.Name, new MethodSignature(SubstituteExternalInterfaceType(m.Signature.ReturnType, reference),
-            m.Signature.ParameterTypes.Select(t => SubstituteExternalInterfaceType(t, reference)), outParameters: m.Signature.OutParameters), m.IsStatic, m.Target));
+            m.Signature.ParameterTypes.Select(t => SubstituteExternalInterfaceType(t, reference)), m.Signature.GenericParameterNames, outParameters: m.Signature.OutParameters), m.IsStatic, m.Target));
     }
 
     private static SignatureType SubstituteExternalInterfaceType(SignatureType type, ImportedTypeReference owner) =>

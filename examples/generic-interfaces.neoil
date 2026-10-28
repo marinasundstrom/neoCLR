@@ -1,0 +1,20 @@
+.module GenericInterfaces
+.entry Main
+.interface Echo
+.method instance Apply<T>(T value) -> T
+.end
+.end
+.type class Identity
+.implements Echo
+.method instance Apply<T>(T value) -> T
+ldarg value
+ret
+.end
+.end
+.function Main() -> Int32
+newobj Identity
+castclass Echo
+ldc.i4 42
+callvirt instance Echo::Apply<Int32>(Int32)
+ret
+.end

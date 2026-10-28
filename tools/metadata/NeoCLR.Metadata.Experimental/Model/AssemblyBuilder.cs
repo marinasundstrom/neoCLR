@@ -161,7 +161,7 @@ public sealed partial class AssemblyBuilder
                          !ReferenceEquals(callerType, familyTarget.DeclaringType) && !callerType.DerivesFrom(familyTarget.DeclaringType!) &&
                          !(instruction.Op is ("call" or "call.constructed") && method.IsConstructor && callerType.IsDirectBaseConstructor(familyTarget, instruction.Type))))
                         throw new InvalidDataException("protected constructor requires a declaring-family caller");
-                    if ((instruction.Target ?? instruction.ConstructedTarget?.Definition ?? instruction.GenericTarget?.Definition)?.IsAbstract == true && instruction.Op is not ("call.virtual" or "call.virtual.constructed" or "call.constrained" or "function.bind"))
+                    if ((instruction.Target ?? instruction.ConstructedTarget?.Definition ?? instruction.GenericTarget?.Definition)?.IsAbstract == true && instruction.Op is not ("call.virtual" or "call.virtual.generic" or "call.virtual.constructed" or "call.constrained" or "function.bind"))
                         throw new InvalidDataException("interface dispatch requires a supported virtual-call contract");
                     if (instruction.ConstrainedOwner is { } implementingType)
                         MethodILGenerator.ValidateConstrainedOperands(this, implementingType, instruction.Target!);
@@ -817,6 +817,7 @@ public sealed partial class AssemblyBuilder
             {
                 metadata.AddMethodDefinition((MethodAttributes)method.GetAttributes(accessors.Contains(method)),
                     (MethodImplAttributes)method.Definition.ImplementationAttributes, metadata.GetOrAddString(method.CliName), Signature(method), -1, firstParameter);
+                genericRows.Add((handles[method], MetadataTokens.GetRowNumber(handles[method]) * 2 + 1, method.Signature.GenericParameterNames));
                 nextMethod++;
                 return;
             }
@@ -834,7 +835,7 @@ public sealed partial class AssemblyBuilder
                     "function.bind" => method.Instructions[i].Target!.IsStatic || method.Instructions[i].Target!.IsAbstract ? 12 : 11,
                     "function.invoke" => 5,
                     "label" => 0,
-                    "type.token" or "object.unbox" or "reference.test" or "object.box" or "reference.cast" or "object.load" or "object.store" or "array.new" or "array.load" or "array.store" or "array.address" or "string" or "constant" or "call" or "call.virtual" or "call.generic" or "call.constructed" or "call.virtual.constructed" or "new.object" or "new.constructed" or "field.address" or "field.load" or "field.store" or "field.import.load" or "field.import.store" or "branch" or "branch.true" or "branch.false" => 5,
+                    "type.token" or "object.unbox" or "reference.test" or "object.box" or "reference.cast" or "object.load" or "object.store" or "array.new" or "array.load" or "array.store" or "array.address" or "string" or "constant" or "call" or "call.virtual" or "call.generic" or "call.virtual.generic" or "call.constructed" or "call.virtual.constructed" or "new.object" or "new.constructed" or "field.address" or "field.load" or "field.store" or "field.import.load" or "field.import.store" or "branch" or "branch.true" or "branch.false" => 5,
                     "argument" or "argument.store" or "argument.address" or "local.load" or "local.store" or "local.address" => 4,
                     "local.initialize" => 6,
                     "equal" or "less" or "greater" or "less.unordered" or "greater.unordered" => 2,
@@ -967,7 +968,7 @@ public sealed partial class AssemblyBuilder
                     case "call.constrained":
                         code.WriteByte(0xfe); code.WriteByte(0x16); code.WriteInt32(ElementToken(instruction.Type!));
                         code.WriteByte(instruction.Target!.IsStatic ? (byte)0x28 : (byte)0x6f); code.WriteInt32(instruction.ConstructedTarget is { } constrainedCall ? ConstructedCallToken(constrainedCall) : ImportMethod(instruction.Target)); break;
-                    case "call.generic": code.WriteByte(0x28); code.WriteInt32(GenericCallToken(instruction.GenericTarget!)); break;
+                    case "call.generic": case "call.virtual.generic": code.WriteByte(instruction.Op == "call.virtual.generic" ? (byte)0x6f : (byte)0x28); code.WriteInt32(GenericCallToken(instruction.GenericTarget!)); break;
                     case "call.virtual": case "call": code.WriteByte(instruction.Op == "call.virtual" ? (byte)0x6f : (byte)0x28); code.WriteInt32(ImportMethod(instruction.Target!)); break;
                     case "function.bind":
                         if (instruction.Target!.IsStatic) code.WriteByte(0x14);

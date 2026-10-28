@@ -8,7 +8,7 @@ Compiler-generated carriers, module functions and internal helpers are not count
 See the [review and findings](class-library-soundness-20261020.md#whole-library-contract-pass) for manual interpretation,
 inherited/runtime contracts, execution evidence, allocation concerns and remaining gaps.
 
-**314 declarations**: Borrowed view: 2; Contract: 72; Enum: 18; Intrinsic: 16; Owned view: 2; Record: 10; Reference: 107; Reference value: 8; Static: 18; Union: 37; Value: 24.
+**326 declarations**: Borrowed view: 2; Contract: 76; Enum: 19; Intrinsic: 16; Owned view: 2; Record: 10; Reference: 113; Reference value: 8; Static: 18; Union: 37; Value: 25.
 
 `Et` = typed Equals; `Eo` = Object Equals; `H` = parameterless GetHashCode;
 `T` = parameterless ToString; `Tf` = formatted ToString overload; `*` = authored override.
@@ -33,6 +33,18 @@ Reference subclasses may inherit value contracts (notably IPv4Address/IPv6Addres
 | [Neo.Localization.Localizer](../../extensions/Neo.Localization/src/Neo.Localization/Neo/Localization/Localizer.rvn#L7) | Contract | — |
 | [Neo.Localization.Localizer<T>](../../extensions/Neo.Localization/src/Neo.Localization/Neo/Localization/Localizer.rvn#L18) | Contract | — |
 | [Neo.Localization.LocalizerFactory](../../extensions/Neo.Localization/src/Neo.Localization/Neo/Localization/LocalizerFactory.rvn#L7) | Contract | — |
+| [Neo.Logging.ConsoleLoggerProvider](../../extensions/Neo.Logging/src/Neo.Logging/Neo/Logging/ConsoleLoggerProvider.rvn#L7) | Reference | — |
+| [Neo.Logging.DefaultLogger<T>](../../extensions/Neo.Logging/src/Neo.Logging/Neo/Logging/DefaultLoggerFactory.rvn#L160) | Reference | — |
+| [Neo.Logging.DefaultLoggerFactory](../../extensions/Neo.Logging/src/Neo.Logging/Neo/Logging/DefaultLoggerFactory.rvn#L9) | Reference | — |
+| [Neo.Logging.EventId](../../extensions/Neo.Logging/src/Neo.Logging/Neo/Logging/Contracts.rvn#L17) | Value | Et, Eo*, H*, T* |
+| [Neo.Logging.LogLevel](../../extensions/Neo.Logging/src/Neo.Logging/Neo/Logging/Contracts.rvn#L6) | Enum | — |
+| [Neo.Logging.Logger](../../extensions/Neo.Logging/src/Neo.Logging/Neo/Logging/Contracts.rvn#L53) | Contract | — |
+| [Neo.Logging.Logger<T>](../../extensions/Neo.Logging/src/Neo.Logging/Neo/Logging/Contracts.rvn#L65) | Contract | — |
+| [Neo.Logging.LoggerFactory](../../extensions/Neo.Logging/src/Neo.Logging/Neo/Logging/Contracts.rvn#L74) | Contract | — |
+| [Neo.Logging.LoggerProvider](../../extensions/Neo.Logging/src/Neo.Logging/Neo/Logging/Contracts.rvn#L68) | Contract | — |
+| [Neo.Logging.NullLogger](../../extensions/Neo.Logging/src/Neo.Logging/Neo/Logging/NullLogger.rvn#L6) | Reference | — |
+| [Neo.Logging.NullLogger<T>](../../extensions/Neo.Logging/src/Neo.Logging/Neo/Logging/NullLogger.rvn#L17) | Reference | — |
+| [Neo.Logging.NullLoggerFactory](../../extensions/Neo.Logging/src/Neo.Logging/Neo/Logging/NullLogger.rvn#L28) | Reference | — |
 | [System.AndroidApiLevel](../../runtime/System.Runtime/src/System.Runtime/System/Environment/Platform.rvn#L33) | Record | T* |
 | [System.Architecture](../../runtime/System.Runtime/src/System.Runtime/System/Environment/Platform.rvn#L83) | Record | T* |
 | [System.Array](../../runtime/System.Runtime/src/System.Runtime/System/Foundations.rvn#L40) | Reference | — |

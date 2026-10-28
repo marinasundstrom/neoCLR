@@ -1,0 +1,43 @@
+module Neo.Logging
+
+import System.*
+
+/// Shared logger that never writes or evaluates a formatter.
+public class NullLogger : Logger {
+    private static val instance = NullLogger()
+    /// Reusable stateless no-op logger.
+    static val Instance: NullLogger => instance
+    private init() { }
+    func IsEnabled(level: LogLevel) -> bool => false
+    func Log<TState>(level: LogLevel, eventId: EventId, state: TState, error: Error?, formatter: (TState, Error?) -> string) { }
+    func BeginScope<TState>(state: TState) -> Disposable? => EmptyScope.Instance
+}
+
+/// Shared typed logger that never writes or evaluates a formatter.
+public class NullLogger<T> : Logger<T> {
+    private static val instance = NullLogger<T>()
+    /// Reusable stateless no-op logger for T.
+    static val Instance: NullLogger<T> => instance
+    private init() { }
+    func IsEnabled(level: LogLevel) -> bool => false
+    func Log<TState>(level: LogLevel, eventId: EventId, state: TState, error: Error?, formatter: (TState, Error?) -> string) { }
+    func BeginScope<TState>(state: TState) -> Disposable? => EmptyScope.Instance
+}
+
+/// Reusable no-op factory. Providers passed to it remain caller-owned and are ignored.
+public class NullLoggerFactory : LoggerFactory {
+    private static val instance = NullLoggerFactory()
+    /// The shared no-op factory.
+    static val Instance: NullLoggerFactory => instance
+    private init() { }
+    func CreateLogger(categoryName: string) -> Logger => NullLogger.Instance
+    func AddProvider(provider: LoggerProvider) { }
+    func Dispose() { }
+}
+
+internal class EmptyScope : Disposable {
+    private static val instance = EmptyScope()
+    internal static val Instance: EmptyScope => instance
+    private init() { }
+    func Dispose() { }
+}

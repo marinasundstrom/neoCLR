@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../../../runtime/NativeLibrary.props" />
+  <PropertyGroup>
+    <AssemblyName>Neo.Logging</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Neo/**/*.rvn" />
+    <ProjectReference Include="../../../../runtime/System.Runtime/src/System.Runtime/System.Runtime.rvnproj" />
+    <ProjectReference Include="../../../Neo.DependencyInjection/src/Neo.DependencyInjection/Neo.DependencyInjection.rvnproj" />
+  </ItemGroup>
+</Project>

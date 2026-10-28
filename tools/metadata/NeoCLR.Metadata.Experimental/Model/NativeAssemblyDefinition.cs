@@ -947,9 +947,9 @@ public sealed partial class NativeAssemblyDefinition
                     MethodDefinition.IsNativeObjectSlot(name, new(resultType, parameterTypes, genericNames), signatureGraph.Types[ownerIndex]), "invalid native Object slot");
                 Require(!interfaceOwner || name == ".cctor" || isAbstract && isVirtual == instance, "interface method flags mismatch");
                 Require(!isAbstract || interfaceOwner || instance && types[ownerIndex].IsAbstractClass && isVirtual && !isOverride, "abstract method requires an abstract owner");
-                Require(!isAbstract || visibility == MethodVisibility.Public && name != ".ctor" && genericArity == 0 &&
+                Require(!isAbstract || visibility == MethodVisibility.Public && name != ".ctor" && (genericArity == 0 || interfaceOwner && instance) &&
                     method.GetProperty("body").GetArrayLength() == 0 && (!method.TryGetProperty("locals", out var interfaceLocals) || interfaceLocals.GetArrayLength() == 0), "invalid abstract method");
-                Require(!isVirtual || instance && visibility == MethodVisibility.Public && genericArity == 0 && name != ".ctor" &&
+                Require(!isVirtual || instance && visibility == MethodVisibility.Public && (genericArity == 0 || interfaceOwner) && name != ".ctor" &&
                     (interfaceOwner || !types[ownerIndex].IsValueType || isOverride && types[ownerIndex].IsValueType), "unsupported virtual method");
                 Require(!isOverride || isVirtual && !interfaceOwner && !types[ownerIndex].IsObjectRoot && !isAbstract, "invalid override flags");
                 var initializer = name == ".cctor";

@@ -70,7 +70,8 @@
       "runtime/System.Web/src",
       "runtime/System.Data.PostgreSql/src",
       "extensions/Neo.DependencyInjection/src",
-      "extensions/Neo.Localization/src"
+      "extensions/Neo.Localization/src",
+      "extensions/Neo.Logging/src"
     ]
   },
   "moduleTerminology": true,

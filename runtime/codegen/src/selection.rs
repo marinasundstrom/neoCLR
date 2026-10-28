@@ -493,10 +493,11 @@ pub(super) fn implicit_implementation(
     concrete: &Type,
     contract: &neoclr::metadata::Function,
 ) -> Result<(usize, FunctionRef), Error> {
-    if contract
-        .owner
-        .as_ref()
-        .is_some_and(|owner| neoclr::native_metadata::interface_has_variance(input, owner))
+    if !contract.generic_parameters.is_empty()
+        || contract
+            .owner
+            .as_ref()
+            .is_some_and(|owner| neoclr::native_metadata::interface_has_variance(input, owner))
         || input.type_definition(concrete).is_some_and(|t| {
             t.base
                 .as_ref()
@@ -517,7 +518,7 @@ pub(super) fn implicit_implementation(
                 name: method.name,
                 owner: method.owner,
                 instance: method.instance,
-                generic_arguments: vec![],
+                generic_arguments: method.generic_arguments,
                 parameters: method.parameters,
             },
         ));
@@ -529,7 +530,14 @@ pub(super) fn implicit_implementation(
     let member_name = |m: &neoclr::metadata::Function| {
         m.origin
             .as_ref()
-            .map(|o| o.name.clone())
+            .map(|o| {
+                // Specialization suffixes identify closed dispatch slots without
+                // changing the original reflection/display identity.
+                match m.name.rsplit_once("$aot_method_") {
+                    Some((_, suffix)) => format!("{}$aot_method_{suffix}", o.name),
+                    None => o.name.clone(),
+                }
+            })
             .unwrap_or_else(|| m.name.rsplit('.').next().unwrap().to_owned())
     };
     let name = member_name(contract);
