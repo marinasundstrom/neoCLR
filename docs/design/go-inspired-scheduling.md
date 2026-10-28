@@ -146,14 +146,38 @@ code-lifetime ownership. Do not compile unused methods merely to hide contention
    worker defaults, migration or preemption policy. Adopt one proven component at
    a time; retain reference modes and report losing cases.
 
-Following the author's scheduling-priority clarification, the immediate next
-implementation is step 1's queue-policy harness and selectable prototype, using
-the worker and [shared async/GC trace session](../experiments/execution-trace/session-README.md)
-controls and adding providers as needed. Neither replaces Task.Run or the production scheduler. A single worker
-must not lose materially on tiny jobs; extra workers must earn their CPU/memory
-cost on parallel work. Do not choose a fixed percentage success threshold after
-seeing results: predeclare the workload, repetition count, acceptable tail/error
-budget and target host constraints for each experiment.
+The [bounded queue-policy prototype](../experiments/queue-policy/README.md) now
+passes ordering, cancellation/reuse and existing worker qualification. Two short
+screens are variable; longer two-worker controls show about 1% lower throughput.
+Keep FIFO as the default. The prototype retains the shared pool/heap gate and
+establishes no application or collector advantage.
+
+The next bounded investigation is real I/O completion-to-resume latency and
+coordination costs, retaining the owner-pinned control and shared async/GC trace.
+Predeclare workload, repetitions, acceptable tail/error budget and host constraints
+before evaluating a candidate. Queue ordering alone cannot remove first-call JIT
+blocking or qualify shared managed execution.
+
+**Author clarification, 2026-10-28:** General-purpose includes future desktop and
+mobile UI applications, as well as HTTP and other communications. RabbitMQ
+bindings should be feasible and competitive; no binding or performance parity is
+claimed. Include low-load input/continuation responsiveness, owner/main-thread
+affinity, frame deadlines, idle wakeups, CPU/energy and memory alongside saturation
+throughput, backpressure and tail latency. Mobile and desktop need actual target
+measurements; a busy desktop worker microbenchmark cannot qualify them. Follow
+.NET-facing scheduling/context contracts; do not infer unrestricted continuation
+migration from an internal queue policy. Compare broker clients only with matched
+protocol, payload, acknowledgement/durability, prefetch and resource constraints.
+These are workload criteria, not a commitment to a UI framework or broker API.
+
+The author also requests optional purpose-specific JIT, GC and scheduling tuning,
+including high request loads, while accounting for the executed logic. Aim for
+balanced defaults and explicit, documented controls rather than a universal server
+preset. Evaluate CPU work, allocation/live-set size, downstream waits, blocking
+calls, available cores and admission limits together; report throughput, tails,
+memory and idle/energy tradeoffs. Existing controls remain as documented; this
+requirement does not announce new knobs or select values. Benchmark candidate
+settings against representative handler logic before adding presets.
 
 ## Execution tracer: proposed first slice
 

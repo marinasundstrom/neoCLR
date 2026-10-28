@@ -38,6 +38,22 @@ pause measurement. Compiler/worker integration, real I/O and finer GC phases
 remain planned; these fixtures do not establish production HTTP performance.
 [Implementation and qualification](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/execution-trace/README.md).
 
+The private local/global/stealing queue experiment now passes focused correctness
+checks, but repeated timings show no broad advantage; FIFO remains the default.
+[Measurement tables and limitations](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/queue-policy-20261028/README.md)
+retain both short screens and longer controls. These are native-job measurements,
+not HTTP or collector comparisons. Next work targets real I/O completion-to-resume
+latency and coordination costs.
+
+The intended general-purpose scope also includes future desktop/mobile UI apps:
+main-thread affinity, input/frame responsiveness and idle CPU/energy matter alongside
+server throughput and backpressure. Competitive messaging bindings, including
+RabbitMQ, are a future evaluation case; no binding, UI platform support or performance
+parity is announced. JIT/AOT and both collectors remain application-level controls.
+The direction includes optional workload-specific JIT/GC/scheduling tuning with
+balanced defaults. Settings must account for actual handler CPU work, allocations
+and waits; no universal high-load preset or new configuration API is announced.
+
 [Investigation and benchmark plan](https://github.com/marinasundstrom/neoCLR/blob/main/docs/design/go-inspired-scheduling.md)
 
 <a id="http-poc"></a>

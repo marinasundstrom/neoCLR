@@ -1,5 +1,12 @@
 # Development conversation record
 
+## 2026-10-28 — Scheduling for general-purpose applications
+
+- **Author:** Emphasized good scheduling/worker services for fast I/O, HTTP and task switching. Clarified that the runtime should serve both normal and server loads, enable competitive RabbitMQ bindings, and that normal applications include future desktop and mobile UI apps.
+- **Assistant response:** Treat real completion-to-resume latency as the next measure. Include owner/main-thread affinity, input/frame responsiveness and idle CPU/energy alongside server throughput, tails and backpressure. Define matched broker protocol/durability/acknowledgement/resource conditions before asserting parity. This does not claim UI/mobile support or implement a binding.
+- **Author tuning clarification:** Requests optional JIT/GC/scheduling tuning for purpose, especially high request load, accounting for executed logic. **Assistant response:** Keep balanced defaults; evaluate CPU, allocations, downstream waits, blocking and core limits together before selecting controls/presets. No new tuning API or optimal values are claimed.
+- **Action/outcome:** Added the private bounded local/global/stealing policy and deterministic cancellation/reuse/order/fairness checks. Existing eleven groups and new checks pass optimized/UBSan. Two short timing matrices vary; longer two-worker controls show about 1% lower throughput. Separate samples show coordination/waiting in both policies, not CPU-attributed costs. Keep FIFO default and move investigation toward actual I/O handoff. [Evidence](validation/queue-policy-20261028/README.md) records raw results, limitations and default assembly equivalence. Neither GC advantages nor HTTP/broker/UI improvements are established. Website direction is prepared for the next manual publication.
+
 ## 2026-10-28 — Default inlining and backend optimization
 
 - **Author:** Requested MethodImplOptions inlining flags, JIT/AOT support and SDK use where relevant; acknowledged that .NET has no Inlining option, then prioritized default inlining. Suggested architecture-dependent instruction heuristics, such as cheaper alternatives to some multiplies, and clarified that backend optimization and inlining are separate and both should be enabled. Requested a commit for each slice.

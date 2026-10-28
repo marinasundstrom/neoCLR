@@ -1,5 +1,8 @@
 #define _POSIX_C_SOURCE 200809L
 #include "native-worker-trace.h"
+#ifdef NEOCLR_WORKER_QUEUES
+#include "native-worker-queues.h"
+#endif
 #include <pthread.h>
 #include <stdatomic.h>
 #include <stdlib.h>
@@ -36,6 +39,9 @@ struct neoclr_worker_job {
     struct neoclr_workers *pool;
     uint64_t generation, order, completion_order;
     unsigned state;
+#ifdef NEOCLR_WORKER_QUEUES
+    unsigned queue;
+#endif
     int cancelled, outcome, delivered;
     void *capture;
     void *local_roots[NEOCLR_WORKER_LOCAL_ROOTS];
@@ -45,16 +51,25 @@ struct neoclr_worker_job {
     void *native_state;
 };
 struct compiled_participant;
-#ifdef NEOCLR_WORKER_TRACE
+#if defined(NEOCLR_WORKER_TRACE) || defined(NEOCLR_WORKER_QUEUES)
 struct worker_start { struct neoclr_workers *pool; unsigned lane; };
+#endif
+#ifdef NEOCLR_WORKER_TRACE
 struct trace_lane { size_t count; uint64_t attempted, dropped; };
 #endif
 struct root { uint64_t generation; void *value; };
 struct neoclr_workers {
     uint64_t identity, submission, settlement;
     pthread_t owner, threads[THREADS];
-#ifdef NEOCLR_WORKER_TRACE
+#if defined(NEOCLR_WORKER_TRACE) || defined(NEOCLR_WORKER_QUEUES)
     struct worker_start starts[THREADS];
+#endif
+#ifdef NEOCLR_WORKER_QUEUES
+    struct { neoclr_worker_job *jobs[JOBS]; unsigned head, count; } queues[THREADS + 1];
+    unsigned queue_workers, local_turns[THREADS], victim[THREADS];
+    neoclr_worker_queue_counts queue_counts;
+#endif
+#ifdef NEOCLR_WORKER_TRACE
     neoclr_worker_trace_event *trace_events;
     size_t trace_capacity;
     uint64_t trace_origin;
@@ -180,19 +195,87 @@ static int adopt(neoclr_workers *p, void *value, neoclr_worker_handle *out) {
     }
     return 0;
 }
+#ifdef NEOCLR_WORKER_QUEUES
+static _Thread_local neoclr_workers *queue_pool;
+static _Thread_local unsigned queue_worker;
+/* All deque metadata and job state change under the existing pool gate. */
+static void queue_push(neoclr_workers *p, neoclr_worker_job *j) {
+    unsigned q = queue_pool == p && executing ? queue_worker + 1 : 0;
+    unsigned count = p->queues[q].count;
+    if (count == JOBS) abort();
+    p->queues[q].jobs[(p->queues[q].head + count) % JOBS] = j;
+    p->queues[q].count++;
+    j->queue = q;
+}
+static neoclr_worker_job *queue_pop(neoclr_workers *p, unsigned q, int newest) {
+    if (!p->queues[q].count) return NULL;
+    unsigned offset = newest ? p->queues[q].count - 1 : 0;
+    neoclr_worker_job *j = p->queues[q].jobs[(p->queues[q].head + offset) % JOBS];
+    if (!newest) p->queues[q].head = (p->queues[q].head + 1) % JOBS;
+    p->queues[q].count--;
+    if (j->state != QUEUED || j->queue != q) abort();
+    return j;
+}
+static void queue_remove(neoclr_worker_job *j) {
+    neoclr_workers *p = j->pool;
+    unsigned q = j->queue, count = p->queues[q].count, at = 0;
+    while (at < count && p->queues[q].jobs[(p->queues[q].head + at) % JOBS] != j) at++;
+    if (at == count) abort();
+    for (; at + 1 < count; at++)
+        p->queues[q].jobs[(p->queues[q].head + at) % JOBS] =
+            p->queues[q].jobs[(p->queues[q].head + at + 1) % JOBS];
+    p->queues[q].count--;
+}
+static neoclr_worker_job *queue_next(neoclr_workers *p) {
+    unsigned w = queue_worker;
+    neoclr_worker_job *j;
+    if (p->local_turns[w] >= 8 && (j = queue_pop(p, 0, 0))) {
+        p->local_turns[w] = 0; p->queue_counts.global++; return j;
+    }
+    if ((j = queue_pop(p, w + 1, 1))) {
+        if (p->local_turns[w] < 8) p->local_turns[w]++;
+        p->queue_counts.local++; return j;
+    }
+    if ((j = queue_pop(p, 0, 0))) {
+        p->local_turns[w] = 0; p->queue_counts.global++; return j;
+    }
+    for (unsigned n = 0; n < p->queue_workers; n++) {
+        unsigned victim = p->victim[w]++ % p->queue_workers;
+        if (victim == w) continue;
+        if ((j = queue_pop(p, victim + 1, 0))) {
+            p->local_turns[w] = 0; p->queue_counts.stolen++; return j;
+        }
+        p->queue_counts.empty_steal_probes++;
+    }
+    return NULL;
+}
+int neoclr_workers_queue_counts(neoclr_workers *p, neoclr_worker_queue_counts *out) {
+    if (!out || !pthread_equal(p->owner, pthread_self()) || !p->joined) return 0;
+    *out = p->queue_counts;
+    return 1;
+}
+#endif
 /* Called only under the gate; completion order is independent of submission. */
 static void complete(neoclr_worker_job *j) {
     if (j->pool->settlement == UINT64_MAX) abort();
     j->completion_order = ++j->pool->settlement;
+#ifdef NEOCLR_WORKER_QUEUES
+    if (j->state == QUEUED) queue_remove(j);
+#endif
     j->state = DONE;
     trace_emit(j->pool, NEOCLR_TRACE_SETTLE, j, (unsigned)j->outcome);
     pthread_cond_broadcast(&j->pool->completion);
 }
 static void *run(void *argument) {
-#ifdef NEOCLR_WORKER_TRACE
+#if defined(NEOCLR_WORKER_TRACE) || defined(NEOCLR_WORKER_QUEUES)
     struct worker_start *start = argument;
     neoclr_workers *p = start->pool;
+#ifdef NEOCLR_WORKER_TRACE
     trace_pool = p; trace_worker = start->lane;
+#endif
+#ifdef NEOCLR_WORKER_QUEUES
+    queue_pool = p; queue_worker = start->lane - 1;
+#endif
 #else
     neoclr_workers *p = argument;
 #endif
@@ -201,8 +284,12 @@ static void *run(void *argument) {
         lock(p);
         neoclr_worker_job *j = NULL;
         while (!j && !p->closing) {
+#ifdef NEOCLR_WORKER_QUEUES
+            j = queue_next(p);
+#else
             for (unsigned i = 0; i < p->capacity; i++)
                 if (p->jobs[i].state == QUEUED && (!j || p->jobs[i].order < j->order)) j = &p->jobs[i];
+#endif
             if (!j) {
                 trace_emit(p, NEOCLR_TRACE_IDLE_BEGIN, NULL, 0);
                 if (pthread_cond_wait(&p->ready, &p->gate)) abort();
@@ -272,9 +359,12 @@ neoclr_workers *neoclr_workers_create(unsigned workers, unsigned capacity, size_
         p->trace_capacity = events;
     }
 #endif
+#ifdef NEOCLR_WORKER_QUEUES
+    p->queue_workers = workers;
+#endif
     for (unsigned i = 0; i < capacity; i++) p->jobs[i].pool = p;
     for (; p->thread_count < workers; p->thread_count++) {
-#ifdef NEOCLR_WORKER_TRACE
+#if defined(NEOCLR_WORKER_TRACE) || defined(NEOCLR_WORKER_QUEUES)
         p->starts[p->thread_count] = (struct worker_start){p, p->thread_count + 1};
         if (pthread_create(&p->threads[p->thread_count], NULL, run, &p->starts[p->thread_count])) {
 #else
@@ -398,6 +488,9 @@ int neoclr_workers_submit(neoclr_workers *p, neoclr_worker_handle capture,
         j->order = ++p->submission; ++j->generation; j->capture = r->value; j->callback = callback;
         j->native_state = native_state; j->cancelled = 0; j->delivered = 0; j->result = (neoclr_worker_value){0};
         j->state = QUEUED; *out = (neoclr_worker_handle){p->identity, j->generation, i, 2};
+#ifdef NEOCLR_WORKER_QUEUES
+        queue_push(p, j);
+#endif
         trace_emit(p, NEOCLR_TRACE_ENQUEUE, j, 0);
         pthread_cond_signal(&p->ready); ok = 1; break;
     }

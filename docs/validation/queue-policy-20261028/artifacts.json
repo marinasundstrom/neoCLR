@@ -1,0 +1,62 @@
+{
+  "comparison-report.json.gz": {
+    "source": "comparison/report.json",
+    "sha256": "89794724fb129a51b3360a6696fd549ca1163988ec1f0087d6220e754908a252"
+  },
+  "final-report.json.gz": {
+    "source": "final/report.json",
+    "sha256": "adaa39546e55b33a3278ba85ff254359a94ec1b093893f597d15fb487f3e2fb4"
+  },
+  "long-report.json.gz": {
+    "source": "long/report.json",
+    "sha256": "f7f675023ad3b24fbecc945495adc4f3e05e4db28a5f737d91508e153e3f5f23"
+  },
+  "safety-validation.json.gz": {
+    "source": "safety/validation.json",
+    "sha256": "242363fbf93cfad2406359c409f368fdb56de7870a39954b54a80b0779ffde13"
+  },
+  "profiles-report.json.gz": {
+    "source": "profiles/report.json",
+    "sha256": "63c3669800d5665918af73f9d41da7659e76e77e49922bfc493119244ac75450"
+  },
+  "profiles-fifo.sample.txt.gz": {
+    "source": "profiles/fifo.sample.txt",
+    "sha256": "773b7226bdd5ca0949967cd810a462a8a3d118d8984cdd766c5e659e31540f53"
+  },
+  "profiles-local.sample.txt.gz": {
+    "source": "profiles/local.sample.txt",
+    "sha256": "304b1fc0b26b472a476db2a24e6682cc91527f37922042e330ebdbd55104a369"
+  },
+  "profiles-fifo.json.gz": {
+    "source": "profiles/fifo.json",
+    "sha256": "ab344a82250f060b4bb12d7fb7d7808617671b9cf890185094dd6cfed771b112"
+  },
+  "profiles-local.json.gz": {
+    "source": "profiles/local.json",
+    "sha256": "6e4dd8ba81f13eb65520d98f4bcacb9de6cd620a0e23f50c05e5f56cabe614ba"
+  },
+  "assembly-report.json.gz": {
+    "source": "assembly/report.json",
+    "sha256": "6f51a9dfd3d1593f3ea54479aa5c70f910867f29c56790cd9b70d1fd17f04a95"
+  },
+  "assembly-baseline-workers.c.gz": {
+    "source": "assembly/baseline-workers.c",
+    "sha256": "7abd1fef7cc95ae43b6ad6f44198b8437cae9f44b745b352c411a260592cf1b8"
+  },
+  "assembly-baseline-default.s.gz": {
+    "source": "assembly/baseline-default.s",
+    "sha256": "8e2cef643d6895563383013395d0c9e140b3b5bd8adfd589bc43e65b230b77e1"
+  },
+  "assembly-current-default.s.gz": {
+    "source": "assembly/current-default.s",
+    "sha256": "8e2cef643d6895563383013395d0c9e140b3b5bd8adfd589bc43e65b230b77e1"
+  },
+  "assembly-baseline-traced.s.gz": {
+    "source": "assembly/baseline-traced.s",
+    "sha256": "a6c36776925140ddb7ac39ceffd47ef9f76d4d59d277ee8199a3a3f4f29083c8"
+  },
+  "assembly-current-traced.s.gz": {
+    "source": "assembly/current-traced.s",
+    "sha256": "a6c36776925140ddb7ac39ceffd47ef9f76d4d59d277ee8199a3a3f4f29083c8"
+  }
+}
