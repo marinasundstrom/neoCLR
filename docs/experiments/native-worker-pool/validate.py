@@ -13,6 +13,7 @@ p.add_argument('--compiled-workers', action='store_true', help='Compile the opti
 p.add_argument('--thread-sanitizer', action='store_true')
 p.add_argument('--trace-workers', action='store_true', help='Compile optional worker trace hooks; ordinary constructor still disables recording')
 p.add_argument('--worker-delivery', action='store_true', help='Compile bounded owner wake delivery')
+p.add_argument('--shared-ready', action='store_true', help='Use the shared runtime ready queue')
 p.add_argument('--local-queues', action='store_true', help='Select the bounded local/global/stealing experiment')
 p.add_argument('--output', type=Path, required=True)
 a = p.parse_args()
@@ -24,7 +25,7 @@ sources = [root/'runtime/native/gc/native-gc.c', root/'runtime/native/gc/root-pr
 report = dict(passed=False, platform=platform.platform(), commands=[],
               meaning='POSIX bounded pool with gated managed access and explicit capture/result roots; no generated-code or HTTP integration.',
               inputs={str(f.relative_to(root)):hashlib.sha256(f.read_bytes()).hexdigest() for f in
-                      [*sources, *list((root/'runtime/native/gc').glob('*.h')), *list((root/'runtime/native/workers').glob('*.h')), root/'runtime/native/workers/compiled-workers.inc', here/'benchmark.c', here/'validate.py']})
+                      [*sources, *list((root/'runtime/native/scheduling').glob('*.h')), *list((root/'runtime/native/gc').glob('*.h')), *list((root/'runtime/native/workers').glob('*.h')), root/'runtime/native/workers/compiled-workers.inc', here/'benchmark.c', here/'validate.py']})
 cc = ['clang']
 if platform.system() == 'Darwin':
     cc = [subprocess.check_output(['xcrun', '--find', 'clang'], text=True).strip(),
@@ -41,6 +42,7 @@ try:
         if a.compiled_workers: command.append('-DNEOCLR_WORKER_GC')
         if a.trace_workers: command.append('-DNEOCLR_WORKER_TRACE')
         if a.local_queues: command.append('-DNEOCLR_WORKER_QUEUES')
+        if a.shared_ready: command.append('-DNEOCLR_SHARED_READY_QUEUE')
         if a.worker_delivery: command.append('-DNEOCLR_WORKER_DELIVERY')
         for cmd in [command, [str(out/name)]]:
             try:

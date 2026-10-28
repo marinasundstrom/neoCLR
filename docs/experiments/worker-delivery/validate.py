@@ -8,6 +8,7 @@ import platform
 import subprocess
 
 p = argparse.ArgumentParser(description=__doc__)
+p.add_argument('--shared-ready', action='store_true')
 p.add_argument('--output', type=Path, required=True)
 a = p.parse_args()
 out = a.output.resolve(); out.mkdir(parents=True, exist_ok=False)
@@ -28,6 +29,7 @@ try:
     flags = ['-std=c11','-O2','-Wall','-Wextra','-Werror','-Wno-deprecated-declarations',
              '-pthread','-Wl,-dead_strip','-DNEOCLR_WORKER_DELIVERY',
              '-I',native/'async','-I',native/'gc','-I',native/'workers','-I',legacy]
+    if a.shared_ready: flags.append('-DNEOCLR_SHARED_READY_QUEUE')
     run(['python3',live/'generate.py','--output',out/'live-gc.c'])
     policy = json.loads((live/'policy.json').read_text())
     for mode in ('sync','concurrent'):

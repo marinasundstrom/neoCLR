@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="$(NeoClrBundleRoot)/lib/NeoCLR.ClassLibrary.props" />
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <RavenNeoClrRuntimeAsyncHelper></RavenNeoClrRuntimeAsyncHelper>
+    <AssemblyName>SharedSchedulingHttp</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Remove="System.Web" />
+    <Compile Include="Http.rvn" />
+    <Compile Include="../../../benchmarks/http-server/Model.rvn" />
+    <Compile Include="$(NeoClrBundleRoot)/lib/RuntimeAwait.rvn" />
+    <!-- Match the existing persistent HTTP benchmark without a friend grant. -->
+    <Compile Include="../../../runtime/raven/src/System/Web/**/*.rvn" />
+  </ItemGroup>
+</Project>

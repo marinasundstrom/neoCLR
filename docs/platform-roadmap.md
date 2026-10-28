@@ -1,5 +1,15 @@
 # neoCLR platform roadmap
 
+**Shared scheduling and profiling gate (2026-10-28):** The author directs shared
+services for Task.Run and other scheduled work, with predictable GC/service
+relationships rather than HTTP-specific policy. Before closing the current HTTP
+goal, measure actual context memory/retention, suspend/resume and queue costs;
+include many endpoints with file and downstream network I/O, mixed short/long
+handlers, and fixed scheduler/resource controls under both collectors. The
+[profiling contract](experiments/shared-scheduling/README.md) records the required
+evidence. Shared bounded ready storage is under qualification; it does not yet
+establish a unified managed execution lifecycle or HTTP performance improvement.
+
 **Owned callback qualification and bounded HTTP goal (2026-10-28):** [Restricted live-store callbacks](validation/worker-owned-callback-20261028/README.md) now complete actual worker marking epochs while preserving shared captures/statics, diagnostics and owner delivery. Image/collector matching rejects uninstrumented callbacks; async/socket/TLS services and simultaneous worker mutators remain excluded. The author explicitly requests pursuing useful HTTP integration, then clarifies “good enough for now”: defer small tuning and broad redesign, measure representative HTTP loads under both collectors, investigate major regressions, and retain credible comparisons without claiming universal superiority. Next choose the smallest safe HTTP integration/owner-scheduling improvement and execute the [bounded acceptance plan](experiments/worker-delivery/http-plan.md).
 
 **Exclusive heap prerequisite (2026-10-28):** [Native lease qualification](validation/heap-adoption-20261028/README.md) passes sequential handoff and concurrent marker join; metadata reconstruction costs roughly 1 µs at 128 blocks and 7.4–7.6 µs at 1,024 blocks in a short screen. The primitive remains outside generated workers. Next qualify a restricted host-callback compiler profile with live-store barriers, static initialization, fault roots and service admission before worker marking; then address HTTP owner participation and the fresh benchmark. Persistent ownership metadata is a later cost-reduction candidate.

@@ -45,6 +45,9 @@ extern int32_t neoclr_callback_gc_contract_v1(void);
 #ifdef NEOCLR_WORKER_ROOT_REUSE
 #include "../gc/participant-roots.h"
 #endif
+#ifdef NEOCLR_SHARED_READY_QUEUE
+#include "../scheduling/ready-queue.h"
+#endif
 #define JOBS 16
 #define ROOTS 32
 #define THREADS 4
@@ -80,9 +83,18 @@ struct neoclr_workers {
     struct worker_start starts[THREADS];
 #endif
 #ifdef NEOCLR_WORKER_QUEUES
+#ifdef NEOCLR_SHARED_READY_QUEUE
+    neoclr_ready_queue queues[THREADS + 1];
+    neoclr_ready_item queue_items[THREADS + 1][JOBS];
+#else
     struct { neoclr_worker_job *jobs[JOBS]; unsigned head, count; } queues[THREADS + 1];
+#endif
     unsigned queue_workers, local_turns[THREADS], victim[THREADS];
     neoclr_worker_queue_counts queue_counts;
+#endif
+#if defined(NEOCLR_SHARED_READY_QUEUE) && !defined(NEOCLR_WORKER_QUEUES)
+    neoclr_ready_queue ready_fifo;
+    neoclr_ready_item ready_items[JOBS];
 #endif
 #ifdef NEOCLR_WORKER_TRACE
     neoclr_worker_trace_event *trace_events;
@@ -219,23 +231,38 @@ static _Thread_local unsigned queue_worker;
 /* All deque metadata and job state change under the existing pool gate. */
 static void queue_push(neoclr_workers *p, neoclr_worker_job *j) {
     unsigned q = queue_pool == p && executing ? queue_worker + 1 : 0;
+#ifdef NEOCLR_SHARED_READY_QUEUE
+    if (!neoclr_ready_push(&p->queues[q],(neoclr_ready_item){(uint64_t)(j-p->jobs)+1,j->order})) abort();
+#else
     unsigned count = p->queues[q].count;
     if (count == JOBS) abort();
     p->queues[q].jobs[(p->queues[q].head + count) % JOBS] = j;
     p->queues[q].count++;
+#endif
     j->queue = q;
 }
 static neoclr_worker_job *queue_pop(neoclr_workers *p, unsigned q, int newest) {
+#ifdef NEOCLR_SHARED_READY_QUEUE
+    neoclr_ready_item item;
+    if (!neoclr_ready_pop(&p->queues[q],newest,&item)) return NULL;
+    if (!item.identity || item.identity>p->capacity) abort();
+    neoclr_worker_job *j=&p->jobs[item.identity-1];
+    if (j->order!=item.order) abort();
+#else
     if (!p->queues[q].count) return NULL;
     unsigned offset = newest ? p->queues[q].count - 1 : 0;
     neoclr_worker_job *j = p->queues[q].jobs[(p->queues[q].head + offset) % JOBS];
     if (!newest) p->queues[q].head = (p->queues[q].head + 1) % JOBS;
     p->queues[q].count--;
+#endif
     if (j->state != QUEUED || j->queue != q) abort();
     return j;
 }
 static void queue_remove(neoclr_worker_job *j) {
     neoclr_workers *p = j->pool;
+#ifdef NEOCLR_SHARED_READY_QUEUE
+    if (!neoclr_ready_remove(&p->queues[j->queue],(uint64_t)(j-p->jobs)+1)) abort();
+#else
     unsigned q = j->queue, count = p->queues[q].count, at = 0;
     while (at < count && p->queues[q].jobs[(p->queues[q].head + at) % JOBS] != j) at++;
     if (at == count) abort();
@@ -243,6 +270,7 @@ static void queue_remove(neoclr_worker_job *j) {
         p->queues[q].jobs[(p->queues[q].head + at) % JOBS] =
             p->queues[q].jobs[(p->queues[q].head + at + 1) % JOBS];
     p->queues[q].count--;
+#endif
 }
 static neoclr_worker_job *queue_next(neoclr_workers *p) {
     unsigned w = queue_worker;
@@ -319,6 +347,8 @@ static void complete(neoclr_worker_job *j) {
     j->completion_order = ++j->pool->settlement;
 #ifdef NEOCLR_WORKER_QUEUES
     if (j->state == QUEUED) queue_remove(j);
+#elif defined(NEOCLR_SHARED_READY_QUEUE)
+    if (j->state == QUEUED && !neoclr_ready_remove(&j->pool->ready_fifo,(uint64_t)(j-j->pool->jobs)+1)) abort();
 #endif
     j->state = DONE;
     delivery_refresh(j->pool);
@@ -345,6 +375,13 @@ static void *run(void *argument) {
         while (!j && !p->closing) {
 #ifdef NEOCLR_WORKER_QUEUES
             j = queue_next(p);
+#elif defined(NEOCLR_SHARED_READY_QUEUE)
+            neoclr_ready_item item;
+            if (neoclr_ready_pop(&p->ready_fifo,0,&item)) {
+                if (!item.identity || item.identity>p->capacity) abort();
+                j=&p->jobs[item.identity-1];
+                if (j->state!=QUEUED || j->order!=item.order) abort();
+            }
 #else
             for (unsigned i = 0; i < p->capacity; i++)
                 if (p->jobs[i].state == QUEUED && (!j || p->jobs[i].order < j->order)) j = &p->jobs[i];
@@ -423,6 +460,12 @@ neoclr_workers *neoclr_workers_create(unsigned workers, unsigned capacity, size_
 #endif
 #ifdef NEOCLR_WORKER_QUEUES
     p->queue_workers = workers;
+#ifdef NEOCLR_SHARED_READY_QUEUE
+    for (unsigned i=0;i<=THREADS;i++) neoclr_ready_init(&p->queues[i],p->queue_items[i],JOBS);
+#endif
+#endif
+#if defined(NEOCLR_SHARED_READY_QUEUE) && !defined(NEOCLR_WORKER_QUEUES)
+    neoclr_ready_init(&p->ready_fifo,p->ready_items,JOBS);
 #endif
     for (unsigned i = 0; i < capacity; i++) p->jobs[i].pool = p;
     for (; p->thread_count < workers; p->thread_count++) {
@@ -576,6 +619,8 @@ int neoclr_workers_submit(neoclr_workers *p, neoclr_worker_handle capture,
         j->state = QUEUED; *out = (neoclr_worker_handle){p->identity, j->generation, i, 2};
 #ifdef NEOCLR_WORKER_QUEUES
         queue_push(p, j);
+#elif defined(NEOCLR_SHARED_READY_QUEUE)
+        if (!neoclr_ready_push(&p->ready_fifo,(neoclr_ready_item){i+1,j->order})) abort();
 #endif
         trace_emit(p, NEOCLR_TRACE_ENQUEUE, j, 0);
         pthread_cond_signal(&p->ready); ok = 1; break;

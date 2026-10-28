@@ -1,5 +1,26 @@
 # Development conversation record
 
+## 2026-10-28 — Shared scheduler predictability and context profiling
+
+- **Author direction:** Task.Run and other scheduled work should share scheduling
+  services. Avoid special HTTP/I/O paths unless their value is established. The
+  purpose is predictable relationships between scheduling, GC and other services,
+  making bottlenecks and workload-specific GC choices easier to measure.
+- **Author requested cases:** Many HTTP endpoints, with some reading/writing files
+  and others making HTTP/socket calls; evaluate interference across scheduling
+  modes. Then requested measuring context size/memory, switching costs and worker
+  queues, and said: “We should be able to profile all this before we complete this goal.”
+- **Assistant response/action:** Added an opt-in shared bounded ready-storage
+  experiment for owner and worker queues, preserving current affinities and root
+  lifetimes. Added a native layout probe and an explicit
+  [profiling gate](experiments/shared-scheduling/README.md) separating fixed records,
+  managed retention, worker stacks, cooperative/OS switches, queue wait and GC/JIT
+  interference. These are partial implementation and measurement infrastructure,
+  not a completed unified scheduler or demonstrated HTTP improvement.
+- **Open:** Actual retained-memory/switching profiles and matched HTTP cohorts
+  remain required before goal completion. Keep the bounded “good enough for now”
+  target; profiling should direct useful improvements rather than endless tuning.
+
 ## 2026-10-28 — Bounded worker/HTTP integration goal
 
 - **Author:** Explicitly asked to pursue integrating improved worker infrastructure and changes that improve HTTP processing. Subsequently clarified the target as “good enough for now”, leaving further improvement for later and avoiding over-optimization while seeking credible performance relative to other runtimes.

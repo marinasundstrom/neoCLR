@@ -113,6 +113,13 @@ epochs. HTTP owner-heap integration remains open.
 [Generated worker qualification](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/worker-owned-callback-20261028/README.md).
 The current target is a useful, measured HTTP integration that is good enough to
 ship incrementally; smaller tuning opportunities can follow later.
+An opt-in shared ready-storage experiment now serves owner and worker queues.
+Its measured fixed native storage adds 4,104 bytes per owner scope and 280 bytes
+per FIFO worker pool on macOS ARM64. These are metadata costs, not total task
+memory. Context retention, suspend/resume costs, queue behavior and mixed HTTP
+endpoints with file/network I/O must be profiled under both collectors before
+closing the goal. No HTTP improvement is established by these native checks.
+[Layout table and qualification](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/shared-scheduling-20261028/README.md).
 Adoption requires proving the change in the real HTTP path and running a **new
 HTTP benchmark after integration**, with both collectors and matched workload/resource
 controls. Existing HTTP performance tables are not replaced by these native results.

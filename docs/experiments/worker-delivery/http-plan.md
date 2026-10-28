@@ -1,5 +1,21 @@
 # HTTP integration and fresh measurement gate
 
+## Shared-service and profiling clarification (2026-10-28)
+
+The author requires shared scheduling mechanisms for Task.Run and other scheduled
+work, avoiding HTTP/I/O-specific policy unless evidence justifies it. The purpose
+is predictable scheduler/GC/service interactions and attributable tuning. Keep
+scheduler configuration and resources constant when comparing collectors. Extend
+HTTP coverage to many endpoints mixing file reads/writes, downstream HTTP/socket
+I/O and complex handlers, including interference with short requests.
+
+Before completing this goal, profile execution-context memory and suspension/
+resumption costs as well as queue behavior. The [profiling contract](../shared-scheduling/README.md)
+separates native records, managed state/capture retention, thread resources,
+cooperative handoffs, OS-thread switches, queue/lock/wakeup costs and GC/JIT
+interference. Retain actual measurements and instrumentation overhead; a sizeof
+inventory or throughput result alone does not close this gate.
+
 Author direction, 28 October 2026: prove the candidate applies to HTTP before
 eventual integration, and run a new benchmark after integration. Current native
 delivery results establish neither HTTP improvements nor a production default.

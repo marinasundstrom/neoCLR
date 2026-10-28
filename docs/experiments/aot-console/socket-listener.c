@@ -59,11 +59,28 @@ static _Thread_local neoclr_socket_scope *head;
 static _Atomic uint64_t next_id = 1;
 #ifdef NEOCLR_NATIVE_GC
 static void release_client(neoclr_socket_scope *, unsigned);
+#ifndef NEOCLR_SHARED_READY_QUEUE
 struct neoclr_runnable {
     struct neoclr_runnable *next;
     uint64_t callback, order;
 };
+#endif
+static uint64_t runnable_order(neoclr_socket_scope *scope) {
+#ifdef NEOCLR_SHARED_READY_QUEUE
+    const neoclr_ready_item *item=neoclr_ready_first(&scope->runnable);
+    return item?item->order:0;
+#else
+    return scope->runnable_head?scope->runnable_head->order:0;
+#endif
+}
 static int take_runnable(neoclr_socket_scope *scope, uint64_t *callback) {
+#ifdef NEOCLR_SHARED_READY_QUEUE
+    neoclr_ready_item item;
+    if (!neoclr_ready_pop(&scope->runnable,0,&item)) return 0;
+    scope->runnable_delivery=item.identity;
+    scope->prefer_runnable=0;
+    *callback=item.identity;
+#else
     neoclr_runnable *item = scope->runnable_head;
     if (!item) return 0;
     scope->runnable_head = item->next;
@@ -72,6 +89,7 @@ static int take_runnable(neoclr_socket_scope *scope, uint64_t *callback) {
     scope->prefer_runnable = 0;
     *callback = item->callback;
     free(item);
+#endif
     return 1;
 }
 #endif
@@ -145,6 +163,9 @@ int32_t neoclr_socket_scope_enter_v1(neoclr_socket_scope *scope, neoclr_aot_cont
     for (neoclr_socket_scope *s = head; s; s = s->previous) if (s == scope) return 3;
     if (neoclr_os_start()) return 3;
     memset(scope, 0, sizeof(*scope));
+#ifdef NEOCLR_SHARED_READY_QUEUE
+    neoclr_ready_init(&scope->runnable,scope->runnable_items,NEOCLR_GC_HOST_ROOT_LIMIT);
+#endif
 #ifdef NEOCLR_HTTPS_SERVER
     scope->tls_config = tls_config_from_environment();
     if (!scope->tls_config) { neoclr_os_stop(); return 3; }
@@ -163,6 +184,11 @@ int32_t neoclr_socket_scope_leave_v1(neoclr_socket_scope *scope) {
         scope->slots[i].id = 0;
     }
 #ifdef NEOCLR_NATIVE_GC
+#ifdef NEOCLR_SHARED_READY_QUEUE
+    neoclr_ready_item item;
+    while (neoclr_ready_pop(&scope->runnable,0,&item))
+        if (neoclr_gc_host_root_release_v1(scope->context,item.identity)) status=3;
+#else
     while (scope->runnable_head) {
         neoclr_runnable *item = scope->runnable_head;
         scope->runnable_head = item->next;
@@ -170,6 +196,7 @@ int32_t neoclr_socket_scope_leave_v1(neoclr_socket_scope *scope) {
         free(item);
     }
     scope->runnable_tail = NULL;
+#endif
     if (scope->runnable_delivery && neoclr_gc_host_root_release_v1(scope->context, scope->runnable_delivery)) status = 3;
     scope->runnable_delivery = 0;
     if (scope->timer_delivery && neoclr_gc_host_root_release_v1(scope->context, scope->timer_delivery)) status = 3;
@@ -508,7 +535,7 @@ void neoclr_scheduler_wait_v1(neoclr_aot_context *context) {
 #endif
 #if !defined(NEOCLR_SCHEDULER_LEGACY_WAIT)
     neoclr_socket_scope *scope = find_scope(context);
-    if (!scope || context->fault.code || scope->scheduler_delivery || scope->runnable_head) return;
+    if (!scope || context->fault.code || scope->scheduler_delivery || runnable_order(scope)) return;
 #ifdef _WIN32
     fd_set reads, writes, errors;
     FD_ZERO(&reads); FD_ZERO(&writes); FD_ZERO(&errors);
@@ -712,6 +739,13 @@ int32_t neoclr_scheduler_submit_v1(neoclr_aot_context *context, uint64_t callbac
     if (status) return status;
     uint64_t order = new_operation_id();
     if (!order) return 3;
+#ifdef NEOCLR_SHARED_READY_QUEUE
+    if (scope->runnable.count==scope->runnable.capacity) return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
+    uint64_t root=0;
+    status=neoclr_gc_host_root_create_v1(context,value,&root);
+    if (status) return status;
+    if (!neoclr_ready_push(&scope->runnable,(neoclr_ready_item){root,order})) abort();
+#else
     neoclr_runnable *item = malloc(sizeof(*item));
     if (!item) return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
     uint64_t root = 0;
@@ -721,6 +755,7 @@ int32_t neoclr_scheduler_submit_v1(neoclr_aot_context *context, uint64_t callbac
     if (scope->runnable_tail) scope->runnable_tail->next = item;
     else scope->runnable_head = item;
     scope->runnable_tail = item;
+#endif
     return 0;
 }
 
@@ -812,8 +847,9 @@ static int32_t socket_poll(neoclr_aot_context *context, uint64_t *callback) {
             (first_submission == 64 || scope->operations[i].id < scope->operations[first_submission].id))
             first_submission = i;
     }
-    int queued_first = scope->runnable_head && (first_submission == 64 ||
-        scope->runnable_head->order < scope->operations[first_submission].id);
+    uint64_t queued_order=runnable_order(scope);
+    int queued_first = queued_order && (first_submission == 64 ||
+        queued_order < scope->operations[first_submission].id);
     if (queued_first && scope->prefer_runnable) return take_runnable(scope, callback);
     unsigned first_timer = 64;
     uint64_t now = monotonic_ns();

@@ -303,9 +303,17 @@ static int backlog_and_sources_contract(void) {
     CHECK(!neoclr_gc_host_root_release_v1(&c, original));
     CHECK(!neoclr_gc_collect_v1(&c, NULL) && c.text.used);
     for (unsigned i = 0; i < 192; i++) {
+#ifdef NEOCLR_SHARED_READY_QUEUE
+        unsigned before=scope.runnable.count;
+#else
         neoclr_runnable *before = scope.runnable_head;
+#endif
         CHECK(neoclr_scheduler_acquire_v1(&c, &delivery, NULL) == NEOCLR_SCHEDULER_READY);
+#ifdef NEOCLR_SHARED_READY_QUEUE
+        if (i < 128) CHECK((scope.runnable.count != before) == (i % 2 == 1));
+#else
         if (i < 128) CHECK((scope.runnable_head != before) == (i % 2 == 1));
+#endif
         void *read = NULL;
         CHECK(!neoclr_gc_collect_v1(&c, NULL) && c.text.used);
         CHECK(!neoclr_gc_callback_read_v1(&c, delivery, &read) && read == callback);
@@ -313,7 +321,15 @@ static int backlog_and_sources_contract(void) {
         CHECK(neoclr_scheduler_complete_v1(&c, delivery, NULL) == 3);
     }
     CHECK(neoclr_scheduler_acquire_v1(&c, &delivery, NULL) == NEOCLR_SCHEDULER_IDLE);
+#ifdef NEOCLR_SHARED_READY_QUEUE
+    CHECK(!scope.runnable.count && !scope.runnable_delivery);
+#ifdef NEOCLR_SCHEDULER_DIAGNOSTICS
+    neoclr_ready_statistics stats=neoclr_ready_stats(&scope.runnable);
+    CHECK(stats.admitted==128 && stats.dispatched==128 && stats.peak==128 && !stats.rejected && !stats.removed);
+#endif
+#else
     CHECK(!scope.runnable_head && !scope.runnable_tail && !scope.runnable_delivery);
+#endif
     CHECK(!neoclr_gc_collect_v1(&c, NULL) && !c.text.used);
     CHECK(!neoclr_socket_scope_leave_v1(&scope));
     return 0;

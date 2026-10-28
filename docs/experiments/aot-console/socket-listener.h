@@ -10,7 +10,12 @@
  * Handles are opaque, process-unique positive Int64s, never file descriptors.
  * OS resources are separate from the managed heap's byte budget. */
 typedef struct neoclr_dns_work neoclr_dns_work;
+#ifdef NEOCLR_SHARED_READY_QUEUE
+#include "../../../runtime/native/scheduling/ready-queue.h"
+#include "native-gc.h"
+#else
 typedef struct neoclr_runnable neoclr_runnable;
+#endif
 typedef struct neoclr_socket_scope {
     neoclr_aot_context *context;
     struct neoclr_socket_scope *previous;
@@ -32,7 +37,12 @@ typedef struct neoclr_socket_scope {
         uint16_t port;
         uint64_t attempt_deadline;
     } operations[64];
+#ifdef NEOCLR_SHARED_READY_QUEUE
+    neoclr_ready_queue runnable;
+    neoclr_ready_item runnable_items[NEOCLR_GC_HOST_ROOT_LIMIT];
+#else
     neoclr_runnable *runnable_head, *runnable_tail;
+#endif
     uint64_t runnable_delivery; /* Detached submission root until acquire/next poll. */
     unsigned prefer_runnable;
     uint64_t timer_delivery; /* One-shot delivery root, retained until next poll/leave. */

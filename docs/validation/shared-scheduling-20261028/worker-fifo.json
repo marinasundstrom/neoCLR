@@ -1,0 +1,103 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0.1-arm64-arm-64bit",
+  "commands": [
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pthread",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/gc",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/workers",
+        "/Users/robert/Projects/neoclr/runtime/native/gc/native-gc.c",
+        "/Users/robert/Projects/neoclr/runtime/native/gc/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/native-worker-pool/test.c",
+        "/Users/robert/Projects/neoclr/runtime/native/workers/native-workers.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/shared-ready-fifo-20261028/optimized",
+        "-DNEOCLR_SHARED_READY_QUEUE",
+        "-DNEOCLR_WORKER_DELIVERY"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/shared-ready-fifo-20261028/optimized"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS bounded admission, two active participants, shared identity, roots, stale tickets\nPASS unpublished result retention, tagged payload, cancellation winner, callback failure\nPASS close cancels queued and active work, reserved completions drain, joined teardown\nPASS result backpressure, foreign pool rejection, root generations and output preservation\nPASS 100 completion/cancellation contests with exactly one outcome\nPASS allocation failure preserves pool and subsequent work completes\nPASS four participant root sets across collection, result handoff, failure, cancellation and reuse\nPASS owner completion delivery, settlement order, bounded dispatch, reentrant submission, notification retention and close\nPASS concurrent native readers, collector/writer exclusion, cancellation, capture lifetime and reclamation (25 rounds)\nPASS concurrent native mutations, cooperative GC, detached cyclic roots, reattachment, cancellation and reclamation (25 rounds)\nPASS native reader/mutator exclusion in both directions and joined cancellation while phases are active\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pthread",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/gc",
+        "-I",
+        "/Users/robert/Projects/neoclr/runtime/native/workers",
+        "/Users/robert/Projects/neoclr/runtime/native/gc/native-gc.c",
+        "/Users/robert/Projects/neoclr/runtime/native/gc/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/native-worker-pool/test.c",
+        "/Users/robert/Projects/neoclr/runtime/native/workers/native-workers.c",
+        "-fsanitize=undefined",
+        "-fno-sanitize-recover=all",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/shared-ready-fifo-20261028/ubsan",
+        "-DNEOCLR_SHARED_READY_QUEUE",
+        "-DNEOCLR_WORKER_DELIVERY"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/shared-ready-fifo-20261028/ubsan"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS bounded admission, two active participants, shared identity, roots, stale tickets\nPASS unpublished result retention, tagged payload, cancellation winner, callback failure\nPASS close cancels queued and active work, reserved completions drain, joined teardown\nPASS result backpressure, foreign pool rejection, root generations and output preservation\nPASS 100 completion/cancellation contests with exactly one outcome\nPASS allocation failure preserves pool and subsequent work completes\nPASS four participant root sets across collection, result handoff, failure, cancellation and reuse\nPASS owner completion delivery, settlement order, bounded dispatch, reentrant submission, notification retention and close\nPASS concurrent native readers, collector/writer exclusion, cancellation, capture lifetime and reclamation (25 rounds)\nPASS concurrent native mutations, cooperative GC, detached cyclic roots, reattachment, cancellation and reclamation (25 rounds)\nPASS native reader/mutator exclusion in both directions and joined cancellation while phases are active\n",
+      "stderr": ""
+    }
+  ],
+  "meaning": "POSIX bounded pool with gated managed access and explicit capture/result roots; no generated-code or HTTP integration.",
+  "inputs": {
+    "runtime/native/gc/native-gc.c": "1f798519e7d18ac79be2c2c455a7483ae73a3171f64203a78a52fba535c78525",
+    "runtime/native/gc/root-probe.c": "ceb5e38e5ebbd69268bfb3badc9cb36f5ea7e1a3ec27a39c21522eb0a94d4add",
+    "docs/experiments/native-worker-pool/test.c": "fd975db2e17acc93b8dc3f8ac6280116679106e4374bf419a56e16b71308169f",
+    "runtime/native/workers/native-workers.c": "c1d22d394ec79d80a9f27137744bb1573deabe69f9c0eeca5078e8feb5dd0508",
+    "runtime/native/scheduling/ready-queue.h": "78e8729f3b609805552acd8a358db1694c347863226e831784f35dd69661ff5b",
+    "runtime/native/gc/root-probe.h": "07ac8f213641a480e0b5282a875b2245e36b98d4e14dd66ed214a10a0218d25f",
+    "runtime/native/gc/participant-roots.h": "f00ed2df27607193052b3e522d333dbccd28bd2d56c3f6ae413878206e87e22f",
+    "runtime/native/gc/heap-adoption.h": "71388df59976b76ad3203e6a403fcc36453d20140a3fc4ec039ea52d18adad71",
+    "runtime/native/gc/execution-state.h": "9674f07e60ff01ad728b4112fd42c70b7aa780becdfa9a6c02728e8022a5e3c5",
+    "runtime/native/gc/native-gc.h": "c4bc226b630afcba8edac359bc9a34059e834787cb1928da841f7007068e3ad3",
+    "runtime/native/workers/http-workers.h": "3879c029beae54cc42f83846d0bdd3485c26458bb3d7d2e41189091b2973e9a6",
+    "runtime/native/workers/native-worker-delivery.h": "b6133e38d1e1bb054be98d7d56aef7fa5a5d7103468d2eb0c7964adc168a7860",
+    "runtime/native/workers/native-workers.h": "3794e65badb176ea2175afa62cedb17d6e63d7bbdd6eb91d934deaaac6d24d4c",
+    "runtime/native/workers/native-worker-trace.h": "94df1e372f25595fe2f8d8f9284137813c07ec3ecf395c8a42234e0a76898f5f",
+    "runtime/native/workers/native-worker-queues.h": "663b6226298e4d0cf031c61550beba813f8fd679fc4355ce485912a519c2b8ca",
+    "runtime/native/workers/compiled-workers.inc": "94be53adc2e93aba40ea5f55787bacb1f365485c781000b6bbc3d8b189bbed38",
+    "docs/experiments/native-worker-pool/benchmark.c": "a1073c96764773a8eb80ef7237d1eacf9705d67bbaf516295495c39bdf78743b",
+    "docs/experiments/native-worker-pool/validate.py": "ddb8764e665f6e43b09a2fe6869a01239f2f20be88eef08aa70dd7a42301506e"
+  }
+}
