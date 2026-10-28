@@ -1,0 +1,160 @@
+[
+  {
+    "aot": [
+      {
+        "bytes": 480,
+        "compileSeconds": 0.168541208,
+        "target": "arm64"
+      },
+      {
+        "bytes": 243,
+        "compileSeconds": 0.178766,
+        "target": "x64"
+      }
+    ],
+    "case": "default",
+    "jit": {
+      "compileAndFinalizeSeconds": 0.231142417,
+      "invocationSeconds": 0.001639208,
+      "invocations": [
+        {
+          "invocationSeconds": 0.001639208,
+          "status": 0,
+          "value": 1238822400
+        },
+        {
+          "invocationSeconds": 0.001280375,
+          "status": 0,
+          "value": 1238822400
+        },
+        {
+          "invocationSeconds": 0.001287625,
+          "status": 0,
+          "value": 1238822400
+        },
+        {
+          "invocationSeconds": 0.001291459,
+          "status": 0,
+          "value": 1238822400
+        },
+        {
+          "invocationSeconds": 0.001340916,
+          "status": 0,
+          "value": 1238822400
+        },
+        {
+          "invocationSeconds": 0.001322083,
+          "status": 0,
+          "value": 1238822400
+        },
+        {
+          "invocationSeconds": 0.001285208,
+          "status": 0,
+          "value": 1238822400
+        },
+        {
+          "invocationSeconds": 0.001279667,
+          "status": 0,
+          "value": 1238822400
+        },
+        {
+          "invocationSeconds": 0.001333292,
+          "status": 0,
+          "value": 1238822400
+        },
+        {
+          "invocationSeconds": 0.001352917,
+          "status": 0,
+          "value": 1238822400
+        },
+        {
+          "invocationSeconds": 0.001314417,
+          "status": 0,
+          "value": 1238822400
+        }
+      ],
+      "profile": "macos-arm64-jit-scalar-v1",
+      "status": 0,
+      "value": 1238822400
+    }
+  },
+  {
+    "aot": [
+      {
+        "bytes": 584,
+        "compileSeconds": 0.205474708,
+        "target": "arm64"
+      },
+      {
+        "bytes": 376,
+        "compileSeconds": 0.173952417,
+        "target": "x64"
+      }
+    ],
+    "case": "noinline",
+    "jit": {
+      "compileAndFinalizeSeconds": 0.166117667,
+      "invocationSeconds": 0.002716666,
+      "invocations": [
+        {
+          "invocationSeconds": 0.002716666,
+          "status": 0,
+          "value": 1238822400
+        },
+        {
+          "invocationSeconds": 0.002716875,
+          "status": 0,
+          "value": 1238822400
+        },
+        {
+          "invocationSeconds": 0.002703417,
+          "status": 0,
+          "value": 1238822400
+        },
+        {
+          "invocationSeconds": 0.002672125,
+          "status": 0,
+          "value": 1238822400
+        },
+        {
+          "invocationSeconds": 0.002656833,
+          "status": 0,
+          "value": 1238822400
+        },
+        {
+          "invocationSeconds": 0.002732125,
+          "status": 0,
+          "value": 1238822400
+        },
+        {
+          "invocationSeconds": 0.002730833,
+          "status": 0,
+          "value": 1238822400
+        },
+        {
+          "invocationSeconds": 0.002798916,
+          "status": 0,
+          "value": 1238822400
+        },
+        {
+          "invocationSeconds": 0.002693167,
+          "status": 0,
+          "value": 1238822400
+        },
+        {
+          "invocationSeconds": 0.002684875,
+          "status": 0,
+          "value": 1238822400
+        },
+        {
+          "invocationSeconds": 0.002693584,
+          "status": 0,
+          "value": 1238822400
+        }
+      ],
+      "profile": "macos-arm64-jit-scalar-v1",
+      "status": 0,
+      "value": 1238822400
+    }
+  }
+]

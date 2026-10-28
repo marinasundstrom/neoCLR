@@ -8,7 +8,8 @@ JIT execution and an interpreter for testing and constrained environments.
 
 ## Development: default method inlining
 
-JIT and AOT automatically inline small, safe integer/Boolean leaf methods.
+JIT and AOT enable the backend’s speed optimizations and independently inline small,
+safe integer/Boolean leaf methods. Instruction selection follows the target architecture.
 `MethodImplOptions.NoInlining` opts out; `AggressiveInlining` permits a larger
 candidate budget but cannot bypass safety limits. There is no `Inlining` flag.
 Calls, branches, allocation, virtual dispatch and faulting operations currently

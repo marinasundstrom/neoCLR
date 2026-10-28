@@ -89,6 +89,16 @@ mod tests {
         serde_json::from_value(serde_json::json!({"name":"Leaf", "parameters":["Int32"], "returns":"Int32", "impl_flags":flags, "body":body})).unwrap()
     }
     #[test]
+    fn backend_optimization_defaults_to_speed() {
+        if std::env::var_os("NEOCLR_TEST_OPT_LEVEL").is_none() {
+            assert_eq!(
+                cranelift_codegen::settings::Flags::new(crate::backend_settings()).opt_level(),
+                cranelift_codegen::settings::OptLevel::Speed,
+            );
+        }
+    }
+
+    #[test]
     fn policy_and_safety_boundaries() {
         let small = vec![Op::Arg(0), Op::Int(1), Op::Add, Op::Return];
         assert!(eligible(&leaf(0, small.clone())));

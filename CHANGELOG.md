@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-28
 
+- Enable Cranelift speed optimization by default for scalar/managed eager and lazy JIT and AOT, independently of method inlining. Retain the test-only comparison override. Inspect ARM64 shifted-add and x64 scaled-LEA lowering for constant multiplication; record mixed short-loop timing/code-size results without claiming a universal speedup.
+
 - Add bounded default leaf-method inlining shared by JIT/AOT, with CLR-compatible MethodImplOptions.NoInlining/AggressiveInlining overrides, metadata/import/reference preservation and Raven core-marker validation. NoInlining wins; unsafe or unsupported candidates remain calls. Refresh the SDK/API reference and document the initial Int32/Boolean scope; small SDK methods require no blanket annotations.
 
 - Record the author-directed Go-inspired concurrency/scheduling investigation, comparing Go and .NET with existing fibers, private parallel compiled workers, lazy-JIT waits and GC ownership. Define staged queue-policy, suspension, managed-parallelism and application-load gates without adopting a scheduler or changing defaults. Refresh the existing native pool baseline with 11 optimized/UBSan safety groups and 1/2/4-worker copied-primitive measurements; add the proposal to the website direction page. Incorporate the author’s execution-tracer suggestion as the first implementation slice, with a correlated task/worker/I/O/JIT/GC timeline, bounded recording, loss reporting and measured overhead; tracer implementation remains planned.

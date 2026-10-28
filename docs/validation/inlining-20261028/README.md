@@ -78,3 +78,49 @@ default policy already selects the leaf.
 Reproduce using the ignored `inlining::tests::qualification` test with
 `NEOCLR_TEST_OPT_LEVEL=none` and `NEOCLR_INLINE_EVIDENCE` set to a fresh directory.
 The output also includes ARM64 and x64 AOT objects for instruction inspection.
+
+
+## Separate speed-optimization slice
+
+The author explicitly requested enabling both independent layers. Production JIT
+(scalar, eager managed and lazy managed) and AOT now set Cranelift `opt_level=speed`
+through the shared settings factory. NoInlining only controls method expansion;
+it does not disable optimizations inside a method. The private test-only
+NEOCLR_TEST_OPT_LEVEL override remains available for isolated comparisons. There is
+no new public command-line flag, tiering policy or NoOptimization attribute.
+
+This follows the .NET separation between method-inlining hints and the runtime's
+optimizer. Cranelift 0.121.2 already folds multiplication by zero/one, rewrites
+powers of two, and selects architecture-dependent instructions. Keep wrapping versus
+checked arithmetic distinctions in neoCLR lowering; do not replace arbitrary
+multiplies with shift/add chains or assume fewer instructions means fewer cycles.
+See the [Cranelift settings contract](https://docs.wasmtime.dev/api/src/cranelift_codegen_meta/shared/settings.rs.html)
+and the pinned implementation `cranelift-codegen-0.121.2/src/opts/arithmetic.isle`,
+`src/isa/aarch64/lower.isle`, and `src/isa/x64/lower.isle` in the Cargo dependency.
+Speed optimization can increase compiler work and sometimes code size; this is an
+explicit execution-throughput policy, not a claim that every function gets faster.
+
+[ARM64 inspection](speed-arm64.asm) shows a shifted add for the inlined multiply-by-eight
+loop, and [x64 inspection](speed-x64.asm) shows scaled LEA. Both standalone leaf bodies
+use shifts. ARM64 execution returns the expected wrapping result; x64 is cross-compiled
+and inspected here, not executed. No additional neoCLR multiplication rewrite is needed.
+
+[Raw speed timings](speed-results.json), using the same checked two-million-iteration
+loop, give these medians across ten post-first invocations on the busy ARM64 host:
+
+| Backend | Default inlining | NoInlining control |
+| --- | ---: | ---: |
+| none | 1.171 ms | 5.470 ms |
+| speed | 1.303 ms | 2.699 ms |
+
+These short timings demonstrate call-elimination behavior and mixed optimization
+results, not a universal speedup or a stable startup comparison. The speed case's
+inlined AOT objects shrink from 488 to 480 bytes (ARM64) and 255 to 243 bytes (x64),
+while the no-inline controls grow. Broader workload and compile-latency comparisons
+remain release/performance follow-up; the correctness gate is the backend suite.
+
+Validation with production speed defaults: [212 backend tests pass](codegen-speed.log),
+including the settings assertion, default/override inlining, JIT values, both AOT
+targets, checked arithmetic, stack/fault handling and managed lowering. The 36 ignored
+tests require explicit external host/fixture inputs; this is not a fresh full
+HTTP/collector/release matrix. The native API snapshot check remains unchanged.
