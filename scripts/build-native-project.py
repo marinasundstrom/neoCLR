@@ -168,7 +168,71 @@ def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, reflection_roots=None, byte_array_limit=65536, http_heap_bytes=1048576, command_timeout=180, https_server=False, reflection_types=None, reflection_constructor_types=None, reflection_method_types=None, http_workers=0):
+def project_retention(project, explicit=None):
+    """Read the author-facing policy before compilation; paths belong to the project."""
+    path = Path(explicit) if explicit is not None else project.with_suffix('.retention.json')
+    if explicit is not None and not path.is_absolute():
+        path = project.parent / path
+    if explicit is None and not path.exists():
+        return None, None, None
+    path = path.resolve()
+    def unique_object(pairs):
+        result = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError('Duplicate retention JSON key: ' + key)
+            result[key] = value
+        return result
+    contents = path.read_bytes()
+    policy = json.loads(contents, object_pairs_hook=unique_object)
+    if (not isinstance(policy, dict) or set(policy) != {'schemaVersion', 'types'}
+            or type(policy['schemaVersion']) is not int or policy['schemaVersion'] != 1
+            or not isinstance(policy['types'], list) or not 1 <= len(policy['types']) <= 64):
+        raise ValueError('Retention file requires schemaVersion 1 and 1–64 types')
+    seen = set()
+    for entry in policy['types']:
+        if not isinstance(entry, dict) or set(entry) != {'name', 'retain'}:
+            raise ValueError('Retention entries require name and retain')
+        name, modes = entry['name'], entry['retain']
+        if not isinstance(name, str) or not name or name != name.strip() or name in seen:
+            raise ValueError('Retention names must be unique nonempty exact metadata names')
+        if (not isinstance(modes, list) or not modes
+                or any(not isinstance(mode, str) or mode not in ('constructors', 'properties', 'methods') for mode in modes)
+                or len(set(modes)) != len(modes)):
+            raise ValueError('retain requires distinct constructors, properties or methods values')
+        seen.add(name)
+    return path, policy['types'], hashlib.sha256(contents).hexdigest()
+
+
+def resolve_project_retention(runtime, assembly, entries, run, modules, resolver):
+    """Combine existing qualified policies without granting additional capabilities."""
+    policy = dict(schemaVersion=8, types=[], moduleCatalogs=[], moduleFunctions=[],
+                  typeCatalogs=[], methodTypes=[])
+    roots = {}
+    for mode in ('properties', 'constructors', 'methods'):
+        names = [entry['name'] for entry in entries if mode in entry['retain']]
+        if not names:
+            continue
+        options = {'constructors': True} if mode == 'constructors' else {'methods': True} if mode == 'methods' else {}
+        path = resolver(runtime, assembly, names, run, modules=modules, **options)[1]
+        resolved = json.loads(path.read_text())
+        policy['methodTypes'].extend(resolved.get('methodTypes', []))
+        for root in resolved['types']:
+            key = json.dumps(root['definition'], sort_keys=True)
+            target = roots.setdefault(key, dict(definition=root['definition'], **{
+                flag: False for flag in ('construct', 'properties', 'getters', 'setters',
+                    'customAttributes', 'fields', 'fieldGetters', 'fieldSetters', 'constructors')}))
+            for flag, value in root.items():
+                if flag != 'definition':
+                    target[flag] |= value
+    policy['types'] = list(roots.values())
+    path = assembly.with_suffix('.reflection.json')
+    path.write_text(json.dumps(policy, indent=2) + '\n')
+    return path
+
+
+def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, reflection_roots=None, byte_array_limit=65536, http_heap_bytes=1048576, command_timeout=180, https_server=False, reflection_types=None, reflection_constructor_types=None, reflection_method_types=None, http_workers=0, retention_file=None):
+    retention_path, retention_entries, retention_digest = project_retention(project, retention_file)
     validate_https_server(https_server, profile, bootstrap_root, (ROOT / 'native-build-kit.json').exists())
     validate_http_workers(http_workers, profile, bootstrap_root, https_server, (ROOT / 'native-build-kit.json').exists())
     if not 0 < command_timeout <= 3600:
@@ -179,12 +243,12 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
         raise ValueError("HTTP heap bytes must be a multiple of eight from 8 through 2147483640")
     if http_heap_bytes != 1048576 and profile not in (PROFILES['http'], PROFILES['windows-http']):
         raise ValueError("HTTP heap configuration requires an HTTP profile")
-    if sum(bool(value) for value in (reflection_roots, reflection_types, reflection_constructor_types, reflection_method_types)) > 1:
-        raise ValueError('Choose one reflection policy: roots, property types, constructor types or method types')
+    if sum(bool(value) for value in (reflection_roots, reflection_types, reflection_constructor_types, reflection_method_types, retention_path)) > 1:
+        raise ValueError('Choose one reflection policy: project retention file, roots, property types, constructor types or method types')
     if profile not in PROFILES.values():
         raise ValueError('Unsupported native build profile')
     validate_scalar_interop(profile, bootstrap_root,
-        reflection_roots or reflection_types or reflection_constructor_types or reflection_method_types,
+        reflection_roots or reflection_types or reflection_constructor_types or reflection_method_types or retention_path,
         byte_array_limit)
     windows = profile in (PROFILES['windows-console'], PROFILES['windows-http'])
     http = profile in (PROFILES['http'], PROFILES['windows-http'])
@@ -301,9 +365,14 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
                   *base.glob('*.h'), *base.parent.joinpath('aot-scalar').glob('*.h'),
                   *base.parent.joinpath('aot-fault-details').glob('*.h'),
                   *compiler.parent.glob('*.dll'), *compiler.parent.glob('*.json')]
+        if retention_path:
+            inputs.append(retention_path)
+            report['retentionFile'] = str(retention_path)
         if windows:
             inputs += sorted((ROOT / 'tools/native').glob('windows-*.h'))
         report['inputs'] = {str(path): sha(path) for path in inputs}
+        if retention_path:
+            report['inputs'][str(retention_path)] = retention_digest
         # Use Raven's evaluated project, including imports and project references.
         # The current driver reports the root output last, after dependency builds.
         stdout = run(['dotnet', compiler, 'neoclr', '--project', project], phase='source-compilation')
@@ -313,16 +382,22 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
             raise RuntimeError('Raven did not report a valid native project output')
         assembly = output / 'app.dll'
         shutil.copy2(paths[-1], assembly)
-        if reflection_types or reflection_constructor_types or reflection_method_types:
+        if reflection_types or reflection_constructor_types or reflection_method_types or retention_entries:
             bundle_manifest = json.loads((bundle / 'manifest.json').read_text())
             runtime = bundle / bundle_manifest['runtime']
             helper = bundle / 'tools/run-native-sample.py'
             for path in (runtime, helper):
                 report['inputs'][str(path)] = sha(path)
-            reflection_roots = runpy.run_path(str(helper))['reflection_roots'](
-                runtime, assembly, reflection_types or reflection_constructor_types or reflection_method_types, run,
-                modules=libraries,
-                **({'constructors': True} if reflection_constructor_types else {'methods': True} if reflection_method_types else {}))[1]
+            resolver = runpy.run_path(str(helper))['reflection_roots']
+            if retention_entries:
+                reflection_roots = resolve_project_retention(
+                    runtime, assembly, retention_entries, run, libraries, resolver)
+            else:
+                reflection_roots = resolver(
+                    runtime, assembly, reflection_types or reflection_constructor_types or reflection_method_types, run,
+                    modules=libraries,
+                    **({'constructors': True} if reflection_constructor_types else {'methods': True} if reflection_method_types else {}))[1]
+
         context = ['--system', seed, *[arg for path in libraries for arg in ('--module', path)],
                    '--object-root', libraries[0]]
         if scalar_interop_profile(profile):
@@ -514,6 +589,7 @@ def main():
     parser.add_argument('--reflection-type', action='append', default=[], help='Application type name retained from the freshly compiled assembly; repeat for multiple types')
     parser.add_argument('--reflection-method-type', action='append', default=[], help='Exact application type whose declared methods may be inspected; does not retain invocation')
     parser.add_argument('--reflection-constructor-type', action='append', default=[], help='Exact application type name whose public constructors may be invoked; resolved after compilation')
+    parser.add_argument('--retention-file', type=Path, help='Named retention JSON, relative to the project directory; default: <project>.retention.json')
     parser.add_argument('--reflection-roots', type=Path, help='Private versioned source-identity reflection retention JSON')
     parser.add_argument('--byte-array-limit', type=int, default=65536, help='Private native byte-array allocation limit; heap capacity remains independent')
     parser.add_argument('--bootstrap-root', help='Private retained HTTP experiment: fn<Void> factory, three host dispatches')
@@ -529,6 +605,7 @@ def main():
         print(build(*(getattr(args, name).resolve() for name in ('project', 'bundle', 'aot', 'output')),
                     profile=PROFILES[args.profile], bootstrap_root=args.bootstrap_root,
                     reflection_roots=args.reflection_roots.resolve() if args.reflection_roots else None,
+                    retention_file=args.retention_file,
                     reflection_types=args.reflection_type,
                     reflection_constructor_types=args.reflection_constructor_type,
                     reflection_method_types=args.reflection_method_type,

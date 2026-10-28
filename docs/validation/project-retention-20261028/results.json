@@ -1,0 +1,135 @@
+{
+  "date": "2026-10-28",
+  "platform": "macOS ARM64",
+  "bundle": "Preview 18, restored selection-box-scan cohort",
+  "cases": [
+    {
+      "name": "di",
+      "buildPassed": true,
+      "retentionFile": "/Users/robert/Projects/neoclr/docs/experiments/dependency-injection/sample/App.retention.json",
+      "policy": {
+        "schemaVersion": 8,
+        "types": [
+          {
+            "definition": {
+              "module": "NeoMetadata_CD998D22E298039314A2A9A3CFB46FF0C74E085374334AA0449F8031D4110EA5",
+              "revision": "1.0.0.0",
+              "index": 7
+            },
+            "construct": true,
+            "properties": false,
+            "getters": false,
+            "setters": false,
+            "customAttributes": false,
+            "fields": false,
+            "fieldGetters": false,
+            "fieldSetters": false,
+            "constructors": true
+          }
+        ],
+        "moduleCatalogs": [],
+        "moduleFunctions": [],
+        "typeCatalogs": [],
+        "methodTypes": []
+      },
+      "exitCode": 0,
+      "stdout": "Hello, Ada!\n",
+      "stderr": "",
+      "inputHashes": {
+        "/Users/robert/Projects/neoclr/target/selection-box-scan-20261028/release/neoclr-native-poc/bin/neoclr-codegen": "943563e99cc5c0592ba1aedb577d9194f13997d243e0c980c451c231b2e7b152",
+        "/Users/robert/Projects/neoclr/docs/experiments/dependency-injection/sample/App.retention.json": "b6132aa9d08a3cc9810eb1d29f211e2e5be5bf495c9d017a4b083b7954db2931",
+        "/Users/robert/Projects/neoclr/target/selection-box-scan-20261028/release/neoclr-native-poc/tools/run-native-sample.py": "1638791c442db34d6b58e06cfe20327374ac9589b7a8fbc40a5d53db1c9c4a97"
+      },
+      "executableSha256": "759a4db547882ca2d1c8b3ad1d8a4c3bc3c399de68a206ff8723c6d1e4d9f6ef"
+    },
+    {
+      "name": "mixed",
+      "buildPassed": true,
+      "retentionFile": "/Users/robert/Projects/neoclr/target/project-retention-20261028/mixed.json",
+      "policy": {
+        "schemaVersion": 8,
+        "types": [
+          {
+            "definition": {
+              "module": "NeoMetadata_CD998D22E298039314A2A9A3CFB46FF0C74E085374334AA0449F8031D4110EA5",
+              "revision": "1.0.0.0",
+              "index": 3
+            },
+            "construct": true,
+            "properties": true,
+            "getters": true,
+            "setters": true,
+            "customAttributes": false,
+            "fields": false,
+            "fieldGetters": false,
+            "fieldSetters": false,
+            "constructors": false
+          },
+          {
+            "definition": {
+              "module": "NeoMetadata_CD998D22E298039314A2A9A3CFB46FF0C74E085374334AA0449F8031D4110EA5",
+              "revision": "1.0.0.0",
+              "index": 4
+            },
+            "construct": true,
+            "properties": false,
+            "getters": false,
+            "setters": false,
+            "customAttributes": false,
+            "fields": false,
+            "fieldGetters": false,
+            "fieldSetters": false,
+            "constructors": true
+          }
+        ],
+        "moduleCatalogs": [],
+        "moduleFunctions": [],
+        "typeCatalogs": [],
+        "methodTypes": [
+          {
+            "module": "NeoMetadata_CD998D22E298039314A2A9A3CFB46FF0C74E085374334AA0449F8031D4110EA5",
+            "revision": "1.0.0.0",
+            "index": 4
+          }
+        ]
+      },
+      "exitCode": 0,
+      "stdout": "Hello, Ada!\n",
+      "stderr": "",
+      "inputHashes": {
+        "/Users/robert/Projects/neoclr/target/selection-box-scan-20261028/release/neoclr-native-poc/bin/neoclr-codegen": "943563e99cc5c0592ba1aedb577d9194f13997d243e0c980c451c231b2e7b152",
+        "/Users/robert/Projects/neoclr/target/project-retention-20261028/mixed.json": "3d1c57ba80b8fe1db98e9f4dfc895077965ad22a0dd3c424951df082bcf079b7",
+        "/Users/robert/Projects/neoclr/target/selection-box-scan-20261028/release/neoclr-native-poc/tools/run-native-sample.py": "1638791c442db34d6b58e06cfe20327374ac9589b7a8fbc40a5d53db1c9c4a97"
+      },
+      "executableSha256": "557867ff48c72f3d2b78dde5db2a624d02105f320f8b6acbf024f8f9ed055533"
+    },
+    {
+      "name": "method-only",
+      "buildPassed": true,
+      "retentionFile": "/Users/robert/Projects/neoclr/target/project-retention-20261028/method-only.json",
+      "policy": {
+        "schemaVersion": 8,
+        "types": [],
+        "moduleCatalogs": [],
+        "moduleFunctions": [],
+        "typeCatalogs": [],
+        "methodTypes": [
+          {
+            "module": "NeoMetadata_CD998D22E298039314A2A9A3CFB46FF0C74E085374334AA0449F8031D4110EA5",
+            "revision": "1.0.0.0",
+            "index": 1
+          }
+        ]
+      },
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: native reflection property metadata was not retained; configure --reflection-roots\n   at neoCLR.Runtime.TypeConstructors [instruction 7]\n   at System.Introspection.RuntimeNominalTypeInfo.GetConstructors [instruction 3]\n   at System.DependencyInjection.ConstructorPlan.Prepare [instruction 18]\n   at System.DependencyInjection.DefaultServiceCollection.Build [instruction 37]\n   at Examples.DependencyInjection.CreateGreeting [instruction 38]\n   at Examples.DependencyInjection.Main [instruction 1]\n",
+      "inputHashes": {
+        "/Users/robert/Projects/neoclr/target/selection-box-scan-20261028/release/neoclr-native-poc/bin/neoclr-codegen": "943563e99cc5c0592ba1aedb577d9194f13997d243e0c980c451c231b2e7b152",
+        "/Users/robert/Projects/neoclr/target/project-retention-20261028/method-only.json": "9384a6e5c26fd61c50fe9b76f02cf208d0a2951f256ab350d6aa85fc9f1eb4ab",
+        "/Users/robert/Projects/neoclr/target/selection-box-scan-20261028/release/neoclr-native-poc/tools/run-native-sample.py": "1638791c442db34d6b58e06cfe20327374ac9589b7a8fbc40a5d53db1c9c4a97"
+      },
+      "executableSha256": "b961e48f64cb8202b6b3e8aaeec29cff44f3c17347032d3da79f0b03c84bd814"
+    }
+  ]
+}

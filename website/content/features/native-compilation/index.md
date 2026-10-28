@@ -83,6 +83,30 @@ also need the types and members they discover at runtime. Development JIT accept
 `--reflection-roots roots.json` to retain them; packaged sample runners prepare the
 appropriate roots. The interpreter does not accept that option.
 
+Development native project builds now read `<project>.retention.json` beside the
+`.rvnproj` file. Each entry declares an exact type name and the capabilities needed:
+
+```json
+{
+  "schemaVersion": 1,
+  "types": [
+    {
+      "name": "Examples.DependencyInjection.Greeter",
+      "retain": ["constructors"]
+    }
+  ]
+}
+```
+
+This is the checked-in policy used by the native DI sample. Supported modes are
+`constructors` (checked activation), `properties` (construction plus property
+getters/setters for object mapping), and `methods` (inspection only). They can be
+combined. `--retention-file config/native.json` selects a different file relative
+to the project directory. Invalid declarations and conflicts with legacy
+reflection-policy arguments fail the build. Generic definitions retain only the
+supported closed shapes known to compilation. This does not add automatic JIT
+file discovery or `DynamicallyAccessedMembers` analysis.
+
 Use matching compiler and library builds for native JSON, attributes and reflection.
 Qualified examples cover specific supported shapes; they do not imply unrestricted
 .NET reflection or support for arbitrary library code.

@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "types": [
+    {
+      "name": "Examples.DependencyInjection.Greeter",
+      "retain": ["constructors"]
+    }
+  ]
+}

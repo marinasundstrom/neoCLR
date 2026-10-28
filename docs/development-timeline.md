@@ -1,5 +1,14 @@
 # Development conversation record
 
+## 2026-10-28 — Project-local AOT retention and runtime annotation direction
+
+- **Author, 2026-10-26:** Asked whether the explicit localization adapter retention option implied a need for a file declaring types that must survive AOT trimming. Then directed adding support so declarations stay with the project instead of repeating command-line arguments, and suggested DynamicallyAccessedMembers if useful.
+- **Assistant/proposal:** Extend the existing named-root resolver with a project-local file and distinguish metadata, construction and invocation requirements. Investigate annotations rather than introducing an attribute without supporting analysis.
+- **Actions/outcome, 2026-10-28:** Resumed the partial builder change, added strict file validation and combined existing policies, migrated the DI sample, and updated website/design guidance. [Qualification](validation/project-retention-20261028/README.md) passes 15 focused tests and two positive native runs; method-only retention fails activation as expected. Existing compiled-identity policy remains private. No Raven compiler changes or new managed APIs were introduced.
+- **Author clarification, 2026-10-28:** Directed that when DynamicallyAccessedMembers is available, runtime API methods that benefit should be annotated.
+- **Assistant response/open work:** Include relevant introspection, DI and object-mapping API annotations, propagation and caller diagnostics in the attribute follow-up. [Scope and tradeoffs](native-retention.md) distinguish this plan from implemented file support. Data-flow analysis, library-provided requirements and new generic instantiation syntax remain open; this task does not permanently reorder the platform roadmap.
+
+
 ## 2026-10-28 - Continue profiling shared lazy-JIT startup work
 
 - **Author:** Directed continuing the measured optimization sequence, retaining the earlier priorities of both collectors, HTTP performance and website updates.

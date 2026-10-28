@@ -98,11 +98,20 @@ requires the macOS host file-input service.
 [Localization API reference →](/docs/localization.html) ·
 [Culture and formatting →](/features/globalization/)
 
-For a native project, add the adapter retention alongside your consumer roots:
+In development builds, keep retention in `App.retention.json` beside
+`App.rvnproj`. Add this entry to its `types` array alongside the consumer's
+constructor entry:
 
-```sh
---reflection-constructor-type 'System.Localization.DefaultLocalizer`1'
+```json
+{
+  "name": "System.Localization.DefaultLocalizer`1",
+  "retain": ["constructors"]
+}
 ```
+
+The complete file has `"schemaVersion": 1` and a `"types"` array. The native
+project builder reads it automatically; `--retention-file` selects another file.
+[Retention modes and boundaries →](/features/native-compilation/#retain-metadata-used-dynamically)
 
 The native project builder resolves this exact metadata name from the supplied
 class-library modules. It retains the closed adapter shapes observed through

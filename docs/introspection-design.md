@@ -933,6 +933,14 @@ changed ordinals, missing types and existing sample behavior. The built-in DI
 suite passes all 13 native tests; two backend tests check invocation and rejection
 without relying on emitted opcode snapshots.
 
+### Project-local retention declarations (development, 2026-10-28)
+
+The native project builder now reads a [name-based retention file](native-retention.md)
+beside the project, combining constructor, property and method-inspection policies
+into fresh backend identities. [Focused tests and native DI qualification](validation/project-retention-20261028/README.md)
+cover the new input path. DynamicallyAccessedMembers analysis and runtime API
+annotations remain a linked follow-up, not an implemented preservation contract.
+
 ## Generic type state (development, 2026-10-21)
 
 TypeInfo now exposes IsGenericType, IsGenericTypeDefinition,

@@ -10,10 +10,13 @@ python3 scripts/build-native-project.py \
   --project docs/experiments/dependency-injection/sample/App.rvnproj \
   --bundle /path/to/bundle \
   --aot /path/to/neoclr-codegen \
-  --reflection-constructor-type Examples.DependencyInjection.Greeter \
   --output target/di-greeting-sample
 ./target/di-greeting-sample/app
 ```
+
+The builder automatically reads the checked-in `App.retention.json` beside the
+project. See [project retention files](../../../native-retention.md) for the format
+and an optional explicit file path.
 
 Expected output: `Hello, Ada!`
 
