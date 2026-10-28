@@ -3,6 +3,11 @@
 #ifdef NEOCLR_WORKER_QUEUES
 #include "native-worker-queues.h"
 #endif
+#ifdef NEOCLR_WORKER_DELIVERY
+#include "native-worker-delivery.h"
+#include <fcntl.h>
+#include <unistd.h>
+#endif
 #include <pthread.h>
 #include <stdatomic.h>
 #include <stdlib.h>
@@ -79,6 +84,9 @@ struct neoclr_workers {
     pthread_cond_t ready, completion;
     unsigned thread_count, capacity, readers, mutators, waiting_writers;
     int closing, joined, dispatching;
+#ifdef NEOCLR_WORKER_DELIVERY
+    int delivery_pipe[2], delivery_signaled;
+#endif
 #ifdef NEOCLR_WORKER_GC
     pthread_cond_t compiled_ready;
     _Atomic unsigned compiled_pause_requested;
@@ -255,6 +263,46 @@ int neoclr_workers_queue_counts(neoclr_workers *p, neoclr_worker_queue_counts *o
     return 1;
 }
 #endif
+#ifdef NEOCLR_WORKER_DELIVERY
+/* One byte represents the level, not one byte per completion. All transitions
+ * share the job-state gate, so dispatch budget exhaustion cannot lose a wake. */
+static void delivery_refresh(neoclr_workers *p) {
+    if (p->delivery_pipe[0] < 0) return;
+    int pending = 0;
+    for (unsigned i = 0; i < p->capacity; i++)
+        pending |= p->jobs[i].state == DONE && !p->jobs[i].delivered;
+    if (pending == p->delivery_signaled) return;
+    unsigned char byte = 1;
+    ssize_t n;
+    do {
+        n = pending ? write(p->delivery_pipe[1], &byte, 1)
+                    : read(p->delivery_pipe[0], &byte, 1);
+    } while (n < 0 && errno == EINTR);
+    if (n != 1) abort(); /* Violated borrowed-descriptor/lifetime contract. */
+    p->delivery_signaled = pending;
+}
+int neoclr_workers_completion_descriptor(neoclr_workers *p) {
+    if (!pthread_equal(p->owner, pthread_self())) return -1;
+    lock(p);
+    if (p->delivery_pipe[0] < 0) {
+        int descriptors[2];
+        if (pipe(descriptors)) { unlock(p); return -1; }
+        for (unsigned i = 0; i < 2; i++) {
+            int flags = fcntl(descriptors[i], F_GETFL);
+            if (flags < 0 || fcntl(descriptors[i], F_SETFL, flags | O_NONBLOCK) ||
+                fcntl(descriptors[i], F_SETFD, FD_CLOEXEC)) {
+                close(descriptors[0]); close(descriptors[1]); unlock(p); return -1;
+            }
+        }
+        p->delivery_pipe[0] = descriptors[0]; p->delivery_pipe[1] = descriptors[1];
+        delivery_refresh(p);
+    }
+    int descriptor = p->delivery_pipe[0];
+    unlock(p); return descriptor;
+}
+#else
+#define delivery_refresh(p) ((void)0)
+#endif
 /* Called only under the gate; completion order is independent of submission. */
 static void complete(neoclr_worker_job *j) {
     if (j->pool->settlement == UINT64_MAX) abort();
@@ -263,6 +311,7 @@ static void complete(neoclr_worker_job *j) {
     if (j->state == QUEUED) queue_remove(j);
 #endif
     j->state = DONE;
+    delivery_refresh(j->pool);
     trace_emit(j->pool, NEOCLR_TRACE_SETTLE, j, (unsigned)j->outcome);
     pthread_cond_broadcast(&j->pool->completion);
 }
@@ -328,6 +377,9 @@ neoclr_workers *neoclr_workers_create(unsigned workers, unsigned capacity, size_
     if (!workers || workers > THREADS || !capacity || capacity > JOBS || bytes < 256 || (bytes & 7)) return NULL;
     neoclr_workers *p = calloc(1, sizeof(*p));
     if (!p) return NULL;
+#ifdef NEOCLR_WORKER_DELIVERY
+    p->delivery_pipe[0] = p->delivery_pipe[1] = -1;
+#endif
     p->context.text.data = calloc(1, bytes);
     if (!p->context.text.data) { free(p); return NULL; }
     p->context.text.capacity = bytes;
@@ -650,6 +702,7 @@ int neoclr_workers_dispatch(neoclr_workers *p, unsigned limit,
         lock(p);
     }
     p->dispatching = 0;
+    delivery_refresh(p);
     unlock(p);
     return (int)delivered;
 }
@@ -684,6 +737,7 @@ int neoclr_workers_take(neoclr_workers *p, neoclr_worker_handle h, int *outcome,
             j->result = (neoclr_worker_value){0}; j->callback = NULL; j->native_state = NULL; j->state = FREE; status = 1;
         }
     }
+    delivery_refresh(p);
     unlock(p); return status;
 }
 int neoclr_workers_collect(neoclr_workers *p, uint64_t *extent) {
@@ -743,6 +797,11 @@ int neoclr_workers_destroy(neoclr_workers *p) {
     pthread_cond_destroy(&p->completion); pthread_cond_destroy(&p->ready); pthread_mutex_destroy(&p->gate);
 #ifdef NEOCLR_WORKER_TRACE
     free(p->trace_events);
+#endif
+#ifdef NEOCLR_WORKER_DELIVERY
+    if (p->delivery_pipe[0] >= 0) {
+        if (close(p->delivery_pipe[0]) || close(p->delivery_pipe[1])) abort();
+    }
 #endif
     free(p->context.text.data); free(p); return 1;
 }

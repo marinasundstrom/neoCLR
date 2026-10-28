@@ -119,6 +119,11 @@ int32_t neoclr_scheduler_submit_to_managed_v1(int64_t, void *, neoclr_aot_contex
  * with a requested <=1 ms timeout; other platforms retain their existing pause.
  * No callbacks, collection or scope mutation. Timers/DNS retain bounded polling. */
 void neoclr_scheduler_wait_v1(neoclr_aot_context *);
+#ifdef NEOCLR_WORKER_DELIVERY
+/* Private POSIX borrowed readiness descriptor; observes but never consumes it.
+ * Caller removes it before closing/destroying its source. No GC/root transfer. */
+void neoclr_scheduler_wait_external_v1(neoclr_aot_context *, int);
+#endif
 int32_t neoclr_scheduler_step_v1(neoclr_aot_context *, uint64_t *, const neoclr_probe_frame *);
 /* Private runtime submission prototype. Clone a rooted image-local fn<Void>
  * into this owner-thread scope; success means admitted, never inline execution.

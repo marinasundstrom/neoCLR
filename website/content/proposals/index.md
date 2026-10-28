@@ -79,8 +79,24 @@ common-peer closed-loop measurements, with different helper threads, collector
 policies and implementation languages. They are not generated neoCLR JIT/AOT, HTTP
 capacity, strict equal-core rankings or a general Task.Run qualification.
 [Full tables, tiny controls, profiles and limitations](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/runtime-handoff-20261028/README.md).
-Next investigate bounded worker-to-owner completion delivery, preserving affinity
-and shared-capture semantics before measuring several independent requests.
+An opt-in bounded completion candidate now wakes the owner directly from native
+worker settlement, preserving existing shared pool roots and owner-only resumption.
+A wait-heavy native/TCP fixture reports these accepted-candidate medians:
+
+| Collector | Polling resume latency | Wake-driven resume latency |
+| --- | --- | --- |
+| Sync | 479 µs | 21 µs |
+| Concurrent | 482 µs | 39 µs |
+
+Batch duration falls 26.0%/17.4%, with CPU increasing 8.0%/24.4% (sync/concurrent).
+These accepted-candidate results include a source-order correctness fix; earlier
+cohorts remain archived separately. These are worker
+return-to-owner-resume times, not HTTP request latencies. General managed captures
+across the HTTP owner/worker boundary remain unqualified.
+[Correctness, traces, profiles and all cohorts](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/worker-delivery-20261028/README.md).
+Adoption requires proving the change in the real HTTP path and running a **new
+HTTP benchmark after integration**, with both collectors and matched workload/resource
+controls. Existing HTTP performance tables are not replaced by these native results.
 
 [Investigation and benchmark plan](https://github.com/marinasundstrom/neoCLR/blob/main/docs/design/go-inspired-scheduling.md)
 

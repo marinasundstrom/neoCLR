@@ -495,7 +495,17 @@ int32_t neoclr_socket_send_until_memory_v1(uint64_t socket, void *owner, int32_t
 }
 /* Owner-thread wait only: no completion, root transfer, collection or guest call.
  * Readiness is a hint; the ordinary poll remains the authority for outcomes. */
+#ifdef NEOCLR_WORKER_DELIVERY
+#ifdef _WIN32
+#error Worker delivery currently requires POSIX descriptors
+#endif
 void neoclr_scheduler_wait_v1(neoclr_aot_context *context) {
+    neoclr_scheduler_wait_external_v1(context, -1);
+}
+void neoclr_scheduler_wait_external_v1(neoclr_aot_context *context, int external) {
+#else
+void neoclr_scheduler_wait_v1(neoclr_aot_context *context) {
+#endif
 #if !defined(NEOCLR_SCHEDULER_LEGACY_WAIT)
     neoclr_socket_scope *scope = find_scope(context);
     if (!scope || context->fault.code || scope->scheduler_delivery || scope->runnable_head) return;
@@ -505,7 +515,11 @@ void neoclr_scheduler_wait_v1(neoclr_aot_context *context) {
 #else
     /* poll also handles descriptors above FD_SETSIZE; the operation table, not
      * the descriptor number, bounds this array. Readiness never consumes I/O. */
+#ifdef NEOCLR_WORKER_DELIVERY
+    struct pollfd descriptors[65];
+#else
     struct pollfd descriptors[64];
+#endif
 #endif
     uint64_t now = monotonic_ns(), delay = UINT64_C(1000000);
     if (!now) { neoclr_os_pause(); return; }
@@ -540,6 +554,9 @@ void neoclr_scheduler_wait_v1(neoclr_aot_context *context) {
 #endif
         watched++;
     }
+#ifdef NEOCLR_WORKER_DELIVERY
+    if (external >= 0) descriptors[watched++] = (struct pollfd){external, POLLIN, 0};
+#endif
     if (!watched) { neoclr_os_pause(); return; }
     /* At most 64 pending operations, matching Winsock's default fd_set capacity.
      * Keep the existing 1 ms poll cap for DNS, timers and legacy TLS, which do not
@@ -557,6 +574,9 @@ void neoclr_scheduler_wait_v1(neoclr_aot_context *context) {
 #endif
 #else
     (void)context;
+#ifdef NEOCLR_WORKER_DELIVERY
+    (void)external;
+#endif
     neoclr_os_pause();
 #endif
 }

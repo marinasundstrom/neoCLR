@@ -26,7 +26,9 @@ codegen settings; improvements should be attributed to the layer actually change
 
 The queue-policy and real-I/O baselines are now followed by a
 [cross-runtime owner-affine handoff comparison](../validation/runtime-handoff-20261028/README.md).
-Next investigate bounded worker-to-owner completion delivery; retain the existing
+The [bounded completion candidate](../experiments/worker-delivery/README.md) now
+connects native worker readiness to the owner pump. Next qualify the HTTP capture/
+service boundary and run a fresh benchmark after integration; retain the existing
 recorders and add provider hooks where measurement requires them. Tiny native-job
 results alone cannot select the shared scheduler or establish HTTP/GC gains.
 Compiler wait/publication tracing remains open; lazy JIT's synchronous first-call
@@ -97,9 +99,9 @@ The cross-runtime fixture preserves an I/O owner's affinity while CPU work may r
 elsewhere. It demonstrates the benefit of independent progress for long jobs, with
 mixed tiny-job costs; it does not implement general managed Task.Run in the compiled
 runtime. A copied-native-payload completion bridge can test transport mechanics,
-but cannot replace shared captures as the product contract. The next gate is
-bounded delivery with cancellation/shutdown races and root ownership, followed by
-managed integration and paced multi-request load. Continue evaluating cooperative
+but cannot replace shared captures as the product contract. Bounded native delivery is now qualified with cancellation, shutdown and rooted
+shared pool identity under both collectors. The next gate is HTTP/managed capture
+and service integration followed by a fresh paced multi-request benchmark. Continue evaluating cooperative
 slicing and ordinary runtime overhead reductions rather than committing to a
 wholesale architecture from this one pattern.
 
@@ -223,6 +225,38 @@ calls, available cores and admission limits together; report throughput, tails,
 memory and idle/energy tradeoffs. Existing controls remain as documented; this
 requirement does not announce new knobs or select values. Benchmark candidate
 settings against representative handler logic before adding presets.
+
+## Bounded completion delivery candidate — 2026-10-28
+
+The [opt-in POSIX source](../experiments/worker-delivery/README.md) uses one
+coalesced pipe byte for terminal, undispatched tickets. The existing pool gate
+orders settlement, notification, take and dispatch; bounded dispatch leaves the
+descriptor readable if further work remains. The owner waits on that descriptor
+alongside sockets, delivers a fixed budget, then resumes ready contexts. Signals
+carry no managed pointers, and workers never invoke owner-bound async/socket code.
+
+Shared captures/results retain the pool's existing roots and heap ownership.
+Testing drops the original capture root, forces collection, adopts result roots,
+and verifies that every reference observes the same final mutation. This does not
+admit arbitrary owner-heap closures or export foreign managed pointers into Tasks.
+The generic source is call-scoped; the embedding adapter retains state, consumes
+tickets and handles outcomes, including root-capacity retry. Pool close still joins
+cooperative callbacks and can block. Only POSIX/macOS is qualified.
+
+[Measurements and limits](../validation/worker-delivery-20261028/README.md) compare
+polling and wake delivery under sync and active concurrent GC. The final fixture
+reduces batch time 26.0%/17.4% and median return-to-resume latency to 21/39 µs
+(sync/concurrent), while CPU rises 8.0%/24.4%. A chained-await regression qualifies
+source polling after resumed executions can submit new work. This isolates wait gaps in native blocking-delay work,
+not generated HTTP throughput, collector superiority or the cost of all pipe
+bookkeeping against an unmodified build. Default builds remain unchanged.
+
+**Author adoption gate:** prove the candidate applies to HTTP, then run a new
+benchmark after integration. Qualify captures, service ownership, faults,
+cancellation, overload and shutdown in the real handler path before claiming an
+application improvement. Use the [fresh HTTP comparison plan](../experiments/worker-delivery/http-plan.md)
+with both collectors, Native AOT and JIT controls. Retain the old HTTP implementation
+as a matched baseline; no production adoption follows from these native numbers.
 
 ## Execution tracer: proposed first slice
 

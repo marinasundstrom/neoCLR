@@ -517,7 +517,16 @@ int32_t neoclr_runtime_async_awaitunit_v1(uint64_t id, neoclr_aot_context *c, in
     int32_t completed;
     return neoclr_runtime_async_waitcompletion_v1(id, c, &completed);
 }
+#ifdef NEOCLR_WORKER_DELIVERY
 int32_t neoclr_runtime_async_pump_v1(neoclr_aot_context *c, neoclr_async_callback invoke, neoclr_async_drain drain) {
+    return neoclr_runtime_async_pump_external_v1(c, invoke, drain, NULL);
+}
+int32_t neoclr_runtime_async_pump_external_v1(neoclr_aot_context *c, neoclr_async_callback invoke,
+    neoclr_async_drain drain, const neoclr_async_external_source *source) {
+    if (source && (!source->poll || source->descriptor < -1)) return 3;
+#else
+int32_t neoclr_runtime_async_pump_v1(neoclr_aot_context *c, neoclr_async_callback invoke, neoclr_async_drain drain) {
+#endif
     if (admit(c) || !invoke || !drain || state.current || state.pumping) return 3;
     state.invoke = invoke; state.drain = drain; state.pumping = 1;
     neoclr_parked_roots entry = {0};
@@ -550,10 +559,20 @@ int32_t neoclr_runtime_async_pump_v1(neoclr_aot_context *c, neoclr_async_callbac
             if (status) break;
         }
         reap_expired();
+        /* A resumed context/drain may submit more external work. Observe the
+         * source after those transitions, before deciding the invocation is idle. */
+#ifdef NEOCLR_WORKER_DELIVERY
+        int external_pending = source ? source->poll(c, source->state) : 0;
+        if (external_pending < 0 || external_pending > 1) { status = 3; break; }
+#endif
         /* Ready continuations must not starve scheduler deliveries: those may
          * release completed body operations and keep bounded ownership reusable. */
         uint64_t delivery = 0;
         int progress = neoclr_scheduler_acquire_v1(c, &delivery, NULL);
+#ifdef NEOCLR_WORKER_DELIVERY
+        if (progress == NEOCLR_SCHEDULER_IDLE && external_pending)
+            progress = NEOCLR_SCHEDULER_PENDING;
+#endif
         /* Idle acquisition may collect and expire owned stacks. Refresh both
          * mapping ownership and readiness before diagnosing unresolved work. */
         reap_expired();
@@ -579,7 +598,12 @@ int32_t neoclr_runtime_async_pump_v1(neoclr_aot_context *c, neoclr_async_callbac
              * observes socket readiness without consuming results or roots. */
             if (!ready) {
                 ASYNC_TRACE(NEOCLR_ASYNC_TRACE_WAIT_BEGIN, state.current, 0, 0);
-                neoclr_scheduler_wait_v1(c);
+#ifdef NEOCLR_WORKER_DELIVERY
+                if (source && source->descriptor >= 0)
+                    neoclr_scheduler_wait_external_v1(c, source->descriptor);
+                else
+#endif
+                    neoclr_scheduler_wait_v1(c);
                 ASYNC_TRACE(NEOCLR_ASYNC_TRACE_WAIT_END, state.current, 0, 0);
             }
         }

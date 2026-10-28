@@ -1,0 +1,190 @@
+{
+  "initial-report.json.gz": {
+    "source": "target/worker-delivery-20261028/report.json",
+    "sha256": "da48fb97be6966826df612fc512b00a238f9b393d73a9a6152d1c807e970b1c4"
+  },
+  "initial-live-gc.c.gz": {
+    "source": "target/worker-delivery-20261028/live-gc.c",
+    "sha256": "f11391be7e52b1a62c5b6879b83874f53e5f1c0b237da13f9c981e938d605423"
+  },
+  "final-report.json.gz": {
+    "source": "target/worker-delivery-20261028-final/report.json",
+    "sha256": "aaf9919f89b64720dd49ce7f657e2787221c36d7b3099dcac87cc199ecabaeb2"
+  },
+  "final-concurrent-trace.json.gz": {
+    "source": "target/worker-delivery-20261028-final/concurrent-trace.json",
+    "sha256": "e681888ecb54454ca86240ba5077605b11cab774327ff1f28ad3909723392c2c"
+  },
+  "final-live-gc.c.gz": {
+    "source": "target/worker-delivery-20261028-final/live-gc.c",
+    "sha256": "f11391be7e52b1a62c5b6879b83874f53e5f1c0b237da13f9c981e938d605423"
+  },
+  "final-sync.trace.json.gz": {
+    "source": "target/worker-delivery-20261028-final/sync.trace.json",
+    "sha256": "f46571f7e399fbf75a0e2730a9b2c15c3873b72b8aac793286bcbe5001a0ad00"
+  },
+  "final-sync-trace.json.gz": {
+    "source": "target/worker-delivery-20261028-final/sync-trace.json",
+    "sha256": "4534fa0f0c8b92eb2d1faf58abde01a218a86136fd03102ad84716496df9dc64"
+  },
+  "final-concurrent.trace.json.gz": {
+    "source": "target/worker-delivery-20261028-final/concurrent.trace.json",
+    "sha256": "073eda9a41eee604feeeeea22a90d9a4a5325a514e871b53baf6df141c7fc9a1"
+  },
+  "existing-validation.json.gz": {
+    "source": "target/worker-delivery-20261028-existing/validation.json",
+    "sha256": "6db0a74a9d8a9f9de0bbac4c0fac7c47d721c9f91a27a1aa065fb373bdc50cd4"
+  },
+  "profiles-concurrent-0.sample.txt.gz": {
+    "source": "target/worker-delivery-20261028-profiles/concurrent-0.sample.txt",
+    "sha256": "e6509145c9b24c10cdf8eef9fccffc364379f90fe9a9fb7221181cd03a17435b"
+  },
+  "profiles-concurrent-1.json.gz": {
+    "source": "target/worker-delivery-20261028-profiles/concurrent-1.json",
+    "sha256": "886959e5124cf275b3501ff914bd1cbcccdb1a33eeaf4557b2bda801bff3c3c7"
+  },
+  "profiles-report.json.gz": {
+    "source": "target/worker-delivery-20261028-profiles/report.json",
+    "sha256": "affbc941e80a083cfb7e9233a7b7bb1f58153a4427f277529af36ebd5fbb07c0"
+  },
+  "profiles-concurrent-0.json.gz": {
+    "source": "target/worker-delivery-20261028-profiles/concurrent-0.json",
+    "sha256": "ba62872b9b8d377b5c15491ffb4761a8aa48add2dea38444e2714e4d1bff1121"
+  },
+  "profiles-sync-1.sample.txt.gz": {
+    "source": "target/worker-delivery-20261028-profiles/sync-1.sample.txt",
+    "sha256": "c987093f1860bf8f41c3fd1810c2b35a2c8f7ac97c83a2b4eb63a44e0396d396"
+  },
+  "profiles-sync-0.sample.txt.gz": {
+    "source": "target/worker-delivery-20261028-profiles/sync-0.sample.txt",
+    "sha256": "f93be669eb4301bb4fce9132fba2abb3166cb18709f7bf4641e25871c45aeda7"
+  },
+  "profiles-concurrent-1.sample.txt.gz": {
+    "source": "target/worker-delivery-20261028-profiles/concurrent-1.sample.txt",
+    "sha256": "5b72dce1b27de38d900314f31e0e7d9b6f01b15582417db7d9c4a57a3ddd6306"
+  },
+  "profiles-sync-0.json.gz": {
+    "source": "target/worker-delivery-20261028-profiles/sync-0.json",
+    "sha256": "84ff49f7995f014836566c159298507acc2a0a3f9ddc9187319d3929339e0d12"
+  },
+  "profiles-sync-1.json.gz": {
+    "source": "target/worker-delivery-20261028-profiles/sync-1.json",
+    "sha256": "7b4ed4f09b134bb889eda5299739b14b1ca6ffbef12a08bc7387d4344178e013"
+  },
+  "assembly-baseline-native-runtime.c.gz": {
+    "source": "target/worker-delivery-20261028-assembly/baseline-native-runtime.c",
+    "sha256": "bf4c5591cb822ec2a789f9f29c5e04911b1f9128c34d8539795c3749a3e54fc6"
+  },
+  "assembly-report.json.gz": {
+    "source": "target/worker-delivery-20261028-assembly/report.json",
+    "sha256": "40556af374c1a6c280643c5bab4d01e6c7bbe1097290d926d2e5e6cde303b131"
+  },
+  "assembly-current-socket-listener.s.gz": {
+    "source": "target/worker-delivery-20261028-assembly/current-socket-listener.s",
+    "sha256": "90e409f9929aee2ddb1ac1268c91bfb9f363d825f75d22d9ee876cc6eeebca2e"
+  },
+  "assembly-baseline-socket-listener.s.gz": {
+    "source": "target/worker-delivery-20261028-assembly/baseline-socket-listener.s",
+    "sha256": "90e409f9929aee2ddb1ac1268c91bfb9f363d825f75d22d9ee876cc6eeebca2e"
+  },
+  "assembly-baseline-native-workers.s.gz": {
+    "source": "target/worker-delivery-20261028-assembly/baseline-native-workers.s",
+    "sha256": "75e74073cc5122f89bec30cfe77a46226c79c1da6871412204d22ba80082cf54"
+  },
+  "assembly-current-native-workers.s.gz": {
+    "source": "target/worker-delivery-20261028-assembly/current-native-workers.s",
+    "sha256": "75e74073cc5122f89bec30cfe77a46226c79c1da6871412204d22ba80082cf54"
+  },
+  "assembly-current-native-runtime.s.gz": {
+    "source": "target/worker-delivery-20261028-assembly/current-native-runtime.s",
+    "sha256": "9a85d6c51a80a377ca32d2dc1b4e2f0a9b47dbf57f0ccdf24adf53a545bba59c"
+  },
+  "assembly-baseline-native-runtime.s.gz": {
+    "source": "target/worker-delivery-20261028-assembly/baseline-native-runtime.s",
+    "sha256": "9a85d6c51a80a377ca32d2dc1b4e2f0a9b47dbf57f0ccdf24adf53a545bba59c"
+  },
+  "assembly-baseline-socket-listener.c.gz": {
+    "source": "target/worker-delivery-20261028-assembly/baseline-socket-listener.c",
+    "sha256": "631bb30128f90d74c77c9772719b2bc7f4a02669d14773af1f6db892b6f19e9e"
+  },
+  "assembly-baseline-native-workers.c.gz": {
+    "source": "target/worker-delivery-20261028-assembly/baseline-native-workers.c",
+    "sha256": "11147ac09c49a9ce049ec1b8ba90fc82d4bde0d7fd2f88db7e840c8ad29650cd"
+  },
+  "tsan-report.json.gz": {
+    "source": "target/worker-delivery-20261028-tsan/report.json",
+    "sha256": "000634d0775b6e97691828c799ed115f9137d63674fa7df4d19d893803ae99ab"
+  },
+  "tsan-smoke.c.gz": {
+    "source": "target/worker-delivery-20261028-tsan/smoke.c",
+    "sha256": "ca19af6e7615ccc10940ee0d3ec60d3b9d99e9694fbd5b8d379088c21f99c1ee"
+  },
+  "accepted-report.json.gz": {
+    "source": "target/worker-delivery-20261028-chain/report.json",
+    "sha256": "c10809f034da2afb64f3c92134fd3bb287e4052a48946637bbb5bb2ed7a24043"
+  },
+  "accepted-concurrent-trace.json.gz": {
+    "source": "target/worker-delivery-20261028-chain/concurrent-trace.json",
+    "sha256": "e249368e4d3affa4e7f15b5528d9fb6b1748723812eed2e65d388cc4b367d2ab"
+  },
+  "accepted-sync.trace.json.gz": {
+    "source": "target/worker-delivery-20261028-chain/sync.trace.json",
+    "sha256": "a28cb6a1f1f44cd459fde0410105b4c9436baad453ee26d8236c8e99adfc2c70"
+  },
+  "accepted-sync-trace.json.gz": {
+    "source": "target/worker-delivery-20261028-chain/sync-trace.json",
+    "sha256": "c208d0e42ed221d6d7c2319a9ded8426c82b85b642693278a72783aa8c04f0f3"
+  },
+  "accepted-concurrent.trace.json.gz": {
+    "source": "target/worker-delivery-20261028-chain/concurrent.trace.json",
+    "sha256": "59416530a3c2f31eec051c3e100b17cf680bf8299d4da564e86575fd7b86cfe1"
+  },
+  "accepted-live-gc.c.gz": {
+    "source": "target/worker-delivery-20261028-chain/live-gc.c",
+    "sha256": "f11391be7e52b1a62c5b6879b83874f53e5f1c0b237da13f9c981e938d605423"
+  },
+  "accepted-regression-report.json.gz": {
+    "source": "target/worker-delivery-20261028-chain/regression/report.json",
+    "sha256": "21492465b838b94a462335ecb69fb79214f7cbe80af7562f12c4176e1ff9bc19"
+  },
+  "accepted-regression-early-poll.c.gz": {
+    "source": "target/worker-delivery-20261028-chain/regression/early-poll.c",
+    "sha256": "dff8c148ce4cb3ae4e25dd0747ac8126045f0f0ab0a330acef3a8845509d5f02"
+  },
+  "accepted-profiles-concurrent-0.sample.txt.gz": {
+    "source": "target/worker-delivery-20261028-chain-profiles/concurrent-0.sample.txt",
+    "sha256": "1ceb96d84cedcb423f03da292fbd469a4b864bab6f4b0dfc5c0c73fa7f05cf02"
+  },
+  "accepted-profiles-concurrent-1.json.gz": {
+    "source": "target/worker-delivery-20261028-chain-profiles/concurrent-1.json",
+    "sha256": "01518b0ee7d3ecbce68303cb56b9c33a3f7f072692e3c52fda6e1a39e2201708"
+  },
+  "accepted-profiles-report.json.gz": {
+    "source": "target/worker-delivery-20261028-chain-profiles/report.json",
+    "sha256": "55bce04d03c69ee7b1ba90b0360241318165b0e8c01ee6ac07dd6daccfb13797"
+  },
+  "accepted-profiles-concurrent-0.json.gz": {
+    "source": "target/worker-delivery-20261028-chain-profiles/concurrent-0.json",
+    "sha256": "63d55810b57feeb907e1d69aaf195fcebceb00b30efe8bdb17dab8e7a4437de4"
+  },
+  "accepted-profiles-sync-1.sample.txt.gz": {
+    "source": "target/worker-delivery-20261028-chain-profiles/sync-1.sample.txt",
+    "sha256": "bf3e2d651b28775e8ea181b0f399d532d91f48ca6e7e17e00c989b58475b0248"
+  },
+  "accepted-profiles-sync-0.sample.txt.gz": {
+    "source": "target/worker-delivery-20261028-chain-profiles/sync-0.sample.txt",
+    "sha256": "fa9943428a3ad11db9f2109eb92c6fab36755b21389ff4643ed02102aabc0ce7"
+  },
+  "accepted-profiles-concurrent-1.sample.txt.gz": {
+    "source": "target/worker-delivery-20261028-chain-profiles/concurrent-1.sample.txt",
+    "sha256": "a80441f1d5af480bccb38e8d9f16f4a6862b9235700512228d3e09d48b1a6f46"
+  },
+  "accepted-profiles-sync-0.json.gz": {
+    "source": "target/worker-delivery-20261028-chain-profiles/sync-0.json",
+    "sha256": "ffa0fc8da03fb28577d890240e777bc02932adac3dbc4620a9105147224875df"
+  },
+  "accepted-profiles-sync-1.json.gz": {
+    "source": "target/worker-delivery-20261028-chain-profiles/sync-1.json",
+    "sha256": "bb968d5c8ed9f2e709d519dbe5f69cb31fe1e1de0195fd49f7eee3a8d484b097"
+  }
+}

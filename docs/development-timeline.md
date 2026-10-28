@@ -1,5 +1,13 @@
 # Development conversation record
 
+## 2026-10-28 — Bounded completion delivery and HTTP adoption gate
+
+- **Author:** Requested bounded worker-to-owner completion delivery, preserving shared captures and GC safety, with measurements under both collectors.
+- **Assistant action/outcome:** Added an opt-in coalesced POSIX readiness descriptor and call-scoped owner-pump source. Existing ticket roots and rooted result adoption preserve shared pool-object identity across collection; workers do not invoke owner socket/async services. The fixture resumes eight worker-backed waits while real TCP input progresses without individual joins. Both collectors pass optimized/UBSan and existing combined worker checks; separate traces, profiles and three timing cohorts are retained. Default-build assembly is unchanged. [Qualification](validation/worker-delivery-20261028/README.md) records 26.0%/17.4% lower batch time and 21/39 µs median return-to-resume latency in the accepted sync/concurrent screen, with CPU rising 8.0%/24.4%. Review fixed an early-source-check idle bug; a chained-await regression rejects the previous ordering. TSan cannot start even a trivial control on this host and is not counted as passed.
+- **Boundary:** Captures remain shared within the admitted pool heap. Arbitrary HTTP owner-heap closures/general managed Task.Run still require shared-heap/compiler/service integration; no copied-capture substitute is selected.
+- **Author subsequent direction:** “Our goal is to have improvements to integrate eventually when we have proven it applies to HTTP also.” Then: “It will require a new benchmark after that”.
+- **Assistant response/plan:** Keep the candidate opt-in, qualify the real HTTP path with capture identity, roots, cancellation and shutdown, then run a fresh matched baseline/candidate HTTP benchmark with both collectors and JIT/AOT controls. Measure mixed handlers from light load through saturation; native fixture gains are not HTTP gains. [Post-integration benchmark plan](experiments/worker-delivery/http-plan.md) records the gate. Website development measurements are prepared for the next manual publication.
+
 ## 2026-10-28 — Cross-runtime handoff and Task.Run execution model
 
 - **Author context:** Previously asked for competitive tradeoffs against other runtimes and willingness to change architecture; directed continuation.

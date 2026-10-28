@@ -12,6 +12,7 @@ p.add_argument('--address-sanitizer', action='store_true', help='Also attempt AS
 p.add_argument('--compiled-workers', action='store_true', help='Compile the optional shared compiler coordinator')
 p.add_argument('--thread-sanitizer', action='store_true')
 p.add_argument('--trace-workers', action='store_true', help='Compile optional worker trace hooks; ordinary constructor still disables recording')
+p.add_argument('--worker-delivery', action='store_true', help='Compile bounded owner wake delivery')
 p.add_argument('--local-queues', action='store_true', help='Select the bounded local/global/stealing experiment')
 p.add_argument('--output', type=Path, required=True)
 a = p.parse_args()
@@ -40,6 +41,7 @@ try:
         if a.compiled_workers: command.append('-DNEOCLR_WORKER_GC')
         if a.trace_workers: command.append('-DNEOCLR_WORKER_TRACE')
         if a.local_queues: command.append('-DNEOCLR_WORKER_QUEUES')
+        if a.worker_delivery: command.append('-DNEOCLR_WORKER_DELIVERY')
         for cmd in [command, [str(out/name)]]:
             try:
                 result = subprocess.run(cmd,capture_output=True,text=True,timeout=60)
