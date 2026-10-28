@@ -6,6 +6,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-10-28
+
+- Scan selected method bodies for boxed `Char` once per dispatch pass instead of once per selected function, recomputing after newly reachable methods are processed. Preserve late-discovered primitive dispatch and unused-method exclusion; all 209 codegen tests pass. A fresh paired HTTP cohort improves readiness medians 7.6-11.3% across eager/lazy JIT and both collectors; warm throughput and allocator reservation remain mixed. Archive 131,968 checked responses, CPU profiles and restored input metadata, and refresh website tables for the next publication. Record the unretained function-name experiment and the loss of its unarchived temporary evidence.
+
 ### 2026-10-26
 
 - Refresh the pinned RavenDoc publisher from Raven `codex/neoclr` with whole backtick and `@`-escaped identifier highlighting, function/type scopes and corrected light/dark function colors. Retain module terminology and the existing site contract; validate the generated website locally before publication.

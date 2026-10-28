@@ -1,5 +1,12 @@
 # Development conversation record
 
+## 2026-10-28 - Continue profiling shared lazy-JIT startup work
+
+- **Author:** Directed continuing the measured optimization sequence, retaining the earlier priorities of both collectors, HTTP performance and website updates.
+- **Assistant:** Tested a function-name candidate iterator, then reverted it after mixed preliminary observations. On resumption, its unarchived target artifacts were unavailable; the assistant recorded this limitation and excluded its numbers from published evidence.
+- **Actions:** Hoisted boxed-Char discovery once per immutable dispatch pass, with a regression covering later interface-dispatch discovery and unused boxing. Rebuilt a fresh guest/native-host cohort against a hash-verified Preview 18 package because the previous development bundle was unavailable. Kept baseline and candidate inputs matched within the new cohort.
+- **Outcome:** All 209 codegen tests and 131,968 HTTP responses pass. Readiness medians improve in all four JIT/GC modes, while warm throughput and memory reservation remain mixed. Separate profiles reduce selection self share from 19.95% to 2.78%. The assistant retained the bounded change, updated website measurement tables, and selected repeated type-relationship work for the next investigation. [Evidence, limits and reproduction](validation/selection-box-scan-20261028/README.md) retain the slower pair, input differences and first-call blocking. Publication remains deferred.
+
 ## 2026-10-26 — Optimize shared metadata selection after the lazy-JIT load study
 
 - **Author:** Asked to commit the measured slice when ready and pick the next best-bet optimization, then directed continuing.

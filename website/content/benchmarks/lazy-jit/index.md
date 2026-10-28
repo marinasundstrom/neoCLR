@@ -1,6 +1,6 @@
 # Lazy JIT and GC under application load
 
-**Development measurements — 26 October 2026.** Lazy JIT lowers and compiles a
+**Development measurements — 26 and 28 October 2026.** Lazy JIT lowers and compiles a
 method when first called, leaving unused bodies uncompiled. The intended direction
 is lazy JIT with concurrent GC where it benefits a broad range of applications.
 The measurements below identify where it helps and which costs need optimization.
@@ -8,13 +8,14 @@ Eager JIT and synchronous GC remain the defaults in the current implementation.
 
 ## Shared startup optimization follow-up
 
-Native selection and generic expansion now reuse temporary immutable metadata
-indexes. The [updated paired HTTP table](/benchmarks/http/) reports the latest
-increment: all 12 eager/lazy and sync/concurrent startup pairs improve. A longer
-lazy/sync throughput check gives 2,105 → 2,099 req/s; no warm-throughput gain is
-claimed. Verification and lazy method counts are unchanged. Memory diagnostics
-and remaining first-call waits are documented separately. The earlier placement
-and load cohort below is not pooled with this follow-up.
+Native selection and generic expansion reuse temporary immutable metadata
+indexes. A further change scans selected bodies once per dispatch pass. The
+[updated paired HTTP table](/benchmarks/http/) reports a fresh 28 October cohort:
+median readiness improves 7.6-11.3% across eager/lazy JIT and both collectors;
+eleven of twelve pairs improve. Warm throughput is mixed, with no gain claimed.
+First-call waits remain. The new library cohort leaves 811 methods uncompiled;
+the earlier placement/load cohort below used different inputs and left 729.
+These independent cohorts are not pooled.
 
 ## Startup and warm execution
 

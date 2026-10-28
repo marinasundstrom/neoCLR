@@ -1225,6 +1225,15 @@ fn select_validated_inventory(
                 pending.push(initializer);
             }
         }
+        // The selected set is fixed throughout this dispatch pass: newly found
+        // targets only enter pending. Recompute after processing the next wave,
+        // rather than rescanning every selected body for every contract.
+        let boxes_char = functions.iter().any(|i| {
+            input.functions[*i]
+                .body
+                .iter()
+                .any(|op| matches!(op, Op::BoxValue(Type::Char)))
+        });
         for &contract in &functions {
             for (_, target) in scalar_interface_targets(input, contract, &functions)? {
                 if !functions.contains(&target) {
@@ -1236,12 +1245,8 @@ fn select_validated_inventory(
             {
                 pending.push(target);
             }
-            if functions.iter().any(|i| {
-                input.functions[*i]
-                    .body
-                    .iter()
-                    .any(|op| matches!(op, Op::BoxValue(Type::Char)))
-            }) && let Some(target) = char_dispatch_target(input, contract)
+            if boxes_char
+                && let Some(target) = char_dispatch_target(input, contract)
                 && !functions.contains(&target)
             {
                 pending.push(target);
@@ -1447,6 +1452,88 @@ pub(super) fn reference_array_backings(report: &Value) -> Vec<usize> {
 #[cfg(test)]
 mod composition_admission_tests {
     use super::*;
+
+    #[test]
+    fn char_boxing_discovered_through_dispatch_retains_object_override() {
+        // The box is not reachable through direct calls. It appears only after
+        // the interface implementation has been added by a dispatch pass.
+        let mut module = neoclr::assemble(
+            r#"
+.module DeferredCharBox
+.type class System.Object
+.method instance virtual GetHashCode() -> Int32
+ldc.i4 0
+ret
+.end
+.end
+.interface Factory
+.method instance Create() -> System.Object
+.end
+.end
+.type class Cell
+.implements Factory
+.method instance .ctor() -> void
+ret
+.end
+.method instance Create() -> System.Object
+.local Char character
+ldloca character
+initobj Char
+ldloc character
+box Char
+ret
+.end
+.end
+.function CharacterHash() -> Int32
+ldc.i4 42
+ret
+.end
+.function Main() -> Int32
+newobj instance Cell::.ctor()
+callvirt instance Factory::Create()
+callvirt instance System.Object::GetHashCode()
+ret
+.end
+"#,
+        )
+        .unwrap();
+        // Supply an intrinsic Char override in the already-validated inventory.
+        let method = module
+            .functions
+            .iter_mut()
+            .find(|f| f.name == "CharacterHash")
+            .unwrap();
+        method.name = "Char.GetHashCode".into();
+        method.owner = Some(Type::Char);
+        method.instance = true;
+        method.is_virtual = true;
+        method.is_override = true;
+        let (selected, report) = select_validated_inventory(&module, "Main", &[], &[]).unwrap();
+        assert!(selected.functions.iter().any(|f| f.name == "Cell.Create"));
+        assert!(selected.functions.iter().any(|f| f.name == "Char.GetHashCode"));
+        assert_eq!(report["charObjectDispatch"].as_array().unwrap().len(), 1);
+
+        // An unreachable box must not retain a primitive override merely because
+        // it exists somewhere in the input inventory.
+        module
+            .functions
+            .iter_mut()
+            .find(|f| f.name == "Main")
+            .unwrap()
+            .body = vec![
+            Op::Construct(
+                neoclr::assembler::parse_function_ref("instance Cell::.ctor()").unwrap(),
+            ),
+            Op::CallVirtual(
+                neoclr::assembler::parse_function_ref("instance System.Object::GetHashCode()")
+                    .unwrap(),
+            ),
+            Op::Return,
+        ];
+        let (selected, report) = select_validated_inventory(&module, "Main", &[], &[]).unwrap();
+        assert!(!selected.functions.iter().any(|f| f.name == "Char.GetHashCode"));
+        assert!(report["charObjectDispatch"].as_array().unwrap().is_empty());
+    }
 
     #[test]
     fn explicit_mapping_identity_follows_selected_rows() {
