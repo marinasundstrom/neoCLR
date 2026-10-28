@@ -38,3 +38,9 @@ It prints `7`. Replacing only DefaultReader's requirement with PublicProperties
 produces `DAM2005`; execution still prints `7` because the method performs no reflection.
 This isolates contract diagnostics from runtime reflection failure. See
 [interface validation](../../validation/dynamic-access-interfaces-20261028/README.md).
+
+The `overrides` project supplies matching annotations on Reader.Read and its virtual
+override DefaultReader.Read. It prints `7` through a base-typed receiver. Changing
+only the override requirement to PublicProperties produces DAM2006 while preserving
+dispatch and the caller's inferred constructor requirement. See
+[override evidence](../../validation/dynamic-access-overrides-20261028/README.md).

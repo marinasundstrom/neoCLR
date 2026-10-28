@@ -1,0 +1,108 @@
+{
+  "date": "2026-10-28",
+  "host": "macOS ARM64",
+  "compilerRevision": "ed1d08def",
+  "tests": {
+    "analysis": 17,
+    "classInterfaces": 7,
+    "inheritance": 1,
+    "apiFingerprint": "pass"
+  },
+  "cases": {
+    "override-match": {
+      "buildPassed": true,
+      "profile": "macos-arm64-http-v1",
+      "backendSha256": "7f47faf4453ca3c024fb317f3d175439b19576a0da000711b926596e881cb65f",
+      "artifacts": {
+        "app.dll": "0feb8503ad46e7679d869df77861ef6cbbf18fe407ffa0e74a790ffc692209ce",
+        "app.o": "446e4501997fee220866d7a31ee21de02c1ef979ff5b0af2d3f89a21271fa3cc",
+        "app": "cc6d3294c733e8f7447b414e827c64d5ea599ef294dda2ee3036291d95d91691"
+      },
+      "dynamicAccess": {
+        "diagnostics": [
+          "DAM2004: dynamic-dispatch implementation bodies are not analyzed; reflection inside them may require explicit retention"
+        ],
+        "types": {
+          "3": 3
+        }
+      },
+      "retainedTypes": [
+        {
+          "checkStatus": 0,
+          "construct": true,
+          "constructor": {
+            "index": 22,
+            "module": "NeoMetadata_ABA4D369647F45877F4AE4FE8AB03E6986D031BC12468F445310036B5EAFBD0D",
+            "revision": "1.0.0.0"
+          },
+          "constructors": true,
+          "customAttributes": false,
+          "definition": {
+            "index": 3,
+            "module": "NeoMetadata_ABA4D369647F45877F4AE4FE8AB03E6986D031BC12468F445310036B5EAFBD0D",
+            "revision": "1.0.0.0"
+          },
+          "fieldGetters": false,
+          "fieldSetters": false,
+          "fields": false,
+          "getters": false,
+          "policy": "explicit source identity; metadata check does not retain constructor body unless invocation is requested",
+          "properties": false,
+          "setters": false,
+          "sourceName": "NeoMetadata_ABA4D369647F45877F4AE4FE8AB03E6986D031BC12468F445310036B5EAFBD0D.T__4D6F64656C"
+        }
+      ],
+      "exitCode": 0,
+      "stdout": "7\n",
+      "stderr": ""
+    },
+    "override-mismatch": {
+      "buildPassed": true,
+      "profile": "macos-arm64-http-v1",
+      "backendSha256": "7f47faf4453ca3c024fb317f3d175439b19576a0da000711b926596e881cb65f",
+      "artifacts": {
+        "app.dll": "444b112ca878bc6c5bef0b3fe533239f740edd277bcfea2a5b8ce4f04ac27e23",
+        "app.o": "446e4501997fee220866d7a31ee21de02c1ef979ff5b0af2d3f89a21271fa3cc",
+        "app": "cc6d3294c733e8f7447b414e827c64d5ea599ef294dda2ee3036291d95d91691"
+      },
+      "dynamicAccess": {
+        "diagnostics": [
+          "DAM2004: dynamic-dispatch implementation bodies are not analyzed; reflection inside them may require explicit retention",
+          "DAM2006: DefaultReader.Read parameter 0 requires 512, but overridden Reader.Read requires 3; corresponding parameter annotations must match"
+        ],
+        "types": {
+          "0": 3
+        }
+      },
+      "retainedTypes": [
+        {
+          "checkStatus": 0,
+          "construct": true,
+          "constructor": {
+            "index": 12,
+            "module": "NeoMetadata_ABA4D369647F45877F4AE4FE8AB03E6986D031BC12468F445310036B5EAFBD0D",
+            "revision": "1.0.0.0"
+          },
+          "constructors": true,
+          "customAttributes": false,
+          "definition": {
+            "index": 0,
+            "module": "NeoMetadata_ABA4D369647F45877F4AE4FE8AB03E6986D031BC12468F445310036B5EAFBD0D",
+            "revision": "1.0.0.0"
+          },
+          "fieldGetters": false,
+          "fieldSetters": false,
+          "fields": false,
+          "getters": false,
+          "policy": "explicit source identity; metadata check does not retain constructor body unless invocation is requested",
+          "properties": false,
+          "setters": false,
+          "sourceName": "NeoMetadata_ABA4D369647F45877F4AE4FE8AB03E6986D031BC12468F445310036B5EAFBD0D.T__4D6F64656C"
+        }
+      ],
+      "exitCode": 0,
+      "stdout": "7\n",
+      "stderr": ""
+    }
+  }
+}

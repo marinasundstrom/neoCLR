@@ -350,6 +350,20 @@ fn declared_method(
         find(&mut module.functions.iter())
     }
 }
+/// The nearest declared ancestor member, using the same slot matching as verification.
+pub(crate) fn inherited_method(
+    module: &Module,
+    owner: &Type,
+    method: &crate::metadata::Function,
+) -> Result<Option<crate::metadata::Function>, Fault> {
+    for base in lineage(module, owner)?.iter().skip(1) {
+        if let Some(candidate) = declared_method(module, base, method)? {
+            return Ok(Some(candidate));
+        }
+    }
+    Ok(None)
+}
+
 // Rootless nominal records have an implicit Object view. Values adapt its slot
 // to a managed box receiver; reference classes retain their object receiver.
 fn implicit_object_contract(
@@ -440,13 +454,7 @@ fn validate_methods(module: &Module) -> Result<(), Fault> {
         {
             continue;
         }
-        let mut inherited = None;
-        for base in lineage(module, owner)?.iter().skip(1) {
-            if let Some(candidate) = declared_method(module, base, method)? {
-                inherited = Some(candidate);
-                break;
-            }
-        }
+        let inherited = inherited_method(module, owner, method)?;
         let boxed_parent = if method.is_override && inherited.is_none() {
             implicit_object_contract(module, owner, method)?
         } else {

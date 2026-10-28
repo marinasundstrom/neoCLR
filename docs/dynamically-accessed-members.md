@@ -45,8 +45,9 @@ not communicate the type that reflection will inspect.
   Unused direct callers do not root their types. Dynamic implementation bodies are
   not traversed before specialization (`DAM2004`); reflection inside them needs
   explicit policy where not otherwise proven. Nongeneric nominal class/interface
-  parameter compatibility is checked separately (`DAM2005`); class virtual overrides,
-  generic mappings and implementation-body traversal remain gaps. Public constructors and instance property accessors selected by
+  parameter compatibility is checked separately (`DAM2005`), as are nongeneric
+  reference-class overrides (`DAM2006`). Generic mappings and implementation-body
+  traversal remain gaps. Public constructors and instance property accessors selected by
   inferred requirements are additional analysis roots. Their direct calls are
   analyzed repeatedly until no new bodies are found, so reflection inside a retained
   constructor/accessor can infer further types. Cycles terminate because the root set
@@ -101,8 +102,8 @@ are costs of the initial implementation, not improvements in .NET semantics.
 Generic-parameter/return/field/property annotations, string type-name resolution,
 receiver annotations, arbitrary generic target retention, richer member flags,
 class/base annotation inheritance and complete interprocedural inference remain
-unimplemented. General class virtual-method annotation compatibility is not
-qualified by this slice. Do not treat an annotation as a blanket no-trim promise.
+unimplemented. Nongeneric nominal reference-class parameter override compatibility
+is checked; generic/value-type virtual contracts remain unqualified. Do not treat an annotation as a blanket no-trim promise.
 Future work must extend metadata transport, flow analysis, runtime API annotations,
 negative diagnostics and reference documentation together.
 
@@ -161,7 +162,29 @@ to `dynamicAccess` and stderr without adding retention roots or changing dispatc
 The cost is extra metadata traversal; no performance gain is claimed.
 
 Generic classes/interfaces/methods, value-type implementations, abstract class mappings
-and standalone class-virtual override compatibility remain unqualified. `DAM2004`
+remain outside the interface check. Nongeneric reference-class overrides are checked
+separately below. `DAM2004`
 still marks the separate implementation-body traversal gap. A mismatch is a diagnostic,
 not proof that inferred retention satisfies the implementation. See
 [matching/mismatching native consumers](validation/dynamic-access-interfaces-20261028/README.md).
+
+## Class override parameter compatibility (2026-10-28)
+
+`DAM2006` reports unequal parameter requirements between a class override and its
+nearest inherited declaration. This uses the same exact-match rule as the interface
+check and .NET IL2092. Absent annotations mean zero requirements; weakening or
+strengthening a requirement is a mismatch. Every override in a chain is checked
+against its nearest declaration, including abstract/reabstracted declarations.
+
+The pass uses the existing inheritance slot lookup shared with verifier validation.
+It checks nongeneric nominal reference-class methods whose ancestry is nongeneric.
+It inspects the supplied load set, without rooting bodies, widening retention or
+changing virtual dispatch. Generic ancestry/methods, value-type overrides and
+runtime-owned implicit Object adaptations remain outside this check. The latter
+currently expose no TypeInfo parameter contracts. DAM2004 still describes the
+separate implementation-body traversal gap.
+
+This adds metadata traversal, not runtime code. No performance improvement is claimed.
+[Override qualification](validation/dynamic-access-overrides-20261028/README.md)
+compares matching and mismatching native consumers and checks existing inheritance
+behavior. Runtime Contract settings, attribute transport and public APIs are unchanged.

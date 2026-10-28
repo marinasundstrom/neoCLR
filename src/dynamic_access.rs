@@ -145,6 +145,59 @@ pub fn interface_contract_diagnostics(module: &Module) -> Result<BTreeSet<String
     })
 }
 
+/// Check nongeneric nominal reference-class override parameter contracts.
+/// Abstract declarations participate; checking does not select executable targets.
+pub fn override_contract_diagnostics(module: &Module) -> Result<BTreeSet<String>, Fault> {
+    crate::runtime_lookup::with_module(module, || {
+        let mut diagnostics = BTreeSet::new();
+        for implementation in &module.functions {
+            if !implementation.is_override || !implementation.generic_parameters.is_empty() {
+                continue;
+            }
+            let Some(owner) = &implementation.owner else {
+                continue;
+            };
+            let Some(ty) = module.type_definition(owner) else {
+                continue;
+            };
+            if !ty.is_reference_type
+                || !ty.generic_parameters.is_empty()
+                || ty.representation != crate::metadata::Representation::Record
+            {
+                continue;
+            }
+            let chain = crate::inheritance::lineage(module, owner)?;
+            if chain.iter().any(|base| {
+                !matches!(base, Type::Named(_))
+                    || module
+                        .type_definition(base)
+                        .is_some_and(|t| !t.generic_parameters.is_empty())
+            }) {
+                continue;
+            }
+            let Some(contract) =
+                crate::inheritance::inherited_method(module, owner, implementation)?
+            else {
+                // Implicit runtime Object slots have no TypeInfo parameter contract.
+                continue;
+            };
+            if !contract.generic_parameters.is_empty() {
+                continue;
+            }
+            let declared = requirements(module, &contract)?;
+            let actual = requirements(module, implementation)?;
+            for (index, (expected, found)) in declared.iter().zip(&actual).enumerate() {
+                if expected != found {
+                    diagnostics.insert(format!(
+                        "DAM2006: {} parameter {index} requires {found}, but overridden {} requires {expected}; corresponding parameter annotations must match",
+                        display_name(module, implementation), display_name(module, &contract)));
+                }
+            }
+        }
+        Ok(diagnostics)
+    })
+}
+
 #[derive(Clone, PartialEq, Eq)]
 struct State {
     stack: Vec<Value>,
@@ -917,6 +970,73 @@ mod tests {
         assert!(interface_contract_diagnostics(&m).unwrap().is_empty());
         m.functions[4].custom_attributes.clear();
         assert_eq!(interface_contract_diagnostics(&m).unwrap().len(), 1);
+        m.functions[0].body = vec![Op::Return];
+        assert!(analyze(&m, "Main").unwrap().types.is_empty());
+    }
+    fn override_fixture() -> Module {
+        let mut m = fixture();
+        m.types[3].is_reference_type = true;
+        m.types[4].is_reference_type = true;
+        m.types[3].base = Some(Type::Named("Other".into()));
+        let mut contract = m.functions[1].clone();
+        contract.name = "Other.Require".into();
+        contract.owner = Some(Type::Named("Other".into()));
+        contract.instance = true;
+        contract.is_virtual = true;
+        let mut implementation = contract.clone();
+        implementation.name = "Model.Require".into();
+        implementation.owner = Some(Type::Named("Model".into()));
+        implementation.is_override = true;
+        m.functions.extend([contract, implementation]);
+        m
+    }
+
+    #[test]
+    fn virtual_override_parameter_requirements_match_exactly() {
+        let mut m = override_fixture();
+        assert!(override_contract_diagnostics(&m).unwrap().is_empty());
+        for flags in [0, 1, 515] {
+            m.functions[4].custom_attributes[0].arguments = vec![AttributeArgument::Int32(flags)];
+            let diagnostics = override_contract_diagnostics(&m).unwrap();
+            assert_eq!(diagnostics.len(), 1);
+            assert!(diagnostics.iter().next().unwrap().contains("DAM2006"));
+        }
+        m.functions[4].custom_attributes.clear();
+        assert_eq!(override_contract_diagnostics(&m).unwrap().len(), 1);
+        m.functions[3].custom_attributes.clear();
+        assert!(override_contract_diagnostics(&m).unwrap().is_empty());
+        m.functions[4].custom_attributes = m.functions[1].custom_attributes.clone();
+        assert_eq!(override_contract_diagnostics(&m).unwrap().len(), 1);
+    }
+
+    #[test]
+    fn overrides_compare_nearest_ancestor_including_abstract_declarations() {
+        let mut m = override_fixture();
+        let mut middle = m.types[4].clone();
+        middle.name = "Middle".into();
+        middle.definition.as_mut().unwrap().index = 5;
+        middle.base = Some(Type::Named("Other".into()));
+        middle.is_abstract = true;
+        m.types.push(middle);
+        m.types[3].base = Some(Type::Named("Middle".into()));
+        let mut method = m.functions[4].clone();
+        method.owner = Some(Type::Named("Middle".into()));
+        method.name = "Middle.Require".into();
+        method.is_abstract = true;
+        method.body.clear();
+        method.custom_attributes[0].arguments = vec![AttributeArgument::Int32(515)];
+        m.functions[4].custom_attributes = method.custom_attributes.clone();
+        m.functions.push(method);
+        let diagnostics = override_contract_diagnostics(&m).unwrap();
+        assert_eq!(diagnostics.len(), 1);
+        assert!(
+            diagnostics
+                .iter()
+                .next()
+                .unwrap()
+                .contains("Middle.Require")
+        );
+        assert!(!diagnostics.iter().next().unwrap().contains("Model.Require"));
         m.functions[0].body = vec![Op::Return];
         assert!(analyze(&m, "Main").unwrap().types.is_empty());
     }
