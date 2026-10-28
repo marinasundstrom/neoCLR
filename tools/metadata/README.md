@@ -406,3 +406,12 @@ selection of this import path; ordinary .NET compilation is unchanged. SDK
 composition-import and authored-composition tests pass, and the freshly compiled
 HTTP client/server pass interpreter end-to-end requests (including UTF-8 JSON and
 invalid input). Fresh packaged SDK/JIT qualification remains separate.
+
+## Return custom attributes (development, 2026-10-28)
+
+`MethodDefinition.ReturnCustomAttributes` is a mutable collection on authored methods
+and read-only on loaded definitions. `Introspection.MethodInfo.GetReturnCustomAttributes()`
+provides metadata-only discovery. CLI output uses the sequence-zero Param row;
+native output uses optional `origin.return_token` and matching attribute target tokens.
+Roundtrip, reference projection and malformed-target checks run with
+`dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --return-attributes`.

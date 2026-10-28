@@ -115,6 +115,9 @@ pub struct MetadataOrigin {
     pub property_tokens: Vec<u32>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub parameter_tokens: Vec<u32>,
+    /// Source Param-row identity of the return slot, when it has metadata.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub return_token: Option<u32>,
     /// Explicit .NET nullable transform facts; -1 denotes the return value.
     /// These annotations do not affect physical signatures or runtime checks.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
@@ -426,6 +429,12 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
         }
         // CLI permits parameters without a Param row. Zero denotes that absence,
         // never an invented row or a module-wide identity.
+        if let Some(token) = origin.return_token {
+            if table != 0x06 {
+                return Err(Fault::new("return token requires a method origin"));
+            }
+            check(origin, token, 0x08)?;
+        }
         for &token in &origin.parameter_tokens {
             if token != 0 {
                 check(origin, token, 0x08)?;

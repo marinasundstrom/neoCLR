@@ -54,6 +54,16 @@ in [the validation record](validation/dynamic-access-20261028/README.md).
 Generic, field, return and receiver contracts remain open; continuation is not
 recorded as approval of a complete .NET trimming implementation.
 
+- **Subsequent author direction:** Requested the remaining unsupported annotations.
+  When asked whether the scope should include member categories as well as returns,
+  fields/properties, generic parameters and receivers, replied: "Include all member categories too".
+- **Assistant action:** Started with distinct return-attribute metadata transport in
+  Raven and neoCLR, return-flow enforcement and interface/override comparison.
+  [Return qualification](validation/dynamic-access-returns-20261028/README.md) records
+  this implemented layer. The broader requested targets/categories remain work in
+  progress; the existing initial subset is not presented as fulfilling that scope.
+
+
 ## 2026-10-28 - Continue profiling shared lazy-JIT startup work
 
 - **Author:** Directed continuing the measured optimization sequence, retaining the earlier priorities of both collectors, HTTP performance and website updates.

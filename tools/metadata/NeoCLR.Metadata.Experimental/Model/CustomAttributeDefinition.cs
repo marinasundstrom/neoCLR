@@ -396,3 +396,18 @@ public sealed partial class AssemblyBuilder
              nativeImportedDefinitions.Keys.Any(t => t.Namespace == "System" && t.Name == "ParamArrayAttribute" &&
                  t.AssemblyIdentity.Equals(attribute.AttributeType.ExplicitScope))));
 }
+
+public sealed partial class MethodDefinition
+{
+    private IList<CustomAttributeDefinition>? returnAttributes;
+    /// <summary>Gets attributes on the return-value slot. Loaded lists are read-only.</summary>
+    public IList<CustomAttributeDefinition> ReturnCustomAttributes => returnAttributes ??= AuthoredSignature is null
+        ? Array.AsReadOnly(Array.Empty<CustomAttributeDefinition>())
+        : new DefinitionCollection<CustomAttributeDefinition>([], attribute =>
+        {
+            if (returnAttributes!.Count >= 256) throw new InvalidDataException("too many return attributes");
+            attribute.ValidateOwner(Module);
+        });
+    internal void SetLoadedReturnAttributes(IEnumerable<CustomAttributeDefinition> attributes)
+        => returnAttributes = Array.AsReadOnly(attributes.ToArray());
+}

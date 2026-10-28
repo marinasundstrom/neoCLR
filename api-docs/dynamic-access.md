@@ -3,7 +3,7 @@
 Development API in `System.Diagnostics.CodeAnalysis`, owned by System.Runtime.
 
 - `DynamicallyAccessedMembersAttribute(memberTypes: DynamicallyAccessedMemberTypes)`
-  declares required members on a `TypeInfo` parameter. Read-only `MemberTypes`
+  declares required members on a `TypeInfo` parameter or return value (`[return: ...]`). Read-only `MemberTypes`
   returns those flags. The attribute constructor stores metadata; runtime execution
   of the constructor is not the retention mechanism.
 - `DynamicallyAccessedMemberTypes` uses standard .NET flag values. Current native
@@ -16,10 +16,10 @@ See the generated [attribute reference](api/System/Diagnostics/CodeAnalysis/Dyna
 and [flag reference](api/System/Diagnostics/CodeAnalysis/DynamicallyAccessedMemberTypes/index.html).
 [Supported flow, diagnostics and annotated runtime APIs](https://github.com/marinasundstrom/neoCLR/blob/main/docs/dynamically-accessed-members.md)
 describe the current boundaries. Unknown-flow warnings mean retention has not been
-proven. Generic parameters, returns, fields, receiver annotations and string
+proven. Generic parameters, fields, receiver annotations and string
 resolution remain unsupported; project retention files remain available.
 
-Nongeneric class/interface implementations should repeat the same parameter
+Nongeneric class/interface implementations should repeat the same parameter and return
 requirements as their interface declarations. The native backend reports `DAM2005`
 on mismatches, including missing annotations; it does not silently strengthen the
 interface contract or retain extra implementation bodies. Nongeneric reference-class
@@ -27,3 +27,6 @@ overrides are checked against their nearest base declaration with `DAM2006`, inc
 abstract declarations and closed generic base classes of nongeneric derived classes.
 Generic derived classes, generic methods/interface mappings and value-type overrides
 remain outside these checks. This does not add generic-parameter annotations.
+
+Annotated returns validate the producer and propagate declared requirements to callers.
+Unknown or insufficient returned values produce DAM2001; known type tokens infer roots.

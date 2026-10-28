@@ -118,7 +118,7 @@ supported closed shapes known to compilation. This does not add automatic JIT
 file discovery.
 
 Development `DynamicallyAccessedMembers` analysis can now infer constructor/property
-retention from known type tokens passed to annotated `TypeInfo` parameters. JSON
+retention from known type tokens passed to annotated `TypeInfo` parameters or returned from annotated factories. JSON
 deserialization and DI registration APIs carry corresponding requirements.
 Unknown flows produce diagnostics; generic-parameter, return, field and receiver
 annotations remain unsupported. Explicit files are still needed for unsupported

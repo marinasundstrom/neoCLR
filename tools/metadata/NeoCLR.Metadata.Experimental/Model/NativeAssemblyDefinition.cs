@@ -35,7 +35,7 @@ public sealed partial class NativeAssemblyDefinition
     }
     private sealed record AttributeRow(SignatureType Owner, CustomAttributeArgument[] Arguments) { internal CustomAttributeNamedArgument[] Named { get; init; } = []; }
     private sealed record FieldRow(string Name, JsonElement Type, FieldVisibility Visibility, bool IsReadOnly = false, SignatureType? Signature = null);
-    private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance, bool Override) { internal Dictionary<int, AttributeRow[]> ParameterAttributes { get; init; } = []; internal AttributeRow[] Attributes { get; init; } = []; internal bool ObjectSlot { get; init; } internal bool Virtual { get; init; } internal bool Abstract { get; init; } internal ushort ImplementationAttributes { get; init; } internal NativeImportDefinition? NativeImport { get; init; } internal int? ParameterArrayIndex { get; init; } internal Dictionary<int, NullableAnnotation> NullableAnnotations { get; init; } = []; internal (SignatureType Owner, string Name)[] ExplicitInterfaces { get; init; } = []; internal Dictionary<int, string> ParameterNames { get; init; } = []; internal Dictionary<int, TypeParameterConstraints> SpecialConstraints { get; init; } = []; internal (int Parameter, SignatureType Type, int Owner, bool Structural)[] TypeConstraints { get; init; } = []; }
+    private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance, bool Override) { internal Dictionary<int, AttributeRow[]> ParameterAttributes { get; init; } = []; internal AttributeRow[] Attributes { get; init; } = []; internal AttributeRow[] ReturnAttributes { get; init; } = []; internal bool ObjectSlot { get; init; } internal bool Virtual { get; init; } internal bool Abstract { get; init; } internal ushort ImplementationAttributes { get; init; } internal NativeImportDefinition? NativeImport { get; init; } internal int? ParameterArrayIndex { get; init; } internal Dictionary<int, NullableAnnotation> NullableAnnotations { get; init; } = []; internal (SignatureType Owner, string Name)[] ExplicitInterfaces { get; init; } = []; internal Dictionary<int, string> ParameterNames { get; init; } = []; internal Dictionary<int, TypeParameterConstraints> SpecialConstraints { get; init; } = []; internal (int Parameter, SignatureType Type, int Owner, bool Structural)[] TypeConstraints { get; init; } = []; }
     private sealed record PropertyRow(int Owner, string Name, SignatureType Type, int Getter, int Setter, SignatureType[] Parameters, bool IsInitOnly);
     private sealed record NativeTypeAlias(string NativeName, AssemblyIdentity Assembly, string Namespace, string Name, int Arity, bool ValueType, string? Declaring, int DeclaringArity);
     private readonly Dictionary<(string Name, int Arity), NativeTypeAlias> nativeTypeAliases;
@@ -847,6 +847,7 @@ public sealed partial class NativeAssemblyDefinition
                 var origin = method.GetProperty("origin");
                 var originFields = new List<string> { "assembly", "module", "name", "token", "member_access", "parameter_tokens" };
                 if (origin.TryGetProperty("nullable_annotations", out _)) originFields.Add("nullable_annotations");
+                if (origin.TryGetProperty("return_token", out _)) originFields.Add("return_token");
                 Shape(origin, originFields.ToArray());
                 var name = Text(origin, "name"); Require(name.Length is > 0 and <= 1024, "invalid native method name"); CheckName(name);
                 var owner = method.GetProperty("owner"); int ownerIndex = -1;
@@ -950,6 +951,8 @@ public sealed partial class NativeAssemblyDefinition
                 Require(Text(origin, "member_access") == (visibility == MethodVisibility.Internal ? "Assembly" : visibility == MethodVisibility.Protected ? "Family" : visibility.ToString()), "native method visibility mismatch");
                 Require(visibility != MethodVisibility.Protected || ownerIndex >= 0 && instance && name == ".ctor", "protected native member must be an instance constructor");
                 Require(ownerIndex >= 0 || visibility != MethodVisibility.Private, "private native global function unsupported");
+                uint? returnToken = origin.TryGetProperty("return_token", out var returnTokenNode) ? returnTokenNode.GetUInt32() : null;
+                if (returnToken is uint rt) Require(rt >> 24 == 8 && (rt & 0xffffff) > 0 && parameterTokens.Add((int)rt), "invalid or duplicate native return token");
                 var tokens = Array(origin, "parameter_tokens", 256);
                 Require(tokens.Length == parameters.Length && tokens.All(t => t.GetInt32() == 0 ||
                     (t.GetInt32() >> 24 == 8 && (t.GetInt32() & 0xffffff) > 0 && parameterTokens.Add(t.GetInt32()))), "invalid or duplicate native parameter token");
@@ -966,6 +969,7 @@ public sealed partial class NativeAssemblyDefinition
                     }
                 int? parameterArray = null;
                 var methodAttributes = new List<AttributeRow>();
+                var returnAttributes = new List<AttributeRow>();
                 var parameterAttributes = new Dictionary<int, List<AttributeRow>>();
                 if (method.TryGetProperty("custom_attributes", out _))
                 {
@@ -976,6 +980,12 @@ public sealed partial class NativeAssemblyDefinition
                         {
                             Require(methodAttributes.Count < 256, "too many method attributes");
                             methodAttributes.Add(ReadAttribute(attribute));
+                            continue;
+                        }
+                        if (returnToken is uint returnAttributeToken && attribute.GetProperty("target_token").GetUInt32() == returnAttributeToken)
+                        {
+                            Require(returnAttributes.Count < 256, "too many return attributes");
+                            returnAttributes.Add(ReadAttribute(attribute));
                             continue;
                         }
                         var markerName = Text(attribute.GetProperty("constructor"), "name");
@@ -1069,7 +1079,7 @@ public sealed partial class NativeAssemblyDefinition
                     Require(!method.TryGetProperty("out_parameters", out var nativeOutputs) || nativeOutputs.GetArrayLength() == 0, "native imports do not infer output marshalling");
                     nativeImport.Validate(new(resultType, parameterTypes));
                 }
-                methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes, genericNames, method.TryGetProperty("out_parameters", out _) ? Array(method, "out_parameters", 256).Select(p => p.GetInt32()) : []), visibility, instance, isOverride) { ParameterAttributes = parameterAttributes.ToDictionary(p => p.Key, p => p.Value.ToArray()), Attributes = methodAttributes.ToArray(), Virtual = isVirtual, Abstract = isAbstract, ObjectSlot = objectSlot, ImplementationAttributes = implementationAttributes, NativeImport = nativeImport, ParameterArrayIndex = parameterArray, NullableAnnotations = nullableAnnotations, ParameterNames = parameterNames, SpecialConstraints = methodSpecialConstraints, TypeConstraints = methodConstraints.ToArray(), ExplicitInterfaces = explicitMappings.ToArray() }); methodNames.Add(Text(method, "name"));
+                methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes, genericNames, method.TryGetProperty("out_parameters", out _) ? Array(method, "out_parameters", 256).Select(p => p.GetInt32()) : []), visibility, instance, isOverride) { ReturnAttributes = returnAttributes.ToArray(), ParameterAttributes = parameterAttributes.ToDictionary(p => p.Key, p => p.Value.ToArray()), Attributes = methodAttributes.ToArray(), Virtual = isVirtual, Abstract = isAbstract, ObjectSlot = objectSlot, ImplementationAttributes = implementationAttributes, NativeImport = nativeImport, ParameterArrayIndex = parameterArray, NullableAnnotations = nullableAnnotations, ParameterNames = parameterNames, SpecialConstraints = methodSpecialConstraints, TypeConstraints = methodConstraints.ToArray(), ExplicitInterfaces = explicitMappings.ToArray() }); methodNames.Add(Text(method, "name"));
             }
             nativeTypeAliases.TryGetValue(("System.Object", 0), out var externalRootAlias);
             if (externalRootAlias is not null)
@@ -1276,6 +1286,13 @@ public sealed partial class NativeAssemblyDefinition
                 : method.Virtual ? owners[method.Owner].AddVirtualMethod(method.Name, signature)
                 : method.Name == ".ctor" ? owners[method.Owner].AddConstructor(signature, method.Visibility)
                 : owners[method.Owner].AddInstanceMethod(method.Name, signature, method.Visibility);
+            foreach (var attribute in method.ReturnAttributes)
+            {
+                var attributeOwner = Remap(attribute.Owner);
+                var reference = attributeOwner.ClassType is { } local ? local.Definition.ToReference()
+                    : graph.Definition.MainModule.ImportReference(attributeOwner.ImportedType!.AssemblyIdentity, attributeOwner.ImportedType.Namespace, attributeOwner.ImportedType.Name);
+                output.Definition.ReturnCustomAttributes.Add(new(reference, attribute.Arguments.Select(a => new CustomAttributeArgument(Remap(a.Type), a.Value)), attribute.Named));
+            }
             foreach (var (position, attributes) in method.ParameterAttributes)
                 foreach (var attribute in attributes)
                 {

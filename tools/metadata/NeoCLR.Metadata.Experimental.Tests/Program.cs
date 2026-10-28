@@ -124,6 +124,7 @@ if (args is ["--aot-attribute-fixture", var attributeInput, var attributeImage, 
 if (args is ["--assembly-attributes"]) { AssemblyAttributeChecks.Run(); return 0; }
 if (args is ["--assembly-attributes", var assemblyAttributeOutput]) { AssemblyAttributeChecks.Run(assemblyAttributeOutput); return 0; }
 
+if (args is ["--return-attributes"]) { ReturnAttributeChecks.Run(); return 0; }
 if (args is ["--member-attributes"]) { MemberAttributeChecks.Run(); return 0; }
 if (args is ["--member-attributes", var attributeOutput]) { MemberAttributeChecks.Run(attributeOutput); return 0; }
 
@@ -656,6 +657,7 @@ var tests = new (string Name, Action Body)[]
     ("Mutable owned field addresses", FieldAddressChecks.Run),
     ("Typed boxing and core Object", BoxingChecks.Run),
     ("Type custom attributes and explicit metadata introspection", CustomAttributeChecks.Run),
+    ("Return custom attributes", () => ReturnAttributeChecks.Run()),
     ("Member custom attributes and classless discovery", () => MemberAttributeChecks.Run()),
     ("Parameter names survive native and CLI metadata", ParameterNameChecks.Run),
     ("Native callback signatures project canonical generic views", FunctionViewChecks.Run),

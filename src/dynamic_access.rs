@@ -1,4 +1,4 @@
-//! Conservative native retention analysis for type-bearing parameter contracts.
+//! Conservative native retention analysis for type-bearing parameter and return contracts.
 //! Unknown flows are diagnostics, never evidence that metadata is retained.
 use crate::{
     Fault, Module,
@@ -45,8 +45,22 @@ fn display_name(module: &Module, function: &Function) -> String {
     }
 }
 
-fn requirements(module: &Module, function: &Function) -> Result<Vec<u32>, Fault> {
-    let mut result = vec![0; function.parameters.len()];
+#[derive(Default)]
+struct Contract {
+    parameters: Vec<u32>,
+    returns: u32,
+}
+impl Contract {
+    fn is_empty(&self) -> bool {
+        self.returns == 0 && self.parameters.iter().all(|f| *f == 0)
+    }
+}
+
+fn requirements(module: &Module, function: &Function) -> Result<Contract, Fault> {
+    let mut result = Contract {
+        parameters: vec![0; function.parameters.len()],
+        returns: 0,
+    };
     for attribute in &function.custom_attributes {
         if attribute
             .constructor
@@ -64,14 +78,24 @@ fn requirements(module: &Module, function: &Function) -> Result<Vec<u32>, Fault>
             ))
         };
         let token = attribute.target_token.ok_or_else(fail)?;
-        let position = function
-            .origin
-            .as_ref()
-            .and_then(|o| o.parameter_tokens.iter().position(|t| *t == token))
-            .ok_or_else(fail)?;
-        if source_name(module, function.parameters.get(position).ok_or_else(fail)?)
-            != Some("System.Introspection.TypeInfo")
-        {
+        let origin = function.origin.as_ref().ok_or_else(fail)?;
+        let (target_type, target_flags) = if origin.return_token == Some(token) {
+            if function.no_result {
+                return Err(fail());
+            }
+            (&function.returns, &mut result.returns)
+        } else {
+            let position = origin
+                .parameter_tokens
+                .iter()
+                .position(|t| *t == token)
+                .ok_or_else(fail)?;
+            (
+                function.parameters.get(position).ok_or_else(fail)?,
+                &mut result.parameters[position],
+            )
+        };
+        if source_name(module, target_type) != Some("System.Introspection.TypeInfo") {
             return Err(fail());
         }
         let [AttributeArgument::Int32(flags)] = attribute.arguments.as_slice() else {
@@ -81,12 +105,12 @@ fn requirements(module: &Module, function: &Function) -> Result<Vec<u32>, Fault>
         {
             return Err(fail());
         }
-        result[position] |= *flags as u32;
+        *target_flags |= *flags as u32;
     }
     Ok(result)
 }
 
-/// Diagnose parameter annotation mismatches in verified, source-identity metadata.
+/// Diagnose parameter and return annotation mismatches in verified, source-identity metadata.
 /// This bounded check covers nongeneric nominal classes and interface methods;
 /// it does not add dispatch targets to retention or analyze their bodies.
 pub fn interface_contract_diagnostics(module: &Module) -> Result<BTreeSet<String>, Fault> {
@@ -98,8 +122,7 @@ pub fn interface_contract_diagnostics(module: &Module) -> Result<BTreeSet<String
             .map(|f| requirements(module, f))
             .collect::<Result<Vec<_>, _>>()?
             .iter()
-            .flatten()
-            .any(|f| *f != 0)
+            .any(|c| !c.is_empty())
         {
             return Ok(diagnostics);
         }
@@ -131,7 +154,15 @@ pub fn interface_contract_diagnostics(module: &Module) -> Result<BTreeSet<String
                         crate::interfaces::implementation(module, &concrete, &interface, contract)?;
                     let declared = requirements(module, contract)?;
                     let actual = requirements(module, &implementation)?;
-                    for (index, (expected, found)) in declared.iter().zip(&actual).enumerate() {
+                    if declared.returns != actual.returns {
+                        diagnostics.insert(format!("DAM2005: {} return requires {}, but interface {} requires {}; corresponding return annotations must match", display_name(module, &implementation), actual.returns, display_name(module, contract), declared.returns));
+                    }
+                    for (index, (expected, found)) in declared
+                        .parameters
+                        .iter()
+                        .zip(&actual.parameters)
+                        .enumerate()
+                    {
                         if expected != found {
                             diagnostics.insert(format!(
                                 "DAM2005: {} parameter {index} requires {found}, but interface {} requires {expected}; corresponding parameter annotations must match",
@@ -145,7 +176,7 @@ pub fn interface_contract_diagnostics(module: &Module) -> Result<BTreeSet<String
     })
 }
 
-/// Check nongeneric nominal reference-class override parameter contracts.
+/// Check nongeneric nominal reference-class override parameter and return contracts.
 /// Abstract declarations participate; checking does not select executable targets.
 pub fn override_contract_diagnostics(module: &Module) -> Result<BTreeSet<String>, Fault> {
     crate::runtime_lookup::with_module(module, || {
@@ -179,7 +210,15 @@ pub fn override_contract_diagnostics(module: &Module) -> Result<BTreeSet<String>
             }
             let declared = requirements(module, &contract)?;
             let actual = requirements(module, implementation)?;
-            for (index, (expected, found)) in declared.iter().zip(&actual).enumerate() {
+            if declared.returns != actual.returns {
+                diagnostics.insert(format!("DAM2006: {} return requires {}, but overridden {} requires {}; corresponding return annotations must match", display_name(module, implementation), actual.returns, display_name(module, &contract), declared.returns));
+            }
+            for (index, (expected, found)) in declared
+                .parameters
+                .iter()
+                .zip(&actual.parameters)
+                .enumerate()
+            {
                 if expected != found {
                     diagnostics.insert(format!(
                         "DAM2006: {} parameter {index} requires {found}, but overridden {} requires {expected}; corresponding parameter annotations must match",
@@ -241,7 +280,7 @@ fn require(module: &Module, value: &Value, flags: u32, site: &str, report: &mut 
 }
 
 /// Analyze a verified, linked module. This initial implementation admits TypeInfo
-/// parameter contracts for public constructors and properties. Other targets/flags
+/// parameter and return contracts for public constructors and properties. Other targets/flags
 /// fail explicitly rather than becoming inert annotations.
 pub fn analyze(module: &Module, root: &str) -> Result<Analysis, Fault> {
     analyze_with_roots(module, root, &[])
@@ -331,7 +370,7 @@ fn analyze_roots(module: &Module, roots: &BTreeSet<usize>) -> Result<Analysis, F
                 == Some(ATTRIBUTE)
         }) {
             return Err(Fault::new(
-                "DAM1001: only TypeInfo parameter annotations are currently supported",
+                "DAM1001: only TypeInfo parameter and return annotations are currently supported",
             ));
         }
     }
@@ -340,7 +379,7 @@ fn analyze_roots(module: &Module, roots: &BTreeSet<usize>) -> Result<Analysis, F
         .iter()
         .map(|f| requirements(module, f))
         .collect::<Result<Vec<_>, _>>()?;
-    if contracts.iter().all(|c| c.iter().all(|f| *f == 0)) {
+    if contracts.iter().all(Contract::is_empty) {
         return Ok(report);
     }
     let mut reachable = BTreeSet::new();
@@ -391,7 +430,7 @@ fn analyze_roots(module: &Module, roots: &BTreeSet<usize>) -> Result<Analysis, F
             continue;
         }
         let mut arguments = vec![Value::Unknown; usize::from(function.instance)];
-        arguments.extend(contract.iter().copied().map(Value::Required));
+        arguments.extend(contract.parameters.iter().copied().map(Value::Required));
         let initial = State {
             stack: vec![],
             locals: vec![Value::Unknown; function.locals.len()],
@@ -400,7 +439,7 @@ fn analyze_roots(module: &Module, roots: &BTreeSet<usize>) -> Result<Analysis, F
         let mut states = vec![None; function.body.len()];
         states[0] = Some(initial);
         let mut queue = VecDeque::from([0]);
-        let mut relevant = false;
+        let mut relevant = contract.returns != 0;
         for op in &function.body {
             if let Op::Call(t)
             | Op::CallVirtual(t)
@@ -409,7 +448,7 @@ fn analyze_roots(module: &Module, roots: &BTreeSet<usize>) -> Result<Analysis, F
             | Op::BindFunction { target: t, .. } = op
             {
                 let callee = crate::vm::resolve(module, t)?;
-                relevant |= requirements(module, &callee)?.iter().any(|r| *r != 0);
+                relevant |= !requirements(module, &callee)?.is_empty();
             }
         }
         if !relevant {
@@ -467,7 +506,11 @@ fn analyze_roots(module: &Module, roots: &BTreeSet<usize>) -> Result<Analysis, F
                 | Op::CallSelf { target, .. }
                 | Op::Construct(target) => {
                     let callee = crate::vm::resolve(module, target)?;
-                    for (index, flags) in requirements(module, &callee)?.into_iter().enumerate() {
+                    let callee_contract = requirements(module, &callee)?;
+                    if callee_contract.returns != 0 && pushes == 1 {
+                        produced[0] = Value::Required(callee_contract.returns);
+                    }
+                    for (index, flags) in callee_contract.parameters.into_iter().enumerate() {
                         require(
                             module,
                             &values[index
@@ -504,9 +547,18 @@ fn analyze_roots(module: &Module, roots: &BTreeSet<usize>) -> Result<Analysis, F
                         produced[0] = values.last().unwrap().clone();
                     }
                 }
+                Op::Return if contract.returns != 0 => {
+                    require(
+                        module,
+                        &values[0],
+                        contract.returns,
+                        &format!("{} instruction {pc} return", display_name(module, function)),
+                        &mut report,
+                    );
+                }
                 Op::BindFunction { target, .. } => {
                     let callee = crate::vm::resolve(module, target)?;
-                    if requirements(module, &callee)?.iter().any(|r| *r != 0) {
+                    if !requirements(module, &callee)?.is_empty() {
                         report.diagnostics.insert(format!("DAM2003: {} instruction {pc}: indirect call to annotated {} requires explicit retention", display_name(module, function), display_name(module, &callee)));
                     }
                 }
@@ -630,6 +682,71 @@ mod tests {
         );
         m.functions = vec![main, required, bridge];
         m
+    }
+
+    fn return_fixture() -> Module {
+        let mut m = fixture();
+        let mut factory = function("Factory", vec![], m.functions[0].body[..2].to_vec());
+        factory.body.push(Op::Return);
+        factory.returns = Type::Named("Info".into());
+        factory.no_result = false;
+        factory.origin = Some(serde_json::from_value(json!({"assembly":"Test","module":"Test.dll","name":"Factory","token":100663299,"return_token":134217730})).unwrap());
+        let mut attribute = m.functions[1].custom_attributes[0].clone();
+        attribute.target_token = Some(134217730);
+        factory.custom_attributes.push(attribute);
+        m.functions[0].body = vec![call(&factory), call(&m.functions[1]), Op::Return];
+        m.functions.push(factory);
+        m
+    }
+
+    #[test]
+    fn return_contract_roots_factory_type_and_satisfies_consumer() {
+        let m = return_fixture();
+        let report = analyze(&m, "Main").unwrap();
+        assert_eq!(report.types.get(&3), Some(&3));
+        assert!(report.diagnostics.is_empty(), "{:?}", report.diagnostics);
+    }
+
+    #[test]
+    fn unknown_return_is_diagnosed_even_without_annotated_consumers() {
+        let mut m = return_fixture();
+        m.functions[3].parameters.push(Type::RuntimeTypeHandle);
+        m.functions[3]
+            .origin
+            .as_mut()
+            .unwrap()
+            .parameter_tokens
+            .push(0);
+        m.functions[3].body[0] = Op::Arg(0);
+        let report = analyze(&m, "Factory").unwrap();
+        assert!(report.types.is_empty());
+        assert!(
+            report
+                .diagnostics
+                .iter()
+                .any(|d| d.contains("DAM2001") && d.contains("Factory") && d.contains("return"))
+        );
+    }
+
+    #[test]
+    fn return_contract_does_not_invent_stronger_guarantee() {
+        let mut m = return_fixture();
+        m.functions[1].custom_attributes[0].arguments = vec![AttributeArgument::Int32(512)];
+        let report = analyze(&m, "Main").unwrap();
+        assert_eq!(report.types.get(&3), Some(&3));
+        assert!(
+            report
+                .diagnostics
+                .iter()
+                .any(|d| d.contains("DAM2001") && d.contains("parameter 0"))
+        );
+        m.functions[3].no_result = true;
+        assert!(
+            analyze(&m, "Main")
+                .unwrap_err()
+                .to_string()
+                .contains("DAM1001")
+        );
     }
 
     #[test]
@@ -982,6 +1099,40 @@ mod tests {
         implementation.is_override = true;
         m.functions.extend([contract, implementation]);
         m
+    }
+
+    #[test]
+    fn return_contracts_match_interface_and_override_declarations() {
+        for (mut m, interface) in [(interface_fixture(), true), (override_fixture(), false)] {
+            for f in &mut m.functions[3..5] {
+                f.parameters.clear();
+                f.origin.as_mut().unwrap().parameter_tokens.clear();
+                f.origin.as_mut().unwrap().return_token = Some(134217729);
+                f.returns = Type::Named("Info".into());
+                f.no_result = false;
+            }
+            let check = if interface {
+                interface_contract_diagnostics
+            } else {
+                override_contract_diagnostics
+            };
+            assert!(check(&m).unwrap().is_empty());
+            for flags in [0, 1, 515] {
+                m.functions[4].custom_attributes[0].arguments =
+                    vec![AttributeArgument::Int32(flags)];
+                let diagnostics = check(&m).unwrap();
+                assert_eq!(diagnostics.len(), 1);
+                assert!(
+                    diagnostics
+                        .iter()
+                        .next()
+                        .unwrap()
+                        .contains("return requires")
+                );
+            }
+            m.functions[4].custom_attributes.clear();
+            assert_eq!(check(&m).unwrap().len(), 1);
+        }
     }
 
     #[test]

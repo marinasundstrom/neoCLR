@@ -419,7 +419,10 @@ public sealed partial class AssemblyDefinition
                 foreach (var parameterHandle in reader.GetMethodDefinition(handle).GetParameters())
                 {
                     var parameter = reader.GetParameter(parameterHandle);
-                    if (parameter.SequenceNumber != 0)
+                    if (parameter.SequenceNumber == 0)
+                        result.MainModule.GetMethodDefinition((uint)MetadataTokens.GetToken(handle))!
+                            .SetLoadedReturnAttributes(ReadAttributes(parameter.GetCustomAttributes()));
+                    else
                         result.MainModule.GetMethodDefinition((uint)MetadataTokens.GetToken(handle))!
                             .SetLoadedParameterAttributes(parameter.SequenceNumber - 1, ReadAttributes(parameter.GetCustomAttributes()));
                 }

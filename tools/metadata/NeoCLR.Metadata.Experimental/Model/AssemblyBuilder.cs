@@ -792,9 +792,11 @@ public sealed partial class AssemblyBuilder
                 blob.WriteUInt16(0);
                 metadata.AddCustomAttribute(parameter, constructor, metadata.GetOrAddBlob(blob));
             }
-            if (method.Definition.NullableAnnotations.TryGetValue(-1, out var returnFlags))
+            if (method.Definition.NullableAnnotations.ContainsKey(-1) || method.Definition.ReturnCustomAttributes.Count != 0)
             {
-                AnnotateNullable(metadata.AddParameter(ParameterAttributes.None, default, 0), returnFlags);
+                var returnParameter = metadata.AddParameter(ParameterAttributes.None, default, 0);
+                WriteAttributes(returnParameter, method.Definition.ReturnCustomAttributes);
+                if (method.Definition.NullableAnnotations.TryGetValue(-1, out var returnFlags)) AnnotateNullable(returnParameter, returnFlags);
                 nextParameter++;
             }
             if (method.Signature.OutParameters.Count > 0 || method.Definition.ParameterNames.Count > 0 || method.Definition.ParameterArrayIndex is not null || method.Definition.NullableAnnotations.Keys.Any(i => i >= 0) || method.Definition.ParameterAttributes.Any(p => p.Value.Count != 0))

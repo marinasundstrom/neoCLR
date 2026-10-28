@@ -1470,6 +1470,7 @@ fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
                         .iter()
                         .chain(&origin.property_tokens)
                         .chain(&origin.parameter_tokens)
+                        .chain(&origin.return_token)
                         .any(|t| *t == token)
                 {
                     return Err(Fault::new(

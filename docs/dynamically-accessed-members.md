@@ -1,7 +1,7 @@
 # Dynamically accessed members (development)
 
 The native backend recognizes `System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembersAttribute`
-on `System.Introspection.TypeInfo` parameters. This is an initial subset of the
+on `System.Introspection.TypeInfo` parameters and return values. This is an initial subset of the
 .NET contract, not general trim analysis. It adds inferred roots to the same
 retention pipeline used by [project retention files](native-retention.md).
 
@@ -28,9 +28,8 @@ not communicate the type that reflection will inspect.
   `PublicConstructors`, `PublicProperties`, and their combinations. The enum
   exposes the conventional .NET values through `Interfaces` and `All`; unsupported
   flag requests fail with `DAM1001` rather than acting as inert annotations.
-- Valid targets are currently `TypeInfo` parameters. The source attribute's usage
-  restricts placement to parameters. Native analysis validates the parameter
-  identity and type; malformed and unsupported contracts fail with `DAM1001`.
+- Valid targets are currently `TypeInfo` parameters and return values. Native
+  analysis validates each target identity and type; malformed and unsupported contracts fail with `DAM1001`.
 - Exact nongeneric nominal type tokens are recognized through the runtime's
   `RuntimeContext.GetTypeInfoFromHandle` and `RuntimeTypeInfo.FromHandle` bridges.
   Locals, argument forwarding, casts and control-flow joins preserve known facts.
@@ -99,7 +98,7 @@ build-time analysis and metadata storage; it does not change interpreter behavio
 or introduce runtime code generation. More conservative retention and warnings
 are costs of the initial implementation, not improvements in .NET semantics.
 
-Generic-parameter/return/field/property annotations, string type-name resolution,
+Generic-parameter/field/property annotations, string type-name resolution,
 receiver annotations, arbitrary generic target retention, richer member flags,
 class/base annotation inheritance and complete interprocedural inference remain
 unimplemented. Nongeneric nominal reference-class parameter override compatibility
@@ -207,3 +206,28 @@ retention roots, runtime behavior, public APIs or compiler encodings are introdu
 [Qualification](validation/dynamic-access-generic-base-20261028/README.md) covers
 substituted signatures, overload distinction, nested substitutions and native
 matching/mismatching controls. No performance improvement is claimed.
+
+## Return contracts (2026-10-28)
+
+`[return: DynamicallyAccessedMembers(...)]` declares requirements on a TypeInfo
+result. Reachable implementations check every return path: known type tokens infer
+roots, annotated inputs can satisfy the result, and unknown or weaker values warn
+with DAM2001. Callers receive the declared guarantee, including through locals and
+joins; a warning in the producer is not proof of successful retention. Interface
+and virtual-override checks now compare return flags as well as parameter flags,
+within the same bounded owner/method scope. This follows .NET's IL2063/IL2093
+[rules](https://github.com/dotnet/runtime/blob/main/docs/tools/illink/error-codes.md).
+
+The [factory consumer](experiments/dynamic-access/returns/Main.rvn) returns
+`typeof(Message)` and deserializes JSON with no explicit retention file.
+Raven emits return annotations with a separate optional method-origin `return_token`
+(Param-table identity); ordinary parameter ordinals do not change. The metadata
+reader, reference projection and compiler importer preserve that association.
+Missing, zero, duplicate and wrong-table return identities reject. Old artifacts
+without return annotations omit the new field. Older strict native readers reject
+artifacts using it; rebuild the compiler, metadata library and backend together.
+Runtime Contract configuration and ordinary .NET emission remain unchanged.
+
+The author has also requested fields/properties, generic parameters, receivers and
+all member categories. Those remain implementation work; this return extension does
+not make currently rejected flags usable. See [qualification](validation/dynamic-access-returns-20261028/README.md).

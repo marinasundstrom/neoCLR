@@ -116,6 +116,7 @@ public sealed partial class NativeAssemblyDefinition
             property.Setter < 0 ? 0 : 0x06000001u + (uint)property.Setter, [], Copy(property.Type), property.Parameters.Select(Copy).ToArray(), property.IsInitOnly)).ToArray();
         var references = References.Select((identity, index) => new AssemblyDefinition.ReferenceRow(0x23000001u + (uint)index, identity)).ToArray();
         var attributes = types.Select(type => type.Attributes.Select(a => (Owner: Copy(a.Owner), Arguments: a.Arguments.Select(argument => (Type: Copy(argument.Type), argument.Value)).ToArray(), a.Named)).ToArray()).ToArray();
+        var returnAttributes = methods.Select(method => method.ReturnAttributes.Select(a => (Owner: Copy(a.Owner), Arguments: a.Arguments.Select(argument => (Type: Copy(argument.Type), argument.Value)).ToArray(), a.Named)).ToArray()).ToArray();
         var methodAttributes = methods.Select(method => method.Attributes.Select(a => (Owner: Copy(a.Owner), Arguments: a.Arguments.Select(argument => (Type: Copy(argument.Type), argument.Value)).ToArray(), a.Named)).ToArray()).ToArray();
         var memberAttributes = types.SelectMany(type => type.MemberAttributes)
             .ToDictionary(pair => pair.Key, pair => pair.Value.Select(a => (Owner: Copy(a.Owner), Arguments: a.Arguments.Select(argument => (Type: Copy(argument.Type), argument.Value)).ToArray(), a.Named)).ToArray());
@@ -140,6 +141,9 @@ public sealed partial class NativeAssemblyDefinition
             }));
         for (int i = 0; i < methods.Length; i++)
             result.MainModule.GetMethodDefinition(0x06000001u + (uint)i)!.SetLoadedAttributes(methodAttributes[i].Select(a =>
+                new CustomAttributeDefinition(a.Owner.Materialize(result.MainModule).ReferencedType!, a.Arguments.Select(argument => new CustomAttributeArgument(argument.Type.Materialize(result.MainModule), argument.Value)), a.Named)));
+        for (int i = 0; i < methods.Length; i++)
+            result.MainModule.GetMethodDefinition(0x06000001u + (uint)i)!.SetLoadedReturnAttributes(returnAttributes[i].Select(a =>
                 new CustomAttributeDefinition(a.Owner.Materialize(result.MainModule).ReferencedType!, a.Arguments.Select(argument => new CustomAttributeArgument(argument.Type.Materialize(result.MainModule), argument.Value)), a.Named)));
         foreach (var (token, attributesForMember) in memberAttributes)
         {

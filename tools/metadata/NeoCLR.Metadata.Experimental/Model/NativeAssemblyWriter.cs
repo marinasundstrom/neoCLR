@@ -30,8 +30,10 @@ public sealed partial class AssemblyBuilder
             throw new InvalidDataException("native Char cannot have both a local and external owner");
         int nextParameterToken = 0x08000001;
         var parameterTokens = new Dictionary<MethodBuilder, int[]>();
+        var returnTokens = new Dictionary<MethodBuilder, int>();
         foreach (var method in methods)
         {
+            if (method.Definition.ReturnCustomAttributes.Count != 0) returnTokens.Add(method, nextParameterToken++);
             var tokens = new int[method.ParameterCount];
             if (method.Signature.OutParameters.Count > 0 || method.Definition.ParameterNames.Count > 0 || method.Definition.ParameterArrayIndex is not null || method.Definition.ParameterAttributes.Any(p => p.Value.Count != 0))
                 for (int position = 0; position < tokens.Length; position++) tokens[position] = nextParameterToken++;
@@ -91,7 +93,7 @@ public sealed partial class AssemblyBuilder
                     ? ImportTypeIdentity(scope, reference.Namespace, reference.Name, 0)
                     : reference.Resolve().Producer ?? throw new InvalidDataException("detached attribute owner");
             }
-        var memberAttributes = methods.SelectMany(method => method.Definition.CustomAttributes.Concat(method.Definition.ParameterAttributes.SelectMany(p => p.Value)))
+        var memberAttributes = methods.SelectMany(method => method.Definition.CustomAttributes.Concat(method.Definition.ReturnCustomAttributes).Concat(method.Definition.ParameterAttributes.SelectMany(p => p.Value)))
             .Concat(types.SelectMany(type => type.MetadataFields.SelectMany(field => field.Definition.CustomAttributes)))
             .Concat(types.SelectMany(type => type.Properties.SelectMany(property => property.Definition.CustomAttributes)))
             .Concat(Definition.CustomAttributes);
@@ -178,6 +180,7 @@ public sealed partial class AssemblyBuilder
             {
                 origin["member_access"] = method.Visibility == MethodVisibility.Internal ? "Assembly" : method.Visibility == MethodVisibility.Protected ? "Family" : method.Visibility.ToString();
                 origin["parameter_tokens"] = parameterTokens[method];
+                if (returnTokens.TryGetValue(method, out var returnToken)) origin["return_token"] = returnToken;
                 if (method.Definition.NullableAnnotations.Count != 0)
                     origin["nullable_annotations"] = method.Definition.NullableAnnotations.OrderBy(p => p.Key).Select(p => new { position = p.Key, flags = p.Value.Flags.Select(f => (int)f).ToArray(), uniform = p.Value.IsUniform }).ToArray();
             }
@@ -472,6 +475,8 @@ public sealed partial class AssemblyBuilder
         object[]? MethodAttributes(MethodBuilder method)
         {
             var attributes = method.Definition.CustomAttributes.Select(a => Attribute(a)).ToList();
+            if (returnTokens.TryGetValue(method, out var returnToken))
+                attributes.AddRange(method.Definition.ReturnCustomAttributes.Select(a => Attribute(a, returnToken)));
             foreach (var (position, values) in method.Definition.ParameterAttributes)
                 attributes.AddRange(values.Select(a => Attribute(a, parameterTokens[method][position])));
             if (parameterAttributes.TryGetValue(method, out var parameterAttribute))

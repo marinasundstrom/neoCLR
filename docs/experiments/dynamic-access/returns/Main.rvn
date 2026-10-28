@@ -1,0 +1,25 @@
+import System.*
+import System.Data.Json.*
+import System.Diagnostics.CodeAnalysis.*
+import System.Introspection.*
+import System.Result.*
+
+public class Message {
+    var Text: string { get; set; } = ""
+    init() { }
+}
+
+[return: DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | DynamicallyAccessedMemberTypes.PublicProperties)]
+func MessageType() -> TypeInfo {
+    return typeof(Message)
+}
+
+func Main() -> int {
+    let Ok(value) = JsonSerializer.Deserialize("{\"Text\":\"retained\"}", MessageType()) else {
+        Console.WriteLine("mapping failed")
+        return 1
+    }
+    let message = (Message)value
+    Console.WriteLine(message.Text)
+    return if message.Text == "retained" { 0 } else { 1 }
+}

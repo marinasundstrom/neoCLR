@@ -72,6 +72,8 @@ public sealed class MethodInfo
     public IReadOnlyList<TypeInfo> GetGenericArguments() => genericArguments;
     /// <summary>Gets whether this view is generic and has no supplied method arguments.</summary>
     public bool IsGenericMethodDefinition => GenericParameterNames.Count != 0 && genericDefinition is null;
+    /// <summary>Gets declared return-value attributes without executing constructors.</summary>
+    public IReadOnlyList<CustomAttributeInfo> GetReturnCustomAttributes() => Definition.ReturnCustomAttributes.Select(a => new CustomAttributeInfo(Context, a)).ToArray();
     /// <summary>Gets the generic definition on the same declaring owner.</summary>
     /// <exception cref="InvalidOperationException">This method is not generic.</exception>
     public MethodInfo GetGenericMethodDefinition() => GenericParameterNames.Count != 0
