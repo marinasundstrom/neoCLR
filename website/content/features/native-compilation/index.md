@@ -123,6 +123,9 @@ deserialization and DI registration APIs carry corresponding requirements.
 Unknown flows produce diagnostics; generic-parameter, return, field and receiver
 annotations remain unsupported. Explicit files are still needed for unsupported
 flows. [Attribute API reference](/docs/api/System/Diagnostics/CodeAnalysis/DynamicallyAccessedMembersAttribute/).
+Inferred constructors and property accessors are also analyzed for
+further annotated calls, including cycles; types discovered through arbitrary
+storage or reflection descriptors still need explicit retention.
 
 Use matching compiler and library builds for native JSON, attributes and reflection.
 Qualified examples cover specific supported shapes; they do not imply unrestricted

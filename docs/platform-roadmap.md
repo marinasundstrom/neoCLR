@@ -4,7 +4,8 @@
 [dynamic member parameter contracts](dynamically-accessed-members.md) alongside
 project retention files. JSON and DI annotations feed bounded native constructor
 and property retention; generic parameters, stored values, dynamic implementation
-bodies and recursive reflection remain gaps. This bounded author request does not
+bodies and descriptor-discovered types remain gaps. Inferred public constructors and
+property accessors now feed recursive direct-call analysis; [closure evidence](validation/dynamic-access-closure-20261028/README.md) records the bounded follow-up. This bounded author request does not
 reprioritize the wider roadmap. See [qualification](validation/dynamic-access-20261028/README.md).
 
 **Author-directed default inlining (2026-10-28):** Shared JIT/AOT lowering now supports bounded automatic Int32/Boolean leaf inlining and MethodImplOptions NoInlining/AggressiveInlining overrides. [Contract and qualification](validation/inlining-20261028/README.md) distinguish safe candidates, metadata/compiler integration and remaining broader inliner gaps. Small SDK helpers use the default; overrides require evidence. Cranelift speed optimization is separately enabled as directed, with architecture-specific instruction selection delegated to the backend and short-loop evidence explicitly limited. Each slice receives its own commit; broader milestone priorities remain unchanged.

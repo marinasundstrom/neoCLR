@@ -69,7 +69,7 @@ fn requirements(module: &Module, function: &Function) -> Result<Vec<u32>, Fault>
             .as_ref()
             .and_then(|o| o.parameter_tokens.iter().position(|t| *t == token))
             .ok_or_else(fail)?;
-        if source_name(module, &function.parameters[position])
+        if source_name(module, function.parameters.get(position).ok_or_else(fail)?)
             != Some("System.Introspection.TypeInfo")
         {
             return Err(fail());
@@ -143,6 +143,59 @@ pub fn analyze(module: &Module, root: &str) -> Result<Analysis, Fault> {
 }
 
 fn analyze_indexed(module: &Module, root: &str) -> Result<Analysis, Fault> {
+    let root = module
+        .functions
+        .iter()
+        .position(|f| f.name == root)
+        .ok_or_else(|| Fault::new("DAM analysis root is missing"))?;
+    let mut roots = BTreeSet::from([root]);
+    loop {
+        let report = analyze_roots(module, &roots)?;
+        let before = roots.len();
+        for (&index, &flags) in &report.types {
+            let ty = &module.types[index];
+            let owner = Type::Named(ty.name.clone());
+            for (index, function) in module.functions.iter().enumerate() {
+                if function.owner.as_ref() != Some(&owner)
+                    || function.visibility != crate::metadata::Visibility::Public
+                    || function.origin.as_ref().is_some_and(|o| {
+                        o.member_access
+                            .is_some_and(|a| a != crate::metadata_origin::SourceAccess::Public)
+                    })
+                {
+                    continue;
+                }
+                let constructor = flags & PUBLIC_CONSTRUCTORS != 0
+                    && function.instance
+                    && function.name.ends_with("..ctor");
+                // Property associations retain source identities while linked
+                // function rows have been relocated. Match the verified signature.
+                let accessor = flags & PUBLIC_PROPERTIES != 0
+                    && ty
+                        .properties
+                        .iter()
+                        .filter(|p| p.instance && p.parameters.is_empty())
+                        .flat_map(|p| p.getter.iter().chain(&p.setter))
+                        .any(|target| {
+                            target.name == function.name
+                                && target.owner == function.owner
+                                && target.instance == function.instance
+                                && target.parameters == function.parameters
+                        });
+                if constructor || accessor {
+                    roots.insert(index);
+                }
+            }
+        }
+        if roots.len() == before {
+            return Ok(report);
+        }
+        // Roots only grow within this finite module. Recompute flow to include
+        // calls made by newly retained constructors/accessors, including cycles.
+    }
+}
+
+fn analyze_roots(module: &Module, roots: &BTreeSet<usize>) -> Result<Analysis, Fault> {
     let mut report = Analysis::default();
     for ty in &module.types {
         if ty.custom_attributes.iter().any(|a| {
@@ -165,13 +218,8 @@ fn analyze_indexed(module: &Module, root: &str) -> Result<Analysis, Fault> {
     if contracts.iter().all(|c| c.iter().all(|f| *f == 0)) {
         return Ok(report);
     }
-    let root = module
-        .functions
-        .iter()
-        .position(|f| f.name == root)
-        .ok_or_else(|| Fault::new("DAM analysis root is missing"))?;
     let mut reachable = BTreeSet::new();
-    let mut pending = vec![root];
+    let mut pending: Vec<_> = roots.iter().copied().collect();
     while let Some(index) = pending.pop() {
         if !reachable.insert(index) {
             continue;
@@ -539,6 +587,14 @@ mod tests {
         m.functions[1].custom_attributes[0].arguments = vec![AttributeArgument::Int32(3)];
         m.functions[1].custom_attributes[0].target_token = None;
         assert!(analyze(&m, "Main").is_err());
+        m.functions[1].custom_attributes[0].target_token = Some(134217729);
+        m.functions[1].parameters.clear();
+        assert!(
+            analyze(&m, "Main")
+                .unwrap_err()
+                .to_string()
+                .contains("DAM1001")
+        );
     }
 
     #[test]
@@ -604,5 +660,88 @@ mod tests {
         assert!(analyze(&m, "Main").unwrap().diagnostics.is_empty());
         m.functions[3].body[2] = Op::ArgumentAddress(0);
         assert!(!analyze(&m, "Main").unwrap().diagnostics.is_empty());
+    }
+    #[test]
+    fn reflected_constructors_close_over_dependencies_and_cycles() {
+        let mut m = fixture();
+        let bridge = m.functions[0].body[1].clone();
+        let require = m.functions[0].body[2].clone();
+        for (owner, dependency) in [("Model", "Other"), ("Other", "Model")] {
+            let mut constructor = function(
+                &format!("{owner}..ctor"),
+                vec![],
+                vec![
+                    Op::LoadTypeToken(Type::Named(dependency.into())),
+                    bridge.clone(),
+                    require.clone(),
+                    Op::Return,
+                ],
+            );
+            constructor.owner = Some(Type::Named(owner.into()));
+            constructor.instance = true;
+            m.functions.push(constructor);
+        }
+        let report = analyze(&m, "Main").unwrap();
+        assert_eq!(report.types, BTreeMap::from([(3, 3), (4, 3)]));
+        assert!(report.diagnostics.is_empty());
+        // A private constructor is not admitted by this public-member contract.
+        m.functions[3].visibility = crate::metadata::Visibility::Private;
+        assert_eq!(analyze(&m, "Main").unwrap().types, BTreeMap::from([(3, 3)]));
+    }
+
+    #[test]
+    fn reflected_accessors_are_followed_only_for_property_requirements() {
+        let mut m = fixture();
+        let mut getter = function(
+            "Model.get_Value",
+            vec![],
+            vec![
+                Op::LoadTypeToken(Type::Named("Other".into())),
+                m.functions[0].body[1].clone(),
+                m.functions[0].body[2].clone(),
+                Op::Int(7),
+                Op::Return,
+            ],
+        );
+        getter.owner = Some(Type::Named("Model".into()));
+        getter.instance = true;
+        getter.no_result = false;
+        getter.returns = Type::Int32;
+        m.types[3].properties.push(
+            serde_json::from_value(json!({
+                "name":"Value", "instance":true, "parameters":[], "ty":"Int32",
+                "getter":{"name":getter.name, "owner":getter.owner, "instance":true,
+                    "parameters":[]}
+            }))
+            .unwrap(),
+        );
+        m.functions.push(getter);
+        assert_eq!(analyze(&m, "Main").unwrap().types, BTreeMap::from([(3, 3)]));
+        m.functions[1].custom_attributes[0].arguments = vec![AttributeArgument::Int32(512)];
+        assert_eq!(
+            analyze(&m, "Main").unwrap().types,
+            BTreeMap::from([(3, 512), (4, 512)])
+        );
+    }
+
+    #[test]
+    fn unknown_flows_in_reflected_bodies_are_diagnosed() {
+        let mut m = fixture();
+        let mut constructor = function(
+            "Model..ctor",
+            vec![Type::Named("Info".into())],
+            vec![Op::Arg(1), m.functions[0].body[2].clone(), Op::Return],
+        );
+        constructor.owner = Some(Type::Named("Model".into()));
+        constructor.instance = true;
+        m.functions.push(constructor);
+        let report = analyze(&m, "Main").unwrap();
+        assert_eq!(report.types, BTreeMap::from([(3, 3)]));
+        assert!(
+            report
+                .diagnostics
+                .iter()
+                .any(|d| d.contains("DAM2001") && d.contains("Model..ctor"))
+        );
     }
 }

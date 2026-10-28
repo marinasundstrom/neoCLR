@@ -45,8 +45,12 @@ not communicate the type that reflection will inspect.
   Unused direct callers do not root their types. Dynamic implementation bodies are
   not traversed before specialization (`DAM2004`); reflection inside them needs
   explicit policy where not otherwise proven. Polymorphic contract compatibility
-  remains a gap. Bodies reachable only through inferred reflection roots are not
-  analyzed recursively; their own reflective dependencies require explicit policy.
+  remains a gap. Public constructors and instance property accessors selected by
+  inferred requirements are additional analysis roots. Their direct calls are
+  analyzed repeatedly until no new bodies are found, so reflection inside a retained
+  constructor/accessor can infer further types. Cycles terminate because the root set
+  only grows within the finite input module. Private constructors, unrequested member
+  categories, static/indexed properties and unrelated methods are excluded.
 - `DAM2001` reports unknown or insufficient input requirements, `DAM2002` reports
   unsupported target shapes, and `DAM2003` reports indirect use of an annotated
   function. These warnings do not establish successful retention. Use a qualified
@@ -72,7 +76,8 @@ The first slice does not infer requirements through registration storage or asyn
 state-machine fields. Such internal flows can still warn even when the caller's
 known type supplied sufficient roots. Nested object-property types, callbacks,
 reflection-discovered types and recursive object graphs are not automatically
-closed over. Their needed types may require explicit policies.
+closed over. The retained-body follow-up handles explicit known type tokens within
+those bodies, not types recovered from property descriptors or arbitrary storage. Their needed types may require explicit policies.
 
 ## .NET comparison and remaining work
 
@@ -105,3 +110,15 @@ runtime library owns the declaration and API annotations. Existing source-name
 origins identify the attribute and handle bridges. The emitted native attribute
 records are retained independently of guest reflection admission. This does not
 add a temporary CLI pseudo-attribute or make a bridge encoding a platform rule.
+
+## Retained-body follow-up (2026-10-28)
+
+The initial pass analyzed only direct entry-point reachability. That left calls made
+inside reflection-retained constructors/accessors outside analysis. Following these
+bodies to a fixed point brings this subset closer to .NET's dependency propagation
+without inventing new attribute semantics. The implementation conservatively considers
+all public constructors for the existing constructor policy; unsupported reflection
+shapes remain subject to backend admission. Re-running the bounded flow pass costs
+additional compilation work; no performance improvement is claimed. Policies supplied
+only through explicit retention files are not analysis seeds in this follow-up.
+See [native before/after and regression evidence](validation/dynamic-access-closure-20261028/README.md).
