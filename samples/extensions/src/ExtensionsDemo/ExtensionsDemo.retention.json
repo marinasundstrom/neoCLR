@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "types": [
+    { "name": "Examples.Extensions.GreetingService", "retain": ["constructors"] },
+    { "name": "Neo.Logging.DefaultLoggerFactory", "retain": ["constructors"] },
+    { "name": "Neo.Logging.DefaultLogger`1", "retain": ["constructors"] },
+    { "name": "Neo.Localization.DefaultLocalizer`1", "retain": ["constructors"] }
+  ]
+}

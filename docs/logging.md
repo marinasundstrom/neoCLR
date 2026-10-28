@@ -2,8 +2,10 @@
 
 Neo.Logging is an optional assembly in
 `extensions/Neo.Logging/src/Neo.Logging`, with Raven tests in the component's
-`test/Neo.Logging.Tests` project. It references System.Runtime and
-Neo.DependencyInjection. Configuration binding remains future work; output-folder
+`test/Neo.Logging.Tests` project. Its implementation references System.Runtime, Neo.Logging.Abstractions and
+Neo.DependencyInjection.Abstractions. Provider-neutral contracts, typed/null adapters
+and literal helpers live in the sibling Neo.Logging.Abstractions project, referencing
+only System.Runtime. Configuration binding remains future work; output-folder
 changes were explicitly deferred by the author.
 
 ## Baseline and decisions

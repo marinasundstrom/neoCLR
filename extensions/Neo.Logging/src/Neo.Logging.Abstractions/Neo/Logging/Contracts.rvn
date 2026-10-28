@@ -77,16 +77,3 @@ public interface LoggerFactory : Disposable {
     /// Adds an owned provider, including to existing category loggers. Configure before logging callbacks.
     func AddProvider(provider: LoggerProvider)
 }
-
-internal static class LogLevels {
-    static func Enabled(level: LogLevel, minimum: LogLevel) -> bool {
-        let value = (int)level
-        return value >= 0 && value <= 5 && value >= (int)minimum
-    }
-
-    static func ValidateMinimum(level: LogLevel) {
-        if (int)level < 0 || (int)level > 6 {
-            System.Fail("Logging minimum level must be Trace through None")
-        }
-    }
-}

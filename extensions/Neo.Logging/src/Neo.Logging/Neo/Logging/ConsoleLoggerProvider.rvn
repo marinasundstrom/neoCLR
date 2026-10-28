@@ -61,7 +61,7 @@ internal class ConsoleLogger : Logger {
         provider.Write(text)
     }
 
-    func BeginScope<TState>(state: TState) -> Disposable? => EmptyScope.Instance
+    func BeginScope<TState>(state: TState) -> Disposable? => NullLogger.Instance.BeginScope<TState>(state)
 
     private static func LevelName(level: LogLevel) -> string => level match {
         LogLevel.Trace => "trace"

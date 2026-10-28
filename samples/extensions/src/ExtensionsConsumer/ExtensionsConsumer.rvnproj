@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../../../runtime/NativeLibrary.props" />
+  <PropertyGroup>
+    <AssemblyName>ExtensionsConsumer</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../ExtensionsDemo/Examples/Extensions/GreetingService.rvn" />
+    <ProjectReference Include="../../../../runtime/System.Runtime/src/System.Runtime/System.Runtime.rvnproj" />
+    <ProjectReference Include="../../../../extensions/Neo.DependencyInjection/src/Neo.DependencyInjection.Abstractions/Neo.DependencyInjection.Abstractions.rvnproj" />
+    <ProjectReference Include="../../../../extensions/Neo.Localization/src/Neo.Localization.Abstractions/Neo.Localization.Abstractions.rvnproj" />
+    <ProjectReference Include="../../../../extensions/Neo.Logging/src/Neo.Logging.Abstractions/Neo.Logging.Abstractions.rvnproj" />
+  </ItemGroup>
+</Project>

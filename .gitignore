@@ -57,3 +57,6 @@
 
 /runtime/raven/tests/cryptography/bin/
 /runtime/raven/tests/cryptography/obj/
+
+/samples/extensions/**/bin/
+/samples/extensions/**/obj/

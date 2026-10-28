@@ -12,9 +12,9 @@ import xml.etree.ElementTree as ET
 ROOT = Path(__file__).resolve().parent.parent
 def project_directory(name):
     if name.startswith('Neo.'):
-        return ROOT / 'extensions' / name / 'src' / name
+        return ROOT / 'extensions' / name.removesuffix('.Abstractions') / 'src' / name
     return ROOT / 'runtime' / name / 'src' / name
-NAMES = ('System.Runtime', 'System.Data', 'System.Networking', 'System.Web', 'Neo.DependencyInjection', 'Neo.Localization', 'Neo.Logging')
+NAMES = ('System.Runtime', 'System.Data', 'System.Networking', 'System.Web', 'Neo.DependencyInjection.Abstractions', 'Neo.DependencyInjection', 'Neo.Localization.Abstractions', 'Neo.Localization', 'Neo.Logging.Abstractions', 'Neo.Logging')
 
 
 def sha(path):

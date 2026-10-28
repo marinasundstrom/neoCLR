@@ -1,0 +1,136 @@
+{
+  "compilerRevision": "34f14c8ce",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/System.Runtime/src/System.Runtime/System.Runtime.rvnproj"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "assemble",
+        "/Users/robert/Projects/neoclr/target/neo-abstractions-20261028/final-libraries/System.runtime.neoil",
+        "/Users/robert/Projects/neoclr/target/neo-abstractions-20261028/final-libraries/System.runtime.neox",
+        "--format",
+        "neox"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/System.Data/src/System.Data/System.Data.rvnproj",
+        "--no-build-references"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/System.Networking/src/System.Networking/System.Networking.rvnproj",
+        "--no-build-references"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/System.Web/src/System.Web/System.Web.rvnproj",
+        "--no-build-references"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/extensions/Neo.DependencyInjection/src/Neo.DependencyInjection.Abstractions/Neo.DependencyInjection.Abstractions.rvnproj",
+        "--no-build-references"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/extensions/Neo.DependencyInjection/src/Neo.DependencyInjection/Neo.DependencyInjection.rvnproj",
+        "--no-build-references"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/extensions/Neo.Localization/src/Neo.Localization.Abstractions/Neo.Localization.Abstractions.rvnproj",
+        "--no-build-references"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/extensions/Neo.Localization/src/Neo.Localization/Neo.Localization.rvnproj",
+        "--no-build-references"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/extensions/Neo.Logging/src/Neo.Logging.Abstractions/Neo.Logging.Abstractions.rvnproj",
+        "--no-build-references"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/extensions/Neo.Logging/src/Neo.Logging/Neo.Logging.rvnproj",
+        "--no-build-references"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/System.Data.PostgreSql/src/System.Data.PostgreSql/System.Data.PostgreSql.rvnproj",
+        "--no-build-references"
+      ],
+      "exitCode": 0
+    }
+  ]
+}

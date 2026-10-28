@@ -1,0 +1,98 @@
+module Neo.DependencyInjection
+
+import System.*
+import System.Diagnostics.CodeAnalysis.*
+import System.Collections.*
+import System.Introspection.*
+import System.Optional.*
+import System.Result.*
+import System.Runtime.CompilerServices.*
+
+/// Controls whether a registration creates values per resolution, per scope or per root provider.
+public enum ServiceLifetime { Transient, Scoped, Singleton }
+
+/// A missing registration, invalid contract, activation failure or provider lifecycle error.
+public union ServiceError {
+    case Missing(type: TypeInfo)
+    case MissingKeyed(type: TypeInfo, key: Object?)
+    case InvalidRegistration(type: TypeInfo)
+    case Activation(type: TypeInfo, error: ActivationError)
+    case Cycle(type: TypeInfo)
+    case ScopeRequired(type: TypeInfo)
+    case InvalidFactoryResult(type: TypeInfo)
+    case Disposed
+}
+
+/// Resolves services within one invocation. Dispose scopes explicitly to release owned services.
+/// Resolution is synchronous and follows the runtime's serialized guest execution model.
+public interface ServiceProvider : Disposable {
+    /// Resolves the last registration for an exact type and key; null selects unkeyed services.
+    func GetRequiredKeyedService(type: TypeInfo, key: Object?) -> Result<Object, ServiceError>
+    /// Returns None only if this exact type/key is unregistered.
+    func GetKeyedService(type: TypeInfo, key: Object?) -> Result<Optional<Object>, ServiceError>
+    /// Resolves registrations for this exact type/key in registration order.
+    func GetKeyedServices(type: TypeInfo, key: Object?) -> Result<Sequence<Object>, ServiceError>
+    /// Resolves the last registration, or returns Missing; activation errors propagate.
+    func GetRequiredService(type: TypeInfo) -> Result<Object, ServiceError>
+    /// Returns None only when unregistered; registered factory or activation failures remain errors.
+    func GetService(type: TypeInfo) -> Result<Optional<Object>, ServiceError>
+    /// Resolves every explicit registration in registration order; an absent type yields an empty sequence.
+    func GetServices(type: TypeInfo) -> Result<Sequence<Object>, ServiceError>
+    /// Creates an independently disposable scope sharing the root singleton cache.
+    func CreateScope() -> Result<ServiceProvider, ServiceError>
+}
+
+/// Collects registrations and builds independent provider snapshots.
+public interface ServiceCollection {
+    /// Adds only if the exact service type/key is absent; never invokes factories.
+    func TryAdd(descriptor: ServiceDescriptor) -> Result<bool, ServiceError>
+    /// Registers an implementation for an exact type/key pair; null is the unkeyed identity.
+    func AddKeyed(service: TypeInfo, key: Object?, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] implementation: TypeInfo, lifetime: ServiceLifetime) -> Result<unit, ServiceError>
+    /// Registers a factory receiving the current provider and the registration key.
+    func AddKeyedFactory(service: TypeInfo, key: Object?, factory: (ServiceProvider, Object?) -> Result<Object, ServiceError>, lifetime: ServiceLifetime) -> Result<unit, ServiceError>
+    /// Registers a caller-owned instance for an exact type/key pair.
+    func AddKeyedInstance(service: TypeInfo, key: Object?, instance: Object) -> Result<unit, ServiceError>
+    /// Adds a checked immutable descriptor; instance descriptors must have singleton lifetime.
+    func Add(descriptor: ServiceDescriptor) -> Result<unit, ServiceError>
+    /// Registers a concrete reference implementation assignable to the requested service.
+    func Add(service: TypeInfo, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] implementation: TypeInfo, lifetime: ServiceLifetime) -> Result<unit, ServiceError>
+    /// Registers a factory whose non-null result is validated and owned by its resolving provider.
+    func AddFactory(service: TypeInfo, factory: (ServiceProvider) -> Result<Object, ServiceError>, lifetime: ServiceLifetime) -> Result<unit, ServiceError>
+    /// Registers an assignable caller-owned instance; provider disposal never disposes this registration.
+    func AddInstance(service: TypeInfo, instance: Object) -> Result<unit, ServiceError>
+    /// Creates an independent snapshot, validating public constructors without invoking factories.
+    func Build() -> Result<ServiceProvider, ServiceError>
+}
+
+/// Describes caller-owned storage, an explicit factory, or automatic constructor activation.
+public union ServiceSource {
+    case Instance(value: Object)
+    case Factory(create: (ServiceProvider) -> Result<Object, ServiceError>)
+    case Constructor(type: TypeInfo)
+}
+
+/// An immutable service identity, activation source and lifetime.
+public class ServiceDescriptor {
+    /// Service key, compared with ordinary Object equality; null means unkeyed.
+    val ServiceKey: Object?
+    /// Creates a keyed descriptor. Key equality must remain stable while registered.
+    init(service: TypeInfo, key: Object?, source: ServiceSource, lifetime: ServiceLifetime) {
+        Service = service
+        ServiceKey = key
+        Source = source
+        Lifetime = lifetime
+    }
+    /// Exact service identity used for registration and resolution.
+    val Service: TypeInfo
+    /// Constructor, factory or caller-owned instance supplying values.
+    val Source: ServiceSource
+    /// Cache and ownership scope for created values.
+    val Lifetime: ServiceLifetime
+    /// Creates a descriptor; the collection validates it when added.
+    init(service: TypeInfo, source: ServiceSource, lifetime: ServiceLifetime) {
+        Service = service
+        ServiceKey = null
+        Source = source
+        Lifetime = lifetime
+    }
+}

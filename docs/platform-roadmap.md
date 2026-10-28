@@ -8,7 +8,11 @@ own project and assembly under `extensions`, with source and test projects in th
 Runtime components follow the same `src/<project>` and `test/<project>` convention. See [the scope and migration](application-services.md) and
 [completed build/test/site evidence](validation/neo-services-20261028/README.md).
 The author subsequently directed the [Neo.Logging foundation](logging.md), preserving
-generic state through compiler/runtime interface support. Neo.Configuration remains planned.
+generic state through compiler/runtime interface support. The follow-up extracts
+three `.Abstractions` assemblies and adds an integrated DI/logging/localization
+sample; see [the assembly boundary](application-services.md) for dependencies and
+[focused qualification](validation/neo-abstractions-20261028/README.md).
+Neo.Configuration remains planned.
 This bounded slice does not replace the broader active milestone.
 
 **Author-directed scheduling wrap-up (2026-10-28):** [Repeated HTTP comparison and integration decision](validation/shared-scheduling-decision-20261028/README.md) retain enabled DNS/native GC correctness fixes and leave shared queues opt-in, with scheduling/collector defaults unchanged. Three untraced rounds show +5.3% sync and −7.5% concurrent throughput medians for shared queues, with overlapping ranges. Separate native profiles point to root/store/binding costs but do not close managed attribution. The author directs wrapping up and enabling only justified defaults; full AOT/capacity/context-profile and cross-thread HTTP ownership gates remain explicitly deferred, not completed.

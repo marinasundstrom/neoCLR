@@ -11,10 +11,10 @@ import zipfile
 
 
 SOURCE_LINK_CHECKS = {
-    'Neo/Logging/Logger/index.html': 'extensions/Neo.Logging/src/Neo.Logging/Neo/Logging/Contracts.rvn',
+    'Neo/Logging/Logger/index.html': 'extensions/Neo.Logging/src/Neo.Logging.Abstractions/Neo/Logging/Contracts.rvn',
     'Neo/Logging/DefaultLoggerFactory/index.html': 'extensions/Neo.Logging/src/Neo.Logging/Neo/Logging/DefaultLoggerFactory.rvn',
-    'Neo/DependencyInjection/ServiceCollection/index.html': 'extensions/Neo.DependencyInjection/src/Neo.DependencyInjection/Neo/DependencyInjection/Services.rvn',
-    'Neo/Localization/Localizer/index.html': 'extensions/Neo.Localization/src/Neo.Localization/Neo/Localization/Localizer.rvn',
+    'Neo/DependencyInjection/ServiceCollection/index.html': 'extensions/Neo.DependencyInjection/src/Neo.DependencyInjection.Abstractions/Neo/DependencyInjection/Services.rvn',
+    'Neo/Localization/Localizer/index.html': 'extensions/Neo.Localization/src/Neo.Localization.Abstractions/Neo/Localization/Localizer.rvn',
     'Neo/Localization/JsonLocalizerProvider/index.html': 'extensions/Neo.Localization/src/Neo.Localization/Neo/Localization/JsonLocalizerProvider.rvn',
     'System/Data/Json/JsonValue/index.html': 'runtime/System.Data/src/System.Data/System/Data/Json/JsonValue.rvn',
     'System/Data/Json/JsonValue/method_ToJsonString.html': 'runtime/System.Data/src/System.Data/System/Data/Json/JsonValue.rvn',

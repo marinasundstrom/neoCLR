@@ -16141,3 +16141,25 @@ Focused sources: `tests/generic_interfaces.rs`,
 and Raven's `NeoClrMetadataProbe --generic-interface-runtime`. The native model
 retains method arguments directly; CLI MethodSpec is bridge encoding, not a native
 runtime dependency or permanent platform limit.
+
+## Native callback nullability across abstraction assemblies (2026-10-28)
+
+The Neo abstraction split exposed lost nested nullability when a generic logger
+formatter crossed an assembly boundary. Raven `codex/neoclr` commit `34f14c8ce`
+records structural function parameter/result annotations in native nullable
+metadata and reapplies them on import. Generic forwarding retains `(T, Error?) ->
+string` without an object-state workaround. Runtime Contract configuration and
+physical callback signatures are unchanged; ordinary .NET emission is unchanged.
+
+Older native payloads treated functions as opaque nullable nodes. The importer
+keeps their outer annotation readable, but missing nested facts require rebuilding
+with the updated producer. The native metadata emitter/importer own this semantic
+contract; the temporary CLI scaffold is not the reference for Neo services. A
+focused emit/import/forwarding regression and the integrated extension sample
+qualify this boundary. The matching Raven notes are in `docs/compiler/neoclr-cli-bridge.md`.
+
+Integrated native validation also qualifies the final private projection of value
+interface views. Only reachable boxing produces an executable interface receiver;
+source metadata remains authoritative for conformance and reflection. This closes
+the file-error/logging composition gap without changing the temporary CLI bridge
+or native public signatures.

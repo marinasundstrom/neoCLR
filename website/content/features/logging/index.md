@@ -20,3 +20,8 @@ requires serialized access and follows the runtime's terminal-fault behavior.
 
 See the [logging API guide](/docs/logging.html) for signatures, ownership,
 filtering, disposal and current differences from .NET.
+
+Provider-neutral contracts and helpers live in `Neo.Logging.Abstractions`; the
+default factory, console provider and DI registration live in `Neo.Logging`.
+Logging and localization integration depend on `Neo.DependencyInjection.Abstractions`.
+See the [integrated application sample](https://github.com/marinasundstrom/neoCLR/blob/main/samples/extensions/README.md).

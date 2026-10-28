@@ -23447,3 +23447,19 @@ and a refreshed API reference. The author then requested a second slice extracti
 `.Abstractions` projects so consumers and
 logging/localization DI integrations can depend on contracts without implementations,
 with minimal verification.
+
+The author additionally requested an integrated sample using these extensions
+through DI. The second slice places abstraction projects beside implementations
+within each component, preserving namespaces, and adds a scoped GreetingService
+with constructor-injected typed logging and localization. A separate compile-only
+project uses only runtime and abstraction references. Cross-assembly formatter
+forwarding exposed missing nested native callback nullability; the assistant fixed
+the native emitter/importer in Raven `34f14c8ce`. Shared artifact output remains
+deferred. Focused outcomes are recorded in the
+[abstraction qualification](validation/neo-abstractions-20261028/README.md).
+
+During integrated native validation, file-error values exposed a mismatch between
+source-wide boxing discovery and final reachable interface metadata. The assistant
+proposed an in-memory localizer to keep the slice bounded; the author asked,
+“Can't you fix the gap?” The assistant restored the JSON-backed sample and pursued
+a native selection fix, with a focused regression covering unreachable boxing.

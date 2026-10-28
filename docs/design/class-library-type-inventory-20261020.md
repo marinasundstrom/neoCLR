@@ -18,33 +18,33 @@ Reference subclasses may inherit value contracts (notably IPv4Address/IPv6Addres
 
 | Type / source | Family | Declared equality, hash, display |
 | --- | --- | --- |
-| [Neo.DependencyInjection.ActivationError](../../extensions/Neo.DependencyInjection/src/Neo.DependencyInjection/Neo/DependencyInjection/ConstructorPlan.rvn#L12) | Enum | — |
-| [Neo.DependencyInjection.DefaultServiceCollection](../../extensions/Neo.DependencyInjection/src/Neo.DependencyInjection/Neo/DependencyInjection/Services.rvn#L125) | Reference | — |
-| [Neo.DependencyInjection.ServiceCollection](../../extensions/Neo.DependencyInjection/src/Neo.DependencyInjection/Neo/DependencyInjection/Services.rvn#L46) | Contract | — |
-| [Neo.DependencyInjection.ServiceDescriptor](../../extensions/Neo.DependencyInjection/src/Neo.DependencyInjection/Neo/DependencyInjection/Services.rvn#L75) | Reference | — |
-| [Neo.DependencyInjection.ServiceError](../../extensions/Neo.DependencyInjection/src/Neo.DependencyInjection/Neo/DependencyInjection/Services.rvn#L15) | Union | — |
-| [Neo.DependencyInjection.ServiceLifetime](../../extensions/Neo.DependencyInjection/src/Neo.DependencyInjection/Neo/DependencyInjection/Services.rvn#L12) | Enum | — |
-| [Neo.DependencyInjection.ServiceProvider](../../extensions/Neo.DependencyInjection/src/Neo.DependencyInjection/Neo/DependencyInjection/Services.rvn#L28) | Contract | — |
-| [Neo.DependencyInjection.ServiceSource](../../extensions/Neo.DependencyInjection/src/Neo.DependencyInjection/Neo/DependencyInjection/Services.rvn#L68) | Union | — |
-| [Neo.Localization.DefaultLocalizer<T>](../../extensions/Neo.Localization/src/Neo.Localization/Neo/Localization/LocalizerFactory.rvn#L13) | Reference | — |
+| [Neo.DependencyInjection.ActivationError](../../extensions/Neo.DependencyInjection/src/Neo.DependencyInjection.Abstractions/Neo/DependencyInjection/ActivationError.rvn#L4) | Enum | — |
+| [Neo.DependencyInjection.DefaultServiceCollection](../../extensions/Neo.DependencyInjection/src/Neo.DependencyInjection/Neo/DependencyInjection/Services.rvn#L22) | Reference | — |
+| [Neo.DependencyInjection.ServiceCollection](../../extensions/Neo.DependencyInjection/src/Neo.DependencyInjection.Abstractions/Neo/DependencyInjection/Services.rvn#L46) | Contract | — |
+| [Neo.DependencyInjection.ServiceDescriptor](../../extensions/Neo.DependencyInjection/src/Neo.DependencyInjection.Abstractions/Neo/DependencyInjection/Services.rvn#L75) | Reference | — |
+| [Neo.DependencyInjection.ServiceError](../../extensions/Neo.DependencyInjection/src/Neo.DependencyInjection.Abstractions/Neo/DependencyInjection/Services.rvn#L15) | Union | — |
+| [Neo.DependencyInjection.ServiceLifetime](../../extensions/Neo.DependencyInjection/src/Neo.DependencyInjection.Abstractions/Neo/DependencyInjection/Services.rvn#L12) | Enum | — |
+| [Neo.DependencyInjection.ServiceProvider](../../extensions/Neo.DependencyInjection/src/Neo.DependencyInjection.Abstractions/Neo/DependencyInjection/Services.rvn#L28) | Contract | — |
+| [Neo.DependencyInjection.ServiceSource](../../extensions/Neo.DependencyInjection/src/Neo.DependencyInjection.Abstractions/Neo/DependencyInjection/Services.rvn#L68) | Union | — |
+| [Neo.Localization.DefaultLocalizer<T>](../../extensions/Neo.Localization/src/Neo.Localization.Abstractions/Neo/Localization/LocalizerFactory.rvn#L13) | Reference | — |
 | [Neo.Localization.JsonLocalizerFactory](../../extensions/Neo.Localization/src/Neo.Localization/Neo/Localization/JsonLocalizerFactory.rvn#L13) | Reference | — |
 | [Neo.Localization.JsonLocalizerProvider](../../extensions/Neo.Localization/src/Neo.Localization/Neo/Localization/JsonLocalizerProvider.rvn#L39) | Reference | — |
 | [Neo.Localization.LocalizationError](../../extensions/Neo.Localization/src/Neo.Localization/Neo/Localization/LocalizationError.rvn#L8) | Union | T* |
-| [Neo.Localization.Localizer](../../extensions/Neo.Localization/src/Neo.Localization/Neo/Localization/Localizer.rvn#L7) | Contract | — |
-| [Neo.Localization.Localizer<T>](../../extensions/Neo.Localization/src/Neo.Localization/Neo/Localization/Localizer.rvn#L18) | Contract | — |
-| [Neo.Localization.LocalizerFactory](../../extensions/Neo.Localization/src/Neo.Localization/Neo/Localization/LocalizerFactory.rvn#L7) | Contract | — |
+| [Neo.Localization.Localizer](../../extensions/Neo.Localization/src/Neo.Localization.Abstractions/Neo/Localization/Localizer.rvn#L7) | Contract | — |
+| [Neo.Localization.Localizer<T>](../../extensions/Neo.Localization/src/Neo.Localization.Abstractions/Neo/Localization/Localizer.rvn#L18) | Contract | — |
+| [Neo.Localization.LocalizerFactory](../../extensions/Neo.Localization/src/Neo.Localization.Abstractions/Neo/Localization/LocalizerFactory.rvn#L7) | Contract | — |
 | [Neo.Logging.ConsoleLoggerProvider](../../extensions/Neo.Logging/src/Neo.Logging/Neo/Logging/ConsoleLoggerProvider.rvn#L7) | Reference | — |
-| [Neo.Logging.DefaultLogger<T>](../../extensions/Neo.Logging/src/Neo.Logging/Neo/Logging/DefaultLoggerFactory.rvn#L160) | Reference | — |
+| [Neo.Logging.DefaultLogger<T>](../../extensions/Neo.Logging/src/Neo.Logging.Abstractions/Neo/Logging/DefaultLogger.rvn#L7) | Reference | — |
 | [Neo.Logging.DefaultLoggerFactory](../../extensions/Neo.Logging/src/Neo.Logging/Neo/Logging/DefaultLoggerFactory.rvn#L9) | Reference | — |
-| [Neo.Logging.EventId](../../extensions/Neo.Logging/src/Neo.Logging/Neo/Logging/Contracts.rvn#L17) | Value | Et, Eo*, H*, T* |
-| [Neo.Logging.LogLevel](../../extensions/Neo.Logging/src/Neo.Logging/Neo/Logging/Contracts.rvn#L6) | Enum | — |
-| [Neo.Logging.Logger](../../extensions/Neo.Logging/src/Neo.Logging/Neo/Logging/Contracts.rvn#L53) | Contract | — |
-| [Neo.Logging.Logger<T>](../../extensions/Neo.Logging/src/Neo.Logging/Neo/Logging/Contracts.rvn#L65) | Contract | — |
-| [Neo.Logging.LoggerFactory](../../extensions/Neo.Logging/src/Neo.Logging/Neo/Logging/Contracts.rvn#L74) | Contract | — |
-| [Neo.Logging.LoggerProvider](../../extensions/Neo.Logging/src/Neo.Logging/Neo/Logging/Contracts.rvn#L68) | Contract | — |
-| [Neo.Logging.NullLogger](../../extensions/Neo.Logging/src/Neo.Logging/Neo/Logging/NullLogger.rvn#L6) | Reference | — |
-| [Neo.Logging.NullLogger<T>](../../extensions/Neo.Logging/src/Neo.Logging/Neo/Logging/NullLogger.rvn#L17) | Reference | — |
-| [Neo.Logging.NullLoggerFactory](../../extensions/Neo.Logging/src/Neo.Logging/Neo/Logging/NullLogger.rvn#L28) | Reference | — |
+| [Neo.Logging.EventId](../../extensions/Neo.Logging/src/Neo.Logging.Abstractions/Neo/Logging/Contracts.rvn#L17) | Value | Et, Eo*, H*, T* |
+| [Neo.Logging.LogLevel](../../extensions/Neo.Logging/src/Neo.Logging.Abstractions/Neo/Logging/Contracts.rvn#L6) | Enum | — |
+| [Neo.Logging.Logger](../../extensions/Neo.Logging/src/Neo.Logging.Abstractions/Neo/Logging/Contracts.rvn#L53) | Contract | — |
+| [Neo.Logging.Logger<T>](../../extensions/Neo.Logging/src/Neo.Logging.Abstractions/Neo/Logging/Contracts.rvn#L65) | Contract | — |
+| [Neo.Logging.LoggerFactory](../../extensions/Neo.Logging/src/Neo.Logging.Abstractions/Neo/Logging/Contracts.rvn#L74) | Contract | — |
+| [Neo.Logging.LoggerProvider](../../extensions/Neo.Logging/src/Neo.Logging.Abstractions/Neo/Logging/Contracts.rvn#L68) | Contract | — |
+| [Neo.Logging.NullLogger](../../extensions/Neo.Logging/src/Neo.Logging.Abstractions/Neo/Logging/NullLogger.rvn#L6) | Reference | — |
+| [Neo.Logging.NullLogger<T>](../../extensions/Neo.Logging/src/Neo.Logging.Abstractions/Neo/Logging/NullLogger.rvn#L17) | Reference | — |
+| [Neo.Logging.NullLoggerFactory](../../extensions/Neo.Logging/src/Neo.Logging.Abstractions/Neo/Logging/NullLogger.rvn#L28) | Reference | — |
 | [System.AndroidApiLevel](../../runtime/System.Runtime/src/System.Runtime/System/Environment/Platform.rvn#L33) | Record | T* |
 | [System.Architecture](../../runtime/System.Runtime/src/System.Runtime/System/Environment/Platform.rvn#L83) | Record | T* |
 | [System.Array](../../runtime/System.Runtime/src/System.Runtime/System/Foundations.rvn#L40) | Reference | — |

@@ -132,3 +132,7 @@ helpers never execute factories while checking registrations.
 The `Increment` and `DoubleValue` functions above may be declared directly at
 module level. The built-in tests register both module-level functions and a bound
 instance method, then resolve and invoke them through their structural function type.
+
+Provider contracts, descriptors and typed helpers are available independently in
+`Neo.DependencyInjection.Abstractions`. The default container remains in
+`Neo.DependencyInjection`; namespaces are unchanged and consumers must rebuild.

@@ -5,7 +5,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Neo/**/*.rvn" />
+    <ProjectReference Include="../Neo.Logging.Abstractions/Neo.Logging.Abstractions.rvnproj" />
     <ProjectReference Include="../../../../runtime/System.Runtime/src/System.Runtime/System.Runtime.rvnproj" />
-    <ProjectReference Include="../../../Neo.DependencyInjection/src/Neo.DependencyInjection/Neo.DependencyInjection.rvnproj" />
+    <ProjectReference Include="../../../Neo.DependencyInjection/src/Neo.DependencyInjection.Abstractions/Neo.DependencyInjection.Abstractions.rvnproj" />
   </ItemGroup>
 </Project>

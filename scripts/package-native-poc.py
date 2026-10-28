@@ -33,7 +33,9 @@ def main():
                 core_assemblies + ['Neo.DependencyInjection', 'Neo.Localization'],
                 core_assemblies + ['Neo.DependencyInjection', 'Neo.Localization', 'System.Data.PostgreSql'],
                 core_assemblies + ['Neo.DependencyInjection', 'Neo.Localization', 'Neo.Logging'],
-                core_assemblies + ['Neo.DependencyInjection', 'Neo.Localization', 'Neo.Logging', 'System.Data.PostgreSql']):
+                core_assemblies + ['Neo.DependencyInjection', 'Neo.Localization', 'Neo.Logging', 'System.Data.PostgreSql'],
+                core_assemblies + ['Neo.DependencyInjection.Abstractions', 'Neo.DependencyInjection', 'Neo.Localization.Abstractions', 'Neo.Localization', 'Neo.Logging.Abstractions', 'Neo.Logging'],
+                core_assemblies + ['Neo.DependencyInjection.Abstractions', 'Neo.DependencyInjection', 'Neo.Localization.Abstractions', 'Neo.Localization', 'Neo.Logging.Abstractions', 'Neo.Logging', 'System.Data.PostgreSql']):
             raise ValueError('Unsupported split class-library selection')
         for relative, expected in catalog['files'].items():
             path = (args.libraries / relative).resolve()

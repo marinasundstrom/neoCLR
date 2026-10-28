@@ -3046,3 +3046,12 @@ Source navigation covers its component project; [the guide](logging.md) describe
 ownership, errors, serialized access and current .NET gaps. The CLI scaffold still
 omits these native application services; their public reference is the production
 native rendering, not a silent type exclusion.
+
+
+### Extension abstraction assemblies (2026-10-28)
+
+The native reference selects Neo.DependencyInjection.Abstractions,
+Neo.Localization.Abstractions and Neo.Logging.Abstractions alongside implementations.
+Namespace URLs remain stable; assembly labels and source links identify the new
+contract projects. ConsoleLoggingExtensions is the new declaring type for AddConsole;
+LoggerFactoryExtensions retains provider-neutral typed creation.

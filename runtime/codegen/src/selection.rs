@@ -895,7 +895,7 @@ pub(super) fn dispatch_targets_with_array(
         }
         // A value constructor alone cannot contribute a reference dispatch target.
         // Only reachable boxes contribute value-type interface dispatch targets.
-        if display && !t.is_reference_type && !boxed_values.contains(t.name.as_str()) {
+        if !t.is_reference_type && !boxed_values.contains(t.name.as_str()) {
             continue;
         }
         if (!t.is_reference_type && !boxed_values.contains(t.name.as_str()))
@@ -1347,7 +1347,24 @@ fn select_validated_inventory(
             }
         }
     }
+    // A value constructed only on the stack cannot receive an interface call.
+    // Source-wide boxing may have kept its conformance alive before reachability;
+    // only boxes in the final selected bodies require executable interface views.
+    let boxed_values: BTreeSet<_> = projected.functions.iter()
+        .flat_map(|f| &f.body)
+        .filter_map(|op| match op {
+            Op::BoxValue(ty) => ty.definition_name(),
+            _ => None,
+        })
+        .map(str::to_owned)
+        .collect();
     for (i, t) in projected.types.iter_mut().enumerate() {
+        if !t.is_reference_type
+            && t.representation == neoclr::metadata::Representation::Record
+            && !boxed_values.contains(&t.name)
+        {
+            t.implements.clear();
+        }
         // Init associations are executable readonly-write authority, not merely
         // descriptions. Preserve only setters already reached through calls.
         let mut retained = vec![];
@@ -1661,6 +1678,59 @@ ret
                 );
             }
         }
+    }
+
+    #[test]
+    fn unboxed_value_conformance_is_not_an_executable_interface_view() {
+        let module = neoclr::assemble(r#"
+.module UnboxedInterface
+.type class System.Object
+.end
+.interface Error
+.method instance Render() -> Int32
+.end
+.end
+.type Payload
+.implements Error
+.method instance byref .ctor() -> void
+ret
+.end
+.method instance byref Render() -> Int32
+ldc.i4 1
+ret
+.end
+.end
+.type class ActualError
+.implements Error
+.method instance .ctor() -> void
+ret
+.end
+.method instance Render() -> Int32
+ldc.i4 42
+ret
+.end
+.end
+.function Main() -> Int32
+newobj instance Payload::.ctor()
+pop
+newobj instance ActualError::.ctor()
+callvirt instance Error::Render()
+ret
+.end
+.function Unreachable() -> Int32
+newobj instance Payload::.ctor()
+box Payload
+pop
+ldc.i4 0
+ret
+.end
+"#).unwrap();
+        neoclr::verify(&module).unwrap();
+        let (expanded, _) = crate::specialization::expand(&module, "Main").unwrap();
+        let (selected, _) = prepare(&expanded, "Main").unwrap();
+        let payload = selected.types.iter().find(|t| t.name == "Payload").unwrap();
+        assert!(payload.implements.is_empty());
+        neoclr::verify(&selected).unwrap();
     }
 
     #[test]

@@ -50,7 +50,7 @@ if (args.Length == 3)
     bundle = inputCopy;
 }
 var names = new[] { "System.Runtime", "System.Data", "System.Networking", "System.Web" }
-    .Concat(new[] { "Neo.DependencyInjection", "Neo.Localization", "Neo.Logging" }
+    .Concat(new[] { "Neo.DependencyInjection.Abstractions", "Neo.DependencyInjection", "Neo.Localization.Abstractions", "Neo.Localization", "Neo.Logging.Abstractions", "Neo.Logging" }
         .Where(name => File.Exists(Path.Combine(bundle, name + ".dll"))))
     .Concat(File.Exists(Path.Combine(bundle, "System.Data.PostgreSql.dll"))
         ? new[] { "System.Data.PostgreSql" } : Array.Empty<string>()).ToArray();

@@ -1,0 +1,19 @@
+module Examples.Extensions
+
+import Neo.Localization.*
+import Neo.Logging.*
+
+/// Application logic depends on provider-neutral logging and localization contracts.
+public class GreetingService {
+    private val logger: Logger<GreetingService>
+    private val strings: Localizer<GreetingService>
+
+    init(logger: Logger<GreetingService>, strings: Localizer<GreetingService>) {
+        self.logger = logger
+        self.strings = strings
+    }
+
+    func Greet(name: string) {
+        logger.LogInformation(strings["Greeting", name])
+    }
+}

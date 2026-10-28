@@ -8,14 +8,6 @@ import System.Optional.*
 import System.Result.*
 import System.Runtime.Reflection.*
 
-/// Reasons automatic constructor activation cannot prepare or invoke an implementation.
-public enum ActivationError {
-    UnsupportedType
-    MissingConstructor
-    AmbiguousConstructor
-    InvocationFailed
-}
-
 internal class ConstructorPlan {
     private val constructor: ConstructorInfo
     private val storedParameters: Sequence<ParameterInfo>

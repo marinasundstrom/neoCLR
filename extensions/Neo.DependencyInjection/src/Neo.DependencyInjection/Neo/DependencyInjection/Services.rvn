@@ -8,109 +8,6 @@ import System.Optional.*
 import System.Result.*
 import System.Runtime.CompilerServices.*
 
-/// Controls whether a registration creates values per resolution, per scope or per root provider.
-public enum ServiceLifetime { Transient, Scoped, Singleton }
-
-/// A missing registration, invalid contract, activation failure or provider lifecycle error.
-public union ServiceError {
-    case Missing(type: TypeInfo)
-    case MissingKeyed(type: TypeInfo, key: Object?)
-    case InvalidRegistration(type: TypeInfo)
-    case Activation(type: TypeInfo, error: ActivationError)
-    case Cycle(type: TypeInfo)
-    case ScopeRequired(type: TypeInfo)
-    case InvalidFactoryResult(type: TypeInfo)
-    case Disposed
-}
-
-/// Resolves services within one invocation. Dispose scopes explicitly to release owned services.
-/// Resolution is synchronous and follows the runtime's serialized guest execution model.
-public interface ServiceProvider : Disposable {
-    /// Resolves the last registration for an exact type and key; null selects unkeyed services.
-    func GetRequiredKeyedService(type: TypeInfo, key: Object?) -> Result<Object, ServiceError>
-    /// Returns None only if this exact type/key is unregistered.
-    func GetKeyedService(type: TypeInfo, key: Object?) -> Result<Optional<Object>, ServiceError>
-    /// Resolves registrations for this exact type/key in registration order.
-    func GetKeyedServices(type: TypeInfo, key: Object?) -> Result<Sequence<Object>, ServiceError>
-    /// Resolves the last registration, or returns Missing; activation errors propagate.
-    func GetRequiredService(type: TypeInfo) -> Result<Object, ServiceError>
-    /// Returns None only when unregistered; registered factory or activation failures remain errors.
-    func GetService(type: TypeInfo) -> Result<Optional<Object>, ServiceError>
-    /// Resolves every explicit registration in registration order; an absent type yields an empty sequence.
-    func GetServices(type: TypeInfo) -> Result<Sequence<Object>, ServiceError>
-    /// Creates an independently disposable scope sharing the root singleton cache.
-    func CreateScope() -> Result<ServiceProvider, ServiceError>
-}
-
-/// Collects registrations and builds independent provider snapshots.
-public interface ServiceCollection {
-    /// Adds only if the exact service type/key is absent; never invokes factories.
-    func TryAdd(descriptor: ServiceDescriptor) -> Result<bool, ServiceError>
-    /// Registers an implementation for an exact type/key pair; null is the unkeyed identity.
-    func AddKeyed(service: TypeInfo, key: Object?, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] implementation: TypeInfo, lifetime: ServiceLifetime) -> Result<unit, ServiceError>
-    /// Registers a factory receiving the current provider and the registration key.
-    func AddKeyedFactory(service: TypeInfo, key: Object?, factory: (ServiceProvider, Object?) -> Result<Object, ServiceError>, lifetime: ServiceLifetime) -> Result<unit, ServiceError>
-    /// Registers a caller-owned instance for an exact type/key pair.
-    func AddKeyedInstance(service: TypeInfo, key: Object?, instance: Object) -> Result<unit, ServiceError>
-    /// Adds a checked immutable descriptor; instance descriptors must have singleton lifetime.
-    func Add(descriptor: ServiceDescriptor) -> Result<unit, ServiceError>
-    /// Registers a concrete reference implementation assignable to the requested service.
-    func Add(service: TypeInfo, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] implementation: TypeInfo, lifetime: ServiceLifetime) -> Result<unit, ServiceError>
-    /// Registers a factory whose non-null result is validated and owned by its resolving provider.
-    func AddFactory(service: TypeInfo, factory: (ServiceProvider) -> Result<Object, ServiceError>, lifetime: ServiceLifetime) -> Result<unit, ServiceError>
-    /// Registers an assignable caller-owned instance; provider disposal never disposes this registration.
-    func AddInstance(service: TypeInfo, instance: Object) -> Result<unit, ServiceError>
-    /// Creates an independent snapshot, validating public constructors without invoking factories.
-    func Build() -> Result<ServiceProvider, ServiceError>
-}
-
-/// Describes caller-owned storage, an explicit factory, or automatic constructor activation.
-public union ServiceSource {
-    case Instance(value: Object)
-    case Factory(create: (ServiceProvider) -> Result<Object, ServiceError>)
-    case Constructor(type: TypeInfo)
-}
-
-/// An immutable service identity, activation source and lifetime.
-public class ServiceDescriptor {
-    internal func Matches(type: TypeInfo, key: Object?) -> bool {
-        return Service.Equals(type) && MatchesKey(key)
-    }
-
-    internal func MatchesGeneric(type: TypeInfo, key: Object?) -> bool {
-        return Service.IsGenericTypeDefinition && type.IsConstructedGenericType && !type.ContainsGenericParameters && MatchesKey(key) && Service.Equals(type.GetGenericTypeDefinition())
-    }
-
-    private func MatchesKey(key: Object?) -> bool {
-        if Object.ReferenceEquals(ServiceKey, key) { return true }
-        if ServiceKey is Object registered { return registered.Equals(key) }
-        return false
-    }
-
-    /// Service key, compared with ordinary Object equality; null means unkeyed.
-    val ServiceKey: Object?
-    /// Creates a keyed descriptor. Key equality must remain stable while registered.
-    init(service: TypeInfo, key: Object?, source: ServiceSource, lifetime: ServiceLifetime) {
-        Service = service
-        ServiceKey = key
-        Source = source
-        Lifetime = lifetime
-    }
-    /// Exact service identity used for registration and resolution.
-    val Service: TypeInfo
-    /// Constructor, factory or caller-owned instance supplying values.
-    val Source: ServiceSource
-    /// Cache and ownership scope for created values.
-    val Lifetime: ServiceLifetime
-    /// Creates a descriptor; the collection validates it when added.
-    init(service: TypeInfo, source: ServiceSource, lifetime: ServiceLifetime) {
-        Service = service
-        ServiceKey = null
-        Source = source
-        Lifetime = lifetime
-    }
-}
-
 internal class ServiceEntry {
     val Registration: ServiceDescriptor
     val Plan: Optional<ConstructorPlan>
@@ -128,7 +25,7 @@ public class DefaultServiceCollection : ServiceCollection {
     /// Preserves the first matching registration regardless of lifetime or activation source.
     func TryAdd(descriptor: ServiceDescriptor) -> Result<bool, ServiceError> {
         for registration in registrations {
-            if registration.Matches(descriptor.Service, descriptor.ServiceKey) { return Ok(false) }
+            if DescriptorMatching.Matches(registration, descriptor.Service, descriptor.ServiceKey) { return Ok(false) }
         }
         _ = Add(descriptor)?
         return Ok(true)
@@ -198,7 +95,7 @@ public class DefaultServiceCollection : ServiceCollection {
     private func Available(type: TypeInfo) -> bool {
         if type.Equals(typeof(ServiceProvider)) { return true }
         for registration in registrations {
-            if (registration.Matches(type, null) || registration.MatchesGeneric(type, null)) { return true }
+            if (DescriptorMatching.Matches(registration, type, null) || DescriptorMatching.MatchesGeneric(registration, type, null)) { return true }
         }
         return false
     }
@@ -287,7 +184,7 @@ internal class DefaultServiceProvider : ServiceProvider {
         if key is null && type.Equals(typeof(ServiceProvider)) { return Ok(Some<Object>(self)) }
         var index = registrations.Count - 1
         while index >= 0 {
-            if registrations[index].Registration.Matches(type, key) {
+            if DescriptorMatching.Matches(registrations[index].Registration, type, key) {
                 let value = ResolveSlot(index, type)?
                 return Ok(Some(value))
             }
@@ -295,7 +192,7 @@ internal class DefaultServiceProvider : ServiceProvider {
         }
         index = registrations.Count - 1
         while index >= 0 {
-            if registrations[index].Registration.MatchesGeneric(type, key) {
+            if DescriptorMatching.MatchesGeneric(registrations[index].Registration, type, key) {
                 let value = ResolveSlot(index, type)?
                 return Ok(Some(value))
             }
@@ -308,7 +205,7 @@ internal class DefaultServiceProvider : ServiceProvider {
         if IsDisposed { return Failure(ServiceError.Disposed) }
         let results = ArrayList<Object>()
         for index in 0..registrations.Count {
-            if registrations[index].Registration.Matches(type, key) || registrations[index].Registration.MatchesGeneric(type, key) {
+            if DescriptorMatching.Matches(registrations[index].Registration, type, key) || DescriptorMatching.MatchesGeneric(registrations[index].Registration, type, key) {
                 results.Add(ResolveSlot(index, type)?)
             }
         }
@@ -347,7 +244,7 @@ internal class DefaultServiceProvider : ServiceProvider {
     private func Available(type: TypeInfo) -> bool {
         if type.Equals(typeof(ServiceProvider)) { return true }
         for entry in registrations {
-            if entry.Registration.Matches(type, null) || entry.Registration.MatchesGeneric(type, null) { return true }
+            if DescriptorMatching.Matches(entry.Registration, type, null) || DescriptorMatching.MatchesGeneric(entry.Registration, type, null) { return true }
         }
         return false
     }
@@ -436,290 +333,20 @@ internal class DefaultServiceProvider : ServiceProvider {
     }
 }
 
-/// Typed lookups preserving missing-service and activation-error distinctions.
-public extension ServiceProviderExtensions for ServiceProvider {
-    /// Typed optional lookup for an exact key; null selects unkeyed registrations.
-    func GetKeyedService<T>(key: Object?) -> Result<Optional<T>, ServiceError> {
-        let result = self.GetKeyedService(typeof(T), key)?
-        if result is Some(let value) { return Ok(Some((T)value)) }
-        return Ok(None)
-    }
-    /// Typed required lookup for an exact key.
-    func GetRequiredKeyedService<T>(key: Object?) -> Result<T, ServiceError> {
-        let value = self.GetRequiredKeyedService(typeof(T), key)?
-        return Ok((T)value)
-    }
-    /// Typed ordered lookup for an exact key without copying the result elements.
-    func GetKeyedServices<T>(key: Object?) -> Result<Sequence<T>, ServiceError> {
-        let values = self.GetKeyedServices(typeof(T), key)?
-        return Ok(ServiceResults<T>(values))
-    }
-    /// Typed form of GetService; preserves activation errors and lifetime behavior.
-    func GetService<T>() -> Result<Optional<T>, ServiceError> {
-        let result = self.GetService(typeof(T))?
-        if result is Some(let value) { return Ok(Some((T)value)) }
-        return Ok(None)
+
+internal static class DescriptorMatching {
+    static func Matches(descriptor: ServiceDescriptor, type: TypeInfo, key: Object?) -> bool {
+        return descriptor.Service.Equals(type) && MatchesKey(descriptor, key)
     }
 
-    /// Typed form of GetServices; preserves activation errors and lifetime behavior.
-    func GetServices<T>() -> Result<Sequence<T>, ServiceError> {
-        let values = self.GetServices(typeof(T))?
-        return Ok(ServiceResults<T>(values))
+    static func MatchesGeneric(descriptor: ServiceDescriptor, type: TypeInfo, key: Object?) -> bool {
+        return descriptor.Service.IsGenericTypeDefinition && type.IsConstructedGenericType && !type.ContainsGenericParameters && MatchesKey(descriptor, key) && descriptor.Service.Equals(type.GetGenericTypeDefinition())
     }
 
-    /// Typed form of GetRequiredService; preserves activation errors and lifetime behavior.
-    func GetRequiredService<T>() -> Result<T, ServiceError> {
-        let value = self.GetRequiredService(typeof(T))?
-        return Ok((T)value)
-    }
-}
-
-// Project typed results without copying the untyped result storage.
-internal class ServiceResults<T> : Sequence<T> {
-    private val values: Sequence<Object>
-    init(values: Sequence<Object>) { self.values = values }
-    val Count: int => values.Count
-    val self[index: int]: T => (T)values[index]
-    func GetIterator() -> Iterator<T> => ServiceResultsIterator<T>(values)
-}
-
-internal class ServiceResultsIterator<T> : Iterator<T> {
-    private val values: Sequence<Object>
-    private var index = -1
-    init(values: Sequence<Object>) { self.values = values }
-    func MoveNext() -> bool {
-        if index >= values.Count { return false }
-        index = index + 1
-        return index < values.Count
-    }
-    val Current: T => (T)values[index]
-    func Dispose() { index = values.Count }
-}
-
-/// Typed reference-service registrations with checked runtime assignability.
-public extension ServiceCollectionExtensions for ServiceCollection {
-    /// Registers a keyed transient implementation of TService.
-    func AddKeyedTransient<TService, TImplementation>(key: Object?) -> Result<unit, ServiceError> {
-        return self.AddKeyed(typeof(TService), key, typeof(TImplementation), ServiceLifetime.Transient)
-    }
-    /// Registers TService as its own keyed transient implementation.
-    func AddKeyedTransient<TService>(key: Object?) -> Result<unit, ServiceError> {
-        return self.AddKeyed(typeof(TService), key, typeof(TService), ServiceLifetime.Transient)
-    }
-    /// Registers a keyed typed factory; its returned service becomes provider-owned.
-    func AddKeyedTransient<TService>(key: Object?, factory: (ServiceProvider, Object?) -> Result<TService, ServiceError>) -> Result<unit, ServiceError> {
-        return self.Add(ServiceDescriptor(typeof(TService), key, ServiceSource.Factory(provider => {
-            let value = factory(provider, key)?
-            return Ok<Object>(value)
-        }), ServiceLifetime.Transient))
-    }
-    /// Registers a keyed scoped implementation of TService.
-    func AddKeyedScoped<TService, TImplementation>(key: Object?) -> Result<unit, ServiceError> {
-        return self.AddKeyed(typeof(TService), key, typeof(TImplementation), ServiceLifetime.Scoped)
-    }
-    /// Registers TService as its own keyed scoped implementation.
-    func AddKeyedScoped<TService>(key: Object?) -> Result<unit, ServiceError> {
-        return self.AddKeyed(typeof(TService), key, typeof(TService), ServiceLifetime.Scoped)
-    }
-    /// Registers a keyed typed factory; its returned service becomes provider-owned.
-    func AddKeyedScoped<TService>(key: Object?, factory: (ServiceProvider, Object?) -> Result<TService, ServiceError>) -> Result<unit, ServiceError> {
-        return self.Add(ServiceDescriptor(typeof(TService), key, ServiceSource.Factory(provider => {
-            let value = factory(provider, key)?
-            return Ok<Object>(value)
-        }), ServiceLifetime.Scoped))
-    }
-    /// Registers a keyed singleton implementation of TService.
-    func AddKeyedSingleton<TService, TImplementation>(key: Object?) -> Result<unit, ServiceError> {
-        return self.AddKeyed(typeof(TService), key, typeof(TImplementation), ServiceLifetime.Singleton)
-    }
-    /// Registers TService as its own keyed singleton implementation.
-    func AddKeyedSingleton<TService>(key: Object?) -> Result<unit, ServiceError> {
-        return self.AddKeyed(typeof(TService), key, typeof(TService), ServiceLifetime.Singleton)
-    }
-    /// Registers a keyed typed factory; its returned service becomes provider-owned.
-    func AddKeyedSingleton<TService>(key: Object?, factory: (ServiceProvider, Object?) -> Result<TService, ServiceError>) -> Result<unit, ServiceError> {
-        return self.Add(ServiceDescriptor(typeof(TService), key, ServiceSource.Factory(provider => {
-            let value = factory(provider, key)?
-            return Ok<Object>(value)
-        }), ServiceLifetime.Singleton))
-    }
-    /// Registers a caller-owned keyed value, including a bound function object.
-    func AddKeyedSingleton<TService>(key: Object?, instance: TService) -> Result<unit, ServiceError> {
-        return self.AddKeyedInstance(typeof(TService), key, instance)
+    private static func MatchesKey(descriptor: ServiceDescriptor, key: Object?) -> bool {
+        if Object.ReferenceEquals(descriptor.ServiceKey, key) { return true }
+        if descriptor.ServiceKey is Object registered { return registered.Equals(key) }
+        return false
     }
 
-    /// Registers a transient service; invalid types or results are reported as ServiceError.
-    func AddTransient<TService, TImplementation>() -> Result<unit, ServiceError> {
-        return self.Add(typeof(TService), typeof(TImplementation), ServiceLifetime.Transient)
-    }
-    /// Registers a transient service; invalid types or results are reported as ServiceError.
-    func AddTransient<TService>() -> Result<unit, ServiceError> {
-        return self.Add(typeof(TService), typeof(TService), ServiceLifetime.Transient)
-    }
-    /// Registers a transient service; invalid types or results are reported as ServiceError.
-    func AddTransient<TService>(factory: (ServiceProvider) -> Result<TService, ServiceError>) -> Result<unit, ServiceError> {
-        return self.AddFactory(typeof(TService), provider => {
-            let value = factory(provider)?
-            return Ok<Object>(value)
-        }, ServiceLifetime.Transient)
-    }
-    /// Registers a scoped service; invalid types or results are reported as ServiceError.
-    func AddScoped<TService, TImplementation>() -> Result<unit, ServiceError> {
-        return self.Add(typeof(TService), typeof(TImplementation), ServiceLifetime.Scoped)
-    }
-    /// Registers a scoped service; invalid types or results are reported as ServiceError.
-    func AddScoped<TService>() -> Result<unit, ServiceError> {
-        return self.Add(typeof(TService), typeof(TService), ServiceLifetime.Scoped)
-    }
-    /// Registers a scoped service; invalid types or results are reported as ServiceError.
-    func AddScoped<TService>(factory: (ServiceProvider) -> Result<TService, ServiceError>) -> Result<unit, ServiceError> {
-        return self.AddFactory(typeof(TService), provider => {
-            let value = factory(provider)?
-            return Ok<Object>(value)
-        }, ServiceLifetime.Scoped)
-    }
-    /// Registers a singleton service; invalid types or results are reported as ServiceError.
-    func AddSingleton<TService, TImplementation>() -> Result<unit, ServiceError> {
-        return self.Add(typeof(TService), typeof(TImplementation), ServiceLifetime.Singleton)
-    }
-    /// Registers a singleton service; invalid types or results are reported as ServiceError.
-    func AddSingleton<TService>() -> Result<unit, ServiceError> {
-        return self.Add(typeof(TService), typeof(TService), ServiceLifetime.Singleton)
-    }
-    /// Registers a singleton service; invalid types or results are reported as ServiceError.
-    func AddSingleton<TService>(factory: (ServiceProvider) -> Result<TService, ServiceError>) -> Result<unit, ServiceError> {
-        return self.AddFactory(typeof(TService), provider => {
-            let value = factory(provider)?
-            return Ok<Object>(value)
-        }, ServiceLifetime.Singleton)
-    }
-    /// Registers a singleton service; invalid types or results are reported as ServiceError.
-    func AddSingleton<TService>(instance: TService) -> Result<unit, ServiceError> {
-        return self.AddInstance(typeof(TService), instance)
-    }
-
-    /// Adds an implementation only when its exact unkeyed service is absent.
-    func TryAdd(service: TypeInfo, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] implementation: TypeInfo, lifetime: ServiceLifetime) -> Result<bool, ServiceError> {
-        return self.TryAdd(ServiceDescriptor(service, ServiceSource.Constructor(implementation), lifetime))
-    }
-    /// Adds an implementation only when its exact service type/key is absent.
-    func TryAddKeyed(service: TypeInfo, key: Object?, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] implementation: TypeInfo, lifetime: ServiceLifetime) -> Result<bool, ServiceError> {
-        return self.TryAdd(ServiceDescriptor(service, key, ServiceSource.Constructor(implementation), lifetime))
-    }
-    /// Adds a factory without invoking it, only when the service is absent.
-    func TryAddFactory(service: TypeInfo, factory: (ServiceProvider) -> Result<Object, ServiceError>, lifetime: ServiceLifetime) -> Result<bool, ServiceError> {
-        return self.TryAdd(ServiceDescriptor(service, ServiceSource.Factory(factory), lifetime))
-    }
-    /// Adds a keyed factory without invoking it, only when the type/key is absent.
-    func TryAddKeyedFactory(service: TypeInfo, key: Object?, factory: (ServiceProvider, Object?) -> Result<Object, ServiceError>, lifetime: ServiceLifetime) -> Result<bool, ServiceError> {
-        return self.TryAdd(ServiceDescriptor(service, key, ServiceSource.Factory(provider => factory(provider, key)), lifetime))
-    }
-    /// Adds a caller-owned instance only when its service is absent.
-    func TryAddInstance(service: TypeInfo, instance: Object) -> Result<bool, ServiceError> {
-        return self.TryAdd(ServiceDescriptor(service, ServiceSource.Instance(instance), ServiceLifetime.Singleton))
-    }
-    /// Adds a caller-owned instance only when its service type/key is absent.
-    func TryAddKeyedInstance(service: TypeInfo, key: Object?, instance: Object) -> Result<bool, ServiceError> {
-        return self.TryAdd(ServiceDescriptor(service, key, ServiceSource.Instance(instance), ServiceLifetime.Singleton))
-    }
-
-    /// Adds only when the service type/key is absent. Registers a keyed transient implementation of TService.
-    func TryAddKeyedTransient<TService, TImplementation>(key: Object?) -> Result<bool, ServiceError> {
-        return self.TryAddKeyed(typeof(TService), key, typeof(TImplementation), ServiceLifetime.Transient)
-    }
-    /// Adds only when the service type/key is absent. Registers TService as its own keyed transient implementation.
-    func TryAddKeyedTransient<TService>(key: Object?) -> Result<bool, ServiceError> {
-        return self.TryAddKeyed(typeof(TService), key, typeof(TService), ServiceLifetime.Transient)
-    }
-    /// Adds only when the service type/key is absent. Registers a keyed typed factory; its returned service becomes provider-owned.
-    func TryAddKeyedTransient<TService>(key: Object?, factory: (ServiceProvider, Object?) -> Result<TService, ServiceError>) -> Result<bool, ServiceError> {
-        return self.TryAdd(ServiceDescriptor(typeof(TService), key, ServiceSource.Factory(provider => {
-            let value = factory(provider, key)?
-            return Ok<Object>(value)
-        }), ServiceLifetime.Transient))
-    }
-    /// Adds only when the service type/key is absent. Registers a keyed scoped implementation of TService.
-    func TryAddKeyedScoped<TService, TImplementation>(key: Object?) -> Result<bool, ServiceError> {
-        return self.TryAddKeyed(typeof(TService), key, typeof(TImplementation), ServiceLifetime.Scoped)
-    }
-    /// Adds only when the service type/key is absent. Registers TService as its own keyed scoped implementation.
-    func TryAddKeyedScoped<TService>(key: Object?) -> Result<bool, ServiceError> {
-        return self.TryAddKeyed(typeof(TService), key, typeof(TService), ServiceLifetime.Scoped)
-    }
-    /// Adds only when the service type/key is absent. Registers a keyed typed factory; its returned service becomes provider-owned.
-    func TryAddKeyedScoped<TService>(key: Object?, factory: (ServiceProvider, Object?) -> Result<TService, ServiceError>) -> Result<bool, ServiceError> {
-        return self.TryAdd(ServiceDescriptor(typeof(TService), key, ServiceSource.Factory(provider => {
-            let value = factory(provider, key)?
-            return Ok<Object>(value)
-        }), ServiceLifetime.Scoped))
-    }
-    /// Adds only when the service type/key is absent. Registers a keyed singleton implementation of TService.
-    func TryAddKeyedSingleton<TService, TImplementation>(key: Object?) -> Result<bool, ServiceError> {
-        return self.TryAddKeyed(typeof(TService), key, typeof(TImplementation), ServiceLifetime.Singleton)
-    }
-    /// Adds only when the service type/key is absent. Registers TService as its own keyed singleton implementation.
-    func TryAddKeyedSingleton<TService>(key: Object?) -> Result<bool, ServiceError> {
-        return self.TryAddKeyed(typeof(TService), key, typeof(TService), ServiceLifetime.Singleton)
-    }
-    /// Adds only when the service type/key is absent. Registers a keyed typed factory; its returned service becomes provider-owned.
-    func TryAddKeyedSingleton<TService>(key: Object?, factory: (ServiceProvider, Object?) -> Result<TService, ServiceError>) -> Result<bool, ServiceError> {
-        return self.TryAdd(ServiceDescriptor(typeof(TService), key, ServiceSource.Factory(provider => {
-            let value = factory(provider, key)?
-            return Ok<Object>(value)
-        }), ServiceLifetime.Singleton))
-    }
-    /// Adds only when the service type/key is absent. Registers a caller-owned keyed value, including a bound function object.
-    func TryAddKeyedSingleton<TService>(key: Object?, instance: TService) -> Result<bool, ServiceError> {
-        return self.TryAddKeyedInstance(typeof(TService), key, instance)
-    }
-
-    /// Adds only when the service type/key is absent. Registers a transient service; invalid types or results are reported as ServiceError.
-    func TryAddTransient<TService, TImplementation>() -> Result<bool, ServiceError> {
-        return self.TryAdd(typeof(TService), typeof(TImplementation), ServiceLifetime.Transient)
-    }
-    /// Adds only when the service type/key is absent. Registers a transient service; invalid types or results are reported as ServiceError.
-    func TryAddTransient<TService>() -> Result<bool, ServiceError> {
-        return self.TryAdd(typeof(TService), typeof(TService), ServiceLifetime.Transient)
-    }
-    /// Adds only when the service type/key is absent. Registers a transient service; invalid types or results are reported as ServiceError.
-    func TryAddTransient<TService>(factory: (ServiceProvider) -> Result<TService, ServiceError>) -> Result<bool, ServiceError> {
-        return self.TryAddFactory(typeof(TService), provider => {
-            let value = factory(provider)?
-            return Ok<Object>(value)
-        }, ServiceLifetime.Transient)
-    }
-    /// Adds only when the service type/key is absent. Registers a scoped service; invalid types or results are reported as ServiceError.
-    func TryAddScoped<TService, TImplementation>() -> Result<bool, ServiceError> {
-        return self.TryAdd(typeof(TService), typeof(TImplementation), ServiceLifetime.Scoped)
-    }
-    /// Adds only when the service type/key is absent. Registers a scoped service; invalid types or results are reported as ServiceError.
-    func TryAddScoped<TService>() -> Result<bool, ServiceError> {
-        return self.TryAdd(typeof(TService), typeof(TService), ServiceLifetime.Scoped)
-    }
-    /// Adds only when the service type/key is absent. Registers a scoped service; invalid types or results are reported as ServiceError.
-    func TryAddScoped<TService>(factory: (ServiceProvider) -> Result<TService, ServiceError>) -> Result<bool, ServiceError> {
-        return self.TryAddFactory(typeof(TService), provider => {
-            let value = factory(provider)?
-            return Ok<Object>(value)
-        }, ServiceLifetime.Scoped)
-    }
-    /// Adds only when the service type/key is absent. Registers a singleton service; invalid types or results are reported as ServiceError.
-    func TryAddSingleton<TService, TImplementation>() -> Result<bool, ServiceError> {
-        return self.TryAdd(typeof(TService), typeof(TImplementation), ServiceLifetime.Singleton)
-    }
-    /// Adds only when the service type/key is absent. Registers a singleton service; invalid types or results are reported as ServiceError.
-    func TryAddSingleton<TService>() -> Result<bool, ServiceError> {
-        return self.TryAdd(typeof(TService), typeof(TService), ServiceLifetime.Singleton)
-    }
-    /// Adds only when the service type/key is absent. Registers a singleton service; invalid types or results are reported as ServiceError.
-    func TryAddSingleton<TService>(factory: (ServiceProvider) -> Result<TService, ServiceError>) -> Result<bool, ServiceError> {
-        return self.TryAddFactory(typeof(TService), provider => {
-            let value = factory(provider)?
-            return Ok<Object>(value)
-        }, ServiceLifetime.Singleton)
-    }
-    /// Adds only when the service type/key is absent. Registers a singleton service; invalid types or results are reported as ServiceError.
-    func TryAddSingleton<TService>(instance: TService) -> Result<bool, ServiceError> {
-        return self.TryAddInstance(typeof(TService), instance)
-    }
 }

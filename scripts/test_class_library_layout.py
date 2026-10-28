@@ -43,6 +43,18 @@ class ClassLibraryLayout(unittest.TestCase):
         self.assertTrue(authored)
         self.assertFalse(authored - owners.keys(), authored - owners.keys())
 
+    def test_extension_abstractions_do_not_reference_implementations(self):
+        for component in ('Neo.DependencyInjection', 'Neo.Localization', 'Neo.Logging'):
+            abstraction = ROOT / 'extensions' / component / 'src' / (component + '.Abstractions') / (component + '.Abstractions.rvnproj')
+            references = [Path(item.attrib['Include']).stem for item in ET.parse(abstraction).findall('.//ProjectReference')]
+            self.assertEqual(['System.Runtime'], references)
+            implementation = ROOT / 'extensions' / component / 'src' / component / (component + '.rvnproj')
+            dependencies = [Path(item.attrib['Include']).stem for item in ET.parse(implementation).findall('.//ProjectReference')]
+            self.assertIn(component + '.Abstractions', dependencies)
+            if component != 'Neo.DependencyInjection':
+                self.assertIn('Neo.DependencyInjection.Abstractions', dependencies)
+                self.assertNotIn('Neo.DependencyInjection', dependencies)
+
     def test_runtime_suite_catalog_resolves_sources(self):
         catalog = json.loads((ROOT / 'scripts/runtime-test-projects.json').read_text())
         for name, relative in catalog.items():

@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-28
 
+- Extract Neo.DependencyInjection.Abstractions, Neo.Logging.Abstractions and Neo.Localization.Abstractions as sibling projects, keeping namespaces and moving implementation dependencies onto contracts. Add an integrated DI/logging/localization sample and an abstractions-only consumer. Preserve nested callback nullability across native assembly imports with Raven `34f14c8ce`; rebuild consumers for the new assembly identities (no type forwarders). Remove the native compiler/linker’s eight-module cap so the split bundle can link; align unboxed value interface views with final reachable boxing so file-backed localization composes with console logging. Refresh API ownership and documentation.
+
 - Add the optional Neo.Logging assembly with generic state/formatter and scope contracts, typed loggers, category-caching default factory, console/null implementations and DI registration. Preserve generic interface calls through native metadata, interpreter dispatch and native specialization; retain method arity in interface projections and emit GenericParam rows for abstract CLI methods. Default logging is synchronous and owner-thread serialized; configuration binding, ambient scopes and message templates remain gaps.
 
 - Add a versioned GUI-neutral diagnostic session export and JSON Schema over the existing opt-in local GC snapshot service. Preserve owner scope, freshness/unavailable values and full uint64 precision; validate real CLI capture and malformed/reset data. Record root-publication, concurrent-store and shared-I/O-wakeup optimization objectives. Heap graph/timeline adapters and a GUI remain future work.

@@ -188,3 +188,11 @@ generation. Collection injection and keyed constructor annotations remain gaps.
 Replace System.DependencyInjection imports with Neo.DependencyInjection and rebuild
 against the new assembly. No old-name compatibility shim is provided. See the
 [application-service boundary](https://github.com/marinasundstrom/neoCLR/blob/main/docs/application-services.md) for dependencies and migration.
+
+
+Development assembly split (2026-10-28): contracts, descriptors, lifetime/error
+types and typed registration/resolution helpers live in
+Neo.DependencyInjection.Abstractions.dll, referencing only System.Runtime.
+Neo.DependencyInjection.dll contains the default container and constructor activation.
+Namespaces remain unchanged; rebuild consumers against the new assembly identities.
+No new friend access or public implementation helper is introduced.

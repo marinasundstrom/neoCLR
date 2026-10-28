@@ -13,7 +13,7 @@ pub(super) fn split(args: &mut Vec<OsString>) -> Vec<OsString> {
         .unwrap_or_default()
 }
 pub(super) fn parse(args: &[OsString]) -> Result<Paths<'_>, Error> {
-    if args.len() > 20 || args.len() % 2 != 0 {
+    if args.len() % 2 != 0 {
         return Err("expected trailing --module, --system or --object-root input pairs".into());
     }
     let mut module_paths = vec![];
@@ -21,10 +21,10 @@ pub(super) fn parse(args: &[OsString]) -> Result<Paths<'_>, Error> {
     let mut object_path = None;
     for pair in args.chunks(2) {
         match pair[0].to_str() {
-            Some("--module") if module_paths.len() < 8 => module_paths.push(&pair[1]),
+            Some("--module") => module_paths.push(&pair[1]),
             Some("--system") if system_path.is_none() => system_path = Some(&pair[1]),
             Some("--object-root") if object_path.is_none() => object_path = Some(&pair[1]),
-            _ => return Err("invalid, duplicate or excessive load-context option".into()),
+            _ => return Err("invalid or duplicate load-context option".into()),
         }
     }
     if object_path.is_some() && system_path.is_none() {

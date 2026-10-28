@@ -118,3 +118,7 @@ project builder reads it automatically; `--retention-file` selects another file.
 The native project builder resolves this exact metadata name from the supplied
 class-library modules. It retains the closed adapter shapes observed through
 `Localizer<T>` requests; it does not enable arbitrary runtime code generation.
+
+The provider-neutral contracts, typed adapter, formatting and diagnostic decorators
+now live in `Neo.Localization.Abstractions`, which references only System.Runtime.
+JSON resources and DI integration remain in `Neo.Localization`, using DI abstractions.

@@ -1252,10 +1252,8 @@ fn expand_validated(
                 let value_display = (super::selection::object_dispatch_contract(&contract)
                     || super::selection::interface_contract(input, &contract))
                     && boxed_values.contains(owner);
-                if super::selection::object_dispatch_contract(&contract)
-                    && !definition.is_reference_type
-                    && !value_display
-                {
+                // A value constructor alone does not produce an interface receiver.
+                if !definition.is_reference_type && !value_display {
                     continue;
                 }
                 if (!definition.is_reference_type && !value_display)

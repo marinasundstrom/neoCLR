@@ -3,9 +3,9 @@ title: Logging
 ---
 # Logging (development)
 
-`Neo.Logging.dll` supplies optional logging abstractions and a synchronous default
-implementation. Import `Neo.Logging.*`; the assembly references System.Runtime
-and Neo.DependencyInjection. It preserves the generic state boundary of
+`Neo.Logging.Abstractions.dll` supplies provider-neutral contracts and helpers.
+`Neo.Logging.dll` supplies the synchronous default implementation and DI integration. Import `Neo.Logging.*`; the abstraction assembly references only System.Runtime. The implementation also
+references Neo.DependencyInjection.Abstractions. It preserves the generic state boundary of
 Microsoft.Extensions.Logging, following Raven's convention of interfaces without
 an I prefix.
 
@@ -44,7 +44,7 @@ console provider does not render scopes. There is no ambient async scope flow.
 `LoggerExtensions` provides literal Log overloads and LogTrace, LogDebug,
 LogInformation, LogWarning, LogError and LogCritical. Braces are literal text;
 message-template parsing is not implemented. LoggerFactoryExtensions adds
-`CreateLogger<T>()` and `AddConsole()`.
+`CreateLogger<T>()`; ConsoleLoggingExtensions adds `AddConsole()`.
 
 ## Dependency injection
 
@@ -69,3 +69,8 @@ and [feature overview](/features/logging/).
 The initial typed logger contract is invariant; .NET typed-category covariance
 and EventId implicit integer conversion are not yet provided. Scope generic
 parameters do not encode the CLR nullable-analysis `notnull` constraint.
+
+Contracts, levels/EventId, `DefaultLogger<T>`, literal helpers and null implementations
+live in Neo.Logging.Abstractions; the default factory, console provider and DI
+registration remain in Neo.Logging. Namespaces stay unchanged; rebuild consumers
+after the assembly split. See the [integrated sample](https://github.com/marinasundstrom/neoCLR/blob/main/samples/extensions/README.md).

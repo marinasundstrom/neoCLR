@@ -154,20 +154,3 @@ internal class AggregateScope : Disposable {
         handles = ArrayList<Disposable>()
     }
 }
-
-/// Typed adapter that obtains its category once from TypeInfo.DisplayName.
-/// Generic/nested category spelling follows neoCLR's current type display contract.
-public class DefaultLogger<T> : Logger<T> {
-    private val inner: Logger
-
-    /// Creates a typed logger through the supplied factory; does not own the factory.
-    init(factory: LoggerFactory) {
-        inner = factory.CreateLogger(typeof(T).DisplayName)
-    }
-
-    func IsEnabled(level: LogLevel) -> bool => inner.IsEnabled(level)
-    func Log<TState>(level: LogLevel, eventId: EventId, state: TState, error: Error?, formatter: (TState, Error?) -> string) {
-        inner.Log<TState>(level, eventId, state, error, formatter)
-    }
-    func BeginScope<TState>(state: TState) -> Disposable? => inner.BeginScope<TState>(state)
-}

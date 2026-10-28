@@ -10,9 +10,11 @@ text is preserved. `Localizer<T>` associates a catalogue with a resource type.
 
 ## JSON provider
 
-`JsonLocalizerProvider`, lookup interfaces, formatting, diagnostics and DI registration
-live in the separate `Neo.Localization.dll` assembly under `Neo.Localization`.
-It references System.Runtime, System.Data and Neo.DependencyInjection. The native
+`Neo.Localization.Abstractions.dll` owns the lookup/factory contracts, typed adapter,
+formatting and missing-key diagnostics and references only System.Runtime.
+`Neo.Localization.dll` owns JSON providers, loading errors and DI registration,
+referencing System.Runtime, System.Data, Neo.Localization.Abstractions and
+Neo.DependencyInjection.Abstractions. Namespaces remain Neo.Localization. The native
 reference includes their members. Replace old System.Localization imports and
 retention names and rebuild consumers; there is no old-name compatibility shim.
 See the [assembly boundary and migration](https://github.com/marinasundstrom/neoCLR/blob/main/docs/application-services.md).

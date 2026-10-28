@@ -1,0 +1,9 @@
+module Neo.DependencyInjection
+
+/// Reasons automatic constructor activation cannot prepare or invoke an implementation.
+public enum ActivationError {
+    UnsupportedType
+    MissingConstructor
+    AmbiguousConstructor
+    InvocationFailed
+}

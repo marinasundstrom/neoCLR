@@ -12,6 +12,9 @@ Neo.DependencyInjection/
     Neo.DependencyInjection.Tests.rvnproj
 ```
 
+Each component now has a second source project, `<Component>.Abstractions`,
+containing provider-neutral contracts and helpers. Implementation projects reference
+their abstractions; logging/localization DI integration references DI abstractions.
 A component can have several source projects and zero or more test projects.
 Neo.Localization and Neo.Logging use the same structure. Neo.Configuration is
 a planned follow-up, not an implemented API. See the

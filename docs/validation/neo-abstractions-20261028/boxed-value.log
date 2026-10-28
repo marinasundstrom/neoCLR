@@ -1,0 +1,7 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.23s
+     Running unittests src/lib.rs (target/debug/deps/neoclr_codegen-6c1fc4e94a4da28d)
+
+running 1 test
+test selection::composition_admission_tests::boxed_value_interface_targets_are_retained_without_a_constructor ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 253 filtered out; finished in 0.18s

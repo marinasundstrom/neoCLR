@@ -1,0 +1,33 @@
+module Examples.Extensions
+
+import System.*
+import System.Globalization.*
+import System.Result.*
+import Neo.DependencyInjection.*
+import Neo.Localization.*
+import Neo.Logging.*
+
+func Run() -> Result<unit, ServiceError> {
+    let services: ServiceCollection = DefaultServiceCollection()
+    _ = services.AddLogging()?
+    let resources = JsonLocalizerProvider("resources")
+    let localizers: LocalizerFactory = JsonLocalizerFactory(resources, Culture.Invariant)
+    _ = services.AddLocalization(localizers)?
+    _ = services.AddScoped<GreetingService>()?
+
+    use root = services.Build()?
+    let logging = root.GetRequiredService<LoggerFactory>()?
+    logging.AddConsole()
+    use scope = root.CreateScope()?
+    let greeting = scope.GetRequiredService<GreetingService>()?
+    greeting.Greet("Ada")
+    return Ok(())
+}
+
+func Main() -> int {
+    let Ok(_) = Run() else {
+        Console.WriteLine("Could not compose the extension services.")
+        return 1
+    }
+    return 0
+}
