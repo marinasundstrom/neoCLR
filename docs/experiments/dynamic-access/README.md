@@ -44,3 +44,9 @@ override DefaultReader.Read. It prints `7` through a base-typed receiver. Changi
 only the override requirement to PublicProperties produces DAM2006 while preserving
 dispatch and the caller's inferred constructor requirement. See
 [override evidence](../../validation/dynamic-access-overrides-20261028/README.md).
+
+The `generic-base` project changes Reader to Reader<T> and overrides it in a
+nongeneric DefaultReader : Reader<int>. Its second parameter exercises substitution
+from T to int. Matching annotations print `7`; changing only the override's annotation
+to PublicProperties now reports DAM2006, which the previous backend skipped.
+See [closed-base qualification](../../validation/dynamic-access-generic-base-20261028/README.md).

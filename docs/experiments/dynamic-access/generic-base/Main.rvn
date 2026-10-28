@@ -1,0 +1,28 @@
+import System.*
+import System.Diagnostics.CodeAnalysis.*
+import System.Introspection.*
+
+public class Model {
+    init() { }
+}
+
+public open class Reader<T> {
+    init() { }
+    virtual func Read([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] type: TypeInfo, value: T) -> int {
+        return 5
+    }
+}
+
+public class DefaultReader : Reader<int> {
+    init() { }
+    override func Read([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] type: TypeInfo, value: int) -> int {
+        return value
+    }
+}
+
+func Main() -> int {
+    let reader: Reader<int> = DefaultReader()
+    let value = reader.Read(typeof(Model), 7)
+    Console.WriteLine(value)
+    return if value == 7 { 0 } else { 1 }
+}

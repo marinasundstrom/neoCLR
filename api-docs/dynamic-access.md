@@ -24,5 +24,6 @@ requirements as their interface declarations. The native backend reports `DAM200
 on mismatches, including missing annotations; it does not silently strengthen the
 interface contract or retain extra implementation bodies. Nongeneric reference-class
 overrides are checked against their nearest base declaration with `DAM2006`, including
-abstract declarations. Generic mappings, generic ancestry and value-type overrides
-remain outside these checks.
+abstract declarations and closed generic base classes of nongeneric derived classes.
+Generic derived classes, generic methods/interface mappings and value-type overrides
+remain outside these checks. This does not add generic-parameter annotations.

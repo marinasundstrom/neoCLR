@@ -166,15 +166,8 @@ pub fn override_contract_diagnostics(module: &Module) -> Result<BTreeSet<String>
             {
                 continue;
             }
-            let chain = crate::inheritance::lineage(module, owner)?;
-            if chain.iter().any(|base| {
-                !matches!(base, Type::Named(_))
-                    || module
-                        .type_definition(base)
-                        .is_some_and(|t| !t.generic_parameters.is_empty())
-            }) {
-                continue;
-            }
+            // A verified nongeneric owner has closed ancestry. The shared lookup
+            // substitutes each constructed base before matching the exact slot.
             let Some(contract) =
                 crate::inheritance::inherited_method(module, owner, implementation)?
             else {
@@ -1039,5 +1032,56 @@ mod tests {
         assert!(!diagnostics.iter().next().unwrap().contains("Model.Require"));
         m.functions[0].body = vec![Op::Return];
         assert!(analyze(&m, "Main").unwrap().types.is_empty());
+    }
+    #[test]
+    fn closed_generic_base_contracts_use_substituted_overload_signatures() {
+        let mut m = override_fixture();
+        m.types[4].generic_parameters = vec![Some("T".into())];
+        m.functions[3].owner = Some(m.types[4].open_type());
+        m.types[3].base = Some(Type::Constructed {
+            definition: "Other".into(),
+            arguments: vec![Type::Int32],
+        });
+        m.functions[3].parameters.push(Type::TypeParameter(0));
+        m.functions[4].parameters.push(Type::Int32);
+        let mut overload = m.functions[3].clone();
+        overload.parameters[1] = Type::String;
+        overload.custom_attributes[0].arguments = vec![AttributeArgument::Int32(512)];
+        m.functions.push(overload);
+        assert!(override_contract_diagnostics(&m).unwrap().is_empty());
+        m.functions[4].custom_attributes[0].arguments = vec![AttributeArgument::Int32(1)];
+        let diagnostics = override_contract_diagnostics(&m).unwrap();
+        assert_eq!(diagnostics.len(), 1);
+        assert!(diagnostics.iter().next().unwrap().contains("requires 3"));
+        // The String overload has its own annotation; do not select by name alone.
+        m.functions[4].parameters[1] = Type::String;
+        m.functions[4].custom_attributes[0].arguments = vec![AttributeArgument::Int32(512)];
+        assert!(override_contract_diagnostics(&m).unwrap().is_empty());
+    }
+
+    #[test]
+    fn closed_generic_ancestry_composes_substitutions_across_levels() {
+        let mut m = override_fixture();
+        m.types[4].generic_parameters = vec![Some("T".into())];
+        m.functions[3].owner = Some(m.types[4].open_type());
+        let mut middle = m.types[4].clone();
+        middle.name = "Middle".into();
+        middle.definition.as_mut().unwrap().index = 5;
+        middle.base = Some(Type::Constructed {
+            definition: "Other".into(),
+            arguments: vec![Type::ArrayRef(Box::new(Type::TypeParameter(0)))],
+        });
+        m.types.push(middle);
+        m.types[3].base = Some(Type::Constructed {
+            definition: "Middle".into(),
+            arguments: vec![Type::Int32],
+        });
+        m.functions[3].parameters.push(Type::TypeParameter(0));
+        m.functions[4]
+            .parameters
+            .push(Type::ArrayRef(Box::new(Type::Int32)));
+        assert!(override_contract_diagnostics(&m).unwrap().is_empty());
+        m.functions[4].custom_attributes.clear();
+        assert_eq!(override_contract_diagnostics(&m).unwrap().len(), 1);
     }
 }

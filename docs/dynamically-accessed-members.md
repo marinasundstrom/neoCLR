@@ -177,9 +177,11 @@ strengthening a requirement is a mismatch. Every override in a chain is checked
 against its nearest declaration, including abstract/reabstracted declarations.
 
 The pass uses the existing inheritance slot lookup shared with verifier validation.
-It checks nongeneric nominal reference-class methods whose ancestry is nongeneric.
+It checks nongeneric nominal reference-class methods, including closed generic
+base classes. The shared slot lookup substitutes each ancestor before matching the
+parameter signature; generic derived classes and generic methods remain excluded.
 It inspects the supplied load set, without rooting bodies, widening retention or
-changing virtual dispatch. Generic ancestry/methods, value-type overrides and
+changing virtual dispatch. Open generic owners/methods, value-type overrides and
 runtime-owned implicit Object adaptations remain outside this check. The latter
 currently expose no TypeInfo parameter contracts. DAM2004 still describes the
 separate implementation-body traversal gap.
@@ -188,3 +190,20 @@ This adds metadata traversal, not runtime code. No performance improvement is cl
 [Override qualification](validation/dynamic-access-overrides-20261028/README.md)
 compares matching and mismatching native consumers and checks existing inheritance
 behavior. Runtime Contract settings, attribute transport and public APIs are unchanged.
+
+## Closed generic base classes (2026-10-28)
+
+DAM2006 now includes an override on a nongeneric derived class whose base is a
+closed generic type, such as `DefaultReader : Reader<int>`. The existing verifier
+slot lookup substitutes the base's type arguments before selecting the overridden
+method, including overloads and multiple ancestry levels. The earlier blanket skip
+for constructed ancestors is removed. A verified nongeneric derived type provides
+a closed ancestry context; this does not add annotations on generic parameters.
+
+The same exact-match rule and diagnostic behavior apply. TypeInfo parameter
+requirements remain the supported annotation target. Generic derived classes,
+generic methods and generic interface mappings remain outside the check. No new
+retention roots, runtime behavior, public APIs or compiler encodings are introduced.
+[Qualification](validation/dynamic-access-generic-base-20261028/README.md) covers
+substituted signatures, overload distinction, nested substitutions and native
+matching/mismatching controls. No performance improvement is claimed.

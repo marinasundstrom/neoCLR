@@ -130,7 +130,9 @@ admitted by project retention files also seed annotation analysis; metadata-only
 policies do not gain invocation rights. Nongeneric class/interface parameter
 annotation mismatches are reported as `DAM2005`. Nongeneric reference-class overrides
 are checked against their nearest base declaration with `DAM2006`; generic mappings,
-generic ancestry and value-type overrides remain outside these checks.
+generic derived classes and value-type overrides remain outside these checks.
+Closed generic base classes of nongeneric derived classes are included in DAM2006;
+this does not add generic-parameter annotations.
 
 Use matching compiler and library builds for native JSON, attributes and reflection.
 Qualified examples cover specific supported shapes; they do not imply unrestricted
