@@ -11,6 +11,7 @@ p = argparse.ArgumentParser(description=__doc__)
 p.add_argument('--address-sanitizer', action='store_true', help='Also attempt ASan/UBSan; retain unsupported/time-out outcomes as failures')
 p.add_argument('--compiled-workers', action='store_true', help='Compile the optional shared compiler coordinator')
 p.add_argument('--thread-sanitizer', action='store_true')
+p.add_argument('--trace-workers', action='store_true', help='Compile optional worker trace hooks; ordinary constructor still disables recording')
 p.add_argument('--output', type=Path, required=True)
 a = p.parse_args()
 out = a.output.resolve()
@@ -21,7 +22,7 @@ sources = [root/'runtime/native/gc/native-gc.c', root/'runtime/native/gc/root-pr
 report = dict(passed=False, platform=platform.platform(), commands=[],
               meaning='POSIX bounded pool with gated managed access and explicit capture/result roots; no generated-code or HTTP integration.',
               inputs={str(f.relative_to(root)):hashlib.sha256(f.read_bytes()).hexdigest() for f in
-                      [*sources, *list((root/'runtime/native/gc').glob('*.h')), root/'runtime/native/workers/native-workers.h', root/'runtime/native/workers/compiled-workers.inc', here/'benchmark.c', here/'validate.py']})
+                      [*sources, *list((root/'runtime/native/gc').glob('*.h')), *list((root/'runtime/native/workers').glob('*.h')), root/'runtime/native/workers/compiled-workers.inc', here/'benchmark.c', here/'validate.py']})
 cc = ['clang']
 if platform.system() == 'Darwin':
     cc = [subprocess.check_output(['xcrun', '--find', 'clang'], text=True).strip(),
@@ -36,6 +37,7 @@ try:
         command = [*cc,'-std=c11','-O2','-Wall','-Wextra','-Werror','-pthread','-DNEOCLR_NATIVE_GC',
                    '-I',str(root/'runtime/native/gc'), '-I', str(root/'runtime/native/workers'), *map(str,sources),*extra,'-o',str(out/name)]
         if a.compiled_workers: command.append('-DNEOCLR_WORKER_GC')
+        if a.trace_workers: command.append('-DNEOCLR_WORKER_TRACE')
         for cmd in [command, [str(out/name)]]:
             try:
                 result = subprocess.run(cmd,capture_output=True,text=True,timeout=60)

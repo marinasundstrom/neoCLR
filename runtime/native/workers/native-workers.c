@@ -1,5 +1,5 @@
 #define _POSIX_C_SOURCE 200809L
-#include "native-workers.h"
+#include "native-worker-trace.h"
 #include <pthread.h>
 #include <stdatomic.h>
 #include <stdlib.h>
@@ -45,10 +45,21 @@ struct neoclr_worker_job {
     void *native_state;
 };
 struct compiled_participant;
+#ifdef NEOCLR_WORKER_TRACE
+struct worker_start { struct neoclr_workers *pool; unsigned lane; };
+struct trace_lane { size_t count; uint64_t attempted, dropped; };
+#endif
 struct root { uint64_t generation; void *value; };
 struct neoclr_workers {
     uint64_t identity, submission, settlement;
     pthread_t owner, threads[THREADS];
+#ifdef NEOCLR_WORKER_TRACE
+    struct worker_start starts[THREADS];
+    neoclr_worker_trace_event *trace_events;
+    size_t trace_capacity;
+    uint64_t trace_origin;
+    struct trace_lane trace_lanes[THREADS + 1];
+#endif
     pthread_mutex_t gate;
     pthread_cond_t ready, completion;
     unsigned thread_count, capacity, readers, mutators, waiting_writers;
@@ -95,6 +106,40 @@ struct neoclr_workers {
 };
 static _Atomic uint64_t next_identity = 1;
 static _Thread_local neoclr_worker_job *entered, *executing, *reading, *mutating;
+#ifdef NEOCLR_WORKER_TRACE
+static _Thread_local neoclr_workers *trace_pool;
+static _Thread_local unsigned trace_worker;
+static uint64_t trace_now(void) {
+    struct timespec t;
+    if (clock_gettime(CLOCK_MONOTONIC, &t)) return 0;
+    return (uint64_t)t.tv_sec * UINT64_C(1000000000) + (uint64_t)t.tv_nsec;
+}
+/* External emissions require the existing gate. Each worker is the sole writer
+ * to its lane, including RETURN outside that gate. No reader until joined. */
+static void trace_emit(neoclr_workers *p, unsigned kind, neoclr_worker_job *j, unsigned detail) {
+    if (!p->trace_events) return;
+    unsigned lane = trace_pool == p ? trace_worker : 0;
+    struct trace_lane *b = &p->trace_lanes[lane];
+    uint64_t sequence = ++b->attempted;
+    if (b->count == p->trace_capacity) { ++b->dropped; return; }
+    uint64_t ns = trace_now();
+    if (!ns) { ++b->dropped; return; }
+    p->trace_events[lane * p->trace_capacity + b->count++] =
+        (neoclr_worker_trace_event){ns, sequence, j ? j->generation : 0,
+            kind, j ? (uint32_t)(j - p->jobs) : UINT32_MAX, detail};
+}
+int neoclr_workers_trace_view(neoclr_workers *p, unsigned lane, neoclr_worker_trace_view *out) {
+    if (!out || !pthread_equal(p->owner, pthread_self()) || !p->joined ||
+        !p->trace_events || lane > p->thread_count) return 0;
+    struct trace_lane *b = &p->trace_lanes[lane];
+    *out = (neoclr_worker_trace_view){p->trace_events + lane * p->trace_capacity,
+        p->identity, p->trace_origin, b->attempted, b->dropped, b->count,
+        p->trace_capacity, p->thread_count};
+    return 1;
+}
+#else
+#define trace_emit(p, kind, job, detail) ((void)0)
+#endif
 static void lock(neoclr_workers *p) { if (entered || reading || mutating || pthread_mutex_lock(&p->gate)) abort(); }
 static void unlock(neoclr_workers *p) { if (pthread_mutex_unlock(&p->gate)) abort(); }
 /* Metadata remains mutex-protected. Only operations touching arena/object bytes
@@ -140,23 +185,37 @@ static void complete(neoclr_worker_job *j) {
     if (j->pool->settlement == UINT64_MAX) abort();
     j->completion_order = ++j->pool->settlement;
     j->state = DONE;
+    trace_emit(j->pool, NEOCLR_TRACE_SETTLE, j, (unsigned)j->outcome);
     pthread_cond_broadcast(&j->pool->completion);
 }
 static void *run(void *argument) {
+#ifdef NEOCLR_WORKER_TRACE
+    struct worker_start *start = argument;
+    neoclr_workers *p = start->pool;
+    trace_pool = p; trace_worker = start->lane;
+#else
     neoclr_workers *p = argument;
+#endif
+    trace_emit(p, NEOCLR_TRACE_START, NULL, 0);
     for (;;) {
         lock(p);
         neoclr_worker_job *j = NULL;
         while (!j && !p->closing) {
             for (unsigned i = 0; i < p->capacity; i++)
                 if (p->jobs[i].state == QUEUED && (!j || p->jobs[i].order < j->order)) j = &p->jobs[i];
-            if (!j && pthread_cond_wait(&p->ready, &p->gate)) abort();
+            if (!j) {
+                trace_emit(p, NEOCLR_TRACE_IDLE_BEGIN, NULL, 0);
+                if (pthread_cond_wait(&p->ready, &p->gate)) abort();
+                trace_emit(p, NEOCLR_TRACE_IDLE_END, NULL, 0);
+            }
         }
-        if (!j) { unlock(p); return NULL; }
+        if (!j) { trace_emit(p, NEOCLR_TRACE_STOP, NULL, 0); unlock(p); return NULL; }
         j->state = RUNNING;
+        trace_emit(p, NEOCLR_TRACE_RUN, j, 0);
         unlock(p);
         executing = j;
         int outcome = j->callback(j, j->native_state);
+        trace_emit(p, NEOCLR_TRACE_RETURN, j, 0);
         executing = NULL;
         if (entered || reading || mutating) abort();
         lock(p);
@@ -170,7 +229,15 @@ static void *run(void *argument) {
         unlock(p);
     }
 }
+#ifdef NEOCLR_WORKER_TRACE
 neoclr_workers *neoclr_workers_create(unsigned workers, unsigned capacity, size_t bytes) {
+    return neoclr_workers_create_traced(workers, capacity, bytes, 0);
+}
+neoclr_workers *neoclr_workers_create_traced(unsigned workers, unsigned capacity, size_t bytes, size_t events) {
+    if (events > 65536) return NULL;
+#else
+neoclr_workers *neoclr_workers_create(unsigned workers, unsigned capacity, size_t bytes) {
+#endif
     if (!workers || workers > THREADS || !capacity || capacity > JOBS || bytes < 256 || (bytes & 7)) return NULL;
     neoclr_workers *p = calloc(1, sizeof(*p));
     if (!p) return NULL;
@@ -195,9 +262,24 @@ neoclr_workers *neoclr_workers_create(unsigned workers, unsigned capacity, size_
         pthread_mutex_destroy(&p->gate); free(p->context.text.data); free(p); return NULL;
     }
 #endif
+#ifdef NEOCLR_WORKER_TRACE
+    if (events) {
+        p->trace_origin = trace_now();
+        p->trace_events = calloc((workers + 1) * events, sizeof(*p->trace_events));
+        if (!p->trace_origin || !p->trace_events) {
+            neoclr_workers_close(p); neoclr_workers_destroy(p); return NULL;
+        }
+        p->trace_capacity = events;
+    }
+#endif
     for (unsigned i = 0; i < capacity; i++) p->jobs[i].pool = p;
     for (; p->thread_count < workers; p->thread_count++) {
+#ifdef NEOCLR_WORKER_TRACE
+        p->starts[p->thread_count] = (struct worker_start){p, p->thread_count + 1};
+        if (pthread_create(&p->threads[p->thread_count], NULL, run, &p->starts[p->thread_count])) {
+#else
         if (pthread_create(&p->threads[p->thread_count], NULL, run, p)) {
+#endif
             neoclr_workers_close(p); neoclr_workers_destroy(p); return NULL;
         }
     }
@@ -316,6 +398,7 @@ int neoclr_workers_submit(neoclr_workers *p, neoclr_worker_handle capture,
         j->order = ++p->submission; ++j->generation; j->capture = r->value; j->callback = callback;
         j->native_state = native_state; j->cancelled = 0; j->delivered = 0; j->result = (neoclr_worker_value){0};
         j->state = QUEUED; *out = (neoclr_worker_handle){p->identity, j->generation, i, 2};
+        trace_emit(p, NEOCLR_TRACE_ENQUEUE, j, 0);
         pthread_cond_signal(&p->ready); ok = 1; break;
     }
     unlock(p); return ok;
@@ -324,6 +407,7 @@ int neoclr_workers_cancel(neoclr_workers *p, neoclr_worker_handle h) {
     lock(p); neoclr_worker_job *j = job_for(p, h); int ok = j && j->state != DONE && !j->cancelled;
     if (ok) {
         j->cancelled = 1;
+        trace_emit(p, NEOCLR_TRACE_CANCEL, j, 0);
         if (j->state == QUEUED) { j->capture = NULL; j->outcome = NEOCLR_WORKER_CANCELLED; complete(j); }
     }
     if (ok) pthread_cond_broadcast(&p->completion);
@@ -525,6 +609,8 @@ int neoclr_workers_close(neoclr_workers *p) {
     p->closing = 1;
     for (unsigned i = 0; i < p->capacity; i++) {
         neoclr_worker_job *j = &p->jobs[i];
+        if ((j->state == RUNNING || j->state == QUEUED) && !j->cancelled)
+            trace_emit(p, NEOCLR_TRACE_CANCEL, j, 1);
         if (j->state == RUNNING) j->cancelled = 1;
         if (j->state == QUEUED) {
             j->cancelled = 1; j->capture = NULL; j->outcome = NEOCLR_WORKER_CANCELLED; complete(j);
@@ -562,6 +648,9 @@ int neoclr_workers_destroy(neoclr_workers *p) {
     pthread_cond_destroy(&p->compiled_ready);
 #endif
     pthread_cond_destroy(&p->completion); pthread_cond_destroy(&p->ready); pthread_mutex_destroy(&p->gate);
+#ifdef NEOCLR_WORKER_TRACE
+    free(p->trace_events);
+#endif
     free(p->context.text.data); free(p); return 1;
 }
 

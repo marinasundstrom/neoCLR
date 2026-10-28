@@ -1,0 +1,35 @@
+{
+  "identical": true,
+  "commands": [
+    [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+      "-isysroot",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+      "-std=c11",
+      "-O2",
+      "-pthread",
+      "-DNEOCLR_NATIVE_GC",
+      "-I",
+      "runtime/native/workers",
+      "-S",
+      "target/execution-trace-20261028/opt-in/baseline-workers.c",
+      "-o",
+      "target/execution-trace-20261028/opt-in/baseline.s"
+    ],
+    [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+      "-isysroot",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+      "-std=c11",
+      "-O2",
+      "-pthread",
+      "-DNEOCLR_NATIVE_GC",
+      "-I",
+      "runtime/native/workers",
+      "-S",
+      "runtime/native/workers/native-workers.c",
+      "-o",
+      "target/execution-trace-20261028/opt-in/default.s"
+    ]
+  ]
+}

@@ -20,10 +20,13 @@ HTTP execution still need ownership and performance qualification with both sync
 and concurrent GC. Adoption will be incremental and measurement-driven; this is
 not an announced runtime capability or a commitment to replicate Go.
 
-A proposed opt-in execution tracer would show runnable, executing and waiting work
-alongside I/O, lazy compilation and GC phases. The first planned slice is bounded
-recording and timeline export, with explicit event-loss and overhead measurements,
-to guide the scheduler comparison. The tracer is not implemented yet.
+The first private execution-tracer slice records worker activity, queue transitions,
+callback intervals and cancellation with bounded buffers and offline timeline
+export. It reports lost events and requires an instrumented build plus per-pool opt-in:
+tiny-job overhead is material, so normal builds compile out the recorder.
+A correlated overview including async suspension, I/O, lazy compilation and GC
+phases is still planned; the worker trace does not yet cover production HTTP.
+[Implementation and qualification](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/execution-trace/README.md).
 
 [Investigation and benchmark plan](https://github.com/marinasundstrom/neoCLR/blob/main/docs/design/go-inspired-scheduling.md)
 
