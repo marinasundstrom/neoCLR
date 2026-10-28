@@ -7,7 +7,7 @@ from pathlib import Path
 spec=importlib.util.spec_from_file_location('async_export',Path(__file__).with_name('async-export.py'))
 async_export=importlib.util.module_from_spec(spec);spec.loader.exec_module(async_export)
 def convert(raw):
-    if raw['schema']!='session-1' or raw['clock']!='CLOCK_MONOTONIC':raise ValueError('unsupported session clock/schema')
+    if raw['schema']!='session-1' or raw['clock'] not in ('CLOCK_MONOTONIC', 'mach_absolute_time/ns'):raise ValueError('unsupported session clock/schema')
     if sorted(l['lane'] for l in raw['lanes'])!=list(range(raw['lane_count'])):raise ValueError('missing producer lane')
     any_loss=any(l['dropped'] for l in raw['lanes'])
     origin=raw['origin_ns'];output=[];groups={};pending={};unknown=0;lost=0;tracks={};requests=epochs=0

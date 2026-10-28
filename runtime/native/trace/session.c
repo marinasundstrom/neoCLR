@@ -1,5 +1,6 @@
 #define _POSIX_C_SOURCE 200809L
 #include "session.h"
+#include "clock.h"
 #include <pthread.h>
 #include <stdatomic.h>
 #include <stdlib.h>
@@ -18,9 +19,7 @@ static _Atomic uint64_t identities=1;
 static _Thread_local neoclr_trace_session *current;
 static _Thread_local unsigned current_lane;
 static uint64_t now(void) {
-    struct timespec t;
-    if (clock_gettime(CLOCK_MONOTONIC,&t)) return 0;
-    return (uint64_t)t.tv_sec*UINT64_C(1000000000)+(uint64_t)t.tv_nsec;
+    return neoclr_trace_clock_ns();
 }
 neoclr_trace_session *neoclr_trace_create(unsigned lanes,size_t capacity) {
     if (!lanes || lanes>16 || !capacity || capacity>65536) return NULL;

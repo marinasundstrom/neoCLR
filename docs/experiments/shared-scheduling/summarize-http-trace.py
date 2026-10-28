@@ -32,6 +32,8 @@ for trial in results['trials']:
     kinds = Counter()
     yielded = {}; parked = {}; completed = {}; gc = []
     transfers = []; finished = []; ready = []; requests = []
+    queued = {}; dequeued = {}; dispatch = {}; queue_wait = []; dispatch_setup = []
+    root_hold = []; high_water = 0; admitted = abandoned = io_dispatch = 0
     previous = 0
     for index, (ns, sequence, domain, kind, source, subject, related, detail) in enumerate(events):
         assert sequence == index+1 and ns >= previous
@@ -55,10 +57,37 @@ for trial in results['trials']:
             elif kind == 101:
                 assert gc, 'unmatched GC request end'
                 requests.append(ns-gc.pop())
+        elif domain == 4:
+            if kind == 200:
+                assert key not in queued
+                queued[key] = ns; admitted += 1
+                high_water = max(high_water, len(queued))
+            elif kind == 201:
+                assert key in queued, 'dequeue without admitted runnable'
+                queue_wait.append(ns-queued.pop(key)); dequeued[key] = ns
+            elif kind == 202:
+                if key in dequeued: dispatch_setup.append(ns-dequeued.pop(key))
+                else: io_dispatch += 1
+                ticket = (source, related)
+                assert ticket not in dispatch
+                dispatch[ticket] = ns
+            elif kind == 203:
+                assert key in dispatch, 'release without dispatch ownership'
+                root_hold.append(ns-dispatch.pop(key))
+            elif kind == 204:
+                assert key in queued
+                queued.pop(key); abandoned += 1
+            else: raise AssertionError('unknown scheduler event')
     assert not gc
+    assert not queued and not dequeued and not dispatch, 'incomplete scheduler ownership lifecycle'
     stacks = next(line for line in trial['stderr'].splitlines() if line.startswith('ASYNC '))
     switches = next(line for line in trial['stderr'].splitlines() if line.startswith('OS_SWITCHES '))
     rows.append(dict(mode=trial['mode'], sample=trial['sample'], events=len(events), kinds=dict(kinds),
+                     clock=trace['clock'], schedulerAdmitted=admitted, schedulerAbandoned=abandoned,
+                     schedulerQueueHighWater=high_water, otherDispatches=io_dispatch,
+                     schedulerQueueResidence=distribution(queue_wait),
+                     schedulerDequeueToDispatch=distribution(dispatch_setup),
+                     schedulerDispatchRootHold=distribution(root_hold),
                      instrumentationEventStorageBytes=trace['capacity']*(trace['recordBytes']+trace['asyncRecordBytes']),
                      parkedCarrierReturn=distribution(transfers), finishedCarrierReturn=distribution(finished),
                      completedOperationToCarrierEnter=distribution(ready), gcRequest=distribution(requests),
@@ -69,7 +98,8 @@ report = dict(scope=__doc__, source=str(a.results.resolve()), rows=rows,
               limitations=['Traced short qualification runs, not headline performance or capacity.',
                            'Park/finish to leave includes trace emission and swapcontext return; root parking occurs before its start.',
                            'Completion to enter includes pump selection; not pure CPU context-switch cost.',
-                           'Native carrier events do not cover every managed state-machine await or Task.Run queue interval.',
+                           'Runnable queue events cover shared scheduler submissions, not every state-machine await or external I/O wait.',
+                           'Dispatch-root release can precede callback execution; root-hold duration is not execution time.',
                            'OS switches cover the whole process including JIT/GC helper threads.',
                            'Process RSS includes JIT/compiler memory; virtual stack reservation is not resident memory.'])
 a.output.write_text(json.dumps(report, indent=2)+'\n')

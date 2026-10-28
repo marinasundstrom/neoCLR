@@ -5,7 +5,8 @@ import hashlib
 import json
 from pathlib import Path
 import subprocess
-p=argparse.ArgumentParser(description=__doc__);p.add_argument('--output',type=Path,required=True);a=p.parse_args()
+p=argparse.ArgumentParser(description=__doc__);p.add_argument('--output',type=Path,required=True)
+p.add_argument('--trace',action='store_true');a=p.parse_args()
 out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
 here=Path(__file__).resolve().parent;root=here.parents[2]
 native=root/'runtime/native';legacy=root/'docs/experiments/aot-console';live=native/'gc/concurrent'
@@ -26,10 +27,12 @@ try:
             defs=['-DNEOCLR_NATIVE_GC'] if mode=='sync' else ['-D'+d for d in policy['defines']]
             gc=[native/'gc/native-gc.c'] if mode=='sync' else [out/'live-gc.c',live/'gate.c']
             binary=out/f'scheduler-{mode}-{variant}'
+            trace=['-DNEOCLR_EXECUTION_TRACE','-I',native/'trace',native/'trace/session.c'] if a.trace else []
+            test=here/'scheduler-trace-test.c' if a.trace else legacy/'socket-scheduler-test.c'
             run([*cc,*flags,*defs,'-DNEOCLR_SHARED_READY_QUEUE','-DNEOCLR_SCHEDULER_DIAGNOSTICS','-pthread',
-                 '-I',legacy,'-I',native/'gc','-I',live,legacy/'socket-scheduler-test.c',legacy/'socket-listener.c',
+                 *trace,'-I',legacy,'-I',native/'gc','-I',live,test,legacy/'socket-listener.c',
                  legacy/'task-queue.c',native/'memory/text-arena.c',native/'gc/root-probe.c',*gc,'-o',binary]);run([binary])
-    files=[Path(__file__),here/'queue-test.c',legacy/'socket-listener.c',legacy/'socket-listener.h',legacy/'socket-scheduler-test.c',legacy/'task-queue.c',out/'live-gc.c']
+    files=[Path(__file__),here/'queue-test.c',here/'scheduler-trace-test.c',legacy/'socket-listener.c',legacy/'socket-listener.h',legacy/'socket-scheduler-test.c',legacy/'task-queue.c',out/'live-gc.c']
     files += [p for p in native.rglob('*') if p.suffix in ('.c','.h','.inc','.py','.json')]
     report['inputs']={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in files}
     report['passed']=True

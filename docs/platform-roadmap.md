@@ -1,5 +1,12 @@
 # neoCLR platform roadmap
 
+**Shared queue profiling (2026-10-28):** [Precise session/queue traces](validation/shared-scheduler-queue-trace-20261028/README.md)
+now capture all HTTP Task.Run admissions and dispatch-root lifetimes under both
+collectors, with teardown and compiled-out checks. Every short case reaches only
+queue depth one; concurrent JSON is worse in its single diagnostic candidate run.
+Next create many-endpoint mixed-I/O pressure before drawing scheduling/GC conclusions;
+retained-memory, full execution cost, tracing overhead and AOT comparisons stay open.
+
 **Shared scheduler HTTP qualification (2026-10-28):** [Generated HTTP checks](validation/shared-scheduling-http-20261028/README.md)
 pass shared-capture Task.Run handlers with both collectors and both queue paths.
 Actual native carrier layout and bounded owner async/GC traces are retained. The

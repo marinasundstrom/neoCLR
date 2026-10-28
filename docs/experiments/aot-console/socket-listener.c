@@ -7,6 +7,10 @@
 #include "native-gc.h"
 #endif
 #include <stdatomic.h>
+#include "../../../runtime/native/trace/session.h"
+#ifdef NEOCLR_EXECUTION_TRACE
+static _Atomic uint64_t next_trace_scope = 1;
+#endif
 #ifndef _WIN32
 #include <poll.h>
 #endif
@@ -90,6 +94,8 @@ static int take_runnable(neoclr_socket_scope *scope, uint64_t *callback) {
     *callback = item->callback;
     free(item);
 #endif
+    NEOCLR_TRACE(NEOCLR_TRACE_SCHEDULER, NEOCLR_TRACE_SCHEDULE_DEQUEUE,
+        scope->trace_identity, *callback, 0, 0);
     return 1;
 }
 #endif
@@ -163,6 +169,10 @@ int32_t neoclr_socket_scope_enter_v1(neoclr_socket_scope *scope, neoclr_aot_cont
     for (neoclr_socket_scope *s = head; s; s = s->previous) if (s == scope) return 3;
     if (neoclr_os_start()) return 3;
     memset(scope, 0, sizeof(*scope));
+#ifdef NEOCLR_EXECUTION_TRACE
+    scope->trace_identity = atomic_fetch_add(&next_trace_scope, 1);
+    if (!scope->trace_identity || scope->trace_identity == UINT64_MAX) abort();
+#endif
 #ifdef NEOCLR_SHARED_READY_QUEUE
     neoclr_ready_init(&scope->runnable,scope->runnable_items,NEOCLR_GC_HOST_ROOT_LIMIT);
 #endif
@@ -186,12 +196,17 @@ int32_t neoclr_socket_scope_leave_v1(neoclr_socket_scope *scope) {
 #ifdef NEOCLR_NATIVE_GC
 #ifdef NEOCLR_SHARED_READY_QUEUE
     neoclr_ready_item item;
-    while (neoclr_ready_pop(&scope->runnable,0,&item))
+    while (neoclr_ready_pop(&scope->runnable,0,&item)) {
+        NEOCLR_TRACE(NEOCLR_TRACE_SCHEDULER, NEOCLR_TRACE_SCHEDULE_ABANDON,
+            scope->trace_identity, item.identity, 0, 0);
         if (neoclr_gc_host_root_release_v1(scope->context,item.identity)) status=3;
+    }
 #else
     while (scope->runnable_head) {
         neoclr_runnable *item = scope->runnable_head;
         scope->runnable_head = item->next;
+        NEOCLR_TRACE(NEOCLR_TRACE_SCHEDULER, NEOCLR_TRACE_SCHEDULE_ABANDON,
+            scope->trace_identity, item->callback, 0, 0);
         if (neoclr_gc_host_root_release_v1(scope->context, item->callback)) status = 3;
         free(item);
     }
@@ -756,6 +771,8 @@ int32_t neoclr_scheduler_submit_v1(neoclr_aot_context *context, uint64_t callbac
     else scope->runnable_head = item;
     scope->runnable_tail = item;
 #endif
+    NEOCLR_TRACE(NEOCLR_TRACE_SCHEDULER, NEOCLR_TRACE_SCHEDULE_ADMIT,
+        scope->trace_identity, root, order, 0);
     return 0;
 }
 
@@ -809,6 +826,8 @@ int32_t neoclr_scheduler_acquire_v1(neoclr_aot_context *context, uint64_t *deliv
     scope->scheduler_delivery = owned;
     scope->scheduler_boundary = boundary;
     *delivery = owned;
+    NEOCLR_TRACE(NEOCLR_TRACE_SCHEDULER, NEOCLR_TRACE_SCHEDULE_DISPATCH,
+        scope->trace_identity, source, owned, 0);
     return NEOCLR_SCHEDULER_READY;
 }
 int32_t neoclr_scheduler_complete_v1(neoclr_aot_context *context, uint64_t delivery,
@@ -823,6 +842,8 @@ int32_t neoclr_scheduler_complete_v1(neoclr_aot_context *context, uint64_t deliv
             if (f->context == context) return 3;
     }
     if (neoclr_gc_host_root_release_v1(context, delivery)) return 3;
+    NEOCLR_TRACE(NEOCLR_TRACE_SCHEDULER, NEOCLR_TRACE_SCHEDULE_RELEASE,
+        scope->trace_identity, delivery, 0, 0);
     scope->scheduler_delivery = 0;
     scope->scheduler_boundary = NULL;
     return 0;

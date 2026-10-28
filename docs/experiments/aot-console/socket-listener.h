@@ -17,6 +17,9 @@ typedef struct neoclr_dns_work neoclr_dns_work;
 typedef struct neoclr_runnable neoclr_runnable;
 #endif
 typedef struct neoclr_socket_scope {
+#ifdef NEOCLR_EXECUTION_TRACE
+    uint64_t trace_identity;
+#endif
     neoclr_aot_context *context;
     struct neoclr_socket_scope *previous;
     struct { uint64_t id; neoclr_socket_descriptor descriptor; int listener;

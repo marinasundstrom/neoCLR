@@ -2,11 +2,20 @@
 
 The third private slice joins owner-thread async events and collector events in
 one bounded native recording. It adds explicit producer registration, session
-identity, lane-local event ordering and one CLOCK_MONOTONIC time base. The
+identity, lane-local event ordering and one monotonic time base. On macOS, new
+captures use mach_absolute_time converted to nanoseconds, avoiding the observed
+microsecond quantization of CLOCK_MONOTONIC; other POSIX targets retain that clock.
+Exports identify the clock, and captures with different clocks must not be merged.
+The
 [worker](README.md) and [async](async-README.md) experiments remain controls.
 This is not a new scheduler, a public diagnostics API or EventPipe compatibility;
 the [Go/.NET comparison](../../design/go-inspired-scheduling.md#execution-tracer-proposed-first-slice)
 continues to guide the diagnostics design.
+
+The shared scheduler now emits runnable admission/dequeue, dispatch-root transfer/
+release and queued-abandonment events in domain 4. The HTTP summary correlates them;
+the older generic session exporter treats unsupported domains as unknown rather
+than inventing intervals. See [queue profiling qualification](../../validation/shared-scheduler-queue-trace-20261028/README.md).
 
 ## Session ownership
 

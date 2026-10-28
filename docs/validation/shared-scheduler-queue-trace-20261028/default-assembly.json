@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "variants": [
+    {
+      "mode": "baseline",
+      "identicalIgnoringFileDirective": true,
+      "assemblyHash": "584dac990da479ff99333f8eda3a3fd5e21482985b47f9872bc3346c1b6de9ae"
+    },
+    {
+      "mode": "shared",
+      "identicalIgnoringFileDirective": true,
+      "assemblyHash": "b1ea3bb657b7a2bc8fe8654a81f52dc484ef90d23ce83ccae20f9cbcf1fe4855"
+    }
+  ],
+  "baselineRevision": "fcc7904994c792481369047880fefa3bf481b9b9",
+  "compiler": "Apple clang version 17.0.0 (clang-1700.6.3.2)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin\n",
+  "flags": [
+    "-std=c11",
+    "-O2",
+    "-S",
+    "-DNEOCLR_NATIVE_GC"
+  ],
+  "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+  "currentSourceHash": "d585af36dc94f6c4fd9f99db58f5540ffb11a31fc63b1451785db4ab06b76d1f"
+}

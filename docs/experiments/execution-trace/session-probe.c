@@ -1,3 +1,4 @@
+#include "../../../runtime/native/trace/clock.h"
 #include "session.h"
 #define main async_main
 #include "async-probe.c"
@@ -22,7 +23,7 @@ int main(int argc,char **argv) {
     if(!capacity) return 0;
     CHECK(neoclr_trace_detach());CHECK(neoclr_trace_close(session));
     neoclr_trace_view view;CHECK(neoclr_trace_view_lane(session,0,&view));
-    printf("{\"schema\":\"session-1\",\"clock\":\"CLOCK_MONOTONIC\",\"session\":%llu,\"origin_ns\":%llu,\"lane_count\":1,\"lanes\":[{\"lane\":0,\"role\":%u,\"attempted\":%llu,\"dropped\":%llu,\"capacity\":%zu,\"events\":[",(unsigned long long)view.session,(unsigned long long)view.origin_ns,view.role,(unsigned long long)view.attempted,(unsigned long long)view.dropped,view.capacity);
+    printf("{\"schema\":\"session-1\",\"clock\":\"" NEOCLR_TRACE_CLOCK_NAME "\",\"session\":%llu,\"origin_ns\":%llu,\"lane_count\":1,\"lanes\":[{\"lane\":0,\"role\":%u,\"attempted\":%llu,\"dropped\":%llu,\"capacity\":%zu,\"events\":[",(unsigned long long)view.session,(unsigned long long)view.origin_ns,view.role,(unsigned long long)view.attempted,(unsigned long long)view.dropped,view.capacity);
     for(size_t i=0;i<view.count;i++) {
         const neoclr_trace_event *e=&view.events[i];
         printf("%s[%llu,%llu,%u,%u,%llu,%llu,%llu,%u]",i?",":"",(unsigned long long)e->ns,(unsigned long long)e->sequence,e->domain,e->kind,(unsigned long long)e->source,(unsigned long long)e->subject,(unsigned long long)e->related,e->detail);

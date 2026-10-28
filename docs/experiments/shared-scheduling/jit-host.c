@@ -1,3 +1,4 @@
+#include "../../../runtime/native/trace/clock.h"
 #include <sys/resource.h>
 #include <time.h>
 #ifdef NEOCLR_EXECUTION_TRACE
@@ -137,7 +138,7 @@ int32_t neoclr_jit_run_v1(const void *entry, int32_t with_args, int32_t argc, co
             !neoclr_trace_detach() || !neoclr_trace_close(trace)) abort();
         neoclr_trace_view view;
         if (!neoclr_trace_view_lane(trace, 0, &view)) abort();
-        fprintf(stderr, "TRACE {\"schema\":\"session-1\",\"clock\":\"CLOCK_MONOTONIC\","
+        fprintf(stderr, "TRACE {\"schema\":\"session-1\",\"clock\":\"" NEOCLR_TRACE_CLOCK_NAME "\","
             "\"origin_ns\":%llu,\"attempted\":%llu,\"dropped\":%llu,\"capacity\":%zu,"
             "\"asyncDropped\":%llu,\"recordBytes\":%zu,\"asyncRecordBytes\":%zu,\"events\":[",
             (unsigned long long)view.origin_ns, (unsigned long long)view.attempted,

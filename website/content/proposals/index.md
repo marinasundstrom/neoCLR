@@ -127,6 +127,12 @@ stack reserves 1 MiB plus guard pages; stacks are reused, and these reservations
 are not resident memory or a per-Task allocation. Managed queue intervals and mixed
 I/O load still need profiling; the short checks establish no throughput gain.
 [HTTP checks, carrier table and profiling limits](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/shared-scheduling-http-20261028/README.md).
+Follow-up traces now capture all 132 runnable submissions in each short HTTP case
+with a more precise clock. Queue depth peaks at one, so these cases still cannot
+establish behavior under pressure. Candidate queue-residence medians range from
+4.125–7.500 µs; concurrent JSON regresses in this single diagnostic run. These are
+instrumented queue intervals, not request latency or throughput improvements.
+[Queue measurement table, raw evidence and limits](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/shared-scheduler-queue-trace-20261028/README.md).
 Adoption requires proving the change in the real HTTP path and running a **new
 HTTP benchmark after integration**, with both collectors and matched workload/resource
 controls. Existing HTTP performance tables are not replaced by these native results.
