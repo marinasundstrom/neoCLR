@@ -14,6 +14,11 @@ Fixed capacity costs idle memory and cancellation removal is linear. Measure tho
 costs rather than assuming allocation avoidance is a win. Identities in queues are
 root handles or native slot/generation identities, never unrooted managed pointers.
 
+The native runtime-await bridge uses stackful OS carriers on this macOS ARM64
+path, alongside generated managed async state machines. `async-layout.c` inspects
+the actual carrier and per-owner TLS definitions. Its stack reservation is not
+resident memory or the size of every managed Task; a Task need not own a carrier.
+
 ## Required profile before closing the HTTP goal
 
 Author direction: measure the execution context itself, its memory, switching cost
@@ -68,3 +73,15 @@ it must not be linked alongside another native-workers translation unit.
 `Http.rvn` is an in-progress shared-capture Task.Run consumer, compiled with the
 same internal Web-source approach as the existing persistent HTTP benchmark.
 It is not yet the many-endpoint or capacity qualification.
+
+`prepare-http.py` accepts a matching compiler bundle, optimized codegen test runner,
+metadata-reading runtime, retained host link recipes and a selection command. It
+builds baseline/shared hosts with equal heap and pacing budgets and writes the
+`build.json` accepted by `benchmarks/gc-suite/matrix/http.py`. Compile the project
+with that bundle first. `--trace` creates a separately labeled diagnostic build;
+its bounded owner trace exports to retained stderr after shutdown, not during
+execution. `summarize-http-trace.py RESULTS --output SUMMARY` rejects missing/lost
+events and summarizes native carrier/GC intervals. It does not report those
+intervals as managed task-queue latency. See the
+[first HTTP qualification](../../validation/shared-scheduling-http-20261028/README.md)
+for retained recipes and the remaining coverage/resolution gaps.

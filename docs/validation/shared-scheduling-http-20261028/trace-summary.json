@@ -1,0 +1,898 @@
+{
+  "scope": "Summarize bounded native carrier/GC traces; not managed task-queue residence.",
+  "source": "/Users/robert/Projects/neoclr/target/shared-scheduling-http-trace-smoke-20261028/results.json",
+  "rows": [
+    {
+      "mode": "baseline-sync",
+      "sample": "plain",
+      "events": 736,
+      "kinds": {
+        "3:100": 16,
+        "3:101": 16,
+        "2:1": 2,
+        "2:3": 230,
+        "2:5": 1,
+        "2:4": 230,
+        "2:6": 229,
+        "2:8": 5,
+        "2:9": 5,
+        "2:2": 2
+      },
+      "instrumentationEventStorageBytes": 6291456,
+      "parkedCarrierReturn": {
+        "count": 1,
+        "minNs": 3000,
+        "medianNs": 3000,
+        "p95Ns": 3000,
+        "p99Ns": 3000,
+        "maxNs": 3000
+      },
+      "finishedCarrierReturn": {
+        "count": 229,
+        "minNs": 0,
+        "medianNs": 1000,
+        "p95Ns": 2000,
+        "p99Ns": 3000,
+        "maxNs": 4000
+      },
+      "completedOperationToCarrierEnter": {
+        "count": 1,
+        "minNs": 9000,
+        "medianNs": 9000,
+        "p95Ns": 9000,
+        "p99Ns": 9000,
+        "maxNs": 9000
+      },
+      "gcRequest": {
+        "count": 16,
+        "minNs": 0,
+        "medianNs": 17000.0,
+        "p95Ns": 36000,
+        "p99Ns": 36000,
+        "maxNs": 36000
+      },
+      "carrierCounters": [
+        229,
+        230,
+        2,
+        2,
+        2162688,
+        0
+      ],
+      "osSwitchCounters": [
+        0,
+        1440
+      ],
+      "processMemory": {
+        "ready": {
+          "pid": 91090,
+          "rssBytes": 911147008,
+          "virtualBytes": 500636418048,
+          "command": [
+            "/bin/ps",
+            "-p",
+            "91090",
+            "-o",
+            "pid=,rss=,vsz="
+          ],
+          "stdout": "91090 889792 488902752\n",
+          "stderr": "",
+          "exitCode": 0
+        },
+        "afterWarmup": {
+          "pid": 91090,
+          "rssBytes": 938803200,
+          "virtualBytes": 500674215936,
+          "command": [
+            "/bin/ps",
+            "-p",
+            "91090",
+            "-o",
+            "pid=,rss=,vsz="
+          ],
+          "stdout": "91090 916800 488939664\n",
+          "stderr": "",
+          "exitCode": 0
+        },
+        "afterTraffic": {
+          "pid": 91090,
+          "rssBytes": 938950656,
+          "virtualBytes": 500674215936,
+          "command": [
+            "/bin/ps",
+            "-p",
+            "91090",
+            "-o",
+            "pid=,rss=,vsz="
+          ],
+          "stdout": "91090 916944 488939664\n",
+          "stderr": "",
+          "exitCode": 0
+        }
+      }
+    },
+    {
+      "mode": "shared-sync",
+      "sample": "plain",
+      "events": 784,
+      "kinds": {
+        "3:100": 25,
+        "3:101": 25,
+        "2:1": 2,
+        "2:3": 230,
+        "2:5": 1,
+        "2:4": 230,
+        "2:6": 229,
+        "2:8": 20,
+        "2:9": 20,
+        "2:2": 2
+      },
+      "instrumentationEventStorageBytes": 6291456,
+      "parkedCarrierReturn": {
+        "count": 1,
+        "minNs": 3000,
+        "medianNs": 3000,
+        "p95Ns": 3000,
+        "p99Ns": 3000,
+        "maxNs": 3000
+      },
+      "finishedCarrierReturn": {
+        "count": 229,
+        "minNs": 0,
+        "medianNs": 1000,
+        "p95Ns": 3000,
+        "p99Ns": 4000,
+        "maxNs": 5000
+      },
+      "completedOperationToCarrierEnter": {
+        "count": 1,
+        "minNs": 10000,
+        "medianNs": 10000,
+        "p95Ns": 10000,
+        "p99Ns": 10000,
+        "maxNs": 10000
+      },
+      "gcRequest": {
+        "count": 25,
+        "minNs": 0,
+        "medianNs": 19000,
+        "p95Ns": 26000,
+        "p99Ns": 34000,
+        "maxNs": 34000
+      },
+      "carrierCounters": [
+        229,
+        230,
+        2,
+        2,
+        2162688,
+        0
+      ],
+      "osSwitchCounters": [
+        0,
+        1453
+      ],
+      "processMemory": {
+        "ready": {
+          "pid": 91126,
+          "rssBytes": 972439552,
+          "virtualBytes": 500636205056,
+          "command": [
+            "/bin/ps",
+            "-p",
+            "91126",
+            "-o",
+            "pid=,rss=,vsz="
+          ],
+          "stdout": "91126 949648 488902544\n",
+          "stderr": "",
+          "exitCode": 0
+        },
+        "afterWarmup": {
+          "pid": 91126,
+          "rssBytes": 1001734144,
+          "virtualBytes": 500674002944,
+          "command": [
+            "/bin/ps",
+            "-p",
+            "91126",
+            "-o",
+            "pid=,rss=,vsz="
+          ],
+          "stdout": "91126 978256 488939456\n",
+          "stderr": "",
+          "exitCode": 0
+        },
+        "afterTraffic": {
+          "pid": 91126,
+          "rssBytes": 1001881600,
+          "virtualBytes": 500674002944,
+          "command": [
+            "/bin/ps",
+            "-p",
+            "91126",
+            "-o",
+            "pid=,rss=,vsz="
+          ],
+          "stdout": "91126 978400 488939456\n",
+          "stderr": "",
+          "exitCode": 0
+        }
+      }
+    },
+    {
+      "mode": "baseline-live",
+      "sample": "plain",
+      "events": 758,
+      "kinds": {
+        "3:100": 17,
+        "3:101": 17,
+        "2:1": 2,
+        "2:3": 230,
+        "2:5": 1,
+        "2:4": 230,
+        "2:6": 229,
+        "3:110": 10,
+        "2:8": 5,
+        "2:9": 5,
+        "3:111": 9,
+        "2:2": 2,
+        "3:112": 1
+      },
+      "instrumentationEventStorageBytes": 6291456,
+      "parkedCarrierReturn": {
+        "count": 1,
+        "minNs": 3000,
+        "medianNs": 3000,
+        "p95Ns": 3000,
+        "p99Ns": 3000,
+        "maxNs": 3000
+      },
+      "finishedCarrierReturn": {
+        "count": 229,
+        "minNs": 0,
+        "medianNs": 1000,
+        "p95Ns": 3000,
+        "p99Ns": 5000,
+        "maxNs": 7000
+      },
+      "completedOperationToCarrierEnter": {
+        "count": 1,
+        "minNs": 29000,
+        "medianNs": 29000,
+        "p95Ns": 29000,
+        "p99Ns": 29000,
+        "maxNs": 29000
+      },
+      "gcRequest": {
+        "count": 17,
+        "minNs": 0,
+        "medianNs": 31000,
+        "p95Ns": 100000,
+        "p99Ns": 100000,
+        "maxNs": 100000
+      },
+      "carrierCounters": [
+        229,
+        230,
+        2,
+        2,
+        2162688,
+        0
+      ],
+      "osSwitchCounters": [
+        0,
+        1496
+      ],
+      "processMemory": {
+        "ready": {
+          "pid": 91162,
+          "rssBytes": 1009369088,
+          "virtualBytes": 500639858688,
+          "command": [
+            "/bin/ps",
+            "-p",
+            "91162",
+            "-o",
+            "pid=,rss=,vsz="
+          ],
+          "stdout": "91162 985712 488906112\n",
+          "stderr": "",
+          "exitCode": 0
+        },
+        "afterWarmup": {
+          "pid": 91162,
+          "rssBytes": 1075953664,
+          "virtualBytes": 500702199808,
+          "command": [
+            "/bin/ps",
+            "-p",
+            "91162",
+            "-o",
+            "pid=,rss=,vsz="
+          ],
+          "stdout": "91162 1050736 488966992\n",
+          "stderr": "",
+          "exitCode": 0
+        },
+        "afterTraffic": {
+          "pid": 91162,
+          "rssBytes": 1076133888,
+          "virtualBytes": 500702199808,
+          "command": [
+            "/bin/ps",
+            "-p",
+            "91162",
+            "-o",
+            "pid=,rss=,vsz="
+          ],
+          "stdout": "91162 1050912 488966992\n",
+          "stderr": "",
+          "exitCode": 0
+        }
+      }
+    },
+    {
+      "mode": "shared-live",
+      "sample": "plain",
+      "events": 758,
+      "kinds": {
+        "3:100": 17,
+        "3:101": 17,
+        "2:1": 2,
+        "2:3": 230,
+        "2:5": 1,
+        "2:4": 230,
+        "2:6": 229,
+        "3:110": 10,
+        "2:8": 5,
+        "2:9": 5,
+        "3:111": 9,
+        "2:2": 2,
+        "3:112": 1
+      },
+      "instrumentationEventStorageBytes": 6291456,
+      "parkedCarrierReturn": {
+        "count": 1,
+        "minNs": 2000,
+        "medianNs": 2000,
+        "p95Ns": 2000,
+        "p99Ns": 2000,
+        "maxNs": 2000
+      },
+      "finishedCarrierReturn": {
+        "count": 229,
+        "minNs": 0,
+        "medianNs": 1000,
+        "p95Ns": 4000,
+        "p99Ns": 5000,
+        "maxNs": 7000
+      },
+      "completedOperationToCarrierEnter": {
+        "count": 1,
+        "minNs": 28000,
+        "medianNs": 28000,
+        "p95Ns": 28000,
+        "p99Ns": 28000,
+        "maxNs": 28000
+      },
+      "gcRequest": {
+        "count": 17,
+        "minNs": 0,
+        "medianNs": 27000,
+        "p95Ns": 100000,
+        "p99Ns": 100000,
+        "maxNs": 100000
+      },
+      "carrierCounters": [
+        229,
+        230,
+        2,
+        2,
+        2162688,
+        0
+      ],
+      "osSwitchCounters": [
+        0,
+        1560
+      ],
+      "processMemory": {
+        "ready": {
+          "pid": 91205,
+          "rssBytes": 979730432,
+          "virtualBytes": 500639711232,
+          "command": [
+            "/bin/ps",
+            "-p",
+            "91205",
+            "-o",
+            "pid=,rss=,vsz="
+          ],
+          "stdout": "91205 956768 488905968\n",
+          "stderr": "",
+          "exitCode": 0
+        },
+        "afterWarmup": {
+          "pid": 91205,
+          "rssBytes": 1046446080,
+          "virtualBytes": 500702052352,
+          "command": [
+            "/bin/ps",
+            "-p",
+            "91205",
+            "-o",
+            "pid=,rss=,vsz="
+          ],
+          "stdout": "91205 1021920 488966848\n",
+          "stderr": "",
+          "exitCode": 0
+        },
+        "afterTraffic": {
+          "pid": 91205,
+          "rssBytes": 1046609920,
+          "virtualBytes": 500702052352,
+          "command": [
+            "/bin/ps",
+            "-p",
+            "91205",
+            "-o",
+            "pid=,rss=,vsz="
+          ],
+          "stdout": "91205 1022080 488966848\n",
+          "stderr": "",
+          "exitCode": 0
+        }
+      }
+    },
+    {
+      "mode": "baseline-sync",
+      "sample": "json",
+      "events": 786,
+      "kinds": {
+        "3:100": 34,
+        "3:101": 34,
+        "2:1": 2,
+        "2:3": 230,
+        "2:5": 1,
+        "2:4": 230,
+        "2:6": 229,
+        "2:8": 12,
+        "2:9": 12,
+        "2:2": 2
+      },
+      "instrumentationEventStorageBytes": 6291456,
+      "parkedCarrierReturn": {
+        "count": 1,
+        "minNs": 3000,
+        "medianNs": 3000,
+        "p95Ns": 3000,
+        "p99Ns": 3000,
+        "maxNs": 3000
+      },
+      "finishedCarrierReturn": {
+        "count": 229,
+        "minNs": 0,
+        "medianNs": 1000,
+        "p95Ns": 2000,
+        "p99Ns": 4000,
+        "maxNs": 5000
+      },
+      "completedOperationToCarrierEnter": {
+        "count": 1,
+        "minNs": 11000,
+        "medianNs": 11000,
+        "p95Ns": 11000,
+        "p99Ns": 11000,
+        "maxNs": 11000
+      },
+      "gcRequest": {
+        "count": 34,
+        "minNs": 0,
+        "medianNs": 23500.0,
+        "p95Ns": 31000,
+        "p99Ns": 35000,
+        "maxNs": 35000
+      },
+      "carrierCounters": [
+        229,
+        230,
+        2,
+        2,
+        2162688,
+        0
+      ],
+      "osSwitchCounters": [
+        0,
+        1818
+      ],
+      "processMemory": {
+        "ready": {
+          "pid": 91254,
+          "rssBytes": 971669504,
+          "virtualBytes": 500636057600,
+          "command": [
+            "/bin/ps",
+            "-p",
+            "91254",
+            "-o",
+            "pid=,rss=,vsz="
+          ],
+          "stdout": "91254 948896 488902400\n",
+          "stderr": "",
+          "exitCode": 0
+        },
+        "afterWarmup": {
+          "pid": 91254,
+          "rssBytes": 1005158400,
+          "virtualBytes": 500673855488,
+          "command": [
+            "/bin/ps",
+            "-p",
+            "91254",
+            "-o",
+            "pid=,rss=,vsz="
+          ],
+          "stdout": "91254 981600 488939312\n",
+          "stderr": "",
+          "exitCode": 0
+        },
+        "afterTraffic": {
+          "pid": 91254,
+          "rssBytes": 1005305856,
+          "virtualBytes": 500673855488,
+          "command": [
+            "/bin/ps",
+            "-p",
+            "91254",
+            "-o",
+            "pid=,rss=,vsz="
+          ],
+          "stdout": "91254 981744 488939312\n",
+          "stderr": "",
+          "exitCode": 0
+        }
+      }
+    },
+    {
+      "mode": "shared-sync",
+      "sample": "json",
+      "events": 778,
+      "kinds": {
+        "3:100": 32,
+        "3:101": 32,
+        "2:1": 2,
+        "2:3": 230,
+        "2:5": 1,
+        "2:4": 230,
+        "2:6": 229,
+        "2:8": 10,
+        "2:9": 10,
+        "2:2": 2
+      },
+      "instrumentationEventStorageBytes": 6291456,
+      "parkedCarrierReturn": {
+        "count": 1,
+        "minNs": 3000,
+        "medianNs": 3000,
+        "p95Ns": 3000,
+        "p99Ns": 3000,
+        "maxNs": 3000
+      },
+      "finishedCarrierReturn": {
+        "count": 229,
+        "minNs": 0,
+        "medianNs": 1000,
+        "p95Ns": 2000,
+        "p99Ns": 4000,
+        "maxNs": 5000
+      },
+      "completedOperationToCarrierEnter": {
+        "count": 1,
+        "minNs": 9000,
+        "medianNs": 9000,
+        "p95Ns": 9000,
+        "p99Ns": 9000,
+        "maxNs": 9000
+      },
+      "gcRequest": {
+        "count": 32,
+        "minNs": 0,
+        "medianNs": 24500.0,
+        "p95Ns": 31000,
+        "p99Ns": 31000,
+        "maxNs": 31000
+      },
+      "carrierCounters": [
+        229,
+        230,
+        2,
+        2,
+        2162688,
+        0
+      ],
+      "osSwitchCounters": [
+        0,
+        1870
+      ],
+      "processMemory": {
+        "ready": {
+          "pid": 91298,
+          "rssBytes": 1007091712,
+          "virtualBytes": 500635959296,
+          "command": [
+            "/bin/ps",
+            "-p",
+            "91298",
+            "-o",
+            "pid=,rss=,vsz="
+          ],
+          "stdout": "91298 983488 488902304\n",
+          "stderr": "",
+          "exitCode": 0
+        },
+        "afterWarmup": {
+          "pid": 91298,
+          "rssBytes": 1040105472,
+          "virtualBytes": 500673757184,
+          "command": [
+            "/bin/ps",
+            "-p",
+            "91298",
+            "-o",
+            "pid=,rss=,vsz="
+          ],
+          "stdout": "91298 1015728 488939216\n",
+          "stderr": "",
+          "exitCode": 0
+        },
+        "afterTraffic": {
+          "pid": 91298,
+          "rssBytes": 1040252928,
+          "virtualBytes": 500673757184,
+          "command": [
+            "/bin/ps",
+            "-p",
+            "91298",
+            "-o",
+            "pid=,rss=,vsz="
+          ],
+          "stdout": "91298 1015872 488939216\n",
+          "stderr": "",
+          "exitCode": 0
+        }
+      }
+    },
+    {
+      "mode": "baseline-live",
+      "sample": "json",
+      "events": 792,
+      "kinds": {
+        "3:100": 28,
+        "3:101": 28,
+        "2:1": 2,
+        "2:3": 230,
+        "2:5": 1,
+        "2:4": 230,
+        "2:6": 229,
+        "3:110": 16,
+        "3:111": 15,
+        "2:8": 5,
+        "2:9": 5,
+        "2:2": 2,
+        "3:112": 1
+      },
+      "instrumentationEventStorageBytes": 6291456,
+      "parkedCarrierReturn": {
+        "count": 1,
+        "minNs": 3000,
+        "medianNs": 3000,
+        "p95Ns": 3000,
+        "p99Ns": 3000,
+        "maxNs": 3000
+      },
+      "finishedCarrierReturn": {
+        "count": 229,
+        "minNs": 0,
+        "medianNs": 1000,
+        "p95Ns": 2000,
+        "p99Ns": 4000,
+        "maxNs": 4000
+      },
+      "completedOperationToCarrierEnter": {
+        "count": 1,
+        "minNs": 28000,
+        "medianNs": 28000,
+        "p95Ns": 28000,
+        "p99Ns": 28000,
+        "maxNs": 28000
+      },
+      "gcRequest": {
+        "count": 28,
+        "minNs": 0,
+        "medianNs": 52500.0,
+        "p95Ns": 94000,
+        "p99Ns": 98000,
+        "maxNs": 98000
+      },
+      "carrierCounters": [
+        229,
+        230,
+        2,
+        2,
+        2162688,
+        0
+      ],
+      "osSwitchCounters": [
+        0,
+        1945
+      ],
+      "processMemory": {
+        "ready": {
+          "pid": 91346,
+          "rssBytes": 974667776,
+          "virtualBytes": 500639776768,
+          "command": [
+            "/bin/ps",
+            "-p",
+            "91346",
+            "-o",
+            "pid=,rss=,vsz="
+          ],
+          "stdout": "91346 951824 488906032\n",
+          "stderr": "",
+          "exitCode": 0
+        },
+        "afterWarmup": {
+          "pid": 91346,
+          "rssBytes": 1051623424,
+          "virtualBytes": 500706590720,
+          "command": [
+            "/bin/ps",
+            "-p",
+            "91346",
+            "-o",
+            "pid=,rss=,vsz="
+          ],
+          "stdout": "91346 1026976 488971280\n",
+          "stderr": "",
+          "exitCode": 0
+        },
+        "afterTraffic": {
+          "pid": 91346,
+          "rssBytes": 1051787264,
+          "virtualBytes": 500706590720,
+          "command": [
+            "/bin/ps",
+            "-p",
+            "91346",
+            "-o",
+            "pid=,rss=,vsz="
+          ],
+          "stdout": "91346 1027136 488971280\n",
+          "stderr": "",
+          "exitCode": 0
+        }
+      }
+    },
+    {
+      "mode": "shared-live",
+      "sample": "json",
+      "events": 796,
+      "kinds": {
+        "3:100": 28,
+        "3:101": 28,
+        "2:1": 2,
+        "2:3": 230,
+        "2:5": 1,
+        "2:4": 230,
+        "2:6": 229,
+        "3:110": 17,
+        "3:111": 16,
+        "2:8": 6,
+        "2:9": 6,
+        "2:2": 2,
+        "3:112": 1
+      },
+      "instrumentationEventStorageBytes": 6291456,
+      "parkedCarrierReturn": {
+        "count": 1,
+        "minNs": 7000,
+        "medianNs": 7000,
+        "p95Ns": 7000,
+        "p99Ns": 7000,
+        "maxNs": 7000
+      },
+      "finishedCarrierReturn": {
+        "count": 229,
+        "minNs": 0,
+        "medianNs": 1000,
+        "p95Ns": 3000,
+        "p99Ns": 4000,
+        "maxNs": 8000
+      },
+      "completedOperationToCarrierEnter": {
+        "count": 1,
+        "minNs": 28000,
+        "medianNs": 28000,
+        "p95Ns": 28000,
+        "p99Ns": 28000,
+        "maxNs": 28000
+      },
+      "gcRequest": {
+        "count": 28,
+        "minNs": 0,
+        "medianNs": 52500.0,
+        "p95Ns": 121000,
+        "p99Ns": 131000,
+        "maxNs": 131000
+      },
+      "carrierCounters": [
+        229,
+        230,
+        2,
+        2,
+        2162688,
+        0
+      ],
+      "osSwitchCounters": [
+        0,
+        1988
+      ],
+      "processMemory": {
+        "ready": {
+          "pid": 91393,
+          "rssBytes": 974946304,
+          "virtualBytes": 500639301632,
+          "command": [
+            "/bin/ps",
+            "-p",
+            "91393",
+            "-o",
+            "pid=,rss=,vsz="
+          ],
+          "stdout": "91393 952096 488905568\n",
+          "stderr": "",
+          "exitCode": 0
+        },
+        "afterWarmup": {
+          "pid": 91393,
+          "rssBytes": 1050345472,
+          "virtualBytes": 500706115584,
+          "command": [
+            "/bin/ps",
+            "-p",
+            "91393",
+            "-o",
+            "pid=,rss=,vsz="
+          ],
+          "stdout": "91393 1025728 488970816\n",
+          "stderr": "",
+          "exitCode": 0
+        },
+        "afterTraffic": {
+          "pid": 91393,
+          "rssBytes": 1050542080,
+          "virtualBytes": 500706115584,
+          "command": [
+            "/bin/ps",
+            "-p",
+            "91393",
+            "-o",
+            "pid=,rss=,vsz="
+          ],
+          "stdout": "91393 1025920 488970816\n",
+          "stderr": "",
+          "exitCode": 0
+        }
+      }
+    }
+  ],
+  "limitations": [
+    "Traced short qualification runs, not headline performance or capacity.",
+    "Park/finish to leave includes trace emission and swapcontext return; root parking occurs before its start.",
+    "Completion to enter includes pump selection; not pure CPU context-switch cost.",
+    "Native carrier events do not cover every managed state-machine await or Task.Run queue interval.",
+    "OS switches cover the whole process including JIT/GC helper threads.",
+    "Process RSS includes JIT/compiler memory; virtual stack reservation is not resident memory."
+  ]
+}

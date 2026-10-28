@@ -120,6 +120,13 @@ memory. Context retention, suspend/resume costs, queue behavior and mixed HTTP
 endpoints with file/network I/O must be profiled under both collectors before
 closing the goal. No HTTP improvement is established by these native checks.
 [Layout table and qualification](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/shared-scheduling-20261028/README.md).
+Generated HTTP handlers now pass capture-mutation/alias checks through Task.Run
+under both collectors and both queue paths. Separate diagnostic runs record native
+carrier and GC events. On this host, a carrier record is 1,056 bytes and each mapped
+stack reserves 1 MiB plus guard pages; stacks are reused, and these reservations
+are not resident memory or a per-Task allocation. Managed queue intervals and mixed
+I/O load still need profiling; the short checks establish no throughput gain.
+[HTTP checks, carrier table and profiling limits](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/shared-scheduling-http-20261028/README.md).
 Adoption requires proving the change in the real HTTP path and running a **new
 HTTP benchmark after integration**, with both collectors and matched workload/resource
 controls. Existing HTTP performance tables are not replaced by these native results.

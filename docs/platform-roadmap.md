@@ -1,5 +1,12 @@
 # neoCLR platform roadmap
 
+**Shared scheduler HTTP qualification (2026-10-28):** [Generated HTTP checks](validation/shared-scheduling-http-20261028/README.md)
+pass shared-capture Task.Run handlers with both collectors and both queue paths.
+Actual native carrier layout and bounded owner async/GC traces are retained. The
+trace exposes insufficient clock resolution for small switches and missing managed
+queue intervals; extend those measurements next, then many-endpoint mixed-I/O/AOT
+load cohorts. No HTTP throughput improvement or complete profiling gate is established.
+
 **Shared scheduling and profiling gate (2026-10-28):** The author directs shared
 services for Task.Run and other scheduled work, with predictable GC/service
 relationships rather than HTTP-specific policy. Before closing the current HTTP

@@ -1,0 +1,52 @@
+{
+  "passed": false,
+  "kind": "qualification",
+  "scope": "Checked HTTP execution/GC matrix, with connection policy and CPU scopes explicit.\n\nPython loopback clients are not evidence of saturation or a framework ranking.\nPrepare all artifacts first; run this tool without competing timed/build workloads.\n",
+  "system": "macOS-27.0.1-arm64-arm-64bit",
+  "workload": "shared-capture-task-run-http",
+  "backendOptimization": "explicit retained recipe",
+  "rounds": 1,
+  "concurrency": 2,
+  "ioGapMs": 0,
+  "headerGapMs": 0,
+  "pipelineDepth": 16,
+  "trials": [
+    {
+      "mode": "baseline-sync",
+      "execution": "jit",
+      "collector": "mark-sweep",
+      "sample": "plain",
+      "protocol": "keepalive",
+      "round": 0,
+      "requests": 32,
+      "warmup": 4,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/deps/neoclr_codegen-6c1fc4e94a4da28d",
+        "mutation_store::tests::full_http_selection_compiles_with_live_gc",
+        "--exact",
+        "--ignored",
+        "--nocapture"
+      ],
+      "environment": {
+        "NEOCLR_LIVE_SELECTION_COMMAND": "/Users/robert/Projects/neoclr/target/shared-scheduling-http-build-20261028-v2/baseline-sync-selection.json",
+        "NEOCLR_LIVE_SELECTION_MODE": "sync",
+        "NEOCLR_JIT_LAZY": "1",
+        "NEOCLR_LIVE_STACK_POLICY": "qualified"
+      },
+      "passed": false,
+      "readySeconds": 53.392145166999995,
+      "failure": "Traceback (most recent call last):\n  File \"/Users/robert/Projects/neoclr/benchmarks/gc-suite/matrix/http.py\", line 170, in trial\n    cold=traffic(port,sample,protocol,a.warmup,depth_override=1)\n  File \"/Users/robert/Projects/neoclr/benchmarks/gc-suite/matrix/http.py\", line 106, in traffic\n    chunk=client.recv(65536);assert chunk,'EOF in headers';pending+=chunk\nsocket.timeout: timed out\n",
+      "clientCpuSeconds": 0.006267000000000036,
+      "exitCode": -9,
+      "stdout": "\nrunning 1 test\nREADY\n61206\n61207\ntest mutation_store::tests::full_http_selection_compiles_with_live_gc has been running for over 60 seconds\n",
+      "stderr": "warning: DAM2004: dynamic-dispatch implementation bodies are not analyzed; reflection inside them may require explicit retention\n",
+      "wholeProcessWallSeconds": 68.423961333,
+      "wholeProcessCpuSeconds": 66.670018
+    }
+  ],
+  "rows": [],
+  "inputs": {
+    "/Users/robert/Projects/neoclr/target/shared-scheduling-http-build-20261028-v2/build.json": "b139d4fc741a1d9efb0e0a104de660332e759e974f9b7e7d65510a2505b323ad",
+    "/Users/robert/Projects/neoclr/benchmarks/gc-suite/matrix/http.py": "077f9b57a31edd9e4fff3283207c60a092299a52cbc46ec8d377b8d066ddc7b8"
+  }
+}

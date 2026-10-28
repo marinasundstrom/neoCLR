@@ -43,7 +43,13 @@ try:
         run([*cc, *flags, '-I', native/'gc', '-I', native/'workers', here/'layout.c',
              native/'gc/native-gc.c', native/'gc/root-probe.c', '-o', binary])
         report['layouts'][name] = json.loads(run([binary]))
-    files = [here/'layout.c', Path(__file__)]
+    binary = out/'async-carrier'
+    run([*cc, '-Wno-deprecated-declarations', '-I', root/'docs/experiments/aot-console',
+         '-I', native/'gc', here/'async-layout.c', native/'gc/native-gc.c',
+         native/'gc/root-probe.c', root/'docs/experiments/aot-console/native-stack.c',
+         '-o', binary])
+    report['layouts']['async-carrier'] = json.loads(run([binary]))
+    files = [here/'layout.c', here/'async-layout.c', Path(__file__)]
     files += [f for base in (native, root/'docs/experiments/aot-console')
               for f in base.rglob('*') if f.suffix in ('.c', '.h', '.inc')]
     report['inputs'] = {str(f.relative_to(root)): hashlib.sha256(f.read_bytes()).hexdigest()
