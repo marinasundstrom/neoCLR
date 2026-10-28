@@ -18,3 +18,9 @@ and [flag reference](api/System/Diagnostics/CodeAnalysis/DynamicallyAccessedMemb
 describe the current boundaries. Unknown-flow warnings mean retention has not been
 proven. Generic parameters, returns, fields, receiver annotations and string
 resolution remain unsupported; project retention files remain available.
+
+Nongeneric class/interface implementations should repeat the same parameter
+requirements as their interface declarations. The native backend reports `DAM2005`
+on mismatches, including missing annotations; it does not silently strengthen the
+interface contract or retain extra implementation bodies. Generic mappings and
+standalone class overrides remain outside this check.

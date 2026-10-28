@@ -242,9 +242,13 @@ pub fn prepare(
         .map(|policy| retained_analysis_bodies(&joined, &source_metadata, &types, &methods, policy))
         .transpose()?
         .unwrap_or_default();
-    let dynamic_access =
+    let mut dynamic_access =
         neoclr::dynamic_access::analyze_with_roots(&joined, root, &explicit_bodies)
             .map_err(|e| e.to_string())?;
+    dynamic_access.diagnostics.extend(
+        neoclr::dynamic_access::interface_contract_diagnostics(&source_metadata)
+            .map_err(|e| e.to_string())?,
+    );
     // Definition-token operands describe metadata; they never instantiate an
     // executable generic type or consume the caller's type parameter scope.
     for fi in 0..joined.functions.len() {

@@ -44,8 +44,9 @@ not communicate the type that reflection will inspect.
 - The pass follows entry-point calls and bound functions, checking declared parameter contracts at interface calls.
   Unused direct callers do not root their types. Dynamic implementation bodies are
   not traversed before specialization (`DAM2004`); reflection inside them needs
-  explicit policy where not otherwise proven. Polymorphic contract compatibility
-  remains a gap. Public constructors and instance property accessors selected by
+  explicit policy where not otherwise proven. Nongeneric nominal class/interface
+  parameter compatibility is checked separately (`DAM2005`); class virtual overrides,
+  generic mappings and implementation-body traversal remain gaps. Public constructors and instance property accessors selected by
   inferred requirements are additional analysis roots. Their direct calls are
   analyzed repeatedly until no new bodies are found, so reflection inside a retained
   constructor/accessor can infer further types. Cycles terminate because the root set
@@ -142,3 +143,25 @@ Generic-owner body specialization remains outside this analysis; the existing
 constructor binder does not supply those as ordinary body seeds. Explicit policies
 still do not prove unknown type flow or suppress DAM2001/DAM2004 diagnostics. See
 [policy-seed qualification](validation/dynamic-access-explicit-20261028/README.md).
+
+## Interface parameter compatibility (2026-10-28)
+
+`DAM2005` warns when corresponding parameter requirements differ between an interface
+method and its selected class implementation. Absent annotations count as no required
+members. Missing, weaker and stronger requirements are mismatches: callers through
+the interface and concrete class must see the same contract. This follows the .NET
+[IL2092 rule](https://learn.microsoft.com/en-us/dotnet/core/deploying/trimming/trim-warnings/il2092)
+and [runtime diagnostic reference](https://github.com/dotnet/runtime/blob/main/docs/tools/illink/error-codes.md#il2092-trim-analysis-dynamicallyaccessedmembertypes-in-dynamicallyaccessedmembersattribute-on-the-parameter-parameter-of-method-method-dont-match-overridden-parameter-parameter-of-method-base-method-all-overridden-members-must-have-the-same-dynamicallyaccessedmembersattribute-usage).
+
+The bounded check uses original source identities and existing interface mapping
+resolution, including explicit implementations and inherited nongeneric interfaces.
+It checks concrete nongeneric nominal reference classes and nongeneric interface
+methods throughout the supplied load set, including unused classes. It adds warnings
+to `dynamicAccess` and stderr without adding retention roots or changing dispatch.
+The cost is extra metadata traversal; no performance gain is claimed.
+
+Generic classes/interfaces/methods, value-type implementations, abstract class mappings
+and standalone class-virtual override compatibility remain unqualified. `DAM2004`
+still marks the separate implementation-body traversal gap. A mismatch is a diagnostic,
+not proof that inferred retention satisfies the implementation. See
+[matching/mismatching native consumers](validation/dynamic-access-interfaces-20261028/README.md).

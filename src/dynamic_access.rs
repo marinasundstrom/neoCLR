@@ -86,6 +86,65 @@ fn requirements(module: &Module, function: &Function) -> Result<Vec<u32>, Fault>
     Ok(result)
 }
 
+/// Diagnose parameter annotation mismatches in verified, source-identity metadata.
+/// This bounded check covers nongeneric nominal classes and interface methods;
+/// it does not add dispatch targets to retention or analyze their bodies.
+pub fn interface_contract_diagnostics(module: &Module) -> Result<BTreeSet<String>, Fault> {
+    crate::runtime_lookup::with_module(module, || {
+        let mut diagnostics = BTreeSet::new();
+        if !module
+            .functions
+            .iter()
+            .map(|f| requirements(module, f))
+            .collect::<Result<Vec<_>, _>>()?
+            .iter()
+            .flatten()
+            .any(|f| *f != 0)
+        {
+            return Ok(diagnostics);
+        }
+        for ty in &module.types {
+            if !ty.is_reference_type
+                || ty.is_abstract
+                || !ty.generic_parameters.is_empty()
+                || ty.representation != crate::metadata::Representation::Record
+            {
+                continue;
+            }
+            let concrete = Type::Named(ty.name.clone());
+            for interface in crate::interfaces::closure(module, &concrete)? {
+                if !matches!(&interface, Type::Named(_)) {
+                    continue;
+                }
+                let definition = crate::interfaces::interface_definition(module, &interface)?;
+                if !definition.generic_parameters.is_empty() {
+                    continue;
+                }
+                for contract in crate::runtime_lookup::functions_for_owner(module, definition) {
+                    if crate::interfaces::is_helper(contract)
+                        || !contract.interface_implementations.is_empty()
+                        || !contract.generic_parameters.is_empty()
+                    {
+                        continue;
+                    }
+                    let implementation =
+                        crate::interfaces::implementation(module, &concrete, &interface, contract)?;
+                    let declared = requirements(module, contract)?;
+                    let actual = requirements(module, &implementation)?;
+                    for (index, (expected, found)) in declared.iter().zip(&actual).enumerate() {
+                        if expected != found {
+                            diagnostics.insert(format!(
+                                "DAM2005: {} parameter {index} requires {found}, but interface {} requires {expected}; corresponding parameter annotations must match",
+                                display_name(module, &implementation), display_name(module, contract)));
+                        }
+                    }
+                }
+            }
+        }
+        Ok(diagnostics)
+    })
+}
+
 #[derive(Clone, PartialEq, Eq)]
 struct State {
     stack: Vec<Value>,
@@ -778,5 +837,87 @@ mod tests {
             BTreeMap::from([(4, 3)])
         );
         assert!(analyze_with_roots(&m, "Main", &[m.functions.len()]).is_err());
+    }
+    fn interface_fixture() -> Module {
+        let mut m = fixture();
+        let mut interface = crate::assemble(".module Extra\n.interface Sink\n.end\n")
+            .unwrap()
+            .types
+            .remove(0);
+        interface.definition = Some(crate::metadata::TypeDefId {
+            module: m.name.clone(),
+            revision: m.revision.clone(),
+            index: m.types.len() as u32,
+        });
+        m.types.push(interface);
+        m.types[3].is_reference_type = true;
+        m.types[3].implements.push(Type::Named("Sink".into()));
+        let mut contract = m.functions[1].clone();
+        contract.definition = Some(crate::metadata::MemberId {
+            module: m.name.clone(),
+            revision: m.revision.clone(),
+            index: 3,
+        });
+        contract.name = "Sink.Require".into();
+        contract.owner = Some(Type::Named("Sink".into()));
+        contract.instance = true;
+        contract.is_abstract = true;
+        contract.body.clear();
+        let mut implementation = contract.clone();
+        implementation.definition.as_mut().unwrap().index = 4;
+        implementation.name = "Model.Require".into();
+        implementation.owner = Some(Type::Named("Model".into()));
+        implementation.is_abstract = false;
+        implementation.body = vec![Op::Return];
+        m.functions.extend([contract, implementation]);
+        m
+    }
+
+    #[test]
+    fn interface_parameter_requirements_must_match_exactly() {
+        let mut m = interface_fixture();
+        assert!(interface_contract_diagnostics(&m).unwrap().is_empty());
+        for flags in [0, 1, 515] {
+            m.functions[4].custom_attributes[0].arguments = vec![AttributeArgument::Int32(flags)];
+            let diagnostics = interface_contract_diagnostics(&m).unwrap();
+            assert_eq!(diagnostics.len(), 1);
+            assert!(diagnostics.iter().next().unwrap().contains("DAM2005"));
+        }
+        m.functions[4].custom_attributes.clear();
+        assert_eq!(interface_contract_diagnostics(&m).unwrap().len(), 1);
+        m.functions[3].custom_attributes.clear();
+        assert!(interface_contract_diagnostics(&m).unwrap().is_empty());
+        m.functions[4].custom_attributes = m.functions[1].custom_attributes.clone();
+        assert_eq!(interface_contract_diagnostics(&m).unwrap().len(), 1);
+    }
+
+    #[test]
+    fn explicit_interface_mapping_uses_declared_identity() {
+        let mut m = interface_fixture();
+        let contract = &m.functions[3];
+        let target: FunctionRef = serde_json::from_value(json!({"name":contract.name,
+            "owner":contract.owner,"instance":true,"parameters":contract.parameters}))
+        .unwrap();
+        m.functions[4].name = "Model.PrivateImplementation".into();
+        m.functions[4].visibility = crate::metadata::Visibility::Private;
+        m.functions[4].interface_implementations.push(target);
+        assert!(interface_contract_diagnostics(&m).unwrap().is_empty());
+        m.functions[4].custom_attributes.clear();
+        assert_eq!(interface_contract_diagnostics(&m).unwrap().len(), 1);
+    }
+    #[test]
+    fn inherited_interface_contracts_are_checked_without_retaining_bodies() {
+        let mut m = interface_fixture();
+        let mut child = m.types[5].clone();
+        child.name = "ChildSink".into();
+        child.definition.as_mut().unwrap().index = 6;
+        child.implements = vec![Type::Named("Sink".into())];
+        m.types.push(child);
+        m.types[3].implements = vec![Type::Named("ChildSink".into())];
+        assert!(interface_contract_diagnostics(&m).unwrap().is_empty());
+        m.functions[4].custom_attributes.clear();
+        assert_eq!(interface_contract_diagnostics(&m).unwrap().len(), 1);
+        m.functions[0].body = vec![Op::Return];
+        assert!(analyze(&m, "Main").unwrap().types.is_empty());
     }
 }

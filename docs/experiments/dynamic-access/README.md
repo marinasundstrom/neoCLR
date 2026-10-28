@@ -32,3 +32,9 @@ an unannotated forwarding function from Main. Its constructor still calls the
 annotated helper for Other. With explicit-policy analysis seeds it prints `retained`
 twice; the pre-follow-up backend trims Other's property metadata. Existing unknown
 flow diagnostics remain visible. See [policy-seed evidence](../../validation/dynamic-access-explicit-20261028/README.md).
+
+The `contracts` project supplies matching annotations on Reader and DefaultReader.
+It prints `7`. Replacing only DefaultReader's requirement with PublicProperties
+produces `DAM2005`; execution still prints `7` because the method performs no reflection.
+This isolates contract diagnostics from runtime reflection failure. See
+[interface validation](../../validation/dynamic-access-interfaces-20261028/README.md).

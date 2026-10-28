@@ -1,0 +1,52 @@
+{
+  "date": "2026-10-28",
+  "host": "macOS ARM64",
+  "compilerRevision": "ed1d08def",
+  "analysisTests": 15,
+  "apiFingerprint": "passed",
+  "cases": {
+    "interface-match": {
+      "buildPassed": true,
+      "profile": "macos-arm64-http-v1",
+      "backendSha256": "f932bf86bcc96d3ab23284d46633df88bfa674ca50cafe3abce8a265f944ea43",
+      "artifacts": {
+        "app.dll": "7c91a92ae45f95f3538c8c1adb4385a7c6cb09c70105fb23ff93c4b1497e7e54",
+        "app.o": "db49c337a2db53f6676d4e66e496fc0032765ec17a408e76be375d912ec470a3",
+        "app": "2e8ae559a8c7f7357ec32be5066907bc08e9edcc4e0060b0dc910e20e0a63f3b"
+      },
+      "dynamicAccess": {
+        "diagnostics": [
+          "DAM2004: dynamic-dispatch implementation bodies are not analyzed; reflection inside them may require explicit retention"
+        ],
+        "types": {
+          "6": 3
+        }
+      },
+      "exitCode": 0,
+      "stdout": "7\n",
+      "stderr": ""
+    },
+    "interface-mismatch": {
+      "buildPassed": true,
+      "profile": "macos-arm64-http-v1",
+      "backendSha256": "f932bf86bcc96d3ab23284d46633df88bfa674ca50cafe3abce8a265f944ea43",
+      "artifacts": {
+        "app.dll": "4a93369d03451973086cb04d90de0875ed1609020acb7b22d5e98f8e8037b520",
+        "app.o": "db49c337a2db53f6676d4e66e496fc0032765ec17a408e76be375d912ec470a3",
+        "app": "2e8ae559a8c7f7357ec32be5066907bc08e9edcc4e0060b0dc910e20e0a63f3b"
+      },
+      "dynamicAccess": {
+        "diagnostics": [
+          "DAM2004: dynamic-dispatch implementation bodies are not analyzed; reflection inside them may require explicit retention",
+          "DAM2005: DefaultReader.Read parameter 0 requires 512, but interface Reader.Read requires 3; corresponding parameter annotations must match"
+        ],
+        "types": {
+          "6": 3
+        }
+      },
+      "exitCode": 0,
+      "stdout": "7\n",
+      "stderr": ""
+    }
+  }
+}

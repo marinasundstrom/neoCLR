@@ -127,7 +127,9 @@ Inferred constructors and property accessors are also analyzed for
 further annotated calls, including cycles; types discovered through arbitrary
 storage or reflection descriptors still need explicit retention. Executable bodies
 admitted by project retention files also seed annotation analysis; metadata-only
-policies do not gain invocation rights.
+policies do not gain invocation rights. Nongeneric class/interface parameter
+annotation mismatches are reported as `DAM2005`; generic mappings and standalone
+class overrides remain outside that check.
 
 Use matching compiler and library builds for native JSON, attributes and reflection.
 Qualified examples cover specific supported shapes; they do not imply unrestricted
