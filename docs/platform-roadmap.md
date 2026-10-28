@@ -1,5 +1,7 @@
 # neoCLR platform roadmap
 
+**Author-directed scheduling wrap-up (2026-10-28):** [Repeated HTTP comparison and integration decision](validation/shared-scheduling-decision-20261028/README.md) retain enabled DNS/native GC correctness fixes and leave shared queues opt-in, with scheduling/collector defaults unchanged. Three untraced rounds show +5.3% sync and −7.5% concurrent throughput medians for shared queues, with overlapping ranges. Separate native profiles point to root/store/binding costs but do not close managed attribution. The author directs wrapping up and enabling only justified defaults; full AOT/capacity/context-profile and cross-thread HTTP ownership gates remain explicitly deferred, not completed.
+
 **Mixed HTTP correctness and pressure (2026-10-28):** [24-endpoint qualification](validation/shared-scheduling-mixed-20261028/README.md) now passes nested/shared-capture tasks, files and downstream HTTP under both collectors after correcting native provider frame/admission gaps. Queue peaks reach 12–15; the single traced shared-queue cohort is slower. The author additionally directs HTTP-stack/binding blocking investigation. Next separate untraced load/AOT comparisons from phase profiling, including synchronous owner file work and DNS polling; this does not close the capacity/context-profile gate.
 
 **Shared queue profiling (2026-10-28):** [Precise session/queue traces](validation/shared-scheduler-queue-trace-20261028/README.md)

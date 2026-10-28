@@ -1,5 +1,25 @@
 # Development conversation record
 
+## 2026-10-28 — Scheduling integration decision and wrap-up
+
+- **Author:** Asked whether current changes were worth integrating and whether
+  there were improvements. Then directed wrapping up and enabling improvements
+  that should be default.
+- **Assistant evidence/recommendation:** Three untraced mixed HTTP rounds show a
+  5.3% shared-queue sync throughput-median increase and a 7.5% concurrent decrease,
+  with overlapping ranges. Recommended retaining committed correctness fixes,
+  leaving shared ready queues opt-in, and keeping scheduler/GC defaults.
+- **Action/outcome:** Retained those defaults; DNS/native GC correctness fixes
+  already apply without a runtime opt-in. Added repeated readiness/first-use/tail
+  measurement and separate native samples. All 23,328 benchmark requests and
+  38,448 sampled-run requests pass. Website tables and the
+  [integration decision](validation/shared-scheduling-decision-20261028/README.md)
+  record mixed results rather than a universal speedup.
+- **Deferred at wrap-up:** Full offered-load/AOT/context/HTTP-phase profiling and
+  general cross-thread HTTP heap ownership remain unproven. Native samples expose
+  root/store costs but many JIT frames remain unsymbolized. No unproven candidate
+  is enabled by default, and no task relationship tracking was added.
+
 ## 2026-10-28 — Mixed HTTP provider boundaries and blocking audit
 
 - **Author:** Asked to investigate what happens in the HTTP stack and its native

@@ -1,0 +1,1411 @@
+{
+  "scope": "Summarize repeated untraced mixed HTTP runs; no capacity inference.",
+  "source": "/Users/robert/Projects/neoclr/target/shared-scheduling-mixed-repeated-20261028/results.json",
+  "sourceSha256": "33911a1a4c7217b6eb64c0110c531f4b8dc4cb461e3bf7898f89692fb5c3a238",
+  "clients": 8,
+  "cycles": 10,
+  "repetitions": 3,
+  "trials": [
+    {
+      "mode": "baseline-sync",
+      "repetition": 0,
+      "readySeconds": 5.7329610419999995,
+      "firstUseSeconds": 2.4823665399999983,
+      "warmRequests": 1920,
+      "batchSeconds": 1.2462855830000006,
+      "requestsPerSecond": 1540.5778789306585,
+      "latencyMs": {
+        "count": 1920,
+        "minimum": 0.32624999999875115,
+        "median": 2.316103999999264,
+        "p95": 20.739333999999943,
+        "p99": 44.925375000000045,
+        "maximum": 49.87479200000067
+      },
+      "familiesMs": {
+        "short": {
+          "count": 320,
+          "minimum": 0.3385829999995593,
+          "median": 1.8324794999999838,
+          "p95": 2.979417000000595,
+          "p99": 46.84074999999943,
+          "maximum": 48.23175000000113
+        },
+        "allocate": {
+          "count": 320,
+          "minimum": 0.3618329999994785,
+          "median": 2.2174375000005853,
+          "p95": 3.566417000000044,
+          "p99": 48.64204199999911,
+          "maximum": 49.87479200000067
+        },
+        "file-read": {
+          "count": 320,
+          "minimum": 0.32624999999875115,
+          "median": 2.0844584999988314,
+          "p95": 2.957042000000243,
+          "p99": 3.263833000000105,
+          "maximum": 3.959583000000322
+        },
+        "file-write": {
+          "count": 320,
+          "minimum": 0.36341600000078245,
+          "median": 2.065979000000162,
+          "p95": 2.801875000001175,
+          "p99": 3.5130829999996394,
+          "maximum": 3.803957999998886
+        },
+        "network": {
+          "count": 320,
+          "minimum": 4.1033339999998475,
+          "median": 13.431875000000204,
+          "p95": 44.19658399999982,
+          "p99": 45.34133300000143,
+          "maximum": 45.95970900000168
+        },
+        "fanout": {
+          "count": 320,
+          "minimum": 0.3489580000000103,
+          "median": 2.3970620000000054,
+          "p95": 3.8800000000005497,
+          "p99": 4.3512080000009945,
+          "maximum": 4.593832999999492
+        }
+      },
+      "invocationCpuSeconds": 3.570904,
+      "invocationWallSeconds": 3.960628,
+      "invocationAllocations": 780415,
+      "invocationAllocatedBytes": 47973794,
+      "invocationCollections": 1337,
+      "invocationPeakLiveBytes": 150481,
+      "invocationPeakArenaBytes": 297272
+    },
+    {
+      "mode": "shared-sync",
+      "repetition": 0,
+      "readySeconds": 5.4923129589999995,
+      "firstUseSeconds": 2.491898081000002,
+      "warmRequests": 1920,
+      "batchSeconds": 1.0962785000000004,
+      "requestsPerSecond": 1751.3797816886852,
+      "latencyMs": {
+        "count": 1920,
+        "minimum": 0.3562499999993918,
+        "median": 1.727208500000188,
+        "p95": 19.1445839999993,
+        "p99": 42.08087499999991,
+        "maximum": 52.281417000003216
+      },
+      "familiesMs": {
+        "short": {
+          "count": 320,
+          "minimum": 0.3585829999970258,
+          "median": 1.109854000000965,
+          "p95": 3.0516250000012235,
+          "p99": 48.51737499999942,
+          "maximum": 50.750625000002714
+        },
+        "allocate": {
+          "count": 320,
+          "minimum": 0.39079100000094513,
+          "median": 1.6639585000000068,
+          "p95": 3.09033299999939,
+          "p99": 49.36562500000008,
+          "maximum": 52.281417000003216
+        },
+        "file-read": {
+          "count": 320,
+          "minimum": 0.3562499999993918,
+          "median": 1.3896459999998,
+          "p95": 2.7047499999994784,
+          "p99": 2.9000000000003467,
+          "maximum": 3.0889589999993916
+        },
+        "file-write": {
+          "count": 320,
+          "minimum": 0.39570799999921746,
+          "median": 1.5936879999998155,
+          "p95": 2.631250000000307,
+          "p99": 2.8458340000021565,
+          "maximum": 3.8189580000000944
+        },
+        "network": {
+          "count": 320,
+          "minimum": 3.8565830000010237,
+          "median": 12.557604499999542,
+          "p95": 41.93749999999952,
+          "p99": 43.032584000002316,
+          "maximum": 44.9903340000013
+        },
+        "fanout": {
+          "count": 320,
+          "minimum": 0.37583399999974176,
+          "median": 1.2528124999988677,
+          "p95": 3.66250000000079,
+          "p99": 4.085499999998632,
+          "maximum": 4.378583000001157
+        }
+      },
+      "invocationCpuSeconds": 3.581449,
+      "invocationWallSeconds": 3.841335,
+      "invocationAllocations": 779983,
+      "invocationAllocatedBytes": 47947130,
+      "invocationCollections": 1303,
+      "invocationPeakLiveBytes": 150685,
+      "invocationPeakArenaBytes": 308280
+    },
+    {
+      "mode": "baseline-live",
+      "repetition": 0,
+      "readySeconds": 5.601955083,
+      "firstUseSeconds": 4.538373872000008,
+      "warmRequests": 1920,
+      "batchSeconds": 1.765558291999998,
+      "requestsPerSecond": 1087.4747147685805,
+      "latencyMs": {
+        "count": 1920,
+        "minimum": 0.5631659999991712,
+        "median": 3.6279995000008114,
+        "p95": 26.668334000000016,
+        "p99": 50.62312500000132,
+        "maximum": 88.57837500000088
+      },
+      "familiesMs": {
+        "short": {
+          "count": 320,
+          "minimum": 0.6514590000001874,
+          "median": 3.0260005000002366,
+          "p95": 4.752999999997343,
+          "p99": 83.38870800000109,
+          "maximum": 86.31666600000187
+        },
+        "allocate": {
+          "count": 320,
+          "minimum": 0.6504590000027122,
+          "median": 3.736103999999685,
+          "p95": 6.1955830000002265,
+          "p99": 86.2214580000007,
+          "maximum": 88.57837500000088
+        },
+        "file-read": {
+          "count": 320,
+          "minimum": 0.66554200000013,
+          "median": 3.272666999999174,
+          "p95": 4.8534999999994,
+          "p99": 5.1244170000011025,
+          "maximum": 5.801583000000221
+        },
+        "file-write": {
+          "count": 320,
+          "minimum": 0.7195420000023489,
+          "median": 3.404020499997884,
+          "p95": 4.316540999997898,
+          "p99": 4.905000000000825,
+          "maximum": 7.345084000000668
+        },
+        "network": {
+          "count": 320,
+          "minimum": 4.819083000001001,
+          "median": 18.094832999999255,
+          "p95": 50.02641699999799,
+          "p99": 53.92345899999995,
+          "maximum": 54.34737500000253
+        },
+        "fanout": {
+          "count": 320,
+          "minimum": 0.5631659999991712,
+          "median": 3.885395999999375,
+          "p95": 6.216208999997974,
+          "p99": 7.432541000000015,
+          "maximum": 8.57670900000329
+        }
+      },
+      "invocationCpuSeconds": 6.415652,
+      "invocationWallSeconds": 6.710965,
+      "invocationAllocations": 779659,
+      "invocationAllocatedBytes": 47927132,
+      "invocationCollections": 1429,
+      "invocationPeakLiveBytes": 195502,
+      "invocationPeakArenaBytes": 785824
+    },
+    {
+      "mode": "shared-live",
+      "repetition": 0,
+      "readySeconds": 5.786731040999996,
+      "firstUseSeconds": 4.504383163999975,
+      "warmRequests": 1920,
+      "batchSeconds": 1.8324250000000006,
+      "requestsPerSecond": 1047.7918605127081,
+      "latencyMs": {
+        "count": 1920,
+        "minimum": 0.5337079999989669,
+        "median": 3.797228999999902,
+        "p95": 28.662165999996603,
+        "p99": 54.085957999994605,
+        "maximum": 88.97129100000001
+      },
+      "familiesMs": {
+        "short": {
+          "count": 320,
+          "minimum": 0.731916999995974,
+          "median": 3.2699999999969975,
+          "p95": 4.727707999997222,
+          "p99": 83.60725000000002,
+          "maximum": 86.48362499999962
+        },
+        "allocate": {
+          "count": 320,
+          "minimum": 0.6712919999998235,
+          "median": 4.36922949999996,
+          "p95": 6.03745899999808,
+          "p99": 86.39879200000422,
+          "maximum": 88.97129100000001
+        },
+        "file-read": {
+          "count": 320,
+          "minimum": 0.5337079999989669,
+          "median": 3.4553540000032967,
+          "p95": 4.543750000003399,
+          "p99": 5.230584000003091,
+          "maximum": 6.673583000001315
+        },
+        "file-write": {
+          "count": 320,
+          "minimum": 0.6428330000005644,
+          "median": 3.7063540000019657,
+          "p95": 4.417541999998775,
+          "p99": 5.174124999996366,
+          "maximum": 7.441624999998453
+        },
+        "network": {
+          "count": 320,
+          "minimum": 5.099207999997191,
+          "median": 18.477145999998612,
+          "p95": 52.167749999995294,
+          "p99": 55.04729100000105,
+          "maximum": 55.91187499999961
+        },
+        "fanout": {
+          "count": 320,
+          "minimum": 0.5957919999985961,
+          "median": 4.135188000002898,
+          "p95": 6.155333999998902,
+          "p99": 6.70620800000421,
+          "maximum": 9.233583000003875
+        }
+      },
+      "invocationCpuSeconds": 6.429098,
+      "invocationWallSeconds": 6.741634,
+      "invocationAllocations": 779587,
+      "invocationAllocatedBytes": 47922688,
+      "invocationCollections": 1514,
+      "invocationPeakLiveBytes": 188275,
+      "invocationPeakArenaBytes": 641328
+    },
+    {
+      "mode": "shared-live",
+      "repetition": 1,
+      "readySeconds": 5.750186916000004,
+      "firstUseSeconds": 4.773374083000014,
+      "warmRequests": 1920,
+      "batchSeconds": 1.8195795419999996,
+      "requestsPerSecond": 1055.1888255951826,
+      "latencyMs": {
+        "count": 1920,
+        "minimum": 0.523958000002267,
+        "median": 3.8767294999999535,
+        "p95": 26.1150420000007,
+        "p99": 51.16354199999762,
+        "maximum": 91.46545799999473
+      },
+      "familiesMs": {
+        "short": {
+          "count": 320,
+          "minimum": 0.523958000002267,
+          "median": 3.271895999997554,
+          "p95": 5.38283400000239,
+          "p99": 85.89591700000199,
+          "maximum": 88.94120800000138
+        },
+        "allocate": {
+          "count": 320,
+          "minimum": 0.8235829999989619,
+          "median": 4.183937000000526,
+          "p95": 5.939458000000286,
+          "p99": 88.88141599999955,
+          "maximum": 91.46545799999473
+        },
+        "file-read": {
+          "count": 320,
+          "minimum": 0.5352080000022852,
+          "median": 3.5270209999964663,
+          "p95": 4.67379100000187,
+          "p99": 5.351833000005968,
+          "maximum": 5.7524580000034575
+        },
+        "file-write": {
+          "count": 320,
+          "minimum": 0.6805000000014161,
+          "median": 3.7305414999977415,
+          "p95": 4.793832999993697,
+          "p99": 5.488499999998453,
+          "maximum": 6.576625000001002
+        },
+        "network": {
+          "count": 320,
+          "minimum": 5.329040999995982,
+          "median": 18.21822900000214,
+          "p95": 51.06570799999588,
+          "p99": 53.252125000000206,
+          "maximum": 54.15529200000435
+        },
+        "fanout": {
+          "count": 320,
+          "minimum": 0.6922080000038022,
+          "median": 3.921208000001286,
+          "p95": 6.318291999996006,
+          "p99": 7.682000000002631,
+          "maximum": 12.020208999999227
+        }
+      },
+      "invocationCpuSeconds": 6.775535,
+      "invocationWallSeconds": 7.072055,
+      "invocationAllocations": 779911,
+      "invocationAllocatedBytes": 47942686,
+      "invocationCollections": 1431,
+      "invocationPeakLiveBytes": 198283,
+      "invocationPeakArenaBytes": 680224
+    },
+    {
+      "mode": "baseline-live",
+      "repetition": 1,
+      "readySeconds": 5.535155666000001,
+      "firstUseSeconds": 4.571470834000003,
+      "warmRequests": 1920,
+      "batchSeconds": 1.6760028330000125,
+      "requestsPerSecond": 1145.5827891192985,
+      "latencyMs": {
+        "count": 1920,
+        "minimum": 0.4579170000056365,
+        "median": 3.489833000003273,
+        "p95": 24.645082999995793,
+        "p99": 48.025832999996965,
+        "maximum": 103.45850000000212
+      },
+      "familiesMs": {
+        "short": {
+          "count": 320,
+          "minimum": 0.4579170000056365,
+          "median": 2.5646249999979887,
+          "p95": 5.18950000000018,
+          "p99": 97.80170800000576,
+          "maximum": 100.946332999996
+        },
+        "allocate": {
+          "count": 320,
+          "minimum": 0.7334999999955016,
+          "median": 3.548375500002976,
+          "p95": 6.182666999990261,
+          "p99": 100.82304099999817,
+          "maximum": 103.45850000000212
+        },
+        "file-read": {
+          "count": 320,
+          "minimum": 0.5210829999953148,
+          "median": 3.172228999993365,
+          "p95": 4.704250000003185,
+          "p99": 5.2615829999922425,
+          "maximum": 5.85070900000062
+        },
+        "file-write": {
+          "count": 320,
+          "minimum": 0.6029159999911826,
+          "median": 3.0346664999996165,
+          "p95": 4.858792000007384,
+          "p99": 5.681084000002556,
+          "maximum": 6.263875000001917
+        },
+        "network": {
+          "count": 320,
+          "minimum": 4.807624999997984,
+          "median": 17.02072949999689,
+          "p95": 47.310750000008284,
+          "p99": 52.05662500000585,
+          "maximum": 53.478333000001044
+        },
+        "fanout": {
+          "count": 320,
+          "minimum": 0.6340420000015001,
+          "median": 3.3061459999998988,
+          "p95": 6.152624999998579,
+          "p99": 7.041208999993387,
+          "maximum": 7.811666999998579
+        }
+      },
+      "invocationCpuSeconds": 6.434706,
+      "invocationWallSeconds": 6.659296,
+      "invocationAllocations": 779443,
+      "invocationAllocatedBytes": 47913800,
+      "invocationCollections": 1237,
+      "invocationPeakLiveBytes": 192423,
+      "invocationPeakArenaBytes": 676360
+    },
+    {
+      "mode": "shared-sync",
+      "repetition": 1,
+      "readySeconds": 5.4276524170000044,
+      "firstUseSeconds": 2.554972208000038,
+      "warmRequests": 1920,
+      "batchSeconds": 1.3259902079999932,
+      "requestsPerSecond": 1447.9744936397071,
+      "latencyMs": {
+        "count": 1920,
+        "minimum": 0.34904199999630237,
+        "median": 2.5558964999987666,
+        "p95": 21.56216699999902,
+        "p99": 46.75575000000265,
+        "maximum": 50.76083299999823
+      },
+      "familiesMs": {
+        "short": {
+          "count": 320,
+          "minimum": 0.34904199999630237,
+          "median": 2.489938000003633,
+          "p95": 3.094457999992528,
+          "p99": 47.47991700000398,
+          "maximum": 49.31491700000379
+        },
+        "allocate": {
+          "count": 320,
+          "minimum": 0.4641249999934871,
+          "median": 2.688021000004426,
+          "p95": 3.986083999990342,
+          "p99": 49.2266660000098,
+          "maximum": 50.76083299999823
+        },
+        "file-read": {
+          "count": 320,
+          "minimum": 0.40212499999370266,
+          "median": 2.2106250000035743,
+          "p95": 3.0573330000009946,
+          "p99": 3.2208330000003116,
+          "maximum": 4.218916999988664
+        },
+        "file-write": {
+          "count": 320,
+          "minimum": 0.38720800000646705,
+          "median": 2.4693125000041505,
+          "p95": 2.80862500000012,
+          "p99": 2.919833999996513,
+          "maximum": 3.2408750000030295
+        },
+        "network": {
+          "count": 320,
+          "minimum": 3.9274999999889815,
+          "median": 13.724041499997952,
+          "p95": 46.604333999994196,
+          "p99": 47.37366599999859,
+          "maximum": 47.42454200000168
+        },
+        "fanout": {
+          "count": 320,
+          "minimum": 0.3816250000028276,
+          "median": 3.054145999996649,
+          "p95": 4.21874999999261,
+          "p99": 4.734833000000549,
+          "maximum": 5.182624999989116
+        }
+      },
+      "invocationCpuSeconds": 3.639462,
+      "invocationWallSeconds": 4.114466,
+      "invocationAllocations": 780055,
+      "invocationAllocatedBytes": 47951574,
+      "invocationCollections": 1330,
+      "invocationPeakLiveBytes": 150487,
+      "invocationPeakArenaBytes": 310656
+    },
+    {
+      "mode": "baseline-sync",
+      "repetition": 1,
+      "readySeconds": 5.330813957999993,
+      "firstUseSeconds": 2.5125122910000073,
+      "warmRequests": 1920,
+      "batchSeconds": 1.3282055420000063,
+      "requestsPerSecond": 1445.559395203902,
+      "latencyMs": {
+        "count": 1920,
+        "minimum": 0.3438749999986612,
+        "median": 2.580312500001014,
+        "p95": 21.39537500001154,
+        "p99": 45.32270800000049,
+        "maximum": 50.868166999990194
+      },
+      "familiesMs": {
+        "short": {
+          "count": 320,
+          "minimum": 0.3438749999986612,
+          "median": 2.2666460000095867,
+          "p95": 3.332583000002387,
+          "p99": 47.52704100000926,
+          "maximum": 49.268834000002926
+        },
+        "allocate": {
+          "count": 320,
+          "minimum": 0.4499580000043579,
+          "median": 2.5408754999958205,
+          "p95": 4.041958000001955,
+          "p99": 49.24179200000367,
+          "maximum": 50.868166999990194
+        },
+        "file-read": {
+          "count": 320,
+          "minimum": 0.4122499999965612,
+          "median": 2.344145999998659,
+          "p95": 3.4968329999998105,
+          "p99": 5.475208000007115,
+          "maximum": 5.845665999999028
+        },
+        "file-write": {
+          "count": 320,
+          "minimum": 0.4420000000067148,
+          "median": 2.4007704999959856,
+          "p95": 3.832000000002722,
+          "p99": 4.752917000004686,
+          "maximum": 5.42058299998871
+        },
+        "network": {
+          "count": 320,
+          "minimum": 4.016042000003495,
+          "median": 13.849708499996893,
+          "p95": 44.621167000002515,
+          "p99": 46.18479200000536,
+          "maximum": 50.46374999999159
+        },
+        "fanout": {
+          "count": 320,
+          "minimum": 0.3749589999983982,
+          "median": 2.800125000000264,
+          "p95": 4.072500000006585,
+          "p99": 4.556792000002474,
+          "maximum": 5.142540999997891
+        }
+      },
+      "invocationCpuSeconds": 3.612754,
+      "invocationWallSeconds": 4.071458,
+      "invocationAllocations": 780379,
+      "invocationAllocatedBytes": 47971572,
+      "invocationCollections": 1285,
+      "invocationPeakLiveBytes": 150487,
+      "invocationPeakArenaBytes": 298208
+    },
+    {
+      "mode": "baseline-sync",
+      "repetition": 2,
+      "readySeconds": 5.269382332999996,
+      "firstUseSeconds": 2.524726293000029,
+      "warmRequests": 1920,
+      "batchSeconds": 1.2210312920000064,
+      "requestsPerSecond": 1572.4412736835823,
+      "latencyMs": {
+        "count": 1920,
+        "minimum": 0.32458300000826057,
+        "median": 2.194666999990602,
+        "p95": 19.886334000005945,
+        "p99": 44.01525000000106,
+        "maximum": 50.888749999998595
+      },
+      "familiesMs": {
+        "short": {
+          "count": 320,
+          "minimum": 0.3394579999991265,
+          "median": 1.8252294999996366,
+          "p95": 3.099875000003749,
+          "p99": 47.587125000006836,
+          "maximum": 49.35220800000195
+        },
+        "allocate": {
+          "count": 320,
+          "minimum": 0.41404199998851254,
+          "median": 2.2563329999982784,
+          "p95": 3.539582999991353,
+          "p99": 49.23991699999419,
+          "maximum": 50.888749999998595
+        },
+        "file-read": {
+          "count": 320,
+          "minimum": 0.32458300000826057,
+          "median": 1.856333499993923,
+          "p95": 2.85754200000099,
+          "p99": 3.338916000004133,
+          "maximum": 3.5409579999878815
+        },
+        "file-write": {
+          "count": 320,
+          "minimum": 0.4028329999954394,
+          "median": 2.051979499995582,
+          "p95": 2.827707999998097,
+          "p99": 3.3077500000047166,
+          "maximum": 4.576541999995243
+        },
+        "network": {
+          "count": 320,
+          "minimum": 3.271791000003077,
+          "median": 13.582021499999541,
+          "p95": 43.014667000008444,
+          "p99": 46.7005419999964,
+          "maximum": 49.54349999999863
+        },
+        "fanout": {
+          "count": 320,
+          "minimum": 0.4178749999965703,
+          "median": 2.1024584999977947,
+          "p95": 3.897209000001567,
+          "p99": 4.36654199999964,
+          "maximum": 5.226292000003241
+        }
+      },
+      "invocationCpuSeconds": 3.631206,
+      "invocationWallSeconds": 3.983355,
+      "invocationAllocations": 779911,
+      "invocationAllocatedBytes": 47942686,
+      "invocationCollections": 1341,
+      "invocationPeakLiveBytes": 150510,
+      "invocationPeakArenaBytes": 297752
+    },
+    {
+      "mode": "shared-sync",
+      "repetition": 2,
+      "readySeconds": 5.334116125000008,
+      "firstUseSeconds": 2.5167533750000075,
+      "warmRequests": 1920,
+      "batchSeconds": 1.1832297920000059,
+      "requestsPerSecond": 1622.6771950650736,
+      "latencyMs": {
+        "count": 1920,
+        "minimum": 0.3256250000021055,
+        "median": 2.0257079999979055,
+        "p95": 19.589791000001355,
+        "p99": 43.736208000012766,
+        "maximum": 50.95741699999223
+      },
+      "familiesMs": {
+        "short": {
+          "count": 320,
+          "minimum": 0.3256250000021055,
+          "median": 1.5472290000033695,
+          "p95": 3.074208000001022,
+          "p99": 47.71008299999835,
+          "maximum": 49.50049999999351
+        },
+        "allocate": {
+          "count": 320,
+          "minimum": 0.3562920000064196,
+          "median": 2.0727500000035093,
+          "p95": 3.26579200000765,
+          "p99": 49.373041999999145,
+          "maximum": 50.95741699999223
+        },
+        "file-read": {
+          "count": 320,
+          "minimum": 0.349416000005931,
+          "median": 1.6958124999959523,
+          "p95": 2.818875000002663,
+          "p99": 3.0414999999948122,
+          "maximum": 3.3699580000075002
+        },
+        "file-write": {
+          "count": 320,
+          "minimum": 0.4232499999972106,
+          "median": 1.7146670000016684,
+          "p95": 2.7063330000061114,
+          "p99": 3.3905829999980597,
+          "maximum": 3.6814169999956903
+        },
+        "network": {
+          "count": 320,
+          "minimum": 3.8848749999971233,
+          "median": 12.735603999992406,
+          "p95": 42.766833000001725,
+          "p99": 44.8975000000047,
+          "maximum": 45.836666999989006
+        },
+        "fanout": {
+          "count": 320,
+          "minimum": 0.38358300000140844,
+          "median": 1.8028750000027571,
+          "p95": 3.8626249999964557,
+          "p99": 4.422207999994043,
+          "maximum": 4.822833999995169
+        }
+      },
+      "invocationCpuSeconds": 3.605078,
+      "invocationWallSeconds": 3.93718,
+      "invocationAllocations": 779983,
+      "invocationAllocatedBytes": 47947130,
+      "invocationCollections": 1353,
+      "invocationPeakLiveBytes": 150478,
+      "invocationPeakArenaBytes": 297224
+    },
+    {
+      "mode": "baseline-live",
+      "repetition": 2,
+      "readySeconds": 5.940935291999992,
+      "firstUseSeconds": 4.649565748000015,
+      "warmRequests": 1920,
+      "batchSeconds": 1.6832778749999875,
+      "requestsPerSecond": 1140.6316381364036,
+      "latencyMs": {
+        "count": 1920,
+        "minimum": 0.513083000001302,
+        "median": 3.566292000002136,
+        "p95": 24.49495800000534,
+        "p99": 48.453666999989764,
+        "maximum": 98.17195799999467
+      },
+      "familiesMs": {
+        "short": {
+          "count": 320,
+          "minimum": 0.6658329999993384,
+          "median": 2.7521040000024755,
+          "p95": 5.445667000003596,
+          "p99": 93.40245900000355,
+          "maximum": 96.24629199998935
+        },
+        "allocate": {
+          "count": 320,
+          "minimum": 0.7223750000093787,
+          "median": 3.533999999994819,
+          "p95": 5.739417000000913,
+          "p99": 96.07425000000092,
+          "maximum": 98.17195799999467
+        },
+        "file-read": {
+          "count": 320,
+          "minimum": 0.513083000001302,
+          "median": 3.154249999994363,
+          "p95": 4.904832999997666,
+          "p99": 5.724625000013361,
+          "maximum": 6.218040999996788
+        },
+        "file-write": {
+          "count": 320,
+          "minimum": 0.5938330000105907,
+          "median": 3.048166499993954,
+          "p95": 4.835041999996292,
+          "p99": 5.70095900000922,
+          "maximum": 6.285625000003847
+        },
+        "network": {
+          "count": 320,
+          "minimum": 5.130166999990138,
+          "median": 17.69674999999893,
+          "p95": 46.58537499999227,
+          "p99": 51.543667000004234,
+          "maximum": 54.728625000009856
+        },
+        "fanout": {
+          "count": 320,
+          "minimum": 0.573417000012455,
+          "median": 3.3189369999959695,
+          "p95": 6.632125000010092,
+          "p99": 7.482791000001043,
+          "maximum": 8.376249999997754
+        }
+      },
+      "invocationCpuSeconds": 6.583888,
+      "invocationWallSeconds": 6.799727,
+      "invocationAllocations": 779479,
+      "invocationAllocatedBytes": 47916022,
+      "invocationCollections": 1148,
+      "invocationPeakLiveBytes": 192674,
+      "invocationPeakArenaBytes": 683040
+    },
+    {
+      "mode": "shared-live",
+      "repetition": 2,
+      "readySeconds": 5.457107167000004,
+      "firstUseSeconds": 4.549583461999987,
+      "warmRequests": 1920,
+      "batchSeconds": 1.5272858750000182,
+      "requestsPerSecond": 1257.1320349570947,
+      "latencyMs": {
+        "count": 1920,
+        "minimum": 0.44512499999882493,
+        "median": 2.6192710000074726,
+        "p95": 25.478915999997298,
+        "p99": 49.16087500001254,
+        "maximum": 89.90662499999758
+      },
+      "familiesMs": {
+        "short": {
+          "count": 320,
+          "minimum": 0.5333750000033888,
+          "median": 1.9861249999948427,
+          "p95": 5.5605000000014115,
+          "p99": 84.70983399999454,
+          "maximum": 87.62929199998837
+        },
+        "allocate": {
+          "count": 320,
+          "minimum": 0.6210829999986345,
+          "median": 2.6720000000182154,
+          "p95": 5.422082999984923,
+          "p99": 87.55691700000057,
+          "maximum": 89.90662499999758
+        },
+        "file-read": {
+          "count": 320,
+          "minimum": 0.44512499999882493,
+          "median": 2.1519370000007143,
+          "p95": 4.4167080000079295,
+          "p99": 4.945542000001524,
+          "maximum": 5.976916999998139
+        },
+        "file-write": {
+          "count": 320,
+          "minimum": 0.5105830000218248,
+          "median": 1.9631669999995438,
+          "p95": 4.411915999995131,
+          "p99": 5.256792000011501,
+          "maximum": 5.913790999997559
+        },
+        "network": {
+          "count": 320,
+          "minimum": 5.688832999993565,
+          "median": 17.307708499998853,
+          "p95": 48.05279100000348,
+          "p99": 50.02049999998803,
+          "maximum": 51.564916999993216
+        },
+        "fanout": {
+          "count": 320,
+          "minimum": 0.6340420000015001,
+          "median": 2.5146664999908808,
+          "p95": 6.233166000015444,
+          "p99": 7.470666999992659,
+          "maximum": 7.9056250000064665
+        }
+      },
+      "invocationCpuSeconds": 6.370481,
+      "invocationWallSeconds": 6.484024,
+      "invocationAllocations": 779623,
+      "invocationAllocatedBytes": 47924910,
+      "invocationCollections": 1045,
+      "invocationPeakLiveBytes": 193542,
+      "invocationPeakArenaBytes": 581304
+    }
+  ],
+  "summaries": [
+    {
+      "mode": "baseline-live",
+      "trials": 3,
+      "readySeconds": {
+        "count": 3,
+        "minimum": 5.535155666000001,
+        "median": 5.601955083,
+        "p95": 5.940935291999992,
+        "p99": 5.940935291999992,
+        "maximum": 5.940935291999992
+      },
+      "firstUseSeconds": {
+        "count": 3,
+        "minimum": 4.538373872000008,
+        "median": 4.571470834000003,
+        "p95": 4.649565748000015,
+        "p99": 4.649565748000015,
+        "maximum": 4.649565748000015
+      },
+      "requestsPerSecond": {
+        "count": 3,
+        "minimum": 1087.4747147685805,
+        "median": 1140.6316381364036,
+        "p95": 1145.5827891192985,
+        "p99": 1145.5827891192985,
+        "maximum": 1145.5827891192985
+      },
+      "invocationCpuSeconds": {
+        "count": 3,
+        "minimum": 6.415652,
+        "median": 6.434706,
+        "p95": 6.583888,
+        "p99": 6.583888,
+        "maximum": 6.583888
+      },
+      "invocationAllocatedBytes": {
+        "count": 3,
+        "minimum": 47913800,
+        "median": 47916022,
+        "p95": 47927132,
+        "p99": 47927132,
+        "maximum": 47927132
+      },
+      "invocationCollections": {
+        "count": 3,
+        "minimum": 1148,
+        "median": 1237,
+        "p95": 1429,
+        "p99": 1429,
+        "maximum": 1429
+      },
+      "invocationPeakLiveBytes": {
+        "count": 3,
+        "minimum": 192423,
+        "median": 192674,
+        "p95": 195502,
+        "p99": 195502,
+        "maximum": 195502
+      },
+      "trialP95Ms": {
+        "count": 3,
+        "minimum": 24.49495800000534,
+        "median": 24.645082999995793,
+        "p95": 26.668334000000016,
+        "p99": 26.668334000000016,
+        "maximum": 26.668334000000016
+      },
+      "trialP99Ms": {
+        "count": 3,
+        "minimum": 48.025832999996965,
+        "median": 48.453666999989764,
+        "p95": 50.62312500000132,
+        "p99": 50.62312500000132,
+        "maximum": 50.62312500000132
+      },
+      "familyTrialP95Ms": {
+        "short": {
+          "count": 3,
+          "minimum": 4.752999999997343,
+          "median": 5.18950000000018,
+          "p95": 5.445667000003596,
+          "p99": 5.445667000003596,
+          "maximum": 5.445667000003596
+        },
+        "allocate": {
+          "count": 3,
+          "minimum": 5.739417000000913,
+          "median": 6.182666999990261,
+          "p95": 6.1955830000002265,
+          "p99": 6.1955830000002265,
+          "maximum": 6.1955830000002265
+        },
+        "file-read": {
+          "count": 3,
+          "minimum": 4.704250000003185,
+          "median": 4.8534999999994,
+          "p95": 4.904832999997666,
+          "p99": 4.904832999997666,
+          "maximum": 4.904832999997666
+        },
+        "file-write": {
+          "count": 3,
+          "minimum": 4.316540999997898,
+          "median": 4.835041999996292,
+          "p95": 4.858792000007384,
+          "p99": 4.858792000007384,
+          "maximum": 4.858792000007384
+        },
+        "network": {
+          "count": 3,
+          "minimum": 46.58537499999227,
+          "median": 47.310750000008284,
+          "p95": 50.02641699999799,
+          "p99": 50.02641699999799,
+          "maximum": 50.02641699999799
+        },
+        "fanout": {
+          "count": 3,
+          "minimum": 6.152624999998579,
+          "median": 6.216208999997974,
+          "p95": 6.632125000010092,
+          "p99": 6.632125000010092,
+          "maximum": 6.632125000010092
+        }
+      }
+    },
+    {
+      "mode": "baseline-sync",
+      "trials": 3,
+      "readySeconds": {
+        "count": 3,
+        "minimum": 5.269382332999996,
+        "median": 5.330813957999993,
+        "p95": 5.7329610419999995,
+        "p99": 5.7329610419999995,
+        "maximum": 5.7329610419999995
+      },
+      "firstUseSeconds": {
+        "count": 3,
+        "minimum": 2.4823665399999983,
+        "median": 2.5125122910000073,
+        "p95": 2.524726293000029,
+        "p99": 2.524726293000029,
+        "maximum": 2.524726293000029
+      },
+      "requestsPerSecond": {
+        "count": 3,
+        "minimum": 1445.559395203902,
+        "median": 1540.5778789306585,
+        "p95": 1572.4412736835823,
+        "p99": 1572.4412736835823,
+        "maximum": 1572.4412736835823
+      },
+      "invocationCpuSeconds": {
+        "count": 3,
+        "minimum": 3.570904,
+        "median": 3.612754,
+        "p95": 3.631206,
+        "p99": 3.631206,
+        "maximum": 3.631206
+      },
+      "invocationAllocatedBytes": {
+        "count": 3,
+        "minimum": 47942686,
+        "median": 47971572,
+        "p95": 47973794,
+        "p99": 47973794,
+        "maximum": 47973794
+      },
+      "invocationCollections": {
+        "count": 3,
+        "minimum": 1285,
+        "median": 1337,
+        "p95": 1341,
+        "p99": 1341,
+        "maximum": 1341
+      },
+      "invocationPeakLiveBytes": {
+        "count": 3,
+        "minimum": 150481,
+        "median": 150487,
+        "p95": 150510,
+        "p99": 150510,
+        "maximum": 150510
+      },
+      "trialP95Ms": {
+        "count": 3,
+        "minimum": 19.886334000005945,
+        "median": 20.739333999999943,
+        "p95": 21.39537500001154,
+        "p99": 21.39537500001154,
+        "maximum": 21.39537500001154
+      },
+      "trialP99Ms": {
+        "count": 3,
+        "minimum": 44.01525000000106,
+        "median": 44.925375000000045,
+        "p95": 45.32270800000049,
+        "p99": 45.32270800000049,
+        "maximum": 45.32270800000049
+      },
+      "familyTrialP95Ms": {
+        "short": {
+          "count": 3,
+          "minimum": 2.979417000000595,
+          "median": 3.099875000003749,
+          "p95": 3.332583000002387,
+          "p99": 3.332583000002387,
+          "maximum": 3.332583000002387
+        },
+        "allocate": {
+          "count": 3,
+          "minimum": 3.539582999991353,
+          "median": 3.566417000000044,
+          "p95": 4.041958000001955,
+          "p99": 4.041958000001955,
+          "maximum": 4.041958000001955
+        },
+        "file-read": {
+          "count": 3,
+          "minimum": 2.85754200000099,
+          "median": 2.957042000000243,
+          "p95": 3.4968329999998105,
+          "p99": 3.4968329999998105,
+          "maximum": 3.4968329999998105
+        },
+        "file-write": {
+          "count": 3,
+          "minimum": 2.801875000001175,
+          "median": 2.827707999998097,
+          "p95": 3.832000000002722,
+          "p99": 3.832000000002722,
+          "maximum": 3.832000000002722
+        },
+        "network": {
+          "count": 3,
+          "minimum": 43.014667000008444,
+          "median": 44.19658399999982,
+          "p95": 44.621167000002515,
+          "p99": 44.621167000002515,
+          "maximum": 44.621167000002515
+        },
+        "fanout": {
+          "count": 3,
+          "minimum": 3.8800000000005497,
+          "median": 3.897209000001567,
+          "p95": 4.072500000006585,
+          "p99": 4.072500000006585,
+          "maximum": 4.072500000006585
+        }
+      }
+    },
+    {
+      "mode": "shared-live",
+      "trials": 3,
+      "readySeconds": {
+        "count": 3,
+        "minimum": 5.457107167000004,
+        "median": 5.750186916000004,
+        "p95": 5.786731040999996,
+        "p99": 5.786731040999996,
+        "maximum": 5.786731040999996
+      },
+      "firstUseSeconds": {
+        "count": 3,
+        "minimum": 4.504383163999975,
+        "median": 4.549583461999987,
+        "p95": 4.773374083000014,
+        "p99": 4.773374083000014,
+        "maximum": 4.773374083000014
+      },
+      "requestsPerSecond": {
+        "count": 3,
+        "minimum": 1047.7918605127081,
+        "median": 1055.1888255951826,
+        "p95": 1257.1320349570947,
+        "p99": 1257.1320349570947,
+        "maximum": 1257.1320349570947
+      },
+      "invocationCpuSeconds": {
+        "count": 3,
+        "minimum": 6.370481,
+        "median": 6.429098,
+        "p95": 6.775535,
+        "p99": 6.775535,
+        "maximum": 6.775535
+      },
+      "invocationAllocatedBytes": {
+        "count": 3,
+        "minimum": 47922688,
+        "median": 47924910,
+        "p95": 47942686,
+        "p99": 47942686,
+        "maximum": 47942686
+      },
+      "invocationCollections": {
+        "count": 3,
+        "minimum": 1045,
+        "median": 1431,
+        "p95": 1514,
+        "p99": 1514,
+        "maximum": 1514
+      },
+      "invocationPeakLiveBytes": {
+        "count": 3,
+        "minimum": 188275,
+        "median": 193542,
+        "p95": 198283,
+        "p99": 198283,
+        "maximum": 198283
+      },
+      "trialP95Ms": {
+        "count": 3,
+        "minimum": 25.478915999997298,
+        "median": 26.1150420000007,
+        "p95": 28.662165999996603,
+        "p99": 28.662165999996603,
+        "maximum": 28.662165999996603
+      },
+      "trialP99Ms": {
+        "count": 3,
+        "minimum": 49.16087500001254,
+        "median": 51.16354199999762,
+        "p95": 54.085957999994605,
+        "p99": 54.085957999994605,
+        "maximum": 54.085957999994605
+      },
+      "familyTrialP95Ms": {
+        "short": {
+          "count": 3,
+          "minimum": 4.727707999997222,
+          "median": 5.38283400000239,
+          "p95": 5.5605000000014115,
+          "p99": 5.5605000000014115,
+          "maximum": 5.5605000000014115
+        },
+        "allocate": {
+          "count": 3,
+          "minimum": 5.422082999984923,
+          "median": 5.939458000000286,
+          "p95": 6.03745899999808,
+          "p99": 6.03745899999808,
+          "maximum": 6.03745899999808
+        },
+        "file-read": {
+          "count": 3,
+          "minimum": 4.4167080000079295,
+          "median": 4.543750000003399,
+          "p95": 4.67379100000187,
+          "p99": 4.67379100000187,
+          "maximum": 4.67379100000187
+        },
+        "file-write": {
+          "count": 3,
+          "minimum": 4.411915999995131,
+          "median": 4.417541999998775,
+          "p95": 4.793832999993697,
+          "p99": 4.793832999993697,
+          "maximum": 4.793832999993697
+        },
+        "network": {
+          "count": 3,
+          "minimum": 48.05279100000348,
+          "median": 51.06570799999588,
+          "p95": 52.167749999995294,
+          "p99": 52.167749999995294,
+          "maximum": 52.167749999995294
+        },
+        "fanout": {
+          "count": 3,
+          "minimum": 6.155333999998902,
+          "median": 6.233166000015444,
+          "p95": 6.318291999996006,
+          "p99": 6.318291999996006,
+          "maximum": 6.318291999996006
+        }
+      }
+    },
+    {
+      "mode": "shared-sync",
+      "trials": 3,
+      "readySeconds": {
+        "count": 3,
+        "minimum": 5.334116125000008,
+        "median": 5.4276524170000044,
+        "p95": 5.4923129589999995,
+        "p99": 5.4923129589999995,
+        "maximum": 5.4923129589999995
+      },
+      "firstUseSeconds": {
+        "count": 3,
+        "minimum": 2.491898081000002,
+        "median": 2.5167533750000075,
+        "p95": 2.554972208000038,
+        "p99": 2.554972208000038,
+        "maximum": 2.554972208000038
+      },
+      "requestsPerSecond": {
+        "count": 3,
+        "minimum": 1447.9744936397071,
+        "median": 1622.6771950650736,
+        "p95": 1751.3797816886852,
+        "p99": 1751.3797816886852,
+        "maximum": 1751.3797816886852
+      },
+      "invocationCpuSeconds": {
+        "count": 3,
+        "minimum": 3.581449,
+        "median": 3.605078,
+        "p95": 3.639462,
+        "p99": 3.639462,
+        "maximum": 3.639462
+      },
+      "invocationAllocatedBytes": {
+        "count": 3,
+        "minimum": 47947130,
+        "median": 47947130,
+        "p95": 47951574,
+        "p99": 47951574,
+        "maximum": 47951574
+      },
+      "invocationCollections": {
+        "count": 3,
+        "minimum": 1303,
+        "median": 1330,
+        "p95": 1353,
+        "p99": 1353,
+        "maximum": 1353
+      },
+      "invocationPeakLiveBytes": {
+        "count": 3,
+        "minimum": 150478,
+        "median": 150487,
+        "p95": 150685,
+        "p99": 150685,
+        "maximum": 150685
+      },
+      "trialP95Ms": {
+        "count": 3,
+        "minimum": 19.1445839999993,
+        "median": 19.589791000001355,
+        "p95": 21.56216699999902,
+        "p99": 21.56216699999902,
+        "maximum": 21.56216699999902
+      },
+      "trialP99Ms": {
+        "count": 3,
+        "minimum": 42.08087499999991,
+        "median": 43.736208000012766,
+        "p95": 46.75575000000265,
+        "p99": 46.75575000000265,
+        "maximum": 46.75575000000265
+      },
+      "familyTrialP95Ms": {
+        "short": {
+          "count": 3,
+          "minimum": 3.0516250000012235,
+          "median": 3.074208000001022,
+          "p95": 3.094457999992528,
+          "p99": 3.094457999992528,
+          "maximum": 3.094457999992528
+        },
+        "allocate": {
+          "count": 3,
+          "minimum": 3.09033299999939,
+          "median": 3.26579200000765,
+          "p95": 3.986083999990342,
+          "p99": 3.986083999990342,
+          "maximum": 3.986083999990342
+        },
+        "file-read": {
+          "count": 3,
+          "minimum": 2.7047499999994784,
+          "median": 2.818875000002663,
+          "p95": 3.0573330000009946,
+          "p99": 3.0573330000009946,
+          "maximum": 3.0573330000009946
+        },
+        "file-write": {
+          "count": 3,
+          "minimum": 2.631250000000307,
+          "median": 2.7063330000061114,
+          "p95": 2.80862500000012,
+          "p99": 2.80862500000012,
+          "maximum": 2.80862500000012
+        },
+        "network": {
+          "count": 3,
+          "minimum": 41.93749999999952,
+          "median": 42.766833000001725,
+          "p95": 46.604333999994196,
+          "p99": 46.604333999994196,
+          "maximum": 46.604333999994196
+        },
+        "fanout": {
+          "count": 3,
+          "minimum": 3.66250000000079,
+          "median": 3.8626249999964557,
+          "p95": 4.21874999999261,
+          "p99": 4.21874999999261,
+          "maximum": 4.21874999999261
+        }
+      }
+    }
+  ],
+  "limitations": [
+    "Closed-loop requests include downstream delay and client overhead; not offered-load capacity.",
+    "Ready includes process launch, metadata selection/verification and JIT runtime setup; filesystem cache is uncontrolled.",
+    "Invocation CPU/allocation/GC counts include first use, warm work and teardown, not warm-only CPU/request.",
+    "Three trials are descriptive; percentiles of trial summaries are not pooled request percentiles.",
+    "File payloads are small and cache state is uncontrolled; no cold-storage performance claim."
+  ]
+}

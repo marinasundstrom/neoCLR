@@ -4,6 +4,29 @@
 tracks plain HTTP and HTTP JSON using the [standard procedure](/benchmarks/gc/procedure/).
 Those experimental AOT results are separate from the published-package series below.
 
+## Development decision: shared scheduling remains opt-in — 28 October 2026
+
+Three untraced rounds with eight clients and 1,920 warm requests per process,
+following 24 first-use endpoints; both collectors use matching 1 MiB heaps:
+
+| Queue / GC | Ready median (s) | First-use sweep (s) | Warm req/s median (range) | Median trial p99 (ms) |
+| --- | ---: | ---: | ---: | ---: |
+| baseline-sync | 5.331 | 2.513 | 1541 (1446–1572) | 44.93 |
+| shared-sync | 5.428 | 2.517 | 1623 (1448–1751) | 43.74 |
+| baseline-live | 5.602 | 4.571 | 1141 (1087–1146) | 48.45 |
+| shared-live | 5.750 | 4.550 | 1055 (1048–1257) | 51.16 |
+
+All 23,328 requests pass. Shared queues improve the sync throughput median by 5.3%
+but reduce the concurrent median by 7.5%; ranges overlap and three trials do not
+establish a general win. **Keep existing scheduling and GC defaults.** The DNS/native
+GC correctness fixes are enabled; shared ready storage stays opt-in.
+
+Ready includes process/metadata setup; first use includes lazy compilation and
+I/O. This closed-loop workload is not production capacity. Separate native stack
+samples highlight root/store and binding costs but leave many JIT frames unnamed.
+AOT, offered-load limits and full context/HTTP phase profiling remain follow-up.
+[Decision, raw data and profiles](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/shared-scheduling-decision-20261028/README.md).
+
 ## Development: mixed scheduling and I/O qualification — 28 October 2026
 
 Twenty-four endpoint methods exercise nested/shared-capture tasks, allocation,

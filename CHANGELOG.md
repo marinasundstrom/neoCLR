@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-28
 
+- Wrap up the shared-scheduling slice with repeated untraced mixed HTTP measurements and separate native stack samples. Record readiness/first-use/per-family tails and reject sampled runs from benchmark summaries. Keep enabled correctness fixes and existing scheduling/GC defaults; shared queues remain opt-in because the sync improvement is variable and concurrent median throughput regresses. Update website tables and explicitly defer the remaining capacity/AOT/context-profile gates.
+
 - Qualify 24-endpoint mixed HTTP with nested/shared-capture tasks, files and downstream network I/O under both collectors and ready-queue variants. Fix missing DNS/multi-address native frame classification and owner-host provider admission; admit audited file/Contains providers while retaining restricted worker service boundaries. Twelve optimized/UBSan native executions and 480 diagnostic HTTP requests pass. Preserve slower shared-queue observations and record HTTP/binding blocking candidates; no capacity or throughput gain is claimed.
 
 - Integrate Raven neoCLR compiler fix `91c1edca8` for structural callback overload specificity. Task.Run infers async unwrapping without explicit type arguments; 21 focused compiler tests and 80 nested-task HTTP requests pass across both collectors and ready-queue variants. Record the unchanged two pre-existing broader compiler-test failures and remaining mixed-I/O limits; packaged SDK replacement and website publication are separate.

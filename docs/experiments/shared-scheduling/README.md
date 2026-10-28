@@ -97,3 +97,16 @@ also qualifies DNS and multi-address socket providers during active epochs.
 [Results, reproducible recipes and blocking audit](../../validation/shared-scheduling-mixed-20261028/README.md)
 retain all four diagnostic cases and their regressions. These checks are not a
 production throughput benchmark; untraced/load/AOT and phase profiling remain open.
+
+
+## Repeated measurement and wrap-up decision
+
+`mixed-http.py --repetitions 3 --clients 8 --cycles 10` alternates mode order,
+records process readiness separately from first-use requests, and retains warm
+latencies. `summarize-mixed.py` produces trial medians/ranges and per-family tails;
+it rejects diagnostic runs. Optional macOS `--native-sample-seconds 5` starts a
+separate stack sample after first use and labels results native-profile.
+[Integration decision and evidence](../../validation/shared-scheduling-decision-20261028/README.md):
+correctness fixes stay enabled, shared queues remain opt-in, existing scheduling
+and GC defaults are retained. Remaining acceptance/profile gates are deferred at
+the author's wrap-up direction; they are not satisfied by this fixed-load cohort.

@@ -22,16 +22,18 @@ p.add_argument('--output', type=Path, required=True)
 p.add_argument('--modes', nargs='+', default=['baseline-sync', 'shared-sync', 'baseline-live', 'shared-live'])
 p.add_argument('--clients', type=int, default=8)
 p.add_argument('--cycles', type=int, default=1)
+p.add_argument('--repetitions', type=int, default=1)
+p.add_argument('--native-sample-seconds', type=int, default=0, help='Separate macOS stack-sampled diagnostic run')
 a = p.parse_args()
-assert 0<a.clients<=16 and a.cycles>0
+assert 0<a.clients<=16 and a.cycles>0 and a.repetitions>0 and 0<=a.native_sample_seconds<=30
 out = a.output.resolve(); out.mkdir(parents=True, exist_ok=False)
 build_path = a.build.resolve()/'build.json'; build = json.loads(build_path.read_text())
 assert build['passed'] and build['workload']=='twenty-four-route-mixed-http'
 for path, digest in build['inputs'].items():
     assert hashlib.sha256(Path(path).read_bytes()).hexdigest()==digest, ('stale input',path)
 routes = [(kind,i) for kind in ('short','allocate','file-read','file-write','network','fanout') for i in range(4)]
-report = dict(passed=False, kind='profile' if build.get('diagnosticOnly') else 'qualification', scope=__doc__, trials=[], clients=a.clients,
-              cycles=a.cycles, downstreamDelaySeconds=[.002,.005,.010,.030],
+report = dict(passed=False, kind='native-profile' if a.native_sample_seconds else 'profile' if build.get('diagnosticOnly') else 'qualification', scope=__doc__, trials=[], clients=a.clients,
+              cycles=a.cycles, repetitions=a.repetitions, nativeSampleSeconds=a.native_sample_seconds, downstreamDelaySeconds=[.002,.005,.010,.030],
               inputs={str(build_path):hashlib.sha256(build_path.read_bytes()).hexdigest(),
                       str(Path(__file__).resolve()):hashlib.sha256(Path(__file__).read_bytes()).hexdigest()})
 
@@ -62,12 +64,16 @@ def traffic(port, selected):
 peer = ThreadingHTTPServer(('127.0.0.1',19876),Downstream)
 threading.Thread(target=peer.serve_forever,daemon=True).start()
 try:
-    for mode in a.modes:
-        print(mode, flush=True)
+    order = [(repeat, mode) for repeat in range(a.repetitions)
+             for mode in (a.modes if repeat % 2 == 0 else list(reversed(a.modes)))]
+    for repeat, mode in order:
+        print(repeat, mode, flush=True)
         recipe=build['recipes'][mode]; lines=queue.Queue(); stdout=[]; stderr=[]
-        trial=dict(mode=mode,sample='mixed',passed=False,command=recipe['command'],environment=recipe['env'])
+        sampler=None
+        trial=dict(mode=mode,repetition=repeat,sample='mixed',passed=False,command=recipe['command'],environment=recipe['env'])
         with tempfile.TemporaryDirectory(prefix='neoclr-mixed-http-') as directory:
             work=Path(directory); (work/'input.txt').write_text('checked file payload')
+            launch=time.perf_counter()
             process=subprocess.Popen(recipe['command'],cwd=work,env=dict(os.environ,**recipe['env']),
                                      text=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
             def drain(stream, target, notify=False):
@@ -84,13 +90,23 @@ try:
                     line=lines.get(timeout=max(.01,deadline-time.monotonic()))
                     assert line is not None,'server exited before readiness'
                     if line.strip()=='READY': break
+                trial['readySeconds']=time.perf_counter()-launch
                 port=int(lines.get(timeout=10)); control=int(lines.get(timeout=10))
                 trial['firstUse']=traffic(port,routes)
+                if a.native_sample_seconds:
+                    sample=out/f'{repeat}-{mode}.sample.txt'
+                    sample_command=['/usr/bin/sample',str(process.pid),str(a.native_sample_seconds),'1','-mayDie','-file',str(sample)]
+                    trial['nativeSampleCommand']=sample_command
+                    sampler=subprocess.Popen(sample_command,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
                 began=time.perf_counter()
                 with ThreadPoolExecutor(max_workers=a.clients) as executor:
                     jobs=[executor.submit(traffic,port,(routes[i:]+routes[:i])*a.cycles) for i in range(a.clients)]
                     trial['requests']=[row for job in jobs for row in job.result()]
                 trial['batchSeconds']=time.perf_counter()-began
+                if sampler:
+                    trial['nativeSampleExitCode']=sampler.wait(timeout=40)
+                    assert sampler.returncode==0 and sample.is_file() and sample.stat().st_size>0
+                    trial['nativeSampleSha256']=hashlib.sha256(sample.read_bytes()).hexdigest()
                 for i in range(4): assert (work/f'output-{i}.txt').read_text()=='checked file payload'
                 with socket.create_connection(('127.0.0.1',control),timeout=10): pass
                 assert process.wait(timeout=30)==0
@@ -100,6 +116,7 @@ try:
                 trial['passed']=True
             except Exception: trial['failure']=traceback.format_exc()
             finally:
+                if sampler and sampler.poll() is None: sampler.terminate(); sampler.wait(timeout=10)
                 if process.poll() is None: process.kill(); process.wait(timeout=10)
                 for thread in threads: thread.join(timeout=5)
                 trial.update(stdout=''.join(stdout),stderr=''.join(stderr),exitCode=process.returncode)
