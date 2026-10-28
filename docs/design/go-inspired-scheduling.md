@@ -152,8 +152,22 @@ screens are variable; longer two-worker controls show about 1% lower throughput.
 Keep FIFO as the default. The prototype retains the shared pool/heap gate and
 establishes no application or collector advantage.
 
-The next bounded investigation is real I/O completion-to-resume latency and
-coordination costs, retaining the owner-pinned control and shared async/GC trace.
+The [real TCP baseline](../validation/io-resume-20261028/README.md) now uses the
+existing owner-local scheduler/carrier with both collectors. Completion-to-resume
+p99 is 2–3 µs in the final short screen; one long callback raises send-to-resume
+latency relative to sixteen callbacks with the same loop count. This identifies
+execution granularity as a responsiveness constraint, without selecting a GC mode.
+Next investigate bounded cooperative execution/offload and admission while keeping
+owner affinity explicit; expand to paced multiple connections and generated
+handlers before adopting a design. The author permits refactoring/redesign without
+backward compatibility (2026-10-28). This removes a migration constraint, not GC
+root/suspension correctness obligations.
+The author emphasizes competitive tradeoffs against other runtimes and discovery
+of both internal optimizations and architectural changes. Cooperative execution
+and offload remain candidates, not chosen architecture. Use matched semantic and
+resource constraints for .NET/Go comparisons, including CPU, memory, idle cost,
+throughput, latency and fairness; retain ordinary runtime optimization candidates
+when they address measured costs without a larger redesign.
 Predeclare workload, repetitions, acceptable tail/error budget and host constraints
 before evaluating a candidate. Queue ordering alone cannot remove first-call JIT
 blocking or qualify shared managed execution.

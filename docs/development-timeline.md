@@ -1,5 +1,13 @@
 # Development conversation record
 
+## 2026-10-28 — Real I/O handoff and redesign authority
+
+- **Author:** Directed continuing immediately, then explicitly permitted refactoring/redesign without regard to backward compatibility.
+- **Assistant response:** Use that authority for internal scheduler/worker/suspension changes while first measuring the existing path. Correctness, root ownership and actual workload benefits still require evidence.
+- **Action/outcome:** Added a real loopback TCP fixture using the current socket adapter and rooted async carrier, with idle, CPU, allocation and long-callback controls. Both collectors pass optimized/UBSan checks; separate traces and stack samples are retained. The final screen has completion-to-resume p99 2–3 µs. One long callback raises median send-to-resume from 42–46 µs to 355–365 µs relative to sixteen callbacks with the same loop count, while slightly reducing batch wall time. Collector tails vary across cohorts. [Evidence and limits](validation/io-resume-20261028/README.md) distinguish configuration effects, closed-loop native callbacks and tiny live graphs from generated application or production capacity claims.
+- **Author tradeoff clarification:** The objective is the best tradeoff comparable to other runtimes, discovering further internal optimizations or architectural/design changes. **Assistant response:** Cooperative execution/offload are candidates, not selected architecture; compare matched workload/resource/semantic conditions and throughput, tails, CPU, memory, idle cost and fairness, while retaining common-runtime optimization opportunities.
+- **Next proposal:** Investigate bounded cooperative execution/offload and admission while preserving owner-thread affinity; expand to paced multiple connections, larger live sets and generated HTTP handlers under JIT/AOT and both collectors. No runtime redesign, compatibility break or collector-default change is implemented in this measurement slice. Website tables/direction are prepared for the next manual publication.
+
 ## 2026-10-28 — Scheduling for general-purpose applications
 
 - **Author:** Emphasized good scheduling/worker services for fast I/O, HTTP and task switching. Clarified that the runtime should serve both normal and server loads, enable competitive RabbitMQ bindings, and that normal applications include future desktop and mobile UI apps.

@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-28
 
+- Add a real TCP completion-to-resume baseline through the existing owner-local socket scheduler and rooted async carrier, comparing idle, CPU, allocation and long-callback shapes under both collectors. Qualify optimized/UBSan behavior and retain separate traces/profiles plus all timing cohorts. Equal-loop-count long callbacks trade lower batch time for higher I/O latency; no production/GC winner is claimed. Record authority to redesign without backward compatibility, and prioritize cooperative execution/offload investigation. Update website evidence for the next publication.
+
 - Enable Cranelift speed optimization by default for scalar/managed eager and lazy JIT and AOT, independently of method inlining. Retain the test-only comparison override. Inspect ARM64 shifted-add and x64 scaled-LEA lowering for constant multiplication; record mixed short-loop timing/code-size results without claiming a universal speedup.
 
 - Add bounded default leaf-method inlining shared by JIT/AOT, with CLR-compatible MethodImplOptions.NoInlining/AggressiveInlining overrides, metadata/import/reference preservation and Raven core-marker validation. NoInlining wins; unsafe or unsupported candidates remain calls. Refresh the SDK/API reference and document the initial Int32/Boolean scope; small SDK methods require no blanket annotations.

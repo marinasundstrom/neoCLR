@@ -43,7 +43,12 @@ checks, but repeated timings show no broad advantage; FIFO remains the default.
 [Measurement tables and limitations](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/queue-policy-20261028/README.md)
 retain both short screens and longer controls. These are native-job measurements,
 not HTTP or collector comparisons. Next work targets real I/O completion-to-resume
-latency and coordination costs.
+latency and coordination costs. A subsequent
+[real TCP baseline and tables](https://github.com/marinasundstrom/neoCLR/blob/main/docs/validation/io-resume-20261028/README.md)
+now compare both collectors: long callbacks delay I/O observation even when
+post-completion resumption stays short. Next investigate cooperative execution,
+offloading and admission. These native fixtures do not establish HTTP capacity,
+UI responsiveness or a collector winner.
 
 The intended general-purpose scope also includes future desktop/mobile UI apps:
 main-thread affinity, input/frame responsiveness and idle CPU/energy matter alongside
