@@ -11,8 +11,10 @@ import zipfile
 
 
 SOURCE_LINK_CHECKS = {
+    'System/IO/FileSystemNotification/index.html': 'runtime/System.Runtime/src/System.Runtime/System/IO/FileSystemNotification.rvn',
+    'System/IO/FileSystemRename/property_OldPath.html': 'runtime/System.Runtime/src/System.Runtime/System/IO/FileSystemWatcher.rvn',
     'System/IO/FileSystemWatcher/index.html': 'runtime/System.Runtime/src/System.Runtime/System/IO/FileSystemWatcher.rvn',
-    'System/IO/FileSystemWatcher/method_OnChanged.html': 'runtime/System.Runtime/src/System.Runtime/System/IO/FileSystemWatcher.rvn',
+    'System/IO/FileSystemWatcher/method_Subscribe.html': 'runtime/System.Runtime/src/System.Runtime/System/IO/FileSystemWatcher.rvn',
     'Neo/Configuration/Json/JsonConfigurationProvider/index.html': 'extensions/Neo.Configuration/src/Neo.Configuration.Json/Neo/Configuration/Json/JsonConfiguration.rvn',
     'Neo/Configuration/Configuration/index.html': 'extensions/Neo.Configuration/src/Neo.Configuration.Abstractions/Neo/Configuration/Contracts.rvn',
     'Neo/Logging/Logger/index.html': 'extensions/Neo.Logging/src/Neo.Logging.Abstractions/Neo/Logging/Contracts.rvn',

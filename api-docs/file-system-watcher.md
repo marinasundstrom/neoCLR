@@ -17,17 +17,19 @@ its provider-resolved File/Directory model; this API uses native filesystem path
 | `TryStart() -> Result<unit, FileSystemWatcherError>` | Establishes the OS subscription before success; repeated starts are harmless. Disposed returns Closed. |
 | `Stop()` | Cancels delivery, discards queued notifications and closes the native subscription. Retains handlers for restart. Idempotent. |
 | `Dispose()` | Stops permanently and releases all registered callbacks. Idempotent. |
-| `OnCreated`, `OnChanged`, `OnDeleted` | Accept `(FileSystemWatcher, FileSystemEventArgs) -> Void`; return Disposable registrations. |
-| `OnRenamed` | Accepts `(FileSystemWatcher, RenamedEventArgs) -> Void`; returns a Disposable registration. Either old or new basename may match Filter. |
-| `OnError` | Accepts `(FileSystemWatcher, ErrorEventArgs) -> Void`; returns a Disposable registration. Re-read state after an error. |
-| `FileSystemEventArgs.ChangeType` | Created, Deleted, Changed or Renamed. |
-| `FileSystemEventArgs.FullPath`, `Name` | Absolute physical path and path relative to the watched root; platform directory separators. |
-| `RenamedEventArgs.OldFullPath`, `OldName` | Previous absolute and root-relative paths; inherits FileSystemEventArgs. |
-| `ErrorEventArgs.Error` | Typed FileSystemWatcherError; no exception payload. |
+| `Subscribe(callback: (FileSystemNotification) -> Void) -> Disposable` | Registers a synchronous callback for every notification kind. Dispose the registration to remove it. |
+| `FileSystemChange.Name`, `FullPath` | Validated root-relative name and full path derived from the canonical watched root and that name. Constructors are internal. |
+| `FileSystemRename.OldPath`, `NewPath` | Two FileSystemChange values sharing the same watched root. Constructor is internal. |
+| `FileSystemNotification.Created(change)` | A created file or directory. |
+| `FileSystemNotification.Changed(change)` | Content or metadata changed; a complete write is not guaranteed. |
+| `FileSystemNotification.Deleted(change)` | A deleted file or directory. |
+| `FileSystemNotification.Renamed(change)` | A known rename pair. Either basename may match Filter. |
+| `FileSystemNotification.RescanRequired(reason)` | Notification loss or provider failure; re-read current state. |
 
-Event argument constructors are internal. `WatcherChangeTypes` uses Created=1,
-Deleted=2, Changed=4, Renamed=8, All=15. All is provided for familiar naming; this
-slice does not expose a change-type mask or WaitForChanged.
+The standard Raven union determines the payload type and change kind. There is no
+separate ChangeType field or event-argument hierarchy. Watchers emit only populated
+cases. Applications can construct cases from received payloads; path and rename
+constructors remain internal to preserve validated path relationships.
 
 `FileSystemWatcherError` values are InvalidPath=1, NotFound=2, AccessDenied=3,
 IoFailure=4, Closed=5, BufferOverflow=6, InvalidEncoding=7,
@@ -83,19 +85,25 @@ PlatformNotSupported. No silent polling fallback is enabled. See
 ## Configuration example
 
 The [executable sample](https://github.com/marinasundstrom/neoCLR/tree/main/samples/file-watcher)
-uses these registrations, with Change/Rename/Rescan scheduling a debounced TryLoad:
+uses one callback, with every case scheduling a debounced TryLoad:
 
 ```raven
-watcher = FileSystemWatcher(directory, "appsettings.json")
-_ = watcher.OnChanged(Change)
-_ = watcher.OnCreated(Change)
-_ = watcher.OnDeleted(Change)
-_ = watcher.OnRenamed(Rename)
-_ = watcher.OnError(Rescan)
+_ = watcher.Subscribe(Notify)
+
+func Notify(notification: FileSystemNotification) {
+    if notification is FileSystemNotification.RescanRequired(_) {
+        Console.WriteLine("Watcher lost detail; reading current settings")
+    }
+    Schedule()
+}
 ```
 
-Automatic configuration reload and provider-level storage change notifications
-remain separate work. Native event declarations are not yet supported by the
-Raven native emitter; disposable registrations are the explicit initial API.
+Breaking development change (2026-10-30): replace OnCreated/OnChanged/OnDeleted/
+OnRenamed/OnError registrations with Subscribe and union matching. WatcherChangeTypes,
+FileSystemEventArgs, RenamedEventArgs and ErrorEventArgs are removed; rebuild consumers.
+The callback no longer receives a sender; capture the watcher when needed.
+
+Direct callbacks are the notification convention. Library event support, automatic
+configuration reload and provider-level storage notifications remain later work.
 NotifyFilter, Filters collections, InternalBufferSize tuning, synchronizing objects
 and WaitForChanged are not implemented.

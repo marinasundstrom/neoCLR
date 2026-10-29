@@ -80,7 +80,8 @@ def main():
                   provider='notify 8.2.0, statically linked runtime adapter',
                   sources={str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
                            for p in [*PROJECT.parent.rglob('*.rvn'), PROJECT,
-                                     ROOT / 'runtime/System.Runtime/src/System.Runtime/System/IO/FileSystemWatcher.rvn']})
+                                     ROOT / 'runtime/System.Runtime/src/System.Runtime/System/IO/FileSystemWatcher.rvn',
+                                     ROOT / 'runtime/System.Runtime/src/System.Runtime/System/IO/FileSystemNotification.rvn']})
     try:
         build = out / 'native'
         result = subprocess.run([sys.executable, str(ROOT / 'scripts/build-native-project.py'),

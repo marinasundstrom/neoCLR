@@ -37,20 +37,28 @@ class Observations {
     var Count = 0
     var Unexpected = 0
     var Errors = 0
-    func Change(sender: FileSystemWatcher, change: FileSystemEventArgs) {
+    func Change(change: FileSystemChange) {
         Count += 1
         if (change.Name != "nested/settings.json" && change.Name != "nested\\settings.json") || (!change.FullPath.EndsWithOrdinal("/nested/settings.json") && !change.FullPath.EndsWithOrdinal("\\nested\\settings.json")) {
             Unexpected += 1
         }
     }
-    func Rename(sender: FileSystemWatcher, change: RenamedEventArgs) {
+    func Rename(change: FileSystemRename) {
         Count += 1
-        if change.Name != "nested/settings.json" && change.OldName != "nested/settings.json" && change.Name != "nested\\settings.json" && change.OldName != "nested\\settings.json" {
+        if change.NewPath.Name != "nested/settings.json" && change.OldPath.Name != "nested/settings.json" && change.NewPath.Name != "nested\\settings.json" && change.OldPath.Name != "nested\\settings.json" {
             Unexpected += 1
         }
     }
-    func Error(sender: FileSystemWatcher, error: ErrorEventArgs) { Errors += 1 }
-    func Removed(sender: FileSystemWatcher, change: FileSystemEventArgs) { Unexpected += 1 }
+    func Notify(notification: FileSystemNotification) {
+        match notification {
+            FileSystemNotification.Created(let change) => Change(change)
+            FileSystemNotification.Changed(let change) => Change(change)
+            FileSystemNotification.Deleted(let change) => Change(change)
+            FileSystemNotification.Renamed(let change) => Rename(change)
+            FileSystemNotification.RescanRequired(_) => { Errors += 1 }
+        }
+    }
+    func Removed(notification: FileSystemNotification) { Unexpected += 1 }
 }
 
 async func Settle() -> Task<()> {
@@ -67,14 +75,10 @@ async func `Physical notifications filter descendants and respect stop restart a
     let watcher = FileSystemWatcher(root, "*.json")
     watcher.IncludeSubdirectories = true
     let observations = Observations()
-    let removed = watcher.OnCreated(observations.Removed)
+    let removed = watcher.Subscribe(observations.Removed)
     removed.Dispose()
     removed.Dispose()
-    _ = watcher.OnCreated(observations.Change)
-    _ = watcher.OnChanged(observations.Change)
-    _ = watcher.OnDeleted(observations.Change)
-    _ = watcher.OnRenamed(observations.Rename)
-    _ = watcher.OnError(observations.Error)
+    _ = watcher.Subscribe(observations.Notify)
     if watcher.TryStart() is Failure(_) { watcher.Dispose(); return Assert.True(false, "Cannot start native watcher") }
     Console.WriteLine("READY create")
     await Settle()

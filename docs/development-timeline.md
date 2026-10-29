@@ -23779,3 +23779,20 @@ and the testing guides now record the author clarification. See the
   [the watcher design](file-system-watcher.md). Backend availability is distinct
   from execution evidence; Windows and broader platform runs remain explicit gates.
   No replacement of System.Storage or automatic AddJsonFile reload was authorized.
+
+## 2026-10-30 — Union-valued watcher callbacks and notification convention
+
+- **Author:** Asked whether FileSystemWatcher should simulate separate events or
+  accept a function callback receiving a union, emphasizing enforced invariants.
+- **Assistant proposal:** One subscription callback with Created/Changed/Deleted,
+  Renamed and RescanRequired cases; derive full paths from root-relative names,
+  removing redundant kind fields and the event-argument hierarchy.
+- **Author decision:** “Implement.” Subsequently directed that callbacks should be
+  the norm, whether accepted through constructors or other registration mechanisms;
+  library event support will be added later.
+- **Action:** Replace watcher registrations with Subscribe returning Disposable,
+  retain the OS provider and invocation lifecycle, update the configuration sample,
+  behavioral tests, API reference and general Raven callback conventions. Keep Task/
+  await for asynchronous operations; the direction concerns notifications.
+- **Validation:** See [the focused watcher union receipt](validation/file-system-watcher-union-20261030/README.md); Windows execution remains
+  unqualified. Concurrent compiler/reflection work is outside this slice.

@@ -17,11 +17,24 @@ re-read current state, not a journal or an atomic-write guarantee. The
 [member reference](../api-docs/file-system-watcher.md) documents exact current
 behavior and gaps; no complete .NET compatibility is claimed.
 
-Raven's native emitter rejects event declarations (NEOMETA001). Disposable
-OnCreated/OnChanged/OnDeleted/OnRenamed/OnError registrations preserve callback
-ownership without adding event metadata in this slice. This differs from .NET's
-`+=`/`-=` syntax but releases captured state explicitly and avoids delegate identity
-matching. Public event syntax remains a compiler/backend gap. Settings can change
+The author subsequently directed a single function callback receiving a union,
+with invariants represented by the payload types (2026-10-30). Subscribe accepts
+`(FileSystemNotification) -> Void` and returns a Disposable. Created/Changed/Deleted
+carry FileSystemChange; Renamed carries FileSystemRename with both paths; a
+RescanRequired case carries the reason. The kind cannot disagree with the payload.
+Paths retain the canonical root and validated relative name, deriving FullPath at
+the boundary. Rename paths must share a root. No independently supplied full-path
+property or redundant ChangeType is retained.
+
+This deliberately differs from .NET's separate events and EventArgs hierarchy:
+it enables exhaustive Raven matching and structurally coherent payloads, at the
+cost of source compatibility with the initial development API and .NET event idioms.
+The author made direct function callbacks the general notification convention,
+accepted through constructors or registration methods as lifetime needs dictate.
+Library event support will come later; this is an intentional API direction, not
+merely a workaround for the current native event-emission gap.
+
+Settings can change
 only while stopped; this avoids implicit OS resubscription and its observation gap,
 at the cost of requiring an explicit Stop/change/Start sequence. NotifyFilter,
 Filters, buffer tuning, WaitForChanged and synchronization objects remain gaps.
@@ -93,3 +106,6 @@ change tokens are separate work, not implied by adding this watcher.
 See [the focused macOS evidence](validation/file-system-watcher-20261029/README.md)
 for native/interpreter lifecycle, ownership, provider and configuration-sample results.
 Windows execution remains a release qualification gate.
+
+The [2026-10-30 union callback receipt](validation/file-system-watcher-union-20261030/README.md)
+records the replacement contract, consumer migration and constructor/type rejection checks.

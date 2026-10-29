@@ -14,6 +14,7 @@ static class SourceUnionReferences
         "System.Text.EncoderState",
         "System.IO.TextReadError",
         "System.IO.StreamError",
+        "System.IO.FileSystemNotification",
         "System.Storage.FileReadError",
         "System.Storage.FileWriteError",
         "System.ConsoleReadError",

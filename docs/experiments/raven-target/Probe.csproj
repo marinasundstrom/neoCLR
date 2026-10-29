@@ -51,4 +51,5 @@
     <EmbeddedResource Include="../../../runtime/System.Data/src/System.Data/System/Data/Sql/SqlError.rvn" LogicalName="NeoCLR.SqlError.rvn" />
     <EmbeddedResource Include="../../../runtime/System.Data/src/System.Data/System/Data/Sql/SqlValue.rvn" LogicalName="NeoCLR.SqlValue.rvn" />
   </ItemGroup>
+<ItemGroup><EmbeddedResource Include="../../../runtime/System.Runtime/src/System.Runtime/System/IO/FileSystemNotification.rvn" LogicalName="NeoCLR.FileSystemNotification.rvn" /></ItemGroup>
 </Project>

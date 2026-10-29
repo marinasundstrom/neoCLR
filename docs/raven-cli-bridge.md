@@ -16227,10 +16227,11 @@ it adds no CLI or native metadata representation. No watcher identity is an
 OS descriptor or guest pointer. The native host's invocation scope and interpreter
 registry close abandoned subscriptions. See [design and validation](file-system-watcher.md).
 
-The source native emitter rejects event declarations, so OnCreated/OnChanged/
-OnDeleted/OnRenamed/OnError return Disposable registrations. The aggregate CLI
-reference projects structural callbacks using its existing Action transport;
-actual native callable shapes remain structural Functions. Public event metadata,
-provider-neutral watching and general compiled FFI string/buffer marshalling remain
-gaps. A future native metadata event implementation must preserve subscription
-and ownership semantics rather than treating this transport as a permanent event ABI.
+The author-directed callback contract now uses Subscribe with a standard Raven
+FileSystemNotification union (2026-10-30). The aggregate CLI reference projects
+structural callbacks using its existing Action transport and the union through
+source-union projection; native callable shapes remain structural Functions and
+native union metadata. No new bridge encoding is introduced. Library event support
+is deferred by design, rather than a compatibility requirement on this API.
+Provider-neutral watching and general compiled FFI string/buffer marshalling remain
+gaps. Preserve subscription and invocation ownership if event helpers are added later.

@@ -1,0 +1,10 @@
+module System.IO
+
+/// Physical notifications are hints to re-read state, not a complete filesystem journal.
+public union FileSystemNotification {
+    case Created(change: FileSystemChange)
+    case Changed(change: FileSystemChange)
+    case Deleted(change: FileSystemChange)
+    case Renamed(change: FileSystemRename)
+    case RescanRequired(reason: FileSystemWatcherError)
+}

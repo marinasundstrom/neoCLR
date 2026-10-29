@@ -1,5 +1,7 @@
 # neoCLR platform roadmap
 
+**Author-directed callbacks (2026-10-30):** Direct function callbacks are the default notification API, accepted through constructors or explicit registration as appropriate. The watcher uses a single union-valued subscription with coherent path payloads. Library event support remains later work; see [conventions](raven-conventions.md) and [watcher design](file-system-watcher.md).
+
 **Author-directed physical watching (2026-10-29):** Add standalone [System.IO.FileSystemWatcher](file-system-watcher.md) first; preserve the WinRT-like System.Storage model. Windows and macOS are the release priorities. Provider-level change notification and automatic configuration reload remain separate work. This bounded slice does not reprioritize the main milestones.
 
 **Author-directed panic design (2026-10-29):** The [synchronous cleanup contract and plan](synchronous-panic-cleanup.md) are documented; implementation remains open. Evaluate existing status propagation and lifetime metadata before new opcodes, without introducing exception handling. Task supervision, Environment termination and GC finalization remain deferred. This bounded direction does not reprioritize the broader milestones.

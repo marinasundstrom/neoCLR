@@ -6,6 +6,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-10-30
+
+- Replace FileSystemWatcher’s separate notification registrations and event-argument hierarchy with Subscribe and the FileSystemNotification union. Changes carry coherent root-relative paths; renames carry both paths from one root; rescan requests carry a reason. Remove WatcherChangeTypes and the old argument types; consumers must migrate and rebuild. Establish direct function callbacks as the notification convention, with library event support deferred. Update the configuration sample, runtime tests and API/website documentation.
+
 ### 2026-10-29
 
 - Refine the generic function-method design around `with args: object?[]` semantics

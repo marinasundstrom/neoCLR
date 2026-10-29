@@ -3,22 +3,23 @@ static class FileSystemWatcherDeclarations
 {
     public const string Source = """
     namespace IO {
-        public enum WatcherChangeTypes { Created = 1, Deleted = 2, Changed = 4, Renamed = 8, All = 15 }
         public enum FileSystemWatcherError { InvalidPath = 1, NotFound = 2, AccessDenied = 3, IoFailure = 4, Closed = 5, BufferOverflow = 6, InvalidEncoding = 7, PlatformNotSupported = 8, ResourceLimit = 9 }
-        public class FileSystemEventArgs {
-            internal FileSystemEventArgs() { }
-            public WatcherChangeTypes ChangeType { get; }
+        public sealed class FileSystemChange {
+            internal FileSystemChange() { }
             public string FullPath { get; }
             public string Name { get; }
         }
-        public sealed class RenamedEventArgs : FileSystemEventArgs {
-            internal RenamedEventArgs() { }
-            public string OldFullPath { get; }
-            public string OldName { get; }
+        public sealed class FileSystemRename {
+            internal FileSystemRename() { }
+            public FileSystemChange OldPath { get; }
+            public FileSystemChange NewPath { get; }
         }
-        public sealed class ErrorEventArgs {
-            internal ErrorEventArgs() { }
-            public FileSystemWatcherError Error { get; }
+        public struct FileSystemNotification {
+            public struct Created { }
+            public struct Changed { }
+            public struct Deleted { }
+            public struct Renamed { }
+            public struct RescanRequired { }
         }
         public sealed class FileSystemWatcher : Disposable {
             public FileSystemWatcher(string path) { }
@@ -30,11 +31,7 @@ static class FileSystemWatcherDeclarations
             public Result<PropagationUnit, FileSystemWatcherError> TryStart() => default;
             public void Stop() { }
             public void Dispose() { }
-            public Disposable OnCreated(Action<FileSystemWatcher, FileSystemEventArgs> callback) => default;
-            public Disposable OnChanged(Action<FileSystemWatcher, FileSystemEventArgs> callback) => default;
-            public Disposable OnDeleted(Action<FileSystemWatcher, FileSystemEventArgs> callback) => default;
-            public Disposable OnRenamed(Action<FileSystemWatcher, RenamedEventArgs> callback) => default;
-            public Disposable OnError(Action<FileSystemWatcher, ErrorEventArgs> callback) => default;
+            public Disposable Subscribe(Action<FileSystemNotification> callback) => default;
         }
     }
     """;

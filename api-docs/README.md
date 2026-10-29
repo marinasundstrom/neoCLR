@@ -3093,10 +3093,14 @@ panic boundaries remain undecided. See [the contract](../docs/system-fault.md).
 
 ### FileSystemWatcher (2026-10-29 development)
 
-System.IO.FileSystemWatcher, WatcherChangeTypes, FileSystemWatcherError,
-FileSystemEventArgs, RenamedEventArgs and ErrorEventArgs are included in the
+System.IO.FileSystemWatcher, FileSystemWatcherError, FileSystemNotification,
+FileSystemChange and FileSystemRename are included in the
 aggregate reference and native selection. Source summaries and the
 [member/lifetime reference](file-system-watcher.md) cover disposable callback
 registrations, setup errors, filtering, ownership and platform limits. Native
 Raven event syntax remains unsupported; no event declaration is silently omitted.
-The native snapshot includes all six public types and their actual members.
+The native snapshot includes all five public types and their actual members.
+
+2026-10-30: the watcher reference replaces separate callbacks and event arguments
+with Subscribe and a standard Raven union. The union is projected from its source
+into the aggregate reference; native rendering covers all five cases and payloads.

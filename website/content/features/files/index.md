@@ -92,6 +92,11 @@ on the invocation completion queue. It supports filename filters, recursive watc
 creation/change/deletion/rename notifications, errors and explicit disposal.
 System.Storage retains its provider-based File/Directory model.
 
+Use `watcher.Subscribe(callback)` to receive `FileSystemNotification`. Match its
+Created, Changed, Deleted, Renamed and RescanRequired cases; rename payloads always
+contain old and new paths. Dispose the returned registration to release the callback.
+
+
 The [configuration watcher sample](https://github.com/marinasundstrom/neoCLR/tree/main/samples/file-watcher)
 subscribes to changes and debounces calls to JsonConfigurationProvider.TryLoad.
 Failed reads preserve previous settings; notifications can be duplicated or lost,

@@ -9,15 +9,6 @@ import System.Runtime.CompilerServices.*
 import System.Text.*
 import System.Time.*
 
-/// Physical filesystem notification kinds; notifications may be duplicated or coalesced.
-public enum WatcherChangeTypes {
-    Created = 1
-    Deleted = 2
-    Changed = 4
-    Renamed = 8
-    All = 15
-}
-
 /// Recoverable watcher setup, transport and notification-loss errors.
 public enum FileSystemWatcherError {
     InvalidPath = 1
@@ -31,33 +22,45 @@ public enum FileSystemWatcherError {
     ResourceLimit = 9
 }
 
-/// A physical change; Name is relative to the watched directory, FullPath is absolute.
-public open class FileSystemEventArgs {
-    val ChangeType: WatcherChangeTypes
-    val FullPath: string
+/// A physical path within a watched root. The full path is derived from the root and Name.
+public class FileSystemChange {
+    private val root: string
     val Name: string
-    internal init(changeType: WatcherChangeTypes, fullPath: string, name: string) {
-        ChangeType = changeType
-        FullPath = fullPath
+    val FullPath: string => root + Name
+
+    internal init(root: string, name: string) {
+        if root.IsEmpty || root.ContainsOrdinal("\u0000") || name.IsEmpty || name.ContainsOrdinal("\u0000") {
+            Panic("Invalid filesystem notification path")
+        }
+        let separator = if root.EndsWithOrdinal("\\") { "\\" } else { "/" }
+        if !root.EndsWithOrdinal(separator) || name.StartsWithOrdinal(separator) ||
+            name == "." || name == ".." || name.StartsWithOrdinal("." + separator) ||
+            name.StartsWithOrdinal(".." + separator) || name.EndsWithOrdinal(separator + ".") ||
+            name.EndsWithOrdinal(separator + "..") || name.ContainsOrdinal(separator + "." + separator) ||
+            name.ContainsOrdinal(separator + ".." + separator) {
+            Panic("Invalid filesystem notification relative name")
+        }
+        if name.EndsWithOrdinal(separator) || name.ContainsOrdinal(separator + separator) {
+            Panic("Invalid filesystem notification path")
+        }
+        self.root = root
         Name = name
     }
+    internal func SharesRoot(other: FileSystemChange) -> bool => root == other.root
 }
 
-/// A paired rename. Platforms may instead report separate deletion and creation notifications.
-public class RenamedEventArgs : FileSystemEventArgs {
-    val OldFullPath: string
-    val OldName: string
-    internal init(changeType: WatcherChangeTypes, fullPath: string, name: string, oldFullPath: string, oldName: string)
-        : base(changeType, fullPath, name) {
-        OldFullPath = oldFullPath
-        OldName = oldName
+/// Both paths of a known rename; ordinary changes cannot carry rename-only data.
+public class FileSystemRename {
+    val OldPath: FileSystemChange
+    val NewPath: FileSystemChange
+
+    internal init(oldPath: FileSystemChange, newPath: FileSystemChange) {
+        if !oldPath.SharesRoot(newPath) {
+            Panic("Rename paths must share a watched root")
+        }
+        OldPath = oldPath
+        NewPath = newPath
     }
-}
-
-/// Reports notification loss or provider failure. Re-read the directory after an error.
-public class ErrorEventArgs {
-    val Error: FileSystemWatcherError
-    internal init(error: FileSystemWatcherError) { Error = error }
 }
 
 /// Watches a physical directory using the OS provider. Access and callbacks are owner-queue serialized.
@@ -69,11 +72,7 @@ public class FileSystemWatcher : Disposable {
     private var handle = 0L
     private var disposed = false
     private var timer: Timer? = null
-    private val created = FileWatchHandlers<FileSystemEventArgs>()
-    private val changed = FileWatchHandlers<FileSystemEventArgs>()
-    private val deleted = FileWatchHandlers<FileSystemEventArgs>()
-    private val renamed = FileWatchHandlers<RenamedEventArgs>()
-    private val errors = FileWatchHandlers<ErrorEventArgs>()
+    private val notifications = FileWatchHandlers()
 
     /// Creates a stopped watcher for all names in path.
     init(path: string) { self.path = path; filter = "*" }
@@ -105,30 +104,13 @@ public class FileSystemWatcher : Disposable {
         }
     }
 
-    /// Raised for a created file or directory.
-    func OnCreated(callback: (FileSystemWatcher, FileSystemEventArgs) -> Void) -> Disposable {
-        if disposed { Panic("FileSystemWatcher is disposed") }
-        return created.Add(callback)
-    }
-    /// Raised for content or metadata changes. Does not guarantee a complete write.
-    func OnChanged(callback: (FileSystemWatcher, FileSystemEventArgs) -> Void) -> Disposable {
-        if disposed { Panic("FileSystemWatcher is disposed") }
-        return changed.Add(callback)
-    }
-    /// Raised for a deleted file or directory.
-    func OnDeleted(callback: (FileSystemWatcher, FileSystemEventArgs) -> Void) -> Disposable {
-        if disposed { Panic("FileSystemWatcher is disposed") }
-        return deleted.Add(callback)
-    }
-    /// Raised when the OS supplies both sides of a rename; either name may match Filter.
-    func OnRenamed(callback: (FileSystemWatcher, RenamedEventArgs) -> Void) -> Disposable {
-        if disposed { Panic("FileSystemWatcher is disposed") }
-        return renamed.Add(callback)
-    }
-    /// Raised for overflow, invalid UTF-8 names or provider errors. Watching remains enabled.
-    func OnError(callback: (FileSystemWatcher, ErrorEventArgs) -> Void) -> Disposable {
-        if disposed { Panic("FileSystemWatcher is disposed") }
-        return errors.Add(callback)
+    /// Subscribes to all notifications. Dispose the registration to release its callback.
+    /// The union case determines the payload; rescan notifications never fabricate a change.
+    func Subscribe(callback: (FileSystemNotification) -> Void) -> Disposable {
+        if disposed {
+            Panic("FileSystemWatcher is disposed")
+        }
+        return notifications.Add(callback)
     }
 
     /// Starts watching before returning. Repeated starts are harmless; disposal returns Closed.
@@ -167,7 +149,7 @@ public class FileSystemWatcher : Disposable {
         if disposed { return }
         disposed = true
         Stop()
-        created.Clear(); changed.Clear(); deleted.Clear(); renamed.Clear(); errors.Clear()
+        notifications.Clear()
     }
     private func CheckStopped() {
         if disposed { Panic("FileSystemWatcher is disposed") }
@@ -180,7 +162,7 @@ public class FileSystemWatcher : Disposable {
             let packet = ReadPacket(generation)
             if packet.Length == 0 { return }
             if packet[0] == 0 {
-                errors.Invoke(self, ErrorEventArgs((FileSystemWatcherError)(int)packet[1]))
+                notifications.Invoke(FileSystemNotification.RescanRequired((FileSystemWatcherError)(int)packet[1]))
                 return
             }
             var fields = ArrayList<string>()
@@ -191,7 +173,7 @@ public class FileSystemWatcher : Disposable {
                     let bytes: ReadOnlySlice<byte> = packet
                     let text = match Encodings.Utf8.Decode(bytes.Slice(start, index - start)) {
                         Ok(let value) => value
-                        Failure(_) => { errors.Invoke(self, ErrorEventArgs(FileSystemWatcherError.InvalidEncoding)); return }
+                        Failure(_) => { notifications.Invoke(FileSystemNotification.RescanRequired(FileSystemWatcherError.InvalidEncoding)); return }
                     }
                     fields.Add(text)
                     start = index + 1
@@ -199,17 +181,29 @@ public class FileSystemWatcher : Disposable {
                 index += 1
             }
             if fields.Count != 4 { Panic("Invalid file watcher provider packet") }
-            let kind = (WatcherChangeTypes)(int)packet[0]
-            if kind == WatcherChangeTypes.Renamed {
-                renamed.Invoke(self, RenamedEventArgs(WatcherChangeTypes.Renamed, fields[0], fields[1], fields[2], fields[3]))
-            } else {
-                let args = FileSystemEventArgs(kind, fields[0], fields[1])
-                if kind == WatcherChangeTypes.Created { created.Invoke(self, args) }
-                if kind == WatcherChangeTypes.Changed { changed.Invoke(self, args) }
-                if kind == WatcherChangeTypes.Deleted { deleted.Invoke(self, args) }
+            let change = DecodePath(fields[0], fields[1])
+            let notification = match (int)packet[0] {
+                1 => FileSystemNotification.Created(change)
+                2 => FileSystemNotification.Deleted(change)
+                4 => FileSystemNotification.Changed(change)
+                8 => FileSystemNotification.Renamed(FileSystemRename(DecodePath(fields[2], fields[3]), change))
+                _ => { Panic("Invalid file watcher notification kind") }
             }
+            notifications.Invoke(notification)
             count += 1
         }
+    }
+    // The trusted OS provider supplies canonical absolute paths and root-relative names.
+    // Verify their relationship once; never retain two independently supplied path strings.
+    private func DecodePath(fullPath: string, name: string) -> FileSystemChange {
+        if name.IsEmpty || !fullPath.EndsWithOrdinal(name) || fullPath.Length <= name.Length {
+            Panic("Invalid file watcher path pair")
+        }
+        let root = fullPath[..(fullPath.Length - name.Length)]
+        if !root.EndsWithOrdinal("/") && !root.EndsWithOrdinal("\\") {
+            Panic("Invalid file watcher root")
+        }
+        return FileSystemChange(root, name)
     }
     private func ReadPacket(current: long) -> byte[] {
         let payload = neoCLR.Runtime.FileWatch(1, "", "", current, 0)
@@ -221,35 +215,35 @@ public class FileSystemWatcher : Disposable {
     }
 }
 
-internal class FileWatchHandlers<T> {
-    private var handlers = ArrayList<FileWatchRegistration<T>>()
-    internal func Add(callback: (FileSystemWatcher, T) -> Void) -> Disposable {
-        let next = ArrayList<FileWatchRegistration<T>>()
+internal class FileWatchHandlers {
+    private var handlers = ArrayList<FileWatchRegistration>()
+    internal func Add(callback: (FileSystemNotification) -> Void) -> Disposable {
+        let next = ArrayList<FileWatchRegistration>()
         for handler in handlers {
             if handler.IsActive { next.Add(handler) }
         }
-        let registration = FileWatchRegistration<T>(callback)
+        let registration = FileWatchRegistration(callback)
         next.Add(registration)
         handlers = next
         return registration
     }
     internal func Clear() {
         for handler in handlers { handler.Dispose() }
-        handlers = ArrayList<FileWatchRegistration<T>>()
+        handlers = ArrayList<FileWatchRegistration>()
     }
-    internal func Invoke(sender: FileSystemWatcher, args: T) {
+    internal func Invoke(notification: FileSystemNotification) {
         let snapshot = handlers
-        for callback in snapshot { callback.Invoke(sender, args) }
+        for callback in snapshot { callback.Invoke(notification) }
     }
 }
 
-internal class FileWatchRegistration<T> : Disposable {
-    private var callback: Optional<(FileSystemWatcher, T) -> Void>
-    init(callback: (FileSystemWatcher, T) -> Void) { self.callback = Some(callback) }
+internal class FileWatchRegistration : Disposable {
+    private var callback: Optional<(FileSystemNotification) -> Void>
+    init(callback: (FileSystemNotification) -> Void) { self.callback = Some(callback) }
     internal val IsActive: bool => callback is Some(_)
-    internal func Invoke(sender: FileSystemWatcher, args: T) {
+    internal func Invoke(notification: FileSystemNotification) {
         let current = callback
-        if current is Some(let invoke) { invoke(sender, args) }
+        if current is Some(let invoke) { invoke(notification) }
     }
     func Dispose() { callback = None }
 }

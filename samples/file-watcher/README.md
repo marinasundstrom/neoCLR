@@ -5,8 +5,8 @@ Development sample: a standalone `System.IO.FileSystemWatcher` reloads a
 on startup and after changes. Edit or atomically replace `appsettings.json` in
 the supplied directory while it runs. Comments and trailing commas are accepted.
 
-The monitor subscribes before its first read, watches creation/change/deletion/
-rename and rescans after watcher errors. A 200 ms timer coalesces bursts. Failed
+The monitor calls `Subscribe(Notify)` before its first read. Its callback receives
+the FileSystemNotification union, scheduling reload for changes and RescanRequired. A 200 ms timer coalesces bursts. Failed
 reads/parses preserve the provider's previous values. A delay cannot guarantee a
 writer has finished; this sample does not implement retry or transactional writes.
 It disposes both timers and the watcher explicitly on normal completion.

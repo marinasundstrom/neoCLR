@@ -1,0 +1,73 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0.1-arm64-arm-64bit",
+  "cases": {
+    "ownership": {
+      "exitCode": 0,
+      "stdout": "PASS invocation watcher ownership and teardown\n",
+      "stderr": ""
+    },
+    "native": {
+      "exitCode": 0,
+      "stdout": "PASS watcher defaults and disposal\nPASS watcher setup errors\nREADY create\nOBS create 3 unexpected=0 errors=0\nREADY replace\nOBS replace 3 unexpected=0 errors=1\nREADY stopped\nREADY restart\nOBS restart 2 unexpected=0 errors=1\nREADY disposed\nPASS physical watcher lifecycle\n",
+      "stderr": "",
+      "phases": [
+        "create",
+        "replace",
+        "stopped",
+        "restart",
+        "disposed"
+      ]
+    },
+    "interpreter": {
+      "exitCode": 0,
+      "stdout": "PASS watcher defaults and disposal\nPASS watcher setup errors\nREADY create\nOBS create 3 unexpected=0 errors=0\nREADY replace\nOBS replace 3 unexpected=0 errors=1\nREADY stopped\nREADY restart\nOBS restart 2 unexpected=0 errors=1\nREADY disposed\nPASS physical watcher lifecycle\n",
+      "stderr": "",
+      "phases": [
+        "create",
+        "replace",
+        "stopped",
+        "restart",
+        "disposed"
+      ]
+    }
+  },
+  "provider": "notify 8.2.0, statically linked runtime adapter",
+  "sources": {
+    "runtime/System.Runtime/test/FileSystemWatcherTests/NeoClr/RuntimeTests/Tests.rvn": "7b74a9446c83df9a519a50460ad473652fab0413b657565edbb9d786b7582ffb",
+    "runtime/System.Runtime/test/FileSystemWatcherTests/FileSystemWatcherTests.rvnproj": "135832b56c33b2432b72c266975817424c241495a4c356eb957d5235ed074874",
+    "runtime/System.Runtime/src/System.Runtime/System/IO/FileSystemWatcher.rvn": "b65f58c4a62c0c177e38d165e650dee6805b9df30e7f3f3e857a60247247fbef",
+    "runtime/System.Runtime/src/System.Runtime/System/IO/FileSystemNotification.rvn": "bb4255d81f7fe7093ccae49fe1e90d6b25ba73435ccb501f970ae737e909aa11"
+  },
+  "negativeCompilation": {
+    "Constructor": {
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "/Users/robert/Projects/neoclr/target/filewatch-union-20261030/negative/Constructor.rvn(2,22): error RAV0500: The constructor 'init(root: string, name: string) -> void' is inaccessible due to its visibility\n"
+    },
+    "Payload": {
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "/Users/robert/Projects/neoclr/target/filewatch-union-20261030/negative/Payload.rvn(2,22): error RAV1501: No overload for constructor for type 'Renamed' takes 1 arguments\n"
+    }
+  },
+  "sample": {
+    "passed": true,
+    "exitCode": 0,
+    "stdout": "before\nWatching appsettings.json for 30 seconds\nSettings unavailable or malformed; keeping previous values\nWatcher lost detail; reading current settings\nafter\n",
+    "stderr": ""
+  },
+  "artifactsSha256": {
+    "target/filewatch-union-20261030/runtime-libraries/System.Runtime.dll": "f8a230acc8df88a1f20ad8005fe0cdb923b914c3e6367209d799ad44d5b036ec",
+    "target/filewatch-union-20261030/validation/native/app": "8bd053a4a49122acdb02e3679ce8501abd48897e0e3284a51f80c5c990eb9e71",
+    "target/filewatch-union-20261030/sample/app": "6570cfa57d2b87426d4ea995a136d5b431ab23168fed0129b72d5afda326f6b0",
+    "target/filewatch-union-20261030/neoclr-current": "5a920c730418252e4751d7db4a140758440a63997836758a117f34fe4b999a06",
+    "target/filewatch-20261029/runtime-bundle-final/bundle/bin/neoclr-codegen": "49e5a7bf4f15e32f7a8baee8b7dd78e607839220c1e25985e770a85d9d538ec9",
+    "target/panic-rename-20261029/compiler/rvnc.dll": "424b23ddb587c999f2553361a42dc0c322812d48161b304e0c337467146ddbe9",
+    "docs/experiments/native-library-documentation-audit/bin/Debug/net10.0/RavenDoc.dll": "b7d34d498041b53167e73a4ce081edbdea89225df47dd70436914747f61b5ddb"
+  },
+  "platformGates": {
+    "macOS": "native and interpreter passed",
+    "Windows": "not executed"
+  }
+}

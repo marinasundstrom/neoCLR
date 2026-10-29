@@ -383,11 +383,20 @@ extension API. See [supported extension boundaries](raven-extension-methods.md).
 
 ## Lambda signatures
 
+Use direct function callbacks as the default notification contract (author direction,
+2026-10-30). Accept them through constructors or registration methods as appropriate
+for the owner's lifecycle. Registration APIs should make callback removal and capture
+lifetime explicit, for example by returning Disposable. Prefer a discriminated union
+when notification variants require different payloads; do not duplicate a union tag
+with a separately mutable kind field. Library-level event support is future work,
+not a prerequisite or an API to simulate today. This applies to notifications; keep
+Task/await as the default for asynchronous operations with a completion result.
+
 Spell callback types with Raven function syntax: `(T) -> U` or `() -> Void`,
 including callback fields and generic type arguments. Let the receiving contract
-supply lambda parameter types where possible. On main this source spelling still
-uses the existing Func/delegate runtime representation; it does not introduce
-structural runtime type identity.
+supply lambda parameter types where possible. Native callbacks use structural
+function signatures; temporary CLI reference projections use their documented
+Func/Action transport. See [the bridge contract](raven-cli-bridge.md).
 
 Prefer inferred callback types when the receiving method supplies enough context:
 

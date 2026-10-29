@@ -16,11 +16,7 @@ class SettingsMonitor : Disposable {
         provider = JsonConfigurationProvider(directory + "/appsettings.json")
         debounce = Timer(Reload)
         watcher = FileSystemWatcher(directory, "appsettings.json")
-        _ = watcher.OnChanged(Change)
-        _ = watcher.OnCreated(Change)
-        _ = watcher.OnDeleted(Change)
-        _ = watcher.OnRenamed(Rename)
-        _ = watcher.OnError(Rescan)
+        _ = watcher.Subscribe(Notify)
     }
 
     func Start() {
@@ -31,10 +27,10 @@ class SettingsMonitor : Disposable {
         Reload()
     }
 
-    private func Change(sender: FileSystemWatcher, change: FileSystemEventArgs) { Schedule() }
-    private func Rename(sender: FileSystemWatcher, change: RenamedEventArgs) { Schedule() }
-    private func Rescan(sender: FileSystemWatcher, error: ErrorEventArgs) {
-        Console.WriteLine("Watcher lost detail; reading current settings")
+    private func Notify(notification: FileSystemNotification) {
+        if notification is FileSystemNotification.RescanRequired(_) {
+            Console.WriteLine("Watcher lost detail; reading current settings")
+        }
         Schedule()
     }
     private func Schedule() {
