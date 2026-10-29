@@ -9,5 +9,6 @@
     <ProjectReference Include="../../../../extensions/Neo.DependencyInjection/src/Neo.DependencyInjection.Abstractions/Neo.DependencyInjection.Abstractions.rvnproj" />
     <ProjectReference Include="../../../../extensions/Neo.Localization/src/Neo.Localization.Abstractions/Neo.Localization.Abstractions.rvnproj" />
     <ProjectReference Include="../../../../extensions/Neo.Logging/src/Neo.Logging.Abstractions/Neo.Logging.Abstractions.rvnproj" />
+    <ProjectReference Include="../../../../extensions/Neo.Configuration/src/Neo.Configuration.Abstractions/Neo.Configuration.Abstractions.rvnproj" />
   </ItemGroup>
 </Project>

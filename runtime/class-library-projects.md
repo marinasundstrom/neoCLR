@@ -13,7 +13,8 @@ service bodies are required. Ordinary Raven/.NET projects are unchanged.
 
 ## Build the class-library bundle
 
-Use Raven `51dd22f5a` or a descendant containing native source-core contracts and
+Use Raven `34f14c8ce` or a descendant containing native source-core contracts,
+generic interface emission and nested native callback nullability, together with
 a matching neoCLR runtime. Build the runtime and compiler first, then:
 
 ```sh
@@ -28,8 +29,11 @@ python3 scripts/build-native-class-library.py \
 The builder constructs Runtime without references, creates an empty reserved System
 module in NEOX format, then builds dependent projects with `--no-build-references`.
 Data and Networking reference Runtime; Web references Data and Networking.
-Neo.DependencyInjection references Runtime; Neo.Localization references Runtime, Data
-and DI. PostgreSql is optional. Runtime components are under runtime/<component>; Neo components are under
+Each Neo abstraction project references Runtime. Implementations reference their
+own abstractions; logging, localization and configuration reference DI abstractions.
+Localization additionally references Data for JSON resources. The optional
+Neo.Configuration.Json provider references Data and the configuration projects.
+PostgreSql is optional. Runtime components are under runtime/<component>; Neo components are under
 extensions/<component>. Both group source projects in src/<project> and optional
 test projects in test/<project>. Each project contains its project file and
 namespace folders. No solution file is required.

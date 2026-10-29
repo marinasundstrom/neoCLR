@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../../../runtime/NativeLibrary.props" />
+  <PropertyGroup><AssemblyName>Neo.Configuration</AssemblyName></PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Neo/**/*.rvn" />
+    <ProjectReference Include="../../../../runtime/System.Runtime/src/System.Runtime/System.Runtime.rvnproj" />
+    <ProjectReference Include="../Neo.Configuration.Abstractions/Neo.Configuration.Abstractions.rvnproj" />
+    <ProjectReference Include="../../../Neo.DependencyInjection/src/Neo.DependencyInjection.Abstractions/Neo.DependencyInjection.Abstractions.rvnproj" />
+  </ItemGroup>
+</Project>

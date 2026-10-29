@@ -348,6 +348,17 @@ DEPENDENCY_INJECTION_NAMES = [
     'DI website sample resolves a scoped constructor graph and disposes scopes',
 ]
 
+CONFIGURATION_NAMES = [
+    'Configuration precedence distinguishes absent null and empty values',
+    'Configuration sections merge numeric children and preserve Unicode paths',
+    'Configuration builds snapshot inputs and retain live sections',
+    'Configuration loads reloads and disposes provider registrations',
+    'Configuration DI preserves overrides and caller ownership',
+    'JSON configuration flattens objects arrays and scalar values',
+    'JSON configuration rejects ambiguous malformed and oversized input atomically',
+    'JSON configuration reads required optional files and reloads through the root',
+]
+
 LOGGING_NAMES = [
     'Logging levels and event identity follow the Microsoft baseline',
     'Null logging skips formatting and returns reusable scope handles',
@@ -514,7 +525,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True, help='Fresh build/evidence directory')
     parser.add_argument('--aot', type=Path, default=ROOT / 'target/debug' / ('neoclr-codegen.exe' if os.name == 'nt' else 'neoclr-codegen'))
     parser.add_argument('--runtime', type=Path, default=ROOT / 'target/release' / ('neoclr.exe' if os.name == 'nt' else 'neoclr'))
-    parser.add_argument('--suite', action='append', choices=('error-context', 'environment-discovery', 'native-callbacks', 'native-buffers', 'native-pointers', 'method-state', 'type-relations', 'collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'memory-lifetimes', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'cryptography', 'gzip', 'encoding-boundaries', 'encoding-buffer-limits', 'int64-parsing', 'primitive-parsing', 'numeric-formatting', 'globalization', 'enum-parsing', 'record-formatting', 'record-allocations', 'floating-special-values', 'decimal', 'currency', 'deconstruction', 'logging', 'localization', 'dependency-injection', 'path-values', 'http-header-values', 'http-method-values', 'media-type-values', 'media-type-allocations', 'uri-path-allocations', 'index-range', 'http-text', 'http-content-copy', 'http-lifetime', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
+    parser.add_argument('--suite', action='append', choices=('error-context', 'environment-discovery', 'native-callbacks', 'native-buffers', 'native-pointers', 'method-state', 'type-relations', 'collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'memory-lifetimes', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'cryptography', 'gzip', 'encoding-boundaries', 'encoding-buffer-limits', 'int64-parsing', 'primitive-parsing', 'numeric-formatting', 'globalization', 'enum-parsing', 'record-formatting', 'record-allocations', 'floating-special-values', 'decimal', 'currency', 'deconstruction', 'configuration', 'logging', 'localization', 'dependency-injection', 'path-values', 'http-header-values', 'http-method-values', 'media-type-values', 'media-type-allocations', 'uri-path-allocations', 'index-range', 'http-text', 'http-content-copy', 'http-lifetime', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
                         help='Run only this suite (repeatable); default runs qualified suites')
     parser.add_argument("--execution-repetitions", type=int, default=1, help="Repeat the full suite process in each mode for timing; guards/selectors still run once")
     parser.add_argument('--mode', action='append', choices=('native', 'interpreter', 'jit'),
@@ -581,6 +592,7 @@ def main():
         ('unicode-casing', 0, ''.join('PASS ' + n + '\n' for n in UNICODE_CASING_NAMES) + f'Tests: {len(UNICODE_CASING_NAMES)}, passed: {len(UNICODE_CASING_NAMES)}, failed: 0, skipped: 0\n'),
         ('int64-parsing', 0, ''.join('PASS ' + n + '\n' for n in INT64_PARSING_NAMES) + f'Tests: {len(INT64_PARSING_NAMES)}, passed: {len(INT64_PARSING_NAMES)}, failed: 0, skipped: 0\n'),
         ('dependency-injection', 0, ''.join('PASS ' + n + '\n' for n in DEPENDENCY_INJECTION_NAMES) + f'Tests: {len(DEPENDENCY_INJECTION_NAMES)}, passed: {len(DEPENDENCY_INJECTION_NAMES)}, failed: 0, skipped: 0\n'),
+        ('configuration', 0, ''.join('PASS ' + n + '\n' for n in CONFIGURATION_NAMES) + f'Tests: {len(CONFIGURATION_NAMES)}, passed: {len(CONFIGURATION_NAMES)}, failed: 0, skipped: 0\n'),
         ('logging', 0, ''.join('PASS ' + n + '\n' for n in LOGGING_NAMES) + f'Tests: {len(LOGGING_NAMES)}, passed: {len(LOGGING_NAMES)}, failed: 0, skipped: 0\n'),
         ('localization', 0, ''.join('PASS ' + n + '\n' for n in LOCALIZATION_NAMES) + f'Tests: {len(LOCALIZATION_NAMES)}, passed: {len(LOCALIZATION_NAMES)}, failed: 0, skipped: 0\n'),
         ('deconstruction', 0, ''.join('PASS ' + n + '\n' for n in DECONSTRUCTION_NAMES) + f'Tests: {len(DECONSTRUCTION_NAMES)}, passed: {len(DECONSTRUCTION_NAMES)}, failed: 0, skipped: 0\n'),
@@ -671,7 +683,7 @@ def main():
                 report['phases'].append(dict(suite=name, phase='discovery', elapsedSeconds=round(time.perf_counter() - started, 6), details=json.loads((out / (name + '-discovery') / 'timings.json').read_text())))
                 environment['NeoClrTestRegistry'] = str(registry)
             # Async memory tests need lifecycle bindings; JSON DOM fixtures also select HTTP content/socket handlers.
-            profile = 'http' if name in ('http-text', 'http-content-copy', 'http-lifetime', 'memory-stream', 'memory-lifetimes', 'gzip', 'json-dom', 'json-streams', 'localization', 'encoding-streams', 'encoding-boundaries') else 'console'
+            profile = 'http' if name in ('http-text', 'http-content-copy', 'http-lifetime', 'memory-stream', 'memory-lifetimes', 'gzip', 'json-dom', 'json-streams', 'configuration', 'localization', 'encoding-streams', 'encoding-boundaries') else 'console'
             if os.name == 'nt':
                 profile = 'windows-' + profile
             if name in ('dependency-injection', 'method-state', 'localization', 'logging'):
@@ -775,6 +787,9 @@ def main():
                 for fixture in ('catalogue.json', 'invalid.json'):
                     shutil.copyfile(ROOT / 'extensions/Neo.Localization/test/Neo.Localization.Tests' / fixture, isolated / fixture)
                 shutil.copytree(ROOT / 'extensions/Neo.Localization/test/Neo.Localization.Tests/resources', isolated / 'resources')
+            if name == 'configuration':
+                for fixture in ('appsettings.json', 'invalid-appsettings.json'):
+                    shutil.copyfile(suite_project(name).parent / fixture, isolated / fixture)
             exe = isolated / ('app.exe' if os.name == 'nt' else 'app')
             if 'native' in modes:
                 shutil.copy2(build / exe.name, exe)
@@ -792,7 +807,7 @@ def main():
                 if mode == 'native':
                     executions.append((mode, [exe], isolated, env))
                 elif mode == 'interpreter':
-                    executions.append((mode, interpreter + ['--execution', 'interpreter'], isolated if name == 'localization' else ROOT, None))
+                    executions.append((mode, interpreter + ['--execution', 'interpreter'], isolated if name in ('localization', 'configuration') else ROOT, None))
                 else:
                     jit = interpreter[:interpreter.index('--instructions')] + [
                         '--jit-host', args.jit_host.resolve(),
@@ -805,7 +820,7 @@ def main():
                         jit += ["--reflection-roots", method_roots]
                     if name in ("localization", "logging"):
                         jit += ["--reflection-roots", service_adapter_roots]
-                    executions.append((mode, jit, isolated if name == 'localization' else ROOT, None))
+                    executions.append((mode, jit, isolated if name in ('localization', 'configuration') else ROOT, None))
             repeated_executions = [(repetition, *execution) for repetition in range(1, args.execution_repetitions + 1) for execution in executions]
             for repetition, mode, command, cwd, environment in repeated_executions:
                 started = time.perf_counter()

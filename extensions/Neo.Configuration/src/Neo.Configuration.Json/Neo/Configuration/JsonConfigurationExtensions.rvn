@@ -1,0 +1,11 @@
+module Neo.Configuration
+
+import Neo.Configuration.Json.*
+
+/// Registers JSON sources. Files are read when Build or Reload calls provider Load.
+public extension JsonConfigurationExtensions for ConfigurationBuilder {
+    /// Adds a required strict-JSON file, relative to the current working directory.
+    func AddJsonFile(path: string) -> ConfigurationBuilder => self.Add(JsonConfigurationSource(path, false))
+    /// Adds a required or optional file. Only missing optional files are ignored.
+    func AddJsonFile(path: string, optional: bool) -> ConfigurationBuilder => self.Add(JsonConfigurationSource(path, optional))
+}

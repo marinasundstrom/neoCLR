@@ -1,0 +1,14 @@
+module Neo.Configuration
+
+import System.*
+import Neo.DependencyInjection.*
+import System.Result.*
+
+/// Registers configuration through DI without transferring ownership to the container.
+public extension ConfigurationServices for ServiceCollection {
+    /// Preserves an existing Configuration registration. The caller must dispose its root after DI.
+    func AddConfiguration(configuration: Configuration) -> Result<unit, ServiceError> {
+        _ = self.TryAddSingleton<Configuration>(configuration)?
+        return Ok(())
+    }
+}

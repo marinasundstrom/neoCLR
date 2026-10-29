@@ -1,0 +1,82 @@
+module Neo.Configuration
+
+import System.*
+import System.Collections.*
+import System.Optional.*
+
+/// Provider-independent hierarchical application settings. Paths use colon separators.
+public interface Configuration {
+    /// Gets the effective value, or null for missing or explicitly null settings; sets all providers.
+    var self[key: string]: string? { get; set; }
+    /// Returns a live section even when no value or descendants exist.
+    func GetSection(key: string) -> ConfigurationSection
+    /// Returns a snapshot of immediate children, case-insensitively distinct and numerically ordered.
+    func GetChildren() -> Sequence<ConfigurationSection>
+}
+
+/// A live view of a configuration path; values and descendants are independent.
+public interface ConfigurationSection : Configuration {
+    /// Final colon-delimited segment.
+    val Key: string { get; }
+    /// Full path from the root.
+    val Path: string { get; }
+    /// Gets or sets this section's scalar value.
+    var Value: string? { get; set; }
+}
+
+/// Owns provider instances. Unlike the .NET root interface, explicitly exposes disposal.
+public interface ConfigurationRoot : Configuration, Disposable {
+    /// Provider snapshot in registration order; later providers take precedence.
+    val Providers: Sequence<ConfigurationProvider> { get; }
+    /// Reloads every provider in registration order. No change tokens are supplied yet.
+    func Reload()
+}
+
+/// A synchronous data source. Load and Set faults propagate; access is owner-thread serialized.
+public interface ConfigurationProvider {
+    /// None means absent; Some(null) masks lower-priority values.
+    func Find(key: string) -> Optional<string?>
+    /// Changes the provider's in-memory value; does not imply persistent storage.
+    func Set(key: string, value: string?)
+    /// Loads or reloads source data.
+    func Load()
+    /// Supplies immediate child keys below parentPath; null requests root children.
+    /// The root merges, orders and deduplicates keys across providers.
+    func GetChildKeys(parentPath: string?) -> Sequence<string>
+}
+
+/// Creates a fresh provider for each Build. The resulting root owns that provider.
+public interface ConfigurationSource {
+    func Build(builder: ConfigurationBuilder) -> ConfigurationProvider
+}
+
+/// Composes sources without reading them until Build.
+public interface ConfigurationBuilder {
+    /// Snapshot of sources in registration order.
+    val Sources: Sequence<ConfigurationSource> { get; }
+    /// Appends a source and returns this builder.
+    func Add(source: ConfigurationSource) -> ConfigurationBuilder
+    /// Creates and loads a new independent root. Later sources take precedence.
+    func Build() -> ConfigurationRoot
+}
+
+/// An immutable input key/value pair; null is a present masking value.
+public class ConfigurationEntry {
+    val Key: string
+    val Value: string?
+    init(key: string, value: string?) {
+        Key = key
+        Value = value
+    }
+}
+
+/// Provider-neutral configuration helpers.
+public extension ConfigurationExtensions for Configuration {
+    /// Reads ConnectionStrings:name without conversion or binding.
+    func GetConnectionString(name: string) -> string? => self.GetSection("ConnectionStrings")[name]
+}
+
+/// Existence is a scalar value or at least one descendant; empty strings are values.
+public extension ConfigurationSectionExtensions for ConfigurationSection {
+    func Exists() -> bool => self.Value != null || self.GetChildren().Count > 0
+}

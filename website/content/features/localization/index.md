@@ -6,6 +6,27 @@ Development (2026-10-28): this API now has its own `Neo.Localization.dll` assemb
 Load a JSON catalogue from a directory you choose, then use `Localizer` for
 key-based lookup. `Localizer<T>` associates resources with a feature type.
 
+
+## Try it
+
+Create a small JSON catalogue and format a translated string. A missing key returns the key itself.
+
+```raven
+module Examples.Extensions.Introductions.Localization
+
+import System.*
+import System.Result.*
+import Neo.Localization.*
+
+func Main() -> int {
+    let Ok(strings) = JsonLocalizerProvider.Create("{\"Greeting\":\"Hej {0}!\"}") else { return 1 }
+    Console.WriteLine(strings["Greeting", "Ada"])
+    return 0
+}
+```
+
+[Complete sample project](https://github.com/marinasundstrom/neoCLR/tree/main/samples/extensions/src/LocalizationIntro) · [Build and run instructions](https://github.com/marinasundstrom/neoCLR/blob/main/samples/extensions/README.md#introductory-examples)
+
 ## Small JSON catalogues
 
 Resources are flat UTF-8 JSON objects whose keys and values are strings:

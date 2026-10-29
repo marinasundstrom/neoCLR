@@ -8,6 +8,27 @@ The indexer returns the key when absent; Find returns `Optional<string>`.
 Empty translations are present. Keys are ordinal and case-sensitive; stored UTF-8
 text is preserved. `Localizer<T>` associates a catalogue with a resource type.
 
+
+## Try it
+
+Create a small JSON catalogue and format a translated string. A missing key returns the key itself.
+
+```raven
+module Examples.Extensions.Introductions.Localization
+
+import System.*
+import System.Result.*
+import Neo.Localization.*
+
+func Main() -> int {
+    let Ok(strings) = JsonLocalizerProvider.Create("{\"Greeting\":\"Hej {0}!\"}") else { return 1 }
+    Console.WriteLine(strings["Greeting", "Ada"])
+    return 0
+}
+```
+
+[Complete sample project](https://github.com/marinasundstrom/neoCLR/tree/main/samples/extensions/src/LocalizationIntro) · [Build and run instructions](https://github.com/marinasundstrom/neoCLR/blob/main/samples/extensions/README.md#introductory-examples)
+
 ## JSON provider
 
 `Neo.Localization.Abstractions.dll` owns the lookup/factory contracts, typed adapter,

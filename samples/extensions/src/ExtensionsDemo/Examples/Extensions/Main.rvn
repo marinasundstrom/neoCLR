@@ -6,11 +6,16 @@ import System.Result.*
 import Neo.DependencyInjection.*
 import Neo.Localization.*
 import Neo.Logging.*
+import Neo.Configuration.*
 
 func Run() -> Result<unit, ServiceError> {
+    let builder: ConfigurationBuilder = DefaultConfigurationBuilder()
+    _ = builder.AddJsonFile("appsettings.json")
+    use configuration = builder.Build()
     let services: ServiceCollection = DefaultServiceCollection()
+    _ = services.AddConfiguration(configuration)?
     _ = services.AddLogging()?
-    let resources = JsonLocalizerProvider("resources")
+    let resources = JsonLocalizerProvider(configuration["Localization:Directory"] ?? "resources")
     let localizers: LocalizerFactory = JsonLocalizerFactory(resources, Culture.Invariant)
     _ = services.AddLocalization(localizers)?
     _ = services.AddScoped<GreetingService>()?
@@ -20,7 +25,7 @@ func Run() -> Result<unit, ServiceError> {
     logging.AddConsole()
     use scope = root.CreateScope()?
     let greeting = scope.GetRequiredService<GreetingService>()?
-    greeting.Greet("Ada")
+    greeting.Greet()
     return Ok(())
 }
 

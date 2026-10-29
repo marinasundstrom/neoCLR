@@ -15,6 +15,7 @@ is supported.
 | `System` | Core types such as Object, Value, HashCode, primitives, String and Array; Func delegates; Optional and Result; common capability and error types; Console. Console is a class in this module. | [Core reference](xref:System), [Object and Value](objects.md), [Console](console.md), [arrays](/features/arrays/index.html), [outcomes](/features/outcomes/index.html), [dates and clocks](/features/time/index.html) |
 | `System.Time` | Dates, TimeOfDay, durations, clocks, calendars, timezone mappings and related errors. | [Reference](xref:System.Time), [time guide](/features/time/) |
 | `Neo.DependencyInjection` | Optional service contracts in Neo.DependencyInjection.Abstractions; default container in Neo.DependencyInjection. | [DI reference](dependency-injection.md) |
+| `Neo.Configuration` | Development hierarchical settings, ordered providers and DI integration. | [Configuration reference](configuration.md) |
 | `Neo.Logging` | Development structured logging, factories, providers and typed DI integration. | [Logging guide](logging.md) |
 | `Neo.Localization` | Development string catalogues, typed scopes, configurable JSON fallback and missing-key reporting. | [Reference](localization.html), [localization guide](localization.md) |
 | `System.Globalization` | Development culture/language profiles, calendar-selecting date/time formatters and fixed/system culture providers. | [Reference](xref:System.Globalization), [globalization guide](/features/globalization/) |

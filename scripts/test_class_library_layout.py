@@ -44,7 +44,7 @@ class ClassLibraryLayout(unittest.TestCase):
         self.assertFalse(authored - owners.keys(), authored - owners.keys())
 
     def test_extension_abstractions_do_not_reference_implementations(self):
-        for component in ('Neo.DependencyInjection', 'Neo.Localization', 'Neo.Logging'):
+        for component in ('Neo.DependencyInjection', 'Neo.Localization', 'Neo.Logging', 'Neo.Configuration'):
             abstraction = ROOT / 'extensions' / component / 'src' / (component + '.Abstractions') / (component + '.Abstractions.rvnproj')
             references = [Path(item.attrib['Include']).stem for item in ET.parse(abstraction).findall('.//ProjectReference')]
             self.assertEqual(['System.Runtime'], references)

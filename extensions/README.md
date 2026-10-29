@@ -14,13 +14,12 @@ Neo.DependencyInjection/
 
 Each component now has a second source project, `<Component>.Abstractions`,
 containing provider-neutral contracts and helpers. Implementation projects reference
-their abstractions; logging/localization DI integration references DI abstractions.
+their abstractions; logging/localization/configuration DI integration references DI abstractions.
 A component can have several source projects and zero or more test projects.
-Neo.Localization and Neo.Logging use the same structure. Neo.Configuration is
-a planned follow-up, not an implemented API. See the
+Neo.Localization, Neo.Logging and Neo.Configuration use the same structure. See the
 [service boundaries and migration](../docs/application-services.md) and
 [class-library build](../runtime/class-library-projects.md).
 
 The shared test driver selects these projects with `--suite dependency-injection`
-and `--suite localization` / `--suite logging`; they share tools/testing/NeoCLR.Testing without
+and `--suite localization` / `--suite logging` / `--suite configuration`; they share tools/testing/NeoCLR.Testing without
 including another suite's test entry point.

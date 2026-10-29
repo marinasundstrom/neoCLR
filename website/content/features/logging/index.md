@@ -25,3 +25,23 @@ Provider-neutral contracts and helpers live in `Neo.Logging.Abstractions`; the
 default factory, console provider and DI registration live in `Neo.Logging`.
 Logging and localization integration depend on `Neo.DependencyInjection.Abstractions`.
 See the [integrated application sample](https://github.com/marinasundstrom/neoCLR/blob/main/samples/extensions/README.md).
+
+## Try it
+
+Create a factory, add the console provider, then write through a category logger. The factory owns its providers; `use` disposes them.
+
+```raven
+module Examples.Extensions.Introductions.Logging
+
+import Neo.Logging.*
+
+func Main() -> int {
+    use factory = DefaultLoggerFactory()
+    factory.AddConsole()
+    let logger = factory.CreateLogger("Introduction")
+    logger.LogInformation("Hello from logging")
+    return 0
+}
+```
+
+[Complete sample project](https://github.com/marinasundstrom/neoCLR/tree/main/samples/extensions/src/LoggingIntro) · [Build and run instructions](https://github.com/marinasundstrom/neoCLR/blob/main/samples/extensions/README.md#introductory-examples)

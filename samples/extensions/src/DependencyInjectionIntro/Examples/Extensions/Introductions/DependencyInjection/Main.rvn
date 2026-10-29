@@ -1,0 +1,20 @@
+module Examples.Extensions.Introductions.DependencyInjection
+
+import System.*
+import System.Result.*
+import Neo.DependencyInjection.*
+
+class Message {
+    val Text: string
+    init(text: string) { Text = text }
+}
+
+func Main() -> int {
+    let services: ServiceCollection = DefaultServiceCollection()
+    let Ok(_) = services.AddSingleton<Message>(Message("Hello from DI")) else { return 1 }
+    let Ok(provider) = services.Build() else { return 1 }
+    use owned = provider
+    let Ok(message) = provider.GetRequiredService<Message>() else { return 1 }
+    Console.WriteLine(message.Text)
+    return 0
+}

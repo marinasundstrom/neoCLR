@@ -1,0 +1,57 @@
+module Neo.Configuration
+
+import System.*
+import System.Collections.*
+import System.Result.*
+
+internal static class ConfigurationKeys {
+    static func Slice(text: string, start: int, count: int) -> string {
+        if text.SliceUtf8(start, count) is Ok(let value) { return value }
+        System.Fail("Invalid configuration path boundary")
+        return ""
+    }
+
+    static func Segment(text: string, start: int) -> string {
+        let bytes = text.Utf8Bytes
+        var end = start
+        while end < bytes.Length && bytes[end] != 58 { end = end + 1 }
+        return Slice(text, start, end - start)
+    }
+
+    static func Key(path: string) -> string {
+        let bytes = path.Utf8Bytes
+        var start = 0
+        var index = 0
+        while index < bytes.Length {
+            if bytes[index] == 58 { start = index + 1 }
+            index = index + 1
+        }
+        return Slice(path, start, bytes.Length - start)
+    }
+
+    static func Compare(left: string, right: string) -> int {
+        if Int32.Parse(left.Trim()) is Ok(let a) {
+            if Int32.Parse(right.Trim()) is Ok(let b) {
+                if a < b { return -1 }
+                if a > b { return 1 }
+                return 0
+            }
+            return -1
+        }
+        if Int32.Parse(right.Trim()) is Ok(_) { return 1 }
+        return String.CompareOrdinalIgnoreCase(left, right)
+    }
+
+    static func Add(keys: ArrayList<string>, key: string) {
+        for existing in keys {
+            if String.CompareOrdinalIgnoreCase(existing, key) == 0 { return }
+        }
+        keys.Add(key)
+        var index = keys.Count - 1
+        while index > 0 && Compare(keys[index - 1], key) > 0 {
+            keys[index] = keys[index - 1]
+            index = index - 1
+        }
+        keys[index] = key
+    }
+}

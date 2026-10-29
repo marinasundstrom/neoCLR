@@ -1,0 +1,12 @@
+module Examples.Extensions.Introductions.Configuration
+
+import System.*
+import Neo.Configuration.*
+
+func Main() -> int {
+    let builder: ConfigurationBuilder = DefaultConfigurationBuilder()
+    _ = builder.AddJsonFile("appsettings.json")
+    use configuration = builder.Build()
+    Console.WriteLine(configuration["Greeting:Name"] ?? "world")
+    return 0
+}

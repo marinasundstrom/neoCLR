@@ -3055,3 +3055,16 @@ Neo.Localization.Abstractions and Neo.Logging.Abstractions alongside implementat
 Namespace URLs remain stable; assembly labels and source links identify the new
 contract projects. ConsoleLoggingExtensions is the new declaring type for AddConsole;
 LoggerFactoryExtensions retains provider-neutral typed creation.
+
+### Neo.Configuration foundation (2026-10-29)
+
+The native reference includes Neo.Configuration.Abstractions and Neo.Configuration,
+including configuration contracts, entries/helpers, defaults, memory provider/source
+and DI registration. Component source roots and native audit selection include both
+projects. The CLI scaffold still does not project optional Neo services; the native
+snapshot and [manual contract guide](configuration.md) are authoritative.
+
+The same foundation now includes Neo.Configuration.Json. The native snapshot
+selects its provider/source/error union and the AddJsonFile extension in the
+Neo.Configuration namespace. The manual reference records strict JSON/DOM quotas
+and recoverable loading behavior alongside the generated members.

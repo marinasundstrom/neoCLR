@@ -46,6 +46,8 @@
       href: features/time/index.md
     - name: "Localization"
       href: features/localization/index.md
+    - name: "Configuration"
+      href: features/configuration/index.md
     - name: "Logging"
       href: features/logging/index.md
     - name: "Dependency injection"
@@ -193,3 +195,6 @@
 
 - name: Logging (development)
   href: docs/logging.md
+
+- name: Configuration (development)
+  href: docs/configuration.md

@@ -1,0 +1,126 @@
+module Neo.Configuration.Json
+
+import System.*
+import System.Collections.*
+import System.Data.Json.*
+import System.Optional.*
+import System.Result.*
+import System.Storage.*
+import System.Storage.FileText.*
+import Neo.Configuration.*
+
+/// Recoverable file, JSON syntax/quota, root-shape and flattened-key errors.
+public union JsonConfigurationError {
+    case File(error: FileReadError)
+    case Json(error: JsonError)
+    case InvalidRoot
+    case DuplicateKey(key: string)
+}
+
+/// Reads strict UTF-8 JSON objects into colon-delimited configuration keys.
+/// Uses existing DOM bounds: 1024 bytes, 32 values, four container levels and 31 entries per container.
+public class JsonConfigurationProvider : ConfigurationProvider {
+    val Path: string
+    val Optional: bool
+    private var data = MemoryConfigurationProvider(ArrayList<ConfigurationEntry>())
+
+    /// Configures a required file; relative paths resolve against the process working directory.
+    init(path: string) {
+        Path = path
+        Optional = false
+    }
+
+    /// Optional suppresses only FileReadError.NotFound, not malformed or unreadable files.
+    init(path: string, optional: bool) {
+        Path = path
+        Optional = optional
+    }
+
+    /// Reads the file and atomically replaces data on success; failures leave prior data intact.
+    func TryLoad() -> Result<unit, JsonConfigurationError> {
+        let text = match ReadAllText(Path, 1024) {
+            Ok(let value) => value
+            Failure(FileReadError.NotFound) => {
+                if Optional {
+                    data = MemoryConfigurationProvider(ArrayList<ConfigurationEntry>())
+                    return Ok(())
+                }
+                return Failure(JsonConfigurationError.File(FileReadError.NotFound))
+            }
+            Failure(let error) => return Failure(JsonConfigurationError.File(error))
+        }
+        return LoadText(text)
+    }
+
+    /// Parses supplied JSON instead of reading the file; failed parsing preserves previous values.
+    /// Later Load/TryLoad reads Path again. Numeric spelling is preserved; booleans use True/False.
+    func LoadText(json: string) -> Result<unit, JsonConfigurationError> {
+        let document = match JsonSerializer.DeserializeNode(json) {
+            Ok(let value) => value
+            Failure(let error) => return Failure(JsonConfigurationError.Json(error))
+        }
+        if !(document is JsonObject) { return Failure(JsonConfigurationError.InvalidRoot) }
+        let next = MemoryConfigurationProvider(ArrayList<ConfigurationEntry>())
+        for pair in (JsonObject)document {
+            _ = Flatten(pair.Value, pair.Key, next)?
+        }
+        data = next
+        return Ok(())
+    }
+
+    private static func Store(data: MemoryConfigurationProvider, path: string, value: string?) -> Result<unit, JsonConfigurationError> {
+        if data.Find(path) is Some(_) { return Failure(JsonConfigurationError.DuplicateKey(path)) }
+        data.Set(path, value)
+        return Ok(())
+    }
+
+    private static func Flatten(node: JsonValue, path: string, data: MemoryConfigurationProvider) -> Result<unit, JsonConfigurationError> {
+        if node is JsonObject objectValue {
+            if objectValue.Count == 0 { return Store(data, path, null) }
+            for pair in objectValue {
+                _ = Flatten(pair.Value, path + ":" + pair.Key, data)?
+            }
+            return Ok(())
+        }
+        if node is JsonArray array {
+            if array.Count == 0 { return Store(data, path, "") }
+            var index = 0
+            for child in array {
+                _ = Flatten(child, path + ":" + index.ToString(), data)?
+                index += 1
+            }
+            return Ok(())
+        }
+        if node is JsonString text { return Store(data, path, text.Value) }
+        if node is JsonNumber number { return Store(data, path, number.Text) }
+        if node is JsonBoolean boolean {
+            if boolean.Value { return Store(data, path, "True") }
+            return Store(data, path, "False")
+        }
+        return Store(data, path, null)
+    }
+
+    /// Reads an effective flattened key; Some(null) is a present null value.
+    func Find(key: string) -> Optional<string?> => data.Find(key)
+    /// Changes only in-memory data; Load restores file data. Does not rewrite the file.
+    func Set(key: string, value: string?) { data.Set(key, value) }
+    /// Loads the file or faults. Use TryLoad to handle diagnostics as a Result.
+    func Load() {
+        if TryLoad() is Failure(_) {
+            System.Fail("Unable to load JSON configuration: " + Path + "; use TryLoad for diagnostics")
+        }
+    }
+    /// Returns sorted immediate children of the flattened document.
+    func GetChildKeys(parentPath: string?) -> Sequence<string> => data.GetChildKeys(parentPath)
+}
+
+/// Creates a fresh JSON provider per root; construction performs no I/O.
+public class JsonConfigurationSource : ConfigurationSource {
+    val Path: string
+    val Optional: bool
+    init(path: string, optional: bool) {
+        Path = path
+        Optional = optional
+    }
+    func Build(builder: ConfigurationBuilder) -> ConfigurationProvider => JsonConfigurationProvider(Path, Optional)
+}

@@ -1,0 +1,79 @@
+module Neo.Configuration
+
+import System.*
+import System.Collections.*
+import System.Optional.*
+
+/// Mutable in-memory provider with ordinal-ignore-case keys; repeated keys replace earlier values.
+public class MemoryConfigurationProvider : ConfigurationProvider {
+    private val entries = ArrayList<ConfigurationEntry>()
+
+    /// Copies the input values; callers retain ownership of the input sequence.
+    init(initialData: Sequence<ConfigurationEntry>) {
+        for entry in initialData { Set(entry.Key, entry.Value) }
+    }
+
+    /// Returns None for an absent key and Some(null) for a present masking value.
+    func Find(key: string) -> Optional<string?> {
+        for entry in entries {
+            if String.CompareOrdinalIgnoreCase(entry.Key, key) == 0 { return Some(entry.Value) }
+        }
+        return None
+    }
+
+    /// Replaces the value ignoring key case, or appends a new key.
+    func Set(key: string, value: string?) {
+        var index = 0
+        while index < entries.Count {
+            if String.CompareOrdinalIgnoreCase(entries[index].Key, key) == 0 {
+                entries[index] = ConfigurationEntry(entries[index].Key, value)
+                return
+            }
+            index = index + 1
+        }
+        entries.Add(ConfigurationEntry(key, value))
+    }
+
+    /// No-op: in-memory mutations survive Reload.
+    func Load() { }
+
+    /// Returns distinct ordered immediate keys; null parent requests the root.
+    func GetChildKeys(parentPath: string?) -> Sequence<string> {
+        let keys = ArrayList<string>()
+        for entry in entries {
+            if parentPath is string parent {
+                let bytes = entry.Key.Utf8Bytes
+                var index = 0
+                while index < bytes.Length {
+                    if bytes[index] == 58 && String.CompareOrdinalIgnoreCase(ConfigurationKeys.Slice(entry.Key, 0, index), parent) == 0 {
+                        ConfigurationKeys.Add(keys, ConfigurationKeys.Segment(entry.Key, index + 1))
+                    }
+                    index = index + 1
+                }
+            } else {
+                ConfigurationKeys.Add(keys, ConfigurationKeys.Segment(entry.Key, 0))
+            }
+        }
+        return keys
+    }
+}
+
+/// Snapshots initial values and creates independent in-memory providers for each build.
+public class MemoryConfigurationSource : ConfigurationSource {
+    private val entries = ArrayList<ConfigurationEntry>()
+
+    init(initialData: Sequence<ConfigurationEntry>) {
+        for entry in initialData { entries.Add(entry) }
+    }
+
+    /// Constructs a new provider with an independent copy of the initial entries.
+    func Build(builder: ConfigurationBuilder) -> ConfigurationProvider => MemoryConfigurationProvider(entries)
+}
+
+/// Registers an in-memory source without loading other sources.
+public extension MemoryConfigurationExtensions for ConfigurationBuilder {
+    /// Appends a snapshot-backed source and returns the builder.
+    func AddInMemoryCollection(initialData: Sequence<ConfigurationEntry>) -> ConfigurationBuilder {
+        return self.Add(MemoryConfigurationSource(initialData))
+    }
+}

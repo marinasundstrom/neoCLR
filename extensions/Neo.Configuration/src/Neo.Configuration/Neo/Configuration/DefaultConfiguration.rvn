@@ -1,0 +1,150 @@
+module Neo.Configuration
+
+import System.*
+import System.Collections.*
+import System.Optional.*
+
+/// Ordered, reusable builder. Each Build creates and loads fresh provider instances.
+public class DefaultConfigurationBuilder : ConfigurationBuilder {
+    private val sources = ArrayList<ConfigurationSource>()
+
+    /// Returns a copy of the ordered source list.
+    val Sources: Sequence<ConfigurationSource> {
+        get {
+            let copy = ArrayList<ConfigurationSource>()
+            for source in sources { copy.Add(source) }
+            return copy
+        }
+    }
+
+    /// Appends a source and returns this builder.
+    func Add(source: ConfigurationSource) -> ConfigurationBuilder {
+        sources.Add(source)
+        return self
+    }
+
+    /// Constructs and loads each source into a new owning root.
+    func Build() -> ConfigurationRoot {
+        let providers = ArrayList<ConfigurationProvider>()
+        for source in sources { providers.Add(source.Build(self)) }
+        return DefaultConfigurationRoot(providers)
+    }
+}
+
+/// Synchronous root with last-provider precedence, live sections and provider ownership.
+public class DefaultConfigurationRoot : ConfigurationRoot {
+    private val providers = ArrayList<ConfigurationProvider>()
+    private var disposed = false
+
+    /// Takes ownership of provider registrations and loads them in order.
+    init(providers: Sequence<ConfigurationProvider>) {
+        for provider in providers { self.providers.Add(provider) }
+        Reload()
+    }
+
+    private func EnsureActive() {
+        if disposed { System.Fail("Configuration root is disposed") }
+    }
+
+    /// Returns a copy of the ordered provider list without transferring ownership.
+    val Providers: Sequence<ConfigurationProvider> {
+        get {
+            let copy = ArrayList<ConfigurationProvider>()
+            for provider in providers { copy.Add(provider) }
+            return copy
+        }
+    }
+
+    /// Reads the effective value or writes through to the root providers.
+    var self[key: string]: string? {
+        get => Read(key)
+        set { Write(key, value) }
+    }
+
+    private func Read(key: string) -> string? {
+        EnsureActive()
+        var index = providers.Count - 1
+        while index >= 0 {
+            if providers[index].Find(key) is Some(let value) { return value }
+            index = index - 1
+        }
+        return null
+    }
+
+    private func Write(key: string, value: string?) {
+        EnsureActive()
+        if providers.Count == 0 { System.Fail("Configuration has no providers") }
+        for provider in providers { provider.Set(key, value) }
+    }
+
+    /// Creates a live child view, including for a missing path.
+    func GetSection(key: string) -> ConfigurationSection {
+        EnsureActive()
+        return DefaultConfigurationSection(self, key)
+    }
+
+    /// Returns a snapshot of distinct sorted immediate sections.
+    func GetChildren() -> Sequence<ConfigurationSection> => Children(null)
+
+    internal func Children(parent: string?) -> Sequence<ConfigurationSection> {
+        EnsureActive()
+        let keys = ArrayList<string>()
+        for provider in providers {
+            for key in provider.GetChildKeys(parent) { ConfigurationKeys.Add(keys, key) }
+        }
+        let children = ArrayList<ConfigurationSection>()
+        for key in keys {
+            var path = key
+            if parent is string prefix { path = prefix + ":" + key }
+            children.Add(DefaultConfigurationSection(self, path))
+        }
+        return children
+    }
+
+    /// Calls Load on each provider in registration order; no change notification.
+    func Reload() {
+        EnsureActive()
+        for provider in providers { provider.Load() }
+    }
+
+    /// Idempotently disposes disposable provider registrations; sections become unusable.
+    func Dispose() {
+        if disposed { return }
+        disposed = true
+        for provider in providers {
+            if provider is Disposable owned { owned.Dispose() }
+        }
+    }
+}
+
+/// A live view owned by its root; disposing the root invalidates the view.
+public class DefaultConfigurationSection : ConfigurationSection {
+    private val root: DefaultConfigurationRoot
+    /// Full colon-delimited path; may contain empty segments.
+    val Path: string
+    /// Final path segment.
+    val Key: string => ConfigurationKeys.Key(Path)
+
+    /// Borrows the root and retains the supplied path.
+    init(root: DefaultConfigurationRoot, path: string) {
+        self.root = root
+        Path = path
+    }
+
+    /// Gets or sets the value at Path independently of its children.
+    var Value: string? {
+        get => root[Path]
+        set { root[Path] = value }
+    }
+
+    /// Reads the effective value or writes through to the root providers.
+    var self[key: string]: string? {
+        get => root[Path + ":" + key]
+        set { root[Path + ":" + key] = value }
+    }
+
+    /// Creates a live child view, including for a missing path.
+    func GetSection(key: string) -> ConfigurationSection => root.GetSection(Path + ":" + key)
+    /// Returns a snapshot of distinct sorted immediate sections.
+    func GetChildren() -> Sequence<ConfigurationSection> => root.Children(Path)
+}

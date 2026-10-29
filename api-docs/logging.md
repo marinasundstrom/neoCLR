@@ -46,6 +46,27 @@ LogInformation, LogWarning, LogError and LogCritical. Braces are literal text;
 message-template parsing is not implemented. LoggerFactoryExtensions adds
 `CreateLogger<T>()`; ConsoleLoggingExtensions adds `AddConsole()`.
 
+
+## Try it
+
+Create a factory, add the console provider, then write through a category logger. The factory owns its providers; `use` disposes them.
+
+```raven
+module Examples.Extensions.Introductions.Logging
+
+import Neo.Logging.*
+
+func Main() -> int {
+    use factory = DefaultLoggerFactory()
+    factory.AddConsole()
+    let logger = factory.CreateLogger("Introduction")
+    logger.LogInformation("Hello from logging")
+    return 0
+}
+```
+
+[Complete sample project](https://github.com/marinasundstrom/neoCLR/tree/main/samples/extensions/src/LoggingIntro) · [Build and run instructions](https://github.com/marinasundstrom/neoCLR/blob/main/samples/extensions/README.md#introductory-examples)
+
 ## Dependency injection
 
 `ServiceCollection.AddLogging()` registers a container-owned singleton

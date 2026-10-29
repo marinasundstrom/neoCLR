@@ -71,7 +71,8 @@
       "runtime/System.Data.PostgreSql/src",
       "extensions/Neo.DependencyInjection/src",
       "extensions/Neo.Localization/src",
-      "extensions/Neo.Logging/src"
+      "extensions/Neo.Logging/src",
+      "extensions/Neo.Configuration/src"
     ]
   },
   "moduleTerminology": true,

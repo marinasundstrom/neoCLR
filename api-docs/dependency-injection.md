@@ -3,12 +3,43 @@ title: Dependency injection
 ---
 # Dependency injection (development)
 
-`Neo.DependencyInjection` lives in its own `Neo.DependencyInjection.dll` assembly. `ServiceCollection` and
+Contracts live in `Neo.DependencyInjection.Abstractions`; the default container
+lives in `Neo.DependencyInjection`. `ServiceCollection` and
 `ServiceProvider` define registration and resolution; `DefaultServiceCollection`
 is the default implementation. Import `Neo.DependencyInjection.*` for typed
 registration and lookup extensions. This development API follows .NET DI's
 service identities, registration order, constructor selection and lifetimes,
 using neoCLR `Result` and `Optional` contracts.
+
+
+## Try it
+
+Register an existing instance, build a provider, then resolve it by its service type. The caller owns supplied instances; `use` disposes the provider.
+
+```raven
+module Examples.Extensions.Introductions.DependencyInjection
+
+import System.*
+import System.Result.*
+import Neo.DependencyInjection.*
+
+class Message {
+    val Text: string
+    init(text: string) { Text = text }
+}
+
+func Main() -> int {
+    let services: ServiceCollection = DefaultServiceCollection()
+    let Ok(_) = services.AddSingleton<Message>(Message("Hello from DI")) else { return 1 }
+    let Ok(provider) = services.Build() else { return 1 }
+    use owned = provider
+    let Ok(message) = provider.GetRequiredService<Message>() else { return 1 }
+    Console.WriteLine(message.Text)
+    return 0
+}
+```
+
+[Complete sample project](https://github.com/marinasundstrom/neoCLR/tree/main/samples/extensions/src/DependencyInjectionIntro) · [Build and run instructions](https://github.com/marinasundstrom/neoCLR/blob/main/samples/extensions/README.md#introductory-examples)
 
 ## Registration and activation
 
@@ -18,8 +49,9 @@ ServiceError>)` or `Instance(Object)`. A collection accepts descriptors through
 `Add`, or uses `Add(service, implementation, lifetime)`, `AddFactory` and
 `AddInstance`. Invalid types, assignability, lifetimes and instance identities
 return `InvalidRegistration`. Instance descriptors require singleton lifetime.
-Services are reference types with fully bound identities; open generic
-registration and value-type services are not supported.
+Service instances are reference types with fully bound identities. Open generic
+service/implementation definitions are supported for constructor registrations;
+value-type services are not supported.
 
 `AddTransient<TService, TImplementation>()`, `AddScoped<...>()` and
 `AddSingleton<...>()` register implementations. Their single-type overloads
@@ -32,8 +64,7 @@ registrations, so later additions do not affect an existing provider. Constructo
 plans select the public constructor with the most available dependencies. Another
 applicable constructor is ambiguous when it requires a type absent from that
 selection. Build does not call constructors or factories. Optional parameter
-defaults, collection injection, keyed parameter annotations and open generic registrations are
-not implemented. `ActivationError` distinguishes unsupported types, missing or
+defaults, collection injection and keyed parameter annotations are not implemented. `ActivationError` distinguishes unsupported types, missing or
 ambiguous constructors and invocation failures.
 
 Factories receive the current provider. A singleton factory always receives the

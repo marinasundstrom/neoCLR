@@ -2,18 +2,22 @@ module Examples.Extensions
 
 import Neo.Localization.*
 import Neo.Logging.*
+import Neo.Configuration.*
 
 /// Application logic depends on provider-neutral logging and localization contracts.
 public class GreetingService {
+    private val configuration: Configuration
     private val logger: Logger<GreetingService>
     private val strings: Localizer<GreetingService>
 
-    init(logger: Logger<GreetingService>, strings: Localizer<GreetingService>) {
+    init(configuration: Configuration, logger: Logger<GreetingService>, strings: Localizer<GreetingService>) {
+        self.configuration = configuration
         self.logger = logger
         self.strings = strings
     }
 
-    func Greet(name: string) {
+    func Greet() {
+        let name = configuration["Greeting:Name"] ?? "world"
         logger.LogInformation(strings["Greeting", name])
     }
 }

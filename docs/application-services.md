@@ -2,7 +2,7 @@
 
 Author direction, 2026-10-28: application services use the `Neo` root namespace.
 Each API family has its own project and assembly. Neo.Logging now adds the
-[logging foundation](logging.md); Neo.Configuration remains a planned follow-up.
+[logging foundation](logging.md); Neo.Configuration adds the [configuration foundation](configuration.md).
 
 The assembly/dependency table below describes the current abstraction split.
 
@@ -84,6 +84,9 @@ assembly identities. No old-assembly type forwarders are supplied.
 | --- | --- | --- |
 | Neo.DependencyInjection.Abstractions | Collection/provider contracts, descriptors, lifetimes/errors, typed registration/resolution helpers | System.Runtime |
 | Neo.DependencyInjection | Default container and activation policy | System.Runtime, Neo.DependencyInjection.Abstractions |
+| Neo.Configuration.Abstractions | Hierarchical settings, builder/source/provider contracts and helpers | System.Runtime |
+| Neo.Configuration | Default builder/root/sections, memory provider and DI integration | System.Runtime, Neo.Configuration.Abstractions, Neo.DependencyInjection.Abstractions |
+| Neo.Configuration.Json | Optional appsettings.json source/provider | System.Runtime, System.Data, Neo.Configuration.Abstractions, Neo.Configuration |
 | Neo.Logging.Abstractions | Logger/factory/provider contracts, EventId/levels, typed adapter, literal helpers and null implementations | System.Runtime |
 | Neo.Logging | Default factory, console provider and DI integration | System.Runtime, Neo.Logging.Abstractions, Neo.DependencyInjection.Abstractions |
 | Neo.Localization.Abstractions | Localizer/factory contracts, typed adapter, formatting and missing-key decorators | System.Runtime |
@@ -121,3 +124,11 @@ the corresponding methods are trimmed. Original conformance metadata and reflect
 relationships remain intact; actual boxed values retain dispatch. This fixes
 composition of file-backed localization and logging's Error formatting without
 changing the .NET-style value boxing contract.
+
+## Configuration foundation (2026-10-29)
+
+Neo.Configuration.Abstractions references only System.Runtime. Neo.Configuration
+references System.Runtime, its abstractions and Neo.DependencyInjection.Abstractions.
+It adds ordered providers, hierarchical sections, an in-memory source and DI
+registration. The integrated service consumes configuration through its abstraction.
+See the [configuration scope and .NET comparison](configuration.md).

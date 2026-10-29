@@ -12,6 +12,36 @@ instances use the same registration model.
 service relationships visible. The built-in tests use these registrations to
 inject a typed localizer into a greeting service.
 
+
+## Try it
+
+Register an existing instance, build a provider, then resolve it by its service type. The caller owns supplied instances; `use` disposes the provider.
+
+```raven
+module Examples.Extensions.Introductions.DependencyInjection
+
+import System.*
+import System.Result.*
+import Neo.DependencyInjection.*
+
+class Message {
+    val Text: string
+    init(text: string) { Text = text }
+}
+
+func Main() -> int {
+    let services: ServiceCollection = DefaultServiceCollection()
+    let Ok(_) = services.AddSingleton<Message>(Message("Hello from DI")) else { return 1 }
+    let Ok(provider) = services.Build() else { return 1 }
+    use owned = provider
+    let Ok(message) = provider.GetRequiredService<Message>() else { return 1 }
+    Console.WriteLine(message.Text)
+    return 0
+}
+```
+
+[Complete sample project](https://github.com/marinasundstrom/neoCLR/tree/main/samples/extensions/src/DependencyInjectionIntro) · [Build and run instructions](https://github.com/marinasundstrom/neoCLR/blob/main/samples/extensions/README.md#introductory-examples)
+
 ## A greeting command with a scoped service
 
 This sample registers settings once and lets the container construct a scoped

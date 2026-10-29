@@ -1,0 +1,11 @@
+module Examples.Extensions.Introductions.Localization
+
+import System.*
+import System.Result.*
+import Neo.Localization.*
+
+func Main() -> int {
+    let Ok(strings) = JsonLocalizerProvider.Create("{\"Greeting\":\"Hej {0}!\"}") else { return 1 }
+    Console.WriteLine(strings["Greeting", "Ada"])
+    return 0
+}

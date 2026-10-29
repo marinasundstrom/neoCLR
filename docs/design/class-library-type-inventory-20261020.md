@@ -8,7 +8,7 @@ Compiler-generated carriers, module functions and internal helpers are not count
 See the [review and findings](class-library-soundness-20261020.md#whole-library-contract-pass) for manual interpretation,
 inherited/runtime contracts, execution evidence, allocation concerns and remaining gaps.
 
-**326 declarations**: Borrowed view: 2; Contract: 76; Enum: 19; Intrinsic: 16; Owned view: 2; Record: 10; Reference: 113; Reference value: 8; Static: 18; Union: 37; Value: 25.
+**341 declarations**: Borrowed view: 2; Contract: 82; Enum: 19; Intrinsic: 16; Owned view: 2; Record: 10; Reference: 121; Reference value: 8; Static: 18; Union: 38; Value: 25.
 
 `Et` = typed Equals; `Eo` = Object Equals; `H` = parameterless GetHashCode;
 `T` = parameterless ToString; `Tf` = formatted ToString overload; `*` = authored override.
@@ -18,6 +18,21 @@ Reference subclasses may inherit value contracts (notably IPv4Address/IPv6Addres
 
 | Type / source | Family | Declared equality, hash, display |
 | --- | --- | --- |
+| [Neo.Configuration.Configuration](../../extensions/Neo.Configuration/src/Neo.Configuration.Abstractions/Neo/Configuration/Contracts.rvn#L8) | Contract | — |
+| [Neo.Configuration.ConfigurationBuilder](../../extensions/Neo.Configuration/src/Neo.Configuration.Abstractions/Neo/Configuration/Contracts.rvn#L54) | Contract | — |
+| [Neo.Configuration.ConfigurationEntry](../../extensions/Neo.Configuration/src/Neo.Configuration.Abstractions/Neo/Configuration/Contracts.rvn#L64) | Reference | — |
+| [Neo.Configuration.ConfigurationProvider](../../extensions/Neo.Configuration/src/Neo.Configuration.Abstractions/Neo/Configuration/Contracts.rvn#L36) | Contract | — |
+| [Neo.Configuration.ConfigurationRoot](../../extensions/Neo.Configuration/src/Neo.Configuration.Abstractions/Neo/Configuration/Contracts.rvn#L28) | Contract | — |
+| [Neo.Configuration.ConfigurationSection](../../extensions/Neo.Configuration/src/Neo.Configuration.Abstractions/Neo/Configuration/Contracts.rvn#L18) | Contract | — |
+| [Neo.Configuration.ConfigurationSource](../../extensions/Neo.Configuration/src/Neo.Configuration.Abstractions/Neo/Configuration/Contracts.rvn#L49) | Contract | — |
+| [Neo.Configuration.DefaultConfigurationBuilder](../../extensions/Neo.Configuration/src/Neo.Configuration/Neo/Configuration/DefaultConfiguration.rvn#L8) | Reference | — |
+| [Neo.Configuration.DefaultConfigurationRoot](../../extensions/Neo.Configuration/src/Neo.Configuration/Neo/Configuration/DefaultConfiguration.rvn#L35) | Reference | — |
+| [Neo.Configuration.DefaultConfigurationSection](../../extensions/Neo.Configuration/src/Neo.Configuration/Neo/Configuration/DefaultConfiguration.rvn#L121) | Reference | — |
+| [Neo.Configuration.Json.JsonConfigurationError](../../extensions/Neo.Configuration/src/Neo.Configuration.Json/Neo/Configuration/Json/JsonConfiguration.rvn#L13) | Union | — |
+| [Neo.Configuration.Json.JsonConfigurationProvider](../../extensions/Neo.Configuration/src/Neo.Configuration.Json/Neo/Configuration/Json/JsonConfiguration.rvn#L22) | Reference | — |
+| [Neo.Configuration.Json.JsonConfigurationSource](../../extensions/Neo.Configuration/src/Neo.Configuration.Json/Neo/Configuration/Json/JsonConfiguration.rvn#L118) | Reference | — |
+| [Neo.Configuration.MemoryConfigurationProvider](../../extensions/Neo.Configuration/src/Neo.Configuration/Neo/Configuration/MemoryConfiguration.rvn#L8) | Reference | — |
+| [Neo.Configuration.MemoryConfigurationSource](../../extensions/Neo.Configuration/src/Neo.Configuration/Neo/Configuration/MemoryConfiguration.rvn#L62) | Reference | — |
 | [Neo.DependencyInjection.ActivationError](../../extensions/Neo.DependencyInjection/src/Neo.DependencyInjection.Abstractions/Neo/DependencyInjection/ActivationError.rvn#L4) | Enum | — |
 | [Neo.DependencyInjection.DefaultServiceCollection](../../extensions/Neo.DependencyInjection/src/Neo.DependencyInjection/Neo/DependencyInjection/Services.rvn#L22) | Reference | — |
 | [Neo.DependencyInjection.ServiceCollection](../../extensions/Neo.DependencyInjection/src/Neo.DependencyInjection.Abstractions/Neo/DependencyInjection/Services.rvn#L46) | Contract | — |

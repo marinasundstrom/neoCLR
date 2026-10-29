@@ -23473,3 +23473,33 @@ views for values that are never boxed in reachable code, preserving source
 conformance and actual boxed dispatch. Focused compiler, layout and API snapshot
 checks passed; broad suites and a full website build were not repeated. See the
 [qualification record](validation/neo-abstractions-20261028/README.md).
+
+## 2026-10-29 — Configuration foundation
+
+The author requested Neo.Configuration based on Microsoft.Extensions.Configuration,
+with a separate abstraction project and integration into the existing DI sample.
+The assistant scoped the foundation to hierarchical sections, ordered providers,
+last-provider precedence, an in-memory provider, explicit reload and DI registration.
+Change notifications, additional providers and binding remain gaps. Consumer code
+references only Configuration abstractions; the sample supplies a caller-owned root
+for greeting and localization settings. See [design](configuration.md) and
+[qualification](validation/neo-configuration-20261029/README.md).
+
+The author then added: “We also want to be able to read appsettings.json”. The
+assistant added an optional Neo.Configuration.Json project, changed the sample to
+load appsettings.json and retained configuration abstractions in consumer code.
+The implementation reuses the public JSON DOM and explicitly documents its strict
+syntax and existing quotas; relaxed syntax, larger documents and watching remain
+parser/provider gaps. File loading, optional files, flattened collision handling
+and reload are included in focused validation.
+
+The author also requested introductory samples on the extension API web pages.
+The assistant added small standalone DI, logging, localization and configuration
+projects, sharing their source examples with the feature pages and API guides.
+The existing integrated app remains the composition example.
+
+The eight configuration contracts passed in both native and interpreter execution.
+All four introductory projects compiled and produced their expected interpreter
+output; the integrated native app read appsettings.json and printed the expected
+localized greeting. The author requested a local preview, which the assistant
+served on loopback port 8765 and opened at the Configuration feature page.

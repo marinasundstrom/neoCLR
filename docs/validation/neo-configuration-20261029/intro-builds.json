@@ -1,0 +1,26 @@
+[
+  {
+    "project": "samples/extensions/src/DependencyInjectionIntro/DependencyInjectionIntro.rvnproj",
+    "exitCode": 0,
+    "stdout": "Native build output: /Users/robert/Projects/neoclr/samples/extensions/src/DependencyInjectionIntro/bin/neoclr/DependencyInjectionIntro.dll\n",
+    "stderr": ""
+  },
+  {
+    "project": "samples/extensions/src/LoggingIntro/LoggingIntro.rvnproj",
+    "exitCode": 0,
+    "stdout": "Native build output: /Users/robert/Projects/neoclr/samples/extensions/src/LoggingIntro/bin/neoclr/LoggingIntro.dll\n",
+    "stderr": ""
+  },
+  {
+    "project": "samples/extensions/src/LocalizationIntro/LocalizationIntro.rvnproj",
+    "exitCode": 0,
+    "stdout": "Native build output: /Users/robert/Projects/neoclr/samples/extensions/src/LocalizationIntro/bin/neoclr/LocalizationIntro.dll\n",
+    "stderr": ""
+  },
+  {
+    "project": "samples/extensions/src/ConfigurationIntro/ConfigurationIntro.rvnproj",
+    "exitCode": 0,
+    "stdout": "Native build output: /Users/robert/Projects/neoclr/samples/extensions/src/ConfigurationIntro/bin/neoclr/ConfigurationIntro.dll\n",
+    "stderr": ""
+  }
+]

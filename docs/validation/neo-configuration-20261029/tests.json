@@ -1,0 +1,34 @@
+{
+  "passed": true,
+  "modes": [
+    "native",
+    "interpreter"
+  ],
+  "platform": "macOS-27.0.1-arm64-arm-64bit",
+  "cases": [
+    {
+      "suite": "configuration",
+      "mode": "native",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 0.32,
+      "stdout": "PASS Configuration precedence distinguishes absent null and empty values\nPASS Configuration sections merge numeric children and preserve Unicode paths\nPASS Configuration builds snapshot inputs and retain live sections\nPASS Configuration loads reloads and disposes provider registrations\nPASS Configuration DI preserves overrides and caller ownership\nPASS JSON configuration flattens objects arrays and scalar values\nPASS JSON configuration rejects ambiguous malformed and oversized input atomically\nPASS JSON configuration reads required optional files and reloads through the root\nTests: 8, passed: 8, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "configuration",
+      "mode": "interpreter",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 37.208,
+      "stdout": "PASS Configuration precedence distinguishes absent null and empty values\nPASS Configuration sections merge numeric children and preserve Unicode paths\nPASS Configuration builds snapshot inputs and retain live sections\nPASS Configuration loads reloads and disposes provider registrations\nPASS Configuration DI preserves overrides and caller ownership\nPASS JSON configuration flattens objects arrays and scalar values\nPASS JSON configuration rejects ambiguous malformed and oversized input atomically\nPASS JSON configuration reads required optional files and reloads through the root\nTests: 8, passed: 8, failed: 0, skipped: 0\n",
+      "stderr": ""
+    }
+  ],
+  "bundleManifestSha256": "60a4b3e722b66c5e27110e38386b2b52ce47f93cb6e17294264146ef6f7f2274",
+  "aotSha256": "93f88f64093412d8932c724f40bcd2205bdcf872cf8010ae1b3bda13d3784b3b",
+  "interpreterSha256": "89354675786f3d81bb92df34a92765cc058907a2413cb72b23d2b49fae9a49c1",
+  "suites": [
+    "configuration"
+  ]
+}

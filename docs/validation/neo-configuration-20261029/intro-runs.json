@@ -1,0 +1,30 @@
+[
+  {
+    "project": "DependencyInjectionIntro",
+    "exitCode": 0,
+    "stdout": "Hello from DI\n",
+    "stderr": "",
+    "passed": true
+  },
+  {
+    "project": "LoggingIntro",
+    "exitCode": 0,
+    "stdout": "info: Introduction[0] Hello from logging\n",
+    "stderr": "",
+    "passed": true
+  },
+  {
+    "project": "LocalizationIntro",
+    "exitCode": 0,
+    "stdout": "Hej Ada!\n",
+    "stderr": "",
+    "passed": true
+  },
+  {
+    "project": "ConfigurationIntro",
+    "exitCode": 0,
+    "stdout": "Ada\n",
+    "stderr": "",
+    "passed": true
+  }
+]

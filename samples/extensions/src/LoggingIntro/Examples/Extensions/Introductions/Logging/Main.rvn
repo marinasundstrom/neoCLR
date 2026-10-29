@@ -1,0 +1,11 @@
+module Examples.Extensions.Introductions.Logging
+
+import Neo.Logging.*
+
+func Main() -> int {
+    use factory = DefaultLoggerFactory()
+    factory.AddConsole()
+    let logger = factory.CreateLogger("Introduction")
+    logger.LogInformation("Hello from logging")
+    return 0
+}
