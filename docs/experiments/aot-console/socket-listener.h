@@ -21,6 +21,9 @@ typedef struct neoclr_socket_scope {
     uint64_t trace_identity;
 #endif
     neoclr_aot_context *context;
+#ifdef NEOCLR_FILE_WATCH
+    int64_t file_watches[64];
+#endif
     struct neoclr_socket_scope *previous;
     struct { uint64_t id; neoclr_socket_descriptor descriptor; int listener;
 #ifdef NEOCLR_HTTPS_SERVER

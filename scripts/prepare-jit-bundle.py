@@ -124,6 +124,17 @@ def complete_services(command):
     additions = [ROOT / 'docs/experiments/aot-console' / name
                  for name in ('string-unicode.c', 'system-culture.c', 'time-zone.c', 'environment-platform.c')] + [ROOT / 'runtime/native/environment/platform.c']
     additions.append(archive)
+    for path in project.native_filewatch_sources():
+        report['inputsSha256'][str(path)] = sha(path)
+    watch_build, watch_archive = project.native_filewatch_build(windows)
+    run(watch_build)
+    command = [arg for arg in command if 'neoclr_filewatch_provider' not in str(arg)]
+    additions.append(watch_archive)
+    watch_flag = '/DNEOCLR_FILE_WATCH' if windows else '-DNEOCLR_FILE_WATCH'
+    if watch_flag not in command:
+        command.insert(1, watch_flag)
+    if not windows and 'CoreServices' not in command:
+        command += ['-framework', 'CoreServices']
     for path in project.native_crypto_sources():
         report['inputsSha256'][str(path)] = sha(path)
     crypto_build, crypto_archive = project.native_crypto_build(windows)

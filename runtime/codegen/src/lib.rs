@@ -560,6 +560,17 @@ fn run_internal(
     if bind_scheduler && (!compile_system || !native_gc) {
         return Err("--bind-scheduler requires --compile-system and --native-gc".into());
     }
+    let watch_count = args.iter().filter(|a| *a == "--bind-file-watch").count();
+    if watch_count > 1 {
+        return Err("duplicate --bind-file-watch option".into());
+    }
+    let bind_file_watch = watch_count == 1;
+    args.retain(|a| a != "--bind-file-watch");
+    if bind_file_watch && (!compile_system || !native_gc) {
+        return Err(
+            "--bind-file-watch requires --compile-system, --native-gc and --reference-arena".into(),
+        );
+    }
     let timer_count = args.iter().filter(|a| *a == "--bind-timers").count();
     if timer_count > 1 {
         return Err("duplicate --bind-timers option".into());
@@ -676,6 +687,9 @@ fn run_internal(
     }
     if bind_console_stream_output && !reference_arena {
         return Err("--bind-console-stream-output requires --reference-arena".into());
+    }
+    if bind_file_watch && !reference_arena {
+        return Err("--bind-file-watch requires --reference-arena".into());
     }
     if bind_file_input && !reference_arena {
         return Err("--bind-file-input requires --reference-arena".into());
@@ -820,6 +834,7 @@ fn run_internal(
                 bind_task_queue,
                 bind_socket_transfer,
                 bind_timers,
+                bind_file_watch,
                 bind_gc_collect: native_gc,
                 bind_runtime_async,
                 bind_stack_trace,

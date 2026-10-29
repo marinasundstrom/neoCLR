@@ -1,5 +1,5 @@
 [workspace]
-members = [".", "runtime/codegen", "tools/native-tls", "tools/security-provider"]
+members = [".", "runtime/codegen", "tools/native-tls", "tools/security-provider", "tools/filewatch-provider"]
 default-members = ["."]
 # Provider static libraries retain their platform-specific build profiles.
 exclude = ["tools/native-crypto", "tools/aot-native-text"]
@@ -16,6 +16,7 @@ license = "MIT"
 publish = false
 
 [dependencies]
+neoclr-filewatch-provider = { path = "tools/filewatch-provider" }
 neoclr-native-tls = { path = "tools/native-tls" }
 neoclr-security-provider = { path = "tools/security-provider" }
 unicode-segmentation = "=1.13.2"

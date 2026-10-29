@@ -1,0 +1,255 @@
+module System.IO
+
+import System.*
+import System.Collections.*
+import System.Concurrency.*
+import System.Result.*
+import System.Optional.*
+import System.Runtime.CompilerServices.*
+import System.Text.*
+import System.Time.*
+
+/// Physical filesystem notification kinds; notifications may be duplicated or coalesced.
+public enum WatcherChangeTypes {
+    Created = 1
+    Deleted = 2
+    Changed = 4
+    Renamed = 8
+    All = 15
+}
+
+/// Recoverable watcher setup, transport and notification-loss errors.
+public enum FileSystemWatcherError {
+    InvalidPath = 1
+    NotFound = 2
+    AccessDenied = 3
+    IoFailure = 4
+    Closed = 5
+    BufferOverflow = 6
+    InvalidEncoding = 7
+    PlatformNotSupported = 8
+    ResourceLimit = 9
+}
+
+/// A physical change; Name is relative to the watched directory, FullPath is absolute.
+public open class FileSystemEventArgs {
+    val ChangeType: WatcherChangeTypes
+    val FullPath: string
+    val Name: string
+    internal init(changeType: WatcherChangeTypes, fullPath: string, name: string) {
+        ChangeType = changeType
+        FullPath = fullPath
+        Name = name
+    }
+}
+
+/// A paired rename. Platforms may instead report separate deletion and creation notifications.
+public class RenamedEventArgs : FileSystemEventArgs {
+    val OldFullPath: string
+    val OldName: string
+    internal init(changeType: WatcherChangeTypes, fullPath: string, name: string, oldFullPath: string, oldName: string)
+        : base(changeType, fullPath, name) {
+        OldFullPath = oldFullPath
+        OldName = oldName
+    }
+}
+
+/// Reports notification loss or provider failure. Re-read the directory after an error.
+public class ErrorEventArgs {
+    val Error: FileSystemWatcherError
+    internal init(error: FileSystemWatcherError) { Error = error }
+}
+
+/// Watches a physical directory using the OS provider. Access and callbacks are owner-queue serialized.
+/// Dispose explicitly to stop the timer and release the native subscription. No finalizer is supplied.
+public class FileSystemWatcher : Disposable {
+    private var path: string
+    private var filter: string
+    private var recursive = false
+    private var handle = 0L
+    private var disposed = false
+    private var timer: Timer? = null
+    private val created = FileWatchHandlers<FileSystemEventArgs>()
+    private val changed = FileWatchHandlers<FileSystemEventArgs>()
+    private val deleted = FileWatchHandlers<FileSystemEventArgs>()
+    private val renamed = FileWatchHandlers<RenamedEventArgs>()
+    private val errors = FileWatchHandlers<ErrorEventArgs>()
+
+    /// Creates a stopped watcher for all names in path.
+    init(path: string) { self.path = path; filter = "*" }
+    /// Creates a stopped watcher with a filename filter supporting * and ?.
+    init(path: string, filter: string) { self.path = path; self.filter = filter }
+
+    /// Physical directory path. Change settings while stopped; relative paths resolve at Start.
+    var Path: string {
+        get => path
+        set { CheckStopped(); path = value }
+    }
+    /// Basename pattern (* and ?), compared ordinally; Windows ignores case. Empty means *.
+    var Filter: string {
+        get => filter
+        set { CheckStopped(); filter = value }
+    }
+    /// Whether descendants are watched. Defaults to false; change while stopped.
+    var IncludeSubdirectories: bool {
+        get => recursive
+        set { CheckStopped(); recursive = value }
+    }
+    /// Starts or stops notifications. Start failures panic; TryStart preserves typed errors.
+    var EnableRaisingEvents: bool {
+        get => handle != 0L
+        set {
+            if value {
+                if TryStart() is Failure(_) { Panic("Unable to start FileSystemWatcher; use TryStart for diagnostics") }
+            } else { Stop() }
+        }
+    }
+
+    /// Raised for a created file or directory.
+    func OnCreated(callback: (FileSystemWatcher, FileSystemEventArgs) -> Void) -> Disposable {
+        if disposed { Panic("FileSystemWatcher is disposed") }
+        return created.Add(callback)
+    }
+    /// Raised for content or metadata changes. Does not guarantee a complete write.
+    func OnChanged(callback: (FileSystemWatcher, FileSystemEventArgs) -> Void) -> Disposable {
+        if disposed { Panic("FileSystemWatcher is disposed") }
+        return changed.Add(callback)
+    }
+    /// Raised for a deleted file or directory.
+    func OnDeleted(callback: (FileSystemWatcher, FileSystemEventArgs) -> Void) -> Disposable {
+        if disposed { Panic("FileSystemWatcher is disposed") }
+        return deleted.Add(callback)
+    }
+    /// Raised when the OS supplies both sides of a rename; either name may match Filter.
+    func OnRenamed(callback: (FileSystemWatcher, RenamedEventArgs) -> Void) -> Disposable {
+        if disposed { Panic("FileSystemWatcher is disposed") }
+        return renamed.Add(callback)
+    }
+    /// Raised for overflow, invalid UTF-8 names or provider errors. Watching remains enabled.
+    func OnError(callback: (FileSystemWatcher, ErrorEventArgs) -> Void) -> Disposable {
+        if disposed { Panic("FileSystemWatcher is disposed") }
+        return errors.Add(callback)
+    }
+
+    /// Starts watching before returning. Repeated starts are harmless; disposal returns Closed.
+    /// Notifications run on the invocation completion queue, at most 64 per 50 ms timer tick.
+    func TryStart() -> Result<unit, FileSystemWatcherError> {
+        if disposed { return Failure(FileSystemWatcherError.Closed) }
+        if handle != 0L { return Ok(()) }
+        if path.IsEmpty || path.ContainsOrdinal("\u0000") || filter.ContainsOrdinal("\u0000") || filter.ContainsOrdinal("/") || filter.ContainsOrdinal("\\") {
+            return Failure(FileSystemWatcherError.InvalidPath)
+        }
+        var recurse = 0
+        if recursive { recurse = 1 }
+        let opened = neoCLR.Runtime.FileWatch(0, path, filter, 0L, recurse)
+        if neoCLR.Runtime.IsValue<byte>(opened) {
+            return Failure((FileSystemWatcherError)(int)neoCLR.Runtime.UnpackValue<byte>(opened))
+        }
+        let next = neoCLR.Runtime.UnpackValue<long>(opened)
+        handle = next
+        let schedule = Timer(Poll)
+        timer = schedule
+        schedule.Start(Duration.FromTicks(500000L), Duration.FromTicks(500000L))
+        return Ok(())
+    }
+
+    /// Stops delivery and releases the native subscription. Pending notifications are discarded.
+    func Stop() {
+        let schedule = timer
+        timer = null
+        if schedule is Timer current { current.Dispose() }
+        let previous = handle
+        handle = 0L
+        if previous != 0L { _ = neoCLR.Runtime.FileWatch(2, "", "", previous, 0) }
+    }
+    /// Stops permanently, releasing subscriptions and handlers. Idempotent.
+    func Dispose() {
+        if disposed { return }
+        disposed = true
+        Stop()
+        created.Clear(); changed.Clear(); deleted.Clear(); renamed.Clear(); errors.Clear()
+    }
+    private func CheckStopped() {
+        if disposed { Panic("FileSystemWatcher is disposed") }
+        if handle != 0L { Panic("Stop FileSystemWatcher before changing settings") }
+    }
+    private func Poll() {
+        let generation = handle
+        var count = 0
+        while handle == generation && handle != 0L && count < 64 {
+            let packet = ReadPacket(generation)
+            if packet.Length == 0 { return }
+            if packet[0] == 0 {
+                errors.Invoke(self, ErrorEventArgs((FileSystemWatcherError)(int)packet[1]))
+                return
+            }
+            var fields = ArrayList<string>()
+            var start = 1
+            var index = 1
+            while index < packet.Length {
+                if packet[index] == 0 {
+                    let bytes: ReadOnlySlice<byte> = packet
+                    let text = match Encodings.Utf8.Decode(bytes.Slice(start, index - start)) {
+                        Ok(let value) => value
+                        Failure(_) => { errors.Invoke(self, ErrorEventArgs(FileSystemWatcherError.InvalidEncoding)); return }
+                    }
+                    fields.Add(text)
+                    start = index + 1
+                }
+                index += 1
+            }
+            if fields.Count != 4 { Panic("Invalid file watcher provider packet") }
+            let kind = (WatcherChangeTypes)(int)packet[0]
+            if kind == WatcherChangeTypes.Renamed {
+                renamed.Invoke(self, RenamedEventArgs(WatcherChangeTypes.Renamed, fields[0], fields[1], fields[2], fields[3]))
+            } else {
+                let args = FileSystemEventArgs(kind, fields[0], fields[1])
+                if kind == WatcherChangeTypes.Created { created.Invoke(self, args) }
+                if kind == WatcherChangeTypes.Changed { changed.Invoke(self, args) }
+                if kind == WatcherChangeTypes.Deleted { deleted.Invoke(self, args) }
+            }
+            count += 1
+        }
+    }
+    private func ReadPacket(current: long) -> byte[] {
+        let payload = neoCLR.Runtime.FileWatch(1, "", "", current, 0)
+        if neoCLR.Runtime.IsValue<byte>(payload) {
+            return [(byte)0, neoCLR.Runtime.UnpackValue<byte>(payload)]
+        }
+        let text = neoCLR.Runtime.UnpackValue<string>(payload)
+        return neoCLR.Runtime.Utf8Encode(text)
+    }
+}
+
+internal class FileWatchHandlers<T> {
+    private var handlers = ArrayList<FileWatchRegistration<T>>()
+    internal func Add(callback: (FileSystemWatcher, T) -> Void) -> Disposable {
+        let next = ArrayList<FileWatchRegistration<T>>()
+        for handler in handlers {
+            if handler.IsActive { next.Add(handler) }
+        }
+        let registration = FileWatchRegistration<T>(callback)
+        next.Add(registration)
+        handlers = next
+        return registration
+    }
+    internal func Clear() {
+        for handler in handlers { handler.Dispose() }
+        handlers = ArrayList<FileWatchRegistration<T>>()
+    }
+    internal func Invoke(sender: FileSystemWatcher, args: T) {
+        let snapshot = handlers
+        for callback in snapshot { callback.Invoke(sender, args) }
+    }
+}
+
+internal class FileWatchRegistration<T> : Disposable {
+    private var callback: Optional<(FileSystemWatcher, T) -> Void>
+    init(callback: (FileSystemWatcher, T) -> Void) { self.callback = Some(callback) }
+    internal val IsActive: bool => callback is Some(_)
+    internal func Invoke(sender: FileSystemWatcher, args: T) {
+        let current = callback
+        if current is Some(let invoke) { invoke(sender, args) }
+    }
+    func Dispose() { callback = None }
+}

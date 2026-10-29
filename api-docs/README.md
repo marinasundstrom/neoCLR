@@ -3089,3 +3089,14 @@ The terminal namespace function is now `System.Panic(message: string)`. Prefer
 consumers with the matching Raven codex/neoclr compiler and runtime bundle.
 This is a naming change only: cleanup-aware unwinding and revised thread/task
 panic boundaries remain undecided. See [the contract](../docs/system-fault.md).
+
+
+### FileSystemWatcher (2026-10-29 development)
+
+System.IO.FileSystemWatcher, WatcherChangeTypes, FileSystemWatcherError,
+FileSystemEventArgs, RenamedEventArgs and ErrorEventArgs are included in the
+aggregate reference and native selection. Source summaries and the
+[member/lifetime reference](file-system-watcher.md) cover disposable callback
+registrations, setup errors, filtering, ownership and platform limits. Native
+Raven event syntax remains unsupported; no event declaration is silently omitted.
+The native snapshot includes all six public types and their actual members.

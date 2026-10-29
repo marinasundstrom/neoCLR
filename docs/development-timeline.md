@@ -23665,3 +23665,21 @@ and the testing guides now record the author clarification. See the
 - **Outcome:** Planning documentation only; no panic cleanup behavior is implemented.
   Cross-backend representation and end-to-end qualification remain implementation
   gates. Corrected the disposal overview's outdated blanket claim about scope cleanup.
+
+## 2026-10-29 — Standalone physical file watching and storage direction
+
+- **Author:** Requested FileSystemWatcher, noting its potential use by configuration.
+  Suggested Microsoft.Extensions.FileProviders as a reference for System.Storage,
+  then clarified that the existing API is unique and closer to WinRT Windows.Storage.
+  Selected “Standalone FileSystemWatcher first” and asked whether it belongs in
+  System.Storage or System.IO. Subsequently emphasized Windows and macOS as the
+  current release priorities, with broader platform support a later challenge.
+- **Assistant recommendation/action:** Place physical-path watching in System.IO,
+  preserve the provider/item storage model, and keep future provider-level watching
+  separate. Implement the shared OS provider behind invocation-owned runtime
+  transport after the FFI prototype exposed compiled marshalling/lifetime gaps.
+  Use disposable callback registrations because native event emission is unsupported.
+- **Status:** Implementation and focused platform qualification are recorded in
+  [the watcher design](file-system-watcher.md). Backend availability is distinct
+  from execution evidence; Windows and broader platform runs remain explicit gates.
+  No replacement of System.Storage or automatic AddJsonFile reload was authorized.

@@ -16214,3 +16214,23 @@ and fault services. Internal Fail/Fault service identities are unchanged. Native
 metadata retains the existing no-result representation. General metadata-based
 terminal recognition remains the CLI replacement. This rename adds no unwinding,
 cleanup or thread/task behavior. Rebuild the compiler/reference/runtime bundle.
+
+
+## Physical file watcher transport (2026-10-29)
+
+The standalone System.IO.FileSystemWatcher uses an exact private InternalCall
+`neoCLR.Runtime.FileWatch(Int32, String, String, Int64, Int32) -> Value`.
+Native intent is invocation-owned OS subscription/read/close, with callbacks
+scheduled by managed Timer on the owner queue. The temporary transport uses
+existing primitive Value tags for handles, UTF-8 packets and typed errors;
+it adds no CLI or native metadata representation. No watcher identity is an
+OS descriptor or guest pointer. The native host's invocation scope and interpreter
+registry close abandoned subscriptions. See [design and validation](file-system-watcher.md).
+
+The source native emitter rejects event declarations, so OnCreated/OnChanged/
+OnDeleted/OnRenamed/OnError return Disposable registrations. The aggregate CLI
+reference projects structural callbacks using its existing Action transport;
+actual native callable shapes remain structural Functions. Public event metadata,
+provider-neutral watching and general compiled FFI string/buffer marshalling remain
+gaps. A future native metadata event implementation must preserve subscription
+and ownership semantics rather than treating this transport as a permanent event ABI.

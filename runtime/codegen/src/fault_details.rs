@@ -86,6 +86,7 @@ pub struct Options {
     pub int32_to_string: Vec<usize>,
     pub string_compare_ordinal: Vec<usize>,
     pub file_input: Vec<usize>,
+    pub file_watch: Vec<usize>,
     pub file_output: Vec<usize>,
     pub path_combine: Vec<usize>,
     pub path_file_name: Vec<usize>,
@@ -1046,6 +1047,13 @@ impl Options {
                 .into_iter()
                 .flatten()
                 .filter(|r| r["implementation"] == "file-read-utf8-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            file_watch: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
+                .filter(|r| r["implementation"] == "file-watch-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
             path_combine: report

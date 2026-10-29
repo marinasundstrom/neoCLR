@@ -50,3 +50,10 @@ func Main() -> int {
 ```
 
 [Complete sample project](https://github.com/marinasundstrom/neoCLR/tree/main/samples/extensions/src/ConfigurationIntro) · [Build and run instructions](https://github.com/marinasundstrom/neoCLR/blob/main/samples/extensions/README.md#introductory-examples)
+
+## Watching configuration files (development)
+
+The standalone [FileSystemWatcher sample](https://github.com/marinasundstrom/neoCLR/tree/main/samples/file-watcher)
+shows debounced reload with failure preservation using the current JSON provider.
+This is application wiring; AddJsonFile does not automatically watch files yet.
+See [the watcher contract](../../docs/file-system-watcher.html).

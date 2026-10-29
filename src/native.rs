@@ -1088,6 +1088,19 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             Binding::Socket(crate::socket_io::Operation::Close),
             Type::Value,
         ),
+        (
+            "neoCLR.Runtime.FileWatch",
+            [
+                Type::Int32,
+                Type::String,
+                Type::String,
+                Type::Int64,
+                Type::Int32,
+            ],
+        ) => (
+            Binding::FileResource(crate::file_streams::Operation::Watch),
+            Type::Value,
+        ),
         ("neoCLR.Runtime.FileOpenRead", [Type::String]) => (
             Binding::FileResource(crate::file_streams::Operation::OpenRead),
             Type::Value,

@@ -22,3 +22,7 @@ internal extern func PathCombine(left: string, right: string) -> string;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
 internal extern func PathGetFileName(path: string) -> string;
+
+// Invocation-owned watcher transport: Int64 handle, String packet, or Byte error.
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func FileWatch(operation: int, path: string, filter: string, handle: long, recursive: int) -> System.Value;

@@ -2495,6 +2495,29 @@ mod type_identity_tests {
     }
 
     #[test]
+    fn file_watcher_requires_the_exact_internal_call_contract() {
+        let source = neoclr::assemble(".module WatchBinding\n.function neoCLR.Runtime.FileWatch(Int32 operation,String path,String filter,Int64 handle,Int32 recursive) -> Value\n.methodimpl InternalCall\n.end\n").unwrap();
+        let inventory =
+            json!({"functions":[{"compiledIndex":0,"name":"neoCLR.Runtime.FileWatch"}]});
+        for variant in 0..5 {
+            let mut input = source.clone();
+            match variant {
+                0 => input.functions[0].parameters[3] = Type::Int32,
+                1 => input.functions[0].returns = Type::String,
+                2 => input.functions[0].impl_flags = 0,
+                3 => input.functions[0].body.push(Op::Int(0)),
+                _ => input.functions[0].locals.push(Type::String),
+            }
+            assert!(file_watch(&mut input, &inventory).is_err());
+        }
+        let mut input = source;
+        assert_eq!(
+            file_watch(&mut input, &inventory).unwrap()[0]["symbol"],
+            "neoclr_file_watch_v1"
+        );
+    }
+
+    #[test]
     fn environment_platform_requires_the_exact_internal_call_contract() {
         let source = neoclr::assemble(".module CultureBinding\n.function neoCLR.Runtime.EnvironmentPlatformInfo(Int32 selector) -> String\n.methodimpl InternalCall\n.end\n").unwrap();
         let inventory = json!({"functions":[{"compiledIndex":0,"name":"neoCLR.Runtime.EnvironmentPlatformInfo"}]});
@@ -3063,4 +3086,62 @@ mod terminal_tests {
             }
         }
     }
+}
+
+/// OS watcher transport; guest callbacks stay on the owner completion queue.
+pub fn file_watch(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
+    let mut bindings = vec![];
+    for row in selection["functions"]
+        .as_array()
+        .ok_or("missing selection inventory")?
+    {
+        if row["name"] != "neoCLR.Runtime.FileWatch" {
+            continue;
+        }
+        let name = "neoCLR.Runtime.FileWatch";
+        let f = &mut input.functions[row["compiledIndex"]
+            .as_u64()
+            .ok_or("missing compiled index")? as usize];
+        if f.name != name
+            || f.owner.is_some()
+            || f.instance
+            || f.receiver_byref
+            || f.receiver_readonly
+            || f.parameters
+                != vec![
+                    Type::Int32,
+                    Type::String,
+                    Type::String,
+                    Type::Int64,
+                    Type::Int32,
+                ]
+            || f.returns != Type::Value
+            || f.no_result
+            || f.impl_flags != 0x1000
+            || f.pinvoke.is_some()
+            || !f.body.is_empty()
+            || !f.locals.is_empty()
+            || f.is_virtual
+            || f.is_override
+            || f.is_abstract
+            || !f.generic_parameters.is_empty()
+            || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty()
+            || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty()
+            || !f.out_when_true.is_empty()
+            || !f.readonly_parameters.is_empty()
+        {
+            return Err("native file watcher requires exact FileWatch(Int32, String, String, Int64, Int32) -> Value InternalCall contract".into());
+        }
+        f.impl_flags = 0;
+        f.body = vec![
+            Op::String(String::new()),
+            Op::PackValue(Type::String),
+            Op::Return,
+        ];
+        bindings.push(json!({"definition":row["definition"],"name":row["name"],"compiledIndex":row["compiledIndex"],
+            "implementation":"file-watch-v1","symbol":"neoclr_file_watch_v1","semantics":"invocation-owned OS file notifications; bounded native queue"}));
+    }
+    Ok(bindings)
 }

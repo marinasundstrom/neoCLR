@@ -5,34 +5,34 @@
     "url": "https://github.com/marinasundstrom/neoCLR",
     "revision": "main"
   },
-  "sha256": "76219eb73698b38fcb4dff90e4c61366f48d546ad40140a347d297d78505eb3c",
-  "librarySourceRevision": "63d1f2baae0d36462bf3df69d8af903148f51d6f",
-  "compilerRevision": "03ed6b587-panic-working-tree",
+  "sha256": "d79c354acdff1227cb8b4838dea3b1e4dafb7b4f107d6e1dcaad60bbb97b31c6",
+  "librarySourceRevision": "9979002939052985cf682d7353e2669dd71de868",
+  "compilerRevision": "b4c5790e1-pinned",
   "libraryBuildEvidence": {
     "file": "build-evidence.json",
-    "sha256": "06f5438b0aac2bf02d7b9a81d1cffddb2a234ece34cce7b6c26c6ff7b5e3665d"
+    "sha256": "714d20dbb4478adc3c073bf2e66c5db5336770b089a89c0c71647d5b792ba646"
   },
-  "rendererRevision": "b4c5790e1",
+  "rendererRevision": "binary-sha256:b7d34d498041b53167e73a4ce081edbdea89225df47dd70436914747f61b5ddb",
   "libraryArtifacts": {
-    "System.Runtime.dll": "82da5961385534599d5ff456e5659c73b3d18ba13a3234467d7d9a428e50d593",
-    "System.Data.dll": "a341b73dc2b18706e39bfcfe932595a98876e27fef63166f5121797cf17fca7a",
-    "System.Networking.dll": "d4f965e2bd919067a820f07c4a5c930220c3943c4d3212dda05101d790de675a",
-    "System.Web.dll": "817c91f9ae2ddd5f780806acbb374b0c6d67213662f3d0f6d5d55da1f8b78037",
-    "Neo.DependencyInjection.Abstractions.dll": "9fe9bbafae81557e464d26ad1db9f218937461413353d4586bb23ae29d86b73b",
-    "Neo.DependencyInjection.dll": "e28424ae8e953e794fd1174fe5a5d4ab36782f5cf033df49eb96353f3eee6a4f",
-    "Neo.Localization.Abstractions.dll": "69bbccaa580e5dc61721993c4f694d68f253ddc144675a34fde1178e20d1ccb2",
-    "Neo.Localization.dll": "2bdbb1d5080bf455dc1abfb22a1641fdb3932d819d56c8238c5d02eda6a6b69c",
+    "System.Runtime.dll": "cb65c6a82d70e93c9e6d84c6e03556724a87d365c1aab387d3dc50765aa14540",
+    "System.Data.dll": "3332522add941a7832ad6e3c8fdbb23e7be9c499851b4d2dfcc1b8e2353fc952",
+    "System.Networking.dll": "bfe1938928e3819121207111a8be581ad689154a07b6c751b54ca4e28c2e7247",
+    "System.Web.dll": "b56f9caba1d1af30484259c1005fc2640bf44b6e92fdb311d5dbba48574740f5",
+    "Neo.DependencyInjection.Abstractions.dll": "0f445f2f2b0ab68371f43788161b3931e633ead91d9a2c182bd6d51eeda7db5a",
+    "Neo.DependencyInjection.dll": "a417a2063da14a606802bfcc5c730727587b97dff091528ab267301077d44b01",
+    "Neo.Localization.Abstractions.dll": "3a135fbdc37fcdcc1c153511ad68c7f7fa92cf76f2bdfdcf5b1013916c57a472",
+    "Neo.Localization.dll": "632d180628a3ef0c6ba596ed625bba79725fa2870cfa7ad305b1e48bf3823de6",
     "Neo.Logging.Abstractions.dll": "d48030829bba91c6d4cd043679c8547e05c9469772524ad42b4e3fbc78edd21d",
-    "Neo.Logging.dll": "ef87fb34e25e468d011e41277ddce4c74ec0a7107202096d83995803f0be0f76",
+    "Neo.Logging.dll": "6b064cb50092005fa8039a7456ecb899ce451ccf2a0a0864c9b5168f937f3aac",
     "Neo.Configuration.Abstractions.dll": "615237ff5d50a4ad5bc83046de3c2374c2024ee144426560cb34cf71673a98eb",
-    "Neo.Configuration.dll": "8e5ddb87ab2e3d32472299bd3fcfa18e6b6427fddb183d1438afcc551f4b07a8",
-    "Neo.Configuration.Json.dll": "c68b8986db9906eeb3976e64e2b89be0cdd6638b332e142c01dab4caa764dbb0",
-    "System.Data.PostgreSql.dll": "292a7ab26e5c8e6bc4d647f418afea327210b6182eb2861cf36a25e6faf4e63c",
-    "System.runtime.neox": "0c72a8656e7158d6bb2f31c0b019d8747dd61a6c4127b278155e104de437769b"
+    "Neo.Configuration.dll": "7dddd94e80c38902ab5d4ce108bdeeede4ba50c755ddc456be553d7481980b9d",
+    "Neo.Configuration.Json.dll": "f3f6601fdce5ff08cb97114bd42dc2f4efbc211342a5454fd79569eca8e74f2c",
+    "System.runtime.neox": "0c72a8656e7158d6bb2f31c0b019d8747dd61a6c4127b278155e104de437769b",
+    "System.Data.PostgreSql.dll": "56e7d33ea2c3fdaddb3a23109b0eed291a3e546c8af14f55eccb0126d0205fad"
   },
   "renderingEvidence": {
     "normalized-sidecars.json": "dbe8731d536d4e645b8929153850b0db47a0a492becb147774145c5e1abdd392",
-    "restored-xml-comments.json": "a4bde54e304a5dbd120f242e525262087c8b0575d3ff0763450521ceea3009f6"
+    "restored-xml-comments.json": "1d50ccd0744d3524b4f68ace3fa3ed50e175f8402960f4ce4d358e69a9ea9c9b"
   },
   "scope": "Reviewed native API rendering; legacy coverage gaps remain explicitly marked by the website overlay."
 }

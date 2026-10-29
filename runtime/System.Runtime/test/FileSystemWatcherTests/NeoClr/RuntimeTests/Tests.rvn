@@ -1,0 +1,119 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.IO.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+import System.Time.*
+import System.Result.*
+import NeoClr.Testing.*
+
+[Test]
+func `Watchers start disabled and disposal permanently closes them`() -> Result<unit, TestFailure> {
+    let watcher = FileSystemWatcher(".")
+    _ = Assert.True(!watcher.EnableRaisingEvents, "Starts disabled")?
+    _ = Assert.True(!watcher.IncludeSubdirectories, "Defaults to direct children")?
+    _ = Assert.Equal("*", watcher.Filter)?
+    watcher.Path = "missing"
+    watcher.Filter = "*.json"
+    watcher.IncludeSubdirectories = true
+    watcher.Dispose()
+    watcher.Dispose()
+    return Assert.True(watcher.TryStart() is Failure(FileSystemWatcherError.Closed), "Cannot reopen disposed watcher")
+}
+
+[Test]
+func `Watcher setup preserves invalid and missing directory errors`() -> Result<unit, TestFailure> {
+    let invalid = FileSystemWatcher("")
+    let bad = invalid.TryStart() is Failure(FileSystemWatcherError.InvalidPath)
+    invalid.Dispose()
+    let missing = FileSystemWatcher("/neoclr-watch-directory-that-does-not-exist")
+    let absent = missing.TryStart() is Failure(FileSystemWatcherError.NotFound)
+    missing.Dispose()
+    return Assert.True(bad && absent, "Typed setup errors")
+}
+
+class Observations {
+    var Count = 0
+    var Unexpected = 0
+    var Errors = 0
+    func Change(sender: FileSystemWatcher, change: FileSystemEventArgs) {
+        Count += 1
+        if (change.Name != "nested/settings.json" && change.Name != "nested\\settings.json") || (!change.FullPath.EndsWithOrdinal("/nested/settings.json") && !change.FullPath.EndsWithOrdinal("\\nested\\settings.json")) {
+            Unexpected += 1
+        }
+    }
+    func Rename(sender: FileSystemWatcher, change: RenamedEventArgs) {
+        Count += 1
+        if change.Name != "nested/settings.json" && change.OldName != "nested/settings.json" && change.Name != "nested\\settings.json" && change.OldName != "nested\\settings.json" {
+            Unexpected += 1
+        }
+    }
+    func Error(sender: FileSystemWatcher, error: ErrorEventArgs) { Errors += 1 }
+    func Removed(sender: FileSystemWatcher, change: FileSystemEventArgs) { Unexpected += 1 }
+}
+
+async func Settle() -> Task<()> {
+    let done = Promise<()>()
+    let timer = Timer(() => { _ = done.Complete(()) })
+    timer.Start(Duration.FromTicks(20000000L))
+    await done.Task
+    timer.Dispose()
+}
+
+// The external test driver performs filesystem writes only after each READY marker.
+[Test]
+async func `Physical notifications filter descendants and respect stop restart and disposal`(root: string) -> Task<Result<unit, TestFailure>> {
+    let watcher = FileSystemWatcher(root, "*.json")
+    watcher.IncludeSubdirectories = true
+    let observations = Observations()
+    let removed = watcher.OnCreated(observations.Removed)
+    removed.Dispose()
+    removed.Dispose()
+    _ = watcher.OnCreated(observations.Change)
+    _ = watcher.OnChanged(observations.Change)
+    _ = watcher.OnDeleted(observations.Change)
+    _ = watcher.OnRenamed(observations.Rename)
+    _ = watcher.OnError(observations.Error)
+    if watcher.TryStart() is Failure(_) { watcher.Dispose(); return Assert.True(false, "Cannot start native watcher") }
+    Console.WriteLine("READY create")
+    await Settle()
+    Console.WriteLine("OBS create " + observations.Count.ToString() + " unexpected=" + observations.Unexpected.ToString() + " errors=" + observations.Errors.ToString())
+    let created = observations.Count > 0 && observations.Unexpected == 0 && observations.Errors == 0
+    observations.Count = 0
+    Console.WriteLine("READY replace")
+    await Settle()
+    Console.WriteLine("OBS replace " + observations.Count.ToString() + " unexpected=" + observations.Unexpected.ToString() + " errors=" + observations.Errors.ToString())
+    let replaced = observations.Count > 0 || observations.Errors > 0
+    watcher.Stop()
+    observations.Count = 0
+    observations.Errors = 0
+    Console.WriteLine("READY stopped")
+    await Settle()
+    let stopped = observations.Count == 0 && observations.Errors == 0
+    if watcher.TryStart() is Failure(_) { watcher.Dispose(); return Assert.True(false, "Cannot restart native watcher") }
+    Console.WriteLine("READY restart")
+    await Settle()
+    Console.WriteLine("OBS restart " + observations.Count.ToString() + " unexpected=" + observations.Unexpected.ToString() + " errors=" + observations.Errors.ToString())
+    let restarted = observations.Count > 0 && observations.Unexpected == 0
+    watcher.Dispose()
+    observations.Count = 0
+    Console.WriteLine("READY disposed")
+    await Settle()
+    let disposed = observations.Count == 0 && !watcher.EnableRaisingEvents
+    return Assert.True(created && replaced && stopped && restarted && disposed, "Filtered callbacks, atomic replacement and lifecycle")
+}
+
+func Report(result: Result<unit, TestFailure>, name: string) {
+    if result is Failure(let error) { Panic(name + ": " + error.Message) }
+    Console.WriteLine("PASS " + name)
+}
+
+// Async discovery is not supported; await the lifecycle consumer explicitly.
+async func Main(args: string[]) -> Task<int> {
+    if args.Length != 1 { Panic("Expected fixture directory") }
+    Report(`Watchers start disabled and disposal permanently closes them`(), "watcher defaults and disposal")
+    Report(`Watcher setup preserves invalid and missing directory errors`(), "watcher setup errors")
+    Report(await `Physical notifications filter descendants and respect stop restart and disposal`(args[0]), "physical watcher lifecycle")
+    return 0
+}

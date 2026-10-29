@@ -64,3 +64,6 @@
 # Retained historical bridge build outputs are not fixtures.
 /runtime/legacy/raven/**/bin/
 /runtime/legacy/raven/**/obj/
+
+/samples/file-watcher/**/bin/
+/samples/file-watcher/**/obj/

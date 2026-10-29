@@ -683,6 +683,7 @@ fn compile_with_driver<M: Module>(
                         // Blocking owner-host file services copy paths before
                         // allocation; read publishes fresh atomic UTF-8 storage,
                         // write borrows rooted inputs without managed mutation.
+                        || d.file_watch.contains(&i)
                         || d.file_input.contains(&i)
                         || d.file_output.contains(&i)
                 });
@@ -1439,6 +1440,19 @@ fn compile_with_driver<M: Module>(
     }
     if let Some(d) = details {
         for (indices, symbol, parameters) in [
+            (
+                &d.file_watch,
+                "neoclr_file_watch_v1",
+                vec![
+                    types::I32,
+                    types::I64,
+                    types::I64,
+                    types::I64,
+                    types::I32,
+                    types::I64,
+                    types::I64,
+                ],
+            ),
             (
                 &d.file_input,
                 if d.native_gc {
@@ -4111,6 +4125,16 @@ fn compile_with_driver<M: Module>(
                             parameters[0],
                             parameters[1],
                             parameters[2],
+                            output,
+                        ]
+                    } else if details.unwrap().file_watch.contains(&i) {
+                        vec![
+                            parameters[0],
+                            parameters[1],
+                            parameters[2],
+                            parameters[3],
+                            parameters[4],
+                            fault_context.unwrap(),
                             output,
                         ]
                     } else if details.unwrap().file_input.contains(&i) {

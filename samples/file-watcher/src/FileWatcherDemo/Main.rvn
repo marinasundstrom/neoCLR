@@ -1,0 +1,73 @@
+import System.*
+import System.IO.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+import System.Optional.*
+import System.Result.*
+import System.Time.*
+import Neo.Configuration.Json.*
+
+class SettingsMonitor : Disposable {
+    private val provider: JsonConfigurationProvider
+    private val watcher: FileSystemWatcher
+    private val debounce: Timer
+
+    init(directory: string) {
+        provider = JsonConfigurationProvider(directory + "/appsettings.json")
+        debounce = Timer(Reload)
+        watcher = FileSystemWatcher(directory, "appsettings.json")
+        _ = watcher.OnChanged(Change)
+        _ = watcher.OnCreated(Change)
+        _ = watcher.OnDeleted(Change)
+        _ = watcher.OnRenamed(Rename)
+        _ = watcher.OnError(Rescan)
+    }
+
+    func Start() {
+        // Subscribe before the initial read so a concurrent write is not missed.
+        if watcher.TryStart() is Failure(_) {
+            Panic("Unable to watch settings directory")
+        }
+        Reload()
+    }
+
+    private func Change(sender: FileSystemWatcher, change: FileSystemEventArgs) { Schedule() }
+    private func Rename(sender: FileSystemWatcher, change: RenamedEventArgs) { Schedule() }
+    private func Rescan(sender: FileSystemWatcher, error: ErrorEventArgs) {
+        Console.WriteLine("Watcher lost detail; reading current settings")
+        Schedule()
+    }
+    private func Schedule() {
+        // A burst restarts the delay. This is application policy, not an OS guarantee.
+        debounce.Start(Duration.FromTicks(2000000L))
+    }
+    private func Reload() {
+        match provider.TryLoad() {
+            Ok(_) => {
+                match provider.Find("Message") {
+                    Some(let text) => Console.WriteLine(text ?? "(null)")
+                    None => Console.WriteLine("No Message setting")
+                }
+            }
+            Failure(_) => Console.WriteLine("Settings unavailable or malformed; keeping previous values")
+        }
+    }
+    func Dispose() {
+        watcher.Dispose()
+        debounce.Dispose()
+    }
+}
+
+async func Main(args: string[]) -> Task<int> {
+    if args.Length != 1 { Panic("Pass the directory containing appsettings.json") }
+    let monitor = SettingsMonitor(args[0])
+    monitor.Start()
+    Console.WriteLine("Watching appsettings.json for 30 seconds")
+    let done = Promise<()>()
+    let timeout = Timer(() => { _ = done.Complete(()) })
+    timeout.Start(Duration.FromTicks(300000000L))
+    await done.Task
+    timeout.Dispose()
+    monitor.Dispose()
+    return 0
+}

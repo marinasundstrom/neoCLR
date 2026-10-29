@@ -30,6 +30,7 @@ pub struct RuntimeContext {
     pub bind_task_queue: bool,
     pub bind_socket_transfer: bool,
     pub bind_timers: bool,
+    pub bind_file_watch: bool,
     pub bind_gc_collect: bool,
     pub bind_runtime_async: bool,
     pub bind_stack_trace: bool,
@@ -942,6 +943,14 @@ pub fn prepare(
             .unwrap()
             .extend(rows);
     }
+    let bind_file_watch = context.is_some_and(|c| c.bind_file_watch);
+    if bind_file_watch {
+        let rows = super::bindings::file_watch(&mut selected, &report)?;
+        report["nativeBindings"]
+            .as_array_mut()
+            .unwrap()
+            .extend(rows);
+    }
     let bind_timers = context.is_some_and(|c| c.bind_timers);
     if bind_timers {
         let rows = super::bindings::timers(&mut selected, &report)?;
@@ -1676,7 +1685,7 @@ pub fn prepare(
     }
     report["loadSet"] = json!({"modules": inputs.iter().map(|m| json!({"name": m.name, "revision": m.revision})).collect::<Vec<_>>(),
         "validation": "all original bodies verified with runtime binder before private canonical projection",
-        "runtimeContext": {"system": system.name, "revision": system.revision, "explicit": context.is_some(), "objectRoot": context.and_then(|c| c.object_root.as_ref()), "compileSystem": compile_system, "bindUserFault": bind_user_fault, "bindConsoleReadByte": bind_console_read_byte, "bindConsoleWriteLine": bind_console_write_line, "bindConsoleStreamOutput": bind_console_stream_output, "bindInt32ToString": bind_int32_to_string, "bindCryptography": bind_cryptography, "bindTls": bind_tls, "bindUtf8Text": bind_utf8_text, "bindPaths": bind_paths, "bindFileOutput": bind_file_output, "bindFileInput": bind_file_input, "bindCharacterText": bind_character_text, "bindSystemCulture": bind_system_culture, "bindEnvironmentPlatform": bind_environment_platform, "bindTimeZoneRules": bind_time_zone_rules, "bindIntegerText": bind_integer_text, "bindSocketListener": bind_socket_listener, "bindSocketAccept": bind_socket_accept, "bindTaskQueue": bind_task_queue, "bindSocketTransfer": bind_socket_transfer, "bindTimers": bind_timers, "bindGCCollect": bind_gc_collect, "bindRuntimeAsync": bind_runtime_async, "bindStackTrace": bind_stack_trace, "bindScheduler": bind_scheduler, "bindSocketClient": bind_socket_client, "referenceArena": reference_arena, "scope": if compile_system { "explicit managed System body selection; native services still require bindings" } else { "validation only; System seed bodies are not compilation inputs" }},
+        "runtimeContext": {"system": system.name, "revision": system.revision, "explicit": context.is_some(), "objectRoot": context.and_then(|c| c.object_root.as_ref()), "compileSystem": compile_system, "bindUserFault": bind_user_fault, "bindConsoleReadByte": bind_console_read_byte, "bindConsoleWriteLine": bind_console_write_line, "bindConsoleStreamOutput": bind_console_stream_output, "bindInt32ToString": bind_int32_to_string, "bindCryptography": bind_cryptography, "bindTls": bind_tls, "bindUtf8Text": bind_utf8_text, "bindPaths": bind_paths, "bindFileOutput": bind_file_output, "bindFileInput": bind_file_input, "bindCharacterText": bind_character_text, "bindSystemCulture": bind_system_culture, "bindEnvironmentPlatform": bind_environment_platform, "bindTimeZoneRules": bind_time_zone_rules, "bindIntegerText": bind_integer_text, "bindSocketListener": bind_socket_listener, "bindSocketAccept": bind_socket_accept, "bindTaskQueue": bind_task_queue, "bindSocketTransfer": bind_socket_transfer, "bindTimers": bind_timers, "bindFileWatch": bind_file_watch, "bindGCCollect": bind_gc_collect, "bindRuntimeAsync": bind_runtime_async, "bindStackTrace": bind_stack_trace, "bindScheduler": bind_scheduler, "bindSocketClient": bind_socket_client, "referenceArena": reference_arena, "scope": if compile_system { "explicit managed System body selection; native services still require bindings" } else { "validation only; System seed bodies are not compilation inputs" }},
         "limits": "up to 128 closed value/reference/interface shapes and 128 function clones; primitive static generic methods; explicit dependencies bounded by total type/method inventory; no dynamic loading"});
     Ok((selected, report))
 }

@@ -197,7 +197,8 @@ pub(crate) fn uses(module: &crate::Module, function: &Function) -> Result<Vec<Se
                 ]);
             }
             crate::native::Binding::FileResource(operation) => match operation {
-                crate::file_streams::Operation::OpenRead
+                crate::file_streams::Operation::Watch
+                | crate::file_streams::Operation::OpenRead
                 | crate::file_streams::Operation::Read
                 | crate::file_streams::Operation::ReadInto
                 | crate::file_streams::Operation::Seek

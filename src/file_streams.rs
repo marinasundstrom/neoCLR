@@ -85,6 +85,7 @@ pub(crate) fn snapshot(view: &crate::MemoryView) -> Result<Value, Fault> {
 
 #[derive(Clone, Copy)]
 pub(crate) enum Operation {
+    Watch,
     OpenRead,
     OpenWrite,
     CreateNew,
@@ -135,6 +136,14 @@ struct OpenFile {
 pub(crate) struct Files {
     open: HashMap<i32, OpenFile>,
     issued: HashSet<i32>,
+    watches: HashSet<i64>,
+}
+impl Drop for Files {
+    fn drop(&mut self) {
+        for id in self.watches.drain() {
+            neoclr_filewatch_provider::close(id);
+        }
+    }
 }
 fn path(path: &str) -> Result<&std::path::Path, Error> {
     if path.is_empty() || path.contains('\0') {
@@ -276,6 +285,44 @@ impl Files {
         args: &[Value],
         limits: &Limits,
     ) -> Result<Value, Fault> {
+        if let (
+            Operation::Watch,
+            [
+                Value::Int32(operation),
+                Value::String(path),
+                Value::String(filter),
+                Value::Int64(handle),
+                Value::Int32(recursive),
+            ],
+        ) = (op, args)
+        {
+            let result = match operation {
+                0 => neoclr_filewatch_provider::open(path, filter, *recursive != 0).map(|id| {
+                    self.watches.insert(id);
+                    Value::Int64(id)
+                }),
+                1 if self.watches.contains(handle) => {
+                    let mut bytes = vec![0; 65536];
+                    let count = neoclr_filewatch_provider::read(*handle, &mut bytes);
+                    if count < 0 {
+                        Err(count)
+                    } else {
+                        bytes.truncate(count as usize);
+                        String::from_utf8(bytes)
+                            .map(|s| Value::String(s.into()))
+                            .map_err(|_| -7)
+                    }
+                }
+                2 if self.watches.remove(handle) => {
+                    neoclr_filewatch_provider::close(*handle);
+                    Ok(Value::Int32(0))
+                }
+                _ => Err(-5),
+            };
+            return Ok(Value::Erased(Box::new(
+                result.unwrap_or_else(|error| Value::Byte((-error) as u8)),
+            )));
+        }
         let result = match (op, args) {
             (Operation::ReadInto, [Value::Int32(id), value]) => {
                 let view = memory(value, false)?;
@@ -452,6 +499,43 @@ impl Files {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn watcher_handles_are_invocation_owned_and_close_on_drop() {
+        let fixture = Fixture::new();
+        let args = [
+            Value::Int32(0),
+            Value::String(fixture.0.to_str().unwrap().into()),
+            Value::String("*.json".into()),
+            Value::Int64(0),
+            Value::Int32(0),
+        ];
+        let mut owner = Files::default();
+        let Value::Erased(value) = owner
+            .invoke(Operation::Watch, &args, &Limits::default())
+            .unwrap()
+        else {
+            panic!("transport");
+        };
+        let Value::Int64(id) = *value else {
+            panic!("open failed: {value:?}");
+        };
+        let other = Files::default()
+            .invoke(
+                Operation::Watch,
+                &[
+                    Value::Int32(1),
+                    Value::String("".into()),
+                    Value::String("".into()),
+                    Value::Int64(id),
+                    Value::Int32(0),
+                ],
+                &Limits::default(),
+            )
+            .unwrap();
+        assert!(matches!(other, Value::Erased(v) if matches!(*v, Value::Byte(5))));
+        drop(owner);
+        assert_eq!(neoclr_filewatch_provider::read(id, &mut [0; 32]), -5);
+    }
     struct Fixture(std::path::PathBuf);
     impl Fixture {
         fn new() -> Self {

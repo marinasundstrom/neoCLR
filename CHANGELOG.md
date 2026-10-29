@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-29
 
+- Add standalone System.IO.FileSystemWatcher with disposable callbacks, recursive basename filtering, typed errors and bounded OS notification queues. Share the statically linked provider across interpreter/native execution, enforce invocation-owned handles and close abandoned subscriptions at teardown. Add a debounced appsettings.json reload sample, runtime tests and API/website references. Windows and macOS are release priorities; macOS is locally exercised and Windows execution remains a qualification gate. Native event syntax and automatic configuration/provider reload remain gaps.
+
 - Document the synchronous panic cleanup contract and implementation plan, comparing existing failure propagation and lifetime metadata with alternatives before adding opcodes. Withdraw experimental panic-cleanup codegen guards and record the author’s exception-free runtime constraint. Panic unwinding remains planned; no new cleanup instructions or runtime behavior are introduced. Clarify existing normal scope cleanup in the disposal overview.
 
 - Contain historical System/neoCLR bootstrap sources and Raven CLI bridge fixtures under runtime/legacy; keep active compiler-service templates under runtime/compiler-services. Update build, test and packaging consumers without changing expanded bootstrap behavior. Old source paths have no compatibility aliases; historical receipts retain their original paths and hashes.

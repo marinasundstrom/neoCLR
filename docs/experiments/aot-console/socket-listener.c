@@ -1,4 +1,7 @@
 #include "socket-listener.h"
+#ifdef NEOCLR_FILE_WATCH
+#include "../../../tools/filewatch-provider/include/neoclr_filewatch.h"
+#endif
 #ifdef NEOCLR_HTTP_WORKERS
 #include "../../../runtime/native/workers/http-workers.h"
 #endif
@@ -185,6 +188,12 @@ int32_t neoclr_socket_scope_enter_v1(neoclr_socket_scope *scope, neoclr_aot_cont
 }
 int32_t neoclr_socket_scope_leave_v1(neoclr_socket_scope *scope) {
     if (!scope || scope != head) return 3;
+#ifdef NEOCLR_FILE_WATCH
+    for (unsigned i = 0; i < 64; i++) {
+        if (scope->file_watches[i]) neoclr_filewatch_close_v1(scope->file_watches[i]);
+        scope->file_watches[i] = 0;
+    }
+#endif
     int32_t status = 0;
     for (unsigned i = 0; i < 64; i++) {
 #ifdef NEOCLR_HTTPS_SERVER
@@ -975,5 +984,48 @@ static int32_t socket_poll(neoclr_aot_context *context, uint64_t *callback) {
         }
     }
     return take_runnable(scope, callback);
+}
+#endif
+
+#ifdef NEOCLR_FILE_WATCH
+/* This existing invocation resource scope also owns timers and task delivery.
+ * The provider holds no guest pointers; scope teardown closes abandoned watchers. */
+int32_t neoclr_file_watch_v1(int32_t operation, const neoclr_aot_text *path,
+    const neoclr_aot_text *filter, int64_t handle, int32_t recursive,
+    neoclr_aot_context *context, void *output) {
+    neoclr_socket_scope *scope = find_scope(context);
+    if (!scope || !output) return 3;
+    if (operation == 0) {
+        if (!path || !filter || !path->length || path->length > SIZE_MAX - 1 || filter->length > SIZE_MAX - 1 ||
+            memchr(path->bytes, 0, (size_t)path->length) || memchr(filter->bytes, 0, (size_t)filter->length)) return publish(output, 2, 1);
+        unsigned slot = 0;
+        while (slot < 64 && scope->file_watches[slot]) slot++;
+        if (slot == 64) return publish(output, 2, 9);
+        char *p = malloc((size_t)path->length + 1), *f = malloc((size_t)filter->length + 1);
+        if (!p || !f) { free(p); free(f); return 5; }
+        memcpy(p, path->bytes, (size_t)path->length); p[path->length] = 0;
+        memcpy(f, filter->bytes, (size_t)filter->length); f[filter->length] = 0;
+        int64_t id = neoclr_filewatch_open_v1(p, f, recursive);
+        free(p); free(f);
+        if (id < 0) return publish(output, 2, (uint64_t)-id);
+        scope->file_watches[slot] = id;
+        return publish(output, 5, (uint64_t)id);
+    }
+    unsigned slot = 0;
+    while (slot < 64 && scope->file_watches[slot] != handle) slot++;
+    if (!handle || slot == 64) return publish(output, 2, 5);
+    if (operation == 2) {
+        neoclr_filewatch_close_v1(handle);
+        scope->file_watches[slot] = 0;
+        return publish(output, 1, 0);
+    }
+    if (operation != 1) return 3;
+    unsigned char *bytes = malloc(65536);
+    if (!bytes) return 5;
+    int32_t length = neoclr_filewatch_read_v1(handle, bytes, 65536);
+    if (length < 0) { free(bytes); return publish(output, 2, (uint64_t)-length); }
+    int32_t status = neoclr_text_decode_utf8_host_bytes_rooted_v1(bytes, (uint64_t)length, &context->text, output);
+    free(bytes);
+    return status;
 }
 #endif

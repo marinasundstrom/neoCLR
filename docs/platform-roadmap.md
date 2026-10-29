@@ -1,5 +1,7 @@
 # neoCLR platform roadmap
 
+**Author-directed physical watching (2026-10-29):** Add standalone [System.IO.FileSystemWatcher](file-system-watcher.md) first; preserve the WinRT-like System.Storage model. Windows and macOS are the release priorities. Provider-level change notification and automatic configuration reload remain separate work. This bounded slice does not reprioritize the main milestones.
+
 **Author-directed panic design (2026-10-29):** The [synchronous cleanup contract and plan](synchronous-panic-cleanup.md) are documented; implementation remains open. Evaluate existing status propagation and lifetime metadata before new opcodes, without introducing exception handling. Task supervision, Environment termination and GC finalization remain deferred. This bounded direction does not reprioritize the broader milestones.
 
 **Author-directed housekeeping (2026-10-29):** Contain historical bootstrap and

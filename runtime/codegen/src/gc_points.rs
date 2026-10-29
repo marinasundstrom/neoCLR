@@ -89,6 +89,7 @@ pub(super) fn native_body(
                 &d.path_combine,
                 &d.file_output,
                 &d.file_input,
+                &d.file_watch,
                 &d.path_file_name,
                 &d.socket_listen,
                 &d.socket_local_port,

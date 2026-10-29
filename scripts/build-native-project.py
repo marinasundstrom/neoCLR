@@ -67,6 +67,21 @@ def native_crypto_sources():
             ROOT / 'docs/experiments/aot-console/cryptography.c']
 
 
+def native_filewatch_sources():
+    return [ROOT / 'tools/filewatch-provider/Cargo.toml', ROOT / 'Cargo.lock',
+            ROOT / 'tools/filewatch-provider/src/lib.rs', ROOT / 'tools/filewatch-provider/include/neoclr_filewatch.h']
+
+
+def native_filewatch_build(windows=False):
+    target = 'x86_64-pc-windows-msvc' if windows else 'aarch64-apple-darwin'
+    directory = ROOT / 'target/filewatch-provider'
+    command = ['cargo', 'build', '--locked', '--release', '--target', target,
+               '--target-dir', directory, '-p', 'neoclr-filewatch-provider']
+    if windows:
+        command += ['--config', 'target.x86_64-pc-windows-msvc.rustflags=["-C","target-feature=+crt-static"]']
+    return command, directory / target / 'release' / ('neoclr_filewatch_provider.lib' if windows else 'libneoclr_filewatch_provider.a')
+
+
 def native_crypto_build(windows=False):
     manifest = ROOT / 'tools/native-crypto/Cargo.toml'
     target = 'x86_64-pc-windows-msvc' if windows else 'aarch64-apple-darwin'
@@ -429,7 +444,7 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
         if not kit_path.exists():
             flags += ['--bind-cryptography']
         flags += ['--bind-tls']
-        flags += ['--bind-scheduler', '--bind-task-queue', '--bind-timers']
+        flags += ['--bind-scheduler', '--bind-task-queue', '--bind-timers', '--bind-file-watch']
         flags += ['--bind-runtime-async']
         if not windows:
             flags += ['--bind-file-input']
@@ -550,13 +565,22 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
             report['httpsConfiguration'] = dict(scope='all-accepted-connections',
                 certificateEnvironment='NEOCLR_HTTPS_CERTIFICATE', privateKeyEnvironment='NEOCLR_HTTPS_PRIVATE_KEY',
                 credentialLoading='runtime-only', api='private-host-capability')
+        native_filewatch = []
+        file_watch = any(binding.get('implementation') == 'file-watch-v1' for binding in selection.get('nativeBindings', []))
+        if file_watch:
+            for path in native_filewatch_sources():
+                report['inputs'][str(path)] = sha(path)
+            command, archive = native_filewatch_build(windows)
+            run(command, phase='native-filewatch-build')
+            native_filewatch.append(archive)
+        report['fileSystemWatcher'] = file_watch
         # Publish the executable only after link and dependency checks succeed.
         pending = output / ('app.pending.exe' if windows else 'app.pending')
         if windows:
             run(['cl', '/nologo', '/W4', '/WX', '/std:c11', '/experimental:c11atomics', '/O2', '/MT',
-                 '/DNEOCLR_NATIVE_GC', *(['/DNEOCLR_NO_DEFAULT_QUEUE'] if no_default_queue else []), *(['/DNEOCLR_MANAGED_TLS'] if managed_tls else []), *(['/DNEOCLR_HTTPS_SERVER'] if https_server else []), '/DNEOCLR_HTTP_HEAP_BYTES=' + str(http_heap_bytes), '/DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=' + str(byte_array_limit), *(['/DNEOCLR_ENTRY_ARGUMENTS'] if selection.get('entryArguments') else []), *(['/DNEOCLR_HTTP_HOST'] if http or async_host else []), *(['/DNEOCLR_RUNTIME_ASYNC', '/I' + str(ROOT / 'runtime/native/async')] if runtime_async else []), '/I' + str(base), '/Fo' + str(output) + '/',
-                 '/Fe:' + str(pending), *adapters, obj, *native_text, *native_tls, *native_crypto, '/link', '/STACK:1048576', *(['Ws2_32.lib'] if http or async_host or native_crypto or managed_tls else []),
-                 *(['Bcrypt.lib', 'Ntdll.lib', 'Userenv.lib', 'Advapi32.lib'] if https_server or native_crypto or managed_tls else [])], phase='host-compile-link')
+                 '/DNEOCLR_NATIVE_GC', *(['/DNEOCLR_FILE_WATCH'] if file_watch else []), *(['/DNEOCLR_NO_DEFAULT_QUEUE'] if no_default_queue else []), *(['/DNEOCLR_MANAGED_TLS'] if managed_tls else []), *(['/DNEOCLR_HTTPS_SERVER'] if https_server else []), '/DNEOCLR_HTTP_HEAP_BYTES=' + str(http_heap_bytes), '/DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=' + str(byte_array_limit), *(['/DNEOCLR_ENTRY_ARGUMENTS'] if selection.get('entryArguments') else []), *(['/DNEOCLR_HTTP_HOST'] if http or async_host else []), *(['/DNEOCLR_RUNTIME_ASYNC', '/I' + str(ROOT / 'runtime/native/async')] if runtime_async else []), '/I' + str(base), '/Fo' + str(output) + '/',
+                 '/Fe:' + str(pending), *adapters, obj, *native_text, *native_tls, *native_crypto, *native_filewatch, '/link', '/STACK:1048576', *(['Ws2_32.lib'] if http or async_host or native_crypto or managed_tls else []),
+                 *(['Bcrypt.lib', 'Ntdll.lib', 'Userenv.lib', 'Advapi32.lib'] if https_server or native_crypto or managed_tls or file_watch else [])], phase='host-compile-link')
             import re
             dependencies = re.findall(r'^\s+([A-Za-z0-9_.-]+\.dll)\s*$', run(['dumpbin', '/dependents', pending], phase='dependency-check'), re.MULTILINE | re.IGNORECASE)
             allowed = {'kernel32.dll', *(['ws2_32.dll'] if http or async_host or native_crypto or managed_tls else []),
@@ -566,11 +590,13 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
                 raise RuntimeError('Unexpected native dependencies: ' + repr(dependencies))
         else:
             run([clang, '-isysroot', sdk, '-arch', 'arm64', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror',
-                 '-DNEOCLR_NATIVE_GC', *(['-pthread', '-DNEOCLR_HTTP_WORKERS=' + str(http_workers)] if http_workers else []), *(['-DNEOCLR_NO_DEFAULT_QUEUE'] if no_default_queue else []), *(['-DNEOCLR_RUNTIME_ASYNC', '-I', ROOT / 'runtime/native/async', '-Wno-deprecated-declarations'] if runtime_async else []), *(['-DNEOCLR_MANAGED_TLS'] if managed_tls else []), *(['-DNEOCLR_HTTPS_SERVER'] if https_server else []), '-DNEOCLR_HTTP_HEAP_BYTES=' + str(http_heap_bytes), '-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=' + str(byte_array_limit), *(['-DNEOCLR_ENTRY_ARGUMENTS'] if selection.get('entryArguments') else []), '-I', base, *adapters, obj, *native_text, *native_tls, *native_crypto, *(['-framework', 'CoreFoundation'] if system_culture else []), '-o', pending], phase='host-compile-link')
+                 '-DNEOCLR_NATIVE_GC', *(['-DNEOCLR_FILE_WATCH'] if file_watch else []), *(['-pthread', '-DNEOCLR_HTTP_WORKERS=' + str(http_workers)] if http_workers else []), *(['-DNEOCLR_NO_DEFAULT_QUEUE'] if no_default_queue else []), *(['-DNEOCLR_RUNTIME_ASYNC', '-I', ROOT / 'runtime/native/async', '-Wno-deprecated-declarations'] if runtime_async else []), *(['-DNEOCLR_MANAGED_TLS'] if managed_tls else []), *(['-DNEOCLR_HTTPS_SERVER'] if https_server else []), '-DNEOCLR_HTTP_HEAP_BYTES=' + str(http_heap_bytes), '-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=' + str(byte_array_limit), *(['-DNEOCLR_ENTRY_ARGUMENTS'] if selection.get('entryArguments') else []), '-I', base, *adapters, obj, *native_text, *native_tls, *native_crypto, *native_filewatch, *(['-framework', 'CoreFoundation'] if system_culture or file_watch else []), *(['-framework', 'CoreServices'] if file_watch else []), '-o', pending], phase='host-compile-link')
             dependencies = [line.split()[0] for line in run(['xcrun', 'otool', '-L', pending], phase='dependency-check').splitlines()[1:]]
             allowed = {'/usr/lib/libSystem.B.dylib'}
-            if system_culture:
+            if system_culture or file_watch:
                 allowed.add('/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation')
+            if file_watch:
+                allowed.add('/System/Library/Frameworks/CoreServices.framework/Versions/A/CoreServices')
             if set(dependencies) != allowed:
                 raise RuntimeError('Unexpected native dependencies: ' + repr(dependencies))
         if any(sha(Path(path)) != digest for path, digest in report['inputs'].items()):

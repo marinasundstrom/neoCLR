@@ -27,7 +27,7 @@ Media type structure, typed presets and Content-Type parsing are available in th
 | Error diagnostics | [Error and ContextError](error-context.md) · [Error handling](/features/error-handling/) |
 | Functions | [Function shapes and objects](functions.md) · [Callbacks](callbacks.md) |
 | Gzip compression | [GZipStream](xref:System.IO.Compression.GZipStream) · [Compression contracts](compression.md) |
-| Streams and files | [System.IO](xref:System.IO) · [System.Storage](xref:System.Storage) · [Stream contracts](streams.md) |
+| Streams and files | [System.IO](xref:System.IO) · [System.Storage](xref:System.Storage) · [Stream contracts](streams.md) · [File watching](file-system-watcher.md) |
 | Console and environment | [Console](xref:System.Console) · [Environment](xref:System.Environment) · [Standard streams](console.md) |
 | Tasks and concurrency | [System.Concurrency.Tasks](xref:System.Concurrency.Tasks) · [System.Concurrency](xref:System.Concurrency) |
 | Dependency injection | [Registration, resolution and lifetimes](dependency-injection.md) · Neo.DependencyInjection / Neo.DependencyInjection.Abstractions |

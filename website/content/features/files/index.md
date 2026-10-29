@@ -85,6 +85,22 @@ supports DOM and flat object mapping; it does not change that sample's contract.
 
 <a id="direction"></a>
 
+## Physical file watching (development)
+
+`System.IO.FileSystemWatcher` watches a physical directory and delivers callbacks
+on the invocation completion queue. It supports filename filters, recursive watching,
+creation/change/deletion/rename notifications, errors and explicit disposal.
+System.Storage retains its provider-based File/Directory model.
+
+The [configuration watcher sample](https://github.com/marinasundstrom/neoCLR/tree/main/samples/file-watcher)
+subscribes to changes and debounces calls to JsonConfigurationProvider.TryLoad.
+Failed reads preserve previous settings; notifications can be duplicated or lost,
+so consumers must also handle errors by re-reading current state.
+
+Windows and macOS are the release priorities. macOS is the local qualification
+target; Windows execution and broader platform coverage remain tracked gates.
+See [API, deployment and limitations](../../docs/file-system-watcher.html).
+
 ## Possible directions
 
 A file catalog can guide richer metadata queries, freshness rules and enumeration.

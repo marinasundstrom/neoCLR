@@ -11,6 +11,19 @@ windows-link, even though it was not compiled in the local macOS validation.
 
 | Package | Locked version | Declared license expression | Preserved texts |
 | --- | --- | --- | --- |
+| bitflags | 2.13.2 | MIT OR Apache-2.0 | [LICENSE-APACHE](third-party/licenses/bitflags-2.13.2/LICENSE-APACHE), [LICENSE-MIT](third-party/licenses/bitflags-2.13.2/LICENSE-MIT) |
+| fsevent-sys | 4.1.0 | MIT | [LICENSE](third-party/licenses/fsevent-sys-4.1.0/LICENSE) |
+| inotify | 0.11.5 | ISC | [LICENSE](third-party/licenses/inotify-0.11.5/LICENSE) |
+| inotify-sys | 0.1.8 | ISC | [LICENSE](third-party/licenses/inotify-sys-0.1.8/LICENSE) |
+| kqueue | 1.2.1 | MIT | [LICENSE](third-party/licenses/kqueue-1.2.1/LICENSE) |
+| kqueue-sys | 1.1.2 | MIT | [LICENSE](third-party/licenses/kqueue-sys-1.1.2/LICENSE) |
+| mio | 1.2.4 | MIT | [LICENSE](third-party/licenses/mio-1.2.4/LICENSE) |
+| notify | 8.2.0 | CC0-1.0 | [LICENSE-CC0](third-party/licenses/notify-8.2.0/LICENSE-CC0) |
+| notify-types | 2.1.0 | MIT OR Apache-2.0 | [LICENSE-APACHE](third-party/licenses/notify-types-2.1.0/LICENSE-APACHE), [LICENSE-MIT](third-party/licenses/notify-types-2.1.0/LICENSE-MIT) |
+| same-file | 1.0.6 | Unlicense/MIT | [COPYING](third-party/licenses/same-file-1.0.6/COPYING), [LICENSE-MIT](third-party/licenses/same-file-1.0.6/LICENSE-MIT), [UNLICENSE](third-party/licenses/same-file-1.0.6/UNLICENSE) |
+| walkdir | 2.5.0 | Unlicense/MIT | [COPYING](third-party/licenses/walkdir-2.5.0/COPYING), [LICENSE-MIT](third-party/licenses/walkdir-2.5.0/LICENSE-MIT), [UNLICENSE](third-party/licenses/walkdir-2.5.0/UNLICENSE) |
+| winapi-util | 0.1.11 | Unlicense OR MIT | [COPYING](third-party/licenses/winapi-util-0.1.11/COPYING), [LICENSE-MIT](third-party/licenses/winapi-util-0.1.11/LICENSE-MIT), [UNLICENSE](third-party/licenses/winapi-util-0.1.11/UNLICENSE) |
+| windows-sys | 0.61.2 | MIT OR Apache-2.0 | [license-apache-2.0](third-party/licenses/windows-sys-0.61.2/license-apache-2.0), [license-mit](third-party/licenses/windows-sys-0.61.2/license-mit) |
 | block-buffer | 0.10.4 | MIT OR Apache-2.0 | [LICENSE-APACHE](third-party/licenses/block-buffer-0.10.4/LICENSE-APACHE), [LICENSE-MIT](third-party/licenses/block-buffer-0.10.4/LICENSE-MIT) |
 | ciborium | 0.2.2 | Apache-2.0 | [LICENSE](third-party/licenses/ciborium-0.2.2/LICENSE) |
 | ciborium-io | 0.2.2 | Apache-2.0 | [LICENSE](third-party/licenses/ciborium-io-0.2.2/LICENSE) |
