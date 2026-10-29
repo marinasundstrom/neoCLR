@@ -34,7 +34,7 @@ func Observe(task: Task<Result<int, Failure>>) {
         if let Failure(Failure.Message(text)) = task.GetResult() {
             Console.WriteLine(text)
         } else {
-            System.Fail("Expected retained error")
+            Panic("Expected retained error")
         }
     })
 }

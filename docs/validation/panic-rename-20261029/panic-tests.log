@@ -1,0 +1,10 @@
+   Compiling neoclr v0.1.0-preview.18 (/Users/robert/Projects/neoclr)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 32.17s
+     Running tests/system_fault.rs (target/debug/deps/system_fault-a574a640bce7fcfc)
+
+running 3 tests
+test fault_binding_uses_canonical_no_result_signature ... ok
+test fault_binding_requires_void_return_and_string_argument ... ok
+test panic_stops_guest_but_does_not_abort_host ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.63s

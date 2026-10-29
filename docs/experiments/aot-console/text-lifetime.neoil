@@ -22,7 +22,7 @@ ldc.i4 42
 ret
 Fail:
 ldloc first
-call System.Fail(String)
+call System.Panic(String)
 ldc.i4 99
 ret
 .end

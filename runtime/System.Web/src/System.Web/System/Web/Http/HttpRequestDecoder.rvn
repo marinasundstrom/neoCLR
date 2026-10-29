@@ -29,7 +29,7 @@ internal class HttpRequestHeaderBuffer : Sequence<byte> {
     val self[index: int]: byte {
         get {
             if index < 0 || index >= count {
-                System.Fail("HTTP header index out of range")
+                Panic("HTTP header index out of range")
             }
             return bytes[index]
         }

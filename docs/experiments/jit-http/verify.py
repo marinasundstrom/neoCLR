@@ -150,7 +150,7 @@ def main():
             report['cliHostSha256']=sha(bundle / 'bin' / ('neoclr-jit-host.dll' if windows else 'neoclr-jit-host.dylib'))
         server_source=ROOT/'docs/experiments/http-server/Server.rvn'
         fault_source=out/'ServerFault.rvn'
-        text=server_source.read_text().replace('func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {','func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {\n    System.Fail("HTTP callback fault")')
+        text=server_source.read_text().replace('func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {','func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {\n    System.Panic("HTTP callback fault")')
         fault_source.write_text(text)
         for name,source,with_args in [('server',server_source,False),('client',HERE/'Client.rvn',True),
                                       ('timeout',ROOT/'docs/experiments/http-timeout/Network.rvn',True),('fault',fault_source,False)]:

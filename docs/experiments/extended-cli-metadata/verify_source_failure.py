@@ -1,4 +1,4 @@
-"""Compile unchanged System.Fail and verify its terminal fault through a separate native consumer."""
+"""Compile unchanged System.Panic and verify its terminal fault through a separate native consumer."""
 import argparse
 import hashlib
 import json
@@ -24,7 +24,7 @@ def main():
     manifest['libraries'].append(dict(assemblyName='Failure',
         sources=[str(path.relative_to(ROOT)) for path in sources],
         types=['System.Runtime.CompilerServices.RuntimeFailure']))
-    manifest['failure'] = dict(assemblyName='Failure', namespaceName='System', functionName='Fail')
+    manifest['failure'] = dict(assemblyName='Failure', namespaceName='System', functionName='Panic')
     selected = output / 'ownership.json'
     selected.write_text(json.dumps(manifest, indent=2) + '\n')
     core, failure, consumer = [output / name for name in ('Core.dll', 'Failure.dll', 'Consumer.dll')]

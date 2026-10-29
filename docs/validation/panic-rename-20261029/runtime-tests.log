@@ -1,0 +1,41 @@
+   Compiling neoclr v0.1.0-preview.18 (/Users/robert/Projects/neoclr)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 29.64s
+     Running tests/neo.rs (target/debug/deps/neo-b23074b5cf07a1d7)
+
+running 9 tests
+test mutable_bindings_can_rebind_references_and_mutate_nested_values ... ok
+test unsupported_and_malformed_source_has_bounded_diagnostics ... ok
+test counter_program_exercises_value_copies_and_heap_field_references ... ok
+test immutable_values_reject_writable_access_but_reference_targets_remain_mutable ... ok
+test forward_calls_and_reference_parameters_are_typed ... ok
+test no_result_namespace_calls_preserve_expression_stack_contracts ... ok
+test compiler_and_runtime_preserve_reference_escape_rules ... ok
+test cli_runs_checks_and_compiles_neo_to_an_ordinary_artifact ... ok
+test expression_precedence_literals_and_void_calls_lower_to_existing_il ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 12.39s
+
+     Running tests/query_terminals.rs (target/debug/deps/query_terminals-7e8d306ac6907ca0)
+
+running 5 tests
+test concrete_find_avoids_query_chain_allocations_for_the_same_result has been running for over 60 seconds
+test iterator_and_disposal_faults_are_not_turned_into_union_outcomes has been running for over 60 seconds
+test predicate_terminals_preserve_fault_boundaries has been running for over 60 seconds
+test predicate_terminals_preserve_matching_order_outcomes_and_cleanup_without_query_wrappers has been running for over 60 seconds
+test terminals_report_cardinality_and_dispose_at_the_expected_boundary has been running for over 60 seconds
+test concrete_find_avoids_query_chain_allocations_for_the_same_result ... ok
+test iterator_and_disposal_faults_are_not_turned_into_union_outcomes ... ok
+test terminals_report_cardinality_and_dispose_at_the_expected_boundary ... ok
+test predicate_terminals_preserve_fault_boundaries ... ok
+test predicate_terminals_preserve_matching_order_outcomes_and_cleanup_without_query_wrappers ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 606.82s
+
+     Running tests/system_fault.rs (target/debug/deps/system_fault-a574a640bce7fcfc)
+
+running 3 tests
+test fault_binding_requires_void_return_and_string_argument ... ok
+test fault_binding_uses_canonical_no_result_signature ... ok
+test panic_stops_guest_but_does_not_abort_host ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.19s

@@ -1,5 +1,7 @@
 module System
 
+import System.*
+
 import System.Result.*
 
 public struct Boolean : ComparableTo<bool>, EquatableTo<bool> {
@@ -17,7 +19,7 @@ public struct Boolean : ComparableTo<bool>, EquatableTo<bool> {
         if status == 1 {
             return Failure(BooleanParseError.InvalidFormat())
         }
-        System.Fail("invalid native parse status")
+        Panic("invalid native parse status")
         return Failure(BooleanParseError.InvalidFormat())
     }
 

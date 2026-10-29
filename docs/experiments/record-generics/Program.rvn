@@ -23,18 +23,18 @@ func Check<T>(first: T, same: T, other: T) {
     let right = Key<T>(same)
     let different = Key<T>(other)
     if !left.Equals(right) || left.Equals(different) || left != right || left == different {
-        System.Fail("generic record equality")
+        Panic("generic record equality")
     }
     if left.GetHashCode() != right.GetHashCode() {
-        System.Fail("generic record hash")
+        Panic("generic record hash")
     }
     let view: EquatableTo<Key<T>> = left
     if !view.Equals(right) || view.Equals(different) {
-        System.Fail("generic record interface")
+        Panic("generic record interface")
     }
     let boxed: Object = left
     if !boxed.Equals(right) || boxed.Equals(different) || boxed.GetHashCode() != left.GetHashCode() {
-        System.Fail("generic record Object overrides")
+        Panic("generic record Object overrides")
     }
 }
 
@@ -44,7 +44,7 @@ func Main() {
         !System.Runtime.CompilerServices.RuntimeHelpers.IsAssignable<TypedValue, EquatableTo<TypedValue>>() ||
         !System.Runtime.CompilerServices.RuntimeHelpers.IsAssignable<string, Object>() ||
         System.Runtime.CompilerServices.RuntimeHelpers.IsAssignable<Object, string>() {
-        System.Fail("declared type assignability")
+        Panic("declared type assignability")
     }
 
     Check<int>(42, 42, 43)
@@ -66,11 +66,11 @@ func Main() {
     let pair = KeyValuePair<int, string>(1, "é")
     let pairSame = KeyValuePair<int, string>(1, "e\u0301")
     if PairWrapper(pair) != PairWrapper(pairSame) || PairWrapper(pair).GetHashCode() != PairWrapper(pairSame).GetHashCode() {
-        System.Fail("imported generic record component")
+        Panic("imported generic record component")
     }
     let reference: EquatableTo<ReferenceKey<string>> = ReferenceKey<string>("é")
     if !reference.Equals(ReferenceKey<string>("e\u0301")) || reference.Equals(ReferenceKey<string>("other")) {
-        System.Fail("generic reference record")
+        Panic("generic reference record")
     }
     Console.WriteLine("PASS generic records")
 }

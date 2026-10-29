@@ -6,21 +6,21 @@ public enum Other { Red = 1 }
 
 func Main() {
     if let .Some(parent) = typeof(Color).BaseType {
-        if !parent.Equals(typeof(Enum)) { Fail("Enum base identity") }
-    } else { Fail("Missing Enum base") }
-    if !typeof(Color).IsSubclassOf(typeof(ValueType)) { Fail("Enum ValueType ancestry") }
+        if !parent.Equals(typeof(Enum)) { Panic("Enum base identity") }
+    } else { Panic("Missing Enum base") }
+    if !typeof(Color).IsSubclassOf(typeof(ValueType)) { Panic("Enum ValueType ancestry") }
     let boxed: Object = Color.Red
-    if !(boxed is Enum) { Fail("Boxed enum ancestry") }
-    if !(boxed is ValueType) { Fail("Boxed value ancestry") }
-    if boxed is Other { Fail("Distinct enum identities collapsed") }
-    if boxed is int { Fail("Enum box became integer") }
+    if !(boxed is Enum) { Panic("Boxed enum ancestry") }
+    if !(boxed is ValueType) { Panic("Boxed value ancestry") }
+    if boxed is Other { Panic("Distinct enum identities collapsed") }
+    if boxed is int { Panic("Enum box became integer") }
     let direct: Enum = Color.Blue
     let value: ValueType = Color.Red
     if direct is Color restored {
-        if restored != Color.Blue { Fail("Enum payload changed") }
-    } else { Fail("Enum unboxing failed") }
-    if !(value is Color) { Fail("ValueType lost enum identity") }
+        if restored != Color.Blue { Panic("Enum payload changed") }
+    } else { Panic("Enum unboxing failed") }
+    if !(value is Color) { Panic("ValueType lost enum identity") }
     let integer: Object = 1
-    if integer is Enum { Fail("Integer is Enum") }
+    if integer is Enum { Panic("Integer is Enum") }
     Console.WriteLine("enum ancestry, boxed identity and copies agree")
 }

@@ -10,7 +10,7 @@ import System.Web.Http.*
 func CheckInvalid(options: HttpServerOptions) {
     // Invalid configuration must be rejected before attempting this invalid bind.
     if !(HttpServer.Listen("invalid address", -1, 0, options) is Failure(HttpError.InvalidRequest(_))) {
-        System.Fail("Invalid server options were not rejected first")
+        Panic("Invalid server options were not rejected first")
     }
 }
 
@@ -51,7 +51,7 @@ func OpenServer(mode: string) -> HttpServer {
     options.RequestReadTimeout = Duration.FromTicks(if mode == "timeout" { 10000L } else { 150000000L })
     options.ResponseWriteTimeout = Duration.FromTicks(600000000L)
     let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4, options) else {
-        System.Fail("Configured listen failed")
+        Panic("Configured listen failed")
     }
     // The running server owns an immutable snapshot, including timeout values.
     options.MaxRequestBodySize = 0
@@ -60,7 +60,7 @@ func OpenServer(mode: string) -> HttpServer {
     options.RequestReadTimeout = Duration.FromTicks(0L)
     options.ResponseWriteTimeout = Duration.FromTicks(0L)
     let Ok(port) = server.GetLocalPort() else {
-        System.Fail("Port unavailable")
+        Panic("Port unavailable")
     }
     Console.WriteLine(port)
     return server
@@ -73,7 +73,7 @@ func Echo(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
 func Validate(result: Result<System.Void, HttpError>, expected: string) {
     if let Ok(_) = result {
         if expected != "ok" {
-            System.Fail("Configured limit was ignored")
+            Panic("Configured limit was ignored")
         }
     } else if let Failure(reason) = result {
         let kind = match reason {
@@ -83,7 +83,7 @@ func Validate(result: Result<System.Void, HttpError>, expected: string) {
         }
         if kind != expected {
             Console.WriteLine(reason.ToString())
-            System.Fail("Unexpected configured HTTP failure")
+            Panic("Unexpected configured HTTP failure")
         }
     }
     Console.WriteLine("PASS server options")

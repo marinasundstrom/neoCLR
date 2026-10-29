@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build Raven System.Fail and compare interpreter/native message, frames and exit."""
+"""Build Raven System.Panic and compare interpreter/native message, frames and exit."""
 import argparse, hashlib, json, os, re, shutil, subprocess, tempfile
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[3]
@@ -49,4 +49,4 @@ with tempfile.TemporaryDirectory() as d:
     if interpreted.stderr.startswith('UserFault: '): assert r.stderr==interpreted.stderr
     report['native']=dict(exit=r.returncode,stdout=r.stdout,stderr=r.stderr,framesMatchInterpreter=True,renderingMatchesInterpreter=(r.stderr==interpreted.stderr),messagePreserved=True,executableOnlyDirectory=True,emptyEnvironment=True,dynamicDependencies=deps)
 report['artifacts']={p.name:sha(p) for p in (assembly,obj,binary)}
-save();print('Passed: Raven System.Fail preserves message/frames, exits 1 and runs standalone.')
+save();print('Passed: Raven System.Panic preserves message/frames, exits 1 and runs standalone.')

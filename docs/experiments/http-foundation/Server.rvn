@@ -6,10 +6,10 @@ import System.Web.Http.*
 
 func OpenServer() -> HttpServer {
     let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) else {
-        System.Fail("Listen failed")
+        Panic("Listen failed")
     }
     let Ok(port) = server.GetLocalPort() else {
-        System.Fail("Port unavailable")
+        Panic("Port unavailable")
     }
     Console.WriteLine(port)
     return server
@@ -22,7 +22,7 @@ func Echo(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
 func ValidateServer(result: Result<System.Void, HttpError>, expected: string) {
     if let Ok(_) = result {
         if expected != "ok" {
-            System.Fail("Invalid request accepted")
+            Panic("Invalid request accepted")
         }
     } else if let Failure(reason) = result {
         CheckError(reason, expected)

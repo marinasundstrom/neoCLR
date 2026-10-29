@@ -83,7 +83,7 @@ internal static class SslBuffers {
         return bytes
     }
     internal static func Encode(text: string) -> byte[] {
-        let Ok(encoded) = Encodings.Utf8.Encode(text) else { System.Fail("Invalid TLS host text") }
+        let Ok(encoded) = Encodings.Utf8.Encode(text) else { Panic("Invalid TLS host text") }
         let bytes = Allocate(encoded.Count)
         var index = 0
         for value in encoded {
@@ -106,7 +106,7 @@ internal static class SslBuffers {
     // plaintext staging owns storage; the other view selects caller memory.
     internal static func CopyPlaintext(source: ReadOnlySlice<byte>, destination: Slice<byte>) {
         if source.Length > destination.Length {
-            System.Fail("Invalid TLS plaintext count")
+            Panic("Invalid TLS plaintext count")
         }
         var index = 0
         while index < source.Length {

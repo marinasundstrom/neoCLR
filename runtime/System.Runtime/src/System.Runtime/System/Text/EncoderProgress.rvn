@@ -1,5 +1,7 @@
 module System.Text
 
+import System.*
+
 public class EncoderProgress {
     private var bytesWritten: int = 0
     private var state: EncoderState = EncoderState.Ready
@@ -10,17 +12,17 @@ public class EncoderProgress {
         EncoderState.Ready => EncoderState.Ready
         EncoderState.Finished => EncoderState.Finished
         _ => {
-            System.Fail("Inactive encoder progress state")
+            Panic("Inactive encoder progress state")
             EncoderState.Ready
         }
     }
 
     init(bytesWritten: int, state: EncoderState) {
         if bytesWritten < 0 {
-            System.Fail("Encoded byte count must be non-negative")
+            Panic("Encoded byte count must be non-negative")
         }
         if !(state.HasValue) {
-            System.Fail("Inactive encoder progress state")
+            Panic("Inactive encoder progress state")
         }
         self.bytesWritten = bytesWritten
         self.state = state

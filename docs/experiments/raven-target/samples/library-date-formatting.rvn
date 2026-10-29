@@ -6,19 +6,19 @@ import System.Console.*
 
 func Main() {
     let Ok(date) = Calendar.Hebrew.CreateDate(5784, 1, 1) else {
-        System.Fail("Invalid Hebrew date")
+        Panic("Invalid Hebrew date")
     }
     let Ok(time) = TimeOfDay.Create(12, 34, 56) else {
-        System.Fail("Invalid time")
+        Panic("Invalid time")
     }
     let value = LocalDateTime.Create(date, time)
     let hebrew = Culture.HebrewIsrael.DateTimeFormat.WithCalendar(Calendar.Hebrew)
     let latin = DateTimeFormat.Invariant.WithCalendar(Calendar.Hebrew)
     let Ok(hebrewText) = hebrew.FormatLocalDateTime(value) else {
-        System.Fail("Date outside Hebrew calendar range")
+        Panic("Date outside Hebrew calendar range")
     }
     let Ok(latinText) = latin.FormatLocalDateTime(value) else {
-        System.Fail("Date outside Hebrew calendar range")
+        Panic("Date outside Hebrew calendar range")
     }
     WriteLine(date.ToString(Culture.Invariant))
     WriteLine(hebrewText)

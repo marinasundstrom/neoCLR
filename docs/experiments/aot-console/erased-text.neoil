@@ -48,7 +48,7 @@ value.is String
 brfalse Failed
 ldloc copy
 value.unpack String
-call System.Fail(String)
+call System.Panic(String)
 ldc.i4 -1
 ret
 Null:

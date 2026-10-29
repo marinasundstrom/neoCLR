@@ -25,7 +25,7 @@ public class Thread {
 
     func Start() {
         if started {
-            System.Fail("Thread has already been started")
+            Panic("Thread has already been started")
         }
         let handle = RuntimeServices.StartWorker(callback, input)
         started = true

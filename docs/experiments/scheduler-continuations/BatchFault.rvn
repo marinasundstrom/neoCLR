@@ -3,7 +3,7 @@ module SchedulerContinuations {
     import System.Concurrency.Tasks.*
 
     func FailInBatch() -> System.Void {
-        System.Fail("batch callback fault")
+        Panic("batch callback fault")
         return ()
     }
 

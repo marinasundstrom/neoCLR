@@ -60,7 +60,7 @@ public class Dns {
         if code == 6 {
             return DnsError.LookupFailed()
         }
-        System.Fail("invalid native DNS error")
+        Panic("invalid native DNS error")
         return DnsError.LookupFailed()
     }
 }

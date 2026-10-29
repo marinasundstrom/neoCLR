@@ -43,7 +43,7 @@ public class DefaultConfigurationRoot : ConfigurationRoot {
     }
 
     private func EnsureActive() {
-        if disposed { System.Fail("Configuration root is disposed") }
+        if disposed { Panic("Configuration root is disposed") }
     }
 
     /// Returns a copy of the ordered provider list without transferring ownership.
@@ -73,7 +73,7 @@ public class DefaultConfigurationRoot : ConfigurationRoot {
 
     private func Write(key: string, value: string?) {
         EnsureActive()
-        if providers.Count == 0 { System.Fail("Configuration has no providers") }
+        if providers.Count == 0 { Panic("Configuration has no providers") }
         for provider in providers { provider.Set(key, value) }
     }
 

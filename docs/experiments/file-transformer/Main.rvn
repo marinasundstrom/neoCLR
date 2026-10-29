@@ -34,7 +34,7 @@ func ReadReport(file: System.Storage.File) -> Result<string, string> {
     return match file.OpenRead() {
         Ok(let input) => {
             let System.Result.Ok(reader) = System.IO.StreamReader.Create(input) else {
-                System.Fail("Unable to create reader")
+                Panic("Unable to create reader")
             }
             let result = reader.ReadToEnd(128)
             reader.Close()
@@ -63,7 +63,7 @@ func WriteReply(output: System.IO.OutputStream, text: string) -> Result<unit, st
             match output.Write(buffer, offset, count - offset) {
                 Ok(let written) => {
                     if written <= 0 || written > count - offset {
-                        System.Fail("Invalid write progress")
+                        Panic("Invalid write progress")
                     }
                     offset += written
                 }

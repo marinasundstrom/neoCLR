@@ -188,7 +188,7 @@ public struct Date : ComparableTo<Date>, EquatableTo<Date>, Formattable {
     /// Formats with a culture's Gregorian default; no ambient culture is read.
     func ToString(culture: Globalization.Culture) -> string {
         let Ok(text) = culture.DateTimeFormat.FormatDate(self) else {
-            System.Fail("A supported culture must format every valid Date")
+            Panic("A supported culture must format every valid Date")
         }
         return text
     }
@@ -222,7 +222,7 @@ public struct Date : ComparableTo<Date>, EquatableTo<Date>, Formattable {
     /// Formats with an explicit culture; unsupported specifiers fault. O/o is invariant.
     func ToString(format: string, culture: Globalization.Culture) -> string {
         let Ok(text) = culture.DateTimeFormat.FormatDate(self, format) else {
-            System.Fail("A supported culture must format every valid Date")
+            Panic("A supported culture must format every valid Date")
         }
         return text
     }

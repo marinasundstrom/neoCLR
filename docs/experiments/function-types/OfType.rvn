@@ -6,7 +6,7 @@ import System.Optional.*
 
 public func Check(value: bool, message: string) {
     if !value {
-        System.Fail(message)
+        Panic(message)
     }
 }
 
@@ -81,7 +81,7 @@ func Main() {
         }
         Check(found, "Module type query supports OfType")
     } else {
-        System.Fail("Missing nominal module")
+        Panic("Missing nominal module")
     }
     Console.WriteLine("OfType query contracts passed")
 }

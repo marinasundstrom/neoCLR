@@ -21,7 +21,7 @@ module RuntimeAwaitBenchmark {
                 let source = Promise<int>()
                 let task = Nested(source.Task)
                 if task.IsCompleted {
-                    System.Fail("Pending benchmark did not suspend")
+                    Panic("Pending benchmark did not suspend")
                 }
                 _ = source.Complete(41)
                 let value = await task
@@ -33,7 +33,7 @@ module RuntimeAwaitBenchmark {
             index = index + 1
         }
         if sum != operations * 42 {
-            System.Fail("Benchmark checksum mismatch")
+            Panic("Benchmark checksum mismatch")
         }
         return 0
     }

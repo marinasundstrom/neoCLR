@@ -3,7 +3,7 @@ import System.Optional.*
 
 func Check(value: bool) {
     if !value {
-        System.Fail("Char utility contract")
+        Panic("Char utility contract")
     }
 }
 
@@ -53,7 +53,7 @@ func Main() {
     if owned is Some(let retained) {
         Check(String.CompareOrdinal(retained.ToString(), "é") == 0)
     } else {
-        System.Fail("Retained Char owner")
+        Panic("Retained Char owner")
     }
     Console.WriteLine("PASS char utilities")
 }

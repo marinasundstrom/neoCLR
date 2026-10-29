@@ -4,11 +4,11 @@ import System.Result.*
 import System.Text.*
 
 func Check(value: bool) {
-    if !value { System.Fail("Encoding provider contract failed") }
+    if !value { Panic("Encoding provider contract failed") }
 }
 
 func Providers() {
-    let Ok(bytes) = Encodings.Utf8.Encode("hé") else { System.Fail("Encode failed") }
+    let Ok(bytes) = Encodings.Utf8.Encode("hé") else { Panic("Encode failed") }
     Check(bytes.Count == 3)
     Check(Encodings.Utf8.Decode(bytes) is Ok("hé"))
     Check(Encodings.Ascii.Encode("é") is Error(EncodingError.UnrepresentableText))
@@ -34,9 +34,9 @@ func Sessions() {
     Check(left.Accept("A", true) is Ok(_))
     Check(right.Accept("B", true) is Ok(_))
     let output: byte[] = [(byte)0, (byte)0]
-    let Ok(a) = left.Drain(output, 0, 2) else { System.Fail("Drain failed") }
+    let Ok(a) = left.Drain(output, 0, 2) else { Panic("Drain failed") }
     Check(a.BytesWritten == 1 && output[0] == 65)
-    let Ok(b) = right.Drain(output, 0, 2) else { System.Fail("Drain failed") }
+    let Ok(b) = right.Drain(output, 0, 2) else { Panic("Drain failed") }
     Check(b.BytesWritten == 1 && output[0] == 66)
     Check(Encodings.Ascii.CreateEncoder().Accept("é", true) is Error(EncodingError.UnrepresentableText))
 }

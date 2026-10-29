@@ -9,12 +9,12 @@ func Main() {
     let Ok(line) = result1 else {
         let result2 = diagnostics.WriteLine("Could not read a UTF-8 line (maximum 128 bytes)")
         let Ok(_) = result2 else {
-            System.Fail("Could not write diagnostic")
+            Panic("Could not write diagnostic")
             return ()
         }
         let result3 = diagnostics.Flush()
         let Ok(_) = result3 else {
-            System.Fail("Could not write diagnostic")
+            Panic("Could not write diagnostic")
             return ()
         }
         return ()
@@ -26,22 +26,22 @@ func Main() {
     let output = Console.Out
     let result4 = output.WriteLine("Hello, $name")
     let Ok(_) = result4 else {
-        System.Fail("Could not write greeting")
+        Panic("Could not write greeting")
         return ()
     }
     let result5 = output.Flush()
     let Ok(_) = result5 else {
-        System.Fail("Could not flush greeting")
+        Panic("Could not flush greeting")
         return ()
     }
     let result6 = diagnostics.WriteLine("Read one line")
     let Ok(_) = result6 else {
-        System.Fail("Could not write diagnostic")
+        Panic("Could not write diagnostic")
         return ()
     }
     let result7 = diagnostics.Flush()
     let Ok(_) = result7 else {
-        System.Fail("Could not write diagnostic")
+        Panic("Could not write diagnostic")
         return ()
     }
     return ()

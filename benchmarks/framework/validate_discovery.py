@@ -30,7 +30,7 @@ def main():
         ('generic', '[Benchmark]\nfunc Invalid<T>() -> int => 1', 'nongeneric module functions'),
         ('result', '[Benchmark]\nfunc Invalid() -> bool => true', 'benchmarks require int'),
         ('empty', 'func NotABenchmark() -> int => 1', 'No benchmarks discovered'),
-        ('named', '[Benchmark(Description: "Named description")]\nfunc Valid() -> int { System.Fail("Must not execute during discovery"); return 1 }', None),
+        ('named', '[Benchmark(Description: "Named description")]\nfunc Valid() -> int { System.Panic("Must not execute during discovery"); return 1 }', None),
     ]
     try:
         for name, body, expected in cases:

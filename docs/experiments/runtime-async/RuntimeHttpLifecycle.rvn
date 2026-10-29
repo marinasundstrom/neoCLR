@@ -37,18 +37,18 @@ module RuntimeHttpLifecycle {
         }
         let result = await client.GetString(url, cancellation.Token)
         if mode == "fault" {
-            System.Fail("runtime HTTP continuation fault")
+            Panic("runtime HTTP continuation fault")
         }
         if mode == "timeout" {
             let Failure(HttpError.TimedOut) = result else {
-                System.Fail("Expected HTTP timeout result")
+                Panic("Expected HTTP timeout result")
             }
         } else if mode == "protocol" {
             let Failure(HttpError.Protocol(_)) = result else {
-                System.Fail("Expected HTTP protocol error")
+                Panic("Expected HTTP protocol error")
             }
         } else {
-            System.Fail("Cancelled request unexpectedly returned a result")
+            Panic("Cancelled request unexpectedly returned a result")
         }
         return 42
     }
@@ -68,24 +68,24 @@ module RuntimeHttpLifecycle {
             operation.OnCompleted(observer.Complete)
             let cancelled = await observer.Task
             if !cancelled {
-                System.Fail("Caller cancellation became a result")
+                Panic("Caller cancellation became a result")
             }
         } else {
             let value = await operation
             if value != 42 {
-                System.Fail("HTTP failure outcome changed")
+                Panic("HTTP failure outcome changed")
             }
         }
         if lifetime.Disposals != 1 {
-            System.Fail("HTTP ordinary completion did not release its scope exactly once")
+            Panic("HTTP ordinary completion did not release its scope exactly once")
         }
         use recovery = HttpClient()
         let result = await recovery.GetString(arguments[2])
         let Ok(text) = result else {
-            System.Fail("HTTP recovery request failed")
+            Panic("HTTP recovery request failed")
         }
         if text != "recovered" {
-            System.Fail("HTTP recovery response changed")
+            Panic("HTTP recovery response changed")
         }
         Console.WriteLine("PASS runtime HTTP lifecycle and recovery")
         return 0

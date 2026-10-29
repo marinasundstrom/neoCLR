@@ -3,7 +3,7 @@ import System.Result.*
 
 func Read(input: Result<int, string>) -> int {
     let Ok(value) = input else {
-        System.Fail("Expected a successful result")
+        Panic("Expected a successful result")
     }
     return value
 }

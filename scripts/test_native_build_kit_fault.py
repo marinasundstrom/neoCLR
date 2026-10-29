@@ -12,8 +12,8 @@ class HttpFaultInjectionTests(unittest.TestCase):
     def test_current_handler_injects_before_normal_route_rejection(self):
         source = (kit.ROOT / 'docs/experiments/http-server/Server.rvn').read_text()
         updated = kit.inject_http_handler_fault(source)
-        self.assertEqual(updated.count('System.Fail("HTTP handler failed")'), 1)
-        self.assertLess(updated.index('System.Fail("HTTP handler failed")'),
+        self.assertEqual(updated.count('System.Panic("HTTP handler failed")'), 1)
+        self.assertLess(updated.index('System.Panic("HTTP handler failed")'),
                         updated.index('if request.Method.Method'))
         self.assertIn('return Task.FromResult(result)', updated)
 

@@ -5,6 +5,6 @@ func Main() {
     let duration: Storage = default
     let contract: EquatableTo<Broken> = Broken(duration)
     if !contract.Equals(Broken(duration)) {
-        System.Fail("record equality")
+        Panic("record equality")
     }
 }

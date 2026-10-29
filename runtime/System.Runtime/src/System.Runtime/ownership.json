@@ -372,7 +372,7 @@
   "failure": {
     "assemblyName": "System.Runtime",
     "namespaceName": "System",
-    "functionName": "Fail"
+    "functionName": "Panic"
   },
   "disposal": {
     "assemblyName": "System.Runtime",

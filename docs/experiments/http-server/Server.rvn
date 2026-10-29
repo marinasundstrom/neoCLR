@@ -35,9 +35,9 @@ func ListenAndServe() -> Task<()> {
             return Start(server)
         }
         server.Close()
-        System.Fail("Local port unavailable")
+        Panic("Local port unavailable")
     }
-    System.Fail("Listen failed")
+    Panic("Listen failed")
     return Task.CompletedTask
 }
 

@@ -91,7 +91,7 @@ public class HttpStringContent : HttpContent {
     private static func Utf8ContentType(contentType: MediaType) -> MediaType {
         if let Some(charset) = contentType.CharSet {
             if charset != "utf-8" {
-                System.Fail("HttpStringContent requires charset=utf-8")
+                Panic("HttpStringContent requires charset=utf-8")
             }
         }
         return contentType

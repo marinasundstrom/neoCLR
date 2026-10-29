@@ -69,7 +69,7 @@ async func Check(exit: int) -> Task<()> {
     if exit != 6 { _ = probe.Body.Complete(()) }
     let result = Read(probe, probe.Body.Task, probe.Entered, exit)
     if result.IsCompleted || probe.Reads != 0 || probe.Acquisitions != 1 {
-        System.Fail("Async iterator failed to suspend before reading Current")
+        Panic("Async iterator failed to suspend before reading Current")
     }
     System.Runtime.GC.Collect()
     let observer = Observer(result)
@@ -85,7 +85,7 @@ async func Check(exit: int) -> Task<()> {
     }
     _ = await probe.Disposing.Task
     if result.IsCompleted || probe.Disposals != 1 {
-        System.Fail("Async disposal did not retain the consumer")
+        Panic("Async disposal did not retain the consumer")
     }
     System.Runtime.GC.Collect()
     if exit == 7 { _ = probe.Release.Cancel() }
@@ -93,18 +93,18 @@ async func Check(exit: int) -> Task<()> {
     let cancelled = await observer.Completed.Task
     if exit == 4 || exit == 6 || exit == 7 {
         if !cancelled || (exit == 4 && probe.Reads != 0) {
-            System.Fail("Cancelled iterator was read or failed to cancel consumer")
+            Panic("Cancelled iterator was read or failed to cancel consumer")
         }
     } else {
         let sum = await result
         var expected = 42
         if exit == 5 { expected = 0 }
         if sum != expected || cancelled {
-            System.Fail("Async iterator lost its result")
+            Panic("Async iterator lost its result")
         }
     }
     if probe.Disposals != 1 {
-        System.Fail("Async iterator disposed twice")
+        Panic("Async iterator disposed twice")
     }
 }
 
@@ -127,23 +127,23 @@ async func CheckNested(cancelCleanup: bool) -> Task<()> {
     result.OnCompleted(observer.Complete)
     _ = await inner.Disposing.Task
     if outer.Disposals != 0 || result.IsCompleted {
-        System.Fail("Nested async cleanup order was lost")
+        Panic("Nested async cleanup order was lost")
     }
     if cancelCleanup { _ = inner.Release.Cancel() }
     else { _ = inner.Release.Complete(()) }
     _ = await outer.Disposing.Task
     if result.IsCompleted || inner.Disposals != 1 {
-        System.Fail("Nested cleanup did not await its outer iterator")
+        Panic("Nested cleanup did not await its outer iterator")
     }
     System.Runtime.GC.Collect()
     _ = outer.Release.Complete(())
     let cancelled = await observer.Completed.Task
     if cancelled != cancelCleanup || outer.Disposals != 1 {
-        System.Fail("Nested cleanup lost cancellation or disposed twice")
+        Panic("Nested cleanup lost cancellation or disposed twice")
     }
     if !cancelCleanup {
         let value = await result
-        if value != 84 { System.Fail("Return value changed during cleanup") }
+        if value != 84 { Panic("Return value changed during cleanup") }
     }
 }
 
@@ -161,11 +161,11 @@ async func CheckOutward() -> Task<()> {
     _ = probe.Next.Complete(true)
     let result = Outward(probe)
     _ = await probe.Disposing.Task
-    if result.IsCompleted { System.Fail("Outward break bypassed async cleanup") }
+    if result.IsCompleted { Panic("Outward break bypassed async cleanup") }
     _ = probe.Release.Complete(())
     let value = await result
     if value != 42 || probe.Disposals != 1 || probe.Acquisitions != 1 {
-        System.Fail("Outward break failed to leave the iteration scope")
+        Panic("Outward break failed to leave the iteration scope")
     }
 }
 
@@ -182,11 +182,11 @@ async func CheckLabeled(stop: bool) -> Task<()> {
     _ = probe.Next.Complete(true)
     let result = Labeled(probe, stop)
     _ = await probe.Disposing.Task
-    if result.IsCompleted { System.Fail("Labelled loop bypassed async cleanup") }
+    if result.IsCompleted { Panic("Labelled loop bypassed async cleanup") }
     _ = probe.Release.Complete(())
     let value = await result
     if value != 42 || probe.Disposals != 1 || probe.Reads != 1 {
-        System.Fail("Labelled loop exit lost its iterator")
+        Panic("Labelled loop exit lost its iterator")
     }
 }
 
@@ -197,12 +197,12 @@ class Resource : Disposable {
     func Dispose() {
         if outer {
             if probe.Disposals != 1 || !probe.Release.Task.IsCompleted {
-                System.Fail("Outer use disposed before asynchronous iterator cleanup")
+                Panic("Outer use disposed before asynchronous iterator cleanup")
             }
             probe.OuterDisposals = probe.OuterDisposals + 1
         } else {
             if probe.Disposals != 0 {
-                System.Fail("Inner use disposed after its iterator")
+                Panic("Inner use disposed after its iterator")
             }
             probe.InnerDisposals = probe.InnerDisposals + 1
         }
@@ -245,16 +245,16 @@ async func CheckMixed(cancel: bool, expression: bool) -> Task<()> {
     else { _ = probe.Body.Complete(()) }
     _ = await probe.Disposing.Task
     if probe.InnerDisposals != 1 || probe.OuterDisposals != 0 || result.IsCompleted {
-        System.Fail("Mixed resource lifetime was lost")
+        Panic("Mixed resource lifetime was lost")
     }
     _ = probe.Release.Complete(())
     let cancelled = await observer.Completed.Task
     if cancelled != cancel || probe.OuterDisposals != 1 || probe.Disposals != 1 {
-        System.Fail("Mixed cleanup failed")
+        Panic("Mixed cleanup failed")
     }
     if !cancel {
         let value = await result
-        if value != 42 { System.Fail("Mixed cleanup changed return value") }
+        if value != 42 { Panic("Mixed cleanup changed return value") }
     }
 }
 

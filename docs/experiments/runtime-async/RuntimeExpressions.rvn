@@ -9,7 +9,7 @@ class Box {
 class Other {}
 
 func Check(value: bool) {
-    if !value { System.Fail("Expression regression") }
+    if !value { Panic("Expression regression") }
 }
 
 async func Read(success: bool) -> Task<Result<string, string>> {

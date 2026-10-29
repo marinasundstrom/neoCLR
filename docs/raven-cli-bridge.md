@@ -16203,3 +16203,14 @@ and the manual JSON guide rather than this limited CLI scaffold. The class-libra
 API documentation pipeline owns this temporary signature projection; eventual
 native-only publication removes the aggregate scaffold dependency. See
 [reader qualification](validation/configuration-json-reader-20261029/README.md).
+
+## Panic rename (2026-10-29)
+
+The public terminal function is now System.Panic; prefer importing System.* and
+calling Panic. RuntimeFailureContract ownership selects Panic and the temporary
+CLI bridge recognizes that exact marked namespace function, encoded as CLI void.
+Raven codex/neoclr owns terminal-flow recognition; neoCLR owns the source wrapper
+and fault services. Internal Fail/Fault service identities are unchanged. Native
+metadata retains the existing no-result representation. General metadata-based
+terminal recognition remains the CLI replacement. This rename adds no unwinding,
+cleanup or thread/task behavior. Rebuild the compiler/reference/runtime bundle.

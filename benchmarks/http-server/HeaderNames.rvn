@@ -19,7 +19,7 @@ internal static class HeaderIdentity {
                 if known {
                     for old in last.Headers {
                         if old.Name == name && !Object.ReferenceEquals(old.Name, name) {
-                            System.Fail("Known header name identity changed")
+                            Panic("Known header name identity changed")
                         }
                     }
                 }
@@ -41,10 +41,10 @@ func InspectHeaders(request: HttpRequest) -> Task<Result<HttpResponse, HttpError
 
 async func Main() -> Task<()> {
     let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) else {
-        System.Fail("Listen failed")
+        Panic("Listen failed")
     }
     let Ok(port) = server.GetLocalPort() else {
-        System.Fail("Port unavailable")
+        Panic("Port unavailable")
     }
     Console.WriteLine(port)
     var index = 0

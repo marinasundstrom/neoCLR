@@ -26,7 +26,7 @@ struct FormattedPayload : Formattable {
 func Check(actual: string, expected: string) {
     if String.CompareOrdinal(actual, expected) != 0 {
         Console.WriteLine(actual)
-        System.Fail("Composite formatting contract")
+        Panic("Composite formatting contract")
     }
 }
 

@@ -60,13 +60,13 @@ module RuntimeMatchSample {
         let gate = Promise<int>()
         let pending = Read(gate.Task, normalLog)
         if normalLog.Count != 0 || pending.IsCompleted {
-            System.Fail("Resource disposed before suspension ended")
+            Panic("Resource disposed before suspension ended")
         }
         System.Runtime.GC.Collect()
         _ = gate.Complete(17)
         let value = await pending
         if value != 42 || normalLog.Count != 2 || normalLog.Order != 21 {
-            System.Fail("Return cleanup did not dispose in reverse order")
+            Panic("Return cleanup did not dispose in reverse order")
         }
         let cancelLog = Log()
         let cancelled = Promise<int>()
@@ -76,7 +76,7 @@ module RuntimeMatchSample {
         _ = cancelled.Cancel()
         let observed = await observer.Task
         if !observed || cancelLog.Count != 2 || cancelLog.Order != 21 {
-            System.Fail("Cancellation bypassed scoped cleanup")
+            Panic("Cancellation bypassed scoped cleanup")
         }
         let unitLog = Log()
         let unitGate = Promise<()>()
@@ -84,7 +84,7 @@ module RuntimeMatchSample {
         _ = unitGate.Complete(())
         await unit
         if unitLog.Count != 1 || unitLog.Order != 3 {
-            System.Fail("Implicit unit return bypassed cleanup")
+            Panic("Implicit unit return bypassed cleanup")
         }
         Console.WriteLine("PASS runtime async match suspension and cleanup")
         return 0

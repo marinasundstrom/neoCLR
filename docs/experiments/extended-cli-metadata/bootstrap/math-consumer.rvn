@@ -5,7 +5,7 @@ alias NativeMath = System.Math
 
 func Check(actual: double, expected: double) {
     if actual != expected {
-        System.Fail("Unexpected math result")
+        Panic("Unexpected math result")
     }
 }
 
@@ -28,26 +28,26 @@ func Main() {
     Check(NativeMath.Max(-2.0, 3.0), 3.0)
     let nan = NativeMath.Sqrt(-1.0)
     if nan == nan || NativeMath.Min(nan, 1.0) == NativeMath.Min(nan, 1.0) {
-        System.Fail("NaN behavior changed")
+        Panic("NaN behavior changed")
     }
     match NativeMath.Abs(-42) {
         Ok(42) => { }
-        _ => System.Fail("Integer Abs failed")
+        _ => Panic("Integer Abs failed")
     }
     match NativeMath.Abs(-2147483648) {
         Failure(_) => { }
-        _ => System.Fail("Integer overflow was lost")
+        _ => Panic("Integer overflow was lost")
     }
     match NativeMath.Clamp(9, 0, 4) {
         Ok(4) => { }
-        _ => System.Fail("Clamp failed")
+        _ => Panic("Clamp failed")
     }
     match NativeMath.Clamp(9, 4, 0) {
         Failure(_) => { }
-        _ => System.Fail("Invalid range was accepted")
+        _ => Panic("Invalid range was accepted")
     }
     if NativeMath.Min(2, 3) != 2 || NativeMath.Max(2, 3) != 3 || NativeMath.Sign(-3) != -1 {
-        System.Fail("Integer helpers failed")
+        Panic("Integer helpers failed")
     }
     Console.WriteLine("Native source math passed")
 }

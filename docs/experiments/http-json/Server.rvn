@@ -76,12 +76,12 @@ func StartServer(arguments: string[]) -> Task<()> {
         }
     }
     let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) else {
-        System.Fail("Listen failed")
+        Panic("Listen failed")
         return Task.CompletedTask
     }
     let Ok(port) = server.GetLocalPort() else {
         server.Close()
-        System.Fail("Local port unavailable")
+        Panic("Local port unavailable")
         return Task.CompletedTask
     }
     Console.WriteLine(port)
@@ -93,7 +93,7 @@ async func FinishServing(server: HttpServer, serving: Task<Result<unit, AppError
     let result = await serving
     server.Close()
     if let Failure(error) = result {
-        System.Fail(error.ToString())
+        Panic(error.ToString())
     }
     Console.WriteLine("Reports served")
 }

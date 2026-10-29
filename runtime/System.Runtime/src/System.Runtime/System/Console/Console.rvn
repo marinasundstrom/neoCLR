@@ -144,7 +144,7 @@ public static class Console {
             if status == 2 {
                 return System.Result<System.Optional<byte>, ConsoleReadError>.Failure(ConsoleReadError.ReadFailed())
             }
-            System.Fail("invalid native I/O status")
+            Panic("invalid native I/O status")
             return System.Result<System.Optional<byte>, ConsoleReadError>.Failure(ConsoleReadError.ReadFailed())
         }
         if neoCLR.Runtime.IsValue<System.Void>(payload) {
@@ -222,7 +222,7 @@ public static class Console {
                 return reader
             }
             let Ok(created) = SyncStreamReader.Create(OpenStandardInput(), true) else {
-                System.Fail("Unable to create text wrapper")
+                Panic("Unable to create text wrapper")
             }
             inputReader = created
             return created
@@ -231,7 +231,7 @@ public static class Console {
     static val Out: SyncTextWriter {
         get {
             let Ok(writer) = SyncStreamWriter.Create(OpenStandardOutput()) else {
-                System.Fail("Unable to create console writer")
+                Panic("Unable to create console writer")
             }
             return writer
         }
@@ -239,7 +239,7 @@ public static class Console {
     static val Error: SyncTextWriter {
         get {
             let Ok(writer) = SyncStreamWriter.Create(OpenStandardError()) else {
-                System.Fail("Unable to create console writer")
+                Panic("Unable to create console writer")
             }
             return writer
         }
@@ -281,11 +281,11 @@ public static class Console {
         let writer = Out
         match writer.Write(value0) {
             Ok(_) => { }
-            Failure(_) => System.Fail("console output failed")
+            Failure(_) => Panic("console output failed")
         }
         match writer.Flush() {
             Ok(_) => { }
-            Failure(_) => System.Fail("console output failed")
+            Failure(_) => Panic("console output failed")
         }
         return ()
     }

@@ -22,19 +22,19 @@ func Narrow(input: Object?) -> string {
 func Main() {
     let empty: Object? = null
     if Narrow(empty) != "other" {
-        System.Fail("Null must not match a string pattern")
+        Panic("Null must not match a string pattern")
     }
     if Narrow("payload") != "payload" {
-        System.Fail("String pattern did not match")
+        Panic("String pattern did not match")
     }
 
     if let Ok(value) = Extract() {
         if value is null {
             Console.WriteLine("PASS nullable Result payload")
         } else {
-            System.Fail("Expected null")
+            Panic("Expected null")
         }
     } else {
-        System.Fail("Expected Ok")
+        Panic("Expected Ok")
     }
 }

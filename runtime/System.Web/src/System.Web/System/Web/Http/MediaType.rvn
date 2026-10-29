@@ -123,7 +123,7 @@ public class MediaType : EquatableTo<MediaType> {
 
     internal static func Known(text: string) -> MediaType {
         let Ok(value) = MediaTypeParser(text).Parse() else {
-            System.Fail("Invalid predefined media type")
+            Panic("Invalid predefined media type")
             return Known("application/octet-stream")
         }
         value.typeName = String.Intern(value.typeName)
@@ -231,7 +231,7 @@ internal class MediaTypeParser {
 
     internal static func Text(bytes: ReadOnlySlice<byte>, first: int, last: int) -> string {
         let Ok(text) = HttpText.Decode(bytes.Slice(first, last - first)) else {
-            System.Fail("Invalid UTF-8 media type text")
+            Panic("Invalid UTF-8 media type text")
             return ""
         }
         return text

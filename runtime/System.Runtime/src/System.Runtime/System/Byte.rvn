@@ -1,5 +1,7 @@
 module System
 
+import System.*
+
 import System.Result.*
 
 public struct Byte : Number, EquatableTo<byte>, Formattable {
@@ -28,7 +30,7 @@ public struct Byte : Number, EquatableTo<byte>, Formattable {
         if status == 2 {
             return Failure(NumberParseError.Overflow())
         }
-        System.Fail("invalid native parse status")
+        Panic("invalid native parse status")
         return Failure(NumberParseError.InvalidFormat())
     }
 

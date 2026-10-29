@@ -6,7 +6,7 @@ import System.Time.*
 
 func Check(condition: bool) {
     if !condition {
-        System.Fail("CancelAfter check failed")
+        Panic("CancelAfter check failed")
     }
 }
 

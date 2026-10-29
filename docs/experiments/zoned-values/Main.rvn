@@ -5,20 +5,20 @@ import System.Collections.*
 
 func Check(value: bool, message: string) {
     if !value {
-        System.Fail(message)
+        Panic(message)
     }
 }
 
 func Zone(name: string) -> TimeZone {
     let Ok(value) = TimeZone.Find(name) else {
-        System.Fail("Zone lookup")
+        Panic("Zone lookup")
     }
     return value
 }
 
 func Zoned(text: string, zone: TimeZone) -> ZonedDateTime {
     let Ok(value) = ZonedDateTime.Parse(text, zone) else {
-        System.Fail("Zoned parse")
+        Panic("Zoned parse")
     }
     return value
 }

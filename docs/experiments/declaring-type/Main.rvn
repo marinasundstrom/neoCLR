@@ -9,13 +9,13 @@ func Main() {
     match ((NominalTypeInfo)typeof(Outer.Inner)).DeclaringType {
         .Some(let owner) => {
             if !owner.Equals(typeof(Outer)) {
-                Fail("Wrong declaring type")
+                Panic("Wrong declaring type")
             }
         }
-        .None => Fail("Missing declaring type")
+        .None => Panic("Missing declaring type")
     }
     match ((NominalTypeInfo)typeof(Outer)).DeclaringType {
-        .Some(_) => Fail("Unexpected declaring type")
+        .Some(_) => Panic("Unexpected declaring type")
         .None => { }
     }
     Console.WriteLine("PASS declaring type")

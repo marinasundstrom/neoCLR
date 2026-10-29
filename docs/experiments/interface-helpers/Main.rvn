@@ -28,19 +28,19 @@ func Main() {
     let normal: Calculation = DefaultCalculation()
     let custom: Calculation = CustomCalculation()
     if normal.Calculate() != 42 || custom.Calculate() != 99 || Calculation.Offset() != 2 {
-        System.Fail("Interface helper contract failed")
+        Panic("Interface helper contract failed")
     }
     var foundOffset = false
     for member in typeof(Calculation).GetMethods() {
         if member.Name == "Offset" {
             foundOffset = true
             if !member.IsStatic || member.IsVirtual || member.IsAbstract {
-                System.Fail("Static helper metadata contract failed")
+                Panic("Static helper metadata contract failed")
             }
         }
     }
     if !foundOffset {
-        System.Fail("Static helper metadata missing")
+        Panic("Static helper metadata missing")
     }
     normal.Show()
     custom.Show()

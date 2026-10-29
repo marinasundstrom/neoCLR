@@ -10,10 +10,10 @@ async func Main() -> Task<()> {
     let sources = ["[1,2,3,4,5,6,7,8]", "{\"first\":\"Café 😀\",\"second\":\"hello\"}", "{\"escaped\":\"é😀\\n\\u0000\\\"\"}"]
     for source in sources {
         let Ok(node) = JsonSerializer.DeserializeNode(source) else {
-            System.Fail("Fixture parse failed")
+            Panic("Fixture parse failed")
         }
         let Ok(expected) = JsonSerializer.SerializeNode(node) else {
-            System.Fail("Fixture serialization failed")
+            Panic("Fixture serialization failed")
         }
         let bytes = source.Utf8Bytes.ToArray()
         let list = ArrayList<byte>()
@@ -24,13 +24,13 @@ async func Main() -> Task<()> {
         for content in contents {
             for index in 0..100 {
                 let Ok(value) = JsonContent.ReadNode(content) else {
-                    System.Fail("HTTP JSON parse failed")
+                    Panic("HTTP JSON parse failed")
                 }
                 let Ok(actual) = JsonSerializer.SerializeNode(value) else {
-                    System.Fail("HTTP JSON serialization failed")
+                    Panic("HTTP JSON serialization failed")
                 }
                 if !actual.Equals(expected) {
-                    System.Fail("HTTP JSON content mismatch")
+                    Panic("HTTP JSON content mismatch")
                 }
             }
         }

@@ -61,13 +61,13 @@ module RuntimeGenericUse {
         let gate = Promise<int>()
         let pending = Echo<int>(gate.Task, log)
         if pending.IsCompleted || log.Count != 0 {
-            System.Fail("Generic method disposed before completion")
+            Panic("Generic method disposed before completion")
         }
         System.Runtime.GC.Collect()
         _ = gate.Complete(42)
         let result = await pending
         if result != 42 || log.Count != 2 || log.Order != 21 {
-            System.Fail("Generic method completion or cleanup differs")
+            Panic("Generic method completion or cleanup differs")
         }
 
         let referenceLog = Log()
@@ -76,7 +76,7 @@ module RuntimeGenericUse {
         _ = referenceGate.Complete(Box(73))
         let referenceResult = await reference
         if referenceResult.Value != 73 || referenceLog.Order != 21 {
-            System.Fail("Generic reference payload or cleanup differs")
+            Panic("Generic reference payload or cleanup differs")
         }
 
         let store = Store<Box>(Box(19))
@@ -85,12 +85,12 @@ module RuntimeGenericUse {
         let ownerTask = store.Read(ownerGate.Task, ownerLog)
         System.Runtime.GC.Collect()
         if ownerLog.Count != 0 {
-            System.Fail("Generic owner disposed while suspended")
+            Panic("Generic owner disposed while suspended")
         }
         _ = ownerGate.Complete(())
         let stored = await ownerTask
         if stored.Value != 19 || ownerLog.Count != 1 || ownerLog.Order != 3 {
-            System.Fail("Generic owner lost its private payload or cleanup")
+            Panic("Generic owner lost its private payload or cleanup")
         }
 
         let nestedLog = Log()
@@ -99,7 +99,7 @@ module RuntimeGenericUse {
         _ = nestedGate.Complete(91)
         let nestedResult = await nested
         if !(nestedResult is Optional<int>.Some(91)) || nestedLog.Count != 1 || nestedLog.Order != 4 {
-            System.Fail("Generic method on generic owner lost its union payload or cleanup")
+            Panic("Generic method on generic owner lost its union payload or cleanup")
         }
         Console.WriteLine("PASS generic async methods owners and scoped cleanup")
         return 0

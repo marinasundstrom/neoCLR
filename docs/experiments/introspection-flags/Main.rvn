@@ -19,7 +19,7 @@ func CheckFlags(info: TypeInfo, abstractType: bool, openType: bool, closedHierar
     if info.IsUnion || info.IsAbstract != abstractType || info.IsOpen != openType ||
         info.IsClosedHierarchy != closedHierarchy || nominalUnion != unionType ||
         info.IsEnum != enumType || info.IsValueType != valueType {
-        System.Fail(info.DisplayName)
+        Panic(info.DisplayName)
     }
 }
 

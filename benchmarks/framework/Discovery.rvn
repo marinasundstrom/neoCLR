@@ -10,7 +10,7 @@ func `Sum a sequence of integers`() -> int {
         total += value
     }
     if total != 4950 {
-        System.Fail("Sum changed")
+        Panic("Sum changed")
     }
     return 1
 }
@@ -22,7 +22,7 @@ func Multiply() -> int {
         total *= value
     }
     if total != 120 {
-        System.Fail("Product changed")
+        Panic("Product changed")
     }
     return 1
 }
@@ -39,7 +39,7 @@ func Main(arguments: string[]) {
 [Arguments(9)]
 func `Add café. 世界 😀`(value: int) -> int {
     if value != 5 {
-        if value != 9 { System.Fail("Wrong inline argument") }
+        if value != 9 { Panic("Wrong inline argument") }
     }
     return 1
 }
@@ -50,7 +50,7 @@ func `Inputs with spaces. λ`() -> int[] => [3, 7]
 [ArgumentsSource("Inputs with spaces. λ")]
 func `Accept source rows`(value: int) -> int {
     if value != 3 {
-        if value != 7 { System.Fail("Wrong source argument") }
+        if value != 7 { Panic("Wrong source argument") }
     }
     return 1
 }

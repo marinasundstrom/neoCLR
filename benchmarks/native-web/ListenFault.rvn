@@ -7,6 +7,6 @@ func Main() -> int {
         return 1
     }
     // Deliberately skip Close: the host must release the descriptor on this fault.
-    System.Fail("socket fault")
+    Panic("socket fault")
     return 0
 }

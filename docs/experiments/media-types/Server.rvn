@@ -6,17 +6,17 @@ import System.Concurrency.Tasks.*
 import System.Web.Http.*
 
 func OpenServer() -> HttpServer {
-    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) else { System.Fail("Listen") }
-    let Ok(port) = server.GetLocalPort() else { System.Fail("Port") }
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) else { Panic("Listen") }
+    let Ok(port) = server.GetLocalPort() else { Panic("Port") }
     Console.WriteLine(port)
     return server
 }
 
 func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
-    let Ok(Some(media)) = request.GetContentType() else { System.Fail("Request type") }
-    let Some(boundary) = media.GetParameter("boundary") else { System.Fail("Boundary") }
+    let Ok(Some(media)) = request.GetContentType() else { Panic("Request type") }
+    let Some(boundary) = media.GetParameter("boundary") else { Panic("Boundary") }
     if boundary != "AbC; 123" {
-        System.Fail("Boundary case or quoting lost")
+        Panic("Boundary case or quoting lost")
     }
     let response = HttpResponse(HttpStatusCode.OK, Array<HttpHeader>.Empty, HttpStringContent("{}", MediaTypes.Application.ProblemJson))
     let outcome: Result<HttpResponse, HttpError> = Ok(response)
@@ -27,6 +27,6 @@ async func Main() -> Task<()> {
     let server = OpenServer()
     let result = await server.ServeOne(Respond)
     server.Close()
-    let Ok(_) = result else { System.Fail("Serve") }
+    let Ok(_) = result else { Panic("Serve") }
     Console.WriteLine("PASS media type server")
 }

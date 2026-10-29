@@ -25,11 +25,11 @@ cases = [
         let thread = Thread(Echo, "tracked thread")
         let completion = thread.Task
         if thread.IsStarted || completion.IsCompleted {
-            System.Fail("started too soon")
+            System.Panic("started too soon")
         }
         thread.Start()
         if !thread.IsStarted {
-            System.Fail("missing start state")
+            System.Panic("missing start state")
         }
         WriteLine(await completion)
         WriteLine(await thread.Task)
@@ -48,7 +48,7 @@ cases = [
             thread.Start()
         })
         if thread.Task.IsCompleted {
-            System.Fail("completion moved to start queue")
+            System.Panic("completion moved to start queue")
         }
         TaskQueue.Default.Drain()
         WriteLine(thread.Task.GetResult())
@@ -57,7 +57,7 @@ cases = [
         let thread = Thread(Echo, "not started")
         TaskQueue.Default.Drain()
         if thread.IsStarted || thread.Task.IsCompleted {
-            System.Fail("unstarted thread made progress")
+            System.Panic("unstarted thread made progress")
         }
     }''', '', None),
     ('Starting twice rejected', prelude + '''func Main() {

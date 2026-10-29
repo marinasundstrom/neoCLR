@@ -20,7 +20,7 @@ module RuntimeAwaitProvider {
                 task.OnCompleted(signal.Complete)
                 neoCLR.Runtime.RuntimeAsyncAwaitUnit(signal.Handle)
                 if !neoCLR.Runtime.RuntimeAsyncRelease(signal.Handle) {
-                    System.Fail("Completion signal still has a waiter")
+                    Panic("Completion signal still has a waiter")
                 }
             }
             return !task.IsCancelled
@@ -65,7 +65,7 @@ module RuntimeAwaitProvider {
         // Deliberate managed-task notification adapter, including cancellation.
         func Complete() -> System.Void {
             if !neoCLR.Runtime.RuntimeAsyncCompleteUnit(Handle) {
-                System.Fail("Completion signal was delivered twice")
+                Panic("Completion signal was delivered twice")
             }
         }
     }

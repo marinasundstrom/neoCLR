@@ -15,7 +15,7 @@ func Main(args: string[]) {
             result = plain
         }
         if String.CompareOrdinal(result, plain) != 0 {
-            System.Fail("Allocation fixture output")
+            Panic("Allocation fixture output")
         }
         count += 1
     }

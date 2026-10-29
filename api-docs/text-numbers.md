@@ -190,7 +190,7 @@ Excess fractional precision is rounded; an unrepresentable magnitude is `Overflo
 support G/G0 and F/N/C with precision 0–99. C is a lower-level convenience that uses the culture’s default currency. Custom patterns, exponential formatting,
 float conversions and integral extraction conversions are outside this foundation.
 Invalid format/scale, arithmetic overflow and division by zero use neoCLR's current
-terminal `System.Fail` contract, rather than recoverable CLR arithmetic exceptions.
+terminal `System.Panic` contract, rather than recoverable CLR arithmetic exceptions.
 
 Arithmetic scratch storage is an ordinary value type; it does not create byte or
 limb arrays. Formatting allocates output storage and a String. Interface/Object

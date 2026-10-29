@@ -40,7 +40,7 @@ internal class JsonClientOperations {
             _ = failed.Complete(Failure(error))
             return failed.Task
         }
-        System.Fail("JSON creation returned no outcome")
+        Panic("JSON creation returned no outcome")
     }
 
     static func Get(client: HttpClient, url: Uri, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | DynamicallyAccessedMemberTypes.PublicProperties)] type: TypeInfo, token: CancellationToken) -> Task<Result<Object, HttpError | JsonError>> {
@@ -61,7 +61,7 @@ internal class JsonClientOperations {
             _ = failed.Complete(Failure(error))
             return failed.Task
         }
-        System.Fail("JSON creation returned no outcome")
+        Panic("JSON creation returned no outcome")
     }
 }
 

@@ -6,7 +6,7 @@ record struct Envelope(Item: Label)
 func Check(actual: string, expected: string) {
     if !actual.Equals(expected, StringComparison.Ordinal) {
         Console.WriteLine(actual)
-        System.Fail("record display mismatch")
+        Panic("record display mismatch")
     }
 }
 

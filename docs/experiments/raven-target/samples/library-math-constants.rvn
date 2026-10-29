@@ -4,7 +4,7 @@ import System.Math.*
 
 func Check(value: bool) {
     if !value {
-        Fail("Math constant mismatch")
+        Panic("Math constant mismatch")
     }
 }
 

@@ -12,7 +12,7 @@ public class ArrayStack<T> : Stack<T> {
 
     init(capacity: int) {
         if capacity < 0 {
-            System.Fail("Collection capacity must be non-negative")
+            Panic("Collection capacity must be non-negative")
         }
         slots = ArrayList<Optional<T>>(capacity)
     }
@@ -72,7 +72,7 @@ public class ArrayStack<T> : Stack<T> {
             if slots[position] is Some(let value) {
                 snapshot.Add(value)
             } else {
-                System.Fail("Collection storage invariant violated")
+                Panic("Collection storage invariant violated")
             }
             index = index + 1
         }

@@ -118,7 +118,7 @@ public class JsonConfigurationProvider : ConfigurationProvider {
     /// Loads the file or faults. Use TryLoad to handle diagnostics as a Result.
     func Load() {
         if TryLoad() is Failure(_) {
-            System.Fail("Unable to load JSON configuration: " + Path + "; use TryLoad for diagnostics")
+            Panic("Unable to load JSON configuration: " + Path + "; use TryLoad for diagnostics")
         }
     }
     /// Returns sorted immediate children of the flattened document.

@@ -7,7 +7,7 @@ import System.Console.*
 
 public func Check(value: bool, message: string) {
     if !value {
-        System.Fail(message)
+        Panic(message)
     }
 }
 
@@ -15,7 +15,7 @@ public func Input(bytes: byte[]) -> MemoryStream {
     let stream = MemoryStream()
     match stream.Write(bytes, 0, bytes.Length) {
         Ok(let count) => Check(count == bytes.Length, "Fixture write")
-        Failure(_) => System.Fail("Fixture write error")
+        Failure(_) => Panic("Fixture write error")
     }
     _ = stream.Seek((long)0)
     return stream
@@ -50,14 +50,14 @@ public class ShortSink : OutputStream {
 public func ExpectRead(result: Result<string, SelectionFailure>, expected: string) {
     match result {
         Ok(let text) => Check(text.Equals(expected), "Selected read content")
-        Failure(_) => System.Fail("Selected read failed")
+        Failure(_) => Panic("Selected read failed")
     }
 }
 
 public func ExpectDecode(result: Result<string, CodecFailure>, expected: string) {
     match result {
         Ok(let text) => Check(text.Equals(expected), "Decoded content")
-        Failure(_) => System.Fail("Decode failed")
+        Failure(_) => Panic("Decode failed")
     }
 }
 
@@ -69,7 +69,7 @@ public func ReaderSelectionChecks() {
     ExpectRead(SelectedReader(Input(bytes), utf8).ReadToEnd(2), "é")
     match SelectedReader(Input(bytes), ascii).ReadToEnd(2) {
         Failure(SelectionFailure.Codec(CodecFailure.InvalidData(_))) => { }
-        _ => System.Fail("ASCII decoding must be strict")
+        _ => Panic("ASCII decoding must be strict")
     }
     let plain: byte[] = [(byte)0, (byte)65, (byte)127]
     let reader = SelectedReader(Input(plain), ascii)
@@ -78,7 +78,7 @@ public func ReaderSelectionChecks() {
     reader.Close()
     match reader.ReadToEnd(3) {
         Failure(SelectionFailure.Closed) => { }
-        _ => System.Fail("Closed reader")
+        _ => Panic("Closed reader")
     }
     let first = utf8.CreateDecoder()
     let second = utf8.CreateDecoder()
@@ -90,18 +90,18 @@ public func ReaderSelectionChecks() {
     ExpectDecode(first.Decode(tail, 0, 1, true), "é")
     match first.Decode(tail, 0, 1, true) {
         Failure(CodecFailure.Finished) => { }
-        _ => System.Fail("Decoder finalization")
+        _ => Panic("Decoder finalization")
     }
     let strict = ascii.CreateDecoder()
     match strict.Decode(plain, 0, 4, false) {
         Failure(CodecFailure.InvalidRange) => { }
-        _ => System.Fail("Invalid range")
+        _ => Panic("Invalid range")
     }
     ExpectDecode(strict.Decode(plain, 0, 3, true), "\u0000A\u007f")
     let limited = SelectedReader(Input(plain), ascii)
     match limited.ReadToEnd(2) {
         Failure(SelectionFailure.LimitExceeded) => { }
-        _ => System.Fail("Read quota")
+        _ => Panic("Read quota")
     }
     WriteLine("Encoding selection reader and independent decoder checks passed")
 }
@@ -111,21 +111,21 @@ public func WriterSelectionChecks() {
     let writer = SelectedWriter(sink)
     match writer.Write("é😀") {
         Ok(let count) => Check(count == 6 && sink.Bytes.Count == 6, "Actual encoded byte count")
-        _ => System.Fail("Default UTF-8 write")
+        _ => Panic("Default UTF-8 write")
     }
     match Utf8.Decode(sink.Bytes) {
         Ok(let text) => Check(text.Equals("é😀"), "Partial write retry")
-        _ => System.Fail("Written UTF-8")
+        _ => Panic("Written UTF-8")
     }
     let asciiSink = ShortSink()
     let asciiWriter = SelectedWriter(asciiSink, AsciiSelection())
     match asciiWriter.Write("valid then é") {
         Failure(SelectionFailure.Codec(CodecFailure.UnrepresentableText)) => Check(asciiSink.Bytes.Count == 0, "Reject before output")
-        _ => System.Fail("ASCII encoding must be strict")
+        _ => Panic("ASCII encoding must be strict")
     }
     match asciiWriter.WriteLine("A") {
         Ok(let count) => Check(count == 2 && asciiSink.Bytes[1] == 10, "Encode newline through selected codec")
-        _ => System.Fail("ASCII line")
+        _ => Panic("ASCII line")
     }
     _ = asciiWriter.Flush()
     Check(asciiSink.Flushes == 1, "Forward flush")
@@ -133,7 +133,7 @@ public func WriterSelectionChecks() {
     Check(asciiSink.Closed, "Close ownership")
     match asciiWriter.Write("A") {
         Failure(SelectionFailure.Closed) => { }
-        _ => System.Fail("Closed writer")
+        _ => Panic("Closed writer")
     }
     WriteLine("Encoding selection writer and strict rejection checks passed")
 }

@@ -75,28 +75,28 @@ func ObserveRead(task: Task<Result<Optional<char>, TextReadError>>) -> Task<unit
 
 func Check(condition: bool, message: string) {
     if !condition {
-        System.Fail(message)
+        Panic(message)
     }
 }
 
 func Text(result: Result<string, TextReadError>, expected: string) {
     match result {
         Ok(let value) => Check(String.CompareOrdinal(value, expected) == 0, "Text bytes")
-        Failure(let error) => System.Fail("Unexpected text error: " + error.ToString())
+        Failure(let error) => Panic("Unexpected text error: " + error.ToString())
     }
 }
 
 func Character(result: Result<Optional<char>, TextReadError>, expected: string) {
     match result {
         Ok(Some(let value)) => Check(String.CompareOrdinal(value.ToString(), expected) == 0, "Grapheme bytes")
-        _ => System.Fail("Expected character")
+        _ => Panic("Expected character")
     }
 }
 
 func End(result: Result<Optional<char>, TextReadError>) {
     match result {
         Ok(None) => { }
-        _ => System.Fail("Expected character EOF")
+        _ => Panic("Expected character EOF")
     }
 }
 
@@ -104,7 +104,7 @@ async func Main() -> Task<unit> {
     for chunk in [1, 2, 7, 256] {
         let input = FragmentedInput("é👩‍💻🇸🇪\r\nnext\nlast", chunk)
         let Ok(reader) = StreamReader.Create(input) else {
-            System.Fail("Unable to create text wrapper")
+            Panic("Unable to create text wrapper")
         }
         Character(await reader.PeekChar(), "é")
         let reads = input.Reads
@@ -116,13 +116,13 @@ async func Main() -> Task<unit> {
         reader.NewLine = "\r\n"
         match await reader.ReadLine(100) {
             Ok(Some(let line)) => Check(line.IsEmpty, "Peek before empty line")
-            _ => System.Fail("Expected empty line")
+            _ => Panic("Expected empty line")
         }
         reader.NewLine = "\n"
         Character(await reader.ReadChar(), "n")
         match await reader.ReadLine(100) {
             Ok(Some(let line)) => Check(line == "ext", "Mixed character and line cursor")
-            _ => System.Fail("Expected remaining line")
+            _ => Panic("Expected remaining line")
         }
         Text(await reader.Read(20), "last")
         End(await reader.PeekChar())
@@ -132,24 +132,24 @@ async func Main() -> Task<unit> {
         reader.Close()
         match await reader.PeekChar() {
             Failure(TextReadError.Closed) => { }
-            _ => System.Fail("Closed peek")
+            _ => Panic("Closed peek")
         }
     }
 
     let limitedInput = FragmentedInput("éx", 256)
     let Ok(limited) = StreamReader.Create(limitedInput) else {
-        System.Fail("Unable to create text wrapper")
+        Panic("Unable to create text wrapper")
     }
     Text(await limited.Read(0, 0), "")
     Check(limitedInput.Reads == 0, "Zero read consumed input")
     match await limited.Read(-1) {
         Failure(TextReadError.InvalidRange) => { }
-        _ => System.Fail("Invalid count")
+        _ => Panic("Invalid count")
     }
     Check(limitedInput.Reads == 0, "Invalid read consumed input")
     match await limited.Read(1, 1) {
         Failure(TextReadError.LimitExceeded) => { }
-        _ => System.Fail("Expected byte limit")
+        _ => Panic("Expected byte limit")
     }
     Character(await limited.PeekChar(), "é")
     Text(await limited.Read(1, 2), "é")
@@ -157,20 +157,20 @@ async func Main() -> Task<unit> {
 
     let pendingInput = PendingInput()
     let Ok(pendingReader) = StreamReader.Create(pendingInput) else {
-        System.Fail("Unable to create text wrapper")
+        Panic("Unable to create text wrapper")
     }
     let first = pendingReader.PeekChar()
     Check(!first.IsCompleted, "Peek did not suspend")
     match await pendingReader.ReadChar() {
         Failure(TextReadError.Busy) => { }
-        _ => System.Fail("Overlapping read accepted")
+        _ => Panic("Overlapping read accepted")
     }
     pendingInput.Source.Complete(Ok(0))
     End(await first)
 
     let cancelledInput = PendingInput()
     let Ok(cancelledReader) = StreamReader.Create(cancelledInput) else {
-        System.Fail("Cancelled reader creation")
+        Panic("Cancelled reader creation")
     }
     let cancelledRead = cancelledReader.ReadChar()
     let readObserved = ObserveRead(cancelledRead)
@@ -184,7 +184,7 @@ async func Main() -> Task<unit> {
 
     let pendingOutput = PendingOutput()
     let Ok(pendingWriter) = StreamWriter.Create(pendingOutput) else {
-        System.Fail("Pending writer creation")
+        Panic("Pending writer creation")
     }
     let pendingWrite = pendingWriter.Write("abc")
     Check(!pendingWrite.IsCompleted, "Write did not suspend")
@@ -203,7 +203,7 @@ async func Main() -> Task<unit> {
     Text(Console.Read(2), "ab")
     match Console.ReadLine() {
         Ok(Some(let line)) => Check(line == "c", "Console mixed cursor")
-        _ => System.Fail("Console line")
+        _ => Panic("Console line")
     }
     Text(Console.In.Read(10), "tail")
     End(Console.ReadChar())

@@ -551,7 +551,7 @@ internal open class RuntimeTypeInfo : TypeInfo {
         if type is RuntimeTypeInfo value { return value.ExecutionHandle }
         if type is RuntimeNominalTypeInfo value { return value.ExecutionHandle }
         if type is RuntimeFunctionTypeInfo value { return value.ExecutionHandle }
-        System.Fail("Invalid TypeInfo implementation")
+        Panic("Invalid TypeInfo implementation")
         return ((RuntimeNominalTypeInfo)typeof(Object)).ExecutionHandle
     }
 

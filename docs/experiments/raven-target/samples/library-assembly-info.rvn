@@ -32,7 +32,7 @@ func Main() {
     if let Some(module) = description.Module {
         Console.WriteLine(module.Assembly.Name)
     } else {
-        System.Fail("Missing nominal module")
+        Panic("Missing nominal module")
     }
     if let Some(token) = description.MetadataToken {
         if let Some(declaredToken) = ((NominalTypeInfo)typeof(Widget)).MetadataToken {

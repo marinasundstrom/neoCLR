@@ -11,7 +11,7 @@ func Main() -> int {
         }
         let text = builder.ToString()
         if text.GetUtf8ByteCount() != 16384 {
-            System.Fail("Construction size mismatch")
+            Panic("Construction size mismatch")
         }
         iteration += 1
     }

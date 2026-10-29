@@ -7307,3 +7307,10 @@ suspension/reentry, forced GC, worker and async checks pass. Matching hosts are
 required. CPU/request improves 1.1–1.6% in local trials, throughput 0.3–1.1%, with
 mixed tails and 1.8–1.9% larger objects. Initial duplicate-TLS regression is preserved.
 [Evidence and limits](../benchmarks/execution/state-integration/README.md).
+
+### Author-directed Panic rename — 2026-10-29
+
+Rename the public System.Fail function to System.Panic and prefer imported Panic
+calls. This naming change retains existing terminal fault behavior and does not
+reprioritize runtime unwinding or thread/task semantics. Those decisions remain
+open; see [the contract and migration](system-fault.md).

@@ -2,7 +2,7 @@ import System.*
 
 func Check(actual: string, expected: string) {
     if String.CompareOrdinal(actual, expected) != 0 {
-        System.Fail("Line ending bytes")
+        Panic("Line ending bytes")
     }
 }
 
@@ -19,7 +19,7 @@ func Main() {
     let lf = "a\nb\n"
     let crlf = "a\r\nb\r\n"
     if !Object.ReferenceEquals(plain, plain.ReplaceLineEndings()) || !Object.ReferenceEquals(lf, lf.ReplaceLineEndings()) || !Object.ReferenceEquals(crlf, crlf.ReplaceLineEndings("\r\n")) {
-        System.Fail("Unchanged line ending owner")
+        Panic("Unchanged line ending owner")
     }
     Check("".ReplaceLineEndings(), "")
     Check("\r\n".ReplaceLineEndings(""), "")

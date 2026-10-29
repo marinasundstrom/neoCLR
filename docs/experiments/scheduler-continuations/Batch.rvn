@@ -31,7 +31,7 @@ module SchedulerContinuations {
 
         func Observe() -> System.Void {
             if !operation.IsCancelled {
-                System.Fail("Cancellation batch ran before outcome publication")
+                Panic("Cancellation batch ran before outcome publication")
             }
             Count += 1
             if Count == 128 {
@@ -60,20 +60,20 @@ module SchedulerContinuations {
         operation.Publish()
         observer.Dispose()
         if counter.Count != 0 || observer.Cancel() {
-            System.Fail("Batch ran inline or disposal retracted admitted observer")
+            Panic("Batch ran inline or disposal retracted admitted observer")
         }
         // Await inside for is not admitted by the current cancellation lowering.
         index = 0
         while index < waiters.Count {
             let value = await waiters[index]
             if value != 42 {
-                System.Fail("Batch lost an await result")
+                Panic("Batch lost an await result")
             }
             index += 1
         }
         _ = await counter.Done.Task
         if counter.Count != 129 {
-            System.Fail("Batch observer or existing runnable work was lost")
+            Panic("Batch observer or existing runnable work was lost")
         }
         Console.WriteLine("PASS 128 awaiters and observer admitted behind 128 runnable callbacks")
         let cancelled = Completion(UnpumpedProducer())
@@ -87,7 +87,7 @@ module SchedulerContinuations {
         cancelled.Cancel()
         let count = await cancellations.Done.Task
         if count != 128 || cancellations.Count != 128 {
-            System.Fail("Cancellation batch lost an observer")
+            Panic("Cancellation batch lost an observer")
         }
         Console.WriteLine("PASS cancellation batch publishes outcome before observation")
         return 0

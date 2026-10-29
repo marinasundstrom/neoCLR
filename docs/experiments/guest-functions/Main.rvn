@@ -4,12 +4,12 @@ module Example.Tests {
 
     [Test("discovered description")]
     func Discovered(value: int) -> int {
-        Fail("Discovery must not invoke test bodies")
+        Panic("Discovery must not invoke test bodies")
     }
 
     [Test(Description: "named description")]
     func Named() -> int {
-        Fail("Discovery must not invoke test bodies")
+        Panic("Discovery must not invoke test bodies")
     }
 
     class Container {

@@ -66,13 +66,13 @@ class ServerProbe {
             let result = serving.GetResult()
             if remaining > 2 {
                 if let Failure(reason) = result {
-                    System.Fail(reason.ToString())
+                    Panic(reason.ToString())
                 }
             } else {
                 if let Failure(HttpError.InvalidRequest(_)) = result {
                     Console.WriteLine("Rejected response")
                 } else {
-                    System.Fail("Invalid application response was accepted")
+                    Panic("Invalid application response was accepted")
                 }
             }
             Advance()
@@ -82,11 +82,11 @@ class ServerProbe {
 
 func Main() {
     let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) else {
-        System.Fail("Listen failed")
+        Panic("Listen failed")
         return
     }
     let Ok(port) = server.GetLocalPort() else {
-        System.Fail("Port unavailable")
+        Panic("Port unavailable")
         return
     }
     Console.WriteLine(port)

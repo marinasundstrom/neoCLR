@@ -6,29 +6,29 @@ import System.Concurrency.Tasks.*
 async func Main() -> Task<int> {
     let operation = neoCLR.Runtime.RuntimeAsyncCreate()
     if neoCLR.Runtime.RuntimeAsyncIsCompleted(operation) {
-        System.Fail("A new operation must be pending")
+        Panic("A new operation must be pending")
     }
     if neoCLR.Runtime.RuntimeAsyncRelease(operation) {
-        System.Fail("A pending operation cannot be released")
+        Panic("A pending operation cannot be released")
     }
     if !neoCLR.Runtime.RuntimeAsyncCompleteUnit(operation) {
-        System.Fail("A pending manual operation must accept completion")
+        Panic("A pending manual operation must accept completion")
     }
     if neoCLR.Runtime.RuntimeAsyncCompleteUnit(operation) {
-        System.Fail("An operation must complete exactly once")
+        Panic("An operation must complete exactly once")
     }
     neoCLR.Runtime.RuntimeAsyncAwaitUnit(operation)
     if !neoCLR.Runtime.RuntimeAsyncWaitCompletion(operation) {
-        System.Fail("Completion must remain observable")
+        Panic("Completion must remain observable")
     }
     if !neoCLR.Runtime.RuntimeAsyncRelease(operation) {
-        System.Fail("A completed unowned operation must be released")
+        Panic("A completed unowned operation must be released")
     }
     if neoCLR.Runtime.RuntimeAsyncRelease(operation) {
-        System.Fail("An operation must release exactly once")
+        Panic("An operation must release exactly once")
     }
     if neoCLR.Runtime.RuntimeAsyncCompleteUnit(operation) {
-        System.Fail("A released operation cannot complete")
+        Panic("A released operation cannot complete")
     }
     Console.WriteLine("PASS runtime async operation lifetime contract")
     return 0

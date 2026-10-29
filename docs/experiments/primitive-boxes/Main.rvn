@@ -5,248 +5,248 @@ func Main() {
     let original0 = (sbyte)-42
     let boxed0: ValueType = original0
     if !boxed0.GetType().Equals(typeof(SByte)) {
-        Fail("SByte runtime identity")
+        Panic("SByte runtime identity")
     }
     if boxed0 is SByte restored0 {
         if (long)restored0 != (long)original0 {
-            Fail("SByte payload changed")
+            Panic("SByte payload changed")
         }
     } else {
-        Fail("SByte exact unboxing")
+        Panic("SByte exact unboxing")
     }
     if boxed0 is Enum {
-        Fail("SByte became Enum")
+        Panic("SByte became Enum")
     }
     let original1 = 255b
     let boxed1: ValueType = original1
     if !boxed1.GetType().Equals(typeof(Byte)) {
-        Fail("Byte runtime identity")
+        Panic("Byte runtime identity")
     }
     if boxed1 is Byte restored1 {
         if (long)restored1 != (long)original1 {
-            Fail("Byte payload changed")
+            Panic("Byte payload changed")
         }
     } else {
-        Fail("Byte exact unboxing")
+        Panic("Byte exact unboxing")
     }
     if boxed1 is Enum {
-        Fail("Byte became Enum")
+        Panic("Byte became Enum")
     }
     let original2 = (short)-1234
     let boxed2: ValueType = original2
     if !boxed2.GetType().Equals(typeof(Int16)) {
-        Fail("Int16 runtime identity")
+        Panic("Int16 runtime identity")
     }
     if boxed2 is Int16 restored2 {
         if (long)restored2 != (long)original2 {
-            Fail("Int16 payload changed")
+            Panic("Int16 payload changed")
         }
     } else {
-        Fail("Int16 exact unboxing")
+        Panic("Int16 exact unboxing")
     }
     if boxed2 is Enum {
-        Fail("Int16 became Enum")
+        Panic("Int16 became Enum")
     }
     let original3 = (ushort)65535
     let boxed3: ValueType = original3
     if !boxed3.GetType().Equals(typeof(UInt16)) {
-        Fail("UInt16 runtime identity")
+        Panic("UInt16 runtime identity")
     }
     if boxed3 is UInt16 restored3 {
         if (long)restored3 != (long)original3 {
-            Fail("UInt16 payload changed")
+            Panic("UInt16 payload changed")
         }
     } else {
-        Fail("UInt16 exact unboxing")
+        Panic("UInt16 exact unboxing")
     }
     if boxed3 is Enum {
-        Fail("UInt16 became Enum")
+        Panic("UInt16 became Enum")
     }
     let original4 = 42
     let boxed4: ValueType = original4
     if !boxed4.GetType().Equals(typeof(Int32)) {
-        Fail("Int32 runtime identity")
+        Panic("Int32 runtime identity")
     }
     if boxed4 is Int32 restored4 {
         if (long)restored4 != (long)original4 {
-            Fail("Int32 payload changed")
+            Panic("Int32 payload changed")
         }
     } else {
-        Fail("Int32 exact unboxing")
+        Panic("Int32 exact unboxing")
     }
     if boxed4 is Enum {
-        Fail("Int32 became Enum")
+        Panic("Int32 became Enum")
     }
     let original5 = (uint)42
     let boxed5: ValueType = original5
     if !boxed5.GetType().Equals(typeof(UInt32)) {
-        Fail("UInt32 runtime identity")
+        Panic("UInt32 runtime identity")
     }
     if boxed5 is UInt32 restored5 {
         if (long)restored5 != (long)original5 {
-            Fail("UInt32 payload changed")
+            Panic("UInt32 payload changed")
         }
     } else {
-        Fail("UInt32 exact unboxing")
+        Panic("UInt32 exact unboxing")
     }
     if boxed5 is Enum {
-        Fail("UInt32 became Enum")
+        Panic("UInt32 became Enum")
     }
     let original6 = 42L
     let boxed6: ValueType = original6
     if !boxed6.GetType().Equals(typeof(Int64)) {
-        Fail("Int64 runtime identity")
+        Panic("Int64 runtime identity")
     }
     if boxed6 is Int64 restored6 {
         if (long)restored6 != (long)original6 {
-            Fail("Int64 payload changed")
+            Panic("Int64 payload changed")
         }
     } else {
-        Fail("Int64 exact unboxing")
+        Panic("Int64 exact unboxing")
     }
     if boxed6 is Enum {
-        Fail("Int64 became Enum")
+        Panic("Int64 became Enum")
     }
     let original7 = (ulong)42
     let boxed7: ValueType = original7
     if !boxed7.GetType().Equals(typeof(UInt64)) {
-        Fail("UInt64 runtime identity")
+        Panic("UInt64 runtime identity")
     }
     if boxed7 is UInt64 restored7 {
         if (long)restored7 != (long)original7 {
-            Fail("UInt64 payload changed")
+            Panic("UInt64 payload changed")
         }
     } else {
-        Fail("UInt64 exact unboxing")
+        Panic("UInt64 exact unboxing")
     }
     if boxed7 is Enum {
-        Fail("UInt64 became Enum")
+        Panic("UInt64 became Enum")
     }
     let original8 = (nint)42
     let boxed8: ValueType = original8
     if !boxed8.GetType().Equals(typeof(IntPtr)) {
-        Fail("IntPtr runtime identity")
+        Panic("IntPtr runtime identity")
     }
     if boxed8 is IntPtr restored8 {
         if (long)restored8 != (long)original8 {
-            Fail("IntPtr payload changed")
+            Panic("IntPtr payload changed")
         }
     } else {
-        Fail("IntPtr exact unboxing")
+        Panic("IntPtr exact unboxing")
     }
     if boxed8 is Enum {
-        Fail("IntPtr became Enum")
+        Panic("IntPtr became Enum")
     }
     let original9 = (nuint)42
     let boxed9: ValueType = original9
     if !boxed9.GetType().Equals(typeof(UIntPtr)) {
-        Fail("UIntPtr runtime identity")
+        Panic("UIntPtr runtime identity")
     }
     if boxed9 is UIntPtr restored9 {
         if (long)restored9 != (long)original9 {
-            Fail("UIntPtr payload changed")
+            Panic("UIntPtr payload changed")
         }
     } else {
-        Fail("UIntPtr exact unboxing")
+        Panic("UIntPtr exact unboxing")
     }
     if boxed9 is Enum {
-        Fail("UIntPtr became Enum")
+        Panic("UIntPtr became Enum")
     }
     let original10 = 1.5f
     let boxed10: ValueType = original10
     if !boxed10.GetType().Equals(typeof(Single)) {
-        Fail("Single runtime identity")
+        Panic("Single runtime identity")
     }
     if boxed10 is Single restored10 {
         if restored10 != original10 {
-            Fail("Single payload changed")
+            Panic("Single payload changed")
         }
     } else {
-        Fail("Single exact unboxing")
+        Panic("Single exact unboxing")
     }
     if boxed10 is Enum {
-        Fail("Single became Enum")
+        Panic("Single became Enum")
     }
     let original11 = 1.5d
     let boxed11: ValueType = original11
     if !boxed11.GetType().Equals(typeof(Double)) {
-        Fail("Double runtime identity")
+        Panic("Double runtime identity")
     }
     if boxed11 is Double restored11 {
         if restored11 != original11 {
-            Fail("Double payload changed")
+            Panic("Double payload changed")
         }
     } else {
-        Fail("Double exact unboxing")
+        Panic("Double exact unboxing")
     }
     if boxed11 is Enum {
-        Fail("Double became Enum")
+        Panic("Double became Enum")
     }
     let original12 = true
     let boxed12: ValueType = original12
     if !boxed12.GetType().Equals(typeof(Boolean)) {
-        Fail("Boolean runtime identity")
+        Panic("Boolean runtime identity")
     }
     if boxed12 is Boolean restored12 {
         if restored12 != original12 {
-            Fail("Boolean payload changed")
+            Panic("Boolean payload changed")
         }
     } else {
-        Fail("Boolean exact unboxing")
+        Panic("Boolean exact unboxing")
     }
     if boxed12 is Enum {
-        Fail("Boolean became Enum")
+        Panic("Boolean became Enum")
     }
     let original13 = Char.FromString("Å")
     let boxed13: ValueType = original13
     if !boxed13.GetType().Equals(typeof(Char)) {
-        Fail("Char runtime identity")
+        Panic("Char runtime identity")
     }
     if boxed13 is Char restored13 {
         if !restored13.Equals(original13) {
-            Fail("Char payload changed")
+            Panic("Char payload changed")
         }
     } else {
-        Fail("Char exact unboxing")
+        Panic("Char exact unboxing")
     }
     if boxed13 is Enum {
-        Fail("Char became Enum")
+        Panic("Char became Enum")
     }
     if boxed1 is SByte {
-        Fail("Byte became SByte")
+        Panic("Byte became SByte")
     }
     if boxed4 is UInt32 {
-        Fail("Int32 became UInt32")
+        Panic("Int32 became UInt32")
     }
     if boxed10 is Double {
-        Fail("Single became Double")
+        Panic("Single became Double")
     }
     let suffixedByte = 10b
     let suffixBox: ValueType = suffixedByte
     if !suffixBox.GetType().Equals(typeof(Byte)) {
-        Fail("10b must infer Byte")
+        Panic("10b must infer Byte")
     }
     if suffixBox is Byte value {
         if (long)value != 10L {
-            Fail("10b payload changed")
+            Panic("10b payload changed")
         }
     } else {
-        Fail("10b exact unboxing")
+        Panic("10b exact unboxing")
     }
     var count = 0
     while count < 32 {
         let allocation: ValueType = (byte)count
         if !(allocation is Byte) {
-            Fail("Repeated Byte boxing")
+            Panic("Repeated Byte boxing")
         }
         count = count + 1
     }
     if boxed13 is Char retained {
         if !retained.Equals(original13) {
-            Fail("Char payload changed across allocations")
+            Panic("Char payload changed across allocations")
         }
     } else {
-        Fail("Char box lost across allocations")
+        Panic("Char box lost across allocations")
     }
     Console.WriteLine("all scalar boxes preserve ancestry and exact identity")
 }

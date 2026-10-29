@@ -3,7 +3,7 @@ import HttpErrorProbe.*
 
 func Check(value: bool) {
     if !value {
-        System.Fail("Union assertion failed")
+        Panic("Union assertion failed")
     }
 }
 
@@ -12,11 +12,11 @@ func Main() {
     if let HttpLimit.Headers = limit {
         Console.WriteLine("Header limit")
     } else {
-        System.Fail("Wrong limit case")
+        Panic("Wrong limit case")
     }
     Check(!default(HttpLimit).HasValue)
     if let HttpLimit.Body = limit {
-        System.Fail("Nonmatching empty case succeeded")
+        Panic("Nonmatching empty case succeeded")
     }
     let boxedLimit: Object = limit
     Check(boxedLimit.ToString() == limit.ToString())
@@ -25,28 +25,28 @@ func Main() {
         if let HttpLimit.Headers = reason {
             Check(reason.HasValue)
         } else {
-            System.Fail("Nested empty-case union changed")
+            Panic("Nested empty-case union changed")
         }
     } else {
-        System.Fail("Missing nested limit")
+        Panic("Missing nested limit")
     }
     let absent = default(HttpError)
     Check(!absent.HasValue)
     Check(!absent.IsTransportFailure)
     if let HttpError.InvalidRequest(_) = absent {
-        System.Fail("Default union invented a case")
+        Panic("Default union invented a case")
     }
     if let HttpError.Transport(_) = absent {
-        System.Fail("Default union invented a nested case")
+        Panic("Default union invented a nested case")
     }
     if let HttpError.TimedOut = absent {
-        System.Fail("Default union invented an empty case")
+        Panic("Default union invented an empty case")
     }
     let failure: HttpError = HttpError.Transport(TransportError.ConnectionRefused("localhost"))
     if let HttpError.Transport(cause) = failure {
         Check(cause.ToString() == "localhost")
     } else {
-        System.Fail("Wrong HTTP case")
+        Panic("Wrong HTTP case")
     }
     Check(failure.IsTransportFailure)
     Console.WriteLine(failure.ToString())

@@ -8,7 +8,7 @@ import System.Web.Http.*
 
 func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
     if request.Target != "/greeting" {
-        System.Fail("Unexpected HTTPS request")
+        Panic("Unexpected HTTPS request")
     }
     let headers = ArrayList<HttpHeader>()
     headers.Add(HttpHeader("Content-Type", "text/plain; charset=utf-8"))
@@ -34,10 +34,10 @@ async func Main(arguments: string[]) -> Task<()> {
     let options = HttpServerOptions()
     options.RequestReadTimeout = Duration.FromTicks(10000000L)
     let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 8, options) else {
-        System.Fail("HTTPS listen failed")
+        Panic("HTTPS listen failed")
     }
     let Ok(port) = server.GetLocalPort() else {
-        System.Fail("HTTPS port unavailable")
+        Panic("HTTPS port unavailable")
     }
     Console.WriteLine(port)
     if mode == "cancel" {
@@ -47,20 +47,20 @@ async func Main(arguments: string[]) -> Task<()> {
         let observer = CancellationObserver(operation)
         operation.OnCompleted(observer.Complete)
         if !(await observer.Task) {
-            System.Fail("Expected cancellation")
+            Panic("Expected cancellation")
         }
     } else {
         let first = await server.ServeOne(Respond)
         if mode == "ok" {
-            if !(first is Ok(_)) { System.Fail("HTTPS request failed") }
+            if !(first is Ok(_)) { Panic("HTTPS request failed") }
         } else if mode == "timeout" {
-            if !(first is Failure(HttpError.TimedOut)) { System.Fail("Expected handshake timeout") }
+            if !(first is Failure(HttpError.TimedOut)) { Panic("Expected handshake timeout") }
         } else {
-            if !(first is Failure(_)) { System.Fail("Invalid TLS peer reached handler") }
+            if !(first is Failure(_)) { Panic("Invalid TLS peer reached handler") }
         }
     }
     let recovery = await server.ServeOne(Respond)
-    if !(recovery is Ok(_)) { System.Fail("HTTPS recovery failed") }
+    if !(recovery is Ok(_)) { Panic("HTTPS recovery failed") }
     server.Close()
     Console.WriteLine("PASS HTTPS server and recovery")
 }

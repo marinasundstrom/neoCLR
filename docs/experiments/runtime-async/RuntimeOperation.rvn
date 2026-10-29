@@ -26,7 +26,7 @@ module RuntimeOperationSample {
         // The existing language binder requires this protocol member. Native runtime
         // await must use the explicit provider mapping, never this legacy callback.
         func OnCompleted(callback: () -> System.Void) {
-            System.Fail("Manual operation used the callback adapter")
+            Panic("Manual operation used the callback adapter")
         }
     }
 
@@ -75,23 +75,23 @@ module RuntimeOperationSample {
             let first = Read(operation)
             let second = ReadEnvelope(envelope)
             if first.IsCompleted || second.IsCompleted {
-                System.Fail("Manual operation did not suspend both readers")
+                Panic("Manual operation did not suspend both readers")
             }
             System.Runtime.GC.Collect()
             if !operation.Complete() || operation.Complete() {
-                System.Fail("Completion was not accepted exactly once")
+                Panic("Completion was not accepted exactly once")
             }
             let a = await first
             let b = await second
             let repeated = await operation
             if a != 42 || b != 42 || repeated != 17 {
-                System.Fail("Independent readers lost the result")
+                Panic("Independent readers lost the result")
             }
             if operation.AwaiterReads != 2 || envelope.Reads != 1 || operation.ResultReads != 3 {
-                System.Fail("Awaiter/result evaluation was not exact")
+                Panic("Awaiter/result evaluation was not exact")
             }
             if !operation.Release() {
-                System.Fail("Completed operation retained waiters")
+                Panic("Completed operation retained waiters")
             }
             iteration = iteration + 1
         }
@@ -100,20 +100,20 @@ module RuntimeOperationSample {
         let observer = CancellationObserver(cancelledReader)
         cancelledReader.OnCompleted(observer.Complete)
         if !cancelled.Cancel() {
-            System.Fail("Cancellation failed")
+            Panic("Cancellation failed")
         }
         let sawCancellation = await observer.Task
         if !sawCancellation || cancelled.ResultReads != 0 {
-            System.Fail("Cancellation read an absent result")
+            Panic("Cancellation read an absent result")
         }
         if !cancelled.Release() {
-            System.Fail("Cancelled operation retained waiters")
+            Panic("Cancelled operation retained waiters")
         }
         let race = ManualOperation()
         race.CompleteBeforeWait = true
         let raced = await Read(race)
         if raced != 42 || !race.Release() {
-            System.Fail("Completion before wait lost its wakeup")
+            Panic("Completion before wait lost its wakeup")
         }
         Console.WriteLine("PASS independent runtime operation await")
         return 0

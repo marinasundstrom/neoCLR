@@ -4,7 +4,7 @@ import System.Concurrency.Tasks.*
 async func Main() -> Task<unit> {
     let result = Promise<int>()
     TaskQueue.Default.Post(() => {
-        System.Fail("Async entry callback fault")
+        Panic("Async entry callback fault")
     })
     _ = await result.Task
     return ()

@@ -1,4 +1,6 @@
+
+import System.*
 func Main() -> int {
- System.Fail("source failure")
+ Panic("source failure")
  return 42
 }

@@ -10,9 +10,9 @@ async func Main() -> Task<()> {
     options.RequestReadTimeout = Duration.FromTicks(600000000L)
     options.ResponseWriteTimeout = Duration.FromTicks(600000000L)
     let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 16, options) else {
-        System.Fail("Listen failed")
+        Panic("Listen failed")
     }
-    let Ok(port) = server.GetLocalPort() else { System.Fail("Port failed") }
+    let Ok(port) = server.GetLocalPort() else { Panic("Port failed") }
     Console.WriteLine(port)
     var running = true
     while running {
@@ -26,7 +26,7 @@ async func Main() -> Task<()> {
             Console.WriteLine(request.Method.Method)
             Console.WriteLine(request.IsSecure)
             context.Respond(HttpStatusCode.OK, request.Content)
-            if (await context.Complete()) is Error(_) { System.Fail("Response failed") }
+            if (await context.Complete()) is Error(_) { Panic("Response failed") }
             running = request.Target != "/stop"
             context.Dispose()
         } else if let Error(reason) = result {

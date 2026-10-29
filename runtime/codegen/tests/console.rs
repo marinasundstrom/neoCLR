@@ -359,7 +359,7 @@ int main(void) {
     assert!(r.stderr.is_empty());
 }
 
-const TEXT_SEED: &str = ".module System\n.references ()\n.function neoCLR.Runtime.Int32ToString(Int32 value) -> String\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.WriteLine(String text) -> Void\n.methodimpl InternalCall\n.end\n.function System.Fail(String text) -> void\nldarg text\ncall neoCLR.Runtime.Fault(String)\npop\nret\n.end\n.function neoCLR.Runtime.Fault(String text) -> Void\n.methodimpl InternalCall\n.end";
+const TEXT_SEED: &str = ".module System\n.references ()\n.function neoCLR.Runtime.Int32ToString(Int32 value) -> String\n.methodimpl InternalCall\n.end\n.function neoCLR.Runtime.WriteLine(String text) -> Void\n.methodimpl InternalCall\n.end\n.function System.Panic(String text) -> void\nldarg text\ncall neoCLR.Runtime.Fault(String)\npop\nret\n.end\n.function neoCLR.Runtime.Fault(String text) -> Void\n.methodimpl InternalCall\n.end";
 #[test]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn invocation_text_survives_nested_calls_faults_and_reclaims_on_next_entry() {
@@ -440,7 +440,7 @@ int main(void) {
     assert!(r.status.success(), "{r:?}");
     let stderr = String::from_utf8(r.stderr).unwrap();
     assert!(
-        stderr.starts_with("UserFault: 1\n   at System.Fail [instruction 1]\n"),
+        stderr.starts_with("UserFault: 1\n   at System.Panic [instruction 1]\n"),
         "{stderr}"
     );
     assert!(stderr.contains("NativeMemoryLimitExceeded: Native memory limit exceeded\n   at Calculate [instruction 1]\n"), "{stderr}");
@@ -541,7 +541,7 @@ fn mixed_text_records_preserve_snapshots_nested_borrows_and_output_neighbors() {
 fn default_text_and_null_native_arguments_match_interpreter() {
     for consumer in [
         "call neoCLR.Runtime.WriteLine(String)\npop",
-        "call System.Fail(String)",
+        "call System.Panic(String)",
     ] {
         let dir = Temp::new();
         let source = format!(
@@ -5498,7 +5498,7 @@ ldarg mode
 brfalse Success
 ldarg mode
 call neoCLR.Runtime.Int32ToString(Int32)
-call System.Fail(String)
+call System.Panic(String)
 Success:
 ldc.i4 42
 ret

@@ -6,7 +6,7 @@ import System.Concurrency.Tasks.*
 
 func Check(condition: bool) {
     if !condition {
-        System.Fail("JSON object mapping check failed")
+        Panic("JSON object mapping check failed")
     }
 }
 
@@ -48,39 +48,39 @@ async func ErrorAlternatives() -> Task<()> {
     let closed = MemoryStream()
     closed.Close()
     let Failure(streamFailure) = await ReadReport(closed) else {
-        System.Fail("Expected stream failure")
+        Panic("Expected stream failure")
     }
     if streamFailure is StreamError error {
         Check(error is StreamError.Closed)
     } else {
-        System.Fail("Stream failure was relabeled")
+        Panic("Stream failure was relabeled")
     }
 
     let empty = MemoryStream()
     let invalidJson = await ReadReport(empty)
     empty.Close()
     let Failure(jsonFailure) = invalidJson else {
-        System.Fail("Expected JSON failure")
+        Panic("Expected JSON failure")
     }
     if jsonFailure is JsonError error {
         Check(error is JsonError.Syntax(_))
     } else {
-        System.Fail("JSON failure was relabeled")
+        Panic("JSON failure was relabeled")
     }
 
     let missingField = MemoryStream()
     let Ok(_) = await JsonSerializer.SerializeNode(missingField, JsonObject()) else {
-        System.Fail("Could not prepare mapping fixture")
+        Panic("Could not prepare mapping fixture")
     }
     let invalidMapping = await ReadReport(missingField)
     missingField.Close()
     let Failure(mappingFailure) = invalidMapping else {
-        System.Fail("Expected mapping failure")
+        Panic("Expected mapping failure")
     }
     if mappingFailure is MappingError error {
         Check(error is MappingError.Json(JsonError.MissingField("station")))
     } else {
-        System.Fail("Mapping failure lost its domain boundary")
+        Panic("Mapping failure lost its domain boundary")
     }
 }
 
@@ -89,6 +89,6 @@ async func Main() -> Task<()> {
         await ErrorAlternatives()
         Console.WriteLine("JSON object mapping checks passed")
     } else {
-        System.Fail("JSON object mapping failed")
+        Panic("JSON object mapping failed")
     }
 }

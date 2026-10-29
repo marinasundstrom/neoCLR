@@ -31,10 +31,10 @@ class DriverApplication {
 
     async func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
         if request.Target == "/body" {
-            let Some(stream) = request.Content.TryGetStream() else { System.Fail("Body stream") }
+            let Some(stream) = request.Content.TryGetStream() else { Panic("Body stream") }
             let bytes: byte[] = [(byte)0, (byte)0]
-            let Ok(count) = await stream.Read(bytes, 0, 2) else { System.Fail("Body read") }
-            if count != 2 || bytes[0] != 65 || bytes[1] != 66 { System.Fail("Body bytes") }
+            let Ok(count) = await stream.Read(bytes, 0, 2) else { Panic("Body read") }
+            if count != 2 || bytes[0] != 65 || bytes[1] != 66 { Panic("Body bytes") }
         }
         if request.Target == "/hold" {
             Started += 1
@@ -50,28 +50,28 @@ class DriverApplication {
 }
 
 async func Run() -> Task<unit> {
-    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 64) else { System.Fail("Listen") }
-    let Ok(control) = Socket.Listen("127.0.0.1", 0, 8) else { System.Fail("Control") }
-    let Ok(port) = server.GetLocalPort() else { System.Fail("Port") }
-    let Ok(controlPort) = control.GetLocalPort() else { System.Fail("Control port") }
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 64) else { Panic("Listen") }
+    let Ok(control) = Socket.Listen("127.0.0.1", 0, 8) else { Panic("Control") }
+    let Ok(port) = server.GetLocalPort() else { Panic("Port") }
+    let Ok(controlPort) = control.GetLocalPort() else { Panic("Control port") }
     let application = DriverApplication()
     let lifetime = server.ServePersistent(application.Respond, 32, 2, CancellationToken.None)
     Console.WriteLine("READY")
     Console.WriteLine(port)
     Console.WriteLine(controlPort)
-    let Ok(release) = await control.Accept() else { System.Fail("Release signal") }
+    let Ok(release) = await control.Accept() else { Panic("Release signal") }
     release.Close()
-    if application.Started != 2 || application.Peak != 2 { System.Fail("Handler admission") }
+    if application.Started != 2 || application.Peak != 2 { Panic("Handler admission") }
     application.Release()
-    let Ok(stop) = await control.Accept() else { System.Fail("Stop signal") }
+    let Ok(stop) = await control.Accept() else { Panic("Stop signal") }
     stop.Close()
     control.Close()
     server.Close()
-    let Ok(_) = await lifetime else { System.Fail("Serve lifetime") }
+    let Ok(_) = await lifetime else { Panic("Serve lifetime") }
     Console.WriteLine("STATS " + server.CompletedRequests.ToString() + " " + server.FailedRequests.ToString() + " " + application.Started.ToString() + " " + application.Peak.ToString())
     if let Some(error) = server.LastRequestError { Console.WriteLine(error.ToString()) }
     if server.CompletedRequests != 11L || server.FailedRequests != 0L || application.Started != 4 || application.Peak != 2 {
-        System.Fail("Driver accounting")
+        Panic("Driver accounting")
     }
     Console.WriteLine("Session wire passed")
 }

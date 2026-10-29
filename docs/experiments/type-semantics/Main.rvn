@@ -18,109 +18,109 @@ public class InitOnly {
 func Main() {
     if let .Some(parent) = typeof(Reference).BaseType {
         if !parent.Equals(typeof(Object)) {
-            Fail("Class has the wrong base")
+            Panic("Class has the wrong base")
         }
     } else {
-        Fail("Class Object base is missing")
+        Panic("Class Object base is missing")
     }
     if let .Some(referenceParent) = typeof(ReferenceRecord).BaseType {
         if !referenceParent.Equals(typeof(Object)) {
-            Fail("Reference record has the wrong base")
+            Panic("Reference record has the wrong base")
         }
     } else {
-        Fail("Reference record Object base is missing")
+        Panic("Reference record Object base is missing")
     }
     if let .Some(valueParent) = typeof(ValueCell).BaseType {
         if !valueParent.Equals(typeof(ValueType)) {
-            Fail("Struct has the wrong base")
+            Panic("Struct has the wrong base")
         }
     } else {
-        Fail("Struct ValueType base is missing")
+        Panic("Struct ValueType base is missing")
     }
     if let .Some(recordParent) = typeof(ValueRecord).BaseType {
         if !recordParent.Equals(typeof(ValueType)) {
-            Fail("Record struct has the wrong base")
+            Panic("Record struct has the wrong base")
         }
     } else {
-        Fail("Record struct ValueType base is missing")
+        Panic("Record struct ValueType base is missing")
     }
     if let .Some(rootParent) = typeof(ValueType).BaseType {
         if !rootParent.Equals(typeof(Object)) {
-            Fail("ValueType has the wrong base")
+            Panic("ValueType has the wrong base")
         }
     } else {
-        Fail("ValueType Object base is missing")
+        Panic("ValueType Object base is missing")
     }
     let initialized = InitOnly { Number = 42 }
     if initialized.Number != 42 {
-        Fail("Init accessor did not initialize class")
+        Panic("Init accessor did not initialize class")
     }
     let immutable = ImmutableRecord(42)
     if immutable.Number != 42 {
-        Fail("Positional init accessor did not initialize record")
+        Panic("Positional init accessor did not initialize record")
     }
     let referenceRecord = ReferenceRecord(1)
     let recordAlias = referenceRecord
     recordAlias.Number = 2
     if referenceRecord.Number != 2 {
-        Fail("Reference record did not alias")
+        Panic("Reference record did not alias")
     }
     if typeof(ReferenceRecord).IsValueType {
-        Fail("Ordinary record is a value type")
+        Panic("Ordinary record is a value type")
     }
     let reference = Reference()
     let alias = reference
     alias.Number = 2
     if reference.Number != 2 {
-        Fail("Class assignment did not alias")
+        Panic("Class assignment did not alias")
     }
     var value = ValueCell()
     var copy = value
     copy.Number = 2
     if value.Number != 1 {
-        Fail("Struct assignment did not copy")
+        Panic("Struct assignment did not copy")
     }
     var valueRecord = ValueRecord(1)
     var recordCopy = valueRecord
     recordCopy.Number = 2
     if valueRecord.Number != 1 {
-        Fail("Record struct assignment did not copy")
+        Panic("Record struct assignment did not copy")
     }
     let boxed: Object = valueRecord
     valueRecord.Number = 3
     if !(boxed is ValueType) {
-        Fail("Boxed record is not a ValueType")
+        Panic("Boxed record is not a ValueType")
     }
     let typedValue: ValueType = ValueRecord(42)
     if typedValue is ValueRecord typedRecord {
         if typedRecord.Number != 42 {
-            Fail("ValueType assignment changed the boxed value")
+            Panic("ValueType assignment changed the boxed value")
         }
     } else {
-        Fail("ValueType assignment lost the record identity")
+        Panic("ValueType assignment lost the record identity")
     }
     let classBox: Object = reference
     if classBox is ValueType {
-        Fail("Ordinary class matched ValueType")
+        Panic("Ordinary class matched ValueType")
     }
     if !typeof(ValueRecord).IsSubclassOf(typeof(ValueType)) {
-        Fail("Record subclass relation is missing")
+        Panic("Record subclass relation is missing")
     }
     if boxed is ValueRecord unboxed {
         if unboxed.Number != 1 {
-            Fail("Box did not preserve independent value")
+            Panic("Box did not preserve independent value")
         }
     } else {
-        Fail("Box did not retain value-record identity")
+        Panic("Box did not retain value-record identity")
     }
     if typeof(Reference).IsValueType {
-        Fail("Class is a value type")
+        Panic("Class is a value type")
     }
     if !typeof(ValueCell).IsValueType {
-        Fail("Struct is a reference type")
+        Panic("Struct is a reference type")
     }
     if !typeof(ValueRecord).IsValueType {
-        Fail("Record struct is a reference type")
+        Panic("Record struct is a reference type")
     }
     Console.WriteLine("classes and records alias; structs copy; boxing isolates; init accessors initialize")
 }

@@ -4,7 +4,7 @@ module RuntimeAwaitFault {
 
     async func FailAfterAwait(input: Task<int>) -> Task<int> {
         let value = await input
-        System.Fail("runtime async sample terminal fault")
+        Panic("runtime async sample terminal fault")
     }
 
     async func Main() -> Task<int> {

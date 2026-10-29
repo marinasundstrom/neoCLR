@@ -9,21 +9,21 @@ func Main() {
         builder.AppendLine("!").AppendLine("")
         let second = builder.ToString()
         if first != "é" || first.Length != 1 || second != "é!\n\n" {
-            System.Fail("Snapshot or grapheme mismatch")
+            Panic("Snapshot or grapheme mismatch")
         }
         builder.Clear()
         if builder.Utf8ByteCount != 0 || builder.ToString() != "" || second != "é!\n\n" {
-            System.Fail("Clear or immutable snapshot mismatch")
+            Panic("Clear or immutable snapshot mismatch")
         }
         iteration += 1
     }
     let exact = StringBuilder(3).AppendLine("é")
     if exact.Utf8ByteCount != 3 || exact.ToString() != "é\n" {
-        System.Fail("Exact byte quota mismatch")
+        Panic("Exact byte quota mismatch")
     }
     let empty = StringBuilder(0).Append("").Clear()
     if empty.ToString() != "" {
-        System.Fail("Empty mismatch")
+        Panic("Empty mismatch")
     }
     Console.WriteLine("PASS StringBuilder reuse")
 }

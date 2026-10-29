@@ -2,7 +2,7 @@ import System.*
 
 func Check(value: bool) {
     if !value {
-        System.Fail("String search contract")
+        Panic("String search contract")
     }
 }
 

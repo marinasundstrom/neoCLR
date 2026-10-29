@@ -17,7 +17,7 @@ class HttpSession {
     private func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
         count += 1
         if request.Target == "/fault" {
-            System.Fail("Retained HTTP handler fault")
+            Panic("Retained HTTP handler fault")
         }
         let headers = ArrayList<HttpHeader>()
         headers.Add(HttpHeader("Content-Type", "text/plain; charset=utf-8"))
@@ -29,7 +29,7 @@ class HttpSession {
     async func Exchange() -> Task<()> {
         let result = await server.ServeOne(Respond)
         if let Failure(error) = result {
-            System.Fail(error.ToString())
+            Panic(error.ToString())
         }
         Console.WriteLine(String.Concat("Completed ", count.ToString()))
     }
@@ -54,7 +54,7 @@ func CreateSession() -> HttpSession {
         }
         server.Close()
     }
-    System.Fail("Retained HTTP listen failed")
+    Panic("Retained HTTP listen failed")
 }
 
 func Bootstrap() -> () -> () {

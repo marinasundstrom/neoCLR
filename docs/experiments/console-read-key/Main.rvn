@@ -4,20 +4,20 @@ import System.Optional.*
 
 func Check(value: bool, message: string) {
     if !value {
-        System.Fail(message)
+        Panic(message)
     }
 }
 
 func Read(reader: ConsoleKeyReader) -> ConsoleKeyInfo {
     let Ok(Some(info)) = reader.ReadKey() else {
-        System.Fail("expected key")
+        Panic("expected key")
     }
     return info
 }
 
 func Scalar(info: ConsoleKeyInfo, expected: int) {
     let Some(value) = info.TextScalar else {
-        System.Fail("expected scalar")
+        Panic("expected scalar")
     }
     Check(value == expected, "scalar value")
 }
@@ -26,50 +26,50 @@ func Main(args: string[]) {
     let mode = args[0]
     if mode == "redirected" {
         let Failure(ConsoleKeyError.Unavailable) = Console.OpenKeyInput() else {
-            System.Fail("redirected input must reject key acquisition")
+            Panic("redirected input must reject key acquisition")
         }
         Console.WriteLine("PASS")
         return
     }
     if mode == "text-first" {
         let Ok(Some(_)) = Console.PeekChar() else {
-            System.Fail("peek")
+            Panic("peek")
         }
         let Failure(ConsoleKeyError.Busy) = Console.OpenKeyInput() else {
-            System.Fail("text cursor must retain ownership")
+            Panic("text cursor must retain ownership")
         }
         let Ok(Some(text)) = Console.ReadLine() else {
-            System.Fail("line")
+            Panic("line")
         }
         Check(text == "abc", "peek retained")
         Console.WriteLine("PASS")
         return
     }
     let Ok(keys) = Console.OpenKeyInput(true) else {
-        System.Fail("open key input")
+        Panic("open key input")
     }
     // Deliberately omit use in this mode to exercise invocation fault cleanup.
     if mode == "fault" {
-        System.Fail("key session fault cleanup")
+        Panic("key session fault cleanup")
     }
     use scope = keys
     let Failure(ConsoleKeyError.Busy) = Console.OpenKeyInput() else {
-        System.Fail("exclusive keys")
+        Panic("exclusive keys")
     }
     let Failure(_) = Console.ReadByte() else {
-        System.Fail("text cannot steal keys")
+        Panic("text cannot steal keys")
     }
     Console.WriteLine("READY")
     if mode == "handoff" {
         let Failure(ConsoleKeyError.InvalidUtf8) = keys.ReadKey() else {
-            System.Fail("handoff invalid UTF8")
+            Panic("handoff invalid UTF8")
         }
         let Ok(_) = keys.Close() else {
-            System.Fail("handoff close")
+            Panic("handoff close")
         }
         Console.WriteLine("TEXT")
         let Ok(Some(text)) = Console.ReadLine() else {
-            System.Fail("handoff line")
+            Panic("handoff line")
         }
         Check(text == "ztail", "retained byte before text")
         Console.WriteLine("PASS")
@@ -98,31 +98,31 @@ func Main(args: string[]) {
         Scalar(alt, 120)
         Check((int)Read(keys).Key == 27, "standalone Escape")
         let Failure(ConsoleKeyError.UnsupportedSequence) = keys.ReadKey() else {
-            System.Fail("unsupported sequence")
+            Panic("unsupported sequence")
         }
         let Failure(ConsoleKeyError.InvalidUtf8) = keys.ReadKey() else {
-            System.Fail("invalid UTF8")
+            Panic("invalid UTF8")
         }
         // The invalid continuation byte is the following 'z'. Closing hands it back.
     }
     let Ok(_) = keys.Close() else {
-        System.Fail("close keys")
+        Panic("close keys")
     }
     let Failure(ConsoleKeyError.Closed) = keys.ReadKey() else {
-        System.Fail("closed keys")
+        Panic("closed keys")
     }
     if mode == "keys" {
         let Ok(reopened) = Console.OpenKeyInput() else {
-            System.Fail("reopen keys")
+            Panic("reopen keys")
         }
         use next = reopened
         Scalar(Read(reopened), 122)
         let Ok(_) = reopened.Close() else {
-            System.Fail("close reopened")
+            Panic("close reopened")
         }
         Console.WriteLine("TEXT")
         let Ok(Some(text)) = Console.ReadLine() else {
-            System.Fail("text after keys")
+            Panic("text after keys")
         }
         Check(text == "tail", "text handoff")
     }

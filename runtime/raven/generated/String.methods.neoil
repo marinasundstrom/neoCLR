@@ -117,8 +117,8 @@ M00000001_IL_0060:
 M00000001_IL_0061:
 ldstr "Character sequence count changed during construction"
 M00000001_IL_0066:
-call System.Fail(String)
-fault "System.Fail returned unexpectedly"
+call System.Panic(String)
+fault "System.Panic returned unexpectedly"
 M00000001_IL_006b:
 M00000001_IL_006c:
 M00000001_IL_006d:
@@ -269,8 +269,8 @@ M00000006_IL_004e:
 M00000006_IL_004f:
 ldstr "String.Join UTF-8 byte count overflow"
 M00000006_IL_0054:
-call System.Fail(String)
-fault "System.Fail returned unexpectedly"
+call System.Panic(String)
+fault "System.Panic returned unexpectedly"
 M00000006_IL_0059:
 M00000006_IL_005a:
 M00000006_IL_005b:
@@ -313,8 +313,8 @@ M00000006_IL_0081:
 M00000006_IL_0082:
 ldstr "String.Join UTF-8 byte count overflow"
 M00000006_IL_0087:
-call System.Fail(String)
-fault "System.Fail returned unexpectedly"
+call System.Panic(String)
+fault "System.Panic returned unexpectedly"
 M00000006_IL_008c:
 M00000006_IL_008d:
 M00000006_IL_008e:
@@ -538,8 +538,8 @@ M0000000b_IL_0033:
 M0000000b_IL_0034:
 ldstr "Unsupported StringComparison"
 M0000000b_IL_0039:
-call System.Fail(String)
-fault "System.Fail returned unexpectedly"
+call System.Panic(String)
+fault "System.Panic returned unexpectedly"
 .end
 .method static CompareOrdinalIgnoreCase(String left,String right) -> Int32
 M0000000c_IL_0000:
@@ -821,7 +821,7 @@ M00000019_IL_0088:
 M00000019_IL_0089:
 ldstr "invalid native UTF-8 slice status"
 M00000019_IL_008e:
-call System.Fail(String)
-fault "System.Fail returned unexpectedly"
+call System.Panic(String)
+fault "System.Panic returned unexpectedly"
 .end
 .end

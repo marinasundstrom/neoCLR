@@ -1,5 +1,7 @@
 module System.Linq
 
+import System.*
+
 import System.Collections.*
 import System.Optional.*
 import System.Result.*
@@ -47,7 +49,7 @@ public extension Operators<T> for Iterable<T> {
         while iterator.MoveNext() {
             if count == 2147483647 {
                 iterator.Dispose()
-                System.Fail("Query count exceeds Int32 capacity")
+                Panic("Query count exceeds Int32 capacity")
             }
             count = count + 1
         }
@@ -62,7 +64,7 @@ public extension Operators<T> for Iterable<T> {
             if predicate(iterator.Current) {
                 if count == 2147483647 {
                     iterator.Dispose()
-                    System.Fail("Query count exceeds Int32 capacity")
+                    Panic("Query count exceeds Int32 capacity")
                 }
                 count = count + 1
             }
@@ -120,7 +122,7 @@ public extension Operators<T> for Iterable<T> {
             let value = valueSelector(item)
             if !result.TryAdd(key, value) {
                 iterator.Dispose()
-                System.Fail("HashMap input contains a duplicate key")
+                Panic("HashMap input contains a duplicate key")
             }
         }
         iterator.Dispose()
@@ -254,7 +256,7 @@ internal class WhereIterator<T> : Iterator<T> {
     val Current: T {
         get {
             if !active {
-                System.Fail("Query iterator has no current element")
+                Panic("Query iterator has no current element")
             }
             return cached[0]
         }
@@ -317,7 +319,7 @@ internal class OfTypeIterator<T, U> : Iterator<U> {
     val Current: U {
         get {
             if !active {
-                System.Fail("Query iterator has no current element")
+                Panic("Query iterator has no current element")
             }
             return cached[0]
         }
@@ -380,7 +382,7 @@ internal class SelectIterator<T, U> : Iterator<U> {
     val Current: U {
         get {
             if !active {
-                System.Fail("Query iterator has no current element")
+                Panic("Query iterator has no current element")
             }
             return cached[0]
         }
@@ -453,7 +455,7 @@ internal class TakeIterator<T> : Iterator<T> {
     val Current: T {
         get {
             if !active {
-                System.Fail("Query iterator has no current element")
+                Panic("Query iterator has no current element")
             }
             return cached[0]
         }
@@ -531,7 +533,7 @@ internal class SkipIterator<T> : Iterator<T> {
     val Current: T {
         get {
             if !active {
-                System.Fail("Query iterator has no current element")
+                Panic("Query iterator has no current element")
             }
             return cached[0]
         }
@@ -607,7 +609,7 @@ internal class ConcatIterator<T> : Iterator<T> {
     val Current: T {
         get {
             if !active {
-                System.Fail("Query iterator has no current element")
+                Panic("Query iterator has no current element")
             }
             return cached[0]
         }
@@ -693,7 +695,7 @@ internal class FlatMapIterator<T, U> : Iterator<U> {
     val Current: U {
         get {
             if !active {
-                System.Fail("Query iterator has no current element")
+                Panic("Query iterator has no current element")
             }
             return cached[0]
         }

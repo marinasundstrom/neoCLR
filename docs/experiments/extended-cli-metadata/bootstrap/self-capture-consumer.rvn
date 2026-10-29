@@ -21,11 +21,11 @@ func Main() {
     let counter = Counter()
     counter.Start()
     if counter.Count != 0 {
-        System.Fail("Callback ran before draining")
+        Panic("Callback ran before draining")
     }
     TaskQueue.Default.Drain()
     if counter.Count != 42 {
-        System.Fail("Callback lost receiver identity")
+        Panic("Callback lost receiver identity")
     }
     Console.WriteLine("Captured self identity passed")
 }

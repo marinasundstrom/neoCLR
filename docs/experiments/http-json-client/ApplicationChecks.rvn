@@ -5,7 +5,7 @@ import System.Web.Http.*
 
 func Check(condition: bool) {
     if !condition {
-        System.Fail("HTTP JSON domain adapter assertion failed")
+        Panic("HTTP JSON domain adapter assertion failed")
     }
 }
 
@@ -15,17 +15,17 @@ func Main() {
     Check(AdaptClientResult(http) is Failure(AppError.Http(HttpError.TimedOut)))
     Check(AdaptClientResult(json) is Failure(AppError.Json(JsonError.Syntax("invalid"))))
     let Ok(payload) = CreateReport() else {
-        System.Fail("Report creation failed")
+        Panic("Report creation failed")
     }
     let valid: Result<ReportPayload, HttpError | JsonError> = Ok(payload)
     let Ok(actual) = AdaptClientResult(valid) else {
-        System.Fail("Successful payload lost")
+        Panic("Successful payload lost")
     }
     let Ok(expectedText) = JsonSerializer.Serialize(payload) else {
-        System.Fail("Expected report serialization failed")
+        Panic("Expected report serialization failed")
     }
     let Ok(actualText) = JsonSerializer.Serialize(actual) else {
-        System.Fail("Actual report serialization failed")
+        Panic("Actual report serialization failed")
     }
     Check(actualText == expectedText)
     Console.WriteLine("HTTP JSON domain adapter checks passed")

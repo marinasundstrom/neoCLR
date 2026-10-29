@@ -35,20 +35,20 @@ func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
 
 async func Main() -> Task<()> {
     let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) else {
-        System.Fail("Listen failed")
+        Panic("Listen failed")
     }
     let Ok(port) = server.GetLocalPort() else {
-        System.Fail("Port failed")
+        Panic("Port failed")
     }
     Console.WriteLine(port)
     for index in 0..8 {
         let result = await server.ServeOne(Respond)
         if let Failure(_) = result {
             if index < 6 {
-                System.Fail("Valid response failed")
+                Panic("Valid response failed")
             }
         } else if index >= 6 {
-            System.Fail("Invalid response accepted")
+            Panic("Invalid response accepted")
         }
     }
     server.Close()

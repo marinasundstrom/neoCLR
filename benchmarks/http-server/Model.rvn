@@ -13,7 +13,7 @@ public class Person {
 
 func RespondWithPerson(person: Person) -> Result<HttpResponse, HttpError> {
     let Ok(text) = JsonSerializer.Serialize(person) else {
-        System.Fail("JSON serialization failed")
+        Panic("JSON serialization failed")
     }
     let headers = ArrayList<HttpHeader>()
     headers.Add(HttpHeader("Content-Type", "application/json; charset=utf-8"))

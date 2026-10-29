@@ -5,34 +5,34 @@
     "url": "https://github.com/marinasundstrom/neoCLR",
     "revision": "main"
   },
-  "sha256": "d0f387f945fc34286f4c5e91ab30914303f8f7d654881c06b24125ebbe29c63c",
-  "librarySourceRevision": "f44bc190757a1490352b6f4d9319caf60e81af75",
-  "compilerRevision": "34f14c8ce",
+  "sha256": "76219eb73698b38fcb4dff90e4c61366f48d546ad40140a347d297d78505eb3c",
+  "librarySourceRevision": "63d1f2baae0d36462bf3df69d8af903148f51d6f",
+  "compilerRevision": "03ed6b587-panic-working-tree",
   "libraryBuildEvidence": {
     "file": "build-evidence.json",
-    "sha256": "dde7de51be3d89ab519af00bbad09ddfe5a8c621da3156f6613b63a621724e09"
+    "sha256": "06f5438b0aac2bf02d7b9a81d1cffddb2a234ece34cce7b6c26c6ff7b5e3665d"
   },
-  "rendererRevision": "34f14c8ce",
+  "rendererRevision": "b4c5790e1",
   "libraryArtifacts": {
-    "System.Runtime.dll": "34c9f9f563899a59ec9c379c3b1f9be299a8ae1050e566ff3e67b7982644ccf2",
-    "System.Data.dll": "5d0aca5f344c117968d5c6a9ef7dda3edc055cb0d3ad1947555221a7f81c886c",
-    "System.Networking.dll": "863afbf744ce9ba9c4af9df39f2fd5a8a1a9ee8f7e51f60bd813e2f7ac45d2e5",
-    "System.Web.dll": "9868844e659ad48e14d523ea1efe0f7c1f3c6b1f88473ae7a9f539481b1234d6",
-    "Neo.DependencyInjection.Abstractions.dll": "9922c08904ca8b04ddb21b483994155c3e787d96c105b5e16a150fecd2dc8135",
-    "Neo.DependencyInjection.dll": "a417a2063da14a606802bfcc5c730727587b97dff091528ab267301077d44b01",
-    "Neo.Localization.Abstractions.dll": "3a135fbdc37fcdcc1c153511ad68c7f7fa92cf76f2bdfdcf5b1013916c57a472",
-    "Neo.Localization.dll": "c897b2aca576177ea68c6cc0fdc815f3f8f87f13ab43bc861b4192c286a60682",
-    "Neo.Logging.Abstractions.dll": "b8a7f31af6ee404b41b6795378daeff169381702b61e5dba619f1e5fcc3b75bc",
-    "Neo.Logging.dll": "8d6a981626f86dd7346bb8a2edb7cd97c7249c65e530e4e7c971488b85a15fdb",
+    "System.Runtime.dll": "82da5961385534599d5ff456e5659c73b3d18ba13a3234467d7d9a428e50d593",
+    "System.Data.dll": "a341b73dc2b18706e39bfcfe932595a98876e27fef63166f5121797cf17fca7a",
+    "System.Networking.dll": "d4f965e2bd919067a820f07c4a5c930220c3943c4d3212dda05101d790de675a",
+    "System.Web.dll": "817c91f9ae2ddd5f780806acbb374b0c6d67213662f3d0f6d5d55da1f8b78037",
+    "Neo.DependencyInjection.Abstractions.dll": "9fe9bbafae81557e464d26ad1db9f218937461413353d4586bb23ae29d86b73b",
+    "Neo.DependencyInjection.dll": "e28424ae8e953e794fd1174fe5a5d4ab36782f5cf033df49eb96353f3eee6a4f",
+    "Neo.Localization.Abstractions.dll": "69bbccaa580e5dc61721993c4f694d68f253ddc144675a34fde1178e20d1ccb2",
+    "Neo.Localization.dll": "2bdbb1d5080bf455dc1abfb22a1641fdb3932d819d56c8238c5d02eda6a6b69c",
+    "Neo.Logging.Abstractions.dll": "d48030829bba91c6d4cd043679c8547e05c9469772524ad42b4e3fbc78edd21d",
+    "Neo.Logging.dll": "ef87fb34e25e468d011e41277ddce4c74ec0a7107202096d83995803f0be0f76",
     "Neo.Configuration.Abstractions.dll": "615237ff5d50a4ad5bc83046de3c2374c2024ee144426560cb34cf71673a98eb",
-    "Neo.Configuration.dll": "1e40c52105c5f6bb5c384e9ba1f4e588dea7aeb718143f6933669b1d5527d3c1",
-    "Neo.Configuration.Json.dll": "a92782b1cdf94bcc9866b934295d25fac1018844fd738f21aec15ccafed36f79",
-    "System.Data.PostgreSql.dll": "9c338d71cefd23d313baf30ef56d6420d6536110b4a6ea0fa8fd693f5283ef41",
+    "Neo.Configuration.dll": "8e5ddb87ab2e3d32472299bd3fcfa18e6b6427fddb183d1438afcc551f4b07a8",
+    "Neo.Configuration.Json.dll": "c68b8986db9906eeb3976e64e2b89be0cdd6638b332e142c01dab4caa764dbb0",
+    "System.Data.PostgreSql.dll": "292a7ab26e5c8e6bc4d647f418afea327210b6182eb2861cf36a25e6faf4e63c",
     "System.runtime.neox": "0c72a8656e7158d6bb2f31c0b019d8747dd61a6c4127b278155e104de437769b"
   },
   "renderingEvidence": {
     "normalized-sidecars.json": "dbe8731d536d4e645b8929153850b0db47a0a492becb147774145c5e1abdd392",
-    "restored-xml-comments.json": "cbe48479d665b8cb63fc38e4f9da40ed4777047336dd6a9d9d580d52a5cf3353"
+    "restored-xml-comments.json": "a4bde54e304a5dbd120f242e525262087c8b0575d3ff0763450521ceea3009f6"
   },
   "scope": "Reviewed native API rendering; legacy coverage gaps remain explicitly marked by the website overlay."
 }

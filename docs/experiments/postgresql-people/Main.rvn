@@ -39,13 +39,13 @@ async func ReadPeople(port: int) -> Task<Result<unit, SqlError>> {
 
 async func Main(arguments: string[]) -> Task<()> {
     if arguments.Length != 1 {
-        System.Fail("Expected the local PostgreSQL port")
+        Panic("Expected the local PostgreSQL port")
     }
     let Ok(port) = Int32.Parse(arguments[0]) else {
-        System.Fail("Expected an integer port")
+        Panic("Expected an integer port")
     }
     let result = await ReadPeople(port)
     if let Failure(error) = result {
-        System.Fail(error.ToString())
+        Panic(error.ToString())
     }
 }

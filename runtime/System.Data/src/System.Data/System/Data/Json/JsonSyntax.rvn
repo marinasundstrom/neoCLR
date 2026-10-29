@@ -11,7 +11,7 @@ internal class JsonSyntax {
         return match Encodings.Utf8.Encode(text) {
             Ok(let bytes) => bytes
             Failure(_) => {
-                System.Fail("Prevalidated JSON token encoding failed")
+                Panic("Prevalidated JSON token encoding failed")
                 ArrayList<byte>()
             }
         }

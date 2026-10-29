@@ -64,7 +64,7 @@ internal class HttpPersistentRun {
             }
             let result = await listener.Accept(server.StopToken)
             let Ok(socket) = result else {
-                let Failure(error) = result else { System.Fail("Accept outcome") }
+                let Failure(error) = result else { Panic("Accept outcome") }
                 return Failure(HttpError.Transport(error))
             }
             if server.IsClosed { socket.Close(); break }

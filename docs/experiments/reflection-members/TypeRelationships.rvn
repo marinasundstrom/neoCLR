@@ -14,22 +14,22 @@ func Main() {
     let constructed = type.CreateInstance<ConstructedModel>(17)
     if constructed is Ok(let model) {
         if model.Value != 17 || !type.IsInstanceOfType(model) {
-            System.Fail("Typed construction lost the concrete instance")
+            Panic("Typed construction lost the concrete instance")
         }
     } else {
-        System.Fail("Compatible typed construction failed")
+        Panic("Compatible typed construction failed")
     }
     let widened = type.CreateInstance<Object>(42)
     if widened is Ok(let value) {
         if !type.IsInstanceOfType(value) {
-            System.Fail("Object result lost the concrete type")
+            Panic("Object result lost the concrete type")
         }
     } else {
-        System.Fail("Assignable Object result rejected")
+        Panic("Assignable Object result rejected")
     }
     let rejected = type.CreateInstance<string>(17)
     if rejected is not Failure(ReflectionError.InvalidResultType) {
-        System.Fail("Incompatible result type was not rejected")
+        Panic("Incompatible result type was not rejected")
     }
     Console.WriteLine("Typed construction relationship checks passed")
 }

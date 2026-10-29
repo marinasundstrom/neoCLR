@@ -20,7 +20,7 @@ class DuplicateIterator : Iterator<KeyValuePair<string, int>> {
     func MoveNext() -> bool {
         index = index + 1
         if index > 2 {
-            System.Fail("Enumerated beyond duplicate")
+            Panic("Enumerated beyond duplicate")
         }
         return true
     }

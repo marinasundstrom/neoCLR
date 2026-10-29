@@ -45,7 +45,7 @@ public class JsonObject : JsonValue, Map<string, JsonValue> {
                     return values[index]
                 }
             }
-            System.Fail("JsonObject field not found")
+            Panic("JsonObject field not found")
         }
     }
 
@@ -125,7 +125,7 @@ public class JsonArray : JsonValue, Sequence<JsonValue> {
     val self[index: int]: JsonValue {
         get {
             if index < 0 || index >= values.Count {
-                System.Fail("JsonArray index out of range")
+                Panic("JsonArray index out of range")
             }
             return values[index]
         }

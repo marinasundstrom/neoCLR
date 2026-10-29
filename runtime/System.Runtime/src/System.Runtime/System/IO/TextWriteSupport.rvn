@@ -8,24 +8,24 @@ internal class TextWriteSupport {
         return match step.State {
             EncoderState.NeedsOutput => {
                 if step.BytesWritten == 0 {
-                    System.Fail("Encoder made no progress with positive capacity")
+                    Panic("Encoder made no progress with positive capacity")
                 }
                 false
             }
             EncoderState.Ready => {
                 if finishing {
-                    System.Fail("Final input did not finalize encoder")
+                    Panic("Final input did not finalize encoder")
                 }
                 true
             }
             EncoderState.Finished => {
                 if !finishing {
-                    System.Fail("Encoder finalized nonfinal input")
+                    Panic("Encoder finalized nonfinal input")
                 }
                 true
             }
             _ => {
-                System.Fail("Invalid encoder state")
+                Panic("Invalid encoder state")
                 false
             }
         }

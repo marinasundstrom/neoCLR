@@ -20,7 +20,7 @@ import System.Result.*
 import System.Optional.*
 import System.Console.*
 public func Check(value: bool) {
-    if !value { System.Fail("Async assertion failed") }
+    if !value { System.Panic("Async assertion failed") }
 }
 '''
 cases = {
@@ -101,7 +101,7 @@ public async func Read(input: Task<Result<int, string>>) -> Task<Result<int, str
         source.Complete(Failure("Unavailable"))
     })
     match answer.GetResult() {
-        Ok(_) => System.Fail("Failure was lost")
+        Ok(_) => System.Panic("Failure was lost")
         Failure(let message) => Check(message == "Unavailable")
     }
 '''),
@@ -150,7 +150,7 @@ public async func Read(initial: Result<int, string>, input: Task<int>) -> Task<R
     Check(answer.IsCompleted)
     Check(!input.Task.IsCompleted)
     match answer.GetResult() {
-        Ok(_) => System.Fail("Failure was lost")
+        Ok(_) => System.Panic("Failure was lost")
         Failure(let message) => Check(message == "early")
     }
 ''')
@@ -212,8 +212,8 @@ for timing in ('immediate', 'resumed'):
     for outcome in ('Ok', 'Error', 'Cancelled'):
         complete = {'Ok': 'source.Complete(Ok(41))', 'Error': 'source.Complete(Failure("unavailable"))', 'Cancelled': 'source.Cancel()'}[outcome]
         check = {
-            'Ok': 'if answer.GetResult() is Ok(let value) { Check(value == 42) } else { System.Fail("Expected Ok") }',
-            'Error': 'if answer.GetResult() is Failure(let message) { Check(message == "unavailable") } else { System.Fail("Expected Error") }',
+            'Ok': 'if answer.GetResult() is Ok(let value) { Check(value == 42) } else { System.Panic("Expected Ok") }',
+            'Error': 'if answer.GetResult() is Failure(let message) { Check(message == "unavailable") } else { System.Panic("Expected Error") }',
             'Cancelled': 'Check(answer.IsCancelled)',
         }[outcome]
         cases[f'{timing} combined awaited propagation {outcome}'] = ("""
@@ -237,7 +237,7 @@ public async func Read(input: Task<Result<int, string>>) -> Task<Result<int, str
 for timing in ('immediate', 'resumed'):
     for outcome in ('Some', 'None'):
         complete = 'source.Complete(Some(41))' if outcome == 'Some' else 'source.Complete(None)'
-        check = ('if answer.GetResult() is Some(let value) { Check(value == 42) } else { System.Fail("Expected Some") }'
+        check = ('if answer.GetResult() is Some(let value) { Check(value == 42) } else { System.Panic("Expected Some") }'
                  if outcome == 'Some' else 'Check(answer.GetResult() is None)')
         cases[f'{timing} combined awaited Option propagation {outcome}'] = ("""
 public async func Read(input: Task<Optional<int>>) -> Task<Optional<int>> {

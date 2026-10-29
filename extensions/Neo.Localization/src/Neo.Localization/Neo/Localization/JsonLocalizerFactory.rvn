@@ -57,7 +57,7 @@ internal class LazyJsonLocalizer : Localizer {
     private func Load() -> Localizer {
         if loaded is Some(let value) { return value }
         let Ok(value) = provider.Load(Culture, resourceType) else {
-            System.Fail("Unable to load localization resources; use JsonLocalizerProvider.Load to handle loading errors")
+            Panic("Unable to load localization resources; use JsonLocalizerProvider.Load to handle loading errors")
             return self
         }
         loaded = Some(value)

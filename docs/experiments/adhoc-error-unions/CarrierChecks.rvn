@@ -4,7 +4,7 @@ import System.Storage.*
 
 func Check(value: bool) {
     if !value {
-        System.Fail("ad-hoc union carrier check failed")
+        Panic("ad-hoc union carrier check failed")
     }
 }
 
@@ -23,7 +23,7 @@ func Main() {
                 Check(fileError is FileReadError.NotFound)
             }
         }
-        Ok(_) => System.Fail("file failure was lost")
+        Ok(_) => Panic("file failure was lost")
     }
     match Combine(Ok(2), "invalid") {
         Failure(let error) => {
@@ -32,7 +32,7 @@ func Main() {
                 Check(parseError is NumberParseError.InvalidFormat)
             }
         }
-        Ok(_) => System.Fail("parse failure was lost")
+        Ok(_) => Panic("parse failure was lost")
     }
     let three: int | bool | string = 42
     let four: int | bool | string | FileReadError = true

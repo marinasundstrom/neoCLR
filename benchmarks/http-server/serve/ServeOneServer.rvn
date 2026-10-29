@@ -42,7 +42,7 @@ class ServingLoop {
         // Exercise a genuinely queued await without imposing an artificial timer.
         let resumed = await Task.Run(() => 1)
         if resumed != 1 {
-            System.Fail("Handler continuation failed")
+            Panic("Handler continuation failed")
         }
         stopping = request.Target == "/stop"
         let size = if stopping { 0 } else if request.Target == "/bulk" { 8192 } else { 10 }
@@ -82,16 +82,16 @@ async func Main(arguments: string[]) -> Task<()> {
         }
     }
     if workerCount == 0 {
-        System.Fail("Worker count must be 1, 4 or 16")
+        Panic("Worker count must be 1, 4 or 16")
     }
     let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 64) else {
-        System.Fail("Listen failed")
+        Panic("Listen failed")
     }
     let Ok(port) = server.GetLocalPort() else {
-        System.Fail("Port failed")
+        Panic("Port failed")
     }
-    let Ok(control) = Socket.Listen("127.0.0.1", 0, 1) else { System.Fail("Control failed") }
-    let Ok(controlPort) = control.GetLocalPort() else { System.Fail("Control port failed") }
+    let Ok(control) = Socket.Listen("127.0.0.1", 0, 1) else { Panic("Control failed") }
+    let Ok(controlPort) = control.GetLocalPort() else { Panic("Control port failed") }
     let state = LoadState(server)
     let workers = ArrayList<Task<()>>()
     var index = 0
@@ -101,7 +101,7 @@ async func Main(arguments: string[]) -> Task<()> {
     }
     Console.WriteLine(port)
     Console.WriteLine(controlPort)
-    let Ok(signal) = await control.Accept() else { System.Fail("Control accept failed") }
+    let Ok(signal) = await control.Accept() else { Panic("Control accept failed") }
     signal.Close()
     control.Close()
     server.Close()

@@ -109,15 +109,15 @@ def main():
     import System.Result.*
     func Main() {
         let Ok(parser) = AppRoutesParser.Create() else {
-            System.Fail("Creation failed")
+            System.Panic("Creation failed")
             return
         }
         let Ok(AppRoutes.OwnerItem(id, name)) = parser.Parse("/owners/Caf%C3%A9/items/42") else {
-            System.Fail("Mixed route missing")
+            System.Panic("Mixed route missing")
             return
         }
         if id != 42 || name != "Café" {
-            System.Fail("Name binding failed")
+            System.Panic("Name binding failed")
             return
         }
         Console.WriteLine("Mixed route checks passed")
@@ -144,7 +144,7 @@ def main():
             if args.schema and reason not in args.schema:
                 continue
             (root / 'Routes.rvn').write_text(source)
-            (root / 'Main.rvn').write_text('import System.*\nimport System.Result.*\nfunc Main() {\n    if AppRoutesParser.Create() is Ok(_) {\n        System.Fail("Invalid schema was accepted")\n    }\n    Console.WriteLine("Schema rejected at startup")\n}\n')
+            (root / 'Main.rvn').write_text('import System.*\nimport System.Result.*\nfunc Main() {\n    if AppRoutesParser.Create() is Ok(_) {\n        System.Panic("Invalid schema was accepted")\n    }\n    Console.WriteLine("Schema rejected at startup")\n}\n')
             if reason == 'unsupported type':
                 result = run(['dotnet', 'msbuild', str(app), '-nologo', '-v:minimal', '-t:NeoCLRImport'], env, success=False)
                 assert 'Unsupported application type: AppRoutes' in result.stdout + result.stderr

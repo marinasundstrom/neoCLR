@@ -17,7 +17,7 @@ import System.Concurrency.Tasks.*
 import System.Result.*
 import System.Console.*
 func Check(value: bool) {
-    if !value { System.Fail("MapResult assertion failed") }
+    if !value { System.Panic("MapResult assertion failed") }
 }
 """
 cases = [
@@ -40,7 +40,7 @@ cases = [
     let source = Promise<Result<int, string>>()
     source.Complete(Failure("unavailable"))
     let mapped = source.Task.MapResult<int>(value => {
-        System.Fail("Error invoked mapper")
+        System.Panic("Error invoked mapper")
         return value + 1
     })
     Check(!mapped.IsCompleted)
@@ -51,7 +51,7 @@ cases = [
     ('Cancellation bypasses mapper', '', """
     let source = Promise<Result<int, string>>()
     let mapped = source.Task.MapResult<int>(value => {
-        System.Fail("Cancellation invoked mapper")
+        System.Panic("Cancellation invoked mapper")
         return value + 1
     })
     mapped.OnCompleted(() => { Check(mapped.IsCancelled); WriteLine("cancelled") })
@@ -99,7 +99,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-mapresult-') as directory:
 func Main() {
     let source = Promise<Result<int, string>>()
     source.Task.MapResult<int>(value => {
-        System.Fail("MapResult mapper fault")
+        System.Panic("MapResult mapper fault")
         return value
     })
     source.Complete(Ok(42))

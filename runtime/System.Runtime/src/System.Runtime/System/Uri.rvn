@@ -1,5 +1,7 @@
 module System
 
+import System.*
+
 import System.Result.*
 
 // Bounded ASCII URI-reference grammar; parsing performs no I/O.
@@ -34,7 +36,7 @@ public class Uri : EquatableTo<Uri> {
         if let Ok(part) = text.SliceUtf8(start, end - start) {
             return part
         }
-        System.Fail("Invalid internal URI boundary")
+        Panic("Invalid internal URI boundary")
         return ""
     }
 

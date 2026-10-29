@@ -26,11 +26,11 @@ func Main() -> int {
         _ = source.Complete(counter)
     })
     if counter.Value != 10 {
-        System.Fail("Explicit queue continuation ran on the wrong queue")
+        Panic("Explicit queue continuation ran on the wrong queue")
     }
     defaultQueue.Drain()
     if counter.Value != 11 || !Object.ReferenceEquals(defaultQueue, TaskQueue.Default) {
-        System.Fail("Default queue identity or delivery changed")
+        Panic("Default queue identity or delivery changed")
     }
     return 0
 }

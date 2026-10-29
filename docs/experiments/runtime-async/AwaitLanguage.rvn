@@ -39,14 +39,14 @@ module RuntimeAwaitLanguage {
 
         func Cancel() -> System.Void {
             if !neoCLR.Runtime.RuntimeAsyncCancel(handle) {
-                System.Fail("Operation cancellation rejected")
+                Panic("Operation cancellation rejected")
             }
             return ()
         }
 
         func Complete() -> System.Void {
             if !neoCLR.Runtime.RuntimeAsyncComplete(handle, 17) {
-                System.Fail("Operation completion rejected")
+                Panic("Operation completion rejected")
             }
             return ()
         }
@@ -130,7 +130,7 @@ module RuntimeAwaitLanguage {
         }
         let cancelled = await observer.Task
         if !cancelled || operation.ResultReads != 0 {
-            System.Fail("Cancellation did not propagate without reading a result")
+            Panic("Cancellation did not propagate without reading a result")
         }
         return ()
     }
@@ -146,20 +146,20 @@ module RuntimeAwaitLanguage {
         _ = neoCLR.Runtime.SchedulerSubmit(pending.Complete)
         let result = await task
         if result != 42 {
-            System.Fail("Ordinary await lost the result")
+            Panic("Ordinary await lost the result")
         }
         let repeated = await pending
         if repeated != 17 {
-            System.Fail("Repeated await lost the result")
+            Panic("Repeated await lost the result")
         }
         if pending.Registrations != 1 {
-            System.Fail("Completed fast path registered a callback")
+            Panic("Completed fast path registered a callback")
         }
         let racing = Operation(neoCLR.Runtime.RuntimeAsyncCreate())
         racing.CompleteOnRegistration = true
         let raceResult = await racing
         if raceResult != 17 || racing.Registrations != 1 {
-            System.Fail("Completion between readiness check and registration was lost")
+            Panic("Completion between readiness check and registration was lost")
         }
         let cancelled = Operation(neoCLR.Runtime.RuntimeAsyncCreate())
         await CheckCancellation(cancelled, true)
@@ -167,7 +167,7 @@ module RuntimeAwaitLanguage {
         alreadyCancelled.Cancel()
         await CheckCancellation(alreadyCancelled, false)
         if alreadyCancelled.Registrations != 0 {
-            System.Fail("Already cancelled await registered a callback")
+            Panic("Already cancelled await registered a callback")
         }
         let cancellationRace = Operation(neoCLR.Runtime.RuntimeAsyncCreate())
         cancellationRace.CancelOnRegistration = true
@@ -175,25 +175,25 @@ module RuntimeAwaitLanguage {
         // A cancelled operation must not cancel this invocation or unrelated work.
         let stillWorks = await pending
         if stillWorks != 17 {
-            System.Fail("Cancellation corrupted an independent operation")
+            Panic("Cancellation corrupted an independent operation")
         }
         let unitBody = UnitBody(neoCLR.Runtime.RuntimeAsyncCreate())
         let unitHandle = neoCLR.Runtime.RuntimeAsyncStart(unitBody.Run)
         if unitBody.Phase != 1 {
-            System.Fail("Unit body did not run until suspension")
+            Panic("Unit body did not run until suspension")
         }
         let unitOperation = UnitOperation(unitHandle)
         let unitTask = ReadUnit(unitOperation)
         if !neoCLR.Runtime.RuntimeAsyncCompleteUnit(unitBody.Gate) {
-            System.Fail("Unit gate completion failed")
+            Panic("Unit gate completion failed")
         }
         await unitTask
         await unitOperation
         if unitBody.Phase != 2 {
-            System.Fail("Unit body did not resume")
+            Panic("Unit body did not resume")
         }
         if !neoCLR.Runtime.RuntimeAsyncRelease(unitHandle) {
-            System.Fail("Unit operation could not be released after observation")
+            Panic("Unit operation could not be released after observation")
         }
         Console.WriteLine("PASS ordinary Raven await through runtime suspension adapter")
         return 0

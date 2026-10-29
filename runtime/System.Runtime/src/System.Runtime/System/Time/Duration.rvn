@@ -64,7 +64,7 @@ public struct Duration : ComparableTo<Duration>, EquatableTo<Duration>, Formatta
     private func FormatDuration(format: string, separator: string) -> string {
         let constant = format == "" || format == "c" || format == "t" || format == "T"
         if !constant && format != "g" && format != "G" {
-            System.Fail("Unsupported Duration format")
+            Panic("Unsupported Duration format")
         }
         // Split before negating: Int64.MinValue itself cannot be made positive.
         var days = StoredTicks / 864000000000L

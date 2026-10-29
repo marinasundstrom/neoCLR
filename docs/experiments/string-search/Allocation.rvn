@@ -13,7 +13,7 @@ func Main(args: string[]) {
                 && "ΣKẞ".EndsWith("ςkß", StringComparison.OrdinalIgnoreCase)
         }
         if !result {
-            System.Fail("Search allocation fixture")
+            Panic("Search allocation fixture")
         }
         count += 1
     }

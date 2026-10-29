@@ -1,7 +1,7 @@
 import System.*
 
 func Stop(message: string) {
-    System.Fail(message)
+    Panic(message)
 }
 
 func Forward(message: string) {

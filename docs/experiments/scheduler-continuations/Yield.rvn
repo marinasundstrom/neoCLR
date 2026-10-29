@@ -18,7 +18,7 @@ module SchedulerContinuations {
 
         func Second() -> System.Void {
             if !markerRan {
-                System.Fail("Batch did not yield to older runnable work")
+                Panic("Batch did not yield to older runnable work")
             }
             Done.Complete(42)
             return ()
@@ -34,7 +34,7 @@ module SchedulerContinuations {
         operation.Publish()
         let result = await check.Done.Task
         if result != 42 {
-            System.Fail("Yield check lost result")
+            Panic("Yield check lost result")
         }
         Console.WriteLine("PASS batch yields between observers to older runnable work")
         return 0

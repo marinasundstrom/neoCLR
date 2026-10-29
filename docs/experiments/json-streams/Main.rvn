@@ -6,7 +6,7 @@ import System.Text.*
 
 func Check(condition: bool) {
     if !condition {
-        System.Fail("JSON stream contract failed")
+        Panic("JSON stream contract failed")
     }
 }
 
@@ -122,7 +122,7 @@ func RoundTrip(text: string) -> Result<string, string> {
 func ReadFailure(input: ShortInput, expected: string) {
     match JsonSerializer.Deserialize(input) {
         Failure(let error) => Check(error == expected)
-        Ok(_) => System.Fail("Invalid input accepted")
+        Ok(_) => Panic("Invalid input accepted")
     }
     Check(!input.Closed)
     input.Close()
@@ -135,120 +135,120 @@ func MemoryContracts() {
     let seek: SeekableStream = memory
     let data: byte[] = [(byte)65, (byte)66, (byte)67]
     let Ok(initial) = memory.GetLength() else {
-        System.Fail("Missing length")
+        Panic("Missing length")
         return
     }
     Check(initial == 0)
     let Ok(written) = output.Write(data, 0, 3) else {
-        System.Fail("Memory write failed")
+        Panic("Memory write failed")
         return
     }
     Check(written == 3)
     let Ok(_) = seek.Seek(1) else {
-        System.Fail("Seek failed")
+        Panic("Seek failed")
         return
     }
     let Ok(_) = output.Write(data, 0, 1) else {
-        System.Fail("Overwrite failed")
+        Panic("Overwrite failed")
         return
     }
     let Ok(_) = seek.Seek(5) else {
-        System.Fail("Gap seek failed")
+        Panic("Gap seek failed")
         return
     }
     let Ok(_) = output.Write(data, 0, 0) else {
-        System.Fail("Empty write failed")
+        Panic("Empty write failed")
         return
     }
     let Ok(before) = memory.GetLength() else {
-        System.Fail("Missing length")
+        Panic("Missing length")
         return
     }
     Check(before == 3)
     let Ok(_) = output.Write(data, 2, 1) else {
-        System.Fail("Gap write failed")
+        Panic("Gap write failed")
         return
     }
     let Ok(_) = seek.Seek(0) else {
-        System.Fail("Rewind failed")
+        Panic("Rewind failed")
         return
     }
     let buffer: byte[] = [(byte)9, (byte)9, (byte)9, (byte)9, (byte)9, (byte)9, (byte)9, (byte)9]
     let Ok(read) = input.Read(buffer, 1, 7) else {
-        System.Fail("Read failed")
+        Panic("Read failed")
         return
     }
     Check(read == 6 && buffer[0] == 9 && buffer[7] == 9)
     Check(buffer[1] == 65 && buffer[2] == 65 && buffer[3] == 67)
     Check(buffer[4] == 0 && buffer[5] == 0 && buffer[6] == 67)
     let Ok(eof) = input.Read(buffer, 0, 1) else {
-        System.Fail("EOF failed")
+        Panic("EOF failed")
         return
     }
     Check(eof == 0)
     match output.Write(data, 2147483647, 1) {
         Failure(let error) => Check(error is StreamError.InvalidRange)
-        Ok(_) => System.Fail("Invalid write accepted")
+        Ok(_) => Panic("Invalid write accepted")
     }
     match input.Read(buffer, -1, 1) {
         Failure(let error) => Check(error is StreamError.InvalidRange)
-        Ok(_) => System.Fail("Invalid read accepted")
+        Ok(_) => Panic("Invalid read accepted")
     }
     match seek.Seek(-1) {
         Failure(let error) => Check(error is StreamError.InvalidRange)
-        Ok(_) => System.Fail("Negative seek accepted")
+        Ok(_) => Panic("Negative seek accepted")
     }
     match seek.Seek(65537) {
         Failure(let error) => Check(error is StreamError.LimitExceeded)
-        Ok(_) => System.Fail("Oversized seek accepted")
+        Ok(_) => Panic("Oversized seek accepted")
     }
     let Ok(position) = seek.GetPosition() else {
-        System.Fail("Missing position")
+        Panic("Missing position")
         return
     }
     Check(position == 6)
     let Ok(_) = seek.Seek(65536) else {
-        System.Fail("Boundary seek failed")
+        Panic("Boundary seek failed")
         return
     }
     match output.Write(data, 0, 1) {
         Failure(let error) => Check(error is StreamError.LimitExceeded)
-        Ok(_) => System.Fail("Oversized write accepted")
+        Ok(_) => Panic("Oversized write accepted")
     }
     let Ok(length) = memory.GetLength() else {
-        System.Fail("Missing length")
+        Panic("Missing length")
         return
     }
     Check(length == 6)
     let Ok(_) = output.Flush() else {
-        System.Fail("Flush failed")
+        Panic("Flush failed")
         return
     }
     input.Close()
     output.Close()
     match memory.GetLength() {
         Failure(let error) => Check(error is StreamError.Closed)
-        Ok(_) => System.Fail("Closed length accepted")
+        Ok(_) => Panic("Closed length accepted")
     }
     match seek.GetPosition() {
         Failure(let error) => Check(error is StreamError.Closed)
-        Ok(_) => System.Fail("Closed position accepted")
+        Ok(_) => Panic("Closed position accepted")
     }
     match output.Write(data, 0, 0) {
         Failure(let error) => Check(error is StreamError.Closed)
-        Ok(_) => System.Fail("Closed write accepted")
+        Ok(_) => Panic("Closed write accepted")
     }
     match input.Read(buffer, 0, 0) {
         Failure(let error) => Check(error is StreamError.Closed)
-        Ok(_) => System.Fail("Closed read accepted")
+        Ok(_) => Panic("Closed read accepted")
     }
     match output.Flush() {
         Failure(let error) => Check(error is StreamError.Closed)
-        Ok(_) => System.Fail("Closed flush accepted")
+        Ok(_) => Panic("Closed flush accepted")
     }
     match seek.Seek(0) {
         Failure(let error) => Check(error is StreamError.Closed)
-        Ok(_) => System.Fail("Closed seek accepted")
+        Ok(_) => Panic("Closed seek accepted")
     }
 }
 
@@ -257,35 +257,35 @@ func Main() {
     let text = "{\"station\":\"Café 😀\",\"readings\":[21,22.5],\"ready\":true,\"note\":null}"
     match RoundTrip(text) {
         Ok(let result) => Console.WriteLine(result)
-        Failure(let error) => System.Fail(error)
+        Failure(let error) => Panic(error)
     }
     let Ok(value) = JsonSerializer.Deserialize("[1,2]") else {
-        System.Fail("Could not create test value")
+        Panic("Could not create test value")
         return
     }
     let failed = ShortOutput(2, false)
     match JsonSerializer.Serialize(failed, value) {
         Failure(let error) => Check(error == "Write: AccessDenied")
-        Ok(_) => System.Fail("Output failure lost")
+        Ok(_) => Panic("Output failure lost")
     }
     Check(failed.Count == 2 && !failed.Closed && failed.Flushes == 0)
     failed.Close()
     let zero = ShortOutput(-1, true)
     match JsonSerializer.Serialize(zero, value) {
         Failure(let error) => Check(error == "Write: IoFailure")
-        Ok(_) => System.Fail("Zero-progress output accepted")
+        Ok(_) => Panic("Zero-progress output accepted")
     }
     Check(!zero.Closed && zero.Count == 0)
     zero.Close()
     let cycle = JsonValue.ArrayValue()
     let Ok(_) = cycle.Add(cycle) else {
-        System.Fail("Could not create cycle")
+        Panic("Could not create cycle")
         return
     }
     let untouched = ShortOutput(-1, false)
     match JsonSerializer.Serialize(untouched, cycle) {
         Failure(_) => Check(untouched.Count == 0 && !untouched.Closed)
-        Ok(_) => System.Fail("Cycle accepted")
+        Ok(_) => Panic("Cycle accepted")
     }
     untouched.Close()
     ReadFailure(ShortInput(Utf8.Encode("{}"), 1), "Read: IoFailure")
@@ -301,7 +301,7 @@ func Main() {
     let malformed = ShortInput(Utf8.Encode("[1,"), -1)
     match JsonSerializer.Deserialize(malformed) {
         Failure(_) => Check(!malformed.Closed)
-        Ok(_) => System.Fail("Truncated JSON accepted")
+        Ok(_) => Panic("Truncated JSON accepted")
     }
     malformed.Close()
     var padding = ""
@@ -311,7 +311,7 @@ func Main() {
     let boundary = "\"" + padding + "\""
     match RoundTrip(boundary) {
         Ok(_) => {}
-        Failure(let error) => System.Fail(error)
+        Failure(let error) => Panic(error)
     }
     Console.WriteLine("JSON stream checks passed")
 }

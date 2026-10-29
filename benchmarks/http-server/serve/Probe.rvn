@@ -9,7 +9,7 @@ import System.Result.*
 import System.Web.Http.*
 
 func Check(value: bool) {
-    if !value { System.Fail("Serve contract failed") }
+    if !value { Panic("Serve contract failed") }
 }
 
 class OwnedInput : InputStream {
@@ -54,7 +54,7 @@ class Application {
     func ReleaseOne(late: bool) {
         let response = HttpResponse(200, ArrayList<HttpHeader>(), HttpMemoryContent([(byte)120]))
         if late {
-            let Ok(content) = HttpStreamContent.Create(OwnedInput(self), 1, false) else { System.Fail("Content failed") }
+            let Ok(content) = HttpStreamContent.Create(OwnedInput(self), 1, false) else { Panic("Content failed") }
             response.Respond(HttpStatusCode.OK, content)
         }
         _ = Gates[Released].Complete(Ok(response))
@@ -73,10 +73,10 @@ func Outcome(task: Task<Result<System.Void, HttpError>>) -> Task<bool> {
 }
 
 async func Main() -> Task<()> {
-    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 64) else { System.Fail("Listen failed") }
-    let Ok(control) = Socket.Listen("127.0.0.1", 0, 1) else { System.Fail("Control failed") }
-    let Ok(port) = server.GetLocalPort() else { System.Fail("Port failed") }
-    let Ok(controlPort) = control.GetLocalPort() else { System.Fail("Port failed") }
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 64) else { Panic("Listen failed") }
+    let Ok(control) = Socket.Listen("127.0.0.1", 0, 1) else { Panic("Control failed") }
+    let Ok(port) = server.GetLocalPort() else { Panic("Port failed") }
+    let Ok(controlPort) = control.GetLocalPort() else { Panic("Port failed") }
     let application = Application(server)
     let cancellation = CancellationTokenSource()
     let preCancelled = CancellationTokenSource()
@@ -90,7 +90,7 @@ async func Main() -> Task<()> {
     Check((await server.ServeOne(application.Respond)) is Error(HttpError.InvalidRequest(_)))
     Console.WriteLine(port)
     Console.WriteLine(controlPort)
-    let Ok(signal) = await control.Accept() else { System.Fail("Control failed") }
+    let Ok(signal) = await control.Accept() else { Panic("Control failed") }
     let buffer: byte[] = [(byte)0]
     while true {
         Check((await signal.Receive(((Memory<byte>)buffer).Slice(0, 1))) is Ok(1))

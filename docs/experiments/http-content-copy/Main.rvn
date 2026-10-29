@@ -5,14 +5,14 @@ import System.Result.*
 import System.Web.Http.*
 
 func Check(value: bool) {
-    if !value { System.Fail("HTTP content copy contract failed") }
+    if !value { Panic("HTTP content copy contract failed") }
 }
 
 async func Main(arguments: string[]) -> Task<()> {
     let client = HttpClient()
     for mode in 0..5 {
-        let Ok(request) = HttpRequest.Get(arguments[0]) else { System.Fail("Invalid address") }
-        let Ok(response) = await client.Send(request, HttpCompletionOption.ResponseHeadersRead) else { System.Fail("Headers failed") }
+        let Ok(request) = HttpRequest.Get(arguments[0]) else { Panic("Invalid address") }
+        let Ok(response) = await client.Send(request, HttpCompletionOption.ResponseHeadersRead) else { Panic("Headers failed") }
         Check(!response.Content.IsBuffered)
         let destination = MemoryStream()
         Console.WriteLine("HEADERS")

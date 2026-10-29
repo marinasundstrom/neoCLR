@@ -1,5 +1,7 @@
 module System
 
+import System.*
+
 import System.Result.*
 
 public struct Int64 : Number, Formattable, EquatableTo<long> {
@@ -22,7 +24,7 @@ public struct Int64 : Number, Formattable, EquatableTo<long> {
         if status == 2 {
             return Failure(NumberParseError.Overflow())
         }
-        System.Fail("invalid native parse status")
+        Panic("invalid native parse status")
         return Failure(NumberParseError.InvalidFormat())
     }
 

@@ -3,6 +3,6 @@ import System.Concurrency.Tasks.*
 
 func Main() {
     TaskQueue.Default.Post(() => {
-        System.Fail("Queued callback fault")
+        Panic("Queued callback fault")
     })
 }

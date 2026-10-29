@@ -16,7 +16,7 @@ module RuntimeAsyncAwaitProbe {
             System.Runtime.GC.Collect()
             Value = 25
             if !neoCLR.Runtime.RuntimeAsyncComplete(Operation, 17) {
-                System.Fail("Completion rejected")
+                Panic("Completion rejected")
             }
             return ()
         }
@@ -37,7 +37,7 @@ module RuntimeAsyncAwaitProbe {
             _ = neoCLR.Runtime.RuntimeAsyncComplete(Parent, 17)
             let reply = neoCLR.Runtime.RuntimeAsyncAwait(Reply)
             if reply != 25 {
-                System.Fail("Detached callback lost parent reply")
+                Panic("Detached callback lost parent reply")
             }
             System.Runtime.GC.Collect()
             _ = neoCLR.Runtime.RuntimeAsyncComplete(Done, 42)
@@ -56,7 +56,7 @@ module RuntimeAsyncAwaitProbe {
         func RunAndCheckWaiter() -> int {
             let result = Run()
             if neoCLR.Runtime.RuntimeAsyncRelease(Gate) {
-                System.Fail("Release retracted a parked waiter's result")
+                Panic("Release retracted a parked waiter's result")
             }
             return result
         }
@@ -80,36 +80,36 @@ module RuntimeAsyncAwaitProbe {
         let producer = Producer(neoCLR.Runtime.RuntimeAsyncCreate())
         _ = neoCLR.Runtime.SchedulerSubmit(producer.Complete)
         if Nested(producer) != 49 {
-            System.Fail("Suspended call chain lost its state")
+            Panic("Suspended call chain lost its state")
         }
 
         let completed = neoCLR.Runtime.RuntimeAsyncCreate()
         _ = neoCLR.Runtime.RuntimeAsyncComplete(completed, 42)
         if neoCLR.Runtime.RuntimeAsyncAwait(completed) != 42 {
-            System.Fail("Already completed operation lost its result")
+            Panic("Already completed operation lost its result")
         }
         let exchange = Exchange(neoCLR.Runtime.RuntimeAsyncCreate(),
             neoCLR.Runtime.RuntimeAsyncCreate(), neoCLR.Runtime.RuntimeAsyncCreate())
         _ = neoCLR.Runtime.SchedulerSubmit(exchange.Run)
         if neoCLR.Runtime.RuntimeAsyncAwait(exchange.Parent) != 17 {
-            System.Fail("Parent failed to resume independently")
+            Panic("Parent failed to resume independently")
         }
         System.Runtime.GC.Collect()
         _ = neoCLR.Runtime.RuntimeAsyncComplete(exchange.Reply, 25)
         if neoCLR.Runtime.RuntimeAsyncAwait(exchange.Done) != 42 {
-            System.Fail("Detached callback failed to resume")
+            Panic("Detached callback failed to resume")
         }
         let body = AsyncBody(neoCLR.Runtime.RuntimeAsyncCreate())
         let invocation = neoCLR.Runtime.RuntimeAsyncStart(body.Run)
         if body.Phase != 1 {
-            System.Fail("Async body did not run until its first suspension")
+            Panic("Async body did not run until its first suspension")
         }
         _ = neoCLR.Runtime.RuntimeAsyncComplete(body.Gate, 0)
         if neoCLR.Runtime.RuntimeAsyncAwait(invocation) != 42 || body.Phase != 2 {
-            System.Fail("Async body did not publish its result")
+            Panic("Async body did not publish its result")
         }
         if neoCLR.Runtime.RuntimeAsyncAwait(invocation) != 42 {
-            System.Fail("Repeated await lost the completed result")
+            Panic("Repeated await lost the completed result")
         }
 
         let shared = neoCLR.Runtime.RuntimeAsyncCreate()
@@ -121,10 +121,10 @@ module RuntimeAsyncAwaitProbe {
         _ = neoCLR.Runtime.RuntimeAsyncAwait(firstTask)
         _ = neoCLR.Runtime.RuntimeAsyncAwait(secondTask)
         if !neoCLR.Runtime.RuntimeAsyncRelease(shared) {
-            System.Fail("Completed operation could not be released")
+            Panic("Completed operation could not be released")
         }
         if neoCLR.Runtime.RuntimeAsyncAwait(firstTask) + neoCLR.Runtime.RuntimeAsyncAwait(secondTask) != 84 {
-            System.Fail("Shared operation did not complete both bodies")
+            Panic("Shared operation did not complete both bodies")
         }
         Console.WriteLine("PASS runtime-owned operation suspension and resumption")
         return 0

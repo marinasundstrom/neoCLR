@@ -21,7 +21,7 @@ class Observer {
 
 func Require(condition: bool) {
     if !condition {
-        System.Fail("Task completion contract failed")
+        Panic("Task completion contract failed")
     }
 }
 
@@ -160,7 +160,7 @@ async func Main() -> Task<()> {
             Require(owner.Value == 42 && nested.Owner.Value == 42)
             Require(nested.Number == 17 && number == 123456789L && text == "retained")
         } else {
-            System.Fail("Promise union payload lost")
+            Panic("Promise union payload lost")
         }
         var copy = await valueTask
         Require(copy.Number == 7 && copy.Owner.Value == 31)

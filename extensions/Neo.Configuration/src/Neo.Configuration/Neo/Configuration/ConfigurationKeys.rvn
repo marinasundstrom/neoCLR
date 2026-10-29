@@ -7,7 +7,7 @@ import System.Result.*
 internal static class ConfigurationKeys {
     static func Slice(text: string, start: int, count: int) -> string {
         if text.SliceUtf8(start, count) is Ok(let value) { return value }
-        System.Fail("Invalid configuration path boundary")
+        Panic("Invalid configuration path boundary")
         return ""
     }
 

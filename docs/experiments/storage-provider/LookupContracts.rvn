@@ -12,31 +12,31 @@ func LookupCases(provider: StorageProvider) {
     match provider.GetFile(RequirePath("/missing")) {
         Failure(let error) => {
             if !(error is System.Storage.StorageLookupError.NotFound) {
-                System.Fail("Missing lookup did not return NotFound")
+                Panic("Missing lookup did not return NotFound")
             }
         }
-        Ok(_) => System.Fail("Lookup created a missing file")
+        Ok(_) => Panic("Lookup created a missing file")
     }
     match provider.GetFile(RequirePath("/")) {
         Failure(let error) => {
             if !(error is System.Storage.StorageLookupError.WrongKind) {
-                System.Fail("Directory lookup did not return WrongKind")
+                Panic("Directory lookup did not return WrongKind")
             }
         }
-        Ok(_) => System.Fail("Directory returned as file")
+        Ok(_) => Panic("Directory returned as file")
     }
     let directory = ProviderDirectory(provider, RequirePath("/"))
     match directory.GetFile("../escape") {
         Failure(let error) => {
             if !(error is System.Storage.StorageLookupError.InvalidPath) {
-                System.Fail("Invalid child has wrong lookup error")
+                Panic("Invalid child has wrong lookup error")
             }
         }
-        Ok(_) => System.Fail("Lookup bypassed child validation")
+        Ok(_) => Panic("Lookup bypassed child validation")
     }
     match provider.WriteText(RequirePath("/lookup.txt"), "found", 5) {
         Ok(_) => { }
-        Failure(let error) => System.Fail(error.ToString())
+        Failure(let error) => Panic(error.ToString())
     }
     // Repeat lookup to check stable descriptor construction.
     var index = 0
@@ -44,10 +44,10 @@ func LookupCases(provider: StorageProvider) {
         match directory.GetFile("lookup.txt") {
             Ok(let file) => {
                 if file.Name != "lookup.txt" || !file.Path.Equals(RequirePath("/lookup.txt")) {
-                    System.Fail("Lookup descriptor changed address")
+                    Panic("Lookup descriptor changed address")
                 }
             }
-            Failure(let error) => System.Fail(error.ToString())
+            Failure(let error) => Panic(error.ToString())
         }
         index += 1
     }
@@ -59,18 +59,18 @@ func Main() {
     match System.Storage.Metadata.GetKind("") {
         Failure(let error) => {
             if !(error is System.Storage.StorageLookupError.InvalidPath) {
-                System.Fail("Empty native path has wrong error")
+                Panic("Empty native path has wrong error")
             }
         }
-        Ok(_) => System.Fail("Empty native path accepted")
+        Ok(_) => Panic("Empty native path accepted")
     }
     match System.Storage.Metadata.GetKind(".") {
         Ok(let kind) => {
             if !(kind == System.Storage.EntryKind.Directory) {
-                System.Fail("Directory metadata lost its kind")
+                Panic("Directory metadata lost its kind")
             }
         }
-        Failure(let error) => System.Fail(error.ToString())
+        Failure(let error) => Panic(error.ToString())
     }
     WriteLine("Typed disk and memory lookup contracts: passed")
 }

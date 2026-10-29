@@ -25,7 +25,7 @@ public class PriorityArrayQueue<TElement, TPriority> {
 
     private func CheckAvailable() {
         if busy {
-            System.Fail("PriorityArrayQueue callbacks must not reenter the queue")
+            Panic("PriorityArrayQueue callbacks must not reenter the queue")
         }
     }
 
@@ -40,7 +40,7 @@ public class PriorityArrayQueue<TElement, TPriority> {
     func EnsureCapacity(capacity: int) -> int {
         CheckAvailable()
         if capacity < 0 {
-            System.Fail("PriorityArrayQueue capacity must be non-negative")
+            Panic("PriorityArrayQueue capacity must be non-negative")
         }
         if capacity > elements.Length {
             let newElements = System.Runtime.CompilerServices.CheckedStorage.Reserve<TElement>(capacity)
@@ -62,7 +62,7 @@ public class PriorityArrayQueue<TElement, TPriority> {
         CheckAvailable()
         if count == elements.Length {
             if count > 1073741823 {
-                System.Fail("PriorityArrayQueue capacity overflow")
+                Panic("PriorityArrayQueue capacity overflow")
             }
             var capacity = 4
             if count != 0 {

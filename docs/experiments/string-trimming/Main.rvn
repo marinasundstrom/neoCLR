@@ -2,7 +2,7 @@ import System.*
 
 func Check(actual: string, expected: string) {
     if String.CompareOrdinal(actual, expected) != 0 {
-        System.Fail("Trimming changed retained bytes or bounds")
+        Panic("Trimming changed retained bytes or bounds")
     }
 }
 
@@ -49,11 +49,11 @@ func Main() {
     Check("\u0000".Trim(), "\u0000")
     let original = "é👨‍👩‍👧‍👦🇸🇪"
     if !Object.ReferenceEquals(original, original.Trim()) || !Object.ReferenceEquals(original, original.TrimStart()) || !Object.ReferenceEquals(original, original.TrimEnd()) {
-        System.Fail("Unchanged trim must preserve owner")
+        Panic("Unchanged trim must preserve owner")
     }
     let empty = ""
     if !Object.ReferenceEquals(empty, empty.Trim()) {
-        System.Fail("Empty trim must preserve owner")
+        Panic("Empty trim must preserve owner")
     }
     Check("".TrimStart(), "")
     Check("".TrimEnd(), "")

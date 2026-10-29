@@ -10,7 +10,7 @@ internal static class LogLevels {
 
     static func ValidateMinimum(level: LogLevel) {
         if (int)level < 0 || (int)level > 6 {
-            System.Fail("Logging minimum level must be Trace through None")
+            Panic("Logging minimum level must be Trace through None")
         }
     }
 }

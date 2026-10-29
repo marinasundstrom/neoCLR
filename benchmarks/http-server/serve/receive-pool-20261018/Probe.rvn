@@ -7,7 +7,7 @@ import System.Time.*
 import System.Web.Http.*
 
 func Check(value: bool) {
-    if !value { System.Fail("Receive buffer ownership failed") }
+    if !value { Panic("Receive buffer ownership failed") }
 }
 
 // Outcome adapter observes cancellation without cancelling the fixture itself.
@@ -27,10 +27,10 @@ async func Main() -> Task<()> {
     let options = HttpServerOptions()
     options.RequestReadTimeout = Duration.FromTicks(600000000L)
     options.ResponseWriteTimeout = Duration.FromTicks(600000000L)
-    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 16, options) else { System.Fail("Listen failed") }
-    let Ok(port) = server.GetLocalPort() else { System.Fail("Port failed") }
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 16, options) else { Panic("Listen failed") }
+    let Ok(port) = server.GetLocalPort() else { Panic("Port failed") }
     Console.WriteLine(port)
-    let Ok(retained) = await server.Accept() else { System.Fail("First accept failed") }
+    let Ok(retained) = await server.Accept() else { Panic("First accept failed") }
     Console.WriteLine("HOLD")
     for index in 0..8 {
         let cancellation = CancellationTokenSource()
@@ -46,7 +46,7 @@ async func Main() -> Task<()> {
             if index == 2 || index == 3 {
                 Check(result is Error(_))
             } else {
-                let Ok(context) = result else { System.Fail("Accept failed") }
+                let Ok(context) = result else { Panic("Accept failed") }
                 await Echo(context)
             }
         }

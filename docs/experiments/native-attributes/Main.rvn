@@ -12,22 +12,22 @@ public class NoteAttribute {
     public field Rank: int
     var Enabled: bool {
         get {
-            System.Fail("Attribute getter executed")
+            Panic("Attribute getter executed")
         }
         set {
-            System.Fail("Attribute setter executed")
+            Panic("Attribute setter executed")
         }
     }
 
     init(text: string?, number: int, enabled: bool, kind: NoteKind) {
-        System.Fail("Attribute constructor executed")
+        Panic("Attribute constructor executed")
     }
 }
 
 public class Subject {
     var Name: string { get; set; }
     init() {
-        System.Fail("Annotated target constructor executed")
+        Panic("Annotated target constructor executed")
     }
 }
 

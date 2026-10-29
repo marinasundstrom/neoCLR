@@ -33,7 +33,7 @@ public record struct Money(val Amount: Decimal, val Currency: Currency) : Format
             return Format(culture)
         }
         if bytes.Length > 3 || (bytes[0] != (byte)67 && bytes[0] != (byte)99) {
-            System.Fail("Unsupported Money format")
+            Panic("Unsupported Money format")
         }
         if bytes.Length == 1 {
             return Format(culture)
@@ -43,7 +43,7 @@ public record struct Money(val Amount: Decimal, val Currency: Currency) : Format
         while index < bytes.Length {
             let digit = (int)bytes[index] - 48
             if digit < 0 || digit > 9 {
-                System.Fail("Unsupported Money precision")
+                Panic("Unsupported Money precision")
             }
             precision = precision * 10 + digit
             index += 1

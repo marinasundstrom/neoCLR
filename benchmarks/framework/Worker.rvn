@@ -22,11 +22,11 @@ class BenchmarkSuite {
 
     func Add(name: string, operation: () -> int) {
         if name == "" {
-            System.Fail("Benchmark name must not be empty")
+            Panic("Benchmark name must not be empty")
         }
         for item in cases {
             if item.Name == name {
-                System.Fail("Duplicate benchmark name")
+                Panic("Duplicate benchmark name")
             }
         }
         cases.Add(BenchmarkCase(name, operation))
@@ -44,25 +44,25 @@ class BenchmarkSuite {
             }
         }
         if arguments.Length != 3 {
-            System.Fail("Expected benchmark name, warmup count and operation count")
+            Panic("Expected benchmark name, warmup count and operation count")
         }
         let Ok(warmups) = Int32.Parse(arguments[1]) else {
-            System.Fail("Invalid warmup count")
+            Panic("Invalid warmup count")
         }
         let Ok(operations) = Int32.Parse(arguments[2]) else {
-            System.Fail("Invalid operation count")
+            Panic("Invalid operation count")
         }
         if warmups < 0 {
-            System.Fail("Benchmark count outside supported range")
+            Panic("Benchmark count outside supported range")
         }
         if warmups > 10000 {
-            System.Fail("Benchmark count outside supported range")
+            Panic("Benchmark count outside supported range")
         }
         if operations < 1 {
-            System.Fail("Benchmark count outside supported range")
+            Panic("Benchmark count outside supported range")
         }
         if operations > 10000 {
-            System.Fail("Benchmark count outside supported range")
+            Panic("Benchmark count outside supported range")
         }
         for item in cases {
             if item.Name == arguments[0] {
@@ -70,7 +70,7 @@ class BenchmarkSuite {
                 var index = 0
                 while index < warmups {
                     if item.Invoke() != 1 {
-                        System.Fail("Warmup correctness check failed")
+                        Panic("Warmup correctness check failed")
                     }
                     index += 1
                 }
@@ -80,7 +80,7 @@ class BenchmarkSuite {
                 while index < operations {
                     let result = item.Invoke()
                     if result != 1 {
-                        System.Fail("Benchmark correctness check failed")
+                        Panic("Benchmark correctness check failed")
                     }
                     checksum += result
                     index += 1
@@ -90,6 +90,6 @@ class BenchmarkSuite {
                 return
             }
         }
-        System.Fail("Unknown benchmark name")
+        Panic("Unknown benchmark name")
     }
 }

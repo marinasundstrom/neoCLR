@@ -35,7 +35,7 @@ module Benchmarks.Scheduler {
 
         func OnCompleted(callback: () -> System.Void) {
             if IsCompleted {
-                System.Fail("Expected a pending registration")
+                Panic("Expected a pending registration")
             }
             callbacks.Add(callback)
         }
@@ -43,7 +43,7 @@ module Benchmarks.Scheduler {
         func Complete() -> System.Void {
             Calls += 1
             if !source.Complete(1) {
-                System.Fail("Duplicate completion")
+                Panic("Duplicate completion")
             }
             let pending = callbacks
             callbacks = ArrayList<() -> System.Void>()
@@ -70,7 +70,7 @@ module Benchmarks.Scheduler {
 
         func OnCompleted(callback: () -> System.Void) {
             if IsCompleted {
-                System.Fail("Expected a pending registration")
+                Panic("Expected a pending registration")
             }
             callbacks.Add(Registration(callback))
         }
@@ -78,7 +78,7 @@ module Benchmarks.Scheduler {
         func Complete() -> System.Void {
             Calls += 1
             if !source.Complete(1) {
-                System.Fail("Duplicate completion")
+                Panic("Duplicate completion")
             }
             let pending = callbacks
             callbacks = ArrayList<Registration>()
@@ -97,66 +97,66 @@ module Benchmarks.Scheduler {
                 let completion = CapturedCompletion(producer)
                 _ = neoCLR.Runtime.SchedulerSubmit(completion.Complete)
                 if completion.Calls != 0 {
-                    System.Fail("Completion ran inline")
+                    Panic("Completion ran inline")
                 }
                 let value = await completion
                 if completion.Calls != 1 {
-                    System.Fail("Delivery count mismatch")
+                    Panic("Delivery count mismatch")
                 }
                 total += value
             } else {
                 let completion = DirectCompletion(producer)
                 _ = neoCLR.Runtime.SchedulerSubmit(completion.Complete)
                 if completion.Calls != 0 {
-                    System.Fail("Completion ran inline")
+                    Panic("Completion ran inline")
                 }
                 let value = await completion
                 if completion.Calls != 1 {
-                    System.Fail("Delivery count mismatch")
+                    Panic("Delivery count mismatch")
                 }
                 total += value
             }
             index += 1
         }
         if total != 32 {
-            System.Fail("Await checksum mismatch")
+            Panic("Await checksum mismatch")
         }
         return 1
     }
 
     func ProducerPumpForbidden() -> System.Void {
-        System.Fail("Producer queue was pumped")
+        Panic("Producer queue was pumped")
         return ()
     }
 
     func ParseCount(text: string) -> int {
         let Ok(value) = Int32.Parse(text) else {
-            System.Fail("Invalid count")
+            Panic("Invalid count")
         }
         return value
     }
 
     async func Main(arguments: string[]) -> Task<int> {
         if arguments.Length != 3 {
-            System.Fail("Expected case, warmups and operations")
+            Panic("Expected case, warmups and operations")
         }
         let name = arguments[0]
         if name != "registration.direct" && name != "registration.captured" {
-            System.Fail("Unknown scheduler benchmark")
+            Panic("Unknown scheduler benchmark")
         }
         let warmups = ParseCount(arguments[1])
         let operations = ParseCount(arguments[2])
         if warmups < 0 {
-            System.Fail("Benchmark count outside supported range")
+            Panic("Benchmark count outside supported range")
         }
         if warmups > 10000 {
-            System.Fail("Benchmark count outside supported range")
+            Panic("Benchmark count outside supported range")
         }
         if operations < 1 {
-            System.Fail("Benchmark count outside supported range")
+            Panic("Benchmark count outside supported range")
         }
         if operations > 10000 {
-            System.Fail("Benchmark count outside supported range")
+            Panic("Benchmark count outside supported range")
         }
 
         let captured = name == "registration.captured"
@@ -167,7 +167,7 @@ module Benchmarks.Scheduler {
         while index < warmups {
             let result = await RunOperation(captured, producer)
             if result != 1 {
-                System.Fail("Warmup failed")
+                Panic("Warmup failed")
             }
             index += 1
         }

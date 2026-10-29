@@ -1,5 +1,7 @@
 module System
 
+import System.*
+
 import System.Optional.*
 
 
@@ -56,7 +58,7 @@ public struct Character : ComparableTo<Character>, EquatableTo<Character> {
         if comparison == StringComparison.OrdinalIgnoreCase {
             return neoCLR.Runtime.CharCompareOrdinalIgnoreCase(m_value, other) == 0
         }
-        System.Fail("Unsupported StringComparison")
+        Panic("Unsupported StringComparison")
         return false
     }
 

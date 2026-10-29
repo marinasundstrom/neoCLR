@@ -166,7 +166,7 @@ func MemoryAsyncRejection() -> Result<unit, TestFailure> {
 // Consumers of potentially pending streams use await instead.
 func CompletedValue<T>(operation: System.Concurrency.Tasks.Task<T>) -> T {
     let Some(Completed(value)) = operation.Outcome else {
-        System.Fail("Expected an immediately completed fixture operation")
+        Panic("Expected an immediately completed fixture operation")
     }
     return value
 }

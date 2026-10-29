@@ -12,7 +12,7 @@ func Main(args: string[]) {
             text = String.Format("{0}:{1}:{2}", arguments)
         }
         if String.CompareOrdinal(text, "a:b:c") != 0 {
-            System.Fail("Formatting allocation contract")
+            Panic("Formatting allocation contract")
         }
         count += 1
     }

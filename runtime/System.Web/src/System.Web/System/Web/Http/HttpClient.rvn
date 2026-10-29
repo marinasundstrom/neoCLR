@@ -89,7 +89,7 @@ public class HttpResponse : Disposable {
                     reasonSource = null
                     return text
                 }
-                System.Fail("Validated HTTP reason text could not be decoded")
+                Panic("Validated HTTP reason text could not be decoded")
             }
             return if storedStatusCode == 200 { "OK" } else { "" }
         }
@@ -556,10 +556,10 @@ public abstract class DelegatingHandler : HttpHandler {
         get => inner
         set {
             if disposed || started {
-                System.Fail("Handler pipeline is already started or disposed")
+                Panic("Handler pipeline is already started or disposed")
             }
             if value is not HttpHandler {
-                System.Fail("Inner handler cannot be null")
+                Panic("Inner handler cannot be null")
             }
             inner = value
         }
@@ -568,14 +568,14 @@ public abstract class DelegatingHandler : HttpHandler {
     /// Forwards to the inner handler, freezing pipeline configuration.
     override func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
         if disposed {
-            System.Fail("HTTP handler is disposed")
+            Panic("HTTP handler is disposed")
         }
         let target = inner
         if target is HttpHandler handler {
             started = true
             return handler.Send(request, cancellationToken)
         }
-        System.Fail("Inner handler has not been assigned")
+        Panic("Inner handler has not been assigned")
     }
 
     /// Disposes the owned inner handler once. Overrides must call base.Dispose().
@@ -834,7 +834,7 @@ public abstract class HttpContent : Disposable {
         if let Failure(error) = parsedMediaType {
             return Failure(error)
         }
-        System.Fail("Content-Type cache has no outcome")
+        Panic("Content-Type cache has no outcome")
         return Ok(None())
     }
 
@@ -867,7 +867,7 @@ public abstract class HttpContent : Disposable {
     internal val Bytes: Sequence<byte> {
         get {
             if !IsBuffered || self is HttpMemoryContent {
-                System.Fail("Content has no sequence storage")
+                Panic("Content has no sequence storage")
             }
             return storedBytes
         }
@@ -1435,7 +1435,7 @@ public class HttpRequest : Disposable {
         } else if let Failure(reason) = parsed {
             return Failure(HttpError.InvalidUri(reason))
         }
-        System.Fail("URI parser returned no outcome")
+        Panic("URI parser returned no outcome")
         return Failure(HttpError.InvalidRequest("Invalid URI"))
     }
 
@@ -1532,19 +1532,19 @@ public class HttpClient : Disposable {
         set {
             if let Some(duration) = value {
                 if duration.Ticks <= 0L {
-                    System.Fail("HTTP timeout is out of range")
+                    Panic("HTTP timeout is out of range")
                 }
                 if duration.Ticks > 21474836470000L {
-                    System.Fail("HTTP timeout is out of range")
+                    Panic("HTTP timeout is out of range")
                 }
             } else if let System.Optional.None = value {
                 // Explicitly disabled, without a negative-duration sentinel.
             } else {
-                System.Fail("Timeout requires Some or None")
+                Panic("Timeout requires Some or None")
             }
             EnsureUsable()
             if started {
-                System.Fail("HTTP timeout cannot change after sending starts")
+                Panic("HTTP timeout cannot change after sending starts")
             }
             timeout = value
         }
@@ -1590,7 +1590,7 @@ public class HttpClient : Disposable {
             } else if let System.Optional.None = value {
                 baseUri = None()
             } else {
-                System.Fail("BaseUri requires Some or None")
+                Panic("BaseUri requires Some or None")
             }
         }
     }
@@ -1626,7 +1626,7 @@ public class HttpClient : Disposable {
 
     private func EnsureUsable() {
         if disposed {
-            System.Fail("HTTP client is disposed")
+            Panic("HTTP client is disposed")
         }
     }
 
@@ -1660,7 +1660,7 @@ public class HttpClient : Disposable {
             return FailedResponse(error)
         }
         let Ok(outgoing) = prepared else {
-            System.Fail("Request preparation returned no outcome")
+            Panic("Request preparation returned no outcome")
         }
         outgoing.HeadersOnly = completionOption == HttpCompletionOption.ResponseHeadersRead
         let operation = HttpSendScope(outgoing, cancellationToken, lifetime.Token)
@@ -1688,7 +1688,7 @@ public class HttpClient : Disposable {
         } else if let Failure(reason) = parsed {
             return FailedResponse(HttpError.InvalidUri(reason))
         }
-        System.Fail("URI parser returned no outcome")
+        Panic("URI parser returned no outcome")
         return FailedResponse(HttpError.InvalidRequest("Invalid URI"))
     }
 
@@ -1710,7 +1710,7 @@ public class HttpClient : Disposable {
         } else if let Failure(reason) = parsed {
             return FailedResponse(reason)
         }
-        System.Fail("Request construction returned no outcome")
+        Panic("Request construction returned no outcome")
         return FailedResponse(HttpError.InvalidRequest("Invalid request"))
     }
 
@@ -1732,7 +1732,7 @@ public class HttpClient : Disposable {
         } else if let Failure(reason) = parsed {
             return FailedResponse(HttpError.InvalidUri(reason))
         }
-        System.Fail("URI parser returned no outcome")
+        Panic("URI parser returned no outcome")
         return FailedResponse(HttpError.InvalidRequest("Invalid URI"))
     }
 
@@ -1754,7 +1754,7 @@ public class HttpClient : Disposable {
         } else if let Failure(reason) = parsed {
             return FailedResponse(reason)
         }
-        System.Fail("Request construction returned no outcome")
+        Panic("Request construction returned no outcome")
         return FailedResponse(HttpError.InvalidRequest("Invalid request"))
     }
 
@@ -1780,7 +1780,7 @@ public class HttpClient : Disposable {
         } else if let Failure(reason) = parsed {
             return FailedResponse(HttpError.InvalidUri(reason))
         }
-        System.Fail("URI parser returned no outcome")
+        Panic("URI parser returned no outcome")
         return FailedResponse(HttpError.InvalidRequest("Invalid URI"))
     }
 
@@ -1802,7 +1802,7 @@ public class HttpClient : Disposable {
         } else if let Failure(reason) = parsed {
             return FailedResponse(reason)
         }
-        System.Fail("Request construction returned no outcome")
+        Panic("Request construction returned no outcome")
         return FailedResponse(HttpError.InvalidRequest("Invalid request"))
     }
 
@@ -1828,7 +1828,7 @@ public class HttpClient : Disposable {
         } else if let Failure(reason) = parsed {
             return FailedResponse(HttpError.InvalidUri(reason))
         }
-        System.Fail("URI parser returned no outcome")
+        Panic("URI parser returned no outcome")
         return FailedResponse(HttpError.InvalidRequest("Invalid URI"))
     }
 
@@ -1850,7 +1850,7 @@ public class HttpClient : Disposable {
         } else if let Failure(reason) = parsed {
             return FailedResponse(reason)
         }
-        System.Fail("Request construction returned no outcome")
+        Panic("Request construction returned no outcome")
         return FailedResponse(HttpError.InvalidRequest("Invalid request"))
     }
 
@@ -1876,7 +1876,7 @@ public class HttpClient : Disposable {
         } else if let Failure(reason) = parsed {
             return FailedResponse(HttpError.InvalidUri(reason))
         }
-        System.Fail("URI parser returned no outcome")
+        Panic("URI parser returned no outcome")
         return FailedResponse(HttpError.InvalidRequest("Invalid URI"))
     }
 
@@ -1898,7 +1898,7 @@ public class HttpClient : Disposable {
         } else if let Failure(reason) = parsed {
             return FailedResponse(reason)
         }
-        System.Fail("Request construction returned no outcome")
+        Panic("Request construction returned no outcome")
         return FailedResponse(HttpError.InvalidRequest("Invalid request"))
     }
 
@@ -1924,7 +1924,7 @@ public class HttpClient : Disposable {
         } else if let Failure(reason) = parsed {
             return FailedResponse(HttpError.InvalidUri(reason))
         }
-        System.Fail("URI parser returned no outcome")
+        Panic("URI parser returned no outcome")
         return FailedResponse(HttpError.InvalidRequest("Invalid URI"))
     }
 
@@ -1946,7 +1946,7 @@ public class HttpClient : Disposable {
         } else if let Failure(reason) = parsed {
             return FailedResponse(reason)
         }
-        System.Fail("Request construction returned no outcome")
+        Panic("Request construction returned no outcome")
         return FailedResponse(HttpError.InvalidRequest("Invalid request"))
     }
 
@@ -2038,7 +2038,7 @@ public class HttpClient : Disposable {
                     return Failure(HttpError.InvalidUri(reason))
                 }
             }
-            System.Fail("URI resolution returned no outcome")
+            Panic("URI resolution returned no outcome")
             return Failure(HttpError.InvalidRequest("Invalid URI"))
         }
         return Ok(uri)
@@ -2079,7 +2079,7 @@ public class HttpSocketHandler : HttpHandler {
     /// Uses one token across lookup, connect and transfers, closing before cancellation completes.
     override func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
         if disposed {
-            System.Fail("HTTP handler is disposed")
+            Panic("HTTP handler is disposed")
         }
         if cancellationToken.IsCancellationRequested {
             let source = Promise<Result<HttpResponse, HttpError>>()
@@ -2427,7 +2427,7 @@ internal class HttpSendScope {
             return
         }
         let Some(task) = pending else {
-            System.Fail("HTTP operation has no pending task")
+            Panic("HTTP operation has no pending task")
         }
         closed = true
         pending = None()

@@ -37,7 +37,7 @@ func AUnicodeLines() -> Result<unit, TestFailure> {
         let encoded = EncodedBytes(text + "\r\n")?
         let source = ShortInput(encoded, -1)
         let Ok(reader) = StreamReader.Create(source) else {
-            System.Fail("Unable to create text wrapper")
+            Panic("Unable to create text wrapper")
         }
         reader.NewLine = "\r\n"
         _ = ReadLineText(reader, text.GetUtf8ByteCount(), text)?
@@ -53,7 +53,7 @@ func BLineEndings() -> Result<unit, TestFailure> {
     let endings = EncodedBytes("A\n\nB\r")?
     let source = ShortInput(endings, -1)
     let Ok(reader) = StreamReader.Create(source) else {
-        System.Fail("Unable to create text wrapper")
+        Panic("Unable to create text wrapper")
     }
     _ = ReadLineText(reader, 1, "A")?
     _ = ReadLineText(reader, 0, "")?
@@ -62,7 +62,7 @@ func BLineEndings() -> Result<unit, TestFailure> {
     _ = ReadText(CompletedValue(reader.ReadToEnd(0)), "")?
     let carriageReturn = EncodedBytes("\r")?
     let Ok(lone) = StreamReader.Create(ShortInput(carriageReturn, -1)) else {
-        System.Fail("Unable to create text wrapper")
+        Panic("Unable to create text wrapper")
     }
     return Assert.True(CompletedValue(lone.ReadLine(0)) is Failure(TextReadError.LimitExceeded), "Lone CR consumes quota")
 }
@@ -72,17 +72,17 @@ func CCustomDecode() -> Result<unit, TestFailure> {
     let encoded = EncodedBytes("x")?
     let source = ShortInput(encoded, -1)
     let Ok(reader) = StreamReader.Create(source, ExpandedEncoding()) else {
-        System.Fail("Unable to create text wrapper")
+        Panic("Unable to create text wrapper")
     }
     _ = ReadLineText(reader, 1, "A")?
     _ = ReadText(CompletedValue(reader.ReadToEnd(1)), "B")?
     let Ok(limited) = StreamReader.Create(ShortInput(encoded, -1), ExpandedEncoding()) else {
-        System.Fail("Unable to create text wrapper")
+        Panic("Unable to create text wrapper")
     }
     _ = Assert.True(CompletedValue(limited.ReadToEnd(1)) is Failure(TextReadError.LimitExceeded), "Decoded expansion counts toward limit")?
     let sink = ShortOutput(-1, false)
     let Ok(writer) = StreamWriter.Create(sink, ExpandedEncoding()) else {
-        System.Fail("Unable to create text wrapper")
+        Panic("Unable to create text wrapper")
     }
     let Ok(count) = CompletedValue(writer.Write("several input bytes")) else {
         return Failure(TestFailure("Custom write", "Ok", "Error"))
@@ -94,7 +94,7 @@ func CCustomDecode() -> Result<unit, TestFailure> {
 func DZeroProgress() -> Result<unit, TestFailure> {
     let sink = FailedSink(true)
     let Ok(writer) = StreamWriter.Create(sink, Encodings.Ascii) else {
-        System.Fail("Unable to create text wrapper")
+        Panic("Unable to create text wrapper")
     }
     _ = Assert.True(CompletedValue(writer.Write("ok")) is Failure(StreamError.IoFailure), "Zero output progress is an error")?
     _ = Assert.Equal(1, sink.Calls)?
@@ -108,7 +108,7 @@ func EReaderPreflight() -> Result<unit, TestFailure> {
     let encoded = EncodedBytes("é")?
     let source = ShortInput(encoded, -1)
     let Ok(reader) = StreamReader.Create(source, Encodings.Utf8, true) else {
-        System.Fail("Unable to create text wrapper")
+        Panic("Unable to create text wrapper")
     }
     _ = Assert.True(CompletedValue(reader.ReadToEnd(-1)) is Failure(TextReadError.InvalidRange), "Negative limit")?
     _ = Assert.True(CompletedValue(reader.ReadLine(65537)) is Failure(TextReadError.LimitExceeded), "Oversized limit")?
@@ -139,7 +139,7 @@ func GMaximumWrite() -> Result<unit, TestFailure> {
     let text = MaximumText()
     let sink = CountingSink()
     let Ok(writer) = StreamWriter.Create(sink) else {
-        System.Fail("Unable to create text wrapper")
+        Panic("Unable to create text wrapper")
     }
     _ = Assert.True(CompletedValue(writer.WriteLine(text)) is Failure(StreamError.LimitExceeded), "LF counts toward line limit")?
     _ = Assert.True(CompletedValue(writer.Write(text + "x")) is Failure(StreamError.LimitExceeded), "Oversized write")?
@@ -157,12 +157,12 @@ func GMaximumWrite() -> Result<unit, TestFailure> {
 func HInputFailures() -> Result<unit, TestFailure> {
     let encoded = EncodedBytes("AB")?
     let Ok(failed) = StreamReader.Create(ShortInput(encoded, 1)) else {
-        System.Fail("Unable to create text wrapper")
+        Panic("Unable to create text wrapper")
     }
     _ = Assert.True(CompletedValue(failed.ReadToEnd(2)) is Failure(TextReadError.IoFailure), "Input error after prefix")?
     let bytes: byte[] = [(byte)65, (byte)240, (byte)159]
     let Ok(truncated) = StreamReader.Create(ShortInput(bytes, -1)) else {
-        System.Fail("Unable to create text wrapper")
+        Panic("Unable to create text wrapper")
     }
     return Assert.True(CompletedValue(truncated.ReadToEnd(8)) is Failure(TextReadError.InvalidUtf8), "Final incomplete scalar")
 }
@@ -178,7 +178,7 @@ func EncodedBytes(text: string) -> Result<Sequence<byte>, TestFailure> {
 // Consumers of potentially pending streams use await instead.
 func CompletedValue<T>(operation: System.Concurrency.Tasks.Task<T>) -> T {
     let Some(Completed(value)) = operation.Outcome else {
-        System.Fail("Expected an immediately completed fixture operation")
+        Panic("Expected an immediately completed fixture operation")
     }
     return value
 }

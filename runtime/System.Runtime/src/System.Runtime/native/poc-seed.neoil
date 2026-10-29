@@ -97,7 +97,7 @@ ret
 .methodimpl InternalCall
 .end
 
-.function System.Fail(String message) -> void
+.function System.Panic(String message) -> void
 ldarg 0
 call neoCLR.Runtime.Fault(String)
 ret

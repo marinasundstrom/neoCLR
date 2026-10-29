@@ -27,7 +27,7 @@ func Content(bytes: Sequence<byte>, expected: string) -> Result<unit, TestFailur
 func AShortWrites() -> Result<unit, TestFailure> {
     let sink = ProbeSink(-1)
     let Ok(writer) = StreamWriter.Create(sink, Encodings.Utf8, true) else {
-        System.Fail("Unable to create text wrapper")
+        Panic("Unable to create text wrapper")
     }
     _ = Wrote(CompletedValue(writer.Write("é😀")), 6)?
     _ = Wrote(CompletedValue(writer.Write("e")), 1)?
@@ -43,7 +43,7 @@ func AShortWrites() -> Result<unit, TestFailure> {
 func BAsciiPreflight() -> Result<unit, TestFailure> {
     let sink = ProbeSink(-1)
     let Ok(writer) = StreamWriter.Create(sink, Encodings.Ascii) else {
-        System.Fail("Unable to create text wrapper")
+        Panic("Unable to create text wrapper")
     }
     _ = Assert.True(CompletedValue(writer.Write("prefix é")) is Failure(StreamError.InvalidEncoding), "Strict write")?
     _ = Assert.Equal(0, sink.Bytes.Count)?
@@ -60,7 +60,7 @@ func BAsciiPreflight() -> Result<unit, TestFailure> {
 func CCompletion() -> Result<unit, TestFailure> {
     let sink = ProbeSink(-1)
     let Ok(writer) = StreamWriter.Create(sink, TrailerEncoding(), true) else {
-        System.Fail("Unable to create text wrapper")
+        Panic("Unable to create text wrapper")
     }
     _ = Wrote(CompletedValue(writer.Write("A")), 1)?
     _ = Assert.True(CompletedValue(writer.Flush()) is Ok(_), "Flush succeeds")?
@@ -76,7 +76,7 @@ func CCompletion() -> Result<unit, TestFailure> {
 func DClose() -> Result<unit, TestFailure> {
     let sink = ProbeSink(-1)
     let Ok(writer) = StreamWriter.Create(sink, TrailerEncoding()) else {
-        System.Fail("Unable to create text wrapper")
+        Panic("Unable to create text wrapper")
     }
     _ = Wrote(CompletedValue(writer.Write("A")), 1)?
     writer.Close()
@@ -89,7 +89,7 @@ func DClose() -> Result<unit, TestFailure> {
 func EOutputFailure() -> Result<unit, TestFailure> {
     let sink = ProbeSink(1)
     let Ok(writer) = StreamWriter.Create(sink, Encodings.Utf8, true) else {
-        System.Fail("Unable to create text wrapper")
+        Panic("Unable to create text wrapper")
     }
     _ = Assert.True(CompletedValue(writer.Write("AB")) is Failure(StreamError.AccessDenied), "Preserve first output error")?
     _ = Content(sink.Bytes, "A")?
@@ -97,7 +97,7 @@ func EOutputFailure() -> Result<unit, TestFailure> {
     _ = Assert.True(CompletedValue(writer.Finish()) is Failure(StreamError.InvalidEncoding), "Failed writer cannot finalize")?
     let finalSink = ProbeSink(2)
     let Ok(finalWriter) = StreamWriter.Create(finalSink, TrailerEncoding(), true) else {
-        System.Fail("Unable to create text wrapper")
+        Panic("Unable to create text wrapper")
     }
     _ = Wrote(CompletedValue(finalWriter.Write("A")), 1)?
     _ = Assert.True(CompletedValue(finalWriter.Finish()) is Failure(StreamError.AccessDenied), "Final trailer failure")?
@@ -129,7 +129,7 @@ func GReader() -> Result<unit, TestFailure> {
     _ = Assert.True(CompletedValue(source.Write(bytes, 0, 4)) is Ok(_), "Complete byte write")?
     _ = Assert.True(source.Seek(0L) is Ok(_), "Rewind input")?
     let Ok(reader) = StreamReader.Create(source, Encodings.Ascii, true) else {
-        System.Fail("Unable to create text wrapper")
+        Panic("Unable to create text wrapper")
     }
     reader.NewLine = "\r\n"
     let Ok(Some(line)) = CompletedValue(reader.ReadLine(1)) else {
@@ -151,7 +151,7 @@ func HReaderErrors() -> Result<unit, TestFailure> {
     _ = Assert.True(CompletedValue(source.Write(bytes, 0, 2)) is Ok(_), "Complete byte write")?
     _ = Assert.True(source.Seek(0L) is Ok(_), "Rewind invalid input")?
     let Ok(reader) = StreamReader.Create(source, Encodings.Ascii) else {
-        System.Fail("Unable to create text wrapper")
+        Panic("Unable to create text wrapper")
     }
     _ = Assert.True(CompletedValue(reader.ReadToEnd(8)) is Failure(TextReadError.InvalidEncoding), "Strict reader conversion")?
     let valid = MemoryStream()
@@ -159,7 +159,7 @@ func HReaderErrors() -> Result<unit, TestFailure> {
     _ = Assert.True(CompletedValue(valid.Write(plain, 0, 3)) is Ok(_), "Complete byte write")?
     _ = Assert.True(valid.Seek(0L) is Ok(_), "Rewind limited input")?
     let Ok(validReader) = StreamReader.Create(valid, Encodings.Ascii) else {
-        System.Fail("Unable to create reader")
+        Panic("Unable to create reader")
     }
     return Assert.True(CompletedValue(validReader.ReadToEnd(2)) is Failure(TextReadError.LimitExceeded), "Decoded text limit")
 }
@@ -168,7 +168,7 @@ func HReaderErrors() -> Result<unit, TestFailure> {
 // Consumers of potentially pending streams use await instead.
 func CompletedValue<T>(operation: System.Concurrency.Tasks.Task<T>) -> T {
     let Some(Completed(value)) = operation.Outcome else {
-        System.Fail("Expected an immediately completed fixture operation")
+        Panic("Expected an immediately completed fixture operation")
     }
     return value
 }
@@ -177,7 +177,7 @@ func CompletedValue<T>(operation: System.Concurrency.Tasks.Task<T>) -> T {
 func IPendingRead() -> Result<unit, TestFailure> {
     let source = PendingInput()
     let Ok(reader) = StreamReader.Create(source) else {
-        System.Fail("Unable to create text wrapper")
+        Panic("Unable to create text wrapper")
     }
     let operation = reader.ReadToEnd(16)
     _ = Assert.True(!operation.IsCompleted, "Reader remains pending")?
@@ -190,7 +190,7 @@ func IPendingRead() -> Result<unit, TestFailure> {
 func JPendingWrite() -> Result<unit, TestFailure> {
     let sink = PendingOutput()
     let Ok(writer) = StreamWriter.Create(sink) else {
-        System.Fail("Unable to create text wrapper")
+        Panic("Unable to create text wrapper")
     }
     let operation = writer.Write("é")
     _ = Assert.True(!operation.IsCompleted && sink.Received == 2, "Writer retains pending output")?
@@ -203,7 +203,7 @@ func JPendingWrite() -> Result<unit, TestFailure> {
 func KPendingCancellation() -> Result<unit, TestFailure> {
     let source = PendingInput()
     let Ok(reader) = StreamReader.Create(source) else {
-        System.Fail("Unable to create text wrapper")
+        Panic("Unable to create text wrapper")
     }
     let operation = reader.ReadToEnd(16)
     _ = Assert.True(!operation.IsCompleted, "Reader starts pending")?

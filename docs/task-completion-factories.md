@@ -17,7 +17,7 @@ invocations. Allocation reduction is separate future work, not a performance cla
 IsCompleted is true and IsCancelled false before return. Await requires no scheduled
 work. Explicit OnCompleted observers retain deferred dispatch, including for a task
 already completed. Reference results preserve identity; Result.Error is a completed
-value, not cancellation or a Fault. System.Fail still ends the invocation; a
+value, not cancellation or a Fault. System.Panic still ends the invocation; a
 following CompletedTask return only supplies an unreachable, well-typed fallback.
 
 ## Implementation and validation

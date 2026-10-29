@@ -3081,3 +3081,11 @@ and documented in the JSON guide. No public API is omitted from the native snaps
 documents strict defaults, depth 64, Result-based validation, remaining serializer
 and mapping gaps, and runtime allocation budgets. Neo.Configuration.Json opts into
 comments/trailing commas and accepts a BOM under its separate 1 MiB input limit.
+
+### Panic rename — 2026-10-29
+
+The terminal namespace function is now `System.Panic(message: string)`. Prefer
+`import System.*` followed by `Panic(message)`. `System.Fail` is removed; rebuild
+consumers with the matching Raven codex/neoclr compiler and runtime bundle.
+This is a naming change only: cleanup-aware unwinding and revised thread/task
+panic boundaries remain undecided. See [the contract](../docs/system-fault.md).

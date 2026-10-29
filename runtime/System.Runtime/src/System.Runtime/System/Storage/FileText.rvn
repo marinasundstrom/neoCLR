@@ -1,5 +1,7 @@
 module System.Storage.FileText
 
+import System.*
+
 import System.Storage.FileReadError
 import System.Storage.FileWriteError
 import System.Result.*
@@ -30,7 +32,7 @@ public func WriteAllText(path: string, text: string, maxBytes: int) -> System.Re
     if status == 7 {
         return Failure(FileWriteError.TooLarge())
     }
-    System.Fail("invalid native file write status")
+    Panic("invalid native file write status")
     return Failure(FileWriteError.WriteFailed())
 }
 
@@ -64,6 +66,6 @@ public func ReadAllText(path: string, maxBytes: int) -> System.Result<string, Fi
     if status == 8 {
         return Failure(FileReadError.InvalidUtf8())
     }
-    System.Fail("invalid native I/O status")
+    Panic("invalid native I/O status")
     return Failure(FileReadError.ReadFailed())
 }

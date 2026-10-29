@@ -16,7 +16,7 @@ public open class ArrayList<T> : List<T> {
 
     init(capacity: int) {
         if capacity < 0 {
-            System.Fail("ArrayList capacity must be non-negative")
+            Panic("ArrayList capacity must be non-negative")
         }
         data = System.Runtime.CompilerServices.CheckedStorage.Reserve<T>(capacity)
         count = 0
@@ -39,13 +39,13 @@ public open class ArrayList<T> : List<T> {
     var self[index: int]: T {
         get {
             if index < 0 || index >= count {
-                System.Fail("ArrayList index out of range")
+                Panic("ArrayList index out of range")
             }
             return data[index]
         }
         set {
             if index < 0 || index >= count {
-                System.Fail("ArrayList index out of range")
+                Panic("ArrayList index out of range")
             }
             data[index] = value
         }
@@ -63,7 +63,7 @@ public open class ArrayList<T> : List<T> {
             if Slice(range) is Ok(let slice) {
                 return slice
             }
-            System.Fail("Range is outside the value")
+            Panic("Range is outside the value")
             return Array<T>.Empty
         }
     }
@@ -86,7 +86,7 @@ public open class ArrayList<T> : List<T> {
                 capacity = 4
             } else {
                 if capacity > 1073741823 {
-                    System.Fail("ArrayList capacity overflow")
+                    Panic("ArrayList capacity overflow")
                 }
                 capacity = capacity * 2
             }
@@ -240,7 +240,7 @@ internal class ArrayListIterator<T> : Iterator<T> {
     val Current: T {
         get {
             if position < 0 || position >= count {
-                System.Fail("Iterator has no current element")
+                Panic("Iterator has no current element")
             }
             return data[position]
         }

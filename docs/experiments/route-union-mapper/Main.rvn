@@ -3,23 +3,23 @@ import System.Result.*
 
 public func Check(value: bool, message: string) {
     if !value {
-        System.Fail(message)
+        Panic(message)
     }
 }
 
 func Main() {
     let Ok(parser) = AppRoutesParser.Create() else {
-        System.Fail("Mapper creation failed")
+        Panic("Mapper creation failed")
         return
     }
     Check(parser.Parse("/items") is Ok(AppRoutes.ListItems), "empty case")
     let Ok(AppRoutes.GetItem(first)) = parser.Parse("/items/42?details=true") else {
-        System.Fail("Typed case missing")
+        Panic("Typed case missing")
         return
     }
     Check(first == 42, "typed parameter")
     let Ok(AppRoutes.GetItem(second)) = parser.Parse("/items/-7") else {
-        System.Fail("Reused mapper failed")
+        Panic("Reused mapper failed")
         return
     }
     Check(second == -7 && first == 42, "independent captures")
@@ -28,7 +28,7 @@ func Main() {
     Check(parser.Parse("/items/2147483648") is Failure(RouteMappingError.InvalidParameter(_, _)), "overflow")
     Check(parser.Parse("/items/%2F") is Failure(RouteMappingError.InvalidTarget(_)), "invalid target")
     let Ok(AppRoutes.GetItem(encoded)) = parser.Parse("/items/%34%32") else {
-        System.Fail("Encoded integer failed")
+        Panic("Encoded integer failed")
         return
     }
     Check(encoded == 42, "decoded parameter")
@@ -36,19 +36,19 @@ func Main() {
     var copy = original
     copy = AppRoutes.ListItems()
     let AppRoutes.GetItem(preserved) = original else {
-        System.Fail("Union copy changed original")
+        Panic("Union copy changed original")
         return
     }
     Check(preserved == 9 && copy is AppRoutes.ListItems, "union copy")
     let boxed: Object = original
     if boxed is AppRoutes restored {
         let AppRoutes.GetItem(value) = restored else {
-            System.Fail("Boxed case changed")
+            Panic("Boxed case changed")
             return
         }
         Check(value == 9, "union boxing")
     } else {
-        System.Fail("Union box missing")
+        Panic("Union box missing")
     }
     Console.WriteLine("Attributed route mapper checks passed")
 }

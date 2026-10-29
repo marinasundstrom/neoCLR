@@ -4,7 +4,7 @@ import System.Globalization.*
 import System.Result.*
 
 func Check(value: bool, message: string) {
-    if !value { System.Fail(message) }
+    if !value { Panic(message) }
 }
 
 class CultureSnapshot : Formattable {
@@ -36,7 +36,7 @@ func Main() {
     let max = Duration.FromTicks(9223372036854775807L)
     Check(min.ToString() == "-10675199.02:48:05.4775808", "minimum")
     Check(max.ToString() == "10675199.02:48:05.4775807", "maximum")
-    if Duration.Parse(min.ToString()) is Ok(let parsed) { Check(parsed.Equals(min), "minimum roundtrip") } else { System.Fail("parse minimum") }
+    if Duration.Parse(min.ToString()) is Ok(let parsed) { Check(parsed.Equals(min), "minimum roundtrip") } else { Panic("parse minimum") }
     let boxed: Object = value
     Check(boxed.ToString() == value.ToString(), "boxed display")
     let contract: Formattable = value
@@ -64,7 +64,7 @@ func Main() {
             let timeBox: Object = time
             let localBox: Object = local
             Check(dateBox.ToString() == date.ToString() && timeBox.ToString() == time.ToString() && localBox.ToString() == local.ToString(), "civil Object dispatch")
-        } else { System.Fail("time creation") }
-    } else { System.Fail("date creation") }
+        } else { Panic("time creation") }
+    } else { Panic("date creation") }
     Console.WriteLine("PASS culture formatting")
 }

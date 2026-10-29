@@ -70,7 +70,7 @@ public class Timer : Disposable {
 
     private func Schedule(delay: int, interval: int) {
         if disposed {
-            System.Fail("Timer is disposed")
+            Panic("Timer is disposed")
         }
         // Ensure a completion destination exists before the runtime retains the callback.
         let queue = TaskQueue.Default
@@ -103,13 +103,13 @@ public class Timer : Disposable {
     internal static func Milliseconds(value: Duration, positive: bool) -> int {
         let ticks = value.Ticks
         if ticks < 0L {
-            System.Fail("Timer duration is out of range")
+            Panic("Timer duration is out of range")
         }
         if ticks > 21474836470000L {
-            System.Fail("Timer duration is out of range")
+            Panic("Timer duration is out of range")
         }
         if positive && ticks == 0L {
-            System.Fail("Timer duration is out of range")
+            Panic("Timer duration is out of range")
         }
         var milliseconds = ticks / 10000L
         if ticks % 10000L != 0 {

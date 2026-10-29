@@ -5,7 +5,7 @@ import System.Web.Http.*
 
 func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
     if request.Method.Method != "GET" || request.Target != "/greeting" {
-        System.Fail("Unexpected benchmark request")
+        Panic("Unexpected benchmark request")
     }
     let person = Person()
     person.id = 42
@@ -16,17 +16,17 @@ func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
 
 async func Main() -> Task<()> {
     let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) else {
-        System.Fail("Listen failed")
+        Panic("Listen failed")
     }
     let Ok(port) = server.GetLocalPort() else {
-        System.Fail("Local port unavailable")
+        Panic("Local port unavailable")
     }
     Console.WriteLine(port)
     for index in 0..<32 {
         let result = await server.ServeOne(Respond)
         if let Error(error) = result {
             server.Close()
-            System.Fail(error.ToString())
+            Panic(error.ToString())
         }
     }
     server.Close()

@@ -9,21 +9,21 @@ async func Main() -> Task<()> {
     let options = HttpServerOptions()
     options.ResponseWriteTimeout = Duration.FromTicks(600000000L)
     let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4, options) else {
-        System.Fail("Listen failed")
+        Panic("Listen failed")
     }
     let Ok(port) = server.GetLocalPort() else {
-        System.Fail("Port failed")
+        Panic("Port failed")
     }
     Console.WriteLine(port)
     var test = 0
     while test < 8 {
         let Ok(context) = await server.Accept() else {
-            System.Fail("Accept failed")
+            Panic("Accept failed")
         }
         if context.Request.Content is HttpMemoryContent buffered {
             CheckRequest(buffered.Memory)
         } else {
-            System.Fail("Buffered acceptance must produce memory content")
+            Panic("Buffered acceptance must produce memory content")
         }
         let size = match test {
             0 => 0
@@ -44,7 +44,7 @@ async func Main() -> Task<()> {
         }
         context.RespondText("Replacement must not affect the pending snapshot")
         if let Error(error) = await pending {
-            System.Fail(error.ToString())
+            Panic(error.ToString())
         }
         context.Dispose()
         test += 1
@@ -54,10 +54,10 @@ async func Main() -> Task<()> {
 }
 
 func CheckRequest(memory: ReadOnlySlice<byte>) {
-    if memory.Length != 4097 { System.Fail("Request length changed") }
+    if memory.Length != 4097 { Panic("Request length changed") }
     var offset = 0
     while offset < memory.Length {
-        if memory[offset] != (byte)122 { System.Fail("Request bytes changed") }
+        if memory[offset] != (byte)122 { Panic("Request bytes changed") }
         offset += 1
     }
 }

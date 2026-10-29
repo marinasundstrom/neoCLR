@@ -225,8 +225,8 @@ fn cli_runs_checks_and_compiles_neo_to_an_ordinary_artifact() {
 #[test]
 fn no_result_namespace_calls_preserve_expression_stack_contracts() {
     for call in [
-        "System.Fail(\"native failure\")",
-        "let result = System.Fail(\"native failure\")",
+        "System.Panic(\"native failure\")",
+        "let result = System.Panic(\"native failure\")",
     ] {
         let source = format!("func Main() -> int {{ {call}; return 42 }}");
         let module = frontend::compile(&source).unwrap();

@@ -4,7 +4,7 @@ import System.Optional.*
 func Main() -> int {
     let candidate: Optional<int> = Some(42)
     let Some(value) = candidate else {
-        System.Fail("missing value")
+        Panic("missing value")
     }
     return value
 }

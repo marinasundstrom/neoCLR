@@ -59,12 +59,12 @@ import System.Optional.*
 
 func Main() {
     let Ok(keys) = Console.OpenKeyInput(true) else {
-        System.Fail("Terminal key input is unavailable")
+        Panic("Terminal key input is unavailable")
     }
     use input = keys
     Console.WriteLine("Press any key to exit.")
     let Ok(Some(_)) = keys.ReadKey() else {
-        System.Fail("Unable to read a key")
+        Panic("Unable to read a key")
     }
 }
 ```

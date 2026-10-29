@@ -36,7 +36,7 @@ func ReadyJson(value: Result<int, JsonError>) -> Task<Result<int, JsonError>> {
 
 func Check(condition: bool) {
     if !condition {
-        System.Fail("Async union propagation assertion failed")
+        Panic("Async union propagation assertion failed")
     }
 }
 
@@ -55,14 +55,14 @@ async func Main() -> Task<int> {
     let httpProgress = Progress()
     let http = Compose(failed.Task, ReadyJson(Ok(2)), httpProgress)
     let Failure(httpError) = await http else {
-        System.Fail("HTTP residual lost")
+        Panic("HTTP residual lost")
     }
     Check(httpError is HttpError && httpProgress.Steps == 0 && httpProgress.Disposed == 1)
 
     let jsonProgress = Progress()
     let json = Compose(source.Task, ReadyJson(Failure(JsonError.Syntax("invalid"))), jsonProgress)
     let Failure(jsonError) = await json else {
-        System.Fail("JSON residual lost")
+        Panic("JSON residual lost")
     }
     Check(jsonError is JsonError && jsonProgress.Steps == 1 && jsonProgress.Disposed == 1)
     Console.WriteLine("HTTP JSON async propagation checks passed")

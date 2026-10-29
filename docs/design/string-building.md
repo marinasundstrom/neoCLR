@@ -18,7 +18,7 @@ policy follows the current array/storage profile, not a permanent text-format li
 The integer constructor specifies a limit, not .NET's initial capacity.
 
 Append(string), AppendLine(string), AppendLine(), and Clear() return the same
-builder. Overflow raises System.Fail's user fault before content mutation. AppendLine
+builder. Overflow raises System.Panic's user fault before content mutation. AppendLine
 preflights both the text and the LF byte, so it cannot leave half a line. Its newline
 is always LF; protocol code must append CRLF explicitly. ToString caches an immutable
 snapshot until the next nonempty append. Clear releases retained text and preserves the

@@ -13,7 +13,7 @@ async func Main() -> Task<int> {
     let source = Promise<int>()
     let pending = CaptureAfter(source.Task)
     if pending.IsCompleted {
-        System.Fail("Expected a suspended capture")
+        Panic("Expected a suspended capture")
     }
     _ = source.Complete(42)
     let trace = await pending

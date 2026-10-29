@@ -18,6 +18,6 @@ public static class SHA256 {
         if status == -1 {
             return Failure(CryptographyError.DestinationTooSmall)
         }
-        System.Fail("Unexpected cryptography provider result")
+        Panic("Unexpected cryptography provider result")
     }
 }

@@ -13,7 +13,7 @@ import NeoClr.Testing.*
 
 func CompletedValue<T>(operation: Task<T>) -> T {
     let Some(Completed(value)) = operation.Outcome else {
-        System.Fail("Expected completed gzip fixture")
+        Panic("Expected completed gzip fixture")
     }
     return value
 }
@@ -199,11 +199,11 @@ func FInput() -> Result<unit, TestFailure> {
     _ = Assert.True(cancelled.IsCancelled, "Input cancellation propagates")?
     _ = Assert.True(CompletedValue(cancelledReader.Read(buffer, 0, 1)) is Failure(StreamError.IoFailure), "Interrupted source cannot replay")?
     let Ok(validText) = StreamReader.Create(Reader(Fixed())) else {
-        System.Fail("Unable to create text wrapper")
+        Panic("Unable to create text wrapper")
     }
     _ = Assert.True(CompletedValue(validText.ReadToEnd(32)) is Ok("abcabcabcabc"), "Compose gzip and text decoding")?
     let Ok(text) = StreamReader.Create(Reader(Trailing())) else {
-        System.Fail("Unable to create text wrapper")
+        Panic("Unable to create text wrapper")
     }
     return Assert.True(CompletedValue(text.ReadToEnd(32)) is Failure(TextReadError.InvalidData), "Preserve binary corruption through text decoding")
 }

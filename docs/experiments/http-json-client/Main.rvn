@@ -12,7 +12,7 @@ import System.Web.Http.Json.*
 
 func Check(condition: bool) {
     if !condition {
-        System.Fail("HTTP JSON client assertion failed")
+        Panic("HTTP JSON client assertion failed")
     }
 }
 
@@ -55,18 +55,18 @@ func JsonVerbs() {
     let reading = client.GetFromJson<Report>("child", token.Token)
     TaskQueue.Default.Drain()
     let Ok(report) = reading.GetResult() else {
-        System.Fail("GET JSON failed")
+        Panic("GET JSON failed")
     }
     Check(report.station == "Café" && good.SawToken)
     let Some(request) = good.Response.Request else {
-        System.Fail("GET origin missing")
+        Panic("GET origin missing")
     }
     Check(request.Target == "/base/child")
     Check(request.GetHeaderValues("x-client")[0] == "json-sample")
     token.Dispose()
 
     let Ok(uri) = Uri.Parse("http://example.test/reports") else {
-        System.Fail("URI creation failed")
+        Panic("URI creation failed")
     }
     let posted = ReplyHandler(400, "not JSON", false)
     let postClient = HttpClient(posted)
@@ -75,17 +75,17 @@ func JsonVerbs() {
     TaskQueue.Default.Drain()
     // POST preserves non-success responses and does not decode their bodies.
     let Ok(postResponse) = posting.GetResult() else {
-        System.Fail("POST response lost")
+        Panic("POST response lost")
     }
     Check(postResponse.StatusCode == HttpStatusCode.BadRequest)
     let Some(postRequest) = postResponse.Request else {
-        System.Fail("POST origin missing")
+        Panic("POST origin missing")
     }
     Check(postRequest.Method.Method == "POST")
     Check(postRequest.GetHeaderValues("x-client")[0] == "json-sample")
     Check(postRequest.GetHeaderValues("content-type")[0] == "application/json; charset=utf-8")
     let Ok(postedReport) = JsonContent.Read<Report>(postRequest.Content) else {
-        System.Fail("Posted body invalid")
+        Panic("Posted body invalid")
     }
     Check(postedReport.station == report.station)
 
@@ -97,31 +97,31 @@ func JsonVerbs() {
     _ = transport.Completion.Complete(Failure(HttpError.TimedOut))
     TaskQueue.Default.Drain()
     let Failure(statusError) = rejection.GetResult() else {
-        System.Fail("Status error missing")
+        Panic("Status error missing")
     }
     if statusError is HttpError httpError {
         let HttpError.UnsuccessfulStatus(code) = httpError else {
-            System.Fail("Status cause missing")
+            Panic("Status cause missing")
         }
         Check(code == HttpStatusCode.NotFound)
     } else {
-        System.Fail("Status alternative missing")
+        Panic("Status alternative missing")
     }
     let Failure(parseError) = malformed.GetResult() else {
-        System.Fail("JSON error missing")
+        Panic("JSON error missing")
     }
     if parseError is JsonError jsonError {
         Check(jsonError is JsonError.Syntax(_))
     } else {
-        System.Fail("JSON alternative missing")
+        Panic("JSON alternative missing")
     }
     let Failure(transportError) = transportResult.GetResult() else {
-        System.Fail("Transport error missing")
+        Panic("Transport error missing")
     }
     if transportError is HttpError httpError {
         Check(httpError is HttpError.TimedOut)
     } else {
-        System.Fail("Transport alternative missing")
+        Panic("Transport alternative missing")
     }
 
     let scalarHandler = ReplyHandler(200, "{}", false)
@@ -130,22 +130,22 @@ func JsonVerbs() {
     Check(scalar.GetResult() is Ok(_))
     Check(scalarHandler.Calls == 1)
     let Some(scalarRequest) = scalarHandler.Response.Request else {
-        System.Fail("Scalar POST origin missing")
+        Panic("Scalar POST origin missing")
     }
     let Ok(scalarValue) = JsonContent.Read<int>(scalarRequest.Content) else {
-        System.Fail("Scalar POST body invalid")
+        Panic("Scalar POST body invalid")
     }
     Check(scalarValue == 42)
 
     let unsupported = ReplyHandler(200, "{}", false)
     let badModel = HttpClient(unsupported).PostAsJson("http://example.test/", (byte)42)
     let Failure(mappingError) = badModel.GetResult() else {
-        System.Fail("Mapping error missing")
+        Panic("Mapping error missing")
     }
     if mappingError is JsonError jsonError {
         Check(jsonError is JsonError.UnsupportedMapping(_))
     } else {
-        System.Fail("Mapping alternative missing")
+        Panic("Mapping alternative missing")
     }
     Check(unsupported.Calls == 0)
 

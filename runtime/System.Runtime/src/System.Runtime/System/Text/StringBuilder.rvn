@@ -17,7 +17,7 @@ public class StringBuilder {
     /// Creates an empty builder; maxUtf8Bytes must be between zero and 65536.
     init(maxUtf8Bytes: int) {
         if !(maxUtf8Bytes >= 0) || maxUtf8Bytes > 65536 {
-            System.Fail("StringBuilder limit must be between 0 and 65536 UTF-8 bytes")
+            Panic("StringBuilder limit must be between 0 and 65536 UTF-8 bytes")
         }
         limit = maxUtf8Bytes
     }
@@ -32,7 +32,7 @@ public class StringBuilder {
     func Append(text: string) -> StringBuilder {
         let bytes = text.GetUtf8ByteCount()
         if bytes > limit - size {
-            System.Fail("StringBuilder UTF-8 byte limit exceeded")
+            Panic("StringBuilder UTF-8 byte limit exceeded")
         }
         if bytes == 0 {
             return self
@@ -49,7 +49,7 @@ public class StringBuilder {
     func AppendLine(text: string) -> StringBuilder {
         let bytes = text.GetUtf8ByteCount()
         if bytes >= limit - size {
-            System.Fail("StringBuilder UTF-8 byte limit exceeded")
+            Panic("StringBuilder UTF-8 byte limit exceeded")
         }
         if bytes == 0 {
             return Append("\n")

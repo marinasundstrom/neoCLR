@@ -51,7 +51,7 @@ func Converter() -> JsonUnionConverter<Reading> {
 
 func Check(condition: bool, message: string) {
     if !condition {
-        System.Fail(message)
+        Panic(message)
     }
 }
 

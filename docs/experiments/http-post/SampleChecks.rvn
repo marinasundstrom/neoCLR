@@ -35,26 +35,26 @@ func CheckSample(mode: int) {
     TaskQueue.Default.Drain()
     if mode == 3 {
         if !pending.IsCancelled {
-            System.Fail("Sample lost task cancellation")
+            Panic("Sample lost task cancellation")
         }
         return
     }
     if mode == 0 {
         let Ok(text) = pending.GetResult() else {
-            System.Fail("Sample lost text")
+            Panic("Sample lost text")
             return
         }
         if text != "Café 🌍" {
-            System.Fail("Sample changed text")
+            Panic("Sample changed text")
         }
     } else {
         let Failure(HttpError.Protocol(message)) = pending.GetResult() else {
-            System.Fail("Sample lost typed error")
+            Panic("Sample lost typed error")
             return
         }
         let expected = if mode == 1 { "peer" } else { "Invalid UTF-8 body" }
         if message != expected {
-            System.Fail("Sample changed error")
+            Panic("Sample changed error")
         }
     }
 }

@@ -5,13 +5,13 @@ import System.Storage.*
 
 func Main() {
     let Ok(_) = FileText.WriteAllText("output.txt", "Hello, värld!", 64) else {
-        Fail("Initial write failed")
+        Panic("Initial write failed")
     }
     let Failure(error) = FileText.WriteAllText("output.txt", "replacement", 2) else {
-        Fail("Oversized write succeeded")
+        Panic("Oversized write succeeded")
     }
     if !(error is FileWriteError.TooLarge) {
-        Fail("Unexpected write error")
+        Panic("Unexpected write error")
     }
     WriteLine("File output passed")
 }

@@ -8,7 +8,7 @@ import System.Concurrency.Tasks.TaskOutcome.*
 
 public func Check(condition: bool, message: string) {
     if !condition {
-        System.Fail(message)
+        Panic(message)
     }
 }
 
@@ -51,11 +51,11 @@ func Main() {
     if some.TryGetValue(out extracted) {
         Check(extracted.Value == 42, "Some extraction")
     } else {
-        System.Fail("Some extraction")
+        Panic("Some extraction")
     }
     Check(extracted.Value == 42, "Some payload")
     if none.TryGetValue(out extracted) {
-        System.Fail("Wrong case extraction")
+        Panic("Wrong case extraction")
     }
     Check(extracted.Value == 0, "Wrong case must clear output")
 
@@ -67,7 +67,7 @@ func Main() {
     Check(!inactive.HasValue, "Default Optional must be inactive")
     Check(Object.ReferenceEquals(inactive.Value, null), "Inactive Value must be null")
     if inactive.TryGetValue(out extracted) {
-        System.Fail("Inactive extraction")
+        Panic("Inactive extraction")
     }
     Check(extracted.Value == 0, "Inactive extraction clears output")
 
@@ -114,10 +114,10 @@ func Main() {
     if taskCompleted.TryGetValue(out taskCase) {
         Check(taskCase.Value == 42, "Completed extraction")
     } else {
-        System.Fail("Completed extraction")
+        Panic("Completed extraction")
     }
     if taskCancelled.TryGetValue(out taskCase) {
-        System.Fail("Cancelled cannot extract Completed")
+        Panic("Cancelled cannot extract Completed")
     }
     Check(taskCase.Value == 0, "Task case mismatch clears output")
     let inactiveTask = default(TaskOutcome<int>)

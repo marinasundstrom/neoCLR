@@ -17,6 +17,6 @@ public static class RandomNumberGenerator {
         if status == -2 {
             return Failure(CryptographyError.ProviderFailure)
         }
-        System.Fail("Unexpected random provider result")
+        Panic("Unexpected random provider result")
     }
 }

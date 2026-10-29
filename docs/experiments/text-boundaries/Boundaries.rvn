@@ -49,7 +49,7 @@ public struct ScalarValue {
         return match Utf8.Decode(bytes) {
             Ok(let text) => text
             Failure(_) => {
-                System.Fail("Invalid scalar encoding in prototype")
+                Panic("Invalid scalar encoding in prototype")
                 ""
             }
         }

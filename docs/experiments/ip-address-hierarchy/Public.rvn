@@ -6,7 +6,7 @@ import System.Result.*
 
 func Check(condition: bool) {
     if !condition {
-        System.Fail("Address hierarchy assertion failed")
+        Panic("Address hierarchy assertion failed")
     }
 }
 
@@ -17,7 +17,7 @@ func Valid(text: string, expected: string) {
             Check(address.Equals(roundTrip))
             Check(address.GetHashCode() == roundTrip.GetHashCode())
         } else {
-            System.Fail("Formatted address must parse")
+            Panic("Formatted address must parse")
         }
         if text.ContainsOrdinal(":") {
             Check(address is IPv6Address)
@@ -25,13 +25,13 @@ func Valid(text: string, expected: string) {
             Check(address is IPv4Address)
         }
     } else {
-        System.Fail(String.Concat("Valid address rejected: ", text))
+        Panic(String.Concat("Valid address rejected: ", text))
     }
 }
 
 func Invalid(text: string) {
     if let Ok(address) = IPAddress.Parse(text) {
-        System.Fail(String.Concat("Invalid address accepted: ", address.ToString()))
+        Panic(String.Concat("Invalid address accepted: ", address.ToString()))
     }
 }
 
@@ -47,68 +47,68 @@ func Main() {
             Check(boxed.Equals(second))
             Check(boxed.GetHashCode() == second.GetHashCode())
         } else {
-            System.Fail("Second address must parse")
+            Panic("Second address must parse")
         }
         if let Ok(mapped) = IPAddress.Parse("::ffff:127.0.0.1") {
             Check(!first.Equals(mapped))
             Check(!mapped.Equals(first))
         } else {
-            System.Fail("Mapped address must parse")
+            Panic("Mapped address must parse")
         }
         var index = 0
         while index < 100 {
             if let Ok(churn) = IPAddress.Parse("127.0.0.1") {
                 Check(first.Equals(churn))
             } else {
-                System.Fail("Churn address must parse")
+                Panic("Churn address must parse")
             }
             index += 1
         }
         Check(first.ToString() == "127.0.0.1")
     } else {
-        System.Fail("First address must parse")
+        Panic("First address must parse")
     }
     if let Failure(error) = IPAddress.Parse("fe80::1%3") {
         Check(error is IPAddressError.UnsupportedScope)
     } else {
-        System.Fail("Scope should be unsupported")
+        Panic("Scope should be unsupported")
     }
     if let Failure(formatError) = IPAddress.Parse("127.1") {
         Check(formatError is IPAddressError.InvalidFormat)
     } else {
-        System.Fail("Abbreviated IPv4 should be invalid")
+        Panic("Abbreviated IPv4 should be invalid")
     }
     if let Ok(loopback) = IPAddress.Parse("127.0.0.1") {
         if let Ok(listener) = Socket.Listen(loopback, 0, 1) {
             listener.Close()
         } else {
-            System.Fail("Address listener failed")
+            Panic("Address listener failed")
         }
     }
     if let Ok(ipv6) = IPAddress.Parse("::1") {
         if let Failure(unsupported) = Socket.Connect(ipv6, 80).GetResult() {
             Check(unsupported is SocketError.UnsupportedAddressFamily)
         } else {
-            System.Fail("IPv6 connect unexpectedly supported")
+            Panic("IPv6 connect unexpectedly supported")
         }
         if let Failure(listenError) = Socket.Listen(ipv6, 0, 1) {
             Check(listenError is SocketError.UnsupportedAddressFamily)
         } else {
-            System.Fail("IPv6 listen unexpectedly supported")
+            Panic("IPv6 listen unexpectedly supported")
         }
         let mixed = ArrayList<IPAddress>()
         mixed.Add(ipv6)
         if let Failure(sequenceError) = Socket.Connect(mixed, 80).GetResult() {
             Check(sequenceError is SocketError.UnsupportedAddressFamily)
         } else {
-            System.Fail("IPv6 sequence unexpectedly supported")
+            Panic("IPv6 sequence unexpectedly supported")
         }
     }
     let empty = ArrayList<IPAddress>()
     if let Failure(emptyError) = Socket.Connect(empty, 80).GetResult() {
         Check(emptyError is SocketError.InvalidRange)
     } else {
-        System.Fail("Empty address values unexpectedly supported")
+        Panic("Empty address values unexpectedly supported")
     }
     Console.WriteLine("Closed address hierarchy value and GC checks passed")
 }

@@ -63,7 +63,7 @@ public class CancellationTokenSource : Disposable {
     val Token: CancellationToken {
         get {
             if disposed {
-                System.Fail("Cancellation source is disposed")
+                Panic("Cancellation source is disposed")
             }
             return CancellationToken(self)
         }
@@ -78,7 +78,7 @@ public class CancellationTokenSource : Disposable {
     /// Zero is deferred. Negative or excessive durations fault, even after cancellation.
     func CancelAfter(delay: Duration) {
         if disposed {
-            System.Fail("Cancellation source is disposed")
+            Panic("Cancellation source is disposed")
         }
         _ = Timer.Milliseconds(delay, false)
         if requested {
@@ -97,14 +97,14 @@ public class CancellationTokenSource : Disposable {
     /// Some schedules cancellation; None disables the pending countdown without cancelling.
     func CancelAfter(delay: Optional<Duration>) {
         if disposed {
-            System.Fail("Cancellation source is disposed")
+            Panic("Cancellation source is disposed")
         }
         if let Some(duration) = delay {
             CancelAfter(duration)
         } else if let System.Optional.None = delay {
             ClearTimer()
         } else {
-            System.Fail("CancelAfter requires Some or None")
+            Panic("CancelAfter requires Some or None")
         }
     }
 
@@ -119,7 +119,7 @@ public class CancellationTokenSource : Disposable {
     /// Sets the request flag and invokes active callbacks synchronously in reverse registration order.
     func Cancel() {
         if disposed {
-            System.Fail("Cancellation source is disposed")
+            Panic("Cancellation source is disposed")
         }
         if requested {
             return
@@ -151,7 +151,7 @@ public class CancellationTokenSource : Disposable {
 
     internal func Register(callback: () -> Void) -> CancellationRegistration {
         if disposed {
-            System.Fail("Cancellation source is disposed")
+            Panic("Cancellation source is disposed")
         }
         if requested {
             callback()

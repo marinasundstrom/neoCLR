@@ -9,7 +9,7 @@ public struct HttpVersion : EquatableTo<HttpVersion> {
 
     /// Creates a version with nonnegative major and minor components; negatives fault.
     init(major: int, minor: int) {
-        if major < 0 || minor < 0 { System.Fail("HTTP version components must be nonnegative") }
+        if major < 0 || minor < 0 { Panic("HTTP version components must be nonnegative") }
         self.major = major
         self.minor = minor
     }

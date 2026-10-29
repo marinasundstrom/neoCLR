@@ -12,17 +12,17 @@ class Application {
 }
 
 async func Main() -> Task<()> {
-    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 64) else { System.Fail("Listen failed") }
-    let Ok(control) = Socket.Listen("127.0.0.1", 0, 1) else { System.Fail("Control failed") }
-    let Ok(port) = server.GetLocalPort() else { System.Fail("Port failed") }
-    let Ok(controlPort) = control.GetLocalPort() else { System.Fail("Control port failed") }
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 64) else { Panic("Listen failed") }
+    let Ok(control) = Socket.Listen("127.0.0.1", 0, 1) else { Panic("Control failed") }
+    let Ok(port) = server.GetLocalPort() else { Panic("Port failed") }
+    let Ok(controlPort) = control.GetLocalPort() else { Panic("Control port failed") }
     let application = Application()
     let lifetime = server.Serve(application.Respond)
     Console.WriteLine("READY " + port.ToString() + " " + controlPort.ToString())
-    let Ok(signal) = await control.Accept() else { System.Fail("Control accept failed") }
+    let Ok(signal) = await control.Accept() else { Panic("Control accept failed") }
     signal.Close()
     control.Close()
     server.Close()
-    if let Failure(_) = await lifetime { System.Fail("Serve failed") }
+    if let Failure(_) = await lifetime { Panic("Serve failed") }
     Console.WriteLine("DONE " + controlPort.ToString() + " " + server.CompletedRequests.ToString() + " " + server.FailedRequests.ToString())
 }

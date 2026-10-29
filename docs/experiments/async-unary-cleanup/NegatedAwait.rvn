@@ -5,7 +5,7 @@ async func Main(arguments: string[]) -> Task<()> {
     if arguments.Length > 0 {
         use cancellation = CancellationTokenSource()
         if !(await Task.FromResult(true)) {
-            System.Fail("Unexpected false result")
+            Panic("Unexpected false result")
         }
     } else {
         _ = await Task.FromResult(true)

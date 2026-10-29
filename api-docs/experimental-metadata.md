@@ -4201,7 +4201,7 @@ reachable fallthrough and unreachable instructions after failure. Out parameters
 assignment only on normal returns; a terminal-only path need not assign them. Labels
 and branch joins retain ordinary flow validation. Definitions can use the same logical
 opcode/string operand through the existing body model. Dynamic diagnostics remain the
-runtime library's `System.Fail(message)` contract; this bounded builder instruction
+runtime library's `System.Panic(message)` contract; this bounded builder instruction
 accepts a literal only.
 
 

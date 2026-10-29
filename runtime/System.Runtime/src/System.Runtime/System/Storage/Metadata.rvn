@@ -24,7 +24,7 @@ public func GetKind(path: string) -> Result<EntryKind, StorageLookupError> {
         if status == 10 {
             return Failure(StorageLookupError.IoFailure())
         }
-        System.Fail("Unexpected metadata error status")
+        Panic("Unexpected metadata error status")
     }
     let kind = neoCLR.Runtime.UnpackValue<int>(payload)
     if kind == 1 {
@@ -33,6 +33,6 @@ public func GetKind(path: string) -> Result<EntryKind, StorageLookupError> {
     if kind == 2 {
         return Ok(EntryKind.Directory)
     }
-    System.Fail("Unexpected metadata kind")
+    Panic("Unexpected metadata kind")
     return Failure(StorageLookupError.IoFailure())
 }

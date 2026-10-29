@@ -18,7 +18,7 @@ class ReportClient {
 
 async func Main(arguments: string[]) -> Task<()> {
     if arguments.Length != 1 {
-        System.Fail("Supply the server base URL, for example http://localhost:8080/")
+        Panic("Supply the server base URL, for example http://localhost:8080/")
         return ()
     }
     let client = HttpClient()
@@ -27,6 +27,6 @@ async func Main(arguments: string[]) -> Task<()> {
     if let Ok(reply) = result {
         Console.WriteLine(reply)
     } else if let Failure(error) = result {
-        System.Fail(error.ToString())
+        Panic(error.ToString())
     }
 }

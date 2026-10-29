@@ -20,7 +20,7 @@ public class ConsoleLoggerProvider : LoggerProvider {
 
     func CreateLogger(categoryName: string) -> Logger {
         if disposed {
-            System.Fail("ConsoleLoggerProvider is disposed")
+            Panic("ConsoleLoggerProvider is disposed")
         }
         return ConsoleLogger(self, categoryName)
     }

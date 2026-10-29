@@ -34,13 +34,13 @@ public class SqlStatement {
                 SqlValue.Text(let text) => parameters.Add(SqlValue.Text(text))
                 SqlValue.Integer(let number) => parameters.Add(SqlValue.Integer(number))
                 SqlValue.Boolean(let flag) => parameters.Add(SqlValue.Boolean(flag))
-                _ => System.Fail("Uninitialized SQL parameter value")
+                _ => Panic("Uninitialized SQL parameter value")
             }
         }
     }
     /// A name for named values, or None for positional values. Invalid indexes fault.
     func ParameterName(index: int) -> Optional<string> {
-        if index < 0 || index >= parameters.Count { System.Fail("SQL parameter index out of range") }
+        if index < 0 || index >= parameters.Count { Panic("SQL parameter index out of range") }
         return if HasNamedParameters { Some(names[index]) } else { None }
     }
     val ParameterCount: int => parameters.Count
@@ -71,7 +71,7 @@ public class SqlRow {
     private val values: ArrayList<Optional<string>>
     init(columns: Sequence<string>, cells: Sequence<Optional<string>>) {
         if columns.Count != cells.Count {
-            System.Fail("SQL column/value count mismatch")
+            Panic("SQL column/value count mismatch")
         }
         names = ArrayList<string>(columns)
         values = ArrayList<Optional<string>>(cells)

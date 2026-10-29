@@ -9,7 +9,7 @@ import System.Web.Http.*
 
 func Check(value: bool) {
     if !value {
-        System.Fail("Response stream contract failed")
+        Panic("Response stream contract failed")
     }
 }
 
@@ -82,10 +82,10 @@ async func Main() -> Task<()> {
     let options = HttpServerOptions()
     options.ResponseWriteTimeout = Duration.FromTicks(50000L)
     let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 16, options) else {
-        System.Fail("Listen failed")
+        Panic("Listen failed")
     }
     let Ok(port) = server.GetLocalPort() else {
-        System.Fail("Port failed")
+        Panic("Port failed")
     }
     Console.WriteLine(port)
     var cancelled = 0
@@ -93,11 +93,11 @@ async func Main() -> Task<()> {
     var index = 0
     while index < 100 {
         let Ok(context) = await server.Accept() else {
-            System.Fail("Accept failed")
+            Panic("Accept failed")
         }
         let input = GeneratedInput(9)
         let Ok(content) = HttpStreamContent.Create(input, 1, false) else {
-            System.Fail("Content failed")
+            Panic("Content failed")
         }
         context.Respond(HttpStatusCode.OK, content)
         let pending = context.Complete()

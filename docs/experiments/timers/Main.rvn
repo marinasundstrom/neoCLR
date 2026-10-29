@@ -5,7 +5,7 @@ import System.Time.*
 
 func Check(condition: bool) {
     if !condition {
-        System.Fail("Timer check failed")
+        Panic("Timer check failed")
     }
 }
 

@@ -172,8 +172,8 @@ M00000002_IL_00c9:
 M00000002_IL_00ca:
 ldstr "Invalid parsed path boundary"
 M00000002_IL_00cf:
-call System.Fail(String)
-fault "System.Fail returned unexpectedly"
+call System.Panic(String)
+fault "System.Panic returned unexpectedly"
 M00000002_IL_00d4:
 M00000002_IL_00d5:
 M00000002_IL_00d6:

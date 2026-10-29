@@ -6,7 +6,7 @@ This is a host API; guest programs cannot catch a Fault or select its code.
 
 ## Explicit faults from guest code
 
-`System.Fail(message: string) -> unit` terminates the invocation with **UserFault**.
+`System.Panic(message: string) -> unit` terminates the invocation with **UserFault**.
 The explicit neoIL `fault "message"` instruction has the same code. There is no
 code argument or overload. A message such as `StackOverflow` remains a UserFault;
 the runtime never infers the classification from guest-supplied text. Explicit
@@ -57,7 +57,7 @@ Fault values itself is trusted host code; this is not a guest capability.
 
 | Stable identifier / Rust variant | Meaning |
 | --- | --- |
-| `UserFault` | Explicit guest fault instruction or System.Fail call, including guest library calls |
+| `UserFault` | Explicit guest fault instruction or System.Panic call, including guest library calls |
 | `StackOverflow` | Configured interpreter call-frame limit exhausted, including a zero-frame budget |
 | `EvaluationStackOverflow` | Configured evaluation/operand-stack limit exhausted |
 | `InstructionLimitExceeded` | Invocation instruction budget exhausted |

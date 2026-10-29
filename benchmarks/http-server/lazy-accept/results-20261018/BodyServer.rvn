@@ -8,7 +8,7 @@ import System.Option.*
 import System.Web.Http.*
 
 func Check(value: bool) {
-    if !value { System.Fail("Incoming body contract failed") }
+    if !value { Panic("Incoming body contract failed") }
 }
 
 func ObserveCancellation(pending: Task<Result<int, StreamError>>) -> Task<bool> {
@@ -57,7 +57,7 @@ async func Consume(stream: InputStream, mode: int) -> Task<()> {
             }
             break
         }
-        let Ok(count) = result else { System.Fail("Missing read outcome") }
+        let Ok(count) = result else { Panic("Missing read outcome") }
         if count == 0 {
             Check(mode < 3 && total == 513)
             Check((await stream.Read(buffer, 1, 17)) is Ok(0))
@@ -70,12 +70,12 @@ async func Consume(stream: InputStream, mode: int) -> Task<()> {
 }
 
 async func Main() -> Task<()> {
-    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 16) else { System.Fail("Listen failed") }
-    let Ok(port) = server.GetLocalPort() else { System.Fail("Port failed") }
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 16) else { Panic("Listen failed") }
+    let Ok(port) = server.GetLocalPort() else { Panic("Port failed") }
     Console.WriteLine(port)
     for mode in 0..9 {
-        let Ok(context) = await server.AcceptHeaders() else { System.Fail("Headers failed") }
-        let Some(stream) = context.Request.Content.TryGetStream() else { System.Fail("Missing stream") }
+        let Ok(context) = await server.AcceptHeaders() else { Panic("Headers failed") }
+        let Some(stream) = context.Request.Content.TryGetStream() else { Panic("Missing stream") }
         // Request bodies cannot be EOF delimited; case two is fixed length here.
         await Consume(stream, mode)
         if mode < 3 {

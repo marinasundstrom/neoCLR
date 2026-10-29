@@ -13,7 +13,7 @@ class DeadlineHolder {
 
 func Check(condition: bool) {
     if !condition {
-        System.Fail("Network deadline assertion failed")
+        Panic("Network deadline assertion failed")
     }
 }
 
@@ -37,7 +37,7 @@ async func Main() -> Task<int> {
     Check(Dns.GetHostAddressesUntil("localhost", expired, stopped.Token).IsCancelled)
     Check(Socket.ConnectUntil(addresses, 0, expired, stopped.Token).IsCancelled)
     let Ok(listener) = Socket.Listen("127.0.0.1", 0, 1) else {
-        System.Fail("Listener creation failed")
+        Panic("Listener creation failed")
         return 1
     }
     let buffer: byte[] = [(byte)0]

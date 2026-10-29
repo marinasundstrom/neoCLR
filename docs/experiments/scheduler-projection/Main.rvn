@@ -30,15 +30,15 @@ module SchedulerProjection {
         let work = Work()
         Scheduler.Submit(work.First)
         if work.Count != 0 {
-            System.Fail("Submission ran inline")
+            Panic("Submission ran inline")
         }
         let result = await work.Done.Task
         if result != 42 || work.Count != 2 {
-            System.Fail("Submission or resumption failed")
+            Panic("Submission or resumption failed")
         }
         let completed = await Task.FromResult(7)
         if completed != 7 {
-            System.Fail("Completed await changed")
+            Panic("Completed await changed")
         }
         Console.WriteLine("PASS deferred submission and state-machine resume")
         return 0

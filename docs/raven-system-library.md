@@ -1,7 +1,7 @@
 # Authoring the foundational library in Raven
 
 **Development migration — 2026-10-02:** the terminal namespace function is now
-`System.Fail(message)`. Earlier dated checkpoints below use its former `System.Fault`
+`System.Panic(message)`. Earlier dated checkpoints below use its former `System.Fault`
 name. Rebuild with the matching compiler, reference and runtime library; host Fault
 results and classification are unchanged. See [the current terminal-failure contract](system-fault.md).
 

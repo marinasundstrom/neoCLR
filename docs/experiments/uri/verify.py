@@ -22,7 +22,7 @@ import System.Collections.*
 
 func Check(value: bool) {
     if !value {
-        System.Fail("URI assertion failed")
+        System.Panic("URI assertion failed")
     }
 }
 
@@ -30,7 +30,7 @@ func Parsed(text: string) -> Uri {
     if let Ok(uri) = Uri.Parse(text) {
         return uri
     }
-    System.Fail("Expected valid URI")
+    System.Panic("Expected valid URI")
     return Parsed("")
 }
 
@@ -55,7 +55,7 @@ func Resolved(baseUri: Uri, reference: string, expected: string) {
             Check(false)
         }
     } else {
-        System.Fail("Expected resolved URI")
+        System.Panic("Expected resolved URI")
     }
 }
 

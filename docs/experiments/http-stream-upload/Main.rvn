@@ -11,7 +11,7 @@ import System.Web.Http.*
 
 func Check(value: bool) {
     if !value {
-        System.Fail("Stream upload contract failed")
+        Panic("Stream upload contract failed")
     }
 }
 
@@ -101,7 +101,7 @@ class UploadCase {
         input = GeneratedInput(mode, cancellation)
         let length = if mode == "empty" { 0 } else { 1025 }
         let Ok(body) = HttpStreamContent.Create(input, length, mode == "borrowed") else {
-            System.Fail("Content construction failed")
+            Panic("Content construction failed")
             return
         }
         content = body
@@ -146,7 +146,7 @@ class UploadCase {
             Check(pending.GetResult() is Failure(HttpError.Transport(_)))
         } else {
             let Ok(response) = pending.GetResult() else {
-                System.Fail("Upload failed")
+                Panic("Upload failed")
                 return
             }
             Check((int)response.StatusCode == 201)
@@ -179,7 +179,7 @@ async func Main(arguments: string[]) -> Task<unit> {
     Check(HttpStreamContent.Create(untouched, 1048577, false) is Failure(HttpError.LimitExceeded(_)))
     Check(untouched.Closes == 0 && untouched.Reads == 0)
     let Ok(maximum) = HttpStreamContent.Create(untouched, 1048576, true) else {
-        System.Fail("Maximum length rejected")
+        Panic("Maximum length rejected")
         return ()
     }
     Check(maximum.Length == 1048576)

@@ -8,7 +8,7 @@ import System.Web.Http.*
 
 func Check(value: bool) {
     if !value {
-        System.Fail("HTTP verb assertion failed")
+        Panic("HTTP verb assertion failed")
     }
 }
 
@@ -45,7 +45,7 @@ class InspectHandler : HttpHandler {
 
 func CheckReply(pending: Task<Result<HttpResponse, HttpError>>) {
     let Ok(response) = pending.GetResult() else {
-        System.Fail("Verb hid response status")
+        Panic("Verb hid response status")
         return
     }
     Check(response.StatusCode == HttpStatusCode.NotFound)
@@ -81,7 +81,7 @@ func Contracts() -> Result<unit, HttpError> {
     if let Failure(HttpError.InvalidRequest(_)) = client.Put("http://other.test/item", content).GetResult() {
         Check(true)
     } else {
-        System.Fail("Absolute URL accepted with BaseUri")
+        Panic("Absolute URL accepted with BaseUri")
     }
     cancellation.Cancel()
     Check(client.Put("invalid URL", content, token).IsCancelled)
@@ -140,7 +140,7 @@ class ClientProbe {
         }
         pending.OnCompleted(() => {
             let Ok(response) = pending.GetResult() else {
-                System.Fail("Verb request failed")
+                Panic("Verb request failed")
                 return
             }
             Check(response.StatusCode == (if index == 2 { HttpStatusCode.NoContent } else { HttpStatusCode.OK }))
@@ -152,7 +152,7 @@ class ClientProbe {
 
 func Main() {
     let Ok(_) = Contracts() else {
-        System.Fail("Contract setup failed")
+        Panic("Contract setup failed")
         return
     }
     ClientProbe().Next()

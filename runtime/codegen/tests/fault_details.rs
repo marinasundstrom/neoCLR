@@ -178,9 +178,9 @@ fn binding(dir: &Temp, seed: &neoclr::Module, app: &str, flags: &[&str], inspect
         .output()
         .unwrap()
 }
-const APP: &str = ".module App\n.function Calculate(Int32 value) -> Int32\nldstr \"bound failure 🌍\"\ncall System.Fail(String)\nldc.i4 42\nret\n.end";
+const APP: &str = ".module App\n.function Calculate(Int32 value) -> Int32\nldstr \"bound failure 🌍\"\ncall System.Panic(String)\nldc.i4 42\nret\n.end";
 fn seed() -> neoclr::Module {
-    neoclr::assemble(".module System\n.references ()\n.function System.Fail(String message) -> void\nldarg message\ncall neoCLR.Runtime.Fault(String)\npop\nret\n.end\n.function neoCLR.Runtime.Fault(String message) -> Void\n.methodimpl InternalCall\n.end").unwrap()
+    neoclr::assemble(".module System\n.references ()\n.function System.Panic(String message) -> void\nldarg message\ncall neoCLR.Runtime.Fault(String)\npop\nret\n.end\n.function neoCLR.Runtime.Fault(String message) -> Void\n.methodimpl InternalCall\n.end").unwrap()
 }
 #[test]
 fn explicit_binding_preserves_wrapper_and_source_identity() {
@@ -210,7 +210,7 @@ fn explicit_binding_preserves_wrapper_and_source_identity() {
             .as_array()
             .unwrap()
             .iter()
-            .any(|f| f["name"] == "System.Fail")
+            .any(|f| f["name"] == "System.Panic")
     );
     #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
     {
@@ -220,7 +220,7 @@ fn explicit_binding_preserves_wrapper_and_source_identity() {
         let stderr = String::from_utf8(result.stderr).unwrap();
         assert_eq!(
             stderr,
-            "UserFault: bound failure 🌍\n   at System.Fail [instruction 1]\n   at Calculate [instruction 1]\n"
+            "UserFault: bound failure 🌍\n   at System.Panic [instruction 1]\n   at Calculate [instruction 1]\n"
         );
         let app = neoclr::assemble(APP).unwrap();
         let program = neoclr::LoadedProgram::with_modules(&app, &seed, &[]).unwrap();
@@ -269,7 +269,7 @@ fn binding_rejects_missing_capability_duplicates_and_altered_service() {
         let dir = Temp::new();
         let app = if case == 1 {
             APP.replace(
-                "call System.Fail(String)",
+                "call System.Panic(String)",
                 "call neoCLR.Runtime.Fault(String)\npop",
             )
         } else {
@@ -324,7 +324,7 @@ fn source_owned_noresult_failure_uses_its_original_identity() {
     .unwrap();
     fs::write(dir.0.join("seed.neoil"), ".module System\n.references ()\n").unwrap();
     let modules = neoclr::assembler::assemble_modules(&[
-        &APP.replace("call System.Fail(String)","call neoCLR.Runtime.Fail(String)"),
+        &APP.replace("call System.Panic(String)","call neoCLR.Runtime.Fail(String)"),
         ".module SourceFailure\n.function neoCLR.Runtime.Fail(String message) -> void\n.methodimpl InternalCall\n.end"
     ]).unwrap();
     fs::write(
@@ -386,7 +386,7 @@ fn canonical_fault_binding_preserves_diagnostics_in_native_code() {
         assert_eq!(result.status.code(), Some(1));
         assert_eq!(
             String::from_utf8(result.stderr).unwrap(),
-            "UserFault: bound failure 🌍\n   at System.Fail [instruction 1]\n   at Calculate [instruction 1]\n"
+            "UserFault: bound failure 🌍\n   at System.Panic [instruction 1]\n   at Calculate [instruction 1]\n"
         );
     }
 }

@@ -24,7 +24,7 @@ module RuntimeAsyncProbe {
         _ = neoCLR.Runtime.SchedulerSubmit(counter.Complete)
         let result = Nested(counter)
         if result != 42 {
-            System.Fail("Runtime yield lost retained state")
+            Panic("Runtime yield lost retained state")
         }
         Console.WriteLine("PASS runtime-owned yield resumes ordinary Raven call chain")
         return 0

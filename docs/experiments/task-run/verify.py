@@ -53,7 +53,7 @@ cases = [
         return Task.Run(Fail)
     }
     func Fail() -> int {
-        System.Fail("task-run-test-fault")
+        System.Panic("task-run-test-fault")
         return 0
     }''', 1, '', 'task-run-test-fault'),
 ]

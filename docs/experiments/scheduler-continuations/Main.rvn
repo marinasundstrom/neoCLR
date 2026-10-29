@@ -15,13 +15,13 @@ module SchedulerContinuations {
         let first = Consume(pending)
         let second = Consume(pending)
         if first.IsCompleted || second.IsCompleted {
-            System.Fail("Pending await completed inline")
+            Panic("Pending await completed inline")
         }
         _ = neoCLR.Runtime.SchedulerSubmit(pending.Publish)
         let one = await first
         let two = await second
         if one != 42 || two != 42 {
-            System.Fail("Pending continuation result mismatch")
+            Panic("Pending continuation result mismatch")
         }
         return 0
     }
@@ -32,19 +32,19 @@ module SchedulerContinuations {
         completed.Publish()
         let immediate = Consume(completed)
         if !immediate.IsCompleted {
-            System.Fail("Completed await unnecessarily suspended")
+            Panic("Completed await unnecessarily suspended")
         }
         let value = await immediate
         if value != 42 {
-            System.Fail("Completed await result mismatch")
+            Panic("Completed await result mismatch")
         }
         completed.OnCompleted(completed.Observe)
         if completed.Deliveries != 0 {
-            System.Fail("Explicit observer ran inline")
+            Panic("Explicit observer ran inline")
         }
         _ = await completed.Observed.Task
         if completed.Deliveries != 1 {
-            System.Fail("Explicit observer delivery mismatch")
+            Panic("Explicit observer delivery mismatch")
         }
         return 0
     }
@@ -61,7 +61,7 @@ module SchedulerContinuations {
         _ = await check.Done.Task
         _ = await cancelled.Observed.Task
         if !waiting.IsCancelled || cancelled.Deliveries != 1 {
-            System.Fail("Cancelled continuation mismatch")
+            Panic("Cancelled continuation mismatch")
         }
         return 0
     }
@@ -75,7 +75,7 @@ module SchedulerContinuations {
 
         func Observe() -> System.Void {
             if !task.IsCancelled {
-                System.Fail("Await did not propagate cancellation")
+                Panic("Await did not propagate cancellation")
             }
             Done.Complete(1)
             return ()
@@ -83,7 +83,7 @@ module SchedulerContinuations {
     }
 
     func CancelledRegistrationRan() -> System.Void {
-        System.Fail("Cancelled registration was dispatched")
+        Panic("Cancelled registration was dispatched")
         return ()
     }
 
@@ -91,22 +91,22 @@ module SchedulerContinuations {
         let operation = Completion(UnpumpedProducer())
         let withdrawn = Continuation(operation.Publish)
         if !withdrawn.Cancel() || withdrawn.Cancel() {
-            System.Fail("Registration cancellation was not one-shot")
+            Panic("Registration cancellation was not one-shot")
         }
         if operation.IsCompleted {
-            System.Fail("Registration cancellation changed operation state")
+            Panic("Registration cancellation changed operation state")
         }
         let delivery = Continuation(operation.Publish)
         delivery.Submit()
         if delivery.Cancel() {
-            System.Fail("Cancellation retracted admitted work")
+            Panic("Cancellation retracted admitted work")
         }
         if operation.IsCompleted {
-            System.Fail("Activation completed operation inline")
+            Panic("Activation completed operation inline")
         }
         let value = await operation
         if value != 42 {
-            System.Fail("Activated continuation lost result")
+            Panic("Activated continuation lost result")
         }
         return 0
     }
@@ -130,17 +130,17 @@ module SchedulerContinuations {
         observer.Dispose()
         observer.Dispose()
         if observer.TrySubmit() {
-            System.Fail("Withdrawn observer was reactivated")
+            Panic("Withdrawn observer was reactivated")
         }
     }
 
     func ObserveCompleted(operation: Completion) {
         use observer = operation.Subscribe(operation.Observe)
         if observer.TrySubmit() {
-            System.Fail("Admitted observer was submitted twice")
+            Panic("Admitted observer was submitted twice")
         }
         if operation.Deliveries != 0 {
-            System.Fail("Observation was not deferred")
+            Panic("Observation was not deferred")
         }
     }
 
@@ -150,18 +150,18 @@ module SchedulerContinuations {
         WithdrawOnReturn(operation)
         DisposeTwice(operation)
         if operation.IsCompleted {
-            System.Fail("Observer disposal changed task state")
+            Panic("Observer disposal changed task state")
         }
         // A surviving waiter still completes; withdrawn subscriptions are skipped.
         _ = neoCLR.Runtime.SchedulerSubmit(operation.Publish)
         let value = await operation
         if value != 42 {
-            System.Fail("Disposal disrupted surviving awaiter")
+            Panic("Disposal disrupted surviving awaiter")
         }
         ObserveCompleted(operation)
         _ = await operation.Observed.Task
         if operation.Deliveries != 1 {
-            System.Fail("Disposal retracted admitted work")
+            Panic("Disposal retracted admitted work")
         }
         return 0
     }

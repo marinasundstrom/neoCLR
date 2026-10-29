@@ -149,7 +149,7 @@ public class SslStream : InputStream, OutputStream, Disposable {
                 let received = (await input.Read(encryptedInput, 0, encryptedInput.Length, token))?
                 inputCount = received
                 if !(inputCount >= 0) || inputCount > encryptedInput.Length {
-                    System.Fail("Invalid TLS input count")
+                    Panic("Invalid TLS input count")
                 }
                 eof = inputCount == 0
             }
@@ -217,7 +217,7 @@ public class SslStream : InputStream, OutputStream, Disposable {
             let plain = SslBuffers.Allocate(size)
             SslBuffers.CopyPlaintext(source.Slice(sent, size), plain)
             let written = (await Pump(3, plain, operation.Token))?
-            if written <= 0 || written > size { System.Fail("Invalid TLS write count") }
+            if written <= 0 || written > size { Panic("Invalid TLS write count") }
             sent += written
         }
         operation.Complete()

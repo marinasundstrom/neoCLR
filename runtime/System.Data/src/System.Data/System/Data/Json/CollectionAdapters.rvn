@@ -43,17 +43,17 @@ internal class CollectionAdapters {
         if let Some(item) = map.Find(key) {
             return item
         }
-        System.Fail("Collection changed while reading")
+        Panic("Collection changed while reading")
     }
 
     static func MapCreate<T>(values: Object[], keys: string[]) -> Object {
         if values.Length != keys.Length {
-            System.Fail("Collection keys and values must have equal lengths")
+            Panic("Collection keys and values must have equal lengths")
         }
         let map = HashMap<string, T>(StringComparer.Ordinal)
         for index in 0..values.Length {
             if !map.TryAdd(keys[index], (T)values[index]) {
-                System.Fail("Duplicate collection key")
+                Panic("Duplicate collection key")
             }
         }
         return map

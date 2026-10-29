@@ -29,21 +29,21 @@ func Query(connection: SqlConnection, name: string, parameters: QueryParameters)
 async func Run(connection: SqlConnection, name: string, parameters: QueryParameters) -> Task<int> {
     let result = await Query(connection, name, parameters)
     let Ok(rows) = result else {
-        System.Fail("PostgreSQL benchmark query failed")
+        Panic("PostgreSQL benchmark query failed")
     }
     let count = if name == "postgres.positional-1" { 1 } else { 32 }
     if rows.Count != count {
-        System.Fail("PostgreSQL benchmark row count")
+        Panic("PostgreSQL benchmark row count")
     }
     var sum = 0
     for row in rows {
         if row.name != "row" || !row.active {
-            System.Fail("PostgreSQL benchmark row content")
+            Panic("PostgreSQL benchmark row content")
         }
         sum += row.id
     }
     if sum != count * (count + 1) / 2 {
-        System.Fail("PostgreSQL benchmark checksum")
+        Panic("PostgreSQL benchmark checksum")
     }
     return 1
 }
@@ -51,33 +51,33 @@ async func Run(connection: SqlConnection, name: string, parameters: QueryParamet
 // Explicit async worker until benchmark discovery supports Task-returning cases.
 async func Main(arguments: string[]) -> Task<()> {
     if arguments.Length != 3 {
-        System.Fail("Expected case, warmups and operations")
+        Panic("Expected case, warmups and operations")
     }
     let name = arguments[0]
     if name != "postgres.positional-1" && name != "postgres.named-32" {
-        System.Fail("Unknown PostgreSQL case")
+        Panic("Unknown PostgreSQL case")
     }
     let Ok(warmups) = Int32.Parse(arguments[1]) else {
-        System.Fail("Invalid warmups")
+        Panic("Invalid warmups")
     }
     let Ok(operations) = Int32.Parse(arguments[2]) else {
-        System.Fail("Invalid operations")
+        Panic("Invalid operations")
     }
     if warmups < 0 {
-        System.Fail("Invalid counts")
+        Panic("Invalid counts")
     }
     if warmups > 10000 {
-        System.Fail("Invalid counts")
+        Panic("Invalid counts")
     }
     if operations < 1 {
-        System.Fail("Invalid counts")
+        Panic("Invalid counts")
     }
     if operations > 10000 {
-        System.Fail("Invalid counts")
+        Panic("Invalid counts")
     }
     let opened = await PostgresDatabase("postgres", "postgres", Configuration.Port, 60000).Open()
     let Ok(session) = opened else {
-        System.Fail("Cannot open benchmark database")
+        Panic("Cannot open benchmark database")
     }
     use connection = session
     let parameters = QueryParameters()

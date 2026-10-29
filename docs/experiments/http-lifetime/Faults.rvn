@@ -11,7 +11,7 @@ class Forwarder : DelegatingHandler {
 func Main(arguments: string[]) {
     let mode = arguments[0]
     let Ok(request) = HttpRequest.Get("http://example.test/") else {
-        System.Fail("Fixture request failed")
+        Panic("Fixture request failed")
     }
     use stopped = CancellationTokenSource()
     stopped.Cancel()

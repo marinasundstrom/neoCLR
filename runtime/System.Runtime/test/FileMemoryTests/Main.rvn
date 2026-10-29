@@ -10,7 +10,7 @@ import System.Concurrency.Tasks.TaskOutcome.*
 // this boundary; it does not test asynchronous OS file I/O.
 func CompletedValue<T>(task: Task<T>) -> T {
     let Some(Completed(value)) = task.Outcome else {
-        System.Fail("Expected inline file completion")
+        Panic("Expected inline file completion")
     }
     return value
 }

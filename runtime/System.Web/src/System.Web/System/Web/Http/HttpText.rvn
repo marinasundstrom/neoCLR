@@ -31,7 +31,7 @@ internal static class HttpText {
                 count -= 1
             }
             if count == 0 {
-                System.Fail("Invalid HTTP text scalar boundary")
+                Panic("Invalid HTTP text scalar boundary")
             }
             for value in EncodeChunk(chunk) {
                 output.Add(value)
@@ -45,7 +45,7 @@ internal static class HttpText {
         return match Encodings.Utf8.Encode(text) {
             Ok(let bytes) => bytes
             Failure(_) => {
-                System.Fail("Prevalidated HTTP text encoding failed")
+                Panic("Prevalidated HTTP text encoding failed")
                 ArrayList<byte>()
             }
         }
@@ -173,7 +173,7 @@ internal class HttpByteWindow : Sequence<byte> {
     val self[index: int]: byte {
         get {
             if index < 0 || index >= count {
-                System.Fail("HTTP byte window index is out of range")
+                Panic("HTTP byte window index is out of range")
             }
             return source[start + index]
         }

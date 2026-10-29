@@ -6,7 +6,7 @@ import System.Runtime.Reflection.*
 
 public func Check(condition: bool, message: string) {
     if !condition {
-        System.Fail(message)
+        Panic(message)
     }
 }
 
@@ -28,7 +28,7 @@ func Main() -> int {
     if let Some(element) = array.GetElementType() {
         Check(element.Equals(number) && element.IsNominalType, "Element identity")
     } else {
-        System.Fail("Missing array element")
+        Panic("Missing array element")
     }
     let generic = typeof(Optional<int[]>)
     let argument = generic.GetGenericArgument(0)
@@ -53,7 +53,7 @@ func Main() -> int {
     if let Some(owner) = invoke.DeclaringType {
         Check(owner.Equals(function) && owner is FunctionTypeInfo, "Invoke belongs to its signature")
     } else {
-        System.Fail("Missing Function owner")
+        Panic("Missing Function owner")
     }
     let properties = function.GetProperties()
     Check(properties.Count == 1 && properties[0].Name == "Function", "Synthesized Function property")
@@ -64,7 +64,7 @@ func Main() -> int {
         Check(getter.Name == "get_Function" && !getter.Equals(invoke), "Distinct synthetic getter")
         Check(getter.Equals(function.GetMethods()[1]), "Property and method discovery agree")
     } else {
-        System.Fail("Missing Function getter")
+        Panic("Missing Function getter")
     }
     let parameters = function.Parameters
     Check(parameters.Count == invoke.GetParameters().Count && parameters[0].Equals(invoke.GetParameters()[0]), "Direct Function parameters agree with Invoke")

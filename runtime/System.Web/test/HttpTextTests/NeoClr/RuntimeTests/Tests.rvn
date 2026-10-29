@@ -15,7 +15,7 @@ func LargePrefix() -> string {
     return match text.SliceUtf8(0, 65535) {
         Ok(let prefix) => prefix
         Failure(_) => {
-            System.Fail("ASCII fixture boundary")
+            Panic("ASCII fixture boundary")
             ""
         }
     }

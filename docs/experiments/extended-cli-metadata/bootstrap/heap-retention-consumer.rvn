@@ -16,20 +16,20 @@ func Main() {
     Heap.Collect()
     Heap.KeepAlive(box)
     if Heap.CollectionCount <= before {
-        System.Fail("Explicit collection was not recorded")
+        Panic("Explicit collection was not recorded")
     }
     if Heap.AllocatedObjectCount < allocated || Heap.ReclaimedObjectCount < reclaimed {
-        System.Fail("Heap counters moved backwards")
+        Panic("Heap counters moved backwards")
     }
     if Heap.HeapObjectCount > Heap.PeakHeapObjectCount || Heap.HeapObjectCount > Heap.HeapObjectLimit {
-        System.Fail("Heap count exceeds its bounds")
+        Panic("Heap count exceeds its bounds")
     }
     if box.Value != 42 || !Object.ReferenceEquals(box, same) {
-        System.Fail("Collection changed a live object's contents or identity")
+        Panic("Collection changed a live object's contents or identity")
     }
     same.Value = 73
     if box.Value != 73 {
-        System.Fail("Shared object identity was lost")
+        Panic("Shared object identity was lost")
     }
     Console.WriteLine("Native source heap passed")
 }

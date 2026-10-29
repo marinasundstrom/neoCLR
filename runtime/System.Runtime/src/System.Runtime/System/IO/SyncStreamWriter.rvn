@@ -97,7 +97,7 @@ public class SyncStreamWriter : SyncTextWriter {
             }
         }
         if !(step.BytesWritten >= 0) || step.BytesWritten > buffer.Length {
-            System.Fail("Invalid encoder byte count")
+            Panic("Invalid encoder byte count")
         }
         if step.BytesWritten > 65536 - total {
             failed = true

@@ -139,8 +139,8 @@ M00000006_IL_004e:
 M00000006_IL_004f:
 ldstr "String.Join UTF-8 byte count overflow"
 M00000006_IL_0054:
-call System.Fail(String)
-fault "System.Fail returned unexpectedly"
+call System.Panic(String)
+fault "System.Panic returned unexpectedly"
 M00000006_IL_0059:
 M00000006_IL_005a:
 M00000006_IL_005b:
@@ -183,8 +183,8 @@ M00000006_IL_0081:
 M00000006_IL_0082:
 ldstr "String.Join UTF-8 byte count overflow"
 M00000006_IL_0087:
-call System.Fail(String)
-fault "System.Fail returned unexpectedly"
+call System.Panic(String)
+fault "System.Panic returned unexpectedly"
 M00000006_IL_008c:
 M00000006_IL_008d:
 M00000006_IL_008e:
@@ -505,7 +505,7 @@ M00000019_IL_0088:
 M00000019_IL_0089:
 ldstr "invalid native UTF-8 slice status"
 M00000019_IL_008e:
-call System.Fail(String)
-fault "System.Fail returned unexpectedly"
+call System.Panic(String)
+fault "System.Panic returned unexpectedly"
 .end
 .end

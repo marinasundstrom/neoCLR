@@ -1,0 +1,9 @@
+import System.*
+
+func Stop() -> int {
+    Panic("panic: åäö ☃")
+}
+
+func Main() -> int {
+    return Stop()
+}

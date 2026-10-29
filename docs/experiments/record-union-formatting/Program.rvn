@@ -12,7 +12,7 @@ record struct PairValue(Value: Choice)
 func Check(actual: string, expected: string) {
     if !actual.Equals(expected, StringComparison.Ordinal) {
         Console.WriteLine(actual)
-        System.Fail("record union display mismatch")
+        Panic("record union display mismatch")
     }
 }
 

@@ -5,21 +5,21 @@ import System.Concurrency.Tasks.*
 
 func Check(value: bool) {
     if !value {
-        System.Fail("Sync stream contract")
+        Panic("Sync stream contract")
     }
 }
 
 func Count(result: Result<int, StreamError>, expected: int) {
     match result {
         Ok(let count) => Check(count == expected)
-        Failure(_) => System.Fail("Unexpected read error")
+        Failure(_) => Panic("Unexpected read error")
     }
 }
 
 func Ok(result: Result<unit, StreamError>) {
     match result {
         Ok(_) => { }
-        Failure(_) => System.Fail("Unexpected write/flush error")
+        Failure(_) => Panic("Unexpected write/flush error")
     }
 }
 
@@ -71,13 +71,13 @@ func CheckLimit(output: SyncOutputStream) {
     let bytes: byte[] = [(byte)1]
     match output.Write(bytes) {
         Failure(StreamError.LimitExceeded) => { }
-        _ => System.Fail("Quota must reject")
+        _ => Panic("Quota must reject")
     }
 }
 
 func CheckClosed(output: SyncOutputStream) {
     match output.Flush() {
         Failure(StreamError.Closed) => { }
-        _ => System.Fail("Shared close state")
+        _ => Panic("Shared close state")
     }
 }

@@ -8,19 +8,19 @@ func Main() {
     let alias = first
     let value: Object = first
     if !Object.ReferenceEquals(first, alias) {
-        System.Fail("Record assignment must preserve class identity")
+        Panic("Record assignment must preserve class identity")
     }
     if Object.ReferenceEquals(first, second) {
-        System.Fail("Separate records must retain distinct identities")
+        Panic("Separate records must retain distinct identities")
     }
     if !first.Equals(second) || !value.Equals(second) || first != second {
-        System.Fail("Record equality must agree through typed and Object views")
+        Panic("Record equality must agree through typed and Object views")
     }
     if first.GetHashCode() != second.GetHashCode() {
-        System.Fail("Equal records must have equal hashes")
+        Panic("Equal records must have equal hashes")
     }
     if first == Key(7) {
-        System.Fail("Different record components must compare unequal")
+        Panic("Different record components must compare unequal")
     }
     Console.WriteLine("Record identity, equality and hashes agree")
 }

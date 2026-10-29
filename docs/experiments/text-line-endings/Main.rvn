@@ -75,28 +75,28 @@ func ObserveRead(task: Task<Result<Optional<char>, TextReadError>>) -> Task<unit
 
 func Check(condition: bool, message: string) {
     if !condition {
-        System.Fail(message)
+        Panic(message)
     }
 }
 
 func Text(result: Result<string, TextReadError>, expected: string) {
     match result {
         Ok(let value) => Check(String.CompareOrdinal(value, expected) == 0, "Text bytes")
-        Failure(let error) => System.Fail("Unexpected text error: " + error.ToString())
+        Failure(let error) => Panic("Unexpected text error: " + error.ToString())
     }
 }
 
 func Character(result: Result<Optional<char>, TextReadError>, expected: string) {
     match result {
         Ok(Some(let value)) => Check(String.CompareOrdinal(value.ToString(), expected) == 0, "Grapheme bytes")
-        _ => System.Fail("Expected character")
+        _ => Panic("Expected character")
     }
 }
 
 func End(result: Result<Optional<char>, TextReadError>) {
     match result {
         Ok(None) => { }
-        _ => System.Fail("Expected character EOF")
+        _ => Panic("Expected character EOF")
     }
 }
 
@@ -104,7 +104,7 @@ async func Main() -> Task<unit> {
     for ending in ["\n", "\r\n", "\r", "END", "abab", "💥"] {
         let input = FragmentedInput("a" + ending + "b" + ending, 1)
         let Ok(lines) = StreamReader.Create(input) else {
-            System.Fail("Delimiter reader")
+            Panic("Delimiter reader")
         }
         let textReader: TextReader = lines
         textReader.NewLine = ending
@@ -115,7 +115,7 @@ async func Main() -> Task<unit> {
     }
     let pendingInput = PendingInput()
     let Ok(pendingReader) = StreamReader.Create(pendingInput) else {
-        System.Fail("Pending delimiter reader")
+        Panic("Pending delimiter reader")
     }
     pendingReader.NewLine = "END"
     let pendingLine = pendingReader.ReadLine(0)
@@ -127,7 +127,7 @@ async func Main() -> Task<unit> {
 
     let exactInput = FragmentedInput("xéyéz", 1)
     let Ok(exact) = StreamReader.Create(exactInput) else {
-        System.Fail("Exact delimiter reader")
+        Panic("Exact delimiter reader")
     }
     exact.NewLine = "é"
     Check(await exact.ReadLine(4) is Ok(Some("xéy")), "Delimiter must compare UTF-8 ordinally")
@@ -135,7 +135,7 @@ async func Main() -> Task<unit> {
 
     let invalidInput = FragmentedInput("aaabtail", 1)
     let Ok(overlap) = StreamReader.Create(invalidInput) else {
-        System.Fail("Overlap reader")
+        Panic("Overlap reader")
     }
     overlap.NewLine = ""
     Check(await overlap.ReadLine(8) is Failure(TextReadError.InvalidRange), "Empty delimiter")
@@ -146,18 +146,18 @@ async func Main() -> Task<unit> {
     Check(await overlap.ReadLine(2) is Ok(Some("ta")), "Changed delimiter")
 
     let Ok(prefixReader) = StreamReader.Create(FragmentedInput("xEN", 1)) else {
-        System.Fail("Partial delimiter reader")
+        Panic("Partial delimiter reader")
     }
     prefixReader.NewLine = "END"
     Check(await prefixReader.ReadLine(3) is Ok(Some("xEN")), "Partial delimiter at EOF")
     let Ok(lfReader) = StreamReader.Create(FragmentedInput("x\r\n", 1)) else {
-        System.Fail("LF reader")
+        Panic("LF reader")
     }
     Check(await lfReader.ReadLine(2) is Ok(Some("x\r")), "LF must preserve CR")
 
     let newlineOutput = MemoryStream()
     let Ok(createdWriter) = StreamWriter.Create(newlineOutput, true) else {
-        System.Fail("Newline writer")
+        Panic("Newline writer")
     }
     let textWriter: TextWriter = createdWriter
     textWriter.NewLine = "\r\n"
@@ -170,7 +170,7 @@ async func Main() -> Task<unit> {
     textWriter.Close()
     Check(newlineOutput.Seek(0) is Ok(0), "Newline seek")
     let Ok(newlineReader) = StreamReader.Create(newlineOutput) else {
-        System.Fail("Newline output reader")
+        Panic("Newline output reader")
     }
     Text(await newlineReader.ReadToEnd(20), "x\r\n💥y")
 

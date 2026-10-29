@@ -1,5 +1,7 @@
 module System
 
+import System.*
+
 import System.Result.*
 
 public struct UInt64 : Number, EquatableTo<ulong>, Formattable {
@@ -28,7 +30,7 @@ public struct UInt64 : Number, EquatableTo<ulong>, Formattable {
         if status == 2 {
             return Failure(NumberParseError.Overflow())
         }
-        System.Fail("invalid native parse status")
+        Panic("invalid native parse status")
         return Failure(NumberParseError.InvalidFormat())
     }
 

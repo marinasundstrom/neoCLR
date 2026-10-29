@@ -23,7 +23,7 @@ module SchedulerContinuations {
                 return false
             }
             if !neoCLR.Runtime.SchedulerActivate(registration) {
-                System.Fail("Continuation registration unavailable")
+                Panic("Continuation registration unavailable")
             }
             submitted = true
             return true
@@ -31,7 +31,7 @@ module SchedulerContinuations {
 
         func Submit() {
             if !TrySubmit() {
-                System.Fail("Continuation registration already consumed")
+                Panic("Continuation registration already consumed")
             }
         }
 
@@ -40,7 +40,7 @@ module SchedulerContinuations {
                 return false
             }
             if !neoCLR.Runtime.SchedulerCancel(registration) {
-                System.Fail("Continuation registration unavailable")
+                Panic("Continuation registration unavailable")
             }
             withdrawn = true
             return true

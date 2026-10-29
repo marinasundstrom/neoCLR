@@ -7,30 +7,30 @@ import System.Console.*
 
 func Check(condition: bool) {
     if !condition {
-        System.Fail("Time/zone contract check failed")
+        Panic("Time/zone contract check failed")
     }
 }
 
 func Civil(year: int, month: int, day: int, hour: int, minute: int) -> LocalDateTime {
     let Ok(date) = Date.Create(year, month, day) else {
-        System.Fail("Invalid test date")
+        Panic("Invalid test date")
     }
     let Ok(time) = TimeOfDay.Create(hour, minute, 0) else {
-        System.Fail("Invalid test time")
+        Panic("Invalid test time")
     }
     return LocalDateTime.Create(date, time)
 }
 
 func Zone(id: string) -> TimeZone {
     let Ok(zone) = TimeZone.Find(id) else {
-        System.Fail("Invalid test zone")
+        Panic("Invalid test zone")
     }
     return zone
 }
 
 func Mapping(zone: TimeZone, local: LocalDateTime) -> LocalTimeMapping {
     let Ok(mapping) = zone.MapLocal(local) else {
-        System.Fail("Unexpected mapping error")
+        Panic("Unexpected mapping error")
     }
     return mapping
 }
@@ -46,11 +46,11 @@ func Main() {
     let zero = TimeOffset.Zero
     Check(zero.Seconds == 0)
     let Ok(half) = TimeOffset.FromSeconds(19800) else {
-        System.Fail("Expected half-hour offset")
+        Panic("Expected half-hour offset")
     }
     let instant = Instant.FromUnixTimeTicks(-1L)
     let Ok(local) = half.AtInstant(instant) else {
-        System.Fail("Expected fixed offset projection")
+        Panic("Expected fixed offset projection")
     }
     Check(local.Date.Year == 1970 && local.Time.Hour == 5 && local.Time.Minute == 29)
     Check(local.Time.FractionTicks == 9999999)
@@ -58,36 +58,36 @@ func Main() {
     Check(half.CompareTo(zero) == 1)
     match TimeOffset.FromSeconds(64801) {
         .Failure(_) => { }
-        .Ok(_) => System.Fail("Expected offset range error")
+        .Ok(_) => Panic("Expected offset range error")
     }
     match zero.AtInstant(Instant.FromUnixTimeTicks(-9223372036854775808L)) {
         .Failure(_) => { }
-        .Ok(_) => System.Fail("Expected date range error")
+        .Ok(_) => Panic("Expected date range error")
     }
     match zero.AtInstant(Instant.FromUnixTimeTicks(9223372036854775807L)) {
         .Failure(_) => { }
-        .Ok(_) => System.Fail("Expected date range error")
+        .Ok(_) => Panic("Expected date range error")
     }
     let Ok(firstDate) = zero.AtInstant(Instant.FromUnixTimeTicks(-621355968000000000L)) else {
-        System.Fail("Expected minimum civil date")
+        Panic("Expected minimum civil date")
     }
     Check(firstDate.Date.Year == 1 && firstDate.Date.Day == 1 && firstDate.Time.Ticks == 0L)
     let Ok(lastDate) = zero.AtInstant(Instant.FromUnixTimeTicks(2534023007999999999L)) else {
-        System.Fail("Expected maximum civil date")
+        Panic("Expected maximum civil date")
     }
     Check(lastDate.Date.Year == 9999 && lastDate.Date.Month == 12 && lastDate.Date.Day == 31)
     match firstDate.Add(Duration.FromTicks(-1L)) {
         .Failure(_) => { }
-        .Ok(_) => System.Fail("Expected minimum date carry failure")
+        .Ok(_) => Panic("Expected minimum date carry failure")
     }
     match lastDate.Add(Duration.FromTicks(1L)) {
         .Failure(_) => { }
-        .Ok(_) => System.Fail("Expected maximum date carry failure")
+        .Ok(_) => Panic("Expected maximum date carry failure")
     }
     let minimum = Instant.FromUnixTimeTicks(-9223372036854775808L)
     match minimum.Add(Duration.FromTicks(-1L)) {
         .Failure(_) => { }
-        .Ok(_) => System.Fail("Expected minimum instant overflow")
+        .Ok(_) => Panic("Expected minimum instant overflow")
     }
     let midnight = Civil(2024, 1, 1, 0, 0)
     let civilChoice: DateTime = midnight
@@ -98,7 +98,7 @@ func Main() {
     Check(midnight.Time.Add(Duration.FromTicks(-1L)).Ticks == 863999999999L)
     Check(midnight.Time.Add(Duration.FromTicks(864000000000L)).Ticks == 0L)
     let Ok(previous) = midnight.Add(Duration.FromTicks(-1L)) else {
-        System.Fail("Expected date carry")
+        Panic("Expected date carry")
     }
     Check(previous.Date.Year == 2023 && previous.Date.Month == 12 && previous.Date.Day == 31)
     Check(previous.Time.Ticks == 863999999999L)
@@ -107,22 +107,22 @@ func Main() {
     let maximum = Instant.FromUnixTimeTicks(9223372036854775807L)
     match maximum.Add(Duration.FromTicks(1L)) {
         .Failure(_) => { }
-        .Ok(_) => System.Fail("Expected instant overflow")
+        .Ok(_) => Panic("Expected instant overflow")
     }
     let Ok(next) = instant.Add(Duration.FromTicks(1L)) else {
-        System.Fail("Expected elapsed addition")
+        Panic("Expected elapsed addition")
     }
     Check(next.UnixTimeTicks == 0L)
     match midnight.Add(Duration.FromTicks(9223372036854775807L)) {
         .Failure(_) => { }
-        .Ok(_) => System.Fail("Expected civil overflow")
+        .Ok(_) => Panic("Expected civil overflow")
     }
     let stockholm = Zone("Europe/Stockholm")
     Check(stockholm.MinYear == 1900 && stockholm.MaxYear == 2099)
     Check(TimeZone.DatabaseVersion == "2025b")
     match Mapping(stockholm, Civil(2024, 3, 31, 2, 30)) {
         Skipped => { }
-        _ => System.Fail("Expected spring gap")
+        _ => Panic("Expected spring gap")
     }
     match Mapping(stockholm, Civil(2024, 10, 27, 2, 30)) {
         Ambiguous(let earlier, let later) => {
@@ -137,42 +137,42 @@ func Main() {
             Check(DescribeDateTime(choices[0]) == "2024-01-01")
             Check(DescribeDateTime(choices[1]) == "Europe/Stockholm")
             let Ok(projected) = stockholm.AtInstant(later.Instant) else {
-                System.Fail("Expected zone round trip")
+                Panic("Expected zone round trip")
             }
             Check(projected.LocalDateTime.Time.Hour == 2 && projected.LocalDateTime.Time.Minute == 30)
         }
-        _ => System.Fail("Expected autumn overlap")
+        _ => Panic("Expected autumn overlap")
     }
     match Mapping(Zone("Asia/Jerusalem"), Civil(2024, 1, 1, 12, 0)) {
         Unique(let value) => Check(value.Offset.Seconds == 7200)
-        _ => System.Fail("Expected unique Israeli time")
+        _ => Panic("Expected unique Israeli time")
     }
     match Mapping(Zone("Pacific/Apia"), Civil(2011, 12, 30, 12, 0)) {
         Skipped => { }
-        _ => System.Fail("Expected skipped date")
+        _ => Panic("Expected skipped date")
     }
     match TimeZone.Find("Not/AZone") {
         .Failure(let reason) => Check(reason.ToString() == "UnknownZone")
-        .Ok(_) => System.Fail("Expected unknown zone")
+        .Ok(_) => Panic("Expected unknown zone")
     }
     match TimeZone.Utc.MapLocal(Civil(2100, 1, 1, 0, 0)) {
         .Failure(let reason) => Check(reason.ToString() == "OutOfRange")
-        .Ok(_) => System.Fail("Expected zone range error")
+        .Ok(_) => Panic("Expected zone range error")
     }
     // Civil +24h and elapsed +24h differ across the spring transition.
     let before = Civil(2024, 3, 30, 12, 0)
     let Unique(start) = Mapping(stockholm, before) else {
-        System.Fail("Expected unique start")
+        Panic("Expected unique start")
     }
     let day = Duration.FromTicks(864000000000L)
     let Ok(civilNext) = before.Add(day) else {
-        System.Fail("Expected next civil day")
+        Panic("Expected next civil day")
     }
     let Ok(elapsed) = start.Instant.Add(day) else {
-        System.Fail("Expected next elapsed day")
+        Panic("Expected next elapsed day")
     }
     let Ok(elapsedNext) = stockholm.AtInstant(elapsed) else {
-        System.Fail("Expected elapsed projection")
+        Panic("Expected elapsed projection")
     }
     Check(civilNext.Time.Hour == 12 && elapsedNext.LocalDateTime.Time.Hour == 13)
     match TimeZone.GetSystem() {

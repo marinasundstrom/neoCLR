@@ -6,27 +6,27 @@ import System.Storage.FileText.*
 func Main() {
     match WriteAllText("storage-demo/text.txt", "värld", 16) {
         Ok(_) => { }
-        Failure(_) => System.Fail("Write failed")
+        Failure(_) => Panic("Write failed")
     }
     match WriteAllText("storage-demo/text.txt", "replacement", 1) {
         Failure(FileWriteError.TooLarge) => { }
-        _ => System.Fail("Write bound was ignored")
+        _ => Panic("Write bound was ignored")
     }
     match ReadAllText("storage-demo/text.txt", 16) {
         Ok(let text) => {
             if text != "värld" {
-                System.Fail("Rejected write changed the file")
+                Panic("Rejected write changed the file")
             }
         }
-        Failure(_) => System.Fail("Read failed")
+        Failure(_) => Panic("Read failed")
     }
     match ReadAllText("storage-demo/text.txt", 1) {
         Failure(FileReadError.TooLarge) => { }
-        _ => System.Fail("Read bound was ignored")
+        _ => Panic("Read bound was ignored")
     }
     match ReadAllText("storage-demo/missing.txt", 16) {
         Failure(FileReadError.NotFound) => { }
-        _ => System.Fail("Missing file status was lost")
+        _ => Panic("Missing file status was lost")
     }
     Console.WriteLine("Native bounded file text passed")
 }

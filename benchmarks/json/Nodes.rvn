@@ -8,21 +8,21 @@ import NeoClr.Benchmarking.*
 func Main(arguments: string[]) {
     let text = DocumentText()
     let Ok(node) = JsonSerializer.DeserializeNode(text) else {
-        System.Fail("JSON setup failed")
+        Panic("JSON setup failed")
     }
     let Ok(canonical) = JsonSerializer.SerializeNode(node) else {
-        System.Fail("JSON setup round trip failed")
+        Panic("JSON setup round trip failed")
     }
     if canonical != text {
-        System.Fail("JSON setup changed nested content")
+        Panic("JSON setup changed nested content")
     }
     let suite = BenchmarkSuite()
     suite.Add("json.nodes.serialize", () => {
         let Ok(output) = JsonSerializer.SerializeNode(node) else {
-            System.Fail("JSON serialization failed")
+            Panic("JSON serialization failed")
         }
         if output != text {
-            System.Fail("JSON serialization changed the document")
+            Panic("JSON serialization changed the document")
         }
         return 1
     })
@@ -36,16 +36,16 @@ func DocumentText() -> string => "{\"name\":\"Café 🌍\",\"station\":{\"active
 func DeserializeNodes() -> int {
     let text = DocumentText()
     let Ok(value) = JsonSerializer.DeserializeNode(text) else {
-        System.Fail("JSON deserialization failed")
+        Panic("JSON deserialization failed")
     }
     if value is JsonObject document {
         if document.Count != 4 {
-            System.Fail("JSON object shape changed")
+            Panic("JSON object shape changed")
         }
         if document.Field("name") is Ok(JsonString name) && name.Value == "Café 🌍" {
             return 1
         }
     }
-    System.Fail("JSON deserialization changed the document")
+    Panic("JSON deserialization changed the document")
     return 0
 }

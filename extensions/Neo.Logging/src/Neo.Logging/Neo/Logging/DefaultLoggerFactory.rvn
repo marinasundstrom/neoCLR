@@ -70,7 +70,7 @@ public class DefaultLoggerFactory : LoggerFactory {
 
     private func CheckActive() {
         if disposed {
-            System.Fail("LoggerFactory is disposed")
+            Panic("LoggerFactory is disposed")
         }
     }
 }

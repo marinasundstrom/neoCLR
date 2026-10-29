@@ -85,7 +85,7 @@ def main():
         seed = args.seed.resolve()
         if name in ('full-owned-handle', 'runtime-owned'):
             library = manifest['libraries'][0]
-            manifest['failure'] = dict(assemblyName=library['assemblyName'], namespaceName='System', functionName='Fail')
+            manifest['failure'] = dict(assemblyName=library['assemblyName'], namespaceName='System', functionName='Panic')
             library['types'] = sorted(set(library['types']) | {'System.RuntimeTypeHandle', 'System.Void', 'System.Value'})
             manifest['unit'] = dict(assemblyName=library['assemblyName'], typeName='System.Void')
             manifest['nativePrimitives']['System.RuntimeTypeHandle'] = library['assemblyName']

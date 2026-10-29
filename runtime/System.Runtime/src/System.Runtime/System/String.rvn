@@ -1,5 +1,7 @@
 module System
 
+import System.*
+
 import System.Result.*
 import System.Optional.*
 import System.Text.Utf8SliceError
@@ -110,7 +112,7 @@ public class String : EquatableTo<string>, ComparableTo<string>, Collections.Seq
         }
         iterator.Dispose()
         if index != count {
-            System.Fail("Character sequence count changed during construction")
+            Panic("Character sequence count changed during construction")
         }
         return neoCLR.Runtime.StringFromChars(snapshot)
     }
@@ -199,13 +201,13 @@ public class String : EquatableTo<string>, ComparableTo<string>, Collections.Seq
         while index < count {
             if index != 0 {
                 if separatorBytes > 2147483647 - size {
-                    System.Fail("String.Join UTF-8 byte count overflow")
+                    Panic("String.Join UTF-8 byte count overflow")
                 }
                 size += separatorBytes
             }
             let bytes = values[index].GetUtf8ByteCount()
             if bytes > 2147483647 - size {
-                System.Fail("String.Join UTF-8 byte count overflow")
+                Panic("String.Join UTF-8 byte count overflow")
             }
             size += bytes
             index += 1
@@ -265,7 +267,7 @@ public class String : EquatableTo<string>, ComparableTo<string>, Collections.Seq
         if comparison == StringComparison.OrdinalIgnoreCase {
             return CompareOrdinalIgnoreCase(left, right)
         }
-        System.Fail("Unsupported StringComparison")
+        Panic("Unsupported StringComparison")
         return 0
     }
 
@@ -409,7 +411,7 @@ public class String : EquatableTo<string>, ComparableTo<string>, Collections.Seq
         if comparison == StringComparison.OrdinalIgnoreCase {
             return neoCLR.Runtime.StringContainsOrdinalIgnoreCase(m_value, substring)
         }
-        System.Fail("Unsupported StringComparison")
+        Panic("Unsupported StringComparison")
         return false
     }
 
@@ -440,7 +442,7 @@ public class String : EquatableTo<string>, ComparableTo<string>, Collections.Seq
         if comparison == StringComparison.OrdinalIgnoreCase {
             return neoCLR.Runtime.StringStartsWithOrdinalIgnoreCase(m_value, prefix)
         }
-        System.Fail("Unsupported StringComparison")
+        Panic("Unsupported StringComparison")
         return false
     }
 
@@ -471,7 +473,7 @@ public class String : EquatableTo<string>, ComparableTo<string>, Collections.Seq
         if comparison == StringComparison.OrdinalIgnoreCase {
             return neoCLR.Runtime.StringEndsWithOrdinalIgnoreCase(m_value, suffix)
         }
-        System.Fail("Unsupported StringComparison")
+        Panic("Unsupported StringComparison")
         return false
     }
 
@@ -521,7 +523,7 @@ public class String : EquatableTo<string>, ComparableTo<string>, Collections.Seq
         if status == 2 {
             return Failure(Utf8SliceError.InvalidBoundary())
         }
-        System.Fail("invalid native UTF-8 slice status")
+        Panic("invalid native UTF-8 slice status")
         return Failure(Utf8SliceError.OutOfRange())
     }
 }

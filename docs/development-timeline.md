@@ -23539,3 +23539,20 @@ budget. Serialization and object-mapping restrictions remain explicit gaps; this
 slice does not claim complete System.Text.Json parity. See
 [the design comparison](json-dom-design.md#2026-10-29--document-reader-options-and-realistic-configuration-input)
 and [focused validation](validation/configuration-json-reader-20261029/README.md).
+
+## 2026-10-29 — Panic naming and deferred behavior decision
+
+- **Author:** Requested renaming System.Fail to System.Panic to avoid confusion
+  with Result.Failure, preferring `import System.*` and `Panic("...")`, and asked
+  for a commit. Described Rust-like panic behavior with stack unwinding and thread
+  termination, including program termination for a main-thread panic.
+- **Assistant:** Identified that current terminal fault propagation does not
+  guarantee guest cleanup; proposed cleanup-aware unwinding and explicit thread/
+  task boundaries as a possible contract. These were proposals, not implementation.
+- **Author:** Directed implementing the rename and deciding behavior later;
+  explicitly confirmed the Raven change belongs on codex/neoclr.
+- **Action:** Rename the public function, compiler recognition, ownership contract
+  and callers while retaining existing runtime fault behavior. Broader panic
+  semantics remain open. See [the current contract](system-fault.md).
+- **Outcome:** Raven rename committed as `b4c5790e1`; focused compiler/runtime
+  checks and separate native consumers pass. See [validation](validation/panic-rename-20261029/README.md).

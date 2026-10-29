@@ -21,16 +21,16 @@ func Main() {
     let source = Promise<Result<int, string>>()
     let pending = reader.Read(source.Task)
     if pending.IsCompleted {
-        System.Fail("Propagation completed before await")
+        Panic("Propagation completed before await")
     }
     _ = source.Complete(Ok(41))
     TaskQueue.Default.Drain()
     if pending.GetResult() is Ok(let value) {
         if value != 42 || reader.Resumed != 1 {
-            System.Fail("Successful await propagation lost its value")
+            Panic("Successful await propagation lost its value")
         }
     } else {
-        System.Fail("Successful await propagated an error")
+        Panic("Successful await propagated an error")
     }
     let failed = Promise<Result<int, string>>()
     let error = reader.Read(failed.Task)
@@ -38,10 +38,10 @@ func Main() {
     TaskQueue.Default.Drain()
     if error.GetResult() is Failure(let message) {
         if message != "expected" || reader.Resumed != 1 {
-            System.Fail("Error propagation continued past the return")
+            Panic("Error propagation continued past the return")
         }
     } else {
-        System.Fail("Await error was lost")
+        Panic("Await error was lost")
     }
     Console.WriteLine("Native async propagation checks passed")
 }

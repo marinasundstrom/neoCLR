@@ -51,7 +51,7 @@ class BenchmarkApplication {
 
     func Verify() {
         if retained.Count != 4096 || cursor != requests % 4096 {
-            System.Fail("Retained window accounting")
+            Panic("Retained window accounting")
         }
         var index = 0
         while index < 4096 {
@@ -60,7 +60,7 @@ class BenchmarkApplication {
                 expected = 42
             }
             if retained[index].id != expected {
-                System.Fail("Retained window survival")
+                Panic("Retained window survival")
             }
             index += 1
         }
@@ -71,13 +71,13 @@ class BenchmarkApplication {
     private func ProcessDocument() {
         let input = "{\"station\":\"Café\",\"readings\":[1,-2,0],\"flags\":[true,false,null],\"metadata\":{\"text\":\"雪\"}}"
         let Ok(document) = JsonSerializer.DeserializeNode(input) else {
-            System.Fail("Parse request model")
+            Panic("Parse request model")
         }
         let Ok(output) = JsonSerializer.SerializeNode(document) else {
-            System.Fail("Serialize request model")
+            Panic("Serialize request model")
         }
         if output != input {
-            System.Fail("Request model round trip")
+            Panic("Request model round trip")
         }
         let records = ArrayList<Person>(32)
         var index = 0
@@ -99,51 +99,51 @@ class BenchmarkApplication {
             index += 1
         }
         if checksum != 24765 {
-            System.Fail("Request calculation")
+            Panic("Request calculation")
         }
     }
 
     async func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
         if request.Method.Method != "GET" {
-            System.Fail("Benchmark method")
+            Panic("Benchmark method")
         }
         var dependencyPort = 0
         for header in request.Headers {
             if header.Name == "x-dependency" || header.Name == "X-Dependency" {
                 let digits = header.Value.Utf8Bytes
                 if digits.Length < 1 || digits.Length > 5 {
-                    System.Fail("Dependency port length")
+                    Panic("Dependency port length")
                 }
                 var offset = 0
                 while offset < digits.Length {
                     let digit = digits[offset]
                     if digit < 48 || digit > 57 {
-                        System.Fail("Dependency port digit")
+                        Panic("Dependency port digit")
                     }
                     dependencyPort = dependencyPort * 10 + (int)digit - 48
                     offset += 1
                 }
                 if dependencyPort < 1 || dependencyPort > 65535 {
-                    System.Fail("Dependency port range")
+                    Panic("Dependency port range")
                 }
             }
         }
         if dependencyPort != 0 {
             let Ok(socket) = await Socket.Connect("127.0.0.1", dependencyPort) else {
-                System.Fail("Dependency connect")
+                Panic("Dependency connect")
             }
             let source: ReadOnlyMemory<byte> = [(byte)42]
             if await socket.Send(source) is not Ok(1) {
-                System.Fail("Dependency send")
+                Panic("Dependency send")
             }
             let response: byte[] = [(byte)0]
             let destination: Memory<byte> = response
             if await socket.Receive(destination) is not Ok(1) {
-                System.Fail("Dependency receive")
+                Panic("Dependency receive")
             }
             socket.Close()
             if response[0] != 43 {
-                System.Fail("Dependency payload")
+                Panic("Dependency payload")
             }
         }
         ProcessDocument()
@@ -152,7 +152,7 @@ class BenchmarkApplication {
             return RespondWithPerson(person)
         }
         if request.Target != "/plain" {
-            System.Fail("Benchmark route")
+            Panic("Benchmark route")
         }
         return Ok(HttpResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), HttpStringContent("Hello, World!")))
     }
@@ -160,16 +160,16 @@ class BenchmarkApplication {
 
 async func Run() -> Task<unit> {
     let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 64) else {
-        System.Fail("Listen")
+        Panic("Listen")
     }
     let Ok(control) = Socket.Listen("127.0.0.1", 0, 8) else {
-        System.Fail("Control")
+        Panic("Control")
     }
     let Ok(port) = server.GetLocalPort() else {
-        System.Fail("Port")
+        Panic("Port")
     }
     let Ok(controlPort) = control.GetLocalPort() else {
-        System.Fail("Control port")
+        Panic("Control port")
     }
     let application = BenchmarkApplication()
     let lifetime = server.ServePersistent(application.Respond, 32, 16, CancellationToken.None)
@@ -177,13 +177,13 @@ async func Run() -> Task<unit> {
     Console.WriteLine(port)
     Console.WriteLine(controlPort)
     let Ok(stop) = await control.Accept() else {
-        System.Fail("Stop signal")
+        Panic("Stop signal")
     }
     stop.Close()
     control.Close()
     server.Close()
     let Ok(_) = await lifetime else {
-        System.Fail("Serve lifetime")
+        Panic("Serve lifetime")
     }
     application.Verify()
     Console.WriteLine("DONE " + server.CompletedRequests.ToString() + " " + server.FailedRequests.ToString())

@@ -16,7 +16,7 @@ func Main() {
         Console.WriteLine("Concrete class")
     }
     if !typeof(Widget).AssignableTo(typeof(Object)) {
-        System.Fail("Widget must be assignable to Object")
+        Panic("Widget must be assignable to Object")
     }
     let text: Object = "Hello"
     let description = text.GetType()

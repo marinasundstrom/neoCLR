@@ -1,11 +1,13 @@
 // Generated from native metadata. Do not edit.
 module NeoClr.Benchmarking
 
+import System.*
+
 func RegisterDiscoveredBenchmarks(suite: BenchmarkSuite) {
     if true {
         let rows = Benchmarks.Discovery.Inputs()
-        if rows.Length == 0 { System.Fail("Data source returned no rows") }
-        if rows.Length > 10000 { System.Fail("Data source exceeded 10000 rows") }
+        if rows.Length == 0 { Panic("Data source returned no rows") }
+        if rows.Length > 10000 { Panic("Data source exceeded 10000 rows") }
         for index in 0..<rows.Length {
             let value = rows[index]
             suite.Add("Benchmarks.Discovery.FromSource/Benchmarks.Discovery.Inputs" + "[" + index.ToString() + "]", () => Benchmarks.Discovery.FromSource(value))

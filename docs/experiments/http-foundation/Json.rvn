@@ -15,7 +15,7 @@ public class Message {
 
 func Check(value: bool) {
     if !value {
-        System.Fail("JSON content contract failed")
+        Panic("JSON content contract failed")
     }
 }
 
@@ -23,14 +23,14 @@ func CreateContent() -> HttpContent {
     let message = Message()
     message.Text = "Café 🌍"
     let Ok(content) = JsonContent.Create(message) else {
-        System.Fail("JSON creation failed")
+        Panic("JSON creation failed")
     }
     return content
 }
 
 func ValidateMessage(result: Result<Message, JsonError>) {
     let Ok(message) = result else {
-        System.Fail("JSON model read failed")
+        Panic("JSON model read failed")
     }
     Check(message.Text == "Café 🌍")
 }
@@ -56,7 +56,7 @@ func CheckImmediate(content: HttpContent) {
     Check(content.ReadJsonNode(source.Token).IsCancelled)
     source.Dispose()
     let Ok(node) = HttpStringContent("[1,null]").ReadJsonNode().GetResult() else {
-        System.Fail("JSON array content failed")
+        Panic("JSON array content failed")
     }
     if node is JsonArray array {
         Check(array.Count == 2)
@@ -67,16 +67,16 @@ func CheckImmediate(content: HttpContent) {
         }
         Check(count == 2)
     } else {
-        System.Fail("JSON array node expected")
+        Panic("JSON array node expected")
     }
     let input = MemoryStream()
     Check(HttpStreamContent.Create(input, 1048577, true) is Failure(HttpError.LimitExceeded(_)))
     let Ok(maximum) = HttpStreamContent.Create(input, 1048576, true) else {
-        System.Fail("Stream admission boundary failed")
+        Panic("Stream admission boundary failed")
     }
     maximum.Dispose()
     let Ok(stream) = HttpStreamContent.Create(input, 0, true) else {
-        System.Fail("Stream creation failed")
+        Panic("Stream creation failed")
     }
     Check(stream.ReadFromJson<Message>().GetResult() is Failure(JsonError.Read(TextReadError.IoFailure)))
     Check(input.GetPosition() is Ok(0L))

@@ -7,7 +7,7 @@ import System.Web.Http.*
 
 func Check(value: bool) {
     if !value {
-        System.Fail("Queued accept assertion failed")
+        Panic("Queued accept assertion failed")
     }
 }
 
@@ -22,7 +22,7 @@ func Cancelled(pending: Task<Result<HttpContext, HttpError>>) -> Task<bool> {
 
 async func Main() -> Task<()> {
     let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 16) else {
-        System.Fail("Listen failed")
+        Panic("Listen failed")
     }
     let sources = ArrayList<CancellationTokenSource>()
     let outcomes = ArrayList<Task<bool>>()
@@ -63,11 +63,11 @@ async func Main() -> Task<()> {
     preCancelled.Dispose()
     // The same listener must still admit and complete an ordinary request.
     let Ok(port) = server.GetLocalPort() else {
-        System.Fail("Port failed")
+        Panic("Port failed")
     }
     Console.WriteLine(port)
     let Ok(context) = await server.Accept() else {
-        System.Fail("Accept after cancellation failed")
+        Panic("Accept after cancellation failed")
     }
     Check(context.Request.Target == "/recovered")
     context.RespondText("OK")

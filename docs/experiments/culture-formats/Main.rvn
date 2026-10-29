@@ -5,17 +5,17 @@ import System.Result.*
 
 func Check(value: bool, message: string) {
     if !value {
-        System.Fail(message)
+        Panic(message)
     }
 }
 
 func Profile(culture: Culture, dateText: string, decimalSeparator: string, groupSeparator: string) {
     let format = culture.DateTimeFormat
     let Ok(date) = Date.Create(2024, 3, 9) else {
-        System.Fail("Date")
+        Panic("Date")
     }
     let Ok(text) = format.FormatDate(date) else {
-        System.Fail("Date format")
+        Panic("Date format")
     }
     Check(text == dateText, "Date convention")
     Check(format.TimeSeparator == ":" && format.ShortTimePattern == (if culture.Name == "en-US" { "h:mm tt" } else { "HH:mm" }) && format.LongTimePattern == (if culture.Name == "en-US" { "h:mm:ss tt" } else { "HH:mm:ss" }), "Time metadata")
@@ -30,7 +30,7 @@ func Profile(culture: Culture, dateText: string, decimalSeparator: string, group
     Check(calendars.Length == 2 && calendars[0].Id == culture.DefaultCalendar.Id && calendars[1].Id == "hebrew", "Optional calendars")
     let hebrew = format.WithCalendar(calendars[1])
     let Ok(projected) = hebrew.FormatDate(date) else {
-        System.Fail("Hebrew calendar projection")
+        Panic("Hebrew calendar projection")
     }
     Check(projected.Length > 0 && format.Calendar.Id == "gregory", "Independent immutable calendar choice")
     calendars[0] = Calendar.Hebrew
@@ -58,13 +58,13 @@ func Main() {
     let uk = Culture.EnglishUnitedKingdom.DateTimeFormat
     Check(us.AMDesignator == "AM" && us.PMDesignator == "PM" && uk.AMDesignator == "", "Clock designators")
     let Ok(midnight) = TimeOfDay.Parse("00:00:00") else {
-        System.Fail("Midnight")
+        Panic("Midnight")
     }
     let Ok(noon) = TimeOfDay.Parse("12:00:00") else {
-        System.Fail("Noon")
+        Panic("Noon")
     }
     let Ok(afternoon) = TimeOfDay.Parse("14:30:05.1234567") else {
-        System.Fail("Afternoon")
+        Panic("Afternoon")
     }
     Check(us.FormatTime(midnight, "t") == "12:00 AM", "US midnight")
     Check(us.FormatTime(noon, "T") == "12:00:00 PM", "US noon")

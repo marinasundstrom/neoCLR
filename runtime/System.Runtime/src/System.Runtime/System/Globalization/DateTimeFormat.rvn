@@ -1,5 +1,7 @@
 module System.Globalization
 
+import System.*
+
 import System.Time.*
 
 import System.Result.*
@@ -97,7 +99,7 @@ public class DateTimeFormat {
         if format == "O" || format == "o" {
             return Invariant.FormatDate(date)
         }
-        System.Fail("Unsupported Date format")
+        Panic("Unsupported Date format")
         return Failure(System.Time.InvalidDateError())
     }
 
@@ -113,7 +115,7 @@ public class DateTimeFormat {
         if format == "T" || format == "t" {
             return FormatClock(time, format == "T", false)
         }
-        System.Fail("Unsupported TimeOfDay format")
+        Panic("Unsupported TimeOfDay format")
         return ""
     }
 
@@ -155,7 +157,7 @@ public class DateTimeFormat {
             let date = selected.FormatDate(value.Date)?
             return Ok(date + "T" + selected.FormatTime(value.Time, "T"))
         }
-        System.Fail("Unsupported LocalDateTime format")
+        Panic("Unsupported LocalDateTime format")
         return Failure(System.Time.InvalidDateError())
     }
 

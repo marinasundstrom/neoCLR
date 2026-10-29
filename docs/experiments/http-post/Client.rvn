@@ -8,7 +8,7 @@ import System.Web.Http.*
 
 func Check(condition: bool) {
     if !condition {
-        System.Fail("POST contract failed")
+        Panic("POST contract failed")
     }
 }
 
@@ -47,7 +47,7 @@ func CheckContracts() {
     let content = ContentFor(0)
     let source = CancellationTokenSource()
     let Ok(uri) = Uri.Parse("echo") else {
-        System.Fail("URI failed")
+        Panic("URI failed")
         return
     }
     Check(client.Post("echo", content, source.Token).GetResult() is Ok(_))
@@ -66,7 +66,7 @@ func CheckContracts() {
     if let Failure(HttpError.InvalidRequest(_)) = HttpClient().Post("http://not-resolved.invalid/", bad).GetResult() {
         Check(true)
     } else {
-        System.Fail("Header injection reached transport")
+        Panic("Header injection reached transport")
     }
     Console.WriteLine("POST contracts passed")
 }
@@ -88,7 +88,7 @@ class ClientProbe {
         let pending = PostText(client, "Café 🌍")
         pending.OnCompleted(() => {
             let Ok(text) = pending.GetResult() else {
-                System.Fail("Propagating POST sample failed")
+                Panic("Propagating POST sample failed")
                 return
             }
             Check(text == "Café 🌍")
@@ -109,7 +109,7 @@ class ClientProbe {
         let pending = if index == 3 { client.Get("empty") } else { client.Post("echo", content) }
         pending.OnCompleted(() => {
             let Ok(response) = pending.GetResult() else {
-                System.Fail("Echo request failed")
+                Panic("Echo request failed")
                 return
             }
             Check(response.StatusCode == (if index == 3 { HttpStatusCode.OK } else { HttpStatusCode.Created }))

@@ -10,7 +10,7 @@ import System.Web.Http.Json.*
 
 async func Configure(request: HttpRequest, response: HttpResponse) -> Task<Result<unit, HttpError>> {
     if request.Version.Major != 1 || request.Version.Minor != 1 {
-        System.Fail("Incoming HTTP version unavailable")
+        Panic("Incoming HTTP version unavailable")
     }
     Console.WriteLine("HEADERS")
     if request.Target == "/text" {
@@ -75,11 +75,11 @@ async func Main(arguments: string[]) -> Task<()> {
     let captured = StartCapturedToken(gate.Task)
     System.Runtime.GC.Collect()
     _ = gate.Complete(true)
-    if !(await captured) { System.Fail("Captured token lost") }
-    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 64) else { System.Fail("Listen failed") }
-    let Ok(control) = Socket.Listen("127.0.0.1", 0, 1) else { System.Fail("Control failed") }
-    let Ok(port) = server.GetLocalPort() else { System.Fail("Port failed") }
-    let Ok(controlPort) = control.GetLocalPort() else { System.Fail("Control port failed") }
+    if !(await captured) { Panic("Captured token lost") }
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 64) else { Panic("Listen failed") }
+    let Ok(control) = Socket.Listen("127.0.0.1", 0, 1) else { Panic("Control failed") }
+    let Ok(port) = server.GetLocalPort() else { Panic("Port failed") }
+    let Ok(controlPort) = control.GetLocalPort() else { Panic("Control port failed") }
     Console.WriteLine(port)
     Console.WriteLine(controlPort)
     let mode = arguments[0]
@@ -87,7 +87,7 @@ async func Main(arguments: string[]) -> Task<()> {
         else if mode == "response" { server.Serve(Respond) }
         else if mode == "one" { server.ServeOne(Respond) }
         else { AcceptOne(server, mode == "headers") }
-    let Ok(signal) = await control.Accept() else { System.Fail("Signal failed") }
+    let Ok(signal) = await control.Accept() else { Panic("Signal failed") }
     let bytes: byte[] = [(byte)0]
     _ = await signal.Receive(bytes)
     server.Close()

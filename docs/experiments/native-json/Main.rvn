@@ -13,7 +13,7 @@ public class Report {
 
 public class Guarded {
     init() {
-        System.Fail("Invalid input ran model code")
+        Panic("Invalid input ran model code")
     }
     var Count: int { get; set; } = 0
     var Active: bool { get; set; } = false
@@ -35,7 +35,7 @@ public class NodeEnvelope {
 
 public class GuardedNode {
     init() {
-        System.Fail("Invalid node kind ran model code")
+        Panic("Invalid node kind ran model code")
     }
     var Payload: JsonObject { get; set; } = JsonObject()
 }

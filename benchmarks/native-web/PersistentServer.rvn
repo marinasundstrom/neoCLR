@@ -32,7 +32,7 @@ class RequestLoop {
             let result = serving.GetResult()
             if let Error(error) = result {
                 server.Close()
-                System.Fail(error.ToString())
+                Panic(error.ToString())
             }
             remaining -= 1
             if remaining == 0 {
@@ -47,11 +47,11 @@ class RequestLoop {
 
 func Main() {
     let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) else {
-        System.Fail("Listen failed")
+        Panic("Listen failed")
     }
     let Ok(port) = server.GetLocalPort() else {
         server.Close()
-        System.Fail("Local port unavailable")
+        Panic("Local port unavailable")
     }
     Console.WriteLine(port)
     RequestLoop(server).Next()

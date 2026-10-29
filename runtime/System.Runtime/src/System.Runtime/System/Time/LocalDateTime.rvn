@@ -36,10 +36,10 @@ public struct LocalDateTime : EquatableTo<LocalDateTime>, ComparableTo<LocalDate
     internal static func FromUnixTimeTicks(ticks: long) -> LocalDateTime {
         let parts = neoCLR.Runtime.UnixTimeToLocal(ticks)
         let Ok(date) = System.Time.Date.Create(parts[0], parts[1], parts[2]) else {
-            System.Fail("Invalid local date from runtime")
+            Panic("Invalid local date from runtime")
         }
         let Ok(time) = System.Time.TimeOfDay.Create(parts[3], parts[4], parts[5], parts[6]) else {
-            System.Fail("Invalid local time from runtime")
+            Panic("Invalid local time from runtime")
         }
         return LocalDateTime(date, time)
     }
@@ -100,7 +100,7 @@ public struct LocalDateTime : EquatableTo<LocalDateTime>, ComparableTo<LocalDate
     /// Formats with an explicit culture; unsupported specifiers fault. O/o is invariant.
     func ToString(format: string, culture: Globalization.Culture) -> string {
         let Ok(text) = culture.DateTimeFormat.FormatLocalDateTime(self, format) else {
-            System.Fail("A supported culture must format every valid LocalDateTime")
+            Panic("A supported culture must format every valid LocalDateTime")
         }
         return text
     }

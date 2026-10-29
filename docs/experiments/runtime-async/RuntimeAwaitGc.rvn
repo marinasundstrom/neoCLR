@@ -32,7 +32,7 @@ module RuntimeAwaitGc {
         while iteration < 80 {
             let value = await Round()
             if value != 42 {
-                System.Fail("A live reference was collected")
+                Panic("A live reference was collected")
             }
             GC.Collect()
             iteration = iteration + 1
@@ -42,11 +42,11 @@ module RuntimeAwaitGc {
         }
         GC.Collect()
         if GC.ReclaimedObjectCount <= reclaimedBefore {
-            System.Fail("No unreachable objects were reclaimed")
+            Panic("No unreachable objects were reclaimed")
         }
         // Same loop slots and await site: no per-iteration growth after warmup.
         if GC.HeapObjectCount > midpoint + 8L {
-            System.Fail("Completed runtime async bodies retained unreachable objects")
+            Panic("Completed runtime async bodies retained unreachable objects")
         }
         Console.WriteLine("PASS Raven runtime async GC reclamation")
         return 0

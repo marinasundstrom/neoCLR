@@ -10,6 +10,6 @@ func CheckError(reason: HttpError, expected: string) {
     }
     if kind != expected {
         Console.WriteLine(reason.ToString())
-        System.Fail("Unexpected HTTP error")
+        Panic("Unexpected HTTP error")
     }
 }

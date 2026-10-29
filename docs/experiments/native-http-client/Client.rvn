@@ -9,7 +9,7 @@ async func ReadInput(limit: int) -> Task<string> {
     if let Ok(Some(text)) = Console.ReadLine(limit) {
         return text
     }
-    System.Fail("Expected input on stdin")
+    Panic("Expected input on stdin")
     return ""
 }
 
@@ -23,7 +23,7 @@ async func Main() -> Task<()> {
     let client = HttpClient()
     let request = client.GetString(url, cancellation.Token)
     if mode == "pending-fault" {
-        System.Fail("Client fault while request pending")
+        Panic("Client fault while request pending")
     }
     if mode == "cancel" {
         cancellation.Cancel()
@@ -32,7 +32,7 @@ async func Main() -> Task<()> {
     cancellation.Dispose()
     if let Ok(text) = result {
         if mode == "fault" {
-            System.Fail("Client continuation fault")
+            Panic("Client continuation fault")
         }
         Console.WriteLine(text)
     } else if let Failure(error) = result {

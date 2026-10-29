@@ -56,7 +56,7 @@ module RuntimeAwaitSample {
         let first = Read(source.Task)
         let nested = Nested(source.Task)
         if first.IsCompleted || nested.IsCompleted {
-            System.Fail("Runtime async body completed before its input")
+            Panic("Runtime async body completed before its input")
         }
         System.Runtime.GC.Collect()
         _ = source.Complete(Payload(17))
@@ -64,7 +64,7 @@ module RuntimeAwaitSample {
         let nestedResult = await nested
         let repeated = await first
         if firstResult.Value != 42 || nestedResult != 42 || repeated.Value != 42 {
-            System.Fail("Runtime async lost a retained result")
+            Panic("Runtime async lost a retained result")
         }
         let unitSource = Promise<()>()
         let unit = Unit(unitSource.Task)
@@ -72,7 +72,7 @@ module RuntimeAwaitSample {
         await unit
         let eager = await Eager()
         if eager != 42 {
-            System.Fail("Runtime async eager result failed")
+            Panic("Runtime async eager result failed")
         }
         let instanceSource = Promise<int>()
         let reader = OffsetReader(25)
@@ -80,7 +80,7 @@ module RuntimeAwaitSample {
         _ = instanceSource.Complete(17)
         let instanceResult = await instanceTask
         if instanceResult != 42 {
-            System.Fail("Runtime async did not retain its receiver and parameter")
+            Panic("Runtime async did not retain its receiver and parameter")
         }
         let cancelled = Promise<Payload>()
         let cancelledTask = Read(cancelled.Task)
@@ -89,7 +89,7 @@ module RuntimeAwaitSample {
         _ = cancelled.Cancel()
         let observed = await observer.Task
         if !observed {
-            System.Fail("Runtime async cancellation was not propagated")
+            Panic("Runtime async cancellation was not propagated")
         }
         Console.WriteLine("PASS Raven runtime async language support")
         return 0

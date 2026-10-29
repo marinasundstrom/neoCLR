@@ -27,7 +27,7 @@ async func Main() -> Task<int> {
         while index < 24 {
             let reader = Read(source.Task)
             if reader.IsCompleted {
-                System.Fail("Reader did not suspend")
+                Panic("Reader did not suspend")
             }
             readers.Add(reader)
             index = index + 1
@@ -40,7 +40,7 @@ async func Main() -> Task<int> {
             sum = sum + value
         }
         if sum != 24 * 42 {
-            System.Fail("Stack reuse lost a retained object or result")
+            Panic("Stack reuse lost a retained object or result")
         }
         round = round + 1
     }

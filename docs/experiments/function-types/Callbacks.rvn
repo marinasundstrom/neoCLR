@@ -4,7 +4,7 @@ import System.Optional.*
 
 public func Check(condition: bool, message: string) {
     if !condition {
-        System.Fail(message)
+        Panic(message)
     }
 }
 
@@ -62,7 +62,7 @@ func Main() -> int {
     if let Some(baseType) = typeof((int) -> int).BaseType {
         Check(baseType.Equals(typeof(Object)), "Function shape inherits Object")
     } else {
-        System.Fail("Missing Object base")
+        Panic("Missing Object base")
     }
     let left = Echoer()
     let right = Echoer()
@@ -77,7 +77,7 @@ func Main() -> int {
     if let Some(owner) = leftFunction.Function.DeclaringType {
         Check(owner.Equals(typeof(Echoer)), "Instance target preserves declaring type")
     } else {
-        System.Fail("Missing target declaring type")
+        Panic("Missing target declaring type")
     }
     Check(first.Twice(40) == 42, "Structural function extension member")
     let shape = typeof((int) -> int)

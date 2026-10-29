@@ -107,7 +107,7 @@ does not change no-result call behavior. See [Raven conventions](raven-conventio
 
 ### Fault-call migration and frontend consumers — 2026-10-22
 
-The bootstrap `neoCLR.Runtime.Fault(String)` service and its `System.Fail` wrapper
+The bootstrap `neoCLR.Runtime.Fault(String)` service and its `System.Panic` wrapper
 now use the canonical no-result contract. The CLI RuntimeFailure intrinsic emits
 the call without an obsolete `pop`; the migrated generated fragment and seed
 copies match that change. This is a text/ABI migration of existing behavior, not a
@@ -117,7 +117,7 @@ its previous compiler/source provenance is retained.
 The prototype `.neo` frontend now respects imported no-result metadata for calls
 and constrained member calls. It materializes logical Void for stored expression
 results, removes immediate unit/discard pairs for expression statements, and
-resolves namespace functions such as `System.Fail` without inventing a nominal
+resolves namespace functions such as `System.Panic` without inventing a nominal
 System owner. Generic value returns retain their existing result. This frontend
 is separate from Raven: Raven source semantics and Runtime Contract settings are
 unchanged. Canonical callback text projection and the remaining legacy producer

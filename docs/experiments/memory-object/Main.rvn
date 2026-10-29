@@ -3,7 +3,7 @@ import System.Collections.*
 
 func Check(value: bool, message: string) {
     if !value {
-        System.Fail(message)
+        Panic(message)
     }
 }
 
@@ -51,13 +51,13 @@ func Main() {
         let view: Slice<byte> = restored
         Check(view[0] == 99b && view[1] == 30b, "Unboxed retained owner and window")
     } else {
-        System.Fail("Exact memory unboxing")
+        Panic("Exact memory unboxing")
     }
     if soleOwner is Memory<byte> owned {
         let bytes: Slice<byte> = owned
         Check(bytes[0] == 2b && bytes[1] == 3b, "Box retains sole owner across GC")
     } else {
-        System.Fail("Sole owner unboxing")
+        Panic("Sole owner unboxing")
     }
     Check(!(retained is ReadOnlyMemory<byte>), "Equality does not change nominal unboxing")
     Console.WriteLine("Memory region contracts: passed")

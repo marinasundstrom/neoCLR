@@ -10,7 +10,7 @@ import System.Networking.Sockets.*
 
 func Check(condition: bool) {
     if !condition {
-        System.Fail("HTTP cancellation/text assertion failed")
+        Panic("HTTP cancellation/text assertion failed")
     }
 }
 
@@ -73,13 +73,13 @@ func CheckContracts() {
     Check(client.Get("bad\r\n", stopped.Token).IsCancelled)
     Check(client.GetString("bad\r\n", stopped.Token).IsCancelled)
     let Ok(uri) = Uri.Parse("child") else {
-        System.Fail("Fixture URI failed")
+        Panic("Fixture URI failed")
         return
     }
     Check(client.Get(uri, stopped.Token).IsCancelled)
     Check(client.GetString(uri, stopped.Token).IsCancelled)
     let Ok(request) = HttpRequest.Get("http://example.test/direct") else {
-        System.Fail("Fixture request failed")
+        Panic("Fixture request failed")
         return
     }
     Check(client.Send(request, stopped.Token).IsCancelled)
@@ -94,7 +94,7 @@ func CheckContracts() {
     live.Cancel()
     TaskQueue.Default.Drain()
     let Ok(value) = text.GetResult() else {
-        System.Fail("Text conversion failed")
+        Panic("Text conversion failed")
         return
     }
     Check(value == "Café 🌍")
@@ -106,12 +106,12 @@ func CheckContracts() {
     if let Ok(first) = plain.GetResult() {
         Check(first == "Café 🌍")
     } else {
-        System.Fail("String overload failed")
+        Panic("String overload failed")
     }
     if let Ok(second) = plainUri.GetResult() {
         Check(second == "Café 🌍")
     } else {
-        System.Fail("URI overload failed")
+        Panic("URI overload failed")
     }
 
     let invalid = HttpClient(ReplyHandler(200, HttpMemoryContent([(byte)255]))).GetString("http://example.test/")
@@ -121,17 +121,17 @@ func CheckContracts() {
     if let Failure(HttpError.Protocol(message)) = invalid.GetResult() {
         Check(message == "Invalid UTF-8 body")
     } else {
-        System.Fail("Invalid UTF-8 was accepted")
+        Panic("Invalid UTF-8 was accepted")
     }
     if let Failure(HttpError.UnsuccessfulStatus(code)) = status.GetResult() {
         Check(code == HttpStatusCode.NotFound)
     } else {
-        System.Fail("Non-success status was accepted")
+        Panic("Non-success status was accepted")
     }
     if let Failure(HttpError.InvalidRequest(_)) = badUri.GetResult() {
         Check(true)
     } else {
-        System.Fail("BaseUri failure was lost")
+        Panic("BaseUri failure was lost")
     }
 
     let pending = PendingHandler()
@@ -149,7 +149,7 @@ func StartControl(source: CancellationTokenSource) {
     let connecting = Socket.Connect("127.0.0.1", 19092)
     connecting.OnCompleted(() => {
         let Ok(connection) = connecting.GetResult() else {
-            System.Fail("Control connect failed")
+            Panic("Control connect failed")
             return
         }
         ReadControl(connection, source)
@@ -161,7 +161,7 @@ func ReadControl(connection: Socket, source: CancellationTokenSource) {
     let read = connection.Receive(buffer)
     read.OnCompleted(() => {
         let Ok(count) = read.GetResult() else {
-            System.Fail("Control read failed")
+            Panic("Control read failed")
             return
         }
         Check(count == 1 && buffer[0] == 1)
@@ -181,9 +181,9 @@ func Main() {
     response.OnCompleted(() => {
         if !response.IsCancelled {
             if let Failure(reason) = response.GetResult() {
-                System.Fail(String.Concat("Response completed before cancellation: ", reason.ToString()))
+                Panic(String.Concat("Response completed before cancellation: ", reason.ToString()))
             }
-            System.Fail("Response succeeded before cancellation")
+            Panic("Response succeeded before cancellation")
         }
         Console.WriteLine("HTTP response cancelled")
     })
@@ -193,7 +193,7 @@ func Main() {
     })
     survivor.OnCompleted(() => {
         let Ok(value) = survivor.GetResult() else {
-            System.Fail("Independent HTTP request failed")
+            Panic("Independent HTTP request failed")
             return
         }
         Check(value == "Café 🌍")

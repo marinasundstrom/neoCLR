@@ -4,7 +4,7 @@ import System.Console.*
 
 func Check(condition: bool) {
     if !condition {
-        System.Fail("Worker Task cancellation contract failed")
+        Panic("Worker Task cancellation contract failed")
     }
 }
 

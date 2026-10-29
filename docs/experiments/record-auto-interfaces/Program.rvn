@@ -8,24 +8,24 @@ func Main() {
     let key = Key(42)
     let contract: EquatableTo<Key> = key
     if !contract.Equals(Key(42)) || contract.Equals(Key(43)) {
-        System.Fail("automatic source record interface")
+        Panic("automatic source record interface")
     }
     let reference: EquatableTo<ReferenceKey> = ReferenceKey(7)
     if !reference.Equals(ReferenceKey(7)) || reference.Equals(ReferenceKey(8)) {
-        System.Fail("automatic reference record interface")
+        Panic("automatic reference record interface")
     }
     let first = ConsoleKeyInfo(ConsoleKey.A, false, false, false, Some(65))
     let same = ConsoleKeyInfo(ConsoleKey.A, false, false, false, Some(65))
     let other = ConsoleKeyInfo(ConsoleKey.A, false, false, true, Some(65))
     let imported: EquatableTo<ConsoleKeyInfo> = first
     if !imported.Equals(same) || imported.Equals(other) {
-        System.Fail("automatic imported record interface")
+        Panic("automatic imported record interface")
     }
     if KeyWrapper(first) != KeyWrapper(same) || KeyWrapper(first) == KeyWrapper(other) {
-        System.Fail("imported record component equality")
+        Panic("imported record component equality")
     }
     if KeyWrapper(first).GetHashCode() != KeyWrapper(same).GetHashCode() {
-        System.Fail("imported record component hashing")
+        Panic("imported record component hashing")
     }
     Console.WriteLine("PASS automatic record interfaces")
 }

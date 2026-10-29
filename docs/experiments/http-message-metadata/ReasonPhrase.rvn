@@ -5,33 +5,33 @@ import System.Concurrency.Tasks.*
 import System.Web.Http.*
 
 async func Check(client: HttpClient, url: string, code: int, reason: string, streamed: bool, disposeFirst: bool) -> Task<unit> {
-    let Ok(request) = HttpRequest.Get(url) else { System.Fail("Request creation failed") }
+    let Ok(request) = HttpRequest.Get(url) else { Panic("Request creation failed") }
     use ownedRequest = request
     let mode = if streamed { HttpCompletionOption.ResponseHeadersRead } else { HttpCompletionOption.ResponseContentRead }
-    let Ok(response) = await client.Send(request, mode) else { System.Fail("HTTP request failed") }
+    let Ok(response) = await client.Send(request, mode) else { Panic("HTTP request failed") }
     use ownedResponse = response
     if disposeFirst { response.Dispose() }
     if (int)response.StatusCode != code || response.IsSuccessStatusCode != (code >= 200 && code <= 299) {
-        System.Fail("Status metadata mismatch")
+        Panic("Status metadata mismatch")
     }
     if response.Version.Major != 1 || response.Version.Minor != 1 {
-        System.Fail("Version mismatch")
+        Panic("Version mismatch")
     }
     if response.ReasonPhrase != reason || response.ReasonPhrase != reason {
-        System.Fail("Reason phrase mismatch")
+        Panic("Reason phrase mismatch")
     }
     if streamed {
         Console.WriteLine("HEADERS_READY")
-        let Ok(text) = await HttpStringContent.Read(response.Content) else { System.Fail("Body read failed") }
-        if text != "x" { System.Fail("Body mismatch") }
+        let Ok(text) = await HttpStringContent.Read(response.Content) else { Panic("Body read failed") }
+        if text != "x" { Panic("Body mismatch") }
     }
 }
 
 async func Main(arguments: string[]) -> Task<int> {
     let local = HttpResponse(200, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))
-    if local.ReasonPhrase != "OK" { System.Fail("Local status phrase mismatch") }
+    if local.ReasonPhrase != "OK" { Panic("Local status phrase mismatch") }
     local.Respond(HttpStatusCode.Created)
-    if local.ReasonPhrase != "" { System.Fail("Changed status phrase mismatch") }
+    if local.ReasonPhrase != "" { Panic("Changed status phrase mismatch") }
     use client = HttpClient()
     let root = arguments[0]
     await Check(client, String.Concat(root, "/custom"), 201, "Created\tHere  ", false, false)

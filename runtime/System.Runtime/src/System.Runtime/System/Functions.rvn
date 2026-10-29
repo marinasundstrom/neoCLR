@@ -2,6 +2,6 @@ module System
 
 import System.Runtime.CompilerServices.RuntimeFailure
 
-public func Fail(message: string) {
+public func Panic(message: string) {
     RuntimeFailure.Terminate(message)
 }

@@ -43,7 +43,7 @@ class Cursor : AsyncIterator<int> {
 
     func MoveNextAsync() -> Task<bool> {
         if ended || disposing { return Task.FromResult(false) }
-        if moving { System.Fail("Overlapping generator advancement") }
+        if moving { Panic("Overlapping generator advancement") }
         moving = true
         next = Promise<bool>()
         if !started {
@@ -52,30 +52,30 @@ class Cursor : AsyncIterator<int> {
             // Deliberate producer-outcome adapter, including cancellation.
             body.OnCompleted(Finish)
         } else {
-            if !resume.Complete(true) { System.Fail("Generator has no suspended yield") }
+            if !resume.Complete(true) { Panic("Generator has no suspended yield") }
         }
         return next.Task
     }
 
     val Current: int {
         get {
-            if !started || moving || ended || disposing { System.Fail("Generator has no current item") }
+            if !started || moving || ended || disposing { Panic("Generator has no current item") }
             return current
         }
     }
 
     func Yield(value: int) -> Task<bool> {
-        if !moving || disposing { System.Fail("Generator yielded without demand") }
+        if !moving || disposing { Panic("Generator yielded without demand") }
         current = value
         resume = Promise<bool>()
         moving = false
         counters.Yields = counters.Yields + 1
-        if !next.Complete(true) { System.Fail("Generator delivered an item twice") }
+        if !next.Complete(true) { Panic("Generator delivered an item twice") }
         return resume.Task
     }
 
     func DisposeAsync() -> Task<()> {
-        if moving { System.Fail("Cannot dispose during generator advancement") }
+        if moving { Panic("Cannot dispose during generator advancement") }
         if disposing { return done.Task }
         disposing = true
         if !started {
@@ -83,7 +83,7 @@ class Cursor : AsyncIterator<int> {
             _ = done.Complete(())
         } else if !ended {
             // Resume with a stop request, so the producer exits through its scopes.
-            if !resume.Complete(false) { System.Fail("Generator has no yield to dispose") }
+            if !resume.Complete(false) { Panic("Generator has no yield to dispose") }
         }
         return done.Task
     }
@@ -134,18 +134,18 @@ async func CheckDemand() -> Task<()> {
     let counters = Counters()
     let stream = Stream(gate.Task, counters)
     let iterator = stream.GetAsyncIterator()
-    if counters.Starts != 0 { System.Fail("Generator started before first advancement") }
+    if counters.Starts != 0 { Panic("Generator started before first advancement") }
     let first = iterator.MoveNextAsync()
-    if first.IsCompleted || counters.Starts != 1 { System.Fail("Generator did not await its input") }
+    if first.IsCompleted || counters.Starts != 1 { Panic("Generator did not await its input") }
     _ = gate.Complete(7)
-    if !await first || iterator.Current != 7 || counters.Resumes != 0 { System.Fail("First yield failed") }
+    if !await first || iterator.Current != 7 || counters.Resumes != 0 { Panic("First yield failed") }
     System.Runtime.GC.Collect()
-    if counters.Yields != 1 || counters.Disposals != 0 { System.Fail("Yield did not retain the producer") }
-    if !await iterator.MoveNextAsync() || iterator.Current != 8 || counters.Resumes != 1 { System.Fail("Second yield failed") }
-    if await iterator.MoveNextAsync() { System.Fail("Generator failed to end") }
+    if counters.Yields != 1 || counters.Disposals != 0 { Panic("Yield did not retain the producer") }
+    if !await iterator.MoveNextAsync() || iterator.Current != 8 || counters.Resumes != 1 { Panic("Second yield failed") }
+    if await iterator.MoveNextAsync() { Panic("Generator failed to end") }
     await iterator.DisposeAsync()
-    if counters.Disposals != 1 || counters.Resumes != 2 { System.Fail("Generator completion lost cleanup") }
-    if await iterator.MoveNextAsync() { System.Fail("Completed generator restarted") }
+    if counters.Disposals != 1 || counters.Resumes != 2 { Panic("Generator completion lost cleanup") }
+    if await iterator.MoveNextAsync() { Panic("Completed generator restarted") }
 }
 
 async func CheckConsumer(stop: bool) -> Task<()> {
@@ -160,7 +160,7 @@ async func CheckConsumer(stop: bool) -> Task<()> {
     var yields = 2
     if stop { expected = 7; resumes = 0; yields = 1 }
     if sum != expected || counters.Resumes != resumes || counters.Yields != yields || counters.Disposals != 1 {
-        System.Fail("Consumer failed to stop or complete the producer")
+        Panic("Consumer failed to stop or complete the producer")
     }
 }
 
@@ -172,7 +172,7 @@ async func CheckCancellation() -> Task<()> {
     result.OnCompleted(observer.Complete)
     _ = gate.Cancel()
     if !await observer.Done.Task || counters.Disposals != 1 || counters.Yields != 0 {
-        System.Fail("Cancelled producer did not clean up")
+        Panic("Cancelled producer did not clean up")
     }
 }
 
@@ -182,7 +182,7 @@ async func CheckUnstarted() -> Task<()> {
     let iterator = Stream(gate.Task, counters).GetAsyncIterator()
     await iterator.DisposeAsync()
     if await iterator.MoveNextAsync() || counters.Starts != 0 || counters.Disposals != 0 {
-        System.Fail("Disposing an unstarted generator ran its body")
+        Panic("Disposing an unstarted generator ran its body")
     }
 }
 
@@ -196,18 +196,18 @@ async func CheckIndependent() -> Task<()> {
     let secondPending = second.MoveNextAsync()
     _ = gate.Complete(7)
     if !await firstPending || !await secondPending || counters.Starts != 2 {
-        System.Fail("Iterable did not create independent producers")
+        Panic("Iterable did not create independent producers")
     }
     if !await first.MoveNextAsync() || first.Current != 8 || second.Current != 7 {
-        System.Fail("Advancing one iterator changed another")
+        Panic("Advancing one iterator changed another")
     }
     await first.DisposeAsync()
     System.Runtime.GC.Collect()
     if counters.Disposals != 1 || !await second.MoveNextAsync() || second.Current != 8 {
-        System.Fail("Disposing one iterator released another")
+        Panic("Disposing one iterator released another")
     }
     await second.DisposeAsync()
-    if counters.Disposals != 2 { System.Fail("Independent producers did not both clean up") }
+    if counters.Disposals != 2 { Panic("Independent producers did not both clean up") }
 }
 
 async func Main() -> Task<int> {

@@ -547,3 +547,9 @@ checks and retain historical evidence under its original selectors. The initial
 migration covers IP-address behavior tests and discovery fixtures; other suites
 can migrate as maintained. See [testing](../api-docs/testing.md) and
 [benchmarking](../api-docs/benchmarking.md) for the development-only contract.
+
+## Terminal panic calls
+
+Prefer `import System.*` and `Panic("diagnostic")` for an unrecoverable error.
+Use `Result.Failure` for recoverable errors. The qualified `System.Panic` spelling
+remains valid; the former `System.Fail` name has been removed.

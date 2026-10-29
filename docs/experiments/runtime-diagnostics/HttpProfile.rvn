@@ -20,7 +20,7 @@ async func Serve(server: HttpServer) -> Task<()> {
     while served < 128 {
         let result = await server.ServeOne(Respond)
         if let Failure(error) = result {
-            System.Fail(error.ToString())
+            Panic(error.ToString())
         }
         served += 1
     }
@@ -35,9 +35,9 @@ async func Main() -> Task<()> {
             await Serve(server)
         } else {
             server.Close()
-            System.Fail("Local port unavailable")
+            Panic("Local port unavailable")
         }
     } else {
-        System.Fail("Listen failed")
+        Panic("Listen failed")
     }
 }

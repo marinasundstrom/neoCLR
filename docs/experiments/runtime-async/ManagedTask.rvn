@@ -33,7 +33,7 @@ module RuntimeManagedTask {
         func Release() -> System.Void {
             _ = neoCLR.Runtime.RuntimeAsyncWaitCompletion(handle)
             if !neoCLR.Runtime.RuntimeAsyncRelease(handle) {
-                System.Fail("Completed body still has an owner")
+                Panic("Completed body still has an owner")
             }
         }
     }
@@ -56,7 +56,7 @@ module RuntimeManagedTask {
         // Deliberate managed-task notification adapter, including cancellation.
         func Complete() -> System.Void {
             if !neoCLR.Runtime.RuntimeAsyncCompleteUnit(Handle) {
-                System.Fail("Completion signal was delivered twice")
+                Panic("Completion signal was delivered twice")
             }
         }
     }
@@ -69,7 +69,7 @@ module RuntimeManagedTask {
             task.OnCompleted(signal.Complete)
             neoCLR.Runtime.RuntimeAsyncAwaitUnit(signal.Handle)
             if !neoCLR.Runtime.RuntimeAsyncRelease(signal.Handle) {
-                System.Fail("Completion signal still has a waiter")
+                Panic("Completion signal still has a waiter")
             }
         }
         return !task.IsCancelled
@@ -141,7 +141,7 @@ module RuntimeManagedTask {
         let firstTask = Start(first.Run)
         let secondTask = Start(second.Run)
         if first.Phase != 1 || second.Phase != 1 || firstTask.IsCompleted || secondTask.IsCompleted {
-            System.Fail("Bodies did not run eagerly to their first suspension")
+            Panic("Bodies did not run eagerly to their first suspension")
         }
         System.Runtime.GC.Collect()
         _ = source.Complete(Payload(17))
@@ -149,10 +149,10 @@ module RuntimeManagedTask {
         let secondResult = await secondTask
         let repeated = await firstTask
         if firstResult.Value != 42 || secondResult.Value != 42 || repeated.Value != 42 {
-            System.Fail("Managed results or retained reference locals were lost")
+            Panic("Managed results or retained reference locals were lost")
         }
         if first.Phase != 2 || second.Phase != 2 {
-            System.Fail("Shared managed input did not resume both bodies")
+            Panic("Shared managed input did not resume both bodies")
         }
 
         let cancelled = Promise<Payload>()
@@ -164,19 +164,19 @@ module RuntimeManagedTask {
         cancelledTask.OnCompleted(observer.Complete)
         let observedCancellation = await observer.Task
         if !observedCancellation || cancelledReader.Phase != 1 {
-            System.Fail("Cancellation was not propagated without reading the result")
+            Panic("Cancellation was not propagated without reading the result")
         }
         let alreadyCancelled = Reader(cancelled.Task)
         let alreadyCancelledTask = Start(alreadyCancelled.Run)
         if !alreadyCancelledTask.IsCompleted || !alreadyCancelledTask.IsCancelled || alreadyCancelled.Phase != 1 {
-            System.Fail("Completed cancellation fast path failed")
+            Panic("Completed cancellation fast path failed")
         }
 
         let unitSource = Promise<()>()
         let unitReader = UnitReader(unitSource.Task)
         let unitTask = Start(unitReader.Run)
         if unitTask.IsCompleted {
-            System.Fail("Pending unit task completed early")
+            Panic("Pending unit task completed early")
         }
         _ = unitSource.Complete(())
         await unitTask
@@ -187,7 +187,7 @@ module RuntimeManagedTask {
         while index < 80 {
             let integer = Start(IntegerBody)
             if !integer.IsCompleted || await integer != 42 {
-                System.Fail("Eager integer body did not publish synchronously")
+                Panic("Eager integer body did not publish synchronously")
             }
             await Start(UnitBody)
             let pending = Promise<Payload>()
@@ -196,7 +196,7 @@ module RuntimeManagedTask {
             _ = pending.Complete(Payload(17))
             let payload = await result
             if payload.Value != 42 {
-                System.Fail("Repeated suspension lost its managed result")
+                Panic("Repeated suspension lost its managed result")
             }
             index = index + 1
         }

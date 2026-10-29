@@ -158,8 +158,8 @@ M00000002_IL_006c:
 M00000002_IL_006d:
 ldstr "StringBuilder limit must be between 0 and 65536 UTF-8 bytes"
 M00000002_IL_0072:
-call System.Fail(String)
-fault "System.Fail returned unexpectedly"
+call System.Panic(String)
+fault "System.Panic returned unexpectedly"
 M00000002_IL_0077:
 M00000002_IL_0078:
 M00000002_IL_0079:
@@ -236,8 +236,8 @@ M00000005_IL_0024:
 M00000005_IL_0025:
 ldstr "StringBuilder UTF-8 byte limit exceeded"
 M00000005_IL_002a:
-call System.Fail(String)
-fault "System.Fail returned unexpectedly"
+call System.Panic(String)
+fault "System.Panic returned unexpectedly"
 M00000005_IL_002f:
 M00000005_IL_0030:
 M00000005_IL_0031:
@@ -485,8 +485,8 @@ M00000006_IL_0024:
 M00000006_IL_0025:
 ldstr "StringBuilder UTF-8 byte limit exceeded"
 M00000006_IL_002a:
-call System.Fail(String)
-fault "System.Fail returned unexpectedly"
+call System.Panic(String)
+fault "System.Panic returned unexpectedly"
 M00000006_IL_002f:
 M00000006_IL_0030:
 M00000006_IL_0031:

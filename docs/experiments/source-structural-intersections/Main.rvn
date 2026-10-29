@@ -18,7 +18,7 @@ func Main() -> int {
     let duck = Duck()
     let traits: Animal & Quacks = Echo(duck)
     if traits.Quack() != 42 {
-        System.Fail("intersection dispatch")
+        Panic("intersection dispatch")
     }
     let info = typeof(Animal & Quacks)
     if info is IntersectionTypeInfo intersectionInfo {
@@ -27,16 +27,16 @@ func Main() -> int {
             count += 1
         }
         if count != 2 {
-            System.Fail("intersection descriptor")
+            Panic("intersection descriptor")
         }
     } else {
-        System.Fail("missing intersection descriptor")
+        Panic("missing intersection descriptor")
     }
     if !typeof(Box<Animal & Quacks>).GetGenericArgument(0).Equals(info) {
-        System.Fail("intersection generic argument")
+        Panic("intersection generic argument")
     }
     if !typeof(Animal & Quacks).IsInstanceOfType(duck) {
-        System.Fail("membership")
+        Panic("membership")
     }
     Console.WriteLine("Source structural intersection passed")
     return 0

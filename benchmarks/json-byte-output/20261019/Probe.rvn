@@ -9,27 +9,27 @@ async func Main() -> Task<()> {
     let sources = ["[1,2,3,4,5,6,7,8]", "{\"first\":\"hello\",\"second\":\"hello\"}", "{\"escaped\":\"é😀\\n\\u0000\\\"\"}"]
     for source in sources {
         let Ok(node) = JsonSerializer.DeserializeNode(source) else {
-            System.Fail("Probe parse failed")
+            Panic("Probe parse failed")
         }
         let Ok(expected) = JsonSerializer.SerializeNode(node) else {
-            System.Fail("Probe serialize failed")
+            Panic("Probe serialize failed")
         }
         for index in 0..100 {
             let Ok(content) = JsonContent.CreateNode(node) else {
-                System.Fail("Content failed")
+                Panic("Content failed")
             }
             if content.Bytes.Count != expected.GetUtf8ByteCount() {
-                System.Fail("Content length mismatch")
+                Panic("Content length mismatch")
             }
             let stream = MemoryStream()
             if (await JsonSerializer.SerializeNode(stream, node)) is Error(_) {
-                System.Fail("Stream failed")
+                Panic("Stream failed")
             }
             let Ok(length) = stream.GetLength() else {
-                System.Fail("Length failed")
+                Panic("Length failed")
             }
             if length != (long)expected.GetUtf8ByteCount() {
-                System.Fail("Stream length mismatch")
+                Panic("Stream length mismatch")
             }
             stream.Close()
         }

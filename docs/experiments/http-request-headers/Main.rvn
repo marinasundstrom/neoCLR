@@ -8,7 +8,7 @@ import System.Web.Http.*
 
 func Check(condition: bool) {
     if !condition {
-        System.Fail("Request header assertion failed")
+        Panic("Request header assertion failed")
     }
 }
 
@@ -42,7 +42,7 @@ func CheckContracts() -> Result<unit, HttpError> {
         if let Failure(HttpError.InvalidRequest(_)) = original.WithHeader(name, "value") {
             Check(true)
         } else {
-            System.Fail("Invalid or reserved header accepted")
+            Panic("Invalid or reserved header accepted")
         }
     }
     let values: string[] = ["a\r\nInjected: yes", "a\t", "Café"]
@@ -50,7 +50,7 @@ func CheckContracts() -> Result<unit, HttpError> {
         if let Failure(HttpError.InvalidRequest(_)) = original.WithHeader("X-Test", value) {
             Check(true)
         } else {
-            System.Fail("Invalid header value accepted")
+            Panic("Invalid header value accepted")
         }
     }
     var many = original
@@ -63,7 +63,7 @@ func CheckContracts() -> Result<unit, HttpError> {
     if let Failure(HttpError.LimitExceeded(_)) = many.WithHeader("X-Extra", "value") {
         Check(true)
     } else {
-        System.Fail("Header count bound bypassed")
+        Panic("Header count bound bypassed")
     }
     var longValue = "x"
     while longValue.Length < 2048 {
@@ -77,13 +77,13 @@ func CheckContracts() -> Result<unit, HttpError> {
         if let Failure(reason) = oversized {
             Console.WriteLine(reason.ToString())
         }
-        System.Fail("Header byte bound did not fail before DNS")
+        Panic("Header byte bound did not fail before DNS")
     }
     let invalidContent = HttpRequest.Post("http://not-resolved.invalid/", HttpMemoryContent(default(ReadOnlyMemory<byte>), "text/plain\r\nBad: yes"))?
     if let Failure(HttpError.InvalidRequest(_)) = HttpClient().Send(invalidContent).GetResult() {
         Check(true)
     } else {
-        System.Fail("Content header bypassed send validation")
+        Panic("Content header bypassed send validation")
     }
     let sample = SendReport(HttpClient(InspectHandler()), "http://example.test/", "Café")
     TaskQueue.Default.Drain()
@@ -103,12 +103,12 @@ class ClientProbe {
         let pending = SendReport(client, "http://127.0.0.1:19091/report", "Café")
         pending.OnCompleted(() => {
             let Ok(response) = pending.GetResult() else {
-                System.Fail("POST header request failed")
+                Panic("POST header request failed")
                 return
             }
             Check(response.IsSuccessStatusCode)
             let Some(request) = response.Request else {
-                System.Fail("POST response request missing")
+                Panic("POST response request missing")
                 return
             }
             Check(request.Target == "/report")
@@ -118,17 +118,17 @@ class ClientProbe {
     }
     func SendGet() {
         let Ok(request) = HttpRequest.Get("http://127.0.0.1:19091/read") else {
-            System.Fail("GET construction failed")
+            Panic("GET construction failed")
             return
         }
         let Ok(configured) = request.WithHeader("X-Request-Id", "get-42") else {
-            System.Fail("GET header construction failed")
+            Panic("GET header construction failed")
             return
         }
         let pending = client.Send(configured)
         pending.OnCompleted(() => {
             let Ok(response) = pending.GetResult() else {
-                System.Fail("GET header request failed")
+                Panic("GET header request failed")
                 return
             }
             Check(response.IsSuccessStatusCode)
@@ -139,7 +139,7 @@ class ClientProbe {
 
 func Main() {
     let Ok(_) = CheckContracts() else {
-        System.Fail("Request header setup failed")
+        Panic("Request header setup failed")
         return
     }
     ClientProbe().Start()

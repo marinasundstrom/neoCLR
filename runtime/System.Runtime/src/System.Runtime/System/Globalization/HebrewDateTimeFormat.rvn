@@ -1,5 +1,7 @@
 module System.Globalization
 
+import System.*
+
 import System.Time.*
 
 import System.Result.*
@@ -54,7 +56,7 @@ internal class HebrewDateTimeFormat : DateTimeFormatRules {
 
     func MonthName(year: int, month: int) -> string {
         let Ok(count) = calendar.GetMonthsInYear(year) else {
-            System.Fail("Expected validated Hebrew year")
+            Panic("Expected validated Hebrew year")
         }
         if count == 13 {
             let leapNames = ["תשרי", "חשוון", "כסלו", "טבת", "שבט", "אדר א׳", "אדר ב׳", "ניסן", "אייר", "סיוון", "תמוז", "אב", "אלול"]

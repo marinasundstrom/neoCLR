@@ -24,12 +24,12 @@ func Main() {
             let diagnostics = Console.Error
             let result2 = diagnostics.WriteLine("Could not read input")
             let Ok(_) = result2 else {
-                System.Fail("Could not write diagnostic")
+                Panic("Could not write diagnostic")
                 return ()
             }
             let result3 = diagnostics.Flush()
             let Ok(_) = result3 else {
-                System.Fail("Could not write diagnostic")
+                Panic("Could not write diagnostic")
                 return ()
             }
         }

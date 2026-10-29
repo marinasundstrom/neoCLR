@@ -38,28 +38,28 @@ class FragmentedInput : SyncInputStream {
 
 func Check(condition: bool, message: string) {
     if !condition {
-        System.Fail(message)
+        Panic(message)
     }
 }
 
 func Text(result: Result<string, TextReadError>, expected: string) {
     match result {
         Ok(let value) => Check(String.CompareOrdinal(value, expected) == 0, "Text bytes")
-        Failure(let error) => System.Fail("Unexpected text error: " + error.ToString())
+        Failure(let error) => Panic("Unexpected text error: " + error.ToString())
     }
 }
 
 func Character(result: Result<Optional<char>, TextReadError>, expected: string) {
     match result {
         Ok(Some(let value)) => Check(String.CompareOrdinal(value.ToString(), expected) == 0, "Grapheme bytes")
-        _ => System.Fail("Expected character")
+        _ => Panic("Expected character")
     }
 }
 
 func End(result: Result<Optional<char>, TextReadError>) {
     match result {
         Ok(None) => { }
-        _ => System.Fail("Expected character EOF")
+        _ => Panic("Expected character EOF")
     }
 }
 
@@ -67,7 +67,7 @@ func Main() {
     for chunk in [1, 2, 7, 256] {
         let input = FragmentedInput("é👩‍💻🇸🇪\r\nnext\nlast", chunk)
         let Ok(reader) = SyncStreamReader.Create(input) else {
-            System.Fail("Unable to create text wrapper")
+            Panic("Unable to create text wrapper")
         }
         Character(reader.PeekChar(), "é")
         let reads = input.Reads
@@ -79,13 +79,13 @@ func Main() {
         reader.NewLine = "\r\n"
         match reader.ReadLine(100) {
             Ok(Some(let line)) => Check(line.IsEmpty, "Peek before empty line")
-            _ => System.Fail("Expected empty line")
+            _ => Panic("Expected empty line")
         }
         reader.NewLine = "\n"
         Character(reader.ReadChar(), "n")
         match reader.ReadLine(100) {
             Ok(Some(let line)) => Check(line == "ext", "Mixed character and line cursor")
-            _ => System.Fail("Expected remaining line")
+            _ => Panic("Expected remaining line")
         }
         Text(reader.Read(20), "last")
         End(reader.PeekChar())
@@ -95,24 +95,24 @@ func Main() {
         reader.Close()
         match reader.PeekChar() {
             Failure(TextReadError.Closed) => { }
-            _ => System.Fail("Closed peek")
+            _ => Panic("Closed peek")
         }
     }
 
     let limitedInput = FragmentedInput("éx", 256)
     let Ok(limited) = SyncStreamReader.Create(limitedInput) else {
-        System.Fail("Unable to create text wrapper")
+        Panic("Unable to create text wrapper")
     }
     Text(limited.Read(0, 0), "")
     Check(limitedInput.Reads == 0, "Zero read consumed input")
     match limited.Read(-1) {
         Failure(TextReadError.InvalidRange) => { }
-        _ => System.Fail("Invalid count")
+        _ => Panic("Invalid count")
     }
     Check(limitedInput.Reads == 0, "Invalid read consumed input")
     match limited.Read(1, 1) {
         Failure(TextReadError.LimitExceeded) => { }
-        _ => System.Fail("Expected byte limit")
+        _ => Panic("Expected byte limit")
     }
     Character(limited.PeekChar(), "é")
     Text(limited.Read(1, 2), "é")
@@ -121,7 +121,7 @@ func Main() {
     for ending in ["\n", "\r\n", "\r", "END", "abab", "💥"] {
         let input = FragmentedInput("a" + ending + "b" + ending, 1)
         let Ok(lines) = SyncStreamReader.Create(input) else {
-            System.Fail("Delimiter reader")
+            Panic("Delimiter reader")
         }
         let textReader: SyncTextReader = lines
         textReader.NewLine = ending
@@ -132,7 +132,7 @@ func Main() {
     }
     let exactInput = FragmentedInput("xéyéz", 1)
     let Ok(exact) = SyncStreamReader.Create(exactInput) else {
-        System.Fail("Exact delimiter reader")
+        Panic("Exact delimiter reader")
     }
     exact.NewLine = "é"
     Check(exact.ReadLine(4) is Ok(Some("xéy")), "Delimiter must compare UTF-8 ordinally")
@@ -140,7 +140,7 @@ func Main() {
 
     let invalidInput = FragmentedInput("aaabtail", 1)
     let Ok(overlap) = SyncStreamReader.Create(invalidInput) else {
-        System.Fail("Overlap reader")
+        Panic("Overlap reader")
     }
     overlap.NewLine = ""
     Check(overlap.ReadLine(8) is Failure(TextReadError.InvalidRange), "Empty delimiter")
@@ -151,18 +151,18 @@ func Main() {
     Check(overlap.ReadLine(2) is Ok(Some("ta")), "Changed delimiter")
 
     let Ok(prefixReader) = SyncStreamReader.Create(FragmentedInput("xEN", 1)) else {
-        System.Fail("Partial delimiter reader")
+        Panic("Partial delimiter reader")
     }
     prefixReader.NewLine = "END"
     Check(prefixReader.ReadLine(3) is Ok(Some("xEN")), "Partial delimiter at EOF")
     let Ok(lfReader) = SyncStreamReader.Create(FragmentedInput("x\r\n", 1)) else {
-        System.Fail("LF reader")
+        Panic("LF reader")
     }
     Check(lfReader.ReadLine(2) is Ok(Some("x\r")), "LF must preserve CR")
 
     let newlineOutput = MemoryStream()
     let Ok(createdWriter) = SyncStreamWriter.Create(newlineOutput, true) else {
-        System.Fail("Newline writer")
+        Panic("Newline writer")
     }
     let textWriter: SyncTextWriter = createdWriter
     textWriter.NewLine = "\r\n"
@@ -175,13 +175,13 @@ func Main() {
     textWriter.Close()
     Check(newlineOutput.Seek(0) is Ok(0), "Newline seek")
     let Ok(newlineReader) = SyncStreamReader.Create(newlineOutput) else {
-        System.Fail("Newline output reader")
+        Panic("Newline output reader")
     }
     Text(newlineReader.ReadToEnd(20), "x\r\n💥y")
 
     let memory = MemoryStream()
     let Ok(writer) = SyncStreamWriter.Create(memory, true) else {
-        System.Fail("Writer creation")
+        Panic("Writer creation")
     }
     Check(writer.Write("é") is Ok(2), "UTF-8 write count")
     Check(writer.WriteLine("x") is Ok(2), "WriteLine count")
@@ -194,7 +194,7 @@ func Main() {
     Check(writer.Flush() is Failure(StreamError.Closed), "Closed writer")
     Check(memory.Seek(0) is Ok(0), "leaveOpen")
     let Ok(roundtrip) = SyncStreamReader.Create(memory) else {
-        System.Fail("Roundtrip reader creation")
+        Panic("Roundtrip reader creation")
     }
     Text(roundtrip.ReadToEnd(100), "éx\ntail")
     roundtrip.Close()
@@ -202,7 +202,7 @@ func Main() {
 
     let ascii = MemoryStream()
     let Ok(asciiWriter) = SyncStreamWriter.Create(ascii, Encodings.Ascii) else {
-        System.Fail("ASCII writer creation")
+        Panic("ASCII writer creation")
     }
     Check(ascii.GetLength() is Ok(0), "Creation wrote bytes")
     Check(asciiWriter.Write("é") is Failure(StreamError.InvalidEncoding), "ASCII rejection")

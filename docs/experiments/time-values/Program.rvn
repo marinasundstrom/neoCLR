@@ -7,20 +7,20 @@ record struct Generic<T>(Value: T)
 
 func Check(condition: bool, message: string) {
     if !condition {
-        System.Fail(message)
+        Panic(message)
     }
 }
 
 func DateOf(day: int) -> Date {
-    let Ok(value) = Date.FromDayNumber(day) else { System.Fail("date factory") }
+    let Ok(value) = Date.FromDayNumber(day) else { Panic("date factory") }
     return value
 }
 func TimeOf(ticks: long) -> TimeOfDay {
-    let Ok(value) = TimeOfDay.FromTicks(ticks) else { System.Fail("time factory") }
+    let Ok(value) = TimeOfDay.FromTicks(ticks) else { Panic("time factory") }
     return value
 }
 func OffsetOf(seconds: int) -> TimeOffset {
-    let Ok(value) = TimeOffset.FromSeconds(seconds) else { System.Fail("offset factory") }
+    let Ok(value) = TimeOffset.FromSeconds(seconds) else { Panic("offset factory") }
     return value
 }
 

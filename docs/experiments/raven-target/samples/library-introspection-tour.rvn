@@ -46,7 +46,7 @@ func Main() {
     if let Some(module) = description.Module {
         Console.WriteLine(module.Name)
     } else {
-        System.Fail("Missing nominal module")
+        Panic("Missing nominal module")
     }
 
     let methods: Sequence<MethodInfo> = typeof(int).GetMethods()

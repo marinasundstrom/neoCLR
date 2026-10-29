@@ -7,7 +7,7 @@ import System.Web.Http.*
 func MakeRequest(url: string, size: int) -> HttpRequest {
     let bytes = (byte[])[for index in 0..size => (byte)(index % 256)]
     let Ok(request) = HttpRequest.Create(HttpMethod.Post, url, HttpMemoryContent(bytes)) else {
-        System.Fail("Request construction failed")
+        Panic("Request construction failed")
     }
     return request
 }
@@ -15,19 +15,19 @@ func MakeRequest(url: string, size: int) -> HttpRequest {
 func Validate(result: Result<HttpResponse, HttpError>, size: int, expected: string) {
     if let Ok(response) = result {
         if expected != "ok" || (int)response.StatusCode != 200 || response.Content.Length != size {
-            System.Fail("Unexpected response")
+            Panic("Unexpected response")
         }
         let content = (HttpMemoryContent)response.Content
         let body: ReadOnlySlice<byte> = content.Memory
         var index = 0
         while index < size {
             if body[index] != (byte)(index % 256) {
-                System.Fail("Response byte mismatch")
+                Panic("Response byte mismatch")
             }
             index += 1
         }
         if response.GetHeaderValues("Link").Count != 0 {
-            System.Fail("Informational headers leaked into final response")
+            Panic("Informational headers leaked into final response")
         }
     } else if let Failure(reason) = result {
         CheckError(reason, expected)
@@ -37,7 +37,7 @@ func Validate(result: Result<HttpResponse, HttpError>, size: int, expected: stri
 
 func ParseSize(value: string) -> int {
     let Ok(size) = Int32.Parse(value) else {
-        System.Fail("Invalid size")
+        Panic("Invalid size")
     }
     return size
 }

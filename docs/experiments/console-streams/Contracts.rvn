@@ -9,7 +9,7 @@ import System.Optional.*
 
 func Check(value: bool) {
     if !value {
-        System.Fail("Console stream contract failed")
+        Panic("Console stream contract failed")
     }
 }
 
@@ -117,7 +117,7 @@ class ZeroOutput : OutputStream {
 
 func ReadExpected(reader: TextReader, bound: int, expected: string) -> Result<unit, TextReadError> {
     let Some(text) = CompletedValue(reader.ReadLine(bound))? else {
-        System.Fail("Unexpected EOF")
+        Panic("Unexpected EOF")
         return Ok(())
     }
     Check(text == expected)
@@ -126,7 +126,7 @@ func ReadExpected(reader: TextReader, bound: int, expected: string) -> Result<un
 
 func ReadExpectedSync(reader: SyncTextReader, bound: int, expected: string) -> Result<unit, TextReadError> {
     let Some(text) = reader.ReadLine(bound)? else {
-        System.Fail("Unexpected EOF")
+        Panic("Unexpected EOF")
     }
     Check(text == expected)
     return Ok(())
@@ -134,19 +134,19 @@ func ReadExpectedSync(reader: SyncTextReader, bound: int, expected: string) -> R
 
 func Main() {
     let Ok(stopped) = StreamWriter.Create(ZeroOutput()) else {
-        System.Fail("Unable to create text wrapper")
+        Panic("Unable to create text wrapper")
     }
     match CompletedValue(stopped.Write("x")) {
         Failure(let error) => Check((error is System.IO.StreamError.IoFailure))
-        Ok(_) => System.Fail("Zero-progress output was accepted")
+        Ok(_) => Panic("Zero-progress output was accepted")
     }
     let destination = ShortOutput()
     let Ok(writer) = StreamWriter.Create(destination, true) else {
-        System.Fail("Unable to create text wrapper")
+        Panic("Unable to create text wrapper")
     }
     match CompletedValue(writer.WriteLine("å")) {
         Ok(let count) => Check(count == 3)
-        Failure(_) => System.Fail("Short writes were not handled")
+        Failure(_) => Panic("Short writes were not handled")
     }
     Check(destination.Count == 3)
     Check(destination.ByteAt(0) == 195 && destination.ByteAt(1) == 165 && destination.ByteAt(2) == 10)
@@ -154,17 +154,17 @@ func Main() {
     Check(!destination.Closed)
     match CompletedValue(writer.Write("")) {
         Failure(let error) => Check((error is System.IO.StreamError.Closed))
-        Ok(_) => System.Fail("Closed writer accepted text")
+        Ok(_) => Panic("Closed writer accepted text")
     }
     let Ok(owned) = StreamWriter.Create(destination) else {
-        System.Fail("Unable to create text wrapper")
+        Panic("Unable to create text wrapper")
     }
     owned.Close()
     Check(destination.Closed)
 
     let input = Console.OpenStandardInput()
     let Ok(reader) = SyncStreamReader.Create(input, true) else {
-        System.Fail("Unable to create text wrapper")
+        Panic("Unable to create text wrapper")
     }
     reader.NewLine = "\r\n"
     Check(ReadExpectedSync(reader, 2, "å") is Ok(_))
@@ -173,11 +173,11 @@ func Main() {
     reader.Close()
     // Closing the reader leaves this stream open, at the next unread byte.
     let Ok(next) = SyncStreamReader.Create(input) else {
-        System.Fail("Unable to create text wrapper")
+        Panic("Unable to create text wrapper")
     }
     Check(ReadExpectedSync(next, 4, "tail") is Ok(_))
     let Ok(end) = next.ReadLine(0) else {
-        System.Fail("Could not read EOF")
+        Panic("Could not read EOF")
         return
     }
     Check(end is None)
@@ -185,23 +185,23 @@ func Main() {
     let buffer: byte[] = [(byte)0]
     match input.Read(buffer[..0]) {
         Failure(let error) => Check((error is System.IO.StreamError.Closed))
-        Ok(_) => System.Fail("Owned input was not closed")
+        Ok(_) => Panic("Owned input was not closed")
     }
     // Closing a wrapper must not close the process channel.
     let closed = Console.OpenStandardOutput()
     closed.Close()
     match closed.Write(buffer) {
         Failure(let error) => Check((error is System.IO.StreamError.Closed))
-        Ok(_) => System.Fail("Closed output accepted bytes")
+        Ok(_) => Panic("Closed output accepted bytes")
     }
     let output = Console.OpenStandardOutput()
     let raw: byte[] = [(byte)65, (byte)10]
     match output.Write(raw) {
         Ok(_) => { }
-        Failure(_) => System.Fail("Byte output failed")
+        Failure(_) => Panic("Byte output failed")
     }
     let Ok(_) = output.Flush() else {
-        System.Fail("Could not flush raw output")
+        Panic("Could not flush raw output")
         return
     }
     Console.Write(42)
@@ -212,7 +212,7 @@ func Main() {
 // This fixture deliberately asserts immediate completion of memory/console providers.
 func CompletedValue<T>(operation: Task<T>) -> T {
     let Some(Completed(value)) = operation.Outcome else {
-        System.Fail("Expected inline fixture completion")
+        Panic("Expected inline fixture completion")
     }
     return value
 }

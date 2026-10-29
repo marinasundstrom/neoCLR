@@ -11,7 +11,7 @@ public class HttpMethod : EquatableTo<HttpMethod> {
     /// Creates a method from a nonempty ASCII HTTP token; invalid values fault.
     init(method: string) {
         if !Valid(method) {
-            System.Fail("Invalid HTTP method")
+            Panic("Invalid HTTP method")
         }
         text = method
     }

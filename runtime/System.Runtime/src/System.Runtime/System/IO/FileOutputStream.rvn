@@ -42,7 +42,7 @@ public class FileOutputStream : OutputStream {
         while true {
             let written = WriteCore(buffer, offset + sent, count - sent)?
             if !(written >= 0) || written > count - sent {
-                System.Fail("Invalid output count")
+                Panic("Invalid output count")
             }
             sent += written
             if sent == count { return Ok(()) }
@@ -128,7 +128,7 @@ public class FileOutputStream : OutputStream {
         if status == 10 {
             return StreamError.IoFailure()
         }
-        System.Fail("invalid native stream error")
+        Panic("invalid native stream error")
         return StreamError.IoFailure()
     }
 }

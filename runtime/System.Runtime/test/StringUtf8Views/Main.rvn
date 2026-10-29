@@ -10,34 +10,34 @@ func HeapBytes() -> ReadOnlySlice<byte> {
 func Main() -> int {
     let literal = "A\u0000é😀".Utf8Bytes
     if literal.Length != 8 || literal[2] != 195 || literal[7] != 128 {
-        System.Fail("Literal UTF-8 view")
+        Panic("Literal UTF-8 view")
     }
     let bytes = HeapBytes()
     let nested = bytes[6..13][..6]
     GC.Collect()
     if nested[0] != 195 || nested[5] != 128 {
-        System.Fail("Owner lost across GC")
+        Panic("Owner lost across GC")
     }
     let Ok(text) = Encodings.Utf8.Decode(nested) else {
-        System.Fail("Decode string window")
+        Panic("Decode string window")
     }
     if text != "é😀" {
-        System.Fail("Wrong window text")
+        Panic("Wrong window text")
     }
     let copy = nested.ToArray()
     copy[0] = (byte)0
     if nested[0] != 195 {
-        System.Fail("Mutable copy changed string")
+        Panic("Mutable copy changed string")
     }
     if !bytes[bytes.Length..].IsEmpty || !"".Utf8Bytes.IsEmpty {
-        System.Fail("Empty string window")
+        Panic("Empty string window")
     }
     if !(Encodings.Utf8.Decode(nested[1..]) is Failure(EncodingError.InvalidUtf8)) {
-        System.Fail("Byte slicing must preserve invalid UTF-8 boundaries")
+        Panic("Byte slicing must preserve invalid UTF-8 boundaries")
     }
     GC.Collect()
     if nested[0] != 195 {
-        System.Fail("Owner lost after copy and decoding")
+        Panic("Owner lost after copy and decoding")
     }
     return 0
 }

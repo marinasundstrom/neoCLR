@@ -38,28 +38,28 @@ module SchedulerContinuations {
 
         func Publish() -> System.Void {
             if IsCompleted {
-                System.Fail("Duplicate completion")
+                Panic("Duplicate completion")
             }
             Dispatch()
             if !source.Complete(42) {
-                System.Fail("Duplicate completion")
+                Panic("Duplicate completion")
             }
             return ()
         }
 
         func PublishFault() -> System.Void {
             Publish()
-            System.Fail("fault after continuation submission")
+            Panic("fault after continuation submission")
             return ()
         }
 
         func Cancel() -> System.Void {
             if IsCompleted {
-                System.Fail("Duplicate cancellation")
+                Panic("Duplicate cancellation")
             }
             Dispatch()
             if !source.Cancel() {
-                System.Fail("Duplicate cancellation")
+                Panic("Duplicate cancellation")
             }
             return ()
         }
@@ -73,7 +73,7 @@ module SchedulerContinuations {
         // Explicit OnCompleted below tests deferred outcome observation, not await.
         func Observe() -> System.Void {
             if !IsCompleted {
-                System.Fail("Observer ran before completion")
+                Panic("Observer ran before completion")
             }
             Deliveries += 1
             Observed.Complete(Deliveries)
@@ -88,7 +88,7 @@ module SchedulerContinuations {
     }
 
     func ProducerPumpForbidden() -> System.Void {
-        System.Fail("producer queue was pumped")
+        Panic("producer queue was pumped")
         return ()
     }
 }

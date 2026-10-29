@@ -30,7 +30,7 @@ class MixedApplication {
 
     async func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
         if request.Method.Method != "GET" {
-            System.Fail("Mixed method")
+            Panic("Mixed method")
         }
         if request.Target == "/fanout/0" {
             return await Fanout0()
@@ -104,7 +104,7 @@ class MixedApplication {
         if request.Target == "/network/3" {
             return await Network3()
         }
-        System.Fail("Unknown mixed endpoint")
+        Panic("Unknown mixed endpoint")
         return Response("invalid")
     }
 
@@ -209,7 +209,7 @@ class MixedApplication {
         // Explicit await and Task.Run's async-unwrapping overload preserve
         // completion dependency without implicit parent/child attachment.
         let Ok(_) = await Task.Run(() => Short(id)) else {
-            System.Fail("Mixed nested task")
+            Panic("Mixed nested task")
         }
         return Response("fanout:" + variant.ToString() + ":ok")
     }
@@ -236,7 +236,7 @@ class MixedApplication {
         let fourthValue = await fourth
         let total = firstValue + secondValue + thirdValue + fourthValue
         if total != 10 || alias.id != 42 || shared.name != "shared" || !alias.active || !Object.ReferenceEquals(shared, alias) {
-            System.Fail("Mixed shared capture")
+            Panic("Mixed shared capture")
         }
         return Response("short:" + variant.ToString() + ":10")
     }
@@ -257,7 +257,7 @@ class MixedApplication {
             return checksum
         })
         if result != count * (count - 1) / 2 || shared.id != count - 1 {
-            System.Fail("Mixed allocation checksum")
+            Panic("Mixed allocation checksum")
         }
         return Response("allocate:" + variant.ToString() + ":" + result.ToString())
     }
@@ -267,12 +267,12 @@ class MixedApplication {
         // this test deliberately does not pretend the operation is async I/O.
         let text = await Task.Run(() => {
             let Ok(value) = FileText.ReadAllText("input.txt", 8192) else {
-                System.Fail("Mixed file read")
+                Panic("Mixed file read")
             }
             return value
         })
         if text != "checked file payload" {
-            System.Fail("Mixed file contents")
+            Panic("Mixed file contents")
         }
         return Response("file-read:" + variant.ToString() + ":ok")
     }
@@ -281,12 +281,12 @@ class MixedApplication {
         let path = "output-" + variant.ToString() + ".txt"
         let result = await Task.Run(() => {
             let Ok(_) = FileText.WriteAllText(path, "checked file payload", 8192) else {
-                System.Fail("Mixed file write")
+                Panic("Mixed file write")
             }
             return 42
         })
         if result != 42 {
-            System.Fail("Mixed file result")
+            Panic("Mixed file result")
         }
         return Response("file-write:" + variant.ToString() + ":ok")
     }
@@ -294,10 +294,10 @@ class MixedApplication {
     async func Network(variant: int) -> Task<Result<HttpResponse, HttpError>> {
         use client = HttpClient()
         let Ok(text) = await client.GetString("http://127.0.0.1:19876/wait/" + variant.ToString()) else {
-            System.Fail("Mixed downstream HTTP")
+            Panic("Mixed downstream HTTP")
         }
         if text != "downstream:" + variant.ToString() {
-            System.Fail("Mixed downstream contents")
+            Panic("Mixed downstream contents")
         }
         return Response("network:" + variant.ToString() + ":ok")
     }
@@ -305,16 +305,16 @@ class MixedApplication {
 
 async func Run() -> Task<unit> {
     let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 64) else {
-        System.Fail("Listen")
+        Panic("Listen")
     }
     let Ok(control) = Socket.Listen("127.0.0.1", 0, 8) else {
-        System.Fail("Control")
+        Panic("Control")
     }
     let Ok(port) = server.GetLocalPort() else {
-        System.Fail("Port")
+        Panic("Port")
     }
     let Ok(controlPort) = control.GetLocalPort() else {
-        System.Fail("Control port")
+        Panic("Control port")
     }
     let application = MixedApplication()
     let lifetime = server.ServePersistent(application.Respond, 32, 16, CancellationToken.None)
@@ -322,13 +322,13 @@ async func Run() -> Task<unit> {
     Console.WriteLine(port)
     Console.WriteLine(controlPort)
     let Ok(stop) = await control.Accept() else {
-        System.Fail("Stop signal")
+        Panic("Stop signal")
     }
     stop.Close()
     control.Close()
     server.Close()
     let Ok(_) = await lifetime else {
-        System.Fail("Serve lifetime")
+        Panic("Serve lifetime")
     }
     Console.WriteLine("DONE " + server.CompletedRequests.ToString() + " " + server.FailedRequests.ToString())
 }

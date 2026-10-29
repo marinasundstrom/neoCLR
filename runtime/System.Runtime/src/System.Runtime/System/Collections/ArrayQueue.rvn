@@ -13,7 +13,7 @@ public class ArrayQueue<T> : Queue<T> {
 
     init(capacity: int) {
         if capacity < 0 {
-            System.Fail("Collection capacity must be non-negative")
+            Panic("Collection capacity must be non-negative")
         }
         slots = ArrayList<Optional<T>>(capacity)
         var index = 0
@@ -49,7 +49,7 @@ public class ArrayQueue<T> : Queue<T> {
         if count == slots.Count {
             let capacity = slots.Count
             if capacity > 1073741823 {
-                System.Fail("Queue capacity overflow")
+                Panic("Queue capacity overflow")
             }
             var size = 4
             if capacity != 0 {
@@ -105,7 +105,7 @@ public class ArrayQueue<T> : Queue<T> {
             if slots[position] is Some(let value) {
                 snapshot.Add(value)
             } else {
-                System.Fail("Collection storage invariant violated")
+                Panic("Collection storage invariant violated")
             }
             index = index + 1
         }

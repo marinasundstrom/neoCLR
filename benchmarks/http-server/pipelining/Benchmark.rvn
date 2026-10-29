@@ -26,7 +26,7 @@ func Main() -> Task<unit> {
 class BenchmarkApplication {
     func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
         if request.Method.Method != "GET" {
-            System.Fail("Benchmark method")
+            Panic("Benchmark method")
         }
         if request.Target == "/json" {
             let person = Person()
@@ -36,7 +36,7 @@ class BenchmarkApplication {
             return Task.FromResult(RespondWithPerson(person))
         }
         if request.Target != "/plain" {
-            System.Fail("Benchmark route")
+            Panic("Benchmark route")
         }
         return Task.FromResult<Result<HttpResponse, HttpError>>(Result<HttpResponse, HttpError>.Ok(
             HttpResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), HttpStringContent("Hello, World!"))))
@@ -45,16 +45,16 @@ class BenchmarkApplication {
 
 async func Run() -> Task<unit> {
     let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 64) else {
-        System.Fail("Listen")
+        Panic("Listen")
     }
     let Ok(control) = Socket.Listen("127.0.0.1", 0, 8) else {
-        System.Fail("Control")
+        Panic("Control")
     }
     let Ok(port) = server.GetLocalPort() else {
-        System.Fail("Port")
+        Panic("Port")
     }
     let Ok(controlPort) = control.GetLocalPort() else {
-        System.Fail("Control port")
+        Panic("Control port")
     }
     let application = BenchmarkApplication()
     let lifetime = server.ServePersistent(application.Respond, 32, 16, CancellationToken.None)
@@ -62,13 +62,13 @@ async func Run() -> Task<unit> {
     Console.WriteLine(port)
     Console.WriteLine(controlPort)
     let Ok(stop) = await control.Accept() else {
-        System.Fail("Stop signal")
+        Panic("Stop signal")
     }
     stop.Close()
     control.Close()
     server.Close()
     let Ok(_) = await lifetime else {
-        System.Fail("Serve lifetime")
+        Panic("Serve lifetime")
     }
     Console.WriteLine("DONE " + server.CompletedRequests.ToString() + " " + server.FailedRequests.ToString())
 }

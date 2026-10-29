@@ -282,7 +282,7 @@ public class Socket {
         if code == 13 {
             return SocketError.AddressInUse()
         }
-        System.Fail("invalid native socket error")
+        Panic("invalid native socket error")
         return SocketError.IoFailure()
     }
 }

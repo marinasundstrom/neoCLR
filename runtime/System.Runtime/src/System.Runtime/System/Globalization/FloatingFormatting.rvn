@@ -10,7 +10,7 @@ internal static class FloatingFormatting {
         let code = (int)bytes[0]
         let upper = if code >= 97 && code <= 122 { code - 32 } else { code }
         if upper != 71 && upper != 82 && upper != 70 && upper != 78 && upper != 69 {
-            System.Fail("Unsupported floating format")
+            Panic("Unsupported floating format")
         }
         return code
     }
@@ -18,12 +18,12 @@ internal static class FloatingFormatting {
     internal static func Precision(format: string) -> int {
         let bytes = format.Utf8Bytes
         if bytes.Length <= 1 { return -1 }
-        if bytes.Length > 3 { System.Fail("Unsupported floating format precision") }
+        if bytes.Length > 3 { Panic("Unsupported floating format precision") }
         var result = 0
         var index = 1
         while index < bytes.Length {
             let digit = (int)bytes[index] - 48
-            if digit < 0 || digit > 9 { System.Fail("Unsupported floating format precision") }
+            if digit < 0 || digit > 9 { Panic("Unsupported floating format precision") }
             result = result * 10 + digit
             index += 1
         }

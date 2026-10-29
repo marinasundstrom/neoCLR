@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-29
 
+- Rename System.Fail to System.Panic to distinguish terminal errors from Result.Failure; prefer importing System.* and calling Panic. Update Raven contract integration, callers and API documentation. No compatibility alias is retained; consumers must rebuild with the matching compiler/runtime bundle. Runtime fault, cleanup and thread/task behavior is unchanged; broader panic semantics are deferred.
+
 - Integrate Raven carrier postfix `!` through existing native terminal failure; add a focused native compiler/interpreter verifier for success, failure and member chaining. No runtime ABI change.
 
 - Add Neo.Configuration.Abstractions and Neo.Configuration with hierarchical live sections, ordered provider precedence, explicit null masking, mutable in-memory sources, optional Neo.Configuration.Json file loading, reload/disposal and caller-owned DI registration. Integrate configuration into the typed logging/localization sample, add four introductory web-page samples backed by standalone projects, and refresh API/website documentation. JSON configuration accepts comments, trailing commas and a UTF-8 BOM, with a 1 MiB input budget and default depth 64. The underlying DOM reader now follows System.Text.Json-style JsonDocumentOptions/JsonCommentHandling, removes fixed byte/value/container-entry caps and handles large escaped UTF-8 strings; strict syntax remains the default. Invalid options return Result errors before consuming input. Serialization and object-mapping limits remain development gaps. Change tokens, environment/command-line providers, binding and options remain gaps.

@@ -9,7 +9,7 @@ import System.Web.Http.*
 
 func Check(condition: bool) {
     if !condition {
-        System.Fail("HTTP base address assertion failed")
+        Panic("HTTP base address assertion failed")
     }
 }
 
@@ -43,12 +43,12 @@ func Resolved(baseText: string, reference: string, expected: string) {
     if let Some(value) = client.BaseUri {
         Check(value == baseText)
     } else {
-        System.Fail("BaseUri was not retained")
+        Panic("BaseUri was not retained")
     }
     if let Ok(response) = client.Get(reference).GetResult() {
         Check((int)response.StatusCode == 200)
     } else {
-        System.Fail("Relative string request failed")
+        Panic("Relative string request failed")
     }
     Check(capture.Target == expected)
     Check(capture.Host == "example.test")
@@ -57,10 +57,10 @@ func Resolved(baseText: string, reference: string, expected: string) {
         if let Ok(response) = client.Get(uri).GetResult() {
             Check((int)response.StatusCode == 200)
         } else {
-            System.Fail("Relative Uri request failed")
+            Panic("Relative Uri request failed")
         }
     } else {
-        System.Fail("Valid relative Uri did not parse")
+        Panic("Valid relative Uri did not parse")
     }
     Check(capture.Target == expected)
     Check(capture.Calls == 2)
@@ -73,13 +73,13 @@ func Rejected(baseText: string, reference: string) {
     if let Failure(_) = client.Get(reference).GetResult() {
         Check(capture.Calls == 0)
     } else {
-        System.Fail("Invalid base/reference pair was dispatched")
+        Panic("Invalid base/reference pair was dispatched")
     }
     if let Ok(uri) = Uri.Parse(reference) {
         if let Failure(_) = client.Get(uri).GetResult() {
             Check(capture.Calls == 0)
         } else {
-            System.Fail("Invalid Uri pair was dispatched")
+            Panic("Invalid Uri pair was dispatched")
         }
     }
 }
@@ -92,12 +92,12 @@ func Main() {
     if let Failure(HttpError.InvalidRequest(_)) = client.Get("relative").GetResult() {
         Check(capture.Calls == 0)
     } else {
-        System.Fail("Relative URL without base was admitted")
+        Panic("Relative URL without base was admitted")
     }
     if let Failure(HttpError.InvalidUri(UriError.InvalidFormat)) = client.Get("http://example.test/%broken").GetResult() {
         Check(capture.Calls == 0)
     } else {
-        System.Fail("Malformed percent escape was admitted")
+        Panic("Malformed percent escape was admitted")
     }
     client.BaseUri = Some("http://example.test:8080/api/")
     client.BaseUri = None()
@@ -106,7 +106,7 @@ func Main() {
         Check(capture.Target == "/?answer=42")
         Check(capture.Port == 80)
     } else {
-        System.Fail("Query-only absolute URL failed")
+        Panic("Query-only absolute URL failed")
     }
     if let Ok(uri) = Uri.Parse("http://example.test/direct") {
         if let Ok(request) = HttpRequest.Get(uri) {
@@ -115,7 +115,7 @@ func Main() {
             _ = client.Send(request).GetResult()
             Check(capture.Target == "/direct")
         } else {
-            System.Fail("Direct Uri request failed")
+            Panic("Direct Uri request failed")
         }
     }
     Console.WriteLine("HTTP base address and overload checks passed")

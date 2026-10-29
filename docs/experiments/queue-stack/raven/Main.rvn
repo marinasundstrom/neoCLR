@@ -14,7 +14,7 @@ class QueueStorage<T> {
         if count == slots.Count {
             let capacity = slots.Count
             if capacity > 1073741823 {
-                System.Fail("Queue capacity overflow")
+                Panic("Queue capacity overflow")
             }
             var size = 4
             if capacity != 0 {

@@ -24,7 +24,7 @@ func Main(args: string[]) {
             result = Char.TryFromString("ab") is None
         }
         if !result {
-            System.Fail("Char allocation fixture")
+            Panic("Char allocation fixture")
         }
         count += 1
     }

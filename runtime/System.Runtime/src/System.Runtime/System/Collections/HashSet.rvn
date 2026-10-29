@@ -34,7 +34,7 @@ public class HashSet<T> : MutableSet<T> {
 
     private func Enter() {
         if busy {
-            System.Fail("HashSet callbacks must not reenter the set")
+            Panic("HashSet callbacks must not reenter the set")
         }
         busy = true
     }
@@ -86,7 +86,7 @@ public class HashSet<T> : MutableSet<T> {
             return
         }
         if buckets.Length > 1073741823 {
-            System.Fail("HashSet capacity overflow")
+            Panic("HashSet capacity overflow")
         }
         let expanded = System.Runtime.CompilerServices.CheckedStorage.Reserve<int>(buckets.Length * 2)
         var index = 0

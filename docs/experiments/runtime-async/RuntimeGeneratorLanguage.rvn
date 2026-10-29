@@ -52,18 +52,18 @@ async func CheckDemand() -> Task<()> {
     let counters = Counters()
     let stream = Values(gate.Task, counters)
     let iterator = stream.GetAsyncIterator()
-    if counters.Starts != 0 { System.Fail("Generator started before first advancement") }
+    if counters.Starts != 0 { Panic("Generator started before first advancement") }
     let first = iterator.MoveNextAsync()
-    if first.IsCompleted || counters.Starts != 1 { System.Fail("Generator did not await its input") }
+    if first.IsCompleted || counters.Starts != 1 { Panic("Generator did not await its input") }
     _ = gate.Complete(7)
-    if !await first || iterator.Current != 7 || counters.Resumes != 0 { System.Fail("First yield failed") }
+    if !await first || iterator.Current != 7 || counters.Resumes != 0 { Panic("First yield failed") }
     System.Runtime.GC.Collect()
-    if counters.Yields != 1 || counters.Disposals != 0 { System.Fail("Yield did not retain the producer") }
-    if !await iterator.MoveNextAsync() || iterator.Current != 8 || counters.Resumes != 1 { System.Fail("Second yield failed") }
-    if await iterator.MoveNextAsync() { System.Fail("Generator failed to end") }
+    if counters.Yields != 1 || counters.Disposals != 0 { Panic("Yield did not retain the producer") }
+    if !await iterator.MoveNextAsync() || iterator.Current != 8 || counters.Resumes != 1 { Panic("Second yield failed") }
+    if await iterator.MoveNextAsync() { Panic("Generator failed to end") }
     await iterator.DisposeAsync()
-    if counters.Disposals != 1 || counters.Resumes != 2 { System.Fail("Generator completion lost cleanup") }
-    if await iterator.MoveNextAsync() { System.Fail("Completed generator restarted") }
+    if counters.Disposals != 1 || counters.Resumes != 2 { Panic("Generator completion lost cleanup") }
+    if await iterator.MoveNextAsync() { Panic("Completed generator restarted") }
 }
 
 async func CheckConsumer(stop: bool) -> Task<()> {
@@ -78,7 +78,7 @@ async func CheckConsumer(stop: bool) -> Task<()> {
     var yields = 2
     if stop { expected = 7; resumes = 0; yields = 1 }
     if sum != expected || counters.Resumes != resumes || counters.Yields != yields || counters.Disposals != 1 {
-        System.Fail("Consumer failed to stop or complete the producer")
+        Panic("Consumer failed to stop or complete the producer")
     }
 }
 
@@ -90,7 +90,7 @@ async func CheckCancellation() -> Task<()> {
     result.OnCompleted(observer.Complete)
     _ = gate.Cancel()
     if !await observer.Done.Task || counters.Disposals != 1 || counters.Yields != 0 {
-        System.Fail("Cancelled producer did not clean up")
+        Panic("Cancelled producer did not clean up")
     }
 }
 
@@ -100,7 +100,7 @@ async func CheckUnstarted() -> Task<()> {
     let iterator = Values(gate.Task, counters).GetAsyncIterator()
     await iterator.DisposeAsync()
     if await iterator.MoveNextAsync() || counters.Starts != 0 || counters.Disposals != 0 {
-        System.Fail("Disposing an unstarted generator ran its body")
+        Panic("Disposing an unstarted generator ran its body")
     }
 }
 
@@ -114,18 +114,18 @@ async func CheckIndependent() -> Task<()> {
     let secondPending = second.MoveNextAsync()
     _ = gate.Complete(7)
     if !await firstPending || !await secondPending || counters.Starts != 2 {
-        System.Fail("Iterable did not create independent producers")
+        Panic("Iterable did not create independent producers")
     }
     if !await first.MoveNextAsync() || first.Current != 8 || second.Current != 7 {
-        System.Fail("Advancing one iterator changed another")
+        Panic("Advancing one iterator changed another")
     }
     await first.DisposeAsync()
     System.Runtime.GC.Collect()
     if counters.Disposals != 1 || !await second.MoveNextAsync() || second.Current != 8 {
-        System.Fail("Disposing one iterator released another")
+        Panic("Disposing one iterator released another")
     }
     await second.DisposeAsync()
-    if counters.Disposals != 2 { System.Fail("Independent producers did not both clean up") }
+    if counters.Disposals != 2 { Panic("Independent producers did not both clean up") }
 }
 
 // Explicit typed closure representation for the generic-producer prerequisite.
@@ -154,12 +154,12 @@ func CheckGenericClosure() {
     let reference = CaptureValue(Payload(73))
     System.Runtime.GC.Collect()
     if number() != 42 || text() != "generic closure" || reference().Value != 73 {
-        System.Fail("Typed generic closure lost its captured value")
+        Panic("Typed generic closure lost its captured value")
     }
     let other = CaptureValue(Payload(19))
     System.Runtime.GC.Collect()
     if reference().Value != 73 || other().Value != 19 {
-        System.Fail("Typed generic closures did not retain independent captures")
+        Panic("Typed generic closures did not retain independent captures")
     }
 }
 
@@ -205,7 +205,7 @@ class GeneratorBox<T> {
     async func Values<U>(gate: Task<U>, counters: Counters) -> AsyncIterable<T> {
         visits = visits + 1
         if visits != 1 {
-            System.Fail("Generic receiver mutation failed")
+            Panic("Generic receiver mutation failed")
         }
         use lifetime = Lifetime(counters)
         _ = Identity(await gate)
@@ -218,38 +218,38 @@ async func CheckGenericOwner() -> Task<()> {
     let callback = GeneratorBox<Payload>(Payload(52)).Callback("owner callback")
     System.Runtime.GC.Collect()
     if callback().Value != 52 {
-        System.Fail("Generic callback lost its receiver")
+        Panic("Generic callback lost its receiver")
     }
     let counters = Counters()
     let gate = Promise<int>()
     let iterator = GeneratorBox<Payload>(Payload(84)).Values(gate.Task, counters).GetAsyncIterator()
     let pending = iterator.MoveNextAsync()
     if pending.IsCompleted {
-        System.Fail("Generic owner failed to suspend")
+        Panic("Generic owner failed to suspend")
     }
     System.Runtime.GC.Collect()
     _ = gate.Complete(19)
     if !await pending || iterator.Current.Value != 84 {
-        System.Fail("Generic owner lost receiver state")
+        Panic("Generic owner lost receiver state")
     }
     System.Runtime.GC.Collect()
     if !await iterator.MoveNextAsync() || iterator.Current.Value != 84 {
-        System.Fail("Generic owner delegation failed")
+        Panic("Generic owner delegation failed")
     }
     await iterator.DisposeAsync()
     if counters.Disposals != 1 {
-        System.Fail("Generic owner lost disposal")
+        Panic("Generic owner lost disposal")
     }
     var total = 0
     await for value in GeneratorBox<int>(11).Values(Task.FromResult("other type"), Counters()) {
         total = total + value
     }
     if total != 33 {
-        System.Fail("Owner and method generic parameters collided")
+        Panic("Owner and method generic parameters collided")
     }
     let single = GeneratorBox<int>(27).Single()
     if !await single.MoveNextAsync() || single.Current != 27 {
-        System.Fail("Generic owner-only iterator failed")
+        Panic("Generic owner-only iterator failed")
     }
     await single.DisposeAsync()
     let cancelledCounters = Counters()
@@ -260,10 +260,10 @@ async func CheckGenericOwner() -> Task<()> {
     _ = cancelledGate.Cancel()
     let cancelled = await observer.Done.Task
     if !cancelled {
-        System.Fail("Generic owner lost cancellation outcome")
+        Panic("Generic owner lost cancellation outcome")
     }
     if cancelledCounters.Disposals != 1 {
-        System.Fail("Generic owner cancellation lost cleanup")
+        Panic("Generic owner cancellation lost cleanup")
     }
 }
 
@@ -272,31 +272,31 @@ async func CheckGeneric() -> Task<()> {
     await for value in Echo(42) { number = value }
     var text = ""
     await for value in Echo("generic") { text = value }
-    if number != 42 || text != "generic" { System.Fail("Generic generator lost its argument") }
+    if number != 42 || text != "generic" { Panic("Generic generator lost its argument") }
     var second = 0
     await for value in Second("first", 63) { second = value }
-    if second != 63 { System.Fail("Generic producer confused parameter ordinals") }
+    if second != 63 { Panic("Generic producer confused parameter ordinals") }
     let scalar = CaptureLambda(91)
     let reference = CaptureLambda(Payload(73))
     let identity = IdentityLambda<int>()
     System.Runtime.GC.Collect()
     if scalar() != 91 || reference().Value != 73 || identity(17) != 17 {
-        System.Fail("Generic closure lost its scoped type or capture")
+        Panic("Generic closure lost its scoped type or capture")
     }
     let gate = Promise<Payload>()
     let counters = Counters()
     let iterator = EchoAfter(gate.Task, counters).GetAsyncIterator()
     let pending = iterator.MoveNextAsync()
-    if pending.IsCompleted { System.Fail("Generic producer did not suspend") }
+    if pending.IsCompleted { Panic("Generic producer did not suspend") }
     System.Runtime.GC.Collect()
     _ = gate.Complete(Payload(29))
-    if !await pending || iterator.Current.Value != 29 { System.Fail("Generic await lost its result") }
+    if !await pending || iterator.Current.Value != 29 { Panic("Generic await lost its result") }
     System.Runtime.GC.Collect()
     if !await iterator.MoveNextAsync() || iterator.Current.Value != 29 {
-        System.Fail("Generic delegation lost its value")
+        Panic("Generic delegation lost its value")
     }
     await iterator.DisposeAsync()
-    if counters.Disposals != 1 { System.Fail("Generic producer lost early cleanup") }
+    if counters.Disposals != 1 { Panic("Generic producer lost early cleanup") }
 }
 
 async func Words() -> AsyncIterable<string> {
@@ -319,10 +319,10 @@ async func CheckShapes() -> Task<()> {
         System.Runtime.GC.Collect()
         text = text + word
     }
-    if text != "alphabeta" { System.Fail("Reference-valued generator failed") }
+    if text != "alphabeta" { Panic("Reference-valued generator failed") }
     let iterator = Single()
     if !await iterator.MoveNextAsync() || iterator.Current != 7 {
-        System.Fail("Direct iterator generator failed")
+        Panic("Direct iterator generator failed")
     }
     await iterator.DisposeAsync()
 }
@@ -338,7 +338,7 @@ async func CheckDelegation(stop: bool) -> Task<()> {
     var expected = 115
     if stop { expected = 8 }
     if sum != expected || inner.Disposals != 1 || outer.Disposals != 1 {
-        System.Fail("Yield delegation lost values or nested cleanup")
+        Panic("Yield delegation lost values or nested cleanup")
     }
 }
 
@@ -385,24 +385,24 @@ async func CheckPendingCleanup(exit: int) -> Task<()> {
     if exit == 2 { _ = gate.Cancel() }
     _ = await inner.Disposing.Task
     if result.IsCompleted || inner.Disposals != 1 || outer.Disposals != 0 || counters.Disposals != 0 {
-        System.Fail("Producer failed to retain nested cleanup")
+        Panic("Producer failed to retain nested cleanup")
     }
     System.Runtime.GC.Collect()
     if exit == 3 { _ = inner.Release.Cancel() }
     else { _ = inner.Release.Complete(()) }
     _ = await outer.Disposing.Task
     if result.IsCompleted || outer.Disposals != 1 || counters.Disposals != 0 {
-        System.Fail("Producer cleanup bypassed outer suspension")
+        Panic("Producer cleanup bypassed outer suspension")
     }
     System.Runtime.GC.Collect()
     _ = outer.Release.Complete(())
     let cancelled = await observer.Done.Task
     if cancelled != (exit == 2 || exit == 3) || counters.Disposals != 1 || inner.Disposals != 1 || outer.Disposals != 1 {
-        System.Fail("Producer cleanup lost cancellation or disposed twice")
+        Panic("Producer cleanup lost cancellation or disposed twice")
     }
     if !cancelled {
         let value = await result
-        if value != 14 { System.Fail("Producer cleanup lost the yielded value") }
+        if value != 14 { Panic("Producer cleanup lost the yielded value") }
     }
 }
 
@@ -431,7 +431,7 @@ func BeginOnlyDisposal(probe: CleanupProbe) -> Task<()> {
     let iterator = YieldWithPendingDisposal(probe).GetAsyncIterator()
     let first = iterator.MoveNextAsync()
     if !first.IsCompleted || !first.GetResult() {
-        System.Fail("Expected synchronous first yield before pending disposal")
+        Panic("Expected synchronous first yield before pending disposal")
     }
     return iterator.DisposeAsync()
 }
@@ -441,23 +441,23 @@ async func CheckTaskOnlyConsumers() -> Task<()> {
     let counters = Counters()
     let advancement = BeginOnlyAdvancement(gate.Task, counters)
     if advancement.IsCompleted || counters.Starts != 1 {
-        System.Fail("Task-only advancement did not suspend")
+        Panic("Task-only advancement did not suspend")
     }
     System.Runtime.GC.Collect()
     _ = gate.Complete(0)
     if await advancement || counters.Disposals != 1 {
-        System.Fail("Task-only advancement lost completion or cleanup")
+        Panic("Task-only advancement lost completion or cleanup")
     }
     let probe = CleanupProbe()
     let disposal = BeginOnlyDisposal(probe)
     _ = await probe.Disposing.Task
     if disposal.IsCompleted || probe.Disposals != 1 {
-        System.Fail("Task-only disposal did not suspend")
+        Panic("Task-only disposal did not suspend")
     }
     System.Runtime.GC.Collect()
     _ = probe.Release.Complete(())
     await disposal
-    if probe.Disposals != 1 { System.Fail("Task-only disposal ran cleanup twice") }
+    if probe.Disposals != 1 { Panic("Task-only disposal ran cleanup twice") }
 }
 
 // Only the scheduler owns the pulse callback; this gives queued notifications
@@ -471,7 +471,7 @@ async func FlushNotifications() -> Task<()> {
 func AbandonYielded(counters: Counters) {
     let iterator = Values(Task.FromResult(7), counters).GetAsyncIterator()
     let first = iterator.MoveNextAsync()
-    if !first.IsCompleted || !first.GetResult() { System.Fail("Expected eager first yield") }
+    if !first.IsCompleted || !first.GetResult() { Panic("Expected eager first yield") }
 }
 
 async func ExternalValues(gate: Task<int>, counters: Counters, reached: Promise<()>) -> AsyncIterable<int> {
@@ -495,7 +495,7 @@ async func CheckAbandonedOwnership() -> Task<()> {
         System.Runtime.GC.Collect()
     }
     if counters.Starts != 160 || counters.Yields != 160 || counters.Resumes != 0 || counters.Disposals != 0 {
-        System.Fail("Abandoned generator resumed or ran managed cleanup")
+        Panic("Abandoned generator resumed or ran managed cleanup")
     }
     let external = Promise<int>()
     let live = Counters()
@@ -503,10 +503,10 @@ async func CheckAbandonedOwnership() -> Task<()> {
     DropPendingConsumer(external.Task, live, reached)
     await FlushNotifications()
     System.Runtime.GC.Collect()
-    if live.Yields != 0 { System.Fail("Pending external input was bypassed") }
+    if live.Yields != 0 { Panic("Pending external input was bypassed") }
     _ = external.Complete(9)
     await reached.Task
-    if live.Yields != 1 || live.Disposals != 0 { System.Fail("External completion lost its suspended producer") }
+    if live.Yields != 1 || live.Disposals != 0 { Panic("External completion lost its suspended producer") }
     await FlushNotifications()
     System.Runtime.GC.Collect()
 }

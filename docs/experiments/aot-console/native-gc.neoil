@@ -56,7 +56,7 @@ ldarg fail
 brfalse Check
 ldarg text
 ldobj String
-call System.Fail(String)
+call System.Panic(String)
 Check:
 ldarg text
 ldobj String

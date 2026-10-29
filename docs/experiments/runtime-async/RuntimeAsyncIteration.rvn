@@ -52,19 +52,19 @@ async func Main() -> Task<int> {
     let probe = Probe()
     let result = Read(probe)
     if result.IsCompleted || probe.Reads != 0 || probe.Acquisitions != 1 {
-        System.Fail("Async iterator failed to suspend before reading Current")
+        Panic("Async iterator failed to suspend before reading Current")
     }
     System.Runtime.GC.Collect()
     _ = probe.Next.Complete(true)
     _ = await probe.Disposing.Task
     if result.IsCompleted || probe.Disposals != 1 || probe.Reads != 1 {
-        System.Fail("Async disposal did not retain the consumer")
+        Panic("Async disposal did not retain the consumer")
     }
     System.Runtime.GC.Collect()
     _ = probe.Release.Complete(())
     let sum = await result
     if sum != 42 || probe.Disposals != 1 {
-        System.Fail("Async iterator lost its result or disposed twice")
+        Panic("Async iterator lost its result or disposed twice")
     }
     Console.WriteLine("PASS managed async iteration contract")
     return 0

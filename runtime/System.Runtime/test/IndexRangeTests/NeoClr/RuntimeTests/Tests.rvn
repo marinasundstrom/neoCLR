@@ -317,7 +317,7 @@ class ObservedSequence : System.Collections.Sequence<int> {
     val Count: int => 5
     val self[index: int]: int {
         get {
-            System.Fail("Slice must not read the sequence indexer")
+            Panic("Slice must not read the sequence indexer")
             return 0
         }
     }
@@ -402,9 +402,9 @@ class DirectList : List<int> {
             return values[range]
         }
     }
-    func Add(value: int) { System.Fail("Fixed test list") }
+    func Add(value: int) { Panic("Fixed test list") }
     func GetIterator() -> Iterator<int> {
-        System.Fail("List slicing must use the range indexer")
+        Panic("List slicing must use the range indexer")
     }
 }
 

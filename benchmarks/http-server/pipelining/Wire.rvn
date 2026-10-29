@@ -21,31 +21,31 @@ func Main() -> Task<unit> {
 }
 
 async func Run() -> Task<unit> {
-    let Ok(listener) = Socket.Listen("127.0.0.1", 0, 8) else { System.Fail("Listen") }
-    let Ok(settings) = HttpServerSettings.Create(HttpServerOptions()) else { System.Fail("Settings") }
+    let Ok(listener) = Socket.Listen("127.0.0.1", 0, 8) else { Panic("Listen") }
+    let Ok(settings) = HttpServerSettings.Create(HttpServerOptions()) else { Panic("Settings") }
     let owner = HttpServer(listener, settings, null)
-    let Ok(port) = listener.GetLocalPort() else { System.Fail("Port") }
+    let Ok(port) = listener.GetLocalPort() else { Panic("Port") }
     Console.WriteLine("READY")
     Console.WriteLine(port)
     for scenario in 0..3 {
-        let Ok(socket) = await listener.Accept(CancellationToken.None) else { System.Fail("Accept") }
+        let Ok(socket) = await listener.Accept(CancellationToken.None) else { Panic("Accept") }
         let connection = HttpConnection(socket)
         let session = HttpRequestSession(connection, settings, false)
         let requests = if scenario == 0 { 3 } else if scenario == 1 { 2 } else { 1 }
         for index in 0..requests {
-            let Ok(request) = await session.Read(CancellationToken.None) else { System.Fail("Read request") }
+            let Ok(request) = await session.Read(CancellationToken.None) else { Panic("Read request") }
             if scenario == 1 && index == 0 {
-                let Some(stream) = request.Content.TryGetStream() else { System.Fail("Body stream") }
+                let Some(stream) = request.Content.TryGetStream() else { Panic("Body stream") }
                 let bytes: byte[] = [(byte)0, (byte)0]
-                let Ok(count) = await stream.Read(bytes, 0, 2) else { System.Fail("Body read") }
-                if count != 2 || bytes[0] != 65 || bytes[1] != 66 { System.Fail("Body bytes") }
+                let Ok(count) = await stream.Read(bytes, 0, 2) else { Panic("Body read") }
+                if count != 2 || bytes[0] != 65 || bytes[1] != 66 { Panic("Body bytes") }
             }
             GC.Collect()
             let context = HttpContext(owner, connection, request)
             context.AttachSession(session)
             context.RespondText(request.Target)
-            let Ok(_) = await context.Complete() else { System.Fail("Complete response") }
-            if context.ConnectionReused != (index + 1 < requests) { System.Fail("Reuse policy") }
+            let Ok(_) = await context.Complete() else { Panic("Complete response") }
+            if context.ConnectionReused != (index + 1 < requests) { Panic("Reuse policy") }
             context.Dispose()
             GC.Collect()
         }

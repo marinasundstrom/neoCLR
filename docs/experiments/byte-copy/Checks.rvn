@@ -4,20 +4,20 @@ import System.Console.*
 
 func Check(condition: bool) {
     if !condition {
-        System.Fail("Byte Copy contract check failed")
+        Panic("Byte Copy contract check failed")
     }
 }
 
 func ExpectCount(result: Result<int, string>, expected: int) {
     match result {
         Ok(let count) => Check(count == expected)
-        Failure(_) => System.Fail("Unexpected Byte Copy error")
+        Failure(_) => Panic("Unexpected Byte Copy error")
     }
 }
 
 func ExpectError(result: Result<int, string>) {
     match result {
-        Ok(_) => System.Fail("Expected Byte Copy error")
+        Ok(_) => Panic("Expected Byte Copy error")
         Failure(_) => { }
     }
 }
@@ -127,10 +127,10 @@ func Main() {
             Ok(let mode) => {
                 match Int32.Parse(arguments[2]) {
                     Ok(let offset) => CheckRanges(mode, offset)
-                    Failure(_) => System.Fail("Invalid test offset")
+                    Failure(_) => Panic("Invalid test offset")
                 }
             }
-            Failure(_) => System.Fail("Invalid test mode")
+            Failure(_) => Panic("Invalid test mode")
         }
         return
     }

@@ -150,7 +150,7 @@ def main():
             project = out / (name + ' project with spaces')
             project.mkdir()
             (project / 'App.rvnproj').write_text('<Project Sdk="Microsoft.NET.Sdk"><Import Project="$(NeoClrBundleRoot)/lib/NeoCLR.ClassLibrary.props"/><PropertyGroup><TargetFramework>net10.0</TargetFramework><OutputType>Exe</OutputType><AssemblyName>HttpShowcase</AssemblyName></PropertyGroup></Project>')
-            code = source.replace('func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {', 'func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {\n    System.Fail("HTTP callback fault")') if fault else source
+            code = source.replace('func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {', 'func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {\n    System.Panic("HTTP callback fault")') if fault else source
             (project / 'Main.rvn').write_text(code, encoding='utf-8')
             destination = out / (name + ' native output')
             command = [sys.executable, ROOT / 'scripts/build-native-project.py', '--profile', 'windows-http' if windows else 'http',

@@ -4,7 +4,7 @@ import System.Concurrency.*
 
 func FailProducer(input: string) -> string {
     // Matching diagnostic text must not forge the runtime cancellation code.
-    System.Fail("execution cancelled")
+    Panic("execution cancelled")
     return input
 }
 

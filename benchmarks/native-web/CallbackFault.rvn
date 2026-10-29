@@ -1,7 +1,7 @@
 import System.*
 
 func Main() -> int {
-    let callback: () -> System.Void = () => System.Fail("callback fault")
+    let callback: () -> System.Void = () => Panic("callback fault")
     callback()
     return 0
 }

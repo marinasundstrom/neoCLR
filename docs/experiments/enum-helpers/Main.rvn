@@ -4,7 +4,7 @@ import System.Introspection.BindingFlags
 
 func Check(condition: bool) {
     if !condition {
-        Fail("Enum helper contract changed")
+        Panic("Enum helper contract changed")
     }
 }
 

@@ -23,11 +23,11 @@ module Benchmarks.Scheduler {
                 let completion = Completion()
                 _ = neoCLR.Runtime.SchedulerSubmit(completion.Complete)
                 if completion.Calls != 0 {
-                    System.Fail("Submission executed inline")
+                    Panic("Submission executed inline")
                 }
                 let value = await completion.Done.Task
                 if completion.Calls != 1 {
-                    System.Fail("Callback delivery count changed")
+                    Panic("Callback delivery count changed")
                 }
                 total += value
             } else {
@@ -37,39 +37,39 @@ module Benchmarks.Scheduler {
             index += 1
         }
         if total != 32 {
-            System.Fail("Await checksum mismatch")
+            Panic("Await checksum mismatch")
         }
         return 1
     }
 
     func ParseCount(text: string) -> int {
         let Ok(value) = Int32.Parse(text) else {
-            System.Fail("Invalid count")
+            Panic("Invalid count")
         }
         return value
     }
 
     async func Main(arguments: string[]) -> Task<int> {
         if arguments.Length != 3 {
-            System.Fail("Expected case, warmups and operations")
+            Panic("Expected case, warmups and operations")
         }
         let name = arguments[0]
         if name != "await.completed" && name != "await.pending" {
-            System.Fail("Unknown scheduler benchmark")
+            Panic("Unknown scheduler benchmark")
         }
         let warmups = ParseCount(arguments[1])
         let operations = ParseCount(arguments[2])
         if warmups < 0 {
-            System.Fail("Benchmark count outside supported range")
+            Panic("Benchmark count outside supported range")
         }
         if warmups > 10000 {
-            System.Fail("Benchmark count outside supported range")
+            Panic("Benchmark count outside supported range")
         }
         if operations < 1 {
-            System.Fail("Benchmark count outside supported range")
+            Panic("Benchmark count outside supported range")
         }
         if operations > 10000 {
-            System.Fail("Benchmark count outside supported range")
+            Panic("Benchmark count outside supported range")
         }
 
         let pending = name == "await.pending"
@@ -78,7 +78,7 @@ module Benchmarks.Scheduler {
         while index < warmups {
             let result = await RunOperation(pending)
             if result != 1 {
-                System.Fail("Warmup failed")
+                Panic("Warmup failed")
             }
             index += 1
         }

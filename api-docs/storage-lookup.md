@@ -10,13 +10,15 @@ when paths belong to an application-selected provider.
   AccessDenied, WrongKind and IoFailure cases.
 
 ```raven
+import System.*
+
 match System.Storage.Metadata.GetKind(".") {
     Ok(let kind) => {
         if kind != EntryKind.Directory {
-            System.Fail("Directory metadata lost its kind")
+            Panic("Directory metadata lost its kind")
         }
     }
-    Failure(let error) => System.Fail(error.ToString())
+    Failure(let error) => Panic(error.ToString())
 }
 ```
 

@@ -21,7 +21,7 @@ struct Status {
 
 func Check(value: bool, message: string) {
     if !value {
-        System.Fail(message)
+        Panic(message)
     }
 }
 
@@ -56,7 +56,7 @@ func Main() {
     if let Some(value) = values.Find(State.Alias) {
         Check(value == 1 && values.Count == 3, "Enum key after collection")
     } else {
-        System.Fail("Enum key lost")
+        Panic("Enum key lost")
     }
     Check(copied.Equals(State.Ready), "Copied enum after collection")
     Console.WriteLine("Enum Object keys, copied values and GC: passed")

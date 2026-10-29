@@ -20,13 +20,13 @@ func Main(args: string[]) {
             let left = Key<int>(i)
             let right = Key<int>(i)
             if !left.Equals(right) || left.GetHashCode() != right.GetHashCode() {
-                System.Fail("generic value semantics")
+                Panic("generic value semantics")
             }
         } else if operation == 2 {
             let left = IntKey(i)
             let right = IntKey(i)
             if !left.Equals(right) || left.GetHashCode() != right.GetHashCode() {
-                System.Fail("direct value semantics")
+                Panic("direct value semantics")
             }
         }
         i += 1

@@ -7,7 +7,7 @@ import System.Result.*
 
 func Check(value: bool, message: string) {
     if !value {
-        System.Fail(message)
+        Panic(message)
     }
 }
 
@@ -96,12 +96,12 @@ func Main() {
     if Path.Parse(composed) is Ok(let firstPath) && Path.Parse(decomposed) is Ok(let secondPath) {
         Check(!firstPath.Equals(secondPath), "Path identity remains ordinal")
     } else {
-        System.Fail("Path fixture")
+        Panic("Path fixture")
     }
     if Uri.Parse("https://example.com/%C3%A9") is Ok(let firstUri) && Uri.Parse("https://example.com/e%CC%81") is Ok(let secondUri) {
         Check(!firstUri.Equals(secondUri), "URI identity remains ordinal")
     } else {
-        System.Fail("URI fixture")
+        Panic("URI fixture")
     }
     Console.WriteLine("PASS canonical text")
 }

@@ -23,16 +23,16 @@ public func Calculate(limit: int) -> (() -> ()) {
                 || !Object.ReferenceEquals(displaced.Link, shared)
                 || !Object.ReferenceEquals(shared.Link, shared)
                 || !Object.ReferenceEquals(next.Link, shared) {
-                System.Fail("Parallel graph lost a live reference")
+                Panic("Parallel graph lost a live reference")
             }
             index += 1
         }
         if limit < 0 {
             let failure = limit
-            System.Fail("Parallel worker failure " + failure.ToString())
+            Panic("Parallel worker failure " + failure.ToString())
         }
         if shared.Value != 42 {
-            System.Fail("Shared capture changed")
+            Panic("Shared capture changed")
         }
     }
 }

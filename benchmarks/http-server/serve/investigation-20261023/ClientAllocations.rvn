@@ -8,11 +8,11 @@ async func Main(arguments: string[]) -> Task<()> {
     var index = 0
     while index < 9 {
         let before = System.Runtime.GC.AllocatedObjectCount
-        let Ok(request) = HttpRequest.Get(arguments[0]) else { System.Fail("Request") }
+        let Ok(request) = HttpRequest.Get(arguments[0]) else { Panic("Request") }
         let constructed = System.Runtime.GC.AllocatedObjectCount
-        let Ok(response) = await client.Send(request) else { System.Fail("Send") }
+        let Ok(response) = await client.Send(request) else { Panic("Send") }
         let received = System.Runtime.GC.AllocatedObjectCount
-        if response.Content.Length != 2 { System.Fail("Body") }
+        if response.Content.Length != 2 { Panic("Body") }
         _ = response.GetContentType()
         let projected = System.Runtime.GC.AllocatedObjectCount
         _ = response.GetContentType()

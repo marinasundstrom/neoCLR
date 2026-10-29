@@ -10,11 +10,11 @@ async func Handle(context: HttpContext) -> Task<Result<unit, HttpError>> {
 
 async func Main() -> Task<()> {
     let Ok(server) = HttpServer.Listen("127.0.0.1", 8080, 64) else {
-        System.Fail("Could not listen")
+        Panic("Could not listen")
     }
     let result = await server.Serve(Handle)
     server.Close()
     if let Failure(error) = result {
-        System.Fail(error.ToString())
+        Panic(error.ToString())
     }
 }

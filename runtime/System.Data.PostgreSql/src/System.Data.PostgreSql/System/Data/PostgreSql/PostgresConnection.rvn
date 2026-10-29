@@ -42,7 +42,7 @@ internal class PostgresConnection : SqlConnection {
         while offset < bytes.Length {
             let sent = await socket.SendUntil(bytes.Slice(offset), deadline.Value, CancellationToken.None)
             if let Failure(error) = sent { return Failure(SqlError.Transport(error.ToString())) }
-            let Ok(count) = sent else { System.Fail("Expected send count") }
+            let Ok(count) = sent else { Panic("Expected send count") }
             if count <= 0 { return Failure(SqlError.Transport("Connection closed while sending")) }
             offset += count
         }
@@ -51,7 +51,7 @@ internal class PostgresConnection : SqlConnection {
     private async func Fill(deadline: Budget) -> Task<Result<unit, SqlError>> {
         let incoming = await socket.ReceiveUntil(receiveBuffer, deadline.Value, CancellationToken.None)
         if let Failure(error) = incoming { return Failure(SqlError.Transport(error.ToString())) }
-        let Ok(length) = incoming else { System.Fail("Expected receive count") }
+        let Ok(length) = incoming else { Panic("Expected receive count") }
         if length <= 0 { return Failure(SqlError.Transport("Unexpected PostgreSQL EOF")) }
         receiveOffset = 0
         receiveCount = length
@@ -126,13 +126,13 @@ internal class PostgresConnection : SqlConnection {
             }
             let packetResult = Next()
             if let Failure(error) = packetResult { return Failure(error) }
-            let Ok(available) = packetResult else { System.Fail("Expected successful SQL result") }
+            let Ok(available) = packetResult else { Panic("Expected successful SQL result") }
             if available is None {
                 let filled = await Fill(deadline)
                 if let Failure(error) = filled { return Failure(error) }
                 continue
             }
-            let Some(packet) = available else { System.Fail("Expected buffered packet") }
+            let Some(packet) = available else { Panic("Expected buffered packet") }
             if kind == 82 {
                 if packet.Integer() != 0 {
                     return Failure(SqlError.Unsupported("Only local trust authentication is supported"))
@@ -220,12 +220,12 @@ internal class PostgresConnection : SqlConnection {
         if statement.HasNamedParameters {
             let binding = PostgresNamedParameters(statement).Bind()
             if let Failure(error) = binding { return Failure(error) }
-            let Ok(value) = binding else { System.Fail("Expected successful parameter binding") }
+            let Ok(value) = binding else { Panic("Expected successful parameter binding") }
             bound = value
         }
         let requestResult = Request(bound)
         if let Failure(error) = requestResult { return Failure(error) }
-        let Ok(request) = requestResult else { System.Fail("Expected successful SQL result") }
+        let Ok(request) = requestResult else { Panic("Expected successful SQL result") }
         busy = true
         received = 0
         let result = await Exchange(request, Budget(timeout))
@@ -251,13 +251,13 @@ internal class PostgresConnection : SqlConnection {
             }
             let packetResult = Next()
             if let Failure(error) = packetResult { return Failure(error) }
-            let Ok(available) = packetResult else { System.Fail("Expected successful SQL result") }
+            let Ok(available) = packetResult else { Panic("Expected successful SQL result") }
             if available is None {
                 let filled = await Fill(deadline)
                 if let Failure(error) = filled { return Failure(error) }
                 continue
             }
-            let Some(packet) = available else { System.Fail("Expected buffered packet") }
+            let Some(packet) = available else { Panic("Expected buffered packet") }
             if kind == 69 {
                 failure = Some(ServerError(packet))
             } else if kind == 83 {
@@ -349,7 +349,7 @@ internal class PostgresConnection : SqlConnection {
         let expected = if commit { "COMMIT" } else { "ROLLBACK" }
         let finished = await Execute(SqlStatement(expected))
         if let Failure(error) = finished { return Failure(error) }
-        let Ok(result) = finished else { System.Fail("Expected successful SQL result") }
+        let Ok(result) = finished else { Panic("Expected successful SQL result") }
         if transactionStatus != 73 || result.CommandTag != expected {
             Dispose()
             return Failure(SqlError.Protocol("Unexpected transaction completion"))

@@ -15,7 +15,7 @@ class Item {
 
 func Check(condition: bool) {
     if !condition {
-        Fail("map entry check failed")
+        Panic("map entry check failed")
     }
 }
 
@@ -72,7 +72,7 @@ func Main() -> int {
     if entry.Find() is Some(let current) {
         Check(current == 16)
     } else {
-        Fail("entry lookup lost value")
+        Panic("entry lookup lost value")
     }
     let words = HashMap<string, int>(StringComparer.OrdinalIgnoreCase)
     words.Set("Test", 12)

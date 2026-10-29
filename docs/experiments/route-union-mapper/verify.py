@@ -122,15 +122,15 @@ def main():
 import System.Result.*
 func Main() {
     let Ok(parser) = AppRoutesParser.Create() else {
-        System.Fail("Creation failed")
+        System.Panic("Creation failed")
         return
     }
     let Ok(AppRoutes.OwnerItem(id, name)) = parser.Parse("/owners/Caf%C3%A9/items/42") else {
-        System.Fail("Mixed route missing")
+        System.Panic("Mixed route missing")
         return
     }
     if id != 42 || name != "Café" {
-        System.Fail("Name binding failed")
+        System.Panic("Name binding failed")
         return
     }
     Console.WriteLine("Mixed route checks passed")

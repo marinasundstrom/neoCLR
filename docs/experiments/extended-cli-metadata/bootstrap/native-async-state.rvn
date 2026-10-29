@@ -38,48 +38,48 @@ class AsyncCounter {
 
 func Main() {
     if Completed().GetResult() != 42 {
-        System.Fail("Completed async result was lost")
+        Panic("Completed async result was lost")
     }
     let completed = Promise<int>()
     _ = completed.Complete(2)
     if AddLater(completed.Task).GetResult() != 42 {
-        System.Fail("Completed await result was lost")
+        Panic("Completed await result was lost")
     }
     let source = Promise<int>()
     let pending = AddLater(source.Task)
     if pending.IsCompleted {
-        System.Fail("Pending await completed too early")
+        Panic("Pending await completed too early")
     }
     _ = source.Complete(2)
     TaskQueue.Default.Drain()
     if !pending.IsCompleted || pending.GetResult() != 42 {
-        System.Fail("Pending await lost its local or result")
+        Panic("Pending await lost its local or result")
     }
     let captured = CapturedPromise()
     if captured.IsCompleted {
-        System.Fail("Captured promise completed before its callback")
+        Panic("Captured promise completed before its callback")
     }
     TaskQueue.Default.Drain()
     if !captured.IsCompleted || captured.GetResult() != 42 {
-        System.Fail("Callback did not retain the hoisted promise identity")
+        Panic("Callback did not retain the hoisted promise identity")
     }
     let counter = AsyncCounter()
     let increment = Promise<int>()
     let changed = counter.Add(increment.Task)
     if changed.IsCompleted || counter.Total != 40 {
-        System.Fail("Instance async method mutated before completion")
+        Panic("Instance async method mutated before completion")
     }
     _ = increment.Complete(2)
     TaskQueue.Default.Drain()
     if changed.GetResult() != 42 || counter.Total != 42 || AsyncCounter.Completed().GetResult() != 42 {
-        System.Fail("Instance async method lost receiver identity")
+        Panic("Instance async method lost receiver identity")
     }
     let cancelled = Promise<int>()
     let cancellation = AddLater(cancelled.Task)
     _ = cancelled.Cancel()
     TaskQueue.Default.Drain()
     if !cancellation.IsCancelled {
-        System.Fail("Await cancellation was not propagated")
+        Panic("Await cancellation was not propagated")
     }
     Console.WriteLine("Native async state checks passed")
 }

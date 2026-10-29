@@ -26,7 +26,7 @@ internal static class IntegerFormatting {
                 code -= 32
             }
             if spec.Length > 3 {
-                System.Fail("Unsupported integer format precision")
+                Panic("Unsupported integer format precision")
             }
             if spec.Length > 1 {
                 precision = 0
@@ -34,7 +34,7 @@ internal static class IntegerFormatting {
                 while index < spec.Length {
                     let digit = (int)spec[index] - 48
                     if digit < 0 || digit > 9 {
-                        System.Fail("Unsupported integer format precision")
+                        Panic("Unsupported integer format precision")
                     }
                     precision = precision * 10 + digit
                     index += 1
@@ -42,10 +42,10 @@ internal static class IntegerFormatting {
             }
         }
         if code != 71 && code != 68 && code != 70 && code != 78 {
-            System.Fail("Unsupported integer format")
+            Panic("Unsupported integer format")
         }
         if code == 71 && precision > 0 {
-            System.Fail("Unsupported integer general precision")
+            Panic("Unsupported integer general precision")
         }
         if code == 71 || (code == 68 && precision <= 1) {
             return if negative { neoCLR.Runtime.Int64ToString(-((long)(value - (ulong)1)) - 1L) } else { neoCLR.Runtime.UInt64ToString(value) }
@@ -105,7 +105,7 @@ internal static class IntegerFormatting {
         }
         let bytes: ReadOnlySlice<byte> = buffer
         let Ok(text) = System.Text.Utf8.Decode(bytes) else {
-            System.Fail("Invalid integer formatting output")
+            Panic("Invalid integer formatting output")
         }
         return text
     }

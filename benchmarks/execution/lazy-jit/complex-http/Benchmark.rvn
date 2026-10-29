@@ -51,7 +51,7 @@ class BenchmarkApplication {
 
     func Verify() {
         if retained.Count != 4096 || cursor != requests % 4096 {
-            System.Fail("Retained window accounting")
+            Panic("Retained window accounting")
         }
         var index = 0
         while index < 4096 {
@@ -60,7 +60,7 @@ class BenchmarkApplication {
                 expected = 42
             }
             if retained[index].id != expected {
-                System.Fail("Retained window survival")
+                Panic("Retained window survival")
             }
             index += 1
         }
@@ -71,13 +71,13 @@ class BenchmarkApplication {
     private func ProcessDocument() {
         let input = "{\"station\":\"Café\",\"readings\":[1,-2,0],\"flags\":[true,false,null],\"metadata\":{\"text\":\"雪\"}}"
         let Ok(document) = JsonSerializer.DeserializeNode(input) else {
-            System.Fail("Parse request model")
+            Panic("Parse request model")
         }
         let Ok(output) = JsonSerializer.SerializeNode(document) else {
-            System.Fail("Serialize request model")
+            Panic("Serialize request model")
         }
         if output != input {
-            System.Fail("Request model round trip")
+            Panic("Request model round trip")
         }
         let records = ArrayList<Person>(32)
         var index = 0
@@ -99,13 +99,13 @@ class BenchmarkApplication {
             index += 1
         }
         if checksum != 24765 {
-            System.Fail("Request calculation")
+            Panic("Request calculation")
         }
     }
 
     func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
         if request.Method.Method != "GET" {
-            System.Fail("Benchmark method")
+            Panic("Benchmark method")
         }
         ProcessDocument()
         let person = RetainPerson()
@@ -113,7 +113,7 @@ class BenchmarkApplication {
             return Task.FromResult(RespondWithPerson(person))
         }
         if request.Target != "/plain" {
-            System.Fail("Benchmark route")
+            Panic("Benchmark route")
         }
         return Task.FromResult<Result<HttpResponse, HttpError>>(Result<HttpResponse, HttpError>.Ok(
             HttpResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), HttpStringContent("Hello, World!"))))
@@ -122,16 +122,16 @@ class BenchmarkApplication {
 
 async func Run() -> Task<unit> {
     let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 64) else {
-        System.Fail("Listen")
+        Panic("Listen")
     }
     let Ok(control) = Socket.Listen("127.0.0.1", 0, 8) else {
-        System.Fail("Control")
+        Panic("Control")
     }
     let Ok(port) = server.GetLocalPort() else {
-        System.Fail("Port")
+        Panic("Port")
     }
     let Ok(controlPort) = control.GetLocalPort() else {
-        System.Fail("Control port")
+        Panic("Control port")
     }
     let application = BenchmarkApplication()
     let lifetime = server.ServePersistent(application.Respond, 32, 16, CancellationToken.None)
@@ -139,13 +139,13 @@ async func Run() -> Task<unit> {
     Console.WriteLine(port)
     Console.WriteLine(controlPort)
     let Ok(stop) = await control.Accept() else {
-        System.Fail("Stop signal")
+        Panic("Stop signal")
     }
     stop.Close()
     control.Close()
     server.Close()
     let Ok(_) = await lifetime else {
-        System.Fail("Serve lifetime")
+        Panic("Serve lifetime")
     }
     application.Verify()
     Console.WriteLine("DONE " + server.CompletedRequests.ToString() + " " + server.FailedRequests.ToString())

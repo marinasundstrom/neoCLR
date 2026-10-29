@@ -19,11 +19,11 @@ func Check(value: Object, expected: string) {
     let result = JsonSerializer.Serialize(value)
     if let .Ok(text) = result {
         if text != expected {
-            Fail("Unexpected JSON: " + text)
+            Panic("Unexpected JSON: " + text)
         }
         Console.WriteLine(text)
     } else {
-        Fail("Serialization failed")
+        Panic("Serialization failed")
     }
 }
 
@@ -37,22 +37,22 @@ async func Main() -> Task<unit> {
     if let .Failure(_) = JsonSerializer.Serialize(TooWide(42L)) {
         Console.WriteLine("unsupported scalar rejected")
     } else {
-        Fail("Unsupported scalar was serialized")
+        Panic("Unsupported scalar was serialized")
     }
     if let .Failure(_) = JsonSerializer.Serialize(Choice.Value(42)) {
         Console.WriteLine("nominal union rejected")
     } else {
-        Fail("Nominal union was serialized")
+        Panic("Nominal union was serialized")
     }
     let large = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
     if let .Failure(_) = JsonSerializer.Serialize(Person(large, 42)) {
         Console.WriteLine("output quota preserved")
     } else {
-        Fail("Output quota was exceeded")
+        Panic("Output quota was exceeded")
     }
     if let .Failure(_) = JsonSerializer.Deserialize<Person>("{\"Name\":\"Bob\",\"Age\":42}") {
         Console.WriteLine("record construction remains unsupported")
     } else {
-        Fail("Unexpected record deserialization")
+        Panic("Unexpected record deserialization")
     }
 }

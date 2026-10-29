@@ -9,7 +9,7 @@ module RuntimeHttpSample {
 
     async func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
         if request.Method.Method != "GET" || request.Target != "/greeting" {
-            System.Fail("Unexpected request")
+            Panic("Unexpected request")
         }
         let body = await Task.Run<string>(ProduceBody)
         System.Runtime.GC.Collect()
@@ -20,10 +20,10 @@ module RuntimeHttpSample {
 
     async func Main() -> Task<int> {
         let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) else {
-            System.Fail("Listen failed")
+            Panic("Listen failed")
         }
         let Ok(port) = server.GetLocalPort() else {
-            System.Fail("Local port unavailable")
+            Panic("Local port unavailable")
         }
         use client = HttpClient()
         let url = String.Concat(String.Concat("http://127.0.0.1:", port.ToString()), "/greeting")
@@ -34,14 +34,14 @@ module RuntimeHttpSample {
             System.Runtime.GC.Collect()
             let response = await reading
             let Ok(text) = response else {
-                System.Fail("HTTP request failed")
+                Panic("HTTP request failed")
             }
             if text != "Café 🌍" {
-                System.Fail("HTTP response changed")
+                Panic("HTTP response changed")
             }
             let served = await serving
             if let Failure(error) = served {
-                System.Fail(error.ToString())
+                Panic(error.ToString())
             }
             count = count + 1
         }

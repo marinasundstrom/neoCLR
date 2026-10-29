@@ -4,13 +4,13 @@ import System.Optional.*
 
 func Main() {
     let Ok(keys) = Console.OpenKeyInput(true) else {
-        System.Fail("Terminal key input is unavailable")
+        Panic("Terminal key input is unavailable")
     }
     use input = keys
     Console.WriteLine("Press Ctrl+C to exit.")
     while true {
         let Ok(Some(key)) = keys.ReadKey() else {
-            System.Fail("Unable to read a key")
+            Panic("Unable to read a key")
         }
         if key.Control {
             match key.Key {

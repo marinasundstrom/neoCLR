@@ -99,7 +99,7 @@ async func CheckExit(exit: int) -> Task<()> {
     let source = Promise<int>()
     let pending = Read(values, source.Task, exit)
     if pending.IsCompleted || values.Disposals != 0 || values.Reads != 1 {
-        System.Fail("Loop did not retain its iterator at suspension")
+        Panic("Loop did not retain its iterator at suspension")
     }
     _ = source.Complete(40)
     let result = await pending
@@ -108,7 +108,7 @@ async func CheckExit(exit: int) -> Task<()> {
         expected = 41
     }
     if result != expected || values.Acquisitions != 1 || values.Disposals != 1 {
-        System.Fail("Loop lost state or disposed incorrectly")
+        Panic("Loop lost state or disposed incorrectly")
     }
 }
 
@@ -117,13 +117,13 @@ async func CheckNested(mode: int) -> Task<()> {
     let source = Promise<int>()
     let pending = Nested(values, source.Task, mode == 1)
     if pending.IsCompleted || values.Disposals != 0 {
-        System.Fail("Nested loop failed to suspend")
+        Panic("Nested loop failed to suspend")
     }
     _ = source.Complete(40)
     let result = await pending
     let count = 2 - mode
     if result != count * 40 || values.Acquisitions != count || values.Disposals != count {
-        System.Fail("Outward loop exit bypassed cleanup")
+        Panic("Outward loop exit bypassed cleanup")
     }
 }
 
@@ -132,13 +132,13 @@ async func CheckNestedWhile(mode: int) -> Task<()> {
     let source = Promise<int>()
     let pending = NestedWhile(values, source.Task, mode == 1)
     if pending.IsCompleted || values.Disposals != 0 {
-        System.Fail("Nested loop failed to suspend")
+        Panic("Nested loop failed to suspend")
     }
     _ = source.Complete(40)
     let result = await pending
     let count = 2 - mode
     if result != count * 40 || values.Acquisitions != count || values.Disposals != count {
-        System.Fail("Outward loop exit bypassed cleanup")
+        Panic("Outward loop exit bypassed cleanup")
     }
 }
 
@@ -151,7 +151,7 @@ async func CheckCancellation() -> Task<()> {
     _ = cancelled.Cancel()
     let observed = await observer.Task
     if !observed || values.Disposals != 1 {
-        System.Fail("Cancelled loop did not dispose its iterator")
+        Panic("Cancelled loop did not dispose its iterator")
     }
 }
 

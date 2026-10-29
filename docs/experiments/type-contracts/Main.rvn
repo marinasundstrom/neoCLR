@@ -7,7 +7,7 @@ import System.Result.*
 
 func Check(value: bool, message: string) {
     if !value {
-        System.Fail(message)
+        Panic(message)
     }
 }
 
@@ -56,22 +56,22 @@ func Main() {
     source.Cancel()
     Check(tokenHash == ((Object)source.Token).GetHashCode(), "Cancellation preserves token identity")
     let Ok(path) = Path.Parse("a/b") else {
-        System.Fail("Path parse")
+        Panic("Path parse")
         return
     }
     let Ok(samePath) = Path.Parse("a/b") else {
-        System.Fail("Path parse")
+        Panic("Path parse")
         return
     }
     Equal(path, samePath)
     Check(!Object.ReferenceEquals(path, samePath), "Paths are separate value objects")
     Check(((Object)path).ToString() == "a/b", "Path display")
     let Ok(uri) = Uri.Parse("https://example.com/a") else {
-        System.Fail("URI parse")
+        Panic("URI parse")
         return
     }
     let Ok(sameUri) = Uri.Parse("https://example.com/a") else {
-        System.Fail("URI parse")
+        Panic("URI parse")
         return
     }
     Equal(uri, sameUri)

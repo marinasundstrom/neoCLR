@@ -17,7 +17,7 @@ import NeoClr.Testing.*
 // The memory and current blocking file providers complete inline; observe that fixture contract.
 func CompletedValue<T>(operation: Task<T>) -> T {
     let Some(Completed(value)) = operation.Outcome else {
-        System.Fail("Expected inline fixture completion")
+        Panic("Expected inline fixture completion")
     }
     return value
 }

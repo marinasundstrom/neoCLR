@@ -1,5 +1,7 @@
 module System.Collections
 
+import System.*
+
 import System.Optional.*
 
 public class HashMap<K, V> : MutableMap<K, V> {
@@ -70,7 +72,7 @@ public class HashMap<K, V> : MutableMap<K, V> {
             let pair = iterator.Current
             if !TryAdd(pair.Key, pair.Value) {
                 iterator.Dispose()
-                System.Fail("HashMap input contains a duplicate key")
+                Panic("HashMap input contains a duplicate key")
             }
         }
         iterator.Dispose()
@@ -85,7 +87,7 @@ public class HashMap<K, V> : MutableMap<K, V> {
             let index = Locate(key, HashKey(key))
             Leave()
             if index < 0 {
-                System.Fail("HashMap key not found")
+                Panic("HashMap key not found")
             }
             return values[index]
         }
@@ -112,7 +114,7 @@ public class HashMap<K, V> : MutableMap<K, V> {
 
     private func Enter() {
         if busy {
-            System.Fail("HashMap callbacks must not reenter the map")
+            Panic("HashMap callbacks must not reenter the map")
         }
         busy = true
     }
@@ -160,7 +162,7 @@ public class HashMap<K, V> : MutableMap<K, V> {
             return
         }
         if size > 1073741823 {
-            System.Fail("HashMap capacity overflow")
+            Panic("HashMap capacity overflow")
         }
         size = size * 2
         let expanded = System.Runtime.CompilerServices.CheckedStorage.Reserve<int>(size)

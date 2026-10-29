@@ -12,7 +12,7 @@ func Combine<T>(value: T) -> int where T: Reads<int> & Adds {
 func Main() -> int {
     let answer = Combine<Answer>(Answer())
     if answer != 42 {
-        System.Fail("external intersection dispatch")
+        Panic("external intersection dispatch")
     }
     Console.WriteLine("External intersection bound passed: 42")
     return 0

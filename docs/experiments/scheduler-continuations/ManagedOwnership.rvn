@@ -52,7 +52,7 @@ module SchedulerContinuations {
         AbandonBatch()
         GC.Collect()
         if GC.HeapObjectCount != baseline {
-            System.Fail("Abandoned awaits retained managed objects")
+            Panic("Abandoned awaits retained managed objects")
         }
         Console.WriteLine("PASS abandoned await cycles reclaimed")
 
@@ -64,7 +64,7 @@ module SchedulerContinuations {
         GC.Collect()
         let value = await done.Task
         if value != 42 {
-            System.Fail("Live operation lost unobserved waiter")
+            Panic("Live operation lost unobserved waiter")
         }
         Console.WriteLine("PASS live operation retains unobserved waiter across collection")
 
@@ -73,7 +73,7 @@ module SchedulerContinuations {
         GC.Collect()
         let result = await scheduled.Task
         if result != 42 {
-            System.Fail("Runnable producer lost unobserved operation")
+            Panic("Runnable producer lost unobserved operation")
         }
         Console.WriteLine("PASS runtime submission retains producer and waiting execution")
 
@@ -82,7 +82,7 @@ module SchedulerContinuations {
         GC.Collect()
         let timedResult = await timed.Task
         if timedResult != 42 {
-            System.Fail("Pending timer lost unobserved operation")
+            Panic("Pending timer lost unobserved operation")
         }
         Console.WriteLine("PASS pending timer retains producer and waiting execution")
         return 0

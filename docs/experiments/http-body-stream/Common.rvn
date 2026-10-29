@@ -6,7 +6,7 @@ import System.Result.*
 import System.Time.*
 
 func Check(value: bool) {
-    if !value { System.Fail("Incoming body contract failed") }
+    if !value { Panic("Incoming body contract failed") }
 }
 
 func ObserveCancellation(pending: Task<Result<int, StreamError>>) -> Task<bool> {
@@ -55,7 +55,7 @@ async func Consume(stream: InputStream, mode: int) -> Task<()> {
             }
             break
         }
-        let Ok(count) = result else { System.Fail("Missing read outcome") }
+        let Ok(count) = result else { Panic("Missing read outcome") }
         if count == 0 {
             Check(mode < 3 && total == 513)
             Check((await stream.Read(buffer, 1, 17)) is Ok(0))

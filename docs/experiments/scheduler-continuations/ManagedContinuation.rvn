@@ -39,7 +39,7 @@ module SchedulerContinuations {
                 return false
             }
             if destination != current {
-                System.Fail("Scheduler destination is not current")
+                Panic("Scheduler destination is not current")
             }
             return true
         }
@@ -71,7 +71,7 @@ module SchedulerContinuations {
 
         func Submit() {
             if !TrySubmit() {
-                System.Fail("Continuation registration already consumed")
+                Panic("Continuation registration already consumed")
             }
         }
 

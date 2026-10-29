@@ -28,10 +28,10 @@ with tempfile.TemporaryDirectory(prefix='neoclr-fault-library-') as temporary:
     run(['dotnet', args.bridge.resolve(), '--reference-library-core', core])
     source = (ROOT / 'runtime/System.Runtime/src/System.Runtime/System/Functions.rvn').read_text()
     cases = [
-        ('Fail', source, None),
-        ('OldName', source.replace('func Fail(', 'func Fault('), 'export does not match'),
+        ('Panic', source, None),
+        ('OldName', source.replace('func Panic(', 'func Fail('), 'export does not match'),
         ('WrongParameterName', source.replace('message', 'text'), 'export does not match'),
-        ('WrongReturn', source.replace('Fail(message: string) {', 'Fail(message: string) -> int {').replace('RuntimeFailure.Terminate(message)', 'RuntimeFailure.Terminate(message)\n    return 0'), 'export does not match'),
+        ('WrongReturn', source.replace('Panic(message: string) {', 'Panic(message: string) -> int {').replace('RuntimeFailure.Terminate(message)', 'RuntimeFailure.Terminate(message)\n    return 0'), 'export does not match'),
     ]
     for name, text, diagnostic in cases:
         folder = root / name

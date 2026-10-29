@@ -300,7 +300,7 @@ func Main() {
     let values = ArrayList<int>()
     values.Add(42)
     let query = values.Map((value: int) -> int => {
-        System.Fail("Query callback fault")
+        System.Panic("Query callback fault")
         return value
     })
     WriteLine("Deferred")

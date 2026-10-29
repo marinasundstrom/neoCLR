@@ -10,16 +10,16 @@ async func Main() -> Task<()> {
     for source in sources {
         for index in 0..200 {
             let Ok(node) = JsonSerializer.DeserializeNode(source) else {
-                System.Fail("Probe parse failed")
+                Panic("Probe parse failed")
             }
             let Ok(actual) = JsonSerializer.SerializeNode(node) else {
-                System.Fail("Probe serialize failed")
+                Panic("Probe serialize failed")
             }
             let Ok(reparsed) = JsonSerializer.DeserializeNode(actual) else {
-                System.Fail("Probe reparse failed")
+                Panic("Probe reparse failed")
             }
             if JsonSerializer.SerializeNode(reparsed) is Error(_) {
-                System.Fail("Round trip failed")
+                Panic("Round trip failed")
             }
         }
     }

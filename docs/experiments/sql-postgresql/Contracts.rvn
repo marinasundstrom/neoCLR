@@ -6,7 +6,7 @@ import System.Result.*
 import System.Concurrency.Tasks.*
 
 func Check(condition: bool, message: string) {
-    if !condition { System.Fail(message) }
+    if !condition { Panic(message) }
 }
 
 // A provider-independent consumer: this connection does not parse PostgreSQL SQL.
@@ -71,7 +71,7 @@ async func Main() -> Task<()> {
     let mapping = SqlMapper.Map<int>(result, value => value.Int32("id"))
     Check(mapping is Failure(_), "Mapping failure is propagated")
     let good = SqlMapper.Map<long>(result, value => value.Int64("id"))
-    let Ok(mapped) = good else { System.Fail("Explicit Int64 map") }
+    let Ok(mapped) = good else { Panic("Explicit Int64 map") }
     Check(mapped[0] == 2147483648L, "Explicit Int64 mapping result")
     use namedConnection = RecordingConnection(result, true, "SELECT :id")
     let namedQuery = await SqlMapper.Query<long>(namedConnection, namedStatement, value => value.Int64("id"))

@@ -64,7 +64,7 @@ def inject_http_handler_fault(source):
         raise ValueError('Expected exactly one HTTP Respond handler for fault injection')
     return source.replace(handler, handler +
                           '    if request.Target == "/fault" {\n'
-                          '        System.Fail("HTTP handler failed")\n'
+                          '        System.Panic("HTTP handler failed")\n'
                           '    }\n', 1)
 
 

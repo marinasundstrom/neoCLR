@@ -1608,7 +1608,7 @@ pub fn prepare(
     report["staticOwnerProjections"] = json!(static_projections);
     // The backend re-verifies the private module with its bundled System context.
     // Give selected seed/library members private names so originals such as
-    // System.Fail cannot collide with that context. Exact definition IDs still bind calls.
+    // System.Panic cannot collide with that context. Exact definition IDs still bind calls.
     let system_names: std::collections::BTreeSet<_> = neoclr::library::system()
         .map_err(|e| e.to_string())?
         .functions

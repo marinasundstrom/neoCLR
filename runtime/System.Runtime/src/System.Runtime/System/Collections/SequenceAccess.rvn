@@ -16,7 +16,7 @@ public extension SequenceAccess<T> for Sequence<T> {
             if self.Slice(range) is Ok(let result) {
                 return result
             }
-            System.Fail("Range is outside the value")
+            Panic("Range is outside the value")
         }
     }
 

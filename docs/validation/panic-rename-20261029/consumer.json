@@ -1,0 +1,38 @@
+{
+  "compilation": [
+    {
+      "case": "qualified",
+      "command": [
+        "dotnet",
+        "target/panic-rename-20261029/compiler/rvnc.dll",
+        "neoclr",
+        "--project",
+        "target/panic-rename-20261029/qualified/Consumer.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/panic-rename-20261029/qualified/bin/neoclr/PanicConsumer.dll\n",
+      "stderr": ""
+    },
+    {
+      "case": "removed",
+      "command": [
+        "dotnet",
+        "target/panic-rename-20261029/compiler/rvnc.dll",
+        "neoclr",
+        "--project",
+        "target/panic-rename-20261029/removed/Consumer.rvnproj"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "/Users/robert/Projects/neoclr/target/panic-rename-20261029/removed/Main.rvn(4,12): error RAV0234: 'Fail' was not found in 'System'.\n"
+    }
+  ],
+  "execution": {
+    "execution": "interpreter",
+    "exitCode": 1,
+    "stdout": "",
+    "stderr": "UserFault: panic: åäö ☃\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F35303631364536393633 [instruction 1]\n   at NeoMetadata_B0A8C70B88E546294893B47668381B07B695758044E08E59CD102E6B74B49237.F_53746F70 [instruction 1]\n   at NeoMetadata_B0A8C70B88E546294893B47668381B07B695758044E08E59CD102E6B74B49237.F_4D61696E [instruction 0]\n",
+    "compilerCommit": "b4c5790e1",
+    "behaviorChange": false
+  }
+}

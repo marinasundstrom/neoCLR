@@ -31,46 +31,46 @@ async func Main() -> Task<int> {
         for item in unionInfo.Types {
             count += 1
         }
-        if count != 3 || !info.IsUnion { System.Fail("union descriptor") }
-    } else { System.Fail("missing union descriptor") }
+        if count != 3 || !info.IsUnion { Panic("union descriptor") }
+    } else { Panic("missing union descriptor") }
     let taskInfo = typeof(Task<Response | HttpError | JsonError>)
-    if !taskInfo.GetGenericArgument(0).Equals(info) { System.Fail("generic union") }
+    if !taskInfo.GetGenericArgument(0).Equals(info) { Panic("generic union") }
     let local: Response | HttpError | JsonError = Echo(Response())
     let response = await Complete(local)
     if response is Response result {
-        if result.Code != 42 { System.Fail("response payload") }
-    } else { System.Fail("response alternative") }
+        if result.Code != 42 { Panic("response payload") }
+    } else { Panic("response alternative") }
     let http = await Complete(HttpError())
     if http is HttpError httpResult {
-        if httpResult.Code != 43 { System.Fail("http payload") }
-    } else { System.Fail("http alternative") }
+        if httpResult.Code != 43 { Panic("http payload") }
+    } else { Panic("http alternative") }
     let json = await Complete(JsonError())
     if json is JsonError jsonResult {
-        if jsonResult.Code != 44 { System.Fail("json payload") }
-    } else { System.Fail("json alternative") }
+        if jsonResult.Code != 44 { Panic("json payload") }
+    } else { Panic("json alternative") }
     let pendingResponse = await Pending(Response())
     if pendingResponse is Response pendingResponseResult {
         if pendingResponseResult.Code != 42 {
-            System.Fail("pending response payload")
+            Panic("pending response payload")
         }
     } else {
-        System.Fail("pending response alternative")
+        Panic("pending response alternative")
     }
     let pendingHttp = await Pending(HttpError())
     if pendingHttp is HttpError pendingHttpResult {
         if pendingHttpResult.Code != 43 {
-            System.Fail("pending http payload")
+            Panic("pending http payload")
         }
     } else {
-        System.Fail("pending http alternative")
+        Panic("pending http alternative")
     }
     let pendingJson = await Pending(JsonError())
     if pendingJson is JsonError pendingJsonResult {
         if pendingJsonResult.Code != 44 {
-            System.Fail("pending json payload")
+            Panic("pending json payload")
         }
     } else {
-        System.Fail("pending json alternative")
+        Panic("pending json alternative")
     }
     Console.WriteLine("Source structural union Task delivery passed")
     return 0

@@ -44,7 +44,7 @@ public class PostgresDatabase : SqlDatabase {
         addresses.Add("127.0.0.1")
         let connected = await Socket.ConnectUntil(addresses, port, deadline.Value, CancellationToken.None)
         if let Failure(error) = connected { return Failure(SqlError.Transport(error.ToString())) }
-        let Ok(socket) = connected else { System.Fail("Expected successful SQL result") }
+        let Ok(socket) = connected else { Panic("Expected successful SQL result") }
         let session = PostgresConnection(socket, timeoutMilliseconds)
         let started = await session.Start(startup, deadline)
         if let Failure(error) = started {

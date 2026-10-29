@@ -10,7 +10,7 @@ import NeoClr.Testing.*
 
 func ParseMedia(text: string) -> MediaType {
     let Ok(value) = MediaType.Parse(text) else {
-        System.Fail("Test media type must parse")
+        Panic("Test media type must parse")
     }
     return value
 }

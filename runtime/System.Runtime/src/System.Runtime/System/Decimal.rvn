@@ -1,5 +1,7 @@
 module System
 
+import System.*
+
 import System.Result.*
 
 /// An exact base-ten value with a 96-bit coefficient and scale from zero through 28.
@@ -39,7 +41,7 @@ public struct Decimal : Number, EquatableTo<Decimal>, Formattable {
     /// Creates a value from the three coefficient words, sign and scale; scale above 28 faults.
     init(lo: int, mid: int, hi: int, isNegative: bool, scale: byte) {
         if scale > (byte)28 {
-            System.Fail("Decimal scale must be between 0 and 28")
+            Panic("Decimal scale must be between 0 and 28")
         }
         low = (uint)lo
         middle = (uint)mid
@@ -92,7 +94,7 @@ public struct Decimal : Number, EquatableTo<Decimal>, Formattable {
     /// Writes four representation words without allocation; a shorter destination faults.
     static func GetBits(value: Decimal, destination: Slice<int>) -> int {
         if destination.Length < 4 {
-            System.Fail("Decimal.GetBits requires four elements")
+            Panic("Decimal.GetBits requires four elements")
         }
         destination[0] = (int)value.low
         destination[1] = (int)value.middle
@@ -158,7 +160,7 @@ public struct Decimal : Number, EquatableTo<Decimal>, Formattable {
 
     private static func Require(value: Result<Decimal, NumberParseError>) -> Decimal {
         let Ok(result) = value else {
-            System.Fail("Decimal overflow")
+            Panic("Decimal overflow")
             return Zero
         }
         return result
@@ -246,7 +248,7 @@ public struct Decimal : Number, EquatableTo<Decimal>, Formattable {
 
     static func /(left: Decimal, right: Decimal) -> Decimal {
         if IsZero(right) {
-            System.Fail("Decimal division by zero")
+            Panic("Decimal division by zero")
         }
         var a = left.Magnitude
         var b = right.Magnitude
@@ -256,7 +258,7 @@ public struct Decimal : Number, EquatableTo<Decimal>, Formattable {
         var remainder = default(DecimalMagnitude)
         var quotient = DecimalMagnitude.Divide(a, b, out remainder)
         if quotient.CompareTo(Limit) > 0 {
-            System.Fail("Decimal overflow")
+            Panic("Decimal overflow")
         }
         var scale = 0
         let minimumScale = if left.Scale > right.Scale { (int)left.Scale - (int)right.Scale } else { 0 }
@@ -304,7 +306,7 @@ public struct Decimal : Number, EquatableTo<Decimal>, Formattable {
 
     static func %(left: Decimal, right: Decimal) -> Decimal {
         if IsZero(right) {
-            System.Fail("Decimal division by zero")
+            Panic("Decimal division by zero")
         }
         let scale = if left.Scale > right.Scale { (int)left.Scale } else { (int)right.Scale }
         var a = left.Magnitude
@@ -325,7 +327,7 @@ public struct Decimal : Number, EquatableTo<Decimal>, Formattable {
     /// Rounds to 0–28 fractional places using nearest, ties-to-even; invalid precision faults.
     static func Round(value: Decimal, decimals: int) -> Decimal {
         if decimals < 0 || decimals > 28 {
-            System.Fail("Decimal rounding precision must be between 0 and 28")
+            Panic("Decimal rounding precision must be between 0 and 28")
         }
         if decimals >= (int)value.Scale {
             return value
@@ -488,7 +490,7 @@ public struct Decimal : Number, EquatableTo<Decimal>, Formattable {
                 code -= 32
             }
             if spec.Length > 3 {
-                System.Fail("Unsupported Decimal precision")
+                Panic("Unsupported Decimal precision")
             }
             if spec.Length > 1 {
                 precision = 0
@@ -496,7 +498,7 @@ public struct Decimal : Number, EquatableTo<Decimal>, Formattable {
                 while formatIndex < spec.Length {
                     let digit = (int)spec[formatIndex] - 48
                     if digit < 0 || digit > 9 {
-                        System.Fail("Unsupported Decimal precision")
+                        Panic("Unsupported Decimal precision")
                     }
                     precision = precision * 10 + digit
                     formatIndex += 1
@@ -504,10 +506,10 @@ public struct Decimal : Number, EquatableTo<Decimal>, Formattable {
             }
         }
         if code != 71 && code != 70 && code != 78 && code != 67 {
-            System.Fail("Unsupported Decimal format")
+            Panic("Unsupported Decimal format")
         }
         if code == 71 && precision > 0 {
-            System.Fail("Unsupported Decimal general precision")
+            Panic("Unsupported Decimal general precision")
         }
         let currency = Globalization.Currency.ForCulture(culture)
         if code != 71 && precision < 0 {
@@ -518,7 +520,7 @@ public struct Decimal : Number, EquatableTo<Decimal>, Formattable {
 
     internal func FormatCurrency(currency: Globalization.Currency, precision: int, culture: Globalization.Culture) -> string {
         if precision < 0 || precision > 99 {
-            System.Fail("Unsupported Decimal currency precision")
+            Panic("Unsupported Decimal currency precision")
         }
         return FormatCore(67, precision, culture, currency)
     }
@@ -594,7 +596,7 @@ public struct Decimal : Number, EquatableTo<Decimal>, Formattable {
         }
         let bytes: ReadOnlySlice<byte> = buffer
         let Ok(text) = Text.Utf8.Decode(bytes) else {
-            System.Fail("Invalid Decimal formatting buffer")
+            Panic("Invalid Decimal formatting buffer")
             return ""
         }
         return text

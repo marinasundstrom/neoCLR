@@ -112,7 +112,7 @@ public class TaskQueue {
 
     func Run(callback: () -> System.Void) {
         if running {
-            System.Fail("Task queue cannot be pumped recursively")
+            Panic("Task queue cannot be pumped recursively")
         }
         running = true
         callback()
@@ -122,7 +122,7 @@ public class TaskQueue {
 
     func Drain() {
         if running {
-            System.Fail("Task queue cannot be pumped recursively")
+            Panic("Task queue cannot be pumped recursively")
         }
         running = true
         while pending.Count != 0 {
@@ -258,10 +258,10 @@ public class Promise<T> {
 
     internal func Read() -> T {
         if cancelled {
-            System.Fail("Task is cancelled; consume its Outcome")
+            Panic("Task is cancelled; consume its Outcome")
         }
         if !self.Completed() {
-            System.Fail("Task is still pending")
+            Panic("Task is still pending")
         }
         return slot[0]
     }
@@ -327,7 +327,7 @@ module System.Runtime.CompilerServices {
             if let Some(state) = machine {
                 return state
             }
-            System.Fail("Async state has not been retained")
+            Panic("Async state has not been retained")
             return GetStateMachine()
         }
 

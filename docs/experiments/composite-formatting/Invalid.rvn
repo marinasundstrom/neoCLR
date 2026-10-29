@@ -3,5 +3,5 @@ import System.*
 func Main(arguments: string[]) {
     let format = arguments[0]
     Console.WriteLine(format, "x")
-    System.Fail("Expected format failure")
+    Panic("Expected format failure")
 }

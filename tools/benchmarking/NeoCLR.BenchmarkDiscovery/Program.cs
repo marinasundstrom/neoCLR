@@ -62,8 +62,8 @@ try
             string Registration(string suffix) => "suite.Add(" + Quote(rowName) + suffix + ", " + callback + ")";
             var code = row.Provider is null ? "    " + Registration("") + "\n" :
                 "    if true {\n        let rows = " + row.ProviderReference + "()\n" +
-                "        if rows.Length == 0 { System.Fail(\"Data source returned no rows\") }\n" +
-                "        if rows.Length > 10000 { System.Fail(\"Data source exceeded 10000 rows\") }\n" +
+                "        if rows.Length == 0 { Panic(\"Data source returned no rows\") }\n" +
+                "        if rows.Length > 10000 { Panic(\"Data source exceeded 10000 rows\") }\n" +
                 "        for index in 0..rows.Length {\n            let value = rows[index]\n            " + Registration(" + \"[\" + index.ToString() + \"]\"") + "\n        }\n    }\n";
             benchmarks.Add((rowId, rowName, display, code, row.Provider is not null));
         }
@@ -71,7 +71,7 @@ try
     if (benchmarks.Count == 0) throw new InvalidDataException("No benchmarks discovered");
     benchmarks.Sort((left, right) => StringComparer.Ordinal.Compare(left.Name, right.Name));
     static string Quote(string value) => RavenNames.StringLiteral(value);
-    var source = "// Generated from native metadata. Do not edit.\nmodule NeoClr.Benchmarking\n\nfunc RegisterDiscoveredBenchmarks(suite: BenchmarkSuite) {\n" +
+    var source = "// Generated from native metadata. Do not edit.\nmodule NeoClr.Benchmarking\n\nimport System.*\n\nfunc RegisterDiscoveredBenchmarks(suite: BenchmarkSuite) {\n" +
         string.Concat(benchmarks.Select(item => item.Code)) + "}\n";
     File.WriteAllText(args[1], source);
     File.WriteAllText(args[2], JsonSerializer.Serialize(new { assembly = assembly.Name, benchmarks = benchmarks.Select(t => new { id = t.Id, name = t.Name, description = t.Description, dynamic = t.Dynamic }) }, new JsonSerializerOptions { WriteIndented = true }) + "\n");

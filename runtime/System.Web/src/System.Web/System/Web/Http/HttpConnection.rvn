@@ -47,7 +47,7 @@ internal class HttpSocketStream : InputStream, OutputStream {
                 LastError = Some(error)
                 return Failure(StreamError.IoFailure)
             }
-            let Ok(written) = result else { System.Fail("Missing socket write outcome") }
+            let Ok(written) = result else { Panic("Missing socket write outcome") }
             if written <= 0 || written > count - sent {
                 return Failure(StreamError.IoFailure)
             }
@@ -152,7 +152,7 @@ internal class HttpConnection {
         if let Ok(read) = result {
             return Ok(read)
         }
-        let Failure(error) = result else { System.Fail("Missing stream read outcome") }
+        let Failure(error) = result else { Panic("Missing stream read outcome") }
         return Failure(ToHttpError(error))
     }
     internal func SendUntil(buffer: byte[], offset: int, count: int, deadline: NetworkDeadline, token: CancellationToken) -> Task<Result<int, HttpError>> {

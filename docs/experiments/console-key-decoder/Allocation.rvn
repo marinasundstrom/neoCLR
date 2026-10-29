@@ -11,7 +11,7 @@ func Main(args: string[]) {
             let key = TerminalKeyDecoder.Decode(modified.Utf8Bytes, false)
             let pending = TerminalKeyDecoder.Decode(unicode.Utf8Bytes.Slice(0, 2), false)
             if text.TextLength != 4 || key.Modifiers != 5 || pending.Consumed != 0 {
-                System.Fail("Decoder allocation fixture")
+                Panic("Decoder allocation fixture")
             }
         }
         iteration += 1

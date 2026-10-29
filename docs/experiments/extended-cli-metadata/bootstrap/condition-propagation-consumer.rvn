@@ -32,15 +32,15 @@ class Harness {
         let result = Run(skip, fail, conjunction)
         if skip {
             if count != 0 || !(result is Ok(let skipped) && skipped == 9) {
-                System.Fail("Short circuit evaluated a skipped operand")
+                Panic("Short circuit evaluated a skipped operand")
             }
         } else if fail {
             if count != 1 || !(result is Failure(let error) && error == "failed") {
-                System.Fail("Residual did not return exactly once")
+                Panic("Residual did not return exactly once")
             }
         } else {
             if count != 11 || !(result is Ok(let value) && value == 42) {
-                System.Fail("Successful propagation changed evaluation")
+                Panic("Successful propagation changed evaluation")
             }
         }
     }

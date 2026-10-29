@@ -58,7 +58,7 @@ internal class ConsoleOutputStream : SyncOutputStream {
             }
             let written = neoCLR.Runtime.UnpackValue<int>(payload)
             if written < 0 || written > buffer.Length - sent {
-                System.Fail("Invalid console output count")
+                Panic("Invalid console output count")
             }
             sent += written
             if sent == buffer.Length {

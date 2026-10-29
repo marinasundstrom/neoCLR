@@ -19,7 +19,7 @@ public class WideParameters {
 }
 
 func Check(value: bool, message: string) {
-    if !value { System.Fail(message) }
+    if !value { Panic(message) }
 }
 
 async func Exercise(connection: SqlConnection) -> Task<Result<unit, SqlError>> {
@@ -30,10 +30,10 @@ async func Exercise(connection: SqlConnection) -> Task<Result<unit, SqlError>> {
     let statement = SqlStatement("SELECT $1::int AS id, $2::text AS name, $3::bool AS active", values)
     let executed = await connection.Execute(statement)
     if let Failure(error) = executed { return Failure(error) }
-    let Ok(mappedResult) = executed else { System.Fail("Expected successful SQL result") }
+    let Ok(mappedResult) = executed else { Panic("Expected successful SQL result") }
     let peopleResult = await SqlMapper.Query<Person>(connection, statement)
     if let Failure(error) = peopleResult { return Failure(error) }
-    let Ok(people) = peopleResult else { System.Fail("Expected successful SQL result") }
+    let Ok(people) = peopleResult else { Panic("Expected successful SQL result") }
     Check(people.Count == 1 && people[0].id == 42 && people[0].name == "Café'; SELECT 999; --" && people[0].active, "Mapped row")
     let selected = await SqlMapper.Query<string>(connection, statement, row => row.RequiredText("name"))
     Check(selected is Ok(_), "Callback mapping")
@@ -83,7 +83,7 @@ async func Exercise(connection: SqlConnection) -> Task<Result<unit, SqlError>> {
     nulls.Add(SqlValue.Text(""))
     let nullable = await connection.Execute(SqlStatement("SELECT $1::text AS missing, $2::text AS empty", nulls))
     if let Failure(error) = nullable { return Failure(error) }
-    let Ok(result) = nullable else { System.Fail("Expected successful SQL result") }
+    let Ok(result) = nullable else { Panic("Expected successful SQL result") }
     Check(result.Row(0).Text("missing") is Ok(None), "NULL distinct from empty")
     Check(result.Row(0).Text("empty") is Ok(Some("")), "Empty text")
     Check(result.Row(0).RequiredText("missing") is Failure(_), "Required NULL fails")
@@ -92,18 +92,18 @@ async func Exercise(connection: SqlConnection) -> Task<Result<unit, SqlError>> {
     Check(emptyColumnRows.Count == 1 && emptyColumnRows.Row(0).Count == 0, "Zero-column row")
     let duplicate = await connection.Execute(SqlStatement("SELECT 1 AS id, 2 AS id"))
     if let Failure(error) = duplicate { return Failure(error) }
-    let Ok(duplicateResult) = duplicate else { System.Fail("Expected successful SQL result") }
+    let Ok(duplicateResult) = duplicate else { Panic("Expected successful SQL result") }
     Check(duplicateResult.Row(0).Text("id") is Failure(_), "Duplicate aliases")
     let created = await connection.Execute(SqlStatement("CREATE TEMP TABLE neoclr_sql_test (id integer PRIMARY KEY)"))
     if let Failure(error) = created { return Failure(error) }
     let began = await connection.Begin()
     if let Failure(error) = began { return Failure(error) }
-    let Ok(transaction) = began else { System.Fail("Expected successful SQL result") }
+    let Ok(transaction) = began else { Panic("Expected successful SQL result") }
     let nested = await connection.Begin()
     Check(nested is Failure(SqlError.InvalidState(_)), "Nested transaction rejected")
     let inserted = await connection.Execute(SqlStatement("INSERT INTO neoclr_sql_test VALUES (1)"))
     if let Failure(error) = inserted { return Failure(error) }
-    let Ok(insertedResult) = inserted else { System.Fail("Expected successful SQL result") }
+    let Ok(insertedResult) = inserted else { Panic("Expected successful SQL result") }
     Check(insertedResult.CommandTag == "INSERT 0 1", "Insert tag")
     let failed = await connection.Execute(SqlStatement("INSERT INTO neoclr_sql_test VALUES (1)"))
     Check(failed is Failure(SqlError.Server("23505", _)), "SQLSTATE preserved")
@@ -113,10 +113,10 @@ async func Exercise(connection: SqlConnection) -> Task<Result<unit, SqlError>> {
     if let Failure(error) = rolledBack { return Failure(error) }
     let counts = await connection.Execute(SqlStatement("SELECT count(*) AS total FROM neoclr_sql_test"))
     if let Failure(error) = counts { return Failure(error) }
-    let Ok(countResult) = counts else { System.Fail("Expected successful SQL result") }
+    let Ok(countResult) = counts else { Panic("Expected successful SQL result") }
     let totalResult = countResult.Row(0).Int64("total")
     if let Failure(error) = totalResult { return Failure(error) }
-    let Ok(total) = totalResult else { System.Fail("Expected successful SQL result") }
+    let Ok(total) = totalResult else { Panic("Expected successful SQL result") }
     Check(total == 0, "Rollback restored table")
     let syntax = await connection.Execute(SqlStatement("SELECT FROM"))
     Check(syntax is Failure(SqlError.Server("42601", _)), "Syntax SQLSTATE")
@@ -124,7 +124,7 @@ async func Exercise(connection: SqlConnection) -> Task<Result<unit, SqlError>> {
     if let Failure(error) = recovered { return Failure(error) }
     let started = await connection.Begin()
     if let Failure(error) = started { return Failure(error) }
-    let Ok(committed) = started else { System.Fail("Expected successful SQL result") }
+    let Ok(committed) = started else { Panic("Expected successful SQL result") }
     let insertedAgain = await connection.Execute(SqlStatement("INSERT INTO neoclr_sql_test VALUES (2)"))
     if let Failure(error) = insertedAgain { return Failure(error) }
     let commit = await committed.Commit()
@@ -151,12 +151,12 @@ async func Exercise(connection: SqlConnection) -> Task<Result<unit, SqlError>> {
 }
 
 async func Main(arguments: string[]) -> Task<()> {
-    let Ok(port) = Int32.Parse(arguments[0]) else { System.Fail("Expected port") }
+    let Ok(port) = Int32.Parse(arguments[0]) else { Panic("Expected port") }
     let opened = await PostgresDatabase("postgres", "postgres", port, 60000).Open()
     if let Failure(error) = opened { Console.WriteLine(error.ToString()) }
-    let Ok(openedConnection) = opened else { System.Fail("Open failed") }
+    let Ok(openedConnection) = opened else { Panic("Open failed") }
     use connection = openedConnection
     let result = await Exercise(connection)
-    if let Failure(error) = result { System.Fail(error.ToString()) }
+    if let Failure(error) = result { Panic(error.ToString()) }
     Console.WriteLine("PASS SQL PostgreSQL")
 }

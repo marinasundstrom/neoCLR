@@ -6,7 +6,7 @@ import System.Result.*
 import System.Concurrency.Tasks.*
 
 func Check(condition: bool, message: string) {
-    if !condition { System.Fail(message) }
+    if !condition { Panic(message) }
 }
 
 async func CheckCase(port: int, mode: string) -> Task<()> {
@@ -19,12 +19,12 @@ async func CheckCase(port: int, mode: string) -> Task<()> {
     } else if mode == "timeout" {
         Check(opening is Failure(SqlError.Transport(_)), "Opening must time out")
     } else {
-        if let Failure(error) = opening { System.Fail(error.ToString()) }
-        let Ok(openedConnection) = opening else { System.Fail("Expected connection") }
+        if let Failure(error) = opening { Panic(error.ToString()) }
+        let Ok(openedConnection) = opening else { Panic("Expected connection") }
         use connection = openedConnection
         let query = await connection.Execute(SqlStatement("SELECT 1"))
         if mode == "fragmented" {
-            let Ok(result) = query else { connection.Dispose(); System.Fail("Expected fragmented result") }
+            let Ok(result) = query else { connection.Dispose(); Panic("Expected fragmented result") }
             Check(result.Row(0).Int32("value") is Ok(42), "Fragmented row value")
         } else {
             if mode == "oversized" || mode == "rows" {
@@ -48,7 +48,7 @@ async func CheckCase(port: int, mode: string) -> Task<()> {
 async func Main(arguments: string[]) -> Task<()> {
     var index = 0
     while index < arguments.Length {
-        let Ok(port) = Int32.Parse(arguments[index]) else { System.Fail("Expected port") }
+        let Ok(port) = Int32.Parse(arguments[index]) else { Panic("Expected port") }
         await CheckCase(port, arguments[index + 1])
         index += 2
     }

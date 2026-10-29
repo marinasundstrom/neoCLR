@@ -3,7 +3,7 @@ import ObjectServiceTests.*
 
 func Main() {
     if !Checks.Run() {
-        System.Fail("Object service contract failed")
+        Panic("Object service contract failed")
     }
     Console.WriteLine("Object service checks passed")
 }

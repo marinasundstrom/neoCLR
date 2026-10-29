@@ -8,7 +8,7 @@ import System.Time.*
 import System.Web.Http.*
 
 func Check(condition: bool) {
-    if !condition { System.Fail("HTTP timeout check failed") }
+    if !condition { Panic("HTTP timeout check failed") }
 }
 
 func Response() -> HttpResponse {
@@ -69,7 +69,7 @@ class ImmediateHandler : HttpHandler {
 async func TimeoutAndCleanup() -> Task<()> {
     let handler = ControlledHandler()
     let client = HttpClient(handler)
-    let Some(initial) = client.Timeout else { System.Fail("Missing default timeout") }
+    let Some(initial) = client.Timeout else { Panic("Missing default timeout") }
     Check(initial.Ticks == 1000000000L)
     client.Timeout = Some(Duration.FromTicks(1L))
     let task = client.Get("http://example.test/")
@@ -78,7 +78,7 @@ async func TimeoutAndCleanup() -> Task<()> {
     Check(pending.Token.IsCancellationRequested && !task.IsCompleted)
     pending.Result.Cancel()
     let result = await task
-    let Failure(HttpError.TimedOut) = result else { System.Fail("Expected timeout") }
+    let Failure(HttpError.TimedOut) = result else { Panic("Expected timeout") }
     client.Dispose()
     Console.WriteLine("PASS timeout waits for handler acknowledgement")
 }
@@ -114,7 +114,7 @@ async func DisabledAndCompleted() -> Task<()> {
     Check(!task.IsCompleted && !pending.Token.IsCancellationRequested)
     pending.Result.Complete(System.Result<HttpResponse, HttpError>.Ok(Response()))
     let result = await task
-    let Ok(response) = result else { System.Fail("Expected response") }
+    let Ok(response) = result else { Panic("Expected response") }
     Check((int)response.StatusCode == 200)
     client.Dispose()
     Console.WriteLine("PASS disabled timeout permits normal completion")
@@ -136,12 +136,12 @@ async func CompletionWins() -> Task<()> {
 
 async func ExpectSuccess(task: Task<Result<HttpResponse, HttpError>>) -> Task<()> {
     let result = await task
-    let Ok(response) = result else { System.Fail("Expected response") }
+    let Ok(response) = result else { Panic("Expected response") }
 }
 
 async func ExpectTimeout(task: Task<Result<HttpResponse, HttpError>>) -> Task<()> {
     let result = await task
-    let Failure(HttpError.TimedOut) = result else { System.Fail("Expected timeout") }
+    let Failure(HttpError.TimedOut) = result else { Panic("Expected timeout") }
 }
 
 async func IndependentRequests() -> Task<()> {
@@ -161,7 +161,7 @@ async func IndependentRequests() -> Task<()> {
 }
 
 func PreparedRequest() -> HttpRequest {
-    let Ok(request) = HttpRequest.Get("http://example.test/") else { System.Fail("Invalid fixture URL") }
+    let Ok(request) = HttpRequest.Get("http://example.test/") else { Panic("Invalid fixture URL") }
     return request
 }
 
@@ -199,7 +199,7 @@ async func LongRequest() -> Task<()> {
     let timer = Timer(() => { pending.Result.Complete(System.Result<HttpResponse, HttpError>.Ok(Response())) })
     timer.Start(Duration.FromTicks(160000000L))
     let result = await task
-    let Ok(response) = result else { System.Fail("Long request failed") }
+    let Ok(response) = result else { Panic("Long request failed") }
     Check(!pending.Token.IsCancellationRequested)
     timer.Dispose()
     client.Dispose()

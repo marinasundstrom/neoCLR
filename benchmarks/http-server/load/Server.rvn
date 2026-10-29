@@ -74,13 +74,13 @@ async func Main(arguments: string[]) -> Task<()> {
         }
     }
     if workerCount == 0 {
-        System.Fail("Worker count must be 1, 4 or 16")
+        Panic("Worker count must be 1, 4 or 16")
     }
     let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 64) else {
-        System.Fail("Listen failed")
+        Panic("Listen failed")
     }
     let Ok(port) = server.GetLocalPort() else {
-        System.Fail("Port failed")
+        Panic("Port failed")
     }
     let state = LoadState(server)
     let workers = ArrayList<Task<()>>()

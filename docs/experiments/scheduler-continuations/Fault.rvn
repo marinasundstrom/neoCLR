@@ -6,7 +6,7 @@ module SchedulerContinuations {
         let source = Completion(UnpumpedProducer())
         _ = neoCLR.Runtime.SchedulerSubmit(source.PublishFault)
         _ = await source
-        System.Fail("Continuation ran after terminal fault")
+        Panic("Continuation ran after terminal fault")
         return 0
     }
 }

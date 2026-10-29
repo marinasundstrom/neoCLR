@@ -16,11 +16,11 @@ async func Main(arguments: string[]) -> Task<()> {
     let result = await client.Get(arguments[0])
     client.Dispose()
     if mode == "timeout" {
-        let Failure(HttpError.TimedOut) = result else { System.Fail("Expected network timeout") }
+        let Failure(HttpError.TimedOut) = result else { Panic("Expected network timeout") }
         Console.WriteLine("PASS socket cleanup before timeout acknowledgement")
     } else {
-        let Ok(response) = result else { System.Fail("Expected network response") }
-        if (int)response.StatusCode != 200 { System.Fail("Unexpected status") }
+        let Ok(response) = result else { Panic("Expected network response") }
+        if (int)response.StatusCode != 200 { Panic("Unexpected status") }
         Console.WriteLine("PASS delayed response with disabled client timeout")
     }
 }

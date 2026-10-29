@@ -3,7 +3,7 @@ import System.Globalization.*
 
 func Check(value: bool, message: string) {
     if !value {
-        System.Fail(message)
+        Panic(message)
     }
 }
 

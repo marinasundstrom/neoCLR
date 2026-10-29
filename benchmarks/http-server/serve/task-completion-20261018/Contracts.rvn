@@ -21,7 +21,7 @@ class Observer {
 
 func Require(condition: bool) {
     if !condition {
-        System.Fail("Task completion contract failed")
+        Panic("Task completion contract failed")
     }
 }
 

@@ -1,7 +1,7 @@
 use neoclr::{Limits, LoadedProgram, Value, assemble};
 
 #[test]
-fn dynamic_fault_stops_guest_but_does_not_abort_host() {
+fn panic_stops_guest_but_does_not_abort_host() {
     let library = assemble(concat!(
         ".module System\n",
         include_str!("../runtime/raven/generated/Fault.methods.neoil"),
@@ -9,6 +9,8 @@ fn dynamic_fault_stops_guest_but_does_not_abort_host() {
         include_str!("../runtime/neoCLR/Runtime/Fault.neoil")
     ))
     .unwrap();
+    assert!(library.functions.iter().any(|f| f.name == "System.Panic"));
+    assert!(!library.functions.iter().any(|f| f.name == "System.Fail"));
     for message in [
         "",
         "StackOverflow",
@@ -21,7 +23,7 @@ fn dynamic_fault_stops_guest_but_does_not_abort_host() {
 .entry Main
 .function Main() -> Int32
 ldstr "{message}"
-call System.Fail(String)
+call System.Panic(String)
 ldc.i4 42
 ret
 .end

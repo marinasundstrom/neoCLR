@@ -102,7 +102,7 @@ public class GZipStream : InputStream, OutputStream {
                     return Failure(StreamError.Closed)
                 }
                 if !(read >= 0) || read > chunk.Length {
-                    System.Fail("Invalid gzip input count")
+                    Panic("Invalid gzip input count")
                 }
                 if read > 65536 - bytes.Count {
                     return Failure(StreamError.LimitExceeded)

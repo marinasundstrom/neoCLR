@@ -69,7 +69,7 @@ public class SyncStreamReader : SyncTextReader {
 
     private func DecodePart(buffer: byte[], count: int, request: int, remaining: int) -> Result<string, TextReadError> {
         if !(count >= 0) || count > request {
-            System.Fail("Invalid input read count")
+            Panic("Invalid input read count")
         }
         lastRead = count
         if count > remaining {
@@ -294,7 +294,7 @@ public class SyncStreamReader : SyncTextReader {
                 if matched == delimiter.Length {
                     match part.SliceUtf8(index + 1, byteCount - index - 1) {
                         Ok(let suffix) => pendingText = suffix
-                        Failure(_) => System.Fail("Invalid decoded line suffix")
+                        Failure(_) => Panic("Invalid decoded line suffix")
                     }
                     return TextReadSupport.DecodeLine(line, line.Count)
                 }

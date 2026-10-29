@@ -8,10 +8,10 @@ import System.Web.Http.Json.*
 
 func OpenJsonServer() -> HttpServer {
     let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) else {
-        System.Fail("Listen failed")
+        Panic("Listen failed")
     }
     let Ok(port) = server.GetLocalPort() else {
-        System.Fail("Port unavailable")
+        Panic("Port unavailable")
     }
     Console.WriteLine(port)
     return server
@@ -20,14 +20,14 @@ func OpenJsonServer() -> HttpServer {
 async func AcceptJson(server: HttpServer) -> Task<HttpContext> {
     let result = await server.Accept()
     let Ok(context) = result else {
-        System.Fail("Accept failed")
+        Panic("Accept failed")
     }
     return context
 }
 
 func ConfigureJson(context: HttpContext) {
     let Ok(_) = context.RespondJson(JsonString("first")) else {
-        System.Fail("Default JSON response failed")
+        Panic("Default JSON response failed")
     }
     let before = context.Response.Content
     var oversized = "0123456789abcdef"
@@ -35,22 +35,22 @@ func ConfigureJson(context: HttpContext) {
         oversized = oversized + oversized
     }
     if !(context.RespondJson(HttpStatusCode.BadRequest, JsonString(oversized)) is Failure(JsonError.LimitExceeded(_))) {
-        System.Fail("Oversized JSON accepted")
+        Panic("Oversized JSON accepted")
     }
     if context.Response.Content.Length != before.Length || context.Response.StatusCode != HttpStatusCode.OK {
-        System.Fail("Serialization failure changed response")
+        Panic("Serialization failure changed response")
     }
     let Ok(node) = context.Request.Content.ReadJsonNode().GetResult() else {
-        System.Fail("Request JSON failed")
+        Panic("Request JSON failed")
     }
     let Ok(_) = context.RespondJson(HttpStatusCode.Created, node) else {
-        System.Fail("JSON response failed")
+        Panic("JSON response failed")
     }
 }
 
 func CheckSent(result: Result<System.Void, HttpError>) {
     let Ok(_) = result else {
-        System.Fail("JSON send failed")
+        Panic("JSON send failed")
     }
     Console.WriteLine("PASS atomic JSON response configuration")
 }

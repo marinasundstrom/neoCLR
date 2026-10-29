@@ -1,31 +1,48 @@
-# Terminal failures with System.Fail
+# Terminal failures with System.Panic
 
-`System.Fail(message: String) -> void` is a namespace function. It terminates the
-current guest execution and preserves a computed UTF-8 diagnostic message. It does
-not return a Result, throw an exception object or resume guest execution. Use Result
-for errors the caller can handle and Optional for ordinary absence.
+`System.Panic(message: string) -> unit` is a non-returning namespace function for
+an unrecoverable guest error, distinct from recoverable `Result.Failure`.
 
 ```raven
 import System.*
 
 func Stop(reason: string) {
-    System.Fail("Cannot continue: " + reason)
+    Panic("Cannot continue: " + reason)
 }
 ```
 
-The command-line runner reports the fault and exits unsuccessfully. Embedding hosts
-receive the existing runtime Fault outcome; the runtime does not abort their process.
-No guest Dispose/finally/destructor execution is promised on this path. The API
-requests a terminal failure; it is not an orderly shutdown or cleanup facility.
-Empty messages are permitted, though descriptive messages are more useful.
+## Rename — 2026-10-29
 
-**Development 2026-09-23:** this API and the explicit fault instruction always
-produce `FaultCode::UserFault`. Guest code cannot supply a code; a message such as
-`StackOverflow` does not change that classification. Runtime detection sites assign
-specific codes for frame limits, arithmetic, memory and cancellation failures.
-See the complete [on-site fault reference](../api-docs/faults.md) for code identifiers,
-host API fields and debugger transport. Message text remains diagnostic, not a
-machine-readable discriminator.
+Replace `System.Fail(message)` with `Panic(message)` after `import System.*`.
+Qualified `System.Panic(message)` remains supported. No compatibility alias is
+retained. Rebuild consumers with the matching Raven `codex/neoclr` compiler,
+reference assembly and runtime library.
+
+This change preserves existing behavior: the call terminates guest execution with
+`UserFault`, preserving the computed UTF-8 message and fault diagnostics. The CLI
+reports the fault and exits unsuccessfully; embedding hosts receive the existing
+`Fault` outcome and survive. Empty messages remain permitted. Guest code cannot
+catch the fault or choose its code. No guest Dispose/finally/destructor execution
+is guaranteed. No new thread or task failure boundary is introduced.
+
+The author identifies Panic with Rust's panic facility. Cleanup-aware stack
+unwinding and revised thread/task termination semantics are a separate, deferred
+behavior decision, not capabilities implemented by this rename. Unlike .NET
+`throw`, this API does not introduce catchable exception objects. Use `Result`
+for errors callers can handle and `Optional` for ordinary absence.
+
+Raven's explicit RuntimeFailureContract now selects the public `Panic` namespace
+function. The temporary CLI bridge recognizes the exact namespace marker, core
+assembly, static non-generic signature and name. CLI metadata still encodes a
+void method; native metadata uses the existing no-result call and terminal fault
+path. Ordinary .NET methods named Panic remain ordinary calls. Internal
+`neoCLR.Runtime.Fail`/`Fault` service identities, `FaultCode`, the neoIL `fault`
+instruction and metadata builder `Fail` are unchanged. Target-owned metadata
+continues to be the replacement for the temporary CLI identity check.
+
+Rename validation: [compiler, runtime, native consumer and reference evidence](validation/panic-rename-20261029/README.md).
+
+The historical checkpoints below describe their original bundles and spellings.
 
 ## Development rename — 2026-10-02
 

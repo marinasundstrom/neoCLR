@@ -36,7 +36,7 @@ struct Mixed {
 }
 func Check(value: bool, message: string) {
     if !value {
-        System.Fail(message)
+        Panic(message)
     }
 }
 func Main() {

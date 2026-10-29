@@ -27,7 +27,7 @@ class SetStorage<T> : MutableSetView<T> {
 
     private func Enter() {
         if busy {
-            System.Fail("Set callbacks must not reenter the set")
+            Panic("Set callbacks must not reenter the set")
         }
         busy = true
     }

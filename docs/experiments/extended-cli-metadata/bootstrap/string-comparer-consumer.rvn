@@ -3,7 +3,7 @@ import System.Collections.*
 
 func Check(condition: bool, message: string) {
     if !condition {
-        System.Fail(message)
+        Panic(message)
     }
 }
 

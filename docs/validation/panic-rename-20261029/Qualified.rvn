@@ -1,0 +1,9 @@
+import System.*
+
+func Stop() -> int {
+    System.Panic("panic: åäö ☃")
+}
+
+func Main() -> int {
+    return Stop()
+}
