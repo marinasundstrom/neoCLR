@@ -15,8 +15,9 @@ reads appsettings.json to choose a greeting name and JSON localization directory
 then injects Configuration alongside typed logging and localization into its service.
 
 See the [configuration API reference](/docs/configuration.html) for members,
-ownership and null semantics. The JSON file provider currently uses strict syntax and the bounded System.Data
-parser (1024 bytes, 32 values, four container levels). Change notifications,
+ownership and null semantics. The JSON file provider accepts comments, trailing
+commas and a UTF-8 BOM, like Microsoft.Extensions.Configuration. It reads up to
+1 MiB with a maximum nesting depth of 64. Change notifications,
 binding and options remain future work; access is synchronous and serialized.
 
 ## Try it
@@ -26,7 +27,11 @@ Build configuration from appsettings.json, then read a colon-delimited key. The 
 Run from `samples/extensions`, containing this appsettings.json:
 
 ```json
-{ "Greeting": { "Name": "Ada" }, "Localization": { "Directory": "resources" } }
+{
+  // Configuration accepts comments and trailing commas, like Microsoft's provider.
+  "Greeting": { "Name": "Ada", },
+  "Localization": { "Directory": "resources", },
+}
 ```
 
 ```raven

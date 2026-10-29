@@ -646,3 +646,27 @@ indent widths or CRLF. The existing escaping policy and document limits remain;
 formatting whitespace counts against the output quota. Options are sampled at
 serialization entry and are neither frozen nor cached. Stream overloads preflight
 the whole output before writes. Converters and naming policies remain separate work.
+
+
+## 2026-10-29 — Document reader options and realistic configuration input
+
+Author direction: remove prototype JSON limits for appsettings.json and keep new
+JSON APIs aligned with System.Text.Json absent a justified philosophical difference.
+The reader now uses JsonDocumentOptions (value type), JsonCommentHandling,
+AllowTrailingCommas and MaxDepth, with strict syntax and depth 64 by default.
+There are no fixed DOM byte/node/container-entry limits. Mutable DOM containers
+also no longer cap Add at 31 children. UTF-8 decoding is chunked at scalar boundaries,
+including escaped strings, avoiding the Encoding per-call limit for large tokens.
+
+Baseline: [.NET document options](https://github.com/dotnet/runtime/blob/v10.0.0/src/libraries/System.Text.Json/src/System/Text/Json/Document/JsonDocumentOptions.cs)
+and [configuration file parsing](https://github.com/dotnet/runtime/blob/v10.0.0/src/libraries/Microsoft.Extensions.Configuration.Json/src/JsonConfigurationFileParser.cs).
+Invalid options return Result failures before input consumption instead of throwing
+in setters; this follows neoCLR's error philosophy. Duplicate-property policy and
+serializer read options remain gaps. JSON serialization/object-mapping limits are
+unchanged. Existing design sections above describe earlier stages and are superseded
+for DOM reading by this section and the [current API guide](../api-docs/json.md).
+
+Neo.Configuration.Json enables skipped comments and trailing commas, accepts a BOM,
+and retains an explicit 1 MiB file/text budget. No parser-specific value count or
+container-size cap remains. Full buffering, runtime memory budgets and linear
+property/flattened-key lookup remain implementation costs; no performance claim is made.

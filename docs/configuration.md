@@ -83,10 +83,19 @@ LoadText return Results and replace data only on success; Load faults on failure
 An optional missing-file reload clears prior data. Root reload is not transactional
 across providers. Writes modify only provider memory; reloading restores file values.
 
-This initial provider reuses the public, bounded strict-JSON DOM: at most 1024 UTF-8
-bytes, 32 values including the root, four nested container levels and 31 entries
-per container. Larger appsettings files return quota errors. Comments, trailing
-commas and BOM handling are gaps relative to .NET's file provider. These are parser
-limitations, not intended permanent configuration contracts. Raising these limits
-or admitting relaxed syntax should be a public JSON parser capability with its own
-validation, not an internal friend grant or silent truncation.
+The provider uses the public JSON document parser with
+`JsonDocumentOptions.CommentHandling = JsonCommentHandling.Skip` and
+`AllowTrailingCommas = true`, matching
+[Microsoft's configuration JSON parser](https://github.com/dotnet/runtime/blob/v10.0.0/src/libraries/Microsoft.Extensions.Configuration.Json/src/JsonConfigurationFileParser.cs).
+Line and block comments and single trailing commas in objects/arrays are accepted;
+quoted comment markers remain text. An initial UTF-8 BOM is stripped. The default
+maximum container depth is 64. There is no 32-value or 31-entry restriction.
+
+Configuration reads are bounded to **1 MiB of UTF-8**, including a BOM. This is an
+explicit development file-input budget, not a System.Text.Json compatibility claim;
+.NET does not impose this file-size cap. File reads return File(TooLarge) and
+LoadText returns Json(LimitExceeded) when exceeded; neither truncates or replaces
+previous data. The parser itself no longer has a fixed byte or node-count limit.
+Runtime allocation budgets still apply. Parsing and flattened storage are fully
+buffered, and ordinal duplicate detection/flat-key storage currently use linear
+searches. Very large configurations may need storage optimization.

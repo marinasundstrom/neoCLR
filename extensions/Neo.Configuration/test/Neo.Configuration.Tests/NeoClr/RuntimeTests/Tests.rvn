@@ -7,6 +7,7 @@ import System.Result.*
 import Neo.Configuration.*
 import Neo.Configuration.Json.*
 import System.Storage.*
+import System.Data.Json.*
 import Neo.DependencyInjection.*
 import NeoClr.Testing.*
 
@@ -127,12 +128,14 @@ func GJsonErrors() -> Result<unit, TestFailure> {
     let Ok(_) = provider.LoadText("{\"Name\":\"retained\"}") else { return Assert.True(false, "Initial JSON") }
     _ = Assert.True(provider.LoadText("[]") is Failure(JsonConfigurationError.InvalidRoot), "Root must be an object")?
     _ = Assert.True(provider.LoadText("{\"A\":{\"B\":1},\"a:b\":2}") is Failure(JsonConfigurationError.DuplicateKey(_)), "Flattened collision")?
-    _ = Assert.True(provider.LoadText("{\"Name\":1,}") is Failure(_), "Trailing commas currently rejected")?
-    _ = Assert.True(provider.LoadText("{/* comment */}") is Failure(_), "Comments currently rejected")?
-    var large = ""
-    for index in 0..1025 { large += " " }
-    _ = Assert.True(provider.LoadText(large) is Failure(_), "Byte quota")?
-    _ = Assert.True(provider.LoadText("{\"a\":{\"b\":{\"c\":{\"d\":{}}}}}") is Failure(_), "Container depth quota")?
+    _ = Assert.True(provider.LoadText("{\"Name\":1,,}") is Failure(_), "Double comma rejected")?
+    _ = Assert.True(provider.LoadText("{/* comment }") is Failure(_), "Unterminated comment")?
+    var large = " "
+    for index in 0..20 { large += large }
+    _ = Assert.True(provider.LoadText(large + " ") is Failure(JsonConfigurationError.Json(JsonError.LimitExceeded(_))), "One MiB byte quota")?
+    var deep = "{}"
+    for index in 0..64 { deep = "{\"a\":" + deep + "}" }
+    _ = Assert.True(provider.LoadText(deep) is Failure(JsonConfigurationError.Json(JsonError.LimitExceeded(_))), "Default container depth quota")?
     return Assert.True(provider.Find("Name") is Some(let value) && value == "retained", "Failure preserves prior data")
 }
 
@@ -152,8 +155,40 @@ func HJsonFiles() -> Result<unit, TestFailure> {
     use root = builder.Build()
     _ = Assert.Equal("override", root["app:name"] ?? "missing")?
     _ = Assert.Equal("3", root["App:Count"] ?? "missing")?
+    _ = Assert.Equal("https://service39.example.test/api", root["Service39:Endpoint"] ?? "missing")?
     root["App:Count"] = "changed"
     root.Reload()
     _ = Assert.True(root.Providers[0].Find("App:Count") is Some(let value) && value == "3", "Reload rereads file")?
     return Assert.Equal("changed", root["App:Count"] ?? "missing")
+}
+
+
+[Test("JSON configuration accepts realistic commented settings and preserves scalar text")]
+func IJsonRealistic() -> Result<unit, TestFailure> {
+    let provider = JsonConfigurationProvider("unused.json")
+    var json = "{/* settings */\"Nested\":{\"A\":{\"B\":{\"C\":{\"D\":\"value\",},},},},\"Urls\":[\"https://example.test\",],"
+    for index in 0..128 {
+        json += "\"Setting" + index.ToString() + "\":\"value\\n雪\",\n"
+    }
+    json += "// scalar forms\n\"Number\":1.250e2,\"Bool\":true,\"Null\":null,}"
+    _ = Assert.True(provider.LoadText("﻿" + json) is Ok(_), "Large commented nested settings")?
+    _ = Assert.True(provider.Find("Nested:A:B:C:D") is Some(let nested) && nested == "value", "Five levels of hierarchy")?
+    _ = Assert.True(provider.Find("Setting127") is Some(let last) && last == "value\n雪", "Decoded Unicode and escapes")?
+    _ = Assert.True(provider.Find("Urls:0") is Some(let url) && url == "https://example.test", "Array trailing comma")?
+    _ = Assert.True(provider.Find("Number") is Some(let number) && number == "1.250e2", "Number spelling")?
+    return Assert.True(provider.Find("Null") is Some(let nullValue) && nullValue == null, "Present null")
+}
+
+
+[Test("JSON configuration loads large files and preserves data on file size failure")]
+func JJsonLargeFile() -> Result<unit, TestFailure> {
+    var content = "é雪😀"
+    for index in 0..13 { content += content }
+    let provider = JsonConfigurationProvider("large-appsettings.json")
+    _ = Assert.True(provider.TryLoad() is Ok(_), "Load more than 64 KiB from file")?
+    _ = Assert.True(provider.Find("Long") is Some(let value) && value == content, "Long Unicode file value")?
+    let oversized = JsonConfigurationProvider("oversized-appsettings.json")
+    _ = Assert.True(oversized.LoadText("{\"Long\":\"retained\"}") is Ok(_), "Seed prior data")?
+    _ = Assert.True(oversized.TryLoad() is Failure(JsonConfigurationError.File(FileReadError.TooLarge)), "File size error")?
+    return Assert.True(oversized.Find("Long") is Some(let retained) && retained == "retained", "Failed file load retains prior data")
 }

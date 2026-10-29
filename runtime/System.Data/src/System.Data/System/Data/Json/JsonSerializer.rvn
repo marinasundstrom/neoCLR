@@ -11,37 +11,70 @@ import System.Result.*
 public class JsonSerializer {
     private init() { }
 
+    /// <summary>Parses strict JSON with a maximum container depth of 64.</summary>
     static func DeserializeNode(text: string) -> Result<JsonValue, JsonError> {
-        if text.GetUtf8ByteCount() > 1024 {
-            return Failure(JsonError.LimitExceeded("Document exceeds 1024 UTF-8 bytes"))
-        }
-        return DocumentReader().Read(text.Utf8Bytes)
+        return DeserializeNode(text, JsonDocumentOptions())
     }
 
-    /// <summary>Parses a borrowed UTF-8 byte window into independently owned JSON values.</summary>
+    /// <summary>Parses text using document syntax options.</summary>
+    /// <param name="text">The complete JSON document.</param>
+    /// <param name="options">Comment, trailing comma and depth policy, copied for this operation.</param>
+    /// <returns>An owned node or an options, syntax or depth error. Allocation follows runtime budgets; no fixed document byte or value count quota is imposed.</returns>
+    static func DeserializeNode(text: string, options: JsonDocumentOptions) -> Result<JsonValue, JsonError> {
+        _ = DocumentReader.Validate(options)?
+        return DocumentReader(options).Read(text.Utf8Bytes)
+    }
+
+    /// <summary>Parses a borrowed UTF-8 document with strict syntax and maximum depth 64.</summary>
     /// <param name="utf8">The complete document, borrowed only during this call.</param>
-    /// <returns>A JSON node or a quota, UTF-8 or syntax error. The 1024-byte limit is checked before UTF-8; complete UTF-8 validation precedes JSON parsing.</returns>
+    /// <returns>Independently owned nodes or a UTF-8, syntax or depth error.</returns>
     static func DeserializeNode(utf8: ReadOnlySlice<byte>) -> Result<JsonValue, JsonError> {
-        if utf8.Length > 1024 {
-            return Failure(JsonError.LimitExceeded("Document exceeds 1024 UTF-8 bytes"))
-        }
+        return DeserializeNode(utf8, JsonDocumentOptions())
+    }
+
+    /// <summary>Parses borrowed UTF-8 using document syntax options.</summary>
+    /// <param name="utf8">Complete document, borrowed only during this call.</param>
+    /// <param name="options">Syntax and depth policy. Invalid options precede UTF-8 validation.</param>
+    /// <returns>An owned node or an error. Complete UTF-8 validation precedes syntax parsing.</returns>
+    static func DeserializeNode(utf8: ReadOnlySlice<byte>, options: JsonDocumentOptions) -> Result<JsonValue, JsonError> {
+        _ = DocumentReader.Validate(options)?
         if !JsonSyntax.ValidUtf8(utf8) {
             return Failure(JsonError.Read(TextReadError.InvalidUtf8))
         }
-        return DocumentReader().Read(utf8)
+        return DocumentReader(options).Read(utf8)
     }
 
+    /// <summary>Reads strict JSON to EOF, leaving the input stream open.</summary>
     async static func DeserializeNode(input: InputStream) -> Task<Result<JsonValue, JsonError>> {
+        return await DeserializeNode(input, JsonDocumentOptions())
+    }
+
+    /// <summary>Reads JSON to EOF with selected syntax and depth options.</summary>
+    /// <param name="input">Borrowed UTF-8 stream, left open on success and failure.</param>
+    /// <param name="options">Copied before reading. Invalid options consume no input.</param>
+    /// <returns>An owned node or options, read, syntax or depth error. Text is buffered in full; this is not an incremental JSON reader.</returns>
+    async static func DeserializeNode(input: InputStream, options: JsonDocumentOptions) -> Task<Result<JsonValue, JsonError>> {
+        _ = DocumentReader.Validate(options)?
         let reader = match StreamReader.Create(input, true) {
             Ok(let value) => value
             Failure(let error) => return Failure(JsonError.Read(error))
         }
-        let result = await reader.ReadToEnd(1024)
-        reader.Close()
-        return match result {
-            Ok(let text) => DeserializeNode(text)
-            Failure(let error) => Failure(JsonError.Read(error))
+        var text = ""
+        var complete = false
+        while !complete {
+            match await reader.Read(4096) {
+                Ok(let part) => {
+                    complete = part.GetUtf8ByteCount() == 0
+                    text += part
+                }
+                Failure(let error) => {
+                    reader.Close()
+                    return Failure(JsonError.Read(error))
+                }
+            }
         }
+        reader.Close()
+        return DeserializeNode(text, options)
     }
 
     static func SerializeNode(value: JsonValue) -> Result<string, JsonError> {

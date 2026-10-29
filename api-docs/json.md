@@ -53,9 +53,8 @@ returned nodes, property names, strings and number lexemes own their text.
 Subsequent changes to the input array do not change a completed result. Mapping
 uses the same supported types and errors as the text overloads.
 
-The 1,024-byte cap is checked first, returning
-`JsonError.LimitExceeded("Document exceeds 1024 UTF-8 bytes")`. Complete strict UTF-8
-validation then runs without creating a document string. Malformed UTF-8 returns
+Complete strict UTF-8
+validation runs without creating a document string. Malformed UTF-8 returns
 `JsonError.Read(TextReadError.InvalidUtf8)`, even if a JSON syntax error appears
 earlier in the bytes. JSON parsing and mapping follow validation. Overlong sequences,
 surrogate encodings, truncated sequences and values above U+10FFFF are rejected.
@@ -221,8 +220,9 @@ JSON nodes. Empty collections and sequence order are preserved. Map keys are
 case-sensitive UTF-8 strings; writing uses the map's observed key order. Reading
 uses ordinal comparison, so a custom comparer is not preserved by a round trip.
 
-The same complete-document bounds apply: 31 entries per container, four container
-levels, 32 value occurrences and 1024 UTF-8 bytes. Invalid later elements fail
+Object mapping retains its four-container-level and 32-value bounds even though
+DOM parsing now supports larger documents. Serialization retains its 1024-byte
+output bound. Invalid later elements fail
 preflight before any model constructor or setter executes. Each occurrence is
 constructed independently; shared references are not preserved.
 
@@ -239,16 +239,48 @@ consume input before failure. Writes validate mapping and the entire encoded doc
 before touching output; a stream failure can still leave a written prefix. This is
 buffered synchronous conversion, not async stream parsing.
 
-Documents allow 1,024 UTF-8 bytes,
-including whitespace, property names and escaped output. String and buffered HTTP input
-return LimitExceeded above that cap; stream input reads at most 1,025 bytes and returns
-Read(TextReadError.LimitExceeded), leaving the stream open. JSON number tokens use the
-same byte cap; longer tokens return InvalidNumber. Existing shape bounds apply: four container levels, 32 value occurrences,
-31 children per container. Development mapping supports up to four object/array container
-levels including the root; deeper graphs and cycles return LimitExceeded. This
-bounded recursion does not preserve reference identity. Generic lists, dictionaries, configurable
-limits and naming/null policies remain later work. Shared content conversion is
-described below.
+DOM reads no longer impose a fixed byte, value-count or per-container entry quota.
+Runtime allocation budgets still apply. Stream input is decoded in chunks and
+buffered in full; the text reader's existing per-grapheme 64 KiB bound remains.
+DOM writes still allow 1024 UTF-8 bytes (including formatting), 32 value occurrences
+and four container levels. Object mapping also retains its four-level/32-value
+bounds; reference identity and cycles are unsupported. These remaining limits are
+development gaps, not intended permanent JSON contracts.
+
+## Document parsing options
+
+[JsonDocumentOptions](xref:System.Data.Json.JsonDocumentOptions) is a value type,
+matching the core design of
+[System.Text.Json.JsonDocumentOptions](https://learn.microsoft.com/en-us/dotnet/api/system.text.json.jsondocumentoptions?view=net-10.0).
+The text, borrowed UTF-8 and asynchronous InputStream DeserializeNode overloads
+accept it. Omitting options uses the same defaults:
+
+| Property | Default | Behavior |
+| --- | --- | --- |
+| AllowTrailingCommas | false | Accept one comma before an array/object closing delimiter when true. |
+| CommentHandling | JsonCommentHandling.Disallow | Skip accepts and discards line and block comments. Allow is reserved for future token readers and is rejected by document parsing, as in .NET. |
+| MaxDepth | 0 | Zero means 64 nested containers. A positive value overrides this; scalar roots consume no container depth. |
+
+Options are copied for the call. Negative depth, Allow or undefined comment policies
+return `JsonError.InvalidOptions` before consuming input. This uses neoCLR's Result
+error model rather than .NET's throwing property setters. Exceeded depth returns
+LimitExceeded. Duplicate decoded property names still return DuplicateField;
+.NET's duplicate-property policy is not yet exposed. Generic object mapping still
+uses strict defaults; serializer read options are a follow-up API gap.
+
+```raven
+var options = JsonDocumentOptions()
+options.CommentHandling = JsonCommentHandling.Skip
+options.AllowTrailingCommas = true
+let result = JsonSerializer.DeserializeNode("/* settings */{\"enabled\":true,}", options)
+```
+
+Comments are only recognized between tokens, never within strings or token text.
+Malformed/truncated comments, double commas, missing values and trailing non-comment
+content still fail. [Neo.Configuration.Json](configuration.html) opts into these
+settings, adds a 1 MiB input budget, and strips an initial UTF-8 BOM. Direct JSON
+parsing continues to reject a BOM. Large strings are decoded on UTF-8 scalar
+boundaries, including escaped strings and surrogate pairs.
 
 ## HTTP content conversion
 
@@ -324,7 +356,7 @@ or array `Item` when absence or invalid bounds should be recoverable.
 Both support ordinary `for` iteration. Object keys/pairs and array elements are
 shallow ordered snapshots: later additions do not extend an existing iterator,
 while child contents remain shared. Count and indexers read the current container.
-Mutation continues through quota-aware Add; mutable collection interfaces are not
+Mutation continues through Add; mutable collection interfaces are not
 implemented. Typed Serialize still recognizes nodes through these interface views.
 
 Converter registration, serializer options and configurable property naming remain
@@ -337,7 +369,9 @@ For incoming request content, use `await content.ReadFromJson<T>()`,
 `await content.ReadFromJson(type)` or `await content.ReadJsonNode()`. These handle
 both buffered and streaming bodies. Streaming reads consume the body once, keep
 content ownership with the exchange and pass the optional CancellationToken to
-transport reads. The 1024-byte JSON quota and strict UTF-8 rules still apply.
+transport reads. Strict UTF-8 and default JSON syntax/depth rules still apply;
+object mapping and writing retain the separate limits described above. The legacy
+buffered byte-sequence adapter still has a 1024-byte copy cap (a separate gap).
 Buffered conversion remains synchronous within the returned task.
 
 The current stream serializer uses a bounded UTF-8 text reader before parsing, so

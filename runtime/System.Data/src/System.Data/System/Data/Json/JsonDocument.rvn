@@ -7,41 +7,79 @@ import System.Text.*
 
 internal class DocumentReader {
     private var position: int
-    private var nodes: int
+    private val options: JsonDocumentOptions
+    private val maxDepth: int
 
-    init() {
+    init(options: JsonDocumentOptions) {
+        self.options = options
+        maxDepth = if options.MaxDepth == 0 { 64 } else { options.MaxDepth }
         position = 0
-        nodes = 0
     }
 
-    private func Skip(bytes: ReadOnlySlice<byte>) {
-        let length = bytes.Length
-        while position < length && JsonSyntax.Whitespace(bytes[position]) {
-            position += 1
+    static func Validate(options: JsonDocumentOptions) -> Result<unit, JsonError> {
+        if options.MaxDepth < 0 {
+            return Failure(JsonError.InvalidOptions("MaxDepth must be non-negative"))
         }
+        if options.CommentHandling != JsonCommentHandling.Disallow && options.CommentHandling != JsonCommentHandling.Skip {
+            return Failure(JsonError.InvalidOptions("Document comments must be Disallow or Skip"))
+        }
+        return Ok(())
     }
 
-    private func Take(bytes: ReadOnlySlice<byte>, value: byte) -> bool {
-        Skip(bytes)
+    private func Skip(bytes: ReadOnlySlice<byte>) -> Result<unit, JsonError> {
+        let length = bytes.Length
+        while position < length {
+            if JsonSyntax.Whitespace(bytes[position]) {
+                position += 1
+            } else if options.CommentHandling == JsonCommentHandling.Skip && bytes[position] == 47 && length - position >= 2 {
+                let next = bytes[position + 1]
+                if next == 47 {
+                    position += 2
+                    while position < length && bytes[position] != 10 && bytes[position] != 13 {
+                        position += 1
+                    }
+                } else if next == 42 {
+                    position += 2
+                    var closed = false
+                    while length - position >= 2 && !closed {
+                        if bytes[position] == 42 && bytes[position + 1] == 47 {
+                            position += 2
+                            closed = true
+                        } else {
+                            position += 1
+                        }
+                    }
+                    if !closed {
+                        return Failure(JsonError.Syntax("Unclosed comment"))
+                    }
+                } else {
+                    return Ok(())
+                }
+            } else {
+                return Ok(())
+            }
+        }
+        return Ok(())
+    }
+
+    private func Take(bytes: ReadOnlySlice<byte>, value: byte) -> Result<bool, JsonError> {
+        _ = Skip(bytes)?
         if position < bytes.Length && bytes[position] == value {
             position += 1
-            return true
+            return Ok(true)
         }
-        return false
+        return Ok(false)
     }
 
     private func DecodeToken(bytes: ReadOnlySlice<byte>) -> Result<string, JsonError> {
-        match Encodings.Utf8.Decode(bytes) {
-            Ok(let text) => return Ok(text)
-            Failure(_) => return Failure(JsonError.Syntax("Invalid token boundary"))
-        }
+        return JsonSyntax.DecodeUtf8(bytes)
     }
 
     private func ReadString(bytes: ReadOnlySlice<byte>) -> Result<string, JsonError> {
         let length = bytes.Length
-        Skip(bytes)
+        _ = Skip(bytes)?
         let start = position
-        if !Take(bytes, (byte)34) {
+        if !(Take(bytes, (byte)34)?) {
             return Failure(JsonError.Syntax("Expected string"))
         }
         var escaped = false
@@ -58,7 +96,7 @@ internal class DocumentReader {
                 if !needsDecoding {
                     return DecodeToken(bytes.Slice(start + 1, position - start - 2))
                 }
-                return MessageReader().Read(bytes.Slice(start, position - start))
+                return MessageReader().Read(bytes.Slice(start, position - start), position - start)
             } else if value <= 31 {
                 needsDecoding = true
             }
@@ -68,11 +106,7 @@ internal class DocumentReader {
 
     private func Value(bytes: ReadOnlySlice<byte>, depth: int) -> Result<JsonValue, JsonError> {
         let length = bytes.Length
-        Skip(bytes)
-        nodes += 1
-        if nodes > 32 {
-            return Failure(JsonError.LimitExceeded("Document exceeds 32 values"))
-        }
+        _ = Skip(bytes)?
         if position == length {
             return Failure(JsonError.Syntax("Missing value"))
         }
@@ -83,8 +117,8 @@ internal class DocumentReader {
             return Ok(value)
         }
         if first == 123 || first == 91 {
-            if depth >= 4 {
-                return Failure(JsonError.LimitExceeded("Container depth exceeds four"))
+            if depth >= maxDepth {
+                return Failure(JsonError.LimitExceeded("Container depth exceeds MaxDepth"))
             }
             position += 1
             let objectValue = first == 123
@@ -94,12 +128,12 @@ internal class DocumentReader {
                 result = JsonObject()
                 closing = (byte)125
             }
-            var containerClosed = Take(bytes, closing)
+            var containerClosed = Take(bytes, closing)?
             while !containerClosed {
                 var name = ""
                 if objectValue {
                     name = ReadString(bytes)?
-                    if !Take(bytes, (byte)58) {
+                    if !(Take(bytes, (byte)58)?) {
                         return Failure(JsonError.Syntax("Expected colon"))
                     }
                 }
@@ -109,9 +143,14 @@ internal class DocumentReader {
                 } else {
                     _ = ((JsonArray)result).Add(child)?
                 }
-                containerClosed = Take(bytes, closing)
-                if !containerClosed && !Take(bytes, (byte)44) {
-                    return Failure(JsonError.Syntax("Expected comma or container end"))
+                containerClosed = Take(bytes, closing)?
+                if !containerClosed {
+                    if !(Take(bytes, (byte)44)?) {
+                        return Failure(JsonError.Syntax("Expected comma or container end"))
+                    }
+                    if options.AllowTrailingCommas {
+                        containerClosed = Take(bytes, closing)?
+                    }
                 }
             }
             return Ok(result)
@@ -120,7 +159,7 @@ internal class DocumentReader {
         var tokenEnd = false
         while position < length && !tokenEnd {
             let value = bytes[position]
-            tokenEnd = (JsonSyntax.Whitespace(value) || value == 44 || value == 93 || value == 125)
+            tokenEnd = (JsonSyntax.Whitespace(value) || value == 44 || value == 93 || value == 125 || value == 47)
             if !tokenEnd {
                 position += 1
             }
@@ -146,7 +185,7 @@ internal class DocumentReader {
 
     func Read(bytes: ReadOnlySlice<byte>) -> Result<JsonValue, JsonError> {
         let result = Value(bytes, 0)?
-        Skip(bytes)
+        _ = Skip(bytes)?
         if position != bytes.Length {
             return Failure(JsonError.Syntax("Trailing content"))
         }

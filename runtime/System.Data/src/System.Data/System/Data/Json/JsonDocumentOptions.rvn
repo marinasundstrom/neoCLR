@@ -1,0 +1,30 @@
+module System.Data.Json
+
+/// <summary>Controls how JSON comments are read.</summary>
+public enum JsonCommentHandling {
+    /// <summary>Reject comments (the default).</summary>
+    Disallow = 0
+    /// <summary>Accept and discard line and block comments.</summary>
+    Skip = 1
+    /// <summary>Reserved for token readers; document parsing rejects this value.</summary>
+    Allow = 2
+}
+
+/// <summary>Controls JSON document parsing, independently of output formatting.</summary>
+/// <remarks>Passed by value. Invalid options return JsonError.InvalidOptions before reading input. Unlike .NET property setters, assignment itself does not throw.</remarks>
+public struct JsonDocumentOptions {
+    init() {
+        AllowTrailingCommas = false
+        CommentHandling = JsonCommentHandling.Disallow
+        MaxDepth = 0
+    }
+
+    /// <summary>Allows a single trailing comma in objects and arrays. Defaults to false.</summary>
+    var AllowTrailingCommas: bool { get; set; }
+
+    /// <summary>Disallow rejects comments; Skip discards them. Allow and unknown values are invalid for documents.</summary>
+    var CommentHandling: JsonCommentHandling { get; set; }
+
+    /// <summary>Maximum nested containers. Zero selects 64; negative values are invalid.</summary>
+    var MaxDepth: int { get; set; }
+}

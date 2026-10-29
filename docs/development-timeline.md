@@ -23519,3 +23519,23 @@ compiler tests; see the carrier unwrap section of `docs/raven-cli-bridge.md`.
 Validation completed: all five native interpreter cases passed against the
 `target/neo-configuration-20261029/final-libraries` bundle.
 [Recorded results and input hashes](validation/carrier-unwrap-20261029/validation.json).
+
+
+### 2026-10-29 — Realistic configuration JSON and .NET-aligned reader options
+
+The author rejected the initial appsettings.json parser limits as too restrictive
+and asked to fix the underlying JSON parser, including comments and trailing commas
+like Microsoft.Extensions.Configuration. The author then clarified: “The Json API
+should stay similar to .NET System.Text.Json in its design when not diverging in
+philosophy or for any other good reason”.
+
+The assistant implemented value-type JsonDocumentOptions, JsonCommentHandling,
+AllowTrailingCommas and MaxDepth (zero means 64), keeping strict syntax by default.
+DOM byte/value/container-entry caps were removed, including large escaped Unicode
+token support. Invalid options return Result errors before reading input, following
+neoCLR's error model rather than .NET throwing setters. Configuration selects skipped
+comments and trailing commas and accepts a UTF-8 BOM, with a separate 1 MiB file/text
+budget. Serialization and object-mapping restrictions remain explicit gaps; this
+slice does not claim complete System.Text.Json parity. See
+[the design comparison](json-dom-design.md#2026-10-29--document-reader-options-and-realistic-configuration-input)
+and [focused validation](validation/configuration-json-reader-20261029/README.md).

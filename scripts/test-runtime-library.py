@@ -216,6 +216,9 @@ JSON_NAMES = [
     'JSON duplicate insertion preserves the original value',
     'JSON objects distinguish present null from missing fields',
     'JSON object indexed access preserves insertion order',
+    'JSON depth defaults to 64 and validates document options',
+    'JSON parsing supports large containers and long UTF-8 escaped strings',
+    'JSON document options follow strict defaults and independent relaxed syntax',
     'JSON documents support every root node kind',
     'JSON scalar nodes expose their typed values',
     'JSON sequence indexing retains node identity and explicit null',
@@ -228,7 +231,7 @@ JSON_STREAM_NAMES = [
     'HTTP JSON async reads consume streams once preserve ownership and honor cancellation',
     'JSON byte input borrows selected windows and returns owned mapped values',
     'JSON byte input accepts UTF-8 scalar boundaries and rejects BOM and raw controls',
-    'JSON byte input rejects invalid UTF-8 before syntax and preserves quotas',
+    'JSON byte input rejects invalid UTF-8 before syntax at any document size',
     'JSON UTF-8 byte output preserves escaping formatting and independent ownership',
     'JSON borrowed token parsing preserves empty Unicode escaped and scalar values',
     'JSON borrowed token parsing rejects malformed escapes controls and numbers',
@@ -237,10 +240,10 @@ JSON_STREAM_NAMES = [
     'JSON indented stream output matches node text and preflights quotas',
     'JSON stream reads reject split invalid UTF-8',
     'JSON memory stream round trip preserves document content',
-    'JSON number document quota preserves long number spelling',
+    'JSON long numbers preserve spelling with separate write limits',
     'JSON streams retry single-byte reads and writes without taking ownership',
     'JSON stream reads preserve the underlying I/O failure',
-    'JSON stream input quota counts bytes and preserves ownership',
+    'JSON streams read beyond the former document quota and preserve ownership',
     'JSON stream reads reject a truncated document',
     'JSON stream boundary counts UTF-8 bytes rather than characters',
     'JSON stream writes preserve partial output and failure cause',
@@ -357,6 +360,8 @@ CONFIGURATION_NAMES = [
     'JSON configuration flattens objects arrays and scalar values',
     'JSON configuration rejects ambiguous malformed and oversized input atomically',
     'JSON configuration reads required optional files and reloads through the root',
+    'JSON configuration accepts realistic commented settings and preserves scalar text',
+    'JSON configuration loads large files and preserves data on file size failure',
 ]
 
 LOGGING_NAMES = [
@@ -726,7 +731,9 @@ def main():
                            '--bundle', bundle, '--aot', args.aot.resolve(), '--output', build]
                 if name in ("encoding-buffer-limits", "http-text", "localization"):
                     command += ["--byte-array-limit", "131072"]
-                if name == "gzip":
+                if name in ("gzip", "configuration", "json-dom"):
+                    # Large JSON input and the configuration 1 MiB rejection boundary
+                    # need a host budget larger than the document itself.
                     command += ["--http-heap-bytes", "33554432"]
                 if name == "json-streams":
                     # Scalar mapping needs a reflection scope, but no retained model constructors.
@@ -790,6 +797,10 @@ def main():
             if name == 'configuration':
                 for fixture in ('appsettings.json', 'invalid-appsettings.json'):
                     shutil.copyfile(suite_project(name).parent / fixture, isolated / fixture)
+                # Exercise file reading independently of guest file-write support.
+                (isolated / 'large-appsettings.json').write_text(
+                    '{/* file */"Long":"' + 'é雪😀' * 8192 + '",}', encoding='utf-8')
+                (isolated / 'oversized-appsettings.json').write_bytes(b' ' * (1048576 + 1))
             exe = isolated / ('app.exe' if os.name == 'nt' else 'app')
             if 'native' in modes:
                 shutil.copy2(build / exe.name, exe)

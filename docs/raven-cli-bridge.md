@@ -16189,3 +16189,17 @@ logs and a JSON result in its output directory. These checks do not qualify AOT.
 Validation completed: all five native interpreter cases passed against the
 `target/neo-configuration-20261029/final-libraries` bundle.
 [Recorded results and input hashes](validation/carrier-unwrap-20261029/validation.json).
+
+
+### JSON document options reference projection (2026-10-29)
+
+The documentation-only aggregate CLI scaffold now projects the public
+JsonDocumentOptions value type, JsonCommentHandling enum, JsonError.InvalidOptions
+and the string/stream DeserializeNode overloads. Native parsing uses the source-owned
+System.Data implementation directly; no compiler/runtime semantic or ABI change is
+introduced. The borrowed ReadOnlySlice<byte>/options overload remains native-only,
+like the pre-existing borrowed JSON overloads; it appears in the native API snapshot
+and the manual JSON guide rather than this limited CLI scaffold. The class-library
+API documentation pipeline owns this temporary signature projection; eventual
+native-only publication removes the aggregate scaffold dependency. See
+[reader qualification](validation/configuration-json-reader-20261029/README.md).

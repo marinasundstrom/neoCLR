@@ -54,9 +54,10 @@ Build the runtime and Neo abstraction projects first using the matching compiler
 No application behavior depends on a service locator inside GreetingService;
 all its dependencies are constructor parameters.
 
-The initial JSON configuration provider shares the bounded System.Data parser:
-1024 UTF-8 bytes, 32 values and four container levels; comments and trailing commas
-are not accepted. The sample appsettings file is within these bounds.
+The JSON configuration provider uses the System.Data parser with comments and
+trailing commas enabled, as demonstrated by appsettings.json. It accepts an initial
+UTF-8 BOM and up to 1 MiB of input with 64 container levels. Value and container
+entry counts are no longer capped at prototype sizes.
 
 ## Introductory examples
 

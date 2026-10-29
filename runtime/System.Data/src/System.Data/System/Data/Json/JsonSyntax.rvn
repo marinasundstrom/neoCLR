@@ -17,6 +17,32 @@ internal class JsonSyntax {
         }
     }
 
+    // Decode bounded windows on scalar boundaries, avoiding the Encoding per-call
+    // limit without allocating an array proportional to the document or token.
+    static func DecodeUtf8(bytes: ReadOnlySlice<byte>) -> Result<string, JsonError> {
+        var text = ""
+        var start = 0
+        while start < bytes.Length {
+            var end = start + 32768
+            if end >= bytes.Length {
+                end = bytes.Length
+            } else {
+                while end > start && bytes[end] >= 128 && bytes[end] <= 191 {
+                    end -= 1
+                }
+            }
+            if end == start {
+                return Failure(JsonError.Syntax("Invalid UTF-8"))
+            }
+            match Encodings.Utf8.Decode(bytes.Slice(start, end - start)) {
+                Ok(let part) => text += part
+                Failure(_) => return Failure(JsonError.Syntax("Invalid UTF-8"))
+            }
+            start = end
+        }
+        return Ok(text)
+    }
+
     static func TokenEquals(bytes: ReadOnlySlice<byte>, text: string) -> bool {
         let expected = text.Utf8Bytes
         let length = bytes.Length
@@ -93,7 +119,7 @@ internal class JsonSyntax {
     // Preserve number text: recognizing JSON grammar must not round to a host number.
     static func ValidNumber(text: string) -> bool {
         let count = text.GetUtf8ByteCount()
-        if count == 0 || count > 1024 {
+        if count == 0 {
             return false
         }
         let bytes = text.Utf8Bytes
@@ -229,9 +255,15 @@ internal class MessageReader {
             return Failure(JsonError.Syntax("Expected a JSON string"))
         }
         position += 1
-        let output = ArrayList<byte>(length)
+        var output = ArrayList<byte>()
+        var decoded = ""
         var closed = false
         while position < length && !closed {
+            // Flush only between UTF-8 scalars. Escapes append complete scalars.
+            if output.Count >= 32768 && !(bytes[position] >= 128 && bytes[position] <= 191) {
+                decoded += JsonSyntax.DecodeUtf8(output[..])?
+                output = ArrayList<byte>()
+            }
             let value = bytes[position]
             position += 1
             if value == 34 {
@@ -305,9 +337,7 @@ internal class MessageReader {
         if position != length {
             return Failure(JsonError.Syntax("Trailing content"))
         }
-        match Encodings.Utf8.Decode(output[..]) {
-            Ok(let text) => return Ok(text)
-            Failure(_) => return Failure(JsonError.Syntax("Invalid UTF-8"))
-        }
+        decoded += JsonSyntax.DecodeUtf8(output[..])?
+        return Ok(decoded)
     }
 }

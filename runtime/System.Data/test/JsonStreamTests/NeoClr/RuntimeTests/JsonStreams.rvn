@@ -85,7 +85,7 @@ func StreamTruncated() -> Result<unit, TestFailure> {
     return Assert.True(result is Failure(JsonError.Syntax(_)), "JSON stream reads reject a truncated document")
 }
 
-[Test("JSON stream input quota counts bytes and preserves ownership")]
+[Test("JSON streams read beyond the former document quota and preserve ownership")]
 func StreamReadQuota() -> Result<unit, TestFailure> {
     let bytes = ArrayList<byte>()
     var index = 0
@@ -93,12 +93,23 @@ func StreamReadQuota() -> Result<unit, TestFailure> {
         bytes.Add((byte)32)
         index = index + 1
     }
+    bytes.Add((byte)91)
+    bytes.Add((byte)49)
+    bytes.Add((byte)44)
+    bytes.Add((byte)93)
     let input = ShortInput(bytes, -1)
-    let result = CompletedValue(JsonSerializer.DeserializeNode(input))
-    _ = Assert.Equal(1025, input.Position)?
-    _ = Assert.True(!input.Closed, "Quota failure must not close input")?
+    var options = JsonDocumentOptions()
+    options.AllowTrailingCommas = true
+    let result = CompletedValue(JsonSerializer.DeserializeNode(input, options))
+    _ = Assert.Equal(1029, input.Position)?
+    _ = Assert.True(!input.Closed, "Large read must not close input")?
     input.Close()
-    return Assert.True(result is Failure(JsonError.Read(TextReadError.LimitExceeded)), "Oversized stream must return read quota failure")
+    _ = Assert.True(result is Ok(JsonArray), "Read whitespace and relaxed array beyond old limit")?
+    let invalidInput = ShortInput(bytes, -1)
+    options.MaxDepth = -1
+    _ = Assert.True(CompletedValue(JsonSerializer.DeserializeNode(invalidInput, options)) is Failure(JsonError.InvalidOptions(_)), "Invalid options")?
+    _ = Assert.True(!invalidInput.Closed, "Invalid options leave input open")?
+    return Assert.Equal(0, invalidInput.Position)
 }
 
 [Test("JSON stream writes preserve partial output and failure cause")]
@@ -157,7 +168,7 @@ func StreamUnicodeBoundary() -> Result<unit, TestFailure> {
     } else {
         return Assert.True(false, "Exact UTF-8 quota must parse")
     }
-    return Assert.True(JsonSerializer.DeserializeNode(text + " ") is Failure(JsonError.LimitExceeded(_)), "One extra byte must exceed document quota")
+    return Assert.True(JsonSerializer.DeserializeNode(text + " ") is Ok(_), "Reads no longer have the 1024-byte quota")
 }
 
 [Test("JSON stream output quota includes escaping and validates before writes")]
@@ -182,7 +193,7 @@ func StreamEscapedOutputQuota() -> Result<unit, TestFailure> {
     return Assert.True(rejected is Failure(JsonError.LimitExceeded(_)), "Escaped output exceeding quota must fail before writing")
 }
 
-[Test("JSON number document quota preserves long number spelling")]
+[Test("JSON long numbers preserve spelling with separate write limits")]
 func StreamNumberBoundary() -> Result<unit, TestFailure> {
     var digits = "1"
     var index = 0
@@ -202,7 +213,11 @@ func StreamNumberBoundary() -> Result<unit, TestFailure> {
     } else {
         return Assert.True(false, "Exact number quota must parse")
     }
-    return Assert.True(JsonNumber.Parse(digits + "0") is Failure(JsonError.InvalidNumber), "Oversized number token must fail")
+    let Ok(longNumber) = JsonNumber.Parse(digits + "0") else {
+        return Assert.True(false, "Number reading has no fixed token-size cap")
+    }
+    _ = Assert.Equal(digits + "0", longNumber.Text)?
+    return Assert.True(JsonSerializer.SerializeNode(longNumber) is Failure(JsonError.LimitExceeded(_)), "Writing retains its separate byte limit")
 }
 
 // Produce 511 copies in nine steps without making boundary tests depend on a
@@ -352,7 +367,7 @@ func ByteInputOwnership() -> Result<unit, TestFailure> {
     return Assert.Equal(20, values[1])
 }
 
-[Test("JSON byte input rejects invalid UTF-8 before syntax and preserves quotas")]
+[Test("JSON byte input rejects invalid UTF-8 before syntax at any document size")]
 func ByteInputValidation() -> Result<unit, TestFailure> {
     _ = ExpectInvalidJsonUtf8([(byte)128])?
     _ = ExpectInvalidJsonUtf8([(byte)192, (byte)128])?
@@ -378,7 +393,7 @@ func ByteInputValidation() -> Result<unit, TestFailure> {
         oversized[index] = (byte)255
         index += 1
     }
-    return Assert.True(JsonSerializer.DeserializeNode(oversized) is Failure(JsonError.LimitExceeded("Document exceeds 1024 UTF-8 bytes")), "Quota precedes UTF-8 validation")
+    return Assert.True(JsonSerializer.DeserializeNode(oversized) is Failure(JsonError.Read(TextReadError.InvalidUtf8)), "Validate UTF-8 beyond the former document quota")
 }
 
 [Test("JSON byte input accepts UTF-8 scalar boundaries and rejects BOM and raw controls")]

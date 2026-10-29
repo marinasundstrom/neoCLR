@@ -3068,3 +3068,16 @@ The same foundation now includes Neo.Configuration.Json. The native snapshot
 selects its provider/source/error union and the AddJsonFile extension in the
 Neo.Configuration namespace. The manual reference records strict JSON/DOM quotas
 and recoverable loading behavior alongside the generated members.
+
+
+## JSON document reader options (2026-10-29 development)
+
+JsonDocumentOptions and JsonCommentHandling are selected public types. JsonSerializer
+includes text, UTF-8-slice and stream DeserializeNode overloads with document options;
+JsonError includes InvalidOptions. The native snapshot and aggregate reference must
+be refreshed together. The new borrowed UTF-8/options overload shares the existing
+CLI scaffold limitation for borrowed slices; it is present in the native reference
+and documented in the JSON guide. No public API is omitted from the native snapshot. The [JSON guide](json.md)
+documents strict defaults, depth 64, Result-based validation, remaining serializer
+and mapping gaps, and runtime allocation budgets. Neo.Configuration.Json opts into
+comments/trailing commas and accepts a BOM under its separate 1 MiB input limit.

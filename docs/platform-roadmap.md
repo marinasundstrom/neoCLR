@@ -13,7 +13,9 @@ three `.Abstractions` assemblies and adds an integrated DI/logging/localization
 sample; see [the assembly boundary](application-services.md) for dependencies and
 [focused qualification](validation/neo-abstractions-20261028/README.md).
 The author then directed [Neo.Configuration](configuration.md): separate abstractions,
-provider-based defaults and DI integration in the same sample.
+provider-based defaults and DI integration in the same sample. The JSON follow-up
+removes prototype DOM reader limits, follows System.Text.Json document options, and
+accepts commented appsettings files; see [focused evidence](validation/configuration-json-reader-20261029/README.md).
 This bounded slice does not replace the broader active milestone.
 
 **Author-directed scheduling wrap-up (2026-10-28):** [Repeated HTTP comparison and integration decision](validation/shared-scheduling-decision-20261028/README.md) retain enabled DNS/native GC correctness fixes and leave shared queues opt-in, with scheduling/collector defaults unchanged. Three untraced rounds show +5.3% sync and −7.5% concurrent throughput medians for shared queues, with overlapping ranges. Separate native profiles point to root/store/binding costs but do not close managed attribution. The author directs wrapping up and enabling only justified defaults; full AOT/capacity/context-profile and cross-thread HTTP ownership gates remain explicitly deferred, not completed.

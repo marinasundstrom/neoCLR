@@ -6,7 +6,7 @@ static class JsonBindings {
     public const string Content = "System.Web.Http.Json.JsonContent";
     public const string Prefix = "System.Data.Json.";
     public static readonly string[] Leaves = new[] { "JsonObject", "JsonArray", "JsonString", "JsonNumber", "JsonBoolean", "JsonNull" }.Select(n => Prefix + n).ToArray();
-    public static readonly string[] Names = new[] { Root, Prefix + "JsonSerializer", Prefix + "JsonSerializerOptions", Prefix + "ObjectMapper", Prefix + "DocumentReader", Prefix + "DocumentWriter", Prefix + "MessageReader", Prefix + "JsonSyntax" }.Concat(Leaves).Append(Content).Concat(HttpJsonBindings.Names).ToArray();
+    public static readonly string[] Names = new[] { Root, Prefix + "JsonSerializer", Prefix + "JsonSerializerOptions", Prefix + "JsonDocumentOptions", Prefix + "JsonCommentHandling", Prefix + "ObjectMapper", Prefix + "DocumentReader", Prefix + "DocumentWriter", Prefix + "MessageReader", Prefix + "JsonSyntax" }.Concat(Leaves).Append(Content).Concat(HttpJsonBindings.Names).ToArray();
     const string Marker = "System.Runtime.CompilerServices.ClosedHierarchyAttribute";
     public static bool Assignable(string source, string target) => target == Root && Leaves.Contains(source);
     public static bool IsName(string name) => Names.Contains(name);
@@ -15,7 +15,7 @@ static class JsonBindings {
     public static bool SameType(TypeReference left, TypeReference right) => left.FullName == right.FullName && IsName(left.FullName) && RuntimeSignatures.IsCore(left.Scope) && ApplicationTypes.IsLibrary(right);
     public const string Declarations = """
 namespace Data.Json {
-public struct JsonError { public struct Syntax { } public struct LimitExceeded { } public struct TypeMismatch { } public struct MissingField { } public struct DuplicateField { } public struct InvalidIndex { } public struct InvalidNumber { } public struct NumberOutOfRange { } public struct Read { } public struct Write { } public struct Reflection { } public struct UnsupportedMapping { } }
+public struct JsonError { public struct InvalidOptions { } public struct Syntax { } public struct LimitExceeded { } public struct TypeMismatch { } public struct MissingField { } public struct DuplicateField { } public struct InvalidIndex { } public struct InvalidNumber { } public struct NumberOutOfRange { } public struct Read { } public struct Write { } public struct Reflection { } public struct UnsupportedMapping { } }
 public abstract class JsonValue {
     protected JsonValue() { }
     public Result<string, JsonError> ToJsonString() => default;
@@ -59,6 +59,13 @@ public sealed class JsonBoolean : JsonValue {
 public sealed class JsonNull : JsonValue {
     public JsonNull() { }
 }
+public enum JsonCommentHandling { Disallow = 0, Skip = 1, Allow = 2 }
+public struct JsonDocumentOptions {
+    public JsonDocumentOptions() { }
+    public bool AllowTrailingCommas { get; set; }
+    public JsonCommentHandling CommentHandling { get; set; }
+    public int MaxDepth { get; set; }
+}
 public sealed class JsonSerializerOptions {
     public JsonSerializerOptions() { }
     public bool WriteIndented { get; set; }
@@ -80,7 +87,9 @@ public sealed class JsonSerializer {
     // Borrowed DeserializeNode/Deserialize<T>/Deserialize(ReadOnlySlice<byte>, TypeInfo)
     // are native-only: this CLI scaffold cannot safely project borrowed views. See api-docs/json.md.
     public static Result<JsonValue, JsonError> DeserializeNode(string text) => default;
+    public static Result<JsonValue, JsonError> DeserializeNode(string text, JsonDocumentOptions options) => default;
     public static Concurrency.Tasks.Task<Result<JsonValue, JsonError>> DeserializeNode(IO.InputStream input) => default;
+    public static Concurrency.Tasks.Task<Result<JsonValue, JsonError>> DeserializeNode(IO.InputStream input, JsonDocumentOptions options) => default;
     public static Result<string, JsonError> SerializeNode(JsonValue value) => default;
     public static Concurrency.Tasks.Task<Result<PropagationUnit, JsonError>> SerializeNode(IO.OutputStream output, JsonValue value) => default;
 }

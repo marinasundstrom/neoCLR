@@ -5,34 +5,34 @@
     "url": "https://github.com/marinasundstrom/neoCLR",
     "revision": "main"
   },
-  "sha256": "5fac8ba1f6b3449ce808f3fe8f0235b297655a6e446f92bd4e2dce6cc60d7d8f",
-  "librarySourceRevision": "54b06df5211a74e8973081efb8fbf6781f4da7c7",
+  "sha256": "d0f387f945fc34286f4c5e91ab30914303f8f7d654881c06b24125ebbe29c63c",
+  "librarySourceRevision": "f44bc190757a1490352b6f4d9319caf60e81af75",
   "compilerRevision": "34f14c8ce",
   "libraryBuildEvidence": {
     "file": "build-evidence.json",
-    "sha256": "52e15bcc755d07a31ccb469402117589ea61483b56168e853da35cdca05ab76d"
+    "sha256": "dde7de51be3d89ab519af00bbad09ddfe5a8c621da3156f6613b63a621724e09"
   },
   "rendererRevision": "34f14c8ce",
   "libraryArtifacts": {
-    "System.Runtime.dll": "d3905fd8e878001194555f9c9ecc5774cdb350fdcb3ae50267811a4a118c2483",
-    "System.Data.dll": "eabec2fe5981e925a4deaf064a8a185baea7847d97499211ff0f8048ebbbf47a",
-    "System.Networking.dll": "1ca10069a89887583ade342a9699868d53ba52c8e93d9bcc9b154f0119c69147",
-    "System.Web.dll": "2360517901f0ff3c866967b543d8f4a5fec07e7ac0b95b64531e00cac91b6e95",
-    "Neo.DependencyInjection.Abstractions.dll": "0f445f2f2b0ab68371f43788161b3931e633ead91d9a2c182bd6d51eeda7db5a",
-    "Neo.DependencyInjection.dll": "e28424ae8e953e794fd1174fe5a5d4ab36782f5cf033df49eb96353f3eee6a4f",
-    "Neo.Localization.Abstractions.dll": "3283aceea276c55376752e7d7e703bb4a6d09bf3652b4dfb1c96860b2d44ee9e",
-    "Neo.Localization.dll": "412b57dcfaf802e4625cee3b97c62c6496863b5864703c457750236144212ebb",
-    "Neo.Logging.Abstractions.dll": "9afd5c7ba7f7e4f431c789d5e7c74d62da066655299794288b66ac119757d0b4",
-    "Neo.Logging.dll": "ac6dfc034fced227561fca260116402887f5909c1a21d12814d38bc194c59c41",
+    "System.Runtime.dll": "34c9f9f563899a59ec9c379c3b1f9be299a8ae1050e566ff3e67b7982644ccf2",
+    "System.Data.dll": "5d0aca5f344c117968d5c6a9ef7dda3edc055cb0d3ad1947555221a7f81c886c",
+    "System.Networking.dll": "863afbf744ce9ba9c4af9df39f2fd5a8a1a9ee8f7e51f60bd813e2f7ac45d2e5",
+    "System.Web.dll": "9868844e659ad48e14d523ea1efe0f7c1f3c6b1f88473ae7a9f539481b1234d6",
+    "Neo.DependencyInjection.Abstractions.dll": "9922c08904ca8b04ddb21b483994155c3e787d96c105b5e16a150fecd2dc8135",
+    "Neo.DependencyInjection.dll": "a417a2063da14a606802bfcc5c730727587b97dff091528ab267301077d44b01",
+    "Neo.Localization.Abstractions.dll": "3a135fbdc37fcdcc1c153511ad68c7f7fa92cf76f2bdfdcf5b1013916c57a472",
+    "Neo.Localization.dll": "c897b2aca576177ea68c6cc0fdc815f3f8f87f13ab43bc861b4192c286a60682",
+    "Neo.Logging.Abstractions.dll": "b8a7f31af6ee404b41b6795378daeff169381702b61e5dba619f1e5fcc3b75bc",
+    "Neo.Logging.dll": "8d6a981626f86dd7346bb8a2edb7cd97c7249c65e530e4e7c971488b85a15fdb",
     "Neo.Configuration.Abstractions.dll": "615237ff5d50a4ad5bc83046de3c2374c2024ee144426560cb34cf71673a98eb",
-    "Neo.Configuration.dll": "7d58d877d67b5388bd4f7c1025c8a0ce4ae8369fe7166275f049fbc298948536",
-    "Neo.Configuration.Json.dll": "581046325dd0c172cd3651de41468f48bca2274efdc81945446a610bd6e98686",
-    "System.Data.PostgreSql.dll": "d4816e89583e5ed3d79a4802fd214868f4c583f54930011b82c08da21e915f8b",
+    "Neo.Configuration.dll": "1e40c52105c5f6bb5c384e9ba1f4e588dea7aeb718143f6933669b1d5527d3c1",
+    "Neo.Configuration.Json.dll": "a92782b1cdf94bcc9866b934295d25fac1018844fd738f21aec15ccafed36f79",
+    "System.Data.PostgreSql.dll": "9c338d71cefd23d313baf30ef56d6420d6536110b4a6ea0fa8fd693f5283ef41",
     "System.runtime.neox": "0c72a8656e7158d6bb2f31c0b019d8747dd61a6c4127b278155e104de437769b"
   },
   "renderingEvidence": {
-    "normalized-sidecars.json": "810497e62e044ae6a1c650278bc7cc5657696681da09374d63b6450fb37d9bc4",
-    "restored-xml-comments.json": "64ca4d8188d696adacfeefd7608e47b92be0d0a98f187db84c7fd7382f02ade1"
+    "normalized-sidecars.json": "dbe8731d536d4e645b8929153850b0db47a0a492becb147774145c5e1abdd392",
+    "restored-xml-comments.json": "cbe48479d665b8cb63fc38e4f9da40ed4777047336dd6a9d9d580d52a5cf3353"
   },
   "scope": "Reviewed native API rendering; legacy coverage gaps remain explicitly marked by the website overlay."
 }

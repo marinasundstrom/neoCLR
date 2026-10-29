@@ -17,8 +17,8 @@ public union JsonConfigurationError {
     case DuplicateKey(key: string)
 }
 
-/// Reads strict UTF-8 JSON objects into colon-delimited configuration keys.
-/// Uses existing DOM bounds: 1024 bytes, 32 values, four container levels and 31 entries per container.
+/// Reads UTF-8 JSON objects into colon-delimited configuration keys.
+/// Accepts comments and trailing commas, with maximum depth 64 and a 1 MiB input limit.
 public class JsonConfigurationProvider : ConfigurationProvider {
     val Path: string
     val Optional: bool
@@ -38,7 +38,7 @@ public class JsonConfigurationProvider : ConfigurationProvider {
 
     /// Reads the file and atomically replaces data on success; failures leave prior data intact.
     func TryLoad() -> Result<unit, JsonConfigurationError> {
-        let text = match ReadAllText(Path, 1024) {
+        let text = match ReadAllText(Path, 1048576) {
             Ok(let value) => value
             Failure(FileReadError.NotFound) => {
                 if Optional {
@@ -55,7 +55,18 @@ public class JsonConfigurationProvider : ConfigurationProvider {
     /// Parses supplied JSON instead of reading the file; failed parsing preserves previous values.
     /// Later Load/TryLoad reads Path again. Numeric spelling is preserved; booleans use True/False.
     func LoadText(json: string) -> Result<unit, JsonConfigurationError> {
-        let document = match JsonSerializer.DeserializeNode(json) {
+        if json.GetUtf8ByteCount() > 1048576 {
+            return Failure(JsonConfigurationError.Json(JsonError.LimitExceeded("Configuration exceeds 1 MiB")))
+        }
+        var options = JsonDocumentOptions()
+        options.CommentHandling = JsonCommentHandling.Skip
+        options.AllowTrailingCommas = true
+        var utf8 = json.Utf8Bytes
+        // File text may start with a UTF-8 BOM, as with .NET's StreamReader.
+        if utf8.Length >= 3 && utf8[0] == 239 && utf8[1] == 187 && utf8[2] == 191 {
+            utf8 = utf8.Slice(3, utf8.Length - 3)
+        }
+        let document = match JsonSerializer.DeserializeNode(utf8, options) {
             Ok(let value) => value
             Failure(let error) => return Failure(JsonConfigurationError.Json(error))
         }

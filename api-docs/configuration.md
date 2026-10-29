@@ -48,7 +48,11 @@ Build configuration from appsettings.json, then read a colon-delimited key. The 
 Run from `samples/extensions`, containing this appsettings.json:
 
 ```json
-{ "Greeting": { "Name": "Ada" }, "Localization": { "Directory": "resources" } }
+{
+  // Configuration accepts comments and trailing commas, like Microsoft's provider.
+  "Greeting": { "Name": "Ada", },
+  "Localization": { "Directory": "resources", },
+}
 ```
 
 ```raven
@@ -86,8 +90,11 @@ The abstractions and base implementation do not reference System.Data.
 Objects use colon keys and arrays numeric segments. Strings decode JSON escapes;
 numbers retain their text, booleans become True/False, null stays null, empty
 objects yield null and empty arrays yield an empty string. The root must be an
-object. Existing JSON limits apply: **1024 UTF-8 bytes, 32 total values, four
-container levels, 31 entries per container**. No comments, trailing commas, BOM
-handling or file watching. Quota/syntax failures are errors, never truncation.
+object. The provider accepts line/block comments, trailing commas and an initial
+UTF-8 BOM, using the public [JSON document options](json.html#document-parsing-options).
+Input is limited to **1 MiB and 64 container levels**; there is no fixed value or
+per-container entry limit. File watching remains unsupported. Size/depth/syntax
+failures preserve prior values; they never truncate input. TryLoad reports
+File(TooLarge) for oversized files; LoadText reports Json(LimitExceeded).
 The sample's [appsettings.json](https://github.com/marinasundstrom/neoCLR/blob/main/samples/extensions/appsettings.json)
 sets Greeting:Name and Localization:Directory.

@@ -323,3 +323,77 @@ func JsonFormatting() -> Result<unit, TestFailure> {
     _ = Assert.True(large.ToJsonString() is Ok(_), "Compact fits the byte quota")?
     return Assert.True(large.ToJsonString(options) is Failure(JsonError.LimitExceeded(_)), "Indentation counts toward the byte quota")
 }
+
+
+[Test("JSON document options follow strict defaults and independent relaxed syntax")]
+func JsonReaderOptions() -> Result<unit, TestFailure> {
+    var options = JsonDocumentOptions()
+    _ = Assert.Equal(0, options.MaxDepth)?
+    _ = Assert.True(!options.AllowTrailingCommas && options.CommentHandling == JsonCommentHandling.Disallow, "Strict defaults")?
+    _ = Assert.True(JsonSerializer.DeserializeNode("/* c */{}", options) is Failure(_), "Comments disallowed")?
+    options.AllowTrailingCommas = true
+    _ = Assert.True(JsonSerializer.DeserializeNode("[1,]", options) is Ok(_), "Array trailing comma")?
+    _ = Assert.True(JsonSerializer.DeserializeNode("{\"a\":1,}", options) is Ok(_), "Object trailing comma")?
+    _ = Assert.True(JsonSerializer.DeserializeNode("/* c */{}", options) is Failure(_), "Comma setting does not enable comments")?
+    options.AllowTrailingCommas = false
+    options.CommentHandling = JsonCommentHandling.Skip
+    _ = Assert.True(JsonSerializer.DeserializeNode("/* head */[1/* value */,// line\r\n2]// tail", options) is Ok(_), "Comments at token boundaries")?
+    _ = Assert.True(JsonSerializer.DeserializeNode("[1,/*tail*/]", options) is Failure(_), "Comments do not enable trailing comma")?
+    options.AllowTrailingCommas = true
+    let source = "/*before*/{ /*name*/ \"url\"/*colon*/:/*value*/\"https://example/a/*literal*/\",\"array\":[1,//next\n2,/*end*/],}//after"
+    let Ok(node) = JsonSerializer.DeserializeNode(source.Utf8Bytes, options) else {
+        return Assert.True(false, "Combined options on borrowed UTF-8")
+    }
+    let document = (JsonObject)node
+    _ = Assert.Equal("https://example/a/*literal*/", ((JsonString)document["url"]).Value)?
+    for invalid in ["[,]", "{,}", "[1,,]", "{\"a\":,}", "[1/*unterminated", "{}/*unterminated", "[1/2]", "[tr/*x*/ue]", "[1/*x*/2]", "{}{}", "// only comment"] {
+        _ = Assert.True(JsonSerializer.DeserializeNode(invalid, options) is Failure(_), "Relaxed syntax still rejects malformed input")?
+    }
+    return Assert.True(JsonSerializer.DeserializeNode("/*empty*/{}//EOF", options) is Ok(_), "Line comment at EOF")
+}
+
+[Test("JSON depth defaults to 64 and validates document options")]
+func JsonReaderDepth() -> Result<unit, TestFailure> {
+    var document = "0"
+    for index in 0..64 { document = "[" + document + "]" }
+    _ = Assert.True(JsonSerializer.DeserializeNode(document) is Ok(_), "Depth 64 accepted")?
+    _ = Assert.True(JsonSerializer.DeserializeNode("[" + document + "]") is Failure(JsonError.LimitExceeded(_)), "Depth 65 rejected")?
+    var options = JsonDocumentOptions()
+    options.MaxDepth = 65
+    _ = Assert.True(JsonSerializer.DeserializeNode("[" + document + "]", options) is Ok(_), "Custom larger depth")?
+    options.MaxDepth = 1
+    _ = Assert.True(JsonSerializer.DeserializeNode("[0]", options) is Ok(_), "Single container")?
+    _ = Assert.True(JsonSerializer.DeserializeNode("[[]]", options) is Failure(JsonError.LimitExceeded(_)), "Empty nested container counts")?
+    options.MaxDepth = -1
+    _ = Assert.True(JsonSerializer.DeserializeNode("null", options) is Failure(JsonError.InvalidOptions(_)), "Negative depth")?
+    options.MaxDepth = 0
+    options.CommentHandling = JsonCommentHandling.Allow
+    _ = Assert.True(JsonSerializer.DeserializeNode("null", options) is Failure(JsonError.InvalidOptions(_)), "DOM cannot retain comment tokens")?
+    options.CommentHandling = (JsonCommentHandling)99
+    return Assert.True(JsonSerializer.DeserializeNode("null", options) is Failure(JsonError.InvalidOptions(_)), "Unknown comment policy")
+}
+
+[Test("JSON parsing supports large containers and long UTF-8 escaped strings")]
+func JsonReaderLarge() -> Result<unit, TestFailure> {
+    var fields = "{"
+    for index in 0..128 {
+        if index > 0 { fields += "," }
+        fields += "\"key" + index.ToString() + "\":[1,2,3]"
+    }
+    fields += "}"
+    let Ok(node) = JsonSerializer.DeserializeNode(fields) else {
+        return Assert.True(false, "More than 1024 bytes, 32 nodes and 31 fields")
+    }
+    _ = Assert.Equal(128, ((JsonObject)node).Count)?
+    var content = "é雪😀"
+    for index in 0..13 { content += content }
+    // More than 64 KiB; chunk boundaries fall inside multi-byte scalars.
+    let Ok(plain) = JsonSerializer.DeserializeNode("\"" + content + "\"") else {
+        return Assert.True(false, "Long unescaped string")
+    }
+    _ = Assert.Equal(content, ((JsonString)plain).Value)?
+    let Ok(escaped) = JsonSerializer.DeserializeNode("\"\\t" + content + "\\uD83D\\uDE00\"") else {
+        return Assert.True(false, "Long escaped string")
+    }
+    return Assert.Equal("\t" + content + "😀", ((JsonString)escaped).Value)
+}

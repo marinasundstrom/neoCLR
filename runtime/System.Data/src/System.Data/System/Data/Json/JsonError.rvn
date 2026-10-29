@@ -5,6 +5,8 @@ import System.IO.*
 import System.Runtime.Reflection.*
 
 public union JsonError {
+    /// Invalid document parsing options, reported before consuming input.
+    case InvalidOptions(message: string)
     case Syntax(message: string)
     case LimitExceeded(message: string)
     case TypeMismatch(expected: string)
@@ -20,6 +22,7 @@ public union JsonError {
 
     override func ToString() -> string {
         return match self {
+            InvalidOptions(let message) => message
             Syntax(let message) => message
             LimitExceeded(let message) => message
             TypeMismatch(let expected) => "Expected " + expected

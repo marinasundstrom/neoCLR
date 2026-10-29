@@ -8,7 +8,7 @@ Compiler-generated carriers, module functions and internal helpers are not count
 See the [review and findings](class-library-soundness-20261020.md#whole-library-contract-pass) for manual interpretation,
 inherited/runtime contracts, execution evidence, allocation concerns and remaining gaps.
 
-**341 declarations**: Borrowed view: 2; Contract: 82; Enum: 19; Intrinsic: 16; Owned view: 2; Record: 10; Reference: 121; Reference value: 8; Static: 18; Union: 38; Value: 25.
+**343 declarations**: Borrowed view: 2; Contract: 82; Enum: 20; Intrinsic: 16; Owned view: 2; Record: 10; Reference: 121; Reference value: 8; Static: 18; Union: 38; Value: 26.
 
 `Et` = typed Equals; `Eo` = Object Equals; `H` = parameterless GetHashCode;
 `T` = parameterless ToString; `Tf` = formatted ToString overload; `*` = authored override.
@@ -30,7 +30,7 @@ Reference subclasses may inherit value contracts (notably IPv4Address/IPv6Addres
 | [Neo.Configuration.DefaultConfigurationSection](../../extensions/Neo.Configuration/src/Neo.Configuration/Neo/Configuration/DefaultConfiguration.rvn#L121) | Reference | — |
 | [Neo.Configuration.Json.JsonConfigurationError](../../extensions/Neo.Configuration/src/Neo.Configuration.Json/Neo/Configuration/Json/JsonConfiguration.rvn#L13) | Union | — |
 | [Neo.Configuration.Json.JsonConfigurationProvider](../../extensions/Neo.Configuration/src/Neo.Configuration.Json/Neo/Configuration/Json/JsonConfiguration.rvn#L22) | Reference | — |
-| [Neo.Configuration.Json.JsonConfigurationSource](../../extensions/Neo.Configuration/src/Neo.Configuration.Json/Neo/Configuration/Json/JsonConfiguration.rvn#L118) | Reference | — |
+| [Neo.Configuration.Json.JsonConfigurationSource](../../extensions/Neo.Configuration/src/Neo.Configuration.Json/Neo/Configuration/Json/JsonConfiguration.rvn#L129) | Reference | — |
 | [Neo.Configuration.MemoryConfigurationProvider](../../extensions/Neo.Configuration/src/Neo.Configuration/Neo/Configuration/MemoryConfiguration.rvn#L8) | Reference | — |
 | [Neo.Configuration.MemoryConfigurationSource](../../extensions/Neo.Configuration/src/Neo.Configuration/Neo/Configuration/MemoryConfiguration.rvn#L62) | Reference | — |
 | [Neo.DependencyInjection.ActivationError](../../extensions/Neo.DependencyInjection/src/Neo.DependencyInjection.Abstractions/Neo/DependencyInjection/ActivationError.rvn#L4) | Enum | — |
@@ -121,15 +121,17 @@ Reference subclasses may inherit value contracts (notably IPv4Address/IPv6Addres
 | [System.ConsoleReadError](../../runtime/System.Runtime/src/System.Runtime/System/ConsoleReadError.rvn#L3) | Union | T* |
 | [System.ContextError<E: Error>](../../runtime/System.Runtime/src/System.Runtime/System/Error.rvn#L20) | Reference | — |
 | [System.ConvertibleInto<out T>](../../runtime/System.Runtime/src/System.Runtime/System/ConvertibleInto.rvn#L3) | Contract | — |
-| [System.Data.Json.JsonArray](../../runtime/System.Data/src/System.Data/System/Data/Json/JsonValue.rvn#L118) | Reference | — |
-| [System.Data.Json.JsonBoolean](../../runtime/System.Data/src/System.Data/System/Data/Json/JsonValue.rvn#L193) | Reference | — |
+| [System.Data.Json.JsonArray](../../runtime/System.Data/src/System.Data/System/Data/Json/JsonValue.rvn#L115) | Reference | — |
+| [System.Data.Json.JsonBoolean](../../runtime/System.Data/src/System.Data/System/Data/Json/JsonValue.rvn#L187) | Reference | — |
+| [System.Data.Json.JsonCommentHandling](../../runtime/System.Data/src/System.Data/System/Data/Json/JsonDocumentOptions.rvn#L4) | Enum | — |
+| [System.Data.Json.JsonDocumentOptions](../../runtime/System.Data/src/System.Data/System/Data/Json/JsonDocumentOptions.rvn#L15) | Value | — |
 | [System.Data.Json.JsonError](../../runtime/System.Data/src/System.Data/System/Data/Json/JsonError.rvn#L7) | Union | T* |
-| [System.Data.Json.JsonNull](../../runtime/System.Data/src/System.Data/System/Data/Json/JsonValue.rvn#L203) | Reference | — |
-| [System.Data.Json.JsonNumber](../../runtime/System.Data/src/System.Data/System/Data/Json/JsonValue.rvn#L169) | Reference | — |
+| [System.Data.Json.JsonNull](../../runtime/System.Data/src/System.Data/System/Data/Json/JsonValue.rvn#L197) | Reference | — |
+| [System.Data.Json.JsonNumber](../../runtime/System.Data/src/System.Data/System/Data/Json/JsonValue.rvn#L163) | Reference | — |
 | [System.Data.Json.JsonObject](../../runtime/System.Data/src/System.Data/System/Data/Json/JsonValue.rvn#L27) | Reference | — |
 | [System.Data.Json.JsonSerializer](../../runtime/System.Data/src/System.Data/System/Data/Json/JsonSerializer.rvn#L11) | Reference | — |
 | [System.Data.Json.JsonSerializerOptions](../../runtime/System.Data/src/System.Data/System/Data/Json/JsonSerializerOptions.rvn#L5) | Reference | — |
-| [System.Data.Json.JsonString](../../runtime/System.Data/src/System.Data/System/Data/Json/JsonValue.rvn#L159) | Reference | — |
+| [System.Data.Json.JsonString](../../runtime/System.Data/src/System.Data/System/Data/Json/JsonValue.rvn#L153) | Reference | — |
 | [System.Data.Json.JsonValue](../../runtime/System.Data/src/System.Data/System/Data/Json/JsonValue.rvn#L8) | Reference | — |
 | [System.Data.PostgreSql.PostgresDatabase](../../runtime/System.Data.PostgreSql/src/System.Data.PostgreSql/System/Data/PostgreSql/PostgresDatabase.rvn#L14) | Reference | — |
 | [System.Data.Sql.SqlConnection](../../runtime/System.Data/src/System.Data/System/Data/Sql/Sql.rvn#L57) | Contract | — |

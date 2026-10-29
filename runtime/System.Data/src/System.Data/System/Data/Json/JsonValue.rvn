@@ -23,7 +23,7 @@ public sealed class JsonValue {
 }
 
 /// <summary>A JSON object with ordinal field names and a read-only map view.</summary>
-/// <remarks>Field and Find provide safe lookup. The indexer faults when a field is absent. Keys and pair iteration are shallow snapshots in insertion order; JsonNull remains an explicit present value. Mutation uses duplicate-rejecting, quota-aware Add.</remarks>
+/// <remarks>Field and Find provide safe lookup. The indexer faults when a field is absent. Keys and pair iteration are shallow snapshots in insertion order; JsonNull remains an explicit present value. Mutation uses duplicate-rejecting Add.</remarks>
 public class JsonObject : JsonValue, Map<string, JsonValue> {
     private var names: ArrayList<string> = ArrayList<string>()
     private var values: ArrayList<JsonValue> = ArrayList<JsonValue>()
@@ -104,9 +104,6 @@ public class JsonObject : JsonValue, Map<string, JsonValue> {
                 return Failure(JsonError.DuplicateField(name))
             }
         }
-        if values.Count >= 31 {
-            return Failure(JsonError.LimitExceeded("Container exceeds 31 entries"))
-        }
         names.Add(name)
         values.Add(value)
         return Ok(())
@@ -114,7 +111,7 @@ public class JsonObject : JsonValue, Map<string, JsonValue> {
 }
 
 /// <summary>A JSON array with a read-only sequence view.</summary>
-/// <remarks>Indexing faults on invalid indices; Item returns a recoverable error. Iteration captures a shallow ordered snapshot; node contents remain shared. Mutation uses quota-aware Add.</remarks>
+/// <remarks>Indexing faults on invalid indices; Item returns a recoverable error. Iteration captures a shallow ordered snapshot; node contents remain shared. Mutation uses Add; storage follows the runtime allocation budget.</remarks>
 public class JsonArray : JsonValue, Sequence<JsonValue> {
     private var values: ArrayList<JsonValue> = ArrayList<JsonValue>()
 
@@ -148,9 +145,6 @@ public class JsonArray : JsonValue, Sequence<JsonValue> {
     }
 
     func Add(value: JsonValue) -> Result<unit, JsonError> {
-        if values.Count >= 31 {
-            return Failure(JsonError.LimitExceeded("Container exceeds 31 entries"))
-        }
         values.Add(value)
         return Ok(())
     }
