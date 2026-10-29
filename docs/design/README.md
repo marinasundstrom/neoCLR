@@ -15,6 +15,8 @@ See the [original proposals](../proposals/README.md) for the supplied source mat
 - [Familiar concepts, deliberate platform contracts](../api-policy.md)
 - [Assembler expressiveness](../assembler-design.md)
 - [Asynchronous API design questions](../async-api-design.md)
+- [Signals and reactive streams proposal](signals-and-reactive-streams.md): structural callbacks, signature-projected publishing, argument packs and subscription lifetimes without event metadata.
+- [Generic function method signatures](generic-function-methods.md): Raven/compiler investigation, function-type method metadata, argument representation and generic materialization.
 - [Compiler-generated async feasibility](../async-state-machine-assessment.md)
 - [Compatibility and innovation strategy](../compatibility-strategy.md)
 - [Date and time API direction](../date-time-design.md)

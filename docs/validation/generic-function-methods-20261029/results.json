@@ -1,0 +1,97 @@
+{
+  "driver": "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+  "driver_sha256": "8c13833e1caf035b9ef6f17b7136091359c123f576184822baa8f72bf92d8b15",
+  "note": "Existing local driver; not rebuilt or asserted to match source HEAD. Parsing probes, not feature implementation tests.",
+  "results": [
+    {
+      "name": "explicit",
+      "exit": 1,
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--library",
+        "-o",
+        "target/function-signature-investigation-20261029/explicit.dll",
+        "target/function-signature-investigation-20261029/explicit.rvn"
+      ],
+      "output": "/Users/robert/Projects/neoclr/target/function-signature-investigation-20261029/explicit.rvn(1,22): error RAV0365: The 'func' constraint requires the neoCLR target and cannot be combined with other constraints\n"
+    },
+    {
+      "name": "projected",
+      "exit": 1,
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--library",
+        "-o",
+        "target/function-signature-investigation-20261029/projected.dll",
+        "target/function-signature-investigation-20261029/projected.rvn"
+      ],
+      "output": "/Users/robert/Projects/neoclr/target/function-signature-investigation-20261029/projected.rvn(1,22): error RAV0365: The 'func' constraint requires the neoCLR target and cannot be combined with other constraints\n/Users/robert/Projects/neoclr/target/function-signature-investigation-20261029/projected.rvn(2,18): error RAV1003: ')' expected\n/Users/robert/Projects/neoclr/target/function-signature-investigation-20261029/projected.rvn(2,20): error RAV1003: ',' expected\n"
+    },
+    {
+      "name": "concrete",
+      "exit": 1,
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--library",
+        "-o",
+        "target/function-signature-investigation-20261029/concrete.dll",
+        "target/function-signature-investigation-20261029/concrete.rvn"
+      ],
+      "output": "/Users/robert/Projects/neoclr/target/function-signature-investigation-20261029/concrete.rvn(2,18): error RAV0131: Assignment target must be settable\n/Users/robert/Projects/neoclr/target/function-signature-investigation-20261029/concrete.rvn(2,27): error RAV1003: ')' expected\n/Users/robert/Projects/neoclr/target/function-signature-investigation-20261029/concrete.rvn(2,31): error RAV1003: ',' expected\n/Users/robert/Projects/neoclr/target/function-signature-investigation-20261029/concrete.rvn(2,40): error RAV1503: Cannot convert from 'int' to '()'\n"
+    },
+    {
+      "name": "explicit-concrete-analysis",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--no-emit",
+        "target/function-signature-investigation-20261029/explicit-concrete.rvn"
+      ],
+      "exit": 1,
+      "output": "<unknown>(1,1): error RAV1014: Entry point 'Main' not found\n\nBuild failed with 1 error(s)\n"
+    },
+    {
+      "name": "concrete-analysis",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--no-emit",
+        "target/function-signature-investigation-20261029/concrete.rvn"
+      ],
+      "exit": 1,
+      "output": "<unknown>(1,1): error RAV1014: Entry point 'Main' not found\n\ntarget/function-signature-investigation-20261029/concrete.rvn(2,18): error RAV0131: Assignment target must be settable\n\ntarget/function-signature-investigation-20261029/concrete.rvn(2,27): error RAV1003: ')' expected\n\ntarget/function-signature-investigation-20261029/concrete.rvn(2,31): error RAV1003: ',' expected\n\ntarget/function-signature-investigation-20261029/concrete.rvn(2,40): error RAV1503: Cannot convert from 'int' to '()'\n\nBuild failed with 5 error(s)\n"
+    },
+    {
+      "name": "explicit-concrete-classlib",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--output-type",
+        "classlib",
+        "--no-emit",
+        "target/function-signature-investigation-20261029/explicit-concrete.rvn"
+      ],
+      "exit": 0,
+      "output": "Build succeeded in 2,5s\n"
+    },
+    {
+      "name": "concrete-classlib",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--output-type",
+        "classlib",
+        "--no-emit",
+        "target/function-signature-investigation-20261029/concrete.rvn"
+      ],
+      "exit": 1,
+      "output": "target/function-signature-investigation-20261029/concrete.rvn(2,18): error RAV0131: Assignment target must be settable\n\ntarget/function-signature-investigation-20261029/concrete.rvn(2,27): error RAV1003: ')' expected\n\ntarget/function-signature-investigation-20261029/concrete.rvn(2,31): error RAV1003: ',' expected\n\ntarget/function-signature-investigation-20261029/concrete.rvn(2,40): error RAV1503: Cannot convert from 'int' to '()'\n\nBuild failed with 4 error(s)\n"
+    }
+  ]
+}

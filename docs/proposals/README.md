@@ -54,6 +54,11 @@ or introspection contracts.
 
 ## Metadata and structural types
 
+The later author-requested [signals and reactive streams design proposal](../design/signals-and-reactive-streams.md)
+(2026-10-29) explores signature-projected methods and argument representation,
+ordinary subscription APIs and an Rx-like layer without event metadata. It is a
+maintained discussion, not part of the original supplied texts or a shipped API.
+
 The [metadata proposal](metadata-format.md) now has a maintained
 [extended CLI metadata design](../design/extended-cli-metadata.md), including structural
 types and staged Raven integration. This is feature-branch exploration, not implemented

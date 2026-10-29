@@ -1,0 +1,4 @@
+/Users/robert/Projects/neoclr/target/function-signature-investigation-20261029/concrete.rvn(2,18): error RAV0131: Assignment target must be settable
+/Users/robert/Projects/neoclr/target/function-signature-investigation-20261029/concrete.rvn(2,27): error RAV1003: ')' expected
+/Users/robert/Projects/neoclr/target/function-signature-investigation-20261029/concrete.rvn(2,31): error RAV1003: ',' expected
+/Users/robert/Projects/neoclr/target/function-signature-investigation-20261029/concrete.rvn(2,40): error RAV1503: Cannot convert from 'int' to '()'

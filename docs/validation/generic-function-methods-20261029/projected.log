@@ -1,0 +1,3 @@
+/Users/robert/Projects/neoclr/target/function-signature-investigation-20261029/projected.rvn(1,22): error RAV0365: The 'func' constraint requires the neoCLR target and cannot be combined with other constraints
+/Users/robert/Projects/neoclr/target/function-signature-investigation-20261029/projected.rvn(2,18): error RAV1003: ')' expected
+/Users/robert/Projects/neoclr/target/function-signature-investigation-20261029/projected.rvn(2,20): error RAV1003: ',' expected

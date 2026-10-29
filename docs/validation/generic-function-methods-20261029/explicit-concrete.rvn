@@ -1,0 +1,3 @@
+public class Wrapper {
+    func Invoke(value: int) -> int => value
+}

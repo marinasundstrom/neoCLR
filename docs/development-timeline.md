@@ -1,5 +1,100 @@
 # Development conversation record
 
+## 2026-10-29 — Library-owned signals using structural functions
+
+- **Author:** Asked how to implement an event/signal system without an event
+  metadata member, using existing structural function types without requiring
+  nominal function types.
+- **Assistant proposal:** Use an ordinary `SignalSource<F> where F: func` to own
+  registrations and a separate subscription-only `Signal<F>` view exposed through
+  a property. Return an idempotent subscription handle for exact registration
+  removal. Keep publishing authority private; the public view must not be the
+  source merely hidden behind a castable interface.
+- **Invocation proposal:** The source accepts a typed visitor `(F) -> unit` and
+  dispatches it over a stable registration snapshot. The publisher knows F's
+  concrete signature and invokes each function there. This avoids boxed dynamic
+  invocation and does not assume `func` supplies an arbitrary parameter list.
+  A payload-oriented source could instead fix its callback shape to
+  `(TPayload) -> unit`; ergonomic arbitrary-signature `Emit(args...)` would need
+  additional compiler support or signature-specific wrappers.
+- **Comparison/tradeoffs:** [.NET events](https://learn.microsoft.com/dotnet/standard/events/)
+  use nominal multicast delegates and event accessors. The proposed ordinary types
+  preserve publisher/subscriber separation without event metadata, but require
+  explicit lifetime handles and dispatch syntax; event-specific reflection and
+  tooling discovery would need a separate convention. Recommend synchronous,
+  ordered snapshot delivery initially, with duplicates treated as separate
+  registrations and strong receiver/capture retention until removal. Cancellation
+  would not retract an already captured dispatch snapshot. Concurrent delivery,
+  recoverable errors and asynchronous aggregation require explicit policies;
+  existing terminal panic must not be described as catchable handler exceptions.
+- **Status:** Proposal only; no API, compiler or runtime implementation or new
+  validation is claimed. Reuses the integrated
+  [function-kind constraint evidence](validation/function-kind-constraint/README.md)
+  and distinguishes the existing
+  [provisional dynamic invocation facility](validation/dynamic-function-invocation/README.md)
+  from the recommended typed dispatch path. API names, policies and compiler
+  qualification remain open; this exchange does not reprioritize the roadmap.
+
+- **Author follow-up:** Observed that this would converge with an Rx-like framework.
+- **Assistant response/proposal:** Agree on shared subscription/lifetime machinery;
+  normalize arbitrary callback signatures into typed values at the reactive
+  boundary so operators can compose. Keep a signal as a hot notification source,
+  while an observable contract can also represent per-subscription producers.
+  [.NET IObservable/IObserver](https://learn.microsoft.com/dotnet/api/system.iobservable-1)
+  supplies the comparison for disposable subscriptions and next/error/completed
+  notifications. Structural callbacks can implement those notification contracts
+  without nominal function types. Typed stream errors would deliberately differ
+  from .NET's Exception channel and must remain distinct from terminal panic.
+  Completion, serialization/reentrancy, scheduling, cancellation propagation and
+  buffering policies remain design work, not an approved Rx implementation.
+
+- **Author request and clarification:** Requested a concrete design proposal for
+  signals and an Rx-like layer, including subscriptions, completion and errors.
+  During drafting, clarified the central need with `func Signal: T`: a method
+  whose parameters/result come from the structural function type. Suggested
+  helpers to extract parameters from a materialized method context, then refined
+  this to “Or at least represent them”.
+- **Assistant action/proposal:** Wrote the
+  [design proposal](design/signals-and-reactive-streams.md), distinguishing
+  signature projection, current argument values and reflection type descriptors.
+  Proposed an explicit compiler-bound argument pack rather than implicit stack
+  discovery, with boxed forwarding through the existing FunctionReflection.Invoke
+  as an initial constrained alternative. Recorded unit-result admission, bridge
+  marshalling limits, rooting/lifetime and generic import requirements. Retained
+  visitor dispatch as an alternative rather than claiming it satisfies the
+  projected-method requirement. Included reactive API sketches and concrete
+  subscription, cancellation, terminal-state and error policies.
+- **Outcome/open:** Documentation only; syntax and examples are explicitly
+  uncompiled proposal notation. No event metadata, compiler/runtime implementation,
+  public API or milestone reprioritization was introduced.
+
+- **Author clarification:** Selected `func Invoke: T with args` as primarily
+  interop syntax and confirmed `args` is `object?[]`. Proposed
+  `FunctionReflectionHelpers.Invoke<T>(handler, args)`, explaining that T should
+  establish the helper result's static type. Explicitly separated Task usage
+  from this capability.
+- **Assistant analysis/action:** Updated both compiler and runtime design notes
+  to distinguish whole-signature substitution from a result-type projection in
+  the helper's fixed parameter signature. Recorded that the multicast loop still
+  needs a return policy for value-returning T, and that direct typed results need
+  an explicit reflection-error policy. Replaced the initial scoped-pack proposal
+  with the selected owned nullable object array. These are contract refinements;
+  no working Raven helper or async semantics are claimed.
+
+- **Author direction:** Requested general return-type projection, continued neoCLR
+  and Raven implementation, nullable object-array arguments and a typed invocation
+  helper, keeping Task separate. Asked how return checking works for open func
+  constraints, then reiterated taking the easy interop path with future improvements.
+  Clarified the goal as library Event/Signal plus source types, exposed through
+  properties, with possible overloaded `+=` and `-=` instead of event metadata.
+- **Assistant response/action:** Explained checking against an opaque projected
+  result and ordinary all-path return rules, without adding return-shape constraint
+  machinery. Began native/SDK projection representation and Raven binding and
+  substitution. SDK projection roundtrip passes and runtime/codegen compile;
+  end-to-end Raven/helper/signal validation remains pending. Recorded the library
+  notification consumer as the concrete acceptance target, not an Rx or Task scope
+  expansion.
+
 ## 2026-10-29 — Contain legacy runtime sources
 
 - **Author:** Requested cleanup of runtime folders left from before Raven became
@@ -23665,6 +23760,7 @@ and the testing guides now record the author clarification. See the
 - **Outcome:** Planning documentation only; no panic cleanup behavior is implemented.
   Cross-backend representation and end-to-end qualification remain implementation
   gates. Corrected the disposal overview's outdated blanket claim about scope cleanup.
+
 
 ## 2026-10-29 — Standalone physical file watching and storage direction
 
