@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-29
 
+- Document the synchronous panic cleanup contract and implementation plan, comparing existing failure propagation and lifetime metadata with alternatives before adding opcodes. Withdraw experimental panic-cleanup codegen guards and record the author’s exception-free runtime constraint. Panic unwinding remains planned; no new cleanup instructions or runtime behavior are introduced. Clarify existing normal scope cleanup in the disposal overview.
+
 - Contain historical System/neoCLR bootstrap sources and Raven CLI bridge fixtures under runtime/legacy; keep active compiler-service templates under runtime/compiler-services. Update build, test and packaging consumers without changing expanded bootstrap behavior. Old source paths have no compatibility aliases; historical receipts retain their original paths and hashes.
 
 - Establish descriptive backtick identifiers as the convention when stating test behavior; traditional names remain valid when clear. Move 464 runtime/extension test descriptions out of Test attributes: rename 461 methods and retain three clear traditional names. Update async callers and qualified-name/sort expectations. Test bodies and description-feature fixtures are unchanged; name-based IDs, selectors and discovery order change.

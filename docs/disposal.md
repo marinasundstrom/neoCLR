@@ -41,10 +41,12 @@ declared lifecycle metadata; implementing an interface is not itself such metada
 
 These are behavioral interface contracts. The VM checks declared conformance,
 receiver modes and exact result signatures, but does not prove idempotence or a
-resource-specific state machine. The methods are ordinary guest IL. No automatic
-scope cleanup, using syntax, destructor dispatch or special Dispose/Close opcode is
-introduced. Explicit calls are required today, including on ordinary Result errors.
-Terminal Faults retain their existing teardown behavior.
+resource-specific state machine. The methods are ordinary guest IL. The original
+interface slice introduced no automatic cleanup or special Dispose/Close opcode.
+Raven now supports [normal scoped iterator/use cleanup](raven-conventions.md#scoped-iterator-cleanup-2026-10-10).
+Terminal Faults still provide no guest-cleanup guarantee. The
+[synchronous panic cleanup contract and plan](synchronous-panic-cleanup.md) describe
+future behavior, separate from GC finalizers and destructor dispatch.
 
 ## Sample and validation
 

@@ -25,11 +25,12 @@ reports the fault and exits unsuccessfully; embedding hosts receive the existing
 catch the fault or choose its code. No guest Dispose/finally/destructor execution
 is guaranteed. No new thread or task failure boundary is introduced.
 
-The author identifies Panic with Rust's panic facility. Cleanup-aware stack
-unwinding and revised thread/task termination semantics are a separate, deferred
-behavior decision, not capabilities implemented by this rename. Unlike .NET
-`throw`, this API does not introduce catchable exception objects. Use `Result`
-for errors callers can handle and `Optional` for ordinary absence.
+The author has adopted synchronous panic unwinding and scope cleanup as the next
+bounded behavior slice. The [contract and implementation plan](synchronous-panic-cleanup.md)
+are documented but **not implemented**. They exclude exception handling and compare
+representations before adding opcodes. Thread/task supervision and Environment
+termination APIs remain deferred. Use Result for errors callers can handle and
+Optional for ordinary absence.
 
 Raven's explicit RuntimeFailureContract now selects the public `Panic` namespace
 function. The temporary CLI bridge recognizes the exact namespace marker, core

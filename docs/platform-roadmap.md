@@ -1,5 +1,7 @@
 # neoCLR platform roadmap
 
+**Author-directed panic design (2026-10-29):** The [synchronous cleanup contract and plan](synchronous-panic-cleanup.md) are documented; implementation remains open. Evaluate existing status propagation and lifetime metadata before new opcodes, without introducing exception handling. Task supervision, Environment termination and GC finalization remain deferred. This bounded direction does not reprioritize the broader milestones.
+
 **Author-directed housekeeping (2026-10-29):** Contain historical bootstrap and
 CLI bridge files under `runtime/legacy`, with active compiler-service templates
 separate. [Source ownership](../runtime/README.md) identifies remaining consumers;

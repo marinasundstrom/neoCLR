@@ -23569,6 +23569,7 @@ and [focused validation](validation/configuration-json-reader-20261029/README.md
 - **Outcome:** Raven rename committed as `b4c5790e1`; focused compiler/runtime
   checks and separate native consumers pass. See [validation](validation/panic-rename-20261029/README.md).
 
+
 ### 2026-10-29 — Behavior descriptions belong in test identifiers
 
 The author asked to move descriptions from Test attributes into backtick test
@@ -23587,3 +23588,80 @@ names and ordinal ordering expectations. This changes IDs and selectors without
 changing assertion bodies or framework semantics. AGENTS.md, Raven conventions
 and the testing guides now record the author clarification. See the
 [migration map and focused qualification](validation/descriptive-test-names-20261029/README.md).
+
+## 2026-10-29 — Panic unwinding and application lifetime discussion
+
+- **Author:** Asked to establish panic/unwinding behavior after the naming-only
+  change; noted Rust's configurable abort strategy but questioned adopting it
+  without a concrete need. Suggested considering .NET-like Environment methods.
+  Clarified that the design must suit a modern runtime and application framework.
+- **Assistant recommendation (not yet accepted or implemented):** Give Panic one
+  cleanup-aware unwinding contract. Treat the logical task/operation as the async
+  failure boundary, preserving the original diagnostic and propagating panic on
+  await; do not kill reusable worker threads or convert panic into cancellation or
+  an ordinary Result.Failure. A main/root-operation panic ends the application.
+  Dedicated-thread panic ends that thread and is observable through its completion.
+  Cleanup does not roll back shared state; containment requires an explicit owner
+  and isolation policy, and detached work must not silently lose panics.
+- **Assistant recommendation:** Separate normal return/cooperative application
+  shutdown, explicit Environment.Exit(code), and emergency
+  Environment.FailFast(message). The latter two proposed APIs do not promise
+  managed scope cleanup. Defer a global abort/unwind switch until a concrete
+  target or measured size/performance requirement justifies its semantic and ABI
+  costs. Define embedding/process boundaries explicitly; genuine runtime
+  corruption cannot promise that an embedding process can safely continue.
+- **Open:** Exact public fault observation/supervision APIs, asynchronous cleanup
+  during panic, double-panic escalation, fatal-runtime-fault classification and
+  hosted termination policy. These are design recommendations, not new shipped
+  capabilities or authorization to implement the whole design.
+- **Evidence:** Current Environment exposes discovery rather than termination;
+  TaskOutcome currently has Completed/Cancelled only, and worker completion
+  directly joins into a Promise. Existing scope cleanup does not establish panic
+  unwinding. Primary comparisons reviewed on 2026-10-29:
+  [Rust panic strategies](https://doc.rust-lang.org/reference/panic.html),
+  [Rust catch_unwind](https://doc.rust-lang.org/std/panic/fn.catch_unwind.html),
+  [Rust thread completion](https://doc.rust-lang.org/std/thread/fn.spawn.html),
+  [.NET task faults](https://learn.microsoft.com/en-us/dotnet/standard/parallel-programming/exception-handling-task-parallel-library),
+  [Environment.Exit](https://learn.microsoft.com/en-us/dotnet/api/system.environment.exit),
+  [Environment.FailFast](https://learn.microsoft.com/en-us/dotnet/api/system.environment.failfast).
+
+### 2026-10-29 — Panic scope and runtime architecture clarification
+
+- **Author:** Accepted documenting the panic contract and implementation plan,
+  then starting with synchronous unwinding and scope cleanup. Deferred task
+  supervision and Environment termination APIs. Asked how destructors, GC
+  finalizers, Disposable, Closable and value types relate to that work, then
+  explicitly kept implementation within the agreed slice.
+- **Assistant:** Proposed separating deterministic cleanup from GC finalization;
+  these discussions did not authorize implementing finalizers or destructors.
+  Started an interpreter prototype with cleanup.push/pop/end instructions before
+  establishing the cross-backend representation and alternatives.
+- **Author correction:** Cautioned against new opcodes when other approaches
+  exist, rejected a workaround implementing half of exception handling, and
+  stated: “neoCLR shouldn't be based around exceptions at all.”
+- **Action:** Withdrew the opcode/interpreter prototype and its tests, including
+  prototype codegen guards captured by concurrent repository work. Existing
+  Panic behavior remains unchanged. No replacement representation is selected.
+- **Design constraint:** Panic is terminal failure with deterministic scope
+  cleanup, not a recoverable exception mechanism. Do not introduce catch/filter/
+  throw machinery or an exception-oriented foundation to implement it. Evaluate
+  compiler/runtime cleanup support across interpreter and native execution before
+  changing the instruction set. Task supervision, termination APIs and GC
+  finalization remain separate later work.
+
+### 2026-10-29 — Synchronous panic contract and alternatives
+
+- **Author:** Requested proceeding with the contract and implementation plan,
+  focused on synchronous cleanup without exception handling, evaluating alternatives
+  before adding opcodes.
+- **Action:** Documented [the contract and plan](synchronous-panic-cleanup.md),
+  including successful acquisition, ordering, roots, diagnostics, secondary failure,
+  current synchronous boundaries and deferred work. Inspected Raven normal cleanup
+  lowering and neoCLR interpreter/native fault paths.
+- **Assistant recommendation:** Qualify compiler-owned lifetime descriptions with
+  existing native status propagation first. Compared source-only rewriting, runtime
+  registration, new opcodes and general exception machinery; no serialized format
+  or new opcode is selected.
+- **Outcome:** Planning documentation only; no panic cleanup behavior is implemented.
+  Cross-backend representation and end-to-end qualification remain implementation
+  gates. Corrected the disposal overview's outdated blanket claim about scope cleanup.
