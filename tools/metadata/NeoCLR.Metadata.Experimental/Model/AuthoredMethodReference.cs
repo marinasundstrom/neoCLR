@@ -90,7 +90,7 @@ public sealed partial class AssemblyBuilder
         if (string.IsNullOrEmpty(name) || name.Length > 1024 || name == ".cctor" || name.Any(char.IsControl) ||
             constructor && (isStatic || signature.ReturnType != PrimitiveType.Void || signature.GenericParameterNames.Count != 0))
             throw new ArgumentException("unsupported method or constructor contract", nameof(name));
-        if (!Supported(signature.ReturnType, true) || signature.ParameterTypes.Any(t => !Supported(t.ByReferenceElement ?? t, false)) || constructor && signature.ParameterTypes.Any(t => t.ByReferenceElement is not null))
+        if (!signature.IsDependent && (!Supported(signature.ReturnType, true) || signature.ParameterTypes.Any(t => !Supported(t.ByReferenceElement ?? t, false)) || constructor && signature.ParameterTypes.Any(t => t.ByReferenceElement is not null)))
             throw new InvalidDataException($"unsupported authored method signature: {declaringType}.{name}({string.Join(", ", signature.ParameterTypes)}) -> {signature.ReturnType}");
         signature.ValidateOwner(this, declaringType.GenericArity, allowSelf: isInterface);
         if (authoredCallableReferences.Any(m => Equals(m.DeclaringReference, declaringType) && m.Target.DeclaringType?.NativePrimitive != nativePrimitive))
@@ -99,7 +99,7 @@ public sealed partial class AssemblyBuilder
         {
             if (!Equals(existing.DeclaringReference, declaringType) || existing.Name != name ||
                 existing.Signature.GenericParameterNames.Count != signature.GenericParameterNames.Count ||
-                !existing.Signature.ParameterTypes.SequenceEqual(signature.ParameterTypes)) continue;
+                (existing.Signature.IsDependent || signature.IsDependent ? existing.Signature.FunctionType != signature.FunctionType : !existing.Signature.ParameterTypes.SequenceEqual(signature.ParameterTypes))) continue;
             if (!existing.Target.Definition.TypeConstraints.SequenceEqual(bounds) || existing.Target.Visibility != visibility || existing.Target.NativeImportObjectSlot != isObjectSlot || existing.Target.DeclaringType?.NativePrimitive != nativePrimitive || existing.Target.NativeValueOverride != isOverride || existing.Target.IsAbstract != (isAbstract || isInterface) || (existing.Target.IsVirtual != (isVirtual || isInterface)) || existing.IsStatic != isStatic || !existing.Signature.Matches(signature))
                 throw new InvalidDataException("conflicting method contract");
             return existing;
@@ -137,6 +137,7 @@ public sealed partial class AssemblyBuilder
         bool Supported(SignatureType type, bool result) => type.PointerElement is not null ? true :
             type.IsSelf ? isInterface :
             type.Composition is { Kind: ReferenceCompositionKind.Union } union ? union.Constituents.All(t => Supported(t, false)) :
+            type.FunctionReturnOperand is { } operand ? Supported(operand, false) :
             type.Tuple is { } tuple ? tuple.ElementTypes.All(t => Supported(t, false)) :
             type.FunctionSignature is { } function ? Supported(function.ReturnType, true) && function.ParameterTypes.All(p => Supported(p, false)) :
             type.Primitive is { } primitive ? primitive != PrimitiveType.Void || result :

@@ -10,11 +10,11 @@ public sealed class ConstructedMethodReference
         MethodArguments = Array.AsReadOnly(methodArguments);
         SignatureType Substitute(SignatureType type) => type.PointerElement is { } pointer ? SignatureType.PointerTo(Substitute(pointer)) : type.Composition is { } composition
             ? SignatureType.FromComposition(composition.Kind, composition.Constituents.Select(Substitute))
-            : type.FunctionSignature is { } function ? function.Substitute(Substitute) : type.ByReferenceElement is { } target ? SignatureType.ByReference(Substitute(target)) : type.ImportedType is { } imported ? imported.Substitute(Substitute) : type.TypeParameterIndex is { } owner ? ownerArguments[owner]
+            : type.FunctionReturnOperand is { } operand ? SignatureType.FunctionReturn(Substitute(operand)) : type.FunctionSignature is { } function ? function.Substitute(Substitute) : type.ByReferenceElement is { } target ? SignatureType.ByReference(Substitute(target)) : type.ImportedType is { } imported ? imported.Substitute(Substitute) : type.TypeParameterIndex is { } owner ? ownerArguments[owner]
             : type.MethodParameterIndex is { } method ? methodArguments[method]
             : type.GenericInstance is { } instance ? instance.Definition.MakeGenericInstance(instance.TypeArguments.Select(Substitute).ToArray())
             : type.ArrayElement is { } element ? SignatureType.ArrayOf(Substitute(element)) : type;
-        Signature = new(Substitute(definition.Signature.ReturnType), definition.Signature.ParameterTypes.Select(Substitute), outParameters: definition.Signature.OutParameters);
+        Signature = definition.Signature.Substitute(Substitute);
     }
     /// <summary>Gets the owned open definition.</summary>
     public MethodBuilder Definition { get; }

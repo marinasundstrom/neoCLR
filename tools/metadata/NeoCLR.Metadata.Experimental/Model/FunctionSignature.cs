@@ -7,23 +7,29 @@ public sealed class FunctionSignature : IEquatable<FunctionSignature>
     internal MethodSignature Signature { get; }
     /// <summary>Gets the ordered parameter types; names do not participate in identity.</summary>
     public IReadOnlyList<SignatureType> ParameterTypes => Signature.ParameterTypes;
+    /// <summary>Gets the indices of output parameters.</summary>
+    public IReadOnlyList<int> OutParameters => Signature.OutParameters;
     /// <summary>Gets the result type, or Void for an explicit no-result function.</summary>
     public SignatureType ReturnType => Signature.ReturnType;
     /// <summary>Gets whether invocation leaves no result on the evaluation stack.</summary>
-    public bool NoResult => ReturnType.Primitive == PrimitiveType.Void;
+    public bool NoResult => Signature.NoResult;
     /// <summary>Compares exact ordered parameter and result shapes.</summary>
-    public bool Equals(FunctionSignature? other) => other is not null && ReturnType == other.ReturnType && ParameterTypes.SequenceEqual(other.ParameterTypes);
+    public bool Equals(FunctionSignature? other) => other is not null && NoResult == other.NoResult && ReturnType == other.ReturnType && ParameterTypes.SequenceEqual(other.ParameterTypes) && OutParameters.SequenceEqual(other.OutParameters);
     /// <summary>Compares structural shapes.</summary>
     public override bool Equals(object? obj) => obj is FunctionSignature other && Equals(other);
     /// <summary>Gets a hash consistent with structural equality.</summary>
-    public override int GetHashCode() { var hash = new HashCode(); hash.Add(ReturnType); foreach (var type in ParameterTypes) hash.Add(type); return hash.ToHashCode(); }
-    internal SignatureType Substitute(Func<SignatureType, SignatureType> map) => SignatureType.Function(new MethodSignature(map(ReturnType), ParameterTypes.Select(map)));
+    public override int GetHashCode() { var hash = new HashCode(); hash.Add(ReturnType); hash.Add(NoResult); foreach (var type in ParameterTypes) hash.Add(type); foreach (var index in OutParameters) hash.Add(index); return hash.ToHashCode(); }
+    internal SignatureType Substitute(Func<SignatureType, SignatureType> map) => SignatureType.MethodFunction(new MethodSignature(map(ReturnType), ParameterTypes.Select(map), outParameters: OutParameters, noResult: NoResult));
     /// <summary>Returns a diagnostic shape, not an encoded identity.</summary>
     public override string ToString() => "(" + string.Join(",", ParameterTypes) + ") -> " + ReturnType;
 }
 
 public sealed partial record SignatureType
 {
+    // Metadata identity is independent of the narrower executable/CLI callback profile.
+    internal static SignatureType MethodFunction(MethodSignature signature)
+        => new(null, null, functionSignature: new FunctionSignature(signature));
+
     /// <summary>Gets the structural callable shape, or null for another type category.</summary>
     public FunctionSignature? FunctionSignature { get; }
     /// <summary>Creates an exact structural Function shape; CLI output uses Func/Action transport.</summary>
@@ -34,7 +40,7 @@ public sealed partial record SignatureType
     public static SignatureType Function(MethodSignature signature)
     {
         ArgumentNullException.ThrowIfNull(signature);
-        if (signature.GenericParameterNames.Count != 0 || signature.ParameterTypes.Count > 16 ||
+        if (signature.IsDependent || signature.GenericParameterNames.Count != 0 || signature.ParameterTypes.Count > 16 ||
             signature.ParameterTypes.Any(t => t.ByReferenceElement is not null) ||
             signature.ParameterTypes.Append(signature.ReturnType).Any(t => t.PointerElement is not null || t.NestingDepth >= 16)) throw new ArgumentException("unsupported function shape", nameof(signature));
         return new(null, null, functionSignature: new FunctionSignature(signature));

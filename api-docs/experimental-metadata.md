@@ -10613,3 +10613,31 @@ GenericParam rows; native output uses optional `origin.generic_parameter_tokens`
 Absent tokens preserve legacy compatibility. Invalid arity, duplicate identities,
 zero tokens and other token tables reject. CLI projection preserves owner/ordinal.
 The focused metadata test group is `--generic-attributes`.
+
+## Function-dependent signatures (development, 2026-10-30)
+
+`MethodSignature.FunctionType: SignatureType` is the authoritative signature view.
+`FromFunctionType(type, genericParameterNames)` accepts a structural function or a
+scoped generic parameter; the latter must have the function constraint on its
+owner. `IsDependent` identifies an unresolved whole signature. Parameter/result
+queries on that shape throw `InvalidOperationException` until substitution resolves it.
+`InteropFunction(functionType, objectType, genericParameterNames)` declares a boxed
+array body ABI; `InteropObjectType` exposes that transport marker. It is not the
+public method signature. `NoResult` distinguishes no stack result from inhabited unit.
+
+`SignatureType.FunctionReturn(functionType)` projects a known result or retains an
+open type/method parameter operand in `FunctionReturnOperand`. Other operands are
+rejected with `ArgumentException`; scoped function constraints are required.
+Substitution traverses projections, including ordinary generic method results.
+
+`Introspection.MethodInfo.FunctionType: TypeInfo` returns a `FunctionTypeInfo` or a
+function-constrained parameter view. Closed methods expose ordinary parameters and
+results. `FunctionTypeInfo.ParameterModes` preserves value/ref/out signature modes.
+`FunctionReturnTypeInfo.FunctionType` identifies the operand of an unresolved result
+projection; resolved projections expose the ordinary result TypeInfo.
+
+Native format 6 stores `function_type`, optional `boxed_arguments`, and FunctionReturn
+type expressions. Format 5 remains readable. Positional parameter metadata cannot
+contradict a whole-signature reference. CLI executable emission and neoIL text export
+of these new forms are not supported; use the native metadata writer. These host
+SDK APIs are documented here rather than included in the guest RavenDoc selection.

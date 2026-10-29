@@ -258,8 +258,22 @@ public sealed partial class MetadataLoadContext
         lock (gate) return Project(signature, arguments, methods, owner);
     }
 
+    private readonly Dictionary<TypeInfo, FunctionReturnTypeInfo> functionReturns = new();
+
     private TypeInfo Project(SignatureType signature, IReadOnlyList<TypeInfo> arguments, IReadOnlyList<TypeInfo> methods, TypeInfo? selfOwner = null)
     {
+        if (signature.FunctionReturnOperand is { } operand)
+        {
+            var functionType = Project(operand, arguments, methods, selfOwner);
+            if (functionType is FunctionTypeInfo shape) return shape.ReturnType;
+            if (functionType is not GenericParameterTypeInfo { SpecialConstraints: TypeParameterConstraints.FunctionType } &&
+                functionType is not MethodGenericParameterTypeInfo { SpecialConstraints: TypeParameterConstraints.FunctionType } &&
+                functionType is not FunctionReturnTypeInfo)
+                throw new InvalidDataException("return-type projection requires a function-constrained operand");
+            if (!functionReturns.TryGetValue(functionType, out var view))
+                functionReturns.Add(functionType, view = new FunctionReturnTypeInfo(this, functionType));
+            return view;
+        }
         if (signature.Tuple is { } tuple)
         {
             var elements = tuple.ElementTypes.Select(t => Project(t, arguments, methods, selfOwner)).ToArray();
@@ -279,10 +293,11 @@ public sealed partial class MetadataLoadContext
         if (signature.FunctionSignature is { } function)
         {
             var result = Project(function.ReturnType, arguments, methods, selfOwner);
-            var parameters = function.ParameterTypes.Select(t => Project(t, arguments, methods, selfOwner)).ToArray();
+            var parameters = function.ParameterTypes.Select(t => Project(t.ByReferenceElement ?? t, arguments, methods, selfOwner)).ToArray();
             if (parameters.Append(result).Any(t => t.Depth >= 16)) throw new InvalidDataException("metadata type nesting exceeds limit");
-            var key = new FunctionKey(result, parameters, function.NoResult);
-            if (!functions.TryGetValue(key, out var view)) functions.Add(key, view = new FunctionTypeInfo(this, result, parameters, function.NoResult));
+            var modes = function.ParameterTypes.Select((t, i) => t.ByReferenceElement is null ? ParameterPassingMode.Value : function.OutParameters.Contains(i) ? ParameterPassingMode.Out : ParameterPassingMode.Ref).ToArray();
+            var key = new FunctionKey(result, parameters, function.NoResult, modes);
+            if (!functions.TryGetValue(key, out var view)) functions.Add(key, view = new FunctionTypeInfo(this, result, parameters, function.NoResult, modes));
             return view;
         }
         if (signature.IsSelf)
@@ -354,10 +369,10 @@ public sealed partial class MetadataLoadContext
         }
     }
 
-    private sealed record FunctionKey(TypeInfo Result, TypeInfo[] Parameters, bool NoResult)
+    private sealed record FunctionKey(TypeInfo Result, TypeInfo[] Parameters, bool NoResult, ParameterPassingMode[] Modes)
     {
-        public bool Equals(FunctionKey? other) => other is not null && ReferenceEquals(Result, other.Result) && NoResult == other.NoResult && Parameters.SequenceEqual(other.Parameters);
-        public override int GetHashCode() { var hash = new HashCode(); hash.Add(Result); hash.Add(NoResult); foreach (var p in Parameters) hash.Add(p); return hash.ToHashCode(); }
+        public bool Equals(FunctionKey? other) => other is not null && ReferenceEquals(Result, other.Result) && NoResult == other.NoResult && Parameters.SequenceEqual(other.Parameters) && Modes.SequenceEqual(other.Modes);
+        public override int GetHashCode() { var hash = new HashCode(); hash.Add(Result); hash.Add(NoResult); foreach (var p in Parameters) hash.Add(p); foreach (var mode in Modes) hash.Add(mode); return hash.ToHashCode(); }
     }
 
     private sealed class ConstructionKey(NominalTypeInfo definition, TypeInfo[] arguments) : IEquatable<ConstructionKey>
@@ -368,4 +383,17 @@ public sealed partial class MetadataLoadContext
         public override bool Equals(object? obj) => obj is ConstructionKey other && Equals(other);
         public override int GetHashCode() { var hash = new HashCode(); hash.Add(Definition); foreach (var argument in Arguments) hash.Add(argument); return hash.ToHashCode(); }
     }
+}
+
+/// <summary>An unresolved result-type projection in an open metadata signature.</summary>
+public sealed class FunctionReturnTypeInfo : TypeInfo
+{
+    internal FunctionReturnTypeInfo(MetadataLoadContext context, TypeInfo operand) : base(context) { FunctionType = operand; }
+    /// <summary>Gets the function type expression whose result is projected.</summary>
+    public TypeInfo FunctionType { get; }
+    internal override int Depth => 1 + FunctionType.Depth;
+    /// <inheritdoc/>
+    public override string DisplayName => "ReturnType<" + FunctionType.DisplayName + ">";
+    /// <inheritdoc/>
+    public override bool IsNominalType => false;
 }

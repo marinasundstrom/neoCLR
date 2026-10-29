@@ -92,7 +92,7 @@ public sealed partial class NativeAssemblyDefinition
             var root = document.RootElement;
             CheckDuplicates(root);
             Shape(root, "format", "name", "revision", "references", "entry", "assemblies", "types", "functions");
-            Require(root.GetProperty("format").GetInt32() == 5, "unsupported native format");
+            Require(root.GetProperty("format").GetInt32() is 5 or 6, "unsupported native format");
             var manifests = Array(root, "assemblies", 1); Require(manifests.Length == 1, "one assembly manifest required");
             var manifest = manifests[0];
             var manifestFields = new List<string> { "name", "full_name", "modules", "references" };
@@ -625,6 +625,11 @@ public sealed partial class NativeAssemblyDefinition
                         return leaf;
                     }
                 }
+                if (element.TryGetProperty("FunctionReturn", out var operand))
+                {
+                    Shape(element, "FunctionReturn");
+                    return SignatureType.FunctionReturn(ReadType(operand, false, allowSelf: allowSelf, allowComposition: allowComposition));
+                }
                 if (element.TryGetProperty("Function", out var function))
                 {
                     Shape(element, "Function"); Shape(function, "parameters", "returns", "no_result");
@@ -794,7 +799,7 @@ public sealed partial class NativeAssemblyDefinition
                     signatureOwners[i].Definition.Fields.Add(new FieldDefinition(field.Name, field.Attributes, LiteralConstant.Type(field.Value), field.Value));
             signatureGraph.ValidateValueLayouts();
             typeArity = 0;
-            string TypeKey(SignatureType type) => type.PointerElement is { } pointer ? "pointer:" + TypeKey(pointer) : type.Tuple is { } tuple ? "tuple:" + JsonSerializer.Serialize(tuple.ElementTypes.Select(TypeKey)) : type.Composition is { } composition ? composition.Kind + JsonSerializer.Serialize(composition.Constituents.Select(TypeKey).Order(StringComparer.Ordinal)) : type.IsSelf ? "self" : type.FunctionSignature is { } function ? "function:" + TypeKey(function.ReturnType) + "(" + string.Join(",", function.ParameterTypes.Select(TypeKey)) + ")" : type.ByReferenceElement is { } target ? "byref:" + TypeKey(target) : type.ImportedType is { } imported ? "external:" + JsonSerializer.Serialize(new { imported.AssemblyIdentity, imported.Namespace, imported.Name, Arguments = imported.TypeArguments.Select(TypeKey).ToArray() }) : type.GenericInstance is { } instance ? "constructed:" + System.Array.IndexOf(signatureOwners, instance.Definition) + "<" + string.Join(",", instance.TypeArguments.Select(TypeKey)) + ">" : type.TypeParameterIndex is { } ordinal ? "type:" + ordinal : type.MethodParameterIndex is { } index ? "method:" + index : type.ArrayElement is { } element ? "array:" + TypeKey(element)
+            string TypeKey(SignatureType type) => type.FunctionReturnOperand is { } operand ? "return:" + TypeKey(operand) : type.PointerElement is { } pointer ? "pointer:" + TypeKey(pointer) : type.Tuple is { } tuple ? "tuple:" + JsonSerializer.Serialize(tuple.ElementTypes.Select(TypeKey)) : type.Composition is { } composition ? composition.Kind + JsonSerializer.Serialize(composition.Constituents.Select(TypeKey).Order(StringComparer.Ordinal)) : type.IsSelf ? "self" : type.FunctionSignature is { } function ? "function:" + TypeKey(function.ReturnType) + "(" + string.Join(",", function.ParameterTypes.Select(TypeKey)) + ")" : type.ByReferenceElement is { } target ? "byref:" + TypeKey(target) : type.ImportedType is { } imported ? "external:" + JsonSerializer.Serialize(new { imported.AssemblyIdentity, imported.Namespace, imported.Name, Arguments = imported.TypeArguments.Select(TypeKey).ToArray() }) : type.GenericInstance is { } instance ? "constructed:" + System.Array.IndexOf(signatureOwners, instance.Definition) + "<" + string.Join(",", instance.TypeArguments.Select(TypeKey)) + ">" : type.TypeParameterIndex is { } ordinal ? "type:" + ordinal : type.MethodParameterIndex is { } index ? "method:" + index : type.ArrayElement is { } element ? "array:" + TypeKey(element)
                 : type.ClassType is { } c ? "class:" + System.Array.IndexOf(signatureOwners, c) : "primitive:" + type.Primitive;
             var methods = new List<MethodRow>();
             var methodNames = new List<string>();
@@ -804,6 +809,8 @@ public sealed partial class NativeAssemblyDefinition
             foreach (var method in Array(root, "functions", 4096))
             {
                 var fields = new List<string> { "name", "owner", "parameters", "returns", "no_result", "origin", "body" };
+                if (method.TryGetProperty("function_type", out _)) fields.Add("function_type");
+                if (method.TryGetProperty("boxed_arguments", out _)) fields.Add("boxed_arguments");
                 if (method.TryGetProperty("parameter_names", out _)) fields.Add("parameter_names");
                 if (method.TryGetProperty("custom_attributes", out _)) fields.Add("custom_attributes");
                 if (method.TryGetProperty("out_parameters", out _)) fields.Add("out_parameters");
@@ -1102,7 +1109,25 @@ public sealed partial class NativeAssemblyDefinition
                     Require(!method.TryGetProperty("out_parameters", out var nativeOutputs) || nativeOutputs.GetArrayLength() == 0, "native imports do not infer output marshalling");
                     nativeImport.Validate(new(resultType, parameterTypes));
                 }
-                methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes, genericNames, method.TryGetProperty("out_parameters", out _) ? Array(method, "out_parameters", 256).Select(p => p.GetInt32()) : []), visibility, instance, isOverride) { GenericAttributes = genericAttributes.ToDictionary(p => p.Key, p => p.Value.ToArray()), ReturnAttributes = returnAttributes.ToArray(), ParameterAttributes = parameterAttributes.ToDictionary(p => p.Key, p => p.Value.ToArray()), Attributes = methodAttributes.ToArray(), Virtual = isVirtual, Abstract = isAbstract, ObjectSlot = objectSlot, ImplementationAttributes = implementationAttributes, NativeImport = nativeImport, ParameterArrayIndex = parameterArray, NullableAnnotations = nullableAnnotations, ParameterNames = parameterNames, SpecialConstraints = methodSpecialConstraints, TypeConstraints = methodConstraints.ToArray(), ExplicitInterfaces = explicitMappings.ToArray() }); methodNames.Add(Text(method, "name"));
+                var signature = new MethodSignature(resultType, parameterTypes, genericNames, method.TryGetProperty("out_parameters", out _) ? Array(method, "out_parameters", 256).Select(p => p.GetInt32()) : []);
+                Require(!method.TryGetProperty("boxed_arguments", out _) || method.TryGetProperty("function_type", out _), "boxed arguments require a dependent function signature");
+                if (method.TryGetProperty("function_type", out var projected))
+                {
+                    Require(root.GetProperty("format").GetInt32() == 6, "dependent signatures require native format 6");
+                    var functionType = ReadType(projected, false);
+                    var constrained = functionType.TypeParameterIndex is { } ti && ownerIndex >= 0 &&
+                        types[ownerIndex].SpecialConstraints.GetValueOrDefault(ti) == TypeParameterConstraints.FunctionType ||
+                        functionType.MethodParameterIndex is { } mi && methodSpecialConstraints.GetValueOrDefault(mi) == TypeParameterConstraints.FunctionType;
+                    Require(constrained, "method signature requires a function-constrained parameter");
+                    var boxed = method.TryGetProperty("boxed_arguments", out var boxedValue) ? ReadType(boxedValue, false) : null;
+                    Require(boxed is null ? parameterTypes.Length == 0 && noResult :
+                        parameterTypes.Length == 1 && parameterTypes[0].ArrayElement == boxed && resultType == boxed && !noResult,
+                        "dependent method body signature disagrees with its argument representation");
+                    Require(signature.OutParameters.Count == 0 && parameterNames.Count == 0 && parameterArray is null && nullableAnnotations.Count == 0 && returnAttributes.Count == 0 && parameterAttributes.Count == 0,
+                        "dependent signature cannot contain explicit parameter/result metadata");
+                    signature = boxed is null ? MethodSignature.FromFunctionType(functionType, genericNames) : MethodSignature.InteropFunction(functionType, boxed, genericNames);
+                }
+                methods.Add(new(ns, name, ownerIndex, signature, visibility, instance, isOverride) { GenericAttributes = genericAttributes.ToDictionary(p => p.Key, p => p.Value.ToArray()), ReturnAttributes = returnAttributes.ToArray(), ParameterAttributes = parameterAttributes.ToDictionary(p => p.Key, p => p.Value.ToArray()), Attributes = methodAttributes.ToArray(), Virtual = isVirtual, Abstract = isAbstract, ObjectSlot = objectSlot, ImplementationAttributes = implementationAttributes, NativeImport = nativeImport, ParameterArrayIndex = parameterArray, NullableAnnotations = nullableAnnotations, ParameterNames = parameterNames, SpecialConstraints = methodSpecialConstraints, TypeConstraints = methodConstraints.ToArray(), ExplicitInterfaces = explicitMappings.ToArray() }); methodNames.Add(Text(method, "name"));
             }
             nativeTypeAliases.TryGetValue(("System.Object", 0), out var externalRootAlias);
             if (externalRootAlias is not null)
@@ -1288,7 +1313,7 @@ public sealed partial class NativeAssemblyDefinition
                 foreach (var (owner, index) in original.Assembly.Types.Select((owner, index) => (owner, index))) mappedOwners.Add(owner, owners[index]);
             return mappedOwners[original];
         }
-        SignatureType Remap(SignatureType type) => type.PointerElement is { } pointer ? SignatureType.PointerTo(Remap(pointer)) : type.FunctionSignature is { } function ? function.Substitute(Remap) : type.ByReferenceElement is { } target ? SignatureType.ByReference(Remap(target)) : type.ImportedType is { } imported ? RemapImported(imported) : type.GenericInstance is { } instance ? RemapOwner(instance.Definition).MakeGenericInstance(instance.TypeArguments.Select(Remap).ToArray()) : type.ArrayElement is { } element ? SignatureType.ArrayOf(Remap(element))
+        SignatureType Remap(SignatureType type) => type.FunctionReturnOperand is { } operand ? SignatureType.FunctionReturn(Remap(operand)) : type.PointerElement is { } pointer ? SignatureType.PointerTo(Remap(pointer)) : type.FunctionSignature is { } function ? function.Substitute(Remap) : type.ByReferenceElement is { } target ? SignatureType.ByReference(Remap(target)) : type.ImportedType is { } imported ? RemapImported(imported) : type.GenericInstance is { } instance ? RemapOwner(instance.Definition).MakeGenericInstance(instance.TypeArguments.Select(Remap).ToArray()) : type.ArrayElement is { } element ? SignatureType.ArrayOf(Remap(element))
             : type.ClassType is { } c ? RemapOwner(c) : type;
         SignatureType RemapImported(ImportedTypeReference type)
         {

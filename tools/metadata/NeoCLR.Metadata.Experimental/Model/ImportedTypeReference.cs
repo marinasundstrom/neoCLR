@@ -120,7 +120,8 @@ public sealed partial class AssemblyBuilder
         return nativeInterfaceConversions[(actual, target)] = Visit(actual);
     }
     internal SignatureType ImportNativeSignatureType(SignatureType type, AssemblyIdentity core, IAssemblyResolver? resolver, bool allowCompositions = false, bool allowTuples = false)
-        => type.Tuple is { } tuple ? allowTuples ? CreateExperimentalTuple(tuple.ElementTypes.Select(t => ImportNativeSignatureType(t, core, resolver, allowTuples: true)).ToArray(), tuple.ElementNames.ToArray()) : throw new InvalidDataException("tuple callable import requires explicit opt-in")
+        => type.FunctionReturnOperand is { } operand ? SignatureType.FunctionReturn(ImportNativeSignatureType(operand, core, resolver, allowCompositions, allowTuples))
+            : type.Tuple is { } tuple ? allowTuples ? CreateExperimentalTuple(tuple.ElementTypes.Select(t => ImportNativeSignatureType(t, core, resolver, allowTuples: true)).ToArray(), tuple.ElementNames.ToArray()) : throw new InvalidDataException("tuple callable import requires explicit opt-in")
             : type.Composition is { } composition
             ? allowCompositions
                 ? SignatureType.FromComposition(composition.Kind, composition.Constituents.Select(t => ImportNativeSignatureType(t, core, resolver, true)))

@@ -77,9 +77,9 @@ public static class NativeModuleContainer
         using var document = JsonDocument.Parse(json);
         var root = document.RootElement;
         if (root.ValueKind != JsonValueKind.Object ||
-            !root.TryGetProperty("format", out var format) || format.ValueKind != JsonValueKind.Number || !format.TryGetInt32(out var version) || version != 5 ||
+            !root.TryGetProperty("format", out var format) || format.ValueKind != JsonValueKind.Number || !format.TryGetInt32(out var version) || version is not (5 or 6) ||
             !root.TryGetProperty("name", out var name) || name.ValueKind != JsonValueKind.String || string.IsNullOrWhiteSpace(name.GetString()) ||
             !root.TryGetProperty("functions", out var functions) || functions.ValueKind != JsonValueKind.Array)
-            throw new InvalidDataException("expected format-5 native module header");
+            throw new InvalidDataException("expected format-5/6 native module header");
     }
 }

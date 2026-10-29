@@ -1,10 +1,16 @@
 # Generic function method signatures
 
-**Investigation and proposed design, 2026-10-29.** This is a general function
+**Development implementation, updated 2026-10-30.** This is a general function
 capability, requested while discussing [signals](signals-and-reactive-streams.md).
 Signals, forwarding wrappers, interceptors and adapters are consumers; none owns
-the language or runtime mechanism. No compiler/runtime feature is implemented by
-this investigation.
+the language or runtime mechanism. The original investigation below is retained;
+implementation progress and qualification are recorded here.
+
+The metadata foundation now supports native format 6, `MethodInfo.FunctionType`,
+whole-signature substitution and general `FunctionReturn` expressions. The SDK
+roundtrip checks open and closed reflection; runtime adapter tests cover typed
+argument packing/result adaptation and malformed declarations. Raven syntax,
+cross-library consumers and the signal extension are being qualified separately.
 
 The author specifies that `func Invoke: T`, with any method name, belongs to an
 open generic definition. Its signature materializes with generic arguments. On a
@@ -29,7 +35,7 @@ class Forwarder<T> where T: func {
     }
 
     func Invoke: T with args {
-        return FunctionReflectionHelpers.Invoke<T>(target, args)
+        return FunctionReflection.Invoke<T>(target, args)
     }
 }
 ```
@@ -162,7 +168,7 @@ class Forwarder<T> where T: func {
 
     func Invoke: T with args {
         for handler in handlers {
-            let result = FunctionReflectionHelpers.Invoke<T>(handler, args)
+            let result = FunctionReflection.Invoke<T>(handler, args)
         }
     }
 }
@@ -171,7 +177,7 @@ class Forwarder<T> where T: func {
 Two distinct dependencies are involved:
 
 - `Forwarder<T>.Invoke` has the entire signature T.
-- `FunctionReflectionHelpers.Invoke<T>` has fixed parameters `(T, object?[])`
+- `FunctionReflection.Invoke<T>` has fixed parameters `(T, object?[])`
   and a result projected from T.
 
 Conceptually the helper's signature is `(T, object?[]) -> ReturnTypeOf(T)`.
@@ -349,3 +355,7 @@ roundtrips pass, and runtime/native-codegen compilation passes. Raven's existing
 11 structural-function tests passed before compiler changes. New projection
 semantic tests, projected method syntax, typed invocation helper, guest reflection
 API, and executable signal qualification are not yet claimed complete.
+
+The author subsequently selected `FunctionReflection` for the typed overload,
+placing it beside the existing dynamic reflection method rather than introducing
+a separate helpers class. Explicit generic arity selects the typed contract.

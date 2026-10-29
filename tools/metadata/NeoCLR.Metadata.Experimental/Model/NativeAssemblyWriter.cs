@@ -40,8 +40,8 @@ public sealed partial class AssemblyBuilder
         foreach (var method in methods)
         {
             if (method.Definition.ReturnCustomAttributes.Count != 0) returnTokens.Add(method, nextParameterToken++);
-            var tokens = new int[method.ParameterCount];
-            if (method.Signature.OutParameters.Count > 0 || method.Definition.ParameterNames.Count > 0 || method.Definition.ParameterArrayIndex is not null || method.Definition.ParameterAttributes.Any(p => p.Value.Count != 0))
+            var tokens = new int[method.Signature.TransportSignature.ParameterTypes.Count];
+            if (method.Signature.TransportSignature.OutParameters.Count > 0 || method.Definition.ParameterNames.Count > 0 || method.Definition.ParameterArrayIndex is not null || method.Definition.ParameterAttributes.Any(p => p.Value.Count != 0))
                 for (int position = 0; position < tokens.Length; position++) tokens[position] = nextParameterToken++;
             parameterTokens.Add(method, tokens);
         }
@@ -176,8 +176,8 @@ public sealed partial class AssemblyBuilder
         static object TypeOwner(TypeBuilder type, IReadOnlyList<SignatureType> arguments) => type.NativeGrapheme ? "Char" : type.NativePrimitive is { } primitive ? primitive.ToString() : arguments.Count == 0 ? new { Named = TypeName(type) } : new { Constructed = new { definition = TypeName(type), arguments = arguments.Select(SignatureValue).ToArray() } };
         static string ExternalName(ImportedTypeReference type) => type.Owner.ImportedMemoryView(type) is { } view ? "System." + view : Equals(type.Owner.ExternalObjectRoot, type) ? "System.Object" : type.Owner.AuthoredPrimitiveOwner(type) is PrimitiveType.Void or PrimitiveType.Value ? "System." + type.Owner.AuthoredPrimitiveOwner(type) : type.Owner.IsNativeGrapheme(type) ? "System.Character" : type.Owner.NativeBindingFor(type.AssemblyIdentity) is { } binding ? binding.TypeName(type) : type.DeclaringType is { } parent ? ExternalName(parent) + ".N_" + Encoded(type.Name) : ModuleIdentity(type.AssemblyIdentity) + ".T_" + Encoded(type.Namespace) + "_" + Encoded(type.Name);
         static object ExternalValue(ImportedTypeReference type) => type.Owner.AuthoredPrimitiveOwner(type) is { } primitive ? primitive.ToString() : NativeImportBinding.IsInhabitedVoid(type) ? "Void" : NativeImportBinding.IsIntrinsicChar(type) ? "Char" : NativeImportBinding.IsErasedValue(type) ? "Value" : type.TypeArguments.Count == 0 ? new { Named = ExternalName(type) } : new { Constructed = new { definition = ExternalName(type), arguments = type.TypeArguments.Select(SignatureValue).ToArray() } };
-        static object SignatureValue(SignatureType type) => type.Tuple is { } tuple ? new { Tuple = tuple.ElementNames.Count == 0 ? (object)tuple.ElementTypes.Select(SignatureValue).ToArray() : new { elements = tuple.ElementTypes.Select(SignatureValue).ToArray(), names = tuple.ElementNames } } : type.Composition is { } composition ? new Dictionary<string, object> { [composition.Kind.ToString()] = composition.Constituents.Select(SignatureValue).ToArray() } : type.PointerElement is { } pointer ? new { Ptr = SignatureValue(pointer) } : type.IsSelf ? "SelfType" : type.FunctionSignature is { } function ? new { Function = new { parameters = function.ParameterTypes.Select(SignatureValue).ToArray(), returns = SignatureValue(function.ReturnType), no_result = function.NoResult } } : type.ByReferenceElement is { } target ? new { ByRef = SignatureValue(target) } : type.ImportedType is { } imported ? ExternalValue(imported) : type.GenericInstance is { } instance ? TypeOwner(instance.Definition, instance.TypeArguments) : type.TypeParameterIndex is { } ordinal ? new { TypeParameter = ordinal } : type.MethodParameterIndex is { } index ? new { MethodTypeParameter = index } : type.ArrayElement is { } element ? new { ArrayRef = SignatureValue(element) } : type.ClassType is { NativePrimitive: PrimitiveType.Void or PrimitiveType.Value } scalar ? (object)scalar.NativePrimitive.Value.ToString() : type.ClassType is { NativeGrapheme: true } ? (object)"Char" : type.ClassType is { } c ? new { Named = TypeName(c) } : type.Primitive!.Value.ToString();
-        static object[] Parameters(MethodBuilder method) => method.Signature.ParameterTypes.Select(SignatureValue).ToArray();
+        static object SignatureValue(SignatureType type) => type.FunctionReturnOperand is { } operand ? new { FunctionReturn = SignatureValue(operand) } : type.Tuple is { } tuple ? new { Tuple = tuple.ElementNames.Count == 0 ? (object)tuple.ElementTypes.Select(SignatureValue).ToArray() : new { elements = tuple.ElementTypes.Select(SignatureValue).ToArray(), names = tuple.ElementNames } } : type.Composition is { } composition ? new Dictionary<string, object> { [composition.Kind.ToString()] = composition.Constituents.Select(SignatureValue).ToArray() } : type.PointerElement is { } pointer ? new { Ptr = SignatureValue(pointer) } : type.IsSelf ? "SelfType" : type.FunctionSignature is { } function ? new { Function = new { parameters = function.ParameterTypes.Select(SignatureValue).ToArray(), returns = SignatureValue(function.ReturnType), no_result = function.NoResult } } : type.ByReferenceElement is { } target ? new { ByRef = SignatureValue(target) } : type.ImportedType is { } imported ? ExternalValue(imported) : type.GenericInstance is { } instance ? TypeOwner(instance.Definition, instance.TypeArguments) : type.TypeParameterIndex is { } ordinal ? new { TypeParameter = ordinal } : type.MethodParameterIndex is { } index ? new { MethodTypeParameter = index } : type.ArrayElement is { } element ? new { ArrayRef = SignatureValue(element) } : type.ClassType is { NativePrimitive: PrimitiveType.Void or PrimitiveType.Value } scalar ? (object)scalar.NativePrimitive.Value.ToString() : type.ClassType is { NativeGrapheme: true } ? (object)"Char" : type.ClassType is { } c ? new { Named = TypeName(c) } : type.Primitive!.Value.ToString();
+        static object[] Parameters(MethodBuilder method) => method.Signature.TransportSignature.ParameterTypes.Select(SignatureValue).ToArray();
         object Origin(string name, int token, MethodBuilder? method = null, bool publiclyVisible = true)
         {
             var origin = new Dictionary<string, object> { ["assembly"] = IdentityText(Identity), ["module"] = Identity.Name + ".dll", ["name"] = name, ["token"] = token };
@@ -499,7 +499,7 @@ public sealed partial class AssemblyBuilder
         }
         var artifact = new
         {
-            format = 5,
+            format = methods.Any(m => m.Signature.IsDependent || m.Signature.FunctionType.ContainsFunctionReturn) || types.Any(t => t.Fields.Concat(t.StaticFields).Any(f => f.FieldType.ContainsFunctionReturn)) ? 6 : 5,
             name = ModuleName(this),
             revision = Identity.Version.ToString(),
             references = dependencies.Values.Select(d => d.NativeBinding is { Revision: null } ? (object)ModuleName(d) : new { name = ModuleName(d), revision = d.NativeBinding is { } binding ? binding.Revision : d.Identity.Version.ToString() }).ToArray(),
@@ -515,13 +515,13 @@ public sealed partial class AssemblyBuilder
             functions = methods.Select((method, index) => new NativeMethodRow(
                 FunctionName(method), Owner(method), Parameters(method),
                 method.Locals.Select(local => SignatureValue(local.SignatureType)).ToArray(),
-                SignatureValue(method.Signature.ReturnType), !method.ReturnsValue,
+                SignatureValue(method.Signature.TransportSignature.ReturnType), !method.ReturnsValue,
                 Origin(method.Name, 0x06000001 + index, method), method.IsAbstract ? [] : NativeBody(method), method.IsAbstract ? true : null, method.IsVirtual && !method.IsStatic ? true : null, method.IsOverride ? true : null,
                 method.Visibility == MethodVisibility.Public ? null : method.Visibility.ToString().ToLowerInvariant(),
                 method.DeclaringType is null && method.Namespace.Length != 0 ? method.Namespace : null,
-                method.IsStatic ? null : true, method.Signature.GenericParameterNames.Count == 0 ? null : method.Signature.GenericParameterNames.ToArray(), method.Signature.OutParameters.Count == 0 ? null : method.Signature.OutParameters.ToArray(), !method.IsStatic && method.DeclaringType!.IsValueType ? true : null,
-                method.Definition.ParameterNames.Count == 0 ? null : Enumerable.Range(0, method.ParameterCount).Select(i => method.Definition.ParameterNames.GetValueOrDefault(i)).ToArray(),
-                method.Definition.TypeConstraints.Count == 0 && method.Definition.SpecialConstraints.Count == 0 ? null : method.Definition.TypeConstraints.Select(c => (object)new { parameter = c.ParameterIndex, kind = new { TypeBound = SignatureValue(c.Bound) } }).Concat(method.Definition.SpecialConstraints.OrderBy(c => c.Key).SelectMany(c => new[] { TypeParameterConstraints.ReferenceType, TypeParameterConstraints.ValueType, TypeParameterConstraints.DefaultConstructor, TypeParameterConstraints.FunctionType }.Where(flag => c.Value.HasFlag(flag)).Select(flag => (object)new { parameter = c.Key, kind = flag.ToString() }))).ToArray(), ExplicitMappings(method), method.Definition.ImplementationAttributes == 0 ? null : method.Definition.ImplementationAttributes, MethodAttributes(method), method.Definition.NativeImport)).ToArray()
+                method.IsStatic ? null : true, method.Signature.GenericParameterNames.Count == 0 ? null : method.Signature.GenericParameterNames.ToArray(), method.Signature.TransportSignature.OutParameters.Count == 0 ? null : method.Signature.TransportSignature.OutParameters.ToArray(), !method.IsStatic && method.DeclaringType!.IsValueType ? true : null,
+                method.Definition.ParameterNames.Count == 0 ? null : Enumerable.Range(0, method.Signature.TransportSignature.ParameterTypes.Count).Select(i => method.Definition.ParameterNames.GetValueOrDefault(i)).ToArray(),
+                method.Definition.TypeConstraints.Count == 0 && method.Definition.SpecialConstraints.Count == 0 ? null : method.Definition.TypeConstraints.Select(c => (object)new { parameter = c.ParameterIndex, kind = new { TypeBound = SignatureValue(c.Bound) } }).Concat(method.Definition.SpecialConstraints.OrderBy(c => c.Key).SelectMany(c => new[] { TypeParameterConstraints.ReferenceType, TypeParameterConstraints.ValueType, TypeParameterConstraints.DefaultConstructor, TypeParameterConstraints.FunctionType }.Where(flag => c.Value.HasFlag(flag)).Select(flag => (object)new { parameter = c.Key, kind = flag.ToString() }))).ToArray(), ExplicitMappings(method), method.Definition.ImplementationAttributes == 0 ? null : method.Definition.ImplementationAttributes, MethodAttributes(method), method.Definition.NativeImport, method.Signature.IsDependent ? SignatureValue(method.Signature.FunctionType) : null, method.Signature.InteropObjectType is { } boxed ? SignatureValue(boxed) : null)).ToArray()
         };
         foreach (var type in types) type.ValidateMemoryView();
         var result = JsonSerializer.SerializeToUtf8Bytes(artifact);
@@ -559,7 +559,11 @@ public sealed partial class AssemblyBuilder
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         object[]? custom_attributes,
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-        NativeImportDefinition? pinvoke);
+        NativeImportDefinition? pinvoke,
+        [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        object? function_type,
+        [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        object? boxed_arguments);
     private sealed record NativeTypeRow(string name, object[] fields, bool is_reference_type,
         bool is_abstract, bool is_sealed,
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]

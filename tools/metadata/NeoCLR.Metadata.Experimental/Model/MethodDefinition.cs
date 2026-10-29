@@ -82,7 +82,7 @@ public sealed partial class MethodDefinition
             decoded!.ReturnType is not (PrimitiveType.Int32 or PrimitiveType.Void) ||
             decoded.ParameterTypes.Any(p => p != PrimitiveType.Int32)) return false;
         parameterCount = decoded.ParameterTypes.Count;
-        returnsValue = decoded.ReturnType != PrimitiveType.Void;
+        returnsValue = !decoded.NoResult;
         return true;
     }
 
@@ -140,6 +140,8 @@ public sealed partial class MethodDefinition
         {
             if (!IsStatic && (DeclaringType is null || GenericArity != 0))
                 throw new InvalidDataException("unsupported native callable import");
+            if (nativeSignature.IsDependent)
+                return MethodSignature.FromFunctionType(consumer.ImportNativeSignatureType(nativeSignature.FunctionType, core, resolver, allowCompositions, allowTuples), nativeSignature.GenericParameterNames);
             return new MethodSignature(consumer.ImportNativeSignatureType(nativeSignature.ReturnType, core, resolver, allowCompositions, allowTuples),
                 nativeSignature.ParameterTypes.Select(type => consumer.ImportNativeSignatureType(type, core, resolver, allowCompositions, allowTuples)), nativeSignature.GenericParameterNames, nativeSignature.OutParameters);
         }

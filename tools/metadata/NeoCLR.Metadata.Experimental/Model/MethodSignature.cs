@@ -3,7 +3,7 @@ namespace NeoCLR.Metadata.Experimental.Model;
 /// <summary>An immutable primitive, owned nominal/imported reference type, scoped generic parameter, vector, interface Self, unmanaged pointer or managed-reference parameter signature type, with opt-in native reference compositions and ordered structural tuples.</summary>
 public sealed partial record SignatureType
 {
-    private SignatureType(PrimitiveType? primitive, TypeBuilder? classType, SignatureType? arrayElement = null, int? methodParameter = null, int? typeParameter = null, GenericTypeInstance? genericInstance = null, ImportedTypeReference? importedType = null, SignatureType? byReferenceElement = null, FunctionSignature? functionSignature = null, TypeReference? referencedType = null, ReferencedGenericType? referencedGenericType = null, bool isSelf = false, SignatureType? pointerElement = null, ReferenceCompositionSignature? composition = null, TupleSignature? tuple = null) { Tuple = tuple; Composition = composition; PointerElement = pointerElement; IsSelf = isSelf; ReferencedGenericInstance = referencedGenericType; ReferencedType = referencedType; FunctionSignature = functionSignature; ByReferenceElement = byReferenceElement; ImportedType = importedType; GenericInstance = genericInstance; Primitive = primitive; ClassType = classType; ArrayElement = arrayElement; MethodParameterIndex = methodParameter; TypeParameterIndex = typeParameter; }
+    private SignatureType(PrimitiveType? primitive, TypeBuilder? classType, SignatureType? arrayElement = null, int? methodParameter = null, int? typeParameter = null, GenericTypeInstance? genericInstance = null, ImportedTypeReference? importedType = null, SignatureType? byReferenceElement = null, FunctionSignature? functionSignature = null, TypeReference? referencedType = null, ReferencedGenericType? referencedGenericType = null, bool isSelf = false, SignatureType? pointerElement = null, ReferenceCompositionSignature? composition = null, TupleSignature? tuple = null, SignatureType? functionReturn = null) { FunctionReturnOperand = functionReturn; Tuple = tuple; Composition = composition; PointerElement = pointerElement; IsSelf = isSelf; ReferencedGenericInstance = referencedGenericType; ReferencedType = referencedType; FunctionSignature = functionSignature; ByReferenceElement = byReferenceElement; ImportedType = importedType; GenericInstance = genericInstance; Primitive = primitive; ClassType = classType; ArrayElement = arrayElement; MethodParameterIndex = methodParameter; TypeParameterIndex = typeParameter; }
     /// <summary>Gets the unmanaged pointer target, or null for other signatures.</summary>
     public SignatureType? PointerElement { get; }
     /// <summary>Creates an unmanaged pointer to a supported scalar, Void, scoped generic parameter, value type, or another unmanaged pointer.</summary>
@@ -104,9 +104,10 @@ public sealed partial record SignatureType
     }
     internal static SignatureType FromReference(TypeReference reference) => new(null, null, referencedType: reference);
     internal static SignatureType FromTuple(TupleSignature tuple) => new(null, null, tuple: tuple);
-    internal int NestingDepth => Tuple is { } tuple ? 1 + tuple.ElementTypes.Max(t => t.NestingDepth) : Composition is { } composition ? 1 + composition.Constituents.Max(t => t.NestingDepth) : PointerElement is { } pointer ? 1 + pointer.NestingDepth : ReferencedGenericInstance is { } loaded ? 1 + loaded.TypeArguments.Max(t => t.NestingDepth) : FunctionSignature is { } shape ? 1 + shape.ParameterTypes.Append(shape.ReturnType).Max(t => t.NestingDepth) : ByReferenceElement is { } target ? 1 + target.NestingDepth : ImportedType is { TypeArguments.Count: > 0 } imported ? 1 + imported.TypeArguments.Max(t => t.NestingDepth) : GenericInstance is { } instance ? 1 + instance.TypeArguments.Max(t => t.NestingDepth) : ArrayElement is { } element ? 1 + element.NestingDepth : 0;
+    internal int NestingDepth => FunctionReturnOperand is { } operand ? 1 + operand.NestingDepth : Tuple is { } tuple ? 1 + tuple.ElementTypes.Max(t => t.NestingDepth) : Composition is { } composition ? 1 + composition.Constituents.Max(t => t.NestingDepth) : PointerElement is { } pointer ? 1 + pointer.NestingDepth : ReferencedGenericInstance is { } loaded ? 1 + loaded.TypeArguments.Max(t => t.NestingDepth) : FunctionSignature is { } shape ? 1 + shape.ParameterTypes.Append(shape.ReturnType).Max(t => t.NestingDepth) : ByReferenceElement is { } target ? 1 + target.NestingDepth : ImportedType is { TypeArguments.Count: > 0 } imported ? 1 + imported.TypeArguments.Max(t => t.NestingDepth) : GenericInstance is { } instance ? 1 + instance.TypeArguments.Max(t => t.NestingDepth) : ArrayElement is { } element ? 1 + element.NestingDepth : 0;
     internal void ValidateOwner(AssemblyBuilder assembly, int genericArity = 0, int typeArity = 0, bool complete = false, bool allowByReference = false, bool allowSelf = false)
     {
+        FunctionReturnOperand?.ValidateOwner(assembly, genericArity, typeArity, complete, allowSelf: allowSelf);
         if (Tuple is { } tuple)
         {
             if (!assembly.AdmitsTuple(tuple)) throw new ArgumentException("tuple signatures require explicit native admission");
@@ -156,12 +157,76 @@ public sealed partial record SignatureType
         return type.NativePrimitive is { } primitive && primitive is not (PrimitiveType.Value or PrimitiveType.Void) ? (SignatureType)primitive : new(null, type);
     }
     /// <summary>Returns a diagnostic name; it is not a serialized type identity.</summary>
-    public override string ToString() => Tuple is { } tuple ? tuple.ToString() : Composition is { } composition ? composition.ToString() : PointerElement is { } pointer ? pointer + "*" : IsSelf ? "Self" : ReferencedGenericInstance is { } loaded ? loaded.ToString() : ReferencedType is { } reference ? reference.Namespace + "." + reference.Name : FunctionSignature is { } function ? function.ToString() : ByReferenceElement is { } target ? target + "&" : ImportedType is { } imported ? imported.ToString() : GenericInstance is { } instance ? instance.ToString() : ArrayElement is { } element ? element + "[]" : MethodParameterIndex is { } index ? "!!" + index : TypeParameterIndex is { } ordinal ? "!" + ordinal : Primitive?.ToString() ?? ClassType!.Namespace + "." + ClassType.Name;
+    public override string ToString() => FunctionReturnOperand is { } operand ? "ReturnType<" + operand + ">" : Tuple is { } tuple ? tuple.ToString() : Composition is { } composition ? composition.ToString() : PointerElement is { } pointer ? pointer + "*" : IsSelf ? "Self" : ReferencedGenericInstance is { } loaded ? loaded.ToString() : ReferencedType is { } reference ? reference.Namespace + "." + reference.Name : FunctionSignature is { } function ? function.ToString() : ByReferenceElement is { } target ? target + "&" : ImportedType is { } imported ? imported.ToString() : GenericInstance is { } instance ? instance.ToString() : ArrayElement is { } element ? element + "[]" : MethodParameterIndex is { } index ? "!!" + index : TypeParameterIndex is { } ordinal ? "!" + ordinal : Primitive?.ToString() ?? ClassType!.Namespace + "." + ClassType.Name;
 }
 
 /// <summary>An immutable signature with supported value types and optional unconstrained method parameters.</summary>
 public class MethodSignature
 {
+    private readonly SignatureType? projectedFunctionType;
+
+    /// <summary>Gets the structural function type or scoped function-constrained parameter defining this method.</summary>
+    /// <remarks>A generic parameter is validated against its declaring scope when the method is attached or loaded.</remarks>
+    public SignatureType FunctionType => projectedFunctionType ?? SignatureType.MethodFunction(this);
+
+    /// <summary>Gets whether the parameter count and result depend on a bare generic parameter.</summary>
+    public bool IsDependent => projectedFunctionType is { FunctionSignature: null };
+
+    /// <summary>Creates a method signature from a structural function type or scoped generic parameter.</summary>
+    /// <remarks>The declaring type or method must constrain a referenced bare parameter as FunctionType.</remarks>
+    public static MethodSignature FromFunctionType(SignatureType functionType, IEnumerable<string>? genericParameterNames = null)
+    {
+        ArgumentNullException.ThrowIfNull(functionType);
+        if (functionType.FunctionSignature is not null)
+        {
+            var shape = functionType.FunctionSignature;
+            return new MethodSignature(shape.ReturnType, shape.ParameterTypes, genericParameterNames, shape.OutParameters, shape.NoResult);
+        }
+        if (functionType.TypeParameterIndex is null && functionType.MethodParameterIndex is null)
+            throw new ArgumentException("method function type must be a function or a function-constrained parameter", nameof(functionType));
+        return new MethodSignature(functionType, genericParameterNames);
+    }
+
+    /// <summary>Creates a dependent method implemented through a boxed argument array and boxed result.</summary>
+    /// <param name="functionType">An in-scope function-constrained generic parameter.</param>
+    /// <param name="objectType">The target runtime Object reference type.</param>
+    /// <param name="genericParameterNames">Method generic parameters, if any.</param>
+    public static MethodSignature InteropFunction(SignatureType functionType, SignatureType objectType, IEnumerable<string>? genericParameterNames = null)
+    {
+        ArgumentNullException.ThrowIfNull(objectType);
+        var result = FromFunctionType(functionType, genericParameterNames);
+        if (!result.IsDependent) throw new ArgumentException("interop declaration requires a dependent function signature", nameof(functionType));
+        result.interopObjectType = objectType;
+        return result;
+    }
+
+    private SignatureType? interopObjectType;
+    /// <summary>Gets the Object type used by the boxed implementation, or null for an ordinary declaration.</summary>
+    public SignatureType? InteropObjectType => interopObjectType;
+
+    private MethodSignature(SignatureType functionType, IEnumerable<string>? genericParameterNames)
+        : this(PrimitiveType.Void, Array.Empty<SignatureType>(), genericParameterNames)
+    {
+        projectedFunctionType = functionType;
+    }
+
+    internal MethodSignature Substitute(Func<SignatureType, SignatureType> substitute, bool retainMethodParameters = false)
+        => IsDependent
+            ? FromFunctionType(substitute(FunctionType), retainMethodParameters ? GenericParameterNames : null)
+            : new MethodSignature(substitute(ReturnType), ParameterTypes.Select(substitute),
+                retainMethodParameters ? GenericParameterNames : null, OutParameters, NoResult);
+
+    // Only legacy transport/row construction may access these placeholders. Public
+    // signature queries require materialization and never interpret them as arity zero.
+    internal MethodSignature TransportSignature => interopObjectType is { } objectType
+        ? new MethodSignature(objectType, [SignatureType.ArrayOf(objectType)], GenericParameterNames)
+        : IsDependent ? new MethodSignature(PrimitiveType.Void, Array.Empty<SignatureType>(), GenericParameterNames) : this;
+
+    private void RequireShape()
+    {
+        if (IsDependent) throw new InvalidOperationException("method signature depends on an unresolved function type parameter");
+    }
+
     /// <summary>Copies up to 256 non-Void parameters. Ownership is checked when defining a method.</summary>
     /// <param name="returnType">Supported primitive, Void, owned nominal or imported reference type.</param>
     /// <param name="parameterTypes">Copied non-Void parameter sequence.</param>
@@ -169,7 +234,8 @@ public class MethodSignature
     /// <exception cref="ArgumentException">Null/Void parameter, byref result, invalid out index, or more than 256 parameters.</exception>
     /// <param name="genericParameterNames">Copied unique method parameter names, at most 32; omitted for nongeneric signatures.</param>
     /// <param name="outParameters">Copied distinct zero-based byref parameter indices assigned before normal return; omitted for ordinary ref parameters.</param>
-    public MethodSignature(SignatureType returnType, IEnumerable<SignatureType> parameterTypes, IEnumerable<string>? genericParameterNames = null, IEnumerable<int>? outParameters = null)
+    /// <param name="noResult">Whether the method returns no value. Defaults to true for primitive Void; false preserves an inhabited unit result.</param>
+    public MethodSignature(SignatureType returnType, IEnumerable<SignatureType> parameterTypes, IEnumerable<string>? genericParameterNames = null, IEnumerable<int>? outParameters = null, bool? noResult = null)
     {
         ArgumentNullException.ThrowIfNull(returnType);
         ArgumentNullException.ThrowIfNull(parameterTypes);
@@ -187,24 +253,36 @@ public class MethodSignature
         var outputs = (outParameters ?? []).Take(257).ToArray();
         if (outputs.Length > 256 || outputs.Distinct().Count() != outputs.Length || outputs.Any(i => i < 0 || i >= parameters.Length || parameters[i].ByReferenceElement is null))
             throw new ArgumentException("out parameters must be distinct byref parameter indices", nameof(outParameters));
-        OutParameters = Array.AsReadOnly(outputs.Order().ToArray());
-        ReturnType = returnType; ParameterTypes = Array.AsReadOnly(parameters);
+        outParametersValue = Array.AsReadOnly(outputs.Order().ToArray());
+        NoResult = noResult ?? returnType.Primitive == PrimitiveType.Void;
+        if (NoResult && returnType.Primitive != PrimitiveType.Void) throw new ArgumentException("no-result signature must use Void", nameof(noResult));
+        returnTypeValue = returnType; parameterTypesValue = Array.AsReadOnly(parameters);
     }
     /// <summary>Creates a primitive-only signature.</summary>
     public MethodSignature(PrimitiveType returnType, IEnumerable<PrimitiveType> parameterTypes)
         : this((SignatureType)returnType, (parameterTypes ?? throw new ArgumentNullException(nameof(parameterTypes))).Select(p => (SignatureType)p)) { }
+    /// <summary>Gets whether invocation leaves no value on the evaluation stack.</summary>
+    public bool NoResult { get; }
     /// <summary>Gets copied names of unconstrained method generic parameters, in ordinal order.</summary>
     public IReadOnlyList<string> GenericParameterNames { get; }
-    /// <summary>Gets the result type; Void denotes no result.</summary>
-    public SignatureType ReturnType { get; }
+    private readonly SignatureType returnTypeValue;
+    /// <summary>Gets the result type after whole-signature materialization.</summary>
+    public SignatureType ReturnType { get { RequireShape(); return returnTypeValue; } }
+    private readonly IReadOnlyList<int> outParametersValue;
     /// <summary>Gets zero-based declared parameter indices that must be assigned before every normal return.</summary>
-    public IReadOnlyList<int> OutParameters { get; }
-    /// <summary>Gets declared parameters, excluding the receiver.</summary>
-    public IReadOnlyList<SignatureType> ParameterTypes { get; }
+    public IReadOnlyList<int> OutParameters { get { RequireShape(); return outParametersValue; } }
+    private readonly IReadOnlyList<SignatureType> parameterTypesValue;
+    /// <summary>Gets declared parameters, excluding the receiver, after whole-signature materialization.</summary>
+    public IReadOnlyList<SignatureType> ParameterTypes { get { RequireShape(); return parameterTypesValue; } }
     internal void ValidateOwner(AssemblyBuilder assembly, int typeArity = 0, bool complete = false, bool allowSelf = false)
     {
+        if (IsDependent)
+        {
+            FunctionType.ValidateOwner(assembly, GenericParameterNames.Count, typeArity, complete);
+            return;
+        }
         ReturnType.ValidateOwner(assembly, GenericParameterNames.Count, typeArity, complete, allowSelf: allowSelf);
         foreach (var type in ParameterTypes) type.ValidateOwner(assembly, GenericParameterNames.Count, typeArity, complete, allowByReference: true, allowSelf: allowSelf);
     }
-    internal bool Matches(MethodSignature other) => GenericParameterNames.Count == other.GenericParameterNames.Count && ReturnType == other.ReturnType && ParameterTypes.SequenceEqual(other.ParameterTypes) && OutParameters.SequenceEqual(other.OutParameters);
+    internal bool Matches(MethodSignature other) => GenericParameterNames.Count == other.GenericParameterNames.Count && FunctionType == other.FunctionType;
 }

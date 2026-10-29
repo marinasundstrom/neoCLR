@@ -6,6 +6,7 @@ namespace NeoCLR.Metadata.Experimental.Introspection;
 /// <remarks>No invocation is available. Constructor definitions may be resolved directly; GetMethods excludes them.</remarks>
 public sealed class MethodInfo
 {
+    private readonly Lazy<TypeInfo> functionType;
     private readonly Lazy<TypeInfo> returns;
     private readonly Lazy<IReadOnlyList<ParameterInfo>> parameters;
     private readonly IReadOnlyList<TypeInfo> genericArguments;
@@ -25,15 +26,33 @@ public sealed class MethodInfo
         GenericParameterNames = Array.AsReadOnly(signature!.GenericParameterNames.ToArray());
         genericArguments = Array.AsReadOnly(arguments ?? GenericParameterNames.Select((_, i) => (TypeInfo)new MethodGenericParameterTypeInfo(context, this, i)).ToArray());
         var typeArguments = owner switch { NominalTypeInfo nominal => nominal.GetGenericArguments(), ConstructedTypeInfo constructed => constructed.TypeArguments, _ => Array.Empty<TypeInfo>() };
-        returns = new(() => context.ResolveMemberSignature(signature.ReturnType, typeArguments, genericArguments, owner));
-        if (definition.ParameterArrayIndex is { } parameterArray &&
-            (parameterArray != signature.ParameterTypes.Count - 1 || signature.ParameterTypes[parameterArray].ArrayElement is null))
-            throw new InvalidDataException("parameter-array marker requires a final by-value vector");
-        parameters = new(() => Array.AsReadOnly(signature.ParameterTypes.Select((type, i) => new ParameterInfo(this, i,
-            context.ResolveMemberSignature(type.ByReferenceElement ?? type, typeArguments, genericArguments, owner),
-            type.ByReferenceElement is null ? ParameterPassingMode.Value : signature.OutParameters.Contains(i) ? ParameterPassingMode.Out : ParameterPassingMode.Ref,
-            definition.ParameterNames.GetValueOrDefault(i))).ToArray()));
+        functionType = new(() =>
+        {
+            var resolved = context.ResolveMemberSignature(signature.FunctionType, typeArguments, genericArguments, owner);
+            if (resolved is not FunctionTypeInfo &&
+                resolved is not GenericParameterTypeInfo { SpecialConstraints: TypeParameterConstraints.FunctionType } &&
+                resolved is not MethodGenericParameterTypeInfo { SpecialConstraints: TypeParameterConstraints.FunctionType })
+                throw new InvalidDataException("method function type must be a function or a function-constrained parameter");
+            return resolved;
+        });
+        returns = new(() => RequireFunctionShape().ReturnType);
+        parameters = new(() =>
+        {
+            var shape = RequireFunctionShape();
+            if (definition.ParameterArrayIndex is { } parameterArray &&
+                (parameterArray != shape.ParameterTypes.Count - 1 || shape.ParameterTypes[parameterArray] is not ArrayTypeInfo))
+                throw new InvalidDataException("parameter-array marker requires a final by-value vector");
+            return Array.AsReadOnly(shape.ParameterTypes.Select((type, i) => new ParameterInfo(this, i,
+                type, shape.ParameterModes[i], definition.ParameterNames.GetValueOrDefault(i))).ToArray());
+        });
     }
+    /// <summary>Gets the method's structural function type or function-constrained generic parameter.</summary>
+    /// <remarks>Substitutes both declaring-type and method generic arguments. Open component types are retained.</remarks>
+    public TypeInfo FunctionType => functionType.Value;
+
+    private FunctionTypeInfo RequireFunctionShape() => FunctionType as FunctionTypeInfo
+        ?? throw new InvalidOperationException("method signature depends on an unresolved function type parameter");
+
     /// <summary>Gets declared method attributes as metadata-only snapshots; parameter attributes are excluded.</summary>
     /// <remarks>No attribute constructor or test body is executed. Resolving an attribute type requires an explicit catalog.</remarks>
     public IReadOnlyList<CustomAttributeInfo> GetCustomAttributes() => Array.AsReadOnly(Definition.CustomAttributes

@@ -34,20 +34,20 @@ public sealed partial class MethodBuilder
         => Instructions.Select((instruction, index) => (instruction, index)).Where(p => p.instruction.Op == "label")
             .ToDictionary(p => p.instruction.Value, p => p.index);
 
-    private readonly record struct BodyValueType(PrimitiveType Primitive, TypeBuilder? Class = null, SignatureType? ArrayElement = null, bool NativeLength = false, int? MethodParameter = null, int? AddressedLocal = null, int? TypeParameter = null, GenericTypeInstance? GenericInstance = null, ImportedTypeReference? ImportedType = null, SignatureType? ByReferenceElement = null, int? AddressedParameter = null, bool ConstructionReceiver = false, FunctionSignature? Function = null, SignatureType? PointerElement = null, ReferenceCompositionSignature? Composition = null, TupleSignature? Tuple = null)
+    private readonly record struct BodyValueType(PrimitiveType Primitive, TypeBuilder? Class = null, SignatureType? ArrayElement = null, bool NativeLength = false, int? MethodParameter = null, int? AddressedLocal = null, int? TypeParameter = null, GenericTypeInstance? GenericInstance = null, ImportedTypeReference? ImportedType = null, SignatureType? ByReferenceElement = null, int? AddressedParameter = null, bool ConstructionReceiver = false, FunctionSignature? Function = null, SignatureType? PointerElement = null, ReferenceCompositionSignature? Composition = null, TupleSignature? Tuple = null, SignatureType? FunctionReturn = null)
     {
         internal SignatureType? ReferenceSignature => ByReferenceElement is not null || AddressedLocal is not null || AddressedParameter is not null ? null
             : Class is { } owner ? owner : GenericInstance is { } generic ? generic
             : ImportedType is { } imported ? imported : ArrayElement is { } element ? SignatureType.ArrayOf(element) : null;
         internal static BodyValueType Receiver(TypeBuilder owner) => owner.IsValueType ? SignatureType.ByReference(owner.OpenSignature) : owner.OpenSignature;
         public static implicit operator BodyValueType(PrimitiveType type) => new(type switch { PrimitiveType.SByte or PrimitiveType.Byte or PrimitiveType.Int16 or PrimitiveType.UInt16 or PrimitiveType.UInt32 => PrimitiveType.Int32, PrimitiveType.UInt64 => PrimitiveType.Int64, _ => type });
-        public static implicit operator BodyValueType(SignatureType type) => type.Tuple is { } tuple ? new(PrimitiveType.Void, Tuple: tuple) : type.Composition is { } composition ? new(PrimitiveType.Void, Composition: composition) : type.ClassType?.NativePrimitive == PrimitiveType.Void ? new(PrimitiveType.Void) : type.ClassType?.NativePrimitive == PrimitiveType.Value || type.ImportedType is { } erased && NativeImportBinding.IsErasedValue(erased) ? new(PrimitiveType.Value) : type.PointerElement is { } pointer ? new(PrimitiveType.Void, PointerElement: pointer) : type.FunctionSignature is { } function ? new(PrimitiveType.Void, Function: function) : type.ByReferenceElement is { } target ? new(PrimitiveType.Void, ByReferenceElement: target) : type.ImportedType is { } imported ? new(PrimitiveType.Void, ImportedType: imported) : type.GenericInstance is { } instance ? new(PrimitiveType.Void, GenericInstance: instance) : type.TypeParameterIndex is { } ordinal ? new(PrimitiveType.Void, TypeParameter: ordinal) : type.MethodParameterIndex is { } index ? new(PrimitiveType.Void, MethodParameter: index) : type.ArrayElement is { } element ? new(PrimitiveType.Void, ArrayElement: element) : type.ClassType is { } c ? new(PrimitiveType.Void, c) : (BodyValueType)type.Primitive!.Value;
+        public static implicit operator BodyValueType(SignatureType type) => type.FunctionReturnOperand is not null ? new(PrimitiveType.Void, FunctionReturn: type) : type.Tuple is { } tuple ? new(PrimitiveType.Void, Tuple: tuple) : type.Composition is { } composition ? new(PrimitiveType.Void, Composition: composition) : type.ClassType?.NativePrimitive == PrimitiveType.Void ? new(PrimitiveType.Void) : type.ClassType?.NativePrimitive == PrimitiveType.Value || type.ImportedType is { } erased && NativeImportBinding.IsErasedValue(erased) ? new(PrimitiveType.Value) : type.PointerElement is { } pointer ? new(PrimitiveType.Void, PointerElement: pointer) : type.FunctionSignature is { } function ? new(PrimitiveType.Void, Function: function) : type.ByReferenceElement is { } target ? new(PrimitiveType.Void, ByReferenceElement: target) : type.ImportedType is { } imported ? new(PrimitiveType.Void, ImportedType: imported) : type.GenericInstance is { } instance ? new(PrimitiveType.Void, GenericInstance: instance) : type.TypeParameterIndex is { } ordinal ? new(PrimitiveType.Void, TypeParameter: ordinal) : type.MethodParameterIndex is { } index ? new(PrimitiveType.Void, MethodParameter: index) : type.ArrayElement is { } element ? new(PrimitiveType.Void, ArrayElement: element) : type.ClassType is { } c ? new(PrimitiveType.Void, c) : (BodyValueType)type.Primitive!.Value;
     }
     private BodyValueType ArgumentType(int index)
     {
         if (!IsStatic && index == 0) return BodyValueType.Receiver(DeclaringType!) with { ConstructionReceiver = IsConstructor && DeclaringType!.IsValueType };
         int parameter = index - (IsStatic ? 0 : 1);
-        BodyValueType type = Signature.ParameterTypes[parameter];
+        BodyValueType type = Signature.TransportSignature.ParameterTypes[parameter];
         return type.ByReferenceElement is null ? type : type with { AddressedParameter = parameter };
     }
     private static BodyValueType LocalType(LocalDefinition local) => local.SignatureType;
@@ -67,7 +67,7 @@ public sealed partial class MethodBuilder
             if (instruction.Op is "argument" or "argument.store" or "argument.address" && (instruction.Value < 0 || instruction.Value >= ArgumentCount))
                 throw new InvalidDataException("argument outside signature");
             if (instruction.Op == "argument.address" && ((!IsStatic && instruction.Value == 0) ||
-                Signature.ParameterTypes[instruction.Value - (IsStatic ? 0 : 1)].ByReferenceElement is not null))
+                Signature.TransportSignature.ParameterTypes[instruction.Value - (IsStatic ? 0 : 1)].ByReferenceElement is not null))
                 throw new InvalidDataException("argument address requires a by-value parameter slot");
         }
         if (!IsStatic && !(IsConstructor && DeclaringType!.NativePrimitive == PrimitiveType.String) && Instructions.Any(i => i.Op == "argument.store" && i.Value == 0))
@@ -76,7 +76,7 @@ public sealed partial class MethodBuilder
         var states = new FlowState?[Instructions.Count];
         var work = new Queue<int>();
         var initiallyAssigned = new bool[locals.Count + ParameterCount + (IsConstructor && DeclaringType!.IsValueType ? DeclaringType.Fields.Count : 0)];
-        for (int i = 0; i < ParameterCount; i++) initiallyAssigned[locals.Count + i] = !Signature.OutParameters.Contains(i);
+        for (int i = 0; i < ParameterCount; i++) initiallyAssigned[locals.Count + i] = !Signature.TransportSignature.OutParameters.Contains(i);
         states[0] = new([], initiallyAssigned, !(IsConstructor && DeclaringType!.HasExplicitClassBase)); work.Enqueue(0);
         while (work.TryDequeue(out var index))
         {
@@ -326,7 +326,7 @@ public sealed partial class MethodBuilder
                     Pop(ArgumentType(instruction.Value)); break;
                 case "argument": stack.Add(!baseInitialized && instruction.Value == 0 ? ArgumentType(0) with { ConstructionReceiver = true } : ArgumentType(instruction.Value)); break;
                 case "argument.address":
-                    stack.Add(SignatureType.ByReference(Signature.ParameterTypes[instruction.Value - (IsStatic ? 0 : 1)])); break;
+                    stack.Add(SignatureType.ByReference(Signature.TransportSignature.ParameterTypes[instruction.Value - (IsStatic ? 0 : 1)])); break;
                 case "boolean": stack.Add(PrimitiveType.Boolean); break;
                 case "local.address": stack.Add(new BodyValueType(PrimitiveType.Void, AddressedLocal: instruction.Value)); break;
                 case "object.load":
@@ -459,7 +459,7 @@ public sealed partial class MethodBuilder
                             callSignature.ParameterTypes.Select(t => MethodILGenerator.SubstituteConstrainedSelf(t, instruction.Type!)),
                             callSignature.GenericParameterNames, callSignature.OutParameters);
                     var outputs = new List<int>();
-                    for (int i = instruction.Target!.ParameterCount - 1; i >= 0; i--)
+                    for (int i = callSignature.ParameterTypes.Count - 1; i >= 0; i--)
                     {
                         bool output = callSignature.OutParameters.Contains(i);
                         if (output && stack.Count > 0)
@@ -469,7 +469,7 @@ public sealed partial class MethodBuilder
                         }
                         Pop(callSignature.ParameterTypes[i], output, compositionCall: true);
                     }
-                    if (instruction.Target.IsConstructor)
+                    if (instruction.Target!.IsConstructor)
                     {
                         if (baseInitialized || !IsConstructor || !DeclaringType!.IsDirectBaseConstructor(instruction.Target, instruction.Type) ||
                             stack.Count != 1 || !stack[0].ConstructionReceiver || !(stack[0] with { ConstructionReceiver = false }).Equals((BodyValueType)DeclaringType.OpenSignature))
@@ -483,7 +483,7 @@ public sealed partial class MethodBuilder
                     }
                     // Receiver and ref input preconditions precede all output assignments.
                     foreach (var slot in outputs) assigned[slot] = true;
-                    if (instruction.Target.ReturnsValue) stack.Add(callSignature.ReturnType);
+                    if (!callSignature.NoResult) stack.Add(callSignature.ReturnType);
                     break;
                 case "native.call":
                     if (!instruction.NativeTarget!.TryGetStaticInt32Signature(out var count)) throw new InvalidDataException("invalid native call");
@@ -499,9 +499,9 @@ public sealed partial class MethodBuilder
                     if (!baseInitialized) throw new InvalidDataException("derived constructor must initialize its base before returning");
                     if (IsConstructor && DeclaringType!.IsValueType && assigned.Skip(locals.Count + ParameterCount).Any(value => !value))
                         throw new InvalidDataException("value constructor must assign every field on every normal return");
-                    if (Signature.OutParameters.Any(i => !assigned[locals.Count + i]))
+                    if (Signature.TransportSignature.OutParameters.Any(i => !assigned[locals.Count + i]))
                         throw new InvalidDataException("out parameter must be assigned on every normal return");
-                    if (ReturnsValue) Pop(Signature.ReturnType);
+                    if (ReturnsValue) Pop(Signature.TransportSignature.ReturnType);
                     if (stack.Count != 0) throw new InvalidDataException("invalid return stack");
                     continue;
                 default: throw new InvalidDataException("unsupported instruction");

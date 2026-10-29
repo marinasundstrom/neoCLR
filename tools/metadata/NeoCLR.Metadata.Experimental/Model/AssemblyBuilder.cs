@@ -132,6 +132,16 @@ public sealed partial class AssemblyBuilder
                 if (method.IsImplicitObjectOverride && !MethodDefinition.IsObjectOverride(method.Name, method.Signature, CoreLibrary, NativeObjectRoot, ExternalObjectRoot))
                     throw new InvalidDataException("Object override does not match the selected root signature");
                 method.Signature.ValidateOwner(this, arity, complete: true, allowSelf: method.DeclaringType?.IsInterface == true);
+                if (method.Signature.IsDependent)
+                {
+                    var reference = method.Signature.FunctionType;
+                    bool proof = reference.TypeParameterIndex is { } ti && method.DeclaringType?.Definition.SpecialConstraints.GetValueOrDefault(ti) == TypeParameterConstraints.FunctionType ||
+                        reference.MethodParameterIndex is { } mi && method.Definition.SpecialConstraints.GetValueOrDefault(mi) == TypeParameterConstraints.FunctionType;
+                    if (!proof) throw new InvalidDataException("dependent method signature requires a function-constrained parameter");
+                    if (method.Definition.ParameterNames.Count != 0 || method.Definition.ParameterAttributes.Any() ||
+                        method.Definition.ReturnCustomAttributes.Count != 0 || method.Definition.ParameterArrayIndex is not null || method.Definition.NullableAnnotations.Count != 0)
+                        throw new InvalidDataException("dependent signature cannot declare positional metadata before materialization");
+                }
                 foreach (var bound in method.Definition.NominalInterfaceConstraints)
                 {
                     var signature = method.Definition.ConstraintSignature(bound.InterfaceType);
@@ -1215,7 +1225,7 @@ public sealed partial class TypeBuilder
         ArgumentNullException.ThrowIfNull(signature);
         signature.ValidateOwner(Assembly, GenericParameterNames.Count, allowSelf: IsInterface);
         if (string.IsNullOrEmpty(name) || name.Length > 1024 || methods.Count >= 256 ||
-            methods.Any(m => m.Name == name && m.Signature.GenericParameterNames.Count == signature.GenericParameterNames.Count && m.Signature.ParameterTypes.SequenceEqual(signature.ParameterTypes)))
+            methods.Any(m => m.Name == name && m.Signature.GenericParameterNames.Count == signature.GenericParameterNames.Count && (m.Signature.IsDependent || signature.IsDependent ? m.Signature.FunctionType == signature.FunctionType : m.Signature.ParameterTypes.SequenceEqual(signature.ParameterTypes))))
             throw new ArgumentException($"invalid or duplicate method: {Namespace}.{Name}.{name}");
         var method = new MethodBuilder(Assembly, this, name, signature, visibility, isStatic: isStatic); Definition.Methods.Add(method.Definition); return method;
     }
@@ -1266,9 +1276,9 @@ public sealed partial class MethodBuilder
     /// <summary>Gets the method name.</summary>
     public string Name => Definition.Name;
     /// <summary>Gets the parameter count.</summary>
-    public int ParameterCount => Signature.ParameterTypes.Count;
+    public int ParameterCount => Signature.TransportSignature.ParameterTypes.Count;
     /// <summary>Gets whether the method has a primitive or owned-class result rather than no result.</summary>
-    public bool ReturnsValue => Signature.ReturnType != PrimitiveType.Void;
+    public bool ReturnsValue => !Signature.TransportSignature.NoResult;
     /// <summary>Appends an Int32 constant.</summary>
     /// <param name="value">Constant value.</param>
     public void LoadConstant(int value) => GetILGenerator().LoadConstant(value);

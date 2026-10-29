@@ -198,6 +198,7 @@ internal sealed class NativeImportBinding(AssemblyDefinition reference, NativeLi
         if (type.ArrayElement is { } element) return "ArrayRef(" + TypeKey(element) + ")";
         if (type.MethodParameterIndex is { } method) return "MethodTypeParameter(" + method + ")";
         if (type.TypeParameterIndex is { } owner) return "TypeParameter(" + owner + ")";
+        if (type.FunctionReturnOperand is { } operand) return "FunctionReturn(" + TypeKey(operand) + ")";
         if (type.FunctionSignature is { } function) return "Function(" + string.Join(",", function.ParameterTypes.Select(TypeKey)) + ")->" + TypeKey(function.ReturnType) + ":" + function.NoResult;
         if (type.ImportedType is { } imported)
         {
@@ -219,7 +220,7 @@ internal sealed class NativeImportBinding(AssemblyDefinition reference, NativeLi
             return "Function(" + string.Join(",", function.GetProperty("parameters").EnumerateArray().Select(TypeKey)) + ")->" + TypeKey(function.GetProperty("returns")) + ":" + Flag(function, "no_result");
         }
         if (type.TryGetProperty("Constructed", out var constructed)) return "Constructed(" + constructed.GetProperty("definition").GetString() + ";" + string.Join(",", constructed.GetProperty("arguments").EnumerateArray().Select(TypeKey)) + ")";
-        foreach (var name in new[] { "ByRef", "ArrayRef" }) if (type.TryGetProperty(name, out var nested)) return name + "(" + TypeKey(nested) + ")";
+        foreach (var name in new[] { "ByRef", "ArrayRef", "FunctionReturn" }) if (type.TryGetProperty(name, out var nested)) return name + "(" + TypeKey(nested) + ")";
         foreach (var name in new[] { "Named", "TypeParameter", "MethodTypeParameter" }) if (type.TryGetProperty(name, out var atom)) return name + "(" + atom.ToString() + ")";
         throw new InvalidDataException("unsupported native binding signature kind");
     }
