@@ -35,16 +35,16 @@ func ReadUnnamed(value: Money) -> Decimal {
     return amount
 }
 
-[Test("Value deconstruction binds named and unnamed locals")]
-func AValue() -> Result<unit, TestFailure> {
+[Test]
+func `Value deconstruction binds named and unnamed locals`() -> Result<unit, TestFailure> {
     let money = Money(12.50m, Currency.SEK)
     let Money(amount, currency) = money
     let (otherAmount, otherCurrency) = money
     return Assert.True(amount == otherAmount && currency == otherCurrency && amount == 12.5m, "Value components")
 }
 
-[Test("Reference deconstruction binds named and unnamed locals")]
-func BReference() -> Result<unit, TestFailure> {
+[Test]
+func `Reference deconstruction binds named and unnamed locals`() -> Result<unit, TestFailure> {
     let pair = ReferencePair(40, 2)
     let ReferencePair(first, second) = pair
     let (a, b) = pair
@@ -53,8 +53,8 @@ func BReference() -> Result<unit, TestFailure> {
     return Assert.True(ReadReference(null) == -1 && ReadReference("wrong") == -1, "Null and wrong type")
 }
 
-[Test("Positional patterns narrow derived and object references")]
-func CDerived() -> Result<unit, TestFailure> {
+[Test]
+func `Positional patterns narrow derived and object references`() -> Result<unit, TestFailure> {
     let child = Child()
     let Child(first, second) = child
     let (a, b) = child
@@ -63,8 +63,8 @@ func CDerived() -> Result<unit, TestFailure> {
     return Assert.True(ReadChildObject(child) == 42 && ReadChildObject(Parent()) == -1 && ReadChildObject(null) == -1, "Object type narrowing")
 }
 
-[Test("Qualified currency patterns match values and reject mismatches")]
-func DPatterns() -> Result<unit, TestFailure> {
+[Test]
+func `Qualified currency patterns match values and reject mismatches`() -> Result<unit, TestFailure> {
     let sek = Money(12.5m, Currency.SEK)
     let usd = Money(12.5m, Currency.USD)
     _ = Assert.True(ReadMoney(sek) == 12.5m && ReadMoney(usd) == -1m, "Boxed value and currency equality")?

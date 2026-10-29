@@ -8,8 +8,8 @@ import NeoClr.Testing.*
 import System.Collections.*
 import System.Web.Http.*
 
-[Test("HTTP header lookup preserves repeated values without splitting commas")]
-func HeadersRepeated() -> Result<unit, TestFailure> {
+[Test]
+func `HTTP header lookup preserves repeated values without splitting commas`() -> Result<unit, TestFailure> {
     let headers = ArrayList<HttpHeader>()
     headers.Add(HttpHeader("Set-Cookie", "a=1; Expires=Wed, 21 Oct 2030 07:28:00 GMT"))
     headers.Add(HttpHeader("set-cookie", "b=2"))
@@ -26,8 +26,8 @@ func HeadersRepeated() -> Result<unit, TestFailure> {
     return Assert.Equal("three", values[1])
 }
 
-[Test("HTTP header lookup distinguishes empty values from absent fields")]
-func HeadersEmpty() -> Result<unit, TestFailure> {
+[Test]
+func `HTTP header lookup distinguishes empty values from absent fields`() -> Result<unit, TestFailure> {
     let headers = ArrayList<HttpHeader>()
     headers.Add(HttpHeader("X-Empty", ""))
     let response = HttpResponse(HttpStatusCode.OK, headers, HttpMemoryContent(default(ReadOnlyMemory<byte>)))
@@ -37,8 +37,8 @@ func HeadersEmpty() -> Result<unit, TestFailure> {
     return Assert.Equal(0, response.GetHeaderValues("missing").Count)
 }
 
-[Test("HTTP header lookup rejects invalid names")]
-func HeadersInvalid() -> Result<unit, TestFailure> {
+[Test]
+func `HTTP header lookup rejects invalid names`() -> Result<unit, TestFailure> {
     let headers = ArrayList<HttpHeader>()
     headers.Add(HttpHeader("X-List", "one"))
     headers.Add(HttpHeader("X-İ", "invalid name"))
@@ -49,8 +49,8 @@ func HeadersInvalid() -> Result<unit, TestFailure> {
     return Assert.True(true, "Invalid lookup names never match")
 }
 
-[Test("HTTP header lookup snapshots remain independent of later additions")]
-func HeadersSnapshot() -> Result<unit, TestFailure> {
+[Test]
+func `HTTP header lookup snapshots remain independent of later additions`() -> Result<unit, TestFailure> {
     let headers = ArrayList<HttpHeader>()
     headers.Add(HttpHeader("Set-Cookie", "a=1"))
     headers.Add(HttpHeader("set-cookie", "b=2"))
@@ -61,8 +61,8 @@ func HeadersSnapshot() -> Result<unit, TestFailure> {
     return Assert.Equal(3, response.GetHeaderValues("set-cookie").Count)
 }
 
-[Test("HTTP request lookup exposes content headers without inventing provider headers")]
-func HeadersRequest() -> Result<unit, TestFailure> {
+[Test]
+func `HTTP request lookup exposes content headers without inventing provider headers`() -> Result<unit, TestFailure> {
     let Ok(post) = HttpRequest.Post("http://example.test/echo", HttpStringContent("Hello")) else {
         return Assert.True(false, "Construct POST request")
     }
@@ -75,8 +75,8 @@ func HeadersRequest() -> Result<unit, TestFailure> {
     return Assert.Equal(0, get.GetHeaderValues("Host").Count)
 }
 
-[Test("HTTP response constructors retain memory content and replace only content type metadata")]
-func ResponseContent() -> Result<unit, TestFailure> {
+[Test]
+func `HTTP response constructors retain memory content and replace only content type metadata`() -> Result<unit, TestFailure> {
     let data: byte[] = [(byte)255, (byte)65, (byte)66, (byte)255]
     let memory: ReadOnlyMemory<byte> = data
     let content = HttpMemoryContent(memory[1..3], "application/octet-stream")
@@ -116,8 +116,8 @@ class RangeEndpoints {
 func DynamicBytes(start: int, end: int) -> byte[] => [for index in start..end => (byte)index]
 func InclusiveBytes(start: int, end: int) -> byte[] => [for index in start..=end => (byte)7]
 
-[Test("HTTP byte producers allocate runtime sized arrays with ordered single endpoint evaluation")]
-func ResponseDynamic() -> Result<unit, TestFailure> {
+[Test]
+func `HTTP byte producers allocate runtime sized arrays with ordered single endpoint evaluation`() -> Result<unit, TestFailure> {
     let endpoints = RangeEndpoints()
     let bytes: byte[] = [for index in endpoints.Start()..endpoints.End() => (byte)index]
     _ = Assert.Equal(12, endpoints.Calls)?
@@ -147,8 +147,8 @@ class ResponseInput : System.IO.InputStream {
     }
 }
 
-[Test("HTTP response construction never reads or changes stream ownership")]
-func ResponseStream() -> Result<unit, TestFailure> {
+[Test]
+func `HTTP response construction never reads or changes stream ownership`() -> Result<unit, TestFailure> {
     let input = ResponseInput()
     let Ok(content) = HttpStreamContent.Create(input, 7, false) else {
         return Assert.True(false, "Stream content constructed")
@@ -163,8 +163,8 @@ func ResponseStream() -> Result<unit, TestFailure> {
     return Assert.Equal(1, input.Closes)
 }
 
-[Test("HTTP messages expose HTTP 1.1 and dispose owned content without reading")]
-func MessageLifetime() -> Result<unit, TestFailure> {
+[Test]
+func `HTTP messages expose HTTP 1.1 and dispose owned content without reading`() -> Result<unit, TestFailure> {
     let input = ResponseInput()
     let Ok(content) = HttpStreamContent.Create(input, 3, false) else { return Assert.True(false, "Create stream content") }
     let Ok(request) = HttpRequest.Post("http://example.test/", content) else { return Assert.True(false, "Create request") }

@@ -42,6 +42,15 @@
   and `val` for read-only properties. Compile target examples instead of assuming
   every host Raven/.NET API or syntax spelling is supported.
 
+- For tests written in `NeoClr.Testing`, prefer descriptive backtick identifiers
+  when stating behavior. Traditional method/function names remain valid when they
+  already communicate the test clearly. Whenever a test needs a prose description,
+  put it in the backtick identifier and use `[Test]`, not a Test attribute description.
+  Keep description arguments only in fixtures specifically exercising that attribute
+  feature. Keep helper/data-source names conventional and meaningful. Renames change
+  test IDs, name filters and discovery order; update active expectations and callers
+  without rewriting historical validation evidence.
+
 - Use `await` by default for asynchronous work, including async `Main`. Reserve
   explicit `OnCompleted` for a documented adapter, outcome-observation or callback-test purpose.
 

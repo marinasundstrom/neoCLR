@@ -8,8 +8,8 @@ import NeoClr.Testing.*
 import System.Storage.Path
 import System.Collections.*
 
-[Test("Path equality agrees across typed interface and Object dispatch")]
-func PathValueEquality() -> Result<unit, TestFailure> {
+[Test]
+func `Path equality agrees across typed interface and Object dispatch`() -> Result<unit, TestFailure> {
     let Ok(first) = Path.Parse("notes/naïve.txt") else {
         return Assert.True(false, "Parse first fixture path")
     }
@@ -27,8 +27,8 @@ func PathValueEquality() -> Result<unit, TestFailure> {
     return Assert.True(!boxed.Equals(null) && !boxed.Equals(42), "Wrong type and null are unequal")
 }
 
-[Test("Equal paths share hashes and virtual display")]
-func PathHashDisplay() -> Result<unit, TestFailure> {
+[Test]
+func `Equal paths share hashes and virtual display`() -> Result<unit, TestFailure> {
     let Ok(first) = Path.Parse("notes/naïve.txt") else {
         return Assert.True(false, "Parse first fixture path")
     }
@@ -41,8 +41,8 @@ func PathHashDisplay() -> Result<unit, TestFailure> {
     return Assert.Equal(first.Text, first.ToString())
 }
 
-[Test("Path equality distinguishes case roots and normalization")]
-func PathOrdinal() -> Result<unit, TestFailure> {
+[Test]
+func `Path equality distinguishes case roots and normalization`() -> Result<unit, TestFailure> {
     let Ok(first) = Path.Parse("notes/naïve.txt") else {
         return Assert.True(false, "Parse first fixture path")
     }
@@ -64,8 +64,8 @@ func PathOrdinal() -> Result<unit, TestFailure> {
     return Assert.True(!first.Equals(cased) && !first.Equals(rooted) && !composed.Equals(decomposed), "Path values retain ordinal text and root distinctions")
 }
 
-[Test("Path maps replace equal keys and retain lookup through growth")]
-func PathMap() -> Result<unit, TestFailure> {
+[Test]
+func `Path maps replace equal keys and retain lookup through growth`() -> Result<unit, TestFailure> {
     let Ok(first) = Path.Parse("notes/naïve.txt") else {
         return Assert.True(false, "Parse first fixture path")
     }
@@ -90,8 +90,8 @@ func PathMap() -> Result<unit, TestFailure> {
     return Assert.True(map.ContainsKey(second) && map.Find(second) is Some(3), "Growth preserves equal-key lookup")
 }
 
-[Test("Path Object equality distinguishes colliding map keys")]
-func PathCollisions() -> Result<unit, TestFailure> {
+[Test]
+func `Path Object equality distinguishes colliding map keys`() -> Result<unit, TestFailure> {
     let Ok(first) = Path.Parse("notes/naïve.txt") else {
         return Assert.True(false, "Parse first fixture path")
     }

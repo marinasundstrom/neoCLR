@@ -532,20 +532,27 @@ artifacts requires recompilation with a matching compiler/runtime bundle.
 
 ## Descriptive test and benchmark names (2026-10-26)
 
-With the unreleased backtick-capable compiler, prefer `[Test]` and a descriptive
-backtick function name when the attribute description merely restates the test's
-behavior. Keep helper functions conventionally named. Keep explicit descriptions
-when testing description behavior or providing an independent display override.
+Author clarification (2026-10-29): prefer backtick identifiers when stating test
+behavior. Traditional names are valid when they already communicate the test
+clearly; backticks are not required for every test. Whenever a test needs a prose
+description, put it in its backtick identifier and use `[Test]` rather than a Test
+attribute description. Retain attribute descriptions only in fixtures exercising
+that feature. Helpers and data sources keep conventional, meaningful names.
+Do not add alphabetic prefixes merely to force an execution order; ordinary tests
+must be independent. Contract fixtures may intentionally test ordering.
+
 For benchmarks, choose concise, stable workload names; avoid changing identifiers
 for editorial changes to reports. Attributes still mark discovery and carry data
 rows/categories; they are not replaced by naming conventions.
 
 neoCLR metadata already preserves Unicode and spaces. The discovery adapter must
 quote source references and preserve scalar text in generated literals. Renames
-change IDs, selectors and ordinal order. Migrate bounded suites with execution
-checks and retain historical evidence under its original selectors. The initial
-migration covers IP-address behavior tests and discovery fixtures; other suites
-can migrate as maintained. See [testing](../api-docs/testing.md) and
+change IDs, selectors and ordinal order. Update active expectations/callers and
+retain historical evidence under its original selectors. The 2026-10-29 migration moves descriptions from 464 ordinary
+runtime/extension test attributes into 461 backtick identifiers and three existing
+clear traditional identifiers. Existing descriptive names, helper names and
+attribute-description contract fixtures are retained. See the
+[migration inventory and focused checks](validation/descriptive-test-names-20261029/README.md). See [testing](../api-docs/testing.md) and
 [benchmarking](../api-docs/benchmarking.md) for the development-only contract.
 
 ## Terminal panic calls

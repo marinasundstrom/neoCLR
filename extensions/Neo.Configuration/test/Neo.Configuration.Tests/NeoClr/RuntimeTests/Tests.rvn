@@ -21,8 +21,8 @@ class ConfigurationProbe : ConfigurationProvider, Disposable {
     func Dispose() { Disposals += 1 }
 }
 
-[Test("Configuration precedence distinguishes absent null and empty values")]
-func APrecedence() -> Result<unit, TestFailure> {
+[Test]
+func `Configuration precedence distinguishes absent null and empty values`() -> Result<unit, TestFailure> {
     let first = MemoryConfigurationProvider([ConfigurationEntry("App:Name", "first"), ConfigurationEntry("only", "base")])
     let last = MemoryConfigurationProvider([ConfigurationEntry("APP:NAME", null)])
     use root = DefaultConfigurationRoot([first, last])
@@ -36,8 +36,8 @@ func APrecedence() -> Result<unit, TestFailure> {
     return Assert.True(root["missing"] == null, "Absent reads null")
 }
 
-[Test("Configuration sections merge numeric children and preserve Unicode paths")]
-func BSections() -> Result<unit, TestFailure> {
+[Test]
+func `Configuration sections merge numeric children and preserve Unicode paths`() -> Result<unit, TestFailure> {
     let builder: ConfigurationBuilder = DefaultConfigurationBuilder()
     _ = builder.AddInMemoryCollection([ConfigurationEntry("List:10:Name", "ten"), ConfigurationEntry("List:2", "two"), ConfigurationEntry("List:word", "text"), ConfigurationEntry("K:Child", "unicode")])
     _ = builder.AddInMemoryCollection([ConfigurationEntry("list:2", "override")])
@@ -57,8 +57,8 @@ func BSections() -> Result<unit, TestFailure> {
     return Assert.Equal("scalar", root["list"] ?? "missing")
 }
 
-[Test("Configuration builds snapshot inputs and retain live sections")]
-func CSnapshots() -> Result<unit, TestFailure> {
+[Test]
+func `Configuration builds snapshot inputs and retain live sections`() -> Result<unit, TestFailure> {
     let data = ArrayList<ConfigurationEntry>()
     data.Add(ConfigurationEntry("ConnectionStrings:Main", "initial"))
     let builder: ConfigurationBuilder = DefaultConfigurationBuilder()
@@ -77,8 +77,8 @@ func CSnapshots() -> Result<unit, TestFailure> {
     return Assert.Equal(1, first.Providers.Count)
 }
 
-[Test("Configuration loads reloads and disposes provider registrations")]
-func DOwnership() -> Result<unit, TestFailure> {
+[Test]
+func `Configuration loads reloads and disposes provider registrations`() -> Result<unit, TestFailure> {
     let provider = ConfigurationProbe()
     let root = DefaultConfigurationRoot([provider])
     _ = Assert.Equal(1, provider.Loads)?
@@ -90,8 +90,8 @@ func DOwnership() -> Result<unit, TestFailure> {
     return Assert.Equal(1, provider.Disposals)
 }
 
-[Test("Configuration DI preserves overrides and caller ownership")]
-func EInjection() -> Result<unit, TestFailure> {
+[Test]
+func `Configuration DI preserves overrides and caller ownership`() -> Result<unit, TestFailure> {
     let probe = ConfigurationProbe()
     let configuration = DefaultConfigurationRoot([probe])
     let replacement = DefaultConfigurationBuilder().Build()
@@ -109,8 +109,8 @@ func EInjection() -> Result<unit, TestFailure> {
 }
 
 
-[Test("JSON configuration flattens objects arrays and scalar values")]
-func FJson() -> Result<unit, TestFailure> {
+[Test]
+func `JSON configuration flattens objects arrays and scalar values`() -> Result<unit, TestFailure> {
     let provider = JsonConfigurationProvider("unused.json")
     let Ok(_) = provider.LoadText("{\"A\":{\"B\":\"one\"},\"Items\":[2,true,null],\"Empty\":[],\"Object\":{},\"None\":null}") else { return Assert.True(false, "Parse JSON") }
     _ = Assert.True(provider.Find("a:b") is Some(let text) && text == "one", "Nested string")?
@@ -122,8 +122,8 @@ func FJson() -> Result<unit, TestFailure> {
     return Assert.True(provider.Find("None") is Some(let value) && value == null, "JSON null")
 }
 
-[Test("JSON configuration rejects ambiguous malformed and oversized input atomically")]
-func GJsonErrors() -> Result<unit, TestFailure> {
+[Test]
+func `JSON configuration rejects ambiguous malformed and oversized input atomically`() -> Result<unit, TestFailure> {
     let provider = JsonConfigurationProvider("unused.json")
     let Ok(_) = provider.LoadText("{\"Name\":\"retained\"}") else { return Assert.True(false, "Initial JSON") }
     _ = Assert.True(provider.LoadText("[]") is Failure(JsonConfigurationError.InvalidRoot), "Root must be an object")?
@@ -139,8 +139,8 @@ func GJsonErrors() -> Result<unit, TestFailure> {
     return Assert.True(provider.Find("Name") is Some(let value) && value == "retained", "Failure preserves prior data")
 }
 
-[Test("JSON configuration reads required optional files and reloads through the root")]
-func HJsonFiles() -> Result<unit, TestFailure> {
+[Test]
+func `JSON configuration reads required optional files and reloads through the root`() -> Result<unit, TestFailure> {
     let missing = JsonConfigurationProvider("configuration-does-not-exist.json")
     _ = Assert.True(missing.TryLoad() is Failure(JsonConfigurationError.File(FileReadError.NotFound)), "Required missing file")?
     let optional = JsonConfigurationProvider("configuration-does-not-exist.json", true)
@@ -163,8 +163,8 @@ func HJsonFiles() -> Result<unit, TestFailure> {
 }
 
 
-[Test("JSON configuration accepts realistic commented settings and preserves scalar text")]
-func IJsonRealistic() -> Result<unit, TestFailure> {
+[Test]
+func `JSON configuration accepts realistic commented settings and preserves scalar text`() -> Result<unit, TestFailure> {
     let provider = JsonConfigurationProvider("unused.json")
     var json = "{/* settings */\"Nested\":{\"A\":{\"B\":{\"C\":{\"D\":\"value\",},},},},\"Urls\":[\"https://example.test\",],"
     for index in 0..128 {
@@ -180,8 +180,8 @@ func IJsonRealistic() -> Result<unit, TestFailure> {
 }
 
 
-[Test("JSON configuration loads large files and preserves data on file size failure")]
-func JJsonLargeFile() -> Result<unit, TestFailure> {
+[Test]
+func `JSON configuration loads large files and preserves data on file size failure`() -> Result<unit, TestFailure> {
     var content = "é雪😀"
     for index in 0..13 { content += content }
     let provider = JsonConfigurationProvider("large-appsettings.json")

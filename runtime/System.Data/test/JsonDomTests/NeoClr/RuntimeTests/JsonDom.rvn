@@ -7,8 +7,8 @@ import NeoClr.Testing.*
 
 // Ported from json-dom/DomContracts and native-json document checks.
 
-[Test("JSON arrays report invalid indices")]
-func JsonArrayBounds() -> Result<unit, TestFailure> {
+[Test]
+func `JSON arrays report invalid indices`() -> Result<unit, TestFailure> {
     let array = JsonArray()
     _ = Assert.True(array.Add(JsonBoolean(true)) is Ok(_), "Add array element")?
     _ = Assert.Equal(1, array.Count)?
@@ -17,8 +17,8 @@ func JsonArrayBounds() -> Result<unit, TestFailure> {
     return Assert.True(array.Item(1) is Failure(JsonError.InvalidIndex(1)), "Past-end index must be rejected")
 }
 
-[Test("JSON objects distinguish present null from missing fields")]
-func JsonObjectNull() -> Result<unit, TestFailure> {
+[Test]
+func `JSON objects distinguish present null from missing fields`() -> Result<unit, TestFailure> {
     let document = JsonObject()
     _ = Assert.True(document.Add("note", JsonNull()) is Ok(_), "Add explicit null")?
     _ = Assert.True(document.Field("note") is Ok(JsonNull), "Present null must remain a node")?
@@ -26,8 +26,8 @@ func JsonObjectNull() -> Result<unit, TestFailure> {
         "Missing field must preserve its name")
 }
 
-[Test("JSON duplicate insertion preserves the original value")]
-func JsonObjectDuplicate() -> Result<unit, TestFailure> {
+[Test]
+func `JSON duplicate insertion preserves the original value`() -> Result<unit, TestFailure> {
     let document = JsonObject()
     _ = Assert.True(document.Add("note", JsonNull()) is Ok(_), "Add original value")?
     if document.Add("note", JsonBoolean(false)) is Failure(JsonError.DuplicateField(let name)) {
@@ -39,8 +39,8 @@ func JsonObjectDuplicate() -> Result<unit, TestFailure> {
     return Assert.True(document.Field("note") is Ok(JsonNull), "Rejected insertion must preserve original null")
 }
 
-[Test("JSON object indexed access preserves insertion order")]
-func JsonObjectOrder() -> Result<unit, TestFailure> {
+[Test]
+func `JSON object indexed access preserves insertion order`() -> Result<unit, TestFailure> {
     let document = JsonObject()
     let array = JsonArray()
     _ = Assert.True(array.Add(JsonBoolean(true)) is Ok(_), "Populate child array")?
@@ -56,8 +56,8 @@ func JsonObjectOrder() -> Result<unit, TestFailure> {
     return Assert.True(document.Item(0) is Ok(JsonArray), "Indexed child must retain its kind")
 }
 
-[Test("JSON numbers preserve spelling and reject fractional Int32 conversion")]
-func JsonNumberFraction() -> Result<unit, TestFailure> {
+[Test]
+func `JSON numbers preserve spelling and reject fractional Int32 conversion`() -> Result<unit, TestFailure> {
     let Ok(number) = JsonNumber.Parse("22.5") else {
         return Assert.True(false, "Valid decimal must parse")
     }
@@ -65,48 +65,48 @@ func JsonNumberFraction() -> Result<unit, TestFailure> {
     return Assert.True(number.AsInt32() is Failure(JsonError.NumberOutOfRange), "Fraction must not silently truncate")
 }
 
-[Test("JSON scalar nodes expose their typed values")]
-func JsonScalarProperties() -> Result<unit, TestFailure> {
+[Test]
+func `JSON scalar nodes expose their typed values`() -> Result<unit, TestFailure> {
     _ = Assert.Equal("hello", JsonString("hello").Value)?
     _ = Assert.True(JsonBoolean(true).Value, "Boolean true must be preserved")?
     return Assert.True(!JsonBoolean(false).Value, "Boolean false must be preserved")
 }
 
-[Test("JSON parsing rejects escaped aliases of duplicate names")]
-func JsonEscapedDuplicate() -> Result<unit, TestFailure> {
+[Test]
+func `JSON parsing rejects escaped aliases of duplicate names`() -> Result<unit, TestFailure> {
     if JsonSerializer.DeserializeNode("{\"a\":1,\"\\u0061\":2}") is Failure(JsonError.DuplicateField(let name)) {
         return Assert.Equal("a", name)
     }
     return Assert.True(false, "Escaped aliases must compare after decoding")
 }
 
-[Test("JSON parsing rejects trailing commas and truncated input")]
-func JsonMalformed() -> Result<unit, TestFailure> {
+[Test]
+func `JSON parsing rejects trailing commas and truncated input`() -> Result<unit, TestFailure> {
     _ = Assert.True(JsonSerializer.DeserializeNode("[1,]") is Failure(_), "Trailing comma must fail")?
     return Assert.True(JsonSerializer.DeserializeNode("[1,") is Failure(_), "Truncated array must fail")
 }
 
-[Test("JSON nested documents round trip with Unicode and number spelling")]
-func JsonDocumentRoundTrip() -> Result<unit, TestFailure> {
+[Test]
+func `JSON nested documents round trip with Unicode and number spelling`() -> Result<unit, TestFailure> {
     let input = "{\"station\":\"Café\",\"readings\":[1,-2,0],\"flags\":[true,false,null],\"empty\":[],\"metadata\":{},\"detail\":{\"text\":\"雪\",\"decimal\":1.25e2}}"
     return CheckJsonDocument(input, input)
 }
 
-[Test("JSON document round trip removes surrounding whitespace")]
-func JsonDocumentWhitespace() -> Result<unit, TestFailure> {
+[Test]
+func `JSON document round trip removes surrounding whitespace`() -> Result<unit, TestFailure> {
     return CheckJsonDocument(" {\"text\":\"Café 😀\",\"values\":[true,null,22.5]} ", "{\"text\":\"Café 😀\",\"values\":[true,null,22.5]}")
 }
 
-[Test("JSON documents support every root node kind")]
-func JsonRootKinds() -> Result<unit, TestFailure> {
+[Test]
+func `JSON documents support every root node kind`() -> Result<unit, TestFailure> {
     for text in ["null", "true", "1.25e2", "\"雪\"", "[]", "{}"] {
         _ = CheckJsonDocument(text, text)?
     }
     return Assert.True(true, "All root kinds round trip")
 }
 
-[Test("JSON serialization rejects cyclic node graphs")]
-func JsonCycle() -> Result<unit, TestFailure> {
+[Test]
+func `JSON serialization rejects cyclic node graphs`() -> Result<unit, TestFailure> {
     let cycle = JsonArray()
     _ = Assert.True(cycle.Add(cycle) is Ok(_), "Construct cycle for serialization validation")?
     return Assert.True(JsonSerializer.SerializeNode(cycle) is Failure(JsonError.LimitExceeded(_)), "Cycle must return a bounded serialization error")
@@ -129,8 +129,8 @@ func CheckJsonDocument(input: string, canonical: string) -> Result<unit, TestFai
     return Assert.Equal(canonical, copiedText)
 }
 
-[Test("JSON map lookup distinguishes null absence and ordinal keys")]
-func JsonMapLookup() -> Result<unit, TestFailure> {
+[Test]
+func `JSON map lookup distinguishes null absence and ordinal keys`() -> Result<unit, TestFailure> {
     let document = JsonObject()
     let nullNode = JsonNull()
     let textNode = JsonString("text")
@@ -149,8 +149,8 @@ func JsonMapLookup() -> Result<unit, TestFailure> {
     return Assert.True(map.ContainsKey("name") && !map.ContainsKey("NAME"), "Keys use ordinal equality")
 }
 
-[Test("JSON map snapshots preserve insertion order and node identity")]
-func JsonMapSnapshot() -> Result<unit, TestFailure> {
+[Test]
+func `JSON map snapshots preserve insertion order and node identity`() -> Result<unit, TestFailure> {
     let document = JsonObject()
     let first = JsonString("first")
     let second = JsonArray()
@@ -180,8 +180,8 @@ func JsonMapSnapshot() -> Result<unit, TestFailure> {
     return Assert.Equal(3, count)
 }
 
-[Test("JSON map views keep JSON node serialization precedence")]
-func JsonMapSerialization() -> Result<unit, TestFailure> {
+[Test]
+func `JSON map views keep JSON node serialization precedence`() -> Result<unit, TestFailure> {
     let Ok(node) = JsonSerializer.DeserializeNode("{\"name\":null,\"nested\":[true,{\"x\":1}]}") else {
         return Assert.True(false, "Parse nested object")
     }
@@ -197,8 +197,8 @@ func JsonMapSerialization() -> Result<unit, TestFailure> {
     return Assert.True(false, "Parsed root must be JsonObject")
 }
 
-[Test("Empty JSON objects support empty map snapshots and safe lookup")]
-func JsonMapEmpty() -> Result<unit, TestFailure> {
+[Test]
+func `Empty JSON objects support empty map snapshots and safe lookup`() -> Result<unit, TestFailure> {
     let map: System.Collections.Map<string, JsonValue> = JsonObject()
     _ = Assert.Equal(0, map.Count)?
     _ = Assert.Equal(0, map.Keys.Count)?
@@ -208,8 +208,8 @@ func JsonMapEmpty() -> Result<unit, TestFailure> {
     return Assert.True(map.Find("missing") is System.Optional<JsonValue>.None, "Empty safe lookup")
 }
 
-[Test("JSON sequence indexing retains node identity and explicit null")]
-func JsonSequenceAccess() -> Result<unit, TestFailure> {
+[Test]
+func `JSON sequence indexing retains node identity and explicit null`() -> Result<unit, TestFailure> {
     let array = JsonArray()
     let first = JsonNull()
     let second = JsonString("雪")
@@ -221,8 +221,8 @@ func JsonSequenceAccess() -> Result<unit, TestFailure> {
     return Assert.True(Object.ReferenceEquals(second, array[1]), "Concrete indexer retains string identity")
 }
 
-[Test("JSON sequence snapshots preserve order and shared child contents")]
-func JsonSequenceSnapshot() -> Result<unit, TestFailure> {
+[Test]
+func `JSON sequence snapshots preserve order and shared child contents`() -> Result<unit, TestFailure> {
     let array = JsonArray()
     let child = JsonArray()
     let last = JsonNull()
@@ -249,8 +249,8 @@ func JsonSequenceSnapshot() -> Result<unit, TestFailure> {
     return Assert.Equal(3, count)
 }
 
-[Test("Empty JSON arrays expose empty sequence snapshots")]
-func JsonSequenceEmpty() -> Result<unit, TestFailure> {
+[Test]
+func `Empty JSON arrays expose empty sequence snapshots`() -> Result<unit, TestFailure> {
     let array = JsonArray()
     let sequence: System.Collections.Sequence<JsonValue> = array
     use items = sequence.GetIterator()
@@ -260,8 +260,8 @@ func JsonSequenceEmpty() -> Result<unit, TestFailure> {
     return Assert.Equal(1, sequence.Count)
 }
 
-[Test("JSON sequence views retain node serialization precedence")]
-func JsonSequenceSerialization() -> Result<unit, TestFailure> {
+[Test]
+func `JSON sequence views retain node serialization precedence`() -> Result<unit, TestFailure> {
     let input = "[null,{\"name\":\"雪\"},[true],1.25e2]"
     let Ok(node) = JsonSerializer.DeserializeNode(input) else {
         return Assert.True(false, "Parse array")
@@ -278,8 +278,8 @@ func JsonSequenceSerialization() -> Result<unit, TestFailure> {
     return Assert.True(false, "Expected array root")
 }
 
-[Test("JSON node text supports compact and indented round trips")]
-func JsonFormatting() -> Result<unit, TestFailure> {
+[Test]
+func `JSON node text supports compact and indented round trips`() -> Result<unit, TestFailure> {
     let compact = "{\"text\":\"Café\\u000a\\\"雪\",\"items\":[true,null,{},[]]}"
     let pretty = "{\n  \"text\": \"Café\\u000a\\\"雪\",\n  \"items\": [\n    true,\n    null,\n    {},\n    []\n  ]\n}"
     let Ok(node) = JsonSerializer.DeserializeNode(compact) else {
@@ -325,8 +325,8 @@ func JsonFormatting() -> Result<unit, TestFailure> {
 }
 
 
-[Test("JSON document options follow strict defaults and independent relaxed syntax")]
-func JsonReaderOptions() -> Result<unit, TestFailure> {
+[Test]
+func `JSON document options follow strict defaults and independent relaxed syntax`() -> Result<unit, TestFailure> {
     var options = JsonDocumentOptions()
     _ = Assert.Equal(0, options.MaxDepth)?
     _ = Assert.True(!options.AllowTrailingCommas && options.CommentHandling == JsonCommentHandling.Disallow, "Strict defaults")?
@@ -352,8 +352,8 @@ func JsonReaderOptions() -> Result<unit, TestFailure> {
     return Assert.True(JsonSerializer.DeserializeNode("/*empty*/{}//EOF", options) is Ok(_), "Line comment at EOF")
 }
 
-[Test("JSON depth defaults to 64 and validates document options")]
-func JsonReaderDepth() -> Result<unit, TestFailure> {
+[Test]
+func `JSON depth defaults to 64 and validates document options`() -> Result<unit, TestFailure> {
     var document = "0"
     for index in 0..64 { document = "[" + document + "]" }
     _ = Assert.True(JsonSerializer.DeserializeNode(document) is Ok(_), "Depth 64 accepted")?
@@ -373,8 +373,8 @@ func JsonReaderDepth() -> Result<unit, TestFailure> {
     return Assert.True(JsonSerializer.DeserializeNode("null", options) is Failure(JsonError.InvalidOptions(_)), "Unknown comment policy")
 }
 
-[Test("JSON parsing supports large containers and long UTF-8 escaped strings")]
-func JsonReaderLarge() -> Result<unit, TestFailure> {
+[Test]
+func `JSON parsing supports large containers and long UTF-8 escaped strings`() -> Result<unit, TestFailure> {
     var fields = "{"
     for index in 0..128 {
         if index > 0 { fields += "," }

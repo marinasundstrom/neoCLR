@@ -7,8 +7,8 @@ import NeoClr.Testing.*
 
 import System.Collections.*
 
-[Test("URI reference resolution corpus group 1")]
-func UriResolution1() -> Result<unit, TestFailure> {
+[Test]
+func `URI reference resolution corpus group 1`() -> Result<unit, TestFailure> {
     let baseUri = RequiredUri("http://a/b/c/d;p?q")?
     _ = CheckResolution(baseUri, "g:h", "g:h")?
     _ = CheckResolution(baseUri, "g", "http://a/b/c/g")?
@@ -21,8 +21,8 @@ func UriResolution1() -> Result<unit, TestFailure> {
     return Assert.True(true, "Resolution corpus group completed")
 }
 
-[Test("URI reference resolution corpus group 2")]
-func UriResolution2() -> Result<unit, TestFailure> {
+[Test]
+func `URI reference resolution corpus group 2`() -> Result<unit, TestFailure> {
     let baseUri = RequiredUri("http://a/b/c/d;p?q")?
     _ = CheckResolution(baseUri, "#s", "http://a/b/c/d;p?q#s")?
     _ = CheckResolution(baseUri, "g#s", "http://a/b/c/g#s")?
@@ -35,8 +35,8 @@ func UriResolution2() -> Result<unit, TestFailure> {
     return Assert.True(true, "Resolution corpus group completed")
 }
 
-[Test("URI reference resolution corpus group 3")]
-func UriResolution3() -> Result<unit, TestFailure> {
+[Test]
+func `URI reference resolution corpus group 3`() -> Result<unit, TestFailure> {
     let baseUri = RequiredUri("http://a/b/c/d;p?q")?
     _ = CheckResolution(baseUri, "./", "http://a/b/c/")?
     _ = CheckResolution(baseUri, "..", "http://a/b/")?
@@ -49,8 +49,8 @@ func UriResolution3() -> Result<unit, TestFailure> {
     return Assert.True(true, "Resolution corpus group completed")
 }
 
-[Test("URI reference resolution corpus group 4")]
-func UriResolution4() -> Result<unit, TestFailure> {
+[Test]
+func `URI reference resolution corpus group 4`() -> Result<unit, TestFailure> {
     let baseUri = RequiredUri("http://a/b/c/d;p?q")?
     _ = CheckResolution(baseUri, "../../../../g", "http://a/g")?
     _ = CheckResolution(baseUri, "/./g", "http://a/g")?
@@ -63,8 +63,8 @@ func UriResolution4() -> Result<unit, TestFailure> {
     return Assert.True(true, "Resolution corpus group completed")
 }
 
-[Test("URI reference resolution corpus group 5")]
-func UriResolution5() -> Result<unit, TestFailure> {
+[Test]
+func `URI reference resolution corpus group 5`() -> Result<unit, TestFailure> {
     let baseUri = RequiredUri("http://a/b/c/d;p?q")?
     _ = CheckResolution(baseUri, "./g/.", "http://a/b/c/g/")?
     _ = CheckResolution(baseUri, "g/./h", "http://a/b/c/g/h")?
@@ -77,8 +77,8 @@ func UriResolution5() -> Result<unit, TestFailure> {
     return Assert.True(true, "Resolution corpus group completed")
 }
 
-[Test("URI reference resolution corpus group 6")]
-func UriResolution6() -> Result<unit, TestFailure> {
+[Test]
+func `URI reference resolution corpus group 6`() -> Result<unit, TestFailure> {
     let baseUri = RequiredUri("http://a/b/c/d;p?q")?
     _ = CheckResolution(baseUri, "g#s/../x", "http://a/b/c/g#s/../x")?
     _ = CheckResolution(baseUri, "http:g", "http:g")?
@@ -89,8 +89,8 @@ func UriResolution6() -> Result<unit, TestFailure> {
     return Assert.True(true, "Resolution corpus group completed")
 }
 
-[Test("URI parsing rejects every invalid grammar corpus input")]
-func UriInvalid() -> Result<unit, TestFailure> {
+[Test]
+func `URI parsing rejects every invalid grammar corpus input`() -> Result<unit, TestFailure> {
     for text in ["a b", "a\\b", "a\n", "%", "%0", "%zz", "1:a", ":a", "a#b#c", "http://a:xyz/", "http://a:1:2/", "http://a@b@c/", "é", "<x>"] {
         if Uri.Parse(text) is Failure(let error) {
             _ = Assert.True(error is UriError.InvalidFormat, "Invalid grammar error kind")?
@@ -101,8 +101,8 @@ func UriInvalid() -> Result<unit, TestFailure> {
     return Assert.True(true, "Invalid grammar corpus rejected")
 }
 
-[Test("URI byte parsing preserves ASCII boundaries and encoded Unicode")]
-func UriByteGrammar() -> Result<unit, TestFailure> {
+[Test]
+func `URI byte parsing preserves ASCII boundaries and encoded Unicode`() -> Result<unit, TestFailure> {
     for text in ["AZaz09+.-:a", "http://user:secret@example.test:80/a%2Fb?q=%C3%A9#%fF", "/-._~!$&'()*+,;=@/?:#", "%00%7F%80%ff"] {
         let uri = RequiredUri(text)?
         _ = Assert.Equal(text, uri.Text)?
@@ -117,8 +117,8 @@ func UriByteGrammar() -> Result<unit, TestFailure> {
     return Assert.True(true, "ASCII boundaries and encoded bytes preserved")
 }
 
-[Test("URI classification and equality preserve literal identity")]
-func UriClassification() -> Result<unit, TestFailure> {
+[Test]
+func `URI classification and equality preserve literal identity`() -> Result<unit, TestFailure> {
     let empty = RequiredUri("")?
     let mail = RequiredUri("mailto:a@example.test")?
     let authority = RequiredUri("//a/path")?
@@ -130,8 +130,8 @@ func UriClassification() -> Result<unit, TestFailure> {
     return Assert.True(!value.Equals("a"), "URI does not equal plain text")
 }
 
-[Test("URI resolution handles authority and path bases and rejects relative bases")]
-func UriBaseRules() -> Result<unit, TestFailure> {
+[Test]
+func `URI resolution handles authority and path bases and rejects relative bases`() -> Result<unit, TestFailure> {
     _ = CheckResolution(RequiredUri("http://a")?, "child", "http://a/child")?
     _ = CheckResolution(RequiredUri("http://a/b/")?, "child", "http://a/b/child")?
     _ = CheckResolution(RequiredUri("http://a/b")?, "child", "http://a/child")?
@@ -150,16 +150,16 @@ func UriBaseRules() -> Result<unit, TestFailure> {
     return Assert.True(false, "Relative base must fail")
 }
 
-[Test("URI parsing reports unsupported bracketed authorities")]
-func UriUnsupportedAuthority() -> Result<unit, TestFailure> {
+[Test]
+func `URI parsing reports unsupported bracketed authorities`() -> Result<unit, TestFailure> {
     if Uri.Parse("http://[::1]/") is Failure(let error) {
         return Assert.True(error is UriError.UnsupportedAuthority, "IPv6 authority remains an explicit unsupported grammar shape")
     }
     return Assert.True(false, "Unsupported authority must fail")
 }
 
-[Test("URI parsing and resolution enforce the byte quota")]
-func UriLengthQuota() -> Result<unit, TestFailure> {
+[Test]
+func `URI parsing and resolution enforce the byte quota`() -> Result<unit, TestFailure> {
     var text = "x"
     var index = 0
     while index < 12 {

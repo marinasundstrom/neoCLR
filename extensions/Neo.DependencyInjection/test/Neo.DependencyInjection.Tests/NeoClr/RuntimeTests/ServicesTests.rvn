@@ -38,8 +38,8 @@ public class ExternalService : Disposable {
     func Dispose() { Count = Count + 1 }
 }
 
-[Test("DI registry snapshots registrations and injects typed localizers")]
-func ERegistry() -> Result<unit, TestFailure> {
+[Test]
+func `DI registry snapshots registrations and injects typed localizers`() -> Result<unit, TestFailure> {
     let services: ServiceCollection = DefaultServiceCollection()
     let strings = Strings()
     _ = Assert.True(services.AddInstance(typeof(Localizer<Feature>), strings) is Ok(_), "Register localizer")?
@@ -56,8 +56,8 @@ func ERegistry() -> Result<unit, TestFailure> {
     return Ok(())
 }
 
-[Test("DI isolates scopes and shares only singleton instances")]
-func FLifetimes() -> Result<unit, TestFailure> {
+[Test]
+func `DI isolates scopes and shares only singleton instances`() -> Result<unit, TestFailure> {
     let services = DefaultServiceCollection()
     _ = services.Add(typeof(TransientService), typeof(TransientService), ServiceLifetime.Transient)
     _ = services.Add(typeof(ScopedService), typeof(ScopedService), ServiceLifetime.Scoped)
@@ -82,8 +82,8 @@ func FLifetimes() -> Result<unit, TestFailure> {
     return Ok(())
 }
 
-[Test("DI rejects cycles and captive scopes without poisoning resolution state")]
-func GFailures() -> Result<unit, TestFailure> {
+[Test]
+func `DI rejects cycles and captive scopes without poisoning resolution state`() -> Result<unit, TestFailure> {
     let services = DefaultServiceCollection()
     _ = services.Add(typeof(CycleA), typeof(CycleA), ServiceLifetime.Transient)
     _ = services.Add(typeof(CycleB), typeof(CycleB), ServiceLifetime.Transient)
@@ -101,8 +101,8 @@ func GFailures() -> Result<unit, TestFailure> {
     return Ok(())
 }
 
-[Test("DI disposes owned services in reverse order and leaves instances caller owned")]
-func HDisposal() -> Result<unit, TestFailure> {
+[Test]
+func `DI disposes owned services in reverse order and leaves instances caller owned`() -> Result<unit, TestFailure> {
     let services = DefaultServiceCollection()
     let log = DisposalLog()
     let external = ExternalService()
@@ -123,8 +123,8 @@ func HDisposal() -> Result<unit, TestFailure> {
     return Assert.Equal(0, external.Count)
 }
 
-[Test("DI validates factories and registrations and resets failed singleton factories")]
-func IFactories() -> Result<unit, TestFailure> {
+[Test]
+func `DI validates factories and registrations and resets failed singleton factories`() -> Result<unit, TestFailure> {
     let services = DefaultServiceCollection()
     _ = Assert.True(services.Add(typeof(Localizer), typeof(Feature), ServiceLifetime.Singleton) is Failure(ServiceError.InvalidRegistration(_)), "Invalid implementation")?
     _ = Assert.True(services.AddInstance(typeof(Localizer), Feature()) is Failure(ServiceError.InvalidRegistration(_)), "Invalid instance")?
@@ -142,8 +142,8 @@ func IFactories() -> Result<unit, TestFailure> {
     return Ok(())
 }
 
-[Test("DI injects the current provider and root disposal invalidates live scopes")]
-func JProvider() -> Result<unit, TestFailure> {
+[Test]
+func `DI injects the current provider and root disposal invalidates live scopes`() -> Result<unit, TestFailure> {
     let services = DefaultServiceCollection()
     _ = services.Add(typeof(ProviderConsumer), typeof(ProviderConsumer), ServiceLifetime.Transient)
     let Ok(root) = services.Build() else { return Assert.True(false, "Build") }
@@ -158,8 +158,8 @@ func JProvider() -> Result<unit, TestFailure> {
 
 public open class ExtensibleService { }
 
-[Test("DI conventional lookups distinguish missing services from activation errors")]
-func KLookups() -> Result<unit, TestFailure> {
+[Test]
+func `DI conventional lookups distinguish missing services from activation errors`() -> Result<unit, TestFailure> {
     let services: ServiceCollection = DefaultServiceCollection()
     let first = Feature()
     let last = Feature()
@@ -184,8 +184,8 @@ func KLookups() -> Result<unit, TestFailure> {
     return Ok(())
 }
 
-[Test("DI generic registrations preserve factory failures and plural singleton slots")]
-func LGenericRegistrations() -> Result<unit, TestFailure> {
+[Test]
+func `DI generic registrations preserve factory failures and plural singleton slots`() -> Result<unit, TestFailure> {
     let services: ServiceCollection = DefaultServiceCollection()
     _ = services.AddSingleton<Localizer<Feature>, Strings>()
     _ = services.AddScoped<ScopedService>()
@@ -209,8 +209,8 @@ func LGenericRegistrations() -> Result<unit, TestFailure> {
     return Ok(())
 }
 
-[Test("DI cleans up factory results when disposal reenters resolution")]
-func MFactoryDisposal() -> Result<unit, TestFailure> {
+[Test]
+func `DI cleans up factory results when disposal reenters resolution`() -> Result<unit, TestFailure> {
     let services: ServiceCollection = DefaultServiceCollection()
     let created = ExternalService()
     _ = services.AddTransient<ExternalService>(provider => {
@@ -235,8 +235,8 @@ func MFactoryDisposal() -> Result<unit, TestFailure> {
     return Assert.Equal(1, shared.Count)
 }
 
-[Test("DI keyed lookups isolate registrations and preserve ordinary key equality")]
-func NKeys() -> Result<unit, TestFailure> {
+[Test]
+func `DI keyed lookups isolate registrations and preserve ordinary key equality`() -> Result<unit, TestFailure> {
     let services: ServiceCollection = DefaultServiceCollection()
     let ordinary = Feature()
     let first = Feature()
@@ -260,8 +260,8 @@ func NKeys() -> Result<unit, TestFailure> {
     return Ok(())
 }
 
-[Test("DI keyed factories and scopes preserve independent lifetime slots")]
-func OKeyedLifetimes() -> Result<unit, TestFailure> {
+[Test]
+func `DI keyed factories and scopes preserve independent lifetime slots`() -> Result<unit, TestFailure> {
     let services: ServiceCollection = DefaultServiceCollection()
     let log = DisposalLog()
     _ = services.AddKeyedScoped<ScopedService>("a")
@@ -297,8 +297,8 @@ public class Multiplier {
 func Increment(value: int) -> int => value + 1
 func DoubleValue(value: int) -> int => value * 2
 
-[Test("DI retrieves keyed bound function objects without invoking them as factories")]
-func PFunctions() -> Result<unit, TestFailure> {
+[Test]
+func `DI retrieves keyed bound function objects without invoking them as factories`() -> Result<unit, TestFailure> {
     let services: ServiceCollection = DefaultServiceCollection()
     let increment: (int) -> int = Increment
     let doubleValue: (int) -> int = DoubleValue
@@ -319,8 +319,8 @@ func PFunctions() -> Result<unit, TestFailure> {
     return Ok(())
 }
 
-[Test("DI TryAdd preserves existing type and key registrations without activating factories")]
-func QTryAdd() -> Result<unit, TestFailure> {
+[Test]
+func `DI TryAdd preserves existing type and key registrations without activating factories`() -> Result<unit, TestFailure> {
     let services: ServiceCollection = DefaultServiceCollection()
     let log = DisposalLog()
     _ = Assert.True(services.TryAddSingleton<SingletonService>() is Ok(true), "First registration")?
@@ -382,8 +382,8 @@ public class GraphRoot {
     }
 }
 
-[Test("DI diamond graphs preserve lifetimes and independent scope ownership")]
-func RGraphs() -> Result<unit, TestFailure> {
+[Test]
+func `DI diamond graphs preserve lifetimes and independent scope ownership`() -> Result<unit, TestFailure> {
     let services: ServiceCollection = DefaultServiceCollection()
     _ = services.AddSingleton<SingletonService>()
     _ = services.AddScoped<GraphShared>()
@@ -422,8 +422,8 @@ func RGraphs() -> Result<unit, TestFailure> {
     return Ok(())
 }
 
-[Test("DI website sample resolves a scoped constructor graph and disposes scopes")]
-func ZWebsiteSample() -> Result<unit, TestFailure> {
+[Test]
+func `DI website sample resolves a scoped constructor graph and disposes scopes`() -> Result<unit, TestFailure> {
     let Ok(text) = Examples.DependencyInjection.CreateGreeting("Ada") else {
         return Assert.True(false, "Resolve website sample")
     }
@@ -453,8 +453,8 @@ public class GenericCycle<T> {
     init(other: GenericCycle<T>) { }
 }
 
-[Test("DI closes open generic registrations and isolates scoped caches by type")]
-func YOpenGenericScopes() -> Result<unit, TestFailure> {
+[Test]
+func `DI closes open generic registrations and isolates scoped caches by type`() -> Result<unit, TestFailure> {
     let services: ServiceCollection = DefaultServiceCollection()
     _ = Assert.True(services.Add(typeof(GenericService<>), typeof(GenericServiceImplementation<>), ServiceLifetime.Scoped) is Ok(_), "Open interface registration")?
     _ = Assert.True(services.Add(typeof(GenericConsumer<>), typeof(GenericConsumer<>), ServiceLifetime.Transient) is Ok(_), "Open consumer registration")?
@@ -487,8 +487,8 @@ func YOpenGenericScopes() -> Result<unit, TestFailure> {
     return Assert.Equal("DD", log.Text)
 }
 
-[Test("DI open generic singletons preserve exact overrides keyed lookup and plural order")]
-func YOpenGenericSingletons() -> Result<unit, TestFailure> {
+[Test]
+func `DI open generic singletons preserve exact overrides keyed lookup and plural order`() -> Result<unit, TestFailure> {
     let services: ServiceCollection = DefaultServiceCollection()
     let closed: GenericService<int> = GenericServiceImplementation<int>()
     _ = Assert.True(services.AddInstance(typeof(GenericService<int>), closed) is Ok(_), "Exact instance")?

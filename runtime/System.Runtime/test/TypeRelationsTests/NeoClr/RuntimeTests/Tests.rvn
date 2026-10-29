@@ -22,8 +22,8 @@ open class Parent : Tagged {
 class Child : Parent { }
 class Other { }
 
-[Test("Type identity and assignment direction")]
-func Identity() -> Result<unit, TestFailure> {
+[Test]
+func `Type identity and assignment direction`() -> Result<unit, TestFailure> {
     let parent = typeof(Parent)
     let child = typeof(Child)
     _ = Assert.True(parent.AssignableFrom(child), "derived to base")?
@@ -33,8 +33,8 @@ func Identity() -> Result<unit, TestFailure> {
     return Assert.True(!child.AssignableTo(typeof(Other)), "unrelated")
 }
 
-[Test("Interface assignment includes inherited contracts")]
-func Interfaces() -> Result<unit, TestFailure> {
+[Test]
+func `Interface assignment includes inherited contracts`() -> Result<unit, TestFailure> {
     _ = Assert.True(typeof(Child).AssignableTo(typeof(Tagged)), "inherited interface")?
     _ = Assert.True(typeof(Child).AssignableTo(typeof(Named)), "base interface")?
     _ = Assert.True(typeof(Tagged).AssignableTo(typeof(Named)), "interface inheritance")?
@@ -42,8 +42,8 @@ func Interfaces() -> Result<unit, TestFailure> {
     return Assert.True(!typeof(Named).AssignableTo(typeof(Child)), "interface to class")
 }
 
-[Test("Boxing and instance checks reject null")]
-func Instances() -> Result<unit, TestFailure> {
+[Test]
+func `Boxing and instance checks reject null`() -> Result<unit, TestFailure> {
     _ = Assert.True(typeof(int).AssignableTo(typeof(Object)), "boxing")?
     _ = Assert.True(!typeof(int).AssignableTo(typeof(long)), "no numeric conversion")?
     _ = Assert.True(typeof(int).IsInstanceOfType(42), "boxed integer")?
@@ -53,8 +53,8 @@ func Instances() -> Result<unit, TestFailure> {
     return Assert.True(!typeof(Object).IsInstanceOfType(null), "null is no instance")
 }
 
-[Test("Closed generic types remain distinct")]
-func Generics() -> Result<unit, TestFailure> {
+[Test]
+func `Closed generic types remain distinct`() -> Result<unit, TestFailure> {
     let generic = typeof(ArrayList<int>)
     let definition = generic.GetGenericTypeDefinition()
     _ = Assert.True(definition.IsGenericTypeDefinition, "Recovered definition")?
@@ -82,8 +82,8 @@ func Generics() -> Result<unit, TestFailure> {
     return Assert.True(!typeof(ArrayList<string>).AssignableTo(typeof(ArrayList<Object>)), "invariant class")
 }
 
-[Test("Arrays preserve element identity")]
-func Arrays() -> Result<unit, TestFailure> {
+[Test]
+func `Arrays preserve element identity`() -> Result<unit, TestFailure> {
     let constructed = typeof(int).MakeArrayType()
     let values: Object?[] = [10, 20]
     let array = (int[])System.Runtime.Reflection.ArrayReflection.Create(constructed, values)
@@ -99,8 +99,8 @@ func Arrays() -> Result<unit, TestFailure> {
     return Assert.True(!typeof(int[]).AssignableTo(typeof(string[])), "array element mismatch")
 }
 
-[Test("Subclass checks are strict and exclude interfaces")]
-func Subclasses() -> Result<unit, TestFailure> {
+[Test]
+func `Subclass checks are strict and exclude interfaces`() -> Result<unit, TestFailure> {
     _ = Assert.True(typeof(Child).IsSubclassOf(typeof(Parent)), "direct base")?
     _ = Assert.True(typeof(Child).IsSubclassOf(typeof(Object)), "transitive base")?
     _ = Assert.True(!typeof(Child).IsSubclassOf(typeof(Child)), "self")?

@@ -97,8 +97,8 @@ func StartWrite(transfer: PendingTransfer) -> Task<int> {
     return transfer.Write(memory[1..3])
 }
 
-[Test("Pending Memory destinations survive collection and preserve surrounding bytes")]
-async func ARead() -> Task<Result<unit, TestFailure>> {
+[Test]
+async func `Pending Memory destinations survive collection and preserve surrounding bytes`() -> Task<Result<unit, TestFailure>> {
     let first = Promise<bool>()
     let second = Promise<bool>()
     let transfer = GatedTransfer(first.Task, second.Task)
@@ -116,8 +116,8 @@ async func ARead() -> Task<Result<unit, TestFailure>> {
     return Assert.Equal(2, await operation)
 }
 
-[Test("Pending ReadOnlyMemory sources survive repeated suspension and collection")]
-async func BWrite() -> Task<Result<unit, TestFailure>> {
+[Test]
+async func `Pending ReadOnlyMemory sources survive repeated suspension and collection`() -> Task<Result<unit, TestFailure>> {
     let first = Promise<bool>()
     let second = Promise<bool>()
     let transfer = GatedTransfer(first.Task, second.Task)
@@ -133,8 +133,8 @@ async func BWrite() -> Task<Result<unit, TestFailure>> {
     return Assert.Equal(30, await operation)
 }
 
-[Test("Cancelled and rejected Memory transfers do not write or resume twice")]
-async func CCancel() -> Task<Result<unit, TestFailure>> {
+[Test]
+async func `Cancelled and rejected Memory transfers do not write or resume twice`() -> Task<Result<unit, TestFailure>> {
     let data: byte[] = [(byte)165, (byte)9, (byte)10, (byte)166]
     let memory: Memory<byte> = data
     let cancelled = Promise<bool>()
@@ -168,8 +168,8 @@ func StartEmpty(transfer: PendingTransfer) -> Task<int> {
     return transfer.Write(memory[1..])
 }
 
-[Test("Default and end-position Memory windows remain empty after suspension")]
-async func DEmpty() -> Task<Result<unit, TestFailure>> {
+[Test]
+async func `Default and end-position Memory windows remain empty after suspension`() -> Task<Result<unit, TestFailure>> {
     let first = Promise<bool>()
     let second = Promise<bool>()
     let transfer = GatedTransfer(first.Task, second.Task)

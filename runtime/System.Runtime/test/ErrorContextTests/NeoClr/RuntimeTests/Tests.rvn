@@ -34,8 +34,8 @@ class CyclicError : Error {
     val StackTrace: Optional<StackTrace> => None
 }
 
-[Test("Platform and author errors opt into message and absent diagnostics")]
-func ALeafErrors() -> Result<unit, TestFailure> {
+[Test]
+func `Platform and author errors opt into message and absent diagnostics`() -> Result<unit, TestFailure> {
     let file: Error = FileReadError.NotFound
     _ = Assert.Equal("NotFound", file.Message)?
     _ = Assert.True(file.Cause is None && file.StackTrace is None, "Leaf diagnostics absent")?
@@ -47,8 +47,8 @@ func ALeafErrors() -> Result<unit, TestFailure> {
     return Assert.True(author.Cause is None && author.StackTrace is None, "Author defaults")
 }
 
-[Test("Context preserves typed payload and interface cause without capturing")]
-func BTypedCause() -> Result<unit, TestFailure> {
+[Test]
+func `Context preserves typed payload and interface cause without capturing`() -> Result<unit, TestFailure> {
     let context = FileReadError.NotFound.WithContext("Loading configuration")
     _ = Assert.True(context.Cause is FileReadError.NotFound, "Typed case retained")?
     let view: Error = context
@@ -57,8 +57,8 @@ func BTypedCause() -> Result<unit, TestFailure> {
     return Assert.True(view.StackTrace is None, "No implicit trace")
 }
 
-[Test("Successful results skip lazy context and capture")]
-func CSuccessBypass() -> Result<unit, TestFailure> {
+[Test]
+func `Successful results skip lazy context and capture`() -> Result<unit, TestFailure> {
     let calls = Counter()
     let success: Result<int, FileReadError> = Ok(42)
     let wrapped = success.WithContext(() => {
@@ -75,8 +75,8 @@ func Propagate() -> Result<int, ContextError<FileReadError>> {
     return Ok(value + 1)
 }
 
-[Test("Failure context evaluates once and propagates the typed wrapper")]
-func DFailurePropagation() -> Result<unit, TestFailure> {
+[Test]
+func `Failure context evaluates once and propagates the typed wrapper`() -> Result<unit, TestFailure> {
     let calls = Counter()
     let failure: Result<int, FileReadError> = Failure(FileReadError.NotFound)
     let wrapped = failure.WithContext(() => {
@@ -94,8 +94,8 @@ func DFailurePropagation() -> Result<unit, TestFailure> {
     return Assert.True(propagated.Cause is FileReadError.AccessDenied, "Propagation retained cause")
 }
 
-[Test("Nested context formats each cause once and keeps concise display")]
-func ENestedFormatting() -> Result<unit, TestFailure> {
+[Test]
+func `Nested context formats each cause once and keeps concise display`() -> Result<unit, TestFailure> {
     let inner = FileReadError.NotFound.WithContext("Reading file")
     let outer = inner.WithContext("Starting application")
     _ = Assert.Equal("Starting application", outer.Message)?
@@ -104,8 +104,8 @@ func ENestedFormatting() -> Result<unit, TestFailure> {
     return Assert.Equal("Starting application\nCaused by: Reading file\nCaused by: NotFound", error.FormatError())
 }
 
-[Test("Explicit capture survives collection and later wrappers reuse its snapshot")]
-func FCaptureReuse() -> Result<unit, TestFailure> {
+[Test]
+func `Explicit capture survives collection and later wrappers reuse its snapshot`() -> Result<unit, TestFailure> {
     let inner = FileReadError.NotFound.WithContext("Capture boundary", true)
     let outer = inner.WithContext("Outer boundary", true)
     let plain = outer.WithContext("No new capture")
@@ -127,8 +127,8 @@ func FCaptureReuse() -> Result<unit, TestFailure> {
     return Assert.True(formatted.Contains("FCaptureReuse"), "Attachment stack retained")
 }
 
-[Test("Domain causes preserve trace and explicit mapping remains available")]
-func GDomainMapping() -> Result<unit, TestFailure> {
+[Test]
+func `Domain causes preserve trace and explicit mapping remains available`() -> Result<unit, TestFailure> {
     let captured = AuthorError().WithContext("Origin", true)
     let domain = DomainError(captured)
     let outer = domain.WithContext("Boundary", true)
@@ -147,22 +147,22 @@ func GDomainMapping() -> Result<unit, TestFailure> {
     return Assert.True(value.Cause is Some(FileReadError), "Mapping retains structured cause")
 }
 
-[Test("Malformed cyclic cause chains have bounded formatting and lookup")]
-func HBoundedChains() -> Result<unit, TestFailure> {
+[Test]
+func `Malformed cyclic cause chains have bounded formatting and lookup`() -> Result<unit, TestFailure> {
     let cycle: Error = CyclicError()
     _ = Assert.True(cycle.FormatError().Contains("Cause chain truncated after 64 layers"), "Bounded formatter")?
     let wrapped = cycle.WithContext("Cycle boundary")
     return Assert.True(wrapped.StackTrace is None, "Bounded trace lookup")
 }
 
-[Test("Unrelated result error types remain unconstrained")]
-func IUnconstrainedResult() -> Result<unit, TestFailure> {
+[Test]
+func `Unrelated result error types remain unconstrained`() -> Result<unit, TestFailure> {
     let value: Result<int, string> = Failure("ordinary residual")
     return Assert.True(value is Failure("ordinary residual"), "No mandatory Error interface")
 }
 
-[Test("Application capture policy is opt in and explicit overrides win")]
-func JApplicationPolicy() -> Result<unit, TestFailure> {
+[Test]
+func `Application capture policy is opt in and explicit overrides win`() -> Result<unit, TestFailure> {
     _ = Assert.True(!ErrorDiagnostics.CaptureStackTraces, "Initially disabled")?
     ErrorDiagnostics.ConfigureStackTraceCapture(true)
     let enabled = AuthorError().WithContext("Application policy")
@@ -178,8 +178,8 @@ func EnableDevelopmentErrorDiagnostics() {
     ErrorDiagnostics.ConfigureStackTraceCapture(true)
 }
 
-[Test("Conditional startup configures capture only when DEBUG is defined")]
-func KConditionalCapturePolicy() -> Result<unit, TestFailure> {
+[Test]
+func `Conditional startup configures capture only when DEBUG is defined`() -> Result<unit, TestFailure> {
     ErrorDiagnostics.ConfigureStackTraceCapture(false)
     EnableDevelopmentErrorDiagnostics()
     let enabled = ErrorDiagnostics.CaptureStackTraces
@@ -205,8 +205,8 @@ func ReadThroughContextBoundary() -> Result<int, Error> {
     return Ok(value)
 }
 
-[Test("Interface result boundaries preserve runtime errors without automatic context")]
-func LInterfaceBoundary() -> Result<unit, TestFailure> {
+[Test]
+func `Interface result boundaries preserve runtime errors without automatic context`() -> Result<unit, TestFailure> {
     let Failure(error) = ReadThroughErrorBoundary() else {
         return Assert.True(false, "Expected interface error")
     }

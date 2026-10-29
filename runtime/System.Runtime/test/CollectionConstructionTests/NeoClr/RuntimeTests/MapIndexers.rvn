@@ -6,8 +6,8 @@ import System.Optional.*
 import System.Result.*
 import NeoClr.Testing.*
 
-[Test("Map indexers share comparer lookup and insert-or-replace semantics")]
-func MapIndexers() -> Result<unit, TestFailure> {
+[Test]
+func `Map indexers share comparer lookup and insert-or-replace semantics`() -> Result<unit, TestFailure> {
     let storage = HashMap<string, int>(StringComparer.OrdinalIgnoreCase)
     let writer: MutableMap<string, int> = storage
     let reader: Map<string, int> = writer

@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-29
 
+- Establish descriptive backtick identifiers as the convention when stating test behavior; traditional names remain valid when clear. Move 464 runtime/extension test descriptions out of Test attributes: rename 461 methods and retain three clear traditional names. Update async callers and qualified-name/sort expectations. Test bodies and description-feature fixtures are unchanged; name-based IDs, selectors and discovery order change.
+
 - Rename System.Fail to System.Panic to distinguish terminal errors from Result.Failure; prefer importing System.* and calling Panic. Update Raven contract integration, callers and API documentation. No compatibility alias is retained; consumers must rebuild with the matching compiler/runtime bundle. Runtime fault, cleanup and thread/task behavior is unchanged; broader panic semantics are deferred.
 
 - Integrate Raven carrier postfix `!` through existing native terminal failure; add a focused native compiler/interpreter verifier for success, failure and member chaining. No runtime ABI change.

@@ -4,8 +4,8 @@ import System.*
 import System.Result.*
 import NeoClr.Testing.*
 
-[Test("Decimal arithmetic preserves exact base ten values")]
-func AArithmetic() -> Result<unit, TestFailure> {
+[Test]
+func `Decimal arithmetic preserves exact base ten values`() -> Result<unit, TestFailure> {
     let a = Decimal(1, 0, 0, false, (byte)1)
     let b = Decimal(2, 0, 0, false, (byte)1)
     _ = Assert.Equal("0.3", (a + b).ToString())?
@@ -16,8 +16,8 @@ func AArithmetic() -> Result<unit, TestFailure> {
     return Assert.Equal("79228162514264337593543950335", Decimal.MaxValue.ToString())
 }
 
-[Test("Decimal equality normalizes scale without changing storage")]
-func BEquality() -> Result<unit, TestFailure> {
+[Test]
+func `Decimal equality normalizes scale without changing storage`() -> Result<unit, TestFailure> {
     let a = Decimal(10, 0, 0, false, (byte)1)
     let b = Decimal(100, 0, 0, false, (byte)2)
     _ = Assert.True(a == b && a.Equals(b), "Numerical equality")?
@@ -28,8 +28,8 @@ func BEquality() -> Result<unit, TestFailure> {
     return Assert.Equal("0.000", zero.ToString())
 }
 
-[Test("Decimal parsing formatting and rounding preserve precision")]
-func CText() -> Result<unit, TestFailure> {
+[Test]
+func `Decimal parsing formatting and rounding preserve precision`() -> Result<unit, TestFailure> {
     let Ok(a) = Decimal.Parse("1234.565") else { return Assert.True(false, "Parse") }
     _ = Assert.Equal("1234.56", Decimal.Round(a, 2).ToString())?
     _ = Assert.Equal("1234.56", a.ToString("F2", Globalization.Culture.Invariant))?
@@ -38,8 +38,8 @@ func CText() -> Result<unit, TestFailure> {
     return Assert.True(Decimal(1) / Decimal(3) == third, "Division precision")
 }
 
-[Test("Decimal syntax uses ordinary value method contracts")]
-func DSyntax() -> Result<unit, TestFailure> {
+[Test]
+func `Decimal syntax uses ordinary value method contracts`() -> Result<unit, TestFailure> {
     let a: decimal = 1.25m
     let b: decimal = 2
     _ = Assert.Equal("3.25", DecimalSum(a, b).ToString())?
@@ -51,8 +51,8 @@ func DSyntax() -> Result<unit, TestFailure> {
     return Assert.True(typed.Equals(a), "Typed equality contract")
 }
 
-[Test("Decimal boundaries reject overflow and round midpoint ties")]
-func EBoundaries() -> Result<unit, TestFailure> {
+[Test]
+func `Decimal boundaries reject overflow and round midpoint ties`() -> Result<unit, TestFailure> {
     let Ok(maximum) = Decimal.Parse("79228162514264337593543950335") else { return Assert.True(false, "Maximum parse") }
     _ = Assert.True(maximum == Decimal.MaxValue, "Maximum value")?
     var result = Decimal.One
@@ -66,8 +66,8 @@ func EBoundaries() -> Result<unit, TestFailure> {
     return Assert.True(words[0] == -1 && words[1] == -1 && words[2] == -1 && words[3] == 0, "Maximum representation")
 }
 
-[Test("Decimal culture formatting and representation use existing contracts")]
-func GContracts() -> Result<unit, TestFailure> {
+[Test]
+func `Decimal culture formatting and representation use existing contracts`() -> Result<unit, TestFailure> {
     let culture = Globalization.Culture.SwedishSweden
     let Ok(value) = Decimal.Parse("1 234,50", culture) else { return Assert.True(false, "Culture parsing") }
     let text: Formattable = value

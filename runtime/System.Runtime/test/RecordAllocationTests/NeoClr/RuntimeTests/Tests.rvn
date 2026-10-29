@@ -7,8 +7,8 @@ import NeoClr.Testing.*
 open record Entity(Id: int)
 record Other(Id: int) : Entity(Id)
 
-[Test("Record class equality avoids reflection descriptor allocations")]
-func AllocationContracts() -> Result<unit, TestFailure> {
+[Test]
+func `Record class equality avoids reflection descriptor allocations`() -> Result<unit, TestFailure> {
     let left = Entity(7)
     let right = Entity(7)
     let other = Other(7)

@@ -1,0 +1,4242 @@
+{
+  "tests": [
+    {
+      "path": "runtime/System.Data/test/JsonDomTests/NeoClr/RuntimeTests/JsonDom.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "JsonArrayBounds",
+      "new": "JSON arrays report invalid indices",
+      "description": "JSON arrays report invalid indices",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonDomTests/NeoClr/RuntimeTests/JsonDom.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "JsonObjectNull",
+      "new": "JSON objects distinguish present null from missing fields",
+      "description": "JSON objects distinguish present null from missing fields",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonDomTests/NeoClr/RuntimeTests/JsonDom.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "JsonObjectDuplicate",
+      "new": "JSON duplicate insertion preserves the original value",
+      "description": "JSON duplicate insertion preserves the original value",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonDomTests/NeoClr/RuntimeTests/JsonDom.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "JsonObjectOrder",
+      "new": "JSON object indexed access preserves insertion order",
+      "description": "JSON object indexed access preserves insertion order",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonDomTests/NeoClr/RuntimeTests/JsonDom.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "JsonNumberFraction",
+      "new": "JSON numbers preserve spelling and reject fractional Int32 conversion",
+      "description": "JSON numbers preserve spelling and reject fractional Int32 conversion",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonDomTests/NeoClr/RuntimeTests/JsonDom.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "JsonScalarProperties",
+      "new": "JSON scalar nodes expose their typed values",
+      "description": "JSON scalar nodes expose their typed values",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonDomTests/NeoClr/RuntimeTests/JsonDom.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "JsonEscapedDuplicate",
+      "new": "JSON parsing rejects escaped aliases of duplicate names",
+      "description": "JSON parsing rejects escaped aliases of duplicate names",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonDomTests/NeoClr/RuntimeTests/JsonDom.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "JsonMalformed",
+      "new": "JSON parsing rejects trailing commas and truncated input",
+      "description": "JSON parsing rejects trailing commas and truncated input",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonDomTests/NeoClr/RuntimeTests/JsonDom.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "JsonDocumentRoundTrip",
+      "new": "JSON nested documents round trip with Unicode and number spelling",
+      "description": "JSON nested documents round trip with Unicode and number spelling",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonDomTests/NeoClr/RuntimeTests/JsonDom.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "JsonDocumentWhitespace",
+      "new": "JSON document round trip removes surrounding whitespace",
+      "description": "JSON document round trip removes surrounding whitespace",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonDomTests/NeoClr/RuntimeTests/JsonDom.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "JsonRootKinds",
+      "new": "JSON documents support every root node kind",
+      "description": "JSON documents support every root node kind",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonDomTests/NeoClr/RuntimeTests/JsonDom.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "JsonCycle",
+      "new": "JSON serialization rejects cyclic node graphs",
+      "description": "JSON serialization rejects cyclic node graphs",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonDomTests/NeoClr/RuntimeTests/JsonDom.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "JsonMapLookup",
+      "new": "JSON map lookup distinguishes null absence and ordinal keys",
+      "description": "JSON map lookup distinguishes null absence and ordinal keys",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonDomTests/NeoClr/RuntimeTests/JsonDom.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "JsonMapSnapshot",
+      "new": "JSON map snapshots preserve insertion order and node identity",
+      "description": "JSON map snapshots preserve insertion order and node identity",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonDomTests/NeoClr/RuntimeTests/JsonDom.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "JsonMapSerialization",
+      "new": "JSON map views keep JSON node serialization precedence",
+      "description": "JSON map views keep JSON node serialization precedence",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonDomTests/NeoClr/RuntimeTests/JsonDom.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "JsonMapEmpty",
+      "new": "Empty JSON objects support empty map snapshots and safe lookup",
+      "description": "Empty JSON objects support empty map snapshots and safe lookup",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonDomTests/NeoClr/RuntimeTests/JsonDom.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "JsonSequenceAccess",
+      "new": "JSON sequence indexing retains node identity and explicit null",
+      "description": "JSON sequence indexing retains node identity and explicit null",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonDomTests/NeoClr/RuntimeTests/JsonDom.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "JsonSequenceSnapshot",
+      "new": "JSON sequence snapshots preserve order and shared child contents",
+      "description": "JSON sequence snapshots preserve order and shared child contents",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonDomTests/NeoClr/RuntimeTests/JsonDom.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "JsonSequenceEmpty",
+      "new": "Empty JSON arrays expose empty sequence snapshots",
+      "description": "Empty JSON arrays expose empty sequence snapshots",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonDomTests/NeoClr/RuntimeTests/JsonDom.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "JsonSequenceSerialization",
+      "new": "JSON sequence views retain node serialization precedence",
+      "description": "JSON sequence views retain node serialization precedence",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonDomTests/NeoClr/RuntimeTests/JsonDom.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "JsonFormatting",
+      "new": "JSON node text supports compact and indented round trips",
+      "description": "JSON node text supports compact and indented round trips",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonDomTests/NeoClr/RuntimeTests/JsonDom.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "JsonReaderOptions",
+      "new": "JSON document options follow strict defaults and independent relaxed syntax",
+      "description": "JSON document options follow strict defaults and independent relaxed syntax",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonDomTests/NeoClr/RuntimeTests/JsonDom.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "JsonReaderDepth",
+      "new": "JSON depth defaults to 64 and validates document options",
+      "description": "JSON depth defaults to 64 and validates document options",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonDomTests/NeoClr/RuntimeTests/JsonDom.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "JsonReaderLarge",
+      "new": "JSON parsing supports large containers and long UTF-8 escaped strings",
+      "description": "JSON parsing supports large containers and long UTF-8 escaped strings",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonStreamTests/NeoClr/RuntimeTests/JsonStreams.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "StreamPartialRoundTrip",
+      "new": "JSON streams retry single-byte reads and writes without taking ownership",
+      "description": "JSON streams retry single-byte reads and writes without taking ownership",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonStreamTests/NeoClr/RuntimeTests/JsonStreams.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "StreamMemoryRoundTrip",
+      "new": "JSON memory stream round trip preserves document content",
+      "description": "JSON memory stream round trip preserves document content",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonStreamTests/NeoClr/RuntimeTests/JsonStreams.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "StreamReadFailure",
+      "new": "JSON stream reads preserve the underlying I/O failure",
+      "description": "JSON stream reads preserve the underlying I/O failure",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonStreamTests/NeoClr/RuntimeTests/JsonStreams.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "StreamInvalidUtf8",
+      "new": "JSON stream reads reject split invalid UTF-8",
+      "description": "JSON stream reads reject split invalid UTF-8",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonStreamTests/NeoClr/RuntimeTests/JsonStreams.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "StreamTruncated",
+      "new": "JSON stream reads reject a truncated document",
+      "description": "JSON stream reads reject a truncated document",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonStreamTests/NeoClr/RuntimeTests/JsonStreams.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "StreamReadQuota",
+      "new": "JSON streams read beyond the former document quota and preserve ownership",
+      "description": "JSON streams read beyond the former document quota and preserve ownership",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonStreamTests/NeoClr/RuntimeTests/JsonStreams.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "StreamWriteFailure",
+      "new": "JSON stream writes preserve partial output and failure cause",
+      "description": "JSON stream writes preserve partial output and failure cause",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonStreamTests/NeoClr/RuntimeTests/JsonStreams.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "StreamZeroProgress",
+      "new": "JSON stream writes reject zero progress without looping",
+      "description": "JSON stream writes reject zero progress without looping",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonStreamTests/NeoClr/RuntimeTests/JsonStreams.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "StreamCyclePreflight",
+      "new": "JSON stream serialization detects cycles before writing",
+      "description": "JSON stream serialization detects cycles before writing",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonStreamTests/NeoClr/RuntimeTests/JsonStreams.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "StreamUnicodeBoundary",
+      "new": "JSON stream boundary counts UTF-8 bytes rather than characters",
+      "description": "JSON stream boundary counts UTF-8 bytes rather than characters",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonStreamTests/NeoClr/RuntimeTests/JsonStreams.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "StreamEscapedOutputQuota",
+      "new": "JSON stream output quota includes escaping and validates before writes",
+      "description": "JSON stream output quota includes escaping and validates before writes",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonStreamTests/NeoClr/RuntimeTests/JsonStreams.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "StreamNumberBoundary",
+      "new": "JSON long numbers preserve spelling with separate write limits",
+      "description": "JSON long numbers preserve spelling with separate write limits",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonStreamTests/NeoClr/RuntimeTests/JsonStreams.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "StreamIndented",
+      "new": "JSON indented stream output matches node text and preflights quotas",
+      "description": "JSON indented stream output matches node text and preflights quotas",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonStreamTests/NeoClr/RuntimeTests/JsonStreams.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "OwnedUtf8Output",
+      "new": "JSON UTF-8 byte output preserves escaping formatting and independent ownership",
+      "description": "JSON UTF-8 byte output preserves escaping formatting and independent ownership",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonStreamTests/NeoClr/RuntimeTests/JsonStreams.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ParserBorrowedValues",
+      "new": "JSON borrowed token parsing preserves empty Unicode escaped and scalar values",
+      "description": "JSON borrowed token parsing preserves empty Unicode escaped and scalar values",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonStreamTests/NeoClr/RuntimeTests/JsonStreams.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ParserInvalidTokens",
+      "new": "JSON borrowed token parsing rejects malformed escapes controls and numbers",
+      "description": "JSON borrowed token parsing rejects malformed escapes controls and numbers",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonStreamTests/NeoClr/RuntimeTests/JsonStreams.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ByteInputOwnership",
+      "new": "JSON byte input borrows selected windows and returns owned mapped values",
+      "description": "JSON byte input borrows selected windows and returns owned mapped values",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonStreamTests/NeoClr/RuntimeTests/JsonStreams.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ByteInputValidation",
+      "new": "JSON byte input rejects invalid UTF-8 before syntax at any document size",
+      "description": "JSON byte input rejects invalid UTF-8 before syntax at any document size",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonStreamTests/NeoClr/RuntimeTests/JsonStreams.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ByteInputUnicodeBoundaries",
+      "new": "JSON byte input accepts UTF-8 scalar boundaries and rejects BOM and raw controls",
+      "description": "JSON byte input accepts UTF-8 scalar boundaries and rejects BOM and raw controls",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonStreamTests/NeoClr/RuntimeTests/JsonStreams.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ByteInputHttp",
+      "new": "JSON HTTP byte input preserves memory windows and aliases and rejects unbuffered content",
+      "description": "JSON HTTP byte input preserves memory windows and aliases and rejects unbuffered content",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Data/test/JsonStreamTests/NeoClr/RuntimeTests/JsonStreams.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ByteInputHttpAsync",
+      "new": "HTTP JSON async reads consume streams once preserve ownership and honor cancellation",
+      "description": "HTTP JSON async reads consume streams once preserve ownership and honor cancellation",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/CollectionConstructionTests/NeoClr/RuntimeTests/Construction.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ConstructionConsumption",
+      "new": "Collection constructors consume and dispose each input once",
+      "description": "Collection constructors consume and dispose each input once",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/CollectionConstructionTests/NeoClr/RuntimeTests/Construction.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ConstructionQuery",
+      "new": "List construction materializes filtered input independently",
+      "description": "List construction materializes filtered input independently",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/CollectionConstructionTests/NeoClr/RuntimeTests/Construction.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ConstructionOrdering",
+      "new": "Queue and stack copies follow source iteration order",
+      "description": "Queue and stack copies follow source iteration order",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/CollectionConstructionTests/NeoClr/RuntimeTests/Construction.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ConstructionSetCopy",
+      "new": "Set copy retains values and explicit comparer after source clear",
+      "description": "Set copy retains values and explicit comparer after source clear",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/CollectionConstructionTests/NeoClr/RuntimeTests/Construction.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ConstructionEmpty",
+      "new": "Collection constructors accept empty arrays",
+      "description": "Collection constructors accept empty arrays",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/CollectionConstructionTests/NeoClr/RuntimeTests/Construction.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ConstructionReferences",
+      "new": "Collection copies preserve element reference identity",
+      "description": "Collection copies preserve element reference identity",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/CollectionConstructionTests/NeoClr/RuntimeTests/MapIndexers.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "MapIndexers",
+      "new": "Map indexers share comparer lookup and insert-or-replace semantics",
+      "description": "Map indexers share comparer lookup and insert-or-replace semantics",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/CollectionConstructionTests/NeoClr/RuntimeTests/Sets.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "SetCollisionReuse",
+      "new": "Set collision chains survive removal growth and slot reuse",
+      "description": "Set collision chains survive removal growth and slot reuse",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/CollectionConstructionTests/NeoClr/RuntimeTests/Sets.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "SetSnapshotClear",
+      "new": "Set snapshot retains values across clear and reuse",
+      "description": "Set snapshot retains values across clear and reuse",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/CollectionConstructionTests/NeoClr/RuntimeTests/Sets.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "SetUnicodeOrdinal",
+      "new": "Set ordinal string equality preserves case and Unicode",
+      "description": "Set ordinal string equality preserves case and Unicode",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/CollectionIterationTests/NeoClr/RuntimeTests/ForCleanup.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ForCompletion",
+      "new": "For completion disposes its iterator",
+      "description": "For completion disposes its iterator",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/CollectionIterationTests/NeoClr/RuntimeTests/ForCleanup.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ForContinue",
+      "new": "For continue preserves traversal and disposal",
+      "description": "For continue preserves traversal and disposal",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/CollectionIterationTests/NeoClr/RuntimeTests/ForCleanup.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ForReturn",
+      "new": "For return disposes before returning to its caller",
+      "description": "For return disposes before returning to its caller",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/CollectionIterationTests/NeoClr/RuntimeTests/ForCleanup.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ForOuterContinue",
+      "new": "Labeled continue disposes each inner iterator",
+      "description": "Labeled continue disposes each inner iterator",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/CollectionIterationTests/NeoClr/RuntimeTests/ForCleanup.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ForEmpty",
+      "new": "For disposes an empty iterator",
+      "description": "For disposes an empty iterator",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/CollectionIterationTests/NeoClr/RuntimeTests/QueryCleanup.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "QueryAll",
+      "new": "All stops at the first failed predicate",
+      "description": "All stops at the first failed predicate",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/CollectionIterationTests/NeoClr/RuntimeTests/QueryCleanup.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "QueryFold",
+      "new": "Fold visits every value",
+      "description": "Fold visits every value",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/CollectionIterationTests/NeoClr/RuntimeTests/QueryCleanup.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "QueryFirst",
+      "new": "First stops after one value",
+      "description": "First stops after one value",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/CollectionIterationTests/NeoClr/RuntimeTests/QueryCleanup.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "QueryLast",
+      "new": "Last visits the complete input",
+      "description": "Last visits the complete input",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/CollectionIterationTests/NeoClr/RuntimeTests/QueryCleanup.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "QuerySingle",
+      "new": "Single rejects multiple values without reading the second",
+      "description": "Single rejects multiple values without reading the second",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/CollectionIterationTests/NeoClr/RuntimeTests/QueryCleanup.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "QuerySelectedFirst",
+      "new": "Predicate First stops at its match",
+      "description": "Predicate First stops at its match",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/CollectionIterationTests/NeoClr/RuntimeTests/QueryCleanup.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "QuerySelectedLast",
+      "new": "Predicate Last retains the final match",
+      "description": "Predicate Last retains the final match",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/CollectionIterationTests/NeoClr/RuntimeTests/QueryCleanup.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "QuerySelectedSingle",
+      "new": "Predicate Single scans for a unique match",
+      "description": "Predicate Single scans for a unique match",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/CollectionIterationTests/NeoClr/RuntimeTests/QueryCleanup.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "QueryCount",
+      "new": "Count advances without reading Current",
+      "description": "Count advances without reading Current",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/CollectionIterationTests/NeoClr/RuntimeTests/QueryCleanup.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "QuerySelectedCount",
+      "new": "Predicate Count reads every value",
+      "description": "Predicate Count reads every value",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/CollectionIterationTests/NeoClr/RuntimeTests/QueryCleanup.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "QueryToList",
+      "new": "ToList materializes and disposes its input",
+      "description": "ToList materializes and disposes its input",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/CollectionIterationTests/NeoClr/RuntimeTests/QueryCleanup.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "QueryEmptyAny",
+      "new": "Any disposes empty input",
+      "description": "Any disposes empty input",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/CollectionIterationTests/NeoClr/RuntimeTests/QueryCleanup.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "QueryMultipleMatches",
+      "new": "Predicate Single stops at the second match",
+      "description": "Predicate Single stops at the second match",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/CollectionIterationTests/NeoClr/RuntimeTests/QueryCleanup.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "QueryNoMatch",
+      "new": "Predicate First disposes input with no match",
+      "description": "Predicate First disposes input with no match",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/CryptographyTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "AHash",
+      "new": "SHA256 preserves aliases tails and short destinations",
+      "description": "SHA256 preserves aliases tails and short destinations",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/CryptographyTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "BMac",
+      "new": "HMACSHA256 verifies known answers and rejects altered tags",
+      "description": "HMACSHA256 verifies known answers and rejects altered tags",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/CryptographyTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "CRandom",
+      "new": "RandomNumberGenerator accepts empty and writable buffers",
+      "description": "RandomNumberGenerator accepts empty and writable buffers",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/CurrencyTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "AIdentity",
+      "new": "Currency identity is independent of culture and amount",
+      "description": "Currency identity is independent of culture and amount",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/CurrencyTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "BProfiles",
+      "new": "Currency formatting follows all five culture profiles",
+      "description": "Currency formatting follows all five culture profiles",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/CurrencyTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "CExplicit",
+      "new": "Explicit currency formatting rounds display without changing the amount",
+      "description": "Explicit currency formatting rounds display without changing the amount",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/CurrencyTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "DParsing",
+      "new": "Currency amount parsing validates identity grouping spacing and direction",
+      "description": "Currency amount parsing validates identity grouping spacing and direction",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/CurrencyTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "EPolicies",
+      "new": "Currency data and language direction are explicit immutable policies",
+      "description": "Currency data and language direction are explicit immutable policies",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/CurrencyTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "FRecords",
+      "new": "Money records preserve identity precision and deconstruction",
+      "description": "Money records preserve identity precision and deconstruction",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/DecimalStorageTests/NeoClr/RuntimeTests/StorageTests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "Storage",
+      "new": "Decimal GetBits writes only the caller supplied slice",
+      "description": "Decimal GetBits writes only the caller supplied slice",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/DecimalTests/NeoClr/RuntimeTests/Oracle.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "FOracle",
+      "new": "Decimal arithmetic agrees with CLR boundary vectors",
+      "description": "Decimal arithmetic agrees with CLR boundary vectors",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/DecimalTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "AArithmetic",
+      "new": "Decimal arithmetic preserves exact base ten values",
+      "description": "Decimal arithmetic preserves exact base ten values",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/DecimalTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "BEquality",
+      "new": "Decimal equality normalizes scale without changing storage",
+      "description": "Decimal equality normalizes scale without changing storage",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/DecimalTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "CText",
+      "new": "Decimal parsing formatting and rounding preserve precision",
+      "description": "Decimal parsing formatting and rounding preserve precision",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/DecimalTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "DSyntax",
+      "new": "Decimal syntax uses ordinary value method contracts",
+      "description": "Decimal syntax uses ordinary value method contracts",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/DecimalTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "EBoundaries",
+      "new": "Decimal boundaries reject overflow and round midpoint ties",
+      "description": "Decimal boundaries reject overflow and round midpoint ties",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/DecimalTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "GContracts",
+      "new": "Decimal culture formatting and representation use existing contracts",
+      "description": "Decimal culture formatting and representation use existing contracts",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/DeconstructionTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "AValue",
+      "new": "Value deconstruction binds named and unnamed locals",
+      "description": "Value deconstruction binds named and unnamed locals",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/DeconstructionTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "BReference",
+      "new": "Reference deconstruction binds named and unnamed locals",
+      "description": "Reference deconstruction binds named and unnamed locals",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/DeconstructionTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "CDerived",
+      "new": "Positional patterns narrow derived and object references",
+      "description": "Positional patterns narrow derived and object references",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/DeconstructionTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "DPatterns",
+      "new": "Qualified currency patterns match values and reject mismatches",
+      "description": "Qualified currency patterns match values and reject mismatches",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/DurationOffsetParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ADurationBounds",
+      "new": "Duration parsing preserves signed tick boundaries",
+      "description": "Duration parsing preserves signed tick boundaries",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/DurationOffsetParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "BDurationRanges",
+      "new": "Duration parsing rejects overflow and invalid clock fields",
+      "description": "Duration parsing rejects overflow and invalid clock fields",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/DurationOffsetParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "CDurationGrammar",
+      "new": "Duration parsing rejects unsupported numeric grammar",
+      "description": "Duration parsing rejects unsupported numeric grammar",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/DurationOffsetParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "DDurationFractions",
+      "new": "Duration fractions scale to ticks and accept bounded leading day zeros",
+      "description": "Duration fractions scale to ticks and accept bounded leading day zeros",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/DurationOffsetParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "EOffsetValues",
+      "new": "Offset parsing accepts zero signs seconds and inclusive bounds",
+      "description": "Offset parsing accepts zero signs seconds and inclusive bounds",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/DurationOffsetParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "FOffsetRanges",
+      "new": "Offset parsing rejects invalid ranges without normalization",
+      "description": "Offset parsing rejects invalid ranges without normalization",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/DurationOffsetParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "GOffsetGrammar",
+      "new": "Offset parsing requires complete ASCII signed syntax",
+      "description": "Offset parsing requires complete ASCII signed syntax",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/DurationOffsetParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "HConsumers",
+      "new": "Parsed offsets project instants and parsed durations preserve arithmetic",
+      "description": "Parsed offsets project instants and parsed durations preserve arithmetic",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EncodingBoundaryTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "AUnicodeLines",
+      "new": "StreamReader decodes Unicode lines across single-byte reads",
+      "description": "StreamReader decodes Unicode lines across single-byte reads",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EncodingBoundaryTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "BLineEndings",
+      "new": "StreamReader distinguishes empty lines EOF and lone carriage returns",
+      "description": "StreamReader distinguishes empty lines EOF and lone carriage returns",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EncodingBoundaryTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "CCustomDecode",
+      "new": "StreamReader delimits custom decoded output and bounds expansion",
+      "description": "StreamReader delimits custom decoded output and bounds expansion",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EncodingBoundaryTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "DZeroProgress",
+      "new": "StreamWriter reports zero progress and preserves flush failures",
+      "description": "StreamWriter reports zero progress and preserves flush failures",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EncodingBoundaryTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "EReaderPreflight",
+      "new": "StreamReader rejects invalid limits before consuming its input",
+      "description": "StreamReader rejects invalid limits before consuming its input",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EncodingBoundaryTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "FEncodingQuota",
+      "new": "Encoding input quotas reject oversized chunks without poisoning sessions",
+      "description": "Encoding input quotas reject oversized chunks without poisoning sessions",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EncodingBoundaryTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "GMaximumWrite",
+      "new": "StreamWriter accepts its maximum byte count and preflights oversized lines",
+      "description": "StreamWriter accepts its maximum byte count and preflights oversized lines",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EncodingBoundaryTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "HInputFailures",
+      "new": "StreamReader preserves input failures and rejects truncated UTF-8 at EOF",
+      "description": "StreamReader preserves input failures and rejects truncated UTF-8 at EOF",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EncodingBufferLimitTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "AUtf8Quota",
+      "new": "UTF-8 decoder quota rejection preserves an incomplete scalar",
+      "description": "UTF-8 decoder quota rejection preserves an incomplete scalar",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EncodingBufferLimitTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "BAsciiQuota",
+      "new": "ASCII decoder accepts the maximum input after rejecting an oversized call",
+      "description": "ASCII decoder accepts the maximum input after rejecting an oversized call",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EncodingBufferLimitTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "CDrainQuota",
+      "new": "Encoder drain quotas preserve accepted text and destination bytes",
+      "description": "Encoder drain quotas preserve accepted text and destination bytes",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EncodingBufferLimitTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "DCarryAtLimit",
+      "new": "UTF-8 decoder maximum input counts new bytes separately from carried bytes",
+      "description": "UTF-8 decoder maximum input counts new bytes separately from carried bytes",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EncodingBufferLimitTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "EArrayRanges",
+      "new": "Native buffer comprehensions preserve selector indices and range endpoints",
+      "description": "Native buffer comprehensions preserve selector indices and range endpoints",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EncodingBufferLimitTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ZOneShotLimits",
+      "new": "One-shot decoding enforces byte limits and accepts the maximum",
+      "description": "One-shot decoding enforces byte limits and accepts the maximum",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EncodingStreamTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "AShortWrites",
+      "new": "StreamWriter completes short writes and preserves cross-input graphemes",
+      "description": "StreamWriter completes short writes and preserves cross-input graphemes",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EncodingStreamTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "BAsciiPreflight",
+      "new": "ASCII StreamWriter rejects complete lines before output and remains reusable",
+      "description": "ASCII StreamWriter rejects complete lines before output and remains reusable",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EncodingStreamTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "CCompletion",
+      "new": "Custom encoder trailers require explicit Finish and are emitted once",
+      "description": "Custom encoder trailers require explicit Finish and are emitted once",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EncodingStreamTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "DClose",
+      "new": "Closing a writer manages ownership without implicit encoder finalization",
+      "description": "Closing a writer manages ownership without implicit encoder finalization",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EncodingStreamTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "EOutputFailure",
+      "new": "Partial write and final-output failures are observable without replay",
+      "description": "Partial write and final-output failures are observable without replay",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EncodingStreamTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "FFinalDrain",
+      "new": "Custom encoder final acceptance waits for all trailer bytes to drain",
+      "description": "Custom encoder final acceptance waits for all trailer bytes to drain",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EncodingStreamTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "GReader",
+      "new": "Selected ASCII reader recognizes CRLF and preserves borrowed ownership",
+      "description": "Selected ASCII reader recognizes CRLF and preserves borrowed ownership",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EncodingStreamTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "HReaderErrors",
+      "new": "Selected readers reject malformed bytes and enforce decoded text limits",
+      "description": "Selected readers reject malformed bytes and enforce decoded text limits",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EncodingStreamTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "IPendingRead",
+      "new": "StreamReader waits for pending input before decoding and completing",
+      "description": "StreamReader waits for pending input before decoding and completing",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EncodingStreamTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "JPendingWrite",
+      "new": "StreamWriter waits for pending output before reporting the byte count",
+      "description": "StreamWriter waits for pending output before reporting the byte count",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EncodingStreamTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "KPendingCancellation",
+      "new": "Cancelled input cancels the pending reader operation",
+      "description": "Cancelled input cancels the pending reader operation",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EncodingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "AProviders",
+      "new": "Encoding providers preserve UTF-8 and reject non-ASCII text",
+      "description": "Encoding providers preserve UTF-8 and reject non-ASCII text",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EncodingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "BSplitPoints",
+      "new": "UTF-8 decoding preserves text at every byte split",
+      "description": "UTF-8 decoding preserves text at every byte split",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EncodingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "CMalformed",
+      "new": "UTF-8 decoders reject malformed scalars and truncated final input",
+      "description": "UTF-8 decoders reject malformed scalars and truncated final input",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EncodingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "DOwnership",
+      "new": "Decoder sessions copy pending input and preserve BOM data",
+      "description": "Decoder sessions copy pending input and preserve BOM data",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EncodingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ERanges",
+      "new": "Decoder windows preserve text and ASCII errors are terminal",
+      "description": "Decoder windows preserve text and ASCII errors are terminal",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EncodingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "FProgress",
+      "new": "Encoders preserve accepted input through one-byte drains",
+      "description": "Encoders preserve accepted input through one-byte drains",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EncodingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "GChunkBoundary",
+      "new": "Encoder chunks preserve scalars across the internal byte boundary",
+      "description": "Encoder chunks preserve scalars across the internal byte boundary",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EncodingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "HAsciiSessions",
+      "new": "ASCII encoder preflight is retryable and factories are independent",
+      "description": "ASCII encoder preflight is retryable and factories are independent",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EncodingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "IOneShotRoundTrip",
+      "new": "One-shot decoding preserves Unicode BOM NUL and empty sequences",
+      "description": "One-shot decoding preserves Unicode BOM NUL and empty sequences",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EncodingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "JOneShotErrors",
+      "new": "One-shot errors do not poison providers and results are snapshots",
+      "description": "One-shot errors do not poison providers and results are snapshots",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EncodingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "KOneShotWindows",
+      "new": "One-shot decoding borrows only its window and owns its result",
+      "description": "One-shot decoding borrows only its window and owns its result",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EnumParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "Names",
+      "new": "Enum names preserve aliases ordinal case and imported types",
+      "description": "Enum names preserve aliases ordinal case and imported types",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EnumParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "Numbers",
+      "new": "Enum numbers preserve signed bounds and unnamed values",
+      "description": "Enum numbers preserve signed bounds and unnamed values",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EnumParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "Lists",
+      "new": "Enum lists combine names independently of Flags metadata",
+      "description": "Enum lists combine names independently of Flags metadata",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EnumParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "TryResults",
+      "new": "Enum TryParse resets output and rejects malformed input",
+      "description": "Enum TryParse resets output and rejects malformed input",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EnumParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "UnicodeNames",
+      "new": "Enum names preserve Unicode and explicit ordinal identity",
+      "description": "Enum names preserve Unicode and explicit ordinal identity",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EnumParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "UnicodeIdentifiers",
+      "new": "Unicode type member parameter and local identifiers use ordinary binding",
+      "description": "Unicode type member parameter and local identifiers use ordinary binding",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EnvironmentDiscoveryTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "AVersionText",
+      "new": "Platform version types retain distinct readable representations",
+      "description": "Platform version types retain distinct readable representations",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EnvironmentDiscoveryTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "BOSDisplay",
+      "new": "Every OS case formats through base Object and interpolation",
+      "description": "Every OS case formats through base Object and interpolation",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EnvironmentDiscoveryTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "CDistributionText",
+      "new": "Distribution identity and release remain independently optional",
+      "description": "Distribution identity and release remain independently optional",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EnvironmentDiscoveryTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "DArchitectureText",
+      "new": "Architecture cases preserve readable and unknown names",
+      "description": "Architecture cases preserve readable and unknown names",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EnvironmentDiscoveryTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ERecordEquality",
+      "new": "OS record equality preserves payload and runtime case identity",
+      "description": "OS record equality preserves payload and runtime case identity",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EnvironmentDiscoveryTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "FHostDiscovery",
+      "new": "Live discovery returns execution platform architecture and newline",
+      "description": "Live discovery returns execution platform architecture and newline",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EnvironmentDiscoveryTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "GHostValueLifetime",
+      "new": "Discovered platform values survive garbage collection",
+      "description": "Discovered platform values survive garbage collection",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/EnvironmentDiscoveryTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "HPatterns",
+      "new": "Nested OS patterns select characteristics and cover every case",
+      "description": "Nested OS patterns select characteristics and cover every case",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/ErrorContextTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ALeafErrors",
+      "new": "Platform and author errors opt into message and absent diagnostics",
+      "description": "Platform and author errors opt into message and absent diagnostics",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/ErrorContextTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "BTypedCause",
+      "new": "Context preserves typed payload and interface cause without capturing",
+      "description": "Context preserves typed payload and interface cause without capturing",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/ErrorContextTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "CSuccessBypass",
+      "new": "Successful results skip lazy context and capture",
+      "description": "Successful results skip lazy context and capture",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/ErrorContextTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "DFailurePropagation",
+      "new": "Failure context evaluates once and propagates the typed wrapper",
+      "description": "Failure context evaluates once and propagates the typed wrapper",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/ErrorContextTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ENestedFormatting",
+      "new": "Nested context formats each cause once and keeps concise display",
+      "description": "Nested context formats each cause once and keeps concise display",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/ErrorContextTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "FCaptureReuse",
+      "new": "Explicit capture survives collection and later wrappers reuse its snapshot",
+      "description": "Explicit capture survives collection and later wrappers reuse its snapshot",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/ErrorContextTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "GDomainMapping",
+      "new": "Domain causes preserve trace and explicit mapping remains available",
+      "description": "Domain causes preserve trace and explicit mapping remains available",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/ErrorContextTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "HBoundedChains",
+      "new": "Malformed cyclic cause chains have bounded formatting and lookup",
+      "description": "Malformed cyclic cause chains have bounded formatting and lookup",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/ErrorContextTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "IUnconstrainedResult",
+      "new": "Unrelated result error types remain unconstrained",
+      "description": "Unrelated result error types remain unconstrained",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/ErrorContextTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "JApplicationPolicy",
+      "new": "Application capture policy is opt in and explicit overrides win",
+      "description": "Application capture policy is opt in and explicit overrides win",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/ErrorContextTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "KConditionalCapturePolicy",
+      "new": "Conditional startup configures capture only when DEBUG is defined",
+      "description": "Conditional startup configures capture only when DEBUG is defined",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/ErrorContextTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "LInterfaceBoundary",
+      "new": "Interface result boundaries preserve runtime errors without automatic context",
+      "description": "Interface result boundaries preserve runtime errors without automatic context",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/FloatingSpecialValuesTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "AConstants",
+      "new": "Floating named constants preserve IEEE and value equality contracts",
+      "description": "Floating named constants preserve IEEE and value equality contracts",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/FloatingSpecialValuesTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "BClassification",
+      "new": "Floating classification covers both widths signs and finite values",
+      "description": "Floating classification covers both widths signs and finite values",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/FloatingSpecialValuesTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "CText",
+      "new": "Floating special values format and parse through existing contracts",
+      "description": "Floating special values format and parse through existing contracts",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/GZipTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ADecode",
+      "new": "Gzip decodes independent stored fixed dynamic and optional-header members",
+      "description": "Gzip decodes independent stored fixed dynamic and optional-header members",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/GZipTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "BInvalid",
+      "new": "Gzip validates checksums truncation headers and quotas before output",
+      "description": "Gzip validates checksums truncation headers and quotas before output",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/GZipTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "CCompress",
+      "new": "Gzip incrementally compresses repeated writes and finishes once",
+      "description": "Gzip incrementally compresses repeated writes and finishes once",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/GZipTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "DContracts",
+      "new": "Gzip empty finish ownership ranges modes and cancellation are explicit",
+      "description": "Gzip empty finish ownership ranges modes and cancellation are explicit",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/GZipTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "EPending",
+      "new": "Gzip awaits output and poisons interrupted streams without replay",
+      "description": "Gzip awaits output and poisons interrupted streams without replay",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/GZipTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "FInput",
+      "new": "Gzip handles pending fragmented input and preserves text-reader errors",
+      "description": "Gzip handles pending fragmented input and preserves text-reader errors",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/GZipTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "GWindows",
+      "new": "Gzip borrows only the selected source window across compression blocks",
+      "description": "Gzip borrows only the selected source window across compression blocks",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/GlobalizationTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ProfileInvariant",
+      "new": "Invariant formatting data and calendar isolation",
+      "description": "Invariant formatting data and calendar isolation",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/GlobalizationTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ProfileSwedishSweden",
+      "new": "SwedishSweden formatting data and calendar isolation",
+      "description": "SwedishSweden formatting data and calendar isolation",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/GlobalizationTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ProfileHebrewIsrael",
+      "new": "HebrewIsrael formatting data and calendar isolation",
+      "description": "HebrewIsrael formatting data and calendar isolation",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/GlobalizationTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ProfileEnglishUnitedKingdom",
+      "new": "EnglishUnitedKingdom formatting data and calendar isolation",
+      "description": "EnglishUnitedKingdom formatting data and calendar isolation",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/GlobalizationTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ProfileEnglishUnitedStates",
+      "new": "EnglishUnitedStates formatting data and calendar isolation",
+      "description": "EnglishUnitedStates formatting data and calendar isolation",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/GlobalizationTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "Preferences",
+      "new": "Culture preferences resolve explicit regions and bounded fallbacks",
+      "description": "Culture preferences resolve explicit regions and bounded fallbacks",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/GlobalizationTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "Clocks",
+      "new": "UK and US clocks preserve midnight noon and invariant output",
+      "description": "UK and US clocks preserve midnight noon and invariant output",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/IndexRangeTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "AIndexValues",
+      "new": "Index preserves direction and resolves end boundaries",
+      "description": "Index preserves direction and resolves end boundaries",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/IndexRangeTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "BValueEquality",
+      "new": "Index and Range typed equality agrees with hashing",
+      "description": "Index and Range typed equality agrees with hashing",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/IndexRangeTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "CRangeBounds",
+      "new": "Range resolution accepts empty and full boundaries",
+      "description": "Range resolution accepts empty and full boundaries",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/IndexRangeTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "DArraySlices",
+      "new": "Array range syntax supports omitted and end-relative boundaries",
+      "description": "Array range syntax supports omitted and end-relative boundaries",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/IndexRangeTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "EArrayIndexes",
+      "new": "Array indexes support values and from-end assignment",
+      "description": "Array indexes support values and from-end assignment",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/IndexRangeTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "FCopySemantics",
+      "new": "Array slices copy storage and preserve reference elements",
+      "description": "Array slices copy storage and preserve reference elements",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/IndexRangeTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "GEvaluationOrder",
+      "new": "Array indexing and slicing evaluate operands once in source order",
+      "description": "Array indexing and slicing evaluate operands once in source order",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/IndexRangeTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "HReadOnlyReceivers",
+      "new": "Read-only value fields use defensive copies for method calls",
+      "description": "Read-only value fields use defensive copies for method calls",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/IndexRangeTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "IValidatedAccess",
+      "new": "Array safe access returns options and results for invalid bounds",
+      "description": "Array safe access returns options and results for invalid bounds",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/IndexRangeTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "JStringSlices",
+      "new": "String ranges preserve graphemes and half-open boundaries",
+      "description": "String ranges preserve graphemes and half-open boundaries",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/IndexRangeTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "KStringSafeAccess",
+      "new": "String safe access rejects invalid grapheme bounds",
+      "description": "String safe access rejects invalid grapheme bounds",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/IndexRangeTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "LStringEvaluation",
+      "new": "String slicing evaluates receiver and bounds once",
+      "description": "String slicing evaluates receiver and bounds once",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/IndexRangeTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "MListRanges",
+      "new": "ArrayList supports directional mutation and independent range copies",
+      "description": "ArrayList supports directional mutation and independent range copies",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/IndexRangeTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "NSequenceSlices",
+      "new": "Sequence slicing consumes one iterator without indexed reads",
+      "description": "Sequence slicing consumes one iterator without indexed reads",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/IndexRangeTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "OSequenceBoundaries",
+      "new": "Sequence invalid and empty slices do not acquire iterators",
+      "description": "Sequence invalid and empty slices do not acquire iterators",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/IndexRangeTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "PSequenceShortSource",
+      "new": "Sequence slicing disposes when enumeration ends before Count",
+      "description": "Sequence slicing disposes when enumeration ends before Count",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/IndexRangeTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "QSequenceAliases",
+      "new": "Sequence safe indexing and slicing work through array aliases",
+      "description": "Sequence safe indexing and slicing work through array aliases",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/IndexRangeTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "RSequenceSyntax",
+      "new": "Sequence extension indexers provide default access and independent slices",
+      "description": "Sequence extension indexers provide default access and independent slices",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/IndexRangeTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "SListDispatch",
+      "new": "Sequence slicing delegates to the list range contract",
+      "description": "Sequence slicing delegates to the list range contract",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/IndexRangeTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "TExtensionWrites",
+      "new": "Native extension indexers support writes and compound assignment",
+      "description": "Native extension indexers support writes and compound assignment",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/InstantParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "AEpoch",
+      "new": "Instant parsing normalizes explicit offsets to the same epoch",
+      "description": "Instant parsing normalizes explicit offsets to the same epoch",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/InstantParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "BPrecision",
+      "new": "Instant parsing preserves fractional ticks before and after the epoch",
+      "description": "Instant parsing preserves fractional ticks before and after the epoch",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/InstantParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "CBounds",
+      "new": "Instant parsing preserves the wider tick domain at civil boundaries",
+      "description": "Instant parsing preserves the wider tick domain at civil boundaries",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/InstantParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "DGrammar",
+      "new": "Instant parsing requires a complete invariant timestamp and explicit offset",
+      "description": "Instant parsing requires a complete invariant timestamp and explicit offset",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/InstantParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ERanges",
+      "new": "Instant parsing rejects invalid civil fields and offset ranges",
+      "description": "Instant parsing rejects invalid civil fields and offset ranges",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/InstantParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "FProjection",
+      "new": "Parsed instants project back through their explicit fixed offset",
+      "description": "Parsed instants project back through their explicit fixed offset",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/Int64ParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "Int64Bounds",
+      "new": "Int64 parsing accepts both signed boundaries",
+      "description": "Int64 parsing accepts both signed boundaries",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/Int64ParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "Int64Signs",
+      "new": "Int64 parsing accepts signs leading zeros and values beyond Int32",
+      "description": "Int64 parsing accepts signs leading zeros and values beyond Int32",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/Int64ParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "Int64InvalidFormat",
+      "new": "Int64 parsing rejects noncanonical lexical inputs",
+      "description": "Int64 parsing rejects noncanonical lexical inputs",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/Int64ParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "Int64Overflow",
+      "new": "Int64 parsing distinguishes overflow from invalid trailing text",
+      "description": "Int64 parsing distinguishes overflow from invalid trailing text",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/Int64ParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "Int64Formatting",
+      "new": "Int64 decimal formatting round trips signed boundaries",
+      "description": "Int64 decimal formatting round trips signed boundaries",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/MemoryLifetimeTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ARead",
+      "new": "Pending Memory destinations survive collection and preserve surrounding bytes",
+      "description": "Pending Memory destinations survive collection and preserve surrounding bytes",
+      "renamed": true,
+      "manual": true
+    },
+    {
+      "path": "runtime/System.Runtime/test/MemoryLifetimeTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "BWrite",
+      "new": "Pending ReadOnlyMemory sources survive repeated suspension and collection",
+      "description": "Pending ReadOnlyMemory sources survive repeated suspension and collection",
+      "renamed": true,
+      "manual": true
+    },
+    {
+      "path": "runtime/System.Runtime/test/MemoryLifetimeTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "CCancel",
+      "new": "Cancelled and rejected Memory transfers do not write or resume twice",
+      "description": "Cancelled and rejected Memory transfers do not write or resume twice",
+      "renamed": true,
+      "manual": true
+    },
+    {
+      "path": "runtime/System.Runtime/test/MemoryLifetimeTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "DEmpty",
+      "new": "Default and end-position Memory windows remain empty after suspension",
+      "description": "Default and end-position Memory windows remain empty after suspension",
+      "renamed": true,
+      "manual": true
+    },
+    {
+      "path": "runtime/System.Runtime/test/MemoryStreamTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "MemoryOverwrite",
+      "new": "MemoryStream overwrites preserve length and untouched bytes",
+      "description": "MemoryStream overwrites preserve length and untouched bytes",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/MemoryStreamTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "MemoryGap",
+      "new": "MemoryStream gap writes zero-fill while empty writes preserve length",
+      "description": "MemoryStream gap writes zero-fill while empty writes preserve length",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/MemoryStreamTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "MemoryInvalidRanges",
+      "new": "MemoryStream rejects invalid buffer and seek ranges without moving",
+      "description": "MemoryStream rejects invalid buffer and seek ranges without moving",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/MemoryStreamTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "MemoryCapacity",
+      "new": "MemoryStream quota errors preserve length and position",
+      "description": "MemoryStream quota errors preserve length and position",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/MemoryStreamTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "MemoryClosed",
+      "new": "MemoryStream closure is shared across interfaces and idempotent",
+      "description": "MemoryStream closure is shared across interfaces and idempotent",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/MemoryStreamTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "MemoryAsyncRoundTrip",
+      "new": "MemoryStream async interfaces preserve complete writes short reads and EOF",
+      "description": "MemoryStream async interfaces preserve complete writes short reads and EOF",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/MemoryStreamTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "MemoryAsyncRejection",
+      "new": "MemoryStream async cancellation and rejected ranges preserve storage",
+      "description": "MemoryStream async cancellation and rejected ranges preserve storage",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/MethodStateTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "MethodState",
+      "new": "Method generic state separates owner and method parameters",
+      "description": "Method generic state separates owner and method parameters",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/MethodStateTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "MethodFilters",
+      "new": "Method discovery filters visibility and scope on value types",
+      "description": "Method discovery filters visibility and scope on value types",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/NativeBufferTests/Tests.rvn",
+      "scope": "",
+      "old": "MemoryWindow",
+      "new": "Native buffer copies bridge Memory windows through a C import",
+      "description": "Native buffer copies bridge Memory windows through a C import",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/NativeBufferTests/Tests.rvn",
+      "scope": "",
+      "old": "TextBytes",
+      "new": "Native byte copies accept borrowed UTF8 without a temporary array",
+      "description": "Native byte copies accept borrowed UTF8 without a temporary array",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/NativeBufferTests/Tests.rvn",
+      "scope": "",
+      "old": "Empty",
+      "new": "Empty native byte copies never dereference null pointers",
+      "description": "Empty native byte copies never dereference null pointers",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/NativeBufferTests/Tests.rvn",
+      "scope": "",
+      "old": "Allocation",
+      "new": "Repeated native byte copies allocate no managed transfer buffers",
+      "description": "Repeated native byte copies allocate no managed transfer buffers",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/NativeCallbackTests/Tests.rvn",
+      "scope": "",
+      "old": "ModuleFunction",
+      "new": "Native callbacks accept Raven module functions",
+      "description": "Native callbacks accept Raven module functions",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/NativeCallbackTests/Tests.rvn",
+      "scope": "",
+      "old": "Captures",
+      "new": "Native callbacks preserve captures across repeated calls",
+      "description": "Native callbacks preserve captures across repeated calls",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/NativeCallbackTests/Tests.rvn",
+      "scope": "",
+      "old": "Receiver",
+      "new": "Native callbacks retain bound receivers for the call",
+      "description": "Native callbacks retain bound receivers for the call",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/NativeCallbackTests/Tests.rvn",
+      "scope": "",
+      "old": "Notification",
+      "new": "Native unit callbacks discard the logical Void result",
+      "description": "Native unit callbacks discard the logical Void result",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/NativeCallbackTests/Tests.rvn",
+      "scope": "",
+      "old": "GenericUnit",
+      "new": "Native callbacks preserve generic unit value returns",
+      "description": "Native callbacks preserve generic unit value returns",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/NativeCallbackTests/Tests.rvn",
+      "scope": "",
+      "old": "ReturnedFunction",
+      "new": "Native returned functions remain callable across collection",
+      "description": "Native returned functions remain callable across collection",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/NativeCallbackTests/Tests.rvn",
+      "scope": "",
+      "old": "ReturnedUnit",
+      "new": "Native returned void functions produce logical unit values",
+      "description": "Native returned void functions produce logical unit values",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/NativePointerTests/Tests.rvn",
+      "scope": "",
+      "old": "Equality",
+      "new": "Typed native pointers compare addresses and preserve borrowed storage",
+      "description": "Typed native pointers compare addresses and preserve borrowed storage",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/NativePointerTests/Tests.rvn",
+      "scope": "",
+      "old": "Hashes",
+      "new": "Typed native pointer hashes match aliases without reading storage",
+      "description": "Typed native pointer hashes match aliases without reading storage",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/NativePointerTests/Tests.rvn",
+      "scope": "",
+      "old": "Defaults",
+      "new": "Default typed native pointers preserve null and generic forwarding",
+      "description": "Default typed native pointers preserve null and generic forwarding",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/NumericFormattingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "IntegralFormats",
+      "new": "Integral formatting preserves widths culture and interface dispatch",
+      "description": "Integral formatting preserves widths culture and interface dispatch",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/NumericFormattingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "FloatingFormats",
+      "new": "Floating formatting preserves precision culture and boxed display",
+      "description": "Floating formatting preserves precision culture and boxed display",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/NumericFormattingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "CultureParsing",
+      "new": "Culture parsing covers every numeric primitive and roundtrips formatting",
+      "description": "Culture parsing covers every numeric primitive and roundtrips formatting",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/NumericFormattingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "CultureParsingFailures",
+      "new": "Culture parsing rejects malformed groups mixed separators and overflow",
+      "description": "Culture parsing rejects malformed groups mixed separators and overflow",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/PathValuesTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "PathValueEquality",
+      "new": "Path equality agrees across typed interface and Object dispatch",
+      "description": "Path equality agrees across typed interface and Object dispatch",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/PathValuesTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "PathHashDisplay",
+      "new": "Equal paths share hashes and virtual display",
+      "description": "Equal paths share hashes and virtual display",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/PathValuesTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "PathOrdinal",
+      "new": "Path equality distinguishes case roots and normalization",
+      "description": "Path equality distinguishes case roots and normalization",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/PathValuesTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "PathMap",
+      "new": "Path maps replace equal keys and retain lookup through growth",
+      "description": "Path maps replace equal keys and retain lookup through growth",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/PathValuesTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "PathCollisions",
+      "new": "Path Object equality distinguishes colliding map keys",
+      "description": "Path Object equality distinguishes colliding map keys",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/PrimitiveParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ParseSByte",
+      "new": "SByte parsing preserves values and reports overflow",
+      "description": "SByte parsing preserves values and reports overflow",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/PrimitiveParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ParseByte",
+      "new": "Byte parsing preserves values and reports overflow",
+      "description": "Byte parsing preserves values and reports overflow",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/PrimitiveParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ParseInt16",
+      "new": "Int16 parsing preserves values and reports overflow",
+      "description": "Int16 parsing preserves values and reports overflow",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/PrimitiveParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ParseUInt16",
+      "new": "UInt16 parsing preserves values and reports overflow",
+      "description": "UInt16 parsing preserves values and reports overflow",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/PrimitiveParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ParseInt32",
+      "new": "Int32 parsing preserves values and reports overflow",
+      "description": "Int32 parsing preserves values and reports overflow",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/PrimitiveParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ParseUInt32",
+      "new": "UInt32 parsing preserves values and reports overflow",
+      "description": "UInt32 parsing preserves values and reports overflow",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/PrimitiveParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ParseUInt64",
+      "new": "UInt64 parsing preserves values and reports overflow",
+      "description": "UInt64 parsing preserves values and reports overflow",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/PrimitiveParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ParseSingle",
+      "new": "Single parsing preserves values and reports overflow",
+      "description": "Single parsing preserves values and reports overflow",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/PrimitiveParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ParseDouble",
+      "new": "Double parsing preserves values and reports overflow",
+      "description": "Double parsing preserves values and reports overflow",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/PrimitiveParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ParseBoolean",
+      "new": "Boolean parsing accepts mixed case and rejects numeric aliases",
+      "description": "Boolean parsing accepts mixed case and rejects numeric aliases",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/PrimitiveParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ParseFormat",
+      "new": "Primitive parsers distinguish invalid format from overflow",
+      "description": "Primitive parsers distinguish invalid format from overflow",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/PrimitiveParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ParseByteValues",
+      "new": "Byte parsing preserves distinct small values",
+      "description": "Byte parsing preserves distinct small values",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/RecordAllocationTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "AllocationContracts",
+      "new": "Record class equality avoids reflection descriptor allocations",
+      "description": "Record class equality avoids reflection descriptor allocations",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/RecordFormattingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ImportedValues",
+      "new": "Records use imported value formatting across typed and boxed calls",
+      "description": "Records use imported value formatting across typed and boxed calls",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/RecordFormattingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "NestedValues",
+      "new": "Nested records and unions retain imported value display contracts",
+      "description": "Nested records and unions retain imported value display contracts",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/RecordFormattingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ScalarsAndNull",
+      "new": "Record scalar formatting preserves null and original Unicode text",
+      "description": "Record scalar formatting preserves null and original Unicode text",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/RecordFormattingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "EnumValues",
+      "new": "Record enum display preserves names flags and numeric fallback",
+      "description": "Record enum display preserves names flags and numeric fallback",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/RecordFormattingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "EnumPayloads",
+      "new": "Record enum payload display survives boxed dispatch and collection",
+      "description": "Record enum payload display survives boxed dispatch and collection",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/RecordFormattingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "FloatingEquality",
+      "new": "Floating records use value equality for NaNs zeros and infinities",
+      "description": "Floating records use value equality for NaNs zeros and infinities",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/RecordFormattingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "FloatingDispatch",
+      "new": "Floating record contracts agree across boxed interface and nested calls",
+      "description": "Floating record contracts agree across boxed interface and nested calls",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/RecordFormattingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "FloatingText",
+      "new": "Floating record display uses primitive text including negative zero",
+      "description": "Floating record display uses primitive text including negative zero",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/RecordFormattingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "GenericText",
+      "new": "Generic record display preserves text null and primitive contracts",
+      "description": "Generic record display preserves text null and primitive contracts",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/RecordFormattingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "GenericDispatch",
+      "new": "Generic record display uses nested and boxed value dispatch",
+      "description": "Generic record display uses nested and boxed value dispatch",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/RecordFormattingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ReferenceContracts",
+      "new": "Root record classes preserve value equality and reference identity",
+      "description": "Root record classes preserve value equality and reference identity",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/RecordFormattingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ReferenceDisplay",
+      "new": "Record class display preserves nested and absent references",
+      "description": "Record class display preserves nested and absent references",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/RecordFormattingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "RecursiveReferences",
+      "new": "Recursive record shapes display finite reference chains",
+      "description": "Recursive record shapes display finite reference chains",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/RecordFormattingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "InheritedContracts",
+      "new": "Inherited record equality observes runtime type and derived state",
+      "description": "Inherited record equality observes runtime type and derived state",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/RecordFormattingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "InheritedDisplay",
+      "new": "Inherited record display includes base members through virtual calls",
+      "description": "Inherited record display includes base members through virtual calls",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/RuntimeLibraryTests/NeoClr/RuntimeTests/Collections.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ListCopy",
+      "new": "ArrayList copy has independent storage",
+      "description": "ArrayList copy has independent storage",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/RuntimeLibraryTests/NeoClr/RuntimeTests/Collections.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "QueueOrder",
+      "new": "ArrayQueue preserves FIFO",
+      "description": "ArrayQueue preserves FIFO",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/RuntimeLibraryTests/NeoClr/RuntimeTests/Collections.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "StackOrder",
+      "new": "ArrayStack preserves LIFO",
+      "description": "ArrayStack preserves LIFO",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/RuntimeLibraryTests/NeoClr/RuntimeTests/Collections.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "SetEquality",
+      "new": "HashSet applies its comparer",
+      "description": "HashSet applies its comparer",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/RuntimeLibraryTests/NeoClr/RuntimeTests/Collections.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "AnyWithoutCurrent",
+      "new": "AnyWithoutCurrent",
+      "description": "Any does not read Current",
+      "renamed": false,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/RuntimeLibraryTests/NeoClr/RuntimeTests/Collections.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "PredicateAny",
+      "new": "Predicate Any stops at its first match",
+      "description": "Predicate Any stops at its first match",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/RuntimeLibraryTests/NeoClr/RuntimeTests/Collections.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ForBreak",
+      "new": "For break disposes its iterator",
+      "description": "For break disposes its iterator",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/RuntimeLibraryTests/NeoClr/RuntimeTests/MapMaterialization.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "MapPairSnapshots",
+      "new": "Map iteration snapshots pairs before mutation",
+      "description": "Map iteration snapshots pairs before mutation",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/RuntimeLibraryTests/NeoClr/RuntimeTests/MapMaterialization.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "MapCopyConstruction",
+      "new": "HashMap copies sequences and maps independently",
+      "description": "HashMap copies sequences and maps independently",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/RuntimeLibraryTests/NeoClr/RuntimeTests/MapMaterialization.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "MapQueryMaterialization",
+      "new": "ToMap materializes pair queries and selectors",
+      "description": "ToMap materializes pair queries and selectors",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/RuntimeLibraryTests/NeoClr/RuntimeTests/MapMaterialization.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "MapCollisionAndEmptyConstruction",
+      "new": "Map materialization handles collisions and empty input",
+      "description": "Map materialization handles collisions and empty input",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/RuntimeLibraryTests/NeoClr/RuntimeTests/MapMaterialization.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "MapSharedReferences",
+      "new": "HashMap copies preserve reference values and comparer",
+      "description": "HashMap copies preserve reference values and comparer",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/RuntimeLibraryTests/NeoClr/RuntimeTests/PriorityArrayQueue.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "PriorityArrayQueueOrder",
+      "new": "PriorityArrayQueue grows and removes the lowest priority first",
+      "description": "PriorityArrayQueue grows and removes the lowest priority first",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/RuntimeLibraryTests/NeoClr/RuntimeTests/PriorityArrayQueue.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "PriorityArrayQueueCustomComparer",
+      "new": "PriorityArrayQueue accepts reversed ordering and preserves reference identity",
+      "description": "PriorityArrayQueue accepts reversed ordering and preserves reference identity",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/RuntimeLibraryTests/NeoClr/RuntimeTests/PriorityArrayQueue.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "PriorityArrayQueueDuplicates",
+      "new": "PriorityArrayQueue duplicate priorities neither lose nor duplicate entries",
+      "description": "PriorityArrayQueue duplicate priorities neither lose nor duplicate entries",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/RuntimeLibraryTests/NeoClr/RuntimeTests/PriorityArrayQueue.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "PriorityArrayQueueClear",
+      "new": "PriorityArrayQueue clear retains capacity and permits reuse",
+      "description": "PriorityArrayQueue clear retains capacity and permits reuse",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/RuntimeLibraryTests/NeoClr/RuntimeTests/PriorityArrayQueue.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "PriorityArrayQueueInterleaved",
+      "new": "PriorityArrayQueue interleaved insertions preserve the heap",
+      "description": "PriorityArrayQueue interleaved insertions preserve the heap",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/RuntimeLibraryTests/NeoClr/RuntimeTests/QueueStack.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "QueueGrowth",
+      "new": "Queue growth preserves wrapped FIFO contents",
+      "description": "Queue growth preserves wrapped FIFO contents",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/RuntimeLibraryTests/NeoClr/RuntimeTests/QueueStack.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "QueueReferences",
+      "new": "Queue preserves references through clear and reuse",
+      "description": "Queue preserves references through clear and reuse",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/RuntimeLibraryTests/NeoClr/RuntimeTests/QueueStack.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "QueueSnapshots",
+      "new": "Queue iterator captures FIFO contents before mutation",
+      "description": "Queue iterator captures FIFO contents before mutation",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/RuntimeLibraryTests/NeoClr/RuntimeTests/QueueStack.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "StackGrowth",
+      "new": "Stack growth preserves LIFO contents",
+      "description": "Stack growth preserves LIFO contents",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/RuntimeLibraryTests/NeoClr/RuntimeTests/QueueStack.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "StackReferences",
+      "new": "Stack preserves references through clear and reuse",
+      "description": "Stack preserves references through clear and reuse",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/RuntimeLibraryTests/NeoClr/RuntimeTests/QueueStack.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "StackSnapshots",
+      "new": "Stack iterator captures LIFO contents before mutation",
+      "description": "Stack iterator captures LIFO contents before mutation",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/StringConstructionTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "StringCopy",
+      "new": "String construction copies character storage",
+      "description": "String construction copies character storage",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/StringConstructionTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "StringSequence",
+      "new": "String exposes a readonly character sequence",
+      "description": "String exposes a readonly character sequence",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/StringConstructionTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "StringEmpty",
+      "new": "String construction accepts an empty character sequence",
+      "description": "String construction accepts an empty character sequence",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/StringConstructionTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "StringGraphemes",
+      "new": "String construction preserves and merges grapheme boundaries",
+      "description": "String construction preserves and merges grapheme boundaries",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/StringConstructionTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "StringNamedArguments",
+      "new": "String named arguments preserve public parameter contracts",
+      "description": "String named arguments preserve public parameter contracts",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/StringConstructionTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "CharacterContract",
+      "new": "Character literals preserve graphemes and allow char identifiers",
+      "description": "Character literals preserve graphemes and allow char identifiers",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/TimeParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ADateValues",
+      "new": "Date parsing accepts bounds and Gregorian leap years",
+      "description": "Date parsing accepts bounds and Gregorian leap years",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/TimeParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "BDateErrors",
+      "new": "Date parsing separates malformed text from invalid civil fields",
+      "description": "Date parsing separates malformed text from invalid civil fields",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/TimeParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "CTimeFractions",
+      "new": "Time parsing scales one through seven fraction digits without rounding",
+      "description": "Time parsing scales one through seven fraction digits without rounding",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/TimeParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "DTimeErrors",
+      "new": "Time parsing rejects malformed clocks leap seconds and excess precision",
+      "description": "Time parsing rejects malformed clocks leap seconds and excess precision",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/TimeParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ECultures",
+      "new": "Civil parsers round trip all supported numeric culture conventions",
+      "description": "Civil parsers round trip all supported numeric culture conventions",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/TimeParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "FCultureMismatch",
+      "new": "Explicit cultures reject mismatched date and fraction separators",
+      "description": "Explicit cultures reject mismatched date and fraction separators",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/TimeParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "GLocalValues",
+      "new": "Local date time parsing preserves boundaries and rejects zone suffixes",
+      "description": "Local date time parsing preserves boundaries and rejects zone suffixes",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/TimeParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "HCurrentCulture",
+      "new": "Default civil parsers use the current culture formatting convention",
+      "description": "Default civil parsers use the current culture formatting convention",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/TypeRelationsTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "Identity",
+      "new": "Type identity and assignment direction",
+      "description": "Type identity and assignment direction",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/TypeRelationsTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "Interfaces",
+      "new": "Interface assignment includes inherited contracts",
+      "description": "Interface assignment includes inherited contracts",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/TypeRelationsTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "Instances",
+      "new": "Boxing and instance checks reject null",
+      "description": "Boxing and instance checks reject null",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/TypeRelationsTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "Generics",
+      "new": "Closed generic types remain distinct",
+      "description": "Closed generic types remain distinct",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/TypeRelationsTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "Arrays",
+      "new": "Arrays preserve element identity",
+      "description": "Arrays preserve element identity",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/TypeRelationsTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "Subclasses",
+      "new": "Subclass checks are strict and exclude interfaces",
+      "description": "Subclass checks are strict and exclude interfaces",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/UnicodeCasingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "CasingExpansion",
+      "new": "Invariant casing supports full Unicode expansions",
+      "description": "Invariant casing supports full Unicode expansions",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/UnicodeCasingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "CasingSigma",
+      "new": "Invariant lowercase respects contextual Greek sigma",
+      "description": "Invariant lowercase respects contextual Greek sigma",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/UnicodeCasingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "CasingSupplementary",
+      "new": "Invariant uppercase preserves emoji and supplementary letters",
+      "description": "Invariant uppercase preserves emoji and supplementary letters",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/UnicodeCasingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "CasingNoNormalization",
+      "new": "CasingNoNormalization",
+      "description": "Invariant casing preserves normalization form",
+      "renamed": false,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/UnicodeCasingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "CasingBoundaries",
+      "new": "Invariant casing preserves embedded NUL and empty strings",
+      "description": "Invariant casing preserves embedded NUL and empty strings",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/UnicodeCasingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "CasingNotOrdinalFolding",
+      "new": "CasingNotOrdinalFolding",
+      "description": "Full casing expansion does not redefine ordinal ignore-case comparison",
+      "renamed": false,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/UriPathAllocationTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "PathParsing",
+      "new": "Path parsing allocates only the requested value",
+      "description": "Path parsing allocates only the requested value",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/UriPathAllocationTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "UriParsing",
+      "new": "URI parsing allocates only the requested value",
+      "description": "URI parsing allocates only the requested value",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/UriPathAllocationTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "UriResolveString",
+      "new": "URI string resolution avoids encoded buffers and reparsing",
+      "description": "URI string resolution avoids encoded buffers and reparsing",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/UriPathAllocationTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "UriResolveValue",
+      "new": "URI value resolution allocates only the result value",
+      "description": "URI value resolution allocates only the result value",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/UriResolutionTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "UriResolution1",
+      "new": "URI reference resolution corpus group 1",
+      "description": "URI reference resolution corpus group 1",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/UriResolutionTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "UriResolution2",
+      "new": "URI reference resolution corpus group 2",
+      "description": "URI reference resolution corpus group 2",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/UriResolutionTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "UriResolution3",
+      "new": "URI reference resolution corpus group 3",
+      "description": "URI reference resolution corpus group 3",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/UriResolutionTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "UriResolution4",
+      "new": "URI reference resolution corpus group 4",
+      "description": "URI reference resolution corpus group 4",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/UriResolutionTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "UriResolution5",
+      "new": "URI reference resolution corpus group 5",
+      "description": "URI reference resolution corpus group 5",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/UriResolutionTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "UriResolution6",
+      "new": "URI reference resolution corpus group 6",
+      "description": "URI reference resolution corpus group 6",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/UriResolutionTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "UriInvalid",
+      "new": "URI parsing rejects every invalid grammar corpus input",
+      "description": "URI parsing rejects every invalid grammar corpus input",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/UriResolutionTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "UriByteGrammar",
+      "new": "URI byte parsing preserves ASCII boundaries and encoded Unicode",
+      "description": "URI byte parsing preserves ASCII boundaries and encoded Unicode",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/UriResolutionTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "UriClassification",
+      "new": "URI classification and equality preserve literal identity",
+      "description": "URI classification and equality preserve literal identity",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/UriResolutionTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "UriBaseRules",
+      "new": "URI resolution handles authority and path bases and rejects relative bases",
+      "description": "URI resolution handles authority and path bases and rejects relative bases",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/UriResolutionTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "UriUnsupportedAuthority",
+      "new": "URI parsing reports unsupported bracketed authorities",
+      "description": "URI parsing reports unsupported bracketed authorities",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/UriResolutionTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "UriLengthQuota",
+      "new": "URI parsing and resolution enforce the byte quota",
+      "description": "URI parsing and resolution enforce the byte quota",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/ZonedTimeParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "AUtc",
+      "new": "Zoned parsing preserves UTC and the pinned database version",
+      "description": "Zoned parsing preserves UTC and the pinned database version",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/ZonedTimeParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "BSeasons",
+      "new": "Zoned parsing validates winter and summer offsets",
+      "description": "Zoned parsing validates winter and summer offsets",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/ZonedTimeParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "COverlap",
+      "new": "Explicit offsets select both DST overlap candidates without losing ticks",
+      "description": "Explicit offsets select both DST overlap candidates without losing ticks",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/ZonedTimeParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "DGap",
+      "new": "Zoned parsing rejects skipped local times for either adjacent offset",
+      "description": "Zoned parsing rejects skipped local times for either adjacent offset",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/ZonedTimeParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "EHalfHour",
+      "new": "Zoned parsing handles half hour transitions",
+      "description": "Zoned parsing handles half hour transitions",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/ZonedTimeParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "FBounds",
+      "new": "Zoned parsing enforces rule bounds and historical second precision",
+      "description": "Zoned parsing enforces rule bounds and historical second precision",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/ZonedTimeParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "GErrors",
+      "new": "Zoned parsing preserves lexical and civil range errors",
+      "description": "Zoned parsing preserves lexical and civil range errors",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Runtime/test/ZonedTimeParsingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "HNames",
+      "new": "Named zone lookup remains ordinal and accepts pinned aliases",
+      "description": "Named zone lookup remains ordinal and accepts pinned aliases",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpContentCopyTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ABackpressure",
+      "new": "HTTP content copy awaits writes before reading more and preserves ownership",
+      "description": "HTTP content copy awaits writes before reading more and preserves ownership",
+      "renamed": true,
+      "manual": true
+    },
+    {
+      "path": "runtime/System.Web/test/HttpContentCopyTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "BBuffered",
+      "new": "HTTP memory content preserves selected windows and aliases across copies",
+      "description": "HTTP memory content preserves selected windows and aliases across copies",
+      "renamed": true,
+      "manual": true
+    },
+    {
+      "path": "runtime/System.Web/test/HttpContentCopyTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "CFailures",
+      "new": "HTTP content copy preserves stream failures and rejects truncated or invalid reads",
+      "description": "HTTP content copy preserves stream failures and rejects truncated or invalid reads",
+      "renamed": true,
+      "manual": true
+    },
+    {
+      "path": "runtime/System.Web/test/HttpContentCopyTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "DLengths",
+      "new": "HTTP content copy respects declared lengths and skips empty I/O",
+      "description": "HTTP content copy respects declared lengths and skips empty I/O",
+      "renamed": true,
+      "manual": true
+    },
+    {
+      "path": "runtime/System.Web/test/HttpContentCopyTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ECancellation",
+      "new": "HTTP content copy cancellation skips pre-cancelled input and stops pending writes",
+      "description": "HTTP content copy cancellation skips pre-cancelled input and stops pending writes",
+      "renamed": true,
+      "manual": true
+    },
+    {
+      "path": "runtime/System.Web/test/HttpContentCopyTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "FDisposal",
+      "new": "HTTP content copy rejects disposed bodies and stops before the next source read",
+      "description": "HTTP content copy rejects disposed bodies and stops before the next source read",
+      "renamed": true,
+      "manual": true
+    },
+    {
+      "path": "runtime/System.Web/test/HttpContentCopyTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "GTextReader",
+      "new": "HTTP string reader consumes generic streams and preserves owned text and errors",
+      "description": "HTTP string reader consumes generic streams and preserves owned text and errors",
+      "renamed": true,
+      "manual": true
+    },
+    {
+      "path": "runtime/System.Web/test/HttpContentCopyTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "HFactory",
+      "new": "HTTP stream creation validates before taking ownership or reading",
+      "description": "HTTP stream creation validates before taking ownership or reading",
+      "renamed": true,
+      "manual": true
+    },
+    {
+      "path": "runtime/System.Web/test/HttpHeaderValuesTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "HeadersRepeated",
+      "new": "HTTP header lookup preserves repeated values without splitting commas",
+      "description": "HTTP header lookup preserves repeated values without splitting commas",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpHeaderValuesTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "HeadersEmpty",
+      "new": "HTTP header lookup distinguishes empty values from absent fields",
+      "description": "HTTP header lookup distinguishes empty values from absent fields",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpHeaderValuesTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "HeadersInvalid",
+      "new": "HTTP header lookup rejects invalid names",
+      "description": "HTTP header lookup rejects invalid names",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpHeaderValuesTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "HeadersSnapshot",
+      "new": "HTTP header lookup snapshots remain independent of later additions",
+      "description": "HTTP header lookup snapshots remain independent of later additions",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpHeaderValuesTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "HeadersRequest",
+      "new": "HTTP request lookup exposes content headers without inventing provider headers",
+      "description": "HTTP request lookup exposes content headers without inventing provider headers",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpHeaderValuesTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ResponseContent",
+      "new": "HTTP response constructors retain memory content and replace only content type metadata",
+      "description": "HTTP response constructors retain memory content and replace only content type metadata",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpHeaderValuesTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ResponseDynamic",
+      "new": "HTTP byte producers allocate runtime sized arrays with ordered single endpoint evaluation",
+      "description": "HTTP byte producers allocate runtime sized arrays with ordered single endpoint evaluation",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpHeaderValuesTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ResponseStream",
+      "new": "HTTP response construction never reads or changes stream ownership",
+      "description": "HTTP response construction never reads or changes stream ownership",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpHeaderValuesTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "MessageLifetime",
+      "new": "HTTP messages expose HTTP 1.1 and dispose owned content without reading",
+      "description": "HTTP messages expose HTTP 1.1 and dispose owned content without reading",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpLifetimeTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "AOwned",
+      "new": "HTTP client use disposes its owned handler exactly once",
+      "description": "HTTP client use disposes its owned handler exactly once",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpLifetimeTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "BBorrowed",
+      "new": "HTTP borrowed handler survives one client and serves another",
+      "description": "HTTP borrowed handler survives one client and serves another",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpLifetimeTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "CCancellation",
+      "new": "HTTP disposal requests cancellation and waits for handler acknowledgement",
+      "description": "HTTP disposal requests cancellation and waits for handler acknowledgement",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpLifetimeTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "DCaller",
+      "new": "HTTP caller cancellation propagates without disposing the handler",
+      "description": "HTTP caller cancellation propagates without disposing the handler",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpLifetimeTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ECompleted",
+      "new": "HTTP completed responses survive disposal and retain request association",
+      "description": "HTTP completed responses survive disposal and retain request association",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpLifetimeTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "FPreCancelled",
+      "new": "HTTP pre-cancellation skips custom handlers",
+      "description": "HTTP pre-cancellation skips custom handlers",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpLifetimeTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "GSocket",
+      "new": "HTTP socket handler disposal is idempotent through Disposable",
+      "description": "HTTP socket handler disposal is idempotent through Disposable",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpLifetimeTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "HDelegation",
+      "new": "HTTP delegating handlers run outward and unwind inward",
+      "description": "HTTP delegating handlers run outward and unwind inward",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpLifetimeTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "IBorrowedPipeline",
+      "new": "HTTP borrowed delegating pipeline remains reusable",
+      "description": "HTTP borrowed delegating pipeline remains reusable",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpLifetimeTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "JIndependentOwners",
+      "new": "HTTP borrowed clients cancel only their own pending sends",
+      "description": "HTTP borrowed clients cancel only their own pending sends",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpLifetimeTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ZDisposedRequest",
+      "new": "HTTP disposed requests are rejected before invoking a custom handler",
+      "description": "HTTP disposed requests are rejected before invoking a custom handler",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpMethodValuesTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "PredefinedMethods",
+      "new": "HTTP predefined method values use canonical tokens",
+      "description": "HTTP predefined method values use canonical tokens",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpMethodValuesTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ParseKnownMethods",
+      "new": "HTTP method parsing canonicalizes every known name",
+      "description": "HTTP method parsing canonicalizes every known name",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpMethodValuesTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "CustomMethods",
+      "new": "HTTP custom method construction and parsing preserve spelling",
+      "description": "HTTP custom method construction and parsing preserve spelling",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpMethodValuesTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "MethodTokenValidation",
+      "new": "HTTP method validation admits token punctuation and rejects separators",
+      "description": "HTTP method validation admits token punctuation and rejects separators",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpMethodValuesTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "MethodEquality",
+      "new": "HTTP method equality and hashes ignore ASCII case",
+      "description": "HTTP method equality and hashes ignore ASCII case",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpMethodValuesTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "MethodSetEquality",
+      "new": "HTTP methods retain case-insensitive identity in a set",
+      "description": "HTTP methods retain case-insensitive identity in a set",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpMethodValuesTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "RequestMethods",
+      "new": "HTTP request factories retain predefined and custom methods",
+      "description": "HTTP request factories retain predefined and custom methods",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpMethodValuesTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "UriRequestMethods",
+      "new": "HTTP URI request factories support custom methods and empty content",
+      "description": "HTTP URI request factories support custom methods and empty content",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpMethodValuesTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "CoffeeExtensionValues",
+      "new": "HTTP coffee requests retain BREW and unnamed status codes",
+      "description": "HTTP coffee requests retain BREW and unnamed status codes",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpRouteMatchingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "RouteCaptures",
+      "new": "Route matching separates query text and converts captured integers",
+      "description": "Route matching separates query text and converts captured integers",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpRouteMatchingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "RouteAbsence",
+      "new": "Route matching preserves case segment and trailing-slash distinctions",
+      "description": "Route matching preserves case segment and trailing-slash distinctions",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpRouteMatchingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "RouteInvalidTargets",
+      "new": "Route matching validates malformed targets even when literals mismatch",
+      "description": "Route matching validates malformed targets even when literals mismatch",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpRouteMatchingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "RouteInvalidPatterns",
+      "new": "Route parsing rejects malformed and unsupported pattern syntax",
+      "description": "Route parsing rejects malformed and unsupported pattern syntax",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpRouteMatchingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "RouteDecoding",
+      "new": "Route captures decode UTF-8 once and preserve literal plus",
+      "description": "Route captures decode UTF-8 once and preserve literal plus",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpRouteMatchingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "RouteIntegerBounds",
+      "new": "Route integer conversion distinguishes path matching from conversion failure",
+      "description": "Route integer conversion distinguishes path matching from conversion failure",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpRouteMatchingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "RouteSegmentLimit",
+      "new": "Route segment quotas admit the boundary and reject one extra segment",
+      "description": "Route segment quotas admit the boundary and reject one extra segment",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpRouteMatchingTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "RouteByteLimit",
+      "new": "Route byte quotas admit the boundary and reject one extra byte",
+      "description": "Route byte quotas admit the boundary and reject one extra byte",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpTextTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ALargeRoundTrip",
+      "new": "HTTP buffered text preserves scalars beyond the one-shot codec quota",
+      "description": "HTTP buffered text preserves scalars beyond the one-shot codec quota",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpTextTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "BLargeErrors",
+      "new": "HTTP buffered text rejects malformed and truncated large bodies",
+      "description": "HTTP buffered text rejects malformed and truncated large bodies",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/HttpTextTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "CSmallRoundTrips",
+      "new": "HTTP buffered text preserves empty BOM and NUL data",
+      "description": "HTTP buffered text preserves empty BOM and NUL data",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/MediaTypeAllocationTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "Allocations",
+      "new": "Warm media type access performs no managed allocations",
+      "description": "Warm media type access performs no managed allocations",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/MediaTypeAllocationTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "RawValidationAllocations",
+      "new": "Raw media type validation performs no managed allocations",
+      "description": "Raw media type validation performs no managed allocations",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/MediaTypeValuesTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "Presets",
+      "new": "Media type presets reuse values and formatted strings",
+      "description": "Media type presets reuse values and formatted strings",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/MediaTypeValuesTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "Structure",
+      "new": "Media type parsing retains structure and custom types",
+      "description": "Media type parsing retains structure and custom types",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/MediaTypeValuesTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "Quoting",
+      "new": "Media type quoted parameters round trip escaped separators",
+      "description": "Media type quoted parameters round trip escaped separators",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/MediaTypeValuesTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "Equality",
+      "new": "Media type equality ignores order and syntax but preserves boundary case",
+      "description": "Media type equality ignores order and syntax but preserves boundary case",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/MediaTypeValuesTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "Immutability",
+      "new": "Media type parameter views cannot mutate the value",
+      "description": "Media type parameter views cannot mutate the value",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/MediaTypeValuesTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "InvalidSyntax",
+      "new": "Media type parser rejects invalid syntax and ambiguous parameters",
+      "description": "Media type parser rejects invalid syntax and ambiguous parameters",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/MediaTypeValuesTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "Ranges",
+      "new": "Media types separate concrete content types from Accept ranges",
+      "description": "Media types separate concrete content types from Accept ranges",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/MediaTypeValuesTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "Whitespace",
+      "new": "Media types accept optional whitespace and empty parameter segments",
+      "description": "Media types accept optional whitespace and empty parameter segments",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/MediaTypeValuesTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "Limits",
+      "new": "Media type limits and parameter updates return errors without faults",
+      "description": "Media type limits and parameter updates return errors without faults",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/MediaTypeValuesTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "TypedContent",
+      "new": "Typed HTTP content retains media types without reparsing",
+      "description": "Typed HTTP content retains media types without reparsing",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/MediaTypeValuesTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "LegacyContent",
+      "new": "Legacy content parsing caches values and distinguishes absence from errors",
+      "description": "Legacy content parsing caches values and distinguishes absence from errors",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "runtime/System.Web/test/MediaTypeValuesTests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "Messages",
+      "new": "HTTP messages expose actual Content-Type and reject duplicate fields",
+      "description": "HTTP messages expose actual Content-Type and reject duplicate fields",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.Configuration/test/Neo.Configuration.Tests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "APrecedence",
+      "new": "Configuration precedence distinguishes absent null and empty values",
+      "description": "Configuration precedence distinguishes absent null and empty values",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.Configuration/test/Neo.Configuration.Tests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "BSections",
+      "new": "Configuration sections merge numeric children and preserve Unicode paths",
+      "description": "Configuration sections merge numeric children and preserve Unicode paths",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.Configuration/test/Neo.Configuration.Tests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "CSnapshots",
+      "new": "Configuration builds snapshot inputs and retain live sections",
+      "description": "Configuration builds snapshot inputs and retain live sections",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.Configuration/test/Neo.Configuration.Tests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "DOwnership",
+      "new": "Configuration loads reloads and disposes provider registrations",
+      "description": "Configuration loads reloads and disposes provider registrations",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.Configuration/test/Neo.Configuration.Tests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "EInjection",
+      "new": "Configuration DI preserves overrides and caller ownership",
+      "description": "Configuration DI preserves overrides and caller ownership",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.Configuration/test/Neo.Configuration.Tests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "FJson",
+      "new": "JSON configuration flattens objects arrays and scalar values",
+      "description": "JSON configuration flattens objects arrays and scalar values",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.Configuration/test/Neo.Configuration.Tests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "GJsonErrors",
+      "new": "JSON configuration rejects ambiguous malformed and oversized input atomically",
+      "description": "JSON configuration rejects ambiguous malformed and oversized input atomically",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.Configuration/test/Neo.Configuration.Tests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "HJsonFiles",
+      "new": "JSON configuration reads required optional files and reloads through the root",
+      "description": "JSON configuration reads required optional files and reloads through the root",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.Configuration/test/Neo.Configuration.Tests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "IJsonRealistic",
+      "new": "JSON configuration accepts realistic commented settings and preserves scalar text",
+      "description": "JSON configuration accepts realistic commented settings and preserves scalar text",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.Configuration/test/Neo.Configuration.Tests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "JJsonLargeFile",
+      "new": "JSON configuration loads large files and preserves data on file size failure",
+      "description": "JSON configuration loads large files and preserves data on file size failure",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.DependencyInjection/test/Neo.DependencyInjection.Tests/NeoClr/RuntimeTests/ServicesTests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ERegistry",
+      "new": "DI registry snapshots registrations and injects typed localizers",
+      "description": "DI registry snapshots registrations and injects typed localizers",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.DependencyInjection/test/Neo.DependencyInjection.Tests/NeoClr/RuntimeTests/ServicesTests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "FLifetimes",
+      "new": "DI isolates scopes and shares only singleton instances",
+      "description": "DI isolates scopes and shares only singleton instances",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.DependencyInjection/test/Neo.DependencyInjection.Tests/NeoClr/RuntimeTests/ServicesTests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "GFailures",
+      "new": "DI rejects cycles and captive scopes without poisoning resolution state",
+      "description": "DI rejects cycles and captive scopes without poisoning resolution state",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.DependencyInjection/test/Neo.DependencyInjection.Tests/NeoClr/RuntimeTests/ServicesTests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "HDisposal",
+      "new": "DI disposes owned services in reverse order and leaves instances caller owned",
+      "description": "DI disposes owned services in reverse order and leaves instances caller owned",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.DependencyInjection/test/Neo.DependencyInjection.Tests/NeoClr/RuntimeTests/ServicesTests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "IFactories",
+      "new": "DI validates factories and registrations and resets failed singleton factories",
+      "description": "DI validates factories and registrations and resets failed singleton factories",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.DependencyInjection/test/Neo.DependencyInjection.Tests/NeoClr/RuntimeTests/ServicesTests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "JProvider",
+      "new": "DI injects the current provider and root disposal invalidates live scopes",
+      "description": "DI injects the current provider and root disposal invalidates live scopes",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.DependencyInjection/test/Neo.DependencyInjection.Tests/NeoClr/RuntimeTests/ServicesTests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "KLookups",
+      "new": "DI conventional lookups distinguish missing services from activation errors",
+      "description": "DI conventional lookups distinguish missing services from activation errors",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.DependencyInjection/test/Neo.DependencyInjection.Tests/NeoClr/RuntimeTests/ServicesTests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "LGenericRegistrations",
+      "new": "DI generic registrations preserve factory failures and plural singleton slots",
+      "description": "DI generic registrations preserve factory failures and plural singleton slots",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.DependencyInjection/test/Neo.DependencyInjection.Tests/NeoClr/RuntimeTests/ServicesTests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "MFactoryDisposal",
+      "new": "DI cleans up factory results when disposal reenters resolution",
+      "description": "DI cleans up factory results when disposal reenters resolution",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.DependencyInjection/test/Neo.DependencyInjection.Tests/NeoClr/RuntimeTests/ServicesTests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "NKeys",
+      "new": "DI keyed lookups isolate registrations and preserve ordinary key equality",
+      "description": "DI keyed lookups isolate registrations and preserve ordinary key equality",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.DependencyInjection/test/Neo.DependencyInjection.Tests/NeoClr/RuntimeTests/ServicesTests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "OKeyedLifetimes",
+      "new": "DI keyed factories and scopes preserve independent lifetime slots",
+      "description": "DI keyed factories and scopes preserve independent lifetime slots",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.DependencyInjection/test/Neo.DependencyInjection.Tests/NeoClr/RuntimeTests/ServicesTests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "PFunctions",
+      "new": "DI retrieves keyed bound function objects without invoking them as factories",
+      "description": "DI retrieves keyed bound function objects without invoking them as factories",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.DependencyInjection/test/Neo.DependencyInjection.Tests/NeoClr/RuntimeTests/ServicesTests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "QTryAdd",
+      "new": "DI TryAdd preserves existing type and key registrations without activating factories",
+      "description": "DI TryAdd preserves existing type and key registrations without activating factories",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.DependencyInjection/test/Neo.DependencyInjection.Tests/NeoClr/RuntimeTests/ServicesTests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "RGraphs",
+      "new": "DI diamond graphs preserve lifetimes and independent scope ownership",
+      "description": "DI diamond graphs preserve lifetimes and independent scope ownership",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.DependencyInjection/test/Neo.DependencyInjection.Tests/NeoClr/RuntimeTests/ServicesTests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ZWebsiteSample",
+      "new": "DI website sample resolves a scoped constructor graph and disposes scopes",
+      "description": "DI website sample resolves a scoped constructor graph and disposes scopes",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.DependencyInjection/test/Neo.DependencyInjection.Tests/NeoClr/RuntimeTests/ServicesTests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "YOpenGenericScopes",
+      "new": "DI closes open generic registrations and isolates scoped caches by type",
+      "description": "DI closes open generic registrations and isolates scoped caches by type",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.DependencyInjection/test/Neo.DependencyInjection.Tests/NeoClr/RuntimeTests/ServicesTests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "YOpenGenericSingletons",
+      "new": "DI open generic singletons preserve exact overrides keyed lookup and plural order",
+      "description": "DI open generic singletons preserve exact overrides keyed lookup and plural order",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.DependencyInjection/test/Neo.DependencyInjection.Tests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ASelect",
+      "new": "DI selects the greediest available public constructor",
+      "description": "DI selects the greediest available public constructor",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.DependencyInjection/test/Neo.DependencyInjection.Tests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "BActivate",
+      "new": "DI activates typed localizer dependencies through a retained plan",
+      "description": "DI activates typed localizer dependencies through a retained plan",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.DependencyInjection/test/Neo.DependencyInjection.Tests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "CReject",
+      "new": "DI rejects ambiguous missing and inaccessible constructors",
+      "description": "DI rejects ambiguous missing and inaccessible constructors",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.DependencyInjection/test/Neo.DependencyInjection.Tests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "DErrors",
+      "new": "DI builds plans without executing constructors or factories",
+      "description": "DI builds plans without executing constructors or factories",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.Localization/test/Neo.Localization.Tests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ALookup",
+      "new": "Localizer preserves strings and distinguishes missing from empty",
+      "description": "Localizer preserves strings and distinguishes missing from empty",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.Localization/test/Neo.Localization.Tests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "BUnicode",
+      "new": "Localizer uses ordinal keys and decodes JSON escapes",
+      "description": "Localizer uses ordinal keys and decodes JSON escapes",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.Localization/test/Neo.Localization.Tests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "CInvalid",
+      "new": "Localizer rejects malformed and non-string catalogues",
+      "description": "Localizer rejects malformed and non-string catalogues",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.Localization/test/Neo.Localization.Tests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "DSize",
+      "new": "Localizer supports catalogues beyond provisional DOM limits",
+      "description": "Localizer supports catalogues beyond provisional DOM limits",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.Localization/test/Neo.Localization.Tests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "EInput",
+      "new": "Localizer reads borrowed streams and explicit files",
+      "description": "Localizer reads borrowed streams and explicit files",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.Localization/test/Neo.Localization.Tests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "FDiagnostics",
+      "new": "Localizer diagnostics report only missing display lookups",
+      "description": "Localizer diagnostics report only missing display lookups",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.Localization/test/Neo.Localization.Tests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "GFallback",
+      "new": "Localizer scopes and cultures fall back per key",
+      "description": "Localizer scopes and cultures fall back per key",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.Localization/test/Neo.Localization.Tests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "HInvariant",
+      "new": "Localizer invariant fallback is configurable and typed scope is explicit",
+      "description": "Localizer invariant fallback is configurable and typed scope is explicit",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.Localization/test/Neo.Localization.Tests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "IFormatting",
+      "new": "Localizer resolves templates before formatting arguments",
+      "description": "Localizer resolves templates before formatting arguments",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.Localization/test/Neo.Localization.Tests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "JDependencyInjection",
+      "new": "Localizer integrates typed JSON resources with scoped constructor injection",
+      "description": "Localizer integrates typed JSON resources with scoped constructor injection",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.Logging/test/Neo.Logging.Tests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "AIdentity",
+      "new": "Logging levels and event identity follow the Microsoft baseline",
+      "description": "Logging levels and event identity follow the Microsoft baseline",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.Logging/test/Neo.Logging.Tests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "BNull",
+      "new": "Null logging skips formatting and returns reusable scope handles",
+      "description": "Null logging skips formatting and returns reusable scope handles",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.Logging/test/Neo.Logging.Tests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "CFiltering",
+      "new": "Default logging filters before evaluating formatters",
+      "description": "Default logging filters before evaluating formatters",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.Logging/test/Neo.Logging.Tests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "DState",
+      "new": "Logging forwards structured state event and error to every enabled provider",
+      "description": "Logging forwards structured state event and error to every enabled provider",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.Logging/test/Neo.Logging.Tests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ECategories",
+      "new": "Logger factories cache ordinal categories and update existing loggers",
+      "description": "Logger factories cache ordinal categories and update existing loggers",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.Logging/test/Neo.Logging.Tests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "FScopes",
+      "new": "Logging scopes preserve provider state and dispose each handle once",
+      "description": "Logging scopes preserve provider state and dispose each handle once",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.Logging/test/Neo.Logging.Tests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "GDisposal",
+      "new": "Factory disposal owns provider registrations and disables cached loggers",
+      "description": "Factory disposal owns provider registrations and disables cached loggers",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.Logging/test/Neo.Logging.Tests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "HConsole",
+      "new": "Console logging renders UTF8 messages and explicit diagnostic errors",
+      "description": "Console logging renders UTF8 messages and explicit diagnostic errors",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.Logging/test/Neo.Logging.Tests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "ITyped",
+      "new": "Typed logging creates a category from the declared type",
+      "description": "Typed logging creates a category from the declared type",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.Logging/test/Neo.Logging.Tests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "JDependencyInjection",
+      "new": "Logging DI resolves singleton typed categories and preserves supplied factory ownership",
+      "description": "Logging DI resolves singleton typed categories and preserves supplied factory ownership",
+      "renamed": true,
+      "manual": false
+    },
+    {
+      "path": "extensions/Neo.Logging/test/Neo.Logging.Tests/NeoClr/RuntimeTests/Tests.rvn",
+      "scope": "NeoClr.RuntimeTests",
+      "old": "KDefaultRegistration",
+      "new": "Logging DI owns the default factory and preserves explicit logger overrides",
+      "description": "Logging DI owns the default factory and preserves explicit logger overrides",
+      "renamed": true,
+      "manual": false
+    }
+  ],
+  "updatedReferences": [
+    {
+      "path": "runtime/System.Runtime/test/MemoryLifetimeTests/NeoClr/RuntimeTests/Main.rvn",
+      "old": "ARead",
+      "new": "`Pending Memory destinations survive collection and preserve surrounding bytes`"
+    },
+    {
+      "path": "runtime/System.Runtime/test/MemoryLifetimeTests/NeoClr/RuntimeTests/Main.rvn",
+      "old": "BWrite",
+      "new": "`Pending ReadOnlyMemory sources survive repeated suspension and collection`"
+    },
+    {
+      "path": "runtime/System.Runtime/test/MemoryLifetimeTests/NeoClr/RuntimeTests/Main.rvn",
+      "old": "CCancel",
+      "new": "`Cancelled and rejected Memory transfers do not write or resume twice`"
+    },
+    {
+      "path": "runtime/System.Runtime/test/MemoryLifetimeTests/NeoClr/RuntimeTests/Main.rvn",
+      "old": "DEmpty",
+      "new": "`Default and end-position Memory windows remain empty after suspension`"
+    },
+    {
+      "path": "runtime/System.Web/test/HttpContentCopyTests/NeoClr/RuntimeTests/Main.rvn",
+      "old": "ABackpressure",
+      "new": "`HTTP content copy awaits writes before reading more and preserves ownership`"
+    },
+    {
+      "path": "runtime/System.Web/test/HttpContentCopyTests/NeoClr/RuntimeTests/Main.rvn",
+      "old": "BBuffered",
+      "new": "`HTTP memory content preserves selected windows and aliases across copies`"
+    },
+    {
+      "path": "runtime/System.Web/test/HttpContentCopyTests/NeoClr/RuntimeTests/Main.rvn",
+      "old": "CFailures",
+      "new": "`HTTP content copy preserves stream failures and rejects truncated or invalid reads`"
+    },
+    {
+      "path": "runtime/System.Web/test/HttpContentCopyTests/NeoClr/RuntimeTests/Main.rvn",
+      "old": "DLengths",
+      "new": "`HTTP content copy respects declared lengths and skips empty I/O`"
+    },
+    {
+      "path": "runtime/System.Web/test/HttpContentCopyTests/NeoClr/RuntimeTests/Main.rvn",
+      "old": "ECancellation",
+      "new": "`HTTP content copy cancellation skips pre-cancelled input and stops pending writes`"
+    },
+    {
+      "path": "runtime/System.Web/test/HttpContentCopyTests/NeoClr/RuntimeTests/Main.rvn",
+      "old": "FDisposal",
+      "new": "`HTTP content copy rejects disposed bodies and stops before the next source read`"
+    },
+    {
+      "path": "runtime/System.Web/test/HttpContentCopyTests/NeoClr/RuntimeTests/Main.rvn",
+      "old": "GTextReader",
+      "new": "`HTTP string reader consumes generic streams and preserves owned text and errors`"
+    },
+    {
+      "path": "runtime/System.Web/test/HttpContentCopyTests/NeoClr/RuntimeTests/Main.rvn",
+      "old": "HFactory",
+      "new": "`HTTP stream creation validates before taking ownership or reading`"
+    }
+  ]
+}

@@ -7,8 +7,8 @@ import System.Optional.*
 import System.Result.*
 import NeoClr.Testing.*
 
-[Test("ArrayList copy has independent storage")]
-func ListCopy() -> Result<unit, TestFailure> {
+[Test]
+func `ArrayList copy has independent storage`() -> Result<unit, TestFailure> {
     let source = ArrayList<int>()
     source.Add(4)
     let copy = ArrayList<int>(source)
@@ -17,8 +17,8 @@ func ListCopy() -> Result<unit, TestFailure> {
     return Assert.Equal(4, copy[0])
 }
 
-[Test("ArrayQueue preserves FIFO")]
-func QueueOrder() -> Result<unit, TestFailure> {
+[Test]
+func `ArrayQueue preserves FIFO`() -> Result<unit, TestFailure> {
     let queue = ArrayQueue<int>()
     queue.Enqueue(4)
     queue.Enqueue(9)
@@ -27,8 +27,8 @@ func QueueOrder() -> Result<unit, TestFailure> {
     return Assert.True(queue.Dequeue() is None, "Drained queue must be empty")
 }
 
-[Test("ArrayStack preserves LIFO")]
-func StackOrder() -> Result<unit, TestFailure> {
+[Test]
+func `ArrayStack preserves LIFO`() -> Result<unit, TestFailure> {
     let stack = ArrayStack<int>()
     stack.Push(4)
     stack.Push(9)
@@ -37,15 +37,15 @@ func StackOrder() -> Result<unit, TestFailure> {
     return Assert.True(stack.Pop() is None, "Drained stack must be empty")
 }
 
-[Test("HashSet applies its comparer")]
-func SetEquality() -> Result<unit, TestFailure> {
+[Test]
+func `HashSet applies its comparer`() -> Result<unit, TestFailure> {
     let set = HashSet<string>(StringComparer.OrdinalIgnoreCase)
     _ = Assert.True(set.Add("Raven"), "First item must be added")?
     _ = Assert.True(!set.Add("RAVEN"), "Equivalent item must be ignored")?
     return Assert.Equal(1, set.Count)
 }
 
-[Test("Any does not read Current")]
+[Test]
 func AnyWithoutCurrent() -> Result<unit, TestFailure> {
     let input = ObservedNumbers()
     _ = Assert.True(input.Any(), "Input is nonempty")?
@@ -54,8 +54,8 @@ func AnyWithoutCurrent() -> Result<unit, TestFailure> {
     return Assert.Equal(1, input.Disposals)
 }
 
-[Test("Predicate Any stops at its first match")]
-func PredicateAny() -> Result<unit, TestFailure> {
+[Test]
+func `Predicate Any stops at its first match`() -> Result<unit, TestFailure> {
     let input = ObservedNumbers()
     _ = Assert.True(input.Any(value => value == 2), "Second element matches")?
     _ = Assert.Equal(2, input.Moves)?
@@ -63,8 +63,8 @@ func PredicateAny() -> Result<unit, TestFailure> {
     return Assert.Equal(1, input.Disposals)
 }
 
-[Test("For break disposes its iterator")]
-func ForBreak() -> Result<unit, TestFailure> {
+[Test]
+func `For break disposes its iterator`() -> Result<unit, TestFailure> {
     let input = ObservedNumbers()
     for value in input {
         break

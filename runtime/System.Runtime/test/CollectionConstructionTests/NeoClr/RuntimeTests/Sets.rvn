@@ -7,8 +7,8 @@ import System.Optional.*
 import System.Result.*
 import NeoClr.Testing.*
 
-[Test("Set collision chains survive removal growth and slot reuse")]
-func SetCollisionReuse() -> Result<unit, TestFailure> {
+[Test]
+func `Set collision chains survive removal growth and slot reuse`() -> Result<unit, TestFailure> {
     let concrete = HashSet<int>(CollidingIntegers())
     let set: MutableSet<int> = concrete
     let view: Set<int> = concrete
@@ -39,8 +39,8 @@ func SetCollisionReuse() -> Result<unit, TestFailure> {
     return Assert.Equal(25, view.Count)
 }
 
-[Test("Set snapshot retains values across clear and reuse")]
-func SetSnapshotClear() -> Result<unit, TestFailure> {
+[Test]
+func `Set snapshot retains values across clear and reuse`() -> Result<unit, TestFailure> {
     let set = HashSet<int>(CollidingIntegers())
     var index = 0
     while index < 25 {
@@ -64,8 +64,8 @@ func SetSnapshotClear() -> Result<unit, TestFailure> {
     return Assert.True(!captured.Contains(42), "Snapshot must exclude later insertions")
 }
 
-[Test("Set ordinal string equality preserves case and Unicode")]
-func SetUnicodeOrdinal() -> Result<unit, TestFailure> {
+[Test]
+func `Set ordinal string equality preserves case and Unicode`() -> Result<unit, TestFailure> {
     let words = HashSet<string>(StringComparer.Ordinal)
     _ = Assert.True(words.Add("Café"), "Insert accented text")?
     _ = Assert.True(!words.Add("Café"), "Reject identical text")?

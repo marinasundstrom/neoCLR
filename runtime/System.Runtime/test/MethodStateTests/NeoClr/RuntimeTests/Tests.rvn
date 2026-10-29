@@ -14,8 +14,8 @@ class MethodOwner<T> {
 
 func InspectMethods<T>() -> Sequence<MethodInfo> => typeof(T).GetMethods()
 
-[Test("Method generic state separates owner and method parameters")]
-func MethodState() -> Result<unit, TestFailure> {
+[Test]
+func `Method generic state separates owner and method parameters`() -> Result<unit, TestFailure> {
     var count = 0
     var echo: TypeInfo? = null
     var other: TypeInfo? = null
@@ -57,8 +57,8 @@ struct MethodValue {
     private static func Hidden() -> int => 42
 }
 
-[Test("Method discovery filters visibility and scope on value types")]
-func MethodFilters() -> Result<unit, TestFailure> {
+[Test]
+func `Method discovery filters visibility and scope on value types`() -> Result<unit, TestFailure> {
     var count = 0
     for method in typeof(MethodValue).GetMethods(BindingFlags.Static | BindingFlags.NonPublic) {
         _ = Assert.Equal("Hidden", method.Name)?

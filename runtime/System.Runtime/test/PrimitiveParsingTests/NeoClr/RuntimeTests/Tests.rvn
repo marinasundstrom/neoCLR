@@ -5,8 +5,8 @@ import System.Result.*
 import System.Optional.*
 import NeoClr.Testing.*
 
-[Test("SByte parsing preserves values and reports overflow")]
-func ParseSByte() -> Result<unit, TestFailure> {
+[Test]
+func `SByte parsing preserves values and reports overflow`() -> Result<unit, TestFailure> {
     if SByte.Parse("-128") is Ok(let value) {
         _ = Assert.True(value == (sbyte)-128, "Parsed SByte value")?
     } else {
@@ -15,8 +15,8 @@ func ParseSByte() -> Result<unit, TestFailure> {
     return Assert.True(SByte.Parse("128") is Failure(NumberParseError.Overflow), "Out-of-range SByte must report overflow")
 }
 
-[Test("Byte parsing preserves values and reports overflow")]
-func ParseByte() -> Result<unit, TestFailure> {
+[Test]
+func `Byte parsing preserves values and reports overflow`() -> Result<unit, TestFailure> {
     if Byte.Parse("255") is Ok(let value) {
         _ = Assert.True(value == (byte)255, "Parsed Byte value")?
     } else {
@@ -25,8 +25,8 @@ func ParseByte() -> Result<unit, TestFailure> {
     return Assert.True(Byte.Parse("-1") is Failure(NumberParseError.Overflow), "Out-of-range Byte must report overflow")
 }
 
-[Test("Int16 parsing preserves values and reports overflow")]
-func ParseInt16() -> Result<unit, TestFailure> {
+[Test]
+func `Int16 parsing preserves values and reports overflow`() -> Result<unit, TestFailure> {
     if Int16.Parse("-32768") is Ok(let value) {
         _ = Assert.True(value == (short)-32768, "Parsed Int16 value")?
     } else {
@@ -35,8 +35,8 @@ func ParseInt16() -> Result<unit, TestFailure> {
     return Assert.True(Int16.Parse("32768") is Failure(NumberParseError.Overflow), "Out-of-range Int16 must report overflow")
 }
 
-[Test("UInt16 parsing preserves values and reports overflow")]
-func ParseUInt16() -> Result<unit, TestFailure> {
+[Test]
+func `UInt16 parsing preserves values and reports overflow`() -> Result<unit, TestFailure> {
     if UInt16.Parse("65535") is Ok(let value) {
         _ = Assert.True(value == (ushort)65535, "Parsed UInt16 value")?
     } else {
@@ -45,8 +45,8 @@ func ParseUInt16() -> Result<unit, TestFailure> {
     return Assert.True(UInt16.Parse("65536") is Failure(NumberParseError.Overflow), "Out-of-range UInt16 must report overflow")
 }
 
-[Test("Int32 parsing preserves values and reports overflow")]
-func ParseInt32() -> Result<unit, TestFailure> {
+[Test]
+func `Int32 parsing preserves values and reports overflow`() -> Result<unit, TestFailure> {
     if Int32.Parse("2147483647") is Ok(let value) {
         _ = Assert.True(value == 2147483647, "Parsed Int32 value")?
     } else {
@@ -55,8 +55,8 @@ func ParseInt32() -> Result<unit, TestFailure> {
     return Assert.True(Int32.Parse("2147483648") is Failure(NumberParseError.Overflow), "Out-of-range Int32 must report overflow")
 }
 
-[Test("UInt32 parsing preserves values and reports overflow")]
-func ParseUInt32() -> Result<unit, TestFailure> {
+[Test]
+func `UInt32 parsing preserves values and reports overflow`() -> Result<unit, TestFailure> {
     if UInt32.Parse("4294967295") is Ok(let value) {
         _ = Assert.True(value == (uint)4294967295L, "Parsed UInt32 value")?
     } else {
@@ -65,8 +65,8 @@ func ParseUInt32() -> Result<unit, TestFailure> {
     return Assert.True(UInt32.Parse("4294967296") is Failure(NumberParseError.Overflow), "Out-of-range UInt32 must report overflow")
 }
 
-[Test("UInt64 parsing preserves values and reports overflow")]
-func ParseUInt64() -> Result<unit, TestFailure> {
+[Test]
+func `UInt64 parsing preserves values and reports overflow`() -> Result<unit, TestFailure> {
     if UInt64.Parse("18446744073709551615") is Ok(let value) {
         _ = Assert.True(value == ((ulong)9223372036854775807L * (ulong)2 + (ulong)1), "Parsed UInt64 value")?
     } else {
@@ -75,8 +75,8 @@ func ParseUInt64() -> Result<unit, TestFailure> {
     return Assert.True(UInt64.Parse("18446744073709551616") is Failure(NumberParseError.Overflow), "Out-of-range UInt64 must report overflow")
 }
 
-[Test("Single parsing preserves values and reports overflow")]
-func ParseSingle() -> Result<unit, TestFailure> {
+[Test]
+func `Single parsing preserves values and reports overflow`() -> Result<unit, TestFailure> {
     if Single.Parse("1.25e2") is Ok(let value) {
         _ = Assert.True(value == (float)125, "Parsed Single value")?
     } else {
@@ -85,8 +85,8 @@ func ParseSingle() -> Result<unit, TestFailure> {
     return Assert.True(Single.Parse("1e39") is Failure(NumberParseError.Overflow), "Out-of-range Single must report overflow")
 }
 
-[Test("Double parsing preserves values and reports overflow")]
-func ParseDouble() -> Result<unit, TestFailure> {
+[Test]
+func `Double parsing preserves values and reports overflow`() -> Result<unit, TestFailure> {
     if Double.Parse("-2.5e-1") is Ok(let value) {
         _ = Assert.True(value == -0.25, "Parsed Double value")?
     } else {
@@ -95,8 +95,8 @@ func ParseDouble() -> Result<unit, TestFailure> {
     return Assert.True(Double.Parse("1e309") is Failure(NumberParseError.Overflow), "Out-of-range Double must report overflow")
 }
 
-[Test("Boolean parsing accepts mixed case and rejects numeric aliases")]
-func ParseBoolean() -> Result<unit, TestFailure> {
+[Test]
+func `Boolean parsing accepts mixed case and rejects numeric aliases`() -> Result<unit, TestFailure> {
     if Boolean.Parse("tRuE") is Ok(let value) {
         _ = Assert.True(value, "Mixed-case true")?
     } else {
@@ -105,14 +105,14 @@ func ParseBoolean() -> Result<unit, TestFailure> {
     return Assert.True(Boolean.Parse("1") is Failure(BooleanParseError.InvalidFormat), "Numeric Boolean must fail")
 }
 
-[Test("Primitive parsers distinguish invalid format from overflow")]
-func ParseFormat() -> Result<unit, TestFailure> {
+[Test]
+func `Primitive parsers distinguish invalid format from overflow`() -> Result<unit, TestFailure> {
     _ = Assert.True(Double.Parse(" 1") is Failure(NumberParseError.InvalidFormat), "Floating parser rejects leading whitespace")?
     return Assert.True(UInt64.Parse("999999999999999999999999x") is Failure(NumberParseError.InvalidFormat), "Invalid suffix takes precedence over unsigned overflow")
 }
 
-[Test("Byte parsing preserves distinct small values")]
-func ParseByteValues() -> Result<unit, TestFailure> {
+[Test]
+func `Byte parsing preserves distinct small values`() -> Result<unit, TestFailure> {
     if Byte.Parse("1") is Ok(let first) && Byte.Parse("2") is Ok(let second) {
         return Assert.True(first == (byte)1 && second == (byte)2, "Small parsed bytes remain distinct")
     }

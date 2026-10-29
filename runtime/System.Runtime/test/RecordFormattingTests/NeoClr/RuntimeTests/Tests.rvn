@@ -10,8 +10,8 @@ record struct Interval(Value: Range)
 record struct Envelope(Position: Position, Interval: Interval)
 record struct OptionalPosition(Value: Optional<Index>)
 
-[Test("Records use imported value formatting across typed and boxed calls")]
-func ImportedValues() -> Result<unit, TestFailure> {
+[Test]
+func `Records use imported value formatting across typed and boxed calls`() -> Result<unit, TestFailure> {
     let position = Position(Index.FromEnd(2))
     let interval = Interval(Range(Index.FromStart(1), Index.FromEnd(2)))
     _ = Assert.Equal("Position { Value = ^2 }", position.ToString())?
@@ -22,8 +22,8 @@ func ImportedValues() -> Result<unit, TestFailure> {
     return Assert.Equal(position.ToString(), boxed.ToString())
 }
 
-[Test("Nested records and unions retain imported value display contracts")]
-func NestedValues() -> Result<unit, TestFailure> {
+[Test]
+func `Nested records and unions retain imported value display contracts`() -> Result<unit, TestFailure> {
     let envelope = Envelope(Position(Index.Start), Interval(Range.All))
     _ = Assert.Equal("Envelope { Position = Position { Value = 0 }, Interval = Interval { Value = 0..^0 } }", envelope.ToString())?
     let some = OptionalPosition(Some(Index.FromEnd(3)))
@@ -33,8 +33,8 @@ func NestedValues() -> Result<unit, TestFailure> {
 
 record struct Scalars(Number: int, Flag: bool, Text: string?)
 
-[Test("Record scalar formatting preserves null and original Unicode text")]
-func ScalarsAndNull() -> Result<unit, TestFailure> {
+[Test]
+func `Record scalar formatting preserves null and original Unicode text`() -> Result<unit, TestFailure> {
     _ = Assert.Equal("Scalars { Number = -2147483648, Flag = True, Text = null }", Scalars(-2147483648, true, null).ToString())?
     let expected = "Scalars { Number = 42, Flag = False, Text = \"é\" }"
     return Assert.True(Scalars(42, false, "é").ToString().Equals(expected, StringComparison.Ordinal), "Original UTF-8 representation")
@@ -46,8 +46,8 @@ record struct Permissions(Value: Access)
 record struct Comparison(Value: StringComparison)
 record struct OptionalPermission(Value: Optional<Access>)
 
-[Test("Record enum display preserves names flags and numeric fallback")]
-func EnumValues() -> Result<unit, TestFailure> {
+[Test]
+func `Record enum display preserves names flags and numeric fallback`() -> Result<unit, TestFailure> {
     _ = Assert.Equal("Permissions { Value = Read }", Permissions(Access.Alias).ToString())?
     _ = Assert.Equal("Permissions { Value = Read, Execute }", Permissions((Access)5).ToString())?
     _ = Assert.Equal("Permissions { Value = 8 }", Permissions((Access)8).ToString())?
@@ -56,8 +56,8 @@ func EnumValues() -> Result<unit, TestFailure> {
     return Assert.Equal("Comparison { Value = Ordinal }", Comparison(StringComparison.Ordinal).ToString())
 }
 
-[Test("Record enum payload display survives boxed dispatch and collection")]
-func EnumPayloads() -> Result<unit, TestFailure> {
+[Test]
+func `Record enum payload display survives boxed dispatch and collection`() -> Result<unit, TestFailure> {
     let value = OptionalPermission(Some((Access)5))
     let boxed: object = value
     let text = boxed.ToString()
@@ -70,8 +70,8 @@ record struct Floating(Wide: double, Narrow: float)
 record struct OptionalFloating(Value: Optional<double>)
 record struct NestedFloating(Value: Floating)
 
-[Test("Floating records use value equality for NaNs zeros and infinities")]
-func FloatingEquality() -> Result<unit, TestFailure> {
+[Test]
+func `Floating records use value equality for NaNs zeros and infinities`() -> Result<unit, TestFailure> {
     let nan = Double.NaN
     let left = Floating(nan, (float)nan)
     let right = Floating(-nan, (float)(-nan))
@@ -89,8 +89,8 @@ func FloatingEquality() -> Result<unit, TestFailure> {
     return Assert.True(Floating(1.0, (float)2.0) != Floating(3.0, (float)2.0), "Double participates")
 }
 
-[Test("Floating record contracts agree across boxed interface and nested calls")]
-func FloatingDispatch() -> Result<unit, TestFailure> {
+[Test]
+func `Floating record contracts agree across boxed interface and nested calls`() -> Result<unit, TestFailure> {
     let nan = Double.NaN
     let value = Floating(nan, (float)nan)
     let boxed: object = value
@@ -106,8 +106,8 @@ func FloatingDispatch() -> Result<unit, TestFailure> {
     return Assert.Equal(first.GetHashCode(), second.GetHashCode())
 }
 
-[Test("Floating record display uses primitive text including negative zero")]
-func FloatingText() -> Result<unit, TestFailure> {
+[Test]
+func `Floating record display uses primitive text including negative zero`() -> Result<unit, TestFailure> {
     let nan = Double.NaN
     let infinity = Double.PositiveInfinity
     _ = Assert.Equal("Floating { Wide = NaN, Narrow = Infinity }", Floating(nan, (float)infinity).ToString())?
@@ -121,8 +121,8 @@ func FloatingText() -> Result<unit, TestFailure> {
 
 record struct Wrapped<T>(Value: T)
 
-[Test("Generic record display preserves text null and primitive contracts")]
-func GenericText() -> Result<unit, TestFailure> {
+[Test]
+func `Generic record display preserves text null and primitive contracts`() -> Result<unit, TestFailure> {
     _ = Assert.Equal("Wrapped { Value = 42 }", Wrapped<int>(42).ToString())?
     _ = Assert.Equal("Wrapped { Value = True }", Wrapped<bool>(true).ToString())?
     _ = Assert.Equal("Wrapped { Value = NaN }", Wrapped<double>(Double.NaN).ToString())?
@@ -132,8 +132,8 @@ func GenericText() -> Result<unit, TestFailure> {
     return Assert.Equal("Wrapped { Value = null }", Wrapped<string?>(null).ToString())
 }
 
-[Test("Generic record display uses nested and boxed value dispatch")]
-func GenericDispatch() -> Result<unit, TestFailure> {
+[Test]
+func `Generic record display uses nested and boxed value dispatch`() -> Result<unit, TestFailure> {
     let value = Wrapped<Position>(Position(Index.FromEnd(2)))
     let boxed: object = value
     System.Runtime.GC.Collect()
@@ -147,8 +147,8 @@ record Person(Name: string, Age: int)
 record Household(Owner: Person?)
 record struct Contact(Owner: Person?)
 
-[Test("Root record classes preserve value equality and reference identity")]
-func ReferenceContracts() -> Result<unit, TestFailure> {
+[Test]
+func `Root record classes preserve value equality and reference identity`() -> Result<unit, TestFailure> {
     let first = Person("Ada", 37)
     let equal = Person("Ada", 37)
     let different = Person("Ada", 38)
@@ -166,8 +166,8 @@ func ReferenceContracts() -> Result<unit, TestFailure> {
     return Assert.Equal("Person { Name = \"Ada\", Age = 37 }", boxed.ToString())
 }
 
-[Test("Record class display preserves nested and absent references")]
-func ReferenceDisplay() -> Result<unit, TestFailure> {
+[Test]
+func `Record class display preserves nested and absent references`() -> Result<unit, TestFailure> {
     let owner = Person("Ada", 37)
     _ = Assert.Equal("Household { Owner = Person { Name = \"Ada\", Age = 37 } }", Household(owner).ToString())?
     _ = Assert.Equal("Household { Owner = null }", Household(null).ToString())?
@@ -177,8 +177,8 @@ func ReferenceDisplay() -> Result<unit, TestFailure> {
 
 record Link(Name: string, Next: Link?)
 
-[Test("Recursive record shapes display finite reference chains")]
-func RecursiveReferences() -> Result<unit, TestFailure> {
+[Test]
+func `Recursive record shapes display finite reference chains`() -> Result<unit, TestFailure> {
     let first = Link("first", Link("last", null))
     let equal = Link("first", Link("last", null))
     _ = Assert.True(first == equal, "Recursive equality")?
@@ -195,8 +195,8 @@ record Leaf(Name: string) : Entity(7)
 open record GenericEntity<T>(Value: T)
 record GenericItem<T>(Value: T, Id: int) : GenericEntity<T>(Value)
 
-[Test("Inherited record equality observes runtime type and derived state")]
-func InheritedContracts() -> Result<unit, TestFailure> {
+[Test]
+func `Inherited record equality observes runtime type and derived state`() -> Result<unit, TestFailure> {
     let first: Entity = Item(1, "a")
     let same: Entity = Item(1, "a")
     let changed: Entity = Item(1, "b")
@@ -215,8 +215,8 @@ func InheritedContracts() -> Result<unit, TestFailure> {
     return Assert.True(generic == genericSame && generic != genericChanged, "Generic inherited state")
 }
 
-[Test("Inherited record display includes base members through virtual calls")]
-func InheritedDisplay() -> Result<unit, TestFailure> {
+[Test]
+func `Inherited record display includes base members through virtual calls`() -> Result<unit, TestFailure> {
     let original = Item(9, "copy")
     let copy = Item(original)
     _ = Assert.True(!Object.ReferenceEquals(original, copy) && original == copy, "Copy preserves base and derived state")?

@@ -5,8 +5,8 @@ import System.Result.*
 import System.Time.*
 import NeoClr.Testing.*
 
-[Test("Zoned parsing preserves UTC and the pinned database version")]
-func AUtc() -> Result<unit, TestFailure> {
+[Test]
+func `Zoned parsing preserves UTC and the pinned database version`() -> Result<unit, TestFailure> {
     _ = Assert.Equal("2025b", TimeZone.DatabaseVersion)?
     let Ok(value) = ZonedDateTime.Parse("1970-01-01T00:00:00Z", TimeZone.Utc) else {
         return Failure(TestFailure("UTC parse", "Ok", "Error"))
@@ -16,8 +16,8 @@ func AUtc() -> Result<unit, TestFailure> {
     return Assert.Equal(0, value.Offset.Seconds)
 }
 
-[Test("Zoned parsing validates winter and summer offsets")]
-func BSeasons() -> Result<unit, TestFailure> {
+[Test]
+func `Zoned parsing validates winter and summer offsets`() -> Result<unit, TestFailure> {
     let Ok(zone) = TimeZone.Find("Europe/Stockholm") else {
         return Failure(TestFailure("Zone lookup", "Ok", "Error"))
     }
@@ -32,8 +32,8 @@ func BSeasons() -> Result<unit, TestFailure> {
     return Assert.True(ZonedDateTime.Parse("2024-01-15T12:00:00Z", zone) is Failure(DateTimeParseError.OffsetMismatch), "Z must match zone UTC offset")
 }
 
-[Test("Explicit offsets select both DST overlap candidates without losing ticks")]
-func COverlap() -> Result<unit, TestFailure> {
+[Test]
+func `Explicit offsets select both DST overlap candidates without losing ticks`() -> Result<unit, TestFailure> {
     let Ok(zone) = TimeZone.Find("Europe/Stockholm") else {
         return Failure(TestFailure("Zone lookup", "Ok", "Error"))
     }
@@ -48,8 +48,8 @@ func COverlap() -> Result<unit, TestFailure> {
     return Assert.Equal(1234567, later.LocalDateTime.Time.FractionTicks)
 }
 
-[Test("Zoned parsing rejects skipped local times for either adjacent offset")]
-func DGap() -> Result<unit, TestFailure> {
+[Test]
+func `Zoned parsing rejects skipped local times for either adjacent offset`() -> Result<unit, TestFailure> {
     let Ok(zone) = TimeZone.Find("Europe/Stockholm") else {
         return Failure(TestFailure("Zone lookup", "Ok", "Error"))
     }
@@ -59,8 +59,8 @@ func DGap() -> Result<unit, TestFailure> {
     return Assert.True(true, "Skipped local times rejected")
 }
 
-[Test("Zoned parsing handles half hour transitions")]
-func EHalfHour() -> Result<unit, TestFailure> {
+[Test]
+func `Zoned parsing handles half hour transitions`() -> Result<unit, TestFailure> {
     let Ok(zone) = TimeZone.Find("Australia/Lord_Howe") else {
         return Failure(TestFailure("Zone lookup", "Ok", "Error"))
     }
@@ -74,8 +74,8 @@ func EHalfHour() -> Result<unit, TestFailure> {
     return Assert.True(ZonedDateTime.Parse("2024-10-06T02:15:00+10:30", zone) is Failure(DateTimeParseError.OffsetMismatch), "Half-hour gap")
 }
 
-[Test("Zoned parsing enforces rule bounds and historical second precision")]
-func FBounds() -> Result<unit, TestFailure> {
+[Test]
+func `Zoned parsing enforces rule bounds and historical second precision`() -> Result<unit, TestFailure> {
     for text in ["1900-01-01T00:00:00Z", "2099-12-31T23:59:59.9999999Z", "1969-12-31T23:59:59.9999999Z"] {
         _ = Assert.True(ZonedDateTime.Parse(text, TimeZone.Utc) is Ok(_), "Supported UTC boundary")?
     }
@@ -92,8 +92,8 @@ func FBounds() -> Result<unit, TestFailure> {
     return Assert.True(ZonedDateTime.Parse("1900-01-01T00:00:00+00:09:21", paris) is Failure(DateTimeParseError.OutOfRange), "UTC also must be in range")
 }
 
-[Test("Zoned parsing preserves lexical and civil range errors")]
-func GErrors() -> Result<unit, TestFailure> {
+[Test]
+func `Zoned parsing preserves lexical and civil range errors`() -> Result<unit, TestFailure> {
     for text in ["", "2024-01-01T00:00:00", "2024-01-01T00:00:00Z[UTC]", "2024-01-01 00:00:00Z"] {
         _ = Assert.True(ZonedDateTime.Parse(text, TimeZone.Utc) is Failure(DateTimeParseError.InvalidFormat), "Strict timestamp grammar")?
     }
@@ -103,8 +103,8 @@ func GErrors() -> Result<unit, TestFailure> {
     return Assert.True(true, "Error categories retained")
 }
 
-[Test("Named zone lookup remains ordinal and accepts pinned aliases")]
-func HNames() -> Result<unit, TestFailure> {
+[Test]
+func `Named zone lookup remains ordinal and accepts pinned aliases`() -> Result<unit, TestFailure> {
     for name in ["", "europe/stockholm", "Not/AZone", "UTC\u0000", "Europe/Stockholm "] {
         _ = Assert.True(TimeZone.Find(name) is Failure(TimeZoneError.UnknownZone), "Unknown or differently cased zone")?
     }

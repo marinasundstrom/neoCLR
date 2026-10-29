@@ -34,15 +34,15 @@ func UseOwned(handler: LifetimeHandler) {
 
 // These tests intentionally inspect cancellation outcomes and scheduling boundaries;
 // awaiting a cancelled task cannot express those assertions.
-[Test("HTTP client use disposes its owned handler exactly once")]
-func AOwned() -> Result<unit, TestFailure> {
+[Test]
+func `HTTP client use disposes its owned handler exactly once`() -> Result<unit, TestFailure> {
     let handler = LifetimeHandler()
     UseOwned(handler)
     return Assert.Equal(1, handler.DisposeCount)
 }
 
-[Test("HTTP borrowed handler survives one client and serves another")]
-func BBorrowed() -> Result<unit, TestFailure> {
+[Test]
+func `HTTP borrowed handler survives one client and serves another`() -> Result<unit, TestFailure> {
     let handler = LifetimeHandler()
     let first = HttpClient(handler, false)
     first.Dispose()
@@ -54,8 +54,8 @@ func BBorrowed() -> Result<unit, TestFailure> {
     return Assert.Equal(1, handler.Calls)
 }
 
-[Test("HTTP disposal requests cancellation and waits for handler acknowledgement")]
-func CCancellation() -> Result<unit, TestFailure> {
+[Test]
+func `HTTP disposal requests cancellation and waits for handler acknowledgement`() -> Result<unit, TestFailure> {
     let handler = LifetimeHandler()
     let client = HttpClient(handler)
     let result = client.Get("http://example.test/")
@@ -68,8 +68,8 @@ func CCancellation() -> Result<unit, TestFailure> {
     return Assert.Equal(1, handler.DisposeCount)
 }
 
-[Test("HTTP caller cancellation propagates without disposing the handler")]
-func DCaller() -> Result<unit, TestFailure> {
+[Test]
+func `HTTP caller cancellation propagates without disposing the handler`() -> Result<unit, TestFailure> {
     let handler = LifetimeHandler()
     use client = HttpClient(handler, false)
     use caller = CancellationTokenSource()
@@ -82,8 +82,8 @@ func DCaller() -> Result<unit, TestFailure> {
     return Assert.Equal(0, handler.DisposeCount)
 }
 
-[Test("HTTP completed responses survive disposal and retain request association")]
-func ECompleted() -> Result<unit, TestFailure> {
+[Test]
+func `HTTP completed responses survive disposal and retain request association`() -> Result<unit, TestFailure> {
     let handler = LifetimeHandler()
     let response = HttpResponse(200, ArrayList<HttpHeader>(), HttpMemoryContent(default(ReadOnlyMemory<byte>)))
     _ = handler.Completion.Complete(Ok(response))
@@ -98,8 +98,8 @@ func ECompleted() -> Result<unit, TestFailure> {
     return Assert.Equal("/answer", request.Target)
 }
 
-[Test("HTTP pre-cancellation skips custom handlers")]
-func FPreCancelled() -> Result<unit, TestFailure> {
+[Test]
+func `HTTP pre-cancellation skips custom handlers`() -> Result<unit, TestFailure> {
     let handler = LifetimeHandler()
     use client = HttpClient(handler)
     use caller = CancellationTokenSource()
@@ -108,8 +108,8 @@ func FPreCancelled() -> Result<unit, TestFailure> {
     return Assert.Equal(0, handler.Calls)
 }
 
-[Test("HTTP socket handler disposal is idempotent through Disposable")]
-func GSocket() -> Result<unit, TestFailure> {
+[Test]
+func `HTTP socket handler disposal is idempotent through Disposable`() -> Result<unit, TestFailure> {
     let handler = HttpSocketHandler()
     let resource: Disposable = handler
     resource.Dispose()
@@ -144,8 +144,8 @@ class RecordingMiddleware : DelegatingHandler {
 
 }
 
-[Test("HTTP delegating handlers run outward and unwind inward")]
-func HDelegation() -> Result<unit, TestFailure> {
+[Test]
+func `HTTP delegating handlers run outward and unwind inward`() -> Result<unit, TestFailure> {
     let events = ArrayList<string>()
     let terminal = LifetimeHandler()
     let inner = RecordingMiddleware("inner", events, terminal)
@@ -167,8 +167,8 @@ func HDelegation() -> Result<unit, TestFailure> {
     return Assert.Equal(1, terminal.DisposeCount)
 }
 
-[Test("HTTP borrowed delegating pipeline remains reusable")]
-func IBorrowedPipeline() -> Result<unit, TestFailure> {
+[Test]
+func `HTTP borrowed delegating pipeline remains reusable`() -> Result<unit, TestFailure> {
     let events = ArrayList<string>()
     let terminal = LifetimeHandler()
     let outer = RecordingMiddleware("outer", events, terminal)
@@ -196,8 +196,8 @@ class SharedHandler : HttpHandler {
     }
 }
 
-[Test("HTTP borrowed clients cancel only their own pending sends")]
-func JIndependentOwners() -> Result<unit, TestFailure> {
+[Test]
+func `HTTP borrowed clients cancel only their own pending sends`() -> Result<unit, TestFailure> {
     let shared = SharedHandler()
     let first = HttpClient(shared, false)
     use second = HttpClient(shared, false)
@@ -213,8 +213,8 @@ func JIndependentOwners() -> Result<unit, TestFailure> {
     return Assert.True(survivor.GetResult() is Failure(HttpError.Handler("expected")), "Independent failure preserved")
 }
 
-[Test("HTTP disposed requests are rejected before invoking a custom handler")]
-func ZDisposedRequest() -> Result<unit, TestFailure> {
+[Test]
+func `HTTP disposed requests are rejected before invoking a custom handler`() -> Result<unit, TestFailure> {
     let handler = LifetimeHandler()
     use client = HttpClient(handler)
     let Ok(request) = HttpRequest.Get("http://example.test/") else { return Assert.True(false, "Create request") }

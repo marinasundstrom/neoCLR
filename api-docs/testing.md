@@ -24,7 +24,11 @@ and takes precedence over constructor data. Discovery reads metadata without
 executing the constructor or setter. Empty text selects the qualified function
 name for display. Changing the description does not change the test ID or order.
 
-Prefer a descriptive function name when it supplies the test's whole description:
+The repository convention prefers backtick identifiers when stating behavior.
+Traditional names are valid when already clear. Whenever a test needs a prose
+description, put it in the identifier and use `[Test]`; do not add a Test attribute
+description. Attribute-description arguments remain supported for compatibility
+and are exercised by dedicated framework contract fixtures:
 
 ```raven
 [Test]
@@ -37,8 +41,9 @@ func `IPv4 parsing and canonical formatting round trip`() -> Result<unit, TestFa
 ```
 
 See the executable [IP address tests](https://github.com/marinasundstrom/neoCLR/blob/main/runtime/System.Networking/test/IpAddressValuesTests/NeoClr/RuntimeTests/Tests.rvn)
-for the helper and complete corpus. Optional descriptions remain useful as display
-overrides. Moving description text into the function name changes its ID,
+for the helper and complete corpus. Helper and data-source functions keep ordinary
+meaningful names. Existing clear test names such as AnyWithoutCurrent need no
+rename. Moving description text into the function name changes its ID,
 name-based filters and ordinal registration order. Backticks themselves are absent
 from metadata, selectors and reports.
 

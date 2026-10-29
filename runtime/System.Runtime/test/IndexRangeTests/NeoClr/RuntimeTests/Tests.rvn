@@ -6,8 +6,8 @@ import System.Result.*
 import System.Optional.*
 import NeoClr.Testing.*
 
-[Test("Index preserves direction and resolves end boundaries")]
-func AIndexValues() -> Result<unit, TestFailure> {
+[Test]
+func `Index preserves direction and resolves end boundaries`() -> Result<unit, TestFailure> {
     let start = Index.Start
     let end = Index.End
     let last: Index = ^1
@@ -24,8 +24,8 @@ func AIndexValues() -> Result<unit, TestFailure> {
     return Assert.Equal(2147483647, Index.FromStart(2147483647).Value)
 }
 
-[Test("Index and Range typed equality agrees with hashing")]
-func BValueEquality() -> Result<unit, TestFailure> {
+[Test]
+func `Index and Range typed equality agrees with hashing`() -> Result<unit, TestFailure> {
     let first = Index.FromEnd(2)
     let same = Index(2, true)
     _ = Assert.True(first.Equals(same), "Index equality")?
@@ -38,8 +38,8 @@ func BValueEquality() -> Result<unit, TestFailure> {
     return Assert.Equal("1..^2", left.ToString())
 }
 
-[Test("Range resolution accepts empty and full boundaries")]
-func CRangeBounds() -> Result<unit, TestFailure> {
+[Test]
+func `Range resolution accepts empty and full boundaries`() -> Result<unit, TestFailure> {
     let all = Range.All
     let empty = all.GetOffsetAndLength(0)
     _ = Assert.True(empty.Item1 == 0 && empty.Item2 == 0, "Empty source")?
@@ -52,8 +52,8 @@ func CRangeBounds() -> Result<unit, TestFailure> {
     return Assert.True(bounds.Item1 == 1 && bounds.Item2 == 2, "Half-open range")
 }
 
-[Test("Array range syntax supports omitted and end-relative boundaries")]
-func DArraySlices() -> Result<unit, TestFailure> {
+[Test]
+func `Array range syntax supports omitted and end-relative boundaries`() -> Result<unit, TestFailure> {
     let values: int[] = [10, 20, 30, 40]
     let middle = values[1..^1]
     let prefix = values[..2]
@@ -73,8 +73,8 @@ func DArraySlices() -> Result<unit, TestFailure> {
     return Assert.Equal(0, empty.Length)
 }
 
-[Test("Array indexes support values and from-end assignment")]
-func EArrayIndexes() -> Result<unit, TestFailure> {
+[Test]
+func `Array indexes support values and from-end assignment`() -> Result<unit, TestFailure> {
     let values: int[] = [10, 20, 30]
     let last: Index = ^1
     _ = Assert.Equal(30, values[last])?
@@ -84,8 +84,8 @@ func EArrayIndexes() -> Result<unit, TestFailure> {
     return Assert.Equal(99, values[^1])
 }
 
-[Test("Array slices copy storage and preserve reference elements")]
-func FCopySemantics() -> Result<unit, TestFailure> {
+[Test]
+func `Array slices copy storage and preserve reference elements`() -> Result<unit, TestFailure> {
     let values: int[] = [10, 20, 30]
     let copy = values[..]
     copy[0] = 99
@@ -116,8 +116,8 @@ class ObservedArray {
     }
 }
 
-[Test("Array indexing and slicing evaluate operands once in source order")]
-func GEvaluationOrder() -> Result<unit, TestFailure> {
+[Test]
+func `Array indexing and slicing evaluate operands once in source order`() -> Result<unit, TestFailure> {
     let observed = ObservedArray()
     _ = Assert.Equal(30, observed.Read()[^observed.Boundary()])?
     _ = Assert.Equal(12, observed.Calls)?
@@ -141,15 +141,15 @@ class ReadOnlyCounter {
     func Read() -> int => counter.Next() + counter.Next()
 }
 
-[Test("Read-only value fields use defensive copies for method calls")]
-func HReadOnlyReceivers() -> Result<unit, TestFailure> {
+[Test]
+func `Read-only value fields use defensive copies for method calls`() -> Result<unit, TestFailure> {
     let value = ReadOnlyCounter()
     _ = Assert.Equal(2, value.Read())?
     return Assert.Equal(2, value.Read())
 }
 
-[Test("Array safe access returns options and results for invalid bounds")]
-func IValidatedAccess() -> Result<unit, TestFailure> {
+[Test]
+func `Array safe access returns options and results for invalid bounds`() -> Result<unit, TestFailure> {
     let values: int[] = [10, 20, 30]
     _ = Assert.True(values.Get(-1) is None, "Negative index")?
     _ = Assert.True(values.Get(3) is None, "Past end")?
@@ -178,8 +178,8 @@ func IValidatedAccess() -> Result<unit, TestFailure> {
     return Assert.True(false, "Empty slice missing")
 }
 
-[Test("String ranges preserve graphemes and half-open boundaries")]
-func JStringSlices() -> Result<unit, TestFailure> {
+[Test]
+func `String ranges preserve graphemes and half-open boundaries`() -> Result<unit, TestFailure> {
     let text = "Aé👩‍💻🇸🇪Z"
     _ = Assert.Equal(5, text.Length)?
     _ = Assert.Equal("é👩‍💻🇸🇪", text[1..^1])?
@@ -193,8 +193,8 @@ func JStringSlices() -> Result<unit, TestFailure> {
     return Assert.Equal("👩‍💻", text[^3].ToString())
 }
 
-[Test("String safe access rejects invalid grapheme bounds")]
-func KStringSafeAccess() -> Result<unit, TestFailure> {
+[Test]
+func `String safe access rejects invalid grapheme bounds`() -> Result<unit, TestFailure> {
     let text = "é🙂"
     _ = Assert.True(text.Get(-1) is None, "Negative")?
     _ = Assert.True(text.Get(2) is None, "End")?
@@ -213,8 +213,8 @@ func KStringSafeAccess() -> Result<unit, TestFailure> {
     return Assert.True(false, "Missing slice")
 }
 
-[Test("String slicing evaluates receiver and bounds once")]
-func LStringEvaluation() -> Result<unit, TestFailure> {
+[Test]
+func `String slicing evaluates receiver and bounds once`() -> Result<unit, TestFailure> {
     let observed = ObservedText()
     let part = observed.Read()[observed.Boundary()..^observed.Boundary()]
     _ = Assert.Equal(122, observed.Calls)?
@@ -233,8 +233,8 @@ class ObservedText {
     }
 }
 
-[Test("ArrayList supports directional mutation and independent range copies")]
-func MListRanges() -> Result<unit, TestFailure> {
+[Test]
+func `ArrayList supports directional mutation and independent range copies`() -> Result<unit, TestFailure> {
     let list = System.Collections.ArrayList<int>(8)
     list.Add(10)
     list.Add(20)
@@ -250,8 +250,8 @@ func MListRanges() -> Result<unit, TestFailure> {
     return Assert.True(list.Slice(0..4) is Failure(_), "Range excludes spare capacity")
 }
 
-[Test("Sequence slicing consumes one iterator without indexed reads")]
-func NSequenceSlices() -> Result<unit, TestFailure> {
+[Test]
+func `Sequence slicing consumes one iterator without indexed reads`() -> Result<unit, TestFailure> {
     let observed = ObservedSequence(5)
     let sequence: System.Collections.Sequence<int> = observed
     if sequence.Slice(1..^1) is Ok(let copy) {
@@ -267,8 +267,8 @@ func NSequenceSlices() -> Result<unit, TestFailure> {
     return Assert.Equal(1, observed.Disposed)
 }
 
-[Test("Sequence invalid and empty slices do not acquire iterators")]
-func OSequenceBoundaries() -> Result<unit, TestFailure> {
+[Test]
+func `Sequence invalid and empty slices do not acquire iterators`() -> Result<unit, TestFailure> {
     let observed = ObservedSequence(5)
     let sequence: System.Collections.Sequence<int> = observed
     _ = Assert.True(sequence.Slice(4..2) is Failure(_), "Reversed")?
@@ -282,8 +282,8 @@ func OSequenceBoundaries() -> Result<unit, TestFailure> {
     return Assert.Equal(0, observed.Acquired)
 }
 
-[Test("Sequence slicing disposes when enumeration ends before Count")]
-func PSequenceShortSource() -> Result<unit, TestFailure> {
+[Test]
+func `Sequence slicing disposes when enumeration ends before Count`() -> Result<unit, TestFailure> {
     let observed = ObservedSequence(2)
     let sequence: System.Collections.Sequence<int> = observed
     _ = Assert.True(sequence.Slice(1..4) is Failure(_), "Short source")?
@@ -291,8 +291,8 @@ func PSequenceShortSource() -> Result<unit, TestFailure> {
     return Assert.Equal(1, observed.Disposed)
 }
 
-[Test("Sequence safe indexing and slicing work through array aliases")]
-func QSequenceAliases() -> Result<unit, TestFailure> {
+[Test]
+func `Sequence safe indexing and slicing work through array aliases`() -> Result<unit, TestFailure> {
     let values: int[] = [10, 20, 30]
     let sequence: System.Collections.Sequence<int> = values
     if sequence.Get(^1) is Some(let last) {
@@ -350,8 +350,8 @@ class ObservedSequenceIterator : System.Collections.Iterator<int> {
 }
 
 
-[Test("Sequence extension indexers provide default access and independent slices")]
-func RSequenceSyntax() -> Result<unit, TestFailure> {
+[Test]
+func `Sequence extension indexers provide default access and independent slices`() -> Result<unit, TestFailure> {
     let values: int[] = [10, 20, 30]
     let sequence: Sequence<int> = values
     _ = Assert.Equal(30, sequence[^1])?
@@ -364,8 +364,8 @@ func RSequenceSyntax() -> Result<unit, TestFailure> {
     return Assert.Equal(3, fallback.Length)
 }
 
-[Test("Sequence slicing delegates to the list range contract")]
-func SListDispatch() -> Result<unit, TestFailure> {
+[Test]
+func `Sequence slicing delegates to the list range contract`() -> Result<unit, TestFailure> {
     let observed = DirectList()
     let list: List<int> = observed
     list[^1] = 30
@@ -415,8 +415,8 @@ extension TestListAccess for ArrayList<int> {
     }
 }
 
-[Test("Native extension indexers support writes and compound assignment")]
-func TExtensionWrites() -> Result<unit, TestFailure> {
+[Test]
+func `Native extension indexers support writes and compound assignment`() -> Result<unit, TestFailure> {
     let values = ArrayList<int>()
     values.Add(1)
     values[true] = 2

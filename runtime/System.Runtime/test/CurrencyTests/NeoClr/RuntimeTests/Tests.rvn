@@ -5,8 +5,8 @@ import System.Globalization.*
 import System.Result.*
 import NeoClr.Testing.*
 
-[Test("Currency identity is independent of culture and amount")]
-func AIdentity() -> Result<unit, TestFailure> {
+[Test]
+func `Currency identity is independent of culture and amount`() -> Result<unit, TestFailure> {
     let Ok(usd) = Currency.Parse("USD") else { return Assert.True(false, "Currency identity") }
     _ = Assert.True(usd == Currency.USD && usd != Currency.SEK, "Code identity")?
     _ = Assert.True(usd.GetHashCode() == Currency.USD.GetHashCode(), "Hash contract")?
@@ -19,8 +19,8 @@ func AIdentity() -> Result<unit, TestFailure> {
     return Assert.True(unsupported is Failure(_), "Codes are explicit uppercase identifiers")
 }
 
-[Test("Currency formatting follows all five culture profiles")]
-func BProfiles() -> Result<unit, TestFailure> {
+[Test]
+func `Currency formatting follows all five culture profiles`() -> Result<unit, TestFailure> {
     let amount = 1234.5m
     _ = Assert.Equal("$1,234.50", amount.ToString("C", Culture.EnglishUnitedStates))?
     _ = Assert.Equal("£1,234.50", amount.ToString("C", Culture.EnglishUnitedKingdom))?
@@ -31,8 +31,8 @@ func BProfiles() -> Result<unit, TestFailure> {
     return Assert.Equal("‏‎-1,234.50 ‏₪", (-amount).ToString("C", Culture.HebrewIsrael))
 }
 
-[Test("Explicit currency formatting rounds display without changing the amount")]
-func CExplicit() -> Result<unit, TestFailure> {
+[Test]
+func `Explicit currency formatting rounds display without changing the amount`() -> Result<unit, TestFailure> {
     let amount = 1234.5m
     _ = Assert.Equal("1 234,50 US$", Currency.USD.Format(amount, Culture.SwedishSweden))?
     _ = Assert.Equal("US$1,234.50", Currency.USD.Format(amount, Culture.EnglishUnitedKingdom))?
@@ -45,8 +45,8 @@ func CExplicit() -> Result<unit, TestFailure> {
     return Assert.Equal("1234.5", amount.ToString())
 }
 
-[Test("Currency amount parsing validates identity grouping spacing and direction")]
-func DParsing() -> Result<unit, TestFailure> {
+[Test]
+func `Currency amount parsing validates identity grouping spacing and direction`() -> Result<unit, TestFailure> {
     let Ok(usd) = Currency.USD.ParseAmount("USD 1,234.50", Culture.EnglishUnitedStates) else { return Assert.True(false, "USD code parse") }
     _ = Assert.True(usd.Amount == 1234.50m && usd.Currency == Currency.USD, "USD value")?
     let Ok(sek) = Currency.SEK.ParseAmount("−1 234,50 kr", Culture.SwedishSweden) else { return Assert.True(false, "SEK parse") }
@@ -63,8 +63,8 @@ func DParsing() -> Result<unit, TestFailure> {
     return Assert.True(bare is Failure(_), "Currency token required")
 }
 
-[Test("Currency data and language direction are explicit immutable policies")]
-func EPolicies() -> Result<unit, TestFailure> {
+[Test]
+func `Currency data and language direction are explicit immutable policies`() -> Result<unit, TestFailure> {
     let format = Culture.SwedishSweden.NumberFormat
     _ = Assert.True(format.Currency == Currency.SEK && format.CurrencyDecimalDigits == 2, "Default currency metadata")?
     _ = Assert.Equal("kr", format.CurrencySymbol)?
@@ -75,8 +75,8 @@ func EPolicies() -> Result<unit, TestFailure> {
     return Assert.True(!Language.English.IsRightToLeft && !Language.Swedish.IsRightToLeft && !Language.Undetermined.IsRightToLeft, "LTR defaults")
 }
 
-[Test("Money records preserve identity precision and deconstruction")]
-func FRecords() -> Result<unit, TestFailure> {
+[Test]
+func `Money records preserve identity precision and deconstruction`() -> Result<unit, TestFailure> {
     let money = Money(1234.500m, Currency.USD)
     let Money(amount, currency) = money
     _ = Assert.True(amount == 1234.5m && currency == Currency.USD, "Positional components")?

@@ -31,8 +31,8 @@ func MaximumText() -> string {
     return text
 }
 
-[Test("StreamReader decodes Unicode lines across single-byte reads")]
-func AUnicodeLines() -> Result<unit, TestFailure> {
+[Test]
+func `StreamReader decodes Unicode lines across single-byte reads`() -> Result<unit, TestFailure> {
     for text in ["", "a", "é", "😀", "é", "a\rb", "\u0000"] {
         let encoded = EncodedBytes(text + "\r\n")?
         let source = ShortInput(encoded, -1)
@@ -48,8 +48,8 @@ func AUnicodeLines() -> Result<unit, TestFailure> {
     return Assert.True(true, "All Unicode lines")
 }
 
-[Test("StreamReader distinguishes empty lines EOF and lone carriage returns")]
-func BLineEndings() -> Result<unit, TestFailure> {
+[Test]
+func `StreamReader distinguishes empty lines EOF and lone carriage returns`() -> Result<unit, TestFailure> {
     let endings = EncodedBytes("A\n\nB\r")?
     let source = ShortInput(endings, -1)
     let Ok(reader) = StreamReader.Create(source) else {
@@ -67,8 +67,8 @@ func BLineEndings() -> Result<unit, TestFailure> {
     return Assert.True(CompletedValue(lone.ReadLine(0)) is Failure(TextReadError.LimitExceeded), "Lone CR consumes quota")
 }
 
-[Test("StreamReader delimits custom decoded output and bounds expansion")]
-func CCustomDecode() -> Result<unit, TestFailure> {
+[Test]
+func `StreamReader delimits custom decoded output and bounds expansion`() -> Result<unit, TestFailure> {
     let encoded = EncodedBytes("x")?
     let source = ShortInput(encoded, -1)
     let Ok(reader) = StreamReader.Create(source, ExpandedEncoding()) else {
@@ -90,8 +90,8 @@ func CCustomDecode() -> Result<unit, TestFailure> {
     return Assert.True(count == 1 && sink.Count == 1 && sink.Bytes[0] == 90, "Count encoded output bytes")
 }
 
-[Test("StreamWriter reports zero progress and preserves flush failures")]
-func DZeroProgress() -> Result<unit, TestFailure> {
+[Test]
+func `StreamWriter reports zero progress and preserves flush failures`() -> Result<unit, TestFailure> {
     let sink = FailedSink(true)
     let Ok(writer) = StreamWriter.Create(sink, Encodings.Ascii) else {
         Panic("Unable to create text wrapper")
@@ -103,8 +103,8 @@ func DZeroProgress() -> Result<unit, TestFailure> {
     return Assert.True(CompletedValue(writer.Flush()) is Failure(StreamError.IoFailure), "Flush error remains observable")
 }
 
-[Test("StreamReader rejects invalid limits before consuming its input")]
-func EReaderPreflight() -> Result<unit, TestFailure> {
+[Test]
+func `StreamReader rejects invalid limits before consuming its input`() -> Result<unit, TestFailure> {
     let encoded = EncodedBytes("é")?
     let source = ShortInput(encoded, -1)
     let Ok(reader) = StreamReader.Create(source, Encodings.Utf8, true) else {
@@ -119,8 +119,8 @@ func EReaderPreflight() -> Result<unit, TestFailure> {
     return Assert.True(CompletedValue(reader.ReadLine(2)) is Failure(TextReadError.Closed), "Closed reader")
 }
 
-[Test("Encoding input quotas reject oversized chunks without poisoning sessions")]
-func FEncodingQuota() -> Result<unit, TestFailure> {
+[Test]
+func `Encoding input quotas reject oversized chunks without poisoning sessions`() -> Result<unit, TestFailure> {
     let excessive = MaximumText() + "x"
     _ = Assert.True(Encodings.Utf8.Encode(excessive) is Failure(EncodingError.LimitExceeded), "UTF-8 input quota")?
     _ = Assert.True(Encodings.Ascii.Encode(excessive) is Failure(EncodingError.LimitExceeded), "ASCII input quota")?
@@ -134,8 +134,8 @@ func FEncodingQuota() -> Result<unit, TestFailure> {
     return Assert.True(step.BytesWritten == 2 && step.State is EncoderState.Finished && buffer[0] == 111 && buffer[1] == 107, "Retry output")
 }
 
-[Test("StreamWriter accepts its maximum byte count and preflights oversized lines")]
-func GMaximumWrite() -> Result<unit, TestFailure> {
+[Test]
+func `StreamWriter accepts its maximum byte count and preflights oversized lines`() -> Result<unit, TestFailure> {
     let text = MaximumText()
     let sink = CountingSink()
     let Ok(writer) = StreamWriter.Create(sink) else {
@@ -153,8 +153,8 @@ func GMaximumWrite() -> Result<unit, TestFailure> {
     return Assert.True(CompletedValue(writer.Finish()) is Ok(0), "Maximum write completion")
 }
 
-[Test("StreamReader preserves input failures and rejects truncated UTF-8 at EOF")]
-func HInputFailures() -> Result<unit, TestFailure> {
+[Test]
+func `StreamReader preserves input failures and rejects truncated UTF-8 at EOF`() -> Result<unit, TestFailure> {
     let encoded = EncodedBytes("AB")?
     let Ok(failed) = StreamReader.Create(ShortInput(encoded, 1)) else {
         Panic("Unable to create text wrapper")

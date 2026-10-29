@@ -15,6 +15,13 @@ when required, without promising full TUnit compatibility.
 | API reference | [Testing APIs](../../api-docs/testing.md), published on the site at `/docs/testing.html` |
 | Examples and evidence | [Runtime tests](../../runtime/raven/tests/README.md), including data and category contracts |
 
+Use `[Test]` with a descriptive backtick identifier when stating behavior, for
+example ``func `ArrayList copy has independent storage`()``. Traditional names remain
+valid when clear. Whenever prose is needed, put it in the identifier rather than
+in the Test attribute; only description-feature contract fixtures retain those
+arguments. Helpers and data sources keep conventional meaningful names. See the
+[naming convention](../../docs/raven-conventions.md#descriptive-test-and-benchmark-names-2026-10-26).
+
 `[Test]` marks a module function returning `Result<unit, TestFailure>`. Optional
 `[Arguments(...)]` or `[MethodDataSource("Inputs")]` expands it into individual
 cases. `[Category("fast")]` tags every row. The reference lists supported argument

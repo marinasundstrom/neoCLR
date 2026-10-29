@@ -7,8 +7,8 @@ import NeoClr.Testing.*
 
 import System.Web.Http.*
 
-[Test("Route matching separates query text and converts captured integers")]
-func RouteCaptures() -> Result<unit, TestFailure> {
+[Test]
+func `Route matching separates query text and converts captured integers`() -> Result<unit, TestFailure> {
     let pattern = RequiredPattern("/stations/{stationId}/reports")?
     let values = RequiredMatch(pattern, "/stations/42/reports?limit=2")?
     if values.Get("stationId") is Ok(let text) {
@@ -20,8 +20,8 @@ func RouteCaptures() -> Result<unit, TestFailure> {
     return Assert.True(values.Get("missing") is Failure(_), "Missing capture reports failure")
 }
 
-[Test("Route matching preserves case segment and trailing-slash distinctions")]
-func RouteAbsence() -> Result<unit, TestFailure> {
+[Test]
+func `Route matching preserves case segment and trailing-slash distinctions`() -> Result<unit, TestFailure> {
     let pattern = RequiredPattern("/stations/{stationId}/reports")?
     for target in ["/missing", "/stations/42/reports/", "/Stations/42/reports", "/stations//reports", "/stations/42", "/stations/42/reports/extra"] {
         _ = Assert.True(pattern.Match(target) is Ok(None), "Valid nonmatching route must return absence: " + target)?
@@ -31,8 +31,8 @@ func RouteAbsence() -> Result<unit, TestFailure> {
     return Assert.True(root.Match("//") is Ok(None), "Repeated slash does not match root")
 }
 
-[Test("Route matching validates malformed targets even when literals mismatch")]
-func RouteInvalidTargets() -> Result<unit, TestFailure> {
+[Test]
+func `Route matching validates malformed targets even when literals mismatch`() -> Result<unit, TestFailure> {
     let pattern = RequiredPattern("/stations/{stationId}/reports")?
     for target in ["/elsewhere/%ZZ", "stations/42/reports", "/stations/%2f/reports", "/stations/%5C/reports", "/stations/%00/reports", "/stations/%ff/reports", "/stations/%/reports", "/stations/%GG/reports", "/stations/42/reports#fragment"] {
         _ = Assert.True(pattern.Match(target) is Failure(_), "Invalid target must report failure: " + target)?
@@ -40,16 +40,16 @@ func RouteInvalidTargets() -> Result<unit, TestFailure> {
     return Assert.True(true, "Malformed targets rejected")
 }
 
-[Test("Route parsing rejects malformed and unsupported pattern syntax")]
-func RouteInvalidPatterns() -> Result<unit, TestFailure> {
+[Test]
+func `Route parsing rejects malformed and unsupported pattern syntax`() -> Result<unit, TestFailure> {
     for text in ["relative", "/{id}/{id}", "/{id", "/{}", "/{1id}", "/{id?}", "/{id:int}", "/x{id}", "/a?b", "/a#b", "/%ZZ"] {
         _ = Assert.True(RoutePattern.Parse(text) is Failure(_), "Invalid pattern must report failure: " + text)?
     }
     return Assert.True(true, "Malformed patterns rejected")
 }
 
-[Test("Route captures decode UTF-8 once and preserve literal plus")]
-func RouteDecoding() -> Result<unit, TestFailure> {
+[Test]
+func `Route captures decode UTF-8 once and preserve literal plus`() -> Result<unit, TestFailure> {
     let pattern = RequiredPattern("/names/{name}")?
     _ = CapturedName(pattern, "/names/Caf%C3%A9", "Café")?
     _ = CapturedName(pattern, "/names/a+b", "a+b")?
@@ -58,8 +58,8 @@ func RouteDecoding() -> Result<unit, TestFailure> {
     return Assert.True(literal.Match("/Café") is Ok(Some(_)), "Decoded literal matches Unicode target")
 }
 
-[Test("Route integer conversion distinguishes path matching from conversion failure")]
-func RouteIntegerBounds() -> Result<unit, TestFailure> {
+[Test]
+func `Route integer conversion distinguishes path matching from conversion failure`() -> Result<unit, TestFailure> {
     let pattern = RequiredPattern("/stations/{stationId}/reports")?
     for text in ["-2147483648", "2147483647"] {
         let values = RequiredMatch(pattern, "/stations/" + text + "/reports")?
@@ -72,8 +72,8 @@ func RouteIntegerBounds() -> Result<unit, TestFailure> {
     return Assert.True(true, "Integer conversions checked")
 }
 
-[Test("Route segment quotas admit the boundary and reject one extra segment")]
-func RouteSegmentLimit() -> Result<unit, TestFailure> {
+[Test]
+func `Route segment quotas admit the boundary and reject one extra segment`() -> Result<unit, TestFailure> {
     var text = ""
     var index = 0
     while index < 16 {
@@ -86,8 +86,8 @@ func RouteSegmentLimit() -> Result<unit, TestFailure> {
     return Assert.True(pattern.Match(text + "/a") is Failure(_), "Target segment overflow")
 }
 
-[Test("Route byte quotas admit the boundary and reject one extra byte")]
-func RouteByteLimit() -> Result<unit, TestFailure> {
+[Test]
+func `Route byte quotas admit the boundary and reject one extra byte`() -> Result<unit, TestFailure> {
     var part = "a"
     var text = "/"
     var index = 0

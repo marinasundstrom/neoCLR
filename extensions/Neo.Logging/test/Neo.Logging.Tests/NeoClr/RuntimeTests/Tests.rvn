@@ -81,8 +81,8 @@ class ProbeScope : Disposable {
     }
 }
 
-[Test("Logging levels and event identity follow the Microsoft baseline")]
-func AIdentity() -> Result<unit, TestFailure> {
+[Test]
+func `Logging levels and event identity follow the Microsoft baseline`() -> Result<unit, TestFailure> {
     _ = Assert.Equal(0, (int)LogLevel.Trace)?
     _ = Assert.Equal(6, (int)LogLevel.None)?
     let first = EventId(7, "first")
@@ -96,8 +96,8 @@ func AIdentity() -> Result<unit, TestFailure> {
     return Assert.Equal("0", default(EventId).ToString())
 }
 
-[Test("Null logging skips formatting and returns reusable scope handles")]
-func BNull() -> Result<unit, TestFailure> {
+[Test]
+func `Null logging skips formatting and returns reusable scope handles`() -> Result<unit, TestFailure> {
     let logger: Logger = NullLogger.Instance
     let formats = LoggingCounter()
     logger.Log<int>(LogLevel.Critical, EventId(1), 42, null, (value, error) => {
@@ -118,8 +118,8 @@ func BNull() -> Result<unit, TestFailure> {
     return Assert.Equal(0, provider.Disposals)
 }
 
-[Test("Default logging filters before evaluating formatters")]
-func CFiltering() -> Result<unit, TestFailure> {
+[Test]
+func `Default logging filters before evaluating formatters`() -> Result<unit, TestFailure> {
     let factory = DefaultLoggerFactory()
     let logger = factory.CreateLogger("category")
     _ = Assert.True(!logger.IsEnabled(LogLevel.Critical), "Empty factory")?
@@ -147,8 +147,8 @@ func CFiltering() -> Result<unit, TestFailure> {
     return Ok(())
 }
 
-[Test("Logging forwards structured state event and error to every enabled provider")]
-func DState() -> Result<unit, TestFailure> {
+[Test]
+func `Logging forwards structured state event and error to every enabled provider`() -> Result<unit, TestFailure> {
     let factory = DefaultLoggerFactory(LogLevel.Trace)
     let first = LoggingProbe()
     let second = LoggingProbe()
@@ -168,8 +168,8 @@ func DState() -> Result<unit, TestFailure> {
     return Assert.Equal(1, second.Writes)
 }
 
-[Test("Logger factories cache ordinal categories and update existing loggers")]
-func ECategories() -> Result<unit, TestFailure> {
+[Test]
+func `Logger factories cache ordinal categories and update existing loggers`() -> Result<unit, TestFailure> {
     let factory = DefaultLoggerFactory()
     let first = LoggingProbe()
     factory.AddProvider(first)
@@ -187,8 +187,8 @@ func ECategories() -> Result<unit, TestFailure> {
     return Ok(())
 }
 
-[Test("Logging scopes preserve provider state and dispose each handle once")]
-func FScopes() -> Result<unit, TestFailure> {
+[Test]
+func `Logging scopes preserve provider state and dispose each handle once`() -> Result<unit, TestFailure> {
     let factory = DefaultLoggerFactory()
     let first = LoggingProbe()
     let second = LoggingProbe()
@@ -213,8 +213,8 @@ func FScopes() -> Result<unit, TestFailure> {
     return Ok(())
 }
 
-[Test("Factory disposal owns provider registrations and disables cached loggers")]
-func GDisposal() -> Result<unit, TestFailure> {
+[Test]
+func `Factory disposal owns provider registrations and disables cached loggers`() -> Result<unit, TestFailure> {
     let factory = DefaultLoggerFactory()
     let probe = LoggingProbe()
     factory.AddProvider(probe)
@@ -230,8 +230,8 @@ func GDisposal() -> Result<unit, TestFailure> {
     return Assert.Equal(2, probe.Writes)
 }
 
-[Test("Console logging renders UTF8 messages and explicit diagnostic errors")]
-func HConsole() -> Result<unit, TestFailure> {
+[Test]
+func `Console logging renders UTF8 messages and explicit diagnostic errors`() -> Result<unit, TestFailure> {
     let lines = ArrayList<string>()
     let console = ConsoleLoggerProvider(text => lines.Add(text))
     let logger = console.CreateLogger("Demo")
@@ -249,8 +249,8 @@ func HConsole() -> Result<unit, TestFailure> {
     return Assert.Equal(2, lines.Count)
 }
 
-[Test("Typed logging creates a category from the declared type")]
-func ITyped() -> Result<unit, TestFailure> {
+[Test]
+func `Typed logging creates a category from the declared type`() -> Result<unit, TestFailure> {
     let factory: LoggerFactory = DefaultLoggerFactory()
     let probe = LoggingProbe()
     factory.AddProvider(probe)
@@ -262,8 +262,8 @@ func ITyped() -> Result<unit, TestFailure> {
     return Ok(())
 }
 
-[Test("Logging DI resolves singleton typed categories and preserves supplied factory ownership")]
-func JDependencyInjection() -> Result<unit, TestFailure> {
+[Test]
+func `Logging DI resolves singleton typed categories and preserves supplied factory ownership`() -> Result<unit, TestFailure> {
     let factory = DefaultLoggerFactory()
     let probe = LoggingProbe()
     factory.AddProvider(probe)
@@ -286,8 +286,8 @@ func JDependencyInjection() -> Result<unit, TestFailure> {
     return Assert.Equal(1, probe.Disposals)
 }
 
-[Test("Logging DI owns the default factory and preserves explicit logger overrides")]
-func KDefaultRegistration() -> Result<unit, TestFailure> {
+[Test]
+func `Logging DI owns the default factory and preserves explicit logger overrides`() -> Result<unit, TestFailure> {
     let services: ServiceCollection = DefaultServiceCollection()
     let Ok(_) = services.AddSingleton<Logger<LoggingFeature>>(NullLogger<LoggingFeature>.Instance) else { return Assert.True(false, "Register override") }
     _ = services.AddLogging()

@@ -12,8 +12,8 @@ public enum Letters { Ångström = 1, Café = 2, שלום = 3 }
 
 func ParseEnum<TEnum>(text: string) -> Result<TEnum, NumberParseError> where TEnum: struct => Enum.Parse<TEnum>(text)
 
-[Test("Enum names preserve aliases ordinal case and imported types")]
-func Names() -> Result<unit, TestFailure> {
+[Test]
+func `Enum names preserve aliases ordinal case and imported types`() -> Result<unit, TestFailure> {
     let Ok(ready) = Enum.Parse<State>("Ready") else { return Assert.True(false, "Named value") }
     let Ok(alias) = Enum.Parse<State>(" Alias ") else { return Assert.True(false, "Alias and whitespace") }
     _ = Assert.True(ready == State.Ready && alias == ready, "Aliases preserve value")?
@@ -27,8 +27,8 @@ func Names() -> Result<unit, TestFailure> {
     return Assert.True(ready.ToString() == "Ready", "Parsed value retains normal enum display")
 }
 
-[Test("Enum numbers preserve signed bounds and unnamed values")]
-func Numbers() -> Result<unit, TestFailure> {
+[Test]
+func `Enum numbers preserve signed bounds and unnamed values`() -> Result<unit, TestFailure> {
     let Ok(positive) = Enum.Parse<State>(" +42 ") else { return Assert.True(false, "Unnamed positive") }
     let Ok(negative) = Enum.Parse<State>("-2147483648") else { return Assert.True(false, "Minimum") }
     let Ok(maximum) = Enum.Parse<State>("2147483647") else { return Assert.True(false, "Maximum") }
@@ -39,8 +39,8 @@ func Numbers() -> Result<unit, TestFailure> {
     return Assert.True((int)empty == 0, "Empty enum bits")
 }
 
-[Test("Enum lists combine names independently of Flags metadata")]
-func Lists() -> Result<unit, TestFailure> {
+[Test]
+func `Enum lists combine names independently of Flags metadata`() -> Result<unit, TestFailure> {
     let Ok(access) = Enum.Parse<Access>(" Read, Write , Execute ") else { return Assert.True(false, "Flag names") }
     _ = Assert.True((int)access == 7, "Combined flags")?
     let Ok(ordinary) = Enum.Parse<State>("Ready, Failed") else { return Assert.True(false, "Ordinary enum list") }
@@ -49,8 +49,8 @@ func Lists() -> Result<unit, TestFailure> {
     return Assert.True(duplicate == Access.Read, "Duplicate names are idempotent")
 }
 
-[Test("Enum TryParse resets output and rejects malformed input")]
-func TryResults() -> Result<unit, TestFailure> {
+[Test]
+func `Enum TryParse resets output and rejects malformed input`() -> Result<unit, TestFailure> {
     var value = State.Failed
     _ = Assert.True(Enum.TryParse<State>("Ready", out value) && value == State.Ready, "Try success")?
     _ = Assert.True(Enum.TryParse<State>("READY", true, out value) && value == State.Ready, "Try case")?
@@ -62,8 +62,8 @@ func TryResults() -> Result<unit, TestFailure> {
     return Ok(())
 }
 
-[Test("Enum names preserve Unicode and explicit ordinal identity")]
-func UnicodeNames() -> Result<unit, TestFailure> {
+[Test]
+func `Enum names preserve Unicode and explicit ordinal identity`() -> Result<unit, TestFailure> {
     let Ok(accent) = Enum.Parse<Letters>("Café") else { return Assert.True(false, "Accented name") }
     _ = Assert.True(accent == Letters.Café, "Accented identity")?
     let Ok(folded) = Enum.Parse<Letters>("ångström", true) else { return Assert.True(false, "Unicode case folding") }
@@ -84,8 +84,8 @@ class Mätning<Τ> {
     func Läs() -> Τ => Värde
 }
 
-[Test("Unicode type member parameter and local identifiers use ordinary binding")]
-func UnicodeIdentifiers() -> Result<unit, TestFailure> {
+[Test]
+func `Unicode type member parameter and local identifiers use ordinary binding`() -> Result<unit, TestFailure> {
     let mätning = Mätning<int>(42)
     return Assert.Equal(42, Behåll<int>(mätning.Läs()))
 }

@@ -3,8 +3,8 @@ import System.*
 import System.Result.*
 import System.Runtime.InteropServices.*
 
-[Test("Typed native pointers compare addresses and preserve borrowed storage")]
-unsafe func Equality() -> Result<unit, TestFailure> {
+[Test]
+unsafe func `Typed native pointers compare addresses and preserve borrowed storage`() -> Result<unit, TestFailure> {
     let raw = NativeMemory.Alloc((nuint)4)
     let first = Ptr<int>((*int)raw)
     let copy = Ptr<int>(first.Pointer)
@@ -15,8 +15,8 @@ unsafe func Equality() -> Result<unit, TestFailure> {
     return Assert.True(equal && distinct, "Aliases compare by address; null differs")
 }
 
-[Test("Typed native pointer hashes match aliases without reading storage")]
-unsafe func Hashes() -> Result<unit, TestFailure> {
+[Test]
+unsafe func `Typed native pointer hashes match aliases without reading storage`() -> Result<unit, TestFailure> {
     let raw = NativeMemory.Alloc((nuint)4)
     let first = Ptr<int>((*int)raw)
     let copy = Ptr<int>(first.Pointer)
@@ -29,8 +29,8 @@ unsafe func Hashes() -> Result<unit, TestFailure> {
     return Assert.True(same && boxedEqual, "Typed and boxed contracts agree without dereferencing uninitialized storage")
 }
 
-[Test("Default typed native pointers preserve null and generic forwarding")]
-unsafe func Defaults() -> Result<unit, TestFailure> {
+[Test]
+unsafe func `Default typed native pointers preserve null and generic forwarding`() -> Result<unit, TestFailure> {
     let empty = default(Ptr<int>)
     let copy = Forward(empty)
     NativeMemory.Free(copy.Pointer)

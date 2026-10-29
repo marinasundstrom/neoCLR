@@ -5,8 +5,8 @@ import System.Result.*
 import System.Security.Cryptography.*
 import NeoClr.Testing.*
 
-[Test("SHA256 preserves aliases tails and short destinations")]
-func AHash() -> Result<unit, TestFailure> {
+[Test]
+func `SHA256 preserves aliases tails and short destinations`() -> Result<unit, TestFailure> {
     let data: byte[] = [(byte)97, (byte)98, (byte)99]
     let output: byte[] = [
         (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0,
@@ -67,8 +67,8 @@ func AHash() -> Result<unit, TestFailure> {
     return Ok(())
 }
 
-[Test("HMACSHA256 verifies known answers and rejects altered tags")]
-func BMac() -> Result<unit, TestFailure> {
+[Test]
+func `HMACSHA256 verifies known answers and rejects altered tags`() -> Result<unit, TestFailure> {
     let key: byte[] = [(byte)107, (byte)101, (byte)121]
     let data: byte[] = [(byte)97, (byte)98, (byte)99]
     let tag: byte[] = [
@@ -112,8 +112,8 @@ func BMac() -> Result<unit, TestFailure> {
     return Assert.Equal(165, (int)small[0])
 }
 
-[Test("RandomNumberGenerator accepts empty and writable buffers")]
-func CRandom() -> Result<unit, TestFailure> {
+[Test]
+func `RandomNumberGenerator accepts empty and writable buffers`() -> Result<unit, TestFailure> {
     _ = Assert.True(RandomNumberGenerator.Fill(default(Slice<byte>)) is Ok, "Default empty fill")?
     let empty: byte[] = []
     let output: byte[] = [

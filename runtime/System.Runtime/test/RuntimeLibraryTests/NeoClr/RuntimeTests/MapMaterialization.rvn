@@ -8,8 +8,8 @@ import System.Result.*
 import NeoClr.Testing.*
 
 // Ported from native-collections/Main.rvn: CheckMaps/CheckMapConstruction.
-[Test("Map iteration snapshots pairs before mutation")]
-func MapPairSnapshots() -> Result<unit, TestFailure> {
+[Test]
+func `Map iteration snapshots pairs before mutation`() -> Result<unit, TestFailure> {
     let map: MutableMap<string, int> = HashMap<string, int>(StringComparer.Ordinal)
     _ = Assert.True(map.TryAdd("answer", 42), "First key must be added")?
     _ = Assert.True(!map.TryAdd("answer", 99), "Duplicate key must be rejected")?
@@ -52,8 +52,8 @@ func MapPairSnapshots() -> Result<unit, TestFailure> {
     return Assert.Equal(original.Value, value)
 }
 
-[Test("HashMap copies sequences and maps independently")]
-func MapCopyConstruction() -> Result<unit, TestFailure> {
+[Test]
+func `HashMap copies sequences and maps independently`() -> Result<unit, TestFailure> {
     let pairs = ArrayList<KeyValuePair<string, int>>()
     pairs.Add(KeyValuePair<string, int>("Café", 7))
     pairs.Add(KeyValuePair<string, int>("雪", 9))
@@ -67,8 +67,8 @@ func MapCopyConstruction() -> Result<unit, TestFailure> {
     return Assert.True(copiedMap.Find("Café") is Some(7), "Map mutation must not change its copy")
 }
 
-[Test("ToMap materializes pair queries and selectors")]
-func MapQueryMaterialization() -> Result<unit, TestFailure> {
+[Test]
+func `ToMap materializes pair queries and selectors`() -> Result<unit, TestFailure> {
     let pairs = ArrayList<KeyValuePair<string, int>>()
     pairs.Add(KeyValuePair<string, int>("Café", 7))
     pairs.Add(KeyValuePair<string, int>("雪", 9))
@@ -82,8 +82,8 @@ func MapQueryMaterialization() -> Result<unit, TestFailure> {
     return Assert.True(selected.Find("雪") is Some(10), "Selectors must preserve Unicode keys")
 }
 
-[Test("Map materialization handles collisions and empty input")]
-func MapCollisionAndEmptyConstruction() -> Result<unit, TestFailure> {
+[Test]
+func `Map materialization handles collisions and empty input`() -> Result<unit, TestFailure> {
     let integers = ArrayList<KeyValuePair<int, int>>()
     integers.Add(KeyValuePair<int, int>(1, 2))
     integers.Add(KeyValuePair<int, int>(2, 3))
@@ -95,8 +95,8 @@ func MapCollisionAndEmptyConstruction() -> Result<unit, TestFailure> {
     return Assert.Equal(0, empty.ToMap(StringComparer.Ordinal).Count)
 }
 
-[Test("HashMap copies preserve reference values and comparer")]
-func MapSharedReferences() -> Result<unit, TestFailure> {
+[Test]
+func `HashMap copies preserve reference values and comparer`() -> Result<unit, TestFailure> {
     let objects = ArrayList<KeyValuePair<string, MapItem>>()
     let item = MapItem()
     objects.Add(KeyValuePair<string, MapItem>("item", item))

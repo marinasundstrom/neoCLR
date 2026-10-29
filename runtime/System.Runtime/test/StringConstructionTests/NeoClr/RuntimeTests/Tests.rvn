@@ -7,8 +7,8 @@ import NeoClr.Testing.*
 
 import System.Collections.*
 
-[Test("String construction copies character storage")]
-func StringCopy() -> Result<unit, TestFailure> {
+[Test]
+func `String construction copies character storage`() -> Result<unit, TestFailure> {
     let characters: Character[] = ['F', 'o', 'o']
     let copied = String(characters)
     characters[0] = 'B'
@@ -16,8 +16,8 @@ func StringCopy() -> Result<unit, TestFailure> {
     return Assert.Equal("Boo", String(characters))
 }
 
-[Test("String exposes a readonly character sequence")]
-func StringSequence() -> Result<unit, TestFailure> {
+[Test]
+func `String exposes a readonly character sequence`() -> Result<unit, TestFailure> {
     let text = String(['F', 'o', 'o'])
     let sequence: Sequence<Character> = text
     _ = Assert.Equal(text.Length, sequence.Count)?
@@ -25,14 +25,14 @@ func StringSequence() -> Result<unit, TestFailure> {
     return Assert.Equal(text, String(sequence))
 }
 
-[Test("String construction accepts an empty character sequence")]
-func StringEmpty() -> Result<unit, TestFailure> {
+[Test]
+func `String construction accepts an empty character sequence`() -> Result<unit, TestFailure> {
     let empty: Character[] = []
     return Assert.Equal("", String(empty))
 }
 
-[Test("String construction preserves and merges grapheme boundaries")]
-func StringGraphemes() -> Result<unit, TestFailure> {
+[Test]
+func `String construction preserves and merges grapheme boundaries`() -> Result<unit, TestFailure> {
     let emoji = Character.FromString("👩‍💻")
     let graphemes: Character[] = [Character.FromString("é"), emoji]
     let text = String(graphemes)
@@ -43,8 +43,8 @@ func StringGraphemes() -> Result<unit, TestFailure> {
     return Assert.Equal(1, String(merging).Length)
 }
 
-[Test("String named arguments preserve public parameter contracts")]
-func StringNamedArguments() -> Result<unit, TestFailure> {
+[Test]
+func `String named arguments preserve public parameter contracts`() -> Result<unit, TestFailure> {
     let text = String.Concat(right: "o", left: "Fo")
     _ = Assert.Equal(String(characters: ['F', 'o', 'o']), text)?
     _ = Assert.True(text.Equals(other: "Foo"), "Named equality operand")?
@@ -58,8 +58,8 @@ func StringNamedArguments() -> Result<unit, TestFailure> {
     return Assert.True(false, "Named UTF-8 slice must succeed")
 }
 
-[Test("Character literals preserve graphemes and allow char identifiers")]
-func CharacterContract() -> Result<unit, TestFailure> {
+[Test]
+func `Character literals preserve graphemes and allow char identifiers`() -> Result<unit, TestFailure> {
     let char = 'é'
     let explicit: Character = char
     let canonical = Character.FromString("é")

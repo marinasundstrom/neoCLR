@@ -3,8 +3,8 @@ import System.*
 import System.Result.*
 import NeoClr.Testing.*
 
-[Test("Decimal arithmetic agrees with CLR boundary vectors")]
-func FOracle() -> Result<unit, TestFailure> {
+[Test]
+func `Decimal arithmetic agrees with CLR boundary vectors`() -> Result<unit, TestFailure> {
     var failures = 0
     var actual = ""
     let Ok(a0) = Decimal.Parse("0") else { return Assert.True(false, "a0") }

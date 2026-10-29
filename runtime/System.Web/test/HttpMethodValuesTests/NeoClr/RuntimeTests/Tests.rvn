@@ -6,8 +6,8 @@ import System.Result.*
 import System.Web.Http.*
 import NeoClr.Testing.*
 
-[Test("HTTP predefined method values use canonical tokens")]
-func PredefinedMethods() -> Result<unit, TestFailure> {
+[Test]
+func `HTTP predefined method values use canonical tokens`() -> Result<unit, TestFailure> {
     _ = Assert.Equal("GET", HttpMethod.Get.Method)?
     _ = Assert.Equal("HEAD", HttpMethod.Head.Method)?
     _ = Assert.Equal("POST", HttpMethod.Post.Method)?
@@ -20,8 +20,8 @@ func PredefinedMethods() -> Result<unit, TestFailure> {
     return Assert.Equal("QUERY", HttpMethod.Query.Method)
 }
 
-[Test("HTTP method parsing canonicalizes every known name")]
-func ParseKnownMethods() -> Result<unit, TestFailure> {
+[Test]
+func `HTTP method parsing canonicalizes every known name`() -> Result<unit, TestFailure> {
     for name in ["get", "head", "post", "put", "patch", "delete", "options", "trace", "connect", "query"] {
         let Ok(method) = HttpMethod.Parse(name) else {
             return Assert.True(false, "Known method parses")
@@ -31,8 +31,8 @@ func ParseKnownMethods() -> Result<unit, TestFailure> {
     return Assert.True(true, "All known names canonicalized")
 }
 
-[Test("HTTP custom method construction and parsing preserve spelling")]
-func CustomMethods() -> Result<unit, TestFailure> {
+[Test]
+func `HTTP custom method construction and parsing preserve spelling`() -> Result<unit, TestFailure> {
     let method = HttpMethod("m-SEARCH")
     _ = Assert.Equal("m-SEARCH", method.Method)?
     _ = Assert.Equal("m-SEARCH", method.ToString())?
@@ -43,8 +43,8 @@ func CustomMethods() -> Result<unit, TestFailure> {
     return Assert.Equal("get", HttpMethod("get").Method)
 }
 
-[Test("HTTP method validation admits token punctuation and rejects separators")]
-func MethodTokenValidation() -> Result<unit, TestFailure> {
+[Test]
+func `HTTP method validation admits token punctuation and rejects separators`() -> Result<unit, TestFailure> {
     let punctuation = "!#$%&'*+-.^_`|~09AZaz"
     let Ok(valid) = HttpMethod.Parse(punctuation) else {
         return Assert.True(false, "HTTP token punctuation is valid")
@@ -58,8 +58,8 @@ func MethodTokenValidation() -> Result<unit, TestFailure> {
     return Assert.True(true, "Invalid methods rejected")
 }
 
-[Test("HTTP method equality and hashes ignore ASCII case")]
-func MethodEquality() -> Result<unit, TestFailure> {
+[Test]
+func `HTTP method equality and hashes ignore ASCII case`() -> Result<unit, TestFailure> {
     let left = HttpMethod("m-search")
     let right = HttpMethod("M-SEARCH")
     _ = Assert.True(left.Equals(right), "Typed equality")?
@@ -75,8 +75,8 @@ class MethodComparer : EqualityComparer<HttpMethod> {
     func GetHashCode(value: HttpMethod) -> int => value.GetHashCode()
 }
 
-[Test("HTTP methods retain case-insensitive identity in a set")]
-func MethodSetEquality() -> Result<unit, TestFailure> {
+[Test]
+func `HTTP methods retain case-insensitive identity in a set`() -> Result<unit, TestFailure> {
     let methods = HashSet<HttpMethod>(MethodComparer())
     methods.Add(HttpMethod("fetch"))
     methods.Add(HttpMethod("FETCH"))
@@ -84,8 +84,8 @@ func MethodSetEquality() -> Result<unit, TestFailure> {
     return Assert.True(methods.Contains(HttpMethod("Fetch")), "Case insensitive set lookup")
 }
 
-[Test("HTTP request factories retain predefined and custom methods")]
-func RequestMethods() -> Result<unit, TestFailure> {
+[Test]
+func `HTTP request factories retain predefined and custom methods`() -> Result<unit, TestFailure> {
     let Ok(get) = HttpRequest.Get("http://example.test/") else {
         return Assert.True(false, "GET construction")
     }
@@ -102,8 +102,8 @@ func RequestMethods() -> Result<unit, TestFailure> {
     return Assert.True(copy.Method.Equals(custom), "Copy retains method")
 }
 
-[Test("HTTP URI request factories support custom methods and empty content")]
-func UriRequestMethods() -> Result<unit, TestFailure> {
+[Test]
+func `HTTP URI request factories support custom methods and empty content`() -> Result<unit, TestFailure> {
     let Ok(uri) = Uri.Parse("http://example.test/") else {
         return Assert.True(false, "URI parse")
     }
@@ -122,8 +122,8 @@ func UriRequestMethods() -> Result<unit, TestFailure> {
     return Assert.Equal(4, withContent.Content.Length)
 }
 
-[Test("HTTP coffee requests retain BREW and unnamed status codes")]
-func CoffeeExtensionValues() -> Result<unit, TestFailure> {
+[Test]
+func `HTTP coffee requests retain BREW and unnamed status codes`() -> Result<unit, TestFailure> {
     let Ok(request) = HttpRequest.Create(HttpMethod("BREW"), "http://example.test/pot-1", HttpStringContent("start")) else {
         return Assert.True(false, "BREW request construction")
     }

@@ -3,8 +3,8 @@ import System.Result.*
 import System.Runtime.InteropServices.*
 import NeoClr.Testing.*
 
-[Test("Native buffer copies bridge Memory windows through a C import")]
-unsafe func MemoryWindow() -> Result<unit, TestFailure> {
+[Test]
+unsafe func `Native buffer copies bridge Memory windows through a C import`() -> Result<unit, TestFailure> {
     let input: byte[] = [9b, 10b, 20b, 30b, 9b]
     let source: ReadOnlyMemory<byte> = input
     let output: byte[] = [99b, 99b, 99b, 99b, 99b]
@@ -22,8 +22,8 @@ unsafe func MemoryWindow() -> Result<unit, TestFailure> {
     return Assert.Equal(10, input[1])
 }
 
-[Test("Native byte copies accept borrowed UTF8 without a temporary array")]
-unsafe func TextBytes() -> Result<unit, TestFailure> {
+[Test]
+unsafe func `Native byte copies accept borrowed UTF8 without a temporary array`() -> Result<unit, TestFailure> {
     let text = "é"
     let pointer = NativeMemory.Alloc((nuint)2)
     NativeMemory.Copy(text.Utf8Bytes, pointer, (nuint)2)
@@ -35,8 +35,8 @@ unsafe func TextBytes() -> Result<unit, TestFailure> {
     return Assert.Equal(99, output[2])
 }
 
-[Test("Empty native byte copies never dereference null pointers")]
-unsafe func Empty() -> Result<unit, TestFailure> {
+[Test]
+unsafe func `Empty native byte copies never dereference null pointers`() -> Result<unit, TestFailure> {
     let pointer = default(*System.Void)
     let input: ReadOnlySlice<byte> = []
     let output: Slice<byte> = []
@@ -45,8 +45,8 @@ unsafe func Empty() -> Result<unit, TestFailure> {
     return Assert.True(true, "Empty copies have no pointer access")
 }
 
-[Test("Repeated native byte copies allocate no managed transfer buffers")]
-unsafe func Allocation() -> Result<unit, TestFailure> {
+[Test]
+unsafe func `Repeated native byte copies allocate no managed transfer buffers`() -> Result<unit, TestFailure> {
     let source: ReadOnlySlice<byte> = [1b, 2b, 3b, 4b]
     let destination: Slice<byte> = [(byte)0, (byte)0, (byte)0, (byte)0]
     let pointer = NativeMemory.Alloc((nuint)4)

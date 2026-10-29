@@ -4,8 +4,8 @@ import System.*
 import System.Result.*
 import NeoClr.Testing.*
 
-[Test("Platform version types retain distinct readable representations")]
-func AVersionText() -> Result<unit, TestFailure> {
+[Test]
+func `Platform version types retain distinct readable representations`() -> Result<unit, TestFailure> {
     _ = Assert.Equal("10.0.26100.0", WindowsVersion(10, 0, 26100, 0).ToString())?
     _ = Assert.Equal("15.2.0", ProductVersion(15, 2, 0).ToString())?
     _ = Assert.Equal("6.12.0-custom", KernelRelease("6.12.0-custom").ToString())?
@@ -19,8 +19,8 @@ func CheckOS(value: OperatingSystem, expected: string) -> Result<unit, TestFailu
     return Assert.Equal(expected, "${value}")
 }
 
-[Test("Every OS case formats through base Object and interpolation")]
-func BOSDisplay() -> Result<unit, TestFailure> {
+[Test]
+func `Every OS case formats through base Object and interpolation`() -> Result<unit, TestFailure> {
     _ = CheckOS(OperatingSystem.Windows(WindowsVersion(10, 0, 26100, 0)), "Windows 10.0.26100.0")?
     _ = CheckOS(OperatingSystem.MacOS(ProductVersion(15, 2, 0)), "macOS 15.2.0")?
     _ = CheckOS(OperatingSystem.Linux(KernelRelease("6.12.0-custom"), DistributionRelease("debian", "testing")), "Linux 6.12.0-custom (debian testing)")?
@@ -30,16 +30,16 @@ func BOSDisplay() -> Result<unit, TestFailure> {
     return CheckOS(OperatingSystem.OtherOS("future host"), "future host")
 }
 
-[Test("Distribution identity and release remain independently optional")]
-func CDistributionText() -> Result<unit, TestFailure> {
+[Test]
+func `Distribution identity and release remain independently optional`() -> Result<unit, TestFailure> {
     _ = Assert.Equal("Unknown distribution", DistributionRelease(null, null).ToString())?
     _ = Assert.Equal("debian", DistributionRelease("debian", null).ToString())?
     _ = Assert.Equal("Unknown distribution rolling", DistributionRelease(null, "rolling").ToString())?
     return Assert.Equal("debian testing", DistributionRelease("debian", "testing").ToString())
 }
 
-[Test("Architecture cases preserve readable and unknown names")]
-func DArchitectureText() -> Result<unit, TestFailure> {
+[Test]
+func `Architecture cases preserve readable and unknown names`() -> Result<unit, TestFailure> {
     _ = Assert.Equal("x86", Architecture.X86().ToString())?
     _ = Assert.Equal("x64", Architecture.X64().ToString())?
     _ = Assert.Equal("ARM", Architecture.Arm().ToString())?
@@ -50,8 +50,8 @@ func DArchitectureText() -> Result<unit, TestFailure> {
     return Assert.Equal("FutureCPU", Architecture.OtherArchitecture("FutureCPU").ToString())
 }
 
-[Test("OS record equality preserves payload and runtime case identity")]
-func ERecordEquality() -> Result<unit, TestFailure> {
+[Test]
+func `OS record equality preserves payload and runtime case identity`() -> Result<unit, TestFailure> {
     let first: OperatingSystem = OperatingSystem.Windows(WindowsVersion(10, 0, 26100, 0))
     let same: OperatingSystem = OperatingSystem.Windows(WindowsVersion(10, 0, 26100, 0))
     let different: OperatingSystem = OperatingSystem.Windows(WindowsVersion(10, 0, 22631, 0))
@@ -62,8 +62,8 @@ func ERecordEquality() -> Result<unit, TestFailure> {
     return Assert.True(KernelRelease("6.12-custom") != KernelRelease("6.12"), "Kernel suffix is identity")
 }
 
-[Test("Live discovery returns execution platform architecture and newline")]
-func FHostDiscovery() -> Result<unit, TestFailure> {
+[Test]
+func `Live discovery returns execution platform architecture and newline`() -> Result<unit, TestFailure> {
     let result = Environment.GetOperatingSystem()
     let Ok(os) = result else {
         return Failure(TestFailure("OS unavailable", "OS description", result.ToString()))
@@ -77,8 +77,8 @@ func FHostDiscovery() -> Result<unit, TestFailure> {
     return Assert.Equal("\n", Environment.NewLine)
 }
 
-[Test("Discovered platform values survive garbage collection")]
-func GHostValueLifetime() -> Result<unit, TestFailure> {
+[Test]
+func `Discovered platform values survive garbage collection`() -> Result<unit, TestFailure> {
     let Ok(os) = Environment.GetOperatingSystem() else {
         return Failure(TestFailure("OS unavailable", "OS description", "Error"))
     }
@@ -101,8 +101,8 @@ func Family(os: OperatingSystem) -> string {
     }
 }
 
-[Test("Nested OS patterns select characteristics and cover every case")]
-func HPatterns() -> Result<unit, TestFailure> {
+[Test]
+func `Nested OS patterns select characteristics and cover every case`() -> Result<unit, TestFailure> {
     let result: Result<OperatingSystem, EnvironmentError> = Ok(OperatingSystem.Linux(KernelRelease("6.12-custom"), DistributionRelease("debian", "testing")))
     if result is Ok(OperatingSystem.Linux(let kernel, let distribution)) {
         _ = Assert.Equal("6.12-custom", kernel.Value)?

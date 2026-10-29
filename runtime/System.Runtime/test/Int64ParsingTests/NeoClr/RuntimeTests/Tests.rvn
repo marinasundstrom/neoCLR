@@ -5,40 +5,40 @@ import System.Result.*
 import System.Optional.*
 import NeoClr.Testing.*
 
-[Test("Int64 parsing accepts both signed boundaries")]
-func Int64Bounds() -> Result<unit, TestFailure> {
+[Test]
+func `Int64 parsing accepts both signed boundaries`() -> Result<unit, TestFailure> {
     _ = Assert.True(Int64.MinValue == -9223372036854775807L - 1L, "Minimum constant")?
     _ = Assert.True(Int64.MaxValue == 9223372036854775807L, "Maximum constant")?
     _ = ParsedLong("9223372036854775807", Int64.MaxValue)?
     return ParsedLong("-9223372036854775808", Int64.MinValue)
 }
 
-[Test("Int64 parsing accepts signs leading zeros and values beyond Int32")]
-func Int64Signs() -> Result<unit, TestFailure> {
+[Test]
+func `Int64 parsing accepts signs leading zeros and values beyond Int32`() -> Result<unit, TestFailure> {
     _ = ParsedLong("+42", 42L)?
     _ = ParsedLong("-0", 0L)?
     _ = ParsedLong("000000000000000000000000000000001", 1L)?
     return ParsedLong("4294967296", 4294967296L)
 }
 
-[Test("Int64 parsing rejects noncanonical lexical inputs")]
-func Int64InvalidFormat() -> Result<unit, TestFailure> {
+[Test]
+func `Int64 parsing rejects noncanonical lexical inputs`() -> Result<unit, TestFailure> {
     for text in ["", "+", "-", " 1", "1 ", "1\u0000", "１２", "1,000", "0x10", "++1"] {
         _ = Assert.True(Int64.Parse(text) is Failure(NumberParseError.InvalidFormat), "Invalid integer text must report format error: " + text)?
     }
     return Assert.True(true, "All malformed forms rejected")
 }
 
-[Test("Int64 parsing distinguishes overflow from invalid trailing text")]
-func Int64Overflow() -> Result<unit, TestFailure> {
+[Test]
+func `Int64 parsing distinguishes overflow from invalid trailing text`() -> Result<unit, TestFailure> {
     for text in ["9223372036854775808", "-9223372036854775809", "99999999999999999999999999999"] {
         _ = Assert.True(Int64.Parse(text) is Failure(NumberParseError.Overflow), "Out-of-range integer must report overflow")?
     }
     return Assert.True(Int64.Parse("99999999999999999999999999999x") is Failure(NumberParseError.InvalidFormat), "Malformed suffix takes precedence over overflow")
 }
 
-[Test("Int64 decimal formatting round trips signed boundaries")]
-func Int64Formatting() -> Result<unit, TestFailure> {
+[Test]
+func `Int64 decimal formatting round trips signed boundaries`() -> Result<unit, TestFailure> {
     let minimum = Int64.MinValue
     let maximum = Int64.MaxValue
     let zero = 0L

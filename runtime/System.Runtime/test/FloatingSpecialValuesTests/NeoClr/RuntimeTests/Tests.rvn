@@ -10,8 +10,8 @@ public class Constants {
     public const NegativeZero: double = -0.0
 }
 
-[Test("Floating named constants preserve IEEE and value equality contracts")]
-func AConstants() -> Result<unit, TestFailure> {
+[Test]
+func `Floating named constants preserve IEEE and value equality contracts`() -> Result<unit, TestFailure> {
     let wide = Double.NaN
     let narrow = Single.NaN
     _ = Assert.True(wide != wide && narrow != narrow, "IEEE NaN operators")?
@@ -22,8 +22,8 @@ func AConstants() -> Result<unit, TestFailure> {
     return Assert.True(Double.PositiveInfinity > 1.0 && Double.NegativeInfinity < -1.0, "Infinity ordering")
 }
 
-[Test("Floating classification covers both widths signs and finite values")]
-func BClassification() -> Result<unit, TestFailure> {
+[Test]
+func `Floating classification covers both widths signs and finite values`() -> Result<unit, TestFailure> {
     let wide: double[] = [Double.NaN, -Double.NaN, Double.PositiveInfinity, Double.NegativeInfinity, 0.0, -0.0, 1.5, -1.5]
     let narrow: float[] = [Single.NaN, -Single.NaN, Single.PositiveInfinity, Single.NegativeInfinity, (float)0.0, (float)(-0.0), (float)1.5, (float)(-1.5)]
     var i = 0
@@ -45,8 +45,8 @@ func BClassification() -> Result<unit, TestFailure> {
     return Assert.True(Single.IsNegativeInfinity(-infinity), "Single infinity negation")
 }
 
-[Test("Floating special values format and parse through existing contracts")]
-func CText() -> Result<unit, TestFailure> {
+[Test]
+func `Floating special values format and parse through existing contracts`() -> Result<unit, TestFailure> {
     _ = Assert.Equal("NaN", Double.NaN.ToString())?
     _ = Assert.Equal("NaN", Single.NaN.ToString())?
     _ = Assert.Equal("Infinity", Double.PositiveInfinity.ToString())?

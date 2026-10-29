@@ -23556,3 +23556,22 @@ and [focused validation](validation/configuration-json-reader-20261029/README.md
   semantics remain open. See [the current contract](system-fault.md).
 - **Outcome:** Raven rename committed as `b4c5790e1`; focused compiler/runtime
   checks and separate native consumers pass. See [validation](validation/panic-rename-20261029/README.md).
+
+### 2026-10-29 — Behavior descriptions belong in test identifiers
+
+The author asked to move descriptions from Test attributes into backtick test
+method names because many existing method names do not explain the behavior,
+and delegated judgment about names worth retaining. The author then requested a
+repository convention and clarified that traditional names remain valid, but
+“whenever you want to add a description, use backtick identifiers”.
+
+The assistant applied the rule to the runtime and Neo extension tests: 461 names
+now state their prior descriptions, while AnyWithoutCurrent, CasingNoNormalization
+and CasingNotOrdinalFolding retain their clear traditional names with plain [Test]
+markers. Existing descriptive names and helper/data-source names are retained.
+Only intentional description-feature fixtures keep Test description arguments.
+The assistant updated async entry-point calls and the harness's qualified display
+names and ordinal ordering expectations. This changes IDs and selectors without
+changing assertion bodies or framework semantics. AGENTS.md, Raven conventions
+and the testing guides now record the author clarification. See the
+[migration map and focused qualification](validation/descriptive-test-names-20261029/README.md).

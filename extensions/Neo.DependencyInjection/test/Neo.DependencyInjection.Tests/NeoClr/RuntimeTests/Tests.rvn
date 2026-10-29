@@ -31,8 +31,8 @@ public class PrivateOnly {
     private init() { }
 }
 
-[Test("DI selects the greediest available public constructor")]
-func ASelect() -> Result<unit, TestFailure> {
+[Test]
+func `DI selects the greediest available public constructor`() -> Result<unit, TestFailure> {
     let services: ServiceCollection = DefaultServiceCollection()
     _ = services.AddSingleton<Localizer<Feature>>(Strings())
     _ = services.AddTransient<Greeting>()
@@ -48,8 +48,8 @@ func ASelect() -> Result<unit, TestFailure> {
     return Assert.Equal("Default", empty.Text)
 }
 
-[Test("DI activates typed localizer dependencies through a retained plan")]
-func BActivate() -> Result<unit, TestFailure> {
+[Test]
+func `DI activates typed localizer dependencies through a retained plan`() -> Result<unit, TestFailure> {
     let services: ServiceCollection = DefaultServiceCollection()
     _ = services.AddSingleton<Localizer<Feature>>(Strings())
     _ = services.AddTransient<Greeting>()
@@ -61,8 +61,8 @@ func BActivate() -> Result<unit, TestFailure> {
     return Assert.True(!Object.ReferenceEquals(first, second), "Fresh transient instances")
 }
 
-[Test("DI rejects ambiguous missing and inaccessible constructors")]
-func CReject() -> Result<unit, TestFailure> {
+[Test]
+func `DI rejects ambiguous missing and inaccessible constructors`() -> Result<unit, TestFailure> {
     let ambiguous: ServiceCollection = DefaultServiceCollection()
     _ = ambiguous.AddSingleton<Localizer<Feature>>(Strings())
     _ = ambiguous.AddTransient<Feature>()
@@ -77,8 +77,8 @@ func CReject() -> Result<unit, TestFailure> {
     return Assert.True(inaccessible.AddTransient<Localizer>() is Failure(ServiceError.InvalidRegistration(_)), "Interface")
 }
 
-[Test("DI builds plans without executing constructors or factories")]
-func DErrors() -> Result<unit, TestFailure> {
+[Test]
+func `DI builds plans without executing constructors or factories`() -> Result<unit, TestFailure> {
     let log = DisposalLog()
     let services: ServiceCollection = DefaultServiceCollection()
     _ = services.AddTransient<Localizer<Feature>>(provider => {

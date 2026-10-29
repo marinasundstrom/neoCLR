@@ -5,8 +5,8 @@ import System.Result.*
 import System.Storage.Path
 import NeoClr.Testing.*
 
-[Test("Path parsing allocates only the requested value")]
-func PathParsing() -> Result<unit, TestFailure> {
+[Test]
+func `Path parsing allocates only the requested value`() -> Result<unit, TestFailure> {
     let text = "notes/naïve.txt"
     _ = Path.Parse(text)
     let before = System.Runtime.GC.AllocatedObjectCount
@@ -21,8 +21,8 @@ func PathParsing() -> Result<unit, TestFailure> {
     return Assert.True(allocated == 32, String.Concat("Path parse objects: ", allocated.ToString()))
 }
 
-[Test("URI parsing allocates only the requested value")]
-func UriParsing() -> Result<unit, TestFailure> {
+[Test]
+func `URI parsing allocates only the requested value`() -> Result<unit, TestFailure> {
     let text = "https://example.test/a/b?q=one#part"
     _ = Uri.Parse(text)
     let before = System.Runtime.GC.AllocatedObjectCount
@@ -37,8 +37,8 @@ func UriParsing() -> Result<unit, TestFailure> {
     return Assert.True(allocated == 32, String.Concat("URI parse objects: ", allocated.ToString()))
 }
 
-[Test("URI string resolution avoids encoded buffers and reparsing")]
-func UriResolveString() -> Result<unit, TestFailure> {
+[Test]
+func `URI string resolution avoids encoded buffers and reparsing`() -> Result<unit, TestFailure> {
     let Ok(baseUri) = Uri.Parse("http://example.test/a/b/c?q=one") else { return Assert.True(false, "Base URI") }
     let reference = "../d?x=two#part"
     _ = baseUri.Resolve(reference)
@@ -54,8 +54,8 @@ func UriResolveString() -> Result<unit, TestFailure> {
     return Assert.True(allocated == 64, String.Concat("URI string resolution objects: ", allocated.ToString()))
 }
 
-[Test("URI value resolution allocates only the result value")]
-func UriResolveValue() -> Result<unit, TestFailure> {
+[Test]
+func `URI value resolution allocates only the result value`() -> Result<unit, TestFailure> {
     let Ok(baseUri) = Uri.Parse("http://example.test/a/b/c?q=one") else { return Assert.True(false, "Base URI") }
     let Ok(reference) = Uri.Parse("../d?x=two#part") else { return Assert.True(false, "Reference URI") }
     _ = baseUri.Resolve(reference)

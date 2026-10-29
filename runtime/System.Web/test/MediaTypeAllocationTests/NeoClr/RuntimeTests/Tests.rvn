@@ -6,8 +6,8 @@ import System.Result.*
 import System.Web.Http.*
 import NeoClr.Testing.*
 
-[Test("Warm media type access performs no managed allocations")]
-func Allocations() -> Result<unit, TestFailure> {
+[Test]
+func `Warm media type access performs no managed allocations`() -> Result<unit, TestFailure> {
     let json = MediaTypes.Application.Json
     let Ok(custom) = MediaType.Parse("application/problem+json; charset=utf-8; profile=custom") else { return Assert.True(false, "Custom parse") }
     let Ok(equal) = MediaType.Parse("application/problem+json; profile=custom; charset=UTF-8") else { return Assert.True(false, "Equal parse") }
@@ -43,8 +43,8 @@ func Allocations() -> Result<unit, TestFailure> {
     return Assert.True(allocated == 0, String.Concat("Managed allocations: ", allocated.ToString()))
 }
 
-[Test("Raw media type validation performs no managed allocations")]
-func RawValidationAllocations() -> Result<unit, TestFailure> {
+[Test]
+func `Raw media type validation performs no managed allocations`() -> Result<unit, TestFailure> {
     let text = "Multipart/Form-Data; boundary=\"AbC; 123\"; Charset=\"UTF-8\"; x=one; ;"
     _ = Assert.True(MediaTypeSyntax.Validate(text) is Ok, "Raw grammar accepts value")?
     let before = System.Runtime.GC.AllocatedObjectCount

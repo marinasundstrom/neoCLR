@@ -22,8 +22,8 @@ func CompletedValue<T>(operation: Task<T>) -> T {
     return value
 }
 
-[Test("Localizer preserves strings and distinguishes missing from empty")]
-func ALookup() -> Result<unit, TestFailure> {
+[Test]
+func `Localizer preserves strings and distinguishes missing from empty`() -> Result<unit, TestFailure> {
     let Ok(strings) = JsonLocalizerProvider.Create("{\"hello\":\"Hej världen\",\"empty\":\"\",\"menu.save\":\"Spara\"}") else {
         return Assert.True(false, "Load catalogue")
     }
@@ -35,8 +35,8 @@ func ALookup() -> Result<unit, TestFailure> {
     return Assert.True(strings.Find("empty") is Some(""), "Present empty string")
 }
 
-[Test("Localizer uses ordinal keys and decodes JSON escapes")]
-func BUnicode() -> Result<unit, TestFailure> {
+[Test]
+func `Localizer uses ordinal keys and decodes JSON escapes`() -> Result<unit, TestFailure> {
     let Ok(strings) = JsonLocalizerProvider.Create("{\"é\":\"one\",\"é\":\"two\",\"emoji\":\"\\uD83D\\uDE00\",\"line\":\"a\\nb\"}") else {
         return Assert.True(false, "Distinct ordinal keys")
     }
@@ -47,8 +47,8 @@ func BUnicode() -> Result<unit, TestFailure> {
     return Assert.True(JsonLocalizerProvider.Create("{\"a\":\"1\",\"\\u0061\":\"2\"}") is Failure(LocalizationError.Json(JsonError.DuplicateField("a"))), "Decoded duplicate")
 }
 
-[Test("Localizer rejects malformed and non-string catalogues")]
-func CInvalid() -> Result<unit, TestFailure> {
+[Test]
+func `Localizer rejects malformed and non-string catalogues`() -> Result<unit, TestFailure> {
     for text in ["[]", "null", "{\"a\":1}", "{\"a\":null}", "{\"a\":{}}", "{\"a\":[]}", "{\"a\":\"b\",}", "{}x", "{\"a\":\"\\uD800\"}", "{\"a\":\"\\q\"}"] {
         _ = Assert.True(JsonLocalizerProvider.Create(text) is Failure(_), "Invalid catalogue")?
     }
@@ -57,8 +57,8 @@ func CInvalid() -> Result<unit, TestFailure> {
     return Assert.True(JsonLocalizerProvider.Create(" {} \n") is Ok(_), "Empty catalogue")
 }
 
-[Test("Localizer supports catalogues beyond provisional DOM limits")]
-func DSize() -> Result<unit, TestFailure> {
+[Test]
+func `Localizer supports catalogues beyond provisional DOM limits`() -> Result<unit, TestFailure> {
     let json = StringBuilder()
     _ = json.Append("{")
     for index in 0..100 {
@@ -74,8 +74,8 @@ func DSize() -> Result<unit, TestFailure> {
     return Assert.True(JsonLocalizerProvider.Create(tooLarge[..]) is Failure(LocalizationError.Json(JsonError.LimitExceeded(_))), "Byte quota before parsing")
 }
 
-[Test("Localizer reads borrowed streams and explicit files")]
-func EInput() -> Result<unit, TestFailure> {
+[Test]
+func `Localizer reads borrowed streams and explicit files`() -> Result<unit, TestFailure> {
     let memory = MemoryStream()
     let Ok(node) = JsonSerializer.DeserializeNode("{\"hello\":\"Hej\"}") else {
         return Assert.True(false, "Fixture")
@@ -106,8 +106,8 @@ class MissingKeys {
     }
 }
 
-[Test("Localizer diagnostics report only missing display lookups")]
-func FDiagnostics() -> Result<unit, TestFailure> {
+[Test]
+func `Localizer diagnostics report only missing display lookups`() -> Result<unit, TestFailure> {
     let Ok(strings) = JsonLocalizerProvider.Create("{\"empty\":\"\"}") else {
         return Assert.True(false, "Fixture")
     }
@@ -126,8 +126,8 @@ func FDiagnostics() -> Result<unit, TestFailure> {
 
 public class FeatureX { }
 
-[Test("Localizer scopes and cultures fall back per key")]
-func GFallback() -> Result<unit, TestFailure> {
+[Test]
+func `Localizer scopes and cultures fall back per key`() -> Result<unit, TestFailure> {
     let provider = JsonLocalizerProvider("resources")
     let Ok(strings) = provider.Load(Culture.SwedishSweden) else {
         return Assert.True(false, "Load unscoped resources")
@@ -146,8 +146,8 @@ func GFallback() -> Result<unit, TestFailure> {
     return Assert.True(provider.Load(Culture.SwedishSweden, "Broken") is Failure(LocalizationError.Json(_)), "Malformed fallback is not silently ignored")
 }
 
-[Test("Localizer invariant fallback is configurable and typed scope is explicit")]
-func HInvariant() -> Result<unit, TestFailure> {
+[Test]
+func `Localizer invariant fallback is configurable and typed scope is explicit`() -> Result<unit, TestFailure> {
     let provider = JsonLocalizerProvider("resources", fallbackToInvariant: false)
     let Ok(strings) = provider.Load<FeatureX>(Culture.SwedishSweden) else {
         return Assert.True(false, "Typed load")
@@ -167,8 +167,8 @@ func HInvariant() -> Result<unit, TestFailure> {
     return Assert.True(provider.Load(Culture.SwedishSweden, "Broken") is Ok(_), "Disabled invariant file is not read")
 }
 
-[Test("Localizer resolves templates before formatting arguments")]
-func IFormatting() -> Result<unit, TestFailure> {
+[Test]
+func `Localizer resolves templates before formatting arguments`() -> Result<unit, TestFailure> {
     let Ok(strings) = JsonLocalizerProvider.Create("{\"Greeting\":\"Hej {0}!\",\"pair\":\"{0}/{1}\",\"triple\":\"{0}/{1}/{2}\",\"many\":\"{0}/{1}/{2}/{3}\",\"escaped\":\"{{{0}}}\",\"empty\":\"\"}") else {
         return Assert.True(false, "Formatting catalogue")
     }
@@ -209,8 +209,8 @@ public class LocalizedGreeting {
     val Region: string => strings["regional"]
 }
 
-[Test("Localizer integrates typed JSON resources with scoped constructor injection")]
-func JDependencyInjection() -> Result<unit, TestFailure> {
+[Test]
+func `Localizer integrates typed JSON resources with scoped constructor injection`() -> Result<unit, TestFailure> {
     let resources = JsonLocalizerProvider("resources")
     let services: ServiceCollection = DefaultServiceCollection()
     _ = Assert.True(services.AddLocalization(JsonLocalizerFactory(resources, Culture.SwedishSweden)) is Ok(_), "Register open typed localizers")?

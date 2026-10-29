@@ -10,8 +10,8 @@ import System.Concurrency.Tasks.*
 import System.Concurrency.Tasks.TaskOutcome.*
 import System.Concurrency.*
 
-[Test("MemoryStream overwrites preserve length and untouched bytes")]
-func MemoryOverwrite() -> Result<unit, TestFailure> {
+[Test]
+func `MemoryStream overwrites preserve length and untouched bytes`() -> Result<unit, TestFailure> {
     let stream = MemoryStream()
     let bytes: byte[] = [(byte)65, (byte)66, (byte)67]
     _ = Assert.True(stream.GetLength() is Ok(0L), "New stream must have zero length")?
@@ -26,8 +26,8 @@ func MemoryOverwrite() -> Result<unit, TestFailure> {
     return Assert.True(output[0] == 65 && output[1] == 65 && output[2] == 67, "Only the overwritten byte changes")
 }
 
-[Test("MemoryStream gap writes zero-fill while empty writes preserve length")]
-func MemoryGap() -> Result<unit, TestFailure> {
+[Test]
+func `MemoryStream gap writes zero-fill while empty writes preserve length`() -> Result<unit, TestFailure> {
     let stream = MemoryStream()
     let bytes: byte[] = [(byte)65, (byte)66, (byte)67]
     _ = Assert.True(CompletedValue(stream.Write(bytes, 0, 3)) is Ok(_), "Write initial content")?
@@ -46,8 +46,8 @@ func MemoryGap() -> Result<unit, TestFailure> {
     return Assert.True(true, "Gap and EOF checks completed")
 }
 
-[Test("MemoryStream rejects invalid buffer and seek ranges without moving")]
-func MemoryInvalidRanges() -> Result<unit, TestFailure> {
+[Test]
+func `MemoryStream rejects invalid buffer and seek ranges without moving`() -> Result<unit, TestFailure> {
     let stream = MemoryStream()
     let bytes: byte[] = [(byte)1]
     _ = Assert.True(CompletedValue(stream.Write(bytes, 2147483647, 1)) is Failure(StreamError.InvalidRange), "Overflowing write range")?
@@ -59,8 +59,8 @@ func MemoryInvalidRanges() -> Result<unit, TestFailure> {
     return Assert.True(true, "Range checks completed")
 }
 
-[Test("MemoryStream quota errors preserve length and position")]
-func MemoryCapacity() -> Result<unit, TestFailure> {
+[Test]
+func `MemoryStream quota errors preserve length and position`() -> Result<unit, TestFailure> {
     let stream = MemoryStream()
     let bytes: byte[] = [(byte)1]
     _ = Assert.True(CompletedValue(stream.Write(bytes, 0, 1)) is Ok(_), "Write initial byte")?
@@ -74,8 +74,8 @@ func MemoryCapacity() -> Result<unit, TestFailure> {
     return Assert.True(true, "Quota checks completed")
 }
 
-[Test("MemoryStream closure is shared across interfaces and idempotent")]
-func MemoryClosed() -> Result<unit, TestFailure> {
+[Test]
+func `MemoryStream closure is shared across interfaces and idempotent`() -> Result<unit, TestFailure> {
     let stream = MemoryStream()
     let input: InputStream = stream
     let output: OutputStream = stream
@@ -92,8 +92,8 @@ func MemoryClosed() -> Result<unit, TestFailure> {
     return Assert.True(seek.Seek(0) is Failure(StreamError.Closed), "Closed seek")
 }
 
-[Test("MemoryStream async interfaces preserve complete writes short reads and EOF")]
-func MemoryAsyncRoundTrip() -> Result<unit, TestFailure> {
+[Test]
+func `MemoryStream async interfaces preserve complete writes short reads and EOF`() -> Result<unit, TestFailure> {
     let task = AsyncMemoryChecks.RoundTrip()
     // Observe settlement to assert the memory fast path; ordinary consumers await.
     let Some(Completed(result)) = task.Outcome else {
@@ -139,8 +139,8 @@ internal class AsyncMemoryChecks {
     }
 }
 
-[Test("MemoryStream async cancellation and rejected ranges preserve storage")]
-func MemoryAsyncRejection() -> Result<unit, TestFailure> {
+[Test]
+func `MemoryStream async cancellation and rejected ranges preserve storage`() -> Result<unit, TestFailure> {
     let stream = MemoryStream()
     use cancellation = CancellationTokenSource()
     cancellation.Cancel()

@@ -7,8 +7,8 @@ import System.Optional.*
 import System.Result.*
 import NeoClr.Testing.*
 
-[Test("Collection constructors consume and dispose each input once")]
-func ConstructionConsumption() -> Result<unit, TestFailure> {
+[Test]
+func `Collection constructors consume and dispose each input once`() -> Result<unit, TestFailure> {
     let input = ObservedNumbers()
     let list = ArrayList<int>(input)
     let queue = ArrayQueue<int>(input)
@@ -24,8 +24,8 @@ func ConstructionConsumption() -> Result<unit, TestFailure> {
     return Assert.True(set.Contains(5), "Construction must use the supplied comparer")
 }
 
-[Test("List construction materializes filtered input independently")]
-func ConstructionQuery() -> Result<unit, TestFailure> {
+[Test]
+func `List construction materializes filtered input independently`() -> Result<unit, TestFailure> {
     let input = ObservedNumbers()
     let list = ArrayList<int>(input)
     let copy = ArrayList<int>(list)
@@ -37,8 +37,8 @@ func ConstructionQuery() -> Result<unit, TestFailure> {
     return Assert.Equal(4, query[1])
 }
 
-[Test("Queue and stack copies follow source iteration order")]
-func ConstructionOrdering() -> Result<unit, TestFailure> {
+[Test]
+func `Queue and stack copies follow source iteration order`() -> Result<unit, TestFailure> {
     let input = ObservedNumbers()
     let queue = ArrayQueue<int>(input)
     let stack = ArrayStack<int>(input)
@@ -61,8 +61,8 @@ func ConstructionOrdering() -> Result<unit, TestFailure> {
     return Assert.True(ordinaryStack.Pop() is Some(4), "Ordinary input is pushed in iteration order")
 }
 
-[Test("Set copy retains values and explicit comparer after source clear")]
-func ConstructionSetCopy() -> Result<unit, TestFailure> {
+[Test]
+func `Set copy retains values and explicit comparer after source clear`() -> Result<unit, TestFailure> {
     let input = ObservedNumbers()
     let set = HashSet<int>(input, ModuloTwo())
     let copy = HashSet<int>(set, ModuloTwo())
@@ -72,8 +72,8 @@ func ConstructionSetCopy() -> Result<unit, TestFailure> {
     return Assert.True(copy.Contains(5) && copy.Contains(6), "Copy must preserve both comparer equivalence classes")
 }
 
-[Test("Collection constructors accept empty arrays")]
-func ConstructionEmpty() -> Result<unit, TestFailure> {
+[Test]
+func `Collection constructors accept empty arrays`() -> Result<unit, TestFailure> {
     let empty: int[] = []
     _ = Assert.Equal(0, ArrayList<int>(empty).Count)?
     _ = Assert.Equal(0, ArrayQueue<int>(empty).Count)?
@@ -81,8 +81,8 @@ func ConstructionEmpty() -> Result<unit, TestFailure> {
     return Assert.Equal(0, HashSet<int>(empty, ModuloTwo()).Count)
 }
 
-[Test("Collection copies preserve element reference identity")]
-func ConstructionReferences() -> Result<unit, TestFailure> {
+[Test]
+func `Collection copies preserve element reference identity`() -> Result<unit, TestFailure> {
     let item = ConstructionItem()
     let items: ConstructionItem[] = [item]
     let copied = ArrayList<ConstructionItem>(items)

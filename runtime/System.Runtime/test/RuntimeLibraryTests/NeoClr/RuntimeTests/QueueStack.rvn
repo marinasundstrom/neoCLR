@@ -7,8 +7,8 @@ import System.Result.*
 import NeoClr.Testing.*
 
 // Ported from native-collections/Main.rvn: entry checks and CheckSnapshots.
-[Test("Queue growth preserves wrapped FIFO contents")]
-func QueueGrowth() -> Result<unit, TestFailure> {
+[Test]
+func `Queue growth preserves wrapped FIFO contents`() -> Result<unit, TestFailure> {
     let queue = ArrayQueue<int>(4)
     _ = Assert.True(queue.Dequeue() is None, "New queue must be empty")?
     var index = 0
@@ -39,8 +39,8 @@ func QueueGrowth() -> Result<unit, TestFailure> {
     return Assert.True(queue.Dequeue() is None, "Drained queue must remain empty")
 }
 
-[Test("Queue preserves references through clear and reuse")]
-func QueueReferences() -> Result<unit, TestFailure> {
+[Test]
+func `Queue preserves references through clear and reuse`() -> Result<unit, TestFailure> {
     let queue = ArrayQueue<QueueStackItem>()
     let item = QueueStackItem()
     queue.Enqueue(item)
@@ -64,8 +64,8 @@ func QueueReferences() -> Result<unit, TestFailure> {
     return Assert.Equal(1, queue.Count)
 }
 
-[Test("Queue iterator captures FIFO contents before mutation")]
-func QueueSnapshots() -> Result<unit, TestFailure> {
+[Test]
+func `Queue iterator captures FIFO contents before mutation`() -> Result<unit, TestFailure> {
     let queue: Queue<int> = ArrayQueue<int>(3)
     queue.Enqueue(1)
     queue.Enqueue(2)
@@ -82,8 +82,8 @@ func QueueSnapshots() -> Result<unit, TestFailure> {
     return Assert.True(queue.Peek() is Some(3), "Current queue must expose the new item")
 }
 
-[Test("Stack growth preserves LIFO contents")]
-func StackGrowth() -> Result<unit, TestFailure> {
+[Test]
+func `Stack growth preserves LIFO contents`() -> Result<unit, TestFailure> {
     let stack = ArrayStack<int>(3)
     _ = Assert.True(stack.Pop() is None, "New stack must be empty")?
     _ = Assert.True(stack.Peek() is None, "New stack must have no top")?
@@ -108,8 +108,8 @@ func StackGrowth() -> Result<unit, TestFailure> {
     return Assert.True(stack.Pop() is None, "Drained stack must remain empty")
 }
 
-[Test("Stack preserves references through clear and reuse")]
-func StackReferences() -> Result<unit, TestFailure> {
+[Test]
+func `Stack preserves references through clear and reuse`() -> Result<unit, TestFailure> {
     let stack = ArrayStack<QueueStackItem>()
     let item = QueueStackItem()
     stack.Push(item)
@@ -133,8 +133,8 @@ func StackReferences() -> Result<unit, TestFailure> {
     return Assert.Equal(1, stack.Count)
 }
 
-[Test("Stack iterator captures LIFO contents before mutation")]
-func StackSnapshots() -> Result<unit, TestFailure> {
+[Test]
+func `Stack iterator captures LIFO contents before mutation`() -> Result<unit, TestFailure> {
     let stack: Stack<int> = ArrayStack<int>(3)
     stack.Push(1)
     stack.Push(2)

@@ -5,8 +5,8 @@ import System.Globalization.*
 import System.Result.*
 import NeoClr.Testing.*
 
-[Test("Integral formatting preserves widths culture and interface dispatch")]
-func IntegralFormats() -> Result<unit, TestFailure> {
+[Test]
+func `Integral formatting preserves widths culture and interface dispatch`() -> Result<unit, TestFailure> {
 
     let invariant = Culture.Invariant
     let swedish = Culture.SwedishSweden
@@ -47,8 +47,8 @@ func IntegralFormats() -> Result<unit, TestFailure> {
     return Assert.True(ff.ToString("N0", invariant) == "18,446,744,073,709,551,615", "Integer interface retained across GC")
 }
 
-[Test("Floating formatting preserves precision culture and boxed display")]
-func FloatingFormats() -> Result<unit, TestFailure> {
+[Test]
+func `Floating formatting preserves precision culture and boxed display`() -> Result<unit, TestFailure> {
     let invariant = Culture.Invariant
     let swedish = Culture.SwedishSweden
     let b = (byte)255
@@ -88,8 +88,8 @@ func FloatingFormats() -> Result<unit, TestFailure> {
     return Ok(())
 }
 
-[Test("Culture parsing covers every numeric primitive and roundtrips formatting")]
-func CultureParsing() -> Result<unit, TestFailure> {
+[Test]
+func `Culture parsing covers every numeric primitive and roundtrips formatting`() -> Result<unit, TestFailure> {
     let swedish = Culture.SwedishSweden
     let invariant = Culture.Invariant
     if SByte.Parse("-128", swedish) is Ok(let parsedSByte) {
@@ -140,8 +140,8 @@ func CultureParsing() -> Result<unit, TestFailure> {
     return Assert.True(UIntPtr.Parse("1234") is Ok(let pointer) && pointer.Equals((nuint)1234), "Invariant native unsigned integer")
 }
 
-[Test("Culture parsing rejects malformed groups mixed separators and overflow")]
-func CultureParsingFailures() -> Result<unit, TestFailure> {
+[Test]
+func `Culture parsing rejects malformed groups mixed separators and overflow`() -> Result<unit, TestFailure> {
     let swedish = Culture.SwedishSweden
     let invariant = Culture.Invariant
     _ = Assert.True(Int32.Parse("12,34", invariant) is Failure(NumberParseError.InvalidFormat), "Int32 rejects 12,34")?

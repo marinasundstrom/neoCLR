@@ -41,8 +41,8 @@ support grow; incompatible changes require an explicit migration.
 From the compiled collection suite:
 
 ```raven
-[Test("ArrayList copy has independent storage")]
-func ListCopy() -> Result<unit, TestFailure> {
+[Test]
+func `ArrayList copy has independent storage`() -> Result<unit, TestFailure> {
     let source = ArrayList<int>()
     source.Add(4)
     let copy = ArrayList<int>(source)
@@ -63,7 +63,11 @@ fixtures and generic/collection assertions are not implemented yet.
 
 `NeoClr.Testing.TestAttribute : System.Attribute` is now source-included with the
 framework. Its `[AttributeUsage(AttributeTargets.Method)]` contract rejects other
-targets and duplicate annotations. Use `[Test]` or `[Test("human-readable description")]`.
+targets and duplicate annotations. Use `[Test]` with a meaningful function name.
+Prefer a backtick name when stating behavior; traditional names remain valid.
+If a prose description is needed, make it the backtick identifier rather than an
+attribute argument. Description arguments are retained only in fixtures that test
+that attribute feature.
 `var Description: string { get; set; }` exposes the supplied text; the parameterless constructor
 sets an empty string. Empty descriptions select the qualified function name.
 Descriptions affect reporting, never test identity or ordering.
@@ -71,8 +75,8 @@ Descriptions affect reporting, never test identity or ordering.
 constructor description, matching normal attribute construction order.
 
 ```raven
-[Test("ArrayQueue preserves FIFO")]
-func QueueOrder() -> Result<unit, TestFailure> {
+[Test]
+func `ArrayQueue preserves FIFO`() -> Result<unit, TestFailure> {
     let queue = ArrayQueue<int>()
     queue.Enqueue(4)
     return Assert.True(queue.Dequeue() is Some(4), "First input must be removed first")

@@ -19,8 +19,8 @@ func Invalid(bytes: byte[]) -> Result<unit, TestFailure> {
     return Assert.True(decoder.Decode(bytes[..0], false) is Failure(EncodingError.Finished), "Malformed decoder is terminal")
 }
 
-[Test("Encoding providers preserve UTF-8 and reject non-ASCII text")]
-func AProviders() -> Result<unit, TestFailure> {
+[Test]
+func `Encoding providers preserve UTF-8 and reject non-ASCII text`() -> Result<unit, TestFailure> {
     let source = "\u0000Aé😀é\u007f"
     let Ok(bytes) = Encodings.Utf8.Encode(source) else {
         return Failure(TestFailure("UTF-8 encode", "Ok", "Error"))
@@ -37,8 +37,8 @@ func AProviders() -> Result<unit, TestFailure> {
     return Assert.True(Encodings.Ascii.Encode("prefix é") is Failure(EncodingError.UnrepresentableText), "Strict ASCII")
 }
 
-[Test("UTF-8 decoding preserves text at every byte split")]
-func BSplitPoints() -> Result<unit, TestFailure> {
+[Test]
+func `UTF-8 decoding preserves text at every byte split`() -> Result<unit, TestFailure> {
     let bytes: byte[] = [(byte)65, (byte)195, (byte)169, (byte)226, (byte)130, (byte)172, (byte)240, (byte)159, (byte)152, (byte)128]
     for split in 0..=(bytes.Length) {
         let decoder = Encodings.Utf8.CreateDecoder()
@@ -53,8 +53,8 @@ func BSplitPoints() -> Result<unit, TestFailure> {
     return Assert.True(true, "All split points")
 }
 
-[Test("UTF-8 decoders reject malformed scalars and truncated final input")]
-func CMalformed() -> Result<unit, TestFailure> {
+[Test]
+func `UTF-8 decoders reject malformed scalars and truncated final input`() -> Result<unit, TestFailure> {
     _ = Invalid([(byte)128])?
     _ = Invalid([(byte)192, (byte)175])?
     _ = Invalid([(byte)224, (byte)128, (byte)128])?
@@ -64,8 +64,8 @@ func CMalformed() -> Result<unit, TestFailure> {
     return Invalid([(byte)240, (byte)159, (byte)152])
 }
 
-[Test("Decoder sessions copy pending input and preserve BOM data")]
-func DOwnership() -> Result<unit, TestFailure> {
+[Test]
+func `Decoder sessions copy pending input and preserve BOM data`() -> Result<unit, TestFailure> {
     let first = Encodings.Utf8.CreateDecoder()
     let second = Encodings.Utf8.CreateDecoder()
     let head: byte[] = [(byte)195]
@@ -79,8 +79,8 @@ func DOwnership() -> Result<unit, TestFailure> {
     return Decoded(Encodings.Utf8.CreateDecoder().Decode(bom[..4], true), "\ufeffA")
 }
 
-[Test("Decoder windows preserve text and ASCII errors are terminal")]
-func ERanges() -> Result<unit, TestFailure> {
+[Test]
+func `Decoder windows preserve text and ASCII errors are terminal`() -> Result<unit, TestFailure> {
     let bytes: byte[] = [(byte)0, (byte)65, (byte)127]
     let decoder = Encodings.Ascii.CreateDecoder()
     _ = Decoded(decoder.Decode(bytes[..3], false), "\u0000A\u007f")?
@@ -91,8 +91,8 @@ func ERanges() -> Result<unit, TestFailure> {
     return Assert.True(strict.Decode(bytes[..1], false) is Failure(EncodingError.Finished), "Invalid ASCII is terminal")
 }
 
-[Test("Encoders preserve accepted input through one-byte drains")]
-func FProgress() -> Result<unit, TestFailure> {
+[Test]
+func `Encoders preserve accepted input through one-byte drains`() -> Result<unit, TestFailure> {
     let encoder = Encodings.Utf8.CreateEncoder()
     var source = "é😀é"
     _ = Assert.True(encoder.Accept(source, false) is Ok(_), "Accept source")?
@@ -129,8 +129,8 @@ func FProgress() -> Result<unit, TestFailure> {
     return Assert.True(encoder.Drain(buffer[..1]) is Failure(EncodingError.Finished), "Drain after finish")
 }
 
-[Test("Encoder chunks preserve scalars across the internal byte boundary")]
-func GChunkBoundary() -> Result<unit, TestFailure> {
+[Test]
+func `Encoder chunks preserve scalars across the internal byte boundary`() -> Result<unit, TestFailure> {
     var prefix = "x"
     for index in 0..8 {
         prefix = prefix + prefix
@@ -162,8 +162,8 @@ func GChunkBoundary() -> Result<unit, TestFailure> {
     return Assert.Equal(source, text)
 }
 
-[Test("ASCII encoder preflight is retryable and factories are independent")]
-func HAsciiSessions() -> Result<unit, TestFailure> {
+[Test]
+func `ASCII encoder preflight is retryable and factories are independent`() -> Result<unit, TestFailure> {
     let provider = Encodings.Ascii
     let first = provider.CreateEncoder()
     let second = provider.CreateEncoder()
@@ -181,8 +181,8 @@ func HAsciiSessions() -> Result<unit, TestFailure> {
     return Assert.True(b.BytesWritten == 1 && b.State is EncoderState.Finished && buffer[0] == 66, "Second session")
 }
 
-[Test("One-shot decoding preserves Unicode BOM NUL and empty sequences")]
-func IOneShotRoundTrip() -> Result<unit, TestFailure> {
+[Test]
+func `One-shot decoding preserves Unicode BOM NUL and empty sequences`() -> Result<unit, TestFailure> {
     let text = "\uFEFF\u0000Aé😀"
     let Ok(bytes) = Encodings.Utf8.Encode(text) else {
         return Failure(TestFailure("One-shot encode", "Ok", "Error"))
@@ -195,8 +195,8 @@ func IOneShotRoundTrip() -> Result<unit, TestFailure> {
     return Decoded(Encodings.Ascii.Decode(ascii), "\u0000A\u007f")
 }
 
-[Test("One-shot errors do not poison providers and results are snapshots")]
-func JOneShotErrors() -> Result<unit, TestFailure> {
+[Test]
+func `One-shot errors do not poison providers and results are snapshots`() -> Result<unit, TestFailure> {
     let bad: byte[] = [(byte)195]
     let overlong: byte[] = [(byte)192, (byte)128]
     _ = Assert.True(Encodings.Utf8.Decode(bad) is Failure(EncodingError.InvalidUtf8), "Truncated scalar rejected")?
@@ -211,8 +211,8 @@ func JOneShotErrors() -> Result<unit, TestFailure> {
     return Decoded(Encodings.Ascii.Decode(good), "B")
 }
 
-[Test("One-shot decoding borrows only its window and owns its result")]
-func KOneShotWindows() -> Result<unit, TestFailure> {
+[Test]
+func `One-shot decoding borrows only its window and owns its result`() -> Result<unit, TestFailure> {
     let bytes: byte[] = [(byte)255, (byte)195, (byte)169, (byte)0, (byte)65, (byte)255]
     let Ok(text) = Encodings.Utf8.Decode(bytes[1..5]) else {
         return Failure(TestFailure("Borrowed window", "Ok", "Error"))

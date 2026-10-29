@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "base": "a8baba4f68ed8bbe0a0181b5dc561c15100a3cad",
+  "unchangedTestBodies": 464,
+  "renamed": 461,
+  "retainedNames": [
+    "AnyWithoutCurrent",
+    "CasingNoNormalization",
+    "CasingNotOrdinalFolding"
+  ],
+  "updatedCallSites": 12,
+  "identifierProbe": {
+    "names": 464,
+    "compiled": true,
+    "rediscoveryIdentical": true,
+    "scope": "Identifier and adapter qualification only; synthetic bodies are not behavior tests."
+  }
+}

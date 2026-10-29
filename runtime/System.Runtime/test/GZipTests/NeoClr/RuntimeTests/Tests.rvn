@@ -50,8 +50,8 @@ func Verify(data: byte[], expected: byte[]) -> Result<unit, TestFailure> {
     return Ok(())
 }
 
-[Test("Gzip decodes independent stored fixed dynamic and optional-header members")]
-func ADecode() -> Result<unit, TestFailure> {
+[Test]
+func `Gzip decodes independent stored fixed dynamic and optional-header members`() -> Result<unit, TestFailure> {
     _ = Verify(Stored(), SmallData())?
     _ = Verify(Fixed(), SmallData())?
     _ = Verify(Dynamic(), LargeData())?
@@ -60,8 +60,8 @@ func ADecode() -> Result<unit, TestFailure> {
     return Verify(Empty(), [])
 }
 
-[Test("Gzip validates checksums truncation headers and quotas before output")]
-func BInvalid() -> Result<unit, TestFailure> {
+[Test]
+func `Gzip validates checksums truncation headers and quotas before output`() -> Result<unit, TestFailure> {
     let buffer: byte[] = [(byte)165]
     let corrupt = Fixed()
     corrupt[corrupt.Length - 8] = (byte)((int)corrupt[corrupt.Length - 8] ^ 1)
@@ -92,8 +92,8 @@ func BInvalid() -> Result<unit, TestFailure> {
     return Assert.Equal(165, (int)buffer[0])
 }
 
-[Test("Gzip incrementally compresses repeated writes and finishes once")]
-func CCompress() -> Result<unit, TestFailure> {
+[Test]
+func `Gzip incrementally compresses repeated writes and finishes once`() -> Result<unit, TestFailure> {
     let sink = MemoryStream()
     let writer = GZipStream.CreateCompressor(sink, true)
     let data = LargeData()
@@ -125,8 +125,8 @@ func CCompress() -> Result<unit, TestFailure> {
     return Ok(())
 }
 
-[Test("Gzip empty finish ownership ranges modes and cancellation are explicit")]
-func DContracts() -> Result<unit, TestFailure> {
+[Test]
+func `Gzip empty finish ownership ranges modes and cancellation are explicit`() -> Result<unit, TestFailure> {
     let sink = MemoryStream()
     let writer = GZipStream.CreateCompressor(sink, true)
     let bytes: byte[] = [(byte)1]
@@ -155,8 +155,8 @@ func DContracts() -> Result<unit, TestFailure> {
     return Assert.True(CompletedValue(invalid.Read(bytes, 0, 1)) is Failure(StreamError.IoFailure), "Failed wrapper cannot replay")
 }
 
-[Test("Gzip awaits output and poisons interrupted streams without replay")]
-func EPending() -> Result<unit, TestFailure> {
+[Test]
+func `Gzip awaits output and poisons interrupted streams without replay`() -> Result<unit, TestFailure> {
     let sink = PendingSink()
     let writer = GZipStream.CreateCompressor(sink)
     let bytes: byte[] = [(byte)65]
@@ -179,8 +179,8 @@ func EPending() -> Result<unit, TestFailure> {
     return Assert.True(CompletedValue(broken.Finish()) is Failure(StreamError.IoFailure), "Failed finalization cannot replay")
 }
 
-[Test("Gzip handles pending fragmented input and preserves text-reader errors")]
-func FInput() -> Result<unit, TestFailure> {
+[Test]
+func `Gzip handles pending fragmented input and preserves text-reader errors`() -> Result<unit, TestFailure> {
     let source = FragmentedSource(Fixed())
     let reader = GZipStream.CreateDecompressor(source)
     let buffer: byte[] = [(byte)165]
@@ -208,8 +208,8 @@ func FInput() -> Result<unit, TestFailure> {
     return Assert.True(CompletedValue(text.ReadToEnd(32)) is Failure(TextReadError.InvalidData), "Preserve binary corruption through text decoding")
 }
 
-[Test("Gzip borrows only the selected source window across compression blocks")]
-func GWindows() -> Result<unit, TestFailure> {
+[Test]
+func `Gzip borrows only the selected source window across compression blocks`() -> Result<unit, TestFailure> {
     let sink = MemoryStream()
     let writer = GZipStream.CreateCompressor(sink, true)
     // Cross the 16384-byte block boundary, excluding both source sentinels.

@@ -23,8 +23,8 @@ func LargePrefix() -> string {
 
 // The current TestAttribute contract is synchronous. Buffered ReadText completes
 // immediately, so GetResult observes that contract without scheduling a wait.
-[Test("HTTP buffered text preserves scalars beyond the one-shot codec quota")]
-func ALargeRoundTrip() -> Result<unit, TestFailure> {
+[Test]
+func `HTTP buffered text preserves scalars beyond the one-shot codec quota`() -> Result<unit, TestFailure> {
     let text = String.Concat(LargePrefix(), "😀é")
     _ = Assert.True(Encodings.Utf8.Encode(text) is Failure(EncodingError.LimitExceeded), "Fixture exceeds one-shot quota")?
     let content = HttpStringContent(text)
@@ -36,8 +36,8 @@ func ALargeRoundTrip() -> Result<unit, TestFailure> {
     return Assert.Equal(text, decoded)
 }
 
-[Test("HTTP buffered text rejects malformed and truncated large bodies")]
-func BLargeErrors() -> Result<unit, TestFailure> {
+[Test]
+func `HTTP buffered text rejects malformed and truncated large bodies`() -> Result<unit, TestFailure> {
     let bytes: byte[] = [for index in 0..65537 => (byte)120]
     bytes[bytes.Length - 1] = (byte)195
     _ = Assert.True(HttpStringContent.Read(HttpMemoryContent(bytes)).GetResult() is Failure(_), "Truncated final scalar")?
@@ -50,8 +50,8 @@ func BLargeErrors() -> Result<unit, TestFailure> {
     return Assert.True(text.EndsWithOrdinal("xA"), "Valid body remains readable")
 }
 
-[Test("HTTP buffered text preserves empty BOM and NUL data")]
-func CSmallRoundTrips() -> Result<unit, TestFailure> {
+[Test]
+func `HTTP buffered text preserves empty BOM and NUL data`() -> Result<unit, TestFailure> {
     for text in ["", "\uFEFFcafé\u0000🌍"] {
         let Ok(decoded) = HttpStringContent.Read(HttpStringContent(text)).GetResult() else {
             return Failure(TestFailure("Buffered text decode", "Ok", "Error"))

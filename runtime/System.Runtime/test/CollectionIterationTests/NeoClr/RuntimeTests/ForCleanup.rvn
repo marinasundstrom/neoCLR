@@ -7,8 +7,8 @@ import System.Optional.*
 import System.Result.*
 import NeoClr.Testing.*
 
-[Test("For completion disposes its iterator")]
-func ForCompletion() -> Result<unit, TestFailure> {
+[Test]
+func `For completion disposes its iterator`() -> Result<unit, TestFailure> {
     let input = ObservedNumbers()
     var sum = 0
     for value in input {
@@ -18,8 +18,8 @@ func ForCompletion() -> Result<unit, TestFailure> {
     return CheckObservation(input, 1, 5, 4, 1)
 }
 
-[Test("For continue preserves traversal and disposal")]
-func ForContinue() -> Result<unit, TestFailure> {
+[Test]
+func `For continue preserves traversal and disposal`() -> Result<unit, TestFailure> {
     let input = ObservedNumbers()
     for value in input {
         continue
@@ -27,15 +27,15 @@ func ForContinue() -> Result<unit, TestFailure> {
     return CheckObservation(input, 1, 5, 4, 1)
 }
 
-[Test("For return disposes before returning to its caller")]
-func ForReturn() -> Result<unit, TestFailure> {
+[Test]
+func `For return disposes before returning to its caller`() -> Result<unit, TestFailure> {
     let input = ObservedNumbers()
     _ = Assert.Equal(1, FirstFromLoop(input))?
     return CheckObservation(input, 1, 1, 1, 1)
 }
 
-[Test("Labeled continue disposes each inner iterator")]
-func ForOuterContinue() -> Result<unit, TestFailure> {
+[Test]
+func `Labeled continue disposes each inner iterator`() -> Result<unit, TestFailure> {
     let input = ObservedNumbers()
     outer: for value in input {
         for other in input {
@@ -45,8 +45,8 @@ func ForOuterContinue() -> Result<unit, TestFailure> {
     return CheckObservation(input, 5, 9, 8, 5)
 }
 
-[Test("For disposes an empty iterator")]
-func ForEmpty() -> Result<unit, TestFailure> {
+[Test]
+func `For disposes an empty iterator`() -> Result<unit, TestFailure> {
     let input = ObservedNumbers()
     input.Limit = 0
     for value in input {

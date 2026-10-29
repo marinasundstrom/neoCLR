@@ -12,13 +12,13 @@ class CallbackState {
 
 func AddOne(value: int) -> int => value + 1
 
-[Test("Native callbacks accept Raven module functions")]
-unsafe func ModuleFunction() -> Result<unit, TestFailure> {
+[Test]
+unsafe func `Native callbacks accept Raven module functions`() -> Result<unit, TestFailure> {
     return Assert.Equal(42, Apply(AddOne, 41))
 }
 
-[Test("Native callbacks preserve captures across repeated calls")]
-unsafe func Captures() -> Result<unit, TestFailure> {
+[Test]
+unsafe func `Native callbacks preserve captures across repeated calls`() -> Result<unit, TestFailure> {
     let state = CallbackState()
     let callback: (int) -> int = value => {
         state.Value += 1
@@ -30,16 +30,16 @@ unsafe func Captures() -> Result<unit, TestFailure> {
     return Assert.Equal(2, state.Value)
 }
 
-[Test("Native callbacks retain bound receivers for the call")]
-unsafe func Receiver() -> Result<unit, TestFailure> {
+[Test]
+unsafe func `Native callbacks retain bound receivers for the call`() -> Result<unit, TestFailure> {
     let state = CallbackState()
     let result = Apply(state.Add, 42)
     _ = Assert.Equal(42, state.Value)?
     return Assert.Equal(42, result)
 }
 
-[Test("Native unit callbacks discard the logical Void result")]
-unsafe func Notification() -> Result<unit, TestFailure> {
+[Test]
+unsafe func `Native unit callbacks discard the logical Void result`() -> Result<unit, TestFailure> {
     let state = CallbackState()
     let callback: (int) -> unit = value => {
         System.Runtime.GC.Collect()
@@ -53,8 +53,8 @@ static class CallbackResults {
     static func Empty<T>(value: int) -> T => default(T)
 }
 
-[Test("Native callbacks preserve generic unit value returns")]
-unsafe func GenericUnit() -> Result<unit, TestFailure> {
+[Test]
+unsafe func `Native callbacks preserve generic unit value returns`() -> Result<unit, TestFailure> {
     let callback: (int) -> unit = CallbackResults.Empty<unit>
     let value: System.Void = callback(1)
     Notify(callback, 2)
@@ -63,16 +63,16 @@ unsafe func GenericUnit() -> Result<unit, TestFailure> {
     return Ok(())
 }
 
-[Test("Native returned functions remain callable across collection")]
-unsafe func ReturnedFunction() -> Result<unit, TestFailure> {
+[Test]
+unsafe func `Native returned functions remain callable across collection`() -> Result<unit, TestFailure> {
     let function = GetFunction()
     System.Runtime.GC.Collect()
     _ = Assert.Equal(42, function(41))?
     return Assert.Equal(42, Apply(function, 41))
 }
 
-[Test("Native returned void functions produce logical unit values")]
-unsafe func ReturnedUnit() -> Result<unit, TestFailure> {
+[Test]
+unsafe func `Native returned void functions produce logical unit values`() -> Result<unit, TestFailure> {
     let function = GetNotification()
     System.Runtime.GC.Collect()
     let value: System.Void = function(42)
