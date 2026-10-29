@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-29
 
+- Integrate Raven carrier postfix `!` through existing native terminal failure; add a focused native compiler/interpreter verifier for success, failure and member chaining. No runtime ABI change.
+
 - Add Neo.Configuration.Abstractions and Neo.Configuration with hierarchical live sections, ordered provider precedence, explicit null masking, mutable in-memory sources, optional Neo.Configuration.Json file loading, reload/disposal and caller-owned DI registration. Integrate configuration into the typed logging/localization sample, add four introductory web-page samples backed by standalone projects, and refresh API/website documentation. JSON configuration initially uses the existing strict DOM quotas (1024 bytes, 32 values, four container levels). Change tokens, environment/command-line providers, binding and options remain gaps.
 
 - Complete qualification of the Neo abstraction split and integrated DI/logging/localization sample: the JSON-backed native app exits successfully with the expected typed-service greeting. Record focused compiler, interface-projection, layout and API snapshot evidence; preserve boxed dispatch while omitting unreachable unboxed value interface views.

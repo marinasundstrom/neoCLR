@@ -23503,3 +23503,19 @@ All four introductory projects compiled and produced their expected interpreter
 output; the integrated native app read appsettings.json and printed the expected
 localized greeting. The author requested a local preview, which the assistant
 served on loopback port 8765 and opened at the Configuration feature page.
+
+### 2026-10-29 — Postfix carrier unwrap
+
+The author proposed `stringBuilder.AppendLine("")!.AppendLine("")!` with `!`
+meaning “Unwrap or fail”, asked for .NET and neoCLR support with shared lowering
+and different failure mechanisms, and clarified that neoCLR is on
+`codex/neoclr` and the changes should also be on main. The assistant implemented
+shared single-evaluation carrier extraction and semantic/completion support in
+both Raven worktrees, preserving nullable suppression. .NET uses an
+`InvalidOperationException`; native neoCLR uses its existing terminal failure
+instruction. A runtime integration verifier and bridge notes accompany the
+compiler tests; see the carrier unwrap section of `docs/raven-cli-bridge.md`.
+
+Validation completed: all five native interpreter cases passed against the
+`target/neo-configuration-20261029/final-libraries` bundle.
+[Recorded results and input hashes](validation/carrier-unwrap-20261029/validation.json).

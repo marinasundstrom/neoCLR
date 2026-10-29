@@ -1,0 +1,46 @@
+{
+  "date": "2026-10-29",
+  "target": "native neoCLR interpreter",
+  "ravenBranch": "codex/neoclr",
+  "libraryBundle": "target/neo-configuration-20261029/final-libraries",
+  "checks": [
+    {
+      "case": "result-success",
+      "exitCode": 42,
+      "passed": true
+    },
+    {
+      "case": "optional-success",
+      "exitCode": 42,
+      "passed": true
+    },
+    {
+      "case": "result-failure",
+      "exitCode": 1,
+      "passed": true
+    },
+    {
+      "case": "optional-failure",
+      "exitCode": 1,
+      "passed": true
+    },
+    {
+      "case": "chaining",
+      "exitCode": 3,
+      "passed": true
+    }
+  ],
+  "sha256": {
+    "target/neo-configuration-20261029/final-libraries/System.Runtime.dll": "2ecf884bf63912934d3bab1e0e4c532b0db4cd147af41615babc42e85d4602d1",
+    "target/neo-configuration-20261029/final-libraries/System.runtime.neox": "0c72a8656e7158d6bb2f31c0b019d8747dd61a6c4127b278155e104de437769b",
+    "target/debug/neoclr": "89354675786f3d81bb92df34a92765cc058907a2413cb72b23d2b49fae9a49c1"
+  },
+  "limitations": [
+    "No AOT execution validation",
+    "Legacy CLI bridge translation not qualified"
+  ],
+  "ravenCommits": {
+    "main": "5814fc977",
+    "codex/neoclr": "03ed6b587"
+  }
+}

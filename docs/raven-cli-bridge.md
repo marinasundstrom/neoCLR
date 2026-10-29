@@ -16163,3 +16163,29 @@ interface views. Only reachable boxing produces an executable interface receiver
 source metadata remains authoritative for conformance and reflection. This closes
 the file-error/logging composition gap without changing the temporary CLI bridge
 or native public signatures.
+
+### Carrier unwrap or fail — 2026-10-29
+
+Raven postfix `!` now extracts `Propagatable` outputs or terminates on a
+non-success result. This is shared language behavior developed on Raven main and
+carried as `03ed6b587` to `codex/neoclr` from main `5814fc977`, with
+target-specific failure emission. The operand is
+evaluated once and chaining uses the output type. It does not propagate a
+residual to the caller or require a carrier return type.
+
+Native emission uses the existing terminal failure instruction and message
+`Carrier unwrap failed`, without a CLR exception object or runtime ABI change.
+The same bound control flow uses `InvalidOperationException` on .NET. The
+historical CLI representation is extraction plus a throw; its translation is
+not qualified here. Native metadata and codegen replace that temporary encoding.
+The existing explicit propagation contract owns carrier selection; residual
+payload details are not included in the terminal message.
+
+`docs/experiments/raven-target/verify_carrier_unwrap.py` qualifies Result and
+Optional success and failure plus member chaining using a supplied compiler,
+native runtime-library bundle and interpreter. It records compiler and execution
+logs and a JSON result in its output directory. These checks do not qualify AOT.
+
+Validation completed: all five native interpreter cases passed against the
+`target/neo-configuration-20261029/final-libraries` bundle.
+[Recorded results and input hashes](validation/carrier-unwrap-20261029/validation.json).
