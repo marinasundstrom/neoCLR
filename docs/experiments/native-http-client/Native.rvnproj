@@ -7,7 +7,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Client.rvn" />
-    <Compile Include="../../../runtime/raven/compiler-services/RuntimeAwait.rvn"
+    <Compile Include="../../../runtime/compiler-services/RuntimeAwait.rvn"
              Condition="'$(RavenNeoClrRuntimeAsyncHelper)' != '' and '$(RavenNeoClrRuntimeAsyncProviderImported)' != 'true'" />
   </ItemGroup>
 </Project>

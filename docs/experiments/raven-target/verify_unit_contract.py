@@ -82,7 +82,7 @@ func Main() {
     imported = root / 'imported'
     run(['dotnet', bridge, '--import', image, core, imported])
     system = root / 'System.neoil'
-    system.write_text(build(ROOT / 'runtime/System.neoil'))
+    system.write_text(build(ROOT / 'runtime/legacy/bootstrap/System.neoil'))
     run([runtime, 'verify', imported / 'App.neoil', '--system', system])
     output = run([runtime, 'run', imported / 'App.neoil', '--system', system])
     assert output.splitlines() == ['notified', '42', 'notified', '42', 'complete', 'error'], output

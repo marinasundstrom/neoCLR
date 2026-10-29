@@ -59,7 +59,7 @@ def main():
             raise RuntimeError(result.stderr or result.stdout)
         return result
     try:
-        for path in [Path(__file__), *sorted((ROOT / 'runtime/raven/compiler-services').glob('*.rvn')), *sorted((ROOT / 'runtime/native').rglob('*.[ch]'))]:
+        for path in [Path(__file__), *sorted((ROOT / 'runtime/compiler-services').glob('*.rvn')), *sorted((ROOT / 'runtime/native').rglob('*.[ch]'))]:
             report['inputs'][str(path)] = hashlib.sha256(path.read_bytes()).hexdigest()
         cases = [('language', 'docs/experiments/runtime-async/RuntimeAwait.rvn'),
                  ('cleanup', 'docs/experiments/runtime-async/RuntimeUse.rvn'),

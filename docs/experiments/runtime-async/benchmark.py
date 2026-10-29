@@ -25,7 +25,7 @@ output.mkdir(parents=True, exist_ok=False)
 here = Path(__file__).resolve().parent
 host = a.host.resolve()
 base = r['commands'][0]['command']
-provider = Path(__file__).resolve().parents[3] / 'runtime/raven/compiler-services/RuntimeAwait.rvn'
+provider = Path(__file__).resolve().parents[3] / 'runtime/compiler-services/RuntimeAwait.rvn'
 bundle = Path(base[base.index('--core-reference') + 1]).parent.parent
 sha = lambda path: hashlib.sha256(Path(path).read_bytes()).hexdigest()
 report = dict(passed=False, platform=platform.platform(), measurement='fresh interpreter invocation; load and verification excluded',

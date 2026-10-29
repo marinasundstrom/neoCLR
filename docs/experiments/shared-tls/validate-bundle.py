@@ -52,7 +52,7 @@ def main():
             source, binary = output / (name + '.neoil'), output / (name + '.neox')
             # Explicit private declarations in the test assembly: no replacement
             # installed seed, public facade or compiler service mapping is implied.
-            source.write_text('.module App\n.entry Main\n.function Main() -> Int32\n' + '\n'.join(locals_ + instructions) + '\nldc.i4 0\nret\n.end\n' + (ROOT / 'runtime/neoCLR/Runtime/Tls.neoil').read_text())
+            source.write_text('.module App\n.entry Main\n.function Main() -> Int32\n' + '\n'.join(locals_ + instructions) + '\nldc.i4 0\nret\n.end\n' + (ROOT / 'runtime/legacy/bootstrap/neoCLR/Runtime/Tls.neoil').read_text())
             run([runtime, 'assemble', source, binary, '--format', 'neox'])
             result = run([runtime, 'run', binary], 1 if fault else 0)
             expected_fault = 'UserFault' if name.endswith('-fault-teardown') else 'RuntimeError'

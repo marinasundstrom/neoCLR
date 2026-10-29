@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-29
 
+- Contain historical System/neoCLR bootstrap sources and Raven CLI bridge fixtures under runtime/legacy; keep active compiler-service templates under runtime/compiler-services. Update build, test and packaging consumers without changing expanded bootstrap behavior. Old source paths have no compatibility aliases; historical receipts retain their original paths and hashes.
+
 - Establish descriptive backtick identifiers as the convention when stating test behavior; traditional names remain valid when clear. Move 464 runtime/extension test descriptions out of Test attributes: rename 461 methods and retain three clear traditional names. Update async callers and qualified-name/sort expectations. Test bodies and description-feature fixtures are unchanged; name-based IDs, selectors and discovery order change.
 
 - Rename System.Fail to System.Panic to distinguish terminal errors from Result.Failure; prefer importing System.* and calling Panic. Update Raven contract integration, callers and API documentation. No compatibility alias is retained; consumers must rebuild with the matching compiler/runtime bundle. Runtime fault, cleanup and thread/task behavior is unchanged; broader panic semantics are deferred.

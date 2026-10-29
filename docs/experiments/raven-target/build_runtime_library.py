@@ -348,8 +348,8 @@ SOURCES = {
     'Double': 'runtime/System.Runtime/src/System.Runtime/System/Double.rvn',
     'Boolean': 'runtime/System.Runtime/src/System.Runtime/System/Boolean.rvn',
 }
-PROJECT = ROOT / 'runtime/raven/System.Runtime.rvnproj'
-GENERATED = ROOT / 'runtime/raven/generated'
+PROJECT = ROOT / 'runtime/legacy/raven/System.Runtime.rvnproj'
+GENERATED = ROOT / 'runtime/legacy/raven/generated'
 
 def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()

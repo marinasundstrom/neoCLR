@@ -85,7 +85,7 @@ func Main() {
     imported = root / 'imported'
     run(['dotnet', bridge, '--import', root / 'compiled/Consumer.dll', core, imported])
     system = root / 'System.neoil'
-    system.write_text(build(ROOT / 'runtime/System.neoil'))
+    system.write_text(build(ROOT / 'runtime/legacy/bootstrap/System.neoil'))
     run([runtime, 'verify', imported / 'App.neoil', '--system', system])
     actual = run([runtime, 'run', imported / 'App.neoil', '--system', system]).splitlines()
     assert actual == expected, (actual, expected)

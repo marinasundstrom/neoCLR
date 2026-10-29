@@ -1,0 +1,6 @@
+; LEGACY CLASS-LIBRARY MIRROR — obsolete for library development.
+; Authoritative source: runtime/raven/src; native projects: runtime/raven/projects.
+; Retained for bootstrap/tests pending archival; see runtime/README.md.
+; Archived Neo profile; the Raven platform uses runtime/raven/Path.neoil.
+.include "../../../raven/generated/Path.bootstrap.methods.neoil"
+.include "../../../raven/generated/Path.bootstrap.helpers.neoil"

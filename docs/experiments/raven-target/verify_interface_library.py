@@ -71,7 +71,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-interface-library-') as temporar
     # runtime-library contract, not only the reference metadata used for compilation.
     run(['dotnet', args.bridge.resolve(), '--reference-core', core])
     system = root / 'System.neoil'
-    system.write_text(build(ROOT / 'runtime/System.neoil'))
+    system.write_text(build(ROOT / 'runtime/legacy/bootstrap/System.neoil'))
     project = root / 'Demo.rvnproj'
     project.write_text(f'''<Project>
   <PropertyGroup><NeoCLRRoot>{escape(str(root))}</NeoCLRRoot></PropertyGroup>

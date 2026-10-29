@@ -39,7 +39,7 @@ def run(label, command, expected=0):
 
 run('raven', ['dotnet', args.compiler, 'neoclr', '--project', HERE / 'NativeMemoryConsumer.rvnproj'])
 image = HERE / 'bin/neoclr/NativeMemoryConsumer.dll'
-core = ROOT / 'runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll'
+core = ROOT / 'runtime/legacy/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll'
 # Use the same explicit minimal seed as the interpreter foundation consumer.
 seed = output / 'System.neoil'
 seed.write_text('.module System\n')

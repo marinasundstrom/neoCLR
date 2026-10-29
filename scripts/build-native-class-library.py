@@ -94,7 +94,7 @@ def main():
     providers = [output / name for name in ('RuntimeAwait.rvn', 'RuntimeGenerator.rvn')]
     items = ET.SubElement(configuration, 'ItemGroup')
     for provider in providers:
-        shutil.copyfile(ROOT / 'runtime/raven/compiler-services' / provider.name, provider)
+        shutil.copyfile(ROOT / 'runtime/compiler-services' / provider.name, provider)
         ET.SubElement(items, 'Compile', Include='$(MSBuildThisFileDirectory)' + provider.name,
                       Condition="'$(RavenNeoClrRuntimeAsyncHelper)' == 'RuntimeAwaitProvider.Bridge'")
     references = ET.SubElement(configuration, 'ItemGroup')
@@ -121,7 +121,7 @@ def main():
         inputs.append(directory / (name + '.rvnproj'))
         inputs += list((directory / ('Neo' if name.startswith('Neo.') else 'System')).rglob('*.rvn'))
         inputs += list((directory / 'neoCLR').rglob('*.rvn'))
-    inputs += list((ROOT / 'runtime/raven/compiler-services').glob('*.rvn'))
+    inputs += list((ROOT / 'runtime/compiler-services').glob('*.rvn'))
     inputs += [args.compiler.parent / name for name in ('Raven.CodeAnalysis.dll', 'Raven.CodeAnalysis.NeoClr.dll', 'NeoCLR.Metadata.Experimental.dll')]
     report['hashes'] = {str(path.resolve()): sha(path) for path in inputs + artifacts}
     (output / 'build-evidence.json').write_text(json.dumps(report, indent=2) + '\n')

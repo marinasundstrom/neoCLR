@@ -88,7 +88,7 @@ func Main() {
     imported = root / 'imported'
     run(['dotnet', bridge, '--import', consumer, core, imported])
     system = root / 'System.neoil'
-    system.write_text(build(ROOT / 'runtime/System.neoil'))
+    system.write_text(build(ROOT / 'runtime/legacy/bootstrap/System.neoil'))
     run([runtime, 'verify', imported / 'App.neoil', '--system', system])
     result = run([runtime, 'run', imported / 'App.neoil', '--system', system])
     assert result.stdout.splitlines() == expected, result.stdout

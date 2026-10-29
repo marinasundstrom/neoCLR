@@ -105,7 +105,7 @@ function name followed by `()`. IDs are scoped to the selected assembly; descrip
 metadata tokens and assembly versions are excluded. Discovery sorts ordinally by
 qualified function name; manual additions retain their chosen registration order.
 
-See the [complete repository contract and validation](https://github.com/marinasundstrom/neoCLR/blob/main/runtime/raven/tests/README.md).
+See the [complete repository contract and validation](https://github.com/marinasundstrom/neoCLR/blob/main/runtime/legacy/raven/tests/README.md).
 Parallel scheduling, class fixtures and future source generators remain proposals.
 
 

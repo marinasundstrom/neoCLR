@@ -1,5 +1,10 @@
 # neoCLR platform roadmap
 
+**Author-directed housekeeping (2026-10-29):** Contain historical bootstrap and
+CLI bridge files under `runtime/legacy`, with active compiler-service templates
+separate. [Source ownership](../runtime/README.md) identifies remaining consumers;
+this relocation does not retire the bootstrap or change milestone priorities.
+
 **Author-directed optimization objectives (2026-10-28):** Pursue [root-publication bookkeeping, concurrent store checks, then shared I/O completion wakeups](experiments/shared-scheduling/optimization-objectives.md), with safety and measured benefit as gates. Prior shared-queue/default decisions remain intact. Standardize diagnostic data independently of a future GUI: the [session contract](diagnostic-session-format.md) now exports existing owner GC snapshots; timeline/heap-graph adapters remain unimplemented.
 
 **Author-directed application-service boundary (2026-10-28):** Move DI and

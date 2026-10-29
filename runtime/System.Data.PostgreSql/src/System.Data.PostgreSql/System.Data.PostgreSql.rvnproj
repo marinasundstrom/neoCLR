@@ -7,7 +7,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="System/**/*.rvn" />
-    <Compile Include="../../../raven/compiler-services/RuntimeAwait.rvn" />
+    <Compile Include="../../../compiler-services/RuntimeAwait.rvn" />
     <ProjectReference Include="../../../System.Runtime/src/System.Runtime/System.Runtime.rvnproj" />
     <ProjectReference Include="../../../System.Data/src/System.Data/System.Data.rvnproj" />
     <ProjectReference Include="../../../System.Networking/src/System.Networking/System.Networking.rvnproj" />

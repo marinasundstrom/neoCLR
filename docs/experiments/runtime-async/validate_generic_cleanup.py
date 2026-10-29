@@ -83,7 +83,7 @@ def main():
                 continue
             fixture = HERE / filename
             inputs[str(fixture)] = sha(fixture)
-            inputs[str(ROOT / 'runtime/raven/compiler-services/RuntimeAwait.rvn')] = sha(ROOT / 'runtime/raven/compiler-services/RuntimeAwait.rvn')
+            inputs[str(ROOT / 'runtime/compiler-services/RuntimeAwait.rvn')] = sha(ROOT / 'runtime/compiler-services/RuntimeAwait.rvn')
             for lowering in ('runtime', 'state-machine'):
                 key = name + '-' + lowering
                 assembly, obj, app = [out / (key + suffix) for suffix in ('.dll', '.o', '')]
@@ -93,7 +93,7 @@ def main():
                     del compile_source[index:index + 2]
                 compile_source += ['-o', assembly, fixture]
                 if lowering == 'runtime':
-                    compile_source += [ROOT / 'runtime/raven/compiler-services/RuntimeAwait.rvn']
+                    compile_source += [ROOT / 'runtime/compiler-services/RuntimeAwait.rvn']
                 if a.project:
                     project_dir = out / (key + '-project')
                     project_dir.mkdir()
@@ -104,7 +104,7 @@ def main():
                     env = dict(os.environ, NeoClrBundleRoot=str(bundle), RavenNeoClrRuntimeAsyncHelper='')
                     if lowering == 'runtime':
                         if not (bundle / 'lib/RuntimeAwait.rvn').is_file():
-                            shutil.copyfile(ROOT / 'runtime/raven/compiler-services/RuntimeAwait.rvn', project_dir / 'RuntimeAsyncBridge.rvn')
+                            shutil.copyfile(ROOT / 'runtime/compiler-services/RuntimeAwait.rvn', project_dir / 'RuntimeAsyncBridge.rvn')
                         env['RavenNeoClrRuntimeAsyncHelper'] = 'RuntimeAwaitProvider.Bridge'
                     inputs[str(project)] = sha(project)
                     run(['dotnet', compiler, 'neoclr', '--project', project], key + '-project-source', env=env)

@@ -19,7 +19,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-globalization-') as directory:
     (work / 'demo').mkdir()
     subprocess.run(['dotnet', str(bridge), '--reference-core', str(work / 'demo/NeoCLR.CoreProbe.dll')], check=True)
     system = work / 'System.neoil'
-    system.write_text(build(ROOT / 'runtime/System.neoil'))
+    system.write_text(build(ROOT / 'runtime/legacy/bootstrap/System.neoil'))
     project = work / 'Example.rvnproj'
     project.write_text(f'''<Project>
   <PropertyGroup><NeoCLRRoot>{work}</NeoCLRRoot></PropertyGroup>

@@ -106,7 +106,7 @@ def main():
             libs = [archive]
             run([*cc, '-dynamiclib', *libs, '-o', host])
             run(['codesign', '--force', '--sign', '-', host])
-        seed = out / 'System.neoil'; seed.write_text('.module System\n.references ()\n' + (ROOT / 'runtime/neoCLR/Runtime/Tls.neoil').read_text())
+        seed = out / 'System.neoil'; seed.write_text('.module System\n.references ()\n' + (ROOT / 'runtime/legacy/bootstrap/neoCLR/Runtime/Tls.neoil').read_text())
         seed_binary = out / 'System.neox'
         seed_binary.unlink(missing_ok=True)
         run([runtime, 'assemble', seed, seed_binary, '--format', 'neox'])

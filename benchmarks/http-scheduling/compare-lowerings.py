@@ -25,7 +25,7 @@ def main():
     assert recipe['passed'] and recipe['profile'] == 'macos-arm64-http-v1'
     bundle, out = a.bundle.resolve(), a.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
-    provider = ROOT/'runtime/raven/compiler-services/RuntimeAwait.rvn'
+    provider = ROOT/'runtime/compiler-services/RuntimeAwait.rvn'
     carrier = ROOT/'docs/experiments/runtime-async/native-runtime.c'
     compiler = bundle/'sdk/tools/rvnc/rvnc.dll'
     report = dict(passed=False, commands=[], inputs={}, lowerings={}, runs=[],

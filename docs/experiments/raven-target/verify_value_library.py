@@ -122,7 +122,7 @@ ret
         application.write_text(prefix + '.function Main()' + driver)
     assert any(m['RuntimeName'] == 'Probe.Counter::.ctor' for m in mapping['MethodIdentities'])
     system = root / 'System.neoil'
-    system.write_text(build(ROOT / 'runtime/System.neoil'))
+    system.write_text(build(ROOT / 'runtime/legacy/bootstrap/System.neoil'))
     run([runtime, 'verify', application, '--system', system])
     assert run([runtime, 'run', application, '--system', system]).splitlines() == ['7', '42', '42']
     original = application.read_text()

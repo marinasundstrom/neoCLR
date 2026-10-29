@@ -88,7 +88,7 @@ public func ChooseText(first: bool, left: string, right: string) -> string {
     application = root / 'App.neoil'
     application.write_text(driver)
     system = root / 'System.neoil'
-    system.write_text(build(ROOT / 'runtime/System.neoil'))
+    system.write_text(build(ROOT / 'runtime/legacy/bootstrap/System.neoil'))
     run([runtime, 'verify', application, '--system', system])
     assert run([runtime, 'run', application, '--system', system]).splitlines() == ['11', 'left', '22', 'right', '2', '42']
     for name, invalid in [('WrongName', source.replace('left: T', 'value: T').replace('        left', '        value')),

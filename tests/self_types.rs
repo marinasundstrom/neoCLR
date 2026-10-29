@@ -230,7 +230,7 @@ ret
     let mut library = assemble(&format!(
         "{}\n{}",
         neoclr::library::system_source(),
-        include_str!("../runtime/raven/generated/Number.methods.neoil")
+        include_str!("../runtime/legacy/raven/generated/Number.methods.neoil")
     ))
     .unwrap();
     library
@@ -241,7 +241,7 @@ ret
         .implements
         .push(Type::Named("System.Number".into()));
     // Use the actual generated numeric member bodies, not copies of their arithmetic.
-    let methods = include_str!("../runtime/raven/generated/Int32.methods.neoil")
+    let methods = include_str!("../runtime/legacy/raven/generated/Int32.methods.neoil")
         .split(".method ")
         .filter(|part| {
             part.starts_with("static get_Zero(")
@@ -500,7 +500,7 @@ fn system_clonable_uses_native_self_for_value_and_reference_clones() {
     let source = GENERIC_CLONE
         .replace(
             ".interface Clonable\n.method instance Clone() -> Self\n.end\n.end",
-            include_str!("../runtime/raven/generated/Clonable.methods.neoil"),
+            include_str!("../runtime/legacy/raven/generated/Clonable.methods.neoil"),
         )
         .replace(".implements Clonable", ".implements System.Clonable")
         .replace(".constraint T Clonable", ".constraint T System.Clonable")

@@ -17,7 +17,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-reflection-members-') as directo
     work=Path(directory)
     (work/'demo').mkdir()
     subprocess.run(['dotnet',str(bridge),'--reference-core',str(work/'demo/NeoCLR.CoreProbe.dll')],check=True)
-    (work/'System.neoil').write_text(build(root/'runtime/System.neoil'))
+    (work/'System.neoil').write_text(build(root/'runtime/legacy/bootstrap/System.neoil'))
     (work/'Test.rvnproj').write_text(f'<Project><PropertyGroup><NeoCLRRoot>{work}</NeoCLRRoot></PropertyGroup><Import Project="{root}/build/NeoCLR.Raven.props"/><ItemGroup><Compile Include="Main.rvn"/></ItemGroup></Project>')
     for source, expected in [
         (Path(__file__).with_name('Main.rvn'), 'Constructor, invocation and field checks passed'),

@@ -14,8 +14,8 @@
 /runtime/System.*/**/obj/
 /extensions/**/bin/
 /extensions/**/obj/
-/runtime/raven/projects/**/bin/
-/runtime/raven/projects/**/obj/
+/runtime/legacy/raven/projects/**/bin/
+/runtime/legacy/raven/projects/**/obj/
 
 # Native task-factory contract project outputs.
 /docs/experiments/task-factories/bin/
@@ -44,19 +44,23 @@
 
 /docs/experiments/http-method/bin/
 /docs/experiments/http-method/obj/
-/runtime/raven/tests/http-method-values/bin/
-/runtime/raven/tests/http-method-values/obj/
+/runtime/legacy/raven/tests/http-method-values/bin/
+/runtime/legacy/raven/tests/http-method-values/obj/
 
-/runtime/raven/tests/index-range/bin/
-/runtime/raven/tests/index-range/obj/
+/runtime/legacy/raven/tests/index-range/bin/
+/runtime/legacy/raven/tests/index-range/obj/
 
 /tools/native-crypto/target/
 
 /docs/experiments/native-cryptography/project/bin/
 /docs/experiments/native-cryptography/project/obj/
 
-/runtime/raven/tests/cryptography/bin/
-/runtime/raven/tests/cryptography/obj/
+/runtime/legacy/raven/tests/cryptography/bin/
+/runtime/legacy/raven/tests/cryptography/obj/
 
 /samples/extensions/**/bin/
 /samples/extensions/**/obj/
+
+# Retained historical bridge build outputs are not fixtures.
+/runtime/legacy/raven/**/bin/
+/runtime/legacy/raven/**/obj/

@@ -35,7 +35,7 @@ for mode,link in zip(['sync','live'],links):
 import shutil
 project=w/'guest';project.mkdir(exist_ok=True)
 for n in ['Benchmark.rvn','Benchmark.rvnproj']:shutil.copy2(root/'benchmarks/http-server/pipelining'/n,project/n)
-p=project/'Benchmark.rvnproj';p.write_text(p.read_text().replace('../../../runtime/raven',str(root/'runtime/raven')))
+p=project/'Benchmark.rvnproj';p.write_text(p.read_text().replace('../../../runtime/legacy/raven',str(root/'runtime/legacy/raven')))
 # The project references ../Model.rvn.
 shutil.copy2(root/'benchmarks/http-server/Model.rvn',w/'Model.rvn')
 run(['dotnet',bundle/'sdk/tools/rvnc/rvnc.dll','neoclr','--project',project/'Benchmark.rvnproj'],dict(os.environ,NeoClrBundleRoot=str(bundle)))

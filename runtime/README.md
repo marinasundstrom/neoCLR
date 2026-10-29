@@ -21,44 +21,34 @@ JSON suites in System.Data, HTTP suites in System.Web, networking suites in
 System.Networking, and DI/localization suites in their Neo components. The
 [suite catalog](../scripts/runtime-test-projects.json) maps stable command-line
 suite names to project files. Shared test-framework source lives under
-`tools/testing/NeoCLR.Testing`. `runtime/raven` retains compiler-service templates,
-legacy bridge fixtures and historical validation receipts, not active API projects.
+`tools/testing/NeoCLR.Testing`.
 
-## Obsolete class-library mirrors
+## Supporting implementation and fixtures
 
-`System/**/*.neoil` and the `System.neoil` bootstrap manifest are **legacy
-class-library mirrors**, not a second maintained implementation of the library.
-Do not add new library types or methods there or copy new Raven APIs into them.
-Some mirrors differ from today's Raven semantics; they are not API documentation.
-They remain checked in because the embedded bootstrap and older tests still
-consume them. Archive them once those consumers have been migrated explicitly.
-Moving them now without moving their consumers would break existing test paths.
+- `native/` and `codegen/` contain the native runtime and Rust backend.
+- `compiler-services/` contains RuntimeAwait and RuntimeGenerator templates used by
+  current native builds and SDK packaging.
+- `legacy/bootstrap/System.neoil`, `legacy/bootstrap/System/` and
+  `legacy/bootstrap/neoCLR/` contain the historical embedded bootstrap manifest,
+  class-library mirrors and service declarations.
+- `legacy/raven/` contains historical CLI bridge fixtures, generated neoIL and
+  validation receipts. The loose carrier snapshots in `legacy/` preserve the
+  bootstrap ABI.
 
-The older `raven/generated` bridge artifacts are also not authored source. Do not
-hand-edit them to implement new behavior. Historical fixture refreshes must use
-their recorded producer and retain provenance.
+All historical library material is contained under `legacy/`. It is retained
+because Cargo's embedded System module, low-level Rust tests and older bridge
+preparation tools still consume it. It is not a second maintained class library;
+new APIs belong in the Raven component projects. Do not hand-edit generated bridge
+fragments to implement new behavior.
 
-## neoIL remains useful
+The 2026-10-29 relocation updates build, test and packaging consumers while
+preserving expanded bootstrap/profile text. Historical receipts and published
+records retain their original paths and hashes; they do not certify a fresh build.
+The old `runtime/System.neoil`, `runtime/System/`, `runtime/neoCLR/` and
+`runtime/raven/` locations have no compatibility aliases.
 
-The neoIL language and low-level assembler tests are not deprecated. Examples,
-interpreter/verifier fixtures and deliberately isolated runtime contract probes
-can continue to use it. `neoCLR/Runtime/*.neoil` provides older bootstrap service
-bindings; their use by fixtures is distinct from authoring the source library's
-service declarations in `System.Runtime/src/System.Runtime/neoCLR/Runtime/*.rvn`.
-
-New library work—including Slice and Memory—starts in Raven source and its
-explicit compiler/runtime metadata contracts. Runtime support remains in Rust;
-that does not make hand-authored neoIL a library implementation path.
-
-## Archival gate
-
-Before moving legacy mirrors to an archive, inventory references from build.rs,
-manifest expansion, test include_str calls, examples and historical bridge tools.
-Migrate active consumers to native Raven artifacts or purpose-specific test
-fixtures, retain a reproducible historical bundle where needed, and verify those
-consumers. Archiving mirrors is separate from deleting neoIL support or tests.
-
-Development Character migration (2026-10-21): the retained neoIL fixtures now use
-`System.Character` for canonical runtime identity. Their old CLI generation JSON
-receipts remain historical records, not fresh build evidence. Production libraries
-are rebuilt from the Raven projects; the native bundle records current source hashes.
+neoIL itself remains supported for assembler/verifier tests and isolated contract
+probes. The native Raven source-core seed under System.Runtime is also intentional.
+Removing the legacy fixtures entirely requires migrating their remaining consumers;
+containment does not claim that migration has happened. See
+[legacy ownership](legacy/README.md).

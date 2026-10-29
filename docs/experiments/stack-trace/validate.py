@@ -63,7 +63,7 @@ try:
         if not asynchronous:
             flag = command.index('--runtime-async-poc'); del command[flag:flag + 2]
         command += ['-o', str(assembly), str(HERE / (case + '.rvn'))]
-        if asynchronous: command += [str(ROOT / 'runtime/raven/compiler-services/RuntimeAwait.rvn')]
+        if asynchronous: command += [str(ROOT / 'runtime/compiler-services/RuntimeAwait.rvn')]
         run(case + '-compile', command)
         interp = [str(a.host.resolve()), 'run', str(assembly), '--system', str(a.libraries.resolve() / 'System.runtime.neox'),
                   '--object-root', str(a.libraries.resolve() / 'System.Runtime.dll'), '--instructions', '100000000']

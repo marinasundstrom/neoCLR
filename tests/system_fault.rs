@@ -4,9 +4,9 @@ use neoclr::{Limits, LoadedProgram, Value, assemble};
 fn panic_stops_guest_but_does_not_abort_host() {
     let library = assemble(concat!(
         ".module System\n",
-        include_str!("../runtime/raven/generated/Fault.methods.neoil"),
-        include_str!("../runtime/raven/generated/Fault.helpers.neoil"),
-        include_str!("../runtime/neoCLR/Runtime/Fault.neoil")
+        include_str!("../runtime/legacy/raven/generated/Fault.methods.neoil"),
+        include_str!("../runtime/legacy/raven/generated/Fault.helpers.neoil"),
+        include_str!("../runtime/legacy/bootstrap/neoCLR/Runtime/Fault.neoil")
     ))
     .unwrap();
     assert!(library.functions.iter().any(|f| f.name == "System.Panic"));
@@ -68,7 +68,7 @@ fn fault_binding_requires_void_return_and_string_argument() {
 fn fault_binding_uses_canonical_no_result_signature() {
     let module = assemble(concat!(
         ".module System\n",
-        include_str!("../runtime/neoCLR/Runtime/Fault.neoil")
+        include_str!("../runtime/legacy/bootstrap/neoCLR/Runtime/Fault.neoil")
     ))
     .unwrap();
     assert!(module.functions[0].no_result);

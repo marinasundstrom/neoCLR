@@ -5,7 +5,7 @@ fn library() -> &'static Module {
     static LIBRARY: OnceLock<Module> = OnceLock::new();
     LIBRARY.get_or_init(|| {
         let output = Command::new("python3").args(["-c",
-            "import runpy; m=runpy.run_path('docs/experiments/raven-target/collection_library.py'); print(m['build'](m['ROOT'] / 'runtime/System.neoil'))"
+            "import runpy; m=runpy.run_path('docs/experiments/raven-target/collection_library.py'); print(m['build'](m['ROOT'] / 'runtime/legacy/bootstrap/System.neoil'))"
         ]).output().unwrap();
         assert!(output.status.success());
         neoclr::assemble(std::str::from_utf8(&output.stdout).unwrap()).unwrap()
@@ -211,7 +211,7 @@ ret
         );
         let library = neoclr::assemble(concat!(
             ".module System\n",
-            include_str!("../runtime/neoCLR/Runtime/StringJoinParts.neoil")
+            include_str!("../runtime/legacy/bootstrap/neoCLR/Runtime/StringJoinParts.neoil")
         ))
         .unwrap();
         let module = neoclr::assemble(&source).unwrap();

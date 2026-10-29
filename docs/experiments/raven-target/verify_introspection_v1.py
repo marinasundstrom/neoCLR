@@ -28,7 +28,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-introspection-v1-') as temporary
     (root / 'demo').mkdir()
     run([*bridge, '--reference-core', root / 'demo/NeoCLR.CoreProbe.dll'])
     system = root / 'System.neoil'
-    system.write_text(build(ROOT / 'runtime/System.neoil'))
+    system.write_text(build(ROOT / 'runtime/legacy/bootstrap/System.neoil'))
     project = root / 'Probe.rvnproj'
     for path in source.glob('*.rvn'):
         (root / path.name).write_text(path.read_text())

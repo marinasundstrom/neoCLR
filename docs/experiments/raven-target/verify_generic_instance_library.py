@@ -164,7 +164,7 @@ callvirt instance {iterator}::get_Current()
     application = root / 'App.neoil'
     application.write_text(driver)
     system = root / 'System.neoil'
-    system.write_text(build(ROOT / 'runtime/System.neoil'))
+    system.write_text(build(ROOT / 'runtime/legacy/bootstrap/System.neoil'))
     run([runtime, 'verify', application, '--system', system])
     assert run([runtime, 'run', application, '--system', system]).splitlines() == ['42', 'second', 'void']
     if args.private_methods:

@@ -505,6 +505,7 @@ fn compile_with_driver<M: Module>(
     long_range_calls: bool,
     lazy: Option<&mut dyn LazyDriver<M>>,
 ) -> Result<(), Error> {
+    crate::compiler::reject_panic_cleanup(input)?;
     let live_stores = details.is_some_and(|d| d.experimental_live_gc_stores);
     let stack_policy = if live_stores {
         crate::mutation_admission::stack_policy()

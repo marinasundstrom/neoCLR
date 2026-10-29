@@ -24,7 +24,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-constructor-arguments-') as temp
     (root / 'demo').mkdir()
     run(['dotnet', args.bridge.resolve(), '--reference-core', root / 'demo/NeoCLR.CoreProbe.dll'])
     system = root / 'System.neoil'
-    system.write_text(build(ROOT / 'runtime/System.neoil'))
+    system.write_text(build(ROOT / 'runtime/legacy/bootstrap/System.neoil'))
     (root / 'Main.rvn').write_text((Path(__file__).parent / 'samples/application-constructor-arguments.rvn').read_text())
     project = root / 'Probe.rvnproj'
     project.write_text(f'''<Project>

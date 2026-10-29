@@ -1,6 +1,6 @@
 //! Exercise the experimental resource protocol below any frontend/library checks.
 use neoclr::{Limits, LoadedProgram, Value, assemble, assembler::parse_function_ref};
-const SERVICES: &str = include_str!("../runtime/neoCLR/Runtime/FileStreams.neoil");
+const SERVICES: &str = include_str!("../runtime/legacy/bootstrap/neoCLR/Runtime/FileStreams.neoil");
 struct Fixture(std::path::PathBuf);
 impl Fixture {
     fn new() -> Self {

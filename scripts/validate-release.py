@@ -94,7 +94,7 @@ def main():
         source = (output / "neoclr-source").resolve()
         for name in ["Cargo.toml", "Cargo.lock", "build.rs", "LICENSE", "README.md",
                      "CHANGELOG.md", "AGENTS.md", "THIRD_PARTY_NOTICES.md",
-                     "runtime/System.neoil", ".github/workflows/ci.yml"]:
+                     "runtime/legacy/bootstrap/System.neoil", ".github/workflows/ci.yml"]:
             if not (source / name).is_file():
                 raise RuntimeError("required source member missing: " + name)
         report["registry_packages"], report["notice_files"] = audit_notices(source)

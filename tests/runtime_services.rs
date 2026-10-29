@@ -156,7 +156,7 @@ fn unreachable_memory_operations_and_native_imports_remain_conservative_requirem
 fn worker_notification_requires_worker_and_dispatch_services() {
     let module = assemble(concat!(
         ".module System\n",
-        include_str!("../runtime/neoCLR/Runtime/Workers.neoil")
+        include_str!("../runtime/legacy/bootstrap/neoCLR/Runtime/Workers.neoil")
     ))
     .unwrap();
     let graph = LoadedProgram::new(&module)
@@ -193,7 +193,7 @@ fn worker_notification_requires_worker_and_dispatch_services() {
 fn socket_submission_requires_socket_and_dispatch_services() {
     let module = assemble(concat!(
         ".module System\n",
-        include_str!("../runtime/neoCLR/Runtime/Sockets.neoil")
+        include_str!("../runtime/legacy/bootstrap/neoCLR/Runtime/Sockets.neoil")
     ))
     .unwrap();
     let program = LoadedProgram::new(&module).unwrap();
@@ -244,7 +244,7 @@ fn socket_submission_requires_socket_and_dispatch_services() {
 fn dns_uses_host_resolution_and_dispatch_without_guest_workers() {
     let module = assemble(concat!(
         ".module System\n",
-        include_str!("../runtime/neoCLR/Runtime/Dns.neoil")
+        include_str!("../runtime/legacy/bootstrap/neoCLR/Runtime/Dns.neoil")
     ))
     .unwrap();
     let program = LoadedProgram::new(&module).unwrap();

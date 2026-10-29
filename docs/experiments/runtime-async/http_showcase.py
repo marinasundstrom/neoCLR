@@ -24,7 +24,7 @@ if not recipe['passed']:
 output = args.output.resolve()
 output.mkdir(parents=True, exist_ok=True)
 root = Path(__file__).resolve().parents[3]
-provider = Path(__file__).resolve().parents[3] / 'runtime/raven/compiler-services/RuntimeAwait.rvn'
+provider = Path(__file__).resolve().parents[3] / 'runtime/compiler-services/RuntimeAwait.rvn'
 compile_base = recipe['commands'][0]['command']
 run_base = recipe['commands'][1]['command']
 inputs = [provider, Path(compile_base[1]), Path(run_base[0]), *[Path(compile_base[i + 1]) for i, arg in enumerate(compile_base) if arg in ('--reference', '--core-reference', '--runtime-seed', '--bootstrap-ownership')]]

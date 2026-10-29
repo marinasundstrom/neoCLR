@@ -103,7 +103,7 @@ def main():
             shutil.copyfile(args.system_json.resolve(), system_json)
         else:
             system_source = output / 'System.neoil'
-            system_source.write_text(build(ROOT / 'runtime/System.neoil'))
+            system_source.write_text(build(ROOT / 'runtime/legacy/bootstrap/System.neoil'))
             run(runtime, 'assemble', system_source, system_json)
         system_model = json.loads(system_json.read_text())
         report['system'] = {'profile': 'raven-collections', 'types': len(system_model['types']),

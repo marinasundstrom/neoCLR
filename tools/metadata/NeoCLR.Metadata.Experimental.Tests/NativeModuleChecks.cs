@@ -25,7 +25,7 @@ internal static class NativeModuleChecks
     {
         Directory.CreateDirectory(directory);
         var systemJson = Path.Combine(directory, "System.neo.json");
-        await Invoke("assemble", "runtime/System.neoil", systemJson);
+        await Invoke("assemble", "runtime/legacy/bootstrap/System.neoil", systemJson);
         var system = Translate(systemJson);
         await Invoke("verify", system);
         foreach (var sample in new[] { "examples/hello.neoil", "examples/hello_functions.neoil" })
@@ -56,7 +56,7 @@ internal static class NativeModuleChecks
         var model = JsonNode.Parse(systemBytes)!;
         File.WriteAllText(Path.Combine(directory, "validation.json"), JsonSerializer.Serialize(new
         {
-            producer = "current runtime/System.neoil manifest and existing generated IL",
+            producer = "current runtime/legacy/bootstrap/System.neoil manifest and existing generated IL",
             directRavenSourceEmission = false,
             cliReferenceProjection = false,
             systemTypes = model["types"]!.AsArray().Count,

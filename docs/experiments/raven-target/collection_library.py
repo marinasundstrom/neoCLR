@@ -30,37 +30,37 @@ def adapt(text: str, name: str) -> str:
 
 
 def build(path: Path) -> str:
-    if path == ROOT / 'runtime/System/Int32ParseError.neoil':
+    if path == ROOT / 'runtime/legacy/bootstrap/System/Int32ParseError.neoil':
         return ''  # Raven parsing uses the shared NumberParseError union.
     if path.resolve().parent == ROOT / 'runtime/legacy':
-        return (build(ROOT / 'runtime/raven/generated' / (path.stem + '.methods.neoil'))
-                + build(ROOT / 'runtime/raven/generated' / (path.stem + '.helpers.neoil')))
-    if path.parent == ROOT / 'runtime/System' and path.stem in {'Environment', 'Console', 'Clonable', 'LocalDateTime', 'Disposable', 'EquatableTo', 'ComparableTo', 'ConvertibleInto', 'SystemClock', 'Closable'}:
-        return build(ROOT / 'runtime/raven' / path.name)
-    if path == ROOT / 'runtime/System/Storage/File.neoil':
-        return build(ROOT / 'runtime/raven/FileText.neoil')
-    if path == ROOT / 'runtime/System/Storage/Path.neoil':
-        return build(ROOT / 'runtime/raven/Path.neoil')
-    if path.parent == ROOT / 'runtime/System' and path.stem in {'Int16', 'Boolean', 'Double', 'UInt32', 'Int32', 'Single', 'Int64', 'UInt64', 'UInt16', 'SByte', 'Byte'}:
-        return build(ROOT / ('runtime/raven/generated/' + path.stem + '.methods.neoil')) + build(ROOT / ('runtime/raven/generated/' + path.stem + '.helpers.neoil'))
-    if path == ROOT / 'runtime/System/String.neoil':
-        return build(ROOT / 'runtime/raven/String.neoil')
-    if path == ROOT / 'runtime/System/Clock.neoil':
-        return build(ROOT / 'runtime/raven/Clock.neoil')
-    if path == ROOT / 'runtime/System/TypeInfo.neoil':
+        return (build(ROOT / 'runtime/legacy/raven/generated' / (path.stem + '.methods.neoil'))
+                + build(ROOT / 'runtime/legacy/raven/generated' / (path.stem + '.helpers.neoil')))
+    if path.parent == ROOT / 'runtime/legacy/bootstrap/System' and path.stem in {'Environment', 'Console', 'Clonable', 'LocalDateTime', 'Disposable', 'EquatableTo', 'ComparableTo', 'ConvertibleInto', 'SystemClock', 'Closable'}:
+        return build(ROOT / 'runtime/legacy/raven' / path.name)
+    if path == ROOT / 'runtime/legacy/bootstrap/System/Storage/File.neoil':
+        return build(ROOT / 'runtime/legacy/raven/FileText.neoil')
+    if path == ROOT / 'runtime/legacy/bootstrap/System/Storage/Path.neoil':
+        return build(ROOT / 'runtime/legacy/raven/Path.neoil')
+    if path.parent == ROOT / 'runtime/legacy/bootstrap/System' and path.stem in {'Int16', 'Boolean', 'Double', 'UInt32', 'Int32', 'Single', 'Int64', 'UInt64', 'UInt16', 'SByte', 'Byte'}:
+        return build(ROOT / ('runtime/legacy/raven/generated/' + path.stem + '.methods.neoil')) + build(ROOT / ('runtime/legacy/raven/generated/' + path.stem + '.helpers.neoil'))
+    if path == ROOT / 'runtime/legacy/bootstrap/System/String.neoil':
+        return build(ROOT / 'runtime/legacy/raven/String.neoil')
+    if path == ROOT / 'runtime/legacy/bootstrap/System/Clock.neoil':
+        return build(ROOT / 'runtime/legacy/raven/Clock.neoil')
+    if path == ROOT / 'runtime/legacy/bootstrap/System/TypeInfo.neoil':
         return ''  # TypeInfo is part of the closed MemberInfo authoring slice.
-    if path == ROOT / 'runtime/System/Type.neoil':
-        return build(ROOT / 'runtime/raven/RuntimeContext.neoil')
-    if path == ROOT / 'runtime/System/Date.neoil':
-        return build(ROOT / 'runtime/raven/Date.neoil')
-    if path == ROOT / 'runtime/System/Time.neoil':
-        return build(ROOT / 'runtime/raven/Time.neoil')
-    if path == ROOT / 'runtime/System/Collections/ArrayList.neoil':
-        return build(ROOT / 'runtime/raven/ArrayList.neoil')
-    if path == ROOT / 'runtime/System/Collections/Iterable.neoil':
-        return build(ROOT / 'runtime/raven/Iterable.neoil')
+    if path == ROOT / 'runtime/legacy/bootstrap/System/Type.neoil':
+        return build(ROOT / 'runtime/legacy/raven/RuntimeContext.neoil')
+    if path == ROOT / 'runtime/legacy/bootstrap/System/Date.neoil':
+        return build(ROOT / 'runtime/legacy/raven/Date.neoil')
+    if path == ROOT / 'runtime/legacy/bootstrap/System/Time.neoil':
+        return build(ROOT / 'runtime/legacy/raven/Time.neoil')
+    if path == ROOT / 'runtime/legacy/bootstrap/System/Collections/ArrayList.neoil':
+        return build(ROOT / 'runtime/legacy/raven/ArrayList.neoil')
+    if path == ROOT / 'runtime/legacy/bootstrap/System/Collections/Iterable.neoil':
+        return build(ROOT / 'runtime/legacy/raven/Iterable.neoil')
     text = path.read_text()
-    if path == ROOT / 'runtime/raven/generated/Descriptors.helpers.neoil':
+    if path == ROOT / 'runtime/legacy/raven/generated/Descriptors.helpers.neoil':
         # Archived CLI snapshots predate the native field-reflection payload.
         # Adapt this test-only profile's storage without rewriting its generated
         # artifacts or reintroducing the bridge into production library builds.
@@ -84,26 +84,26 @@ def build(path: Path) -> str:
             '.field private StoredIsGenericMethodDefinition Boolean\n'
             '.field private StoredContainsGenericParameters Boolean\n'
             '.field private Identity String', 1)
-    if path == ROOT / 'runtime/System/Collections/Iterator.neoil':
-        return build(ROOT / 'runtime/raven/Iterator.neoil')
+    if path == ROOT / 'runtime/legacy/bootstrap/System/Collections/Iterator.neoil':
+        return build(ROOT / 'runtime/legacy/raven/Iterator.neoil')
     if path.stem in COLLECTIONS | {'Disposable'}:
         text = adapt(text, path.stem)
     if path.stem in {'EquatableTo', 'ComparableTo', 'ConvertibleInto', 'Clonable', 'Closable'}:
         text = text.replace('instance readonly byref ', 'instance ').replace('instance byref ', 'instance ')
-    if path == ROOT / 'runtime/System/Reflection.neoil':
+    if path == ROOT / 'runtime/legacy/bootstrap/System/Reflection.neoil':
         # Raven owns descriptor bodies; legacy Neo retains its value-based profile.
-        return (build(ROOT / 'runtime/raven/ParameterInfo.neoil')
-                + build(ROOT / 'runtime/raven/Descriptors.neoil')
-                + build(ROOT / 'runtime/raven/ReflectionError.neoil')
-                + build(ROOT / 'runtime/raven/BindingFlags.neoil'))
-    if path == ROOT / 'runtime/System/Collections/List.neoil':
-        return build(ROOT / 'runtime/raven/CollectionContracts.neoil') + build(ROOT / 'runtime/raven/List.neoil')
-    if path == ROOT / 'runtime/System/Array.neoil':
-        return build(ROOT / 'runtime/raven/Array.neoil') + build(ROOT / 'runtime/raven/NativeMemory.neoil')
+        return (build(ROOT / 'runtime/legacy/raven/ParameterInfo.neoil')
+                + build(ROOT / 'runtime/legacy/raven/Descriptors.neoil')
+                + build(ROOT / 'runtime/legacy/raven/ReflectionError.neoil')
+                + build(ROOT / 'runtime/legacy/raven/BindingFlags.neoil'))
+    if path == ROOT / 'runtime/legacy/bootstrap/System/Collections/List.neoil':
+        return build(ROOT / 'runtime/legacy/raven/CollectionContracts.neoil') + build(ROOT / 'runtime/legacy/raven/List.neoil')
+    if path == ROOT / 'runtime/legacy/bootstrap/System/Array.neoil':
+        return build(ROOT / 'runtime/legacy/raven/Array.neoil') + build(ROOT / 'runtime/legacy/raven/NativeMemory.neoil')
     if path.stem == 'Function':
         # Array<T> owns ForEach in the Raven profile. There is no nominal callable declaration.
         return ''
-    if path.parent == ROOT / 'runtime/neoCLR/Runtime':
+    if path.parent == ROOT / 'runtime/legacy/bootstrap/neoCLR/Runtime':
         text = re.sub(r'System\.Type\b', 'System.Introspection.TypeInfo', text)
     lines = []
     for line in text.splitlines(keepends=True):
@@ -112,100 +112,100 @@ def build(path: Path) -> str:
     result = ''.join(lines)
     if path.name == 'System.neoil':
         result = result.replace('.module System\n', '.module System\n.assembly {"name":"System.Runtime","full_name":"System.Runtime","modules":["System"],"references":[]}\n', 1)
-        result += build(ROOT / 'runtime/raven/AssemblyInfo.neoil')
-        result += build(ROOT / 'runtime/raven/ModuleInfo.neoil')
-        result += build(ROOT / 'runtime/neoCLR/Runtime/AssemblyInfo.neoil')
-        result += build(ROOT / 'runtime/raven/Object.neoil')
-        result += build(ROOT / 'runtime/neoCLR/Runtime/EnumInspection.neoil')
-        result += build(ROOT / 'runtime/raven/HashCode.neoil')
-        result += build(ROOT / 'runtime/raven/GC.neoil')
-        result += build(ROOT / 'runtime/neoCLR/Runtime/GC.neoil')
-        result += build(ROOT / 'runtime/neoCLR/Runtime/ObjectTypeHandle.neoil')
-        result += build(ROOT / 'runtime/neoCLR/Runtime/ReflectionExecution.neoil')
-        result += build(ROOT / 'runtime/neoCLR/Runtime/ReflectionMembers.neoil')
-        result += build(ROOT / 'runtime/neoCLR/Runtime/ObjectIdentity.neoil')
-        result += build(ROOT / 'runtime/raven/SingleError.neoil')
-        result += build(ROOT / 'runtime/raven/Linq.neoil')
-        result += build(ROOT / 'runtime/raven/OptionalOperators.neoil')
-        result += build(ROOT / 'runtime/raven/OptionalNestedOperators.neoil')
-        result += build(ROOT / 'runtime/raven/ResultOperators.neoil')
-        result += build(ROOT / 'runtime/raven/StringComparison.neoil')
-        result += build(ROOT / 'runtime/raven/Comparers.neoil')
-        result += build(ROOT / 'runtime/raven/TimeOffset.neoil')
-        result += build(ROOT / 'runtime/raven/ZonedDateTime.neoil')
-        result += build(ROOT / 'runtime/raven/DateTime.neoil')
-        result += build(ROOT / 'runtime/raven/TimeZone.neoil')
-        result += build(ROOT / 'runtime/raven/TimeZoneError.neoil')
-        result += build(ROOT / 'runtime/raven/LocalTimeMapping.neoil')
-        result += build(ROOT / 'runtime/raven/Calendar.neoil')
-        result += build(ROOT / 'runtime/raven/Culture.neoil')
-        result += build(ROOT / 'runtime/neoCLR/Runtime/TimeZones.neoil')
-        result += build(ROOT / 'runtime/neoCLR/Runtime/SystemCultureName.neoil')
-        result += build(ROOT / 'runtime/raven/Language.neoil')
-        result += build(ROOT / 'runtime/raven/CultureProvider.neoil')
-        result += build(ROOT / 'runtime/raven/FixedCultureProvider.neoil')
-        result += build(ROOT / 'runtime/raven/SystemCultureProvider.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/AssemblyInfo.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/ModuleInfo.neoil')
+        result += build(ROOT / 'runtime/legacy/bootstrap/neoCLR/Runtime/AssemblyInfo.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/Object.neoil')
+        result += build(ROOT / 'runtime/legacy/bootstrap/neoCLR/Runtime/EnumInspection.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/HashCode.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/GC.neoil')
+        result += build(ROOT / 'runtime/legacy/bootstrap/neoCLR/Runtime/GC.neoil')
+        result += build(ROOT / 'runtime/legacy/bootstrap/neoCLR/Runtime/ObjectTypeHandle.neoil')
+        result += build(ROOT / 'runtime/legacy/bootstrap/neoCLR/Runtime/ReflectionExecution.neoil')
+        result += build(ROOT / 'runtime/legacy/bootstrap/neoCLR/Runtime/ReflectionMembers.neoil')
+        result += build(ROOT / 'runtime/legacy/bootstrap/neoCLR/Runtime/ObjectIdentity.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/SingleError.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/Linq.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/OptionalOperators.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/OptionalNestedOperators.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/ResultOperators.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/StringComparison.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/Comparers.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/TimeOffset.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/ZonedDateTime.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/DateTime.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/TimeZone.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/TimeZoneError.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/LocalTimeMapping.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/Calendar.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/Culture.neoil')
+        result += build(ROOT / 'runtime/legacy/bootstrap/neoCLR/Runtime/TimeZones.neoil')
+        result += build(ROOT / 'runtime/legacy/bootstrap/neoCLR/Runtime/SystemCultureName.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/Language.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/CultureProvider.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/FixedCultureProvider.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/SystemCultureProvider.neoil')
 
-        result += build(ROOT / 'runtime/raven/DateTimeFormat.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/DateTimeFormat.neoil')
 
-        result += build(ROOT / 'runtime/raven/Map.neoil')
-        result += build(ROOT / 'runtime/raven/Number.neoil')
-        result += build(ROOT / 'runtime/raven/NumberParseError.neoil')
-        result += build(ROOT / 'runtime/raven/BooleanParseError.neoil')
-        result += build(ROOT / 'runtime/raven/Encoder.neoil')
-        result += build(ROOT / 'runtime/raven/EncoderProgress.neoil')
-        result += build(ROOT / 'runtime/raven/EncoderState.neoil')
-        result += build(ROOT / 'runtime/raven/Encoding.neoil')
-        result += build(ROOT / 'runtime/raven/Decoder.neoil')
-        result += build(ROOT / 'runtime/raven/EncodingError.neoil')
-        result += build(ROOT / 'runtime/raven/Encodings.neoil')
-        result += build(ROOT / 'runtime/raven/Utf8.neoil')
-        result += build(ROOT / 'runtime/raven/StringBuilder.neoil')
-        result += build(ROOT / 'runtime/raven/EntryKind.neoil')
-        result += build(ROOT / 'runtime/raven/StorageLookupError.neoil')
-        result += build(ROOT / 'runtime/raven/StorageMetadata.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/Map.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/Number.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/NumberParseError.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/BooleanParseError.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/Encoder.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/EncoderProgress.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/EncoderState.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/Encoding.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/Decoder.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/EncodingError.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/Encodings.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/Utf8.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/StringBuilder.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/EntryKind.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/StorageLookupError.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/StorageMetadata.neoil')
         # Provider contracts require the Raven StorageItem/File/Directory hierarchy.
         # Keep them out of the legacy bootstrap manifest, which has static File helpers.
-        result += build(ROOT / 'runtime/raven/StorageItems.neoil')
-        result += build(ROOT / 'runtime/raven/StorageProvider.neoil')
-        result += build(ROOT / 'runtime/raven/FileSystem.neoil')
-        result += build(ROOT / 'runtime/raven/TextReadError.neoil')
-        result += build(ROOT / 'runtime/raven/TextReader.neoil')
-        result += build(ROOT / 'runtime/raven/TextWriter.neoil')
-        result += build(ROOT / 'runtime/raven/StreamWriter.neoil')
-        result += build(ROOT / 'runtime/neoCLR/Runtime/ConsoleStreams.neoil')
-        result += build(ROOT / 'runtime/raven/JsonError.neoil')
-        result += build(ROOT / 'runtime/raven/HttpJsonError.neoil')
-        result += build(ROOT / 'runtime/raven/JsonValue.neoil')
-        result += build(ROOT / 'runtime/raven/MemoryStream.neoil')
-        result += build(ROOT / 'runtime/raven/StreamReader.neoil')
-        result += build(ROOT / 'runtime/raven/SeekableStream.neoil')
-        result += build(ROOT / 'runtime/raven/FileInputStream.neoil')
-        result += build(ROOT / 'runtime/raven/FileOutputStream.neoil')
-        result += build(ROOT / 'runtime/neoCLR/Runtime/FileStreams.neoil')
-        result += build(ROOT / 'runtime/raven/DnsError.neoil')
-        result += build(ROOT / 'runtime/raven/Dns.neoil')
-        result += build(ROOT / 'runtime/neoCLR/Runtime/Dns.neoil')
-        result += build(ROOT / 'runtime/raven/UnionProtocol.neoil')
-        result += build(ROOT / 'runtime/raven/SocketError.neoil')
-        result += build(ROOT / 'runtime/raven/Socket.neoil')
-        result += build(ROOT / 'runtime/raven/UriError.neoil')
-        result += build(ROOT / 'runtime/raven/Uri.neoil')
-        result += build(ROOT / 'runtime/raven/IPAddressError.neoil')
-        result += build(ROOT / 'runtime/raven/IPAddress.neoil')
-        result += build(ROOT / 'runtime/raven/Cancellation.neoil')
-        result += build(ROOT / 'runtime/raven/HttpStatusCode.neoil')
-        result += build(ROOT / 'runtime/raven/HttpError.neoil')
-        result += build(ROOT / 'runtime/raven/HttpClient.neoil')
-        result += build(ROOT / 'runtime/neoCLR/Runtime/Sockets.neoil')
-        result += build(ROOT / 'runtime/raven/Workers.neoil')
-        result += build(ROOT / 'runtime/neoCLR/Runtime/Workers.neoil')
-        result += build(ROOT / 'runtime/raven/TaskState.neoil')
-        result += build(ROOT / 'runtime/raven/TaskOutcome.neoil')
-        result += build(ROOT / 'runtime/raven/Tasks.neoil')
-        result += build(ROOT / 'runtime/neoCLR/Runtime/Tasks.neoil')
-        result += build(ROOT / 'runtime/raven/InvalidUtf8Error.neoil')
-        result += build(ROOT / 'runtime/neoCLR/Runtime/Utf8.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/StorageItems.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/StorageProvider.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/FileSystem.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/TextReadError.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/TextReader.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/TextWriter.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/StreamWriter.neoil')
+        result += build(ROOT / 'runtime/legacy/bootstrap/neoCLR/Runtime/ConsoleStreams.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/JsonError.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/HttpJsonError.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/JsonValue.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/MemoryStream.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/StreamReader.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/SeekableStream.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/FileInputStream.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/FileOutputStream.neoil')
+        result += build(ROOT / 'runtime/legacy/bootstrap/neoCLR/Runtime/FileStreams.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/DnsError.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/Dns.neoil')
+        result += build(ROOT / 'runtime/legacy/bootstrap/neoCLR/Runtime/Dns.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/UnionProtocol.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/SocketError.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/Socket.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/UriError.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/Uri.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/IPAddressError.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/IPAddress.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/Cancellation.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/HttpStatusCode.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/HttpError.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/HttpClient.neoil')
+        result += build(ROOT / 'runtime/legacy/bootstrap/neoCLR/Runtime/Sockets.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/Workers.neoil')
+        result += build(ROOT / 'runtime/legacy/bootstrap/neoCLR/Runtime/Workers.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/TaskState.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/TaskOutcome.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/Tasks.neoil')
+        result += build(ROOT / 'runtime/legacy/bootstrap/neoCLR/Runtime/Tasks.neoil')
+        result += build(ROOT / 'runtime/legacy/raven/InvalidUtf8Error.neoil')
+        result += build(ROOT / 'runtime/legacy/bootstrap/neoCLR/Runtime/Utf8.neoil')
     return result
 
 
@@ -214,6 +214,6 @@ if __name__ == '__main__':
     parser.add_argument('output', type=Path)
     args = parser.parse_args()
     # Refuse to overwrite a library that may already be in use by a saved demo.
-    source = build(ROOT / 'runtime/System.neoil')
+    source = build(ROOT / 'runtime/legacy/bootstrap/System.neoil')
     with args.output.open('x') as stream:
         stream.write('; Generated Raven collection profile; do not edit.\n' + source)

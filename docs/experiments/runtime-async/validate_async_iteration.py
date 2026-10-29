@@ -91,9 +91,9 @@ def main():
                 assembly, obj, app = [out / (label + suffix) for suffix in ('.dll', '.o', '')]
                 source = command('stack-reuse-source')
                 source[1] = str(compiler)
-                source[source.index('-o') + 1:] = [str(assembly), str(HERE / filename), str(ROOT / 'runtime/raven/compiler-services/RuntimeAwait.rvn')]
+                source[source.index('-o') + 1:] = [str(assembly), str(HERE / filename), str(ROOT / 'runtime/compiler-services/RuntimeAwait.rvn')]
                 if args.generator_language:
-                    source.append(str(ROOT / 'runtime/raven/compiler-services/RuntimeGenerator.rvn'))
+                    source.append(str(ROOT / 'runtime/compiler-services/RuntimeGenerator.rvn'))
                 if lowering == 'state-machine':
                     i = source.index('--runtime-async-poc')
                     del source[i:i + 2]

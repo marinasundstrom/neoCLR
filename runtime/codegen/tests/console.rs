@@ -6287,7 +6287,7 @@ fn check_string_join_parts_preserves_bytes_snapshots_and_faults(native_gc: bool)
     let dir = Temp::new();
     let seed = neoclr::assemble(concat!(
         ".module System\n.references ()\n",
-        include_str!("../../../runtime/neoCLR/Runtime/StringJoinParts.neoil")
+        include_str!("../../../runtime/legacy/bootstrap/neoCLR/Runtime/StringJoinParts.neoil")
     ))
     .unwrap();
     let source = include_str!("../../../docs/experiments/aot-console/join-parts.neoil");
@@ -9153,8 +9153,8 @@ fn string_replace_ordinal_native_gc_matches_interpreter() {
 fn check_string_replace_ordinal(gc: bool) {
     let seed = neoclr::assemble(&format!(
         ".module System\n.references ()\n{}\n{}",
-        include_str!("../../../runtime/neoCLR/Runtime/StringReplaceOrdinal.neoil"),
-        include_str!("../../../runtime/neoCLR/Runtime/StringCompareOrdinal.neoil")
+        include_str!("../../../runtime/legacy/bootstrap/neoCLR/Runtime/StringReplaceOrdinal.neoil"),
+        include_str!("../../../runtime/legacy/bootstrap/neoCLR/Runtime/StringCompareOrdinal.neoil")
     ))
     .unwrap();
     let cases = [
@@ -11985,8 +11985,8 @@ int main(int argc,char **argv) {
 fn rooted_native_preferences_execute_and_reclaim() {
     let seed = neoclr::assemble(&format!(
         ".module System\n.references ()\n{}\n{}",
-        include_str!("../../../runtime/neoCLR/Runtime/SystemCultureName.neoil"),
-        include_str!("../../../runtime/neoCLR/Runtime/TimeZones.neoil")
+        include_str!("../../../runtime/legacy/bootstrap/neoCLR/Runtime/SystemCultureName.neoil"),
+        include_str!("../../../runtime/legacy/bootstrap/neoCLR/Runtime/TimeZones.neoil")
     ))
     .unwrap();
     for gc in [false, true] {
@@ -12003,8 +12003,8 @@ fn rooted_native_preferences_execute_and_reclaim() {
         }
         let source = format!(
             "{source}\n{}\n{}",
-            include_str!("../../../runtime/neoCLR/Runtime/SystemCultureName.neoil"),
-            include_str!("../../../runtime/neoCLR/Runtime/TimeZones.neoil")
+            include_str!("../../../runtime/legacy/bootstrap/neoCLR/Runtime/SystemCultureName.neoil"),
+            include_str!("../../../runtime/legacy/bootstrap/neoCLR/Runtime/TimeZones.neoil")
         );
         let result = compile_source(&dir, &seed, &source, &flags, false);
         assert!(

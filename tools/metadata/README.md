@@ -191,7 +191,7 @@ Raven's `codex/metadata-consumer`. See the [public API contract](../../api-docs/
 
 ```sh
 # Assemble the current source manifest (including checked-in generated Raven IL).
-target/debug/neoclr assemble runtime/System.neoil target/System.neo.json
+target/debug/neoclr assemble runtime/legacy/bootstrap/System.neoil target/System.neo.json
 dotnet run --project tools/metadata/NeoCLR.Metadata.Translate -- target/System.neo.json target/System.neox
 target/debug/neoclr verify target/System.neox
 target/debug/neoclr run examples/hello.neoil --system target/System.neox
@@ -201,7 +201,7 @@ The translator now emits required standalone schema 3 (32 MiB JSON / 8 MiB binar
 full UInt64 operands); older schema-2-only runtimes reject it. The C# WriteBinary API
 remains available for schema-2 compatibility. The translator creates a new output file and refuses overwrites. It uses the independent
 NativeModuleContainer API; runtime validation is a separate required step. These are
-standalone native containers, not PE references. The checked-in `runtime/raven/generated/*.json`
+standalone native containers, not PE references. The checked-in `runtime/legacy/raven/generated/*.json`
 files are bootstrap manifests, not format-5 executable modules, and are rejected.
 
 Run the C# full-library and generic dependency consumer check from the repository root

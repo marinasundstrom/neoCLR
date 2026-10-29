@@ -56,10 +56,10 @@ def visit(path, active=(), context=()):
     if len(stack) != initial_depth:
         raise ValueError((path, 'Unclosed declaration block'))
 
-visit(ROOT / 'runtime/System.neoil')
+visit(ROOT / 'runtime/legacy/bootstrap/System.neoil')
 result = {
     'purpose': 'Source declaration checklist; visibility and per-API Raven coverage need review. No entry asserts successful import or execution.',
-    'manifest': 'runtime/System.neoil',
+    'manifest': 'runtime/legacy/bootstrap/System.neoil',
     'sourceFiles': files,
     'counts': dict(sorted(Counter(e['declaration'].split()[0][1:] for e in entries).items())),
     'declarations': entries,

@@ -1,0 +1,24 @@
+; LEGACY CLASS-LIBRARY MIRROR — obsolete for library development.
+; Authoritative source: runtime/raven/src; native projects: runtime/raven/projects.
+; Retained for bootstrap/tests pending archival; see runtime/README.md.
+; Preserve legacy File helper bodies and call-site identity. The Raven profile
+; substitutes FileText's implementation and uses File as an interface.
+.type System.Storage.File
+.include "../../../raven/generated/FileText.methods.neoil"
+.end
+.include "../../../raven/generated/FileText.helpers.neoil"
+.type System.Storage.FileText
+.method static ReadAllText(String path,Int32 maxBytes) -> System.Result<String,System.Storage.FileReadError>
+ldarg path
+ldarg maxBytes
+call System.Storage.File::ReadAllText(String,Int32)
+ret
+.end
+.method static WriteAllText(String path,String text,Int32 maxBytes) -> System.Result<Void,System.Storage.FileWriteError>
+ldarg path
+ldarg text
+ldarg maxBytes
+call System.Storage.File::WriteAllText(String,String,Int32)
+ret
+.end
+.end

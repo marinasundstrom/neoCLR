@@ -4,7 +4,7 @@ The planned [System.Runtime assembly](system-runtime-assembly.md) will own the
 minimum managed foundation now being authored through the System project.
 This is a project/assembly boundary, not a move of every type into one namespace.
 
-The [Raven test framework](../runtime/raven/tests/README.md) provides module-level
+The [Raven test framework](../runtime/legacy/raven/tests/README.md) provides module-level
 runtime-library tests with a stable execution contract and a planned TestAttribute
 introspection adapter. Native and interpreted execution share the same suites.
 
@@ -32,7 +32,7 @@ In particular, the current whole-file text helper is a bounded demonstration, no
 foundation of a permanent Stream API. General I/O abstractions should follow concrete
 needs and the primitives required to implement them in platform code.
 
-[System.neoil](../runtime/System.neoil) provides platform-written methods and explicit native declarations:
+[System.neoil](../runtime/legacy/bootstrap/System.neoil) provides platform-written methods and explicit native declarations:
 
 - [Eager ArrayList filtering and searches](arraylist-filtering.md) use Func<T,Boolean>
   and ordinary iterator/Optional IL. Find returns Optional<T> without invalid defaults.
@@ -84,7 +84,7 @@ and proposed operation-specific error types. All six reviewed Result APIs now us
 
 ## Build and use
 
-`runtime/System.neoil` is an ordered `.include` manifest. Class and feature sources
+`runtime/legacy/bootstrap/System.neoil` is an ordered `.include` manifest. Class and feature sources
 live under namespace folders: for example, `System/Console.neoil`,
 `System/Storage/File.neoil`, and `System/Runtime/CompilerServices/UnionAttribute.neoil`.
 Generic carriers and their companions share `System/Optional.neoil` and
@@ -108,7 +108,7 @@ The string-only assembler remains independent of filesystem access. The fully ex
 bundled source is available through `neoclr::library::system_source()`.
 
 ```sh
-cargo run -- assemble runtime/System.neoil System.neo.json
+cargo run -- assemble runtime/legacy/bootstrap/System.neoil System.neo.json
 cargo run -- check System.neo.json
 cargo run -- run examples/hello.neoil System.neo.json
 ```
@@ -225,7 +225,7 @@ but becomes more expensive to maintain as algorithms and APIs grow.
 
 The current [System project and Math bootstrap](raven-system-library.md) resumes
 ordinary library authoring after Preview 7. Foundational Raven sources share
-`runtime/raven/System.Runtime.rvnproj`; Math is its first source, not its own assembly.
+`runtime/legacy/raven/System.Runtime.rvnproj`; Math is its first source, not its own assembly.
 The stages and limitations below remain the gates for expanding that migration.
 
 ### First migration groundwork

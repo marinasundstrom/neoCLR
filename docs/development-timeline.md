@@ -1,5 +1,17 @@
 # Development conversation record
 
+## 2026-10-29 — Contain legacy runtime sources
+
+- **Author:** Requested cleanup of runtime folders left from before Raven became
+  the implementation language, clarified “At least legacy should be contained”,
+  and requested a commit when done.
+- **Assistant action:** Found active embedded-bootstrap and test consumers; moved
+  the old System/neoCLR sources and historical Raven bridge material under
+  `runtime/legacy`, separating active templates into `runtime/compiler-services`.
+  Updated runnable consumers; retained historical receipts unchanged.
+- **Scope:** This contains legacy dependencies without retiring the embedded
+  bootstrap or neoIL support. See [source ownership](../runtime/README.md).
+
 ## 2026-10-28 — Optimization objectives and GUI-neutral diagnostics
 
 - **Author:** Directed adopting root-publication overhead, concurrent-store checks

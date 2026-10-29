@@ -63,7 +63,7 @@ fn library() -> &'static crate::Module {
     LIBRARY.get_or_init(|| {
         let output = std::process::Command::new("python3")
             .current_dir(env!("CARGO_MANIFEST_DIR"))
-            .args(["-c", "import runpy; m=runpy.run_path('docs/experiments/raven-target/collection_library.py'); print(m['build'](m['ROOT'] / 'runtime/System.neoil'))"])
+            .args(["-c", "import runpy; m=runpy.run_path('docs/experiments/raven-target/collection_library.py'); print(m['build'](m['ROOT'] / 'runtime/legacy/bootstrap/System.neoil'))"])
             .output().unwrap();
         assert!(output.status.success());
         let source = String::from_utf8(output.stdout).unwrap() + "\n.function neoCLR.Runtime.TestSocketReceive(arrayref<Byte> destination,Int32 offset,Int32 count,fn<Void> callback) -> Void\n.methodimpl InternalCall\n.end\n";

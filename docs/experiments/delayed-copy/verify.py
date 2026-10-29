@@ -49,7 +49,7 @@ def main():
         generated = fragments((root / 'imported/Implementation.neoil').read_text(), 'Workers', 'System.Concurrency.Thread')
         system = (bundle / 'lib/System.neoil').read_text()
         for name, replacement in generated.items():
-            original = (ROOT / 'runtime/raven/generated' / name).read_text()
+            original = (ROOT / 'runtime/legacy/raven/generated' / name).read_text()
             if system.count(original) != 1:
                 raise AssertionError('Expected matching development worker implementation: ' + name)
             system = system.replace(original, replacement)

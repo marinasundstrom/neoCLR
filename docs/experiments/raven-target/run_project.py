@@ -42,7 +42,7 @@ try:
             parser.error('A published bridge requires --system for the collection target profile.')
         else:
             from collection_library import build, ROOT
-            system.write_text(build(ROOT / 'runtime/System.neoil'))
+            system.write_text(build(ROOT / 'runtime/legacy/bootstrap/System.neoil'))
         system_arguments = ['--system', str(system)]
     elif profile != 'bundled-system':
         raise SystemExit('Unsupported imported library profile: ' + str(profile))

@@ -2,7 +2,7 @@
 use neoclr::{
     Limits, LoadedProgram, RuntimeService, Value, assemble, assembler::parse_function_ref,
 };
-const SERVICES: &str = include_str!("../runtime/neoCLR/Runtime/Tls.neoil");
+const SERVICES: &str = include_str!("../runtime/legacy/bootstrap/neoCLR/Runtime/Tls.neoil");
 #[test]
 fn guest_tls_configuration_reports_errors_and_capabilities() {
     let module = assemble(&format!(".module TlsTests\n{SERVICES}\n.function Run() -> Int32\n.local arrayref<Byte> owner\nldc.i4 0\nnewarr Byte\nstloc owner\nldloc owner\nldc.i4 0\nnewarr Byte\nldc.i4 0\nnewarr Byte\ncall neoCLR.Runtime.TlsCreateClient(arrayref<Byte>,arrayref<Byte>,arrayref<Byte>)\nret\n.end")).unwrap();

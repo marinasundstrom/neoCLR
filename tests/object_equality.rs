@@ -6,7 +6,7 @@ fn library() -> &'static Module {
     LIBRARY.get_or_init(|| {
         let output = Command::new("python3")
             .current_dir(env!("CARGO_MANIFEST_DIR"))
-            .args(["-c", "import runpy; m=runpy.run_path('docs/experiments/raven-target/collection_library.py'); print(m['build'](m['ROOT'] / 'runtime/System.neoil'))"])
+            .args(["-c", "import runpy; m=runpy.run_path('docs/experiments/raven-target/collection_library.py'); print(m['build'](m['ROOT'] / 'runtime/legacy/bootstrap/System.neoil'))"])
             .output().unwrap();
         assert!(output.status.success());
         neoclr::assemble(std::str::from_utf8(&output.stdout).unwrap()).unwrap()

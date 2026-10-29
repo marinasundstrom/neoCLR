@@ -31,9 +31,9 @@ ret
 
 // The text assembler does not expand file includes; embed the generated contracts.
 const COLLECTION_CONTRACTS: &str = concat!(
-    include_str!("../runtime/raven/generated/Collection.methods.neoil"),
-    include_str!("../runtime/raven/generated/Sequence.methods.neoil"),
-    include_str!("../runtime/raven/generated/MutableSequence.methods.neoil")
+    include_str!("../runtime/legacy/raven/generated/Collection.methods.neoil"),
+    include_str!("../runtime/legacy/raven/generated/Sequence.methods.neoil"),
+    include_str!("../runtime/legacy/raven/generated/MutableSequence.methods.neoil")
 );
 
 // Pair the generated array members and their scalar adapters with this test's
@@ -41,8 +41,8 @@ const COLLECTION_CONTRACTS: &str = concat!(
 fn array_source() -> String {
     format!(
         "{}{}",
-        include_str!("../runtime/raven/generated/Array.methods.neoil"),
-        include_str!("../runtime/raven/generated/Array.helpers.neoil")
+        include_str!("../runtime/legacy/raven/generated/Array.methods.neoil"),
+        include_str!("../runtime/legacy/raven/generated/Array.helpers.neoil")
             .split("\n.type ")
             .next()
             .unwrap()
@@ -137,7 +137,7 @@ fn reflection_library() -> neoclr::Module {
     // Preserve historical library contracts separately while using ordinary reference
     // iterator declarations for the managed-array profile under test.
     let source = neoclr::library::system_source()
-        .replace(include_str!("../runtime/System/Array.neoil"), "")
+        .replace(include_str!("../runtime/legacy/bootstrap/System/Array.neoil"), "")
         .replace("System.Collections.Iterable", "Historical.Iterable")
         .replace("System.Collections.Iterator", "Historical.Iterator");
     assemble(&format!(
@@ -282,7 +282,7 @@ fn array_metadata_cannot_promise_unimplemented_growth() {
     let source = format!(
         ".module System\n{ITERATION}\n{}\n{}\n{}",
         COLLECTION_CONTRACTS,
-        include_str!("../runtime/raven/generated/List.methods.neoil"),
+        include_str!("../runtime/legacy/raven/generated/List.methods.neoil"),
         array_source().replace(
             ".implements System.Collections.MutableSequence<T0>",
             ".implements System.Collections.List<T0>"

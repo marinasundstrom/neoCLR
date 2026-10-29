@@ -30,7 +30,7 @@ lib = a.libraries.resolve()
 sha = lambda path: hashlib.sha256(Path(path).read_bytes()).hexdigest()
 report = dict(passed=False, commands=[], cases=[], inputs={})
 for path in [Path(__file__), *HERE.glob('*.rvn'), a.compiler, a.runtime, a.jit_compiler, a.jit_host,
-             ROOT / 'runtime/raven/compiler-services/RuntimeAwait.rvn',
+             ROOT / 'runtime/compiler-services/RuntimeAwait.rvn',
              *(a.compiler.parent / name for name in ('Raven.CodeAnalysis.dll', 'Raven.CodeAnalysis.NeoClr.dll', 'NeoCLR.Metadata.Experimental.dll')),
              *lib.glob('*.dll'), lib / 'System.runtime.neox', lib / 'bundle.json',
              *(ROOT / 'runtime/System.Data/src/System.Data/System/Data/Sql').glob('*.rvn'),
@@ -172,7 +172,7 @@ try:
             shutil.copyfile(project_dir / 'bin/neoclr' / (case + '.dll'), out / (case + '.dll'))
         else:
             args = base + ['-o', out / (case + '.dll'), HERE / (case + '.rvn')]
-            args += ['--runtime-async-poc', 'RuntimeAwaitProvider.Bridge', ROOT / 'runtime/raven/compiler-services/RuntimeAwait.rvn']
+            args += ['--runtime-async-poc', 'RuntimeAwaitProvider.Bridge', ROOT / 'runtime/compiler-services/RuntimeAwait.rvn']
             run(case + '-compile', args)
     disassembly = out / 'Main.neoil'
     run('metadata', [a.runtime.resolve(), 'disassemble', out / 'Main.dll', disassembly])

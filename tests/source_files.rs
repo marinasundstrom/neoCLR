@@ -92,7 +92,7 @@ fn malformed_missing_and_cyclic_includes_fail_with_source_context() {
 
 #[test]
 fn system_manifest_matches_bundled_source_and_compiled_metadata() {
-    let text = read_source("runtime/System.neoil").unwrap();
+    let text = read_source("runtime/legacy/bootstrap/System.neoil").unwrap();
     assert_eq!(text, neoclr::library::system_source());
     let explicit = assemble(&text).unwrap();
     assert_eq!(
@@ -106,7 +106,7 @@ fn cli_assembles_manifest_to_a_standalone_artifact() {
     let fixture = Fixture::new();
     let artifact = fixture.0.join("System.neo.json");
     let output = std::process::Command::new(env!("CARGO_BIN_EXE_neoclr"))
-        .args(["assemble", "runtime/System.neoil"])
+        .args(["assemble", "runtime/legacy/bootstrap/System.neoil"])
         .arg(&artifact)
         .output()
         .unwrap();

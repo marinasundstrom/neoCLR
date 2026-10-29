@@ -34,7 +34,7 @@ rows = []
 # Both generated method bodies and adapters can call runtime services.
 caller_index = {}
 for candidate in dict.fromkeys([*source['sourceFiles'],
-        *[str(p.relative_to(ROOT)) for p in (ROOT / 'runtime/raven/generated').glob('*.neoil')]]):
+        *[str(p.relative_to(ROOT)) for p in (ROOT / 'runtime/legacy/raven/generated').glob('*.neoil')]]):
     for line, text in enumerate((ROOT / candidate).read_text().splitlines(), 1):
         match = re.search(r'\bcall (neoCLR\.Runtime\.[^(]+)\(', text)
         if match:
@@ -53,130 +53,130 @@ for file in source['sourceFiles']:
                 raise ValueError('Service without a reviewed library caller: ' + name)
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'implementation-service', 'callers': callers})
         continue
-    if file.startswith(('runtime/raven/generated/Object.', 'runtime/raven/generated/UnionAttribute.')):
+    if file.startswith(('runtime/legacy/raven/generated/Object.', 'runtime/legacy/raven/generated/UnionAttribute.')):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-intrinsic-marker',
                      'tests': ['docs/experiments/raven-target/verify_marker_library.py', 'tests/raven_reflection.rs'],
                      'note': 'Empty Raven root/attribute declarations; checked empty constructors project to the existing runtime marker ABI. Compiler-facing Object members and attribute recognition remain metadata protocol.'})
         continue
-    if file == 'runtime/raven/UnicodeScalar.neoil' or file.startswith('runtime/raven/generated/UnicodeScalar.'):
+    if file == 'runtime/legacy/raven/UnicodeScalar.neoil' or file.startswith('runtime/legacy/raven/generated/UnicodeScalar.'):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-unicode-scalar',
                      'samples': ['library-grapheme-strings.rvn'], 'tests': ['tests/grapheme_chars.rs'],
                      'note': 'Explicit Unicode scalar access complements grapheme-based Char; it is not an encoding-specific String type.'})
         continue
-    if file.startswith('runtime/raven/generated/BindingFlags.'):
+    if file.startswith('runtime/legacy/raven/generated/BindingFlags.'):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-enum-declaration',
                      'samples': ['library-flags.rvn', 'library-reflection.rvn'],
                      'tests': ['tests/enums.rs', 'docs/experiments/raven-target/verify_flags_library.py'],
                      'note': 'A normal Raven enum owns the named Int32 values and Flags attribute. Checked compiler lowering supplies intrinsic enum operations using the existing nominal runtime ABI, preserving unknown bits.'})
         continue
-    if file.startswith('runtime/raven/generated/Fault.'):
+    if file.startswith('runtime/legacy/raven/generated/Fault.'):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-terminal-namespace-function',
                      'tests': ['tests/system_fault.rs', 'docs/experiments/raven-target/verify_fault.py', 'docs/experiments/raven-target/verify_fault_library.py'],
                      'note': 'Computed String diagnostic; terminates guest execution, not the embedding host. No compiler non-return analysis.'})
         continue
-    if file == 'runtime/System/Array.neoil':
+    if file == 'runtime/legacy/bootstrap/System/Array.neoil':
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'replaced-in-raven-profile',
-                     'replacementFiles': ['runtime/raven/Array.neoil', 'runtime/raven/NativeMemory.neoil'],
+                     'replacementFiles': ['runtime/legacy/raven/Array.neoil', 'runtime/legacy/raven/NativeMemory.neoil'],
                      'samples': ['library-managed-array-metadata.rvn', 'library-native-buffer.rvn'],
                      'note': 'The Raven profile uses source-authored Array members, callback loop and private iterator. Checked intrinsic storage and iteration-signature projection preserve identity and filtering; legacy Neo keeps its native descriptor API. NativeMemory is separately Raven-authored.'})
         continue
-    if file == 'runtime/System/Collections/ArrayList.neoil':
+    if file == 'runtime/legacy/bootstrap/System/Collections/ArrayList.neoil':
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-class-bootstrap',
-                     'replacementFiles': ['runtime/raven/ArrayList.neoil', 'runtime/System.Runtime/src/System.Runtime/System/Collections/ArrayList.rvn'],
+                     'replacementFiles': ['runtime/legacy/raven/ArrayList.neoil', 'runtime/System.Runtime/src/System.Runtime/System/Collections/ArrayList.rvn'],
                      'samples': ['library-list-filters.rvn', 'library-delegates.rvn', 'library-maps.rvn'],
                      'note': 'The complete class and private iterator are Raven-authored. Direct checked array storage replaces the legacy state wrapper; searches preserve captured buffer/extent and Option outcomes. Historical Neo profile unchanged.'})
         continue
-    if file in ('runtime/System/Time.neoil', 'runtime/System/Date.neoil'):
+    if file in ('runtime/legacy/bootstrap/System/Time.neoil', 'runtime/legacy/bootstrap/System/Date.neoil'):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-value-bootstrap',
-                     'replacementFiles': ['runtime/raven/' + Path(file).name, 'runtime/System.Runtime/src/System.Runtime/System/' + Path(file).stem + '.rvn'],
+                     'replacementFiles': ['runtime/legacy/raven/' + Path(file).name, 'runtime/System.Runtime/src/System.Runtime/System/' + Path(file).stem + '.rvn'],
                      'samples': ['library-calendar.rvn', 'library-clock.rvn'],
                      'tests': ['tests/raven_calendar.rs'],
                      'note': 'Existing factories, calendar/tick boundaries, comparison and readonly access preserved. Historical Neo profile unchanged.'})
         continue
-    if file == 'runtime/System/Collections/List.neoil':
+    if file == 'runtime/legacy/bootstrap/System/Collections/List.neoil':
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'replaced-in-raven-profile',
-                     'replacementFiles': ['runtime/raven/CollectionContracts.neoil', 'runtime/raven/List.neoil'],
+                     'replacementFiles': ['runtime/legacy/raven/CollectionContracts.neoil', 'runtime/legacy/raven/List.neoil'],
                      'samples': ['library-collection-capabilities.rvn'],
                      'note': 'Count, read indexing and replacement are inherited; List retains Add. All contracts remain invariant.'})
         continue
-    if file.startswith('runtime/raven/generated/') and Path(file).name.split('.')[0] in (
+    if file.startswith('runtime/legacy/raven/generated/') and Path(file).name.split('.')[0] in (
             'Boolean', 'SByte', 'Byte', 'Int16', 'UInt16', 'UInt32', 'Int64', 'UInt64', 'Single', 'Double', 'IntPtr', 'UIntPtr'):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-primitive-struct',
                      'samples': ['library-primitives.rvn', 'library-booleans.rvn'],
                      'tests': ['tests/common_interfaces.rs', 'docs/experiments/raven-target/verify_primitive_library.py'],
                      'note': 'Matched private backing storage becomes intrinsic loads; no nested runtime field or new primitive constructor.'})
         continue
-    if file.startswith(('runtime/raven/generated/Value.', 'runtime/raven/generated/RuntimeTypeHandle.')):
+    if file.startswith(('runtime/legacy/raven/generated/Value.', 'runtime/legacy/raven/generated/RuntimeTypeHandle.')):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-memberless-declaration',
                      'tests': ['tests/erased_inputs.rs', 'tests/value_storage.rs', 'tests/raven_reflection.rs',
                                'docs/experiments/raven-target/verify_declaration_library.py'],
                      'note': 'Source declarations only; erased values and opaque type handles retain intrinsic runtime representations.'})
         continue
-    if any(file.startswith('runtime/raven/generated/' + name + '.') for name in
+    if any(file.startswith('runtime/legacy/raven/generated/' + name + '.') for name in
            ('FileReadError', 'FileWriteError', 'ConsoleReadError', 'Utf8SliceError', 'Int32ParseError', 'IntegerDivisionError')):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-error-carrier',
                      'samples': ['library-errors.rvn', 'library-string-slices.rvn'],
                      'tests': ['tests/io_errors.rs', 'tests/strings.rs', 'docs/experiments/raven-target/verify_error_carrier_library.py'],
                      'note': 'Raven owns nested empty cases, case constructors/predicates/extractors and formatting. Checked constructor lowering preserves one erased payload and the existing value receiver ABI.'})
         continue
-    if any(file.startswith('runtime/raven/generated/' + name + '.') for name in
+    if any(file.startswith('runtime/legacy/raven/generated/' + name + '.') for name in
            ('InvalidRangeError', 'InvalidDateError', 'InvalidTimeError', 'OverflowError', 'EnvironmentError', 'Void')):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-empty-value',
                      'samples': ['library-errors.rvn', 'library-void.rvn'],
                      'tests': ['tests/errors.rs', 'tests/arithmetic_errors.rs', 'docs/experiments/raven-target/verify_empty_library.py'],
                      'note': 'Empty values preserve payload-free defaults, existing constructors/formatting and nominal Void. No new constructor on EnvironmentError or Void.'})
         continue
-    if file.startswith(('runtime/raven/generated/Optional.', 'runtime/raven/generated/Result.')):
+    if file.startswith(('runtime/legacy/raven/generated/Optional.', 'runtime/legacy/raven/generated/Result.')):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-generic-union',
                      'samples': ['library-unions.rvn', 'library-generic-unions.rvn', 'library-result-void-propagation.rvn'],
                      'tests': ['tests/propagation.rs', 'tests/union_out.rs', 'docs/experiments/raven-target/verify_generic_union_library.py'],
                      'note': 'Raven owns cases, one erased carrier payload, factories and extraction. Checked constructor/readonly receiver projections and literal Boolean returns retain true-only output assignment. Bootstrap-only LeaveUnassigned is restricted to immediate false returns.'})
         continue
-    if file.startswith('runtime/raven/generated/Propagatable.'):
+    if file.startswith('runtime/legacy/raven/generated/Propagatable.'):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-conditional-output-contract',
                      'tests': ['tests/propagation.rs', 'docs/experiments/raven-target/verify_propagation_library.py'],
                      'note': 'Exact generic positions and out metadata preserve readonly receivers and true-only output initialization.'})
         continue
-    if file.startswith('runtime/raven/generated/String.'):
+    if file.startswith('runtime/legacy/raven/generated/String.'):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-opaque-bootstrap',
                      'samples': ['library-strings.rvn', 'library-string-slices.rvn', 'library-errors.rvn'],
                      'tests': ['tests/strings.rs', 'tests/errors.rs', 'docs/experiments/raven-target/verify_opaque_library.py'],
                      'note': 'Checked intrinsic String storage retains native ownership and its receiver ABI. Compiler operators remain intrinsic; opaque allocation and storage mutation are rejected.'})
         continue
-    if file.startswith('runtime/raven/generated/Char.'):
+    if file.startswith('runtime/legacy/raven/generated/Char.'):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-char-struct',
                      'tests': ['tests/character_classification.rs', 'docs/experiments/raven-target/verify_scalar_library.py'],
                      'note': 'System/Char.rvn owns comparison and all sixteen predicates; UTF-16 units and native Unicode category behavior are unchanged.'})
         continue
-    if file.startswith(('runtime/raven/generated/Instant.', 'runtime/raven/generated/Duration.')):
+    if file.startswith(('runtime/legacy/raven/generated/Instant.', 'runtime/legacy/raven/generated/Duration.')):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-time-values',
                      'samples': ['library-instants.rvn'], 'tests': ['tests/instant_clock.rs'],
                      'note': 'Signed 100 ns tick values; Instant uses Unix epoch, Duration has no epoch. System-zone conversion is a bounded demo API.'})
         continue
-    if file.startswith('runtime/raven/generated/Int32.'):
+    if file.startswith('runtime/legacy/raven/generated/Int32.'):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-scalar-bootstrap',
                      'samples': ['library-primitives.rvn', 'library-division.rvn'],
                      'tests': ['tests/character_classification.rs', 'docs/experiments/raven-target/verify_scalar_library.py'],
                      'note': 'Raven owns Parse, Divide, Equals, CompareTo and ToString. Bootstrap intrinsics decode native parse payloads; the scalar formatting receiver is preserved.'})
         continue
-    if file.startswith('runtime/raven/generated/FileText.'):
+    if file.startswith('runtime/legacy/raven/generated/FileText.'):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-file-write-bootstrap',
                      'tests': ['tests/file_output.rs', 'tests/io_errors.rs'],
                      'note': 'Raven constructs existing read and write Results from native payload/status values. Unknown statuses still fault. Development native helpers use FileText; legacy raw File aliases remain.'})
         continue
-    if file.startswith('runtime/raven/generated/Path.'):
+    if file.startswith('runtime/legacy/raven/generated/Path.'):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-path-bootstrap',
                      'tests': ['tests/path.rs'],
                      'note': 'Raven wrappers preserve the existing lexical host services and parameter names.'})
         continue
-    if file.startswith('runtime/raven/generated/Math.'):
+    if file.startswith('runtime/legacy/raven/generated/Math.'):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-math-bootstrap',
                      'samples': ['library-math.rvn', 'library-clamp.rvn'],
                      'tests': ['docs/experiments/raven-target/verify_math_library.py', 'tests/math_helpers.rs', 'tests/math_typed.rs'],
                      'note': 'All twenty Math functions are Raven-authored; Double operations retain native services behind checked bootstrap-only bindings. Source authority is runtime/System.Runtime/src/System.Runtime/System/Math/Functions.rvn.'})
         continue
     slice_name = Path(file).name.split('.')[0]
-    if file.startswith('runtime/raven/generated/') and slice_name in SOURCES:
+    if file.startswith('runtime/legacy/raven/generated/') and slice_name in SOURCES:
         origin = SOURCES[slice_name]
         assert (ROOT / origin).is_file()
         rows.append({'file': file, 'declarations': len(entries),
@@ -204,7 +204,7 @@ result['targetProfileAdditions'] = [{
     'tests': ['tests/tasks.rs', 'docs/experiments/task-contract/verify_tasks.py', 'docs/experiments/task-contract/verify_async.py'],
     'note': 'Generic Task/TCS and generated async on an explicit single-invocation queue. No shared-object thread safety or runtime suspension claim. See docs/task-contracts.md.'
 }, {
-    'file': 'runtime/raven/Clock.neoil',
+    'file': 'runtime/legacy/raven/Clock.neoil',
     'disposition': 'raven-authored-interface-contract',
     'samples': ['library-clock.rvn', 'library-instants.rvn'],
     'tests': ['docs/experiments/raven-target/verify_interface_library.py', 'tests/instant_clock.rs'],
@@ -216,32 +216,32 @@ result['targetProfileAdditions'] = [{
     'tests': ['docs/experiments/raven-target/verify_type_library.py', 'docs/experiments/raven-target/verify_introspection_namespace.py'],
     'note': 'TypeInfo queries use Raven bodies and checked runtime-service adapters. The handle factory remains internal; invocation is outside the descriptive API.'
 }, {
-    'file': 'runtime/raven/ParameterInfo.neoil',
+    'file': 'runtime/legacy/raven/ParameterInfo.neoil',
     'disposition': 'raven-authored-parameter-descriptor',
     'samples': ['library-reflection.rvn'],
     'tests': ['docs/experiments/raven-target/verify_parameter_info_library.py', 'docs/experiments/raven-target/verify_introspection_namespace.py'],
     'note': 'Six parameter snapshot readers are Raven-authored. The importer validates field order/types; runtime factories still produce snapshots. The inherited member hierarchy and its array copies are Raven-authored in Descriptors.rvn.'
 }, {
-    'file': 'runtime/raven/RuntimeContext.neoil',
+    'file': 'runtime/legacy/raven/RuntimeContext.neoil',
     'disposition': 'raven-authored-runtime-context',
     'samples': ['library-reflection.rvn', 'library-array-unified.rvn'],
     'tests': ['tests/raven_reflection.rs', 'docs/experiments/raven-target/verify_type_library.py'],
     'note': 'RuntimeContext exposes ExecutingAssembly and type lookup. Object.GetType returns TypeInfo; the old public Type class is retired. Descriptive queries do not construct described objects.'
 }, {
-    'file': 'runtime/raven/Map.neoil',
+    'file': 'runtime/legacy/raven/Map.neoil',
     'disposition': 'experimental-map-contracts-with-raven-implementation',
     'samples': ['library-maps.rvn'],
     'tests': ['tests/raven_collections.rs', 'docs/experiments/raven-target/verify_collection_capabilities.py'],
     'note': 'HashMap algorithms and Map/MutableMap contracts are authored in Raven. Private helpers retain visibility and all bodies are checked. Explicit equality/hash callbacks; no default comparer, removal or pair iteration. See docs/map-contracts.md.'
 }]
 result['targetProfileAdditions'] += [{
-    'file': 'runtime/raven/Descriptors.neoil',
+    'file': 'runtime/legacy/raven/Descriptors.neoil',
     'disposition': 'raven-authored-inherited-descriptors',
     'samples': ['library-reflection.rvn'],
     'tests': ['tests/raven_reflection.rs', 'docs/experiments/raven-target/verify_descriptor_library.py'],
     'note': 'Exact inherited snapshot storage, parameter-array copies and accessor visibility filtering; native factories retain ownership.'
 }, {
-    'file': 'runtime/raven/NativeMemory.neoil',
+    'file': 'runtime/legacy/raven/NativeMemory.neoil',
     'disposition': 'raven-authored-native-allocation-helpers',
     'samples': ['library-native-buffer.rvn'],
     'tests': ['tests/native_memory_api.rs', 'docs/experiments/raven-target/verify_native_library.py'],
@@ -253,10 +253,10 @@ result['targetProfileAdditions'] += [{
     'samples': ['library-query-terminals.rvn'],
     'tests': ['tests/query_terminals.rs', 'docs/experiments/raven-target/verify_queries.py'],
     'note': 'Operators, SingleError case/formatting bodies and private deferred iterator classes are authored in Raven with generated bootstrap bodies; First/Last return Option and Single returns Result with Empty/Multiple. Checked storage retains generic cached elements. Normal-outcome cleanup only. See docs/raven-query-api.md.'
-} for file in ('runtime/raven/Linq.neoil', 'runtime/raven/SingleError.neoil', 'runtime/System.Runtime/src/System.Runtime/System/Linq/Operators.rvn',
-                 'runtime/raven/generated/Linq.methods.neoil', 'runtime/raven/generated/Linq.helpers.neoil')]
+} for file in ('runtime/legacy/raven/Linq.neoil', 'runtime/legacy/raven/SingleError.neoil', 'runtime/System.Runtime/src/System.Runtime/System/Linq/Operators.rvn',
+                 'runtime/legacy/raven/generated/Linq.methods.neoil', 'runtime/legacy/raven/generated/Linq.helpers.neoil')]
 result['targetProfileAdditions'] += [{
-    'file': 'runtime/raven/' + name + '.neoil',
+    'file': 'runtime/legacy/raven/' + name + '.neoil',
     'disposition': 'raven-authored-existing-contract',
     'samples': samples,
     'tests': tests,

@@ -40,7 +40,7 @@ for repo, label in [(ROOT, 'neoCLR'), (raven, 'Raven')]:
     for license_file in [*repo.glob('LICENSE*'), *repo.glob('THIRD_PARTY_NOTICES*')]:
         if license_file.is_file():
             shutil.copy2(license_file, output / 'licenses' / (label + '-' + license_file.name))
-(output / 'lib/System.neoil').write_text(build(ROOT / 'runtime/System.neoil'))
+(output / 'lib/System.neoil').write_text(build(ROOT / 'runtime/legacy/bootstrap/System.neoil'))
 subprocess.run(['dotnet', str(output / 'tools/bridge/Probe.dll'), '--reference-core',
                 str(output / 'demo/NeoCLR.CoreProbe.dll')], check=True)
 shutil.copy2(source / 'samples/library-workflow.rvn', output / 'demo/Main.rvn')

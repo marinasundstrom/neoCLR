@@ -27,7 +27,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-introspection-') as temporary:
     (root / 'demo').mkdir()
     run([*bridge, '--reference-core', root / 'demo/NeoCLR.CoreProbe.dll'])
     system = root / 'System.neoil'
-    system.write_text(build(ROOT / 'runtime/System.neoil'))
+    system.write_text(build(ROOT / 'runtime/legacy/bootstrap/System.neoil'))
     project = root / 'Demo.rvnproj'
     project.write_text(f'''<Project>
   <PropertyGroup><NeoCLRRoot>{escape(str(root))}</NeoCLRRoot></PropertyGroup>

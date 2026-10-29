@@ -72,7 +72,7 @@ fn cli_compiles_and_loads_platform_runtime_library() {
             .as_nanos()
     ));
     let compiled = Command::new(binary)
-        .args(["assemble", "runtime/System.neoil"])
+        .args(["assemble", "runtime/legacy/bootstrap/System.neoil"])
         .arg(&path)
         .output()
         .unwrap();

@@ -31,10 +31,10 @@ def catalog(paths):
     return {body for path in paths for body in bodies(path.read_text())}
 
 
-generated = catalog((ROOT / 'runtime/raven/generated').glob('*.neoil'))
+generated = catalog((ROOT / 'runtime/legacy/raven/generated').glob('*.neoil'))
 native = {re.sub(r'System\.Type\b', 'System.Introspection.TypeInfo', body)
-          for body in catalog((ROOT / 'runtime/neoCLR').rglob('*.neoil'))}
-selected = list(bodies(build(ROOT / 'runtime/System.neoil')))
+          for body in catalog((ROOT / 'runtime/legacy/bootstrap/neoCLR').rglob('*.neoil'))}
+selected = list(bodies(build(ROOT / 'runtime/legacy/bootstrap/System.neoil')))
 unknown = [body.splitlines()[0] for body in selected if body not in generated | native]
 if unknown:
     raise SystemExit('Unowned Raven-profile bodies:\n' + '\n'.join(unknown))

@@ -42,7 +42,7 @@ def main():
     spec = importlib.util.spec_from_file_location('collection_library', ROOT / 'docs/experiments/raven-target/collection_library.py')
     library = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(library)
-    (staged / 'lib/System.neoil').write_text(library.build(ROOT / 'runtime/System.neoil'), encoding='utf-8')
+    (staged / 'lib/System.neoil').write_text(library.build(ROOT / 'runtime/legacy/bootstrap/System.neoil'), encoding='utf-8')
     shutil.copytree(ROOT / 'examples/preview', staged / 'samples/neoil')
     shutil.copytree(ROOT / 'third-party', staged / 'third-party')
     for source in ('LICENSE', 'THIRD_PARTY_NOTICES.md'):

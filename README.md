@@ -124,7 +124,7 @@ for exact-commit platform evidence. Dependencies must be downloaded on the first
 build; the commands use Cargo.lock through `--locked`.
 
 The assembler and interpreter are built together as the `neoclr` executable.
-The bundled `runtime/System.neoil` library is assembled automatically; it does not
+The bundled `runtime/legacy/bootstrap/System.neoil` library is assembled automatically; it does not
 need a separate build for normal sample execution.
 
 ### Quick start
@@ -192,14 +192,14 @@ budget (default 65,536); `--array-bytes 268435456` adjusts its logical payload
 byte budget (default 16 MiB). Other limits stay unchanged.
 See [execution-budget options](docs/cli-module-sets.md#explicit-run-instruction-budget-development).
 
-### Build the runtime library explicitly (optional)
+### Build the legacy bootstrap library explicitly (optional)
 
-The runtime sources are organized by namespace under `runtime/System/` and
-`runtime/neoCLR/Runtime/`. `runtime/System.neoil` is the ordered source manifest;
+The historical bootstrap fixtures are organized by namespace under `runtime/legacy/bootstrap/System/` and
+`runtime/legacy/bootstrap/neoCLR/Runtime/`. `runtime/legacy/bootstrap/System.neoil` is the ordered source manifest;
 its included files assemble into one System module. Cargo bundles those same files.
 
 ```sh
-cargo run --locked -- assemble runtime/System.neoil System.neo.json
+cargo run --locked -- assemble runtime/legacy/bootstrap/System.neoil System.neo.json
 cargo run --locked -- run hello.neo.json --execution interpreter --system System.neo.json
 ```
 
@@ -333,7 +333,7 @@ By default, the executable embeds the library source and assembles/caches it onc
 It can also use an explicitly compiled System artifact:
 
 ```sh
-cargo run -- assemble runtime/System.neoil System.neo.json
+cargo run -- assemble runtime/legacy/bootstrap/System.neoil System.neo.json
 cargo run -- run examples/hello.neoil --execution interpreter System.neo.json
 ```
 
@@ -367,7 +367,7 @@ See [module sets](docs/module-sets.md) and [runtime library design](docs/runtime
 - Frame-owned aggregate copying and explicit heap allocation/sharing.
 - A line-oriented assembler with quoted strings, labels, source-line diagnostics,
   and forward function/type references.
-- A platform-written [System library](runtime/System.neoil): overloaded
+- A platform-written [System library](runtime/legacy/bootstrap/System.neoil): overloaded
   `System.Console.WriteLine`, `System.Int32.Parse`, `System.Int32.Divide`, and
   `System.Math.Abs`, plus instance `Int32.ToString()`, assembled into the same metadata/IL representation as apps.
 - Explicit `.pinvoke` imports with dynamic library loading and scalar/pointer C-ABI calls.

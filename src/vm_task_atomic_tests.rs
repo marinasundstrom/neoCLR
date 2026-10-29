@@ -6,35 +6,35 @@ pub(super) fn library() -> Module {
         ".module System\n.type class abstract System.Object\n.method instance virtual ToString() -> String\nfault \"Object formatting is outside the task fixture\"\n.end\n.end\n",
     );
     for path in [
-        "runtime/System/Runtime/CompilerServices/UnionAttribute.neoil",
-        "runtime/neoCLR/Runtime/EnumInspection.neoil",
-        "runtime/neoCLR/Runtime/StringConcat.neoil",
-        "runtime/raven/generated/Propagatable.methods.neoil",
-        "runtime/raven/generated/Propagatable.helpers.neoil",
-        "runtime/raven/EquatableTo.neoil",
-        "runtime/raven/UnionProtocol.neoil",
-        "runtime/raven/Tasks.neoil",
-        "runtime/raven/ArrayList.neoil",
-        "runtime/raven/CollectionContracts.neoil",
-        "runtime/raven/List.neoil",
-        "runtime/raven/Iterable.neoil",
-        "runtime/raven/generated/Optional.methods.neoil",
-        "runtime/raven/generated/Optional.helpers.neoil",
-        "runtime/raven/generated/Result.methods.neoil",
-        "runtime/raven/generated/Result.helpers.neoil",
-        "runtime/raven/TaskOutcome.neoil",
-        "runtime/raven/TaskState.neoil",
-        "runtime/raven/Disposable.neoil",
-        "runtime/raven/Iterator.neoil",
-        "runtime/neoCLR/Runtime/Tasks.neoil",
-        "runtime/System/Fault.neoil",
-        "runtime/neoCLR/Runtime/Fault.neoil",
+        "runtime/legacy/bootstrap/System/Runtime/CompilerServices/UnionAttribute.neoil",
+        "runtime/legacy/bootstrap/neoCLR/Runtime/EnumInspection.neoil",
+        "runtime/legacy/bootstrap/neoCLR/Runtime/StringConcat.neoil",
+        "runtime/legacy/raven/generated/Propagatable.methods.neoil",
+        "runtime/legacy/raven/generated/Propagatable.helpers.neoil",
+        "runtime/legacy/raven/EquatableTo.neoil",
+        "runtime/legacy/raven/UnionProtocol.neoil",
+        "runtime/legacy/raven/Tasks.neoil",
+        "runtime/legacy/raven/ArrayList.neoil",
+        "runtime/legacy/raven/CollectionContracts.neoil",
+        "runtime/legacy/raven/List.neoil",
+        "runtime/legacy/raven/Iterable.neoil",
+        "runtime/legacy/raven/generated/Optional.methods.neoil",
+        "runtime/legacy/raven/generated/Optional.helpers.neoil",
+        "runtime/legacy/raven/generated/Result.methods.neoil",
+        "runtime/legacy/raven/generated/Result.helpers.neoil",
+        "runtime/legacy/raven/TaskOutcome.neoil",
+        "runtime/legacy/raven/TaskState.neoil",
+        "runtime/legacy/raven/Disposable.neoil",
+        "runtime/legacy/raven/Iterator.neoil",
+        "runtime/legacy/bootstrap/neoCLR/Runtime/Tasks.neoil",
+        "runtime/legacy/bootstrap/System/Fault.neoil",
+        "runtime/legacy/bootstrap/neoCLR/Runtime/Fault.neoil",
     ] {
         source.push_str(&crate::source::read_source(path).unwrap());
         source.push('\n');
     }
     // Import only the real Concat implementation needed by generated diagnostics.
-    let strings = include_str!("../runtime/raven/generated/String.bootstrap.methods.neoil");
+    let strings = include_str!("../runtime/legacy/raven/generated/String.bootstrap.methods.neoil");
     let concat = strings
         .split(".method static Concat(")
         .nth(1)

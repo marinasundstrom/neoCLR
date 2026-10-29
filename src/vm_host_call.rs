@@ -367,7 +367,7 @@ mod tests {
     fn service(name: &str) -> crate::metadata::Function {
         let module = crate::assemble(&format!(
             ".module System\n{}",
-            include_str!("../runtime/neoCLR/Runtime/FileStreams.neoil")
+            include_str!("../runtime/legacy/bootstrap/neoCLR/Runtime/FileStreams.neoil")
         ))
         .unwrap();
         module

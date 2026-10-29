@@ -226,11 +226,11 @@ ret
 fn bundled_gc_facade_matches_canonical_service_returns() {
     let module = assemble(concat!(
         ".module App\n.entry Main\n.type class System.Object\n.end\n",
-        include_str!("../runtime/neoCLR/Runtime/GC.neoil"),
+        include_str!("../runtime/legacy/bootstrap/neoCLR/Runtime/GC.neoil"),
         ".type System.Runtime.GC\n",
-        include_str!("../runtime/raven/generated/GC.methods.neoil"),
+        include_str!("../runtime/legacy/raven/generated/GC.methods.neoil"),
         ".end\n",
-        include_str!("../runtime/raven/generated/GC.helpers.neoil"),
+        include_str!("../runtime/legacy/raven/generated/GC.helpers.neoil"),
         ".function Main() -> Int32\n.local System.Object empty\nldloca empty\ninitobj System.Object\nldc.i4 42\nheap.new\ncall System.Runtime.GC::Collect()\nldloc empty\ncall System.Runtime.GC::KeepAlive(System.Object)\nldobj Int32\nret\n.end"
     )).unwrap();
     let program = LoadedProgram::new(&module).unwrap();

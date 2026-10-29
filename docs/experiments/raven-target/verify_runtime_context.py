@@ -29,7 +29,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-runtime-context-') as temporary:
     (root / 'demo').mkdir()
     run([*bridge, '--reference-core', root / 'demo/NeoCLR.CoreProbe.dll'])
     system = root / 'System.neoil'
-    system.write_text(build(ROOT / 'runtime/System.neoil'))
+    system.write_text(build(ROOT / 'runtime/legacy/bootstrap/System.neoil'))
     files = ['TypeInfo', 'MemberInfo', 'FieldInfo', 'RuntimeTypeInfo', 'RuntimeFieldInfo', 'RuntimeContext', 'ContextSample']
     for name in files:
         text = (source / (name + '.rvn')).read_text()

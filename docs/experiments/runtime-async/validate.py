@@ -29,7 +29,7 @@ expected = ({'language': 'PASS Raven runtime async language support', 'gc': 'PAS
             else 'PASS runtime-owned operation suspension and resumption')
 sources = [source]
 if args.runtime_await:
-    sources.append(Path(__file__).resolve().parents[3] / 'runtime/raven/compiler-services/RuntimeAwait.rvn')
+    sources.append(Path(__file__).resolve().parents[3] / 'runtime/compiler-services/RuntimeAwait.rvn')
 compiler = args.compiler.resolve() if args.compiler else bundle / 'sdk/tools/rvnc/rvnc.dll'
 compiler_inputs = [compiler, *(compiler.parent / name for name in [
     'Raven.CodeAnalysis.dll', 'Raven.CodeAnalysis.NeoClr.dll', 'NeoCLR.Metadata.Experimental.dll'])]

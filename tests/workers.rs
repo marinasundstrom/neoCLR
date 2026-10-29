@@ -6,7 +6,7 @@ fn library() -> &'static neoclr::Module {
     LIBRARY.get_or_init(|| {
         let output = std::process::Command::new("python3")
             .current_dir(env!("CARGO_MANIFEST_DIR"))
-            .args(["-c", "import runpy; m=runpy.run_path('docs/experiments/raven-target/collection_library.py'); print(m['build'](m['ROOT'] / 'runtime/System.neoil'))"])
+            .args(["-c", "import runpy; m=runpy.run_path('docs/experiments/raven-target/collection_library.py'); print(m['build'](m['ROOT'] / 'runtime/legacy/bootstrap/System.neoil'))"])
             .output().unwrap();
         assert!(output.status.success());
         assemble(std::str::from_utf8(&output.stdout).unwrap()).unwrap()
@@ -644,7 +644,7 @@ fn no_result_worker_notification_dispatches_without_a_stack_result() {
     let types = NOTIFY_TYPES;
     let services = neoclr::assemble(concat!(
         ".module WorkerServices\n",
-        include_str!("../runtime/neoCLR/Runtime/Workers.neoil")
+        include_str!("../runtime/legacy/bootstrap/neoCLR/Runtime/Workers.neoil")
     ))
     .unwrap();
     let service = services

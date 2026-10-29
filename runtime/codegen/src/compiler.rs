@@ -86,6 +86,7 @@ pub(super) fn compile_for_target_with_imports(
     native_imports: bool,
     verification: Option<&neoclr::LoadedProgram>,
 ) -> Result<Vec<u8>, Error> {
+    reject_panic_cleanup(input)?;
     if native_imports && (target != Target::MacosArm64 || details.is_some()) {
         return Err("native imports currently require the macOS ARM64 scalar AOT profile".into());
     }
@@ -1087,5 +1088,25 @@ pub(super) fn prepare_calls(context: &mut cranelift_codegen::Context, long_range
         for function in context.func.dfg.ext_funcs.values_mut() {
             function.colocated = false;
         }
+    }
+}
+
+pub(crate) fn reject_panic_cleanup(input: &neoclr::Module) -> Result<(), Error> {
+    if input.functions.iter().any(|function| function.body.iter().any(|op|
+        matches!(op, Op::CleanupPush(_) | Op::CleanupPop | Op::CleanupEnd))) {
+        return Err("synchronous panic cleanup currently requires interpreter execution".into());
+    }
+    Ok(())
+}
+
+#[cfg(test)]
+mod panic_cleanup_tests {
+    #[test]
+    fn native_backends_reject_panic_cleanup_until_lowering_is_supported() {
+        let input = neoclr::assemble(".module PanicTest\n.entry Main\n.function Main() -> void\ncleanup.push Handler\nfault \"panic\"\nHandler:\ncleanup.end\n.end").unwrap();
+        let scalar = super::compile(&input, "Main", false, None).unwrap_err();
+        assert!(scalar.to_string().contains("requires interpreter"));
+        let values = crate::values::compile(&input, "Main", None, crate::Target::MacosArm64).unwrap_err();
+        assert!(values.to_string().contains("requires interpreter"));
     }
 }

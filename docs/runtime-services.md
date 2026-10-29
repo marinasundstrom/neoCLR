@@ -195,7 +195,7 @@ See [shared provider design and validation](shared-security-provider.md).
 ## TLS ownership services (development, 2026-10-12)
 
 The interpreter recognizes the exact private declarations in
-[runtime/neoCLR/Runtime/Tls.neoil](../runtime/neoCLR/Runtime/Tls.neoil). They create
+[runtime/legacy/bootstrap/neoCLR/Runtime/Tls.neoil](../runtime/legacy/bootstrap/neoCLR/Runtime/Tls.neoil). They create
 client/server configuration and session resources, release them or abort a session.
 `Tls` capability use also requires ManagedArrays and ManagedHeap. Guest owner tokens
 are empty managed byte arrays validated against the current heap; raw provider handles

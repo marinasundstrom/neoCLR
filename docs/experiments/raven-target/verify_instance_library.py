@@ -98,7 +98,7 @@ ret
 .end
 ''')
     system = root / 'System.neoil'
-    system.write_text(build(ROOT / 'runtime/System.neoil'))
+    system.write_text(build(ROOT / 'runtime/legacy/bootstrap/System.neoil'))
     run([runtime, 'verify', application, '--system', system])
     assert run([runtime, 'run', application, '--system', system]).splitlines() == ['42', '99']
     for name, invalid, diagnostic in [

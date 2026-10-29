@@ -300,7 +300,7 @@ Format 4 removes some/none/ok/err/is.case/ldcase and the special Optional/Result
 
 ## Runtime library contracts
 
-These are ordinary functions compiled from [System.neoil](../runtime/System.neoil).
+These are ordinary functions compiled from [System.neoil](../runtime/legacy/bootstrap/System.neoil).
 
 | Symbol | Parameters | Return |
 | --- | --- | --- |

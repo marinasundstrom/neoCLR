@@ -21,7 +21,7 @@ bridge = args.bridge.resolve()
 runtime = args.runtime.resolve()
 core = root / "api-docs/reference/NeoCLR.CoreProbe.dll"
 system = output / "System.Collections.neoil"
-system.write_text(build(root / "runtime/System.neoil"))
+system.write_text(build(root / "runtime/legacy/bootstrap/System.neoil"))
 expected_outputs = {
     "application-interfaces": "42\n99\n",
     "application-inheritance": "7\n42\n",
