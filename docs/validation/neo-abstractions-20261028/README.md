@@ -1,4 +1,4 @@
-# Neo abstraction assemblies and integrated sample — 2026-10-28
+# Neo abstraction assemblies and integrated sample — 2026-10-28–29
 
 Author-directed second slice; verification is focused rather than a full suite.
 
@@ -32,3 +32,14 @@ proposed in-memory fallback was rejected by the author; the final sample retains
 file-backed resources and the native selection/projection fix is included.
 
 Commands to build and run the sample are in its [README](../../../samples/extensions/README.md).
+
+Final completion (2026-10-29): the normal native project build passed and the
+JSON-backed executable exited 0, printing:
+
+```text
+info: Examples.Extensions.GreetingService[0] Hej Ada! Logging and localization are composed through DI.
+```
+
+See [sample evidence](sample.json). The compiler bridge fix is committed in Raven
+`34f14c8ce`; the implementation is committed in neoCLR `c9289d551` with formatting follow-up
+`4c303ef7c`.

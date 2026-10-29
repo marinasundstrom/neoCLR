@@ -1,0 +1,94 @@
+{
+  "completed": "2026-10-29",
+  "compilerRevision": "34f14c8ce",
+  "buildOutput": "target/extensions-demo",
+  "buildCommands": [
+    {
+      "phase": "toolchain",
+      "exitCode": 0
+    },
+    {
+      "phase": "toolchain",
+      "exitCode": 0
+    },
+    {
+      "phase": "toolchain",
+      "exitCode": 0
+    },
+    {
+      "phase": "source-compilation",
+      "exitCode": 0
+    },
+    {
+      "phase": "toolchain",
+      "exitCode": 0
+    },
+    {
+      "phase": "toolchain",
+      "exitCode": 0
+    },
+    {
+      "phase": "toolchain",
+      "exitCode": 0
+    },
+    {
+      "phase": "toolchain",
+      "exitCode": 0
+    },
+    {
+      "phase": "toolchain",
+      "exitCode": 0
+    },
+    {
+      "phase": "toolchain",
+      "exitCode": 0
+    },
+    {
+      "phase": "toolchain",
+      "exitCode": 0
+    },
+    {
+      "phase": "toolchain",
+      "exitCode": 0
+    },
+    {
+      "phase": "toolchain",
+      "exitCode": 0
+    },
+    {
+      "phase": "toolchain",
+      "exitCode": 0
+    },
+    {
+      "phase": "toolchain",
+      "exitCode": 0
+    },
+    {
+      "phase": "toolchain",
+      "exitCode": 0
+    },
+    {
+      "phase": "native-compilation",
+      "exitCode": 0
+    },
+    {
+      "phase": "native-kernel-build",
+      "exitCode": 0
+    },
+    {
+      "phase": "host-compile-link",
+      "exitCode": 0
+    },
+    {
+      "phase": "dependency-check",
+      "exitCode": 0
+    }
+  ],
+  "executableSha256": "f65689e0ffcb534b2ff48c3c3168b8cfa515d89f07c55a55657e1bb2eeda81f1",
+  "run": {
+    "cwd": "samples/extensions",
+    "command": "../../target/extensions-demo/app",
+    "exitCode": 0,
+    "stdout": "info: Examples.Extensions.GreetingService[0] Hej Ada! Logging and localization are composed through DI.\n"
+  }
+}

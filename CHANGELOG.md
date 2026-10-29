@@ -6,6 +6,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-10-29
+
+- Complete qualification of the Neo abstraction split and integrated DI/logging/localization sample: the JSON-backed native app exits successfully with the expected typed-service greeting. Record focused compiler, interface-projection, layout and API snapshot evidence; preserve boxed dispatch while omitting unreachable unboxed value interface views.
+
 ### 2026-10-28
 
 - Extract Neo.DependencyInjection.Abstractions, Neo.Logging.Abstractions and Neo.Localization.Abstractions as sibling projects, keeping namespaces and moving implementation dependencies onto contracts. Add an integrated DI/logging/localization sample and an abstractions-only consumer. Preserve nested callback nullability across native assembly imports with Raven `34f14c8ce`; rebuild consumers for the new assembly identities (no type forwarders). Remove the native compiler/linker’s eight-module cap so the split bundle can link; align unboxed value interface views with final reachable boxing so file-backed localization composes with console logging. Refresh API ownership and documentation.

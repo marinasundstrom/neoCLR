@@ -23463,3 +23463,13 @@ source-wide boxing discovery and final reachable interface metadata. The assista
 proposed an in-memory localizer to keep the slice bounded; the author asked,
 “Can't you fix the gap?” The assistant restored the JSON-backed sample and pursued
 a native selection fix, with a focused regression covering unreachable boxing.
+
+## 2026-10-29 — Extension abstraction slice completed
+
+The author directed the assistant to finish the work. The final JSON-backed
+sample passed native compilation and exited successfully, resolving typed logging
+and localization through DI. The native fix now removes executable interface
+views for values that are never boxed in reachable code, preserving source
+conformance and actual boxed dispatch. Focused compiler, layout and API snapshot
+checks passed; broad suites and a full website build were not repeated. See the
+[qualification record](validation/neo-abstractions-20261028/README.md).
