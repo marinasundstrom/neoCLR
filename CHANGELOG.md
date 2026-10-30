@@ -25,7 +25,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Refreshed macOS five-round workload measurements pass on a loaded development
   host, without a controlled performance claim. The refreshed Windows package, editor
   and HTTPS gates pass; updated standalone console fixtures and Windows measurements
-  remain under qualification before publication.
+  remain under qualification before publication. Plan applicable Python behavior-fixture
+  migration to `NeoClr.Testing` after release, as explicitly directed; this migration
+  is deferred and is not part of current release-harness repairs.
 
 - Support nominal value-type parameter defaults, including CancellationToken = default,
   through native and CLI metadata. Consolidate runtime stream, socket, DNS, TLS and
