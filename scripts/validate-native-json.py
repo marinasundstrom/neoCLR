@@ -22,9 +22,12 @@ sha = common.sha
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--packaged-tools', action='store_true', help='Use verified runtime/backend roles from --bundle')
     parser.add_argument('--bundle', type=Path, help='Required on macOS; Windows rebuilds the pinned bundle libraries')
     parser.add_argument('--case', choices=['introspection', 'json'], help='Run one focused consumer; default runs both')
     args = parser.parse_args()
+    if args.packaged_tools and not args.bundle:
+        parser.error('--packaged-tools requires --bundle')
     out = args.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
     report = dict(passed=False, platform=platform.platform(), cases=[], commands=[])
@@ -71,11 +74,20 @@ def main():
         else:
             raise ValueError('--bundle is required on macOS')
         report['bundleManifestSha256'] = sha(bundle / 'manifest.json')
-        run(['cargo', 'build', '--locked', '--manifest-path', ROOT / 'runtime/codegen/Cargo.toml'], 'aot-build')
-        aot = ROOT / ('target/debug/neoclr-codegen' + ('.exe' if windows else ''))
+        if args.packaged_tools:
+            manifest = json.loads((bundle / 'manifest.json').read_text())
+            builder = common.load('json_builder', ROOT / 'scripts/build-native-project.py')
+            builder.verify_files(bundle, manifest['files'])
+            roles = [manifest['runtime'], manifest['jit']['compiler']]
+            if any(role not in manifest['files'] for role in roles):
+                raise ValueError('Uncatalogued runtime/backend role')
+            runtime, aot = [bundle / role for role in roles]
+        else:
+            run(['cargo', 'build', '--locked', '--manifest-path', ROOT / 'runtime/codegen/Cargo.toml'], 'aot-build')
+            aot = ROOT / ('target/debug/neoclr-codegen' + ('.exe' if windows else ''))
+            run(['cargo', 'build', '--locked', '--release', '--bin', 'neoclr'], 'interpreter-build')
+            runtime = ROOT / ('target/release/neoclr' + ('.exe' if windows else ''))
         report['aotSha256'] = sha(aot)
-        run(['cargo', 'build', '--locked', '--release', '--bin', 'neoclr'], 'interpreter-build')
-        runtime = ROOT / ('target/release/neoclr' + ('.exe' if windows else ''))
         report['interpreterSha256'] = sha(runtime)
         for name, sample, expected in samples:
             project = out / (name + ' project with spaces')

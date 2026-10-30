@@ -18,6 +18,9 @@ on:
       - 'scripts/build-native-project.py'
       - 'scripts/validate-windows-project.py'
       - 'scripts/validate-native-client-project.py'
+      - 'scripts/validate-native-json.py'
+      - 'scripts/test-runtime-library.py'
+      - 'docs/experiments/native-cryptography/**'
       - '.github/workflows/windows-native-project.yml'
   pull_request:
     paths:
@@ -31,6 +34,9 @@ on:
       - 'scripts/build-native-project.py'
       - 'scripts/validate-windows-project.py'
       - 'scripts/validate-native-client-project.py'
+      - 'scripts/validate-native-json.py'
+      - 'scripts/test-runtime-library.py'
+      - 'docs/experiments/native-cryptography/**'
       - '.github/workflows/windows-native-project.yml'
 permissions:
   contents: read
@@ -98,6 +104,18 @@ jobs:
           if (!$vs) { throw 'MSVC x64 tools not found' }
           cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-client-project.py --bundle target/qualified/neoclr-native-poc --packaged-tools --output target/windows-client-validation"
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Qualify changed library consumers with packaged tools
+        shell: pwsh
+        run: |
+          $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          if (!$vs) { throw 'MSVC x64 tools not found' }
+          $bundle = 'target/qualified/neoclr-native-poc'
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python docs/experiments/native-cryptography/validate-project.py --bundle $bundle --aot $bundle/bin/neoclr-codegen.exe --output target/windows-contract-validation/cryptography"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-json.py --bundle $bundle --packaged-tools --case json --output target/windows-contract-validation/json"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          python scripts/test-runtime-library.py --suite http-content-copy --mode interpreter --bundle $bundle --runtime $bundle/bin/neoclr.exe --aot $bundle/bin/neoclr-codegen.exe --output target/windows-contract-validation/content-copy
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -105,6 +123,7 @@ jobs:
           path: |
             target/windows-project-validation/
             target/windows-client-validation/
+            target/windows-contract-validation/
             target/qualification/package-run.json
           retention-days: 14
           if-no-files-found: warn

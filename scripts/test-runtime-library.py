@@ -856,7 +856,11 @@ def main():
             repeated_executions = [(repetition, *execution) for repetition in range(1, args.execution_repetitions + 1) for execution in executions]
             for repetition, mode, command, cwd, environment in repeated_executions:
                 started = time.perf_counter()
-                result = subprocess.run(list(map(str, command)), cwd=cwd, env=environment, capture_output=True, timeout=600 if name in ("http-text", "gzip") else 180)
+                # Content-copy includes the same 65,537-byte text-quota boundary
+                # as the large text suite; interpreter byte loops need its budget.
+                timeout = 600 if (name in ("http-text", "gzip")
+                                  or (name == "http-content-copy" and mode == "interpreter")) else 180
+                result = subprocess.run(list(map(str, command)), cwd=cwd, env=environment, capture_output=True, timeout=timeout)
                 record = dict(suite=name, mode=mode, repetition=repetition, exitCode=result.returncode,
                               elapsedSeconds=round(time.perf_counter() - started, 3),
                               stdout=result.stdout.decode('utf-8').replace('\r\n', '\n'),

@@ -36,6 +36,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   HTTP-client package checks select catalogued runtime/backend tools and the shared process helper.
   Refresh the standalone cryptography consumer to public slice APIs; qualify the expanded JSON
   corpus with HTTP host bindings while documenting the remaining minimal-host retention gap.
+  Give the interpreter content-copy quota probe the established large-text timeout budget.
+  Include pinned Raven upstream license/notice texts and audit their presence in native bundles.
   Record passing macOS package, editor, HTTPS, async, header, PostgreSQL and build-kit
   checks; native network/GC and runtime-product integration pass on both target hosts.
   Refreshed macOS five-round workload measurements pass on a loaded development

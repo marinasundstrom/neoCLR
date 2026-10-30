@@ -20,3 +20,8 @@ Ship this directory with the runtime bundle and as a companion attribution archi
 when distributing the separate SDK/VSIX. Their existing package layouts omit some of
 these notices. Retain neoCLR's root notices and third-party tree for the Rust runtime.
 A changed dependency graph must be reviewed and this inventory updated before release.
+
+Raven's own MIT license and upstream notices are preserved under
+[`upstream/raven`](upstream/raven/source.json), with exact source revision and text
+hashes. Native bundle notice refresh includes these files alongside the dependency
+notices. Separate SDK/VSIX assets still require their companion attribution archive.

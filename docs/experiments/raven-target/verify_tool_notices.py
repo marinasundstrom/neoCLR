@@ -25,4 +25,20 @@ for package in manifest['packages']:
         path = (root / notice['path']).resolve()
         if root not in path.parents or hashlib.sha256(path.read_bytes()).hexdigest() != notice['sha256']:
             raise SystemExit('Invalid notice: ' + notice['path'])
-print(f'{len(seen)} NuGet dependencies covered; all {len(manifest["packages"])} package notice sets verified')
+upstream_root = root / 'third-party/raven-tools/upstream/raven'
+upstream = json.loads((upstream_root / 'source.json').read_text())
+for name, expected in upstream['files'].items():
+    path = (upstream_root / name).resolve()
+    if upstream_root not in path.parents or hashlib.sha256(path.read_bytes()).hexdigest() != expected:
+        raise SystemExit('Invalid Raven upstream notice: ' + name)
+bundle_manifest = args.tools / 'manifest.json'
+if bundle_manifest.is_file():
+    bundle = json.loads(bundle_manifest.read_text())
+    if bundle.get('format') == 'neoclr-native-poc-v1':
+        for name in ('source.json', *upstream['files']):
+            relative = 'third-party/raven-tools/upstream/raven/' + name
+            expected = hashlib.sha256((upstream_root / name).read_bytes()).hexdigest()
+            path = args.tools / relative
+            if bundle['files'].get(relative) != expected or not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != expected:
+                raise SystemExit('Missing or mismatched bundled Raven upstream notice: ' + relative)
+print(f'{len(seen)} NuGet dependencies covered; all {len(manifest["packages"])} package notice sets and Raven upstream notices verified')

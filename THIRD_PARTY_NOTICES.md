@@ -220,3 +220,11 @@ Interpreter-only package builds do not link Cranelift.
 | wasmtime-jit-icache-coherence | 34.0.2 | Apache-2.0 WITH LLVM-exception | [CRANELIFT-LICENSE](tools/aot-poc/CRANELIFT-LICENSE) |
 | wasmtime-math | 34.0.2 | Apache-2.0 WITH LLVM-exception | [CRANELIFT-LICENSE](tools/aot-poc/CRANELIFT-LICENSE) |
 | windows-sys | 0.59.0 | MIT OR Apache-2.0 | [license-apache-2.0](third-party/licenses/windows-sys-0.59.0/license-apache-2.0), [license-mit](third-party/licenses/windows-sys-0.59.0/license-mit) |
+
+## Bundled experimental Raven tools
+
+Binary toolchain bundles also contain Raven compiler/language-server code and its
+reviewed tool dependencies. See [toolchain attribution](third-party/raven-tools/README.md),
+including [Raven's MIT license](third-party/raven-tools/upstream/raven/LICENSE) and
+[upstream notices](third-party/raven-tools/upstream/raven/THIRD-PARTY-NOTICES.txt).
+The pinned source revision and text hashes accompany those files.
